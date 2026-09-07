@@ -30,3 +30,12 @@
 .dark {
   background-color: #b58863;
 }
+
+.error {
+  color: red;
+}
+
+.check {
+  background-color: #e74c3c !important;
+  box-shadow: inset 0 0 15px rgba(255, 0, 0, 0.7);
+}
