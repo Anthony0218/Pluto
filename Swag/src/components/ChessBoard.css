@@ -1,14 +1,3 @@
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-}
-
-main {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
 .chess-board {
   width: 640px;
   height: 640px;
@@ -18,9 +7,20 @@ main {
   grid-template-rows: repeat(8, 1fr);
 }
 
+.selected {
+  outline: 4px solid black;
+  outline-offset: -4px;
+}
+
 .square {
   width: 80px;
   height: 80px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-size: 60px;
 }
 
 .light {

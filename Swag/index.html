@@ -7,7 +7,71 @@
     <title>keineahnung</title>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <div id="root">
+    <table>
+      <tr>
+        <th>♥️</th>
+        <th>♠️</th>
+        <th>♣️</th>
+        <th>♦️</th>
+      </tr>
+      <tr>
+        <td class="card">A</td> //objekt orientiert
+        <td>A</td>
+        <td>A</td>
+        <td>A</td>
+      </tr>
+      <tr>
+        <td>K</td>
+        <td>K</td>
+        <td>K</td>
+        <td>K</td>
+      </tr>
+      <tr>
+        <td>O</td>
+        <td>O</td>
+        <td>O</td>
+        <td>O</td>
+      </tr>
+      <tr>
+        <td>U</td>
+        <td>U</td>
+        <td>U</td>
+        <td>U</td>
+      </tr>
+      <tr>
+        <td>10</td>
+        <td>10</td>
+        <td>10</td>
+        <td>10</td>
+      </tr>
+      <tr>
+        <td>9</td>
+        <td>9</td>
+        <td>9</td>
+        <td>9</td>
+      </tr>
+      <tr>
+        <td>8</td>
+        <td>8</td>
+        <td>8</td>
+        <td>8</td>
+      </tr>
+      <tr>
+        <td>7</td>
+        <td>7</td>
+        <td>7</td>
+        <td>7</td>
+      </tr>
+    </table>
+    <button onclick="randomize(52)"
+    </div>
+    <script type="module" src="/src/main.tsx">
+      function randomize(x:number, y:number) {
+        math.random(7,13)
+        //x cards for y players, x*y = 52 when full
+        //52-x*y cards overflow ("Bürgerkarten")
+      }
+    </script>
   </body>
 </html>
