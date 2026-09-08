@@ -1,7 +1,18 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Chess, type Square } from "chess.js";
 import "./ChessBoard.css";
 import { supabase } from "../lib/supabase";
+import { getSquareName, getReadableMove } from "../utils/chessUtils";
+import { useStockfish } from "../hooks/useStockfish.ts";
+import Board from "./Board.tsx";
+import CapturedPieces from "./CapturedPieces.tsx";
+import type { PieceType } from "../utils/chessUtils.ts";
+import {
+  playPieceSelectSound,
+  playPieceMoveSound,
+  playPieceCaptureSound,
+  playRandomSound,
+} from "../utils/sound.ts";
 
 type SavedGame = {
   id: string;
@@ -15,21 +26,6 @@ type SavedGame = {
   black_check_counter: number;
 };
 
-const pieceSymbols = {
-  wp: "♙",
-  wn: "♘",
-  wb: "♗",
-  wr: "♖",
-  wq: "♕",
-  wk: "♔",
-
-  bp: "♟",
-  bn: "♞",
-  bb: "♝",
-  br: "♜",
-  bq: "♛",
-  bk: "♚",
-};
 const pieceValues: Record<string, number> = {
   p: 1,
   n: 3,
@@ -49,131 +45,22 @@ const pieceValueList = [
 
 export default function ChessBoard() {
   useEffect(() => {
-    loadSavedGames();
+    analyzePosition(game.fen(), "position");
   }, []);
-  const stockfish = useRef<Worker | null>(null);
-  const beforeMoveEvaluation = useRef<number | null>(null);
-  const afterMoveEvaluation = useRef<number | null>(null);
-  const playerMoveColor = useRef<"w" | "b" | null>(null);
-  const analysisType = useRef<"before" | "after" | "position" | null>(null);
-  const currentAnalysisFen = useRef<string | null>(null);
-  const analysisId = useRef(0);
+
+  const {
+    evaluation,
+    bestMove,
+    moveRating,
+    analyzePosition,
+    setPlayerMoveColor,
+    clearMoveAnalysis,
+    resetAnalysis,
+  } = useStockfish();
 
   useEffect(() => {
     analyzePosition(game.fen(), "before");
   }, []);
-
-  useEffect(() => {
-    const worker = new Worker("/stockfish/stockfish-18-lite-single.js");
-
-    stockfish.current = worker;
-
-    worker.onmessage = (event) => {
-      const message = event.data as string;
-
-      console.log("Stockfish:", message);
-
-      if (message.startsWith("info") && message.includes("score cp")) {
-        const match = message.match(/score cp (-?\d+)/);
-
-        if (!match) {
-          return;
-        }
-
-        const depthMatch = message.match(/depth (\d+)/);
-
-        if (!depthMatch) {
-          return;
-        }
-
-        const depth = Number(depthMatch[1]);
-
-        if (depth < 15) {
-          return;
-        }
-
-        const centipawns = Number(match[1]);
-        const score = centipawns / 100;
-
-        if (analysisType.current === "position") {
-          setEvaluation(score);
-
-          // This is the position immediately before
-          // the player's move.
-          beforeMoveEvaluation.current = score;
-        }
-
-        if (analysisType.current === "after") {
-          afterMoveEvaluation.current = score;
-          setEvaluation(score);
-        }
-      }
-
-      if (message.startsWith("bestmove")) {
-        const move = message.split(" ")[1];
-
-        if (move) {
-          setBestMove(move);
-        }
-
-        if (
-          analysisType.current === "after" &&
-          beforeMoveEvaluation.current !== null &&
-          afterMoveEvaluation.current !== null &&
-          playerMoveColor.current !== null
-        ) {
-          const rating = getMoveRating(
-            beforeMoveEvaluation.current,
-            afterMoveEvaluation.current,
-            playerMoveColor.current,
-          );
-
-          console.log(
-            "BEFORE:",
-            beforeMoveEvaluation.current,
-            "AFTER:",
-            afterMoveEvaluation.current,
-            "COLOR:",
-            playerMoveColor.current,
-            "RATING:",
-            rating,
-          );
-
-          setMoveRating(rating);
-
-          beforeMoveEvaluation.current = afterMoveEvaluation.current;
-        }
-
-        analysisType.current = null;
-      }
-    };
-
-    worker.postMessage("uci");
-
-    return () => {
-      worker.terminate();
-    };
-  }, []);
-
-  function analyzePosition(fen: string, type: "before" | "after" | "position") {
-    if (!stockfish.current) {
-      return;
-    }
-
-    analysisType.current = type;
-
-    if (type === "before") {
-      beforeMoveEvaluation.current = null;
-    }
-
-    if (type === "after") {
-      afterMoveEvaluation.current = null;
-    }
-
-    stockfish.current.postMessage("stop");
-    stockfish.current.postMessage(`position fen ${fen}`);
-    stockfish.current.postMessage("go depth 15");
-  }
 
   async function saveGame() {
     const gameData = {
@@ -253,13 +140,8 @@ export default function ChessBoard() {
     setLegalMoves([]);
     setLastMove(null);
     setIllegal(false);
-    setEvaluation(null);
-    setBestMove(null);
-    setMoveRating(null);
-    beforeMoveEvaluation.current = null;
-    afterMoveEvaluation.current = null;
-    playerMoveColor.current = null;
-    analysisType.current = null;
+    resetAnalysis();
+
     analyzePosition(game.fen(), "position");
   }
 
@@ -299,13 +181,7 @@ export default function ChessBoard() {
     setWhiteCheckCounter(0);
     setBlackCheckCounter(0);
     setCurrentGameId(null);
-    setEvaluation(null);
-    setBestMove(null);
-    setMoveRating(null);
-    beforeMoveEvaluation.current = null;
-    afterMoveEvaluation.current = null;
-    playerMoveColor.current = null;
-    analysisType.current = null;
+    resetAnalysis();
   }
   function undoMove() {
     const move = game.undo();
@@ -314,19 +190,7 @@ export default function ChessBoard() {
       return;
     }
 
-    // Stop the current Stockfish calculation
-    stockfish.current?.postMessage("stop");
-
-    // Reset Stockfish analysis state
-    analysisType.current = "position";
-    beforeMoveEvaluation.current = null;
-    afterMoveEvaluation.current = null;
-    playerMoveColor.current = null;
-
-    // Clear the displayed analysis
-    setMoveRating(null);
-    setBestMove(null);
-    setEvaluation(null);
+    resetAnalysis();
 
     setPosition(game.fen());
     setSelectedSquare(null);
@@ -388,13 +252,6 @@ export default function ChessBoard() {
       });
 
       setMoveHistory(game.history());
-
-      if (capturedPiece) {
-        playSound("capture");
-      } else {
-        playSound("move");
-      }
-
       setPosition(game.fen());
       checkGameOver();
       setPromotionFrom(null);
@@ -446,66 +303,6 @@ export default function ChessBoard() {
       return;
     }
   }
-  function getReadableMove(move: string) {
-    if (move.length < 4) {
-      return move;
-    }
-
-    return `${move.slice(0, 2)}-${move.slice(2, 4)}`;
-  }
-  function getMoveRating(
-    beforeEvaluation: number,
-    afterEvaluation: number,
-    playerColor: "w" | "b",
-  ) {
-    // Stockfish evaluation is from White's perspective.
-    //
-    // Before the move:
-    //   White wants a higher number
-    //   Black wants a lower number
-    //
-    // After the move the side to move changes, so we
-    // must still compare from the player's perspective.
-
-    const beforeForPlayer =
-      playerColor === "w" ? beforeEvaluation : -beforeEvaluation;
-
-    const afterForPlayer =
-      playerColor === "w" ? -afterEvaluation : afterEvaluation;
-
-    const evaluationLoss = beforeForPlayer - afterForPlayer;
-    const evaluationChange =
-      playerColor === "w"
-        ? afterEvaluation - beforeEvaluation
-        : beforeEvaluation - afterEvaluation;
-
-    console.log({
-      beforeEvaluation,
-      afterEvaluation,
-      playerColor,
-      beforeForPlayer,
-      afterForPlayer,
-      evaluationLoss,
-    });
-
-    if (evaluationLoss <= 0.1) {
-      return "Excellent";
-    }
-
-    if (evaluationLoss <= 0.3) {
-      return "Good";
-    }
-
-    if (evaluationLoss <= 0.7) {
-      return "Inaccuracy";
-    }
-
-    if (evaluationLoss <= 1.5) {
-      return "Mistake";
-    }
-
-    return "Blunder";
-  }
 
   function getEvaluationPercentage() {
     if (evaluation === null) {
@@ -531,8 +328,8 @@ export default function ChessBoard() {
 
   const [currentGameId, setCurrentGameId] = useState<string | null>(null);
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
-  const [capturedWhite, setCapturedWhite] = useState<string[]>([]);
-  const [capturedBlack, setCapturedBlack] = useState<string[]>([]);
+  const [capturedWhite, setCapturedWhite] = useState<PieceType[]>([]);
+  const [capturedBlack, setCapturedBlack] = useState<PieceType[]>([]);
   const [moveHistory, setMoveHistory] = useState<string[]>([]);
   const whiteMaterial = capturedBlack.reduce(
     (total, piece) => total + pieceValues[piece],
@@ -551,10 +348,6 @@ export default function ChessBoard() {
   const [whitePlayer, setWhitePlayer] = useState("");
   const [blackPlayer, setBlackPlayer] = useState("");
 
-  const [evaluation, setEvaluation] = useState<number | null>(null);
-  const [bestMove, setBestMove] = useState<string | null>(null);
-  const [moveRating, setMoveRating] = useState<string | null>(null);
-
   const [illegal, setIllegal] = useState(false);
   const [position, setPosition] = useState(game.fen());
   const [whiteCheckCounter, setWhiteCheckCounter] = useState<number>(0);
@@ -563,13 +356,6 @@ export default function ChessBoard() {
   const [winner, setWinner] = useState<string>("w");
 
   const board = game.board();
-
-  function getSquareName(row: number, column: number): Square {
-    const files = "abcdefgh";
-    const rank = 8 - row;
-
-    return `${files[column]}${rank}` as Square;
-  }
 
   function handleSquareClick(row: number, column: number) {
     if (gameOver) {
@@ -584,10 +370,10 @@ export default function ChessBoard() {
       if (piece) {
         setSelectedSquare(square);
 
-        playerMoveColor.current = game.turn();
+        playPieceSelectSound(piece.type);
 
-        setMoveRating(null);
-        setBestMove(null);
+        setPlayerMoveColor(game.turn());
+        clearMoveAnalysis();
 
         const moves = game.moves({
           square,
@@ -621,6 +407,13 @@ export default function ChessBoard() {
         from: selectedSquare,
         to: square,
       });
+
+      if (move.captured) {
+        playPieceCaptureSound(move.piece);
+      } else {
+        playPieceMoveSound(move.piece);
+      }
+
       setMoveHistory(game.history());
 
       if (move.captured) {
@@ -634,17 +427,6 @@ export default function ChessBoard() {
       setIllegal(false);
       if (capturedPiece) {
       }
-
-      // Choose the basic move sound
-      if (capturedPiece && move.piece == "p") {
-        playSound("capture");
-      } else if (!capturedPiece) {
-        playSound("move");
-      }
-      if (move.piece == "k") {
-        playSound("mbappe");
-      }
-
       if (game.isCheckmate()) {
         if (game.turn() === "w") {
           setWinner("black");
@@ -661,33 +443,7 @@ export default function ChessBoard() {
         }
         playSound("check");
       } else if (move.isKingsideCastle() || move.isQueensideCastle()) {
-        playSound("castle");
-      } else if (move.captured) {
-        switch (move.piece) {
-          case "p":
-            playSound("pawn-capture");
-            break;
-
-          case "n":
-            playSound("knight-capture");
-            break;
-
-          case "b":
-            playSound("bishop-capture");
-            break;
-
-          case "r":
-            playSound("sacrifices-the-rook");
-            break;
-
-          case "q":
-            playSound("queen-capture");
-            break;
-
-          case "k":
-            playSound("king");
-            break;
-        }
+        playRandomSound(["castle-1", "castle-2"]);
       }
       setPosition(game.fen());
       analyzePosition(game.fen(), "after");
@@ -743,50 +499,15 @@ export default function ChessBoard() {
           <div className="evaluation-black" />
         </div>
       </div>
+      <Board
+        board={board}
+        selectedSquare={selectedSquare}
+        legalMoves={legalMoves}
+        lastMove={lastMove}
+        isInCheck={game.isCheck()}
+        onSquareClick={handleSquareClick}
+      />
 
-      <div className="chess-board">
-        {board.map((row, rowIndex) =>
-          row.map((piece, columnIndex) => {
-            const square = getSquareName(rowIndex, columnIndex);
-            const isLastMove =
-              lastMove?.from === square || lastMove?.to === square;
-
-            const isLegalMove = legalMoves.includes(square);
-            const isLight = (rowIndex + columnIndex) % 2 === 0;
-            const isCheckedKing =
-              game.isCheck() &&
-              piece?.type === "k" &&
-              piece.color === game.turn();
-
-            const isSelected = selectedSquare === square;
-
-            let symbol = "";
-
-            if (piece) {
-              const key =
-                `${piece.color}${piece.type}` as keyof typeof pieceSymbols;
-
-              symbol = pieceSymbols[key];
-            }
-
-            return (
-              <button
-                key={square}
-                className={`square ${
-                  isLight ? "light" : "dark"
-                } ${isSelected ? "selected" : ""} ${
-                  isCheckedKing ? "check" : ""
-                } ${isLegalMove ? "legal-move" : ""} ${
-                  isLastMove ? "last-move" : ""
-                }`}
-                onClick={() => handleSquareClick(rowIndex, columnIndex)}
-              >
-                {symbol}
-              </button>
-            );
-          }),
-        )}
-      </div>
       <div className="sidebar">
         <div className="controls">
           <div className="error">
@@ -855,25 +576,10 @@ export default function ChessBoard() {
             </div>
           </div>
         </div>
-        <div className="captured-pieces">
-          <div>
-            Captured White:
-            {capturedWhite.map((piece, index) => (
-              <span key={index}>
-                {pieceSymbols[`w${piece}` as keyof typeof pieceSymbols]}
-              </span>
-            ))}
-          </div>
-
-          <div>
-            Captured Black:
-            {capturedBlack.map((piece, index) => (
-              <span key={index}>
-                {pieceSymbols[`b${piece}` as keyof typeof pieceSymbols]}
-              </span>
-            ))}
-          </div>
-        </div>
+        <CapturedPieces
+          capturedBlack={capturedBlack}
+          capturedWhite={capturedWhite}
+        />
         <div className="material-advantage">
           {materialDifference > 0 && <span>White +{materialDifference}</span>}
 
