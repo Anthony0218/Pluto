@@ -32,7 +32,7 @@ export default function WattenGame() {
   >("reveal");
 
   const [Farbe, setFarbe] = useState<
-    "Herz" | "Schelle" | "Eichel" | "Gras" | null
+    "Herz" | "Schellen" | "Eichel" | "Gras" | null
   >(null);
   const specialCards = [
     { suit: "Herz", rank: "König" },
@@ -382,7 +382,7 @@ export default function WattenGame() {
 
   return (
     <main className="min-h-screen bg-emerald-950 px-4 py-6 text-white md:px-8">
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto w-full max-w-[1600px]">
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
@@ -414,14 +414,14 @@ export default function WattenGame() {
                   <div className="mt-1 flex items-center justify-center gap-2">
                     <span
                       className={`text-2xl ${
-                        Farbe === "Herz" || Farbe === "Schelle"
+                        Farbe === "Herz" || Farbe === "Schellen"
                           ? "text-red-400"
                           : "text-white"
                       }`}
                     >
                       {Farbe === "Herz"
                         ? "♥"
-                        : Farbe === "Schelle"
+                        : Farbe === "Schellen"
                           ? "♦"
                           : Farbe === "Eichel"
                             ? "♣"
@@ -458,40 +458,6 @@ export default function WattenGame() {
           </div>
         </div>
 
-        {/* Score */}
-        <div className="mb-6 grid grid-cols-3 gap-3">
-          {players.map((player, index) => {
-            const isCurrentPlayer = index === currentPlayer;
-
-            return (
-              <div
-                key={player.id}
-                className={`rounded-2xl border p-4 ${
-                  isCurrentPlayer
-                    ? "border-indigo-400 bg-indigo-500/20"
-                    : "border-emerald-700 bg-emerald-900/50"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-white">
-                    {player.name}
-                  </span>
-
-                  {isCurrentPlayer && (
-                    <span className="rounded-full bg-indigo-500 px-2.5 py-1 text-xs font-semibold text-white">
-                      Your turn
-                    </span>
-                  )}
-                </div>
-
-                <p className="mt-1 text-sm text-emerald-300">
-                  {player.cards.length} cards · {tricksWon[player.id] ?? 0}{" "}
-                  tricks
-                </p>
-              </div>
-            );
-          })}
-        </div>
         {notification && (
           <div className="absolute left-1/2 top-8 z-50 -translate-x-1/2 animate-in fade-in slide-in-from-top-3">
             <div className="flex items-center gap-3 rounded-2xl border border-red-400/30 bg-red-950/90 px-5 py-3 text-sm font-semibold text-red-200 shadow-2xl backdrop-blur">
@@ -728,7 +694,9 @@ export default function WattenGame() {
                     key={value}
                     type="button"
                     onClick={() => {
-                      setFarbe(value as "Herz" | "Schelle" | "Eichel" | "Gras");
+                      setFarbe(
+                        value as "Herz" | "Schellen" | "Eichel" | "Gras",
+                      );
 
                       setPhase("schlag");
                     }}
@@ -736,7 +704,7 @@ export default function WattenGame() {
                   >
                     <span
                       className={`text-4xl ${
-                        value === "Herz" || value === "Schelle"
+                        value === "Herz" || value === "Schellen"
                           ? "text-red-400"
                           : "text-white"
                       }`}
@@ -789,7 +757,7 @@ export default function WattenGame() {
 
         {/* Table */}
 
-        <div className="relative min-h-[720px] overflow-hidden rounded-[40px] border-8 border-emerald-900 bg-emerald-700 shadow-2xl">
+        <div className="relative min-h-[720px] w-full overflow-hidden rounded-[40px] border-8 border-emerald-900 bg-emerald-700 shadow-2xl">
           {/* Subtle table pattern */}
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.06),transparent_55%)]" />
 
@@ -838,7 +806,7 @@ export default function WattenGame() {
 
           {/* RIGHT PLAYER */}
           <div
-            className={`absolute right-5 top-1/2 w-48 -translate-y-1/2 rounded-2xl border p-4 text-center transition-all ${
+            className={`absolute right-5 top-[42%] flex h-52 w-44 -translate-y-1/2 flex-col justify-center rounded-2xl border p-4 text-center transition-all ${
               currentPlayerData.id === rightPlayer.id
                 ? "border-amber-400 bg-amber-400/20 shadow-lg shadow-amber-400/20 ring-2 ring-amber-400"
                 : "border-white/10 bg-emerald-950/40"
@@ -859,16 +827,17 @@ export default function WattenGame() {
               {tricksWon[rightPlayer.id] ?? 0} tricks
             </p>
 
-            <div className="mt-3 flex flex-col items-center">
+            <div className="mt-3 flex justify-center">
               {rightPlayer.cards.map((card, index) => (
                 <div
                   key={card.id}
-                  className={`h-10 w-16 rounded-md border border-white/20 bg-zinc-900 shadow-md ${
-                    index !== 0 ? "-mt-5" : ""
+                  className={`h-16 w-10 rounded-md border border-white/20 bg-zinc-900 shadow-md ${
+                    index !== 0 ? "-ml-3" : ""
                   }`}
                 />
               ))}
             </div>
+
             <button
               type="button"
               onClick={() => requestToSeeCards(2)}
@@ -880,7 +849,7 @@ export default function WattenGame() {
 
           {/* LEFT PLAYER */}
           <div
-            className={`absolute left-5 top-1/2 w-48 -translate-y-1/2 rounded-2xl border p-4 text-center transition-all ${
+            className={`absolute left-5 top-[42%] flex h-52 w-44 -translate-y-1/2 flex-col justify-center rounded-2xl border p-4 text-center transition-all ${
               currentPlayerData.id === leftPlayer.id
                 ? "border-amber-400 bg-amber-400/20 shadow-lg shadow-amber-400/20 ring-2 ring-amber-400"
                 : "border-white/10 bg-emerald-950/40"
@@ -895,16 +864,17 @@ export default function WattenGame() {
               tricks
             </p>
 
-            <div className="mt-3 flex flex-col items-center">
+            <div className="mt-3 flex justify-center">
               {leftPlayer.cards.map((card, index) => (
                 <div
                   key={card.id}
-                  className={`h-10 w-16 rounded-md border border-white/20 bg-zinc-900 shadow-md ${
-                    index !== 0 ? "-mt-5" : ""
+                  className={`h-16 w-10 rounded-md border border-white/20 bg-zinc-900 shadow-md ${
+                    index !== 0 ? "-ml-3" : ""
                   }`}
                 />
               ))}
             </div>
+
             <button
               type="button"
               onClick={() => requestToSeeCards(0)}
@@ -915,7 +885,7 @@ export default function WattenGame() {
           </div>
 
           {/* PLAYED CARDS */}
-          <div className="absolute left-1/2 top-[45%] flex min-h-44 min-w-[360px] -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-4 rounded-3xl border border-white/10 bg-emerald-950/30 p-6 shadow-inner">
+          <div className="absolute left-1/2 top-[42%] flex h-52 w-[420px] -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-4 rounded-3xl border border-white/10 bg-emerald-950/30 p-6 shadow-inner">
             {playedCards.length === 0 ? (
               <div className="text-center">
                 <div className="text-3xl opacity-30">🃏</div>
@@ -959,8 +929,8 @@ export default function WattenGame() {
           </div>
 
           {/* CURRENT PLAYER HAND */}
-          <div className="absolute bottom-5 left-1/2 w-full -translate-x-1/2 px-6">
-            <div className="mx-auto max-w-4xl rounded-3xl border border-white/10 bg-emerald-950/70 p-5 shadow-2xl backdrop-blur">
+          <div className="absolute bottom-4 left-1/2 z-30 w-full -translate-x-1/2 px-6">
+            <div className="mx-auto h-56 max-w-4xl rounded-3xl border border-white/10 bg-emerald-950/90 p-4 shadow-2xl backdrop-blur-md">
               {/* Current player */}
               <div className="mb-4 text-center">
                 <div className="inline-flex items-center gap-2 rounded-full bg-amber-400 px-4 py-1.5 text-sm font-bold text-amber-950 shadow-lg">
@@ -970,37 +940,41 @@ export default function WattenGame() {
                 </div>
               </div>
 
-              {/* Cards */}
-              <div className="flex justify-center gap-2">
-                {currentPlayerData.cards.map((card) => (
-                  <WattenCardComponent
-                    key={card.id}
-                    card={card}
-                    disabled={!!winner || cardPlayedThisTurn}
-                    onClick={() => playCard(card)}
-                  />
-                ))}
-              </div>
-              {phase === "playing" &&
-                playedCards.length < 3 &&
-                cardPlayedThisTurn && (
-                  <div className="mt-5 flex flex-col items-center gap-2">
-                    <p className="text-xs text-emerald-300">
-                      Card played. Finish your turn to continue.
-                    </p>
+              {/* Cards + Finish Turn */}
+              <div className="flex items-center justify-center gap-6">
+                {/* Cards */}
+                <div className="flex justify-center gap-2">
+                  {currentPlayerData.cards.map((card) => (
+                    <WattenCardComponent
+                      key={card.id}
+                      card={card}
+                      disabled={!!winner || cardPlayedThisTurn}
+                      onClick={() => playCard(card)}
+                    />
+                  ))}
+                </div>
 
-                    <button
-                      type="button"
-                      onClick={finishPlayerTurn}
-                      className="animate-pulse rounded-xl bg-amber-400 px-8 py-3 font-bold text-amber-950 shadow-lg shadow-amber-400/20 transition hover:scale-105 hover:bg-amber-300"
-                    >
-                      Finish Turn
-                    </button>
-                  </div>
-                )}
+                {/* Finish Turn button */}
+                {phase === "playing" &&
+                  playedCards.length < 3 &&
+                  cardPlayedThisTurn && (
+                    <div className="flex flex-col items-center gap-2">
+                      <p className="text-center text-xs font-medium text-emerald-200">
+                        Card played.
+                      </p>
+
+                      <button
+                        type="button"
+                        onClick={finishPlayerTurn}
+                        className="animate-pulse whitespace-nowrap rounded-xl bg-amber-400 px-5 py-3 font-bold text-amber-950 shadow-xl shadow-amber-400/30 transition hover:scale-105 hover:bg-amber-300"
+                      >
+                        Finish Turn
+                      </button>
+                    </div>
+                  )}
+              </div>
             </div>
           </div>
-
           {/* WINNER */}
           {winner && (
             <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/60 backdrop-blur-sm">
