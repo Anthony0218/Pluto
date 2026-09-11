@@ -8,3 +8,6 @@ export const supabase = createClient(
   supabaseUrl,
   supabaseKey
 );
+if (import.meta.env.DEV) {
+  (window as any).supabase = supabase;
+}

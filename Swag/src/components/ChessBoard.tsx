@@ -13,9 +13,17 @@ import {
   playPieceCaptureSound,
   playRandomSound,
 } from "../utils/sound.ts";
+import PromotionBar from "./PromotionBar";
+import GameControls from "./GameControls.tsx";
+import MoveHistory from "./MoveHistory.tsx";
+import GameStatus from "./GameStatus.tsx";
+import { useAuth } from "../context/AuthContext";
+import playButton from "../assets/trash-button.svg";
+import loadButton from "../assets/load-button.svg";
 
 type SavedGame = {
   id: string;
+  user_id: string;
   created_at: string;
   name: string | null;
   white_player: string | null;
@@ -43,10 +51,54 @@ const pieceValueList = [
   { type: "k", symbol: "♔", name: "King" },
 ];
 
-export default function ChessBoard() {
+type ChessBoardProps = {
+  onlineGameId?: string;
+};
+
+export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
+  const { user, profile } = useAuth();
+  const [playerColor, setPlayerColor] = useState<"w" | "b" | null>(null);
   useEffect(() => {
-    analyzePosition(game.fen(), "position");
-  }, []);
+    if (!onlineGameId || !user) {
+      return;
+    }
+
+    async function loadOnlineGame() {
+      const { data, error } = await supabase
+        .from("online_games")
+        .select("white_player, black_player, fen, moves, status")
+        .eq("id", onlineGameId)
+        .single();
+
+      if (error) {
+        console.error("Error loading online game:", error);
+        return;
+      }
+
+      if (data.white_player === user?.id) {
+        setPlayerColor("w");
+      } else if (data.black_player === user?.id) {
+        setPlayerColor("b");
+      }
+
+      game.reset();
+
+      for (const move of data.moves ?? []) {
+        game.move(move);
+      }
+
+      setPosition(game.fen());
+      setMoveHistory(game.history());
+    }
+
+    loadOnlineGame();
+  }, [onlineGameId, user]);
+
+  useEffect(() => {
+    if (user) {
+      loadSavedGames();
+    }
+  }, [user]);
 
   const {
     evaluation,
@@ -59,13 +111,23 @@ export default function ChessBoard() {
   } = useStockfish();
 
   useEffect(() => {
+    analyzePosition(game.fen(), "position");
+  }, []);
+
+  useEffect(() => {
     analyzePosition(game.fen(), "before");
   }, []);
 
   async function saveGame() {
+    if (!user) {
+      console.error("You must be logged in to save a game.");
+      return;
+    }
+
     const gameData = {
+      user_id: user?.id,
       name: gameName || "Unnamed Game",
-      white_player: whitePlayer || "White",
+      white_player: whitePlayer || profile?.username || "White",
       black_player: blackPlayer || "Black",
       fen: game.fen(),
       moves: game.history(),
@@ -108,6 +170,23 @@ export default function ChessBoard() {
 
     await loadSavedGames();
   }
+  function rebuildCapturedPieces() {
+    const whiteCaptured: PieceType[] = [];
+    const blackCaptured: PieceType[] = [];
+
+    for (const move of game.history({ verbose: true })) {
+      if (move.captured) {
+        if (move.color === "w") {
+          blackCaptured.push(move.captured as PieceType);
+        } else {
+          whiteCaptured.push(move.captured as PieceType);
+        }
+      }
+    }
+
+    setCapturedWhite(whiteCaptured);
+    setCapturedBlack(blackCaptured);
+  }
 
   async function loadSpecificGame(id: string) {
     const { data, error } = await supabase
@@ -144,22 +223,30 @@ export default function ChessBoard() {
 
     analyzePosition(game.fen(), "position");
   }
+  async function sendMove(moveHistory: string[]) {
+    // update Supabase
+  }
 
   async function loadSavedGames() {
+    if (!user) {
+      return;
+    }
+
     const { data, error } = await supabase
       .from("games")
       .select(
-        "id, created_at, name, white_player, black_player, fen, moves, white_check_counter, black_check_counter",
+        "id, created_at, name, white_player, black_player, fen, moves, white_check_counter, black_check_counter, user_id",
       )
+      .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
     if (error) {
       console.error("Error loading saved games:", error);
       return;
     }
-    setWhitePlayer("");
-    setBlackPlayer("");
+
     setSavedGames(data ?? []);
+    rebuildCapturedPieces();
   }
 
   function restartGame() {
@@ -182,6 +269,9 @@ export default function ChessBoard() {
     setBlackCheckCounter(0);
     setCurrentGameId(null);
     resetAnalysis();
+    setGameName("");
+    setWhitePlayer("");
+    setBlackPlayer("");
   }
   function undoMove() {
     const move = game.undo();
@@ -209,7 +299,7 @@ export default function ChessBoard() {
         to: previousMove.to,
       });
     }
-
+    checkGameOver();
     analyzePosition(game.fen(), "position");
   }
 
@@ -253,7 +343,7 @@ export default function ChessBoard() {
 
       setMoveHistory(game.history());
       setPosition(game.fen());
-      checkGameOver();
+
       setPromotionFrom(null);
       setPromotionSquare(null);
     } catch {
@@ -357,9 +447,32 @@ export default function ChessBoard() {
 
   const board = game.board();
 
+  const checkedKingSquare: Square | null = game.isCheck()
+    ? (() => {
+        const kingColor = game.turn();
+
+        for (let row = 0; row < board.length; row++) {
+          for (let column = 0; column < board[row].length; column++) {
+            const piece = board[row][column];
+
+            if (piece?.type === "k" && piece.color === kingColor) {
+              return getSquareName(row, column);
+            }
+          }
+        }
+
+        return null;
+      })()
+    : null;
+
   function handleSquareClick(row: number, column: number) {
     if (gameOver) {
       return;
+    }
+    if (onlineGameId && playerColor) {
+      if (game.turn() !== playerColor) {
+        return;
+      }
     }
 
     const square = getSquareName(row, column);
@@ -393,6 +506,7 @@ export default function ChessBoard() {
 
       if (
         selectedPiece?.type === "p" &&
+        legalMoves.includes(square) &&
         (square[1] === "8" || square[1] === "1")
       ) {
         setPromotionFrom(selectedSquare);
@@ -406,6 +520,10 @@ export default function ChessBoard() {
       const move = game.move({
         from: selectedSquare,
         to: square,
+      });
+      setLastMove({
+        from: move.from,
+        to: move.to,
       });
 
       if (move.captured) {
@@ -459,8 +577,8 @@ export default function ChessBoard() {
   }
 
   return (
-    <div className="box">
-      <div className="piece-values">
+    <div className="chess-layout">
+      <div className="chess-piece-values">
         <h3>Piece Value</h3>
 
         {pieceValueList.map((piece) => (
@@ -475,107 +593,41 @@ export default function ChessBoard() {
       </div>
 
       {promotionSquare && promotionFrom && (
-        <div className="promotion-menu">
-          <h3>Promote pawn</h3>
-
-          <button onClick={() => promotePawn("q")}>♕</button>
-
-          <button onClick={() => promotePawn("r")}>♖</button>
-
-          <button onClick={() => promotePawn("b")}>♗</button>
-
-          <button onClick={() => promotePawn("n")}>♘</button>
-        </div>
+        <PromotionBar onPromote={promotePawn} />
       )}
-      <div className="board-area">
-        <div className="evaluation-bar">
-          <div
-            className="evaluation-white"
-            style={{
-              height: `${getEvaluationPercentage()}%`,
-            }}
-          />
 
-          <div className="evaluation-black" />
-        </div>
-      </div>
+      <div className="board-area"></div>
+      <GameStatus
+        illegal={illegal}
+        whiteCheckCounter={whiteCheckCounter}
+        blackCheckCounter={blackCheckCounter}
+        gameOver={gameOver}
+        gameOverReason={gameOverReason}
+        winner={winner}
+      />
+
       <Board
         board={board}
         selectedSquare={selectedSquare}
         legalMoves={legalMoves}
         lastMove={lastMove}
-        isInCheck={game.isCheck()}
+        checkedKingSquare={checkedKingSquare}
         onSquareClick={handleSquareClick}
       />
 
-      <div className="sidebar">
-        <div className="controls">
-          <div className="error">
-            {illegal && <div>This is an illegal move! </div>}
-            <div>
-              white: {whiteCheckCounter}, black: {blackCheckCounter}
-            </div>
-            {gameOver && (
-              <div className="game-over">
-                {gameOverReason === "Checkmate" ? (
-                  <span>{winner} has won by checkmate!</span>
-                ) : (
-                  <span>Game drawn: {gameOverReason}</span>
-                )}
-              </div>
-            )}
+      <div className="chess-controls-sidebar">
+        <GameControls
+          gameName={gameName}
+          whitePlayer={whitePlayer}
+          blackPlayer={blackPlayer}
+          onGameNameChange={setGameName}
+          onWhitePlayerChange={setWhitePlayer}
+          onBlackPlayerChange={setBlackPlayer}
+          onUndo={undoMove}
+          onRestart={restartGame}
+          onSave={saveGame}
+        />
 
-            {moveRating && (
-              <div className={`move-rating ${moveRating.toLowerCase()}`}>
-                <strong>Move:</strong> {moveRating}
-              </div>
-            )}
-
-            <div className="stockfish-analysis">
-              <div>
-                <strong>Stockfish:</strong>{" "}
-                {evaluation === null
-                  ? "Calculating..."
-                  : evaluation > 0
-                    ? `+${evaluation.toFixed(2)}`
-                    : evaluation.toFixed(2)}
-              </div>
-
-              <div>
-                <strong>Best move:</strong>{" "}
-                {bestMove ? getReadableMove(bestMove) : "Calculating..."}
-              </div>
-            </div>
-
-            <button onClick={undoMove}>Undo</button>
-
-            <button onClick={restartGame}>Restart Game</button>
-            <div className="game-info">
-              <input
-                type="text"
-                placeholder="Game name"
-                value={gameName}
-                onChange={(event) => setGameName(event.target.value)}
-              />
-
-              <input
-                type="text"
-                placeholder="White player"
-                value={whitePlayer}
-                onChange={(event) => setWhitePlayer(event.target.value)}
-              />
-
-              <input
-                type="text"
-                placeholder="Black player"
-                value={blackPlayer}
-                onChange={(event) => setBlackPlayer(event.target.value)}
-              />
-
-              <button onClick={saveGame}>Save Game</button>
-            </div>
-          </div>
-        </div>
         <CapturedPieces
           capturedBlack={capturedBlack}
           capturedWhite={capturedWhite}
@@ -604,59 +656,20 @@ export default function ChessBoard() {
                 <small>{new Date(savedGame.created_at).toLocaleString()}</small>
               </div>
 
-              <button onClick={() => loadSpecificGame(savedGame.id)}>
-                Load
-              </button>
               <button
-                onClick={() => {
-                  if (window.confirm("Delete this game?")) {
-                    deleteGame(savedGame.id);
-                  }
-                }}
+                className="svg-button"
+                onClick={() => loadSpecificGame(savedGame.id)}
               >
-                Delete
+                <img src={loadButton} alt="Load" />
+              </button>
+              <button className="svg-button">
+                <img src={playButton} alt="Play" />
               </button>
             </div>
           ))}
         </div>
 
-        <div className="move-history">
-          <h3>Moves</h3>
-
-          {Array.from(
-            { length: Math.ceil(moveHistory.length / 2) },
-            (_, index) => {
-              const whiteMove = moveHistory[index * 2];
-              const blackMove = moveHistory[index * 2 + 1];
-
-              return (
-                <div className="move-row" key={index}>
-                  <span className="move-number">{index + 1}.</span>
-
-                  <span
-                    className={
-                      index * 2 === moveHistory.length - 1
-                        ? "current-move"
-                        : "white-move"
-                    }
-                  >
-                    {whiteMove}
-                  </span>
-
-                  <span
-                    className={
-                      index * 2 + 1 === moveHistory.length - 1
-                        ? "current-move"
-                        : "black-move"
-                    }
-                  >
-                    {blackMove ?? ""}
-                  </span>
-                </div>
-              );
-            },
-          )}
-        </div>
+        <MoveHistory moves={moveHistory} />
       </div>
     </div>
   );

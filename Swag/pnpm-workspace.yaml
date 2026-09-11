@@ -1,2 +1,3 @@
 allowBuilds:
-  stockfish: set this to true or false
+  core-js: false
+  stockfish: false

@@ -21,7 +21,7 @@ type BoardProps = {
     from: Square;
     to: Square;
   } | null;
-  isInCheck: boolean;
+  checkedKingSquare: Square | null;
   onSquareClick: (row: number, column: number) => void;
 };
 const pieceSymbols = {
@@ -45,16 +45,16 @@ export default function Board({
   selectedSquare,
   legalMoves,
   lastMove,
-  isInCheck,
+  checkedKingSquare,
   onSquareClick,
 }: BoardProps) {
   return (
     <div className="chess-board">
       {board.map((row, rowIndex) =>
         row.map((piece, columnIndex) => {
-          const isCheckedKing = isInCheck && piece?.type === "k";
-
           const square = getSquareName(rowIndex, columnIndex);
+          const isCheckedKing =
+            piece?.type === "k" && checkedKingSquare === square;
           const isLastMove =
             lastMove?.from === square || lastMove?.to === square;
 
