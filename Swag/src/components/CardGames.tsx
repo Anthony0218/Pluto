@@ -242,15 +242,7 @@ export default function CardDeck() {
       <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">
-              A Card Game
-            </h1>
-
-            <p className="mt-1 text-Eichel-200">
-              Get rid of all your cards first.
-            </p>
-          </div>
+          
 
           <button
             type="button"
