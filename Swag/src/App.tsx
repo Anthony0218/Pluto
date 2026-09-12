@@ -15,13 +15,17 @@ function App() {
 
   return (
     <div className="flex flex-col items-center justify-center text-center">
-      <h1 className="text-5xl font-bold text-zinc-900">Willkommen!</h1>
+      <h1 className="text-5xl font-bold text-zinc-900 dark:text-white">
+        Willkommen!
+      </h1>
 
-      <h2 className="mt-4 text-2xl font-semibold text-zinc-800">
+      <h2 className="mt-4 text-2xl font-semibold text-zinc-800 dark:text-zinc-200">
         Welcome, {profile?.username ?? user.email}
       </h2>
 
-      <p className="mt-2 text-zinc-500">Rating: {profile?.rating ?? 1200}</p>
+      <p className="mt-2 text-zinc-500 dark:text-zinc-400">
+        Rating: {profile?.rating ?? 1200}
+      </p>
 
       <div className="mt-8 flex gap-3">
         <Link

@@ -1,3 +1,4 @@
+import { useTheme } from "@/context/ThemeContext";
 import {
   BarChart3,
   Folder,
@@ -44,8 +45,9 @@ const navigation = [
 ];
 
 export default function SideBar() {
+  const { darkMode, toggleDarkMode } = useTheme();
   return (
-    <aside className="flex h-full w-full flex-col border-r border-zinc-200 bg-white">
+    <aside className="flex min-h-screen w-64 flex-col border-r border-zinc-200 bg-white">
       <div className="flex h-16 items-center border-b border-zinc-200 px-6">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-white">
@@ -100,6 +102,16 @@ export default function SideBar() {
       </nav>
 
       {/* Bottom section */}
+      <button
+        type="button"
+        onClick={toggleDarkMode}
+        className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left font-medium text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
+      >
+        <span className="text-xl">{darkMode ? "☀️" : "🌙"}</span>
+
+        <span>{darkMode ? "Light Mode" : "Dark Mode"}</span>
+      </button>
+
       <div className="border-t border-zinc-200 p-3">
         <NavLink
           to="/settings"

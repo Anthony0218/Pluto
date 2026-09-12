@@ -271,3 +271,42 @@ export function playerName(player: PlayerId): string {
       return "Player 3";
   }
 }
+
+function getBeginnerCardHint(card: WattenCard): string | undefined {
+  if (!helpMode) {
+    return undefined;
+  }
+
+  // Existing special first-trick hint gets priority.
+  if (canActivateTrumpfOderKritisch(card)) {
+    return "Hauptschlag — if you lead this card now, Trumpf oder Kritisch becomes active.";
+  }
+
+  const criticalValue = getCriticalValue(card);
+
+  if (criticalValue === 3) {
+    return "Max — the highest Kritischer and the highest card in Watten.";
+  }
+
+  if (criticalValue === 2) {
+    return "Belli — the second-highest Kritischer.";
+  }
+
+  if (criticalValue === 1) {
+    return "Spitz — the third-highest Kritischer.";
+  }
+
+  if (isHauptschlag(card)) {
+    return "Hauptschlag — the strongest non-Kritisch card.";
+  }
+
+  if (card.rank === schlag) {
+    return "Schlag — stronger than normal Trumpf cards. If two equal Schläge are played, the earlier one wins.";
+  }
+
+  if (card.suit === Farbe) {
+    return `Trumpf (${Farbe}) — this card beats ordinary non-Trumpf cards.`;
+  }
+
+  return undefined;
+}
