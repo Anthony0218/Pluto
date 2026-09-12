@@ -1,93 +1,155 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
-
-type Player = {
-  id: string;
-  name: string;
-};
+import { useNavigate } from "react-router";
+import type { WattenVariant, WattenPlayerInfo } from "../utils/types";
 
 export default function WattenHotseat() {
   const navigate = useNavigate();
 
-  const [players, setPlayers] = useState<Player[]>([
-    { id: "1", name: "" },
-    { id: "2", name: "" },
-    { id: "3", name: "" },
+  const [variant, setVariant] = useState<WattenVariant>("three-player");
+
+  const playerCount = variant === "three-player" ? 3 : 4;
+
+  const [playerNames, setPlayerNames] = useState([
+    "Player 1",
+    "Player 2",
+    "Player 3",
+    "Player 4",
   ]);
 
-  function updatePlayer(id: string, name: string) {
-    setPlayers((current) =>
-      current.map((player) =>
-        player.id === id ? { ...player, name } : player,
-      ),
+  function updatePlayerName(index: number, value: string) {
+    setPlayerNames((current) =>
+      current.map((name, i) => (i === index ? value : name)),
     );
   }
 
   function startGame() {
-    const hasEmptyPlayer = players.some((player) => player.name.trim() === "");
-
-    if (hasEmptyPlayer) {
-      return;
-    }
+    const players: WattenPlayerInfo[] = playerNames
+      .slice(0, playerCount)
+      .map((name, index) => ({
+        id: String(index + 1),
+        name: name.trim() || `Player ${index + 1}`,
+      }));
 
     navigate("/watten/hotseat/game", {
       state: {
+        variant,
+        mode: "hotseat",
         players,
       },
     });
   }
 
   return (
-    <main className="min-h-screen bg-zinc-50 px-6 py-12">
-      <div className="mx-auto max-w-xl">
-        <Link
-          to="/watten"
-          className="text-sm font-medium text-zinc-500 hover:text-zinc-900"
-        >
-          ← Back to Watten
-        </Link>
+    <main className="min-h-screen bg-emerald-950 px-4 py-10 text-white">
+      <div className="mx-auto max-w-2xl">
+        <div className="rounded-3xl border border-white/10 bg-zinc-950/90 p-8 shadow-2xl">
+          <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
+            Bayerisches Watten
+          </p>
 
-        <div className="mt-8 rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold tracking-tight text-zinc-900">
-              Hotseat
-            </h1>
+          <h1 className="mt-2 text-3xl font-black">Hotseat</h1>
 
-            <p className="mt-2 text-zinc-500">
-              Enter the names of the three players.
+          <p className="mt-2 text-sm text-zinc-400">
+            Wählt zuerst die Spielvariante.
+          </p>
+
+          {/* VARIANT */}
+          <div className="mt-8">
+            <p className="mb-3 text-sm font-bold text-zinc-300">
+              Spieleranzahl
             </p>
+
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setVariant("three-player")}
+                className={`rounded-2xl border p-5 text-left transition ${
+                  variant === "three-player"
+                    ? "border-amber-400 bg-amber-400/10"
+                    : "border-white/10 bg-white/5 hover:bg-white/10"
+                }`}
+              >
+                <div className="text-xl font-black">3 Spieler</div>
+
+                <p className="mt-2 text-sm text-zinc-400">
+                  Ein Alleinspieler gegen zwei Gegenspieler.
+                </p>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setVariant("four-player")}
+                className={`rounded-2xl border p-5 text-left transition ${
+                  variant === "four-player"
+                    ? "border-amber-400 bg-amber-400/10"
+                    : "border-white/10 bg-white/5 hover:bg-white/10"
+                }`}
+              >
+                <div className="text-xl font-black">4 Spieler</div>
+
+                <p className="mt-2 text-sm text-zinc-400">
+                  Zwei feste Teams mit gegenüberliegenden Partnern.
+                </p>
+              </button>
+            </div>
           </div>
 
-          <div className="space-y-5">
-            {players.map((player, index) => (
-              <div key={player.id}>
-                <label
-                  htmlFor={`player-${player.id}`}
-                  className="mb-2 block text-sm font-medium text-zinc-700"
-                >
-                  Player {index + 1}
-                </label>
+          {/* PLAYER NAMES */}
+          <div className="mt-8">
+            <p className="mb-3 text-sm font-bold text-zinc-300">Spielernamen</p>
 
-                <input
-                  id={`player-${player.id}`}
-                  value={player.name}
-                  onChange={(event) =>
-                    updatePlayer(player.id, event.target.value)
-                  }
-                  placeholder={`Player ${index + 1}`}
-                  className="w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
-                />
+            <div className="space-y-3">
+              {Array.from({
+                length: playerCount,
+              }).map((_, index) => (
+                <div key={index} className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-sm font-black text-emerald-300">
+                    {index + 1}
+                  </div>
+
+                  <input
+                    type="text"
+                    value={playerNames[index]}
+                    onChange={(event) =>
+                      updatePlayerName(index, event.target.value)
+                    }
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-amber-400"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {variant === "four-player" && (
+            <div className="mt-6 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 p-4">
+              <p className="text-sm font-bold text-emerald-200">
+                Teamaufteilung
+              </p>
+
+              <div className="mt-2 grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <span className="text-zinc-400">Team A</span>
+                  <p className="font-semibold">
+                    {playerNames[0]} + {playerNames[2]}
+                  </p>
+                </div>
+
+                <div>
+                  <span className="text-zinc-400">Team B</span>
+                  <p className="font-semibold">
+                    {playerNames[1]} + {playerNames[3]}
+                  </p>
+                </div>
               </div>
-            ))}
-          </div>
+            </div>
+          )}
 
           <button
             type="button"
             onClick={startGame}
-            disabled={players.some((player) => !player.name.trim())}
-            className="mt-8 w-full rounded-xl bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-40"
+            className="mt-8 w-full rounded-xl bg-amber-400 px-6 py-4 text-lg font-black text-amber-950 transition hover:bg-amber-300"
           >
-            Start Game
+            Spiel starten
           </button>
         </div>
       </div>

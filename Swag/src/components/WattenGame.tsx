@@ -1,7 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router";
 import type { WattenCard } from "../utils/watten";
-import { createDeck, shuffleDeck } from "../utils/watten";
+import {
+  createDeck,
+  determineTrickWinner,
+  getCriticalValue,
+  getNextPlayer,
+  getPreviousPlayer,
+  getWattenCardRole,
+  isAbhebenCard,
+  isCritical,
+  isFirstTrick,
+  isHauptschlag,
+  isTrumpfOderKritischActive,
+  isTrumpfOderKritischCard,
+  mustFollowTrumpfOderKritisch,
+  normalRankValue,
+  shuffleDeck,
+  wouldCardWin,
+} from "../utils/watten";
 import WattenCardComponent from "./WattenCard";
 
 type Player = {
@@ -20,10 +37,6 @@ type PlayedCard = {
   card: WattenCard;
 };
 
-type WattenGameProps = {
-  Farbe: string;
-  schlag: string;
-};
 function playCardSound() {
   const audio = new Audio("/sounds/card-play.mp3");
   audio.volume = 0.5;
@@ -77,9 +90,11 @@ export default function WattenGame() {
     | "setup"
     | "reveal"
     | "abheben"
+    | "dealReady"
     | "trump"
     | "schlag"
     | "playing"
+    | "trickPause"
     | "trickReview"
   >("setup");
 
@@ -109,9 +124,18 @@ export default function WattenGame() {
   );
   const [deck, setDeck] = useState<WattenCard[]>(() => createNewRoundDeck());
 
-  const [trumpCaller, setTrumpCaller] = useState(0);
+  const initialDealer = playerInfo.length - 1;
 
-  const abhebenPlayer = (trumpCaller + 2) % 3;
+  const [dealer, setDealer] = useState(initialDealer);
+
+  // Vorhand is the player to the left of the dealer.
+  // In the 3-player version, Vorhand is also the solo player.
+  const [trumpCaller, setTrumpCaller] = useState(() =>
+    getNextPlayer(initialDealer, playerInfo.length),
+  );
+
+  // The player to the right of the dealer cuts.
+  const abhebenPlayer = getPreviousPlayer(dealer, players.length);
 
   const [currentPlayer, setCurrentPlayer] = useState(2);
   const [showPassScreen, setShowPassScreen] = useState(false);
@@ -125,6 +149,19 @@ export default function WattenGame() {
 
   const [playedCards, setPlayedCards] = useState<PlayedCard[]>([]);
   const [abgehobenCard, setAbgehobenCard] = useState<WattenCard | null>(null);
+  type AbhebenAnimation =
+    | "idle"
+    | "revealing"
+    | "returning"
+    | "taking"
+    | "finished";
+
+  const [abhebenAnimation, setAbhebenAnimation] =
+    useState<AbhebenAnimation>("idle");
+
+  const [selectedAbhebenIndex, setSelectedAbhebenIndex] = useState<
+    number | null
+  >(null);
   const [abhebenFinished, setAbhebenFinished] = useState(false);
   const [helpMode, setHelpMode] = useState(false);
   type WattenSide = "solo" | "team";
@@ -241,7 +278,7 @@ export default function WattenGame() {
     // The current player has now played a card.
     setCardPlayedThisTurn(true);
 
-    if (newPlayedCards.length === 3) {
+    if (newPlayedCards.length === players.length) {
       finishTrick(newPlayedCards);
     }
   }
@@ -251,45 +288,85 @@ export default function WattenGame() {
       return;
     }
 
-    const nextPlayer = (currentPlayer + 1) % 3;
+    const nextPlayer = getNextPlayer(currentPlayer, players.length);
 
     setCardPlayedThisTurn(false);
     setCurrentPlayer(nextPlayer);
     setShowPassScreen(true);
   }
 
-  function drawAbhebenCard() {
-    const drawnCard = deck[0];
-
-    if (!drawnCard) {
+  function chooseAbhebenCard(cardIndex: number) {
+    if (
+      abhebenAnimation !== "idle" ||
+      abhebenFinished ||
+      selectedAbhebenIndex !== null
+    ) {
       return;
     }
 
-    // Remove the card from the deck.
-    setDeck((current) => current.slice(1));
+    const chosenCard = deck[cardIndex];
 
-    // Only the Abheben player gets to see the actual card.
-    setAbgehobenCard(drawnCard);
-
-    if (isAbhebenCard(drawnCard)) {
-      // Abheben player gets the special card.
-      setPlayers((current) =>
-        current.map((player, index) =>
-          index === abhebenPlayer
-            ? {
-                ...player,
-                cards: [...player.cards, drawnCard],
-              }
-            : player,
-        ),
-      );
-
-      setAbhebenFinished(false);
+    if (!chosenCard) {
       return;
     }
 
-    // Not a special card.
-    setAbhebenFinished(false);
+    setSelectedAbhebenIndex(cardIndex);
+    setAbgehobenCard(chosenCard);
+
+    // Render one frame face-down.
+    setAbhebenAnimation("idle");
+
+    window.setTimeout(() => {
+      // Flip the selected card.
+      setAbhebenAnimation("revealing");
+
+      window.setTimeout(() => {
+        if (isAbhebenCard(chosenCard)) {
+          // Kritische flies toward player's hand.
+          setAbhebenAnimation("taking");
+
+          window.setTimeout(() => {
+            // Actually remove it from the deck.
+            setDeck((currentDeck) =>
+              currentDeck.filter((card) => card.id !== chosenCard.id),
+            );
+
+            // And add it to Abheber's hand.
+            setPlayers((currentPlayers) =>
+              currentPlayers.map((player, index) =>
+                index === abhebenPlayer
+                  ? {
+                      ...player,
+                      cards: [...player.cards, chosenCard],
+                    }
+                  : player,
+              ),
+            );
+
+            setAbhebenAnimation("finished");
+            setAbhebenFinished(true);
+
+            window.setTimeout(() => {
+              setPhase("dealReady");
+            }, 350);
+          }, 700);
+        } else {
+          // Normal card returns visually to deck.
+          setAbhebenAnimation("returning");
+
+          window.setTimeout(() => {
+            // No setDeck() here.
+            // It never left the real deck.
+            setAbhebenAnimation("finished");
+            setAbhebenFinished(true);
+
+            window.setTimeout(() => {
+              setPhase("dealReady");
+            }, 350);
+          }, 700);
+        }
+      }, 650);
+    }, 50);
   }
 
   function continueHotseat() {
@@ -310,127 +387,18 @@ export default function WattenGame() {
     return shuffleDeck(createDeck());
   }
 
-  const normalRankValue: Record<string, number> = {
-    "7": 1,
-    "8": 2,
-    "9": 3,
-    "10": 4,
-    Unter: 5,
-    Ober: 6,
-    König: 7,
-    Ass: 8,
-  };
-
-  function getCriticalValue(card: WattenCard): number {
-    // Highest card in the whole game
-    if (card.suit === "Herz" && card.rank === "König") {
-      return 3;
-    }
-
-    // Second highest
-    if (card.suit === "Schellen" && card.rank === "7") {
-      return 2;
-    }
-
-    // Third highest
-    if (card.suit === "Eichel" && card.rank === "7") {
-      return 1;
-    }
-
-    return 0;
-  }
-
-  function getWattenStrength(card: WattenCard, leadSuit: string) {
-    const criticalValue = getCriticalValue(card);
-
-    // Kritische
-    if (criticalValue > 0) {
-      return {
-        category: 5,
-        value: criticalValue,
-      };
-    }
-
-    // Hauptschlag: Schlag + Trumpffarbe
-    if (card.rank === schlag && card.suit === Farbe) {
-      return {
-        category: 4,
-        value: 1,
-      };
-    }
-
-    // Other Schläge.
-    // All are equal, so play order decides between them.
-    if (card.rank === schlag) {
-      return {
-        category: 3,
-        value: 1,
-      };
-    }
-
-    // Normal Trumpf
-    if (card.suit === Farbe) {
-      return {
-        category: 2,
-        value: normalRankValue[card.rank] ?? 0,
-      };
-    }
-
-    // No trump in the trick:
-    // only the suit of the first played card matters.
-    if (card.suit === leadSuit) {
-      return {
-        category: 1,
-        value: normalRankValue[card.rank] ?? 0,
-      };
-    }
-
-    // Off-suit normal cards cannot win.
-    return {
-      category: 0,
-      value: 0,
-    };
-  }
-  function determineTrickWinner(cards: PlayedCard[]) {
-    const leadSuit = cards[0].card.suit;
-
-    let winningCard = cards[0];
-    let winningStrength = getWattenStrength(winningCard.card, leadSuit);
-
-    for (let i = 1; i < cards.length; i++) {
-      const played = cards[i];
-
-      const strength = getWattenStrength(played.card, leadSuit);
-
-      const strongerCategory = strength.category > winningStrength.category;
-
-      const sameCategoryButHigher =
-        strength.category === winningStrength.category &&
-        strength.value > winningStrength.value;
-
-      if (strongerCategory || sameCategoryButHigher) {
-        winningCard = played;
-        winningStrength = strength;
-      }
-    }
-
-    return winningCard;
-  }
-
   function finishTrick(cards: PlayedCard[]) {
     if (!Farbe || !schlag) {
       return;
     }
 
-    const winningCard = determineTrickWinner(cards);
+    const winningCard = determineTrickWinner(cards, Farbe, schlag);
 
     setTrickWinner(winningCard);
 
     // Do NOT remove the cards yet.
     // We want to show them during trickReview.
-    setPhase("trickReview");
-
-    setCardPlayedThisTurn(false);
+    setPhase("trickPause");
   }
 
   function finishTrickReview() {
@@ -511,8 +479,21 @@ export default function WattenGame() {
 
     return `${opponents[0].name} & ${opponents[1].name}`;
   }
-  const currentSide = getPlayerSide(currentPlayer);
+  function isSideGespannt(side: WattenSide) {
+    const sidePlayers =
+      side === "solo"
+        ? [players[trumpCaller]]
+        : players.filter((_, index) => index !== trumpCaller);
 
+    return sidePlayers.some((player) => {
+      const points = scores[player.id] ?? 0;
+
+      return points >= targetScore - 2 && points < targetScore;
+    });
+  }
+
+  const currentSide = getPlayerSide(currentPlayer);
+  const currentSideIsGespannt = isSideGespannt(currentSide);
   const canRaise =
     phase === "playing" &&
     !winner &&
@@ -520,6 +501,7 @@ export default function WattenGame() {
     !showPassScreen &&
     !cardPlayedThisTurn &&
     !pendingBid &&
+    !currentSideIsGespannt &&
     roundValue < 4 &&
     (lastBidSide === null || currentSide !== lastBidSide);
   function raiseRoundValue() {
@@ -557,37 +539,6 @@ export default function WattenGame() {
     setPendingBid(null);
   }
 
-  function getWattenCardRole(card: WattenCard, leadSuit: string): string {
-    if (card.suit === "Herz" && card.rank === "König") {
-      return "Max · Höchste Kritische";
-    }
-
-    if (card.suit === "Schellen" && card.rank === "7") {
-      return "Belli · Zweithöchste Kritische";
-    }
-
-    if (card.suit === "Eichel" && card.rank === "7") {
-      return "Spitz · dritthöchste Kritische";
-    }
-
-    if (card.rank === schlag && card.suit === Farbe) {
-      return "Hauptschlag";
-    }
-
-    if (card.rank === schlag) {
-      return "Schlag";
-    }
-
-    if (card.suit === Farbe) {
-      return "Trumpf";
-    }
-
-    if (card.suit === leadSuit) {
-      return "angespielte Farbe";
-    }
-
-    return "Fehlfarbe";
-  }
   function finishViewingCards() {
     if (viewingPlayer === null) {
       return;
@@ -605,23 +556,23 @@ export default function WattenGame() {
   }
 
   function restartGame() {
-    const nextTrumpCaller = (trumpCaller + 1) % 3;
+    const nextDealer = getNextPlayer(dealer, players.length);
 
-    startNewRound(nextTrumpCaller);
+    startNewRound(nextDealer);
   }
 
-  function isAbhebenCard(card: WattenCard) {
-    return (
-      (card.suit === "Herz" && card.rank === "König") ||
-      (card.suit === "Schellen" && card.rank === "7") ||
-      (card.suit === "Eichel" && card.rank === "7")
-    );
+  function startNextRound() {
+    const nextDealer = getNextPlayer(dealer, players.length);
+
+    startNewRound(nextDealer);
   }
-  function startNewRound(nextTrumpCaller: number) {
+
+  function startNewRound(nextDealer: number) {
     const newDeck = shuffleDeck(createDeck());
+    const nextTrumpCaller = getNextPlayer(nextDealer, players.length);
 
-    const nextAbhebenPlayer = (nextTrumpCaller + 2) % 3;
-
+    const nextAbhebenPlayer = getPreviousPlayer(nextDealer, players.length);
+    setDealer(nextDealer);
     setTrumpCaller(nextTrumpCaller);
     setDeck(newDeck);
 
@@ -639,6 +590,11 @@ export default function WattenGame() {
     setRoundValue(2);
     setPendingBid(null);
     setLastBidSide(null);
+    setAbgehobenCard(null);
+
+    setSelectedAbhebenIndex(null);
+    setAbhebenAnimation("idle");
+    setAbhebenFinished(false);
 
     setTricksWon({
       [playerInfo[0].id]: 0,
@@ -658,136 +614,47 @@ export default function WattenGame() {
 
     setWinner(null);
   }
+
   function finishAbheben() {
-    if (!abgehobenCard) {
+    if (!abhebenFinished) {
       return;
     }
 
-    const gotSpecialCard = isAbhebenCard(abgehobenCard);
-    const remainingDeck = deck;
+    const { dealtPlayers, remainingDeck } = dealRemainingCards(
+      players,
+      deck,
+      dealer,
+    );
 
-    if (gotSpecialCard) {
-      // Abheben player already has the special card.
-      // Give Abheben player 4 additional cards.
-      // Give the other players 5 cards each.
-      setPlayers((current) =>
-        current.map((player, index) => {
-          const cardsToDraw = index === abhebenPlayer ? 4 : 5;
+    setPlayers(dealtPlayers);
+    setDeck(remainingDeck);
 
-          return {
-            ...player,
-            cards: [...player.cards, ...remainingDeck.slice(0, cardsToDraw)],
-          };
-        }),
-      );
-
-      setDeck(remainingDeck.slice(13));
-    } else {
-      // Nobody got a special card.
-      // Everyone gets 5 cards.
-      setPlayers((current) =>
-        current.map((player, index) => ({
-          ...player,
-          cards: remainingDeck.slice(index * 5, index * 5 + 5),
-        })),
-      );
-
-      setDeck(remainingDeck.slice(15));
-    }
     setCardsSeen(
       Object.fromEntries(playerInfo.map((player) => [player.id, false])),
     );
 
-    // Abheben is finished.
-    // Players can look at their cards whenever they want.
-    // The Trumpf player gets a button on the board.
+    // Vorhand chooses Schlag/Farbe
+    // and later leads the first trick.
     setCurrentPlayer(trumpCaller);
+
     setPhase("playing");
     setShowPassScreen(true);
   }
-  function isCritical(card: WattenCard) {
-    return (
-      (card.suit === "Herz" && card.rank === "König") ||
-      (card.suit === "Schellen" && card.rank === "7") ||
-      (card.suit === "Eichel" && card.rank === "7")
-    );
-  }
-
-  function isHauptschlag(card: WattenCard) {
-    if (!Farbe || !schlag) {
-      return false;
-    }
-
-    // A Kritischer is always treated as Kritisch, not as Hauptschlag.
-    // Example: Herz-König when König + Herz were chosen.
-    return !isCritical(card) && card.suit === Farbe && card.rank === schlag;
-  }
-
-  function isFirstTrick() {
-    return Object.values(tricksWon).every((count) => count === 0);
-  }
-
-  function isTrumpfOderKritischActive() {
-    if (!Farbe || !schlag) {
-      return false;
-    }
-
-    if (!isFirstTrick()) {
-      return false;
-    }
-
-    // The Hauptschlag has to be the very first card of the first trick.
-    const firstPlayedCard = playedCards[0]?.card;
-
-    if (!firstPlayedCard || !isHauptschlag(firstPlayedCard)) {
-      return false;
-    }
-
-    // Once somebody has beaten it with a Kritischer,
-    // the remaining players are free again.
-    const criticalAlreadyPlayed = playedCards
-      .slice(1)
-      .some((played) => isCritical(played.card));
-
-    return !criticalAlreadyPlayed;
-  }
-
-  function isTrumpfOderKritischCard(card: WattenCard) {
-    if (!Farbe) {
-      return false;
-    }
-
-    return isCritical(card) || card.suit === Farbe;
-  }
-
-  function currentPlayerMustFollowTrumpfOderKritisch() {
-    if (!isTrumpfOderKritischActive()) {
-      return false;
-    }
-
-    // The player is only forced if they actually have
-    // at least one legal Trumpf/Kritisch response.
-    return currentPlayerData.cards.some((card) =>
-      isTrumpfOderKritischCard(card),
-    );
-  }
 
   function canCurrentPlayerPlayCard(card: WattenCard) {
-    if (!currentPlayerMustFollowTrumpfOderKritisch()) {
+    if (!currentPlayerMustFollowTrumpfOderKritisch) {
       return true;
     }
 
-    return isTrumpfOderKritischCard(card);
-  }
-
-  function startNextRound() {
-    const nextTrumpCaller = (trumpCaller + 1) % 3;
-
-    startNewRound(nextTrumpCaller);
+    return isTrumpfOderKritischCard(card, Farbe);
   }
 
   function canActivateTrumpfOderKritisch(card: WattenCard) {
-    return isFirstTrick() && playedCards.length === 0 && isHauptschlag(card);
+    return (
+      isFirstTrick(tricksWon) &&
+      playedCards.length === 0 &&
+      isHauptschlag(card, Farbe, schlag)
+    );
   }
   function getBeginnerCardHint(card: WattenCard): string | undefined {
     if (!helpMode) {
@@ -813,7 +680,7 @@ export default function WattenGame() {
       return "Spitz — die dritthöchste Kritische.";
     }
 
-    if (isHauptschlag(card)) {
+    if (isHauptschlag(card, Farbe, schlag)) {
       return "Hauptschlag — die stärkste nicht-kritische Karte.";
     }
 
@@ -838,18 +705,19 @@ export default function WattenGame() {
     const sortByRankDescending = (a: WattenCard, b: WattenCard) =>
       (normalRankValue[b.rank] ?? 0) - (normalRankValue[a.rank] ?? 0);
 
-    // 1. Kritische
     const kritische = fullDeck
       .filter((card) => isCritical(card))
       .sort((a, b) => getCriticalValue(b) - getCriticalValue(a));
 
-    // 2. Hauptschlag
-    const hauptschlag = fullDeck.filter((card) => isHauptschlag(card));
+    const hauptschlag = fullDeck.filter((card) =>
+      isHauptschlag(card, Farbe, schlag),
+    );
 
-    // 3. Other Schläge
     const schlaege = fullDeck.filter(
       (card) =>
-        card.rank === schlag && !isCritical(card) && !isHauptschlag(card),
+        card.rank === schlag &&
+        !isCritical(card) &&
+        !isHauptschlag(card, Farbe, schlag),
     );
 
     // 4. Remaining Trumpf / Farbe cards
@@ -908,26 +776,6 @@ export default function WattenGame() {
     ];
   }
 
-  function wouldCardCurrentlyWin(card: WattenCard): boolean | null {
-    // No comparison is possible when leading a trick.
-    if (playedCards.length === 0) {
-      return null;
-    }
-
-    const simulatedPlay: PlayedCard = {
-      playerId: currentPlayerData.id,
-      card,
-    };
-
-    const simulatedCards = [...playedCards, simulatedPlay];
-
-    const simulatedWinner = determineTrickWinner(simulatedCards);
-
-    return (
-      simulatedWinner.playerId === currentPlayerData.id &&
-      simulatedWinner.card.id === card.id
-    );
-  }
   function awardGamePoints(winningSide: WattenSide, points: number) {
     const updatedScores = { ...scores };
 
@@ -953,9 +801,57 @@ export default function WattenGame() {
       setGameWinner(overallWinners.map((player) => player.name).join(" & "));
     }
   }
+  function dealRemainingCards(
+    currentPlayers: Player[],
+    currentDeck: WattenCard[],
+    dealerIndex: number,
+  ) {
+    const dealtPlayers = currentPlayers.map((player) => ({
+      ...player,
+      cards: [...player.cards],
+    }));
+
+    const remainingDeck = [...currentDeck];
+
+    // Vorhand receives first.
+    const firstPlayer = getNextPlayer(dealerIndex, dealtPlayers.length);
+
+    const dealOrder = Array.from(
+      { length: dealtPlayers.length },
+      (_, offset) => (firstPlayer + offset) % dealtPlayers.length,
+    );
+
+    // First packet -> everyone reaches 3 cards.
+    // Second packet -> everyone reaches 5 cards.
+    //
+    // Someone who already received a Kritische
+    // during Abheben gets correspondingly fewer.
+    for (const targetHandSize of [3, 5]) {
+      for (const playerIndex of dealOrder) {
+        const player = dealtPlayers[playerIndex];
+
+        const cardsNeeded = targetHandSize - player.cards.length;
+
+        if (cardsNeeded <= 0) {
+          continue;
+        }
+
+        const cardsToGive = remainingDeck.splice(0, cardsNeeded);
+
+        player.cards.push(...cardsToGive);
+      }
+    }
+
+    return {
+      dealtPlayers,
+      remainingDeck,
+    };
+  }
   const currentPlayerData = players[currentPlayer];
 
   const soloPlayer = players[trumpCaller];
+
+  const abhebenPlayerData = players[abhebenPlayer];
 
   const teamPlayers = players.filter((_, index) => index !== trumpCaller);
 
@@ -965,13 +861,35 @@ export default function WattenGame() {
     (sum, player) => sum + (tricksWon[player.id] ?? 0),
     0,
   );
+  const trumpfOderKritischActive = isTrumpfOderKritischActive(
+    playedCards,
+    tricksWon,
+    Farbe,
+    schlag,
+  );
+
+  const currentPlayerMustFollowTrumpfOderKritisch =
+    mustFollowTrumpfOderKritisch(
+      currentPlayerData.cards,
+      playedCards,
+      tricksWon,
+      Farbe,
+      schlag,
+    );
 
   // Rotate the seating perspective around the current player.
-  const leftOpponentIndex = (currentPlayer + 1) % players.length;
-  const rightOpponentIndex = (currentPlayer + 2) % players.length;
+  const leftOpponentIndex = getNextPlayer(currentPlayer, players.length);
+
+  const rightOpponentIndex = getPreviousPlayer(currentPlayer, players.length);
 
   const leftOpponent = players[leftOpponentIndex];
+
   const rightOpponent = players[rightOpponentIndex];
+
+  function openTrickReview() {
+    setCardPlayedThisTurn(false);
+    setPhase("trickReview");
+  }
 
   return (
     <main className="min-h-screen bg-emerald-950 px-4 py-6 text-white md:px-8">
@@ -1215,54 +1133,105 @@ export default function WattenGame() {
                 </div>
               </div>
 
-              {/* Drawn card */}
-              {abgehobenCard ? (
-                <div className="mt-8">
-                  <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                    Your card
-                  </p>
+              {/* ABHEBEN CARD SELECTION */}
+              <div className="mt-8">
+                {!abgehobenCard ? (
+                  <>
+                    <p className="mb-4 text-sm font-semibold text-zinc-300">
+                      Wähle eine Karte zum Abheben
+                    </p>
 
-                  <div className="flex justify-center">
-                    <div
-                      className={
-                        isAbhebenCard(abgehobenCard)
-                          ? "rounded-2xl border-2 border-amber-400 bg-amber-400/10 p-2 shadow-[0_0_30px_rgba(251,191,36,0.35)]"
-                          : "rounded-2xl border border-zinc-700 bg-zinc-800 p-2"
-                      }
-                    >
-                      <WattenCardComponent card={abgehobenCard} disabled />
+                    <div className="space-y-4">
+                      {[deck.slice(0, 16), deck.slice(16)].map(
+                        (row, rowIndex) => (
+                          <div
+                            key={rowIndex}
+                            className="flex justify-center px-10"
+                          >
+                            {row.map((card, index) => {
+                              const actualIndex = rowIndex * 16 + index;
+
+                              return (
+                                <button
+                                  key={card.id}
+                                  type="button"
+                                  onClick={() => chooseAbhebenCard(actualIndex)}
+                                  className={`
+                relative h-20 w-12
+                rounded-lg
+                border border-white/20
+                bg-zinc-950
+                shadow-lg
+                transition-all
+                duration-200
+                hover:z-30
+                hover:-translate-y-3
+                hover:scale-110
+                hover:border-amber-300
+                ${index !== 0 ? "-ml-5" : ""}
+              `}
+                                >
+                                  <div className="absolute inset-1 rounded-md border border-emerald-300/30 bg-emerald-900" />
+                                </button>
+                              );
+                            })}
+                          </div>
+                        ),
+                      )}
                     </div>
+
+                    <p className="mt-4 text-xs text-zinc-500">
+                      Wähle eine der {deck.length} verdeckten Karten.
+                    </p>
+                  </>
+                ) : (
+                  <div className="flex flex-col items-center">
+                    <div className="abheben-card-scene relative h-40 w-28">
+                      <div
+                        className={`abheben-card-flip relative h-full w-full ${
+                          abhebenAnimation !== "idle" ? "is-flipped" : ""
+                        }`}
+                      >
+                        {/* BACK */}
+                        <div className="abheben-card-face absolute inset-0 rounded-xl border-2 border-white/20 bg-zinc-950 shadow-xl">
+                          <div className="absolute inset-2 rounded-lg border border-emerald-400/40 bg-emerald-900">
+                            <div className="absolute inset-2 rounded border border-white/10" />
+                          </div>
+                        </div>
+
+                        {/* FRONT */}
+                        <div className="abheben-card-face abheben-card-front absolute inset-0">
+                          <WattenCardComponent card={abgehobenCard} disabled />
+                        </div>
+                      </div>
+                    </div>
+
+                    {abhebenAnimation === "revealing" && (
+                      <p className="mt-4 font-semibold text-white">
+                        Karte wird aufgedeckt...
+                      </p>
+                    )}
+
+                    {abhebenAnimation === "returning" && (
+                      <p className="mt-4 font-semibold text-zinc-300">
+                        Keine Kritische — die Karte kommt zurück in den Stapel.
+                      </p>
+                    )}
+
+                    {abhebenAnimation === "taking" && (
+                      <p className="mt-4 font-semibold text-amber-300">
+                        Kritische! Die Karte kommt auf deine Hand.
+                      </p>
+                    )}
+
+                    {abhebenAnimation === "finished" && (
+                      <p className="mt-4 font-semibold text-emerald-300">
+                        Abheben beendet — Karten werden zusammengelegt...
+                      </p>
+                    )}
                   </div>
-
-                  <p
-                    className={`mt-4 text-sm font-semibold ${
-                      isAbhebenCard(abgehobenCard)
-                        ? "text-amber-400"
-                        : "text-zinc-400"
-                    }`}
-                  >
-                    {isAbhebenCard(abgehobenCard)
-                      ? "🎉 You got a special card!"
-                      : "This is not a special card."}
-                  </p>
-
-                  <button
-                    type="button"
-                    onClick={finishAbheben}
-                    className="mt-6 w-full rounded-xl bg-emerald-500 px-5 py-4 font-bold text-emerald-950 transition hover:bg-emerald-400"
-                  >
-                    Finish Turn
-                  </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={drawAbhebenCard}
-                  className="mt-8 w-full rounded-xl bg-emerald-500 px-5 py-4 font-bold text-emerald-950 transition hover:bg-emerald-400"
-                >
-                  Karte abheben
-                </button>
-              )}
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -1284,11 +1253,9 @@ export default function WattenGame() {
                 {players[trumpCaller].name}
               </p>
 
-              <h2 className="mt-2 text-3xl font-bold">Choose Trumpf</h2>
+              <h2 className="mt-2 text-3xl font-bold">Trumpf</h2>
 
-              <p className="mt-2 text-zinc-400">
-                Choose the suit that will be trump.
-              </p>
+              <p className="mt-2 text-zinc-400">Wähle den Trumpf.</p>
 
               <div className="mt-6 grid grid-cols-2 gap-3">
                 {[
@@ -1333,11 +1300,9 @@ export default function WattenGame() {
                 {players[currentPlayer].name}
               </p>
 
-              <h2 className="mt-2 text-3xl font-bold">Choose Schlag</h2>
+              <h2 className="mt-2 text-3xl font-bold">Schlag</h2>
 
-              <p className="mt-2 text-zinc-400">
-                Choose the rank that will be Schlag.
-              </p>
+              <p className="mt-2 text-zinc-400">Wähle den Schlag.</p>
 
               <div className="mt-6 grid grid-cols-4 gap-3 md:grid-cols-8">
                 {["7", "8", "9", "10", "Unter", "Ober", "König", "Ass"].map(
@@ -1412,7 +1377,12 @@ export default function WattenGame() {
                       <p className="mt-3 font-semibold">{player?.name}</p>
 
                       <p className="mt-1 text-xs text-emerald-300">
-                        {getWattenCardRole(played.card, leadSuit)}
+                        {getWattenCardRole(
+                          played.card,
+                          leadSuit,
+                          Farbe,
+                          schlag,
+                        )}
                       </p>
 
                       {isWinner && (
@@ -1695,6 +1665,89 @@ export default function WattenGame() {
           {/* CENTER: PLAYING TABLE */}
           <div className="relative min-h-[640px] min-w-0 overflow-visible rounded-[100px] border-[8px] border-emerald-900 bg-emerald-700 shadow-2xl">
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.06),transparent_55%)]" />
+            {/* DECK READY AFTER ABHEBEN */}
+            {phase === "dealReady" && !winner && (
+              <div className="absolute left-1/2 top-[43%] z-40 -translate-x-1/2 -translate-y-1/2">
+                <div className="flex items-center gap-10 rounded-3xl border border-white/10 bg-emerald-950/70 px-10 py-8 shadow-2xl backdrop-blur-sm">
+                  {/* Animated deck */}
+                  <div className="flex flex-col items-center">
+                    <div className="relative h-32 w-24">
+                      {[0, 1, 2, 3, 4, 5].map((index) => (
+                        <div
+                          key={index}
+                          className={`watten-deck-gather-card deck-gather-${index} absolute inset-0 rounded-xl border-2 border-white/20 bg-zinc-950 shadow-xl`}
+                        >
+                          <div className="absolute inset-2 rounded-lg border border-emerald-400/40 bg-emerald-900">
+                            <div className="absolute inset-2 rounded border border-white/10" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <p className="mt-4 text-sm font-semibold text-emerald-200">
+                      {deck.length} Karten im Stapel
+                    </p>
+                  </div>
+
+                  {/* Deal button */}
+                  <div className="flex flex-col items-start">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-emerald-300">
+                      Abheben beendet
+                    </p>
+
+                    <h3 className="mt-1 text-xl font-bold text-white">
+                      Karten bereit zum Austeilen
+                    </h3>
+
+                    <button
+                      type="button"
+                      onClick={finishAbheben}
+                      className="mt-5 rounded-xl bg-amber-400 px-7 py-4 font-bold text-amber-950 shadow-xl transition hover:scale-105 hover:bg-amber-300"
+                    >
+                      austeilen und Zug beenden
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+            {/* ABHEBER HAND DURING DEAL READY */}
+            {phase === "dealReady" && (
+              <div className="absolute bottom-4 left-1/2 z-30 w-full -translate-x-1/2 px-10">
+                <div className="relative mx-auto min-h-32 max-w-xl rounded-2xl border border-amber-400/20 bg-zinc-950/95 px-6 py-4 shadow-2xl backdrop-blur-md">
+                  {/* Player label */}
+                  <div className="absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-amber-400 px-5 py-1.5 text-sm font-black text-amber-950 shadow-lg">
+                    ▼ {abhebenPlayerData.name} · ABHEBER
+                  </div>
+
+                  <div className="mt-3 text-center">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-emerald-300">
+                      Deine Hand nach dem Abheben
+                    </p>
+
+                    <p className="mt-1 text-xs text-zinc-500">
+                      Die restlichen Karten werden gleich ausgeteilt.
+                    </p>
+                  </div>
+
+                  <div className="mt-4 flex min-h-20 items-center justify-center gap-3">
+                    {abhebenPlayerData.cards.length > 0 ? (
+                      abhebenPlayerData.cards.map((card) => (
+                        <div
+                          key={card.id}
+                          className="animate-in fade-in zoom-in duration-500"
+                        >
+                          <WattenCardComponent card={card} disabled />
+                        </div>
+                      ))
+                    ) : (
+                      <div className="flex h-20 items-center justify-center rounded-xl border border-dashed border-white/15 px-8 text-sm text-zinc-500">
+                        Noch keine Karte auf der Hand
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
             {/* GAME STATUS - BETWEEN OPPONENTS */}
             <div className="absolute left-1/2 top-8 z-20 -translate-x-1/2">
               <div className="flex min-w-72 flex-col items-center rounded-2xl border border-white/10 bg-emerald-950/80 px-5 py-3 shadow-lg backdrop-blur">
@@ -1876,17 +1929,22 @@ export default function WattenGame() {
             {/* LEFT OPPONENT */}
             <div className="absolute left-10 top-8 z-20 w-48 rounded-2xl border border-white/10 bg-emerald-950/55 p-3 text-center shadow-lg transition-all duration-300">
               {/* NEXT PLAYER */}
-              <div className="absolute -top-2 right-2 rounded-full border border-emerald-400/30 bg-emerald-950 px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider text-emerald-300 shadow">
-                Nächster
-              </div>
+              {phase !== "dealReady" && (
+                <div className="absolute -top-2 right-2 rounded-full border border-amber-400/40 bg-amber-400 px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider text-amber-950 shadow">
+                  Nächster Spieler
+                </div>
+              )}
 
               <div className="text-lg font-bold text-white">
                 {leftOpponent.name}
               </div>
 
               <p className="mt-0.5 text-[11px] text-emerald-300">
-                {leftOpponent.cards.length} Karten ·{" "}
-                {tricksWon[leftOpponent.id] ?? 0} Stiche
+                {phase === "dealReady"
+                  ? "Wartet auf Karten"
+                  : `${leftOpponent.cards.length} Karten · ${
+                      tricksWon[leftOpponent.id] ?? 0
+                    } Stiche`}
               </p>
 
               {/* Hidden cards */}
@@ -1915,13 +1973,21 @@ export default function WattenGame() {
 
             {/* RIGHT OPPONENT */}
             <div className="absolute right-10 top-8 z-20 w-48 rounded-2xl border border-white/10 bg-emerald-950/55 p-3 text-center shadow-lg transition-all duration-300">
+              {phase === "dealReady" && (
+                <div className="absolute -top-2 left-2 rounded-full border border-amber-400/40 bg-amber-400 px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider text-amber-950 shadow">
+                  Beginnt das Spiel
+                </div>
+              )}
               <div className="text-lg font-bold text-white">
                 {rightOpponent.name}
               </div>
 
               <p className="mt-0.5 text-[11px] text-emerald-300">
-                {rightOpponent.cards.length} Karten ·{" "}
-                {tricksWon[rightOpponent.id] ?? 0} Stiche
+                {phase === "dealReady"
+                  ? "Wartet auf Karten"
+                  : `${rightOpponent.cards.length} Karten · ${
+                      tricksWon[rightOpponent.id] ?? 0
+                    } Stiche`}
               </p>
 
               {/* Hidden cards */}
@@ -1994,16 +2060,27 @@ export default function WattenGame() {
                 ))
               )}
             </div>
+            {phase === "trickPause" && (
+              <div className="absolute bottom-5 left-1/2 z-30 -translate-x-1/2">
+                <button
+                  type="button"
+                  onClick={openTrickReview}
+                  className="rounded-xl bg-amber-400 px-6 py-3 font-bold text-amber-950 shadow-xl transition hover:scale-105 hover:bg-amber-300"
+                >
+                  weiter
+                </button>
+              </div>
+            )}
             <div className="absolute bottom-60 left-50">
-              {isTrumpfOderKritischActive() && (
+              {trumpfOderKritischActive && (
                 <div
                   className={`mx-auto mb-3 w-fit rounded-xl border px-4 py-2 text-center text-sm font-bold ${
-                    currentPlayerMustFollowTrumpfOderKritisch()
+                    currentPlayerMustFollowTrumpfOderKritisch
                       ? "border-red-400/50 bg-red-500/20 text-red-100"
                       : "border-amber-400/50 bg-amber-400/20 text-amber-100"
                   }`}
                 >
-                  {currentPlayerMustFollowTrumpfOderKritisch()
+                  {currentPlayerMustFollowTrumpfOderKritisch
                     ? "Trumpf oder Kritisch! You must play one of the highlighted cards."
                     : "Trumpf oder Kritisch — you have neither, so you may play any card."}
                 </div>
@@ -2027,7 +2104,7 @@ export default function WattenGame() {
                     <div className="mb-1 text-center">
                       <div className="mb-1 text-center">
                         <span className="text-xs font-semibold uppercase tracking-widest text-emerald-300">
-                          Handkarten
+                          Handkarten von
                         </span>
 
                         <span className="ml-2 text-sm font-bold text-white">
@@ -2061,7 +2138,7 @@ export default function WattenGame() {
                       <div className="flex justify-center gap-2">
                         {currentPlayerData.cards.map((card) => {
                           const mustFollow =
-                            currentPlayerMustFollowTrumpfOderKritisch();
+                            currentPlayerMustFollowTrumpfOderKritisch;
 
                           const legalUnderForcedRule =
                             canCurrentPlayerPlayCard(card);
@@ -2070,7 +2147,13 @@ export default function WattenGame() {
                             helpMode &&
                             playedCards.length > 0 &&
                             !cardPlayedThisTurn
-                              ? wouldCardCurrentlyWin(card)
+                              ? wouldCardWin(
+                                  card,
+                                  currentPlayerData.id,
+                                  playedCards,
+                                  Farbe,
+                                  schlag,
+                                )
                               : null;
 
                           return (
@@ -2108,7 +2191,7 @@ export default function WattenGame() {
                       {/* RIGHT: Finish Turn */}
                       <div className="flex justify-start">
                         {phase === "playing" &&
-                          playedCards.length < 3 &&
+                          playedCards.length < players.length &&
                           cardPlayedThisTurn && (
                             <div className="flex flex-col items-center gap-2">
                               <p className="text-center text-xs font-medium text-emerald-200">
@@ -2266,6 +2349,11 @@ export default function WattenGame() {
                   </p>
                 )}
               </div>
+              {currentSideIsGespannt && (
+                <p className="text-xs font-bold text-red-300">
+                  Gespannt · Erhöhen nicht möglich
+                </p>
+              )}
             </div>
           </aside>
         </div>

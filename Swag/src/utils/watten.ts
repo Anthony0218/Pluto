@@ -60,6 +60,38 @@ export type WattenCard = {
   suit: Suit;
   rank: Rank;
 };
+export type PlayedCard = {
+  playerId: string;
+  card: WattenCard;
+};
+
+export type WattenSuit =
+  | "Herz"
+  | "Schellen"
+  | "Eichel"
+  | "Gras";
+
+export const normalRankValue: Record<string, number> = {
+  "7": 1,
+  "8": 2,
+  "9": 3,
+  "10": 4,
+  Unter: 5,
+  Ober: 6,
+  König: 7,
+  Ass: 8,
+} as const;
+
+
+
+export function getPreviousPlayer(
+  currentPlayer: number,
+  playerCount: number,
+) {
+  return (
+    currentPlayer - 1 + playerCount
+  ) % playerCount;
+}
 
 export const suits: Suit[] = [
   "Eichel",
@@ -186,53 +218,49 @@ export function cardStrength(
  * Returns the winner of cards played in a trick.
  */
 export function determineTrickWinner(
-  cards: { playerId: PlayerId; card: Card }[],
-  trumpSuit: Suit,
-  schlag: Rank,
-): PlayerId {
+  cards: PlayedCard[],
+  Farbe: WattenSuit | null,
+  schlag: string | null,
+): PlayedCard {
   if (cards.length === 0) {
-    throw new Error("Cannot determine winner of empty trick.");
+    throw new Error("Cannot determine winner of an empty trick.");
   }
 
-  const ledSuit = cards[0].card.suit;
+  const leadSuit = cards[0].card.suit;
 
-  let winner = cards[0];
+  let winningCard = cards[0];
 
-  for (const played of cards.slice(1)) {
-    const currentStrength = cardStrength(
+  let winningStrength = getWattenStrength(
+    winningCard.card,
+    leadSuit,
+    Farbe,
+    schlag,
+  );
+
+  for (let i = 1; i < cards.length; i++) {
+    const played = cards[i];
+
+    const strength = getWattenStrength(
       played.card,
-      trumpSuit,
+      leadSuit,
+      Farbe,
       schlag,
-      ledSuit,
     );
 
-    const winnerStrength = cardStrength(
-      winner.card,
-      trumpSuit,
-      schlag,
-      ledSuit,
-    );
+    const strongerCategory =
+      strength.category > winningStrength.category;
 
-    // Cards from another suit normally cannot win.
-    const currentCanWin =
-      played.card.suit === ledSuit ||
-      isTrump(played.card, trumpSuit) ||
-      isSchlag(played.card, schlag);
+    const sameCategoryButHigher =
+      strength.category === winningStrength.category &&
+      strength.value > winningStrength.value;
 
-    const winnerCanWin =
-      winner.card.suit === ledSuit ||
-      isTrump(winner.card, trumpSuit) ||
-      isSchlag(winner.card, schlag);
-
-    if (
-      currentCanWin &&
-      (!winnerCanWin || currentStrength > winnerStrength)
-    ) {
-      winner = played;
+    if (strongerCategory || sameCategoryButHigher) {
+      winningCard = played;
+      winningStrength = strength;
     }
   }
 
-  return winner.playerId;
+  return winningCard;
 }
 
 /**
@@ -272,41 +300,271 @@ export function playerName(player: PlayerId): string {
   }
 }
 
-function getBeginnerCardHint(card: WattenCard): string | undefined {
-  if (!helpMode) {
-    return undefined;
+export function getNextPlayer(
+  currentPlayer: number,
+  playerCount: number,
+) {
+  return (currentPlayer + 1) % playerCount;
+}
+
+
+
+export function getCriticalValue(card: WattenCard): number {
+    // Highest card in the whole game
+    if (card.suit === "Herz" && card.rank === "König") {
+      return 3;
+    }
+
+    // Second highest
+    if (card.suit === "Schellen" && card.rank === "7") {
+      return 2;
+    }
+
+    // Third highest
+    if (card.suit === "Eichel" && card.rank === "7") {
+      return 1;
+    }
+
+    return 0;
   }
 
-  // Existing special first-trick hint gets priority.
-  if (canActivateTrumpfOderKritisch(card)) {
-    return "Hauptschlag — if you lead this card now, Trumpf oder Kritisch becomes active.";
+  export function isCritical(card: WattenCard) {
+    return (
+      (card.suit === "Herz" && card.rank === "König") ||
+      (card.suit === "Schellen" && card.rank === "7") ||
+      (card.suit === "Eichel" && card.rank === "7")
+    );
+  }
+export function isAbhebenCard(card: WattenCard) {
+    return (
+      (card.suit === "Herz" && card.rank === "König") ||
+      (card.suit === "Schellen" && card.rank === "7") ||
+      (card.suit === "Eichel" && card.rank === "7")
+    );
+  }
+export function isHauptschlag(
+  card: WattenCard,
+  Farbe: WattenSuit | null,
+  schlag: string | null,
+): boolean {
+  if (!Farbe || !schlag) {
+    return false;
   }
 
+  return (
+    !isCritical(card) &&
+    card.suit === Farbe &&
+    card.rank === schlag
+  );
+}
+export function getWattenStrength(
+  card: WattenCard,
+  leadSuit: string,
+  Farbe: WattenSuit | null,
+  schlag: string | null,
+) {
   const criticalValue = getCriticalValue(card);
 
-  if (criticalValue === 3) {
-    return "Max — the highest Kritischer and the highest card in Watten.";
+  // Kritische
+  if (criticalValue > 0) {
+    return {
+      category: 5,
+      value: criticalValue,
+    };
   }
 
-  if (criticalValue === 2) {
-    return "Belli — the second-highest Kritischer.";
+  // Hauptschlag
+  if (card.rank === schlag && card.suit === Farbe) {
+    return {
+      category: 4,
+      value: 1,
+    };
   }
 
-  if (criticalValue === 1) {
-    return "Spitz — the third-highest Kritischer.";
+  // Other Schläge
+  if (card.rank === schlag) {
+    return {
+      category: 3,
+      value: 1,
+    };
   }
 
-  if (isHauptschlag(card)) {
-    return "Hauptschlag — the strongest non-Kritisch card.";
+  // Trumpf
+  if (card.suit === Farbe) {
+    return {
+      category: 2,
+      value: normalRankValue[card.rank] ?? 0,
+    };
+  }
+
+  // Angespielte Farbe
+  if (card.suit === leadSuit) {
+    return {
+      category: 1,
+      value: normalRankValue[card.rank] ?? 0,
+    };
+  }
+
+  return {
+    category: 0,
+    value: 0,
+  };
+}
+export function isFirstTrick(
+  tricksWon: Record<string, number>,
+): boolean {
+  return Object.values(tricksWon).every(
+    (count) => count === 0,
+  );
+}
+
+export function isTrumpfOderKritischCard(
+  card: WattenCard,
+  Farbe: WattenSuit | null,
+): boolean {
+  if (!Farbe) {
+    return false;
+  }
+
+  return isCritical(card) || card.suit === Farbe;
+}
+export function isTrumpfOderKritischActive(
+  playedCards: PlayedCard[],
+  tricksWon: Record<string, number>,
+  Farbe: WattenSuit | null,
+  schlag: string | null,
+): boolean {
+  if (!Farbe || !schlag) {
+    return false;
+  }
+
+  if (!isFirstTrick(tricksWon)) {
+    return false;
+  }
+
+  const firstPlayedCard = playedCards[0]?.card;
+
+  if (
+    !firstPlayedCard ||
+    !isHauptschlag(firstPlayedCard, Farbe, schlag)
+  ) {
+    return false;
+  }
+
+  const criticalAlreadyPlayed = playedCards
+    .slice(1)
+    .some((played) => isCritical(played.card));
+
+  return !criticalAlreadyPlayed;
+}
+
+export function mustFollowTrumpfOderKritisch(
+  hand: WattenCard[],
+  playedCards: PlayedCard[],
+  tricksWon: Record<string, number>,
+  Farbe: WattenSuit | null,
+  schlag: string | null,
+): boolean {
+  if (
+    !isTrumpfOderKritischActive(
+      playedCards,
+      tricksWon,
+      Farbe,
+      schlag,
+    )
+  ) {
+    return false;
+  }
+
+  return hand.some((card) =>
+    isTrumpfOderKritischCard(card, Farbe),
+  );
+}
+
+export function canPlayWattenCard(
+  card: WattenCard,
+  hand: WattenCard[],
+  playedCards: PlayedCard[],
+  tricksWon: Record<string, number>,
+  Farbe: WattenSuit | null,
+  schlag: string | null,
+): boolean {
+  const mustFollow = mustFollowTrumpfOderKritisch(
+    hand,
+    playedCards,
+    tricksWon,
+    Farbe,
+    schlag,
+  );
+
+  if (!mustFollow) {
+    return true;
+  }
+
+  return isTrumpfOderKritischCard(card, Farbe);
+}
+
+export function getWattenCardRole(
+  card: WattenCard,
+  leadSuit: string,
+  Farbe: WattenSuit | null,
+  schlag: string | null,
+): string {
+  if (card.suit === "Herz" && card.rank === "König") {
+    return "Max · Höchste Kritische";
+  }
+
+  if (card.suit === "Schellen" && card.rank === "7") {
+    return "Belli · Zweithöchste Kritische";
+  }
+
+  if (card.suit === "Eichel" && card.rank === "7") {
+    return "Spitz · dritthöchste Kritische";
+  }
+
+  if (isHauptschlag(card, Farbe, schlag)) {
+    return "Hauptschlag";
   }
 
   if (card.rank === schlag) {
-    return "Schlag — stronger than normal Trumpf cards. If two equal Schläge are played, the earlier one wins.";
+    return "Schlag";
   }
 
   if (card.suit === Farbe) {
-    return `Trumpf (${Farbe}) — this card beats ordinary non-Trumpf cards.`;
+    return "Trumpf";
   }
 
-  return undefined;
+  if (card.suit === leadSuit) {
+    return "angespielte Farbe";
+  }
+
+  return "Fehlfarbe";
+}
+
+export function wouldCardWin(
+  card: WattenCard,
+  playerId: string,
+  playedCards: PlayedCard[],
+  Farbe: WattenSuit | null,
+  schlag: string | null,
+): boolean | null {
+  if (playedCards.length === 0) {
+    return null;
+  }
+
+  const simulatedPlay: PlayedCard = {
+    playerId,
+    card,
+  };
+
+  const simulatedWinner = determineTrickWinner(
+    [...playedCards, simulatedPlay],
+    Farbe,
+    schlag,
+  );
+
+  return (
+    simulatedWinner.playerId === playerId &&
+    simulatedWinner.card.id === card.id
+  );
 }

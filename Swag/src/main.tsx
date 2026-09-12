@@ -16,6 +16,8 @@ import WattenHotseat from "./pages/WattenHotseat";
 import WattenGame from "./components/WattenGame";
 import WattenHotseatPage from "./pages/WattenGamePage";
 import { ThemeProvider } from "./context/ThemeContext";
+import WattenMultiplayerGame from "./pages/WattenMultiplayerGame";
+import WattenMultiplayer from "./pages/WattenMultiplayer";
 
 const router = createBrowserRouter([
   {
@@ -52,6 +54,14 @@ const router = createBrowserRouter([
       {
         path: "/watten/hotseat/game",
         element: <WattenHotseatPage />,
+      },
+      {
+        path: "/watten/multiplayer",
+        element: <WattenMultiplayer />,
+      },
+      {
+        path: "/watten/multiplayer/:gameId",
+        element: <WattenMultiplayerGame />,
       },
     ],
   },

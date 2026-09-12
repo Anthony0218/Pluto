@@ -23,3 +23,91 @@ body {
   background: #fafafa;
   color: #18181b;
 }
+.abheben-card-scene {
+  perspective: 900px;
+}
+
+.abheben-card-flip {
+  transform-style: preserve-3d;
+  transition:
+    transform 0.65s ease,
+    opacity 0.7s ease;
+}
+
+.abheben-card-flip.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.abheben-card-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.abheben-card-front {
+  transform: rotateY(180deg);
+}
+@keyframes watten-deck-gather {
+  0% {
+    transform: translate(var(--deck-x), var(--deck-y)) rotate(var(--deck-r))
+      scale(0.85);
+    opacity: 0;
+  }
+
+  65% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+.watten-deck-gather-card {
+  animation: watten-deck-gather 700ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+
+  opacity: 0;
+}
+
+/* Cards come from different positions */
+.deck-gather-0 {
+  --deck-x: -130px;
+  --deck-y: -60px;
+  --deck-r: -16deg;
+  animation-delay: 0ms;
+}
+
+.deck-gather-1 {
+  --deck-x: 120px;
+  --deck-y: -50px;
+  --deck-r: 14deg;
+  animation-delay: 70ms;
+}
+
+.deck-gather-2 {
+  --deck-x: -100px;
+  --deck-y: 60px;
+  --deck-r: 10deg;
+  animation-delay: 140ms;
+}
+
+.deck-gather-3 {
+  --deck-x: 110px;
+  --deck-y: 65px;
+  --deck-r: -12deg;
+  animation-delay: 210ms;
+}
+
+.deck-gather-4 {
+  --deck-x: 0px;
+  --deck-y: -100px;
+  --deck-r: 8deg;
+  animation-delay: 280ms;
+}
+
+.deck-gather-5 {
+  --deck-x: 0px;
+  --deck-y: 90px;
+  --deck-r: -6deg;
+  animation-delay: 350ms;
+}
