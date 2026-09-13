@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
-import { Outlet } from "react-router";
+import { Outlet } from "react-router-dom";
 import SideBar from "./SideBar";
 
 export default function AppLayout() {
@@ -13,7 +13,7 @@ export default function AppLayout() {
         <button
           type="button"
           onClick={() => setSidebarOpen(true)}
-          className="fixed left-4 top-4 z-[200] flex h-10 w-10 items-center justify-center rounded-lg bg-white text-zinc-700 shadow-md transition hover:bg-zinc-100 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+          className="fixed mt-3 left-4 top-4 z-[200] flex h-10 w-10 items-center justify-center rounded-lg bg-white text-zinc-700 shadow-md transition hover:bg-zinc-100 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
         >
           <Menu size={22} />
         </button>

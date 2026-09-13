@@ -1,12 +1,6 @@
 import "./ChessBoard.css";
 import { type Square } from "chess.js";
 import { getSquareName } from "../utils/chessUtils";
-import type { PieceType } from "../utils/chessUtils";
-
-type CapturedPiecesProps = {
-  capturedWhite: PieceType[];
-  capturedBlack: PieceType[];
-};
 
 type BoardPiece = {
   type: "p" | "n" | "b" | "r" | "q" | "k";
@@ -24,6 +18,7 @@ type BoardProps = {
   checkedKingSquare: Square | null;
   onSquareClick: (row: number, column: number) => void;
 };
+
 const pieceSymbols = {
   wp: "♙",
   wn: "♘",
@@ -53,14 +48,15 @@ export default function Board({
       {board.map((row, rowIndex) =>
         row.map((piece, columnIndex) => {
           const square = getSquareName(rowIndex, columnIndex);
+
           const isCheckedKing =
             piece?.type === "k" && checkedKingSquare === square;
+
           const isLastMove =
             lastMove?.from === square || lastMove?.to === square;
 
           const isLegalMove = legalMoves.includes(square);
           const isLight = (rowIndex + columnIndex) % 2 === 0;
-
           const isSelected = selectedSquare === square;
 
           let symbol = "";
@@ -84,7 +80,22 @@ export default function Board({
               }`}
               onClick={() => onSquareClick(rowIndex, columnIndex)}
             >
-              {symbol}
+              {piece && (
+                <span
+                  className={`
+                    select-none
+                    transition-transform duration-150
+                    hover:scale-105
+                    ${
+                      piece.color === "w"
+                        ? "text-[#fff1c7] drop-shadow-[0_2px_2px_rgba(0,0,0,0.65)]"
+                        : "text-sky-500 drop-shadow-[0_2px_2px_rgba(0,0,0,0.75)]"
+                    }
+                  `}
+                >
+                  {symbol}
+                </span>
+              )}
             </button>
           );
         }),

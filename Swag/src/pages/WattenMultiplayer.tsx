@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 export default function WattenMultiplayer() {
   const navigate = useNavigate();

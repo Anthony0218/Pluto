@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Chess, type Square } from "chess.js";
-import "./ChessBoard.css";
+
 import { supabase } from "../lib/supabase";
 import { getSquareName, getReadableMove } from "../utils/chessUtils";
 import { useStockfish } from "../hooks/useStockfish.ts";
@@ -577,99 +577,286 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
   }
 
   return (
-    <div className="chess-layout">
-      <div className="chess-piece-values">
-        <h3>Piece Value</h3>
+    <div className="min-h-screen bg-zinc-950 px-4 py-6 text-zinc-100 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1500px]">
+        {/* Header */}
+        <header className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight text-white">
+              Chess
+            </h1>
 
-        {pieceValueList.map((piece) => (
-          <div className="piece-value" key={piece.type}>
-            <span className="piece-symbol">{piece.symbol}</span>
-
-            <span>
-              {piece.name}: {pieceValues[piece.type]}
-            </span>
+            <p className="mt-1 text-sm text-zinc-400">
+              Play, analyse and review your games
+            </p>
           </div>
-        ))}
-      </div>
 
-      {promotionSquare && promotionFrom && (
-        <PromotionBar onPromote={promotePawn} />
-      )}
+          <div className="flex items-center gap-2">
+            {moveRating && (
+              <div className="rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-sm text-zinc-300">
+                {moveRating}
+              </div>
+            )}
 
-      <div className="board-area"></div>
-      <GameStatus
-        illegal={illegal}
-        whiteCheckCounter={whiteCheckCounter}
-        blackCheckCounter={blackCheckCounter}
-        gameOver={gameOver}
-        gameOverReason={gameOverReason}
-        winner={winner}
-      />
+            {bestMove && (
+              <div className="rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-sm text-zinc-300">
+                Best: <span className="font-medium text-white">{bestMove}</span>
+              </div>
+            )}
+          </div>
+        </header>
 
-      <Board
-        board={board}
-        selectedSquare={selectedSquare}
-        legalMoves={legalMoves}
-        lastMove={lastMove}
-        checkedKingSquare={checkedKingSquare}
-        onSquareClick={handleSquareClick}
-      />
+        {/* Main layout */}
+        <main className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)_320px]">
+          {/* LEFT SIDEBAR */}
+          <aside className="min-w-0">
+            <div className="space-y-4 xl:sticky xl:top-6">
+              {/* Saved Games */}
+              <section className="rounded-2xl border border-zinc-800 bg-zinc-900/70">
+                <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-3">
+                  <div>
+                    <h2 className="text-sm font-semibold text-zinc-200">
+                      Saved Games
+                    </h2>
 
-      <div className="chess-controls-sidebar">
-        <GameControls
-          gameName={gameName}
-          whitePlayer={whitePlayer}
-          blackPlayer={blackPlayer}
-          onGameNameChange={setGameName}
-          onWhitePlayerChange={setWhitePlayer}
-          onBlackPlayerChange={setBlackPlayer}
-          onUndo={undoMove}
-          onRestart={restartGame}
-          onSave={saveGame}
-        />
+                    <p className="mt-0.5 text-xs text-zinc-500">
+                      {savedGames.length}{" "}
+                      {savedGames.length === 1 ? "game" : "games"}
+                    </p>
+                  </div>
+                </div>
 
-        <CapturedPieces
-          capturedBlack={capturedBlack}
-          capturedWhite={capturedWhite}
-        />
-        <div className="material-advantage">
-          {materialDifference > 0 && <span>White +{materialDifference}</span>}
+                <div className="max-h-80 space-y-1 overflow-y-auto p-2">
+                  {savedGames.length === 0 && (
+                    <div className="py-8 text-center">
+                      <p className="text-sm text-zinc-500">
+                        No saved games yet
+                      </p>
+                    </div>
+                  )}
 
-          {materialDifference < 0 && (
-            <span>Black +{Math.abs(materialDifference)}</span>
-          )}
+                  {savedGames.map((savedGame) => (
+                    <div
+                      key={savedGame.id}
+                      className="group flex items-center gap-3 rounded-xl p-3 transition-colors hover:bg-zinc-800/70"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-zinc-200">
+                          {savedGame.name || "Unnamed Game"}
+                        </p>
 
-          {materialDifference === 0 && <span>Equal</span>}
-        </div>
-        <div className="saved-games">
-          <h3>Saved Games</h3>
+                        <p className="mt-1 truncate text-xs text-zinc-500">
+                          ♔ {savedGame.white_player || "White"}
+                          <span className="mx-1.5 text-zinc-700">vs</span>♚{" "}
+                          {savedGame.black_player || "Black"}
+                        </p>
 
-          {savedGames.map((savedGame) => (
-            <div className="saved-game" key={savedGame.id}>
-              <div>
-                <strong>{savedGame.name || "Unnamed Game"}</strong>
+                        <p className="mt-1 text-[11px] text-zinc-600">
+                          {new Date(savedGame.created_at).toLocaleString()}
+                        </p>
+                      </div>
 
-                <div>♔ {savedGame.white_player || "White"}</div>
+                      <div className="flex shrink-0 gap-1 opacity-70 transition-opacity group-hover:opacity-100">
+                        <button
+                          type="button"
+                          onClick={() => loadSpecificGame(savedGame.id)}
+                          className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-800 transition hover:bg-zinc-700"
+                          title="Load game"
+                        >
+                          <img
+                            src={loadButton}
+                            alt="Load"
+                            className="h-4 w-4"
+                          />
+                        </button>
 
-                <div>♚ {savedGame.black_player || "Black"}</div>
+                        <button
+                          type="button"
+                          onClick={() => deleteGame(savedGame.id)}
+                          className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-800 transition hover:border-red-900 hover:bg-red-950/60"
+                          title="Delete game"
+                        >
+                          <img
+                            src={playButton}
+                            alt="Delete"
+                            className="h-4 w-4"
+                          />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
 
-                <small>{new Date(savedGame.created_at).toLocaleString()}</small>
+              {/* Captured Pieces */}
+              <section className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
+                <div className="mb-3 flex items-center justify-between">
+                  <h2 className="text-sm font-semibold text-zinc-200">
+                    Captured Pieces
+                  </h2>
+
+                  <span className="text-xs text-zinc-500">
+                    {materialDifference > 0 && `White +${materialDifference}`}
+                    {materialDifference < 0 &&
+                      `Black +${Math.abs(materialDifference)}`}
+                    {materialDifference === 0 && "Equal"}
+                  </span>
+                </div>
+
+                <CapturedPieces
+                  capturedBlack={capturedBlack}
+                  capturedWhite={capturedWhite}
+                />
+              </section>
+
+              {/* Move History */}
+              <section className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
+                <div className="mb-3 flex items-center justify-between">
+                  <h2 className="text-sm font-semibold text-zinc-200">
+                    Move History
+                  </h2>
+
+                  <span className="text-xs text-zinc-500">
+                    {moveHistory.length} moves
+                  </span>
+                </div>
+
+                <div className="max-h-72 overflow-y-auto">
+                  <MoveHistory moves={moveHistory} />
+                </div>
+              </section>
+            </div>
+          </aside>
+
+          {/* CENTER */}
+          <section className="min-w-0">
+            <div className="mx-auto max-w-[820px]">
+              {/* Game Status */}
+              <div className="mb-3 rounded-2xl border border-zinc-800 bg-zinc-900/60 px-4 py-3">
+                <GameStatus
+                  illegal={illegal}
+                  whiteCheckCounter={whiteCheckCounter}
+                  blackCheckCounter={blackCheckCounter}
+                  gameOver={gameOver}
+                  gameOverReason={gameOverReason}
+                  winner={winner}
+                />
               </div>
 
-              <button
-                className="svg-button"
-                onClick={() => loadSpecificGame(savedGame.id)}
-              >
-                <img src={loadButton} alt="Load" />
-              </button>
-              <button className="svg-button">
-                <img src={playButton} alt="Play" />
-              </button>
-            </div>
-          ))}
-        </div>
+              {/* Evaluation */}
+              <div className="mb-3 flex items-center gap-3">
+                <span className="w-10 text-right text-xs font-medium text-zinc-500">
+                  {evaluation !== null
+                    ? evaluation > 0
+                      ? `+${evaluation.toFixed(1)}`
+                      : evaluation.toFixed(1)
+                    : "0.0"}
+                </span>
 
-        <MoveHistory moves={moveHistory} />
+                <div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
+                  <div
+                    className="absolute inset-y-0 left-0 bg-zinc-200 transition-all duration-300"
+                    style={{ width: `${getEvaluationPercentage()}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Promotion */}
+              {promotionSquare && promotionFrom && (
+                <div className="mb-3">
+                  <PromotionBar onPromote={promotePawn} />
+                </div>
+              )}
+
+              {/* Board */}
+              <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 p-2 shadow-2xl shadow-black/30 sm:p-3">
+                <Board
+                  board={board}
+                  selectedSquare={selectedSquare}
+                  legalMoves={legalMoves}
+                  lastMove={lastMove}
+                  checkedKingSquare={checkedKingSquare}
+                  onSquareClick={handleSquareClick}
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* RIGHT SIDEBAR */}
+          <aside className="min-w-0">
+            <div className="space-y-4 xl:sticky xl:top-6">
+              {/* Piece Values */}
+              <section className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-sm font-semibold text-zinc-200">
+                    Piece Values
+                  </h2>
+
+                  <span className="text-xs text-zinc-600">Material</span>
+                </div>
+
+                <div className="space-y-1">
+                  {pieceValueList.map((piece) => (
+                    <div
+                      key={piece.type}
+                      className="flex items-center justify-between rounded-xl px-3 py-2 transition-colors hover:bg-zinc-800/70"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-8 w-8 items-center justify-center text-2xl text-zinc-200">
+                          {piece.symbol}
+                        </span>
+
+                        <span className="text-sm text-zinc-300">
+                          {piece.name}
+                        </span>
+                      </div>
+
+                      <span className="rounded-md bg-zinc-800 px-2 py-0.5 text-xs font-semibold text-zinc-400">
+                        {pieceValues[piece.type]}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 border-t border-zinc-800 pt-4">
+                  <div className="flex items-center justify-between rounded-xl bg-zinc-950/60 px-3 py-3">
+                    <span className="text-sm text-zinc-500">Advantage</span>
+
+                    <span className="text-sm font-semibold text-zinc-200">
+                      {materialDifference > 0 && `White +${materialDifference}`}
+                      {materialDifference < 0 &&
+                        `Black +${Math.abs(materialDifference)}`}
+                      {materialDifference === 0 && "Equal"}
+                    </span>
+                  </div>
+                </div>
+              </section>
+
+              {/* Game Controls */}
+              <section className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 shadow-xl shadow-black/10">
+                <div className="mb-4">
+                  <h2 className="font-semibold text-white">Game Controls</h2>
+
+                  <p className="mt-1 text-xs text-zinc-500">
+                    Players, game name and actions
+                  </p>
+                </div>
+
+                <GameControls
+                  gameName={gameName}
+                  whitePlayer={whitePlayer}
+                  blackPlayer={blackPlayer}
+                  onGameNameChange={setGameName}
+                  onWhitePlayerChange={setWhitePlayer}
+                  onBlackPlayerChange={setBlackPlayer}
+                  onUndo={undoMove}
+                  onRestart={restartGame}
+                  onSave={saveGame}
+                />
+              </section>
+            </div>
+          </aside>
+        </main>
       </div>
     </div>
   );

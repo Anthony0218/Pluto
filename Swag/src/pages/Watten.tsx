@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import { Gamepad2, Users } from "lucide-react";
 
 export default function Watten() {

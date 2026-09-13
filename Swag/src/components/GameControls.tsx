@@ -1,15 +1,10 @@
-import "./ChessBoard.css";
-import loadButton from "../assets/load-button.svg";
-
 type GameControlsProps = {
   gameName: string;
   whitePlayer: string;
   blackPlayer: string;
-
   onGameNameChange: (value: string) => void;
   onWhitePlayerChange: (value: string) => void;
   onBlackPlayerChange: (value: string) => void;
-
   onUndo: () => void;
   onRestart: () => void;
   onSave: () => void;
@@ -26,38 +21,130 @@ export default function GameControls({
   onRestart,
   onSave,
 }: GameControlsProps) {
-  return (
-    <div className="game-controls">
-      <div className="control-buttons">
-        <button onClick={onUndo}>Undo</button>
+  const inputClass =
+    "w-full rounded-xl border border-zinc-700 bg-zinc-950/70 px-3.5 py-2.5 " +
+    "text-sm text-zinc-100 placeholder:text-zinc-600 " +
+    "outline-none transition-all duration-200 " +
+    "hover:border-zinc-600 " +
+    "focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20";
 
-        <button onClick={onRestart}>Restart Game</button>
+  return (
+    <div className="space-y-5">
+      {/* Inputs */}
+      <div className="space-y-3">
+        <div>
+          <label className="mb-1.5 block text-xs font-medium text-zinc-400">
+            Game name
+          </label>
+
+          <input
+            type="text"
+            value={gameName}
+            onChange={(e) => onGameNameChange(e.target.value)}
+            placeholder="My chess game"
+            className={inputClass}
+          />
+        </div>
+
+        <div>
+          <label className="mb-1.5 block text-xs font-medium text-zinc-400">
+            White player
+          </label>
+
+          <div className="relative">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-lg text-zinc-300">
+              ♔
+            </span>
+
+            <input
+              type="text"
+              value={whitePlayer}
+              onChange={(e) => onWhitePlayerChange(e.target.value)}
+              placeholder="White"
+              className={`${inputClass} pl-10`}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="mb-1.5 block text-xs font-medium text-zinc-400">
+            Black player
+          </label>
+
+          <div className="relative">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-lg text-zinc-300">
+              ♚
+            </span>
+
+            <input
+              type="text"
+              value={blackPlayer}
+              onChange={(e) => onBlackPlayerChange(e.target.value)}
+              placeholder="Black"
+              className={`${inputClass} pl-10`}
+            />
+          </div>
+        </div>
       </div>
 
-      <div className="game-info">
-        <input
-          type="text"
-          placeholder="Game name"
-          value={gameName}
-          onChange={(event) => onGameNameChange(event.target.value)}
-        />
+      {/* Divider */}
+      <div className="h-px bg-zinc-800" />
 
-        <input
-          type="text"
-          placeholder="White player"
-          value={whitePlayer}
-          onChange={(event) => onWhitePlayerChange(event.target.value)}
-        />
+      {/* Buttons */}
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={onUndo}
+          className="
+            rounded-xl
+            bg-sky-500
+            px-4 py-2.5
+            text-sm font-semibold text-white
+            shadow-lg shadow-sky-500/15
+            transition-all duration-200
+            hover:bg-sky-400
+            hover:shadow-sky-500/25
+            active:scale-[0.98]
+          "
+        >
+          Undo
+        </button>
 
-        <input
-          type="text"
-          placeholder="Black player"
-          value={blackPlayer}
-          onChange={(event) => onBlackPlayerChange(event.target.value)}
-        />
+        <button
+          type="button"
+          onClick={onRestart}
+          className="
+            rounded-xl
+            bg-amber-500
+            px-4 py-2.5
+            text-sm font-semibold text-zinc-950
+            shadow-lg shadow-amber-500/15
+            transition-all duration-200
+            hover:bg-amber-400
+            hover:shadow-amber-500/25
+            active:scale-[0.98]
+          "
+        >
+          Restart
+        </button>
 
-        <button className="svg-button" onClick={onSave}>
-          Save Game <img src={loadButton} alt="save" />
+        <button
+          type="button"
+          onClick={onSave}
+          className="
+            col-span-2
+            rounded-xl
+            bg-emerald-500
+            px-4 py-2.5
+            text-sm font-semibold text-white
+            shadow-lg shadow-emerald-500/15
+            transition-all duration-200
+            hover:bg-emerald-400
+            hover:shadow-emerald-500/25
+            active:scale-[0.98]
+          "
+        >
+          Save Game
         </button>
       </div>
     </div>

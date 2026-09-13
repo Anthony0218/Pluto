@@ -9,7 +9,7 @@ import {
   Users,
   LogOut,
 } from "lucide-react";
-import { NavLink } from "react-router";
+import { NavLink } from "react-router-dom";
 
 const navigation = [
   {

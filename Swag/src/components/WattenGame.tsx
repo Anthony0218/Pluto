@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router";
-import type { WattenCard } from "../utils/watten";
+import { Link, useLocation } from "react-router-dom";
+import type { WattenPlayerInfo, WattenVariant } from "../utils/types";
 import {
   createDeck,
   determineTrickWinner,
@@ -18,6 +18,7 @@ import {
   normalRankValue,
   shuffleDeck,
   wouldCardWin,
+  type WattenCard,
 } from "../utils/watten";
 import WattenCardComponent from "./WattenCard";
 
@@ -25,11 +26,6 @@ type Player = {
   id: string;
   name: string;
   cards: WattenCard[];
-};
-
-type PlayerInfo = {
-  id: string;
-  name: string;
 };
 
 type PlayedCard = {
@@ -91,6 +87,8 @@ export default function WattenGame() {
     | "reveal"
     | "abheben"
     | "dealReady"
+    | "fourPlayerReady"
+    | "fourPlayerPlayReady"
     | "trump"
     | "schlag"
     | "playing"
@@ -109,11 +107,22 @@ export default function WattenGame() {
 
   const [schlag, setSchlag] = useState<string | null>(null);
 
-  const playerInfo: PlayerInfo[] = location.state?.players ?? [
-    { id: "1", name: "Player 1" },
-    { id: "2", name: "Player 2" },
-    { id: "3", name: "Player 3" },
-  ];
+  const variant: WattenVariant = location.state?.variant ?? "three-player";
+
+  const playerInfo: WattenPlayerInfo[] =
+    location.state?.players ??
+    (variant === "four-player"
+      ? [
+          { id: "1", name: "Player 1" },
+          { id: "2", name: "Player 2" },
+          { id: "3", name: "Player 3" },
+          { id: "4", name: "Player 4" },
+        ]
+      : [
+          { id: "1", name: "Player 1" },
+          { id: "2", name: "Player 2" },
+          { id: "3", name: "Player 3" },
+        ]);
 
   const [players, setPlayers] = useState<Player[]>(() =>
     playerInfo.map((player) => ({
@@ -163,16 +172,21 @@ export default function WattenGame() {
     number | null
   >(null);
   const [abhebenFinished, setAbhebenFinished] = useState(false);
+  const [fourPlayerCriticalCount, setFourPlayerCriticalCount] = useState(0);
+
+  const [abhebenTakingPlayer, setAbhebenTakingPlayer] = useState<number | null>(
+    null,
+  );
   const [helpMode, setHelpMode] = useState(false);
-  type WattenSide = "solo" | "team";
+  type FourPlayerTeam = "team-a" | "team-b";
+
+  type WattenSide = "solo" | "team" | FourPlayerTeam;
 
   const [targetScore, setTargetScore] = useState(15);
 
-  const [scores, setScores] = useState<Record<string, number>>(() => ({
-    [playerInfo[0].id]: 0,
-    [playerInfo[1].id]: 0,
-    [playerInfo[2].id]: 0,
-  }));
+  const [scores, setScores] = useState<Record<string, number>>(() =>
+    Object.fromEntries(playerInfo.map((player) => [player.id, 0])),
+  );
 
   const [gameWinner, setGameWinner] = useState<string | null>(null);
 
@@ -190,11 +204,9 @@ export default function WattenGame() {
 
   const [trickWinner, setTrickWinner] = useState<PlayedCard | null>(null);
 
-  const [tricksWon, setTricksWon] = useState<Record<string, number>>(() => ({
-    [playerInfo[0].id]: 0,
-    [playerInfo[1].id]: 0,
-    [playerInfo[2].id]: 0,
-  }));
+  const [tricksWon, setTricksWon] = useState<Record<string, number>>(() =>
+    Object.fromEntries(playerInfo.map((player) => [player.id, 0])),
+  );
 
   const [winner, setWinner] = useState<string | null>(null);
   const [viewingPlayer, setViewingPlayer] = useState<number | null>(null);
@@ -205,11 +217,7 @@ export default function WattenGame() {
   const [showRules, setShowRules] = useState(false);
 
   function startGame() {
-    setScores({
-      [playerInfo[0].id]: 0,
-      [playerInfo[1].id]: 0,
-      [playerInfo[2].id]: 0,
-    });
+    setScores(Object.fromEntries(playerInfo.map((player) => [player.id, 0])));
 
     setGameWinner(null);
 
@@ -368,7 +376,159 @@ export default function WattenGame() {
       }, 650);
     }, 50);
   }
+  function finishFourPlayerCut(
+    pile: WattenCard[],
+    rest: WattenCard[],
+    animateReturn: boolean,
+  ) {
+    function complete() {
+      // A physical cut changes the deck order:
+      // upper rest first, then the cut pile.
+      setDeck([...rest, ...pile]);
 
+      setAbhebenAnimation("finished");
+      setAbhebenFinished(true);
+      setAbhebenTakingPlayer(null);
+
+      window.setTimeout(() => {
+        setPhase("dealReady");
+      }, 350);
+    }
+
+    if (animateReturn) {
+      setAbhebenAnimation("returning");
+
+      window.setTimeout(() => {
+        complete();
+      }, 700);
+
+      return;
+    }
+
+    complete();
+  }
+
+  function revealFourPlayerCutCard(
+    pile: WattenCard[],
+    rest: WattenCard[],
+    criticalCount: number,
+  ) {
+    const exposedCard = pile[pile.length - 1];
+
+    if (!exposedCard) {
+      finishFourPlayerCut(pile, rest, false);
+      return;
+    }
+
+    // First render its back.
+    setAbgehobenCard(exposedCard);
+    setAbhebenAnimation("idle");
+
+    window.setTimeout(() => {
+      // Then flip it.
+      setAbhebenAnimation("revealing");
+
+      window.setTimeout(() => {
+        // NORMAL CARD:
+        // the cut ends and this card remains
+        // inside the deck.
+        if (!isAbhebenCard(exposedCard)) {
+          finishFourPlayerCut(pile, rest, true);
+
+          return;
+        }
+
+        // KRITISCHE:
+        //
+        // 1st -> Abheber
+        // 2nd -> Dealer
+        // 3rd -> Abheber
+        const recipientIndex = criticalCount % 2 === 0 ? abhebenPlayer : dealer;
+
+        setAbhebenTakingPlayer(recipientIndex);
+
+        setAbhebenAnimation("taking");
+
+        window.setTimeout(() => {
+          // Give the critical card to
+          // the correct player.
+          setPlayers((currentPlayers) =>
+            currentPlayers.map((player, index) =>
+              index === recipientIndex
+                ? {
+                    ...player,
+                    cards: [...player.cards, exposedCard],
+                  }
+                : player,
+            ),
+          );
+
+          // Remove exposed critical
+          // from the cut pile.
+          const nextPile = pile.slice(0, -1);
+
+          const nextCriticalCount = criticalCount + 1;
+
+          setFourPlayerCriticalCount(nextCriticalCount);
+
+          setAbhebenTakingPlayer(null);
+
+          // All three Kritische found:
+          // Abheben is finished.
+          if (nextCriticalCount >= 3 || nextPile.length === 0) {
+            // Important: taken critical cards
+            // are NOT returned to the deck.
+            setDeck([...rest, ...nextPile]);
+
+            setAbhebenAnimation("finished");
+
+            setAbhebenFinished(true);
+
+            window.setTimeout(() => {
+              setPhase("dealReady");
+            }, 350);
+
+            return;
+          }
+
+          // Expose the next card below it.
+          window.setTimeout(() => {
+            revealFourPlayerCutCard(nextPile, rest, nextCriticalCount);
+          }, 300);
+        }, 700);
+      }, 650);
+    }, 50);
+  }
+
+  function chooseFourPlayerCut(cardIndex: number) {
+    if (
+      variant !== "four-player" ||
+      abgehobenCard !== null ||
+      abhebenFinished ||
+      selectedAbhebenIndex !== null
+    ) {
+      return;
+    }
+
+    // Clicking a card means:
+    // "cut the deck here".
+    const cutIndex = cardIndex + 1;
+
+    // There must be cards on both
+    // sides of the cut.
+    if (cutIndex <= 0 || cutIndex >= deck.length) {
+      return;
+    }
+
+    const pile = deck.slice(0, cutIndex);
+
+    const rest = deck.slice(cutIndex);
+
+    setSelectedAbhebenIndex(cardIndex);
+    setFourPlayerCriticalCount(0);
+
+    revealFourPlayerCutCard(pile, rest, 0);
+  }
   function continueHotseat() {
     setShowPassScreen(false);
 
@@ -400,6 +560,25 @@ export default function WattenGame() {
     // We want to show them during trickReview.
     setPhase("trickPause");
   }
+  function getFourPlayerTeam(playerIndex: number): "team-a" | "team-b" {
+    return playerIndex % 2 === 0 ? "team-a" : "team-b";
+  }
+
+  function getFourPlayerTeamPlayers(team: "team-a" | "team-b") {
+    return players.filter((_, index) =>
+      team === "team-a" ? index % 2 === 0 : index % 2 === 1,
+    );
+  }
+
+  function getFourPlayerTeamTricks(
+    team: "team-a" | "team-b",
+    trickState: Record<string, number>,
+  ) {
+    return getFourPlayerTeamPlayers(team).reduce(
+      (sum, player) => sum + (trickState[player.id] ?? 0),
+      0,
+    );
+  }
 
   function finishTrickReview() {
     if (!trickWinner) {
@@ -414,6 +593,59 @@ export default function WattenGame() {
     };
 
     setTricksWon(newTricks);
+    if (variant === "four-player") {
+      const winnerIndex = players.findIndex((player) => player.id === winnerId);
+
+      const winningTeam = getFourPlayerTeam(winnerIndex);
+
+      const teamATricks = getFourPlayerTeamTricks("team-a", newTricks);
+
+      const teamBTricks = getFourPlayerTeamTricks("team-b", newTricks);
+
+      if (teamATricks >= 3) {
+        awardFourPlayerPoints("team-a", roundValue);
+
+        const team = getFourPlayerTeamPlayers("team-a");
+
+        setWinner(`${team[0].name} & ${team[1].name}`);
+
+        setPlayedCards([]);
+        setTrickWinner(null);
+        setPendingBid(null);
+        setPhase("playing");
+
+        return;
+      }
+
+      if (teamBTricks >= 3) {
+        awardFourPlayerPoints("team-b", roundValue);
+
+        const team = getFourPlayerTeamPlayers("team-b");
+
+        setWinner(`${team[0].name} & ${team[1].name}`);
+
+        setPlayedCards([]);
+        setTrickWinner(null);
+        setPendingBid(null);
+        setPhase("playing");
+
+        return;
+      }
+
+      // Winner leads next trick.
+      setPlayedCards([]);
+      setTrickWinner(null);
+
+      setCurrentPlayer(winnerIndex);
+      setPhase("playing");
+
+      setCardPlayedThisTurn(false);
+
+      // Hotseat: pass device to trick winner.
+      setShowPassScreen(true);
+
+      return;
+    }
 
     const solo = players[trumpCaller];
 
@@ -467,23 +699,53 @@ export default function WattenGame() {
     setShowPassScreen(true);
   }
   function getPlayerSide(playerIndex: number): WattenSide {
+    if (variant === "four-player") {
+      return getFourPlayerTeam(playerIndex);
+    }
+
     return playerIndex === trumpCaller ? "solo" : "team";
   }
 
-  function getSideLabel(side: WattenSide) {
+  function getSidePlayers(side: WattenSide): Player[] {
     if (side === "solo") {
-      return players[trumpCaller].name;
+      return [players[trumpCaller]];
     }
 
-    const opponents = players.filter((_, index) => index !== trumpCaller);
+    if (side === "team") {
+      return players.filter((_, index) => index !== trumpCaller);
+    }
 
-    return `${opponents[0].name} & ${opponents[1].name}`;
+    if (side === "team-a") {
+      return getFourPlayerTeamPlayers("team-a");
+    }
+
+    return getFourPlayerTeamPlayers("team-b");
   }
+
+  function getSideLabel(side: WattenSide) {
+    return getSidePlayers(side)
+      .map((player) => player.name)
+      .join(" & ");
+  }
+
+  function getOpposingSide(side: WattenSide): WattenSide {
+    if (side === "team-a") {
+      return "team-b";
+    }
+
+    if (side === "team-b") {
+      return "team-a";
+    }
+
+    if (side === "solo") {
+      return "team";
+    }
+
+    return "solo";
+  }
+
   function isSideGespannt(side: WattenSide) {
-    const sidePlayers =
-      side === "solo"
-        ? [players[trumpCaller]]
-        : players.filter((_, index) => index !== trumpCaller);
+    const sidePlayers = getSidePlayers(side);
 
     return sidePlayers.some((player) => {
       const points = scores[player.id] ?? 0;
@@ -493,7 +755,9 @@ export default function WattenGame() {
   }
 
   const currentSide = getPlayerSide(currentPlayer);
+
   const currentSideIsGespannt = isSideGespannt(currentSide);
+
   const canRaise =
     phase === "playing" &&
     !winner &&
@@ -595,12 +859,12 @@ export default function WattenGame() {
     setSelectedAbhebenIndex(null);
     setAbhebenAnimation("idle");
     setAbhebenFinished(false);
+    setFourPlayerCriticalCount(0);
+    setAbhebenTakingPlayer(null);
 
-    setTricksWon({
-      [playerInfo[0].id]: 0,
-      [playerInfo[1].id]: 0,
-      [playerInfo[2].id]: 0,
-    });
+    setTricksWon(
+      Object.fromEntries(playerInfo.map((player) => [player.id, 0])),
+    );
     setAbgehobenCard(null);
     setAbhebenFinished(false);
     // First pass the device to the Abheben player.
@@ -633,8 +897,21 @@ export default function WattenGame() {
       Object.fromEntries(playerInfo.map((player) => [player.id, false])),
     );
 
-    // Vorhand chooses Schlag/Farbe
-    // and later leads the first trick.
+    // FOUR PLAYER:
+    // cards are dealt, but we intentionally
+    // stop before Schlag/Farbe for now.
+    if (variant === "four-player") {
+      const vorhanden = getNextPlayer(dealer, players.length);
+
+      setCurrentPlayer(vorhanden);
+      setPhase("fourPlayerReady");
+      setShowPassScreen(false);
+
+      return;
+    }
+
+    // THREE PLAYER:
+    // keep your existing behaviour.
     setCurrentPlayer(trumpCaller);
 
     setPhase("playing");
@@ -642,7 +919,21 @@ export default function WattenGame() {
   }
 
   function canCurrentPlayerPlayCard(card: WattenCard) {
-    if (!currentPlayerMustFollowTrumpfOderKritisch) {
+    const player = players[currentPlayer];
+
+    if (!player) {
+      return false;
+    }
+
+    const mustFollow = mustFollowTrumpfOderKritisch(
+      player.cards,
+      playedCards,
+      tricksWon,
+      Farbe,
+      schlag,
+    );
+
+    if (!mustFollow) {
       return true;
     }
 
@@ -777,8 +1068,12 @@ export default function WattenGame() {
   }
 
   function awardGamePoints(winningSide: WattenSide, points: number) {
-    const updatedScores = { ...scores };
+    if (winningSide === "team-a" || winningSide === "team-b") {
+      awardFourPlayerPoints(winningSide, points);
 
+      return;
+    }
+    const updatedScores = { ...scores };
     if (winningSide === "solo") {
       const solo = players[trumpCaller];
 
@@ -799,6 +1094,30 @@ export default function WattenGame() {
 
     if (overallWinners.length > 0) {
       setGameWinner(overallWinners.map((player) => player.name).join(" & "));
+    }
+  }
+  function awardFourPlayerPoints(
+    winningTeam: "team-a" | "team-b",
+    points: number,
+  ) {
+    const updatedScores = {
+      ...scores,
+    };
+
+    const winningPlayers = getFourPlayerTeamPlayers(winningTeam);
+
+    winningPlayers.forEach((player) => {
+      updatedScores[player.id] = (updatedScores[player.id] ?? 0) + points;
+    });
+
+    setScores(updatedScores);
+
+    const teamReachedTarget = winningPlayers.some(
+      (player) => (updatedScores[player.id] ?? 0) >= targetScore,
+    );
+
+    if (teamReachedTarget) {
+      setGameWinner(winningPlayers.map((player) => player.name).join(" & "));
     }
   }
   function dealRemainingCards(
@@ -846,6 +1165,1410 @@ export default function WattenGame() {
       dealtPlayers,
       remainingDeck,
     };
+  }
+
+  if (variant === "four-player") {
+    const vorhandIndex = getNextPlayer(dealer, players.length);
+
+    const vorhandPlayer = players[vorhandIndex];
+
+    const dealerPlayer = players[dealer];
+    const bottomPlayerIndex = currentPlayer;
+
+    const leftPlayerIndex = getNextPlayer(bottomPlayerIndex, players.length);
+
+    const topPlayerIndex = getNextPlayer(leftPlayerIndex, players.length);
+
+    const rightPlayerIndex = getPreviousPlayer(
+      bottomPlayerIndex,
+      players.length,
+    );
+
+    const bottomPlayer = players[bottomPlayerIndex];
+
+    const leftPlayer = players[leftPlayerIndex];
+
+    const topPlayer = players[topPlayerIndex];
+
+    const rightPlayer = players[rightPlayerIndex];
+    const fourCurrentPlayer = players[currentPlayer];
+
+    const fourCurrentMustFollow = mustFollowTrumpfOderKritisch(
+      fourCurrentPlayer.cards,
+      playedCards,
+      tricksWon,
+      Farbe,
+      schlag,
+    );
+
+    const fourTrumpfOderKritischActive = isTrumpfOderKritischActive(
+      playedCards,
+      tricksWon,
+      Farbe,
+      schlag,
+    );
+
+    const teamATricks = getFourPlayerTeamTricks("team-a", tricksWon);
+
+    const teamBTricks = getFourPlayerTeamTricks("team-b", tricksWon);
+
+    const teamAPlayers = getFourPlayerTeamPlayers("team-a");
+
+    const teamBPlayers = getFourPlayerTeamPlayers("team-b");
+    const teamAScore = scores[teamAPlayers[0]?.id] ?? 0;
+
+    const teamBScore = scores[teamBPlayers[0]?.id] ?? 0;
+    function getTeamVisuals(playerIndex: number) {
+      const team = getFourPlayerTeam(playerIndex);
+
+      if (team === "team-a") {
+        return {
+          label: "Team A",
+          box: "border-amber-400/40 bg-amber-400/10",
+          badge: "bg-amber-400 text-amber-950",
+          text: "text-amber-300",
+        };
+      }
+
+      return {
+        label: "Team B",
+        box: "border-emerald-400/40 bg-emerald-400/10",
+        badge: "bg-emerald-400 text-emerald-950",
+        text: "text-emerald-300",
+      };
+    }
+
+    const bottomTeam = getTeamVisuals(bottomPlayerIndex);
+
+    const leftTeam = getTeamVisuals(leftPlayerIndex);
+
+    const topTeam = getTeamVisuals(topPlayerIndex);
+
+    const rightTeam = getTeamVisuals(rightPlayerIndex);
+
+    function HiddenPreviewCards({ player }: { player: Player }) {
+      return (
+        <div className="mt-3 flex justify-center">
+          {player.cards.map((card, index) => (
+            <div
+              key={card.id}
+              className={`relative h-14 w-9 rounded-md border border-white/20 bg-zinc-900 shadow-md ${
+                index !== 0 ? "-ml-3" : ""
+              }`}
+            >
+              <div className="absolute inset-1 rounded-sm border border-emerald-400/20 bg-emerald-950" />
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    return (
+      <main className="min-h-screen bg-emerald-950 px-4 py-6 text-white md:px-8">
+        <div className="mx-auto w-full max-w-[1800px]">
+          {/* HEADER */}
+          <div className="relative z-30 mb-4 flex items-center justify-between">
+            <div className="ml-5 pl-5">
+              <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
+                Bayerisches Watten
+              </p>
+
+              <h1 className="mt-1 text-2xl font-black">4 Spieler · Hotseat</h1>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setHelpMode((current) => !current)}
+                className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
+                  helpMode
+                    ? "bg-amber-400 text-amber-950 hover:bg-amber-300"
+                    : "bg-white/10 text-white hover:bg-white/20"
+                }`}
+              >
+                {helpMode ? "💡 Help On" : "💡 Help"}
+              </button>
+
+              <Link
+                to="/watten/hotseat"
+                className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium transition hover:bg-white/20"
+              >
+                Zurück
+              </Link>
+            </div>
+          </div>
+          {/* TABLE + SIDEBARS */}
+          <div className="grid w-full grid-cols-[16rem_minmax(0,1fr)_16rem] items-start gap-5">
+            {/* LEFT SIDEBAR: HELP + TEAM SCORE */}
+            <aside className="relative w-64 pt-15">
+              {/* CARD PRIORITY HELP */}
+              {Farbe && schlag && (
+                <div className="absolute left-0 top-5 z-50 w-full">
+                  <button
+                    type="button"
+                    onClick={() => setShowRankingHelp((current) => !current)}
+                    className={`w-full rounded-xl border px-4 py-2 text-xs font-bold shadow-lg transition ${
+                      showRankingHelp
+                        ? "border-amber-400/40 bg-amber-400 text-amber-950 hover:bg-amber-300"
+                        : "border-white/10 bg-zinc-950/95 text-white hover:bg-zinc-900"
+                    }`}
+                  >
+                    {showRankingHelp
+                      ? "📚 Kartenrangfolge ausblenden"
+                      : "📚 Kartenrangfolge einblenden"}
+                  </button>
+
+                  {showRankingHelp && (
+                    <div className="absolute left-0 top-full mt-2 h-[650px] w-full overflow-y-auto rounded-3xl border border-white/10 bg-zinc-950/95 p-4 shadow-2xl backdrop-blur">
+                      <div className="mb-5">
+                        <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
+                          Anfängerhilfe
+                        </p>
+
+                        <h2 className="mt-1 text-xl font-bold text-white">
+                          Kartenrangfolge
+                        </h2>
+
+                        <p className="mt-1 text-xs text-zinc-400">
+                          Von oben nach unten: höchste Priorität zuerst.
+                        </p>
+
+                        <div className="mt-3 flex gap-4 text-xs">
+                          <span className="text-emerald-300">
+                            Farbe: <strong>{Farbe}</strong>
+                          </span>
+
+                          <span className="text-amber-300">
+                            Schlag: <strong>{schlag}</strong>
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-5">
+                        {getCardPriorityGroups().map((group, groupIndex) => (
+                          <section
+                            key={group.title}
+                            className="rounded-xl border border-white/10 bg-white/5 p-4"
+                          >
+                            <div className="flex items-start gap-3">
+                              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-400 text-xs font-black text-amber-950">
+                                {groupIndex + 1}
+                              </div>
+
+                              <div>
+                                <h3 className="font-bold text-white">
+                                  {group.title}
+                                </h3>
+
+                                <p className="mt-1 text-xs leading-relaxed text-zinc-400">
+                                  {group.description}
+                                </p>
+                              </div>
+                            </div>
+
+                            {group.cards.length > 0 ? (
+                              <div className="mt-3 flex flex-wrap gap-2">
+                                {group.cards.map((card) => (
+                                  <MiniWattenCard key={card.id} card={card} />
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="mt-3 rounded-lg bg-white/5 px-3 py-2 text-xs text-zinc-500">
+                                Keine Karte in dieser Kategorie.
+                              </p>
+                            )}
+                          </section>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* TEAM SCORE */}
+              <div className="h-[650px] rounded-3xl border border-white/10 bg-zinc-950/95 p-5 shadow-2xl">
+                <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
+                  Punktestand
+                </p>
+
+                <h3 className="mt-1 text-lg font-bold text-white">
+                  Ziel: {targetScore} Punkte
+                </h3>
+
+                {/* TEAM A */}
+                <div className="mt-6 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4">
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-amber-300">
+                    Team A
+                  </p>
+
+                  <p className="mt-1 font-bold text-white">
+                    {teamAPlayers[0]?.name}
+                    <span className="text-zinc-500"> & </span>
+                    {teamAPlayers[1]?.name}
+                  </p>
+
+                  <div className="mt-4 flex items-end justify-between">
+                    <span className="text-3xl font-black text-amber-400">
+                      {teamAScore}
+                    </span>
+
+                    <span className="text-xs text-zinc-500">
+                      / {targetScore}
+                    </span>
+                  </div>
+
+                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
+                    <div
+                      className="h-full rounded-full bg-amber-400 transition-all duration-300"
+                      style={{
+                        width: `${Math.min(
+                          100,
+                          (teamAScore / targetScore) * 100,
+                        )}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* VS */}
+                <div className="my-5 flex items-center gap-3">
+                  <div className="h-px flex-1 bg-white/10" />
+
+                  <span className="text-xs font-bold text-zinc-500">VS</span>
+
+                  <div className="h-px flex-1 bg-white/10" />
+                </div>
+
+                {/* TEAM B */}
+                <div className="rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4">
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-emerald-300">
+                    Team B
+                  </p>
+
+                  <p className="mt-1 font-bold text-white">
+                    {teamBPlayers[0]?.name}
+                    <span className="text-zinc-500"> & </span>
+                    {teamBPlayers[1]?.name}
+                  </p>
+
+                  <div className="mt-4 flex items-end justify-between">
+                    <span className="text-3xl font-black text-emerald-400">
+                      {teamBScore}
+                    </span>
+
+                    <span className="text-xs text-zinc-500">
+                      / {targetScore}
+                    </span>
+                  </div>
+
+                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
+                    <div
+                      className="h-full rounded-full bg-emerald-400 transition-all duration-300"
+                      style={{
+                        width: `${Math.min(
+                          100,
+                          (teamBScore / targetScore) * 100,
+                        )}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </aside>
+            {/* CENTER: 4 PLAYER TABLE */}
+            <div className="relative min-h-[640px] min-w-0 overflow-visible rounded-[100px] border-[8px] border-emerald-900 bg-emerald-700 shadow-2xl">
+              {/* TABLE SURFACE */}
+              <div className="pointer-events-none absolute inset-0 rounded-[92px] bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.07),transparent_58%)]" />
+              {phase === "setup" && (
+                <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[110px] bg-black/30 backdrop-blur-sm">
+                  <div className="w-full max-w-lg rounded-3xl border border-white/10 bg-zinc-950/95 p-8 text-center shadow-2xl">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
+                      4-Spieler-Watten
+                    </p>
+
+                    <h2 className="mt-2 text-3xl font-black">Bereit?</h2>
+
+                    <div className="mt-6 grid grid-cols-2 gap-3 text-sm">
+                      <div className="rounded-xl bg-amber-400/10 p-3">
+                        <p className="text-amber-300">Team A</p>
+
+                        <strong>
+                          {players[0].name}
+                          {" + "}
+                          {players[2].name}
+                        </strong>
+                      </div>
+
+                      <div className="rounded-xl bg-emerald-400/10 p-3">
+                        <p className="text-emerald-300">Team B</p>
+
+                        <strong>
+                          {players[1].name}
+                          {" + "}
+                          {players[3].name}
+                        </strong>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={startGame}
+                      className="mt-8 w-full rounded-xl bg-amber-400 px-6 py-4 text-lg font-black text-amber-950 transition hover:bg-amber-300"
+                    >
+                      Spiel starten
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* 4-PLAYER GEHEN DECISION */}
+              {pendingBid && (
+                <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/70 px-6 backdrop-blur-sm">
+                  <div className="w-full max-w-md rounded-3xl border border-white/10 bg-zinc-950 p-8 text-center shadow-2xl">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
+                      Gehen
+                    </p>
+
+                    <h2 className="mt-2 text-2xl font-black text-white">
+                      {getSideLabel(pendingBid.side)} geht auf{" "}
+                      {pendingBid.value}
+                    </h2>
+
+                    <p className="mt-5 text-sm text-zinc-400">
+                      Die Entscheidung liegt bei
+                    </p>
+
+                    <p className="mt-1 text-lg font-black text-emerald-300">
+                      {getSideLabel(getOpposingSide(pendingBid.side))}
+                    </p>
+
+                    <div className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-zinc-300">
+                      Aktueller Rundenwert:{" "}
+                      <strong className="text-amber-300">{roundValue}</strong>
+                      <br />
+                      Neuer Rundenwert bei Halten:{" "}
+                      <strong className="text-amber-300">
+                        {pendingBid.value}
+                      </strong>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={holdBid}
+                      className="mt-6 w-full rounded-xl bg-emerald-500 px-5 py-3 font-black text-emerald-950 transition hover:bg-emerald-400"
+                    >
+                      {pendingBid.value} halten
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={declineBid}
+                      className="mt-3 w-full rounded-xl bg-red-500/20 px-5 py-3 font-bold text-red-200 transition hover:bg-red-500/30"
+                    >
+                      Nicht halten
+                    </button>
+
+                    <p className="mt-4 text-xs leading-5 text-zinc-500">
+                      Bei „Nicht halten“ gewinnt {getSideLabel(pendingBid.side)}{" "}
+                      die Runde mit dem bisherigen Wert von {roundValue}{" "}
+                      Punkten.
+                    </p>
+                  </div>
+                </div>
+              )}
+              {showPassScreen &&
+                (phase === "reveal" ||
+                  phase === "schlag" ||
+                  phase === "trump") && (
+                  <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/70 px-6 backdrop-blur-sm">
+                    <div className="w-full max-w-md rounded-3xl bg-zinc-900 p-8 text-center shadow-2xl">
+                      <div className="text-4xl">🃏</div>
+
+                      <p className="mt-5 text-xs font-semibold uppercase tracking-widest text-emerald-400">
+                        {phase === "reveal"
+                          ? "Abheben"
+                          : phase === "schlag"
+                            ? "Schlag bestimmen"
+                            : "Farbe bestimmen"}
+                      </p>
+
+                      <h2 className="mt-2 text-2xl font-bold">
+                        Gerät weitergeben
+                      </h2>
+
+                      <p className="mt-3 text-zinc-400">Gib das Gerät an</p>
+
+                      <p className="mt-1 text-xl font-black text-emerald-400">
+                        {players[currentPlayer].name}
+                      </p>
+
+                      <p className="mt-3 text-sm text-zinc-500">
+                        {phase === "reveal"
+                          ? "Dieser Spieler hebt ab."
+                          : phase === "schlag"
+                            ? "Vorhand bestimmt den Schlag."
+                            : "Der Geber bestimmt die Farbe."}
+                      </p>
+
+                      <button
+                        type="button"
+                        onClick={continueHotseat}
+                        className="mt-8 w-full rounded-xl bg-emerald-500 px-5 py-3 font-black text-emerald-950 transition hover:bg-emerald-400"
+                      >
+                        Ich bin bereit
+                      </button>
+                    </div>
+                  </div>
+                )}
+              {phase === "abheben" && !showPassScreen && (
+                <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 px-6 backdrop-blur-sm">
+                  <div className="w-full max-w-2xl rounded-3xl border border-white/10 bg-zinc-950 p-8 text-center shadow-2xl">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
+                      {players[abhebenPlayer].name}
+                      {" · "}Abheber
+                    </p>
+
+                    <h2 className="mt-2 text-3xl font-black">Abheben</h2>
+
+                    {!abgehobenCard ? (
+                      <>
+                        <p className="mt-3 text-sm text-zinc-400">
+                          Wähle eine Stelle im Stapel. Die gewählte Karte wird
+                          beim Abheben sichtbar.
+                        </p>
+
+                        <div className="mt-8 space-y-4">
+                          {[deck.slice(0, 16), deck.slice(16)].map(
+                            (row, rowIndex) => (
+                              <div
+                                key={rowIndex}
+                                className="flex justify-center px-10"
+                              >
+                                {row.map((card, index) => {
+                                  const actualIndex = rowIndex * 16 + index;
+
+                                  const cannotCut =
+                                    actualIndex === deck.length - 1;
+
+                                  return (
+                                    <button
+                                      key={card.id}
+                                      type="button"
+                                      disabled={cannotCut}
+                                      onClick={() =>
+                                        chooseFourPlayerCut(actualIndex)
+                                      }
+                                      className={`
+                              relative h-20 w-12
+                              rounded-lg
+                              border border-white/20
+                              bg-zinc-950
+                              shadow-lg
+                              transition-all
+                              duration-200
+
+                              ${index !== 0 ? "-ml-5" : ""}
+
+                              ${
+                                cannotCut
+                                  ? "cursor-not-allowed opacity-30"
+                                  : "hover:z-30 hover:-translate-y-3 hover:scale-110 hover:border-amber-300"
+                              }
+                            `}
+                                    >
+                                      <div className="absolute inset-1 rounded-md border border-emerald-300/30 bg-emerald-900" />
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            ),
+                          )}
+                        </div>
+
+                        <p className="mt-5 text-xs text-zinc-500">
+                          Die letzte Karte kann nicht als Schnittstelle gewählt
+                          werden.
+                        </p>
+                      </>
+                    ) : (
+                      <div className="mt-8 flex flex-col items-center">
+                        <div className="abheben-card-scene relative h-40 w-28">
+                          <div
+                            className={`abheben-card-flip relative h-full w-full ${
+                              abhebenAnimation !== "idle" ? "is-flipped" : ""
+                            }`}
+                          >
+                            <div className="abheben-card-face absolute inset-0 rounded-xl border-2 border-white/20 bg-zinc-950 shadow-xl">
+                              <div className="absolute inset-2 rounded-lg border border-emerald-400/40 bg-emerald-900" />
+                            </div>
+
+                            <div className="abheben-card-face abheben-card-front absolute inset-0">
+                              <WattenCardComponent
+                                card={abgehobenCard}
+                                disabled
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {abhebenAnimation === "revealing" && (
+                          <p className="mt-5 font-semibold text-white">
+                            Karte wird aufgedeckt...
+                          </p>
+                        )}
+
+                        {abhebenAnimation === "taking" &&
+                          abhebenTakingPlayer !== null && (
+                            <div className="mt-5">
+                              <p className="font-black text-amber-300">
+                                Kritische!
+                              </p>
+
+                              <p className="mt-1 text-sm text-zinc-300">
+                                Die Karte geht an{" "}
+                                <strong>
+                                  {players[abhebenTakingPlayer].name}
+                                </strong>
+                              </p>
+                            </div>
+                          )}
+
+                        {abhebenAnimation === "returning" && (
+                          <p className="mt-5 font-semibold text-zinc-300">
+                            Keine Kritische — Abheben beendet.
+                          </p>
+                        )}
+
+                        {fourPlayerCriticalCount > 0 && (
+                          <p className="mt-3 text-xs font-semibold text-emerald-300">
+                            {fourPlayerCriticalCount} Kritische aufgenommen
+                          </p>
+                        )}
+
+                        {abhebenAnimation === "finished" && (
+                          <p className="mt-5 font-semibold text-emerald-300">
+                            Karten werden wieder zu einem Stapel
+                            zusammengelegt...
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+              {phase === "dealReady" && (
+                <>
+                  {/* DECK / SAME SIZE AS PLAYING FIELD */}
+                  <div className="absolute left-1/2 top-[45%] z-40 flex h-44 w-[440px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-3xl border border-white/10 bg-emerald-950/30 p-4 shadow-inner">
+                    <div className="flex w-full items-center justify-center gap-10">
+                      {/* DECK */}
+                      <div className="text-center">
+                        <div className="relative mx-auto h-24 w-18">
+                          {[0, 1, 2, 3, 4, 5].map((index) => (
+                            <div
+                              key={index}
+                              className={`watten-deck-gather-card deck-gather-${index} absolute inset-0 rounded-xl border-2 border-white/20 bg-zinc-950 shadow-xl`}
+                            >
+                              <div className="absolute inset-2 rounded-lg border border-emerald-400/40 bg-emerald-900" />
+                            </div>
+                          ))}
+                        </div>
+
+                        <p className="mt-2 text-xs font-semibold text-emerald-200">
+                          {deck.length} Karten
+                        </p>
+                      </div>
+
+                      {/* DEAL */}
+                      <div className="text-left">
+                        <p className="text-[10px] font-semibold uppercase tracking-widest text-emerald-300">
+                          Abheben beendet
+                        </p>
+
+                        <h3 className="mt-1 text-lg font-bold text-white">
+                          Karten bereit
+                        </h3>
+
+                        <button
+                          type="button"
+                          onClick={finishAbheben}
+                          className="mt-3 rounded-xl bg-amber-400 px-6 py-3 text-sm font-black text-amber-950 shadow-lg transition hover:scale-105 hover:bg-amber-300"
+                        >
+                          Karten austeilen
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ABHEBER HAND DURING DEAL READY */}
+                  <div className="absolute bottom-4 left-1/2 z-30 w-full -translate-x-1/2 px-10">
+                    <div className="relative mx-auto min-h-32 max-w-xl rounded-2xl border border-amber-400/20 bg-zinc-950/95 px-6 py-4 shadow-2xl backdrop-blur-md">
+                      {/* Player label */}
+                      <div className="absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-amber-400 px-5 py-1.5 text-sm font-black text-amber-950 shadow-lg">
+                        ▼ {players[abhebenPlayer].name} · ABHEBER
+                      </div>
+
+                      <div className="mt-3 text-center">
+                        <p className="text-xs font-semibold uppercase tracking-widest text-emerald-300">
+                          Deine Hand nach dem Abheben
+                        </p>
+
+                        <p className="mt-1 text-xs text-zinc-500">
+                          Die restlichen Karten werden gleich ausgeteilt.
+                        </p>
+                      </div>
+
+                      <div className="mt-4 flex min-h-20 items-center justify-center gap-3">
+                        {players[abhebenPlayer].cards.length > 0 ? (
+                          players[abhebenPlayer].cards.map((card) => (
+                            <div
+                              key={card.id}
+                              className="animate-in fade-in zoom-in duration-500"
+                            >
+                              <WattenCardComponent card={card} disabled />
+                            </div>
+                          ))
+                        ) : (
+                          <div className="flex h-20 items-center justify-center rounded-xl border border-dashed border-white/15 px-8 text-sm text-zinc-500">
+                            Noch keine Karte auf der Hand
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+              {phase === "fourPlayerReady" && (
+                <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[110px] bg-black/35 backdrop-blur-sm">
+                  <div className="w-full max-w-lg rounded-3xl border border-white/10 bg-zinc-950/95 p-8 text-center shadow-2xl">
+                    <div className="text-4xl">✓</div>
+
+                    <p className="mt-5 text-xs font-semibold uppercase tracking-widest text-emerald-400">
+                      Karten ausgeteilt
+                    </p>
+
+                    <h2 className="mt-2 text-3xl font-black">
+                      Alle Spieler haben 5 Karten
+                    </h2>
+
+                    <div className="mt-6 rounded-2xl border border-amber-400/20 bg-amber-400/10 p-5">
+                      <p className="text-xs font-semibold uppercase tracking-widest text-amber-300">
+                        Vorhand
+                      </p>
+
+                      <p className="mt-1 text-xl font-black text-white">
+                        {vorhandPlayer.name}
+                      </p>
+
+                      <p className="mt-2 text-sm text-zinc-400">
+                        Vorhand bestimmt zuerst den Schlag.
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCurrentPlayer(vorhandIndex);
+
+                        setPhase("schlag");
+
+                        setShowPassScreen(true);
+                      }}
+                      className="mt-8 w-full rounded-xl bg-amber-400 px-6 py-4 text-lg font-black text-amber-950 transition hover:bg-amber-300"
+                    >
+                      Schlag bestimmen
+                    </button>
+                  </div>
+                </div>
+              )}
+              {phase === "schlag" && !showPassScreen && (
+                <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 px-6 backdrop-blur-sm">
+                  <div className="w-full max-w-2xl rounded-3xl border border-white/10 bg-zinc-950 p-8 text-center shadow-2xl">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
+                      Vorhand
+                    </p>
+
+                    <p className="mt-1 text-lg font-bold text-emerald-300">
+                      {vorhandPlayer.name}
+                    </p>
+
+                    <h2 className="mt-3 text-3xl font-black">
+                      Schlag bestimmen
+                    </h2>
+
+                    <p className="mt-2 text-sm text-zinc-400">
+                      Wähle den Rang, der in dieser Runde Schlag ist.
+                    </p>
+
+                    <div className="mt-8 grid grid-cols-4 gap-3 md:grid-cols-8">
+                      {[
+                        "7",
+                        "8",
+                        "9",
+                        "10",
+                        "Unter",
+                        "Ober",
+                        "König",
+                        "Ass",
+                      ].map((rank) => (
+                        <button
+                          key={rank}
+                          type="button"
+                          onClick={() => {
+                            // Save Schlag.
+                            setSchlag(rank);
+
+                            // Now the dealer must choose Farbe.
+                            setCurrentPlayer(dealer);
+
+                            setPhase("trump");
+
+                            // Hide the choice while the
+                            // device is passed.
+                            setShowPassScreen(true);
+                          }}
+                          className="rounded-xl border border-zinc-700 bg-zinc-800 px-3 py-4 text-sm font-semibold transition hover:border-amber-400 hover:bg-amber-400/10"
+                        >
+                          {rank}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="mt-6 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-zinc-400">
+                      Danach bestimmt{" "}
+                      <strong className="text-white">
+                        {dealerPlayer.name}
+                      </strong>{" "}
+                      als Geber die Farbe.
+                    </div>
+                  </div>
+                </div>
+              )}
+              {phase === "trump" && !showPassScreen && (
+                <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 px-6 backdrop-blur-sm">
+                  <div className="w-full max-w-lg rounded-3xl border border-white/10 bg-zinc-950 p-8 text-center shadow-2xl">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
+                      Geber
+                    </p>
+
+                    <p className="mt-1 text-lg font-bold text-emerald-300">
+                      {dealerPlayer.name}
+                    </p>
+
+                    <h2 className="mt-3 text-3xl font-black">
+                      Farbe bestimmen
+                    </h2>
+
+                    <p className="mt-2 text-sm text-zinc-400">
+                      Schlag wurde bereits von Vorhand bestimmt:
+                    </p>
+
+                    <div className="mx-auto mt-3 w-fit rounded-xl border border-amber-400/20 bg-amber-400/10 px-5 py-2 text-lg font-black text-amber-300">
+                      {schlag}
+                    </div>
+
+                    <div className="mt-8 grid grid-cols-2 gap-3">
+                      {[
+                        ["Herz", "♥"],
+                        ["Schellen", "♦"],
+                        ["Eichel", "♣"],
+                        ["Gras", "♠"],
+                      ].map(([value, symbol]) => (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => {
+                            setFarbe(
+                              value as "Herz" | "Schellen" | "Eichel" | "Gras",
+                            );
+
+                            // Vorhand begins the first trick.
+                            setCurrentPlayer(vorhandIndex);
+
+                            // Don't enter the old 3-player
+                            // playing engine yet.
+                            setPhase("fourPlayerPlayReady");
+
+                            setShowPassScreen(false);
+                          }}
+                          className="rounded-2xl border border-zinc-700 bg-zinc-800 p-6 transition hover:border-emerald-400 hover:bg-emerald-500/10"
+                        >
+                          <span
+                            className={`text-4xl ${
+                              value === "Herz" || value === "Schellen"
+                                ? "text-red-400"
+                                : "text-white"
+                            }`}
+                          >
+                            {symbol}
+                          </span>
+
+                          <span className="mt-2 block font-semibold">
+                            {value}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+              {showPassScreen && phase === "playing" && !winner && (
+                <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/70 px-6 backdrop-blur-sm">
+                  <div className="w-full max-w-md rounded-3xl bg-zinc-900 p-8 text-center shadow-2xl">
+                    <div className="text-4xl">🃏</div>
+
+                    <p className="mt-5 text-xs font-semibold uppercase tracking-widest text-emerald-400">
+                      Nächster Spieler
+                    </p>
+
+                    <h2 className="mt-2 text-2xl font-bold">
+                      Gerät weitergeben
+                    </h2>
+
+                    <p className="mt-4 text-xl font-black text-emerald-300">
+                      {players[currentPlayer].name}
+                    </p>
+
+                    <button
+                      type="button"
+                      onClick={continueHotseat}
+                      className="mt-8 w-full rounded-xl bg-emerald-500 px-5 py-3 font-black text-emerald-950 transition hover:bg-emerald-400"
+                    >
+                      Ich bin bereit
+                    </button>
+                  </div>
+                </div>
+              )}
+              {phase === "fourPlayerPlayReady" && (
+                <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[110px] bg-black/35 backdrop-blur-sm">
+                  <div className="w-full max-w-lg rounded-3xl border border-white/10 bg-zinc-950/95 p-8 text-center shadow-2xl">
+                    <div className="text-4xl">🃏</div>
+
+                    <p className="mt-5 text-xs font-semibold uppercase tracking-widest text-emerald-400">
+                      Schlag und Farbe stehen fest
+                    </p>
+
+                    <div className="mt-6 grid grid-cols-2 gap-4">
+                      <div className="rounded-2xl border border-amber-400/20 bg-amber-400/10 p-5">
+                        <p className="text-xs font-semibold uppercase tracking-widest text-amber-300">
+                          Schlag
+                        </p>
+
+                        <p className="mt-2 text-2xl font-black">{schlag}</p>
+
+                        <p className="mt-2 text-xs text-zinc-400">
+                          gewählt von
+                        </p>
+
+                        <p className="font-bold text-white">
+                          {vorhandPlayer.name}
+                        </p>
+                      </div>
+
+                      <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-5">
+                        <p className="text-xs font-semibold uppercase tracking-widest text-emerald-300">
+                          Farbe
+                        </p>
+
+                        <p className="mt-2 text-2xl font-black">
+                          {Farbe === "Herz"
+                            ? "♥"
+                            : Farbe === "Schellen"
+                              ? "♦"
+                              : Farbe === "Eichel"
+                                ? "♣"
+                                : "♠"}{" "}
+                          {Farbe}
+                        </p>
+
+                        <p className="mt-2 text-xs text-zinc-400">
+                          gewählt vom Geber
+                        </p>
+
+                        <p className="font-bold text-white">
+                          {dealerPlayer.name}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-7 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-5">
+                      <p className="text-xs font-semibold uppercase tracking-widest text-amber-300">
+                        Beginnt den ersten Stich
+                      </p>
+
+                      <p className="mt-2 text-2xl font-black text-white">
+                        {vorhandPlayer.name}
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCurrentPlayer(vorhandIndex);
+
+                        setPhase("playing");
+
+                        setShowPassScreen(true);
+                      }}
+                      className="mt-8 w-full rounded-xl bg-amber-400 px-6 py-4 text-lg font-black text-amber-950 transition hover:scale-[1.02] hover:bg-amber-300"
+                    >
+                      Spiel beginnen
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {phase === "trickPause" && (
+                <div className="absolute bottom-5 left-1/2 z-40 -translate-x-1/2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCardPlayedThisTurn(false);
+                      setPhase("trickReview");
+                    }}
+                    className="rounded-xl bg-amber-400 px-7 py-3 font-black text-amber-950 shadow-xl transition hover:scale-105 hover:bg-amber-300"
+                  >
+                    Stich auswerten
+                  </button>
+                </div>
+              )}
+              {phase === "trickReview" && trickWinner && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 px-6 backdrop-blur-sm">
+                  <div className="w-full max-w-4xl rounded-3xl border border-white/10 bg-emerald-950 p-8 shadow-2xl">
+                    <div className="text-center">
+                      <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
+                        Stich Review
+                      </p>
+
+                      <h2 className="mt-2 text-3xl font-black">
+                        {
+                          players.find(
+                            (player) => player.id === trickWinner.playerId,
+                          )?.name
+                        }{" "}
+                        gewinnt den Stich!
+                      </h2>
+                    </div>
+
+                    <div className="mt-8 flex items-start justify-center gap-5">
+                      {playedCards.map((played, index) => {
+                        const isWinner =
+                          played.playerId === trickWinner.playerId &&
+                          played.card.id === trickWinner.card.id;
+
+                        const player = players.find(
+                          (candidate) => candidate.id === played.playerId,
+                        );
+
+                        return (
+                          <div
+                            key={`${played.playerId}-${played.card.id}`}
+                            className={`flex flex-col items-center rounded-2xl p-4 ${
+                              isWinner
+                                ? "bg-amber-400/20 ring-2 ring-amber-400"
+                                : "bg-white/5"
+                            }`}
+                          >
+                            <div className="mb-3 rounded-full bg-white/10 px-3 py-1 text-xs font-bold">
+                              {index + 1}. {player?.name}
+                            </div>
+
+                            <WattenCardComponent card={played.card} disabled />
+
+                            {isWinner && (
+                              <div className="mt-3 rounded-full bg-amber-400 px-3 py-1 text-xs font-black text-amber-950">
+                                Stich-Sieger
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={finishTrickReview}
+                      className="mx-auto mt-8 block rounded-xl bg-amber-400 px-8 py-3 font-black text-amber-950 transition hover:bg-amber-300"
+                    >
+                      Weiter
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* TOP PLAYER — partner */}
+              <div
+                className={`absolute left-1/2 top-6 z-20 w-52 -translate-x-1/2 rounded-2xl border p-4 text-center shadow-xl backdrop-blur ${topTeam.box}`}
+              >
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-amber-400 px-3 py-1 text-[9px] font-black uppercase tracking-wider text-amber-950">
+                  Partner
+                </div>
+
+                <div className="mt-1 text-lg font-bold">{topPlayer.name}</div>
+
+                <div
+                  className={`mx-auto mt-1 w-fit rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${topTeam.badge}`}
+                >
+                  {topTeam.label}
+                </div>
+
+                <HiddenPreviewCards player={topPlayer} />
+              </div>
+
+              {/* LEFT PLAYER — next clockwise */}
+              <div
+                className={`absolute left-3 top-1/2 z-20 w-44 -translate-y-1/2 rounded-2xl border p-3 text-center shadow-xl backdrop-blur ${leftTeam.box}`}
+              >
+                <div className="absolute -top-3 right-3 rounded-full bg-amber-400 px-3 py-1 text-[9px] font-black uppercase tracking-wider text-amber-950">
+                  Nächster Spieler
+                </div>
+
+                <div className="text-lg font-bold">{leftPlayer.name}</div>
+
+                <div
+                  className={`mx-auto mt-1 w-fit rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${leftTeam.badge}`}
+                >
+                  {leftTeam.label}
+                </div>
+
+                <HiddenPreviewCards player={leftPlayer} />
+              </div>
+
+              {/* RIGHT PLAYER */}
+              <div
+                className={`absolute right-3 top-1/2 z-20 w-44 -translate-y-1/2 rounded-2xl border p-3 text-center shadow-xl backdrop-blur ${rightTeam.box}`}
+              >
+                <div className="text-lg font-bold">{rightPlayer.name}</div>
+
+                <div
+                  className={`mx-auto mt-1 w-fit rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${rightTeam.badge}`}
+                >
+                  {rightTeam.label}
+                </div>
+
+                <HiddenPreviewCards player={rightPlayer} />
+              </div>
+
+              {/* PLAYED CARDS */}
+              <div className="absolute left-1/2 top-[45%] z-10 flex h-44 w-[440px] -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-3 rounded-3xl border border-white/10 bg-emerald-950/30 p-4 shadow-inner">
+                {playedCards.length === 0 ? (
+                  <div className="text-center">
+                    <div className="text-4xl opacity-30">🃏</div>
+
+                    <p className="mt-2 text-sm text-emerald-300/50">
+                      Karte ausspielen
+                    </p>
+                  </div>
+                ) : (
+                  playedCards.map((played) => {
+                    const player = players.find(
+                      (candidate) => candidate.id === played.playerId,
+                    );
+
+                    return (
+                      <div
+                        key={`${played.playerId}-${played.card.id}`}
+                        className="flex flex-col items-center gap-2"
+                      >
+                        <WattenCardComponent card={played.card} disabled />
+
+                        <span className="text-xs font-medium text-emerald-100">
+                          {player?.name}
+                        </span>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+
+              {/* CURRENT PLAYER HAND */}
+              {!showPassScreen && phase === "playing" && !winner && (
+                <div className="absolute bottom-4 left-1/2 z-30 w-full max-w-4xl -translate-x-1/2 px-8">
+                  <div
+                    className={`relative rounded-2xl border px-6 py-5 shadow-2xl backdrop-blur ${
+                      bottomTeam.label === "Team A"
+                        ? "border-amber-400/40 bg-zinc-950/95"
+                        : "border-emerald-400/40 bg-zinc-950/95"
+                    }`}
+                  >
+                    {/* ACTIVE PLAYER */}
+                    <div className="absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-amber-400 px-5 py-1.5 text-sm font-black text-amber-950 shadow-lg">
+                      ▼ {fourCurrentPlayer.name} · AM ZUG
+                    </div>
+
+                    <div
+                      className={`mx-auto mt-3 w-fit rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wider ${bottomTeam.badge}`}
+                    >
+                      {bottomTeam.label}
+                    </div>
+
+                    {fourTrumpfOderKritischActive && (
+                      <div
+                        className={`mx-auto mt-3 w-fit rounded-xl border px-4 py-2 text-xs font-bold ${
+                          fourCurrentMustFollow
+                            ? "border-red-400/40 bg-red-500/20 text-red-100"
+                            : "border-amber-400/40 bg-amber-400/20 text-amber-100"
+                        }`}
+                      >
+                        {fourCurrentMustFollow
+                          ? "Trumpf oder Kritisch — du musst eine passende Karte spielen."
+                          : "Trumpf oder Kritisch — du hast keine passende Karte und darfst frei spielen."}
+                      </div>
+                    )}
+
+                    {/* LEFT: Help legend */}
+                    <div className="mt-5 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+                      <div className="flex justify-end">
+                        {helpMode &&
+                          playedCards.length > 0 &&
+                          !cardPlayedThisTurn && (
+                            <div className="flex flex-col gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-xs font-semibold">
+                              <span className="flex items-center gap-2 text-green-300">
+                                <span className="h-3 w-3 rounded-full bg-green-500" />
+                                Schlägt den aktuellen Gewinner
+                              </span>
+
+                              <span className="flex items-center gap-2 text-red-300">
+                                <span className="h-3 w-3 rounded-full bg-red-500" />
+                                Schlägt den aktuellen Gewinner nicht
+                              </span>
+                            </div>
+                          )}
+                      </div>
+
+                      {/* CARDS */}
+                      <div className="flex justify-center gap-2">
+                        {fourCurrentPlayer.cards.map((card) => {
+                          const legal =
+                            !fourCurrentMustFollow ||
+                            isTrumpfOderKritischCard(card, Farbe);
+
+                          const comparison =
+                            helpMode &&
+                            playedCards.length > 0 &&
+                            !cardPlayedThisTurn &&
+                            legal
+                              ? wouldCardWin(
+                                  card,
+                                  fourCurrentPlayer.id,
+                                  playedCards,
+                                  Farbe,
+                                  schlag,
+                                )
+                              : null;
+
+                          return (
+                            <WattenCardComponent
+                              key={card.id}
+                              card={card}
+                              disabled={!!winner || cardPlayedThisTurn}
+                              invalid={
+                                fourCurrentMustFollow &&
+                                !legal &&
+                                !cardPlayedThisTurn
+                              }
+                              requiredChoice={
+                                fourCurrentMustFollow &&
+                                legal &&
+                                !cardPlayedThisTurn
+                              }
+                              helpStatus={
+                                helpMode &&
+                                !cardPlayedThisTurn &&
+                                legal &&
+                                comparison !== null
+                                  ? comparison
+                                    ? "winning"
+                                    : "losing"
+                                  : undefined
+                              }
+                              hint={getBeginnerCardHint(card)}
+                              onClick={() => playCard(card)}
+                            />
+                          );
+                        })}
+                      </div>
+
+                      {/* FINISH TURN */}
+                      <div className="flex justify-start">
+                        {playedCards.length < players.length &&
+                          cardPlayedThisTurn && (
+                            <button
+                              type="button"
+                              onClick={finishPlayerTurn}
+                              className="animate-pulse whitespace-nowrap rounded-xl bg-amber-400 px-5 py-3 font-black text-amber-950 shadow-xl transition hover:scale-105 hover:bg-amber-300"
+                            >
+                              Zug beenden
+                            </button>
+                          )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* CLOCKWISE INDICATOR */}
+              <div className="absolute left-7 top-7 z-30 rounded-full border border-white/10 bg-emerald-950/80 px-4 py-2 text-xs font-semibold text-emerald-200 shadow-lg backdrop-blur">
+                ↻ Spielrichtung im Uhrzeigersinn
+              </div>
+              {winner && (
+                <div className="absolute inset-0 z-[110] flex items-center justify-center rounded-[110px] bg-black/65 backdrop-blur-sm">
+                  <div className="w-full max-w-lg rounded-3xl border border-amber-400/30 bg-zinc-950 p-10 text-center shadow-2xl">
+                    <div className="text-5xl">🏆</div>
+
+                    <p className="mt-5 text-xs font-semibold uppercase tracking-widest text-amber-400">
+                      Rundensieger
+                    </p>
+
+                    <h2 className="mt-2 text-3xl font-black">{winner}</h2>
+
+                    <p className="mt-3 text-zinc-400">{roundValue} Punkte</p>
+
+                    {!gameWinner && (
+                      <button
+                        type="button"
+                        onClick={startNextRound}
+                        className="mt-8 rounded-xl bg-amber-400 px-7 py-3 font-black text-amber-950 transition hover:bg-amber-300"
+                      >
+                        Nächste Runde
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* RIGHT SIDEBAR: STICHSTAND */}
+            <aside className="w-64 pt-10">
+              <div className="h-[650px] overflow-y-auto rounded-3xl border border-white/10 bg-zinc-950/95 p-5 shadow-2xl">
+                <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
+                  Aktueller Stichstand
+                </p>
+
+                <h3 className="mt-1 text-lg font-bold text-white">2 gegen 2</h3>
+
+                {/* TEAM A */}
+                <div className="mt-5 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4">
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-amber-300">
+                    Team A
+                  </p>
+
+                  <p className="mt-1 font-bold text-white">
+                    {teamAPlayers[0]?.name}
+                    <span className="text-zinc-500"> & </span>
+                    {teamAPlayers[1]?.name}
+                  </p>
+
+                  <p className="mt-2 text-2xl font-black text-amber-400">
+                    {teamATricks}
+                  </p>
+
+                  <p className="text-xs text-zinc-400">
+                    {teamATricks === 1 ? "Stich" : "Stiche"}
+                  </p>
+                </div>
+
+                {/* VS */}
+                <div className="my-4 flex items-center gap-3">
+                  <div className="h-px flex-1 bg-white/10" />
+
+                  <span className="text-xs font-bold text-zinc-500">VS</span>
+
+                  <div className="h-px flex-1 bg-white/10" />
+                </div>
+
+                {/* TEAM B */}
+                <div className="rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4">
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-emerald-300">
+                    Team B
+                  </p>
+
+                  <p className="mt-1 font-bold text-white">
+                    {teamBPlayers[0]?.name}
+                    <span className="text-zinc-500"> & </span>
+                    {teamBPlayers[1]?.name}
+                  </p>
+
+                  <p className="mt-2 text-2xl font-black text-emerald-400">
+                    {teamBTricks}
+                  </p>
+
+                  <p className="text-xs text-zinc-400">
+                    {teamBTricks === 1 ? "Stich" : "Stiche"}
+                  </p>
+                </div>
+
+                {/* STICH PROGRESS */}
+                <div className="mt-5">
+                  <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+                    3 Stiche zum Sieg
+                  </p>
+
+                  {/* TEAM A */}
+                  <div className="grid grid-cols-3 gap-1">
+                    {[0, 1, 2].map((index) => (
+                      <div
+                        key={index}
+                        className={`h-2 rounded-full ${
+                          index < teamATricks ? "bg-amber-400" : "bg-white/10"
+                        }`}
+                      />
+                    ))}
+                  </div>
+
+                  {/* TEAM B */}
+                  <div className="mt-2 grid grid-cols-3 gap-1">
+                    {[0, 1, 2].map((index) => (
+                      <div
+                        key={index}
+                        className={`h-2 rounded-full ${
+                          index < teamBTricks ? "bg-emerald-400" : "bg-white/10"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                {/* RUNDENWERT / GEHEN */}
+                <div className="mt-5 rounded-xl border border-white/10 bg-white/5 p-3 text-center">
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
+                    Rundenwert
+                  </p>
+
+                  <p className="mt-1 text-2xl font-black text-amber-400">
+                    {roundValue} Punkte
+                  </p>
+
+                  {canRaise && (
+                    <button
+                      type="button"
+                      onClick={raiseRoundValue}
+                      className="mt-3 w-full rounded-xl bg-amber-400 px-3 py-2 text-sm font-black text-amber-950 transition hover:bg-amber-300"
+                    >
+                      Gehen auf {roundValue + 1}
+                    </button>
+                  )}
+
+                  {roundValue === 4 && (
+                    <p className="mt-2 text-xs font-semibold text-zinc-500">
+                      Maximum erreicht
+                    </p>
+                  )}
+
+                  {currentSideIsGespannt && (
+                    <div className="mt-3 rounded-lg border border-red-400/20 bg-red-500/10 px-2 py-2">
+                      <p className="text-xs font-bold text-red-300">Gespannt</p>
+
+                      <p className="mt-1 text-[10px] text-red-200/70">
+                        Erhöhen nicht möglich
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </main>
+    );
   }
   const currentPlayerData = players[currentPlayer];
 
@@ -895,6 +2618,13 @@ export default function WattenGame() {
     <main className="min-h-screen bg-emerald-950 px-4 py-6 text-white md:px-8">
       <div className="mx-auto w-full max-w-[1800px]">
         {/* Header */}
+        <div className="ml-5 pl-5">
+          <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
+            Bayerisches Watten
+          </p>
+
+          <h1 className="mt-1 text-2xl font-black">3 Spieler · Hotseat</h1>
+        </div>
         <div className="relative z-30 flex items-center justify-end gap-3 pr-2">
           <button
             type="button"
@@ -1526,7 +3256,7 @@ export default function WattenGame() {
           {/* LEFT SIDEBAR: PUNKTESTAND */}
           <aside className="relative w-64 pt-15">
             {/* CARD PRIORITY HELP */}
-            {helpMode && Farbe && schlag && (
+            {Farbe && schlag && (
               <div className="absolute left-0 top-5 z-50 w-full">
                 <button
                   type="button"

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import type { WattenVariant, WattenPlayerInfo } from "../utils/types";
 
 export default function WattenHotseat() {
@@ -101,48 +101,74 @@ export default function WattenHotseat() {
             <div className="space-y-3">
               {Array.from({
                 length: playerCount,
-              }).map((_, index) => (
-                <div key={index} className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-sm font-black text-emerald-300">
-                    {index + 1}
-                  </div>
+              }).map((_, index) => {
+                const isTeamA = variant === "four-player" && index % 2 === 0;
 
-                  <input
-                    type="text"
-                    value={playerNames[index]}
-                    onChange={(event) =>
-                      updatePlayerName(index, event.target.value)
-                    }
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-amber-400"
-                  />
-                </div>
-              ))}
+                const isTeamB = variant === "four-player" && index % 2 === 1;
+
+                return (
+                  <div
+                    key={index}
+                    className={`flex items-center gap-2 rounded-xl border px-3 py-2 ${
+                      isTeamA
+                        ? "border-amber-400/30 bg-amber-400/5"
+                        : isTeamB
+                          ? "border-emerald-400/30 bg-emerald-400/5"
+                          : "border-white/10 bg-white/5"
+                    }`}
+                  >
+                    {/* PLAYER NUMBER */}
+                    <div
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-black ${
+                        isTeamA
+                          ? "bg-amber-400 text-amber-950"
+                          : isTeamB
+                            ? "bg-emerald-400 text-emerald-950"
+                            : "bg-emerald-500/15 text-emerald-300"
+                      }`}
+                    >
+                      {index + 1}
+                    </div>
+
+                    {/* PLAYER NAME */}
+                    <input
+                      type="text"
+                      value={playerNames[index]}
+                      onChange={(event) =>
+                        updatePlayerName(index, event.target.value)
+                      }
+                      className={`min-w-0 flex-1 rounded-lg border bg-zinc-950/70 px-3 py-2 text-sm text-white outline-none transition ${
+                        isTeamA
+                          ? "border-amber-400/30 focus:border-amber-400"
+                          : isTeamB
+                            ? "border-emerald-400/30 focus:border-emerald-400"
+                            : "border-white/10 focus:border-amber-400"
+                      }`}
+                    />
+
+                    {/* TEAM RADIO */}
+                    {variant === "four-player" && (
+                      <label
+                        className={`flex shrink-0 items-center gap-1.5 rounded-lg border px-2.5 py-1.5 ${
+                          isTeamA
+                            ? "border-amber-400/40 bg-amber-400/10"
+                            : "border-emerald-400/40 bg-emerald-400/10"
+                        }`}
+                      >
+                        <span
+                          className={`text-[11px] font-black ${
+                            isTeamA ? "text-amber-300" : "text-emerald-300"
+                          }`}
+                        >
+                          {isTeamA ? "Team A" : "Team B"}
+                        </span>
+                      </label>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
-
-          {variant === "four-player" && (
-            <div className="mt-6 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 p-4">
-              <p className="text-sm font-bold text-emerald-200">
-                Teamaufteilung
-              </p>
-
-              <div className="mt-2 grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <span className="text-zinc-400">Team A</span>
-                  <p className="font-semibold">
-                    {playerNames[0]} + {playerNames[2]}
-                  </p>
-                </div>
-
-                <div>
-                  <span className="text-zinc-400">Team B</span>
-                  <p className="font-semibold">
-                    {playerNames[1]} + {playerNames[3]}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
 
           <button
             type="button"
