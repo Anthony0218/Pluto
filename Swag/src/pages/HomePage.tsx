@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-type Tab = "Spiele" | "Online spielen" | "Lernen" | "Fortschritt";
+type Tab = "Übersicht" | "Online spielen" | "Spiele" | "Fortschritt";
 
 type Game = {
   title: string;
@@ -38,23 +38,52 @@ const games: Game[] = [
     title: "Watten Multiplayer",
     subtitle: "Gemeinsam spielen",
     description:
-      "Fordere Freunde und andere Spieler zu einer Online-Partie Watten heraus.",
+      "Watten sonst? Fordere Freunde und andere Spieler zu einer Online-Partie Watten heraus.",
     image: "/images/watten-multiplayer.png",
     route: "/watten/multiplayer",
     tag: "Online",
     features: ["Mehrspieler", "Echtzeit", "Online"],
   },
 ];
-
+const gameList = [
+  {
+    name: "Schach",
+    description: "Klassisches Schach mit Analyse und Stockfish.",
+    route: "/chessGame",
+    category: "Strategie",
+    image: "/images/chess-game-icon.png",
+  },
+  {
+    name: "Watten",
+    description: "Das traditionelle bayerische Kartenspiel.",
+    route: "/watten",
+    category: "Kartenspiel",
+    image: "/images/watten-game-icon.png",
+  },
+  {
+    name: "Watten Hotseat",
+    description: "Spielt gemeinsam an einem Bildschirm.",
+    route: "/watten/hotseat",
+    category: "Lokal",
+    image: "/images/watten-game-icon.png",
+  },
+  {
+    name: "Watten Multiplayer",
+    description: "Spiele Watten online mit anderen Spielern.",
+    route: "/watten/multiplayer",
+    category: "Online",
+    image: "/images/watten-game-icon.png",
+  },
+];
 export default function HomePage() {
   const navigate = useNavigate();
-  const tabs: Tab[] = ["Spiele", "Online spielen", "Lernen", "Fortschritt"];
-  const [activeTab, setActiveTab] = useState<Tab>("Spiele");
+  const tabs: Tab[] = ["Übersicht", "Online spielen", "Spiele", "Fortschritt"];
+  const [activeTab, setActiveTab] = useState<Tab>("Übersicht");
   const [currentGame, setCurrentGame] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
-    if (isPaused || activeTab !== "Spiele") {
+    if (isPaused || activeTab !== "Übersicht") {
       return;
     }
 
@@ -79,7 +108,7 @@ export default function HomePage() {
         {/* HEADER */}
         <header className="mb-8 ml-10 flex items-center justify-between">
           <button
-            onClick={() => setActiveTab("Spiele")}
+            onClick={() => setActiveTab("Übersicht")}
             className="flex items-center gap-3"
           >
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-500 text-xl font-bold text-white shadow-lg shadow-sky-500/20">
@@ -132,7 +161,7 @@ export default function HomePage() {
         </nav>
 
         {/* GAMES */}
-        {activeTab === "Spiele" && (
+        {activeTab === "Übersicht" && (
           <div className="space-y-6">
             {/* FEATURED SLIDER */}
             <section
@@ -330,7 +359,7 @@ export default function HomePage() {
 
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <button
-                  onClick={() => setActiveTab("Lernen")}
+                  onClick={() => navigate("/chessGame")}
                   className="group rounded-2xl border border-zinc-800 bg-zinc-900 p-5 text-left transition hover:border-zinc-700 hover:bg-zinc-800"
                 >
                   <span className="text-2xl">♘</span>
@@ -432,64 +461,143 @@ export default function HomePage() {
           </section>
         )}
 
-        {/* LEARN */}
-        {activeTab === "Lernen" && (
+        {/* SPIELE */}
+        {activeTab === "Spiele" && (
           <section>
-            <div className="mb-6">
+            {/* Heading */}
+            <div className="mb-7">
               <h2 className="text-3xl font-semibold tracking-tight text-white">
-                Lernen
+                Spiele
               </h2>
 
               <p className="mt-2 text-zinc-500">
-                Lerne die Spiele mit kurzen interaktiven Lektionen.
+                Wähle ein Spiel und starte direkt eine neue Partie.
               </p>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
-                <span className="text-4xl">♘</span>
+            {/* Game grid */}
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {gameList.map((game) => (
+                <button
+                  key={game.name}
+                  type="button"
+                  onClick={() => navigate(game.route)}
+                  className="
+        group
+        relative
+        aspect-square
+        overflow-hidden
+        rounded-2xl
+        border border-zinc-800
+        bg-zinc-900
+        text-left
 
-                <h3 className="mt-6 text-xl font-semibold text-white">
-                  Schach
-                </h3>
+        transition-all duration-300 ease-out
 
-                <p className="mt-2 text-sm leading-6 text-zinc-500">
-                  Lerne Figurenbewegungen, Taktiken, Eröffnungen und
-                  positionelles Spiel.
-                </p>
+        hover:z-10
+        hover:scale-[1.04]
+        hover:border-zinc-500
+        hover:shadow-2xl
+        hover:shadow-black/40
+        hover:ring-2
+        hover:ring-sky-500/60
 
-                <div className="mt-6 h-1.5 overflow-hidden rounded-full bg-zinc-800">
-                  <div className="h-full w-[30%] rounded-full bg-sky-500" />
-                </div>
+        active:scale-[1.01]
+      "
+                >
+                  {/* Background image */}
+                  <img
+                    src={game.image}
+                    alt={game.name}
+                    className="
+          absolute inset-0
+          h-full w-full
+          object-cover
+          transition-transform duration-500
+          group-hover:scale-110
+        "
+                  />
 
-                <p className="mt-2 text-xs text-zinc-600">
-                  {" "}
-                  30 % abgeschlossen
-                </p>
-              </div>
+                  {/* Dark overlay */}
+                  <div
+                    className="
+          absolute inset-0
+          bg-gradient-to-t
+          from-black/95
+          via-black/45
+          to-black/10
+          transition-all duration-300
+          group-hover:via-black/35
+        "
+                  />
 
-              <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
-                <span className="text-4xl">🂡</span>
+                  {/* subtle hover glow */}
+                  <div
+                    className="
+          absolute inset-0
+          bg-sky-500/0
+          transition-colors duration-300
+          group-hover:bg-sky-500/5
+        "
+                  />
 
-                <h3 className="mt-6 text-xl font-semibold text-white">
-                  Watten
-                </h3>
+                  {/* Content */}
+                  <div className="relative flex h-full flex-col p-5">
+                    {/* Category */}
+                    <div className="flex justify-end">
+                      <span
+                        className="
+              rounded-full
+              border border-white/15
+              bg-black/30
+              px-2.5 py-1
+              text-[10px] font-semibold
+              uppercase tracking-wider
+              text-zinc-200
+              backdrop-blur-md
+            "
+                      >
+                        {game.category}
+                      </span>
+                    </div>
 
-                <p className="mt-2 text-sm leading-6 text-zinc-500">
-                  Lerne Schlag, Trumpf, Kritisch und wie du einen Stich richtig
-                  einschätzt.
-                </p>
+                    {/* Bottom content */}
+                    <div className="mt-auto">
+                      <h3
+                        className="
+              text-2xl font-semibold
+              tracking-tight text-white
+              drop-shadow-lg
+              transition-transform duration-300
+              group-hover:translate-x-1
+            "
+                      >
+                        {game.name}
+                      </h3>
 
-                <div className="mt-6 h-1.5 overflow-hidden rounded-full bg-zinc-800">
-                  <div className="h-full w-[55%] rounded-full bg-sky-500" />
-                </div>
+                      <p className="mt-2 max-w-[90%] text-sm leading-5 text-zinc-300">
+                        {game.description}
+                      </p>
 
-                <p className="mt-2 text-xs text-zinc-600">55 % abgeschlossen</p>
-              </div>
+                      <div
+                        className="
+              mt-4 flex items-center gap-2
+              text-sm font-semibold text-sky-300
+              transition-all duration-300
+              group-hover:translate-x-1
+              group-hover:text-sky-200
+            "
+                      >
+                        Spielen
+                        <span>→</span>
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              ))}
             </div>
           </section>
         )}
-
         {/* PROGRESS */}
         {activeTab === "Fortschritt" && (
           <section>

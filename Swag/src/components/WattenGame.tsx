@@ -17,11 +17,31 @@ import {
   mustFollowTrumpfOderKritisch,
   normalRankValue,
   shuffleDeck,
+  WATTEN_CARD_CLIP,
   wouldCardWin,
   type WattenCard,
 } from "../utils/watten";
 import WattenCardComponent from "./WattenCard";
+import CardThemeSelector from "./WattenCardGameSelector";
+import { useCardTheme } from "@/context/CardThemeContext";
+import { getWattenCardImage } from "@/utils/WattenCardImages";
+import TableThemeSelector from "./TableThemeSelector";
+import { useTableTheme, type TableTheme } from "@/context/TableThemeContext";
 
+const tableBackgrounds: Record<TableTheme, string> = {
+  classic: "/images/tables/classic.webp",
+  bavarian: "/images/tables/bavarian.webp",
+  royal: "/images/tables/royal.webp",
+  steampunk: "/images/tables/steampunk.webp",
+  alpine: "/images/tables/alpine.webp",
+  midnight: "/images/tables/midnight.webp",
+};
+const suitIcons = {
+  Herz: "/images/icons/herz.webp",
+  Schellen: "/images/icons/schellen.webp",
+  Eichel: "/images/icons/eichel.webp",
+  Gras: "/images/icons/gras.webp",
+} as const;
 type Player = {
   id: string;
   name: string;
@@ -43,44 +63,47 @@ export function playHoverSound() {
   audio.volume = 0.1;
   void audio.play();
 }
-function MiniWattenCard({ card }: { card: WattenCard }) {
-  const isRed = card.suit === "Herz" || card.suit === "Schellen";
+type DisplayWattenCard = Pick<WattenCard, "suit" | "rank">;
 
-  const suitSymbol =
-    card.suit === "Herz"
-      ? "♥"
-      : card.suit === "Schellen"
-        ? "🔔"
-        : card.suit === "Eichel"
-          ? "♣"
-          : "🍃";
+function MiniWattenCard({ card }: { card: DisplayWattenCard }) {
+  const { cardTheme } = useCardTheme();
+
+  const imageSrc = getWattenCardImage(card, cardTheme);
 
   return (
-    <div className="relative flex h-20 w-12 shrink-0 flex-col items-center justify-center rounded-lg border border-zinc-300 bg-white shadow">
-      <span
-        className={`text-lg font-bold ${
-          isRed ? "text-red-600" : "text-zinc-900"
-        }`}
-      >
-        {suitSymbol}
-      </span>
-
-      <span
-        className={`mt-1 text-[11px] font-bold ${
-          isRed ? "text-red-600" : "text-zinc-900"
-        }`}
-      >
-        {card.rank}
-      </span>
-
-      <span className="absolute bottom-1 text-[7px] text-zinc-400">
-        {card.suit}
-      </span>
+    <div
+      className="
+        relative
+        h-20
+        w-12
+        shrink-0
+        transition-transform
+        duration-200
+        hover:z-20
+        hover:scale-110
+      "
+    >
+      <img
+        src={imageSrc}
+        alt={`${card.suit} ${card.rank}`}
+        draggable={false}
+        style={{
+          clipPath: WATTEN_CARD_CLIP,
+        }}
+        className="
+          h-full
+          w-full
+          object-fill
+          drop-shadow-md
+          rounded-[6px]
+        "
+      />
     </div>
   );
 }
 
 export default function WattenGame() {
+  const { tableTheme } = useTableTheme();
   const location = useLocation();
   const [phase, setPhase] = useState<
     | "setup"
@@ -99,10 +122,19 @@ export default function WattenGame() {
   const [Farbe, setFarbe] = useState<
     "Herz" | "Schellen" | "Eichel" | "Gras" | null
   >(null);
-  const specialCards = [
-    { suit: "Herz", rank: "König" },
-    { suit: "Schellen", rank: "7" },
-    { suit: "Eichel", rank: "7" },
+  const specialCards: DisplayWattenCard[] = [
+    {
+      suit: "Herz",
+      rank: "König",
+    },
+    {
+      suit: "Schellen",
+      rank: "7",
+    },
+    {
+      suit: "Eichel",
+      rank: "7",
+    },
   ];
 
   const [schlag, setSchlag] = useState<string | null>(null);
@@ -172,7 +204,7 @@ export default function WattenGame() {
     number | null
   >(null);
   const [abhebenFinished, setAbhebenFinished] = useState(false);
-  const [fourPlayerCriticalCount, setFourPlayerCriticalCount] = useState(0);
+  const [abhebenCriticalCount, setAbhebenCriticalCount] = useState(0);
 
   const [abhebenTakingPlayer, setAbhebenTakingPlayer] = useState<number | null>(
     null,
@@ -248,7 +280,7 @@ export default function WattenGame() {
       return;
     }
     if (!Farbe) {
-      setNotification("YWähle zuerst den Trumpf & Schlag.");
+      setNotification("Wähle zuerst den Trumpf & Schlag.");
 
       setTimeout(() => {
         setNotification(null);
@@ -302,88 +334,14 @@ export default function WattenGame() {
     setCurrentPlayer(nextPlayer);
     setShowPassScreen(true);
   }
-
-  function chooseAbhebenCard(cardIndex: number) {
-    if (
-      abhebenAnimation !== "idle" ||
-      abhebenFinished ||
-      selectedAbhebenIndex !== null
-    ) {
-      return;
-    }
-
-    const chosenCard = deck[cardIndex];
-
-    if (!chosenCard) {
-      return;
-    }
-
-    setSelectedAbhebenIndex(cardIndex);
-    setAbgehobenCard(chosenCard);
-
-    // Render one frame face-down.
-    setAbhebenAnimation("idle");
-
-    window.setTimeout(() => {
-      // Flip the selected card.
-      setAbhebenAnimation("revealing");
-
-      window.setTimeout(() => {
-        if (isAbhebenCard(chosenCard)) {
-          // Kritische flies toward player's hand.
-          setAbhebenAnimation("taking");
-
-          window.setTimeout(() => {
-            // Actually remove it from the deck.
-            setDeck((currentDeck) =>
-              currentDeck.filter((card) => card.id !== chosenCard.id),
-            );
-
-            // And add it to Abheber's hand.
-            setPlayers((currentPlayers) =>
-              currentPlayers.map((player, index) =>
-                index === abhebenPlayer
-                  ? {
-                      ...player,
-                      cards: [...player.cards, chosenCard],
-                    }
-                  : player,
-              ),
-            );
-
-            setAbhebenAnimation("finished");
-            setAbhebenFinished(true);
-
-            window.setTimeout(() => {
-              setPhase("dealReady");
-            }, 350);
-          }, 700);
-        } else {
-          // Normal card returns visually to deck.
-          setAbhebenAnimation("returning");
-
-          window.setTimeout(() => {
-            // No setDeck() here.
-            // It never left the real deck.
-            setAbhebenAnimation("finished");
-            setAbhebenFinished(true);
-
-            window.setTimeout(() => {
-              setPhase("dealReady");
-            }, 350);
-          }, 700);
-        }
-      }, 650);
-    }, 50);
-  }
-  function finishFourPlayerCut(
+  function finishCut(
     pile: WattenCard[],
     rest: WattenCard[],
     animateReturn: boolean,
   ) {
     function complete() {
-      // A physical cut changes the deck order:
-      // upper rest first, then the cut pile.
+      // After cutting:
+      // upper part first, cut pile afterwards.
       setDeck([...rest, ...pile]);
 
       setAbhebenAnimation("finished");
@@ -408,7 +366,7 @@ export default function WattenGame() {
     complete();
   }
 
-  function revealFourPlayerCutCard(
+  function revealCutCard(
     pile: WattenCard[],
     rest: WattenCard[],
     criticalCount: number,
@@ -416,42 +374,43 @@ export default function WattenGame() {
     const exposedCard = pile[pile.length - 1];
 
     if (!exposedCard) {
-      finishFourPlayerCut(pile, rest, false);
+      finishCut(pile, rest, false);
       return;
     }
 
-    // First render its back.
+    // Show next exposed card face-down first.
     setAbgehobenCard(exposedCard);
     setAbhebenAnimation("idle");
 
     window.setTimeout(() => {
-      // Then flip it.
+      // Flip card.
       setAbhebenAnimation("revealing");
 
       window.setTimeout(() => {
-        // NORMAL CARD:
-        // the cut ends and this card remains
-        // inside the deck.
+        /*
+        NORMAL CARD:
+        sequence ends.
+        The normal card remains in the deck.
+      */
         if (!isAbhebenCard(exposedCard)) {
-          finishFourPlayerCut(pile, rest, true);
-
+          finishCut(pile, rest, true);
           return;
         }
 
-        // KRITISCHE:
-        //
-        // 1st -> Abheber
-        // 2nd -> Dealer
-        // 3rd -> Abheber
+        /*
+        KRITISCHE:
+
+        1st Kritische -> Abheber
+        2nd Kritische -> Geber
+        3rd Kritische -> Abheber
+      */
         const recipientIndex = criticalCount % 2 === 0 ? abhebenPlayer : dealer;
 
         setAbhebenTakingPlayer(recipientIndex);
-
         setAbhebenAnimation("taking");
 
         window.setTimeout(() => {
-          // Give the critical card to
-          // the correct player.
+          // Give Kritische to correct player.
           setPlayers((currentPlayers) =>
             currentPlayers.map((player, index) =>
               index === recipientIndex
@@ -463,25 +422,22 @@ export default function WattenGame() {
             ),
           );
 
-          // Remove exposed critical
-          // from the cut pile.
+          // Remove taken Kritische from cut pile.
           const nextPile = pile.slice(0, -1);
 
           const nextCriticalCount = criticalCount + 1;
 
-          setFourPlayerCriticalCount(nextCriticalCount);
+          setAbhebenCriticalCount(nextCriticalCount);
 
           setAbhebenTakingPlayer(null);
 
-          // All three Kritische found:
-          // Abheben is finished.
+          /*
+          Maximum = all three Kritische.
+        */
           if (nextCriticalCount >= 3 || nextPile.length === 0) {
-            // Important: taken critical cards
-            // are NOT returned to the deck.
             setDeck([...rest, ...nextPile]);
 
             setAbhebenAnimation("finished");
-
             setAbhebenFinished(true);
 
             window.setTimeout(() => {
@@ -491,18 +447,20 @@ export default function WattenGame() {
             return;
           }
 
-          // Expose the next card below it.
+          /*
+          A Kritische was found:
+          expose the next card immediately.
+        */
           window.setTimeout(() => {
-            revealFourPlayerCutCard(nextPile, rest, nextCriticalCount);
+            revealCutCard(nextPile, rest, nextCriticalCount);
           }, 300);
         }, 700);
       }, 650);
     }, 50);
   }
 
-  function chooseFourPlayerCut(cardIndex: number) {
+  function chooseCut(cardIndex: number) {
     if (
-      variant !== "four-player" ||
       abgehobenCard !== null ||
       abhebenFinished ||
       selectedAbhebenIndex !== null
@@ -510,12 +468,13 @@ export default function WattenGame() {
       return;
     }
 
-    // Clicking a card means:
-    // "cut the deck here".
+    /*
+    Clicking a card means:
+    cut immediately after this card.
+  */
     const cutIndex = cardIndex + 1;
 
-    // There must be cards on both
-    // sides of the cut.
+    // Must leave cards on both sides.
     if (cutIndex <= 0 || cutIndex >= deck.length) {
       return;
     }
@@ -525,10 +484,11 @@ export default function WattenGame() {
     const rest = deck.slice(cutIndex);
 
     setSelectedAbhebenIndex(cardIndex);
-    setFourPlayerCriticalCount(0);
+    setAbhebenCriticalCount(0);
 
-    revealFourPlayerCutCard(pile, rest, 0);
+    revealCutCard(pile, rest, 0);
   }
+
   function continueHotseat() {
     setShowPassScreen(false);
 
@@ -859,7 +819,7 @@ export default function WattenGame() {
     setSelectedAbhebenIndex(null);
     setAbhebenAnimation("idle");
     setAbhebenFinished(false);
-    setFourPlayerCriticalCount(0);
+    setAbhebenCriticalCount(0);
     setAbhebenTakingPlayer(null);
 
     setTricksWon(
@@ -1275,6 +1235,7 @@ export default function WattenGame() {
 
               <h1 className="mt-1 text-2xl font-black">4 Spieler · Hotseat</h1>
             </div>
+
             <div className="flex items-center gap-3">
               <button
                 type="button"
@@ -1287,6 +1248,8 @@ export default function WattenGame() {
               >
                 {helpMode ? "💡 Help On" : "💡 Help"}
               </button>
+              <CardThemeSelector />
+              <TableThemeSelector />
 
               <Link
                 to="/watten/hotseat"
@@ -1294,6 +1257,48 @@ export default function WattenGame() {
               >
                 Zurück
               </Link>
+            </div>
+          </div>
+          {/* GAME STATUS - BETWEEN OPPONENTS */}
+          <div className="absolute left-1/3 top-3 z-20 -translate-x-1/2">
+            <div className="flex min-w-72 flex-col items-center rounded-2xl border border-white/10 bg-emerald-950/80 px-5 py-3 shadow-lg backdrop-blur">
+              {/* Farbe + Schlag */}
+              <div className="flex items-center justify-center gap-10">
+                <div className="text-center">
+                  <p className="text-[11px] font-semibold uppercase tracking-widest text-emerald-300">
+                    Farbe
+                  </p>
+
+                  {Farbe ? (
+                    <div className="mt-0.5 flex items-center gap-2">
+                      <img
+                        src={suitIcons[Farbe]}
+                        alt={Farbe}
+                        draggable={false}
+                        className="h-7 w-7 object-contain"
+                      />
+
+                      <span className="text-sm font-bold text-white">
+                        {Farbe}
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-[10px] text-zinc-500">–</span>
+                  )}
+                </div>
+
+                <div className="h-7 w-px bg-white/10" />
+
+                <div className="text-center">
+                  <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-300">
+                    Schlag
+                  </p>
+
+                  <p className="mt-0.5 text-base font-bold text-white">
+                    {schlag ?? "–"}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
           {/* TABLE + SIDEBARS */}
@@ -1475,11 +1480,27 @@ export default function WattenGame() {
               </div>
             </aside>
             {/* CENTER: 4 PLAYER TABLE */}
-            <div className="relative min-h-[640px] min-w-0 overflow-visible rounded-[100px] border-[8px] border-emerald-900 bg-emerald-700 shadow-2xl">
+            <div
+              className="
+    relative
+    min-h-[640px]
+    min-w-0
+    overflow-visible
+    rounded-[60px]
+    shadow-2xl
+    transition-all
+    duration-500
+  "
+              style={{
+                backgroundImage: `url(${tableBackgrounds[tableTheme]})`,
+                backgroundSize: "100% 100%",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+              }}
+            >
               {/* TABLE SURFACE */}
-              <div className="pointer-events-none absolute inset-0 rounded-[92px] bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.07),transparent_58%)]" />
               {phase === "setup" && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[110px] bg-black/30 backdrop-blur-sm">
+                <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[110px] bg-black/30">
                   <div className="w-full max-w-lg rounded-3xl border border-white/10 bg-zinc-950/95 p-8 text-center shadow-2xl">
                     <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
                       4-Spieler-Watten
@@ -1519,7 +1540,6 @@ export default function WattenGame() {
                   </div>
                 </div>
               )}
-
               {/* 4-PLAYER GEHEN DECISION */}
               {pendingBid && (
                 <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/70 px-6 backdrop-blur-sm">
@@ -1654,9 +1674,7 @@ export default function WattenGame() {
                                       key={card.id}
                                       type="button"
                                       disabled={cannotCut}
-                                      onClick={() =>
-                                        chooseFourPlayerCut(actualIndex)
-                                      }
+                                      onClick={() => chooseCut(actualIndex)}
                                       className={`
                               relative h-20 w-12
                               rounded-lg
@@ -1738,9 +1756,9 @@ export default function WattenGame() {
                           </p>
                         )}
 
-                        {fourPlayerCriticalCount > 0 && (
+                        {abhebenCriticalCount > 0 && (
                           <p className="mt-3 text-xs font-semibold text-emerald-300">
-                            {fourPlayerCriticalCount} Kritische aufgenommen
+                            {abhebenCriticalCount} Kritische aufgenommen
                           </p>
                         )}
 
@@ -1801,7 +1819,7 @@ export default function WattenGame() {
 
                   {/* ABHEBER HAND DURING DEAL READY */}
                   <div className="absolute bottom-4 left-1/2 z-30 w-full -translate-x-1/2 px-10">
-                    <div className="relative mx-auto min-h-32 max-w-xl rounded-2xl border border-amber-400/20 bg-zinc-950/95 px-6 py-4 shadow-2xl backdrop-blur-md">
+                    <div className="relative mx-auto min-h-32 max-w-xl rounded-2xl border border-amber-400 px-6 py-4 shadow-2xl backdrop-blur">
                       {/* Player label */}
                       <div className="absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-amber-400 px-5 py-1.5 text-sm font-black text-amber-950 shadow-lg">
                         ▼ {players[abhebenPlayer].name} · ABHEBER
@@ -1812,7 +1830,7 @@ export default function WattenGame() {
                           Deine Hand nach dem Abheben
                         </p>
 
-                        <p className="mt-1 text-xs text-zinc-500">
+                        <p className="mt-1 text-sm font-bold text-red-300">
                           Die restlichen Karten werden gleich ausgeteilt.
                         </p>
                       </div>
@@ -1828,7 +1846,7 @@ export default function WattenGame() {
                             </div>
                           ))
                         ) : (
-                          <div className="flex h-20 items-center justify-center rounded-xl border border-dashed border-white/15 px-8 text-sm text-zinc-500">
+                          <div className="flex h-20 items-center justify-center rounded-xl border border-dashed border-white/15 px-8 text-sm text-black">
                             Noch keine Karte auf der Hand
                           </div>
                         )}
@@ -1898,6 +1916,18 @@ export default function WattenGame() {
                     <p className="mt-2 text-sm text-zinc-400">
                       Wähle den Rang, der in dieser Runde Schlag ist.
                     </p>
+                    {/* VORHAND HAND */}
+                    <div className="mt-6">
+                      <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-emerald-300">
+                        Deine Karten
+                      </p>
+
+                      <div className="pointer-events-none flex justify-center gap-2">
+                        {vorhandPlayer.cards.map((card) => (
+                          <WattenCardComponent key={card.id} card={card} />
+                        ))}
+                      </div>
+                    </div>
 
                     <div className="mt-8 grid grid-cols-4 gap-3 md:grid-cols-8">
                       {[
@@ -1965,48 +1995,58 @@ export default function WattenGame() {
                     <div className="mx-auto mt-3 w-fit rounded-xl border border-amber-400/20 bg-amber-400/10 px-5 py-2 text-lg font-black text-amber-300">
                       {schlag}
                     </div>
+                    {/* DEALER HAND */}
+                    <div className="mt-6">
+                      <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-emerald-300">
+                        Deine Karten
+                      </p>
+
+                      <div className="pointer-events-none flex justify-center gap-2">
+                        {dealerPlayer.cards.map((card) => (
+                          <WattenCardComponent key={card.id} card={card} />
+                        ))}
+                      </div>
+                    </div>
 
                     <div className="mt-8 grid grid-cols-2 gap-3">
-                      {[
-                        ["Herz", "♥"],
-                        ["Schellen", "♦"],
-                        ["Eichel", "♣"],
-                        ["Gras", "♠"],
-                      ].map(([value, symbol]) => (
-                        <button
-                          key={value}
-                          type="button"
-                          onClick={() => {
-                            setFarbe(
-                              value as "Herz" | "Schellen" | "Eichel" | "Gras",
-                            );
+                      {(["Herz", "Schellen", "Eichel", "Gras"] as const).map(
+                        (value) => (
+                          <button
+                            key={value}
+                            type="button"
+                            onClick={() => {
+                              setFarbe(value);
 
-                            // Vorhand begins the first trick.
-                            setCurrentPlayer(vorhandIndex);
+                              // Vorhand begins the first trick.
+                              setCurrentPlayer(vorhandIndex);
 
-                            // Don't enter the old 3-player
-                            // playing engine yet.
-                            setPhase("fourPlayerPlayReady");
-
-                            setShowPassScreen(false);
-                          }}
-                          className="rounded-2xl border border-zinc-700 bg-zinc-800 p-6 transition hover:border-emerald-400 hover:bg-emerald-500/10"
-                        >
-                          <span
-                            className={`text-4xl ${
-                              value === "Herz" || value === "Schellen"
-                                ? "text-red-400"
-                                : "text-white"
-                            }`}
+                              setPhase("fourPlayerPlayReady");
+                              setShowPassScreen(false);
+                            }}
+                            className="
+          flex flex-col items-center justify-center
+          rounded-2xl
+          border border-zinc-700
+          bg-zinc-800
+          p-6
+          transition
+          hover:border-emerald-400
+          hover:bg-emerald-500/10
+        "
                           >
-                            {symbol}
-                          </span>
+                            <img
+                              src={suitIcons[value]}
+                              alt={value}
+                              draggable={false}
+                              className="h-16 w-16 object-contain"
+                            />
 
-                          <span className="mt-2 block font-semibold">
-                            {value}
-                          </span>
-                        </button>
-                      ))}
+                            <span className="mt-2 block font-semibold">
+                              {value}
+                            </span>
+                          </button>
+                        ),
+                      )}
                     </div>
                   </div>
                 </div>
@@ -2069,16 +2109,18 @@ export default function WattenGame() {
                           Farbe
                         </p>
 
-                        <p className="mt-2 text-2xl font-black">
-                          {Farbe === "Herz"
-                            ? "♥"
-                            : Farbe === "Schellen"
-                              ? "♦"
-                              : Farbe === "Eichel"
-                                ? "♣"
-                                : "♠"}{" "}
-                          {Farbe}
-                        </p>
+                        {Farbe && (
+                          <div className="mt-2 flex items-center justify-center gap-2">
+                            <img
+                              src={suitIcons[Farbe]}
+                              alt={Farbe}
+                              className="h-8 w-8 object-contain"
+                              draggable={false}
+                            />
+
+                            <span className="text-2xl font-black">{Farbe}</span>
+                          </div>
+                        )}
 
                         <p className="mt-2 text-xs text-zinc-400">
                           gewählt vom Geber
@@ -2116,7 +2158,6 @@ export default function WattenGame() {
                   </div>
                 </div>
               )}
-
               {phase === "trickPause" && (
                 <div className="absolute bottom-5 left-1/2 z-40 -translate-x-1/2">
                   <button
@@ -2194,68 +2235,67 @@ export default function WattenGame() {
                   </div>
                 </div>
               )}
+              {phase !== "setup" && (
+                <div>
+                  <div
+                    className={`absolute left-1/2 top-6 z-20 w-52 -translate-x-1/2 rounded-2xl border p-4 text-center shadow-xl backdrop-blur ${topTeam.box}`}
+                  >
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-amber-400 px-3 py-1 text-[9px] font-black uppercase tracking-wider text-amber-950">
+                      Partner
+                    </div>
 
-              {/* TOP PLAYER — partner */}
-              <div
-                className={`absolute left-1/2 top-6 z-20 w-52 -translate-x-1/2 rounded-2xl border p-4 text-center shadow-xl backdrop-blur ${topTeam.box}`}
-              >
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-amber-400 px-3 py-1 text-[9px] font-black uppercase tracking-wider text-amber-950">
-                  Partner
+                    <div className="mt-1 text-lg font-bold">
+                      {topPlayer.name}
+                    </div>
+
+                    <div
+                      className={`mx-auto mt-1 w-fit rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${topTeam.badge}`}
+                    >
+                      {topTeam.label}
+                    </div>
+
+                    <HiddenPreviewCards player={topPlayer} />
+                  </div>
+
+                  <div
+                    className={`absolute left-3 top-1/2 z-20 w-44 -translate-y-1/2 rounded-2xl border p-3 text-center shadow-xl backdrop-blur ${leftTeam.box}`}
+                  >
+                    <div className="absolute -top-3 right-3 rounded-full bg-amber-400 px-3 py-1 text-[9px] font-black uppercase tracking-wider text-amber-950">
+                      Nächster Spieler
+                    </div>
+
+                    <div className="text-lg font-bold">{leftPlayer.name}</div>
+
+                    <div
+                      className={`mx-auto mt-1 w-fit rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${leftTeam.badge}`}
+                    >
+                      {leftTeam.label}
+                    </div>
+
+                    <HiddenPreviewCards player={leftPlayer} />
+                  </div>
+
+                  <div
+                    className={`absolute right-3 top-1/2 z-20 w-44 -translate-y-1/2 rounded-2xl border p-3 text-center shadow-xl backdrop-blur ${rightTeam.box}`}
+                  >
+                    <div className="text-lg font-bold">{rightPlayer.name}</div>
+
+                    <div
+                      className={`mx-auto mt-1 w-fit rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${rightTeam.badge}`}
+                    >
+                      {rightTeam.label}
+                    </div>
+
+                    <HiddenPreviewCards player={rightPlayer} />
+                  </div>
                 </div>
-
-                <div className="mt-1 text-lg font-bold">{topPlayer.name}</div>
-
-                <div
-                  className={`mx-auto mt-1 w-fit rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${topTeam.badge}`}
-                >
-                  {topTeam.label}
-                </div>
-
-                <HiddenPreviewCards player={topPlayer} />
-              </div>
-
-              {/* LEFT PLAYER — next clockwise */}
-              <div
-                className={`absolute left-3 top-1/2 z-20 w-44 -translate-y-1/2 rounded-2xl border p-3 text-center shadow-xl backdrop-blur ${leftTeam.box}`}
-              >
-                <div className="absolute -top-3 right-3 rounded-full bg-amber-400 px-3 py-1 text-[9px] font-black uppercase tracking-wider text-amber-950">
-                  Nächster Spieler
-                </div>
-
-                <div className="text-lg font-bold">{leftPlayer.name}</div>
-
-                <div
-                  className={`mx-auto mt-1 w-fit rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${leftTeam.badge}`}
-                >
-                  {leftTeam.label}
-                </div>
-
-                <HiddenPreviewCards player={leftPlayer} />
-              </div>
-
-              {/* RIGHT PLAYER */}
-              <div
-                className={`absolute right-3 top-1/2 z-20 w-44 -translate-y-1/2 rounded-2xl border p-3 text-center shadow-xl backdrop-blur ${rightTeam.box}`}
-              >
-                <div className="text-lg font-bold">{rightPlayer.name}</div>
-
-                <div
-                  className={`mx-auto mt-1 w-fit rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${rightTeam.badge}`}
-                >
-                  {rightTeam.label}
-                </div>
-
-                <HiddenPreviewCards player={rightPlayer} />
-              </div>
-
+              )}
               {/* PLAYED CARDS */}
               <div className="absolute left-1/2 top-[45%] z-10 flex h-44 w-[440px] -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-3 rounded-3xl border border-white/10 bg-emerald-950/30 p-4 shadow-inner">
                 {playedCards.length === 0 ? (
                   <div className="text-center">
-                    <div className="text-4xl opacity-30">🃏</div>
-
                     <p className="mt-2 text-sm text-emerald-300/50">
-                      Karte ausspielen
+                      Spielfeld
                     </p>
                   </div>
                 ) : (
@@ -2279,17 +2319,10 @@ export default function WattenGame() {
                   })
                 )}
               </div>
-
               {/* CURRENT PLAYER HAND */}
               {!showPassScreen && phase === "playing" && !winner && (
                 <div className="absolute bottom-4 left-1/2 z-30 w-full max-w-4xl -translate-x-1/2 px-8">
-                  <div
-                    className={`relative rounded-2xl border px-6 py-5 shadow-2xl backdrop-blur ${
-                      bottomTeam.label === "Team A"
-                        ? "border-amber-400/40 bg-zinc-950/95"
-                        : "border-emerald-400/40 bg-zinc-950/95"
-                    }`}
-                  >
+                  <div className={`relative rounded-2xl px-6 py-5 shadow-2xl`}>
                     {/* ACTIVE PLAYER */}
                     <div className="absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-amber-400 px-5 py-1.5 text-sm font-black text-amber-950 shadow-lg">
                       ▼ {fourCurrentPlayer.name} · AM ZUG
@@ -2405,7 +2438,6 @@ export default function WattenGame() {
                   </div>
                 </div>
               )}
-
               {/* CLOCKWISE INDICATOR */}
               <div className="absolute left-7 top-7 z-30 rounded-full border border-white/10 bg-emerald-950/80 px-4 py-2 text-xs font-semibold text-emerald-200 shadow-lg backdrop-blur">
                 ↻ Spielrichtung im Uhrzeigersinn
@@ -2625,7 +2657,8 @@ export default function WattenGame() {
 
           <h1 className="mt-1 text-2xl font-black">3 Spieler · Hotseat</h1>
         </div>
-        <div className="relative z-30 flex items-center justify-end gap-3 pr-2">
+
+        <div className="relative pb-5 z-30 flex items-center justify-end gap-3 pr-2">
           <button
             type="button"
             onClick={() => setHelpMode((current) => !current)}
@@ -2648,6 +2681,8 @@ export default function WattenGame() {
           >
             📖 Spielregeln
           </button>
+          <CardThemeSelector />
+          <TableThemeSelector />
           <Link
             to="/watten"
             className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium transition hover:bg-white/20"
@@ -2837,25 +2872,15 @@ export default function WattenGame() {
                   Special cards
                 </div>
 
-                <div className="flex justify-center gap-3">
+                <div className="flex justify-center gap-4">
                   {specialCards.map((specialCard) => (
                     <div
                       key={`${specialCard.suit}-${specialCard.rank}`}
-                      className="flex h-24 w-16 flex-col items-center justify-center rounded-xl border border-amber-400/40 bg-amber-400/10 shadow-lg"
+                      className="flex flex-col items-center gap-2"
                     >
-                      <span className="text-2xl">
-                        {specialCard.suit === "Herz"
-                          ? "♥"
-                          : specialCard.suit === "Schellen"
-                            ? "🔔"
-                            : "🌿"}
-                      </span>
+                      <MiniWattenCard card={specialCard} />
 
-                      <span className="mt-1 text-xs font-bold">
-                        {specialCard.rank}
-                      </span>
-
-                      <span className="text-[9px] text-amber-300">
+                      <span className="text-[10px] font-semibold text-amber-300">
                         {specialCard.suit}
                       </span>
                     </div>
@@ -2881,25 +2906,33 @@ export default function WattenGame() {
                             {row.map((card, index) => {
                               const actualIndex = rowIndex * 16 + index;
 
+                              const cannotCut = actualIndex === deck.length - 1;
+
                               return (
                                 <button
                                   key={card.id}
                                   type="button"
-                                  onClick={() => chooseAbhebenCard(actualIndex)}
+                                  disabled={cannotCut}
+                                  onClick={() => chooseCut(actualIndex)}
                                   className={`
-                relative h-20 w-12
-                rounded-lg
-                border border-white/20
-                bg-zinc-950
-                shadow-lg
-                transition-all
-                duration-200
-                hover:z-30
-                hover:-translate-y-3
-                hover:scale-110
-                hover:border-amber-300
-                ${index !== 0 ? "-ml-5" : ""}
-              `}
+  relative
+  h-20
+  w-12
+  rounded-lg
+  border border-white/20
+  bg-zinc-950
+  shadow-lg
+  transition-all
+  duration-200
+
+  ${index !== 0 ? "-ml-5" : ""}
+
+  ${
+    cannotCut
+      ? "cursor-not-allowed opacity-30"
+      : "hover:z-30 hover:-translate-y-3 hover:scale-110 hover:border-amber-300"
+  }
+`}
                                 >
                                   <div className="absolute inset-1 rounded-md border border-emerald-300/30 bg-emerald-900" />
                                 </button>
@@ -2978,63 +3011,108 @@ export default function WattenGame() {
         )}
         {phase === "trump" && !winner && !showPassScreen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6 backdrop-blur-sm">
-            <div className="w-full max-w-lg rounded-3xl bg-zinc-900 p-8 text-white shadow-2xl">
+            <div className="w-full max-w-2xl rounded-3xl bg-zinc-900 p-8 text-center text-white shadow-2xl">
               <p className="text-sm font-semibold uppercase tracking-wider text-emerald-400">
                 {players[trumpCaller].name}
               </p>
 
-              <h2 className="mt-2 text-3xl font-bold">Trumpf</h2>
+              <h2 className="mt-2 text-3xl font-bold">Trumpf bestimmen</h2>
 
-              <p className="mt-2 text-zinc-400">Wähle den Trumpf.</p>
+              <p className="mt-2 text-zinc-400">
+                Sieh dir deine Karten an und wähle danach den Trumpf.
+              </p>
 
-              <div className="mt-6 grid grid-cols-2 gap-3">
-                {[
-                  ["Herz", "♥", "Herz"],
-                  ["Schellen", "♦", "Schellen"],
-                  ["Eichel", "♣", "Eichel"],
-                  ["Gras", "♠", "Gras"],
-                ].map(([value, symbol, name]) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => {
-                      setFarbe(
-                        value as "Herz" | "Schellen" | "Eichel" | "Gras",
-                      );
+              {/* OWN HAND */}
+              <div className="mt-6">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-emerald-300">
+                  Deine Karten
+                </p>
 
-                      setPhase("schlag");
-                    }}
-                    className="rounded-2xl border border-zinc-700 bg-zinc-800 p-6 transition hover:border-emerald-400 hover:bg-emerald-500/10"
-                  >
-                    <span
-                      className={`text-4xl ${
-                        value === "Herz" || value === "Schellen"
-                          ? "text-red-400"
-                          : "text-white"
-                      }`}
+                <div className="flex justify-center gap-2">
+                  {players[trumpCaller].cards.map((card) => (
+                    <div key={card.id} className="pointer-events-none">
+                      <WattenCardComponent card={card} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* TRUMPF CHOICE */}
+              <div className="mt-8 grid grid-cols-2 gap-3">
+                {(["Herz", "Schellen", "Eichel", "Gras"] as const).map(
+                  (value) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => {
+                        setFarbe(value);
+                        setPhase("schlag");
+                      }}
+                      className="
+          flex flex-col items-center justify-center
+          rounded-2xl
+          border border-zinc-700
+          bg-zinc-800
+          p-6
+          transition
+          hover:border-emerald-400
+          hover:bg-emerald-500/10
+        "
                     >
-                      {symbol}
-                    </span>
+                      <img
+                        src={suitIcons[value]}
+                        alt={value}
+                        draggable={false}
+                        className="h-16 w-16 object-contain"
+                      />
 
-                    <span className="mt-2 block font-semibold">{name}</span>
-                  </button>
-                ))}
+                      <span className="mt-3 block font-semibold">{value}</span>
+                    </button>
+                  ),
+                )}
               </div>
             </div>
           </div>
         )}
         {phase === "schlag" && !winner && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6 backdrop-blur-sm">
-            <div className="w-full max-w-2xl rounded-3xl bg-zinc-900 p-8 text-white shadow-2xl">
+            <div className="w-full max-w-2xl rounded-3xl bg-zinc-900 p-8 text-center text-white shadow-2xl">
               <p className="text-sm font-semibold uppercase tracking-wider text-emerald-400">
-                {players[currentPlayer].name}
+                {players[trumpCaller].name}
               </p>
 
-              <h2 className="mt-2 text-3xl font-bold">Schlag</h2>
+              <h2 className="mt-2 text-3xl font-bold">Schlag bestimmen</h2>
 
-              <p className="mt-2 text-zinc-400">Wähle den Schlag.</p>
+              <p className="mt-2 text-zinc-400">
+                Sieh dir deine Karten an und wähle danach den Schlag.
+              </p>
 
-              <div className="mt-6 grid grid-cols-4 gap-3 md:grid-cols-8">
+              {/* SELECTED TRUMPF */}
+              <div className="mx-auto mt-4 w-fit rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-5 py-2">
+                <span className="text-xs uppercase tracking-widest text-emerald-300">
+                  Trumpf
+                </span>
+
+                <p className="mt-1 font-black text-white">{Farbe}</p>
+              </div>
+
+              {/* OWN HAND */}
+              <div className="mt-6">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-emerald-300">
+                  Deine Karten
+                </p>
+
+                <div className="flex justify-center gap-2">
+                  {players[trumpCaller].cards.map((card) => (
+                    <div key={card.id} className="pointer-events-none">
+                      <WattenCardComponent card={card} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* SCHLAG CHOICE */}
+              <div className="mt-8 grid grid-cols-4 gap-3 md:grid-cols-8">
                 {["7", "8", "9", "10", "Unter", "Ober", "König", "Ass"].map(
                   (rank) => (
                     <button
@@ -3044,9 +3122,8 @@ export default function WattenGame() {
                         setSchlag(rank);
                         setCurrentPlayer(trumpCaller);
                         setPhase("playing");
-                        setShowPassScreen(false);
                       }}
-                      className="rounded-xl border border-zinc-700 bg-zinc-800 px-3 py-4 text-sm font-semibold transition hover:border-emerald-400 hover:bg-emerald-500/10"
+                      className="rounded-xl border border-zinc-700 bg-zinc-800 px-3 py-4 text-sm font-semibold transition hover:border-amber-400 hover:bg-amber-400/10"
                     >
                       {rank}
                     </button>
@@ -3393,8 +3470,24 @@ export default function WattenGame() {
           </aside>
 
           {/* CENTER: PLAYING TABLE */}
-          <div className="relative min-h-[640px] min-w-0 overflow-visible rounded-[100px] border-[8px] border-emerald-900 bg-emerald-700 shadow-2xl">
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.06),transparent_55%)]" />
+          <div
+            className="
+    relative
+    h-[520px]
+    overflow-hidden
+    rounded-[40px]
+    border border-white/10
+    shadow-2xl
+    transition-all
+    duration-500
+  "
+            style={{
+              backgroundImage: `url(${tableBackgrounds[tableTheme]})`,
+              backgroundSize: "100% 100%",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            }}
+          >
             {/* DECK READY AFTER ABHEBEN */}
             {phase === "dealReady" && !winner && (
               <div className="absolute left-1/2 top-[43%] z-40 -translate-x-1/2 -translate-y-1/2">
@@ -3443,7 +3536,7 @@ export default function WattenGame() {
             {/* ABHEBER HAND DURING DEAL READY */}
             {phase === "dealReady" && (
               <div className="absolute bottom-4 left-1/2 z-30 w-full -translate-x-1/2 px-10">
-                <div className="relative mx-auto min-h-32 max-w-xl rounded-2xl border border-amber-400/20 bg-zinc-950/95 px-6 py-4 shadow-2xl backdrop-blur-md">
+                <div className="relative mx-auto min-h-32 max-w-xl rounded-2xl border border-amber-400/20 px-6 py-4 shadow-2xl backdrop-blur-sm">
                   {/* Player label */}
                   <div className="absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-amber-400 px-5 py-1.5 text-sm font-black text-amber-950 shadow-lg">
                     ▼ {abhebenPlayerData.name} · ABHEBER
@@ -3454,7 +3547,7 @@ export default function WattenGame() {
                       Deine Hand nach dem Abheben
                     </p>
 
-                    <p className="mt-1 text-xs text-zinc-500">
+                    <p className="mt-1 text-sm font-bold text-black">
                       Die restlichen Karten werden gleich ausgeteilt.
                     </p>
                   </div>
@@ -3470,7 +3563,7 @@ export default function WattenGame() {
                         </div>
                       ))
                     ) : (
-                      <div className="flex h-20 items-center justify-center rounded-xl border border-dashed border-white/15 px-8 text-sm text-zinc-500">
+                      <div className="flex h-20 items-center justify-center rounded-xl border border-dashed px-8 text-sm text-black">
                         Noch keine Karte auf der Hand
                       </div>
                     )}
@@ -3489,22 +3582,13 @@ export default function WattenGame() {
                     </p>
 
                     {Farbe ? (
-                      <div className="mt-0.5 flex items-center gap-1.5">
-                        <span
-                          className={`text-xl font-bold ${
-                            Farbe === "Herz" || Farbe === "Schellen"
-                              ? "text-red-400"
-                              : "text-white"
-                          }`}
-                        >
-                          {Farbe === "Herz"
-                            ? "♥"
-                            : Farbe === "Schellen"
-                              ? "♦"
-                              : Farbe === "Eichel"
-                                ? "♣"
-                                : "♠"}
-                        </span>
+                      <div className="mt-0.5 flex items-center gap-2">
+                        <img
+                          src={suitIcons[Farbe]}
+                          alt={Farbe}
+                          draggable={false}
+                          className="h-7 w-7 object-contain"
+                        />
 
                         <span className="text-sm font-bold text-white">
                           {Farbe}
@@ -3527,37 +3611,6 @@ export default function WattenGame() {
                     </p>
                   </div>
                 </div>
-
-                {/* exact Hauptschlag */}
-                {Farbe && schlag && (
-                  <div className="mt-1.5 flex items-center gap-2">
-                    <span className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
-                      Hauptschlag
-                    </span>
-
-                    <div className="flex h-8 min-w-12 items-center justify-center gap-1.5 rounded-lg border border-amber-400/40 bg-white px-2.5">
-                      <span
-                        className={`text-lg font-black ${
-                          Farbe === "Herz" || Farbe === "Schellen"
-                            ? "text-red-600"
-                            : "text-zinc-900"
-                        }`}
-                      >
-                        {Farbe === "Herz"
-                          ? "♥"
-                          : Farbe === "Schellen"
-                            ? "♦"
-                            : Farbe === "Eichel"
-                              ? "♣"
-                              : "♠"}
-                      </span>
-
-                      <span className="text-xl font-black text-zinc-900">
-                        {schlag}
-                      </span>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
             {/* PRE-GAME SETUP */}
@@ -3655,103 +3708,103 @@ export default function WattenGame() {
                 </div>
               </div>
             )}
+            {phase !== "setup" && (
+              <div>
+                {/* LEFT OPPONENT */}
+                <div className="absolute left-10 top-8 z-20 w-48 rounded-2xl border border-white/10 bg-emerald-950/55 p-3 text-center shadow-lg transition-all duration-300">
+                  {/* NEXT PLAYER */}
+                  {phase !== "dealReady" && (
+                    <div className="absolute -top-2 right-2 rounded-full border border-amber-400/40 bg-amber-400 px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider text-amber-950 shadow">
+                      Nächster Spieler
+                    </div>
+                  )}
 
-            {/* LEFT OPPONENT */}
-            <div className="absolute left-10 top-8 z-20 w-48 rounded-2xl border border-white/10 bg-emerald-950/55 p-3 text-center shadow-lg transition-all duration-300">
-              {/* NEXT PLAYER */}
-              {phase !== "dealReady" && (
-                <div className="absolute -top-2 right-2 rounded-full border border-amber-400/40 bg-amber-400 px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider text-amber-950 shadow">
-                  Nächster Spieler
-                </div>
-              )}
+                  <div className="text-lg font-bold text-white">
+                    {leftOpponent.name}
+                  </div>
 
-              <div className="text-lg font-bold text-white">
-                {leftOpponent.name}
-              </div>
+                  <p className="mt-0.5 text-[11px] text-emerald-300">
+                    {phase === "dealReady"
+                      ? "Wartet auf Karten"
+                      : `${leftOpponent.cards.length} Karten · ${
+                          tricksWon[leftOpponent.id] ?? 0
+                        } Stiche`}
+                  </p>
 
-              <p className="mt-0.5 text-[11px] text-emerald-300">
-                {phase === "dealReady"
-                  ? "Wartet auf Karten"
-                  : `${leftOpponent.cards.length} Karten · ${
-                      tricksWon[leftOpponent.id] ?? 0
-                    } Stiche`}
-              </p>
-
-              {/* Hidden cards */}
-              <div className="mt-2 flex justify-center">
-                {leftOpponent.cards.map((card, index) => (
-                  <div
-                    onMouseEnter={playHoverSound}
-                    key={card.id}
-                    className={`relative h-14 w-9 rounded-md border border-white/20 bg-zinc-900 shadow-md
+                  {/* Hidden cards */}
+                  <div className="mt-2 flex justify-center">
+                    {leftOpponent.cards.map((card, index) => (
+                      <div
+                        onMouseEnter={playHoverSound}
+                        key={card.id}
+                        className={`relative h-14 w-9 rounded-md border border-white/20 bg-zinc-900 shadow-md
   transition-all duration-200 ease-out
   hover:z-20 hover:-translate-y-2 hover:scale-110 hover:border-amber-300/50 hover:shadow-xl
   ${index !== 0 ? "-ml-3" : ""}
 `}
-                  />
-                ))}
-              </div>
+                      />
+                    ))}
+                  </div>
 
-              <button
-                type="button"
-                onClick={() => requestToSeeCards(leftOpponentIndex)}
-                className="mt-2 rounded-md bg-white/10 px-2 py-1 text-[10px] font-semibold text-white transition hover:bg-white/20"
-              >
-                👁 Karten ansehen
-              </button>
-            </div>
-
-            {/* RIGHT OPPONENT */}
-            <div className="absolute right-10 top-8 z-20 w-48 rounded-2xl border border-white/10 bg-emerald-950/55 p-3 text-center shadow-lg transition-all duration-300">
-              {phase === "dealReady" && (
-                <div className="absolute -top-2 left-2 rounded-full border border-amber-400/40 bg-amber-400 px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider text-amber-950 shadow">
-                  Beginnt das Spiel
+                  <button
+                    type="button"
+                    onClick={() => requestToSeeCards(leftOpponentIndex)}
+                    className="mt-2 rounded-md bg-white/10 px-2 py-1 text-[10px] font-semibold text-white transition hover:bg-white/20"
+                  >
+                    👁 Karten ansehen
+                  </button>
                 </div>
-              )}
-              <div className="text-lg font-bold text-white">
-                {rightOpponent.name}
-              </div>
 
-              <p className="mt-0.5 text-[11px] text-emerald-300">
-                {phase === "dealReady"
-                  ? "Wartet auf Karten"
-                  : `${rightOpponent.cards.length} Karten · ${
-                      tricksWon[rightOpponent.id] ?? 0
-                    } Stiche`}
-              </p>
+                {/* RIGHT OPPONENT */}
+                <div className="absolute right-10 top-8 z-20 w-48 rounded-2xl border border-white/10 bg-emerald-950/55 p-3 text-center shadow-lg transition-all duration-300">
+                  {phase === "dealReady" && (
+                    <div className="absolute -top-2 left-2 rounded-full border border-amber-400/40 bg-amber-400 px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider text-amber-950 shadow">
+                      Beginnt das Spiel
+                    </div>
+                  )}
+                  <div className="text-lg font-bold text-white">
+                    {rightOpponent.name}
+                  </div>
 
-              {/* Hidden cards */}
-              <div className="mt-2 flex justify-center">
-                {rightOpponent.cards.map((card, index) => (
-                  <div
-                    onMouseEnter={playHoverSound}
-                    key={card.id}
-                    className={`relative h-14 w-9 rounded-md border border-white/20 bg-zinc-900 shadow-md
+                  <p className="mt-0.5 text-[11px] text-emerald-300">
+                    {phase === "dealReady"
+                      ? "Wartet auf Karten"
+                      : `${rightOpponent.cards.length} Karten · ${
+                          tricksWon[rightOpponent.id] ?? 0
+                        } Stiche`}
+                  </p>
+
+                  {/* Hidden cards */}
+                  <div className="mt-2 flex justify-center">
+                    {rightOpponent.cards.map((card, index) => (
+                      <div
+                        onMouseEnter={playHoverSound}
+                        key={card.id}
+                        className={`relative h-14 w-9 rounded-md border border-white/20 bg-zinc-900 shadow-md
   transition-all duration-200 ease-out
   hover:z-20 hover:-translate-y-2 hover:scale-110 hover:border-amber-300/50 hover:shadow-xl
   ${index !== 0 ? "-ml-3" : ""}
 `}
-                  />
-                ))}
-              </div>
+                      />
+                    ))}
+                  </div>
 
-              <button
-                type="button"
-                onClick={() => requestToSeeCards(rightOpponentIndex)}
-                className="mt-2 rounded-md bg-white/10 px-2 py-1 text-[10px] font-semibold text-white transition hover:bg-white/20"
-              >
-                👁 Karten ansehen
-              </button>
-            </div>
+                  <button
+                    type="button"
+                    onClick={() => requestToSeeCards(rightOpponentIndex)}
+                    className="mt-2 rounded-md bg-white/10 px-2 py-1 text-[10px] font-semibold text-white transition hover:bg-white/20"
+                  >
+                    👁 Karten ansehen
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* PLAYED CARDS */}
             <div className="absolute left-1/2 top-[46%] z-10 flex h-44 w-[380px] -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-3 rounded-3xl border border-white/10 bg-emerald-950/30 p-4 shadow-inner">
               {playedCards.length === 0 ? (
                 <div className="text-center">
-                  <div className="text-3xl opacity-30">🃏</div>
-                  <p className="mt-2 text-sm text-emerald-300/50">
-                    Play a card
-                  </p>
+                  <p className="mt-2 text-sm text-emerald-300/50">Spielfeld</p>
                   {/* TRUMPF BUTTON */}
                   {phase === "playing" &&
                     !winner &&
@@ -3821,7 +3874,7 @@ export default function WattenGame() {
               <>
                 {/* CURRENT PLAYER HAND */}
                 <div className="absolute bottom-3 left-1/2 z-30 w-full -translate-x-1/2 px-10">
-                  <div className="relative mx-auto min-h-40 max-w-3xl rounded-2xl border border-white/10 bg-zinc-950/95 p-2.5 shadow-2xl backdrop-blur-md">
+                  <div className="relative mx-auto min-h-40 max-w-3xl rounded-2xl p-2.5 shadow-2xl">
                     {/* Active player label */}
                     <div className="absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-amber-400 px-5 py-1.5 text-sm font-black text-amber-950 shadow-lg">
                       ▼ {currentPlayerData.name} · AM ZUG ·{" "}

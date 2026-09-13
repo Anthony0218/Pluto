@@ -577,60 +577,77 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 px-4 py-6 text-zinc-100 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-zinc-950 px-4 py-6 text-slate-100 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-[1500px]">
-        {/* Header */}
-        <header className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-white">
-              Chess
-            </h1>
+        {/* HEADER */}
+        <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-sky-500/15 text-3xl text-sky-300 ring-1 ring-sky-500/20">
+              ♞
+            </div>
 
-            <p className="mt-1 text-sm text-zinc-400">
-              Play, analyse and review your games
-            </p>
+            <div>
+              <h1 className="text-2xl font-semibold tracking-tight text-white">
+                Schach
+              </h1>
+
+              <p className="mt-0.5 text-sm text-slate-400">
+                Spielen, analysieren und verbessern.
+              </p>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {moveRating && (
-              <div className="rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-sm text-zinc-300">
+              <div className="rounded-full border border-slate-700 bg-slate-800 px-3 py-1.5 text-sm text-slate-200 shadow-sm">
                 {moveRating}
               </div>
             )}
 
             {bestMove && (
-              <div className="rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-sm text-zinc-300">
-                Best: <span className="font-medium text-white">{bestMove}</span>
+              <div className="rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1.5 text-sm text-sky-300">
+                Bester Zug:
+                <span className="ml-1 font-semibold text-sky-200">
+                  {bestMove}
+                </span>
               </div>
             )}
           </div>
         </header>
 
-        {/* Main layout */}
+        {/* MAIN LAYOUT */}
         <main className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)_320px]">
-          {/* LEFT SIDEBAR */}
+          {/* =========================================================
+            LEFT SIDEBAR
+        ========================================================= */}
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              {/* Saved Games */}
-              <section className="rounded-2xl border border-zinc-800 bg-zinc-900/70">
-                <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-3">
+              {/* SAVED GAMES */}
+              <section className="overflow-hidden rounded-2xl border border-slate-700 bg-slate-800/90 shadow-lg shadow-black/15">
+                <div className="flex items-center justify-between border-b border-slate-700 px-4 py-3">
                   <div>
-                    <h2 className="text-sm font-semibold text-zinc-200">
-                      Saved Games
+                    <h2 className="text-sm font-semibold text-slate-100">
+                      Gespeicherte Partien
                     </h2>
 
-                    <p className="mt-0.5 text-xs text-zinc-500">
+                    <p className="mt-0.5 text-xs text-slate-400">
                       {savedGames.length}{" "}
-                      {savedGames.length === 1 ? "game" : "games"}
+                      {savedGames.length === 1 ? "Partie" : "Partien"}
                     </p>
+                  </div>
+
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900/60 text-sm text-sky-300">
+                    {savedGames.length}
                   </div>
                 </div>
 
                 <div className="max-h-80 space-y-1 overflow-y-auto p-2">
                   {savedGames.length === 0 && (
                     <div className="py-8 text-center">
-                      <p className="text-sm text-zinc-500">
-                        No saved games yet
+                      <div className="mb-2 text-3xl text-slate-600">♟</div>
+
+                      <p className="text-sm text-slate-400">
+                        Noch keine gespeicherten Partien
                       </p>
                     </div>
                   )}
@@ -638,20 +655,28 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                   {savedGames.map((savedGame) => (
                     <div
                       key={savedGame.id}
-                      className="group flex items-center gap-3 rounded-xl p-3 transition-colors hover:bg-zinc-800/70"
+                      className="
+                      group flex items-center gap-3
+                      rounded-xl p-3
+                      transition-all duration-200
+                      hover:translate-x-0.5
+                      hover:bg-slate-700/70
+                    "
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-zinc-200">
-                          {savedGame.name || "Unnamed Game"}
+                        <p className="truncate text-sm font-medium text-slate-100">
+                          {savedGame.name || "Unbenannte Partie"}
                         </p>
 
-                        <p className="mt-1 truncate text-xs text-zinc-500">
-                          ♔ {savedGame.white_player || "White"}
-                          <span className="mx-1.5 text-zinc-700">vs</span>♚{" "}
-                          {savedGame.black_player || "Black"}
+                        <p className="mt-1 truncate text-xs text-slate-400">
+                          <span className="text-amber-100">♔</span>{" "}
+                          {savedGame.white_player || "Weiß"}
+                          <span className="mx-1.5 text-slate-600">vs</span>
+                          <span className="text-sky-400">♚</span>{" "}
+                          {savedGame.black_player || "Schwarz"}
                         </p>
 
-                        <p className="mt-1 text-[11px] text-zinc-600">
+                        <p className="mt-1 text-[11px] text-slate-500">
                           {new Date(savedGame.created_at).toLocaleString()}
                         </p>
                       </div>
@@ -660,8 +685,16 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                         <button
                           type="button"
                           onClick={() => loadSpecificGame(savedGame.id)}
-                          className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-800 transition hover:bg-zinc-700"
-                          title="Load game"
+                          className="
+                          flex h-8 w-8 items-center justify-center
+                          rounded-lg
+                          border border-slate-600
+                          bg-slate-700
+                          transition
+                          hover:border-sky-500/50
+                          hover:bg-slate-600
+                        "
+                          title="Partie laden"
                         >
                           <img
                             src={loadButton}
@@ -673,8 +706,16 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                         <button
                           type="button"
                           onClick={() => deleteGame(savedGame.id)}
-                          className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-800 transition hover:border-red-900 hover:bg-red-950/60"
-                          title="Delete game"
+                          className="
+                          flex h-8 w-8 items-center justify-center
+                          rounded-lg
+                          border border-slate-600
+                          bg-slate-700
+                          transition
+                          hover:border-red-500/50
+                          hover:bg-red-950/60
+                        "
+                          title="Partie löschen"
                         >
                           <img
                             src={playButton}
@@ -688,51 +729,90 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                 </div>
               </section>
 
-              {/* Captured Pieces */}
-              <section className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
+              {/* CAPTURED PIECES */}
+              <section className="rounded-2xl border border-slate-700 bg-slate-800/90 p-4 shadow-lg shadow-black/15">
                 <div className="mb-3 flex items-center justify-between">
-                  <h2 className="text-sm font-semibold text-zinc-200">
-                    Captured Pieces
-                  </h2>
+                  <div>
+                    <h2 className="text-sm font-semibold text-slate-100">
+                      Geschlagene Figuren
+                    </h2>
 
-                  <span className="text-xs text-zinc-500">
-                    {materialDifference > 0 && `White +${materialDifference}`}
+                    <p className="mt-0.5 text-xs text-slate-400">
+                      Materialübersicht
+                    </p>
+                  </div>
+
+                  <span
+                    className={`
+                    rounded-lg px-2.5 py-1
+                    text-xs font-semibold
+                    ${
+                      materialDifference > 0
+                        ? "bg-amber-100/10 text-amber-200"
+                        : materialDifference < 0
+                          ? "bg-sky-500/10 text-sky-300"
+                          : "bg-slate-900/60 text-slate-400"
+                    }
+                  `}
+                  >
+                    {materialDifference > 0 && `Weiß +${materialDifference}`}
+
                     {materialDifference < 0 &&
-                      `Black +${Math.abs(materialDifference)}`}
-                    {materialDifference === 0 && "Equal"}
+                      `Schwarz +${Math.abs(materialDifference)}`}
+
+                    {materialDifference === 0 && "Ausgeglichen"}
                   </span>
                 </div>
 
-                <CapturedPieces
-                  capturedBlack={capturedBlack}
-                  capturedWhite={capturedWhite}
-                />
+                <div className="rounded-xl bg-slate-900/50 p-3">
+                  <CapturedPieces
+                    capturedBlack={capturedBlack}
+                    capturedWhite={capturedWhite}
+                  />
+                </div>
               </section>
 
-              {/* Move History */}
-              <section className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
+              {/* MOVE HISTORY */}
+              <section className="rounded-2xl border border-slate-700 bg-slate-800/90 p-4 shadow-lg shadow-black/15">
                 <div className="mb-3 flex items-center justify-between">
-                  <h2 className="text-sm font-semibold text-zinc-200">
-                    Move History
-                  </h2>
+                  <div>
+                    <h2 className="text-sm font-semibold text-slate-100">
+                      Zugverlauf
+                    </h2>
 
-                  <span className="text-xs text-zinc-500">
-                    {moveHistory.length} moves
+                    <p className="mt-0.5 text-xs text-slate-400">
+                      Verlauf der Partie
+                    </p>
+                  </div>
+
+                  <span className="rounded-lg bg-slate-900/60 px-2.5 py-1 text-xs font-medium text-slate-300">
+                    {moveHistory.length}
                   </span>
                 </div>
 
-                <div className="max-h-72 overflow-y-auto">
+                <div className="max-h-72 overflow-y-auto rounded-xl bg-slate-900/50 p-2">
                   <MoveHistory moves={moveHistory} />
                 </div>
               </section>
             </div>
           </aside>
 
-          {/* CENTER */}
+          {/* =========================================================
+            CENTER
+        ========================================================= */}
           <section className="min-w-0">
             <div className="mx-auto max-w-[820px]">
-              {/* Game Status */}
-              <div className="mb-3 rounded-2xl border border-zinc-800 bg-zinc-900/60 px-4 py-3">
+              {/* GAME STATUS */}
+              <div
+                className="
+                mb-3
+                rounded-xl
+                border border-slate-700
+                bg-slate-800/90
+                px-4 py-2.5
+                shadow-md shadow-black/10
+              "
+              >
                 <GameStatus
                   illegal={illegal}
                   whiteCheckCounter={whiteCheckCounter}
@@ -743,9 +823,17 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                 />
               </div>
 
-              {/* Evaluation */}
-              <div className="mb-3 flex items-center gap-3">
-                <span className="w-10 text-right text-xs font-medium text-zinc-500">
+              {/* EVALUATION */}
+              <div
+                className="
+                mb-3 flex items-center gap-3
+                rounded-xl
+                border border-slate-800
+                bg-slate-900/70
+                px-3 py-2
+              "
+              >
+                <span className="w-11 text-right text-xs font-semibold text-slate-300">
                   {evaluation !== null
                     ? evaluation > 0
                       ? `+${evaluation.toFixed(1)}`
@@ -753,23 +841,46 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                     : "0.0"}
                 </span>
 
-                <div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
+                <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-slate-950">
                   <div
-                    className="absolute inset-y-0 left-0 bg-zinc-200 transition-all duration-300"
-                    style={{ width: `${getEvaluationPercentage()}%` }}
+                    className="
+                    absolute inset-y-0 left-0
+                    rounded-full
+                    bg-sky-400
+                    transition-all duration-300
+                  "
+                    style={{
+                      width: `${getEvaluationPercentage()}%`,
+                    }}
                   />
                 </div>
+
+                <span className="text-[10px] font-medium uppercase tracking-wider text-slate-500">
+                  Bewertung
+                </span>
               </div>
 
-              {/* Promotion */}
+              {/* PROMOTION */}
               {promotionSquare && promotionFrom && (
-                <div className="mb-3">
+                <div className="mb-3 rounded-xl border border-slate-700 bg-slate-800 p-3 shadow-xl">
                   <PromotionBar onPromote={promotePawn} />
                 </div>
               )}
 
-              {/* Board */}
-              <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 p-2 shadow-2xl shadow-black/30 sm:p-3">
+              {/* BOARD */}
+              <div
+                className="
+                overflow-hidden
+                rounded-2xl
+                border border-slate-600
+                bg-gradient-to-b
+                from-slate-700
+                to-slate-800
+                p-3
+                shadow-2xl shadow-black/40
+                ring-1 ring-white/5
+              "
+              >
                 <Board
                   board={board}
                   selectedSquare={selectedSquare}
@@ -779,66 +890,41 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                   onSquareClick={handleSquareClick}
                 />
               </div>
+
+              {/* MOBILE MATERIAL */}
+              <div className="mt-3 flex items-center justify-between rounded-xl border border-slate-700 bg-slate-800/90 px-4 py-3 xl:hidden">
+                <span className="text-sm text-slate-400">Material</span>
+
+                <span className="text-sm font-semibold text-slate-100">
+                  {materialDifference > 0 && `Weiß +${materialDifference}`}
+
+                  {materialDifference < 0 &&
+                    `Schwarz +${Math.abs(materialDifference)}`}
+
+                  {materialDifference === 0 && "Ausgeglichen"}
+                </span>
+              </div>
             </div>
           </section>
 
-          {/* RIGHT SIDEBAR */}
+          {/* =========================================================
+            RIGHT SIDEBAR
+        ========================================================= */}
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              {/* Piece Values */}
-              <section className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
-                <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-sm font-semibold text-zinc-200">
-                    Piece Values
-                  </h2>
-
-                  <span className="text-xs text-zinc-600">Material</span>
-                </div>
-
-                <div className="space-y-1">
-                  {pieceValueList.map((piece) => (
-                    <div
-                      key={piece.type}
-                      className="flex items-center justify-between rounded-xl px-3 py-2 transition-colors hover:bg-zinc-800/70"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="flex h-8 w-8 items-center justify-center text-2xl text-zinc-200">
-                          {piece.symbol}
-                        </span>
-
-                        <span className="text-sm text-zinc-300">
-                          {piece.name}
-                        </span>
-                      </div>
-
-                      <span className="rounded-md bg-zinc-800 px-2 py-0.5 text-xs font-semibold text-zinc-400">
-                        {pieceValues[piece.type]}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-4 border-t border-zinc-800 pt-4">
-                  <div className="flex items-center justify-between rounded-xl bg-zinc-950/60 px-3 py-3">
-                    <span className="text-sm text-zinc-500">Advantage</span>
-
-                    <span className="text-sm font-semibold text-zinc-200">
-                      {materialDifference > 0 && `White +${materialDifference}`}
-                      {materialDifference < 0 &&
-                        `Black +${Math.abs(materialDifference)}`}
-                      {materialDifference === 0 && "Equal"}
-                    </span>
-                  </div>
-                </div>
-              </section>
-
-              {/* Game Controls */}
-              <section className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 shadow-xl shadow-black/10">
+              {/* GAME CONTROLS FIRST */}
+              <section className="rounded-2xl border border-slate-700 bg-slate-800/90 p-4 shadow-lg shadow-black/15">
                 <div className="mb-4">
-                  <h2 className="font-semibold text-white">Game Controls</h2>
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-sky-400 shadow-sm shadow-sky-400" />
 
-                  <p className="mt-1 text-xs text-zinc-500">
-                    Players, game name and actions
+                    <h2 className="font-semibold text-slate-100">
+                      Spielsteuerung
+                    </h2>
+                  </div>
+
+                  <p className="mt-1 text-xs text-slate-400">
+                    Spieler, Partie und Aktionen
                   </p>
                 </div>
 
@@ -854,6 +940,134 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                   onSave={saveGame}
                 />
               </section>
+
+              {/* PIECE VALUES */}
+              <section className="rounded-2xl border border-slate-700 bg-slate-800/90 p-4 shadow-lg shadow-black/15">
+                <div className="mb-3 flex items-center justify-between">
+                  <div>
+                    <h2 className="text-sm font-semibold text-slate-100">
+                      Figurenwerte
+                    </h2>
+
+                    <p className="mt-0.5 text-xs text-slate-400">
+                      Standardwerte
+                    </p>
+                  </div>
+
+                  <span className="text-xs text-slate-500">Material</span>
+                </div>
+
+                <div className="space-y-1">
+                  {pieceValueList.map((piece) => (
+                    <div
+                      key={piece.type}
+                      className="
+                      flex items-center justify-between
+                      rounded-lg
+                      px-2.5 py-1.5
+                      transition-colors
+                      hover:bg-slate-700/70
+                    "
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-7 w-7 items-center justify-center text-xl text-amber-100">
+                          {piece.symbol}
+                        </span>
+
+                        <span className="text-sm text-slate-300">
+                          {piece.name}
+                        </span>
+                      </div>
+
+                      <span
+                        className="
+                        rounded-md
+                        bg-slate-900/70
+                        px-2 py-0.5
+                        text-xs font-semibold
+                        text-sky-300
+                      "
+                      >
+                        {pieceValues[piece.type]}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* MATERIAL ADVANTAGE */}
+                <div className="mt-4 border-t border-slate-700 pt-4">
+                  <div className="flex items-center justify-between rounded-xl bg-slate-900/60 px-3 py-3">
+                    <span className="text-sm text-slate-400">Vorteil</span>
+
+                    <span
+                      className={`
+                      text-sm font-semibold
+                      ${
+                        materialDifference > 0
+                          ? "text-amber-200"
+                          : materialDifference < 0
+                            ? "text-sky-300"
+                            : "text-slate-300"
+                      }
+                    `}
+                    >
+                      {materialDifference > 0 && `Weiß +${materialDifference}`}
+
+                      {materialDifference < 0 &&
+                        `Schwarz +${Math.abs(materialDifference)}`}
+
+                      {materialDifference === 0 && "Ausgeglichen"}
+                    </span>
+                  </div>
+                </div>
+              </section>
+
+              {/* SMALL ANALYSIS CARD */}
+              {(evaluation !== null || bestMove) && (
+                <section className="rounded-2xl border border-sky-500/20 bg-sky-500/5 p-4">
+                  <div className="mb-3 flex items-center gap-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-500/10 text-lg text-sky-300">
+                      ♙
+                    </div>
+
+                    <div>
+                      <h2 className="text-sm font-semibold text-slate-100">
+                        Analyse
+                      </h2>
+
+                      <p className="text-[11px] text-slate-400">Stockfish</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    {evaluation !== null && (
+                      <div className="flex items-center justify-between rounded-lg bg-slate-900/50 px-3 py-2">
+                        <span className="text-xs text-slate-400">
+                          Bewertung
+                        </span>
+
+                        <span className="text-sm font-semibold text-sky-300">
+                          {evaluation > 0
+                            ? `+${evaluation.toFixed(1)}`
+                            : evaluation.toFixed(1)}
+                        </span>
+                      </div>
+                    )}
+
+                    {bestMove && (
+                      <div className="flex items-center justify-between rounded-lg bg-slate-900/50 px-3 py-2">
+                        <span className="text-xs text-slate-400">
+                          Bester Zug
+                        </span>
+
+                        <span className="text-sm font-semibold text-slate-100">
+                          {bestMove}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </section>
+              )}
             </div>
           </aside>
         </main>

@@ -21,6 +21,9 @@ import WattenMultiplayerGame from "./pages/WattenMultiplayerGame";
 
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import WattenRules from "./pages/WattenRules";
+import { CardThemeProvider } from "./context/CardThemeContext";
+import { TableThemeProvider } from "./context/TableThemeContext";
 
 const router = createBrowserRouter([
   {
@@ -76,6 +79,10 @@ const router = createBrowserRouter([
         path: "/watten/multiplayer/:gameId",
         element: <WattenMultiplayerGame />,
       },
+      {
+        path: "/watten/rules",
+        element: <WattenRules />,
+      },
     ],
   },
 ]);
@@ -84,7 +91,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ThemeProvider>
       <AuthProvider>
-        <RouterProvider router={router} />
+        <CardThemeProvider>
+          <TableThemeProvider>
+            <RouterProvider router={router} />
+          </TableThemeProvider>
+        </CardThemeProvider>
       </AuthProvider>
     </ThemeProvider>
   </React.StrictMode>,

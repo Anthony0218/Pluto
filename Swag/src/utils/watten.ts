@@ -568,3 +568,8 @@ export function wouldCardWin(
     simulatedWinner.card.id === card.id
   );
 }
+
+
+export const WATTEN_CARD_CLIP =
+  "inset(1px_2px_1px_2px_round_6px)";
+ 
