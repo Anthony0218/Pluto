@@ -16,14 +16,15 @@ import AppLayout from "./components/AppLayout";
 import Watten from "./pages/Watten";
 import WattenHotseat from "./pages/WattenHotseat";
 import WattenHotseatPage from "./pages/WattenGamePage";
-import WattenMultiplayer from "./pages/WattenMultiplayer";
-import WattenMultiplayerGame from "./pages/WattenMultiplayerGame";
 
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import WattenRules from "./pages/WattenRules";
 import { CardThemeProvider } from "./context/CardThemeContext";
 import { TableThemeProvider } from "./context/TableThemeContext";
+import WattenMultiplayerLobby from "./components/WattenMultiplayerLobby";
+import WattenMultiplayerRoom from "./components/WattenMultiplayerRoom";
+import WattenMultiplayerGame from "./components/WattenMultiplayerGame";
 
 const router = createBrowserRouter([
   {
@@ -71,17 +72,17 @@ const router = createBrowserRouter([
       },
 
       {
-        path: "/watten/multiplayer",
-        element: <WattenMultiplayer />,
-      },
-
-      {
-        path: "/watten/multiplayer/:gameId",
-        element: <WattenMultiplayerGame />,
-      },
-      {
         path: "/watten/rules",
         element: <WattenRules />,
+      },
+      { path: "/watten/multiplayer", element: <WattenMultiplayerLobby /> },
+      {
+        path: "/watten/multiplayer/:roomCode",
+        element: <WattenMultiplayerRoom />,
+      },
+      {
+        path: "/watten/multiplayer/:roomCode/game",
+        element: <WattenMultiplayerGame />,
       },
     ],
   },
