@@ -1,154 +1,112 @@
-import { useEffect, useRef, useState } from "react";
-import { getMoveRating } from "../utils/chessUtils";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-type AnalysisType = "before" | "after" | "position";
-
-type PlayerColor = "w" | "b";
+export type StockfishMove = {
+  from: string;
+  to: string;
+  promotion?: string;
+};
 
 export function useStockfish() {
-  const stockfish = useRef<Worker | null>(null);
-  const beforeMoveEvaluation = useRef<number | null>(null);
-  const afterMoveEvaluation = useRef<number | null>(null);
-  const playerMoveColor = useRef<"w" | "b" | null>(null);
-  const analysisType = useRef<"before" | "after" | "position" | null>(null);
-  const [evaluation, setEvaluation] = useState<number | null>(null);
-  const [bestMove, setBestMove] = useState<string | null>(null);
-  const [moveRating, setMoveRating] = useState<string | null>(null);
+  const workerRef = useRef<Worker | null>(null);
+
+  const [ready, setReady] = useState(false);
+  const [thinking, setThinking] = useState(false);
 
   useEffect(() => {
     const worker = new Worker("/stockfish/stockfish-18-lite-single.js");
 
-    stockfish.current = worker;
+    workerRef.current = worker;
 
-    worker.onmessage = (event) => {
-      const message = event.data as string;
+    const handleMessage = (event: MessageEvent) => {
+      const line = String(event.data);
 
-      console.log("Stockfish:", message);
+      console.log("[Stockfish]", line);
 
-      if (message.startsWith("info") && message.includes("score cp")) {
-        const match = message.match(/score cp (-?\d+)/);
-
-        if (!match) {
-          return;
-        }
-
-        const depthMatch = message.match(/depth (\d+)/);
-
-        if (!depthMatch) {
-          return;
-        }
-
-        const depth = Number(depthMatch[1]);
-
-        if (depth < 15) {
-          return;
-        }
-
-        const centipawns = Number(match[1]);
-        const score = centipawns / 100;
-
-        if (analysisType.current === "position") {
-          setEvaluation(score);
-
-          // This is the position immediately before
-          // the player's move.
-          beforeMoveEvaluation.current = score;
-        }
-
-        if (analysisType.current === "after") {
-          afterMoveEvaluation.current = score;
-          setEvaluation(score);
-        }
+      if (line === "uciok") {
+        worker.postMessage("isready");
       }
 
-      if (message.startsWith("bestmove")) {
-        const move = message.split(" ")[1];
-
-        if (move) {
-          setBestMove(move);
-        }
-
-        if (
-          analysisType.current === "after" &&
-          beforeMoveEvaluation.current !== null &&
-          afterMoveEvaluation.current !== null &&
-          playerMoveColor.current !== null
-        ) {
-          const rating = getMoveRating(
-            beforeMoveEvaluation.current,
-            afterMoveEvaluation.current,
-            playerMoveColor.current,
-          );
-
-          console.log(
-            "BEFORE:",
-            beforeMoveEvaluation.current,
-            "AFTER:",
-            afterMoveEvaluation.current,
-            "COLOR:",
-            playerMoveColor.current,
-            "RATING:",
-            rating,
-          );
-
-          setMoveRating(rating);
-
-          beforeMoveEvaluation.current = afterMoveEvaluation.current;
-        }
-
-        analysisType.current = null;
+      if (line === "readyok") {
+        setReady(true);
       }
     };
+
+    worker.addEventListener("message", handleMessage);
 
     worker.postMessage("uci");
 
     return () => {
+      worker.removeEventListener("message", handleMessage);
+      worker.postMessage("quit");
       worker.terminate();
+
+      workerRef.current = null;
     };
   }, []);
-  function analyzePosition(fen: string, type: "before" | "after" | "position") {
-    if (!stockfish.current) {
+
+  const setSkillLevel = useCallback((level: number) => {
+    const worker = workerRef.current;
+
+    if (!worker) {
       return;
     }
 
-    analysisType.current = type;
+    const safeLevel = Math.max(0, Math.min(20, level));
 
-    if (type === "before") {
-      beforeMoveEvaluation.current = null;
-    }
+    worker.postMessage(`setoption name Skill Level value ${safeLevel}`);
+  }, []);
 
-    if (type === "after") {
-      afterMoveEvaluation.current = null;
-    }
+  const getBestMove = useCallback(
+    (fen: string, moveTime = 500): Promise<StockfishMove | null> => {
+      return new Promise((resolve) => {
+        const worker = workerRef.current;
 
-    stockfish.current.postMessage("stop");
-    stockfish.current.postMessage(`position fen ${fen}`);
-    stockfish.current.postMessage("go depth 15");
-  }
-  function setPlayerMoveColor(color: PlayerColor) {
-    playerMoveColor.current = color;
-  }
-  function resetAnalysis() {
-    setEvaluation(null);
-    setBestMove(null);
-    setMoveRating(null);
+        if (!worker) {
+          resolve(null);
+          return;
+        }
 
-    beforeMoveEvaluation.current = null;
-    afterMoveEvaluation.current = null;
-    playerMoveColor.current = null;
-    analysisType.current = null;
-  }
-  function clearMoveAnalysis() {
-    setBestMove(null);
-    setMoveRating(null);
-  }
+        setThinking(true);
+
+        const handleBestMove = (event: MessageEvent) => {
+          const line = String(event.data);
+
+          if (!line.startsWith("bestmove")) {
+            return;
+          }
+
+          worker.removeEventListener("message", handleBestMove);
+
+          setThinking(false);
+
+          const [, move] = line.split(" ");
+
+          if (!move || move === "(none)") {
+            resolve(null);
+            return;
+          }
+
+          resolve({
+            from: move.slice(0, 2),
+            to: move.slice(2, 4),
+            promotion: move.length > 4 ? move.slice(4, 5) : undefined,
+          });
+        };
+
+        worker.addEventListener("message", handleBestMove);
+
+        worker.postMessage("stop");
+        worker.postMessage(`position fen ${fen}`);
+        worker.postMessage(`go movetime ${moveTime}`);
+      });
+    },
+    [],
+  );
+
   return {
-    evaluation,
-    bestMove,
-    moveRating,
-    analyzePosition,
-    setPlayerMoveColor,
-    clearMoveAnalysis,
-    resetAnalysis,
+    ready,
+    thinking,
+    setSkillLevel,
+    getBestMove,
   };
 }

@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { Chess, type Square } from "chess.js";
 
 import { supabase } from "../lib/supabase";
-import { getSquareName, getReadableMove } from "../utils/chessUtils";
-import { useStockfish } from "../hooks/useStockfish.ts";
+import { getSquareName } from "../utils/chessUtils";
 import Board from "./Board.tsx";
 import CapturedPieces from "./CapturedPieces.tsx";
 import type { PieceType } from "../utils/chessUtils.ts";
@@ -99,24 +98,6 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
       loadSavedGames();
     }
   }, [user]);
-
-  const {
-    evaluation,
-    bestMove,
-    moveRating,
-    analyzePosition,
-    setPlayerMoveColor,
-    clearMoveAnalysis,
-    resetAnalysis,
-  } = useStockfish();
-
-  useEffect(() => {
-    analyzePosition(game.fen(), "position");
-  }, []);
-
-  useEffect(() => {
-    analyzePosition(game.fen(), "before");
-  }, []);
 
   async function saveGame() {
     if (!user) {
@@ -219,14 +200,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
     setLegalMoves([]);
     setLastMove(null);
     setIllegal(false);
-    resetAnalysis();
-
-    analyzePosition(game.fen(), "position");
   }
-  async function sendMove(moveHistory: string[]) {
-    // update Supabase
-  }
-
   async function loadSavedGames() {
     if (!user) {
       return;
@@ -268,7 +242,6 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
     setWhiteCheckCounter(0);
     setBlackCheckCounter(0);
     setCurrentGameId(null);
-    resetAnalysis();
     setGameName("");
     setWhitePlayer("");
     setBlackPlayer("");
@@ -279,8 +252,6 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
     if (!move) {
       return;
     }
-
-    resetAnalysis();
 
     setPosition(game.fen());
     setSelectedSquare(null);
@@ -300,11 +271,10 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
       });
     }
     checkGameOver();
-    analyzePosition(game.fen(), "position");
   }
 
   async function deleteGame(id: string) {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("games")
       .delete()
       .eq("id", id)
@@ -328,8 +298,6 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
     }
 
     try {
-      const capturedPiece = game.get(promotionSquare);
-
       const move = game.move({
         from: promotionFrom,
         to: promotionSquare,
@@ -394,18 +362,6 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
     }
   }
 
-  function getEvaluationPercentage() {
-    if (evaluation === null) {
-      return 50;
-    }
-
-    // Convert the evaluation into a percentage.
-    // Clamp it so the bar never goes completely beyond the board.
-    const percentage = 50 + evaluation * 10;
-
-    return Math.max(5, Math.min(95, percentage));
-  }
-
   const [game] = useState(() => new Chess());
   const [legalMoves, setLegalMoves] = useState<Square[]>([]);
   const [lastMove, setLastMove] = useState<{
@@ -439,7 +395,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
   const [blackPlayer, setBlackPlayer] = useState("");
 
   const [illegal, setIllegal] = useState(false);
-  const [position, setPosition] = useState(game.fen());
+  const [, setPosition] = useState(game.fen());
   const [whiteCheckCounter, setWhiteCheckCounter] = useState<number>(0);
   const [blackCheckCounter, setBlackCheckCounter] = useState<number>(0);
 
@@ -485,17 +441,12 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
         playPieceSelectSound(piece.type);
 
-        setPlayerMoveColor(game.turn());
-        clearMoveAnalysis();
-
         const moves = game.moves({
           square,
           verbose: true,
         });
 
         setLegalMoves(moves.map((move) => move.to));
-
-        analyzePosition(game.fen(), "position");
       }
 
       return;
@@ -514,8 +465,6 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
         setSelectedSquare(null);
         return;
       }
-
-      const capturedPiece = game.get(square);
 
       const move = game.move({
         from: selectedSquare,
@@ -543,8 +492,6 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
       }
 
       setIllegal(false);
-      if (capturedPiece) {
-      }
       if (game.isCheckmate()) {
         if (game.turn() === "w") {
           setWinner("black");
@@ -564,7 +511,6 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
         playRandomSound(["castle-1", "castle-2"]);
       }
       setPosition(game.fen());
-      analyzePosition(game.fen(), "after");
     } catch {
       console.log("Illegal move");
       setIllegal(true);
@@ -577,76 +523,171 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 px-4 py-6 text-slate-100 sm:px-6 lg:px-8">
+    <div
+      className="
+      min-h-screen
+      bg-[radial-gradient(circle_at_top,#21170f_0%,#111111_38%,#090909_100%)]
+      px-4
+      py-6
+      text-zinc-100
+      sm:px-6
+      lg:px-8
+    "
+    >
       <div className="mx-auto max-w-[1500px]">
-        {/* HEADER */}
-        <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-sky-500/15 text-3xl text-sky-300 ring-1 ring-sky-500/20">
+        {/* =========================================================
+          HEADER
+         ========================================================= */}
+
+        <header
+          className="
+          mb-7
+          flex
+          flex-col
+          gap-4
+          rounded-3xl
+          border
+          border-white/5
+          bg-zinc-900/50
+          px-5
+          py-4
+          shadow-xl
+          shadow-black/20
+          backdrop-blur-md
+          sm:flex-row
+          sm:items-center
+          sm:justify-between
+        "
+        >
+          <div className="flex items-center gap-4">
+            <div
+              className="
+              flex
+              h-12
+              w-12
+              items-center
+              justify-center
+              rounded-2xl
+              border
+              border-amber-500/20
+              bg-amber-400/10
+              text-3xl
+              text-amber-200
+              shadow-inner
+            "
+            >
               ♞
             </div>
 
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight text-white">
-                Schach
+              <p
+                className="
+                text-[10px]
+                font-bold
+                uppercase
+                tracking-[0.28em]
+                text-amber-400
+              "
+              >
+                Classic Chess
+              </p>
+
+              <h1
+                className="
+                mt-0.5
+                text-2xl
+                font-black
+                tracking-tight
+                text-white
+              "
+              >
+                Hotseat
               </h1>
 
-              <p className="mt-0.5 text-sm text-slate-400">
-                Spielen, analysieren und verbessern.
+              <p className="mt-0.5 text-sm text-zinc-500">
+                Zwei Spieler · ein Brett
               </p>
             </div>
           </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            {moveRating && (
-              <div className="rounded-full border border-slate-700 bg-slate-800 px-3 py-1.5 text-sm text-slate-200 shadow-sm">
-                {moveRating}
-              </div>
-            )}
-
-            {bestMove && (
-              <div className="rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1.5 text-sm text-sky-300">
-                Bester Zug:
-                <span className="ml-1 font-semibold text-sky-200">
-                  {bestMove}
-                </span>
-              </div>
-            )}
-          </div>
         </header>
 
-        {/* MAIN LAYOUT */}
-        <main className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)_320px]">
+        {/* =========================================================
+          MAIN LAYOUT
+         ========================================================= */}
+
+        <main
+          className="
+          grid
+          gap-6
+          xl:grid-cols-[300px_minmax(0,1fr)_300px]
+        "
+        >
           {/* =========================================================
             LEFT SIDEBAR
-        ========================================================= */}
+           ========================================================= */}
+
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
               {/* SAVED GAMES */}
-              <section className="overflow-hidden rounded-2xl border border-slate-700 bg-slate-800/90 shadow-lg shadow-black/15">
-                <div className="flex items-center justify-between border-b border-slate-700 px-4 py-3">
+
+              <section
+                className="
+                overflow-hidden
+                rounded-3xl
+                border
+                border-white/10
+                bg-zinc-900/75
+                shadow-xl
+                shadow-black/20
+                backdrop-blur-md
+              "
+              >
+                <div
+                  className="
+                  flex
+                  items-center
+                  justify-between
+                  border-b
+                  border-white/5
+                  px-4
+                  py-4
+                "
+                >
                   <div>
-                    <h2 className="text-sm font-semibold text-slate-100">
+                    <h2 className="text-sm font-bold text-zinc-100">
                       Gespeicherte Partien
                     </h2>
 
-                    <p className="mt-0.5 text-xs text-slate-400">
-                      {savedGames.length}{" "}
-                      {savedGames.length === 1 ? "Partie" : "Partien"}
-                    </p>
+                    <p className="mt-1 text-xs text-zinc-500">Frühere Spiele</p>
                   </div>
 
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900/60 text-sm text-sky-300">
+                  <div
+                    className="
+                    flex
+                    h-9
+                    min-w-9
+                    items-center
+                    justify-center
+                    rounded-xl
+                    border
+                    border-amber-500/10
+                    bg-amber-400/10
+                    px-2
+                    text-xs
+                    font-bold
+                    text-amber-300
+                  "
+                  >
                     {savedGames.length}
                   </div>
                 </div>
 
                 <div className="max-h-80 space-y-1 overflow-y-auto p-2">
                   {savedGames.length === 0 && (
-                    <div className="py-8 text-center">
-                      <div className="mb-2 text-3xl text-slate-600">♟</div>
+                    <div className="py-9 text-center">
+                      <div className="mb-2 text-3xl text-zinc-700">♟</div>
 
-                      <p className="text-sm text-slate-400">
+                      <p className="text-sm text-zinc-500">
                         Noch keine gespeicherten Partien
                       </p>
                     </div>
@@ -656,43 +697,78 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                     <div
                       key={savedGame.id}
                       className="
-                      group flex items-center gap-3
-                      rounded-xl p-3
-                      transition-all duration-200
-                      hover:translate-x-0.5
-                      hover:bg-slate-700/70
+                      group
+                      flex
+                      items-center
+                      gap-3
+                      rounded-2xl
+                      border
+                      border-transparent
+                      p-3
+                      transition
+                      duration-200
+                      hover:border-white/5
+                      hover:bg-white/5
                     "
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-slate-100">
+                        <p
+                          className="
+                          truncate
+                          text-sm
+                          font-semibold
+                          text-zinc-200
+                        "
+                        >
                           {savedGame.name || "Unbenannte Partie"}
                         </p>
 
-                        <p className="mt-1 truncate text-xs text-slate-400">
-                          <span className="text-amber-100">♔</span>{" "}
+                        <p
+                          className="
+                          mt-1
+                          truncate
+                          text-xs
+                          text-zinc-500
+                        "
+                        >
+                          <span className="text-[#fff3d5]">♔</span>{" "}
                           {savedGame.white_player || "Weiß"}
-                          <span className="mx-1.5 text-slate-600">vs</span>
-                          <span className="text-sky-400">♚</span>{" "}
+                          <span className="mx-1.5 text-zinc-700">vs</span>
+                          <span className="text-zinc-400">♚</span>{" "}
                           {savedGame.black_player || "Schwarz"}
                         </p>
 
-                        <p className="mt-1 text-[11px] text-slate-500">
+                        <p className="mt-1 text-[10px] text-zinc-600">
                           {new Date(savedGame.created_at).toLocaleString()}
                         </p>
                       </div>
 
-                      <div className="flex shrink-0 gap-1 opacity-70 transition-opacity group-hover:opacity-100">
+                      <div
+                        className="
+                        flex
+                        shrink-0
+                        gap-1
+                        opacity-70
+                        transition
+                        group-hover:opacity-100
+                      "
+                      >
                         <button
                           type="button"
                           onClick={() => loadSpecificGame(savedGame.id)}
                           className="
-                          flex h-8 w-8 items-center justify-center
-                          rounded-lg
-                          border border-slate-600
-                          bg-slate-700
+                          flex
+                          h-9
+                          w-9
+                          items-center
+                          justify-center
+                          rounded-xl
+                          border
+                          border-white/10
+                          bg-white/5
                           transition
-                          hover:border-sky-500/50
-                          hover:bg-slate-600
+                          hover:border-amber-400/30
+                          hover:bg-amber-400/10
                         "
                           title="Partie laden"
                         >
@@ -707,13 +783,18 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                           type="button"
                           onClick={() => deleteGame(savedGame.id)}
                           className="
-                          flex h-8 w-8 items-center justify-center
-                          rounded-lg
-                          border border-slate-600
-                          bg-slate-700
+                          flex
+                          h-9
+                          w-9
+                          items-center
+                          justify-center
+                          rounded-xl
+                          border
+                          border-white/10
+                          bg-white/5
                           transition
-                          hover:border-red-500/50
-                          hover:bg-red-950/60
+                          hover:border-red-500/30
+                          hover:bg-red-500/10
                         "
                           title="Partie löschen"
                         >
@@ -730,28 +811,44 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
               </section>
 
               {/* CAPTURED PIECES */}
-              <section className="rounded-2xl border border-slate-700 bg-slate-800/90 p-4 shadow-lg shadow-black/15">
-                <div className="mb-3 flex items-center justify-between">
+
+              <section
+                className="
+                rounded-3xl
+                border
+                border-white/10
+                bg-zinc-900/75
+                p-4
+                shadow-xl
+                shadow-black/20
+                backdrop-blur-md
+              "
+              >
+                <div className="mb-4 flex items-start justify-between">
                   <div>
-                    <h2 className="text-sm font-semibold text-slate-100">
+                    <h2 className="text-sm font-bold text-zinc-100">
                       Geschlagene Figuren
                     </h2>
 
-                    <p className="mt-0.5 text-xs text-slate-400">
+                    <p className="mt-1 text-xs text-zinc-500">
                       Materialübersicht
                     </p>
                   </div>
 
                   <span
                     className={`
-                    rounded-lg px-2.5 py-1
-                    text-xs font-semibold
+                    rounded-xl
+                    px-2.5
+                    py-1
+                    text-xs
+                    font-bold
+
                     ${
                       materialDifference > 0
-                        ? "bg-amber-100/10 text-amber-200"
+                        ? "bg-amber-400/10 text-amber-200"
                         : materialDifference < 0
-                          ? "bg-sky-500/10 text-sky-300"
-                          : "bg-slate-900/60 text-slate-400"
+                          ? "bg-white/10 text-zinc-300"
+                          : "bg-white/5 text-zinc-500"
                     }
                   `}
                   >
@@ -764,7 +861,15 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                   </span>
                 </div>
 
-                <div className="rounded-xl bg-slate-900/50 p-3">
+                <div
+                  className="
+                  rounded-2xl
+                  border
+                  border-white/5
+                  bg-black/20
+                  p-3
+                "
+                >
                   <CapturedPieces
                     capturedBlack={capturedBlack}
                     capturedWhite={capturedWhite}
@@ -773,24 +878,56 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
               </section>
 
               {/* MOVE HISTORY */}
-              <section className="rounded-2xl border border-slate-700 bg-slate-800/90 p-4 shadow-lg shadow-black/15">
-                <div className="mb-3 flex items-center justify-between">
+
+              <section
+                className="
+                rounded-3xl
+                border
+                border-white/10
+                bg-zinc-900/75
+                p-4
+                shadow-xl
+                shadow-black/20
+                backdrop-blur-md
+              "
+              >
+                <div className="mb-4 flex items-center justify-between">
                   <div>
-                    <h2 className="text-sm font-semibold text-slate-100">
+                    <h2 className="text-sm font-bold text-zinc-100">
                       Zugverlauf
                     </h2>
 
-                    <p className="mt-0.5 text-xs text-slate-400">
+                    <p className="mt-1 text-xs text-zinc-500">
                       Verlauf der Partie
                     </p>
                   </div>
 
-                  <span className="rounded-lg bg-slate-900/60 px-2.5 py-1 text-xs font-medium text-slate-300">
+                  <span
+                    className="
+                    rounded-xl
+                    bg-white/5
+                    px-2.5
+                    py-1
+                    text-xs
+                    font-semibold
+                    text-zinc-400
+                  "
+                  >
                     {moveHistory.length}
                   </span>
                 </div>
 
-                <div className="max-h-72 overflow-y-auto rounded-xl bg-slate-900/50 p-2">
+                <div
+                  className="
+                  max-h-72
+                  overflow-y-auto
+                  rounded-2xl
+                  border
+                  border-white/5
+                  bg-black/20
+                  p-2
+                "
+                >
                   <MoveHistory moves={moveHistory} />
                 </div>
               </section>
@@ -799,103 +936,71 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
           {/* =========================================================
             CENTER
-        ========================================================= */}
+           ========================================================= */}
+
           <section className="min-w-0">
             <div className="mx-auto max-w-[820px]">
-              {/* GAME STATUS */}
-              <div
-                className="
-                mb-3
-                rounded-xl
-                border border-slate-700
-                bg-slate-800/90
-                px-4 py-2.5
-                shadow-md shadow-black/10
-              "
-              >
-                <GameStatus
-                  illegal={illegal}
-                  whiteCheckCounter={whiteCheckCounter}
-                  blackCheckCounter={blackCheckCounter}
-                  gameOver={gameOver}
-                  gameOverReason={gameOverReason}
-                  winner={winner}
-                />
-              </div>
-
-              {/* EVALUATION */}
-              <div
-                className="
-                mb-3 flex items-center gap-3
-                rounded-xl
-                border border-slate-800
-                bg-slate-900/70
-                px-3 py-2
-              "
-              >
-                <span className="w-11 text-right text-xs font-semibold text-slate-300">
-                  {evaluation !== null
-                    ? evaluation > 0
-                      ? `+${evaluation.toFixed(1)}`
-                      : evaluation.toFixed(1)
-                    : "0.0"}
-                </span>
-
-                <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-slate-950">
-                  <div
-                    className="
-                    absolute inset-y-0 left-0
-                    rounded-full
-                    bg-sky-400
-                    transition-all duration-300
-                  "
-                    style={{
-                      width: `${getEvaluationPercentage()}%`,
-                    }}
-                  />
-                </div>
-
-                <span className="text-[10px] font-medium uppercase tracking-wider text-slate-500">
-                  Bewertung
-                </span>
-              </div>
-
               {/* PROMOTION */}
+
               {promotionSquare && promotionFrom && (
-                <div className="mb-3 rounded-xl border border-slate-700 bg-slate-800 p-3 shadow-xl">
+                <div
+                  className="
+                    mb-3
+                    rounded-2xl
+                    border
+                    border-amber-500/20
+                    bg-zinc-900/90
+                    p-3
+                    shadow-xl
+                  "
+                >
                   <PromotionBar onPromote={promotePawn} />
                 </div>
               )}
 
-              {/* BOARD */}
-              <div
-                className="
-                overflow-hidden
-                rounded-2xl
-                border border-slate-600
-                bg-gradient-to-b
-                from-slate-700
-                to-slate-800
-                p-3
-                shadow-2xl shadow-black/40
-                ring-1 ring-white/5
-              "
-              >
-                <Board
-                  board={board}
-                  selectedSquare={selectedSquare}
-                  legalMoves={legalMoves}
-                  lastMove={lastMove}
-                  checkedKingSquare={checkedKingSquare}
-                  onSquareClick={handleSquareClick}
-                />
-              </div>
+              {/* =====================================================
+                BOARD
+
+                Board.tsx already contains:
+                - wood frame
+                - wood squares
+                - coordinates
+                - piece styling
+                - selected square
+                - legal moves
+                - last move
+                - check glow
+               ===================================================== */}
+
+              <Board
+                board={board}
+                selectedSquare={selectedSquare}
+                legalMoves={legalMoves}
+                lastMove={lastMove}
+                checkedKingSquare={checkedKingSquare}
+                onSquareClick={handleSquareClick}
+              />
 
               {/* MOBILE MATERIAL */}
-              <div className="mt-3 flex items-center justify-between rounded-xl border border-slate-700 bg-slate-800/90 px-4 py-3 xl:hidden">
-                <span className="text-sm text-slate-400">Material</span>
 
-                <span className="text-sm font-semibold text-slate-100">
+              <div
+                className="
+                mt-4
+                flex
+                items-center
+                justify-between
+                rounded-2xl
+                border
+                border-white/10
+                bg-zinc-900/75
+                px-4
+                py-3
+                xl:hidden
+              "
+              >
+                <span className="text-sm text-zinc-500">Material</span>
+
+                <span className="text-sm font-bold text-zinc-200">
                   {materialDifference > 0 && `Weiß +${materialDifference}`}
 
                   {materialDifference < 0 &&
@@ -909,21 +1014,40 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
           {/* =========================================================
             RIGHT SIDEBAR
-        ========================================================= */}
+           ========================================================= */}
+
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              {/* GAME CONTROLS FIRST */}
-              <section className="rounded-2xl border border-slate-700 bg-slate-800/90 p-4 shadow-lg shadow-black/15">
-                <div className="mb-4">
-                  <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-sky-400 shadow-sm shadow-sky-400" />
+              {/* GAME CONTROLS */}
 
-                    <h2 className="font-semibold text-slate-100">
-                      Spielsteuerung
-                    </h2>
+              <section
+                className="
+                rounded-3xl
+                border
+                border-white/10
+                bg-zinc-900/75
+                p-4
+                shadow-xl
+                shadow-black/20
+                backdrop-blur-md
+              "
+              >
+                <div className="mb-5">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="
+                      h-2
+                      w-2
+                      rounded-full
+                      bg-amber-400
+                      shadow-[0_0_10px_rgba(251,191,36,0.55)]
+                    "
+                    />
+
+                    <h2 className="font-bold text-zinc-100">Spielsteuerung</h2>
                   </div>
 
-                  <p className="mt-1 text-xs text-slate-400">
+                  <p className="mt-1.5 text-xs text-zinc-500">
                     Spieler, Partie und Aktionen
                   </p>
                 </div>
@@ -942,19 +1066,31 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
               </section>
 
               {/* PIECE VALUES */}
-              <section className="rounded-2xl border border-slate-700 bg-slate-800/90 p-4 shadow-lg shadow-black/15">
-                <div className="mb-3 flex items-center justify-between">
+
+              <section
+                className="
+                rounded-3xl
+                border
+                border-white/10
+                bg-zinc-900/75
+                p-4
+                shadow-xl
+                shadow-black/20
+                backdrop-blur-md
+              "
+              >
+                <div className="mb-4 flex items-start justify-between">
                   <div>
-                    <h2 className="text-sm font-semibold text-slate-100">
+                    <h2 className="text-sm font-bold text-zinc-100">
                       Figurenwerte
                     </h2>
 
-                    <p className="mt-0.5 text-xs text-slate-400">
-                      Standardwerte
-                    </p>
+                    <p className="mt-1 text-xs text-zinc-500">Standardwerte</p>
                   </div>
 
-                  <span className="text-xs text-slate-500">Material</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">
+                    Material
+                  </span>
                 </div>
 
                 <div className="space-y-1">
@@ -962,31 +1098,49 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                     <div
                       key={piece.type}
                       className="
-                      flex items-center justify-between
-                      rounded-lg
-                      px-2.5 py-1.5
-                      transition-colors
-                      hover:bg-slate-700/70
-                    "
+                        flex
+                        items-center
+                        justify-between
+                        rounded-xl
+                        px-3
+                        py-2
+                        transition
+                        hover:bg-white/5
+                      "
                     >
-                      <div className="flex items-center gap-2">
-                        <span className="flex h-7 w-7 items-center justify-center text-xl text-amber-100">
+                      <div className="flex items-center gap-3">
+                        <span
+                          className="
+                            flex
+                            h-8
+                            w-8
+                            items-center
+                            justify-center
+                            text-2xl
+                            text-[#fff3d5]
+                            [text-shadow:0_2px_3px_rgba(0,0,0,0.6)]
+                          "
+                        >
                           {piece.symbol}
                         </span>
 
-                        <span className="text-sm text-slate-300">
+                        <span className="text-sm text-zinc-300">
                           {piece.name}
                         </span>
                       </div>
 
                       <span
                         className="
-                        rounded-md
-                        bg-slate-900/70
-                        px-2 py-0.5
-                        text-xs font-semibold
-                        text-sky-300
-                      "
+                          rounded-lg
+                          border
+                          border-white/5
+                          bg-black/20
+                          px-2.5
+                          py-1
+                          text-xs
+                          font-bold
+                          text-amber-200
+                        "
                       >
                         {pieceValues[piece.type]}
                       </span>
@@ -994,20 +1148,35 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                   ))}
                 </div>
 
-                {/* MATERIAL ADVANTAGE */}
-                <div className="mt-4 border-t border-slate-700 pt-4">
-                  <div className="flex items-center justify-between rounded-xl bg-slate-900/60 px-3 py-3">
-                    <span className="text-sm text-slate-400">Vorteil</span>
+                {/* ADVANTAGE */}
+
+                <div className="mt-4 border-t border-white/5 pt-4">
+                  <div
+                    className="
+                    flex
+                    items-center
+                    justify-between
+                    rounded-2xl
+                    border
+                    border-white/5
+                    bg-black/20
+                    px-3
+                    py-3
+                  "
+                  >
+                    <span className="text-sm text-zinc-500">Vorteil</span>
 
                     <span
                       className={`
-                      text-sm font-semibold
+                      text-sm
+                      font-bold
+
                       ${
                         materialDifference > 0
                           ? "text-amber-200"
                           : materialDifference < 0
-                            ? "text-sky-300"
-                            : "text-slate-300"
+                            ? "text-zinc-300"
+                            : "text-zinc-500"
                       }
                     `}
                     >
@@ -1021,53 +1190,6 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                   </div>
                 </div>
               </section>
-
-              {/* SMALL ANALYSIS CARD */}
-              {(evaluation !== null || bestMove) && (
-                <section className="rounded-2xl border border-sky-500/20 bg-sky-500/5 p-4">
-                  <div className="mb-3 flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-500/10 text-lg text-sky-300">
-                      ♙
-                    </div>
-
-                    <div>
-                      <h2 className="text-sm font-semibold text-slate-100">
-                        Analyse
-                      </h2>
-
-                      <p className="text-[11px] text-slate-400">Stockfish</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    {evaluation !== null && (
-                      <div className="flex items-center justify-between rounded-lg bg-slate-900/50 px-3 py-2">
-                        <span className="text-xs text-slate-400">
-                          Bewertung
-                        </span>
-
-                        <span className="text-sm font-semibold text-sky-300">
-                          {evaluation > 0
-                            ? `+${evaluation.toFixed(1)}`
-                            : evaluation.toFixed(1)}
-                        </span>
-                      </div>
-                    )}
-
-                    {bestMove && (
-                      <div className="flex items-center justify-between rounded-lg bg-slate-900/50 px-3 py-2">
-                        <span className="text-xs text-slate-400">
-                          Bester Zug
-                        </span>
-
-                        <span className="text-sm font-semibold text-slate-100">
-                          {bestMove}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </section>
-              )}
             </div>
           </aside>
         </main>

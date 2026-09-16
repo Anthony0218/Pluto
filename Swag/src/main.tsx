@@ -25,6 +25,12 @@ import { TableThemeProvider } from "./context/TableThemeContext";
 import WattenMultiplayerLobby from "./components/WattenMultiplayerLobby";
 import WattenMultiplayerRoom from "./components/WattenMultiplayerRoom";
 import WattenMultiplayerGame from "./components/WattenMultiplayerGame";
+import ChessClassicMenu from "./pages/ChessClassicalMenu";
+import ChessMenu from "./pages/ChessMenu";
+import ChessComputer from "./pages/ChessComputer";
+import ChessMultiplayerLobby from "./pages/ChessMultiplayerLobby";
+import ChessMultiplayerRoom from "./pages/ChessMultiplayerRoom";
+import ChessMultiplayerGame from "./pages/ChessMultiplayerGame";
 
 const router = createBrowserRouter([
   {
@@ -37,7 +43,15 @@ const router = createBrowserRouter([
       },
 
       {
-        path: "/chessGame",
+        path: "/chess",
+        element: <ChessMenu />,
+      },
+      {
+        path: "/chess/classic",
+        element: <ChessClassicMenu />,
+      },
+      {
+        path: "/chess/classic/hotseat",
         element: <ChessGame />,
       },
 
@@ -83,6 +97,22 @@ const router = createBrowserRouter([
       {
         path: "/watten/multiplayer/:roomCode/game",
         element: <WattenMultiplayerGame />,
+      },
+      {
+        path: "/chess/classic/ai",
+        element: <ChessComputer />,
+      },
+      {
+        path: "/chess/classic/multiplayer",
+        element: <ChessMultiplayerLobby />,
+      },
+      {
+        path: "/chess/classic/multiplayer/:roomCode",
+        element: <ChessMultiplayerRoom />,
+      },
+      {
+        path: "/chess/classic/multiplayer/:roomCode/game",
+        element: <ChessMultiplayerGame />,
       },
     ],
   },

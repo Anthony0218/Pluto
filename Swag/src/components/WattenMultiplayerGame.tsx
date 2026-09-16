@@ -754,6 +754,15 @@ export default function WattenMultiplayerGame() {
   const abheber = players.find((player) => player.seat === game.abheben_player);
 
   const isMyTurn = game.current_player === mySeat;
+  const myRematchReady =
+    mySeat === 0
+      ? gameState.white_rematch_ready
+      : gameState.black_rematch_ready;
+
+  const opponentRematchReady =
+    mySeat === 0
+      ? gameState.black_rematch_ready
+      : gameState.white_rematch_ready;
   const myTeam = getTeamForSeat(mySeat);
 
   const teamAPlayers = players.filter(
