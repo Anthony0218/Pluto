@@ -4,7 +4,7 @@ import { Chess, type Square } from "chess.js";
 
 import { getSquareName, type PieceType } from "../utils/chessUtils";
 
-import Board from "./Board.tsx";
+import Board from "./Board";
 
 import {
   playPieceCaptureSound,
@@ -27,6 +27,8 @@ import {
 } from "../games/chess/variants/mutationChess";
 
 import { buildMutationStats } from "../games/chess/variants/mutationStats";
+
+import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.ts";
 
 /* =========================================================
    TYPES
@@ -462,13 +464,17 @@ export default function MutationChessBoard() {
     ? historyPreviewChess.board()
     : board;
 
+  const {
+    orientation: liveBoardOrientation,
+    flipPending,
+    snapToSide,
+  } = useDelayedBoardOrientation(game.turn(), 1500);
+
   const boardOrientation: "white" | "black" = historyPreviewChess
     ? historyPreviewChess.turn() === "w"
       ? "white"
       : "black"
-    : game.turn() === "w"
-      ? "white"
-      : "black";
+    : liveBoardOrientation;
 
   const historyPreviewMove = historyPreview
     ? {
@@ -638,6 +644,28 @@ export default function MutationChessBoard() {
         promotion,
       });
 
+      /*
+       * chess.js exposes captured/promotion as PieceSymbol | undefined,
+       * but MutationMoveRecord uses stricter legal subsets.
+       * Narrow them before creating the record.
+       */
+      const captured =
+        move.captured === "p" ||
+        move.captured === "n" ||
+        move.captured === "b" ||
+        move.captured === "r" ||
+        move.captured === "q"
+          ? move.captured
+          : undefined;
+
+      const promotedTo =
+        move.promotion === "q" ||
+        move.promotion === "r" ||
+        move.promotion === "b" ||
+        move.promotion === "n"
+          ? move.promotion
+          : undefined;
+
       const nextPly = records.length + 1;
 
       /*
@@ -665,8 +693,8 @@ export default function MutationChessBoard() {
         from: move.from,
         to: move.to,
         piece: move.piece,
-        captured: move.captured,
-        promotion: move.promotion,
+        captured,
+        promotion: promotedTo,
         fenAfter: game.fen(),
         mutation,
       };
@@ -686,7 +714,7 @@ export default function MutationChessBoard() {
       setPromotionSquare(null);
       setHistoryPreviewPly(null);
 
-      if (move.captured) {
+      if (captured) {
         playPieceCaptureSound(move.piece);
       } else {
         playPieceMoveSound(move.piece);
@@ -803,6 +831,7 @@ export default function MutationChessBoard() {
       nextRecords[nextRecords.length - 1]?.fenAfter ?? new Chess().fen();
 
     game.load(targetFen);
+    snapToSide(game.turn());
 
     setRecords(nextRecords);
 
@@ -831,6 +860,7 @@ export default function MutationChessBoard() {
 
   function restartGame() {
     game.reset();
+    snapToSide(game.turn());
 
     setRecords([]);
     setMutationSeed(createMutationSeed());
@@ -1278,7 +1308,9 @@ export default function MutationChessBoard() {
                     ? historyPreviewCheckedKingSquare
                     : checkedKingSquare
                 }
-                onSquareClick={historyPreview ? () => {} : handleSquareClick}
+                onSquareClick={
+                  historyPreview || flipPending ? () => {} : handleSquareClick
+                }
                 mutationSquares={displayedMutationSquares}
                 orientation={boardOrientation}
               />

@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from "react";
+
 import { type Square } from "chess.js";
 import { getSquareName } from "../utils/chessUtils";
 
@@ -51,6 +53,55 @@ type BoardProps = {
   whiteMissionTargetSquares?: Square[];
   blackMissionTargetSquares?: Square[];
 
+  /*
+   * Horror Chess status markers.
+   */
+  infectedSquares?: Square[];
+  cursedSquares?: Square[];
+  hotSquares?: Square[];
+  frozenSquares?: Square[];
+  doomedSquares?: Square[];
+  graveSquares?: Square[];
+  fogSquares?: Square[];
+
+  /*
+   * Draft Chess setup-zone markers.
+   */
+  draftSetupSquares?: Square[];
+  draftKingSquares?: Square[];
+
+  /*
+   * Mirror Chess setup markers.
+   */
+  mirrorSetupSquares?: Square[];
+  mirrorAvailableSquares?: Square[];
+  mirrorPreviewSquares?: Square[];
+
+  /*
+   * ChessRoulette Lucky Squares.
+   *
+   * Untriggered Lucky Squares show "?".
+   * Triggered Lucky Squares reveal their effect icon until they expire.
+   */
+  luckySquares?: Square[];
+  destroyLuckySquares?: Square[];
+  teleportLuckySquares?: Square[];
+  swapLuckySquares?: Square[];
+  promoteLuckySquares?: Square[];
+  activeLuckySquares?: Square[];
+
+  /*
+   * Chess Hot Potato markers.
+   *
+   * The carrier gets a native bomb/countdown badge.
+   * The most recent blast uses the same native square overlay path
+   * as the other variants.
+   */
+  hotPotatoSquare?: Square | null;
+  hotPotatoMovesRemaining?: number;
+  hotPotatoExplosionSquares?: Square[];
+  hotPotatoBlownUpKingSquares?: Square[];
+
   orientation?: "white" | "black";
 
   /*
@@ -91,32 +142,192 @@ export default function Board({
   availableShopSpawnSquares = [],
   whiteMissionTargetSquares = [],
   blackMissionTargetSquares = [],
+  infectedSquares = [],
+  cursedSquares = [],
+  hotSquares = [],
+  frozenSquares = [],
+  doomedSquares = [],
+  graveSquares = [],
+  fogSquares = [],
+  draftSetupSquares = [],
+  draftKingSquares = [],
+  mirrorSetupSquares = [],
+  mirrorAvailableSquares = [],
+  mirrorPreviewSquares = [],
+  luckySquares = [],
+  destroyLuckySquares = [],
+  teleportLuckySquares = [],
+  swapLuckySquares = [],
+  promoteLuckySquares = [],
+  activeLuckySquares = [],
+  hotPotatoSquare = null,
+  hotPotatoMovesRemaining = 0,
+  hotPotatoExplosionSquares = [],
+  hotPotatoBlownUpKingSquares = [],
   orientation = "white",
   pieceScale = 1,
 }: BoardProps) {
+  /*
+   * Orientation animation lives INSIDE Board.tsx.
+   *
+   * Parent components continue to pass only:
+   *
+   *   orientation="white" | "black"
+   *
+   * When orientation changes, the whole chess board turns FLAT
+   * through 180 degrees like a physical board being rotated on a
+   * table.
+   *
+   * The piece layer counter-rotates by -180 degrees at the same
+   * speed, so the chess symbols stay upright while their positions
+   * travel around the board.
+   *
+   * At the end of the animation:
+   *   - the logical displayed orientation changes,
+   *   - board rotation resets instantly to 0,
+   *   - piece counter-rotation resets instantly to 0.
+   *
+   * A 180°-rotated White-oriented board has the same square
+   * positions as a Black-oriented board, so that reset is visually
+   * seamless.
+   */
+  const [displayedOrientation, setDisplayedOrientation] = useState<
+    "white" | "black"
+  >(orientation);
+
+  type RotationPhase = "idle" | "rotating" | "reset";
+
+  const [rotationPhase, setRotationPhase] = useState<RotationPhase>("idle");
+
+  const displayedOrientationRef = useRef<"white" | "black">(orientation);
+
+  const rotationTimerRef = useRef<number | null>(null);
+
+  const resetFrameRef = useRef<number | null>(null);
+
+  const ROTATION_MS = 520;
+
+  useEffect(() => {
+    if (orientation === displayedOrientationRef.current) {
+      return;
+    }
+
+    if (rotationTimerRef.current !== null) {
+      window.clearTimeout(rotationTimerRef.current);
+    }
+
+    if (resetFrameRef.current !== null) {
+      window.cancelAnimationFrame(resetFrameRef.current);
+    }
+
+    /*
+     * Rotate the currently displayed board through a full half-turn.
+     */
+    setRotationPhase("rotating");
+
+    rotationTimerRef.current = window.setTimeout(() => {
+      /*
+       * At 180° the physical square locations already match the
+       * requested opposite orientation.
+       *
+       * Swap the logical orientation and remove the transforms
+       * without a transition. The screen therefore stays in the
+       * same visual position while the DOM returns to its normal
+       * unrotated state.
+       */
+      displayedOrientationRef.current = orientation;
+
+      setDisplayedOrientation(orientation);
+
+      setRotationPhase("reset");
+
+      resetFrameRef.current = window.requestAnimationFrame(() => {
+        setRotationPhase("idle");
+      });
+    }, ROTATION_MS);
+
+    return () => {
+      if (rotationTimerRef.current !== null) {
+        window.clearTimeout(rotationTimerRef.current);
+      }
+
+      if (resetFrameRef.current !== null) {
+        window.cancelAnimationFrame(resetFrameRef.current);
+      }
+    };
+  }, [orientation]);
+
+  const orientationAnimating = rotationPhase !== "idle";
+
+  const boardRotation = rotationPhase === "rotating" ? 180 : 0;
+
+  const pieceCounterRotation = rotationPhase === "rotating" ? -180 : 0;
+
+  const boardTransform = `rotate(${boardRotation}deg)`;
+
+  const boardTransition =
+    rotationPhase === "reset"
+      ? "none"
+      : `transform ${ROTATION_MS}ms cubic-bezier(0.22, 1, 0.36, 1), filter 220ms ease, box-shadow 220ms ease`;
+
+  const pieceTransition =
+    rotationPhase === "reset"
+      ? "none"
+      : `transform ${ROTATION_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`;
+
+  const boardFilter =
+    rotationPhase === "rotating"
+      ? "brightness(0.9) saturate(0.95)"
+      : "brightness(1) saturate(1)";
+
+  const boardShadow =
+    rotationPhase === "rotating"
+      ? "0 38px 90px rgba(0,0,0,0.62)"
+      : "0 30px 80px rgba(0,0,0,0.55)";
+
   return (
     /*
-     * OUTER WOODEN FRAME
+     * ROTATION WRAPPER
+     *
+     * No 3D perspective is needed now. This is a flat, tabletop
+     * rotation around the center of the board.
      */
-    <div
-      className="
-        w-full
-        rounded-[28px]
-        border
-        border-[#5f412d]
-        bg-gradient-to-br
-        from-[#493323]
-        via-[#2d1e15]
-        to-[#160e09]
-        p-3
-        shadow-[0_30px_80px_rgba(0,0,0,0.55)]
-        sm:p-4
-      "
-    >
-      {/* Inner frame */}
-
+    <div className="w-full">
+      {/*
+       * OUTER WOODEN FRAME
+       */}
       <div
+        aria-busy={orientationAnimating}
         className="
+          w-full
+          rounded-[28px]
+          border
+          border-[#5f412d]
+          bg-gradient-to-br
+          from-[#493323]
+          via-[#2d1e15]
+          to-[#160e09]
+          p-3
+          sm:p-4
+        "
+        style={{
+          transform: boardTransform,
+
+          transition: boardTransition,
+
+          transformOrigin: "center center",
+
+          willChange: "transform, filter, box-shadow",
+
+          filter: boardFilter,
+
+          boxShadow: boardShadow,
+        }}
+      >
+        {/* Inner frame */}
+
+        <div
+          className="
           rounded-[18px]
           border
           border-black/40
@@ -125,11 +336,11 @@ export default function Board({
           shadow-inner
           sm:p-2
         "
-      >
-        {/* Chess board */}
+        >
+          {/* Chess board */}
 
-        <div
-          className="
+          <div
+            className="
             grid
             aspect-square
             w-full
@@ -139,77 +350,145 @@ export default function Board({
             rounded-xl
             shadow-[0_12px_30px_rgba(0,0,0,0.45)]
           "
-        >
-          {board.map((_, displayRow) =>
-            board[displayRow].map((_, displayColumn) => {
-              /*
-               * Actual chess.js coordinates.
-               *
-               * The displayed position changes when
-               * playing as Black, while the real
-               * chess coordinates remain correct.
-               */
+          >
+            {board.map((_, displayRow) =>
+              board[displayRow].map((_, displayColumn) => {
+                /*
+                 * Actual chess.js coordinates.
+                 *
+                 * The displayed position changes when
+                 * playing as Black, while the real
+                 * chess coordinates remain correct.
+                 */
 
-              const row = orientation === "white" ? displayRow : 7 - displayRow;
+                const row =
+                  displayedOrientation === "white"
+                    ? displayRow
+                    : 7 - displayRow;
 
-              const column =
-                orientation === "white" ? displayColumn : 7 - displayColumn;
+                const column =
+                  displayedOrientation === "white"
+                    ? displayColumn
+                    : 7 - displayColumn;
 
-              const piece = board[row][column];
+                const piece = board[row][column];
 
-              const square = getSquareName(row, column);
+                const square = getSquareName(row, column);
 
-              const isLight = (row + column) % 2 === 0;
+                const isLight = (row + column) % 2 === 0;
 
-              const isSelected = selectedSquare === square;
+                const isSelected = selectedSquare === square;
 
-              const isLegalMove = legalMoves.includes(square);
+                const isLegalMove = legalMoves.includes(square);
 
-              const isLastMove =
-                lastMove?.from === square || lastMove?.to === square;
+                const isLastMove =
+                  lastMove?.from === square || lastMove?.to === square;
 
-              const isHeartSquare = heartSquares.includes(square);
+                const isHeartSquare = heartSquares.includes(square);
 
-              const isMutationSquare = mutationSquares.includes(square);
+                const isMutationSquare = mutationSquares.includes(square);
 
-              const isBountySquare = bountySquares.includes(square);
+                const isBountySquare = bountySquares.includes(square);
 
-              const isShopSpawnSquare = shopSpawnSquares.includes(square);
+                const isShopSpawnSquare = shopSpawnSquares.includes(square);
 
-              const isAvailableShopSpawnSquare =
-                availableShopSpawnSquares.includes(square);
+                const isAvailableShopSpawnSquare =
+                  availableShopSpawnSquares.includes(square);
 
-              const isWhiteMissionTargetSquare =
-                whiteMissionTargetSquares.includes(square);
+                const isWhiteMissionTargetSquare =
+                  whiteMissionTargetSquares.includes(square);
 
-              const isBlackMissionTargetSquare =
-                blackMissionTargetSquares.includes(square);
+                const isBlackMissionTargetSquare =
+                  blackMissionTargetSquares.includes(square);
 
-              const isAnyMissionTargetSquare =
-                isWhiteMissionTargetSquare || isBlackMissionTargetSquare;
+                const isAnyMissionTargetSquare =
+                  isWhiteMissionTargetSquare || isBlackMissionTargetSquare;
 
-              const isCheckedKing =
-                piece?.type === "k" && checkedKingSquare === square;
+                const isInfectedSquare = infectedSquares.includes(square);
 
-              let symbol = "";
+                const isCursedSquare = cursedSquares.includes(square);
 
-              if (piece) {
-                const key =
-                  `${piece.color}${piece.type}` as keyof typeof pieceSymbols;
+                const isHotSquare = hotSquares.includes(square);
 
-                symbol = pieceSymbols[key];
-              }
+                const isFrozenSquare = frozenSquares.includes(square);
 
-              const file = square[0];
-              const rank = square[1];
+                const isDoomedSquare = doomedSquares.includes(square);
 
-              return (
-                <button
-                  key={square}
-                  type="button"
-                  aria-label={square}
-                  onClick={() => onSquareClick(row, column)}
-                  className={`
+                const isGraveSquare = graveSquares.includes(square);
+
+                const isFogSquare = fogSquares.includes(square);
+
+                const isDraftSetupSquare = draftSetupSquares.includes(square);
+
+                const isDraftKingSquare = draftKingSquares.includes(square);
+
+                const isMirrorSetupSquare = mirrorSetupSquares.includes(square);
+
+                const isMirrorAvailableSquare =
+                  mirrorAvailableSquares.includes(square);
+
+                const isMirrorPreviewSquare =
+                  mirrorPreviewSquares.includes(square);
+
+                const isLuckySquare = luckySquares.includes(square);
+
+                const isDestroyLuckySquare =
+                  destroyLuckySquares.includes(square);
+
+                const isTeleportLuckySquare =
+                  teleportLuckySquares.includes(square);
+
+                const isSwapLuckySquare = swapLuckySquares.includes(square);
+
+                const isPromoteLuckySquare =
+                  promoteLuckySquares.includes(square);
+
+                const isTriggeredLuckySquare =
+                  isDestroyLuckySquare ||
+                  isTeleportLuckySquare ||
+                  isSwapLuckySquare ||
+                  isPromoteLuckySquare;
+
+                const isActiveLuckySquare = activeLuckySquares.includes(square);
+
+                const isHotPotatoSquare = hotPotatoSquare === square;
+
+                const isHotPotatoExplosionSquare =
+                  hotPotatoExplosionSquares.includes(square);
+
+                const isHotPotatoBlownUpKingSquare =
+                  hotPotatoBlownUpKingSquares.includes(square) &&
+                  piece?.type === "k";
+
+                const isCheckedKing =
+                  piece?.type === "k" && checkedKingSquare === square;
+
+                let symbol = "";
+
+                if (piece) {
+                  const key =
+                    `${piece.color}${piece.type}` as keyof typeof pieceSymbols;
+
+                  symbol = pieceSymbols[key];
+                }
+
+                const file = square[0];
+                const rank = square[1];
+
+                return (
+                  <button
+                    key={square}
+                    type="button"
+                    aria-label={square}
+                    onClick={() => {
+                      if (orientationAnimating) {
+                        return;
+                      }
+
+                      onSquareClick(row, column);
+                    }}
+                    disabled={orientationAnimating}
+                    className={`
                     group
                     relative
                     flex
@@ -222,6 +501,8 @@ export default function Board({
                     transition-[filter,box-shadow]
                     duration-150
                     focus:outline-none
+                    disabled:cursor-default
+                    disabled:opacity-100
 
                     ${
                       isLight
@@ -250,17 +531,265 @@ export default function Board({
 
                     hover:brightness-105
                   `}
-                >
-                  {/* =========================
+                  >
+                    {isDraftSetupSquare && (
+                      <span
+                        className="
+                        pointer-events-none
+                        absolute
+                        inset-0
+                        z-[1]
+                        bg-emerald-400/10
+                        shadow-[inset_0_0_16px_rgba(52,211,153,0.16)]
+                      "
+                      />
+                    )}
+
+                    {isDraftKingSquare && (
+                      <span
+                        className="
+                        pointer-events-none
+                        absolute
+                        right-1
+                        top-1
+                        z-[18]
+                        flex
+                        h-5
+                        w-5
+                        items-center
+                        justify-center
+                        rounded-full
+                        border
+                        border-amber-200/35
+                        bg-amber-950/70
+                        text-[10px]
+                        font-black
+                        text-amber-200
+                      "
+                        aria-hidden="true"
+                      >
+                        ♔
+                      </span>
+                    )}
+
+                    {isMirrorSetupSquare && (
+                      <span
+                        className="
+                        pointer-events-none
+                        absolute
+                        inset-0
+                        z-[1]
+                        bg-violet-400/[0.07]
+                        shadow-[inset_0_0_18px_rgba(167,139,250,0.12)]
+                      "
+                      />
+                    )}
+
+                    {isMirrorAvailableSquare && (
+                      <span
+                        className="
+                        pointer-events-none
+                        absolute
+                        inset-[5px]
+                        z-[6]
+                        rounded-md
+                        border
+                        border-emerald-300/40
+                        shadow-[inset_0_0_12px_rgba(110,231,183,0.15)]
+                      "
+                      />
+                    )}
+
+                    {isMirrorPreviewSquare && (
+                      <span
+                        className="
+                        pointer-events-none
+                        absolute
+                        left-1/2
+                        top-1/2
+                        z-[18]
+                        -translate-x-1/2
+                        -translate-y-1/2
+                        text-xl
+                        font-black
+                        leading-none
+                        text-violet-200
+                        drop-shadow-[0_0_8px_rgba(167,139,250,0.9)]
+                      "
+                        aria-hidden="true"
+                      >
+                        ◈
+                      </span>
+                    )}
+
+                    {/* =========================
+                      CHESSROULETTE LUCKY SQUARE
+                     ========================= */}
+
+                    {isLuckySquare && (
+                      <>
+                        <span
+                          className={`
+                          pointer-events-none
+                          absolute
+                          inset-0
+                          z-[5]
+                          ${
+                            isDestroyLuckySquare
+                              ? "bg-red-500/16 shadow-[inset_0_0_30px_rgba(239,68,68,0.42)]"
+                              : isTeleportLuckySquare
+                                ? "bg-cyan-400/16 shadow-[inset_0_0_30px_rgba(34,211,238,0.42)]"
+                                : isSwapLuckySquare
+                                  ? "bg-violet-400/16 shadow-[inset_0_0_30px_rgba(167,139,250,0.42)]"
+                                  : isPromoteLuckySquare
+                                    ? "bg-amber-300/16 shadow-[inset_0_0_30px_rgba(251,191,36,0.42)]"
+                                    : "bg-amber-300/14 shadow-[inset_0_0_30px_rgba(251,191,36,0.38)]"
+                          }
+                          ${isActiveLuckySquare ? "animate-pulse" : ""}
+                        `}
+                        />
+
+                        <span
+                          className={`
+                          pointer-events-none
+                          absolute
+                          left-1/2
+                          top-1/2
+                          z-[8]
+                          flex
+                          h-[62%]
+                          w-[62%]
+                          -translate-x-1/2
+                          -translate-y-1/2
+                          items-center
+                          justify-center
+                          rounded-full
+                          border-2
+                          bg-zinc-950/45
+                          text-[clamp(1.3rem,3.5vw,2.6rem)]
+                          font-black
+                          leading-none
+                          shadow-[0_0_22px_rgba(255,255,255,0.16)]
+                          ${
+                            isTriggeredLuckySquare
+                              ? "border-white/35"
+                              : "border-amber-100/45 text-amber-100"
+                          }
+                          ${
+                            isActiveLuckySquare
+                              ? "scale-110 animate-bounce"
+                              : ""
+                          }
+                        `}
+                          aria-hidden="true"
+                        >
+                          {isDestroyLuckySquare
+                            ? "💥"
+                            : isTeleportLuckySquare
+                              ? "🌀"
+                              : isSwapLuckySquare
+                                ? "🔄"
+                                : isPromoteLuckySquare
+                                  ? "🎴"
+                                  : "?"}
+                        </span>
+                      </>
+                    )}
+
+                    {/* =========================
+                      CHESS HOT POTATO
+                     ========================= */}
+
+                    {isHotPotatoExplosionSquare && (
+                      <>
+                        <span
+                          className="
+                          pointer-events-none
+                          absolute
+                          inset-0
+                          z-[7]
+                          animate-pulse
+                          bg-[radial-gradient(circle,rgba(251,146,60,0.78)_0%,rgba(239,68,68,0.55)_45%,rgba(127,29,29,0.18)_78%)]
+                          shadow-[inset_0_0_30px_rgba(249,115,22,0.78)]
+                        "
+                        />
+
+                        <span
+                          className="
+                          pointer-events-none
+                          absolute
+                          left-1/2
+                          top-1/2
+                          z-[18]
+                          -translate-x-1/2
+                          -translate-y-1/2
+                          text-[clamp(1.5rem,4vw,3.2rem)]
+                          leading-none
+                          drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]
+                        "
+                          aria-hidden="true"
+                        >
+                          💥
+                        </span>
+                      </>
+                    )}
+
+                    {isHotPotatoSquare && (
+                      <>
+                        <span
+                          className="
+                          pointer-events-none
+                          absolute
+                          inset-0
+                          z-[5]
+                          animate-pulse
+                          bg-orange-500/12
+                          shadow-[inset_0_0_30px_rgba(249,115,22,0.5)]
+                        "
+                        />
+
+                        <span
+                          className="
+                          pointer-events-none
+                          absolute
+                          right-1
+                          top-1
+                          z-[19]
+                          flex
+                          min-w-10
+                          items-center
+                          justify-center
+                          gap-0.5
+                          rounded-full
+                          border
+                          border-orange-100/70
+                          bg-zinc-950/90
+                          px-1.5
+                          py-1
+                          text-[10px]
+                          font-black
+                          leading-none
+                          text-orange-100
+                          shadow-[0_2px_10px_rgba(0,0,0,0.55)]
+                        "
+                          aria-label={`Hot Potato explodes in ${hotPotatoMovesRemaining} moves`}
+                        >
+                          <span aria-hidden="true">💣</span>
+                          <span>{hotPotatoMovesRemaining}</span>
+                        </span>
+                      </>
+                    )}
+
+                    {/* =========================
                       THREE LIVES HEART SQUARE
                       Rendered INSIDE the real board square,
                       so it can never drift or offset.
                      ========================= */}
 
-                  {isHeartSquare && (
-                    <>
-                      <span
-                        className="
+                    {isHeartSquare && (
+                      <>
+                        <span
+                          className="
                           pointer-events-none
                           absolute
                           inset-0
@@ -268,10 +797,10 @@ export default function Board({
                           bg-red-400/25
                           shadow-[inset_0_0_24px_rgba(248,113,113,0.28)]
                         "
-                      />
+                        />
 
-                      <span
-                        className="
+                        <span
+                          className="
                           pointer-events-none
                           absolute
                           inset-0
@@ -287,20 +816,20 @@ export default function Board({
                           text-red-400
                           drop-shadow-[0_0_12px_rgba(248,113,113,0.95)]
                         "
-                      >
-                        <span className="animate-pulse leading-none">♥</span>
-                      </span>
-                    </>
-                  )}
+                        >
+                          <span className="animate-pulse leading-none">♥</span>
+                        </span>
+                      </>
+                    )}
 
-                  {/* =========================
+                    {/* =========================
                       MUTATION SQUARE
                      ========================= */}
 
-                  {isMutationSquare && (
-                    <>
-                      <span
-                        className="
+                    {isMutationSquare && (
+                      <>
+                        <span
+                          className="
                           pointer-events-none
                           absolute
                           inset-0
@@ -308,10 +837,10 @@ export default function Board({
                           bg-violet-400/25
                           shadow-[inset_0_0_26px_rgba(167,139,250,0.35)]
                         "
-                      />
+                        />
 
-                      <span
-                        className="
+                        <span
+                          className="
                           pointer-events-none
                           absolute
                           inset-0
@@ -326,20 +855,20 @@ export default function Board({
                           text-violet-200/55
                           drop-shadow-[0_0_12px_rgba(167,139,250,0.95)]
                         "
-                      >
-                        ✦
-                      </span>
-                    </>
-                  )}
+                        >
+                          ✦
+                        </span>
+                      </>
+                    )}
 
-                  {/* =========================
+                    {/* =========================
                       CAPITALISM BOUNTY TARGET
                      ========================= */}
 
-                  {isBountySquare && (
-                    <>
-                      <span
-                        className="
+                    {isBountySquare && (
+                      <>
+                        <span
+                          className="
                           pointer-events-none
                           absolute
                           inset-0
@@ -347,10 +876,10 @@ export default function Board({
                           bg-amber-300/20
                           shadow-[inset_0_0_24px_rgba(251,191,36,0.22)]
                         "
-                      />
+                        />
 
-                      <span
-                        className="
+                        <span
+                          className="
                           pointer-events-none
                           absolute
                           right-1.5
@@ -372,20 +901,20 @@ export default function Board({
                           text-amber-950
                           shadow-[0_2px_8px_rgba(0,0,0,0.4)]
                         "
-                      >
-                        $
-                      </span>
-                    </>
-                  )}
+                        >
+                          $
+                        </span>
+                      </>
+                    )}
 
-                  {/* =========================
+                    {/* =========================
                       CAPITALISM SHOP SPAWN POINT
                      ========================= */}
 
-                  {isShopSpawnSquare && (
-                    <>
-                      <span
-                        className={`
+                    {isShopSpawnSquare && (
+                      <>
+                        <span
+                          className={`
                           pointer-events-none
                           absolute
                           inset-0
@@ -397,18 +926,18 @@ export default function Board({
                               : "bg-cyan-300/[0.06]"
                           }
                         `}
-                      />
+                        />
 
-                      <span
-                        className={`
+                        <span
+                          className={`
                           pointer-events-none
                           absolute
                           bottom-1.5
                           left-1.5
                           z-[18]
                           flex
-                          h-5
-                          w-5
+                          h-7
+                          w-7
                           items-center
                           justify-center
                           rounded-full
@@ -424,20 +953,20 @@ export default function Board({
                               : "border-cyan-100/20 bg-cyan-900/70 text-cyan-200/55"
                           }
                         `}
-                      >
-                        +
-                      </span>
-                    </>
-                  )}
+                        >
+                          +
+                        </span>
+                      </>
+                    )}
 
-                  {/* =========================
+                    {/* =========================
                       KING JOURNEY TARGET
                      ========================= */}
 
-                  {isAnyMissionTargetSquare && (
-                    <>
-                      <span
-                        className={`
+                    {isAnyMissionTargetSquare && (
+                      <>
+                        <span
+                          className={`
                           pointer-events-none
                           absolute
                           inset-0
@@ -452,10 +981,10 @@ export default function Board({
                                 : "bg-violet-300/22 shadow-[inset_0_0_28px_rgba(196,181,253,0.36)]"
                           }
                         `}
-                      />
+                        />
 
-                      <span
-                        className={`
+                        <span
+                          className={`
                           pointer-events-none
                           absolute
                           left-1/2
@@ -481,23 +1010,23 @@ export default function Board({
                                 : "h-9 w-9 border-violet-100/70 bg-violet-300/95 text-xl text-violet-950"
                           }
                         `}
-                      >
-                        {isWhiteMissionTargetSquare &&
-                        isBlackMissionTargetSquare
-                          ? "♔♚"
-                          : isWhiteMissionTargetSquare
-                            ? "♔"
-                            : "♚"}
-                      </span>
+                        >
+                          {isWhiteMissionTargetSquare &&
+                          isBlackMissionTargetSquare
+                            ? "♔♚"
+                            : isWhiteMissionTargetSquare
+                              ? "♔"
+                              : "♚"}
+                        </span>
 
-                      <span
-                        className={`
+                        <span
+                          className={`
                           pointer-events-none
                           absolute
                           bottom-1
                           right-1
                           z-[19]
-                          text-[10px]
+                          text-[15px]
                           font-black
                           leading-none
 
@@ -510,35 +1039,251 @@ export default function Board({
                                 : "text-violet-100"
                           }
                         `}
-                      >
-                        ★
-                      </span>
-                    </>
-                  )}
+                        >
+                          ★
+                        </span>
+                      </>
+                    )}
 
-                  {/* =========================
+                    {/* =========================
+                      HORROR CHESS STATUS MARKERS
+                     ========================= */}
+
+                    {isInfectedSquare && (
+                      <>
+                        <span
+                          className="
+                          pointer-events-none
+                          absolute
+                          inset-0
+                          z-[3]
+                          bg-emerald-500/15
+                          shadow-[inset_0_0_24px_rgba(16,185,129,0.32)]
+                        "
+                        />
+
+                        <span
+                          className="
+                          pointer-events-none
+                          absolute
+                          left-1
+                          top-1
+                          z-[17]
+                          flex
+                          h-5
+                          w-5
+                          items-center
+                          justify-center
+                          rounded-full
+                          border
+                          border-emerald-100/35
+                          bg-emerald-950/85
+                          text-[10px]
+                          font-black
+                          text-emerald-300
+                        "
+                        >
+                          ☣
+                        </span>
+                      </>
+                    )}
+
+                    {isCursedSquare && (
+                      <>
+                        <span
+                          className="
+                          pointer-events-none
+                          absolute
+                          inset-0
+                          z-[4]
+                          bg-fuchsia-500/12
+                          shadow-[inset_0_0_28px_rgba(217,70,239,0.34)]
+                        "
+                        />
+
+                        <span
+                          className="
+                          pointer-events-none
+                          absolute
+                          right-1
+                          top-1
+                          z-[18]
+                          flex
+                          h-7
+                          w-7
+                          items-center
+                          justify-center
+                          rounded-full
+                          border
+                          border-fuchsia-100/40
+                          bg-fuchsia-950/90
+                          text-[16px]
+                          font-black
+                          text-fuchsia-200
+                        "
+                        >
+                          ☠
+                        </span>
+                      </>
+                    )}
+
+                    {isHotSquare && (
+                      <>
+                        <span
+                          className="
+                          pointer-events-none
+                          absolute
+                          inset-0
+                          z-[5]
+                          bg-red-500/20
+                          shadow-[inset_0_0_30px_rgba(239,68,68,0.48)]
+                        "
+                        />
+
+                        <span
+                          className="
+                          pointer-events-none
+                          absolute
+                          bottom-1
+                          right-1
+                          z-[18]
+                          text-xl
+                          font-black
+                          leading-none
+                          text-orange-200
+                          drop-shadow-[0_0_8px_rgba(249,115,22,0.95)]
+                        "
+                        >
+                          🔥
+                        </span>
+                      </>
+                    )}
+
+                    {isFrozenSquare && (
+                      <>
+                        <span
+                          className="
+                          pointer-events-none
+                          absolute
+                          inset-0
+                          z-[7]
+                          bg-cyan-200/25
+                          shadow-[inset_0_0_30px_rgba(103,232,249,0.5)]
+                        "
+                        />
+
+                        <span
+                          className="
+                          pointer-events-none
+                          absolute
+                          bottom-1
+                          left-1
+                          z-[18]
+                          text-xl
+                          font-black
+                          leading-none
+                          text-cyan-50
+                          drop-shadow-[0_0_8px_rgba(34,211,238,0.95)]
+                        "
+                        >
+                          ❄
+                        </span>
+                      </>
+                    )}
+
+                    {isDoomedSquare && (
+                      <>
+                        <span
+                          className="
+                          pointer-events-none
+                          absolute
+                          inset-[3px]
+                          z-[9]
+                          rounded-sm
+                          border-2
+                          border-dashed
+                          border-red-200
+                          shadow-[inset_0_0_22px_rgba(248,113,113,0.42)]
+                        "
+                        />
+
+                        <span
+                          className="
+                          pointer-events-none
+                          absolute
+                          left-1/2
+                          top-1/2
+                          z-[19]
+                          -translate-x-1/2
+                          -translate-y-1/2
+                          text-3xl
+                          font-black
+                          leading-none
+                          text-red-200/90
+                          drop-shadow-[0_0_8px_rgba(239,68,68,0.9)]
+                        "
+                        >
+                          ×
+                        </span>
+                      </>
+                    )}
+
+                    {isGraveSquare && (
+                      <>
+                        <span
+                          className="
+                          pointer-events-none
+                          absolute
+                          inset-0
+                          z-[8]
+                          bg-zinc-950/18
+                          shadow-[inset_0_0_24px_rgba(24,24,27,0.55)]
+                        "
+                        />
+
+                        <span
+                          className="
+                          pointer-events-none
+                          absolute
+                          left-1/2
+                          top-1/2
+                          z-[19]
+                          -translate-x-1/2
+                          -translate-y-1/2
+                          text-3xl
+                          leading-none
+                          drop-shadow-[0_0_8px_rgba(0,0,0,0.9)]
+                        "
+                          aria-hidden="true"
+                        >
+                          🪦
+                        </span>
+                      </>
+                    )}
+
+                    {/* =========================
                       LAST MOVE HIGHLIGHT
                      ========================= */}
 
-                  {isLastMove && (
-                    <span
-                      className="
+                    {isLastMove && (
+                      <span
+                        className="
                         pointer-events-none
                         absolute
                         inset-0
                         z-[2]
                         bg-yellow-300/25
                       "
-                    />
-                  )}
+                      />
+                    )}
 
-                  {/* =========================
+                    {/* =========================
                       CHECK GLOW
                      ========================= */}
 
-                  {isCheckedKing && (
-                    <span
-                      className="
+                    {isCheckedKing && (
+                      <span
+                        className="
                         pointer-events-none
                         absolute
                         inset-0
@@ -546,16 +1291,16 @@ export default function Board({
                         bg-[radial-gradient(circle,rgba(239,68,68,0.85)_0%,rgba(185,28,28,0.52)_45%,rgba(127,29,29,0.05)_80%)]
                         shadow-[inset_0_0_20px_rgba(239,68,68,0.85)]
                       "
-                    />
-                  )}
+                      />
+                    )}
 
-                  {/* =========================
+                    {/* =========================
                       EMPTY LEGAL MOVE
                      ========================= */}
 
-                  {isLegalMove && !piece && (
-                    <span
-                      className="
+                    {isLegalMove && !piece && (
+                      <span
+                        className="
                         pointer-events-none
                         absolute
                         z-[6]
@@ -565,16 +1310,16 @@ export default function Board({
                         bg-black/30
                         shadow-sm
                       "
-                    />
-                  )}
+                      />
+                    )}
 
-                  {/* =========================
+                    {/* =========================
                       LEGAL CAPTURE
                      ========================= */}
 
-                  {isLegalMove && piece && (
-                    <span
-                      className="
+                    {isLegalMove && piece && (
+                      <span
+                        className="
                         pointer-events-none
                         absolute
                         inset-[7%]
@@ -583,23 +1328,23 @@ export default function Board({
                         border-[clamp(3px,0.5vw,6px)]
                         border-black/25
                       "
-                    />
-                  )}
+                      />
+                    )}
 
-                  {/* =========================
+                    {/* =========================
                       PIECE
                      ========================= */}
 
-                  {piece && (
-                    /*
-                     * Outer wrapper controls only
-                     * the overall piece size.
-                     *
-                     * The inner span keeps the
-                     * existing hover animation.
-                     */
-                    <span
-                      className="
+                    {piece && !isHotPotatoBlownUpKingSquare && (
+                      /*
+                       * Outer wrapper controls only
+                       * the overall piece size.
+                       *
+                       * The inner span keeps the
+                       * existing hover animation.
+                       */
+                      <span
+                        className="
                         pointer-events-none
                         relative
                         z-10
@@ -609,13 +1354,18 @@ export default function Board({
                         items-center
                         justify-center
                       "
-                      style={{
-                        transform: `scale(${pieceScale})`,
-                        transformOrigin: "center",
-                      }}
-                    >
-                      <span
-                        className={`
+                        style={{
+                          transform: `scale(${pieceScale}) rotate(${pieceCounterRotation}deg)`,
+
+                          transformOrigin: "center center",
+
+                          transition: pieceTransition,
+
+                          willChange: "transform",
+                        }}
+                      >
+                        <span
+                          className={`
                           pointer-events-none
                           relative
                           select-none
@@ -641,20 +1391,57 @@ export default function Board({
                               `
                           }
                         `}
-                      >
-                        {symbol}
+                        >
+                          {symbol}
+                        </span>
                       </span>
-                    </span>
-                  )}
+                    )}
 
-                  {/* =========================
+                    {isFogSquare && (
+                      <>
+                        <span
+                          className="
+                          pointer-events-none
+                          absolute
+                          inset-0
+                          z-[19]
+                          bg-zinc-950/90
+                          backdrop-blur-[1px]
+                        "
+                        />
+                        <span
+                          className="
+                          pointer-events-none
+                          absolute
+                          left-1/2
+                          top-1/2
+                          z-[19]
+                          -translate-x-1/2
+                          -translate-y-1/2
+                          text-lg
+                          leading-none
+                          text-zinc-600/70
+                        "
+                          aria-hidden="true"
+                        >
+                          ◌
+                        </span>
+                      </>
+                    )}
+
+                    {/* =========================
                       FILE COORDINATE
                       a b c d e f g h
                      ========================= */}
 
-                  {displayRow === 7 && (
-                    <span
-                      className={`
+                    {displayRow === 7 && (
+                      <span
+                        style={{
+                          opacity: orientationAnimating ? 0 : 1,
+
+                          transition: "opacity 120ms ease",
+                        }}
+                        className={`
                         pointer-events-none
                         absolute
                         bottom-1
@@ -665,19 +1452,24 @@ export default function Board({
 
                         ${isLight ? "text-[#66452f]/70" : "text-[#f1ddbe]/70"}
                       `}
-                    >
-                      {file}
-                    </span>
-                  )}
+                      >
+                        {file}
+                      </span>
+                    )}
 
-                  {/* =========================
+                    {/* =========================
                       RANK COORDINATE
                       1 2 3 4 5 6 7 8
                      ========================= */}
 
-                  {displayColumn === 0 && (
-                    <span
-                      className={`
+                    {displayColumn === 0 && (
+                      <span
+                        style={{
+                          opacity: orientationAnimating ? 0 : 1,
+
+                          transition: "opacity 120ms ease",
+                        }}
+                        className={`
                         pointer-events-none
                         absolute
                         left-1.5
@@ -688,14 +1480,15 @@ export default function Board({
 
                         ${isLight ? "text-[#66452f]/70" : "text-[#f1ddbe]/70"}
                       `}
-                    >
-                      {rank}
-                    </span>
-                  )}
-                </button>
-              );
-            }),
-          )}
+                      >
+                        {rank}
+                      </span>
+                    )}
+                  </button>
+                );
+              }),
+            )}
+          </div>
         </div>
       </div>
     </div>

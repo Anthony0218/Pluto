@@ -37,6 +37,15 @@ import ThreeLivesChessBoard from "./components/ThreeLivesChessBoard";
 import MutationChessBoard from "./components/MutationChessBoard";
 import CapitalismChessBoard from "./components/CapitalismChessBoard";
 import CapitalismChessRules from "./components/CapitalismChessRules";
+import HorrorChessRules from "./components/HorrorChessRules";
+import HorrorChessBoard from "./components/HorrorChessBoard";
+import FogOfWarChessBoard from "./components/FogOfWarChessBoard";
+import FogOfWarChessRules from "./components/FogOfWarChessRules";
+import DraftChessBoard from "./components/DraftChessBoard";
+import DraftChessRules from "./components/DraftChessRules";
+import MirrorChessBoard from "./components/MirrorChessBoard";
+import ChessRouletteBoard from "./components/ChessRouletteBoard";
+import ChessHotPotatoBoard from "./components/ChessHotPotatoBoard";
 
 const router = createBrowserRouter([
   {
@@ -129,7 +138,7 @@ const router = createBrowserRouter([
         element: <ChessVariantsMenu />,
       },
       {
-        path: "/chess/variants/three-lives/hotseat",
+        path: "games/chess/variants/three-lives/hotseat",
         element: <ThreeLivesChessBoard />,
       },
       {
@@ -143,6 +152,42 @@ const router = createBrowserRouter([
       {
         path: "/games/chess/variants/chessmarket/rules",
         element: <CapitalismChessRules />,
+      },
+      {
+        path: "/games/chess/variants/horror/hotseat",
+        element: <HorrorChessBoard />,
+      },
+      {
+        path: "/games/chess/variants/horror/rules",
+        element: <HorrorChessRules />,
+      },
+      {
+        path: "/games/chess/variants/fogofwar/hotseat",
+        element: <FogOfWarChessBoard />,
+      },
+      {
+        path: "/games/chess/variants/fogofwar/rules",
+        element: <FogOfWarChessRules />,
+      },
+      {
+        path: "/games/chess/variants/draft/hotseat",
+        element: <DraftChessBoard />,
+      },
+      {
+        path: "/games/chess/variants/draft/rules",
+        element: <DraftChessRules />,
+      },
+      {
+        path: "/games/chess/variants/mirror/hotseat",
+        element: <MirrorChessBoard />,
+      },
+      {
+        path: "/games/chess/variants/roulette/hotseat",
+        element: <ChessRouletteBoard />,
+      },
+      {
+        path: "/games/chess/variants/hotpotato/hotseat",
+        element: <ChessHotPotatoBoard />,
       },
     ],
   },

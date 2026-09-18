@@ -4,7 +4,7 @@ import { Chess, type Square } from "chess.js";
 
 import { getSquareName, type PieceType } from "../utils/chessUtils";
 
-import Board from "./Board.tsx";
+import Board from "./Board";
 
 import {
   playPieceSelectSound,
@@ -26,6 +26,8 @@ import {
   type ThreeLivesHitMoment,
   type ThreeLivesStatsPiece,
 } from "../games/chess/variants/threeLivesStats";
+
+import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.ts";
 
 /* =========================================================
    TYPES
@@ -972,15 +974,20 @@ export default function ThreeLivesChessBoard() {
 
   /*
    * Local Hotseat orientation:
-   * the side to move is always at the bottom.
+   * after a move, keep the mover at the bottom for 1.5 seconds,
+   * then flip to the new side-to-move.
    */
+  const {
+    orientation: liveBoardOrientation,
+    flipPending,
+    snapToSide,
+  } = useDelayedBoardOrientation(game.turn(), 1500);
+
   const boardOrientation: "white" | "black" = historyPreviewChess
     ? historyPreviewChess.turn() === "w"
       ? "white"
       : "black"
-    : game.turn() === "w"
-      ? "white"
-      : "black";
+    : liveBoardOrientation;
 
   const historyPreviewMove = historyPreview
     ? {
@@ -1280,6 +1287,7 @@ export default function ThreeLivesChessBoard() {
     setHeartSeed(createThreeLivesHeartSeed());
 
     game.reset();
+    snapToSide(game.turn());
 
     setPosition(game.fen());
 
@@ -1322,6 +1330,8 @@ export default function ThreeLivesChessBoard() {
     if (!move) {
       return;
     }
+
+    snapToSide(game.turn());
 
     setHistoryPreviewPly(null);
 
@@ -2231,7 +2241,9 @@ export default function ThreeLivesChessBoard() {
                     ? historyPreviewCheckedKingSquare
                     : checkedKingSquare
                 }
-                onSquareClick={historyPreview ? () => {} : handleSquareClick}
+                onSquareClick={
+                  historyPreview || flipPending ? () => {} : handleSquareClick
+                }
                 heartSquares={displayedHeartSquares}
                 orientation={boardOrientation}
               />

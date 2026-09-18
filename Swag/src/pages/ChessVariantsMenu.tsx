@@ -11,6 +11,7 @@ type VariantCard = {
   description: string;
   tags: string[];
   route?: string;
+  rulesRoute?: string;
   available: boolean;
   accent: "red" | "violet" | "amber" | "rose" | "sky" | "emerald" | "zinc";
 };
@@ -35,6 +36,7 @@ function getInitialChessLanguage(): Language {
 
 const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
   de: {
+    Rules: "Regeln",
     "Chess Variants": "Schachvarianten",
     "Different rules. Same board.": "Andere Regeln. Dasselbe Brett.",
     "Seven ways to turn classic chess into something completely different.":
@@ -99,6 +101,7 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
       "Wir bauen ein Regelsystem nach dem anderen, beginnend mit lokalem Hotseat vor KI oder Multiplayer.",
   },
   bar: {
+    Rules: "Regeln",
     "Chess Variants": "Schachvariantn",
     "Different rules. Same board.": "Andere Regeln. S gleiche Brett.",
     "Seven ways to turn classic chess into something completely different.":
@@ -153,6 +156,7 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
       "Mia bauen oane Regelwelt nach da andern, z'erst lokal Hotseat, später KI und Multiplayer.",
   },
   ko: {
+    Rules: "규칙",
     "Chess Variants": "체스 변형",
     "Different rules. Same board.": "다른 규칙. 같은 체스판.",
     "Seven ways to turn classic chess into something completely different.":
@@ -217,6 +221,7 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
       "먼저 로컬 핫시트부터 하나씩 규칙 시스템을 만들고, 이후 AI와 멀티플레이로 확장합니다.",
   },
   ru: {
+    Rules: "Правила",
     "Chess Variants": "Варианты шахмат",
     "Different rules. Same board.": "Другие правила. Та же доска.",
     "Seven ways to turn classic chess into something completely different.":
@@ -316,6 +321,7 @@ const variants: VariantCard[] = [
       "Earn coins through captures, checks, missions and bounties, then spend them on limited Royal Powers.",
     tags: ["Economy", "Bounties", "Missions", "Royal Powers", "Hotseat"],
     route: "/games/chess/variants/chessmarket/hotseat",
+    rulesRoute: "/games/chess/variants/chessmarket/rules",
     available: true,
     accent: "amber",
   },
@@ -327,7 +333,9 @@ const variants: VariantCard[] = [
     description:
       "Infection, cursed pieces, burning squares and knight-triggered freezing turn the board into a survival game.",
     tags: ["Infection", "Curses", "Hot squares", "Knight freeze"],
-    available: false,
+    route: "/games/chess/variants/horror/hotseat",
+    rulesRoute: "/games/chess/variants/horror/rules",
+    available: true,
     accent: "rose",
   },
   {
@@ -338,7 +346,9 @@ const variants: VariantCard[] = [
     description:
       "Limited vision combines with randomized legal starting positions to create hidden-information chess.",
     tags: ["Fog of war", "Random start", "Hidden information"],
-    available: false,
+    available: true,
+    route: "/games/chess/variants/fogofwar/hotseat",
+    rulesRoute: "/games/chess/variants/fogofwar/rules",
     accent: "sky",
   },
   {
@@ -349,7 +359,9 @@ const variants: VariantCard[] = [
     description:
       "Spend a point budget on your starting army. The king must remain on the back rank.",
     tags: ["Budget", "Custom army", "Back-rank king"],
-    available: false,
+    available: true,
+    route: "/games/chess/variants/draft/hotseat",
+    rulesRoute: "/games/chess/variants/draft/rules",
     accent: "emerald",
   },
   {
@@ -360,7 +372,33 @@ const variants: VariantCard[] = [
     description:
       "Create a custom legal formation and mirror it for the opponent so both sides begin symmetrically.",
     tags: ["Custom setup", "Symmetry", "Fair start"],
-    available: false,
+    available: true,
+    route: "/games/chess/variants/mirror/hotseat",
+    rulesRoute: "/games/chess/variants/mirror/rules",
+    accent: "zinc",
+  },
+  {
+    id: "roulette",
+    icon: "◈",
+    title: "Chess Roulette",
+    subtitle: "Roulette Fields on the board",
+    description: "Be careful about your moves.",
+    tags: ["Random", "Casual", "Luck"],
+    available: true,
+    route: "/games/chess/variants/roulette/hotseat",
+    rulesRoute: "/games/chess/variants/roulette/rules",
+    accent: "zinc",
+  },
+  {
+    id: "hotpotato",
+    icon: "◈",
+    title: "Hot Potato Chess",
+    subtitle: "Avoid the bombs!",
+    description: "Try to flee from the bombs.",
+    tags: ["Random", "Casual", "Luck"],
+    available: true,
+    route: "/games/chess/variants/hotpotato/hotseat",
+    rulesRoute: "/games/chess/variants/hotpotato/rules",
     accent: "zinc",
   },
 ];
@@ -537,9 +575,42 @@ function VariantCardView({
           {t(language, variant.subtitle)}
         </p>
 
-        <h2 className="mt-1 text-xl font-black tracking-tight text-white">
-          {t(language, variant.title)}
-        </h2>
+        <div className="mt-1 flex items-center justify-between gap-3">
+          <h2 className="min-w-0 text-xl font-black tracking-tight text-white">
+            {t(language, variant.title)}
+          </h2>
+
+          {variant.rulesRoute && (
+            <Link
+              to={variant.rulesRoute}
+              onClick={(event) => event.stopPropagation()}
+              className={`
+                inline-flex
+                shrink-0
+                items-center
+                gap-1
+                rounded-full
+                border
+                px-2.5
+                py-1
+                text-[10px]
+                font-black
+                uppercase
+                tracking-wide
+                transition
+                hover:-translate-y-0.5
+                ${accentClasses[variant.accent]}
+              `}
+              aria-label={`${t(language, "Rules")} — ${t(
+                language,
+                variant.title,
+              )}`}
+            >
+              <span aria-hidden="true">📖</span>
+              <span>{t(language, "Rules")}</span>
+            </Link>
+          )}
+        </div>
 
         <p className="mt-3 text-sm leading-6 text-zinc-500">
           {t(language, variant.description)}

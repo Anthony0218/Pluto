@@ -49,6 +49,7 @@ import {
 } from "../games/chess/variants/capitalismChess";
 
 import { buildCapitalismStats } from "../games/chess/variants/capitalismStats";
+import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.ts";
 
 /* =========================================================
    TYPES
@@ -633,10 +634,6 @@ export default function CapitalismChessBoard() {
 
   const [winner, setWinner] = useState<Winner>("white");
 
-  const [whitePlayer, setWhitePlayer] = useState("");
-
-  const [blackPlayer, setBlackPlayer] = useState("");
-
   const [historyPreviewPly, setHistoryPreviewPly] = useState<number | null>(
     null,
   );
@@ -665,8 +662,17 @@ export default function CapitalismChessBoard() {
 
   const displayedCapitalState = historyPreview?.stateAfter ?? capitalState;
 
-  const boardOrientation: "white" | "black" =
-    displayedChess.turn() === "w" ? "white" : "black";
+  const {
+    orientation: liveBoardOrientation,
+    flipPending,
+    snapToSide,
+  } = useDelayedBoardOrientation(game.turn(), 1500);
+
+  const boardOrientation: "white" | "black" = historyPreviewChess
+    ? historyPreviewChess.turn() === "w"
+      ? "white"
+      : "black"
+    : liveBoardOrientation;
 
   const historyPreviewMove = historyPreview
     ? {
@@ -860,9 +866,26 @@ export default function CapitalismChessBoard() {
         promotion,
       });
 
+      const captured =
+        move.captured === "p" ||
+        move.captured === "n" ||
+        move.captured === "b" ||
+        move.captured === "r" ||
+        move.captured === "q"
+          ? move.captured
+          : undefined;
+
+      const promotedTo =
+        move.promotion === "q" ||
+        move.promotion === "r" ||
+        move.promotion === "b" ||
+        move.promotion === "n"
+          ? move.promotion
+          : undefined;
+
       let capturedSquare: Square | null = null;
 
-      if (move.captured) {
+      if (captured) {
         /*
          * If destination was empty before a capture,
          * this was en-passant.
@@ -881,9 +904,9 @@ export default function CapitalismChessBoard() {
           piece: move.piece,
           from: move.from,
           to: move.to,
-          captured: move.captured,
+          captured,
           capturedSquare,
-          promotion: move.promotion,
+          promotion: promotedTo,
           isCheck: game.isCheck(),
           isCastle: move.isKingsideCastle() || move.isQueensideCastle(),
           isKingsideCastle: move.isKingsideCastle(),
@@ -900,8 +923,8 @@ export default function CapitalismChessBoard() {
         from: move.from,
         to: move.to,
         piece: move.piece,
-        captured: move.captured,
-        promotion: move.promotion,
+        captured,
+        promotion: promotedTo,
         fenAfter: game.fen(),
         economy: economyResult.event,
         stateAfter: economyResult.state,
@@ -924,7 +947,7 @@ export default function CapitalismChessBoard() {
       setPromotionSquare(null);
       setHistoryPreviewPly(null);
 
-      if (move.captured) {
+      if (captured) {
         playPieceCaptureSound(move.piece);
       } else {
         playPieceMoveSound(move.piece);
@@ -1105,6 +1128,7 @@ export default function CapitalismChessBoard() {
       nextRecords[nextRecords.length - 1]?.fenAfter ?? new Chess().fen();
 
     game.load(targetFen);
+    snapToSide(game.turn());
 
     const restoredState =
       nextRecords[nextRecords.length - 1]?.stateAfter ??
@@ -1139,6 +1163,7 @@ export default function CapitalismChessBoard() {
 
   function restartGame() {
     game.reset();
+    snapToSide(game.turn());
 
     const nextSeed = createCapitalismSeed();
 
@@ -1319,15 +1344,163 @@ export default function CapitalismChessBoard() {
                 />
 
                 <CapitalismGameControls
-                  whitePlayer={whitePlayer}
-                  blackPlayer={blackPlayer}
-                  onWhitePlayerChange={setWhitePlayer}
-                  onBlackPlayerChange={setBlackPlayer}
                   onUndo={undoMove}
                   onRestart={restartGame}
                   t={t}
                 />
               </Panel>
+
+              {/* PIECE MARKET */}
+
+              <section className="rounded-3xl border border-amber-400/15 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
+                <div className="mb-4 flex items-start justify-between gap-3">
+                  <div>
+                    <h2 className="font-bold text-zinc-100">
+                      {t("Piece Market")}
+                    </h2>
+
+                    <p className="mt-1 text-xs leading-5 text-zinc-500">
+                      {t(
+                        "Buy a piece and spawn it on an empty rook home square",
+                      )}
+                    </p>
+                  </div>
+
+                  <CoinIcon size="md" />
+                </div>
+
+                <div className="mb-3 flex items-center justify-between rounded-xl bg-amber-400/[0.06] px-3 py-2">
+                  <span className="text-xs font-black text-zinc-300">
+                    {currentSide === "white"
+                      ? `♔ ${t("White")}`
+                      : `♚ ${t("Black")}`}
+                  </span>
+
+                  <span className="flex items-center gap-1.5 text-sm font-black text-amber-200">
+                    <CoinIcon size="sm" />
+                    {capitalState.coins[currentSide]}
+                  </span>
+                </div>
+
+                {game.isCheck() ? (
+                  <div className="rounded-xl border border-red-400/10 bg-red-400/[0.04] px-3 py-3 text-xs text-red-300">
+                    {t("Cannot buy while in check")}
+                  </div>
+                ) : availableShopSquares.length === 0 ? (
+                  <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3 text-xs text-zinc-600">
+                    {t("No rook home square is free")}
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {(
+                      [
+                        ["p", "Pawn"],
+                        ["n", "Knight"],
+                        ["b", "Bishop"],
+                        ["r", "Rook"],
+                        ["q", "Queen"],
+                      ] as Array<[ShopPieceType, string]>
+                    ).map(([piece, label]) => (
+                      <ShopPieceRow
+                        key={piece}
+                        piece={piece}
+                        label={t(label)}
+                        cost={SHOP_PIECE_COSTS[piece]}
+                        availableSquares={availableShopSquares}
+                        enabledSquares={availableShopSquares.filter((square) =>
+                          canBuyPiece({
+                            state: capitalState,
+                            game,
+                            side: currentSide,
+                            piece,
+                            square,
+                          }),
+                        )}
+                        side={currentSide}
+                        onBuy={(square) => purchasePiece(piece, square)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </section>
+
+              {/* ROYAL POWERS */}
+
+              <section className="rounded-3xl border border-amber-400/15 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
+                <div className="mb-4 flex items-start justify-between gap-3">
+                  <div>
+                    <h2 className="font-bold text-zinc-100">
+                      {t("Royal Powers")}
+                    </h2>
+
+                    <p className="mt-1 text-xs text-zinc-500">
+                      {t("Current player may spend coins")}
+                    </p>
+                  </div>
+
+                  <span className="text-xl text-amber-300">♛</span>
+                </div>
+
+                <div className="mb-3 rounded-xl bg-amber-400/[0.06] px-3 py-2 text-xs font-black text-amber-200">
+                  {currentSide === "white"
+                    ? `♔ ${t("White")}`
+                    : `♚ ${t("Black")}`}{" "}
+                  · {capitalState.coins[currentSide]} $
+                </div>
+
+                <div className="space-y-2">
+                  <PowerButton
+                    title={t("Royal Investment")}
+                    detail={t("Double the next capture income")}
+                    cost={ROYAL_POWER_COSTS.investment}
+                    used={capitalState.powers[currentSide].investmentUsed}
+                    armed={capitalState.powers[currentSide].investmentArmed}
+                    enabled={
+                      !gameOver &&
+                      !historyPreview &&
+                      canUseRoyalPower(capitalState, currentSide, "investment")
+                    }
+                    onClick={() => useRoyalPower("investment")}
+                    t={t}
+                  />
+
+                  <PowerButton
+                    title={t("Mission Decree")}
+                    detail={t("Reroll your current mission")}
+                    cost={ROYAL_POWER_COSTS.mission_decree}
+                    used={capitalState.powers[currentSide].missionDecreeUsed}
+                    enabled={
+                      !gameOver &&
+                      !historyPreview &&
+                      canUseRoyalPower(
+                        capitalState,
+                        currentSide,
+                        "mission_decree",
+                      )
+                    }
+                    onClick={() => useRoyalPower("mission_decree")}
+                    t={t}
+                  />
+
+                  <PowerButton
+                    title={t("Bounty Decree")}
+                    detail={t("Reroll your bounty target")}
+                    cost={ROYAL_POWER_COSTS.bounty_decree}
+                    used={capitalState.powers[currentSide].bountyDecreeUsed}
+                    enabled={
+                      !gameOver &&
+                      !historyPreview &&
+                      canUseRoyalPower(
+                        capitalState,
+                        currentSide,
+                        "bounty_decree",
+                      )
+                    }
+                    onClick={() => useRoyalPower("bounty_decree")}
+                    t={t}
+                  />
+                </div>
+              </section>
 
               <Panel>
                 <div className="mb-4 flex items-start justify-between gap-3">
@@ -1562,7 +1735,9 @@ export default function CapitalismChessBoard() {
                     ? historyPreviewCheckedKingSquare
                     : checkedKingSquare
                 }
-                onSquareClick={historyPreview ? () => {} : handleSquareClick}
+                onSquareClick={
+                  historyPreview || flipPending ? () => {} : handleSquareClick
+                }
                 bountySquares={displayedBountySquares}
                 shopSpawnSquares={historyPreview ? [] : shopSpawnSquares}
                 availableShopSpawnSquares={
@@ -1599,13 +1774,13 @@ export default function CapitalismChessBoard() {
                 <div className="grid grid-cols-2 gap-3">
                   <TreasuryCard
                     side="white"
-                    name={whitePlayer.trim() || t("White")}
+                    name={t("White")}
                     coins={displayedCapitalState.coins.white}
                   />
 
                   <TreasuryCard
                     side="black"
-                    name={blackPlayer.trim() || t("Black")}
+                    name={t("Black")}
                     coins={displayedCapitalState.coins.black}
                   />
                 </div>
@@ -1637,158 +1812,6 @@ export default function CapitalismChessBoard() {
                     side="black"
                     state={displayedCapitalState}
                     chess={displayedChess}
-                    t={t}
-                  />
-                </div>
-              </section>
-
-              {/* PIECE MARKET */}
-
-              <section className="rounded-3xl border border-amber-400/15 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
-                <div className="mb-4 flex items-start justify-between gap-3">
-                  <div>
-                    <h2 className="font-bold text-zinc-100">
-                      {t("Piece Market")}
-                    </h2>
-
-                    <p className="mt-1 text-xs leading-5 text-zinc-500">
-                      {t(
-                        "Buy a piece and spawn it on an empty rook home square",
-                      )}
-                    </p>
-                  </div>
-
-                  <CoinIcon size="md" />
-                </div>
-
-                <div className="mb-3 flex items-center justify-between rounded-xl bg-amber-400/[0.06] px-3 py-2">
-                  <span className="text-xs font-black text-zinc-300">
-                    {currentSide === "white"
-                      ? `♔ ${t("White")}`
-                      : `♚ ${t("Black")}`}
-                  </span>
-
-                  <span className="flex items-center gap-1.5 text-sm font-black text-amber-200">
-                    <CoinIcon size="sm" />
-                    {capitalState.coins[currentSide]}
-                  </span>
-                </div>
-
-                {game.isCheck() ? (
-                  <div className="rounded-xl border border-red-400/10 bg-red-400/[0.04] px-3 py-3 text-xs text-red-300">
-                    {t("Cannot buy while in check")}
-                  </div>
-                ) : availableShopSquares.length === 0 ? (
-                  <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3 text-xs text-zinc-600">
-                    {t("No rook home square is free")}
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {(
-                      [
-                        ["p", "Pawn"],
-                        ["n", "Knight"],
-                        ["b", "Bishop"],
-                        ["r", "Rook"],
-                        ["q", "Queen"],
-                      ] as Array<[ShopPieceType, string]>
-                    ).map(([piece, label]) => (
-                      <ShopPieceRow
-                        key={piece}
-                        piece={piece}
-                        label={t(label)}
-                        cost={SHOP_PIECE_COSTS[piece]}
-                        availableSquares={availableShopSquares}
-                        enabledSquares={availableShopSquares.filter((square) =>
-                          canBuyPiece({
-                            state: capitalState,
-                            game,
-                            side: currentSide,
-                            piece,
-                            square,
-                          }),
-                        )}
-                        side={currentSide}
-                        onBuy={(square) => purchasePiece(piece, square)}
-                      />
-                    ))}
-                  </div>
-                )}
-              </section>
-
-              {/* ROYAL POWERS */}
-
-              <section className="rounded-3xl border border-amber-400/15 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
-                <div className="mb-4 flex items-start justify-between gap-3">
-                  <div>
-                    <h2 className="font-bold text-zinc-100">
-                      {t("Royal Powers")}
-                    </h2>
-
-                    <p className="mt-1 text-xs text-zinc-500">
-                      {t("Current player may spend coins")}
-                    </p>
-                  </div>
-
-                  <span className="text-xl text-amber-300">♛</span>
-                </div>
-
-                <div className="mb-3 rounded-xl bg-amber-400/[0.06] px-3 py-2 text-xs font-black text-amber-200">
-                  {currentSide === "white"
-                    ? `♔ ${t("White")}`
-                    : `♚ ${t("Black")}`}{" "}
-                  · {capitalState.coins[currentSide]} $
-                </div>
-
-                <div className="space-y-2">
-                  <PowerButton
-                    title={t("Royal Investment")}
-                    detail={t("Double the next capture income")}
-                    cost={ROYAL_POWER_COSTS.investment}
-                    used={capitalState.powers[currentSide].investmentUsed}
-                    armed={capitalState.powers[currentSide].investmentArmed}
-                    enabled={
-                      !gameOver &&
-                      !historyPreview &&
-                      canUseRoyalPower(capitalState, currentSide, "investment")
-                    }
-                    onClick={() => useRoyalPower("investment")}
-                    t={t}
-                  />
-
-                  <PowerButton
-                    title={t("Mission Decree")}
-                    detail={t("Reroll your current mission")}
-                    cost={ROYAL_POWER_COSTS.mission_decree}
-                    used={capitalState.powers[currentSide].missionDecreeUsed}
-                    enabled={
-                      !gameOver &&
-                      !historyPreview &&
-                      canUseRoyalPower(
-                        capitalState,
-                        currentSide,
-                        "mission_decree",
-                      )
-                    }
-                    onClick={() => useRoyalPower("mission_decree")}
-                    t={t}
-                  />
-
-                  <PowerButton
-                    title={t("Bounty Decree")}
-                    detail={t("Reroll your bounty target")}
-                    cost={ROYAL_POWER_COSTS.bounty_decree}
-                    used={capitalState.powers[currentSide].bountyDecreeUsed}
-                    enabled={
-                      !gameOver &&
-                      !historyPreview &&
-                      canUseRoyalPower(
-                        capitalState,
-                        currentSide,
-                        "bounty_decree",
-                      )
-                    }
-                    onClick={() => useRoyalPower("bounty_decree")}
                     t={t}
                   />
                 </div>
@@ -2100,67 +2123,31 @@ function PanelTitle({
 }
 
 function CapitalismGameControls({
-  whitePlayer,
-  blackPlayer,
-  onWhitePlayerChange,
-  onBlackPlayerChange,
   onUndo,
   onRestart,
   t,
 }: {
-  whitePlayer: string;
-  blackPlayer: string;
-  onWhitePlayerChange: (value: string) => void;
-  onBlackPlayerChange: (value: string) => void;
   onUndo: () => void;
   onRestart: () => void;
   t: (key: string) => string;
 }) {
   return (
-    <div className="space-y-4">
-      <label className="block">
-        <span className="mb-1.5 block text-[10px] font-black uppercase tracking-wider text-zinc-600">
-          {t("White player")}
-        </span>
+    <div className="grid grid-cols-2 gap-2">
+      <button
+        type="button"
+        onClick={onUndo}
+        className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm font-bold text-zinc-300 transition hover:bg-white/10 hover:text-white"
+      >
+        ↶ {t("Undo")}
+      </button>
 
-        <input
-          value={whitePlayer}
-          onChange={(event) => onWhitePlayerChange(event.target.value)}
-          placeholder={t("White")}
-          className="w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 text-sm text-zinc-200 outline-none transition placeholder:text-zinc-700 focus:border-amber-400/30"
-        />
-      </label>
-
-      <label className="block">
-        <span className="mb-1.5 block text-[10px] font-black uppercase tracking-wider text-zinc-600">
-          {t("Black player")}
-        </span>
-
-        <input
-          value={blackPlayer}
-          onChange={(event) => onBlackPlayerChange(event.target.value)}
-          placeholder={t("Black")}
-          className="w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 text-sm text-zinc-200 outline-none transition placeholder:text-zinc-700 focus:border-amber-400/30"
-        />
-      </label>
-
-      <div className="grid grid-cols-2 gap-2">
-        <button
-          type="button"
-          onClick={onUndo}
-          className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm font-bold text-zinc-300 transition hover:bg-white/10 hover:text-white"
-        >
-          ↶ {t("Undo")}
-        </button>
-
-        <button
-          type="button"
-          onClick={onRestart}
-          className="rounded-xl border border-amber-400/15 bg-amber-400/[0.06] px-3 py-2.5 text-sm font-bold text-amber-300 transition hover:bg-amber-400/[0.12]"
-        >
-          ↻ {t("Restart")}
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={onRestart}
+        className="rounded-xl border border-amber-400/15 bg-amber-400/[0.06] px-3 py-2.5 text-sm font-bold text-amber-300 transition hover:bg-amber-400/[0.12]"
+      >
+        ↻ {t("Restart")}
+      </button>
     </div>
   );
 }
