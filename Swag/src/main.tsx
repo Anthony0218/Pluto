@@ -32,6 +32,11 @@ import ChessMultiplayerLobby from "./pages/ChessMultiplayerLobby";
 import ChessMultiplayerRoom from "./pages/ChessMultiplayerRoom";
 import ChessMultiplayerGame from "./pages/ChessMultiplayerGame";
 import ChessRulesAndTips from "./components/ChessRulesAndTips";
+import ChessVariantsMenu from "./pages/ChessVariantsMenu";
+import ThreeLivesChessBoard from "./components/ThreeLivesChessBoard";
+import MutationChessBoard from "./components/MutationChessBoard";
+import CapitalismChessBoard from "./components/CapitalismChessBoard";
+import CapitalismChessRules from "./components/CapitalismChessRules";
 
 const router = createBrowserRouter([
   {
@@ -118,6 +123,26 @@ const router = createBrowserRouter([
       {
         path: "/chess/rules",
         element: <ChessRulesAndTips />,
+      },
+      {
+        path: "/chess/variants",
+        element: <ChessVariantsMenu />,
+      },
+      {
+        path: "/chess/variants/three-lives/hotseat",
+        element: <ThreeLivesChessBoard />,
+      },
+      {
+        path: "/games/chess/variants/mutation/hotseat",
+        element: <MutationChessBoard />,
+      },
+      {
+        path: "/games/chess/variants/chessmarket/hotseat",
+        element: <CapitalismChessBoard />,
+      },
+      {
+        path: "/games/chess/variants/chessmarket/rules",
+        element: <CapitalismChessRules />,
       },
     ],
   },
