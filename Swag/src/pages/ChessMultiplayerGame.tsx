@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Link, useParams } from "react-router-dom";
 
@@ -6,6 +6,15 @@ import { Chess, type Square } from "chess.js";
 
 import Board from "../components/Board";
 import PromotionBar from "../components/PromotionBar";
+import ChessGameReview from "../components/ChessGameReview";
+
+import { type PieceType } from "../utils/chessUtils";
+import {
+  playPieceSelectSound,
+  playPieceMoveSound,
+  playPieceCaptureSound,
+  playRandomSound,
+} from "../utils/sound.ts";
 
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
@@ -22,6 +31,7 @@ type RoomPlayer = {
   user_id: string;
   seat: number;
   display_name: string;
+  chosen_color: "white" | "black" | null;
 };
 
 type MultiplayerGame = {
@@ -45,6 +55,17 @@ type MultiplayerGame = {
 
   white_rematch_ready: boolean;
   black_rematch_ready: boolean;
+
+  undo_requested_by: string | null;
+  undo_requested_version: number | null;
+
+  /*
+   * Persistent anti-spam marker:
+   * once this user requested Undo for this exact game version,
+   * the same move cannot be requested again after Decline.
+   */
+  undo_last_requested_by: string | null;
+  undo_last_requested_version: number | null;
 };
 
 type GameOutcome = {
@@ -66,6 +87,23 @@ const languageOptions: Array<{ value: Language; label: string }> = [
 ];
 
 const deTranslations: Record<string, string> = {
+  "Undo request sent": "Rücknahme angefragt",
+  "Waiting for opponent response...": "Warte auf Antwort des Gegners...",
+  "Opponent requests to undo the last move.":
+    "Der Gegner möchte den letzten Zug zurücknehmen.",
+  "Accept Undo": "Rücknahme akzeptieren",
+  Decline: "Ablehnen",
+  "Only the player who made the last move can request undo.":
+    "Nur der Spieler, der den letzten Zug gemacht hat, kann eine Rücknahme anfragen.",
+  "You already requested undo for this move.":
+    "Für diesen Zug hast du bereits eine Rücknahme angefragt.",
+  "Choose Side": "Seite wählen",
+  "Side selection locks after the first move.":
+    "Die Seitenwahl wird nach dem ersten Zug gesperrt.",
+  Chosen: "Gewählt",
+  Current: "Aktuell",
+  "A side already chosen by your opponent is locked.":
+    "Eine vom Gegner bereits gewählte Seite ist gesperrt.",
   Language: "Sprache",
   "Classic Chess": "Klassisches Schach",
   Hotseat: "Hotseat",
@@ -213,6 +251,23 @@ const deTranslations: Record<string, string> = {
   "Black in check": "Schwarz im Schach",
 };
 const bavarianTranslations: Record<string, string> = {
+  "Undo request sent": "Zrucknehma angfragt",
+  "Waiting for opponent response...": "Wart auf de Antwort vom Gegner...",
+  "Opponent requests to undo the last move.":
+    "Da Gegner mecht den letzten Zug zrucknehma.",
+  "Accept Undo": "Zrucknehma erlaubn",
+  Decline: "Ablehna",
+  "Only the player who made the last move can request undo.":
+    "Bloß da Spieler vom letzten Zug ko a Zrucknehma anfragn.",
+  "You already requested undo for this move.":
+    "Für den Zug host scho a Zrucknehma angfragt.",
+  "Choose Side": "Seitn aussuacha",
+  "Side selection locks after the first move.":
+    "Nachm ersten Zug is d Seitnwahl gspeichert.",
+  Chosen: "G'wählt",
+  Current: "Aktuell",
+  "A side already chosen by your opponent is locked.":
+    "A Seitn, de da Gegner scho g'wählt hod, is g'sperrt.",
   Language: "Sproch",
   "Classic Chess": "Klassisches Schach",
   "Two players · one board": "Zwoa Spieler · oa Brett",
@@ -271,6 +326,23 @@ const bavarianTranslations: Record<string, string> = {
   "Black in check": "Schwarz im Schach",
 };
 const koreanTranslations: Record<string, string> = {
+  "Undo request sent": "되돌리기 요청 전송됨",
+  "Waiting for opponent response...": "상대의 응답을 기다리는 중...",
+  "Opponent requests to undo the last move.":
+    "상대가 마지막 수를 되돌리기를 요청했습니다.",
+  "Accept Undo": "되돌리기 수락",
+  Decline: "거절",
+  "Only the player who made the last move can request undo.":
+    "마지막 수를 둔 플레이어만 되돌리기를 요청할 수 있습니다.",
+  "You already requested undo for this move.":
+    "이 수에 대해서는 이미 되돌리기를 요청했습니다.",
+  "Choose Side": "진영 선택",
+  "Side selection locks after the first move.":
+    "첫 수가 두어진 뒤에는 진영을 바꿀 수 없습니다.",
+  Chosen: "선택",
+  Current: "현재",
+  "A side already chosen by your opponent is locked.":
+    "상대가 이미 선택한 진영은 선택할 수 없습니다.",
   Language: "언어",
   "Classic Chess": "클래식 체스",
   Hotseat: "핫시트",
@@ -415,6 +487,23 @@ const koreanTranslations: Record<string, string> = {
   "Black in check": "흑 체크 횟수",
 };
 const russianTranslations: Record<string, string> = {
+  "Undo request sent": "Запрос отмены отправлен",
+  "Waiting for opponent response...": "Ожидание ответа соперника...",
+  "Opponent requests to undo the last move.":
+    "Соперник просит отменить последний ход.",
+  "Accept Undo": "Принять отмену",
+  Decline: "Отклонить",
+  "Only the player who made the last move can request undo.":
+    "Запросить отмену может только игрок, сделавший последний ход.",
+  "You already requested undo for this move.":
+    "Вы уже запрашивали отмену этого хода.",
+  "Choose Side": "Выбрать сторону",
+  "Side selection locks after the first move.":
+    "Выбор стороны блокируется после первого хода.",
+  Chosen: "Выбрано",
+  Current: "Сейчас",
+  "A side already chosen by your opponent is locked.":
+    "Сторона, уже выбранная соперником, недоступна.",
   Language: "Язык",
   "Classic Chess": "Классические шахматы",
   Hotseat: "Хотсит",
@@ -631,6 +720,24 @@ function ChessLanguageSelector({
   );
 }
 
+const pieceValues: Record<string, number> = {
+  p: 1,
+  n: 3,
+  b: 3,
+  r: 5,
+  q: 9,
+  k: 0,
+};
+
+const pieceValueList = [
+  { type: "p", symbol: "♙", name: "Pawn" },
+  { type: "n", symbol: "♘", name: "Knight" },
+  { type: "b", symbol: "♗", name: "Bishop" },
+  { type: "r", symbol: "♖", name: "Rook" },
+  { type: "q", symbol: "♕", name: "Queen" },
+  { type: "k", symbol: "♔", name: "King" },
+];
+
 function getGameOutcome(game: Chess): GameOutcome {
   if (game.isCheckmate()) {
     return {
@@ -732,9 +839,72 @@ export default function ChessMultiplayerGame() {
 
   const [showResignConfirm, setShowResignConfirm] = useState(false);
 
+  const [reviewOpen, setReviewOpen] = useState(false);
+
+  /*
+   * Keep an independent copy of the completed game's moves.
+   * This prevents a late Realtime packet from making post-game review
+   * disappear for one side.
+   */
+  const [completedGameMoves, setCompletedGameMoves] = useState<string[]>([]);
+
+  const [historyPreviewPly, setHistoryPreviewPly] = useState<number | null>(
+    null,
+  );
+
   const [actionLoading, setActionLoading] = useState<
-    "resign" | "rematch" | null
+    "resign" | "rematch" | "undo-request" | "undo-response" | "side" | null
   >(null);
+
+  // Multiplayer deliberately has NO live Stockfish/Coach hook.
+  // Engine analysis is only mounted after the game through ChessGameReview.
+  const lastSeenMoveCountRef = useRef(0);
+
+  /*
+   * Deduplicate game-end sounds by the finished game itself, not by row
+   * version or delivery order. Polling and Realtime may observe the same
+   * checkmate in either order, but the signature below stays identical.
+   */
+  const lastGameEndSoundKeyRef = useRef<string | null>(null);
+
+  function playSound(sound: string) {
+    const audio = new Audio(`/sounds/${sound}.mp3`);
+    audio.play().catch(() => {});
+  }
+
+  function getGameEndSoundKey(game: MultiplayerGame): string | null {
+    if (game.status !== "finished") {
+      return null;
+    }
+
+    const lastMove = game.moves[game.moves.length - 1] ?? "no-move";
+
+    return [
+      game.moves.length,
+      lastMove,
+      game.winner ?? "no-winner",
+      game.end_reason ?? "no-reason",
+    ].join("|");
+  }
+
+  function maybePlayGameEndSound(game: MultiplayerGame) {
+    /*
+     * A genuine rematch/new game resets the deduplication key.
+     */
+    if (game.status === "playing" && game.moves.length === 0) {
+      lastGameEndSoundKeyRef.current = null;
+      return;
+    }
+
+    const soundKey = getGameEndSoundKey(game);
+
+    if (!soundKey || lastGameEndSoundKeyRef.current === soundKey) {
+      return;
+    }
+
+    lastGameEndSoundKeyRef.current = soundKey;
+    playSound(game.winner === "draw" ? "draw" : "checkmate");
+  }
   async function resignGame() {
     if (!room || gameState?.status !== "playing" || actionLoading) {
       return;
@@ -756,7 +926,10 @@ export default function ChessMultiplayerGame() {
       console.error(resignError);
 
       setError(resignError.message);
+      return;
     }
+
+    await refreshChessGameState();
   }
   async function requestRematch() {
     if (!room || gameState?.status !== "finished" || actionLoading) {
@@ -783,6 +956,299 @@ export default function ChessMultiplayerGame() {
     }
   }
 
+  async function refreshChessGameState() {
+    if (!room) {
+      return;
+    }
+
+    const { data, error: refreshError } = await supabase
+      .from("chess_games")
+      .select(
+        `
+          room_id,
+          fen,
+          moves,
+          status,
+          winner,
+          end_reason,
+          version,
+          last_move_from,
+          last_move_to,
+          white_rematch_ready,
+          black_rematch_ready,
+          undo_requested_by,
+          undo_requested_version,
+          undo_last_requested_by,
+          undo_last_requested_version
+        `,
+      )
+      .eq("room_id", room.id)
+      .single();
+
+    if (refreshError || !data) {
+      console.error("Could not refresh chess game:", refreshError);
+      return;
+    }
+
+    const refreshedGame = data as MultiplayerGame;
+
+    setGameState((current) => {
+      if (
+        current &&
+        current.version === refreshedGame.version &&
+        current.fen === refreshedGame.fen &&
+        current.status === refreshedGame.status &&
+        current.winner === refreshedGame.winner &&
+        current.end_reason === refreshedGame.end_reason &&
+        current.undo_requested_by === refreshedGame.undo_requested_by &&
+        current.undo_requested_version ===
+          refreshedGame.undo_requested_version &&
+        current.undo_last_requested_by ===
+          refreshedGame.undo_last_requested_by &&
+        current.undo_last_requested_version ===
+          refreshedGame.undo_last_requested_version &&
+        current.white_rematch_ready === refreshedGame.white_rematch_ready &&
+        current.black_rematch_ready === refreshedGame.black_rematch_ready &&
+        current.moves.length === refreshedGame.moves.length &&
+        current.moves.every(
+          (move, index) => move === refreshedGame.moves[index],
+        )
+      ) {
+        return current;
+      }
+
+      return refreshedGame;
+    });
+
+    maybePlayGameEndSound(refreshedGame);
+    lastSeenMoveCountRef.current = (refreshedGame.moves ?? []).length;
+
+    if (
+      refreshedGame.moves.length > 0 &&
+      (refreshedGame.status === "finished" ||
+        refreshedGame.winner !== null ||
+        refreshedGame.end_reason !== null)
+    ) {
+      setCompletedGameMoves(refreshedGame.moves);
+    }
+  }
+
+  async function refreshRoomPlayers() {
+    if (!room || !user) {
+      return;
+    }
+
+    const { data, error: playerRefreshError } = await supabase
+      .from("chess_room_players")
+      .select(
+        `
+          room_id,
+          user_id,
+          seat,
+          display_name,
+          chosen_color
+        `,
+      )
+      .eq("room_id", room.id)
+      .order("seat", {
+        ascending: true,
+      });
+
+    if (playerRefreshError || !data) {
+      console.error("Could not refresh chess players:", playerRefreshError);
+      return;
+    }
+
+    const refreshedPlayers = data as RoomPlayer[];
+
+    setPlayers(refreshedPlayers);
+
+    const me = refreshedPlayers.find((player) => player.user_id === user.id);
+
+    if (me) {
+      setMySeat(me.seat);
+    }
+  }
+
+  async function chooseSide(color: "white" | "black") {
+    if (
+      !room ||
+      !gameState ||
+      gameState.moves.length !== 0 ||
+      gameState.status !== "playing" ||
+      actionLoading
+    ) {
+      return;
+    }
+
+    setActionLoading("side");
+    setError(null);
+
+    const { error: sideError } = await supabase.rpc("choose_chess_side", {
+      p_room_id: room.id,
+      p_color: color,
+    });
+
+    if (sideError) {
+      console.error("choose_chess_side failed:", sideError);
+      setError(sideError.message);
+    }
+
+    await refreshRoomPlayers();
+    setSelectedSquare(null);
+    setLegalMoves([]);
+    setPromotionFrom(null);
+    setPromotionSquare(null);
+    setActionLoading(null);
+  }
+
+  function buildUndoSnapshot(moves: string[]) {
+    if (moves.length === 0) {
+      return null;
+    }
+
+    const replay = new Chess();
+    let previousLastFrom: Square | null = null;
+    let previousLastTo: Square | null = null;
+
+    for (let index = 0; index < moves.length - 1; index += 1) {
+      const replayedMove = replay.move(moves[index]);
+      previousLastFrom = replayedMove.from;
+      previousLastTo = replayedMove.to;
+    }
+
+    return {
+      previousFen: replay.fen(),
+      previousLastFrom,
+      previousLastTo,
+    };
+  }
+
+  async function requestUndo() {
+    if (
+      !room ||
+      !gameState ||
+      gameState.status !== "playing" ||
+      gameState.moves.length === 0 ||
+      gameState.undo_requested_by ||
+      actionLoading
+    ) {
+      return;
+    }
+
+    /*
+     * One SAN entry equals one ply:
+     *   odd number of plies  -> White made the latest move (seat 0)
+     *   even number of plies -> Black made the latest move (seat 1)
+     */
+    const requestLastMoverSeat = gameState.moves.length % 2 === 1 ? 0 : 1;
+
+    if (mySeat !== requestLastMoverSeat) {
+      setError(t("Only the player who made the last move can request undo."));
+      return;
+    }
+
+    const alreadyRequestedThisMove =
+      Boolean(user?.id) &&
+      gameState.undo_last_requested_by === user?.id &&
+      gameState.undo_last_requested_version === gameState.version;
+
+    if (alreadyRequestedThisMove) {
+      setError(t("You already requested undo for this move."));
+      return;
+    }
+
+    const snapshot = buildUndoSnapshot(gameState.moves);
+
+    if (!snapshot) {
+      return;
+    }
+
+    setActionLoading("undo-request");
+    setError(null);
+
+    const { error: undoError } = await supabase.rpc("request_chess_undo", {
+      p_room_id: room.id,
+      p_previous_fen: snapshot.previousFen,
+      p_previous_last_from: snapshot.previousLastFrom,
+      p_previous_last_to: snapshot.previousLastTo,
+    });
+
+    if (undoError) {
+      console.error(undoError);
+      setError(undoError.message);
+    } else if (user?.id) {
+      setGameState((current) =>
+        current
+          ? {
+              ...current,
+              undo_requested_by: user.id,
+              undo_last_requested_by: user.id,
+              undo_last_requested_version: current.version,
+            }
+          : current,
+      );
+    }
+
+    /*
+     * Do not depend only on Realtime for an undo request.
+     * Fetch the authoritative row immediately so both clients see
+     * the pending state consistently even if a Realtime event is late.
+     */
+    await refreshChessGameState();
+    setActionLoading(null);
+  }
+
+  async function respondToUndo(accept: boolean) {
+    if (
+      !room ||
+      !gameState ||
+      gameState.status !== "playing" ||
+      !gameState.undo_requested_by ||
+      actionLoading
+    ) {
+      return;
+    }
+
+    setActionLoading("undo-response");
+    setError(null);
+
+    const { error: undoError } = await supabase.rpc("respond_chess_undo", {
+      p_room_id: room.id,
+      p_accept: accept,
+    });
+
+    if (undoError) {
+      console.error(undoError);
+      setError(undoError.message);
+    } else {
+      setGameState((current) =>
+        current
+          ? {
+              ...current,
+              undo_requested_by: null,
+              undo_requested_version: null,
+            }
+          : current,
+      );
+
+      if (accept) {
+        /*
+         * If the last move disappears, any historical preview based on
+         * the old move list must be closed.
+         */
+        setHistoryPreviewPly(null);
+        setSelectedSquare(null);
+        setLegalMoves([]);
+        setPromotionFrom(null);
+        setPromotionSquare(null);
+      }
+    }
+
+    await refreshChessGameState();
+    setActionLoading(null);
+  }
+
   /*
    * Build a fresh chess.js game whenever
    * the database FEN changes.
@@ -800,10 +1266,201 @@ export default function ChessMultiplayerGame() {
 
   const board = chess.board();
 
+  /* =========================================================
+     CLICKABLE MOVE HISTORY PREVIEW
+     ========================================================= */
+
+  const historyRows = useMemo(() => {
+    const replay = new Chess();
+    const rows: Array<{
+      ply: number;
+      moveNumber: number;
+      color: "w" | "b";
+      san: string;
+      from: Square;
+      to: Square;
+      piece: string;
+      fenAfter: string;
+    }> = [];
+
+    for (const [index, san] of (gameState?.moves ?? []).entries()) {
+      try {
+        const move = replay.move(san);
+
+        rows.push({
+          ply: index + 1,
+          moveNumber: Math.floor(index / 2) + 1,
+          color: move.color,
+          san: move.san,
+          from: move.from,
+          to: move.to,
+          piece: move.piece,
+          fenAfter: replay.fen(),
+        });
+      } catch {
+        break;
+      }
+    }
+
+    return rows;
+  }, [gameState?.moves]);
+
+  const materialState = useMemo(() => {
+    const replay = new Chess();
+    const capturedWhite: PieceType[] = [];
+    const capturedBlack: PieceType[] = [];
+    let whiteChecks = 0;
+    let blackChecks = 0;
+
+    for (const san of gameState?.moves ?? []) {
+      const move = replay.move(san);
+
+      if (move.captured) {
+        if (move.color === "w") capturedBlack.push(move.captured as PieceType);
+        else capturedWhite.push(move.captured as PieceType);
+      }
+
+      if (replay.isCheck()) {
+        if (replay.turn() === "w") whiteChecks += 1;
+        else blackChecks += 1;
+      }
+    }
+
+    const whiteMaterial = capturedBlack.reduce(
+      (total, piece) => total + pieceValues[piece],
+      0,
+    );
+    const blackMaterial = capturedWhite.reduce(
+      (total, piece) => total + pieceValues[piece],
+      0,
+    );
+
+    return {
+      capturedWhite,
+      capturedBlack,
+      whiteChecks,
+      blackChecks,
+      materialDifference: whiteMaterial - blackMaterial,
+    };
+  }, [gameState?.moves]);
+
+  function playMoveFeedbackSound(moves: string[]) {
+    if (moves.length === 0) return;
+
+    try {
+      const replay = new Chess();
+      let last = null as ReturnType<Chess["move"]> | null;
+
+      for (const san of moves) {
+        last = replay.move(san);
+      }
+
+      if (!last) return;
+
+      if (last.captured) playPieceCaptureSound(last.piece);
+      else playPieceMoveSound(last.piece);
+
+      if (!replay.isCheckmate() && replay.isCheck()) {
+        playSound("check");
+      } else if (last.isKingsideCastle() || last.isQueensideCastle()) {
+        playRandomSound(["castle-1", "castle-2"]);
+      }
+    } catch {
+      // Sound must never block multiplayer state updates.
+    }
+  }
+
+  const historyPreview =
+    historyPreviewPly !== null
+      ? (historyRows[historyPreviewPly - 1] ?? null)
+      : null;
+
+  const historyPreviewChess = useMemo(
+    () => (historyPreview ? new Chess(historyPreview.fenAfter) : null),
+    [historyPreview?.fenAfter],
+  );
+
+  const displayedBoard = historyPreviewChess
+    ? historyPreviewChess.board()
+    : board;
+
+  const historyPreviewMove = historyPreview
+    ? {
+        from: historyPreview.from,
+        to: historyPreview.to,
+      }
+    : null;
+
+  const historyPreviewCheckedKingSquare: Square | null =
+    historyPreviewChess?.isCheck()
+      ? (() => {
+          const previewBoard = historyPreviewChess.board();
+          const kingColor = historyPreviewChess.turn();
+          const files = "abcdefgh";
+
+          for (let row = 0; row < previewBoard.length; row++) {
+            for (let column = 0; column < previewBoard[row].length; column++) {
+              const piece = previewBoard[row][column];
+
+              if (piece?.type === "k" && piece.color === kingColor) {
+                return `${files[column]}${8 - row}` as Square;
+              }
+            }
+          }
+
+          return null;
+        })()
+      : null;
+
+  useEffect(() => {
+    if (historyPreviewPly !== null && historyPreviewPly > historyRows.length) {
+      setHistoryPreviewPly(null);
+    }
+  }, [historyPreviewPly, historyRows.length]);
+
   const myColor: "w" | "b" | null =
     mySeat === 0 ? "w" : mySeat === 1 ? "b" : null;
 
   const orientation: "white" | "black" = mySeat === 1 ? "black" : "white";
+
+  const gameEndedForReview =
+    gameState !== null &&
+    gameState.moves.length > 0 &&
+    (gameState.status === "finished" ||
+      gameState.winner !== null ||
+      gameState.end_reason !== null ||
+      chess.isGameOver());
+
+  const reviewMoves =
+    completedGameMoves.length > 0
+      ? completedGameMoves
+      : (gameState?.moves ?? []);
+
+  const gameReviewAvailable =
+    reviewMoves.length > 0 &&
+    (completedGameMoves.length > 0 || gameEndedForReview);
+
+  useEffect(() => {
+    if (!gameState) {
+      return;
+    }
+
+    if (gameEndedForReview) {
+      setCompletedGameMoves(gameState.moves);
+      return;
+    }
+
+    if (gameState.status === "playing" && gameState.moves.length === 0) {
+      setCompletedGameMoves([]);
+      setReviewOpen(false);
+    }
+  }, [
+    gameState?.status,
+    gameState?.winner,
+    gameState?.end_reason,
+    gameState?.moves,
+    gameEndedForReview,
+  ]);
 
   /*
    * Convert database last move into
@@ -895,7 +1552,8 @@ export default function ChessMultiplayerGame() {
             room_id,
             user_id,
             seat,
-            display_name
+            display_name,
+            chosen_color
           `,
       )
       .eq("room_id", loadedRoom.id)
@@ -947,7 +1605,11 @@ export default function ChessMultiplayerGame() {
   last_move_from,
   last_move_to,
   white_rematch_ready,
-  black_rematch_ready
+  black_rematch_ready,
+  undo_requested_by,
+  undo_requested_version,
+  undo_last_requested_by,
+  undo_last_requested_version
 `,
       )
       .eq("room_id", loadedRoom.id)
@@ -963,7 +1625,16 @@ export default function ChessMultiplayerGame() {
       return;
     }
 
-    setGameState(gameData as MultiplayerGame);
+    const loadedGame = gameData as MultiplayerGame;
+
+    setGameState(loadedGame);
+    lastSeenMoveCountRef.current = (loadedGame.moves ?? []).length;
+
+    /*
+     * If the page is opened/reloaded after the game already finished,
+     * remember that result without replaying the end sound.
+     */
+    lastGameEndSoundKeyRef.current = getGameEndSoundKey(loadedGame);
 
     setLoading(false);
   }, [roomCode, user]);
@@ -971,6 +1642,30 @@ export default function ChessMultiplayerGame() {
   useEffect(() => {
     void loadGame();
   }, [loadGame]);
+
+  /*
+   * ----------------------------------
+   * AUTHORITATIVE SYNC FALLBACK
+   * ----------------------------------
+   *
+   * Realtime remains the fast path, but an UPDATE event can occasionally be
+   * missed or delayed. Polling the single chess_games row once per second
+   * guarantees that an undo request reaches the opponent's screen.
+   */
+  useEffect(() => {
+    if (!room) {
+      return;
+    }
+
+    const intervalId = window.setInterval(() => {
+      void refreshChessGameState();
+      void refreshRoomPlayers();
+    }, 1000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [room?.id]);
 
   /*
    * ----------------------------------
@@ -1000,6 +1695,26 @@ export default function ChessMultiplayerGame() {
 
         (payload) => {
           const updated = payload.new as MultiplayerGame;
+          const nextMoveCount = updated.moves?.length ?? 0;
+
+          if (nextMoveCount > lastSeenMoveCountRef.current) {
+            playMoveFeedbackSound(updated.moves);
+          }
+
+          maybePlayGameEndSound(updated);
+          lastSeenMoveCountRef.current = nextMoveCount;
+
+          if (
+            nextMoveCount > 0 &&
+            (updated.status === "finished" ||
+              updated.winner !== null ||
+              updated.end_reason !== null)
+          ) {
+            setCompletedGameMoves(updated.moves);
+          } else if (updated.status === "playing" && nextMoveCount === 0) {
+            setCompletedGameMoves([]);
+            setReviewOpen(false);
+          }
 
           setGameState(updated);
 
@@ -1010,6 +1725,12 @@ export default function ChessMultiplayerGame() {
           setSelectedSquare(null);
 
           setLegalMoves([]);
+
+          setPromotionFrom(null);
+
+          setPromotionSquare(null);
+
+          setHistoryPreviewPly(null);
         },
       )
 
@@ -1035,7 +1756,7 @@ export default function ChessMultiplayerGame() {
     to: Square,
     promotion?: "q" | "r" | "b" | "n",
   ) {
-    if (!room || !gameState || moving) {
+    if (!room || !gameState || moving || gameState.undo_requested_by) {
       return;
     }
 
@@ -1088,54 +1809,71 @@ export default function ChessMultiplayerGame() {
     setMoving(false);
 
     if (moveError) {
-      console.error(moveError);
+      const fullMoveError = {
+        code: moveError.code,
+        message: moveError.message,
+        details: moveError.details,
+        hint: moveError.hint,
+      };
 
-      /*
-       * Most commonly caused by another
-       * tab / stale position.
-       */
-      setError(moveError.message);
+      console.error(
+        "play_chess_move failed:",
+        JSON.stringify(fullMoveError, null, 2),
+      );
+
+      setError(
+        [moveError.code, moveError.message, moveError.details, moveError.hint]
+          .filter(Boolean)
+          .join(" · "),
+      );
 
       await loadGame();
 
       return;
     }
 
+    const submittedMoves = [...gameState.moves, move.san];
+
     /*
-     * Update immediately instead of
-     * waiting a few milliseconds for
-     * Realtime.
+     * IMPORTANT:
      *
-     * Realtime will shortly send the
-     * authoritative row too.
+     * Do NOT append the move locally with setGameState here.
+     *
+     * The Supabase UPDATE can reach the Realtime subscription before this
+     * RPC promise resolves. If we then append the same SAN move locally,
+     * the player who made the move can end up with the move twice:
+     *
+     *   server / opponent: [e4]
+     *   local mover:       [e4, e4]
+     *
+     * That breaks last-mover detection (especially visible for White) and
+     * also corrupts the move list passed into Game Review.
+     *
+     * chess_games is therefore the single authoritative source after every
+     * successful multiplayer move.
      */
-    setGameState((current) =>
-      current
-        ? {
-            ...current,
+    if (lastSeenMoveCountRef.current < submittedMoves.length) {
+      playMoveFeedbackSound(submittedMoves);
+      lastSeenMoveCountRef.current = submittedMoves.length;
+    }
 
-            fen: localGame.fen(),
+    /*
+     * Preserve the exact completed move list immediately so the Game Review
+     * entry point is available even before the follow-up SELECT finishes.
+     */
+    if (outcome.finished) {
+      setCompletedGameMoves(submittedMoves);
+    }
 
-            moves: [...current.moves, move.san],
-
-            version: current.version + 1,
-
-            last_move_from: move.from,
-
-            last_move_to: move.to,
-
-            status: outcome.finished ? "finished" : "playing",
-
-            winner: outcome.winner,
-
-            end_reason: outcome.reason,
-          }
-        : current,
-    );
+    await refreshChessGameState();
 
     setSelectedSquare(null);
 
     setLegalMoves([]);
+
+    setPromotionFrom(null);
+
+    setPromotionSquare(null);
   }
 
   /*
@@ -1145,7 +1883,13 @@ export default function ChessMultiplayerGame() {
    */
 
   function handleSquareClick(row: number, column: number) {
-    if (!gameState || !myColor || moving) {
+    if (
+      historyPreviewPly !== null ||
+      !gameState ||
+      !myColor ||
+      moving ||
+      gameState.undo_requested_by
+    ) {
       return;
     }
 
@@ -1176,6 +1920,8 @@ export default function ChessMultiplayerGame() {
 
       setSelectedSquare(square);
 
+      playPieceSelectSound(clickedPiece.type);
+
       const moves = chess.moves({
         square,
         verbose: true,
@@ -1192,6 +1938,8 @@ export default function ChessMultiplayerGame() {
      */
     if (clickedPiece && clickedPiece.color === myColor) {
       setSelectedSquare(square);
+
+      playPieceSelectSound(clickedPiece.type);
 
       const moves = chess.moves({
         square,
@@ -1281,6 +2029,43 @@ export default function ChessMultiplayerGame() {
   const black = players.find((player) => player.seat === 1);
 
   const isMyTurn = chess.turn() === myColor;
+
+  const undoRequestedByMe =
+    Boolean(user?.id) && gameState.undo_requested_by === user?.id;
+
+  const undoRequestedByOpponent =
+    Boolean(gameState.undo_requested_by) &&
+    gameState.undo_requested_by !== user?.id;
+
+  const myPlayer = players.find((player) => player.user_id === user?.id);
+
+  const opponentPlayer = players.find((player) => player.user_id !== user?.id);
+
+  const whiteClaimedByOpponent = opponentPlayer?.chosen_color === "white";
+
+  const blackClaimedByOpponent = opponentPlayer?.chosen_color === "black";
+
+  /*
+   * Only the player who made the latest move may request a takeback.
+   *
+   * SAN move-count parity is authoritative here:
+   *   odd  -> White moved last (seat 0)
+   *   even -> Black moved last (seat 1)
+   */
+  const lastMoverSeat = gameState.moves.length % 2 === 1 ? 0 : 1;
+
+  const alreadyRequestedUndoForCurrentMove =
+    Boolean(user?.id) &&
+    gameState.undo_last_requested_by === user?.id &&
+    gameState.undo_last_requested_version === gameState.version;
+
+  const canRequestUndo =
+    gameState.status === "playing" &&
+    gameState.moves.length > 0 &&
+    !gameState.undo_requested_by &&
+    mySeat === lastMoverSeat &&
+    !alreadyRequestedUndoForCurrentMove;
+
   const myRematchReady =
     mySeat === 0
       ? gameState.white_rematch_ready
@@ -1500,6 +2285,84 @@ export default function ChessMultiplayerGame() {
                 </div>
               </section>
 
+              {/* CAPTURED PIECES — same baseline as Hotseat */}
+
+              <section
+                className="
+                  rounded-3xl
+                  border
+                  border-white/10
+                  bg-zinc-900/75
+                  p-4
+                  shadow-xl
+                  shadow-black/20
+                  backdrop-blur-md
+                "
+              >
+                <div className="mb-4 flex items-start justify-between">
+                  <div>
+                    <h2 className="text-sm font-bold text-zinc-100">
+                      {t("Captured Pieces")}
+                    </h2>
+                    <p className="mt-1 text-xs text-zinc-500">
+                      {t("Material overview")}
+                    </p>
+                  </div>
+
+                  <span
+                    className={`rounded-xl px-2.5 py-1 text-xs font-bold ${
+                      materialState.materialDifference > 0
+                        ? "bg-amber-400/10 text-amber-200"
+                        : materialState.materialDifference < 0
+                          ? "bg-white/10 text-zinc-300"
+                          : "bg-white/5 text-zinc-500"
+                    }`}
+                  >
+                    {materialState.materialDifference > 0 &&
+                      `${t("White")} +${materialState.materialDifference}`}
+                    {materialState.materialDifference < 0 &&
+                      `${t("Black")} +${Math.abs(materialState.materialDifference)}`}
+                    {materialState.materialDifference === 0 && t("Equal")}
+                  </span>
+                </div>
+
+                <div
+                  className="
+                    rounded-2xl
+                    border
+                    border-white/5
+                    bg-black/20
+                    p-3
+                  "
+                >
+                  <CapturedPiecesGrid
+                    capturedBlack={materialState.capturedBlack}
+                    capturedWhite={materialState.capturedWhite}
+                    t={t}
+                  />
+                </div>
+
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <div className="rounded-xl bg-black/20 px-3 py-2">
+                    <p className="text-[10px] uppercase tracking-wider text-zinc-600">
+                      {t("White in check")}
+                    </p>
+                    <p className="mt-1 font-bold text-zinc-300">
+                      {materialState.whiteChecks}
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl bg-black/20 px-3 py-2">
+                    <p className="text-[10px] uppercase tracking-wider text-zinc-600">
+                      {t("Black in check")}
+                    </p>
+                    <p className="mt-1 font-bold text-zinc-300">
+                      {materialState.blackChecks}
+                    </p>
+                  </div>
+                </div>
+              </section>
+
               {/* ROOM INFORMATION */}
 
               <section
@@ -1706,6 +2569,31 @@ export default function ChessMultiplayerGame() {
                   </div>
                 </div>
 
+                {gameReviewAvailable && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setHistoryPreviewPly(null);
+                      setReviewOpen(true);
+                    }}
+                    className="
+                      rounded-xl
+                      border
+                      border-amber-400/20
+                      bg-amber-400/10
+                      px-3
+                      py-2
+                      text-xs
+                      font-bold
+                      text-amber-300
+                      transition
+                      hover:bg-amber-400/20
+                    "
+                  >
+                    ♞ {t("Open Game Review")}
+                  </button>
+                )}
+
                 {gameState.status === "playing" && (
                   <span
                     className={`
@@ -1750,9 +2638,35 @@ export default function ChessMultiplayerGame() {
                 </div>
               )}
 
+              {/* HISTORY PREVIEW STATUS */}
+
+              {historyPreview && (
+                <div className="mb-3 flex items-center justify-between gap-4 rounded-xl border border-blue-400/20 bg-blue-400/[0.07] px-4 py-3">
+                  <div>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-blue-300">
+                      {t("History Preview")}
+                    </p>
+
+                    <p className="mt-1 text-sm font-bold text-white">
+                      {t("Move")} {historyPreview.moveNumber}
+                      {historyPreview.color === "w" ? "." : "..."}{" "}
+                      {historyPreview.san}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setHistoryPreviewPly(null)}
+                    className="shrink-0 rounded-lg bg-white/10 px-3 py-2 text-xs font-bold text-zinc-200 transition hover:bg-white/20"
+                  >
+                    {t("Back to Live Board")}
+                  </button>
+                </div>
+              )}
+
               {/* PROMOTION */}
 
-              {promotionFrom && promotionSquare && (
+              {promotionFrom && promotionSquare && !historyPreview && (
                 <div
                   className="
                   mb-3
@@ -1774,18 +2688,22 @@ export default function ChessMultiplayerGame() {
 
               <div className="relative">
                 <Board
-                  board={board}
-                  selectedSquare={selectedSquare}
-                  legalMoves={legalMoves}
-                  lastMove={lastMove}
-                  checkedKingSquare={checkedKingSquare}
-                  onSquareClick={handleSquareClick}
+                  board={displayedBoard}
+                  selectedSquare={historyPreview ? null : selectedSquare}
+                  legalMoves={historyPreview ? [] : legalMoves}
+                  lastMove={historyPreviewMove ?? lastMove}
+                  checkedKingSquare={
+                    historyPreview
+                      ? historyPreviewCheckedKingSquare
+                      : checkedKingSquare
+                  }
+                  onSquareClick={historyPreview ? () => {} : handleSquareClick}
                   orientation={orientation}
                 />
 
                 {/* GAME OVER */}
 
-                {gameState.status === "finished" && (
+                {gameReviewAvailable && !historyPreview && !reviewOpen && (
                   <div
                     className="
                     absolute
@@ -1865,8 +2783,11 @@ export default function ChessMultiplayerGame() {
 
                       <button
                         type="button"
-                        disabled={myRematchReady || actionLoading === "rematch"}
-                        onClick={requestRematch}
+                        disabled={reviewMoves.length === 0}
+                        onClick={() => {
+                          setHistoryPreviewPly(null);
+                          setReviewOpen(true);
+                        }}
                         className="
                         mt-7
                         w-full
@@ -1878,6 +2799,30 @@ export default function ChessMultiplayerGame() {
                         text-zinc-950
                         transition
                         hover:bg-amber-300
+                        disabled:cursor-not-allowed
+                        disabled:opacity-40
+                      "
+                      >
+                        {t("Open Game Review")}
+                      </button>
+
+                      <button
+                        type="button"
+                        disabled={myRematchReady || actionLoading === "rematch"}
+                        onClick={requestRematch}
+                        className="
+                        mt-3
+                        w-full
+                        rounded-xl
+                        border
+                        border-white/10
+                        bg-white/5
+                        px-5
+                        py-3
+                        font-bold
+                        text-zinc-200
+                        transition
+                        hover:bg-white/10
                         disabled:cursor-not-allowed
                         disabled:opacity-40
                       "
@@ -2018,9 +2963,233 @@ export default function ChessMultiplayerGame() {
                 </div>
 
                 <div className="space-y-2">
+                  {gameState.status === "playing" &&
+                    gameState.moves.length === 0 && (
+                      <div
+                        className="
+                          mb-3
+                          rounded-2xl
+                          border
+                          border-white/10
+                          bg-black/20
+                          p-3
+                        "
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <p className="text-xs font-black text-zinc-200">
+                              {t("Choose Side")}
+                            </p>
+                            <p className="mt-1 text-[10px] leading-4 text-zinc-600">
+                              {t("Side selection locks after the first move.")}
+                            </p>
+                          </div>
+
+                          <span className="rounded-lg bg-white/5 px-2 py-1 text-[10px] font-bold text-zinc-500">
+                            {myPlayer?.chosen_color
+                              ? `${t("Chosen")}: ${
+                                  myPlayer.chosen_color === "white"
+                                    ? t("White")
+                                    : t("Black")
+                                }`
+                              : `${t("Current")}: ${
+                                  mySeat === 0 ? t("White") : t("Black")
+                                }`}
+                          </span>
+                        </div>
+
+                        <div className="mt-3 grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            disabled={
+                              actionLoading !== null || whiteClaimedByOpponent
+                            }
+                            onClick={() => void chooseSide("white")}
+                            className={`
+                              rounded-xl
+                              border
+                              px-3
+                              py-3
+                              text-sm
+                              font-black
+                              transition
+                              disabled:cursor-not-allowed
+                              disabled:opacity-35
+
+                              ${
+                                myPlayer?.chosen_color === "white"
+                                  ? "border-amber-400/30 bg-amber-400/15 text-amber-200"
+                                  : "border-white/10 bg-white/5 text-zinc-200 hover:bg-white/10"
+                              }
+                            `}
+                          >
+                            ♔ {t("White")}
+                          </button>
+
+                          <button
+                            type="button"
+                            disabled={
+                              actionLoading !== null || blackClaimedByOpponent
+                            }
+                            onClick={() => void chooseSide("black")}
+                            className={`
+                              rounded-xl
+                              border
+                              px-3
+                              py-3
+                              text-sm
+                              font-black
+                              transition
+                              disabled:cursor-not-allowed
+                              disabled:opacity-35
+
+                              ${
+                                myPlayer?.chosen_color === "black"
+                                  ? "border-amber-400/30 bg-amber-400/15 text-amber-200"
+                                  : "border-white/10 bg-white/5 text-zinc-200 hover:bg-white/10"
+                              }
+                            `}
+                          >
+                            ♚ {t("Black")}
+                          </button>
+                        </div>
+
+                        {(whiteClaimedByOpponent || blackClaimedByOpponent) && (
+                          <p className="mt-2 text-center text-[10px] text-zinc-600">
+                            {t(
+                              "A side already chosen by your opponent is locked.",
+                            )}
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                  {gameState.status === "playing" &&
+                    !gameState.undo_requested_by && (
+                      <>
+                        <button
+                          type="button"
+                          disabled={!canRequestUndo || actionLoading !== null}
+                          onClick={() => void requestUndo()}
+                          className="
+                          w-full
+                          rounded-xl
+                          border
+                          border-white/10
+                          bg-white/5
+                          px-4
+                          py-3
+                          text-sm
+                          font-bold
+                          text-zinc-300
+                          transition
+                          hover:bg-white/10
+                          disabled:cursor-not-allowed
+                          disabled:opacity-40
+                        "
+                        >
+                          {actionLoading === "undo-request"
+                            ? t("Undo request sent")
+                            : t("Undo Move")}
+                        </button>
+
+                        {!canRequestUndo && gameState.moves.length > 0 && (
+                          <p className="px-1 text-center text-[10px] leading-4 text-zinc-600">
+                            {alreadyRequestedUndoForCurrentMove
+                              ? t("You already requested undo for this move.")
+                              : t(
+                                  "Only the player who made the last move can request undo.",
+                                )}
+                          </p>
+                        )}
+                      </>
+                    )}
+
+                  {undoRequestedByMe && (
+                    <div
+                      className="
+                        rounded-xl
+                        border
+                        border-amber-400/15
+                        bg-amber-400/5
+                        px-3
+                        py-3
+                        text-center
+                      "
+                    >
+                      <p className="text-xs font-bold text-amber-300">
+                        {t("Undo request sent")}
+                      </p>
+                      <p className="mt-1 text-[10px] text-zinc-500">
+                        {t("Waiting for opponent response...")}
+                      </p>
+                    </div>
+                  )}
+
+                  {undoRequestedByOpponent && (
+                    <div
+                      className="
+                        rounded-xl
+                        border
+                        border-amber-400/20
+                        bg-amber-400/10
+                        p-3
+                      "
+                    >
+                      <p className="text-xs font-bold text-amber-200">
+                        {t("Opponent requests to undo the last move.")}
+                      </p>
+
+                      <div className="mt-3 grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          disabled={actionLoading !== null}
+                          onClick={() => void respondToUndo(true)}
+                          className="
+                            rounded-lg
+                            bg-amber-400
+                            px-3
+                            py-2
+                            text-xs
+                            font-black
+                            text-zinc-950
+                            transition
+                            hover:bg-amber-300
+                            disabled:opacity-40
+                          "
+                        >
+                          {t("Accept Undo")}
+                        </button>
+
+                        <button
+                          type="button"
+                          disabled={actionLoading !== null}
+                          onClick={() => void respondToUndo(false)}
+                          className="
+                            rounded-lg
+                            border
+                            border-white/10
+                            bg-white/5
+                            px-3
+                            py-2
+                            text-xs
+                            font-bold
+                            text-zinc-300
+                            transition
+                            hover:bg-white/10
+                            disabled:opacity-40
+                          "
+                        >
+                          {t("Decline")}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                   {gameState.status === "playing" && (
                     <button
                       type="button"
+                      disabled={Boolean(gameState.undo_requested_by)}
                       onClick={() => setShowResignConfirm(true)}
                       className="
                       w-full
@@ -2036,9 +3205,45 @@ export default function ChessMultiplayerGame() {
                       transition
                       hover:border-red-500/30
                       hover:bg-red-500/20
+                      disabled:cursor-not-allowed
+                      disabled:opacity-40
                     "
                     >
                       {t("Resign")}
+                    </button>
+                  )}
+
+                  {gameReviewAvailable && (
+                    <button
+                      type="button"
+                      disabled={reviewMoves.length === 0}
+                      onClick={() => {
+                        setHistoryPreviewPly(null);
+                        setReviewOpen(true);
+                      }}
+                      className="
+                        flex
+                        w-full
+                        items-center
+                        justify-center
+                        gap-2
+                        rounded-xl
+                        border
+                        border-amber-400/20
+                        bg-amber-400/10
+                        px-4
+                        py-3
+                        text-sm
+                        font-bold
+                        text-amber-300
+                        transition
+                        hover:bg-amber-400/20
+                        disabled:cursor-not-allowed
+                        disabled:opacity-40
+                      "
+                    >
+                      <span>♞</span>
+                      <span>{t("Open Game Review")}</span>
                     </button>
                   )}
 
@@ -2071,15 +3276,15 @@ export default function ChessMultiplayerGame() {
 
               <section
                 className="
-                rounded-3xl
-                border
-                border-white/10
-                bg-zinc-900/75
-                p-4
-                shadow-xl
-                shadow-black/20
-                backdrop-blur-md
-              "
+                  rounded-3xl
+                  border
+                  border-white/10
+                  bg-zinc-900/75
+                  p-4
+                  shadow-xl
+                  shadow-black/20
+                  backdrop-blur-md
+                "
               >
                 <div className="mb-4 flex items-center justify-between">
                   <div>
@@ -2092,80 +3297,102 @@ export default function ChessMultiplayerGame() {
                     </p>
                   </div>
 
-                  <span
-                    className="
-                    rounded-xl
-                    bg-white/5
-                    px-2.5
-                    py-1
-                    text-xs
-                    font-semibold
-                    text-zinc-400
-                  "
-                  >
+                  <span className="rounded-xl bg-white/5 px-2.5 py-1 text-xs font-semibold text-zinc-400">
                     {gameState.moves.length}
                   </span>
                 </div>
 
-                <div
-                  className="
-                  max-h-[420px]
-                  min-h-32
-                  overflow-y-auto
-                  rounded-2xl
-                  border
-                  border-white/5
-                  bg-black/20
-                  p-2
-                "
-                >
-                  {gameState.moves.length === 0 ? (
-                    <div className="py-8 text-center">
-                      <div className="text-2xl text-zinc-700">♟</div>
-
-                      <p className="mt-2 text-xs text-zinc-600">
-                        {t("No moves yet")}
-                      </p>
+                <div className="max-h-[420px] overflow-y-auto rounded-2xl border border-white/5 bg-black/20">
+                  {historyRows.length === 0 ? (
+                    <div className="px-4 py-8 text-center text-xs text-zinc-600">
+                      {t("No moves yet")}
                     </div>
                   ) : (
-                    <div className="space-y-1">
-                      {gameState.moves.map((move, index) => (
-                        <div
-                          key={`${move}-${index}`}
-                          className="
-                          flex
-                          items-center
-                          gap-3
-                          rounded-xl
-                          px-3
-                          py-2
-                          transition
-                          hover:bg-white/5
-                        "
-                        >
-                          <span
-                            className="
-                            flex
-                            h-6
-                            min-w-6
-                            items-center
-                            justify-center
-                            rounded-lg
-                            bg-white/5
-                            text-[10px]
-                            font-bold
-                            text-zinc-600
-                          "
-                          >
-                            {index + 1}
-                          </span>
+                    <table className="w-full border-collapse">
+                      <thead className="sticky top-0 z-10 bg-zinc-900">
+                        <tr className="border-b border-white/5 text-left text-[9px] font-black uppercase tracking-wider text-zinc-600">
+                          <th className="px-3 py-2">{t("Move")}</th>
+                          <th className="px-2 py-2">{t("Side")}</th>
+                          <th className="px-2 py-2">{t("Played")}</th>
+                        </tr>
+                      </thead>
 
-                          <span className="font-mono text-sm font-semibold text-zinc-300">
-                            {move}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+                      <tbody>
+                        {historyRows.map((move) => {
+                          const selected = historyPreviewPly === move.ply;
+
+                          return (
+                            <tr
+                              key={move.ply}
+                              tabIndex={0}
+                              onClick={() => {
+                                setHistoryPreviewPly(move.ply);
+                                setSelectedSquare(null);
+                                setLegalMoves([]);
+                                setPromotionFrom(null);
+                                setPromotionSquare(null);
+                              }}
+                              onKeyDown={(event) => {
+                                if (
+                                  event.key === "Enter" ||
+                                  event.key === " "
+                                ) {
+                                  setHistoryPreviewPly(move.ply);
+                                  setSelectedSquare(null);
+                                  setLegalMoves([]);
+                                  setPromotionFrom(null);
+                                  setPromotionSquare(null);
+                                }
+                              }}
+                              className={`
+                                cursor-pointer
+                                border-b
+                                border-white/5
+                                transition
+                                last:border-0
+                                ${
+                                  selected
+                                    ? "bg-blue-400/10"
+                                    : "hover:bg-white/5"
+                                }
+                              `}
+                            >
+                              <td className="px-3 py-2.5 text-[10px] text-zinc-600">
+                                {move.moveNumber}
+                                {move.color === "w" ? "." : "..."}
+                              </td>
+
+                              <td className="px-2 py-2.5">
+                                {move.color === "w" ? (
+                                  <span className="inline-flex items-center gap-1 rounded-full bg-[#fff3d5]/10 px-2 py-1 text-[9px] font-bold text-[#fff3d5]">
+                                    ♔ {t("White")}
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 rounded-full bg-white/5 px-2 py-1 text-[9px] font-bold text-zinc-400">
+                                    ♚ {t("Black")}
+                                  </span>
+                                )}
+                              </td>
+
+                              <td className="px-2 py-2.5">
+                                <div className="flex items-center gap-2">
+                                  <span className="w-5 text-center text-lg leading-none">
+                                    {getMultiplayerHistoryPieceSymbol(
+                                      move.color,
+                                      move.piece,
+                                    )}
+                                  </span>
+
+                                  <span className="font-mono text-xs font-bold text-zinc-200">
+                                    {move.san}
+                                  </span>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
                   )}
                 </div>
               </section>
@@ -2252,6 +3479,56 @@ export default function ChessMultiplayerGame() {
                       {gameState.version}
                     </span>
                   </div>
+                </div>
+              </section>
+
+              {/* PIECE VALUES — same baseline as Hotseat */}
+
+              <section
+                className="
+                  rounded-3xl
+                  border
+                  border-white/10
+                  bg-zinc-900/75
+                  p-4
+                  shadow-xl
+                  shadow-black/20
+                  backdrop-blur-md
+                "
+              >
+                <div className="mb-4 flex items-start justify-between">
+                  <div>
+                    <h2 className="text-sm font-bold text-zinc-100">
+                      {t("Piece Values")}
+                    </h2>
+                    <p className="mt-1 text-xs text-zinc-500">
+                      {t("Standard values")}
+                    </p>
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">
+                    {t("Material")}
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  {pieceValueList.map((piece) => (
+                    <div
+                      key={piece.type}
+                      className="flex items-center justify-between rounded-xl px-3 py-2 transition hover:bg-white/5"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-xl text-[#fff3d5]">
+                          {piece.symbol}
+                        </span>
+                        <span className="text-xs font-semibold text-zinc-400">
+                          {t(piece.name)}
+                        </span>
+                      </div>
+                      <span className="text-xs font-black text-zinc-300">
+                        {pieceValues[piece.type]}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </section>
             </div>
@@ -2358,9 +3635,132 @@ export default function ChessMultiplayerGame() {
             </div>
           </div>
         )}
+
+        <ChessGameReview
+          moves={reviewMoves}
+          orientation={orientation}
+          open={gameReviewAvailable && reviewOpen}
+          onClose={() => setReviewOpen(false)}
+        />
       </div>
     </div>
   );
+}
+
+function CapturedPiecesGrid({
+  capturedBlack,
+  capturedWhite,
+  t,
+}: {
+  capturedBlack: PieceType[];
+  capturedWhite: PieceType[];
+  t: (key: string) => string;
+}) {
+  const symbols: Record<"white" | "black", Record<PieceType, string>> = {
+    white: {
+      p: "♙",
+      n: "♘",
+      b: "♗",
+      r: "♖",
+      q: "♕",
+      k: "♔",
+    },
+    black: {
+      p: "♟",
+      n: "♞",
+      b: "♝",
+      r: "♜",
+      q: "♛",
+      k: "♚",
+    },
+  };
+
+  function CapturedRow({
+    color,
+    pieces,
+  }: {
+    color: "white" | "black";
+    pieces: PieceType[];
+  }) {
+    return (
+      <div className="grid grid-cols-[52px_minmax(0,1fr)] items-start gap-2">
+        <div className="pt-2 text-[10px] font-black uppercase tracking-wider text-zinc-600">
+          {color === "white" ? t("White") : t("Black")}
+        </div>
+
+        <div
+          className="
+            flex
+            min-h-10
+            flex-wrap
+            content-start
+            gap-1.5
+            rounded-xl
+            border
+            border-white/5
+            bg-black/20
+            p-1.5
+          "
+        >
+          {pieces.length === 0 ? (
+            <span className="px-1 py-1 text-xs text-zinc-700">—</span>
+          ) : (
+            pieces.map((piece, index) => (
+              <span
+                key={`${color}-${piece}-${index}`}
+                className="
+                  flex
+                  h-7
+                  w-7
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-lg
+                  border
+                  border-white/5
+                  bg-white/[0.04]
+                  text-[20px]
+                  leading-none
+                "
+              >
+                {symbols[color][piece]}
+              </span>
+            ))
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-[96px] space-y-2">
+      <CapturedRow color="black" pieces={capturedBlack} />
+      <CapturedRow color="white" pieces={capturedWhite} />
+    </div>
+  );
+}
+
+function getMultiplayerHistoryPieceSymbol(color: "w" | "b", piece: string) {
+  const symbols: Record<"w" | "b", Record<string, string>> = {
+    w: {
+      p: "♙",
+      n: "♘",
+      b: "♗",
+      r: "♖",
+      q: "♕",
+      k: "♔",
+    },
+    b: {
+      p: "♟",
+      n: "♞",
+      b: "♝",
+      r: "♜",
+      q: "♛",
+      k: "♚",
+    },
+  };
+
+  return symbols[color][piece] ?? "";
 }
 
 function PlayerBar({

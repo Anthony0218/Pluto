@@ -19,6 +19,7 @@
     "class-variance-authority": "^0.7.1",
     "cn": "^0.2.6",
     "lucide-react": "^1.42.0",
+    "pnpm": "^12.4.2",
     "react": "^19.2.8",
     "react-aria": "^3.52.1",
     "react-aria-components": "^1.21.1",

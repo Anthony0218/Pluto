@@ -7,7 +7,6 @@ import { supabase } from "../lib/supabase";
 import { getSquareName, type PieceType } from "../utils/chessUtils";
 
 import Board from "./Board.tsx";
-import CapturedPieces from "./CapturedPieces.tsx";
 
 import {
   playPieceSelectSound,
@@ -2271,9 +2270,10 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                     p-3
                   "
                 >
-                  <CapturedPieces
+                  <CapturedPiecesGrid
                     capturedBlack={capturedBlack}
                     capturedWhite={capturedWhite}
+                    t={t}
                   />
                 </div>
               </section>
@@ -3365,4 +3365,97 @@ function getHistoryPieceSymbol(color: "w" | "b", piece: PieceType) {
   };
 
   return symbols[color][piece];
+}
+
+function CapturedPiecesGrid({
+  capturedBlack,
+  capturedWhite,
+  t,
+}: {
+  capturedBlack: PieceType[];
+  capturedWhite: PieceType[];
+  t: (key: string) => string;
+}) {
+  const symbols: Record<"white" | "black", Record<PieceType, string>> = {
+    white: {
+      p: "♙",
+      n: "♘",
+      b: "♗",
+      r: "♖",
+      q: "♕",
+      k: "♔",
+    },
+    black: {
+      p: "♟",
+      n: "♞",
+      b: "♝",
+      r: "♜",
+      q: "♛",
+      k: "♚",
+    },
+  };
+
+  function CapturedRow({
+    color,
+    pieces,
+  }: {
+    color: "white" | "black";
+    pieces: PieceType[];
+  }) {
+    return (
+      <div className="grid grid-cols-[52px_minmax(0,1fr)] items-start gap-2">
+        <div className="pt-2 text-[10px] font-black uppercase tracking-wider text-zinc-600">
+          {color === "white" ? t("White") : t("Black")}
+        </div>
+
+        <div
+          className="
+            flex
+            min-h-10
+            flex-wrap
+            content-start
+            gap-1.5
+            rounded-xl
+            border
+            border-white/5
+            bg-black/20
+            p-1.5
+          "
+        >
+          {pieces.length === 0 ? (
+            <span className="px-1 py-1 text-xs text-zinc-700">—</span>
+          ) : (
+            pieces.map((piece, index) => (
+              <span
+                key={`${color}-${piece}-${index}`}
+                className="
+                  flex
+                  h-7
+                  w-7
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-lg
+                  border
+                  border-white/5
+                  bg-white/[0.04]
+                  text-[20px]
+                  leading-none
+                "
+              >
+                {symbols[color][piece]}
+              </span>
+            ))
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-[96px] space-y-2">
+      <CapturedRow color="black" pieces={capturedBlack} />
+      <CapturedRow color="white" pieces={capturedWhite} />
+    </div>
+  );
 }

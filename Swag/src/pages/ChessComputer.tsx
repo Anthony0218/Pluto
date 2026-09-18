@@ -19,29 +19,28 @@ const difficultyLevels: Record<Difficulty, DifficultySettings> = {
   beginner: {
     skillLevel: 0,
     thinkTime: 80,
-    randomMoveChance: 0.45,
+    randomMoveChance: 0.6,
     label: "Beginner",
     description: "Very forgiving. Makes frequent mistakes and weak moves.",
   },
-
   easy: {
     skillLevel: 0,
-    thinkTime: 150,
-    randomMoveChance: 0.2,
+    thinkTime: 80,
+    randomMoveChance: 0.4,
     label: "Easy",
-    description: "Casual opponent with noticeable mistakes.",
+    description: "Forgiving. Makes mistakes and weak moves.",
   },
 
   medium: {
-    skillLevel: 3,
+    skillLevel: 1,
     thinkTime: 300,
     randomMoveChance: 0.05,
-    label: "Medium",
+    label: "Normal",
     description: "Solid play with occasional inaccuracies.",
   },
 
   hard: {
-    skillLevel: 10,
+    skillLevel: 5,
     thinkTime: 500,
     randomMoveChance: 0,
     label: "Hard",
@@ -279,23 +278,6 @@ export default function ChessComputer() {
                         <p className="mt-1 text-xs leading-5 text-zinc-500">
                           {settings.description}
                         </p>
-                      </div>
-
-                      <div className="shrink-0 text-right">
-                        <p className="text-xs font-semibold text-zinc-400">
-                          Skill {settings.skillLevel}
-                        </p>
-
-                        <p className="mt-1 text-[10px] text-zinc-600">
-                          {settings.thinkTime} ms
-                        </p>
-
-                        {settings.randomMoveChance > 0 && (
-                          <p className="mt-1 text-[10px] font-semibold text-amber-300">
-                            {Math.round(settings.randomMoveChance * 100)}% weak
-                            moves
-                          </p>
-                        )}
                       </div>
                     </button>
                   );

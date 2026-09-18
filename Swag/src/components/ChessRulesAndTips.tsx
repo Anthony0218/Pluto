@@ -2947,7 +2947,7 @@ export default function ChessRulesAndTips() {
     },
     {
       key: "openings",
-      label: "Openings (not for beginners yet)",
+      label: "Openings",
       icon: "♙",
       description: "Recognize common starts",
     },

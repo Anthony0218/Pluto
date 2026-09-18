@@ -1,11 +1,16 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Chess, type Square } from "chess.js";
 
 import Board from "../components/Board";
-import CapturedPieces from "../components/CapturedPieces";
-import MoveHistory from "../components/MoveHistory";
 import PromotionBar from "../components/PromotionBar";
+
+import {
+  playPieceSelectSound,
+  playPieceMoveSound,
+  playPieceCaptureSound,
+  playRandomSound,
+} from "../utils/sound.ts";
 
 import { getSquareName, type PieceType } from "../utils/chessUtils";
 
@@ -84,6 +89,7 @@ const languageOptions: Array<{ value: Language; label: string }> = [
 ];
 
 const deTranslations: Record<string, string> = {
+  "Available after the game ends": "Nach Spielende verfügbar",
   Language: "Sprache",
   "Classic Chess": "Klassisches Schach",
   Hotseat: "Hotseat",
@@ -143,6 +149,11 @@ const deTranslations: Record<string, string> = {
   "Optional Stockfish analysis": "Optionale Stockfish-Analyse",
   "Your last move": "Dein letzter Zug",
   Difficulty: "Schwierigkeit",
+  Beginner: "Anfänger",
+  Easy: "Leicht",
+  Normal: "Normal",
+  Hard: "Schwer",
+  Expert: "Experte",
   Skill: "Stärke",
   "Think time": "Denkzeit",
   "Weak-move chance": "Chance für schwachen Zug",
@@ -231,6 +242,7 @@ const deTranslations: Record<string, string> = {
   "Black in check": "Schwarz im Schach",
 };
 const bavarianTranslations: Record<string, string> = {
+  "Available after the game ends": "Nachm Spui verfügbar",
   Language: "Sproch",
   "Classic Chess": "Klassisches Schach",
   "Two players · one board": "Zwoa Spieler · oa Brett",
@@ -244,6 +256,12 @@ const bavarianTranslations: Record<string, string> = {
   "Game Controls": "Spielsteuerung",
   "Players, game and actions": "Spieler, Partie und Aktionen",
   "Piece Values": "Figurenwerte",
+  Difficulty: "Schwierigkeit",
+  Beginner: "Anfänger",
+  Easy: "Leicht",
+  Normal: "Normal",
+  Hard: "Schwer",
+  Expert: "Experte",
   Players: "Spieler",
   You: "Du",
   "Your turn": "Du bist dro",
@@ -289,6 +307,7 @@ const bavarianTranslations: Record<string, string> = {
   "Black in check": "Schwarz im Schach",
 };
 const koreanTranslations: Record<string, string> = {
+  "Available after the game ends": "게임 종료 후 사용할 수 있습니다",
   Language: "언어",
   "Classic Chess": "클래식 체스",
   Hotseat: "핫시트",
@@ -348,6 +367,11 @@ const koreanTranslations: Record<string, string> = {
   "Optional Stockfish analysis": "선택적 Stockfish 분석",
   "Your last move": "내 마지막 수",
   Difficulty: "난이도",
+  Beginner: "초급",
+  Easy: "쉬움",
+  Normal: "보통",
+  Hard: "어려움",
+  Expert: "전문가",
   Skill: "레벨",
   "Think time": "생각 시간",
   "Weak-move chance": "약한 수 확률",
@@ -433,6 +457,7 @@ const koreanTranslations: Record<string, string> = {
   "Black in check": "흑 체크 횟수",
 };
 const russianTranslations: Record<string, string> = {
+  "Available after the game ends": "Доступно после окончания партии",
   Language: "Язык",
   "Classic Chess": "Классические шахматы",
   Hotseat: "Хотсит",
@@ -492,6 +517,11 @@ const russianTranslations: Record<string, string> = {
   "Optional Stockfish analysis": "Дополнительный анализ Stockfish",
   "Your last move": "Ваш последний ход",
   Difficulty: "Сложность",
+  Beginner: "Начальный",
+  Easy: "Легко",
+  Normal: "Нормально",
+  Hard: "Сложно",
+  Expert: "Эксперт",
   Skill: "Уровень",
   "Think time": "Время на ход",
   "Weak-move chance": "Вероятность слабого хода",
@@ -798,6 +828,16 @@ function getRandomLegalMove(game: Chess): EngineMove | null {
   };
 }
 
+type DifficultyLabel = "Beginner" | "Easy" | "Normal" | "Hard" | "Expert";
+
+function getDifficultyLabel(skillLevel: number): DifficultyLabel {
+  if (skillLevel <= 3) return "Beginner";
+  if (skillLevel <= 7) return "Easy";
+  if (skillLevel <= 11) return "Normal";
+  if (skillLevel <= 15) return "Hard";
+  return "Expert";
+}
+
 /* =========================================================
    COMPONENT
    ========================================================= */
@@ -811,6 +851,7 @@ export default function ChessComputerBoard({
 }: ChessComputerBoardProps) {
   const [language, setLanguage] = useState<Language>(getInitialChessLanguage);
   const t = (key: string) => translateChess(language, key);
+  const difficultyLabel = getDifficultyLabel(skillLevel);
 
   function changeLanguage(nextLanguage: Language) {
     setLanguage(nextLanguage);
@@ -840,6 +881,10 @@ export default function ChessComputerBoard({
 
   const [moveHistory, setMoveHistory] = useState<string[]>([]);
 
+  const [historyPreviewPly, setHistoryPreviewPly] = useState<number | null>(
+    null,
+  );
+
   const [capturedWhite, setCapturedWhite] = useState<PieceType[]>([]);
 
   const [capturedBlack, setCapturedBlack] = useState<PieceType[]>([]);
@@ -850,9 +895,10 @@ export default function ChessComputerBoard({
 
   const [gameResult, setGameResult] = useState<GameResult | null>(null);
 
+  const [reviewOpen, setReviewOpen] = useState(false);
+
   const [showResignConfirm, setShowResignConfirm] = useState(false);
 
-  const [reviewOpen, setReviewOpen] = useState(false);
   /*
    * ---------------------------------------------------------
    * STOCKFISH OPPONENT
@@ -898,7 +944,123 @@ export default function ChessComputerBoard({
 
   const computerColor = humanColor === "w" ? "b" : "w";
 
+  function playSound(sound: string) {
+    const audio = new Audio(`/sounds/${sound}.mp3`);
+    audio.play().catch(() => {});
+  }
+
   const board = game.board();
+
+  /*
+   * Authoritative history for anything the user sees.
+   *
+   * `game` is a mutable chess.js object, while `position` is updated
+   * after every move/undo/restart and therefore acts as the React
+   * revision key. This prevents the visible move history from lagging
+   * one state update behind the actual board.
+   */
+  const currentMoveHistory = useMemo(() => game.history(), [game, position]);
+
+  /* =========================================================
+     CLICKABLE MOVE HISTORY PREVIEW
+     ========================================================= */
+
+  const historyRows = useMemo(() => {
+    const replay = new Chess();
+
+    return currentMoveHistory.map((san, index) => {
+      const move = replay.move(san);
+
+      return {
+        ply: index + 1,
+        moveNumber: Math.floor(index / 2) + 1,
+        color: move.color,
+        san: move.san,
+        from: move.from,
+        to: move.to,
+        piece: move.piece as PieceType,
+        fenAfter: replay.fen(),
+      };
+    });
+  }, [currentMoveHistory]);
+
+  const historyPreview =
+    historyPreviewPly !== null
+      ? (historyRows[historyPreviewPly - 1] ?? null)
+      : null;
+
+  useEffect(() => {
+    setMoveHistory((previous) => {
+      if (
+        previous.length === currentMoveHistory.length &&
+        previous.every((move, index) => move === currentMoveHistory[index])
+      ) {
+        return previous;
+      }
+
+      return currentMoveHistory;
+    });
+
+    if (
+      historyPreviewPly !== null &&
+      historyPreviewPly > currentMoveHistory.length
+    ) {
+      setHistoryPreviewPly(null);
+    }
+  }, [currentMoveHistory, historyPreviewPly]);
+
+  const historyPreviewChess = useMemo(
+    () => (historyPreview ? new Chess(historyPreview.fenAfter) : null),
+    [historyPreview?.fenAfter],
+  );
+
+  const displayedBoard = historyPreviewChess
+    ? historyPreviewChess.board()
+    : board;
+
+  const historyPreviewMove = historyPreview
+    ? {
+        from: historyPreview.from,
+        to: historyPreview.to,
+      }
+    : null;
+
+  const checkCounters = useMemo(() => {
+    const replay = new Chess();
+    let whiteChecks = 0;
+    let blackChecks = 0;
+
+    for (const san of currentMoveHistory) {
+      replay.move(san);
+
+      if (replay.isCheck()) {
+        if (replay.turn() === "w") whiteChecks += 1;
+        else blackChecks += 1;
+      }
+    }
+
+    return { whiteChecks, blackChecks };
+  }, [currentMoveHistory]);
+
+  const historyPreviewCheckedKingSquare: Square | null =
+    historyPreviewChess?.isCheck()
+      ? (() => {
+          const previewBoard = historyPreviewChess.board();
+          const kingColor = historyPreviewChess.turn();
+
+          for (let row = 0; row < previewBoard.length; row++) {
+            for (let column = 0; column < previewBoard[row].length; column++) {
+              const piece = previewBoard[row][column];
+
+              if (piece?.type === "k" && piece.color === kingColor) {
+                return getSquareName(row, column);
+              }
+            }
+          }
+
+          return null;
+        })()
+      : null;
 
   /* =========================================================
      MATERIAL
@@ -1159,11 +1321,21 @@ export default function ChessComputerBoard({
       });
 
       if (move.captured) {
+        playPieceCaptureSound(move.piece);
+
         if (move.color === "w") {
           setCapturedBlack((pieces) => [...pieces, move.captured as PieceType]);
         } else {
           setCapturedWhite((pieces) => [...pieces, move.captured as PieceType]);
         }
+      } else {
+        playPieceMoveSound(move.piece);
+      }
+
+      if (!game.isCheckmate() && game.isCheck()) {
+        playSound("check");
+      } else if (move.isKingsideCastle() || move.isQueensideCastle()) {
+        playRandomSound(["castle-1", "castle-2"]);
       }
 
       setMoveHistory(game.history());
@@ -1301,6 +1473,10 @@ export default function ChessComputerBoard({
      ========================================================= */
 
   function handleSquareClick(row: number, column: number) {
+    if (historyPreviewPly !== null) {
+      return;
+    }
+
     if (!ready || thinking) {
       return;
     }
@@ -1347,6 +1523,8 @@ export default function ChessComputerBoard({
 
       setSelectedSquare(square);
 
+      playPieceSelectSound(clickedPiece.type);
+
       const moves = game.moves({
         square,
         verbose: true,
@@ -1363,6 +1541,8 @@ export default function ChessComputerBoard({
      */
     if (clickedPiece && clickedPiece.color === humanColor) {
       setSelectedSquare(square);
+
+      playPieceSelectSound(clickedPiece.type);
 
       const moves = game.moves({
         square,
@@ -1430,11 +1610,21 @@ export default function ChessComputerBoard({
       });
 
       if (move.captured) {
+        playPieceCaptureSound(move.piece);
+
         if (move.color === "w") {
           setCapturedBlack((pieces) => [...pieces, move.captured as PieceType]);
         } else {
           setCapturedWhite((pieces) => [...pieces, move.captured as PieceType]);
         }
+      } else {
+        playPieceMoveSound(move.piece);
+      }
+
+      if (!game.isCheckmate() && game.isCheck()) {
+        playSound("check");
+      } else if (move.isKingsideCastle() || move.isQueensideCastle()) {
+        playRandomSound(["castle-1", "castle-2"]);
       }
 
       setMoveHistory(game.history());
@@ -1457,6 +1647,12 @@ export default function ChessComputerBoard({
 
   function finishGame(result: GameResult) {
     gameEndedRef.current = true;
+
+    if (result.winner === "draw") {
+      playSound("draw");
+    } else {
+      playSound("checkmate");
+    }
 
     /*
      * Invalidate pending Coach
@@ -1517,11 +1713,21 @@ export default function ChessComputerBoard({
       });
 
       if (move.captured) {
+        playPieceCaptureSound(move.piece);
+
         if (move.color === "w") {
           setCapturedBlack((pieces) => [...pieces, move.captured as PieceType]);
         } else {
           setCapturedWhite((pieces) => [...pieces, move.captured as PieceType]);
         }
+      } else {
+        playPieceMoveSound(move.piece);
+      }
+
+      if (!game.isCheckmate() && game.isCheck()) {
+        playSound("check");
+      } else if (move.isKingsideCastle() || move.isQueensideCastle()) {
+        playRandomSound(["castle-1", "castle-2"]);
       }
 
       setMoveHistory(game.history());
@@ -1549,6 +1755,8 @@ export default function ChessComputerBoard({
      ========================================================= */
 
   function restartGame() {
+    setReviewOpen(false);
+    setHistoryPreviewPly(null);
     gameEndedRef.current = false;
 
     /*
@@ -1673,13 +1881,14 @@ export default function ChessComputerBoard({
 
     setPosition(game.fen());
   }
-  const hasHumanMove = moveHistory.length > (humanColor === "b" ? 1 : 0);
+  const hasHumanMove = currentMoveHistory.length > (humanColor === "b" ? 1 : 0);
 
   function undoLastTurn() {
     if (thinking || analyzing || !hasHumanMove) {
       return;
     }
 
+    setHistoryPreviewPly(null);
     gameEndedRef.current = false;
 
     coachGenerationRef.current += 1;
@@ -1938,10 +2147,41 @@ export default function ChessComputerBoard({
                 </span>
               </div>
 
-              <CapturedPieces
-                capturedBlack={capturedBlack}
-                capturedWhite={capturedWhite}
-              />
+              <div
+                className="
+                  rounded-2xl
+                  border
+                  border-white/5
+                  bg-black/20
+                  p-3
+                "
+              >
+                <CapturedPiecesGrid
+                  capturedBlack={capturedBlack}
+                  capturedWhite={capturedWhite}
+                  t={t}
+                />
+              </div>
+
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <div className="rounded-xl bg-black/20 px-3 py-2">
+                  <p className="text-[10px] uppercase tracking-wider text-zinc-600">
+                    {t("White in check")}
+                  </p>
+                  <p className="mt-1 font-bold text-zinc-300">
+                    {checkCounters.whiteChecks}
+                  </p>
+                </div>
+
+                <div className="rounded-xl bg-black/20 px-3 py-2">
+                  <p className="text-[10px] uppercase tracking-wider text-zinc-600">
+                    {t("Black in check")}
+                  </p>
+                  <p className="mt-1 font-bold text-zinc-300">
+                    {checkCounters.blackChecks}
+                  </p>
+                </div>
+              </div>
             </section>
 
             {/* MOVE HISTORY */}
@@ -1958,18 +2198,120 @@ export default function ChessComputerBoard({
                 backdrop-blur-md
               "
             >
-              <div className="mb-3 flex items-center justify-between">
-                <h2 className="text-sm font-bold text-zinc-100">
-                  Move History
-                </h2>
+              <div className="mb-4 flex items-center justify-between">
+                <div>
+                  <h2 className="text-sm font-bold text-zinc-100">
+                    {t("Move History")}
+                  </h2>
 
-                <span className="text-xs text-zinc-500">
-                  {moveHistory.length} {t("moves")}
+                  <p className="mt-1 text-xs text-zinc-500">
+                    {t("Game history")}
+                  </p>
+                </div>
+
+                <span className="rounded-xl bg-white/5 px-2.5 py-1 text-xs font-semibold text-zinc-400">
+                  {currentMoveHistory.length}
                 </span>
               </div>
 
-              <div className="max-h-72 overflow-y-auto">
-                <MoveHistory moves={moveHistory} />
+              <div
+                className="
+                  max-h-[420px]
+                  overflow-y-auto
+                  rounded-2xl
+                  border
+                  border-white/5
+                  bg-black/20
+                "
+              >
+                {historyRows.length === 0 ? (
+                  <div className="px-4 py-8 text-center text-xs text-zinc-600">
+                    {t("No moves yet")}
+                  </div>
+                ) : (
+                  <table className="w-full border-collapse">
+                    <thead className="sticky top-0 z-10 bg-zinc-900">
+                      <tr className="border-b border-white/5 text-left text-[9px] font-black uppercase tracking-wider text-zinc-600">
+                        <th className="px-3 py-2">{t("Move")}</th>
+                        <th className="px-2 py-2">{t("Side")}</th>
+                        <th className="px-2 py-2">{t("Played")}</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {historyRows.map((move) => {
+                        const selected = historyPreviewPly === move.ply;
+
+                        return (
+                          <tr
+                            key={move.ply}
+                            tabIndex={0}
+                            onClick={() => {
+                              setHistoryPreviewPly(move.ply);
+                              setHelpVisible(false);
+                              setSuggestedMoves([]);
+                              setSelectedSquare(null);
+                              setLegalMoves([]);
+                              setPromotionFrom(null);
+                              setPromotionSquare(null);
+                            }}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter" || event.key === " ") {
+                                setHistoryPreviewPly(move.ply);
+                                setHelpVisible(false);
+                                setSuggestedMoves([]);
+                                setSelectedSquare(null);
+                                setLegalMoves([]);
+                              }
+                            }}
+                            className={`
+                              cursor-pointer
+                              border-b
+                              border-white/5
+                              transition
+                              last:border-0
+                              ${
+                                selected ? "bg-blue-400/10" : "hover:bg-white/5"
+                              }
+                            `}
+                          >
+                            <td className="px-3 py-2.5 text-[10px] text-zinc-600">
+                              {move.moveNumber}
+                              {move.color === "w" ? "." : "..."}
+                            </td>
+
+                            <td className="px-2 py-2.5">
+                              {move.color === "w" ? (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-[#fff3d5]/10 px-2 py-1 text-[9px] font-bold text-[#fff3d5]">
+                                  ♔ {t("White")}
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-white/5 px-2 py-1 text-[9px] font-bold text-zinc-400">
+                                  ♚ {t("Black")}
+                                </span>
+                              )}
+                            </td>
+
+                            <td className="px-2 py-2.5">
+                              <div className="flex items-center gap-2">
+                                <span className="w-5 text-center text-lg leading-none">
+                                  {getHistoryPieceSymbol(
+                                    move.color,
+                                    move.piece,
+                                  )}
+                                </span>
+
+                                <span className="font-mono text-xs font-bold text-zinc-200">
+                                  {move.san}
+                                </span>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                )}
               </div>
             </section>
           </div>
@@ -2010,19 +2352,42 @@ export default function ChessComputerBoard({
                   {getGameStatus()}
                 </span>
 
-                <div className="text-right">
-                  <p className="text-xs text-zinc-500">Skill {skillLevel}</p>
-
-                  <p className="mt-0.5 text-[10px] text-zinc-600">
-                    {thinkTime} ms
-                  </p>
-                </div>
+                <span className="text-xs font-bold text-zinc-400">
+                  {t("Difficulty")}:{" "}
+                  <span className="text-zinc-100">{t(difficultyLabel)}</span>
+                </span>
               </div>
             </div>
 
+            {/* HISTORY PREVIEW STATUS */}
+
+            {historyPreview && (
+              <div className="mb-3 flex items-center justify-between gap-4 rounded-xl border border-blue-400/20 bg-blue-400/[0.07] px-4 py-3">
+                <div>
+                  <p className="text-[9px] font-black uppercase tracking-widest text-blue-300">
+                    {t("History Preview")}
+                  </p>
+
+                  <p className="mt-1 text-sm font-bold text-white">
+                    {t("Move")} {historyPreview.moveNumber}
+                    {historyPreview.color === "w" ? "." : "..."}{" "}
+                    {historyPreview.san}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setHistoryPreviewPly(null)}
+                  className="shrink-0 rounded-lg bg-white/10 px-3 py-2 text-xs font-bold text-zinc-200 transition hover:bg-white/20"
+                >
+                  {t("Back to Live Board")}
+                </button>
+              </div>
+            )}
+
             {/* PROMOTION */}
 
-            {promotionFrom && promotionSquare && (
+            {promotionFrom && promotionSquare && !historyPreview && (
               <div className="mb-3">
                 <PromotionBar onPromote={promotePawn} />
               </div>
@@ -2032,18 +2397,22 @@ export default function ChessComputerBoard({
 
             <div className="relative">
               <Board
-                board={board}
-                selectedSquare={selectedSquare}
-                legalMoves={legalMoves}
-                lastMove={lastMove}
-                checkedKingSquare={checkedKingSquare}
-                onSquareClick={handleSquareClick}
+                board={displayedBoard}
+                selectedSquare={historyPreview ? null : selectedSquare}
+                legalMoves={historyPreview ? [] : legalMoves}
+                lastMove={historyPreviewMove ?? lastMove}
+                checkedKingSquare={
+                  historyPreview
+                    ? historyPreviewCheckedKingSquare
+                    : checkedKingSquare
+                }
+                onSquareClick={historyPreview ? () => {} : handleSquareClick}
                 orientation={playerColor}
               />
 
               {/* GAME RESULT */}
 
-              {gameResult && (
+              {gameResult && !historyPreview && (
                 <div
                   className="
                     absolute
@@ -2102,7 +2471,7 @@ export default function ChessComputerBoard({
 
                     <button
                       type="button"
-                      onClick={restartGame}
+                      onClick={() => setReviewOpen(true)}
                       className="
                         mt-7
                         w-full
@@ -2114,6 +2483,25 @@ export default function ChessComputerBoard({
                         text-zinc-950
                         transition
                         hover:bg-amber-300
+                      "
+                    >
+                      {t("Open Game Review")}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={restartGame}
+                      className="
+                        mt-3
+                        w-full
+                        rounded-xl
+                        bg-white/10
+                        px-5
+                        py-3
+                        font-semibold
+                        text-white
+                        transition
+                        hover:bg-white/20
                       "
                     >
                       {t("Play Again")}
@@ -2175,29 +2563,33 @@ export default function ChessComputerBoard({
               <div className="mt-5 space-y-3">
                 <div
                   className="
+                    flex
+                    items-center
+                    justify-between
                     rounded-xl
                     bg-black/20
                     px-3
                     py-3
                   "
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-zinc-500">
-                      {t("Difficulty")}
-                    </span>
+                  <span className="text-sm text-zinc-500">
+                    {t("Difficulty")}
+                  </span>
 
-                    <span className="text-sm font-semibold text-white">
-                      {t("Skill")} {skillLevel}
-                    </span>
-                  </div>
+                  <span className="text-sm font-semibold text-white">
+                    {t(difficultyLabel)}
+                  </span>
+                </div>
 
-                  <div className="mt-2 flex items-center justify-between text-[10px] text-zinc-600">
-                    <span>{t("Think time")}</span>
-
-                    <span>{thinkTime} ms</span>
-                  </div>
-
-                  <div className="mt-1 flex items-center justify-between text-[10px] text-zinc-600">
+                <div
+                  className="
+                    rounded-xl
+                    bg-black/20
+                    px-3
+                    py-3
+                  "
+                >
+                  <div className="flex items-center justify-between text-[10px] text-zinc-600">
                     <span>{t("Weak-move chance")}</span>
 
                     <span>{Math.round(randomMoveChance * 100)}%</span>
@@ -2265,6 +2657,46 @@ export default function ChessComputerBoard({
                 >
                   {t("New Game")}
                 </button>
+
+                <button
+                  type="button"
+                  disabled={
+                    gameResult === null || currentMoveHistory.length === 0
+                  }
+                  onClick={() => setReviewOpen(true)}
+                  className="
+                    flex
+                    w-full
+                    items-center
+                    justify-center
+                    gap-2
+                    rounded-xl
+                    border
+                    border-amber-400/20
+                    bg-amber-400/10
+                    px-4
+                    py-3
+                    text-sm
+                    font-bold
+                    text-amber-300
+                    transition
+                    hover:bg-amber-400/20
+                    disabled:cursor-not-allowed
+                    disabled:border-white/5
+                    disabled:bg-white/[0.03]
+                    disabled:text-zinc-600
+                    disabled:hover:bg-white/[0.03]
+                  "
+                >
+                  <span>♞</span>
+                  <span>{t("Open Game Review")}</span>
+                </button>
+
+                {gameResult === null && (
+                  <p className="text-center text-[10px] text-zinc-600">
+                    {t("Available after the game ends")}
+                  </p>
+                )}
 
                 <button
                   type="button"
@@ -2703,16 +3135,134 @@ export default function ChessComputerBoard({
           </div>
         </aside>
       </main>
-      {gameResult && (
-        <ChessGameReview
-          moves={moveHistory}
-          orientation={playerColor}
-          open={reviewOpen}
-          onClose={() => setReviewOpen(false)}
-        />
-      )}
+      <ChessGameReview
+        moves={currentMoveHistory}
+        orientation={playerColor}
+        open={reviewOpen}
+        onClose={() => setReviewOpen(false)}
+      />
     </div>
   );
+}
+
+/* =========================================================
+   HISTORY PIECE SYMBOL
+   ========================================================= */
+
+function CapturedPiecesGrid({
+  capturedBlack,
+  capturedWhite,
+  t,
+}: {
+  capturedBlack: PieceType[];
+  capturedWhite: PieceType[];
+  t: (key: string) => string;
+}) {
+  const symbols: Record<"white" | "black", Record<PieceType, string>> = {
+    white: {
+      p: "♙",
+      n: "♘",
+      b: "♗",
+      r: "♖",
+      q: "♕",
+      k: "♔",
+    },
+    black: {
+      p: "♟",
+      n: "♞",
+      b: "♝",
+      r: "♜",
+      q: "♛",
+      k: "♚",
+    },
+  };
+
+  function CapturedRow({
+    color,
+    pieces,
+  }: {
+    color: "white" | "black";
+    pieces: PieceType[];
+  }) {
+    return (
+      <div className="grid grid-cols-[52px_minmax(0,1fr)] items-start gap-2">
+        <div className="pt-2 text-[10px] font-black uppercase tracking-wider text-zinc-600">
+          {color === "white" ? t("White") : t("Black")}
+        </div>
+
+        <div
+          className="
+            flex
+            min-h-10
+            flex-wrap
+            content-start
+            gap-1.5
+            rounded-xl
+            border
+            border-white/5
+            bg-black/20
+            p-1.5
+          "
+        >
+          {pieces.length === 0 ? (
+            <span className="px-1 py-1 text-xs text-zinc-700">—</span>
+          ) : (
+            pieces.map((piece, index) => (
+              <span
+                key={`${color}-${piece}-${index}`}
+                className="
+                  flex
+                  h-7
+                  w-7
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-lg
+                  border
+                  border-white/5
+                  bg-white/[0.04]
+                  text-[20px]
+                  leading-none
+                "
+              >
+                {symbols[color][piece]}
+              </span>
+            ))
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-[96px] space-y-2">
+      <CapturedRow color="black" pieces={capturedBlack} />
+      <CapturedRow color="white" pieces={capturedWhite} />
+    </div>
+  );
+}
+
+function getHistoryPieceSymbol(color: "w" | "b", piece: PieceType) {
+  const symbols: Record<"w" | "b", Record<PieceType, string>> = {
+    w: {
+      p: "♙",
+      n: "♘",
+      b: "♗",
+      r: "♖",
+      q: "♕",
+      k: "♔",
+    },
+    b: {
+      p: "♟",
+      n: "♞",
+      b: "♝",
+      r: "♜",
+      q: "♛",
+      k: "♚",
+    },
+  };
+
+  return symbols[color][piece];
 }
 
 /* =========================================================
