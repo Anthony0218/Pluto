@@ -20,7 +20,7 @@ const games: Game[] = [
     description:
       "Spiele Schach, tritt gegen Stockfish an, analysiere Stellungen und werte deine Partien aus.",
     image: "/images/chess-home.png",
-    route: "/chessGame",
+    route: "/chess",
     tag: "Strategie",
     features: ["Einzelspieler", "Stockfish", "Analyse"],
   },
@@ -49,7 +49,7 @@ const gameList = [
   {
     name: "Schach",
     description: "Klassisches Schach mit Analyse und Stockfish.",
-    route: "/chessGame",
+    route: "/chess",
     category: "Strategie",
     image: "/images/chess-game-icon.png",
   },

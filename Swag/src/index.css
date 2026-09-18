@@ -122,3 +122,66 @@ body {
     transform: translateX(0);
   }
 }
+@keyframes wattenCardInBottom {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 120px) scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+@keyframes wattenCardInTop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -120px) scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+@keyframes wattenCardInLeft {
+  from {
+    opacity: 0;
+    transform: translate(-120px, -50%) scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(0, -50%) scale(1);
+  }
+}
+
+@keyframes wattenCardInRight {
+  from {
+    opacity: 0;
+    transform: translate(120px, -50%) scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(0, -50%) scale(1);
+  }
+}
+
+.watten-card-in-bottom {
+  animation: wattenCardInBottom 280ms ease-out;
+}
+
+.watten-card-in-top {
+  animation: wattenCardInTop 280ms ease-out;
+}
+
+.watten-card-in-left {
+  animation: wattenCardInLeft 280ms ease-out;
+}
+
+.watten-card-in-right {
+  animation: wattenCardInRight 280ms ease-out;
+}

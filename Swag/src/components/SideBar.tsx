@@ -29,7 +29,7 @@ const navigation = [
   },
   {
     label: "Chess",
-    href: "/chessGame",
+    href: "/chess",
     icon: Folder,
   },
   {

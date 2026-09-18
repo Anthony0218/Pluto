@@ -16,23 +16,9 @@ type Player = {
   cards: Card[];
 };
 
-const CARD_VALUES: CardValue[] = [ 
-  "7",
-  "8",
-  "9",
-  "10",
-  "U",
-  "O",
-  "K",
-  "A",
-];
+const CARD_VALUES: CardValue[] = ["7", "8", "9", "10", "U", "O", "K", "A"];
 
-const CARD_COLORS: CardColor[] = [
-  "Herz",
-  "Schellen",
-  "Eichel",
-  "Gras",
-];
+const CARD_COLORS: CardColor[] = ["Herz", "Schellen", "Eichel", "Gras"];
 
 const CARD_ORDER: Record<CardValue, number> = {
   "7": 1,
@@ -58,7 +44,7 @@ function createDeck(): Card[] {
       id: `${value}-${color}`,
       value,
       color,
-    }))
+    })),
   );
 }
 
@@ -68,21 +54,20 @@ function shuffleDeck(cards: Card[]): Card[] {
   for (let i = shuffled.length - 1; i > 0; i--) {
     const randomIndex = Math.floor(Math.random() * (i + 1));
 
-    [shuffled[i], shuffled[randomIndex]] = [
-      shuffled[randomIndex],
-      shuffled[i],
-    ];
+    [shuffled[i], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[i]];
   }
 
   return shuffled;
 }
 
-function startGame(deck: Card[]):any { //all the games you can play with a deck of cards
+function startGame(deck: Card[]): any {
+  //all the games you can play with a deck of cards
   const gameName = document.getElementById("gameNames")?.innerHTML;
   const playerCount = document.getElementById("playerCount")?.innerHTML;
   let deckIndex = 0; //so viele Karten wurden bisher ausgeteilt
   let rules = "";
-  const players: Player[] = [ //max player count
+  const players: Player[] = [
+    //max player count
     {
       id: 1,
       name: "Player 1",
@@ -105,8 +90,8 @@ function startGame(deck: Card[]):any { //all the games you can play with a deck 
     },
   ];
 
-  switch(gameName) {
-    case ("Arschloch"): { 
+  switch (gameName) {
+    case "Arschloch": {
       while (32 - deckIndex >= players.length) {
         for (const player of players) {
           player.cards.push(deck[deckIndex]);
@@ -114,16 +99,15 @@ function startGame(deck: Card[]):any { //all the games you can play with a deck 
         }
       }
     }
-    case ("Schafkopf"): {
-
+    case "Schafkopf": {
     }
   }
   return {
-      players,
-      rules,
-      deckIndex,
-      remainingDeck: deck.slice(deckIndex),
-  }
+    players,
+    rules,
+    deckIndex,
+    remainingDeck: deck.slice(deckIndex),
+  };
 }
 
 function createGame() {
@@ -133,17 +117,13 @@ function createGame() {
 
 export default function CardDeck() {
   const initialGame = useMemo(() => createGame(), []);
-  const [players, setPlayers] = useState<Player[]>(
-    initialGame.players
-  );
+  const [players, setPlayers] = useState<Player[]>(initialGame.players);
   const [remainingDeck, setRemainingDeck] = useState<Card[]>(
-    initialGame.remainingDeck
+    initialGame.remainingDeck,
   );
   const [currentPlayer, setCurrentPlayer] = useState(0);
   const [playedCard, setPlayedCard] = useState<Card | null>(null);
-  const [message, setMessage] = useState(
-    "Player 1 starts the game."
-  );
+  const [message, setMessage] = useState("Player 1 starts the game.");
 
   const resetGame = () => {
     const game = createGame();
@@ -160,19 +140,14 @@ export default function CardDeck() {
     if (!playedCard) {
       return true;
     }
-    return (
-      CARD_ORDER[card.value] >=
-      CARD_ORDER[playedCard.value]
-    );
+    return CARD_ORDER[card.value] >= CARD_ORDER[playedCard.value];
   };
 
   const playCard = (card: Card) => {
     const player = players[currentPlayer];
 
     if (!canPlayCard(card)) {
-      setMessage(
-        `${card.value} cannot be played on ${playedCard?.value}.`
-      );
+      setMessage(`${card.value} cannot be played on ${playedCard?.value}.`);
 
       return;
     }
@@ -185,7 +160,7 @@ export default function CardDeck() {
       return {
         ...currentPlayerData,
         cards: currentPlayerData.cards.filter(
-          (playerCard) => playerCard.id !== card.id
+          (playerCard) => playerCard.id !== card.id,
         ),
       };
     });
@@ -193,8 +168,7 @@ export default function CardDeck() {
     setPlayers(updatedPlayers);
     setPlayedCard(card);
 
-    const playerHasWon =
-      updatedPlayers[currentPlayer].cards.length === 0;
+    const playerHasWon = updatedPlayers[currentPlayer].cards.length === 0;
 
     if (playerHasWon) {
       setMessage(`${player.name} wins! 🎉`);
@@ -205,9 +179,7 @@ export default function CardDeck() {
 
     setCurrentPlayer(nextPlayer);
 
-    setMessage(
-      `${players[nextPlayer].name}'s turn.`
-    );
+    setMessage(`${players[nextPlayer].name}'s turn.`);
   };
 
   const drawCard = () => {
@@ -232,9 +204,7 @@ export default function CardDeck() {
     setPlayers(updatedPlayers);
     setRemainingDeck(remainingDeck.slice(1));
 
-    setMessage(
-      `${players[currentPlayer].name} drew a card.`
-    );
+    setMessage(`${players[currentPlayer].name} drew a card.`);
   };
 
   return (
@@ -242,8 +212,6 @@ export default function CardDeck() {
       <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
-          
-
           <button
             type="button"
             onClick={resetGame}
@@ -255,9 +223,7 @@ export default function CardDeck() {
 
         {/* Game status */}
         <div className="mb-8 rounded-xl bg-Eichel-800 p-4 text-center">
-          <p className="text-lg font-semibold">
-            {message}
-          </p>
+          <p className="text-lg font-semibold">{message}</p>
 
           <p className="mt-1 text-sm text-Eichel-200">
             {remainingDeck.length} cards remaining in deck
@@ -266,9 +232,7 @@ export default function CardDeck() {
 
         {/* Played card */}
         <section className="mb-10 flex flex-col items-center">
-          <h2 className="mb-4 text-lg font-semibold">
-            Current Card
-          </h2>
+          <h2 className="mb-4 text-lg font-semibold">Current Card</h2>
 
           {playedCard ? (
             <CardView card={playedCard} large />
@@ -282,8 +246,7 @@ export default function CardDeck() {
         {/* Players */}
         <div className="grid gap-8 md:grid-cols-2">
           {players.map((player, playerIndex) => {
-            const isCurrentPlayer =
-              playerIndex === currentPlayer;
+            const isCurrentPlayer = playerIndex === currentPlayer;
 
             return (
               <section
@@ -296,14 +259,10 @@ export default function CardDeck() {
               >
                 <div className="mb-5 flex items-center justify-between">
                   <div>
-                    <h2 className="text-xl font-bold">
-                      {player.name}
-                    </h2>
+                    <h2 className="text-xl font-bold">{player.name}</h2>
 
                     {isCurrentPlayer && (
-                      <span className="text-sm text-Gras-300">
-                        Your turn
-                      </span>
+                      <span className="text-sm text-Gras-300">Your turn</span>
                     )}
                   </div>
 
@@ -349,36 +308,18 @@ export default function CardDeck() {
   );
 }
 
-function CardView({
-  card,
-  large = false,
-}: {
-  card: Card;
-  large?: boolean;
-}) {
+function CardView({ card, large = false }: { card: Card; large?: boolean }) {
   return (
     <div
       className={`flex flex-col items-center justify-between rounded-xl border-2 bg-white font-bold shadow-lg ${
         large ? "h-36 w-24 p-3" : "h-28 w-20 p-2"
       } ${COLOR_CLASS[card.color]}`}
     >
-      <span className="self-start text-xs uppercase">
-        {card.color}
-      </span>
+      <span className="self-start text-xs uppercase">{card.color}</span>
 
-      <span
-        className={
-          large
-            ? "text-4xl"
-            : "text-3xl"
-        }
-      >
-        {card.value}
-      </span>
+      <span className={large ? "text-4xl" : "text-3xl"}>{card.value}</span>
 
-      <span className="self-end text-xs">
-        {card.value}
-      </span>
+      <span className="self-end text-xs">{card.value}</span>
     </div>
   );
 }

@@ -16,14 +16,22 @@ import AppLayout from "./components/AppLayout";
 import Watten from "./pages/Watten";
 import WattenHotseat from "./pages/WattenHotseat";
 import WattenHotseatPage from "./pages/WattenGamePage";
-import WattenMultiplayer from "./pages/WattenMultiplayer";
-import WattenMultiplayerGame from "./pages/WattenMultiplayerGame";
 
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import WattenRules from "./pages/WattenRules";
 import { CardThemeProvider } from "./context/CardThemeContext";
 import { TableThemeProvider } from "./context/TableThemeContext";
+import WattenMultiplayerLobby from "./components/WattenMultiplayerLobby";
+import WattenMultiplayerRoom from "./components/WattenMultiplayerRoom";
+import WattenMultiplayerGame from "./components/WattenMultiplayerGame";
+import ChessClassicMenu from "./pages/ChessClassicalMenu";
+import ChessMenu from "./pages/ChessMenu";
+import ChessComputer from "./pages/ChessComputer";
+import ChessMultiplayerLobby from "./pages/ChessMultiplayerLobby";
+import ChessMultiplayerRoom from "./pages/ChessMultiplayerRoom";
+import ChessMultiplayerGame from "./pages/ChessMultiplayerGame";
+import ChessRulesAndTips from "./components/ChessRulesAndTips";
 
 const router = createBrowserRouter([
   {
@@ -36,7 +44,15 @@ const router = createBrowserRouter([
       },
 
       {
-        path: "/chessGame",
+        path: "/chess",
+        element: <ChessMenu />,
+      },
+      {
+        path: "/chess/classic",
+        element: <ChessClassicMenu />,
+      },
+      {
+        path: "/chess/classic/hotseat",
         element: <ChessGame />,
       },
 
@@ -71,17 +87,37 @@ const router = createBrowserRouter([
       },
 
       {
-        path: "/watten/multiplayer",
-        element: <WattenMultiplayer />,
+        path: "/watten/rules",
+        element: <WattenRules />,
       },
-
+      { path: "/watten/multiplayer", element: <WattenMultiplayerLobby /> },
       {
-        path: "/watten/multiplayer/:gameId",
+        path: "/watten/multiplayer/:roomCode",
+        element: <WattenMultiplayerRoom />,
+      },
+      {
+        path: "/watten/multiplayer/:roomCode/game",
         element: <WattenMultiplayerGame />,
       },
       {
-        path: "/watten/rules",
-        element: <WattenRules />,
+        path: "/chess/classic/ai",
+        element: <ChessComputer />,
+      },
+      {
+        path: "/chess/classic/multiplayer",
+        element: <ChessMultiplayerLobby />,
+      },
+      {
+        path: "/chess/classic/multiplayer/:roomCode",
+        element: <ChessMultiplayerRoom />,
+      },
+      {
+        path: "/chess/classic/multiplayer/:roomCode/game",
+        element: <ChessMultiplayerGame />,
+      },
+      {
+        path: "/chess/rules",
+        element: <ChessRulesAndTips />,
       },
     ],
   },
