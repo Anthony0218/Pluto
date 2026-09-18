@@ -17,6 +17,13 @@ type BoardProps = {
   checkedKingSquare: Square | null;
   onSquareClick: (row: number, column: number) => void;
   orientation?: "white" | "black";
+
+  /*
+   * Allows smaller pieces on boards
+   * such as Game Review without
+   * changing the normal game board.
+   */
+  pieceScale?: number;
 };
 
 const pieceSymbols = {
@@ -43,6 +50,7 @@ export default function Board({
   checkedKingSquare,
   onSquareClick,
   orientation = "white",
+  pieceScale = 1,
 }: BoardProps) {
   return (
     /*
@@ -64,6 +72,7 @@ export default function Board({
       "
     >
       {/* Inner frame */}
+
       <div
         className="
           rounded-[18px]
@@ -76,6 +85,7 @@ export default function Board({
         "
       >
         {/* Chess board */}
+
         <div
           className="
             grid
@@ -97,6 +107,7 @@ export default function Board({
                * playing as Black, while the real
                * chess coordinates remain correct.
                */
+
               const row = orientation === "white" ? displayRow : 7 - displayRow;
 
               const column =
@@ -137,127 +148,149 @@ export default function Board({
                   aria-label={square}
                   onClick={() => onSquareClick(row, column)}
                   className={`
-                      group
-                      relative
-                      flex
-                      aspect-square
-                      items-center
-                      justify-center
-                      overflow-hidden
-                      border-0
-                      p-0
-                      transition-[filter,box-shadow]
-                      duration-150
-                      focus:outline-none
+                    group
+                    relative
+                    flex
+                    aspect-square
+                    items-center
+                    justify-center
+                    overflow-hidden
+                    border-0
+                    p-0
+                    transition-[filter,box-shadow]
+                    duration-150
+                    focus:outline-none
 
-                      ${
-                        isLight
-                          ? `
-                            bg-gradient-to-br
-                            from-[#ead7b7]
-                            to-[#d5b78b]
-                          `
-                          : `
-                            bg-gradient-to-br
-                            from-[#9a6746]
-                            to-[#724a31]
-                          `
-                      }
+                    ${
+                      isLight
+                        ? `
+                          bg-gradient-to-br
+                          from-[#ead7b7]
+                          to-[#d5b78b]
+                        `
+                        : `
+                          bg-gradient-to-br
+                          from-[#9a6746]
+                          to-[#724a31]
+                        `
+                    }
 
-                      ${
-                        isSelected
-                          ? `
-                            z-10
-                            ring-4
-                            ring-inset
-                            ring-amber-300
-                          `
-                          : ""
-                      }
+                    ${
+                      isSelected
+                        ? `
+                          z-10
+                          ring-4
+                          ring-inset
+                          ring-amber-300
+                        `
+                        : ""
+                    }
 
-                      hover:brightness-105
-                    `}
+                    hover:brightness-105
+                  `}
                 >
                   {/* =========================
-                        LAST MOVE HIGHLIGHT
-                       ========================= */}
+                      LAST MOVE HIGHLIGHT
+                     ========================= */}
 
                   {isLastMove && (
                     <span
                       className="
-                          pointer-events-none
-                          absolute
-                          inset-0
-                          z-[2]
-                          bg-yellow-300/25
-                        "
+                        pointer-events-none
+                        absolute
+                        inset-0
+                        z-[2]
+                        bg-yellow-300/25
+                      "
                     />
                   )}
 
                   {/* =========================
-                        CHECK GLOW
-                       ========================= */}
+                      CHECK GLOW
+                     ========================= */}
 
                   {isCheckedKing && (
                     <span
                       className="
-                          pointer-events-none
-                          absolute
-                          inset-0
-                          z-[3]
-                          bg-[radial-gradient(circle,rgba(239,68,68,0.85)_0%,rgba(185,28,28,0.52)_45%,rgba(127,29,29,0.05)_80%)]
-                          shadow-[inset_0_0_20px_rgba(239,68,68,0.85)]
-                        "
+                        pointer-events-none
+                        absolute
+                        inset-0
+                        z-[3]
+                        bg-[radial-gradient(circle,rgba(239,68,68,0.85)_0%,rgba(185,28,28,0.52)_45%,rgba(127,29,29,0.05)_80%)]
+                        shadow-[inset_0_0_20px_rgba(239,68,68,0.85)]
+                      "
                     />
                   )}
 
                   {/* =========================
-                        EMPTY LEGAL MOVE
-                       ========================= */}
+                      EMPTY LEGAL MOVE
+                     ========================= */}
 
                   {isLegalMove && !piece && (
                     <span
                       className="
-                            pointer-events-none
-                            absolute
-                            z-[6]
-                            h-[22%]
-                            w-[22%]
-                            rounded-full
-                            bg-black/30
-                            shadow-sm
-                          "
+                        pointer-events-none
+                        absolute
+                        z-[6]
+                        h-[22%]
+                        w-[22%]
+                        rounded-full
+                        bg-black/30
+                        shadow-sm
+                      "
                     />
                   )}
 
                   {/* =========================
-                        LEGAL CAPTURE
-                       ========================= */}
+                      LEGAL CAPTURE
+                     ========================= */}
 
                   {isLegalMove && piece && (
                     <span
                       className="
-                            pointer-events-none
-                            absolute
-                            inset-[7%]
-                            z-[6]
-                            rounded-full
-                            border-[clamp(3px,0.5vw,6px)]
-                            border-black/25
-                          "
+                        pointer-events-none
+                        absolute
+                        inset-[7%]
+                        z-[6]
+                        rounded-full
+                        border-[clamp(3px,0.5vw,6px)]
+                        border-black/25
+                      "
                     />
                   )}
 
                   {/* =========================
-                        PIECE
-                       ========================= */}
+                      PIECE
+                     ========================= */}
 
                   {piece && (
+                    /*
+                     * Outer wrapper controls only
+                     * the overall piece size.
+                     *
+                     * The inner span keeps the
+                     * existing hover animation.
+                     */
                     <span
-                      className={`
+                      className="
+                        pointer-events-none
+                        relative
+                        z-10
+                        flex
+                        h-full
+                        w-full
+                        items-center
+                        justify-center
+                      "
+                      style={{
+                        transform: `scale(${pieceScale})`,
+                        transformOrigin: "center",
+                      }}
+                    >
+                      <span
+                        className={`
                           pointer-events-none
                           relative
-                          z-10
                           select-none
 
                           font-serif
@@ -281,52 +314,53 @@ export default function Board({
                               `
                           }
                         `}
-                    >
-                      {symbol}
+                      >
+                        {symbol}
+                      </span>
                     </span>
                   )}
 
                   {/* =========================
-                        FILE COORDINATE
-                        a b c d e f g h
-                       ========================= */}
+                      FILE COORDINATE
+                      a b c d e f g h
+                     ========================= */}
 
                   {displayRow === 7 && (
                     <span
                       className={`
-                          pointer-events-none
-                          absolute
-                          bottom-1
-                          right-1.5
-                          z-20
-                          text-[clamp(8px,1vw,12px)]
-                          font-black
+                        pointer-events-none
+                        absolute
+                        bottom-1
+                        right-1.5
+                        z-20
+                        text-[clamp(8px,1vw,12px)]
+                        font-black
 
-                          ${isLight ? "text-[#66452f]/70" : "text-[#f1ddbe]/70"}
-                        `}
+                        ${isLight ? "text-[#66452f]/70" : "text-[#f1ddbe]/70"}
+                      `}
                     >
                       {file}
                     </span>
                   )}
 
                   {/* =========================
-                        RANK COORDINATE
-                        1 2 3 4 5 6 7 8
-                       ========================= */}
+                      RANK COORDINATE
+                      1 2 3 4 5 6 7 8
+                     ========================= */}
 
                   {displayColumn === 0 && (
                     <span
                       className={`
-                          pointer-events-none
-                          absolute
-                          left-1.5
-                          top-1
-                          z-20
-                          text-[clamp(8px,1vw,12px)]
-                          font-black
+                        pointer-events-none
+                        absolute
+                        left-1.5
+                        top-1
+                        z-20
+                        text-[clamp(8px,1vw,12px)]
+                        font-black
 
-                          ${isLight ? "text-[#66452f]/70" : "text-[#f1ddbe]/70"}
-                        `}
+                        ${isLight ? "text-[#66452f]/70" : "text-[#f1ddbe]/70"}
+                      `}
                     >
                       {rank}
                     </span>

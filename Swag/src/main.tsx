@@ -31,6 +31,7 @@ import ChessComputer from "./pages/ChessComputer";
 import ChessMultiplayerLobby from "./pages/ChessMultiplayerLobby";
 import ChessMultiplayerRoom from "./pages/ChessMultiplayerRoom";
 import ChessMultiplayerGame from "./pages/ChessMultiplayerGame";
+import ChessRulesAndTips from "./components/ChessRulesAndTips";
 
 const router = createBrowserRouter([
   {
@@ -113,6 +114,10 @@ const router = createBrowserRouter([
       {
         path: "/chess/classic/multiplayer/:roomCode/game",
         element: <ChessMultiplayerGame />,
+      },
+      {
+        path: "/chess/rules",
+        element: <ChessRulesAndTips />,
       },
     ],
   },

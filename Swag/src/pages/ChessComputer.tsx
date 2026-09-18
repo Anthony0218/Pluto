@@ -7,12 +7,54 @@ type PlayerColor = "white" | "black" | "random";
 
 type Difficulty = "beginner" | "easy" | "medium" | "hard" | "expert";
 
-const difficultyLevels: Record<Difficulty, number> = {
-  beginner: 0,
-  easy: 3,
-  medium: 7,
-  hard: 12,
-  expert: 18,
+type DifficultySettings = {
+  skillLevel: number;
+  thinkTime: number;
+  randomMoveChance: number;
+  label: string;
+  description: string;
+};
+
+const difficultyLevels: Record<Difficulty, DifficultySettings> = {
+  beginner: {
+    skillLevel: 0,
+    thinkTime: 80,
+    randomMoveChance: 0.45,
+    label: "Beginner",
+    description: "Very forgiving. Makes frequent mistakes and weak moves.",
+  },
+
+  easy: {
+    skillLevel: 0,
+    thinkTime: 150,
+    randomMoveChance: 0.2,
+    label: "Easy",
+    description: "Casual opponent with noticeable mistakes.",
+  },
+
+  medium: {
+    skillLevel: 3,
+    thinkTime: 300,
+    randomMoveChance: 0.05,
+    label: "Medium",
+    description: "Solid play with occasional inaccuracies.",
+  },
+
+  hard: {
+    skillLevel: 10,
+    thinkTime: 500,
+    randomMoveChance: 0,
+    label: "Hard",
+    description: "Strong tactical play with few mistakes.",
+  },
+
+  expert: {
+    skillLevel: 18,
+    thinkTime: 800,
+    randomMoveChance: 0,
+    label: "Expert",
+    description: "Very strong Stockfish play.",
+  },
 };
 
 export default function ChessComputer() {
@@ -24,6 +66,8 @@ export default function ChessComputer() {
 
   const [playerColor, setPlayerColor] = useState<"white" | "black">("white");
 
+  const selectedDifficulty = difficultyLevels[difficulty];
+
   function startGame() {
     let resolvedColor: "white" | "black";
 
@@ -34,6 +78,7 @@ export default function ChessComputer() {
     }
 
     setPlayerColor(resolvedColor);
+
     setGameStarted(true);
   }
 
@@ -42,19 +87,65 @@ export default function ChessComputer() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-4 py-6 text-zinc-100 sm:px-6 lg:px-8">
+    <main
+      className="
+        min-h-screen
+        bg-[radial-gradient(circle_at_top,#21170f_0%,#111111_38%,#090909_100%)]
+        px-4
+        py-6
+        text-zinc-100
+        sm:px-6
+        lg:px-8
+      "
+    >
       <div className="mx-auto w-full max-w-[1500px]">
         <Link
           to="/chess/classic"
-          className="text-sm font-semibold text-zinc-400 transition hover:text-white"
+          className="
+            text-sm
+            font-semibold
+            text-zinc-400
+            transition
+            hover:text-white
+          "
         >
           ← Classic Chess
         </Link>
 
         {!gameStarted ? (
           <div className="mx-auto mt-12 max-w-xl">
+            {/* HEADER */}
+
             <div className="text-center">
-              <p className="text-xs font-bold uppercase tracking-[0.3em] text-amber-400">
+              <div
+                className="
+                  mx-auto
+                  flex
+                  h-16
+                  w-16
+                  items-center
+                  justify-center
+                  rounded-2xl
+                  border
+                  border-amber-500/20
+                  bg-amber-400/10
+                  text-4xl
+                  text-amber-200
+                "
+              >
+                ♞
+              </div>
+
+              <p
+                className="
+                  mt-6
+                  text-xs
+                  font-bold
+                  uppercase
+                  tracking-[0.3em]
+                  text-amber-400
+                "
+              >
                 Classic Chess
               </p>
 
@@ -68,7 +159,15 @@ export default function ChessComputer() {
             {/* COLOR */}
 
             <section className="mt-10">
-              <h2 className="text-sm font-bold uppercase tracking-widest text-zinc-400">
+              <h2
+                className="
+                  text-sm
+                  font-bold
+                  uppercase
+                  tracking-widest
+                  text-zinc-400
+                "
+              >
                 Choose Color
               </h2>
 
@@ -76,7 +175,9 @@ export default function ChessComputer() {
                 {(
                   [
                     ["white", "♙", "White"],
+
                     ["random", "◐", "Random"],
+
                     ["black", "♟", "Black"],
                   ] as const
                 ).map(([value, icon, label]) => (
@@ -85,17 +186,27 @@ export default function ChessComputer() {
                     type="button"
                     onClick={() => setSelectedColor(value)}
                     className={`
-                      rounded-2xl
-                      border
-                      p-5
-                      transition
+                        rounded-2xl
+                        border
+                        p-5
+                        transition-all
+                        duration-200
 
-                      ${
-                        selectedColor === value
-                          ? "border-amber-400 bg-amber-400/10"
-                          : "border-white/10 bg-zinc-900 hover:bg-zinc-800"
-                      }
-                    `}
+                        ${
+                          selectedColor === value
+                            ? `
+                              border-amber-400
+                              bg-amber-400/10
+                              shadow-[0_0_25px_rgba(251,191,36,0.08)]
+                            `
+                            : `
+                              border-white/10
+                              bg-zinc-900/75
+                              hover:border-white/20
+                              hover:bg-zinc-800
+                            `
+                        }
+                      `}
                   >
                     <div className="text-4xl">{icon}</div>
 
@@ -108,51 +219,91 @@ export default function ChessComputer() {
             {/* DIFFICULTY */}
 
             <section className="mt-8">
-              <h2 className="text-sm font-bold uppercase tracking-widest text-zinc-400">
+              <h2
+                className="
+                  text-sm
+                  font-bold
+                  uppercase
+                  tracking-widest
+                  text-zinc-400
+                "
+              >
                 Difficulty
               </h2>
 
               <div className="mt-4 grid gap-3">
                 {(
-                  [
-                    ["beginner", "Beginner"],
-                    ["easy", "Easy"],
-                    ["medium", "Medium"],
-                    ["hard", "Hard"],
-                    ["expert", "Expert"],
-                  ] as const
-                ).map(([value, label]) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => setDifficulty(value)}
-                    className={`
-                      flex
-                      items-center
-                      justify-between
-                      rounded-xl
-                      border
-                      px-5
-                      py-4
-                      text-left
-                      transition
+                  ["beginner", "easy", "medium", "hard", "expert"] as const
+                ).map((value) => {
+                  const settings = difficultyLevels[value];
 
-                      ${
-                        difficulty === value
-                          ? "border-amber-400 bg-amber-400/10"
-                          : "border-white/10 bg-zinc-900 hover:bg-zinc-800"
-                      }
-                    `}
-                  >
-                    <span className="font-bold">{label}</span>
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setDifficulty(value)}
+                      className={`
+                          flex
+                          items-center
+                          justify-between
+                          gap-4
+                          rounded-2xl
+                          border
+                          px-5
+                          py-4
+                          text-left
+                          transition-all
+                          duration-200
 
-                    <span className="text-xs text-zinc-500">
-                      Skill {difficultyLevels[value]}
-                    </span>
-                  </button>
-                ))}
+                          ${
+                            difficulty === value
+                              ? `
+                                border-amber-400
+                                bg-amber-400/10
+                                shadow-[0_0_25px_rgba(251,191,36,0.06)]
+                              `
+                              : `
+                                border-white/10
+                                bg-zinc-900/75
+                                hover:border-white/20
+                                hover:bg-zinc-800
+                              `
+                          }
+                        `}
+                    >
+                      <div className="min-w-0">
+                        <div className="font-bold text-zinc-100">
+                          {settings.label}
+                        </div>
+
+                        <p className="mt-1 text-xs leading-5 text-zinc-500">
+                          {settings.description}
+                        </p>
+                      </div>
+
+                      <div className="shrink-0 text-right">
+                        <p className="text-xs font-semibold text-zinc-400">
+                          Skill {settings.skillLevel}
+                        </p>
+
+                        <p className="mt-1 text-[10px] text-zinc-600">
+                          {settings.thinkTime} ms
+                        </p>
+
+                        {settings.randomMoveChance > 0 && (
+                          <p className="mt-1 text-[10px] font-semibold text-amber-300">
+                            {Math.round(settings.randomMoveChance * 100)}% weak
+                            moves
+                          </p>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </section>
+
+            {/* START GAME */}
 
             <button
               type="button"
@@ -176,8 +327,18 @@ export default function ChessComputer() {
           </div>
         ) : (
           <>
+            {/* GAME HEADER */}
+
             <div className="mt-6 text-center">
-              <p className="text-xs font-bold uppercase tracking-[0.3em] text-amber-400">
+              <p
+                className="
+                  text-xs
+                  font-bold
+                  uppercase
+                  tracking-[0.3em]
+                  text-amber-400
+                "
+              >
                 Classic Chess
               </p>
 
@@ -189,23 +350,45 @@ export default function ChessComputer() {
                   {playerColor === "white" ? "White" : "Black"}
                 </strong>
                 {" · "}
-                Difficulty: <strong className="text-white">{difficulty}</strong>
+                Difficulty:{" "}
+                <strong className="text-white">
+                  {selectedDifficulty.label}
+                </strong>
               </p>
             </div>
+
+            {/* CHESS GAME */}
 
             <div className="mt-8">
               <ChessComputerBoard
                 playerColor={playerColor}
-                skillLevel={difficultyLevels[difficulty]}
+                skillLevel={selectedDifficulty.skillLevel}
+                thinkTime={selectedDifficulty.thinkTime}
+                randomMoveChance={selectedDifficulty.randomMoveChance}
                 onChangeSettings={leaveGame}
               />
             </div>
+
+            {/* CHANGE SETTINGS */}
 
             <div className="mt-8 text-center">
               <button
                 type="button"
                 onClick={leaveGame}
-                className="rounded-xl bg-white/10 px-5 py-3 text-sm font-bold transition hover:bg-white/20"
+                className="
+                  rounded-xl
+                  border
+                  border-white/10
+                  bg-white/5
+                  px-5
+                  py-3
+                  text-sm
+                  font-bold
+                  text-zinc-300
+                  transition
+                  hover:bg-white/10
+                  hover:text-white
+                "
               >
                 Change Settings
               </button>
