@@ -7,6 +7,7 @@ import "./index.css";
 
 import App from "./App";
 import ChessGame from "./pages/ChessGames";
+import ChessRoom from "./pages/ChessRoom";
 import Profile from "./pages/Profile";
 import OnlineGame from "./pages/OnlineGame";
 import OnlineGameRoom from "./pages/OnlineGameRoom";
@@ -68,6 +69,10 @@ const router = createBrowserRouter([
       {
         path: "/chess/classic/hotseat",
         element: <ChessGame />,
+      },
+      {
+        path: "/chess/classic/custom",
+        element: <ChessRoom />
       },
 
       {
