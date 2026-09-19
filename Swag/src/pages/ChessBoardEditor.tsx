@@ -433,6 +433,7 @@ const COLUMN_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 function Grid() {
   const [rowCount, setRowCount] = useState(3);
   const [columnCount, setColumnCount] = useState(4);
+
   return (
     <div>
       <div>
@@ -479,14 +480,23 @@ function Grid() {
         {Array.from(
           { length: rowCount * columnCount },
           (_, index) => (
-            <div style={{ minWidth: 0, minHeight: 0 }}>
+            <div
+              key={index}
+              style={{
+                minWidth: 0,
+                minHeight: 0,
+              }}
+            >
               <button
+                type="button"
                 style={{
                   width: "100%",
                   height: "100%",
                   padding: 0,
                   boxSizing: "border-box",
+                  cursor: "pointer",
                 }}
+                onClick={() => console.log(`Button ${index + 1} clicked`)}
               />
             </div>
           )
@@ -495,6 +505,7 @@ function Grid() {
     </div>
   );
 }
+
 /*
 <ChessBoard
         board={board}
