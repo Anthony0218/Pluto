@@ -445,8 +445,8 @@ export default function ChessBoardEditor() {
         selectedColor={selectedColor}
         selectedPiece={selectedPiece}
         boardSize={boardSize}
-        pieceInfoCheckbox={true}
-        opponentInfoCheckbox={false}
+        pieceInfoCheckbox={pieceInfoCheckbox}
+        opponentInfoCheckbox={opponentInfoCheckbox}
         onPieceInfoChange={setPieceInfoCheckbox}
         onOpponentInfoChange={setOpponentInfoCheckbox}
         onBoardSizeChange={setBoardSize}
