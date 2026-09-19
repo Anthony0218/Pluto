@@ -53,7 +53,12 @@ import {
 } from "../games/chess/variants/bossBattle";
 import { useVariantChessAi } from "@/hooks/useVariantChessAi";
 import { chooseBossAiPower } from "../games/chess/ai/bossBattleAi";
-import { chessColorFromPlayerColor, oppositeChessColor, type Difficulty, type ChessPlayerColor } from "../games/chess/ai/variantAi";
+import {
+  chessColorFromPlayerColor,
+  oppositeChessColor,
+  type Difficulty,
+  type ChessPlayerColor,
+} from "../games/chess/ai/variantAi";
 
 const translations: Partial<TranslationTable> = {
   de: {
@@ -410,7 +415,7 @@ type VariantAiBoardProps = {
 export default function BossBattleBoard({
   aiMode = false,
   playerColor = "white",
-  difficulty = "medium",
+  difficulty = "casual",
 }: VariantAiBoardProps) {
   const { language, setLanguage } = useChessLanguage();
   const t = (key: string) => translateChess(language, key, translations);
@@ -450,10 +455,10 @@ export default function BossBattleBoard({
   const humanColor = chessColorFromPlayerColor(playerColor);
   const computerColor = oppositeChessColor(humanColor);
 
-  const {
-    ready: aiReady,
-    chooseMove: chooseAiMove,
-  } = useVariantChessAi(aiMode, difficulty);
+  const { ready: aiReady, chooseMove: chooseAiMove } = useVariantChessAi(
+    aiMode,
+    difficulty,
+  );
 
   const aiMovePendingRef = useRef(false);
 
@@ -535,7 +540,6 @@ export default function BossBattleBoard({
     bossTargetMode,
     chooseAiMove,
   ]);
-
 
   const {
     orientation: liveBoardOrientation,
@@ -921,7 +925,9 @@ export default function BossBattleBoard({
   function undoMove() {
     const snapshot = undoStack[undoStack.length - 1];
     if (!snapshot) return;
-
+    if (aiMode) {
+      return;
+    }
     const restoredGame = new Chess(snapshot.fen);
 
     setGame(restoredGame);
@@ -1022,24 +1028,11 @@ export default function BossBattleBoard({
                 />
 
                 <div className="space-y-3">
-                  <PlayerInput
-                    label={t("White player")}
-                    value={whitePlayer}
-                    onChange={setWhitePlayer}
-                    placeholder={t("White")}
-                  />
-                  <PlayerInput
-                    label={t("Boss player")}
-                    value={bossPlayer}
-                    onChange={setBossPlayer}
-                    placeholder={t("Boss")}
-                  />
-
                   <div className="grid grid-cols-2 gap-2 pt-1">
                     <button
                       type="button"
                       onClick={undoMove}
-                      disabled={undoStack.length === 0}
+                      disabled={undoStack.length === 0 || aiMode}
                       className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs font-black text-zinc-300 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-35"
                     >
                       ↶ {t("Undo")}
@@ -1052,8 +1045,6 @@ export default function BossBattleBoard({
                       ↻ {t("Restart")}
                     </button>
                   </div>
-
-                  <BoardAnimationToggle />
                 </div>
               </section>
 

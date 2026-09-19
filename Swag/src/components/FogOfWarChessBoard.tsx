@@ -24,7 +24,12 @@ import { buildFogStats } from "../games/chess/variants/fogOfWarStats";
 import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.ts";
 import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
 import { chooseFogAiMove } from "../games/chess/ai/fogOfWarAi";
-import { chessColorFromPlayerColor, oppositeChessColor, type Difficulty, type ChessPlayerColor } from "../games/chess/ai/variantAi";
+import {
+  chessColorFromPlayerColor,
+  oppositeChessColor,
+  type Difficulty,
+  type ChessPlayerColor,
+} from "../games/chess/ai/variantAi";
 
 type Language = "en" | "de" | "bar" | "ko" | "ru";
 type Winner = "white" | "black" | "draw";
@@ -315,7 +320,6 @@ export default function FogOfWarChessBoard({
     null,
   );
   const [statsTab, setStatsTab] = useState<StatsTab>("vision");
-  const [turnShielded, setTurnShielded] = useState(true);
 
   const humanColor = chessColorFromPlayerColor(playerColor);
   const computerColor = oppositeChessColor(humanColor);
@@ -366,7 +370,6 @@ export default function FogOfWarChessBoard({
     promotionFrom,
     promotionSquare,
   ]);
-
 
   const historyPreview =
     historyPreviewPly !== null
@@ -479,7 +482,7 @@ export default function FogOfWarChessBoard({
     to: Square,
     promotion?: "q" | "r" | "b" | "n",
   ) {
-    if (gameOver || historyPreview || turnShielded) return;
+    if (gameOver || historyPreview) return;
     try {
       const move = game.move({ from, to, promotion });
       const captured =
@@ -526,8 +529,7 @@ export default function FogOfWarChessBoard({
         if (game.isCheck()) playSound("check");
         else if (move.isKingsideCastle() || move.isQueensideCastle())
           playRandomSound(["castle-1", "castle-2"]);
-        setTurnShielded(true);
-      } else setTurnShielded(false);
+      }
     } catch {
       playSound("illegal");
       setSelectedSquare(null);
@@ -538,7 +540,7 @@ export default function FogOfWarChessBoard({
   function handleSquareClick(row: number, column: number) {
     if (aiMode && game.turn() !== humanColor) return;
 
-    if (gameOver || historyPreview || turnShielded) return;
+    if (gameOver || historyPreview) return;
     const square = getSquareName(row, column);
     if (selectedSquare === null) {
       const piece = game.get(square);
@@ -582,7 +584,7 @@ export default function FogOfWarChessBoard({
   }
 
   function undoMove() {
-    if (records.length === 0) return;
+    if (records.length === 0 || aiMode) return;
     const nextRecords = records.slice(0, -1);
     game.load(nextRecords[nextRecords.length - 1]?.fenAfter ?? initialFen);
     snapToSide(game.turn());
@@ -597,7 +599,7 @@ export default function FogOfWarChessBoard({
     setGameOver(false);
     setGameOverReason("");
     setWinner("white");
-    setTurnShielded(true);
+
     updateGameOver(nextRecords, false);
   }
 
@@ -620,7 +622,6 @@ export default function FogOfWarChessBoard({
     setGameOver(false);
     setGameOverReason("");
     setWinner("white");
-    setTurnShielded(true);
   }
 
   const safePreview = (record: FogMoveRecord) =>
@@ -689,7 +690,12 @@ export default function FogOfWarChessBoard({
                   title={t("Game Controls")}
                   subtitle={t("Private hotseat")}
                 />
-                <FogControls onUndo={undoMove} onRestart={restartGame} t={t} />
+                <FogControls
+                  onUndo={undoMove}
+                  onRestart={restartGame}
+                  undoDisabled={aiMode}
+                  t={t}
+                />
               </Panel>
               <Panel>
                 <div className="mb-4 flex items-start justify-between gap-3">
@@ -741,7 +747,6 @@ export default function FogOfWarChessBoard({
                                 setHistoryPreviewPly(record.ply);
                                 setSelectedSquare(null);
                                 setLegalMoves([]);
-                                setTurnShielded(false);
                               }}
                               className={`border-b border-white/5 last:border-0 ${canPreview ? "cursor-pointer hover:bg-white/5" : "cursor-not-allowed opacity-55"} ${historyPreviewPly === record.ply ? "bg-blue-400/10" : ""}`}
                             >
@@ -794,14 +799,11 @@ export default function FogOfWarChessBoard({
                   </div>
                 </div>
               )}
-              {promotionSquare &&
-                promotionFrom &&
-                !historyPreview &&
-                !turnShielded && (
-                  <div className="mb-3 rounded-2xl border border-sky-400/20 bg-zinc-900/90 p-3">
-                    <PromotionBar onPromote={promotePawn} />
-                  </div>
-                )}
+              {promotionSquare && promotionFrom && !historyPreview && (
+                <div className="mb-3 rounded-2xl border border-sky-400/20 bg-zinc-900/90 p-3">
+                  <PromotionBar onPromote={promotePawn} />
+                </div>
+              )}
               {historyPreview && (
                 <div className="mb-3 flex items-center justify-between rounded-xl border border-blue-400/20 bg-blue-400/[0.07] px-4 py-3">
                   <div>
@@ -818,7 +820,6 @@ export default function FogOfWarChessBoard({
                     type="button"
                     onClick={() => {
                       setHistoryPreviewPly(null);
-                      setTurnShielded(true);
                     }}
                     className="rounded-lg bg-white/10 px-3 py-2 text-xs font-bold"
                   >
@@ -834,45 +835,11 @@ export default function FogOfWarChessBoard({
                   lastMove={displayedLastMove}
                   checkedKingSquare={checkedKingSquare}
                   onSquareClick={
-                    historyPreview || turnShielded || flipPending
-                      ? () => {}
-                      : handleSquareClick
+                    historyPreview || flipPending ? () => {} : handleSquareClick
                   }
                   fogSquares={fogSquares}
                   orientation={boardOrientation}
                 />
-                {turnShielded && !historyPreview && !gameOver && (
-                  <div className="absolute inset-0 z-[80] flex items-center justify-center rounded-xl bg-zinc-950/95 p-6 backdrop-blur-md">
-                    <div className="w-full max-w-md rounded-3xl border border-sky-400/20 bg-zinc-900/95 p-7 text-center shadow-2xl">
-                      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-sky-400/20 bg-sky-400/10 text-4xl">
-                        🌫
-                      </div>
-                      <p className="mt-5 text-xs font-black uppercase tracking-[0.2em] text-sky-300">
-                        {t("Pass the device")}
-                      </p>
-                      <h2 className="mt-2 text-2xl font-black text-white">
-                        {t("Do not look at the board")}
-                      </h2>
-                      <p className="mt-3 text-sm text-zinc-500">
-                        {t("Reveal for")}{" "}
-                        <span className="font-black text-zinc-200">
-                          {game.turn() === "w" ? t("White") : t("Black")}
-                        </span>
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (flipPending) return;
-                          setTurnShielded(false);
-                        }}
-                        disabled={flipPending}
-                        className="mt-6 w-full rounded-xl bg-sky-300 px-4 py-3 text-sm font-black text-zinc-950 hover:bg-sky-200 disabled:cursor-wait disabled:opacity-40"
-                      >
-                        {t("Reveal Board")}
-                      </button>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           </section>
@@ -965,7 +932,6 @@ export default function FogOfWarChessBoard({
                       type="button"
                       onClick={() => {
                         setHistoryPreviewPly(fogStats.latestCapture!.ply);
-                        setTurnShielded(false);
                       }}
                       className="mt-4 w-full rounded-xl border border-white/5 bg-black/20 px-3 py-3 text-left hover:border-sky-400/20"
                     >
@@ -1035,10 +1001,12 @@ function PanelTitle({
 function FogControls({
   onUndo,
   onRestart,
+  undoDisabled,
   t,
 }: {
   onUndo: () => void;
   onRestart: () => void;
+  undoDisabled: boolean;
   t: (key: string) => string;
 }) {
   return (
@@ -1046,7 +1014,13 @@ function FogControls({
       <button
         type="button"
         onClick={onUndo}
-        className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm font-bold text-zinc-300"
+        disabled={undoDisabled}
+        className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm font-bold text-zinc-300 disabled:cursor-not-allowed
+    disabled:border-white/5
+    disabled:bg-white/[0.02]
+    disabled:text-zinc-600
+    disabled:opacity-50
+    disabled:hover:bg-white/[0.02]"
       >
         ↶ {t("Undo")}
       </button>

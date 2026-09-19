@@ -1583,7 +1583,7 @@ export default function PortalChessBoard({
   }
 
   function undoMove() {
-    if (records.length === 0 || pendingPortalPromotion) {
+    if (records.length === 0 || pendingPortalPromotion || aiMode) {
       return;
     }
 
@@ -1818,7 +1818,8 @@ export default function PortalChessBoard({
                   type="button"
                   onClick={undoMove}
                   disabled={
-                    records.length === 0 || Boolean(pendingPortalPromotion)
+                    records.length === 0 ||
+                    Boolean(pendingPortalPromotion || aiMode)
                   }
                   className="
                     rounded-xl

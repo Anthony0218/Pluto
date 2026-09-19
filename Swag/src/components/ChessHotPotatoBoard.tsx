@@ -39,7 +39,12 @@ import {
 } from "../games/chess/variants/HotPotato.ts";
 import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
 import { useVariantChessAi } from "@/hooks/useVariantChessAi";
-import { chessColorFromPlayerColor, oppositeChessColor, type Difficulty, type ChessPlayerColor } from "../games/chess/ai/variantAi";
+import {
+  chessColorFromPlayerColor,
+  oppositeChessColor,
+  type Difficulty,
+  type ChessPlayerColor,
+} from "../games/chess/ai/variantAi";
 
 const translations: Partial<TranslationTable> = {
   de: {
@@ -334,7 +339,7 @@ type VariantAiBoardProps = {
 export default function ChessHotPotatoBoard({
   aiMode = false,
   playerColor = "white",
-  difficulty = "medium",
+  difficulty = "casual",
 }: VariantAiBoardProps) {
   const { language, setLanguage } = useChessLanguage();
   const t = (key: string) => translateChess(language, key, translations);
@@ -396,10 +401,10 @@ export default function ChessHotPotatoBoard({
   const humanColor = chessColorFromPlayerColor(playerColor);
   const computerColor = oppositeChessColor(humanColor);
 
-  const {
-    ready: aiReady,
-    chooseMove: chooseAiMove,
-  } = useVariantChessAi(aiMode, difficulty);
+  const { ready: aiReady, chooseMove: chooseAiMove } = useVariantChessAi(
+    aiMode,
+    difficulty,
+  );
 
   const aiMovePendingRef = useRef(false);
 
@@ -454,7 +459,6 @@ export default function ChessHotPotatoBoard({
     pendingPromotion,
     chooseAiMove,
   ]);
-
 
   /* =======================================================
      BOARD ORIENTATION
@@ -837,7 +841,7 @@ export default function ChessHotPotatoBoard({
     const snapshot = undoStack[undoStack.length - 1];
 
     if (!snapshot) return;
-
+    if (aiMode) return;
     const restoredGame = new Chess(snapshot.fen);
 
     setGame(restoredGame);
@@ -1060,36 +1064,17 @@ export default function ChessHotPotatoBoard({
                 </div>
 
                 <div className="space-y-3">
-                  <label className="block">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
-                      {t("White player")}
-                    </span>
-                    <input
-                      value={whitePlayer}
-                      onChange={(event) => setWhitePlayer(event.target.value)}
-                      placeholder={t("White")}
-                      className="mt-1.5 w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 text-sm font-semibold text-zinc-200 outline-none transition placeholder:text-zinc-700 focus:border-amber-400/30"
-                    />
-                  </label>
-
-                  <label className="block">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
-                      {t("Black player")}
-                    </span>
-                    <input
-                      value={blackPlayer}
-                      onChange={(event) => setBlackPlayer(event.target.value)}
-                      placeholder={t("Black")}
-                      className="mt-1.5 w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 text-sm font-semibold text-zinc-200 outline-none transition placeholder:text-zinc-700 focus:border-amber-400/30"
-                    />
-                  </label>
-
                   <div className="grid grid-cols-2 gap-2 pt-1">
                     <button
                       type="button"
                       onClick={undoMove}
-                      disabled={undoStack.length === 0}
-                      className="rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2.5 text-xs font-black text-zinc-300 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-35"
+                      disabled={undoStack.length === 0 || aiMode}
+                      className="rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2.5 text-xs font-black text-zinc-300 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:cursor-not-allowed
+    disabled:border-white/5
+    disabled:bg-white/[0.02]
+    disabled:text-zinc-600
+    disabled:opacity-50
+    disabled:hover:bg-white/[0.02]"
                     >
                       {t("Undo")}
                     </button>

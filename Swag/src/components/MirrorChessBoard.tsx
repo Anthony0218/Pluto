@@ -1078,7 +1078,7 @@ export default function MirrorChessBoard({
   }
 
   function undoMove() {
-    if (phase !== "playing" || records.length === 0) {
+    if (phase !== "playing" || records.length === 0 || aiMode) {
       return;
     }
 
@@ -1320,6 +1320,7 @@ export default function MirrorChessBoard({
                     <GameControls
                       onUndo={undoMove}
                       onRestart={restartSetup}
+                      undoDisabled={aiMode}
                       t={t}
                     />
                   </Panel>
@@ -1771,10 +1772,12 @@ function SetupStat({
 function GameControls({
   onUndo,
   onRestart,
+  undoDisabled,
   t,
 }: {
   onUndo: () => void;
   onRestart: () => void;
+  undoDisabled: boolean;
   t: (key: string) => string;
 }) {
   return (
@@ -1782,7 +1785,13 @@ function GameControls({
       <button
         type="button"
         onClick={onUndo}
-        className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm font-bold text-zinc-300 transition hover:bg-white/10 hover:text-white"
+        disabled={undoDisabled}
+        className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm font-bold text-zinc-300 transition hover:bg-white/10 hover:text-white disabled:cursor-not-allowed
+    disabled:border-white/5
+    disabled:bg-white/[0.02]
+    disabled:text-zinc-600
+    disabled:opacity-50
+    disabled:hover:bg-white/[0.02]"
       >
         ↶ {t("Undo")}
       </button>

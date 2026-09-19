@@ -909,7 +909,7 @@ export default function MutationChessBoard({
      ======================================================= */
 
   function undoMove() {
-    if (records.length === 0) return;
+    if (records.length === 0 || aiMode) return;
 
     const nextRecords = records.slice(0, -1);
 
@@ -1158,12 +1158,9 @@ export default function MutationChessBoard({
                 />
 
                 <MutationGameControls
-                  whitePlayer={whitePlayer}
-                  blackPlayer={blackPlayer}
-                  onWhitePlayerChange={setWhitePlayer}
-                  onBlackPlayerChange={setBlackPlayer}
                   onUndo={undoMove}
                   onRestart={restartGame}
+                  undoDisabled={aiMode}
                   t={t}
                 />
               </Panel>
@@ -1816,55 +1813,29 @@ function PanelTitle({
 }
 
 function MutationGameControls({
-  whitePlayer,
-  blackPlayer,
-  onWhitePlayerChange,
-  onBlackPlayerChange,
   onUndo,
   onRestart,
+  undoDisabled,
   t,
 }: {
-  whitePlayer: string;
-  blackPlayer: string;
-  onWhitePlayerChange: (value: string) => void;
-  onBlackPlayerChange: (value: string) => void;
   onUndo: () => void;
   onRestart: () => void;
+  undoDisabled: boolean;
   t: (key: string) => string;
 }) {
   return (
     <div className="space-y-4">
-      <label className="block">
-        <span className="mb-1.5 block text-[10px] font-black uppercase tracking-wider text-zinc-600">
-          {t("White player")}
-        </span>
-
-        <input
-          value={whitePlayer}
-          onChange={(event) => onWhitePlayerChange(event.target.value)}
-          placeholder={t("White")}
-          className="w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 text-sm text-zinc-200 outline-none transition placeholder:text-zinc-700 focus:border-violet-400/30"
-        />
-      </label>
-
-      <label className="block">
-        <span className="mb-1.5 block text-[10px] font-black uppercase tracking-wider text-zinc-600">
-          {t("Black player")}
-        </span>
-
-        <input
-          value={blackPlayer}
-          onChange={(event) => onBlackPlayerChange(event.target.value)}
-          placeholder={t("Black")}
-          className="w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 text-sm text-zinc-200 outline-none transition placeholder:text-zinc-700 focus:border-violet-400/30"
-        />
-      </label>
-
       <div className="grid grid-cols-2 gap-2">
         <button
           type="button"
           onClick={onUndo}
-          className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm font-bold text-zinc-300 transition hover:bg-white/10 hover:text-white"
+          disabled={undoDisabled}
+          className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm font-bold text-zinc-300 transition hover:bg-white/10 hover:text-white disabled:cursor-not-allowed
+    disabled:border-white/5
+    disabled:bg-white/[0.02]
+    disabled:text-zinc-600
+    disabled:opacity-50
+    disabled:hover:bg-white/[0.02]"
         >
           ↶ {t("Undo")}
         </button>

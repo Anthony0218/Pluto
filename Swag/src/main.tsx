@@ -282,7 +282,7 @@ const router = createBrowserRouter([
         element: <BossBattleAiPage />,
       },
       {
-        path: "/games/chess/variants/capitalism/ai",
+        path: "/games/chess/variants/chessmarket/ai",
         element: <CapitalismAiPage />,
       },
       {

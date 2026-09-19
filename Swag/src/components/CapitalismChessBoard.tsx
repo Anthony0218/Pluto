@@ -52,7 +52,12 @@ import { buildCapitalismStats } from "../games/chess/variants/capitalismStats";
 import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.ts";
 import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
 import { useVariantChessAi } from "@/hooks/useVariantChessAi";
-import { chessColorFromPlayerColor, oppositeChessColor, type Difficulty, type ChessPlayerColor } from "../games/chess/ai/variantAi";
+import {
+  chessColorFromPlayerColor,
+  oppositeChessColor,
+  type Difficulty,
+  type ChessPlayerColor,
+} from "../games/chess/ai/variantAi";
 
 /* =========================================================
    TYPES
@@ -591,7 +596,7 @@ type VariantAiBoardProps = {
 export default function CapitalismChessBoard({
   aiMode = false,
   playerColor = "white",
-  difficulty = "medium",
+  difficulty = "casual",
 }: VariantAiBoardProps) {
   const [language, setLanguage] = useState<Language>(getInitialLanguage);
   const [boardAnimationEnabled, setBoardAnimationEnabled] = useState(true);
@@ -655,10 +660,10 @@ export default function CapitalismChessBoard({
   const humanColor = chessColorFromPlayerColor(playerColor);
   const computerColor = oppositeChessColor(humanColor);
 
-  const {
-    ready: aiReady,
-    chooseMove: chooseAiMove,
-  } = useVariantChessAi(aiMode, difficulty);
+  const { ready: aiReady, chooseMove: chooseAiMove } = useVariantChessAi(
+    aiMode,
+    difficulty,
+  );
 
   const aiMovePendingRef = useRef(false);
 
@@ -714,7 +719,6 @@ export default function CapitalismChessBoard({
     promotionSquare,
     chooseAiMove,
   ]);
-
 
   const [statsTab, setStatsTab] = useState<StatsTab>("overview");
 
@@ -1202,9 +1206,7 @@ export default function CapitalismChessBoard({
      ======================================================= */
 
   function undoMove() {
-    if (records.length === 0) {
-      return;
-    }
+    if (aiMode || records.length === 0) return;
 
     const nextRecords = records.slice(0, -1);
 
@@ -1432,6 +1434,7 @@ export default function CapitalismChessBoard({
                   onUndo={undoMove}
                   onRestart={restartGame}
                   t={t}
+                  undoDisabled={aiMode}
                 />
               </Panel>
 
@@ -2210,18 +2213,26 @@ function PanelTitle({
 function CapitalismGameControls({
   onUndo,
   onRestart,
+  undoDisabled,
   t,
 }: {
   onUndo: () => void;
   onRestart: () => void;
+  undoDisabled: boolean;
   t: (key: string) => string;
 }) {
   return (
     <div className="grid grid-cols-2 gap-2">
       <button
         type="button"
+        disabled={undoDisabled}
         onClick={onUndo}
-        className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm font-bold text-zinc-300 transition hover:bg-white/10 hover:text-white"
+        className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm font-bold text-zinc-300 transition hover:bg-white/10 hover:text-white disabled:cursor-not-allowed
+    disabled:border-white/5
+    disabled:bg-white/[0.02]
+    disabled:text-zinc-600
+    disabled:opacity-50
+    disabled:hover:bg-white/[0.02]"
       >
         ↶ {t("Undo")}
       </button>

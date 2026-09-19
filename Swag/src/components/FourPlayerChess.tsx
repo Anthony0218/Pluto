@@ -434,8 +434,8 @@ export default function FourPlayerChess({
                 </div>
               )}
             </div>
+            <BoardAnimationToggle />
           </div>
-          <BoardAnimationToggle />
         </header>
 
         <main className="grid gap-6 xl:grid-cols-[290px_minmax(0,1fr)_290px]">
@@ -449,8 +449,13 @@ export default function FourPlayerChess({
                   <button
                     type="button"
                     onClick={undo}
-                    disabled={undoStack.length === 0}
-                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs font-black text-zinc-300 hover:bg-white/10 disabled:opacity-40"
+                    disabled={undoStack.length === 0 || aiMode}
+                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs font-black text-zinc-300 hover:bg-white/10 disabled:cursor-not-allowed
+    disabled:border-white/5
+    disabled:bg-white/[0.02]
+    disabled:text-zinc-600
+    disabled:opacity-50
+    disabled:hover:bg-white/[0.02]"
                   >
                     ↶ {t("Undo")}
                   </button>

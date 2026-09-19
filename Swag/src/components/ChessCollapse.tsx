@@ -47,7 +47,12 @@ import {
 } from "../games/chess/variants/chessCollapse";
 import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
 import { useVariantChessAi } from "@/hooks/useVariantChessAi";
-import { chessColorFromPlayerColor, oppositeChessColor, type Difficulty, type ChessPlayerColor } from "../games/chess/ai/variantAi";
+import {
+  chessColorFromPlayerColor,
+  oppositeChessColor,
+  type Difficulty,
+  type ChessPlayerColor,
+} from "../games/chess/ai/variantAi";
 
 const translations: Partial<TranslationTable> = {
   de: {
@@ -372,7 +377,7 @@ type VariantAiBoardProps = {
 export default function ChessCollapseBoard({
   aiMode = false,
   playerColor = "white",
-  difficulty = "medium",
+  difficulty = "casual",
 }: VariantAiBoardProps) {
   const { language, setLanguage } = useChessLanguage();
   const t = (key: string) => translateChess(language, key, translations);
@@ -416,10 +421,10 @@ export default function ChessCollapseBoard({
   const humanColor = chessColorFromPlayerColor(playerColor);
   const computerColor = oppositeChessColor(humanColor);
 
-  const {
-    ready: aiReady,
-    chooseMove: chooseAiMove,
-  } = useVariantChessAi(aiMode, difficulty);
+  const { ready: aiReady, chooseMove: chooseAiMove } = useVariantChessAi(
+    aiMode,
+    difficulty,
+  );
 
   const aiMovePendingRef = useRef(false);
 
@@ -443,10 +448,7 @@ export default function ChessCollapseBoard({
       .filter((move) =>
         isSquareInsideCollapseBounds(move.to as Square, collapse.bounds),
       )
-      .map(
-        (move) =>
-          `${move.from}${move.to}${move.promotion ?? ""}`,
-      );
+      .map((move) => `${move.from}${move.to}${move.promotion ?? ""}`);
 
     if (allowedMoves.length === 0) {
       return;
@@ -490,7 +492,6 @@ export default function ChessCollapseBoard({
     pendingPromotion,
     chooseAiMove,
   ]);
-
 
   const {
     orientation: liveBoardOrientation,
@@ -797,7 +798,7 @@ export default function ChessCollapseBoard({
   function undoMove() {
     const snapshot = undoStack[undoStack.length - 1];
     if (!snapshot) return;
-
+    if (aiMode) return;
     const restoredGame = new Chess(snapshot.fen);
 
     setGame(restoredGame);
@@ -951,24 +952,11 @@ export default function ChessCollapseBoard({
                 </div>
 
                 <div className="space-y-3">
-                  <PlayerInput
-                    label={t("White player")}
-                    value={whitePlayer}
-                    onChange={setWhitePlayer}
-                    placeholder={t("White")}
-                  />
-                  <PlayerInput
-                    label={t("Black player")}
-                    value={blackPlayer}
-                    onChange={setBlackPlayer}
-                    placeholder={t("Black")}
-                  />
-
                   <div className="grid grid-cols-2 gap-2 pt-1">
                     <button
                       type="button"
                       onClick={undoMove}
-                      disabled={undoStack.length === 0}
+                      disabled={undoStack.length === 0 || aiMode}
                       className="rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2.5 text-xs font-black text-zinc-300 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-35"
                     >
                       {t("Undo")}

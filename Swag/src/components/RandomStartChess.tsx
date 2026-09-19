@@ -23,7 +23,12 @@ import {
 } from "../games/chess/variants/randomStartChess";
 import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
 import { useVariantChessAi } from "@/hooks/useVariantChessAi";
-import { chessColorFromPlayerColor, oppositeChessColor, type Difficulty, type ChessPlayerColor } from "../games/chess/ai/variantAi";
+import {
+  chessColorFromPlayerColor,
+  oppositeChessColor,
+  type Difficulty,
+  type ChessPlayerColor,
+} from "../games/chess/ai/variantAi";
 
 const translations: Partial<TranslationTable> = {
   de: {
@@ -138,7 +143,7 @@ type VariantAiBoardProps = {
 export default function RandomStartChess({
   aiMode = false,
   playerColor = "white",
-  difficulty = "medium",
+  difficulty = "casual",
 }: VariantAiBoardProps) {
   const { language, setLanguage } = useChessLanguage();
   const t = (key: string) => translateChess(language, key, translations);
@@ -171,10 +176,10 @@ export default function RandomStartChess({
   const humanColor = chessColorFromPlayerColor(playerColor);
   const computerColor = oppositeChessColor(humanColor);
 
-  const {
-    ready: aiReady,
-    chooseMove: chooseAiMove,
-  } = useVariantChessAi(aiMode, difficulty);
+  const { ready: aiReady, chooseMove: chooseAiMove } = useVariantChessAi(
+    aiMode,
+    difficulty,
+  );
 
   const aiMovePendingRef = useRef(false);
 
@@ -187,7 +192,6 @@ export default function RandomStartChess({
       historyPreview ||
       Boolean(promotionFrom || promotionSquare) ||
       game.turn() !== computerColor
-      
     ) {
       return;
     }
@@ -458,7 +462,7 @@ export default function RandomStartChess({
   }
 
   function undoMove() {
-    if (records.length === 0) {
+    if (records.length === 0 || aiMode) {
       return;
     }
 
@@ -552,8 +556,8 @@ export default function RandomStartChess({
                 </span>
               )}
             </div>
+            <BoardAnimationToggle />
           </div>
-          <BoardAnimationToggle />
         </header>
 
         <main className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
@@ -567,8 +571,13 @@ export default function RandomStartChess({
                   <button
                     type="button"
                     onClick={undoMove}
-                    disabled={records.length === 0}
-                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs font-black text-zinc-300 transition hover:bg-white/10 disabled:opacity-40"
+                    disabled={records.length === 0 || aiMode}
+                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs font-black text-zinc-300 transition hover:bg-white/10 disabled:cursor-not-allowed
+    disabled:border-white/5
+    disabled:bg-white/[0.02]
+    disabled:text-zinc-600
+    disabled:opacity-50
+    disabled:hover:bg-white/[0.02]"
                   >
                     ↶ {t("Undo")}
                   </button>
