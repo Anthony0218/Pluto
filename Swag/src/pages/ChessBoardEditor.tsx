@@ -440,7 +440,7 @@ export default function ChessBoardEditor() {
   return (
     <>
     <div className="grid grid-flow-col grid-rows-3 gap-4">
-      <div className="row-span-3 h-screen w-1/3">
+      <div className="row-span-3 h-screen w-1/3 rounded-sm place-items-center">
         <Sidebar
         selectedColor={selectedColor}
         selectedPiece={selectedPiece}

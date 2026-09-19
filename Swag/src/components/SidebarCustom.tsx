@@ -47,7 +47,7 @@ export default function Sidebar({
       : "white";
 
   return (
-    <aside>
+    <>
       <h2>
         Position
       </h2>
@@ -124,6 +124,6 @@ export default function Sidebar({
         </button>
 
       </div>
-    </aside>
+    </>
   );
 }
