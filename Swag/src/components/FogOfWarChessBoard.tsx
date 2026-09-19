@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 import { Chess, type Square } from "chess.js";
 import { getSquareName, type PieceType } from "../utils/chessUtils";
 import Board from "./Board";
@@ -23,6 +23,8 @@ import { buildFogStats } from "../games/chess/variants/fogOfWarStats";
 
 import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.ts";
 import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
+import { chooseFogAiMove } from "../games/chess/ai/fogOfWarAi";
+import { chessColorFromPlayerColor, oppositeChessColor, type Difficulty, type ChessPlayerColor } from "../games/chess/ai/variantAi";
 
 type Language = "en" | "de" | "bar" | "ko" | "ru";
 type Winner = "white" | "black" | "draw";
@@ -270,7 +272,18 @@ function getInitialLanguage(): Language {
     : "en";
 }
 
-export default function FogOfWarChessBoard() {
+type VariantAiBoardProps = {
+  aiMode?: boolean;
+  playerColor?: ChessPlayerColor;
+  difficulty?: Difficulty;
+  onChangeSettings?: () => void;
+};
+
+export default function FogOfWarChessBoard({
+  aiMode = false,
+  playerColor = "white",
+  difficulty = "casual",
+}: VariantAiBoardProps) {
   const [language, setLanguage] = useState<Language>(getInitialLanguage);
   const t = (key: string) =>
     language === "en"
@@ -304,6 +317,57 @@ export default function FogOfWarChessBoard() {
   const [statsTab, setStatsTab] = useState<StatsTab>("vision");
   const [turnShielded, setTurnShielded] = useState(true);
 
+  const humanColor = chessColorFromPlayerColor(playerColor);
+  const computerColor = oppositeChessColor(humanColor);
+  const aiMovePendingRef = useRef(false);
+
+  useEffect(() => {
+    if (
+      !aiMode ||
+      aiMovePendingRef.current ||
+      gameOver ||
+      historyPreviewPly !== null ||
+      promotionFrom ||
+      promotionSquare ||
+      game.turn() !== computerColor
+    ) {
+      return;
+    }
+
+    const expectedFen = game.fen();
+    aiMovePendingRef.current = true;
+
+    const timer = window.setTimeout(() => {
+      try {
+        const move = chooseFogAiMove(game, computerColor, difficulty);
+
+        if (
+          !move ||
+          game.fen() !== expectedFen ||
+          game.turn() !== computerColor
+        ) {
+          return;
+        }
+
+        commitMove(move.from, move.to, move.promotion);
+      } finally {
+        aiMovePendingRef.current = false;
+      }
+    }, 260);
+
+    return () => window.clearTimeout(timer);
+  }, [
+    aiMode,
+    computerColor,
+    difficulty,
+    records.length,
+    gameOver,
+    historyPreviewPly,
+    promotionFrom,
+    promotionSquare,
+  ]);
+
+
   const historyPreview =
     historyPreviewPly !== null
       ? (records[historyPreviewPly - 1] ?? null)
@@ -324,7 +388,7 @@ export default function FogOfWarChessBoard() {
     orientation: liveBoardOrientation,
     flipPending,
     snapToSide,
-  } = useDelayedBoardOrientation(liveSide, 1500);
+  } = useDelayedBoardOrientation(aiMode ? humanColor : liveSide, 1500);
 
   const boardOrientation: "white" | "black" = historyPreviewChess
     ? displayedSide === "w"
@@ -472,6 +536,8 @@ export default function FogOfWarChessBoard() {
   }
 
   function handleSquareClick(row: number, column: number) {
+    if (aiMode && game.turn() !== humanColor) return;
+
     if (gameOver || historyPreview || turnShielded) return;
     const square = getSquareName(row, column);
     if (selectedSquare === null) {

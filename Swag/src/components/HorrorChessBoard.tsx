@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { Chess, type Square } from "chess.js";
 
@@ -34,6 +34,13 @@ import {
 import { buildHorrorStats } from "../games/chess/variants/horrorStats";
 import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.ts";
 import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
+import { useVariantChessAi } from "@/hooks/useVariantChessAi";
+import {
+  chessColorFromPlayerColor,
+  oppositeChessColor,
+  type Difficulty,
+  type ChessPlayerColor,
+} from "../games/chess/ai/variantAi";
 
 type Language = "en" | "de" | "bar" | "ko" | "ru";
 
@@ -341,7 +348,18 @@ function getInitialLanguage(): Language {
   return "en";
 }
 
-export default function HorrorChessBoard() {
+type VariantAiBoardProps = {
+  aiMode?: boolean;
+  playerColor?: ChessPlayerColor;
+  difficulty?: Difficulty;
+  onChangeSettings?: () => void;
+};
+
+export default function HorrorChessBoard({
+  aiMode = false,
+  playerColor = "white",
+  difficulty = "casual",
+}: VariantAiBoardProps) {
   const [language, setLanguage] = useState<Language>(getInitialLanguage);
 
   const t = (key: string) => {
@@ -397,6 +415,89 @@ export default function HorrorChessBoard() {
     null,
   );
 
+  const humanColor = chessColorFromPlayerColor(playerColor);
+  const computerColor = oppositeChessColor(humanColor);
+
+  const { ready: aiReady, chooseMove: chooseAiMove } = useVariantChessAi(
+    aiMode,
+    difficulty,
+  );
+
+  const aiMovePendingRef = useRef(false);
+
+  useEffect(() => {
+    if (
+      !aiMode ||
+      !aiReady ||
+      aiMovePendingRef.current ||
+      gameOver ||
+      historyPreviewPly !== null ||
+      promotionFrom ||
+      promotionSquare ||
+      game.turn() !== computerColor
+    ) {
+      return;
+    }
+
+    const expectedFen = game.fen();
+    const nextPly = records.length + 1;
+
+    const allowedMoves = game
+      .moves({ verbose: true })
+      .filter((move) =>
+        isHorrorMoveAllowed({
+          game,
+          state: horrorState,
+          from: move.from,
+          to: move.to,
+          nextPly,
+        }),
+      )
+      .map((move) => `${move.from}${move.to}${move.promotion ?? ""}`);
+
+    if (allowedMoves.length === 0) {
+      return;
+    }
+
+    let cancelled = false;
+    aiMovePendingRef.current = true;
+
+    const timer = window.setTimeout(async () => {
+      try {
+        const move = await chooseAiMove(game, allowedMoves);
+
+        if (
+          cancelled ||
+          !move ||
+          game.fen() !== expectedFen ||
+          game.turn() !== computerColor
+        ) {
+          return;
+        }
+
+        commitMove(move.from, move.to, move.promotion);
+      } finally {
+        aiMovePendingRef.current = false;
+      }
+    }, 220);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [
+    aiMode,
+    aiReady,
+    computerColor,
+    records.length,
+    horrorState,
+    gameOver,
+    historyPreviewPly,
+    promotionFrom,
+    promotionSquare,
+    chooseAiMove,
+  ]);
+
   const [statsTab, setStatsTab] = useState<StatsTab>("survival");
 
   const historyPreview =
@@ -434,7 +535,7 @@ export default function HorrorChessBoard() {
     orientation: liveBoardOrientation,
     flipPending,
     snapToSide,
-  } = useDelayedBoardOrientation(game.turn(), 1500);
+  } = useDelayedBoardOrientation(aiMode ? humanColor : game.turn(), 1500);
 
   const boardOrientation: "white" | "black" = historyPreviewChess
     ? historyPreviewChess.turn() === "w"
@@ -788,6 +889,8 @@ export default function HorrorChessBoard() {
   }
 
   function handleSquareClick(row: number, column: number) {
+    if (aiMode && game.turn() !== humanColor) return;
+
     if (gameOver || historyPreview) {
       return;
     }

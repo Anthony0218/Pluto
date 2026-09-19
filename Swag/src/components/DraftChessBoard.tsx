@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { Chess, type Square } from "chess.js";
 
@@ -44,6 +44,13 @@ import {
 
 import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.ts";
 import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
+import { useVariantChessAi } from "@/hooks/useVariantChessAi";
+import {
+  chessColorFromPlayerColor,
+  oppositeChessColor,
+  type Difficulty,
+  type ChessPlayerColor,
+} from "../games/chess/ai/variantAi";
 
 type Language = "en" | "de" | "bar" | "ko" | "ru";
 
@@ -407,7 +414,18 @@ function getInitialLanguage(): Language {
   return "en";
 }
 
-export default function DraftChessBoard() {
+type VariantAiBoardProps = {
+  aiMode?: boolean;
+  playerColor?: ChessPlayerColor;
+  difficulty?: Difficulty;
+  onChangeSettings?: () => void;
+};
+
+export default function DraftChessBoard({
+  aiMode = false,
+  playerColor = "white",
+  difficulty = "casual",
+}: VariantAiBoardProps) {
   const [language, setLanguage] = useState<Language>(getInitialLanguage);
 
   const t = (key: string) => {
@@ -430,11 +448,23 @@ export default function DraftChessBoard() {
     }
   }
 
+  const humanColor = chessColorFromPlayerColor(playerColor);
+  const computerColor = oppositeChessColor(humanColor);
+
+  const { ready: aiReady, chooseMove: chooseAiMove } = useVariantChessAi(
+    aiMode,
+    difficulty,
+  );
+
+  const aiMovePendingRef = useRef(false);
+
   const [setupState, setSetupState] = useState<DraftSetupState>(
     createInitialDraftSetupState,
   );
 
-  const [setupSide, setSetupSide] = useState<DraftSide>("w");
+  const [setupSide, setSetupSide] = useState<DraftSide>(() =>
+    aiMode ? humanColor : "w",
+  );
 
   const [setupTool, setSetupTool] = useState<SetupTool>("p");
 
@@ -477,6 +507,61 @@ export default function DraftChessBoard() {
 
   const [statsTab, setStatsTab] = useState<StatsTab>("armies");
 
+  useEffect(() => {
+    if (
+      !aiMode ||
+      phase !== "playing" ||
+      !aiReady ||
+      aiMovePendingRef.current ||
+      gameOver ||
+      historyPreviewPly !== null ||
+      promotionFrom ||
+      promotionSquare ||
+      game.turn() !== computerColor
+    ) {
+      return;
+    }
+
+    const expectedFen = game.fen();
+    let cancelled = false;
+    aiMovePendingRef.current = true;
+
+    const timer = window.setTimeout(async () => {
+      try {
+        const move = await chooseAiMove(game);
+
+        if (
+          cancelled ||
+          !move ||
+          game.fen() !== expectedFen ||
+          game.turn() !== computerColor
+        ) {
+          return;
+        }
+
+        commitMove(move.from, move.to, move.promotion);
+      } finally {
+        aiMovePendingRef.current = false;
+      }
+    }, 220);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [
+    aiMode,
+    phase,
+    aiReady,
+    computerColor,
+    records.length,
+    gameOver,
+    historyPreviewPly,
+    promotionFrom,
+    promotionSquare,
+    chooseAiMove,
+  ]);
+
   const historyPreview =
     historyPreviewPly !== null
       ? (records[historyPreviewPly - 1] ?? null)
@@ -500,13 +585,17 @@ export default function DraftChessBoard() {
     orientation: liveBoardOrientation,
     flipPending,
     snapToSide,
-  } = useDelayedBoardOrientation(game.turn(), 1500);
+  } = useDelayedBoardOrientation(aiMode ? humanColor : game.turn(), 1500);
 
   const boardOrientation: "white" | "black" =
     phase === "setup"
-      ? setupSide === "w"
-        ? "white"
-        : "black"
+      ? aiMode
+        ? humanColor === "w"
+          ? "white"
+          : "black"
+        : setupSide === "w"
+          ? "white"
+          : "black"
       : historyPreviewChess
         ? historyPreviewChess.turn() === "w"
           ? "white"
@@ -593,6 +682,8 @@ export default function DraftChessBoard() {
   }
 
   function handleSetupSquareClick(row: number, column: number) {
+    if (aiMode && setupSide !== humanColor) return;
+
     if (phase !== "setup" || privacyStep !== "none") {
       return;
     }
@@ -653,6 +744,30 @@ export default function DraftChessBoard() {
 
     if (result.error) {
       setSetupError(result.error);
+      return;
+    }
+
+    if (aiMode) {
+      /*
+       * In Vs AI the human builds only their own army.
+       * The opponent receives a legal randomized army using the same
+       * 39-point rules, then both sides are confirmed.
+       */
+      const aiSide: DraftSide = computerColor;
+      const randomized = randomizeDraftArmy(result.state, aiSide);
+      const confirmedAi = applyDraftSetupAction(randomized, {
+        type: "CONFIRM_ARMY",
+        side: aiSide,
+      });
+
+      if (confirmedAi.error) {
+        setSetupError(confirmedAi.error);
+        return;
+      }
+
+      setSetupState(confirmedAi.state);
+      setSetupError("");
+      setPrivacyStep("to-game");
       return;
     }
 
@@ -916,6 +1031,8 @@ export default function DraftChessBoard() {
   }
 
   function handleGameSquareClick(row: number, column: number) {
+    if (aiMode && game.turn() !== humanColor) return;
+
     if (phase !== "playing" || gameOver || historyPreview) {
       return;
     }

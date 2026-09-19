@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useRef, useEffect, useMemo, useState } from "react";
 import {
   LanguageSelector,
   translateChess,
@@ -38,6 +38,8 @@ import {
   type HotPotatoState,
 } from "../games/chess/variants/HotPotato.ts";
 import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
+import { useVariantChessAi } from "@/hooks/useVariantChessAi";
+import { chessColorFromPlayerColor, oppositeChessColor, type Difficulty, type ChessPlayerColor } from "../games/chess/ai/variantAi";
 
 const translations: Partial<TranslationTable> = {
   de: {
@@ -322,7 +324,18 @@ function cloneHotPotato(state: HotPotatoState): HotPotatoState {
    COMPONENT
    ========================================================= */
 
-export default function ChessHotPotatoBoard() {
+type VariantAiBoardProps = {
+  aiMode?: boolean;
+  playerColor?: ChessPlayerColor;
+  difficulty?: Difficulty;
+  onChangeSettings?: () => void;
+};
+
+export default function ChessHotPotatoBoard({
+  aiMode = false,
+  playerColor = "white",
+  difficulty = "medium",
+}: VariantAiBoardProps) {
   const { language, setLanguage } = useChessLanguage();
   const t = (key: string) => translateChess(language, key, translations);
   /* =======================================================
@@ -380,6 +393,69 @@ export default function ChessHotPotatoBoard() {
   const [capturedWhite, setCapturedWhite] = useState<PieceType[]>([]);
   const [capturedBlack, setCapturedBlack] = useState<PieceType[]>([]);
 
+  const humanColor = chessColorFromPlayerColor(playerColor);
+  const computerColor = oppositeChessColor(humanColor);
+
+  const {
+    ready: aiReady,
+    chooseMove: chooseAiMove,
+  } = useVariantChessAi(aiMode, difficulty);
+
+  const aiMovePendingRef = useRef(false);
+
+  useEffect(() => {
+    if (
+      !aiMode ||
+      !aiReady ||
+      aiMovePendingRef.current ||
+      finishedGame ||
+      historyPreviewPly !== null ||
+      pendingPromotion ||
+      game.turn() !== computerColor
+    ) {
+      return;
+    }
+
+    const expectedFen = game.fen();
+    let cancelled = false;
+    aiMovePendingRef.current = true;
+
+    const timer = window.setTimeout(async () => {
+      try {
+        const move = await chooseAiMove(game);
+
+        if (
+          cancelled ||
+          !move ||
+          game.fen() !== expectedFen ||
+          game.turn() !== computerColor
+        ) {
+          return;
+        }
+
+        makeMove(move.from, move.to, move.promotion);
+      } finally {
+        aiMovePendingRef.current = false;
+      }
+    }, 220);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [
+    aiMode,
+    aiReady,
+    computerColor,
+    game,
+    history.length,
+    finishedGame,
+    historyPreviewPly,
+    pendingPromotion,
+    chooseAiMove,
+  ]);
+
+
   /* =======================================================
      BOARD ORIENTATION
      ======================================================= */
@@ -388,7 +464,7 @@ export default function ChessHotPotatoBoard() {
     orientation: liveBoardOrientation,
     flipPending,
     snapToSide,
-  } = useDelayedBoardOrientation(game.turn(), 1500);
+  } = useDelayedBoardOrientation(aiMode ? humanColor : game.turn(), 1500);
 
   /* =======================================================
      HISTORY PREVIEW
@@ -705,6 +781,8 @@ export default function ChessHotPotatoBoard() {
      ======================================================= */
 
   function handleSquareClick(row: number, column: number) {
+    if (aiMode && game.turn() !== humanColor) return;
+
     if (finishedGame || historyPreview || pendingPromotion || flipPending)
       return;
 

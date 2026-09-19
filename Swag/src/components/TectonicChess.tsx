@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { Chess, type Square } from "chess.js";
 
@@ -44,6 +44,14 @@ import {
   type TectonicSide,
   type TectonicState,
 } from "../games/chess/variants/tectonicChess";
+import { useVariantChessAi } from "@/hooks/useVariantChessAi";
+import { chooseTectonicAiShift } from "../games/chess/ai/tectonicAi";
+import {
+  chessColorFromPlayerColor,
+  oppositeChessColor,
+  type Difficulty,
+  type ChessPlayerColor,
+} from "../games/chess/ai/variantAi";
 
 type PromotionPiece = "q" | "r" | "b" | "n";
 
@@ -378,7 +386,18 @@ function resultText(result: FinishedGame, t: (key: string) => string): string {
   return t("Threefold repetition. Draw.");
 }
 
-export default function TectonicChess() {
+type VariantAiBoardProps = {
+  aiMode?: boolean;
+  playerColor?: ChessPlayerColor;
+  difficulty?: Difficulty;
+  onChangeSettings?: () => void;
+};
+
+export default function TectonicChess({
+  aiMode = false,
+  playerColor = "white",
+  difficulty = "casual",
+}: VariantAiBoardProps) {
   const { language, setLanguage } = useChessLanguage();
 
   const t = (key: string) => translateChess(language, key, translations);
@@ -418,11 +437,93 @@ export default function TectonicChess() {
     tectonicRepetitionKey(new Chess(), createInitialTectonicState()),
   ]);
 
+  const humanColor = chessColorFromPlayerColor(playerColor);
+  const computerColor = oppositeChessColor(humanColor);
+
+  const { ready: aiReady, chooseMove: chooseAiMove } = useVariantChessAi(
+    aiMode,
+    difficulty,
+  );
+
+  const aiMovePendingRef = useRef(false);
+
+  useEffect(() => {
+    if (
+      !aiMode ||
+      aiMovePendingRef.current ||
+      finishedGame ||
+      historyPreviewIndex !== null ||
+      pendingPromotion ||
+      game.turn() !== computerColor
+    ) {
+      return;
+    }
+
+    const expectedFen = game.fen();
+    let cancelled = false;
+    aiMovePendingRef.current = true;
+
+    const timer = window.setTimeout(async () => {
+      try {
+        if (tectonic.pendingShift) {
+          const action = chooseTectonicAiShift(game, tectonic, difficulty);
+
+          if (
+            cancelled ||
+            game.fen() !== expectedFen ||
+            game.turn() !== computerColor
+          ) {
+            return;
+          }
+
+          performShift(action, true);
+          return;
+        }
+
+        if (!aiReady) {
+          return;
+        }
+
+        const move = await chooseAiMove(game);
+
+        if (
+          cancelled ||
+          !move ||
+          game.fen() !== expectedFen ||
+          game.turn() !== computerColor
+        ) {
+          return;
+        }
+
+        commitNormalMove(move.from, move.to, move.promotion);
+      } finally {
+        aiMovePendingRef.current = false;
+      }
+    }, 220);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [
+    aiMode,
+    aiReady,
+    computerColor,
+    difficulty,
+    game,
+    tectonic,
+    history.length,
+    finishedGame,
+    historyPreviewIndex,
+    pendingPromotion,
+    chooseAiMove,
+  ]);
+
   const {
     orientation: liveBoardOrientation,
     flipPending,
     snapToSide,
-  } = useDelayedBoardOrientation(game.turn(), 1500);
+  } = useDelayedBoardOrientation(aiMode ? humanColor : game.turn(), 1500);
 
   const legalShiftQuadrants = useMemo(
     () =>
@@ -605,6 +706,8 @@ export default function TectonicChess() {
   }
 
   function handleSquareClick(row: number, column: number) {
+    if (aiMode && game.turn() !== humanColor) return;
+
     if (
       finishedGame ||
       tectonic.pendingShift ||
@@ -681,7 +784,11 @@ export default function TectonicChess() {
     commitNormalMove(selectedSquare, square);
   }
 
-  function performShift(quadrant: TectonicQuadrant | null) {
+  function performShift(
+    quadrant: TectonicQuadrant | null,
+    initiatedByAi = false,
+  ) {
+    if (aiMode && !initiatedByAi && game.turn() !== humanColor) return;
     if (
       finishedGame ||
       !tectonic.pendingShift ||

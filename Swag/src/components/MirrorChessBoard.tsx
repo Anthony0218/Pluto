@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { Chess, type Square } from "chess.js";
 
@@ -39,6 +39,13 @@ import {
 
 import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.ts";
 import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
+import { useVariantChessAi } from "@/hooks/useVariantChessAi";
+import {
+  chessColorFromPlayerColor,
+  oppositeChessColor,
+  type Difficulty,
+  type ChessPlayerColor,
+} from "../games/chess/ai/variantAi";
 
 type Language = "en" | "de" | "bar" | "ko" | "ru";
 
@@ -362,7 +369,18 @@ function getInitialLanguage(): Language {
   return "en";
 }
 
-export default function MirrorChessBoard() {
+type VariantAiBoardProps = {
+  aiMode?: boolean;
+  playerColor?: ChessPlayerColor;
+  difficulty?: Difficulty;
+  onChangeSettings?: () => void;
+};
+
+export default function MirrorChessBoard({
+  aiMode = false,
+  playerColor = "white",
+  difficulty = "casual",
+}: VariantAiBoardProps) {
   const [language, setLanguage] = useState<Language>(getInitialLanguage);
 
   const t = (key: string) => {
@@ -424,6 +442,16 @@ export default function MirrorChessBoard() {
 
   const [statsTab, setStatsTab] = useState<StatsTab>("setup");
 
+  const humanColor = chessColorFromPlayerColor(playerColor);
+  const computerColor = oppositeChessColor(humanColor);
+
+  const { ready: aiReady, chooseMove: chooseAiMove } = useVariantChessAi(
+    aiMode,
+    difficulty,
+  );
+
+  const aiMovePendingRef = useRef(false);
+
   const historyPreview =
     historyPreviewPly !== null
       ? (records[historyPreviewPly - 1] ?? null)
@@ -457,6 +485,107 @@ export default function MirrorChessBoard() {
 
   const setupSquares = getMirrorSetupSquares(setupState.turn);
 
+  useEffect(() => {
+    if (
+      !aiMode ||
+      phase !== "setup" ||
+      setupState.complete ||
+      setupState.turn !== computerColor ||
+      availableSquares.length === 0
+    ) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      /*
+       * The setup draw itself is random and hidden from opening theory.
+       * The AI selects a legal square without looking ahead at future draws.
+       */
+      const index = Math.floor(Math.random() * availableSquares.length);
+      const square = availableSquares[index];
+
+      const result = applyMirrorSetupAction(setupState, {
+        type: "PLACE_DRAWN_PIECE",
+        side: computerColor,
+        square,
+      });
+
+      if (!result.error) {
+        setSetupState(result.state);
+        setSetupError("");
+        setSelectedSquare(null);
+
+        if (currentPiece) {
+          playPieceSelectSound(currentPiece);
+        }
+      }
+    }, 300);
+
+    return () => window.clearTimeout(timer);
+  }, [
+    aiMode,
+    phase,
+    setupState,
+    computerColor,
+    availableSquares,
+    currentPiece,
+  ]);
+
+  useEffect(() => {
+    if (
+      !aiMode ||
+      phase !== "playing" ||
+      !aiReady ||
+      aiMovePendingRef.current ||
+      gameOver ||
+      historyPreviewPly !== null ||
+      promotionFrom ||
+      promotionSquare ||
+      game.turn() !== computerColor
+    ) {
+      return;
+    }
+
+    const expectedFen = game.fen();
+    let cancelled = false;
+    aiMovePendingRef.current = true;
+
+    const timer = window.setTimeout(async () => {
+      try {
+        const move = await chooseAiMove(game);
+
+        if (
+          cancelled ||
+          !move ||
+          game.fen() !== expectedFen ||
+          game.turn() !== computerColor
+        ) {
+          return;
+        }
+
+        commitMove(move.from, move.to, move.promotion);
+      } finally {
+        aiMovePendingRef.current = false;
+      }
+    }, 220);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [
+    aiMode,
+    phase,
+    aiReady,
+    computerColor,
+    records.length,
+    gameOver,
+    historyPreviewPly,
+    promotionFrom,
+    promotionSquare,
+    chooseAiMove,
+  ]);
+
   const currentPreviewSquares: Square[] =
     selectedSquare && phase === "setup"
       ? [selectedSquare, mirrorSquare(selectedSquare)]
@@ -474,7 +603,7 @@ export default function MirrorChessBoard() {
     orientation: liveBoardOrientation,
     flipPending,
     snapToSide,
-  } = useDelayedBoardOrientation(game.turn(), 1500);
+  } = useDelayedBoardOrientation(aiMode ? humanColor : game.turn(), 1500);
 
   /*
    * Mirror setup phase:
@@ -487,7 +616,7 @@ export default function MirrorChessBoard() {
     orientation: setupBoardOrientation,
     flipPending: setupFlipPending,
     snapToSide: snapSetupToSide,
-  } = useDelayedBoardOrientation(setupState.turn, 1500);
+  } = useDelayedBoardOrientation(aiMode ? humanColor : setupState.turn, 1500);
 
   const boardOrientation: "white" | "black" =
     phase === "setup"
@@ -543,6 +672,8 @@ export default function MirrorChessBoard() {
   }
 
   function handleSetupSquareClick(row: number, column: number) {
+    if (aiMode && setupState.turn !== humanColor) return;
+
     if (
       phase !== "setup" ||
       setupState.complete ||
@@ -855,6 +986,8 @@ export default function MirrorChessBoard() {
   }
 
   function handleGameSquareClick(row: number, column: number) {
+    if (aiMode && game.turn() !== humanColor) return;
+
     if (phase !== "playing" || gameOver || historyPreview) {
       return;
     }

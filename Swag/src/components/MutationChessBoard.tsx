@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useRef, useEffect, useMemo, useState } from "react";
 
 import { Chess, type Square } from "chess.js";
 
@@ -30,6 +30,13 @@ import { buildMutationStats } from "../games/chess/variants/mutationStats";
 
 import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.ts";
 import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
+import { useVariantChessAi } from "@/hooks/useVariantChessAi";
+import {
+  chessColorFromPlayerColor,
+  oppositeChessColor,
+  type Difficulty,
+  type ChessPlayerColor,
+} from "../games/chess/ai/variantAi";
 
 /* =========================================================
    TYPES
@@ -388,7 +395,18 @@ function getInitialLanguage(): Language {
    COMPONENT
    ========================================================= */
 
-export default function MutationChessBoard() {
+type VariantAiBoardProps = {
+  aiMode?: boolean;
+  playerColor?: ChessPlayerColor;
+  difficulty?: Difficulty;
+  onChangeSettings?: () => void;
+};
+
+export default function MutationChessBoard({
+  aiMode = false,
+  playerColor = "white",
+  difficulty = "casual",
+}: VariantAiBoardProps) {
   const [language, setLanguage] = useState<Language>(getInitialLanguage);
 
   const t = (key: string) => {
@@ -443,6 +461,69 @@ export default function MutationChessBoard() {
     null,
   );
 
+  const humanColor = chessColorFromPlayerColor(playerColor);
+  const computerColor = oppositeChessColor(humanColor);
+
+  const { ready: aiReady, chooseMove: chooseAiMove } = useVariantChessAi(
+    aiMode,
+    difficulty,
+  );
+
+  const aiMovePendingRef = useRef(false);
+
+  useEffect(() => {
+    if (
+      !aiMode ||
+      !aiReady ||
+      aiMovePendingRef.current ||
+      gameOver ||
+      historyPreview ||
+      Boolean(promotionFrom || promotionSquare) ||
+      game.turn() !== computerColor
+    ) {
+      return;
+    }
+
+    const expectedFen = game.fen();
+    let cancelled = false;
+
+    aiMovePendingRef.current = true;
+
+    const timer = window.setTimeout(async () => {
+      try {
+        const aiMove = await chooseAiMove(game);
+
+        if (
+          cancelled ||
+          !aiMove ||
+          game.fen() !== expectedFen ||
+          game.turn() !== computerColor
+        ) {
+          return;
+        }
+
+        commitMove(aiMove.from, aiMove.to, aiMove.promotion);
+      } finally {
+        aiMovePendingRef.current = false;
+      }
+    }, 220);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [
+    aiMode,
+    aiReady,
+    computerColor,
+    records.length,
+    gameOver,
+    historyPreviewPly,
+    promotionFrom,
+    promotionSquare,
+    chooseAiMove,
+  ]);
+
   const [statsTab, setStatsTab] = useState<StatsTab>("overview");
 
   /* =======================================================
@@ -469,7 +550,7 @@ export default function MutationChessBoard() {
     orientation: liveBoardOrientation,
     flipPending,
     snapToSide,
-  } = useDelayedBoardOrientation(game.turn(), 1500);
+  } = useDelayedBoardOrientation(aiMode ? humanColor : game.turn(), 1500);
 
   const boardOrientation: "white" | "black" = historyPreviewChess
     ? historyPreviewChess.turn() === "w"
@@ -743,6 +824,10 @@ export default function MutationChessBoard() {
      ======================================================= */
 
   function handleSquareClick(row: number, column: number) {
+    if (aiMode && game.turn() !== humanColor) {
+      return;
+    }
+
     if (gameOver || historyPreview) {
       return;
     }

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useRef, useEffect, useMemo, useState } from "react";
 import {
   LanguageSelector,
   translateChess,
@@ -51,6 +51,9 @@ import {
   type BossTargetMode,
   type BossWinner,
 } from "../games/chess/variants/bossBattle";
+import { useVariantChessAi } from "@/hooks/useVariantChessAi";
+import { chooseBossAiPower } from "../games/chess/ai/bossBattleAi";
+import { chessColorFromPlayerColor, oppositeChessColor, type Difficulty, type ChessPlayerColor } from "../games/chess/ai/variantAi";
 
 const translations: Partial<TranslationTable> = {
   de: {
@@ -397,7 +400,18 @@ function getFinish(
   return null;
 }
 
-export default function BossBattleBoard() {
+type VariantAiBoardProps = {
+  aiMode?: boolean;
+  playerColor?: ChessPlayerColor;
+  difficulty?: Difficulty;
+  onChangeSettings?: () => void;
+};
+
+export default function BossBattleBoard({
+  aiMode = false,
+  playerColor = "white",
+  difficulty = "medium",
+}: VariantAiBoardProps) {
   const { language, setLanguage } = useChessLanguage();
   const t = (key: string) => translateChess(language, key, translations);
   const [game, setGame] = useState(() => new Chess(BOSS_STARTING_FEN));
@@ -433,11 +447,101 @@ export default function BossBattleBoard() {
   const [capturedWhite, setCapturedWhite] = useState<PieceType[]>([]);
   const [capturedBlack, setCapturedBlack] = useState<PieceType[]>([]);
 
+  const humanColor = chessColorFromPlayerColor(playerColor);
+  const computerColor = oppositeChessColor(humanColor);
+
+  const {
+    ready: aiReady,
+    chooseMove: chooseAiMove,
+  } = useVariantChessAi(aiMode, difficulty);
+
+  const aiMovePendingRef = useRef(false);
+
+  useEffect(() => {
+    if (
+      !aiMode ||
+      aiMovePendingRef.current ||
+      finishedGame ||
+      historyPreviewPly !== null ||
+      pendingPromotion ||
+      bossTargetMode ||
+      game.turn() !== computerColor
+    ) {
+      return;
+    }
+
+    const expectedFen = game.fen();
+    let cancelled = false;
+    aiMovePendingRef.current = true;
+
+    const timer = window.setTimeout(async () => {
+      try {
+        /*
+         * Only Black owns Boss powers. If Black is controlled by AI, let
+         * the variant layer decide whether to spend the turn on a power.
+         */
+        if (computerColor === "b") {
+          const powerAction = chooseBossAiPower(game, bossState, difficulty);
+
+          if (powerAction) {
+            if (
+              !cancelled &&
+              game.fen() === expectedFen &&
+              game.turn() === "b"
+            ) {
+              commitPower(powerAction.power, powerAction.target);
+            }
+
+            return;
+          }
+        }
+
+        if (!aiReady) {
+          return;
+        }
+
+        const move = await chooseAiMove(game);
+
+        if (
+          cancelled ||
+          !move ||
+          game.fen() !== expectedFen ||
+          game.turn() !== computerColor
+        ) {
+          return;
+        }
+
+        makeMove(move.from, move.to, move.promotion);
+      } finally {
+        aiMovePendingRef.current = false;
+      }
+    }, 240);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [
+    aiMode,
+    aiReady,
+    computerColor,
+    difficulty,
+    game,
+    bossState,
+    history.length,
+    finishedGame,
+    historyPreviewPly,
+    pendingPromotion,
+    bossTargetMode,
+    chooseAiMove,
+  ]);
+
+
   const {
     orientation: liveBoardOrientation,
     flipPending,
     snapToSide,
-  } = useDelayedBoardOrientation(game.turn(), 1500);
+  } = useDelayedBoardOrientation(aiMode ? humanColor : game.turn(), 1500);
 
   const historyPreview =
     historyPreviewPly !== null
@@ -742,6 +846,8 @@ export default function BossBattleBoard() {
   }
 
   function choosePower(power: BossPowerId) {
+    if (aiMode && game.turn() !== humanColor) return;
+
     if (!canUseBossPower(game, bossState, power)) return;
 
     clearSelection();
@@ -757,6 +863,8 @@ export default function BossBattleBoard() {
   }
 
   function handleSquareClick(row: number, column: number) {
+    if (aiMode && game.turn() !== humanColor) return;
+
     if (finishedGame || historyPreview || pendingPromotion || flipPending)
       return;
 

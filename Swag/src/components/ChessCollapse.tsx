@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useRef, useEffect, useMemo, useState } from "react";
 import {
   LanguageSelector,
   translateChess,
@@ -46,6 +46,8 @@ import {
   type CollapseState,
 } from "../games/chess/variants/chessCollapse";
 import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
+import { useVariantChessAi } from "@/hooks/useVariantChessAi";
+import { chessColorFromPlayerColor, oppositeChessColor, type Difficulty, type ChessPlayerColor } from "../games/chess/ai/variantAi";
 
 const translations: Partial<TranslationTable> = {
   de: {
@@ -360,7 +362,18 @@ function collapseStatusText(
   return `${t("Next warning in")} ${state.movesUntilWarning}`;
 }
 
-export default function ChessCollapseBoard() {
+type VariantAiBoardProps = {
+  aiMode?: boolean;
+  playerColor?: ChessPlayerColor;
+  difficulty?: Difficulty;
+  onChangeSettings?: () => void;
+};
+
+export default function ChessCollapseBoard({
+  aiMode = false,
+  playerColor = "white",
+  difficulty = "medium",
+}: VariantAiBoardProps) {
   const { language, setLanguage } = useChessLanguage();
   const t = (key: string) => translateChess(language, key, translations);
   const initialFen = useMemo(() => new Chess().fen(), []);
@@ -400,11 +413,90 @@ export default function ChessCollapseBoard() {
   const [capturedWhite, setCapturedWhite] = useState<PieceType[]>([]);
   const [capturedBlack, setCapturedBlack] = useState<PieceType[]>([]);
 
+  const humanColor = chessColorFromPlayerColor(playerColor);
+  const computerColor = oppositeChessColor(humanColor);
+
+  const {
+    ready: aiReady,
+    chooseMove: chooseAiMove,
+  } = useVariantChessAi(aiMode, difficulty);
+
+  const aiMovePendingRef = useRef(false);
+
+  useEffect(() => {
+    if (
+      !aiMode ||
+      !aiReady ||
+      aiMovePendingRef.current ||
+      finishedGame ||
+      historyPreviewPly !== null ||
+      pendingPromotion ||
+      game.turn() !== computerColor
+    ) {
+      return;
+    }
+
+    const expectedFen = game.fen();
+
+    const allowedMoves = game
+      .moves({ verbose: true })
+      .filter((move) =>
+        isSquareInsideCollapseBounds(move.to as Square, collapse.bounds),
+      )
+      .map(
+        (move) =>
+          `${move.from}${move.to}${move.promotion ?? ""}`,
+      );
+
+    if (allowedMoves.length === 0) {
+      return;
+    }
+
+    let cancelled = false;
+    aiMovePendingRef.current = true;
+
+    const timer = window.setTimeout(async () => {
+      try {
+        const move = await chooseAiMove(game, allowedMoves);
+
+        if (
+          cancelled ||
+          !move ||
+          game.fen() !== expectedFen ||
+          game.turn() !== computerColor
+        ) {
+          return;
+        }
+
+        makeMove(move.from, move.to, move.promotion);
+      } finally {
+        aiMovePendingRef.current = false;
+      }
+    }, 220);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [
+    aiMode,
+    aiReady,
+    computerColor,
+    game,
+    history.length,
+    collapse,
+    finishedGame,
+    historyPreviewPly,
+    pendingPromotion,
+    chooseAiMove,
+  ]);
+
+
   const {
     orientation: liveBoardOrientation,
     flipPending,
     snapToSide,
-  } = useDelayedBoardOrientation(game.turn(), 1500);
+  } = useDelayedBoardOrientation(aiMode ? humanColor : game.turn(), 1500);
 
   const historyPreview =
     historyPreviewPly !== null
@@ -652,6 +744,8 @@ export default function ChessCollapseBoard() {
   }
 
   function handleSquareClick(row: number, column: number) {
+    if (aiMode && game.turn() !== humanColor) return;
+
     if (finishedGame || historyPreview || pendingPromotion || flipPending)
       return;
 

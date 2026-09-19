@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { Chess, type Square } from "chess.js";
 
@@ -33,6 +33,13 @@ import {
 } from "../games/chess/variants/portalChess";
 
 import { useDelayedBoardOrientation } from "../hooks/useDelayedBoardOrientation";
+import { useVariantChessAi } from "@/hooks/useVariantChessAi";
+import {
+  chessColorFromPlayerColor,
+  oppositeChessColor,
+  type Difficulty,
+  type ChessPlayerColor,
+} from "../games/chess/ai/variantAi";
 
 type Language = "en" | "de" | "bar" | "ko" | "ru";
 
@@ -846,7 +853,18 @@ function PortalPromotionModal({
   );
 }
 
-export default function PortalChessBoard() {
+type VariantAiBoardProps = {
+  aiMode?: boolean;
+  playerColor?: ChessPlayerColor;
+  difficulty?: Difficulty;
+  onChangeSettings?: () => void;
+};
+
+export default function PortalChessBoard({
+  aiMode = false,
+  playerColor = "white",
+  difficulty = "casual",
+}: VariantAiBoardProps) {
   const [language, setLanguage] = useState<Language>(getInitialLanguage);
 
   const t = (key: string) => {
@@ -923,6 +941,99 @@ export default function PortalChessBoard() {
 
   const [gameOverReason, setGameOverReason] = useState("");
 
+  const humanColor = chessColorFromPlayerColor(playerColor);
+  const computerColor = oppositeChessColor(humanColor);
+
+  const { ready: aiReady, chooseMove: chooseAiMove } = useVariantChessAi(
+    aiMode,
+    difficulty,
+  );
+
+  const aiMovePendingRef = useRef(false);
+
+  useEffect(() => {
+    if (
+      !aiMode ||
+      !aiReady ||
+      aiMovePendingRef.current ||
+      gameOver ||
+      historyPreviewPly !== null ||
+      promotionFrom ||
+      promotionSquare ||
+      pendingPortalPromotion ||
+      game.turn() !== computerColor
+    ) {
+      return;
+    }
+
+    const expectedFen = game.fen();
+    let cancelled = false;
+    aiMovePendingRef.current = true;
+
+    const timer = window.setTimeout(async () => {
+      try {
+        const move = await chooseAiMove(game);
+
+        if (
+          cancelled ||
+          !move ||
+          game.fen() !== expectedFen ||
+          game.turn() !== computerColor
+        ) {
+          return;
+        }
+
+        commitAiMove(move.from, move.to, move.promotion);
+      } finally {
+        aiMovePendingRef.current = false;
+      }
+    }, 220);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [
+    aiMode,
+    aiReady,
+    computerColor,
+    position,
+    records.length,
+    gameOver,
+    historyPreviewPly,
+    promotionFrom,
+    promotionSquare,
+    pendingPortalPromotion,
+    chooseAiMove,
+  ]);
+
+  useEffect(() => {
+    if (
+      !aiMode ||
+      !pendingPortalPromotion ||
+      pendingPortalPromotion.move.color !== computerColor
+    ) {
+      return;
+    }
+
+    const deck = pendingPortalPromotion.pending.deck;
+
+    if (deck.length === 0) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      /*
+       * Cards are face-down. Choose an index randomly so the AI does not
+       * cheat by inspecting which card is strongest.
+       */
+      const card = deck[Math.floor(Math.random() * deck.length)];
+      resolvePromotionCard(card);
+    }, 450);
+
+    return () => window.clearTimeout(timer);
+  }, [aiMode, computerColor, pendingPortalPromotion]);
+
   const [winner, setWinner] = useState<Winner>("white");
 
   const historyPreview =
@@ -943,7 +1054,7 @@ export default function PortalChessBoard() {
     orientation: liveBoardOrientation,
     flipPending,
     snapToSide,
-  } = useDelayedBoardOrientation(game.turn(), 1500);
+  } = useDelayedBoardOrientation(aiMode ? humanColor : game.turn(), 1500);
 
   const boardOrientation: "white" | "black" = historyPreviewChess
     ? historyPreviewChess.turn() === "w"
@@ -1270,7 +1381,49 @@ export default function PortalChessBoard() {
     appendFinalRecord(move, beforeFen, portalBefore, finalState, event);
   }
 
+  function commitAiMove(
+    from: Square,
+    to: Square,
+    promotion?: "q" | "r" | "b" | "n",
+  ) {
+    if (gameOver || historyPreview || flipPending || pendingPortalPromotion) {
+      return;
+    }
+
+    try {
+      const beforeFen = game.fen();
+      const portalBefore = clonePortalState(portalState);
+
+      const move = game.move({
+        from,
+        to,
+        ...(promotion ? { promotion } : {}),
+      });
+
+      const moveInfo = {
+        color: move.color as PortalSide,
+        piece: move.piece as PortalPieceType,
+        from: move.from,
+        to: move.to,
+        san: move.san,
+        captured: move.captured as PortalPieceType | undefined,
+      };
+
+      setPromotionFrom(null);
+      setPromotionSquare(null);
+      setSelectedSquare(null);
+      setLegalMoves([]);
+      setHistoryPreviewPly(null);
+
+      finishStandardMove(moveInfo, beforeFen, portalBefore);
+    } catch {
+      playSound("illegal");
+    }
+  }
+
   function handleSquareClick(row: number, column: number) {
+    if (aiMode && game.turn() !== humanColor) return;
+
     if (gameOver || historyPreview || flipPending || pendingPortalPromotion) {
       return;
     }
@@ -1942,11 +2095,11 @@ export default function PortalChessBoard() {
                     : handleSquareClick
                 }
                 orientation={boardOrientation}
-                destroyPortalSquares={destroyPortalSquares}
-                teleportPortalSquares={teleportPortalSquares}
-                swapPortalSquares={swapPortalSquares}
-                promotePortalSquares={promotePortalSquares}
-                activePortalSquares={
+                destroyLuckySquares={destroyPortalSquares}
+                teleportLuckySquares={teleportPortalSquares}
+                swapLuckySquares={swapPortalSquares}
+                promoteLuckySquares={promotePortalSquares}
+                activeLuckySquares={
                   activePortalSquare ? [activePortalSquare] : []
                 }
               />

@@ -60,6 +60,24 @@ import TectonicChess from "./components/TectonicChess";
 import TectonicChessRules from "./components/TectonicChessRules";
 import TotalChaosChess from "./components/TotalChaosChess";
 import TotalChaosChessRules from "./components/TotalChaosChessRules";
+import {
+  BossBattleAiPage,
+  CapitalismAiPage,
+  CollapseAiPage,
+  DraftAiPage,
+  FogOfWarAiPage,
+  HorrorAiPage,
+  HotPotatoAiPage,
+  MirrorAiPage,
+  MutationAiPage,
+  PortalAiPage,
+  RandomStartAiPage,
+  RouletteAiPage,
+  TectonicAiPage,
+  ThreeLivesAiPage,
+  TotalChaosAiPage,
+} from "./components/ai/AllVariantAiPages";
+import FourPlayerAiPage from "./components/ai/FourPlayerAiPage";
 
 const router = createBrowserRouter([
   {
@@ -254,6 +272,70 @@ const router = createBrowserRouter([
       {
         path: "/games/chess/variants/complete-chaos/rules",
         element: <TotalChaosChessRules />,
+      },
+      {
+        path: "/games/chess/variants/complete-chaos/ai",
+        element: <TotalChaosAiPage />,
+      },
+      {
+        path: "/games/chess/variants/boss/ai",
+        element: <BossBattleAiPage />,
+      },
+      {
+        path: "/games/chess/variants/capitalism/ai",
+        element: <CapitalismAiPage />,
+      },
+      {
+        path: "/games/chess/variants/collapse/ai",
+        element: <CollapseAiPage />,
+      },
+      {
+        path: "/games/chess/variants/hotpotato/ai",
+        element: <HotPotatoAiPage />,
+      },
+      {
+        path: "/games/chess/variants/roulette/ai",
+        element: <RouletteAiPage />,
+      },
+      {
+        path: "/games/chess/variants/draft/ai",
+        element: <DraftAiPage />,
+      },
+      {
+        path: "/games/chess/variants/fogofwar/ai",
+        element: <FogOfWarAiPage />,
+      },
+      {
+        path: "/games/chess/variants/4-players/ai",
+        element: <FourPlayerAiPage />,
+      },
+      {
+        path: "/games/chess/variants/horror/ai",
+        element: <HorrorAiPage />,
+      },
+      {
+        path: "/games/chess/variants/mirror/ai",
+        element: <MirrorAiPage />,
+      },
+      {
+        path: "/games/chess/variants/mutation/ai",
+        element: <MutationAiPage />,
+      },
+      {
+        path: "/games/chess/variants/portal/ai",
+        element: <PortalAiPage />,
+      },
+      {
+        path: "/games/chess/variants/randomstart/ai",
+        element: <RandomStartAiPage />,
+      },
+      {
+        path: "/games/chess/variants/tectonic/ai",
+        element: <TectonicAiPage />,
+      },
+      {
+        path: "/games/chess/variants/three-lives/ai",
+        element: <ThreeLivesAiPage />,
       },
     ],
   },

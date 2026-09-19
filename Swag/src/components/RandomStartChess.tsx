@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   LanguageSelector,
   translateChess,
@@ -22,6 +22,8 @@ import {
   type RandomStartPosition,
 } from "../games/chess/variants/randomStartChess";
 import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
+import { useVariantChessAi } from "@/hooks/useVariantChessAi";
+import { chessColorFromPlayerColor, oppositeChessColor, type Difficulty, type ChessPlayerColor } from "../games/chess/ai/variantAi";
 
 const translations: Partial<TranslationTable> = {
   de: {
@@ -126,7 +128,18 @@ type MoveRecord = {
 
 type Winner = "white" | "black" | "draw";
 
-export default function RandomStartChess() {
+type VariantAiBoardProps = {
+  aiMode?: boolean;
+  playerColor?: ChessPlayerColor;
+  difficulty?: Difficulty;
+  onChangeSettings?: () => void;
+};
+
+export default function RandomStartChess({
+  aiMode = false,
+  playerColor = "white",
+  difficulty = "medium",
+}: VariantAiBoardProps) {
   const { language, setLanguage } = useChessLanguage();
   const t = (key: string) => translateChess(language, key, translations);
   const [startPosition, setStartPosition] = useState<RandomStartPosition>(() =>
@@ -155,11 +168,75 @@ export default function RandomStartChess() {
     null,
   );
 
+  const humanColor = chessColorFromPlayerColor(playerColor);
+  const computerColor = oppositeChessColor(humanColor);
+
+  const {
+    ready: aiReady,
+    chooseMove: chooseAiMove,
+  } = useVariantChessAi(aiMode, difficulty);
+
+  const aiMovePendingRef = useRef(false);
+
+  useEffect(() => {
+    if (
+      !aiMode ||
+      !aiReady ||
+      aiMovePendingRef.current ||
+      gameOver ||
+      historyPreview ||
+      Boolean(promotionFrom || promotionSquare) ||
+      game.turn() !== computerColor
+      
+    ) {
+      return;
+    }
+
+    const expectedFen = game.fen();
+    let cancelled = false;
+
+    aiMovePendingRef.current = true;
+
+    const timer = window.setTimeout(async () => {
+      try {
+        const aiMove = await chooseAiMove(game);
+
+        if (
+          cancelled ||
+          !aiMove ||
+          game.fen() !== expectedFen ||
+          game.turn() !== computerColor
+        ) {
+          return;
+        }
+
+        commitMove(aiMove.from, aiMove.to, aiMove.promotion);
+      } finally {
+        aiMovePendingRef.current = false;
+      }
+    }, 220);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [
+    aiMode,
+    aiReady,
+    computerColor,
+    records.length,
+    gameOver,
+    historyPreviewPly,
+    promotionFrom,
+    promotionSquare,
+    chooseAiMove,
+  ]);
+
   const {
     orientation: liveBoardOrientation,
     flipPending,
     snapToSide,
-  } = useDelayedBoardOrientation(game.turn(), 1500);
+  } = useDelayedBoardOrientation(aiMode ? humanColor : game.turn(), 1500);
 
   const historyPreview =
     historyPreviewPly !== null
@@ -307,6 +384,10 @@ export default function RandomStartChess() {
   }
 
   function handleSquareClick(row: number, column: number) {
+    if (aiMode && game.turn() !== humanColor) {
+      return;
+    }
+
     if (gameOver || historyPreview || flipPending) {
       return;
     }

@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   LanguageSelector,
   translateChess,
@@ -23,6 +23,8 @@ import {
   type FourPlayerState,
 } from "../games/chess/variants/fourPlayerChess";
 import BoardAnimationToggle from "./BoardAnimationToggle";
+import { chooseFourPlayerAiMove } from "../games/chess/ai/fourPlayerAi";
+import { type Difficulty } from "../games/chess/ai/variantAi";
 
 const translations: Partial<TranslationTable> = {
   de: {
@@ -233,7 +235,18 @@ function translateFourPlayerEvent(
   return text;
 }
 
-export default function FourPlayerChess() {
+type FourPlayerAiProps = {
+  aiMode?: boolean;
+  humanColor?: FourPlayerColor;
+  difficulty?: Difficulty;
+  onChangeSettings?: () => void;
+};
+
+export default function FourPlayerChess({
+  aiMode = false,
+  humanColor = "red",
+  difficulty = "casual",
+}: FourPlayerAiProps) {
   const { language, setLanguage } = useChessLanguage();
   const t = (key: string) => translateChess(language, key, translations);
   const [state, setState] = useState<FourPlayerState>(
@@ -242,6 +255,37 @@ export default function FourPlayerChess() {
 
   const [undoStack, setUndoStack] = useState<FourPlayerState[]>([]);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
+
+  const aiMovePendingRef = useRef(false);
+
+  useEffect(() => {
+    if (
+      !aiMode ||
+      aiMovePendingRef.current ||
+      state.winner ||
+      state.turn === humanColor
+    ) {
+      return;
+    }
+
+    aiMovePendingRef.current = true;
+
+    const timer = window.setTimeout(() => {
+      try {
+        const move = chooseFourPlayerAiMove(state, difficulty);
+
+        if (!move || state.turn === humanColor || state.winner) {
+          return;
+        }
+
+        commitMove(move.from, move.to);
+      } finally {
+        aiMovePendingRef.current = false;
+      }
+    }, 260);
+
+    return () => window.clearTimeout(timer);
+  }, [aiMode, humanColor, difficulty, state]);
 
   const [selectedSquare, setSelectedSquare] = useState<FourPlayerSquare | null>(
     null,
@@ -271,7 +315,34 @@ export default function FourPlayerChess() {
     return null;
   }, [state]);
 
+  function commitMove(from: FourPlayerSquare, to: FourPlayerSquare) {
+    const previous = cloneFourPlayerState(state);
+    const next = applyFourPlayerMove(state, from, to);
+
+    if (next === state || next.moveCount === state.moveCount) {
+      return false;
+    }
+
+    setUndoStack((stack) => [...stack, previous]);
+
+    setHistory((items) => [
+      ...items,
+      {
+        index: items.length + 1,
+        state: cloneFourPlayerState(next),
+        notation: moveNotation(next),
+      },
+    ]);
+
+    setState(next);
+    setSelectedSquare(null);
+
+    return true;
+  }
+
   function selectOrMove(row: number, column: number) {
+    if (aiMode && state.turn !== humanColor) return;
+
     if (state.winner || !isPlayableFourPlayerSquare(row, column)) {
       return;
     }
@@ -297,26 +368,7 @@ export default function FourPlayerChess() {
       return;
     }
 
-    const previous = cloneFourPlayerState(state);
-    const next = applyFourPlayerMove(state, selectedSquare, square);
-
-    if (next === state || next.moveCount === state.moveCount) {
-      return;
-    }
-
-    setUndoStack((stack) => [...stack, previous]);
-
-    setHistory((items) => [
-      ...items,
-      {
-        index: items.length + 1,
-        state: cloneFourPlayerState(next),
-        notation: moveNotation(next),
-      },
-    ]);
-
-    setState(next);
-    setSelectedSquare(null);
+    commitMove(selectedSquare, square);
   }
 
   function undo() {

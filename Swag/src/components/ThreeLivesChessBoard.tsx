@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useRef, useEffect, useMemo, useState } from "react";
 
 import { Chess, type Square } from "chess.js";
 
@@ -29,6 +29,13 @@ import {
 
 import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.ts";
 import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
+import { useVariantChessAi } from "@/hooks/useVariantChessAi";
+import {
+  chessColorFromPlayerColor,
+  oppositeChessColor,
+  type Difficulty,
+  type ChessPlayerColor,
+} from "../games/chess/ai/variantAi";
 
 /* =========================================================
    TYPES
@@ -844,7 +851,18 @@ const pieceValues: Record<string, number> = {
    COMPONENT
    ========================================================= */
 
-export default function ThreeLivesChessBoard() {
+type VariantAiBoardProps = {
+  aiMode?: boolean;
+  playerColor?: ChessPlayerColor;
+  difficulty?: Difficulty;
+  onChangeSettings?: () => void;
+};
+
+export default function ThreeLivesChessBoard({
+  aiMode = false,
+  playerColor = "white",
+  difficulty = "casual",
+}: VariantAiBoardProps) {
   const [language, setLanguage] = useState<Language>(getInitialChessLanguage);
   const t = (key: string) => translateChess(language, key);
 
@@ -918,6 +936,70 @@ export default function ThreeLivesChessBoard() {
    */
   const [heartSeed, setHeartSeed] = useState<number>(createThreeLivesHeartSeed);
 
+  const humanColor = chessColorFromPlayerColor(playerColor);
+  const computerColor = oppositeChessColor(humanColor);
+
+  const { ready: aiReady, chooseMove: chooseAiMove } = useVariantChessAi(
+    aiMode,
+    difficulty,
+  );
+
+  const aiMovePendingRef = useRef(false);
+
+  useEffect(() => {
+    if (
+      !aiMode ||
+      !aiReady ||
+      aiMovePendingRef.current ||
+      gameOver ||
+      historyPreviewPly !== null ||
+      promotionFrom ||
+      promotionSquare ||
+      game.turn() !== computerColor
+    ) {
+      return;
+    }
+
+    const expectedFen = game.fen();
+    let cancelled = false;
+    aiMovePendingRef.current = true;
+
+    const timer = window.setTimeout(async () => {
+      try {
+        const move = await chooseAiMove(game);
+
+        if (
+          cancelled ||
+          !move ||
+          game.fen() !== expectedFen ||
+          game.turn() !== computerColor
+        ) {
+          return;
+        }
+
+        commitAiMove(move.from, move.to, move.promotion);
+      } finally {
+        aiMovePendingRef.current = false;
+      }
+    }, 220);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [
+    aiMode,
+    aiReady,
+    computerColor,
+    position,
+    moveHistory.length,
+    gameOver,
+    historyPreviewPly,
+    promotionFrom,
+    promotionSquare,
+    chooseAiMove,
+  ]);
+
   /* =======================================================
      BOARD
      ======================================================= */
@@ -982,7 +1064,7 @@ export default function ThreeLivesChessBoard() {
     orientation: liveBoardOrientation,
     flipPending,
     snapToSide,
-  } = useDelayedBoardOrientation(game.turn(), 1500);
+  } = useDelayedBoardOrientation(aiMode ? humanColor : game.turn(), 1500);
 
   const boardOrientation: "white" | "black" = historyPreviewChess
     ? historyPreviewChess.turn() === "w"
@@ -1432,11 +1514,77 @@ export default function ThreeLivesChessBoard() {
     }
   }
 
+  function commitAiMove(
+    from: Square,
+    to: Square,
+    promotion?: "q" | "r" | "b" | "n",
+  ) {
+    if (gameOver || historyPreviewPly !== null) {
+      return;
+    }
+
+    try {
+      const move = game.move({
+        from,
+        to,
+        ...(promotion ? { promotion } : {}),
+      });
+
+      const afterFen = game.fen();
+
+      setHistoryPreviewPly(null);
+      setLastMove({
+        from: move.from,
+        to: move.to,
+      });
+
+      if (move.captured) {
+        playPieceCaptureSound(move.piece);
+
+        if (move.color === "w") {
+          setCapturedBlack((pieces) => [...pieces, move.captured as PieceType]);
+        } else {
+          setCapturedWhite((pieces) => [...pieces, move.captured as PieceType]);
+        }
+      } else {
+        playPieceMoveSound(move.piece);
+      }
+
+      setMoveHistory(game.history());
+      setIllegal(false);
+      setPromotionFrom(null);
+      setPromotionSquare(null);
+      setSelectedSquare(null);
+      setLegalMoves([]);
+
+      if (game.isCheck()) {
+        if (game.turn() === "w") {
+          setWhiteCheckCounter((counter) => counter + 1);
+        } else {
+          setBlackCheckCounter((counter) => counter + 1);
+        }
+
+        if (!game.isCheckmate()) {
+          playSound("check");
+        }
+      } else if (move.isKingsideCastle() || move.isQueensideCastle()) {
+        playRandomSound(["castle-1", "castle-2"]);
+      }
+
+      setPosition(afterFen);
+      checkGameOver(true);
+    } catch {
+      setIllegal(true);
+    }
+  }
+
   /* =======================================================
      BOARD CLICK
      ======================================================= */
 
   function handleSquareClick(row: number, column: number) {
+    if (aiMode && game.turn() !== humanColor) return;
+
     if (gameOver || historyPreviewPly !== null) {
       return;
     }

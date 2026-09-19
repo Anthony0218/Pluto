@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { Chess, type Square } from "chess.js";
 
@@ -51,6 +51,8 @@ import {
 import { buildCapitalismStats } from "../games/chess/variants/capitalismStats";
 import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.ts";
 import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
+import { useVariantChessAi } from "@/hooks/useVariantChessAi";
+import { chessColorFromPlayerColor, oppositeChessColor, type Difficulty, type ChessPlayerColor } from "../games/chess/ai/variantAi";
 
 /* =========================================================
    TYPES
@@ -579,7 +581,18 @@ function getInitialLanguage(): Language {
    COMPONENT
    ========================================================= */
 
-export default function CapitalismChessBoard() {
+type VariantAiBoardProps = {
+  aiMode?: boolean;
+  playerColor?: ChessPlayerColor;
+  difficulty?: Difficulty;
+  onChangeSettings?: () => void;
+};
+
+export default function CapitalismChessBoard({
+  aiMode = false,
+  playerColor = "white",
+  difficulty = "medium",
+}: VariantAiBoardProps) {
   const [language, setLanguage] = useState<Language>(getInitialLanguage);
   const [boardAnimationEnabled, setBoardAnimationEnabled] = useState(true);
   const t = (key: string) => {
@@ -639,6 +652,70 @@ export default function CapitalismChessBoard() {
     null,
   );
 
+  const humanColor = chessColorFromPlayerColor(playerColor);
+  const computerColor = oppositeChessColor(humanColor);
+
+  const {
+    ready: aiReady,
+    chooseMove: chooseAiMove,
+  } = useVariantChessAi(aiMode, difficulty);
+
+  const aiMovePendingRef = useRef(false);
+
+  useEffect(() => {
+    if (
+      !aiMode ||
+      !aiReady ||
+      aiMovePendingRef.current ||
+      gameOver ||
+      historyPreviewPly !== null ||
+      promotionFrom ||
+      promotionSquare ||
+      game.turn() !== computerColor
+    ) {
+      return;
+    }
+
+    const expectedFen = game.fen();
+    let cancelled = false;
+    aiMovePendingRef.current = true;
+
+    const timer = window.setTimeout(async () => {
+      try {
+        const move = await chooseAiMove(game);
+
+        if (
+          cancelled ||
+          !move ||
+          game.fen() !== expectedFen ||
+          game.turn() !== computerColor
+        ) {
+          return;
+        }
+
+        commitMove(move.from, move.to, move.promotion);
+      } finally {
+        aiMovePendingRef.current = false;
+      }
+    }, 220);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [
+    aiMode,
+    aiReady,
+    computerColor,
+    records.length,
+    gameOver,
+    historyPreviewPly,
+    promotionFrom,
+    promotionSquare,
+    chooseAiMove,
+  ]);
+
+
   const [statsTab, setStatsTab] = useState<StatsTab>("overview");
 
   /* =======================================================
@@ -667,7 +744,7 @@ export default function CapitalismChessBoard() {
     orientation: liveBoardOrientation,
     flipPending,
     snapToSide,
-  } = useDelayedBoardOrientation(game.turn(), 1500);
+  } = useDelayedBoardOrientation(aiMode ? humanColor : game.turn(), 1500);
 
   const boardOrientation: "white" | "black" = historyPreviewChess
     ? historyPreviewChess.turn() === "w"
@@ -976,6 +1053,8 @@ export default function CapitalismChessBoard() {
      ======================================================= */
 
   function handleSquareClick(row: number, column: number) {
+    if (aiMode && game.turn() !== humanColor) return;
+
     if (gameOver || historyPreview) {
       return;
     }
@@ -1064,6 +1143,8 @@ export default function CapitalismChessBoard() {
      ======================================================= */
 
   function purchasePiece(piece: ShopPieceType, square: Square) {
+    if (aiMode && game.turn() !== humanColor) return;
+
     if (gameOver || historyPreview) {
       return;
     }
@@ -1099,6 +1180,8 @@ export default function CapitalismChessBoard() {
   }
 
   function useRoyalPower(power: RoyalPowerId) {
+    if (aiMode && game.turn() !== humanColor) return;
+
     if (gameOver || historyPreview) {
       return;
     }

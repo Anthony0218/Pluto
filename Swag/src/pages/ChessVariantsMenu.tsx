@@ -29,6 +29,7 @@ type VariantCard = {
     | "pink"
     | "teal"
     | "blue";
+  aiRoute?: string;
 };
 
 const languageOptions: Array<{ value: Language; label: string }> = [
@@ -514,6 +515,7 @@ const variants: VariantCard[] = [
     tags: ["Budget", "Custom army", "Back-rank king"],
     available: true,
     route: "/games/chess/variants/draft/hotseat",
+    aiRoute: "/games/chess/variants/draft/ai",
     rulesRoute: "/games/chess/variants/draft/rules",
     accent: "emerald",
   },
@@ -527,6 +529,7 @@ const variants: VariantCard[] = [
     tags: ["Custom setup", "Symmetry", "Fair start"],
     available: true,
     route: "/games/chess/variants/mirror/hotseat",
+    aiRoute: "/games/chess/variants/mirror/ai",
     rulesRoute: "/games/chess/variants/mirror/rules",
     accent: "zinc",
   },
@@ -540,6 +543,7 @@ const variants: VariantCard[] = [
     tags: ["Random setup", "Asymmetric start", "No castling"],
     available: true,
     route: "/games/chess/variants/randomstart/hotseat",
+    aiRoute: "/games/chess/variants/randomstart/ai",
     accent: "lime",
   },
   {
@@ -552,6 +556,7 @@ const variants: VariantCard[] = [
     tags: ["Fog of war", "Random start", "Hidden information"],
     available: true,
     route: "/games/chess/variants/fogofwar/hotseat",
+    aiRoute: "/games/chess/variants/fogofwar/ai",
     rulesRoute: "/games/chess/variants/fogofwar/rules",
     accent: "sky",
   },
@@ -565,6 +570,7 @@ const variants: VariantCard[] = [
     tags: ["Lucky Squares", "Random effects", "Transformations"],
     available: true,
     route: "/games/chess/variants/roulette/hotseat",
+    aiRoute: "/games/chess/variants/roulette/ai",
     rulesRoute: "/games/chess/variants/roulette/rules",
     accent: "fuchsia",
   },
@@ -577,6 +583,7 @@ const variants: VariantCard[] = [
       "Every ten plies, a random non-king piece mutates into another piece.",
     tags: ["Random events", "Mutations", "Hotseat"],
     route: "/games/chess/variants/mutation/hotseat",
+    aiRoute: "/games/chess/variants/mutation/ai",
     available: true,
     accent: "violet",
   },
@@ -590,6 +597,7 @@ const variants: VariantCard[] = [
     tags: ["4 Players", "Free-for-all", "Elimination"],
     available: true,
     route: "/games/chess/variants/4-players/hotseat",
+    aiRoute: "/games/chess/variants/4-players/ai",
     accent: "cyan",
   },
   {
@@ -602,6 +610,7 @@ const variants: VariantCard[] = [
     tags: ["Full-board setup", "Random geometry", "No opening theory"],
     available: true,
     route: "/games/chess/variants/complete-chaos/hotseat",
+    aiRoute: "/games/chess/variants/complete-chaos/ai",
     rulesRoute: "/games/chess/variants/complete-chaos/rules",
     accent: "pink",
   },
@@ -614,6 +623,7 @@ const variants: VariantCard[] = [
       "Infection, cursed pieces, burning squares and knight-triggered freezing turn the board into a survival game.",
     tags: ["Infection", "Curses", "Hot squares", "Knight freeze"],
     route: "/games/chess/variants/horror/hotseat",
+    aiRoute: "/games/chess/variants/horror/ai",
     rulesRoute: "/games/chess/variants/horror/rules",
     available: true,
     accent: "rose",
@@ -628,6 +638,7 @@ const variants: VariantCard[] = [
     tags: ["Bomb carrier", "4–12 fuse", "Explosions"],
     available: true,
     route: "/games/chess/variants/hotpotato/hotseat",
+    aiRoute: "/games/chess/variants/hotpotato/ai",
     rulesRoute: "/games/chess/variants/hotpotato/rules",
     accent: "orange",
   },
@@ -641,6 +652,7 @@ const variants: VariantCard[] = [
     tags: ["Shrinking board", "3 King lives", "Survival"],
     available: true,
     route: "/games/chess/variants/collapse/hotseat",
+    aiRoute: "/games/chess/variants/collapse/ai",
     rulesRoute: "/games/chess/variants/hotpotato/rules",
     accent: "red",
   },
@@ -654,6 +666,7 @@ const variants: VariantCard[] = [
     tags: ["Asymmetric", "Boss Powers", "Rage"],
     available: true,
     route: "/games/chess/variants/boss/hotseat",
+    aiRoute: "/games/chess/variants/boss/ai",
     rulesRoute: "/games/chess/variants/boss/rules",
     accent: "indigo",
   },
@@ -666,6 +679,7 @@ const variants: VariantCard[] = [
       "Both players start with three lives. Every check removes one life; checkmate still wins instantly.",
     tags: ["3 HP", "Check damage", "Hotseat"],
     route: "/games/chess/variants/three-lives/hotseat",
+    aiRoute: "/games/chess/variants/three-lives/ai",
     available: true,
     accent: "red",
   },
@@ -679,6 +693,7 @@ const variants: VariantCard[] = [
     tags: ["4×4 Rotation", "Board Shift", "Strategy"],
     available: true,
     route: "/games/chess/variants/tectonic/hotseat",
+    aiRoute: "/games/chess/variants/tectonic/ai",
     rulesRoute: "/games/chess/variants/tectonic/rules",
     accent: "teal",
   },
@@ -691,19 +706,7 @@ const variants: VariantCard[] = [
       "Earn coins through captures, checks, missions and bounties, then spend them on limited Royal Powers.",
     tags: ["Economy", "Bounties", "Missions", "Royal Powers", "Hotseat"],
     route: "/games/chess/variants/chessmarket/hotseat",
-    rulesRoute: "/games/chess/variants/chessmarket/rules",
-    available: true,
-    accent: "amber",
-  },
-  {
-    id: "capitalism",
-    icon: "🪙",
-    title: "Chess Market",
-    subtitle: "Every move has a price",
-    description:
-      "Earn coins through captures, checks, missions and bounties, then spend them on limited Royal Powers.",
-    tags: ["Economy", "Bounties", "Missions", "Royal Powers", "Hotseat"],
-    route: "/games/chess/variants/chessmarket/hotseat",
+    aiRoute: "/games/chess/variants/chessmarket/ai",
     rulesRoute: "/games/chess/variants/chessmarket/rules",
     available: true,
     accent: "amber",
@@ -1395,47 +1398,58 @@ function VariantCardView({
       </div>
 
       <div className="relative mt-auto pt-5">
-        {variant.available && variant.route ? (
-          <Link
-            to={variant.route}
-            className={`
-              flex
-              w-full
-              items-center
-              justify-center
-              gap-2
-              rounded-xl
-              px-4
-              py-3
-              text-sm
-              font-black
-              transition
-              ${buttonClasses[variant.accent]}
-            `}
-          >
-            <span>{t(language, "Play Hotseat")}</span>
-            <span aria-hidden="true">→</span>
-          </Link>
-        ) : (
-          <button
-            type="button"
-            disabled
-            className="
-              w-full
-              cursor-not-allowed
-              rounded-xl
-              border
-              border-white/5
-              bg-white/[0.025]
-              px-4
-              py-3
-              text-sm
-              font-bold
-              text-zinc-700
-            "
-          >
-            {t(language, "Coming soon")}
-          </button>
+        {variant.available && (
+          <div className="relative mt-auto grid grid-cols-2 gap-2">
+            {/* HOTSEAT */}
+            {variant.route && (
+              <Link
+                to={variant.route}
+                className={`
+          flex
+          items-center
+          justify-center
+          gap-2
+          rounded-xl
+          border
+          border-white/10
+          bg-white/5
+          px-3
+          py-3
+          text-sm
+          font-black
+          text-zinc-200
+          transition
+          hover:bg-white/10
+        `}
+              >
+                <span>👥</span>
+                <span>{t(language, "Hotseat")}</span>
+              </Link>
+            )}
+
+            {/* VS AI */}
+            {variant.aiRoute && (
+              <Link
+                to={variant.aiRoute}
+                className={`
+          flex
+          items-center
+          justify-center
+          gap-2
+          rounded-xl
+          px-3
+          py-3
+          text-sm
+          font-black
+          transition
+          ${buttonClasses[variant.accent]}
+        `}
+              >
+                <span>🤖</span>
+                <span>{t(language, "Vs AI")}</span>
+              </Link>
+            )}
+          </div>
         )}
       </div>
     </article>
@@ -1587,7 +1601,7 @@ export default function ChessVariantsMenu() {
         </section>
 
         <footer className="py-8 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-800">
-          Chess Variants · 15 modes
+          Chess Variants · 16 modes
         </footer>
       </div>
     </main>
