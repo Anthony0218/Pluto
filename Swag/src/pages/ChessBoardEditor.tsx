@@ -464,7 +464,62 @@ export default function ChessBoardEditor() {
       </div>
 
       <div className="col-span-2 row-span-2 place-self-center">
-        <ChessBoard
+        <Grid />
+      </div>
+    </div>
+    </>
+  )
+};
+
+const ROW_OPTIONS = [1, 2, 3, 4, 5, 6];
+
+function Grid() {
+  const [rowCount, setRowCount] = useState(3);
+
+  return (
+    <div>
+      <label htmlFor="row-count">Number of rows: </label>
+
+      <select
+        id="row-count"
+        value={rowCount}
+        onChange={(event) => setRowCount(Number(event.target.value))}
+      >
+        {ROW_OPTIONS.map((count) => (
+          <option key={count} value={count}>
+            {count}
+          </option>
+        ))}
+      </select>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateRows: `repeat(${rowCount}, 50px)`,
+          gridTemplateColumns: "repeat(4, 100px)",
+          gap: "8px",
+          marginTop: "16px",
+        }}
+      >
+        {Array.from({ length: rowCount * 4 }, (_, index) => (
+          <div
+            key={index}
+            style={{
+              border: "1px solid #ccc",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {index + 1}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+/*
+<ChessBoard
         board={board}
         boardSize={boardSize}
         selectedSquare={selectedSquare}
@@ -475,12 +530,4 @@ export default function ChessBoardEditor() {
         onSquareHover={setHoveredSquare}
         onSquareRemove={removePiece}
       />
-      </div>
-        
-        
-    </div>
-      
-    </>
-    
-  )
-};
+      */
