@@ -9,7 +9,6 @@ import App from "./App";
 import GameList from "./pages/GameList";
 import Profile from "./pages/Profile";
 import ChessGame from "./pages/ChessGames";
-import ChessRoom from "./pages/ChessRoom";
 import OnlineGame from "./pages/OnlineGame";
 import OnlineGameRoom from "./pages/OnlineGameRoom";
 
