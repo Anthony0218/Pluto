@@ -66,131 +66,131 @@ const router = createBrowserRouter([
         element: <GameList />
       },
       {
-        path: "/games/chess",
+        path: "/chess",
         element: <ChessMenu />,
       },      
       {
-        path: "/games/chess/rules",
+        path: "/chess/rules",
         element: <ChessRulesAndTips />,
       },
       {
-        path: "/games/chess/classic",
+        path: "/chess/classic",
         element: <ChessClassicMenu />,
       },
       {
-        path: "/games/chess/classic/hotseat",
+        path: "/chess/classic/hotseat",
         element: <ChessGame />,
       },
       {
-        path: "/games/chess/classic/ai",
+        path: "/chess/classic/ai",
         element: <ChessComputer />,
       },
       {
-        path: "/games/chess/classic/multiplayer",
+        path: "/chess/classic/multiplayer",
         element: <ChessMultiplayerLobby />,
       },
       {
-        path: "/games/chess/classic/multiplayer/:roomCode",
+        path: "/chess/classic/multiplayer/:roomCode",
         element: <ChessMultiplayerRoom />,
       },
       {
-        path: "/games/chess/classic/multiplayer/:roomCode/game",
+        path: "/chess/classic/multiplayer/:roomCode/game",
         element: <ChessMultiplayerGame />,
       },
 
       {
-        path: "/games/chess/variants",
+        path: "/chess/variants",
         element: <ChessVariantsMenu />,
       },
       {
-        path: "/games/chess/variants/three-lives/hotseat",
+        path: "/chess/variants/three-lives/hotseat",
         element: <ThreeLivesChessBoard />,
       },
       {
-        path: "/games/chess/variants/mutation/hotseat",
+        path: "/chess/variants/mutation/hotseat",
         element: <MutationChessBoard />,
       },
       {
-        path: "/games/chess/variants/chessmarket/hotseat",
+        path: "/chess/variants/chessmarket/hotseat",
         element: <CapitalismChessBoard />,
       },
       {
-        path: "/games/chess/variants/chessmarket/rules",
+        path: "/chess/variants/chessmarket/rules",
         element: <CapitalismChessRules />,
       },
       {
-        path: "/games/chess/variants/horror/hotseat",
+        path: "/chess/variants/horror/hotseat",
         element: <HorrorChessBoard />,
       },
       {
-        path: "/games/chess/variants/horror/rules",
+        path: "/chess/variants/horror/rules",
         element: <HorrorChessRules />,
       },
       {
-        path: "/games/chess/variants/fogofwar/hotseat",
+        path: "/chess/variants/fogofwar/hotseat",
         element: <FogOfWarChessBoard />,
       },
       {
-        path: "/games/chess/variants/fogofwar/rules",
+        path: "/chess/variants/fogofwar/rules",
         element: <FogOfWarChessRules />,
       },
       {
-        path: "/games/chess/variants/draft/hotseat",
+        path: "/chess/variants/draft/hotseat",
         element: <DraftChessBoard />,
       },
       {
-        path: "/games/chess/variants/draft/rules",
+        path: "/chess/variants/draft/rules",
         element: <DraftChessRules />,
       },
       {
-        path: "/games/chess/variants/mirror/hotseat",
+        path: "/chess/variants/mirror/hotseat",
         element: <MirrorChessBoard />,
       },
       {
-        path: "/games/chess/variants/roulette/hotseat",
+        path: "/chess/variants/roulette/hotseat",
         element: <ChessRouletteBoard />,
       },
       {
-        path: "/games/chess/variants/hotpotato/hotseat",
+        path: "/chess/variants/hotpotato/hotseat",
         element: <ChessHotPotatoBoard />,
       },
 
 
       {
-        path: "/games/onlineGame",
+        path: "/onlineGame",
         element: <OnlineGame />,
       },
       {
-        path: "/games/onlineGame/:gameId",
+        path: "/onlineGame/:gameId",
         element: <OnlineGameRoom />,
       },
 
       {
-        path: "/games/watten",
+        path: "/watten",
         element: <Watten />,
       },
       {
-        path: "/games/watten/hotseat",
+        path: "/watten/hotseat",
         element: <WattenHotseat />,
       },
       {
-        path: "/games/watten/hotseat/game",
+        path: "/watten/hotseat/game",
         element: <WattenHotseatPage />,
       },
       {
-        path: "/games/watten/rules",
+        path: "/watten/rules",
         element: <WattenRules />,
       },
       { 
-        path: "/games/watten/multiplayer", 
+        path: "/watten/multiplayer", 
         element: <WattenMultiplayerLobby /> 
       },
       {
-        path: "/games/watten/multiplayer/:roomCode",
+        path: "/watten/multiplayer/:roomCode",
         element: <WattenMultiplayerRoom />,
       },
       {
-        path: "/games/watten/multiplayer/:roomCode/game",
+        path: "/watten/multiplayer/:roomCode/game",
         element: <WattenMultiplayerGame />,
       },
       
