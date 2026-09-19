@@ -51,20 +51,24 @@ export default function Sidebar({
       <h2>
         Position
       </h2>
-
-      <label>
-        <input
-          id="pieceInfoCheckbox"
-          type="checkbox"
-          checked={
-            pieceInfoCheckbox
-          }
-          onChange={(event) =>
-            onPieceInfoChange(
-              event.target.checked
-            )
-          }
-        />
+      <div>
+        
+      </div>
+      <label><div>
+          <input
+            id="pieceInfoCheckbox"
+            type="checkbox"
+            checked={
+              pieceInfoCheckbox
+            }
+            onChange={(event) =>
+              onPieceInfoChange(
+                event.target.checked
+              )
+            }
+          />
+        </div>
+        
 
         Show selected piece moves
       </label>
