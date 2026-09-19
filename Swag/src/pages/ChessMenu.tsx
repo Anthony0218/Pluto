@@ -6,20 +6,20 @@ export default function ChessMenu() {
       title: "Chess Classic",
       description:
         "Play standard chess against another player or the computer.",
-      path: "/games/chess/classic",
+      path: "/chess/classic",
       icon: "♟️",
     },
     {
       title: "Chess Variants",
       description: "Play Chess960 and other alternative chess variants.",
-      path: "/games/chess/variants",
+      path: "/chess/variants",
       icon: "♞",
     },
     {
       title: "Chess Custom",
       description:
         "Create and play chess games with your own rules and concepts.",
-      path: "/games/chess/custom",
+      path: "/chess/custom",
       icon: "⚙️",
     },
   ];
