@@ -366,8 +366,10 @@ export default function ChessBoardEditor() {
     setOpponentInfoCheckbox,
   ] = useState(false);
 
-  const [hoveredSquare, setHoveredSquare] =
-    useState<string | null>(null);
+  const [
+    hoveredSquare, 
+    setHoveredSquare
+  ] = useState<string | null>(null);
 
   const [
     selectedSquare,
@@ -378,59 +380,13 @@ export default function ChessBoardEditor() {
    * Possible moves for the selected piece
    * if it were placed on the hovered square.
    */
-  const selectedPieceMoves =
-    hoveredSquare &&
-    pieceInfoCheckbox
-      ? getPossibleMoves(
-          {
-            ...board,
-            [hoveredSquare]: {
-              color: selectedColor,
-              type: selectedPiece,
-            },
-          },
-          hoveredSquare
-        )
-      : [];
+ 
 
   /*
    * All possible destinations of the
    * opposite color's currently placed pieces.
    */
-  const opponentColor =
-    selectedColor === "white"
-      ? "black"
-      : "white";
 
-  const opponentMoves =
-    opponentInfoCheckbox
-      ? getAllColorMoves(
-          board,
-          opponentColor
-        )
-      : new Set<string>();
-
-  function placePiece(square: string) {
-    setSelectedSquare(square);
-
-    setBoard((oldBoard) => ({
-      ...oldBoard,
-
-      [square]: {
-        color: selectedColor,
-        type: selectedPiece,
-      },
-    }));
-  }
-
-  function removePiece(square: string) {
-    setBoard((oldBoard) => ({
-      ...oldBoard,
-      [square]: null,
-    }));
-
-    setSelectedSquare(null);
-  }
 
   function clearBoard() {
     setBoard(createEmptyBoard());
@@ -477,8 +433,6 @@ const COLUMN_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 function Grid() {
   const [rowCount, setRowCount] = useState(3);
   const [columnCount, setColumnCount] = useState(4);
-  const [cellSize, setCellSize] = useState(75);
-  
   return (
     <div>
       <div>
@@ -512,25 +466,12 @@ function Grid() {
           ))}
         </select>
       </div>
-      
-      {/* Cell size */} 
-      <div>
-        <label htmlFor="cell-size"> Cell size: {cellSize}px </label>
 
-        <input 
-          id="cell-size" 
-          type="range" 
-          min="25" 
-          max="200" 
-          step="5" 
-          value={cellSize} 
-          onChange={(event) => setCellSize(Number(event.target.value))}
-        />
       <div
         style={{
           display: "grid",
-          gridTemplateRows: `repeat(${rowCount}, ${cellSize}px)`,
-          gridTemplateColumns: `repeat(${columnCount}, ${cellSize}px)`,
+          gridTemplateRows: `repeat(${rowCount}, 50px)`,
+          gridTemplateColumns: `repeat(${columnCount}, 100px)`,
           gap: "8px",
           marginTop: "16px",
         }}
@@ -551,7 +492,6 @@ function Grid() {
           )
         )}
       </div>
-    </div>
     </div>
   );
 }
