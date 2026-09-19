@@ -1,4 +1,7 @@
 import { useState } from "react";
+
+import "../index.css";
+
 import ChessBoard from "../components/ChessBoardCustom";
 import SelectionNavigation from "../components/SelectionNavigation";
 import Sidebar from "../components/SidebarCustom";
@@ -436,10 +439,12 @@ export default function ChessBoardEditor() {
 
   return (
     <>
-      <Sidebar
-        selectedColor={"white"}
-        selectedPiece={"king"}
-        boardSize={640}
+    <div className="grid grid-flow-col grid-rows-3 gap-4">
+      <div className="row-span-3 h-screen w-1/3">
+        <Sidebar
+        selectedColor={selectedColor}
+        selectedPiece={selectedPiece}
+        boardSize={boardSize}
         pieceInfoCheckbox={true}
         opponentInfoCheckbox={false}
         onPieceInfoChange={setPieceInfoCheckbox}
@@ -447,26 +452,34 @@ export default function ChessBoardEditor() {
         onBoardSizeChange={setBoardSize}
         onClearBoard={clearBoard}
       />
+      </div>
       
-      <div>
+      <div className="col-span-2 w-2/3">
         <SelectionNavigation
-          color={"white"}
-          pieceType={"king"}
+          color={selectedColor}
+          pieceType={selectedPiece}
           onColorChange={setSelectedColor}
           onPieceChange={setSelectedPiece}
         />
-        <ChessBoard
-          board={board}
-          boardSize={boardSize}
-          selectedSquare={selectedSquare}
-          hoveredSquare={hoveredSquare}
-          selectedPieceMoves={selectedPieceMoves}
-          opponentMoves={opponentMoves}
-          onSquareClick={placePiece}
-          onSquareHover={setHoveredSquare}
-          onSquareRemove={removePiece}
-        />
       </div>
+
+      <div className="col-span-2 row-span-2 place-self-center">
+        <ChessBoard
+        board={board}
+        boardSize={boardSize}
+        selectedSquare={selectedSquare}
+        hoveredSquare={hoveredSquare}
+        selectedPieceMoves={selectedPieceMoves}
+        opponentMoves={opponentMoves}
+        onSquareClick={placePiece}
+        onSquareHover={setHoveredSquare}
+        onSquareRemove={removePiece}
+      />
+      </div>
+        
+        
+    </div>
+      
     </>
     
   )
