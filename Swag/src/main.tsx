@@ -82,10 +82,6 @@ const router = createBrowserRouter([
         element: <ChessGame />,
       },
       {
-        path: "/games/chess/classic/custom",
-        element: <ChessRoom />
-      },
-      {
         path: "/games/chess/classic/ai",
         element: <ChessComputer />,
       },
