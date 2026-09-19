@@ -493,6 +493,8 @@ function Grid() {
                   width: "100%",
                   height: "100%",
                   padding: 0,
+                  zIndex: 3,
+                  border: "2px red dashed",
                   boxSizing: "border-box",
                   cursor: "pointer",
                 }}
