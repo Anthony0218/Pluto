@@ -1,4 +1,3 @@
-import React from "react";
 import {
   type Color,
   type PieceType,
@@ -48,12 +47,12 @@ export default function Sidebar({
       : "white";
 
   return (
-    <aside style={styles.sidebar}>
+    <aside>
       <h2>
         Position
       </h2>
 
-      <label style={styles.checkbox}>
+      <label>
         <input
           id="pieceInfoCheckbox"
           type="checkbox"
@@ -70,7 +69,7 @@ export default function Sidebar({
         Show selected piece moves
       </label>
 
-      <label style={styles.checkbox}>
+      <label>
         <input
           id="opponentInfoCheckbox"
           type="checkbox"
@@ -87,14 +86,14 @@ export default function Sidebar({
         Show opponent moves
       </label>
 
-      <div style={styles.opponent}>
+      <div>
         Opponent:{" "}
         <strong>
           {opponentColor}
         </strong>
       </div>
 
-      <div style={styles.sizeControl}>
+      <div>
         <label htmlFor="boardSizeSlider">
           Board size:{" "}
           {boardSize}px
@@ -115,12 +114,11 @@ export default function Sidebar({
         />
       </div>
 
-      <div style={styles.actions}>
+      <div>
 
         <button
           type="button"
           onClick={onClearBoard}
-          style={styles.button}
         >
           Clear board
         </button>
@@ -129,104 +127,3 @@ export default function Sidebar({
     </aside>
   );
 }
-
-const styles: Record<
-  string,
-  React.CSSProperties
-> = {
-  sidebar: {
-    width: 280,
-
-    flexShrink: 0,
-
-    padding: 20,
-
-    background: "#2a2a2a",
-
-    border: "1px solid #444",
-    borderRadius: 10,
-  },
-
-  checkbox: {
-    display: "flex",
-    gap: 10,
-
-    marginBottom: 12,
-
-    cursor: "pointer",
-  },
-
-  preview: {
-    padding: 12,
-    marginBottom: 16,
-
-    background: "#222",
-
-    borderRadius: 8,
-
-    textAlign: "center",
-  },
-
-  moves: {
-    marginTop: 8,
-
-    color: "#aaa",
-
-    fontSize: 12,
-    lineHeight: 1.5,
-  },
-
-  opponent: {
-    marginBottom: 20,
-
-    color: "#aaa",
-
-    fontSize: 13,
-  },
-
-  sizeControl: {
-    display: "flex",
-    flexDirection: "column",
-
-    gap: 8,
-
-    marginBottom: 20,
-
-    color: "#ccc",
-
-    fontSize: 13,
-  },
-
-  actions: {
-    display: "flex",
-    flexDirection: "column",
-
-    gap: 8,
-  },
-
-  button: {
-    padding: 10,
-
-    border: "none",
-    borderRadius: 6,
-
-    background: "#444",
-    color: "white",
-
-    cursor: "pointer",
-  },
-
-  export: {
-    padding: 12,
-
-    border: "none",
-    borderRadius: 6,
-
-    background: "#287a45",
-    color: "white",
-
-    fontWeight: "bold",
-
-    cursor: "pointer",
-  },
-};
