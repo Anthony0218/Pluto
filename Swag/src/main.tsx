@@ -6,7 +6,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 
 import App from "./App";
-import GameList from "./pages/GameList";
 import Profile from "./pages/Profile";
 import ChessGame from "./pages/ChessGames";
 import OnlineGame from "./pages/OnlineGame";
@@ -62,10 +61,6 @@ const router = createBrowserRouter([
       {
         path: "/profile",
         element: <Profile />,
-      },
-      {
-        path: "/games",
-        element: <GameList />
       },
       {
         path: "/chess",
