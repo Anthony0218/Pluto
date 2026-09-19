@@ -43,6 +43,7 @@ import {
 } from "../games/chess/variants/draftStats";
 
 import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.ts";
+import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
 
 type Language = "en" | "de" | "bar" | "ko" | "ru";
 
@@ -1136,6 +1137,7 @@ export default function DraftChessBoard() {
               </div>
             )}
           </div>
+          <BoardAnimationToggle />
         </header>
 
         {phase === "setup" && (

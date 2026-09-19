@@ -1,11 +1,17 @@
 import { useMemo, useState } from "react";
+import {
+  LanguageSelector,
+  translateChess,
+  useChessLanguage,
+  type TranslationTable,
+} from "../games/chess/i18n/chessLanguage.tsx";
 
 import { Chess, type Square } from "chess.js";
 
 import Board from "./Board.tsx";
-import PromotionBar from "./PromotionBar";
+import PromotionBar from "./PromotionBar.tsx";
 
-import { getSquareName, type PieceType } from "../utils/chessUtils";
+import { getSquareName, type PieceType } from "../utils/chessUtils.ts";
 
 import {
   playPieceCaptureSound,
@@ -31,6 +37,172 @@ import {
   type HotPotatoOutcome,
   type HotPotatoState,
 } from "../games/chess/variants/HotPotato.ts";
+import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
+
+const translations: Partial<TranslationTable> = {
+  de: {
+    "Chess Hot Potato": "Schach Hot Potato",
+    "Pass the danger": "Gib die Gefahr weiter",
+    "Random fuse": "Zufällige Zündzeit",
+    moves: "Züge",
+    "moves left": "Züge übrig",
+    "Respawn in": "Neu in",
+    "Current board material": "Aktuelles Brettmaterial",
+    "White +": "Weiß +",
+    "Black +": "Schwarz +",
+    "Current carrier": "Aktueller Träger",
+    "This potato started with a": "Diese Bombe startete mit einer",
+    "move fuse": "Züge-Zündzeit",
+    "Cooling down": "Abkühlphase",
+    "Next potato": "Nächste Bombe",
+    "A new random non-king carrier appears after the cooldown.":
+      "Nach der Abkühlzeit erscheint ein neuer zufälliger Nicht-König-Träger.",
+    "Hot Potato Stats": "Hot-Potato-Statistik",
+    "Chaos from this match": "Chaos aus dieser Partie",
+    Explosions: "Explosionen",
+    Transfers: "Übergaben",
+    Destroyed: "Zerstört",
+    Fuse: "Zündzeit",
+    "random moves": "zufällige Züge",
+    "A random non-king piece starts as the carrier.":
+      "Eine zufällige Nicht-Königsfigur startet als Träger.",
+    "Each new potato gets a random fuse from 4 to 12 completed player moves.":
+      "Jede neue Bombe erhält eine zufällige Zündzeit von 4 bis 12 abgeschlossenen Zügen.",
+    "Capture the carrier and your capturing piece inherits it.":
+      "Schlage den Träger und deine schlagende Figur übernimmt die Bombe.",
+    "The carrier square and all 8 adjacent squares explode.":
+      "Das Trägerfeld und alle 8 Nachbarfelder explodieren.",
+    "If exactly one king is in the blast radius, that player loses.":
+      "Ist genau ein König im Explosionsradius, verliert diese Seite.",
+    "If both kings are in the radius, the game is a draw.":
+      "Sind beide Könige im Radius, endet die Partie remis.",
+    "After an explosion, 5 moves pass before the next potato appears.":
+      "Nach einer Explosion vergehen 5 Züge bis zur nächsten Bombe.",
+    "Both kings blown up! Draw.": "Beide Könige explodiert! Remis.",
+    "The game ended in a draw.": "Die Partie endete remis.",
+    "King blown up! White wins.": "König explodiert! Weiß gewinnt.",
+    "King blown up! Black wins.": "König explodiert! Schwarz gewinnt.",
+    "White wins by checkmate.": "Weiß gewinnt durch Schachmatt.",
+    "Black wins by checkmate.": "Schwarz gewinnt durch Schachmatt.",
+    Cooldown: "Abkühlzeit",
+    plies: "Halbzüge",
+    "Back to Live Board": "Zurück zum Live-Brett",
+    "Hot Potato": "Hot Potato",
+  },
+  bar: {
+    "Chess Hot Potato": "Schach Hot Potato",
+    "Pass the danger": "Gib de G'fahr weiter",
+    "Random fuse": "Zufällige Zündzeit",
+    moves: "Züg",
+    "moves left": "Züg übrig",
+    "Respawn in": "Neu in",
+    "Cooling down": "Abkühlphase",
+    "Next potato": "Nächste Bombn",
+    Explosions: "Explosionen",
+    Transfers: "Übergaben",
+    Destroyed: "Zerstört",
+    Fuse: "Zündzeit",
+    "random moves": "zufällige Züg",
+    Cooldown: "Abkühlzeit",
+    plies: "Halbzüg",
+  },
+  ko: {
+    "Chess Hot Potato": "체스 핫 포테이토",
+    "Pass the danger": "위험을 넘기세요",
+    "Random fuse": "랜덤 타이머",
+    moves: "수",
+    "moves left": "수 남음",
+    "Respawn in": "재생성까지",
+    "Current board material": "현재 기물 현황",
+    "White +": "백 +",
+    "Black +": "흑 +",
+    "Current carrier": "현재 운반자",
+    "This potato started with a": "이 폭탄의 시작 타이머:",
+    "move fuse": "수",
+    "Cooling down": "쿨다운 중",
+    "Next potato": "다음 폭탄",
+    "A new random non-king carrier appears after the cooldown.":
+      "쿨다운 후 무작위 비킹 기물에 새 폭탄이 생깁니다.",
+    "Hot Potato Stats": "핫 포테이토 통계",
+    "Chaos from this match": "이번 게임의 혼돈",
+    Explosions: "폭발",
+    Transfers: "전달",
+    Destroyed: "파괴",
+    Fuse: "타이머",
+    "random moves": "랜덤 수",
+    "A random non-king piece starts as the carrier.":
+      "무작위 비킹 기물이 운반자로 시작합니다.",
+    "Each new potato gets a random fuse from 4 to 12 completed player moves.":
+      "새 폭탄마다 4~12 완료 수의 랜덤 타이머가 설정됩니다.",
+    "Capture the carrier and your capturing piece inherits it.":
+      "운반자를 잡으면 잡은 기물이 폭탄을 이어받습니다.",
+    "The carrier square and all 8 adjacent squares explode.":
+      "운반 칸과 주변 8칸이 폭발합니다.",
+    "If exactly one king is in the blast radius, that player loses.":
+      "폭발 범위에 킹 하나만 있으면 그 진영이 패배합니다.",
+    "If both kings are in the radius, the game is a draw.":
+      "두 킹 모두 범위에 있으면 무승부입니다.",
+    "After an explosion, 5 moves pass before the next potato appears.":
+      "폭발 후 5수가 지나야 다음 폭탄이 생깁니다.",
+    "Both kings blown up! Draw.": "두 킹 모두 폭발! 무승부.",
+    "The game ended in a draw.": "게임은 무승부로 끝났습니다.",
+    "King blown up! White wins.": "킹 폭발! 백 승리.",
+    "King blown up! Black wins.": "킹 폭발! 흑 승리.",
+    "White wins by checkmate.": "백이 체크메이트로 승리합니다.",
+    "Black wins by checkmate.": "흑이 체크메이트로 승리합니다.",
+    Cooldown: "쿨다운",
+    plies: "하프무브",
+    "Hot Potato": "핫 포테이토",
+  },
+  ru: {
+    "Chess Hot Potato": "Шахматная горячая картошка",
+    "Pass the danger": "Передай опасность",
+    "Random fuse": "Случайный таймер",
+    moves: "ходов",
+    "moves left": "ходов осталось",
+    "Respawn in": "Новая через",
+    "Current board material": "Текущий материал",
+    "White +": "Белые +",
+    "Black +": "Чёрные +",
+    "Current carrier": "Текущий носитель",
+    "This potato started with a": "Эта бомба начала с",
+    "move fuse": "ходов таймера",
+    "Cooling down": "Перезарядка",
+    "Next potato": "Следующая бомба",
+    "A new random non-king carrier appears after the cooldown.":
+      "После перезарядки появится новый случайный носитель кроме короля.",
+    "Hot Potato Stats": "Статистика Hot Potato",
+    "Chaos from this match": "Хаос этой партии",
+    Explosions: "Взрывы",
+    Transfers: "Передачи",
+    Destroyed: "Уничтожено",
+    Fuse: "Таймер",
+    "random moves": "случайных ходов",
+    "A random non-king piece starts as the carrier.":
+      "Случайная фигура кроме короля начинает как носитель.",
+    "Each new potato gets a random fuse from 4 to 12 completed player moves.":
+      "Каждая новая бомба получает случайный таймер от 4 до 12 завершённых ходов.",
+    "Capture the carrier and your capturing piece inherits it.":
+      "Взявшая носителя фигура наследует бомбу.",
+    "The carrier square and all 8 adjacent squares explode.":
+      "Поле носителя и все 8 соседних полей взрываются.",
+    "If exactly one king is in the blast radius, that player loses.":
+      "Если во взрыве один король, его сторона проигрывает.",
+    "If both kings are in the radius, the game is a draw.":
+      "Если оба короля в зоне, результат — ничья.",
+    "After an explosion, 5 moves pass before the next potato appears.":
+      "После взрыва проходит 5 ходов до новой бомбы.",
+    "Both kings blown up! Draw.": "Оба короля взорваны! Ничья.",
+    "The game ended in a draw.": "Партия закончилась ничьей.",
+    "King blown up! White wins.": "Король взорван! Белые победили.",
+    "King blown up! Black wins.": "Король взорван! Чёрные победили.",
+    "White wins by checkmate.": "Белые выигрывают матом.",
+    "Black wins by checkmate.": "Чёрные выигрывают матом.",
+    Cooldown: "Перезарядка",
+    plies: "полуходов",
+    "Hot Potato": "Hot Potato",
+  },
+};
 
 /* =========================================================
    TYPES
@@ -95,20 +267,24 @@ const pieceValues: Record<PieceType, number> = {
    HELPERS
    ========================================================= */
 
-function resultText(result: FinishedGame): string {
+function resultText(result: FinishedGame, t: (key: string) => string): string {
   if (!result) return "";
 
   if (result.outcome === "draw") {
     return result.reason === "explosion"
-      ? "Both kings blown up! Draw."
-      : "The game ended in a draw.";
+      ? t("Both kings blown up! Draw.")
+      : t("The game ended in a draw.");
   }
 
-  const winner = result.outcome === "white" ? "White" : "Black";
+  if (result.reason === "explosion") {
+    return result.outcome === "white"
+      ? t("King blown up! White wins.")
+      : t("King blown up! Black wins.");
+  }
 
-  return result.reason === "explosion"
-    ? `King blown up! ${winner} wins.`
-    : `${winner} wins by checkmate.`;
+  return result.outcome === "white"
+    ? t("White wins by checkmate.")
+    : t("Black wins by checkmate.");
 }
 
 function getHistoryPieceSymbol(color: "w" | "b", piece: PieceType) {
@@ -147,6 +323,8 @@ function cloneHotPotato(state: HotPotatoState): HotPotatoState {
    ========================================================= */
 
 export default function ChessHotPotatoBoard() {
+  const { language, setLanguage } = useChessLanguage();
+  const t = (key: string) => translateChess(language, key, translations);
   /* =======================================================
      CHESS GAME
      ======================================================= */
@@ -695,21 +873,27 @@ export default function ChessHotPotatoBoard() {
 
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-orange-400">
-                Chess Variant
+                {t("Chess Variant")}
               </p>
 
               <h1 className="mt-0.5 text-2xl font-black tracking-tight text-white">
-                Chess Hot Potato
+                {t("Chess Hot Potato")}
               </h1>
 
               <p className="mt-0.5 text-sm text-zinc-500">
-                Pass the danger · random fuse {HOT_POTATO_MIN_FUSE_MOVES}–
-                {HOT_POTATO_MAX_FUSE_MOVES} moves
+                {t("Pass the danger")} · {t("Random fuse")}{" "}
+                {HOT_POTATO_MIN_FUSE_MOVES}–{HOT_POTATO_MAX_FUSE_MOVES}{" "}
+                {t("moves")}
               </p>
             </div>
           </div>
 
           <div className="flex flex-wrap items-center justify-end gap-2">
+            <LanguageSelector
+              language={language}
+              onChange={setLanguage}
+              label={t("Language")}
+            />
             <div
               className={`
                 flex
@@ -734,8 +918,8 @@ export default function ChessHotPotatoBoard() {
               </span>
 
               {displayedHotPotato.square
-                ? `${displayedHotPotato.movesUntilExplosion} moves left`
-                : `Respawn in ${displayedHotPotato.respawnMovesRemaining}`}
+                ? `${displayedHotPotato.movesUntilExplosion} ${t("moves left")}`
+                : `${t("Respawn in")} ${displayedHotPotato.respawnMovesRemaining}`}
             </div>
 
             {!finishedGame && !historyPreview && (
@@ -756,10 +940,11 @@ export default function ChessHotPotatoBoard() {
                 "
               >
                 <span className="h-2 w-2 animate-pulse rounded-full bg-amber-400" />
-                {game.turn() === "w" ? "White to move" : "Black to move"}
+                {game.turn() === "w" ? t("White to move") : t("Black to move")}
               </div>
             )}
           </div>
+          <BoardAnimationToggle />
         </header>
 
         {/* =================================================
@@ -786,15 +971,41 @@ export default function ChessHotPotatoBoard() {
                 <div className="mb-5">
                   <div className="flex items-center gap-2">
                     <div className="h-2 w-2 rounded-full bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.55)]" />
-                    <h2 className="font-bold text-zinc-100">Game Controls</h2>
+                    <h2 className="font-bold text-zinc-100">
+                      {t("Game Controls")}
+                    </h2>
                   </div>
 
                   <p className="mt-1.5 text-xs text-zinc-500">
-                    Players, game and actions
+                    {t("Players, game and actions")}
                   </p>
                 </div>
 
                 <div className="space-y-3">
+                  <label className="block">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
+                      {t("White player")}
+                    </span>
+                    <input
+                      value={whitePlayer}
+                      onChange={(event) => setWhitePlayer(event.target.value)}
+                      placeholder={t("White")}
+                      className="mt-1.5 w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 text-sm font-semibold text-zinc-200 outline-none transition placeholder:text-zinc-700 focus:border-amber-400/30"
+                    />
+                  </label>
+
+                  <label className="block">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
+                      {t("Black player")}
+                    </span>
+                    <input
+                      value={blackPlayer}
+                      onChange={(event) => setBlackPlayer(event.target.value)}
+                      placeholder={t("Black")}
+                      className="mt-1.5 w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 text-sm font-semibold text-zinc-200 outline-none transition placeholder:text-zinc-700 focus:border-amber-400/30"
+                    />
+                  </label>
+
                   <div className="grid grid-cols-2 gap-2 pt-1">
                     <button
                       type="button"
@@ -802,7 +1013,7 @@ export default function ChessHotPotatoBoard() {
                       disabled={undoStack.length === 0}
                       className="rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2.5 text-xs font-black text-zinc-300 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-35"
                     >
-                      Undo
+                      {t("Undo")}
                     </button>
 
                     <button
@@ -810,7 +1021,7 @@ export default function ChessHotPotatoBoard() {
                       onClick={restartGame}
                       className="rounded-xl border border-orange-400/15 bg-orange-400/[0.07] px-3 py-2.5 text-xs font-black text-orange-200 transition hover:bg-orange-400/10"
                     >
-                      New Game
+                      {t("New Game")}
                     </button>
                   </div>
                 </div>
@@ -822,10 +1033,10 @@ export default function ChessHotPotatoBoard() {
                 <div className="mb-4 flex items-start justify-between gap-3">
                   <div>
                     <h2 className="text-sm font-bold text-zinc-100">
-                      Captured Pieces
+                      {t("Captured Pieces")}
                     </h2>
                     <p className="mt-1 text-xs text-zinc-500">
-                      Current board material
+                      {t("Current board material")}
                     </p>
                   </div>
 
@@ -838,10 +1049,11 @@ export default function ChessHotPotatoBoard() {
                           : "bg-white/5 text-zinc-500"
                     }`}
                   >
-                    {materialDifference > 0 && `White +${materialDifference}`}
+                    {materialDifference > 0 &&
+                      `${t("White")} +${materialDifference}`}
                     {materialDifference < 0 &&
-                      `Black +${Math.abs(materialDifference)}`}
-                    {materialDifference === 0 && "Equal"}
+                      `${t("Black")} +${Math.abs(materialDifference)}`}
+                    {materialDifference === 0 && t("Equal")}
                   </span>
                 </div>
 
@@ -849,6 +1061,7 @@ export default function ChessHotPotatoBoard() {
                   <CapturedPiecesGrid
                     capturedBlack={capturedBlack}
                     capturedWhite={capturedWhite}
+                    t={t}
                   />
                 </div>
               </section>
@@ -859,9 +1072,11 @@ export default function ChessHotPotatoBoard() {
                 <div className="mb-4 flex items-center justify-between">
                   <div>
                     <h2 className="text-sm font-bold text-zinc-100">
-                      Move History
+                      {t("Move History")}
                     </h2>
-                    <p className="mt-1 text-xs text-zinc-500">Game history</p>
+                    <p className="mt-1 text-xs text-zinc-500">
+                      {t("Game history")}
+                    </p>
                   </div>
 
                   <span className="rounded-xl bg-white/5 px-2.5 py-1 text-xs font-semibold text-zinc-400">
@@ -872,15 +1087,15 @@ export default function ChessHotPotatoBoard() {
                 <div className="max-h-80 overflow-y-auto rounded-2xl border border-white/5 bg-black/20">
                   {history.length === 0 ? (
                     <div className="px-4 py-8 text-center text-xs text-zinc-600">
-                      No moves yet
+                      {t("No moves yet")}
                     </div>
                   ) : (
                     <table className="w-full border-collapse">
                       <thead className="sticky top-0 z-10 bg-zinc-900">
                         <tr className="border-b border-white/5 text-left text-[9px] font-black uppercase tracking-wider text-zinc-600">
-                          <th className="px-3 py-2">Move</th>
-                          <th className="px-2 py-2">Side</th>
-                          <th className="px-2 py-2">Played</th>
+                          <th className="px-3 py-2">{t("Move")}</th>
+                          <th className="px-2 py-2">{t("Side")}</th>
+                          <th className="px-2 py-2">{t("Played")}</th>
                         </tr>
                       </thead>
 
@@ -970,7 +1185,7 @@ export default function ChessHotPotatoBoard() {
                         Game Over
                       </p>
                       <p className="mt-1 font-black text-white">
-                        {resultText(finishedGame)}
+                        {resultText(finishedGame, t)}
                       </p>
                     </div>
 
@@ -999,11 +1214,11 @@ export default function ChessHotPotatoBoard() {
                 <div className="mb-3 flex items-center justify-between gap-4 rounded-xl border border-blue-400/20 bg-blue-400/[0.07] px-4 py-3">
                   <div>
                     <p className="text-[9px] font-black uppercase tracking-widest text-blue-300">
-                      History Preview
+                      {t("History Preview")}
                     </p>
 
                     <p className="mt-1 text-sm font-bold text-white">
-                      Move {historyPreview.moveNumber}
+                      {t("Move")} {historyPreview.moveNumber}
                       {historyPreview.color === "w" ? "." : "..."}{" "}
                       {historyPreview.san}
                     </p>
@@ -1011,7 +1226,7 @@ export default function ChessHotPotatoBoard() {
                     <p className="mt-1 text-[10px] font-semibold text-zinc-500">
                       {historyPreview.hotPotatoAfter.square
                         ? `💣 ${historyPreview.hotPotatoAfter.movesUntilExplosion}`
-                        : `Cooldown ${historyPreview.hotPotatoAfter.respawnMovesRemaining}`}
+                        : `${t("Cooldown")} ${historyPreview.hotPotatoAfter.respawnMovesRemaining}`}
                     </p>
                   </div>
 
@@ -1020,7 +1235,7 @@ export default function ChessHotPotatoBoard() {
                     onClick={() => setHistoryPreviewPly(null)}
                     className="shrink-0 rounded-lg bg-white/10 px-3 py-2 text-xs font-bold text-zinc-200 transition hover:bg-white/20"
                   >
-                    Back to Live Board
+                    {t("Back to Live Board")}
                   </button>
                 </div>
               )}
@@ -1044,11 +1259,11 @@ export default function ChessHotPotatoBoard() {
               {/* MOBILE STATUS */}
 
               <div className="mt-4 flex items-center justify-between rounded-2xl border border-white/10 bg-zinc-900/75 px-4 py-3 xl:hidden">
-                <span className="text-sm text-zinc-500">Hot Potato</span>
+                <span className="text-sm text-zinc-500">{t("Hot Potato")}</span>
                 <span className="text-sm font-bold text-zinc-200">
                   {displayedHotPotato.square
-                    ? `💣 ${displayedHotPotato.movesUntilExplosion} moves · ${displayedHotPotato.square}`
-                    : `Respawn in ${displayedHotPotato.respawnMovesRemaining}`}
+                    ? `💣 ${displayedHotPotato.movesUntilExplosion} ${t("moves")} · ${displayedHotPotato.square}`
+                    : `${t("Respawn in")} ${displayedHotPotato.respawnMovesRemaining}`}
                 </span>
               </div>
             </div>
@@ -1066,10 +1281,10 @@ export default function ChessHotPotatoBoard() {
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <div>
                     <h2 className="text-base font-black text-zinc-100">
-                      Hot Potato
+                      {t("Hot Potato")}
                     </h2>
                     <p className="mt-1 text-xs text-zinc-500">
-                      Pass it before the fuse reaches zero
+                      {t("Pass the danger")}
                     </p>
                   </div>
 
@@ -1084,7 +1299,7 @@ export default function ChessHotPotatoBoard() {
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
-                            Current carrier
+                            {t("Current carrier")}
                           </p>
 
                           <p className="mt-2 font-mono text-2xl font-black uppercase text-white">
@@ -1118,20 +1333,20 @@ export default function ChessHotPotatoBoard() {
                       </div>
 
                       <p className="mt-2 text-[10px] text-zinc-600">
-                        This potato started with a{" "}
-                        {displayedHotPotato.fuseMovesTotal}-move fuse
+                        {t("This potato started with a")}{" "}
+                        {displayedHotPotato.fuseMovesTotal}-{t("move fuse")}
                       </p>
                     </div>
                   </div>
                 ) : (
                   <div className="rounded-2xl border border-sky-300/15 bg-sky-400/[0.05] p-4">
                     <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
-                      Cooling down
+                      {t("Cooling down")}
                     </p>
 
                     <div className="mt-2 flex items-end justify-between gap-3">
                       <p className="text-sm font-bold text-sky-200">
-                        Next potato
+                        {t("Next potato")}
                       </p>
                       <span className="text-4xl font-black leading-none text-sky-200">
                         {displayedHotPotato.respawnMovesRemaining}
@@ -1139,7 +1354,9 @@ export default function ChessHotPotatoBoard() {
                     </div>
 
                     <p className="mt-2 text-[10px] text-zinc-600">
-                      A new random non-king carrier appears after the cooldown.
+                      {t(
+                        "A new random non-king carrier appears after the cooldown.",
+                      )}
                     </p>
                   </div>
                 )}
@@ -1151,39 +1368,39 @@ export default function ChessHotPotatoBoard() {
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <div>
                     <h2 className="text-base font-black text-zinc-100">
-                      Hot Potato Stats
+                      {t("Hot Potato Stats")}
                     </h2>
                     <p className="mt-1 text-xs text-zinc-500">
-                      Chaos from this match
+                      {t("Chaos from this match")}
                     </p>
                   </div>
 
                   <span className="rounded-full border border-orange-400/15 bg-orange-400/[0.07] px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-orange-300">
-                    {history.length} plies
+                    {history.length} {t("plies")}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
                   <StatCard
                     icon="💥"
-                    label="Explosions"
+                    label={t("Explosions")}
                     value={String(explosionCount)}
                   />
                   <StatCard
                     icon="↔"
-                    label="Transfers"
+                    label={t("Transfers")}
                     value={String(transferCount)}
                   />
                   <StatCard
                     icon="☠"
-                    label="Destroyed"
+                    label={t("Destroyed")}
                     value={String(destroyedPieceCount)}
                   />
                   <StatCard
                     icon="⏳"
-                    label="Fuse"
+                    label={t("Fuse")}
                     value={`${HOT_POTATO_MIN_FUSE_MOVES}–${HOT_POTATO_MAX_FUSE_MOVES}`}
-                    detail="random moves"
+                    detail={t("random moves")}
                   />
                 </div>
               </section>
@@ -1192,38 +1409,54 @@ export default function ChessHotPotatoBoard() {
 
               <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
                 <div className="mb-4">
-                  <h2 className="text-sm font-bold text-zinc-100">Rules</h2>
-                  <p className="mt-1 text-xs text-zinc-500">Chess Hot Potato</p>
+                  <h2 className="text-sm font-bold text-zinc-100">
+                    {t("Rules")}
+                  </h2>
+                  <p className="mt-1 text-xs text-zinc-500">
+                    {t("Chess Hot Potato")}
+                  </p>
                 </div>
 
                 <div className="space-y-2 text-xs leading-5 text-zinc-400">
                   <RuleLine
                     icon="💣"
-                    text="A random non-king piece starts as the carrier."
+                    text={t("A random non-king piece starts as the carrier.")}
                   />
                   <RuleLine
                     icon="🎲"
-                    text={`Each new potato gets a random fuse from ${HOT_POTATO_MIN_FUSE_MOVES} to ${HOT_POTATO_MAX_FUSE_MOVES} completed player moves.`}
+                    text={t(
+                      "Each new potato gets a random fuse from 4 to 12 completed player moves.",
+                    )}
                   />
                   <RuleLine
                     icon="↔"
-                    text="Capture the carrier and your capturing piece inherits it."
+                    text={t(
+                      "Capture the carrier and your capturing piece inherits it.",
+                    )}
                   />
                   <RuleLine
                     icon="💥"
-                    text="The carrier square and all 8 adjacent squares explode."
+                    text={t(
+                      "The carrier square and all 8 adjacent squares explode.",
+                    )}
                   />
                   <RuleLine
                     icon="♔"
-                    text="If exactly one king is in the blast radius, that player loses."
+                    text={t(
+                      "If exactly one king is in the blast radius, that player loses.",
+                    )}
                   />
                   <RuleLine
                     icon="♔♚"
-                    text="If both kings are in the radius, the game is a draw."
+                    text={t(
+                      "If both kings are in the radius, the game is a draw.",
+                    )}
                   />
                   <RuleLine
                     icon="❄"
-                    text="After an explosion, 5 moves pass before the next potato appears."
+                    text={t(
+                      "After an explosion, 5 moves pass before the next potato appears.",
+                    )}
                   />
                 </div>
               </section>
@@ -1282,9 +1515,11 @@ function RuleLine({ icon, text }: { icon: string; text: string }) {
 function CapturedPiecesGrid({
   capturedBlack,
   capturedWhite,
+  t,
 }: {
   capturedBlack: PieceType[];
   capturedWhite: PieceType[];
+  t: (key: string) => string;
 }) {
   const whiteSymbols: Record<PieceType, string> = {
     p: "♙",
@@ -1308,7 +1543,7 @@ function CapturedPiecesGrid({
     <div className="space-y-3">
       <div className="grid grid-cols-[52px_minmax(0,1fr)] items-start gap-2">
         <span className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
-          White
+          {t("White")}
         </span>
         <div className="flex min-h-7 flex-wrap gap-1 text-xl leading-none text-[#fff3d5]">
           {capturedWhite.length === 0 ? (
@@ -1323,7 +1558,7 @@ function CapturedPiecesGrid({
 
       <div className="grid grid-cols-[52px_minmax(0,1fr)] items-start gap-2">
         <span className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
-          Black
+          {t("Black")}
         </span>
         <div className="flex min-h-7 flex-wrap gap-1 text-xl leading-none text-zinc-300">
           {capturedBlack.length === 0 ? (

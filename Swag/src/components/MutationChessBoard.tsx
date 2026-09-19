@@ -29,6 +29,7 @@ import {
 import { buildMutationStats } from "../games/chess/variants/mutationStats";
 
 import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.ts";
+import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
 
 /* =========================================================
    TYPES
@@ -1004,6 +1005,7 @@ export default function MutationChessBoard() {
               </div>
             )}
           </div>
+          <BoardAnimationToggle />
         </header>
 
         {/* RULE STRIP */}

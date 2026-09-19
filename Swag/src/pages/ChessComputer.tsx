@@ -34,7 +34,7 @@ const difficultyLevels: Record<Difficulty, DifficultySettings> = {
   medium: {
     skillLevel: 1,
     thinkTime: 300,
-    randomMoveChance: 0.05,
+    randomMoveChance: 0.15,
     label: "Normal",
     description: "Solid play with occasional inaccuracies.",
   },
@@ -42,7 +42,7 @@ const difficultyLevels: Record<Difficulty, DifficultySettings> = {
   hard: {
     skillLevel: 5,
     thinkTime: 500,
-    randomMoveChance: 0,
+    randomMoveChance: 0.02,
     label: "Hard",
     description: "Strong tactical play with few mistakes.",
   },

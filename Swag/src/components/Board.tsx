@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { type Square } from "chess.js";
 import { getSquareName } from "../utils/chessUtils";
+import { useChessSettings } from "@/context/ChessSettingsContext";
 
 type BoardPiece = {
   type: "p" | "n" | "b" | "r" | "q" | "k";
@@ -102,6 +103,25 @@ type BoardProps = {
   hotPotatoExplosionSquares?: Square[];
   hotPotatoBlownUpKingSquares?: Square[];
 
+  /*
+   * Chess Collapse markers.
+   * Warning squares crack first, impact squares flash on the collapse move,
+   * and collapsed squares become permanent holes in the board.
+   */
+  collapseWarningSquares?: Square[];
+  collapsedSquares?: Square[];
+  collapseImpactSquares?: Square[];
+
+  /*
+   * Boss Battle Chess markers.
+   */
+  bossSquare?: Square | null;
+  bossPowerTargetSquares?: Square[];
+  bossPowerTargetMode?: "summon" | "dark_step" | null;
+  bossShockwaveSquares?: Square[];
+  bossArmorActive?: boolean;
+  bossRage?: number;
+
   orientation?: "white" | "black";
 
   /*
@@ -164,6 +184,15 @@ export default function Board({
   hotPotatoMovesRemaining = 0,
   hotPotatoExplosionSquares = [],
   hotPotatoBlownUpKingSquares = [],
+  collapseWarningSquares = [],
+  collapsedSquares = [],
+  collapseImpactSquares = [],
+  bossSquare = null,
+  bossPowerTargetSquares = [],
+  bossPowerTargetMode = null,
+  bossShockwaveSquares = [],
+  bossArmorActive = false,
+  bossRage = 0,
   orientation = "white",
   pieceScale = 1,
 }: BoardProps) {
@@ -195,6 +224,8 @@ export default function Board({
     "white" | "black"
   >(orientation);
 
+  const { boardAnimationEnabled } = useChessSettings();
+
   type RotationPhase = "idle" | "rotating" | "reset";
 
   const [rotationPhase, setRotationPhase] = useState<RotationPhase>("idle");
@@ -208,19 +239,62 @@ export default function Board({
   const ROTATION_MS = 520;
 
   useEffect(() => {
-    if (orientation === displayedOrientationRef.current) {
-      return;
-    }
-
+    /*
+     * Stop any previous rotation/reset before reacting to the
+     * requested orientation or animation setting.
+     */
     if (rotationTimerRef.current !== null) {
       window.clearTimeout(rotationTimerRef.current);
+
+      rotationTimerRef.current = null;
     }
 
     if (resetFrameRef.current !== null) {
       window.cancelAnimationFrame(resetFrameRef.current);
+
+      resetFrameRef.current = null;
     }
 
     /*
+     * Nothing to flip.
+     */
+    if (orientation === displayedOrientationRef.current) {
+      if (!boardAnimationEnabled) {
+        setRotationPhase("idle");
+      }
+
+      return;
+    }
+
+    /*
+     * ANIMATION OFF
+     *
+     * The orientation prop itself is still delayed by
+     * useDelayedBoardOrientation. Once that delayed orientation
+     * arrives here, switch sides immediately without rotating.
+     */
+    if (!boardAnimationEnabled) {
+      displayedOrientationRef.current = orientation;
+
+      setDisplayedOrientation(orientation);
+
+      /*
+       * "reset" disables CSS transitions for the instantaneous swap.
+       */
+      setRotationPhase("reset");
+
+      resetFrameRef.current = window.requestAnimationFrame(() => {
+        setRotationPhase("idle");
+
+        resetFrameRef.current = null;
+      });
+
+      return;
+    }
+
+    /*
+     * ANIMATION ON
+     *
      * Rotate the currently displayed board through a full half-turn.
      */
     setRotationPhase("rotating");
@@ -241,23 +315,32 @@ export default function Board({
 
       setRotationPhase("reset");
 
+      rotationTimerRef.current = null;
+
       resetFrameRef.current = window.requestAnimationFrame(() => {
         setRotationPhase("idle");
+
+        resetFrameRef.current = null;
       });
     }, ROTATION_MS);
 
     return () => {
       if (rotationTimerRef.current !== null) {
         window.clearTimeout(rotationTimerRef.current);
+
+        rotationTimerRef.current = null;
       }
 
       if (resetFrameRef.current !== null) {
         window.cancelAnimationFrame(resetFrameRef.current);
+
+        resetFrameRef.current = null;
       }
     };
-  }, [orientation]);
+  }, [orientation, boardAnimationEnabled]);
 
-  const orientationAnimating = rotationPhase !== "idle";
+  const orientationAnimating =
+    boardAnimationEnabled && rotationPhase !== "idle";
 
   const boardRotation = rotationPhase === "rotating" ? 180 : 0;
 
@@ -266,22 +349,22 @@ export default function Board({
   const boardTransform = `rotate(${boardRotation}deg)`;
 
   const boardTransition =
-    rotationPhase === "reset"
+    !boardAnimationEnabled || rotationPhase === "reset"
       ? "none"
       : `transform ${ROTATION_MS}ms cubic-bezier(0.22, 1, 0.36, 1), filter 220ms ease, box-shadow 220ms ease`;
 
   const pieceTransition =
-    rotationPhase === "reset"
+    !boardAnimationEnabled || rotationPhase === "reset"
       ? "none"
       : `transform ${ROTATION_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`;
 
   const boardFilter =
-    rotationPhase === "rotating"
+    boardAnimationEnabled && rotationPhase === "rotating"
       ? "brightness(0.9) saturate(0.95)"
       : "brightness(1) saturate(1)";
 
   const boardShadow =
-    rotationPhase === "rotating"
+    boardAnimationEnabled && rotationPhase === "rotating"
       ? "0 38px 90px rgba(0,0,0,0.62)"
       : "0 30px 80px rgba(0,0,0,0.55)";
 
@@ -459,6 +542,22 @@ export default function Board({
                 const isHotPotatoBlownUpKingSquare =
                   hotPotatoBlownUpKingSquares.includes(square) &&
                   piece?.type === "k";
+
+                const isCollapseWarningSquare =
+                  collapseWarningSquares.includes(square);
+
+                const isCollapsedSquare = collapsedSquares.includes(square);
+
+                const isCollapseImpactSquare =
+                  collapseImpactSquares.includes(square);
+
+                const isBossSquare = bossSquare === square;
+
+                const isBossPowerTargetSquare =
+                  bossPowerTargetSquares.includes(square);
+
+                const isBossShockwaveSquare =
+                  bossShockwaveSquares.includes(square);
 
                 const isCheckedKing =
                   piece?.type === "k" && checkedKingSquare === square;
@@ -777,6 +876,281 @@ export default function Board({
                           <span aria-hidden="true">💣</span>
                           <span>{hotPotatoMovesRemaining}</span>
                         </span>
+                      </>
+                    )}
+
+                    {/* =========================
+                      BOSS BATTLE CHESS
+                     ========================= */}
+
+                    {isBossShockwaveSquare && (
+                      <>
+                        <span
+                          className="
+                            pointer-events-none
+                            absolute
+                            inset-0
+                            z-[8]
+                            animate-pulse
+                            bg-[radial-gradient(circle,rgba(248,113,113,0.56)_0%,rgba(239,68,68,0.28)_48%,transparent_78%)]
+                            shadow-[inset_0_0_28px_rgba(239,68,68,0.5)]
+                          "
+                        />
+
+                        <span
+                          className="
+                            pointer-events-none
+                            absolute
+                            left-1/2
+                            top-1/2
+                            z-[18]
+                            -translate-x-1/2
+                            -translate-y-1/2
+                            text-[clamp(1.2rem,3vw,2.4rem)]
+                            leading-none
+                          "
+                          aria-hidden="true"
+                        >
+                          💥
+                        </span>
+                      </>
+                    )}
+
+                    {isBossPowerTargetSquare && (
+                      <>
+                        <span
+                          className={`
+                            pointer-events-none
+                            absolute
+                            inset-[6%]
+                            z-[13]
+                            rounded-md
+                            border-2
+                            border-dashed
+                            ${
+                              bossPowerTargetMode === "summon"
+                                ? "border-emerald-200/80 bg-emerald-400/12 shadow-[inset_0_0_18px_rgba(52,211,153,0.3)]"
+                                : "border-violet-200/80 bg-violet-400/12 shadow-[inset_0_0_18px_rgba(167,139,250,0.3)]"
+                            }
+                          `}
+                        />
+
+                        <span
+                          className={`
+                            pointer-events-none
+                            absolute
+                            bottom-1
+                            right-1
+                            z-[19]
+                            rounded-full
+                            border
+                            bg-zinc-950/90
+                            px-1.5
+                            py-0.5
+                            text-[10px]
+                            font-black
+                            ${
+                              bossPowerTargetMode === "summon"
+                                ? "border-emerald-200/40 text-emerald-200"
+                                : "border-violet-200/40 text-violet-200"
+                            }
+                          `}
+                          aria-hidden="true"
+                        >
+                          {bossPowerTargetMode === "summon" ? "♟+" : "✦"}
+                        </span>
+                      </>
+                    )}
+
+                    {isBossSquare && (
+                      <>
+                        <span
+                          className={`
+                            pointer-events-none
+                            absolute
+                            inset-0
+                            z-[4]
+                            ${
+                              bossArmorActive
+                                ? "bg-cyan-300/14 shadow-[inset_0_0_34px_rgba(103,232,249,0.48)]"
+                                : "bg-red-500/10 shadow-[inset_0_0_34px_rgba(239,68,68,0.38)]"
+                            }
+                          `}
+                        />
+
+                        <span
+                          className="
+                            pointer-events-none
+                            absolute
+                            left-1
+                            top-1
+                            z-[19]
+                            rounded-full
+                            border
+                            border-red-200/35
+                            bg-red-950/90
+                            px-1.5
+                            py-0.5
+                            text-[8px]
+                            font-black
+                            uppercase
+                            tracking-wider
+                            text-red-100
+                          "
+                        >
+                          Boss
+                        </span>
+
+                        {bossArmorActive && (
+                          <span
+                            className="
+                              pointer-events-none
+                              absolute
+                              right-1
+                              top-1
+                              z-[20]
+                              text-base
+                              drop-shadow-[0_0_8px_rgba(103,232,249,0.95)]
+                            "
+                            aria-hidden="true"
+                          >
+                            🛡
+                          </span>
+                        )}
+
+                        {bossRage > 0 && (
+                          <span
+                            className="
+                              pointer-events-none
+                              absolute
+                              bottom-1
+                              left-1
+                              z-[20]
+                              rounded-full
+                              bg-zinc-950/85
+                              px-1.5
+                              py-0.5
+                              text-[9px]
+                              font-black
+                              text-orange-200
+                            "
+                            aria-hidden="true"
+                          >
+                            🔥{bossRage}
+                          </span>
+                        )}
+                      </>
+                    )}
+
+                    {/* =========================
+                      CHESS COLLAPSE
+                     ========================= */}
+
+                    {isCollapseWarningSquare && !isCollapsedSquare && (
+                      <>
+                        <span
+                          className="
+                          pointer-events-none
+                          absolute
+                          inset-0
+                          z-[8]
+                          animate-pulse
+                          bg-orange-500/20
+                          shadow-[inset_0_0_28px_rgba(249,115,22,0.5)]
+                        "
+                        />
+
+                        <span
+                          className="
+                          pointer-events-none
+                          absolute
+                          inset-[8%]
+                          z-[17]
+                          opacity-80
+                          bg-[linear-gradient(135deg,transparent_0%,transparent_43%,rgba(255,237,213,0.85)_44%,rgba(255,237,213,0.85)_47%,transparent_48%,transparent_62%,rgba(127,29,29,0.8)_63%,rgba(127,29,29,0.8)_66%,transparent_67%)]
+                        "
+                        />
+
+                        <span
+                          className="
+                          pointer-events-none
+                          absolute
+                          right-1
+                          top-1
+                          z-[19]
+                          rounded-full
+                          border
+                          border-orange-100/50
+                          bg-zinc-950/85
+                          px-1.5
+                          py-0.5
+                          text-[10px]
+                          font-black
+                          text-orange-200
+                        "
+                          aria-hidden="true"
+                        >
+                          ⚠
+                        </span>
+                      </>
+                    )}
+
+                    {isCollapseImpactSquare && (
+                      <>
+                        <span
+                          className="
+                          pointer-events-none
+                          absolute
+                          inset-0
+                          z-[27]
+                          animate-pulse
+                          bg-[radial-gradient(circle,rgba(248,113,113,0.75)_0%,rgba(127,29,29,0.6)_48%,rgba(9,9,11,0.35)_78%)]
+                        "
+                        />
+                        <span
+                          className="
+                          pointer-events-none
+                          absolute
+                          left-1/2
+                          top-1/2
+                          z-[31]
+                          -translate-x-1/2
+                          -translate-y-1/2
+                          text-[clamp(1.4rem,4vw,3rem)]
+                          leading-none
+                        "
+                          aria-hidden="true"
+                        >
+                          💥
+                        </span>
+                      </>
+                    )}
+
+                    {isCollapsedSquare && (
+                      <>
+                        <span
+                          className="
+                          pointer-events-none
+                          absolute
+                          inset-0
+                          z-[29]
+                          bg-[radial-gradient(circle_at_center,#09090b_0%,#09090b_48%,#18181b_70%,#3f1d1d_100%)]
+                          shadow-[inset_0_0_20px_rgba(0,0,0,1)]
+                        "
+                        />
+
+                        <span
+                          className="
+                          pointer-events-none
+                          absolute
+                          inset-[8%]
+                          z-[30]
+                          rounded-md
+                          border
+                          border-red-950/80
+                          shadow-[0_0_18px_rgba(0,0,0,0.9),inset_0_0_12px_rgba(0,0,0,0.95)]
+                        "
+                        />
                       </>
                     )}
 
@@ -1298,7 +1672,7 @@ export default function Board({
                       EMPTY LEGAL MOVE
                      ========================= */}
 
-                    {isLegalMove && !piece && (
+                    {isLegalMove && !piece && !isCollapsedSquare && (
                       <span
                         className="
                         pointer-events-none
@@ -1317,7 +1691,7 @@ export default function Board({
                       LEGAL CAPTURE
                      ========================= */}
 
-                    {isLegalMove && piece && (
+                    {isLegalMove && piece && !isCollapsedSquare && (
                       <span
                         className="
                         pointer-events-none
@@ -1335,16 +1709,18 @@ export default function Board({
                       PIECE
                      ========================= */}
 
-                    {piece && !isHotPotatoBlownUpKingSquare && (
-                      /*
-                       * Outer wrapper controls only
-                       * the overall piece size.
-                       *
-                       * The inner span keeps the
-                       * existing hover animation.
-                       */
-                      <span
-                        className="
+                    {piece &&
+                      !isHotPotatoBlownUpKingSquare &&
+                      !isCollapsedSquare && (
+                        /*
+                         * Outer wrapper controls only
+                         * the overall piece size.
+                         *
+                         * The inner span keeps the
+                         * existing hover animation.
+                         */
+                        <span
+                          className="
                         pointer-events-none
                         relative
                         z-10
@@ -1354,18 +1730,18 @@ export default function Board({
                         items-center
                         justify-center
                       "
-                        style={{
-                          transform: `scale(${pieceScale}) rotate(${pieceCounterRotation}deg)`,
+                          style={{
+                            transform: `scale(${pieceScale}) rotate(${pieceCounterRotation}deg)`,
 
-                          transformOrigin: "center center",
+                            transformOrigin: "center center",
 
-                          transition: pieceTransition,
+                            transition: pieceTransition,
 
-                          willChange: "transform",
-                        }}
-                      >
-                        <span
-                          className={`
+                            willChange: "transform",
+                          }}
+                        >
+                          <span
+                            className={`
                           pointer-events-none
                           relative
                           select-none
@@ -1391,11 +1767,11 @@ export default function Board({
                               `
                           }
                         `}
-                        >
-                          {symbol}
+                          >
+                            {symbol}
+                          </span>
                         </span>
-                      </span>
-                    )}
+                      )}
 
                     {isFogSquare && (
                       <>

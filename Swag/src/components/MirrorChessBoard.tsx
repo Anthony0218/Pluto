@@ -38,6 +38,7 @@ import {
 } from "../games/chess/variants/mirrorStats";
 
 import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.ts";
+import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
 
 type Language = "en" | "de" | "bar" | "ko" | "ru";
 
@@ -1035,6 +1036,7 @@ export default function MirrorChessBoard() {
               </div>
             )}
           </div>
+          <BoardAnimationToggle />
         </header>
 
         {phase === "setup" && (

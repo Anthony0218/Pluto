@@ -1,7 +1,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { Chess, type Square } from "chess.js";
 import { getSquareName, type PieceType } from "../utils/chessUtils";
-import Board from "./Board.tsx";
+import Board from "./Board";
 import PromotionBar from "./PromotionBar";
 import {
   playPieceCaptureSound,
@@ -22,6 +22,7 @@ import {
 import { buildFogStats } from "../games/chess/variants/fogOfWarStats";
 
 import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.ts";
+import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
 
 type Language = "en" | "de" | "bar" | "ko" | "ru";
 type Winner = "white" | "black" | "draw";
@@ -593,6 +594,7 @@ export default function FogOfWarChessBoard() {
               </div>
             )}
           </div>
+          <BoardAnimationToggle />
         </header>
 
         <section className="mb-6 grid gap-3 rounded-3xl border border-sky-400/10 bg-sky-400/[0.03] px-5 py-4 md:grid-cols-3">

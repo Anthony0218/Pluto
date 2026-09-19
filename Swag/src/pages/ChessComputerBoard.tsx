@@ -926,6 +926,18 @@ export default function ChessComputerBoard({
 
   const [suggestedMoves, setSuggestedMoves] = useState<SuggestedMove[]>([]);
 
+  const [highlightedSuggestionUci, setHighlightedSuggestionUci] = useState<
+    string | null
+  >(null);
+
+  const helpMove =
+    helpVisible && highlightedSuggestionUci
+      ? {
+          from: highlightedSuggestionUci.slice(0, 2) as Square,
+          to: highlightedSuggestionUci.slice(2, 4) as Square,
+        }
+      : null;
+
   const [moveFeedback, setMoveFeedback] = useState<MoveFeedback | null>(null);
 
   /*
@@ -1193,6 +1205,7 @@ export default function ChessComputerBoard({
      */
     if (helpVisible) {
       setHelpVisible(false);
+      setHighlightedSuggestionUci(null);
 
       return;
     }
@@ -1210,6 +1223,8 @@ export default function ChessComputerBoard({
     const fen = game.fen();
 
     setHelpVisible(true);
+    setSuggestedMoves([]);
+    setHighlightedSuggestionUci(null);
 
     /*
      * Analyze fresh position.
@@ -1245,6 +1260,12 @@ export default function ChessComputerBoard({
       });
 
     setSuggestedMoves(suggestions);
+
+    /*
+     * Automatically show the #1 suggestion on the board.
+     * The user can click #2 / #3 in the Coach panel to switch it.
+     */
+    setHighlightedSuggestionUci(suggestions[0]?.uci ?? null);
   }
 
   /* =========================================================
@@ -1347,6 +1368,8 @@ export default function ChessComputerBoard({
       setHelpVisible(false);
 
       setSuggestedMoves([]);
+
+      setHighlightedSuggestionUci(null);
 
       setPosition(game.fen());
     } catch (error) {
@@ -1505,6 +1528,17 @@ export default function ChessComputerBoard({
       return;
     }
 
+    /*
+     * The Coach overlay uses selectedSquare/legalMoves only as a visual preview.
+     * Once the player clicks the board, return to normal board interaction
+     * and continue processing this same click.
+     */
+    if (helpVisible) {
+      setHelpVisible(false);
+      setSuggestedMoves([]);
+      setHighlightedSuggestionUci(null);
+    }
+
     const square = getSquareName(row, column);
 
     const clickedPiece = game.get(square);
@@ -1604,6 +1638,8 @@ export default function ChessComputerBoard({
 
       setSuggestedMoves([]);
 
+      setHighlightedSuggestionUci(null);
+
       setLastMove({
         from: move.from,
         to: move.to,
@@ -1674,6 +1710,8 @@ export default function ChessComputerBoard({
 
     setSuggestedMoves([]);
 
+    setHighlightedSuggestionUci(null);
+
     setShowResignConfirm(false);
   }
 
@@ -1706,6 +1744,8 @@ export default function ChessComputerBoard({
       setHelpVisible(false);
 
       setSuggestedMoves([]);
+
+      setHighlightedSuggestionUci(null);
 
       setLastMove({
         from: move.from,
@@ -1790,6 +1830,8 @@ export default function ChessComputerBoard({
     setHelpVisible(false);
 
     setSuggestedMoves([]);
+
+    setHighlightedSuggestionUci(null);
 
     setMoveFeedback(null);
 
@@ -1925,6 +1967,8 @@ export default function ChessComputerBoard({
     setHelpVisible(false);
 
     setSuggestedMoves([]);
+
+    setHighlightedSuggestionUci(null);
 
     setMoveFeedback(null);
 
@@ -2250,6 +2294,7 @@ export default function ChessComputerBoard({
                               setHistoryPreviewPly(move.ply);
                               setHelpVisible(false);
                               setSuggestedMoves([]);
+                              setHighlightedSuggestionUci(null);
                               setSelectedSquare(null);
                               setLegalMoves([]);
                               setPromotionFrom(null);
@@ -2260,6 +2305,7 @@ export default function ChessComputerBoard({
                                 setHistoryPreviewPly(move.ply);
                                 setHelpVisible(false);
                                 setSuggestedMoves([]);
+                                setHighlightedSuggestionUci(null);
                                 setSelectedSquare(null);
                                 setLegalMoves([]);
                               }
@@ -2398,8 +2444,16 @@ export default function ChessComputerBoard({
             <div className="relative">
               <Board
                 board={displayedBoard}
-                selectedSquare={historyPreview ? null : selectedSquare}
-                legalMoves={historyPreview ? [] : legalMoves}
+                selectedSquare={
+                  historyPreview
+                    ? null
+                    : helpMove
+                      ? helpMove.from
+                      : selectedSquare
+                }
+                legalMoves={
+                  historyPreview ? [] : helpMove ? [helpMove.to] : legalMoves
+                }
                 lastMove={historyPreviewMove ?? lastMove}
                 checkedKingSquare={
                   historyPreview
@@ -2898,55 +2952,99 @@ export default function ChessComputerBoard({
                         : t("No analysis available.")}
                     </div>
                   ) : (
-                    suggestedMoves.map((suggestion, index) => (
-                      <div
-                        key={`${suggestion.uci}-${index}`}
-                        className="
+                    suggestedMoves.map((suggestion, index) => {
+                      const selected =
+                        highlightedSuggestionUci === suggestion.uci;
+
+                      return (
+                        <button
+                          key={`${suggestion.uci}-${index}`}
+                          type="button"
+                          onClick={() =>
+                            setHighlightedSuggestionUci(suggestion.uci)
+                          }
+                          className={`
                             flex
+                            w-full
                             items-center
                             justify-between
                             rounded-xl
                             border
-                            border-white/5
-                            bg-black/20
                             px-3
                             py-2.5
-                          "
-                      >
-                        <div className="flex items-center gap-3">
-                          <span
-                            className="
+                            text-left
+                            transition
+
+                            ${
+                              selected
+                                ? `
+                                  border-amber-400/30
+                                  bg-amber-400/10
+                                `
+                                : `
+                                  border-white/5
+                                  bg-black/20
+                                  hover:border-white/10
+                                  hover:bg-white/5
+                                `
+                            }
+                          `}
+                        >
+                          <div className="flex items-center gap-3">
+                            <span
+                              className={`
                                 flex
                                 h-6
                                 w-6
                                 items-center
                                 justify-center
                                 rounded-md
-                                bg-amber-400/10
                                 text-[10px]
                                 font-black
-                                text-amber-300
-                              "
-                          >
-                            {index + 1}
-                          </span>
 
-                          <div>
-                            <p className="font-mono text-sm font-bold text-zinc-200">
-                              {suggestion.san}
-                            </p>
+                                ${
+                                  selected
+                                    ? "bg-amber-300 text-zinc-950"
+                                    : "bg-amber-400/10 text-amber-300"
+                                }
+                              `}
+                            >
+                              {index + 1}
+                            </span>
 
-                            <p className="text-[10px] text-zinc-600">
-                              {suggestion.uci}
-                            </p>
+                            <div>
+                              <p
+                                className={`font-mono text-sm font-bold ${
+                                  selected ? "text-amber-200" : "text-zinc-200"
+                                }`}
+                              >
+                                {suggestion.san}
+                              </p>
+
+                              <p className="text-[10px] text-zinc-600">
+                                {suggestion.uci}
+                              </p>
+                            </div>
                           </div>
-                        </div>
 
-                        <span className="text-xs font-semibold text-zinc-400">
-                          {suggestion.evaluation}
-                        </span>
-                      </div>
-                    ))
+                          <div className="text-right">
+                            <span className="block text-xs font-semibold text-zinc-400">
+                              {suggestion.evaluation}
+                            </span>
+
+                            <span
+                              className={`mt-0.5 block text-[9px] font-bold ${
+                                selected ? "text-amber-300" : "text-zinc-700"
+                              }`}
+                            >
+                              {selected
+                                ? t("Shown on board")
+                                : t("Click to show")}
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    })
                   )}
                 </div>
               )}

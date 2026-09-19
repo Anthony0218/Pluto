@@ -4,7 +4,7 @@ import { Chess, type Square } from "chess.js";
 
 import { getSquareName, type PieceType } from "../utils/chessUtils";
 
-import Board from "./Board.tsx";
+import Board from "./Board";
 import PromotionBar from "./PromotionBar";
 
 import {
@@ -33,6 +33,7 @@ import {
 
 import { buildHorrorStats } from "../games/chess/variants/horrorStats";
 import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.ts";
+import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
 
 type Language = "en" | "de" | "bar" | "ko" | "ru";
 
@@ -987,6 +988,7 @@ export default function HorrorChessBoard() {
               </div>
             )}
           </div>
+          <BoardAnimationToggle />
         </header>
 
         <section className="mb-6 grid gap-3 rounded-3xl border border-rose-400/10 bg-rose-400/[0.025] px-5 py-4 md:grid-cols-2 xl:grid-cols-4">

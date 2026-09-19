@@ -4,7 +4,7 @@ import { Chess, type Square } from "chess.js";
 
 import { getSquareName, type PieceType } from "../utils/chessUtils";
 
-import Board from "./Board.tsx";
+import Board from "./Board";
 
 import {
   playPieceCaptureSound,
@@ -50,6 +50,7 @@ import {
 
 import { buildCapitalismStats } from "../games/chess/variants/capitalismStats";
 import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.ts";
+import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
 
 /* =========================================================
    TYPES
@@ -580,7 +581,7 @@ function getInitialLanguage(): Language {
 
 export default function CapitalismChessBoard() {
   const [language, setLanguage] = useState<Language>(getInitialLanguage);
-
+  const [boardAnimationEnabled, setBoardAnimationEnabled] = useState(true);
   const t = (key: string) => {
     if (language === "en") {
       return key;
@@ -1300,6 +1301,7 @@ export default function CapitalismChessBoard() {
               </div>
             )}
           </div>
+          <BoardAnimationToggle />
         </header>
 
         {/* ECONOMY STRIP */}

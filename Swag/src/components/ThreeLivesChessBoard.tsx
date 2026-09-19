@@ -28,6 +28,7 @@ import {
 } from "../games/chess/variants/threeLivesStats";
 
 import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.ts";
+import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
 
 /* =========================================================
    TYPES
@@ -1780,6 +1781,7 @@ export default function ThreeLivesChessBoard() {
               </div>
             )}
           </div>
+          <BoardAnimationToggle />
         </header>
 
         {/* =================================================

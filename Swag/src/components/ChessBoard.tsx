@@ -6,7 +6,7 @@ import { supabase } from "../lib/supabase";
 
 import { getSquareName, type PieceType } from "../utils/chessUtils";
 
-import Board from "./Board.tsx";
+import Board from "./Board";
 
 import {
   playPieceSelectSound,
@@ -35,6 +35,7 @@ import {
 import ChessGameReview from "./ChessGameReview";
 
 import { useDelayedBoardOrientation } from "../hooks/useDelayedBoardOrientation";
+import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
 
 /* =========================================================
    TYPES
@@ -2046,6 +2047,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
               </div>
             )}
           </div>
+          <BoardAnimationToggle />
         </header>
 
         {/* =================================================

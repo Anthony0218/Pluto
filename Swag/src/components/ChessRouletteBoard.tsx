@@ -35,6 +35,7 @@ import {
 } from "../games/chess/variants/chessRoulette";
 
 import { useDelayedBoardOrientation } from "../hooks/useDelayedBoardOrientation";
+import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
 
 type Language = "en" | "de" | "bar" | "ko" | "ru";
 
@@ -1741,6 +1742,7 @@ export default function ChessRouletteBoard() {
               </select>
             </label>
           </div>
+          <BoardAnimationToggle />
         </header>
 
         <div

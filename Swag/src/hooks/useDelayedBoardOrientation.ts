@@ -14,7 +14,10 @@ function toOrientation(side: ChessSide): BoardOrientation {
  * Example with 1500 ms:
  * White moves -> game.turn() becomes "b"
  * -> board stays White-bottom for 1.5 seconds
- * -> board becomes Black-bottom.
+ * -> orientation becomes Black-bottom.
+ *
+ * Whether Board.tsx animates that orientation change or snaps instantly
+ * is intentionally handled separately by Board.tsx.
  */
 export function useDelayedBoardOrientation(
   sideToMove: ChessSide,
@@ -53,6 +56,7 @@ export function useDelayedBoardOrientation(
 
     if (orientation === desiredOrientation) {
       setFlipPending(false);
+
       return;
     }
 

@@ -46,6 +46,20 @@ import DraftChessRules from "./components/DraftChessRules";
 import MirrorChessBoard from "./components/MirrorChessBoard";
 import ChessRouletteBoard from "./components/ChessRouletteBoard";
 import ChessHotPotatoBoard from "./components/ChessHotPotatoBoard";
+import ChessCollapseBoard from "./components/ChessCollapse";
+import { ChessSettingsProvider } from "./context/ChessSettingsContext";
+import BossBattleBoard from "./components/BossBattle";
+import FourPlayerChess from "./components/FourPlayerChess";
+import RandomStartChess from "./components/RandomStartChess";
+import MirrorChessRules from "./components/MirrorChessRules";
+import ChessRouletteRules from "./components/ChessRouletteRules";
+import ChessHotPotatoRules from "./components/ChessHotPotatoRules";
+import ChessCollapseRules from "./components/ChessCollapseRules";
+import BossBattleRules from "./components/BossBattleRules";
+import TectonicChess from "./components/TectonicChess";
+import TectonicChessRules from "./components/TectonicChessRules";
+import TotalChaosChess from "./components/TotalChaosChess";
+import TotalChaosChessRules from "./components/TotalChaosChessRules";
 
 const router = createBrowserRouter([
   {
@@ -182,12 +196,64 @@ const router = createBrowserRouter([
         element: <MirrorChessBoard />,
       },
       {
+        path: "/games/chess/variants/mirror/rules",
+        element: <MirrorChessRules />,
+      },
+      {
         path: "/games/chess/variants/roulette/hotseat",
         element: <ChessRouletteBoard />,
       },
       {
+        path: "/games/chess/variants/roulette/rules",
+        element: <ChessRouletteRules />,
+      },
+      {
         path: "/games/chess/variants/hotpotato/hotseat",
         element: <ChessHotPotatoBoard />,
+      },
+      {
+        path: "/games/chess/variants/hotpotato/rules",
+        element: <ChessHotPotatoRules />,
+      },
+      {
+        path: "/games/chess/variants/collapse/hotseat",
+        element: <ChessCollapseBoard />,
+      },
+      {
+        path: "/games/chess/variants/collapse/rules",
+        element: <ChessCollapseRules />,
+      },
+      {
+        path: "/games/chess/variants/boss/hotseat",
+        element: <BossBattleBoard />,
+      },
+      {
+        path: "/games/chess/variants/boss/rules",
+        element: <BossBattleRules />,
+      },
+      {
+        path: "/games/chess/variants/4-players/hotseat",
+        element: <FourPlayerChess />,
+      },
+      {
+        path: "/games/chess/variants/randomstart/hotseat",
+        element: <RandomStartChess />,
+      },
+      {
+        path: "/games/chess/variants/tectonic/hotseat",
+        element: <TectonicChess />,
+      },
+      {
+        path: "/games/chess/variants/tectonic/rules",
+        element: <TectonicChessRules />,
+      },
+      {
+        path: "/games/chess/variants/complete-chaos/hotseat",
+        element: <TotalChaosChess />,
+      },
+      {
+        path: "/games/chess/variants/complete-chaos/rules",
+        element: <TotalChaosChessRules />,
       },
     ],
   },
@@ -195,14 +261,16 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ThemeProvider>
-      <AuthProvider>
-        <CardThemeProvider>
-          <TableThemeProvider>
-            <RouterProvider router={router} />
-          </TableThemeProvider>
-        </CardThemeProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <ChessSettingsProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <CardThemeProvider>
+            <TableThemeProvider>
+              <RouterProvider router={router} />
+            </TableThemeProvider>
+          </CardThemeProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </ChessSettingsProvider>
   </React.StrictMode>,
 );
