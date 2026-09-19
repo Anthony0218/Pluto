@@ -18,6 +18,8 @@ import Watten from "./pages/Watten";
 import WattenHotseat from "./pages/WattenHotseat";
 import WattenHotseatPage from "./pages/WattenGamePage";
 
+import ChessBoardEditor from "./pages/ChessBoardEditor";
+
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import WattenRules from "./pages/WattenRules";
@@ -76,6 +78,10 @@ const router = createBrowserRouter([
       {
         path: "/chess/classic",
         element: <ChessClassicMenu />,
+      },
+      {
+        path: "/chess/classic/custom",
+        element: <ChessBoardEditor />,
       },
       {
         path: "/chess/classic/hotseat",
