@@ -471,50 +471,87 @@ export default function ChessBoardEditor() {
   )
 };
 
-const ROW_OPTIONS = [1, 2, 3, 4, 5, 6];
+const ROW_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const COLUMN_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 function Grid() {
   const [rowCount, setRowCount] = useState(3);
-
+  const [columnCount, setColumnCount] = useState(4);
+  const [cellSize, setCellSize] = useState(75);
+  
   return (
     <div>
-      <label htmlFor="row-count">Number of rows: </label>
+      <div>
+        <label htmlFor="row-count">Number of rows: </label>
 
-      <select
-        id="row-count"
-        value={rowCount}
-        onChange={(event) => setRowCount(Number(event.target.value))}
-      >
-        {ROW_OPTIONS.map((count) => (
-          <option key={count} value={count}>
-            {count}
-          </option>
-        ))}
-      </select>
+        <select
+          id="row-count"
+          value={rowCount}
+          onChange={(event) => setRowCount(Number(event.target.value))}
+        >
+          {ROW_OPTIONS.map((count) => (
+            <option key={count} value={count}>
+              {count}
+            </option>
+          ))}
+        </select>
+      </div>
 
+      <div>
+        <label htmlFor="column-count">Number of columns: </label>
+
+        <select
+          id="column-count"
+          value={columnCount}
+          onChange={(event) => setColumnCount(Number(event.target.value))}
+        >
+          {COLUMN_OPTIONS.map((count) => (
+            <option key={count} value={count}>
+              {count}
+            </option>
+          ))}
+        </select>
+      </div>
+      
+      {/* Cell size */} 
+      <div>
+        <label htmlFor="cell-size"> Cell size: {cellSize}px </label>
+
+        <input 
+          id="cell-size" 
+          type="range" 
+          min="25" 
+          max="200" 
+          step="5" 
+          value={cellSize} 
+          onChange={(event) => setCellSize(Number(event.target.value))}
+        />
       <div
         style={{
           display: "grid",
-          gridTemplateRows: `repeat(${rowCount}, 50px)`,
-          gridTemplateColumns: "repeat(4, 100px)",
+          gridTemplateRows: `repeat(${rowCount}, ${cellSize}px)`,
+          gridTemplateColumns: `repeat(${columnCount}, ${cellSize}px)`,
           gap: "8px",
           marginTop: "16px",
         }}
       >
-        {Array.from({ length: rowCount * 4 }, (_, index) => (
-          <div
-            key={index}
-            style={{
-              border: "1px solid #ccc",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {index + 1}
-          </div>
-        ))}
+        {Array.from(
+          { length: rowCount * columnCount },
+          (_, index) => (
+            <div style={{ minWidth: 0, minHeight: 0 }}>
+              <button
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  padding: 0,
+                  boxSizing: "border-box",
+                }}
+              />
+            </div>
+          )
+        )}
       </div>
+    </div>
     </div>
   );
 }
