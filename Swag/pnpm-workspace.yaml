@@ -1,2 +1,6 @@
 packages:
   - "."
+allowBuilds:
+  core-js: set this to true or false
+  pnpm: set this to true or false
+  stockfish: set this to true or false

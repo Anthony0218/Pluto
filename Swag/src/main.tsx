@@ -6,9 +6,10 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 
 import App from "./App";
+import GameList from "./pages/GameList";
+import Profile from "./pages/Profile";
 import ChessGame from "./pages/ChessGames";
 import ChessRoom from "./pages/ChessRoom";
-import Profile from "./pages/Profile";
 import OnlineGame from "./pages/OnlineGame";
 import OnlineGameRoom from "./pages/OnlineGameRoom";
 
@@ -57,93 +58,57 @@ const router = createBrowserRouter([
         path: "/",
         element: <App />,
       },
-
-      {
-        path: "/chess",
-        element: <ChessMenu />,
-      },
-      {
-        path: "/chess/classic",
-        element: <ChessClassicMenu />,
-      },
-      {
-        path: "/chess/classic/hotseat",
-        element: <ChessGame />,
-      },
-      {
-        path: "/chess/classic/custom",
-        element: <ChessRoom />
-      },
-
       {
         path: "/profile",
         element: <Profile />,
       },
-
       {
-        path: "/onlineGame",
-        element: <OnlineGame />,
-      },
-
-      {
-        path: "/onlineGame/:gameId",
-        element: <OnlineGameRoom />,
-      },
-
-      {
-        path: "/watten",
-        element: <Watten />,
-      },
-
-      {
-        path: "/watten/hotseat",
-        element: <WattenHotseat />,
-      },
-
-      {
-        path: "/watten/hotseat/game",
-        element: <WattenHotseatPage />,
-      },
-
-      {
-        path: "/watten/rules",
-        element: <WattenRules />,
-      },
-      { path: "/watten/multiplayer", element: <WattenMultiplayerLobby /> },
-      {
-        path: "/watten/multiplayer/:roomCode",
-        element: <WattenMultiplayerRoom />,
+        path: "/games",
+        element: <GameList />
       },
       {
-        path: "/watten/multiplayer/:roomCode/game",
-        element: <WattenMultiplayerGame />,
-      },
+        path: "/games/chess",
+        element: <ChessMenu />,
+      },      
       {
-        path: "/chess/classic/ai",
-        element: <ChessComputer />,
-      },
-      {
-        path: "/chess/classic/multiplayer",
-        element: <ChessMultiplayerLobby />,
-      },
-      {
-        path: "/chess/classic/multiplayer/:roomCode",
-        element: <ChessMultiplayerRoom />,
-      },
-      {
-        path: "/chess/classic/multiplayer/:roomCode/game",
-        element: <ChessMultiplayerGame />,
-      },
-      {
-        path: "/chess/rules",
+        path: "/games/chess/rules",
         element: <ChessRulesAndTips />,
       },
       {
-        path: "/chess/variants",
+        path: "/games/chess/classic",
+        element: <ChessClassicMenu />,
+      },
+      {
+        path: "/games/chess/classic/hotseat",
+        element: <ChessGame />,
+      },
+      {
+        path: "/games/chess/classic/custom",
+        element: <ChessRoom />
+      },
+      {
+        path: "/games/chess/classic/ai",
+        element: <ChessComputer />,
+      },
+      {
+        path: "/games/chess/classic/multiplayer",
+        element: <ChessMultiplayerLobby />,
+      },
+      {
+        path: "/games/chess/classic/multiplayer/:roomCode",
+        element: <ChessMultiplayerRoom />,
+      },
+      {
+        path: "/games/chess/classic/multiplayer/:roomCode/game",
+        element: <ChessMultiplayerGame />,
+      },
+
+      {
+        path: "/games/chess/variants",
         element: <ChessVariantsMenu />,
       },
       {
-        path: "games/chess/variants/three-lives/hotseat",
+        path: "/games/chess/variants/three-lives/hotseat",
         element: <ThreeLivesChessBoard />,
       },
       {
@@ -194,6 +159,46 @@ const router = createBrowserRouter([
         path: "/games/chess/variants/hotpotato/hotseat",
         element: <ChessHotPotatoBoard />,
       },
+
+
+      {
+        path: "/games/onlineGame",
+        element: <OnlineGame />,
+      },
+      {
+        path: "/games/onlineGame/:gameId",
+        element: <OnlineGameRoom />,
+      },
+
+      {
+        path: "/games/watten",
+        element: <Watten />,
+      },
+      {
+        path: "/games/watten/hotseat",
+        element: <WattenHotseat />,
+      },
+      {
+        path: "/games/watten/hotseat/game",
+        element: <WattenHotseatPage />,
+      },
+      {
+        path: "/games/watten/rules",
+        element: <WattenRules />,
+      },
+      { 
+        path: "/games/watten/multiplayer", 
+        element: <WattenMultiplayerLobby /> 
+      },
+      {
+        path: "/games/watten/multiplayer/:roomCode",
+        element: <WattenMultiplayerRoom />,
+      },
+      {
+        path: "/games/watten/multiplayer/:roomCode/game",
+        element: <WattenMultiplayerGame />,
+      },
+      
     ],
   },
 ]);

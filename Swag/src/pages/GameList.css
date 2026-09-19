@@ -1,0 +1,32 @@
+.games-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.box {
+  box-sizing: border-box;
+  width: 100%;
+  overflow: hidden;
+
+  border: 2px solid #333;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.box-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid #ddd;
+}
+
+.box-header h2 {
+  margin: 0;
+}
+
+.box-content {
+  padding: 16px;
+}
