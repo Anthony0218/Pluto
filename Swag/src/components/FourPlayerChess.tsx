@@ -284,7 +284,12 @@ export default function FourPlayerChess({
       }
     }, 260);
 
-    return () => window.clearTimeout(timer);
+    return () => {
+      window.clearTimeout(timer);
+      // Needed when the human is not Red: StrictMode cancels the first
+      // development timer once, so release the pending guard for the real run.
+      aiMovePendingRef.current = false;
+    };
   }, [aiMode, humanColor, difficulty, state]);
 
   const [selectedSquare, setSelectedSquare] = useState<FourPlayerSquare | null>(

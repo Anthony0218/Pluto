@@ -470,7 +470,8 @@ export default function BossBattleBoard({
       historyPreviewPly !== null ||
       pendingPromotion ||
       bossTargetMode ||
-      game.turn() !== computerColor
+      game.turn() !== computerColor ||
+      !aiReady
     ) {
       return;
     }
@@ -525,6 +526,9 @@ export default function BossBattleBoard({
     return () => {
       cancelled = true;
       window.clearTimeout(timer);
+      // React StrictMode runs an extra setup/cleanup cycle in development.
+      // Reset the guard so an AI-controlled White side can make the opening move.
+      aiMovePendingRef.current = false;
     };
   }, [
     aiMode,

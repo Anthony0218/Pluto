@@ -454,7 +454,8 @@ export default function TectonicChess({
       finishedGame ||
       historyPreviewIndex !== null ||
       pendingPromotion ||
-      game.turn() !== computerColor
+      game.turn() !== computerColor ||
+      (!tectonic.pendingShift && !aiReady)
     ) {
       return;
     }
@@ -504,6 +505,9 @@ export default function TectonicChess({
     return () => {
       cancelled = true;
       window.clearTimeout(timer);
+      // React StrictMode runs an extra setup/cleanup cycle in development.
+      // Reset the guard here so the real effect can schedule White's first AI move.
+      aiMovePendingRef.current = false;
     };
   }, [
     aiMode,

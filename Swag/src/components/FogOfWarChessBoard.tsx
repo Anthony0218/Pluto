@@ -359,7 +359,11 @@ export default function FogOfWarChessBoard({
       }
     }, 260);
 
-    return () => window.clearTimeout(timer);
+    return () => {
+      window.clearTimeout(timer);
+      // Needed for React StrictMode's development-only setup/cleanup cycle.
+      aiMovePendingRef.current = false;
+    };
   }, [
     aiMode,
     computerColor,
