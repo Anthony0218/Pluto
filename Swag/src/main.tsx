@@ -76,12 +76,12 @@ const router = createBrowserRouter([
         element: <ChessRulesAndTips />,
       },
       {
-        path: "/chess/classic",
-        element: <ChessClassicMenu />,
+        path: "/chess/custom",
+        element: <ChessBoardEditor />,
       },
       {
-        path: "/chess/classic/custom",
-        element: <ChessBoardEditor />,
+        path: "/chess/classic",
+        element: <ChessClassicMenu />,
       },
       {
         path: "/chess/classic/hotseat",
