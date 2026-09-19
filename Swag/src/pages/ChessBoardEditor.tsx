@@ -396,7 +396,7 @@ export default function ChessBoardEditor() {
   return (
     <>
     <div className="grid grid-flow-col grid-rows-3 gap-4">
-      <div className="row-span-3 h-screen w-1/3 rounded-sm place-items-center">
+      <div className="p-8 row-span-3 h-screen w-1/3 rounded-sm place-items-center outline-double">
         <Sidebar
         selectedColor={selectedColor}
         selectedPiece={selectedPiece}
@@ -426,19 +426,3 @@ export default function ChessBoardEditor() {
     </>
   )
 };
-
-
-
-/*
-<ChessBoard
-        board={board}
-        boardSize={boardSize}
-        selectedSquare={selectedSquare}
-        hoveredSquare={hoveredSquare}
-        selectedPieceMoves={selectedPieceMoves}
-        opponentMoves={opponentMoves}
-        onSquareClick={placePiece}
-        onSquareHover={setHoveredSquare}
-        onSquareRemove={removePiece}
-      />
-      */

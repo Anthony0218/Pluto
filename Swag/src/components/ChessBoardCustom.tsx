@@ -1,120 +1,180 @@
 import { useState } from "react";
 
-const ROW_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-const COLUMN_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const ROW_OPTIONS = [2, 3, 4, 5, 6, 7, 8];
+const COLUMN_OPTIONS = [2, 3, 4, 5, 6, 7, 8];
 
-type Cell = {
-  id: number;
-  content: string;
+type ObjectType = "circle" | "square" | "triangle";
+
+type BoardObject = {
+  id: string;
+  type: ObjectType;
+  color: string;
 };
 
-export default function ChessBoard() {
-  const [rowCount, setRowCount] = useState(3);
+type Cell = {
+  index: number;
+  object: BoardObject | null;
+};
+
+function createBoard(rows: number, columns: number): Cell[] {
+  return Array.from(
+    { length: rows * columns },
+    (_, index) => ({
+      index,
+      object: null,
+    })
+  );
+}
+
+export default function Grid() {
+  const [rowCount, setRowCount] = useState(4);
   const [columnCount, setColumnCount] = useState(4);
 
-  const [cells, setCells] = useState<Cell[]>(() =>
-    createCells(3, 4)
+  const [board, setBoard] = useState<Cell[]>(() =>
+    createBoard(4, 4)
   );
 
-  function createCells(rows: number, columns: number): Cell[] {
-    return Array.from(
-      { length: rows * columns },
-      (_, index) => ({
-        id: index,
-        content: `Cell ${index + 1}`,
-      })
-    );
-  }
-
-  function changeRows(rows: number) {
-    setRowCount(rows);
-    setCells(createCells(rows, columnCount));
-  }
-
-  function changeColumns(columns: number) {
-    setColumnCount(columns);
-    setCells(createCells(rowCount, columns));
-  }
-
-  /**
-   * Swap the contents of two cells.
+  /*
+   * Put an object into a specific cell.
    */
-  function swapCells(indexA: number, indexB: number) {
-    setCells((currentCells) => {
-      const newCells = [...currentCells];
+  function setObject(
+    index: number,
+    object: BoardObject | null
+  ) {
+    setBoard((currentBoard) => {
+      const newBoard = [...currentBoard];
 
-      const temp = newCells[indexA].content;
-      newCells[indexA].content = newCells[indexB].content;
-      newCells[indexB].content = temp;
+      newBoard[index] = {
+        ...newBoard[index],
+        object,
+      };
 
-      return newCells;
+      return newBoard;
     });
   }
 
-  /**
-   * Find the adjacent cells of a given cell.
+  /*
+   * Swap the objects between two cells.
    *
-   * Returns the indexes of the cells that exist
-   * above, below, left and right.
+   * The cells themselves don't move.
+   * Only their objects change positions.
    */
-  function getAdjacentCells(index: number): {
-    up?: number;
-    down?: number;
-    left?: number;
-    right?: number;
-  } {
+  function swapObjects(
+    indexA: number,
+    indexB: number
+  ) {
+    setBoard((currentBoard) => {
+      const newBoard = [...currentBoard];
+
+      const objectA = newBoard[indexA].object;
+      const objectB = newBoard[indexB].object;
+
+      newBoard[indexA] = {
+        ...newBoard[indexA],
+        object: objectB,
+      };
+
+      newBoard[indexB] = {
+        ...newBoard[indexB],
+        object: objectA,
+      };
+
+      return newBoard;
+    });
+  }
+
+  /*
+   * Return the indexes of all cells directly
+   * adjacent to the supplied cell.
+   */
+  function getAdjacentCells(index: number): number[] {
     const row = Math.floor(index / columnCount);
     const column = index % columnCount;
 
-    const adjacent: {
-      up?: number;
-      down?: number;
-      left?: number;
-      right?: number;
-    } = {};
+    const adjacent: number[] = [];
 
-    // Cell above
+    // Up
     if (row > 0) {
-      adjacent.up = index - columnCount;
+      adjacent.push(index - columnCount);
     }
 
-    // Cell below
+    // Down
     if (row < rowCount - 1) {
-      adjacent.down = index + columnCount;
+      adjacent.push(index + columnCount);
     }
 
-    // Cell to the left
+    // Left
     if (column > 0) {
-      adjacent.left = index - 1;
+      adjacent.push(index - 1);
     }
 
-    // Cell to the right
+    // Right
     if (column < columnCount - 1) {
-      adjacent.right = index + 1;
+      adjacent.push(index + 1);
     }
 
     return adjacent;
   }
 
-  function handleCellClick(index: number) {
-    const adjacent = getAdjacentCells(index);
+  /*
+   * Move an object from one cell to an adjacent cell.
+   *
+   * This is simply a swap, so the target cell's
+   * object moves back to the original cell.
+   */
+  function moveObject(
+    fromIndex: number,
+    toIndex: number
+  ) {
+    const adjacentCells = getAdjacentCells(fromIndex);
 
-    console.log(`Cell ${index} clicked`);
-    console.log("Adjacent cells:", adjacent);
+    if (!adjacentCells.includes(toIndex)) {
+      return;
+    }
+
+    swapObjects(fromIndex, toIndex);
+  }
+
+  /*
+   * Change the board dimensions.
+   */
+  function resizeBoard(
+    rows: number,
+    columns: number
+  ) {
+    setRowCount(rows);
+    setColumnCount(columns);
+    setBoard(createBoard(rows, columns));
+  }
+
+  /*
+   * Example: create an object and put it into
+   * a specific cell.
+   */
+  function addExampleObject(index: number) {
+    setObject(index, {
+      id: crypto.randomUUID(),
+      type: "circle",
+      color: "red",
+    });
   }
 
   return (
     <div>
-      <div>
+      {/* Board controls */}
+      <div style={{ marginBottom: "16px" }}>
         <label htmlFor="row-count">
-          Number of rows:
+          Rows:
         </label>
 
         <select
           id="row-count"
           value={rowCount}
           onChange={(event) =>
-            changeRows(Number(event.target.value))
+            resizeBoard(
+              Number(event.target.value),
+              columnCount
+            )
           }
         >
           {ROW_OPTIONS.map((count) => (
@@ -123,18 +183,22 @@ export default function ChessBoard() {
             </option>
           ))}
         </select>
-      </div>
 
-      <div>
-        <label htmlFor="column-count">
-          Number of columns:
+        <label
+          htmlFor="column-count"
+          style={{ marginLeft: "16px" }}
+        >
+          Columns:
         </label>
 
         <select
           id="column-count"
           value={columnCount}
           onChange={(event) =>
-            changeColumns(Number(event.target.value))
+            resizeBoard(
+              rowCount,
+              Number(event.target.value)
+            )
           }
         >
           {COLUMN_OPTIONS.map((count) => (
@@ -145,46 +209,71 @@ export default function ChessBoard() {
         </select>
       </div>
 
+      {/* Board */}
       <div
         style={{
           display: "grid",
-          gridTemplateRows: `repeat(${rowCount}, 50px)`,
-          gridTemplateColumns: `repeat(${columnCount}, 100px)`,
+          gridTemplateRows: `repeat(${rowCount}, 80px)`,
+          gridTemplateColumns: `repeat(${columnCount}, 80px)`,
           gap: "8px",
-          marginTop: "16px",
         }}
       >
-        {cells.map((cell, index) => (
+        {board.map((cell) => (
           <div
-            key={cell.id}
+            key={cell.index}
             style={{
+              border: "1px solid #ccc",
               minWidth: 0,
               minHeight: 0,
             }}
           >
             <button
               type="button"
-              onClick={() => handleCellClick(index)}
+              onClick={() => {
+                if (cell.object === null) {
+                  addExampleObject(cell.index);
+                }
+              }}
               style={{
                 width: "100%",
                 height: "100%",
-                padding: 0,
+                padding: "8px",
                 boxSizing: "border-box",
-                cursor: "pointer",
               }}
             >
-              {cell.content}
+              {cell.object ? (
+                <span
+                  style={{
+                    display: "block",
+                    width: "100%",
+                    height: "100%",
+                    backgroundColor:
+                      cell.object.color,
+                  }}
+                />
+              ) : (
+                cell.index
+              )}
             </button>
           </div>
         ))}
       </div>
 
+      {/* Example movement controls */}
       <div style={{ marginTop: "16px" }}>
         <button
           type="button"
-          onClick={() => swapCells(0, 1)}
+          onClick={() => moveObject(0, 1)}
         >
-          Swap first two cells
+          Move object 0 → 1
+        </button>
+
+        <button
+          type="button"
+          onClick={() => moveObject(1, 5)}
+          style={{ marginLeft: "8px" }}
+        >
+          Move object 1 → 5
         </button>
       </div>
     </div>
