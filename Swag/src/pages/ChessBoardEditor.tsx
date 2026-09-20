@@ -144,7 +144,7 @@ export function Sidebar({
   onObjectChange,
 }: SidebarProps) {
   return (
-    <aside className="flex h-full flex-col justify-center gap-8 p-6">
+    <div className="flex h-full flex-col justify-center gap-8 p-6">
       <h2 className="text-xl font-bold">
         Objects
       </h2>
@@ -232,7 +232,7 @@ export function Sidebar({
           />
         </div>
       </div>
-    </aside>
+    </div>
   );
 }
 
