@@ -64,6 +64,7 @@ export default function ChessBoardEditor() {
           dimensions={dimensions}
           selectedObject={selectedObject}
           onBoardChange={setBoard}
+          width={600}
         />
       </div>
     </div>
