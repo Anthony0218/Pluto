@@ -41,7 +41,7 @@ export default function ChessBoardEditor() {
   }
 
   return (
-    <div className="grid grid-cols-[minmax(220px,1fr)_minmax(0,3fr)] grid-rows-[auto_1fr] gap-0">
+    <div className="grid grid-cols-[minmax(220px,1fr)_minmax(0,3fr)] grid-rows-[auto_minmax(0,1fr)] gap-0">
       <div className="row-span-3 place-items-center outline-4 outline-rose-500">
         <Sidebar
           selectedObject={selectedObject}
