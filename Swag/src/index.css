@@ -187,8 +187,6 @@ body {
 }
 
 .wooden-board {
-  box-sizing: content-box;
-  border-image-source: url("./assets/16x16template.png");
-  border-image-repeat: round;
-  border-image-outset: 16x;
+  box-sizing: border-box;
+  border-image-source: url("./assets/wooden-border.png");
 }
