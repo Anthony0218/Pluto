@@ -592,34 +592,36 @@ export function Grid({
   }
 
   return (
-    <div
-      className="grid"
-      style={{
-        width: `${width}px`,
-        gridTemplateColumns: `repeat(${dimensions.columns}, minmax(0, 1fr))`,
-        gridTemplateRows: `repeat(${dimensions.rows}, minmax(0, 1fr))`,
-        borderImage: `
-          url("../assets/custom-grid-border.png") 30 / 19px round;`,
-      }}
-    >
-      {board.map((cell) => (
-        <button
-          key={cell.index}
-          onClick={() => handleCellClick(cell.index)}
-          className="relative aspect-square min-w-0 border-2 border-slate-500 bg-slate-100 p-1"
-        >
-          {cell.object && (
-            <>
-              <ObjectRenderer object={cell.object} />
+    <div className="wooden-border">
+      <>
+      <div
+        className="grid"
+        style={{
+          width: `${width}px`,
+          gridTemplateColumns: `repeat(${dimensions.columns}, minmax(0, 1fr))`,
+          gridTemplateRows: `repeat(${dimensions.rows}, minmax(0, 1fr))`,
+        }}
+      >
+        {board.map((cell) => (
+          <button
+            key={cell.index}
+            onClick={() => handleCellClick(cell.index)}
+            className="relative aspect-square min-w-0 border-2 border-slate-500 bg-slate-100 p-1"
+          >
+            {cell.object && (
+              <>
+                <ObjectRenderer object={cell.object} />
 
-              <ObjectOverlay
-                color={cell.object.color}
-                opacity={0.25}
-              />
-            </>
-          )}
-        </button>
-      ))}
+                <ObjectOverlay
+                  color={cell.object.color}
+                  opacity={0.25}
+                />
+              </>
+            )}
+          </button>
+        ))}
+      </div>
+      </>
     </div>
   );
 }
