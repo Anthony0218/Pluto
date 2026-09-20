@@ -15,10 +15,8 @@ import {
 } from "../utils/sound.ts";
 
 import {
-  DRAFT_BUDGET,
   DRAFT_PIECE_COSTS,
   applyDraftSetupAction,
-  buildDraftStartFen,
   canConfirmDraftArmy,
   countDraftPieceType,
   createInitialDraftSetupState,

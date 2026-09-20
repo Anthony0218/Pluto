@@ -63,7 +63,7 @@ function shuffleDeck(cards: Card[]): Card[] {
 function startGame(deck: Card[]): any {
   //all the games you can play with a deck of cards
   const gameName = document.getElementById("gameNames")?.innerHTML;
-  const playerCount = document.getElementById("playerCount")?.innerHTML;
+
   let deckIndex = 0; //so viele Karten wurden bisher ausgeteilt
   let rules = "";
   const players: Player[] = [
@@ -91,14 +91,6 @@ function startGame(deck: Card[]): any {
   ];
 
   switch (gameName) {
-    case "Arschloch": {
-      while (32 - deckIndex >= players.length) {
-        for (const player of players) {
-          player.cards.push(deck[deckIndex]);
-          deckIndex++;
-        }
-      }
-    }
     case "Schafkopf": {
     }
   }

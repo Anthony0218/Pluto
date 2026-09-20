@@ -30,6 +30,7 @@ type VariantCard = {
     | "teal"
     | "blue";
   aiRoute?: string;
+  multiplayerRoute?: string;
 };
 
 const languageOptions: Array<{ value: Language; label: string }> = [
@@ -518,6 +519,7 @@ const variants: VariantCard[] = [
     aiRoute: "/games/chess/variants/draft/ai",
     rulesRoute: "/games/chess/variants/draft/rules",
     accent: "emerald",
+    multiplayerRoute: "/games/chess/variants/draft/multiplayer",
   },
   {
     id: "mirror",
@@ -532,6 +534,7 @@ const variants: VariantCard[] = [
     aiRoute: "/games/chess/variants/mirror/ai",
     rulesRoute: "/games/chess/variants/mirror/rules",
     accent: "zinc",
+    multiplayerRoute: "/games/chess/variants/mirror/multiplayer",
   },
   {
     id: "randomstart",
@@ -544,6 +547,7 @@ const variants: VariantCard[] = [
     available: true,
     route: "/games/chess/variants/randomstart/hotseat",
     aiRoute: "/games/chess/variants/randomstart/ai",
+    multiplayerRoute: "/games/chess/variants/randomstart/multiplayer",
     accent: "lime",
   },
   {
@@ -558,6 +562,7 @@ const variants: VariantCard[] = [
     route: "/games/chess/variants/fogofwar/hotseat",
     aiRoute: "/games/chess/variants/fogofwar/ai",
     rulesRoute: "/games/chess/variants/fogofwar/rules",
+    multiplayerRoute: "/games/chess/variants/fog-of-war/multiplayer",
     accent: "sky",
   },
   {
@@ -573,6 +578,7 @@ const variants: VariantCard[] = [
     aiRoute: "/games/chess/variants/roulette/ai",
     rulesRoute: "/games/chess/variants/roulette/rules",
     accent: "fuchsia",
+    multiplayerRoute: "/games/chess/variants/roulette/multiplayer",
   },
   {
     id: "mutation",
@@ -586,6 +592,7 @@ const variants: VariantCard[] = [
     aiRoute: "/games/chess/variants/mutation/ai",
     available: true,
     accent: "violet",
+    multiplayerRoute: "/games/chess/variants/mutation/multiplayer",
   },
   {
     id: "four-player",
@@ -599,6 +606,7 @@ const variants: VariantCard[] = [
     route: "/games/chess/variants/4-players/hotseat",
     aiRoute: "/games/chess/variants/4-players/ai",
     accent: "cyan",
+    multiplayerRoute: "/games/chess/variants/4-players/multiplayer",
   },
   {
     id: "complete-chaos",
@@ -613,6 +621,7 @@ const variants: VariantCard[] = [
     aiRoute: "/games/chess/variants/complete-chaos/ai",
     rulesRoute: "/games/chess/variants/complete-chaos/rules",
     accent: "pink",
+    multiplayerRoute: "/games/chess/variants/complete-chaos/multiplayer",
   },
   {
     id: "horror",
@@ -627,6 +636,7 @@ const variants: VariantCard[] = [
     rulesRoute: "/games/chess/variants/horror/rules",
     available: true,
     accent: "rose",
+    multiplayerRoute: "/games/chess/variants/horror/multiplayer",
   },
   {
     id: "hotpotato",
@@ -640,6 +650,7 @@ const variants: VariantCard[] = [
     route: "/games/chess/variants/hotpotato/hotseat",
     aiRoute: "/games/chess/variants/hotpotato/ai",
     rulesRoute: "/games/chess/variants/hotpotato/rules",
+    multiplayerRoute: "/games/chess/variants/hot-potato/multiplayer",
     accent: "orange",
   },
   {
@@ -654,6 +665,7 @@ const variants: VariantCard[] = [
     route: "/games/chess/variants/collapse/hotseat",
     aiRoute: "/games/chess/variants/collapse/ai",
     rulesRoute: "/games/chess/variants/hotpotato/rules",
+    multiplayerRoute: "/games/chess/variants/collapse/multiplayer",
     accent: "red",
   },
   {
@@ -669,6 +681,7 @@ const variants: VariantCard[] = [
     aiRoute: "/games/chess/variants/boss/ai",
     rulesRoute: "/games/chess/variants/boss/rules",
     accent: "indigo",
+    multiplayerRoute: "/games/chess/variants/boss/multiplayer",
   },
   {
     id: "three-lives",
@@ -682,6 +695,7 @@ const variants: VariantCard[] = [
     aiRoute: "/games/chess/variants/three-lives/ai",
     available: true,
     accent: "red",
+    multiplayerRoute: "/games/chess/variants/three-lives/multiplayer",
   },
   {
     id: "tectonic",
@@ -696,6 +710,7 @@ const variants: VariantCard[] = [
     aiRoute: "/games/chess/variants/tectonic/ai",
     rulesRoute: "/games/chess/variants/tectonic/rules",
     accent: "teal",
+    multiplayerRoute: "/games/chess/variants/tectonic/multiplayer",
   },
   {
     id: "capitalism",
@@ -705,11 +720,12 @@ const variants: VariantCard[] = [
     description:
       "Earn coins through captures, checks, missions and bounties, then spend them on limited Royal Powers.",
     tags: ["Economy", "Bounties", "Missions", "Royal Powers", "Hotseat"],
-    route: "/games/chess/variants/chessmarket/hotseat",
-    aiRoute: "/games/chess/variants/chessmarket/ai",
-    rulesRoute: "/games/chess/variants/chessmarket/rules",
+    route: "/games/chess/variants/capitalism/hotseat",
+    aiRoute: "/games/chess/variants/capitalism/ai",
+    rulesRoute: "/games/chess/variants/capitalism/rules",
     available: true,
     accent: "amber",
+    multiplayerRoute: "/games/chess/variants/capitalism/multiplayer",
   },
   {
     id: "3d-chess",
@@ -1447,6 +1463,31 @@ function VariantCardView({
               >
                 <span>🤖</span>
                 <span>{t(language, "Vs AI")}</span>
+              </Link>
+            )}
+            {variant.multiplayerRoute && (
+              <Link
+                to={variant.multiplayerRoute}
+                className="
+      flex
+      items-center
+      justify-center
+      gap-2
+      rounded-xl
+      border
+      border-cyan-400/20
+      bg-cyan-400/[0.08]
+      px-3
+      py-3
+      text-sm
+      font-black
+      text-cyan-200
+      transition
+      hover:bg-cyan-400/[0.14]
+    "
+              >
+                <span>🌐</span>
+                <span>Multiplayer</span>
               </Link>
             )}
           </div>

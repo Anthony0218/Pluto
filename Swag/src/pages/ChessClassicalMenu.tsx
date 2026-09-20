@@ -23,7 +23,7 @@ const modes: ClassicMode[] = [
   {
     title: "Play vs Computer",
     description: "Play against Stockfish with selectable difficulty levels.",
-    path: "/chess/classic/ai",
+    path: "/games/chess/classic/ai",
     icon: "🤖",
     eyebrow: "Challenge the engine",
     accent: "sky",
@@ -37,7 +37,7 @@ const modes: ClassicMode[] = [
   {
     title: "Hotseat",
     description: "Two players play locally on the same computer.",
-    path: "/chess/classic/hotseat",
+    path: "/games/chess/classic/hotseat",
     icon: "👥",
     eyebrow: "One screen. Two players.",
     accent: "amber",
@@ -51,7 +51,7 @@ const modes: ClassicMode[] = [
   {
     title: "Multiplayer",
     description: "Create or join an online chess room.",
-    path: "/chess/classic/multiplayer",
+    path: "/games/chess/classic/multiplayer",
     icon: "🌐",
     eyebrow: "Play online",
     accent: "emerald",
@@ -220,7 +220,7 @@ function ClassicPreview({
           transform: `translateX(-${activeIndex * 100}%)`,
         }}
       >
-        {modes.map((mode, index) => (
+        {modes.map((mode) => (
           <div key={mode.path} className="min-w-full p-5 sm:p-6">
             <div className="grid min-h-[310px] items-center gap-6 md:grid-cols-[minmax(0,1fr)_280px]">
               <div>

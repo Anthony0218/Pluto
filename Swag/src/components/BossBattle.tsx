@@ -23,10 +23,8 @@ import {
 import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.ts";
 
 import {
-  BOSS_ARMOR_PLIES,
   BOSS_MAX_HP,
   BOSS_MAX_RAGE,
-  BOSS_RAGE_TURNS_PER_LEVEL,
   BOSS_STARTING_FEN,
   bossPowerIcon,
   bossPowerLabel,
@@ -439,9 +437,6 @@ export default function BossBattleBoard({
   const [bossTargetMode, setBossTargetMode] = useState<BossTargetMode>(null);
 
   const [finishedGame, setFinishedGame] = useState<FinishedGame>(null);
-
-  const [whitePlayer, setWhitePlayer] = useState("");
-  const [bossPlayer, setBossPlayer] = useState("");
 
   const [history, setHistory] = useState<BossHistoryEntry[]>([]);
   const [historyPreviewPly, setHistoryPreviewPly] = useState<number | null>(
@@ -1414,32 +1409,6 @@ export default function BossBattleBoard({
         </main>
       </div>
     </div>
-  );
-}
-
-function PlayerInput({
-  label,
-  value,
-  onChange,
-  placeholder,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  placeholder: string;
-}) {
-  return (
-    <label className="block">
-      <span className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
-        {label}
-      </span>
-      <input
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
-        className="mt-1.5 w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 text-sm font-semibold text-zinc-200 outline-none transition placeholder:text-zinc-700 focus:border-red-400/30"
-      />
-    </label>
   );
 }
 

@@ -363,13 +363,6 @@ export default function ChessHotPotatoBoard({
   const [finishedGame, setFinishedGame] = useState<FinishedGame>(null);
 
   /* =======================================================
-     LOCAL PLAYERS
-     ======================================================= */
-
-  const [whitePlayer, setWhitePlayer] = useState("");
-  const [blackPlayer, setBlackPlayer] = useState("");
-
-  /* =======================================================
      HOT POTATO
      ======================================================= */
 

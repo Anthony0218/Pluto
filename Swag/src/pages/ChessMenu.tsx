@@ -25,7 +25,7 @@ const modes: ChessMode[] = [
   {
     title: "Chess Classic",
     description: "Play standard chess against another player or the computer.",
-    path: "/chess/classic",
+    path: "/games/chess/classic",
     icon: "♟",
     eyebrow: "The original game",
     accent: "amber",
@@ -40,7 +40,7 @@ const modes: ChessMode[] = [
     title: "Chess Variants",
     description:
       "Explore completely different rule systems, unusual boards and experimental chess ideas.",
-    path: "/chess/variants",
+    path: "/games/chess/variants",
     icon: "♞",
     eyebrow: "Break the rules",
     accent: "violet",
@@ -55,7 +55,7 @@ const modes: ChessMode[] = [
     title: "Chess Custom",
     description:
       "Create and play chess games with your own rules, concepts and experimental setups.",
-    path: "/chess/custom",
+    path: "/games/chess/custom",
     icon: "⚙",
     eyebrow: "Build your own",
     accent: "sky",
@@ -199,7 +199,7 @@ export default function ChessMenu() {
           </div>
 
           <Link
-            to="/chess/rules"
+            to="/games/chess/rules"
             className="
               group
               relative

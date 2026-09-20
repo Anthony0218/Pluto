@@ -20,7 +20,7 @@ const games: Game[] = [
     description:
       "Spiele Schach, tritt gegen Stockfish an, analysiere Stellungen und werte deine Partien aus.",
     image: "/images/chess-home.png",
-    route: "/chess",
+    route: "/games/chess",
     tag: "Strategie",
     features: ["Einzelspieler", "Stockfish", "Analyse"],
   },
@@ -30,7 +30,7 @@ const games: Game[] = [
     description:
       "Spiele Watten mit taktischen Hinweisen, Punktewertung und einer einsteigerfreundlichen Hilfe.",
     image: "/images/watten-home.png",
-    route: "/watten",
+    route: "/games/watten",
     tag: "Kartenspiel",
     features: ["3 Spieler", "Hilfemodus", "Punktewertung"],
   },
@@ -40,37 +40,46 @@ const games: Game[] = [
     description:
       "Watten sonst? Fordere Freunde und andere Spieler zu einer Online-Partie Watten heraus.",
     image: "/images/watten-multiplayer.png",
-    route: "/watten/multiplayer",
+    route: "/games/watten/multiplayer",
     tag: "Online",
     features: ["Mehrspieler", "Echtzeit", "Online"],
   },
 ];
-const gameList = [
+export const gameList = [
   {
     name: "Schach",
-    description: "Klassisches Schach mit Analyse und Stockfish.",
-    route: "/chess",
+    description:
+      "Klassisches Schach gegen Freunde, lokal oder gegen Stockfish.",
+    route: "/games/chess",
     category: "Strategie",
+    image: "/images/chess-game-icon.png",
+  },
+  {
+    name: "Schach Varianten",
+    description:
+      "Entdecke neue Schachregeln wie Mutation, Horror, Roulette und viele weitere.",
+    route: "/games/chess/variants",
+    category: "Varianten",
+    image: "/images/chess-game-icon.png",
+  },
+  {
+    name: "Schach Multiplayer",
+    description: "Spiele klassisches Schach online gegen andere Spieler.",
+    route: "/games/chess/multiplayer",
+    category: "Online",
     image: "/images/chess-game-icon.png",
   },
   {
     name: "Watten",
     description: "Das traditionelle bayerische Kartenspiel.",
-    route: "/watten",
+    route: "/games/watten",
     category: "Kartenspiel",
     image: "/images/watten-game-icon.png",
   },
   {
-    name: "Watten Hotseat",
-    description: "Spielt gemeinsam an einem Bildschirm.",
-    route: "/watten/hotseat",
-    category: "Lokal",
-    image: "/images/watten-game-icon.png",
-  },
-  {
     name: "Watten Multiplayer",
-    description: "Spiele Watten online mit anderen Spielern.",
-    route: "/watten/multiplayer",
+    description: "Spiele Watten online gemeinsam mit anderen Spielern.",
+    route: "/games/watten/multiplayer",
     category: "Online",
     image: "/images/watten-game-icon.png",
   },
@@ -125,11 +134,17 @@ export default function HomePage() {
           </button>
 
           <div className="flex items-center gap-3">
-            <button className="hidden rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2 text-sm text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800 sm:block">
+            <button
+              onClick={() => navigate("/games")}
+              className="hidden rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2 text-sm text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800 sm:block"
+            >
               Meine Spiele
             </button>
 
-            <button className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-800 text-sm font-semibold text-zinc-200 transition hover:bg-zinc-700">
+            <button
+              onClick={() => navigate("/profile")}
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-800 text-sm font-semibold text-zinc-200 transition hover:bg-zinc-700"
+            >
               A
             </button>
           </div>

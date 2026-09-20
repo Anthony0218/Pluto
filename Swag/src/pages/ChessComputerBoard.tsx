@@ -17,6 +17,9 @@ import { getSquareName, type PieceType } from "../utils/chessUtils";
 import { useStockfish } from "@/hooks/useStockfish";
 
 import ChessGameReview from "../components/ChessGameReview";
+import { ProfileAvatar } from "../components/ProfileAvatarPicker";
+import { supabase } from "../lib/supabase";
+import { useAuth } from "../context/AuthContext";
 
 import {
   useStockfishAnalysis,
@@ -849,6 +852,12 @@ export default function ChessComputerBoard({
   randomMoveChance,
   onChangeSettings,
 }: ChessComputerBoardProps) {
+  const { user, profile } = useAuth();
+
+  const [humanAvatarId, setHumanAvatarId] = useState(
+    () => (profile as { avatar_id?: string | null } | null)?.avatar_id ?? "m1",
+  );
+
   const [language, setLanguage] = useState<Language>(getInitialChessLanguage);
   const t = (key: string) => translateChess(language, key);
   const difficultyLabel = getDifficultyLabel(skillLevel);
@@ -859,6 +868,46 @@ export default function ChessComputerBoard({
       window.localStorage.setItem("chess-language", nextLanguage);
     }
   }
+
+  useEffect(() => {
+    const contextAvatar =
+      (profile as { avatar_id?: string | null } | null)?.avatar_id ?? "m1";
+
+    setHumanAvatarId(contextAvatar);
+
+    if (!user) {
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadCurrentAvatar() {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("avatar_id")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Could not load profile avatar:", error);
+        return;
+      }
+
+      if (
+        !cancelled &&
+        typeof data?.avatar_id === "string" &&
+        data.avatar_id.length > 0
+      ) {
+        setHumanAvatarId(data.avatar_id);
+      }
+    }
+
+    void loadCurrentAvatar();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id, profile]);
 
   const [game] = useState(() => new Chess());
 
@@ -2040,24 +2089,11 @@ export default function ChessComputerBoard({
                   `}
                 >
                   <div className="flex items-center gap-3">
-                    <div
-                      className={`
-                        flex
-                        h-11
-                        w-11
-                        items-center
-                        justify-center
-                        rounded-xl
-                        text-2xl
-
-                        ${
-                          humanColor === "w"
-                            ? "bg-[#fff3d5] text-zinc-900"
-                            : "border border-white/10 bg-zinc-800 text-zinc-100"
-                        }
-                      `}
-                    >
-                      {humanColor === "w" ? "♔" : "♚"}
+                    <div className="h-11 w-11 shrink-0 overflow-hidden rounded-xl border border-amber-300/20">
+                      <ProfileAvatar
+                        avatarId={humanAvatarId}
+                        className="h-full w-full"
+                      />
                     </div>
 
                     <div className="min-w-0 flex-1">
@@ -2118,23 +2154,23 @@ export default function ChessComputerBoard({
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className={`
+                      className="
                         flex
                         h-11
                         w-11
+                        shrink-0
                         items-center
                         justify-center
                         rounded-xl
+                        border
+                        border-cyan-300/20
+                        bg-cyan-400/10
                         text-2xl
-
-                        ${
-                          computerColor === "w"
-                            ? "bg-[#fff3d5] text-zinc-900"
-                            : "border border-white/10 bg-zinc-800 text-zinc-100"
-                        }
-                      `}
+                        shadow-inner
+                      "
+                      aria-label="Stockfish"
                     >
-                      {computerColor === "w" ? "♔" : "♚"}
+                      🤖
                     </div>
 
                     <div className="min-w-0 flex-1">

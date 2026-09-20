@@ -33,7 +33,7 @@ type VariantRulesPageProps = {
   onLanguageChange: (language: ChessLanguage) => void;
   languageLabel: string;
   coreIdeaLabel: string;
-  ruleLabel: string;
+  ruleLabel?: string;
   playLabel: string;
 };
 
@@ -86,7 +86,6 @@ export default function VariantRulesPage({
   onLanguageChange,
   languageLabel,
   coreIdeaLabel,
-  ruleLabel,
   playLabel,
 }: VariantRulesPageProps) {
   const colors = accents[accent];

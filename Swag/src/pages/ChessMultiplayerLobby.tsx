@@ -49,7 +49,7 @@ export default function ChessMultiplayerLobby() {
       return;
     }
 
-    navigate(`/chess/classic/multiplayer/${data}`);
+    navigate(`/games/chess/classic/multiplayer/${data}`);
   }
 
   async function joinRoom() {
@@ -82,7 +82,7 @@ export default function ChessMultiplayerLobby() {
       return;
     }
 
-    navigate(`/chess/classic/multiplayer/${data}`);
+    navigate(`/games/chess/classic/multiplayer/${data}`);
   }
 
   if (!user) {

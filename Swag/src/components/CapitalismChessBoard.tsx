@@ -39,11 +39,9 @@ import {
   missionDefinitions,
   pieceValues,
   resolveCapitalismAfterMove,
-  sideFromColor,
   type CapitalSide,
   type CapitalState,
   type CapitalismMoveRecord,
-  type MissionAssignment,
   type RoyalPowerId,
   type ShopPieceType,
 } from "../games/chess/variants/capitalismChess";
@@ -599,7 +597,7 @@ export default function CapitalismChessBoard({
   difficulty = "casual",
 }: VariantAiBoardProps) {
   const [language, setLanguage] = useState<Language>(getInitialLanguage);
-  const [boardAnimationEnabled, setBoardAnimationEnabled] = useState(true);
+
   const t = (key: string) => {
     if (language === "en") {
       return key;
@@ -725,8 +723,6 @@ export default function CapitalismChessBoard({
   /* =======================================================
      DERIVED
      ======================================================= */
-
-  const board = game.board();
 
   const historyPreview =
     historyPreviewPly !== null

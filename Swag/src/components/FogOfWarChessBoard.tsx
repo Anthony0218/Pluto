@@ -385,9 +385,24 @@ export default function FogOfWarChessBoard({
   );
   const liveSide: FogSide = game.turn();
   const displayedChess = historyPreviewChess ?? game;
-  const displayedSide: FogSide = historyPreviewChess
-    ? historyPreviewChess.turn()
-    : liveSide;
+
+  /*
+   * In Hotseat, Fog of War follows the side whose turn it is, exactly as before.
+   *
+   * In Vs AI, however, the screen must ALWAYS stay on the human player's
+   * information set. Otherwise, immediately after the human moves, game.turn()
+   * changes to the computer and the board briefly renders the computer's fog
+   * view until the AI replies.
+   *
+   * Keeping the viewing side fixed to humanColor also prevents history preview
+   * from accidentally exposing the AI's hidden information.
+   */
+  const displayedSide: FogSide = aiMode
+    ? humanColor
+    : historyPreviewChess
+      ? historyPreviewChess.turn()
+      : liveSide;
+
   const displayedBoard = getMaskedBoard(displayedChess, displayedSide);
   const fogSquares = getFogSquares(displayedChess, displayedSide);
   const visibleSquares = getFogVisibleSquares(displayedChess, displayedSide);

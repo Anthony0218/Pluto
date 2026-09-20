@@ -29,12 +29,12 @@ const navigation = [
   },
   {
     label: "Chess",
-    href: "/chess",
+    href: "/games/chess",
     icon: Folder,
   },
   {
     label: "Watten",
-    href: "/watten",
+    href: "games/watten",
     icon: Users,
   },
   {
