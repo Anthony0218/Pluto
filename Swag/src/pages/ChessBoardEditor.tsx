@@ -41,28 +41,28 @@ export default function ChessBoardEditor() {
   }
 
   return (
-    <div className="grid grid-cols-[minmax(220px,1fr)_minmax(0,3fr)] grid-rows-[auto_minmax(0,1fr)] gap-0">
-      <div className="row-span-3 place-items-center outline-4 outline-rose-500">
+    <div className="grid grid-flow-col grid-rows-3 gap-0 bg-neutral-900">
+      <div className="row-span-3 place-items-center border-r-4 border-rose-500 z-0">
         <Sidebar
           selectedObject={selectedObject}
           onObjectChange={setSelectedObject}
         />
       </div>
-
-      <div className="col-span-2 h-full bg-mauve-900">
-        <Navigation
-          dimensions={dimensions}
-          onDimensionsChange={handleDimensionsChange}
-        />
-      </div>
-
-      <div className="col-span-2 row-span-2 pl-4 bg-mauve-900">
+      
+      <div className="col-span-2 row-span-2 p-4 bg-mauve-900" z-0>
         <Grid
           board={board}
           dimensions={dimensions}
           selectedObject={selectedObject}
           onBoardChange={setBoard}
           width={600}
+        />
+      </div>
+
+      <div className="col-span-2 h-full bg-mauve-900" z-10>
+        <Navigation
+          dimensions={dimensions}
+          onDimensionsChange={handleDimensionsChange}
         />
       </div>
     </div>
@@ -254,86 +254,146 @@ export function Navigation({
   dimensions,
   onDimensionsChange,
 }: NavigationProps) {
-  const [isVisible, setIsVisible] = useState(true);
+  
+  const [squareLocked, setSquareLocked] = useState(false); 
+  
+  /* * Change rows. * * If square lock is enabled, columns follow rows. */ 
+  function handleRowsChange(rows: number) {
+    onDimensionsChange({ 
+      rows, columns: squareLocked ? rows : dimensions.columns, 
+    }); 
+  } 
 
-  useEffect(() => {
-    let lastScrollY = window.scrollY;
-
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-
-      if (currentScrollY < lastScrollY) {
-        // Scrolling up
-        setIsVisible(false);
-      } else if (currentScrollY > lastScrollY) {
-        // Scrolling down
-        setIsVisible(true);
-      }
-
-      lastScrollY = currentScrollY;
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
+  /* * Change columns. * * If square lock is enabled, rows follow columns. */ 
+  function handleColumnsChange(columns: number) {
+    onDimensionsChange({ 
+      rows: squareLocked ? columns : dimensions.rows, columns, 
+    }); 
+  } 
+  
+  /* * Toggle square-grid mode. * * When enabled, immediately synchronize the * rows with the current column count. */ 
+  function handleSquareToggle() { 
+    const nextLockedState = !squareLocked; setSquareLocked(nextLockedState); 
+    if (nextLockedState) { 
+      onDimensionsChange({ 
+        rows: dimensions.columns, columns: dimensions.columns, 
+      }); 
+    } 
+  } 
+  
+  /* * The grid-size slider always creates an n × n grid. */ 
+  function handleGridSizeChange(size: number) {
+     onDimensionsChange({ 
+      rows: size, columns: size, 
+    }); 
+  }
+  
   return (
     <div
-      className={`
-        sticky top-0 z-50
-        flex items-center justify-center gap-8
-        bg-stone-950 h-full
-        border-b-4 border-rose-400
-        divide-solid divide-rose-500
-        transition-transform duration-300
-        ${isVisible ? "translate-y-0" : "-translate-y-full"}
-      `}
+      className="
+        sticky bottom-0 z-50
+        flex flex-wrap items-center justify-center gap-8
+        bg-rose-400/20
+        border-b-4 border-rose-500
+        p-4
+      "
     >
+      {/* Rows */}
       <label className="flex items-center gap-2">
         Rows
+
         <select
           value={dimensions.rows}
           onChange={(event) =>
-            onDimensionsChange({
-              ...dimensions,
-              rows: Number(event.target.value),
-            })
+            handleRowsChange(
+              Number(event.target.value),
+            )
           }
-          className="rounded-md border-2 border-slate-400 bg-white px-3 py-2"
+          className="
+            rounded-md
+            border-2 border-rose-950
+            bg-rose-400/20
+            px-3 py-2
+            text-rose-950
+          "
         >
-          {Array.from({ length: 10 }, (_, index) => index + 1).map(
-            (value) => (
-              <option key={value} value={value}>
-                {value}
-              </option>
-            ),
-          )}
+          {Array.from(
+            { length: 10 },
+            (_, index) => index + 1,
+          ).map((value) => (
+            <option 
+            className="
+              rounded-md
+              border-2 border-rose-950
+              bg-rose-400/20
+              px-3 py-2
+              text-rose-950
+              " 
+            key={value} value={value}>
+              {value}
+            </option>
+          ))}
         </select>
       </label>
 
+      {/* Columns */}
       <label className="flex items-center gap-2">
         Columns
+
         <select
           value={dimensions.columns}
           onChange={(event) =>
-            onDimensionsChange({
-              ...dimensions,
-              columns: Number(event.target.value),
-            })
+            handleColumnsChange(
+              Number(event.target.value),
+            )
           }
-          className="rounded-md border-2 border-slate-400 bg-white px-3 py-2"
+          className="
+            rounded-md
+            border-2 border-slate-400
+            bg-white
+            px-3 py-2
+          "
         >
-          {Array.from({ length: 10 }, (_, index) => index + 1).map(
-            (value) => (
-              <option key={value} value={value}>
-                {value}
-              </option>
-            ),
-          )}
+          {Array.from(
+            { length: 10 },
+            (_, index) => index + 1,
+          ).map((value) => (
+            <option key={value} value={value}>
+              {value}
+            </option>
+          ))}
         </select>
+      </label>
+
+      {/* Grid Size Slider */}
+      <label className="flex items-center gap-3">
+        <span className="whitespace-nowrap text-sm font-medium">
+          Grid Size
+        </span>
+
+        <input
+          type="range"
+          min="1"
+          max="10"
+          step="1"
+          value={
+            dimensions.rows === dimensions.columns
+              ? dimensions.rows
+              : dimensions.columns
+          }
+          onChange={(event) =>
+            handleGridSizeChange(
+              Number(event.target.value),
+            )
+          }
+          className="w-32 accent-slate-600"
+        />
+
+        <span className="w-5 text-center font-semibold">
+          {dimensions.rows === dimensions.columns
+            ? dimensions.rows
+            : "–"}
+        </span>
       </label>
     </div>
   );
@@ -538,6 +598,8 @@ export function Grid({
         width: `${width}px`,
         gridTemplateColumns: `repeat(${dimensions.columns}, minmax(0, 1fr))`,
         gridTemplateRows: `repeat(${dimensions.rows}, minmax(0, 1fr))`,
+        borderImage: `
+          url("../assets/custom-grid-border.png") 30 / 19px round;`,
       }}
     >
       {board.map((cell) => (
