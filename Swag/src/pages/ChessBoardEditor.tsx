@@ -149,7 +149,7 @@ export function Sidebar({
   onObjectChange,
 }: SidebarProps) {
   return (
-    <aside className="flex flex-col gap-6 p-6">
+    <aside className="flex h-full flex-col justify-center gap-8 p-6">
       <h2 className="text-xl font-bold">
         Objects
       </h2>
@@ -258,7 +258,7 @@ export function Navigation({
   onDimensionsChange,
 }: NavigationProps) {
   return (
-    <nav className="flex items-center gap-6 p-4">
+    <nav className="flex items-center justify-center gap-8 rounded-md border-2 border-slate-400 bg-slate-50 p-4">
       <h1 className="text-xl font-bold">
         Board
       </h1>
@@ -525,7 +525,7 @@ export function Grid({
       {board.map((cell) => (
         <div
           key={cell.index}
-          className="aspect-square min-w-0 rounded border p-1"
+          className="aspect-square min-w-0 rounded border-2 border-slate-500 p-1"
         >
           <button
             type="button"
