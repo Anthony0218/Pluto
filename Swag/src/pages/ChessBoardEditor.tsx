@@ -258,7 +258,7 @@ export function Navigation({
   onDimensionsChange,
 }: NavigationProps) {
   return (
-    <nav className="flex items-center justify-center gap-8 rounded-md border-2 border-slate-400 bg-slate-50 p-4">
+    <div className="flex items-center justify-center gap-8 rounded-md border-2 border-slate-400 bg-slate-50 p-4">
       <h1 className="text-xl font-bold">
         Board
       </h1>
@@ -314,7 +314,7 @@ export function Navigation({
           ))}
         </select>
       </label>
-    </nav>
+    </div>
   );
 }
 
