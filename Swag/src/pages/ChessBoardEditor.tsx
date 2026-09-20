@@ -41,7 +41,7 @@ export default function ChessBoardEditor() {
   }
 
   return (
-    <div className="grid grid-flow-col grid-rows-3 gap-0">
+    <div className="grid grid-cols-[minmax(220px,1fr)_minmax(0,3fr)] grid-rows-[auto_1fr] gap-0">
       <div className="row-span-3 place-items-center outline-4 outline-rose-500">
         <Sidebar
           selectedObject={selectedObject}
@@ -289,7 +289,7 @@ export function Navigation({
         border-b-4 border-rose-400
         divide-solid divide-rose-500
         transition-transform duration-300
-        ${isVisible ? "translate-y-1/3" : "-translate-y-full"}
+        ${isVisible ? "translate-y-0" : "-translate-y-full"}
       `}
     >
       <label className="flex items-center gap-2">
