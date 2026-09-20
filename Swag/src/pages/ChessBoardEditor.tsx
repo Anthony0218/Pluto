@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import "../index.css";
 
@@ -42,7 +42,7 @@ export default function ChessBoardEditor() {
 
   return (
     <div className="grid grid-flow-col grid-rows-3 gap-4">
-      <div className="row-span-3 ml-8 h-screen w-1/3 place-items-center rounded-sm outline-double">
+      <div className="row-span-3 w-1/3 place-items-center rounded-sm outline-double">
         <Sidebar
           selectedObject={selectedObject}
           onObjectChange={setSelectedObject}
@@ -58,7 +58,7 @@ export default function ChessBoardEditor() {
         />
       </div>
 
-      <div className="col-span-2 row-span-2 place-self-center">
+      <div className="col-span-2 row-span-2">
         <Grid
           board={board}
           dimensions={dimensions}
@@ -90,11 +90,6 @@ export type BoardObject = {
 export type Cell = {
   index: number;
   object: BoardObject | null;
-};
-
-type BoardDimensions = {
-  rows: number;
-  columns: number;
 };
 
 type ObjectTemplate = {
@@ -246,25 +241,60 @@ export function Sidebar({
    NAVIGATION
    ========================================================= */
 
+type BoardDimensions = {
+  rows: number;
+  columns: number;
+};
+
 type NavigationProps = {
   dimensions: BoardDimensions;
-  onDimensionsChange: (
-    dimensions: BoardDimensions
-  ) => void;
+  onDimensionsChange: (dimensions: BoardDimensions) => void;
 };
 
 export function Navigation({
   dimensions,
   onDimensionsChange,
 }: NavigationProps) {
-  return (
-    <div className="flex items-center justify-center gap-8 rounded-md border-2 border-slate-400 bg-slate-50 p-4">
-      <h1 className="text-xl font-bold">
-        Board
-      </h1>
+  const [isVisible, setIsVisible] = useState(true);
 
-      <label>
-        Rows{" "}
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY < lastScrollY) {
+        // Scrolling up
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY) {
+        // Scrolling down
+        setIsVisible(false);
+      }
+
+      lastScrollY = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  return (
+    <div
+      className={`
+        sticky top-0 z-50
+        flex items-center justify-center gap-8
+        border-2 border-slate-400
+        bg-slate-50/95 p-4
+        shadow-md backdrop-blur-sm
+        transition-transform duration-300
+        ${isVisible ? "translate-y-0" : "-translate-y-full"}
+      `}
+    >
+      <label className="flex items-center gap-2">
+        Rows
         <select
           value={dimensions.rows}
           onChange={(event) =>
@@ -273,24 +303,20 @@ export function Navigation({
               rows: Number(event.target.value),
             })
           }
-          className="ml-2 rounded border p-1"
+          className="rounded-md border-2 border-slate-400 bg-white px-3 py-2"
         >
-          {Array.from(
-            { length: 10 },
-            (_, index) => index + 1
-          ).map((value) => (
-            <option
-              key={value}
-              value={value}
-            >
-              {value}
-            </option>
-          ))}
+          {Array.from({ length: 10 }, (_, index) => index + 1).map(
+            (value) => (
+              <option key={value} value={value}>
+                {value}
+              </option>
+            ),
+          )}
         </select>
       </label>
 
-      <label>
-        Columns{" "}
+      <label className="flex items-center gap-2">
+        Columns
         <select
           value={dimensions.columns}
           onChange={(event) =>
@@ -299,25 +325,20 @@ export function Navigation({
               columns: Number(event.target.value),
             })
           }
-          className="ml-2 rounded border p-1"
+          className="rounded-md border-2 border-slate-400 bg-white px-3 py-2"
         >
-          {Array.from(
-            { length: 10 },
-            (_, index) => index + 1
-          ).map((value) => (
-            <option
-              key={value}
-              value={value}
-            >
-              {value}
-            </option>
-          ))}
+          {Array.from({ length: 10 }, (_, index) => index + 1).map(
+            (value) => (
+              <option key={value} value={value}>
+                {value}
+              </option>
+            ),
+          )}
         </select>
       </label>
     </div>
   );
 }
-
 
 /* =========================================================
    OBJECT RENDERER
