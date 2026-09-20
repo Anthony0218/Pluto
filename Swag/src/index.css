@@ -189,4 +189,5 @@ body {
 .wooden-board {
   border: 24px solid transparent;
   border-image: url("./assets/16x16template.png") 30 / 16px round;
+  box-sizing: content-box;
 }
