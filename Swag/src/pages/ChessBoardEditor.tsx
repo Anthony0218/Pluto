@@ -41,24 +41,22 @@ export default function ChessBoardEditor() {
   }
 
   return (
-    <div className="grid grid-flow-col grid-rows-3 gap-4">
-      <div className="row-span-3 place-items-center rounded-sm outline-double">
+    <div className="grid grid-flow-col grid-rows-3 gap-0">
+      <div className="row-span-3 place-items-center outline-4 outline-rose-500">
         <Sidebar
           selectedObject={selectedObject}
           onObjectChange={setSelectedObject}
         />
       </div>
 
-      <div className="col-span-2 w-2/3">
+      <div className="col-span-2 h-full bg-mauve-900">
         <Navigation
           dimensions={dimensions}
-          onDimensionsChange={
-            handleDimensionsChange
-          }
+          onDimensionsChange={handleDimensionsChange}
         />
       </div>
 
-      <div className="col-span-2 row-span-2">
+      <div className="col-span-2 row-span-2 pl-4 bg-mauve-900">
         <Grid
           board={board}
           dimensions={dimensions}
@@ -266,10 +264,10 @@ export function Navigation({
 
       if (currentScrollY < lastScrollY) {
         // Scrolling up
-        setIsVisible(true);
+        setIsVisible(false);
       } else if (currentScrollY > lastScrollY) {
         // Scrolling down
-        setIsVisible(false);
+        setIsVisible(true);
       }
 
       lastScrollY = currentScrollY;
@@ -287,9 +285,9 @@ export function Navigation({
       className={`
         sticky top-0 z-50
         flex items-center justify-center gap-8
-        border-2 border-slate-400
-        bg-slate-50/95 p-4
-        shadow-md backdrop-blur-sm
+        bg-stone-950 h-full
+        border-b-4 border-rose-400
+        divide-solid divide-rose-500
         transition-transform duration-300
         ${isVisible ? "translate-y-0" : "-translate-y-full"}
       `}
