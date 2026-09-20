@@ -42,7 +42,7 @@ export default function ChessBoardEditor() {
 
   return (
     <div className="grid grid-flow-col grid-rows-3 gap-4">
-      <div className="row-span-3 w-1/3 place-items-center rounded-sm outline-double">
+      <div className="row-span-3 place-items-center rounded-sm outline-double">
         <Sidebar
           selectedObject={selectedObject}
           onObjectChange={setSelectedObject}
@@ -402,6 +402,35 @@ function ObjectRenderer({
     </div>
   );
 }
+type ObjectOverlayProps = {
+  color?: string;
+  opacity?: number;
+};
+
+function ObjectOverlay({
+  color = "currentColor",
+  opacity = 0.35,
+}: ObjectOverlayProps) {
+  return (
+    <svg
+      className="pointer-events-none absolute inset-0 z-10 h-full w-full"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <circle
+        cx="50"
+        cy="50"
+        r="38"
+        fill={color}
+        fillOpacity={opacity}
+        stroke={color}
+        strokeWidth="2"
+        strokeOpacity={opacity}
+      />
+    </svg>
+  );
+}
 
 
 /* =========================================================
@@ -544,32 +573,31 @@ export function Grid({
       }}
     >
       {board.map((cell) => (
-        <div
+        <button
+          type="button"
           key={cell.index}
-          className="aspect-square min-w-0 rounded border-2 border-slate-500 p-1"
+          className="relative aspect-square rounded-md border-2 border-slate-500 bg-slate-100 p-1"
+          onClick={() => {
+            if (cell.object) {
+              removeObject(cell.index);
+            } else {
+              placeObject(cell.index);
+            }
+          }}
         >
-          <button
-            type="button"
-            className="h-full w-full rounded"
-            onClick={() => {
-              if (cell.object) {
-                removeObject(cell.index);
-              } else {
-                placeObject(cell.index);
-              }
-            }}
-          >
-            {cell.object ? (
-              <ObjectRenderer
-                object={cell.object}
-              />
-            ) : (
-              <span className="text-gray-400">
-                {cell.index}
-              </span>
+          {cell.object && ( 
+            <> 
+            <ObjectRenderer 
+              object={cell.object} 
+              /> 
+
+            <ObjectOverlay 
+              color={cell.object.color} 
+              opacity={0.25} 
+              /> 
+            </> 
             )}
-          </button>
-        </div>
+        </button>
       ))}
     </div>
   );
