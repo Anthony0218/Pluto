@@ -26,7 +26,7 @@ function createBoard(rows: number, columns: number): Cell[] {
   );
 }
 
-export default function Grid() {
+export default function ChessBoard() {
   const [rowCount, setRowCount] = useState(4);
   const [columnCount, setColumnCount] = useState(4);
 
@@ -157,6 +157,32 @@ export default function Grid() {
       type: "circle",
       color: "red",
     });
+  }
+
+  function getPosition(index: number) { 
+    return { row: Math.floor(index / columnCount), column: index % columnCount, }; 
+  }
+
+  function areOnSameLine( indexA: number, indexB: number ): boolean { 
+    const positionA = getPosition(indexA); 
+    const positionB = getPosition(indexB); 
+    return ( positionA.row === positionB.row || positionA.column === positionB.column ); 
+  }
+
+  function areOnSameDiagonal( indexA: number, indexB: number ): boolean { 
+    const positionA = getPosition(indexA); 
+    const positionB = getPosition(indexB); 
+    const rowDifference = Math.abs( positionA.row - positionB.row ); 
+    const columnDifference = Math.abs( positionA.column - positionB.column ); 
+    return rowDifference === columnDifference; 
+  }
+
+  function areAdjacent( indexA: number, indexB: number ): boolean { 
+    const positionA = getPosition(indexA); 
+    const positionB = getPosition(indexB); 
+    const rowDifference = Math.abs( positionA.row - positionB.row ); 
+    const columnDifference = Math.abs( positionA.column - positionB.column ); 
+    return ( rowDifference <= 1 && columnDifference <= 1 && (rowDifference !== 0 || columnDifference !== 0) ); 
   }
 
   return (

@@ -2,427 +2,554 @@ import { useState } from "react";
 
 import "../index.css";
 
-import ChessBoard from "../components/ChessBoardCustom";
-import SelectionNavigation from "../components/SelectionNavigation";
-import Sidebar from "../components/SidebarCustom";
+export default function ChessBoardEditor() {
+  const [dimensions, setDimensions] =
+    useState<BoardDimensions>({
+      rows: 4,
+      columns: 4,
+    });
 
-import "../utils/customChess";
+  const [board, setBoard] = useState<Cell[]>(
+    () => createBoard(4, 4)
+  );
 
-type Color = "white" | "black";
+  const [selectedObject, setSelectedObject] =
+    useState<ObjectTemplate>({
+      type: "circle",
+      color: "#3b82f6",
+      value: "player",
+    });
 
-type PieceType =
-  | "king"
-  | "queen"
-  | "rook"
-  | "bishop"
-  | "knight"
-  | "pawn";
-
-type Piece = {
-  color: Color;
-  type: PieceType;
-};
-
-type Board = Record<string, Piece | null>;
-
-const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
-const ranks = [8, 7, 6, 5, 4, 3, 2, 1];
-
-
-
-function createEmptyBoard(): Board {
-  const board: Board = {};
-
-  for (const rank of ranks) {
-    for (const file of files) {
-      board[`${file}${rank}`] = null;
-    }
-  }
-
-  return board;
-}
-
-/* -------------------------------------------------------
-   Coordinate helpers
-------------------------------------------------------- */
-
-function squareToCoordinates(square: string) {
-  const file = files.indexOf(square[0]);
-  const rank = Number(square[1]);
-
-  return {
-    file,
-    rank,
-  };
-}
-
-function coordinatesToSquare(
-  file: number,
-  rank: number
-): string | null {
-  if (file < 0 || file > 7) {
-    return null;
-  }
-
-  if (rank < 1 || rank > 8) {
-    return null;
-  }
-
-  return `${files[file]}${rank}`;
-}
-
-/* -------------------------------------------------------
-   Move calculation
-------------------------------------------------------- */
-
-/*
- * Calculates pseudo-legal moves.
-
- * This intentionally does not check whether the player's
- * king would be left in check.
-
- * That keeps the position editor independent of a chess
- * library and makes it useful for arbitrary constellations.
- */
-function getPossibleMoves(
-  board: Board,
-  square: string
-): string[] {
-  const piece = board[square];
-
-  if (!piece) {
-    return [];
-  }
-
-  const { file, rank } =
-    squareToCoordinates(square);
-
-  const moves: string[] = [];
-
-  function addSquare(
-    targetFile: number,
-    targetRank: number
-  ): boolean {
-    const target =
-      coordinatesToSquare(
-        targetFile,
-        targetRank
-      );
-
-    if (!target) {
-      return false;
-    }
-
-    const targetPiece = board[target];
-
-    if (!targetPiece) {
-      moves.push(target);
-      return true;
-    }
+  function handleDimensionsChange(
+    newDimensions: BoardDimensions
+  ) {
+    setDimensions(newDimensions);
 
     /*
-     * A piece cannot move onto a square occupied
-     * by a friendly piece.
+     * Create a new board when the dimensions change.
      *
-     * It can capture an opponent piece.
+     * If you want to preserve existing objects when
+     * resizing, this can instead be implemented to
+     * copy objects from the old board.
      */
-    if (
-      targetPiece.color !==
-      piece?.color
-    ) {
-      moves.push(target);
-    }
-
-    return false;
-  }
-
-  function addSlidingMoves(
-    directions: Array<[number, number]>
-  ) {
-    for (const [df, dr] of directions) {
-      let currentFile = file + df;
-      let currentRank = rank + dr;
-
-      while (true) {
-        const canContinue = addSquare(
-          currentFile,
-          currentRank
-        );
-
-        if (!canContinue) {
-          break;
-        }
-
-        currentFile += df;
-        currentRank += dr;
-      }
-    }
-  }
-
-  switch (piece.type) {
-    case "rook":
-      addSlidingMoves([
-        [1, 0],
-        [-1, 0],
-        [0, 1],
-        [0, -1],
-      ]);
-      break;
-
-    case "bishop":
-      addSlidingMoves([
-        [1, 1],
-        [1, -1],
-        [-1, 1],
-        [-1, -1],
-      ]);
-      break;
-
-    case "queen":
-      addSlidingMoves([
-        [1, 0],
-        [-1, 0],
-        [0, 1],
-        [0, -1],
-        [1, 1],
-        [1, -1],
-        [-1, 1],
-        [-1, -1],
-      ]);
-      break;
-
-    case "knight": {
-      const knightMoves = [
-        [1, 2],
-        [2, 1],
-        [2, -1],
-        [1, -2],
-        [-1, -2],
-        [-2, -1],
-        [-2, 1],
-        [-1, 2],
-      ];
-
-      for (const [df, dr] of knightMoves) {
-        addSquare(
-          file + df,
-          rank + dr
-        );
-      }
-
-      break;
-    }
-
-    case "king": {
-      const kingMoves = [
-        [1, 0],
-        [-1, 0],
-        [0, 1],
-        [0, -1],
-        [1, 1],
-        [1, -1],
-        [-1, 1],
-        [-1, -1],
-      ];
-
-      for (const [df, dr] of kingMoves) {
-        addSquare(
-          file + df,
-          rank + dr
-        );
-      }
-
-      break;
-    }
-
-    case "pawn": {
-      const direction =
-        piece.color === "white"
-          ? 1
-          : -1;
-
-      const startingRank =
-        piece.color === "white"
-          ? 2
-          : 7;
-
-      /*
-       * One square forward.
-       */
-      const oneForward =
-        coordinatesToSquare(
-          file,
-          rank + direction
-        );
-
-      if (
-        oneForward &&
-        !board[oneForward]
-      ) {
-        moves.push(oneForward);
-
-        /*
-         * Two squares from starting position.
-         */
-        if (rank === startingRank) {
-          const twoForward =
-            coordinatesToSquare(
-              file,
-              rank +
-                direction * 2
-            );
-
-          if (
-            twoForward &&
-            !board[twoForward]
-          ) {
-            moves.push(twoForward);
-          }
-        }
-      }
-
-      /*
-       * Pawn captures.
-       */
-      for (const df of [-1, 1]) {
-        const target =
-          coordinatesToSquare(
-            file + df,
-            rank + direction
-          );
-
-        if (
-          target &&
-          board[target] &&
-          board[target]?.color !==
-            piece.color
-        ) {
-          moves.push(target);
-        }
-      }
-
-      break;
-    }
-  }
-
-  return moves;
-}
-
-/*
- * Returns all currently possible moves of one color.
- */
-function getAllColorMoves(
-  board: Board,
-  color: Color
-): Set<string> {
-  const moves = new Set<string>();
-
-  for (const square of Object.keys(board)) {
-    const piece = board[square];
-
-    if (
-      piece &&
-      piece.color === color
-    ) {
-      const pieceMoves =
-        getPossibleMoves(
-          board,
-          square
-        );
-
-      for (const move of pieceMoves) {
-        moves.add(move);
-      }
-    }
-  }
-
-  return moves;
-}
-
-/* -------------------------------------------------------
-   Main component
-------------------------------------------------------- */
-
-export default function ChessBoardEditor() {
-  const [board, setBoard] =
-    useState<Board>(createEmptyBoard);
-
-  const [boardSize, setBoardSize] = 
-    useState(640);
-
-  const [selectedColor, setSelectedColor] =
-    useState<Color>("white");
-
-  const [selectedPiece, setSelectedPiece] =
-    useState<PieceType>("king");
-
-  const [
-    pieceInfoCheckbox,
-    setPieceInfoCheckbox,
-  ] = useState(false);
-
-  const [
-    opponentInfoCheckbox,
-    setOpponentInfoCheckbox,
-  ] = useState(false);
-
-  const [
-    hoveredSquare, 
-    setHoveredSquare
-  ] = useState<string | null>(null);
-
-  const [
-    selectedSquare,
-    setSelectedSquare,
-  ] = useState<string | null>(null);
-
-  /*
-   * Possible moves for the selected piece
-   * if it were placed on the hovered square.
-   */
- 
-
-  /*
-   * All possible destinations of the
-   * opposite color's currently placed pieces.
-   */
-
-
-  function clearBoard() {
-    setBoard(createEmptyBoard());
-    setSelectedSquare(null);
+    setBoard(
+      createBoard(
+        newDimensions.rows,
+        newDimensions.columns
+      )
+    );
   }
 
   return (
-    <>
     <div className="grid grid-flow-col grid-rows-3 gap-4">
-      <div className="p-8 row-span-3 h-screen w-1/3 rounded-sm place-items-center outline-double">
+      <div className="row-span-3 ml-8 h-screen w-1/3 place-items-center rounded-sm outline-double">
         <Sidebar
-        selectedColor={selectedColor}
-        selectedPiece={selectedPiece}
-        boardSize={boardSize}
-        pieceInfoCheckbox={pieceInfoCheckbox}
-        opponentInfoCheckbox={opponentInfoCheckbox}
-        onPieceInfoChange={setPieceInfoCheckbox}
-        onOpponentInfoChange={setOpponentInfoCheckbox}
-        onBoardSizeChange={setBoardSize}
-        onClearBoard={clearBoard}
-      />
+          selectedObject={selectedObject}
+          onObjectChange={setSelectedObject}
+        />
       </div>
-      
+
       <div className="col-span-2 w-2/3">
-        <SelectionNavigation
-          color={selectedColor}
-          pieceType={selectedPiece}
-          onColorChange={setSelectedColor}
-          onPieceChange={setSelectedPiece}
+        <Navigation
+          dimensions={dimensions}
+          onDimensionsChange={
+            handleDimensionsChange
+          }
         />
       </div>
 
       <div className="col-span-2 row-span-2 place-self-center">
-        <ChessBoard />
+        <Grid
+          board={board}
+          dimensions={dimensions}
+          selectedObject={selectedObject}
+          onBoardChange={setBoard}
+        />
       </div>
     </div>
-    </>
-  )
+  );
+}
+
+
+/* =========================================================
+   TYPES
+   ========================================================= */
+
+export type ObjectType =
+  | "circle"
+  | "square"
+  | "triangle";
+
+export type BoardObject = {
+  id: string;
+  type: ObjectType;
+  color: string;
+  value: string;
 };
+
+export type Cell = {
+  index: number;
+  object: BoardObject | null;
+};
+
+type BoardDimensions = {
+  rows: number;
+  columns: number;
+};
+
+type ObjectTemplate = {
+  type: ObjectType;
+  color: string;
+  value: string;
+};
+
+
+/* =========================================================
+   BOARD HELPERS
+   ========================================================= */
+
+function createBoard(
+  rows: number,
+  columns: number
+): Cell[] {
+  return Array.from(
+    { length: rows * columns },
+    (_, index) => ({
+      index,
+      object: null,
+    })
+  );
+}
+
+function createObject(
+  template: ObjectTemplate
+): BoardObject {
+  return {
+    id: crypto.randomUUID(),
+    type: template.type,
+    color: template.color,
+    value: template.value,
+  };
+}
+
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+type SidebarProps = {
+  selectedObject: ObjectTemplate;
+  onObjectChange: (
+    object: ObjectTemplate
+  ) => void;
+};
+
+export function Sidebar({
+  selectedObject,
+  onObjectChange,
+}: SidebarProps) {
+  return (
+    <aside className="flex flex-col gap-6 p-6">
+      <h2 className="text-xl font-bold">
+        Objects
+      </h2>
+
+      {/* Object type */}
+      <div className="flex flex-col gap-2">
+        <label htmlFor="object-type">
+          Type
+        </label>
+
+        <select
+          id="object-type"
+          className="rounded border p-2"
+          value={selectedObject.type}
+          onChange={(event) =>
+            onObjectChange({
+              ...selectedObject,
+              type:
+                event.target.value as ObjectType,
+            })
+          }
+        >
+          <option value="circle">
+            Circle
+          </option>
+
+          <option value="square">
+            Square
+          </option>
+
+          <option value="triangle">
+            Triangle
+          </option>
+        </select>
+      </div>
+
+      {/* Color */}
+      <div className="flex flex-col gap-2">
+        <label htmlFor="object-color">
+          Color
+        </label>
+
+        <input
+          id="object-color"
+          type="color"
+          value={selectedObject.color}
+          onChange={(event) =>
+            onObjectChange({
+              ...selectedObject,
+              color: event.target.value,
+            })
+          }
+          className="h-10 w-full"
+        />
+      </div>
+
+      {/* Value */}
+      <div className="flex flex-col gap-2">
+        <label htmlFor="object-value">
+          Value
+        </label>
+
+        <input
+          id="object-value"
+          type="text"
+          value={selectedObject.value}
+          onChange={(event) =>
+            onObjectChange({
+              ...selectedObject,
+              value: event.target.value,
+            })
+          }
+          className="rounded border p-2"
+          placeholder="e.g. player"
+        />
+      </div>
+
+      {/* Preview */}
+      <div className="flex flex-col gap-2">
+        <span>Preview</span>
+
+        <div className="flex h-24 items-center justify-center rounded border">
+          <ObjectRenderer
+            object={createObject(selectedObject)}
+          />
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+type NavigationProps = {
+  dimensions: BoardDimensions;
+  onDimensionsChange: (
+    dimensions: BoardDimensions
+  ) => void;
+};
+
+export function Navigation({
+  dimensions,
+  onDimensionsChange,
+}: NavigationProps) {
+  return (
+    <nav className="flex items-center gap-6 p-4">
+      <h1 className="text-xl font-bold">
+        Board
+      </h1>
+
+      <label>
+        Rows{" "}
+        <select
+          value={dimensions.rows}
+          onChange={(event) =>
+            onDimensionsChange({
+              ...dimensions,
+              rows: Number(event.target.value),
+            })
+          }
+          className="ml-2 rounded border p-1"
+        >
+          {Array.from(
+            { length: 10 },
+            (_, index) => index + 1
+          ).map((value) => (
+            <option
+              key={value}
+              value={value}
+            >
+              {value}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label>
+        Columns{" "}
+        <select
+          value={dimensions.columns}
+          onChange={(event) =>
+            onDimensionsChange({
+              ...dimensions,
+              columns: Number(event.target.value),
+            })
+          }
+          className="ml-2 rounded border p-1"
+        >
+          {Array.from(
+            { length: 10 },
+            (_, index) => index + 1
+          ).map((value) => (
+            <option
+              key={value}
+              value={value}
+            >
+              {value}
+            </option>
+          ))}
+        </select>
+      </label>
+    </nav>
+  );
+}
+
+
+/* =========================================================
+   OBJECT RENDERER
+   ========================================================= */
+
+function ObjectRenderer({
+  object,
+}: {
+  object: BoardObject;
+}) {
+  const baseClasses =
+    "flex h-full w-full items-center justify-center";
+
+  if (object.type === "circle") {
+    return (
+      <div
+        className={`${baseClasses} rounded-full`}
+        style={{
+          backgroundColor: object.color,
+        }}
+      >
+        <span className="text-white">
+          {object.value}
+        </span>
+      </div>
+    );
+  }
+
+  if (object.type === "triangle") {
+    return (
+      <div
+        className="flex h-full w-full items-center justify-center"
+        style={{
+          color: object.color,
+        }}
+      >
+        <div
+          className="h-0 w-0"
+          style={{
+            borderLeft:
+              "30px solid transparent",
+            borderRight:
+              "30px solid transparent",
+            borderBottom: `50px solid ${object.color}`,
+          }}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`${baseClasses} rounded-sm`}
+      style={{
+        backgroundColor: object.color,
+      }}
+    >
+      <span className="text-white">
+        {object.value}
+      </span>
+    </div>
+  );
+}
+
+
+/* =========================================================
+   GRID
+   ========================================================= */
+
+type GridProps = {
+  board: Cell[];
+  dimensions: BoardDimensions;
+  selectedObject: ObjectTemplate;
+
+  onBoardChange: (
+    board: Cell[]
+  ) => void;
+};
+
+export function Grid({
+  board,
+  dimensions,
+  selectedObject,
+  onBoardChange,
+}: GridProps) {
+  function placeObject(index: number) {
+    const newBoard = [...board];
+
+    newBoard[index] = {
+      ...newBoard[index],
+      object: createObject(selectedObject),
+    };
+
+    onBoardChange(newBoard);
+  }
+
+  function removeObject(index: number) {
+    const newBoard = [...board];
+
+    newBoard[index] = {
+      ...newBoard[index],
+      object: null,
+    };
+
+    onBoardChange(newBoard);
+  }
+
+  function swapObjects(
+    indexA: number,
+    indexB: number
+  ) {
+    const newBoard = [...board];
+
+    const objectA =
+      newBoard[indexA].object;
+
+    const objectB =
+      newBoard[indexB].object;
+
+    newBoard[indexA] = {
+      ...newBoard[indexA],
+      object: objectB,
+    };
+
+    newBoard[indexB] = {
+      ...newBoard[indexB],
+      object: objectA,
+    };
+
+    onBoardChange(newBoard);
+  }
+
+  function getPosition(index: number) {
+    return {
+      row: Math.floor(
+        index / dimensions.columns
+      ),
+      column:
+        index % dimensions.columns,
+    };
+  }
+
+  function getAdjacentCells(
+    index: number
+  ): number[] {
+    const { row, column } =
+      getPosition(index);
+
+    const result: number[] = [];
+
+    if (row > 0) {
+      result.push(
+        index - dimensions.columns
+      );
+    }
+
+    if (
+      row <
+      dimensions.rows - 1
+    ) {
+      result.push(
+        index + dimensions.columns
+      );
+    }
+
+    if (column > 0) {
+      result.push(index - 1);
+    }
+
+    if (
+      column <
+      dimensions.columns - 1
+    ) {
+      result.push(index + 1);
+    }
+
+    return result;
+  }
+
+  function moveObject(
+    fromIndex: number,
+    toIndex: number
+  ) {
+    const adjacent =
+      getAdjacentCells(fromIndex);
+
+    if (!adjacent.includes(toIndex)) {
+      return;
+    }
+
+    swapObjects(
+      fromIndex,
+      toIndex
+    );
+  }
+
+  return (
+    <div
+      className="grid gap-2"
+      style={{
+        gridTemplateColumns:
+          `repeat(${dimensions.columns}, minmax(0, 1fr))`,
+      }}
+    >
+      {board.map((cell) => (
+        <div
+          key={cell.index}
+          className="aspect-square min-w-0 rounded border p-1"
+        >
+          <button
+            type="button"
+            className="h-full w-full rounded"
+            onClick={() => {
+              if (cell.object) {
+                removeObject(cell.index);
+              } else {
+                placeObject(cell.index);
+              }
+            }}
+          >
+            {cell.object ? (
+              <ObjectRenderer
+                object={cell.object}
+              />
+            ) : (
+              <span className="text-gray-400">
+                {cell.index}
+              </span>
+            )}
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+}
