@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-const ROW_OPTIONS = [2, 3, 4, 5, 6, 7, 8];
-const COLUMN_OPTIONS = [2, 3, 4, 5, 6, 7, 8];
+const ROW_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
+const COLUMN_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
 
 type ObjectType = "circle" | "square" | "triangle";
 

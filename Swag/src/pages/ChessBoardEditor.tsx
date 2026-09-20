@@ -437,22 +437,32 @@ function ObjectOverlay({
    GRID
    ========================================================= */
 
+
 type GridProps = {
   board: Cell[];
   dimensions: BoardDimensions;
   selectedObject: ObjectTemplate;
-
-  onBoardChange: (
-    board: Cell[]
-  ) => void;
+  onBoardChange: (board: Cell[]) => void;
+  width?: number;
 };
+
 
 export function Grid({
   board,
   dimensions,
   selectedObject,
   onBoardChange,
+  width = 600,
 }: GridProps) {
+  const columnCount = dimensions.columns;
+
+  function getPosition(index: number) {
+    return {
+      row: Math.floor(index / columnCount),
+      column: index % columnCount,
+    };
+  }
+
   function placeObject(index: number) {
     const newBoard = [...board];
 
@@ -475,17 +485,11 @@ export function Grid({
     onBoardChange(newBoard);
   }
 
-  function swapObjects(
-    indexA: number,
-    indexB: number
-  ) {
+  function swapObjects(indexA: number, indexB: number) {
     const newBoard = [...board];
 
-    const objectA =
-      newBoard[indexA].object;
-
-    const objectB =
-      newBoard[indexB].object;
+    const objectA = newBoard[indexA].object;
+    const objectB = newBoard[indexB].object;
 
     newBoard[indexA] = {
       ...newBoard[indexA],
@@ -500,103 +504,59 @@ export function Grid({
     onBoardChange(newBoard);
   }
 
-  function getPosition(index: number) {
-    return {
-      row: Math.floor(
-        index / dimensions.columns
-      ),
-      column:
-        index % dimensions.columns,
-    };
+  function areAdjacent(indexA: number, indexB: number) {
+    const positionA = getPosition(indexA);
+    const positionB = getPosition(indexB);
+
+    const rowDifference = Math.abs(positionA.row - positionB.row);
+    const columnDifference = Math.abs(
+      positionA.column - positionB.column,
+    );
+
+    return rowDifference + columnDifference === 1;
   }
 
-  function getAdjacentCells(
-    index: number
-  ): number[] {
-    const { row, column } =
-      getPosition(index);
-
-    const result: number[] = [];
-
-    if (row > 0) {
-      result.push(
-        index - dimensions.columns
-      );
-    }
-
-    if (
-      row <
-      dimensions.rows - 1
-    ) {
-      result.push(
-        index + dimensions.columns
-      );
-    }
-
-    if (column > 0) {
-      result.push(index - 1);
-    }
-
-    if (
-      column <
-      dimensions.columns - 1
-    ) {
-      result.push(index + 1);
-    }
-
-    return result;
-  }
-
-  function moveObject(
-    fromIndex: number,
-    toIndex: number
-  ) {
-    const adjacent =
-      getAdjacentCells(fromIndex);
-
-    if (!adjacent.includes(toIndex)) {
+  function moveObject(fromIndex: number, toIndex: number) {
+    if (!areAdjacent(fromIndex, toIndex)) {
       return;
     }
 
-    swapObjects(
-      fromIndex,
-      toIndex
-    );
+    swapObjects(fromIndex, toIndex);
+  }
+
+  function handleCellClick(index: number) {
+    if (board[index].object) {
+      removeObject(index);
+    } else {
+      placeObject(index);
+    }
   }
 
   return (
     <div
-      className="grid gap-2"
+      className="grid"
       style={{
-        gridTemplateColumns:
-          `repeat(${dimensions.columns}, minmax(0, 1fr))`,
+        width: `${width}px`,
+        gridTemplateColumns: `repeat(${dimensions.columns}, minmax(0, 1fr))`,
+        gridTemplateRows: `repeat(${dimensions.rows}, minmax(0, 1fr))`,
       }}
     >
       {board.map((cell) => (
         <button
-          type="button"
           key={cell.index}
-          className="relative aspect-square rounded-md border-2 border-slate-500 bg-slate-100 p-1"
-          onClick={() => {
-            if (cell.object) {
-              removeObject(cell.index);
-            } else {
-              placeObject(cell.index);
-            }
-          }}
+          onClick={() => handleCellClick(cell.index)}
+          className="relative aspect-square min-w-0 border-2 border-slate-500 bg-slate-100 p-1"
         >
-          {cell.object && ( 
-            <> 
-            <ObjectRenderer 
-              object={cell.object} 
-              /> 
+          {cell.object && (
+            <>
+              <ObjectRenderer object={cell.object} />
 
-            <ObjectOverlay 
-              color={cell.object.color} 
-              opacity={0.25} 
-              /> 
-            </> 
-            )}
+              <ObjectOverlay
+                color={cell.object.color}
+                opacity={0.25}
+              />
+            </>
+          )}
         </button>
       ))}
     </div>
