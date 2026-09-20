@@ -289,7 +289,7 @@ export function Navigation({
         border-b-4 border-rose-400
         divide-solid divide-rose-500
         transition-transform duration-300
-        ${isVisible ? "translate-y-0" : "-translate-y-full"}
+        ${isVisible ? "translate-y-1/3" : "-translate-y-full"}
       `}
     >
       <label className="flex items-center gap-2">
