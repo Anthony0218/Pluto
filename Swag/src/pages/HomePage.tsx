@@ -47,6 +47,13 @@ const games: Game[] = [
 ];
 export const gameList = [
   {
+    name: "Medieval Kingdoms",
+    description: "A turn based strategy game in medieval style.",
+    route: "/games/medieval-kingdoms",
+    category: "Strategie",
+    image: "/images/chess-game-icon.png",
+  },
+  {
     name: "Schach",
     description:
       "Klassisches Schach gegen Freunde, lokal oder gegen Stockfish.",

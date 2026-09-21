@@ -139,6 +139,8 @@ import {
 import GamesPage from "./pages/GamesPage.tsx";
 import ProfilePage from "./pages/ProfilePage.tsx";
 import { WattenThreePlayerMultiplayerGame } from "./components/WattenThreePlayerMultiplayer.tsx";
+import MedievalKingdomsWorldPage from "./pages/MedievalKingdoms/MedievalKingdomsWorldPage.tsx";
+import MedievalKingdomsBattlePage from "./pages/MedievalKingdoms/MedievalKingdomsBattlePage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -528,6 +530,14 @@ const router = createBrowserRouter([
       {
         path: "/games/chess/variants/mutation/multiplayer/:roomCode",
         element: <MutationMultiplayerGame />,
+      },
+      {
+        path: "/games/medieval-kingdoms",
+        element: <MedievalKingdomsWorldPage />,
+      },
+      {
+        path: "/games/medieval-kingdoms/battle/:battleId",
+        element: <MedievalKingdomsBattlePage />,
       },
     ],
   },
