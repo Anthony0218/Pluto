@@ -48,6 +48,17 @@ export const games: Game[] = [
     features: ["Rundenbasiert", "Taktik", "Mittelalter"],
     finished: false,
   },
+  {
+    title: "Schach 3D",
+    subtitle: "Schach in einer neuen Dimension",
+    description:
+      "Erlebe klassisches Schach auf einem animierten 3D-Brett – lokal im Hotseat oder gegen Stockfish mit mehreren Schwierigkeitsstufen.",
+    image: "/images/chess3d.png",
+    route: "/games/chess/3dchess",
+    tag: "Strategie · 3D",
+    features: ["3D-Brett", "Hotseat", "Stockfish AI"],
+    finished: true,
+  },
 ];
 export const gameList = [
   {
@@ -76,6 +87,16 @@ export const gameList = [
     category: "Strategie",
     image: "/images/medieval-kingdoms-icon.png",
     finished: false,
+  },
+
+  {
+    name: "Schach 3D",
+    description:
+      "Klassisches Schach als interaktives 3D-Erlebnis – lokal im Hotseat oder gegen Stockfish.",
+    route: "/games/chess/3dchess",
+    category: "Strategie · 3D",
+    image: "/images/chess3d-icon.png",
+    finished: true,
   },
 ];
 export default function HomePage() {

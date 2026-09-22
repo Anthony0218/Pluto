@@ -885,7 +885,7 @@ export default function ChessComputerBoard({
       const { data, error } = await supabase
         .from("profiles")
         .select("avatar_id")
-        .eq("id", user.id)
+        .eq("id", user?.id)
         .maybeSingle();
 
       if (error) {
