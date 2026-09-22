@@ -128,7 +128,7 @@ const translations: TranslationTable = {
     Skips: "Übersprungen",
     "Checks by shift": "Schachs durch Shift",
     Rulebook: "Regelbuch",
-    "Every 4 normal plies, the side whose turn comes next gets a Tectonic Shift instead of a normal move.":
+    "Every 4 normal plies, the side whose turn comes next gets a Tectonic Shift before its normal move.":
       "Alle 4 normalen Halbzüge erhält die Seite, die als Nächstes am Zug wäre, einen Tectonic Shift statt eines normalen Zuges.",
     "A shift rotates one 4×4 quadrant 90° clockwise.":
       "Ein Shift dreht einen 4×4-Quadranten um 90° im Uhrzeigersinn.",
@@ -202,7 +202,7 @@ const translations: TranslationTable = {
     Skips: "건너뜀",
     "Checks by shift": "시프트 체크",
     Rulebook: "규칙서",
-    "Every 4 normal plies, the side whose turn comes next gets a Tectonic Shift instead of a normal move.":
+    "Every 4 normal plies, the side whose turn comes next gets a Tectonic Shift before its normal move.":
       "일반 하프무브 4회마다 다음 차례의 플레이어는 일반 수 대신 텍토닉 시프트를 수행합니다.",
     "A shift rotates one 4×4 quadrant 90° clockwise.":
       "시프트는 4×4 사분면 하나를 시계 방향으로 90° 회전시킵니다.",
@@ -261,7 +261,7 @@ const translations: TranslationTable = {
     Skips: "Пропуски",
     "Checks by shift": "Шахи сдвигом",
     Rulebook: "Правила",
-    "Every 4 normal plies, the side whose turn comes next gets a Tectonic Shift instead of a normal move.":
+    "Every 4 normal plies, the side whose turn comes next gets a Tectonic Shift before its normal move.":
       "После каждых 4 обычных полуходов сторона, чей ход следующий, выполняет тектонический сдвиг вместо обычного хода.",
     "A shift rotates one 4×4 quadrant 90° clockwise.":
       "Сдвиг поворачивает один квадрант 4×4 на 90° по часовой стрелке.",
@@ -301,46 +301,72 @@ function getFinish(
   state: TectonicState,
   repetitionKeys: string[],
 ): FinishedGame {
-  if (game.isCheckmate()) {
-    return {
-      winner: game.turn() === "w" ? "black" : "white",
-      reason: "checkmate",
-    };
-  }
+  /*
+   * A derived Tectonic position should already be sanitized by the
+   * shared rules module. Keep result evaluation guarded as a final
+   * safety net so a chess.js move-generation exception cannot freeze AI.
+   */
+  try {
+    if (state.pendingShift) {
+      if (isTectonicLockedOut(game, state)) {
+        return {
+          winner: game.turn() === "w" ? "black" : "white",
+          reason: "tectonic_lock",
+        };
+      }
 
-  if (isTectonicLockedOut(game, state)) {
-    return {
-      winner: game.turn() === "w" ? "black" : "white",
-      reason: "tectonic_lock",
-    };
-  }
+      if (isThreefoldTectonic(repetitionKeys)) {
+        return {
+          winner: "draw",
+          reason: "repetition",
+        };
+      }
 
-  if (game.isStalemate()) {
-    return {
-      winner: "draw",
-      reason: "stalemate",
-    };
-  }
+      return null;
+    }
 
-  if (game.isInsufficientMaterial()) {
-    return {
-      winner: "draw",
-      reason: "insufficient",
-    };
-  }
+    if (game.isCheckmate()) {
+      return {
+        winner: game.turn() === "w" ? "black" : "white",
+        reason: "checkmate",
+      };
+    }
 
-  if (game.isDrawByFiftyMoves()) {
-    return {
-      winner: "draw",
-      reason: "fifty",
-    };
-  }
+    if (game.isStalemate()) {
+      return {
+        winner: "draw",
+        reason: "stalemate",
+      };
+    }
 
-  if (isThreefoldTectonic(repetitionKeys)) {
-    return {
-      winner: "draw",
-      reason: "repetition",
-    };
+    if (game.isInsufficientMaterial()) {
+      return {
+        winner: "draw",
+        reason: "insufficient",
+      };
+    }
+
+    if (game.isDrawByFiftyMoves()) {
+      return {
+        winner: "draw",
+        reason: "fifty",
+      };
+    }
+
+    if (isThreefoldTectonic(repetitionKeys)) {
+      return {
+        winner: "draw",
+        reason: "repetition",
+      };
+    }
+  } catch (error) {
+    console.error("Tectonic finish evaluation failed", {
+      fen: game.fen(),
+      state,
+      error,
+    });
+
+    return null;
   }
 
   return null;
@@ -596,6 +622,9 @@ export default function TectonicChess({
   const pliesUntilShift = tectonic.pendingShift
     ? 0
     : Math.max(0, TECTONIC_PLIES_PER_SHIFT - tectonic.normalPliesSinceShift);
+
+  const moveAfterSkippedShift =
+    !tectonic.pendingShift && tectonic.consecutiveShiftSkips > 0;
 
   const shiftHistory = history.filter((entry) => entry.kind === "shift");
 
@@ -951,9 +980,11 @@ export default function TectonicChess({
                 >
                   {tectonic.pendingShift
                     ? `${t("TECTONIC SHIFT")} · ${shifterName}`
-                    : game.turn() === "w"
-                      ? t("White to move")
-                      : t("Black to move")}
+                    : moveAfterSkippedShift
+                      ? `${shifterName} · normal move after skip`
+                      : game.turn() === "w"
+                        ? t("White to move")
+                        : t("Black to move")}
                 </div>
               )}
             </div>

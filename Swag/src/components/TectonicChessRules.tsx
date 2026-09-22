@@ -273,7 +273,6 @@ const translations: TranslationTable = {
 
 export default function TectonicChessRules() {
   const { language, setLanguage } = useChessLanguage();
-
   const t = (key: string) => translateChess(language, key, translations);
 
   return (
@@ -286,7 +285,7 @@ export default function TectonicChessRules() {
       backRoute="/games/chess/variants/tectonic/hotseat"
       backLabel={t("Back to Tectonic Chess")}
       coreIdea={t(
-        "Every four normal plies, the next player does not make a normal chess move. Instead, that player receives a Tectonic Shift and may rotate one legal 4×4 quadrant 90° clockwise or skip.",
+        "Every four normal plies, the next side receives a Tectonic Shift before its normal move. It may rotate one legal 4×4 quadrant 90° clockwise or Skip. A rotation consumes the special action and passes the turn; a Skip keeps the player's normal chess move.",
       )}
       language={language}
       onLanguageChange={setLanguage}
@@ -302,15 +301,15 @@ export default function TectonicChessRules() {
         },
         {
           icon: "↻",
-          title: t("Special turn"),
-          text: t("A Tectonic Shift replaces that player's normal move."),
+          title: t("Shift before the normal move"),
+          text: t(
+            "After four normal plies, the next side must resolve its Tectonic Shift first.",
+          ),
         },
         {
-          icon: "♜",
-          title: t("Strategic geometry"),
-          text: t(
-            "Pieces keep their identity but may suddenly occupy completely different squares.",
-          ),
+          icon: "⏭",
+          title: t("Skip keeps your move"),
+          text: t("Skipping does not consume the player's normal chess move."),
         },
       ]}
       rules={[
@@ -323,86 +322,93 @@ export default function TectonicChessRules() {
         },
         {
           icon: "4",
-          title: t("A shift happens after 4 normal plies"),
+          title: t("A shift opportunity appears after 4 normal plies"),
           text: t(
-            "Only ordinary chess moves count toward the four-ply timer. Tectonic Shifts themselves do not count.",
-          ),
-        },
-        {
-          icon: "↻",
-          title: t("The next side gets the Shift instead of a move"),
-          text: t(
-            "After the fourth normal ply, the side that would move next enters Tectonic Shift mode. Rotating or skipping consumes that special turn and play passes to the opponent.",
+            "Only ordinary chess moves count toward the four-ply timer. Tectonic Shift actions themselves do not count as normal plies.",
           ),
         },
         {
           icon: "90°",
-          title: t("Rotate exactly one quadrant 90° clockwise"),
+          title: t("A rotation turns one quadrant 90° clockwise"),
           text: t(
-            "Every piece inside the chosen 4×4 quadrant moves with the rotation. No piece is captured by the rotation itself.",
+            "Every piece inside the chosen 4×4 quadrant moves with the board. No piece is captured merely because of the rotation.",
+          ),
+        },
+        {
+          icon: "→",
+          title: t("A real rotation consumes the special action"),
+          text: t(
+            "After a legal quadrant rotation, the side to move changes immediately to the opponent and the normal four-ply counter resets.",
+          ),
+        },
+        {
+          icon: "⏭",
+          title: t("Skip does not consume the normal chess move"),
+          text: t(
+            "If your King is not in check, you may Skip. The board and side to move remain unchanged, so you then make your normal chess move.",
+          ),
+        },
+        {
+          icon: "1→2",
+          title: t("After the first Skip, the opponent gets a Shift"),
+          text: t(
+            "When the first skipping player makes the following normal move, the opponent receives an immediate Tectonic Shift opportunity before their normal move.",
+          ),
+        },
+        {
+          icon: "2→0",
+          title: t("Two consecutive Skips end the special sequence"),
+          text: t(
+            "If the opponent also Skips, they still make their normal chess move. After that move the skip chain ends and the normal four-ply counter restarts from zero.",
           ),
         },
         {
           icon: "♔",
           title: t("Your own King must remain safe"),
           text: t(
-            "A quadrant is illegal if rotating it leaves your own King in check. Illegal quadrants are disabled in the interface.",
-          ),
-        },
-        {
-          icon: "+",
-          title: t("A shift may create check or checkmate"),
-          text: t(
-            "After the shift, the opponent is the next side to act. Therefore a rotation may directly give check or even checkmate.",
-          ),
-        },
-        {
-          icon: "🔒",
-          title: t("The previous quadrant is locked once"),
-          text: t(
-            "The quadrant used by the previous rotation cannot be used on the immediately following Tectonic Shift. A skipped Shift clears that lock.",
-          ),
-        },
-        {
-          icon: "⏭",
-          title: t("Skip is normally allowed"),
-          text: t(
-            "If your King is not in check, you may Skip instead of rotating. Skip still consumes the Tectonic Shift turn.",
+            "A quadrant is illegal if rotating it leaves your own King in check. Unsafe rotations are disabled.",
           ),
         },
         {
           icon: "!",
-          title: t("Check changes the Shift"),
+          title: t("Skip is forbidden while your King is in check"),
           text: t(
-            "If your King is already in check when Tectonic Shift mode begins, Skip is disabled. You must find a legal quadrant rotation that makes your King safe. If none exists, you lose by Tectonic Lock.",
+            "If Tectonic Shift mode begins while your King is checked, you must use a legal rotation that makes the King safe. If none exists, you lose by Tectonic Lock.",
+          ),
+        },
+        {
+          icon: "🔒",
+          title: t("The previous rotated quadrant is locked once"),
+          text: t(
+            "The quadrant used by the previous real rotation cannot be rotated again on the immediately following Shift. A Skip clears that one-shift lock.",
           ),
         },
         {
           icon: "♙",
           title: t("Pawns keep their original direction"),
           text: t(
-            "A rotation may move a Pawn sideways or even onto a very unusual rank, but White Pawns still move toward rank 8 and Black Pawns toward rank 1.",
+            "A rotation may relocate Pawns to unusual files or ranks, but White Pawns still move toward rank 8 and Black Pawns toward rank 1.",
           ),
         },
         {
           icon: "♕",
           title: t("Rotation alone does not promote a Pawn"),
           text: t(
-            "Promotion happens only when a Pawn completes a normal chess move onto its promotion rank.",
+            "Promotion occurs only when a Pawn completes a normal chess move onto its promotion rank.",
           ),
         },
         {
           icon: "♖",
-          title: t("Castling rights can be destroyed by the board"),
+          title: t("Castling rights follow the rotated position"),
           text: t(
-            "If a King or an eligible Rook is physically relocated by a Tectonic rotation, the corresponding castling right is permanently removed.",
+            "After a rotation, a castling right survives only if the eligible King and Rook are still physically on the required home squares. Otherwise that right is removed.",
           ),
         },
         {
           icon: "♟",
           title: t("Normal chess endings remain active"),
           text: t(
-            "Checkmate, stalemate, insufficient material, the 50-move rule and repetition can still end the game. Tectonic repetition also includes the current quadrant lock and Shift timer.",
+            "Checkmate, stalemate, insufficient material, the 50-move rule and repetition can still end the game. Tectonic repetition also includes Shift state such as locks and the skip chain.",
           ),
         },
       ]}
@@ -410,26 +416,44 @@ export default function TectonicChessRules() {
       <VisualCard
         accent="violet"
         eyebrow={t("Example")}
-        title={t("How one cycle works")}
+        title={t("First Skip sequence")}
       >
         <Flow
           steps={[
+            { icon: "×4", label: t("Four normal plies") },
+            {
+              icon: "⏭",
+              label: t("White Skips"),
+              detail: t("White still keeps the normal move."),
+            },
             {
               icon: "♙",
-              label: t("White move"),
-            },
-            {
-              icon: "♟",
-              label: t("Black move"),
-            },
-            {
-              icon: "×4",
-              label: t("Four normal plies"),
+              label: t("White moves"),
+              detail: t("Black now receives a Shift."),
             },
             {
               icon: "↻",
-              label: t("Next side shifts"),
-              detail: t("Rotate or Skip, then turn passes."),
+              label: t("Black resolves Shift"),
+              detail: t("Rotate, or Skip and still make Black's normal move."),
+            },
+          ]}
+        />
+      </VisualCard>
+
+      <VisualCard
+        accent="violet"
+        eyebrow={t("Example")}
+        title={t("If both players Skip")}
+      >
+        <Flow
+          steps={[
+            { icon: "⏭", label: t("White Skip") },
+            { icon: "♙", label: t("White normal move") },
+            { icon: "⏭", label: t("Black Skip") },
+            {
+              icon: "♟",
+              label: t("Black normal move"),
+              detail: t("Skip chain ends; counter resets to 0."),
             },
           ]}
         />
@@ -453,21 +477,21 @@ export default function TectonicChessRules() {
               icon: "♔",
               title: t("Move a King"),
               text: t(
-                "A King inside the quadrant moves with the board, as long as the resulting square is safe.",
+                "A King inside the quadrant moves with the board if the resulting position is legal.",
               ),
             },
             {
               icon: "♙",
               title: t("Rebuild pawn structure"),
               text: t(
-                "Pawns may be rotated onto files and ranks they could never reach through normal Pawn movement alone.",
+                "Pawns may be rotated onto files and ranks unreachable by ordinary Pawn movement.",
               ),
             },
             {
               icon: "+",
               title: t("Create a direct check"),
               text: t(
-                "Because the opponent moves next after the Shift, a newly opened attack is immediately real.",
+                "A real rotation passes play to the opponent, so an opened attack can immediately give check.",
               ),
             },
           ]}

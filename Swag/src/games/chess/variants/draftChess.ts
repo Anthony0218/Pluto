@@ -557,7 +557,15 @@ export function validateDraftStartPosition(state: DraftSetupState): {
      * Keep chess.js validation as a second layer:
      * this catches things such as illegal Pawn placement on rank 1/8.
      */
-    new Chess(fen);
+    /*
+     * Draft Chess deliberately allows unusual starting formations.
+     * We already validated the variant-specific requirements above,
+     * especially that neither King starts in check.
+     *
+     * Load with skipValidation so standard-chess start-position rules
+     * do not reject an otherwise legal Draft setup.
+     */
+    new Chess(fen, { skipValidation: true });
 
     return {
       ok: true,

@@ -13,7 +13,7 @@ type Game = {
   features: string[];
 };
 
-const games: Game[] = [
+export const games: Game[] = [
   {
     title: "Schach",
     subtitle: "Klassische Strategie",
@@ -47,13 +47,6 @@ const games: Game[] = [
 ];
 export const gameList = [
   {
-    name: "Medieval Kingdoms",
-    description: "A turn based strategy game in medieval style.",
-    route: "/games/medieval-kingdoms",
-    category: "Strategie",
-    image: "/images/chess-game-icon.png",
-  },
-  {
     name: "Schach",
     description:
       "Klassisches Schach gegen Freunde, lokal oder gegen Stockfish.",
@@ -61,21 +54,7 @@ export const gameList = [
     category: "Strategie",
     image: "/images/chess-game-icon.png",
   },
-  {
-    name: "Schach Varianten",
-    description:
-      "Entdecke neue Schachregeln wie Mutation, Horror, Roulette und viele weitere.",
-    route: "/games/chess/variants",
-    category: "Varianten",
-    image: "/images/chess-game-icon.png",
-  },
-  {
-    name: "Schach Multiplayer",
-    description: "Spiele klassisches Schach online gegen andere Spieler.",
-    route: "/games/chess/multiplayer",
-    category: "Online",
-    image: "/images/chess-game-icon.png",
-  },
+
   {
     name: "Watten",
     description: "Das traditionelle bayerische Kartenspiel.",
@@ -83,12 +62,13 @@ export const gameList = [
     category: "Kartenspiel",
     image: "/images/watten-game-icon.png",
   },
+
   {
-    name: "Watten Multiplayer",
-    description: "Spiele Watten online gemeinsam mit anderen Spielern.",
-    route: "/games/watten/multiplayer",
-    category: "Online",
-    image: "/images/watten-game-icon.png",
+    name: "Medieval Kingdoms",
+    description: "A turn based strategy game in medieval style.",
+    route: "/games/medieval-kingdoms",
+    category: "Strategie",
+    image: "/images/chess-game-icon.png",
   },
 ];
 export default function HomePage() {

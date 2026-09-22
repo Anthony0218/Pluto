@@ -37,10 +37,12 @@ import {
   findCollapseKingSquare,
   getCollapseChessOutcome,
   isSquareInsideCollapseBounds,
+  isSquarePlayableForCollapse,
   isThreefoldCollapse,
   type CollapseDestroyedPiece,
   type CollapseKingLives,
   type CollapseKingRelocation,
+  type CollapseMode,
   type CollapseOutcome,
   type CollapseSide,
   type CollapseState,
@@ -361,6 +363,12 @@ function collapseStatusText(
   state: CollapseState,
   t: (key: string) => string,
 ): string {
+  if (state.mode === "squares") {
+    const half = state.nextSquareHalf === "lower" ? "ranks 1–4" : "ranks 5–8";
+
+    return `Next square in ${state.movesUntilWarning} · ${half}`;
+  }
+
   if (collapseCoreReached(state.bounds)) return t("Central core reached");
   if (state.warningEdge)
     return `${t(collapseEdgeLabel(state.warningEdge))} ${t("collapses in")} ${state.warningMovesRemaining}`;
@@ -401,8 +409,10 @@ export default function ChessCollapseBoard({
   const [whitePlayer, setWhitePlayer] = useState("");
   const [blackPlayer, setBlackPlayer] = useState("");
 
+  const [collapseMode, setCollapseMode] = useState<CollapseMode>("squares");
+
   const [collapse, setCollapse] = useState<CollapseState>(() =>
-    createInitialCollapseState(),
+    createInitialCollapseState(undefined, "squares"),
   );
 
   const [kingLives, setKingLives] = useState<CollapseKingLives>(() =>
@@ -446,7 +456,7 @@ export default function ChessCollapseBoard({
     const allowedMoves = game
       .moves({ verbose: true })
       .filter((move) =>
-        isSquareInsideCollapseBounds(move.to as Square, collapse.bounds),
+        isSquarePlayableForCollapse(move.to as Square, collapse),
       )
       .map((move) => `${move.from}${move.to}${move.promotion ?? ""}`);
 
@@ -565,7 +575,7 @@ export default function ChessCollapseBoard({
   function selectPiece(square: Square) {
     if (historyPreview || finishedGame || pendingPromotion || flipPending)
       return;
-    if (!isSquareInsideCollapseBounds(square, collapse.bounds)) return;
+    if (!isSquarePlayableForCollapse(square, collapse)) return;
 
     const piece = game.get(square);
 
@@ -579,6 +589,7 @@ export default function ChessCollapseBoard({
         to: move.to as Square,
       })),
       collapse.bounds,
+      collapse.collapsedSquares,
     );
 
     setSelectedSquare(square);
@@ -607,6 +618,7 @@ export default function ChessCollapseBoard({
     const outcome = getCollapseChessOutcome(
       candidateGame,
       candidateCollapse.bounds,
+      candidateCollapse.collapsedSquares,
     );
 
     if (outcome) {
@@ -637,7 +649,7 @@ export default function ChessCollapseBoard({
     promotion?: PromotionPiece,
   ): boolean {
     if (finishedGame || historyPreview) return false;
-    if (!isSquareInsideCollapseBounds(to, collapse.bounds)) return false;
+    if (!isSquarePlayableForCollapse(to, collapse)) return false;
 
     const nextGame = new Chess(game.fen());
 
@@ -752,7 +764,7 @@ export default function ChessCollapseBoard({
 
     const square = getSquareName(row, column);
 
-    if (!isSquareInsideCollapseBounds(square, collapse.bounds)) {
+    if (!isSquarePlayableForCollapse(square, collapse)) {
       clearSelection();
       return;
     }
@@ -804,6 +816,7 @@ export default function ChessCollapseBoard({
     setGame(restoredGame);
     snapToSide(restoredGame.turn());
     setCollapse(cloneCollapseState(snapshot.collapse));
+    setCollapseMode(snapshot.collapse.mode ?? "rows");
     setKingLives(cloneCollapseLives(snapshot.lives));
     setLastMove(snapshot.lastMove);
     setCapturedWhite([...snapshot.capturedWhite]);
@@ -816,9 +829,32 @@ export default function ChessCollapseBoard({
     clearSelection();
   }
 
+  function changeCollapseMode(mode: CollapseMode) {
+    if (history.length > 0 || mode === collapseMode) return;
+
+    const freshGame = new Chess();
+    const freshCollapse = createInitialCollapseState(undefined, mode);
+
+    setCollapseMode(mode);
+    setGame(freshGame);
+    snapToSide(freshGame.turn());
+    setCollapse(freshCollapse);
+    setKingLives(createInitialCollapseLives());
+    setSelectedSquare(null);
+    setLegalMoves([]);
+    setLastMove(null);
+    setPendingPromotion(null);
+    setFinishedGame(null);
+    setCapturedWhite([]);
+    setCapturedBlack([]);
+    setHistory([]);
+    setHistoryPreviewPly(null);
+    setUndoStack([]);
+  }
+
   function restartGame() {
     const freshGame = new Chess();
-    const freshCollapse = createInitialCollapseState();
+    const freshCollapse = createInitialCollapseState(undefined, collapseMode);
 
     setGame(freshGame);
     snapToSide(freshGame.turn());
@@ -952,6 +988,34 @@ export default function ChessCollapseBoard({
                 </div>
 
                 <div className="space-y-3">
+                  <div>
+                    <p className="mb-2 text-[10px] font-black uppercase tracking-wider text-zinc-500">
+                      Collapse mode
+                    </p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {(
+                        [
+                          ["squares", "Standard Squares"],
+                          ["rows", "Classic Rows"],
+                        ] as const
+                      ).map(([mode, label]) => (
+                        <button
+                          key={mode}
+                          type="button"
+                          onClick={() => changeCollapseMode(mode)}
+                          disabled={history.length > 0}
+                          className={`rounded-xl border px-3 py-2.5 text-[11px] font-black transition disabled:cursor-not-allowed disabled:opacity-40 ${
+                            collapseMode === mode
+                              ? "border-red-300/30 bg-red-400/10 text-red-100"
+                              : "border-white/10 bg-black/20 text-zinc-500 hover:bg-white/5"
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-2 gap-2 pt-1">
                     <button
                       type="button"
@@ -1271,7 +1335,33 @@ export default function ChessCollapseBoard({
                   </span>
                 </div>
 
-                {collapseCoreReached(displayedCollapse.bounds) ? (
+                {displayedCollapse.mode === "squares" ? (
+                  <div className="rounded-2xl border border-red-300/15 bg-red-400/[0.05] p-4">
+                    <p className="text-xs font-black uppercase tracking-widest text-red-300">
+                      Standard Squares
+                    </p>
+                    <div className="mt-3 flex items-end justify-between gap-4">
+                      <div>
+                        <p className="text-sm font-black text-white">
+                          Next:{" "}
+                          {displayedCollapse.nextSquareHalf === "lower"
+                            ? "ranks 1–4"
+                            : "ranks 5–8"}
+                        </p>
+                        <p className="mt-1 text-[10px] text-zinc-600">
+                          One non-king square disappears every 3 moves.
+                        </p>
+                      </div>
+                      <span className="text-4xl font-black leading-none text-red-200">
+                        {displayedCollapse.movesUntilWarning}
+                      </span>
+                    </div>
+                    <p className="mt-3 text-[10px] text-zinc-600">
+                      Dead squares cannot be entered and kings are never
+                      selected.
+                    </p>
+                  </div>
+                ) : collapseCoreReached(displayedCollapse.bounds) ? (
                   <div className="rounded-2xl border border-emerald-300/15 bg-emerald-400/[0.05] p-4">
                     <p className="text-xs font-black uppercase tracking-widest text-emerald-300">
                       {t("Core reached")}

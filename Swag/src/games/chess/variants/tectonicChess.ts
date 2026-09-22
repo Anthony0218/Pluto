@@ -1,9 +1,4 @@
-import {
-  Chess,
-  type Color,
-  type PieceSymbol,
-  type Square,
-} from "chess.js";
+import { Chess, type Color, type PieceSymbol, type Square } from "chess.js";
 
 export type TectonicQuadrant = "A" | "B" | "C" | "D";
 export type TectonicSide = "w" | "b";
@@ -16,6 +11,7 @@ export type TectonicState = {
   lastShiftQuadrant: TectonicQuadrant | null;
   lastShiftSquares: Square[];
   skippedLastShift: boolean;
+  consecutiveShiftSkips: number;
 };
 
 export type TectonicShiftResult = {
@@ -31,12 +27,7 @@ type ChessPiece = {
 
 export const TECTONIC_PLIES_PER_SHIFT = 4;
 
-export const TECTONIC_QUADRANTS: TectonicQuadrant[] = [
-  "A",
-  "B",
-  "C",
-  "D",
-];
+export const TECTONIC_QUADRANTS: TectonicQuadrant[] = ["A", "B", "C", "D"];
 
 const FILES = "abcdefgh";
 
@@ -59,21 +50,18 @@ export function createInitialTectonicState(): TectonicState {
     lastShiftQuadrant: null,
     lastShiftSquares: [],
     skippedLastShift: false,
+    consecutiveShiftSkips: 0,
   };
 }
 
-export function cloneTectonicState(
-  state: TectonicState,
-): TectonicState {
+export function cloneTectonicState(state: TectonicState): TectonicState {
   return {
     ...state,
     lastShiftSquares: [...state.lastShiftSquares],
   };
 }
 
-export function quadrantLabel(
-  quadrant: TectonicQuadrant,
-): string {
+export function quadrantLabel(quadrant: TectonicQuadrant): string {
   switch (quadrant) {
     case "A":
       return "A · a5–d8";
@@ -86,23 +74,14 @@ export function quadrantLabel(
   }
 }
 
-export function getQuadrantSquares(
-  quadrant: TectonicQuadrant,
-): Square[] {
-  const { row: startRow, column: startColumn } =
-    quadrantStarts[quadrant];
+export function getQuadrantSquares(quadrant: TectonicQuadrant): Square[] {
+  const { row: startRow, column: startColumn } = quadrantStarts[quadrant];
 
   const squares: Square[] = [];
 
   for (let row = startRow; row < startRow + 4; row += 1) {
-    for (
-      let column = startColumn;
-      column < startColumn + 4;
-      column += 1
-    ) {
-      squares.push(
-        `${FILES[column]}${8 - row}` as Square,
-      );
+    for (let column = startColumn; column < startColumn + 4; column += 1) {
+      squares.push(`${FILES[column]}${8 - row}` as Square);
     }
   }
 
@@ -116,16 +95,46 @@ export function advanceTectonicAfterNormalMove(
     return cloneTectonicState(state);
   }
 
+  /*
+   * First skipped shift:
+   * the same player still makes a normal chess move. After that move,
+   * the opponent receives the Tectonic Shift opportunity.
+   */
+  if (state.consecutiveShiftSkips === 1) {
+    return {
+      ...cloneTectonicState(state),
+      normalPliesSinceShift: TECTONIC_PLIES_PER_SHIFT,
+      pendingShift: true,
+      lastShiftQuadrant: null,
+      lastShiftSquares: [],
+      skippedLastShift: true,
+    };
+  }
+
+  /*
+   * Second consecutive skipped shift:
+   * that player also gets their normal chess move. Once it is completed,
+   * the special shift sequence is over and the normal 4-ply counter
+   * starts again for the next player.
+   */
+  if (state.consecutiveShiftSkips >= 2) {
+    return {
+      ...cloneTectonicState(state),
+      normalPliesSinceShift: 0,
+      pendingShift: false,
+      consecutiveShiftSkips: 0,
+      lastShiftQuadrant: null,
+      lastShiftSquares: [],
+      skippedLastShift: true,
+    };
+  }
+
   const nextCount = state.normalPliesSinceShift + 1;
 
   return {
     ...cloneTectonicState(state),
-    normalPliesSinceShift: Math.min(
-      TECTONIC_PLIES_PER_SHIFT,
-      nextCount,
-    ),
-    pendingShift:
-      nextCount >= TECTONIC_PLIES_PER_SHIFT,
+    normalPliesSinceShift: Math.min(TECTONIC_PLIES_PER_SHIFT, nextCount),
+    pendingShift: nextCount >= TECTONIC_PLIES_PER_SHIFT,
     lastShiftQuadrant: null,
     lastShiftSquares: [],
     skippedLastShift: false,
@@ -133,14 +142,10 @@ export function advanceTectonicAfterNormalMove(
 }
 
 function pieceToFen(piece: ChessPiece): string {
-  return piece.color === "w"
-    ? piece.type.toUpperCase()
-    : piece.type;
+  return piece.color === "w" ? piece.type.toUpperCase() : piece.type;
 }
 
-function boardToFen(
-  board: (ChessPiece | null)[][],
-): string {
+function boardToFen(board: (ChessPiece | null)[][]): string {
   return board
     .map((row) => {
       let empty = 0;
@@ -194,75 +199,102 @@ function rotateBoardClockwise(
   const board = cloneBoard(game.board());
   const source = cloneBoard(game.board());
 
-  const { row: startRow, column: startColumn } =
-    quadrantStarts[quadrant];
+  const { row: startRow, column: startColumn } = quadrantStarts[quadrant];
 
   for (let localRow = 0; localRow < 4; localRow += 1) {
-    for (
-      let localColumn = 0;
-      localColumn < 4;
-      localColumn += 1
-    ) {
-      const piece =
-        source[startRow + localRow][
-          startColumn + localColumn
-        ];
+    for (let localColumn = 0; localColumn < 4; localColumn += 1) {
+      const piece = source[startRow + localRow][startColumn + localColumn];
 
       const targetLocalRow = localColumn;
       const targetLocalColumn = 3 - localRow;
 
-      board[startRow + targetLocalRow][
-        startColumn + targetLocalColumn
-      ] = piece;
+      board[startRow + targetLocalRow][startColumn + targetLocalColumn] = piece;
     }
   }
 
   return board;
 }
 
-function removeCastlingRight(
+function pieceAtBoardSquare(
+  board: (ChessPiece | null)[][],
+  square: Square,
+): ChessPiece | null {
+  const file = FILES.indexOf(square[0]);
+  const rank = Number(square[1]);
+  const row = 8 - rank;
+
+  if (file < 0 || row < 0 || row > 7) {
+    return null;
+  }
+
+  return board[row]?.[file] ?? null;
+}
+
+function hasPieceAt(
+  board: (ChessPiece | null)[][],
+  square: Square,
+  type: PieceSymbol,
+  color: Color,
+): boolean {
+  const piece = pieceAtBoardSquare(board, square);
+
+  return piece?.type === type && piece.color === color;
+}
+
+function castlingAfterRotation(
   castling: string,
-  right: string,
+  rotatedBoard: (ChessPiece | null)[][],
 ): string {
   if (castling === "-") {
     return "-";
   }
 
-  const next = castling.replace(right, "");
+  /*
+   * Never trust a historical castling flag after physically rotating
+   * pieces. chess.js assumes a castling right is backed by the King and
+   * corresponding Rook on their home squares; stale flags can make its
+   * internal move generator enter an invalid state.
+   *
+   * Preserve a right only when:
+   *   1. it already existed before the rotation, and
+   *   2. the required King and Rook are still on the correct home squares
+   *      after the rotation.
+   */
+  let next = "";
+
+  if (
+    castling.includes("K") &&
+    hasPieceAt(rotatedBoard, "e1", "k", "w") &&
+    hasPieceAt(rotatedBoard, "h1", "r", "w")
+  ) {
+    next += "K";
+  }
+
+  if (
+    castling.includes("Q") &&
+    hasPieceAt(rotatedBoard, "e1", "k", "w") &&
+    hasPieceAt(rotatedBoard, "a1", "r", "w")
+  ) {
+    next += "Q";
+  }
+
+  if (
+    castling.includes("k") &&
+    hasPieceAt(rotatedBoard, "e8", "k", "b") &&
+    hasPieceAt(rotatedBoard, "h8", "r", "b")
+  ) {
+    next += "k";
+  }
+
+  if (
+    castling.includes("q") &&
+    hasPieceAt(rotatedBoard, "e8", "k", "b") &&
+    hasPieceAt(rotatedBoard, "a8", "r", "b")
+  ) {
+    next += "q";
+  }
 
   return next || "-";
-}
-
-function castlingAfterRotation(
-  castling: string,
-  quadrant: TectonicQuadrant,
-): string {
-  let next = castling;
-
-  /*
-   * A tectonic rotation physically relocates pieces. If a King or
-   * eligible Rook is inside that rotating quadrant, its original
-   * castling right is permanently lost.
-   */
-  if (quadrant === "A") {
-    next = removeCastlingRight(next, "q");
-  }
-
-  if (quadrant === "B") {
-    next = removeCastlingRight(next, "k");
-    next = removeCastlingRight(next, "q");
-  }
-
-  if (quadrant === "C") {
-    next = removeCastlingRight(next, "Q");
-  }
-
-  if (quadrant === "D") {
-    next = removeCastlingRight(next, "K");
-    next = removeCastlingRight(next, "Q");
-  }
-
-  return next;
 }
 
 function buildRotatedFen(
@@ -273,15 +305,9 @@ function buildRotatedFen(
   const fields = game.fen().split(" ");
 
   const currentTurn = game.turn();
-  const rotatedBoard = rotateBoardClockwise(
-    game,
-    quadrant,
-  );
+  const rotatedBoard = rotateBoardClockwise(game, quadrant);
 
-  const castling = castlingAfterRotation(
-    fields[2] ?? "-",
-    quadrant,
-  );
+  const castling = castlingAfterRotation(fields[2] ?? "-", rotatedBoard);
 
   const nextTurn: TectonicSide = keepCurrentTurn
     ? currentTurn
@@ -319,36 +345,41 @@ function consumeSkipFen(game: Chess): string {
   const fields = game.fen().split(" ");
   const currentTurn = game.turn();
 
-  fields[1] =
-    currentTurn === "w" ? "b" : "w";
+  fields[1] = currentTurn === "w" ? "b" : "w";
 
   fields[3] = "-";
 
-  fields[4] = String(
-    Number(fields[4] ?? "0") + 1,
-  );
+  fields[4] = String(Number(fields[4] ?? "0") + 1);
 
   if (currentTurn === "b") {
-    fields[5] = String(
-      Number(fields[5] ?? "1") + 1,
-    );
+    fields[5] = String(Number(fields[5] ?? "1") + 1);
   }
 
   return fields.join(" ");
+}
+
+function createSafeTectonicGame(fen: string): Chess | null {
+  try {
+    const game = new Chess(fen, { skipValidation: true });
+
+    /*
+     * Force chess.js to exercise its move generator immediately.
+     * This catches stale/invalid derived state here rather than later in
+     * AI or result evaluation.
+     */
+    game.moves();
+
+    return game;
+  } catch {
+    return null;
+  }
 }
 
 export function getTectonicPreviewGame(
   game: Chess,
   quadrant: TectonicQuadrant,
 ): Chess | null {
-  try {
-    return new Chess(
-      buildRotatedFen(game, quadrant, true),
-      { skipValidation: true },
-    );
-  } catch {
-    return null;
-  }
+  return createSafeTectonicGame(buildRotatedFen(game, quadrant, true));
 }
 
 export function getTectonicPostShiftPreviewGame(
@@ -356,24 +387,11 @@ export function getTectonicPostShiftPreviewGame(
   state: TectonicState,
   quadrant: TectonicQuadrant,
 ): Chess | null {
-  if (
-    !isLegalTectonicRotation(
-      game,
-      state,
-      quadrant,
-    )
-  ) {
+  if (!isLegalTectonicRotation(game, state, quadrant)) {
     return null;
   }
 
-  try {
-    return new Chess(
-      buildRotatedFen(game, quadrant, false),
-      { skipValidation: true },
-    );
-  } catch {
-    return null;
-  }
+  return createSafeTectonicGame(buildRotatedFen(game, quadrant, false));
 }
 
 export function isLegalTectonicRotation(
@@ -389,10 +407,7 @@ export function isLegalTectonicRotation(
     return false;
   }
 
-  const preview = getTectonicPreviewGame(
-    game,
-    quadrant,
-  );
+  const preview = getTectonicPreviewGame(game, quadrant);
 
   if (!preview) {
     return false;
@@ -411,11 +426,7 @@ export function getLegalTectonicQuadrants(
   state: TectonicState,
 ): TectonicQuadrant[] {
   return TECTONIC_QUADRANTS.filter((quadrant) =>
-    isLegalTectonicRotation(
-      game,
-      state,
-      quadrant,
-    ),
+    isLegalTectonicRotation(game, state, quadrant),
   );
 }
 
@@ -423,10 +434,7 @@ export function canSkipTectonicShift(
   game: Chess,
   state: TectonicState,
 ): boolean {
-  return (
-    state.pendingShift &&
-    !game.isCheck()
-  );
+  return state.pendingShift && !game.isCheck();
 }
 
 export function isTectonicLockedOut(
@@ -441,12 +449,7 @@ export function isTectonicLockedOut(
     return false;
   }
 
-  return (
-    getLegalTectonicQuadrants(
-      game,
-      state,
-    ).length === 0
-  );
+  return getLegalTectonicQuadrants(game, state).length === 0;
 }
 
 export function applyTectonicShift(
@@ -465,21 +468,32 @@ export function applyTectonicShift(
       return null;
     }
 
-    const nextGame = new Chess(
-      consumeSkipFen(game),
-      { skipValidation: true },
-    );
+    /*
+     * Skipping the Tectonic Shift no longer consumes the player's
+     * normal chess move. Keep the exact same side to move.
+     *
+     * After the first skip, that player's following normal move hands
+     * a shift opportunity to the opponent.
+     *
+     * After a second consecutive skip, that player's following normal
+     * move ends the special sequence and resets the normal counter.
+     */
+    const nextGame = new Chess(game.fen(), { skipValidation: true });
 
     return {
       game: nextGame,
       quadrant: null,
       state: {
         ...cloneTectonicState(state),
-        normalPliesSinceShift: 0,
+        normalPliesSinceShift: TECTONIC_PLIES_PER_SHIFT,
         pendingShift: false,
         shiftCount: state.shiftCount + 1,
+        consecutiveShiftSkips: Math.min(
+          2,
+          (state.consecutiveShiftSkips ?? 0) + 1,
+        ),
         /*
-         * A skipped shift consumes the one-shift lock.
+         * A skipped shift consumes the one-shift quadrant lock.
          */
         lockedQuadrant: null,
         lastShiftQuadrant: null,
@@ -489,20 +503,17 @@ export function applyTectonicShift(
     };
   }
 
-  if (
-    !isLegalTectonicRotation(
-      game,
-      state,
-      quadrant,
-    )
-  ) {
+  if (!isLegalTectonicRotation(game, state, quadrant)) {
     return null;
   }
 
-  const nextGame = new Chess(
+  const nextGame = createSafeTectonicGame(
     buildRotatedFen(game, quadrant, false),
-    { skipValidation: true },
   );
+
+  if (!nextGame) {
+    return null;
+  }
 
   /*
    * Sanity check: the special turn must really have passed.
@@ -521,9 +532,9 @@ export function applyTectonicShift(
       shiftCount: state.shiftCount + 1,
       lockedQuadrant: quadrant,
       lastShiftQuadrant: quadrant,
-      lastShiftSquares:
-        getQuadrantSquares(quadrant),
+      lastShiftSquares: getQuadrantSquares(quadrant),
       skippedLastShift: false,
+      consecutiveShiftSkips: 0,
     },
   };
 }
@@ -538,13 +549,12 @@ export function tectonicRepetitionKey(
     fenFields.slice(0, 4).join(" "),
     `tectonic:${state.normalPliesSinceShift}`,
     `pending:${state.pendingShift ? 1 : 0}`,
+    `skips:${state.consecutiveShiftSkips ?? 0}`,
     `lock:${state.lockedQuadrant ?? "-"}`,
   ].join("|");
 }
 
-export function isThreefoldTectonic(
-  keys: string[],
-): boolean {
+export function isThreefoldTectonic(keys: string[]): boolean {
   const counts = new Map<string, number>();
 
   for (const key of keys) {
@@ -570,10 +580,7 @@ export function findTectonicKingSquare(
     for (let column = 0; column < 8; column += 1) {
       const piece = board[row][column];
 
-      if (
-        piece?.type === "k" &&
-        piece.color === color
-      ) {
+      if (piece?.type === "k" && piece.color === color) {
         return `${FILES[column]}${8 - row}` as Square;
       }
     }

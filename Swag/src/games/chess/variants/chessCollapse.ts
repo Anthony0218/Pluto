@@ -3,6 +3,8 @@ import { Chess, type Square } from "chess.js";
 export type CollapseSide = "w" | "b";
 export type CollapseOutcome = "white" | "black" | "draw" | null;
 export type CollapseEdge = "left" | "right" | "top" | "bottom";
+export type CollapseMode = "squares" | "rows";
+export type CollapseHalf = "lower" | "upper";
 export type CollapsePieceType = "p" | "n" | "b" | "r" | "q" | "k";
 
 export type CollapseBounds = {
@@ -19,6 +21,8 @@ export type CollapseKingLives = {
 
 export type CollapseState = {
   seed: number;
+  mode: CollapseMode;
+  nextSquareHalf: CollapseHalf;
   bounds: CollapseBounds;
   collapsedSquares: Square[];
   warningEdge: CollapseEdge | null;
@@ -126,9 +130,12 @@ export function createInitialCollapseLives(): CollapseKingLives {
 
 export function createInitialCollapseState(
   seed = createCollapseSeed(),
+  mode: CollapseMode = "squares",
 ): CollapseState {
   return {
     seed,
+    mode,
+    nextSquareHalf: "lower",
     bounds: {
       minFile: 0,
       maxFile: 7,
@@ -139,7 +146,7 @@ export function createInitialCollapseState(
     warningEdge: null,
     warningSquares: [],
     warningMovesRemaining: 0,
-    movesUntilWarning: randomDelay(seed, 0, 0),
+    movesUntilWarning: mode === "squares" ? 3 : randomDelay(seed, 0, 0),
     collapseCount: 0,
     lastImpactSquares: [],
   };
@@ -148,6 +155,8 @@ export function createInitialCollapseState(
 export function cloneCollapseState(state: CollapseState): CollapseState {
   return {
     ...state,
+    mode: state.mode ?? "rows",
+    nextSquareHalf: state.nextSquareHalf ?? "lower",
     bounds: { ...state.bounds },
     collapsedSquares: [...state.collapsedSquares],
     warningSquares: [...state.warningSquares],
@@ -176,11 +185,26 @@ export function isSquareInsideCollapseBounds(
   );
 }
 
+export function isSquarePlayableForCollapse(
+  square: Square,
+  state: Pick<CollapseState, "bounds" | "collapsedSquares">,
+): boolean {
+  return (
+    isSquareInsideCollapseBounds(square, state.bounds) &&
+    !state.collapsedSquares.includes(square)
+  );
+}
+
 export function filterMovesForCollapse<T extends { to: Square }>(
   moves: T[],
   bounds: CollapseBounds,
+  collapsedSquares: Square[] = [],
 ): T[] {
-  return moves.filter((move) => isSquareInsideCollapseBounds(move.to, bounds));
+  return moves.filter(
+    (move) =>
+      isSquareInsideCollapseBounds(move.to, bounds) &&
+      !collapsedSquares.includes(move.to),
+  );
 }
 
 export function getAvailableCollapseEdges(
@@ -620,6 +644,8 @@ function collapseCurrentEdge(
 
   const nextState: CollapseState = {
     seed: state.seed,
+    mode: state.mode,
+    nextSquareHalf: state.nextSquareHalf,
     bounds: nextBounds,
     collapsedSquares: [
       ...state.collapsedSquares,
@@ -653,12 +679,150 @@ function collapseCurrentEdge(
   };
 }
 
+function getStandardSquareCandidates(
+  game: Chess,
+  state: CollapseState,
+): Square[] {
+  const lower = state.nextSquareHalf === "lower";
+  const minRank = lower ? 1 : 5;
+  const maxRank = lower ? 4 : 8;
+  const candidates: Square[] = [];
+
+  for (let rank = minRank; rank <= maxRank; rank += 1) {
+    for (let file = 0; file < 8; file += 1) {
+      const square = `${files[file]}${rank}` as Square;
+
+      if (state.collapsedSquares.includes(square)) continue;
+
+      const piece = game.get(square);
+
+      // A king's square can never disappear in Standard Squares mode.
+      if (piece?.type === "k") continue;
+
+      candidates.push(square);
+    }
+  }
+
+  return candidates;
+}
+
+function chooseStandardCollapseSquare(
+  game: Chess,
+  state: CollapseState,
+  completedPly: number,
+): Square | null {
+  const candidates = getStandardSquareCandidates(game, state);
+
+  if (candidates.length === 0) return null;
+
+  const random = mulberry32(
+    mixSeed(
+      state.seed,
+      state.collapseCount,
+      completedPly,
+      state.nextSquareHalf === "lower" ? 0x14a1 : 0x58b8,
+    ),
+  );
+
+  return candidates[Math.floor(random() * candidates.length)] ?? null;
+}
+
+function collapseStandardSquare(
+  game: Chess,
+  state: CollapseState,
+  lives: CollapseKingLives,
+  completedPly: number,
+): CollapseAdvanceResult {
+  const next = cloneCollapseState(state);
+  next.lastImpactSquares = [];
+
+  const movesRemaining = next.movesUntilWarning - 1;
+
+  if (movesRemaining > 0) {
+    next.movesUntilWarning = movesRemaining;
+
+    return {
+      state: next,
+      lives: cloneCollapseLives(lives),
+      outcome: null,
+      kingHits: [],
+      trappedKings: [],
+      relocatedKings: [],
+      destroyedPieces: [],
+      collapsedNow: [],
+    };
+  }
+
+  const square = chooseStandardCollapseSquare(game, next, completedPly);
+
+  if (!square) {
+    next.movesUntilWarning = 3;
+
+    return {
+      state: next,
+      lives: cloneCollapseLives(lives),
+      outcome: null,
+      kingHits: [],
+      trappedKings: [],
+      relocatedKings: [],
+      destroyedPieces: [],
+      collapsedNow: [],
+    };
+  }
+
+  const destroyedPieces: CollapseDestroyedPiece[] = [];
+  const rightsToRemove = new Set<string>();
+  const piece = game.get(square);
+
+  // Kings were excluded above, so only an ordinary piece can be destroyed.
+  if (piece && piece.type !== "k") {
+    destroyedPieces.push({
+      square,
+      type: piece.type as CollapsePieceType,
+      color: piece.color as CollapseSide,
+    });
+
+    game.remove(square);
+
+    if (square === "a1") rightsToRemove.add("Q");
+    if (square === "h1") rightsToRemove.add("K");
+    if (square === "a8") rightsToRemove.add("q");
+    if (square === "h8") rightsToRemove.add("k");
+  }
+
+  stripCastlingRights(game, rightsToRemove);
+
+  next.collapsedSquares = [...next.collapsedSquares, square];
+  next.lastImpactSquares = [square];
+  next.collapseCount += 1;
+  next.nextSquareHalf = next.nextSquareHalf === "lower" ? "upper" : "lower";
+  next.movesUntilWarning = 3;
+  next.warningEdge = null;
+  next.warningSquares = [];
+  next.warningMovesRemaining = 0;
+
+  return {
+    state: next,
+    lives: cloneCollapseLives(lives),
+    outcome: null,
+    kingHits: [],
+    trappedKings: [],
+    relocatedKings: [],
+    destroyedPieces,
+    collapsedNow: [square],
+  };
+}
+
 export function advanceCollapseAfterMove(
   game: Chess,
   state: CollapseState,
   lives: CollapseKingLives,
   completedPly: number,
 ): CollapseAdvanceResult {
+  if ((state.mode ?? "rows") === "squares") {
+    return collapseStandardSquare(game, state, lives, completedPly);
+  }
+
   const next = cloneCollapseState(state);
   next.lastImpactSquares = [];
 
@@ -774,10 +938,12 @@ export function findCollapseKingSquare(
 export function getCollapseChessOutcome(
   game: Chess,
   bounds: CollapseBounds,
+  collapsedSquares: Square[] = [],
 ): CollapseOutcome {
   const legalMoves = filterMovesForCollapse(
     game.moves({ verbose: true }).map((move) => ({ to: move.to as Square })),
     bounds,
+    collapsedSquares,
   );
 
   if (legalMoves.length === 0) {

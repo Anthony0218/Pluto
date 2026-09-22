@@ -103,8 +103,8 @@ const pieceNames: Record<DraftPieceType, string> = {
 const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
   de: {
     Random: "Zufall",
-    "Invalid setup replaced with two independent random legal armies.":
-      "Die ungültige Aufstellung wurde durch zwei unabhängige zufällige legale Armeen ersetzt.",
+    "A King started in check, so both armies were replaced with independent random legal armies.":
+      "Ein König stand in der Startstellung im Schach, deshalb wurden beide Armeen durch unabhängige zufällige legale Armeen ersetzt.",
     "Chess Variant": "Schachvariante",
     "Draft Chess": "Draft-Schach",
     "Build your own army": "Stelle deine eigene Armee zusammen",
@@ -178,8 +178,8 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
 
   bar: {
     Random: "Zufall",
-    "Invalid setup replaced with two independent random legal armies.":
-      "De ungültige Aufstellung is durch zwoa unabhängige zufällige legale Armeen ersetzt worn.",
+    "A King started in check, so both armies were replaced with independent random legal armies.":
+      "A Kini war in da Startstellung im Schach, drum san beide Armeen durch zwoa unabhängige zufällige legale Armeen ersetzt worn.",
     "Chess Variant": "Schachvariantn",
     "Draft Chess": "Draft-Schach",
     "Build your own army": "Bau da dei eigene Armee",
@@ -248,8 +248,8 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
 
   ko: {
     Random: "랜덤",
-    "Invalid setup replaced with two independent random legal armies.":
-      "유효하지 않은 배치가 서로 다른 두 개의 독립적인 랜덤 합법 군대로 자동 교체되었습니다.",
+    "A King started in check, so both armies were replaced with independent random legal armies.":
+      "시작 배치에서 킹이 체크 상태였기 때문에 두 군대가 각각 독립적인 합법 랜덤 군대로 교체되었습니다.",
     "Chess Variant": "체스 변형",
     "Draft Chess": "드래프트 체스",
     "Build your own army": "직접 군대를 구성합니다",
@@ -323,8 +323,8 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
 
   ru: {
     Random: "Случайно",
-    "Invalid setup replaced with two independent random legal armies.":
-      "Недопустимая расстановка была заменена двумя независимыми случайными легальными армиями.",
+    "A King started in check, so both armies were replaced with independent random legal armies.":
+      "В начальной позиции король находился под шахом, поэтому обе армии были заменены независимыми случайными легальными армиями.",
     "Chess Variant": "Шахматный вариант",
     "Draft Chess": "Драфт-шахматы",
     "Build your own army": "Соберите свою армию",
@@ -797,6 +797,26 @@ export default function DraftChessBoard({
     let validation = validateDraftStartPosition(stateToStart);
 
     if (!validation.ok || !validation.fen) {
+      const startsInCheck =
+        validation.error ===
+        "A King is already in check in the starting position.";
+
+      /*
+       * Emergency fallback is ONLY for the special Draft case where
+       * the revealed armies would start with a King already in check.
+       * Any other validation problem is shown to the player and the
+       * chosen armies are preserved.
+       */
+      if (!startsInCheck) {
+        setSetupError(
+          validation.error ?? "The selected Draft armies could not be started.",
+        );
+
+        playSound("illegal");
+
+        return;
+      }
+
       const fallback = createIndependentRandomDraftSetup();
 
       stateToStart = fallback.state;
@@ -821,7 +841,7 @@ export default function DraftChessBoard({
 
     const fen = validation.fen;
 
-    game.load(fen);
+    game.load(fen, { skipValidation: true });
 
     snapToSide(game.turn());
 
@@ -851,7 +871,31 @@ export default function DraftChessBoard({
     nextRecords: DraftMoveRecord[],
     playResultSound = false,
   ) {
-    if (game.isCheckmate()) {
+    /*
+     * Draft Chess can begin from unusual custom formations, so determine
+     * mate/stalemate from the actual legal-move condition as well as the
+     * chess.js convenience helpers.
+     *
+     * Checkmate = side to move is checked AND has zero legal moves.
+     * Stalemate = side to move is not checked AND has zero legal moves.
+     */
+    let legalMoveCount = 0;
+    let sideToMoveIsChecked = false;
+
+    try {
+      legalMoveCount = game.moves().length;
+      sideToMoveIsChecked = game.isCheck();
+    } catch {
+      /*
+       * Keep the chess.js helpers below as a fallback if move generation
+       * ever fails on an unusual Draft position.
+       */
+    }
+
+    const isCheckmate =
+      (sideToMoveIsChecked && legalMoveCount === 0) || game.isCheckmate();
+
+    if (isCheckmate) {
       setGameOver(true);
 
       setGameOverReason("Checkmate");
@@ -865,7 +909,10 @@ export default function DraftChessBoard({
       return true;
     }
 
-    if (game.isStalemate()) {
+    const isStalemate =
+      (!sideToMoveIsChecked && legalMoveCount === 0) || game.isStalemate();
+
+    if (isStalemate) {
       setGameOver(true);
 
       setGameOverReason("Stalemate");
@@ -1373,6 +1420,21 @@ export default function DraftChessBoard({
                 </>
               ) : (
                 <>
+                  {autoRandomFallbackUsed && (
+                    <Panel>
+                      <div className="rounded-2xl border border-amber-400/20 bg-amber-400/[0.07] px-3 py-3">
+                        <p className="text-[10px] font-black uppercase tracking-wider text-amber-300">
+                          ⚠ Start position corrected
+                        </p>
+                        <p className="mt-2 text-xs font-bold leading-5 text-amber-100">
+                          {t(
+                            "A King started in check, so both armies were replaced with independent random legal armies.",
+                          )}
+                        </p>
+                      </div>
+                    </Panel>
+                  )}
+
                   <Panel>
                     <PanelTitle
                       title={t("Game Controls")}
@@ -1448,15 +1510,6 @@ export default function DraftChessBoard({
 
           <section className="min-w-0">
             <div className="mx-auto max-w-[820px]">
-              {phase === "playing" && autoRandomFallbackUsed && (
-                <div className="mb-3 rounded-2xl border border-amber-400/20 bg-amber-400/[0.07] px-4 py-3 text-xs font-bold text-amber-100">
-                  🎲{" "}
-                  {t(
-                    "Invalid setup replaced with two independent random legal armies.",
-                  )}
-                </div>
-              )}
-
               {phase === "playing" && gameOver && (
                 <GameOverBanner
                   reason={t(gameOverReason)}

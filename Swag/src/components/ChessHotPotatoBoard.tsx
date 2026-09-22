@@ -24,18 +24,17 @@ import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.t
 import {
   HOT_POTATO_MIN_FUSE_MOVES,
   HOT_POTATO_MAX_FUSE_MOVES,
-  HOT_POTATO_RESPAWN_WAIT_MOVES,
-  createInitialHotPotatoState,
+  createCoolingHotPotatoState,
+  createInitialHotPotatoStates,
+  createRespawnedHotPotatoState,
   findKingSquare,
   getHotPotatoSquareAfterMove,
   getNormalChessOutcome,
-  getRandomHotPotatoSquare,
-  getRandomHotPotatoFuseMoves,
   isChessInCheck,
   resolveHotPotatoExplosion,
   type DestroyedPiece,
   type HotPotatoOutcome,
-  type HotPotatoState,
+  type HotPotatoStates,
 } from "../games/chess/variants/HotPotato.ts";
 import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
 import { useVariantChessAi } from "@/hooks/useVariantChessAi";
@@ -236,7 +235,7 @@ type HotPotatoHistoryEntry = {
   from: Square;
   to: Square;
   fenAfter: string;
-  hotPotatoAfter: HotPotatoState;
+  hotPotatoesAfter: HotPotatoStates;
   explosionSquaresAfter: Square[];
   blownUpKingSquaresAfter: Square[];
   potatoTransferred: boolean;
@@ -245,7 +244,7 @@ type HotPotatoHistoryEntry = {
 
 type UndoSnapshot = {
   fen: string;
-  hotPotato: HotPotatoState;
+  hotPotatoes: HotPotatoStates;
   lastMove: { from: Square; to: Square } | null;
   capturedWhite: PieceType[];
   capturedBlack: PieceType[];
@@ -321,8 +320,11 @@ function getBoardMaterialDifference(game: Chess) {
   return white - black;
 }
 
-function cloneHotPotato(state: HotPotatoState): HotPotatoState {
-  return { ...state };
+function cloneHotPotatoes(states: HotPotatoStates): HotPotatoStates {
+  return {
+    w: { ...states.w },
+    b: { ...states.b },
+  };
 }
 
 /* =========================================================
@@ -366,9 +368,9 @@ export default function ChessHotPotatoBoard({
      HOT POTATO
      ======================================================= */
 
-  const [hotPotato, setHotPotato] = useState<HotPotatoState>(() => {
+  const [hotPotatoes, setHotPotatoes] = useState<HotPotatoStates>(() => {
     const initialGame = new Chess();
-    return createInitialHotPotatoState(initialGame);
+    return createInitialHotPotatoStates(initialGame);
   });
 
   const [explosionSquares, setExplosionSquares] = useState<Square[]>([]);
@@ -490,9 +492,9 @@ export default function ChessHotPotatoBoard({
     ? { from: historyPreview.from, to: historyPreview.to }
     : lastMove;
 
-  const displayedHotPotato = historyPreview
-    ? historyPreview.hotPotatoAfter
-    : hotPotato;
+  const displayedHotPotatoes = historyPreview
+    ? historyPreview.hotPotatoesAfter
+    : hotPotatoes;
 
   const displayedExplosionSquares = historyPreview
     ? historyPreview.explosionSquaresAfter
@@ -551,7 +553,7 @@ export default function ChessHotPotatoBoard({
   function snapshotCurrentState(): UndoSnapshot {
     return {
       fen: game.fen(),
-      hotPotato: cloneHotPotato(hotPotato),
+      hotPotatoes: cloneHotPotatoes(hotPotatoes),
       lastMove,
       capturedWhite: [...capturedWhite],
       capturedBlack: [...capturedBlack],
@@ -589,7 +591,6 @@ export default function ChessHotPotatoBoard({
     const nextGame = new Chess(game.fen());
 
     let move;
-
     try {
       move = nextGame.move({
         from,
@@ -603,104 +604,125 @@ export default function ChessHotPotatoBoard({
     if (!move) return false;
 
     const beforeMove = snapshotCurrentState();
+    const nextHotPotatoes = cloneHotPotatoes(hotPotatoes);
 
-    let nextHotPotato = cloneHotPotato(hotPotato);
     let nextExplosionSquares: Square[] = [];
     let nextBlownUpKingSquares: Square[] = [];
     let variantFinish: FinishedGame = null;
     let destroyedPieces: DestroyedPiece[] = [];
     let potatoTransferred = false;
+    let transfersThisMove = 0;
+    let explosionsThisMove = 0;
 
-    /* -----------------------------------------------------
-       ACTIVE HOT POTATO
-       ----------------------------------------------------- */
+    // First update both bomb locations/fuses from the chess move.
+    const explodingOwners: Array<"w" | "b"> = [];
 
-    if (hotPotato.square) {
-      const carrierBeforeMove = hotPotato.square;
+    for (const owner of ["w", "b"] as const) {
+      const potato = nextHotPotatoes[owner];
 
-      const carrierWasCaptured =
-        carrierBeforeMove === move.to && carrierBeforeMove !== move.from;
+      if (potato.square) {
+        const carrierBeforeMove = potato.square;
 
-      const enPassantCarrierWasCaptured =
-        move.flags.includes("e") &&
-        carrierBeforeMove === (`${move.to[0]}${move.from[1]}` as Square);
+        const carrierWasCaptured =
+          carrierBeforeMove === move.to && carrierBeforeMove !== move.from;
 
-      potatoTransferred = carrierWasCaptured || enPassantCarrierWasCaptured;
+        const enPassantCarrierWasCaptured =
+          move.flags.includes("e") &&
+          carrierBeforeMove === (`${move.to[0]}${move.from[1]}` as Square);
 
-      const movedPotatoSquare = getHotPotatoSquareAfterMove(hotPotato.square, {
-        from: move.from as Square,
-        to: move.to as Square,
-        color: move.color,
-        flags: move.flags,
-      });
-
-      const movesUntilExplosion = hotPotato.movesUntilExplosion - 1;
-
-      if (movesUntilExplosion <= 0) {
-        const explosion = resolveHotPotatoExplosion(
-          nextGame,
-          movedPotatoSquare,
-        );
-
-        nextExplosionSquares = explosion.explosionSquares;
-        nextBlownUpKingSquares = explosion.blownUpKingSquares;
-        destroyedPieces = explosion.destroyedPieces;
-
-        nextHotPotato = {
-          square: null,
-          movesUntilExplosion: 0,
-          fuseMovesTotal: 0,
-          respawnMovesRemaining: HOT_POTATO_RESPAWN_WAIT_MOVES,
-        };
-
-        if (explosion.outcome) {
-          variantFinish = {
-            outcome: explosion.outcome,
-            reason: "explosion",
-          };
+        if (carrierWasCaptured || enPassantCarrierWasCaptured) {
+          potatoTransferred = true;
+          transfersThisMove += 1;
         }
-      } else {
-        nextHotPotato = {
-          square: movedPotatoSquare,
-          movesUntilExplosion,
-          fuseMovesTotal: hotPotato.fuseMovesTotal,
-          respawnMovesRemaining: 0,
-        };
-      }
-    } else if (hotPotato.respawnMovesRemaining > 0) {
-      /* -----------------------------------------------------
-       FIVE-MOVE COOLDOWN AFTER EXPLOSION
-       ----------------------------------------------------- */
-      const respawnMovesRemaining = hotPotato.respawnMovesRemaining - 1;
 
-      if (respawnMovesRemaining === 0) {
-        const nextFuseMoves = getRandomHotPotatoFuseMoves();
+        const movedSquare = getHotPotatoSquareAfterMove(carrierBeforeMove, {
+          from: move.from as Square,
+          to: move.to as Square,
+          color: move.color,
+          flags: move.flags,
+        });
 
-        nextHotPotato = {
-          square: getRandomHotPotatoSquare(nextGame),
-          movesUntilExplosion: nextFuseMoves,
-          fuseMovesTotal: nextFuseMoves,
-          respawnMovesRemaining: 0,
-        };
-      } else {
-        nextHotPotato = {
-          square: null,
-          movesUntilExplosion: 0,
-          fuseMovesTotal: 0,
-          respawnMovesRemaining,
-        };
+        potato.square = movedSquare;
+        potato.movesUntilExplosion -= 1;
+
+        if (potato.movesUntilExplosion <= 0) {
+          explodingOwners.push(owner);
+        }
+      } else if (potato.respawnMovesRemaining > 0) {
+        potato.respawnMovesRemaining -= 1;
+
+        if (potato.respawnMovesRemaining <= 0) {
+          nextHotPotatoes[owner] = createRespawnedHotPotatoState(
+            nextGame,
+            owner,
+          );
+        }
       }
     }
 
-    /* -----------------------------------------------------
-       STANDARD CHESS RESULT
-       ----------------------------------------------------- */
+    // Resolve bombs that reached zero on this ply.
+    for (const owner of explodingOwners) {
+      const center = nextHotPotatoes[owner].square;
+      if (!center) continue;
+
+      const explosion = resolveHotPotatoExplosion(nextGame, center);
+
+      nextExplosionSquares = [
+        ...new Set([...nextExplosionSquares, ...explosion.explosionSquares]),
+      ];
+      nextBlownUpKingSquares = [
+        ...new Set([
+          ...nextBlownUpKingSquares,
+          ...explosion.blownUpKingSquares,
+        ]),
+      ];
+      destroyedPieces = [...destroyedPieces, ...explosion.destroyedPieces];
+      explosionsThisMove += 1;
+
+      nextHotPotatoes[owner] = createCoolingHotPotatoState(
+        owner,
+        nextHotPotatoes[owner].blastPattern,
+      );
+    }
+
+    // If one blast physically destroyed the carrier of the other bomb,
+    // that bomb starts its own cooldown from this ply.
+    for (const owner of ["w", "b"] as const) {
+      const potato = nextHotPotatoes[owner];
+      if (
+        potato.square &&
+        nextExplosionSquares.includes(potato.square) &&
+        !nextGame.get(potato.square)
+      ) {
+        nextHotPotatoes[owner] = createCoolingHotPotatoState(
+          owner,
+          nextHotPotatoes[owner].blastPattern,
+        );
+      }
+    }
+
+    const whiteKingSquare = findKingSquare(nextGame, "w");
+    const blackKingSquare = findKingSquare(nextGame, "b");
+    const whiteKingHit =
+      whiteKingSquare !== null &&
+      nextBlownUpKingSquares.includes(whiteKingSquare);
+    const blackKingHit =
+      blackKingSquare !== null &&
+      nextBlownUpKingSquares.includes(blackKingSquare);
+
+    if (whiteKingHit || blackKingHit) {
+      variantFinish = {
+        outcome:
+          whiteKingHit && blackKingHit
+            ? "draw"
+            : whiteKingHit
+              ? "black"
+              : "white",
+        reason: "explosion",
+      };
+    }
 
     const normalFinish = variantFinish ? null : getNormalFinish(nextGame);
-
-    /* -----------------------------------------------------
-       SOUND / CAPTURES
-       ----------------------------------------------------- */
 
     let nextCapturedWhite = [...capturedWhite];
     let nextCapturedBlack = [...capturedBlack];
@@ -717,10 +739,6 @@ export default function ChessHotPotatoBoard({
       playPieceMoveSound(move.piece);
     }
 
-    /* -----------------------------------------------------
-       HISTORY ENTRY
-       ----------------------------------------------------- */
-
     const nextPly = history.length + 1;
 
     const nextHistoryEntry: HotPotatoHistoryEntry = {
@@ -732,7 +750,7 @@ export default function ChessHotPotatoBoard({
       from: move.from as Square,
       to: move.to as Square,
       fenAfter: nextGame.fen(),
-      hotPotatoAfter: cloneHotPotato(nextHotPotato),
+      hotPotatoesAfter: cloneHotPotatoes(nextHotPotatoes),
       explosionSquaresAfter: nextExplosionSquares,
       blownUpKingSquaresAfter: nextBlownUpKingSquares,
       potatoTransferred,
@@ -741,7 +759,7 @@ export default function ChessHotPotatoBoard({
 
     setUndoStack((stack) => [...stack, beforeMove]);
     setGame(nextGame);
-    setHotPotato(nextHotPotato);
+    setHotPotatoes(nextHotPotatoes);
     setExplosionSquares(nextExplosionSquares);
     setBlownUpKingSquares(nextBlownUpKingSquares);
     setLastMove({
@@ -752,12 +770,12 @@ export default function ChessHotPotatoBoard({
     setCapturedBlack(nextCapturedBlack);
     setHistory((rows) => [...rows, nextHistoryEntry]);
 
-    if (potatoTransferred) {
-      setTransferCount((count) => count + 1);
+    if (transfersThisMove > 0) {
+      setTransferCount((count) => count + transfersThisMove);
     }
 
-    if (nextExplosionSquares.length > 0) {
-      setExplosionCount((count) => count + 1);
+    if (explosionsThisMove > 0) {
+      setExplosionCount((count) => count + explosionsThisMove);
       setDestroyedPieceCount((count) => count + destroyedPieces.length);
     }
 
@@ -840,7 +858,7 @@ export default function ChessHotPotatoBoard({
     setGame(restoredGame);
     snapToSide(restoredGame.turn());
 
-    setHotPotato(cloneHotPotato(snapshot.hotPotato));
+    setHotPotatoes(cloneHotPotatoes(snapshot.hotPotatoes));
     setLastMove(snapshot.lastMove);
     setCapturedWhite([...snapshot.capturedWhite]);
     setCapturedBlack([...snapshot.capturedBlack]);
@@ -864,7 +882,7 @@ export default function ChessHotPotatoBoard({
     setGame(freshGame);
     snapToSide(freshGame.turn());
 
-    setHotPotato(createInitialHotPotatoState(freshGame));
+    setHotPotatoes(createInitialHotPotatoStates(freshGame));
     setExplosionSquares([]);
     setBlownUpKingSquares([]);
 
@@ -970,31 +988,34 @@ export default function ChessHotPotatoBoard({
               label={t("Language")}
             />
             <div
-              className={`
+              className="
                 flex
                 items-center
                 gap-2
                 rounded-full
                 border
+                border-orange-400/20
+                bg-orange-400/[0.07]
                 px-3
                 py-1.5
                 text-xs
                 font-bold
-
-                ${
-                  displayedHotPotato.square
-                    ? "border-orange-400/20 bg-orange-400/[0.07] text-orange-200"
-                    : "border-sky-400/20 bg-sky-400/[0.07] text-sky-200"
-                }
-              `}
+                text-orange-200
+              "
             >
-              <span aria-hidden="true">
-                {displayedHotPotato.square ? "💣" : "❄"}
-              </span>
+              <span aria-hidden="true">💣</span>
 
-              {displayedHotPotato.square
-                ? `${displayedHotPotato.movesUntilExplosion} ${t("moves left")}`
-                : `${t("Respawn in")} ${displayedHotPotato.respawnMovesRemaining}`}
+              <span>
+                {(["w", "b"] as const)
+                  .map((owner) => {
+                    const potato = displayedHotPotatoes[owner];
+
+                    return potato.square
+                      ? `${owner === "w" ? "W" : "B"} ${potato.movesUntilExplosion}`
+                      : `${owner === "w" ? "W" : "B"} ❄${potato.respawnMovesRemaining}`;
+                  })
+                  .join(" · ")}
+              </span>
             </div>
 
             {!finishedGame && !historyPreview && (
@@ -1280,9 +1301,14 @@ export default function ChessHotPotatoBoard({
                     </p>
 
                     <p className="mt-1 text-[10px] font-semibold text-zinc-500">
-                      {historyPreview.hotPotatoAfter.square
-                        ? `💣 ${historyPreview.hotPotatoAfter.movesUntilExplosion}`
-                        : `${t("Cooldown")} ${historyPreview.hotPotatoAfter.respawnMovesRemaining}`}
+                      {(["w", "b"] as const)
+                        .map((owner) => {
+                          const potato = historyPreview.hotPotatoesAfter[owner];
+                          return potato.square
+                            ? `${owner === "w" ? "W" : "B"} 💣 ${potato.movesUntilExplosion}`
+                            : `${owner === "w" ? "W" : "B"} ${t("Cooldown")} ${potato.respawnMovesRemaining}`;
+                        })
+                        .join(" · ")}
                     </p>
                   </div>
 
@@ -1305,8 +1331,22 @@ export default function ChessHotPotatoBoard({
                 onSquareClick={
                   historyPreview || flipPending ? () => {} : handleSquareClick
                 }
-                hotPotatoSquare={displayedHotPotato.square}
-                hotPotatoMovesRemaining={displayedHotPotato.movesUntilExplosion}
+                hotPotatoes={(["w", "b"] as const)
+                  .map((owner) => ({
+                    owner,
+                    square: displayedHotPotatoes[owner].square,
+                    movesRemaining:
+                      displayedHotPotatoes[owner].movesUntilExplosion,
+                  }))
+                  .filter(
+                    (
+                      potato,
+                    ): potato is {
+                      owner: "w" | "b";
+                      square: Square;
+                      movesRemaining: number;
+                    } => potato.square !== null,
+                  )}
                 hotPotatoExplosionSquares={displayedExplosionSquares}
                 hotPotatoBlownUpKingSquares={displayedBlownUpKingSquares}
                 orientation={boardOrientation}
@@ -1317,9 +1357,14 @@ export default function ChessHotPotatoBoard({
               <div className="mt-4 flex items-center justify-between rounded-2xl border border-white/10 bg-zinc-900/75 px-4 py-3 xl:hidden">
                 <span className="text-sm text-zinc-500">{t("Hot Potato")}</span>
                 <span className="text-sm font-bold text-zinc-200">
-                  {displayedHotPotato.square
-                    ? `💣 ${displayedHotPotato.movesUntilExplosion} ${t("moves")} · ${displayedHotPotato.square}`
-                    : `${t("Respawn in")} ${displayedHotPotato.respawnMovesRemaining}`}
+                  {(["w", "b"] as const)
+                    .map((owner) => {
+                      const potato = displayedHotPotatoes[owner];
+                      return potato.square
+                        ? `${owner === "w" ? "W" : "B"} 💣 ${potato.movesUntilExplosion}`
+                        : `${owner === "w" ? "W" : "B"} ❄ ${potato.respawnMovesRemaining}`;
+                    })
+                    .join(" · ")}
                 </span>
               </div>
             </div>
@@ -1334,88 +1379,101 @@ export default function ChessHotPotatoBoard({
               {/* HOT POTATO STATUS */}
 
               <section className="rounded-3xl border border-orange-400/15 bg-zinc-900/80 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
-                <div className="mb-4 flex items-center justify-between gap-3">
-                  <div>
-                    <h2 className="text-base font-black text-zinc-100">
-                      {t("Hot Potato")}
-                    </h2>
-                    <p className="mt-1 text-xs text-zinc-500">
-                      {t("Pass the danger")}
-                    </p>
-                  </div>
-
-                  <span className="text-2xl" aria-hidden="true">
-                    💣
-                  </span>
+                <div className="mb-4">
+                  <h2 className="text-base font-black text-zinc-100">
+                    {t("Hot Potato")}
+                  </h2>
+                  <p className="mt-1 text-xs text-zinc-500">
+                    Two independent bombs
+                  </p>
                 </div>
 
-                {displayedHotPotato.square ? (
-                  <div className="space-y-3">
-                    <div className="rounded-2xl border border-orange-300/15 bg-orange-400/[0.05] p-4">
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
-                            {t("Current carrier")}
-                          </p>
+                <div className="space-y-3">
+                  {(["w", "b"] as const).map((owner) => {
+                    const potato = displayedHotPotatoes[owner];
+                    const patternLabel =
+                      potato.blastPattern === "ring"
+                        ? "Ring 1"
+                        : potato.blastPattern === "cross2"
+                          ? "Cross 2"
+                          : "Diagonal 2";
 
-                          <p className="mt-2 font-mono text-2xl font-black uppercase text-white">
-                            {displayedHotPotato.square}
+                    return (
+                      <div
+                        key={owner}
+                        className={`rounded-2xl border p-4 ${
+                          owner === "w"
+                            ? "border-amber-300/15 bg-amber-300/[0.04]"
+                            : "border-violet-300/15 bg-violet-300/[0.04]"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="text-xs font-black uppercase tracking-wider text-zinc-400">
+                            {owner === "w" ? "White bomb" : "Black bomb"}
                           </p>
+                          <span className="rounded-full border border-white/10 bg-black/25 px-2 py-1 text-[10px] font-black text-zinc-300">
+                            {patternLabel}
+                          </span>
                         </div>
 
-                        <span className="text-4xl font-black leading-none text-orange-200">
-                          {displayedHotPotato.movesUntilExplosion}
-                        </span>
+                        {potato.square ? (
+                          <>
+                            <div className="mt-3 flex items-end justify-between gap-4">
+                              <div>
+                                <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-600">
+                                  Carrier
+                                </p>
+                                <p className="mt-1 font-mono text-xl font-black uppercase text-white">
+                                  {potato.square}
+                                </p>
+                              </div>
+
+                              <div className="text-right">
+                                <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-600">
+                                  Explodes in
+                                </p>
+                                <p className="mt-1 text-3xl font-black text-orange-200">
+                                  {potato.movesUntilExplosion}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="mt-3 h-2 overflow-hidden rounded-full bg-black/30">
+                              <div
+                                className="h-full rounded-full bg-orange-400 transition-all duration-300"
+                                style={{
+                                  width: `${Math.max(
+                                    0,
+                                    Math.min(
+                                      100,
+                                      (potato.movesUntilExplosion /
+                                        Math.max(1, potato.fuseMovesTotal)) *
+                                        100,
+                                    ),
+                                  )}%`,
+                                }}
+                              />
+                            </div>
+                          </>
+                        ) : (
+                          <div className="mt-3 flex items-center justify-between rounded-xl border border-white/5 bg-black/20 px-3 py-3">
+                            <div>
+                              <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-600">
+                                Cooling down
+                              </p>
+                              <p className="mt-1 text-xs text-zinc-500">
+                                A new random bomb will spawn for this side.
+                              </p>
+                            </div>
+                            <span className="text-2xl font-black text-cyan-200">
+                              {potato.respawnMovesRemaining}
+                            </span>
+                          </div>
+                        )}
                       </div>
-
-                      <div className="mt-4 h-2 overflow-hidden rounded-full bg-black/30">
-                        <div
-                          className="h-full rounded-full bg-orange-400 transition-all duration-300"
-                          style={{
-                            width: `${Math.max(
-                              0,
-                              Math.min(
-                                100,
-                                (displayedHotPotato.movesUntilExplosion /
-                                  Math.max(
-                                    1,
-                                    displayedHotPotato.fuseMovesTotal,
-                                  )) *
-                                  100,
-                              ),
-                            )}%`,
-                          }}
-                        />
-                      </div>
-
-                      <p className="mt-2 text-[10px] text-zinc-600">
-                        {t("This potato started with a")}{" "}
-                        {displayedHotPotato.fuseMovesTotal}-{t("move fuse")}
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="rounded-2xl border border-sky-300/15 bg-sky-400/[0.05] p-4">
-                    <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
-                      {t("Cooling down")}
-                    </p>
-
-                    <div className="mt-2 flex items-end justify-between gap-3">
-                      <p className="text-sm font-bold text-sky-200">
-                        {t("Next potato")}
-                      </p>
-                      <span className="text-4xl font-black leading-none text-sky-200">
-                        {displayedHotPotato.respawnMovesRemaining}
-                      </span>
-                    </div>
-
-                    <p className="mt-2 text-[10px] text-zinc-600">
-                      {t(
-                        "A new random non-king carrier appears after the cooldown.",
-                      )}
-                    </p>
-                  </div>
-                )}
+                    );
+                  })}
+                </div>
               </section>
 
               {/* HOT POTATO STATS */}

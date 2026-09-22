@@ -664,7 +664,7 @@ const variants: VariantCard[] = [
     available: true,
     route: "/games/chess/variants/collapse/hotseat",
     aiRoute: "/games/chess/variants/collapse/ai",
-    rulesRoute: "/games/chess/variants/hotpotato/rules",
+    rulesRoute: "/games/chess/variants/collapse/rules",
     multiplayerRoute: "/games/chess/variants/collapse/multiplayer",
     accent: "red",
   },

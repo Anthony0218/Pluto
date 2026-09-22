@@ -107,11 +107,6 @@ const royalPowers: Array<{
   detail: string;
 }> = [
   {
-    id: "investment",
-    label: "Investment",
-    detail: "Double the base value of your next capture.",
-  },
-  {
     id: "mission_decree",
     label: "Mission Decree",
     detail: "Replace your current mission with a new contract.",
@@ -371,7 +366,7 @@ export function CapitalismMultiplayerLobby() {
               </p>
               <h1 className="mt-1 text-3xl font-black">Capitalism Chess</h1>
               <p className="mt-1 text-sm text-zinc-500">
-                Economy, bounties, contracts, market purchases and King Journey.
+                Coins come only from missions and bounty rewards.
               </p>
             </div>
           </div>
@@ -433,7 +428,9 @@ export function CapitalismMultiplayerLobby() {
 
               <input
                 value={joinCode}
-                onChange={(event) => setJoinCode(event.target.value.toUpperCase())}
+                onChange={(event) =>
+                  setJoinCode(event.target.value.toUpperCase())
+                }
                 placeholder="ROOM CODE"
                 className="mt-4 w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 font-mono uppercase tracking-widest outline-none focus:border-amber-400/40"
               />
@@ -464,12 +461,15 @@ export function CapitalismMultiplayerGame() {
 
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [legalMoves, setLegalMoves] = useState<Square[]>([]);
-  const [promotion, setPromotion] = useState<{ from: Square; to: Square } | null>(
-    null,
-  );
+  const [promotion, setPromotion] = useState<{
+    from: Square;
+    to: Square;
+  } | null>(null);
   const [selectedShopPiece, setSelectedShopPiece] =
     useState<ShopPieceType>("p");
-  const [historyPreviewPly, setHistoryPreviewPly] = useState<number | null>(null);
+  const [historyPreviewPly, setHistoryPreviewPly] = useState<number | null>(
+    null,
+  );
   const [moving, setMoving] = useState(false);
   const [actionBusy, setActionBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -490,7 +490,8 @@ export function CapitalismMultiplayerGame() {
   const lastVersionRef = useRef<number | null>(null);
 
   const me = players.find((player) => player.user_id === user?.id) ?? null;
-  const opponent = players.find((player) => player.user_id !== user?.id) ?? null;
+  const opponent =
+    players.find((player) => player.user_id !== user?.id) ?? null;
   const mySide: CapitalSide | null = me?.chosen_color ?? null;
   const myColor = mySide ? sideToColor(mySide) : null;
   const orientation: "white" | "black" = mySide === "black" ? "black" : "white";
@@ -537,17 +538,19 @@ export function CapitalismMultiplayerGame() {
 
     const loadedRoom = roomData as VariantRoom;
 
-    const [{ data: playerData, error: playerError }, { data: gameData, error: gameError }] =
-      await Promise.all([
-        supabase
-          .from("variant_room_players")
-          .select("room_id, user_id, seat, display_name, chosen_color")
-          .eq("room_id", loadedRoom.id)
-          .order("seat", { ascending: true }),
-        supabase
-          .from("variant_games")
-          .select(
-            `
+    const [
+      { data: playerData, error: playerError },
+      { data: gameData, error: gameError },
+    ] = await Promise.all([
+      supabase
+        .from("variant_room_players")
+        .select("room_id, user_id, seat, display_name, chosen_color")
+        .eq("room_id", loadedRoom.id)
+        .order("seat", { ascending: true }),
+      supabase
+        .from("variant_games")
+        .select(
+          `
               room_id,
               variant,
               seed,
@@ -568,13 +571,15 @@ export function CapitalismMultiplayerGame() {
               undo_last_requested_by,
               undo_last_requested_version
             `,
-          )
-          .eq("room_id", loadedRoom.id)
-          .single(),
-      ]);
+        )
+        .eq("room_id", loadedRoom.id)
+        .single(),
+    ]);
 
     if (playerError || gameError || !gameData) {
-      setError(playerError?.message ?? gameError?.message ?? "Game load failed.");
+      setError(
+        playerError?.message ?? gameError?.message ?? "Game load failed.",
+      );
       return;
     }
 
@@ -858,7 +863,9 @@ export function CapitalismMultiplayerGame() {
       setSelectedSquare(square);
       playPieceSelectSound(piece.type);
       setLegalMoves(
-        liveGame.moves({ square, verbose: true }).map((candidate) => candidate.to),
+        liveGame
+          .moves({ square, verbose: true })
+          .map((candidate) => candidate.to),
       );
       return;
     }
@@ -880,7 +887,9 @@ export function CapitalismMultiplayerGame() {
         setSelectedSquare(square);
         playPieceSelectSound(clicked.type);
         setLegalMoves(
-          liveGame.moves({ square, verbose: true }).map((candidate) => candidate.to),
+          liveGame
+            .moves({ square, verbose: true })
+            .map((candidate) => candidate.to),
         );
       } else {
         clearSelection();
@@ -1048,16 +1057,13 @@ export function CapitalismMultiplayerGame() {
     setActionBusy("undo");
     setError(null);
 
-    const { error: rpcError } = await supabase.rpc(
-      "request_capitalism_undo",
-      {
-        p_room_id: room.id,
-        p_previous_fen: previous.fen,
-        p_previous_state: previous.state,
-        p_previous_last_from: previous.lastFrom,
-        p_previous_last_to: previous.lastTo,
-      },
-    );
+    const { error: rpcError } = await supabase.rpc("request_capitalism_undo", {
+      p_room_id: room.id,
+      p_previous_fen: previous.fen,
+      p_previous_state: previous.state,
+      p_previous_last_from: previous.lastFrom,
+      p_previous_last_to: previous.lastTo,
+    });
 
     setActionBusy(null);
     if (rpcError) setError(rpcError.message);
@@ -1068,13 +1074,10 @@ export function CapitalismMultiplayerGame() {
     if (!room || !gameState?.undo_requested_by || actionBusy) return;
 
     setActionBusy("undo-response");
-    const { error: rpcError } = await supabase.rpc(
-      "respond_capitalism_undo",
-      {
-        p_room_id: room.id,
-        p_accept: accept,
-      },
-    );
+    const { error: rpcError } = await supabase.rpc("respond_capitalism_undo", {
+      p_room_id: room.id,
+      p_accept: accept,
+    });
 
     setActionBusy(null);
     if (rpcError) setError(rpcError.message);
@@ -1365,7 +1368,8 @@ export function CapitalismMultiplayerGame() {
                     </h2>
 
                     <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">
-                      Share this room code. The game starts automatically when everyone has joined.
+                      Share this room code. The game starts automatically when
+                      everyone has joined.
                     </p>
 
                     <div className="mt-6 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-5 py-5">
@@ -1379,12 +1383,13 @@ export function CapitalismMultiplayerGame() {
                     </div>
 
                     <p className="mt-4 text-xs font-bold text-zinc-400">
-                      {copied ? "✓ Copied to clipboard" : "Click this box to copy the code"}
+                      {copied
+                        ? "✓ Copied to clipboard"
+                        : "Click this box to copy the code"}
                     </p>
                   </button>
                 </div>
               )}
-
 
               {liveFinish && historyPreviewPly === null && (
                 <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[28px] bg-zinc-950/80 p-6 backdrop-blur-sm">
@@ -1426,7 +1431,8 @@ export function CapitalismMultiplayerGame() {
           <aside className="space-y-4">
             <Panel title="Piece Market">
               <p className="text-xs leading-5 text-zinc-500">
-                Buy before your move and spawn the piece on an empty original rook square.
+                Buy before your move and spawn the piece on an empty original
+                rook square.
               </p>
 
               <div className="mt-3 grid grid-cols-5 gap-1.5">
@@ -1469,7 +1475,9 @@ export function CapitalismMultiplayerGame() {
                       key={square}
                       type="button"
                       disabled={!legal}
-                      onClick={() => void purchasePiece(selectedShopPiece, square)}
+                      onClick={() =>
+                        void purchasePiece(selectedShopPiece, square)
+                      }
                       className="rounded-xl border border-amber-300/15 bg-amber-400/[0.07] px-3 py-2 text-xs font-black text-amber-200 disabled:cursor-not-allowed disabled:opacity-30"
                     >
                       Spawn on {square.toUpperCase()}
@@ -1557,7 +1565,9 @@ export function CapitalismMultiplayerGame() {
                 <button
                   type="button"
                   onClick={resign}
-                  disabled={gameState.status !== "playing" || Boolean(actionBusy)}
+                  disabled={
+                    gameState.status !== "playing" || Boolean(actionBusy)
+                  }
                   className="rounded-xl border border-red-400/15 bg-red-400/[0.06] px-3 py-2.5 text-sm font-black text-red-300 disabled:opacity-40"
                 >
                   Resign
@@ -1587,8 +1597,9 @@ export function CapitalismMultiplayerGame() {
                 <>
                   <h2 className="text-xl font-black">Opponent requests Undo</h2>
                   <p className="mt-2 text-sm text-zinc-500">
-                    Accepting restores the position before the latest chess move,
-                    including coins, market purchases, missions, bounties and royal powers.
+                    Accepting restores the position before the latest chess
+                    move, including coins, market purchases, missions, bounties
+                    and royal powers.
                   </p>
                   <div className="mt-5 grid grid-cols-2 gap-2">
                     <button

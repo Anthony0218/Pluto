@@ -32,6 +32,7 @@ import {
   getDraftSetupSquares,
   getDraftSpentPoints,
   randomizeDraftArmy,
+  createIndependentRandomDraftSetup,
   validateDraftStartPosition,
   type DraftMoveRecord,
   type DraftPieceType,
@@ -95,7 +96,10 @@ const blackSymbols: Record<DraftPieceType, string> = {
 };
 
 function normalizeCode(value: string) {
-  return value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6);
+  return value
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "")
+    .slice(0, 6);
 }
 
 function colorToSide(color: TwoPlayerColor): DraftSide {
@@ -198,7 +202,6 @@ function buildHistory(initialFen: string, moves: string[]): HistoryRow[] {
   return rows;
 }
 
-
 function playLatestDraftMoveSound(initialFen: string, moves: string[]) {
   if (moves.length === 0) return;
   try {
@@ -226,8 +229,10 @@ function findCheckedKing(game: Chess): Square | null {
 
 function resultLabel(game: VariantGame) {
   if (game.winner === "draw") return `Draw · ${game.end_reason ?? "Game over"}`;
-  if (game.winner === "white") return `White wins · ${game.end_reason ?? "Game over"}`;
-  if (game.winner === "black") return `Black wins · ${game.end_reason ?? "Game over"}`;
+  if (game.winner === "white")
+    return `White wins · ${game.end_reason ?? "Game over"}`;
+  if (game.winner === "black")
+    return `Black wins · ${game.end_reason ?? "Game over"}`;
   return game.end_reason ?? "Game over";
 }
 
@@ -314,7 +319,8 @@ export function DraftMultiplayerLobby() {
                 Build your army privately
               </h1>
               <p className="mt-1 text-sm text-zinc-500">
-                39 points · separate hidden setups · reveal only when both armies are locked
+                39 points · separate hidden setups · reveal only when both
+                armies are locked
               </p>
             </div>
           </div>
@@ -328,7 +334,10 @@ export function DraftMultiplayerLobby() {
           </Panel>
         ) : (
           <div className="grid gap-5 lg:grid-cols-2">
-            <Panel title="Create room" subtitle="Choose your side before drafting">
+            <Panel
+              title="Create room"
+              subtitle="Choose your side before drafting"
+            >
               <div className="grid grid-cols-2 gap-2">
                 {(["white", "black"] as TwoPlayerColor[]).map((color) => (
                   <button
@@ -341,7 +350,8 @@ export function DraftMultiplayerLobby() {
                         : "border-white/10 bg-black/20 text-zinc-400 hover:bg-white/5"
                     }`}
                   >
-                    {color === "white" ? "♔" : "♚"} {color === "white" ? "White" : "Black"}
+                    {color === "white" ? "♔" : "♚"}{" "}
+                    {color === "white" ? "White" : "Black"}
                   </button>
                 ))}
               </div>
@@ -358,7 +368,9 @@ export function DraftMultiplayerLobby() {
             <Panel title="Join room" subtitle="You receive the opposite side">
               <input
                 value={joinCode}
-                onChange={(event) => setJoinCode(normalizeCode(event.target.value))}
+                onChange={(event) =>
+                  setJoinCode(normalizeCode(event.target.value))
+                }
                 onKeyDown={(event) => event.key === "Enter" && void joinRoom()}
                 placeholder="ABC123"
                 className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-center font-mono text-2xl font-black uppercase tracking-[0.3em] text-white outline-none transition focus:border-emerald-400/40"
@@ -388,7 +400,8 @@ export function DraftMultiplayerGame() {
   const [room, setRoom] = useState<VariantRoom | null>(null);
   const [players, setPlayers] = useState<VariantRoomPlayer[]>([]);
   const [gameState, setGameState] = useState<VariantGame | null>(null);
-  const [setupState, setSetupState] = useState<DraftSetupState>(createEmptySetup);
+  const [setupState, setSetupState] =
+    useState<DraftSetupState>(createEmptySetup);
   const [setupTool, setSetupTool] = useState<SetupTool>("p");
   const [setupError, setSetupError] = useState<string | null>(null);
 
@@ -398,7 +411,9 @@ export function DraftMultiplayerGame() {
     from: Square;
     to: Square;
   } | null>(null);
-  const [historyPreviewPly, setHistoryPreviewPly] = useState<number | null>(null);
+  const [historyPreviewPly, setHistoryPreviewPly] = useState<number | null>(
+    null,
+  );
 
   const [loading, setLoading] = useState(true);
   const [moving, setMoving] = useState(false);
@@ -421,7 +436,8 @@ export function DraftMultiplayerGame() {
       ? myPlayer.chosen_color
       : null;
   const mySide = myColor ? colorToSide(myColor) : null;
-  const orientation: "white" | "black" = myColor === "black" ? "black" : "white";
+  const orientation: "white" | "black" =
+    myColor === "black" ? "black" : "white";
 
   const publicState = (gameState?.state ?? {}) as DraftPublicState;
   const phase = publicState.phase ?? "setup";
@@ -451,7 +467,8 @@ export function DraftMultiplayerGame() {
   const displayedGame = previewGame ?? liveGame;
   const playingBoard = displayedGame.board();
   const setupBoard = useMemo(
-    () => (mySide ? draftPlacementsToBoard(setupState, mySide) : new Chess().board()),
+    () =>
+      mySide ? draftPlacementsToBoard(setupState, mySide) : new Chess().board(),
     [mySide, setupState],
   );
 
@@ -468,14 +485,37 @@ export function DraftMultiplayerGame() {
       };
     }
     return null;
-  }, [gameState?.last_move_from, gameState?.last_move_to, historyPreviewPly, historyRows]);
+  }, [
+    gameState?.last_move_from,
+    gameState?.last_move_to,
+    historyPreviewPly,
+    historyRows,
+  ]);
 
-  const checkedKingSquare = phase === "playing" ? findCheckedKing(displayedGame) : null;
+  const checkedKingSquare =
+    phase === "playing" ? findCheckedKing(displayedGame) : null;
   const setupConfirmed = mySide ? publicConfirmed[mySide] : false;
-  const opponentSide: DraftSide | null = mySide === "w" ? "b" : mySide === "b" ? "w" : null;
-  const opponentConfirmed = opponentSide ? publicConfirmed[opponentSide] : false;
-  const remainingPoints = mySide ? getDraftRemainingPoints(setupState, mySide) : DRAFT_BUDGET;
+  const opponentSide: DraftSide | null =
+    mySide === "w" ? "b" : mySide === "b" ? "w" : null;
+  const opponentConfirmed = opponentSide
+    ? publicConfirmed[opponentSide]
+    : false;
+  const remainingPoints = mySide
+    ? getDraftRemainingPoints(setupState, mySide)
+    : DRAFT_BUDGET;
   const spentPoints = mySide ? getDraftSpentPoints(setupState, mySide) : 0;
+
+  const checkedStartWasAutoReplaced = useMemo(() => {
+    if (phase !== "playing" || !publicState.setup) return false;
+
+    const originalValidation = validateDraftStartPosition(publicState.setup);
+
+    return (
+      !originalValidation.ok &&
+      originalValidation.error ===
+        "A King is already in check in the starting position."
+    );
+  }, [phase, publicState.setup]);
 
   const undoPending = Boolean(gameState?.undo_requested_by);
   const isMyTurn = Boolean(mySide) && liveGame.turn() === mySide;
@@ -505,8 +545,10 @@ export function DraftMultiplayerGame() {
     !alreadyRequestedUndo &&
     actionLoading === null &&
     !moving;
-  const myUndoRequest = Boolean(user?.id) && gameState?.undo_requested_by === user?.id;
-  const opponentUndoRequest = Boolean(gameState?.undo_requested_by) && !myUndoRequest;
+  const myUndoRequest =
+    Boolean(user?.id) && gameState?.undo_requested_by === user?.id;
+  const opponentUndoRequest =
+    Boolean(gameState?.undo_requested_by) && !myUndoRequest;
 
   const myRematchReady =
     myColor === "white"
@@ -524,10 +566,7 @@ export function DraftMultiplayerGame() {
   const applyGame = useCallback((raw: VariantGame) => {
     const next = normalizeGame(raw);
     const nextMoveCount = next.moves?.length ?? 0;
-    if (
-      next.initial_fen &&
-      nextMoveCount > lastSeenMoveCountRef.current
-    ) {
+    if (next.initial_fen && nextMoveCount > lastSeenMoveCountRef.current) {
       playLatestDraftMoveSound(next.initial_fen, next.moves);
     }
     if (nextMoveCount < lastSeenMoveCountRef.current) {
@@ -581,7 +620,8 @@ export function DraftMultiplayerGame() {
         .order("seat", { ascending: true });
 
       if (playerError || !playerData) {
-        if (!silent) setError(playerError?.message ?? "Players could not be loaded.");
+        if (!silent)
+          setError(playerError?.message ?? "Players could not be loaded.");
         setLoading(false);
         return;
       }
@@ -596,19 +636,22 @@ export function DraftMultiplayerGame() {
 
       const { data: gameData, error: gameError } = await supabase
         .from("variant_games")
-        .select(`
+        .select(
+          `
           room_id, variant, seed, initial_fen, fen, moves, state, status,
           winner, end_reason, version, last_move_from, last_move_to,
           white_rematch_ready, black_rematch_ready, next_seed,
           next_initial_fen, undo_requested_by, undo_requested_version,
           undo_previous_fen, undo_previous_last_from, undo_previous_last_to,
           undo_last_requested_by, undo_last_requested_version
-        `)
+        `,
+        )
         .eq("room_id", loadedRoom.id)
         .single();
 
       if (gameError || !gameData) {
-        if (!silent) setError(gameError?.message ?? "Game could not be loaded.");
+        if (!silent)
+          setError(gameError?.message ?? "Game could not be loaded.");
         setLoading(false);
         return;
       }
@@ -632,8 +675,10 @@ export function DraftMultiplayerGame() {
 
         const setupRound = state.round ?? 1;
         const key = localSetupKey(loadedRoom.id, user.id, setupRound);
-        const local = typeof window !== "undefined" ? readLocalPlacements(key) : null;
-        if (!privateSetup?.confirmed && local && local.length > 0) placements = local;
+        const local =
+          typeof window !== "undefined" ? readLocalPlacements(key) : null;
+        if (!privateSetup?.confirmed && local && local.length > 0)
+          placements = local;
 
         nextSetup = createEmptySetup();
         nextSetup.placements[side] = placements;
@@ -703,9 +748,13 @@ export function DraftMultiplayerGame() {
   }, [actionLoading, loadRoom, moving, room?.id]);
 
   useEffect(() => {
-    if (!room || !user || !mySide || phase !== "setup" || setupConfirmed) return;
+    if (!room || !user || !mySide || phase !== "setup" || setupConfirmed)
+      return;
     const key = localSetupKey(room.id, user.id, round);
-    window.localStorage.setItem(key, JSON.stringify(setupState.placements[mySide]));
+    window.localStorage.setItem(
+      key,
+      JSON.stringify(setupState.placements[mySide]),
+    );
   }, [mySide, phase, room, round, setupConfirmed, setupState.placements, user]);
 
   useEffect(() => {
@@ -714,27 +763,56 @@ export function DraftMultiplayerGame() {
     finalizeAttemptRef.current = gameState.version;
 
     const validation = validateDraftStartPosition(publicState.setup);
+
+    let fenToFinalize = validation.fen;
+
     if (!validation.ok || !validation.fen) {
-      setError(
-        validation.error ??
-          "The two armies create an illegal starting position. Both armies were unlocked so you can adjust them.",
-      );
-      void supabase.rpc("reopen_draft_setup", {
-        p_room_id: room.id,
-        p_expected_version: gameState.version,
-      });
-      return;
+      const startsInCheck =
+        validation.error ===
+        "A King is already in check in the starting position.";
+
+      /*
+       * Draft multiplayer uses the same emergency rule as local / AI:
+       * ONLY an initial checked King triggers automatic replacement.
+       *
+       * Do not reopen the draft. Generate two independent legal random
+       * armies and immediately finalize the match with that safe FEN.
+       */
+      if (startsInCheck) {
+        const fallback = createIndependentRandomDraftSetup();
+        fenToFinalize = fallback.fen;
+
+        setError(null);
+      } else {
+        setError(
+          validation.error ??
+            "The two armies create an illegal starting position. Both armies were unlocked so you can adjust them.",
+        );
+
+        void supabase.rpc("reopen_draft_setup", {
+          p_room_id: room.id,
+          p_expected_version: gameState.version,
+        });
+
+        return;
+      }
     }
 
+    if (!fenToFinalize) return;
+
     setActionLoading("finalize");
+
     void supabase
       .rpc("finalize_draft_variant_game", {
         p_room_id: room.id,
         p_expected_version: gameState.version,
-        p_initial_fen: validation.fen,
+        p_initial_fen: fenToFinalize,
       })
       .then(({ error: rpcError }) => {
-        if (rpcError && !rpcError.message.includes("changed")) setError(rpcError.message);
+        if (rpcError && !rpcError.message.includes("changed")) {
+          setError(rpcError.message);
+        }
+
         return loadRoom(true);
       })
       .finally(() => setActionLoading(null));
@@ -746,7 +824,12 @@ export function DraftMultiplayerGame() {
     const action =
       setupTool === "remove"
         ? ({ type: "REMOVE_PIECE", side: mySide, square } as const)
-        : ({ type: "PLACE_PIECE", side: mySide, square, piece: setupTool } as const);
+        : ({
+            type: "PLACE_PIECE",
+            side: mySide,
+            square,
+            piece: setupTool,
+          } as const);
 
     const result = applyDraftSetupAction(setupState, action);
     if (result.error) return setSetupError(result.error);
@@ -791,7 +874,11 @@ export function DraftMultiplayerGame() {
     setLegalMoves([]);
   }
 
-  async function submitMove(from: Square, to: Square, promotion?: PromotionPiece) {
+  async function submitMove(
+    from: Square,
+    to: Square,
+    promotion?: PromotionPiece,
+  ) {
     if (!room || !gameState || !gameState.fen || !canMove) return;
     const local = new Chess(gameState.fen);
     let move;
@@ -888,7 +975,8 @@ export function DraftMultiplayerGame() {
 
   function undoSnapshot() {
     if (!gameState?.initial_fen || historyRows.length === 0) return null;
-    const previous = historyRows.length >= 2 ? historyRows[historyRows.length - 2] : null;
+    const previous =
+      historyRows.length >= 2 ? historyRows[historyRows.length - 2] : null;
     return {
       previousFen: previous?.fenAfter ?? gameState.initial_fen,
       previousLastFrom: previous?.from ?? null,
@@ -926,7 +1014,13 @@ export function DraftMultiplayerGame() {
   }
 
   async function resign() {
-    if (!room || gameState?.status !== "playing" || undoPending || actionLoading) return;
+    if (
+      !room ||
+      gameState?.status !== "playing" ||
+      undoPending ||
+      actionLoading
+    )
+      return;
     setActionLoading("resign");
     const { error: rpcError } = await supabase.rpc("resign_variant_game", {
       p_room_id: room.id,
@@ -938,7 +1032,13 @@ export function DraftMultiplayerGame() {
   }
 
   async function rematch() {
-    if (!room || gameState?.status !== "finished" || myRematchReady || actionLoading) return;
+    if (
+      !room ||
+      gameState?.status !== "finished" ||
+      myRematchReady ||
+      actionLoading
+    )
+      return;
     setActionLoading("rematch");
     const { error: rpcError } = await supabase.rpc("request_draft_rematch", {
       p_room_id: room.id,
@@ -960,12 +1060,15 @@ export function DraftMultiplayerGame() {
   }
 
   if (!user) return <SimplePage text="Sign in to open this Draft room." />;
-  if (loading && !gameState) return <SimplePage text="Loading Draft multiplayer..." />;
-  if (!room || !gameState) return <SimplePage text={error ?? "Draft room unavailable."} />;
+  if (loading && !gameState)
+    return <SimplePage text="Loading Draft multiplayer..." />;
+  if (!room || !gameState)
+    return <SimplePage text={error ?? "Draft room unavailable."} />;
 
   const board = phase === "playing" ? playingBoard : setupBoard;
   const setupSquares = mySide ? getDraftSetupSquares(mySide) : [];
-  const kingSquares = mySide && setupTool === "k" ? getDraftKingSquares(mySide) : [];
+  const kingSquares =
+    mySide && setupTool === "k" ? getDraftKingSquares(mySide) : [];
   const ownPieces = mySide ? countDraftPieces(setupState, mySide) : 0;
 
   return (
@@ -973,20 +1076,37 @@ export function DraftMultiplayerGame() {
       <div className="mx-auto max-w-[1500px]">
         <header className="mb-6 flex flex-col gap-4 rounded-3xl border border-emerald-400/15 bg-zinc-900/60 px-5 py-4 shadow-xl shadow-black/20 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-400/20 bg-emerald-400/10 text-3xl">⚔</div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-400/20 bg-emerald-400/10 text-3xl">
+              ⚔
+            </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-300">Draft Chess · Multiplayer</p>
-              <h1 className="mt-1 text-2xl font-black text-white">Build your own army</h1>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-300">
+                Draft Chess · Multiplayer
+              </p>
+              <h1 className="mt-1 text-2xl font-black text-white">
+                Build your own army
+              </h1>
               <p className="mt-1 text-sm text-zinc-500">
-                {phase === "playing" ? `${liveGame.turn() === "w" ? "White" : "Black"} to move` : `Private setup · round ${round}`}
+                {phase === "playing"
+                  ? `${liveGame.turn() === "w" ? "White" : "Black"} to move`
+                  : `Private setup · round ${round}`}
               </p>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <button type="button" onClick={() => void copyCode()} className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 font-mono text-xs font-black text-zinc-300">
+            <button
+              type="button"
+              onClick={() => void copyCode()}
+              className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 font-mono text-xs font-black text-zinc-300"
+            >
               {copied ? "Copied" : `Room ${room.code}`}
             </button>
-            <Link to="/games/chess/variants/draft/multiplayer" className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-zinc-400 hover:bg-white/10">Leave</Link>
+            <Link
+              to="/games/chess/variants/draft/multiplayer"
+              className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-zinc-400 hover:bg-white/10"
+            >
+              Leave
+            </Link>
           </div>
         </header>
 
@@ -1003,7 +1123,14 @@ export function DraftMultiplayerGame() {
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
               {phase !== "playing" ? (
-                <Panel title="Army Builder" subtitle={mySide === "w" ? "Ranks 1–2 · King on rank 1" : "Ranks 7–8 · King on rank 8"}>
+                <Panel
+                  title="Army Builder"
+                  subtitle={
+                    mySide === "w"
+                      ? "Ranks 1–2 · King on rank 1"
+                      : "Ranks 7–8 · King on rank 8"
+                  }
+                >
                   <div className="mb-4 grid grid-cols-2 gap-2">
                     <MiniStat label="Points left" value={remainingPoints} />
                     <MiniStat label="Points spent" value={spentPoints} />
@@ -1016,50 +1143,126 @@ export function DraftMultiplayerGame() {
                     onSelect={setSetupTool}
                   />
                   <div className="mt-4 grid grid-cols-3 gap-2">
-                    <button type="button" disabled={setupConfirmed} onClick={clearArmy} className="rounded-xl border border-white/10 bg-white/5 px-2 py-2.5 text-[11px] font-bold text-zinc-300 disabled:opacity-30">↺ Clear</button>
-                    <button type="button" disabled={setupConfirmed} onClick={randomizeArmy} className="rounded-xl border border-violet-400/20 bg-violet-400/[0.07] px-2 py-2.5 text-[11px] font-black text-violet-200 disabled:opacity-30">🎲 Random</button>
                     <button
                       type="button"
-                      disabled={!mySide || setupConfirmed || !canConfirmDraftArmy(setupState, mySide ?? "w").ok || actionLoading !== null || players.length < 2}
+                      disabled={setupConfirmed}
+                      onClick={clearArmy}
+                      className="rounded-xl border border-white/10 bg-white/5 px-2 py-2.5 text-[11px] font-bold text-zinc-300 disabled:opacity-30"
+                    >
+                      ↺ Clear
+                    </button>
+                    <button
+                      type="button"
+                      disabled={setupConfirmed}
+                      onClick={randomizeArmy}
+                      className="rounded-xl border border-violet-400/20 bg-violet-400/[0.07] px-2 py-2.5 text-[11px] font-black text-violet-200 disabled:opacity-30"
+                    >
+                      🎲 Random
+                    </button>
+                    <button
+                      type="button"
+                      disabled={
+                        !mySide ||
+                        setupConfirmed ||
+                        !canConfirmDraftArmy(setupState, mySide ?? "w").ok ||
+                        actionLoading !== null ||
+                        players.length < 2
+                      }
                       onClick={() => void confirmArmy()}
                       className="rounded-xl bg-emerald-300 px-2 py-2.5 text-[11px] font-black text-zinc-950 disabled:cursor-not-allowed disabled:opacity-30"
                     >
                       ✓ Confirm
                     </button>
                   </div>
-                  {setupConfirmed && <p className="mt-4 rounded-xl border border-emerald-400/15 bg-emerald-400/[0.06] px-3 py-3 text-xs font-bold text-emerald-200">Your army is locked. {opponentConfirmed ? "Revealing both armies..." : "Waiting for the opponent."}</p>}
+                  {setupConfirmed && (
+                    <p className="mt-4 rounded-xl border border-emerald-400/15 bg-emerald-400/[0.06] px-3 py-3 text-xs font-bold text-emerald-200">
+                      Your army is locked.{" "}
+                      {opponentConfirmed
+                        ? "Revealing both armies..."
+                        : "Waiting for the opponent."}
+                    </p>
+                  )}
                 </Panel>
               ) : (
                 <>
-                  <Panel title="Game Controls" subtitle="Negotiated online actions">
+                  {checkedStartWasAutoReplaced && (
+                    <Panel
+                      title="⚠ Start position corrected"
+                      subtitle="Automatic Draft safety rule"
+                    >
+                      <div className="rounded-xl border border-amber-400/20 bg-amber-400/[0.07] p-3">
+                        <p className="text-xs font-black text-amber-100">
+                          A King was already in check in the revealed starting
+                          position.
+                        </p>
+                        <p className="mt-2 text-xs leading-5 text-amber-200/80">
+                          Both drafted armies were therefore replaced
+                          automatically with two independent random legal armies
+                          before move 1.
+                        </p>
+                      </div>
+                    </Panel>
+                  )}
+
+                  <Panel
+                    title="Game Controls"
+                    subtitle="Negotiated online actions"
+                  >
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         type="button"
                         disabled={!canRequestUndo}
                         onClick={() => void requestUndo()}
                         className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm font-bold text-zinc-300 disabled:cursor-not-allowed disabled:opacity-30"
-                      >↶ Undo</button>
+                      >
+                        ↶ Undo
+                      </button>
                       <button
                         type="button"
                         disabled={gameState.status !== "playing" || undoPending}
                         onClick={() => void resign()}
                         className="rounded-xl border border-red-400/15 bg-red-400/[0.06] px-3 py-2.5 text-sm font-bold text-red-200 disabled:cursor-not-allowed disabled:opacity-30"
-                      >Resign</button>
+                      >
+                        Resign
+                      </button>
                     </div>
-                    {myUndoRequest && <p className="mt-3 text-xs text-amber-200">Undo request sent. Waiting for opponent.</p>}
+                    {myUndoRequest && (
+                      <p className="mt-3 text-xs text-amber-200">
+                        Undo request sent. Waiting for opponent.
+                      </p>
+                    )}
                     {opponentUndoRequest && (
                       <div className="mt-3 rounded-xl border border-amber-400/20 bg-amber-400/[0.06] p-3">
-                        <p className="text-xs font-black text-amber-100">Opponent requests an undo.</p>
+                        <p className="text-xs font-black text-amber-100">
+                          Opponent requests an undo.
+                        </p>
                         <div className="mt-2 grid grid-cols-2 gap-2">
-                          <button onClick={() => void respondUndo(true)} className="rounded-lg bg-emerald-300 px-3 py-2 text-xs font-black text-zinc-950">Accept</button>
-                          <button onClick={() => void respondUndo(false)} className="rounded-lg bg-white/10 px-3 py-2 text-xs font-black text-zinc-200">Decline</button>
+                          <button
+                            onClick={() => void respondUndo(true)}
+                            className="rounded-lg bg-emerald-300 px-3 py-2 text-xs font-black text-zinc-950"
+                          >
+                            Accept
+                          </button>
+                          <button
+                            onClick={() => void respondUndo(false)}
+                            className="rounded-lg bg-white/10 px-3 py-2 text-xs font-black text-zinc-200"
+                          >
+                            Decline
+                          </button>
                         </div>
                       </div>
                     )}
                   </Panel>
 
-                  <Panel title="Move History" subtitle="Click a move to preview it on the board">
-                    <HistoryList rows={historyRows} selected={historyPreviewPly} onSelect={setHistoryPreviewPly} />
+                  <Panel
+                    title="Move History"
+                    subtitle="Click a move to preview it on the board"
+                  >
+                    <HistoryList
+                      rows={historyRows}
+                      selected={historyPreviewPly}
+                      onSelect={setHistoryPreviewPly}
+                    />
                   </Panel>
                 </>
               )}
@@ -1071,64 +1274,115 @@ export function DraftMultiplayerGame() {
               {historyPreviewPly !== null && phase === "playing" && (
                 <div className="mb-3 flex items-center justify-between rounded-xl border border-blue-400/20 bg-blue-400/[0.07] px-4 py-3">
                   <div>
-                    <p className="text-[9px] font-black uppercase tracking-widest text-blue-300">History Preview</p>
-                    <p className="mt-1 text-sm font-bold text-white">{historyPreviewPly === 0 ? "Initial Draft position" : historyRows[historyPreviewPly - 1]?.san}</p>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-blue-300">
+                      History Preview
+                    </p>
+                    <p className="mt-1 text-sm font-bold text-white">
+                      {historyPreviewPly === 0
+                        ? "Initial Draft position"
+                        : historyRows[historyPreviewPly - 1]?.san}
+                    </p>
                   </div>
-                  <button type="button" onClick={() => setHistoryPreviewPly(null)} className="rounded-lg bg-white/10 px-3 py-2 text-xs font-bold text-zinc-200">Back to Live Board</button>
+                  <button
+                    type="button"
+                    onClick={() => setHistoryPreviewPly(null)}
+                    className="rounded-lg bg-white/10 px-3 py-2 text-xs font-bold text-zinc-200"
+                  >
+                    Back to Live Board
+                  </button>
+                </div>
+              )}
+
+              {gameState.status === "finished" && (
+                <div className="mb-4 rounded-3xl border border-emerald-400/20 bg-emerald-400/[0.06] p-5">
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-300">
+                    Game Over
+                  </p>
+                  <h2 className="mt-2 text-xl font-black text-white">
+                    {resultLabel(gameState)}
+                  </h2>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <button
+                      disabled={myRematchReady}
+                      onClick={() => void rematch()}
+                      className="rounded-xl bg-emerald-300 px-4 py-2.5 text-sm font-black text-zinc-950 disabled:opacity-40"
+                    >
+                      {myRematchReady ? "Rematch requested" : "Rematch"}
+                    </button>
+                    {opponentRematchReady && (
+                      <span className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs font-bold text-zinc-300">
+                        Opponent ready
+                      </span>
+                    )}
+                  </div>
                 </div>
               )}
 
               <div className="relative">
                 <Board
                   board={board}
-                  selectedSquare={phase === "playing" && historyPreviewPly === null ? selectedSquare : null}
-                  legalMoves={phase === "playing" && historyPreviewPly === null ? legalMoves : []}
+                  selectedSquare={
+                    phase === "playing" && historyPreviewPly === null
+                      ? selectedSquare
+                      : null
+                  }
+                  legalMoves={
+                    phase === "playing" && historyPreviewPly === null
+                      ? legalMoves
+                      : []
+                  }
                   lastMove={phase === "playing" ? displayedLastMove : null}
                   checkedKingSquare={checkedKingSquare}
-                  onSquareClick={phase === "playing" ? handleGameSquare : (row, column) => editSetup(getSquareName(row, column))}
+                  onSquareClick={
+                    phase === "playing"
+                      ? handleGameSquare
+                      : (row, column) => editSetup(getSquareName(row, column))
+                  }
                   draftSetupSquares={phase !== "playing" ? setupSquares : []}
                   draftKingSquares={phase !== "playing" ? kingSquares : []}
                   orientation={orientation}
                 />
-              {players.length < 2 && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[28px] bg-zinc-950/70 p-4 backdrop-blur-[3px]">
-                  <button
-                    type="button"
-                    onClick={() => void copyCode()}
-                    className="w-full max-w-lg rounded-[30px] border border-white/15 bg-zinc-900/95 px-8 py-8 text-center shadow-2xl shadow-black/60 transition hover:border-amber-300/35 hover:bg-zinc-900 active:scale-[0.99]"
-                    title="Copy room code"
-                  >
-                    <div className="text-4xl">🌐</div>
+                {players.length < 2 && (
+                  <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[28px] bg-zinc-950/70 p-4 backdrop-blur-[3px]">
+                    <button
+                      type="button"
+                      onClick={() => void copyCode()}
+                      className="w-full max-w-lg rounded-[30px] border border-white/15 bg-zinc-900/95 px-8 py-8 text-center shadow-2xl shadow-black/60 transition hover:border-amber-300/35 hover:bg-zinc-900 active:scale-[0.99]"
+                      title="Copy room code"
+                    >
+                      <div className="text-4xl">🌐</div>
 
-                    <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">
-                      Waiting for players
-                    </p>
-
-                    <h2 className="mt-2 text-2xl font-black text-white">
-                      {players.length}/2 players connected
-                    </h2>
-
-                    <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">
-                      Share this room code. The game starts automatically when everyone has joined.
-                    </p>
-
-                    <div className="mt-6 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-5 py-5">
-                      <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">
-                        Room Code
+                      <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">
+                        Waiting for players
                       </p>
 
-                      <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">
-                        {room.code}
+                      <h2 className="mt-2 text-2xl font-black text-white">
+                        {players.length}/2 players connected
+                      </h2>
+
+                      <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">
+                        Share this room code. The game starts automatically when
+                        everyone has joined.
                       </p>
-                    </div>
 
-                    <p className="mt-4 text-xs font-bold text-zinc-400">
-                      {copied ? "✓ Copied to clipboard" : "Click this box to copy the code"}
-                    </p>
-                  </button>
-                </div>
-              )}
+                      <div className="mt-6 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-5 py-5">
+                        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">
+                          Room Code
+                        </p>
 
+                        <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">
+                          {room.code}
+                        </p>
+                      </div>
+
+                      <p className="mt-4 text-xs font-bold text-zinc-400">
+                        {copied
+                          ? "✓ Copied to clipboard"
+                          : "Click this box to copy the code"}
+                      </p>
+                    </button>
+                  </div>
+                )}
 
                 {pendingPromotion && historyPreviewPly === null && (
                   <PromotionBar onPromote={promotePawn} />
@@ -1138,38 +1392,44 @@ export function DraftMultiplayerGame() {
                   <div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center rounded-xl bg-zinc-950/45 p-6 backdrop-blur-[2px]">
                     <div className="max-w-sm rounded-3xl border border-emerald-400/20 bg-zinc-900/95 p-6 text-center shadow-2xl">
                       <div className="text-4xl">🛡</div>
-                      <p className="mt-3 text-xs font-black uppercase tracking-[0.2em] text-emerald-300">Army locked</p>
-                      <p className="mt-2 text-sm text-zinc-400">{opponentConfirmed ? "Both armies are ready. Starting game..." : "Your opponent still sees only their own setup."}</p>
+                      <p className="mt-3 text-xs font-black uppercase tracking-[0.2em] text-emerald-300">
+                        Army locked
+                      </p>
+                      <p className="mt-2 text-sm text-zinc-400">
+                        {opponentConfirmed
+                          ? "Both armies are ready. Starting game..."
+                          : "Your opponent still sees only their own setup."}
+                      </p>
                     </div>
                   </div>
                 )}
               </div>
-
-              {gameState.status === "finished" && (
-                <div className="mt-4 rounded-3xl border border-emerald-400/20 bg-emerald-400/[0.06] p-5">
-                  <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-300">Game Over</p>
-                  <h2 className="mt-2 text-xl font-black text-white">{resultLabel(gameState)}</h2>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <button disabled={myRematchReady} onClick={() => void rematch()} className="rounded-xl bg-emerald-300 px-4 py-2.5 text-sm font-black text-zinc-950 disabled:opacity-40">{myRematchReady ? "Rematch requested" : "Rematch"}</button>
-                    {opponentRematchReady && <span className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs font-bold text-zinc-300">Opponent ready</span>}
-                  </div>
-                </div>
-              )}
             </div>
           </section>
 
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
               <Panel title="Room" subtitle="Private Draft match">
-                <InfoRow label="You" value={`${myPlayer?.display_name ?? "—"} · ${myColor ?? "—"}`} />
-                <InfoRow label="Opponent" value={`${opponent?.display_name ?? "Waiting..."} · ${opponent?.chosen_color ?? "—"}`} />
+                <InfoRow
+                  label="You"
+                  value={`${myPlayer?.display_name ?? "—"} · ${myColor ?? "—"}`}
+                />
+                <InfoRow
+                  label="Opponent"
+                  value={`${opponent?.display_name ?? "Waiting..."} · ${opponent?.chosen_color ?? "—"}`}
+                />
                 <InfoRow label="Round" value={String(round)} />
               </Panel>
 
               <Panel title="Draft Status" subtitle="39-point budget">
                 <div className="grid grid-cols-2 gap-2">
                   <MiniStat label="Pieces" value={ownPieces} />
-                  <MiniStat label="King" value={mySide ? countDraftPieceType(setupState, mySide, "k") : 0} />
+                  <MiniStat
+                    label="King"
+                    value={
+                      mySide ? countDraftPieceType(setupState, mySide, "k") : 0
+                    }
+                  />
                 </div>
                 <div className="mt-3 space-y-2 text-xs">
                   <StatusLine label="Your army" ready={setupConfirmed} />
@@ -1222,10 +1482,16 @@ function PiecePalette({
             }`}
           >
             <span className="flex items-center gap-2">
-              <span className="text-2xl">{side === "w" ? whiteSymbols[piece] : blackSymbols[piece]}</span>
-              <span className="text-[10px] font-black">{pieceNames[piece]}</span>
+              <span className="text-2xl">
+                {side === "w" ? whiteSymbols[piece] : blackSymbols[piece]}
+              </span>
+              <span className="text-[10px] font-black">
+                {pieceNames[piece]}
+              </span>
             </span>
-            <span className="rounded-lg bg-black/20 px-1.5 py-1 text-[9px] font-black">{cost}</span>
+            <span className="rounded-lg bg-black/20 px-1.5 py-1 text-[9px] font-black">
+              {cost}
+            </span>
           </button>
         );
       })}
@@ -1265,7 +1531,9 @@ function HistoryList({
         <span className="font-bold text-zinc-300">Initial Draft position</span>
       </button>
       {rows.length === 0 ? (
-        <div className="px-4 py-6 text-center text-xs text-zinc-600">No moves yet</div>
+        <div className="px-4 py-6 text-center text-xs text-zinc-600">
+          No moves yet
+        </div>
       ) : (
         rows.map((row) => (
           <button
@@ -1274,9 +1542,18 @@ function HistoryList({
             onClick={() => onSelect(row.ply)}
             className={`flex w-full items-center gap-3 border-b border-white/5 px-3 py-2.5 text-left last:border-0 ${selected === row.ply ? "bg-blue-400/10" : "hover:bg-white/5"}`}
           >
-            <span className="w-8 text-[10px] text-zinc-600">{row.moveNumber}{row.color === "w" ? "." : "..."}</span>
-            <span className="text-lg">{row.color === "w" ? whiteSymbols[row.piece as DraftPieceType] : blackSymbols[row.piece as DraftPieceType]}</span>
-            <span className="font-mono text-xs font-bold text-zinc-200">{row.san}</span>
+            <span className="w-8 text-[10px] text-zinc-600">
+              {row.moveNumber}
+              {row.color === "w" ? "." : "..."}
+            </span>
+            <span className="text-lg">
+              {row.color === "w"
+                ? whiteSymbols[row.piece as DraftPieceType]
+                : blackSymbols[row.piece as DraftPieceType]}
+            </span>
+            <span className="font-mono text-xs font-bold text-zinc-200">
+              {row.san}
+            </span>
           </button>
         ))
       )}
@@ -1284,7 +1561,15 @@ function HistoryList({
   );
 }
 
-function Panel({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
+function Panel({
+  title,
+  subtitle,
+  children,
+}: {
+  title: string;
+  subtitle?: string;
+  children: ReactNode;
+}) {
   return (
     <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/15 backdrop-blur-md">
       <div className="mb-4">
@@ -1299,7 +1584,9 @@ function Panel({ title, subtitle, children }: { title: string; subtitle?: string
 function MiniStat({ label, value }: { label: string; value: number | string }) {
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 p-3">
-      <p className="text-[9px] font-black uppercase tracking-wider text-zinc-600">{label}</p>
+      <p className="text-[9px] font-black uppercase tracking-wider text-zinc-600">
+        {label}
+      </p>
       <p className="mt-2 text-xl font-black text-zinc-200">{value}</p>
     </div>
   );
@@ -1309,7 +1596,9 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-3 border-b border-white/5 py-2 text-xs last:border-0">
       <span className="text-zinc-500">{label}</span>
-      <span className="max-w-[180px] truncate font-black text-zinc-200">{value}</span>
+      <span className="max-w-[180px] truncate font-black text-zinc-200">
+        {value}
+      </span>
     </div>
   );
 }
@@ -1318,23 +1607,39 @@ function StatusLine({ label, ready }: { label: string; ready: boolean }) {
   return (
     <div className="flex items-center justify-between rounded-xl border border-white/5 bg-black/20 px-3 py-2.5">
       <span className="text-zinc-500">{label}</span>
-      <span className={ready ? "font-black text-emerald-300" : "font-bold text-zinc-600"}>{ready ? "Ready" : "Building"}</span>
+      <span
+        className={
+          ready ? "font-black text-emerald-300" : "font-bold text-zinc-600"
+        }
+      >
+        {ready ? "Ready" : "Building"}
+      </span>
     </div>
   );
 }
 
 function Rule({ text }: { text: string }) {
-  return <div className="mb-2 rounded-xl border border-white/5 bg-black/20 px-3 py-2.5 text-xs leading-5 text-zinc-400 last:mb-0">{text}</div>;
+  return (
+    <div className="mb-2 rounded-xl border border-white/5 bg-black/20 px-3 py-2.5 text-xs leading-5 text-zinc-400 last:mb-0">
+      {text}
+    </div>
+  );
 }
 
 function ErrorBox({ children }: { children: ReactNode }) {
-  return <div className="mb-5 mt-4 rounded-2xl border border-red-400/20 bg-red-400/[0.07] px-4 py-3 text-sm font-semibold text-red-200">{children}</div>;
+  return (
+    <div className="mb-5 mt-4 rounded-2xl border border-red-400/20 bg-red-400/[0.07] px-4 py-3 text-sm font-semibold text-red-200">
+      {children}
+    </div>
+  );
 }
 
 function SimplePage({ text }: { text: string }) {
   return (
     <main className="min-h-screen bg-zinc-950 px-4 py-8 text-zinc-100">
-      <div className="mx-auto max-w-2xl rounded-3xl border border-white/10 bg-zinc-900/70 p-6 text-center">{text}</div>
+      <div className="mx-auto max-w-2xl rounded-3xl border border-white/10 bg-zinc-900/70 p-6 text-center">
+        {text}
+      </div>
     </main>
   );
 }

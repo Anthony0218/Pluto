@@ -209,24 +209,15 @@ export default function CapitalismChessRules() {
   const [language, setLanguage] = useState<Language>(getInitialLanguage);
 
   const t = (key: string) => {
-    if (language === "en") {
-      return key;
-    }
-
-    if (language === "bar") {
+    if (language === "en") return key;
+    if (language === "bar")
       return translations.bar[key] ?? translations.de[key] ?? key;
-    }
-
-    if (language === "ru") {
-      return translations.ru[key] ?? key;
-    }
-
+    if (language === "ru") return translations.ru[key] ?? key;
     return translations[language][key] ?? key;
   };
 
   function changeLanguage(nextLanguage: Language) {
     setLanguage(nextLanguage);
-
     if (typeof window !== "undefined") {
       window.localStorage.setItem(CHESS_LANGUAGE_STORAGE_KEY, nextLanguage);
     }
@@ -241,16 +232,13 @@ export default function CapitalismChessRules() {
               <p className="text-[10px] font-black uppercase tracking-[0.25em] text-amber-400">
                 Chess Variant III
               </p>
-
               <h1 className="mt-2 text-3xl font-black text-white">
                 {t("Capitalism Chess Rulebook")}
               </h1>
-
               <p className="mt-2 text-sm text-zinc-500">
                 {t("Economy, contracts, shopping and survival rules")}
               </p>
             </div>
-
             <div className="flex flex-wrap items-center gap-2">
               <a
                 href="/games/chess/variants/capitalism/hotseat"
@@ -258,7 +246,6 @@ export default function CapitalismChessRules() {
               >
                 ← {t("Back to Capitalism Chess")}
               </a>
-
               <select
                 value={language}
                 onChange={(event) =>
@@ -277,25 +264,24 @@ export default function CapitalismChessRules() {
         </header>
 
         <RuleSection number="0" title={t("Core Goal")} accent="amber">
-          <p className="text-sm leading-7 text-zinc-400">
+          <RuleParagraph>
             {t(
               "Capitalism Chess keeps normal chess victory conditions. Checkmate still wins the game.",
             )}
-          </p>
+          </RuleParagraph>
         </RuleSection>
 
         <RuleSection number="1" title={t("1. Money")} accent="amber">
-          <p className="mb-4 text-sm text-zinc-400">
-            {t("You earn coins while playing normal chess.")}
-          </p>
-
-          <TwoColumnTable
-            headers={[t("Action"), t("Reward")]}
-            rows={actionRewards.map(([action, reward]) => [
-              t(action),
-              `${reward} $`,
-            ])}
-          />
+          <RuleParagraph>
+            {t(
+              "Each player starts with 2 coins. Coins are earned only from Bounties and Missions.",
+            )}
+          </RuleParagraph>
+          <RuleCallout icon="$">
+            {t(
+              "Normal moves, ordinary captures, check, castling and promotion give no automatic coin income.",
+            )}
+          </RuleCallout>
         </RuleSection>
 
         <RuleSection number="2" title={t("2. Bounties")} accent="amber">
@@ -304,16 +290,12 @@ export default function CapitalismChessRules() {
               "Each player hunts one opposing non-King piece. The marked $ square follows that piece when it moves.",
             )}
           </RuleParagraph>
-
           <RuleParagraph>
-            {t(
-              "Bounty rewards are random from 3 to 10 coins. A Pawn can therefore carry a jackpot bounty.",
-            )}
+            {t("Every bounty reward is random from 3 to 9 coins.")}
           </RuleParagraph>
-
           <RuleCallout icon="$">
             {t(
-              "The bounty bonus is added on top of the normal capture reward.",
+              "You receive coins only if you actually capture your active bounty target. There is no separate normal capture reward.",
             )}
           </RuleCallout>
         </RuleSection>
@@ -321,14 +303,12 @@ export default function CapitalismChessRules() {
         <RuleSection number="3" title={t("3. Missions")} accent="emerald">
           <RuleParagraph>
             {t(
-              "Each player has one active mission. Every newly assigned mission receives a random reward from 3 to 10 coins.",
+              "Each player has one active mission. Every newly assigned mission receives a random reward from 3 to 9 coins.",
             )}
           </RuleParagraph>
-
           <p className="mt-4 text-xs font-black uppercase tracking-wider text-zinc-600">
             {t("Mission examples")}
           </p>
-
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             {[
               "Give check",
@@ -347,10 +327,9 @@ export default function CapitalismChessRules() {
               </div>
             ))}
           </div>
-
           <RuleCallout icon="+">
             {t(
-              "Mission rewards are extra; normal action income still applies.",
+              "Mission rewards and bounty rewards are the only ways to generate new coins.",
             )}
           </RuleCallout>
         </RuleSection>
@@ -359,31 +338,26 @@ export default function CapitalismChessRules() {
           <RuleParagraph>
             {t("Pieces may only spawn on your original rook home squares.")}
           </RuleParagraph>
-
           <div className="my-4 grid gap-3 sm:grid-cols-2">
             <SpawnCard
               side="white"
               label={t("White spawn points")}
               squares="a1 · h1"
             />
-
             <SpawnCard
               side="black"
               label={t("Black spawn points")}
               squares="a8 · h8"
             />
           </div>
-
           <RuleParagraph>
             {t(
               "Green + means the rook-home square is empty and usable. A dim + means it is currently occupied.",
             )}
           </RuleParagraph>
-
           <RuleParagraph>
             {t("You cannot buy a piece while your King is in check.")}
           </RuleParagraph>
-
           <TwoColumnTable
             headers={[t("Piece"), t("Cost")]}
             rows={shopCosts.map(([piece, cost]) => [t(piece), `${cost} $`])}
@@ -391,20 +365,21 @@ export default function CapitalismChessRules() {
         </RuleSection>
 
         <RuleSection number="5" title={t("5. Royal Powers")} accent="violet">
-          <PowerRule title={t("Royal Investment")} cost="5 $">
-            {t("Double the normal income of your next capture.")}
-          </PowerRule>
-
+          <RuleParagraph>
+            {t(
+              "Royal Investment is disabled because normal capture income no longer exists.",
+            )}
+          </RuleParagraph>
           <PowerRule title={t("Mission Decree")} cost="4 $">
             {t("Reroll your active mission.")}
           </PowerRule>
-
           <PowerRule title={t("Bounty Decree")} cost="4 $">
             {t("Reroll your active bounty target and its reward.")}
           </PowerRule>
-
           <RuleCallout icon="♛">
-            {t("Each Royal Power can be used only once by each player.")}
+            {t(
+              "Mission Decree and Bounty Decree can each be used only once by each player.",
+            )}
           </RuleCallout>
         </RuleSection>
 
@@ -418,45 +393,38 @@ export default function CapitalismChessRules() {
               "This special rule activates only when one side has only its King, or only King + Pawns, with no Queen, Rook, Bishop or Knight left.",
             )}
           </RuleParagraph>
-
           <RuleParagraph>
             {t(
               "That player can no longer receive ordinary missions. Their only mission is King Journey.",
             )}
           </RuleParagraph>
-
           <RuleParagraph>
             {t(
               "Move the King onto the marked target square to complete the mission.",
             )}
           </RuleParagraph>
-
           <div className="my-5 grid gap-3 sm:grid-cols-2">
             <JourneyMarkerCard
               side="white"
               title={t("White King Journey target")}
               symbol="♔"
             />
-
             <JourneyMarkerCard
               side="black"
               title={t("Black King Journey target")}
               symbol="♚"
             />
           </div>
-
           <RuleCallout icon="♔♚">
             {t(
               "If both targets are the same square, both King symbols appear together.",
             )}
           </RuleCallout>
-
           <RuleParagraph>
             {t(
               "The target is never the King's current square and starts on an empty square.",
             )}
           </RuleParagraph>
-
           <RuleParagraph>
             {t(
               "If the player buys a Knight, Bishop, Rook or Queen, normal missions return. Buying another Pawn does not end King Journey mode.",

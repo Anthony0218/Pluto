@@ -5,13 +5,19 @@ export const HOT_POTATO_MAX_FUSE_MOVES = 12;
 export const HOT_POTATO_RESPAWN_WAIT_MOVES = 5;
 
 export type HotPotatoOutcome = "white" | "black" | "draw" | null;
+export type HotPotatoOwner = "w" | "b";
+export type HotPotatoBlastPattern = "ring" | "cross2" | "diagonal2";
 
 export type HotPotatoState = {
+  owner: HotPotatoOwner;
   square: Square | null;
   movesUntilExplosion: number;
   fuseMovesTotal: number;
   respawnMovesRemaining: number;
+  blastPattern: HotPotatoBlastPattern;
 };
+
+export type HotPotatoStates = Record<HotPotatoOwner, HotPotatoState>;
 
 export type HotPotatoMove = {
   from: Square;
@@ -36,12 +42,17 @@ export type ExplosionResolution = {
 export function getRandomHotPotatoSquare(
   game: Chess,
   random: () => number = Math.random,
+  color?: HotPotatoOwner,
 ): Square | null {
   const candidates: Square[] = [];
 
   for (const row of game.board()) {
     for (const piece of row) {
-      if (piece && piece.type !== "k") {
+      if (
+        piece &&
+        piece.type !== "k" &&
+        (color === undefined || piece.color === color)
+      ) {
         candidates.push(piece.square);
       }
     }
@@ -62,17 +73,61 @@ export function getRandomHotPotatoFuseMoves(
   return HOT_POTATO_MIN_FUSE_MOVES + Math.floor(random() * range);
 }
 
+export function getRandomHotPotatoBlastPattern(
+  random: () => number = Math.random,
+): HotPotatoBlastPattern {
+  const patterns: HotPotatoBlastPattern[] = ["ring", "cross2", "diagonal2"];
+
+  return patterns[Math.floor(random() * patterns.length)] ?? "ring";
+}
+
 export function createInitialHotPotatoState(
   game: Chess,
   random: () => number = Math.random,
+  owner: HotPotatoOwner = "w",
 ): HotPotatoState {
   const fuseMoves = getRandomHotPotatoFuseMoves(random);
 
   return {
-    square: getRandomHotPotatoSquare(game, random),
+    owner,
+    square: getRandomHotPotatoSquare(game, random, owner),
     movesUntilExplosion: fuseMoves,
     fuseMovesTotal: fuseMoves,
     respawnMovesRemaining: 0,
+    blastPattern: getRandomHotPotatoBlastPattern(random),
+  };
+}
+
+export function createInitialHotPotatoStates(
+  game: Chess,
+  whiteRandom: () => number = Math.random,
+  blackRandom: () => number = Math.random,
+): HotPotatoStates {
+  return {
+    w: createInitialHotPotatoState(game, whiteRandom, "w"),
+    b: createInitialHotPotatoState(game, blackRandom, "b"),
+  };
+}
+
+export function createRespawnedHotPotatoState(
+  game: Chess,
+  owner: HotPotatoOwner,
+  random: () => number = Math.random,
+): HotPotatoState {
+  return createInitialHotPotatoState(game, random, owner);
+}
+
+export function createCoolingHotPotatoState(
+  owner: HotPotatoOwner,
+  blastPattern: HotPotatoBlastPattern = "ring",
+): HotPotatoState {
+  return {
+    owner,
+    square: null,
+    movesUntilExplosion: 0,
+    fuseMovesTotal: 0,
+    respawnMovesRemaining: HOT_POTATO_RESPAWN_WAIT_MOVES,
+    blastPattern,
   };
 }
 
@@ -93,21 +148,50 @@ function coordinatesToSquare(file: number, rank: number): Square | null {
   return `${fileLetter}${rank + 1}` as Square;
 }
 
-export function getExplosionSquares(center: Square): Square[] {
+function addExplosionOffset(
+  squares: Set<Square>,
+  file: number,
+  rank: number,
+  fileOffset: number,
+  rankOffset: number,
+) {
+  const square = coordinatesToSquare(file + fileOffset, rank + rankOffset);
+
+  if (square) {
+    squares.add(square);
+  }
+}
+
+export function getExplosionSquares(
+  center: Square,
+  pattern: HotPotatoBlastPattern = "ring",
+): Square[] {
   const { file, rank } = squareToCoordinates(center);
-  const squares: Square[] = [];
+  const squares = new Set<Square>([center]);
 
-  for (let fileOffset = -1; fileOffset <= 1; fileOffset += 1) {
-    for (let rankOffset = -1; rankOffset <= 1; rankOffset += 1) {
-      const square = coordinatesToSquare(file + fileOffset, rank + rankOffset);
-
-      if (square) {
-        squares.push(square);
+  if (pattern === "ring") {
+    for (let fileOffset = -1; fileOffset <= 1; fileOffset += 1) {
+      for (let rankOffset = -1; rankOffset <= 1; rankOffset += 1) {
+        addExplosionOffset(squares, file, rank, fileOffset, rankOffset);
       }
+    }
+  } else if (pattern === "cross2") {
+    for (const distance of [1, 2]) {
+      addExplosionOffset(squares, file, rank, distance, 0);
+      addExplosionOffset(squares, file, rank, -distance, 0);
+      addExplosionOffset(squares, file, rank, 0, distance);
+      addExplosionOffset(squares, file, rank, 0, -distance);
+    }
+  } else {
+    for (const distance of [1, 2]) {
+      addExplosionOffset(squares, file, rank, distance, distance);
+      addExplosionOffset(squares, file, rank, distance, -distance);
+      addExplosionOffset(squares, file, rank, -distance, distance);
+      addExplosionOffset(squares, file, rank, -distance, -distance);
     }
   }
 
-  return squares;
+  return [...squares];
 }
 
 export function findKingSquare(game: Chess, color: "w" | "b"): Square | null {
@@ -186,7 +270,7 @@ export function getHotPotatoSquareAfterMove(
 /**
  * Resolves a Hot Potato explosion in-place on the supplied Chess instance.
  *
- * The blast is the carrier square plus all 8 surrounding squares.
+ * The blast shape is controlled by HotPotatoBlastPattern.
  * Kings are NOT removed from chess.js because a king-less FEN is unsafe for
  * history/undo. Instead, blownUpKingSquares tells the Board which king symbols
  * must disappear visually after the terminal blast.
@@ -194,8 +278,9 @@ export function getHotPotatoSquareAfterMove(
 export function resolveHotPotatoExplosion(
   game: Chess,
   hotPotatoSquare: Square,
+  pattern: HotPotatoBlastPattern = "ring",
 ): ExplosionResolution {
-  const explosionSquares = getExplosionSquares(hotPotatoSquare);
+  const explosionSquares = getExplosionSquares(hotPotatoSquare, pattern);
 
   const whiteKingSquare = findKingSquare(game, "w");
   const blackKingSquare = findKingSquare(game, "b");
@@ -211,7 +296,7 @@ export function resolveHotPotatoExplosion(
     ...(blackKingHit && blackKingSquare ? [blackKingSquare] : []),
   ];
 
-  // Remove every non-king piece in the 3x3 blast area.
+  // Remove every non-king piece in the selected blast area.
   const destroyedPieces: DestroyedPiece[] = [];
 
   for (const square of explosionSquares) {

@@ -32,6 +32,10 @@ export function BossBattleAiPage() {
       title="Boss Battle Chess"
       icon="♚"
       Board={BossBattleBoard}
+      sideLabels={{
+        white: "White Army",
+        black: "Boss",
+      }}
     />
   );
 }
@@ -78,11 +82,7 @@ export function RouletteAiPage() {
 
 export function DraftAiPage() {
   return (
-    <VariantAiLauncher
-      title="Draft Chess"
-      icon="⚔"
-      Board={DraftChessBoard}
-    />
+    <VariantAiLauncher title="Draft Chess" icon="⚔" Board={DraftChessBoard} />
   );
 }
 
@@ -98,21 +98,13 @@ export function FogOfWarAiPage() {
 
 export function HorrorAiPage() {
   return (
-    <VariantAiLauncher
-      title="Horror Chess"
-      icon="☠"
-      Board={HorrorChessBoard}
-    />
+    <VariantAiLauncher title="Horror Chess" icon="☠" Board={HorrorChessBoard} />
   );
 }
 
 export function MirrorAiPage() {
   return (
-    <VariantAiLauncher
-      title="Mirror Chess"
-      icon="◈"
-      Board={MirrorChessBoard}
-    />
+    <VariantAiLauncher title="Mirror Chess" icon="◈" Board={MirrorChessBoard} />
   );
 }
 
@@ -148,11 +140,7 @@ export function RandomStartAiPage() {
 
 export function TectonicAiPage() {
   return (
-    <VariantAiLauncher
-      title="Tectonic Chess"
-      icon="↻"
-      Board={TectonicChess}
-    />
+    <VariantAiLauncher title="Tectonic Chess" icon="↻" Board={TectonicChess} />
   );
 }
 

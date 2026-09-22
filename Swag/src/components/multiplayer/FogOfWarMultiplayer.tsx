@@ -134,7 +134,10 @@ const pieceValues: Record<string, number> = {
 };
 
 function normalizeCode(value: string) {
-  return value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6);
+  return value
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "")
+    .slice(0, 6);
 }
 
 function chessColor(color: TwoPlayerColor): FogSide {
@@ -177,7 +180,9 @@ async function callFogFunction(body: Record<string, unknown>) {
 
   if (error) throw new Error(error.message);
   if (!data || !data.ok) {
-    throw new Error(data && "error" in data ? data.error : "Fog server request failed");
+    throw new Error(
+      data && "error" in data ? data.error : "Fog server request failed",
+    );
   }
   return data;
 }
@@ -189,7 +194,9 @@ function pieceAt(board: MaskedBoard, square: Square): MaskedPiece | null {
 }
 
 function optimisticMoveBoard(board: MaskedBoard, from: Square, to: Square) {
-  const next = board.map((row) => row.map((piece) => (piece ? { ...piece } : null)));
+  const next = board.map((row) =>
+    row.map((piece) => (piece ? { ...piece } : null)),
+  );
   const fromColumn = "abcdefgh".indexOf(from[0]);
   const fromRow = 8 - Number(from[1]);
   const toColumn = "abcdefgh".indexOf(to[0]);
@@ -216,6 +223,7 @@ export function FogOfWarMultiplayerLobby() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
   const [hostColor, setHostColor] = useState<TwoPlayerColor>("white");
+  const [randomStart, setRandomStart] = useState(true);
   const [joinCode, setJoinCode] = useState("");
   const [loading, setLoading] = useState<"create" | "join" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -235,13 +243,16 @@ export function FogOfWarMultiplayerLobby() {
       const result = await callFogFunction({
         action: "create",
         hostColor,
+        randomStart,
         displayName,
       });
       navigate(
         `/games/chess/variants/fog-of-war/multiplayer/${String(result.code)}`,
       );
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not create room.");
+      setError(
+        cause instanceof Error ? cause.message : "Could not create room.",
+      );
     } finally {
       setLoading(null);
     }
@@ -286,7 +297,8 @@ export function FogOfWarMultiplayerLobby() {
                 Your opponent cannot inspect what the fog hides.
               </h1>
               <p className="mt-1 text-sm text-zinc-500">
-                The real board stays on the server. Each browser receives only its own masked view.
+                The real board stays on the server. Each browser receives only
+                its own masked view.
               </p>
             </div>
           </div>
@@ -313,12 +325,45 @@ export function FogOfWarMultiplayerLobby() {
                         : "border-white/10 bg-black/20 text-zinc-400 hover:bg-white/5"
                     }`}
                   >
-                    {color === "white" ? "♔" : "♚"} {color === "white" ? "White" : "Black"}
+                    {color === "white" ? "♔" : "♚"}{" "}
+                    {color === "white" ? "White" : "Black"}
                   </button>
                 ))}
               </div>
+
+              <div className="mt-4">
+                <p className="mb-2 text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">
+                  Starting position
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setRandomStart(false)}
+                    className={`rounded-xl border px-4 py-3 font-black transition ${
+                      !randomStart
+                        ? "border-sky-400/30 bg-sky-400/10 text-sky-200"
+                        : "border-white/10 bg-black/20 text-zinc-400 hover:bg-white/5"
+                    }`}
+                  >
+                    ♜ Standard
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRandomStart(true)}
+                    className={`rounded-xl border px-4 py-3 font-black transition ${
+                      randomStart
+                        ? "border-violet-400/30 bg-violet-400/10 text-violet-200"
+                        : "border-white/10 bg-black/20 text-zinc-400 hover:bg-white/5"
+                    }`}
+                  >
+                    🎲 Random
+                  </button>
+                </div>
+              </div>
+
               <div className="mt-4 rounded-xl border border-sky-300/10 bg-sky-400/[0.05] p-3 text-xs leading-5 text-zinc-400">
-                Hidden pieces, the true FEN and full move history never enter either player's browser.
+                Hidden pieces, the true FEN and full move history never enter
+                either player's browser.
               </div>
               <button
                 type="button"
@@ -333,7 +378,9 @@ export function FogOfWarMultiplayerLobby() {
             <Panel title="Join room" subtitle="You receive the opposite side">
               <input
                 value={joinCode}
-                onChange={(event) => setJoinCode(normalizeCode(event.target.value))}
+                onChange={(event) =>
+                  setJoinCode(normalizeCode(event.target.value))
+                }
                 onKeyDown={(event) => event.key === "Enter" && void joinRoom()}
                 placeholder="ABC123"
                 maxLength={6}
@@ -367,8 +414,12 @@ export function FogOfWarMultiplayerGame() {
     from: Square;
     to: Square;
   } | null>(null);
-  const [historyPreviewPly, setHistoryPreviewPly] = useState<number | null>(null);
-  const [optimisticBoard, setOptimisticBoard] = useState<MaskedBoard | null>(null);
+  const [historyPreviewPly, setHistoryPreviewPly] = useState<number | null>(
+    null,
+  );
+  const [optimisticBoard, setOptimisticBoard] = useState<MaskedBoard | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [moving, setMoving] = useState(false);
   const [actionLoading, setActionLoading] = useState<ActionLoading>(null);
@@ -408,7 +459,9 @@ export function FogOfWarMultiplayerGame() {
         setError(null);
       } catch (cause) {
         if (!silent) {
-          setError(cause instanceof Error ? cause.message : "Could not load room.");
+          setError(
+            cause instanceof Error ? cause.message : "Could not load room.",
+          );
         }
       } finally {
         if (!silent) setLoading(false);
@@ -455,21 +508,26 @@ export function FogOfWarMultiplayerGame() {
   }, [actionLoading, loadSnapshot, moving, snapshot?.room.id]);
 
   const me = useMemo(
-    () => snapshot?.players.find((player) => player.user_id === user?.id) ?? null,
+    () =>
+      snapshot?.players.find((player) => player.user_id === user?.id) ?? null,
     [snapshot?.players, user?.id],
   );
   const opponent = useMemo(
-    () => snapshot?.players.find((player) => player.user_id !== user?.id) ?? null,
+    () =>
+      snapshot?.players.find((player) => player.user_id !== user?.id) ?? null,
     [snapshot?.players, user?.id],
   );
 
   const preview = useMemo(() => {
     if (!snapshot || historyPreviewPly === null) return null;
     if (historyPreviewPly === 0) return snapshot.initialView;
-    return snapshot.history.find((entry) => entry.ply === historyPreviewPly) ?? null;
+    return (
+      snapshot.history.find((entry) => entry.ply === historyPreviewPly) ?? null
+    );
   }, [historyPreviewPly, snapshot]);
 
-  const displayedBoard = preview?.board ?? optimisticBoard ?? snapshot?.board ?? [];
+  const displayedBoard =
+    preview?.board ?? optimisticBoard ?? snapshot?.board ?? [];
   const displayedFogSquares = preview?.fogSquares ?? snapshot?.fogSquares ?? [];
   const displayedLastMove = preview?.lastMove ?? snapshot?.lastMove ?? null;
   const displayedCheckedKing =
@@ -480,12 +538,12 @@ export function FogOfWarMultiplayerGame() {
   const mySide = snapshot ? chessColor(snapshot.myColor) : null;
   const canMove = Boolean(
     snapshot &&
-      snapshot.status === "playing" &&
-      snapshot.turn === mySide &&
-      !snapshot.undo.requestedBy &&
-      historyPreviewPly === null &&
-      !moving &&
-      actionLoading === null,
+    snapshot.status === "playing" &&
+    snapshot.turn === mySide &&
+    !snapshot.undo.requestedBy &&
+    historyPreviewPly === null &&
+    !moving &&
+    actionLoading === null,
   );
 
   const legalMoves = selectedSquare
@@ -545,10 +603,7 @@ export function FogOfWarMultiplayerGame() {
     }
 
     const movingPiece = pieceAt(snapshot.board, selectedSquare);
-    if (
-      movingPiece?.type === "p" &&
-      (square[1] === "8" || square[1] === "1")
-    ) {
+    if (movingPiece?.type === "p" && (square[1] === "8" || square[1] === "1")) {
       setPendingPromotion({ from: selectedSquare, to: square });
       clearSelection();
       return;
@@ -615,7 +670,11 @@ export function FogOfWarMultiplayerGame() {
     setActionLoading(action);
     setError(null);
     try {
-      const result = await callFogFunction({ action: body.action, roomCode, ...body });
+      const result = await callFogFunction({
+        action: body.action,
+        roomCode,
+        ...body,
+      });
       if (result.snapshot) {
         lastHistoryLengthRef.current = result.snapshot.history.length;
         setSnapshot(result.snapshot);
@@ -685,7 +744,8 @@ export function FogOfWarMultiplayerGame() {
                 You cannot see everything
               </h1>
               <p className="mt-0.5 text-sm text-zinc-500">
-                Private server-side fog · {snapshot.myColor === "white" ? "White" : "Black"} view
+                Private server-side fog ·{" "}
+                {snapshot.myColor === "white" ? "White" : "Black"} view
               </p>
             </div>
           </div>
@@ -711,9 +771,21 @@ export function FogOfWarMultiplayerGame() {
         </header>
 
         <section className="mb-6 grid gap-3 rounded-3xl border border-sky-400/10 bg-sky-400/[0.03] px-5 py-4 md:grid-cols-3">
-          <RuleStrip icon="♙" title="Own army" detail="Your own pieces are always visible" />
-          <RuleStrip icon="◌" title="Reachable squares" detail="Attacked and legal squares reveal the fog" />
-          <RuleStrip icon="?" title="Hidden enemy" detail="The real enemy position remains server-side" />
+          <RuleStrip
+            icon="♙"
+            title="Own army"
+            detail="Your own pieces are always visible"
+          />
+          <RuleStrip
+            icon="◌"
+            title="Reachable squares"
+            detail="Attacked and legal squares reveal the fog"
+          />
+          <RuleStrip
+            icon="?"
+            title="Hidden enemy"
+            detail="The real enemy position remains server-side"
+          />
         </section>
 
         {snapshot.status === "finished" && (
@@ -731,13 +803,20 @@ export function FogOfWarMultiplayerGame() {
               <p className="text-xs font-black uppercase tracking-widest text-amber-300">
                 Undo request
               </p>
-              <p className="mt-1 text-sm text-zinc-300">Your opponent wants to undo the latest move.</p>
+              <p className="mt-1 text-sm text-zinc-300">
+                Your opponent wants to undo the latest move.
+              </p>
             </div>
             <div className="flex gap-2">
               <button
                 type="button"
                 disabled={actionLoading !== null}
-                onClick={() => void doAction("undo-response", { action: "undo-respond", accept: true })}
+                onClick={() =>
+                  void doAction("undo-response", {
+                    action: "undo-respond",
+                    accept: true,
+                  })
+                }
                 className="rounded-xl bg-emerald-300 px-4 py-2 text-xs font-black text-zinc-950 disabled:opacity-40"
               >
                 Accept
@@ -745,7 +824,12 @@ export function FogOfWarMultiplayerGame() {
               <button
                 type="button"
                 disabled={actionLoading !== null}
-                onClick={() => void doAction("undo-response", { action: "undo-respond", accept: false })}
+                onClick={() =>
+                  void doAction("undo-response", {
+                    action: "undo-respond",
+                    accept: false,
+                  })
+                }
                 className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-black text-zinc-300 disabled:opacity-40"
               >
                 Decline
@@ -765,7 +849,9 @@ export function FogOfWarMultiplayerGame() {
                       className="flex items-center justify-between rounded-xl border border-white/5 bg-black/20 px-3 py-2.5"
                     >
                       <span className="truncate text-sm font-bold text-zinc-200">
-                        {player.user_id === user.id ? `${player.display_name} · You` : player.display_name}
+                        {player.user_id === user.id
+                          ? `${player.display_name} · You`
+                          : player.display_name}
                       </span>
                       <span className="text-xl">
                         {player.chosen_color === "white" ? "♔" : "♚"}
@@ -775,25 +861,45 @@ export function FogOfWarMultiplayerGame() {
                 </div>
                 {snapshot.status === "waiting" && (
                   <p className="mt-3 rounded-xl border border-sky-400/10 bg-sky-400/[0.04] px-3 py-3 text-xs text-zinc-500">
-                    Share room code <span className="font-mono font-black text-sky-200">{snapshot.room.code}</span> with your opponent.
+                    Share room code{" "}
+                    <span className="font-mono font-black text-sky-200">
+                      {snapshot.room.code}
+                    </span>{" "}
+                    with your opponent.
                   </p>
                 )}
               </Panel>
 
-              <Panel title="Game Controls" subtitle="Negotiated multiplayer actions">
+              <Panel
+                title="Game Controls"
+                subtitle="Negotiated multiplayer actions"
+              >
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
-                    disabled={!snapshot.undo.canRequest || actionLoading !== null || moving}
-                    onClick={() => void doAction("undo-request", { action: "undo-request" })}
+                    disabled={
+                      !snapshot.undo.canRequest ||
+                      actionLoading !== null ||
+                      moving
+                    }
+                    onClick={() =>
+                      void doAction("undo-request", { action: "undo-request" })
+                    }
                     className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm font-bold text-zinc-300 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     ↶ Undo
                   </button>
                   <button
                     type="button"
-                    disabled={snapshot.status !== "playing" || actionLoading !== null || moving || Boolean(snapshot.undo.requestedBy)}
-                    onClick={() => void doAction("resign", { action: "resign" })}
+                    disabled={
+                      snapshot.status !== "playing" ||
+                      actionLoading !== null ||
+                      moving ||
+                      Boolean(snapshot.undo.requestedBy)
+                    }
+                    onClick={() =>
+                      void doAction("resign", { action: "resign" })
+                    }
                     className="rounded-xl border border-red-400/15 bg-red-400/[0.05] px-3 py-2.5 text-sm font-bold text-red-300 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     Flag Resign
@@ -811,7 +917,9 @@ export function FogOfWarMultiplayerGame() {
                     <button
                       type="button"
                       disabled={myReady || actionLoading !== null}
-                      onClick={() => void doAction("rematch", { action: "rematch" })}
+                      onClick={() =>
+                        void doAction("rematch", { action: "rematch" })
+                      }
                       className="w-full rounded-xl bg-sky-300 px-4 py-3 text-sm font-black text-zinc-950 disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       {myReady ? "Rematch requested" : "Play Again"}
@@ -833,10 +941,16 @@ export function FogOfWarMultiplayerGame() {
                       ? `Black +${Math.abs(materialDiff)}`
                       : "Material equal"}
                 </div>
-                <CapturedPieces capturedBlack={capturedBlack} capturedWhite={capturedWhite} />
+                <CapturedPieces
+                  capturedBlack={capturedBlack}
+                  capturedWhite={capturedWhite}
+                />
               </Panel>
 
-              <Panel title="Move History" subtitle="Click a move for your historical fog view">
+              <Panel
+                title="Move History"
+                subtitle="Click a move for your historical fog view"
+              >
                 <button
                   type="button"
                   onClick={() => {
@@ -853,7 +967,9 @@ export function FogOfWarMultiplayerGame() {
                 </button>
                 <div className="max-h-80 overflow-y-auto rounded-2xl border border-white/5 bg-black/20">
                   {snapshot.history.length === 0 ? (
-                    <div className="px-4 py-8 text-center text-xs text-zinc-600">No moves yet</div>
+                    <div className="px-4 py-8 text-center text-xs text-zinc-600">
+                      No moves yet
+                    </div>
                   ) : (
                     snapshot.history.map((entry) => (
                       <button
@@ -864,13 +980,18 @@ export function FogOfWarMultiplayerGame() {
                           clearSelection();
                         }}
                         className={`flex w-full items-center gap-2 border-b border-white/5 px-3 py-2.5 text-left last:border-0 hover:bg-white/5 ${
-                          historyPreviewPly === entry.ply ? "bg-sky-400/[0.08]" : ""
+                          historyPreviewPly === entry.ply
+                            ? "bg-sky-400/[0.08]"
+                            : ""
                         }`}
                       >
                         <span className="w-10 text-[10px] text-zinc-600">
-                          {entry.moveNumber}{entry.color === "w" ? "." : "..."}
+                          {entry.moveNumber}
+                          {entry.color === "w" ? "." : "..."}
                         </span>
-                        <span className={`font-mono text-xs font-black ${entry.label === "Hidden move" ? "text-zinc-600" : "text-zinc-200"}`}>
+                        <span
+                          className={`font-mono text-xs font-black ${entry.label === "Hidden move" ? "text-zinc-600" : "text-zinc-200"}`}
+                        >
                           {entry.label}
                         </span>
                       </button>
@@ -886,11 +1007,15 @@ export function FogOfWarMultiplayerGame() {
               {historyPreviewPly !== null && (
                 <div className="mb-3 flex items-center justify-between rounded-xl border border-sky-400/20 bg-sky-400/[0.07] px-4 py-3">
                   <div>
-                    <p className="text-[9px] font-black uppercase tracking-widest text-sky-300">History Preview</p>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-sky-300">
+                      History Preview
+                    </p>
                     <p className="mt-1 text-sm font-bold text-white">
                       {historyPreviewPly === 0
                         ? "Initial position"
-                        : snapshot.history.find((entry) => entry.ply === historyPreviewPly)?.label ?? "Historical position"}
+                        : (snapshot.history.find(
+                            (entry) => entry.ply === historyPreviewPly,
+                          )?.label ?? "Historical position")}
                     </p>
                   </div>
                   <button
@@ -906,58 +1031,68 @@ export function FogOfWarMultiplayerGame() {
               <div className="relative">
                 <Board
                   board={displayedBoard}
-                  selectedSquare={historyPreviewPly === null ? selectedSquare : null}
+                  selectedSquare={
+                    historyPreviewPly === null ? selectedSquare : null
+                  }
                   legalMoves={historyPreviewPly === null ? legalMoves : []}
                   lastMove={displayedLastMove}
                   checkedKingSquare={displayedCheckedKing}
-                  onSquareClick={historyPreviewPly !== null || !canMove ? () => {} : handleSquareClick}
+                  onSquareClick={
+                    historyPreviewPly !== null || !canMove
+                      ? () => {}
+                      : handleSquareClick
+                  }
                   fogSquares={displayedFogSquares}
                   orientation={orientation}
                 />
-              {snapshot.players.length < 2 && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[28px] bg-zinc-950/70 p-4 backdrop-blur-[3px]">
-                  <button
-                    type="button"
-                    onClick={() => void copyRoomCode()}
-                    className="w-full max-w-lg rounded-[30px] border border-white/15 bg-zinc-900/95 px-8 py-8 text-center shadow-2xl shadow-black/60 transition hover:border-amber-300/35 hover:bg-zinc-900 active:scale-[0.99]"
-                    title="Copy room code"
-                  >
-                    <div className="text-4xl">🌐</div>
+                {snapshot.players.length < 2 && (
+                  <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[28px] bg-zinc-950/70 p-4 backdrop-blur-[3px]">
+                    <button
+                      type="button"
+                      onClick={() => void copyRoomCode()}
+                      className="w-full max-w-lg rounded-[30px] border border-white/15 bg-zinc-900/95 px-8 py-8 text-center shadow-2xl shadow-black/60 transition hover:border-amber-300/35 hover:bg-zinc-900 active:scale-[0.99]"
+                      title="Copy room code"
+                    >
+                      <div className="text-4xl">🌐</div>
 
-                    <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">
-                      Waiting for players
-                    </p>
-
-                    <h2 className="mt-2 text-2xl font-black text-white">
-                      {snapshot.players.length}/2 players connected
-                    </h2>
-
-                    <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">
-                      Share this room code. The game starts automatically when everyone has joined.
-                    </p>
-
-                    <div className="mt-6 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-5 py-5">
-                      <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">
-                        Room Code
+                      <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">
+                        Waiting for players
                       </p>
 
-                      <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">
-                        {snapshot.room.code}
+                      <h2 className="mt-2 text-2xl font-black text-white">
+                        {snapshot.players.length}/2 players connected
+                      </h2>
+
+                      <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">
+                        Share this room code. The game starts automatically when
+                        everyone has joined.
                       </p>
-                    </div>
 
-                    <p className="mt-4 text-xs font-bold text-zinc-400">
-                      {copied ? "✓ Copied to clipboard" : "Click this box to copy the code"}
-                    </p>
-                  </button>
-                </div>
-              )}
+                      <div className="mt-6 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-5 py-5">
+                        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">
+                          Room Code
+                        </p>
 
+                        <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">
+                          {snapshot.room.code}
+                        </p>
+                      </div>
+
+                      <p className="mt-4 text-xs font-bold text-zinc-400">
+                        {copied
+                          ? "✓ Copied to clipboard"
+                          : "Click this box to copy the code"}
+                      </p>
+                    </button>
+                  </div>
+                )}
 
                 {pendingPromotion && historyPreviewPly === null && (
                   <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/45 p-4 backdrop-blur-[4px]">
                     <div className="w-full max-w-md rounded-3xl border border-sky-400/20 bg-zinc-900/95 p-5 shadow-2xl shadow-black/60">
-                      <p className="mb-4 text-center text-xs font-black uppercase tracking-[0.24em] text-sky-300">Choose promotion</p>
+                      <p className="mb-4 text-center text-xs font-black uppercase tracking-[0.24em] text-sky-300">
+                        Choose promotion
+                      </p>
                       <PromotionBar onPromote={promotePawn} />
                     </div>
                   </div>
@@ -968,34 +1103,76 @@ export function FogOfWarMultiplayerGame() {
 
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              <Panel title="Fog Status" subtitle={`${snapshot.myColor === "white" ? "White" : "Black"}'s private vision`}>
+              <Panel
+                title="Fog Status"
+                subtitle={`${snapshot.myColor === "white" ? "White" : "Black"}'s private vision`}
+              >
                 <div className="grid grid-cols-2 gap-2">
-                  <StatCard label="Visible" value={preview?.visibleSquares.length ?? snapshot.visibleSquares.length} />
-                  <StatCard label="Hidden" value={64 - (preview?.visibleSquares.length ?? snapshot.visibleSquares.length)} />
+                  <StatCard
+                    label="Visible"
+                    value={
+                      preview?.visibleSquares.length ??
+                      snapshot.visibleSquares.length
+                    }
+                  />
+                  <StatCard
+                    label="Hidden"
+                    value={
+                      64 -
+                      (preview?.visibleSquares.length ??
+                        snapshot.visibleSquares.length)
+                    }
+                  />
                 </div>
                 <div className="mt-3 rounded-xl border border-violet-400/10 bg-violet-400/[0.04] px-3 py-3">
-                  <p className="text-[10px] font-black uppercase tracking-wider text-violet-300">Random Start</p>
-                  <p className="mt-1 text-xs text-zinc-500">Same formation for both sides</p>
-                  <p className="mt-2 font-mono text-[10px] text-zinc-700">Seed {snapshot.seed}</p>
+                  <p className="text-[10px] font-black uppercase tracking-wider text-violet-300">
+                    Random Start
+                  </p>
+                  <p className="mt-1 text-xs text-zinc-500">
+                    Same formation for both sides
+                  </p>
+                  <p className="mt-2 font-mono text-[10px] text-zinc-700">
+                    Seed {snapshot.seed}
+                  </p>
                 </div>
               </Panel>
 
-              <Panel title="Fog Stats" subtitle="Only information your side is allowed to know">
+              <Panel
+                title="Fog Stats"
+                subtitle="Only information your side is allowed to know"
+              >
                 <div className="grid grid-cols-2 gap-2">
-                  <StatCard label="Captures" value={snapshot.history.filter((entry) => entry.captured).length} />
-                  <StatCard label="Checks" value={snapshot.history.filter((entry) => entry.gaveCheck).length} />
+                  <StatCard
+                    label="Captures"
+                    value={
+                      snapshot.history.filter((entry) => entry.captured).length
+                    }
+                  />
+                  <StatCard
+                    label="Checks"
+                    value={
+                      snapshot.history.filter((entry) => entry.gaveCheck).length
+                    }
+                  />
                   <StatCard label="Moves" value={snapshot.history.length} />
-                  <StatCard label="Visible now" value={snapshot.visibleSquares.length} />
+                  <StatCard
+                    label="Visible now"
+                    value={snapshot.visibleSquares.length}
+                  />
                 </div>
               </Panel>
 
-              <Panel title="Privacy" subtitle="Why this multiplayer mode is different">
+              <Panel
+                title="Privacy"
+                subtitle="Why this multiplayer mode is different"
+              >
                 <div className="space-y-2 text-xs leading-5 text-zinc-500">
                   <p className="rounded-xl border border-sky-400/10 bg-sky-400/[0.04] px-3 py-2">
                     The browser never receives the full FEN.
                   </p>
                   <p className="rounded-xl border border-white/5 bg-black/20 px-3 py-2">
-                    Opponent history entries remain “Hidden move” and historical previews are re-masked for your color.
+                    Opponent history entries remain “Hidden move” and historical
+                    previews are re-masked for your color.
                   </p>
                 </div>
               </Panel>
@@ -1032,10 +1209,14 @@ function CapturedPieces({
 
   return (
     <div className="rounded-2xl border border-white/5 bg-black/20 p-3">
-      <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">Black</p>
+      <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
+        Black
+      </p>
       {render(capturedBlack, "b")}
       <div className="mt-3 border-t border-white/5 pt-3">
-        <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">White</p>
+        <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
+          White
+        </p>
         {render(capturedWhite, "w")}
       </div>
     </div>
@@ -1068,7 +1249,9 @@ function StatCard({ label, value }: { label: string; value: number }) {
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3">
       <p className="text-xl font-black text-zinc-100">{value}</p>
-      <p className="mt-2 text-[9px] font-black uppercase tracking-wider text-zinc-600">{label}</p>
+      <p className="mt-2 text-[9px] font-black uppercase tracking-wider text-zinc-600">
+        {label}
+      </p>
     </div>
   );
 }

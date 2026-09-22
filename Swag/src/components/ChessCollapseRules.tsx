@@ -206,17 +206,18 @@ const translations: Partial<TranslationTable> = {
 export default function ChessCollapseRules() {
   const { language, setLanguage } = useChessLanguage();
   const t = (key: string) => translateChess(language, key, translations);
+
   return (
     <VariantRulesPage
       variantLabel={t("Chess Variant")}
       title={t("Chess Collapse")}
-      subtitle={t("The board gets smaller while both Kings fight to survive.")}
+      subtitle={t("The board disappears around the pieces.")}
       icon="⚠"
       accent="red"
       backRoute="/games/chess/variants/collapse/hotseat"
       backLabel={t("Back to Chess Collapse")}
       coreIdea={t(
-        "Outer edges of the board are warned and then permanently destroyed. Each King has 3 collapse lives, but checkmate still ends the game immediately. A King trapped on a collapsing edge with no legal adjacent escape loses the game at once.",
+        "Chess Collapse now has two modes. Standard Squares removes one random square every 3 completed plies, while Row Collapse uses the original shrinking-edge, warning and King-life system.",
       )}
       language={language}
       onLanguageChange={setLanguage}
@@ -226,124 +227,159 @@ export default function ChessCollapseRules() {
       playLabel={t("Play Chess Collapse")}
       features={[
         {
-          icon: "♥♥♥",
-          title: t("3 King lives"),
+          icon: "▪",
+          title: t("Standard Squares"),
           text: t(
-            "Collapse damage removes a life. Checkmate ignores remaining lives and still wins immediately.",
+            "One random square disappears every 3 completed plies, alternating between the lower and upper halves of the board.",
           ),
         },
         {
-          icon: "⚠",
-          title: t("4-ply warning"),
+          icon: "▰",
+          title: t("Row Collapse"),
           text: t(
-            "A selected outer edge becomes a danger zone for 4 completed plies before it disappears.",
-          ),
-        },
-        {
-          icon: "▣",
-          title: t("Central 4×4 survives"),
-          text: t("Collapse stops once only the c3–f6 core remains."),
-        },
-      ]}
-      rules={[
-        {
-          icon: "♥",
-          title: t("Each King starts with 3 collapse lives"),
-          text: t(
-            "Lives protect a King from surviving collapse impacts. They do not replace normal chess check and checkmate rules.",
+            "The original mode warns an outer edge and then permanently removes the whole row or file.",
           ),
         },
         {
           icon: "♔",
-          title: t("Checkmate always ends the game immediately"),
+          title: t("Normal checkmate still wins"),
           text: t(
-            "If a move produces normal checkmate, the game ends at once even if the mated King still has collapse lives remaining.",
+            "Both modes still use normal chess check and checkmate rules, adjusted so dead squares cannot be legal destinations.",
+          ),
+        },
+      ]}
+      rules={[
+        {
+          icon: "1",
+          title: t("Choose the Collapse mode before play"),
+          text: t(
+            "Standard Squares and Row Collapse use different destruction rules. The selected mode stays fixed for that game.",
           ),
         },
         {
-          icon: "🎯",
-          title: t("The game chooses a safer outer edge"),
+          icon: "▪",
+          title: t("Standard Squares: one square every 3 plies"),
           text: t(
-            "Collapse selection is board-aware so the opening does not immediately delete a fully packed back rank. Crowded edges are avoided while a meaningfully safer outer edge exists.",
+            "After every 3 completed plies, one surviving square is selected and permanently collapses.",
           ),
         },
         {
-          icon: "⚠",
-          title: t("The danger zone lasts 4 completed plies"),
+          icon: "↕",
+          title: t("Standard Squares alternates board halves"),
           text: t(
-            "Once an outer edge is selected, all squares on that edge are visibly warned. Players may still move onto or through legal warned squares during the countdown.",
+            "The first disappearing square is chosen from ranks 1–4, the next from ranks 5–8, then lower, upper, and so on.",
           ),
         },
         {
-          icon: "💥",
-          title: t("The whole warned edge collapses"),
+          icon: "♔",
+          title: t("A King's current square never disappears"),
           text: t(
-            "When the countdown reaches zero, that complete outer row or file becomes permanently dead. Normal non-King pieces still standing there are destroyed.",
+            "In Standard Squares mode, a square occupied by either King is excluded from the random collapse candidates.",
           ),
         },
         {
-          icon: "♥−1",
-          title: t("A King hit by the collapse loses one life"),
+          icon: "×",
+          title: t("Collapsed squares are permanently dead"),
           text: t(
-            "If the King is on the collapsing edge, one collapse life is removed. If lives reach zero, that side loses.",
+            "A collapsed square cannot be entered again. Legal-move generation filters out moves whose destination is a dead square.",
+          ),
+        },
+        {
+          icon: "▰",
+          title: t("Row Collapse keeps the original warning system"),
+          text: t(
+            "In Row Collapse, a safer outer edge is selected, warned for 4 completed plies, and then the entire row or file disappears.",
+          ),
+        },
+        {
+          icon: "♥♥♥",
+          title: t("King lives belong to Row Collapse"),
+          text: t(
+            "Each King has 3 collapse lives in Row Collapse. A King hit by an edge collapse loses one life; normal checkmate still ends the game immediately.",
           ),
         },
         {
           icon: "↗",
-          title: t("Emergency escape is only one adjacent King move"),
+          title: t("Row Collapse emergency escape is one King step"),
           text: t(
-            "A surviving hit King may relocate only to an adjacent surviving square that is empty and not attacked. It cannot teleport across the board.",
-          ),
-        },
-        {
-          icon: "☠",
-          title: t("A trapped King loses immediately"),
-          text: t(
-            "If a King is caught on the collapsing danger zone and has no legal adjacent surviving escape square, the game is over immediately even if that King still had extra lives.",
+            "A surviving hit King may relocate only to an adjacent surviving, empty and safe square. If no legal adjacent escape exists, that side loses immediately.",
           ),
         },
         {
           icon: "▣",
-          title: t("Collapse stops at c3–f6"),
+          title: t("Row Collapse stops at the central 4×4"),
           text: t(
-            "Edges continue disappearing inward until the central 4×4 board remains. Those sixteen squares are never removed.",
+            "The shrinking-edge mode never goes past c3–f6. Once that central 4×4 remains, no further edges collapse.",
           ),
         },
         {
-          icon: "♔♚",
-          title: t("Simultaneous final destruction can draw"),
+          icon: "♟",
+          title: t("Normal chess endings remain active"),
           text: t(
-            "If the same collapse removes both Kings' final collapse life at once, the result is a draw.",
+            "Checkmate, stalemate, insufficient material, the 50-move rule and repetition still apply, with dead-square restrictions included in move legality.",
           ),
         },
       ]}
     >
       <VisualCard
         accent="red"
-        eyebrow={t("Collapse cycle")}
-        title={t("What happens to an outer edge")}
+        eyebrow={t("Standard Squares")}
+        title={t("The default three-ply rhythm")}
+      >
+        <Flow
+          steps={[
+            {
+              icon: "♙",
+              label: t("3 normal plies"),
+              detail: t("Play ordinary legal chess moves."),
+            },
+            {
+              icon: "▪",
+              label: t("One square collapses"),
+              detail: t("Never the square under a King."),
+            },
+            {
+              icon: "↕",
+              label: t("Switch board half"),
+              detail: t("Lower ranks, then upper ranks, alternating."),
+            },
+            {
+              icon: "×",
+              label: t("Square stays dead"),
+              detail: t("It can never be a legal destination again."),
+            },
+          ]}
+        />
+      </VisualCard>
+
+      <VisualCard
+        accent="red"
+        eyebrow={t("Row Collapse")}
+        title={t("The original shrinking-board cycle")}
       >
         <Flow
           steps={[
             {
               icon: "🎯",
               label: t("Edge selected"),
-              detail: t("Safer available edge is preferred."),
+              detail: t("A safer available outer edge is preferred."),
             },
             {
               icon: "⚠",
               label: t("Danger zone"),
-              detail: t("4 completed plies to escape."),
+              detail: t("4 completed plies before collapse."),
             },
             {
               icon: "💥",
-              label: t("Edge collapses"),
-              detail: t("Pieces there are destroyed."),
+              label: t("Whole edge collapses"),
+              detail: t(
+                "Pieces there can be destroyed; Kings use collapse lives.",
+              ),
             },
             {
               icon: "▣",
               label: t("Board shrinks"),
-              detail: t("The new outer edge becomes eligible later."),
+              detail: t("The process stops at c3–f6."),
             },
           ]}
         />

@@ -96,6 +96,8 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
     Visible: "Sichtbar",
     Hidden: "Verdeckt",
     "Random Start": "Zufallsstart",
+    "Standard Start": "Normale Aufstellung",
+    "Starting Position": "Startaufstellung",
     "Same formation for both sides": "Gleiche Formation für beide Seiten",
     "Fog Stats": "Nebelstatistik",
     Vision: "Sicht",
@@ -144,6 +146,8 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
     Visible: "Sichtbar",
     Hidden: "Verdeckt",
     "Random Start": "Zufallsstart",
+    "Standard Start": "Normale Aufstellung",
+    "Starting Position": "Startaufstellung",
     "Same formation for both sides": "Gleiche Aufstellung für beide",
     "Fog Stats": "Nebelstatistik",
     Vision: "Sicht",
@@ -197,6 +201,8 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
     Visible: "보임",
     Hidden: "숨김",
     "Random Start": "랜덤 시작",
+    "Standard Start": "기본 시작",
+    "Starting Position": "시작 배치",
     "Same formation for both sides": "양쪽 동일한 랜덤 배치",
     "Fog Stats": "안개 통계",
     Vision: "시야",
@@ -245,6 +251,8 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
     Visible: "Видимо",
     Hidden: "Скрыто",
     "Random Start": "Случайный старт",
+    "Standard Start": "Обычная расстановка",
+    "Starting Position": "Начальная расстановка",
     "Same formation for both sides": "Одинаковая расстановка для обеих сторон",
     "Fog Stats": "Статистика тумана",
     Vision: "Обзор",
@@ -302,6 +310,7 @@ export default function FogOfWarChessBoard({
       window.localStorage.setItem(CHESS_LANGUAGE_STORAGE_KEY, next);
   };
 
+  const [randomStart, setRandomStart] = useState(true);
   const [fogSeed, setFogSeed] = useState<number>(createFogSeed);
   const [game] = useState(() => createFogGame(fogSeed));
   const [initialFen, setInitialFen] = useState(() => game.fen());
@@ -622,10 +631,11 @@ export default function FogOfWarChessBoard({
     updateGameOver(nextRecords, false);
   }
 
-  function restartGame() {
+  function resetGame(useRandomStart: boolean) {
     const nextSeed = createFogSeed();
-    const nextGame = createFogGame(nextSeed);
+    const nextGame = useRandomStart ? createFogGame(nextSeed) : new Chess();
     const nextFen = nextGame.fen();
+
     game.load(nextFen);
     snapToSide(game.turn());
     setFogSeed(nextSeed);
@@ -641,6 +651,16 @@ export default function FogOfWarChessBoard({
     setGameOver(false);
     setGameOverReason("");
     setWinner("white");
+  }
+
+  function restartGame() {
+    resetGame(randomStart);
+  }
+
+  function changeRandomStart(nextRandomStart: boolean) {
+    if (nextRandomStart === randomStart) return;
+    setRandomStart(nextRandomStart);
+    resetGame(nextRandomStart);
   }
 
   const safePreview = (record: FogMoveRecord) =>
@@ -713,6 +733,9 @@ export default function FogOfWarChessBoard({
                   onUndo={undoMove}
                   onRestart={restartGame}
                   undoDisabled={aiMode}
+                  randomStart={randomStart}
+                  onRandomStartChange={changeRandomStart}
+                  startSelectionDisabled={records.length > 0}
                   t={t}
                 />
               </Panel>
@@ -889,14 +912,18 @@ export default function FogOfWarChessBoard({
                 </div>
                 <div className="mt-3 rounded-xl border border-violet-400/10 bg-violet-400/[0.04] px-3 py-3">
                   <p className="text-[10px] font-black uppercase tracking-wider text-violet-300">
-                    {t("Random Start")}
+                    {t("Starting Position")}
                   </p>
                   <p className="mt-1 text-xs text-zinc-500">
-                    {t("Same formation for both sides")}
+                    {randomStart
+                      ? t("Same formation for both sides")
+                      : t("Standard Start")}
                   </p>
-                  <p className="mt-2 font-mono text-[10px] text-zinc-700">
-                    Seed {fogSeed}
-                  </p>
+                  {randomStart && (
+                    <p className="mt-2 font-mono text-[10px] text-zinc-700">
+                      Seed {fogSeed}
+                    </p>
+                  )}
                 </div>
               </section>
               <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4">
@@ -1021,35 +1048,70 @@ function FogControls({
   onUndo,
   onRestart,
   undoDisabled,
+  randomStart,
+  onRandomStartChange,
+  startSelectionDisabled,
   t,
 }: {
   onUndo: () => void;
   onRestart: () => void;
   undoDisabled: boolean;
+  randomStart: boolean;
+  onRandomStartChange: (value: boolean) => void;
+  startSelectionDisabled: boolean;
   t: (key: string) => string;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-2">
-      <button
-        type="button"
-        onClick={onUndo}
-        disabled={undoDisabled}
-        className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm font-bold text-zinc-300 disabled:cursor-not-allowed
-    disabled:border-white/5
-    disabled:bg-white/[0.02]
-    disabled:text-zinc-600
-    disabled:opacity-50
-    disabled:hover:bg-white/[0.02]"
-      >
-        ↶ {t("Undo")}
-      </button>
-      <button
-        type="button"
-        onClick={onRestart}
-        className="rounded-xl border border-sky-400/15 bg-sky-400/[0.06] px-3 py-2.5 text-sm font-bold text-sky-300"
-      >
-        ↻ {t("Restart")}
-      </button>
+    <div className="space-y-3">
+      <div>
+        <p className="mb-2 text-[10px] font-black uppercase tracking-wider text-zinc-500">
+          {t("Starting Position")}
+        </p>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => onRandomStartChange(false)}
+            disabled={startSelectionDisabled}
+            className={`rounded-xl border px-3 py-2.5 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-40 ${
+              !randomStart
+                ? "border-sky-400/30 bg-sky-400/10 text-sky-200"
+                : "border-white/10 bg-white/5 text-zinc-400 hover:bg-white/[0.08]"
+            }`}
+          >
+            ♜ {t("Standard Start")}
+          </button>
+          <button
+            type="button"
+            onClick={() => onRandomStartChange(true)}
+            disabled={startSelectionDisabled}
+            className={`rounded-xl border px-3 py-2.5 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-40 ${
+              randomStart
+                ? "border-violet-400/30 bg-violet-400/10 text-violet-200"
+                : "border-white/10 bg-white/5 text-zinc-400 hover:bg-white/[0.08]"
+            }`}
+          >
+            🎲 {t("Random Start")}
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={onUndo}
+          disabled={undoDisabled}
+          className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm font-bold text-zinc-300 disabled:cursor-not-allowed disabled:border-white/5 disabled:bg-white/[0.02] disabled:text-zinc-600 disabled:opacity-50 disabled:hover:bg-white/[0.02]"
+        >
+          ↶ {t("Undo")}
+        </button>
+        <button
+          type="button"
+          onClick={onRestart}
+          className="rounded-xl border border-sky-400/15 bg-sky-400/[0.06] px-3 py-2.5 text-sm font-bold text-sky-300"
+        >
+          ↻ {t("Restart")}
+        </button>
+      </div>
     </div>
   );
 }

@@ -100,6 +100,11 @@ type BoardProps = {
    */
   hotPotatoSquare?: Square | null;
   hotPotatoMovesRemaining?: number;
+  hotPotatoes?: Array<{
+    square: Square;
+    movesRemaining: number;
+    owner?: "w" | "b";
+  }>;
   hotPotatoExplosionSquares?: Square[];
   hotPotatoBlownUpKingSquares?: Square[];
 
@@ -182,6 +187,7 @@ export default function Board({
   activeLuckySquares = [],
   hotPotatoSquare = null,
   hotPotatoMovesRemaining = 0,
+  hotPotatoes = [],
   hotPotatoExplosionSquares = [],
   hotPotatoBlownUpKingSquares = [],
   collapseWarningSquares = [],
@@ -534,7 +540,28 @@ export default function Board({
 
                 const isActiveLuckySquare = activeLuckySquares.includes(square);
 
-                const isHotPotatoSquare = hotPotatoSquare === square;
+                const hotPotatoesOnSquare = hotPotatoes.filter(
+                  (potato) => potato.square === square,
+                );
+
+                const legacyHotPotatoOnSquare =
+                  hotPotatoSquare === square
+                    ? [
+                        {
+                          square,
+                          movesRemaining: hotPotatoMovesRemaining,
+                          owner: undefined,
+                        },
+                      ]
+                    : [];
+
+                const displayedHotPotatoesOnSquare =
+                  hotPotatoesOnSquare.length > 0
+                    ? hotPotatoesOnSquare
+                    : legacyHotPotatoOnSquare;
+
+                const isHotPotatoSquare =
+                  displayedHotPotatoesOnSquare.length > 0;
 
                 const isHotPotatoExplosionSquare =
                   hotPotatoExplosionSquares.includes(square);
@@ -855,26 +882,42 @@ export default function Board({
                           top-1
                           z-[19]
                           flex
-                          min-w-10
-                          items-center
-                          justify-center
+                          flex-col
                           gap-0.5
-                          rounded-full
-                          border
-                          border-orange-100/70
-                          bg-zinc-950/90
-                          px-1.5
-                          py-1
-                          text-[10px]
-                          font-black
-                          leading-none
-                          text-orange-100
-                          shadow-[0_2px_10px_rgba(0,0,0,0.55)]
                         "
-                          aria-label={`Hot Potato explodes in ${hotPotatoMovesRemaining} moves`}
                         >
-                          <span aria-hidden="true">💣</span>
-                          <span>{hotPotatoMovesRemaining}</span>
+                          {displayedHotPotatoesOnSquare.map((potato, index) => (
+                            <span
+                              key={`${potato.owner ?? "legacy"}-${index}`}
+                              className={`
+                                  flex
+                                  min-w-10
+                                  items-center
+                                  justify-center
+                                  gap-0.5
+                                  rounded-full
+                                  border
+                                  bg-zinc-950/90
+                                  px-1.5
+                                  py-1
+                                  text-[10px]
+                                  font-black
+                                  leading-none
+                                  shadow-[0_2px_10px_rgba(0,0,0,0.55)]
+                                  ${
+                                    potato.owner === "w"
+                                      ? "border-amber-100/70 text-amber-100"
+                                      : potato.owner === "b"
+                                        ? "border-violet-200/70 text-violet-200"
+                                        : "border-orange-100/70 text-orange-100"
+                                  }
+                                `}
+                              aria-label={`Hot Potato explodes in ${potato.movesRemaining} moves`}
+                            >
+                              <span aria-hidden="true">💣</span>
+                              <span>{potato.movesRemaining}</span>
+                            </span>
+                          ))}
                         </span>
                       </>
                     )}

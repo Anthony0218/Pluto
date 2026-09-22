@@ -1,12 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-type Language =
-  | "en"
-  | "de"
-  | "bar"
-  | "ko"
-  | "ru";
+type Language = "en" | "de" | "bar" | "ko" | "ru";
 
 type ExampleSquare = {
   piece?: string;
@@ -30,10 +25,7 @@ const languageOptions: Array<{
   { value: "ru", label: "Русский" },
 ];
 
-const translations: Record<
-  Exclude<Language, "en">,
-  Record<string, string>
-> = {
+const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
   de: {
     "Chess Variant V": "Schachvariante V",
     "Fog of War Chess": "Nebel-des-Krieges-Schach",
@@ -59,10 +51,10 @@ const translations: Record<
     "3. Hidden enemy pieces": "3. Verdeckte gegnerische Figuren",
     "An enemy piece outside your current vision is completely hidden. You only see it once one of your pieces can attack or legally reach its square.":
       "Eine gegnerische Figur außerhalb deiner Sicht ist vollständig verborgen. Sie wird erst sichtbar, wenn eine deiner Figuren ihr Feld angreifen oder legal erreichen kann.",
-    "4. Random symmetric start": "4. Zufälliger symmetrischer Start",
-    "Queen, Bishops and Knights are shuffled across b/c/d/f/g. King stays on e, Rooks stay on a/h, and Black mirrors White exactly.":
+    "4. Choose the starting position": "4. Zufälliger symmetrischer Start",
+    "Fog of War can start from normal chess or from Random Start. In Random Start, Queen, Bishops and Knights are shuffled across b/c/d/f/g; King stays on e, Rooks stay on a/h, and Black mirrors White exactly.":
       "Dame, Läufer und Springer werden auf b/c/d/f/g gemischt. Der König bleibt auf e, die Türme auf a/h, und Schwarz spiegelt Weiß exakt.",
-    "Castling still works normally because King and Rooks remain on their standard squares.":
+    "The start option is chosen before the game. In Random Start, castling still works normally because King and Rooks remain on their standard squares.":
       "Die Rochade funktioniert normal, weil König und Türme auf ihren Standardfeldern bleiben.",
     "5. Hotseat privacy screen": "5. Hotseat-Sichtschutz",
     "After every move the board is covered. Pass the device to the next player, then press Reveal Board to show only that player's fogged view.":
@@ -79,8 +71,8 @@ const translations: Record<
     "Example B — Hidden enemy": "Beispiel B — Verdeckter Gegner",
     "The black Queen is outside White's vision, so White sees only fog on h6.":
       "Die schwarze Dame liegt außerhalb der weißen Sicht, daher sieht Weiß auf h6 nur Nebel.",
-    "Example C — Random start": "Beispiel C — Zufallsstart",
-    "Both sides receive the exact same shuffled back-rank pattern.":
+    "Example C — Random Start option": "Beispiel C — Zufallsstart",
+    "When Random Start is enabled, both sides receive the exact same shuffled back-rank pattern. With it disabled, the normal chess starting position is used.":
       "Beide Seiten erhalten exakt dieselbe gemischte Grundreihen-Anordnung.",
     "Board legend": "Brett-Legende",
     Visible: "Sichtbar",
@@ -112,10 +104,10 @@ const translations: Record<
     "3. Hidden enemy pieces": "3. Verdeckte Gegner",
     "An enemy piece outside your current vision is completely hidden. You only see it once one of your pieces can attack or legally reach its square.":
       "A Gegner außerhalb deiner Sicht is komplett versteckt. Du siehst ihn erst, wennst sein Feld angreifn oder legal erreichen kannst.",
-    "4. Random symmetric start": "4. Zufälliger symmetrischer Start",
-    "Queen, Bishops and Knights are shuffled across b/c/d/f/g. King stays on e, Rooks stay on a/h, and Black mirrors White exactly.":
+    "4. Choose the starting position": "4. Zufälliger symmetrischer Start",
+    "Fog of War can start from normal chess or from Random Start. In Random Start, Queen, Bishops and Knights are shuffled across b/c/d/f/g; King stays on e, Rooks stay on a/h, and Black mirrors White exactly.":
       "Dame, Läufer und Springer werdn auf b/c/d/f/g g'mischt. Kini bleibt auf e, Türm auf a/h, Schwarz spiegelt Weiß.",
-    "Castling still works normally because King and Rooks remain on their standard squares.":
+    "The start option is chosen before the game. In Random Start, castling still works normally because King and Rooks remain on their standard squares.":
       "Rochade geht normal, weil Kini und Türm auf de Standardfelder bleibn.",
     "5. Hotseat privacy screen": "5. Hotseat-Sichtschutz",
     "After every move the board is covered. Pass the device to the next player, then press Reveal Board to show only that player's fogged view.":
@@ -132,8 +124,8 @@ const translations: Record<
     "Example B — Hidden enemy": "Beispiel B — Verdeckter Gegner",
     "The black Queen is outside White's vision, so White sees only fog on h6.":
       "De schwarze Dame is außerhalb da Sicht, also sieht Weiß auf h6 bloß Nebel.",
-    "Example C — Random start": "Beispiel C — Zufallsstart",
-    "Both sides receive the exact same shuffled back-rank pattern.":
+    "Example C — Random Start option": "Beispiel C — Zufallsstart",
+    "When Random Start is enabled, both sides receive the exact same shuffled back-rank pattern. With it disabled, the normal chess starting position is used.":
       "Beide Seiten kriagn exakt de gleiche gemischte Grundreihe.",
     "Board legend": "Brett-Legende",
     Visible: "Sichtbar",
@@ -165,10 +157,10 @@ const translations: Record<
     "3. Hidden enemy pieces": "3. 보이지 않는 상대 기물",
     "An enemy piece outside your current vision is completely hidden. You only see it once one of your pieces can attack or legally reach its square.":
       "현재 시야 밖에 있는 상대 기물은 완전히 숨겨집니다. 자신의 기물이 그 칸을 공격하거나 합법적으로 도달할 수 있을 때만 보입니다.",
-    "4. Random symmetric start": "4. 대칭 랜덤 시작",
-    "Queen, Bishops and Knights are shuffled across b/c/d/f/g. King stays on e, Rooks stay on a/h, and Black mirrors White exactly.":
+    "4. Choose the starting position": "4. 대칭 랜덤 시작",
+    "Fog of War can start from normal chess or from Random Start. In Random Start, Queen, Bishops and Knights are shuffled across b/c/d/f/g; King stays on e, Rooks stay on a/h, and Black mirrors White exactly.":
       "퀸, 비숍 2개, 나이트 2개가 b/c/d/f/g에 무작위 배치됩니다. 킹은 e, 룩은 a/h에 그대로 있으며 흑은 백의 배치를 정확히 대칭으로 사용합니다.",
-    "Castling still works normally because King and Rooks remain on their standard squares.":
+    "The start option is chosen before the game. In Random Start, castling still works normally because King and Rooks remain on their standard squares.":
       "킹과 룩이 원래 위치에 남아 있으므로 캐슬링은 일반 체스와 동일하게 가능합니다.",
     "5. Hotseat privacy screen": "5. 핫시트 프라이버시 화면",
     "After every move the board is covered. Pass the device to the next player, then press Reveal Board to show only that player's fogged view.":
@@ -185,8 +177,8 @@ const translations: Record<
     "Example B — Hidden enemy": "예시 B — 숨겨진 상대 기물",
     "The black Queen is outside White's vision, so White sees only fog on h6.":
       "흑 퀸이 백의 시야 밖에 있으므로 백에게 h6은 안개로만 보입니다.",
-    "Example C — Random start": "예시 C — 랜덤 시작",
-    "Both sides receive the exact same shuffled back-rank pattern.":
+    "Example C — Random Start option": "예시 C — 랜덤 시작",
+    "When Random Start is enabled, both sides receive the exact same shuffled back-rank pattern. With it disabled, the normal chess starting position is used.":
       "양쪽은 정확히 동일하게 섞인 후방 랭크 배치를 사용합니다.",
     "Board legend": "보드 범례",
     Visible: "보임",
@@ -218,10 +210,10 @@ const translations: Record<
     "3. Hidden enemy pieces": "3. Скрытые фигуры противника",
     "An enemy piece outside your current vision is completely hidden. You only see it once one of your pieces can attack or legally reach its square.":
       "Фигура противника вне вашего обзора полностью скрыта. Она становится видимой, когда ваша фигура может атаковать её поле или легально попасть на него.",
-    "4. Random symmetric start": "4. Случайный симметричный старт",
-    "Queen, Bishops and Knights are shuffled across b/c/d/f/g. King stays on e, Rooks stay on a/h, and Black mirrors White exactly.":
+    "4. Choose the starting position": "4. Случайный симметричный старт",
+    "Fog of War can start from normal chess or from Random Start. In Random Start, Queen, Bishops and Knights are shuffled across b/c/d/f/g; King stays on e, Rooks stay on a/h, and Black mirrors White exactly.":
       "Ферзь, слоны и кони случайно размещаются на b/c/d/f/g. Король остаётся на e, ладьи на a/h, а чёрные точно зеркалят белых.",
-    "Castling still works normally because King and Rooks remain on their standard squares.":
+    "The start option is chosen before the game. In Random Start, castling still works normally because King and Rooks remain on their standard squares.":
       "Рокировка работает нормально, поскольку король и ладьи остаются на стандартных полях.",
     "5. Hotseat privacy screen": "5. Экран приватности Hotseat",
     "After every move the board is covered. Pass the device to the next player, then press Reveal Board to show only that player's fogged view.":
@@ -238,8 +230,8 @@ const translations: Record<
     "Example B — Hidden enemy": "Пример B — скрытый противник",
     "The black Queen is outside White's vision, so White sees only fog on h6.":
       "Чёрный ферзь находится вне обзора белых, поэтому на h6 белые видят только туман.",
-    "Example C — Random start": "Пример C — случайный старт",
-    "Both sides receive the exact same shuffled back-rank pattern.":
+    "Example C — Random Start option": "Пример C — случайный старт",
+    "When Random Start is enabled, both sides receive the exact same shuffled back-rank pattern. With it disabled, the normal chess starting position is used.":
       "Обе стороны получают одну и ту же перемешанную расстановку заднего ряда.",
     "Board legend": "Легенда доски",
     Visible: "Видимо",
@@ -252,39 +244,23 @@ function getInitialLanguage(): Language {
     return "en";
   }
 
-  const stored =
-    window.localStorage.getItem(
-      "chess-language",
-    );
+  const stored = window.localStorage.getItem("chess-language");
 
-  return languageOptions.some(
-    (option) =>
-      option.value === stored,
-  )
+  return languageOptions.some((option) => option.value === stored)
     ? (stored as Language)
     : "en";
 }
 
-function t(
-  language: Language,
-  key: string,
-): string {
+function t(language: Language, key: string): string {
   if (language === "en") {
     return key;
   }
 
   if (language === "bar") {
-    return (
-      translations.bar[key] ??
-      translations.de[key] ??
-      key
-    );
+    return translations.bar[key] ?? translations.de[key] ?? key;
   }
 
-  return (
-    translations[language][key] ??
-    key
-  );
+  return translations[language][key] ?? key;
 }
 
 const rookVisionBoard: ExampleBoard = {
@@ -400,23 +376,13 @@ const randomStartBoard: ExampleBoard = {
 };
 
 export default function FogOfWarChessRules() {
-  const [language, setLanguage] =
-    useState<Language>(
-      getInitialLanguage,
-    );
+  const [language, setLanguage] = useState<Language>(getInitialLanguage);
 
-  function changeLanguage(
-    nextLanguage: Language,
-  ) {
+  function changeLanguage(nextLanguage: Language) {
     setLanguage(nextLanguage);
 
-    if (
-      typeof window !== "undefined"
-    ) {
-      window.localStorage.setItem(
-        "chess-language",
-        nextLanguage,
-      );
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("chess-language", nextLanguage);
     }
   }
 
@@ -427,44 +393,26 @@ export default function FogOfWarChessRules() {
           <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.25em] text-sky-300">
-                {t(
-                  language,
-                  "Chess Variant V",
-                )}
+                {t(language, "Chess Variant V")}
               </p>
 
               <h1 className="mt-2 text-3xl font-black text-white">
-                {t(
-                  language,
-                  "Fog of War Chess",
-                )}
+                {t(language, "Fog of War Chess")}
               </h1>
 
               <p className="mt-2 text-sm text-zinc-500">
-                {t(
-                  language,
-                  "Rules & Examples",
-                )}
+                {t(language, "Rules & Examples")}
               </p>
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <LanguageSelector
-                language={language}
-                onChange={
-                  changeLanguage
-                }
-              />
+              <LanguageSelector language={language} onChange={changeLanguage} />
 
               <Link
                 to="/games/chess/variants/fog-of-war/hotseat"
                 className="inline-flex rounded-full border border-sky-400/15 bg-sky-400/[0.07] px-4 py-2 text-xs font-black text-sky-200 transition hover:bg-sky-400/[0.13]"
               >
-                ←{" "}
-                {t(
-                  language,
-                  "Back to Fog of War",
-                )}
+                ← {t(language, "Back to Fog of War")}
               </Link>
             </div>
           </div>
@@ -478,10 +426,7 @@ export default function FogOfWarChessRules() {
 
             <div>
               <h2 className="font-black text-sky-100">
-                {t(
-                  language,
-                  "Core idea",
-                )}
+                {t(language, "Core idea")}
               </h2>
 
               <p className="mt-2 text-sm leading-7 text-zinc-400">
@@ -504,45 +449,30 @@ export default function FogOfWarChessRules() {
         <section className="mb-6 rounded-2xl border border-white/5 bg-zinc-900/55 px-4 py-3">
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
             <span className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-600">
-              {t(
-                language,
-                "Board legend",
-              )}
+              {t(language, "Board legend")}
             </span>
 
             <LegendItem
               sample="◻"
-              label={t(
-                language,
-                "Visible square",
-              )}
+              label={t(language, "Visible square")}
               className="border-sky-400/20 bg-sky-400/10 text-sky-200"
             />
 
             <LegendItem
               sample="🌫"
-              label={t(
-                language,
-                "Fogged square",
-              )}
+              label={t(language, "Fogged square")}
               className="border-zinc-500/30 bg-zinc-900 text-zinc-500"
             />
 
             <LegendItem
               sample="♖"
-              label={t(
-                language,
-                "Your piece",
-              )}
+              label={t(language, "Your piece")}
               className="border-white/10 bg-white/[0.05] text-white"
             />
 
             <LegendItem
               sample="♟"
-              label={t(
-                language,
-                "Visible enemy",
-              )}
+              label={t(language, "Visible enemy")}
               className="border-rose-400/20 bg-rose-400/[0.08] text-rose-200"
             />
           </div>
@@ -551,10 +481,7 @@ export default function FogOfWarChessRules() {
         <div className="space-y-5">
           <RuleCard
             number="1"
-            title={t(
-              language,
-              "1. Your army is always visible",
-            )}
+            title={t(language, "1. Your army is always visible")}
           >
             {t(
               language,
@@ -563,30 +490,16 @@ export default function FogOfWarChessRules() {
           </RuleCard>
 
           <VisualRuleCard
-            title={t(
-              language,
-              "Example A — White rook vision",
-            )}
+            title={t(language, "Example A — White rook vision")}
             text={t(
               language,
               "The rook reveals its file and rank until a piece blocks the line.",
             )}
           >
-            <MiniBoard
-              board={
-                rookVisionBoard
-              }
-              fogByDefault
-            />
+            <MiniBoard board={rookVisionBoard} fogByDefault />
           </VisualRuleCard>
 
-          <RuleCard
-            number="2"
-            title={t(
-              language,
-              "2. Attacks reveal squares",
-            )}
-          >
+          <RuleCard number="2" title={t(language, "2. Attacks reveal squares")}>
             {t(
               language,
               "Squares attacked by your pieces become visible. Sliding pieces reveal along their line until the first occupied square.",
@@ -594,30 +507,16 @@ export default function FogOfWarChessRules() {
           </RuleCard>
 
           <VisualRuleCard
-            title={t(
-              language,
-              "Example B — Hidden enemy",
-            )}
+            title={t(language, "Example B — Hidden enemy")}
             text={t(
               language,
               "The black Queen is outside White's vision, so White sees only fog on h6.",
             )}
           >
-            <MiniBoard
-              board={
-                hiddenEnemyBoard
-              }
-              fogByDefault
-            />
+            <MiniBoard board={hiddenEnemyBoard} fogByDefault />
           </VisualRuleCard>
 
-          <RuleCard
-            number="3"
-            title={t(
-              language,
-              "3. Hidden enemy pieces",
-            )}
-          >
+          <RuleCard number="3" title={t(language, "3. Hidden enemy pieces")}>
             {t(
               language,
               "An enemy piece outside your current vision is completely hidden. You only see it once one of your pieces can attack or legally reach its square.",
@@ -626,67 +525,45 @@ export default function FogOfWarChessRules() {
 
           <RuleCard
             number="4"
-            title={t(
-              language,
-              "4. Random symmetric start",
-            )}
+            title={t(language, "4. Choose the starting position")}
           >
             <p>
               {t(
                 language,
-                "Queen, Bishops and Knights are shuffled across b/c/d/f/g. King stays on e, Rooks stay on a/h, and Black mirrors White exactly.",
+                "Fog of War can start from normal chess or from Random Start. In Random Start, Queen, Bishops and Knights are shuffled across b/c/d/f/g; King stays on e, Rooks stay on a/h, and Black mirrors White exactly.",
               )}
             </p>
 
             <p className="mt-2">
               {t(
                 language,
-                "Castling still works normally because King and Rooks remain on their standard squares.",
+                "The start option is chosen before the game. In Random Start, castling still works normally because King and Rooks remain on their standard squares.",
               )}
             </p>
           </RuleCard>
 
           <VisualRuleCard
-            title={t(
-              language,
-              "Example C — Random start",
-            )}
+            title={t(language, "Example C — Random Start option")}
             text={t(
               language,
-              "Both sides receive the exact same shuffled back-rank pattern.",
+              "When Random Start is enabled, both sides receive the exact same shuffled back-rank pattern. With it disabled, the normal chess starting position is used.",
             )}
           >
-            <MiniBoard
-              board={
-                randomStartBoard
-              }
-              fogByDefault={false}
-            />
+            <MiniBoard board={randomStartBoard} fogByDefault={false} />
           </VisualRuleCard>
 
-          <RuleCard
-            number="5"
-            title={t(
-              language,
-              "5. Hotseat privacy screen",
-            )}
-          >
+          <RuleCard number="5" title={t(language, "5. Hotseat privacy screen")}>
             {t(
               language,
               "After every move the board is covered. Pass the device to the next player, then press Reveal Board to show only that player's fogged view.",
             )}
 
-            <PrivacyExample
-              language={language}
-            />
+            <PrivacyExample language={language} />
           </RuleCard>
 
           <RuleCard
             number="6"
-            title={t(
-              language,
-              "6. Check, checkmate and legality",
-            )}
+            title={t(language, "6. Check, checkmate and legality")}
           >
             {t(
               language,
@@ -694,13 +571,7 @@ export default function FogOfWarChessRules() {
             )}
           </RuleCard>
 
-          <RuleCard
-            number="7"
-            title={t(
-              language,
-              "7. Undo and history",
-            )}
-          >
+          <RuleCard number="7" title={t(language, "7. Undo and history")}>
             {t(
               language,
               "Undo restores the previous full position and hides the board again. History previews remain fogged instead of exposing the full board.",
@@ -729,13 +600,9 @@ function RuleCard({
         </span>
 
         <div className="min-w-0">
-          <h2 className="font-black text-white">
-            {title}
-          </h2>
+          <h2 className="font-black text-white">{title}</h2>
 
-          <div className="mt-2 text-sm leading-7 text-zinc-400">
-            {children}
-          </div>
+          <div className="mt-2 text-sm leading-7 text-zinc-400">{children}</div>
         </div>
       </div>
     </section>
@@ -758,18 +625,12 @@ function VisualRuleCard({
           Visual example
         </p>
 
-        <h3 className="mt-2 text-lg font-black text-white">
-          {title}
-        </h3>
+        <h3 className="mt-2 text-lg font-black text-white">{title}</h3>
 
-        <p className="mt-2 text-sm leading-7 text-zinc-400">
-          {text}
-        </p>
+        <p className="mt-2 text-sm leading-7 text-zinc-400">{text}</p>
       </div>
 
-      <div className="flex justify-center">
-        {children}
-      </div>
+      <div className="flex justify-center">{children}</div>
     </section>
   );
 }
@@ -785,50 +646,24 @@ function MiniBoard({
 
   const squares: React.ReactNode[] = [];
 
-  for (
-    let rank = 8;
-    rank >= 1;
-    rank -= 1
-  ) {
-    for (
-      let fileIndex = 0;
-      fileIndex < 8;
-      fileIndex += 1
-    ) {
-      const file =
-        files[fileIndex];
+  for (let rank = 8; rank >= 1; rank -= 1) {
+    for (let fileIndex = 0; fileIndex < 8; fileIndex += 1) {
+      const file = files[fileIndex];
 
-      const square =
-        `${file}${rank}`;
+      const square = `${file}${rank}`;
 
-      const info =
-        board[square];
+      const info = board[square];
 
-      const dark =
-        (
-          fileIndex +
-          rank
-        ) %
-          2 ===
-        1;
+      const dark = (fileIndex + rank) % 2 === 1;
 
-      const fog =
-        info?.fog ??
-        (
-          fogByDefault &&
-          !info?.visible
-        );
+      const fog = info?.fog ?? (fogByDefault && !info?.visible);
 
-      const visible =
-        !fog;
+      const visible = !fog;
 
       squares.push(
         <div
           key={square}
-          title={
-            info?.label ??
-            square
-          }
+          title={info?.label ?? square}
           className={`
             relative
             flex
@@ -836,16 +671,8 @@ function MiniBoard({
             items-center
             justify-center
             overflow-hidden
-            ${
-              dark
-                ? "bg-zinc-700"
-                : "bg-zinc-300"
-            }
-            ${
-              info?.highlighted
-                ? "ring-2 ring-inset ring-sky-300"
-                : ""
-            }
+            ${dark ? "bg-zinc-700" : "bg-zinc-300"}
+            ${info?.highlighted ? "ring-2 ring-inset ring-sky-300" : ""}
           `}
         >
           {visible && (
@@ -935,11 +762,7 @@ function MiniBoard({
   );
 }
 
-function PrivacyExample({
-  language,
-}: {
-  language: Language;
-}) {
+function PrivacyExample({ language }: { language: Language }) {
   return (
     <div className="mt-4 max-w-sm rounded-2xl border border-sky-400/15 bg-zinc-950/70 p-5 text-center">
       <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-xl bg-sky-400/10 text-2xl">
@@ -992,9 +815,7 @@ function LegendItem({
         {sample}
       </span>
 
-      <span className="text-[10px] font-bold text-zinc-400">
-        {label}
-      </span>
+      <span className="text-[10px] font-bold text-zinc-400">{label}</span>
     </div>
   );
 }
@@ -1004,50 +825,29 @@ function LanguageSelector({
   onChange,
 }: {
   language: Language;
-  onChange: (
-    language: Language,
-  ) => void;
+  onChange: (language: Language) => void;
 }) {
   return (
     <label className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-400">
       <span>🌐</span>
 
-      <span className="hidden sm:inline">
-        {t(
-          language,
-          "Language",
-        )}
-      </span>
+      <span className="hidden sm:inline">{t(language, "Language")}</span>
 
       <select
         value={language}
-        onChange={(event) =>
-          onChange(
-            event.target
-              .value as Language,
-          )
-        }
+        onChange={(event) => onChange(event.target.value as Language)}
         className="bg-transparent text-xs font-bold text-zinc-200 outline-none [color-scheme:dark]"
-        aria-label={t(
-          language,
-          "Language",
-        )}
+        aria-label={t(language, "Language")}
       >
-        {languageOptions.map(
-          (option) => (
-            <option
-              key={
-                option.value
-              }
-              value={
-                option.value
-              }
-              className="bg-zinc-900 text-zinc-100"
-            >
-              {option.label}
-            </option>
-          ),
-        )}
+        {languageOptions.map((option) => (
+          <option
+            key={option.value}
+            value={option.value}
+            className="bg-zinc-900 text-zinc-100"
+          >
+            {option.label}
+          </option>
+        ))}
       </select>
     </label>
   );

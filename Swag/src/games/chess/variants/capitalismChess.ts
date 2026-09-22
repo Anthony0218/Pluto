@@ -143,10 +143,10 @@ export const pieceValues: Record<CapitalPieceType, number> = {
  * That unpredictability is part of Capitalism Chess.
  */
 export const BOUNTY_REWARD_MIN = 3;
-export const BOUNTY_REWARD_MAX = 10;
+export const BOUNTY_REWARD_MAX = 9;
 
 export const MISSION_REWARD_MIN = 3;
-export const MISSION_REWARD_MAX = 10;
+export const MISSION_REWARD_MAX = 9;
 
 function seededReward(seedText: string, min: number, max: number): number {
   const range = max - min + 1;
@@ -883,21 +883,24 @@ export function resolveCapitalismAfterMove({
 
   moveOpponentBountyWithPiece(state, move);
 
-  const captureCoins = move.captured ? pieceValues[move.captured] : 0;
+  /*
+   * Economy:
+   * there is no passive income for moving or capturing.
+   * Coins can only be earned from bounty and mission rewards.
+   */
+  const captureCoins = 0;
+  const investmentBonus = 0;
+  const checkCoins = 0;
+  const castleCoins = 0;
+  const promotionCoins = 0;
 
-  let investmentBonus = 0;
-
+  /*
+   * Legacy Investment may still be armed in an older saved game.
+   * A capture consumes it, but it no longer creates income.
+   */
   if (move.captured && state.powers[side].investmentArmed) {
-    investmentBonus = captureCoins;
-
     state.powers[side].investmentArmed = false;
   }
-
-  const checkCoins = move.isCheck ? CHECK_REWARD : 0;
-
-  const castleCoins = move.isCastle ? CASTLE_REWARD : 0;
-
-  const promotionCoins = move.promotion ? PROMOTION_REWARD : 0;
 
   let bountyCoins = 0;
   let bountyClaimed: EconomyEvent["bountyClaimed"] = null;
@@ -960,14 +963,7 @@ export function resolveCapitalismAfterMove({
    */
   normalizeMissions(state, gameAfterMove, seed);
 
-  const totalEarned =
-    captureCoins +
-    investmentBonus +
-    checkCoins +
-    castleCoins +
-    promotionCoins +
-    bountyCoins +
-    missionCoins;
+  const totalEarned = bountyCoins + missionCoins;
 
   state.coins[side] += totalEarned;
 
@@ -1004,7 +1000,7 @@ export function canUseRoyalPower(
 
   switch (power) {
     case "investment":
-      return !powerState.investmentUsed && !powerState.investmentArmed;
+      return false;
 
     case "mission_decree":
       return !powerState.missionDecreeUsed;

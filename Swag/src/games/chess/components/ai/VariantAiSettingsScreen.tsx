@@ -16,6 +16,11 @@ type VariantAiSettingsScreenProps = {
   icon?: ReactNode;
   onStart: (settings: VariantAiStartSettings) => void;
   onBack?: () => void;
+
+  sideLabels?: {
+    white: string;
+    black: string;
+  };
 };
 
 const difficultyOrder: Difficulty[] = ["noob", "casual", "tryhard"];
@@ -25,6 +30,10 @@ export default function VariantAiSettingsScreen({
   icon = "♟",
   onStart,
   onBack,
+  sideLabels = {
+    white: "White",
+    black: "Black",
+  },
 }: VariantAiSettingsScreenProps) {
   const [playerColor, setPlayerColor] = useState<ChessPlayerColor>("white");
 
@@ -66,7 +75,8 @@ export default function VariantAiSettingsScreen({
                   <span className="mr-2 text-xl">
                     {color === "white" ? "♔" : "♚"}
                   </span>
-                  <span className="font-bold capitalize">{color}</span>
+
+                  <span className="font-bold">{sideLabels[color]}</span>
                 </button>
               ))}
             </div>
@@ -124,7 +134,12 @@ export default function VariantAiSettingsScreen({
 
           <button
             type="button"
-            onClick={() => onStart({ playerColor, difficulty })}
+            onClick={() =>
+              onStart({
+                playerColor,
+                difficulty,
+              })
+            }
             className="flex-1 rounded-xl bg-amber-300 px-5 py-3 font-black text-zinc-950 transition hover:bg-amber-200"
           >
             Start vs AI

@@ -29,10 +29,12 @@ import {
   findCollapseKingSquare,
   getCollapseChessOutcome,
   isSquareInsideCollapseBounds,
+  isSquarePlayableForCollapse,
   isThreefoldCollapse,
   type CollapseDestroyedPiece,
   type CollapseKingLives,
   type CollapseKingRelocation,
+  type CollapseMode,
   type CollapseOutcome,
   type CollapseSide,
   type CollapseState,
@@ -113,9 +115,10 @@ const START_FEN = new Chess().fen();
 
 function createInitialStoredState(
   seed = createCollapseSeed(),
+  mode: CollapseMode = "squares",
 ): CollapseStoredState {
   return {
-    collapse: createInitialCollapseState(seed),
+    collapse: createInitialCollapseState(seed, mode),
     lives: createInitialCollapseLives(),
     records: [],
   };
@@ -165,7 +168,11 @@ function normalFinish(
   collapse: CollapseState,
   previousRecords: CollapseRecord[],
 ): FinishedGame {
-  const outcome = getCollapseChessOutcome(game, collapse.bounds);
+  const outcome = getCollapseChessOutcome(
+    game,
+    collapse.bounds,
+    collapse.collapsedSquares,
+  );
   if (outcome) {
     return {
       outcome,
@@ -191,7 +198,10 @@ function stateBeforeLastMove(state: CollapseStoredState) {
   if (previousRecords.length === 0) {
     return {
       fen: START_FEN,
-      state: createInitialStoredState(state.collapse.seed),
+      state: createInitialStoredState(
+        state.collapse.seed,
+        state.collapse.mode ?? "rows",
+      ),
       lastFrom: null as string | null,
       lastTo: null as string | null,
     };
@@ -232,6 +242,7 @@ export function CollapseMultiplayerLobby() {
     (profile as { username?: string | null } | null)?.username ?? "Player",
   );
   const [hostColor, setHostColor] = useState<PlayerColor>("white");
+  const [collapseMode, setCollapseMode] = useState<CollapseMode>("squares");
   const [joinCode, setJoinCode] = useState("");
   const [busy, setBusy] = useState<"create" | "join" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -242,7 +253,7 @@ export function CollapseMultiplayerLobby() {
     setError(null);
 
     const seed = createCollapseSeed();
-    const initialState = createInitialStoredState(seed);
+    const initialState = createInitialStoredState(seed, collapseMode);
     const { data, error: rpcError } = await supabase.rpc(
       "create_collapse_variant_room",
       {
@@ -339,6 +350,32 @@ export function CollapseMultiplayerLobby() {
                   </button>
                 ))}
               </div>
+
+              <p className="mt-4 text-[10px] font-black uppercase tracking-wider text-zinc-500">
+                Collapse mode
+              </p>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                {(
+                  [
+                    ["squares", "Standard Squares"],
+                    ["rows", "Classic Rows"],
+                  ] as const
+                ).map(([mode, label]) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    onClick={() => setCollapseMode(mode)}
+                    className={`rounded-xl border px-3 py-2.5 text-xs font-black ${
+                      collapseMode === mode
+                        ? "border-red-300/30 bg-red-400/15 text-red-100"
+                        : "border-white/10 bg-white/5 text-zinc-500"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
               <button
                 type="button"
                 onClick={createRoom}
@@ -594,7 +631,7 @@ export function CollapseMultiplayerGame() {
 
   function selectPiece(square: Square) {
     if (!state || !mySide || liveGame.turn() !== mySide) return;
-    if (!isSquareInsideCollapseBounds(square, state.collapse.bounds)) return;
+    if (!isSquarePlayableForCollapse(square, state.collapse)) return;
     const piece = liveGame.get(square);
     if (!piece || piece.color !== mySide) {
       clearSelection();
@@ -606,6 +643,7 @@ export function CollapseMultiplayerGame() {
         .moves({ square, verbose: true })
         .map((move) => ({ to: move.to as Square })),
       state.collapse.bounds,
+      state.collapse.collapsedSquares,
     );
     setSelectedSquare(square);
     setLegalMoves(moves.map((move) => move.to));
@@ -627,7 +665,7 @@ export function CollapseMultiplayerGame() {
       gameState.undo_requested_by ||
       finished ||
       liveGame.turn() !== mySide ||
-      !isSquareInsideCollapseBounds(to, state.collapse.bounds)
+      !isSquarePlayableForCollapse(to, state.collapse)
     )
       return;
 
@@ -767,7 +805,7 @@ export function CollapseMultiplayerGame() {
       return;
 
     const square = getSquareName(row, column);
-    if (!isSquareInsideCollapseBounds(square, state.collapse.bounds)) {
+    if (!isSquarePlayableForCollapse(square, state.collapse)) {
       clearSelection();
       return;
     }
@@ -864,7 +902,10 @@ export function CollapseMultiplayerGame() {
   async function requestRematch() {
     if (!room || gameState?.status !== "finished" || actionBusy) return;
     const seed = createCollapseSeed();
-    const nextState = createInitialStoredState(seed);
+    const nextState = createInitialStoredState(
+      seed,
+      state?.collapse.mode ?? "squares",
+    );
     setActionBusy("rematch");
     setError(null);
     const { error: rpcError } = await supabase.rpc("request_collapse_rematch", {

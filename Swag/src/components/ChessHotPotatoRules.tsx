@@ -183,9 +183,83 @@ const translations: Partial<TranslationTable> = {
   },
 };
 
+type ExplosionPattern = "ring" | "cross" | "diagonal";
+
+function isExplosionCell(
+  row: number,
+  col: number,
+  pattern: ExplosionPattern,
+): boolean {
+  const dRow = row - 2;
+  const dCol = col - 2;
+
+  if (pattern === "ring") {
+    return Math.abs(dRow) <= 1 && Math.abs(dCol) <= 1;
+  }
+
+  if (pattern === "cross") {
+    return (
+      (dRow === 0 && Math.abs(dCol) <= 2) || (dCol === 0 && Math.abs(dRow) <= 2)
+    );
+  }
+
+  return Math.abs(dRow) === Math.abs(dCol) && Math.abs(dRow) <= 2;
+}
+
+function ExplosionPatternCard({
+  title,
+  detail,
+  pattern,
+}: {
+  title: string;
+  detail: string;
+  pattern: ExplosionPattern;
+}) {
+  const rows = Array.from({ length: 5 }, (_, index) => index);
+  const cols = Array.from({ length: 5 }, (_, index) => index);
+
+  return (
+    <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+      <h3 className="text-sm font-black text-white">{title}</h3>
+      <p className="mt-1 text-xs leading-5 text-zinc-400">{detail}</p>
+
+      <div className="mt-4 inline-block rounded-xl border border-white/10 bg-zinc-950 p-2">
+        <div className="grid grid-cols-5 gap-1">
+          {rows.flatMap((row) =>
+            cols.map((col) => {
+              const isCenter = row === 2 && col === 2;
+              const active = isExplosionCell(row, col, pattern);
+              const dark = (row + col) % 2 === 0;
+
+              return (
+                <div
+                  key={`${row}-${col}`}
+                  className={[
+                    "flex h-9 w-9 items-center justify-center rounded-md border text-sm font-black",
+                    isCenter
+                      ? "border-amber-300 bg-amber-300 text-zinc-950"
+                      : active
+                        ? "border-orange-400/40 bg-orange-500/20 text-orange-200"
+                        : dark
+                          ? "border-zinc-800 bg-zinc-900 text-zinc-700"
+                          : "border-zinc-800 bg-zinc-800/70 text-zinc-700",
+                  ].join(" ")}
+                >
+                  {isCenter ? "💣" : active ? "✦" : ""}
+                </div>
+              );
+            }),
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ChessHotPotatoRules() {
   const { language, setLanguage } = useChessLanguage();
   const t = (key: string) => translateChess(language, key, translations);
+
   return (
     <VariantRulesPage
       variantLabel={t("Chess Variant")}
@@ -196,7 +270,7 @@ export default function ChessHotPotatoRules() {
       backRoute="/games/chess/variants/hot-potato/hotseat"
       backLabel={t("Back to Hot Potato")}
       coreIdea={t(
-        "A random non-King piece carries a bomb with a hidden random fuse of 4–12 completed plies. The bomb follows its carrier, transfers to a capturing piece, and eventually destroys the carrier square plus all adjacent squares.",
+        "Two independent bombs are active: one begins on a random White non-King piece and one on a random Black non-King piece. Each bomb has its own random 4–12 ply fuse, blast shape and cooldown.",
       )}
       language={language}
       onLanguageChange={setLanguage}
@@ -206,100 +280,130 @@ export default function ChessHotPotatoRules() {
       playLabel={t("Play Chess Hot Potato")}
       features={[
         {
-          icon: "💣",
-          title: t("Random carrier"),
-          text: t("Each new potato is assigned to a random non-King piece."),
+          icon: "💣💣",
+          title: t("Two independent bombs"),
+          text: t(
+            "White and Black each begin with their own bomb, and the two countdowns continue independently.",
+          ),
         },
         {
           icon: "⏳",
           title: t("Random 4–12 fuse"),
-          text: t("Every new potato receives its own random countdown."),
+          text: t("Every new bomb receives its own random countdown."),
         },
         {
-          icon: "💥",
-          title: t("3×3 blast"),
+          icon: "✦",
+          title: t("Random blast shape"),
           text: t(
-            "The carrier square and up to eight adjacent squares are destroyed.",
+            "Every spawned bomb randomly uses Ring 1, Cross 2 or Diagonal 2.",
           ),
         },
       ]}
       rules={[
         {
-          icon: "💣",
-          title: t("A random non-King piece starts with the potato"),
+          icon: "♙♟",
+          title: t("Each side starts with one bomb"),
           text: t(
-            "At the beginning of the game, one non-King piece is selected as the first carrier.",
+            "At the beginning, a random non-King White piece carries the White bomb and a random non-King Black piece carries the Black bomb.",
           ),
         },
         {
           icon: "4–12",
-          title: t("Every potato gets a random fuse"),
+          title: t("Each bomb has its own fuse"),
           text: t(
-            "A newly created potato receives a random countdown between 4 and 12 completed plies. The countdown decreases after each completed player move.",
+            "A new bomb gets a random fuse from 4 to 12 completed plies. Each completed chess move reduces every active bomb's remaining fuse independently.",
           ),
         },
         {
           icon: "→",
-          title: t("The potato follows its carrier"),
+          title: t("A bomb follows its carrier"),
           text: t(
-            "If the carrier moves normally, the bomb moves with that piece to its new square.",
+            "If a carrier moves, including a rook moving during castling, its bomb follows that piece to the new square.",
           ),
         },
         {
           icon: "↔",
-          title: t("Capture the carrier to inherit the bomb"),
+          title: t("Capture transfers that bomb"),
           text: t(
-            "If the carrier is captured, the capturing piece becomes the new carrier immediately. The same fuse continues counting down.",
+            "If a bomb carrier is captured, the capturing piece immediately inherits that same bomb and its remaining fuse. En-passant transfer is handled too.",
+          ),
+        },
+        {
+          icon: "✦",
+          title: t("Every spawn gets a random blast shape"),
+          text: t(
+            "Ring 1 hits the carrier square plus adjacent squares. Cross 2 reaches up to two squares horizontally and vertically. Diagonal 2 reaches up to two squares along the diagonals.",
           ),
         },
         {
           icon: "💥",
-          title: t("The explosion covers a 3×3 area"),
+          title: t("Explosion destroys non-King pieces"),
           text: t(
-            "When the fuse reaches zero, the carrier square and every valid adjacent square explode. Non-King pieces inside the blast are destroyed.",
+            "When a bomb reaches zero, all non-King pieces in that bomb's blast squares are destroyed.",
           ),
         },
         {
           icon: "♔",
-          title: t("A King in the blast loses the game"),
+          title: t("A King caught in a blast loses"),
           text: t(
-            "If exactly one King is inside the explosion radius, that side loses immediately.",
-          ),
-        },
-        {
-          icon: "♔♚",
-          title: t("Both Kings in the blast means a draw"),
-          text: t(
-            "If both Kings are caught in the same explosion, the game ends as a draw.",
+            "If exactly one King is inside an explosion, that side loses immediately. If both Kings are caught by the same explosion, the game is a draw.",
           ),
         },
         {
           icon: "❄",
-          title: t("Five-ply cooldown after every explosion"),
+          title: t("Each bomb has its own 5-ply cooldown"),
           text: t(
-            "After a non-terminal explosion, five completed plies pass with no active potato. Then a new random non-King carrier receives a fresh random fuse.",
+            "After a non-terminal explosion, only that bomb cools down for 5 completed plies. The other bomb can remain active. Then a fresh carrier, fuse and blast shape are generated.",
           ),
         },
         {
           icon: "♟",
-          title: t("Normal chess can still end the game"),
+          title: t("Normal chess endings remain active"),
           text: t(
-            "Checkmate and the normal chess draw conditions remain active. A normal terminal result can end the game before the next explosion.",
+            "Checkmate and normal chess draw conditions can still end the game before either bomb explodes.",
           ),
         },
       ]}
     >
       <VisualCard
         accent="orange"
+        eyebrow={t("Explosion patterns")}
+        title={t("The three possible blast shapes")}
+      >
+        <div className="grid gap-4 lg:grid-cols-3">
+          <ExplosionPatternCard
+            title={t("Ring 1")}
+            detail={t("The carrier square plus every adjacent square.")}
+            pattern="ring"
+          />
+          <ExplosionPatternCard
+            title={t("Cross 2")}
+            detail={t(
+              "The carrier square plus up to two squares horizontally and vertically.",
+            )}
+            pattern="cross"
+          />
+          <ExplosionPatternCard
+            title={t("Diagonal 2")}
+            detail={t(
+              "The carrier square plus up to two squares along each diagonal.",
+            )}
+            pattern="diagonal"
+          />
+        </div>
+      </VisualCard>
+
+      <VisualCard
+        accent="orange"
         eyebrow={t("Bomb lifecycle")}
-        title={t("One potato cycle")}
+        title={t("One bomb's independent cycle")}
       >
         <Flow
           steps={[
             {
               icon: "💣",
               label: t("Carrier chosen"),
-              detail: t("Random non-King piece."),
+              detail: t("Random non-King piece of that bomb's side."),
             },
             {
               icon: "⏳",
@@ -307,14 +411,14 @@ export default function ChessHotPotatoRules() {
               detail: t("Random 4–12 completed plies."),
             },
             {
-              icon: "💥",
-              label: t("Explosion"),
-              detail: t("Carrier square + adjacent 8 squares."),
+              icon: "✦",
+              label: t("Random blast"),
+              detail: t("Ring 1, Cross 2 or Diagonal 2."),
             },
             {
               icon: "❄",
               label: t("Cooldown"),
-              detail: t("5 plies, then a fresh potato."),
+              detail: t("5 plies, then that bomb respawns."),
             },
           ]}
         />

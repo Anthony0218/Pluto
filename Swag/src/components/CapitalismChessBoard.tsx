@@ -18,11 +18,8 @@ import PromotionBar from "./PromotionBar";
 import {
   BOUNTY_REWARD_MAX,
   BOUNTY_REWARD_MIN,
-  CASTLE_REWARD,
-  CHECK_REWARD,
   MISSION_REWARD_MAX,
   MISSION_REWARD_MIN,
-  PROMOTION_REWARD,
   ROYAL_POWER_COSTS,
   SHOP_PIECE_COSTS,
   STARTING_COINS,
@@ -1389,15 +1386,15 @@ export default function CapitalismChessBoard({
 
         <section className="mb-6 grid gap-3 rounded-3xl border border-amber-400/10 bg-amber-400/[0.035] px-5 py-4 sm:grid-cols-2 lg:grid-cols-4">
           <EconomyRule
-            icon="⚔"
-            title={`Capture = piece value`}
-            detail="Pawn 1 · N/B 3 · R 5 · Q 9"
+            icon="🪙"
+            title="No passive income"
+            detail="Moving and normal captures give no automatic coins."
           />
 
           <EconomyRule
-            icon="♔"
-            title={`Check +${CHECK_REWARD}`}
-            detail={`Castle +${CASTLE_REWARD} · Promotion +${PROMOTION_REWARD}`}
+            icon="⚔"
+            title="Earn through contracts"
+            detail="Coins come only from missions and bounty targets."
           />
 
           <EconomyRule
@@ -1533,21 +1530,6 @@ export default function CapitalismChessBoard({
                 </div>
 
                 <div className="space-y-2">
-                  <PowerButton
-                    title={t("Royal Investment")}
-                    detail={t("Double the next capture income")}
-                    cost={ROYAL_POWER_COSTS.investment}
-                    used={capitalState.powers[currentSide].investmentUsed}
-                    armed={capitalState.powers[currentSide].investmentArmed}
-                    enabled={
-                      !gameOver &&
-                      !historyPreview &&
-                      canUseRoyalPower(capitalState, currentSide, "investment")
-                    }
-                    onClick={() => useRoyalPower("investment")}
-                    t={t}
-                  />
-
                   <PowerButton
                     title={t("Mission Decree")}
                     detail={t("Reroll your current mission")}
@@ -2005,16 +1987,6 @@ export default function CapitalismChessBoard({
                 {statsTab === "market" && (
                   <div className="mt-4 space-y-2">
                     <MarketRow
-                      label={t("Capture income")}
-                      value={stats.captureIncome}
-                    />
-
-                    <MarketRow
-                      label={t("Check income")}
-                      value={stats.checkIncome}
-                    />
-
-                    <MarketRow
                       label={t("Bounty income")}
                       value={stats.bountyIncome}
                     />
@@ -2022,16 +1994,6 @@ export default function CapitalismChessBoard({
                     <MarketRow
                       label={t("Mission income")}
                       value={stats.missionIncome}
-                    />
-
-                    <MarketRow
-                      label={t("Castle + promotion")}
-                      value={stats.castleIncome + stats.promotionIncome}
-                    />
-
-                    <MarketRow
-                      label={t("Investment bonus")}
-                      value={stats.investmentIncome}
                     />
 
                     {stats.biggestPayday && (
