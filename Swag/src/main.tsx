@@ -11,7 +11,7 @@ import OnlineGame from "./pages/OnlineGame";
 import OnlineGameRoom from "./pages/OnlineGameRoom";
 
 import AppLayout from "./components/AppLayout";
-
+import NotFoundPage from "./pages/NotFoundPage";
 import Watten from "./pages/Watten";
 import WattenHotseat from "./pages/WattenHotseat";
 import WattenHotseatPage from "./pages/WattenGamePage";
@@ -538,6 +538,10 @@ const router = createBrowserRouter([
       {
         path: "/games/medieval-kingdoms/battle/:battleId",
         element: <MedievalKingdomsBattlePage />,
+      },
+      {
+        path: "*",
+        element: <NotFoundPage />,
       },
     ],
   },

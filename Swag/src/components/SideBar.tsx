@@ -1,7 +1,6 @@
 import { useTheme } from "@/context/ThemeContext";
 import {
   BarChart3,
-  Folder,
   Gamepad2,
   Home,
   Settings,
@@ -18,9 +17,9 @@ const navigation = [
     icon: Home,
   },
   {
-    label: "Dashboard",
-    href: "/dashboard",
-    icon: BarChart3,
+    label: "Profile",
+    href: "/profile",
+    icon: Users,
   },
   {
     label: "Games",
@@ -30,16 +29,16 @@ const navigation = [
   {
     label: "Chess",
     href: "/games/chess",
-    icon: Folder,
+    icon: BarChart3,
   },
   {
     label: "Watten",
-    href: "games/watten",
-    icon: Users,
+    href: "/games/watten",
+    icon: BarChart3,
   },
   {
-    label: "Leaderboard",
-    href: "/leaderboard",
+    label: "Medieval Kingdoms",
+    href: "/games/medieval-kingdoms",
     icon: Trophy,
   },
 ];

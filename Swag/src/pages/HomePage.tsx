@@ -11,6 +11,7 @@ type Game = {
   route: string;
   tag: string;
   features: string[];
+  finished: boolean;
 };
 
 export const games: Game[] = [
@@ -23,6 +24,7 @@ export const games: Game[] = [
     route: "/games/chess",
     tag: "Strategie",
     features: ["Einzelspieler", "Stockfish", "Analyse"],
+    finished: true,
   },
   {
     title: "Watten",
@@ -33,16 +35,18 @@ export const games: Game[] = [
     route: "/games/watten",
     tag: "Kartenspiel",
     features: ["3 Spieler", "Hilfemodus", "Punktewertung"],
+    finished: true,
   },
   {
-    title: "Watten Multiplayer",
-    subtitle: "Gemeinsam spielen",
+    title: "Medieval Kingdoms",
+    subtitle: "Rundenbasierte Strategie",
     description:
-      "Watten sonst? Fordere Freunde und andere Spieler zu einer Online-Partie Watten heraus.",
-    image: "/images/watten-multiplayer.png",
-    route: "/games/watten/multiplayer",
-    tag: "Online",
-    features: ["Mehrspieler", "Echtzeit", "Online"],
+      "Führe dein mittelalterliches Königreich, plane deine Züge und kämpfe in rundenbasierten Schlachten um die Vorherrschaft.",
+    image: "/images/medieval-kingdoms.png",
+    route: "/games/medieval-kingdoms",
+    tag: "Strategie",
+    features: ["Rundenbasiert", "Taktik", "Mittelalter"],
+    finished: false,
   },
 ];
 export const gameList = [
@@ -53,6 +57,7 @@ export const gameList = [
     route: "/games/chess",
     category: "Strategie",
     image: "/images/chess-game-icon.png",
+    finished: true,
   },
 
   {
@@ -61,6 +66,7 @@ export const gameList = [
     route: "/games/watten",
     category: "Kartenspiel",
     image: "/images/watten-game-icon.png",
+    finished: true,
   },
 
   {
@@ -68,7 +74,8 @@ export const gameList = [
     description: "A turn based strategy game in medieval style.",
     route: "/games/medieval-kingdoms",
     category: "Strategie",
-    image: "/images/chess-game-icon.png",
+    image: "/images/medieval-kingdoms-icon.png",
+    finished: false,
   },
 ];
 export default function HomePage() {
@@ -193,9 +200,21 @@ export default function HomePage() {
 
                       <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/70 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-transparent lg:to-zinc-900" />
 
-                      <span className="absolute left-5 top-5 rounded-full border border-white/10 bg-black/35 px-3 py-1 text-xs font-medium text-white backdrop-blur-md">
-                        {game.tag}
-                      </span>
+                      <div className="absolute left-5 top-5 flex flex-wrap gap-2">
+                        <span className="rounded-full border border-white/10 bg-black/35 px-3 py-1 text-xs font-medium text-white backdrop-blur-md">
+                          {game.tag}
+                        </span>
+
+                        <span
+                          className={`rounded-full border px-3 py-1 text-xs font-black backdrop-blur-md ${
+                            game.finished
+                              ? "border-emerald-400/25 bg-emerald-400/15 text-emerald-200"
+                              : "border-amber-400/25 bg-amber-400/15 text-amber-200"
+                          }`}
+                        >
+                          {game.finished ? "Fertig" : "In Entwicklung"}
+                        </span>
+                      </div>
                     </div>
 
                     {/* CONTENT */}
@@ -279,7 +298,7 @@ export default function HomePage() {
             <section className="grid gap-4 lg:grid-cols-12">
               {/* CONTINUE */}
               <button
-                onClick={() => navigate("/chessGame")}
+                onClick={() => navigate("/games/chess")}
                 className="group rounded-2xl border border-zinc-800 bg-zinc-900 p-5 text-left transition duration-300 hover:-translate-y-1 hover:border-zinc-700 hover:bg-zinc-800 lg:col-span-5"
               >
                 <div className="mb-7 flex items-center justify-between">
@@ -361,7 +380,7 @@ export default function HomePage() {
 
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <button
-                  onClick={() => navigate("/chessGame")}
+                  onClick={() => navigate("/games/chess/rules")}
                   className="group rounded-2xl border border-zinc-800 bg-zinc-900 p-5 text-left transition hover:border-zinc-700 hover:bg-zinc-800"
                 >
                   <span className="text-2xl">♘</span>
@@ -376,7 +395,7 @@ export default function HomePage() {
                 </button>
 
                 <button
-                  onClick={() => navigate("/watten")}
+                  onClick={() => navigate("/games/watten/rules")}
                   className="group rounded-2xl border border-zinc-800 bg-zinc-900 p-5 text-left transition hover:border-zinc-700 hover:bg-zinc-800"
                 >
                   <span className="text-2xl">🂡</span>
@@ -391,7 +410,7 @@ export default function HomePage() {
                 </button>
 
                 <button
-                  onClick={() => setActiveTab("Fortschritt")}
+                  onClick={() => navigate("/profile")}
                   className="group rounded-2xl border border-zinc-800 bg-zinc-900 p-5 text-left transition hover:border-zinc-700 hover:bg-zinc-800"
                 >
                   <span className="text-2xl">↗</span>
@@ -424,7 +443,7 @@ export default function HomePage() {
 
             <div className="grid gap-4 md:grid-cols-2">
               <button
-                onClick={() => navigate("/watten/multiplayer")}
+                onClick={() => navigate("games/watten/multiplayer")}
                 className="group rounded-2xl border border-zinc-800 bg-zinc-900 p-6 text-left transition hover:-translate-y-1 hover:border-sky-500/40"
               >
                 <div className="mb-8 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-500/10 text-2xl">
@@ -445,19 +464,27 @@ export default function HomePage() {
                 </p>
               </button>
 
-              <div className="rounded-2xl border border-dashed border-zinc-800 bg-zinc-900/40 p-6">
-                <div className="mb-8 flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-800 text-2xl text-zinc-500">
-                  ♞
-                </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <button
+                  onClick={() => navigate("/games/chess/multiplayer")}
+                  className="group rounded-2xl border border-zinc-800 bg-zinc-900 p-6 text-left transition hover:-translate-y-1 hover:border-sky-500/40"
+                >
+                  <div className="mb-8 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-500/10 text-2xl">
+                    ♞
+                  </div>
 
-                <h3 className="text-xl font-semibold text-zinc-400">
-                  Schach Multiplayer
-                </h3>
+                  <h3 className="text-xl font-semibold text-zinc-400">
+                    Schach Multiplayer
+                  </h3>
+                  <p className="mt-2 text-sm text-zinc-500">
+                    Erstelle eine Partie oder tritt einer bestehenden
+                    Schachpartie bei.
+                  </p>
 
-                <p className="mt-2 text-sm text-zinc-600">
-                  {" "}
-                  Demnächst verfügbar.
-                </p>
+                  <p className="mt-6 text-sm font-medium text-sky-400">
+                    Jetzt spielen →
+                  </p>
+                </button>
               </div>
             </div>
           </section>
@@ -546,7 +573,7 @@ export default function HomePage() {
                   {/* Content */}
                   <div className="relative flex h-full flex-col p-5">
                     {/* Category */}
-                    <div className="flex justify-end">
+                    <div className="flex flex-wrap justify-end gap-2">
                       <span
                         className="
               rounded-full
@@ -560,6 +587,16 @@ export default function HomePage() {
             "
                       >
                         {game.category}
+                      </span>
+
+                      <span
+                        className={`rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-wider backdrop-blur-md ${
+                          game.finished
+                            ? "border-emerald-400/25 bg-emerald-400/15 text-emerald-200"
+                            : "border-amber-400/25 bg-amber-400/15 text-amber-200"
+                        }`}
+                      >
+                        {game.finished ? "Fertig" : "In Entwicklung"}
                       </span>
                     </div>
 

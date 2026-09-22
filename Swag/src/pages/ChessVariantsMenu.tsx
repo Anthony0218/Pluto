@@ -507,6 +507,21 @@ function t(language: Language, key: string): string {
 
 const variants: VariantCard[] = [
   {
+    id: "complete-chaos",
+    icon: "🌀",
+    title: "Total Chaos Chess",
+    subtitle: "Nothing starts where it should",
+    description:
+      "All 32 standard pieces are scattered across the board into a playable random position. Understand the chaos before your opponent does.",
+    tags: ["Full-board setup", "Random geometry", "No opening theory"],
+    available: true,
+    route: "/games/chess/variants/complete-chaos/hotseat",
+    aiRoute: "/games/chess/variants/complete-chaos/ai",
+    rulesRoute: "/games/chess/variants/complete-chaos/rules",
+    accent: "pink",
+    multiplayerRoute: "/games/chess/variants/complete-chaos/multiplayer",
+  },
+  {
     id: "draft",
     icon: "⚔",
     title: "Draft Chess",
@@ -536,20 +551,7 @@ const variants: VariantCard[] = [
     accent: "zinc",
     multiplayerRoute: "/games/chess/variants/mirror/multiplayer",
   },
-  {
-    id: "randomstart",
-    icon: "🎲",
-    title: "Random Start Chess",
-    subtitle: "Forget your opening book",
-    description:
-      "White and Black receive independently shuffled back ranks, creating a different non-mirrored opening every game.",
-    tags: ["Random setup", "Asymmetric start", "No castling"],
-    available: true,
-    route: "/games/chess/variants/randomstart/hotseat",
-    aiRoute: "/games/chess/variants/randomstart/ai",
-    multiplayerRoute: "/games/chess/variants/randomstart/multiplayer",
-    accent: "lime",
-  },
+
   {
     id: "fog-of-war",
     icon: "🌫",
@@ -566,6 +568,21 @@ const variants: VariantCard[] = [
     accent: "sky",
   },
   {
+    id: "tectonic",
+    icon: "↻",
+    title: "Tectonic Chess",
+    subtitle: "Move pieces. Then move the board.",
+    description:
+      "Every four normal plies, a player can rotate one 4×4 quadrant and reshape the geometry of the entire position.",
+    tags: ["4×4 Rotation", "Board Shift", "Strategy"],
+    available: true,
+    route: "/games/chess/variants/tectonic/hotseat",
+    aiRoute: "/games/chess/variants/tectonic/ai",
+    rulesRoute: "/games/chess/variants/tectonic/rules",
+    accent: "teal",
+    multiplayerRoute: "/games/chess/variants/tectonic/multiplayer",
+  },
+  {
     id: "roulette",
     icon: "🎰",
     title: "Chess Roulette",
@@ -580,20 +597,7 @@ const variants: VariantCard[] = [
     accent: "fuchsia",
     multiplayerRoute: "/games/chess/variants/roulette/multiplayer",
   },
-  {
-    id: "mutation",
-    icon: "🧬",
-    title: "Mutation Chess",
-    subtitle: "The board changes itself",
-    description:
-      "Every ten plies, a random non-king piece mutates into another piece.",
-    tags: ["Random events", "Mutations", "Hotseat"],
-    route: "/games/chess/variants/mutation/hotseat",
-    aiRoute: "/games/chess/variants/mutation/ai",
-    available: true,
-    accent: "violet",
-    multiplayerRoute: "/games/chess/variants/mutation/multiplayer",
-  },
+
   {
     id: "four-player",
     icon: "✣",
@@ -608,36 +612,7 @@ const variants: VariantCard[] = [
     accent: "cyan",
     multiplayerRoute: "/games/chess/variants/4-players/multiplayer",
   },
-  {
-    id: "complete-chaos",
-    icon: "🌀",
-    title: "Total Chaos Chess",
-    subtitle: "Nothing starts where it should",
-    description:
-      "All 32 standard pieces are scattered across the board into a playable random position. Understand the chaos before your opponent does.",
-    tags: ["Full-board setup", "Random geometry", "No opening theory"],
-    available: true,
-    route: "/games/chess/variants/complete-chaos/hotseat",
-    aiRoute: "/games/chess/variants/complete-chaos/ai",
-    rulesRoute: "/games/chess/variants/complete-chaos/rules",
-    accent: "pink",
-    multiplayerRoute: "/games/chess/variants/complete-chaos/multiplayer",
-  },
-  {
-    id: "horror",
-    icon: "☠",
-    title: "Horror Chess",
-    subtitle: "The board is dangerous",
-    description:
-      "Infection, cursed pieces, burning squares and knight-triggered freezing turn the board into a survival game.",
-    tags: ["Infection", "Curses", "Hot squares", "Knight freeze"],
-    route: "/games/chess/variants/horror/hotseat",
-    aiRoute: "/games/chess/variants/horror/ai",
-    rulesRoute: "/games/chess/variants/horror/rules",
-    available: true,
-    accent: "rose",
-    multiplayerRoute: "/games/chess/variants/horror/multiplayer",
-  },
+
   {
     id: "hotpotato",
     icon: "💣",
@@ -669,6 +644,20 @@ const variants: VariantCard[] = [
     accent: "red",
   },
   {
+    id: "mutation",
+    icon: "🧬",
+    title: "Mutation Chess",
+    subtitle: "The board changes itself",
+    description:
+      "Every ten plies, a random non-king piece mutates into another piece.",
+    tags: ["Random events", "Mutations", "Hotseat"],
+    route: "/games/chess/variants/mutation/hotseat",
+    aiRoute: "/games/chess/variants/mutation/ai",
+    available: true,
+    accent: "violet",
+    multiplayerRoute: "/games/chess/variants/mutation/multiplayer",
+  },
+  {
     id: "boss",
     icon: "♚",
     title: "Boss Battle Chess",
@@ -683,35 +672,7 @@ const variants: VariantCard[] = [
     accent: "indigo",
     multiplayerRoute: "/games/chess/variants/boss/multiplayer",
   },
-  {
-    id: "three-lives",
-    icon: "♥",
-    title: "Three Lives Chess",
-    subtitle: "Every check hurts",
-    description:
-      "Both players start with three lives. Every check removes one life; checkmate still wins instantly.",
-    tags: ["3 HP", "Check damage", "Hotseat"],
-    route: "/games/chess/variants/three-lives/hotseat",
-    aiRoute: "/games/chess/variants/three-lives/ai",
-    available: true,
-    accent: "red",
-    multiplayerRoute: "/games/chess/variants/three-lives/multiplayer",
-  },
-  {
-    id: "tectonic",
-    icon: "↻",
-    title: "Tectonic Chess",
-    subtitle: "Move pieces. Then move the board.",
-    description:
-      "Every four normal plies, a player can rotate one 4×4 quadrant and reshape the geometry of the entire position.",
-    tags: ["4×4 Rotation", "Board Shift", "Strategy"],
-    available: true,
-    route: "/games/chess/variants/tectonic/hotseat",
-    aiRoute: "/games/chess/variants/tectonic/ai",
-    rulesRoute: "/games/chess/variants/tectonic/rules",
-    accent: "teal",
-    multiplayerRoute: "/games/chess/variants/tectonic/multiplayer",
-  },
+
   {
     id: "capitalism",
     icon: "🪙",
@@ -738,7 +699,66 @@ const variants: VariantCard[] = [
     available: false,
     accent: "blue",
   },
+  {
+    id: "king-of-the-hill",
+    icon: "⛰️",
+    title: "King of the Hill",
+    subtitle: "be dominant!",
+    description:
+      "spannende Schachvariante, bei der man neben dem klassischen Schachmatt auch gewinnt, indem man seinen König in die Mitte des Brettes zieht.",
+    tags: ["fight", "till", "end"],
+    available: false,
+    route: "/games/chess/variants/kingofthehill/hotseat",
+    aiRoute: "/games/chess/variants/kingofthehill/ai",
+    multiplayerRoute: "/games/chess/variants/kingofthehill/multiplayer",
+    accent: "amber",
+  },
+  {
+    id: "randomstart",
+    icon: "🎲",
+    title: "Random Start Chess",
+    subtitle: "Forget your opening book",
+    description:
+      "White and Black receive independently shuffled back ranks, creating a different non-mirrored opening every game.",
+    tags: ["Random setup", "Asymmetric start", "No castling"],
+    available: false,
+    route: "/games/chess/variants/randomstart/hotseat",
+    aiRoute: "/games/chess/variants/randomstart/ai",
+    multiplayerRoute: "/games/chess/variants/randomstart/multiplayer",
+    accent: "lime",
+  },
+  {
+    id: "three-lives",
+    icon: "♥",
+    title: "Three Lives Chess",
+    subtitle: "Every check hurts",
+    description:
+      "Both players start with three lives. Every check removes one life; checkmate still wins instantly.",
+    tags: ["3 HP", "Check damage", "Hotseat"],
+    route: "/games/chess/variants/three-lives/hotseat",
+    aiRoute: "/games/chess/variants/three-lives/ai",
+    available: false,
+    accent: "red",
+    multiplayerRoute: "/games/chess/variants/three-lives/multiplayer",
+  },
+  {
+    id: "horror",
+    icon: "☠",
+    title: "Horror Chess",
+    subtitle: "The board is dangerous",
+    description:
+      "Infection, cursed pieces, burning squares and knight-triggered freezing turn the board into a survival game.",
+    tags: ["Infection", "Curses", "Hot squares", "Knight freeze"],
+    route: "/games/chess/variants/horror/hotseat",
+    aiRoute: "/games/chess/variants/horror/ai",
+    rulesRoute: "/games/chess/variants/horror/rules",
+    available: false,
+    accent: "rose",
+    multiplayerRoute: "/games/chess/variants/horror/multiplayer",
+  },
 ];
+
+const availableVariants = variants.filter((variant) => variant.available);
 
 const accentClasses: Record<VariantCard["accent"], string> = {
   red: "border-red-400/20 bg-red-400/[0.05] text-red-300",
@@ -1048,12 +1068,22 @@ function shuffleVariants(items: VariantCard[]): VariantCard[] {
 
 function VariantPreviewCarousel({ language }: { language: Language }) {
   const [previewOrder, setPreviewOrder] = useState<VariantCard[]>(() =>
-    shuffleVariants(variants),
+    shuffleVariants(availableVariants),
   );
 
   const [previewIndex, setPreviewIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
+    setPreviewOrder(shuffleVariants(availableVariants));
+    setPreviewIndex(0);
+  }, []);
+
+  useEffect(() => {
+    if (isPaused || previewOrder.length <= 1) {
+      return;
+    }
+
     const timer = window.setInterval(() => {
       setPreviewIndex((current) => {
         const next = current + 1;
@@ -1062,15 +1092,16 @@ function VariantPreviewCarousel({ language }: { language: Language }) {
           return next;
         }
 
-        setPreviewOrder(shuffleVariants(variants));
+        setPreviewOrder(shuffleVariants(availableVariants));
         return 0;
       });
     }, 3600);
 
     return () => window.clearInterval(timer);
-  }, [previewOrder.length]);
+  }, [isPaused, previewOrder.length]);
 
   function goTo(index: number) {
+    if (previewOrder.length === 0) return;
     setPreviewIndex((index + previewOrder.length) % previewOrder.length);
   }
 
@@ -1088,6 +1119,8 @@ function VariantPreviewCarousel({ language }: { language: Language }) {
         shadow-black/20
         backdrop-blur-md
       "
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
     >
       <div
         className="
@@ -1642,7 +1675,7 @@ export default function ChessVariantsMenu() {
         </section>
 
         <footer className="py-8 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-800">
-          Chess Variants · 16 modes
+          Chess Variants · 12 modes
         </footer>
       </div>
     </main>

@@ -802,20 +802,26 @@ export function DraftMultiplayerGame() {
 
     setActionLoading("finalize");
 
-    void supabase
-      .rpc("finalize_draft_variant_game", {
-        p_room_id: room.id,
-        p_expected_version: gameState.version,
-        p_initial_fen: fenToFinalize,
-      })
-      .then(({ error: rpcError }) => {
+    void (async () => {
+      try {
+        const { error: rpcError } = await supabase.rpc(
+          "finalize_draft_variant_game",
+          {
+            p_room_id: room.id,
+            p_expected_version: gameState.version,
+            p_initial_fen: fenToFinalize,
+          },
+        );
+
         if (rpcError && !rpcError.message.includes("changed")) {
           setError(rpcError.message);
         }
 
-        return loadRoom(true);
-      })
-      .finally(() => setActionLoading(null));
+        await loadRoom(true);
+      } finally {
+        setActionLoading(null);
+      }
+    })();
   }, [gameState, loadRoom, phase, publicState.setup, room]);
 
   function editSetup(square: Square) {
