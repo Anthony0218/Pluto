@@ -770,18 +770,18 @@ function PrivacyExample({ language }: { language: Language }) {
       </div>
 
       <p className="mt-3 text-[10px] font-black uppercase tracking-[0.18em] text-sky-300">
-        Pass the device
+        {t(language, "Pass the device")}
       </p>
 
       <p className="mt-2 text-sm font-black text-white">
-        Do not look at the board
+        {t(language, "Do not look at the board")}
       </p>
 
       <button
         type="button"
         className="mt-4 w-full rounded-xl bg-sky-300 px-4 py-2.5 text-xs font-black text-zinc-950"
       >
-        Reveal Board
+        {t(language, "Reveal Board")}
       </button>
     </div>
   );

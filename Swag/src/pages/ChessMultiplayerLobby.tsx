@@ -94,6 +94,14 @@ export default function ChessMultiplayerLobby() {
           <p className="mt-3 text-zinc-400">
             You must be logged in to play online.
           </p>
+
+          <button
+            type="button"
+            onClick={() => navigate("/login")}
+            className="mt-6 rounded-xl bg-emerald-300 px-6 py-3 text-sm font-black text-zinc-950 transition hover:bg-emerald-200 active:scale-[0.98]"
+          >
+            Log in
+          </button>
         </div>
       </main>
     );

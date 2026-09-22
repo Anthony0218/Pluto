@@ -33,6 +33,9 @@ import type {
   HitEffect,
   Position,
   PreviewAction,
+  GameMode,
+  GameModeConfig,
+  FactionId,
   SkillActionId,
   TerrainType,
   Unit,
@@ -60,8 +63,20 @@ import {
   unitCanInteractWithObject,
 } from "../../games/MedievalKingdoms/objectInteractions";
 import SkillPreviewOverlay from "./SkillPreviewOverlay";
+import {
+  evaluateGameMode,
+  GAME_MODE_DESCRIPTIONS,
+  GAME_MODE_LABELS,
+} from "../../games/MedievalKingdoms/gameModes";
 
-type Props = { battleId: string };
+type Props = {
+  battleId: string;
+  gameMode?: GameMode;
+  gameModeConfig?: GameModeConfig;
+  playerFaction?: FactionId;
+  backPath?: string;
+  onVictory?: (winner: FactionId) => void;
+};
 type PendingProjectile = {
   start: Position;
   end: Position;
@@ -78,10 +93,18 @@ type PendingSpell = {
   hitEffects: HitEffect[];
 };
 
-export default function Battlefield({ battleId }: Props) {
+export default function Battlefield({
+  battleId,
+  gameMode = "capture",
+  gameModeConfig,
+  playerFaction = "falconstone",
+  backPath = "/games/medieval-kingdoms",
+  onVictory,
+}: Props) {
   const navigate = useNavigate();
   const battle = BATTLES[battleId] ?? BATTLES["falcon-bridge"];
   const [game, setGame] = useState(() => createInitialBattleState(battle.id));
+  const reportedWinnerRef = useRef<FactionId | null>(null);
   const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
   const [hoveredUnitId, setHoveredUnitId] = useState<string | null>(null);
   const [pinnedUnitId, setPinnedUnitId] = useState<string | null>(null);
@@ -179,6 +202,20 @@ export default function Battlefield({ battleId }: Props) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [battle.id, battle.terrainMask]);
+
+  useEffect(() => {
+    reportedWinnerRef.current = null;
+  }, [battle.id, gameMode]);
+
+  useEffect(() => {
+    if (!game.winner || reportedWinnerRef.current === game.winner) {
+      return;
+    }
+
+    reportedWinnerRef.current = game.winner;
+
+    onVictory?.(game.winner);
+  }, [game.winner, onVictory]);
 
   useEffect(() => {
     if (!aimMode || aimStage !== "direction" || projectile || pendingSpell)
@@ -323,21 +360,17 @@ export default function Battlefield({ battleId }: Props) {
       };
     }
 
-    const objectRule =
-      getObjectMovementRule(
-        selectedUnit,
-        target,
-        game.objects,
-        battle.mapAspectRatio,
-      );
+    const objectRule = getObjectMovementRule(
+      selectedUnit,
+      target,
+      game.objects,
+      battle.mapAspectRatio,
+    );
 
-    if (
-      !objectRule.legal
-    ) {
+    if (!objectRule.legal) {
       return {
         legal: false,
-        reason:
-          objectRule.reason,
+        reason: objectRule.reason,
       };
     }
 
@@ -387,66 +420,38 @@ export default function Battlefield({ battleId }: Props) {
       terrainMaskRef.current,
       battle.mapAspectRatio,
     );
-    const landing =
-      applyLandingObjectEffects(
-        result.state,
-        selectedUnit.id,
-        target,
-        battle.mapAspectRatio,
-      );
-
-    setGame(
-      landing.state,
+    const landing = applyLandingObjectEffects(
+      result.state,
+      selectedUnit.id,
+      target,
+      battle.mapAspectRatio,
     );
 
-    setMessage(
-      [
-        result.message,
-        ...landing.messages,
-      ]
-        .filter(Boolean)
-        .join(" "),
-    );
+    setGame(landing.state);
+
+    setMessage([result.message, ...landing.messages].filter(Boolean).join(" "));
 
     setMoveMode(false);
     setDragPreview(null);
 
-    if (
-      landing.damage > 0
-    ) {
+    if (landing.damage > 0) {
       const effect: HitEffect = {
-        targetId:
-          selectedUnit.id,
-        damage:
-          landing.damage,
-        hit:
-          true,
-        position:
-          target,
-        label:
-          "HAZARD",
+        targetId: selectedUnit.id,
+        damage: landing.damage,
+        hit: true,
+        position: target,
+        label: "HAZARD",
       };
 
-      setDamageEffects([
-        effect,
-      ]);
+      setDamageEffects([effect]);
 
-      setHitFlashUnitIds([
-        selectedUnit.id,
-      ]);
+      setHitFlashUnitIds([selectedUnit.id]);
 
-      window.setTimeout(
-        () => {
-          setDamageEffects(
-            [],
-          );
+      window.setTimeout(() => {
+        setDamageEffects([]);
 
-          setHitFlashUnitIds(
-            [],
-          );
-        },
-        1000,
-      );
+        setHitFlashUnitIds([]);
+      }, 1000);
     }
 
     if (result.trapTriggered) {
@@ -972,10 +977,29 @@ export default function Battlefield({ battleId }: Props) {
     clearInteraction();
     setSelectedUnitId(null);
     setPinnedUnitId(null);
-    const next = endTurn(game, battle.mapAspectRatio);
-    setGame(next);
+
+    const actingFaction = game.activeFaction;
+
+    // Campaign battles use the selected game-mode evaluator instead of
+    // battleEngine's old "capture objective = instant win" rule.
+    const transitioned = endTurn(game, battle.mapAspectRatio, "none");
+
+    const evaluated = evaluateGameMode(
+      transitioned,
+      gameMode,
+      {
+        ...gameModeConfig,
+        playerFaction: gameModeConfig?.playerFaction ?? playerFaction,
+      },
+      actingFaction,
+    );
+
+    setGame(evaluated.state);
+
     setMessage(
-      next.winner ? `${next.winner} wins.` : `${next.activeFaction} turn.`,
+      evaluated.state.winner
+        ? `${evaluated.state.winner} wins · ${GAME_MODE_LABELS[gameMode]}.`
+        : (evaluated.message ?? `${evaluated.state.activeFaction} turn.`),
     );
   }
 
@@ -1011,13 +1035,23 @@ export default function Battlefield({ battleId }: Props) {
           <p className="text-sm text-[#bba17a]">
             Round {game.round} · {battle.subtitle}
           </p>
+
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <span className="rounded-full border border-[#c89b4f] bg-[#5d411f] px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-[#ffe2a0]">
+              {GAME_MODE_LABELS[gameMode]}
+            </span>
+
+            <span className="text-[11px] text-[#a9906c]">
+              {GAME_MODE_DESCRIPTIONS[gameMode]}
+            </span>
+          </div>
         </div>
         <button
           type="button"
-          onClick={() => navigate("/games/medieval-kingdoms")}
+          onClick={() => navigate(backPath)}
           className="rounded-xl border border-[#856239] bg-[#4a3521] px-5 py-3 font-bold text-[#f1d9aa] hover:bg-[#604526]"
         >
-          ← World Map
+          ← Campaign Map
         </button>
       </div>
 

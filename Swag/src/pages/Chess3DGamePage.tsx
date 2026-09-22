@@ -165,16 +165,23 @@ export default function Chess3DGamePage({
     };
   }, [isAiMode, stockfishReady, fen, game, getBestMove, difficultyConfig]);
 
-  function handleHumanMove(move: Move) {
-    const nextGame = new Chess(fen);
+  function handleHumanMove(move: Move, resultingFen?: string) {
+    let nextFen: string;
 
-    nextGame.move({
-      from: move.from,
-      to: move.to,
-      promotion: move.promotion,
-    });
+    if (resultingFen) {
+      nextFen = resultingFen;
+    } else {
+      const nextGame = new Chess(fen);
 
-    const nextFen = nextGame.fen();
+      nextGame.move({
+        from: move.from,
+        to: move.to,
+        promotion: move.promotion,
+      });
+
+      nextFen = nextGame.fen();
+    }
+
     setFen(nextFen);
     setFenHistory((current) => [...current, nextFen]);
     setMoveHistory((current) => [...current, move]);

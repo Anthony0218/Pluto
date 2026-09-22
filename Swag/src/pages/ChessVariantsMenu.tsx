@@ -696,7 +696,9 @@ const variants: VariantCard[] = [
     description:
       "A future chess variant played across multiple vertical layers, where pieces can attack, defend and move through three-dimensional space.",
     tags: ["3D Board", "Multiple Layers", "Future"],
-    available: false,
+    route: "/games/chess/3dchess",
+
+    available: true,
     accent: "blue",
   },
   {
@@ -1410,40 +1412,6 @@ function VariantCardView({
             </span>
           ))}
         </div>
-
-        {variant.rulesRoute && (
-          <Link
-            to={variant.rulesRoute}
-            onClick={(event) => event.stopPropagation()}
-            className={`
-              inline-flex
-              shrink-0
-              items-center
-              gap-2
-              rounded-xl
-              border
-              px-3.5
-              py-2.5
-              text-xs
-              font-black
-              uppercase
-              tracking-wide
-              transition
-              hover:-translate-y-0.5
-              hover:brightness-125
-              ${accentClasses[variant.accent]}
-            `}
-            aria-label={`${t(language, "Rules")} — ${t(
-              language,
-              variant.title,
-            )}`}
-          >
-            <span aria-hidden="true" className="text-base">
-              📖
-            </span>
-            <span>{t(language, "Rules")}</span>
-          </Link>
-        )}
       </div>
 
       <div className="relative mt-auto pt-5">
@@ -1521,6 +1489,33 @@ function VariantCardView({
               >
                 <span>🌐</span>
                 <span>Multiplayer</span>
+              </Link>
+            )}
+            {variant.rulesRoute && (
+              <Link
+                to={variant.rulesRoute}
+                className={`
+                  flex
+                  items-center
+                  justify-center
+                  gap-2
+                  rounded-xl
+                  border
+                  px-3
+                  py-3
+                  text-sm
+                  font-black
+                  transition
+                  ${accentClasses[variant.accent]}
+                  hover:brightness-125
+                `}
+                aria-label={`${t(language, "Rules")} — ${t(
+                  language,
+                  variant.title,
+                )}`}
+              >
+                <span aria-hidden="true">📖</span>
+                <span>{t(language, "Rules")}</span>
               </Link>
             )}
           </div>
@@ -1675,7 +1670,7 @@ export default function ChessVariantsMenu() {
         </section>
 
         <footer className="py-8 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-800">
-          Chess Variants · 12 modes
+          Chess Variants · 13 modes
         </footer>
       </div>
     </main>

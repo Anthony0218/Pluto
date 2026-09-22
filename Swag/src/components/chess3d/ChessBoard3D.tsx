@@ -46,7 +46,7 @@ type ExternalMove = {
 type Props = {
   game: Chess;
   resetToken: number;
-  onMove: (move: Move) => void;
+  onMove: (move: Move, resultingFen?: string) => void;
   backgroundImage?: string;
   inputEnabled?: boolean;
   externalMove?: ExternalMove;
@@ -84,6 +84,179 @@ function createVisualPieces(game: Chess): VisualPiece[] {
 
 function getEnPassantCapturedSquare(move: Move): Square {
   return `${move.to[0]}${move.from[1]}` as Square;
+}
+
+type CustomCastleSide = "king" | "queen";
+
+function hasMovedFrom(
+  moveHistory: Move[],
+  color: Color,
+  piece: PieceSymbol,
+  from: Square,
+) {
+  return moveHistory.some(
+    (move) =>
+      move.color === color && move.piece === piece && move.from === from,
+  );
+}
+
+function isSquareAttacked(game: Chess, square: Square, byColor: Color) {
+  const chess = game as Chess & {
+    isAttacked?: (square: Square, color: Color) => boolean;
+  };
+
+  return typeof chess.isAttacked === "function"
+    ? chess.isAttacked(square, byColor)
+    : false;
+}
+
+function canCustomCastle(
+  game: Chess,
+  moveHistory: Move[],
+  color: Color,
+  side: CustomCastleSide,
+) {
+  const rank = color === "w" ? "1" : "8";
+  const kingSquare = `d${rank}` as Square;
+  const rookSquare =
+    side === "king" ? (`h${rank}` as Square) : (`a${rank}` as Square);
+
+  const king = game.get(kingSquare);
+  const rook = game.get(rookSquare);
+
+  if (
+    !king ||
+    king.type !== "k" ||
+    king.color !== color ||
+    !rook ||
+    rook.type !== "r" ||
+    rook.color !== color
+  ) {
+    return false;
+  }
+
+  if (
+    hasMovedFrom(moveHistory, color, "k", kingSquare) ||
+    hasMovedFrom(moveHistory, color, "r", rookSquare)
+  ) {
+    return false;
+  }
+
+  const emptySquares: Square[] =
+    side === "king"
+      ? ([`e${rank}`, `f${rank}`, `g${rank}`] as Square[])
+      : ([`c${rank}`, `b${rank}`] as Square[]);
+
+  if (emptySquares.some((square) => game.get(square))) {
+    return false;
+  }
+
+  const enemy: Color = color === "w" ? "b" : "w";
+
+  const kingPath: Square[] =
+    side === "king"
+      ? ([kingSquare, `e${rank}`, `f${rank}`] as Square[])
+      : ([kingSquare, `c${rank}`, `b${rank}`] as Square[]);
+
+  return !kingPath.some((square) => isSquareAttacked(game, square, enemy));
+}
+
+function getCustomCastleTargets(
+  game: Chess,
+  moveHistory: Move[],
+  color: Color,
+) {
+  const rank = color === "w" ? "1" : "8";
+  const targets: Array<{
+    square: Square;
+    side: CustomCastleSide;
+  }> = [];
+
+  if (canCustomCastle(game, moveHistory, color, "king")) {
+    targets.push({
+      square: `f${rank}` as Square,
+      side: "king",
+    });
+  }
+
+  if (canCustomCastle(game, moveHistory, color, "queen")) {
+    targets.push({
+      square: `b${rank}` as Square,
+      side: "queen",
+    });
+  }
+
+  return targets;
+}
+
+function buildCustomCastleFen(
+  game: Chess,
+  color: Color,
+  side: CustomCastleSide,
+) {
+  const rank = color === "w" ? "1" : "8";
+
+  const kingFrom = `d${rank}` as Square;
+  const kingTo =
+    side === "king" ? (`f${rank}` as Square) : (`b${rank}` as Square);
+
+  const rookFrom =
+    side === "king" ? (`h${rank}` as Square) : (`a${rank}` as Square);
+
+  const rookTo =
+    side === "king" ? (`e${rank}` as Square) : (`c${rank}` as Square);
+
+  const next = new Chess(game.fen());
+
+  next.remove(kingFrom);
+  next.remove(rookFrom);
+
+  next.put({ type: "k", color }, kingTo);
+  next.put({ type: "r", color }, rookTo);
+
+  const currentFields = game.fen().split(" ");
+  const nextFields = next.fen().split(" ");
+
+  const halfmove = Number.parseInt(currentFields[4] ?? "0", 10) + 1;
+
+  const fullmove =
+    Number.parseInt(currentFields[5] ?? "1", 10) + (color === "b" ? 1 : 0);
+
+  return [
+    nextFields[0],
+    color === "w" ? "b" : "w",
+    "-",
+    "-",
+    String(halfmove),
+    String(fullmove),
+  ].join(" ");
+}
+
+function createCustomCastleMove(
+  game: Chess,
+  color: Color,
+  side: CustomCastleSide,
+) {
+  const rank = color === "w" ? "1" : "8";
+  const from = `d${rank}` as Square;
+  const to = side === "king" ? (`f${rank}` as Square) : (`b${rank}` as Square);
+
+  const resultingFen = buildCustomCastleFen(game, color, side);
+
+  const move = {
+    color,
+    from,
+    to,
+    piece: "k",
+    captured: undefined,
+    promotion: undefined,
+    flags: side === "king" ? "K" : "Q",
+    san: side === "king" ? "O-O" : "O-O-O",
+    before: game.fen(),
+    after: resultingFen,
+  } as unknown as Move;
+
+  return { move, resultingFen };
 }
 
 function BoardFurniture() {
@@ -285,6 +458,7 @@ function Scene({
   visualPieces,
   selectedSquare,
   legalMoves,
+  customCastleTargets,
   onSquareClick,
   checkedKingColor,
   checkmatedKingColor,
@@ -296,6 +470,10 @@ function Scene({
   visualPieces: VisualPiece[];
   selectedSquare: Square | null;
   legalMoves: Move[];
+  customCastleTargets: Array<{
+    square: Square;
+    side: CustomCastleSide;
+  }>;
   onSquareClick: (square: Square) => void;
   checkedKingColor: Color | null;
   checkmatedKingColor: Color | null;
@@ -328,6 +506,9 @@ function Scene({
         Array.from({ length: 8 }, (_, file) => {
           const square = coordinatesToSquare(file, rank);
           const legalMove = legalMoveMap.get(square);
+          const isCustomCastleTarget = customCastleTargets.some(
+            (target) => target.square === square,
+          );
 
           return (
             <ChessSquare3D
@@ -336,7 +517,7 @@ function Scene({
               file={file}
               rank={rank}
               selected={selectedSquare === square}
-              legalMove={Boolean(legalMove)}
+              legalMove={Boolean(legalMove) || isCustomCastleTarget}
               legalCapture={Boolean(legalMove?.captured)}
               lastMoveFrom={lastMove?.from === square}
               lastMoveTo={lastMove?.to === square}
@@ -474,6 +655,12 @@ export default function ChessBoard3D({
 }: Props) {
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [legalMoves, setLegalMoves] = useState<Move[]>([]);
+  const [customCastleTargets, setCustomCastleTargets] = useState<
+    Array<{
+      square: Square;
+      side: CustomCastleSide;
+    }>
+  >([]);
   const [visualPieces, setVisualPieces] = useState<VisualPiece[]>(() =>
     createVisualPieces(game),
   );
@@ -496,6 +683,7 @@ export default function ChessBoard3D({
     setVisualPieces(createVisualPieces(game));
     setSelectedSquare(null);
     setLegalMoves([]);
+    setCustomCastleTargets([]);
     setCameraEffect((current) => ({
       id: current.id + 1,
       kind: "none",
@@ -505,6 +693,7 @@ export default function ChessBoard3D({
   function clearSelection() {
     setSelectedSquare(null);
     setLegalMoves([]);
+    setCustomCastleTargets([]);
   }
 
   function selectSquare(square: Square) {
@@ -520,8 +709,15 @@ export default function ChessBoard3D({
       verbose: true,
     });
 
+    const castleTargets =
+      piece.type === "k" &&
+      square === (`d${piece.color === "w" ? "1" : "8"}` as Square)
+        ? getCustomCastleTargets(game, moveHistory, piece.color)
+        : [];
+
     setSelectedSquare(square);
     setLegalMoves(moves);
+    setCustomCastleTargets(castleTargets);
   }
 
   function animateVisualMove(move: Move) {
@@ -553,6 +749,38 @@ export default function ChessBoard3D({
             type: move.promotion ?? piece.type,
             promoted: Boolean(move.promotion),
           };
+        }
+
+        if (move.flags.includes("K")) {
+          const rookFrom = move.color === "w" ? "h1" : "h8";
+          const rookTo = move.color === "w" ? "e1" : "e8";
+
+          if (
+            piece.square === rookFrom &&
+            piece.color === move.color &&
+            piece.type === "r"
+          ) {
+            return {
+              ...piece,
+              square: rookTo as Square,
+            };
+          }
+        }
+
+        if (move.flags.includes("Q")) {
+          const rookFrom = move.color === "w" ? "a1" : "a8";
+          const rookTo = move.color === "w" ? "c1" : "c8";
+
+          if (
+            piece.square === rookFrom &&
+            piece.color === move.color &&
+            piece.type === "r"
+          ) {
+            return {
+              ...piece,
+              square: rookTo as Square,
+            };
+          }
         }
 
         if (move.flags.includes("k")) {
@@ -658,6 +886,31 @@ export default function ChessBoard3D({
       return;
     }
 
+    const customCastle = customCastleTargets.find(
+      (target) => target.square === square,
+    );
+
+    if (customCastle && selectedSquare) {
+      const movingPiece = game.get(selectedSquare);
+
+      if (movingPiece?.type === "k" && movingPiece.color === game.turn()) {
+        const { move: executedMove, resultingFen } = createCustomCastleMove(
+          game,
+          movingPiece.color,
+          customCastle.side,
+        );
+
+        animateVisualMove(executedMove);
+
+        const resultingGame = new Chess(resultingFen);
+        triggerEffectForMove(executedMove, resultingGame);
+
+        onMove(executedMove, resultingFen);
+        clearSelection();
+        return;
+      }
+    }
+
     const destinationMoves = legalMoves.filter((move) => move.to === square);
 
     if (destinationMoves.length === 0) {
@@ -727,6 +980,7 @@ export default function ChessBoard3D({
             visualPieces={visualPieces}
             selectedSquare={selectedSquare}
             legalMoves={legalMoves}
+            customCastleTargets={customCastleTargets}
             onSquareClick={handleSquareClick}
             checkedKingColor={checkedKingColor}
             checkmatedKingColor={checkmatedKingColor}

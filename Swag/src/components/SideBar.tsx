@@ -1,4 +1,3 @@
-import { useTheme } from "@/context/ThemeContext";
 import {
   BarChart3,
   Gamepad2,
@@ -8,7 +7,9 @@ import {
   Users,
   LogOut,
 } from "lucide-react";
-import { NavLink } from "react-router-dom";
+
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const navigation = [
   {
@@ -41,10 +42,22 @@ const navigation = [
     href: "/games/medieval-kingdoms",
     icon: Trophy,
   },
+  {
+    label: "Credits",
+    href: "/credits",
+    icon: Trophy,
+  },
 ];
 
 export default function SideBar() {
-  const { darkMode, toggleDarkMode } = useTheme();
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
+
+  async function handleLogout() {
+    await signOut();
+    navigate("/login");
+  }
+
   return (
     <aside className="flex min-h-screen w-64 flex-col border-r border-zinc-200 bg-white">
       <div className="flex h-16 items-center border-b border-zinc-200 px-6">
@@ -100,17 +113,6 @@ export default function SideBar() {
         })}
       </nav>
 
-      {/* Bottom section */}
-      <button
-        type="button"
-        onClick={toggleDarkMode}
-        className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left font-medium text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
-      >
-        <span className="text-xl">{darkMode ? "☀️" : "🌙"}</span>
-
-        <span>{darkMode ? "Light Mode" : "Dark Mode"}</span>
-      </button>
-
       <div className="border-t border-zinc-200 p-3">
         <NavLink
           to="/settings"
@@ -128,6 +130,7 @@ export default function SideBar() {
 
         <button
           type="button"
+          onClick={handleLogout}
           className="mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-red-50 hover:text-red-600"
         >
           <LogOut size={19} />

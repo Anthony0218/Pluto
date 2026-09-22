@@ -74,8 +74,8 @@ export const BATTLES: Record<string, BattleDefinition> = {
       name: "Ancient Grove",
 
       position: {
-        x: 49,
-        y: 41,
+        x: 53,
+        y: 48,
       },
 
       radius: 7,
@@ -203,5 +203,9 @@ export function createInitialBattleState(battleId: string): BattleState {
     winner: null,
 
     maxRounds: battle.maxRounds,
+
+    modeState: {
+      scores: {},
+    },
   };
 }

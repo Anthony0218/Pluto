@@ -47,6 +47,56 @@ export type PreviewAction =
 
 export type Position = { x: number; y: number };
 
+export type GameMode =
+  | "elimination"
+  | "capture"
+  | "kingOfTheHill"
+  | "defense"
+  | "survival"
+  | "boss"
+  | "escort"
+  | "breakthrough"
+  | "artifact";
+
+export type GameModeConfig = {
+  targetRound?: number;
+  scoreToWin?: number;
+  bossUnitId?: string;
+  escortUnitId?: string;
+  playerFaction?: FactionId;
+};
+
+export type CampaignBattleNode = {
+  id: string;
+  name: string;
+  description: string;
+  position: Position;
+  battleId: string;
+  gameMode: GameMode;
+  gameModeConfig?: GameModeConfig;
+  order: number;
+  optional?: boolean;
+};
+
+export type CampaignDefinition = {
+  id: string;
+  name: string;
+  subtitle: string;
+  description: string;
+  regionMap?: string;
+  battles: CampaignBattleNode[];
+};
+
+export type CampaignProgress = {
+  completedCampaigns: string[];
+  completedBattles: string[];
+  currentCampaignId: string;
+};
+
+export type BattleModeState = {
+  scores: Partial<Record<FactionId, number>>;
+};
+
 export type TerrainType =
   | "normal"
   | "blocked"
@@ -186,6 +236,7 @@ export type BattleState = {
   winner: FactionId | null;
   maxRounds: number;
   objects: BattlefieldObject[];
+  modeState: BattleModeState;
 };
 
 export type BattleDefinition = {
@@ -249,9 +300,8 @@ export type ClanDefinition = {
 export type WorldPlace = {
   id: string;
   name: string;
-  route: string;
+  campaignId: string;
   maskColor: [number, number, number];
   lore: string;
   marker: Position;
-  available: boolean;
 };

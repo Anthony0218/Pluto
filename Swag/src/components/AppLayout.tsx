@@ -7,7 +7,7 @@ export default function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen w-full bg-zinc-50 dark:bg-zinc-950">
+    <div className="min-h-screen w-full bg-black dark:bg-zinc-950">
       {/* Menu button */}
       {!sidebarOpen && (
         <button

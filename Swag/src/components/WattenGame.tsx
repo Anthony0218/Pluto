@@ -210,9 +210,6 @@ export default function WattenGame() {
     Object.fromEntries(playerInfo.map((player) => [player.id, false])),
   );
   const [cardPlayedThisTurn, setCardPlayedThisTurn] = useState(false);
-  const [, setCardsReviewed] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(playerInfo.map((player) => [player.id, false])),
-  );
 
   const [playedCards, setPlayedCards] = useState<PlayedCard[]>([]);
   const [abgehobenCard, setAbgehobenCard] = useState<WattenCard | null>(null);
@@ -1614,10 +1611,55 @@ export default function WattenGame() {
                       </div>
                     </div>
 
+                    {/* Target score */}
+                    <div className="mt-5">
+                      <label className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400">
+                        {l("Punkte zum Sieg", "Points to win")}
+                      </label>
+
+                      <div className="mt-2 flex items-center justify-center gap-2">
+                        {[11, 15, 18].map((score) => (
+                          <button
+                            key={score}
+                            type="button"
+                            onClick={() => setTargetScore(score)}
+                            className={`h-10 w-14 rounded-lg text-sm font-black transition ${
+                              targetScore === score
+                                ? "bg-amber-400 text-amber-950 ring-2 ring-amber-200"
+                                : "bg-white/10 text-white hover:bg-white/20"
+                            }`}
+                          >
+                            {score}
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="mt-3">
+                        <label className="text-[10px] text-zinc-500">
+                          {l("Oder eigener Wert:", "Or custom value:")}
+                        </label>
+
+                        <input
+                          type="number"
+                          min={4}
+                          max={50}
+                          value={targetScore}
+                          onChange={(event) => {
+                            const value = Number(event.target.value);
+
+                            if (Number.isFinite(value)) {
+                              setTargetScore(Math.max(4, Math.min(50, value)));
+                            }
+                          }}
+                          className="mx-auto mt-1.5 block w-20 rounded-lg border border-white/10 bg-zinc-900 px-2 py-1.5 text-center text-sm font-bold text-white outline-none focus:border-amber-400"
+                        />
+                      </div>
+                    </div>
+
                     <button
                       type="button"
                       onClick={startGame}
-                      className="mt-8 w-full rounded-xl bg-amber-400 px-6 py-4 text-lg font-black text-amber-950 transition hover:bg-amber-300"
+                      className="mt-5 w-full rounded-xl bg-amber-400 px-5 py-3 text-sm font-black text-amber-950 transition hover:bg-amber-300"
                     >
                       {l("Spiel starten", "Start game")}
                     </button>
@@ -3413,7 +3455,7 @@ export default function WattenGame() {
                     )}
                   </h2>
 
-                  <p className="mt-2 text-sm text-zinc-400">
+                  <p className="mt-1.5 text-xs text-zinc-400">
                     {l(
                       "Regelvariante, die in diesem Spiel verwendet wird.",
                       "Rules variant used in this game.",
@@ -3828,12 +3870,12 @@ export default function WattenGame() {
             {/* PRE-GAME SETUP */}
             {phase === "setup" && (
               <div className="absolute inset-0 z-40 flex items-center justify-center rounded-[110px] bg-emerald-950/20 backdrop-blur-sm">
-                <div className="w-full max-w-lg rounded-3xl border border-white/10 bg-zinc-950/95 p-8 text-center shadow-2xl backdrop-blur-md">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
+                <div className="w-full max-w-md rounded-2xl border border-white/10 bg-zinc-950/95 p-5 text-center shadow-2xl backdrop-blur-md">
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-amber-400">
                     {l("Neues Spiel", "New game")}
                   </p>
 
-                  <h2 className="mt-2 text-3xl font-bold text-white">
+                  <h2 className="mt-1 text-2xl font-bold text-white">
                     {t("Watten")}
                   </h2>
 
@@ -3845,11 +3887,11 @@ export default function WattenGame() {
                   </p>
 
                   {/* Players */}
-                  <div className="mt-6 flex justify-center gap-2">
+                  <div className="mt-4 flex justify-center gap-1.5">
                     {players.map((player) => (
                       <div
                         key={player.id}
-                        className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white"
+                        className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white"
                       >
                         {player.name}
                       </div>
@@ -3857,18 +3899,18 @@ export default function WattenGame() {
                   </div>
 
                   {/* Target score */}
-                  <div className="mt-8">
-                    <label className="text-xs font-semibold uppercase tracking-widest text-zinc-400">
+                  <div className="mt-5">
+                    <label className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400">
                       {l("Punkte zum Sieg", "Points to win")}
                     </label>
 
-                    <div className="mt-3 flex items-center justify-center gap-3">
+                    <div className="mt-2 flex items-center justify-center gap-2">
                       {[11, 15, 18].map((score) => (
                         <button
                           key={score}
                           type="button"
                           onClick={() => setTargetScore(score)}
-                          className={`h-12 w-16 rounded-xl font-black transition ${
+                          className={`h-10 w-14 rounded-lg text-sm font-black transition ${
                             targetScore === score
                               ? "bg-amber-400 text-amber-950 ring-2 ring-amber-200"
                               : "bg-white/10 text-white hover:bg-white/20"
@@ -3879,8 +3921,8 @@ export default function WattenGame() {
                       ))}
                     </div>
 
-                    <div className="mt-4">
-                      <label className="text-xs text-zinc-500">
+                    <div className="mt-3">
+                      <label className="text-[10px] text-zinc-500">
                         {l("Oder eigener Wert:", "Or custom value:")}
                       </label>
 
@@ -3896,13 +3938,13 @@ export default function WattenGame() {
                             setTargetScore(Math.max(4, Math.min(50, value)));
                           }
                         }}
-                        className="mx-auto mt-2 block w-24 rounded-xl border border-white/10 bg-zinc-900 px-3 py-2 text-center font-bold text-white outline-none focus:border-amber-400"
+                        className="mx-auto mt-1.5 block w-20 rounded-lg border border-white/10 bg-zinc-900 px-2 py-1.5 text-center text-sm font-bold text-white outline-none focus:border-amber-400"
                       />
                     </div>
                   </div>
 
                   {/* Basic scoring explanation */}
-                  <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-left text-sm text-zinc-300">
+                  <div className="mt-4 rounded-xl border border-white/10 bg-white/5 p-3 text-left text-xs text-zinc-300">
                     <div className="flex justify-between">
                       <span>
                         {l("Normaler Rundensieg", "Normal round win")}
@@ -3925,7 +3967,7 @@ export default function WattenGame() {
                   <button
                     type="button"
                     onClick={startGame}
-                    className="mt-8 w-full rounded-2xl bg-amber-400 px-6 py-4 text-lg font-black text-amber-950 shadow-xl transition hover:scale-[1.02] hover:bg-amber-300"
+                    className="mt-5 w-full rounded-xl bg-amber-400 px-5 py-3 text-sm font-black text-amber-950 shadow-xl transition hover:scale-[1.02] hover:bg-amber-300"
                   >
                     {l("Spiel starten", "Start game")}
                   </button>

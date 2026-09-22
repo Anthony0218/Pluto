@@ -185,8 +185,6 @@ export function clonePortalState(state: PortalState): PortalState {
 export function createInitialPortalState(
   seed = createPortalSeed(),
 ): PortalState {
-  const random = mulberry32(seed);
-
   /*
    * Variant 8 rule:
    * visible Lucky Squares can ONLY exist on ranks 3, 4, 5 and 6.
@@ -466,11 +464,7 @@ function tryPortalMutation(
   }
 }
 
-function allEmptySquares(
-  game: Chess,
-  pieceType: PortalPieceType,
-  color: PortalSide,
-): Square[] {
+function allEmptySquares(game: Chess, pieceType: PortalPieceType): Square[] {
   const result: Square[] = [];
 
   for (let rank = 1; rank <= 8; rank += 1) {
@@ -734,11 +728,7 @@ export function resolvePortalAfterMove(
 
     const candidates = piece
       ? shuffled(
-          allEmptySquares(
-            game,
-            piece.type as PortalPieceType,
-            piece.color as PortalSide,
-          ),
+          allEmptySquares(game, piece.type as PortalPieceType),
           eventSeed,
         )
       : [];

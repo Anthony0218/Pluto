@@ -1,13 +1,8 @@
-import {
-  FACTION_TURN_ORDER,
-} from "./clanData";
+import { FACTION_TURN_ORDER } from "./clanData";
 
-import {
-  TERRAIN,
-} from "./terrain";
+import { TERRAIN } from "./terrain";
 
 import type {
-  AttackActionId,
   AttackResult,
   BattleState,
   DamageRange,
@@ -21,26 +16,18 @@ import type {
   Unit,
 } from "./types";
 
-import type {
-  TerrainMask,
-} from "./terrainMask";
+import type { TerrainMask } from "./terrainMask";
 
 export function distance(
   a: Position,
   b: Position,
   mapAspectRatio: number,
 ): number {
-  const dx =
-    b.x - a.x;
+  const dx = b.x - a.x;
 
-  const dy =
-    (b.y - a.y) *
-    mapAspectRatio;
+  const dy = (b.y - a.y) * mapAspectRatio;
 
-  return Math.hypot(
-    dx,
-    dy,
-  );
+  return Math.hypot(dx, dy);
 }
 
 export function angleFromTo(
@@ -48,37 +35,17 @@ export function angleFromTo(
   b: Position,
   mapAspectRatio: number,
 ): number {
-  const dx =
-    b.x - a.x;
+  const dx = b.x - a.x;
 
-  const dy =
-    (b.y - a.y) *
-    mapAspectRatio;
+  const dy = (b.y - a.y) * mapAspectRatio;
 
-  return (
-    (Math.atan2(
-      dy,
-      dx,
-    ) *
-      180) /
-      Math.PI +
-    360
-  ) % 360;
+  return ((Math.atan2(dy, dx) * 180) / Math.PI + 360) % 360;
 }
 
-function angularDifference(
-  a: number,
-  b: number,
-): number {
-  const diff =
-    Math.abs(
-      a - b,
-    ) % 360;
+function angularDifference(a: number, b: number): number {
+  const diff = Math.abs(a - b) % 360;
 
-  return Math.min(
-    diff,
-    360 - diff,
-  );
+  return Math.min(diff, 360 - diff);
 }
 
 export function getMovementPath(
@@ -86,63 +53,34 @@ export function getMovementPath(
   end: Position,
   samples = 100,
 ): Position[] {
-  const points:
-    Position[] = [];
+  const points: Position[] = [];
 
-  for (
-    let i = 0;
-    i <= samples;
-    i++
-  ) {
-    const t =
-      i / samples;
+  for (let i = 0; i <= samples; i++) {
+    const t = i / samples;
 
     points.push({
-      x:
-        start.x +
-        (end.x -
-          start.x) *
-          t,
+      x: start.x + (end.x - start.x) * t,
 
-      y:
-        start.y +
-        (end.y -
-          start.y) *
-          t,
+      y: start.y + (end.y - start.y) * t,
     });
   }
 
   return points;
 }
 
-function livingFactions(
-  state: BattleState,
-): FactionId[] {
-  return FACTION_TURN_ORDER.filter(
-    (faction) =>
-      state.units.some(
-        (unit) =>
-          unit.faction ===
-          faction,
-      ),
+function livingFactions(state: BattleState): FactionId[] {
+  return FACTION_TURN_ORDER.filter((faction) =>
+    state.units.some((unit) => unit.faction === faction),
   );
 }
 
-function updateWinnerByElimination(
-  state: BattleState,
-): BattleState {
-  const living =
-    livingFactions(
-      state,
-    );
+function updateWinnerByElimination(state: BattleState): BattleState {
+  const living = livingFactions(state);
 
-  if (
-    living.length === 1
-  ) {
+  if (living.length === 1) {
     return {
       ...state,
-      winner:
-        living[0],
+      winner: living[0],
     };
   }
 
@@ -171,17 +109,11 @@ export function moveUnitWithTerrain(
   terrainMask: TerrainMask,
   mapAspectRatio: number,
 ): MovementResult {
-  const unit =
-    state.units.find(
-      (current) =>
-        current.id ===
-        unitId,
-    );
+  const unit = state.units.find((current) => current.id === unitId);
 
   if (
     !unit ||
-    unit.faction !==
-      state.activeFaction ||
+    unit.faction !== state.activeFaction ||
     unit.hasMoved ||
     state.winner
   ) {
@@ -189,145 +121,90 @@ export function moveUnitWithTerrain(
       state,
       moved: false,
       died: false,
-      message:
-        "This unit cannot move now.",
+      message: "This unit cannot move now.",
     };
   }
 
-  const path =
-    getMovementPath(
-      unit.position,
-      target,
-    );
+  const path = getMovementPath(unit.position, target);
 
-  let movementCost =
-    0;
+  let movementCost = 0;
 
-  for (
-    let i = 1;
-    i < path.length;
-    i++
-  ) {
-    const previous =
-      path[i - 1];
+  for (let i = 1; i < path.length; i++) {
+    const previous = path[i - 1];
 
-    const current =
-      path[i];
+    const current = path[i];
 
-    const terrainType =
-      terrainMask.getTerrainAtPosition(
-        current,
-      );
+    const terrainType = terrainMask.getTerrainAtPosition(current);
 
-    const terrain =
-      TERRAIN[
-        terrainType
-      ];
+    const terrain = TERRAIN[terrainType];
 
-    if (
-      !terrain.walkable
-    ) {
+    if (!terrain.walkable) {
       return {
         state,
         moved: false,
         died: false,
-        message:
-          "The route is blocked.",
+        message: "The route is blocked.",
       };
     }
 
-    if (
-      terrain.lethal
-    ) {
+    if (terrain.lethal) {
       return {
-        state:
-          updateWinnerByElimination(
-            {
-              ...state,
+        state: updateWinnerByElimination({
+          ...state,
 
-              units:
-                state.units.filter(
-                  (
-                    currentUnit,
-                  ) =>
-                    currentUnit.id !==
-                    unit.id,
-                ),
-            },
+          units: state.units.filter(
+            (currentUnit) => currentUnit.id !== unit.id,
           ),
+        }),
 
         moved: true,
         died: true,
-        message:
-          `${unit.name} fell into the gorge.`,
+        message: `${unit.name} fell into the gorge.`,
       };
     }
 
     movementCost +=
-      distance(
-        previous,
-        current,
-        mapAspectRatio,
-      ) *
-      terrain.movementMultiplier;
+      distance(previous, current, mapAspectRatio) * terrain.movementMultiplier;
 
-    if (
-      movementCost >
-      unit.moveRange
-    ) {
+    if (movementCost > unit.moveRange) {
       return {
         state,
         moved: false,
         died: false,
-        message:
-          `${unit.name} cannot move that far.`,
+        message: `${unit.name} cannot move that far.`,
       };
     }
   }
 
-  const facing =
-    angleFromTo(
-      unit.position,
-      target,
-      mapAspectRatio,
-    );
+  const facing = angleFromTo(unit.position, target, mapAspectRatio);
 
-  const trap =
-    trapAtPosition(
-      state,
-      unit,
-      target,
-      mapAspectRatio,
-    );
+  const trap = trapAtPosition(state, unit, target, mapAspectRatio);
 
   const trapDamage = trap?.damage ?? 0;
 
-  let units =
-    state.units
-      .map(
-        (current) =>
-          current.id === unit.id
-            ? {
-                ...current,
-                position: target,
-                hasMoved: true,
-                facingAngle: facing,
-                defenseMode: null,
-                guardTargetId: null,
-                health: Math.max(0, current.health - trapDamage),
-              }
-            : current,
-      )
-      .filter((current) => current.health > 0);
+  let units = state.units
+    .map((current) =>
+      current.id === unit.id
+        ? {
+            ...current,
+            position: target,
+            hasMoved: true,
+            facingAngle: facing,
+            defenseMode: null,
+            guardTargetId: null,
+            health: Math.max(0, current.health - trapDamage),
+          }
+        : current,
+    )
+    .filter((current) => current.health > 0);
 
-  const nextState =
-    updateWinnerByElimination({
-      ...state,
-      units,
-      traps: trap
-        ? state.traps.filter((currentTrap) => currentTrap.id !== trap.id)
-        : state.traps,
-    });
+  const nextState = updateWinnerByElimination({
+    ...state,
+    units,
+    traps: trap
+      ? state.traps.filter((currentTrap) => currentTrap.id !== trap.id)
+      : state.traps,
+  });
 
   return {
     state: nextState,
@@ -348,123 +225,78 @@ export function getHitChance(
   mapAspectRatio: number,
   accuracyModifier = 0,
 ): number {
-  const currentDistance =
-    distance(
-      attacker.position,
-      defender.position,
-      mapAspectRatio,
-    );
+  const currentDistance = distance(
+    attacker.position,
+    defender.position,
+    mapAspectRatio,
+  );
 
-  if (
-    currentDistance >
-    attacker.attackRange
-  ) {
+  if (currentDistance > attacker.attackRange) {
     return 0;
   }
 
-  const rangeRatio =
-    currentDistance /
-    attacker.attackRange;
+  const rangeRatio = currentDistance / attacker.attackRange;
 
   let probability =
     0.58 +
-    attacker.impact *
-      0.028 +
-    attacker.agility *
-      0.012 -
-    defender.agility *
-      0.018 -
-    rangeRatio *
-      0.25 +
+    attacker.impact * 0.028 +
+    attacker.agility * 0.012 -
+    defender.agility * 0.018 -
+    rangeRatio * 0.25 +
     accuracyModifier;
 
-  const attackerTerrain =
-    terrainMask.getTerrainAtPosition(
-      attacker.position,
-    );
+  const attackerTerrain = terrainMask.getTerrainAtPosition(attacker.position);
 
-  const defenderTerrain =
-    terrainMask.getTerrainAtPosition(
-      defender.position,
-    );
+  const defenderTerrain = terrainMask.getTerrainAtPosition(defender.position);
 
-  if (
-    attackerTerrain ===
-    "highGround"
-  ) {
-    probability +=
-      0.1;
+  if (attackerTerrain === "highGround") {
+    probability += 0.1;
   }
 
-  if (
-    defenderTerrain ===
-    "forest"
-  ) {
-    probability -=
-      0.12;
+  if (defenderTerrain === "forest") {
+    probability -= 0.12;
   }
 
-  switch (
-    defender.defenseMode
-  ) {
+  switch (defender.defenseMode) {
     case "brace":
-      probability -=
-        0.05;
+      probability -= 0.05;
       break;
 
     case "dodge":
-      probability -=
-        0.25;
+      probability -= 0.25;
       break;
 
     case "counter":
-      probability -=
-        0.04;
+      probability -= 0.04;
       break;
 
     case "cover":
-      probability -=
-        0.2;
+      probability -= 0.2;
       break;
 
     case "fortify":
-      probability -=
-        0.12;
+      probability -= 0.12;
       break;
 
     case "evade":
-      probability -=
-        0.16;
+      probability -= 0.16;
       break;
 
     case "shield": {
-      const incoming =
-        angleFromTo(
-          defender.position,
-          attacker.position,
-          mapAspectRatio,
-        );
+      const incoming = angleFromTo(
+        defender.position,
+        attacker.position,
+        mapAspectRatio,
+      );
 
-      if (
-        angularDifference(
-          defender.facingAngle,
-          incoming,
-        ) <= 60
-      ) {
-        probability -=
-          0.3;
+      if (angularDifference(defender.facingAngle, incoming) <= 60) {
+        probability -= 0.3;
       }
       break;
     }
   }
 
-  return Math.max(
-    0.05,
-    Math.min(
-      0.95,
-      probability,
-    ),
-  );
+  return Math.max(0.05, Math.min(0.95, probability));
 }
 
 export function getDamageRange(
@@ -472,62 +304,35 @@ export function getDamageRange(
   defender: Unit,
   damageMultiplier = 1,
 ): DamageRange {
-  let reduction =
-    defender.toughness *
-    0.035;
+  let reduction = defender.toughness * 0.035;
 
-  switch (
-    defender.defenseMode
-  ) {
+  switch (defender.defenseMode) {
     case "brace":
-      reduction +=
-        0.16;
+      reduction += 0.16;
       break;
 
     case "shield":
-      reduction +=
-        0.06;
+      reduction += 0.06;
       break;
 
     case "cover":
-      reduction +=
-        0.06;
+      reduction += 0.06;
       break;
 
     case "fortify":
-      reduction +=
-        0.25;
+      reduction += 0.25;
       break;
   }
 
-  const boost =
-    attacker.damageBoostTurns > 0 ? 1.35 : 1;
+  const boost = attacker.damageBoostTurns > 0 ? 1.35 : 1;
 
   const base =
-    attacker.damage *
-    boost *
-    damageMultiplier *
-    Math.max(
-      0.3,
-      1 - reduction,
-    );
+    attacker.damage * boost * damageMultiplier * Math.max(0.3, 1 - reduction);
 
   return {
-    min:
-      Math.max(
-        1,
-        Math.round(
-          base * 0.8,
-        ),
-      ),
+    min: Math.max(1, Math.round(base * 0.8)),
 
-    max:
-      Math.max(
-        1,
-        Math.round(
-          base,
-        ),
-      ),
+    max: Math.max(1, Math.round(base)),
   };
 }
 
@@ -536,20 +341,12 @@ export function canAttack(
   defender: Unit,
   mapAspectRatio: number,
 ): boolean {
-  if (
-    attacker.hasActed ||
-    attacker.faction ===
-      defender.faction
-  ) {
+  if (attacker.hasActed || attacker.faction === defender.faction) {
     return false;
   }
 
   return (
-    distance(
-      attacker.position,
-      defender.position,
-      mapAspectRatio,
-    ) <=
+    distance(attacker.position, defender.position, mapAspectRatio) <=
     attacker.attackRange
   );
 }
@@ -573,91 +370,46 @@ export function findRayTarget(
   mapAspectRatio: number,
   coneHalfAngle = 10,
 ): Unit | null {
-  const normalized =
-    ((angle % 360) +
-      360) %
-    360;
+  const normalized = ((angle % 360) + 360) % 360;
 
-  let best:
-    | {
-        unit: Unit;
-        diff: number;
-        distance: number;
-      }
-    | null = null;
+  let best: {
+    unit: Unit;
+    diff: number;
+    distance: number;
+  } | null = null;
 
-  for (
-    const enemy of
-      state.units.filter(
-        (unit) =>
-          unit.faction !==
-            attacker.faction &&
-          canAttack(
-            attacker,
-            unit,
-            mapAspectRatio,
-          ),
-      )
-  ) {
-    const enemyAngle =
-      angleFromTo(
-        attacker.position,
-        enemy.position,
-        mapAspectRatio,
-      );
+  for (const enemy of state.units.filter(
+    (unit) =>
+      unit.faction !== attacker.faction &&
+      canAttack(attacker, unit, mapAspectRatio),
+  )) {
+    const enemyAngle = angleFromTo(
+      attacker.position,
+      enemy.position,
+      mapAspectRatio,
+    );
 
-    const diff =
-      angularDifference(
-        enemyAngle,
-        normalized,
-      );
+    const diff = angularDifference(enemyAngle, normalized);
 
-    const d =
-      distance(
-        attacker.position,
-        enemy.position,
-        mapAspectRatio,
-      );
+    const d = distance(attacker.position, enemy.position, mapAspectRatio);
 
     if (
-      diff <=
-        coneHalfAngle &&
-      (!best ||
-        diff <
-          best.diff ||
-        (diff ===
-          best.diff &&
-          d <
-            best.distance))
+      diff <= coneHalfAngle &&
+      (!best || diff < best.diff || (diff === best.diff && d < best.distance))
     ) {
       best = {
-        unit:
-          enemy,
+        unit: enemy,
         diff,
-        distance:
-          d,
+        distance: d,
       };
     }
   }
 
-  return (
-    best?.unit ??
-    null
-  );
+  return best?.unit ?? null;
 }
 
-function randomDamage(
-  range: DamageRange,
-): number {
-  return (
-    Math.floor(
-      Math.random() *
-        (range.max -
-          range.min +
-          1),
-    ) +
-    range.min
-  );
+function randomDamage(range: DamageRange): number {
+  return Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
 }
 
 function applyGuardSplit(
@@ -669,64 +421,35 @@ function applyGuardSplit(
   units: Unit[];
   defenderDamage: number;
 } {
-  const guardian =
-    state.units.find(
-      (unit) =>
-        unit.faction ===
-          defender.faction &&
-        unit.defenseMode ===
-          "guard" &&
-        unit.guardTargetId ===
-          defender.id &&
-        distance(
-          unit.position,
-          defender.position,
-          mapAspectRatio,
-        ) <=
-          10,
-    );
+  const guardian = state.units.find(
+    (unit) =>
+      unit.faction === defender.faction &&
+      unit.defenseMode === "guard" &&
+      unit.guardTargetId === defender.id &&
+      distance(unit.position, defender.position, mapAspectRatio) <= 10,
+  );
 
-  if (
-    !guardian
-  ) {
+  if (!guardian) {
     return {
-      units:
-        state.units,
+      units: state.units,
 
-      defenderDamage:
-        damage,
+      defenderDamage: damage,
     };
   }
 
-  const absorbed =
-    Math.max(
-      1,
-      Math.round(
-        damage * 0.5,
-      ),
-    );
+  const absorbed = Math.max(1, Math.round(damage * 0.5));
 
   return {
-    defenderDamage:
-      damage -
-      absorbed,
+    defenderDamage: damage - absorbed,
 
-    units:
-      state.units.map(
-        (unit) =>
-          unit.id ===
-          guardian.id
-            ? {
-                ...unit,
-                health:
-                  Math.max(
-                    0,
-                    unit.health -
-                      absorbed,
-                  ),
-              }
-            : unit,
-      ),
+    units: state.units.map((unit) =>
+      unit.id === guardian.id
+        ? {
+            ...unit,
+            health: Math.max(0, unit.health - absorbed),
+          }
+        : unit,
+    ),
   };
 }
 
@@ -736,70 +459,38 @@ function postAttackDefenseMovement(
   attacker: Unit,
   mapAspectRatio: number,
 ): Unit[] {
-  const defender =
-    units.find(
-      (unit) =>
-        unit.id ===
-        defenderId,
-    );
+  const defender = units.find((unit) => unit.id === defenderId);
 
-  if (
-    !defender ||
-    defender.defenseMode !==
-      "evade"
-  ) {
+  if (!defender || defender.defenseMode !== "evade") {
     return units;
   }
 
-  const angle =
-    angleFromTo(
-      attacker.position,
-      defender.position,
-      mapAspectRatio,
-    );
+  const angle = angleFromTo(
+    attacker.position,
+    defender.position,
+    mapAspectRatio,
+  );
 
-  const rad =
-    (angle *
-      Math.PI) /
-    180;
+  const rad = (angle * Math.PI) / 180;
 
-  return units.map(
-    (unit) =>
-      unit.id ===
-      defender.id
-        ? {
-            ...unit,
+  return units.map((unit) =>
+    unit.id === defender.id
+      ? {
+          ...unit,
 
-            position: {
-              x:
-                Math.max(
-                  2,
-                  Math.min(
-                    98,
-                    unit.position.x +
-                      Math.cos(
-                        rad,
-                      ) *
-                        3,
-                  ),
-                ),
+          position: {
+            x: Math.max(2, Math.min(98, unit.position.x + Math.cos(rad) * 3)),
 
-              y:
-                Math.max(
-                  2,
-                  Math.min(
-                    98,
-                    unit.position.y +
-                      (Math.sin(
-                        rad,
-                      ) *
-                        3) /
-                        mapAspectRatio,
-                  ),
-                ),
-            },
-          }
-        : unit,
+            y: Math.max(
+              2,
+              Math.min(
+                98,
+                unit.position.y + (Math.sin(rad) * 3) / mapAspectRatio,
+              ),
+            ),
+          },
+        }
+      : unit,
   );
 }
 
@@ -810,42 +501,23 @@ function applyCounter(
   mapAspectRatio: number,
 ): Unit[] {
   if (
-    defenderBefore.defenseMode !==
-      "counter" ||
-    distance(
-      defenderBefore.position,
-      attackerBefore.position,
-      mapAspectRatio,
-    ) >
+    defenderBefore.defenseMode !== "counter" ||
+    distance(defenderBefore.position, attackerBefore.position, mapAspectRatio) >
       6
   ) {
     return units;
   }
 
-  const counterDamage =
-    Math.max(
-      1,
-      Math.round(
-        defenderBefore.damage *
-          0.35,
-      ),
-    );
+  const counterDamage = Math.max(1, Math.round(defenderBefore.damage * 0.35));
 
-  return units.map(
-    (unit) =>
-      unit.id ===
-      attackerBefore.id
-        ? {
-            ...unit,
+  return units.map((unit) =>
+    unit.id === attackerBefore.id
+      ? {
+          ...unit,
 
-            health:
-              Math.max(
-                0,
-                unit.health -
-                  counterDamage,
-              ),
-          }
-        : unit,
+          health: Math.max(0, unit.health - counterDamage),
+        }
+      : unit,
   );
 }
 
@@ -861,221 +533,133 @@ export function attackUnit(
     knockback?: number;
   },
 ): AttackResult {
-  const attacker =
-    state.units.find(
-      (unit) =>
-        unit.id ===
-        attackerId,
-    );
+  const attacker = state.units.find((unit) => unit.id === attackerId);
 
-  const defender =
-    state.units.find(
-      (unit) =>
-        unit.id ===
-        defenderId,
-    );
+  const defender = state.units.find((unit) => unit.id === defenderId);
 
   if (
     !attacker ||
     !defender ||
     state.winner ||
-    attacker.faction !==
-      state.activeFaction ||
-    !canAttack(
-      attacker,
-      defender,
-      mapAspectRatio,
-    )
+    attacker.faction !== state.activeFaction ||
+    !canAttack(attacker, defender, mapAspectRatio)
   ) {
     return {
       state,
       hit: false,
       damage: 0,
       hitChance: 0,
-      targetId:
-        defenderId,
+      targetId: defenderId,
     };
   }
 
-  const hitChance =
-    getHitChance(
-      attacker,
-      defender,
-      terrainMask,
-      mapAspectRatio,
-      options?.accuracyModifier ??
-        0,
-    );
+  const hitChance = getHitChance(
+    attacker,
+    defender,
+    terrainMask,
+    mapAspectRatio,
+    options?.accuracyModifier ?? 0,
+  );
 
-  const hit =
-    Math.random() <
-    hitChance;
+  const hit = Math.random() < hitChance;
 
-  const damageRange =
-    getDamageRange(
-      attacker,
-      defender,
-      options?.damageMultiplier ??
-        1,
-    );
+  const damageRange = getDamageRange(
+    attacker,
+    defender,
+    options?.damageMultiplier ?? 1,
+  );
 
-  const damage =
-    hit
-      ? randomDamage(
-          damageRange,
-        )
-      : 0;
+  const damage = hit ? randomDamage(damageRange) : 0;
 
-  const guard =
-    hit
-      ? applyGuardSplit(
-          state,
-          defender,
-          damage,
+  const guard = hit
+    ? applyGuardSplit(state, defender, damage, mapAspectRatio)
+    : {
+        units: state.units,
+        defenderDamage: 0,
+      };
+
+  let units = guard.units.map((unit) => {
+    if (unit.id === attacker.id) {
+      return {
+        ...unit,
+        hasActed: true,
+        facingAngle: angleFromTo(
+          attacker.position,
+          defender.position,
           mapAspectRatio,
-        )
-      : {
-          units:
-            state.units,
-          defenderDamage:
-            0,
-        };
+        ),
+      };
+    }
 
-  let units =
-    guard.units.map(
-      (unit) => {
-        if (
-          unit.id ===
-          attacker.id
-        ) {
-          return {
-            ...unit,
-            hasActed:
-              true,
-            facingAngle:
-              angleFromTo(
-                attacker.position,
-                defender.position,
-                mapAspectRatio,
-              ),
-          };
-        }
+    if (unit.id === defender.id && hit) {
+      return {
+        ...unit,
 
-        if (
-          unit.id ===
-            defender.id &&
-          hit
-        ) {
-          return {
-            ...unit,
+        health: Math.max(0, unit.health - guard.defenderDamage),
+      };
+    }
 
-            health:
-              Math.max(
-                0,
-                unit.health -
-                  guard.defenderDamage,
-              ),
-          };
-        }
+    return unit;
+  });
 
-        return unit;
-      },
+  if (hit && options?.knockback) {
+    const angle = angleFromTo(
+      attacker.position,
+      defender.position,
+      mapAspectRatio,
     );
 
-  if (
-    hit &&
-    options?.knockback
-  ) {
-    const angle =
-      angleFromTo(
-        attacker.position,
-        defender.position,
-        mapAspectRatio,
-      );
+    const rad = (angle * Math.PI) / 180;
 
-    const rad =
-      (angle *
-        Math.PI) /
-      180;
+    units = units.map((unit) =>
+      unit.id === defender.id
+        ? {
+            ...unit,
 
-    units =
-      units.map(
-        (unit) =>
-          unit.id ===
-          defender.id
-            ? {
-                ...unit,
+            position: {
+              x: Math.max(
+                1,
+                Math.min(
+                  99,
+                  unit.position.x + Math.cos(rad) * options.knockback!,
+                ),
+              ),
 
-                position: {
-                  x:
-                    Math.max(
-                      1,
-                      Math.min(
-                        99,
-                        unit.position.x +
-                          Math.cos(
-                            rad,
-                          ) *
-                            options.knockback!,
-                      ),
-                    ),
-
-                  y:
-                    Math.max(
-                      1,
-                      Math.min(
-                        99,
-                        unit.position.y +
-                          (Math.sin(
-                            rad,
-                          ) *
-                            options.knockback!) /
-                            mapAspectRatio,
-                      ),
-                    ),
-                },
-              }
-            : unit,
-      );
+              y: Math.max(
+                1,
+                Math.min(
+                  99,
+                  unit.position.y +
+                    (Math.sin(rad) * options.knockback!) / mapAspectRatio,
+                ),
+              ),
+            },
+          }
+        : unit,
+    );
   }
 
-  units =
-    postAttackDefenseMovement(
-      units,
-      defender.id,
-      attacker,
-      mapAspectRatio,
-    );
+  units = postAttackDefenseMovement(
+    units,
+    defender.id,
+    attacker,
+    mapAspectRatio,
+  );
 
-  units =
-    applyCounter(
-      units,
-      defender,
-      attacker,
-      mapAspectRatio,
-    );
+  units = applyCounter(units, defender, attacker, mapAspectRatio);
 
-  units =
-    units.filter(
-      (unit) =>
-        unit.health >
-        0,
-    );
+  units = units.filter((unit) => unit.health > 0);
 
   return {
-    state:
-      updateWinnerByElimination(
-        {
-          ...state,
-          units,
-        },
-      ),
+    state: updateWinnerByElimination({
+      ...state,
+      units,
+    }),
 
     hit,
     damage,
     hitChance,
-    targetId:
-      defender.id,
+    targetId: defender.id,
   };
 }
 
@@ -1090,7 +674,11 @@ export function meleeAttack(
   const attacker = state.units.find((unit) => unit.id === attackerId);
   const defender = state.units.find((unit) => unit.id === defenderId);
 
-  if (!attacker || !defender || !canMeleeAttack(attacker, defender, mapAspectRatio)) {
+  if (
+    !attacker ||
+    !defender ||
+    !canMeleeAttack(attacker, defender, mapAspectRatio)
+  ) {
     return { state, hit: false, damage: 0, hitChance: 0, targetId: defenderId };
   }
 
@@ -1115,132 +703,78 @@ export function sweepAttack(
   angle: number,
   mapAspectRatio: number,
 ): MultiAttackResult {
-  const attacker =
-    state.units.find(
-      (unit) =>
-        unit.id ===
-        attackerId,
-    );
+  const attacker = state.units.find((unit) => unit.id === attackerId);
 
-  if (
-    !attacker
-  ) {
+  if (!attacker) {
     return {
       state,
       hits: [],
     };
   }
 
-  const hits:
-    HitEffect[] = [];
+  const hits: HitEffect[] = [];
 
-  const affected =
-    state.units.filter(
-      (unit) =>
-        unit.faction !==
-          attacker.faction &&
-        distance(
-          attacker.position,
-          unit.position,
-          mapAspectRatio,
-        ) <=
-          Math.min(
-            attacker.attackRange,
-            10,
-          ) &&
-        angularDifference(
-          angleFromTo(
-            attacker.position,
-            unit.position,
-            mapAspectRatio,
-          ),
-          angle,
-        ) <=
-          35,
+  const affected = state.units.filter(
+    (unit) =>
+      unit.faction !== attacker.faction &&
+      distance(attacker.position, unit.position, mapAspectRatio) <=
+        Math.min(attacker.attackRange, 10) &&
+      angularDifference(
+        angleFromTo(attacker.position, unit.position, mapAspectRatio),
+        angle,
+      ) <= 35,
+  );
+
+  let units = state.units.map((unit) => {
+    const target = affected.find((enemy) => enemy.id === unit.id);
+
+    if (!target) {
+      return unit;
+    }
+
+    const damage = Math.max(
+      1,
+      Math.round(
+        attacker.damage *
+          (attacker.damageBoostTurns > 0 ? 1.35 : 1) *
+          0.55 *
+          Math.max(0.4, 1 - target.toughness * 0.03),
+      ),
     );
 
-  let units =
-    state.units.map(
-      (unit) => {
-        const target =
-          affected.find(
-            (enemy) =>
-              enemy.id ===
-              unit.id,
-          );
-
-        if (!target) {
-          return unit;
-        }
-
-        const damage =
-          Math.max(
-            1,
-            Math.round(
-              attacker.damage *
-                (attacker.damageBoostTurns > 0 ? 1.35 : 1) *
-                0.55 *
-                Math.max(
-                  0.4,
-                  1 -
-                    target.toughness *
-                      0.03,
-                ),
-            ),
-          );
-
-        hits.push({
-          targetId:
-            target.id,
-          damage,
-          hit: true,
-          position: {
-            ...target.position,
-          },
-        });
-
-        return {
-          ...unit,
-
-          health:
-            Math.max(
-              0,
-              unit.health -
-                damage,
-            ),
-        };
+    hits.push({
+      targetId: target.id,
+      damage,
+      hit: true,
+      position: {
+        ...target.position,
       },
-    );
+    });
 
-  units =
-    units
-      .map(
-        (unit) =>
-          unit.id ===
-          attacker.id
-            ? {
-                ...unit,
-                hasActed:
-                  true,
-                facingAngle:
-                  angle,
-              }
-            : unit,
-      )
-      .filter(
-        (unit) =>
-          unit.health >
-          0,
-      );
+    return {
+      ...unit,
+
+      health: Math.max(0, unit.health - damage),
+    };
+  });
+
+  units = units
+    .map((unit) =>
+      unit.id === attacker.id
+        ? {
+            ...unit,
+            hasActed: true,
+            facingAngle: angle,
+          }
+        : unit,
+    )
+    .filter((unit) => unit.health > 0);
 
   return {
-    state:
-      updateWinnerByElimination(
-        {
-          ...state,
-          units,
-        },
-      ),
+    state: updateWinnerByElimination({
+      ...state,
+      units,
+    }),
 
     hits,
   };
@@ -1253,12 +787,7 @@ export function areaAttackAtPoint(
   mapAspectRatio: number,
   radius = 5,
 ): MultiAttackResult {
-  const attacker =
-    state.units.find(
-      (unit) =>
-        unit.id ===
-        attackerId,
-    );
+  const attacker = state.units.find((unit) => unit.id === attackerId);
 
   if (!attacker) {
     return {
@@ -1267,101 +796,62 @@ export function areaAttackAtPoint(
     };
   }
 
-  const hits:
-    HitEffect[] = [];
+  const hits: HitEffect[] = [];
 
-  let units =
-    state.units.map(
-      (unit) => {
-        if (
-          unit.faction ===
-          attacker.faction
-        ) {
-          return unit;
-        }
+  let units = state.units.map((unit) => {
+    if (unit.faction === attacker.faction) {
+      return unit;
+    }
 
-        const d =
-          distance(
-            impactPoint,
-            unit.position,
-            mapAspectRatio,
-          );
+    const d = distance(impactPoint, unit.position, mapAspectRatio);
 
-        if (
-          d > radius
-        ) {
-          return unit;
-        }
+    if (d > radius) {
+      return unit;
+    }
 
-        const falloff =
-          Math.max(
-            0.45,
-            1 -
-              d /
-                (radius *
-                  1.5),
-          );
+    const falloff = Math.max(0.45, 1 - d / (radius * 1.5));
 
-        const damage =
-          Math.max(
-            1,
-            Math.round(
-              attacker.damage *
-                (attacker.damageBoostTurns > 0 ? 1.35 : 1) *
-                0.7 *
-                falloff,
-            ),
-          );
-
-        hits.push({
-          targetId:
-            unit.id,
-          damage,
-          hit: true,
-          position: {
-            ...unit.position,
-          },
-        });
-
-        return {
-          ...unit,
-          health:
-            Math.max(
-              0,
-              unit.health -
-                damage,
-            ),
-        };
-      },
+    const damage = Math.max(
+      1,
+      Math.round(
+        attacker.damage *
+          (attacker.damageBoostTurns > 0 ? 1.35 : 1) *
+          0.7 *
+          falloff,
+      ),
     );
 
-  units =
-    units
-      .map(
-        (unit) =>
-          unit.id ===
-          attacker.id
-            ? {
-                ...unit,
-                hasActed:
-                  true,
-              }
-            : unit,
-      )
-      .filter(
-        (unit) =>
-          unit.health >
-          0,
-      );
+    hits.push({
+      targetId: unit.id,
+      damage,
+      hit: true,
+      position: {
+        ...unit.position,
+      },
+    });
+
+    return {
+      ...unit,
+      health: Math.max(0, unit.health - damage),
+    };
+  });
+
+  units = units
+    .map((unit) =>
+      unit.id === attacker.id
+        ? {
+            ...unit,
+            hasActed: true,
+          }
+        : unit,
+    )
+    .filter((unit) => unit.health > 0);
 
   return {
-    state:
-      updateWinnerByElimination(
-        {
-          ...state,
-          units,
-        },
-      ),
+    state: updateWinnerByElimination({
+      ...state,
+      units,
+    }),
 
     hits,
   };
@@ -1373,12 +863,7 @@ export function archerAttackAtPoint(
   impactPoint: Position,
   mapAspectRatio: number,
 ): AttackResult {
-  const attacker =
-    state.units.find(
-      (unit) =>
-        unit.id ===
-        attackerId,
-    );
+  const attacker = state.units.find((unit) => unit.id === attackerId);
 
   if (!attacker) {
     return {
@@ -1386,135 +871,71 @@ export function archerAttackAtPoint(
       hit: false,
       damage: 0,
       hitChance: 0,
-      targetId:
-        null,
+      targetId: null,
     };
   }
 
-  const target =
-    state.units
-      .filter(
-        (unit) =>
-          unit.faction !==
-          attacker.faction,
-      )
-      .map(
-        (unit) => ({
-          unit,
+  const target = state.units
+    .filter((unit) => unit.faction !== attacker.faction)
+    .map((unit) => ({
+      unit,
 
-          d:
-            distance(
-              impactPoint,
-              unit.position,
-              mapAspectRatio,
-            ),
-        }),
-      )
-      .sort(
-        (
-          a,
-          b,
-        ) =>
-          a.d -
-          b.d,
-      )
-      .find(
-        (entry) =>
-          entry.d <=
-          2.8,
-      )?.unit;
+      d: distance(impactPoint, unit.position, mapAspectRatio),
+    }))
+    .sort((a, b) => a.d - b.d)
+    .find((entry) => entry.d <= 2.8)?.unit;
 
   if (!target) {
     return {
-      state:
-        spendAttackIntoAir(
-          state,
-          attacker.id,
-        ),
+      state: spendAttackIntoAir(state, attacker.id),
 
-      hit:
-        false,
+      hit: false,
 
-      damage:
-        0,
+      damage: 0,
 
-      hitChance:
-        0,
+      hitChance: 0,
 
-      targetId:
-        null,
+      targetId: null,
     };
   }
 
-  const range =
-    getDamageRange(
-      attacker,
-      target,
-    );
+  const range = getDamageRange(attacker, target);
 
-  const damage =
-    randomDamage(
-      range,
-    );
+  const damage = randomDamage(range);
 
-  let units =
-    state.units
-      .map(
-        (unit) => {
-          if (
-            unit.id ===
-            attacker.id
-          ) {
-            return {
-              ...unit,
-              hasActed:
-                true,
-            };
-          }
+  let units = state.units
+    .map((unit) => {
+      if (unit.id === attacker.id) {
+        return {
+          ...unit,
+          hasActed: true,
+        };
+      }
 
-          if (
-            unit.id ===
-            target.id
-          ) {
-            return {
-              ...unit,
-              health:
-                Math.max(
-                  0,
-                  unit.health -
-                    damage,
-                ),
-            };
-          }
+      if (unit.id === target.id) {
+        return {
+          ...unit,
+          health: Math.max(0, unit.health - damage),
+        };
+      }
 
-          return unit;
-        },
-      )
-      .filter(
-        (unit) =>
-          unit.health >
-          0,
-      );
+      return unit;
+    })
+    .filter((unit) => unit.health > 0);
 
   return {
-    state:
-      updateWinnerByElimination(
-        {
-          ...state,
-          units,
-        },
-      ),
+    state: updateWinnerByElimination({
+      ...state,
+      units,
+    }),
 
-    hit:
-      true,
+    hit: true,
 
     damage,
 
-    hitChance:
-      1,
+    hitChance: 1,
 
-    targetId:
-      target.id,
+    targetId: target.id,
   };
 }
 
@@ -1529,12 +950,7 @@ export function chargeAttack(
   hit: HitEffect | null;
   end: Position;
 } {
-  const attacker =
-    state.units.find(
-      (unit) =>
-        unit.id ===
-        attackerId,
-    );
+  const attacker = state.units.find((unit) => unit.id === attackerId);
 
   if (!attacker) {
     return {
@@ -1547,181 +963,106 @@ export function chargeAttack(
     };
   }
 
-  const range =
-    Math.max(
-      4,
-      Math.min(
-        attacker.moveRange *
-          0.65,
-        12,
-      ),
-    );
+  const range = Math.max(4, Math.min(attacker.moveRange * 0.65, 12));
 
-  const rad =
-    (angle *
-      Math.PI) /
-    180;
+  const rad = (angle * Math.PI) / 180;
 
   const end: Position = {
-    x:
-      Math.max(
-        1,
-        Math.min(
-          99,
-          attacker.position.x +
-            Math.cos(
-              rad,
-            ) *
-              range,
-        ),
-      ),
+    x: Math.max(1, Math.min(99, attacker.position.x + Math.cos(rad) * range)),
 
-    y:
-      Math.max(
-        1,
-        Math.min(
-          99,
-          attacker.position.y +
-            (Math.sin(
-              rad,
-            ) *
-              range) /
-              mapAspectRatio,
-        ),
+    y: Math.max(
+      1,
+      Math.min(
+        99,
+        attacker.position.y + (Math.sin(rad) * range) / mapAspectRatio,
       ),
+    ),
   };
 
-  const moved =
-    moveUnitWithTerrain(
-      state,
-      attacker.id,
-      end,
-      terrainMask,
-      mapAspectRatio,
-    );
+  const moved = moveUnitWithTerrain(
+    state,
+    attacker.id,
+    end,
+    terrainMask,
+    mapAspectRatio,
+  );
 
-  if (
-    !moved.moved ||
-    moved.died
-  ) {
+  if (!moved.moved || moved.died) {
     return {
-      state:
-        moved.state,
-      hit:
-        null,
+      state: moved.state,
+      hit: null,
       end,
     };
   }
 
-  const movedAttacker =
-    moved.state.units.find(
-      (unit) =>
-        unit.id ===
-        attacker.id,
-    );
+  const movedAttacker = moved.state.units.find(
+    (unit) => unit.id === attacker.id,
+  );
 
   if (!movedAttacker) {
     return {
-      state:
-        moved.state,
-      hit:
-        null,
+      state: moved.state,
+      hit: null,
       end,
     };
   }
 
-  const target =
-    moved.state.units
-      .filter(
-        (unit) =>
-          unit.faction !==
-          movedAttacker.faction,
-      )
-      .map(
-        (unit) => ({
-          unit,
+  const target = moved.state.units
+    .filter((unit) => unit.faction !== movedAttacker.faction)
+    .map((unit) => ({
+      unit,
 
-          d:
-            distance(
-              movedAttacker.position,
-              unit.position,
-              mapAspectRatio,
-            ),
-        }),
-      )
-      .sort(
-        (
-          a,
-          b,
-        ) =>
-          a.d -
-          b.d,
-      )
-      .find(
-        (entry) =>
-          entry.d <=
-          5,
-      )?.unit;
+      d: distance(movedAttacker.position, unit.position, mapAspectRatio),
+    }))
+    .sort((a, b) => a.d - b.d)
+    .find((entry) => entry.d <= 5)?.unit;
 
   if (!target) {
     return {
       state: {
         ...moved.state,
 
-        units:
-          moved.state.units.map(
-            (unit) =>
-              unit.id ===
-              attacker.id
-                ? {
-                    ...unit,
-                    hasActed:
-                      true,
-                  }
-                : unit,
-          ),
+        units: moved.state.units.map((unit) =>
+          unit.id === attacker.id
+            ? {
+                ...unit,
+                hasActed: true,
+              }
+            : unit,
+        ),
       },
 
-      hit:
-        null,
+      hit: null,
 
       end,
     };
   }
 
-  const result =
-    attackUnit(
-      moved.state,
-      attacker.id,
-      target.id,
-      terrainMask,
-      mapAspectRatio,
-      {
-        damageMultiplier:
-          1.25,
-        accuracyModifier:
-          0.08,
-      },
-    );
+  const result = attackUnit(
+    moved.state,
+    attacker.id,
+    target.id,
+    terrainMask,
+    mapAspectRatio,
+    {
+      damageMultiplier: 1.25,
+      accuracyModifier: 0.08,
+    },
+  );
 
   return {
-    state:
-      result.state,
+    state: result.state,
 
-    hit:
-      result.hit
-        ? {
-            targetId:
-              target.id,
-            damage:
-              result.damage,
-            hit:
-              true,
-            position: {
-              ...target.position,
-            },
-          }
-        : null,
+    hit: result.hit
+      ? {
+          targetId: target.id,
+          damage: result.damage,
+          hit: true,
+          position: {
+            ...target.position,
+          },
+        }
+      : null,
 
     end,
   };
@@ -1736,45 +1077,29 @@ export function applyDefenseAction(
   return {
     ...state,
 
-    units:
-      state.units.map(
-        (unit) => {
-          if (
-            unit.id !==
-              unitId ||
-            unit.faction !==
-              state.activeFaction ||
-            unit.hasActed
-          ) {
-            return unit;
-          }
+    units: state.units.map((unit) => {
+      if (
+        unit.id !== unitId ||
+        unit.faction !== state.activeFaction ||
+        unit.hasActed
+      ) {
+        return unit;
+      }
 
-          return {
-            ...unit,
+      return {
+        ...unit,
 
-            hasActed:
-              true,
+        hasActed: true,
 
-            hasMoved:
-              mode ===
-                "fortify"
-                ? true
-                : unit.hasMoved,
+        hasMoved: mode === "fortify" ? true : unit.hasMoved,
 
-            defenseMode:
-              mode,
+        defenseMode: mode,
 
-            guardTargetId:
-              mode ===
-              "guard"
-                ? guardTargetId
-                : null,
-          };
-        },
-      ),
+        guardTargetId: mode === "guard" ? guardTargetId : null,
+      };
+    }),
   };
 }
-
 
 export function healTarget(
   state: BattleState,
@@ -1784,15 +1109,30 @@ export function healTarget(
 ): BattleState {
   const caster = state.units.find((unit) => unit.id === casterId);
   const target = state.units.find((unit) => unit.id === targetId);
-  if (!caster || !target || caster.faction !== state.activeFaction || caster.hasActed || target.faction !== caster.faction) return state;
+  if (
+    !caster ||
+    !target ||
+    caster.faction !== state.activeFaction ||
+    caster.hasActed ||
+    target.faction !== caster.faction
+  )
+    return state;
   return {
     ...state,
     units: state.units.map((unit) => {
       if (unit.id === caster.id && unit.id === target.id) {
-        return { ...unit, hasActed: true, health: Math.min(unit.maxHealth, unit.health + amount) };
+        return {
+          ...unit,
+          hasActed: true,
+          health: Math.min(unit.maxHealth, unit.health + amount),
+        };
       }
       if (unit.id === caster.id) return { ...unit, hasActed: true };
-      if (unit.id === target.id) return { ...unit, health: Math.min(unit.maxHealth, unit.health + amount) };
+      if (unit.id === target.id)
+        return {
+          ...unit,
+          health: Math.min(unit.maxHealth, unit.health + amount),
+        };
       return unit;
     }),
   };
@@ -1806,15 +1146,30 @@ export function boostTarget(
 ): BattleState {
   const caster = state.units.find((unit) => unit.id === casterId);
   const target = state.units.find((unit) => unit.id === targetId);
-  if (!caster || !target || caster.faction !== state.activeFaction || caster.hasActed || target.faction !== caster.faction) return state;
+  if (
+    !caster ||
+    !target ||
+    caster.faction !== state.activeFaction ||
+    caster.hasActed ||
+    target.faction !== caster.faction
+  )
+    return state;
   return {
     ...state,
     units: state.units.map((unit) => {
       if (unit.id === caster.id && unit.id === target.id) {
-        return { ...unit, hasActed: true, damageBoostTurns: Math.max(unit.damageBoostTurns, turns) };
+        return {
+          ...unit,
+          hasActed: true,
+          damageBoostTurns: Math.max(unit.damageBoostTurns, turns),
+        };
       }
       if (unit.id === caster.id) return { ...unit, hasActed: true };
-      if (unit.id === target.id) return { ...unit, damageBoostTurns: Math.max(unit.damageBoostTurns, turns) };
+      if (unit.id === target.id)
+        return {
+          ...unit,
+          damageBoostTurns: Math.max(unit.damageBoostTurns, turns),
+        };
       return unit;
     }),
   };
@@ -1830,12 +1185,27 @@ export function burnTarget(
 ): BattleState {
   const caster = state.units.find((unit) => unit.id === casterId);
   const target = state.units.find((unit) => unit.id === targetId);
-  if (!caster || !target || caster.faction !== state.activeFaction || caster.hasActed || target.faction === caster.faction) return state;
-  const units = state.units.map((unit) => {
-    if (unit.id === caster.id) return { ...unit, hasActed: true };
-    if (unit.id === target.id) return { ...unit, health: Math.max(0, unit.health - initialDamage), burnTurns: Math.max(unit.burnTurns, burnTurns), burnDamage: Math.max(unit.burnDamage, burnDamage) };
-    return unit;
-  }).filter((unit) => unit.health > 0);
+  if (
+    !caster ||
+    !target ||
+    caster.faction !== state.activeFaction ||
+    caster.hasActed ||
+    target.faction === caster.faction
+  )
+    return state;
+  const units = state.units
+    .map((unit) => {
+      if (unit.id === caster.id) return { ...unit, hasActed: true };
+      if (unit.id === target.id)
+        return {
+          ...unit,
+          health: Math.max(0, unit.health - initialDamage),
+          burnTurns: Math.max(unit.burnTurns, burnTurns),
+          burnDamage: Math.max(unit.burnDamage, burnDamage),
+        };
+      return unit;
+    })
+    .filter((unit) => unit.health > 0);
   return updateWinnerByElimination({ ...state, units });
 }
 
@@ -1845,7 +1215,8 @@ export function placeTrap(
   position: Position,
 ): BattleState {
   const caster = state.units.find((unit) => unit.id === casterId);
-  if (!caster || caster.faction !== state.activeFaction || caster.hasActed) return state;
+  if (!caster || caster.faction !== state.activeFaction || caster.hasActed)
+    return state;
   const trap: Trap = {
     id: `trap-${state.round}-${casterId}-${state.traps.length + 1}`,
     ownerFaction: caster.faction,
@@ -1857,7 +1228,9 @@ export function placeTrap(
   return {
     ...state,
     traps: [...state.traps, trap],
-    units: state.units.map((unit) => unit.id === caster.id ? { ...unit, hasActed: true } : unit),
+    units: state.units.map((unit) =>
+      unit.id === caster.id ? { ...unit, hasActed: true } : unit,
+    ),
   };
 }
 
@@ -1868,12 +1241,24 @@ export function teleportCaster(
   terrainMask: TerrainMask,
 ): BattleState {
   const caster = state.units.find((unit) => unit.id === casterId);
-  if (!caster || caster.faction !== state.activeFaction || caster.hasActed) return state;
+  if (!caster || caster.faction !== state.activeFaction || caster.hasActed)
+    return state;
   const terrain = TERRAIN[terrainMask.getTerrainAtPosition(position)];
   if (!terrain.walkable || terrain.lethal) return state;
   return {
     ...state,
-    units: state.units.map((unit) => unit.id === caster.id ? { ...unit, position, hasMoved: true, hasActed: true, defenseMode: null, guardTargetId: null } : unit),
+    units: state.units.map((unit) =>
+      unit.id === caster.id
+        ? {
+            ...unit,
+            position,
+            hasMoved: true,
+            hasActed: true,
+            defenseMode: null,
+            guardTargetId: null,
+          }
+        : unit,
+    ),
   };
 }
 
@@ -1884,44 +1269,30 @@ export function spendAttackIntoAir(
   return {
     ...state,
 
-    units:
-      state.units.map(
-        (unit) =>
-          unit.id ===
-          attackerId
-            ? {
-                ...unit,
-                hasActed:
-                  true,
-              }
-            : unit,
-      ),
+    units: state.units.map((unit) =>
+      unit.id === attackerId
+        ? {
+            ...unit,
+            hasActed: true,
+          }
+        : unit,
+    ),
   };
 }
 
-export function finishUnit(
-  state: BattleState,
-  unitId: string,
-): BattleState {
+export function finishUnit(state: BattleState, unitId: string): BattleState {
   return {
     ...state,
 
-    units:
-      state.units.map(
-        (unit) =>
-          unit.id ===
-            unitId &&
-          unit.faction ===
-            state.activeFaction
-            ? {
-                ...unit,
-                hasMoved:
-                  true,
-                hasActed:
-                  true,
-              }
-            : unit,
-      ),
+    units: state.units.map((unit) =>
+      unit.id === unitId && unit.faction === state.activeFaction
+        ? {
+            ...unit,
+            hasMoved: true,
+            hasActed: true,
+          }
+        : unit,
+    ),
   };
 }
 
@@ -1932,117 +1303,72 @@ function factionAtObjective(
 ): boolean {
   return state.units.some(
     (unit) =>
-      unit.faction ===
-        faction &&
-      distance(
-        unit.position,
-        state.objective.position,
-        mapAspectRatio,
-      ) <=
+      unit.faction === faction &&
+      distance(unit.position, state.objective.position, mapAspectRatio) <=
         state.objective.radius,
   );
 }
 
-function nextLivingFaction(
-  state: BattleState,
-): {
+function nextLivingFaction(state: BattleState): {
   faction: FactionId;
   wrapped: boolean;
 } {
-  const currentIndex =
-    FACTION_TURN_ORDER.indexOf(
-      state.activeFaction,
-    );
+  const currentIndex = FACTION_TURN_ORDER.indexOf(state.activeFaction);
 
-  for (
-    let step = 1;
-    step <=
-    FACTION_TURN_ORDER.length;
-    step++
-  ) {
-    const rawIndex =
-      currentIndex +
-      step;
+  for (let step = 1; step <= FACTION_TURN_ORDER.length; step++) {
+    const rawIndex = currentIndex + step;
 
-    const index =
-      rawIndex %
-      FACTION_TURN_ORDER.length;
+    const index = rawIndex % FACTION_TURN_ORDER.length;
 
-    const faction =
-      FACTION_TURN_ORDER[
-        index
-      ];
+    const faction = FACTION_TURN_ORDER[index];
 
-    if (
-      state.units.some(
-        (unit) =>
-          unit.faction ===
-          faction,
-      )
-    ) {
+    if (state.units.some((unit) => unit.faction === faction)) {
       return {
         faction,
 
-        wrapped:
-          rawIndex >=
-          FACTION_TURN_ORDER.length,
+        wrapped: rawIndex >= FACTION_TURN_ORDER.length,
       };
     }
   }
 
   return {
-    faction:
-      state.activeFaction,
+    faction: state.activeFaction,
 
-    wrapped:
-      false,
+    wrapped: false,
   };
 }
 
 export function endTurn(
   state: BattleState,
   mapAspectRatio: number,
+  victoryMode: "legacy" | "none" = "legacy",
 ): BattleState {
-  if (
-    state.winner
-  ) {
+  if (state.winner) {
     return state;
   }
 
-  const contenders =
-    FACTION_TURN_ORDER.filter(
-      (faction) =>
-        factionAtObjective(
-          state,
-          faction,
-          mapAspectRatio,
-        ),
-    );
+  const contenders = FACTION_TURN_ORDER.filter((faction) =>
+    factionAtObjective(state, faction, mapAspectRatio),
+  );
 
   if (
-    contenders.length ===
-      1 &&
-    contenders[0] ===
-      state.activeFaction
+    victoryMode === "legacy" &&
+    contenders.length === 1 &&
+    contenders[0] === state.activeFaction
   ) {
     return {
       ...state,
 
       objective: {
         ...state.objective,
-        controlledBy:
-          state.activeFaction,
+        controlledBy: state.activeFaction,
       },
 
-      winner:
-        state.activeFaction,
+      winner: state.activeFaction,
     };
   }
 
-  const next =
-    nextLivingFaction(
-      state,
-    );
+  const next = nextLivingFaction(state);
 
   const transitioned: BattleState = {
     ...state,

@@ -398,7 +398,6 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
     "Win the pinned knight before it can escape.":
       "Gewinne den gefesselten Springer, bevor er entkommen kann.",
     "King and Queen Skewer": "König-Dame-Spieß",
-    Skewer: "Spieß",
     "Check the king and win the queen behind it.":
       "Gib Schach und gewinne anschließend die Dame hinter dem König.",
     "Discovered attack": "Abzugsangriff",
@@ -1194,7 +1193,6 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
     "Win the pinned knight before it can escape.":
       "움직일 수 없는 핀된 나이트가 도망가기 전에 잡으세요.",
     "King and Queen Skewer": "킹-퀸 스큐어",
-    Skewer: "스큐어",
     "Check the king and win the queen behind it.":
       "킹을 체크해 움직이게 한 뒤 뒤에 있는 퀸을 잡으세요.",
     "Discovered attack": "디스커버드 어택",
@@ -1655,7 +1653,6 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
     "Win the pinned knight before it can escape.":
       "Выиграйте связанного коня, пока он не может уйти.",
     "King and Queen Skewer": "Линейный удар король–ферзь",
-    Skewer: "Линейный удар",
     "Check the king and win the queen behind it.":
       "Дайте шах королю и затем выиграйте стоящего за ним ферзя.",
     "Discovered attack": "Вскрытое нападение",
@@ -4891,7 +4888,7 @@ function InteractivePuzzleBoard({
                         drop-shadow-[0_2px_2px_rgba(0,0,0,0.55)]
                         sm:text-[40px]
                         lg:text-[46px]
-                        ${piece.color === "w" ? "text-[#fff3d5]" : "text-[#17120f]"}
+                        ${piece?.color === "w" ? "text-[#fff3d5]" : "text-[#17120f]"}
                       `}
                     >
                       {miniPieceSymbols[pieceCode]}
