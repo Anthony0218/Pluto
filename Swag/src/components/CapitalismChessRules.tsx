@@ -187,16 +187,6 @@ function getInitialLanguage(): Language {
   return "en";
 }
 
-const actionRewards = [
-  ["Capture Pawn", "1"],
-  ["Capture Knight / Bishop", "3"],
-  ["Capture Rook", "5"],
-  ["Capture Queen", "9"],
-  ["Give check", "1"],
-  ["Castle", "4"],
-  ["Promote a Pawn", "6"],
-];
-
 const shopCosts = [
   ["Pawn", "3"],
   ["Knight", "5"],

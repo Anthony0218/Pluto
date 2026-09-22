@@ -341,23 +341,6 @@ function buildRotatedFen(
   ].join(" ");
 }
 
-function consumeSkipFen(game: Chess): string {
-  const fields = game.fen().split(" ");
-  const currentTurn = game.turn();
-
-  fields[1] = currentTurn === "w" ? "b" : "w";
-
-  fields[3] = "-";
-
-  fields[4] = String(Number(fields[4] ?? "0") + 1);
-
-  if (currentTurn === "b") {
-    fields[5] = String(Number(fields[5] ?? "1") + 1);
-  }
-
-  return fields.join(" ");
-}
-
 function createSafeTectonicGame(fen: string): Chess | null {
   try {
     const game = new Chess(fen, { skipValidation: true });

@@ -206,12 +206,12 @@ export default function WattenGame() {
 
   const [currentPlayer, setCurrentPlayer] = useState(2);
   const [showPassScreen, setShowPassScreen] = useState(false);
-  const [cardsSeen, setCardsSeen] = useState<Record<string, boolean>>(() =>
+  const [, setCardsSeen] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(playerInfo.map((player) => [player.id, false])),
   );
   const [cardPlayedThisTurn, setCardPlayedThisTurn] = useState(false);
-  const [cardsReviewed, setCardsReviewed] = useState<Record<string, boolean>>(
-    () => Object.fromEntries(playerInfo.map((player) => [player.id, false])),
+  const [, setCardsReviewed] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(playerInfo.map((player) => [player.id, false])),
   );
 
   const [playedCards, setPlayedCards] = useState<PlayedCard[]>([]);

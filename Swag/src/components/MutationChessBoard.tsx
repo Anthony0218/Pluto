@@ -454,9 +454,6 @@ export default function MutationChessBoard({
   const [gameOverReason, setGameOverReason] = useState("");
   const [winner, setWinner] = useState<Winner>("white");
 
-  const [whitePlayer, setWhitePlayer] = useState("");
-  const [blackPlayer, setBlackPlayer] = useState("");
-
   const [historyPreviewPly, setHistoryPreviewPly] = useState<number | null>(
     null,
   );

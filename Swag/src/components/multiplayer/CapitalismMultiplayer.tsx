@@ -6,7 +6,7 @@ import Board from "../Board";
 import PromotionBar from "../PromotionBar";
 import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../context/AuthContext";
-import { getSquareName, type PieceType } from "../../utils/chessUtils";
+import { getSquareName } from "../../utils/chessUtils";
 import {
   playPieceCaptureSound,
   playPieceMoveSound,
@@ -490,8 +490,6 @@ export function CapitalismMultiplayerGame() {
   const lastVersionRef = useRef<number | null>(null);
 
   const me = players.find((player) => player.user_id === user?.id) ?? null;
-  const opponent =
-    players.find((player) => player.user_id !== user?.id) ?? null;
   const mySide: CapitalSide | null = me?.chosen_color ?? null;
   const myColor = mySide ? sideToColor(mySide) : null;
   const orientation: "white" | "black" = mySide === "black" ? "black" : "white";

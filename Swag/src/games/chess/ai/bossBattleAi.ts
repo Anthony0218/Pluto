@@ -8,10 +8,7 @@ import {
   type BossPowerId,
 } from "../variants/bossBattle";
 
-import {
-  difficultyLevels,
-  type Difficulty,
-} from "./variantAi";
+import { difficultyLevels, type Difficulty } from "./variantAi";
 
 export type BossAiPowerAction = {
   power: BossPowerId;
@@ -40,11 +37,9 @@ export function chooseBossAiPower(
    * fuller use of the variant mechanics.
    */
   const rankChance: Record<Difficulty, number> = {
-    beginner: 0.18,
-    easy: 0.28,
-    medium: 0.42,
-    hard: 0.60,
-    expert: 0.75,
+    noob: 0.18,
+    casual: 0.42,
+    tryhard: 0.75,
   };
 
   if (Math.random() > rankChance[difficulty]) {

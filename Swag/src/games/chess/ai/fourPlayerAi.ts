@@ -2,18 +2,12 @@ import {
   applyFourPlayerMove,
   getFourPlayerLegalMoves,
   type FourPlayerColor,
-  type FourPlayerMove,
-  type FourPlayerPiece,
   type FourPlayerPieceType,
   type FourPlayerSquare,
   type FourPlayerState,
 } from "../variants/fourPlayerChess";
 
-import {
-  difficultyRank,
-  difficultyLevels,
-  type Difficulty,
-} from "./variantAi";
+import { difficultyRank, difficultyLevels, type Difficulty } from "./variantAi";
 
 const pieceValue: Record<FourPlayerPieceType, number> = {
   p: 100,
@@ -65,10 +59,7 @@ function centerBonus(square: FourPlayerSquare) {
   return Math.max(0, 24 - (dr + dc) * 3);
 }
 
-function scoreMove(
-  state: FourPlayerState,
-  move: FourPlayerAiMove,
-): number {
+function scoreMove(state: FourPlayerState, move: FourPlayerAiMove): number {
   const movingPiece = state.board[move.from.row]?.[move.from.column];
   const captured = state.board[move.to.row]?.[move.to.column];
 
@@ -97,9 +88,7 @@ function scoreMove(
   /*
    * Reward moves that eliminate somebody immediately.
    */
-  score +=
-    (state.activePlayers.length - next.activePlayers.length) *
-    5000;
+  score += (state.activePlayers.length - next.activePlayers.length) * 5000;
 
   return score;
 }

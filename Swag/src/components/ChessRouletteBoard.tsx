@@ -2,7 +2,7 @@ import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { Chess, type Square } from "chess.js";
 
-import { getSquareName, type PieceType } from "../utils/chessUtils";
+import { getSquareName } from "../utils/chessUtils";
 
 import Board from "./Board.tsx";
 import PromotionBar from "./PromotionBar";
@@ -11,7 +11,6 @@ import {
   playPieceCaptureSound,
   playPieceMoveSound,
   playPieceSelectSound,
-  playRandomSound,
 } from "../utils/sound.ts";
 
 import {

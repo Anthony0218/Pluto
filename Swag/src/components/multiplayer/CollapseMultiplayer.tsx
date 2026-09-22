@@ -28,7 +28,6 @@ import {
   filterMovesForCollapse,
   findCollapseKingSquare,
   getCollapseChessOutcome,
-  isSquareInsideCollapseBounds,
   isSquarePlayableForCollapse,
   isThreefoldCollapse,
   type CollapseDestroyedPiece,

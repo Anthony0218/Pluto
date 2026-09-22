@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 
 import { Link } from "react-router-dom";
 
@@ -322,7 +322,7 @@ function ModePreview({
           transform: `translateX(-${activeIndex * 100}%)`,
         }}
       >
-        {modes.map((mode, index) => (
+        {modes.map((mode) => (
           <div key={mode.path} className="min-w-full p-5 sm:p-6">
             <div className="grid min-h-[310px] items-center gap-6 md:grid-cols-[minmax(0,1fr)_280px]">
               <div>

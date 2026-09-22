@@ -423,13 +423,6 @@ export function horrorMoveTouchesFire({
   );
 }
 
-function castlingRookMove(move: HorrorMoveInput): {
-  from: Square;
-  to: Square;
-} | null {
-  return rookCastleSquares(move);
-}
-
 function chooseInfectionSpread(
   game: Chess,
   state: HorrorState,

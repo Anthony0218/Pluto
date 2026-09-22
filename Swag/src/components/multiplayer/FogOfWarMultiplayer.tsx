@@ -507,17 +507,6 @@ export function FogOfWarMultiplayerGame() {
     return () => window.clearInterval(interval);
   }, [actionLoading, loadSnapshot, moving, snapshot?.room.id]);
 
-  const me = useMemo(
-    () =>
-      snapshot?.players.find((player) => player.user_id === user?.id) ?? null,
-    [snapshot?.players, user?.id],
-  );
-  const opponent = useMemo(
-    () =>
-      snapshot?.players.find((player) => player.user_id !== user?.id) ?? null,
-    [snapshot?.players, user?.id],
-  );
-
   const preview = useMemo(() => {
     if (!snapshot || historyPreviewPly === null) return null;
     if (historyPreviewPly === 0) return snapshot.initialView;

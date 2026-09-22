@@ -928,7 +928,7 @@ export default function ChessComputerBoard({
     to: Square;
   } | null>(null);
 
-  const [moveHistory, setMoveHistory] = useState<string[]>([]);
+  const [, setMoveHistory] = useState<string[]>([]);
 
   const [historyPreviewPly, setHistoryPreviewPly] = useState<number | null>(
     null,

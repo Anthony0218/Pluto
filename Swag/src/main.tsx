@@ -11,7 +11,7 @@ import OnlineGame from "./pages/OnlineGame";
 import OnlineGameRoom from "./pages/OnlineGameRoom";
 
 import AppLayout from "./components/AppLayout";
-import NotFoundPage from "./pages/NotFoundPage";
+import NotFoundPage from "./pages/NotFoundPage.tsx";
 import Watten from "./pages/Watten";
 import WattenHotseat from "./pages/WattenHotseat";
 import WattenHotseatPage from "./pages/WattenGamePage";

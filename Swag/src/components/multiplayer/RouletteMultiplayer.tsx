@@ -130,10 +130,6 @@ function colorToSide(color: TwoPlayerColor): PortalSide {
   return color === "white" ? "w" : "b";
 }
 
-function sideToColor(side: PortalSide): TwoPlayerColor {
-  return side === "w" ? "white" : "black";
-}
-
 function clonePortals(portals: Portal[]): Portal[] {
   return portals.map((portal) => ({ ...portal }));
 }
@@ -1758,45 +1754,47 @@ export function RouletteMultiplayerGame() {
                     activePortalSquare ? [activePortalSquare] : []
                   }
                 />
-              {players.length < 2 && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[28px] bg-zinc-950/70 p-4 backdrop-blur-[3px]">
-                  <button
-                    type="button"
-                    onClick={() => void copyRoomCode()}
-                    className="w-full max-w-lg rounded-[30px] border border-white/15 bg-zinc-900/95 px-8 py-8 text-center shadow-2xl shadow-black/60 transition hover:border-amber-300/35 hover:bg-zinc-900 active:scale-[0.99]"
-                    title="Copy room code"
-                  >
-                    <div className="text-4xl">🌐</div>
+                {players.length < 2 && (
+                  <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[28px] bg-zinc-950/70 p-4 backdrop-blur-[3px]">
+                    <button
+                      type="button"
+                      onClick={() => void copyRoomCode()}
+                      className="w-full max-w-lg rounded-[30px] border border-white/15 bg-zinc-900/95 px-8 py-8 text-center shadow-2xl shadow-black/60 transition hover:border-amber-300/35 hover:bg-zinc-900 active:scale-[0.99]"
+                      title="Copy room code"
+                    >
+                      <div className="text-4xl">🌐</div>
 
-                    <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">
-                      Waiting for players
-                    </p>
-
-                    <h2 className="mt-2 text-2xl font-black text-white">
-                      {players.length}/2 players connected
-                    </h2>
-
-                    <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">
-                      Share this room code. The game starts automatically when everyone has joined.
-                    </p>
-
-                    <div className="mt-6 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-5 py-5">
-                      <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">
-                        Room Code
+                      <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">
+                        Waiting for players
                       </p>
 
-                      <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">
-                        {room.code}
+                      <h2 className="mt-2 text-2xl font-black text-white">
+                        {players.length}/2 players connected
+                      </h2>
+
+                      <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">
+                        Share this room code. The game starts automatically when
+                        everyone has joined.
                       </p>
-                    </div>
 
-                    <p className="mt-4 text-xs font-bold text-zinc-400">
-                      {copied ? "✓ Copied to clipboard" : "Click this box to copy the code"}
-                    </p>
-                  </button>
-                </div>
-              )}
+                      <div className="mt-6 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-5 py-5">
+                        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">
+                          Room Code
+                        </p>
 
+                        <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">
+                          {room.code}
+                        </p>
+                      </div>
+
+                      <p className="mt-4 text-xs font-bold text-zinc-400">
+                        {copied
+                          ? "✓ Copied to clipboard"
+                          : "Click this box to copy the code"}
+                      </p>
+                    </button>
+                  </div>
+                )}
 
                 {promotionFrom &&
                   promotionSquare &&

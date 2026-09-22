@@ -466,7 +466,7 @@ export default function HomePage() {
 
               <div className="grid gap-4 md:grid-cols-2">
                 <button
-                  onClick={() => navigate("/games/chess/multiplayer")}
+                  onClick={() => navigate("/games/chess/classic/multiplayer")}
                   className="group rounded-2xl border border-zinc-800 bg-zinc-900 p-6 text-left transition hover:-translate-y-1 hover:border-sky-500/40"
                 >
                   <div className="mb-8 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-500/10 text-2xl">

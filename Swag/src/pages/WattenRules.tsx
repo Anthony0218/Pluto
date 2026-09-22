@@ -65,12 +65,6 @@ const suits: Suit[] = ["Herz", "Schellen", "Eichel", "Gras"];
 
 const ranks: Rank[] = ["7", "8", "9", "10", "Unter", "Ober", "König", "Ass"];
 
-const criticalNames: Record<string, string> = {
-  "Herz-König": "Max",
-  "Schellen-7": "Belli",
-  "Eichel-7": "Spitz",
-};
-
 type SituationMode = "three" | "four";
 
 type SituationCard = DisplayCard;

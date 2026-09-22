@@ -916,9 +916,9 @@ export default function ThreeLivesChessBoard({
      LOCAL PLAYERS
      ======================================================= */
 
-  const [whitePlayer, setWhitePlayer] = useState("");
+  const [whitePlayer] = useState("");
 
-  const [blackPlayer, setBlackPlayer] = useState("");
+  const [blackPlayer] = useState("");
 
   const [historyPreviewPly, setHistoryPreviewPly] = useState<number | null>(
     null,

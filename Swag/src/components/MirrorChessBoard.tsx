@@ -29,7 +29,6 @@ import {
   type MirrorMoveRecord,
   type MirrorPieceType,
   type MirrorSetupState,
-  type MirrorSide,
 } from "../games/chess/variants/mirrorChess";
 
 import {

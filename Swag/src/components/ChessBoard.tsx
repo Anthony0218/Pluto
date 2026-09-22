@@ -717,7 +717,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
   const [game] = useState(() => new Chess());
 
-  const [position, setPosition] = useState(game.fen());
+  const [, setPosition] = useState(game.fen());
 
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
 

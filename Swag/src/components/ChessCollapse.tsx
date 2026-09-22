@@ -23,9 +23,6 @@ import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.t
 
 import {
   COLLAPSE_KING_MAX_LIVES,
-  COLLAPSE_MAX_DELAY_MOVES,
-  COLLAPSE_MIN_DELAY_MOVES,
-  COLLAPSE_WARNING_MOVES,
   advanceCollapseAfterMove,
   cloneCollapseLives,
   cloneCollapseState,
@@ -406,8 +403,8 @@ export default function ChessCollapseBoard({
 
   const [finishedGame, setFinishedGame] = useState<FinishedGame>(null);
 
-  const [whitePlayer, setWhitePlayer] = useState("");
-  const [blackPlayer, setBlackPlayer] = useState("");
+  const [whitePlayer] = useState("");
+  const [blackPlayer] = useState("");
 
   const [collapseMode, setCollapseMode] = useState<CollapseMode>("squares");
 
@@ -1514,32 +1511,6 @@ export default function ChessCollapseBoard({
         </main>
       </div>
     </div>
-  );
-}
-
-function PlayerInput({
-  label,
-  value,
-  onChange,
-  placeholder,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  placeholder: string;
-}) {
-  return (
-    <label className="block">
-      <span className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
-        {label}
-      </span>
-      <input
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
-        className="mt-1.5 w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 text-sm font-semibold text-zinc-200 outline-none transition placeholder:text-zinc-700 focus:border-amber-400/30"
-      />
-    </label>
   );
 }
 
