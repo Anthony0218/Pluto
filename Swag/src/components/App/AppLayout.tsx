@@ -14,7 +14,7 @@ function getInitialTheme(): AppTheme {
 
   const saved = window.localStorage.getItem(THEME_STORAGE_KEY);
 
-  return saved === "pluto" ? "pluto" : "black";
+  return saved === "black" ? "black" : "pluto";
 }
 
 export default function AppLayout() {

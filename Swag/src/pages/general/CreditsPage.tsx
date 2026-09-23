@@ -150,17 +150,6 @@ export default function CreditsPage() {
           </p>
         </section>
 
-        <section className="mt-6 rounded-3xl border border-amber-400/10 bg-amber-400/[0.03] p-6">
-          <h2 className="font-black text-white">Before publishing</h2>
-
-          <p className="mt-2 text-sm leading-7 text-zinc-400">
-            Keep a copy of each third-party license in your repository. For
-            Stockfish, also make sure the exact source corresponding to the
-            distributed engine build can be reached from your public project or
-            from a clearly identified upstream source.
-          </p>
-        </section>
-
         <footer className="py-8 text-center text-[11px] text-zinc-600">
           Credits and license information may be updated when dependencies or
           assets change.
