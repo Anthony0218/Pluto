@@ -1,5 +1,5 @@
 import { useAuth } from "./context/AuthContext";
-import HomePage from "./pages/HomePage";
+import HomePage from "./pages/general/HomePage";
 
 function App() {
   const { loading } = useAuth();
