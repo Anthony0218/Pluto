@@ -147,6 +147,7 @@ import Chess3DMenu from "./pages/Chess3DMenu.tsx";
 import CreditsPage from "./pages/CreditsPage.tsx";
 import MedievalKingdomsRegionPage from "./pages/MedievalKingdoms/MedievalKingdomsRegionPage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
+import FriendsPage from "./pages/FriendsPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -172,6 +173,10 @@ const router = createBrowserRouter([
       {
         path: "/profile",
         element: <ProfilePage />,
+      },
+      {
+        path: "/friends",
+        element: <FriendsPage />,
       },
 
       {
