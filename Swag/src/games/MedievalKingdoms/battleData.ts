@@ -15,7 +15,8 @@ import type { BattleDefinition, BattleState } from "./types";
 export const BATTLES: Record<string, BattleDefinition> = {
   "falcon-bridge": {
     id: "falcon-bridge",
-    name: "Falcon Bridge",
+    regionId: "moonville",
+    name: "Moonville Lunar (ONLY PLACEHOLDER, GAME DOES NOT WORK YET)",
     subtitle: "Battle for the crossing",
     lore: "The ancient bridge controls the western approaches to Falconstone.",
 
@@ -52,7 +53,9 @@ export const BATTLES: Record<string, BattleDefinition> = {
   "blackthorn-bridge": {
     id: "blackthorn-bridge",
 
-    name: "Green Hell",
+    regionId: "moonville",
+
+    name: "Blackthorn Bridge",
 
     subtitle: "War beneath the canopy",
 
@@ -91,7 +94,9 @@ export const BATTLES: Record<string, BattleDefinition> = {
   "emberclaw-bridge": {
     id: "emberclaw-bridge",
 
-    name: "Pit 2",
+    regionId: "brickstone-fortress",
+
+    name: "Brickstone Fortress",
 
     subtitle: "Battle at the crater",
 
@@ -129,6 +134,8 @@ export const BATTLES: Record<string, BattleDefinition> = {
 
   "one-eyed-oak": {
     id: "one-eyed-oak",
+
+    regionId: "one-eyed-oak",
 
     name: "One Eyed Oak",
 
@@ -175,30 +182,13 @@ export function createInitialBattleState(battleId: string): BattleState {
 
     activeFaction: battle.startingFaction,
 
-    units: battle.units.map((unit) => ({
-      ...unit,
-
-      position: {
-        ...unit.position,
-      },
-    })),
+    units: structuredClone(battle.units),
 
     traps: [],
 
-    objects: battle.objects.map((object) => ({
-      ...object,
-      position: {
-        ...object.position,
-      },
-    })),
+    objects: structuredClone(battle.objects),
 
-    objective: {
-      ...battle.objective,
-
-      position: {
-        ...battle.objective.position,
-      },
-    },
+    objective: structuredClone(battle.objective),
 
     winner: null,
 

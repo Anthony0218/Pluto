@@ -1,7 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 
 import RegionMap from "../../../components/MedievalKingdoms/RegionMap";
-import MoonvilleMinigames from "../../../components/MedievalKingdoms/minigames/MoonvilleMinigames";
 
 import { getCampaign } from "../../../games/MedievalKingdoms/campaignData";
 
@@ -9,6 +8,7 @@ import {
   isCampaignUnlocked,
   useCampaignProgress,
 } from "../../../games/MedievalKingdoms/campaignProgress";
+import MoonvilleMinigames from "@/components/MedievalKingdoms/minigames/MoonvilleMinigames";
 
 export default function MedievalKingdomsRegionPage() {
   const { campaignId } = useParams<{
@@ -42,48 +42,58 @@ export default function MedievalKingdomsRegionPage() {
   if (!isCampaignUnlocked(campaign.id, progress)) {
     return (
       <main className="min-h-screen bg-[#21170f] px-4 py-8 text-[#f5e4c1]">
-        <div className="mx-auto max-w-xl rounded-2xl border border-[#795a34] bg-[#3b2a1b] p-6">
-          <div className="text-3xl">🔒</div>
+        <div className="mx-auto max-w-4xl">
+          <div className="rounded-2xl border border-[#795a34] bg-[#3b2a1b] p-6">
+            <div className="text-3xl">🔒</div>
 
-          <h1 className="mt-2 text-xl font-black">{campaign.name} is locked</h1>
+            <h1 className="mt-2 text-xl font-black">
+              {campaign.name} is locked
+            </h1>
 
-          <p className="mt-2 text-sm text-[#bda77f]">
-            Complete the previous campaign first.
-          </p>
+            <p className="mt-2 text-sm text-[#bda77f]">
+              This campaign is not available yet.
+            </p>
 
-          <button
-            type="button"
-            onClick={() => navigate("/games/medieval-kingdoms")}
-            className="mt-4 rounded-xl border border-[#a57c43] bg-[#5a4024] px-4 py-2 font-bold"
-          >
-            Return to continent
-          </button>
+            <p className="mt-1 text-sm text-[#9f8969]">
+              Complete the previous campaign first to unlock it.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => navigate("/games/medieval-kingdoms")}
+              className="mt-4 rounded-xl border border-[#a57c43] bg-[#5a4024] px-4 py-2 font-bold transition hover:bg-[#6a4b29]"
+            >
+              Return to continent
+            </button>
+          </div>
+
+          <div className="mt-8 rounded-2xl border border-[#795a34] bg-[#2d2016] p-6">
+            <div className="mb-5 text-center">
+              <p className="text-xs font-black uppercase tracking-[0.25em] text-[#d3a448]">
+                While you wait
+              </p>
+
+              <h2 className="mt-1 text-2xl font-black text-[#ffe7ad]">
+                Minigames
+              </h2>
+
+              <p className="mt-2 text-sm text-[#aa9471]">
+                Play a few minigames while this campaign is still locked.
+              </p>
+            </div>
+
+            <MoonvilleMinigames />
+          </div>
         </div>
       </main>
     );
   }
-
-  if (campaign.id === "moonville") {
+  if (campaignId === "brickstone-fortress")
     return (
       <main className="min-h-screen bg-[#21170f] px-4 py-8">
         <MoonvilleMinigames />
       </main>
     );
-  }
-  if (campaign.id === "brickstone-fortress") {
-    return (
-      <main className="min-h-screen bg-[#21170f] px-4 py-8">
-        <MoonvilleMinigames />
-      </main>
-    );
-  }
-  if (campaign.id === "one-eyed-oak") {
-    return (
-      <main className="min-h-screen bg-[#21170f] px-4 py-8">
-        <MoonvilleMinigames />
-      </main>
-    );
-  }
 
   return (
     <main className="min-h-screen bg-[#21170f] px-4 py-8">
