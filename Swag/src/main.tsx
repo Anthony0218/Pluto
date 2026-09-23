@@ -6,58 +6,56 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 
 import App from "./App";
-import ChessGame from "./pages/ChessGames";
-import OnlineGame from "./pages/OnlineGame";
-import OnlineGameRoom from "./pages/OnlineGameRoom";
+import ChessGame from "./pages/games/Chess/ChessGames.tsx";
 
-import AppLayout from "./components/AppLayout";
-import NotFoundPage from "./pages/NotFoundPage.tsx";
-import Watten from "./pages/Watten";
-import WattenHotseat from "./pages/WattenHotseat";
-import WattenHotseatPage from "./pages/WattenGamePage";
+import AppLayout from "./components/App/AppLayout.tsx";
+import NotFoundPage from "./pages/general/NotFoundPage.tsx";
+import Watten from "./pages/games/Watten/Watten.tsx";
+import WattenHotseat from "./pages/games/Watten/WattenHotseat.tsx";
+import WattenHotseatPage from "./pages/games/Watten/WattenGamePage.tsx";
 
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
-import WattenRules from "./pages/WattenRules";
+import WattenRules from "./pages/games/Watten/WattenRules.tsx";
 import { CardThemeProvider } from "./context/CardThemeContext";
 import { TableThemeProvider } from "./context/TableThemeContext";
-import WattenMultiplayerLobby from "./components/WattenMultiplayerLobby";
-import WattenMultiplayerGame from "./components/WattenMultiplayerGame.tsx";
-import ChessClassicMenu from "./pages/ChessClassicalMenu";
-import ChessMenu from "./pages/ChessMenu";
-import ChessComputer from "./pages/ChessComputer";
-import ChessMultiplayerLobby from "./pages/ChessMultiplayerLobby";
-import ChessMultiplayerRoom from "./pages/ChessMultiplayerRoom";
-import ChessMultiplayerGame from "./pages/ChessMultiplayerGame";
-import ChessRulesAndTips from "./components/ChessRulesAndTips";
-import ChessVariantsMenu from "./pages/ChessVariantsMenu";
-import ThreeLivesChessBoard from "./components/ThreeLivesChessBoard";
-import MutationChessBoard from "./components/MutationChessBoard";
-import CapitalismChessBoard from "./components/CapitalismChessBoard";
-import CapitalismChessRules from "./components/CapitalismChessRules";
-import HorrorChessRules from "./components/HorrorChessRules";
-import HorrorChessBoard from "./components/HorrorChessBoard";
-import FogOfWarChessBoard from "./components/FogOfWarChessBoard";
-import FogOfWarChessRules from "./components/FogOfWarChessRules";
-import DraftChessBoard from "./components/DraftChessBoard";
-import DraftChessRules from "./components/DraftChessRules";
-import MirrorChessBoard from "./components/MirrorChessBoard";
-import ChessRouletteBoard from "./components/ChessRouletteBoard";
-import ChessHotPotatoBoard from "./components/ChessHotPotatoBoard";
-import ChessCollapseBoard from "./components/ChessCollapse";
+import WattenMultiplayerLobby from "./components/Watten/WattenMultiplayerLobby.tsx";
+import WattenMultiplayerGame from "./components/Watten/WattenMultiplayerGame.tsx";
+import ChessClassicMenu from "./pages/games/Chess/ChessClassicalMenu.tsx";
+import ChessMenu from "./pages/games/Chess/ChessMenu.tsx";
+import ChessComputer from "./pages/games/Chess/ChessComputer.tsx";
+import ChessMultiplayerLobby from "./pages/games/Chess/ChessMultiplayerLobby.tsx";
+import ChessMultiplayerRoom from "./pages/games/Chess/ChessMultiplayerRoom.tsx";
+import ChessMultiplayerGame from "./pages/games/Chess/ChessMultiplayerGame.tsx";
+import ChessRulesAndTips from "./components/chess/singleplayer/ChessRulesAndTips.tsx";
+import ChessVariantsMenu from "./pages/games/Chess/ChessVariantsMenu.tsx";
+import ThreeLivesChessBoard from "./components/chess/singleplayer/ThreeLivesChessBoard.tsx";
+import MutationChessBoard from "./components/chess/singleplayer/MutationChessBoard.tsx";
+import CapitalismChessBoard from "./components/chess/singleplayer/CapitalismChessBoard.tsx";
+import CapitalismChessRules from "./components/chess/singleplayer/CapitalismChessRules.tsx";
+import HorrorChessRules from "./components/chess/singleplayer/HorrorChessRules.tsx";
+import HorrorChessBoard from "./components/chess/singleplayer/HorrorChessBoard.tsx";
+import FogOfWarChessBoard from "./components/chess/singleplayer/FogOfWarChessBoard.tsx";
+import FogOfWarChessRules from "./components/chess/singleplayer/FogOfWarChessRules.tsx";
+import DraftChessBoard from "./components/chess/singleplayer/DraftChessBoard.tsx";
+import DraftChessRules from "./components/chess/singleplayer/DraftChessRules.tsx";
+import MirrorChessBoard from "./components/chess/singleplayer/MirrorChessBoard.tsx";
+import ChessRouletteBoard from "./components/chess/singleplayer/ChessRouletteBoard.tsx";
+import ChessHotPotatoBoard from "./components/chess/singleplayer/ChessHotPotatoBoard.tsx";
+import ChessCollapseBoard from "./components/chess/singleplayer/ChessCollapse.tsx";
 import { ChessSettingsProvider } from "./context/ChessSettingsContext";
-import BossBattleBoard from "./components/BossBattle";
-import FourPlayerChess from "./components/FourPlayerChess";
-import RandomStartChess from "./components/RandomStartChess";
-import MirrorChessRules from "./components/MirrorChessRules";
-import ChessRouletteRules from "./components/ChessRouletteRules";
-import ChessHotPotatoRules from "./components/ChessHotPotatoRules";
-import ChessCollapseRules from "./components/ChessCollapseRules";
-import BossBattleRules from "./components/BossBattleRules";
-import TectonicChess from "./components/TectonicChess";
-import TectonicChessRules from "./components/TectonicChessRules";
-import TotalChaosChess from "./components/TotalChaosChess";
-import TotalChaosChessRules from "./components/TotalChaosChessRules";
+import BossBattleBoard from "./components/chess/singleplayer/BossBattle.tsx";
+import FourPlayerChess from "./components/chess/singleplayer/FourPlayerChess.tsx";
+import RandomStartChess from "./components/chess/singleplayer/RandomStartChess.tsx";
+import MirrorChessRules from "./components/chess/singleplayer/MirrorChessRules.tsx";
+import ChessRouletteRules from "./components/chess/singleplayer/ChessRouletteRules.tsx";
+import ChessHotPotatoRules from "./components/chess/singleplayer/ChessHotPotatoRules.tsx";
+import ChessCollapseRules from "./components/chess/singleplayer/ChessCollapseRules.tsx";
+import BossBattleRules from "./components/chess/singleplayer/BossBattleRules.tsx";
+import TectonicChess from "./components/chess/singleplayer/TectonicChess.tsx";
+import TectonicChessRules from "./components/chess/singleplayer/TectonicChessRules.tsx";
+import TotalChaosChess from "./components/chess/singleplayer/TotalChaosChess.tsx";
+import TotalChaosChessRules from "./components/chess/singleplayer/TotalChaosChessRules.tsx";
 import {
   BossBattleAiPage,
   CapitalismAiPage,
@@ -74,80 +72,80 @@ import {
   TectonicAiPage,
   ThreeLivesAiPage,
   TotalChaosAiPage,
-} from "./components/ai/AllVariantAiPages";
-import FourPlayerAiPage from "./components/ai/FourPlayerAiPage";
+} from "./components/chess/ai/AllVariantAiPages.tsx";
+import FourPlayerAiPage from "./components/chess/ai/FourPlayerAiPage.tsx";
 import {
   RandomStartMultiplayerGame,
   RandomStartMultiplayerLobby,
-} from "./components/multiplayer/RandomStartMultiplayer";
+} from "./components/chess/multiplayer/RandomStartMultiplayer.tsx";
 import {
   TotalChaosMultiplayerGame,
   TotalChaosMultiplayerLobby,
-} from "./components/multiplayer/TotalChaosMultiplayer";
+} from "./components/chess/multiplayer/TotalChaosMultiplayer.tsx";
 import {
   DraftMultiplayerGame,
   DraftMultiplayerLobby,
-} from "./components/multiplayer/DraftMultiplayer";
+} from "./components/chess/multiplayer/DraftMultiplayer.tsx";
 import {
   FourPlayerMultiplayerGame,
   FourPlayerMultiplayerLobby,
-} from "./components/multiplayer/FourPlayerMultiplayer";
+} from "./components/chess/multiplayer/FourPlayerMultiplayer.tsx";
 import {
   RouletteMultiplayerGame,
   RouletteMultiplayerLobby,
-} from "./components/multiplayer/RouletteMultiplayer";
+} from "./components/chess/multiplayer/RouletteMultiplayer.tsx";
 import {
   ThreeLivesMultiplayerGame,
   ThreeLivesMultiplayerLobby,
-} from "./components/multiplayer/ThreeLivesMultiplayer";
+} from "./components/chess/multiplayer/ThreeLivesMultiplayer.tsx";
 import {
   MirrorMultiplayerGame,
   MirrorMultiplayerLobby,
-} from "./components/multiplayer/MirrorMultiplayer";
+} from "./components/chess/multiplayer/MirrorMultiplayer.tsx";
 import {
   MutationMultiplayerGame,
   MutationMultiplayerLobby,
-} from "./components/multiplayer/MutationMultiplayer";
+} from "./components/chess/multiplayer/MutationMultiplayer.tsx";
 import {
   FogOfWarMultiplayerGame,
   FogOfWarMultiplayerLobby,
-} from "./components/multiplayer/FogOfWarMultiplayer.tsx";
+} from "./components/chess/multiplayer/FogOfWarMultiplayer.tsx";
 import {
   TectonicMultiplayerGame,
   TectonicMultiplayerLobby,
-} from "./components/multiplayer/TectonicMultiplayer.tsx";
+} from "./components/chess/multiplayer/TectonicMultiplayer.tsx";
 import {
   HotPotatoMultiplayerGame,
   HotPotatoMultiplayerLobby,
-} from "./components/multiplayer/HotPotatoMultiplayer.tsx";
+} from "./components/chess/multiplayer/HotPotatoMultiplayer.tsx";
 import {
   CollapseMultiplayerGame,
   CollapseMultiplayerLobby,
-} from "./components/multiplayer/CollapseMultiplayer.tsx";
+} from "./components/chess/multiplayer/CollapseMultiplayer.tsx";
 import {
   CapitalismMultiplayerGame,
   CapitalismMultiplayerLobby,
-} from "./components/multiplayer/CapitalismMultiplayer.tsx";
+} from "./components/chess/multiplayer/CapitalismMultiplayer.tsx";
 import {
   HorrorMultiplayerGame,
   HorrorMultiplayerLobby,
-} from "./components/multiplayer/HorrorMultiplayer.tsx";
+} from "./components/chess/multiplayer/HorrorMultiplayer.tsx";
 import {
   BossBattleMultiplayerGame,
   BossBattleMultiplayerLobby,
-} from "./components/multiplayer/BossBattleMultiplayer.tsx";
-import GamesPage from "./pages/GamesPage.tsx";
-import ProfilePage from "./pages/ProfilePage.tsx";
-import { WattenThreePlayerMultiplayerGame } from "./components/WattenThreePlayerMultiplayer.tsx";
-import MedievalKingdomsWorldPage from "./pages/MedievalKingdoms/MedievalKingdomsWorldPage.tsx";
-import MedievalKingdomsBattlePage from "./pages/MedievalKingdoms/MedievalKingdomsBattlePage.tsx";
-import Chess3DAiPage from "./pages/Chess3DAiPage.tsx";
-import Chess3DHotseatPage from "./pages/Chess3DHotseatPage.tsx";
-import Chess3DMenu from "./pages/Chess3DMenu.tsx";
-import CreditsPage from "./pages/CreditsPage.tsx";
-import MedievalKingdomsRegionPage from "./pages/MedievalKingdoms/MedievalKingdomsRegionPage.tsx";
-import LoginPage from "./pages/LoginPage.tsx";
-import FriendsPage from "./pages/FriendsPage.tsx";
+} from "./components/chess/multiplayer/BossBattleMultiplayer.tsx";
+import GamesPage from "./pages/general/GamesPage.tsx";
+import ProfilePage from "./pages/social/ProfilePage.tsx";
+import { WattenThreePlayerMultiplayerGame } from "./components/Watten/WattenThreePlayerMultiplayer.tsx";
+import MedievalKingdomsWorldPage from "./pages/games/MedievalKingdoms/MedievalKingdomsWorldPage.tsx";
+import MedievalKingdomsBattlePage from "./pages/games/MedievalKingdoms/MedievalKingdomsBattlePage.tsx";
+import Chess3DAiPage from "./pages/games/Chess/Chess3DAiPage.tsx";
+import Chess3DHotseatPage from "./pages/games/3DChess/Chess3DHotseatPage.tsx";
+import Chess3DMenu from "./pages/games/3DChess/Chess3DMenu.tsx";
+import CreditsPage from "./pages/general/CreditsPage.tsx";
+import MedievalKingdomsRegionPage from "./pages/games/MedievalKingdoms/MedievalKingdomsRegionPage.tsx";
+import LoginPage from "./pages/general/LoginPage.tsx";
+import FriendsPage from "./pages/social/FriendsPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -190,16 +188,6 @@ const router = createBrowserRouter([
       {
         path: "/games/chess/classic/hotseat",
         element: <ChessGame />,
-      },
-
-      {
-        path: "/onlineGame",
-        element: <OnlineGame />,
-      },
-
-      {
-        path: "/onlineGame/:gameId",
-        element: <OnlineGameRoom />,
       },
 
       {

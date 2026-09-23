@@ -8,7 +8,7 @@ import type {
 
 export const CAMPAIGN_ORDER = [
   "moonville",
-  "arkstone-fortress",
+  "brickstone-fortress",
   "the-guild",
   "worlds-end",
   "one-eyed-oak",
@@ -20,8 +20,7 @@ export const CAMPAIGN_ORDER = [
   "first-light",
 ] as const;
 
-export type CampaignId =
-  (typeof CAMPAIGN_ORDER)[number];
+export type CampaignId = (typeof CAMPAIGN_ORDER)[number];
 
 function battle(
   id: string,
@@ -31,6 +30,7 @@ function battle(
   battleId: string,
   gameMode: GameMode,
   order: number,
+  maskColor: [number, number, number],
   gameModeConfig?: GameModeConfig,
   optional = false,
 ): CampaignBattleNode {
@@ -42,6 +42,7 @@ function battle(
     battleId,
     gameMode,
     order,
+    maskColor,
     gameModeConfig,
     optional,
   };
@@ -61,22 +62,29 @@ function battle(
 export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
   moonville: {
     id: "moonville",
+
     name: "Moon Ville",
     subtitle: "The War Begins",
-    description:
-      "The campaign begins beneath Moon Ville's pale western sky.",
-    regionMap:
-      "/MedievalKingdoms/regions/moonville.png",
+
+    description: "The campaign begins beneath Moon Ville's pale western sky.",
+
+    regionMap: "/MedievalKingdoms/maps/regions/moonville.png",
+
+    regionMask: "/MedievalKingdoms/maps/regions/moonville-mask.png",
+
     battles: [
       battle(
-        "moon-outskirts",
-        "Moon Ville Outskirts",
+        "lunar-sanctum",
+        "Lunar Sanctum (PLACEHOLDER)",
         "Break the first enemy patrol before it reaches the town.",
-        { x: 22, y: 72 },
+        { x: 32, y: 72 },
         "falcon-bridge",
         "elimination",
         1,
+
+        [241, 255, 3],
       ),
+
       battle(
         "moon-crossing",
         "Moon Crossing",
@@ -85,28 +93,33 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "blackthorn-bridge",
         "capture",
         2,
+
+        [255, 186, 3],
       ),
+
       battle(
-        "lunar-sanctum",
-        "Lunar Sanctum",
+        "moon-outskirts",
+        "Moon Ville Outskirts",
         "Survive the final assault and claim Moon Ville.",
         { x: 76, y: 25 },
         "emberclaw-bridge",
         "survival",
         3,
+
+        [3, 255, 60],
+
         { targetRound: 8 },
       ),
     ],
   },
-
-  "arkstone-fortress": {
-    id: "arkstone-fortress",
+  "brickstone-fortress": {
+    id: "brickstone-fortress",
     name: "Arkstone Fortress",
     subtitle: "The Northern Gate",
     description:
       "Fight through mountain approaches and open the road to Arkstone.",
-    regionMap:
-      "/MedievalKingdoms/regions/arkstone-fortress.png",
+    regionMap: "/MedievalKingdoms/regions/arkstone-fortress.png",
+    regionMask: "/MedievalKingdoms/maps/regions/arkstone-fortress-mask.png",
     battles: [
       battle(
         "arkstone-pass",
@@ -116,6 +129,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "blackthorn-bridge",
         "elimination",
         1,
+        [0, 255, 0],
       ),
       battle(
         "arkstone-gate",
@@ -125,6 +139,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "falcon-bridge",
         "capture",
         2,
+        [0, 255, 0],
       ),
       battle(
         "arkstone-citadel",
@@ -134,6 +149,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "emberclaw-bridge",
         "defense",
         3,
+        [0, 255, 0],
         { targetRound: 9 },
       ),
     ],
@@ -145,8 +161,8 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
     subtitle: "Contracts and Steel",
     description:
       "The mercantile city is divided between rival houses and hired armies.",
-    regionMap:
-      "/MedievalKingdoms/regions/the-guild.png",
+    regionMap: "/MedievalKingdoms/regions/the-guild.png",
+    regionMask: "/MedievalKingdoms/maps/regions/the-guild-mask.png",
     battles: [
       battle(
         "guild-road",
@@ -156,6 +172,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "falcon-bridge",
         "elimination",
         1,
+        [0, 255, 0],
       ),
       battle(
         "guild-market",
@@ -165,6 +182,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "blackthorn-bridge",
         "kingOfTheHill",
         2,
+        [0, 255, 0],
         { scoreToWin: 3 },
       ),
       battle(
@@ -175,6 +193,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "emberclaw-bridge",
         "capture",
         3,
+        [0, 255, 0],
       ),
     ],
   },
@@ -185,8 +204,8 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
     subtitle: "Beyond the Last Road",
     description:
       "A distant frontier where armies disappear into stone and mist.",
-    regionMap:
-      "/MedievalKingdoms/regions/worlds-end.png",
+    regionMap: "/MedievalKingdoms/regions/worlds-end.png",
+    regionMask: "/MedievalKingdoms/maps/regions/worlds-end-mask.png",
     battles: [
       battle(
         "end-road",
@@ -196,6 +215,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "emberclaw-bridge",
         "breakthrough",
         1,
+        [0, 255, 0],
       ),
       battle(
         "end-watch",
@@ -205,6 +225,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "blackthorn-bridge",
         "survival",
         2,
+        [0, 255, 0],
         { targetRound: 8 },
       ),
       battle(
@@ -215,6 +236,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "falcon-bridge",
         "boss",
         3,
+        [0, 255, 0],
       ),
     ],
   },
@@ -225,8 +247,8 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
     subtitle: "The Watching Tree",
     description:
       "Ancient roads converge around a tree older than the kingdoms.",
-    regionMap:
-      "/MedievalKingdoms/regions/one-eyed-oak.png",
+    regionMap: "/MedievalKingdoms/regions/one-eyed-oak.png",
+    regionMask: "/MedievalKingdoms/maps/regions/one-eyed-oak-mask.png",
     battles: [
       battle(
         "oak-road",
@@ -236,6 +258,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "falcon-bridge",
         "elimination",
         1,
+        [0, 255, 0],
       ),
       battle(
         "oak-clearing",
@@ -245,6 +268,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "blackthorn-bridge",
         "kingOfTheHill",
         2,
+        [0, 255, 0],
         { scoreToWin: 4 },
       ),
       battle(
@@ -255,6 +279,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "emberclaw-bridge",
         "capture",
         3,
+        [0, 255, 0],
       ),
     ],
   },
@@ -263,10 +288,9 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
     id: "pit-2",
     name: "Pit 2",
     subtitle: "The Crater War",
-    description:
-      "Broken roads and steep crater walls split the battlefield.",
-    regionMap:
-      "/MedievalKingdoms/regions/pit-2.png",
+    description: "Broken roads and steep crater walls split the battlefield.",
+    regionMap: "/MedievalKingdoms/regions/pit-2.png",
+    regionMask: "/MedievalKingdoms/maps/regions/pit-2-mask.png",
     battles: [
       battle(
         "pit-rim",
@@ -276,6 +300,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "emberclaw-bridge",
         "elimination",
         1,
+        [0, 255, 0],
       ),
       battle(
         "pit-descent",
@@ -285,6 +310,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "blackthorn-bridge",
         "breakthrough",
         2,
+        [0, 255, 0],
       ),
       battle(
         "pit-core",
@@ -294,6 +320,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "falcon-bridge",
         "survival",
         3,
+        [0, 255, 0],
         { targetRound: 9 },
       ),
     ],
@@ -303,10 +330,9 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
     id: "green-hell",
     name: "Green Hell",
     subtitle: "War Beneath the Canopy",
-    description:
-      "Dense forest turns every trail into an ambush.",
-    regionMap:
-      "/MedievalKingdoms/regions/green-hell.png",
+    description: "Dense forest turns every trail into an ambush.",
+    regionMap: "/MedievalKingdoms/regions/green-hell.png",
+    regionMask: "/MedievalKingdoms/maps/regions/green-hell-mask.png",
     battles: [
       battle(
         "green-edge",
@@ -316,6 +342,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "blackthorn-bridge",
         "elimination",
         1,
+        [0, 255, 0],
       ),
       battle(
         "green-shrine",
@@ -325,6 +352,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "emberclaw-bridge",
         "kingOfTheHill",
         2,
+        [0, 255, 0],
         { scoreToWin: 4 },
       ),
       battle(
@@ -335,6 +363,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "falcon-bridge",
         "boss",
         3,
+        [0, 255, 0],
       ),
     ],
   },
@@ -343,10 +372,9 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
     id: "sir-hongkong",
     name: "Sir Hongkong",
     subtitle: "The Vertical City",
-    description:
-      "A strange tower-city rises above roads cut into sheer stone.",
-    regionMap:
-      "/MedievalKingdoms/regions/sir-hongkong.png",
+    description: "A strange tower-city rises above roads cut into sheer stone.",
+    regionMap: "/MedievalKingdoms/regions/sir-hongkong.png",
+    regionMask: "/MedievalKingdoms/maps/regions/sir-hongkong-mask.png",
     battles: [
       battle(
         "hongkong-lower",
@@ -356,6 +384,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "falcon-bridge",
         "capture",
         1,
+        [0, 255, 0],
       ),
       battle(
         "hongkong-stairs",
@@ -365,6 +394,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "emberclaw-bridge",
         "breakthrough",
         2,
+        [0, 255, 0],
       ),
       battle(
         "hongkong-tower",
@@ -374,6 +404,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "blackthorn-bridge",
         "defense",
         3,
+        [0, 255, 0],
         { targetRound: 9 },
       ),
     ],
@@ -385,8 +416,8 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
     subtitle: "The Fractured Land",
     description:
       "The earth has split around a radiant rift and unstable crossings.",
-    regionMap:
-      "/MedievalKingdoms/regions/rifts-rising.png",
+    regionMap: "/MedievalKingdoms/regions/rifts-rising.png",
+    regionMask: "/MedievalKingdoms/maps/regions/rifts-rising-mask.png",
     battles: [
       battle(
         "rift-edge",
@@ -396,6 +427,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "blackthorn-bridge",
         "elimination",
         1,
+        [0, 255, 0],
       ),
       battle(
         "rift-crossing",
@@ -405,6 +437,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "falcon-bridge",
         "capture",
         2,
+        [0, 255, 0],
       ),
       battle(
         "rift-core",
@@ -414,6 +447,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "emberclaw-bridge",
         "survival",
         3,
+        [0, 255, 0],
         { targetRound: 10 },
       ),
     ],
@@ -425,8 +459,8 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
     subtitle: "Forges of War",
     description:
       "Fortified workshops and furnace roads form a brutal industrial front.",
-    regionMap:
-      "/MedievalKingdoms/regions/meltstone.png",
+    regionMap: "/MedievalKingdoms/regions/meltstone.png",
+    regionMask: "/MedievalKingdoms/maps/regions/meltstone-mask.png",
     battles: [
       battle(
         "melt-road",
@@ -436,6 +470,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "emberclaw-bridge",
         "elimination",
         1,
+        [0, 255, 0],
       ),
       battle(
         "melt-forge",
@@ -445,6 +480,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "blackthorn-bridge",
         "kingOfTheHill",
         2,
+        [0, 255, 0],
         { scoreToWin: 4 },
       ),
       battle(
@@ -455,6 +491,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "falcon-bridge",
         "capture",
         3,
+        [0, 255, 0],
       ),
     ],
   },
@@ -465,8 +502,8 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
     subtitle: "The Final Campaign",
     description:
       "The last campaign climbs toward the beacon at the eastern frontier.",
-    regionMap:
-      "/MedievalKingdoms/regions/first-light.png",
+    regionMap: "/MedievalKingdoms/regions/first-light.png",
+    regionMask: "/MedievalKingdoms/maps/regions/first-light-mask.png",
     battles: [
       battle(
         "light-approach",
@@ -476,6 +513,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "falcon-bridge",
         "breakthrough",
         1,
+        [0, 255, 0],
       ),
       battle(
         "light-beacon",
@@ -485,6 +523,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "blackthorn-bridge",
         "defense",
         2,
+        [0, 255, 0],
         { targetRound: 10 },
       ),
       battle(
@@ -495,6 +534,7 @@ export const CAMPAIGNS: Record<CampaignId, CampaignDefinition> = {
         "emberclaw-bridge",
         "boss",
         3,
+        [0, 255, 0],
       ),
     ],
   },
@@ -505,31 +545,18 @@ export function getCampaign(
 ): CampaignDefinition | null {
   if (!campaignId) return null;
 
-  return (
-    CAMPAIGNS[
-      campaignId as CampaignId
-    ] ?? null
-  );
+  return CAMPAIGNS[campaignId as CampaignId] ?? null;
 }
 
 export function getCampaignBattle(
   campaignId: string | undefined,
   battleNodeId: string | undefined,
 ): CampaignBattleNode | null {
-  const campaign =
-    getCampaign(
-      campaignId,
-    );
+  const campaign = getCampaign(campaignId);
 
   if (!campaign || !battleNodeId) {
     return null;
   }
 
-  return (
-    campaign.battles.find(
-      (node) =>
-        node.id ===
-        battleNodeId,
-    ) ?? null
-  );
+  return campaign.battles.find((node) => node.id === battleNodeId) ?? null;
 }

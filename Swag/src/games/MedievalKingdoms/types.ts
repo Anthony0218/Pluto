@@ -70,11 +70,16 @@ export type CampaignBattleNode = {
   id: string;
   name: string;
   description: string;
+
   position: Position;
+
   battleId: string;
   gameMode: GameMode;
-  gameModeConfig?: GameModeConfig;
   order: number;
+
+  maskColor: [number, number, number];
+
+  gameModeConfig?: GameModeConfig;
   optional?: boolean;
 };
 
@@ -83,7 +88,10 @@ export type CampaignDefinition = {
   name: string;
   subtitle: string;
   description: string;
-  regionMap?: string;
+
+  regionMap: string;
+  regionMask: string;
+
   battles: CampaignBattleNode[];
 };
 
@@ -96,6 +104,7 @@ export type CampaignProgress = {
 export type BattleModeState = {
   scores: Partial<Record<FactionId, number>>;
 };
+export type RegionId = "moonville" | "brickstone-fortress" | "one-eyed-oak";
 
 export type TerrainType =
   | "normal"
@@ -241,17 +250,24 @@ export type BattleState = {
 
 export type BattleDefinition = {
   id: string;
+  regionId: string;
+
   name: string;
   subtitle: string;
   lore: string;
+
   mapImage: string;
   terrainMask: string;
   mapAspectRatio: number;
+
   startingFaction: FactionId;
+
   maxRounds: number;
+
   objective: BattleObjective;
-  units: Unit[];
+
   objects: BattlefieldObject[];
+  units: Unit[];
 };
 
 export type AttackResult = {

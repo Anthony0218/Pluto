@@ -3,7 +3,11 @@ import { Gamepad2, Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../context/AuthContext";
-import type { Friend, FriendMessage, PresetMessageType } from "../../types/social";
+import type {
+  Friend,
+  FriendMessage,
+  PresetMessageType,
+} from "../../types/social";
 import FriendAvatar from "./FriendAvatar";
 
 type FriendChatProps = { friend: Friend };
@@ -27,13 +31,14 @@ export default function FriendChat({ friend }: FriendChatProps) {
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   const friendName =
-    friend.display_name ||
-    (friend.username ? `@${friend.username}` : "Friend");
+    friend.display_name || (friend.username ? `@${friend.username}` : "Friend");
 
   const orderedMessages = useMemo(
-    () => [...messages].sort((a, b) =>
-      new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-    ),
+    () =>
+      [...messages].sort(
+        (a, b) =>
+          new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+      ),
     [messages],
   );
 
@@ -45,9 +50,11 @@ export default function FriendChat({ friend }: FriendChatProps) {
       setLoading(true);
       const { data, error } = await supabase
         .from("friend_messages")
-        .select("id,sender_id,receiver_id,message_type,game,game_code,created_at")
+        .select(
+          "id,sender_id,receiver_id,message_type,game,game_code,created_at",
+        )
         .or(
-          `and(sender_id.eq.${user.id},receiver_id.eq.${friend.id}),and(sender_id.eq.${friend.id},receiver_id.eq.${user.id})`,
+          `and(sender_id.eq.${user?.id},receiver_id.eq.${friend.id}),and(sender_id.eq.${friend.id},receiver_id.eq.${user?.id})`,
         )
         .order("created_at", { ascending: true });
 
@@ -68,8 +75,10 @@ export default function FriendChat({ friend }: FriendChatProps) {
         (payload) => {
           const message = payload.new as FriendMessage;
           const belongs =
-            (message.sender_id === user.id && message.receiver_id === friend.id) ||
-            (message.sender_id === friend.id && message.receiver_id === user.id);
+            (message.sender_id === user.id &&
+              message.receiver_id === friend.id) ||
+            (message.sender_id === friend.id &&
+              message.receiver_id === user.id);
 
           if (!belongs) return;
 
@@ -191,14 +200,19 @@ export default function FriendChat({ friend }: FriendChatProps) {
           <div className="flex h-full min-h-56 items-center justify-center text-center">
             <div>
               <p className="font-semibold text-zinc-300">No messages yet</p>
-              <p className="mt-1 text-sm text-zinc-500">Say Hey or send a game invite.</p>
+              <p className="mt-1 text-sm text-zinc-500">
+                Say Hey or send a game invite.
+              </p>
             </div>
           </div>
         ) : (
           orderedMessages.map((message) => {
             const mine = message.sender_id === user?.id;
             return (
-              <div key={message.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+              <div
+                key={message.id}
+                className={`flex ${mine ? "justify-end" : "justify-start"}`}
+              >
                 <div
                   className={`max-w-[78%] rounded-2xl px-4 py-3 text-sm ${
                     mine
@@ -217,10 +231,34 @@ export default function FriendChat({ friend }: FriendChatProps) {
 
       <div className="border-t border-white/10 p-4">
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          <button disabled={sending} onClick={() => void sendPreset("hey")} className="rounded-xl border border-white/10 bg-zinc-800 px-3 py-2.5 text-sm font-semibold text-zinc-200 hover:bg-zinc-700 disabled:opacity-50">👋 Hey</button>
-          <button disabled={sending} onClick={() => void sendPreset("play")} className="rounded-xl border border-white/10 bg-zinc-800 px-3 py-2.5 text-sm font-semibold text-zinc-200 hover:bg-zinc-700 disabled:opacity-50">🎮 Play?</button>
-          <button disabled={sending} onClick={() => void sendPreset("yes")} className="rounded-xl border border-white/10 bg-zinc-800 px-3 py-2.5 text-sm font-semibold text-zinc-200 hover:bg-zinc-700 disabled:opacity-50">✅ Yes</button>
-          <button disabled={sending} onClick={() => void sendPreset("no")} className="rounded-xl border border-white/10 bg-zinc-800 px-3 py-2.5 text-sm font-semibold text-zinc-200 hover:bg-zinc-700 disabled:opacity-50">❌ No</button>
+          <button
+            disabled={sending}
+            onClick={() => void sendPreset("hey")}
+            className="rounded-xl border border-white/10 bg-zinc-800 px-3 py-2.5 text-sm font-semibold text-zinc-200 hover:bg-zinc-700 disabled:opacity-50"
+          >
+            👋 Hey
+          </button>
+          <button
+            disabled={sending}
+            onClick={() => void sendPreset("play")}
+            className="rounded-xl border border-white/10 bg-zinc-800 px-3 py-2.5 text-sm font-semibold text-zinc-200 hover:bg-zinc-700 disabled:opacity-50"
+          >
+            🎮 Play?
+          </button>
+          <button
+            disabled={sending}
+            onClick={() => void sendPreset("yes")}
+            className="rounded-xl border border-white/10 bg-zinc-800 px-3 py-2.5 text-sm font-semibold text-zinc-200 hover:bg-zinc-700 disabled:opacity-50"
+          >
+            ✅ Yes
+          </button>
+          <button
+            disabled={sending}
+            onClick={() => void sendPreset("no")}
+            className="rounded-xl border border-white/10 bg-zinc-800 px-3 py-2.5 text-sm font-semibold text-zinc-200 hover:bg-zinc-700 disabled:opacity-50"
+          >
+            ❌ No
+          </button>
         </div>
 
         <button
@@ -236,7 +274,9 @@ export default function FriendChat({ friend }: FriendChatProps) {
             <div className="grid gap-2 sm:grid-cols-[140px_1fr_auto]">
               <select
                 value={inviteGame}
-                onChange={(event) => setInviteGame(event.target.value as "chess" | "watten")}
+                onChange={(event) =>
+                  setInviteGame(event.target.value as "chess" | "watten")
+                }
                 className="rounded-xl border border-white/10 bg-zinc-950 px-3 py-2.5 text-sm text-white outline-none"
               >
                 <option value="chess">Chess</option>
@@ -245,7 +285,9 @@ export default function FriendChat({ friend }: FriendChatProps) {
 
               <input
                 value={gameCode}
-                onChange={(event) => setGameCode(event.target.value.toUpperCase())}
+                onChange={(event) =>
+                  setGameCode(event.target.value.toUpperCase())
+                }
                 maxLength={20}
                 placeholder="Room code"
                 className="rounded-xl border border-white/10 bg-zinc-950 px-3 py-2.5 font-mono text-sm uppercase text-white outline-none focus:border-sky-400/50"
@@ -253,7 +295,10 @@ export default function FriendChat({ friend }: FriendChatProps) {
 
               <button
                 type="button"
-                disabled={sending || !/^[A-Z0-9_-]{3,20}$/.test(gameCode.trim().toUpperCase())}
+                disabled={
+                  sending ||
+                  !/^[A-Z0-9_-]{3,20}$/.test(gameCode.trim().toUpperCase())
+                }
                 onClick={() => void sendGameInvite()}
                 className="rounded-xl bg-sky-500 px-4 py-2.5 text-sm font-bold text-white hover:bg-sky-400 disabled:opacity-40"
               >
