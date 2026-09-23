@@ -83,6 +83,7 @@ function RulesBox({ scenario, mode }: { scenario: Scenario; mode: PlayMode }) {
 /** Import this page in Pluto's existing router. No new dependencies are required. */
 export default function NaturaMenu() {
   const [match, setMatch] = useState<Match>(freshMatch);
+  const [gameRulesOpen, setGameRulesOpen] = useState(false);
   const scenario = SCENARIOS.find((s) => s.id === match.selected)!;
   const q = scenario.questions[match.question + (match.turn === 1 ? 3 : 0)];
   const finishGame = useCallback((result: GameResult) => {
@@ -189,11 +190,13 @@ export default function NaturaMenu() {
         </div>
         {match.stage === "menu" && (
           <main className="natura-panel">
-            <p className="natura-eyebrow">FOUR HABITATS · FOUR WAYS TO PLAY</p>
+            <p className="natura-eyebrow">
+              {SCENARIOS.length} HABITATS · {SCENARIOS.length} WAYS TO PLAY
+            </p>
             <h1>Life in the wild.</h1>
             <p>
-              Chase, bluff, build and listen. Discover an animal behaviour in
-              every round.
+              Chase, bluff, build, listen and aim. Discover an animal behaviour
+              in every round.
             </p>
             <div className="natura-cards">
               {SCENARIOS.map((s) => (
@@ -222,7 +225,8 @@ export default function NaturaMenu() {
                   setMatch((prev) => ({ ...prev, mode: "hotseat" }))
                 }
               >
-                Hotseat<small>Two players on one device</small>
+                Local two players
+                <small>One device · shared controls or private turns</small>
               </button>
               <button
                 disabled={match.round > 1}
@@ -269,7 +273,10 @@ export default function NaturaMenu() {
             )}
             <button
               className="natura-primary"
-              onClick={() => setMatch((prev) => ({ ...prev, stage: "game" }))}
+              onClick={() => {
+                setGameRulesOpen(false);
+                setMatch((prev) => ({ ...prev, stage: "game" }));
+              }}
             >
               Ready — start game →
             </button>
@@ -283,7 +290,10 @@ export default function NaturaMenu() {
         )}
         {match.stage === "game" && (
           <main>
-            <details className="natura-game-help">
+            <details
+              className="natura-game-help"
+              onToggle={(event) => setGameRulesOpen(event.currentTarget.open)}
+            >
               <summary>Animal behaviour & rules</summary>
               <AnimalBox scenario={scenario} />
               <RulesBox scenario={scenario} mode={match.mode} />
@@ -293,6 +303,7 @@ export default function NaturaMenu() {
               scenario={match.selected}
               mode={match.mode}
               round={match.round}
+              rulesOpen={gameRulesOpen}
               onComplete={finishGame}
             />
           </main>
