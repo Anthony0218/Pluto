@@ -41,7 +41,7 @@ const uiText = {
     wattenMultiplayer: "Watten Multiplayer",
     wattenMultiplayerText:
       "Erstelle eine Partie oder tritt einer bestehenden Watten-Runde bei.",
-    chessMultiplayer: "{t.chessMultiplayer}",
+    chessMultiplayer: "Schach Multiplayer",
     chessMultiplayerText:
       "Erstelle eine Partie oder tritt einer bestehenden Schachpartie bei.",
     playNow: "Jetzt spielen →",
