@@ -392,10 +392,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
   }, [gameState?.initial_fen, gameState?.moves]);
 
   useEffect(() => {
-    if (
-      historyPreviewPly !== null &&
-      historyPreviewPly > historyRows.length
-    ) {
+    if (historyPreviewPly !== null && historyPreviewPly > historyRows.length) {
       setHistoryPreviewPly(null);
     }
   }, [historyPreviewPly, historyRows.length]);
@@ -434,7 +431,12 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
     }
 
     return null;
-  }, [gameState?.last_move_from, gameState?.last_move_to, historyPreviewPly, historyRows]);
+  }, [
+    gameState?.last_move_from,
+    gameState?.last_move_to,
+    historyPreviewPly,
+    historyRows,
+  ]);
 
   const checkedKingSquare = findCheckedKing(displayedGame);
 
@@ -493,7 +495,11 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
         : false;
 
   const randomStartMeta: RandomStartPosition | null = useMemo(() => {
-    if (variant !== "randomstart" || gameState?.seed === null || gameState?.seed === undefined) {
+    if (
+      variant !== "randomstart" ||
+      gameState?.seed === null ||
+      gameState?.seed === undefined
+    ) {
       return null;
     }
 
@@ -501,7 +507,11 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
   }, [variant, gameState?.seed]);
 
   const chaosMeta: TotalChaosPosition | null = useMemo(() => {
-    if (variant !== "complete-chaos" || gameState?.seed === null || gameState?.seed === undefined) {
+    if (
+      variant !== "complete-chaos" ||
+      gameState?.seed === null ||
+      gameState?.seed === undefined
+    ) {
       return null;
     }
 
@@ -535,10 +545,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
       setPendingPromotion(null);
     }
 
-    if (
-      updated.initial_fen &&
-      nextMoveCount > lastSeenMoveCountRef.current
-    ) {
+    if (updated.initial_fen && nextMoveCount > lastSeenMoveCountRef.current) {
       playLatestMoveSound(updated.initial_fen, updated.moves);
     }
 
@@ -735,12 +742,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
     to: Square,
     promotion?: PromotionPiece,
   ) {
-    if (
-      !room ||
-      !gameState ||
-      !gameState.initial_fen ||
-      !canMove
-    ) {
+    if (!room || !gameState || !gameState.initial_fen || !canMove) {
       return;
     }
 
@@ -786,22 +788,19 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
     setMoving(true);
     setError(null);
 
-    const { error: moveError } = await supabase.rpc(
-      "play_variant_chess_move",
-      {
-        p_room_id: room.id,
-        p_expected_variant: variant,
-        p_from: move.from,
-        p_to: move.to,
-        p_move_san: move.san,
-        p_new_fen: localGame.fen(),
-        /* Server still has the pre-optimistic version. */
-        p_expected_version: previousGameState.version,
-        p_is_finished: outcome.finished,
-        p_winner: outcome.winner,
-        p_end_reason: outcome.reason,
-      },
-    );
+    const { error: moveError } = await supabase.rpc("play_variant_chess_move", {
+      p_room_id: room.id,
+      p_expected_variant: variant,
+      p_from: move.from,
+      p_to: move.to,
+      p_move_san: move.san,
+      p_new_fen: localGame.fen(),
+      /* Server still has the pre-optimistic version. */
+      p_expected_version: previousGameState.version,
+      p_is_finished: outcome.finished,
+      p_winner: outcome.winner,
+      p_end_reason: outcome.reason,
+    });
 
     setMoving(false);
 
@@ -870,7 +869,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
       previousFen:
         gameState.moves.length === 1
           ? gameState.initial_fen
-          : previousMove?.fenAfter ?? gameState.initial_fen,
+          : (previousMove?.fenAfter ?? gameState.initial_fen),
       previousLastFrom: previousMove?.from ?? null,
       previousLastTo: previousMove?.to ?? null,
     };
@@ -1024,7 +1023,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
 
   if (!user) {
     return (
-      <main className="min-h-screen bg-zinc-950 px-4 py-8 text-zinc-100">
+      <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100">
         <div className="mx-auto max-w-2xl rounded-3xl border border-amber-400/20 bg-amber-400/[0.06] p-6">
           Sign in to open this multiplayer room.
         </div>
@@ -1034,7 +1033,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
 
   if (loading && !gameState) {
     return (
-      <main className="min-h-screen bg-zinc-950 px-4 py-8 text-zinc-100">
+      <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100">
         <div className="mx-auto max-w-2xl rounded-3xl border border-white/10 bg-zinc-900/70 p-6 text-center">
           Loading multiplayer room...
         </div>
@@ -1044,7 +1043,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
 
   if (!room || !gameState) {
     return (
-      <main className="min-h-screen bg-zinc-950 px-4 py-8 text-zinc-100">
+      <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100">
         <div className="mx-auto max-w-2xl rounded-3xl border border-red-400/20 bg-red-400/[0.06] p-6">
           <p className="font-black text-red-200">
             {error ?? "Room could not be loaded."}
@@ -1075,15 +1074,19 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
           : "Opponent's turn";
 
   const whiteLineup = randomStartMeta
-    ? randomStartMeta.whiteBackRank.map((piece) => piece.toUpperCase()).join(" ")
+    ? randomStartMeta.whiteBackRank
+        .map((piece) => piece.toUpperCase())
+        .join(" ")
     : "—";
 
   const blackLineup = randomStartMeta
-    ? randomStartMeta.blackBackRank.map((piece) => piece.toUpperCase()).join(" ")
+    ? randomStartMeta.blackBackRank
+        .map((piece) => piece.toUpperCase())
+        .join(" ")
     : "—";
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-4 py-6 text-zinc-100 sm:px-6">
+    <main className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1460px]">
         <header
           className={`mb-6 rounded-3xl border ${page.accentBorder} bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20`}
@@ -1151,7 +1154,8 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                       >
                         <div className="min-w-0">
                           <p className="truncate text-sm font-black text-zinc-200">
-                            {player.display_name}{mine ? " · You" : ""}
+                            {player.display_name}
+                            {mine ? " · You" : ""}
                           </p>
                           <p className="mt-0.5 text-[10px] font-black uppercase tracking-wider text-zinc-600">
                             {player.chosen_color ?? "Waiting"}
@@ -1164,7 +1168,6 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                     );
                   })}
                 </div>
-
               </Panel>
 
               <Panel title="Game Controls" subtitle="Players and actions">
@@ -1245,18 +1248,28 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
               </Panel>
 
               {variant === "randomstart" ? (
-                <Panel title="Starting Position" subtitle="This game's independent shuffle">
+                <Panel
+                  title="Starting Position"
+                  subtitle="This game's independent shuffle"
+                >
                   <Lineup title="White back rank" value={whiteLineup} />
                   <div className="mt-3">
                     <Lineup title="Black back rank" value={blackLineup} />
                   </div>
                   <p className="mt-3 text-[10px] leading-5 text-zinc-600">
-                    The two back ranks are shuffled separately, so Black is not a reflection of White.
+                    The two back ranks are shuffled separately, so Black is not
+                    a reflection of White.
                   </p>
                 </Panel>
               ) : (
-                <Panel title="Chaos Setup" subtitle="The opening book is useless">
-                  <InfoRow label="Chaos seed" value={String(gameState.seed ?? "—")} />
+                <Panel
+                  title="Chaos Setup"
+                  subtitle="The opening book is useless"
+                >
+                  <InfoRow
+                    label="Chaos seed"
+                    value={String(gameState.seed ?? "—")}
+                  />
                   <InfoRow
                     label="Orthodox matches"
                     value={String(chaosMeta?.orthodoxMatches ?? "—")}
@@ -1291,7 +1304,9 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                     {historyPreviewPly === 0
                       ? "Starting position"
                       : `${historyRows[historyPreviewPly - 1]?.moveNumber}${
-                          historyRows[historyPreviewPly - 1]?.color === "w" ? "." : "..."
+                          historyRows[historyPreviewPly - 1]?.color === "w"
+                            ? "."
+                            : "..."
                         } ${historyRows[historyPreviewPly - 1]?.san ?? ""}`}
                   </p>
                 </div>
@@ -1340,7 +1355,8 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                     </h2>
 
                     <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">
-                      Share this room code. The game starts automatically when everyone has joined.
+                      Share this room code. The game starts automatically when
+                      everyone has joined.
                     </p>
 
                     <div className="mt-6 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-5 py-5">
@@ -1401,7 +1417,9 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                     )}
 
                     {opponentRematchReady && !myRematchReady && (
-                      <p className={`mt-3 text-xs font-semibold ${page.accentText}`}>
+                      <p
+                        className={`mt-3 text-xs font-semibold ${page.accentText}`}
+                      >
                         Opponent wants a rematch.
                       </p>
                     )}
@@ -1420,7 +1438,10 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
 
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              <Panel title="Move History" subtitle={`${historyRows.length} plies · click to preview`}>
+              <Panel
+                title="Move History"
+                subtitle={`${historyRows.length} plies · click to preview`}
+              >
                 <div className="max-h-[380px] overflow-y-auto rounded-xl border border-white/5 bg-black/20">
                   <button
                     type="button"
@@ -1464,7 +1485,10 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                                 clearSelection();
                               }}
                               onKeyDown={(event) => {
-                                if (event.key === "Enter" || event.key === " ") {
+                                if (
+                                  event.key === "Enter" ||
+                                  event.key === " "
+                                ) {
                                   setHistoryPreviewPly(row.ply);
                                   clearSelection();
                                 }
@@ -1476,7 +1500,8 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                               }`}
                             >
                               <td className="px-3 py-2.5 text-[10px] text-zinc-600">
-                                {row.moveNumber}{row.color === "w" ? "." : "..."}
+                                {row.moveNumber}
+                                {row.color === "w" ? "." : "..."}
                               </td>
                               <td className="px-2 py-2.5 text-lg">
                                 {row.color === "w" ? "♔" : "♚"}
@@ -1494,7 +1519,8 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
 
                 {historyPreviewPly !== null && (
                   <p className="mt-2 text-[10px] leading-4 text-zinc-600">
-                    Preview is local only. It never changes the multiplayer game state.
+                    Preview is local only. It never changes the multiplayer game
+                    state.
                   </p>
                 )}
               </Panel>
@@ -1502,21 +1528,45 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
               {variant === "randomstart" ? (
                 <Panel title="Random Start" subtitle="Random setup only">
                   <div className="space-y-2">
-                    <RuleLine icon="8" text="Each side keeps the normal set of 8 back-rank pieces." />
-                    <RuleLine icon="↯" text="White and Black are shuffled independently." />
+                    <RuleLine
+                      icon="8"
+                      text="Each side keeps the normal set of 8 back-rank pieces."
+                    />
+                    <RuleLine
+                      icon="↯"
+                      text="White and Black are shuffled independently."
+                    />
                     <RuleLine icon="♙" text="Pawns remain on ranks 2 and 7." />
-                    <RuleLine icon="♖" text="Castling is disabled for the entire game." />
-                    <RuleLine icon="✓" text="After setup, normal chess rules apply." />
+                    <RuleLine
+                      icon="♖"
+                      text="Castling is disabled for the entire game."
+                    />
+                    <RuleLine
+                      icon="✓"
+                      text="After setup, normal chess rules apply."
+                    />
                   </div>
                 </Panel>
               ) : (
                 <Panel title="Total Chaos" subtitle="Full-board random setup">
                   <div className="space-y-2">
-                    <RuleLine icon="32" text="The normal 32 pieces are scattered across the full board." />
-                    <RuleLine icon="♔" text="Kings never begin in check and never begin adjacent." />
-                    <RuleLine icon="♙" text="Pawns may begin anywhere except ranks 1 and 8." />
+                    <RuleLine
+                      icon="32"
+                      text="The normal 32 pieces are scattered across the full board."
+                    />
+                    <RuleLine
+                      icon="♔"
+                      text="Kings never begin in check and never begin adjacent."
+                    />
+                    <RuleLine
+                      icon="♙"
+                      text="Pawns may begin anywhere except ranks 1 and 8."
+                    />
                     <RuleLine icon="♖" text="Castling is disabled." />
-                    <RuleLine icon="✓" text="After setup, normal chess rules apply." />
+                    <RuleLine
+                      icon="✓"
+                      text="After setup, normal chess rules apply."
+                    />
                   </div>
                 </Panel>
               )}

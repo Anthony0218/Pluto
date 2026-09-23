@@ -64,7 +64,7 @@ export default function Auth() {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-zinc-950 px-4 py-8 text-zinc-100 sm:px-6">
+    <main className="relative min-h-screen overflow-hidden bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-[-10%] top-[-10%] h-[420px] w-[420px] rounded-full bg-emerald-400/[0.08] blur-3xl" />
         <div className="absolute bottom-[-15%] right-[-10%] h-[460px] w-[460px] rounded-full bg-amber-300/[0.06] blur-3xl" />

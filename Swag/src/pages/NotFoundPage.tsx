@@ -4,7 +4,7 @@ export default function NotFoundPage() {
   const navigate = useNavigate();
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-5 py-8 text-zinc-100 sm:px-8">
+    <main className="min-h-screen bg-transparent px-5 py-8 text-zinc-100 sm:px-8">
       <div className="flex min-h-[80vh] items-center justify-center">
         <div
           className="

@@ -607,7 +607,7 @@ export default function TotalChaosChess({
       : t("The game ended in a draw.");
 
   return (
-    <div className="min-h-screen bg-zinc-950 px-4 py-6 text-zinc-100 sm:px-6">
+    <div className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1460px]">
         <header className="mb-6 rounded-3xl border border-pink-400/10 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">

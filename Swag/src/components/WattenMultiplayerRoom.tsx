@@ -480,7 +480,7 @@ export default function WattenMultiplayerRoom() {
 
   if (!user) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-emerald-950 text-white">
+      <main className="flex min-h-screen items-center justify-center bg-transparent text-white">
         <p>{l("Bitte zuerst einloggen.", "Please sign in first.")}</p>
       </main>
     );
@@ -488,7 +488,7 @@ export default function WattenMultiplayerRoom() {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-emerald-950 text-white">
+      <main className="flex min-h-screen items-center justify-center bg-transparent text-white">
         <div className="text-center">
           <div className="mx-auto h-9 w-9 animate-spin rounded-full border-4 border-white/15 border-t-amber-300" />
 
@@ -502,7 +502,7 @@ export default function WattenMultiplayerRoom() {
 
   if (error && !room) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-emerald-950 px-6 text-white">
+      <main className="flex min-h-screen items-center justify-center bg-transparent px-6 text-white">
         <div className="text-center">
           <p className="text-red-300">{error}</p>
 
@@ -523,7 +523,7 @@ export default function WattenMultiplayerRoom() {
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#164e3d_0%,#052e27_35%,#07110e_100%)] px-4 py-8 text-white sm:px-6">
+    <main className="min-h-screen bg-transparent px-4 py-8 text-white sm:px-6">
       <div className="mx-auto max-w-5xl">
         {/* HEADER */}
 

@@ -3,7 +3,7 @@ import { gameList } from "./HomePage";
 
 export default function GamesPage() {
   return (
-    <main className="min-h-screen bg-zinc-950 px-4 py-10 text-white sm:px-6">
+    <main className="min-h-screen bg-transparent px-4 py-10 text-white sm:px-6">
       <div className="mx-auto max-w-7xl">
         {/* HEADER */}
         <div className="mb-10">
@@ -62,28 +62,37 @@ export default function GamesPage() {
 
                 <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent" />
 
-                {/* CATEGORY */}
-                <span
-                  className="
-                    absolute
-                    left-4
-                    top-4
-                    rounded-full
-                    border
-                    border-white/10
-                    bg-black/60
-                    px-3
-                    py-1
-                    text-[10px]
-                    font-black
-                    uppercase
-                    tracking-wider
-                    text-amber-300
-                    backdrop-blur-md
-                  "
-                >
-                  {game.category}
-                </span>
+                {/* CATEGORY + STATUS */}
+                <div className="absolute left-4 top-4 flex flex-wrap gap-2">
+                  <span
+                    className="
+                      rounded-full
+                      border
+                      border-white/10
+                      bg-black/60
+                      px-3
+                      py-1
+                      text-[10px]
+                      font-black
+                      uppercase
+                      tracking-wider
+                      text-amber-300
+                      backdrop-blur-md
+                    "
+                  >
+                    {game.category}
+                  </span>
+
+                  <span
+                    className={`rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-wider backdrop-blur-md ${
+                      game.finished
+                        ? "border-emerald-400/25 bg-emerald-400/15 text-emerald-200"
+                        : "border-amber-400/25 bg-amber-400/15 text-amber-200"
+                    }`}
+                  >
+                    {game.finished ? "Fertig" : "In Entwicklung"}
+                  </span>
+                </div>
               </div>
 
               {/* CONTENT */}

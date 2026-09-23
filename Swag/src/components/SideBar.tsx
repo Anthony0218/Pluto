@@ -1,12 +1,4 @@
-import {
-  BarChart3,
-  Gamepad2,
-  Home,
-  Settings,
-  Trophy,
-  Users,
-  LogOut,
-} from "lucide-react";
+import { BarChart3, Home, Settings, Trophy, Users, LogOut } from "lucide-react";
 
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -25,7 +17,7 @@ const navigation = [
   {
     label: "Games",
     href: "/games",
-    icon: Gamepad2,
+    icon: Trophy,
   },
   {
     label: "Chess",
@@ -62,17 +54,20 @@ export default function SideBar() {
     <aside className="flex min-h-screen w-64 flex-col border-r border-zinc-200 bg-white">
       <div className="flex h-16 items-center border-b border-zinc-200 px-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-white">
-            <Gamepad2 size={20} />
+          <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-indigo-600">
+            <img
+              src="/pluto-icon.png"
+              alt="Pluto icon"
+              className="h-full w-full object-cover"
+            />
           </div>
 
           <span className="text-lg font-bold tracking-tight text-zinc-900">
-            Swag
+            Pluto
           </span>
         </div>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 space-y-1 px-3 py-5">
         <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
           Navigation

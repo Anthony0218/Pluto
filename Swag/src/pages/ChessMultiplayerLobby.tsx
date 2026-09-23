@@ -87,7 +87,7 @@ export default function ChessMultiplayerLobby() {
 
   if (!user) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-zinc-950 px-6 text-white">
+      <main className="flex min-h-screen items-center justify-center bg-transparent px-6 text-white">
         <div className="text-center">
           <h1 className="text-3xl font-black">Chess Multiplayer</h1>
 
@@ -111,7 +111,7 @@ export default function ChessMultiplayerLobby() {
     <main
       className="
         min-h-screen
-        bg-[radial-gradient(circle_at_top,#21170f_0%,#111111_38%,#090909_100%)]
+       bg-transparent
         px-6
         py-10
         text-white

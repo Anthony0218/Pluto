@@ -1,12 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-type Language =
-  | "en"
-  | "de"
-  | "bar"
-  | "ko"
-  | "ru";
+type Language = "en" | "de" | "bar" | "ko" | "ru";
 
 type MiniSquare = {
   piece?: string;
@@ -29,10 +24,7 @@ const languageOptions: Array<{
   { value: "ru", label: "Русский" },
 ];
 
-const translations: Record<
-  Exclude<Language, "en">,
-  Record<string, string>
-> = {
+const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
   de: {
     "Chess Variant VI": "Schachvariante VI",
     "Draft Chess": "Draft-Schach",
@@ -279,39 +271,23 @@ function getInitialLanguage(): Language {
     return "en";
   }
 
-  const stored =
-    window.localStorage.getItem(
-      "chess-language",
-    );
+  const stored = window.localStorage.getItem("chess-language");
 
-  return languageOptions.some(
-    (option) =>
-      option.value === stored,
-  )
+  return languageOptions.some((option) => option.value === stored)
     ? (stored as Language)
     : "en";
 }
 
-function t(
-  language: Language,
-  key: string,
-): string {
+function t(language: Language, key: string): string {
   if (language === "en") {
     return key;
   }
 
   if (language === "bar") {
-    return (
-      translations.bar[key] ??
-      translations.de[key] ??
-      key
-    );
+    return translations.bar[key] ?? translations.de[key] ?? key;
   }
 
-  return (
-    translations[language][key] ??
-    key
-  );
+  return translations[language][key] ?? key;
 }
 
 const whiteSetupExample: MiniBoardState = {
@@ -389,71 +365,43 @@ const budgetExample: MiniBoardState = {
 };
 
 export default function DraftChessRules() {
-  const [language, setLanguage] =
-    useState<Language>(
-      getInitialLanguage,
-    );
+  const [language, setLanguage] = useState<Language>(getInitialLanguage);
 
-  function changeLanguage(
-    nextLanguage: Language,
-  ) {
+  function changeLanguage(nextLanguage: Language) {
     setLanguage(nextLanguage);
 
-    if (
-      typeof window !== "undefined"
-    ) {
-      window.localStorage.setItem(
-        "chess-language",
-        nextLanguage,
-      );
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("chess-language", nextLanguage);
     }
   }
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-4 py-6 text-zinc-100 sm:px-6">
+    <main className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-5xl">
         <header className="mb-6 rounded-3xl border border-emerald-400/15 bg-zinc-900/75 p-6 shadow-xl shadow-black/20">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-300">
-                {t(
-                  language,
-                  "Chess Variant VI",
-                )}
+                {t(language, "Chess Variant VI")}
               </p>
 
               <h1 className="mt-2 text-3xl font-black text-white">
-                {t(
-                  language,
-                  "Draft Chess",
-                )}
+                {t(language, "Draft Chess")}
               </h1>
 
               <p className="mt-2 text-sm text-zinc-500">
-                {t(
-                  language,
-                  "Rules & Examples",
-                )}
+                {t(language, "Rules & Examples")}
               </p>
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <LanguageSelector
-                language={language}
-                onChange={
-                  changeLanguage
-                }
-              />
+              <LanguageSelector language={language} onChange={changeLanguage} />
 
               <Link
                 to="/games/chess/variants/draft/hotseat"
                 className="inline-flex rounded-full border border-emerald-400/15 bg-emerald-400/[0.07] px-4 py-2 text-xs font-black text-emerald-200 transition hover:bg-emerald-400/[0.13]"
               >
-                ←{" "}
-                {t(
-                  language,
-                  "Back to Draft Chess",
-                )}
+                ← {t(language, "Back to Draft Chess")}
               </Link>
             </div>
           </div>
@@ -467,10 +415,7 @@ export default function DraftChessRules() {
 
             <div>
               <h2 className="font-black text-emerald-100">
-                {t(
-                  language,
-                  "Core idea",
-                )}
+                {t(language, "Core idea")}
               </h2>
 
               <p className="mt-2 text-sm leading-7 text-zinc-400">
@@ -493,36 +438,24 @@ export default function DraftChessRules() {
         <section className="mb-6 rounded-2xl border border-white/5 bg-zinc-900/55 px-4 py-3">
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
             <span className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-600">
-              {t(
-                language,
-                "Board legend",
-              )}
+              {t(language, "Board legend")}
             </span>
 
             <LegendItem
               sample=""
-              label={t(
-                language,
-                "Allowed setup square",
-              )}
+              label={t(language, "Allowed setup square")}
               className="border-emerald-400/20 bg-emerald-400/15 text-emerald-200"
             />
 
             <LegendItem
               sample="♔"
-              label={t(
-                language,
-                "King must be here",
-              )}
+              label={t(language, "King must be here")}
               className="border-amber-400/20 bg-amber-400/10 text-amber-200"
             />
 
             <LegendItem
               sample="×"
-              label={t(
-                language,
-                "Not available in setup",
-              )}
+              label={t(language, "Not available in setup")}
               className="border-zinc-600/30 bg-zinc-900 text-zinc-600"
             />
           </div>
@@ -530,77 +463,26 @@ export default function DraftChessRules() {
 
         <section className="mb-5 rounded-3xl border border-white/10 bg-zinc-900/70 p-5">
           <h2 className="font-black text-white">
-            {t(
-              language,
-              "Piece costs",
-            )}
+            {t(language, "Piece costs")}
           </h2>
 
           <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
-            <CostCard
-              symbol="♙"
-              name={t(
-                language,
-                "Pawn",
-              )}
-              cost={1}
-            />
+            <CostCard symbol="♙" name={t(language, "Pawn")} cost={1} />
 
-            <CostCard
-              symbol="♘"
-              name={t(
-                language,
-                "Knight",
-              )}
-              cost={3}
-            />
+            <CostCard symbol="♘" name={t(language, "Knight")} cost={3} />
 
-            <CostCard
-              symbol="♗"
-              name={t(
-                language,
-                "Bishop",
-              )}
-              cost={3}
-            />
+            <CostCard symbol="♗" name={t(language, "Bishop")} cost={3} />
 
-            <CostCard
-              symbol="♖"
-              name={t(
-                language,
-                "Rook",
-              )}
-              cost={5}
-            />
+            <CostCard symbol="♖" name={t(language, "Rook")} cost={5} />
 
-            <CostCard
-              symbol="♕"
-              name={t(
-                language,
-                "Queen",
-              )}
-              cost={9}
-            />
+            <CostCard symbol="♕" name={t(language, "Queen")} cost={9} />
 
-            <CostCard
-              symbol="♔"
-              name={t(
-                language,
-                "King",
-              )}
-              cost={0}
-            />
+            <CostCard symbol="♔" name={t(language, "King")} cost={0} />
           </div>
         </section>
 
         <div className="space-y-5">
-          <RuleCard
-            number="1"
-            title={t(
-              language,
-              "1. Setup zones",
-            )}
-          >
+          <RuleCard number="1" title={t(language, "1. Setup zones")}>
             {t(
               language,
               "White may place pieces only on ranks 1–2. Black may place pieces only on ranks 7–8.",
@@ -608,55 +490,23 @@ export default function DraftChessRules() {
           </RuleCard>
 
           <section className="grid gap-5 md:grid-cols-2">
-            <VisualBoardCard
-              title={t(
-                language,
-                "White setup zone",
-              )}
-            >
-              <MiniBoard
-                board={
-                  whiteSetupExample
-                }
-                setupSide="w"
-              />
+            <VisualBoardCard title={t(language, "White setup zone")}>
+              <MiniBoard board={whiteSetupExample} setupSide="w" />
             </VisualBoardCard>
 
-            <VisualBoardCard
-              title={t(
-                language,
-                "Black setup zone",
-              )}
-            >
-              <MiniBoard
-                board={
-                  blackSetupExample
-                }
-                setupSide="b"
-              />
+            <VisualBoardCard title={t(language, "Black setup zone")}>
+              <MiniBoard board={blackSetupExample} setupSide="b" />
             </VisualBoardCard>
           </section>
 
-          <RuleCard
-            number="2"
-            title={t(
-              language,
-              "2. King restriction",
-            )}
-          >
+          <RuleCard number="2" title={t(language, "2. King restriction")}>
             {t(
               language,
               "Each side must have exactly one King. White's King must be on rank 1; Black's King must be on rank 8.",
             )}
           </RuleCard>
 
-          <RuleCard
-            number="3"
-            title={t(
-              language,
-              "3. Budget",
-            )}
-          >
+          <RuleCard number="3" title={t(language, "3. Budget")}>
             {t(
               language,
               "You may spend up to 39 points. You do not need to spend all 39.",
@@ -664,43 +514,20 @@ export default function DraftChessRules() {
           </RuleCard>
 
           <VisualBoardCard
-            title={t(
-              language,
-              "Budget example",
-            )}
-            text={t(
-              language,
-              "This sample army uses 39 points exactly.",
-            )}
+            title={t(language, "Budget example")}
+            text={t(language, "This sample army uses 39 points exactly.")}
           >
-            <MiniBoard
-              board={
-                budgetExample
-              }
-              setupSide="w"
-            />
+            <MiniBoard board={budgetExample} setupSide="w" />
           </VisualBoardCard>
 
-          <RuleCard
-            number="4"
-            title={t(
-              language,
-              "4. Piece quantities",
-            )}
-          >
+          <RuleCard number="4" title={t(language, "4. Piece quantities")}>
             {t(
               language,
               "There is no fixed maximum number of Pawns, Knights, Bishops, Rooks or Queens. Your budget and the 16 available setup squares are the limits.",
             )}
           </RuleCard>
 
-          <RuleCard
-            number="5"
-            title={t(
-              language,
-              "5. Private Hotseat setup",
-            )}
-          >
+          <RuleCard number="5" title={t(language, "5. Private Hotseat setup")}>
             <p>
               {t(
                 language,
@@ -708,33 +535,17 @@ export default function DraftChessRules() {
               )}
             </p>
 
-            <PrivateSetupFlow
-              language={
-                language
-              }
-            />
+            <PrivateSetupFlow language={language} />
           </RuleCard>
 
-          <RuleCard
-            number="6"
-            title={t(
-              language,
-              "6. Reveal and start",
-            )}
-          >
+          <RuleCard number="6" title={t(language, "6. Reveal and start")}>
             {t(
               language,
               "After Black confirms, both armies are revealed and normal chess begins with White to move.",
             )}
           </RuleCard>
 
-          <RuleCard
-            number="7"
-            title={t(
-              language,
-              "7. Castling",
-            )}
-          >
+          <RuleCard number="7" title={t(language, "7. Castling")}>
             {t(
               language,
               "Castling is available only when the King is on e1/e8 and the corresponding Rook is on a1/h1 or a8/h8 at game start.",
@@ -743,10 +554,7 @@ export default function DraftChessRules() {
 
           <RuleCard
             number="8"
-            title={t(
-              language,
-              "8. Normal chess after setup",
-            )}
+            title={t(language, "8. Normal chess after setup")}
           >
             {t(
               language,
@@ -776,13 +584,9 @@ function RuleCard({
         </span>
 
         <div className="min-w-0">
-          <h2 className="font-black text-white">
-            {title}
-          </h2>
+          <h2 className="font-black text-white">{title}</h2>
 
-          <div className="mt-2 text-sm leading-7 text-zinc-400">
-            {children}
-          </div>
+          <div className="mt-2 text-sm leading-7 text-zinc-400">{children}</div>
         </div>
       </div>
     </section>
@@ -804,19 +608,11 @@ function VisualBoardCard({
         Visual example
       </p>
 
-      <h3 className="mt-2 text-lg font-black text-white">
-        {title}
-      </h3>
+      <h3 className="mt-2 text-lg font-black text-white">{title}</h3>
 
-      {text && (
-        <p className="mt-2 text-sm leading-7 text-zinc-400">
-          {text}
-        </p>
-      )}
+      {text && <p className="mt-2 text-sm leading-7 text-zinc-400">{text}</p>}
 
-      <div className="mt-4 flex justify-center">
-        {children}
-      </div>
+      <div className="mt-4 flex justify-center">{children}</div>
     </section>
   );
 }
@@ -832,17 +628,11 @@ function CostCard({
 }) {
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3 text-center">
-      <div className="text-3xl leading-none">
-        {symbol}
-      </div>
+      <div className="text-3xl leading-none">{symbol}</div>
 
-      <p className="mt-2 text-xs font-black text-zinc-200">
-        {name}
-      </p>
+      <p className="mt-2 text-xs font-black text-zinc-200">{name}</p>
 
-      <p className="mt-1 text-lg font-black text-emerald-300">
-        {cost}
-      </p>
+      <p className="mt-1 text-lg font-black text-emerald-300">{cost}</p>
     </div>
   );
 }
@@ -857,47 +647,23 @@ function MiniBoard({
   const files = "abcdefgh";
   const squares: React.ReactNode[] = [];
 
-  for (
-    let rank = 8;
-    rank >= 1;
-    rank -= 1
-  ) {
-    for (
-      let fileIndex = 0;
-      fileIndex < 8;
-      fileIndex += 1
-    ) {
-      const file =
-        files[fileIndex];
+  for (let rank = 8; rank >= 1; rank -= 1) {
+    for (let fileIndex = 0; fileIndex < 8; fileIndex += 1) {
+      const file = files[fileIndex];
 
-      const square =
-        `${file}${rank}`;
+      const square = `${file}${rank}`;
 
-      const info =
-        board[square];
+      const info = board[square];
 
       const isAllowed =
         info?.allowed ??
-        (
-          setupSide === "w"
-            ? rank === 1 ||
-              rank === 2
-            : rank === 7 ||
-              rank === 8
-        );
+        (setupSide === "w"
+          ? rank === 1 || rank === 2
+          : rank === 7 || rank === 8);
 
-      const isBackRank =
-        setupSide === "w"
-          ? rank === 1
-          : rank === 8;
+      const isBackRank = setupSide === "w" ? rank === 1 : rank === 8;
 
-      const dark =
-        (
-          fileIndex +
-          rank
-        ) %
-          2 ===
-        1;
+      const dark = (fileIndex + rank) % 2 === 1;
 
       squares.push(
         <div
@@ -909,29 +675,20 @@ function MiniBoard({
             items-center
             justify-center
             overflow-hidden
-            ${
-              dark
-                ? "bg-zinc-700"
-                : "bg-zinc-300"
-            }
+            ${dark ? "bg-zinc-700" : "bg-zinc-300"}
             ${
               isAllowed
                 ? "shadow-[inset_0_0_0_999px_rgba(16,185,129,0.12)]"
                 : ""
             }
-            ${
-              info?.highlight
-                ? "ring-2 ring-inset ring-amber-300"
-                : ""
-            }
+            ${info?.highlight ? "ring-2 ring-inset ring-amber-300" : ""}
           `}
         >
-          {isBackRank &&
-            isAllowed && (
-              <span className="absolute right-0.5 top-0.5 z-10 text-[7px] font-black text-amber-200/80">
-                ♔
-              </span>
-            )}
+          {isBackRank && isAllowed && (
+            <span className="absolute right-0.5 top-0.5 z-10 text-[7px] font-black text-amber-200/80">
+              ♔
+            </span>
+          )}
 
           {info?.piece && (
             <span className="relative z-20 text-[clamp(18px,4.3vw,34px)] leading-none">
@@ -953,11 +710,7 @@ function MiniBoard({
                 z-30
                 text-[7px]
                 font-black
-                ${
-                  dark
-                    ? "text-zinc-300/60"
-                    : "text-zinc-700/60"
-                }
+                ${dark ? "text-zinc-300/60" : "text-zinc-700/60"}
               `}
             >
               {rank}
@@ -974,11 +727,7 @@ function MiniBoard({
                 z-30
                 text-[7px]
                 font-black
-                ${
-                  dark
-                    ? "text-zinc-300/60"
-                    : "text-zinc-700/60"
-                }
+                ${dark ? "text-zinc-300/60" : "text-zinc-700/60"}
               `}
             >
               {file}
@@ -998,68 +747,32 @@ function MiniBoard({
   );
 }
 
-function PrivateSetupFlow({
-  language,
-}: {
-  language: Language;
-}) {
+function PrivateSetupFlow({ language }: { language: Language }) {
   const steps = [
-    [
-      "♔",
-      t(
-        language,
-        "White builds",
-      ),
-    ],
-    [
-      "🛡",
-      t(
-        language,
-        "Pass device",
-      ),
-    ],
-    [
-      "♚",
-      t(
-        language,
-        "Black builds",
-      ),
-    ],
-    [
-      "⚔",
-      t(
-        language,
-        "Reveal armies",
-      ),
-    ],
+    ["♔", t(language, "White builds")],
+    ["🛡", t(language, "Pass device")],
+    ["♚", t(language, "Black builds")],
+    ["⚔", t(language, "Reveal armies")],
   ];
 
   return (
     <div className="mt-4 grid gap-2 sm:grid-cols-4">
-      {steps.map(
-        ([icon, label], index) => (
-          <div
-            key={label}
-            className="relative rounded-xl border border-white/5 bg-black/20 px-3 py-3 text-center"
-          >
-            <div className="text-2xl">
-              {icon}
-            </div>
+      {steps.map(([icon, label], index) => (
+        <div
+          key={label}
+          className="relative rounded-xl border border-white/5 bg-black/20 px-3 py-3 text-center"
+        >
+          <div className="text-2xl">{icon}</div>
 
-            <p className="mt-2 text-[10px] font-black text-zinc-300">
-              {label}
-            </p>
+          <p className="mt-2 text-[10px] font-black text-zinc-300">{label}</p>
 
-            {index <
-              steps.length -
-                1 && (
-              <span className="absolute -right-2 top-1/2 hidden -translate-y-1/2 text-zinc-700 sm:block">
-                →
-              </span>
-            )}
-          </div>
-        ),
-      )}
+          {index < steps.length - 1 && (
+            <span className="absolute -right-2 top-1/2 hidden -translate-y-1/2 text-zinc-700 sm:block">
+              →
+            </span>
+          )}
+        </div>
+      ))}
     </div>
   );
 }
@@ -1092,9 +805,7 @@ function LegendItem({
         {sample}
       </span>
 
-      <span className="text-[10px] font-bold text-zinc-400">
-        {label}
-      </span>
+      <span className="text-[10px] font-bold text-zinc-400">{label}</span>
     </div>
   );
 }
@@ -1104,50 +815,29 @@ function LanguageSelector({
   onChange,
 }: {
   language: Language;
-  onChange: (
-    language: Language,
-  ) => void;
+  onChange: (language: Language) => void;
 }) {
   return (
     <label className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-400">
       <span>🌐</span>
 
-      <span className="hidden sm:inline">
-        {t(
-          language,
-          "Language",
-        )}
-      </span>
+      <span className="hidden sm:inline">{t(language, "Language")}</span>
 
       <select
         value={language}
-        onChange={(event) =>
-          onChange(
-            event.target
-              .value as Language,
-          )
-        }
+        onChange={(event) => onChange(event.target.value as Language)}
         className="bg-transparent text-xs font-bold text-zinc-200 outline-none [color-scheme:dark]"
-        aria-label={t(
-          language,
-          "Language",
-        )}
+        aria-label={t(language, "Language")}
       >
-        {languageOptions.map(
-          (option) => (
-            <option
-              key={
-                option.value
-              }
-              value={
-                option.value
-              }
-              className="bg-zinc-900 text-zinc-100"
-            >
-              {option.label}
-            </option>
-          ),
-        )}
+        {languageOptions.map((option) => (
+          <option
+            key={option.value}
+            value={option.value}
+            className="bg-zinc-900 text-zinc-100"
+          >
+            {option.label}
+          </option>
+        ))}
       </select>
     </label>
   );

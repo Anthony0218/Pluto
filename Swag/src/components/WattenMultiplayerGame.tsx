@@ -234,7 +234,7 @@ function DealDeckControl({
         disabled={!canDeal}
         onClick={onDeal}
         onMouseEnter={playHoverSound}
-        className={`group relative mx-auto block h-28 w-24 transition ${
+        className={`group relative mx-auto block h-28 w-24 transition max-md:h-20 max-md:w-16 ${
           canDeal
             ? "cursor-pointer hover:-translate-y-2 hover:scale-105"
             : "cursor-default"
@@ -243,7 +243,7 @@ function DealDeckControl({
         {[0, 1, 2, 3].map((layer) => (
           <span
             key={layer}
-            className="absolute left-1/2 top-1/2 h-24 w-16 rounded-[8px] border border-amber-200/35 bg-zinc-950 shadow-xl"
+            className="absolute left-1/2 top-1/2 h-24 w-16 rounded-[8px] border border-amber-200/35 bg-zinc-950 shadow-xl max-md:h-16 max-md:w-11"
             style={{
               transform: `translate(calc(-50% + ${layer * 2}px), calc(-50% - ${layer * 2}px))`,
               zIndex: layer,
@@ -1215,7 +1215,7 @@ export default function WattenMultiplayerGame() {
 
   if (error) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-emerald-950 text-white">
+      <main className="flex min-h-screen items-center justify-center bg-transparent text-white">
         <div className="text-center">
           <p className="text-red-300">{error}</p>
 
@@ -1232,7 +1232,7 @@ export default function WattenMultiplayerGame() {
 
   if (!user) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-emerald-950 px-4 text-white">
+      <main className="flex min-h-screen items-center justify-center bg-transparent px-4 text-white">
         <div className="text-center">
           <p className="text-lg font-black">
             {l("Bitte zuerst einloggen.", "Please sign in first.")}
@@ -1251,7 +1251,7 @@ export default function WattenMultiplayerGame() {
 
   if (loading || !room || mySeat === null) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-emerald-950 text-white">
+      <main className="flex min-h-screen items-center justify-center bg-transparent text-white">
         <p>
           {l(
             "Multiplayer-Spiel wird geladen...",
@@ -1275,7 +1275,7 @@ export default function WattenMultiplayerGame() {
     const missingPlayers = Math.max(0, 4 - players.length);
 
     return (
-      <main className="min-h-screen bg-[radial-gradient(circle_at_top,#164e3d_0%,#082f27_38%,#07110e_100%)] px-4 py-8 text-white sm:px-6">
+      <main className="min-h-screen bg-transparent px-4 py-8 text-white sm:px-6">
         <div className="mx-auto max-w-6xl">
           <header className="mb-6 flex flex-wrap items-start justify-between gap-4 rounded-[30px] border border-emerald-300/15 bg-zinc-950/65 p-6 shadow-2xl shadow-black/30">
             <div>
@@ -1295,7 +1295,7 @@ export default function WattenMultiplayerGame() {
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 max-md:w-full max-md:gap-2 max-md:overflow-x-auto max-md:pb-1">
               <WattenLanguageSelector
                 language={language}
                 onChange={changeLanguage}
@@ -1311,7 +1311,7 @@ export default function WattenMultiplayerGame() {
             </div>
           </header>
 
-          <div className="grid gap-5 lg:grid-cols-[300px_minmax(0,1fr)]">
+          <div className="grid gap-3 lg:grid-cols-[300px_minmax(0,1fr)] lg:gap-5">
             {/* PLAYERS */}
             <aside className="rounded-[30px] border border-white/10 bg-zinc-950/75 p-5 shadow-xl shadow-black/20">
               <div className="flex items-center justify-between">
@@ -1353,7 +1353,7 @@ export default function WattenMultiplayerGame() {
                           : "border-white/10 bg-white/[0.03]"
                       }`}
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 max-md:w-full max-md:gap-2 max-md:overflow-x-auto max-md:pb-1">
                         <div
                           className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-sm font-black ${
                             player
@@ -1447,7 +1447,7 @@ export default function WattenMultiplayerGame() {
 
             {/* TABLE / COPYABLE ROOM CODE */}
             <section
-              className="relative min-h-[620px] overflow-hidden rounded-[42px] border border-white/10 shadow-2xl"
+              className="relative min-h-[620px] overflow-hidden rounded-[42px] border border-white/10 shadow-2xl max-md:min-h-[480px] max-md:rounded-[28px]"
               style={{
                 backgroundImage: `url(${tableBackgrounds[tableTheme]})`,
                 backgroundSize: "100% 100%",
@@ -1600,7 +1600,7 @@ export default function WattenMultiplayerGame() {
    */
   if (!game) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-emerald-950 text-white">
+      <main className="flex min-h-screen items-center justify-center bg-transparent text-white">
         <div className="text-center">
           <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-white/15 border-t-amber-300" />
           <p className="mt-4 text-sm font-bold text-zinc-300">
@@ -1920,7 +1920,7 @@ export default function WattenMultiplayerGame() {
   }
 
   return (
-    <main className="min-h-screen bg-emerald-950 px-4 py-6 text-white md:px-8">
+    <main className="min-h-screen bg-transparent px-4 py-6 text-white md:px-8">
       {actionError && (
         <div className="fixed left-1/2 top-5 z-[250] -translate-x-1/2 rounded-xl border border-red-400/30 bg-red-950/95 px-5 py-3 text-sm font-bold text-red-200 shadow-2xl">
           {actionError}
@@ -2105,11 +2105,11 @@ export default function WattenMultiplayerGame() {
             </div>
           </div>
         )}
-      <div className="mx-auto w-full max-w-[1800px]">
+      <div className="mx-auto w-full max-w-[1800px] max-md:px-2">
         {/* HEADER */}
 
-        <div className="relative z-30 mb-4 flex items-center justify-between">
-          <div className="ml-5 pl-5">
+        <div className="relative z-30 mb-3 flex items-start justify-between gap-2 max-md:flex-col md:mb-4 md:items-center">
+          <div className="ml-5 pl-5 max-md:ml-0 max-md:pl-0">
             <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
               {t("Bavarian Watten")}
             </p>
@@ -2123,7 +2123,7 @@ export default function WattenMultiplayerGame() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 max-md:w-full max-md:gap-2 max-md:overflow-x-auto max-md:pb-1">
             <WattenLanguageSelector
               language={language}
               onChange={changeLanguage}
@@ -2174,11 +2174,13 @@ export default function WattenMultiplayerGame() {
     grid-cols-[16rem_minmax(0,1fr)_16rem]
     items-start
     gap-5
+    max-md:grid-cols-1
+    max-md:gap-3
   "
         >
           {/* LEFT SIDEBAR */}
 
-          <aside className="relative w-64 pt-15">
+          <aside className="relative w-64 pt-15 max-md:order-2 max-md:w-full max-md:pt-0">
             {/* CARD PRIORITY */}
 
             {game.farbe && game.schlag && (
@@ -2222,6 +2224,12 @@ export default function WattenMultiplayerGame() {
                 h-[720px]
                 w-full
                 overflow-y-auto
+                max-md:fixed
+                max-md:inset-x-2
+                max-md:top-20
+                max-md:z-[200]
+                max-md:h-[70vh]
+                max-md:w-auto
                 rounded-3xl
                 border
                 border-white/10
@@ -2288,7 +2296,7 @@ export default function WattenMultiplayerGame() {
 
             {/* SCORE */}
 
-            <div className="h-[720px] rounded-3xl border border-white/10 bg-zinc-950/95 p-5 shadow-2xl">
+            <div className="h-[720px] rounded-3xl border border-white/10 bg-zinc-950/95 p-5 shadow-2xl max-md:h-auto max-md:p-3">
               <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
                 {l("Punktestand", "Score")}
               </p>
@@ -2426,6 +2434,9 @@ export default function WattenMultiplayerGame() {
     overflow-visible
     rounded-[60px]
     shadow-2xl
+    max-md:order-1
+    max-md:min-h-[540px]
+    max-md:rounded-[32px]
   "
               style={{
                 backgroundImage: `url(${tableBackgrounds[tableTheme]})`,
@@ -2440,6 +2451,7 @@ export default function WattenMultiplayerGame() {
     absolute
     inset-0
     rounded-[60px]
+    max-md:rounded-[32px]
     bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.10),transparent_58%)]
   "
               />
@@ -2450,6 +2462,8 @@ export default function WattenMultiplayerGame() {
     absolute
     inset-[18px]
     rounded-[48px]
+    max-md:inset-[8px]
+    max-md:rounded-[24px]
     border
     border-white/5
   "
@@ -2477,6 +2491,7 @@ export default function WattenMultiplayerGame() {
     left-1/2
     top-7
     -translate-x-1/2
+    max-md:top-2
   "
                 cardCount={waitingForDeal ? 0 : cardCountForSeat(topSeat)}
               />
@@ -2501,6 +2516,7 @@ export default function WattenMultiplayerGame() {
     left-7
     top-1/2
     -translate-y-1/2
+    max-md:left-1
   "
                 cardCount={waitingForDeal ? 0 : cardCountForSeat(leftSeat)}
               />
@@ -2526,6 +2542,7 @@ export default function WattenMultiplayerGame() {
     right-7
     top-1/2
     -translate-y-1/2
+    max-md:right-1
   "
                 cardCount={waitingForDeal ? 0 : cardCountForSeat(rightSeat)}
               />
@@ -3249,7 +3266,7 @@ export default function WattenMultiplayerGame() {
 
               {/* ME / BOTTOM */}
 
-              <div className="absolute bottom-5 left-1/2 -translate-x-1/2 text-center">
+              <div className="absolute bottom-5 left-1/2 -translate-x-1/2 text-center max-md:bottom-2 max-md:w-full max-md:px-1">
                 <div
                   className={`
                 relative
@@ -3258,6 +3275,8 @@ export default function WattenMultiplayerGame() {
                 border
                 px-5
                 py-3
+                max-md:px-3
+                max-md:py-2
                 ${
                   isMyTurn
                     ? "border-emerald-400 bg-emerald-400/15"
@@ -3652,6 +3671,11 @@ function PlayerBox({
       border
       px-5
       py-4
+      max-md:w-28
+      max-md:max-w-28
+      max-md:rounded-xl
+      max-md:px-2
+      max-md:py-2
       text-center
       shadow-xl
       backdrop-blur-md
@@ -3693,15 +3717,15 @@ function PlayerBox({
         </div>
       )}
 
-      <div className="mx-auto h-14 w-14 overflow-hidden rounded-2xl border border-white/10 shadow-lg">
+      <div className="mx-auto h-14 w-14 overflow-hidden rounded-2xl border border-white/10 shadow-lg max-md:h-9 max-md:w-9 max-md:rounded-xl">
         <ProfileAvatar avatarId={avatarId} className="h-full w-full" />
       </div>
 
-      <p className="mt-2 text-base font-black text-white">
+      <p className="mt-2 text-base font-black text-white max-md:mt-1 max-md:truncate max-md:text-xs">
         {player.display_name}
       </p>
 
-      <div className="mt-2 flex items-center justify-center gap-2">
+      <div className="mt-2 flex items-center justify-center gap-2 max-md:mt-1 max-md:flex-col max-md:gap-1">
         <span
           className={`
           rounded-full

@@ -969,7 +969,7 @@ export default function MutationChessBoard({
     <div
       className="
         min-h-screen
-        bg-zinc-950
+        bg-transparent
         px-4
         py-6
         text-zinc-100

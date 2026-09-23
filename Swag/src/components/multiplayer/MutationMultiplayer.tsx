@@ -410,7 +410,7 @@ export function MutationMultiplayerLobby() {
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#24123f_0%,#111116_38%,#08080b_100%)] px-4 py-8 text-zinc-100 sm:px-6">
+    <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-5xl">
         <header className="mb-7 rounded-3xl border border-violet-400/15 bg-zinc-900/65 p-6 shadow-2xl shadow-black/30">
           <div className="flex items-center gap-4">
@@ -1124,7 +1124,7 @@ export function MutationMultiplayerGame() {
 
   if (!user) {
     return (
-      <main className="min-h-screen bg-zinc-950 p-8 text-zinc-100">
+      <main className="min-h-screen bg-transparent p-8 text-zinc-100">
         Sign in required.
       </main>
     );
@@ -1132,7 +1132,7 @@ export function MutationMultiplayerGame() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-zinc-950 p-8 text-zinc-400">
+      <main className="min-h-screen bg-transparent p-8 text-zinc-400">
         Loading Mutation room...
       </main>
     );
@@ -1140,7 +1140,7 @@ export function MutationMultiplayerGame() {
 
   if (!room || !gameState) {
     return (
-      <main className="min-h-screen bg-zinc-950 p-8 text-zinc-100">
+      <main className="min-h-screen bg-transparent p-8 text-zinc-100">
         <p>Mutation room unavailable.</p>
         {error && <ErrorBox>{error}</ErrorBox>}
       </main>
@@ -1150,7 +1150,7 @@ export function MutationMultiplayerGame() {
   const activeTurnColor = liveGame.turn() === "w" ? "white" : "black";
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,#21143a_0%,#111116_38%,#08080b_100%)] px-4 py-6 text-zinc-100 sm:px-6">
+    <div className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1500px]">
         <header className="mb-7 flex flex-col gap-4 rounded-3xl border border-violet-400/10 bg-zinc-900/50 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">

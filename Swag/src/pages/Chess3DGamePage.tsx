@@ -249,7 +249,7 @@ export default function Chess3DGamePage({
   })();
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-4 py-8 text-zinc-100 sm:px-6">
+    <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1400px]">
         <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>

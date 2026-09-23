@@ -41,7 +41,7 @@ export default function FourPlayerAiPage() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-4 py-8 text-zinc-100">
+    <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100">
       <section className="mx-auto max-w-4xl rounded-3xl border border-white/10 bg-zinc-900/75 p-6">
         <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-300">
           Vs AI

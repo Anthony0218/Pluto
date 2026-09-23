@@ -1,9 +1,13 @@
 import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { supabase } from "../lib/supabase";
+import { Link } from "react-router-dom";
 
 type LoginMode = "login" | "register";
 type Language = "de" | "en";
+
+type LoginPageProps = {
+  onLogin?: (email: string, password: string) => Promise<void> | void;
+  onRegister?: (email: string, password: string) => Promise<void> | void;
+};
 
 const LANGUAGE_STORAGE_KEY = "swag-language";
 
@@ -12,7 +16,7 @@ const translations = {
     backHome: "← Zurück zur Startseite",
     back: "← Zurück",
     hubEyebrow: "Dein Spiele-Hub",
-    heroTitle: "Swag",
+    heroTitle: "Pluto",
     heroText:
       "Spiele Schach, Varianten und Watten mit einem Konto und behalte deinen persönlichen Spielverlauf an einem Ort.",
     chess: "Schach",
@@ -38,6 +42,8 @@ const translations = {
     confirmPassword: "Passwort bestätigen",
     pleaseEnter: "Bitte gib deine E-Mail-Adresse und dein Passwort ein.",
     mismatch: "Die Passwörter stimmen nicht überein.",
+    loginNotConnected: "Die Anmeldung ist noch nicht verbunden.",
+    registerNotConnected: "Die Registrierung ist noch nicht verbunden.",
     genericError: "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
     wait: "Bitte warten...",
     signIn: "Anmelden",
@@ -50,7 +56,7 @@ const translations = {
     backHome: "← Back to home",
     back: "← Back",
     hubEyebrow: "Your game hub",
-    heroTitle: "Swag",
+    heroTitle: "Pluto",
     heroText:
       "Play chess, variants and Watten with one account and keep your personal game history in one place.",
     chess: "Chess",
@@ -75,6 +81,8 @@ const translations = {
     confirmPassword: "Confirm password",
     pleaseEnter: "Please enter your email and password.",
     mismatch: "Passwords do not match.",
+    loginNotConnected: "Login is not connected yet.",
+    registerNotConnected: "Registration is not connected yet.",
     genericError: "Something went wrong. Please try again.",
     wait: "Please wait...",
     signIn: "Sign in",
@@ -99,8 +107,7 @@ function getInitialLanguage(): Language {
   return window.navigator.language.toLowerCase().startsWith("de") ? "de" : "en";
 }
 
-export default function LoginPage() {
-  const navigate = useNavigate();
+export default function LoginPage({ onLogin, onRegister }: LoginPageProps) {
   const [mode, setMode] = useState<LoginMode>("login");
   const [language, setLanguage] = useState<Language>(getInitialLanguage);
   const [email, setEmail] = useState("");
@@ -139,38 +146,19 @@ export default function LoginPage() {
 
     try {
       if (mode === "login") {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
-          password,
-        });
-
-        if (error) {
-          throw error;
+        if (!onLogin) {
+          setMessage(t.loginNotConnected);
+          return;
         }
 
-        navigate("/");
+        await onLogin(email.trim(), password);
       } else {
-        const { data, error } = await supabase.auth.signUp({
-          email: email.trim(),
-          password,
-        });
-
-        if (error) {
-          throw error;
+        if (!onRegister) {
+          setMessage(t.registerNotConnected);
+          return;
         }
 
-        if (data.session) {
-          navigate("/");
-        } else {
-          setMessage(
-            language === "de"
-              ? "Konto erstellt. Bitte bestätige deine E-Mail-Adresse und melde dich anschließend an."
-              : "Account created. Please confirm your email address, then log in.",
-          );
-          setMode("login");
-          setPassword("");
-          setConfirmPassword("");
-        }
+        await onRegister(email.trim(), password);
       }
     } catch (error) {
       setMessage(error instanceof Error ? error.message : t.genericError);
@@ -180,7 +168,7 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-zinc-950 px-4 py-8 text-zinc-100 sm:px-6">
+    <main className="relative min-h-screen overflow-hidden bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-[-10%] top-[-10%] h-[420px] w-[420px] rounded-full bg-emerald-400/[0.08] blur-3xl" />
         <div className="absolute bottom-[-15%] right-[-10%] h-[460px] w-[460px] rounded-full bg-amber-300/[0.06] blur-3xl" />

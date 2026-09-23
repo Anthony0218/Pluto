@@ -85,7 +85,10 @@ const blackSymbols: Record<MirrorPieceType, string> = {
 };
 
 function normalizeCode(value: string) {
-  return value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6);
+  return value
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "")
+    .slice(0, 6);
 }
 
 function colorToSide(color: TwoPlayerColor): MirrorSide {
@@ -218,8 +221,10 @@ function playLatestMoveSound(initialFen: string, moves: string[]) {
 
 function resultLabel(game: VariantGame) {
   if (game.winner === "draw") return `Draw · ${game.end_reason ?? "Game over"}`;
-  if (game.winner === "white") return `White wins · ${game.end_reason ?? "Game over"}`;
-  if (game.winner === "black") return `Black wins · ${game.end_reason ?? "Game over"}`;
+  if (game.winner === "white")
+    return `White wins · ${game.end_reason ?? "Game over"}`;
+  if (game.winner === "black")
+    return `Black wins · ${game.end_reason ?? "Game over"}`;
   return game.end_reason ?? "Game over";
 }
 
@@ -334,11 +339,13 @@ export function MirrorMultiplayerLobby() {
 
     setLoading(null);
     if (rpcError) return setError(rpcError.message);
-    navigate(`/games/chess/variants/mirror/multiplayer/${String(data ?? code)}`);
+    navigate(
+      `/games/chess/variants/mirror/multiplayer/${String(data ?? code)}`,
+    );
   }
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-4 py-8 text-zinc-100 sm:px-6">
+    <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-5xl">
         <header className="mb-7 rounded-3xl border border-violet-400/15 bg-zinc-900/70 p-6 shadow-2xl shadow-black/30">
           <div className="flex items-center gap-4">
@@ -353,7 +360,8 @@ export function MirrorMultiplayerLobby() {
                 Build one mirrored army together
               </h1>
               <p className="mt-1 text-sm text-zinc-500">
-                The seeded piece bag is shared · White and Black alternate placements
+                The seeded piece bag is shared · White and Black alternate
+                placements
               </p>
             </div>
           </div>
@@ -380,7 +388,8 @@ export function MirrorMultiplayerLobby() {
                         : "border-white/10 bg-black/20 text-zinc-400 hover:bg-white/5"
                     }`}
                   >
-                    {color === "white" ? "♔" : "♚"} {color === "white" ? "White" : "Black"}
+                    {color === "white" ? "♔" : "♚"}{" "}
+                    {color === "white" ? "White" : "Black"}
                   </button>
                 ))}
               </div>
@@ -397,7 +406,9 @@ export function MirrorMultiplayerLobby() {
             <Panel title="Join room" subtitle="You receive the opposite side">
               <input
                 value={joinCode}
-                onChange={(event) => setJoinCode(normalizeCode(event.target.value))}
+                onChange={(event) =>
+                  setJoinCode(normalizeCode(event.target.value))
+                }
                 onKeyDown={(event) => event.key === "Enter" && void joinRoom()}
                 placeholder="ABC123"
                 className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-center font-mono text-2xl font-black uppercase tracking-[0.3em] text-white outline-none transition focus:border-violet-400/40"
@@ -433,7 +444,9 @@ export function MirrorMultiplayerGame() {
     from: Square;
     to: Square;
   } | null>(null);
-  const [historyPreviewPly, setHistoryPreviewPly] = useState<number | null>(null);
+  const [historyPreviewPly, setHistoryPreviewPly] = useState<number | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [moving, setMoving] = useState(false);
   const [actionLoading, setActionLoading] = useState<ActionLoading>(null);
@@ -452,7 +465,8 @@ export function MirrorMultiplayerGame() {
     [players, user?.id],
   );
   const myColor = myPlayer?.chosen_color ?? null;
-  const orientation: "white" | "black" = myColor === "black" ? "black" : "white";
+  const orientation: "white" | "black" =
+    myColor === "black" ? "black" : "white";
 
   const mirrorState = useMemo(() => readMirrorState(gameState), [gameState]);
   const phase = mirrorState?.phase ?? "setup";
@@ -493,10 +507,14 @@ export function MirrorMultiplayerGame() {
   }, [gameState?.initial_fen, historyPreviewPly, historyRows]);
 
   const displayedGame = previewGame ?? liveGame;
-  const board = phase === "setup" ? setupBoard : displayedGame?.board() ?? new Chess().board();
-  const checkedKingSquare = phase === "playing" && displayedGame
-    ? findCheckedKing(displayedGame)
-    : null;
+  const board =
+    phase === "setup"
+      ? setupBoard
+      : (displayedGame?.board() ?? new Chess().board());
+  const checkedKingSquare =
+    phase === "playing" && displayedGame
+      ? findCheckedKing(displayedGame)
+      : null;
 
   const displayedLastMove = useMemo(() => {
     if (phase !== "playing") return null;
@@ -512,7 +530,13 @@ export function MirrorMultiplayerGame() {
       };
     }
     return null;
-  }, [gameState?.last_move_from, gameState?.last_move_to, historyPreviewPly, historyRows, phase]);
+  }, [
+    gameState?.last_move_from,
+    gameState?.last_move_to,
+    historyPreviewPly,
+    historyRows,
+    phase,
+  ]);
 
   const undoPending = Boolean(gameState?.undo_requested_by);
   const isMyTurn =
@@ -531,7 +555,9 @@ export function MirrorMultiplayerGame() {
     !undoPending;
 
   const lastHistoryMove = historyRows[historyRows.length - 1] ?? null;
-  const lastMoverColor = lastHistoryMove ? sideToColor(lastHistoryMove.color) : null;
+  const lastMoverColor = lastHistoryMove
+    ? sideToColor(lastHistoryMove.color)
+    : null;
   const alreadyRequestedUndo =
     Boolean(user?.id) &&
     gameState?.undo_last_requested_by === user?.id &&
@@ -546,8 +572,10 @@ export function MirrorMultiplayerGame() {
     !alreadyRequestedUndo &&
     !moving &&
     actionLoading === null;
-  const myUndoRequest = Boolean(user?.id) && gameState?.undo_requested_by === user?.id;
-  const opponentUndoRequest = Boolean(gameState?.undo_requested_by) && !myUndoRequest;
+  const myUndoRequest =
+    Boolean(user?.id) && gameState?.undo_requested_by === user?.id;
+  const opponentUndoRequest =
+    Boolean(gameState?.undo_requested_by) && !myUndoRequest;
 
   const myRematchReady =
     myColor === "white"
@@ -566,10 +594,7 @@ export function MirrorMultiplayerGame() {
     const updated = normalizeGame(raw);
     const nextMoveCount = updated.moves.length;
 
-    if (
-      updated.initial_fen &&
-      nextMoveCount > lastSeenMoveCountRef.current
-    ) {
+    if (updated.initial_fen && nextMoveCount > lastSeenMoveCountRef.current) {
       playLatestMoveSound(updated.initial_fen, updated.moves);
     }
 
@@ -592,70 +617,75 @@ export function MirrorMultiplayerGame() {
     setGameState(updated);
   }, []);
 
-  const loadRoom = useCallback(async (silent = false) => {
-    if (!roomCode || !user) return;
-    if (!silent) {
-      setLoading(true);
-      setError(null);
-    }
+  const loadRoom = useCallback(
+    async (silent = false) => {
+      if (!roomCode || !user) return;
+      if (!silent) {
+        setLoading(true);
+        setError(null);
+      }
 
-    const { data: roomData, error: roomError } = await supabase
-      .from("variant_rooms")
-      .select("id, code, host_id, variant, max_players, status, created_at")
-      .eq("code", roomCode.toUpperCase())
-      .eq("variant", "mirror")
-      .single();
+      const { data: roomData, error: roomError } = await supabase
+        .from("variant_rooms")
+        .select("id, code, host_id, variant, max_players, status, created_at")
+        .eq("code", roomCode.toUpperCase())
+        .eq("variant", "mirror")
+        .single();
 
-    if (roomError || !roomData) {
-      if (!silent) setError("Room not found.");
-      setLoading(false);
-      return;
-    }
+      if (roomError || !roomData) {
+        if (!silent) setError("Room not found.");
+        setLoading(false);
+        return;
+      }
 
-    const loadedRoom = roomData as VariantRoom;
-    const { data: playerData, error: playerError } = await supabase
-      .from("variant_room_players")
-      .select("room_id, user_id, seat, display_name, chosen_color")
-      .eq("room_id", loadedRoom.id)
-      .order("seat", { ascending: true });
+      const loadedRoom = roomData as VariantRoom;
+      const { data: playerData, error: playerError } = await supabase
+        .from("variant_room_players")
+        .select("room_id, user_id, seat, display_name, chosen_color")
+        .eq("room_id", loadedRoom.id)
+        .order("seat", { ascending: true });
 
-    if (playerError) {
-      if (!silent) setError(playerError.message);
-      setLoading(false);
-      return;
-    }
+      if (playerError) {
+        if (!silent) setError(playerError.message);
+        setLoading(false);
+        return;
+      }
 
-    const loadedPlayers = (playerData ?? []) as VariantRoomPlayer[];
-    if (!loadedPlayers.some((player) => player.user_id === user.id)) {
-      if (!silent) setError("You are not a player in this room.");
-      setLoading(false);
-      return;
-    }
+      const loadedPlayers = (playerData ?? []) as VariantRoomPlayer[];
+      if (!loadedPlayers.some((player) => player.user_id === user.id)) {
+        if (!silent) setError("You are not a player in this room.");
+        setLoading(false);
+        return;
+      }
 
-    const { data: gameData, error: gameError } = await supabase
-      .from("variant_games")
-      .select(`
+      const { data: gameData, error: gameError } = await supabase
+        .from("variant_games")
+        .select(
+          `
         room_id, variant, seed, initial_fen, fen, moves, state, status,
         winner, end_reason, version, last_move_from, last_move_to,
         white_rematch_ready, black_rematch_ready, next_seed, next_initial_fen,
         next_state, undo_requested_by, undo_requested_version,
         undo_previous_fen, undo_previous_last_from, undo_previous_last_to,
         undo_last_requested_by, undo_last_requested_version
-      `)
-      .eq("room_id", loadedRoom.id)
-      .single();
+      `,
+        )
+        .eq("room_id", loadedRoom.id)
+        .single();
 
-    if (gameError || !gameData) {
-      if (!silent) setError("Game could not be loaded.");
+      if (gameError || !gameData) {
+        if (!silent) setError("Game could not be loaded.");
+        setLoading(false);
+        return;
+      }
+
+      setRoom(loadedRoom);
+      setPlayers(loadedPlayers);
+      applyAuthoritativeGame(gameData as VariantGame);
       setLoading(false);
-      return;
-    }
-
-    setRoom(loadedRoom);
-    setPlayers(loadedPlayers);
-    applyAuthoritativeGame(gameData as VariantGame);
-    setLoading(false);
-  }, [applyAuthoritativeGame, roomCode, user]);
+    },
+    [applyAuthoritativeGame, roomCode, user],
+  );
 
   useEffect(() => {
     void loadRoom(false);
@@ -773,7 +803,10 @@ export function MirrorMultiplayerGame() {
     }
 
     const previous = gameState;
-    const nextState: MirrorPublicState = { phase: "setup", setup: result.state };
+    const nextState: MirrorPublicState = {
+      phase: "setup",
+      setup: result.state,
+    };
     const optimistic: VariantGame = {
       ...gameState,
       state: nextState as unknown as Record<string, unknown>,
@@ -785,11 +818,14 @@ export function MirrorMultiplayerGame() {
     setError(null);
     if (currentPiece) playPieceSelectSound(currentPiece);
 
-    const { error: setupError } = await supabase.rpc("play_mirror_setup_action", {
-      p_room_id: room.id,
-      p_new_state: nextState,
-      p_expected_version: previous.version,
-    });
+    const { error: setupError } = await supabase.rpc(
+      "play_mirror_setup_action",
+      {
+        p_room_id: room.id,
+        p_new_state: nextState,
+        p_expected_version: previous.version,
+      },
+    );
 
     setActionLoading(null);
 
@@ -805,7 +841,10 @@ export function MirrorMultiplayerGame() {
     }
   }
 
-  async function finalizeSetup(setup: MirrorSetupState, expectedVersion: number) {
+  async function finalizeSetup(
+    setup: MirrorSetupState,
+    expectedVersion: number,
+  ) {
     if (!room || actionLoading === "finalize") return;
 
     const validation = isMirrorStartPositionValid(setup);
@@ -824,11 +863,14 @@ export function MirrorMultiplayerGame() {
 
     setActionLoading("finalize");
     setError(null);
-    const { error: finalizeError } = await supabase.rpc("finalize_mirror_setup", {
-      p_room_id: room.id,
-      p_initial_fen: initialFen,
-      p_expected_version: expectedVersion,
-    });
+    const { error: finalizeError } = await supabase.rpc(
+      "finalize_mirror_setup",
+      {
+        p_room_id: room.id,
+        p_initial_fen: initialFen,
+        p_expected_version: expectedVersion,
+      },
+    );
     setActionLoading(null);
 
     if (finalizeError) {
@@ -843,8 +885,19 @@ export function MirrorMultiplayerGame() {
     }
   }
 
-  async function submitMove(from: Square, to: Square, promotion?: PromotionPiece) {
-    if (!room || !gameState || !gameState.initial_fen || !gameState.fen || !canMove) return;
+  async function submitMove(
+    from: Square,
+    to: Square,
+    promotion?: PromotionPiece,
+  ) {
+    if (
+      !room ||
+      !gameState ||
+      !gameState.initial_fen ||
+      !gameState.fen ||
+      !canMove
+    )
+      return;
 
     const localGame = new Chess(gameState.fen, { skipValidation: true });
     let move;
@@ -858,7 +911,11 @@ export function MirrorMultiplayerGame() {
 
     const nextMoves = [...gameState.moves, move.san];
     const nextRows = buildHistory(gameState.initial_fen, nextMoves);
-    const outcome = getMirrorOutcome(localGame, nextRows, gameState.initial_fen);
+    const outcome = getMirrorOutcome(
+      localGame,
+      nextRows,
+      gameState.initial_fen,
+    );
     const previous = gameState;
     const optimistic: VariantGame = {
       ...gameState,
@@ -949,12 +1006,13 @@ export function MirrorMultiplayerGame() {
 
   function buildUndoSnapshot() {
     if (!gameState?.initial_fen || gameState.moves.length === 0) return null;
-    const previousMove = historyRows.length >= 2 ? historyRows[historyRows.length - 2] : null;
+    const previousMove =
+      historyRows.length >= 2 ? historyRows[historyRows.length - 2] : null;
     return {
       previousFen:
         gameState.moves.length === 1
           ? gameState.initial_fen
-          : previousMove?.fenAfter ?? gameState.initial_fen,
+          : (previousMove?.fenAfter ?? gameState.initial_fen),
       previousLastFrom: previousMove?.from ?? null,
       previousLastTo: previousMove?.to ?? null,
     };
@@ -997,7 +1055,13 @@ export function MirrorMultiplayerGame() {
   }
 
   async function resign() {
-    if (!room || gameState?.status !== "playing" || actionLoading || undoPending) return;
+    if (
+      !room ||
+      gameState?.status !== "playing" ||
+      actionLoading ||
+      undoPending
+    )
+      return;
     setActionLoading("resign");
     setError(null);
     const { error: resignError } = await supabase.rpc("resign_variant_game", {
@@ -1010,16 +1074,26 @@ export function MirrorMultiplayerGame() {
   }
 
   async function requestRematch() {
-    if (!room || !gameState || gameState.status !== "finished" || myRematchReady || actionLoading) return;
+    if (
+      !room ||
+      !gameState ||
+      gameState.status !== "finished" ||
+      myRematchReady ||
+      actionLoading
+    )
+      return;
     const seed = createMirrorSeed();
     const setup = createInitialMirrorSetupState(seed);
     setActionLoading("rematch");
     setError(null);
-    const { error: rematchError } = await supabase.rpc("request_mirror_rematch", {
-      p_room_id: room.id,
-      p_next_seed: seed,
-      p_next_state: { phase: "setup", setup },
-    });
+    const { error: rematchError } = await supabase.rpc(
+      "request_mirror_rematch",
+      {
+        p_room_id: room.id,
+        p_next_seed: seed,
+        p_next_state: { phase: "setup", setup },
+      },
+    );
     if (rematchError) setError(rematchError.message);
     await loadRoom(true);
     setActionLoading(null);
@@ -1037,16 +1111,24 @@ export function MirrorMultiplayerGame() {
   }
 
   if (!user) {
-    return <main className="min-h-screen bg-zinc-950 p-8 text-zinc-100">Sign in required.</main>;
+    return (
+      <main className="min-h-screen bg-transparent p-8 text-zinc-100">
+        Sign in required.
+      </main>
+    );
   }
 
   if (loading) {
-    return <main className="min-h-screen bg-zinc-950 p-8 text-zinc-400">Loading Mirror room...</main>;
+    return (
+      <main className="min-h-screen bg-transparent p-8 text-zinc-400">
+        Loading Mirror room...
+      </main>
+    );
   }
 
   if (!room || !gameState || !setupState) {
     return (
-      <main className="min-h-screen bg-zinc-950 p-8 text-zinc-100">
+      <main className="min-h-screen bg-transparent p-8 text-zinc-100">
         <p>Mirror room unavailable.</p>
         {error && <ErrorBox>{error}</ErrorBox>}
       </main>
@@ -1055,17 +1137,24 @@ export function MirrorMultiplayerGame() {
 
   const placementCount = setupState.placements.length;
   const pairsLeft = Math.max(0, setupState.bag.length - placementCount);
-  const mySetupTurn = myColor !== null && colorToSide(myColor) === setupState.turn;
+  const mySetupTurn =
+    myColor !== null && colorToSide(myColor) === setupState.turn;
 
   return (
-    <div className="min-h-screen bg-zinc-950 px-4 py-6 text-zinc-100 sm:px-6">
+    <div className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1500px]">
         <header className="mb-6 flex flex-col gap-4 rounded-3xl border border-violet-400/10 bg-zinc-900/55 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-violet-400/20 bg-violet-400/10 text-3xl">◈</div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-violet-400/20 bg-violet-400/10 text-3xl">
+              ◈
+            </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-300">Mirror Chess · Multiplayer</p>
-              <h1 className="mt-0.5 text-2xl font-black text-white">Build one army together</h1>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-300">
+                Mirror Chess · Multiplayer
+              </p>
+              <h1 className="mt-0.5 text-2xl font-black text-white">
+                Build one army together
+              </h1>
               <p className="mt-1 text-sm text-zinc-500">
                 {phase === "setup"
                   ? `${setupTurnColor === "white" ? "White" : "Black"} places the next seeded piece`
@@ -1092,16 +1181,33 @@ export function MirrorMultiplayerGame() {
 
         {phase === "setup" && (
           <section className="mb-6 grid gap-3 rounded-3xl border border-violet-400/10 bg-violet-400/[0.03] px-5 py-4 md:grid-cols-3">
-            <div className="rounded-2xl border border-white/5 bg-black/20 p-3 text-xs text-zinc-400"><b className="text-violet-200">🎲 Seeded piece</b><br />Both browsers use the exact same 16-piece bag.</div>
-            <div className="rounded-2xl border border-white/5 bg-black/20 p-3 text-xs text-zinc-400"><b className="text-violet-200">◈ Mirrored placement</b><br />Every placement appears automatically for the opposite army.</div>
-            <div className="rounded-2xl border border-white/5 bg-black/20 p-3 text-xs text-zinc-400"><b className="text-violet-200">↔ Alternating setup</b><br />White and Black take turns choosing a square.</div>
+            <div className="rounded-2xl border border-white/5 bg-black/20 p-3 text-xs text-zinc-400">
+              <b className="text-violet-200">🎲 Seeded piece</b>
+              <br />
+              Both browsers use the exact same 16-piece bag.
+            </div>
+            <div className="rounded-2xl border border-white/5 bg-black/20 p-3 text-xs text-zinc-400">
+              <b className="text-violet-200">◈ Mirrored placement</b>
+              <br />
+              Every placement appears automatically for the opposite army.
+            </div>
+            <div className="rounded-2xl border border-white/5 bg-black/20 p-3 text-xs text-zinc-400">
+              <b className="text-violet-200">↔ Alternating setup</b>
+              <br />
+              White and Black take turns choosing a square.
+            </div>
           </section>
         )}
 
         <main className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              <Panel title="Players" subtitle={players.length < 2 ? "Waiting for opponent..." : "Connected"}>
+              <Panel
+                title="Players"
+                subtitle={
+                  players.length < 2 ? "Waiting for opponent..." : "Connected"
+                }
+              >
                 <div className="space-y-2">
                   {players.map((player) => (
                     <PlayerCard
@@ -1111,7 +1217,8 @@ export function MirrorMultiplayerGame() {
                       active={
                         phase === "setup"
                           ? player.chosen_color === setupTurnColor
-                          : player.chosen_color === (liveGame?.turn() === "w" ? "white" : "black")
+                          : player.chosen_color ===
+                            (liveGame?.turn() === "w" ? "white" : "black")
                       }
                       you={player.user_id === user.id}
                     />
@@ -1120,34 +1227,61 @@ export function MirrorMultiplayerGame() {
               </Panel>
 
               {phase === "setup" ? (
-                <Panel title="Mirror Setup" subtitle="Alternating random construction">
+                <Panel
+                  title="Mirror Setup"
+                  subtitle="Alternating random construction"
+                >
                   <div className="rounded-2xl border border-violet-400/15 bg-violet-400/[0.06] p-4 text-center">
-                    <p className="text-[10px] font-black uppercase tracking-[0.18em] text-violet-300">Next piece</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.18em] text-violet-300">
+                      Next piece
+                    </p>
                     {currentPiece ? (
                       <>
                         <div className="mt-3 text-6xl leading-none">
-                          {setupState.turn === "w" ? whiteSymbols[currentPiece] : blackSymbols[currentPiece]}
+                          {setupState.turn === "w"
+                            ? whiteSymbols[currentPiece]
+                            : blackSymbols[currentPiece]}
                         </div>
-                        <p className="mt-3 font-black text-white">{pieceNames[currentPiece]}</p>
+                        <p className="mt-3 font-black text-white">
+                          {pieceNames[currentPiece]}
+                        </p>
                         <p className="mt-1 text-xs text-zinc-500">
-                          {mySetupTurn ? "Your placement turn" : "Opponent is placing"}
+                          {mySetupTurn
+                            ? "Your placement turn"
+                            : "Opponent is placing"}
                         </p>
                       </>
                     ) : (
-                      <p className="mt-3 font-black text-emerald-200">Formation complete</p>
+                      <p className="mt-3 font-black text-emerald-200">
+                        Formation complete
+                      </p>
                     )}
                   </div>
 
                   <div className="mt-3 grid grid-cols-2 gap-2">
-                    <div className="rounded-xl border border-white/5 bg-black/20 p-3"><p className="text-[9px] uppercase tracking-wider text-zinc-600">Placed</p><p className="mt-1 text-xl font-black">{placementCount}</p></div>
-                    <div className="rounded-xl border border-white/5 bg-black/20 p-3"><p className="text-[9px] uppercase tracking-wider text-zinc-600">Pairs left</p><p className="mt-1 text-xl font-black">{pairsLeft}</p></div>
+                    <div className="rounded-xl border border-white/5 bg-black/20 p-3">
+                      <p className="text-[9px] uppercase tracking-wider text-zinc-600">
+                        Placed
+                      </p>
+                      <p className="mt-1 text-xl font-black">
+                        {placementCount}
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-white/5 bg-black/20 p-3">
+                      <p className="text-[9px] uppercase tracking-wider text-zinc-600">
+                        Pairs left
+                      </p>
+                      <p className="mt-1 text-xl font-black">{pairsLeft}</p>
+                    </div>
                   </div>
 
                   {setupState.complete && !gameState.initial_fen && (
                     <button
                       type="button"
                       disabled={actionLoading !== null}
-                      onClick={() => void finalizeSetup(setupState, gameState.version)}
+                      onClick={() =>
+                        void finalizeSetup(setupState, gameState.version)
+                      }
                       className="mt-3 w-full rounded-xl bg-violet-300 px-3 py-3 text-sm font-black text-zinc-950 hover:bg-violet-200 disabled:opacity-40"
                     >
                       ▶ Start Match
@@ -1167,7 +1301,11 @@ export function MirrorMultiplayerGame() {
                     </button>
                     <button
                       type="button"
-                      disabled={gameState.status !== "playing" || actionLoading !== null || undoPending}
+                      disabled={
+                        gameState.status !== "playing" ||
+                        actionLoading !== null ||
+                        undoPending
+                      }
                       onClick={() => void resign()}
                       className="rounded-xl border border-red-400/15 bg-red-400/[0.06] px-3 py-2.5 text-sm font-bold text-red-200 disabled:opacity-35"
                     >
@@ -1178,11 +1316,28 @@ export function MirrorMultiplayerGame() {
               )}
 
               {gameState.undo_requested_by && phase === "playing" && (
-                <Panel title="Undo request" subtitle={myUndoRequest ? "Waiting for opponent" : "Opponent wants to undo the latest move"}>
+                <Panel
+                  title="Undo request"
+                  subtitle={
+                    myUndoRequest
+                      ? "Waiting for opponent"
+                      : "Opponent wants to undo the latest move"
+                  }
+                >
                   {opponentUndoRequest ? (
                     <div className="grid grid-cols-2 gap-2">
-                      <button onClick={() => void respondUndo(true)} className="rounded-xl bg-emerald-300 px-3 py-2.5 font-black text-zinc-950">Accept</button>
-                      <button onClick={() => void respondUndo(false)} className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 font-black text-zinc-300">Decline</button>
+                      <button
+                        onClick={() => void respondUndo(true)}
+                        className="rounded-xl bg-emerald-300 px-3 py-2.5 font-black text-zinc-950"
+                      >
+                        Accept
+                      </button>
+                      <button
+                        onClick={() => void respondUndo(false)}
+                        className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 font-black text-zinc-300"
+                      >
+                        Decline
+                      </button>
                     </div>
                   ) : (
                     <p className="text-sm text-zinc-400">Request sent.</p>
@@ -1196,8 +1351,12 @@ export function MirrorMultiplayerGame() {
             <div className="mx-auto max-w-[820px]">
               {gameState.status === "finished" && (
                 <div className="mb-3 rounded-2xl border border-violet-400/20 bg-violet-400/[0.07] p-4">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-violet-300">Game Over</p>
-                  <p className="mt-1 text-lg font-black text-white">{resultLabel(gameState)}</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-violet-300">
+                    Game Over
+                  </p>
+                  <p className="mt-1 text-lg font-black text-white">
+                    {resultLabel(gameState)}
+                  </p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <button
                       type="button"
@@ -1207,7 +1366,11 @@ export function MirrorMultiplayerGame() {
                     >
                       {myRematchReady ? "Rematch requested" : "Play Again"}
                     </button>
-                    {opponentRematchReady && <span className="rounded-xl bg-white/5 px-3 py-2 text-xs text-zinc-400">Opponent ready</span>}
+                    {opponentRematchReady && (
+                      <span className="rounded-xl bg-white/5 px-3 py-2 text-xs text-zinc-400">
+                        Opponent ready
+                      </span>
+                    )}
                   </div>
                 </div>
               )}
@@ -1215,22 +1378,37 @@ export function MirrorMultiplayerGame() {
               {historyPreviewPly !== null && phase === "playing" && (
                 <div className="mb-3 flex items-center justify-between rounded-xl border border-violet-400/20 bg-violet-400/[0.06] px-4 py-3">
                   <div>
-                    <p className="text-[9px] font-black uppercase tracking-widest text-violet-300">History Preview</p>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-violet-300">
+                      History Preview
+                    </p>
                     <p className="mt-1 text-sm font-bold text-white">
                       {historyPreviewPly === 0
                         ? "Initial mirrored position"
                         : `${historyRows[historyPreviewPly - 1]?.moveNumber}${historyRows[historyPreviewPly - 1]?.color === "w" ? "." : "..."} ${historyRows[historyPreviewPly - 1]?.san ?? ""}`}
                     </p>
                   </div>
-                  <button onClick={() => setHistoryPreviewPly(null)} className="rounded-lg bg-white/10 px-3 py-2 text-xs font-bold">Back to Live Board</button>
+                  <button
+                    onClick={() => setHistoryPreviewPly(null)}
+                    className="rounded-lg bg-white/10 px-3 py-2 text-xs font-bold"
+                  >
+                    Back to Live Board
+                  </button>
                 </div>
               )}
 
               <div className="relative">
                 <Board
                   board={board}
-                  selectedSquare={phase === "playing" && historyPreviewPly === null ? selectedSquare : null}
-                  legalMoves={phase === "playing" && historyPreviewPly === null ? legalMoves : []}
+                  selectedSquare={
+                    phase === "playing" && historyPreviewPly === null
+                      ? selectedSquare
+                      : null
+                  }
+                  legalMoves={
+                    phase === "playing" && historyPreviewPly === null
+                      ? legalMoves
+                      : []
+                  }
                   lastMove={displayedLastMove}
                   checkedKingSquare={checkedKingSquare}
                   onSquareClick={
@@ -1241,54 +1419,60 @@ export function MirrorMultiplayerGame() {
                         : handleGameSquareClick
                   }
                   mirrorSetupSquares={phase === "setup" ? setupSquares : []}
-                  mirrorAvailableSquares={phase === "setup" && mySetupTurn ? availableSquares : []}
+                  mirrorAvailableSquares={
+                    phase === "setup" && mySetupTurn ? availableSquares : []
+                  }
                   mirrorPreviewSquares={[]}
                   orientation={orientation}
                 />
-              {players.length < 2 && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[28px] bg-zinc-950/70 p-4 backdrop-blur-[3px]">
-                  <button
-                    type="button"
-                    onClick={() => void copyRoomCode()}
-                    className="w-full max-w-lg rounded-[30px] border border-white/15 bg-zinc-900/95 px-8 py-8 text-center shadow-2xl shadow-black/60 transition hover:border-amber-300/35 hover:bg-zinc-900 active:scale-[0.99]"
-                    title="Copy room code"
-                  >
-                    <div className="text-4xl">🌐</div>
+                {players.length < 2 && (
+                  <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[28px] bg-zinc-950/70 p-4 backdrop-blur-[3px]">
+                    <button
+                      type="button"
+                      onClick={() => void copyRoomCode()}
+                      className="w-full max-w-lg rounded-[30px] border border-white/15 bg-zinc-900/95 px-8 py-8 text-center shadow-2xl shadow-black/60 transition hover:border-amber-300/35 hover:bg-zinc-900 active:scale-[0.99]"
+                      title="Copy room code"
+                    >
+                      <div className="text-4xl">🌐</div>
 
-                    <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">
-                      Waiting for players
-                    </p>
-
-                    <h2 className="mt-2 text-2xl font-black text-white">
-                      {players.length}/2 players connected
-                    </h2>
-
-                    <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">
-                      Share this room code. The game starts automatically when everyone has joined.
-                    </p>
-
-                    <div className="mt-6 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-5 py-5">
-                      <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">
-                        Room Code
+                      <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">
+                        Waiting for players
                       </p>
 
-                      <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">
-                        {room.code}
+                      <h2 className="mt-2 text-2xl font-black text-white">
+                        {players.length}/2 players connected
+                      </h2>
+
+                      <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">
+                        Share this room code. The game starts automatically when
+                        everyone has joined.
                       </p>
-                    </div>
 
-                    <p className="mt-4 text-xs font-bold text-zinc-400">
-                      {copied ? "✓ Copied to clipboard" : "Click this box to copy the code"}
-                    </p>
-                  </button>
-                </div>
-              )}
+                      <div className="mt-6 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-5 py-5">
+                        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">
+                          Room Code
+                        </p>
 
+                        <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">
+                          {room.code}
+                        </p>
+                      </div>
+
+                      <p className="mt-4 text-xs font-bold text-zinc-400">
+                        {copied
+                          ? "✓ Copied to clipboard"
+                          : "Click this box to copy the code"}
+                      </p>
+                    </button>
+                  </div>
+                )}
 
                 {pendingPromotion && historyPreviewPly === null && (
                   <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/45 p-4 backdrop-blur-[4px]">
                     <div className="w-full max-w-sm rounded-3xl border border-violet-400/20 bg-zinc-900/95 p-4 shadow-2xl">
-                      <p className="mb-3 text-center text-sm font-black text-violet-200">Choose promotion</p>
+                      <p className="mb-3 text-center text-sm font-black text-violet-200">
+                        Choose promotion
+                      </p>
                       <PromotionBar onPromote={promotePawn} />
                     </div>
                   </div>
@@ -1299,7 +1483,14 @@ export function MirrorMultiplayerGame() {
 
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              <Panel title={phase === "setup" ? "Shared Piece Bag" : "Move History"} subtitle={phase === "setup" ? `Seed ${setupState.seed}` : `${historyRows.length} plies · click to preview`}>
+              <Panel
+                title={phase === "setup" ? "Shared Piece Bag" : "Move History"}
+                subtitle={
+                  phase === "setup"
+                    ? `Seed ${setupState.seed}`
+                    : `${historyRows.length} plies · click to preview`
+                }
+              >
                 {phase === "setup" ? (
                   <div className="grid grid-cols-8 gap-1">
                     {setupState.bag.map((piece, index) => (
@@ -1327,7 +1518,9 @@ export function MirrorMultiplayerGame() {
                       Start · Mirrored position
                     </button>
                     {historyRows.length === 0 ? (
-                      <p className="px-3 py-6 text-center text-xs text-zinc-700">No moves yet</p>
+                      <p className="px-3 py-6 text-center text-xs text-zinc-700">
+                        No moves yet
+                      </p>
                     ) : (
                       historyRows.map((row) => (
                         <button
@@ -1336,8 +1529,13 @@ export function MirrorMultiplayerGame() {
                           onClick={() => setHistoryPreviewPly(row.ply)}
                           className={`flex w-full items-center gap-3 border-b border-white/5 px-3 py-2.5 text-left last:border-0 ${historyPreviewPly === row.ply ? "bg-violet-400/10" : "hover:bg-white/5"}`}
                         >
-                          <span className="w-10 text-[10px] text-zinc-600">{row.moveNumber}{row.color === "w" ? "." : "..."}</span>
-                          <span className="font-mono text-xs font-black text-zinc-200">{row.san}</span>
+                          <span className="w-10 text-[10px] text-zinc-600">
+                            {row.moveNumber}
+                            {row.color === "w" ? "." : "..."}
+                          </span>
+                          <span className="font-mono text-xs font-black text-zinc-200">
+                            {row.san}
+                          </span>
                         </button>
                       ))
                     )}
@@ -1345,13 +1543,33 @@ export function MirrorMultiplayerGame() {
                 )}
               </Panel>
 
-              <Panel title="Mirror Status" subtitle={phase === "setup" ? "One placement creates two pieces" : "Symmetric origin · normal chess play"}>
+              <Panel
+                title="Mirror Status"
+                subtitle={
+                  phase === "setup"
+                    ? "One placement creates two pieces"
+                    : "Symmetric origin · normal chess play"
+                }
+              >
                 <div className="grid grid-cols-2 gap-2">
-                  <div className="rounded-xl border border-white/5 bg-black/20 p-3"><p className="text-[9px] uppercase tracking-wider text-zinc-600">Placed pairs</p><p className="mt-1 text-xl font-black">{placementCount}</p></div>
-                  <div className="rounded-xl border border-white/5 bg-black/20 p-3"><p className="text-[9px] uppercase tracking-wider text-zinc-600">Seed</p><p className="mt-1 truncate font-mono text-xs font-black">{setupState.seed}</p></div>
+                  <div className="rounded-xl border border-white/5 bg-black/20 p-3">
+                    <p className="text-[9px] uppercase tracking-wider text-zinc-600">
+                      Placed pairs
+                    </p>
+                    <p className="mt-1 text-xl font-black">{placementCount}</p>
+                  </div>
+                  <div className="rounded-xl border border-white/5 bg-black/20 p-3">
+                    <p className="text-[9px] uppercase tracking-wider text-zinc-600">
+                      Seed
+                    </p>
+                    <p className="mt-1 truncate font-mono text-xs font-black">
+                      {setupState.seed}
+                    </p>
+                  </div>
                 </div>
                 <p className="mt-3 text-xs leading-5 text-zinc-500">
-                  The King is restricted to the back rank. Other pieces can use either setup rank, matching the current Mirror rules.
+                  The King is restricted to the back rank. Other pieces can use
+                  either setup rank, matching the current Mirror rules.
                 </p>
               </Panel>
             </div>
@@ -1360,7 +1578,8 @@ export function MirrorMultiplayerGame() {
 
         {players.length < 2 && (
           <div className="mt-5 rounded-2xl border border-amber-400/20 bg-amber-400/[0.06] px-4 py-3 text-sm font-semibold text-amber-100">
-            Waiting for a second player. Share room code <span className="font-mono font-black">{room.code}</span>.
+            Waiting for a second player. Share room code{" "}
+            <span className="font-mono font-black">{room.code}</span>.
           </div>
         )}
         {error && <ErrorBox>{error}</ErrorBox>}

@@ -44,7 +44,7 @@ export default function MedievalKingdomsBattlePage() {
 
   if (!campaign || !battleNode) {
     return (
-      <main className="min-h-screen bg-[#21170f] px-4 py-8 text-[#f5e4c1]">
+      <main className="min-h-screen bg-transparent px-4 py-8 text-[#f5e4c1]">
         <div className="mx-auto max-w-xl rounded-2xl border border-[#795a34] bg-[#3b2a1b] p-6">
           <h1 className="text-xl font-black">Battle not found</h1>
 

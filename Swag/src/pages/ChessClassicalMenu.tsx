@@ -94,7 +94,7 @@ export default function ChessClassicMenu() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-white">
+    <main className="min-h-screen bg-transparent text-white">
       <div
         className="
           pointer-events-none

@@ -282,7 +282,7 @@ export function FogOfWarMultiplayerLobby() {
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#0c3445_0%,#111116_38%,#08080b_100%)] px-4 py-8 text-zinc-100 sm:px-6">
+    <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-5xl">
         <header className="mb-7 rounded-3xl border border-sky-400/15 bg-zinc-900/65 p-6 shadow-2xl shadow-black/30">
           <div className="flex items-center gap-4">
@@ -693,7 +693,7 @@ export function FogOfWarMultiplayerGame() {
 
   if (!user) {
     return (
-      <main className="min-h-screen bg-zinc-950 p-8 text-zinc-100">
+      <main className="min-h-screen bg-transparent p-8 text-zinc-100">
         Sign in to open this room.
       </main>
     );
@@ -701,7 +701,7 @@ export function FogOfWarMultiplayerGame() {
 
   if (loading || !snapshot) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-zinc-950 text-zinc-400">
+      <main className="flex min-h-screen items-center justify-center bg-transparent text-zinc-400">
         Loading Fog of War room…
       </main>
     );
@@ -718,7 +718,7 @@ export function FogOfWarMultiplayerGame() {
   const materialDiff = whiteMaterial - blackMaterial;
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#0c3445_0%,#111116_38%,#08080b_100%)] px-4 py-6 text-zinc-100 sm:px-6">
+    <main className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1500px]">
         <header className="mb-7 flex flex-col gap-4 rounded-3xl border border-sky-400/10 bg-zinc-900/55 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">

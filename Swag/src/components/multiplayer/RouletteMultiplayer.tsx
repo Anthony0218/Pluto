@@ -562,7 +562,7 @@ export function RouletteMultiplayerLobby() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-4 py-8 text-zinc-100 sm:px-6">
+    <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-5xl">
         <header className="mb-7 rounded-3xl border border-violet-400/15 bg-zinc-900/70 p-6 shadow-2xl shadow-black/30">
           <div className="flex items-center gap-4">
@@ -1402,7 +1402,7 @@ export function RouletteMultiplayerGame() {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-zinc-950 text-zinc-400">
+      <main className="flex min-h-screen items-center justify-center bg-transparent text-zinc-400">
         Loading ChessRoulette room...
       </main>
     );
@@ -1410,7 +1410,7 @@ export function RouletteMultiplayerGame() {
 
   if (!user) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-zinc-950 p-6 text-zinc-200">
+      <main className="flex min-h-screen items-center justify-center bg-transparent p-6 text-zinc-200">
         <Panel title="Sign in required">
           <Link
             className="text-violet-300"
@@ -1425,7 +1425,7 @@ export function RouletteMultiplayerGame() {
 
   if (!room || !gameState) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-zinc-950 p-6 text-zinc-200">
+      <main className="flex min-h-screen items-center justify-center bg-transparent p-6 text-zinc-200">
         <Panel title="Room unavailable">
           <p className="text-sm text-zinc-400">
             {error ?? "Could not load the room."}
@@ -1453,7 +1453,7 @@ export function RouletteMultiplayerGame() {
     records.at(-1)?.color === mySide;
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-4 py-6 text-zinc-100 sm:px-6">
+    <main className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1600px]">
         <header className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-violet-400/10 bg-zinc-900/50 px-5 py-4">
           <div>

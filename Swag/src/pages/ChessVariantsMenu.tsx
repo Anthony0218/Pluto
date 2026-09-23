@@ -1537,7 +1537,7 @@ export default function ChessVariantsMenu() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-zinc-100">
+    <main className="min-h-screen bg-transparent text-zinc-100">
       <div
         className="
           pointer-events-none

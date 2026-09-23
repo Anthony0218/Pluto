@@ -1257,7 +1257,7 @@ export default function DraftChessBoard({
   const board = phase === "setup" ? setupBoard : playingBoard;
 
   return (
-    <div className="min-h-screen bg-zinc-950 px-4 py-6 text-zinc-100 sm:px-6">
+    <div className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1500px]">
         <header className="mb-7 flex flex-col gap-4 rounded-3xl border border-emerald-400/10 bg-zinc-900/50 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">

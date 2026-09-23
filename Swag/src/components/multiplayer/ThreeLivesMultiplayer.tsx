@@ -84,7 +84,10 @@ const pieceValues: Record<string, number> = {
 };
 
 function normalizeCode(value: string) {
-  return value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6);
+  return value
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "")
+    .slice(0, 6);
 }
 
 function colorToChess(color: TwoPlayerColor): "w" | "b" {
@@ -222,8 +225,10 @@ function playLatestMoveSound(initialFen: string, moves: string[]) {
 
 function resultLabel(game: VariantGame) {
   if (game.winner === "draw") return `Draw · ${game.end_reason ?? "Game over"}`;
-  if (game.winner === "white") return `White wins · ${game.end_reason ?? "Game over"}`;
-  if (game.winner === "black") return `Black wins · ${game.end_reason ?? "Game over"}`;
+  if (game.winner === "white")
+    return `White wins · ${game.end_reason ?? "Game over"}`;
+  if (game.winner === "black")
+    return `Black wins · ${game.end_reason ?? "Game over"}`;
   return game.end_reason ?? "Game over";
 }
 
@@ -267,8 +272,14 @@ function CapturedPieces({ rows }: { rows: ThreeLivesHistoryRow[] }) {
     .filter((row) => row.color === "w" && row.captured)
     .map((row) => row.captured as PieceType);
 
-  const whiteMaterial = capturedBlack.reduce((sum, piece) => sum + (pieceValues[piece] ?? 0), 0);
-  const blackMaterial = capturedWhite.reduce((sum, piece) => sum + (pieceValues[piece] ?? 0), 0);
+  const whiteMaterial = capturedBlack.reduce(
+    (sum, piece) => sum + (pieceValues[piece] ?? 0),
+    0,
+  );
+  const blackMaterial = capturedWhite.reduce(
+    (sum, piece) => sum + (pieceValues[piece] ?? 0),
+    0,
+  );
   const diff = whiteMaterial - blackMaterial;
 
   const render = (pieces: PieceType[], color: "w" | "b") => (
@@ -288,13 +299,21 @@ function CapturedPieces({ rows }: { rows: ThreeLivesHistoryRow[] }) {
   return (
     <>
       <div className="mb-3 rounded-xl border border-white/5 bg-black/20 px-3 py-2 text-xs font-bold text-zinc-400">
-        {diff > 0 ? `White +${diff}` : diff < 0 ? `Black +${Math.abs(diff)}` : "Material equal"}
+        {diff > 0
+          ? `White +${diff}`
+          : diff < 0
+            ? `Black +${Math.abs(diff)}`
+            : "Material equal"}
       </div>
       <div className="rounded-2xl border border-white/5 bg-black/20 p-3">
-        <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">Black pieces captured</p>
+        <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
+          Black pieces captured
+        </p>
         {render(capturedBlack, "b")}
         <div className="mt-3 border-t border-white/5 pt-3">
-          <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">White pieces captured</p>
+          <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
+            White pieces captured
+          </p>
           {render(capturedWhite, "w")}
         </div>
       </div>
@@ -349,26 +368,39 @@ export function ThreeLivesMultiplayerLobby() {
     });
     setLoading(null);
     if (rpcError) return setError(rpcError.message);
-    navigate(`/games/chess/variants/three-lives/multiplayer/${String(data ?? code)}`);
+    navigate(
+      `/games/chess/variants/three-lives/multiplayer/${String(data ?? code)}`,
+    );
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#21170f_0%,#111111_38%,#090909_100%)] px-4 py-8 text-zinc-100 sm:px-6">
+    <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-5xl">
         <header className="mb-7 rounded-3xl border border-amber-400/15 bg-zinc-900/65 p-6 shadow-2xl shadow-black/30">
           <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-amber-500/20 bg-amber-400/10 text-3xl text-amber-200">♞</div>
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-amber-500/20 bg-amber-400/10 text-3xl text-amber-200">
+              ♞
+            </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-400">Three Lives · Multiplayer</p>
-              <h1 className="mt-1 text-3xl font-black text-white">Checks hurt. Hearts heal.</h1>
-              <p className="mt-1 text-sm text-zinc-500">Every check costs one life · bonus hearts are synchronized · checkmate still wins</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-400">
+                Three Lives · Multiplayer
+              </p>
+              <h1 className="mt-1 text-3xl font-black text-white">
+                Checks hurt. Hearts heal.
+              </h1>
+              <p className="mt-1 text-sm text-zinc-500">
+                Every check costs one life · bonus hearts are synchronized ·
+                checkmate still wins
+              </p>
             </div>
           </div>
         </header>
 
         {!user ? (
           <Panel title="Sign in required">
-            <p className="text-sm text-zinc-400">Multiplayer rooms use your existing Supabase account.</p>
+            <p className="text-sm text-zinc-400">
+              Multiplayer rooms use your existing Supabase account.
+            </p>
           </Panel>
         ) : (
           <div className="grid gap-5 lg:grid-cols-2">
@@ -385,7 +417,8 @@ export function ThreeLivesMultiplayerLobby() {
                         : "border-white/10 bg-black/20 text-zinc-400 hover:bg-white/5"
                     }`}
                   >
-                    {color === "white" ? "♔" : "♚"} {color === "white" ? "White" : "Black"}
+                    {color === "white" ? "♔" : "♚"}{" "}
+                    {color === "white" ? "White" : "Black"}
                   </button>
                 ))}
               </div>
@@ -395,14 +428,18 @@ export function ThreeLivesMultiplayerLobby() {
                 onClick={() => void createRoom()}
                 className="mt-5 w-full rounded-xl bg-amber-300 px-5 py-3 font-black text-zinc-950 transition hover:bg-amber-200 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {loading === "create" ? "Creating..." : "Create Three Lives Room"}
+                {loading === "create"
+                  ? "Creating..."
+                  : "Create Three Lives Room"}
               </button>
             </Panel>
 
             <Panel title="Join room" subtitle="You receive the opposite side">
               <input
                 value={joinCode}
-                onChange={(event) => setJoinCode(normalizeCode(event.target.value))}
+                onChange={(event) =>
+                  setJoinCode(normalizeCode(event.target.value))
+                }
                 onKeyDown={(event) => event.key === "Enter" && void joinRoom()}
                 placeholder="ABC123"
                 className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-center font-mono text-2xl font-black uppercase tracking-[0.3em] text-white outline-none transition focus:border-amber-400/40"
@@ -434,8 +471,13 @@ export function ThreeLivesMultiplayerGame() {
   const [gameState, setGameState] = useState<VariantGame | null>(null);
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [legalMoves, setLegalMoves] = useState<Square[]>([]);
-  const [pendingPromotion, setPendingPromotion] = useState<{ from: Square; to: Square } | null>(null);
-  const [historyPreviewPly, setHistoryPreviewPly] = useState<number | null>(null);
+  const [pendingPromotion, setPendingPromotion] = useState<{
+    from: Square;
+    to: Square;
+  } | null>(null);
+  const [historyPreviewPly, setHistoryPreviewPly] = useState<number | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [moving, setMoving] = useState(false);
   const [actionLoading, setActionLoading] = useState<ActionLoading>(null);
@@ -454,7 +496,8 @@ export function ThreeLivesMultiplayerGame() {
     [players, user?.id],
   );
   const myColor = myPlayer?.chosen_color ?? null;
-  const orientation: "white" | "black" = myColor === "black" ? "black" : "white";
+  const orientation: "white" | "black" =
+    myColor === "black" ? "black" : "white";
 
   const seed = gameState?.seed ?? 0;
   const powerState = useMemo(
@@ -476,7 +519,8 @@ export function ThreeLivesMultiplayerGame() {
 
   const previewGame = useMemo(() => {
     if (historyPreviewPly === null) return null;
-    if (historyPreviewPly === 0) return new Chess(gameState?.initial_fen ?? START_FEN);
+    if (historyPreviewPly === 0)
+      return new Chess(gameState?.initial_fen ?? START_FEN);
     const row = historyRows[historyPreviewPly - 1];
     return row ? new Chess(row.fenAfter) : null;
   }, [gameState?.initial_fen, historyPreviewPly, historyRows]);
@@ -498,17 +542,26 @@ export function ThreeLivesMultiplayerGame() {
       };
     }
     return null;
-  }, [gameState?.last_move_from, gameState?.last_move_to, historyPreviewPly, historyRows]);
+  }, [
+    gameState?.last_move_from,
+    gameState?.last_move_to,
+    historyPreviewPly,
+    historyRows,
+  ]);
 
   const displayedPower = useMemo(() => {
     if (historyPreviewPly === null) return powerState;
     if (historyPreviewPly === 0) {
       return buildThreeLivesPowerupState([], seed);
     }
-    return buildThreeLivesPowerupState(gameState?.moves.slice(0, historyPreviewPly) ?? [], seed);
+    return buildThreeLivesPowerupState(
+      gameState?.moves.slice(0, historyPreviewPly) ?? [],
+      seed,
+    );
   }, [gameState?.moves, historyPreviewPly, powerState, seed]);
 
-  const isMyTurn = Boolean(myColor) && liveGame.turn() === colorToChess(myColor!);
+  const isMyTurn =
+    Boolean(myColor) && liveGame.turn() === colorToChess(myColor!);
   const undoPending = Boolean(gameState?.undo_requested_by);
   const canMove =
     room?.status === "playing" &&
@@ -521,7 +574,9 @@ export function ThreeLivesMultiplayerGame() {
     !undoPending;
 
   const lastHistoryMove = historyRows[historyRows.length - 1] ?? null;
-  const lastMoverColor = lastHistoryMove ? chessToColor(lastHistoryMove.color) : null;
+  const lastMoverColor = lastHistoryMove
+    ? chessToColor(lastHistoryMove.color)
+    : null;
   const alreadyRequestedUndo =
     Boolean(user?.id) &&
     gameState?.undo_last_requested_by === user?.id &&
@@ -535,8 +590,10 @@ export function ThreeLivesMultiplayerGame() {
     !alreadyRequestedUndo &&
     !moving &&
     actionLoading === null;
-  const myUndoRequest = Boolean(user?.id) && gameState?.undo_requested_by === user?.id;
-  const opponentUndoRequest = Boolean(gameState?.undo_requested_by) && !myUndoRequest;
+  const myUndoRequest =
+    Boolean(user?.id) && gameState?.undo_requested_by === user?.id;
+  const opponentUndoRequest =
+    Boolean(gameState?.undo_requested_by) && !myUndoRequest;
 
   const myRematchReady =
     myColor === "white"
@@ -554,7 +611,8 @@ export function ThreeLivesMultiplayerGame() {
   const applyAuthoritativeGame = useCallback((raw: VariantGame) => {
     const updated = normalizeGame(raw);
     const nextMoveCount = updated.moves.length;
-    const seedChanged = lastSeedRef.current !== null && updated.seed !== lastSeedRef.current;
+    const seedChanged =
+      lastSeedRef.current !== null && updated.seed !== lastSeedRef.current;
 
     if (seedChanged || nextMoveCount < lastSeenMoveCountRef.current) {
       setHistoryPreviewPly(null);
@@ -573,70 +631,75 @@ export function ThreeLivesMultiplayerGame() {
     setGameState(updated);
   }, []);
 
-  const loadRoom = useCallback(async (silent = false) => {
-    if (!roomCode || !user) return;
-    if (!silent) {
-      setLoading(true);
-      setError(null);
-    }
+  const loadRoom = useCallback(
+    async (silent = false) => {
+      if (!roomCode || !user) return;
+      if (!silent) {
+        setLoading(true);
+        setError(null);
+      }
 
-    const { data: roomData, error: roomError } = await supabase
-      .from("variant_rooms")
-      .select("id, code, host_id, variant, max_players, status, created_at")
-      .eq("code", roomCode.toUpperCase())
-      .eq("variant", "three-lives")
-      .single();
+      const { data: roomData, error: roomError } = await supabase
+        .from("variant_rooms")
+        .select("id, code, host_id, variant, max_players, status, created_at")
+        .eq("code", roomCode.toUpperCase())
+        .eq("variant", "three-lives")
+        .single();
 
-    if (roomError || !roomData) {
-      if (!silent) setError("Room not found.");
-      setLoading(false);
-      return;
-    }
+      if (roomError || !roomData) {
+        if (!silent) setError("Room not found.");
+        setLoading(false);
+        return;
+      }
 
-    const loadedRoom = roomData as VariantRoom;
-    const { data: playerData, error: playerError } = await supabase
-      .from("variant_room_players")
-      .select("room_id, user_id, seat, display_name, chosen_color")
-      .eq("room_id", loadedRoom.id)
-      .order("seat", { ascending: true });
+      const loadedRoom = roomData as VariantRoom;
+      const { data: playerData, error: playerError } = await supabase
+        .from("variant_room_players")
+        .select("room_id, user_id, seat, display_name, chosen_color")
+        .eq("room_id", loadedRoom.id)
+        .order("seat", { ascending: true });
 
-    if (playerError) {
-      if (!silent) setError(playerError.message);
-      setLoading(false);
-      return;
-    }
+      if (playerError) {
+        if (!silent) setError(playerError.message);
+        setLoading(false);
+        return;
+      }
 
-    const loadedPlayers = (playerData ?? []) as VariantRoomPlayer[];
-    if (!loadedPlayers.some((player) => player.user_id === user.id)) {
-      if (!silent) setError("You are not a player in this room.");
-      setLoading(false);
-      return;
-    }
+      const loadedPlayers = (playerData ?? []) as VariantRoomPlayer[];
+      if (!loadedPlayers.some((player) => player.user_id === user.id)) {
+        if (!silent) setError("You are not a player in this room.");
+        setLoading(false);
+        return;
+      }
 
-    const { data: gameData, error: gameError } = await supabase
-      .from("variant_games")
-      .select(`
+      const { data: gameData, error: gameError } = await supabase
+        .from("variant_games")
+        .select(
+          `
         room_id, variant, seed, initial_fen, fen, moves, state, status,
         winner, end_reason, version, last_move_from, last_move_to,
         white_rematch_ready, black_rematch_ready, next_seed, next_initial_fen,
         undo_requested_by, undo_requested_version, undo_previous_fen,
         undo_previous_last_from, undo_previous_last_to,
         undo_last_requested_by, undo_last_requested_version
-      `)
-      .eq("room_id", loadedRoom.id)
-      .single();
+      `,
+        )
+        .eq("room_id", loadedRoom.id)
+        .single();
 
-    if (gameError || !gameData) {
-      if (!silent) setError("Game could not be loaded.");
+      if (gameError || !gameData) {
+        if (!silent) setError("Game could not be loaded.");
+        setLoading(false);
+        return;
+      }
+
+      setRoom(loadedRoom);
+      setPlayers(loadedPlayers);
+      applyAuthoritativeGame(gameData as VariantGame);
       setLoading(false);
-      return;
-    }
-
-    setRoom(loadedRoom);
-    setPlayers(loadedPlayers);
-    applyAuthoritativeGame(gameData as VariantGame);
-    setLoading(false);
-  }, [applyAuthoritativeGame, roomCode, user]);
+    },
+    [applyAuthoritativeGame, roomCode, user],
+  );
 
   useEffect(() => {
     void loadRoom(false);
@@ -710,8 +773,19 @@ export function ThreeLivesMultiplayerGame() {
     setLegalMoves([]);
   }
 
-  async function submitMove(from: Square, to: Square, promotion?: PromotionPiece) {
-    if (!room || !gameState || !gameState.fen || !gameState.initial_fen || !canMove) return;
+  async function submitMove(
+    from: Square,
+    to: Square,
+    promotion?: PromotionPiece,
+  ) {
+    if (
+      !room ||
+      !gameState ||
+      !gameState.fen ||
+      !gameState.initial_fen ||
+      !canMove
+    )
+      return;
 
     const localGame = new Chess(gameState.fen);
     let move;
@@ -815,12 +889,13 @@ export function ThreeLivesMultiplayerGame() {
 
   function buildUndoSnapshot() {
     if (!gameState?.initial_fen || gameState.moves.length === 0) return null;
-    const previousMove = historyRows.length >= 2 ? historyRows[historyRows.length - 2] : null;
+    const previousMove =
+      historyRows.length >= 2 ? historyRows[historyRows.length - 2] : null;
     return {
       previousFen:
         gameState.moves.length === 1
           ? gameState.initial_fen
-          : previousMove?.fenAfter ?? gameState.initial_fen,
+          : (previousMove?.fenAfter ?? gameState.initial_fen),
       previousLastFrom: previousMove?.from ?? null,
       previousLastTo: previousMove?.to ?? null,
     };
@@ -863,7 +938,13 @@ export function ThreeLivesMultiplayerGame() {
   }
 
   async function resign() {
-    if (!room || gameState?.status !== "playing" || actionLoading || undoPending) return;
+    if (
+      !room ||
+      gameState?.status !== "playing" ||
+      actionLoading ||
+      undoPending
+    )
+      return;
     setActionLoading("resign");
     setError(null);
     const { error: resignError } = await supabase.rpc("resign_variant_game", {
@@ -876,14 +957,24 @@ export function ThreeLivesMultiplayerGame() {
   }
 
   async function requestRematch() {
-    if (!room || !gameState || gameState.status !== "finished" || myRematchReady || actionLoading) return;
+    if (
+      !room ||
+      !gameState ||
+      gameState.status !== "finished" ||
+      myRematchReady ||
+      actionLoading
+    )
+      return;
     setActionLoading("rematch");
     setError(null);
-    const { error: rematchError } = await supabase.rpc("request_variant_rematch", {
-      p_room_id: room.id,
-      p_next_seed: createThreeLivesHeartSeed(),
-      p_next_initial_fen: START_FEN,
-    });
+    const { error: rematchError } = await supabase.rpc(
+      "request_variant_rematch",
+      {
+        p_room_id: room.id,
+        p_next_seed: createThreeLivesHeartSeed(),
+        p_next_initial_fen: START_FEN,
+      },
+    );
     if (rematchError) setError(rematchError.message);
     await loadRoom(true);
     setActionLoading(null);
@@ -901,14 +992,22 @@ export function ThreeLivesMultiplayerGame() {
   }
 
   if (!user) {
-    return <main className="min-h-screen bg-zinc-950 p-8 text-zinc-100">Sign in required.</main>;
+    return (
+      <main className="min-h-screen bg-transparent p-8 text-zinc-100">
+        Sign in required.
+      </main>
+    );
   }
   if (loading) {
-    return <main className="min-h-screen bg-zinc-950 p-8 text-zinc-400">Loading Three Lives room...</main>;
+    return (
+      <main className="min-h-screen bg-transparent p-8 text-zinc-400">
+        Loading Three Lives room...
+      </main>
+    );
   }
   if (!room || !gameState) {
     return (
-      <main className="min-h-screen bg-zinc-950 p-8 text-zinc-100">
+      <main className="min-h-screen bg-transparent p-8 text-zinc-100">
         <p>Three Lives room unavailable.</p>
         {error && <ErrorBox>{error}</ErrorBox>}
       </main>
@@ -922,21 +1021,33 @@ export function ThreeLivesMultiplayerGame() {
       <div className="mx-auto max-w-[1500px]">
         <header className="mb-7 flex flex-col gap-4 rounded-3xl border border-white/5 bg-zinc-900/50 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-amber-500/20 bg-amber-400/10 text-3xl text-amber-200">♞</div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-amber-500/20 bg-amber-400/10 text-3xl text-amber-200">
+              ♞
+            </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-400">Chess Variant · Multiplayer</p>
-              <h1 className="mt-0.5 text-2xl font-black text-white">Three Lives Chess</h1>
-              <p className="mt-0.5 text-sm text-zinc-500">Every check costs one life · Checkmate still wins</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-400">
+                Chess Variant · Multiplayer
+              </p>
+              <h1 className="mt-0.5 text-2xl font-black text-white">
+                Three Lives Chess
+              </h1>
+              <p className="mt-0.5 text-sm text-zinc-500">
+                Every check costs one life · Checkmate still wins
+              </p>
             </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
             <div className="flex items-center gap-2 rounded-full border border-red-400/15 bg-red-400/[0.06] px-3 py-1.5 text-xs font-bold">
               <span className="text-[#fff3d5]">♔</span>
-              <span className="tracking-wide text-red-300">{hearts(displayedPower.whiteHp)}</span>
+              <span className="tracking-wide text-red-300">
+                {hearts(displayedPower.whiteHp)}
+              </span>
               <span className="mx-1 text-zinc-700">·</span>
               <span className="text-zinc-400">♚</span>
-              <span className="tracking-wide text-red-300">{hearts(displayedPower.blackHp)}</span>
+              <span className="tracking-wide text-red-300">
+                {hearts(displayedPower.blackHp)}
+              </span>
             </div>
             {gameState.status === "playing" && (
               <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-300">
@@ -944,17 +1055,30 @@ export function ThreeLivesMultiplayerGame() {
                 {activeTurnColor === "white" ? "White" : "Black"} to move
               </div>
             )}
-            <button onClick={() => void copyRoomCode()} className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 font-mono text-xs font-black text-zinc-300">
+            <button
+              onClick={() => void copyRoomCode()}
+              className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 font-mono text-xs font-black text-zinc-300"
+            >
               Room {room.code} {copied ? "✓" : ""}
             </button>
-            <Link to="/games/chess/variants/three-lives/multiplayer" className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-400 hover:bg-white/10">Lobby</Link>
+            <Link
+              to="/games/chess/variants/three-lives/multiplayer"
+              className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-400 hover:bg-white/10"
+            >
+              Lobby
+            </Link>
           </div>
         </header>
 
         <main className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              <Panel title="Players" subtitle={players.length < 2 ? "Waiting for opponent..." : "Connected"}>
+              <Panel
+                title="Players"
+                subtitle={
+                  players.length < 2 ? "Waiting for opponent..." : "Connected"
+                }
+              >
                 <div className="space-y-2">
                   {players.map((player) => (
                     <div
@@ -962,11 +1086,16 @@ export function ThreeLivesMultiplayerGame() {
                       className={`rounded-2xl border p-3 ${player.chosen_color === activeTurnColor && gameState.status === "playing" ? "border-amber-400/25 bg-amber-400/[0.06]" : "border-white/5 bg-black/20"}`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-black text-zinc-200">{player.display_name}</span>
-                        <span className="text-xl">{player.chosen_color === "black" ? "♚" : "♔"}</span>
+                        <span className="font-black text-zinc-200">
+                          {player.display_name}
+                        </span>
+                        <span className="text-xl">
+                          {player.chosen_color === "black" ? "♚" : "♔"}
+                        </span>
                       </div>
                       <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-zinc-600">
-                        {player.user_id === user.id ? "You" : "Opponent"} · {player.chosen_color ?? "waiting"}
+                        {player.user_id === user.id ? "You" : "Opponent"} ·{" "}
+                        {player.chosen_color ?? "waiting"}
                       </p>
                     </div>
                   ))}
@@ -985,7 +1114,11 @@ export function ThreeLivesMultiplayerGame() {
                   </button>
                   <button
                     type="button"
-                    disabled={gameState.status !== "playing" || actionLoading !== null || undoPending}
+                    disabled={
+                      gameState.status !== "playing" ||
+                      actionLoading !== null ||
+                      undoPending
+                    }
                     onClick={() => void resign()}
                     className="rounded-xl border border-red-400/15 bg-red-400/[0.06] px-3 py-2.5 text-sm font-bold text-red-200 disabled:opacity-35"
                   >
@@ -995,11 +1128,28 @@ export function ThreeLivesMultiplayerGame() {
               </Panel>
 
               {gameState.undo_requested_by && (
-                <Panel title="Undo request" subtitle={myUndoRequest ? "Waiting for opponent" : "Opponent wants to undo the latest move"}>
+                <Panel
+                  title="Undo request"
+                  subtitle={
+                    myUndoRequest
+                      ? "Waiting for opponent"
+                      : "Opponent wants to undo the latest move"
+                  }
+                >
                   {opponentUndoRequest ? (
                     <div className="grid grid-cols-2 gap-2">
-                      <button onClick={() => void respondUndo(true)} className="rounded-xl bg-emerald-300 px-3 py-2.5 font-black text-zinc-950">Accept</button>
-                      <button onClick={() => void respondUndo(false)} className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 font-black text-zinc-300">Decline</button>
+                      <button
+                        onClick={() => void respondUndo(true)}
+                        className="rounded-xl bg-emerald-300 px-3 py-2.5 font-black text-zinc-950"
+                      >
+                        Accept
+                      </button>
+                      <button
+                        onClick={() => void respondUndo(false)}
+                        className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 font-black text-zinc-300"
+                      >
+                        Decline
+                      </button>
                     </div>
                   ) : (
                     <p className="text-sm text-zinc-400">Request sent.</p>
@@ -1017,8 +1167,12 @@ export function ThreeLivesMultiplayerGame() {
             <div className="mx-auto max-w-[820px]">
               {gameState.status === "finished" && (
                 <div className="mb-3 rounded-2xl border border-amber-400/20 bg-amber-400/[0.07] p-4">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-amber-300">Game Over</p>
-                  <p className="mt-1 text-lg font-black text-white">{resultLabel(gameState)}</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-amber-300">
+                    Game Over
+                  </p>
+                  <p className="mt-1 text-lg font-black text-white">
+                    {resultLabel(gameState)}
+                  </p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <button
                       type="button"
@@ -1028,7 +1182,11 @@ export function ThreeLivesMultiplayerGame() {
                     >
                       {myRematchReady ? "Rematch requested" : "Play Again"}
                     </button>
-                    {opponentRematchReady && <span className="rounded-xl bg-white/5 px-3 py-2 text-xs text-zinc-400">Opponent ready</span>}
+                    {opponentRematchReady && (
+                      <span className="rounded-xl bg-white/5 px-3 py-2 text-xs text-zinc-400">
+                        Opponent ready
+                      </span>
+                    )}
                   </div>
                 </div>
               )}
@@ -1036,73 +1194,91 @@ export function ThreeLivesMultiplayerGame() {
               {historyPreviewPly !== null && (
                 <div className="mb-3 flex items-center justify-between rounded-xl border border-amber-400/20 bg-amber-400/[0.06] px-4 py-3">
                   <div>
-                    <p className="text-[9px] font-black uppercase tracking-widest text-amber-300">History Preview</p>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-amber-300">
+                      History Preview
+                    </p>
                     <p className="mt-1 text-sm font-bold text-white">
                       {historyPreviewPly === 0
                         ? "Initial position"
                         : `${historyRows[historyPreviewPly - 1]?.moveNumber}${historyRows[historyPreviewPly - 1]?.color === "w" ? "." : "..."} ${historyRows[historyPreviewPly - 1]?.san ?? ""}`}
                     </p>
-                    <p className="mt-1 text-xs text-red-300">♔ {displayedPower.whiteHp} ♥ · ♚ {displayedPower.blackHp} ♥</p>
+                    <p className="mt-1 text-xs text-red-300">
+                      ♔ {displayedPower.whiteHp} ♥ · ♚ {displayedPower.blackHp}{" "}
+                      ♥
+                    </p>
                   </div>
-                  <button onClick={() => setHistoryPreviewPly(null)} className="rounded-lg bg-white/10 px-3 py-2 text-xs font-bold">Back to Live Board</button>
+                  <button
+                    onClick={() => setHistoryPreviewPly(null)}
+                    className="rounded-lg bg-white/10 px-3 py-2 text-xs font-bold"
+                  >
+                    Back to Live Board
+                  </button>
                 </div>
               )}
 
               <div className="relative">
                 <Board
                   board={board}
-                  selectedSquare={historyPreviewPly === null ? selectedSquare : null}
+                  selectedSquare={
+                    historyPreviewPly === null ? selectedSquare : null
+                  }
                   legalMoves={historyPreviewPly === null ? legalMoves : []}
                   lastMove={displayedLastMove}
                   checkedKingSquare={checkedKingSquare}
-                  onSquareClick={historyPreviewPly !== null ? () => {} : handleSquareClick}
+                  onSquareClick={
+                    historyPreviewPly !== null ? () => {} : handleSquareClick
+                  }
                   heartSquares={displayedPower.activeHearts}
                   orientation={orientation}
                 />
-              {players.length < 2 && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[28px] bg-zinc-950/70 p-4 backdrop-blur-[3px]">
-                  <button
-                    type="button"
-                    onClick={() => void copyRoomCode()}
-                    className="w-full max-w-lg rounded-[30px] border border-white/15 bg-zinc-900/95 px-8 py-8 text-center shadow-2xl shadow-black/60 transition hover:border-amber-300/35 hover:bg-zinc-900 active:scale-[0.99]"
-                    title="Copy room code"
-                  >
-                    <div className="text-4xl">🌐</div>
+                {players.length < 2 && (
+                  <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[28px] bg-zinc-950/70 p-4 backdrop-blur-[3px]">
+                    <button
+                      type="button"
+                      onClick={() => void copyRoomCode()}
+                      className="w-full max-w-lg rounded-[30px] border border-white/15 bg-zinc-900/95 px-8 py-8 text-center shadow-2xl shadow-black/60 transition hover:border-amber-300/35 hover:bg-zinc-900 active:scale-[0.99]"
+                      title="Copy room code"
+                    >
+                      <div className="text-4xl">🌐</div>
 
-                    <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">
-                      Waiting for players
-                    </p>
-
-                    <h2 className="mt-2 text-2xl font-black text-white">
-                      {players.length}/2 players connected
-                    </h2>
-
-                    <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">
-                      Share this room code. The game starts automatically when everyone has joined.
-                    </p>
-
-                    <div className="mt-6 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-5 py-5">
-                      <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">
-                        Room Code
+                      <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">
+                        Waiting for players
                       </p>
 
-                      <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">
-                        {room.code}
+                      <h2 className="mt-2 text-2xl font-black text-white">
+                        {players.length}/2 players connected
+                      </h2>
+
+                      <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">
+                        Share this room code. The game starts automatically when
+                        everyone has joined.
                       </p>
-                    </div>
 
-                    <p className="mt-4 text-xs font-bold text-zinc-400">
-                      {copied ? "✓ Copied to clipboard" : "Click this box to copy the code"}
-                    </p>
-                  </button>
-                </div>
-              )}
+                      <div className="mt-6 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-5 py-5">
+                        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">
+                          Room Code
+                        </p>
 
+                        <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">
+                          {room.code}
+                        </p>
+                      </div>
+
+                      <p className="mt-4 text-xs font-bold text-zinc-400">
+                        {copied
+                          ? "✓ Copied to clipboard"
+                          : "Click this box to copy the code"}
+                      </p>
+                    </button>
+                  </div>
+                )}
 
                 {pendingPromotion && historyPreviewPly === null && (
                   <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/45 p-4 backdrop-blur-[4px]">
                     <div className="w-full max-w-sm rounded-3xl border border-amber-400/20 bg-zinc-900/95 p-4 shadow-2xl">
-                      <p className="mb-3 text-center text-sm font-black text-amber-200">Choose promotion</p>
+                      <p className="mb-3 text-center text-sm font-black text-amber-200">
+                        Choose promotion
+                      </p>
                       <PromotionBar onPromote={promotePawn} />
                     </div>
                   </div>
@@ -1113,35 +1289,75 @@ export function ThreeLivesMultiplayerGame() {
 
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              <Panel title="Player Lives" subtitle="Collect hearts or land checks">
+              <Panel
+                title="Player Lives"
+                subtitle="Collect hearts or land checks"
+              >
                 <div className="space-y-3">
                   <div className="rounded-2xl border border-red-400/10 bg-red-400/[0.04] p-3">
-                    <div className="flex items-center justify-between"><span className="font-black text-zinc-200">White</span><span className="text-lg text-red-300">{hearts(displayedPower.whiteHp)}</span></div>
-                    <p className="mt-1 text-[10px] text-zinc-600">{displayedPower.whiteHp} lives</p>
+                    <div className="flex items-center justify-between">
+                      <span className="font-black text-zinc-200">White</span>
+                      <span className="text-lg text-red-300">
+                        {hearts(displayedPower.whiteHp)}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-[10px] text-zinc-600">
+                      {displayedPower.whiteHp} lives
+                    </p>
                   </div>
                   <div className="rounded-2xl border border-red-400/10 bg-red-400/[0.04] p-3">
-                    <div className="flex items-center justify-between"><span className="font-black text-zinc-200">Black</span><span className="text-lg text-red-300">{hearts(displayedPower.blackHp)}</span></div>
-                    <p className="mt-1 text-[10px] text-zinc-600">{displayedPower.blackHp} lives</p>
+                    <div className="flex items-center justify-between">
+                      <span className="font-black text-zinc-200">Black</span>
+                      <span className="text-lg text-red-300">
+                        {hearts(displayedPower.blackHp)}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-[10px] text-zinc-600">
+                      {displayedPower.blackHp} lives
+                    </p>
                   </div>
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-2">
-                  <div className="rounded-xl border border-white/5 bg-black/20 p-3"><p className="text-[9px] uppercase tracking-wider text-zinc-600">Active hearts</p><p className="mt-1 text-xl font-black">{displayedPower.activeHearts.length}</p></div>
-                  <div className="rounded-xl border border-white/5 bg-black/20 p-3"><p className="text-[9px] uppercase tracking-wider text-zinc-600">Pickups</p><p className="mt-1 text-xl font-black">{displayedPower.pickups.length}</p></div>
+                  <div className="rounded-xl border border-white/5 bg-black/20 p-3">
+                    <p className="text-[9px] uppercase tracking-wider text-zinc-600">
+                      Active hearts
+                    </p>
+                    <p className="mt-1 text-xl font-black">
+                      {displayedPower.activeHearts.length}
+                    </p>
+                  </div>
+                  <div className="rounded-xl border border-white/5 bg-black/20 p-3">
+                    <p className="text-[9px] uppercase tracking-wider text-zinc-600">
+                      Pickups
+                    </p>
+                    <p className="mt-1 text-xl font-black">
+                      {displayedPower.pickups.length}
+                    </p>
+                  </div>
                 </div>
-                <p className="mt-3 font-mono text-[10px] text-zinc-700">Heart seed {seed}</p>
+                <p className="mt-3 font-mono text-[10px] text-zinc-700">
+                  Heart seed {seed}
+                </p>
               </Panel>
 
-              <Panel title="Move History" subtitle={`${historyRows.length} plies · click to preview`}>
+              <Panel
+                title="Move History"
+                subtitle={`${historyRows.length} plies · click to preview`}
+              >
                 <div className="max-h-[460px] overflow-y-auto rounded-2xl border border-white/5 bg-black/20">
                   <button
                     type="button"
                     onClick={() => setHistoryPreviewPly(0)}
                     className={`w-full border-b border-white/5 px-3 py-2 text-left text-xs font-bold ${historyPreviewPly === 0 ? "bg-amber-400/10 text-amber-200" : "text-zinc-500 hover:bg-white/5"}`}
                   >
-                    Start · {buildThreeLivesPowerupState([], seed).activeHearts.length} hearts
+                    Start ·{" "}
+                    {buildThreeLivesPowerupState([], seed).activeHearts.length}{" "}
+                    hearts
                   </button>
                   {historyRows.length === 0 ? (
-                    <p className="px-3 py-6 text-center text-xs text-zinc-700">No moves yet</p>
+                    <p className="px-3 py-6 text-center text-xs text-zinc-700">
+                      No moves yet
+                    </p>
                   ) : (
                     historyRows.map((row) => (
                       <button
@@ -1151,12 +1367,28 @@ export function ThreeLivesMultiplayerGame() {
                         className={`w-full border-b border-white/5 px-3 py-2.5 text-left last:border-0 ${historyPreviewPly === row.ply ? "bg-amber-400/10" : "hover:bg-white/5"}`}
                       >
                         <div className="flex items-center gap-3">
-                          <span className="w-10 text-[10px] text-zinc-600">{row.moveNumber}{row.color === "w" ? "." : "..."}</span>
-                          <span className="font-mono text-xs font-black text-zinc-200">{row.san}</span>
-                          {row.life?.damagedSide && <span className="ml-auto text-xs text-red-300">−♥</span>}
-                          {row.life?.heartPickedBy && <span className="ml-auto text-xs text-emerald-300">+♥</span>}
+                          <span className="w-10 text-[10px] text-zinc-600">
+                            {row.moveNumber}
+                            {row.color === "w" ? "." : "..."}
+                          </span>
+                          <span className="font-mono text-xs font-black text-zinc-200">
+                            {row.san}
+                          </span>
+                          {row.life?.damagedSide && (
+                            <span className="ml-auto text-xs text-red-300">
+                              −♥
+                            </span>
+                          )}
+                          {row.life?.heartPickedBy && (
+                            <span className="ml-auto text-xs text-emerald-300">
+                              +♥
+                            </span>
+                          )}
                         </div>
-                        <p className="mt-1 pl-[52px] text-[9px] text-zinc-600">♔ {row.life?.whiteHpAfter ?? THREE_LIVES_MAX_HP} · ♚ {row.life?.blackHpAfter ?? THREE_LIVES_MAX_HP}</p>
+                        <p className="mt-1 pl-[52px] text-[9px] text-zinc-600">
+                          ♔ {row.life?.whiteHpAfter ?? THREE_LIVES_MAX_HP} · ♚{" "}
+                          {row.life?.blackHpAfter ?? THREE_LIVES_MAX_HP}
+                        </p>
                       </button>
                     ))
                   )}
@@ -1168,7 +1400,8 @@ export function ThreeLivesMultiplayerGame() {
 
         {players.length < 2 && (
           <div className="mt-5 rounded-2xl border border-amber-400/20 bg-amber-400/[0.06] px-4 py-3 text-sm font-semibold text-amber-100">
-            Waiting for a second player. Share room code <span className="font-mono font-black">{room.code}</span>.
+            Waiting for a second player. Share room code{" "}
+            <span className="font-mono font-black">{room.code}</span>.
           </div>
         )}
         {error && <ErrorBox>{error}</ErrorBox>}

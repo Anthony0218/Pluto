@@ -27,8 +27,7 @@ const variantInfo = {
     accentBorder: "border-violet-400/20",
     accentSoft: "bg-violet-400/10",
     accentButton: "bg-violet-400 text-violet-950 hover:bg-violet-300",
-    selectedButton:
-      "border-violet-400/30 bg-violet-400/10 text-violet-200",
+    selectedButton: "border-violet-400/30 bg-violet-400/10 text-violet-200",
     focusBorder: "focus:border-violet-400/40",
     description:
       "A single independent back-rank shuffle is stored in the room, so both players always start from exactly the same randomized position.",
@@ -43,8 +42,7 @@ const variantInfo = {
     accentBorder: "border-pink-400/20",
     accentSoft: "bg-pink-400/10",
     accentButton: "bg-pink-300 text-zinc-950 hover:bg-pink-200",
-    selectedButton:
-      "border-pink-400/30 bg-pink-400/10 text-pink-200",
+    selectedButton: "border-pink-400/30 bg-pink-400/10 text-pink-200",
     focusBorder: "focus:border-pink-400/40",
     description:
       "One full-board Chaos position is generated and saved with the room. The random setup is identical on both browsers.",
@@ -157,14 +155,16 @@ export default function SeededVariantMultiplayerLobby({ variant }: Props) {
       const joinedCode = typeof data === "string" ? data : code;
       navigate(`${info.baseRoute}/${joinedCode}`);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Could not join room.");
+      setError(
+        caught instanceof Error ? caught.message : "Could not join room.",
+      );
     } finally {
       setLoading(null);
     }
   }
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-4 py-8 text-zinc-100 sm:px-6">
+    <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-5xl">
         <header
           className={`mb-7 rounded-3xl border ${info.accentBorder} bg-zinc-900/70 p-6 shadow-2xl shadow-black/30`}
@@ -240,7 +240,9 @@ export default function SeededVariantMultiplayerLobby({ variant }: Props) {
                 onClick={() => void createRoom()}
                 className={`mt-6 w-full rounded-xl px-5 py-3 font-black transition disabled:cursor-not-allowed disabled:opacity-50 ${info.accentButton}`}
               >
-                {loading === "create" ? "Creating..." : "Create Multiplayer Room"}
+                {loading === "create"
+                  ? "Creating..."
+                  : "Create Multiplayer Room"}
               </button>
             </section>
 

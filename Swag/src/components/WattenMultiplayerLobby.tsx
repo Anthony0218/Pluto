@@ -255,7 +255,7 @@ export default function WattenMultiplayerLobby() {
   }
 
   return (
-    <main className="min-h-screen bg-emerald-950 px-4 py-10 text-white sm:px-6">
+    <main className="min-h-screen bg-transparent px-4 py-10 text-white sm:px-6">
       <div className="mx-auto max-w-5xl">
         <div className="rounded-[30px] border border-white/10 bg-zinc-950/90 p-6 shadow-2xl shadow-black/30 sm:p-8">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">

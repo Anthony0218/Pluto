@@ -91,7 +91,7 @@ export default function VariantRulesPage({
   const colors = accents[accent];
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-4 py-6 text-zinc-100 sm:px-6">
+    <main className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1100px]">
         <header
           className={`

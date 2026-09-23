@@ -353,7 +353,7 @@ export function CapitalismMultiplayerLobby() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-4 py-8 text-zinc-100">
+    <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100">
       <div className="mx-auto max-w-3xl">
         <div className="rounded-[32px] border border-amber-400/15 bg-zinc-900/80 p-6 shadow-2xl shadow-black/30">
           <div className="flex items-center gap-4">
@@ -1119,7 +1119,7 @@ export function CapitalismMultiplayerGame() {
 
   if (!room || !gameState || !stored || !me || !displayedCapital) {
     return (
-      <main className="min-h-screen bg-zinc-950 p-8 text-zinc-100">
+      <main className="min-h-screen bg-transparent p-8 text-zinc-100">
         <div className="mx-auto max-w-xl rounded-3xl border border-white/10 bg-zinc-900 p-6">
           <p className="font-black">Loading Capitalism room…</p>
           {error && <p className="mt-3 text-sm text-red-300">{error}</p>}
@@ -1194,7 +1194,7 @@ export function CapitalismMultiplayerGame() {
       : Boolean(gameState.white_rematch_ready);
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-4 py-6 text-zinc-100 sm:px-6">
+    <main className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1500px]">
         <header className="mb-6 flex flex-col gap-4 rounded-3xl border border-amber-400/10 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">

@@ -233,7 +233,7 @@ export default function ChessMultiplayerRoom() {
     <main
       className="
         min-h-screen
-        bg-[radial-gradient(circle_at_top,#21170f_0%,#111111_38%,#090909_100%)]
+        bg-transparent
         px-6
         py-10
         text-white

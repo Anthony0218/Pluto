@@ -351,7 +351,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100">
+    <div className="min-h-screen bg-transparent text-zinc-100">
       <div className="mx-auto max-w-[1450px] px-5 py-6 sm:px-8 lg:px-10">
         {/* HEADER */}
         <header className="mb-8 ml-10 flex items-center justify-between">
@@ -359,13 +359,17 @@ export default function HomePage() {
             onClick={() => setActiveTab("Übersicht")}
             className="flex items-center gap-3"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-500 text-xl font-bold text-white shadow-lg shadow-sky-500/20">
-              ♞
+            <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-indigo-600 shadow-lg">
+              <img
+                src="/pluto-icon.png"
+                alt="Pluto icon"
+                className="h-full w-full object-cover"
+              />
             </div>
 
             <div className="text-left">
               <h1 className="text-lg font-semibold tracking-tight text-white">
-                SWAG
+                Pluto
               </h1>
 
               <p className="text-[11px] text-zinc-500">{t.tagline}</p>

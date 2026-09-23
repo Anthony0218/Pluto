@@ -314,13 +314,13 @@ function PlayerAvatarRow({
 
 function HiddenCards({ count }: { count: number }) {
   return (
-    <div className="mt-2 flex justify-center">
+    <div className="mt-2 flex justify-center max-md:mt-1">
       {Array.from({ length: count }, (_, index) => (
         <div
           key={index}
           onMouseEnter={playHoverSound}
-          className={`relative h-12 w-8 rounded-md border border-white/20 bg-zinc-950 shadow-md ${
-            index !== 0 ? "-ml-3" : ""
+          className={`relative h-12 w-8 rounded-md border border-white/20 bg-zinc-950 shadow-md max-md:h-9 max-md:w-6 ${
+            index !== 0 ? "-ml-3 max-md:-ml-2" : ""
           }`}
         >
           <div className="absolute inset-1 rounded border border-emerald-400/25 bg-emerald-950" />
@@ -463,17 +463,17 @@ function OpponentBox({
 
   return (
     <div
-      className={`w-52 rounded-2xl border p-3 text-center shadow-xl backdrop-blur ${
+      className={`w-52 rounded-2xl border p-3 text-center shadow-xl backdrop-blur max-md:w-40 max-md:p-2 ${
         active
           ? "border-amber-300/50 bg-amber-950/75"
           : "border-white/10 bg-emerald-950/65"
       }`}
     >
-      <div className="mx-auto h-12 w-12 overflow-hidden rounded-2xl border border-white/10">
+      <div className="mx-auto h-12 w-12 overflow-hidden rounded-2xl border border-white/10 max-md:h-9 max-md:w-9 max-md:rounded-xl">
         <ProfileAvatar avatarId={avatarId} className="h-full w-full" />
       </div>
 
-      <p className="mt-2 truncate font-black text-white">
+      <p className="mt-2 truncate font-black text-white max-md:mt-1 max-md:text-xs">
         {player.display_name}
       </p>
 
@@ -487,7 +487,7 @@ function OpponentBox({
         {role === "solo" ? t("Solo") : t("Team")}
       </span>
 
-      <p className="mt-1 text-[10px] text-zinc-300">
+      <p className="mt-1 text-[10px] text-zinc-300 max-md:text-[9px]">
         {cards} {t("Cards")} · {tricks} {t("Tricks")}
       </p>
 
@@ -588,7 +588,7 @@ export function WattenThreePlayerMultiplayerLobby() {
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#164e3d_0%,#082f27_36%,#07110e_100%)] px-4 py-8 text-white sm:px-6">
+    <main className="min-h-screen bg-transparent px-4 py-8 text-white sm:px-6">
       <div className="mx-auto max-w-5xl">
         <header className="mb-7 rounded-[30px] border border-emerald-300/15 bg-zinc-950/65 p-6 shadow-2xl shadow-black/30">
           <div className="flex flex-wrap items-start justify-between gap-5">
@@ -1320,7 +1320,7 @@ export function WattenThreePlayerMultiplayerGame() {
 
   if (!user) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-emerald-950 px-4 text-white">
+      <main className="flex min-h-screen items-center justify-center bg-transparent px-4 text-white">
         <Panel title={t("Sign in required")}>
           <p className="text-sm text-zinc-400">
             {t("Multiplayer uses your Supabase account.")}
@@ -1332,7 +1332,7 @@ export function WattenThreePlayerMultiplayerGame() {
 
   if (error) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-emerald-950 px-4 text-white">
+      <main className="flex min-h-screen items-center justify-center bg-transparent px-4 text-white">
         <div className="text-center">
           <p className="text-red-300">{error}</p>
           <Link
@@ -1348,7 +1348,7 @@ export function WattenThreePlayerMultiplayerGame() {
 
   if (loading || !room || !game || mySeat === null) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-emerald-950 text-white">
+      <main className="flex min-h-screen items-center justify-center bg-transparent text-white">
         <p>{t("Game is loading...")}</p>
       </main>
     );
@@ -1440,7 +1440,7 @@ export function WattenThreePlayerMultiplayerGame() {
       .join(" & ") ?? "";
 
   return (
-    <main className="min-h-screen bg-emerald-950 px-4 py-5 text-white md:px-6">
+    <main className="min-h-screen bg-transparent px-4 py-5 text-white md:px-6 max-md:px-2 max-md:py-3">
       {actionError && (
         <div className="fixed left-1/2 top-5 z-[250] -translate-x-1/2 rounded-xl border border-red-400/30 bg-red-950/95 px-5 py-3 text-sm font-bold text-red-200 shadow-2xl">
           {actionError}
@@ -1458,7 +1458,7 @@ export function WattenThreePlayerMultiplayerGame() {
         mySeat === game.abheben_player &&
         abhebenPreview.length > 0 && (
           <div className="fixed inset-0 z-[220] flex items-center justify-center bg-black/70 px-6 backdrop-blur-sm">
-            <div className="w-full max-w-3xl rounded-3xl border border-violet-300/20 bg-zinc-950 p-8 text-center shadow-2xl">
+            <div className="w-full max-w-3xl rounded-3xl border border-violet-300/20 bg-zinc-950 p-8 text-center shadow-2xl max-md:max-w-[94vw] max-md:p-4">
               <p className="text-xs font-black uppercase tracking-[0.25em] text-violet-300">
                 {t("Abheben")}
               </p>
@@ -1512,12 +1512,12 @@ export function WattenThreePlayerMultiplayerGame() {
         )}
 
       <div className="mx-auto max-w-[1780px]">
-        <header className="mb-4 flex flex-wrap items-center justify-between gap-4">
+        <header className="mb-4 flex flex-wrap items-center justify-between gap-4 max-md:mb-3 max-md:gap-2">
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.25em] text-amber-300">
               {t("Bavarian Watten")}
             </p>
-            <h1 className="mt-1 text-2xl font-black">
+            <h1 className="mt-1 text-2xl font-black max-md:text-xl">
               {t("3 Player Multiplayer")}
             </h1>
             <p className="mt-1 text-xs text-emerald-300/70">
@@ -1526,7 +1526,7 @@ export function WattenThreePlayerMultiplayerGame() {
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center justify-end gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2 max-md:w-full max-md:flex-nowrap max-md:justify-start max-md:overflow-x-auto max-md:pb-1">
             <button
               type="button"
               onClick={() => setHelpMode((value) => !value)}
@@ -1557,9 +1557,9 @@ export function WattenThreePlayerMultiplayerGame() {
           </div>
         </header>
 
-        <div className="grid grid-cols-1 gap-4 xl:grid-cols-[270px_minmax(0,1fr)_270px]">
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-[270px_minmax(0,1fr)_270px] max-md:gap-3">
           {/* PLAYERS SIDEBAR */}
-          <aside>
+          <aside className="max-md:order-2">
             <Panel title={t("Players")} subtitle="1 vs 2">
               <div className="space-y-3">
                 {players.map((player) => (
@@ -1653,7 +1653,7 @@ export function WattenThreePlayerMultiplayerGame() {
 
           {/* TABLE */}
           <section
-            className="relative min-h-[690px] overflow-hidden rounded-[42px] border border-white/10 shadow-2xl"
+            className="relative min-h-[690px] overflow-hidden rounded-[42px] border border-white/10 shadow-2xl max-md:order-1 max-md:min-h-[560px] max-md:rounded-[28px]"
             style={{
               backgroundImage: `url(${tableBackgrounds[tableTheme]})`,
               backgroundSize: "100% 100%",
@@ -1828,8 +1828,8 @@ export function WattenThreePlayerMultiplayerGame() {
             )}
 
             {/* STATUS */}
-            <div className="absolute left-1/2 top-5 z-30 -translate-x-1/2 rounded-2xl border border-white/10 bg-emerald-950/80 px-5 py-3 shadow-xl backdrop-blur">
-              <div className="flex items-center gap-7">
+            <div className="absolute left-1/2 top-5 z-30 -translate-x-1/2 rounded-2xl border border-white/10 bg-emerald-950/80 px-5 py-3 shadow-xl backdrop-blur max-md:left-2 max-md:right-2 max-md:top-2 max-md:translate-x-0 max-md:px-2 max-md:py-2">
+              <div className="flex items-center gap-7 max-md:grid max-md:grid-cols-4 max-md:gap-1">
                 <div className="text-center">
                   <p className="text-[9px] font-black uppercase tracking-wider text-emerald-300">
                     {t("Trump")}
@@ -1848,7 +1848,7 @@ export function WattenThreePlayerMultiplayerGame() {
                   )}
                 </div>
 
-                <div className="h-8 w-px bg-white/10" />
+                <div className="h-8 w-px bg-white/10 max-md:hidden" />
 
                 <div className="text-center">
                   <p className="text-[9px] font-black uppercase tracking-wider text-amber-300">
@@ -1870,7 +1870,7 @@ export function WattenThreePlayerMultiplayerGame() {
 
                 <div className="h-8 w-px bg-white/10" />
 
-                <div className="min-w-28 text-center">
+                <div className="min-w-28 text-center max-md:min-w-0">
                   <p className="text-[9px] font-black uppercase tracking-wider text-amber-300">
                     {t("Turn")}
                   </p>
@@ -1887,7 +1887,7 @@ export function WattenThreePlayerMultiplayerGame() {
             </div>
 
             {/* OPPONENTS */}
-            <div className="absolute left-8 top-24 z-20">
+            <div className="absolute left-8 top-24 z-20 max-md:left-1 max-md:top-[82px] max-md:origin-top-left max-md:scale-[0.72]">
               <OpponentBox
                 player={leftPlayer}
                 avatarId={leftPlayer?.avatar_id ?? "m1"}
@@ -1899,7 +1899,7 @@ export function WattenThreePlayerMultiplayerGame() {
               />
             </div>
 
-            <div className="absolute right-8 top-24 z-20">
+            <div className="absolute right-8 top-24 z-20 max-md:right-1 max-md:top-[82px] max-md:origin-top-right max-md:scale-[0.72]">
               <OpponentBox
                 player={rightPlayer}
                 avatarId={rightPlayer?.avatar_id ?? "f1"}
@@ -1912,7 +1912,7 @@ export function WattenThreePlayerMultiplayerGame() {
             </div>
 
             {/* CURRENT TRICK */}
-            <div className="absolute left-1/2 top-[45%] z-20 flex min-h-48 w-[460px] -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-4 rounded-3xl border border-white/10 bg-emerald-950/30 p-4 shadow-inner">
+            <div className="absolute left-1/2 top-[45%] z-20 flex min-h-48 w-[460px] -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-4 rounded-3xl border border-white/10 bg-emerald-950/30 p-4 shadow-inner max-md:min-h-36 max-md:w-[calc(100%-1rem)] max-md:gap-0 max-md:p-2">
               {game.played_cards.length === 0 ? (
                 <p className="text-sm font-bold text-emerald-200/40">
                   {t("Game table")}
@@ -1927,7 +1927,7 @@ export function WattenThreePlayerMultiplayerGame() {
                     <div
                       key={`${played.seat}-${played.card.id}`}
                       onMouseEnter={playHoverSound}
-                      className="flex flex-col items-center gap-2"
+                      className="flex flex-col items-center gap-2 max-md:-mx-2 max-md:scale-[0.72]"
                     >
                       <WattenCardComponent card={played.card} disabled />
                       <span className="max-w-28 truncate text-[10px] font-bold text-emerald-100">
@@ -1942,7 +1942,7 @@ export function WattenThreePlayerMultiplayerGame() {
             {/* ABHEBEN */}
             {game.phase === "abheben" && players.length === 3 && (
               <div className="absolute inset-0 z-[80] flex items-center justify-center bg-black/55 p-6 backdrop-blur-sm">
-                <div className="w-full max-w-4xl rounded-3xl border border-violet-300/20 bg-zinc-950/95 p-7 text-center shadow-2xl">
+                <div className="w-full max-w-4xl rounded-3xl border border-violet-300/20 bg-zinc-950/95 p-7 text-center shadow-2xl max-md:max-w-[94vw] max-md:p-4">
                   <p className="text-xs font-black uppercase tracking-[0.2em] text-violet-300">
                     {t("Abheben")}
                   </p>
@@ -2033,7 +2033,7 @@ export function WattenThreePlayerMultiplayerGame() {
               game.phase === "trump" &&
               game.trump_caller === mySeat && (
                 <div className="absolute inset-0 z-[80] flex items-center justify-center bg-black/60 p-6 backdrop-blur-sm">
-                  <div className="w-full max-w-2xl rounded-3xl border border-white/10 bg-zinc-950 p-7 text-center">
+                  <div className="w-full max-w-2xl rounded-3xl border border-white/10 bg-zinc-950 p-7 text-center max-md:max-w-[94vw] max-md:p-4">
                     <h2 className="text-2xl font-black">{t("Choose trump")}</h2>
                     <p className="mt-2 text-sm text-zinc-500">
                       {t("Choose the trump suit.")}
@@ -2161,7 +2161,7 @@ export function WattenThreePlayerMultiplayerGame() {
               game.pending_bid_side &&
               game.pending_bid_value !== null && (
                 <div className="absolute inset-0 z-[90] flex items-center justify-center bg-black/70 p-6 backdrop-blur-sm">
-                  <div className="w-full max-w-md rounded-3xl border border-white/10 bg-zinc-950 p-7 text-center shadow-2xl">
+                  <div className="w-full max-w-md rounded-3xl border border-white/10 bg-zinc-950 p-7 text-center shadow-2xl max-md:max-w-[94vw] max-md:p-4">
                     <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-300">
                       {l("Gehen", "Raise")}
                     </p>
@@ -2410,17 +2410,17 @@ export function WattenThreePlayerMultiplayerGame() {
             )}
 
             {/* OWN HAND */}
-            <div className="absolute bottom-4 left-1/2 z-30 w-full max-w-4xl -translate-x-1/2 px-8">
+            <div className="absolute bottom-4 left-1/2 z-30 w-full max-w-4xl -translate-x-1/2 px-8 max-md:bottom-2 max-md:px-2">
               <div
-                className={`relative rounded-3xl border p-4 shadow-2xl backdrop-blur ${
+                className={`relative rounded-3xl border p-4 shadow-2xl backdrop-blur max-md:rounded-2xl max-md:p-2 ${
                   game.current_player === mySeat
                     ? "border-amber-300/35 bg-emerald-950/65"
                     : "border-white/10 bg-emerald-950/50"
                 }`}
               >
-                <div className="flex items-center justify-center gap-3">
+                <div className="flex items-center justify-center gap-3 max-md:gap-2">
                   {me && (
-                    <div className="h-11 w-11 overflow-hidden rounded-xl border border-white/10">
+                    <div className="h-11 w-11 overflow-hidden rounded-xl border border-white/10 max-md:h-8 max-md:w-8">
                       <ProfileAvatar
                         avatarId={me.avatar_id || "m1"}
                         className="h-full w-full"
@@ -2447,7 +2447,7 @@ export function WattenThreePlayerMultiplayerGame() {
                   </div>
                 )}
 
-                <div className="mt-3 flex justify-center gap-2">
+                <div className="mt-3 flex justify-center gap-2 max-md:mt-1 max-md:origin-bottom max-md:scale-[0.72] max-md:gap-0">
                   {!waitingForDeal &&
                     hand.map((card) => {
                       const legal =
@@ -2499,7 +2499,7 @@ export function WattenThreePlayerMultiplayerGame() {
           </section>
 
           {/* ROUND SIDEBAR */}
-          <aside className="relative">
+          <aside className="relative max-md:order-3">
             {game.farbe && game.schlag && (
               <div className="relative z-[170] mb-3">
                 <button

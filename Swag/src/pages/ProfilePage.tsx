@@ -267,7 +267,7 @@ export default function ProfilePage() {
 
   if (!user) {
     return (
-      <main className="min-h-screen bg-zinc-950 px-4 py-10 text-white">
+      <main className="min-h-screen bg-transparent px-4 py-10 text-white">
         <div className="mx-auto max-w-xl rounded-3xl border border-white/10 bg-zinc-900 p-8 text-center">
           <div className="text-5xl">👤</div>
 
@@ -286,7 +286,7 @@ export default function ProfilePage() {
      ========================================================= */
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-4 py-10 text-white sm:px-6">
+    <main className="min-h-screen bg-transparent px-4 py-10 text-white sm:px-6">
       <div className="mx-auto max-w-5xl">
         {/* HEADER */}
 

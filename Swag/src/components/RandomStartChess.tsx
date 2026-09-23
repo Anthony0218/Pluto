@@ -523,7 +523,7 @@ export default function RandomStartChess({
     .join(" ");
 
   return (
-    <div className="min-h-screen bg-zinc-950 px-4 py-6 text-zinc-100 sm:px-6">
+    <div className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1460px]">
         <header className="mb-6 rounded-3xl border border-violet-400/10 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20">
           <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-300">

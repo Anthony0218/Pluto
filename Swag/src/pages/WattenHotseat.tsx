@@ -59,7 +59,7 @@ export default function WattenHotseat() {
   }
 
   return (
-    <main className="min-h-screen bg-emerald-950 px-4 py-10 text-white">
+    <main className="min-h-screen bg-transparent px-4 py-10 text-white">
       <div className="mx-auto max-w-2xl">
         <div className="rounded-3xl border border-white/10 bg-zinc-950/90 p-8 shadow-2xl">
           <div className="flex items-start justify-between gap-4">

@@ -387,7 +387,7 @@ export default function FogOfWarChessRules() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-4 py-6 text-zinc-100 sm:px-6">
+    <main className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-5xl">
         <header className="mb-6 rounded-3xl border border-sky-400/15 bg-zinc-900/75 p-6 shadow-xl shadow-black/20">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
