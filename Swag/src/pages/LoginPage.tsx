@@ -18,7 +18,7 @@ const translations = {
     hubEyebrow: "Dein Spiele-Hub",
     heroTitle: "Pluto",
     heroText:
-      "Spiele Schach, Varianten und Watten mit einem Konto und behalte deinen persönlichen Spielverlauf an einem Ort.",
+      "Spiele verschiedene Games mit deinem Konto und behalte deinen persönlichen Spielverlauf an einem Ort.",
     chess: "Schach",
     chessText: "Klassisch und Varianten",
     watten: "Watten",
@@ -58,7 +58,7 @@ const translations = {
     hubEyebrow: "Your game hub",
     heroTitle: "Pluto",
     heroText:
-      "Play chess, variants and Watten with one account and keep your personal game history in one place.",
+      "Play different games with your account and keep your personal game history in one place.",
     chess: "Chess",
     chessText: "Classic and variants",
     watten: "Watten",
@@ -242,17 +242,18 @@ export default function LoginPage({ onLogin, onRegister }: LoginPageProps) {
                     </div>
                   ))}
                 </div>
-                <div className="mt-7 mb-5 ml-40">
-                  <p className="text-xs font-black text-sky-200">
+                {/* Guest access */}
+                <div className="mt-6 flex w-full flex-col items-center border-t border-white/10 pt-5 text-center">
+                  <p className="max-w-sm text-xs font-semibold leading-5 text-sky-200/90">
                     {t.multiplayerOnly}
                   </p>
 
                   <Link
                     to="/"
-                    className="mt-3 inline-flex items-center gap-2 rounded-xl bg-sky-500 px-5 py-2.5 text-sm font-black text-white shadow-lg shadow-sky-500/20 transition hover:bg-sky-400 active:scale-[0.98]"
+                    className="mt-3 inline-flex min-w-[220px] items-center justify-center gap-2 rounded-xl border border-sky-300/20 bg-sky-500 px-5 py-2.5 text-sm font-black text-white shadow-lg shadow-sky-500/20 transition hover:-translate-y-0.5 hover:bg-sky-400 active:translate-y-0 active:scale-[0.98]"
                   >
                     {t.continueGuest}
-                    <span>→</span>
+                    <span aria-hidden="true">→</span>
                   </Link>
                 </div>
               </div>

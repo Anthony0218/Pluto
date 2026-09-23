@@ -149,17 +149,7 @@ export const games: Game[] = [
     features: ["3 Spieler", "Hilfemodus", "Punktewertung"],
     finished: true,
   },
-  {
-    title: "Medieval Kingdoms",
-    subtitle: "Rundenbasierte Strategie",
-    description:
-      "Führe dein mittelalterliches Königreich, plane deine Züge und kämpfe in rundenbasierten Schlachten um die Vorherrschaft.",
-    image: "/images/medieval-kingdoms.png",
-    route: "/games/medieval-kingdoms",
-    tag: "Strategie",
-    features: ["Rundenbasiert", "Taktik", "Mittelalter"],
-    finished: false,
-  },
+
   {
     title: "Schach 3D",
     subtitle: "Schach in einer neuen Dimension",
@@ -170,6 +160,17 @@ export const games: Game[] = [
     tag: "Strategie · 3D",
     features: ["3D-Brett", "Hotseat", "Stockfish AI"],
     finished: true,
+  },
+  {
+    title: "Medieval Kingdoms",
+    subtitle: "Rundenbasierte Strategie",
+    description:
+      "Führe dein mittelalterliches Königreich, plane deine Züge und kämpfe in rundenbasierten Schlachten um die Vorherrschaft.",
+    image: "/images/medieval-kingdoms.png",
+    route: "/games/medieval-kingdoms",
+    tag: "Strategie",
+    features: ["Rundenbasiert", "Taktik", "Mittelalter"],
+    finished: false,
   },
 ];
 export const gameList = [
@@ -193,15 +194,6 @@ export const gameList = [
   },
 
   {
-    name: "Medieval Kingdoms",
-    description: "A turn based strategy game in medieval style.",
-    route: "/games/medieval-kingdoms",
-    category: "Strategie",
-    image: "/images/medieval-kingdoms-icon.png",
-    finished: false,
-  },
-
-  {
     name: "Schach 3D",
     description:
       "Klassisches Schach als interaktives 3D-Erlebnis – lokal im Hotseat oder gegen Stockfish.",
@@ -209,6 +201,14 @@ export const gameList = [
     category: "Strategie · 3D",
     image: "/images/chess3d-icon.png",
     finished: true,
+  },
+  {
+    name: "Medieval Kingdoms",
+    description: "A turn based strategy game in medieval style.",
+    route: "/games/medieval-kingdoms",
+    category: "Strategie",
+    image: "/images/medieval-kingdoms-icon.png",
+    finished: false,
   },
 ];
 
@@ -283,7 +283,7 @@ export default function HomePage() {
   const [language, setLanguage] = useState<Language>(getInitialLanguage);
   const t = uiText[language];
 
-  const tabs: Tab[] = ["Übersicht", "Online spielen", "Spiele", "Fortschritt"];
+  const tabs: Tab[] = ["Übersicht", "Spiele", "Online spielen", "Fortschritt"];
 
   const localizedGames =
     language === "en"
@@ -697,67 +697,6 @@ export default function HomePage() {
             </section>
           </div>
         )}
-
-        {/* PLAY ONLINE */}
-        {activeTab === "Online spielen" && (
-          <section>
-            <div className="mb-6">
-              <h2 className="text-3xl font-semibold tracking-tight text-white">
-                {t.onlineTitle}
-              </h2>
-
-              <p className="mt-2 text-zinc-500">{t.onlineText}</p>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <button
-                onClick={() => openMultiplayer("/games/watten/multiplayer")}
-                className="group rounded-2xl border border-zinc-800 bg-zinc-900 p-6 text-left transition hover:-translate-y-1 hover:border-sky-500/40"
-              >
-                <div className="mb-8 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-500/10 text-2xl">
-                  🂡
-                </div>
-
-                <h3 className="text-xl font-semibold text-white">
-                  {t.wattenMultiplayer}
-                </h3>
-
-                <p className="mt-2 text-sm text-zinc-500">
-                  {t.wattenMultiplayerText}
-                </p>
-
-                <p className="mt-6 text-sm font-medium text-sky-400">
-                  {t.playNow}
-                </p>
-              </button>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <button
-                  onClick={() =>
-                    openMultiplayer("/games/chess/classic/multiplayer")
-                  }
-                  className="group rounded-2xl border border-zinc-800 bg-zinc-900 p-6 text-left transition hover:-translate-y-1 hover:border-sky-500/40"
-                >
-                  <div className="mb-8 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-500/10 text-2xl">
-                    ♞
-                  </div>
-
-                  <h3 className="text-xl font-semibold text-zinc-400">
-                    {t.chessMultiplayer}
-                  </h3>
-                  <p className="mt-2 text-sm text-zinc-500">
-                    {t.chessMultiplayerText}
-                  </p>
-
-                  <p className="mt-6 text-sm font-medium text-sky-400">
-                    {t.playNow}
-                  </p>
-                </button>
-              </div>
-            </div>
-          </section>
-        )}
-
         {/* SPIELE */}
         {activeTab === "Spiele" && (
           <section>
@@ -903,6 +842,66 @@ export default function HomePage() {
             </div>
           </section>
         )}
+        {/* PLAY ONLINE */}
+        {activeTab === "Online spielen" && (
+          <section>
+            <div className="mb-6">
+              <h2 className="text-3xl font-semibold tracking-tight text-white">
+                {t.onlineTitle}
+              </h2>
+
+              <p className="mt-2 text-zinc-500">{t.onlineText}</p>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <button
+                onClick={() => openMultiplayer("/games/watten/multiplayer")}
+                className="group rounded-2xl border border-zinc-800 bg-zinc-900 p-6 text-left transition hover:-translate-y-1 hover:border-sky-500/40"
+              >
+                <div className="mb-8 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-500/10 text-2xl">
+                  🂡
+                </div>
+
+                <h3 className="text-xl font-semibold text-white">
+                  {t.wattenMultiplayer}
+                </h3>
+
+                <p className="mt-2 text-sm text-zinc-500">
+                  {t.wattenMultiplayerText}
+                </p>
+
+                <p className="mt-6 text-sm font-medium text-sky-400">
+                  {t.playNow}
+                </p>
+              </button>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <button
+                  onClick={() =>
+                    openMultiplayer("/games/chess/classic/multiplayer")
+                  }
+                  className="group rounded-2xl border border-zinc-800 bg-zinc-900 p-6 text-left transition hover:-translate-y-1 hover:border-sky-500/40"
+                >
+                  <div className="mb-8 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-500/10 text-2xl">
+                    ♞
+                  </div>
+
+                  <h3 className="text-xl font-semibold text-zinc-400">
+                    {t.chessMultiplayer}
+                  </h3>
+                  <p className="mt-2 text-sm text-zinc-500">
+                    {t.chessMultiplayerText}
+                  </p>
+
+                  <p className="mt-6 text-sm font-medium text-sky-400">
+                    {t.playNow}
+                  </p>
+                </button>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* PROGRESS */}
         {activeTab === "Fortschritt" && (
           <section>
