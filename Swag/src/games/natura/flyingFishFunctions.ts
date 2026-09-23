@@ -87,7 +87,10 @@ function spawnObstacle(game: FlyingFishState) {
   game.obstacles.push(obstacle);
 }
 
-function playerHit(obstacle: FlyingFishObstacle, player: FlyingFishPlayerState) {
+function playerHit(
+  obstacle: FlyingFishObstacle,
+  player: FlyingFishPlayerState,
+) {
   const dx = obstacle.x - player.x;
   const dy = obstacle.y - player.y;
   const radius = obstacle.radius + 25;
@@ -117,9 +120,10 @@ function finishGame(game: FlyingFishState, mode: PlayMode) {
   } else {
     game.winner = null;
   }
-  game.reason = game.winner === null
-    ? `Both flying fish finished level on ${a.score} dodges with ${a.lives} hearts left.`
-    : `Player ${game.winner + 1} wins with ${game.players[game.winner].score} dodges and ${game.players[game.winner].lives} hearts left.`;
+  game.reason =
+    game.winner === null
+      ? `Both flying fish finished level on ${a.score} dodges with ${a.lives} hearts left.`
+      : `Player ${game.winner + 1} wins with ${game.players[game.winner].score} dodges and ${game.players[game.winner].lives} hearts left.`;
 }
 
 export function updateFlyingFishGame(
@@ -148,7 +152,8 @@ export function updateFlyingFishGame(
   if (game.spawnTimer <= 0) {
     spawnObstacle(game);
     const topScore = Math.max(game.players[0].score, game.players[1].score);
-    game.spawnTimer = Math.max(0.42, 1.03 - topScore * 0.012) + Math.random() * 0.42;
+    game.spawnTimer =
+      Math.max(0.42, 1.03 - topScore * 0.012) + Math.random() * 0.42;
   }
 
   game.players.forEach((player, index) => {
@@ -163,9 +168,10 @@ export function updateFlyingFishGame(
     player.vx = clamp(player.vx, -370, 370);
     player.x = clamp(player.x + player.vx * dt, 40, FLYING_FISH_W - 40);
 
-    const baseY = game.phase === "sky"
-      ? FLYING_FISH_H * (index === 0 ? 0.56 : 0.68)
-      : FLYING_FISH_H * (index === 0 ? 0.40 : 0.53);
+    const baseY =
+      game.phase === "sky"
+        ? FLYING_FISH_H * (index === 0 ? 0.56 : 0.68)
+        : FLYING_FISH_H * (index === 0 ? 0.4 : 0.53);
     const targetY = baseY + Math.sin(game.elapsed * 4.2 + index * 1.8) * 7;
     player.y += (targetY - player.y) * Math.min(1, dt * 5.5);
     player.invulnerable = Math.max(0, player.invulnerable - dt);
@@ -177,7 +183,8 @@ export function updateFlyingFishGame(
     obstacle.x += Math.sin(game.elapsed * 2.6 + obstacle.wobble) * 29 * dt;
 
     game.players.forEach((player, index) => {
-      if (!player.active || player.lives <= 0 || player.invulnerable > 0) return;
+      if (!player.active || player.lives <= 0 || player.invulnerable > 0)
+        return;
       if (playerHit(obstacle, player)) {
         player.lives -= 1;
         player.invulnerable = 1.55;
@@ -193,9 +200,10 @@ export function updateFlyingFishGame(
         return;
       }
 
-      const passed = game.phase === "sky"
-        ? obstacle.y > player.y + 45
-        : obstacle.y < player.y - 45;
+      const passed =
+        game.phase === "sky"
+          ? obstacle.y > player.y + 45
+          : obstacle.y < player.y - 45;
       if (passed && !obstacle.passed[index] && !obstacle.dead) {
         obstacle.passed[index] = true;
         player.score += 1;
@@ -254,7 +262,7 @@ function drawSky(ctx: CanvasRenderingContext2D, game: FlyingFishState) {
 
   ctx.fillStyle = "rgba(255,255,255,.58)";
   for (let i = 0; i < 5; i += 1) {
-    const x = (i * 230 + game.elapsed * 13) % (FLYING_FISH_W + 260) - 130;
+    const x = ((i * 230 + game.elapsed * 13) % (FLYING_FISH_W + 260)) - 130;
     const y = 65 + (i % 3) * 55;
     ctx.beginPath();
     ctx.ellipse(x, y, 66, 18, 0, 0, Math.PI * 2);
@@ -326,7 +334,10 @@ function drawFlyingFish(
     return;
   }
 
-  if (player.invulnerable > 0 && Math.floor(player.invulnerable * 12) % 2 === 0) {
+  if (
+    player.invulnerable > 0 &&
+    Math.floor(player.invulnerable * 12) % 2 === 0
+  ) {
     ctx.globalAlpha = 0.32;
   }
 
@@ -398,7 +409,11 @@ function drawFlyingFish(
   }
 }
 
-function drawSeabird(ctx: CanvasRenderingContext2D, obstacle: FlyingFishObstacle, time: number) {
+function drawSeabird(
+  ctx: CanvasRenderingContext2D,
+  obstacle: FlyingFishObstacle,
+  time: number,
+) {
   ctx.save();
   ctx.translate(obstacle.x, obstacle.y);
   ctx.rotate(Math.sin(time * 5 + obstacle.wobble) * 0.08);
@@ -424,7 +439,11 @@ function drawSeabird(ctx: CanvasRenderingContext2D, obstacle: FlyingFishObstacle
   ctx.restore();
 }
 
-function drawTuna(ctx: CanvasRenderingContext2D, obstacle: FlyingFishObstacle, time: number) {
+function drawTuna(
+  ctx: CanvasRenderingContext2D,
+  obstacle: FlyingFishObstacle,
+  time: number,
+) {
   ctx.save();
   ctx.translate(obstacle.x, obstacle.y);
   ctx.rotate(-Math.PI / 2 + Math.sin(time * 2 + obstacle.wobble) * 0.07);

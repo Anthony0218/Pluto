@@ -70,16 +70,16 @@ export const FLYING_FISH_FACTS: FlyingFishFact[] = [
   {
     animal: "FLYING FISH",
     title: "They glide rather than flap.",
-    text: "Flying fish use greatly enlarged pectoral fins as gliding surfaces after accelerating underwater and breaking through the surface.",
+    text: "Flying fish have greatly enlarged fins used for gliding above the water after they burst through the surface.",
     label: "Australian Museum",
-    url: "https://australian.museum/learn/animals/fishes/a-flyingfish-cheilopogon-sp/",
+    url: "https://publications.australian.museum/blog/amri-news/flying-without-wings/",
   },
   {
     animal: "FLYING FISH",
     title: "Some can glide for hundreds of metres.",
-    text: "Flying fish can stay just above the sea surface for long glides; four-winged species also use enlarged pelvic fins.",
+    text: "Flying fish can glide for hundreds of metres in good conditions; many species also use an enlarged lower tail lobe to skim the surface and extend a glide.",
     label: "Australian Museum",
-    url: "https://australian.museum/learn/animals/fishes/a-flyingfish-cheilopogon-sp/",
+    url: "https://publications.australian.museum/blog/amri-news/flying-without-wings/",
   },
   {
     animal: "TUNA",
