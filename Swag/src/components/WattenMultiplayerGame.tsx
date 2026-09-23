@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
@@ -9,6 +9,7 @@ import WattenCardComponent from "./WattenCard";
 import {
   createDeck,
   getCriticalValue,
+  getWattenCardRole,
   isCritical,
   isFirstTrick,
   isHauptschlag,
@@ -23,8 +24,17 @@ import CardThemeSelector from "./WattenCardGameSelector";
 import { useCardTheme } from "@/context/CardThemeContext";
 import { getWattenCardImage } from "@/utils/WattenCardImages";
 import TableThemeSelector from "./TableThemeSelector";
+import { ProfileAvatar } from "./ProfileAvatarPicker";
 
 import { useTableTheme, type TableTheme } from "@/context/TableThemeContext";
+import {
+  getInitialWattenLanguage,
+  setStoredWattenLanguage,
+  translateWatten,
+  translateWattenPair,
+  WattenLanguageSelector,
+  type WattenLanguage,
+} from "@/games/watten/i18n/wattenLanguage";
 
 type Room = {
   id: string;
@@ -117,6 +127,7 @@ function MiniWattenCard({ card }: { card: DisplayWattenCard }) {
 
   return (
     <div
+      onMouseEnter={playHoverSound}
       className="
         relative
         h-20
@@ -143,6 +154,118 @@ function MiniWattenCard({ card }: { card: DisplayWattenCard }) {
           drop-shadow-md
         "
       />
+    </div>
+  );
+}
+
+function DealAnimation({ playerCount }: { playerCount: 3 | 4 }) {
+  const directions =
+    playerCount === 3
+      ? ["bottom", "left", "right"]
+      : ["bottom", "left", "top", "right"];
+
+  return (
+    <div className="pointer-events-none absolute inset-0 z-[110] overflow-hidden rounded-[60px]">
+      <style>{`
+        @keyframes watten-deal-bottom {
+          0% { transform: translate(-50%, -50%) scale(.88) rotate(-4deg); opacity: 1; }
+          100% { transform: translate(-50%, 300px) scale(.96) rotate(8deg); opacity: 0; }
+        }
+        @keyframes watten-deal-left {
+          0% { transform: translate(-50%, -50%) scale(.88) rotate(4deg); opacity: 1; }
+          100% { transform: translate(-390px, -25px) scale(.96) rotate(-12deg); opacity: 0; }
+        }
+        @keyframes watten-deal-top {
+          0% { transform: translate(-50%, -50%) scale(.88) rotate(-3deg); opacity: 1; }
+          100% { transform: translate(-50%, -315px) scale(.96) rotate(6deg); opacity: 0; }
+        }
+        @keyframes watten-deal-right {
+          0% { transform: translate(-50%, -50%) scale(.88) rotate(-4deg); opacity: 1; }
+          100% { transform: translate(340px, -25px) scale(.96) rotate(12deg); opacity: 0; }
+        }
+        @keyframes watten-deck-pulse {
+          0%, 100% { transform: translate(-50%, -50%) scale(1); }
+          50% { transform: translate(-50%, -50%) scale(1.04); }
+        }
+      `}</style>
+
+      <div
+        className="absolute left-1/2 top-1/2 h-24 w-16 rounded-[8px] border border-amber-200/40 bg-zinc-950 shadow-2xl"
+        style={{ animation: "watten-deck-pulse 700ms ease-in-out infinite" }}
+      >
+        <div className="absolute inset-[4px] rounded-[6px] border border-emerald-300/40 bg-emerald-950">
+          <div className="absolute inset-1 rounded-[4px] border border-amber-300/20" />
+        </div>
+      </div>
+
+      {Array.from({ length: playerCount * 5 }, (_, index) => {
+        const direction = directions[index % playerCount];
+        return (
+          <div
+            key={index}
+            className="absolute left-1/2 top-1/2 h-24 w-16 rounded-[8px] border border-amber-200/35 bg-zinc-950 shadow-2xl"
+            style={{
+              animation: `watten-deal-${direction} 650ms cubic-bezier(.18,.75,.25,1) ${index * 92}ms both`,
+            }}
+          >
+            <div className="absolute inset-[4px] rounded-[6px] border border-emerald-300/35 bg-emerald-950">
+              <div className="absolute inset-1 rounded-[4px] border border-amber-300/15" />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function DealDeckControl({
+  canDeal,
+  onDeal,
+  l,
+}: {
+  canDeal: boolean;
+  onDeal: () => void;
+  l: (de: string, en: string) => string;
+}) {
+  return (
+    <div className="text-center">
+      <button
+        type="button"
+        disabled={!canDeal}
+        onClick={onDeal}
+        onMouseEnter={playHoverSound}
+        className={`group relative mx-auto block h-28 w-24 transition max-md:h-20 max-md:w-16 ${
+          canDeal
+            ? "cursor-pointer hover:-translate-y-2 hover:scale-105"
+            : "cursor-default"
+        }`}
+      >
+        {[0, 1, 2, 3].map((layer) => (
+          <span
+            key={layer}
+            className="absolute left-1/2 top-1/2 h-24 w-16 rounded-[8px] border border-amber-200/35 bg-zinc-950 shadow-xl max-md:h-16 max-md:w-11"
+            style={{
+              transform: `translate(calc(-50% + ${layer * 2}px), calc(-50% - ${layer * 2}px))`,
+              zIndex: layer,
+            }}
+          >
+            <span className="absolute inset-[4px] rounded-[6px] border border-emerald-300/35 bg-emerald-950">
+              <span className="absolute inset-1 rounded-[4px] border border-amber-300/15" />
+            </span>
+          </span>
+        ))}
+      </button>
+
+      <p className="mt-2 text-xs font-black uppercase tracking-[0.18em] text-amber-300">
+        {canDeal
+          ? l("Karten austeilen", "Distribute cards")
+          : l("Der Geber teilt gleich aus", "Waiting for the dealer")}
+      </p>
+      {canDeal && (
+        <p className="mt-1 text-[10px] text-zinc-400">
+          {l("Klicke auf den Kartenstapel.", "Click the deck to deal.")}
+        </p>
+      )}
     </div>
   );
 }
@@ -189,17 +312,39 @@ function playHoverSound() {
 export default function WattenMultiplayerGame() {
   const { roomCode } = useParams();
 
-  const navigate = useNavigate();
-
   const { user } = useAuth();
 
   const { tableTheme } = useTableTheme();
+
+  const [language, setLanguage] = useState<WattenLanguage>(
+    getInitialWattenLanguage,
+  );
+  const [waitingTargetScore, setWaitingTargetScore] = useState(15);
+
+  const t = useCallback(
+    (key: string) => translateWatten(language, key),
+    [language],
+  );
+
+  const l = useCallback(
+    (de: string, en: string) => translateWattenPair(language, de, en),
+    [language],
+  );
+
+  function changeLanguage(next: WattenLanguage) {
+    setLanguage(next);
+    setStoredWattenLanguage(next);
+  }
 
   const [room, setRoom] = useState<Room | null>(null);
 
   const [game, setGame] = useState<MultiplayerGame | null>(null);
 
   const [players, setPlayers] = useState<RoomPlayer[]>([]);
+
+  const [playerAvatarIds, setPlayerAvatarIds] = useState<
+    Record<string, string>
+  >({});
 
   const [hand, setHand] = useState<WattenCard[]>([]);
 
@@ -208,11 +353,18 @@ export default function WattenMultiplayerGame() {
   const [loading, setLoading] = useState(true);
 
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [starting, setStarting] = useState(false);
   const [cutting, setCutting] = useState(false);
 
   const [abhebenPreview, setAbhebenPreview] = useState<AbhebenEvent[]>([]);
+  const [visibleAbhebenCount, setVisibleAbhebenCount] = useState(0);
 
   const [showAbhebenPreview, setShowAbhebenPreview] = useState(false);
+  const [abhebenRevealDone, setAbhebenRevealDone] = useState(false);
+  const [dealReady, setDealReady] = useState(false);
+  const [dealCompletedKey, setDealCompletedKey] = useState<string | null>(null);
+  const [dealAnimating, setDealAnimating] = useState(false);
   const [choosing, setChoosing] = useState(false);
 
   const [playingCard, setPlayingCard] = useState(false);
@@ -228,39 +380,187 @@ export default function WattenMultiplayerGame() {
   const [actionError, setActionError] = useState<string | null>(null);
 
   const shownAbhebenResultRef = useRef<string | null>(null);
+  const dealChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(
+    null,
+  );
+  const dealAnimatingRef = useRef(false);
+  const dealCloseTimerRef = useRef<number | null>(null);
 
   const [helpMode, setHelpMode] = useState(false);
 
   const [showRankingHelp, setShowRankingHelp] = useState(false);
 
-  async function loadHand(roomId: string) {
-    if (!user) {
+  const beginDealAnimation = useCallback((key: string) => {
+    if (dealAnimatingRef.current) return;
+
+    dealAnimatingRef.current = true;
+    setDealReady(false);
+    setAbhebenRevealDone(false);
+    setShowAbhebenPreview(false);
+    setDealAnimating(true);
+
+    if (dealCloseTimerRef.current !== null) {
+      window.clearTimeout(dealCloseTimerRef.current);
+    }
+
+    dealCloseTimerRef.current = window.setTimeout(() => {
+      dealAnimatingRef.current = false;
+      setDealAnimating(false);
+      setDealCompletedKey(key);
+      dealCloseTimerRef.current = null;
+    }, 2750);
+  }, []);
+
+  async function copyRoomCode() {
+    if (!room?.code || !navigator.clipboard) {
       return;
     }
 
-    const { data, error } = await supabase
-      .from("watten_hands")
-      .select(
-        `
-        room_id,
-        user_id,
-        cards
-        `,
-      )
-      .eq("room_id", roomId)
-      .eq("user_id", user.id)
-      .single();
+    try {
+      await navigator.clipboard.writeText(room.code);
+      setCopied(true);
 
-    if (error) {
-      console.error("Could not load hand:", error);
-
-      return;
+      window.setTimeout(() => {
+        setCopied(false);
+      }, 1600);
+    } catch {
+      setError(
+        l(
+          "Der Raumcode konnte nicht kopiert werden.",
+          "Could not copy room code.",
+        ),
+      );
     }
-
-    const row = data as HandRow;
-
-    setHand(row.cards ?? []);
   }
+
+  async function startGame() {
+    if (!room || !user) {
+      return;
+    }
+
+    if (room.host_id !== user.id) {
+      return;
+    }
+
+    if (players.length !== 4 || starting) {
+      return;
+    }
+
+    const target = Math.max(2, Math.min(30, Math.trunc(waitingTargetScore)));
+    setWaitingTargetScore(target);
+    setStarting(true);
+    setError(null);
+
+    // Use the backend signature that is actually installed. The previous
+    // implementation first probed a p_target_score overload; when that
+    // overload did not exist Supabase correctly returned HTTP 400, even
+    // though the fallback below then started the game successfully.
+    const { error: startError } = await supabase.rpc("start_watten_game", {
+      p_room_id: room.id,
+    });
+
+    if (startError) {
+      setStarting(false);
+      console.error("Could not start Watten:", startError);
+      setError(
+        startError.message ??
+          l(
+            "Das Spiel konnte nicht gestartet werden.",
+            "The game could not be started.",
+          ),
+      );
+      return;
+    }
+
+    let targetError: { message: string } | null = null;
+
+    // Preserve the selected target score after the game row has been created.
+    const targetRpc = await supabase.rpc("set_watten_target_score", {
+      p_room_id: room.id,
+      p_target_score: target,
+    });
+
+    if (targetRpc.error) {
+      const targetRpcMessage = targetRpc.error.message.toLowerCase();
+      const helperMissing =
+        targetRpcMessage.includes("set_watten_target_score") &&
+        (targetRpcMessage.includes("schema cache") ||
+          targetRpcMessage.includes("could not find the function") ||
+          targetRpcMessage.includes("function public.set_watten_target_score"));
+
+      if (helperMissing) {
+        const directUpdate = await supabase
+          .from("watten_games")
+          .update({ target_score: target })
+          .eq("room_id", room.id);
+        targetError = directUpdate.error;
+      } else {
+        targetError = targetRpc.error;
+      }
+    }
+
+    setStarting(false);
+
+    if (targetError) {
+      console.error("Could not set Watten target score:", targetError);
+      setError(
+        l(
+          `Das Spiel wurde gestartet, aber das Ziel konnte nicht auf ${target} Punkte gesetzt werden: ${targetError.message}`,
+          `The game started, but the target could not be set to ${target} points: ${targetError.message}`,
+        ),
+      );
+    }
+  }
+
+  const userId = user?.id ?? null;
+
+  useEffect(() => {
+    if (!room?.id || room.status !== "waiting") return;
+
+    const stored = window.localStorage.getItem(`watten-target-${room.id}`);
+    const parsed = stored ? Number(stored) : NaN;
+    if (Number.isFinite(parsed) && parsed >= 2 && parsed <= 30) {
+      setWaitingTargetScore(Math.trunc(parsed));
+    }
+  }, [room?.id, room?.status]);
+
+  function updateWaitingTargetScore(value: number) {
+    const next = Math.max(2, Math.min(30, Math.trunc(value)));
+    setWaitingTargetScore(next);
+    if (room?.id) {
+      window.localStorage.setItem(`watten-target-${room.id}`, String(next));
+    }
+  }
+
+  const loadHand = useCallback(
+    async (roomId: string) => {
+      if (!userId) {
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("watten_hands")
+        .select(
+          `
+          room_id,
+          user_id,
+          cards
+          `,
+        )
+        .eq("room_id", roomId)
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Could not load hand:", error);
+        return;
+      }
+
+      const row = data as HandRow | null;
+      setHand(row?.cards ?? []);
+    },
+    [userId],
+  );
   async function performCut(cutIndex: number) {
     if (!room || !game || mySeat === null) {
       return;
@@ -288,7 +588,10 @@ export default function WattenMultiplayerGame() {
     if (error) {
       console.error("Abheben failed:", error);
 
-      setError(error.message ?? "Abheben fehlgeschlagen.");
+      setError(
+        error.message ??
+          l("Abheben fehlgeschlagen.", "Cutting the deck failed."),
+      );
 
       return;
     }
@@ -318,7 +621,12 @@ export default function WattenMultiplayerGame() {
     if (error) {
       console.error("Schlag selection failed:", error);
 
-      setError(error.message);
+      setError(
+        l(
+          `Schlag konnte nicht gespeichert werden: ${error.message}`,
+          `Could not save Schlag: ${error.message}`,
+        ),
+      );
       return;
     }
 
@@ -347,7 +655,12 @@ export default function WattenMultiplayerGame() {
     if (error) {
       console.error("Farbe selection failed:", error);
 
-      setError(error.message);
+      setError(
+        l(
+          `Die Farbe konnte nicht gespeichert werden: ${error.message}`,
+          `Could not save the suit: ${error.message}`,
+        ),
+      );
       return;
     }
 
@@ -375,7 +688,10 @@ export default function WattenMultiplayerGame() {
 
     if (!cardIsLegal(card)) {
       setError(
-        "Trumpf oder Kritisch: Du musst Trumpf oder einen Kritischen spielen.",
+        l(
+          "Trumpf oder Kritisch: Du musst Trumpf oder einen Kritischen spielen.",
+          "Trump or critical: you must play a trump or critical card.",
+        ),
       );
 
       return;
@@ -395,7 +711,13 @@ export default function WattenMultiplayerGame() {
     if (error) {
       console.error("Card play failed:", error);
 
-      setError(error.message ?? "Die Karte konnte nicht gespielt werden.");
+      setError(
+        error.message ??
+          l(
+            "Die Karte konnte nicht gespielt werden.",
+            "The card could not be played.",
+          ),
+      );
 
       return;
     }
@@ -427,7 +749,12 @@ export default function WattenMultiplayerGame() {
 
       console.error("Could not continue trick:", error);
 
-      setError(error.message);
+      setError(
+        l(
+          `Der nächste Stich konnte nicht gestartet werden: ${error.message}`,
+          `Could not continue to the next trick: ${error.message}`,
+        ),
+      );
     }
   }
 
@@ -452,7 +779,12 @@ export default function WattenMultiplayerGame() {
     if (error) {
       console.error("Gehen failed:", error);
 
-      setActionError(error.message);
+      setActionError(
+        l(
+          `Gehen konnte nicht erhöht werden: ${error.message}`,
+          `Could not raise: ${error.message}`,
+        ),
+      );
     }
   }
   async function respondToBid(hold: boolean) {
@@ -493,7 +825,12 @@ export default function WattenMultiplayerGame() {
 
       console.error("Bid response failed:", error);
 
-      setActionError(error.message);
+      setActionError(
+        l(
+          `Die Entscheidung konnte nicht gespeichert werden: ${error.message}`,
+          `Could not save the decision: ${error.message}`,
+        ),
+      );
     }
   }
   async function startNextRound() {
@@ -521,226 +858,755 @@ export default function WattenMultiplayerGame() {
 
       console.error("Next round failed:", error);
 
-      setActionError(error.message);
+      setActionError(
+        l(
+          `Die nächste Runde konnte nicht gestartet werden: ${error.message}`,
+          `Could not start the next round: ${error.message}`,
+        ),
+      );
     }
   }
 
   function cardCountForSeat(seat: number) {
     return resolvedGame.cards_remaining?.[String(seat)] ?? 0;
   }
-  useEffect(() => {
-    if (!roomCode || !user) {
-      return;
-    }
+  const refreshRoomState = useCallback(
+    async (showLoader = false) => {
+      if (!roomCode || !userId) {
+        return;
+      }
 
-    let channel: ReturnType<typeof supabase.channel> | undefined;
+      if (showLoader) {
+        setLoading(true);
+      }
 
-    async function loadGame() {
-      setLoading(true);
-      setError(null);
-
-      // -----------------------------------
-      // ROOM
-      // -----------------------------------
+      const normalizedCode = roomCode.trim().toUpperCase();
 
       const { data: roomData, error: roomError } = await supabase
         .from("watten_rooms")
-        .select(
-          `
-          id,
-          code,
-          host_id,
-          status
-          `,
-        )
-        .eq("code", roomCode?.toUpperCase())
-        .single();
+        .select("id, code, host_id, status")
+        .eq("code", normalizedCode)
+        .maybeSingle();
 
       if (roomError || !roomData) {
         console.error(roomError);
-
-        setError("Raum nicht gefunden.");
-
-        setLoading(false);
-
+        setError(l("Raum nicht gefunden.", "Room not found."));
+        if (showLoader) setLoading(false);
         return;
       }
 
       const loadedRoom = roomData as Room;
 
-      setRoom(loadedRoom);
-
-      if (loadedRoom.status !== "playing") {
-        navigate(`/watten/multiplayer/${loadedRoom.code}`);
-
-        return;
-      }
-
-      // -----------------------------------
-      // PLAYERS
-      // -----------------------------------
-
       const { data: playerData, error: playerError } = await supabase
         .from("watten_room_players")
-        .select(
-          `
-          room_id,
-          user_id,
-          seat,
-          display_name
-          `,
-        )
+        .select("room_id, user_id, seat, display_name")
         .eq("room_id", loadedRoom.id)
-        .order("seat", {
-          ascending: true,
-        });
+        .order("seat", { ascending: true });
 
       if (playerError) {
         console.error(playerError);
-
-        setError("Spieler konnten nicht geladen werden.");
-
-        setLoading(false);
-
+        setError(
+          l(
+            "Spieler konnten nicht geladen werden.",
+            "Players could not be loaded.",
+          ),
+        );
+        if (showLoader) setLoading(false);
         return;
       }
 
       const loadedPlayers = (playerData ?? []) as RoomPlayer[];
-
-      setPlayers(loadedPlayers);
-
-      const me = loadedPlayers.find((player) => player.user_id === user?.id);
+      const me = loadedPlayers.find((player) => player.user_id === userId);
 
       if (!me) {
-        setError("Du bist kein Spieler dieses Raumes.");
-
-        setLoading(false);
-
+        setError(
+          l(
+            "Du bist kein Spieler dieses Raumes.",
+            "You are not a player in this room.",
+          ),
+        );
+        if (showLoader) setLoading(false);
         return;
       }
 
+      setRoom(loadedRoom);
+      setPlayers(loadedPlayers);
       setMySeat(me.seat);
+      setError(null);
 
-      // -----------------------------------
-      // PUBLIC GAME
-      // -----------------------------------
+      const playerUserIds = [
+        ...new Set(
+          loadedPlayers.map((player) => player.user_id).filter(Boolean),
+        ),
+      ];
 
-      const { data: gameData, error: gameError } = await supabase
-        .from("watten_games")
-        .select("*")
-        .eq("room_id", loadedRoom.id)
-        .single();
+      if (playerUserIds.length > 0) {
+        const { data: avatarRows, error: avatarError } = await supabase
+          .from("profiles")
+          .select("id, avatar_id")
+          .in("id", playerUserIds);
 
-      if (gameError || !gameData) {
-        console.error(gameError);
+        if (avatarError) {
+          console.warn("Could not load Watten avatars:", avatarError);
+        } else {
+          const nextAvatars: Record<string, string> = {};
 
-        setError("Spielstatus konnte nicht geladen werden.");
+          for (const row of avatarRows ?? []) {
+            if (typeof row.id === "string") {
+              nextAvatars[row.id] =
+                typeof row.avatar_id === "string" && row.avatar_id
+                  ? row.avatar_id
+                  : "m1";
+            }
+          }
 
-        setLoading(false);
-
-        return;
+          setPlayerAvatarIds(nextAvatars);
+        }
       }
 
-      setGame(gameData as MultiplayerGame);
+      if (loadedRoom.status === "playing" || loadedRoom.status === "finished") {
+        const { data: gameData, error: gameError } = await supabase
+          .from("watten_games")
+          .select("*")
+          .eq("room_id", loadedRoom.id)
+          .maybeSingle();
 
-      // -----------------------------------
-      // PRIVATE HAND
-      // -----------------------------------
+        if (gameError) {
+          console.error(gameError);
+          setError(
+            l(
+              "Spielstatus konnte nicht geladen werden.",
+              "Game state could not be loaded.",
+            ),
+          );
+        } else if (gameData) {
+          setGame(gameData as MultiplayerGame);
+          await loadHand(loadedRoom.id);
+        }
+      } else {
+        setGame(null);
+        setHand([]);
+      }
 
-      await loadHand(loadedRoom.id);
+      if (showLoader) {
+        setLoading(false);
+      }
+    },
+    [roomCode, userId, loadHand, l],
+  );
 
-      // -----------------------------------
-      // REALTIME
-      // -----------------------------------
-
-      channel = supabase
-        .channel(`watten-game-${loadedRoom.id}-${user?.id}`)
-
-        // PUBLIC GAME UPDATE
-        .on(
-          "postgres_changes",
-          {
-            event: "UPDATE",
-            schema: "public",
-            table: "watten_games",
-            filter: `room_id=eq.${loadedRoom.id}`,
-          },
-          (payload) => {
-            setGame(payload.new as MultiplayerGame);
-          },
-        )
-
-        .on(
-          "postgres_changes",
-          {
-            event: "*",
-            schema: "public",
-            table: "watten_hands",
-            filter: `user_id=eq.${user?.id}`,
-          },
-          () => {
-            void loadHand(loadedRoom.id);
-          },
-        )
-        .subscribe();
-
-      setLoading(false);
+  // Initial room/game load. This effect performs data fetching only.
+  useEffect(() => {
+    if (!roomCode || !userId) {
+      return;
     }
 
-    void loadGame();
+    void refreshRoomState(true);
+  }, [roomCode, userId, refreshRoomState]);
+
+  // Realtime lifecycle is intentionally separate from async loading. All
+  // postgres_changes callbacks are registered synchronously before subscribe().
+  useEffect(() => {
+    if (!room?.id || !userId) {
+      return;
+    }
+
+    const roomId = room.id;
+    const channelInstance =
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+    // Supabase reuses an existing channel when the topic is identical. A unique
+    // instance suffix prevents React StrictMode cleanup/reattach races from
+    // returning a channel that has already been subscribed.
+    const channel = supabase.channel(
+      `watten-game-${roomId}-${userId}-${channelInstance}`,
+    );
+
+    channel.on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "watten_room_players",
+        filter: `room_id=eq.${roomId}`,
+      },
+      () => {
+        void refreshRoomState(false);
+      },
+    );
+
+    channel.on(
+      "postgres_changes",
+      {
+        event: "UPDATE",
+        schema: "public",
+        table: "watten_rooms",
+        filter: `id=eq.${roomId}`,
+      },
+      () => {
+        void refreshRoomState(false);
+      },
+    );
+
+    channel.on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "watten_games",
+        filter: `room_id=eq.${roomId}`,
+      },
+      () => {
+        void refreshRoomState(false);
+      },
+    );
+
+    channel.on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "watten_hands",
+        filter: `user_id=eq.${userId}`,
+      },
+      () => {
+        void refreshRoomState(false);
+      },
+    );
+
+    channel.subscribe((status, subscriptionError) => {
+      if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+        console.error(
+          "Watten realtime subscription failed:",
+          status,
+          subscriptionError,
+        );
+      }
+    });
 
     return () => {
-      if (channel) {
-        void supabase.removeChannel(channel);
-      }
+      void supabase.removeChannel(channel);
     };
-  }, [roomCode, user, navigate]);
+  }, [room?.id, userId, refreshRoomState]);
+
+  // Polling fallback keeps the room usable even if a Realtime event is missed.
   useEffect(() => {
-    if (!game?.abheben_result || game.abheben_result.length === 0) {
+    if (!room?.id || !userId) {
       return;
     }
 
-    const key = JSON.stringify(game.abheben_result);
+    const timer = window.setInterval(() => {
+      void refreshRoomState(false);
+    }, 2200);
 
-    if (shownAbhebenResultRef.current === key) {
+    return () => window.clearInterval(timer);
+  }, [room?.id, userId, refreshRoomState]);
+
+  const abhebenResultKey = JSON.stringify(game?.abheben_result ?? []);
+  const waitingForDeal =
+    abhebenResultKey !== "[]" && dealCompletedKey !== abhebenResultKey;
+
+  useEffect(() => {
+    const events = game?.abheben_result ?? [];
+
+    if (events.length === 0) {
+      setShowAbhebenPreview(false);
+      setVisibleAbhebenCount(0);
+      setAbhebenRevealDone(false);
+      setDealReady(false);
       return;
     }
 
-    shownAbhebenResultRef.current = key;
+    if (shownAbhebenResultRef.current === abhebenResultKey) {
+      return;
+    }
 
-    setAbhebenPreview(game.abheben_result);
+    shownAbhebenResultRef.current = abhebenResultKey;
+    dealAnimatingRef.current = false;
+    setDealAnimating(false);
+    setDealCompletedKey(null);
+    setDealReady(false);
+    setAbhebenPreview(events);
+    setVisibleAbhebenCount(1);
+    setAbhebenRevealDone(false);
     setShowAbhebenPreview(true);
 
-    const timer = window.setTimeout(() => {
-      setShowAbhebenPreview(false);
-    }, 4500);
+    const timers: number[] = [];
+    const perCardDelay = 2500;
+
+    for (let index = 1; index < events.length; index += 1) {
+      timers.push(
+        window.setTimeout(() => {
+          setVisibleAbhebenCount(index + 1);
+        }, index * perCardDelay),
+      );
+    }
+
+    const revealDuration = Math.max(2000, events.length * perCardDelay + 700);
+
+    timers.push(
+      window.setTimeout(() => {
+        setAbhebenRevealDone(true);
+        setShowAbhebenPreview(false);
+        setDealReady(true);
+      }, revealDuration),
+    );
 
     return () => {
-      window.clearTimeout(timer);
+      timers.forEach((timer) => window.clearTimeout(timer));
     };
-  }, [game?.abheben_result]);
+  }, [abhebenResultKey]);
+
+  useEffect(() => {
+    if (!room?.id) return;
+
+    const channel = supabase.channel(`watten4-deal-${room.id}`);
+    channel.on("broadcast", { event: "distribute_cards" }, ({ payload }) => {
+      const key =
+        payload && typeof payload === "object" && "abhebenKey" in payload
+          ? String(payload.abhebenKey)
+          : "";
+
+      if (key && key !== abhebenResultKey) return;
+      beginDealAnimation(key || abhebenResultKey);
+    });
+    channel.subscribe();
+    dealChannelRef.current = channel;
+
+    return () => {
+      if (dealChannelRef.current === channel) {
+        dealChannelRef.current = null;
+      }
+      void supabase.removeChannel(channel);
+    };
+  }, [room?.id, abhebenResultKey, beginDealAnimation]);
+
+  useEffect(() => {
+    return () => {
+      if (dealCloseTimerRef.current !== null) {
+        window.clearTimeout(dealCloseTimerRef.current);
+      }
+    };
+  }, []);
+
+  async function distributeCards() {
+    if (
+      !game ||
+      mySeat === null ||
+      mySeat !== game.dealer ||
+      !abhebenRevealDone
+    ) {
+      return;
+    }
+
+    beginDealAnimation(abhebenResultKey);
+
+    const channel = dealChannelRef.current;
+    if (channel) {
+      await channel.send({
+        type: "broadcast",
+        event: "distribute_cards",
+        payload: { abhebenKey: abhebenResultKey },
+      });
+    }
+  }
 
   if (error) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-emerald-950 text-white">
+      <main className="flex min-h-screen items-center justify-center bg-transparent text-white">
         <div className="text-center">
           <p className="text-red-300">{error}</p>
 
           <Link
-            to="/watten/multiplayer"
+            to="/games/watten/multiplayer"
             className="mt-6 inline-block rounded-xl bg-white/10 px-5 py-3"
           >
-            Zurück
+            {t("Back")}
           </Link>
         </div>
       </main>
     );
   }
 
-  if (loading || !room || !game || mySeat === null) {
+  if (!user) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-emerald-950 text-white">
-        <p>Multiplayer-Spiel wird geladen...</p>
+      <main className="flex min-h-screen items-center justify-center bg-transparent px-4 text-white">
+        <div className="text-center">
+          <p className="text-lg font-black">
+            {l("Bitte zuerst einloggen.", "Please sign in first.")}
+          </p>
+
+          <Link
+            to="/games/watten/multiplayer"
+            className="mt-5 inline-block rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-bold text-zinc-300 transition hover:bg-white/10"
+          >
+            {t("Back")}
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
+  if (loading || !room || mySeat === null) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-transparent text-white">
+        <p>
+          {l(
+            "Multiplayer-Spiel wird geladen...",
+            "Loading multiplayer game...",
+          )}
+        </p>
+      </main>
+    );
+  }
+
+  /*
+   * ---------------------------------------------------------
+   * WAITING ROOM
+   * ---------------------------------------------------------
+   *
+   * This used to live in WattenMultiplayerRoom.tsx.
+   * It now stays on the same route/component as the real game.
+   */
+  if (room.status === "waiting") {
+    const isHost = room.host_id === user.id;
+    const missingPlayers = Math.max(0, 4 - players.length);
+
+    return (
+      <main className="min-h-screen bg-transparent px-4 py-8 text-white sm:px-6">
+        <div className="mx-auto max-w-6xl">
+          <header className="mb-6 flex flex-wrap items-start justify-between gap-4 rounded-[30px] border border-emerald-300/15 bg-zinc-950/65 p-6 shadow-2xl shadow-black/30">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-300">
+                {t("Bavarian Watten")} · Multiplayer
+              </p>
+
+              <h1 className="mt-1 text-3xl font-black">
+                {l("4 Spieler · 2 gegen 2", "4 Players · 2 vs 2")}
+              </h1>
+
+              <p className="mt-2 max-w-xl text-sm leading-6 text-zinc-400">
+                {l(
+                  "Teile den Raumcode mit drei Mitspielern. Der Gastgeber kann die Partie starten, sobald alle vier Plätze belegt sind.",
+                  "Share the room code with three other players. The host can start once all four seats are filled.",
+                )}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 max-md:w-full max-md:gap-2 max-md:overflow-x-auto max-md:pb-1">
+              <WattenLanguageSelector
+                language={language}
+                onChange={changeLanguage}
+                label={t("Language")}
+              />
+
+              <Link
+                to="/games/watten/multiplayer"
+                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-black text-zinc-300 transition hover:bg-white/10 hover:text-white"
+              >
+                {t("Leave")}
+              </Link>
+            </div>
+          </header>
+
+          <div className="grid gap-3 lg:grid-cols-[300px_minmax(0,1fr)] lg:gap-5">
+            {/* PLAYERS */}
+            <aside className="rounded-[30px] border border-white/10 bg-zinc-950/75 p-5 shadow-xl shadow-black/20">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-300">
+                    {t("Players")}
+                  </p>
+
+                  <h2 className="mt-1 text-xl font-black">
+                    {players.length}/4 {l("verbunden", "connected")}
+                  </h2>
+                </div>
+
+                <span
+                  className={`h-3 w-3 rounded-full ${
+                    players.length === 4
+                      ? "bg-emerald-400"
+                      : "animate-pulse bg-amber-400"
+                  }`}
+                />
+              </div>
+
+              <div className="mt-5 space-y-3">
+                {[0, 1, 2, 3].map((seat) => {
+                  const player = players.find(
+                    (current) => current.seat === seat,
+                  );
+
+                  const teamA = seat % 2 === 0;
+
+                  return (
+                    <div
+                      key={seat}
+                      className={`rounded-2xl border p-4 ${
+                        player
+                          ? teamA
+                            ? "border-amber-400/25 bg-amber-400/[0.06]"
+                            : "border-emerald-400/25 bg-emerald-400/[0.06]"
+                          : "border-white/10 bg-white/[0.03]"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 max-md:w-full max-md:gap-2 max-md:overflow-x-auto max-md:pb-1">
+                        <div
+                          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-sm font-black ${
+                            player
+                              ? teamA
+                                ? "bg-amber-300 text-amber-950"
+                                : "bg-emerald-300 text-emerald-950"
+                              : "bg-zinc-800 text-zinc-600"
+                          }`}
+                        >
+                          {seat + 1}
+                        </div>
+
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <p className="truncate font-black">
+                              {player?.display_name ??
+                                l(
+                                  "Wartet auf Spieler...",
+                                  "Waiting for player...",
+                                )}
+                            </p>
+
+                            {player?.user_id === user.id && (
+                              <span className="rounded-full bg-sky-400/10 px-2 py-0.5 text-[9px] font-black text-sky-300">
+                                {l("DU", "YOU")}
+                              </span>
+                            )}
+                          </div>
+
+                          <p
+                            className={`mt-1 text-[10px] font-black uppercase tracking-wider ${
+                              teamA ? "text-amber-300" : "text-emerald-300"
+                            }`}
+                          >
+                            {teamA ? "Team A" : "Team B"}
+                          </p>
+
+                          {player?.user_id === room.host_id && (
+                            <p className="mt-1 text-[10px] font-semibold text-zinc-500">
+                              {l("Gastgeber", "Host")}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="mt-5 rounded-2xl border border-white/5 bg-black/20 p-4 text-center">
+                {players.length < 4 ? (
+                  <>
+                    <p className="text-xs font-black text-zinc-300">
+                      {l("Noch", "Still")} {missingPlayers}{" "}
+                      {l(
+                        missingPlayers === 1
+                          ? "Spieler benötigt"
+                          : "Spieler benötigt",
+                        missingPlayers === 1
+                          ? "player needed"
+                          : "players needed",
+                      )}
+                    </p>
+
+                    <p className="mt-1 text-[10px] leading-4 text-zinc-600">
+                      {l(
+                        "Neue Spieler erscheinen automatisch.",
+                        "New players appear automatically.",
+                      )}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-xs font-black text-emerald-300">
+                      {l(
+                        "Alle vier Spieler sind verbunden.",
+                        "All four players are connected.",
+                      )}
+                    </p>
+
+                    <p className="mt-1 text-[10px] leading-4 text-zinc-600">
+                      {l(
+                        "Die Partie kann jetzt gestartet werden.",
+                        "The game can now be started.",
+                      )}
+                    </p>
+                  </>
+                )}
+              </div>
+            </aside>
+
+            {/* TABLE / COPYABLE ROOM CODE */}
+            <section
+              className="relative min-h-[620px] overflow-hidden rounded-[42px] border border-white/10 shadow-2xl max-md:min-h-[480px] max-md:rounded-[28px]"
+              style={{
+                backgroundImage: `url(${tableBackgrounds[tableTheme]})`,
+                backgroundSize: "100% 100%",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+              }}
+            >
+              <div className="absolute inset-0 flex items-center justify-center bg-zinc-950/55 p-4 backdrop-blur-[2px]">
+                <div className="w-full max-w-lg">
+                  <button
+                    type="button"
+                    onClick={() => void copyRoomCode()}
+                    className="w-full rounded-[26px] border border-white/15 bg-zinc-900/95 px-6 py-5 text-center shadow-2xl shadow-black/60 transition hover:border-amber-300/35 hover:bg-zinc-900 active:scale-[0.99]"
+                    title={l("Raumcode kopieren", "Copy room code")}
+                  >
+                    <div className="text-3xl">🃏</div>
+
+                    <p className="mt-2 text-[10px] font-black uppercase tracking-[0.22em] text-amber-300">
+                      {t("Waiting for players")}
+                    </p>
+
+                    <h2 className="mt-1 text-xl font-black text-white">
+                      {players.length}/4{" "}
+                      {l("Spieler verbunden", "players connected")}
+                    </h2>
+
+                    <p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-zinc-500">
+                      {l(
+                        "Teile diesen Raumcode mit deinen Mitspielern.",
+                        "Share this room code with the other players.",
+                      )}
+                    </p>
+
+                    <div className="mt-4 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-4 py-3">
+                      <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">
+                        {t("Room code")}
+                      </p>
+
+                      <p className="mt-1 break-all font-mono text-3xl font-black tracking-[0.14em] text-amber-200 sm:text-4xl">
+                        {room.code}
+                      </p>
+                    </div>
+
+                    <p className="mt-2 text-[10px] font-bold text-zinc-400">
+                      {copied
+                        ? `✓ ${t("Copied to clipboard")}`
+                        : t("Click this box to copy the code")}
+                    </p>
+                  </button>
+
+                  {isHost && (
+                    <div className="mt-3 rounded-2xl border border-white/10 bg-zinc-950/85 p-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">
+                          {l("Siegpunkte", "Target score")}
+                        </p>
+                        <span className="text-sm font-black text-amber-300">
+                          {waitingTargetScore}
+                        </span>
+                      </div>
+
+                      <div className="mt-2 flex items-center gap-2">
+                        {[11, 15, 18].map((score) => (
+                          <button
+                            key={score}
+                            type="button"
+                            onClick={() => updateWaitingTargetScore(score)}
+                            className={`min-w-0 flex-1 rounded-lg px-2 py-2 text-sm font-black transition ${
+                              waitingTargetScore === score
+                                ? "bg-amber-300 text-amber-950"
+                                : "border border-white/10 bg-white/5 text-zinc-300 hover:bg-white/10"
+                            }`}
+                          >
+                            {score}
+                          </button>
+                        ))}
+
+                        <input
+                          aria-label={l(
+                            "Eigener Zielwert",
+                            "Custom target score",
+                          )}
+                          type="number"
+                          min={2}
+                          max={30}
+                          value={waitingTargetScore}
+                          onChange={(event) => {
+                            const value = Number(event.target.value);
+                            if (Number.isFinite(value))
+                              updateWaitingTargetScore(value);
+                          }}
+                          className="w-20 rounded-lg border border-white/10 bg-black/25 px-2 py-2 text-center text-sm font-black outline-none transition focus:border-amber-300/50"
+                        />
+                      </div>
+
+                      <p className="mt-1 text-[9px] font-bold text-zinc-600">
+                        {l("Eigener Wert: 2–30", "Custom: 2–30")}
+                      </p>
+                    </div>
+                  )}
+
+                  {isHost ? (
+                    <button
+                      type="button"
+                      disabled={players.length !== 4 || starting}
+                      onClick={() => void startGame()}
+                      className="mt-3 w-full rounded-xl bg-amber-300 px-5 py-2.5 text-sm font-black text-amber-950 transition hover:bg-amber-200 disabled:cursor-not-allowed disabled:opacity-35"
+                    >
+                      {starting
+                        ? l("Spiel wird gestartet...", "Game is starting...")
+                        : players.length === 4
+                          ? l("Spiel starten", "Start game")
+                          : l(
+                              `Warte auf ${missingPlayers} ${missingPlayers === 1 ? "weiteren Spieler" : "weitere Spieler"}`,
+                              `Waiting for ${missingPlayers} more ${missingPlayers === 1 ? "player" : "players"}`,
+                            )}
+                    </button>
+                  ) : (
+                    <div className="mt-4 rounded-2xl border border-white/10 bg-zinc-950/85 px-5 py-4 text-center">
+                      <p className="text-sm font-black text-zinc-300">
+                        {players.length === 4
+                          ? l("Alle Spieler sind da.", "All players are here.")
+                          : l(
+                              "Warte auf weitere Spieler...",
+                              "Waiting for more players...",
+                            )}
+                      </p>
+
+                      <p className="mt-1 text-xs text-zinc-600">
+                        {l(
+                          "Der Gastgeber startet die Partie.",
+                          "The host starts the game.",
+                        )}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  /*
+   * A room can switch to "playing" a fraction before the game row is
+   * received through Realtime. Keep a short loading state instead of
+   * throwing the user back to a separate room page.
+   */
+  if (!game) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-transparent text-white">
+        <div className="text-center">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-white/15 border-t-amber-300" />
+          <p className="mt-4 text-sm font-bold text-zinc-300">
+            {l("Spiel wird gestartet...", "Game is starting...")}
+          </p>
+        </div>
       </main>
     );
   }
@@ -754,15 +1620,7 @@ export default function WattenMultiplayerGame() {
   const abheber = players.find((player) => player.seat === game.abheben_player);
 
   const isMyTurn = game.current_player === mySeat;
-  const myRematchReady =
-    mySeat === 0
-      ? gameState.white_rematch_ready
-      : gameState.black_rematch_ready;
 
-  const opponentRematchReady =
-    mySeat === 0
-      ? gameState.black_rematch_ready
-      : gameState.white_rematch_ready;
   const myTeam = getTeamForSeat(mySeat);
 
   const teamAPlayers = players.filter(
@@ -781,8 +1639,12 @@ export default function WattenMultiplayerGame() {
 
   const myTeamScore = myTeam === "team-a" ? teamAScore : teamBScore;
 
+  // For short test/quick matches up to 4 points, disable the Gespannt
+  // restriction so Gehen remains usable (same behavior as the 3-player mode).
   const myTeamIsGespannt =
-    myTeamScore >= targetScore - 2 && myTeamScore < targetScore;
+    targetScore >= 5 &&
+    myTeamScore >= targetScore - 2 &&
+    myTeamScore < targetScore;
 
   const canRaise =
     game.phase === "playing" &&
@@ -906,21 +1768,33 @@ export default function WattenMultiplayerGame() {
       resolvedGame.played_cards.length === 0 &&
       isHauptschlag(card, resolvedGame.farbe, resolvedGame.schlag)
     ) {
-      return "Hauptschlag — Wenn du diese Karte jetzt ausspielst, wird „Trumpf oder Kritisch“ aktiv.";
+      return l(
+        "Hauptschlag — Wenn du diese Karte jetzt ausspielst, wird „Trumpf oder Kritisch“ aktiv.",
+        "Main Schlag — playing this card now activates ‘Trump or Critical’. ",
+      );
     }
 
     const criticalValue = getCriticalValue(card);
 
     if (criticalValue === 3) {
-      return "Max — die höchste Kritische und die höchste Karte beim Watten.";
+      return l(
+        "Max — die höchste Kritische und die höchste Karte beim Watten.",
+        "Max — the highest critical card and the highest card in Watten.",
+      );
     }
 
     if (criticalValue === 2) {
-      return "Belli — die zweithöchste Kritische.";
+      return l(
+        "Belli — die zweithöchste Kritische.",
+        "Belli — the second-highest critical card.",
+      );
     }
 
     if (criticalValue === 1) {
-      return "Spitz — die dritthöchste Kritische.";
+      return l(
+        "Spitz — die dritthöchste Kritische.",
+        "Spitz — the third-highest critical card.",
+      );
     }
 
     if (
@@ -928,15 +1802,24 @@ export default function WattenMultiplayerGame() {
       resolvedGame.schlag &&
       isHauptschlag(card, resolvedGame.farbe, resolvedGame.schlag)
     ) {
-      return "Hauptschlag — die stärkste nicht-kritische Karte.";
+      return l(
+        "Hauptschlag — die stärkste nicht-kritische Karte.",
+        "Main Schlag — the strongest non-critical card.",
+      );
     }
 
     if (card.rank === resolvedGame.schlag) {
-      return `Schlag (${resolvedGame.schlag}) — stärker als normale Trumpfkarten.`;
+      return l(
+        `Schlag (${resolvedGame.schlag}) — stärker als normale Trumpfkarten.`,
+        `Schlag (${resolvedGame.schlag}) — stronger than normal trump cards.`,
+      );
     }
 
     if (card.suit === resolvedGame.farbe) {
-      return `Trumpf (${resolvedGame.farbe})`;
+      return l(
+        `Trumpf (${resolvedGame.farbe})`,
+        `Trump (${resolvedGame.farbe})`,
+      );
     }
 
     return undefined;
@@ -994,36 +1877,50 @@ export default function WattenMultiplayerGame() {
 
     return [
       {
-        title: "Kritische",
+        title: l("Kritische", "Critical cards"),
         description: "Max → Belli → Spitz",
         cards: kritische,
       },
       {
-        title: "Hauptschlag",
-        description: "Schlag + Farbe. Höchste nicht-kritische Karte.",
+        title: l("Hauptschlag", "Main Schlag"),
+        description: l(
+          "Schlag + Farbe. Höchste nicht-kritische Karte.",
+          "Schlag + suit. Highest non-critical card.",
+        ),
         cards: hauptschlag,
       },
       {
-        title: "Schläge",
-        description: `Alle anderen ${resolvedGame.schlag}. Gleich stark; der zuerst gespielte gewinnt.`,
+        title: l("Schläge", "Schlag cards"),
+        description: l(
+          `Alle anderen ${resolvedGame.schlag}. Gleich stark; der zuerst gespielte gewinnt.`,
+          `All other ${resolvedGame.schlag}. Equal strength; the first played wins.`,
+        ),
         cards: schlaege,
       },
       {
-        title: `Trumpf / Farbe (${resolvedGame.farbe})`,
-        description: "Danach folgen die übrigen Karten der Trumpffarbe.",
+        title: l(
+          `Trumpf / Farbe (${resolvedGame.farbe})`,
+          `Trump / suit (${resolvedGame.farbe})`,
+        ),
+        description: l(
+          "Danach folgen die übrigen Karten der Trumpffarbe.",
+          "Then follow the remaining cards of the trump suit.",
+        ),
         cards: trumpfCards,
       },
       {
-        title: "Normale Karten",
-        description:
+        title: l("Normale Karten", "Normal cards"),
+        description: l(
           "Angespielte Farbe: Ass → König → Ober → Unter → 10 → 9 → 8 → 7.",
+          "Led suit: Ace → King → Ober → Unter → 10 → 9 → 8 → 7.",
+        ),
         cards: normalCards,
       },
     ];
   }
 
   return (
-    <main className="min-h-screen bg-emerald-950 px-4 py-6 text-white md:px-8">
+    <main className="min-h-screen bg-transparent px-4 py-6 text-white md:px-8">
       {actionError && (
         <div className="fixed left-1/2 top-5 z-[250] -translate-x-1/2 rounded-xl border border-red-400/30 bg-red-950/95 px-5 py-3 text-sm font-bold text-red-200 shadow-2xl">
           {actionError}
@@ -1037,75 +1934,91 @@ export default function WattenMultiplayerGame() {
           </button>
         </div>
       )}
-      {showAbhebenPreview && abhebenPreview.length > 0 && (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/70 px-6 backdrop-blur-sm">
-          <div className="w-full max-w-3xl rounded-3xl border border-white/10 bg-zinc-950 p-8 text-center shadow-2xl">
-            <p className="text-xs font-bold uppercase tracking-[0.25em] text-amber-400">
-              Abheben
-            </p>
+      {showAbhebenPreview &&
+        mySeat === game.abheben_player &&
+        abhebenPreview.length > 0 && (
+          <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/70 px-6 backdrop-blur-sm">
+            <div className="w-full max-w-3xl rounded-3xl border border-white/10 bg-zinc-950 p-8 text-center shadow-2xl">
+              <p className="text-xs font-bold uppercase tracking-[0.25em] text-amber-400">
+                {t("Abheben")}
+              </p>
 
-            <h2 className="mt-2 text-3xl font-black">Ergebnis</h2>
+              <h2 className="mt-2 text-3xl font-black">
+                {l("Ergebnis", "Result")}
+              </h2>
 
-            <div className="mt-8 flex flex-wrap items-start justify-center gap-6">
-              {abhebenPreview.map((event, index) => {
-                const recipient =
-                  event.recipient_seat !== null
-                    ? players.find(
-                        (player) => player.seat === event.recipient_seat,
-                      )
-                    : null;
+              <div className="mt-8 flex min-h-44 flex-wrap items-start justify-center gap-6">
+                {abhebenPreview
+                  .slice(0, visibleAbhebenCount)
+                  .map((event, index) => {
+                    const recipient =
+                      event.recipient_seat !== null
+                        ? players.find(
+                            (player) => player.seat === event.recipient_seat,
+                          )
+                        : null;
 
-                return (
-                  <div
-                    key={`${event.card.id}-${index}`}
-                    className="flex flex-col items-center"
-                  >
-                    <div className="pointer-events-none">
-                      <WattenCardComponent card={event.card} />
-                    </div>
+                    return (
+                      <div
+                        key={`${event.card.id}-${index}`}
+                        className="flex flex-col items-center rounded-2xl border border-white/10 bg-white/5 p-3"
+                      >
+                        <div onMouseEnter={playHoverSound}>
+                          <WattenCardComponent card={event.card} />
+                        </div>
 
-                    {event.critical ? (
-                      <>
-                        <p className="mt-3 font-black text-amber-300">
-                          Kritische!
-                        </p>
+                        {event.critical ? (
+                          <>
+                            <p className="mt-3 font-black text-amber-300">
+                              {l("Kritische!", "Critical!")}
+                            </p>
 
-                        <p className="mt-1 text-xs text-zinc-400">geht an</p>
+                            <p className="mt-1 text-xs text-zinc-400">
+                              {l("geht an", "goes to")}
+                            </p>
 
-                        <p className="mt-1 text-sm font-bold text-white">
-                          {recipient?.display_name}
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        <p className="mt-3 font-bold text-zinc-300">
-                          Keine Kritische
-                        </p>
+                            <p className="mt-1 text-sm font-bold text-white">
+                              {recipient?.display_name}
+                            </p>
+                          </>
+                        ) : (
+                          <>
+                            <p className="mt-3 font-bold text-zinc-300">
+                              {l("Keine Kritische", "No critical card")}
+                            </p>
 
-                        <p className="mt-1 text-xs text-zinc-500">
-                          Abheben beendet
-                        </p>
-                      </>
-                    )}
-                  </div>
-                );
-              })}
+                            <p className="mt-1 text-xs text-zinc-500">
+                              {l("Abheben beendet", "Cut finished")}
+                            </p>
+                          </>
+                        )}
+                      </div>
+                    );
+                  })}
+              </div>
+
+              {visibleAbhebenCount < abhebenPreview.length ? (
+                <p className="mt-5 animate-pulse text-sm font-black text-amber-300">
+                  {l("Nächste Karte...", "Next card...")}
+                </p>
+              ) : (
+                <p className="mt-5 text-xs font-bold text-zinc-500">
+                  {l(
+                    "Die letzte Karte bleibt kurz sichtbar. Danach liegt der Stapel wieder auf dem Tisch.",
+                    "The final card stays visible briefly. Then the deck returns to the table.",
+                  )}
+                </p>
+              )}
+
+              <p className="mt-4 text-xs font-bold text-zinc-500">
+                {l(
+                  "Die aufgedeckte Karte bleibt kurz sichtbar. Danach liegt der Stapel wieder auf dem Tisch.",
+                  "The revealed card stays visible briefly. Then the deck returns to the table.",
+                )}
+              </p>
             </div>
-
-            <p className="mt-8 text-sm text-emerald-300">
-              Die Karten wurden ausgeteilt.
-            </p>
-
-            <button
-              type="button"
-              onClick={() => setShowAbhebenPreview(false)}
-              className="mt-6 rounded-xl bg-emerald-500 px-6 py-3 font-black text-emerald-950 transition hover:bg-emerald-400"
-            >
-              Weiter
-            </button>
           </div>
-        </div>
-      )}
+        )}
       {/* GEHEN DECISION */}
 
       {game.phase === "bidPending" &&
@@ -1114,26 +2027,26 @@ export default function WattenMultiplayerGame() {
           <div className="fixed inset-0 z-[180] flex items-center justify-center bg-black/75 px-6 backdrop-blur-sm">
             <div className="w-full max-w-md rounded-3xl border border-white/10 bg-zinc-950 p-8 text-center shadow-2xl">
               <p className="text-xs font-bold uppercase tracking-[0.25em] text-amber-400">
-                Gehen
+                {l("Gehen", "Raise")}
               </p>
 
               <h2 className="mt-3 text-2xl font-black text-white">
                 {teamName(game.pending_bid_team)}
               </h2>
 
-              <p className="mt-2 text-zinc-300">geht auf</p>
+              <p className="mt-2 text-zinc-300">{l("geht auf", "raises to")}</p>
 
               <p className="mt-2 text-5xl font-black text-amber-400">
                 {game.pending_bid_value}
               </p>
 
-              <p className="mt-1 text-sm text-zinc-500">Punkte</p>
+              <p className="mt-1 text-sm text-zinc-500">{t("Points")}</p>
 
               <div className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-zinc-300">
-                Aktueller Rundenwert:{" "}
+                {l("Aktueller Rundenwert", "Current round value")}:{" "}
                 <strong className="text-amber-300">{game.round_value}</strong>
                 <br />
-                Neuer Wert bei Halten:{" "}
+                {l("Neuer Wert bei Halten", "New value if held")}:{" "}
                 <strong className="text-emerald-300">
                   {game.pending_bid_value}
                 </strong>
@@ -1142,7 +2055,7 @@ export default function WattenMultiplayerGame() {
               {canRespondToBid ? (
                 <>
                   <p className="mt-6 text-sm font-bold text-emerald-300">
-                    Dein Team muss entscheiden.
+                    {l("Dein Team muss entscheiden.", "Your team must decide.")}
                   </p>
 
                   <button
@@ -1164,18 +2077,26 @@ export default function WattenMultiplayerGame() {
                     }}
                     className="mt-3 w-full rounded-xl bg-red-500/20 px-5 py-3 font-bold text-red-200 transition hover:bg-red-500/30 disabled:opacity-40"
                   >
-                    Nicht halten
+                    {l("Nicht halten", "Decline")}
                   </button>
 
                   <p className="mt-4 text-xs leading-5 text-zinc-500">
-                    Bei „Nicht halten“ erhält {teamName(game.pending_bid_team)}{" "}
-                    den bisherigen Rundenwert von {game.round_value} Punkten.
+                    {l("Bei „Nicht halten“ erhält", "If declined,")}{" "}
+                    {teamName(game.pending_bid_team)}{" "}
+                    {l(
+                      "den bisherigen Rundenwert von",
+                      "receives the current round value of",
+                    )}{" "}
+                    {game.round_value} {t("Points")}.
                   </p>
                 </>
               ) : (
                 <>
                   <p className="mt-7 text-sm text-zinc-400">
-                    Die Gegenseite entscheidet...
+                    {l(
+                      "Die Gegenseite entscheidet...",
+                      "The other team is deciding...",
+                    )}
                   </p>
 
                   <div className="mx-auto mt-4 h-6 w-6 animate-spin rounded-full border-2 border-white/20 border-t-amber-400" />
@@ -1184,23 +2105,31 @@ export default function WattenMultiplayerGame() {
             </div>
           </div>
         )}
-      <div className="mx-auto w-full max-w-[1800px]">
+      <div className="mx-auto w-full max-w-[1800px] max-md:px-2">
         {/* HEADER */}
 
-        <div className="relative z-30 mb-4 flex items-center justify-between">
-          <div className="ml-5 pl-5">
+        <div className="relative z-30 mb-3 flex items-start justify-between gap-2 max-md:flex-col md:mb-4 md:items-center">
+          <div className="ml-5 pl-5 max-md:ml-0 max-md:pl-0">
             <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
-              Bayerisches Watten
+              {t("Bavarian Watten")}
             </p>
 
             <h1 className="mt-1 text-2xl font-black">
-              4 Spieler · Multiplayer
+              {l("4 Spieler · Multiplayer", "4 Players · Multiplayer")}
             </h1>
 
-            <p className="mt-1 text-xs text-zinc-400">Raum {room.code}</p>
+            <p className="mt-1 text-xs text-zinc-400">
+              {t("Room code")}: {room.code}
+            </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 max-md:w-full max-md:gap-2 max-md:overflow-x-auto max-md:pb-1">
+            <WattenLanguageSelector
+              language={language}
+              onChange={changeLanguage}
+              label={t("Language")}
+            />
+
             <button
               type="button"
               onClick={() => setHelpMode((current) => !current)}
@@ -1218,7 +2147,9 @@ export default function WattenMultiplayerGame() {
         }
       `}
             >
-              {helpMode ? "💡 Help On" : "💡 Help"}
+              {helpMode
+                ? l("💡 Hilfe an", "💡 Help On")
+                : l("💡 Hilfe", "💡 Help")}
             </button>
 
             <CardThemeSelector />
@@ -1226,10 +2157,10 @@ export default function WattenMultiplayerGame() {
             <TableThemeSelector />
 
             <Link
-              to="/watten/multiplayer"
+              to="/games/watten/multiplayer"
               className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium transition hover:bg-white/20"
             >
-              Exit
+              {t("Leave")}
             </Link>
           </div>
         </div>
@@ -1243,11 +2174,13 @@ export default function WattenMultiplayerGame() {
     grid-cols-[16rem_minmax(0,1fr)_16rem]
     items-start
     gap-5
+    max-md:grid-cols-1
+    max-md:gap-3
   "
         >
           {/* LEFT SIDEBAR */}
 
-          <aside className="relative w-64 pt-15">
+          <aside className="relative w-64 pt-15 max-md:order-2 max-md:w-full max-md:pt-0">
             {/* CARD PRIORITY */}
 
             {game.farbe && game.schlag && (
@@ -1274,8 +2207,11 @@ export default function WattenMultiplayerGame() {
             `}
                 >
                   {showRankingHelp
-                    ? "📚 Kartenrangfolge ausblenden"
-                    : "📚 Kartenrangfolge einblenden"}
+                    ? l("📚 Kartenrangfolge ausblenden", "📚 Hide card ranking")
+                    : l(
+                        "📚 Kartenrangfolge einblenden",
+                        "📚 Show card ranking",
+                      )}
                 </button>
 
                 {showRankingHelp && (
@@ -1288,6 +2224,12 @@ export default function WattenMultiplayerGame() {
                 h-[720px]
                 w-full
                 overflow-y-auto
+                max-md:fixed
+                max-md:inset-x-2
+                max-md:top-20
+                max-md:z-[200]
+                max-md:h-[70vh]
+                max-md:w-auto
                 rounded-3xl
                 border
                 border-white/10
@@ -1298,22 +2240,24 @@ export default function WattenMultiplayerGame() {
               "
                   >
                     <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
-                      Anfängerhilfe
+                      {l("Anfängerhilfe", "Beginner help")}
                     </p>
 
-                    <h2 className="mt-1 text-xl font-bold">Kartenrangfolge</h2>
+                    <h2 className="mt-1 text-xl font-bold">
+                      {l("Kartenrangfolge", "Card ranking")}
+                    </h2>
 
                     <p className="mt-1 text-xs text-zinc-400">
-                      Höchste Priorität zuerst.
+                      {t("Highest priority first.")}
                     </p>
 
                     <div className="mt-3 text-xs">
                       <span className="text-emerald-300">
-                        Farbe: <strong>{game.farbe}</strong>
+                        {l("Farbe", "Suit")}: <strong>{game.farbe}</strong>
                       </span>
 
                       <span className="ml-3 text-amber-300">
-                        Schlag: <strong>{game.schlag}</strong>
+                        {t("Schlag")}: <strong>{game.schlag}</strong>
                       </span>
                     </div>
 
@@ -1352,13 +2296,13 @@ export default function WattenMultiplayerGame() {
 
             {/* SCORE */}
 
-            <div className="h-[720px] rounded-3xl border border-white/10 bg-zinc-950/95 p-5 shadow-2xl">
+            <div className="h-[720px] rounded-3xl border border-white/10 bg-zinc-950/95 p-5 shadow-2xl max-md:h-auto max-md:p-3">
               <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
-                Punktestand
+                {l("Punktestand", "Score")}
               </p>
 
               <h3 className="mt-1 text-lg font-bold">
-                Ziel: {targetScore} Punkte
+                {l("Ziel", "Target")}: {targetScore} {t("Points")}
               </h3>
 
               <div className="mt-6 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4">
@@ -1446,7 +2390,7 @@ export default function WattenMultiplayerGame() {
                   {/* SCHLAG */}
                   <div className="flex items-center gap-2">
                     <span className="text-[9px] font-black uppercase tracking-[0.18em] text-zinc-500">
-                      Schlag
+                      {t("Schlag")}
                     </span>
 
                     <span className="rounded-lg bg-amber-400/15 px-2.5 py-1 text-lg font-black text-amber-300">
@@ -1459,7 +2403,7 @@ export default function WattenMultiplayerGame() {
                   {/* FARBE */}
                   <div className="flex items-center gap-2">
                     <span className="text-[9px] font-black uppercase tracking-[0.18em] text-zinc-500">
-                      Farbe
+                      {l("Farbe", "Suit")}
                     </span>
 
                     {game.farbe && (
@@ -1490,6 +2434,9 @@ export default function WattenMultiplayerGame() {
     overflow-visible
     rounded-[60px]
     shadow-2xl
+    max-md:order-1
+    max-md:min-h-[540px]
+    max-md:rounded-[32px]
   "
               style={{
                 backgroundImage: `url(${tableBackgrounds[tableTheme]})`,
@@ -1504,6 +2451,7 @@ export default function WattenMultiplayerGame() {
     absolute
     inset-0
     rounded-[60px]
+    max-md:rounded-[32px]
     bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.10),transparent_58%)]
   "
               />
@@ -1514,14 +2462,24 @@ export default function WattenMultiplayerGame() {
     absolute
     inset-[18px]
     rounded-[48px]
+    max-md:inset-[8px]
+    max-md:rounded-[24px]
     border
     border-white/5
   "
               />
+
+              {dealAnimating && <DealAnimation playerCount={4} />}
               {/* TOP */}
 
               <PlayerBox
+                l={l}
                 player={topPlayer}
+                avatarId={
+                  topPlayer
+                    ? (playerAvatarIds[topPlayer.user_id] ?? "m1")
+                    : "m1"
+                }
                 seat={topSeat}
                 dealer={game.dealer}
                 abheber={game.abheben_player}
@@ -1533,13 +2491,20 @@ export default function WattenMultiplayerGame() {
     left-1/2
     top-7
     -translate-x-1/2
+    max-md:top-2
   "
-                cardCount={cardCountForSeat(topSeat)}
+                cardCount={waitingForDeal ? 0 : cardCountForSeat(topSeat)}
               />
 
               {/* LEFT */}
               <PlayerBox
+                l={l}
                 player={leftPlayer}
+                avatarId={
+                  leftPlayer
+                    ? (playerAvatarIds[leftPlayer.user_id] ?? "f1")
+                    : "f1"
+                }
                 seat={leftSeat}
                 dealer={game.dealer}
                 abheber={game.abheben_player}
@@ -1551,14 +2516,21 @@ export default function WattenMultiplayerGame() {
     left-7
     top-1/2
     -translate-y-1/2
+    max-md:left-1
   "
-                cardCount={cardCountForSeat(leftSeat)}
+                cardCount={waitingForDeal ? 0 : cardCountForSeat(leftSeat)}
               />
 
               {/* RIGHT */}
 
               <PlayerBox
+                l={l}
                 player={rightPlayer}
+                avatarId={
+                  rightPlayer
+                    ? (playerAvatarIds[rightPlayer.user_id] ?? "m2")
+                    : "m2"
+                }
                 seat={rightSeat}
                 dealer={game.dealer}
                 abheber={game.abheben_player}
@@ -1570,15 +2542,16 @@ export default function WattenMultiplayerGame() {
     right-7
     top-1/2
     -translate-y-1/2
+    max-md:right-1
   "
-                cardCount={cardCountForSeat(rightSeat)}
+                cardCount={waitingForDeal ? 0 : cardCountForSeat(rightSeat)}
               />
 
               {/* CENTER */}
 
               <div
                 className={
-                  game.phase === "playing"
+                  game.phase === "playing" && !waitingForDeal
                     ? `
           pointer-events-none
           absolute
@@ -1603,20 +2576,38 @@ export default function WattenMultiplayerGame() {
         `
                 }
               >
-                {game.phase === "abheben" ? (
+                {waitingForDeal ? (
+                  dealReady && !dealAnimating ? (
+                    <DealDeckControl
+                      canDeal={mySeat === game.dealer}
+                      onDeal={() => void distributeCards()}
+                      l={l}
+                    />
+                  ) : (
+                    <p className="animate-pulse text-sm font-black text-zinc-400">
+                      {l(
+                        "Abheben wird abgeschlossen...",
+                        "Finishing the cut...",
+                      )}
+                    </p>
+                  )
+                ) : game.phase === "abheben" ? (
                   <>
                     <p className="text-xs font-bold uppercase tracking-widest text-amber-300">
-                      Abheben
+                      {t("Abheben")}
                     </p>
 
                     {isMyTurn ? (
                       <>
                         <h2 className="mt-3 text-2xl font-black text-emerald-300">
-                          Du hebst ab
+                          {l("Du hebst ab", "You are cutting")}
                         </h2>
 
                         <p className="mt-2 text-xs text-zinc-400">
-                          Wähle eine Stelle im Stapel.
+                          {l(
+                            "Wähle eine Stelle im Stapel.",
+                            "Choose a cut position in the deck.",
+                          )}
                         </p>
 
                         <div className="mt-7 space-y-4">
@@ -1674,18 +2665,18 @@ export default function WattenMultiplayerGame() {
 
                         {cutting && (
                           <p className="mt-5 animate-pulse text-sm font-bold text-amber-300">
-                            Karte wird aufgedeckt...
+                            {l("Karte wird aufgedeckt...", "Revealing card...")}
                           </p>
                         )}
                       </>
                     ) : (
                       <>
                         <h2 className="mt-3 text-xl font-black">
-                          {abheber?.display_name} hebt ab
+                          {abheber?.display_name} {l("hebt ab", "is cutting")}
                         </h2>
 
                         <p className="mt-3 text-sm text-zinc-400">
-                          Bitte warten...
+                          {l("Bitte warten...", "Please wait...")}
                         </p>
                       </>
                     )}
@@ -1693,17 +2684,17 @@ export default function WattenMultiplayerGame() {
                 ) : game.phase === "schlag" ? (
                   <>
                     <p className="text-xs font-bold uppercase tracking-widest text-amber-300">
-                      Schlag bestimmen
+                      {l("Schlag bestimmen", "Choose Schlag")}
                     </p>
 
                     {isMyTurn ? (
                       <>
                         <h2 className="mt-3 text-2xl font-black text-amber-300">
-                          Du bist Vorhand
+                          {l("Du bist Vorhand", "You are Forehand")}
                         </h2>
 
                         <p className="mt-2 text-sm text-zinc-400">
-                          Wähle den Schlag.
+                          {l("Wähle den Schlag.", "Choose the Schlag rank.")}
                         </p>
 
                         <div className="mt-6 grid grid-cols-4 gap-2">
@@ -1748,18 +2739,22 @@ export default function WattenMultiplayerGame() {
 
                         {choosing && (
                           <p className="mt-4 animate-pulse text-xs font-bold text-amber-300">
-                            Schlag wird gespeichert...
+                            {l(
+                              "Schlag wird gespeichert...",
+                              "Saving Schlag...",
+                            )}
                           </p>
                         )}
                       </>
                     ) : (
                       <>
                         <h2 className="mt-3 text-xl font-black">
-                          {vorhand?.display_name} bestimmt den Schlag
+                          {vorhand?.display_name}{" "}
+                          {l("bestimmt den Schlag", "chooses the Schlag")}
                         </h2>
 
                         <p className="mt-3 text-sm text-zinc-400">
-                          Bitte warten...
+                          {l("Bitte warten...", "Please wait...")}
                         </p>
                       </>
                     )}
@@ -1767,11 +2762,13 @@ export default function WattenMultiplayerGame() {
                 ) : game.phase === "trump" ? (
                   <>
                     <p className="text-xs font-bold uppercase tracking-widest text-emerald-300">
-                      Farbe bestimmen
+                      {l("Farbe bestimmen", "Choose suit")}
                     </p>
 
                     <div className="mt-3 rounded-xl border border-amber-400/20 bg-amber-400/10 px-4 py-2">
-                      <span className="text-xs text-zinc-400">Schlag</span>
+                      <span className="text-xs text-zinc-400">
+                        {t("Schlag")}
+                      </span>
 
                       <p className="text-xl font-black text-amber-300">
                         {game.schlag}
@@ -1781,11 +2778,14 @@ export default function WattenMultiplayerGame() {
                     {isMyTurn ? (
                       <>
                         <h2 className="mt-5 text-2xl font-black text-emerald-300">
-                          Du bist Geber
+                          {l("Du bist Geber", "You are the dealer")}
                         </h2>
 
                         <p className="mt-2 text-sm text-zinc-400">
-                          Wähle die Trumpffarbe.
+                          {l(
+                            "Wähle die Trumpffarbe.",
+                            "Choose the trump suit.",
+                          )}
                         </p>
 
                         <div className="mt-6 grid grid-cols-2 gap-3">
@@ -1836,18 +2836,19 @@ export default function WattenMultiplayerGame() {
 
                         {choosing && (
                           <p className="mt-4 animate-pulse text-xs font-bold text-emerald-300">
-                            Farbe wird gespeichert...
+                            {l("Farbe wird gespeichert...", "Saving suit...")}
                           </p>
                         )}
                       </>
                     ) : (
                       <>
                         <h2 className="mt-5 text-xl font-black">
-                          {dealer?.display_name} bestimmt die Farbe
+                          {dealer?.display_name}{" "}
+                          {l("bestimmt die Farbe", "chooses the suit")}
                         </h2>
 
                         <p className="mt-3 text-sm text-zinc-400">
-                          Bitte warten...
+                          {l("Bitte warten...", "Please wait...")}
                         </p>
                       </>
                     )}
@@ -1905,6 +2906,7 @@ export default function WattenMultiplayerGame() {
                           return (
                             <div
                               key={`${played.seat}-${played.card.id}`}
+                              onMouseEnter={playHoverSound}
                               className={`
                   absolute
                   flex
@@ -1981,7 +2983,7 @@ export default function WattenMultiplayerGame() {
       backdrop-blur
     "
                         >
-                          Spiel deine Karte
+                          {l("Spiel deine Karte", "Play your card")}
                         </div>
                       ) : (
                         <div
@@ -2014,25 +3016,40 @@ export default function WattenMultiplayerGame() {
                   <div className="fixed inset-0 z-[160] flex items-center justify-center bg-black/70 px-6 backdrop-blur-sm">
                     <div className="w-full max-w-3xl rounded-3xl border border-white/10 bg-zinc-950 p-8 text-center shadow-2xl">
                       <p className="text-xs font-bold uppercase tracking-[0.25em] text-amber-400">
-                        Stich
+                        {l("Stich", "Trick")}
                       </p>
 
                       <h2 className="mt-2 text-3xl font-black">
-                        Stich beendet
+                        {l("Stich beendet", "Trick finished")}
                       </h2>
 
-                      <div className="mt-8 flex justify-center gap-5">
+                      <p className="mt-2 text-xs text-emerald-300/80">
+                        {l("Angespielte Farbe", "Lead suit")}:{" "}
+                        {game.played_cards[0]?.card.suit ?? "–"}
+                      </p>
+
+                      <div className="mt-8 flex flex-wrap items-start justify-center gap-5">
                         {game.played_cards.map((played) => {
                           const won = played.seat === game.trick_winner_seat;
 
                           const player = players.find(
                             (candidate) => candidate.seat === played.seat,
                           );
+                          const leadSuit = game.played_cards[0]?.card.suit;
+                          const role = leadSuit
+                            ? getWattenCardRole(
+                                played.card,
+                                leadSuit,
+                                game.farbe,
+                                game.schlag,
+                              )
+                            : "";
 
                           return (
                             <div
                               key={`${played.seat}-${played.card.id}`}
-                              className="flex flex-col items-center"
+                              onMouseEnter={playHoverSound}
+                              className="flex w-40 flex-col items-center"
                             >
                               <div
                                 className={`
@@ -2064,10 +3081,13 @@ export default function WattenMultiplayerGame() {
                               <p className="mt-3 text-sm font-bold">
                                 {player?.display_name}
                               </p>
+                              <p className="mt-1 min-h-8 text-[10px] leading-4 text-emerald-300">
+                                {role}
+                              </p>
 
                               {won && (
                                 <span className="mt-2 animate-pulse rounded-full bg-amber-400 px-3 py-1 text-xs font-black text-amber-950">
-                                  Stich-Sieger
+                                  {l("Stich-Sieger", "Trick winner")}
                                 </span>
                               )}
                             </div>
@@ -2075,13 +3095,40 @@ export default function WattenMultiplayerGame() {
                         })}
                       </div>
 
+                      {(() => {
+                        const winningPlay = game.played_cards.find(
+                          (played) => played.seat === game.trick_winner_seat,
+                        );
+                        const leadSuit = game.played_cards[0]?.card.suit;
+                        if (!winningPlay || !leadSuit) return null;
+
+                        return (
+                          <div className="mx-auto mt-6 max-w-xl rounded-2xl border border-amber-300/20 bg-amber-400/[0.07] px-4 py-3">
+                            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-amber-300">
+                              {l(
+                                "Warum diese Karte gewinnt",
+                                "Why this card won",
+                              )}
+                            </p>
+                            <p className="mt-1 text-sm font-bold text-white">
+                              {getWattenCardRole(
+                                winningPlay.card,
+                                leadSuit,
+                                game.farbe,
+                                game.schlag,
+                              )}
+                            </p>
+                          </div>
+                        );
+                      })()}
+
                       <p className="mt-8 text-lg font-black text-emerald-300">
                         {
                           players.find(
                             (player) => player.seat === game.trick_winner_seat,
                           )?.display_name
                         }{" "}
-                        gewinnt den Stich
+                        {l("gewinnt den Stich", "wins the trick")}
                       </p>
 
                       <button
@@ -2092,7 +3139,9 @@ export default function WattenMultiplayerGame() {
                         }}
                         className="mt-7 rounded-xl bg-emerald-500 px-8 py-3 font-black text-emerald-950 transition hover:bg-emerald-400 disabled:opacity-50"
                       >
-                        {continuingTrick ? "Bitte warten..." : "Weiter"}
+                        {continuingTrick
+                          ? l("Bitte warten...", "Please wait...")
+                          : t("Continue")}
                       </button>
                     </div>
                   </div>
@@ -2103,7 +3152,7 @@ export default function WattenMultiplayerGame() {
                     <div className="text-5xl">🏆</div>
 
                     <p className="mt-5 text-xs font-bold uppercase tracking-[0.25em] text-amber-400">
-                      Runde beendet
+                      {l("Runde beendet", "Round finished")}
                     </p>
 
                     <h2 className="mt-2 text-3xl font-black">
@@ -2113,22 +3162,25 @@ export default function WattenMultiplayerGame() {
                     </h2>
 
                     <p className="mt-2 text-xl font-black text-emerald-300">
-                      gewinnt die Runde
+                      {l("gewinnt die Runde", "wins the round")}
                     </p>
 
                     <div className="mx-auto mt-7 max-w-sm rounded-2xl border border-white/10 bg-white/5 p-5">
                       <p className="text-xs uppercase tracking-widest text-zinc-500">
-                        Grund
+                        {l("Grund", "Reason")}
                       </p>
 
                       <p className="mt-1 font-bold">
                         {game.round_end_reason === "declined"
-                          ? "Gehen wurde nicht gehalten"
-                          : "3 Stiche erreicht"}
+                          ? l(
+                              "Gehen wurde nicht gehalten",
+                              "Raise was declined",
+                            )
+                          : l("3 Stiche erreicht", "3 tricks reached")}
                       </p>
 
                       <p className="mt-5 text-xs uppercase tracking-widest text-zinc-500">
-                        Rundenwert
+                        {t("Round value")}
                       </p>
 
                       <p className="mt-1 text-4xl font-black text-amber-400">
@@ -2159,8 +3211,11 @@ export default function WattenMultiplayerGame() {
                       className="mt-8 w-full rounded-xl bg-amber-400 px-7 py-4 text-lg font-black text-amber-950 transition hover:bg-amber-300 disabled:opacity-40"
                     >
                       {startingNextRound
-                        ? "Neue Runde wird vorbereitet..."
-                        : "Nächste Runde"}
+                        ? l(
+                            "Neue Runde wird vorbereitet...",
+                            "Preparing next round...",
+                          )
+                        : t("Next round")}
                     </button>
                   </div>
                 </div>
@@ -2173,7 +3228,7 @@ export default function WattenMultiplayerGame() {
                     <div className="text-7xl">🏆</div>
 
                     <p className="mt-6 text-xs font-black uppercase tracking-[0.3em] text-amber-400">
-                      Gesamtsieger
+                      {l("Gesamtsieger", "Match winner")}
                     </p>
 
                     <h2 className="mt-4 text-4xl font-black text-white">
@@ -2182,7 +3237,7 @@ export default function WattenMultiplayerGame() {
 
                     <p className="mt-3 text-zinc-400">
                       {game.match_winner === "team-a" ? teamAScore : teamBScore}{" "}
-                      Punkte erreicht
+                      {l("Punkte erreicht", "Target reached")}
                     </p>
 
                     <div className="mt-8 grid grid-cols-2 gap-4">
@@ -2200,10 +3255,10 @@ export default function WattenMultiplayerGame() {
                     </div>
 
                     <Link
-                      to="/watten/multiplayer"
+                      to="/games/watten/multiplayer"
                       className="mt-8 inline-block rounded-xl bg-amber-400 px-7 py-3 font-black text-amber-950 transition hover:bg-amber-300"
                     >
-                      Zur Lobby
+                      {l("Zur Lobby", "Back to lobby")}
                     </Link>
                   </div>
                 </div>
@@ -2211,7 +3266,7 @@ export default function WattenMultiplayerGame() {
 
               {/* ME / BOTTOM */}
 
-              <div className="absolute bottom-5 left-1/2 -translate-x-1/2 text-center">
+              <div className="absolute bottom-5 left-1/2 -translate-x-1/2 text-center max-md:bottom-2 max-md:w-full max-md:px-1">
                 <div
                   className={`
                 relative
@@ -2220,6 +3275,8 @@ export default function WattenMultiplayerGame() {
                 border
                 px-5
                 py-3
+                max-md:px-3
+                max-md:py-2
                 ${
                   isMyTurn
                     ? "border-emerald-400 bg-emerald-400/15"
@@ -2246,10 +3303,21 @@ export default function WattenMultiplayerGame() {
         shadow-xl
       "
                     >
-                      ▼ DU BIST AM ZUG
+                      ▼ {l("DU BIST AM ZUG", "YOUR TURN")}
                     </div>
                   )}
-                  <p className="font-black">{me?.display_name}</p>
+                  <div className="flex items-center justify-center gap-3">
+                    <div className="h-12 w-12 shrink-0 overflow-hidden rounded-2xl border border-white/10">
+                      <ProfileAvatar
+                        avatarId={
+                          me ? (playerAvatarIds[me.user_id] ?? "m1") : "m1"
+                        }
+                        className="h-full w-full"
+                      />
+                    </div>
+
+                    <p className="font-black">{me?.display_name}</p>
+                  </div>
                   <div className="mt-2 flex items-center justify-center gap-3">
                     <span
                       className={`
@@ -2273,19 +3341,25 @@ export default function WattenMultiplayerGame() {
 
                     <span className="text-[10px] font-bold text-zinc-400">
                       {tricksForTeam(myTeam)}{" "}
-                      {tricksForTeam(myTeam) === 1 ? "Stich" : "Stiche"}
+                      {l(
+                        tricksForTeam(myTeam) === 1 ? "Stich" : "Stiche",
+                        tricksForTeam(myTeam) === 1 ? "trick" : "tricks",
+                      )}
                     </span>
                   </div>
 
                   <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-emerald-300">
-                    Du
+                    {l("Du", "You")}
                   </p>
                 </div>
                 {game.phase === "playing" &&
                   isMyTurn &&
                   mustPlayTrumpfOderKritisch && (
                     <div className="mx-auto mb-4 w-fit rounded-xl border border-red-400/40 bg-red-500/20 px-4 py-2 text-xs font-bold text-red-100">
-                      Trumpf oder Kritisch — du musst eine passende Karte
+                      {l(
+                        "Trumpf oder Kritisch — du musst eine passende Karte",
+                        "Trump or Critical — you must play an eligible card",
+                      )}
                       spielen.
                     </div>
                   )}
@@ -2293,37 +3367,39 @@ export default function WattenMultiplayerGame() {
                 {/* PRIVATE HAND */}
 
                 <div className="mt-4 flex justify-center">
-                  {hand.map((card, index) => {
-                    const legal = cardIsLegal(card);
-                    const comparison =
-                      helpMode &&
-                      game.phase === "playing" &&
-                      game.played_cards.length > 0 &&
-                      legal &&
-                      game.farbe &&
-                      game.schlag
-                        ? wouldCardWin(
-                            card,
-                            me?.user_id ?? "",
-                            game.played_cards,
-                            game.farbe,
-                            game.schlag,
-                          )
-                        : null;
+                  {!waitingForDeal &&
+                    hand.map((card, index) => {
+                      const legal = cardIsLegal(card);
+                      const comparison =
+                        helpMode &&
+                        game.phase === "playing" &&
+                        game.played_cards.length > 0 &&
+                        legal &&
+                        game.farbe &&
+                        game.schlag
+                          ? wouldCardWin(
+                              card,
+                              me?.user_id ?? "",
+                              game.played_cards,
+                              game.farbe,
+                              game.schlag,
+                            )
+                          : null;
 
-                    const canPlay =
-                      game.phase === "playing" &&
-                      isMyTurn &&
-                      legal &&
-                      !playingCard;
+                      const canPlay =
+                        game.phase === "playing" &&
+                        isMyTurn &&
+                        legal &&
+                        !playingCard;
 
-                    return (
-                      <div
-                        key={card.id}
-                        style={{
-                          zIndex: index,
-                        }}
-                        className={`
+                      return (
+                        <div
+                          key={card.id}
+                          onMouseEnter={playHoverSound}
+                          style={{
+                            zIndex: index,
+                          }}
+                          className={`
     relative
     rounded-xl
     transition-all
@@ -2343,24 +3419,24 @@ export default function WattenMultiplayerGame() {
 
     ${canPlay ? "hover:z-50 hover:-translate-y-4" : ""}
   `}
-                      >
-                        <WattenCardComponent
-                          card={card}
-                          disabled={!canPlay}
-                          hint={
-                            helpMode ? getBeginnerCardHint(card) : undefined
-                          }
-                          onClick={
-                            canPlay
-                              ? () => {
-                                  void playCard(card);
-                                }
-                              : undefined
-                          }
-                        />
-                      </div>
-                    );
-                  })}
+                        >
+                          <WattenCardComponent
+                            card={card}
+                            disabled={!canPlay}
+                            hint={
+                              helpMode ? getBeginnerCardHint(card) : undefined
+                            }
+                            onClick={
+                              canPlay
+                                ? () => {
+                                    void playCard(card);
+                                  }
+                                : undefined
+                            }
+                          />
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
             </div>
@@ -2371,10 +3447,12 @@ export default function WattenMultiplayerGame() {
           <aside className="w-64 pt-10">
             <div className="h-[720px] overflow-y-auto rounded-3xl border border-white/10 bg-zinc-950/95 p-5 shadow-2xl">
               <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
-                Aktueller Stichstand
+                {l("Aktueller Stichstand", "Current trick score")}
               </p>
 
-              <h3 className="mt-1 text-lg font-bold">2 gegen 2</h3>
+              <h3 className="mt-1 text-lg font-bold">
+                {l("2 gegen 2", "2 vs 2")}
+              </h3>
 
               {/* TEAM A */}
 
@@ -2390,7 +3468,10 @@ export default function WattenMultiplayerGame() {
                 </p>
 
                 <p className="text-xs text-zinc-400">
-                  {teamATricks === 1 ? "Stich" : "Stiche"}
+                  {l(
+                    teamATricks === 1 ? "Stich" : "Stiche",
+                    teamATricks === 1 ? "trick" : "tricks",
+                  )}
                 </p>
               </div>
 
@@ -2416,7 +3497,10 @@ export default function WattenMultiplayerGame() {
                 </p>
 
                 <p className="text-xs text-zinc-400">
-                  {teamBTricks === 1 ? "Stich" : "Stiche"}
+                  {l(
+                    teamBTricks === 1 ? "Stich" : "Stiche",
+                    teamBTricks === 1 ? "trick" : "tricks",
+                  )}
                 </p>
               </div>
 
@@ -2424,7 +3508,7 @@ export default function WattenMultiplayerGame() {
 
               <div className="mt-5">
                 <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
-                  3 Stiche zum Sieg
+                  {l("3 Stiche zum Sieg", "3 tricks to win")}
                 </p>
 
                 <div className="grid grid-cols-3 gap-1">
@@ -2454,12 +3538,32 @@ export default function WattenMultiplayerGame() {
 
               <div className="mt-5 rounded-xl border border-white/10 bg-white/5 p-3 text-center">
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
-                  Rundenwert
+                  {l("Gehen · Rundenwert", "Gehen · Round value")}
                 </p>
 
                 <p className="mt-1 text-2xl font-black text-amber-400">
-                  {game.round_value} Punkte
+                  {game.round_value} {t("Points")}
                 </p>
+
+                <div className="mt-2 flex items-center justify-center gap-1 text-[10px] font-black text-zinc-600">
+                  <span
+                    className={game.round_value >= 2 ? "text-amber-300" : ""}
+                  >
+                    2
+                  </span>
+                  <span>→</span>
+                  <span
+                    className={game.round_value >= 3 ? "text-amber-300" : ""}
+                  >
+                    3
+                  </span>
+                  <span>→</span>
+                  <span
+                    className={game.round_value >= 4 ? "text-amber-300" : ""}
+                  >
+                    4
+                  </span>
+                </div>
 
                 {canRaise && (
                   <button
@@ -2470,24 +3574,45 @@ export default function WattenMultiplayerGame() {
                     }}
                     className="mt-3 w-full rounded-xl bg-amber-400 px-3 py-2 text-sm font-black text-amber-950 transition hover:bg-amber-300 disabled:opacity-40"
                   >
-                    Gehen auf {game.round_value + 1}
+                    {l("Gehen auf", "Raise to")} {game.round_value + 1}
                   </button>
                 )}
 
-                {game.round_value === 4 && (
+                {game.round_value >= 4 && (
                   <p className="mt-2 text-xs font-semibold text-zinc-500">
-                    Maximum erreicht
+                    {l("Maximum erreicht", "Maximum reached")}
                   </p>
                 )}
 
                 {isMyTurn && myTeamIsGespannt && (
                   <div className="mt-3 rounded-lg border border-red-400/20 bg-red-500/10 px-2 py-2">
-                    <p className="text-xs font-bold text-red-300">Gespannt</p>
+                    <p className="text-xs font-bold text-red-300">
+                      {t("Gespannt")}
+                    </p>
 
                     <p className="mt-1 text-[10px] text-red-200/70">
-                      Erhöhen nicht möglich
+                      {l(
+                        "Dein Team ist gespannt und darf nicht gehen.",
+                        "Your team is gespannt and cannot raise.",
+                      )}
                     </p>
                   </div>
+                )}
+
+                <p className="mt-3 border-t border-white/10 pt-3 text-[10px] leading-4 text-zinc-600">
+                  {l(
+                    "Standard: 2 Punkte. Gehen erhöht auf 3, danach maximal 4. Die Gegenseite hält oder lehnt ab.",
+                    "Standard: 2 points. Gehen raises to 3, then at most 4. The opposing team holds or declines.",
+                  )}
+                </p>
+
+                {targetScore < 5 && (
+                  <p className="mt-2 text-[10px] leading-4 text-sky-300/80">
+                    {l(
+                      "Bei kurzen Spielen bis 4 Punkte ist die Gespannt-Sperre deaktiviert, damit Gehen weiterhin möglich bleibt.",
+                      "For short matches up to 4 points, the Gespannt restriction is disabled so Gehen remains usable.",
+                    )}
+                  </p>
                 )}
               </div>
             </div>
@@ -2499,7 +3624,9 @@ export default function WattenMultiplayerGame() {
 }
 
 function PlayerBox({
+  l,
   player,
+  avatarId,
   seat,
   dealer,
   abheber,
@@ -2509,7 +3636,11 @@ function PlayerBox({
   team,
   teamTricks,
 }: {
+  l: (de: string, en: string) => string;
+
   player: RoomPlayer | undefined;
+
+  avatarId: string;
 
   seat: number;
 
@@ -2540,6 +3671,11 @@ function PlayerBox({
       border
       px-5
       py-4
+      max-md:w-28
+      max-md:max-w-28
+      max-md:rounded-xl
+      max-md:px-2
+      max-md:py-2
       text-center
       shadow-xl
       backdrop-blur-md
@@ -2577,13 +3713,19 @@ function PlayerBox({
           shadow-lg
         "
         >
-          ● Am Zug
+          ● {l("Am Zug", "Turn")}
         </div>
       )}
 
-      <p className="text-base font-black text-white">{player.display_name}</p>
+      <div className="mx-auto h-14 w-14 overflow-hidden rounded-2xl border border-white/10 shadow-lg max-md:h-9 max-md:w-9 max-md:rounded-xl">
+        <ProfileAvatar avatarId={avatarId} className="h-full w-full" />
+      </div>
 
-      <div className="mt-2 flex items-center justify-center gap-2">
+      <p className="mt-2 text-base font-black text-white max-md:mt-1 max-md:truncate max-md:text-xs">
+        {player.display_name}
+      </p>
+
+      <div className="mt-2 flex items-center justify-center gap-2 max-md:mt-1 max-md:flex-col max-md:gap-1">
         <span
           className={`
           rounded-full
@@ -2605,20 +3747,24 @@ function PlayerBox({
         </span>
 
         <span className="text-[10px] font-bold text-zinc-400">
-          {teamTricks} {teamTricks === 1 ? "Stich" : "Stiche"}
+          {teamTricks}{" "}
+          {l(
+            teamTricks === 1 ? "Stich" : "Stiche",
+            teamTricks === 1 ? "trick" : "tricks",
+          )}
         </span>
       </div>
 
       <div className="mt-2 flex justify-center gap-2 text-[9px] font-bold uppercase tracking-wider">
         {seat === dealer && (
           <span className="rounded-full bg-amber-400 px-2 py-1 text-amber-950">
-            Geber
+            {l("Geber", "Dealer")}
           </span>
         )}
 
         {seat === abheber && (
           <span className="rounded-full bg-emerald-400 px-2 py-1 text-emerald-950">
-            Abheber
+            {l("Abheber", "Cutter")}
           </span>
         )}
       </div>

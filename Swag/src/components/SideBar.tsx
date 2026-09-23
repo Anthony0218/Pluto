@@ -1,15 +1,7 @@
-import { useTheme } from "@/context/ThemeContext";
-import {
-  BarChart3,
-  Folder,
-  Gamepad2,
-  Home,
-  Settings,
-  Trophy,
-  Users,
-  LogOut,
-} from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { BarChart3, Home, Settings, Trophy, Users, LogOut } from "lucide-react";
+
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const navigation = [
   {
@@ -18,49 +10,64 @@ const navigation = [
     icon: Home,
   },
   {
-    label: "Dashboard",
-    href: "/dashboard",
-    icon: BarChart3,
+    label: "Profile",
+    href: "/profile",
+    icon: Users,
   },
   {
     label: "Games",
     href: "/games",
-    icon: Gamepad2,
+    icon: Trophy,
   },
   {
     label: "Chess",
-    href: "/chess",
-    icon: Folder,
+    href: "/games/chess",
+    icon: BarChart3,
   },
   {
     label: "Watten",
-    href: "/watten",
-    icon: Users,
+    href: "/games/watten",
+    icon: BarChart3,
   },
   {
-    label: "Leaderboard",
-    href: "/leaderboard",
+    label: "Medieval Kingdoms",
+    href: "/games/medieval-kingdoms",
+    icon: Trophy,
+  },
+  {
+    label: "Credits",
+    href: "/credits",
     icon: Trophy,
   },
 ];
 
 export default function SideBar() {
-  const { darkMode, toggleDarkMode } = useTheme();
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
+
+  async function handleLogout() {
+    await signOut();
+    navigate("/login");
+  }
+
   return (
     <aside className="flex min-h-screen w-64 flex-col border-r border-zinc-200 bg-white">
       <div className="flex h-16 items-center border-b border-zinc-200 px-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-white">
-            <Gamepad2 size={20} />
+          <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-indigo-600">
+            <img
+              src="/pluto-icon.png"
+              alt="Pluto icon"
+              className="h-full w-full object-cover"
+            />
           </div>
 
           <span className="text-lg font-bold tracking-tight text-zinc-900">
-            Swag
+            Pluto
           </span>
         </div>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 space-y-1 px-3 py-5">
         <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
           Navigation
@@ -101,17 +108,6 @@ export default function SideBar() {
         })}
       </nav>
 
-      {/* Bottom section */}
-      <button
-        type="button"
-        onClick={toggleDarkMode}
-        className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left font-medium text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
-      >
-        <span className="text-xl">{darkMode ? "☀️" : "🌙"}</span>
-
-        <span>{darkMode ? "Light Mode" : "Dark Mode"}</span>
-      </button>
-
       <div className="border-t border-zinc-200 p-3">
         <NavLink
           to="/settings"
@@ -129,6 +125,7 @@ export default function SideBar() {
 
         <button
           type="button"
+          onClick={handleLogout}
           className="mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-red-50 hover:text-red-600"
         >
           <LogOut size={19} />

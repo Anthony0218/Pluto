@@ -1,9 +1,8 @@
 import { useAuth } from "./context/AuthContext";
-import Auth from "./components/Auth";
 import HomePage from "./pages/HomePage";
 
 function App() {
-  const { user, loading } = useAuth();
+  const { loading } = useAuth();
 
   if (loading) {
     return (
@@ -11,10 +10,6 @@ function App() {
         Wird geladen...
       </div>
     );
-  }
-
-  if (!user) {
-    return <Auth />;
   }
 
   return <HomePage />;

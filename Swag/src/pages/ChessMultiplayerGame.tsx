@@ -7,6 +7,7 @@ import { Chess, type Square } from "chess.js";
 import Board from "../components/Board";
 import PromotionBar from "../components/PromotionBar";
 import ChessGameReview from "../components/ChessGameReview";
+import { ProfileAvatar } from "../components/ProfileAvatarPicker";
 
 import { type PieceType } from "../utils/chessUtils";
 import {
@@ -803,7 +804,7 @@ function getGameOutcome(game: Chess): GameOutcome {
 export default function ChessMultiplayerGame() {
   const { roomCode } = useParams();
 
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
 
   const [language, setLanguage] = useState<Language>(getInitialChessLanguage);
   const t = (key: string) => translateChess(language, key);
@@ -818,6 +819,10 @@ export default function ChessMultiplayerGame() {
   const [room, setRoom] = useState<ChessRoom | null>(null);
 
   const [players, setPlayers] = useState<RoomPlayer[]>([]);
+
+  const [playerAvatarIds, setPlayerAvatarIds] = useState<
+    Record<string, string>
+  >({});
 
   const [gameState, setGameState] = useState<MultiplayerGame | null>(null);
 
@@ -855,6 +860,82 @@ export default function ChessMultiplayerGame() {
   const [actionLoading, setActionLoading] = useState<
     "resign" | "rematch" | "undo-request" | "undo-response" | "side" | null
   >(null);
+
+  const playerUserIdsKey = useMemo(
+    () =>
+      [...new Set(players.map((player) => player.user_id))].sort().join(","),
+    [players],
+  );
+
+  useEffect(() => {
+    const userIds = playerUserIdsKey
+      ? playerUserIdsKey.split(",").filter(Boolean)
+      : [];
+
+    if (userIds.length === 0) {
+      setPlayerAvatarIds({});
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadPlayerAvatars() {
+      const { data, error: avatarError } = await supabase
+        .from("profiles")
+        .select("id, avatar_id")
+        .in("id", userIds);
+
+      if (avatarError) {
+        console.error("Could not load player avatars:", avatarError);
+
+        /*
+         * The local player's avatar can still be shown from AuthContext
+         * if the project's profile RLS does not expose other profiles.
+         */
+        const ownAvatar =
+          (profile as { avatar_id?: string | null } | null)?.avatar_id ?? "m1";
+
+        if (!cancelled && user?.id) {
+          setPlayerAvatarIds((current) => ({
+            ...current,
+            [user.id]: ownAvatar,
+          }));
+        }
+
+        return;
+      }
+
+      const next: Record<string, string> = {};
+
+      for (const row of data ?? []) {
+        if (
+          typeof row.id === "string" &&
+          typeof row.avatar_id === "string" &&
+          row.avatar_id.length > 0
+        ) {
+          next[row.id] = row.avatar_id;
+        }
+      }
+
+      /*
+       * Keep the authenticated user's context value as a fallback.
+       */
+      if (user?.id && !next[user.id]) {
+        next[user.id] =
+          (profile as { avatar_id?: string | null } | null)?.avatar_id ?? "m1";
+      }
+
+      if (!cancelled) {
+        setPlayerAvatarIds(next);
+      }
+    }
+
+    void loadPlayerAvatars();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [playerUserIdsKey, user?.id, profile]);
 
   // Multiplayer deliberately has NO live Stockfish/Coach hook.
   // Engine analysis is only mounted after the game through ChessGameReview.
@@ -2080,7 +2161,7 @@ export default function ChessMultiplayerGame() {
     <div
       className="
       min-h-screen
-      bg-[radial-gradient(circle_at_top,#21170f_0%,#111111_38%,#090909_100%)]
+      bg-transparent
       px-4
       py-6
       text-zinc-100
@@ -2265,6 +2346,9 @@ export default function ChessMultiplayerGame() {
                 <div className="space-y-3">
                   <PlayerBar
                     name={white?.display_name ?? t("White")}
+                    avatarId={
+                      white ? (playerAvatarIds[white.user_id] ?? "m1") : "m1"
+                    }
                     color="white"
                     active={
                       gameState.status === "playing" && chess.turn() === "w"
@@ -2275,6 +2359,9 @@ export default function ChessMultiplayerGame() {
 
                   <PlayerBar
                     name={black?.display_name ?? t("Black")}
+                    avatarId={
+                      black ? (playerAvatarIds[black.user_id] ?? "f1") : "f1"
+                    }
                     color="black"
                     active={
                       gameState.status === "playing" && chess.turn() === "b"
@@ -3765,12 +3852,14 @@ function getMultiplayerHistoryPieceSymbol(color: "w" | "b", piece: string) {
 
 function PlayerBar({
   name,
+  avatarId,
   color,
   active,
   me = false,
   t,
 }: {
   name: string;
+  avatarId: string;
   color: "white" | "black";
   active: boolean;
   me?: boolean;
@@ -3804,32 +3893,16 @@ function PlayerBar({
       <div className="flex items-center gap-3">
         <div
           className={`
-            flex
             h-11
             w-11
             shrink-0
-            items-center
-            justify-center
+            overflow-hidden
             rounded-xl
-            text-2xl
-            shadow-inner
-
-            ${
-              color === "white"
-                ? `
-                  bg-[#fff3d5]
-                  text-zinc-900
-                `
-                : `
-                  border
-                  border-white/10
-                  bg-zinc-800
-                  text-zinc-100
-                `
-            }
+            border
+            ${color === "white" ? "border-amber-100/25" : "border-white/10"}
           `}
         >
-          {color === "white" ? "♔" : "♚"}
+          <ProfileAvatar avatarId={avatarId} className="h-full w-full" />
         </div>
 
         <div className="min-w-0 flex-1">

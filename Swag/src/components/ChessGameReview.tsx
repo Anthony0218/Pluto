@@ -404,9 +404,6 @@ export default function ChessGameReview({
   );
 
   const totalCritical = reviewRows.filter((row) => row.critical).length;
-  const totalBlunders = reviewRows.filter(
-    (row) => row.review.quality === "Blunder",
-  ).length;
 
   const piecePerformance = useMemo(
     () => buildPiecePerformance(reviewRows),

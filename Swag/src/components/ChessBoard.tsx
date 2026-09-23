@@ -6,7 +6,7 @@ import { supabase } from "../lib/supabase";
 
 import { getSquareName, type PieceType } from "../utils/chessUtils";
 
-import Board from "./Board.tsx";
+import Board from "./Board";
 
 import {
   playPieceSelectSound,
@@ -33,6 +33,9 @@ import {
 } from "../utils/chessAnalysis";
 
 import ChessGameReview from "./ChessGameReview";
+
+import { useDelayedBoardOrientation } from "../hooks/useDelayedBoardOrientation";
+import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
 
 /* =========================================================
    TYPES
@@ -714,7 +717,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
   const [game] = useState(() => new Chess());
 
-  const [position, setPosition] = useState(game.fen());
+  const [, setPosition] = useState(game.fen());
 
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
 
@@ -868,18 +871,30 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
   /*
    * HOTSEAT BOARD ORIENTATION
    *
-   * In a local game, always place the side whose turn it is
-   * at the bottom of the board:
+   * Local Hotseat:
+   * after a move, keep the player who just moved at the bottom
+   * for 1.5 seconds, then flip to the new side-to-move.
    *
-   *   White to move -> White at the bottom
-   *   Black to move -> Black at the bottom
+   * Online mode:
+   * keep the board fixed to the logged-in player's own side.
    *
-   * The old onlineGameId mode keeps the board fixed to the
-   * logged-in player's own side instead.
-   *
-   * While browsing move history, orient the preview toward
-   * the side that is to move in that historical position.
+   * History preview:
+   * orient immediately toward the side to move in that
+   * historical position.
    */
+  const {
+    orientation: delayedHotseatOrientation,
+    flipPending,
+    snapToSide,
+  } = useDelayedBoardOrientation(game.turn(), 1500);
+
+  /*
+   * The delay belongs only to local Hotseat.
+   * Do not block the legacy online mode while the unused Hotseat
+   * orientation hook catches up in the background.
+   */
+  const hotseatFlipPending = !onlineGameId && flipPending;
+
   const boardOrientation: "white" | "black" = historyPreviewChess
     ? historyPreviewChess.turn() === "w"
       ? "white"
@@ -888,9 +903,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
       ? playerColor === "w"
         ? "white"
         : "black"
-      : game.turn() === "w"
-        ? "white"
-        : "black";
+      : delayedHotseatOrientation;
 
   const historyPreviewMove = historyPreview
     ? {
@@ -1294,6 +1307,12 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
         game.move(move);
       }
 
+      /*
+       * Keep the Hotseat orientation state synchronized even though
+       * online mode renders from playerColor instead.
+       */
+      snapToSide(game.turn());
+
       rebuildDerivedState();
 
       checkGameOver(false);
@@ -1426,6 +1445,12 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
     setPromotionSquare(null);
 
+    /*
+     * Loading a saved game is not a normal move transition,
+     * so show the loaded side-to-move immediately.
+     */
+    snapToSide(game.turn());
+
     rebuildDerivedState();
 
     checkGameOver(false);
@@ -1469,6 +1494,11 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
     setHistoryPreviewPly(null);
 
     game.reset();
+
+    /*
+     * Restart always returns immediately to White-bottom.
+     */
+    snapToSide("w");
 
     setPosition(game.fen());
 
@@ -1529,6 +1559,12 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
     if (!move) {
       return;
     }
+
+    /*
+     * Undo is a control action rather than a new Hotseat move,
+     * so orient immediately to the restored side-to-move.
+     */
+    snapToSide(game.turn());
 
     clearCoach();
 
@@ -1669,7 +1705,12 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
      ======================================================= */
 
   function handleSquareClick(row: number, column: number) {
-    if (gameOver || analyzing || historyPreviewPly !== null) {
+    if (
+      gameOver ||
+      analyzing ||
+      historyPreviewPly !== null ||
+      hotseatFlipPending
+    ) {
       return;
     }
     if (helpVisible) {
@@ -1882,7 +1923,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
     <div
       className="
         min-h-screen
-        bg-[radial-gradient(circle_at_top,#21170f_0%,#111111_38%,#090909_100%)]
+        bg-transparent
         px-4
         py-6
         text-zinc-100
@@ -2006,6 +2047,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
               </div>
             )}
           </div>
+          <BoardAnimationToggle />
         </header>
 
         {/* =================================================
@@ -2618,7 +2660,11 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                     ? historyPreviewCheckedKingSquare
                     : checkedKingSquare
                 }
-                onSquareClick={historyPreview ? () => {} : handleSquareClick}
+                onSquareClick={
+                  historyPreview || hotseatFlipPending
+                    ? () => {}
+                    : handleSquareClick
+                }
                 orientation={boardOrientation}
               />
 

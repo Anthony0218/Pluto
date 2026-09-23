@@ -49,7 +49,7 @@ export default function ChessMultiplayerLobby() {
       return;
     }
 
-    navigate(`/chess/classic/multiplayer/${data}`);
+    navigate(`/games/chess/classic/multiplayer/${data}`);
   }
 
   async function joinRoom() {
@@ -82,18 +82,26 @@ export default function ChessMultiplayerLobby() {
       return;
     }
 
-    navigate(`/chess/classic/multiplayer/${data}`);
+    navigate(`/games/chess/classic/multiplayer/${data}`);
   }
 
   if (!user) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-zinc-950 px-6 text-white">
+      <main className="flex min-h-screen items-center justify-center bg-transparent px-6 text-white">
         <div className="text-center">
           <h1 className="text-3xl font-black">Chess Multiplayer</h1>
 
           <p className="mt-3 text-zinc-400">
             You must be logged in to play online.
           </p>
+
+          <button
+            type="button"
+            onClick={() => navigate("/login")}
+            className="mt-6 rounded-xl bg-emerald-300 px-6 py-3 text-sm font-black text-zinc-950 transition hover:bg-emerald-200 active:scale-[0.98]"
+          >
+            Log in
+          </button>
         </div>
       </main>
     );
@@ -103,7 +111,7 @@ export default function ChessMultiplayerLobby() {
     <main
       className="
         min-h-screen
-        bg-[radial-gradient(circle_at_top,#21170f_0%,#111111_38%,#090909_100%)]
+       bg-transparent
         px-6
         py-10
         text-white

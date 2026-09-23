@@ -1,9 +1,28 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { WattenVariant, WattenPlayerInfo } from "../utils/types";
+import {
+  getInitialWattenLanguage,
+  setStoredWattenLanguage,
+  translateWatten,
+  WattenLanguageSelector,
+  type WattenLanguage,
+} from "@/games/watten/i18n/wattenLanguage";
 
 export default function WattenHotseat() {
   const navigate = useNavigate();
+  const [language, setLanguage] = useState<WattenLanguage>(
+    getInitialWattenLanguage,
+  );
+  const t = useCallback(
+    (key: string) => translateWatten(language, key),
+    [language],
+  );
+
+  function changeLanguage(next: WattenLanguage) {
+    setLanguage(next);
+    setStoredWattenLanguage(next);
+  }
 
   const [variant, setVariant] = useState<WattenVariant>("three-player");
 
@@ -30,7 +49,7 @@ export default function WattenHotseat() {
         name: name.trim() || `Player ${index + 1}`,
       }));
 
-    navigate("/watten/hotseat/game", {
+    navigate("/games/watten/hotseat/game", {
       state: {
         variant,
         mode: "hotseat",
@@ -40,23 +59,33 @@ export default function WattenHotseat() {
   }
 
   return (
-    <main className="min-h-screen bg-emerald-950 px-4 py-10 text-white">
+    <main className="min-h-screen bg-transparent px-4 py-10 text-white">
       <div className="mx-auto max-w-2xl">
         <div className="rounded-3xl border border-white/10 bg-zinc-950/90 p-8 shadow-2xl">
-          <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
-            Bayerisches Watten
-          </p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
+                {t("Bavarian Watten")}
+              </p>
 
-          <h1 className="mt-2 text-3xl font-black">Hotseat</h1>
+              <h1 className="mt-2 text-3xl font-black">Hotseat</h1>
+            </div>
+
+            <WattenLanguageSelector
+              language={language}
+              onChange={changeLanguage}
+              label={t("Language")}
+            />
+          </div>
 
           <p className="mt-2 text-sm text-zinc-400">
-            Wählt zuerst die Spielvariante.
+            {t("Choose the game variant first.")}
           </p>
 
           {/* VARIANT */}
           <div className="mt-8">
             <p className="mb-3 text-sm font-bold text-zinc-300">
-              Spieleranzahl
+              {t("Number of players")}
             </p>
 
             <div className="grid grid-cols-2 gap-3">
@@ -69,10 +98,10 @@ export default function WattenHotseat() {
                     : "border-white/10 bg-white/5 hover:bg-white/10"
                 }`}
               >
-                <div className="text-xl font-black">3 Spieler</div>
+                <div className="text-xl font-black">{t("3 Players")}</div>
 
                 <p className="mt-2 text-sm text-zinc-400">
-                  Ein Alleinspieler gegen zwei Gegenspieler.
+                  {t("One solo player against a team of two.")}
                 </p>
               </button>
 
@@ -85,10 +114,12 @@ export default function WattenHotseat() {
                     : "border-white/10 bg-white/5 hover:bg-white/10"
                 }`}
               >
-                <div className="text-xl font-black">4 Spieler</div>
+                <div className="text-xl font-black">{t("4 Players")}</div>
 
                 <p className="mt-2 text-sm text-zinc-400">
-                  Zwei feste Teams mit gegenüberliegenden Partnern.
+                  {t(
+                    "Two fixed teams with partners sitting opposite each other.",
+                  )}
                 </p>
               </button>
             </div>
@@ -96,7 +127,9 @@ export default function WattenHotseat() {
 
           {/* PLAYER NAMES */}
           <div className="mt-8">
-            <p className="mb-3 text-sm font-bold text-zinc-300">Spielernamen</p>
+            <p className="mb-3 text-sm font-bold text-zinc-300">
+              {t("Player names")}
+            </p>
 
             <div className="space-y-3">
               {Array.from({
@@ -175,7 +208,7 @@ export default function WattenHotseat() {
             onClick={startGame}
             className="mt-8 w-full rounded-xl bg-amber-400 px-6 py-4 text-lg font-black text-amber-950 transition hover:bg-amber-300"
           >
-            Spiel starten
+            {t("Start game")}
           </button>
         </div>
       </div>

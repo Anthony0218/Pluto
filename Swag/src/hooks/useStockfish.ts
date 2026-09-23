@@ -6,13 +6,19 @@ export type StockfishMove = {
   promotion?: string;
 };
 
-export function useStockfish() {
+export function useStockfish(enabled = true) {
   const workerRef = useRef<Worker | null>(null);
 
   const [ready, setReady] = useState(false);
   const [thinking, setThinking] = useState(false);
 
   useEffect(() => {
+    if (!enabled) {
+      setReady(false);
+      setThinking(false);
+      return;
+    }
+
     const worker = new Worker("/stockfish/stockfish-18-lite-single.js");
 
     workerRef.current = worker;
@@ -37,12 +43,21 @@ export function useStockfish() {
 
     return () => {
       worker.removeEventListener("message", handleMessage);
-      worker.postMessage("quit");
+
+      try {
+        worker.postMessage("quit");
+      } catch {
+        // Worker may already be terminating.
+      }
+
       worker.terminate();
 
       workerRef.current = null;
+
+      setReady(false);
+      setThinking(false);
     };
-  }, []);
+  }, [enabled]);
 
   const setSkillLevel = useCallback((level: number) => {
     const worker = workerRef.current;
@@ -56,12 +71,31 @@ export function useStockfish() {
     worker.postMessage(`setoption name Skill Level value ${safeLevel}`);
   }, []);
 
+  /**
+   * `searchMoves` is optional.
+   *
+   * It is the important extension for variants such as Horror / Collapse:
+   * Stockfish still evaluates the chess position, but it is only allowed to
+   * choose moves that the variant layer has declared legal.
+   *
+   * Existing classic calls remain valid:
+   *   getBestMove(fen, 500)
+   */
   const getBestMove = useCallback(
-    (fen: string, moveTime = 500): Promise<StockfishMove | null> => {
+    (
+      fen: string,
+      moveTime = 500,
+      searchMoves?: string[],
+    ): Promise<StockfishMove | null> => {
       return new Promise((resolve) => {
         const worker = workerRef.current;
 
         if (!worker) {
+          resolve(null);
+          return;
+        }
+
+        if (searchMoves && searchMoves.length === 0) {
           resolve(null);
           return;
         }
@@ -97,7 +131,15 @@ export function useStockfish() {
 
         worker.postMessage("stop");
         worker.postMessage(`position fen ${fen}`);
-        worker.postMessage(`go movetime ${moveTime}`);
+
+        const searchMovesCommand =
+          searchMoves && searchMoves.length > 0
+            ? ` searchmoves ${searchMoves.join(" ")}`
+            : "";
+
+        worker.postMessage(
+          `go movetime ${Math.max(1, moveTime)}${searchMovesCommand}`,
+        );
       });
     },
     [],

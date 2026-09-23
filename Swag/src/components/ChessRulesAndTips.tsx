@@ -1,8 +1,8 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Chess } from "chess.js";
+import { Chess, type Square } from "chess.js";
 
-type TabKey = "rules" | "openings" | "situations";
+type TabKey = "rules" | "openings" | "situations" | "puzzles";
 type Language = "en" | "de" | "bar" | "ko" | "ru";
 
 const languageOptions: Array<{ value: Language; label: string }> = [
@@ -322,6 +322,166 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
       "Ein häufiges Endspielprinzip: Türme stehen oft am aktivsten hinter Freibauern – eigenen wie gegnerischen.",
     "From behind, the rook can support its own pawn or attack an enemy pawn while remaining active.":
       "Von hinten kann der Turm den eigenen Bauern unterstützen oder einen gegnerischen Bauern angreifen und aktiv bleiben.",
+    Puzzles: "Aufgaben",
+    "Solve interactively": "Interaktiv lösen",
+    "Interactive Chess Puzzles": "Interaktive Schachaufgaben",
+    "Find the best move": "Finde den besten Zug",
+    "Play the position, get instant feedback, and learn why moves work.":
+      "Spiele die Stellung, erhalte sofortiges Feedback und lerne, warum Züge funktionieren.",
+    "All puzzles": "Alle Aufgaben",
+    Tactics: "Taktik",
+    Checkmates: "Mattaufgaben",
+    Puzzle: "Aufgabe",
+    Goal: "Ziel",
+    Difficulty: "Schwierigkeit",
+    Beginner: "Anfänger",
+    Intermediate: "Mittel",
+    Advanced: "Fortgeschritten",
+    "Select a piece and make your move.":
+      "Wähle eine Figur und spiele deinen Zug.",
+    "Correct!": "Richtig!",
+    "Excellent move.": "Ausgezeichneter Zug.",
+    "Try another move.": "Versuche einen anderen Zug.",
+    "That move is not legal in this position.":
+      "Dieser Zug ist in dieser Stellung nicht legal.",
+    "Legal move, but not one of the four teaching candidates.":
+      "Legal, aber keiner der vier Lernkandidaten.",
+    "Combination continues": "Die Kombination geht weiter",
+    "Opponent reply": "Gegnerische Antwort",
+    "Your move again": "Du bist wieder am Zug",
+    "Solved!": "Gelöst!",
+    "You found the full combination.":
+      "Du hast die vollständige Kombination gefunden.",
+    "Reset puzzle": "Aufgabe zurücksetzen",
+    "Next puzzle": "Nächste Aufgabe",
+    "Show move analysis": "Zuganalyse zeigen",
+    "Hide move analysis": "Zuganalyse ausblenden",
+    "Candidate move analysis": "Analyse der Kandidatenzüge",
+    "Best move": "Bester Zug",
+    "2nd choice": "2. Wahl",
+    "3rd choice": "3. Wahl",
+    "Worst move": "Schlechtester Zug",
+    Line: "Variante",
+    "Curated teaching ranking — not a live engine evaluation.":
+      "Didaktische Auswahl — keine Live-Engine-Bewertung.",
+    "Mate in 1": "Matt in 1",
+    "Mate in 2": "Matt in 2",
+    "Win material": "Material gewinnen",
+    "Royal Fork": "Königsgabel",
+    "Win the queen with a knight fork.":
+      "Gewinne die Dame mit einer Springergabel.",
+    "Loose Queen": "Ungedeckte Dame",
+    "Spot the hanging queen and take it.":
+      "Erkenne die ungedeckte Dame und schlage sie.",
+    "Find checkmate in one.": "Finde Schachmatt in einem Zug.",
+    "Smothered Mate": "Ersticktes Matt",
+    "Deflection to the Back Rank": "Ablenkung zur Grundreihe",
+    "Force mate in two by deflecting the queen.":
+      "Erzwinge Matt in zwei durch Ablenkung der Dame.",
+    "Queen Sacrifice Smothered Mate": "Damenopfer zum erstickten Matt",
+    "Force mate in two with a queen sacrifice.":
+      "Erzwinge Matt in zwei mit einem Damenopfer.",
+    "The opponent reply is played automatically.":
+      "Die gegnerische Antwort wird automatisch gespielt.",
+    "The combination breaks here. Return to the forcing line.":
+      "Hier bricht die Kombination ab. Kehre zur zwingenden Variante zurück.",
+    "This is the key move of the puzzle.":
+      "Das ist der Schlüsselzug der Aufgabe.",
+    "Now finish the combination.": "Beende jetzt die Kombination.",
+    "Representative reply": "Beispielantwort",
+    Feedback: "Feedback",
+    Highlighted: "Markiert",
+    "Click a move to highlight it on the board.":
+      "Klicke auf einen Zug, um ihn auf dem Brett farbig zu markieren.",
+    "Absolute Pin": "Absolute Fesselung",
+    "Exploit a pin": "Fesselung ausnutzen",
+    "Win the pinned knight before it can escape.":
+      "Gewinne den gefesselten Springer, bevor er entkommen kann.",
+    "King and Queen Skewer": "König-Dame-Spieß",
+    "Check the king and win the queen behind it.":
+      "Gib Schach und gewinne anschließend die Dame hinter dem König.",
+    "Discovered attack": "Abzugsangriff",
+    "Use a forcing bishop move to uncover the rook against the queen.":
+      "Nutze einen zwingenden Läuferzug, um den Turmangriff auf die Dame freizulegen.",
+    "Improve the rook": "Turm verbessern",
+    "Place your rook behind the passed pawn.":
+      "Stelle deinen Turm hinter den Freibauern.",
+    "Central Knight Outpost": "Zentraler Springer-Vorposten",
+    "Find an outpost": "Vorposten finden",
+    "Put the knight on a square enemy pawns cannot chase.":
+      "Stelle den Springer auf ein Feld, von dem gegnerische Bauern ihn nicht vertreiben können.",
+    "Create Luft": "Luft schaffen",
+    "King safety": "Königssicherheit",
+    "Create a safe escape square for your king without overextending the pawns.":
+      "Schaffe ein sicheres Fluchtfeld für deinen König, ohne die Bauern unnötig weit vorzuschieben.",
+    "You found the tactical point.": "Du hast das taktische Motiv gefunden.",
+    "You found the strategic setup.":
+      "Du hast die strategische Aufstellung gefunden.",
+    "You found the strategic square.":
+      "Du hast das strategische Feld gefunden.",
+    "You improved the king's safety.":
+      "Du hast die Königssicherheit verbessert.",
+    "Really Hard": "Sehr schwer",
+    "Clearance Sacrifice for Promotion": "Räumungsopfer zur Umwandlung",
+    "Clear the promotion square": "Umwandlungsfeld freiräumen",
+    "Sacrifice the rook so the pawn can promote with tempo.":
+      "Opfere den Turm, damit der Bauer mit Tempo umwandeln kann.",
+    "Deflection Before the Back-Rank Mate": "Ablenkung vor dem Grundreihenmatt",
+    "Sacrifice the queen to remove the last defender of the back rank.":
+      "Opfere die Dame, um den letzten Verteidiger der Grundreihe zu entfernen.",
+    "Boden's Mate": "Bodens Matt",
+    "Sacrifice the queen to open both diagonals around the king.":
+      "Opfere die Dame, um beide Diagonalen um den König zu öffnen.",
+    "Légal's Mate": "Légals Matt",
+    "Mate in 3": "Matt in 3",
+    "Ignore the attacked queen and calculate the mating combination to the end.":
+      "Ignoriere die angegriffene Dame und berechne die Mattkombination bis zum Ende.",
+    "Greek Gift Attack": "Griechisches Geschenk",
+    "Build a mating attack": "Mattangriff aufbauen",
+    "Sacrifice the bishop, force the king out, and bring the queen into the attack.":
+      "Opfere den Läufer, zwinge den König heraus und bringe die Dame in den Angriff.",
+    "The opponent accepts the queen.": "Der Gegner nimmt die Dame.",
+    "The opponent accepts the bishop.": "Der Gegner nimmt den Läufer.",
+    "You built the classic Greek Gift attacking setup.":
+      "Du hast die klassische Angriffsstellung des griechischen Geschenks aufgebaut.",
+    "Difficulty progression": "Schwierigkeitsverlauf",
+    "Trade Queens When You Are Ahead": "Damen tauschen, wenn du vorne liegst",
+    "Simplify when ahead": "Vereinfachen bei Materialvorteil",
+    "You are up a rook. Remove the opponent's queen and reduce counterplay.":
+      "Du hast einen Turm mehr. Tausche die gegnerische Dame und reduziere das Gegenspiel.",
+    "This is the clean simplifying move.": "Das ist die saubere Vereinfachung.",
+    "The queens are gone and your extra rook becomes much easier to use.":
+      "Die Damen sind verschwunden und dein Mehrturm lässt sich viel leichter verwerten.",
+    "Keep Queens When You Are Behind": "Damen behalten, wenn du hinten liegst",
+    "Avoid the wrong trade": "Den falschen Tausch vermeiden",
+    "You are down a rook. Keep the queens and create checking chances.":
+      "Du hast einen Turm weniger. Behalte die Damen und suche Schachgebote.",
+    "You kept the queen and created immediate activity.":
+      "Du hast die Dame behalten und sofort Aktivität erzeugt.",
+    "Trade a Bad Bishop for a Strong Knight":
+      "Schlechten Läufer gegen starken Springer tauschen",
+    "Choose the right exchange": "Den richtigen Tausch wählen",
+    "Remove the opponent's powerful central knight instead of letting it dominate the board.":
+      "Entferne den starken zentralen Springer, statt ihn das Brett beherrschen zu lassen.",
+    "You exchanged an ordinary bishop for the opponent's best-placed piece.":
+      "Du hast einen gewöhnlichen Läufer gegen die bestplatzierte gegnerische Figur getauscht.",
+    "The dangerous knight is gone, and Black is left with a pawn on d5 instead.":
+      "Der gefährliche Springer ist weg und Schwarz hat stattdessen nur noch einen Bauern auf d5.",
+    "Open the Center Against an Exposed King":
+      "Das Zentrum gegen einen ungeschützten König öffnen",
+    "Open the center": "Zentrum öffnen",
+    "The enemy king is stuck in the middle. Open lines before it can become safe.":
+      "Der gegnerische König steckt in der Mitte. Öffne Linien, bevor er sich retten kann.",
+    "Opening the e-file immediately exposes the king.":
+      "Das Öffnen der e-Linie setzt den König sofort unter Druck.",
+    "Keep the Center Closed When Your King Is Unsafe":
+      "Das Zentrum geschlossen halten, wenn dein König unsicher steht",
+    "Do not open too early": "Nicht zu früh öffnen",
+    "Your king is still exposed and Black's pieces are ready. Keep the center closed until you are safer.":
+      "Dein König steht noch unsicher und die schwarzen Figuren sind bereit. Halte das Zentrum geschlossen, bis dein König sicherer ist.",
+    "You kept the dangerous central file closed.":
+      "Du hast die gefährliche zentrale Linie geschlossen gehalten.",
+    Selected: "Ausgewählt",
   },
   bar: {
     Language: "Sproch",
@@ -629,6 +789,34 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
       "Ein häufiges Endspielprinzip: Türme stehen oft am aktivsten hinter Freibauern – eigenen wie gegnerischen.",
     "From behind, the rook can support its own pawn or attack an enemy pawn while remaining active.":
       "Von hinten kann der Turm den eigenen Bauern unterstützen oder einen gegnerischen Bauern angreifen und aktiv bleiben.",
+    Puzzles: "Aufgabn",
+    "Solve interactively": "Interaktiv lösn",
+    "Interactive Chess Puzzles": "Interaktive Schachaufgabn",
+    "Find the best move": "Find den bestn Zug",
+    "All puzzles": "Alle Aufgabn",
+    Tactics: "Taktik",
+    Checkmates: "Mattaufgabn",
+    "Correct!": "Richtig!",
+    "Try another move.": "Probier an andern Zug.",
+    "Solved!": "G'löst!",
+    "Reset puzzle": "Aufgab zrucksetzn",
+    "Next puzzle": "Nächste Aufgab",
+    "Best move": "Bester Zug",
+    "Worst move": "Schlechtester Zug",
+    Highlighted: "Markiert",
+    "Click a move to highlight it on the board.":
+      "Klick auf an Zug, dann werd er am Brett farbig markiert.",
+    "Absolute Pin": "Absolute Fesselung",
+    "Create Luft": "Luft macha",
+    "Really Hard": "Sau schwer",
+    "Légal's Mate": "Légals Matt",
+    "Greek Gift Attack": "Griechisches Gschenk",
+    "Difficulty progression": "Schwierigkeitsverlauf",
+    "Trade Queens When You Are Ahead": "Damen tauschn, wennst vorn bist",
+    "Keep Queens When You Are Behind": "Damen behalten, wennst hint bist",
+    "Open the center": "Zentrum aufmachn",
+    "Do not open too early": "Ned z'friah aufmachn",
+    Selected: "Ausg'wählt",
   },
   ko: {
     Language: "언어",
@@ -934,6 +1122,157 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
       "흔한 엔드게임 원칙입니다. 룩은 자신의 패스드 폰이든 상대의 패스드 폰이든 그 뒤에 있을 때 가장 활발한 경우가 많습니다.",
     "From behind, the rook can support its own pawn or attack an enemy pawn while remaining active.":
       "뒤에서 룩은 자신의 폰을 지원하거나 상대 폰을 공격하면서 활발하게 활동할 수 있습니다.",
+    Puzzles: "퍼즐",
+    "Solve interactively": "인터랙티브 풀이",
+    "Interactive Chess Puzzles": "인터랙티브 체스 퍼즐",
+    "Find the best move": "최선의 수를 찾으세요",
+    "Play the position, get instant feedback, and learn why moves work.":
+      "포지션에서 직접 수를 두고 즉시 피드백을 받으며 왜 좋은 수인지 배웁니다.",
+    "All puzzles": "전체 퍼즐",
+    Tactics: "전술",
+    Checkmates: "체크메이트",
+    Puzzle: "퍼즐",
+    Goal: "목표",
+    Difficulty: "난이도",
+    Beginner: "초급",
+    Intermediate: "중급",
+    Advanced: "고급",
+    "Select a piece and make your move.": "기물을 선택하고 수를 두세요.",
+    "Correct!": "정답!",
+    "Excellent move.": "훌륭한 수입니다.",
+    "Try another move.": "다른 수를 시도해 보세요.",
+    "That move is not legal in this position.":
+      "이 포지션에서는 합법적인 수가 아닙니다.",
+    "Legal move, but not one of the four teaching candidates.":
+      "합법적인 수이지만 네 개의 학습 후보 수에는 포함되지 않습니다.",
+    "Combination continues": "콤비네이션 계속",
+    "Opponent reply": "상대의 응수",
+    "Your move again": "다시 당신 차례입니다",
+    "Solved!": "해결!",
+    "You found the full combination.": "전체 콤비네이션을 찾았습니다.",
+    "Reset puzzle": "퍼즐 초기화",
+    "Next puzzle": "다음 퍼즐",
+    "Show move analysis": "수 분석 보기",
+    "Hide move analysis": "수 분석 숨기기",
+    "Candidate move analysis": "후보 수 분석",
+    "Best move": "최선의 수",
+    "2nd choice": "2순위",
+    "3rd choice": "3순위",
+    "Worst move": "최악의 수",
+    Line: "진행",
+    "Curated teaching ranking — not a live engine evaluation.":
+      "학습용으로 엄선한 순위이며 실시간 엔진 평가는 아닙니다.",
+    "Mate in 1": "1수 메이트",
+    "Mate in 2": "2수 메이트",
+    "Win material": "기물 이득",
+    "Royal Fork": "로열 포크",
+    "Win the queen with a knight fork.": "나이트 포크로 퀸을 얻으세요.",
+    "Loose Queen": "느슨한 퀸",
+    "Spot the hanging queen and take it.": "보호받지 못한 퀸을 찾아 잡으세요.",
+    "Find checkmate in one.": "한 수 체크메이트를 찾으세요.",
+    "Smothered Mate": "스머더드 메이트",
+    "Deflection to the Back Rank": "백랭크로의 디플렉션",
+    "Force mate in two by deflecting the queen.":
+      "퀸을 유인해 두 수 안에 메이트를 강제하세요.",
+    "Queen Sacrifice Smothered Mate": "퀸 희생 스머더드 메이트",
+    "Force mate in two with a queen sacrifice.":
+      "퀸 희생으로 두 수 안에 메이트를 강제하세요.",
+    "The opponent reply is played automatically.":
+      "상대의 응수는 자동으로 진행됩니다.",
+    "The combination breaks here. Return to the forcing line.":
+      "이 수에서는 콤비네이션이 끊깁니다. 강제 수순으로 돌아가세요.",
+    "This is the key move of the puzzle.": "이 수가 퍼즐의 핵심입니다.",
+    "Now finish the combination.": "이제 콤비네이션을 마무리하세요.",
+    "Representative reply": "대표 응수",
+    Feedback: "피드백",
+    Highlighted: "강조됨",
+    "Click a move to highlight it on the board.":
+      "수를 클릭하면 해당 수가 같은 색으로 보드에 강조됩니다.",
+    "Absolute Pin": "절대 핀",
+    "Exploit a pin": "핀 활용",
+    "Win the pinned knight before it can escape.":
+      "움직일 수 없는 핀된 나이트가 도망가기 전에 잡으세요.",
+    "King and Queen Skewer": "킹-퀸 스큐어",
+    "Check the king and win the queen behind it.":
+      "킹을 체크해 움직이게 한 뒤 뒤에 있는 퀸을 잡으세요.",
+    "Discovered attack": "디스커버드 어택",
+    "Use a forcing bishop move to uncover the rook against the queen.":
+      "강제적인 비숍 수로 룩의 퀸 공격 라인을 여세요.",
+    "Improve the rook": "룩 개선",
+    "Place your rook behind the passed pawn.":
+      "룩을 패스드 폰 뒤에 배치하세요.",
+    "Central Knight Outpost": "중앙 나이트 아웃포스트",
+    "Find an outpost": "아웃포스트 찾기",
+    "Put the knight on a square enemy pawns cannot chase.":
+      "상대 폰이 쫓아낼 수 없는 칸에 나이트를 배치하세요.",
+    "Create Luft": "루프트 만들기",
+    "King safety": "킹 안전",
+    "Create a safe escape square for your king without overextending the pawns.":
+      "폰을 과도하게 전진시키지 않으면서 킹의 탈출 칸을 만드세요.",
+    "You found the tactical point.": "전술의 핵심을 찾았습니다.",
+    "You found the strategic setup.": "전략적인 배치를 찾았습니다.",
+    "You found the strategic square.": "전략적인 핵심 칸을 찾았습니다.",
+    "You improved the king's safety.": "킹의 안전을 개선했습니다.",
+    "Really Hard": "최상급",
+    "Clearance Sacrifice for Promotion": "승격을 위한 클리어런스 희생",
+    "Clear the promotion square": "승격 칸 비우기",
+    "Sacrifice the rook so the pawn can promote with tempo.":
+      "룩을 희생해 폰이 템포를 얻으며 승격하도록 만드세요.",
+    "Deflection Before the Back-Rank Mate": "백랭크 메이트 전 디플렉션",
+    "Sacrifice the queen to remove the last defender of the back rank.":
+      "퀸을 희생해 백랭크의 마지막 수비수를 제거하세요.",
+    "Boden's Mate": "보든 메이트",
+    "Sacrifice the queen to open both diagonals around the king.":
+      "퀸을 희생해 킹 주변의 두 대각선을 모두 여세요.",
+    "Légal's Mate": "레갈의 메이트",
+    "Mate in 3": "3수 메이트",
+    "Ignore the attacked queen and calculate the mating combination to the end.":
+      "공격받는 퀸을 무시하고 마지막 체크메이트까지 수읽기하세요.",
+    "Greek Gift Attack": "그릭 기프트 공격",
+    "Build a mating attack": "메이팅 공격 구축",
+    "Sacrifice the bishop, force the king out, and bring the queen into the attack.":
+      "비숍을 희생해 킹을 끌어내고 퀸을 공격에 합류시키세요.",
+    "The opponent accepts the queen.": "상대가 퀸을 잡습니다.",
+    "The opponent accepts the bishop.": "상대가 비숍을 잡습니다.",
+    "You built the classic Greek Gift attacking setup.":
+      "전형적인 그릭 기프트 공격 배치를 완성했습니다.",
+    "Difficulty progression": "난이도 진행",
+    "Trade Queens When You Are Ahead": "앞서 있을 때 퀸 교환하기",
+    "Simplify when ahead": "앞설 때 단순화",
+    "You are up a rook. Remove the opponent's queen and reduce counterplay.":
+      "룩 하나를 앞서고 있습니다. 상대 퀸을 교환해 반격 가능성을 줄이세요.",
+    "This is the clean simplifying move.": "가장 깔끔하게 단순화하는 수입니다.",
+    "The queens are gone and your extra rook becomes much easier to use.":
+      "퀸이 사라지면 여분의 룩을 훨씬 쉽게 활용할 수 있습니다.",
+    "Keep Queens When You Are Behind": "뒤질 때 퀸 유지하기",
+    "Avoid the wrong trade": "잘못된 교환 피하기",
+    "You are down a rook. Keep the queens and create checking chances.":
+      "룩 하나가 부족합니다. 퀸을 남겨 체크와 반격 기회를 만드세요.",
+    "You kept the queen and created immediate activity.":
+      "퀸을 유지하면서 즉각적인 활동성을 만들었습니다.",
+    "Trade a Bad Bishop for a Strong Knight":
+      "나쁜 비숍을 강한 나이트와 교환하기",
+    "Choose the right exchange": "올바른 교환 선택",
+    "Remove the opponent's powerful central knight instead of letting it dominate the board.":
+      "상대의 강력한 중앙 나이트가 보드를 지배하기 전에 제거하세요.",
+    "You exchanged an ordinary bishop for the opponent's best-placed piece.":
+      "평범한 비숍을 상대의 가장 잘 배치된 기물과 교환했습니다.",
+    "The dangerous knight is gone, and Black is left with a pawn on d5 instead.":
+      "위험한 나이트가 사라지고 흑은 d5의 폰만 남게 됩니다.",
+    "Open the Center Against an Exposed King": "노출된 킹을 상대로 중앙 열기",
+    "Open the center": "중앙 열기",
+    "The enemy king is stuck in the middle. Open lines before it can become safe.":
+      "상대 킹이 중앙에 갇혀 있습니다. 안전해지기 전에 라인을 여세요.",
+    "Opening the e-file immediately exposes the king.":
+      "e파일을 열면 즉시 상대 킹이 노출됩니다.",
+    "Keep the Center Closed When Your King Is Unsafe":
+      "내 킹이 불안할 때 중앙 닫아두기",
+    "Do not open too early": "너무 일찍 열지 않기",
+    "Your king is still exposed and Black's pieces are ready. Keep the center closed until you are safer.":
+      "내 킹이 아직 노출되어 있고 흑 기물들이 준비되어 있습니다. 안전해질 때까지 중앙을 닫아두세요.",
+    "You kept the dangerous central file closed.":
+      "위험한 중앙 파일을 닫아두었습니다.",
+    Selected: "선택됨",
   },
   ru: {
     Language: "Язык",
@@ -1242,6 +1581,163 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
       "Распространённый эндшпильный принцип: ладьи часто наиболее активны позади проходных пешек — своих или чужих.",
     "From behind, the rook can support its own pawn or attack an enemy pawn while remaining active.":
       "Сзади ладья может поддерживать свою пешку или атаковать чужую, оставаясь активной.",
+    Puzzles: "Задачи",
+    "Solve interactively": "Решать интерактивно",
+    "Interactive Chess Puzzles": "Интерактивные шахматные задачи",
+    "Find the best move": "Найдите лучший ход",
+    "Play the position, get instant feedback, and learn why moves work.":
+      "Сыграйте ход, получите мгновенную обратную связь и узнайте, почему ход работает.",
+    "All puzzles": "Все задачи",
+    Tactics: "Тактика",
+    Checkmates: "Маты",
+    Puzzle: "Задача",
+    Goal: "Цель",
+    Difficulty: "Сложность",
+    Beginner: "Начальный",
+    Intermediate: "Средний",
+    Advanced: "Продвинутый",
+    "Select a piece and make your move.": "Выберите фигуру и сделайте ход.",
+    "Correct!": "Верно!",
+    "Excellent move.": "Отличный ход.",
+    "Try another move.": "Попробуйте другой ход.",
+    "That move is not legal in this position.":
+      "Этот ход нелегален в данной позиции.",
+    "Legal move, but not one of the four teaching candidates.":
+      "Ход легален, но не входит в четыре учебных кандидата.",
+    "Combination continues": "Комбинация продолжается",
+    "Opponent reply": "Ответ соперника",
+    "Your move again": "Снова ваш ход",
+    "Solved!": "Решено!",
+    "You found the full combination.": "Вы нашли всю комбинацию.",
+    "Reset puzzle": "Сбросить задачу",
+    "Next puzzle": "Следующая задача",
+    "Show move analysis": "Показать анализ ходов",
+    "Hide move analysis": "Скрыть анализ ходов",
+    "Candidate move analysis": "Анализ ходов-кандидатов",
+    "Best move": "Лучший ход",
+    "2nd choice": "2-й выбор",
+    "3rd choice": "3-й выбор",
+    "Worst move": "Худший ход",
+    Line: "Вариант",
+    "Curated teaching ranking — not a live engine evaluation.":
+      "Учебный рейтинг, а не оценка живого движка.",
+    "Mate in 1": "Мат в 1",
+    "Mate in 2": "Мат в 2",
+    "Win material": "Выиграть материал",
+    "Royal Fork": "Королевская вилка",
+    "Win the queen with a knight fork.": "Выиграйте ферзя коневой вилкой.",
+    "Loose Queen": "Незащищённый ферзь",
+    "Spot the hanging queen and take it.":
+      "Найдите незащищённого ферзя и возьмите его.",
+    "Find checkmate in one.": "Найдите мат в один ход.",
+    "Smothered Mate": "Спёртый мат",
+    "Deflection to the Back Rank": "Отвлечение к последней горизонтали",
+    "Force mate in two by deflecting the queen.":
+      "Форсируйте мат в два хода, отвлекая ферзя.",
+    "Queen Sacrifice Smothered Mate": "Жертва ферзя ради спёртого мата",
+    "Force mate in two with a queen sacrifice.":
+      "Форсируйте мат в два хода жертвой ферзя.",
+    "The opponent reply is played automatically.":
+      "Ответ соперника разыгрывается автоматически.",
+    "The combination breaks here. Return to the forcing line.":
+      "Здесь комбинация рушится. Вернитесь к форсирующей линии.",
+    "This is the key move of the puzzle.": "Это ключевой ход задачи.",
+    "Now finish the combination.": "Теперь завершите комбинацию.",
+    "Representative reply": "Пример ответа",
+    Feedback: "Обратная связь",
+    Highlighted: "Подсвечено",
+    "Click a move to highlight it on the board.":
+      "Нажмите на ход, чтобы подсветить его на доске соответствующим цветом.",
+    "Absolute Pin": "Абсолютная связка",
+    "Exploit a pin": "Использовать связку",
+    "Win the pinned knight before it can escape.":
+      "Выиграйте связанного коня, пока он не может уйти.",
+    "King and Queen Skewer": "Линейный удар король–ферзь",
+    "Check the king and win the queen behind it.":
+      "Дайте шах королю и затем выиграйте стоящего за ним ферзя.",
+    "Discovered attack": "Вскрытое нападение",
+    "Use a forcing bishop move to uncover the rook against the queen.":
+      "Сделайте форсирующий ход слоном и откройте нападение ладьи на ферзя.",
+    "Improve the rook": "Улучшить ладью",
+    "Place your rook behind the passed pawn.":
+      "Поставьте ладью позади проходной пешки.",
+    "Central Knight Outpost": "Центральный форпост коня",
+    "Find an outpost": "Найти форпост",
+    "Put the knight on a square enemy pawns cannot chase.":
+      "Поставьте коня на поле, откуда вражеские пешки не смогут его прогнать.",
+    "Create Luft": "Создать форточку",
+    "King safety": "Безопасность короля",
+    "Create a safe escape square for your king without overextending the pawns.":
+      "Создайте королю безопасное поле для отхода, не ослабляя пешки слишком сильно.",
+    "You found the tactical point.": "Вы нашли тактическую идею.",
+    "You found the strategic setup.":
+      "Вы нашли правильную стратегическую расстановку.",
+    "You found the strategic square.": "Вы нашли ключевое стратегическое поле.",
+    "You improved the king's safety.": "Вы улучшили безопасность короля.",
+    "Really Hard": "Очень сложно",
+    "Clearance Sacrifice for Promotion":
+      "Освобождающая жертва ради превращения",
+    "Clear the promotion square": "Освободить поле превращения",
+    "Sacrifice the rook so the pawn can promote with tempo.":
+      "Пожертвуйте ладью, чтобы пешка превратилась с темпом.",
+    "Deflection Before the Back-Rank Mate":
+      "Отвлечение перед матом по последней горизонтали",
+    "Sacrifice the queen to remove the last defender of the back rank.":
+      "Пожертвуйте ферзя, чтобы убрать последнего защитника последней горизонтали.",
+    "Boden's Mate": "Мат Бодена",
+    "Sacrifice the queen to open both diagonals around the king.":
+      "Пожертвуйте ферзя, чтобы открыть обе диагонали вокруг короля.",
+    "Légal's Mate": "Мат Легаля",
+    "Mate in 3": "Мат в 3",
+    "Ignore the attacked queen and calculate the mating combination to the end.":
+      "Игнорируйте атакованного ферзя и рассчитайте матовую комбинацию до конца.",
+    "Greek Gift Attack": "Греческий дар",
+    "Build a mating attack": "Построить матовую атаку",
+    "Sacrifice the bishop, force the king out, and bring the queen into the attack.":
+      "Пожертвуйте слона, выманите короля и подключите ферзя к атаке.",
+    "The opponent accepts the queen.": "Соперник принимает жертву ферзя.",
+    "The opponent accepts the bishop.": "Соперник принимает жертву слона.",
+    "You built the classic Greek Gift attacking setup.":
+      "Вы построили классическую атакующую схему греческого дара.",
+    "Difficulty progression": "Рост сложности",
+    "Trade Queens When You Are Ahead": "Меняйте ферзей, когда у вас перевес",
+    "Simplify when ahead": "Упрощать при материальном перевесе",
+    "You are up a rook. Remove the opponent's queen and reduce counterplay.":
+      "У вас лишняя ладья. Разменяйте ферзей и уменьшите контригру соперника.",
+    "This is the clean simplifying move.":
+      "Это самый простой путь к упрощению.",
+    "The queens are gone and your extra rook becomes much easier to use.":
+      "После размена ферзей реализовать лишнюю ладью намного проще.",
+    "Keep Queens When You Are Behind": "Сохраняйте ферзей, когда отстаёте",
+    "Avoid the wrong trade": "Избегать неправильного размена",
+    "You are down a rook. Keep the queens and create checking chances.":
+      "У вас не хватает ладьи. Сохраните ферзей и ищите шахи и контригру.",
+    "You kept the queen and created immediate activity.":
+      "Вы сохранили ферзя и сразу создали активную игру.",
+    "Trade a Bad Bishop for a Strong Knight":
+      "Разменяйте плохого слона на сильного коня",
+    "Choose the right exchange": "Выбрать правильный размен",
+    "Remove the opponent's powerful central knight instead of letting it dominate the board.":
+      "Уберите сильного центрального коня соперника, не позволяя ему доминировать.",
+    "You exchanged an ordinary bishop for the opponent's best-placed piece.":
+      "Вы разменяли обычного слона на лучше всего расположенную фигуру соперника.",
+    "The dangerous knight is gone, and Black is left with a pawn on d5 instead.":
+      "Опасный конь исчез, а у чёрных вместо него осталась пешка на d5.",
+    "Open the Center Against an Exposed King":
+      "Открывайте центр против незащищённого короля",
+    "Open the center": "Открыть центр",
+    "The enemy king is stuck in the middle. Open lines before it can become safe.":
+      "Король соперника застрял в центре. Откройте линии, пока он не успел укрыться.",
+    "Opening the e-file immediately exposes the king.":
+      "Открытие линии e сразу обнажает короля.",
+    "Keep the Center Closed When Your King Is Unsafe":
+      "Держите центр закрытым, пока ваш король уязвим",
+    "Do not open too early": "Не открывать слишком рано",
+    "Your king is still exposed and Black's pieces are ready. Keep the center closed until you are safer.":
+      "Ваш король ещё уязвим, а фигуры чёрных готовы к атаке. Держите центр закрытым, пока не обеспечите королю безопасность.",
+    "You kept the dangerous central file closed.":
+      "Вы оставили опасную центральную линию закрытой.",
+    Selected: "Выбрано",
   },
 };
 
@@ -2922,6 +3418,2240 @@ function SituationsTab() {
   );
 }
 
+type PuzzleCategory = "Tactic" | "Checkmate" | "Strategy" | "Endgame";
+type PuzzleDifficulty =
+  | "Beginner"
+  | "Intermediate"
+  | "Advanced"
+  | "Really Hard";
+type PuzzleRank = 1 | 2 | 3 | "worst";
+
+type PuzzleCandidate = {
+  uci: string;
+  label: string;
+  rank: PuzzleRank;
+  explanation: string;
+};
+
+type PuzzleLineMove = {
+  uci: string;
+  label: string;
+  note?: string;
+};
+
+type InteractivePuzzle = {
+  id: string;
+  title: string;
+  category: PuzzleCategory;
+  difficulty: PuzzleDifficulty;
+  objective: string;
+  goal: string;
+  fen: string;
+  orientation: "white" | "black";
+  line: PuzzleLineMove[];
+  candidates: PuzzleCandidate[];
+};
+
+type PuzzleFeedback = {
+  tone: "success" | "info" | "warning";
+  title: string;
+  text: string;
+  moveLabel?: string;
+  rank?: PuzzleRank;
+};
+
+const interactivePuzzles: InteractivePuzzle[] = [
+  {
+    id: "royal-fork",
+    title: "Royal Fork",
+    category: "Tactic",
+    difficulty: "Beginner",
+    objective: "Win material",
+    goal: "Win the queen with a knight fork.",
+    fen: "q3k3/8/8/1N6/8/8/8/6K1 w - - 0 1",
+    orientation: "white",
+    line: [
+      {
+        uci: "b5c7",
+        label: "Nc7+",
+        note: "This is the key move of the puzzle.",
+      },
+      {
+        uci: "e8d7",
+        label: "...Kd7",
+        note: "Representative reply",
+      },
+      {
+        uci: "c7a8",
+        label: "Nxa8",
+        note: "You found the full combination.",
+      },
+    ],
+    candidates: [
+      {
+        uci: "b5c7",
+        label: "Nc7+",
+        rank: 1,
+        explanation:
+          "Best: the knight checks the king on e8 and attacks the queen on a8 at the same time. The king must respond, so the queen falls next.",
+      },
+      {
+        uci: "b5d6",
+        label: "Nd6+",
+        rank: 2,
+        explanation:
+          "A useful forcing check, but it does not attack the queen. You gain time, not material.",
+      },
+      {
+        uci: "b5a7",
+        label: "Na7",
+        rank: 3,
+        explanation:
+          "The knight stays active, but the move misses the immediate tactical fork.",
+      },
+      {
+        uci: "b5c3",
+        label: "Nc3",
+        rank: "worst",
+        explanation:
+          "The knight retreats from the action and gives Black time to save the queen. The tactical opportunity disappears.",
+      },
+    ],
+  },
+  {
+    id: "loose-queen",
+    title: "Loose Queen",
+    category: "Tactic",
+    difficulty: "Beginner",
+    objective: "Win material",
+    goal: "Spot the hanging queen and take it.",
+    fen: "4k3/8/8/3q4/2B5/8/8/6K1 w - - 0 1",
+    orientation: "white",
+    line: [
+      {
+        uci: "c4d5",
+        label: "Bxd5",
+        note: "Excellent move.",
+      },
+    ],
+    candidates: [
+      {
+        uci: "c4d5",
+        label: "Bxd5",
+        rank: 1,
+        explanation:
+          "Best: the queen on d5 is hanging. Capturing it immediately wins the most valuable piece on the board.",
+      },
+      {
+        uci: "c4b5",
+        label: "Bb5+",
+        rank: 2,
+        explanation:
+          "A forcing check is attractive, but Black can answer the check and then move the queen. Checks are not automatically better than winning material.",
+      },
+      {
+        uci: "c4d3",
+        label: "Bd3",
+        rank: 3,
+        explanation:
+          "A safe developing move, but it ignores a free queen. Always scan captures before quiet moves.",
+      },
+      {
+        uci: "c4a2",
+        label: "Ba2",
+        rank: "worst",
+        explanation:
+          "The bishop moves away from the tactical target and allows Black to save the queen for free.",
+      },
+    ],
+  },
+  {
+    id: "back-rank-mate",
+    title: "Back-Rank Mate",
+    category: "Checkmate",
+    difficulty: "Beginner",
+    objective: "Mate in 1",
+    goal: "Find checkmate in one.",
+    fen: "6k1/5ppp/8/8/8/8/8/K3R3 w - - 0 1",
+    orientation: "white",
+    line: [
+      {
+        uci: "e1e8",
+        label: "Re8#",
+        note: "You found the full combination.",
+      },
+    ],
+    candidates: [
+      {
+        uci: "e1e8",
+        label: "Re8#",
+        rank: 1,
+        explanation:
+          "Best: the rook reaches the eighth rank with check. The king has no escape because its own pawns seal the seventh rank.",
+      },
+      {
+        uci: "e1e7",
+        label: "Re7",
+        rank: 2,
+        explanation:
+          "The rook stays active and keeps pressure, but there is no reason to postpone an immediate checkmate.",
+      },
+      {
+        uci: "e1f1",
+        label: "Rf1",
+        rank: 3,
+        explanation:
+          "A legal rook move, but it gives Black a tempo to create an escape square or defend.",
+      },
+      {
+        uci: "e1e2",
+        label: "Re2",
+        rank: "worst",
+        explanation:
+          "The rook retreats from the mating rank and throws away a forced win immediately.",
+      },
+    ],
+  },
+  {
+    id: "smothered-mate",
+    title: "Smothered Mate",
+    category: "Checkmate",
+    difficulty: "Intermediate",
+    objective: "Mate in 1",
+    goal: "Find checkmate in one.",
+    fen: "6rk/6pr/7N/8/8/8/8/K7 w - - 0 1",
+    orientation: "white",
+    line: [
+      {
+        uci: "h6f7",
+        label: "Nf7#",
+        note: "You found the full combination.",
+      },
+    ],
+    candidates: [
+      {
+        uci: "h6f7",
+        label: "Nf7#",
+        rank: 1,
+        explanation:
+          "Best: the knight attacks h8. The black king is trapped by its own rook and pawn structure, so the knight check is mate.",
+      },
+      {
+        uci: "h6g8",
+        label: "Nxg8",
+        rank: 2,
+        explanation:
+          "Winning the rook is good materially, but checkmate is stronger than winning material.",
+      },
+      {
+        uci: "h6f5",
+        label: "Nf5",
+        rank: 3,
+        explanation:
+          "The knight remains active, but the move ignores a mating pattern that is available right now.",
+      },
+      {
+        uci: "h6g4",
+        label: "Ng4",
+        rank: "worst",
+        explanation:
+          "The knight retreats far from the king and loses both the mate and the rook-winning opportunity.",
+      },
+    ],
+  },
+  {
+    id: "back-rank-deflection",
+    title: "Deflection to the Back Rank",
+    category: "Checkmate",
+    difficulty: "Intermediate",
+    objective: "Mate in 2",
+    goal: "Force mate in two by deflecting the queen.",
+    fen: "3qr1k1/4Rppp/8/8/8/8/8/K3R3 w - - 0 1",
+    orientation: "white",
+    line: [
+      {
+        uci: "e7e8",
+        label: "Rxe8+",
+        note: "This is the key move of the puzzle.",
+      },
+      {
+        uci: "d8e8",
+        label: "...Qxe8",
+        note: "The opponent reply is played automatically.",
+      },
+      {
+        uci: "e1e8",
+        label: "Rxe8#",
+        note: "You found the full combination.",
+      },
+    ],
+    candidates: [
+      {
+        uci: "e7e8",
+        label: "Rxe8+",
+        rank: 1,
+        explanation:
+          "Best: the first rook sacrifices itself with check and drags the black queen onto e8. That clears the e-file for the second rook.",
+      },
+      {
+        uci: "e7f7",
+        label: "Rxf7",
+        rank: 2,
+        explanation:
+          "You win a pawn, but Black keeps the back rank defended. Material is less important than the forced mating sequence.",
+      },
+      {
+        uci: "e7e6",
+        label: "Re6",
+        rank: 3,
+        explanation:
+          "The rook remains active, but the forcing check is lost and Black gets time to defend.",
+      },
+      {
+        uci: "e7e2",
+        label: "Re2",
+        rank: "worst",
+        explanation:
+          "This blocks the second rook on e1 and destroys the geometry of your own mating attack.",
+      },
+    ],
+  },
+  {
+    id: "queen-sac-smothered",
+    title: "Queen Sacrifice Smothered Mate",
+    category: "Checkmate",
+    difficulty: "Advanced",
+    objective: "Mate in 2",
+    goal: "Force mate in two with a queen sacrifice.",
+    fen: "5r1k/6pp/4Q2N/8/8/8/8/K7 w - - 0 1",
+    orientation: "white",
+    line: [
+      {
+        uci: "e6g8",
+        label: "Qg8+",
+        note: "This is the key move of the puzzle.",
+      },
+      {
+        uci: "f8g8",
+        label: "...Rxg8",
+        note: "The opponent reply is played automatically.",
+      },
+      {
+        uci: "h6f7",
+        label: "Nf7#",
+        note: "You found the full combination.",
+      },
+    ],
+    candidates: [
+      {
+        uci: "e6g8",
+        label: "Qg8+",
+        rank: 1,
+        explanation:
+          "Best: the queen is deliberately offered on g8. The king cannot take it because the knight on h6 protects g8, so the rook is forced to capture.",
+      },
+      {
+        uci: "e6f5",
+        label: "Qf5",
+        rank: 2,
+        explanation:
+          "The queen keeps attacking chances, but the forcing sacrifice is much stronger because it controls Black's reply.",
+      },
+      {
+        uci: "e6d5",
+        label: "Qd5",
+        rank: 3,
+        explanation:
+          "A central queen move preserves pressure, but it lets Black reorganize instead of forcing the mating net.",
+      },
+      {
+        uci: "e6a2",
+        label: "Qa2",
+        rank: "worst",
+        explanation:
+          "The queen abandons the kingside and removes the tactical pressure that makes the smothered-mate pattern possible.",
+      },
+    ],
+  },
+
+  {
+    id: "absolute-pin",
+    title: "Absolute Pin",
+    category: "Tactic",
+    difficulty: "Beginner",
+    objective: "Exploit a pin",
+    goal: "Win the pinned knight before it can escape.",
+    fen: "4k3/4n3/3P4/8/8/8/8/4R1K1 w - - 0 1",
+    orientation: "white",
+    line: [
+      {
+        uci: "d6e7",
+        label: "dxe7",
+        note: "You found the tactical point.",
+      },
+    ],
+    candidates: [
+      {
+        uci: "d6e7",
+        label: "dxe7",
+        rank: 1,
+        explanation:
+          "Best: the knight on e7 is absolutely pinned to the king by the rook on e1. It cannot move, so the pawn can simply take it.",
+      },
+      {
+        uci: "d6d7",
+        label: "d7",
+        rank: 2,
+        explanation:
+          "The passed pawn becomes dangerous, but you are leaving a free pinned knight on the board.",
+      },
+      {
+        uci: "e1e2",
+        label: "Re2",
+        rank: 3,
+        explanation:
+          "The rook remains active, but moving it away releases the pin and lets the knight escape.",
+      },
+      {
+        uci: "e1a1",
+        label: "Ra1",
+        rank: "worst",
+        explanation:
+          "Worst: the rook completely abandons the e-file, immediately freeing the pinned knight and wasting the tactical opportunity.",
+      },
+    ],
+  },
+  {
+    id: "king-queen-skewer",
+    title: "King and Queen Skewer",
+    category: "Tactic",
+    difficulty: "Intermediate",
+    objective: "Skewer",
+    goal: "Check the king and win the queen behind it.",
+    fen: "4q3/4k3/8/8/8/8/8/R5K1 w - - 0 1",
+    orientation: "white",
+    line: [
+      {
+        uci: "a1e1",
+        label: "Re1+",
+        note: "This is the key move of the puzzle.",
+      },
+      {
+        uci: "e7d7",
+        label: "...Kd7",
+        note: "Representative reply",
+      },
+      {
+        uci: "e1e8",
+        label: "Rxe8",
+        note: "You found the full combination.",
+      },
+    ],
+    candidates: [
+      {
+        uci: "a1e1",
+        label: "Re1+",
+        rank: 1,
+        explanation:
+          "Best: the rook checks the king on e7. The queen sits directly behind the king on e8, so after the king moves the rook wins the queen.",
+      },
+      {
+        uci: "a1a7",
+        label: "Ra7+",
+        rank: 2,
+        explanation:
+          "A forcing check, but it attacks from the side and does not line the king up with the queen.",
+      },
+      {
+        uci: "g1f2",
+        label: "Kf2",
+        rank: 3,
+        explanation:
+          "A harmless improving king move, but the tactical skewer is available immediately and should not be postponed.",
+      },
+      {
+        uci: "a1a2",
+        label: "Ra2",
+        rank: "worst",
+        explanation:
+          "The rook becomes passive and gives Black time to separate the king and queen, removing the skewer completely.",
+      },
+    ],
+  },
+  {
+    id: "discovered-attack",
+    title: "Discovered Attack",
+    category: "Tactic",
+    difficulty: "Intermediate",
+    objective: "Discovered attack",
+    goal: "Use a forcing bishop move to uncover the rook against the queen.",
+    fen: "3k4/3q4/8/8/3B4/8/8/3R2K1 w - - 0 1",
+    orientation: "white",
+    line: [
+      {
+        uci: "d4b6",
+        label: "Bb6+",
+        note: "This is the key move of the puzzle.",
+      },
+      {
+        uci: "d8c8",
+        label: "...Kc8",
+        note: "Representative reply",
+      },
+      {
+        uci: "d1d7",
+        label: "Rxd7",
+        note: "You found the full combination.",
+      },
+    ],
+    candidates: [
+      {
+        uci: "d4b6",
+        label: "Bb6+",
+        rank: 1,
+        explanation:
+          "Best: moving the bishop gives check while simultaneously opening the d-file. Black must answer the check, and then the rook captures the queen on d7.",
+      },
+      {
+        uci: "d4e5",
+        label: "Be5",
+        rank: 2,
+        explanation:
+          "This also uncovers the rook against the queen, but without check. Black can simply move the queen away.",
+      },
+      {
+        uci: "g1f2",
+        label: "Kf2",
+        rank: 3,
+        explanation:
+          "A legal improving move, but it misses the forcing discovered attack that wins major material.",
+      },
+      {
+        uci: "d1d2",
+        label: "Rd2",
+        rank: "worst",
+        explanation:
+          "The rook moves off the attacking file while the bishop still blocks the queen. Both parts of the combination disappear.",
+      },
+    ],
+  },
+  {
+    id: "rook-behind-pawn",
+    title: "Rook Behind the Passed Pawn",
+    category: "Endgame",
+    difficulty: "Beginner",
+    objective: "Improve the rook",
+    goal: "Place your rook behind the passed pawn.",
+    fen: "6k1/8/3P4/8/8/8/6K1/R7 w - - 0 1",
+    orientation: "white",
+    line: [
+      {
+        uci: "a1d1",
+        label: "Rd1",
+        note: "You found the strategic setup.",
+      },
+    ],
+    candidates: [
+      {
+        uci: "a1d1",
+        label: "Rd1",
+        rank: 1,
+        explanation:
+          "Best: the rook belongs behind the passed pawn. From d1 it supports every advance while staying active as the pawn moves up the d-file.",
+      },
+      {
+        uci: "a1a6",
+        label: "Ra6",
+        rank: 2,
+        explanation:
+          "The rook supports the pawn from the side, but it can become awkward as the pawn advances and may be attacked more easily.",
+      },
+      {
+        uci: "g2f3",
+        label: "Kf3",
+        rank: 3,
+        explanation:
+          "Improving the king is useful in an endgame, but activating the rook behind the passed pawn is the more urgent structural improvement.",
+      },
+      {
+        uci: "a1h1",
+        label: "Rh1",
+        rank: "worst",
+        explanation:
+          "The rook moves far away from the passed pawn and contributes almost nothing to its advance.",
+      },
+    ],
+  },
+  {
+    id: "central-outpost",
+    title: "Central Knight Outpost",
+    category: "Strategy",
+    difficulty: "Beginner",
+    objective: "Find an outpost",
+    goal: "Put the knight on a square enemy pawns cannot chase.",
+    fen: "6k1/8/8/2p1p3/8/2N5/8/6K1 w - - 0 1",
+    orientation: "white",
+    line: [
+      {
+        uci: "c3d5",
+        label: "Nd5",
+        note: "You found the strategic square.",
+      },
+    ],
+    candidates: [
+      {
+        uci: "c3d5",
+        label: "Nd5",
+        rank: 1,
+        explanation:
+          "Best: d5 is a strong central outpost. The black pawns on c5 and e5 attack d4, not d5, so they cannot chase the knight away.",
+      },
+      {
+        uci: "c3b5",
+        label: "Nb5",
+        rank: 2,
+        explanation:
+          "The knight becomes more active, but b5 is less central and controls fewer important squares than d5.",
+      },
+      {
+        uci: "c3e2",
+        label: "Ne2",
+        rank: 3,
+        explanation:
+          "The knight stays safe, but it retreats from the center instead of occupying the available outpost.",
+      },
+      {
+        uci: "c3a4",
+        label: "Na4",
+        rank: "worst",
+        explanation:
+          "The knight moves to the rim, where it influences far fewer central squares and has no immediate target.",
+      },
+    ],
+  },
+  {
+    id: "create-luft",
+    title: "Create Luft",
+    category: "Strategy",
+    difficulty: "Beginner",
+    objective: "King safety",
+    goal: "Create a safe escape square for your king without overextending the pawns.",
+    fen: "k5r1/8/8/8/8/8/5PPP/6K1 w - - 0 1",
+    orientation: "white",
+    line: [
+      {
+        uci: "h2h3",
+        label: "h3",
+        note: "You improved the king's safety.",
+      },
+    ],
+    candidates: [
+      {
+        uci: "h2h3",
+        label: "h3",
+        rank: 1,
+        explanation:
+          "Best: h3 quietly gives the king an escape square on h2 and reduces the danger of future back-rank mating ideas.",
+      },
+      {
+        uci: "h2h4",
+        label: "h4",
+        rank: 2,
+        explanation:
+          "This also vacates h2, but advancing two squares weakens more dark squares and places the pawn farther from the king.",
+      },
+      {
+        uci: "f2f3",
+        label: "f3",
+        rank: 3,
+        explanation:
+          "It creates an escape square on f2, but it also weakens the diagonal around the king more than h3 does.",
+      },
+      {
+        uci: "g1h1",
+        label: "Kh1",
+        rank: "worst",
+        explanation:
+          "Worst: the king moves deeper into the corner without creating any escape square. The back-rank problem remains.",
+      },
+    ],
+  },
+
+  {
+    id: "clearance-promotion",
+    title: "Clearance Sacrifice for Promotion",
+    category: "Tactic",
+    difficulty: "Advanced",
+    objective: "Clear the promotion square",
+    goal: "Sacrifice the rook so the pawn can promote with tempo.",
+    fen: "6r1/4k1P1/8/8/8/8/8/K6R w - - 0 1",
+    orientation: "white",
+    line: [
+      {
+        uci: "h1h8",
+        label: "Rh8!",
+        note: "This is the key move of the puzzle.",
+      },
+      {
+        uci: "g8h8",
+        label: "...Rxh8",
+        note: "The opponent reply is played automatically.",
+      },
+      {
+        uci: "g7h8q",
+        label: "gxh8=Q",
+        note: "You found the full combination.",
+      },
+    ],
+    candidates: [
+      {
+        uci: "h1h8",
+        label: "Rh8!",
+        rank: 1,
+        explanation:
+          "Best: the rook deliberately enters h8. If Black captures it, the g7-pawn recaptures on h8 and promotes immediately. The rook sacrifice clears the promotion square.",
+      },
+      {
+        uci: "h1h7",
+        label: "Rh7",
+        rank: 2,
+        explanation:
+          "The rook becomes active and attacks along the seventh rank, but it does not force the black rook away from g8.",
+      },
+      {
+        uci: "h1h6",
+        label: "Rh6",
+        rank: 3,
+        explanation:
+          "The rook stays near the pawn, but the promotion problem remains unsolved because g8 is still occupied.",
+      },
+      {
+        uci: "h1h2",
+        label: "Rh2",
+        rank: "worst",
+        explanation:
+          "The rook retreats from the critical eighth rank and gives Black time to blockade the pawn permanently.",
+      },
+    ],
+  },
+  {
+    id: "opera-deflection",
+    title: "Deflection Before the Back-Rank Mate",
+    category: "Checkmate",
+    difficulty: "Advanced",
+    objective: "Mate in 2",
+    goal: "Sacrifice the queen to remove the last defender of the back rank.",
+    fen: "4k3/2Bnpp2/8/8/8/1Q6/8/3R2K1 w - - 0 1",
+    orientation: "white",
+    line: [
+      {
+        uci: "b3b8",
+        label: "Qb8+!",
+        note: "This is the key move of the puzzle.",
+      },
+      {
+        uci: "d7b8",
+        label: "...Nxb8",
+        note: "The opponent reply is played automatically.",
+      },
+      {
+        uci: "d1d8",
+        label: "Rd8#",
+        note: "You found the full combination.",
+      },
+    ],
+    candidates: [
+      {
+        uci: "b3b8",
+        label: "Qb8+!",
+        rank: 1,
+        explanation:
+          "Best: the queen sacrifice forces the knight away from d7. Once the knight captures on b8, the d-file is completely open and Rd8 is mate.",
+      },
+      {
+        uci: "b3b7",
+        label: "Qb7",
+        rank: 2,
+        explanation:
+          "The queen enters the seventh rank and keeps pressure, but the knight remains on d7 and continues to block the mating rook.",
+      },
+      {
+        uci: "b3a3",
+        label: "Qa3",
+        rank: 3,
+        explanation:
+          "The queen remains active, but the move does nothing to remove the defender on d7.",
+      },
+      {
+        uci: "b3c3",
+        label: "Qc3",
+        rank: "worst",
+        explanation:
+          "The queen steps away from the forcing line and gives Black time to consolidate the back rank.",
+      },
+    ],
+  },
+  {
+    id: "bodens-mate",
+    title: "Boden's Mate",
+    category: "Checkmate",
+    difficulty: "Advanced",
+    objective: "Mate in 2",
+    goal: "Sacrifice the queen to open both diagonals around the king.",
+    fen: "2k5/1p1p4/2n1N3/2Q5/8/8/8/1R3BK1 w - - 0 1",
+    orientation: "white",
+    line: [
+      {
+        uci: "c5c6",
+        label: "Qxc6+!",
+        note: "This is the key move of the puzzle.",
+      },
+      {
+        uci: "b7c6",
+        label: "...bxc6",
+        note: "The opponent reply is played automatically.",
+      },
+      {
+        uci: "f1a6",
+        label: "Ba6#",
+        note: "You found the full combination.",
+      },
+    ],
+    candidates: [
+      {
+        uci: "c5c6",
+        label: "Qxc6+!",
+        rank: 1,
+        explanation:
+          "Best: the queen sacrifice drags the b7-pawn onto c6. That vacates b7, opening the bishop diagonal a6-b7-c8 and the rook's access to b8. Ba6 then creates the classic Boden mating net.",
+      },
+      {
+        uci: "c5a7",
+        label: "Qa7",
+        rank: 2,
+        explanation:
+          "The queen stays near the king and creates pressure, but the b7-pawn continues to block the decisive bishop diagonal.",
+      },
+      {
+        uci: "c5c3",
+        label: "Qc3",
+        rank: 3,
+        explanation:
+          "The queen centralizes safely, but the immediate mating geometry disappears.",
+      },
+      {
+        uci: "c5c1",
+        label: "Qc1",
+        rank: "worst",
+        explanation:
+          "The queen retreats all the way from the attack, surrendering the forcing opportunity around the exposed king.",
+      },
+    ],
+  },
+  {
+    id: "legals-mate",
+    title: "Légal's Mate",
+    category: "Checkmate",
+    difficulty: "Really Hard",
+    objective: "Mate in 3",
+    goal: "Ignore the attacked queen and calculate the mating combination to the end.",
+    fen: "r2qkbnr/ppp2ppp/2np4/4p3/2B1P1b1/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 0 5",
+    orientation: "white",
+    line: [
+      {
+        uci: "f3e5",
+        label: "Nxe5!",
+        note: "This is the key move of the puzzle.",
+      },
+      {
+        uci: "g4d1",
+        label: "...Bxd1",
+        note: "The opponent accepts the queen.",
+      },
+      {
+        uci: "c4f7",
+        label: "Bxf7+",
+        note: "Combination continues",
+      },
+      {
+        uci: "e8e7",
+        label: "...Ke7",
+        note: "The opponent reply is played automatically.",
+      },
+      {
+        uci: "c3d5",
+        label: "Nd5#",
+        note: "You found the full combination.",
+      },
+    ],
+    candidates: [
+      {
+        uci: "f3e5",
+        label: "Nxe5!",
+        rank: 1,
+        explanation:
+          "Best: White appears to abandon the queen, but the point is a forcing mating attack. After ...Bxd1, Bxf7+ drives the king to e7 and Nd5 is mate.",
+      },
+      {
+        uci: "h2h3",
+        label: "h3",
+        rank: 2,
+        explanation:
+          "A sensible move that questions the bishop and preserves the queen, but it misses the tactical chance to end the game immediately.",
+      },
+      {
+        uci: "d2d3",
+        label: "d3",
+        rank: 3,
+        explanation:
+          "A normal developing move, but the position contains a concrete combination that is much stronger than quiet development.",
+      },
+      {
+        uci: "a2a3",
+        label: "a3",
+        rank: "worst",
+        explanation:
+          "A slow flank move ignores the tactical concentration around f7 and allows Black to stabilize the pin on the queen.",
+      },
+    ],
+  },
+  {
+    id: "greek-gift",
+    title: "Greek Gift Attack",
+    category: "Tactic",
+    difficulty: "Really Hard",
+    objective: "Build a mating attack",
+    goal: "Sacrifice the bishop, force the king out, and bring the queen into the attack.",
+    fen: "6k1/5ppp/8/8/8/3B1N2/8/3QR1K1 w - - 0 1",
+    orientation: "white",
+    line: [
+      {
+        uci: "d3h7",
+        label: "Bxh7+!",
+        note: "This is the key move of the puzzle.",
+      },
+      {
+        uci: "g8h7",
+        label: "...Kxh7",
+        note: "The opponent accepts the bishop.",
+      },
+      {
+        uci: "f3g5",
+        label: "Ng5+",
+        note: "Combination continues",
+      },
+      {
+        uci: "h7g8",
+        label: "...Kg8",
+        note: "The opponent reply is played automatically.",
+      },
+      {
+        uci: "d1h5",
+        label: "Qh5!",
+        note: "You built the classic Greek Gift attacking setup.",
+      },
+    ],
+    candidates: [
+      {
+        uci: "d3h7",
+        label: "Bxh7+!",
+        rank: 1,
+        explanation:
+          "Best: the bishop sacrifice destroys the h7 shelter and forces the king away from its normal defensive structure. Ng5+ then gains another tempo and Qh5 brings the queen into the attack.",
+      },
+      {
+        uci: "f3g5",
+        label: "Ng5",
+        rank: 2,
+        explanation:
+          "The knight heads toward the king, but without first removing h7 the attack is less forcing and Black has more defensive resources.",
+      },
+      {
+        uci: "d1e2",
+        label: "Qe2",
+        rank: 3,
+        explanation:
+          "The queen improves, but slowly. The position rewards a forcing sacrifice before Black can reinforce the kingside.",
+      },
+      {
+        uci: "d3c4",
+        label: "Bc4",
+        rank: "worst",
+        explanation:
+          "The bishop leaves the critical h7 diagonal and gives up the defining tactical idea of the position.",
+      },
+    ],
+  },
+
+  {
+    id: "trade-queens-when-ahead",
+    title: "Trade Queens When You Are Ahead",
+    category: "Strategy",
+    difficulty: "Beginner",
+    objective: "Simplify when ahead",
+    goal: "You are up a rook. Remove the opponent's queen and reduce counterplay.",
+    fen: "r2q2k1/8/8/8/8/8/8/R2Q2KR w - - 0 1",
+    orientation: "white",
+    line: [
+      {
+        uci: "d1d8",
+        label: "Qxd8+",
+        note: "This is the clean simplifying move.",
+      },
+      {
+        uci: "a8d8",
+        label: "...Rxd8",
+        note: "The queens are gone and your extra rook becomes much easier to use.",
+      },
+    ],
+    candidates: [
+      {
+        uci: "d1d8",
+        label: "Qxd8+",
+        rank: 1,
+        explanation:
+          "Best: when you are clearly ahead in material, trading queens usually reduces the opponent's tactical chances. After ...Rxd8, White still has two rooks against one rook and almost no mating danger.",
+      },
+      {
+        uci: "d1f3",
+        label: "Qf3",
+        rank: 2,
+        explanation:
+          "The queen stays active, but keeping queens on the board gives the losing side more chances for checks, forks and perpetual attacks.",
+      },
+      {
+        uci: "d1e2",
+        label: "Qe2",
+        rank: 3,
+        explanation:
+          "A safe move, but it misses the simplest path. When ahead, ask whether a queen trade can turn a complicated game into an easy endgame.",
+      },
+      {
+        uci: "d1h5",
+        label: "Qh5",
+        rank: "worst",
+        explanation:
+          "The queen moves far from the trade and keeps the position unnecessarily tactical. The player who is ahead usually benefits from reducing danger, not increasing it.",
+      },
+    ],
+  },
+  {
+    id: "keep-queens-when-behind",
+    title: "Keep Queens When You Are Behind",
+    category: "Strategy",
+    difficulty: "Beginner",
+    objective: "Avoid the wrong trade",
+    goal: "You are down a rook. Keep the queens and create checking chances.",
+    fen: "r2q2k1/8/8/8/8/8/8/3Q2K1 w - - 0 1",
+    orientation: "white",
+    line: [
+      {
+        uci: "d1d5",
+        label: "Qd5+",
+        note: "You kept the queen and created immediate activity.",
+      },
+    ],
+    candidates: [
+      {
+        uci: "d1d5",
+        label: "Qd5+",
+        rank: 1,
+        explanation:
+          "Best: when you are behind material, active queens create practical chances. Qd5+ forces the opponent to respond instead of calmly converting the extra rook.",
+      },
+      {
+        uci: "d1f3",
+        label: "Qf3",
+        rank: 2,
+        explanation:
+          "Keeping the queen is correct. Qf3 is active, but a forcing check is even better because it makes the opponent solve an immediate problem.",
+      },
+      {
+        uci: "d1e2",
+        label: "Qe2",
+        rank: 3,
+        explanation:
+          "You correctly avoid the queen trade, but the queen is less active here. When behind, look for checks and threats.",
+      },
+      {
+        uci: "d1d8",
+        label: "Qxd8+",
+        rank: "worst",
+        explanation:
+          "Worst: after ...Rxd8 the queens disappear and White is simply a rook down with almost no counterplay. Simplifying usually helps the side that is already ahead.",
+      },
+    ],
+  },
+  {
+    id: "trade-bad-bishop-for-outpost-knight",
+    title: "Trade a Bad Bishop for a Strong Knight",
+    category: "Strategy",
+    difficulty: "Beginner",
+    objective: "Choose the right exchange",
+    goal: "Remove the opponent's powerful central knight instead of letting it dominate the board.",
+    fen: "6k1/8/4p3/3n4/2B5/8/8/6K1 w - - 0 1",
+    orientation: "white",
+    line: [
+      {
+        uci: "c4d5",
+        label: "Bxd5",
+        note: "You exchanged an ordinary bishop for the opponent's best-placed piece.",
+      },
+      {
+        uci: "e6d5",
+        label: "...exd5",
+        note: "The dangerous knight is gone, and Black is left with a pawn on d5 instead.",
+      },
+    ],
+    candidates: [
+      {
+        uci: "c4d5",
+        label: "Bxd5",
+        rank: 1,
+        explanation:
+          "Best: do not compare pieces only by their nominal value. The knight on d5 is a powerful centralized piece, while the bishop has no comparable target. Exchanging bishop for knight removes Black's strongest piece.",
+      },
+      {
+        uci: "c4b3",
+        label: "Bb3",
+        rank: 2,
+        explanation:
+          "The bishop stays active, but the knight remains on its excellent central square.",
+      },
+      {
+        uci: "c4d3",
+        label: "Bd3",
+        rank: 3,
+        explanation:
+          "The bishop retreats to safety, but White has passed up the chance to remove the dominant knight.",
+      },
+      {
+        uci: "c4f1",
+        label: "Bf1",
+        rank: "worst",
+        explanation:
+          "The bishop becomes passive while the knight keeps its outpost. A good trade is often about piece quality, not just equal point values.",
+      },
+    ],
+  },
+  {
+    id: "open-center-against-king",
+    title: "Open the Center Against an Exposed King",
+    category: "Strategy",
+    difficulty: "Beginner",
+    objective: "Open the center",
+    goal: "The enemy king is stuck in the middle. Open lines before it can become safe.",
+    fen: "4k3/8/8/3p4/2B1P3/8/8/4R1K1 w - - 0 1",
+    orientation: "white",
+    line: [
+      {
+        uci: "e4d5",
+        label: "exd5+",
+        note: "Opening the e-file immediately exposes the king.",
+      },
+    ],
+    candidates: [
+      {
+        uci: "e4d5",
+        label: "exd5+",
+        rank: 1,
+        explanation:
+          "Best: the pawn leaves e4 and opens the e-file for the rook. Because the black king is still on e8, opening the center comes with check and creates immediate pressure.",
+      },
+      {
+        uci: "c4d5",
+        label: "Bxd5",
+        rank: 2,
+        explanation:
+          "You remove the central pawn, but your own e4-pawn still blocks the rook. The center opens less effectively.",
+      },
+      {
+        uci: "c4d3",
+        label: "Bd3",
+        rank: 3,
+        explanation:
+          "The bishop remains useful, but this gives the king time to escape. When the enemy king is exposed, time matters.",
+      },
+      {
+        uci: "e4e5",
+        label: "e5",
+        rank: "worst",
+        explanation:
+          "Worst: e5 closes the center and blocks your own rook. That is exactly what the exposed king wants — fewer open lines and more time.",
+      },
+    ],
+  },
+  {
+    id: "keep-center-closed-own-king",
+    title: "Keep the Center Closed When Your King Is Unsafe",
+    category: "Strategy",
+    difficulty: "Beginner",
+    objective: "Do not open too early",
+    goal: "Your king is still exposed and Black's pieces are ready. Keep the center closed until you are safer.",
+    fen: "4r1k1/8/8/2bp4/4P2q/8/5P1P/4RK2 w - - 0 1",
+    orientation: "white",
+    line: [
+      {
+        uci: "e4e5",
+        label: "e5",
+        note: "You kept the dangerous central file closed.",
+      },
+    ],
+    candidates: [
+      {
+        uci: "e4e5",
+        label: "e5",
+        rank: 1,
+        explanation:
+          "Best: the pawn remains on the e-file and keeps Black's rook from entering. When your own king is vulnerable and the opponent has more active pieces, closing the center can buy the time you need.",
+      },
+      {
+        uci: "f2f3",
+        label: "f3",
+        rank: 2,
+        explanation:
+          "This gives the king some breathing room and attacks the center indirectly, but it weakens dark squares and does not solve the e-file problem as cleanly.",
+      },
+      {
+        uci: "f1g1",
+        label: "Kg1",
+        rank: 3,
+        explanation:
+          "Moving the king toward safety is sensible, but Black still has the option to open the center immediately.",
+      },
+      {
+        uci: "e4d5",
+        label: "exd5",
+        rank: "worst",
+        explanation:
+          "Worst: the e-pawn leaves the file and exposes the rook on e1 to Black's rook on e8. With your king still unsafe, opening lines helps the better-developed attacker.",
+      },
+    ],
+  },
+];
+
+const puzzleDifficultyOrder: Record<PuzzleDifficulty, number> = {
+  Beginner: 0,
+  Intermediate: 1,
+  Advanced: 2,
+  "Really Hard": 3,
+};
+
+const orderedPuzzleIndexes = interactivePuzzles
+  .map((_, index) => index)
+  .sort(
+    (leftIndex, rightIndex) =>
+      puzzleDifficultyOrder[interactivePuzzles[leftIndex].difficulty] -
+      puzzleDifficultyOrder[interactivePuzzles[rightIndex].difficulty],
+  );
+
+function puzzleMoveParts(uci: string) {
+  return {
+    from: uci.slice(0, 2) as Square,
+    to: uci.slice(2, 4) as Square,
+    promotion: uci.length > 4 ? (uci[4] as "q" | "r" | "b" | "n") : undefined,
+  };
+}
+
+function puzzleMoveUci(move: { from: string; to: string; promotion?: string }) {
+  return `${move.from}${move.to}${move.promotion ?? ""}`;
+}
+
+function checkedKingSquare(game: Chess): Square | null {
+  if (!game.isCheck()) {
+    return null;
+  }
+
+  const side = game.turn();
+  const files = "abcdefgh";
+
+  for (let row = 0; row < 8; row += 1) {
+    for (let column = 0; column < 8; column += 1) {
+      const piece = game.board()[row][column];
+
+      if (piece?.type === "k" && piece.color === side) {
+        return `${files[column]}${8 - row}` as Square;
+      }
+    }
+  }
+
+  return null;
+}
+
+type CandidatePreview = {
+  from: Square;
+  to: Square;
+  rank: PuzzleRank;
+  label: string;
+};
+
+function candidatePreviewMarker(rank: PuzzleRank) {
+  if (rank === 1) return "1";
+  if (rank === 2) return "2";
+  if (rank === 3) return "3";
+  return "!";
+}
+
+function candidateFromClass(rank: PuzzleRank) {
+  if (rank === 1) {
+    return "ring-4 ring-inset ring-emerald-300/95 bg-emerald-400/20";
+  }
+
+  if (rank === 2) {
+    return "ring-4 ring-inset ring-orange-200/95 bg-orange-300/28";
+  }
+
+  if (rank === 3) {
+    return "ring-4 ring-inset ring-amber-400/85 bg-amber-600/18";
+  }
+
+  return "ring-4 ring-inset ring-red-300/95 bg-red-400/20";
+}
+
+function candidateToClass(rank: PuzzleRank) {
+  if (rank === 1) {
+    return "ring-4 ring-inset ring-emerald-200 bg-emerald-400/48";
+  }
+
+  if (rank === 2) {
+    return "ring-4 ring-inset ring-orange-100 bg-orange-300/58";
+  }
+
+  if (rank === 3) {
+    return "ring-4 ring-inset ring-amber-300/85 bg-amber-600/38";
+  }
+
+  return "ring-4 ring-inset ring-red-200 bg-red-400/48";
+}
+
+function selectedCandidateCardClass(rank: PuzzleRank) {
+  if (rank === 1) return "ring-2 ring-emerald-300/80";
+  if (rank === 2) return "ring-2 ring-orange-200/90";
+  if (rank === 3) return "ring-2 ring-amber-400/75";
+  return "ring-2 ring-red-300/80";
+}
+
+function InteractivePuzzleBoard({
+  fen,
+  orientation,
+  selectedSquare,
+  legalSquares,
+  lastMove,
+  candidatePreview,
+  disabled,
+  onSquareClick,
+}: {
+  fen: string;
+  orientation: "white" | "black";
+  selectedSquare: Square | null;
+  legalSquares: Square[];
+  lastMove: { from: Square; to: Square } | null;
+  candidatePreview: CandidatePreview | null;
+  disabled: boolean;
+  onSquareClick: (square: Square) => void;
+}) {
+  const game = new Chess(fen);
+  const checkedSquare = checkedKingSquare(game);
+
+  const files =
+    orientation === "white"
+      ? ["a", "b", "c", "d", "e", "f", "g", "h"]
+      : ["h", "g", "f", "e", "d", "c", "b", "a"];
+
+  const ranks =
+    orientation === "white"
+      ? [8, 7, 6, 5, 4, 3, 2, 1]
+      : [1, 2, 3, 4, 5, 6, 7, 8];
+
+  return (
+    <div className="mx-auto w-full max-w-[560px]">
+      <div className="overflow-hidden rounded-3xl border border-white/10 bg-[#1a120d] p-2 shadow-2xl shadow-black/30">
+        <div className="grid grid-cols-8 overflow-hidden rounded-2xl">
+          {ranks.flatMap((rank, rankIndex) =>
+            files.map((file, fileIndex) => {
+              const square = `${file}${rank}` as Square;
+              const piece = game.get(square);
+              const isLight = (rank + files.indexOf(file)) % 2 !== 0;
+              const isSelected = selectedSquare === square;
+              const isLegal = legalSquares.includes(square);
+              const isCapture = isLegal && Boolean(piece);
+              const isLastMove =
+                lastMove?.from === square || lastMove?.to === square;
+              const isChecked = checkedSquare === square;
+              const isCandidateFrom = candidatePreview?.from === square;
+              const isCandidateTo = candidatePreview?.to === square;
+
+              const pieceCode = piece
+                ? (`${piece.color}${piece.type}` as MiniPieceCode)
+                : null;
+
+              return (
+                <button
+                  key={square}
+                  type="button"
+                  disabled={disabled}
+                  onClick={() => onSquareClick(square)}
+                  className={`
+                    relative
+                    flex
+                    aspect-square
+                    items-center
+                    justify-center
+                    overflow-hidden
+                    transition
+                    ${isLight ? "bg-[#ddc6a0]" : "bg-[#8a5b3c]"}
+                    ${disabled ? "cursor-default" : "cursor-pointer"}
+                  `}
+                  title={square}
+                >
+                  {isLastMove && (
+                    <span className="pointer-events-none absolute inset-0 bg-amber-300/28" />
+                  )}
+
+                  {isCandidateFrom && candidatePreview && (
+                    <span
+                      className={`
+                        pointer-events-none
+                        absolute
+                        inset-0
+                        z-[4]
+                        ${candidateFromClass(candidatePreview.rank)}
+                      `}
+                    />
+                  )}
+
+                  {isCandidateTo && candidatePreview && (
+                    <>
+                      <span
+                        className={`
+                          pointer-events-none
+                          absolute
+                          inset-0
+                          z-[4]
+                          ${candidateToClass(candidatePreview.rank)}
+                        `}
+                      />
+
+                      <span
+                        className="
+                          pointer-events-none
+                          absolute
+                          right-1
+                          top-1
+                          z-20
+                          flex
+                          h-5
+                          min-w-5
+                          items-center
+                          justify-center
+                          rounded-full
+                          border
+                          border-black/20
+                          bg-zinc-950/80
+                          px-1
+                          text-[9px]
+                          font-black
+                          text-white
+                          shadow
+                        "
+                      >
+                        {candidatePreviewMarker(candidatePreview.rank)}
+                      </span>
+                    </>
+                  )}
+
+                  {isSelected && (
+                    <span className="pointer-events-none absolute inset-0 ring-4 ring-inset ring-sky-300/90" />
+                  )}
+
+                  {isChecked && (
+                    <span className="pointer-events-none absolute inset-0 bg-red-500/40 ring-4 ring-inset ring-red-200/80" />
+                  )}
+
+                  {isLegal && !isCapture && (
+                    <span className="pointer-events-none absolute h-[28%] w-[28%] rounded-full bg-emerald-950/45 ring-2 ring-emerald-100/60" />
+                  )}
+
+                  {isCapture && (
+                    <span className="pointer-events-none absolute inset-[7%] rounded-full border-[4px] border-amber-200/75" />
+                  )}
+
+                  {pieceCode && (
+                    <span
+                      className={`
+                        relative
+                        z-10
+                        select-none
+                        font-serif
+                        text-[30px]
+                        leading-none
+                        drop-shadow-[0_2px_2px_rgba(0,0,0,0.55)]
+                        sm:text-[40px]
+                        lg:text-[46px]
+                        ${piece?.color === "w" ? "text-[#fff3d5]" : "text-[#17120f]"}
+                      `}
+                    >
+                      {miniPieceSymbols[pieceCode]}
+                    </span>
+                  )}
+
+                  {(fileIndex === 0 || rankIndex === ranks.length - 1) && (
+                    <span
+                      className={`
+                        pointer-events-none
+                        absolute
+                        text-[8px]
+                        font-black
+                        ${isLight ? "text-[#76583d]" : "text-[#ead5b1]/75"}
+                        ${fileIndex === 0 ? "left-1 top-1" : "bottom-1 right-1"}
+                      `}
+                    >
+                      {fileIndex === 0 ? rank : file}
+                    </span>
+                  )}
+                </button>
+              );
+            }),
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function candidateRankLabel(rank: PuzzleRank) {
+  if (rank === 1) return "Best move";
+  if (rank === 2) return "2nd choice";
+  if (rank === 3) return "3rd choice";
+  return "Worst move";
+}
+
+function candidateRankClass(rank: PuzzleRank) {
+  if (rank === 1) {
+    return "border-emerald-400/20 bg-emerald-400/[0.07] text-emerald-300";
+  }
+
+  if (rank === 2) {
+    return "border-orange-300/35 bg-orange-300/[0.11] text-orange-200";
+  }
+
+  if (rank === 3) {
+    return "border-amber-500/20 bg-amber-600/[0.055] text-amber-400";
+  }
+
+  return "border-red-400/20 bg-red-400/[0.07] text-red-300";
+}
+
+function compactPuzzleTitle(title: string) {
+  if (title.length <= 24) {
+    return title;
+  }
+
+  const words = title.split(" ");
+
+  if (words.length <= 3) {
+    return title;
+  }
+
+  return `${words.slice(0, 3).join(" ")}…`;
+}
+
+function feedbackRankClass(rank: PuzzleRank) {
+  if (rank === 1) {
+    return "border-emerald-400/30 bg-emerald-400/[0.10]";
+  }
+
+  if (rank === 2) {
+    return "border-orange-300/40 bg-orange-300/[0.12]";
+  }
+
+  if (rank === 3) {
+    return "border-amber-500/25 bg-amber-600/[0.065]";
+  }
+
+  return "border-red-400/30 bg-red-400/[0.10]";
+}
+
+function PuzzlesTab() {
+  const t = useT();
+
+  const [filter, setFilter] = useState<"All" | PuzzleCategory>("All");
+  const [puzzleIndex, setPuzzleIndex] = useState(0);
+  const puzzle = interactivePuzzles[puzzleIndex];
+
+  const [fen, setFen] = useState(puzzle.fen);
+  const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
+  const [legalSquares, setLegalSquares] = useState<Square[]>([]);
+  const [lastMove, setLastMove] = useState<{
+    from: Square;
+    to: Square;
+  } | null>(null);
+  const [lineStep, setLineStep] = useState(0);
+  const [feedback, setFeedback] = useState<PuzzleFeedback | null>(null);
+  const [showAnalysis, setShowAnalysis] = useState(false);
+  const [autoReplying, setAutoReplying] = useState(false);
+  const [candidatePreview, setCandidatePreview] =
+    useState<CandidatePreview | null>(null);
+
+  const solved = lineStep >= puzzle.line.length;
+
+  const visiblePuzzleIndexes = orderedPuzzleIndexes
+    .map((index) => ({
+      item: interactivePuzzles[index],
+      index,
+    }))
+    .filter(({ item }) => filter === "All" || item.category === filter);
+
+  const displayedPuzzleNumber = orderedPuzzleIndexes.indexOf(puzzleIndex) + 1;
+
+  function resetPuzzle(nextIndex = puzzleIndex) {
+    const nextPuzzle = interactivePuzzles[nextIndex];
+
+    setPuzzleIndex(nextIndex);
+    setFen(nextPuzzle.fen);
+    setSelectedSquare(null);
+    setLegalSquares([]);
+    setLastMove(null);
+    setLineStep(0);
+    setFeedback(null);
+    setShowAnalysis(false);
+    setAutoReplying(false);
+    setCandidatePreview(null);
+  }
+
+  function changeFilter(nextFilter: "All" | PuzzleCategory) {
+    setFilter(nextFilter);
+
+    if (nextFilter === "All" || puzzle.category === nextFilter) {
+      return;
+    }
+
+    const firstMatch = interactivePuzzles.findIndex(
+      (item) => item.category === nextFilter,
+    );
+
+    if (firstMatch >= 0) {
+      resetPuzzle(firstMatch);
+    }
+  }
+
+  function nextPuzzle() {
+    const currentOrderedIndex = orderedPuzzleIndexes.indexOf(puzzleIndex);
+
+    const nextOrderedIndex =
+      (currentOrderedIndex + 1) % orderedPuzzleIndexes.length;
+
+    resetPuzzle(orderedPuzzleIndexes[nextOrderedIndex]);
+  }
+
+  function attemptMove(from: Square, to: Square) {
+    if (autoReplying || solved || lineStep % 2 === 1) {
+      return;
+    }
+
+    const game = new Chess(fen);
+    let move;
+
+    try {
+      const movingPiece = game.get(from);
+      const needsPromotion =
+        movingPiece?.type === "p" && (to[1] === "8" || to[1] === "1");
+
+      move = game.move(
+        needsPromotion
+          ? {
+              from,
+              to,
+              promotion: "q",
+            }
+          : {
+              from,
+              to,
+            },
+      );
+    } catch {
+      move = null;
+    }
+
+    if (!move) {
+      setFeedback({
+        tone: "warning",
+        title: "Try another move.",
+        text: "That move is not legal in this position.",
+      });
+      return;
+    }
+
+    const playedUci = puzzleMoveUci(move);
+    const expected = puzzle.line[lineStep];
+    const candidate =
+      lineStep === 0
+        ? puzzle.candidates.find((item) => item.uci === playedUci)
+        : undefined;
+
+    setSelectedSquare(null);
+    setLegalSquares([]);
+    setCandidatePreview(null);
+    setShowAnalysis(true);
+
+    if (playedUci !== expected.uci) {
+      setFeedback({
+        tone: "warning",
+        rank: candidate?.rank,
+        title: candidate
+          ? candidateRankLabel(candidate.rank)
+          : "Try another move.",
+        moveLabel: candidate?.label ?? move.san,
+        text:
+          lineStep > 0
+            ? "The combination breaks here. Return to the forcing line."
+            : (candidate?.explanation ??
+              "Legal move, but not one of the four teaching candidates."),
+      });
+
+      return;
+    }
+
+    setFen(game.fen());
+    setLastMove({
+      from: move.from,
+      to: move.to,
+    });
+
+    const nextStep = lineStep + 1;
+    setLineStep(nextStep);
+
+    if (nextStep >= puzzle.line.length) {
+      setFeedback({
+        tone: "success",
+        rank: 1,
+        title: "Solved!",
+        moveLabel: expected.label,
+        text: "You found the full combination.",
+      });
+      return;
+    }
+
+    setFeedback({
+      tone: "success",
+      rank: 1,
+      title: lineStep === 0 ? "Correct!" : "Combination continues",
+      moveLabel: expected.label,
+      text:
+        expected.note ??
+        (lineStep === 0 ? "Excellent move." : "Now finish the combination."),
+    });
+  }
+
+  function handleSquareClick(square: Square) {
+    if (autoReplying || solved || lineStep % 2 === 1) {
+      return;
+    }
+
+    setCandidatePreview(null);
+
+    const game = new Chess(fen);
+
+    if (!selectedSquare) {
+      const piece = game.get(square);
+
+      if (!piece || piece.color !== game.turn()) {
+        return;
+      }
+
+      setSelectedSquare(square);
+      setLegalSquares(
+        game
+          .moves({
+            square,
+            verbose: true,
+          })
+          .map((move) => move.to),
+      );
+      return;
+    }
+
+    if (legalSquares.includes(square)) {
+      attemptMove(selectedSquare, square);
+      return;
+    }
+
+    const clickedPiece = game.get(square);
+
+    if (clickedPiece?.color === game.turn()) {
+      setSelectedSquare(square);
+      setLegalSquares(
+        game
+          .moves({
+            square,
+            verbose: true,
+          })
+          .map((move) => move.to),
+      );
+      return;
+    }
+
+    setSelectedSquare(null);
+    setLegalSquares([]);
+  }
+
+  useEffect(() => {
+    if (solved || lineStep >= puzzle.line.length || lineStep % 2 === 0) {
+      return;
+    }
+
+    setAutoReplying(true);
+
+    const timer = window.setTimeout(() => {
+      const game = new Chess(fen);
+      const reply = puzzle.line[lineStep];
+      const parts = puzzleMoveParts(reply.uci);
+
+      let move;
+
+      try {
+        move = game.move(parts);
+      } catch {
+        move = null;
+      }
+
+      if (!move) {
+        setAutoReplying(false);
+        return;
+      }
+
+      setFen(game.fen());
+      setLastMove({
+        from: move.from,
+        to: move.to,
+      });
+
+      const nextStep = lineStep + 1;
+      setLineStep(nextStep);
+      setAutoReplying(false);
+
+      setFeedback({
+        tone: "info",
+        title: "Opponent reply",
+        moveLabel: reply.label,
+        text:
+          nextStep < puzzle.line.length
+            ? "Your move again"
+            : (reply.note ?? "Combination continues"),
+      });
+    }, 700);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [fen, lineStep, puzzle, solved]);
+
+  const activeFeedbackRank = candidatePreview?.rank ?? feedback?.rank;
+
+  const feedbackClass =
+    activeFeedbackRank !== undefined
+      ? feedbackRankClass(activeFeedbackRank)
+      : feedback?.tone === "success"
+        ? "border-emerald-400/20 bg-emerald-400/[0.07]"
+        : feedback?.tone === "warning"
+          ? "border-red-400/20 bg-red-400/[0.07]"
+          : "border-violet-400/20 bg-violet-400/[0.07]";
+
+  return (
+    <div>
+      <SectionHeading
+        eyebrow="Interactive Chess Puzzles"
+        title="Find the best move"
+        description="Play the position, get instant feedback, and learn why moves work."
+      />
+
+      <div className="mt-5 flex flex-wrap gap-2">
+        {(
+          [
+            ["All", "All puzzles"],
+            ["Tactic", "Tactics"],
+            ["Checkmate", "Checkmates"],
+            ["Strategy", "Strategy"],
+            ["Endgame", "Endgame"],
+          ] as const
+        ).map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => changeFilter(value)}
+            className={`
+              rounded-full
+              border
+              px-3
+              py-1.5
+              text-xs
+              font-black
+              transition
+              ${
+                filter === value
+                  ? "border-amber-400/25 bg-amber-400/10 text-amber-200"
+                  : "border-white/10 bg-white/5 text-zinc-500 hover:bg-white/10"
+              }
+            `}
+          >
+            {t(label)}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-5 grid gap-5 xl:grid-cols-[360px_minmax(0,1fr)_360px] 2xl:grid-cols-[400px_minmax(0,1fr)_360px]">
+        <aside className="rounded-3xl border border-white/10 bg-zinc-900/55 p-4">
+          <div className="rounded-2xl border border-white/8 bg-black/20 p-3">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600">
+                {t("Difficulty progression")}
+              </p>
+
+              <span className="rounded-full border border-white/8 bg-white/[0.04] px-2 py-1 text-[9px] font-black text-zinc-500">
+                {visiblePuzzleIndexes.length} / {interactivePuzzles.length}
+              </span>
+            </div>
+
+            <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[9px] font-black">
+              <span className="rounded-full border border-emerald-400/15 bg-emerald-400/[0.06] px-2 py-1 text-emerald-300">
+                {t("Beginner")}
+              </span>
+
+              <span className="text-zinc-700">→</span>
+
+              <span className="rounded-full border border-sky-400/15 bg-sky-400/[0.06] px-2 py-1 text-sky-300">
+                {t("Intermediate")}
+              </span>
+
+              <span className="text-zinc-700">→</span>
+
+              <span className="rounded-full border border-violet-400/15 bg-violet-400/[0.06] px-2 py-1 text-violet-300">
+                {t("Advanced")}
+              </span>
+
+              <span className="text-zinc-700">→</span>
+
+              <span className="rounded-full border border-red-400/15 bg-red-400/[0.06] px-2 py-1 text-red-300">
+                {t("Really Hard")}
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-3 max-h-[800px] overflow-y-auto pr-1">
+            <div className="grid grid-cols-2 gap-2">
+              {visiblePuzzleIndexes.map(({ item, index }) => {
+                const isActive = index === puzzleIndex;
+
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => resetPuzzle(index)}
+                    className={`
+                      group
+                      relative
+                      min-h-[146px]
+                      rounded-[1.4rem]
+                      border
+                      p-3
+                      text-left
+                      transition
+                      hover:-translate-y-0.5
+                      ${
+                        isActive
+                          ? "border-amber-400/30 bg-amber-400/[0.09] shadow-[0_0_0_1px_rgba(251,191,36,0.08)]"
+                          : "border-white/8 bg-black/20 hover:bg-white/[0.045]"
+                      }
+                    `}
+                  >
+                    <span className="pointer-events-none absolute -right-1 -top-1 h-5 w-5 rounded-full border border-white/10 bg-zinc-950/85" />
+                    <span className="pointer-events-none absolute -left-1 bottom-4 h-4 w-4 rounded-full border border-white/8 bg-zinc-950/85" />
+
+                    <div className="flex items-start justify-between gap-2">
+                      <span
+                        className={`
+                          rounded-full
+                          border
+                          px-2
+                          py-1
+                          text-[9px]
+                          font-black
+                          ${
+                            item.difficulty === "Beginner"
+                              ? "border-emerald-400/15 bg-emerald-400/[0.06] text-emerald-300"
+                              : item.difficulty === "Intermediate"
+                                ? "border-sky-400/15 bg-sky-400/[0.06] text-sky-300"
+                                : item.difficulty === "Advanced"
+                                  ? "border-violet-400/15 bg-violet-400/[0.06] text-violet-300"
+                                  : "border-red-400/15 bg-red-400/[0.06] text-red-300"
+                          }
+                        `}
+                      >
+                        {t(item.difficulty)}
+                      </span>
+
+                      <span className="rounded-full border border-white/8 bg-white/[0.04] px-2 py-1 text-[9px] font-black text-zinc-500">
+                        {index + 1}
+                      </span>
+                    </div>
+
+                    <div className="mt-2">
+                      <p className="line-clamp-2 text-[13px] font-black leading-[1.15rem] text-zinc-100">
+                        {t(compactPuzzleTitle(item.title))}
+                      </p>
+
+                      <p className="mt-2 line-clamp-2 text-[10px] leading-[1rem] text-zinc-500">
+                        {t(item.objective)}
+                      </p>
+                    </div>
+
+                    <div className="mt-3 flex items-end justify-between gap-2">
+                      <span className="rounded-full border border-white/8 bg-black/20 px-2 py-1 text-[9px] font-black text-zinc-500">
+                        {t(item.category)}
+                      </span>
+
+                      <span
+                        className={`
+                          text-[10px]
+                          font-black
+                          transition
+                          ${isActive ? "text-amber-300" : "text-zinc-600 group-hover:text-zinc-400"}
+                        `}
+                      >
+                        {isActive ? t("Selected") : "→"}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </aside>
+
+        <section className="min-w-0 rounded-3xl border border-white/10 bg-zinc-900/65 p-4 sm:p-5">
+          <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-400">
+                {t("Puzzle")} {displayedPuzzleNumber} /{" "}
+                {interactivePuzzles.length}
+              </p>
+
+              <h3 className="mt-1 text-xl font-black text-white">
+                {t(puzzle.title)}
+              </h3>
+
+              <p className="mt-1 text-xs text-zinc-500">
+                <span className="font-black text-zinc-400">{t("Goal")}:</span>{" "}
+                {t(puzzle.goal)}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <span className="rounded-full border border-violet-400/15 bg-violet-400/[0.06] px-2.5 py-1 text-[10px] font-black text-violet-300">
+                {t(puzzle.difficulty)}
+              </span>
+
+              <span className="rounded-full border border-amber-400/15 bg-amber-400/[0.06] px-2.5 py-1 text-[10px] font-black text-amber-300">
+                {t(puzzle.objective)}
+              </span>
+            </div>
+          </div>
+
+          <InteractivePuzzleBoard
+            fen={fen}
+            orientation={puzzle.orientation}
+            selectedSquare={selectedSquare}
+            legalSquares={legalSquares}
+            lastMove={lastMove}
+            candidatePreview={candidatePreview}
+            disabled={autoReplying || solved || lineStep % 2 === 1}
+            onSquareClick={handleSquareClick}
+          />
+
+          <div className="mt-4 rounded-2xl border border-white/8 bg-black/20 p-3">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-xs font-bold text-zinc-400">
+                {autoReplying
+                  ? t("Opponent reply")
+                  : solved
+                    ? t("Solved!")
+                    : lineStep > 0
+                      ? t("Your move again")
+                      : t("Select a piece and make your move.")}
+              </p>
+
+              {puzzle.line.length > 1 && (
+                <span className="text-[10px] font-bold text-zinc-600">
+                  {t("The opponent reply is played automatically.")}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => resetPuzzle()}
+              className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-zinc-400 transition hover:bg-white/10 hover:text-white"
+            >
+              ↺ {t("Reset puzzle")}
+            </button>
+
+            <button
+              type="button"
+              onClick={nextPuzzle}
+              className="rounded-xl border border-amber-400/20 bg-amber-400/10 px-3 py-2 text-xs font-black text-amber-200 transition hover:bg-amber-400/20"
+            >
+              {t("Next puzzle")} →
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowAnalysis((value) => !value)}
+              className="rounded-xl border border-sky-400/15 bg-sky-400/[0.06] px-3 py-2 text-xs font-black text-sky-300 transition hover:bg-sky-400/10"
+            >
+              {showAnalysis ? t("Hide move analysis") : t("Show move analysis")}
+            </button>
+          </div>
+        </section>
+
+        <aside className="space-y-4">
+          <section className={`rounded-3xl border p-4 ${feedbackClass}`}>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
+              {t("Feedback")}
+            </p>
+
+            {feedback ? (
+              <>
+                <div className="mt-2 flex items-center justify-between gap-3">
+                  <h3 className="font-black text-white">{t(feedback.title)}</h3>
+
+                  {feedback.moveLabel && (
+                    <span className="rounded-lg border border-white/10 bg-black/20 px-2 py-1 font-mono text-xs font-black text-zinc-200">
+                      {feedback.moveLabel}
+                    </span>
+                  )}
+                </div>
+
+                <p className="mt-2 text-xs leading-5 text-zinc-400">
+                  {t(feedback.text)}
+                </p>
+              </>
+            ) : (
+              <p className="mt-2 text-xs leading-5 text-zinc-500">
+                {t("Select a piece and make your move.")}
+              </p>
+            )}
+          </section>
+
+          {showAnalysis && (
+            <section className="rounded-3xl border border-white/10 bg-zinc-900/65 p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="font-black text-white">
+                    {t("Candidate move analysis")}
+                  </h3>
+
+                  <p className="mt-1 text-[10px] leading-4 text-zinc-600">
+                    {t(
+                      "Curated teaching ranking — not a live engine evaluation.",
+                    )}
+                  </p>
+
+                  <p className="mt-1 text-[10px] font-bold leading-4 text-zinc-500">
+                    {t("Click a move to highlight it on the board.")}
+                  </p>
+                </div>
+
+                <span className="text-xl">♟</span>
+              </div>
+
+              <div className="mt-4 space-y-2">
+                {puzzle.candidates.map((candidate) => {
+                  const parts = puzzleMoveParts(candidate.uci);
+                  const selected =
+                    candidatePreview?.from === parts.from &&
+                    candidatePreview?.to === parts.to &&
+                    candidatePreview?.rank === candidate.rank;
+
+                  return (
+                    <button
+                      key={candidate.uci}
+                      type="button"
+                      onClick={() =>
+                        setCandidatePreview((current) =>
+                          current?.from === parts.from &&
+                          current?.to === parts.to &&
+                          current?.rank === candidate.rank
+                            ? null
+                            : {
+                                from: parts.from,
+                                to: parts.to,
+                                rank: candidate.rank,
+                                label: candidate.label,
+                              },
+                        )
+                      }
+                      className={`
+                        w-full
+                        rounded-2xl
+                        border
+                        p-3
+                        text-left
+                        transition
+                        hover:-translate-y-0.5
+                        hover:brightness-110
+                        ${candidateRankClass(candidate.rank)}
+                        ${
+                          selected
+                            ? selectedCandidateCardClass(candidate.rank)
+                            : ""
+                        }
+                      `}
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-[10px] font-black uppercase tracking-wider">
+                          {t(candidateRankLabel(candidate.rank))}
+                        </span>
+
+                        <span className="flex items-center gap-2">
+                          {selected && (
+                            <span className="text-[9px] font-black uppercase tracking-wider text-white/70">
+                              {t("Highlighted")}
+                            </span>
+                          )}
+
+                          <span className="font-mono text-sm font-black text-white">
+                            {candidate.label}
+                          </span>
+                        </span>
+                      </div>
+
+                      <p className="mt-2 text-[11px] leading-5 text-zinc-400">
+                        {t(candidate.explanation)}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="mt-4 rounded-2xl border border-white/8 bg-black/20 p-3">
+                <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
+                  {t("Line")}
+                </p>
+
+                <p className="mt-1 font-mono text-xs font-black text-zinc-300">
+                  {puzzle.line.map((move) => move.label).join("  ")}
+                </p>
+              </div>
+            </section>
+          )}
+        </aside>
+      </div>
+    </div>
+  );
+}
+
 export default function ChessRulesAndTips() {
   const [activeTab, setActiveTab] = useState<TabKey>("rules");
   const [language, setLanguage] = useState<Language>("en");
@@ -2946,6 +5676,12 @@ export default function ChessRulesAndTips() {
       description: "Learn recurring patterns",
     },
     {
+      key: "puzzles",
+      label: "Puzzles",
+      icon: "🧩",
+      description: "Solve interactively",
+    },
+    {
       key: "openings",
       label: "Openings",
       icon: "♙",
@@ -2958,7 +5694,7 @@ export default function ChessRulesAndTips() {
       <div
         className="
         min-h-screen
-        bg-[radial-gradient(circle_at_top,#21170f_0%,#111111_38%,#090909_100%)]
+        bg-transparent
         px-4
         py-6
         text-zinc-100
@@ -3079,7 +5815,7 @@ export default function ChessRulesAndTips() {
               </label>
 
               <Link
-                to="/chess"
+                to="/games/chess"
                 className="
                 rounded-full
                 border
@@ -3111,7 +5847,7 @@ export default function ChessRulesAndTips() {
             border-white/10
             bg-zinc-900/70
             p-2
-            md:grid-cols-3
+            md:grid-cols-2 xl:grid-cols-4
           "
           >
             {tabs.map((tab) => {
@@ -3199,6 +5935,7 @@ export default function ChessRulesAndTips() {
           >
             {activeTab === "rules" && <RulesTab />}
             {activeTab === "situations" && <SituationsTab />}
+            {activeTab === "puzzles" && <PuzzlesTab />}
             {activeTab === "openings" && <OpeningsTab />}
           </main>
         </div>

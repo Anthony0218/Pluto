@@ -34,7 +34,7 @@ const difficultyLevels: Record<Difficulty, DifficultySettings> = {
   medium: {
     skillLevel: 1,
     thinkTime: 300,
-    randomMoveChance: 0.05,
+    randomMoveChance: 0.15,
     label: "Normal",
     description: "Solid play with occasional inaccuracies.",
   },
@@ -42,7 +42,7 @@ const difficultyLevels: Record<Difficulty, DifficultySettings> = {
   hard: {
     skillLevel: 5,
     thinkTime: 500,
-    randomMoveChance: 0,
+    randomMoveChance: 0.02,
     label: "Hard",
     description: "Strong tactical play with few mistakes.",
   },
@@ -89,7 +89,7 @@ export default function ChessComputer() {
     <main
       className="
         min-h-screen
-        bg-[radial-gradient(circle_at_top,#21170f_0%,#111111_38%,#090909_100%)]
+        bg-transparent
         px-4
         py-6
         text-zinc-100

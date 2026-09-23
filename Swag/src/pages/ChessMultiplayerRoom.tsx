@@ -91,7 +91,7 @@ export default function ChessMultiplayerRoom() {
   }, [roomCode]);
   useEffect(() => {
     if (room?.status === "playing") {
-      navigate(`/chess/classic/multiplayer/${room.code}/game`);
+      navigate(`/games/chess/classic/multiplayer/${room.code}/game`);
     }
   }, [room?.status, room?.code, navigate]);
   useEffect(() => {
@@ -233,7 +233,7 @@ export default function ChessMultiplayerRoom() {
     <main
       className="
         min-h-screen
-        bg-[radial-gradient(circle_at_top,#21170f_0%,#111111_38%,#090909_100%)]
+        bg-transparent
         px-6
         py-10
         text-white
