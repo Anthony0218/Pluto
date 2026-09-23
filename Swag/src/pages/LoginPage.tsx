@@ -1,13 +1,9 @@
 import { useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 type LoginMode = "login" | "register";
 type Language = "de" | "en";
-
-type LoginPageProps = {
-  onLogin?: (email: string, password: string) => Promise<void> | void;
-  onRegister?: (email: string, password: string) => Promise<void> | void;
-};
 
 const LANGUAGE_STORAGE_KEY = "swag-language";
 
@@ -107,7 +103,9 @@ function getInitialLanguage(): Language {
   return window.navigator.language.toLowerCase().startsWith("de") ? "de" : "en";
 }
 
-export default function LoginPage({ onLogin, onRegister }: LoginPageProps) {
+export default function LoginPage() {
+  const navigate = useNavigate();
+  const { signIn, signUp } = useAuth();
   const [mode, setMode] = useState<LoginMode>("login");
   const [language, setLanguage] = useState<Language>(getInitialLanguage);
   const [email, setEmail] = useState("");
@@ -146,19 +144,25 @@ export default function LoginPage({ onLogin, onRegister }: LoginPageProps) {
 
     try {
       if (mode === "login") {
-        if (!onLogin) {
-          setMessage(t.loginNotConnected);
-          return;
+        const { error } = await signIn(email.trim(), password);
+
+        if (error) {
+          throw error;
         }
 
-        await onLogin(email.trim(), password);
+        navigate("/", { replace: true });
       } else {
-        if (!onRegister) {
-          setMessage(t.registerNotConnected);
-          return;
+        const { error } = await signUp(email.trim(), password);
+
+        if (error) {
+          throw error;
         }
 
-        await onRegister(email.trim(), password);
+        setMessage(
+          language === "de"
+            ? "Konto wurde erstellt. Prüfe gegebenenfalls deine E-Mails zur Bestätigung."
+            : "Account created. Check your email for confirmation if required.",
+        );
       }
     } catch (error) {
       setMessage(error instanceof Error ? error.message : t.genericError);
