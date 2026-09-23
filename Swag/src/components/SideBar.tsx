@@ -1,4 +1,12 @@
-import { BarChart3, Home, Settings, Trophy, Users, LogOut } from "lucide-react";
+import {
+  BarChart3,
+  Home,
+  Settings,
+  Trophy,
+  Users,
+  LogOut,
+  UserRoundPlus,
+} from "lucide-react";
 
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -13,6 +21,11 @@ const navigation = [
     label: "Profile",
     href: "/profile",
     icon: Users,
+  },
+  {
+    label: "Friends",
+    href: "/friends",
+    icon: UserRoundPlus,
   },
   {
     label: "Games",
