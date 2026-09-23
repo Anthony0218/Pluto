@@ -43,6 +43,11 @@ const navigation = [
     icon: BarChart3,
   },
   {
+    label: "Natura",
+    href: "/games/natura",
+    icon: Trophy,
+  },
+  {
     label: "Medieval Kingdoms",
     href: "/games/medieval-kingdoms",
     icon: Trophy,

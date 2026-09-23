@@ -146,6 +146,7 @@ import CreditsPage from "./pages/general/CreditsPage.tsx";
 import MedievalKingdomsRegionPage from "./pages/games/MedievalKingdoms/MedievalKingdomsRegionPage.tsx";
 import LoginPage from "./pages/general/LoginPage.tsx";
 import FriendsPage from "./pages/social/FriendsPage.tsx";
+import NaturaMenu from "./pages/games/natura/naturaMenu.tsx";
 
 const router = createBrowserRouter([
   {
@@ -181,6 +182,11 @@ const router = createBrowserRouter([
         path: "/games/chess",
         element: <ChessMenu />,
       },
+      {
+        path: "/games/natura",
+        element: <NaturaMenu />,
+      },
+
       {
         path: "/games/chess/classic",
         element: <ChessClassicMenu />,
