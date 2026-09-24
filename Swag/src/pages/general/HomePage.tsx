@@ -128,6 +128,16 @@ type Game = {
 
 export const games: Game[] = [
   {
+    title: "Schafkopf",
+    subtitle: "Bayerisches Partnerspiel",
+    description: "Rufspiel, Wenz und Solo mit verbindlichem Zugeben – im Hotseat, gegen KI oder online zu viert.",
+    image: "/images/watten-home.png",
+    route: "/games/schafkopf",
+    tag: "Kartenspiel",
+    features: ["Hotseat", "Gegen KI", "Multiplayer"],
+    finished: true,
+  },
+  {
     title: "Schach",
     subtitle: "Klassische Strategie",
     description:
@@ -175,6 +185,14 @@ export const games: Game[] = [
 ];
 export const gameList = [
   {
+    name: "Schafkopf",
+    description: "Rufspiel, Wenz und Solo – lokal, gegen KI oder online. Mit verpflichtendem Zugeben.",
+    route: "/games/schafkopf",
+    category: "Kartenspiel",
+    image: "/images/watten-game-icon.png",
+    finished: true,
+  },
+  {
     name: "Schach",
     description:
       "Klassisches Schach gegen Freunde, lokal oder gegen Stockfish.",
@@ -216,6 +234,13 @@ const gameTranslationsEn: Record<
   string,
   Pick<Game, "title" | "subtitle" | "description" | "tag" | "features">
 > = {
+  Schafkopf: {
+    title: "Schafkopf",
+    subtitle: "Bavarian partnership game",
+    description: "Rufspiel, Wenz and Solo with enforced legal moves — hotseat, against AI or online with four players.",
+    tag: "Card Game",
+    features: ["Hotseat", "Against AI", "Multiplayer"],
+  },
   Schach: {
     title: "Chess",
     subtitle: "Classic Strategy",

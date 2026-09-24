@@ -147,6 +147,10 @@ import MedievalKingdomsRegionPage from "./pages/games/MedievalKingdoms/MedievalK
 import LoginPage from "./pages/general/LoginPage.tsx";
 import FriendsPage from "./pages/social/FriendsPage.tsx";
 import NaturaMenu from "./pages/games/natura/naturaMenu.tsx";
+import SchafKopfMenuPage from "./pages/schafkopf/SchafKopfMenuPage.tsx";
+import SchafKopfLobbyPage from "./pages/schafkopf/SchafKopfLobbyPage.tsx";
+import SchafkopfGame from "./components/Schafkopf/SchafkopfGame.tsx";
+import SchafkopfMultiplayerGame from "./components/Schafkopf/SchafkopfMultiplayerGame.tsx";
 
 const router = createBrowserRouter([
   {
@@ -200,6 +204,11 @@ const router = createBrowserRouter([
         path: "/games/watten",
         element: <Watten />,
       },
+      { path: "/games/schafkopf", element: <SchafKopfMenuPage /> },
+      { path: "/games/schafkopf/hotseat", element: <SchafkopfGame key="schafkopf-hotseat" mode="hotseat" /> },
+      { path: "/games/schafkopf/ai", element: <SchafkopfGame key="schafkopf-ai" mode="ai" /> },
+      { path: "/games/schafkopf/multiplayer", element: <SchafKopfLobbyPage /> },
+      { path: "/games/schafkopf/multiplayer/:roomCode", element: <SchafkopfMultiplayerGame /> },
 
       {
         path: "/games/watten/hotseat",

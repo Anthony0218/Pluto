@@ -365,7 +365,15 @@ function CameraEffects({ effect }: { effect: CameraEffect }) {
   return null;
 }
 
-function CameraPresetRig({ view }: { view: Chess3DCameraView }) {
+function CameraPresetRig({
+  view,
+  controlsRef,
+  userInteractingRef,
+}: {
+  view: Chess3DCameraView;
+  controlsRef: React.MutableRefObject<any>;
+  userInteractingRef: React.MutableRefObject<boolean>;
+}) {
   const { camera } = useThree();
   const startRef = useRef(new THREE.Vector3());
   const targetRef = useRef(new THREE.Vector3());
@@ -379,10 +387,15 @@ function CameraPresetRig({ view }: { view: Chess3DCameraView }) {
     startRef.current.copy(camera.position);
     targetRef.current.set(...CHESS_3D_CAMERA_POSITIONS[view.preset]);
     progressRef.current = 0;
-  }, [view, camera]);
+
+    if (controlsRef.current) {
+      controlsRef.current.target.set(0, 0.15, 0);
+      controlsRef.current.update();
+    }
+  }, [view, camera, controlsRef]);
 
   useFrame((_, delta) => {
-    if (progressRef.current >= 1) return;
+    if (progressRef.current >= 1 || userInteractingRef.current) return;
 
     progressRef.current = Math.min(1, progressRef.current + delta / 0.58);
 
@@ -391,7 +404,12 @@ function CameraPresetRig({ view }: { view: Chess3DCameraView }) {
 
     camera.position.lerpVectors(startRef.current, targetRef.current, eased);
 
-    camera.lookAt(0, 0.15, 0);
+    if (controlsRef.current) {
+      controlsRef.current.target.set(0, 0.15, 0);
+      controlsRef.current.update();
+    } else {
+      camera.lookAt(0, 0.15, 0);
+    }
   });
 
   return null;
@@ -466,6 +484,8 @@ function Scene({
   lastMove,
   pieceSkin,
   cameraView,
+  controlsRef,
+  userInteractingRef,
 }: {
   visualPieces: VisualPiece[];
   selectedSquare: Square | null;
@@ -481,6 +501,8 @@ function Scene({
   lastMove: Move | null;
   pieceSkin: Chess3DPieceSkin;
   cameraView: Chess3DCameraView;
+  controlsRef: React.MutableRefObject<any>;
+  userInteractingRef: React.MutableRefObject<boolean>;
 }) {
   const legalMoveMap = useMemo(
     () => new Map(legalMoves.map((move) => [move.to, move])),
@@ -556,14 +578,27 @@ function Scene({
       </Suspense>
 
       <CameraEffects effect={cameraEffect} />
-      <CameraPresetRig view={cameraView} />
+      <CameraPresetRig
+        view={cameraView}
+        controlsRef={controlsRef}
+        userInteractingRef={userInteractingRef}
+      />
 
       <OrbitControls
+        ref={controlsRef}
         target={[0, 0.15, 0]}
         enablePan={false}
+        enableDamping
+        dampingFactor={0.08}
         minDistance={6}
         maxDistance={17}
         maxPolarAngle={Math.PI / 2.02}
+        onStart={() => {
+          userInteractingRef.current = true;
+        }}
+        onEnd={() => {
+          userInteractingRef.current = false;
+        }}
       />
     </>
   );
@@ -670,6 +705,8 @@ export default function ChessBoard3D({
     kind: "none",
   });
 
+  const controlsRef = useRef<any>(null);
+  const userInteractingRef = useRef(false);
   const lastExternalMoveIdRef = useRef<number | null>(null);
   const lastMove = moveHistory.at(-1) ?? null;
 
@@ -988,6 +1025,8 @@ export default function ChessBoard3D({
             lastMove={lastMove}
             pieceSkin={pieceSkin}
             cameraView={cameraView}
+            controlsRef={controlsRef}
+            userInteractingRef={userInteractingRef}
           />
         </Canvas>
       </div>

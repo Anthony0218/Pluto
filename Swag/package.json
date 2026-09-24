@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "test:natura": "node --test tests/archerfish.test.mjs",
+    "test:natura": "node --test tests/*.test.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

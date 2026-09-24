@@ -424,3 +424,9 @@ entrypoint = "./functions/make-move/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/make-move/*.html" ]
+
+[functions.schafkopf-multiplayer]
+enabled = true
+# The function authenticates every request with auth.getUser before using service_role.
+verify_jwt = false
+entrypoint = "./functions/schafkopf-multiplayer/index.ts"

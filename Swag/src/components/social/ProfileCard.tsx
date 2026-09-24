@@ -1,6 +1,5 @@
 import type { User } from "@supabase/supabase-js";
 import type { Dispatch, SetStateAction } from "react";
-import "../pages/Profile.css";
 
 type Profile = {
   id: string;

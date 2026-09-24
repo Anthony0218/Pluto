@@ -1,3 +1,5 @@
+import { WILD_SCENARIOS } from "./wildModesData.ts";
+
 export type Role = "falcon" | "mouse";
 export type Mode = "solo" | "duo";
 export type Phase = "ready" | "hunt" | "capture" | "boss" | "end";
@@ -145,7 +147,14 @@ export type ScenarioId =
   | "bridges"
   | "echo"
   | "archerfish"
-  | "flyingfish";
+  | "flyingfish"
+  | "humpback"
+  | "dungbeetle"
+  | "greenheron"
+  | "bolas"
+  | "coconut"
+  | "trapjaw"
+  | "cuttlefish";
 export type Stage = "menu" | "briefing" | "game" | "quiz" | "results";
 export type PlayMode = "hotseat" | "ai";
 export type GameResult = { winner: Player | null; detail: string };
@@ -173,6 +182,7 @@ export const BRIDGE_MAPS = [
   { name: "Moss crossing", required: 8, detour: 8, shortcut: 4 },
 ];
 export const SCENARIOS: Scenario[] = [
+  ...WILD_SCENARIOS,
   {
     id: "archerfish",
     icon: "🐟",
@@ -315,6 +325,241 @@ export const SCENARIOS: Scenario[] = [
         ["Yes", "No, they glide", "Only at night"],
         1,
         "Their enlarged fins act as gliding surfaces; they do not flap them like bird wings.",
+      ),
+    ],
+  },
+  {
+    id: "humpback",
+    icon: "🐋",
+    title: "Bubble Corral",
+    setting: "Open ocean · humpback whales and schooling fish",
+    behaviour:
+      "Humpbacks bubble-netting around prey can concentrate a tight shoal before a feeding lunge. The whale uses a ring of bubbles to trap fish in a small patch of water.",
+    rules: [
+      "Steer the whale around the school and release bubbles to compress the prey into a tighter pocket. Wider loops take longer and let the school scatter.",
+      "When the prey is crowded, dive and lunge through the centre to collect a bigger score. A quick strike brings a smaller haul; a patient line-up can pay off.",
+      "Coral: WASD move, Space bubble, Left Shift dive. Gold: arrows move, Enter bubble, Right Shift dive. The round lasts 45 seconds, and the bigger prey claust develops the highest reward.",
+    ],
+    abstraction:
+      "The crowding mechanic, bubble trail and dive reward are simplified game rules. The real whale behaviour is far more variable, but the basic idea is a bubble corral around food.",
+    source: {
+      label: "University of Hawaiʻi: bubble-net feeding video",
+      url: "https://www.himb.hawaii.edu/news/whale-bubble-net-feeding-documented-by-uh-researchers-through-groundbreaking-video/",
+    },
+    questions: [
+      quiz(
+        "What is a humpback whale trying to do with a bubble ring?",
+        [
+          "Trap prey into a tighter patch",
+          "Build an island",
+          "Hide from sunlight",
+        ],
+        0,
+        "Bubble nets concentrate schooling fish close together.",
+      ),
+      quiz(
+        "What does a wider enclosure cost?",
+        [
+          "More bubble volume",
+          "More time and more escape chances",
+          "No visible change",
+        ],
+        1,
+        "A wider corral gives prey more room to scatter.",
+      ),
+      quiz(
+        "Why might a player delay a lunge?",
+        [
+          "To wait for a denser school",
+          "To get colder water",
+          "To stop the bubbles",
+        ],
+        0,
+        "A tighter patch can give a bigger payoff.",
+      ),
+      quiz(
+        "Which part is a game simplification?",
+        [
+          "Whales feed on schools of fish",
+          "Bubble nets concentrate prey",
+          "Exact time-to-catch is fixed for gameplay",
+        ],
+        2,
+        "The timer and reward structure are designed for a playable round.",
+      ),
+      quiz(
+        "What are the fish doing in the school?",
+        [
+          "Swimming in a dense cluster",
+          "Sleeping on the bottom",
+          "Making nests",
+        ],
+        0,
+        "The fish are moving together as a compact schooling group.",
+      ),
+      quiz(
+        "What does the player control?",
+        [
+          "A whale’s position and bubble trail",
+          "A coral reef",
+          "A cloud layer",
+        ],
+        0,
+        "The game is about steering the whale to make the bubble corral.",
+      ),
+    ],
+  },
+  {
+    id: "dungbeetle",
+    icon: "🪲",
+    title: "Milky Way Express",
+    setting: "Night dunes · dung beetle and the Milky Way",
+    behaviour:
+      "Some nocturnal dung beetles maintain a straight course by orienting to the Milky Way. A temporary cloud cover can briefly interrupt that celestial reference.",
+    rules: [
+      "Roll the beetle’s ball across uneven ground while keeping the little sky map aligned with the Milky Way. A single detour is easy; recovering the original path is the challenge.",
+      "Clouds pass over the sky and briefly hide the stars, so the heading drifts unless you correct it. Avoid obstacles, then re-align before the next turn.",
+      "Coral: WASD roll and brake; Space or Left Shift re-centre on the sky. Gold: arrows roll and brake; Enter or Right Shift re-centre. The objective is a clean straight run with the fewest course corrections.",
+    ],
+    abstraction:
+      "The sky map, drifting direction, obstacle detours and temporary cloud blocks are game rules. The underlying beetle behaviour is inspired by real celestial orientation.",
+    source: {
+      label: "Lund University: dung beetle celestial navigation",
+      url: "https://www.lu.se/publikation/6e6b0a11-b2b5-4d8b-b37d-2a1a7e675149",
+    },
+    questions: [
+      quiz(
+        "What helps a dung beetle keep direction at night?",
+        [
+          "The Milky Way",
+          "The sound of running water",
+          "A bright patch of grass",
+        ],
+        0,
+        "Beetles can use the Milky Way as a celestial compass.",
+      ),
+      quiz(
+        "Why is detouring around an obstacle tricky?",
+        [
+          "It breaks the original heading",
+          "It makes the beetle too large",
+          "It makes the ball heavier",
+        ],
+        0,
+        "A detour can make the animal lose its original direction.",
+      ),
+      quiz(
+        "What do clouds do in the game?",
+        [
+          "Briefly hide the star reference",
+          "Increase the beetle’s speed",
+          "Create rain",
+        ],
+        0,
+        "Cloud cover temporarily obscures the celestial guide.",
+      ),
+      quiz(
+        "Which is the main challenge?",
+        [
+          "Recovering course after a detour",
+          "Stopping all movement",
+          "Moving backward",
+        ],
+        0,
+        "The real challenge is re-aligning and continuing smoothly.",
+      ),
+      quiz(
+        "Why use a small sky view?",
+        [
+          "To keep a heading reference while the beetle rolls",
+          "To measure rain",
+          "To find tree roots",
+        ],
+        0,
+        "The tiny sky map is a simplified navigator display.",
+      ),
+      quiz(
+        "What does the game simplify?",
+        [
+          "A full night sky into a small compass scene",
+          "The beetle’s body shape",
+          "The dung ball shape",
+        ],
+        0,
+        "The game highlights the navigation problem rather than full real-world terrain complexity.",
+      ),
+    ],
+  },
+  {
+    id: "greenheron",
+    icon: "🪶",
+    title: "Bait & Wait",
+    setting: "Pond edge · green heron and wary fish",
+    behaviour:
+      "Green herons may drop floating objects into water to bait fish closer, then strike when prey comes within reach. Timing matters as the lure drifts away.",
+    rules: [
+      "Place bait in the pond, then watch the lure drift with the current. Fish move toward the bait, but they also scatter if the lure drifts too far.",
+      "Strike early for a smaller catch, or wait for a fuller shoal and a better angle while risking that the bait floats away before the fish finish circling it.",
+      "Coral: WASD move, Space place bait, Left Shift strike. Gold: arrows move, Enter place bait, Right Shift strike. A quick lunge is rewarding, but patience can make a better chance.",
+    ],
+    abstraction:
+      "Helplessly drifting bait, fish behaviour and the reach threshold are all game rules to represent the lure-and-wait decision in a compact round.",
+    source: {
+      label: "Audubon: green heron",
+      url: "https://www.audubon.org/field-guide/bird/green-heron",
+    },
+    questions: [
+      quiz(
+        "Why would a heron drop bait or a lure?",
+        ["To attract nearby fish", "To build a nest", "To mark a territory"],
+        0,
+        "Lures can draw fish within striking distance.",
+      ),
+      quiz(
+        "What is the trade-off in waiting?",
+        [
+          "Better opportunity versus bait drift",
+          "Longer wingspan versus deeper water",
+          "More mud versus more light",
+        ],
+        0,
+        "The bait can drift away before the heron gets the best chance.",
+      ),
+      quiz(
+        "Why might an early strike be tempting?",
+        [
+          "It is quick and low risk",
+          "The fish are always larger",
+          "The water becomes calm",
+        ],
+        0,
+        "The first fish to approach may be a smaller, safer catch.",
+      ),
+      quiz(
+        "What does the fish react to?",
+        [
+          "The bait drifting in the water",
+          "The heron’s song",
+          "The pond depth alone",
+        ],
+        0,
+        "The lure can attract fish into the strike zone.",
+      ),
+      quiz(
+        "Which part is a game invention?",
+        [
+          "Herons use lures in some situations",
+          "Bait drifts in a set way for play",
+          "Fish always swim in circles",
+        ],
+        1,
+        "The exact drifting and timing rules are simplified for better play.",
+      ),
+      quiz(
+        "What is the player’s main decision?",
+        ["When to strike", "Whether to eat the fish", "Where to nest"],
+        0,
+        "The timing of the strike is the core challenge.",
       ),
     ],
   },

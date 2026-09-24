@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import NaturaGame from "../../../components/natura/NaturaGame";
+import DidYouKnow from "../../../components/natura/DidYouKnow";
 import { SCENARIOS } from "../../../games/natura/naturaData";
 import type {
   GameResult,
@@ -195,8 +196,8 @@ export default function NaturaMenu() {
             </p>
             <h1>Life in the wild.</h1>
             <p>
-              Chase, bluff, build, listen and aim. Discover an animal behaviour
-              in every round.
+              Chase, bluff, build, launch and disguise. Discover an animal
+              behaviour in every round.
             </p>
             <div className="natura-cards">
               {SCENARIOS.map((s) => (
@@ -215,6 +216,7 @@ export default function NaturaMenu() {
               ))}
             </div>
             <AnimalBox scenario={scenario} />
+            <DidYouKnow key={scenario.id} scenario={scenario.id} />
             <h2>Choose your opponent</h2>
             <div className="natura-options">
               <button
@@ -260,6 +262,7 @@ export default function NaturaMenu() {
             </h1>
             <AnimalBox scenario={scenario} />
             <RulesBox scenario={scenario} mode={match.mode} />
+            <DidYouKnow key={scenario.id} scenario={scenario.id} />
             {scenario.id === "meadow" && (
               <p>
                 <b>{label(0, match.mode)}:</b>{" "}
@@ -306,6 +309,18 @@ export default function NaturaMenu() {
               rulesOpen={gameRulesOpen}
               onComplete={finishGame}
             />
+            {![
+              "trapjaw",
+              "cuttlefish",
+              "flyingfish",
+              "bolas",
+              "coconut",
+              "humpback",
+              "dungbeetle",
+              "greenheron",
+            ].includes(scenario.id) && (
+              <DidYouKnow key={scenario.id} scenario={scenario.id} />
+            )}
           </main>
         )}
         {match.stage === "quiz" && (
@@ -390,6 +405,7 @@ export default function NaturaMenu() {
               </aside>
             )}
             <AnimalBox scenario={scenario} />
+            <DidYouKnow key={scenario.id} scenario={scenario.id} />
             <details>
               <summary>Match scoring history</summary>
               <ul>

@@ -1,5 +1,10 @@
+import ToolAnimalsGame from "./ToolAnimalsGame";
 import type { ReactNode } from "react";
 import ArcherfishGame from "./ArcherfishGame";
+import WildModesGame from "./WildModesGame";
+import HumpbackGame from "./HumpbackGame";
+import DungBeetleGame from "./DungBeetleGame";
+import GreenHeronGame from "./GreenHeronGame";
 import type { AlarmResponse } from "../../games/natura/naturafunctions";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -998,8 +1003,46 @@ export default function NaturaGame({
         <LivingBridges mode={mode} onComplete={onComplete} />
       )}
       {scenario === "echo" && <EchoChase mode={mode} onComplete={onComplete} />}
+      {(scenario === "bolas" || scenario === "coconut") && (
+        <ToolAnimalsGame
+          kind={scenario}
+          mode={mode}
+          rulesOpen={rulesOpen}
+          onComplete={onComplete}
+        />
+      )}
+      {(scenario === "trapjaw" || scenario === "cuttlefish") && (
+        <WildModesGame
+          kind={scenario}
+          mode={mode}
+          round={round}
+          rulesOpen={rulesOpen}
+          onComplete={onComplete}
+        />
+      )}
       {scenario === "archerfish" && (
         <ArcherfishGame
+          mode={mode}
+          rulesOpen={rulesOpen}
+          onComplete={onComplete}
+        />
+      )}
+      {scenario === "humpback" && (
+        <HumpbackGame
+          mode={mode}
+          rulesOpen={rulesOpen}
+          onComplete={onComplete}
+        />
+      )}
+      {scenario === "dungbeetle" && (
+        <DungBeetleGame
+          mode={mode}
+          rulesOpen={rulesOpen}
+          onComplete={onComplete}
+        />
+      )}
+      {scenario === "greenheron" && (
+        <GreenHeronGame
           mode={mode}
           rulesOpen={rulesOpen}
           onComplete={onComplete}
