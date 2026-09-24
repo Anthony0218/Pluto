@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { gameList } from "./HomePage";
+import { gameList } from "../../data/games";
 
 export default function GamesPage() {
   return (

@@ -1,67 +1,90 @@
+import { useEffect, useState } from "react";
+
 import {
-  BarChart3,
-  Home,
-  Settings,
-  Trophy,
-  Users,
+  BookOpen,
+  ChevronDown,
+  Gamepad2,
+  LayoutDashboard,
   LogOut,
-  UserRoundPlus,
+  Settings,
+  UserRound,
+  Users,
 } from "lucide-react";
 
-import { NavLink, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 
-const navigation = [
+import { useAuth } from "../../context/AuthContext";
+import ThemeToggle from "./ThemeToggle";
+
+/* ============================================
+   GAME CATEGORIES
+============================================ */
+
+const gameCategories = [
   {
-    label: "Home",
-    href: "/",
-    icon: Home,
+    label: "Board & Strategy",
+    games: [
+      {
+        label: "Chess",
+        href: "/games/chess",
+      },
+      {
+        label: "Natura",
+        href: "/games/natura",
+      },
+      {
+        label: "Medieval Kingdoms",
+        href: "/games/medieval-kingdoms",
+      },
+    ],
   },
   {
-    label: "Profile",
-    href: "/profile",
-    icon: Users,
-  },
-  {
-    label: "Friends",
-    href: "/friends",
-    icon: UserRoundPlus,
-  },
-  {
-    label: "Games",
-    href: "/games",
-    icon: Trophy,
-  },
-  {
-    label: "Chess",
-    href: "/games/chess",
-    icon: BarChart3,
-  },
-  {
-    label: "Watten",
-    href: "/games/watten",
-    icon: BarChart3,
-  },
-  {
-    label: "Natura",
-    href: "/games/natura",
-    icon: Trophy,
-  },
-  {
-    label: "Medieval Kingdoms",
-    href: "/games/medieval-kingdoms",
-    icon: Trophy,
-  },
-  {
-    label: "Credits",
-    href: "/credits",
-    icon: Trophy,
+    label: "Card Games",
+    games: [
+      {
+        label: "Watten",
+        href: "/games/watten",
+      },
+      {
+        label: "Schafkopf",
+        href: "/games/schafkopf",
+      },
+    ],
   },
 ];
 
+/* ============================================
+   SIDEBAR
+============================================ */
+
 export default function SideBar() {
   const { signOut } = useAuth();
+
   const navigate = useNavigate();
+  const location = useLocation();
+
+  /*
+   * Games should count as active for every
+   * route underneath /games.
+   *
+   * Example:
+   * /games/chess/classic/ai
+   * still highlights Games.
+   */
+  const gamesActive =
+    location.pathname === "/games" || location.pathname.startsWith("/games/");
+
+  const [gamesOpen, setGamesOpen] = useState(gamesActive);
+
+  /*
+   * Automatically open Games when the user
+   * enters a game route directly.
+   */
+  useEffect(() => {
+    if (gamesActive) {
+      setGamesOpen(true);
+    }
+  }, [gamesActive]);
 
   async function handleLogout() {
     await signOut();
@@ -69,87 +92,415 @@ export default function SideBar() {
   }
 
   return (
-    <aside className="flex min-h-screen w-64 flex-col border-r border-zinc-200 bg-white">
-      <div className="flex h-16 items-center border-b border-zinc-200 px-6">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-indigo-600">
-            <img
-              src="/pluto-icon.png"
-              alt="Pluto icon"
-              className="h-full w-full object-cover"
-            />
-          </div>
+    <aside
+      className="
+        flex
+        h-full
+        w-64
+        flex-col
+        border-r
+        border-white/[0.07]
+        bg-[#060a14]/95
+        text-white
+        backdrop-blur-xl
+      "
+    >
+      {/* ========================================
+          NAVIGATION
+      ======================================== */}
 
-          <span className="text-lg font-bold tracking-tight text-zinc-900">
-            Pluto
-          </span>
-        </div>
-      </div>
-
-      <nav className="flex-1 space-y-1 px-3 py-5">
-        <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
-          Navigation
+      <nav
+        className="
+          flex-1
+          overflow-y-auto
+          px-3
+          py-5
+        "
+      >
+        <p
+          className="
+            mb-3
+            px-3
+            text-[10px]
+            font-bold
+            uppercase
+            tracking-[0.2em]
+            text-zinc-600
+          "
+        >
+          Pluto
         </p>
 
-        {navigation.map((item) => {
-          const Icon = item.icon;
+        <div className="space-y-1">
+          {/* DASHBOARD */}
+          <SidebarLink
+            label="Dashboard"
+            href="/dashboard"
+            icon={LayoutDashboard}
+          />
 
-          return (
-            <NavLink
-              key={item.href}
-              to={item.href}
-              className={({ isActive }) =>
-                `group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-                  isActive
-                    ? "bg-indigo-50 text-indigo-700"
-                    : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
-                }`
-              }
+          {/* ====================================
+              GAMES
+          ==================================== */}
+
+          <div>
+            <button
+              type="button"
+              onClick={() => setGamesOpen((current) => !current)}
+              className={`
+                group
+                flex
+                w-full
+                items-center
+                gap-3
+                rounded-xl
+                px-3
+                py-2.5
+                text-left
+                text-sm
+                font-medium
+                transition
+
+                ${
+                  gamesActive
+                    ? `
+                      bg-indigo-500/15
+                      text-indigo-200
+                    `
+                    : `
+                      text-zinc-500
+                      hover:bg-white/[0.04]
+                      hover:text-white
+                    `
+                }
+              `}
             >
-              {({ isActive }) => (
-                <>
-                  <Icon
-                    size={19}
-                    strokeWidth={isActive ? 2.3 : 2}
-                    className={
-                      isActive
-                        ? "text-indigo-600"
-                        : "text-zinc-400 group-hover:text-zinc-600"
-                    }
-                  />
+              <Gamepad2 size={18} strokeWidth={gamesActive ? 2.3 : 2} />
 
-                  <span>{item.label}</span>
-                </>
-              )}
-            </NavLink>
-          );
-        })}
+              <span className="flex-1">Games</span>
+
+              <ChevronDown
+                size={15}
+                className={`
+                  text-zinc-600
+                  transition-transform
+                  duration-200
+
+                  ${gamesOpen ? "rotate-180" : ""}
+                `}
+              />
+            </button>
+
+            {/* ==================================
+                GAMES SUBMENU
+            ================================== */}
+
+            <div
+              className={`
+                grid
+                transition-all
+                duration-200
+                ease-out
+
+                ${
+                  gamesOpen
+                    ? `
+                      grid-rows-[1fr]
+                      opacity-100
+                    `
+                    : `
+                      grid-rows-[0fr]
+                      opacity-0
+                    `
+                }
+              `}
+            >
+              <div className="overflow-hidden">
+                <div
+                  className="
+                    ml-[25px]
+                    mt-1
+                    border-l
+                    border-white/[0.07]
+                    pb-2
+                    pl-3
+                  "
+                >
+                  {/* ALL GAMES */}
+                  <NavLink
+                    to="/games"
+                    end
+                    className={({ isActive }) =>
+                      `
+                        flex
+                        items-center
+                        rounded-lg
+                        px-3
+                        py-2
+                        text-xs
+                        font-medium
+                        transition
+
+                        ${
+                          isActive
+                            ? `
+                              bg-white/[0.06]
+                              text-white
+                            `
+                            : `
+                              text-zinc-500
+                              hover:bg-white/[0.035]
+                              hover:text-zinc-300
+                            `
+                        }
+                      `
+                    }
+                  >
+                    All Games
+                  </NavLink>
+
+                  {/* CATEGORIES */}
+                  {gameCategories.map((category) => (
+                    <div key={category.label} className="mt-4">
+                      <p
+                        className="
+                          mb-1
+                          px-3
+                          text-[9px]
+                          font-bold
+                          uppercase
+                          tracking-[0.18em]
+                          text-zinc-700
+                        "
+                      >
+                        {category.label}
+                      </p>
+
+                      <div className="space-y-0.5">
+                        {category.games.map((game) => {
+                          /*
+                           * We use pathname manually instead
+                           * of NavLink's exact isActive so
+                           * Chess remains highlighted on:
+                           *
+                           * /games/chess/classic
+                           * /games/chess/variants/...
+                           */
+                          const gameActive =
+                            location.pathname === game.href ||
+                            location.pathname.startsWith(`${game.href}/`);
+
+                          return (
+                            <NavLink
+                              key={game.href}
+                              to={game.href}
+                              className={`
+                                flex
+                                items-center
+                                gap-2
+                                rounded-lg
+                                px-3
+                                py-2
+                                text-xs
+                                font-medium
+                                transition
+
+                                ${
+                                  gameActive
+                                    ? `
+                                      bg-indigo-500/10
+                                      text-indigo-200
+                                    `
+                                    : `
+                                      text-zinc-500
+                                      hover:bg-white/[0.035]
+                                      hover:text-zinc-300
+                                    `
+                                }
+                              `}
+                            >
+                              <span
+                                className={`
+                                  h-1
+                                  w-1
+                                  shrink-0
+                                  rounded-full
+
+                                  ${
+                                    gameActive ? "bg-indigo-300" : "bg-zinc-700"
+                                  }
+                                `}
+                              />
+
+                              <span>{game.label}</span>
+                            </NavLink>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* LEARN */}
+          <SidebarLink label="Learn" href="/learn" icon={BookOpen} />
+
+          {/* FRIENDS */}
+          <SidebarLink label="Friends" href="/friends" icon={Users} />
+
+          {/* PROFILE */}
+          <SidebarLink label="Profile" href="/profile" icon={UserRound} />
+        </div>
       </nav>
 
-      <div className="border-t border-zinc-200 p-3">
+      {/* ========================================
+          BOTTOM
+      ======================================== */}
+
+      <div
+        className="
+          space-y-3
+          border-t
+          border-white/[0.07]
+          p-3
+        "
+      >
+        {/* APPEARANCE */}
+        <div>
+          <p
+            className="
+              mb-2
+              px-2
+              text-[10px]
+              font-bold
+              uppercase
+              tracking-[0.18em]
+              text-zinc-600
+            "
+          >
+            Appearance
+          </p>
+
+          <ThemeToggle />
+        </div>
+
+        {/* SETTINGS */}
         <NavLink
           to="/settings"
           className={({ isActive }) =>
-            `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-              isActive
-                ? "bg-zinc-100 text-zinc-900"
-                : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
-            }`
+            `
+              flex
+              items-center
+              gap-3
+              rounded-xl
+              px-3
+              py-2.5
+              text-sm
+              font-medium
+              transition
+
+              ${
+                isActive
+                  ? `
+                    bg-white/[0.06]
+                    text-white
+                  `
+                  : `
+                    text-zinc-500
+                    hover:bg-white/[0.04]
+                    hover:text-white
+                  `
+              }
+            `
           }
         >
-          <Settings size={19} />
-          Settings
+          <Settings size={18} />
+
+          <span>Settings</span>
         </NavLink>
 
+        {/* LOGOUT */}
         <button
           type="button"
           onClick={handleLogout}
-          className="mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-red-50 hover:text-red-600"
+          className="
+            flex
+            w-full
+            items-center
+            gap-3
+            rounded-xl
+            px-3
+            py-2.5
+            text-sm
+            font-medium
+            text-zinc-500
+            transition
+            hover:bg-red-500/10
+            hover:text-red-300
+          "
         >
-          <LogOut size={19} />
-          Log out
+          <LogOut size={18} />
+
+          <span>Log out</span>
         </button>
       </div>
     </aside>
+  );
+}
+
+/* ============================================
+   STANDARD MAIN NAVIGATION LINK
+============================================ */
+
+function SidebarLink({
+  label,
+  href,
+  icon: Icon,
+}: {
+  label: string;
+  href: string;
+  icon: React.ElementType;
+}) {
+  return (
+    <NavLink
+      to={href}
+      className={({ isActive }) =>
+        `
+          group
+          flex
+          items-center
+          gap-3
+          rounded-xl
+          px-3
+          py-2.5
+          text-sm
+          font-medium
+          transition
+
+          ${
+            isActive
+              ? `
+                bg-indigo-500/15
+                text-indigo-200
+              `
+              : `
+                text-zinc-500
+                hover:bg-white/[0.04]
+                hover:text-white
+              `
+          }
+        `
+      }
+    >
+      {({ isActive }) => (
+        <>
+          <Icon size={18} strokeWidth={isActive ? 2.3 : 2} />
+
+          <span>{label}</span>
+        </>
+      )}
+    </NavLink>
   );
 }

@@ -1,5 +1,5 @@
 import { useAuth } from "./context/AuthContext";
-import HomePage from "./pages/general/HomePage";
+import DashboardPage from "./pages/general/DashboardPage";
 
 function App() {
   const { loading } = useAuth();
@@ -12,7 +12,7 @@ function App() {
     );
   }
 
-  return <HomePage />;
+  return <DashboardPage />;
 }
 
 export default App;

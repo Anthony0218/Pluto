@@ -7,6 +7,8 @@ import "./index.css";
 
 import App from "./App";
 import ChessGame from "./pages/games/Chess/ChessGames.tsx";
+import RootLayout from "./components/App/RootLayout.tsx";
+import LandingPage from "./pages/general/LandingPage.tsx";
 
 import AppLayout from "./components/App/AppLayout.tsx";
 import NotFoundPage from "./pages/general/NotFoundPage.tsx";
@@ -15,7 +17,7 @@ import WattenHotseat from "./pages/games/Watten/WattenHotseat.tsx";
 import WattenHotseatPage from "./pages/games/Watten/WattenGamePage.tsx";
 
 import { AuthProvider } from "./context/AuthContext";
-import { ThemeProvider } from "./context/ThemeContext";
+import { ThemeProvider } from "./context/ThemeContext.tsx";
 import WattenRules from "./pages/games/Watten/WattenRules.tsx";
 import { CardThemeProvider } from "./context/CardThemeContext";
 import { TableThemeProvider } from "./context/TableThemeContext";
@@ -154,437 +156,466 @@ import SchafkopfMultiplayerGame from "./components/Schafkopf/SchafkopfMultiplaye
 
 const router = createBrowserRouter([
   {
-    element: <AppLayout />,
+    element: <RootLayout />,
 
     children: [
       {
         path: "/",
-        element: <App />,
+        element: <LandingPage />,
       },
+
+      {
+        path: "/login",
+        element: <LoginPage />,
+      },
+
       {
         path: "/credits",
         element: <CreditsPage />,
       },
       {
-        path: "/login",
-        element: <LoginPage />,
-      },
-      {
-        path: "/games",
-        element: <GamesPage />,
-      },
-      {
-        path: "/profile",
-        element: <ProfilePage />,
-      },
-      {
-        path: "/friends",
-        element: <FriendsPage />,
-      },
+        element: <AppLayout />,
 
-      {
-        path: "/games/chess",
-        element: <ChessMenu />,
-      },
-      {
-        path: "/games/natura",
-        element: <NaturaMenu />,
-      },
+        children: [
+          {
+            path: "/dashboard",
+            element: <App />,
+          },
+          {
+            path: "/credits",
+            element: <CreditsPage />,
+          },
 
-      {
-        path: "/games/chess/classic",
-        element: <ChessClassicMenu />,
-      },
-      {
-        path: "/games/chess/classic/hotseat",
-        element: <ChessGame />,
-      },
+          {
+            path: "/games",
+            element: <GamesPage />,
+          },
+          {
+            path: "/profile",
+            element: <ProfilePage />,
+          },
+          {
+            path: "/friends",
+            element: <FriendsPage />,
+          },
 
-      {
-        path: "/games/watten",
-        element: <Watten />,
-      },
-      { path: "/games/schafkopf", element: <SchafKopfMenuPage /> },
-      { path: "/games/schafkopf/hotseat", element: <SchafkopfGame key="schafkopf-hotseat" mode="hotseat" /> },
-      { path: "/games/schafkopf/ai", element: <SchafkopfGame key="schafkopf-ai" mode="ai" /> },
-      { path: "/games/schafkopf/multiplayer", element: <SchafKopfLobbyPage /> },
-      { path: "/games/schafkopf/multiplayer/:roomCode", element: <SchafkopfMultiplayerGame /> },
+          {
+            path: "/games/chess",
+            element: <ChessMenu />,
+          },
+          {
+            path: "/games/natura",
+            element: <NaturaMenu />,
+          },
 
-      {
-        path: "/games/watten/hotseat",
-        element: <WattenHotseat />,
-      },
+          {
+            path: "/games/chess/classic",
+            element: <ChessClassicMenu />,
+          },
+          {
+            path: "/games/chess/classic/hotseat",
+            element: <ChessGame />,
+          },
 
-      {
-        path: "/games/watten/hotseat/game",
-        element: <WattenHotseatPage />,
-      },
+          {
+            path: "/games/watten",
+            element: <Watten />,
+          },
+          { path: "/games/schafkopf", element: <SchafKopfMenuPage /> },
+          {
+            path: "/games/schafkopf/hotseat",
+            element: <SchafkopfGame key="schafkopf-hotseat" mode="hotseat" />,
+          },
+          {
+            path: "/games/schafkopf/ai",
+            element: <SchafkopfGame key="schafkopf-ai" mode="ai" />,
+          },
+          {
+            path: "/games/schafkopf/multiplayer",
+            element: <SchafKopfLobbyPage />,
+          },
+          {
+            path: "/games/schafkopf/multiplayer/:roomCode",
+            element: <SchafkopfMultiplayerGame />,
+          },
 
-      {
-        path: "/games/watten/rules",
-        element: <WattenRules />,
-      },
-      {
-        path: "/games/watten/multiplayer",
-        element: <WattenMultiplayerLobby />,
-      },
-      {
-        path: "/games/watten/multiplayer/4/:roomCode",
-        element: <WattenMultiplayerGame />,
-      },
-      {
-        path: "/games/watten/multiplayer/3/:roomCode",
-        element: <WattenThreePlayerMultiplayerGame />,
-      },
+          {
+            path: "/games/watten/hotseat",
+            element: <WattenHotseat />,
+          },
 
-      {
-        path: "/games/chess/classic/ai",
-        element: <ChessComputer />,
-      },
-      {
-        path: "/games/chess/classic/multiplayer",
-        element: <ChessMultiplayerLobby />,
-      },
-      {
-        path: "/games/chess/classic/multiplayer/:roomCode",
-        element: <ChessMultiplayerRoom />,
-      },
-      {
-        path: "/games/chess/classic/multiplayer/:roomCode/game",
-        element: <ChessMultiplayerGame />,
-      },
-      {
-        path: "/games/chess/rules",
-        element: <ChessRulesAndTips />,
-      },
-      {
-        path: "/games/chess/variants",
-        element: <ChessVariantsMenu />,
-      },
-      {
-        path: "/games/chess/variants/three-lives/hotseat",
-        element: <ThreeLivesChessBoard />,
-      },
-      {
-        path: "/games/chess/variants/mutation/hotseat",
-        element: <MutationChessBoard />,
-      },
-      {
-        path: "/games/chess/variants/capitalism/hotseat",
-        element: <CapitalismChessBoard />,
-      },
-      {
-        path: "/games/chess/variants/capitalism/rules",
-        element: <CapitalismChessRules />,
-      },
-      {
-        path: "/games/chess/variants/horror/hotseat",
-        element: <HorrorChessBoard />,
-      },
-      {
-        path: "/games/chess/variants/horror/rules",
-        element: <HorrorChessRules />,
-      },
-      {
-        path: "/games/chess/variants/fogofwar/hotseat",
-        element: <FogOfWarChessBoard />,
-      },
-      {
-        path: "/games/chess/variants/fogofwar/rules",
-        element: <FogOfWarChessRules />,
-      },
-      {
-        path: "/games/chess/variants/draft/hotseat",
-        element: <DraftChessBoard />,
-      },
-      {
-        path: "/games/chess/variants/draft/rules",
-        element: <DraftChessRules />,
-      },
-      {
-        path: "/games/chess/variants/mirror/hotseat",
-        element: <MirrorChessBoard />,
-      },
-      {
-        path: "/games/chess/variants/mirror/rules",
-        element: <MirrorChessRules />,
-      },
-      {
-        path: "/games/chess/variants/roulette/hotseat",
-        element: <ChessRouletteBoard />,
-      },
-      {
-        path: "/games/chess/variants/roulette/rules",
-        element: <ChessRouletteRules />,
-      },
-      {
-        path: "/games/chess/variants/hotpotato/hotseat",
-        element: <ChessHotPotatoBoard />,
-      },
-      {
-        path: "/games/chess/variants/hotpotato/rules",
-        element: <ChessHotPotatoRules />,
-      },
-      {
-        path: "/games/chess/variants/collapse/hotseat",
-        element: <ChessCollapseBoard />,
-      },
-      {
-        path: "/games/chess/variants/collapse/rules",
-        element: <ChessCollapseRules />,
-      },
-      {
-        path: "/games/chess/variants/boss/hotseat",
-        element: <BossBattleBoard />,
-      },
-      {
-        path: "/games/chess/variants/boss/rules",
-        element: <BossBattleRules />,
-      },
-      {
-        path: "/games/chess/variants/4-players/hotseat",
-        element: <FourPlayerChess />,
-      },
-      {
-        path: "/games/chess/variants/randomstart/hotseat",
-        element: <RandomStartChess />,
-      },
+          {
+            path: "/games/watten/hotseat/game",
+            element: <WattenHotseatPage />,
+          },
 
-      {
-        path: "/games/chess/variants/tectonic/hotseat",
-        element: <TectonicChess />,
-      },
-      {
-        path: "/games/chess/variants/tectonic/rules",
-        element: <TectonicChessRules />,
-      },
-      {
-        path: "/games/chess/variants/complete-chaos/hotseat",
-        element: <TotalChaosChess />,
-      },
-      {
-        path: "/games/chess/variants/complete-chaos/rules",
-        element: <TotalChaosChessRules />,
-      },
-      {
-        path: "/games/chess/variants/complete-chaos/ai",
-        element: <TotalChaosAiPage />,
-      },
-      {
-        path: "/games/chess/variants/complete-chaos/multiplayer/:roomCode",
-        element: <TotalChaosMultiplayerGame />,
-      },
-      {
-        path: "/games/chess/variants/complete-chaos/multiplayer",
-        element: <TotalChaosMultiplayerLobby />,
-      },
+          {
+            path: "/games/watten/rules",
+            element: <WattenRules />,
+          },
+          {
+            path: "/games/watten/multiplayer",
+            element: <WattenMultiplayerLobby />,
+          },
+          {
+            path: "/games/watten/multiplayer/4/:roomCode",
+            element: <WattenMultiplayerGame />,
+          },
+          {
+            path: "/games/watten/multiplayer/3/:roomCode",
+            element: <WattenThreePlayerMultiplayerGame />,
+          },
 
-      {
-        path: "/games/chess/variants/boss/ai",
-        element: <BossBattleAiPage />,
-      },
-      {
-        path: "/games/chess/variants/boss/multiplayer",
-        element: <BossBattleMultiplayerLobby />,
-      },
-      {
-        path: "/games/chess/variants/boss/multiplayer/:roomCode",
-        element: <BossBattleMultiplayerGame />,
-      },
-      {
-        path: "/games/chess/variants/capitalism/ai",
-        element: <CapitalismAiPage />,
-      },
-      {
-        path: "/games/chess/variants/capitalism/multiplayer",
-        element: <CapitalismMultiplayerLobby />,
-      },
-      {
-        path: "/games/chess/variants/capitalism/multiplayer/:roomCode",
-        element: <CapitalismMultiplayerGame />,
-      },
-      {
-        path: "/games/chess/variants/collapse/ai",
-        element: <CollapseAiPage />,
-      },
-      {
-        path: "/games/chess/variants/collapse/multiplayer",
-        element: <CollapseMultiplayerLobby />,
-      },
-      {
-        path: "/games/chess/variants/collapse/multiplayer/:roomCode",
-        element: <CollapseMultiplayerGame />,
-      },
-      {
-        path: "/games/chess/variants/hotpotato/ai",
-        element: <HotPotatoAiPage />,
-      },
-      {
-        path: "/games/chess/variants/hot-potato/multiplayer",
-        element: <HotPotatoMultiplayerLobby />,
-      },
-      {
-        path: "/games/chess/variants/hot-potato/multiplayer/:roomCode",
-        element: <HotPotatoMultiplayerGame />,
-      },
-      {
-        path: "/games/chess/variants/roulette/ai",
-        element: <RouletteAiPage />,
-      },
-      {
-        path: "/games/chess/variants/roulette/multiplayer/:roomCode",
-        element: <RouletteMultiplayerGame />,
-      },
-      {
-        path: "/games/chess/variants/roulette/multiplayer",
-        element: <RouletteMultiplayerLobby />,
-      },
-      {
-        path: "/games/chess/variants/draft/ai",
-        element: <DraftAiPage />,
-      },
-      {
-        path: "/games/chess/variants/draft/multiplayer",
-        element: <DraftMultiplayerLobby />,
-      },
-      {
-        path: "/games/chess/variants/draft/multiplayer/:roomCode",
-        element: <DraftMultiplayerGame />,
-      },
-      {
-        path: "/games/chess/variants/fogofwar/ai",
-        element: <FogOfWarAiPage />,
-      },
-      {
-        path: "/games/chess/variants/fog-of-war/multiplayer",
-        element: <FogOfWarMultiplayerLobby />,
-      },
-      {
-        path: "/games/chess/variants/fog-of-war/multiplayer/:roomCode",
-        element: <FogOfWarMultiplayerGame />,
-      },
-      {
-        path: "/games/chess/variants/4-players/ai",
-        element: <FourPlayerAiPage />,
-      },
-      {
-        path: "/games/chess/variants/4-players/multiplayer/:roomCode",
-        element: <FourPlayerMultiplayerGame />,
-      },
-      {
-        path: "/games/chess/variants/4-players/multiplayer",
-        element: <FourPlayerMultiplayerLobby />,
-      },
-      {
-        path: "/games/chess/variants/horror/ai",
-        element: <HorrorAiPage />,
-      },
-      {
-        path: "/games/chess/variants/horror/multiplayer",
-        element: <HorrorMultiplayerLobby />,
-      },
-      {
-        path: "/games/chess/variants/horror/multiplayer/:roomCode",
-        element: <HorrorMultiplayerGame />,
-      },
-      {
-        path: "/games/chess/variants/mirror/ai",
-        element: <MirrorAiPage />,
-      },
-      {
-        path: "/games/chess/variants/mirror/multiplayer",
-        element: <MirrorMultiplayerLobby />,
-      },
+          {
+            path: "/games/chess/classic/ai",
+            element: <ChessComputer />,
+          },
+          {
+            path: "/games/chess/classic/multiplayer",
+            element: <ChessMultiplayerLobby />,
+          },
+          {
+            path: "/games/chess/classic/multiplayer/:roomCode",
+            element: <ChessMultiplayerRoom />,
+          },
+          {
+            path: "/games/chess/classic/multiplayer/:roomCode/game",
+            element: <ChessMultiplayerGame />,
+          },
+          {
+            path: "/games/chess/rules",
+            element: <ChessRulesAndTips />,
+          },
+          {
+            path: "/games/chess/variants",
+            element: <ChessVariantsMenu />,
+          },
+          {
+            path: "/games/chess/variants/three-lives/hotseat",
+            element: <ThreeLivesChessBoard />,
+          },
+          {
+            path: "/games/chess/variants/mutation/hotseat",
+            element: <MutationChessBoard />,
+          },
+          {
+            path: "/games/chess/variants/capitalism/hotseat",
+            element: <CapitalismChessBoard />,
+          },
+          {
+            path: "/games/chess/variants/capitalism/rules",
+            element: <CapitalismChessRules />,
+          },
+          {
+            path: "/games/chess/variants/horror/hotseat",
+            element: <HorrorChessBoard />,
+          },
+          {
+            path: "/games/chess/variants/horror/rules",
+            element: <HorrorChessRules />,
+          },
+          {
+            path: "/games/chess/variants/fogofwar/hotseat",
+            element: <FogOfWarChessBoard />,
+          },
+          {
+            path: "/games/chess/variants/fogofwar/rules",
+            element: <FogOfWarChessRules />,
+          },
+          {
+            path: "/games/chess/variants/draft/hotseat",
+            element: <DraftChessBoard />,
+          },
+          {
+            path: "/games/chess/variants/draft/rules",
+            element: <DraftChessRules />,
+          },
+          {
+            path: "/games/chess/variants/mirror/hotseat",
+            element: <MirrorChessBoard />,
+          },
+          {
+            path: "/games/chess/variants/mirror/rules",
+            element: <MirrorChessRules />,
+          },
+          {
+            path: "/games/chess/variants/roulette/hotseat",
+            element: <ChessRouletteBoard />,
+          },
+          {
+            path: "/games/chess/variants/roulette/rules",
+            element: <ChessRouletteRules />,
+          },
+          {
+            path: "/games/chess/variants/hotpotato/hotseat",
+            element: <ChessHotPotatoBoard />,
+          },
+          {
+            path: "/games/chess/variants/hotpotato/rules",
+            element: <ChessHotPotatoRules />,
+          },
+          {
+            path: "/games/chess/variants/collapse/hotseat",
+            element: <ChessCollapseBoard />,
+          },
+          {
+            path: "/games/chess/variants/collapse/rules",
+            element: <ChessCollapseRules />,
+          },
+          {
+            path: "/games/chess/variants/boss/hotseat",
+            element: <BossBattleBoard />,
+          },
+          {
+            path: "/games/chess/variants/boss/rules",
+            element: <BossBattleRules />,
+          },
+          {
+            path: "/games/chess/variants/4-players/hotseat",
+            element: <FourPlayerChess />,
+          },
+          {
+            path: "/games/chess/variants/randomstart/hotseat",
+            element: <RandomStartChess />,
+          },
 
-      {
-        path: "/games/chess/variants/mirror/multiplayer/:roomCode",
-        element: <MirrorMultiplayerGame />,
-      },
-      {
-        path: "/games/chess/variants/portal/ai",
-        element: <PortalAiPage />,
-      },
-      {
-        path: "/games/chess/variants/randomstart/ai",
-        element: <RandomStartAiPage />,
-      },
-      {
-        path: "/games/chess/variants/randomstart/multiplayer",
-        element: <RandomStartMultiplayerLobby />,
-      },
-      {
-        path: "/games/chess/variants/randomstart/multiplayer/:roomCode",
-        element: <RandomStartMultiplayerGame />,
-      },
-      {
-        path: "/games/chess/variants/tectonic/ai",
-        element: <TectonicAiPage />,
-      },
+          {
+            path: "/games/chess/variants/tectonic/hotseat",
+            element: <TectonicChess />,
+          },
+          {
+            path: "/games/chess/variants/tectonic/rules",
+            element: <TectonicChessRules />,
+          },
+          {
+            path: "/games/chess/variants/complete-chaos/hotseat",
+            element: <TotalChaosChess />,
+          },
+          {
+            path: "/games/chess/variants/complete-chaos/rules",
+            element: <TotalChaosChessRules />,
+          },
+          {
+            path: "/games/chess/variants/complete-chaos/ai",
+            element: <TotalChaosAiPage />,
+          },
+          {
+            path: "/games/chess/variants/complete-chaos/multiplayer/:roomCode",
+            element: <TotalChaosMultiplayerGame />,
+          },
+          {
+            path: "/games/chess/variants/complete-chaos/multiplayer",
+            element: <TotalChaosMultiplayerLobby />,
+          },
 
-      {
-        path: "/games/chess/variants/tectonic/multiplayer",
-        element: <TectonicMultiplayerLobby />,
-      },
-      {
-        path: "/games/chess/variants/tectonic/multiplayer/:roomCode",
-        element: <TectonicMultiplayerGame />,
-      },
-      {
-        path: "/games/chess/variants/three-lives/ai",
-        element: <ThreeLivesAiPage />,
-      },
-      {
-        path: "/games/chess/variants/three-lives/multiplayer",
-        element: <ThreeLivesMultiplayerLobby />,
-      },
-      {
-        path: "/games/chess/variants/three-lives/multiplayer/:roomCode",
-        element: <ThreeLivesMultiplayerGame />,
-      },
-      {
-        path: "/games/chess/variants/mutation/ai",
-        element: <MutationAiPage />,
-      },
-      {
-        path: "/games/chess/variants/mutation/multiplayer",
-        element: <MutationMultiplayerLobby />,
-      },
-      {
-        path: "/games/chess/variants/mutation/multiplayer/:roomCode",
-        element: <MutationMultiplayerGame />,
-      },
-      {
-        path: "/games/medieval-kingdoms",
-        element: <MedievalKingdomsWorldPage />,
-      },
-      {
-        path: "/games/medieval-kingdoms/battle/:battleId",
-        element: <MedievalKingdomsBattlePage />,
-      },
-      {
-        path: "/games/medieval-kingdoms",
-        element: <MedievalKingdomsWorldPage />,
-      },
-      {
-        path: "/games/medieval-kingdoms/campaign/:campaignId",
-        element: <MedievalKingdomsRegionPage />,
-      },
-      {
-        path: "/games/medieval-kingdoms/campaign/:campaignId/battle/:battleNodeId",
-        element: <MedievalKingdomsBattlePage />,
-      },
+          {
+            path: "/games/chess/variants/boss/ai",
+            element: <BossBattleAiPage />,
+          },
+          {
+            path: "/games/chess/variants/boss/multiplayer",
+            element: <BossBattleMultiplayerLobby />,
+          },
+          {
+            path: "/games/chess/variants/boss/multiplayer/:roomCode",
+            element: <BossBattleMultiplayerGame />,
+          },
+          {
+            path: "/games/chess/variants/capitalism/ai",
+            element: <CapitalismAiPage />,
+          },
+          {
+            path: "/games/chess/variants/capitalism/multiplayer",
+            element: <CapitalismMultiplayerLobby />,
+          },
+          {
+            path: "/games/chess/variants/capitalism/multiplayer/:roomCode",
+            element: <CapitalismMultiplayerGame />,
+          },
+          {
+            path: "/games/chess/variants/collapse/ai",
+            element: <CollapseAiPage />,
+          },
+          {
+            path: "/games/chess/variants/collapse/multiplayer",
+            element: <CollapseMultiplayerLobby />,
+          },
+          {
+            path: "/games/chess/variants/collapse/multiplayer/:roomCode",
+            element: <CollapseMultiplayerGame />,
+          },
+          {
+            path: "/games/chess/variants/hotpotato/ai",
+            element: <HotPotatoAiPage />,
+          },
+          {
+            path: "/games/chess/variants/hot-potato/multiplayer",
+            element: <HotPotatoMultiplayerLobby />,
+          },
+          {
+            path: "/games/chess/variants/hot-potato/multiplayer/:roomCode",
+            element: <HotPotatoMultiplayerGame />,
+          },
+          {
+            path: "/games/chess/variants/roulette/ai",
+            element: <RouletteAiPage />,
+          },
+          {
+            path: "/games/chess/variants/roulette/multiplayer/:roomCode",
+            element: <RouletteMultiplayerGame />,
+          },
+          {
+            path: "/games/chess/variants/roulette/multiplayer",
+            element: <RouletteMultiplayerLobby />,
+          },
+          {
+            path: "/games/chess/variants/draft/ai",
+            element: <DraftAiPage />,
+          },
+          {
+            path: "/games/chess/variants/draft/multiplayer",
+            element: <DraftMultiplayerLobby />,
+          },
+          {
+            path: "/games/chess/variants/draft/multiplayer/:roomCode",
+            element: <DraftMultiplayerGame />,
+          },
+          {
+            path: "/games/chess/variants/fogofwar/ai",
+            element: <FogOfWarAiPage />,
+          },
+          {
+            path: "/games/chess/variants/fog-of-war/multiplayer",
+            element: <FogOfWarMultiplayerLobby />,
+          },
+          {
+            path: "/games/chess/variants/fog-of-war/multiplayer/:roomCode",
+            element: <FogOfWarMultiplayerGame />,
+          },
+          {
+            path: "/games/chess/variants/4-players/ai",
+            element: <FourPlayerAiPage />,
+          },
+          {
+            path: "/games/chess/variants/4-players/multiplayer/:roomCode",
+            element: <FourPlayerMultiplayerGame />,
+          },
+          {
+            path: "/games/chess/variants/4-players/multiplayer",
+            element: <FourPlayerMultiplayerLobby />,
+          },
+          {
+            path: "/games/chess/variants/horror/ai",
+            element: <HorrorAiPage />,
+          },
+          {
+            path: "/games/chess/variants/horror/multiplayer",
+            element: <HorrorMultiplayerLobby />,
+          },
+          {
+            path: "/games/chess/variants/horror/multiplayer/:roomCode",
+            element: <HorrorMultiplayerGame />,
+          },
+          {
+            path: "/games/chess/variants/mirror/ai",
+            element: <MirrorAiPage />,
+          },
+          {
+            path: "/games/chess/variants/mirror/multiplayer",
+            element: <MirrorMultiplayerLobby />,
+          },
 
-      {
-        path: "/games/chess/3dchess",
-        element: <Chess3DMenu />,
-      },
-      {
-        path: "/games/chess/3dchess/hotseat",
-        element: <Chess3DHotseatPage />,
-      },
-      {
-        path: "/games/chess/3dchess/ai",
-        element: <Chess3DAiPage />,
+          {
+            path: "/games/chess/variants/mirror/multiplayer/:roomCode",
+            element: <MirrorMultiplayerGame />,
+          },
+          {
+            path: "/games/chess/variants/portal/ai",
+            element: <PortalAiPage />,
+          },
+          {
+            path: "/games/chess/variants/randomstart/ai",
+            element: <RandomStartAiPage />,
+          },
+          {
+            path: "/games/chess/variants/randomstart/multiplayer",
+            element: <RandomStartMultiplayerLobby />,
+          },
+          {
+            path: "/games/chess/variants/randomstart/multiplayer/:roomCode",
+            element: <RandomStartMultiplayerGame />,
+          },
+          {
+            path: "/games/chess/variants/tectonic/ai",
+            element: <TectonicAiPage />,
+          },
+
+          {
+            path: "/games/chess/variants/tectonic/multiplayer",
+            element: <TectonicMultiplayerLobby />,
+          },
+          {
+            path: "/games/chess/variants/tectonic/multiplayer/:roomCode",
+            element: <TectonicMultiplayerGame />,
+          },
+          {
+            path: "/games/chess/variants/three-lives/ai",
+            element: <ThreeLivesAiPage />,
+          },
+          {
+            path: "/games/chess/variants/three-lives/multiplayer",
+            element: <ThreeLivesMultiplayerLobby />,
+          },
+          {
+            path: "/games/chess/variants/three-lives/multiplayer/:roomCode",
+            element: <ThreeLivesMultiplayerGame />,
+          },
+          {
+            path: "/games/chess/variants/mutation/ai",
+            element: <MutationAiPage />,
+          },
+          {
+            path: "/games/chess/variants/mutation/multiplayer",
+            element: <MutationMultiplayerLobby />,
+          },
+          {
+            path: "/games/chess/variants/mutation/multiplayer/:roomCode",
+            element: <MutationMultiplayerGame />,
+          },
+          {
+            path: "/games/medieval-kingdoms",
+            element: <MedievalKingdomsWorldPage />,
+          },
+          {
+            path: "/games/medieval-kingdoms/battle/:battleId",
+            element: <MedievalKingdomsBattlePage />,
+          },
+          {
+            path: "/games/medieval-kingdoms",
+            element: <MedievalKingdomsWorldPage />,
+          },
+          {
+            path: "/games/medieval-kingdoms/campaign/:campaignId",
+            element: <MedievalKingdomsRegionPage />,
+          },
+          {
+            path: "/games/medieval-kingdoms/campaign/:campaignId/battle/:battleNodeId",
+            element: <MedievalKingdomsBattlePage />,
+          },
+
+          {
+            path: "/games/chess/3dchess",
+            element: <Chess3DMenu />,
+          },
+          {
+            path: "/games/chess/3dchess/hotseat",
+            element: <Chess3DHotseatPage />,
+          },
+          {
+            path: "/games/chess/3dchess/ai",
+            element: <Chess3DAiPage />,
+          },
+        ],
       },
       {
         path: "*",
