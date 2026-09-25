@@ -36,6 +36,7 @@ import ChessGameReview from "./ChessGameReview";
 
 import { useDelayedBoardOrientation } from "../../../hooks/useDelayedBoardOrientation.ts";
 import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
+import ChessMatchStatus from "./ChessMatchStatus.tsx";
 
 /* =========================================================
    TYPES
@@ -807,6 +808,8 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
    * is shown and Stockfish can grade moves / suggest best moves.
    */
   const [coachModeEnabled, setCoachModeEnabled] = useState(false);
+  const [pieceValuesOpen, setPieceValuesOpen] = useState(false);
+  const [savedGamesOpen, setSavedGamesOpen] = useState(false);
 
   /*
    * Used to invalidate an old
@@ -886,7 +889,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
     orientation: delayedHotseatOrientation,
     flipPending,
     snapToSide,
-  } = useDelayedBoardOrientation(game.turn(), 1500);
+  } = useDelayedBoardOrientation(game.turn(), 300);
 
   /*
    * The delay belongs only to local Hotseat.
@@ -1916,47 +1919,138 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
   }
 
   /* =======================================================
+     MATCH STATUS
+     ======================================================= */
+
+  const latestMoveSan = moveHistory[moveHistory.length - 1] ?? "";
+
+  const latestMoverColor: "w" | "b" | null =
+    moveHistory.length === 0 ? null : moveHistory.length % 2 === 1 ? "w" : "b";
+
+  const latestMoverLabel =
+    latestMoverColor === "w"
+      ? t("White")
+      : latestMoverColor === "b"
+        ? t("Black")
+        : null;
+
+  const hotseatMatchStatus = (() => {
+    if (historyPreview) {
+      return {
+        event: "info" as const,
+        message: `${t("History Preview")} · ${historyPreview.san}`,
+        detail: `${t("Move")} ${historyPreview.moveNumber}${
+          historyPreview.color === "w" ? "." : "..."
+        }`,
+      };
+    }
+
+    if (gameOver) {
+      return {
+        event: winner === "draw" ? ("draw" as const) : ("checkmate" as const),
+        message:
+          winner === "draw"
+            ? t("Draw")
+            : winner === "white"
+              ? t("White wins")
+              : t("Black wins"),
+        detail: gameOverReason,
+      };
+    }
+
+    if (game.isCheck()) {
+      const checkedSide = game.turn() === "w" ? t("White") : t("Black");
+
+      return {
+        event: "check" as const,
+        message: `${checkedSide} is in check`,
+        detail: game.turn() === "w" ? t("White to move") : t("Black to move"),
+      };
+    }
+
+    if (latestMoverLabel && /^O-O-O/.test(latestMoveSan)) {
+      return {
+        event: "castle" as const,
+        message: `${latestMoverLabel} castled queenside`,
+        detail: latestMoveSan,
+      };
+    }
+
+    if (latestMoverLabel && /^O-O/.test(latestMoveSan)) {
+      return {
+        event: "castle" as const,
+        message: `${latestMoverLabel} castled kingside`,
+        detail: latestMoveSan,
+      };
+    }
+
+    if (latestMoverLabel && latestMoveSan.includes("=")) {
+      return {
+        event: "promotion" as const,
+        message: `${latestMoverLabel} promoted a pawn`,
+        detail: latestMoveSan,
+      };
+    }
+
+    if (latestMoverLabel && latestMoveSan.includes("x")) {
+      return {
+        event: "capture" as const,
+        message: `${latestMoverLabel} captured a piece`,
+        detail: latestMoveSan,
+      };
+    }
+
+    return {
+      event: "turn" as const,
+      message: game.turn() === "w" ? t("White to move") : t("Black to move"),
+      detail: `${moveHistory.length} ${t("moves")}`,
+    };
+  })();
+
+  /* =======================================================
      RENDER
      ======================================================= */
+
+  const hotseatPlayerOrder: Array<"w" | "b"> =
+    boardOrientation === "white" ? ["b", "w"] : ["w", "b"];
 
   return (
     <div
       className="
-        min-h-screen
-        bg-transparent
-        px-4
-        py-6
+        relative
+        left-1/2
+        min-h-[calc(100dvh-4rem)]
+        w-screen
+        -translate-x-1/2
+        overflow-x-hidden
+        bg-[#05080d]
+        bg-[radial-gradient(circle_at_50%_-10%,rgba(245,158,11,0.12),transparent_30%),radial-gradient(circle_at_12%_38%,rgba(59,130,246,0.08),transparent_28%),linear-gradient(180deg,#05080d_0%,#08101a_48%,#04070b_100%)]
+        px-3
+        py-3
         text-zinc-100
         sm:px-6
-        lg:px-8
+        lg:px-6
+        xl:h-[calc(100dvh-4rem)]
+        xl:min-h-0
+        xl:overflow-hidden
       "
     >
-      <div className="mx-auto max-w-[1500px]">
+      <div className="h-full w-full max-w-none">
         {/* =================================================
             HEADER
            ================================================= */}
 
         <header
           className="
-            mb-7
+            mb-2
             flex
-            flex-col
-            gap-4
-            rounded-3xl
-            border
-            border-white/5
-            bg-zinc-900/50
-            px-5
-            py-4
-            shadow-xl
-            shadow-black/20
-            backdrop-blur-md
-            sm:flex-row
-            sm:items-center
-            sm:justify-between
+            shrink-0
+            items-center
+            justify-end
+            gap-2
           "
         >
-          <div className="flex items-center gap-4">
+          <div className="hidden">
             <div
               className="
                 flex
@@ -2057,741 +2151,20 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
         <main
           className="
             grid
-            gap-6
-            xl:grid-cols-[300px_minmax(0,1fr)_300px]
+            gap-4
+            xl:h-[calc(100%-2.75rem)]
+            xl:min-h-0
+            xl:grid-cols-[minmax(260px,19vw)_minmax(0,1fr)_minmax(260px,19vw)]
           "
         >
           {/* ===============================================
               LEFT SIDEBAR
              =============================================== */}
 
-          <aside className="min-w-0">
-            <div className="space-y-4 xl:sticky xl:top-6">
-              {/* SAVED GAMES */}
-
-              <section
-                className="
-                  overflow-hidden
-                  rounded-3xl
-                  border
-                  border-white/10
-                  bg-zinc-900/75
-                  shadow-xl
-                  shadow-black/20
-                  backdrop-blur-md
-                "
-              >
-                <div
-                  className="
-                    flex
-                    items-center
-                    justify-between
-                    border-b
-                    border-white/5
-                    px-4
-                    py-4
-                  "
-                >
-                  <div>
-                    <h2 className="text-sm font-bold text-zinc-100">
-                      {t("Saved Games")}
-                    </h2>
-
-                    <p className="mt-1 text-xs text-zinc-500">
-                      {t("Previous games")}
-                    </p>
-                  </div>
-
-                  <div
-                    className="
-                      flex
-                      h-9
-                      min-w-9
-                      items-center
-                      justify-center
-                      rounded-xl
-                      border
-                      border-amber-500/10
-                      bg-amber-400/10
-                      px-2
-                      text-xs
-                      font-bold
-                      text-amber-300
-                    "
-                  >
-                    {savedGames.length}
-                  </div>
-                </div>
-
-                <div className="max-h-80 space-y-1 overflow-y-auto p-2">
-                  {savedGames.length === 0 && (
-                    <div className="py-9 text-center">
-                      <div className="mb-2 text-3xl text-zinc-700">♟</div>
-
-                      <p className="text-sm text-zinc-500">
-                        {t("No saved games yet")}
-                      </p>
-                    </div>
-                  )}
-
-                  {savedGames.map((savedGame) => (
-                    <div
-                      key={savedGame.id}
-                      className="
-                          group
-                          flex
-                          items-center
-                          gap-3
-                          rounded-2xl
-                          border
-                          border-transparent
-                          p-3
-                          transition
-                          duration-200
-                          hover:border-white/5
-                          hover:bg-white/5
-                        "
-                    >
-                      <div className="min-w-0 flex-1">
-                        <p
-                          className="
-                              truncate
-                              text-sm
-                              font-semibold
-                              text-zinc-200
-                            "
-                        >
-                          {savedGame.name || t("Unnamed Game")}
-                        </p>
-
-                        <p
-                          className="
-                              mt-1
-                              truncate
-                              text-xs
-                              text-zinc-500
-                            "
-                        >
-                          <span className="text-[#fff3d5]">♔</span>{" "}
-                          {savedGame.white_player || t("White")}
-                          <span className="mx-1.5 text-zinc-700">vs</span>
-                          <span className="text-zinc-400">♚</span>{" "}
-                          {savedGame.black_player || t("Black")}
-                        </p>
-
-                        <p className="mt-1 text-[10px] text-zinc-600">
-                          {new Date(savedGame.created_at).toLocaleString()}
-                        </p>
-                      </div>
-
-                      <div
-                        className="
-                            flex
-                            shrink-0
-                            gap-1
-                            opacity-70
-                            transition
-                            group-hover:opacity-100
-                          "
-                      >
-                        <button
-                          type="button"
-                          onClick={() => loadSpecificGame(savedGame.id)}
-                          className="
-                              flex
-                              h-9
-                              w-9
-                              items-center
-                              justify-center
-                              rounded-xl
-                              border
-                              border-white/10
-                              bg-white/5
-                              transition
-                              hover:border-amber-400/30
-                              hover:bg-amber-400/10
-                            "
-                          title={t("Load game")}
-                        >
-                          <img
-                            src={loadButton}
-                            alt="Load"
-                            className="h-4 w-4"
-                          />
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => deleteGame(savedGame.id)}
-                          className="
-                              flex
-                              h-9
-                              w-9
-                              items-center
-                              justify-center
-                              rounded-xl
-                              border
-                              border-white/10
-                              bg-white/5
-                              transition
-                              hover:border-red-500/30
-                              hover:bg-red-500/10
-                            "
-                          title={t("Delete game")}
-                        >
-                          <img
-                            src={playButton}
-                            alt="Delete"
-                            className="h-4 w-4"
-                          />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              {/* CAPTURED PIECES */}
-
-              <section
-                className="
-                  rounded-3xl
-                  border
-                  border-white/10
-                  bg-zinc-900/75
-                  p-4
-                  shadow-xl
-                  shadow-black/20
-                  backdrop-blur-md
-                "
-              >
-                <div className="mb-4 flex items-start justify-between">
-                  <div>
-                    <h2 className="text-sm font-bold text-zinc-100">
-                      {t("Captured Pieces")}
-                    </h2>
-
-                    <p className="mt-1 text-xs text-zinc-500">
-                      {t("Material overview")}
-                    </p>
-                  </div>
-
-                  <span
-                    className={`
-                      rounded-xl
-                      px-2.5
-                      py-1
-                      text-xs
-                      font-bold
-
-                      ${
-                        materialDifference > 0
-                          ? "bg-amber-400/10 text-amber-200"
-                          : materialDifference < 0
-                            ? "bg-white/10 text-zinc-300"
-                            : "bg-white/5 text-zinc-500"
-                      }
-                    `}
-                  >
-                    {materialDifference > 0 &&
-                      `${t("White")} +${materialDifference}`}
-
-                    {materialDifference < 0 &&
-                      `${t("Black")} +${Math.abs(materialDifference)}`}
-
-                    {materialDifference === 0 && t("Equal")}
-                  </span>
-                </div>
-
-                <div
-                  className="
-                    rounded-2xl
-                    border
-                    border-white/5
-                    bg-black/20
-                    p-3
-                  "
-                >
-                  <CapturedPiecesGrid
-                    capturedBlack={capturedBlack}
-                    capturedWhite={capturedWhite}
-                    t={t}
-                  />
-                </div>
-              </section>
-
-              {/* MOVE HISTORY */}
-
-              <section
-                className="
-                  rounded-3xl
-                  border
-                  border-white/10
-                  bg-zinc-900/75
-                  p-4
-                  shadow-xl
-                  shadow-black/20
-                  backdrop-blur-md
-                "
-              >
-                <div className="mb-4 flex items-center justify-between">
-                  <div>
-                    <h2 className="text-sm font-bold text-zinc-100">
-                      {t("Move History")}
-                    </h2>
-
-                    <p className="mt-1 text-xs text-zinc-500">
-                      {t("Game history")}
-                    </p>
-                  </div>
-
-                  <span
-                    className="
-                      rounded-xl
-                      bg-white/5
-                      px-2.5
-                      py-1
-                      text-xs
-                      font-semibold
-                      text-zinc-400
-                    "
-                  >
-                    {moveHistory.length}
-                  </span>
-                </div>
-
-                <div
-                  className="
-                    max-h-80
-                    overflow-y-auto
-                    rounded-2xl
-                    border
-                    border-white/5
-                    bg-black/20
-                  "
-                >
-                  {historyRows.length === 0 ? (
-                    <div className="px-4 py-8 text-center text-xs text-zinc-600">
-                      {t("No moves yet")}
-                    </div>
-                  ) : (
-                    <table className="w-full border-collapse">
-                      <thead className="sticky top-0 z-10 bg-zinc-900">
-                        <tr
-                          className="
-                            border-b
-                            border-white/5
-                            text-left
-                            text-[9px]
-                            font-black
-                            uppercase
-                            tracking-wider
-                            text-zinc-600
-                          "
-                        >
-                          <th className="px-3 py-2">{t("Move")}</th>
-                          <th className="px-2 py-2">{t("Side")}</th>
-                          <th className="px-2 py-2">{t("Played")}</th>
-                        </tr>
-                      </thead>
-
-                      <tbody>
-                        {historyRows.map((move) => {
-                          const selected = historyPreviewPly === move.ply;
-
-                          return (
-                            <tr
-                              key={move.ply}
-                              tabIndex={0}
-                              onClick={() => {
-                                setHistoryPreviewPly(move.ply);
-                                setHelpVisible(false);
-                                setSuggestions([]);
-                                setHighlightedSuggestionUci(null);
-                                setSelectedSquare(null);
-                                setLegalMoves([]);
-                              }}
-                              onKeyDown={(event) => {
-                                if (
-                                  event.key === "Enter" ||
-                                  event.key === " "
-                                ) {
-                                  setHistoryPreviewPly(move.ply);
-                                  setHelpVisible(false);
-                                  setSuggestions([]);
-                                  setHighlightedSuggestionUci(null);
-                                  setSelectedSquare(null);
-                                  setLegalMoves([]);
-                                }
-                              }}
-                              className={`
-                                cursor-pointer
-                                border-b
-                                border-white/5
-                                transition
-                                last:border-0
-
-                                ${
-                                  selected
-                                    ? "bg-blue-400/10"
-                                    : "hover:bg-white/5"
-                                }
-                              `}
-                            >
-                              <td className="px-3 py-2.5 text-[10px] text-zinc-600">
-                                {move.moveNumber}
-                                {move.color === "w" ? "." : "..."}
-                              </td>
-
-                              <td className="px-2 py-2.5">
-                                {move.color === "w" ? (
-                                  <span
-                                    className="
-                                      inline-flex
-                                      items-center
-                                      gap-1
-                                      rounded-full
-                                      bg-[#fff3d5]/10
-                                      px-2
-                                      py-1
-                                      text-[9px]
-                                      font-bold
-                                      text-[#fff3d5]
-                                    "
-                                  >
-                                    ♔ {t("White")}
-                                  </span>
-                                ) : (
-                                  <span
-                                    className="
-                                      inline-flex
-                                      items-center
-                                      gap-1
-                                      rounded-full
-                                      bg-white/5
-                                      px-2
-                                      py-1
-                                      text-[9px]
-                                      font-bold
-                                      text-zinc-400
-                                    "
-                                  >
-                                    ♚ {t("Black")}
-                                  </span>
-                                )}
-                              </td>
-
-                              <td className="px-2 py-2.5">
-                                <div className="flex items-center gap-2">
-                                  <span className="w-5 text-center text-lg leading-none">
-                                    {getHistoryPieceSymbol(
-                                      move.color,
-                                      move.piece,
-                                    )}
-                                  </span>
-
-                                  <span className="font-mono text-xs font-bold text-zinc-200">
-                                    {move.san}
-                                  </span>
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  )}
-                </div>
-              </section>
-            </div>
-          </aside>
-
-          {/* ===============================================
-              CENTER
-             =============================================== */}
-
-          <section className="min-w-0">
-            <div className="mx-auto max-w-[820px]">
-              {/* GAME OVER STATUS */}
-
-              {gameOver && (
-                <div
-                  className="
-                    mb-3
-                    rounded-2xl
-                    border
-                    border-amber-500/20
-                    bg-amber-400/[0.07]
-                    px-4
-                    py-3
-                  "
-                >
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-widest text-amber-400">
-                        {t("Game Over")}
-                      </p>
-
-                      <p className="mt-1 font-black text-white">
-                        {gameOverReason}
-                      </p>
-                    </div>
-
-                    <span className="text-sm font-bold text-zinc-300">
-                      {winner === "draw"
-                        ? t("Draw")
-                        : winner === "white"
-                          ? t("White wins")
-                          : t("Black wins")}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setReviewOpen(true)}
-                      className="
-    rounded-xl
-    border
-    border-amber-400/20
-    bg-amber-400/10
-    px-4
-    py-2.5
-    text-sm
-    font-bold
-    text-amber-300
-    transition
-    hover:bg-amber-400/20
-  "
-                    >
-                      ♞ {t("Open Game Review")}
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* PROMOTION */}
-
-              {promotionSquare && promotionFrom && (
-                <div
-                  className="
-                      mb-3
-                      rounded-2xl
-                      border
-                      border-amber-500/20
-                      bg-zinc-900/90
-                      p-3
-                      shadow-xl
-                    "
-                >
-                  <PromotionBar onPromote={promotePawn} />
-                </div>
-              )}
-
-              {/* HISTORY PREVIEW STATUS */}
-
-              {historyPreview && (
-                <div
-                  className="
-                    mb-3
-                    flex
-                    items-center
-                    justify-between
-                    gap-4
-                    rounded-xl
-                    border
-                    border-blue-400/20
-                    bg-blue-400/[0.07]
-                    px-4
-                    py-3
-                  "
-                >
-                  <div>
-                    <p className="text-[9px] font-black uppercase tracking-widest text-blue-300">
-                      {t("History Preview")}
-                    </p>
-
-                    <p className="mt-1 text-sm font-bold text-white">
-                      Move {historyPreview.moveNumber}
-                      {historyPreview.color === "w" ? "." : "..."}{" "}
-                      {historyPreview.san}
-                    </p>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setHistoryPreviewPly(null)}
-                    className="
-                      shrink-0
-                      rounded-lg
-                      bg-white/10
-                      px-3
-                      py-2
-                      text-xs
-                      font-bold
-                      text-zinc-200
-                      transition
-                      hover:bg-white/20
-                    "
-                  >
-                    {t("Back to Live Board")}
-                  </button>
-                </div>
-              )}
-
-              {/* BOARD */}
-
-              <Board
-                board={displayedBoard}
-                selectedSquare={
-                  historyPreviewMove
-                    ? null
-                    : helpMove
-                      ? helpMove.from
-                      : selectedSquare
-                }
-                legalMoves={
-                  historyPreviewMove
-                    ? []
-                    : helpMove
-                      ? [helpMove.to]
-                      : legalMoves
-                }
-                lastMove={historyPreviewMove ?? lastMove}
-                checkedKingSquare={
-                  historyPreview
-                    ? historyPreviewCheckedKingSquare
-                    : checkedKingSquare
-                }
-                onSquareClick={
-                  historyPreview || hotseatFlipPending
-                    ? () => {}
-                    : handleSquareClick
-                }
-                orientation={boardOrientation}
-              />
-
-              {/* ANALYSIS BLOCKING MESSAGE */}
-
-              {analyzing && coachAllowed && (
-                <div
-                  className="
-                      mt-3
-                      flex
-                      items-center
-                      justify-center
-                      gap-2
-                      rounded-xl
-                      border
-                      border-white/5
-                      bg-black/20
-                      px-4
-                      py-2
-                      text-xs
-                      text-zinc-500
-                    "
-                >
-                  <span
-                    className="
-                        h-2
-                        w-2
-                        animate-pulse
-                        rounded-full
-                        bg-amber-400
-                      "
-                  />
-                  {t("Stockfish is analyzing...")}
-                </div>
-              )}
-
-              {/* MOBILE MATERIAL */}
-
-              <div
-                className="
-                  mt-4
-                  flex
-                  items-center
-                  justify-between
-                  rounded-2xl
-                  border
-                  border-white/10
-                  bg-zinc-900/75
-                  px-4
-                  py-3
-                  xl:hidden
-                "
-              >
-                <span className="text-sm text-zinc-500">{t("Material")}</span>
-
-                <span className="text-sm font-bold text-zinc-200">
-                  {materialDifference > 0 &&
-                    `${t("White")} +${materialDifference}`}
-
-                  {materialDifference < 0 &&
-                    `${t("Black")} +${Math.abs(materialDifference)}`}
-
-                  {materialDifference === 0 && t("Equal")}
-                </span>
-              </div>
-            </div>
-          </section>
-
-          {/* ===============================================
-              RIGHT SIDEBAR
-             =============================================== */}
-
-          <aside className="min-w-0">
-            <div className="space-y-4 xl:sticky xl:top-6">
+          <aside className="order-4 min-w-0 xl:order-1 xl:h-full xl:min-h-0 xl:overflow-hidden xl:pr-1">
+            <div className="flex h-full min-h-0 flex-col gap-3">
               {/* ===========================================
-                  GAME CONTROLS
-                 =========================================== */}
-
-              <section
-                className="
-                  rounded-3xl
-                  border
-                  border-white/10
-                  bg-zinc-900/75
-                  p-4
-                  shadow-xl
-                  shadow-black/20
-                  backdrop-blur-md
-                "
-              >
-                <div className="mb-5">
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="
-                        h-2
-                        w-2
-                        rounded-full
-                        bg-amber-400
-                        shadow-[0_0_10px_rgba(251,191,36,0.55)]
-                      "
-                    />
-
-                    <h2 className="font-bold text-zinc-100">
-                      {t("Game Controls")}
-                    </h2>
-                  </div>
-
-                  <p className="mt-1.5 text-xs text-zinc-500">
-                    {t("Players, game and actions")}
-                  </p>
-                </div>
-
-                <GameControls
-                  gameName={gameName}
-                  whitePlayer={whitePlayer}
-                  blackPlayer={blackPlayer}
-                  onGameNameChange={setGameName}
-                  onWhitePlayerChange={setWhitePlayer}
-                  onBlackPlayerChange={setBlackPlayer}
-                  onUndo={undoMove}
-                  onRestart={restartGame}
-                  onSave={saveGame}
-                />
-              </section>
-
-              {/* ===========================================
-                  CHESS COACH MODE TOGGLE
+                  CHESS COACH — LEFT SIDEBAR TOP
                  =========================================== */}
 
               {!onlineGameId && (
@@ -2817,8 +2190,8 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
                     ${
                       coachModeEnabled
-                        ? "border-amber-400/30 bg-amber-400/[0.08] hover:bg-amber-400/[0.12]"
-                        : "border-white/10 bg-zinc-900/75 hover:border-amber-400/20 hover:bg-zinc-900"
+                        ? "border-amber-400/30 bg-[linear-gradient(145deg,rgba(40,31,13,.65),rgba(8,15,23,.96))] shadow-[0_0_26px_rgba(251,191,36,.06)] hover:bg-amber-400/[0.10]"
+                        : "border-amber-400/12 bg-[linear-gradient(145deg,rgba(10,18,28,.97),rgba(5,10,17,.94))] hover:border-amber-400/25"
                     }
                   `}
                 >
@@ -2846,7 +2219,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                     </div>
 
                     <div>
-                      <p className="text-sm font-bold text-zinc-100">
+                      <p className="font-serif text-lg font-semibold text-[#f6ead1]">
                         {t("Chess Coach")}
                       </p>
 
@@ -2900,18 +2273,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                  =========================================== */}
 
               {coachAllowed && (
-                <section
-                  className="
-                  rounded-3xl
-                  border
-                  border-white/10
-                  bg-zinc-900/75
-                  p-4
-                  shadow-xl
-                  shadow-black/20
-                  backdrop-blur-md
-                "
-                >
+                <section className="rounded-3xl border border-amber-400/15 bg-[linear-gradient(145deg,rgba(10,18,28,.97),rgba(5,10,17,.94))] p-4 shadow-2xl shadow-black/35 backdrop-blur-xl">
                   <div className="flex items-center justify-between">
                     <div>
                       <h2 className="font-bold text-zinc-100">
@@ -3175,22 +2537,643 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                 </section>
               )}
 
+              {/* SAVED GAMES */}
+
+              <section className="order-3 overflow-hidden rounded-3xl border border-amber-400/15 bg-[linear-gradient(145deg,rgba(10,18,28,.97),rgba(5,10,17,.94))] shadow-2xl shadow-black/35 backdrop-blur-xl">
+                <button
+                  type="button"
+                  onClick={() => setSavedGamesOpen((open) => !open)}
+                  className="flex w-full items-center justify-between gap-3 border-amber-300/10 bg-amber-300/[0.025] px-4 py-3.5 text-left transition hover:bg-amber-300/[0.05]"
+                >
+                  <div>
+                    <h2 className="font-serif text-lg font-semibold text-[#f6ead1]">
+                      {t("Saved Games")}
+                    </h2>
+                    <p className="mt-0.5 text-[10px] uppercase tracking-[0.18em] text-zinc-600">
+                      {t("Previous games")}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-lg border border-amber-300/10 bg-amber-300/[0.06] px-2 py-1 text-xs font-bold text-amber-200">
+                      {savedGames.length}
+                    </span>
+                    <span className="rounded-lg border border-amber-400/20 bg-amber-400/10 px-3 py-1.5 text-xs font-black text-amber-300">
+                      {savedGamesOpen ? "Hide" : "Show"}
+                    </span>
+                  </div>
+                </button>
+
+                {savedGamesOpen && (
+                  <div className="border-t border-white/5">
+                    <div className="max-h-44 space-y-1 overflow-y-auto p-2 [scrollbar-width:thin]">
+                      {savedGames.length === 0 ? (
+                        <div className="py-6 text-center">
+                          <div className="mb-2 text-2xl text-zinc-700">♟</div>
+                          <p className="text-xs text-zinc-500">
+                            {t("No saved games yet")}
+                          </p>
+                        </div>
+                      ) : (
+                        savedGames.map((savedGame) => (
+                          <div
+                            key={savedGame.id}
+                            className="group flex items-center gap-3 rounded-2xl border border-transparent p-2.5 transition hover:border-amber-300/10 hover:bg-amber-300/[0.035]"
+                          >
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-xs font-semibold text-zinc-200">
+                                {savedGame.name || t("Unnamed Game")}
+                              </p>
+                              <p className="mt-1 truncate text-[10px] text-zinc-600">
+                                {savedGame.white_player || t("White")}{" "}
+                                <span className="px-1 text-zinc-700">vs</span>{" "}
+                                {savedGame.black_player || t("Black")}
+                              </p>
+                            </div>
+                            <div className="flex shrink-0 gap-1">
+                              <button
+                                type="button"
+                                onClick={() => loadSpecificGame(savedGame.id)}
+                                className="rounded-lg border border-amber-400/10 bg-amber-400/[0.04] px-2 py-1.5 text-[10px] font-bold text-amber-200/80 transition hover:bg-amber-400/10"
+                                title={t("Load game")}
+                              >
+                                Load
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => deleteGame(savedGame.id)}
+                                className="rounded-lg border border-red-500/10 bg-red-500/[0.04] px-2 py-1.5 text-[10px] font-bold text-red-300/80 transition hover:bg-red-500/10"
+                                title={t("Delete game")}
+                              >
+                                ×
+                              </button>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+              </section>
+
+              {/* CAPTURED PIECES */}
+
+              <section className="order-1 rounded-3xl border border-amber-400/15 bg-[linear-gradient(145deg,rgba(10,18,28,.97),rgba(5,10,17,.94))] p-4 shadow-2xl shadow-black/35 backdrop-blur-xl">
+                <div className="mb-4 flex items-start justify-between gap-3">
+                  <div>
+                    <h2 className="font-serif text-lg font-semibold text-[#f6ead1]">
+                      {t("Captured Pieces")}
+                    </h2>
+
+                    <p className="mt-0.5 text-[10px] uppercase tracking-[0.18em] text-zinc-600">
+                      {t("Material overview")}
+                    </p>
+                  </div>
+
+                  <span
+                    className={`
+                      rounded-xl
+                      px-2.5
+                      py-1
+                      text-xs
+                      font-bold
+
+                      ${
+                        materialDifference > 0
+                          ? "bg-amber-400/10 text-amber-200"
+                          : materialDifference < 0
+                            ? "bg-white/10 text-zinc-300"
+                            : "bg-white/5 text-zinc-500"
+                      }
+                    `}
+                  >
+                    {materialDifference > 0 &&
+                      `${t("White")} +${materialDifference}`}
+
+                    {materialDifference < 0 &&
+                      `${t("Black")} +${Math.abs(materialDifference)}`}
+
+                    {materialDifference === 0 && t("Equal")}
+                  </span>
+                </div>
+
+                <div
+                  className="
+                    rounded-2xl
+                    border
+                    border-white/5
+                    bg-black/20
+                    p-3
+                  "
+                >
+                  <CapturedPiecesGrid
+                    capturedBlack={capturedBlack}
+                    capturedWhite={capturedWhite}
+                    t={t}
+                  />
+                </div>
+              </section>
+
+              <section className="order-2 overflow-hidden rounded-3xl border border-amber-400/15 bg-[#091019]/90 shadow-2xl shadow-black/30 backdrop-blur-xl">
+                <button
+                  type="button"
+                  onClick={() => setPieceValuesOpen((open) => !open)}
+                  className="flex w-full items-center justify-between px-4 py-4 text-left transition hover:bg-white/[0.03]"
+                >
+                  <div>
+                    <h2 className="font-serif text-lg font-semibold text-[#f6ead1]">
+                      {t("Piece Values")}
+                    </h2>
+                    <p className="mt-0.5 text-[10px] uppercase tracking-[0.2em] text-zinc-600">
+                      {t("Standard values")}
+                    </p>
+                  </div>
+                  <span className="rounded-lg border border-amber-400/20 bg-amber-400/10 px-3 py-1.5 text-xs font-black text-amber-300">
+                    {pieceValuesOpen ? "Hide" : "Show"}
+                  </span>
+                </button>
+                {pieceValuesOpen && (
+                  <div className="max-h-52 overflow-y-auto border-t border-white/5 p-3 [scrollbar-width:thin]">
+                    <div className="space-y-1">
+                      {pieceValueList.map((piece) => (
+                        <div
+                          key={piece.type}
+                          className="flex items-center justify-between rounded-xl px-2 py-2 hover:bg-white/[0.04]"
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="text-2xl text-[#f8e7c0]">
+                              {piece.symbol}
+                            </span>
+                            <span className="text-sm text-zinc-400">
+                              {t(piece.name)}
+                            </span>
+                          </div>
+                          <span className="text-sm font-black text-zinc-200">
+                            {pieceValues[piece.type]}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-3 rounded-xl bg-black/20 px-3 py-2 text-right text-xs font-bold text-zinc-400">
+                      {materialDifference === 0
+                        ? t("Equal")
+                        : materialDifference > 0
+                          ? `${t("White")} +${materialDifference}`
+                          : `${t("Black")} +${Math.abs(materialDifference)}`}
+                    </div>
+                  </div>
+                )}
+              </section>
+              {/* MOVE HISTORY */}
+              <section className="order-4 flex min-h-[140px] flex-1 flex-col overflow-hidden rounded-3xl border border-amber-400/15 bg-[#091019]/90 shadow-2xl shadow-black/30 backdrop-blur-xl">
+                <div className="flex items-center justify-between border-b border-white/5 px-4 py-3">
+                  <div>
+                    <h2 className="font-serif text-lg font-semibold text-[#f6ead1]">
+                      {t("Move History")}
+                    </h2>
+                    <p className="mt-0.5 text-[10px] uppercase tracking-[0.2em] text-zinc-600">
+                      {t("Game history")}
+                    </p>
+                  </div>
+                  <span className="rounded-lg border border-white/5 bg-white/5 px-2.5 py-1 text-xs font-bold text-zinc-400">
+                    {moveHistory.length}
+                  </span>
+                </div>
+                <div className="max-h-64 min-h-0 flex-1 overflow-y-auto [scrollbar-width:thin] xl:max-h-none">
+                  {historyRows.length === 0 ? (
+                    <div className="px-4 py-8 text-center text-xs text-zinc-600">
+                      {t("No moves yet")}
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-white/5">
+                      {historyRows.map((move) => {
+                        const selected = historyPreviewPly === move.ply;
+                        return (
+                          <button
+                            key={move.ply}
+                            type="button"
+                            onClick={() => {
+                              setHistoryPreviewPly(move.ply);
+                              setHelpVisible(false);
+                              setSuggestions([]);
+                              setHighlightedSuggestionUci(null);
+                              setSelectedSquare(null);
+                              setLegalMoves([]);
+                            }}
+                            className={`flex w-full items-center gap-3 px-4 py-2.5 text-left transition hover:bg-white/[0.04] ${selected ? "bg-blue-400/10" : ""}`}
+                          >
+                            <span className="w-8 text-[10px] font-black text-zinc-600">
+                              {move.moveNumber}
+                              {move.color === "w" ? "." : "..."}
+                            </span>
+                            <span className="text-lg leading-none">
+                              {getHistoryPieceSymbol(move.color, move.piece)}
+                            </span>
+                            <span className="font-mono text-xs font-bold text-zinc-200">
+                              {move.san}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </section>
+            </div>
+          </aside>
+
+          {/* ===============================================
+              CENTER
+             =============================================== */}
+
+          <section className="order-1 min-w-0 xl:order-2 xl:h-full xl:min-h-0">
+            <div className="mx-auto w-full max-w-[820px] xl:flex xl:h-full xl:min-h-0 xl:max-w-[min(804px,calc(100dvh-24rem))] xl:flex-col">
+              <section className="mb-2 shrink-0 rounded-2xl border border-amber-400/30 bg-[#08111c]/90 px-4 py-2.5 text-center shadow-[0_0_40px_rgba(245,158,11,0.08)] backdrop-blur-xl">
+                <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-400">
+                  {t("Classic Chess")}
+                </p>
+                <h1 className="mt-1 font-serif text-3xl font-semibold text-[#f7ead0]">
+                  {t("Hotseat")}
+                </h1>
+                <p className="mt-1 text-xs text-zinc-500">
+                  {game.turn() === "w"
+                    ? t("White to move")
+                    : t("Black to move")}
+                </p>
+              </section>
+
+              {/* GAME OVER STATUS */}
+
+              {gameOver && (
+                <div
+                  className="
+                    mb-3
+                    rounded-2xl
+                    border
+                    border-amber-500/20
+                    bg-amber-400/[0.07]
+                    px-4
+                    py-3
+                  "
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-widest text-amber-400">
+                        {t("Game Over")}
+                      </p>
+
+                      <p className="mt-1 font-black text-white">
+                        {gameOverReason}
+                      </p>
+                    </div>
+
+                    <span className="text-sm font-bold text-zinc-300">
+                      {winner === "draw"
+                        ? t("Draw")
+                        : winner === "white"
+                          ? t("White wins")
+                          : t("Black wins")}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setReviewOpen(true)}
+                      className="
+    rounded-xl
+    border
+    border-amber-400/20
+    bg-amber-400/10
+    px-4
+    py-2.5
+    text-sm
+    font-bold
+    text-amber-300
+    transition
+    hover:bg-amber-400/20
+  "
+                    >
+                      ♞ {t("Open Game Review")}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* PROMOTION */}
+
+              {promotionSquare && promotionFrom && (
+                <div
+                  className="
+                      mb-3
+                      rounded-2xl
+                      border
+                      border-amber-500/20
+                      bg-zinc-900/90
+                      p-3
+                      shadow-xl
+                    "
+                >
+                  <PromotionBar onPromote={promotePawn} />
+                </div>
+              )}
+
+              {/* HISTORY PREVIEW STATUS */}
+
+              {historyPreview && (
+                <div
+                  className="
+                    mb-3
+                    flex
+                    items-center
+                    justify-between
+                    gap-4
+                    rounded-xl
+                    border
+                    border-blue-400/20
+                    bg-blue-400/[0.07]
+                    px-4
+                    py-3
+                  "
+                >
+                  <div>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-blue-300">
+                      {t("History Preview")}
+                    </p>
+
+                    <p className="mt-1 text-sm font-bold text-white">
+                      Move {historyPreview.moveNumber}
+                      {historyPreview.color === "w" ? "." : "..."}{" "}
+                      {historyPreview.san}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setHistoryPreviewPly(null)}
+                    className="
+                      shrink-0
+                      rounded-lg
+                      bg-white/10
+                      px-3
+                      py-2
+                      text-xs
+                      font-bold
+                      text-zinc-200
+                      transition
+                      hover:bg-white/20
+                    "
+                  >
+                    {t("Back to Live Board")}
+                  </button>
+                </div>
+              )}
+
+              <ChessMatchStatus
+                event={hotseatMatchStatus.event}
+                message={hotseatMatchStatus.message}
+                detail={hotseatMatchStatus.detail}
+                label="Match status"
+                className="mb-2"
+                effects={
+                  hotseatFlipPending
+                    ? [
+                        {
+                          id: "turn-change",
+                          label: "Board",
+                          value: "Changing sides",
+                          tone: "amber",
+                        },
+                      ]
+                    : []
+                }
+              />
+
+              {/* BOARD */}
+
+              <div className="shrink-0">
+                <Board
+                  board={displayedBoard}
+                  selectedSquare={
+                    historyPreviewMove
+                      ? null
+                      : helpMove
+                        ? helpMove.from
+                        : selectedSquare
+                  }
+                  legalMoves={
+                    historyPreviewMove
+                      ? []
+                      : helpMove
+                        ? [helpMove.to]
+                        : legalMoves
+                  }
+                  lastMove={historyPreviewMove ?? lastMove}
+                  checkedKingSquare={
+                    historyPreview
+                      ? historyPreviewCheckedKingSquare
+                      : checkedKingSquare
+                  }
+                  onSquareClick={
+                    historyPreview || hotseatFlipPending
+                      ? () => {}
+                      : handleSquareClick
+                  }
+                  orientation={boardOrientation}
+                />
+              </div>
+
+              {/* ANALYSIS BLOCKING MESSAGE */}
+
+              {analyzing && coachAllowed && (
+                <div
+                  className="
+                      mt-3
+                      flex
+                      items-center
+                      justify-center
+                      gap-2
+                      rounded-xl
+                      border
+                      border-white/5
+                      bg-black/20
+                      px-4
+                      py-2
+                      text-xs
+                      text-zinc-500
+                    "
+                >
+                  <span
+                    className="
+                        h-2
+                        w-2
+                        animate-pulse
+                        rounded-full
+                        bg-amber-400
+                      "
+                  />
+                  {t("Stockfish is analyzing...")}
+                </div>
+              )}
+
+              {/* MOBILE MATERIAL */}
+
+              <div
+                className="
+                  mt-4
+                  flex
+                  items-center
+                  justify-between
+                  rounded-2xl
+                  border
+                  border-white/10
+                  bg-zinc-900/75
+                  px-4
+                  py-3
+                  xl:hidden
+                "
+              >
+                <span className="text-sm text-zinc-500">{t("Material")}</span>
+
+                <span className="text-sm font-bold text-zinc-200">
+                  {materialDifference > 0 &&
+                    `${t("White")} +${materialDifference}`}
+
+                  {materialDifference < 0 &&
+                    `${t("Black")} +${Math.abs(materialDifference)}`}
+
+                  {materialDifference === 0 && t("Equal")}
+                </span>
+              </div>
+            </div>
+          </section>
+
+          {/* ===============================================
+              RIGHT SIDEBAR
+             =============================================== */}
+
+          <aside className="order-3 min-w-0 xl:order-3 xl:h-full xl:min-h-0 xl:overflow-y-auto xl:pl-1 [scrollbar-width:thin]">
+            <div className="space-y-3">
+              {/* WAITING PLAYER MINI BOARD */}
+              <section className="relative aspect-square w-full shrink-0 overflow-hidden rounded-3xl border border-amber-400/20 bg-[#07101a] shadow-2xl shadow-black/40">
+                <div className="pointer-events-none absolute left-2 top-2 z-20 rounded-lg border border-amber-300/15 bg-black/65 px-2 py-1 backdrop-blur-md">
+                  <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-amber-100/90">
+                    Waiting board
+                  </p>
+                </div>
+
+                <div className="pointer-events-none h-full w-full">
+                  <Board
+                    board={displayedBoard}
+                    selectedSquare={null}
+                    legalMoves={[]}
+                    lastMove={historyPreviewMove ?? lastMove}
+                    checkedKingSquare={
+                      historyPreview
+                        ? historyPreviewCheckedKingSquare
+                        : checkedKingSquare
+                    }
+                    onSquareClick={() => {}}
+                    orientation={
+                      boardOrientation === "white" ? "black" : "white"
+                    }
+                    pieceScale={0.5}
+                  />
+                </div>
+              </section>
+
+              {/* PLAYERS — ordered to match the visible board */}
+              <div className="order-0 shrink-0 space-y-2">
+                {hotseatPlayerOrder.map((color, index) => {
+                  const isWhite = color === "w";
+                  const active = game.turn() === color && !gameOver;
+
+                  return (
+                    <div key={color} className="space-y-2">
+                      <section
+                        className={`rounded-3xl border p-3.5 shadow-2xl shadow-black/30 backdrop-blur-xl transition ${
+                          active
+                            ? "border-amber-400/30 bg-[linear-gradient(145deg,rgba(39,30,13,.52),rgba(7,14,22,.95))] shadow-[0_0_26px_rgba(251,191,36,.07)]"
+                            : "border-white/10 bg-[linear-gradient(145deg,rgba(10,18,28,.96),rgba(5,10,17,.94))]"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <PlayerSilhouette tone={isWhite ? "amber" : "sky"} />
+
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate font-serif text-lg font-semibold text-[#f7ead0]">
+                              {isWhite
+                                ? whitePlayer || t("White")
+                                : blackPlayer || t("Black")}
+                            </p>
+                            <p className="mt-0.5 text-xs text-zinc-500">
+                              {isWhite ? t("White") : t("Black")}
+                            </p>
+                          </div>
+
+                          {active && (
+                            <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-amber-400 shadow-[0_0_14px_rgba(251,191,36,.65)]" />
+                          )}
+                        </div>
+                      </section>
+
+                      {index === 0 && (
+                        <div className="flex items-center gap-2 px-2">
+                          <span className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-white/20" />
+                          <span className="rounded-full border border-amber-400/15 bg-amber-400/[0.06] px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-amber-200/75">
+                            VS
+                          </span>
+                          <span className="h-px flex-1 bg-gradient-to-l from-transparent via-white/10 to-white/20" />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* ===========================================
+                  GAME CONTROLS
+                 =========================================== */}
+
+              <section className="rounded-3xl border border-amber-400/15 bg-[linear-gradient(145deg,rgba(10,18,28,.97),rgba(5,10,17,.94))] p-4 shadow-2xl shadow-black/35 backdrop-blur-xl">
+                <div className="mb-5">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="
+                        h-2
+                        w-2
+                        rounded-full
+                        bg-amber-400
+                        shadow-[0_0_10px_rgba(251,191,36,0.55)]
+                      "
+                    />
+
+                    <h2 className="font-serif text-xl font-semibold text-[#f6ead1]">
+                      {t("Game Controls")}
+                    </h2>
+                  </div>
+
+                  <p className="mt-1.5 text-xs text-zinc-500">
+                    {t("Players, game and actions")}
+                  </p>
+                </div>
+
+                <div className="[&_input]:border-white/10 [&_input]:bg-black/25 [&_input]:text-zinc-100 [&_input]:outline-none [&_input:focus]:border-amber-400/35 [&_button]:border [&_button]:border-white/10 [&_button]:bg-white/[0.045] [&_button]:text-zinc-200 [&_button:hover]:border-amber-400/20 [&_button:hover]:bg-amber-400/[0.07]">
+                  <GameControls
+                    gameName={gameName}
+                    whitePlayer={whitePlayer}
+                    blackPlayer={blackPlayer}
+                    onGameNameChange={setGameName}
+                    onWhitePlayerChange={setWhitePlayer}
+                    onBlackPlayerChange={setBlackPlayer}
+                    onUndo={undoMove}
+                    onRestart={restartGame}
+                    onSave={saveGame}
+                  />
+                </div>
+              </section>
+
               {/* ===========================================
                   PIECE VALUES
                  =========================================== */}
 
-              <section
-                className="
-                  rounded-3xl
-                  border
-                  border-white/10
-                  bg-zinc-900/75
-                  p-4
-                  shadow-xl
-                  shadow-black/20
-                  backdrop-blur-md
-                "
-              >
+              <section className="hidden">
                 <div className="mb-4 flex items-start justify-between">
                   <div>
                     <h2 className="text-sm font-bold text-zinc-100">
@@ -3411,6 +3394,34 @@ function getHistoryPieceSymbol(color: "w" | "b", piece: PieceType) {
   };
 
   return symbols[color][piece];
+}
+
+function PlayerSilhouette({ tone }: { tone: "amber" | "sky" }) {
+  const toneClasses =
+    tone === "amber"
+      ? "border-amber-300/25 bg-amber-300/[0.08] text-amber-100 ring-amber-400/5"
+      : "border-sky-300/20 bg-sky-300/[0.07] text-sky-100 ring-sky-400/5";
+
+  return (
+    <div
+      className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full border ring-4 ${toneClasses}`}
+      aria-hidden="true"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        className="h-7 w-7"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.7"
+      >
+        <circle cx="12" cy="8" r="3.25" />
+        <path
+          d="M5.5 19.25c.55-4.05 3-6.25 6.5-6.25s5.95 2.2 6.5 6.25"
+          strokeLinecap="round"
+        />
+      </svg>
+    </div>
+  );
 }
 
 function CapturedPiecesGrid({

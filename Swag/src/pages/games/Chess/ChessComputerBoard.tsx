@@ -4,6 +4,7 @@ import { Chess, type Square } from "chess.js";
 
 import Board from "../../../components/chess/singleplayer/Board.tsx";
 import PromotionBar from "../../../components/chess/singleplayer/PromotionBar.tsx";
+import ChessMatchStatus from "../../../components/chess/singleplayer/ChessMatchStatus.tsx";
 
 import {
   playPieceSelectSound,
@@ -127,6 +128,7 @@ const deTranslations: Record<string, string> = {
   "Chess Coach": "Schach-Coach",
   "Live analysis enabled": "Live-Analyse aktiviert",
   "Enable Stockfish feedback": "Stockfish-Feedback aktivieren",
+  "Enable Chess Coach": "Schach-Coach aktivieren",
   "Live Stockfish analysis": "Live-Stockfish-Analyse",
   "Last move": "Letzter Zug",
   "Evaluation loss": "Bewertungsverlust",
@@ -180,6 +182,8 @@ const deTranslations: Record<string, string> = {
   "Online game": "Online-Partie",
   Room: "Raum",
   "Game finished": "Partie beendet",
+  "White has won!": "Weiß hat gewonnen!",
+  "Black has won!": "Schwarz hat gewonnen!",
   "Opponent's turn": "Gegner am Zug",
   Leave: "Verlassen",
   "White and Black": "Weiß und Schwarz",
@@ -275,6 +279,8 @@ const bavarianTranslations: Record<string, string> = {
   "You win": "Du gwinnst",
   "You lose": "Du verlierst",
   "Waiting for opponent...": "Wart auf'n Gegner...",
+  "White has won!": "Weiß hod gwunna!",
+  "Black has won!": "Schwarz hod gwunna!",
   "Back to lobby": "Zruck zur Lobby",
   Resign: "Aufgebn",
   "New Game": "Neue Partie",
@@ -345,6 +351,7 @@ const koreanTranslations: Record<string, string> = {
   "Chess Coach": "체스 코치",
   "Live analysis enabled": "실시간 분석 활성화",
   "Enable Stockfish feedback": "Stockfish 피드백 켜기",
+  "Enable Chess Coach": "체스 코치 활성화",
   "Live Stockfish analysis": "실시간 Stockfish 분석",
   "Last move": "마지막 수",
   "Evaluation loss": "평가 손실",
@@ -398,6 +405,8 @@ const koreanTranslations: Record<string, string> = {
   "Online game": "온라인 게임",
   Room: "방",
   "Game finished": "게임 종료",
+  "White has won!": "백이 승리했습니다!",
+  "Black has won!": "흑이 승리했습니다!",
   "Opponent's turn": "상대 차례",
   Leave: "나가기",
   "White and Black": "백과 흑",
@@ -495,6 +504,7 @@ const russianTranslations: Record<string, string> = {
   "Chess Coach": "Шахматный тренер",
   "Live analysis enabled": "Анализ в реальном времени включён",
   "Enable Stockfish feedback": "Включить подсказки Stockfish",
+  "Enable Chess Coach": "Включить шахматного тренера",
   "Live Stockfish analysis": "Анализ Stockfish в реальном времени",
   "Last move": "Последний ход",
   "Evaluation loss": "Потеря оценки",
@@ -548,6 +558,8 @@ const russianTranslations: Record<string, string> = {
   "Online game": "Онлайн-партия",
   Room: "Комната",
   "Game finished": "Партия окончена",
+  "White has won!": "Белые победили!",
+  "Black has won!": "Чёрные победили!",
   "Opponent's turn": "Ход соперника",
   Leave: "Выйти",
   "White and Black": "Белые и чёрные",
@@ -948,6 +960,10 @@ export default function ChessComputerBoard({
 
   const [showResignConfirm, setShowResignConfirm] = useState(false);
 
+  const [pieceValuesOpen, setPieceValuesOpen] = useState(false);
+
+  const [coachModeEnabled, setCoachModeEnabled] = useState(false);
+
   /*
    * ---------------------------------------------------------
    * STOCKFISH OPPONENT
@@ -1004,6 +1020,18 @@ export default function ChessComputerBoard({
   const humanColor = playerColor === "white" ? "w" : "b";
 
   const computerColor = humanColor === "w" ? "b" : "w";
+
+  function toggleCoachMode() {
+    if (coachModeEnabled) {
+      coachGenerationRef.current += 1;
+      setMoveFeedback(null);
+      setHelpVisible(false);
+      setSuggestedMoves([]);
+      setHighlightedSuggestionUci(null);
+    }
+
+    setCoachModeEnabled((enabled) => !enabled);
+  }
 
   function playSound(sound: string) {
     const audio = new Audio(`/sounds/${sound}.mp3`);
@@ -1183,7 +1211,7 @@ export default function ChessComputerBoard({
     playedUci: string,
     playedSan: string,
   ) {
-    if (!analysisReady) {
+    if (!coachModeEnabled || !analysisReady) {
       return;
     }
 
@@ -1260,6 +1288,7 @@ export default function ChessComputerBoard({
     }
 
     if (
+      !coachModeEnabled ||
       !analysisReady ||
       analyzing ||
       thinking ||
@@ -2024,9 +2053,116 @@ export default function ChessComputerBoard({
     synchronizeGameState();
   }
 
+  const latestMoveSan = currentMoveHistory[currentMoveHistory.length - 1] ?? "";
+
+  const latestMoverColor: "w" | "b" | null =
+    currentMoveHistory.length === 0
+      ? null
+      : currentMoveHistory.length % 2 === 1
+        ? "w"
+        : "b";
+
+  const latestMoverLabel =
+    latestMoverColor === null
+      ? null
+      : latestMoverColor === humanColor
+        ? t("You")
+        : "Stockfish";
+
+  const singleplayerMatchStatus = (() => {
+    if (historyPreview) {
+      return {
+        event: "info" as const,
+        message: `${t("History Preview")} · ${historyPreview.san}`,
+        detail: `${t("Move")} ${historyPreview.moveNumber}${
+          historyPreview.color === "w" ? "." : "..."
+        }`,
+      };
+    }
+
+    if (gameResult) {
+      const winnerColor =
+        gameResult.winner === "draw"
+          ? null
+          : gameResult.winner === "human"
+            ? humanColor
+            : humanColor === "w"
+              ? "b"
+              : "w";
+
+      return {
+        event:
+          gameResult.winner === "draw"
+            ? ("draw" as const)
+            : ("checkmate" as const),
+        message:
+          winnerColor === null
+            ? t("Draw")
+            : winnerColor === "w"
+              ? t("White has won!")
+              : t("Black has won!"),
+        detail: t(gameResult.message),
+      };
+    }
+
+    if (game.isCheck()) {
+      const humanInCheck = game.turn() === humanColor;
+
+      return {
+        event: "check" as const,
+        message: humanInCheck
+          ? t("You are in check")
+          : t("Stockfish is in check"),
+        detail: humanInCheck ? t("Your turn") : t("Stockfish's turn"),
+      };
+    }
+
+    if (latestMoverLabel && /^O-O-O/.test(latestMoveSan)) {
+      return {
+        event: "castle" as const,
+        message: `${latestMoverLabel} castled queenside`,
+        detail: latestMoveSan,
+      };
+    }
+
+    if (latestMoverLabel && /^O-O/.test(latestMoveSan)) {
+      return {
+        event: "castle" as const,
+        message: `${latestMoverLabel} castled kingside`,
+        detail: latestMoveSan,
+      };
+    }
+
+    if (latestMoverLabel && latestMoveSan.includes("=")) {
+      return {
+        event: "promotion" as const,
+        message: `${latestMoverLabel} promoted a pawn`,
+        detail: latestMoveSan,
+      };
+    }
+
+    if (latestMoverLabel && latestMoveSan.includes("x")) {
+      return {
+        event: "capture" as const,
+        message: `${latestMoverLabel} captured a piece`,
+        detail: latestMoveSan,
+      };
+    }
+
+    return {
+      event: "turn" as const,
+      message:
+        game.turn() === humanColor ? t("Your turn") : t("Stockfish's turn"),
+      detail: `${currentMoveHistory.length} ${t("moves")}`,
+    };
+  })();
+
+  const singleplayerPlayerOrder: Array<"w" | "b"> =
+    playerColor === "white" ? ["b", "w"] : ["w", "b"];
+
   return (
-    <div className="w-full">
-      <div className="mb-4 flex justify-end">
+    <div className="relative left-1/2 min-h-[calc(100dvh-4rem)] w-screen -translate-x-1/2 overflow-x-hidden bg-[#05080d] bg-[radial-gradient(circle_at_50%_-10%,rgba(245,158,11,0.12),transparent_30%),radial-gradient(circle_at_12%_38%,rgba(14,165,233,0.08),transparent_28%),linear-gradient(180deg,#03070b_0%,#07111b_48%,#020509_100%)] px-3 py-3 sm:px-5 lg:px-6 xl:h-[calc(100dvh-4rem)] xl:min-h-0 xl:overflow-hidden">
+      <div className="mb-2 flex shrink-0 justify-end">
         <ChessLanguageSelector
           language={language}
           onChange={changeLanguage}
@@ -2037,186 +2173,349 @@ export default function ChessComputerBoard({
       <main
         className="
           grid
-          gap-6
-          xl:grid-cols-[320px_minmax(0,1fr)_320px]
+          gap-4
+          xl:h-[calc(100%-2.75rem)]
+          xl:min-h-0
+          xl:grid-cols-[minmax(260px,19vw)_minmax(0,1fr)_minmax(260px,19vw)]
         "
       >
         {/* =====================================================
             LEFT SIDEBAR
            ===================================================== */}
 
-        <aside className="min-w-0">
-          <div className="space-y-4 xl:sticky xl:top-6">
-            {/* PLAYERS */}
+        <aside className="order-3 min-w-0 xl:order-1 xl:h-full xl:min-h-0 xl:overflow-hidden xl:pr-1">
+          <div className="flex h-full min-h-0 flex-col gap-3">
+            {/* =================================================
+                CHESS COACH TOGGLE
+               ================================================= */}
 
-            <section
-              className="
-                rounded-3xl
-                border
-                border-white/10
-                bg-zinc-900/75
-                p-4
-                shadow-xl
-                shadow-black/20
-                backdrop-blur-md
-              "
+            <button
+              type="button"
+              onClick={toggleCoachMode}
+              aria-pressed={coachModeEnabled}
+              className={`group flex w-full items-center justify-between gap-4 rounded-3xl border p-4 text-left shadow-xl shadow-black/20 backdrop-blur-md transition ${
+                coachModeEnabled
+                  ? "border-amber-400/30 bg-[linear-gradient(145deg,rgba(40,31,13,.65),rgba(8,15,23,.96))] shadow-[0_0_26px_rgba(251,191,36,.06)] hover:bg-amber-400/[0.10]"
+                  : "border-amber-400/12 bg-[linear-gradient(145deg,rgba(10,18,28,.97),rgba(5,10,17,.94))] hover:border-amber-400/25"
+              }`}
             >
-              <div className="mb-4">
-                <h2 className="text-sm font-bold text-zinc-100">
-                  {t("Players")}
-                </h2>
+              <div className="flex items-center gap-3">
+                <div
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xl transition ${
+                    coachModeEnabled
+                      ? "bg-amber-400/15 text-amber-200"
+                      : "bg-white/5 text-zinc-500 group-hover:text-amber-300"
+                  }`}
+                >
+                  ♞
+                </div>
 
-                <p className="mt-1 text-xs text-zinc-500">
-                  {t("You vs Stockfish")}
-                </p>
+                <div>
+                  <p className="font-serif text-lg font-semibold text-[#f6ead1]">
+                    {t("Chess Coach")}
+                  </p>
+                  <p className="mt-0.5 text-xs text-zinc-500">
+                    {coachModeEnabled
+                      ? t("Live analysis enabled")
+                      : t("Enable Chess Coach")}
+                  </p>
+                </div>
               </div>
 
-              <div className="space-y-3">
-                {/* HUMAN */}
+              <div
+                className={`relative h-6 w-11 shrink-0 rounded-full border transition ${
+                  coachModeEnabled
+                    ? "border-amber-400/30 bg-amber-400/20"
+                    : "border-white/10 bg-black/30"
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 h-4 w-4 rounded-full transition-all ${
+                    coachModeEnabled
+                      ? "left-[22px] bg-amber-300"
+                      : "left-1 bg-zinc-500"
+                  }`}
+                />
+              </div>
+            </button>
 
-                <div
-                  className={`
-                    rounded-2xl
-                    border
-                    p-3
-                    transition
+            {coachModeEnabled && (
+              <section className="rounded-3xl border border-amber-400/15 bg-[linear-gradient(145deg,rgba(10,18,28,.97),rgba(5,10,17,.94))] p-4 shadow-2xl shadow-black/35 backdrop-blur-xl">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="font-serif text-xl font-semibold text-[#f6ead1]">
+                      {t("Chess Coach")}
+                    </h2>
 
-                    ${
-                      game.turn() === humanColor && !gameResult
-                        ? "border-amber-400/25 bg-amber-400/[0.07]"
-                        : "border-white/5 bg-black/20"
-                    }
-                  `}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="h-11 w-11 shrink-0 overflow-hidden rounded-xl border border-amber-300/20">
-                      <ProfileAvatar
-                        avatarId={humanAvatarId}
-                        className="h-full w-full"
-                      />
-                    </div>
+                    <p className="mt-1 text-xs text-zinc-500">
+                      {t("Optional Stockfish analysis")}
+                    </p>
+                  </div>
 
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className="font-bold text-white">{t("You")}</p>
-
-                        <span
-                          className="
-                            rounded-full
-                            bg-amber-400/10
-                            px-2
-                            py-0.5
-                            text-[8px]
-                            font-black
-                            uppercase
-                            tracking-widest
-                            text-amber-300
-                          "
-                        >
-                          You
-                        </span>
-                      </div>
-
-                      <p className="mt-0.5 text-xs text-zinc-500">
-                        {humanColor === "w" ? t("White") : t("Black")}
-                      </p>
-                    </div>
-
-                    {game.turn() === humanColor && !gameResult && (
-                      <span
-                        className="
-                            h-2
-                            w-2
-                            animate-pulse
-                            rounded-full
-                            bg-amber-400
-                          "
-                      />
-                    )}
+                  <div
+                    className="
+                      flex
+                      h-9
+                      w-9
+                      items-center
+                      justify-center
+                      rounded-xl
+                      bg-amber-400/10
+                      text-xl
+                      text-amber-200
+                    "
+                  >
+                    ♞
                   </div>
                 </div>
 
-                {/* COMPUTER */}
+                {/* LAST MOVE RATING */}
 
-                <div
-                  className={`
-                    rounded-2xl
-                    border
-                    p-3
-                    transition
-
-                    ${
-                      game.turn() === computerColor && !gameResult
-                        ? "border-amber-400/25 bg-amber-400/[0.07]"
-                        : "border-white/5 bg-black/20"
-                    }
-                  `}
-                >
-                  <div className="flex items-center gap-3">
-                    <div
+                {moveFeedback && (
+                  <div
+                    className="
+                      mt-4
+                      rounded-2xl
+                      border
+                      border-white/5
+                      bg-black/20
+                      p-3
+                    "
+                  >
+                    <p
                       className="
-                        flex
-                        h-11
-                        w-11
-                        shrink-0
-                        items-center
-                        justify-center
-                        rounded-xl
-                        border
-                        border-cyan-300/20
-                        bg-cyan-400/10
-                        text-2xl
-                        shadow-inner
+                        text-[10px]
+                        font-bold
+                        uppercase
+                        tracking-widest
+                        text-zinc-500
                       "
-                      aria-label="Stockfish"
                     >
-                      🤖
+                      {t("Your last move")}
+                    </p>
+
+                    <div className="mt-2 flex items-center justify-between gap-3">
+                      <span className="font-mono text-lg font-bold text-white">
+                        {moveFeedback.playedMove}
+                      </span>
+
+                      <MoveQualityBadge quality={moveFeedback.quality} />
                     </div>
 
-                    <div className="min-w-0 flex-1">
-                      <p className="font-bold text-white">Stockfish</p>
-
-                      <p className="mt-0.5 text-xs text-zinc-500">
-                        {computerColor === "w" ? t("White") : t("Black")}
+                    {moveFeedback.quality !== "Best" && (
+                      <p className="mt-2 text-xs text-zinc-500">
+                        {t("Evaluation loss")}:{" "}
+                        {(moveFeedback.centipawnLoss / 100).toFixed(2)}{" "}
+                        {t("pawns")}
                       </p>
-                    </div>
+                    )}
 
-                    {game.turn() === computerColor && !gameResult && (
-                      <span
+                    {moveFeedback.bestMove &&
+                      moveFeedback.quality !== "Best" && (
+                        <p className="mt-1 text-[11px] text-zinc-600">
+                          {t("Engine preferred")}:{" "}
+                          <span className="font-mono text-zinc-400">
+                            {uciToSan(
+                              /*
+                               * We do not retain the
+                               * exact old FEN here,
+                               * therefore show the UCI
+                               * fallback safely.
+                               */
+                              game.fen(),
+                              moveFeedback.bestMove,
+                            )}
+                          </span>
+                        </p>
+                      )}
+                  </div>
+                )}
+
+                {/* HELP BUTTON */}
+
+                <button
+                  type="button"
+                  disabled={
+                    !analysisReady ||
+                    analyzing ||
+                    thinking ||
+                    gameResult !== null ||
+                    game.turn() !== humanColor
+                  }
+                  onClick={toggleHelp}
+                  className={`
+                    mt-4
+                    w-full
+                    rounded-xl
+                    border
+                    px-4
+                    py-3
+                    text-sm
+                    font-bold
+                    transition
+
+                    ${
+                      helpVisible
+                        ? `
+                          border-amber-400/30
+                          bg-amber-400/10
+                          text-amber-300
+                        `
+                        : `
+                          border-white/10
+                          bg-white/5
+                          text-zinc-300
+                          hover:bg-white/10
+                        `
+                    }
+
+                    disabled:cursor-not-allowed
+                    disabled:opacity-40
+                  `}
+                >
+                  {analyzing
+                    ? t("Analyzing...")
+                    : helpVisible
+                      ? t("Hide Help")
+                      : t("Help · Best Moves")}
+                </button>
+
+                {/* BEST MOVES */}
+
+                {helpVisible && (
+                  <div className="mt-3 space-y-2">
+                    {suggestedMoves.length === 0 ? (
+                      <div
                         className="
-                            h-2
-                            w-2
-                            animate-pulse
-                            rounded-full
-                            bg-amber-400
-                          "
-                      />
+                          rounded-xl
+                          bg-black/20
+                          px-3
+                          py-4
+                          text-center
+                          text-xs
+                          text-zinc-500
+                        "
+                      >
+                        {analyzing
+                          ? t("Stockfish is analyzing...")
+                          : t("No analysis available.")}
+                      </div>
+                    ) : (
+                      suggestedMoves.map((suggestion, index) => {
+                        const selected =
+                          highlightedSuggestionUci === suggestion.uci;
+
+                        return (
+                          <button
+                            key={`${suggestion.uci}-${index}`}
+                            type="button"
+                            onClick={() =>
+                              setHighlightedSuggestionUci(suggestion.uci)
+                            }
+                            className={`
+                              flex
+                              w-full
+                              items-center
+                              justify-between
+                              rounded-xl
+                              border
+                              px-3
+                              py-2.5
+                              text-left
+                              transition
+
+                              ${
+                                selected
+                                  ? `
+                                    border-amber-400/30
+                                    bg-amber-400/10
+                                  `
+                                  : `
+                                    border-white/5
+                                    bg-black/20
+                                    hover:border-white/10
+                                    hover:bg-white/5
+                                  `
+                              }
+                            `}
+                          >
+                            <div className="flex items-center gap-3">
+                              <span
+                                className={`
+                                  flex
+                                  h-6
+                                  w-6
+                                  items-center
+                                  justify-center
+                                  rounded-md
+                                  text-[10px]
+                                  font-black
+
+                                  ${
+                                    selected
+                                      ? "bg-amber-300 text-zinc-950"
+                                      : "bg-amber-400/10 text-amber-300"
+                                  }
+                                `}
+                              >
+                                {index + 1}
+                              </span>
+
+                              <div>
+                                <p
+                                  className={`font-mono text-sm font-bold ${
+                                    selected
+                                      ? "text-amber-200"
+                                      : "text-zinc-200"
+                                  }`}
+                                >
+                                  {suggestion.san}
+                                </p>
+
+                                <p className="text-[10px] text-zinc-600">
+                                  {suggestion.uci}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="text-right">
+                              <span className="block text-xs font-semibold text-zinc-400">
+                                {suggestion.evaluation}
+                              </span>
+
+                              <span
+                                className={`mt-0.5 block text-[9px] font-bold ${
+                                  selected ? "text-amber-300" : "text-zinc-700"
+                                }`}
+                              >
+                                {selected
+                                  ? t("Shown on board")
+                                  : t("Click to show")}
+                              </span>
+                            </div>
+                          </button>
+                        );
+                      })
                     )}
                   </div>
-                </div>
-              </div>
-            </section>
+                )}
+              </section>
+            )}
 
             {/* CAPTURED PIECES */}
 
-            <section
-              className="
-                rounded-3xl
-                border
-                border-white/10
-                bg-zinc-900/75
-                p-4
-                shadow-xl
-                shadow-black/20
-                backdrop-blur-md
-              "
-            >
-              <div className="mb-3 flex items-center justify-between">
-                <h2 className="text-sm font-bold text-zinc-100">
-                  Captured Pieces
-                </h2>
+            <section className="order-1 rounded-3xl border border-amber-400/15 bg-[linear-gradient(145deg,rgba(10,18,28,.97),rgba(5,10,17,.94))] p-4 shadow-2xl shadow-black/35 backdrop-blur-xl">
+              <div className="mb-4 flex items-start justify-between gap-3">
+                <div>
+                  <h2 className="font-serif text-lg font-semibold text-[#f6ead1]">
+                    {t("Captured Pieces")}
+                  </h2>
+                  <p className="mt-0.5 text-[10px] uppercase tracking-[0.18em] text-zinc-600">
+                    {t("Material overview")}
+                  </p>
+                </div>
 
-                <span className="text-xs text-zinc-500">
+                <span className="rounded-xl border border-amber-300/10 bg-amber-300/[0.05] px-2.5 py-1 text-xs font-bold text-amber-100/80">
                   {materialDifference > 0 &&
                     `${t("White")} +${materialDifference}`}
 
@@ -2264,135 +2563,110 @@ export default function ChessComputerBoard({
               </div>
             </section>
 
-            {/* MOVE HISTORY */}
-
-            <section
-              className="
-                rounded-3xl
-                border
-                border-white/10
-                bg-zinc-900/75
-                p-4
-                shadow-xl
-                shadow-black/20
-                backdrop-blur-md
-              "
-            >
-              <div className="mb-4 flex items-center justify-between">
+            <section className="order-2 overflow-hidden rounded-3xl border border-amber-400/15 bg-[#091019]/90 shadow-2xl shadow-black/30 backdrop-blur-xl">
+              <button
+                type="button"
+                onClick={() => setPieceValuesOpen((open) => !open)}
+                className="flex w-full items-center justify-between px-4 py-3.5 text-left transition hover:bg-white/[0.03]"
+              >
                 <div>
-                  <h2 className="text-sm font-bold text-zinc-100">
+                  <h2 className="font-serif text-lg font-semibold text-[#f6ead1]">
+                    {t("Piece Values")}
+                  </h2>
+                  <p className="mt-0.5 text-[10px] uppercase tracking-[0.2em] text-zinc-600">
+                    {t("Standard values")}
+                  </p>
+                </div>
+                <span className="rounded-lg border border-amber-400/20 bg-amber-400/10 px-3 py-1.5 text-xs font-black text-amber-300">
+                  {pieceValuesOpen ? "Hide" : "Show"}
+                </span>
+              </button>
+              {pieceValuesOpen && (
+                <div className="max-h-52 overflow-y-auto border-t border-white/5 p-3 [scrollbar-width:thin]">
+                  <div className="space-y-1">
+                    {pieceValueList.map((piece) => (
+                      <div
+                        key={piece.type}
+                        className="flex items-center justify-between rounded-xl px-2 py-2 hover:bg-white/[0.04]"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl text-[#f8e7c0]">
+                            {piece.symbol}
+                          </span>
+                          <span className="text-sm text-zinc-400">
+                            {t(piece.name)}
+                          </span>
+                        </div>
+                        <span className="text-sm font-black text-zinc-200">
+                          {pieceValues[piece.type]}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-3 rounded-xl bg-black/20 px-3 py-2 text-right text-xs font-bold text-zinc-400">
+                    {materialDifference === 0
+                      ? t("Equal")
+                      : materialDifference > 0
+                        ? `${t("White")} +${materialDifference}`
+                        : `${t("Black")} +${Math.abs(materialDifference)}`}
+                  </div>
+                </div>
+              )}
+            </section>
+            {/* MOVE HISTORY */}
+            <section className="order-3 flex min-h-[140px] flex-1 flex-col overflow-hidden rounded-3xl border border-amber-400/15 bg-[#091019]/90 shadow-2xl shadow-black/30 backdrop-blur-xl">
+              <div className="flex items-center justify-between border-b border-white/5 px-4 py-3">
+                <div>
+                  <h2 className="font-serif text-lg font-semibold text-[#f6ead1]">
                     {t("Move History")}
                   </h2>
-
-                  <p className="mt-1 text-xs text-zinc-500">
+                  <p className="mt-0.5 text-[10px] uppercase tracking-[0.2em] text-zinc-600">
                     {t("Game history")}
                   </p>
                 </div>
-
-                <span className="rounded-xl bg-white/5 px-2.5 py-1 text-xs font-semibold text-zinc-400">
+                <span className="rounded-lg border border-white/5 bg-white/5 px-2.5 py-1 text-xs font-bold text-zinc-400">
                   {currentMoveHistory.length}
                 </span>
               </div>
-
-              <div
-                className="
-                  max-h-[420px]
-                  overflow-y-auto
-                  rounded-2xl
-                  border
-                  border-white/5
-                  bg-black/20
-                "
-              >
+              <div className="max-h-64 min-h-0 flex-1 overflow-y-auto [scrollbar-width:thin] xl:max-h-none">
                 {historyRows.length === 0 ? (
                   <div className="px-4 py-8 text-center text-xs text-zinc-600">
                     {t("No moves yet")}
                   </div>
                 ) : (
-                  <table className="w-full border-collapse">
-                    <thead className="sticky top-0 z-10 bg-zinc-900">
-                      <tr className="border-b border-white/5 text-left text-[9px] font-black uppercase tracking-wider text-zinc-600">
-                        <th className="px-3 py-2">{t("Move")}</th>
-                        <th className="px-2 py-2">{t("Side")}</th>
-                        <th className="px-2 py-2">{t("Played")}</th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {historyRows.map((move) => {
-                        const selected = historyPreviewPly === move.ply;
-
-                        return (
-                          <tr
-                            key={move.ply}
-                            tabIndex={0}
-                            onClick={() => {
-                              setHistoryPreviewPly(move.ply);
-                              setHelpVisible(false);
-                              setSuggestedMoves([]);
-                              setHighlightedSuggestionUci(null);
-                              setSelectedSquare(null);
-                              setLegalMoves([]);
-                              setPromotionFrom(null);
-                              setPromotionSquare(null);
-                            }}
-                            onKeyDown={(event) => {
-                              if (event.key === "Enter" || event.key === " ") {
-                                setHistoryPreviewPly(move.ply);
-                                setHelpVisible(false);
-                                setSuggestedMoves([]);
-                                setHighlightedSuggestionUci(null);
-                                setSelectedSquare(null);
-                                setLegalMoves([]);
-                              }
-                            }}
-                            className={`
-                              cursor-pointer
-                              border-b
-                              border-white/5
-                              transition
-                              last:border-0
-                              ${
-                                selected ? "bg-blue-400/10" : "hover:bg-white/5"
-                              }
-                            `}
-                          >
-                            <td className="px-3 py-2.5 text-[10px] text-zinc-600">
-                              {move.moveNumber}
-                              {move.color === "w" ? "." : "..."}
-                            </td>
-
-                            <td className="px-2 py-2.5">
-                              {move.color === "w" ? (
-                                <span className="inline-flex items-center gap-1 rounded-full bg-[#fff3d5]/10 px-2 py-1 text-[9px] font-bold text-[#fff3d5]">
-                                  ♔ {t("White")}
-                                </span>
-                              ) : (
-                                <span className="inline-flex items-center gap-1 rounded-full bg-white/5 px-2 py-1 text-[9px] font-bold text-zinc-400">
-                                  ♚ {t("Black")}
-                                </span>
-                              )}
-                            </td>
-
-                            <td className="px-2 py-2.5">
-                              <div className="flex items-center gap-2">
-                                <span className="w-5 text-center text-lg leading-none">
-                                  {getHistoryPieceSymbol(
-                                    move.color,
-                                    move.piece,
-                                  )}
-                                </span>
-
-                                <span className="font-mono text-xs font-bold text-zinc-200">
-                                  {move.san}
-                                </span>
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                  <div className="divide-y divide-white/5">
+                    {historyRows.map((move) => {
+                      const selected = historyPreviewPly === move.ply;
+                      return (
+                        <button
+                          key={move.ply}
+                          type="button"
+                          onClick={() => {
+                            setHistoryPreviewPly(move.ply);
+                            setHelpVisible(false);
+                            setSuggestedMoves([]);
+                            setHighlightedSuggestionUci(null);
+                            setSelectedSquare(null);
+                            setLegalMoves([]);
+                            setPromotionFrom(null);
+                            setPromotionSquare(null);
+                          }}
+                          className={`flex w-full items-center gap-3 px-4 py-2.5 text-left transition hover:bg-white/[0.04] ${selected ? "bg-blue-400/10" : ""}`}
+                        >
+                          <span className="w-8 text-[10px] font-black text-zinc-600">
+                            {move.moveNumber}
+                            {move.color === "w" ? "." : "..."}
+                          </span>
+                          <span className="text-lg leading-none">
+                            {getHistoryPieceSymbol(move.color, move.piece)}
+                          </span>
+                          <span className="font-mono text-xs font-bold text-zinc-200">
+                            {move.san}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 )}
               </div>
             </section>
@@ -2403,19 +2677,29 @@ export default function ChessComputerBoard({
             CENTER
            ===================================================== */}
 
-        <section className="min-w-0">
-          <div className="mx-auto max-w-[820px]">
+        <section className="order-1 min-w-0 xl:order-2 xl:h-full xl:min-h-0">
+          <div className="mx-auto w-full max-w-[820px] xl:flex xl:h-full xl:min-h-0 xl:max-w-[min(820px,calc(100dvh-23rem))] xl:flex-col">
+            <section className="mb-2 shrink-0 rounded-2xl border border-amber-400/30 bg-[#08111c]/90 px-4 py-2.5 text-center shadow-[0_0_40px_rgba(245,158,11,0.08)] backdrop-blur-xl">
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-400">
+                {t("Classic Chess")}
+              </p>
+              <h1 className="mt-0.5 font-serif text-2xl font-semibold text-[#f7ead0]">
+                Singleplayer
+              </h1>
+            </section>
+
             {/* STATUS */}
 
             <div
               className="
-                mb-3
-                rounded-2xl
+                mb-2
+                shrink-0
+                rounded-xl
                 border
                 border-white/10
                 bg-zinc-900/75
-                px-4
-                py-3
+                px-3
+                py-2
                 shadow-lg
                 shadow-black/10
                 backdrop-blur-md
@@ -2475,9 +2759,47 @@ export default function ChessComputerBoard({
               </div>
             )}
 
+            <ChessMatchStatus
+              event={singleplayerMatchStatus.event}
+              message={singleplayerMatchStatus.message}
+              detail={singleplayerMatchStatus.detail}
+              label="Match status"
+              className="mb-2"
+              actions={
+                gameResult && !historyPreview ? (
+                  <>
+                    <button
+                      type="button"
+                      disabled={currentMoveHistory.length === 0}
+                      onClick={() => setReviewOpen(true)}
+                      className="rounded-lg border border-amber-300/25 bg-amber-300/[0.10] px-3 py-2 text-[10px] font-black text-amber-100 transition hover:bg-amber-300/[0.16] disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      {t("Open Game Review")}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={restartGame}
+                      className="rounded-lg border border-emerald-300/20 bg-emerald-300/[0.08] px-3 py-2 text-[10px] font-black text-emerald-100 transition hover:bg-emerald-300/[0.14]"
+                    >
+                      {t("Rematch")}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={onChangeSettings}
+                      className="rounded-lg border border-white/10 bg-white/[0.045] px-3 py-2 text-[10px] font-black text-zinc-300 transition hover:bg-white/[0.08] hover:text-white"
+                    >
+                      {t("Back to lobby")}
+                    </button>
+                  </>
+                ) : undefined
+              }
+            />
+
             {/* BOARD */}
 
-            <div className="relative">
+            <div className="relative shrink-0">
               <Board
                 board={displayedBoard}
                 selectedSquare={
@@ -2499,125 +2821,6 @@ export default function ChessComputerBoard({
                 onSquareClick={historyPreview ? () => {} : handleSquareClick}
                 orientation={playerColor}
               />
-
-              {/* GAME RESULT */}
-
-              {gameResult && !historyPreview && (
-                <div
-                  className="
-                    absolute
-                    inset-0
-                    z-30
-                    flex
-                    items-center
-                    justify-center
-                    rounded-[28px]
-                    bg-zinc-950/75
-                    p-6
-                    backdrop-blur-sm
-                  "
-                >
-                  <div
-                    className="
-                      w-full
-                      max-w-sm
-                      rounded-3xl
-                      border
-                      border-white/10
-                      bg-zinc-900/95
-                      p-8
-                      text-center
-                      shadow-2xl
-                    "
-                  >
-                    <div className="text-5xl">
-                      {gameResult.winner === "human"
-                        ? "♔"
-                        : gameResult.winner === "stockfish"
-                          ? "♚"
-                          : "½"}
-                    </div>
-
-                    <p
-                      className="
-                        mt-5
-                        text-xs
-                        font-bold
-                        uppercase
-                        tracking-[0.25em]
-                        text-amber-400
-                      "
-                    >
-                      {t("Game Over")}
-                    </p>
-
-                    <h2 className="mt-2 text-3xl font-black text-white">
-                      {t(gameResult.title)}
-                    </h2>
-
-                    <p className="mt-3 text-zinc-400">
-                      {t(gameResult.message)}
-                    </p>
-
-                    <button
-                      type="button"
-                      onClick={() => setReviewOpen(true)}
-                      className="
-                        mt-7
-                        w-full
-                        rounded-xl
-                        bg-amber-400
-                        px-5
-                        py-3
-                        font-black
-                        text-zinc-950
-                        transition
-                        hover:bg-amber-300
-                      "
-                    >
-                      {t("Open Game Review")}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={restartGame}
-                      className="
-                        mt-3
-                        w-full
-                        rounded-xl
-                        bg-white/10
-                        px-5
-                        py-3
-                        font-semibold
-                        text-white
-                        transition
-                        hover:bg-white/20
-                      "
-                    >
-                      {t("Play Again")}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={onChangeSettings}
-                      className="
-                        mt-3
-                        w-full
-                        rounded-xl
-                        bg-white/10
-                        px-5
-                        py-3
-                        font-semibold
-                        text-white
-                        transition
-                        hover:bg-white/20
-                      "
-                    >
-                      {t("Change Settings")}
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </section>
@@ -2626,25 +2829,82 @@ export default function ChessComputerBoard({
             RIGHT SIDEBAR
            ===================================================== */}
 
-        <aside className="min-w-0">
-          <div className="space-y-4 xl:sticky xl:top-6">
+        <aside className="order-2 min-w-0 xl:order-3 xl:h-full xl:min-h-0 xl:overflow-y-auto xl:pl-1 [scrollbar-width:thin]">
+          <div className="space-y-3">
+            {/* PLAYERS — ordered to match the visible board */}
+            <div className="shrink-0 space-y-2">
+              {singleplayerPlayerOrder.map((color, index) => {
+                const isHuman = color === humanColor;
+                const active = game.turn() === color && !gameResult;
+
+                return (
+                  <div key={color} className="space-y-2">
+                    <section
+                      className={`rounded-3xl border p-3.5 shadow-2xl shadow-black/30 backdrop-blur-xl transition ${
+                        active
+                          ? "border-amber-400/30 bg-[linear-gradient(145deg,rgba(39,30,13,.52),rgba(7,14,22,.95))] shadow-[0_0_26px_rgba(251,191,36,.07)]"
+                          : "border-white/10 bg-[linear-gradient(145deg,rgba(10,18,28,.96),rgba(5,10,17,.94))]"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        {isHuman ? (
+                          <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full border border-amber-300/25 bg-black/30 ring-4 ring-amber-400/5">
+                            <ProfileAvatar
+                              avatarId={humanAvatarId}
+                              className="h-full w-full"
+                            />
+                          </div>
+                        ) : (
+                          <div
+                            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-sky-300/20 bg-sky-300/[0.07] text-xl ring-4 ring-sky-400/5"
+                            aria-label="Stockfish"
+                          >
+                            🤖
+                          </div>
+                        )}
+
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate font-serif text-lg font-semibold text-[#f7ead0]">
+                            {isHuman ? t("You") : "Stockfish"}
+                          </p>
+                          <p className="mt-0.5 text-xs text-zinc-500">
+                            {color === "w" ? t("White") : t("Black")}
+                          </p>
+                        </div>
+
+                        {active && (
+                          <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-amber-400 shadow-[0_0_14px_rgba(251,191,36,.65)]" />
+                        )}
+                      </div>
+                    </section>
+
+                    {index === 0 && (
+                      <div className="flex items-center gap-2 px-2">
+                        <span className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-white/20" />
+                        <span className="rounded-full border border-amber-400/15 bg-amber-400/[0.06] px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-amber-200/75">
+                          VS
+                        </span>
+                        <span className="h-px flex-1 bg-gradient-to-l from-transparent via-white/10 to-white/20" />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
             {/* =================================================
                 GAME CONTROLS
                ================================================= */}
 
-            <section
-              className="
-                rounded-3xl
-                border
-                border-white/10
-                bg-zinc-900/75
-                p-4
-                shadow-xl
-                shadow-black/20
-                backdrop-blur-md
-              "
-            >
-              <h2 className="font-bold text-white">{t("Game Controls")}</h2>
+            <section className="rounded-3xl border border-amber-400/15 bg-[linear-gradient(145deg,rgba(10,18,28,.97),rgba(5,10,17,.94))] p-4 shadow-2xl shadow-black/35 backdrop-blur-xl">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-amber-300/15 bg-amber-300/[0.07] text-lg text-amber-200">
+                  ⚙
+                </div>
+                <h2 className="font-serif text-xl font-semibold text-[#f6ead1]">
+                  {t("Game Controls")}
+                </h2>
+              </div>
 
               <p className="mt-1 text-xs text-zinc-500">
                 {t("Stockfish game settings")}
@@ -2748,13 +3008,12 @@ export default function ChessComputerBoard({
                   {t("New Game")}
                 </button>
 
-                <button
-                  type="button"
-                  disabled={
-                    gameResult === null || currentMoveHistory.length === 0
-                  }
-                  onClick={() => setReviewOpen(true)}
-                  className="
+                {gameResult === null && (
+                  <button
+                    type="button"
+                    disabled={true}
+                    onClick={() => setReviewOpen(true)}
+                    className="
                     flex
                     w-full
                     items-center
@@ -2777,10 +3036,11 @@ export default function ChessComputerBoard({
                     disabled:text-zinc-600
                     disabled:hover:bg-white/[0.03]
                   "
-                >
-                  <span>♞</span>
-                  <span>{t("Open Game Review")}</span>
-                </button>
+                  >
+                    <span>♞</span>
+                    <span>{t("Open Game Review")}</span>
+                  </button>
+                )}
 
                 {gameResult === null && (
                   <p className="text-center text-[10px] text-zinc-600">
@@ -2814,294 +3074,10 @@ export default function ChessComputerBoard({
             </section>
 
             {/* =================================================
-                CHESS COACH
-               ================================================= */}
-
-            <section
-              className="
-                rounded-3xl
-                border
-                border-white/10
-                bg-zinc-900/75
-                p-4
-                shadow-xl
-                shadow-black/20
-                backdrop-blur-md
-              "
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-sm font-bold text-zinc-100">
-                    {t("Chess Coach")}
-                  </h2>
-
-                  <p className="mt-1 text-xs text-zinc-500">
-                    {t("Optional Stockfish analysis")}
-                  </p>
-                </div>
-
-                <div
-                  className="
-                    flex
-                    h-9
-                    w-9
-                    items-center
-                    justify-center
-                    rounded-xl
-                    bg-amber-400/10
-                    text-xl
-                    text-amber-200
-                  "
-                >
-                  ♞
-                </div>
-              </div>
-
-              {/* LAST MOVE RATING */}
-
-              {moveFeedback && (
-                <div
-                  className="
-                    mt-4
-                    rounded-2xl
-                    border
-                    border-white/5
-                    bg-black/20
-                    p-3
-                  "
-                >
-                  <p
-                    className="
-                      text-[10px]
-                      font-bold
-                      uppercase
-                      tracking-widest
-                      text-zinc-500
-                    "
-                  >
-                    {t("Your last move")}
-                  </p>
-
-                  <div className="mt-2 flex items-center justify-between gap-3">
-                    <span className="font-mono text-lg font-bold text-white">
-                      {moveFeedback.playedMove}
-                    </span>
-
-                    <MoveQualityBadge quality={moveFeedback.quality} />
-                  </div>
-
-                  {moveFeedback.quality !== "Best" && (
-                    <p className="mt-2 text-xs text-zinc-500">
-                      {t("Evaluation loss")}:{" "}
-                      {(moveFeedback.centipawnLoss / 100).toFixed(2)}{" "}
-                      {t("pawns")}
-                    </p>
-                  )}
-
-                  {moveFeedback.bestMove && moveFeedback.quality !== "Best" && (
-                    <p className="mt-1 text-[11px] text-zinc-600">
-                      {t("Engine preferred")}:{" "}
-                      <span className="font-mono text-zinc-400">
-                        {uciToSan(
-                          /*
-                           * We do not retain the
-                           * exact old FEN here,
-                           * therefore show the UCI
-                           * fallback safely.
-                           */
-                          game.fen(),
-                          moveFeedback.bestMove,
-                        )}
-                      </span>
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {/* HELP BUTTON */}
-
-              <button
-                type="button"
-                disabled={
-                  !analysisReady ||
-                  analyzing ||
-                  thinking ||
-                  gameResult !== null ||
-                  game.turn() !== humanColor
-                }
-                onClick={toggleHelp}
-                className={`
-                  mt-4
-                  w-full
-                  rounded-xl
-                  border
-                  px-4
-                  py-3
-                  text-sm
-                  font-bold
-                  transition
-
-                  ${
-                    helpVisible
-                      ? `
-                        border-amber-400/30
-                        bg-amber-400/10
-                        text-amber-300
-                      `
-                      : `
-                        border-white/10
-                        bg-white/5
-                        text-zinc-300
-                        hover:bg-white/10
-                      `
-                  }
-
-                  disabled:cursor-not-allowed
-                  disabled:opacity-40
-                `}
-              >
-                {analyzing
-                  ? t("Analyzing...")
-                  : helpVisible
-                    ? t("Hide Help")
-                    : t("Help · Best Moves")}
-              </button>
-
-              {/* BEST MOVES */}
-
-              {helpVisible && (
-                <div className="mt-3 space-y-2">
-                  {suggestedMoves.length === 0 ? (
-                    <div
-                      className="
-                        rounded-xl
-                        bg-black/20
-                        px-3
-                        py-4
-                        text-center
-                        text-xs
-                        text-zinc-500
-                      "
-                    >
-                      {analyzing
-                        ? t("Stockfish is analyzing...")
-                        : t("No analysis available.")}
-                    </div>
-                  ) : (
-                    suggestedMoves.map((suggestion, index) => {
-                      const selected =
-                        highlightedSuggestionUci === suggestion.uci;
-
-                      return (
-                        <button
-                          key={`${suggestion.uci}-${index}`}
-                          type="button"
-                          onClick={() =>
-                            setHighlightedSuggestionUci(suggestion.uci)
-                          }
-                          className={`
-                            flex
-                            w-full
-                            items-center
-                            justify-between
-                            rounded-xl
-                            border
-                            px-3
-                            py-2.5
-                            text-left
-                            transition
-
-                            ${
-                              selected
-                                ? `
-                                  border-amber-400/30
-                                  bg-amber-400/10
-                                `
-                                : `
-                                  border-white/5
-                                  bg-black/20
-                                  hover:border-white/10
-                                  hover:bg-white/5
-                                `
-                            }
-                          `}
-                        >
-                          <div className="flex items-center gap-3">
-                            <span
-                              className={`
-                                flex
-                                h-6
-                                w-6
-                                items-center
-                                justify-center
-                                rounded-md
-                                text-[10px]
-                                font-black
-
-                                ${
-                                  selected
-                                    ? "bg-amber-300 text-zinc-950"
-                                    : "bg-amber-400/10 text-amber-300"
-                                }
-                              `}
-                            >
-                              {index + 1}
-                            </span>
-
-                            <div>
-                              <p
-                                className={`font-mono text-sm font-bold ${
-                                  selected ? "text-amber-200" : "text-zinc-200"
-                                }`}
-                              >
-                                {suggestion.san}
-                              </p>
-
-                              <p className="text-[10px] text-zinc-600">
-                                {suggestion.uci}
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="text-right">
-                            <span className="block text-xs font-semibold text-zinc-400">
-                              {suggestion.evaluation}
-                            </span>
-
-                            <span
-                              className={`mt-0.5 block text-[9px] font-bold ${
-                                selected ? "text-amber-300" : "text-zinc-700"
-                              }`}
-                            >
-                              {selected
-                                ? t("Shown on board")
-                                : t("Click to show")}
-                            </span>
-                          </div>
-                        </button>
-                      );
-                    })
-                  )}
-                </div>
-              )}
-            </section>
-
-            {/* =================================================
                 PIECE VALUES
                ================================================= */}
 
-            <section
-              className="
-                rounded-3xl
-                border
-                border-white/10
-                bg-zinc-900/75
-                p-4
-                shadow-xl
-                shadow-black/20
-                backdrop-blur-md
-              "
-            >
+            <section className="hidden">
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-sm font-bold text-zinc-100">
                   {t("Piece Values")}
@@ -3274,6 +3250,8 @@ export default function ChessComputerBoard({
         orientation={playerColor}
         open={reviewOpen}
         onClose={() => setReviewOpen(false)}
+        puzzleSource={gameResult ? "singleplayer" : undefined}
+        puzzlePlayerColor={gameResult ? playerColor : undefined}
       />
     </div>
   );

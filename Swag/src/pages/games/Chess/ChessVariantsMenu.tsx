@@ -54,6 +54,7 @@ function getInitialChessLanguage(): Language {
 const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
   de: {
     Rules: "Regeln",
+    Singleplayer: "Einzelspieler",
     "Chess Variants": "Schachvarianten",
     "Different rules. Same board.": "Andere Regeln. Dasselbe Brett.",
     "Seven ways to turn classic chess into something completely different.":
@@ -184,6 +185,7 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
   },
   bar: {
     Rules: "Regeln",
+    Singleplayer: "Oanspuia",
     "Chess Variants": "Schachvariantn",
     "Different rules. Same board.": "Andere Regeln. S gleiche Brett.",
     "Seven ways to turn classic chess into something completely different.":
@@ -244,6 +246,7 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
   },
   ko: {
     Rules: "규칙",
+    Singleplayer: "싱글플레이어",
     "Chess Variants": "체스 변형",
     "Different rules. Same board.": "다른 규칙. 같은 체스판.",
     "Seven ways to turn classic chess into something completely different.":
@@ -375,6 +378,7 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
   },
   ru: {
     Rules: "Правила",
+    Singleplayer: "Одиночная игра",
     "Chess Variants": "Варианты шахмат",
     "Different rules. Same board.": "Другие правила. Та же доска.",
     "Seven ways to turn classic chess into something completely different.":
@@ -763,39 +767,63 @@ const variants: VariantCard[] = [
 const availableVariants = variants.filter((variant) => variant.available);
 
 const accentClasses: Record<VariantCard["accent"], string> = {
-  red: "border-red-400/20 bg-red-400/[0.05] text-red-300",
-  violet: "border-violet-400/20 bg-violet-400/[0.05] text-violet-300",
-  amber: "border-amber-400/20 bg-amber-400/[0.05] text-amber-300",
-  rose: "border-rose-400/20 bg-rose-400/[0.05] text-rose-300",
-  sky: "border-sky-400/20 bg-sky-400/[0.05] text-sky-300",
-  emerald: "border-emerald-400/20 bg-emerald-400/[0.05] text-emerald-300",
-  zinc: "border-zinc-500/30 bg-zinc-500/[0.06] text-zinc-300",
-  orange: "border-orange-400/20 bg-orange-400/[0.06] text-orange-300",
-  cyan: "border-cyan-400/20 bg-cyan-400/[0.06] text-cyan-300",
-  fuchsia: "border-fuchsia-400/20 bg-fuchsia-400/[0.06] text-fuchsia-300",
-  indigo: "border-indigo-400/20 bg-indigo-400/[0.06] text-indigo-300",
-  lime: "border-lime-400/20 bg-lime-400/[0.06] text-lime-300",
-  pink: "border-pink-400/20 bg-pink-400/[0.06] text-pink-300",
-  teal: "border-teal-400/20 bg-teal-400/[0.06] text-teal-300",
-  blue: "border-blue-400/20 bg-blue-400/[0.06] text-blue-300",
+  red: "border-red-400/45 bg-red-400/[0.055] text-red-300",
+  violet: "border-violet-400/45 bg-violet-400/[0.055] text-violet-300",
+  amber: "border-amber-400/45 bg-amber-400/[0.055] text-amber-300",
+  rose: "border-rose-400/45 bg-rose-400/[0.055] text-rose-300",
+  sky: "border-sky-400/45 bg-sky-400/[0.055] text-sky-300",
+  emerald: "border-emerald-400/45 bg-emerald-400/[0.055] text-emerald-300",
+  zinc: "border-zinc-400/30 bg-zinc-400/[0.045] text-zinc-300",
+  orange: "border-orange-400/45 bg-orange-400/[0.055] text-orange-300",
+  cyan: "border-cyan-400/45 bg-cyan-400/[0.055] text-cyan-300",
+  fuchsia: "border-fuchsia-400/45 bg-fuchsia-400/[0.055] text-fuchsia-300",
+  indigo: "border-indigo-400/45 bg-indigo-400/[0.055] text-indigo-300",
+  lime: "border-lime-400/45 bg-lime-400/[0.055] text-lime-300",
+  pink: "border-pink-400/45 bg-pink-400/[0.055] text-pink-300",
+  teal: "border-teal-400/45 bg-teal-400/[0.055] text-teal-300",
+  blue: "border-blue-400/45 bg-blue-400/[0.055] text-blue-300",
 };
 
-const buttonClasses: Record<VariantCard["accent"], string> = {
-  red: "bg-red-300 text-zinc-950 hover:bg-red-200",
-  violet: "bg-violet-300 text-zinc-950 hover:bg-violet-200",
-  amber: "bg-amber-300 text-zinc-950 hover:bg-amber-200",
-  rose: "bg-rose-300 text-zinc-950 hover:bg-rose-200",
-  sky: "bg-sky-300 text-zinc-950 hover:bg-sky-200",
-  emerald: "bg-emerald-300 text-zinc-950 hover:bg-emerald-200",
-  zinc: "bg-zinc-300 text-zinc-950 hover:bg-zinc-200",
-  orange: "bg-orange-300 text-zinc-950 hover:bg-orange-200",
-  cyan: "bg-cyan-300 text-zinc-950 hover:bg-cyan-200",
-  fuchsia: "bg-fuchsia-300 text-zinc-950 hover:bg-fuchsia-200",
-  indigo: "bg-indigo-300 text-white hover:bg-indigo-200 hover:text-zinc-950",
-  lime: "bg-lime-300 text-zinc-950 hover:bg-lime-200",
-  pink: "bg-pink-300 text-zinc-950 hover:bg-pink-200",
-  teal: "bg-teal-300 text-zinc-950 hover:bg-teal-200",
-  blue: "bg-blue-300 text-zinc-950 hover:bg-blue-200",
+const accentGlow: Record<VariantCard["accent"], string> = {
+  red: "from-red-500/35 via-red-950/15 to-transparent",
+  violet: "from-violet-500/38 via-violet-950/16 to-transparent",
+  amber: "from-amber-500/38 via-amber-950/16 to-transparent",
+  rose: "from-rose-500/36 via-rose-950/16 to-transparent",
+  sky: "from-sky-500/38 via-sky-950/16 to-transparent",
+  emerald: "from-emerald-500/38 via-emerald-950/16 to-transparent",
+  zinc: "from-zinc-300/20 via-zinc-900/18 to-transparent",
+  orange: "from-orange-500/38 via-orange-950/16 to-transparent",
+  cyan: "from-cyan-500/38 via-cyan-950/16 to-transparent",
+  fuchsia: "from-fuchsia-500/38 via-fuchsia-950/16 to-transparent",
+  indigo: "from-indigo-500/38 via-indigo-950/16 to-transparent",
+  lime: "from-lime-500/34 via-lime-950/14 to-transparent",
+  pink: "from-pink-500/38 via-pink-950/16 to-transparent",
+  teal: "from-teal-500/38 via-teal-950/16 to-transparent",
+  blue: "from-blue-500/38 via-blue-950/16 to-transparent",
+};
+
+const accentShadow: Record<VariantCard["accent"], string> = {
+  red: "shadow-[0_0_30px_rgba(248,113,113,.08)] hover:shadow-[0_0_36px_rgba(248,113,113,.14)]",
+  violet:
+    "shadow-[0_0_30px_rgba(167,139,250,.08)] hover:shadow-[0_0_36px_rgba(167,139,250,.14)]",
+  amber:
+    "shadow-[0_0_30px_rgba(251,191,36,.08)] hover:shadow-[0_0_36px_rgba(251,191,36,.14)]",
+  rose: "shadow-[0_0_30px_rgba(251,113,133,.08)] hover:shadow-[0_0_36px_rgba(251,113,133,.14)]",
+  sky: "shadow-[0_0_30px_rgba(56,189,248,.08)] hover:shadow-[0_0_36px_rgba(56,189,248,.14)]",
+  emerald:
+    "shadow-[0_0_30px_rgba(52,211,153,.08)] hover:shadow-[0_0_36px_rgba(52,211,153,.14)]",
+  zinc: "shadow-[0_0_30px_rgba(212,212,216,.05)] hover:shadow-[0_0_36px_rgba(212,212,216,.09)]",
+  orange:
+    "shadow-[0_0_30px_rgba(251,146,60,.08)] hover:shadow-[0_0_36px_rgba(251,146,60,.14)]",
+  cyan: "shadow-[0_0_30px_rgba(34,211,238,.08)] hover:shadow-[0_0_36px_rgba(34,211,238,.14)]",
+  fuchsia:
+    "shadow-[0_0_30px_rgba(232,121,249,.08)] hover:shadow-[0_0_36px_rgba(232,121,249,.14)]",
+  indigo:
+    "shadow-[0_0_30px_rgba(129,140,248,.08)] hover:shadow-[0_0_36px_rgba(129,140,248,.14)]",
+  lime: "shadow-[0_0_30px_rgba(163,230,53,.08)] hover:shadow-[0_0_36px_rgba(163,230,53,.14)]",
+  pink: "shadow-[0_0_30px_rgba(244,114,182,.08)] hover:shadow-[0_0_36px_rgba(244,114,182,.14)]",
+  teal: "shadow-[0_0_30px_rgba(45,212,191,.08)] hover:shadow-[0_0_36px_rgba(45,212,191,.14)]",
+  blue: "shadow-[0_0_30px_rgba(96,165,250,.08)] hover:shadow-[0_0_36px_rgba(96,165,250,.14)]",
 };
 
 function LanguageSelector({
@@ -806,69 +834,24 @@ function LanguageSelector({
   onChange: (language: Language) => void;
 }) {
   return (
-    <label
-      className="
-        flex
-        items-center
-        gap-2
-        rounded-full
-        border
-        border-white/10
-        bg-white/5
-        px-3
-        py-1.5
-        text-xs
-        font-bold
-        text-zinc-400
-      "
-    >
-      <span>🌐</span>
-      <span className="hidden sm:inline">{t(language, "Language")}</span>
-
-      <select
-        value={language}
-        onChange={(event) => onChange(event.target.value as Language)}
-        className="
-          bg-transparent
-          text-xs
-          font-bold
-          text-zinc-200
-          outline-none
-          [color-scheme:dark]
-        "
-        aria-label={t(language, "Language")}
-      >
-        {languageOptions.map((option) => (
-          <option
-            key={option.value}
-            value={option.value}
-            className="bg-zinc-900 text-zinc-100"
-          >
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </label>
+    <div className="flex flex-wrap gap-2" aria-label={t(language, "Language")}>
+      {languageOptions.map((option) => (
+        <button
+          key={option.value}
+          type="button"
+          onClick={() => onChange(option.value)}
+          className={`rounded-full border px-4 py-2 text-[11px] font-semibold transition ${
+            option.value === language
+              ? "border-amber-300/65 bg-amber-300/[0.09] text-amber-100 shadow-[0_0_22px_rgba(251,191,36,.08)]"
+              : "border-white/12 bg-black/20 text-zinc-400 hover:border-white/25 hover:text-white"
+          }`}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
   );
 }
-
-const artGlowClasses: Record<VariantCard["accent"], string> = {
-  red: "from-red-500/18 via-red-500/[0.04] to-transparent",
-  violet: "from-violet-500/18 via-violet-500/[0.04] to-transparent",
-  amber: "from-amber-500/18 via-amber-500/[0.04] to-transparent",
-  rose: "from-rose-500/18 via-rose-500/[0.04] to-transparent",
-  sky: "from-sky-500/18 via-sky-500/[0.04] to-transparent",
-  emerald: "from-emerald-500/18 via-emerald-500/[0.04] to-transparent",
-  zinc: "from-zinc-400/14 via-zinc-400/[0.03] to-transparent",
-  orange: "from-orange-500/18 via-orange-500/[0.04] to-transparent",
-  cyan: "from-cyan-500/18 via-cyan-500/[0.04] to-transparent",
-  fuchsia: "from-fuchsia-500/18 via-fuchsia-500/[0.04] to-transparent",
-  indigo: "from-indigo-500/18 via-indigo-500/[0.04] to-transparent",
-  lime: "from-lime-500/18 via-lime-500/[0.04] to-transparent",
-  pink: "from-pink-500/18 via-pink-500/[0.04] to-transparent",
-  teal: "from-teal-500/18 via-teal-500/[0.04] to-transparent",
-  blue: "from-blue-500/18 via-blue-500/[0.04] to-transparent",
-};
 
 type VariantArtworkSpec = {
   main: string;
@@ -878,99 +861,82 @@ type VariantArtworkSpec = {
 };
 
 const variantArtwork: Record<string, VariantArtworkSpec> = {
-  draft: {
-    main: "⚔",
-    left: "♜ ♞",
-    right: "♝ ♛",
-    footer: "BUILD YOUR ARMY",
+  "complete-chaos": {
+    main: "♛",
+    left: "✦ ♟",
+    right: "♜ ✦",
+    footer: "PURE CHAOS",
   },
-  mirror: {
-    main: "◈",
-    left: "♔",
-    right: "♚",
-    footer: "d2 ↕ d7",
-  },
-  randomstart: {
-    main: "🎲",
-    left: "♜♝♞",
-    right: "♛♚♜",
-    footer: "NO TWO BACK RANKS ALIKE",
-  },
+  draft: { main: "⚔", left: "♜ ♞", right: "♝ ♛", footer: "BUILD YOUR ARMY" },
+  mirror: { main: "◈", left: "♔", right: "♚", footer: "PERFECT SYMMETRY" },
   "fog-of-war": {
     main: "♚",
     left: "░▒",
     right: "▓░",
-    footer: "WHAT CAN YOU SEE?",
+    footer: "HIDDEN INFORMATION",
+  },
+  tectonic: {
+    main: "↻",
+    left: "A │ B",
+    right: "C │ D",
+    footer: "ROTATE THE BOARD",
   },
   roulette: {
     main: "🎰",
     left: "? 🎴",
-    right: "🌀 💥",
-    footer: "DESTROY · SWAP · TELEPORT",
-  },
-  mutation: {
-    main: "🧬",
-    left: "♙ → ♘",
-    right: "→ ♕",
-    footer: "MUTATE",
+    right: "🌀 ✦",
+    footer: "LUCKY SQUARES",
   },
   "four-player": {
     main: "✣",
     left: "♜  ♞",
     right: "♝  ♛",
-    footer: "RED · BLUE · YELLOW · GREEN",
+    footer: "FOUR ARMIES",
   },
-  "complete-chaos": {
-    main: "🌀",
-    left: "♚ ? ♙",
-    right: "? ♜ ?",
-    footer: "EVERY PIECE · ANY SQUARE",
+  hotpotato: { main: "💣", left: "♟", right: "4…12", footer: "PASS THE BOMB" },
+  collapse: {
+    main: "⚠",
+    left: "▦",
+    right: "▣",
+    footer: "SURVIVE THE COLLAPSE",
   },
+  mutation: { main: "♞", left: "♙ → ♘", right: "→ ♕", footer: "MUTATE" },
+  boss: { main: "♚", left: "♥♥♥", right: "⚡🔥", footer: "BOSS POWERS" },
+  capitalism: {
+    main: "♛",
+    left: "◉ ◉",
+    right: "♜ + ◉",
+    footer: "CAPTURE · EARN · SPEND",
+  },
+  "3d-chess": { main: "♜", left: "▦", right: "▦", footer: "MULTIPLE LAYERS" },
+  "king-of-the-hill": {
+    main: "♔",
+    left: "△",
+    right: "△",
+    footer: "CONTROL THE CENTER",
+  },
+  randomstart: {
+    main: "?",
+    left: "♜♝♞",
+    right: "♛♚♜",
+    footer: "RANDOM BACK RANK",
+  },
+  "three-lives": { main: "♥", left: "♔", right: "♥ ♥", footer: "THREE LIVES" },
   horror: {
     main: "☠",
     left: "♞ ❄",
     right: "♟ 🔥",
     footer: "CURSE · INFECT · SURVIVE",
   },
-  hotpotato: {
-    main: "💣",
-    left: "♟",
-    right: "4…12",
-    footer: "MOVE IT BEFORE IT BLOWS",
-  },
-  collapse: {
-    main: "⚠",
-    left: "▦",
-    right: "▣",
-    footer: "EDGE → WARNING → VOID",
-  },
-  boss: {
-    main: "♚",
-    left: "♥♥♥",
-    right: "⚡🔥",
-    footer: "5 HP · POWERS · RAGE",
-  },
-  "three-lives": {
-    main: "♔",
-    left: "♥ ♥",
-    right: "♥",
-    footer: "CHECK → −1 HP",
-  },
-  tectonic: {
-    main: "↻",
-    left: "A │ B",
-    right: "C │ D",
-    footer: "ROTATE THE POSITION",
-  },
-  capitalism: {
-    main: "♛",
-    left: "🪙 🪙",
-    right: "♜ + 🪙",
-    footer: "CAPTURE · EARN · SPEND",
-  },
 };
 
-function VariantArtwork({ variant }: { variant: VariantCard }) {
+function VariantArtwork({
+  variant,
+  compact = false,
+}: {
+  variant: VariantCard;
+  compact?: boolean;
+}) {
   const art = variantArtwork[variant.id] ?? {
     main: variant.icon,
     left: "♜",
@@ -980,307 +946,249 @@ function VariantArtwork({ variant }: { variant: VariantCard }) {
 
   return (
     <div
-      className={`
-        relative
-        mb-5
-        h-32
-        overflow-hidden
-        rounded-2xl
-        border
-        ${accentClasses[variant.accent]}
-        bg-gradient-to-br
-        ${artGlowClasses[variant.accent]}
-      `}
+      className={`relative overflow-hidden bg-gradient-to-br ${accentGlow[variant.accent]} ${
+        compact ? "h-full min-h-[126px]" : "h-full min-h-[300px]"
+      }`}
     >
-      <div
-        className="
-          pointer-events-none
-          absolute
-          inset-0
-          opacity-[0.08]
-          [background-image:linear-gradient(rgba(255,255,255,.55)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.55)_1px,transparent_1px)]
-          [background-size:25%_25%]
-        "
-      />
-
-      <div className="absolute left-4 top-4 whitespace-pre text-sm font-black tracking-widest opacity-55">
+      <div className="absolute inset-0 opacity-[0.09] [background-image:linear-gradient(rgba(255,255,255,.45)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.45)_1px,transparent_1px)] [background-size:42px_42px]" />
+      <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-black/75 to-transparent" />
+      <div className="absolute -right-10 -top-12 h-40 w-40 rounded-full bg-white/[0.035] blur-3xl" />
+      <span
+        className={`absolute left-4 top-4 font-black tracking-widest opacity-45 ${compact ? "text-[10px]" : "text-sm"}`}
+      >
         {art.left}
-      </div>
-
-      <div className="absolute right-4 top-4 whitespace-pre text-sm font-black tracking-widest opacity-55">
+      </span>
+      <span
+        className={`absolute right-4 top-4 font-black tracking-widest opacity-45 ${compact ? "text-[10px]" : "text-sm"}`}
+      >
         {art.right}
-      </div>
-
-      <div
-        className="
-          absolute
-          left-1/2
-          top-1/2
-          -translate-x-1/2
-          -translate-y-[58%]
-          select-none
-          text-6xl
-          font-black
-          leading-none
-          drop-shadow-[0_8px_20px_rgba(0,0,0,.5)]
-          transition
-          duration-500
-          group-hover:scale-110
-          group-hover:-rotate-3
-        "
+      </span>
+      <span
+        className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[52%] select-none leading-none drop-shadow-[0_18px_28px_rgba(0,0,0,.65)] transition duration-500 group-hover:scale-105 ${
+          compact ? "text-[74px]" : "text-[145px]"
+        }`}
       >
         {art.main}
-      </div>
-
-      <div
-        className="
-          absolute
-          bottom-3
-          left-1/2
-          -translate-x-1/2
-          whitespace-nowrap
-          text-[8px]
-          font-black
-          uppercase
-          tracking-[0.22em]
-          opacity-45
-        "
+      </span>
+      <span
+        className={`absolute bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap font-black uppercase tracking-[0.22em] opacity-45 ${compact ? "text-[7px]" : "text-[9px]"}`}
       >
         {art.footer}
-      </div>
-
-      <div className="absolute -bottom-10 -right-8 text-[110px] font-black leading-none opacity-[0.035]">
-        {variant.icon}
-      </div>
+      </span>
     </div>
   );
 }
 
-function shuffleVariants(items: VariantCard[]): VariantCard[] {
-  const result = [...items];
-
-  for (let index = result.length - 1; index > 0; index -= 1) {
-    const swapIndex = Math.floor(Math.random() * (index + 1));
-
-    [result[index], result[swapIndex]] = [result[swapIndex], result[index]];
-  }
-
-  return result;
-}
-
 function VariantPreviewCarousel({ language }: { language: Language }) {
-  const [previewOrder, setPreviewOrder] = useState<VariantCard[]>(() =>
-    shuffleVariants(availableVariants),
-  );
-
+  const [previewOrder, setPreviewOrder] = useState<VariantCard[]>(() => [
+    ...availableVariants,
+  ]);
   const [previewIndex, setPreviewIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
-    setPreviewOrder(shuffleVariants(availableVariants));
-    setPreviewIndex(0);
-  }, []);
-
-  useEffect(() => {
-    if (isPaused || previewOrder.length <= 1) {
-      return;
-    }
+    if (isPaused || previewOrder.length <= 1) return;
 
     const timer = window.setInterval(() => {
-      setPreviewIndex((current) => {
-        const next = current + 1;
-
-        if (next < previewOrder.length) {
-          return next;
-        }
-
-        setPreviewOrder(shuffleVariants(availableVariants));
-        return 0;
-      });
-    }, 3600);
+      setPreviewIndex((current) => (current + 1) % previewOrder.length);
+    }, 4600);
 
     return () => window.clearInterval(timer);
   }, [isPaused, previewOrder.length]);
 
   function goTo(index: number) {
-    if (previewOrder.length === 0) return;
+    if (!previewOrder.length) return;
     setPreviewIndex((index + previewOrder.length) % previewOrder.length);
   }
 
   return (
     <section
-      className="
-        relative
-        min-h-[360px]
-        overflow-hidden
-        rounded-3xl
-        border
-        border-white/10
-        bg-zinc-900/65
-        shadow-xl
-        shadow-black/20
-        backdrop-blur-md
-      "
+      className="group relative min-h-[430px] overflow-hidden rounded-[18px] border border-fuchsia-300/35 bg-black/55 shadow-[0_28px_90px_rgba(0,0,0,.42)] backdrop-blur-xl"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      <div
-        className="
-          pointer-events-none
-          absolute
-          inset-0
-          bg-[radial-gradient(circle_at_75%_20%,rgba(255,255,255,.055),transparent_32%)]
-        "
-      />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_83%_32%,rgba(217,70,239,.16),transparent_25%),radial-gradient(circle_at_8%_100%,rgba(245,158,11,.06),transparent_34%)]" />
 
       <div
-        className="
-          relative
-          flex
-          h-full
-          transition-transform
-          duration-700
-          ease-[cubic-bezier(.22,1,.36,1)]
-        "
-        style={{
-          transform: `translateX(-${previewIndex * 100}%)`,
-        }}
+        className="relative flex h-full transition-transform duration-700 ease-[cubic-bezier(.22,1,.36,1)]"
+        style={{ transform: `translateX(-${previewIndex * 100}%)` }}
       >
         {previewOrder.map((variant, index) => (
-          <div
+          <article
             key={`${variant.id}-${index}`}
-            className="
-              min-w-full
-              p-5
-              sm:p-6
-            "
+            className="min-w-full p-5 sm:p-6 lg:p-7"
           >
-            <div className="grid min-h-[310px] items-center gap-5 md:grid-cols-[minmax(0,1fr)_270px]">
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`
-                      rounded-full
-                      border
-                      px-2.5
-                      py-1
-                      text-[9px]
-                      font-black
-                      uppercase
-                      tracking-widest
-                      ${
-                        variant.available
-                          ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300"
-                          : "border-white/10 bg-white/5 text-zinc-600"
-                      }
-                    `}
-                  >
-                    {t(
-                      language,
-                      variant.available ? "Available" : "Coming soon",
-                    )}
+            <div className="grid min-h-[374px] gap-5 md:grid-cols-[minmax(0,1fr)_44%]">
+              <div className="relative z-10 flex min-w-0 flex-col py-1">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="rounded-full border border-emerald-400/40 bg-emerald-400/10 px-3 py-1 text-[9px] font-black uppercase tracking-[0.17em] text-emerald-300">
+                    ● {t(language, "Available")}
                   </span>
-
-                  <span className="text-[10px] font-black tracking-[0.2em] text-zinc-700">
+                  <span className="text-[10px] font-black tracking-[0.2em] text-zinc-400">
                     {String(index + 1).padStart(2, "0")} /{" "}
                     {String(previewOrder.length).padStart(2, "0")}
                   </span>
                 </div>
 
-                <p
-                  className={`
-                    mt-5
-                    text-[10px]
-                    font-black
-                    uppercase
-                    tracking-[0.24em]
-                    ${accentClasses[variant.accent]}
-                    border-0
-                    bg-transparent
-                  `}
-                >
+                <p className="mt-7 text-[10px] font-black uppercase tracking-[0.30em] text-amber-300/90">
                   {t(language, variant.subtitle)}
                 </p>
-
-                <h2 className="mt-2 text-3xl font-black tracking-tight text-white sm:text-4xl">
+                <h2 className="mt-2 font-serif text-4xl leading-[1.02] tracking-[-0.025em] text-white sm:text-5xl">
                   {t(language, variant.title)}
                 </h2>
-
-                <p className="mt-3 max-w-xl text-sm leading-6 text-zinc-500">
+                <p className="mt-4 max-w-xl font-serif text-[16px] leading-7 text-zinc-300/80">
                   {t(language, variant.description)}
                 </p>
 
                 <div className="mt-5 flex flex-wrap gap-2">
-                  {variant.tags.map((tag) => (
+                  {variant.tags.slice(0, 3).map((tag) => (
                     <span
                       key={tag}
-                      className={`
-                        rounded-full
-                        border
-                        px-2.5
-                        py-1
-                        text-[10px]
-                        font-bold
-                        ${accentClasses[variant.accent]}
-                      `}
+                      className={`rounded-full border px-3 py-1 text-[10px] font-semibold ${accentClasses[variant.accent]}`}
                     >
                       {t(language, tag)}
                     </span>
                   ))}
                 </div>
+
+                <div className="mt-auto flex items-end gap-3 pt-6">
+                  <button
+                    type="button"
+                    onClick={() => goTo(previewIndex - 1)}
+                    className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/30 text-2xl text-zinc-300 transition hover:border-white/35 hover:text-white"
+                    aria-label="Previous variant"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => goTo(previewIndex + 1)}
+                    className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/30 text-2xl text-zinc-300 transition hover:border-white/35 hover:text-white"
+                    aria-label="Next variant"
+                  >
+                    ›
+                  </button>
+                </div>
               </div>
 
-              <div className="min-w-0">
+              <div className="relative hidden overflow-hidden rounded-[14px] border border-white/10 md:block">
                 <VariantArtwork variant={variant} />
               </div>
             </div>
-          </div>
+          </article>
         ))}
       </div>
 
-      <div className="absolute bottom-4 left-5 right-5 flex items-center justify-between gap-4">
-        <div className="flex max-w-[70%] gap-1.5 overflow-hidden">
-          {previewOrder.map((variant, index) => (
-            <button
-              key={variant.id}
-              type="button"
-              onClick={() => goTo(index)}
-              className={`
-                h-1.5
-                rounded-full
-                transition-all
-                ${
-                  index === previewIndex
-                    ? "w-7 bg-white/65"
-                    : "w-1.5 bg-white/15 hover:bg-white/30"
-                }
-              `}
-              aria-label={`${t(language, variant.title)} ${index + 1}`}
-            />
-          ))}
-        </div>
-
-        <div className="flex shrink-0 gap-2">
+      <div className="absolute bottom-6 left-1/2 z-20 hidden -translate-x-1/2 gap-2 md:flex">
+        {previewOrder.map((variant, index) => (
           <button
+            key={`${variant.id}-dot`}
             type="button"
-            onClick={() => goTo(previewIndex - 1)}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black/25 text-lg font-black text-zinc-400 transition hover:bg-white/10 hover:text-white"
-            aria-label="Previous variant"
-          >
-            ‹
-          </button>
-
-          <button
-            type="button"
-            onClick={() => goTo(previewIndex + 1)}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black/25 text-lg font-black text-zinc-400 transition hover:bg-white/10 hover:text-white"
-            aria-label="Next variant"
-          >
-            ›
-          </button>
-        </div>
+            onClick={() => goTo(index)}
+            className={`h-2 rounded-full transition-all ${
+              index === previewIndex
+                ? "w-7 bg-white/75"
+                : "w-2 bg-white/20 hover:bg-white/35"
+            }`}
+            aria-label={`${t(language, variant.title)} ${index + 1}`}
+          />
+        ))}
       </div>
     </section>
+  );
+}
+
+function VariantActionButtons({
+  variant,
+  language,
+}: {
+  variant: VariantCard;
+  language: Language;
+}) {
+  if (!variant.available) {
+    return (
+      <div className="grid grid-cols-4 gap-1.5 opacity-45">
+        {["Singleplayer", "Multiplayer", "Hotseat", "Rules"].map((label) => (
+          <span
+            key={label}
+            className="rounded-lg border border-white/12 bg-black/20 px-2 py-2 text-center text-[9px] font-semibold text-zinc-500"
+          >
+            {t(language, label)}
+          </span>
+        ))}
+      </div>
+    );
+  }
+
+  const base =
+    "flex min-h-9 items-center justify-center rounded-lg border px-2 py-2 text-center text-[9px] font-semibold transition";
+
+  return (
+    <div className="grid grid-cols-4 gap-1.5">
+      {/* 1. Singleplayer (formerly Vs AI) */}
+      {variant.aiRoute ? (
+        <Link
+          to={variant.aiRoute}
+          className={`${base} border-white/15 bg-black/25 text-zinc-300 hover:bg-white/[0.07] hover:text-white`}
+        >
+          {t(language, "Singleplayer")}
+        </Link>
+      ) : (
+        <span
+          className={`${base} border-white/[0.06] bg-black/10 text-zinc-700`}
+        >
+          {t(language, "Singleplayer")}
+        </span>
+      )}
+
+      {/* 2. Multiplayer */}
+      {variant.multiplayerRoute ? (
+        <Link
+          to={variant.multiplayerRoute}
+          className={`${base} border-white/15 bg-black/25 text-zinc-300 hover:bg-white/[0.07] hover:text-white`}
+        >
+          Multiplayer
+        </Link>
+      ) : (
+        <span
+          className={`${base} border-white/[0.06] bg-black/10 text-zinc-700`}
+        >
+          Multiplayer
+        </span>
+      )}
+
+      {/* 3. Hotseat */}
+      {variant.route ? (
+        <Link
+          to={variant.route}
+          className={`${base} border-white/15 bg-black/25 text-zinc-300 hover:bg-white/[0.07] hover:text-white`}
+        >
+          {variant.id === "3d-chess" ? "Play" : t(language, "Hotseat")}
+        </Link>
+      ) : (
+        <span
+          className={`${base} border-white/[0.06] bg-black/10 text-zinc-700`}
+        >
+          {t(language, "Hotseat")}
+        </span>
+      )}
+
+      {/* 4. Rules stays last */}
+      {variant.rulesRoute ? (
+        <Link
+          to={variant.rulesRoute}
+          className={`${base} border-white/15 bg-black/25 text-zinc-300 hover:bg-white/[0.07] hover:text-white`}
+        >
+          {t(language, "Rules")}
+        </Link>
+      ) : (
+        <span
+          className={`${base} border-white/[0.06] bg-black/10 text-zinc-700`}
+        >
+          {t(language, "Rules")}
+        </span>
+      )}
+    </div>
   );
 }
 
@@ -1295,231 +1203,56 @@ function VariantCardView({
 }) {
   return (
     <article
-      className="
-        group
-        relative
-        flex
-        min-h-[430px]
-        flex-col
-        overflow-hidden
-        rounded-3xl
-        border
-        border-white/10
-        bg-zinc-900/70
-        p-4
-        shadow-xl
-        shadow-black/20
-        backdrop-blur-md
-        transition
-        duration-300
-        hover:-translate-y-1.5
-        hover:border-white/20
-        hover:bg-zinc-900
-        hover:shadow-2xl
-        hover:shadow-black/30
-      "
+      className={`group relative overflow-hidden rounded-[13px] border bg-black/50 transition duration-300 hover:-translate-y-0.5 ${accentClasses[variant.accent]} ${accentShadow[variant.accent]}`}
     >
-      <div
-        className="
-          pointer-events-none
-          absolute
-          -right-14
-          -top-14
-          h-44
-          w-44
-          rounded-full
-          bg-white/[0.025]
-          blur-3xl
-        "
-      />
-
-      <VariantArtwork variant={variant} />
-
-      <div className="relative flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-3">
-          <div
-            className={`
-              flex
-              h-10
-              w-10
-              shrink-0
-              items-center
-              justify-center
-              rounded-xl
-              border
-              text-xl
-              shadow-inner
-              ${accentClasses[variant.accent]}
-            `}
-          >
-            {variant.icon}
-          </div>
-
-          <div className="min-w-0">
-            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600">
-              {String(number).padStart(2, "0")} ·{" "}
-              {t(language, variant.subtitle)}
-            </p>
-
-            <h2 className="mt-1 truncate text-xl font-black tracking-tight text-white">
-              {t(language, variant.title)}
-            </h2>
-          </div>
+      <div className="grid min-h-[180px] grid-cols-[34%_minmax(0,1fr)]">
+        <div className="relative overflow-hidden border-r border-white/[0.08]">
+          <VariantArtwork variant={variant} compact />
         </div>
 
-        <span
-          className={`
-            shrink-0
-            rounded-full
-            border
-            px-2.5
-            py-1
-            text-[9px]
-            font-black
-            uppercase
-            tracking-widest
-            ${
-              variant.available
-                ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300"
-                : "border-white/10 bg-white/5 text-zinc-600"
-            }
-          `}
-        >
-          {t(language, variant.available ? "Available" : "Coming soon")}
-        </span>
-      </div>
+        <div className="relative flex min-w-0 flex-col p-3.5">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <p className="text-[8px] font-black uppercase tracking-[0.18em] text-zinc-600">
+                {String(number).padStart(2, "0")} ·{" "}
+                {t(language, variant.subtitle)}
+              </p>
+              <h3 className="mt-1.5 truncate font-serif text-[20px] leading-tight text-white">
+                {t(language, variant.title)}
+              </h3>
+            </div>
 
-      <p className="relative mt-4 text-sm leading-6 text-zinc-500">
-        {t(language, variant.description)}
-      </p>
-
-      <div className="relative mt-4 flex items-start gap-3">
-        <div className="flex min-w-0 flex-1 flex-wrap gap-2">
-          {variant.tags.map((tag) => (
             <span
-              key={tag}
-              className={`
-                rounded-full
-                border
-                px-2.5
-                py-1
-                text-[10px]
-                font-bold
-                ${accentClasses[variant.accent]}
-              `}
+              className={`shrink-0 rounded-full border px-2 py-1 text-[7px] font-black uppercase tracking-wider ${
+                variant.available
+                  ? "border-emerald-400/35 bg-emerald-400/10 text-emerald-300"
+                  : "border-amber-400/30 bg-amber-400/[0.08] text-amber-300"
+              }`}
             >
-              {t(language, tag)}
+              {variant.available ? "● " : "○ "}
+              {t(language, variant.available ? "Available" : "Coming soon")}
             </span>
-          ))}
-        </div>
-      </div>
-
-      <div className="relative mt-auto pt-5">
-        {variant.available && (
-          <div className="relative mt-auto grid grid-cols-2 gap-2">
-            {/* HOTSEAT */}
-            {variant.route && (
-              <Link
-                to={variant.route}
-                className={`
-          flex
-          items-center
-          justify-center
-          gap-2
-          rounded-xl
-          border
-          border-white/10
-          bg-white/5
-          px-3
-          py-3
-          text-sm
-          font-black
-          text-zinc-200
-          transition
-          hover:bg-white/10
-        `}
-              >
-                <span>👥</span>
-                <span>{t(language, "Hotseat")}</span>
-              </Link>
-            )}
-
-            {/* VS AI */}
-            {variant.aiRoute && (
-              <Link
-                to={variant.aiRoute}
-                className={`
-          flex
-          items-center
-          justify-center
-          gap-2
-          rounded-xl
-          px-3
-          py-3
-          text-sm
-          font-black
-          transition
-          ${buttonClasses[variant.accent]}
-        `}
-              >
-                <span>🤖</span>
-                <span>{t(language, "Vs AI")}</span>
-              </Link>
-            )}
-            {variant.multiplayerRoute && (
-              <Link
-                to={variant.multiplayerRoute}
-                className="
-      flex
-      items-center
-      justify-center
-      gap-2
-      rounded-xl
-      border
-      border-cyan-400/20
-      bg-cyan-400/[0.08]
-      px-3
-      py-3
-      text-sm
-      font-black
-      text-cyan-200
-      transition
-      hover:bg-cyan-400/[0.14]
-    "
-              >
-                <span>🌐</span>
-                <span>Multiplayer</span>
-              </Link>
-            )}
-            {variant.rulesRoute && (
-              <Link
-                to={variant.rulesRoute}
-                className={`
-                  flex
-                  items-center
-                  justify-center
-                  gap-2
-                  rounded-xl
-                  border
-                  px-3
-                  py-3
-                  text-sm
-                  font-black
-                  transition
-                  ${accentClasses[variant.accent]}
-                  hover:brightness-125
-                `}
-                aria-label={`${t(language, "Rules")} — ${t(
-                  language,
-                  variant.title,
-                )}`}
-              >
-                <span aria-hidden="true">📖</span>
-                <span>{t(language, "Rules")}</span>
-              </Link>
-            )}
           </div>
-        )}
+
+          <p className="mt-2 line-clamp-2 font-serif text-[12px] leading-[1.45rem] text-zinc-400">
+            {t(language, variant.description)}
+          </p>
+
+          <div className="mt-2.5 flex flex-wrap gap-1.5">
+            {variant.tags.slice(0, 2).map((tag) => (
+              <span
+                key={tag}
+                className={`rounded-full border px-2 py-0.5 text-[8px] font-semibold ${accentClasses[variant.accent]}`}
+              >
+                {t(language, tag)}
+              </span>
+            ))}
+          </div>
+
+          <div className="mt-auto pt-3">
+            <VariantActionButtons variant={variant} language={language} />
+          </div>
+        </div>
       </div>
     </article>
   );
@@ -1537,141 +1270,145 @@ export default function ChessVariantsMenu() {
   }
 
   return (
-    <main className="min-h-screen bg-transparent text-zinc-100">
-      <div
-        className="
-          pointer-events-none
-          fixed
-          inset-0
-          bg-[radial-gradient(circle_at_top,rgba(251,191,36,0.06),transparent_34%)]
-        "
-      />
+    <main className="relative left-1/2 min-h-[100dvh] w-screen -translate-x-1/2 overflow-hidden bg-[#07090b] text-zinc-100">
+      {/* Same full-screen atmosphere as ChessMenu / ChessClassicalMenu. */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_13%_68%,rgba(245,158,11,.09),transparent_28%),radial-gradient(circle_at_76%_23%,rgba(217,70,239,.07),transparent_30%),linear-gradient(to_bottom,#0a0d10,#07090b_58%,#040506)]" />
 
-      <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <section className="mb-7 grid gap-5 lg:grid-cols-[360px_minmax(0,1fr)]">
-          <header
-            className="
-              relative
-              flex
-              min-h-[360px]
-              flex-col
-              overflow-hidden
-              rounded-3xl
-              border
-              border-amber-400/10
-              bg-zinc-900/60
-              p-6
-              shadow-xl
-              shadow-black/20
-              backdrop-blur-md
-              lg:aspect-square
-            "
+      <div className="pointer-events-none absolute -bottom-28 -left-24 text-[390px] leading-none text-amber-100/[0.035]">
+        ♚
+      </div>
+
+      <div className="pointer-events-none absolute bottom-[-72px] left-[25%] text-[250px] leading-none text-white/[0.018]">
+        ♞
+      </div>
+
+      <div className="pointer-events-none absolute right-[-50px] top-[15%] text-[290px] leading-none text-fuchsia-100/[0.018]">
+        ♝
+      </div>
+
+      <div className="relative flex min-h-[100dvh] w-full flex-col">
+        {/* Same compact top bar used on the other menu pages. */}
+        <nav className="flex min-h-20 w-full items-center justify-between border-b border-white/[0.07] px-6 sm:px-10 lg:px-14 xl:px-20">
+          <Link to="/games/chess" className="inline-flex items-center gap-3">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-amber-300/20 bg-amber-300/10 text-lg text-amber-300">
+              ♛
+            </span>
+            <span className="font-serif text-sm tracking-[0.28em] text-zinc-200">
+              CHESS
+            </span>
+          </Link>
+
+          <Link
+            to="/games/chess/rules"
+            className="inline-flex items-center gap-2 text-sm text-zinc-500 transition hover:text-white"
           >
-            <div
-              className="
-                pointer-events-none
-                absolute
-                -right-12
-                -top-12
-                text-[190px]
-                font-black
-                leading-none
-                text-amber-300/[0.025]
-              "
-            >
-              ♞
-            </div>
+            <span className="text-base">♔</span>
+            <span className="hidden sm:inline">{t(language, "Rules")}</span>
+          </Link>
+        </nav>
 
-            <div
-              className="
-                flex
-                h-14
-                w-14
-                items-center
-                justify-center
-                rounded-2xl
-                border
-                border-amber-500/20
-                bg-amber-400/10
-                text-3xl
-                text-amber-200
-                shadow-inner
-              "
-            >
-              ♞
-            </div>
+        {/* HERO: title fixed on the left, featured variant on the right. */}
+        <section className="grid min-h-0 flex-1 lg:grid-cols-[minmax(360px,.82fr)_minmax(620px,1.18fr)]">
+          <header className="relative flex min-h-[430px] flex-col justify-center px-7 py-14 sm:px-10 lg:min-h-0 lg:px-14 lg:py-16 xl:px-20 2xl:px-24">
+            <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-px bg-gradient-to-b from-transparent via-white/10 to-transparent lg:block" />
 
-            <div className="relative mt-6">
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-400">
+            <div className="max-w-[620px]">
+              <Link
+                to="/games/chess"
+                className="mb-8 inline-flex items-center gap-2 text-sm text-zinc-600 transition hover:text-white"
+              >
+                <span>←</span>
+                {t(language, "Back to Chess")}
+              </Link>
+
+              <p className="text-[11px] font-black uppercase tracking-[0.34em] text-amber-400">
                 {t(language, "Different rules. Same board.")}
               </p>
 
-              <h1 className="mt-2 text-4xl font-black tracking-tight text-white">
+              <h1 className="mt-5 font-serif text-[52px] leading-[.94] tracking-[-0.035em] text-white sm:text-[66px] xl:text-[82px]">
                 {t(language, "Chess Variants")}
               </h1>
 
-              <p className="mt-3 text-sm leading-6 text-zinc-500">
-                {t(
-                  language,
-                  "Fifteen ways to turn classic chess into something completely different.",
-                )}
+              <p className="mt-6 max-w-[520px] font-serif text-[18px] leading-8 text-zinc-400 sm:text-[20px]">
+                {variants.length} ways to turn classic chess into something
+                completely different.
               </p>
-            </div>
 
-            <div className="relative mt-auto pt-6">
-              <div className="mt-4 flex flex-wrap items-center gap-2">
+              <div className="mt-7">
+                <p className="mb-3 text-[9px] font-black uppercase tracking-[0.28em] text-zinc-700">
+                  {t(language, "Language")}
+                </p>
+
                 <LanguageSelector
                   language={language}
                   onChange={changeLanguage}
                 />
-
-                <Link
-                  to="/games/chess"
-                  className="
-                    rounded-full
-                    border
-                    border-white/10
-                    bg-white/5
-                    px-3
-                    py-1.5
-                    text-xs
-                    font-semibold
-                    text-zinc-400
-                    transition
-                    hover:bg-white/10
-                    hover:text-white
-                  "
-                >
-                  ← {t(language, "Back to Chess")}
-                </Link>
               </div>
+            </div>
+
+            <div className="mt-12 flex items-center gap-4 text-[9px] font-black uppercase tracking-[0.28em] text-zinc-700">
+              <span className="h-px w-14 bg-amber-400/45" />
+              {variants.length} unique ways to play
+            </div>
+
+            <div className="pointer-events-none absolute bottom-[5%] right-[4%] hidden text-[190px] leading-none text-amber-100/[0.022] xl:block">
+              ♞
             </div>
           </header>
 
-          <VariantPreviewCarousel language={language} />
+          <div className="relative flex min-h-[560px] items-center border-t border-white/[0.06] px-5 py-8 sm:px-8 lg:min-h-0 lg:border-t-0 lg:px-10 lg:py-12 xl:px-14 2xl:px-20">
+            <div className="mx-auto w-full max-w-[980px]">
+              <div className="mb-4 flex items-center justify-between gap-4 px-1">
+                <div>
+                  <p className="text-[9px] font-black uppercase tracking-[0.28em] text-fuchsia-300/60">
+                    Featured
+                  </p>
+                  <h2 className="mt-1 font-serif text-[24px] text-white sm:text-[28px]">
+                    Explore a variant
+                  </h2>
+                </div>
+
+                <span className="hidden text-[9px] font-black uppercase tracking-[0.25em] text-zinc-700 sm:inline">
+                  Auto preview
+                </span>
+              </div>
+
+              <VariantPreviewCarousel language={language} />
+            </div>
+          </div>
         </section>
 
-        <section
-          className="
-            grid
-            gap-5
-            md:grid-cols-2
-            xl:grid-cols-3
-          "
-        >
-          {variants.map((variant, index) => (
-            <VariantCardView
-              key={variant.id}
-              variant={variant}
-              language={language}
-              number={index + 1}
-            />
-          ))}
-        </section>
+        {/* FULL VARIANT LIBRARY */}
+        <section className="relative border-t border-white/[0.07] px-4 pb-12 pt-8 sm:px-6 lg:px-10 lg:pb-16 lg:pt-10 xl:px-14 2xl:px-20">
+          <div className="mx-auto w-full max-w-[1560px]">
+            <div className="mb-5 flex flex-wrap items-end justify-between gap-4 px-1">
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-[0.28em] text-amber-300/65">
+                  Variant Library
+                </p>
 
-        <footer className="py-8 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-800">
-          Chess Variants · 13 modes
-        </footer>
+                <h2 className="mt-1.5 font-serif text-[30px] leading-tight text-white sm:text-[36px]">
+                  All Variants
+                </h2>
+              </div>
+
+              <p className="text-[9px] font-black uppercase tracking-[0.30em] text-zinc-600">
+                {variants.length} unique ways to play
+              </p>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {variants.map((variant, index) => (
+                <VariantCardView
+                  key={variant.id}
+                  variant={variant}
+                  language={language}
+                  number={index + 1}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
       </div>
     </main>
   );
