@@ -16,7 +16,11 @@ export default function DashboardPlayCarousel() {
   const game = games[currentGame];
 
   useEffect(() => {
-    if (paused || games.length <= 1) {
+    if (
+      paused ||
+      games.length <= 1 ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
       return;
     }
 
@@ -41,6 +45,13 @@ export default function DashboardPlayCarousel() {
 
   return (
     <section
+      aria-label="Available games"
+      aria-roledescription="carousel"
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget))
+          setPaused(false);
+      }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       className="
@@ -75,9 +86,11 @@ export default function DashboardPlayCarousel() {
           transform: `translateX(-${currentGame * 100}%)`,
         }}
       >
-        {games.map((item) => (
+        {games.map((item, index) => (
           <div
             key={item.route}
+            inert={index !== currentGame}
+            aria-hidden={index !== currentGame}
             className="
               relative
               min-h-[360px]

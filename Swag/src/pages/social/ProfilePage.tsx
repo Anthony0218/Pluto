@@ -52,7 +52,7 @@ function StatCard({
 }
 
 export default function ProfilePage() {
-  const { user, profile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
 
   const [username, setUsername] = useState("");
   const [avatarId, setAvatarId] = useState("m1");
@@ -82,7 +82,7 @@ export default function ProfilePage() {
         ? typedProfile.username.trim()
         : "";
 
-    setUsername(currentName || user?.email?.split("@")[0]?.trim() || "Player");
+    setUsername(currentName || "");
 
     setAvatarId(typedProfile?.avatar_id ?? "m1");
   }, [profile, user?.email]);
@@ -210,6 +210,7 @@ export default function ProfilePage() {
       return;
     }
 
+    await refreshProfile();
     setUsername(nextName);
     setEditing(false);
     setMessage("Name gespeichert.");
@@ -254,6 +255,7 @@ export default function ProfilePage() {
       return;
     }
 
+    await refreshProfile();
     setMessage("Avatar gespeichert.");
 
     window.setTimeout(() => {

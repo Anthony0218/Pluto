@@ -1,15 +1,16 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import { supabase } from "../../../lib/supabase";
 import { useAuth } from "../../../context/AuthContext";
 
 export default function ChessMultiplayerLobby() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const { user, profile } = useAuth();
 
-  const [roomCode, setRoomCode] = useState("");
+  const [roomCode, setRoomCode] = useState(() => (searchParams.get("code") ?? "").trim().toUpperCase());
 
   const [loading, setLoading] = useState(false);
 

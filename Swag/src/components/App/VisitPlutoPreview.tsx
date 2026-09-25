@@ -1,393 +1,106 @@
-import {
-  ArrowRight,
-  BookOpen,
-  Flame,
-  Gamepad2,
-  Sparkles,
-  Trophy,
-} from "lucide-react";
-
+import { ArrowRight, BookOpen, Gamepad2, Target, Users } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import FriendAvatar from "../social/FriendAvatar";
 
 export default function VisitPlutoPreview() {
+  const { user, profile } = useAuth();
   return (
-    <div className="relative">
-      {/* BACKGROUND GLOW */}
-      <div
-        className="
-          pointer-events-none
-          absolute
-          inset-12
-          bg-indigo-500/[0.18]
-          blur-[100px]
-        "
-      />
-
-      <div
-        className="
-          relative
-          overflow-hidden
-          rounded-[28px]
-
-          border
-          border-white/[0.09]
-
-          bg-[#080d1d]/90
-
-          shadow-2xl
-          shadow-black/50
-
-          backdrop-blur-xl
-        "
-      >
-        {/* MINI APP HEADER */}
-        <div
-          className="
-            flex
-            items-center
-            justify-between
-
-            border-b
-            border-white/[0.07]
-
-            px-5
-            py-4
-          "
-        >
-          <div className="flex items-center gap-3">
-            <img
-              src="/pluto-icon.png"
-              alt="Pluto"
-              className="
-                h-9
-                w-9
-                rounded-xl
-                object-cover
-              "
-            />
-
-            <div>
-              <p className="text-sm font-semibold text-white">Pluto</p>
-
-              <p className="text-[10px] text-zinc-600">Your dashboard</p>
-            </div>
-          </div>
-
-          <div
-            className="
-              rounded-full
-              border border-indigo-400/20
-              bg-indigo-400/[0.08]
-              px-3
-              py-1
-
-              text-[10px]
-              font-medium
-              text-indigo-300
-            "
-          >
-            Dashboard
-          </div>
-        </div>
-
-        {/* CONTENT */}
-        <div className="p-5 sm:p-6">
-          {/* STATS */}
-          <div className="grid grid-cols-3 gap-2 sm:gap-3">
-            <MiniStat icon={<Flame size={15} />} value="7" label="day streak" />
-
-            <MiniStat icon={<Sparkles size={15} />} value="1,240" label="XP" />
-
-            <MiniStat icon={<Trophy size={15} />} value="12" label="level" />
-          </div>
-
-          {/* CONTINUE PLAYING */}
-          <div
-            className="
-              mt-4
-              overflow-hidden
-              rounded-2xl
-
-              border
-              border-white/[0.07]
-
-              bg-white/[0.025]
-            "
-          >
-            <div
-              className="
-                flex
-                items-center
-                justify-between
-
-                p-4
-              "
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  className="
-                    flex
-                    h-11
-                    w-11
-                    items-center
-                    justify-center
-
-                    rounded-xl
-
-                    bg-indigo-400/[0.08]
-
-                    text-indigo-300
-                  "
-                >
-                  <Gamepad2 size={20} />
-                </div>
-
-                <div>
-                  <p
-                    className="
-                      text-[10px]
-                      font-semibold
-                      uppercase
-                      tracking-[0.17em]
-                      text-zinc-600
-                    "
-                  >
-                    Continue playing
-                  </p>
-
-                  <p className="mt-1 text-sm font-semibold">Chess</p>
-                </div>
-              </div>
-
-              <span className="text-sm text-zinc-600">→</span>
-            </div>
-          </div>
-
-          {/* LEARNING */}
-          <div
-            className="
-              mt-3
-              rounded-2xl
-
-              border
-              border-white/[0.07]
-
-              bg-white/[0.025]
-
-              p-4
-            "
-          >
-            <div className="flex items-center gap-3">
-              <div
-                className="
-                  flex
-                  h-11
-                  w-11
-                  items-center
-                  justify-center
-
-                  rounded-xl
-
-                  bg-violet-400/[0.08]
-
-                  text-violet-300
-                "
-              >
-                <BookOpen size={19} />
-              </div>
-
-              <div className="min-w-0 flex-1">
-                <div
-                  className="
-                    flex
-                    items-center
-                    justify-between
-                    gap-3
-                  "
-                >
-                  <div>
-                    <p
-                      className="
-                        text-[10px]
-                        font-semibold
-                        uppercase
-                        tracking-[0.17em]
-                        text-zinc-600
-                      "
-                    >
-                      Continue learning
-                    </p>
-
-                    <p className="mt-1 text-sm font-semibold">
-                      Control the Center
-                    </p>
-                  </div>
-
-                  <span className="text-xs text-zinc-500">60%</span>
-                </div>
-
-                {/* PROGRESS */}
-                <div
-                  className="
-                    mt-3
-                    h-1.5
-                    overflow-hidden
-                    rounded-full
-                    bg-white/[0.06]
-                  "
-                >
-                  <div
-                    className="
-                      h-full
-                      w-[60%]
-                      rounded-full
-
-                      bg-gradient-to-r
-                      from-indigo-500
-                      to-violet-400
-                    "
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* SMALL ACTIVITY */}
-          <div
-            className="
-              mt-3
-              grid
-              gap-3
-              sm:grid-cols-2
-            "
-          >
-            <div
-              className="
-                rounded-2xl
-                border border-white/[0.07]
-                bg-white/[0.02]
-                p-4
-              "
-            >
-              <p className="text-[10px] uppercase tracking-wider text-zinc-600">
-                Daily challenge
-              </p>
-
-              <p className="mt-2 text-sm font-medium">Find the best move</p>
-            </div>
-
-            <div
-              className="
-                rounded-2xl
-                border border-white/[0.07]
-                bg-white/[0.02]
-                p-4
-              "
-            >
-              <p className="text-[10px] uppercase tracking-wider text-zinc-600">
-                Friends
-              </p>
-
-              <p className="mt-2 text-sm font-medium">4 online now</p>
-            </div>
-          </div>
-        </div>
-
-        {/* VISIT PLUTO */}
-        <div
-          className="
-            flex
-            items-center
-            justify-between
-            gap-4
-
-            border-t
-            border-white/[0.07]
-
-            bg-white/[0.015]
-
-            px-5
-            py-4
-
-            sm:px-6
-          "
-        >
-          <div>
-            <p className="text-sm font-semibold">Visit Pluto</p>
-
-            <p className="mt-0.5 text-xs text-zinc-500">
-              Your games, learning and progress.
-            </p>
-          </div>
-
-          <Link
-            to="/dashboard"
-            className="
-              group
-
-              inline-flex
-              shrink-0
-              items-center
-              gap-2
-
-              rounded-xl
-
-              bg-indigo-500
-
-              px-4
-              py-2.5
-
-              text-xs
-              font-semibold
-              text-white
-
-              transition
-
-              hover:bg-indigo-400
-            "
-          >
-            Open Pluto
-            <ArrowRight
-              size={14}
-              className="
-                transition-transform
-                group-hover:translate-x-0.5
-              "
-            />
-          </Link>
+    <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#080d1d]/90 shadow-2xl shadow-black/50 backdrop-blur-xl">
+      <div className="flex items-center gap-3 border-b border-white/10 px-5 py-4">
+        {profile ? (
+          <FriendAvatar profile={profile} />
+        ) : (
+          <img src="/pluto-icon.png" alt="" className="h-9 w-9 rounded-xl" />
+        )}
+        <div>
+          <p className="text-sm font-semibold text-white">
+            {profile?.username || profile?.display_name || "Pluto"}
+          </p>
+          <p className="mt-1 text-xs text-zinc-400">
+            {user ? "Your dashboard" : "Your place to play and learn"}
+          </p>
         </div>
       </div>
-    </div>
-  );
-}
-
-function MiniStat({
-  icon,
-  value,
-  label,
-}: {
-  icon: React.ReactNode;
-  value: string;
-  label: string;
-}) {
-  return (
-    <div
-      className="
-        rounded-xl
-
-        border
-        border-white/[0.06]
-
-        bg-white/[0.025]
-
-        p-3
-      "
-    >
-      <div className="text-indigo-300">{icon}</div>
-
-      <p className="mt-3 text-sm font-bold text-white sm:text-base">{value}</p>
-
-      <p className="mt-0.5 text-[10px] text-zinc-600">{label}</p>
+      <div className="p-5 sm:p-6">
+        {profile ? (
+          <div className="mb-4 grid grid-cols-3 gap-3">
+            {[
+              ["Games", profile.games_played],
+              ["Wins", profile.wins],
+              ["Rating", profile.rating],
+            ].map(([label, value]) => (
+              <div
+                key={label}
+                className="rounded-xl border border-white/10 bg-white/[0.025] p-3"
+              >
+                <p className="font-bold text-white">
+                  {value?.toLocaleString() ?? "—"}
+                </p>
+                <p className="mt-1 text-xs text-zinc-400">{label}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="mb-4 text-sm text-zinc-400">
+            {user
+              ? "Your profile stats are currently unavailable."
+              : "Log in to keep your profile, game activity and friends together."}
+          </p>
+        )}
+        <div className="space-y-3">
+          {[
+            {
+              title: "Explore games",
+              description: "Find your next game.",
+              to: "/games",
+              icon: Gamepad2,
+            },
+            {
+              title: "Learn something new",
+              description: "Rules and strategies for your next match.",
+              to: "/learn",
+              icon: BookOpen,
+            },
+            {
+              title: "Daily challenge",
+              description: "See today's goal and your progress.",
+              to: "/dashboard",
+              icon: Target,
+            },
+            {
+              title: "Friends",
+              description: "Find friends and open a conversation.",
+              to: "/friends",
+              icon: Users,
+            },
+          ].map(({ title, description, to, icon: Icon }) => (
+            <Link
+              key={title}
+              to={to}
+              className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.025] p-4 hover:bg-white/5"
+            >
+              <Icon className="shrink-0 text-indigo-300" size={22} />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold">{title}</p>
+                <p className="mt-1 text-xs text-zinc-400">{description}</p>
+              </div>
+              <ArrowRight size={16} className="text-zinc-400" />
+            </Link>
+          ))}
+        </div>
+      </div>
+      <div className="flex items-center justify-between gap-4 border-t border-white/10 px-5 py-4">
+        <p className="text-xs text-zinc-400">
+          Your games, learning and progress.
+        </p>
+        <Link
+          to="/dashboard"
+          className="shrink-0 rounded-xl bg-indigo-500 px-4 py-2.5 text-xs font-semibold text-white hover:bg-indigo-400"
+        >
+          Open Pluto
+        </Link>
+      </div>
     </div>
   );
 }

@@ -1,4 +1,13 @@
-import type { Game } from "@/pages/general/DashboardPage";
+export type Game = {
+  title: string;
+  subtitle: string;
+  description: string;
+  image: string;
+  route: string;
+  tag: string;
+  features: string[];
+  finished: boolean;
+};
 
 export const games: Game[] = [
   {
@@ -57,51 +66,23 @@ export const games: Game[] = [
     features: ["Rundenbasiert", "Taktik", "Mittelalter"],
     finished: false,
   },
-];
-export const gameList = [
   {
-    name: "Schafkopf",
+    title: "Natura",
+    subtitle: "Discover the natural world",
     description:
-      "Rufspiel, Wenz und Solo – lokal, gegen KI oder online. Mit verpflichtendem Zugeben.",
-    route: "/games/schafkopf",
-    category: "Kartenspiel",
-    image: "/images/watten-game-icon.png",
+      "Explore animals and their remarkable abilities through interactive games.",
+    image: "/pluto-icon.png",
+    route: "/games/natura",
+    tag: "Nature",
+    features: ["Animals", "Discovery"],
     finished: true,
-  },
-  {
-    name: "Schach",
-    description:
-      "Klassisches Schach gegen Freunde, lokal oder gegen Stockfish.",
-    route: "/games/chess",
-    category: "Strategie",
-    image: "/images/chess-game-icon.png",
-    finished: true,
-  },
-
-  {
-    name: "Watten",
-    description: "Das traditionelle bayerische Kartenspiel.",
-    route: "/games/watten",
-    category: "Kartenspiel",
-    image: "/images/watten-game-icon.png",
-    finished: true,
-  },
-
-  {
-    name: "Schach 3D",
-    description:
-      "Klassisches Schach als interaktives 3D-Erlebnis – lokal im Hotseat oder gegen Stockfish.",
-    route: "/games/chess/3dchess",
-    category: "Strategie · 3D",
-    image: "/images/chess3d-icon.png",
-    finished: true,
-  },
-  {
-    name: "Medieval Kingdoms",
-    description: "A turn based strategy game in medieval style.",
-    route: "/games/medieval-kingdoms",
-    category: "Strategie",
-    image: "/images/medieval-kingdoms-icon.png",
-    finished: false,
   },
 ];
+export const gameList = games.map((game) => ({
+  name: game.title,
+  description: game.description,
+  route: game.route,
+  category: game.tag,
+  image: game.image,
+  finished: game.finished,
+}));

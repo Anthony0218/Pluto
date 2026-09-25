@@ -1,3 +1,4 @@
+import LearnPage from "./pages/general/LearnPage";
 import React from "react";
 import ReactDOM from "react-dom/client";
 
@@ -177,6 +178,10 @@ const router = createBrowserRouter([
         element: <AppLayout />,
 
         children: [
+          {
+            path: "/learn",
+            element: <LearnPage />,
+          },
           {
             path: "/dashboard",
             element: <App />,

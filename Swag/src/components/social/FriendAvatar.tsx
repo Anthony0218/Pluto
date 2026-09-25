@@ -1,7 +1,11 @@
+import { ProfileAvatar } from "./ProfileAvatarPicker";
 import type { PublicProfile } from "../../types/social";
 
 type FriendAvatarProps = {
-  profile: Pick<PublicProfile, "display_name" | "username" | "avatar_url">;
+  profile: Pick<
+    PublicProfile,
+    "display_name" | "username" | "avatar_url" | "avatar_id"
+  >;
   size?: "sm" | "md" | "lg";
 };
 
@@ -16,11 +20,21 @@ export default function FriendAvatar({
   size = "md",
 }: FriendAvatarProps) {
   const label =
-    profile.display_name?.trim() ||
-    profile.username?.trim() ||
-    "Friend";
+    profile.display_name?.trim() || profile.username?.trim() || "Friend";
 
   const initial = label.charAt(0).toUpperCase();
+
+  if (profile.avatar_id) {
+    return (
+      <span
+        role="img"
+        aria-label={`${label} avatar`}
+        className={`${sizeClasses[size]} shrink-0 overflow-hidden rounded-full border border-white/10`}
+      >
+        <ProfileAvatar avatarId={profile.avatar_id} className="h-full w-full" />
+      </span>
+    );
+  }
 
   if (profile.avatar_url) {
     return (

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Check, Search, UserPlus, Users, X } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../context/AuthContext";
 import type { Friend, FriendRequest, PublicProfile } from "../../types/social";
@@ -21,6 +21,8 @@ function profileLabel(profile: PublicProfile) {
 export default function FriendsPage() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const requestedFriendId = searchParams.get("friend");
   const [friends, setFriends] = useState<Friend[]>([]);
   const [requests, setRequests] = useState<IncomingRequest[]>([]);
   const [selectedFriendId, setSelectedFriendId] = useState<string | null>(null);
@@ -68,7 +70,7 @@ export default function FriendsPage() {
     if (allProfileIds.length > 0) {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id,username,display_name,avatar_url")
+        .select("id,username,display_name,avatar_url,avatar_id")
         .in("id", allProfileIds);
 
       if (error) console.error("Could not load profiles:", error);
@@ -94,11 +96,12 @@ export default function FriendsPage() {
     );
 
     setSelectedFriendId((current) => {
+      if (!current && requestedFriendId && loadedFriends.some(friend => friend.id === requestedFriendId)) return requestedFriendId;
       if (current && loadedFriends.some((friend) => friend.id === current))
         return current;
       return loadedFriends[0]?.id ?? null;
     });
-  }, [user]);
+  }, [user, requestedFriendId]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -142,7 +145,7 @@ export default function FriendsPage() {
         setSearching(true);
         const { data, error } = await supabase
           .from("profiles")
-          .select("id,username,display_name,avatar_url")
+          .select("id,username,display_name,avatar_url,avatar_id")
           .neq("id", user.id)
           .ilike("username", `%${query}%`)
           .limit(8);

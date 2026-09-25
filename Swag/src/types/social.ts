@@ -3,6 +3,7 @@ export type PublicProfile = {
   username: string | null;
   display_name: string | null;
   avatar_url: string | null;
+  avatar_id?: string | null;
 };
 
 export type Friend = PublicProfile;

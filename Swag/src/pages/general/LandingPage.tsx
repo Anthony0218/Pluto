@@ -39,8 +39,7 @@ export default function LandingPage() {
           </>
         }
         description="
-          Interactive lessons, rules,
-          strategies and courses that
+          Rules and strategies that
           help you understand the games
           you play.
         "
@@ -69,8 +68,8 @@ export default function LandingPage() {
           into explanations you can
           actually learn from.
         "
-        href="/coach"
-        action="Try Chess Coach"
+        href="/games/chess/classic/ai"
+        action="Practice with Stockfish"
       >
         <CoachShowcase />
       </FeatureSection>

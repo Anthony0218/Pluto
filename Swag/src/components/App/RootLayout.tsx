@@ -1,9 +1,15 @@
-import { Outlet } from "react-router-dom";
+import { useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 
+import AccountActivity from "./AccountActivity";
+import NavigationDrawer from "./NavigationDrawer";
 import PublicHeader from "./PublicHeader";
 import { useTheme } from "../../context/ThemeContext";
 
 export default function RootLayout() {
+  const location = useLocation();
+  const [openAt, setOpenAt] = useState<string | null>(null);
+  const navigationOpen = openAt === location.key;
   const { plutoMode } = useTheme();
 
   return (
@@ -16,7 +22,15 @@ export default function RootLayout() {
       `}
     >
       {/* GLOBAL HEADER */}
-      <PublicHeader />
+      <AccountActivity />
+      <PublicHeader
+        key={location.key}
+        navigationOpen={navigationOpen}
+        onToggleNavigation={() =>
+          setOpenAt(navigationOpen ? null : location.key)
+        }
+      />
+      {navigationOpen && <NavigationDrawer onClose={() => setOpenAt(null)} />}
 
       {/* 
         PublicHeader is fixed and h-16 = 64px.

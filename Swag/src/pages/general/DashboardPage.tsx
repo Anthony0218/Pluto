@@ -1,1105 +1,574 @@
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   ArrowRight,
   BarChart3,
   Flame,
   Search,
-  Sparkles,
   Target,
   Trophy,
   Users,
+  X,
 } from "lucide-react";
-
-import { useNavigate } from "react-router-dom";
-
+import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-
-import { gameList } from "../../data/games";
-
+import { games } from "../../data/games";
+import { learningResources } from "../../data/navigation";
+import {
+  useDashboardData,
+  type DashboardActivity,
+} from "../../hooks/useDashboardData";
+import type { Friend } from "../../types/social";
 import DashboardPlayCarousel from "../../components/App/DashboardPlayCarousel";
+import FriendAvatar from "../../components/social/FriendAvatar";
+import FriendChat from "../../components/social/FriendChat";
+
+const panel = "rounded-2xl border border-white/[0.08] bg-[#080d1c]/85 p-5";
+const textLink =
+  "inline-flex items-center gap-1.5 text-xs font-medium text-indigo-300 hover:text-indigo-200";
+const friendName = (friend: Friend) =>
+  friend.username || friend.display_name || "Player";
 
 export default function DashboardPage() {
-  const navigate = useNavigate();
-
-  const { user } = useAuth();
-
-  const displayName = user?.email?.split("@")[0] ?? "Player";
-
-  const greeting = getGreeting();
+  const { user, profile, loading: authLoading } = useAuth();
+  const { activity, friends, onlineIds, loading, activityError, friendsError } =
+    useDashboardData();
+  const [search, setSearch] = useState("");
+  const [selectedFriendId, setSelectedFriendId] = useState<string | null>(null);
+  const [now, setNow] = useState(Date.now);
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 30_000);
+    return () => window.clearInterval(timer);
+  }, []);
+  const hour = new Date(now).getHours();
+  const greeting =
+    hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  const displayName =
+    profile?.username?.trim() || profile?.display_name?.trim();
+  const onlineFriends = friends.filter((friend) =>
+    onlineIds.includes(friend.id),
+  );
+  const selectedFriend = friends.find(
+    (friend) => friend.id === selectedFriendId,
+  );
+  const query = search.trim().toLocaleLowerCase();
+  const matchingGames = games.filter((game) =>
+    `${game.title} ${game.description}`.toLocaleLowerCase().includes(query),
+  );
+  const matchingLessons = learningResources.filter((item) =>
+    `${item.title} ${item.description}`.toLocaleLowerCase().includes(query),
+  );
+  const matchingFriends = friends.filter((friend) =>
+    `${friend.username ?? ""} ${friend.display_name ?? ""}`
+      .toLocaleLowerCase()
+      .includes(query),
+  );
+  const recentGames = (activity?.recent_games ?? []).flatMap((visit) => {
+    const game = games.find((item) => item.route === visit.game_route);
+    return game ? [game] : [];
+  });
+  const wins = profile?.wins;
+  const played = profile?.games_played;
+  const winRate =
+    played && wins != null
+      ? Math.min(100, Math.round((wins / played) * 100))
+      : 0;
 
   return (
-    <main
-      className="
-        min-h-screen
-        bg-transparent
-        text-zinc-100
-      "
-    >
-      <div
-        className="
-          mx-auto
-          max-w-[1550px]
-
-          px-5
-          py-7
-
-          sm:px-7
-
-          xl:px-9
-        "
-      >
-        {/* =====================================
-            GRID
-        ===================================== */}
-
-        <div
-          className="
-            grid
-            gap-6
-
-            xl:grid-cols-[minmax(0,1fr)_350px]
-          "
-        >
-          {/* ===================================
-              MAIN COLUMN
-          =================================== */}
-
+    <main className="min-h-screen bg-transparent text-zinc-100">
+      <div className="mx-auto max-w-[1550px] px-5 py-7 sm:px-7 xl:px-9">
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_350px]">
           <div className="min-w-0">
-            {/* SEARCH */}
-            <div
-              className="
-                relative
-                mb-9
-                max-w-xl
-              "
-            >
+            <div className="relative mb-8 max-w-xl">
               <Search
                 size={18}
-                className="
-                  absolute
-                  left-4
-                  top-1/2
-                  -translate-y-1/2
-                  text-zinc-600
-                "
+                className="absolute left-4 top-3.5 text-zinc-400"
               />
-
               <input
+                aria-label="Search games, learning resources and friends"
                 type="search"
-                placeholder="Search games, lessons, friends..."
-                className="
-                  h-11
-                  w-full
-
-                  rounded-xl
-
-                  border
-                  border-white/[0.08]
-
-                  bg-[#0b1020]/75
-
-                  pl-11
-                  pr-4
-
-                  text-sm
-                  text-white
-
-                  outline-none
-
-                  placeholder:text-zinc-600
-
-                  transition
-
-                  focus:border-indigo-400/30
-                "
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search games, learning resources, friends..."
+                className="h-11 w-full rounded-xl border border-white/10 bg-[#0b1020]/75 pl-11 pr-4 text-sm outline-none placeholder:text-zinc-500 focus:border-indigo-400/50"
               />
+              {query && (
+                <div className="absolute inset-x-0 top-13 z-30 max-h-96 overflow-y-auto rounded-xl border border-white/10 bg-[#0c1226] p-3 shadow-2xl">
+                  {matchingGames.map((game) => (
+                    <SearchLink
+                      key={game.route}
+                      title={game.title}
+                      type="Game"
+                      route={game.route}
+                    />
+                  ))}
+                  {matchingLessons.map((item) => (
+                    <SearchLink
+                      key={item.route}
+                      title={item.title}
+                      type="Learn"
+                      route={item.route}
+                    />
+                  ))}
+                  {matchingFriends.map((friend) => (
+                    <button
+                      type="button"
+                      key={friend.id}
+                      onClick={() => {
+                        setSelectedFriendId(friend.id);
+                        setSearch("");
+                      }}
+                      className="flex w-full items-center gap-3 rounded-lg p-3 text-left hover:bg-white/5"
+                    >
+                      <FriendAvatar profile={friend} size="sm" />
+                      <span>{friendName(friend)}</span>
+                      <span className="ml-auto text-xs text-zinc-400">
+                        Chat
+                      </span>
+                    </button>
+                  ))}
+                  {!matchingGames.length &&
+                    !matchingLessons.length &&
+                    !matchingFriends.length && (
+                      <p className="p-3 text-sm text-zinc-400">
+                        No results found.
+                      </p>
+                    )}
+                </div>
+              )}
             </div>
-
-            {/* GREETING */}
             <section className="mb-6">
-              <h1
-                className="
-                  text-3xl
-                  font-bold
-                  tracking-tight
-
-                  sm:text-4xl
-                "
-              >
-                {greeting}, {displayName} 👋
+              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+                {greeting}
+                {displayName ? `, ${displayName}` : ""} 👋
               </h1>
-
-              <p
-                className="
-                  mt-2
-                  text-zinc-500
-                "
-              >
+              <p className="mt-2 text-zinc-400">
                 A little progress each day leads to big results.
               </p>
-
-              {/* STATS */}
-              <div
-                className="
-                  mt-5
-                  flex
-                  flex-wrap
-                  gap-3
-                "
-              >
+              {!user && !authLoading && (
+                <p className="mt-3 text-sm text-zinc-300">
+                  <Link to="/login" className="text-indigo-300 underline">
+                    Log in
+                  </Link>{" "}
+                  to see your progress and friends.
+                </p>
+              )}
+              {user && !profile && !authLoading && (
+                <p className="mt-3 text-sm text-zinc-400">
+                  Your profile couldn’t be loaded.{" "}
+                  <Link to="/profile" className="text-indigo-300">
+                    Open profile
+                  </Link>
+                </p>
+              )}
+              <div className="mt-5 flex flex-wrap gap-3">
                 <StatChip
                   icon={<Flame size={17} className="text-orange-400" />}
-                  value="7"
-                  text="day streak"
+                  value={activity?.streak}
+                  label="day activity streak"
                 />
-
                 <StatChip
-                  icon={<Sparkles size={17} className="text-indigo-300" />}
-                  value="1,240"
-                  text="total XP"
+                  icon={<Trophy size={17} className="text-indigo-300" />}
+                  value={played}
+                  label="games played"
                 />
-
                 <StatChip
                   icon={<BarChart3 size={17} className="text-violet-300" />}
-                  value="Level 12"
-                  text=""
+                  value={profile?.rating}
+                  label="rating"
                 />
-
                 <StatChip
                   icon={<Users size={17} className="text-emerald-400" />}
-                  value="24"
-                  text="friends online"
+                  value={
+                    !user || loading || friendsError
+                      ? null
+                      : onlineFriends.length
+                  }
+                  label="friends online"
                 />
               </div>
             </section>
-
-            {/* PLAY CAROUSEL */}
             <DashboardPlayCarousel />
-
-            {/* ===================================
-                YOUR GAMES
-            =================================== */}
-
             <section className="mt-6">
               <SectionHeader
-                title="Your Games"
+                title="Recently explored"
                 action="View all games"
-                onClick={() => navigate("/games")}
+                to="/games"
               />
-
-              <div
-                className="
-                  grid
-                  gap-4
-
-                  md:grid-cols-3
-                "
-              >
-                {gameList.slice(0, 2).map((game) => (
-                  <button
-                    key={game.route}
-                    type="button"
-                    onClick={() => navigate(game.route)}
-                    className="
-                        group
-                        relative
-
-                        min-h-[180px]
-
-                        overflow-hidden
-
-                        rounded-2xl
-
-                        border
-                        border-white/[0.08]
-
-                        bg-[#0b1020]
-
-                        text-left
-
-                        transition
-
-                        hover:-translate-y-1
-                        hover:border-indigo-400/20
-                      "
-                  >
-                    <img
-                      src={game.image}
-                      alt={game.name}
-                      className="
-                          absolute
-                          inset-0
-
-                          h-full
-                          w-full
-
-                          object-cover
-
-                          transition
-                          duration-500
-
-                          group-hover:scale-105
-                        "
-                    />
-
-                    <div
-                      className="
-                          absolute
-                          inset-0
-
-                          bg-gradient-to-t
-
-                          from-black/95
-                          via-black/40
-                          to-transparent
-                        "
-                    />
-
-                    <div
-                      className="
-                          relative
-
-                          flex
-                          h-full
-                          min-h-[180px]
-                          flex-col
-                          justify-end
-
-                          p-5
-                        "
+              {loading ? (
+                <p className={`${panel} text-sm text-zinc-400`}>
+                  Loading your games…
+                </p>
+              ) : activityError ? (
+                <p className={`${panel} text-sm text-zinc-400`}>
+                  Your recent activity is unavailable. You can still browse all
+                  games.
+                </p>
+              ) : recentGames.length ? (
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {recentGames.slice(0, 3).map((game) => (
+                    <Link
+                      key={game.route}
+                      to={game.route}
+                      className="group relative min-h-44 overflow-hidden rounded-2xl border border-white/10 bg-[#0b1020]"
                     >
-                      <h3
-                        className="
-                            text-xl
-                            font-semibold
-                          "
-                      >
-                        {game.name}
-                      </h3>
-
-                      <p
-                        className="
-                            mt-1
-                            text-sm
-                            text-zinc-400
-                          "
-                      >
-                        {game.description}
-                      </p>
-                    </div>
-                  </button>
-                ))}
-
-                {/* MORE GAMES */}
-                <button
-                  type="button"
-                  onClick={() => navigate("/games")}
-                  className="
-                    group
-
-                    flex
-                    min-h-[180px]
-                    flex-col
-                    justify-center
-
-                    overflow-hidden
-
-                    rounded-2xl
-
-                    border
-                    border-indigo-400/20
-
-                    bg-gradient-to-br
-                    from-indigo-500/[0.13]
-                    via-[#0c1124]
-                    to-violet-500/[0.08]
-
-                    p-6
-
-                    text-left
-
-                    transition
-
-                    hover:-translate-y-1
-                    hover:border-indigo-400/40
-                  "
-                >
-                  <div
-                    className="
-                      flex
-                      h-11
-                      w-11
-                      items-center
-                      justify-center
-
-                      rounded-xl
-
-                      bg-indigo-500/15
-
-                      text-indigo-300
-                    "
-                  >
-                    <Trophy size={20} />
-                  </div>
-
-                  <h3
-                    className="
-                      mt-5
-                      text-lg
-                      font-semibold
-                    "
-                  >
-                    More Games
-                  </h3>
-
-                  <p
-                    className="
-                      mt-1
-                      text-sm
-                      text-zinc-500
-                    "
-                  >
-                    Explore all games and discover new ones.
+                      <img
+                        src={game.image}
+                        alt=""
+                        className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+                      <div className="relative flex min-h-44 flex-col justify-end p-5">
+                        <h3 className="text-xl font-semibold">{game.title}</h3>
+                        <p className="mt-1 text-sm text-zinc-300">
+                          {game.subtitle}
+                        </p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className={panel}>
+                  <p className="text-sm text-zinc-400">
+                    {user
+                      ? "Games you explore will appear here. Choose a game above to get started."
+                      : "Log in to keep your game activity across visits."}
                   </p>
-
-                  <ArrowRight
-                    size={18}
-                    className="
-                      mt-4
-                      text-indigo-300
-
-                      transition-transform
-
-                      group-hover:translate-x-1
-                    "
-                  />
-                </button>
-              </div>
+                </div>
+              )}
             </section>
-
-            {/* ===================================
-                CONTINUE LEARNING
-            =================================== */}
-
             <section className="mt-6">
               <SectionHeader
-                title="Continue Learning"
-                action="View all lessons"
-                onClick={() => navigate("/learn")}
+                title="Learn something new"
+                action="View all resources"
+                to="/learn"
               />
-
-              <div
-                className="
-                  flex
-                  flex-col
-                  gap-5
-
-                  rounded-2xl
-
-                  border
-                  border-white/[0.08]
-
-                  bg-[#0b1020]/80
-
-                  p-5
-
-                  sm:flex-row
-                  sm:items-center
-                "
-              >
-                <div
-                  className="
-                    flex
-                    h-28
-                    w-full
-                    shrink-0
-                    items-center
-                    justify-center
-
-                    rounded-xl
-
-                    bg-gradient-to-br
-                    from-amber-200/20
-                    to-indigo-500/10
-
-                    text-4xl
-
-                    sm:w-36
-                  "
-                >
-                  ♟
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <p
-                    className="
-                      text-xs
-                      text-zinc-600
-                    "
+              <div className="grid gap-3 sm:grid-cols-2">
+                {learningResources.slice(0, 2).map((resource) => (
+                  <Link
+                    key={resource.route}
+                    to={resource.route}
+                    className={`${panel} transition hover:border-indigo-400/30`}
                   >
-                    Chess Basics
-                  </p>
-
-                  <h3
-                    className="
-                      mt-1
-                      font-semibold
-                    "
-                  >
-                    Control the Center
-                  </h3>
-
-                  <p
-                    className="
-                      mt-1
-                      text-sm
-                      text-zinc-500
-                    "
-                  >
-                    Learn why the center is crucial and how to dominate it.
-                  </p>
-
-                  <div
-                    className="
-                      mt-4
-                      flex
-                      items-center
-                      gap-3
-                    "
-                  >
-                    <div
-                      className="
-                        h-1.5
-                        flex-1
-                        overflow-hidden
-                        rounded-full
-                        bg-white/[0.06]
-                      "
-                    >
-                      <div
-                        className="
-                          h-full
-                          w-[60%]
-                          rounded-full
-                          bg-indigo-500
-                        "
-                      />
-                    </div>
-
-                    <span
-                      className="
-                        text-xs
-                        text-zinc-500
-                      "
-                    >
-                      3 / 5
+                    <h3 className="font-semibold">{resource.title}</h3>
+                    <p className="mt-2 text-sm text-zinc-400">
+                      {resource.description}
+                    </p>
+                    <span className={`${textLink} mt-4`}>
+                      Start learning <ArrowRight size={14} />
                     </span>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => navigate("/learn")}
-                  className="
-                    inline-flex
-                    shrink-0
-                    items-center
-                    justify-center
-                    gap-2
-
-                    rounded-xl
-
-                    bg-indigo-500
-
-                    px-5
-                    py-3
-
-                    text-sm
-                    font-semibold
-
-                    transition
-
-                    hover:bg-indigo-400
-                  "
-                >
-                  Continue Lesson
-                  <ArrowRight size={15} />
-                </button>
+                  </Link>
+                ))}
               </div>
             </section>
           </div>
-
-          {/* ===================================
-              RIGHT RAIL
-          =================================== */}
-
-          <aside
-            className="
-              space-y-4
-
-              xl:sticky
-              xl:top-24
-              xl:self-start
-            "
-          >
-            <ProgressCard />
-
-            <DailyChallenge />
-
-            <FriendsOnline />
+          <aside className="space-y-4 xl:sticky xl:top-24 xl:self-start">
+            <section className={panel}>
+              <SectionHeader
+                title="Your Progress"
+                action="See details"
+                to="/profile"
+              />
+              {profile ? (
+                <>
+                  <Link to="/profile" className="mt-5 flex items-center gap-3">
+                    <FriendAvatar profile={profile} />
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold">
+                        {displayName || "Player"}
+                      </p>
+                      <p className="text-xs text-zinc-400">
+                        Your saved profile stats
+                      </p>
+                    </div>
+                  </Link>
+                  <div className="mt-5 flex items-center gap-4">
+                    <div
+                      role="img"
+                      aria-label={`${winRate}% win rate`}
+                      className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full"
+                      style={{
+                        background: `conic-gradient(#8b5cf6 ${winRate}%, #1f2937 ${winRate}% 100%)`,
+                      }}
+                    >
+                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#080d1c] text-lg font-bold">
+                        {played ? `${winRate}%` : "—"}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="font-semibold">Win rate</p>
+                      <p className="mt-1 text-sm text-zinc-400">
+                        {played
+                          ? `${wins ?? 0} wins in ${played} recorded games`
+                          : "No completed games recorded yet."}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-5 grid grid-cols-3 gap-2">
+                    {[
+                      ["Wins", profile.wins],
+                      ["Draws", profile.draws],
+                      ["Losses", profile.losses],
+                    ].map(([label, value]) => (
+                      <div
+                        key={label}
+                        className="rounded-xl border border-white/10 bg-white/[0.025] p-3 text-center"
+                      >
+                        <p className="font-bold">{value ?? "—"}</p>
+                        <p className="mt-1 text-xs text-zinc-400">{label}</p>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <p className="mt-4 text-sm text-zinc-400">
+                  {authLoading
+                    ? "Loading profile…"
+                    : user
+                      ? "Your profile stats are unavailable."
+                      : "Log in to see your saved stats."}
+                </p>
+              )}
+            </section>
+            <DailyChallenge
+              challenge={activity?.challenge ?? null}
+              now={now}
+              loading={loading}
+              unavailable={activityError}
+              signedIn={!!user}
+            />
+            <section className={panel}>
+              <SectionHeader
+                title={`Friends Online${!user || loading || friendsError ? "" : ` (${onlineFriends.length})`}`}
+                action="View all"
+                to="/friends"
+              />
+              {loading ? (
+                <p className="mt-4 text-sm text-zinc-400">Loading friends…</p>
+              ) : friendsError ? (
+                <p className="mt-4 text-sm text-zinc-400">
+                  Online status is temporarily unavailable.
+                </p>
+              ) : onlineFriends.length ? (
+                <div className="mt-4 space-y-2">
+                  {onlineFriends.map((friend) => (
+                    <button
+                      key={friend.id}
+                      type="button"
+                      onClick={() => setSelectedFriendId(friend.id)}
+                      className="flex w-full items-center gap-3 rounded-xl p-2 text-left hover:bg-white/5"
+                    >
+                      <FriendAvatar profile={friend} />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold">
+                          {friendName(friend)}
+                        </p>
+                        <p className="mt-1 flex items-center gap-1.5 text-xs text-zinc-400">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                          Online
+                        </p>
+                      </div>
+                      <span className="rounded-lg border border-indigo-400/20 px-3 py-2 text-xs text-indigo-300">
+                        Chat
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-4 text-sm text-zinc-400">
+                  {!user
+                    ? "Log in to connect with your friends."
+                    : friends.length
+                      ? "None of your friends are online right now. You can still message them from Friends."
+                      : "No friends yet. Find someone by username on the Friends page."}
+                </p>
+              )}
+            </section>
           </aside>
         </div>
       </div>
+      {selectedFriend && (
+        <ChatDialog
+          key={selectedFriend.id}
+          friend={selectedFriend}
+          onClose={() => setSelectedFriendId(null)}
+        />
+      )}
     </main>
   );
 }
 
-/* ============================================
-   HELPERS
-============================================ */
-
-function getGreeting() {
-  const hour = new Date().getHours();
-
-  if (hour < 12) {
-    return "Good morning";
-  }
-
-  if (hour < 18) {
-    return "Good afternoon";
-  }
-
-  return "Good evening";
-}
-
-function StatChip({
-  icon,
-  value,
-  text,
+function DailyChallenge({
+  challenge,
+  now,
+  loading,
+  unavailable,
+  signedIn,
 }: {
-  icon: React.ReactNode;
-  value: string;
-  text: string;
+  challenge: DashboardActivity["challenge"];
+  now: number;
+  loading: boolean;
+  unavailable: boolean;
+  signedIn: boolean;
 }) {
+  const minutes = challenge
+    ? Math.max(0, Math.ceil((Date.parse(challenge.expires_at) - now) / 60_000))
+    : 0;
+  const progress = challenge
+    ? Math.min(challenge.progress, challenge.target)
+    : 0;
+  const completed = !!challenge && progress >= challenge.target;
   return (
-    <div
-      className="
-        flex
-        items-center
-        gap-2.5
-
-        rounded-xl
-
-        border
-        border-white/[0.08]
-
-        bg-[#0b1020]/70
-
-        px-4
-        py-2.5
-      "
-    >
-      {icon}
-
-      <span
-        className="
-          text-sm
-          font-semibold
-          text-white
-        "
-      >
-        {value}
-      </span>
-
-      {text && (
-        <span
-          className="
-            text-xs
-            text-zinc-500
-          "
-        >
-          {text}
-        </span>
+    <section className={panel}>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="font-semibold">Daily Challenge</h2>
+        {challenge && (
+          <span className="text-xs text-zinc-400">
+            {minutes > 0
+              ? `${Math.floor(minutes / 60)}h ${minutes % 60}m left`
+              : "Refreshing…"}
+          </span>
+        )}
+      </div>
+      {loading ? (
+        <p className="mt-4 text-sm text-zinc-400">Loading challenge…</p>
+      ) : !challenge ? (
+        <p className="mt-4 text-sm text-zinc-400">
+          {!signedIn
+            ? "Log in to track your daily challenge."
+            : unavailable
+              ? "Your daily challenge is temporarily unavailable."
+              : "No challenge is available today."}
+        </p>
+      ) : (
+        <>
+          <div className="mt-4 flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.025] p-4">
+            <Target size={30} className="shrink-0 text-indigo-300" />
+            <div className="min-w-0 flex-1">
+              <h3 className="text-sm font-semibold">{challenge.title}</h3>
+              <p className="mt-1 text-xs leading-relaxed text-zinc-400">
+                {challenge.description}
+              </p>
+              <progress
+                aria-label="Daily challenge progress"
+                max={challenge.target}
+                value={progress}
+                className="mt-3 h-2 w-full accent-indigo-500"
+              />
+              <p className="mt-1 text-xs text-zinc-300">
+                {progress} / {challenge.target}
+                {completed ? " · Completed!" : ""}
+              </p>
+            </div>
+          </div>
+          <Link to="/games" className={`${textLink} mt-4`}>
+            {completed ? "Explore more games" : "Choose a game"}
+            <ArrowRight size={14} />
+          </Link>
+        </>
       )}
-    </div>
+    </section>
   );
 }
 
 function SectionHeader({
   title,
   action,
-  onClick,
+  to,
 }: {
   title: string;
   action: string;
-  onClick: () => void;
+  to: string;
 }) {
   return (
-    <div
-      className="
-        mb-3
-
-        flex
-        items-center
-        justify-between
-      "
-    >
-      <h2
-        className="
-          text-lg
-          font-semibold
-        "
-      >
-        {title}
-      </h2>
-
-      <button
-        type="button"
-        onClick={onClick}
-        className="
-          flex
-          items-center
-          gap-1.5
-
-          text-xs
-          font-medium
-          text-indigo-300
-
-          transition
-
-          hover:text-indigo-200
-        "
-      >
+    <div className="mb-3 flex items-center justify-between gap-3">
+      <h2 className="text-lg font-semibold">{title}</h2>
+      <Link to={to} className={`${textLink} shrink-0`}>
         {action}
-
         <ArrowRight size={13} />
-      </button>
+      </Link>
     </div>
   );
 }
-
-function ProgressCard() {
-  return (
-    <section
-      className="
-        rounded-2xl
-
-        border
-        border-white/[0.08]
-
-        bg-[#080d1c]/85
-
-        p-5
-      "
-    >
-      <div
-        className="
-          flex
-          items-center
-          justify-between
-        "
-      >
-        <h2 className="font-semibold">Your Progress</h2>
-
-        <button
-          className="
-            text-xs
-            text-indigo-300
-          "
-        >
-          See details →
-        </button>
-      </div>
-
-      <div
-        className="
-          mt-5
-          flex
-          items-center
-          gap-5
-        "
-      >
-        <div
-          className="
-            relative
-            flex
-            h-20
-            w-20
-            shrink-0
-            items-center
-            justify-center
-            rounded-full
-          "
-          style={{
-            background: "conic-gradient(#8b5cf6 0 42%, #1f2937 42% 100%)",
-          }}
-        >
-          <div
-            className="
-              flex
-              h-16
-              w-16
-              items-center
-              justify-center
-              rounded-full
-              bg-[#080d1c]
-            "
-          >
-            <span
-              className="
-                text-lg
-                font-bold
-              "
-            >
-              42%
-            </span>
-          </div>
-        </div>
-
-        <div>
-          <p className="font-semibold">Keep going!</p>
-
-          <p
-            className="
-              mt-1
-              text-sm
-              text-zinc-500
-            "
-          >
-            You're making great progress.
-          </p>
-        </div>
-      </div>
-
-      <div
-        className="
-          mt-5
-          grid
-          grid-cols-3
-          gap-2
-        "
-      >
-        <SmallStat icon="🔥" value="7" label="Streak" />
-
-        <SmallStat icon="XP" value="1,240" label="Total XP" />
-
-        <SmallStat icon="▥" value="12" label="Level" />
-      </div>
-    </section>
-  );
-}
-
-function SmallStat({
+function StatChip({
   icon,
   value,
   label,
 }: {
-  icon: string;
-  value: string;
+  icon: ReactNode;
+  value: number | null | undefined;
   label: string;
 }) {
   return (
-    <div
-      className="
-        rounded-xl
-
-        border
-        border-white/[0.07]
-
-        bg-white/[0.025]
-
-        p-3
-
-        text-center
-      "
-    >
-      <div className="text-sm">{icon}</div>
-
-      <p
-        className="
-          mt-2
-          text-sm
-          font-bold
-        "
-      >
-        {value}
-      </p>
-
-      <p
-        className="
-          mt-1
-          text-[10px]
-          text-zinc-600
-        "
-      >
-        {label}
-      </p>
+    <div className="flex items-center gap-2.5 rounded-xl border border-white/[0.08] bg-[#0b1020]/70 px-4 py-2.5">
+      {icon}
+      <span className="text-sm font-semibold">
+        {value?.toLocaleString() ?? "—"}
+      </span>
+      <span className="text-xs text-zinc-400">{label}</span>
     </div>
   );
 }
-
-function DailyChallenge() {
+function SearchLink({
+  title,
+  type,
+  route,
+}: {
+  title: string;
+  type: string;
+  route: string;
+}) {
   return (
-    <section
-      className="
-        rounded-2xl
-
-        border
-        border-white/[0.08]
-
-        bg-[#080d1c]/85
-
-        p-5
-      "
+    <Link
+      to={route}
+      className="flex items-center justify-between gap-3 rounded-lg p-3 text-sm hover:bg-white/5"
     >
-      <div
-        className="
-          flex
-          items-center
-          justify-between
-        "
-      >
-        <h2 className="font-semibold">Daily Challenge</h2>
-
-        <span
-          className="
-            text-xs
-            text-zinc-600
-          "
-        >
-          12h left
-        </span>
-      </div>
-
-      <div
-        className="
-          mt-4
-
-          flex
-          items-center
-          gap-4
-
-          rounded-xl
-
-          border
-          border-white/[0.07]
-
-          bg-white/[0.025]
-
-          p-4
-        "
-      >
-        <div
-          className="
-            flex
-            h-12
-            w-12
-            shrink-0
-            items-center
-            justify-center
-
-            rounded-xl
-
-            bg-indigo-500/20
-
-            text-indigo-300
-          "
-        >
-          <Target size={22} />
-        </div>
-
-        <div className="flex-1">
-          <p
-            className="
-              text-sm
-              font-semibold
-            "
-          >
-            Win 2 games
-          </p>
-
-          <p
-            className="
-              mt-1
-              text-xs
-              text-zinc-600
-            "
-          >
-            Any game mode
-          </p>
-
-          <div
-            className="
-              mt-3
-              flex
-              items-center
-              gap-3
-            "
-          >
-            <div
-              className="
-                h-1.5
-                flex-1
-                rounded-full
-                bg-white/[0.06]
-              "
-            >
-              <div
-                className="
-                  h-full
-                  w-1/2
-                  rounded-full
-                  bg-indigo-500
-                "
-              />
-            </div>
-
-            <span
-              className="
-                text-[10px]
-                text-zinc-500
-              "
-            >
-              1/2
-            </span>
-          </div>
-        </div>
-      </div>
-    </section>
+      {title}
+      <span className="text-xs text-zinc-400">{type}</span>
+    </Link>
   );
 }
-
-function FriendsOnline() {
-  const friends = [
-    ["Sophie", "Playing Chess"],
-    ["Lukas", "In a Watten game"],
-    ["Emma", "Learning"],
-    ["Noah", "Online"],
-  ];
-
+function ChatDialog({
+  friend,
+  onClose,
+}: {
+  friend: Friend;
+  onClose: () => void;
+}) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const previousFocus = document.activeElement as HTMLElement | null;
+    dialog.current?.showModal();
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      previousFocus?.focus();
+    };
+  }, []);
   return (
-    <section
-      className="
-        rounded-2xl
-
-        border
-        border-white/[0.08]
-
-        bg-[#080d1c]/85
-
-        p-5
-      "
+    <dialog
+      ref={dialog}
+      aria-label={`Chat with ${friendName(friend)}`}
+      onCancel={onClose}
+      onClick={(event) => {
+        if (event.currentTarget === event.target) onClose();
+      }}
+      className="m-auto max-h-[90dvh] w-[min(680px,95vw)] max-w-none overflow-y-auto rounded-3xl border border-white/10 bg-[#080d1c] p-0 text-white shadow-2xl backdrop:bg-black/60 backdrop:backdrop-blur-md"
     >
-      <div
-        className="
-          flex
-          items-center
-          justify-between
-        "
-      >
-        <h2 className="font-semibold">Friends Online</h2>
-
-        <span
-          className="
-            text-xs
-            text-indigo-300
-          "
-        >
-          View all →
-        </span>
-      </div>
-
-      <div className="mt-4 space-y-2">
-        {friends.map(([name, activity]) => (
-          <div
-            key={name}
-            className="
-                flex
-                items-center
-                gap-3
-                py-2
-              "
+      <div>
+        <div className="flex justify-end p-2">
+          <button
+            autoFocus
+            type="button"
+            onClick={onClose}
+            aria-label="Close chat"
+            className="rounded-lg p-2 hover:bg-white/10"
           >
-            <div
-              className="
-                  relative
-                  flex
-                  h-9
-                  w-9
-                  shrink-0
-                  items-center
-                  justify-center
-                  rounded-full
-                  bg-white/[0.06]
-                  text-xs
-                  font-semibold
-                "
-            >
-              {name[0]}
-
-              <span
-                className="
-                    absolute
-                    bottom-0
-                    right-0
-
-                    h-2.5
-                    w-2.5
-
-                    rounded-full
-
-                    border-2
-                    border-[#080d1c]
-
-                    bg-emerald-400
-                  "
-              />
-            </div>
-
-            <div className="min-w-0 flex-1">
-              <p
-                className="
-                    truncate
-                    text-sm
-                    font-medium
-                  "
-              >
-                {name}
-              </p>
-
-              <p
-                className="
-                    truncate
-                    text-xs
-                    text-zinc-600
-                  "
-              >
-                {activity}
-              </p>
-            </div>
-
-            <button
-              className="
-                  rounded-lg
-
-                  border
-                  border-indigo-400/20
-
-                  px-3
-                  py-1.5
-
-                  text-xs
-                  text-indigo-300
-
-                  transition
-
-                  hover:bg-indigo-500/10
-                "
-            >
-              Play
-            </button>
-          </div>
-        ))}
+            <X size={20} />
+          </button>
+        </div>
+        <FriendChat friend={friend} />
       </div>
-    </section>
+    </dialog>
   );
 }

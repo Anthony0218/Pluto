@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { BrainCircuit, Check, ChevronRight, Lightbulb } from "lucide-react";
 
 export default function CoachShowcase() {
@@ -62,7 +63,7 @@ export default function CoachShowcase() {
               text-emerald-300
             "
           >
-            Analysis complete
+            Example position
           </div>
         </div>
 
@@ -218,8 +219,8 @@ export default function CoachShowcase() {
               <Reason text="Prepares kingside castling" />
             </div>
 
-            <button
-              type="button"
+            <Link
+              to="/games/chess/classic/ai"
               className="
                 group
                 mt-7
@@ -234,7 +235,9 @@ export default function CoachShowcase() {
                 hover:bg-white/[0.05]
               "
             >
-              <span className="text-xs font-medium">Show engine line</span>
+              <span className="text-xs font-medium">
+                Practice with Stockfish
+              </span>
 
               <ChevronRight
                 size={15}
@@ -244,7 +247,7 @@ export default function CoachShowcase() {
                   group-hover:translate-x-0.5
                 "
               />
-            </button>
+            </Link>
           </div>
         </div>
       </div>

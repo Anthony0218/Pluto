@@ -25,6 +25,7 @@ export default function FriendChat({ friend }: FriendChatProps) {
   const [messages, setMessages] = useState<FriendMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteGame, setInviteGame] = useState<"chess" | "watten">("chess");
   const [gameCode, setGameCode] = useState("");
@@ -59,8 +60,19 @@ export default function FriendChat({ friend }: FriendChatProps) {
         .order("created_at", { ascending: true });
 
       if (!disposed) {
-        if (error) console.error("Could not load friend messages:", error);
-        setMessages((data ?? []) as FriendMessage[]);
+        if (error) {
+          setErrorMessage(
+            "Messages could not be loaded. Please reopen this chat to retry.",
+          );
+        } else {
+          setMessages((current) => [
+            ...new Map(
+              [...current, ...((data ?? []) as FriendMessage[])].map(
+                (message) => [message.id, message],
+              ),
+            ).values(),
+          ]);
+        }
         setLoading(false);
       }
     }
@@ -106,16 +118,27 @@ export default function FriendChat({ friend }: FriendChatProps) {
   ) {
     if (!user || sending) return;
     setSending(true);
+    setErrorMessage(null);
 
-    const { error } = await supabase.from("friend_messages").insert({
-      sender_id: user.id,
-      receiver_id: friend.id,
-      message_type: messageType,
-      game: null,
-      game_code: null,
-    });
+    const { data, error } = await supabase
+      .from("friend_messages")
+      .insert({
+        sender_id: user.id,
+        receiver_id: friend.id,
+        message_type: messageType,
+        game: null,
+        game_code: null,
+      })
+      .select("id,sender_id,receiver_id,message_type,game,game_code,created_at")
+      .single();
 
-    if (error) console.error("Could not send message:", error);
+    if (error) setErrorMessage("Message could not be sent. Please try again.");
+    else if (data)
+      setMessages((current) =>
+        current.some((message) => message.id === data.id)
+          ? current
+          : [...current, data as FriendMessage],
+      );
     setSending(false);
   }
 
@@ -125,19 +148,30 @@ export default function FriendChat({ friend }: FriendChatProps) {
     if (!/^[A-Z0-9_-]{3,20}$/.test(normalizedCode)) return;
 
     setSending(true);
-    const { error } = await supabase.from("friend_messages").insert({
-      sender_id: user.id,
-      receiver_id: friend.id,
-      message_type: "game_code",
-      game: inviteGame,
-      game_code: normalizedCode,
-    });
+    setErrorMessage(null);
+    const { data, error } = await supabase
+      .from("friend_messages")
+      .insert({
+        sender_id: user.id,
+        receiver_id: friend.id,
+        message_type: "game_code",
+        game: inviteGame,
+        game_code: normalizedCode,
+      })
+      .select("id,sender_id,receiver_id,message_type,game,game_code,created_at")
+      .single();
 
     if (!error) {
+      if (data)
+        setMessages((current) =>
+          current.some((message) => message.id === data.id)
+            ? current
+            : [...current, data as FriendMessage],
+        );
       setGameCode("");
       setInviteOpen(false);
     } else {
-      console.error("Could not send game invite:", error);
+      setErrorMessage("Game invite could not be sent. Please try again.");
     }
 
     setSending(false);
@@ -147,11 +181,15 @@ export default function FriendChat({ friend }: FriendChatProps) {
     if (!message.game || !message.game_code) return;
 
     if (message.game === "watten") {
-      navigate(`/games/watten/multiplayer/${message.game_code}`);
+      navigate(
+        `/games/watten/multiplayer?code=${encodeURIComponent(message.game_code)}`,
+      );
       return;
     }
 
-    navigate(`/games/chess/classic/multiplayer/${message.game_code}`);
+    navigate(
+      `/games/chess/classic/multiplayer?code=${encodeURIComponent(message.game_code)}`,
+    );
   }
 
   function renderMessage(message: FriendMessage) {
@@ -171,7 +209,7 @@ export default function FriendChat({ friend }: FriendChatProps) {
               onClick={() => joinInvite(message)}
               className="mt-3 rounded-lg bg-sky-500 px-3 py-2 text-xs font-bold text-white transition hover:bg-sky-400"
             >
-              Join game
+              Open lobby
             </button>
           )}
         </div>
@@ -193,6 +231,14 @@ export default function FriendChat({ friend }: FriendChatProps) {
         </div>
       </header>
 
+      {errorMessage && (
+        <p
+          role="alert"
+          className="border-b border-red-400/20 bg-red-400/10 px-5 py-3 text-sm text-red-200"
+        >
+          {errorMessage}
+        </p>
+      )}
       <div className="flex-1 space-y-3 overflow-y-auto p-5">
         {loading ? (
           <p className="text-sm text-zinc-500">Loading messages...</p>
@@ -273,6 +319,7 @@ export default function FriendChat({ friend }: FriendChatProps) {
           <div className="mt-3 rounded-2xl border border-white/10 bg-black/20 p-3">
             <div className="grid gap-2 sm:grid-cols-[140px_1fr_auto]">
               <select
+                aria-label="Invite game"
                 value={inviteGame}
                 onChange={(event) =>
                   setInviteGame(event.target.value as "chess" | "watten")
@@ -284,6 +331,7 @@ export default function FriendChat({ friend }: FriendChatProps) {
               </select>
 
               <input
+                aria-label="Room code"
                 value={gameCode}
                 onChange={(event) =>
                   setGameCode(event.target.value.toUpperCase())
