@@ -11,6 +11,39 @@ export type Game = {
 
 export const games: Game[] = [
   {
+    title: "Atlas Arena",
+    subtitle: "The world is your board",
+    description:
+      "Master countries, capitals, flags and geographic facts on an interactive world map.",
+    image: "/images/atlas-arena.svg",
+    route: "/games/atlas-arena",
+    tag: "Geography",
+    features: ["Map Click", "Speed Run", "Map Fill"],
+    finished: true,
+  },
+  {
+    title: "Go",
+    subtitle: "Ancient territory strategy",
+    description:
+      "Claim territory and capture groups on 9×9, 13×13, or 19×19 boards — locally, against AI, or online.",
+    image: "/images/go-home.svg",
+    route: "/games/go",
+    tag: "Strategy",
+    features: ["Vs Bot", "Hotseat", "Multiplayer"],
+    finished: true,
+  },
+  {
+    title: "Shogi",
+    subtitle: "Japanese chess",
+    description:
+      "Promote pieces and return captures to the board in a complete game of Japanese Shogi.",
+    image: "/images/shogi-home.svg",
+    route: "/games/shogi",
+    tag: "Strategy",
+    features: ["Drops", "Vs Bot", "Multiplayer"],
+    finished: true,
+  },
+  {
     title: "Schafkopf",
     subtitle: "Bayerisches Partnerspiel",
     description:

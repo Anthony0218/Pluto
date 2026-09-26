@@ -1,0 +1,19 @@
+{
+  "atlasDataVersion": "2026-09",
+  "synchronizedAt": "2026-09-26T21:19:59.079Z",
+  "entityCount": 248,
+  "playableUn195Count": 195,
+  "sources": {
+    "unM49": "https://unstats.un.org/unsd/methodology/m49/overview/",
+    "geonamesCountries": "https://download.geonames.org/export/dump/countryInfo.txt",
+    "geonamesCities": "https://download.geonames.org/export/dump/cities15000.zip",
+    "flags": "https://github.com/lipis/flag-icons/tree/v7.5.0",
+    "population": "https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json&per_page=20000&mrnev=1",
+    "area": "https://api.worldbank.org/v2/country/all/indicator/AG.SRF.TOTL.K2?format=json&per_page=20000&mrnev=1"
+  },
+  "geometry": {
+    "source": "Natural Earth via world-atlas",
+    "version": "Natural Earth 110m / world-atlas package",
+    "boundaryPolicy": "de facto rendering; gameplay scope is independently configured"
+  }
+}

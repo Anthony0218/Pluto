@@ -186,6 +186,11 @@ export default function FriendChat({ friend, roomInvite }: FriendChatProps) {
   function joinInvite(message: FriendMessage) {
     if (!message.game || !message.game_code) return;
 
+    if (message.game_route === "/games/atlas-arena/multiplayer") {
+      navigate(`${message.game_route}/${encodeURIComponent(message.game_code)}`);
+      return;
+    }
+
     if (message.game_route && /^\/games\/chess\/(?:classic|variants\/[a-z0-9-]+)\/multiplayer$/.test(message.game_route)) {
       navigate(`${message.game_route}?code=${encodeURIComponent(message.game_code)}`);
       return;
@@ -209,7 +214,7 @@ export default function FriendChat({ friend, roomInvite }: FriendChatProps) {
         <div>
           <div className="flex items-center gap-2 font-semibold">
             <Gamepad2 size={16} />
-            {message.game === "watten" ? ui("Watten invite") : ui("Chess invite")}
+            {message.game_route === "/games/atlas-arena/multiplayer" ? ui("Atlas Arena invite") : message.game === "watten" ? ui("Watten invite") : ui("Chess invite")}
           </div>
           <div className="mt-2 font-mono text-lg font-black tracking-widest">
             {message.game_code}

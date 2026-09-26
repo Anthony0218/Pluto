@@ -4,7 +4,10 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   ArrowRight,
   BarChart3,
+  Bell,
   Flame,
+  Gamepad2,
+  Mail,
   Search,
   Target,
   Trophy,
@@ -18,6 +21,7 @@ import { learningResources } from "../../data/navigation";
 import {
   useDashboardData,
   type DashboardActivity,
+  type DashboardNotification,
 } from "../../hooks/useDashboardData";
 import type { Friend } from "../../types/social";
 import DashboardPlayCarousel from "../../components/App/DashboardPlayCarousel";
@@ -33,15 +37,21 @@ const friendName = (friend: Friend) =>
 export default function DashboardPage() {
   useUiLanguage();
   const { user, profile, loading: authLoading } = useAuth();
-  const { activity, friends, onlineIds, loading, activityError, friendsError } =
+  const { activity, friends, onlineIds, notifications, loading, activityError, friendsError } =
     useDashboardData();
   const [search, setSearch] = useState("");
   const [selectedFriendId, setSelectedFriendId] = useState<string | null>(null);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [lastNotificationsRead, setLastNotificationsRead] = useState(0);
   const [now, setNow] = useState(Date.now);
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 30_000);
     return () => window.clearInterval(timer);
   }, []);
+  useEffect(() => {
+    if (!user) { setLastNotificationsRead(0); return; }
+    setLastNotificationsRead(Number(window.localStorage.getItem(`pluto-notifications-read-${user.id}`) || 0));
+  }, [user]);
   const hour = new Date(now).getHours();
   const greeting =
     hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
@@ -75,6 +85,13 @@ export default function DashboardPage() {
     played && wins != null
       ? Math.min(100, Math.round((wins / played) * 100))
       : 0;
+  const unreadNotifications = notifications.filter((item) => Date.parse(item.createdAt) > lastNotificationsRead);
+  const openNotifications = () => {
+    setNotificationsOpen((open) => !open);
+    const readAt = Date.now();
+    setLastNotificationsRead(readAt);
+    if (user) window.localStorage.setItem(`pluto-notifications-read-${user.id}`, String(readAt));
+  };
 
   return (
     <main className="min-h-screen bg-transparent text-zinc-100">
@@ -317,6 +334,14 @@ export default function DashboardPage() {
                 action={ui("View all")}
                 to="/friends"
               />
+              <div className="mt-4 border-b border-white/10 pb-4">
+                <button type="button" aria-expanded={notificationsOpen} onClick={openNotifications} className="flex w-full items-center gap-3 rounded-xl border border-indigo-300/20 bg-indigo-400/[0.06] p-3 text-left hover:bg-indigo-400/[0.1]">
+                  <span className="relative grid h-9 w-9 place-items-center rounded-lg bg-indigo-400/15 text-indigo-200"><Bell size={18} />{unreadNotifications.length > 0 && <i className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-[#080d1c] bg-red-500" />}</span>
+                  <span className="min-w-0 flex-1"><strong className="block text-sm text-zinc-100">Friend notifications</strong><small className="block text-xs text-zinc-400">{unreadNotifications.length ? `${unreadNotifications.length} new message${unreadNotifications.length === 1 ? "" : "s"} or request${unreadNotifications.length === 1 ? "" : "s"}` : "Messages, invites and friend requests"}</small></span>
+                  <span className="text-xs text-indigo-200">{notificationsOpen ? "Close" : "Open"}</span>
+                </button>
+                {notificationsOpen && <div className="mt-2 max-h-56 space-y-1 overflow-y-auto rounded-xl border border-white/10 bg-black/15 p-2">{notifications.length ? notifications.slice(0, 6).map((item) => <NotificationLink key={item.id} item={item} unread={Date.parse(item.createdAt) > lastNotificationsRead} onOpen={() => setNotificationsOpen(false)} />) : <p className="px-2 py-4 text-center text-sm text-zinc-400">No friend notifications yet.</p>}</div>}
+              </div>
               {loading ? (
                 <p className="mt-4 text-sm text-zinc-400">{ui("Loading friends…")}</p>
               ) : friendsError ? (
@@ -360,6 +385,12 @@ export default function DashboardPage() {
       )}
     </main>
   );
+}
+
+function NotificationLink({ item, unread, onOpen }: { item: DashboardNotification; unread: boolean; onOpen: () => void }) {
+  const to = item.kind === "friend_request" ? "/friends" : item.gameRoute === "/games/atlas-arena/multiplayer" && item.gameCode ? `${item.gameRoute}/${item.gameCode}` : "/friends";
+  const Icon = item.kind === "friend_request" ? Users : item.gameCode ? Gamepad2 : Mail;
+  return <Link to={to} onClick={onOpen} className="flex items-center gap-3 rounded-lg px-2 py-2.5 text-left hover:bg-white/5"><span className={`grid h-8 w-8 place-items-center rounded-lg ${item.kind === "friend_request" ? "bg-violet-400/15 text-violet-200" : "bg-sky-400/15 text-sky-200"}`}><Icon size={16} /></span><span className="min-w-0 flex-1"><strong className="flex items-center gap-2 text-sm text-zinc-100">{item.title}{unread && <i className="h-2 w-2 rounded-full bg-red-500" />}</strong><small className="block truncate text-xs text-zinc-400">{item.detail}</small></span></Link>;
 }
 
 function DailyChallenge({
