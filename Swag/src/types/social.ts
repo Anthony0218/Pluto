@@ -30,5 +30,6 @@ export type FriendMessage = {
   message_type: PresetMessageType;
   game: "chess" | "watten" | null;
   game_code: string | null;
+  game_route?: string | null;
   created_at: string;
 };

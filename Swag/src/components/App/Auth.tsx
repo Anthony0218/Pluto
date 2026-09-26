@@ -1,8 +1,10 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 export default function Auth() {
+  useUiLanguage();
   const { signIn, signUp } = useAuth();
 
   const [email, setEmail] = useState("");
@@ -80,22 +82,13 @@ export default function Auth() {
                 <Link
                   to="/"
                   className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-black text-zinc-300 transition hover:bg-white/10 hover:text-white"
-                >
-                  ← Back to home
-                </Link>
+                >{ui("← Back to home")}</Link>
 
-                <p className="mt-12 text-xs font-black uppercase tracking-[0.26em] text-emerald-300">
-                  Game Hub
-                </p>
+                <p className="mt-12 text-xs font-black uppercase tracking-[0.26em] text-emerald-300">{ui("Game Hub")}</p>
 
-                <h1 className="mt-4 max-w-xl text-5xl font-black tracking-tight text-white">
-                  One account for your games, ratings and progress.
-                </h1>
+                <h1 className="mt-4 max-w-xl text-5xl font-black tracking-tight text-white">{ui("One account for your games, ratings and progress.")}</h1>
 
-                <p className="mt-5 max-w-lg text-base leading-7 text-zinc-400">
-                  Sign in to keep your chess and Watten experience connected
-                  across the site.
-                </p>
+                <p className="mt-5 max-w-lg text-base leading-7 text-zinc-400">{ui("Sign in to keep your chess and Watten experience connected across the site.")}</p>
               </div>
 
               <div className="grid gap-3 sm:grid-cols-3">
@@ -111,11 +104,11 @@ export default function Auth() {
                     <div className="text-2xl">{icon}</div>
 
                     <h2 className="mt-3 text-sm font-black text-white">
-                      {title}
+                      {ui(title)}
                     </h2>
 
                     <p className="mt-1 text-xs leading-5 text-zinc-500">
-                      {description}
+                      {ui(description)}
                     </p>
                   </div>
                 ))}
@@ -129,23 +122,17 @@ export default function Auth() {
                 <Link
                   to="/"
                   className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-black text-zinc-300 transition hover:bg-white/10"
-                >
-                  ← Back
-                </Link>
+                >{ui("← Back")}</Link>
               </div>
 
-              <p className="mt-8 text-[10px] font-black uppercase tracking-[0.24em] text-emerald-300 lg:mt-0">
-                Account
-              </p>
+              <p className="mt-8 text-[10px] font-black uppercase tracking-[0.24em] text-emerald-300 lg:mt-0">{ui("Account")}</p>
 
               <h2 className="mt-2 text-3xl font-black text-white">
-                {isRegistering ? "Create your account" : "Welcome back"}
+                {isRegistering ? ui("Create your account") : ui("Welcome back")}
               </h2>
 
               <p className="mt-2 text-sm leading-6 text-zinc-500">
-                {isRegistering
-                  ? "Create an account to save your profile and progress."
-                  : "Sign in to continue to your profile and games."}
+                {isRegistering ? ui("Create an account to save your profile and progress.") : ui("Sign in to continue to your profile and games.")}
               </p>
 
               <div className="mt-7 grid grid-cols-2 rounded-xl border border-white/10 bg-black/20 p-1">
@@ -161,9 +148,7 @@ export default function Auth() {
                       ? "bg-emerald-300 text-zinc-950"
                       : "text-zinc-400 hover:text-white"
                   }`}
-                >
-                  Login
-                </button>
+                >{ui("Login")}</button>
 
                 <button
                   type="button"
@@ -177,18 +162,16 @@ export default function Auth() {
                       ? "bg-emerald-300 text-zinc-950"
                       : "text-zinc-400 hover:text-white"
                   }`}
-                >
-                  Register
-                </button>
+                >{ui("Register")}</button>
               </div>
 
               <form onSubmit={handleSubmit} className="mt-6 space-y-4">
                 <label className="block">
-                  <span className="text-xs font-bold text-zinc-400">Email</span>
+                  <span className="text-xs font-bold text-zinc-400">{ui("Email")}</span>
 
                   <input
                     type="email"
-                    placeholder="you@example.com"
+                    placeholder={ui("you@example.com")}
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
                     autoComplete="email"
@@ -197,13 +180,11 @@ export default function Auth() {
                 </label>
 
                 <label className="block">
-                  <span className="text-xs font-bold text-zinc-400">
-                    Password
-                  </span>
+                  <span className="text-xs font-bold text-zinc-400">{ui("Password")}</span>
 
                   <input
                     type="password"
-                    placeholder="••••••••"
+                    placeholder={ui("••••••••")}
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
                     autoComplete={
@@ -215,7 +196,7 @@ export default function Auth() {
 
                 {error && (
                   <div className="rounded-xl border border-red-400/20 bg-red-400/[0.06] px-4 py-3 text-xs leading-5 text-red-200">
-                    {error}
+                    {ui(error)}
                   </div>
                 )}
 
@@ -230,11 +211,7 @@ export default function Auth() {
                   disabled={busy}
                   className="w-full rounded-xl bg-emerald-300 px-5 py-3.5 text-sm font-black text-zinc-950 transition hover:bg-emerald-200 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {busy
-                    ? "Please wait..."
-                    : isRegistering
-                      ? "Create Account"
-                      : "Login"}
+                  {busy ? ui("Please wait...") : isRegistering ? ui("Create Account") : ui("Login")}
                 </button>
               </form>
 
@@ -243,18 +220,14 @@ export default function Auth() {
                 onClick={toggleMode}
                 className="mt-5 w-full text-center text-xs font-bold text-zinc-500 transition hover:text-emerald-300"
               >
-                {isRegistering
-                  ? "Already have an account? Login"
-                  : "Need an account? Sign up"}
+                {isRegistering ? ui("Already have an account? Login") : ui("Need an account? Sign up")}
               </button>
 
               <div className="mt-8 border-t border-white/5 pt-5 text-center">
                 <Link
                   to="/credits"
                   className="text-xs font-bold text-zinc-600 transition hover:text-zinc-300"
-                >
-                  Credits & licenses
-                </Link>
+                >{ui("Credits & licenses")}</Link>
               </div>
             </div>
           </section>

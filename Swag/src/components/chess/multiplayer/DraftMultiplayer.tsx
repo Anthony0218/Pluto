@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import {
   useCallback,
   useEffect,
@@ -252,10 +253,11 @@ function readLocalPlacements(key: string): DraftPlacement[] | null {
 }
 
 export function DraftMultiplayerLobby() {
+  useUiLanguage();
   const navigate = useNavigate();
   const { user, profile } = useAuth();
   const [hostColor, setHostColor] = useState<TwoPlayerColor>("white");
-  const [joinCode, setJoinCode] = useState("");
+  const [joinCode, setJoinCode] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
   const [loading, setLoading] = useState<"create" | "join" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -304,7 +306,7 @@ export function DraftMultiplayerLobby() {
   }
 
   return (
-    <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
+    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-5xl">
         <header className="mb-7 rounded-3xl border border-emerald-400/15 bg-zinc-900/70 p-6 shadow-2xl shadow-black/30">
           <div className="flex items-center gap-4">
@@ -312,31 +314,22 @@ export function DraftMultiplayerLobby() {
               ⚔
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-300">
-                Draft Chess · Multiplayer
-              </p>
-              <h1 className="mt-1 text-3xl font-black text-white">
-                Build your army privately
-              </h1>
-              <p className="mt-1 text-sm text-zinc-500">
-                39 points · separate hidden setups · reveal only when both
-                armies are locked
-              </p>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-300">{ui("Draft Chess · Multiplayer")}</p>
+              <h1 className="mt-1 text-3xl font-black text-white">{ui("Build your army privately")}</h1>
+              <p className="mt-1 text-sm text-zinc-500">{ui("39 points · separate hidden setups · reveal only when both armies are locked")}</p>
             </div>
           </div>
         </header>
 
         {!user ? (
-          <Panel title="Sign in required">
-            <p className="text-sm text-zinc-400">
-              Multiplayer rooms use your existing Supabase account.
-            </p>
+          <Panel title={ui("Sign in required")}>
+            <p className="text-sm text-zinc-400">{ui("Multiplayer rooms use your existing Supabase account.")}</p>
           </Panel>
         ) : (
           <div className="grid gap-5 lg:grid-cols-2">
             <Panel
-              title="Create room"
-              subtitle="Choose your side before drafting"
+              title={ui("Create room")}
+              subtitle={ui("Choose your side before drafting")}
             >
               <div className="grid grid-cols-2 gap-2">
                 {(["white", "black"] as TwoPlayerColor[]).map((color) => (
@@ -351,7 +344,7 @@ export function DraftMultiplayerLobby() {
                     }`}
                   >
                     {color === "white" ? "♔" : "♚"}{" "}
-                    {color === "white" ? "White" : "Black"}
+                    {color === "white" ? ui("White") : ui("Black")}
                   </button>
                 ))}
               </div>
@@ -361,18 +354,18 @@ export function DraftMultiplayerLobby() {
                 onClick={() => void createRoom()}
                 className="mt-5 w-full rounded-xl bg-emerald-300 px-5 py-3 font-black text-zinc-950 transition hover:bg-emerald-200 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {loading === "create" ? "Creating..." : "Create Draft Room"}
+                {loading === "create" ? ui("Creating...") : ui("Create Draft Room")}
               </button>
             </Panel>
 
-            <Panel title="Join room" subtitle="You receive the opposite side">
+            <Panel title={ui("Join room")} subtitle={ui("You receive the opposite side")}>
               <input
                 value={joinCode}
                 onChange={(event) =>
                   setJoinCode(normalizeCode(event.target.value))
                 }
                 onKeyDown={(event) => event.key === "Enter" && void joinRoom()}
-                placeholder="ABC123"
+                placeholder={ui("ABC123")}
                 className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-center font-mono text-2xl font-black uppercase tracking-[0.3em] text-white outline-none transition focus:border-emerald-400/40"
               />
               <button
@@ -381,19 +374,20 @@ export function DraftMultiplayerLobby() {
                 onClick={() => void joinRoom()}
                 className="mt-3 w-full rounded-xl border border-emerald-400/20 bg-emerald-400/[0.07] px-5 py-3 font-black text-emerald-200 transition hover:bg-emerald-400/10 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {loading === "join" ? "Joining..." : "Join Draft Room"}
+                {loading === "join" ? ui("Joining...") : ui("Join Draft Room")}
               </button>
             </Panel>
           </div>
         )}
 
-        {error && <ErrorBox>{error}</ErrorBox>}
+        {error && <ErrorBox>{ui(error)}</ErrorBox>}
       </div>
     </main>
   );
 }
 
 export function DraftMultiplayerGame() {
+  useUiLanguage();
   const { roomCode } = useParams();
   const { user } = useAuth();
 
@@ -1065,9 +1059,9 @@ export function DraftMultiplayerGame() {
     }
   }
 
-  if (!user) return <SimplePage text="Sign in to open this Draft room." />;
+  if (!user) return <SimplePage text={ui("Sign in to open this Draft room.")} />;
   if (loading && !gameState)
-    return <SimplePage text="Loading Draft multiplayer..." />;
+    return <SimplePage text={ui("Loading Draft multiplayer...")} />;
   if (!room || !gameState)
     return <SimplePage text={error ?? "Draft room unavailable."} />;
 
@@ -1078,7 +1072,7 @@ export function DraftMultiplayerGame() {
   const ownPieces = mySide ? countDraftPieces(setupState, mySide) : 0;
 
   return (
-    <div className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
+    <div className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1500px]">
         <header className="mb-6 flex flex-col gap-4 rounded-3xl border border-emerald-400/15 bg-zinc-900/60 px-5 py-4 shadow-xl shadow-black/20 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
@@ -1086,16 +1080,10 @@ export function DraftMultiplayerGame() {
               ⚔
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-300">
-                Draft Chess · Multiplayer
-              </p>
-              <h1 className="mt-1 text-2xl font-black text-white">
-                Build your own army
-              </h1>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-300">{ui("Draft Chess · Multiplayer")}</p>
+              <h1 className="mt-1 text-2xl font-black text-white">{ui("Build your own army")}</h1>
               <p className="mt-1 text-sm text-zinc-500">
-                {phase === "playing"
-                  ? `${liveGame.turn() === "w" ? "White" : "Black"} to move`
-                  : `Private setup · round ${round}`}
+                {phase === "playing" ? `${liveGame.turn() === "w" ? "White" : "Black"} to move` : `Private setup · round ${round}`}
               </p>
             </div>
           </div>
@@ -1105,32 +1093,29 @@ export function DraftMultiplayerGame() {
               onClick={() => void copyCode()}
               className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 font-mono text-xs font-black text-zinc-300"
             >
-              {copied ? "Copied" : `Room ${room.code}`}
+              {copied ? ui("Copied") : `Room ${room.code}`}
             </button>
             <Link
               to="/games/chess/variants/draft/multiplayer"
               className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-zinc-400 hover:bg-white/10"
-            >
-              Leave
-            </Link>
+            >{ui("Leave")}</Link>
           </div>
         </header>
 
-        {error && <ErrorBox>{error}</ErrorBox>}
+        {error && <ErrorBox>{ui(error)}</ErrorBox>}
         {setupError && <ErrorBox>{setupError}</ErrorBox>}
 
         {players.length < 2 && (
-          <div className="mb-5 rounded-2xl border border-amber-400/20 bg-amber-400/[0.06] px-4 py-3 text-sm text-amber-100">
-            Waiting for the second player. Share room code <b>{room.code}</b>.
+          <div className="mb-5 rounded-2xl border border-amber-400/20 bg-amber-400/[0.06] px-4 py-3 text-sm text-amber-100">{ui("Waiting for the second player. Share room code")}<b>{room.code}</b>.
           </div>
         )}
 
-        <main className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
+        <main className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
               {phase !== "playing" ? (
                 <Panel
-                  title="Army Builder"
+                  title={ui("Army Builder")}
                   subtitle={
                     mySide === "w"
                       ? "Ranks 1–2 · King on rank 1"
@@ -1138,8 +1123,8 @@ export function DraftMultiplayerGame() {
                   }
                 >
                   <div className="mb-4 grid grid-cols-2 gap-2">
-                    <MiniStat label="Points left" value={remainingPoints} />
-                    <MiniStat label="Points spent" value={spentPoints} />
+                    <MiniStat label={ui("Points left")} value={remainingPoints} />
+                    <MiniStat label={ui("Points spent")} value={spentPoints} />
                   </div>
                   <PiecePalette
                     side={mySide ?? "w"}
@@ -1154,17 +1139,13 @@ export function DraftMultiplayerGame() {
                       disabled={setupConfirmed}
                       onClick={clearArmy}
                       className="rounded-xl border border-white/10 bg-white/5 px-2 py-2.5 text-[11px] font-bold text-zinc-300 disabled:opacity-30"
-                    >
-                      ↺ Clear
-                    </button>
+                    >{ui("↺ Clear")}</button>
                     <button
                       type="button"
                       disabled={setupConfirmed}
                       onClick={randomizeArmy}
                       className="rounded-xl border border-violet-400/20 bg-violet-400/[0.07] px-2 py-2.5 text-[11px] font-black text-violet-200 disabled:opacity-30"
-                    >
-                      🎲 Random
-                    </button>
+                    >{ui("🎲 Random")}</button>
                     <button
                       type="button"
                       disabled={
@@ -1176,16 +1157,11 @@ export function DraftMultiplayerGame() {
                       }
                       onClick={() => void confirmArmy()}
                       className="rounded-xl bg-emerald-300 px-2 py-2.5 text-[11px] font-black text-zinc-950 disabled:cursor-not-allowed disabled:opacity-30"
-                    >
-                      ✓ Confirm
-                    </button>
+                    >{ui("✓ Confirm")}</button>
                   </div>
                   {setupConfirmed && (
-                    <p className="mt-4 rounded-xl border border-emerald-400/15 bg-emerald-400/[0.06] px-3 py-3 text-xs font-bold text-emerald-200">
-                      Your army is locked.{" "}
-                      {opponentConfirmed
-                        ? "Revealing both armies..."
-                        : "Waiting for the opponent."}
+                    <p className="mt-4 rounded-xl border border-emerald-400/15 bg-emerald-400/[0.06] px-3 py-3 text-xs font-bold text-emerald-200">{ui("Your army is locked.")}{" "}
+                      {opponentConfirmed ? ui("Revealing both armies...") : ui("Waiting for the opponent.")}
                     </p>
                   )}
                 </Panel>
@@ -1193,26 +1169,19 @@ export function DraftMultiplayerGame() {
                 <>
                   {checkedStartWasAutoReplaced && (
                     <Panel
-                      title="⚠ Start position corrected"
-                      subtitle="Automatic Draft safety rule"
+                      title={ui("⚠ Start position corrected")}
+                      subtitle={ui("Automatic Draft safety rule")}
                     >
                       <div className="rounded-xl border border-amber-400/20 bg-amber-400/[0.07] p-3">
-                        <p className="text-xs font-black text-amber-100">
-                          A King was already in check in the revealed starting
-                          position.
-                        </p>
-                        <p className="mt-2 text-xs leading-5 text-amber-200/80">
-                          Both drafted armies were therefore replaced
-                          automatically with two independent random legal armies
-                          before move 1.
-                        </p>
+                        <p className="text-xs font-black text-amber-100">{ui("A King was already in check in the revealed starting position.")}</p>
+                        <p className="mt-2 text-xs leading-5 text-amber-200/80">{ui("Both drafted armies were therefore replaced automatically with two independent random legal armies before move 1.")}</p>
                       </div>
                     </Panel>
                   )}
 
                   <Panel
-                    title="Game Controls"
-                    subtitle="Negotiated online actions"
+                    title={ui("Game Controls")}
+                    subtitle={ui("Negotiated online actions")}
                   >
                     <div className="grid grid-cols-2 gap-2">
                       <button
@@ -1220,49 +1189,37 @@ export function DraftMultiplayerGame() {
                         disabled={!canRequestUndo}
                         onClick={() => void requestUndo()}
                         className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm font-bold text-zinc-300 disabled:cursor-not-allowed disabled:opacity-30"
-                      >
-                        ↶ Undo
-                      </button>
+                      >{ui("↶ Undo")}</button>
                       <button
                         type="button"
                         disabled={gameState.status !== "playing" || undoPending}
                         onClick={() => void resign()}
                         className="rounded-xl border border-red-400/15 bg-red-400/[0.06] px-3 py-2.5 text-sm font-bold text-red-200 disabled:cursor-not-allowed disabled:opacity-30"
-                      >
-                        Resign
-                      </button>
+                      >{ui("Resign")}</button>
                     </div>
                     {myUndoRequest && (
-                      <p className="mt-3 text-xs text-amber-200">
-                        Undo request sent. Waiting for opponent.
-                      </p>
+                      <p className="mt-3 text-xs text-amber-200">{ui("Undo request sent. Waiting for opponent.")}</p>
                     )}
                     {opponentUndoRequest && (
                       <div className="mt-3 rounded-xl border border-amber-400/20 bg-amber-400/[0.06] p-3">
-                        <p className="text-xs font-black text-amber-100">
-                          Opponent requests an undo.
-                        </p>
+                        <p className="text-xs font-black text-amber-100">{ui("Opponent requests an undo.")}</p>
                         <div className="mt-2 grid grid-cols-2 gap-2">
                           <button
                             onClick={() => void respondUndo(true)}
                             className="rounded-lg bg-emerald-300 px-3 py-2 text-xs font-black text-zinc-950"
-                          >
-                            Accept
-                          </button>
+                          >{ui("Accept")}</button>
                           <button
                             onClick={() => void respondUndo(false)}
                             className="rounded-lg bg-white/10 px-3 py-2 text-xs font-black text-zinc-200"
-                          >
-                            Decline
-                          </button>
+                          >{ui("Decline")}</button>
                         </div>
                       </div>
                     )}
                   </Panel>
 
                   <Panel
-                    title="Move History"
-                    subtitle="Click a move to preview it on the board"
+                    title={ui("Move History")}
+                    subtitle={ui("Click a move to preview it on the board")}
                   >
                     <HistoryList
                       rows={historyRows}
@@ -1280,30 +1237,22 @@ export function DraftMultiplayerGame() {
               {historyPreviewPly !== null && phase === "playing" && (
                 <div className="mb-3 flex items-center justify-between rounded-xl border border-blue-400/20 bg-blue-400/[0.07] px-4 py-3">
                   <div>
-                    <p className="text-[9px] font-black uppercase tracking-widest text-blue-300">
-                      History Preview
-                    </p>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-blue-300">{ui("History Preview")}</p>
                     <p className="mt-1 text-sm font-bold text-white">
-                      {historyPreviewPly === 0
-                        ? "Initial Draft position"
-                        : historyRows[historyPreviewPly - 1]?.san}
+                      {historyPreviewPly === 0 ? ui("Initial Draft position") : historyRows[historyPreviewPly - 1]?.san}
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => setHistoryPreviewPly(null)}
                     className="rounded-lg bg-white/10 px-3 py-2 text-xs font-bold text-zinc-200"
-                  >
-                    Back to Live Board
-                  </button>
+                  >{ui("Back to Live Board")}</button>
                 </div>
               )}
 
               {gameState.status === "finished" && (
                 <div className="mb-4 rounded-3xl border border-emerald-400/20 bg-emerald-400/[0.06] p-5">
-                  <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-300">
-                    Game Over
-                  </p>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-300">{ui("Game Over")}</p>
                   <h2 className="mt-2 text-xl font-black text-white">
                     {resultLabel(gameState)}
                   </h2>
@@ -1313,12 +1262,10 @@ export function DraftMultiplayerGame() {
                       onClick={() => void rematch()}
                       className="rounded-xl bg-emerald-300 px-4 py-2.5 text-sm font-black text-zinc-950 disabled:opacity-40"
                     >
-                      {myRematchReady ? "Rematch requested" : "Rematch"}
+                      {myRematchReady ? ui("Rematch requested") : ui("Rematch")}
                     </button>
                     {opponentRematchReady && (
-                      <span className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs font-bold text-zinc-300">
-                        Opponent ready
-                      </span>
+                      <span className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs font-bold text-zinc-300">{ui("Opponent ready")}</span>
                     )}
                   </div>
                 </div>
@@ -1354,27 +1301,19 @@ export function DraftMultiplayerGame() {
                       type="button"
                       onClick={() => void copyCode()}
                       className="w-full max-w-lg rounded-[30px] border border-white/15 bg-zinc-900/95 px-8 py-8 text-center shadow-2xl shadow-black/60 transition hover:border-amber-300/35 hover:bg-zinc-900 active:scale-[0.99]"
-                      title="Copy room code"
+                      title={ui("Copy room code")}
                     >
                       <div className="text-4xl">🌐</div>
 
-                      <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">
-                        Waiting for players
-                      </p>
+                      <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">{ui("Waiting for players")}</p>
 
                       <h2 className="mt-2 text-2xl font-black text-white">
-                        {players.length}/2 players connected
-                      </h2>
+                        {players.length}{ui("/2 players connected")}</h2>
 
-                      <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">
-                        Share this room code. The game starts automatically when
-                        everyone has joined.
-                      </p>
+                      <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">{ui("Share this room code. The game starts automatically when everyone has joined.")}</p>
 
                       <div className="mt-6 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-5 py-5">
-                        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">
-                          Room Code
-                        </p>
+                        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">{ui("Room Code")}</p>
 
                         <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">
                           {room.code}
@@ -1382,9 +1321,7 @@ export function DraftMultiplayerGame() {
                       </div>
 
                       <p className="mt-4 text-xs font-bold text-zinc-400">
-                        {copied
-                          ? "✓ Copied to clipboard"
-                          : "Click this box to copy the code"}
+                        {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
                       </p>
                     </button>
                   </div>
@@ -1398,13 +1335,9 @@ export function DraftMultiplayerGame() {
                   <div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center rounded-xl bg-zinc-950/45 p-6 backdrop-blur-[2px]">
                     <div className="max-w-sm rounded-3xl border border-emerald-400/20 bg-zinc-900/95 p-6 text-center shadow-2xl">
                       <div className="text-4xl">🛡</div>
-                      <p className="mt-3 text-xs font-black uppercase tracking-[0.2em] text-emerald-300">
-                        Army locked
-                      </p>
+                      <p className="mt-3 text-xs font-black uppercase tracking-[0.2em] text-emerald-300">{ui("Army locked")}</p>
                       <p className="mt-2 text-sm text-zinc-400">
-                        {opponentConfirmed
-                          ? "Both armies are ready. Starting game..."
-                          : "Your opponent still sees only their own setup."}
+                        {opponentConfirmed ? ui("Both armies are ready. Starting game...") : ui("Your opponent still sees only their own setup.")}
                       </p>
                     </div>
                   </div>
@@ -1415,38 +1348,38 @@ export function DraftMultiplayerGame() {
 
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              <Panel title="Room" subtitle="Private Draft match">
+              <Panel title={ui("Room")} subtitle={ui("Private Draft match")}>
                 <InfoRow
-                  label="You"
+                  label={ui("You")}
                   value={`${myPlayer?.display_name ?? "—"} · ${myColor ?? "—"}`}
                 />
                 <InfoRow
-                  label="Opponent"
+                  label={ui("Opponent")}
                   value={`${opponent?.display_name ?? "Waiting..."} · ${opponent?.chosen_color ?? "—"}`}
                 />
-                <InfoRow label="Round" value={String(round)} />
+                <InfoRow label={ui("Round")} value={String(round)} />
               </Panel>
 
-              <Panel title="Draft Status" subtitle="39-point budget">
+              <Panel title={ui("Draft Status")} subtitle={ui("39-point budget")}>
                 <div className="grid grid-cols-2 gap-2">
-                  <MiniStat label="Pieces" value={ownPieces} />
+                  <MiniStat label={ui("Pieces")} value={ownPieces} />
                   <MiniStat
-                    label="King"
+                    label={ui("King")}
                     value={
                       mySide ? countDraftPieceType(setupState, mySide, "k") : 0
                     }
                   />
                 </div>
                 <div className="mt-3 space-y-2 text-xs">
-                  <StatusLine label="Your army" ready={setupConfirmed} />
-                  <StatusLine label="Opponent army" ready={opponentConfirmed} />
+                  <StatusLine label={ui("Your army")} ready={setupConfirmed} />
+                  <StatusLine label={ui("Opponent army")} ready={opponentConfirmed} />
                 </div>
               </Panel>
 
-              <Panel title="Rules" subtitle="Draft Chess">
-                <Rule text="Each player privately builds an army with at most 39 points." />
-                <Rule text="The king must stay on the back rank. Your setup is hidden until both players confirm." />
-                <Rule text="After reveal, normal chess rules apply from the custom starting position." />
+              <Panel title={ui("Rules")} subtitle={ui("Draft Chess")}>
+                <Rule text={ui("Each player privately builds an army with at most 39 points.")} />
+                <Rule text={ui("The king must stay on the back rank. Your setup is hidden until both players confirm.")} />
+                <Rule text={ui("After reveal, normal chess rules apply from the custom starting position.")} />
               </Panel>
             </div>
           </aside>
@@ -1469,6 +1402,7 @@ function PiecePalette({
   disabled: boolean;
   onSelect: (tool: SetupTool) => void;
 }) {
+  useUiLanguage();
   const pieces: DraftPieceType[] = ["p", "n", "b", "r", "q", "k"];
   return (
     <div className="grid grid-cols-2 gap-2">
@@ -1510,9 +1444,7 @@ function PiecePalette({
             ? "border-red-300/35 bg-red-400/10 text-red-200"
             : "border-white/10 bg-white/5 text-zinc-400 hover:bg-white/10"
         }`}
-      >
-        ✕ Remove
-      </button>
+      >{ui("✕ Remove")}</button>
     </div>
   );
 }
@@ -1526,6 +1458,7 @@ function HistoryList({
   selected: number | null;
   onSelect: (ply: number) => void;
 }) {
+  useUiLanguage();
   return (
     <div className="max-h-80 overflow-y-auto rounded-2xl border border-white/5 bg-black/20">
       <button
@@ -1534,12 +1467,10 @@ function HistoryList({
         className={`flex w-full items-center justify-between border-b border-white/5 px-3 py-2.5 text-left text-xs ${selected === 0 ? "bg-blue-400/10" : "hover:bg-white/5"}`}
       >
         <span className="text-zinc-600">0</span>
-        <span className="font-bold text-zinc-300">Initial Draft position</span>
+        <span className="font-bold text-zinc-300">{ui("Initial Draft position")}</span>
       </button>
       {rows.length === 0 ? (
-        <div className="px-4 py-6 text-center text-xs text-zinc-600">
-          No moves yet
-        </div>
+        <div className="px-4 py-6 text-center text-xs text-zinc-600">{ui("No moves yet")}</div>
       ) : (
         rows.map((row) => (
           <button
@@ -1553,9 +1484,7 @@ function HistoryList({
               {row.color === "w" ? "." : "..."}
             </span>
             <span className="text-lg">
-              {row.color === "w"
-                ? whiteSymbols[row.piece as DraftPieceType]
-                : blackSymbols[row.piece as DraftPieceType]}
+              {row.color === "w" ? whiteSymbols[row.piece as DraftPieceType] : blackSymbols[row.piece as DraftPieceType]}
             </span>
             <span className="font-mono text-xs font-bold text-zinc-200">
               {row.san}
@@ -1576,11 +1505,12 @@ function Panel({
   subtitle?: string;
   children: ReactNode;
 }) {
+  useUiLanguage();
   return (
     <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/15 backdrop-blur-md">
       <div className="mb-4">
-        <h2 className="text-sm font-black text-zinc-100">{title}</h2>
-        {subtitle && <p className="mt-1 text-xs text-zinc-500">{subtitle}</p>}
+        <h2 className="text-sm font-black text-zinc-100">{ui(title)}</h2>
+        {subtitle && <p className="mt-1 text-xs text-zinc-500">{ui(subtitle)}</p>}
       </div>
       {children}
     </section>
@@ -1588,10 +1518,11 @@ function Panel({
 }
 
 function MiniStat({ label, value }: { label: string; value: number | string }) {
+  useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 p-3">
       <p className="text-[9px] font-black uppercase tracking-wider text-zinc-600">
-        {label}
+        {ui(label)}
       </p>
       <p className="mt-2 text-xl font-black text-zinc-200">{value}</p>
     </div>
@@ -1599,9 +1530,10 @@ function MiniStat({ label, value }: { label: string; value: number | string }) {
 }
 
 function InfoRow({ label, value }: { label: string; value: string }) {
+  useUiLanguage();
   return (
     <div className="flex items-center justify-between gap-3 border-b border-white/5 py-2 text-xs last:border-0">
-      <span className="text-zinc-500">{label}</span>
+      <span className="text-zinc-500">{ui(label)}</span>
       <span className="max-w-[180px] truncate font-black text-zinc-200">
         {value}
       </span>
@@ -1610,29 +1542,32 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 }
 
 function StatusLine({ label, ready }: { label: string; ready: boolean }) {
+  useUiLanguage();
   return (
     <div className="flex items-center justify-between rounded-xl border border-white/5 bg-black/20 px-3 py-2.5">
-      <span className="text-zinc-500">{label}</span>
+      <span className="text-zinc-500">{ui(label)}</span>
       <span
         className={
           ready ? "font-black text-emerald-300" : "font-bold text-zinc-600"
         }
       >
-        {ready ? "Ready" : "Building"}
+        {ready ? ui("Ready") : ui("Building")}
       </span>
     </div>
   );
 }
 
 function Rule({ text }: { text: string }) {
+  useUiLanguage();
   return (
     <div className="mb-2 rounded-xl border border-white/5 bg-black/20 px-3 py-2.5 text-xs leading-5 text-zinc-400 last:mb-0">
-      {text}
+      {ui(text)}
     </div>
   );
 }
 
 function ErrorBox({ children }: { children: ReactNode }) {
+  useUiLanguage();
   return (
     <div className="mb-5 mt-4 rounded-2xl border border-red-400/20 bg-red-400/[0.07] px-4 py-3 text-sm font-semibold text-red-200">
       {children}
@@ -1641,10 +1576,11 @@ function ErrorBox({ children }: { children: ReactNode }) {
 }
 
 function SimplePage({ text }: { text: string }) {
+  useUiLanguage();
   return (
-    <main className="min-h-screen bg-zinc-950 px-4 py-8 text-zinc-100">
+    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-zinc-950 px-4 py-8 text-zinc-100">
       <div className="mx-auto max-w-2xl rounded-3xl border border-white/10 bg-zinc-900/70 p-6 text-center">
-        {text}
+        {ui(text)}
       </div>
     </main>
   );

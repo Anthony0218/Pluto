@@ -1,3 +1,4 @@
+import { useAppLanguage } from "@/i18n/languageStore";
 import { useCallback, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import type { WattenPlayerInfo, WattenVariant } from "../../utils/types";
@@ -29,7 +30,6 @@ import TableThemeSelector from "../App/TableThemeSelector";
 import { useTableTheme, type TableTheme } from "@/context/TableThemeContext";
 
 import {
-  getInitialWattenLanguage,
   setStoredWattenLanguage,
   translateWatten,
   translateWattenPair,
@@ -113,9 +113,7 @@ function MiniWattenCard({ card }: { card: DisplayWattenCard }) {
 
 export default function WattenGame() {
   const { tableTheme } = useTableTheme();
-  const [language, setLanguage] = useState<WattenLanguage>(
-    getInitialWattenLanguage,
-  );
+  const { language, setLanguage } = useAppLanguage();
   const t = useCallback(
     (key: string) => translateWatten(language, key),
     [language],

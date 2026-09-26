@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { Link } from "react-router-dom";
 import type { ReactNode } from "react";
 import {
@@ -88,6 +89,7 @@ export default function VariantRulesPage({
   coreIdeaLabel,
   playLabel,
 }: VariantRulesPageProps) {
+  useUiLanguage();
   const colors = accents[accent];
 
   return (
@@ -141,10 +143,10 @@ export default function VariantRulesPage({
                 </p>
 
                 <h1 className="mt-1 text-2xl font-black tracking-tight text-white sm:text-3xl">
-                  {title}
+                  {ui(title)}
                 </h1>
 
-                <p className="mt-1 text-sm text-zinc-500">{subtitle}</p>
+                <p className="mt-1 text-sm text-zinc-500">{ui(subtitle)}</p>
               </div>
             </div>
 
@@ -218,11 +220,11 @@ export default function VariantRulesPage({
                 <div className="text-2xl">{feature.icon}</div>
 
                 <h2 className="mt-3 text-sm font-black text-white">
-                  {feature.title}
+                  {ui(feature.title)}
                 </h2>
 
                 <p className="mt-1 text-xs leading-5 text-zinc-500">
-                  {feature.text}
+                  {ui(feature.text)}
                 </p>
               </div>
             ))}
@@ -266,15 +268,14 @@ export default function VariantRulesPage({
                         tracking-wider
                         ${colors.text}
                       `}
-                    >
-                      Rule {index + 1}
+                    >{ui("Rule")}{index + 1}
                     </span>
 
-                    <h2 className="font-black text-white">{rule.title}</h2>
+                    <h2 className="font-black text-white">{ui(rule.title)}</h2>
                   </div>
 
                   <div className="mt-2 text-sm leading-7 text-zinc-400">
-                    {rule.text}
+                    {ui(rule.text)}
                   </div>
                 </div>
               </div>
@@ -318,6 +319,7 @@ export function VisualCard({
   children: ReactNode;
   accent?: VariantRulesPageProps["accent"];
 }) {
+  useUiLanguage();
   const colors = accents[accent];
 
   return (
@@ -340,10 +342,10 @@ export function VisualCard({
           ${colors.text}
         `}
       >
-        {eyebrow}
+        {ui(eyebrow)}
       </p>
 
-      <h3 className="mt-2 text-lg font-black text-white">{title}</h3>
+      <h3 className="mt-2 text-lg font-black text-white">{ui(title)}</h3>
 
       <div className="mt-4">{children}</div>
     </section>
@@ -359,6 +361,7 @@ export function Flow({
     detail?: string;
   }>;
 }) {
+  useUiLanguage();
   return (
     <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
       {steps.map((step, index) => (
@@ -368,7 +371,7 @@ export function Flow({
         >
           <div className="text-2xl">{step.icon}</div>
 
-          <p className="mt-2 text-xs font-black text-zinc-200">{step.label}</p>
+          <p className="mt-2 text-xs font-black text-zinc-200">{ui(step.label)}</p>
 
           {step.detail && (
             <p className="mt-1 text-[10px] leading-4 text-zinc-600">
@@ -396,6 +399,7 @@ export function EffectGrid({
     text: string;
   }>;
 }) {
+  useUiLanguage();
   return (
     <div className="grid gap-2 sm:grid-cols-2">
       {items.map((item) => (
@@ -406,10 +410,10 @@ export function EffectGrid({
           <div className="flex items-center gap-3">
             <span className="text-2xl">{item.icon}</span>
 
-            <p className="text-sm font-black text-white">{item.title}</p>
+            <p className="text-sm font-black text-white">{ui(item.title)}</p>
           </div>
 
-          <p className="mt-2 text-xs leading-5 text-zinc-500">{item.text}</p>
+          <p className="mt-2 text-xs leading-5 text-zinc-500">{ui(item.text)}</p>
         </div>
       ))}
     </div>

@@ -1,0 +1,59 @@
+/* Shared chess surfaces start beneath the 64px public header. */
+.chess-variant-page {
+  background: radial-gradient(ellipse at 50% 0%,#f59e0b14,transparent 45%), linear-gradient(180deg,#05080d,#07111b 50%,#020509);
+  width: 100%;
+  padding: 12px 16px;
+}
+.chess-variant-page > div { max-width: 1800px; margin-inline: auto; }
+.chess-variant-page > div > header {
+  border: 1px solid #fbbf2426; border-radius: 16px;
+  background: #091019e6; padding: 12px 20px; margin-bottom: 12px;
+}
+.chess-variant-page h1 { font-family: Georgia,serif; color: #f7ead0; font-weight: 500; }
+.chess-game-grid { --board-size: min(820px,calc(100dvh - 16rem)); --side-width: clamp(240px,18vw,320px); gap: 16px; }
+.chess-game-grid > aside section { border-color: #fbbf2426; background-color: #091019e6; border-radius: 20px; }
+.chess-game-grid > aside { min-width: 0; scrollbar-width: thin; }
+.chess-sidebar-toggle { display: none; }
+body:has(.chess-game-grid) .chess-sidebar-toggle { display: block; }
+@media (min-width:1280px) {
+  .chess-variant-page:has(.chess-game-grid) { height: calc(100dvh - 4rem); min-height: 0; overflow: hidden; }
+  .chess-variant-page:has(.chess-game-grid) > div { height: 100%; display: flex; flex-direction: column; min-height: 0; }
+  .chess-game-grid {
+    grid-template-columns: var(--side-width) minmax(0,var(--board-size)) var(--side-width) !important;
+    width: min(100%,calc(var(--board-size) + var(--side-width) * 2 + 32px));
+    margin-inline: auto; min-height: 0; flex: 1; align-items: start;
+  }
+  .chess-game-grid > aside { height: 100%; max-height: calc(100dvh - 12rem); overflow-y: auto !important; padding-bottom: 3rem; }
+  .chess-game-grid > aside > div { position: static; }
+  .chess-game-grid > :not(aside) { min-width: 0; width: 100%; max-width: none; }
+  .chess-menu-page { height: calc(100dvh - 4rem); min-height: 0; }
+  .chess-menu-page > div.relative { height: 100%; min-height: 0; }
+  .chess-menu-page nav { min-height: 64px; flex-shrink: 0; }
+  .chess-menu-page > div > section { min-height: 0; }
+}
+@media (max-height:850px) and (min-width:1024px) {
+  .chess-menu-page header { padding-block: 20px; }
+  .chess-menu-page h1 { font-size: clamp(32px,5vw,58px); }
+  .chess-menu-page header p { margin-top: 12px; }
+  .chess-menu-page header .mt-12 { margin-top: 20px; }
+}
+@media (max-width:1279px) {
+  .chess-game-grid { display: flex; flex-direction: column; align-items: center; }
+  .chess-game-grid > :not(aside) { order: 0; width: min(100%,800px); }
+  .chess-game-grid > aside { order: 1; width: min(100%,800px); }
+}
+@media (prefers-reduced-motion:reduce) { .chess-game-grid * { scroll-behavior: auto; } }
+@media (min-width:1280px) {
+  .classic-game-grid > section > div > section:first-child { padding-block: 6px; }
+  .classic-game-grid > section > div > section:first-child h1 { font-size: 22px; line-height: 26px; margin-top: 2px; }
+  .classic-game-grid > section > div > section:first-child > p:last-child { display: none; }
+  .chess-animation-control { padding-block: 5px; }
+  .chess-animation-control p + p { display: none; }
+}
+@media (min-width:1024px) and (max-width:1279px) {
+  .chess-menu-page { height: calc(100dvh - 4rem); min-height: 0; }
+  .chess-menu-page > div.relative { height: 100%; min-height: 0; }
+  .chess-menu-page nav { min-height: 56px; }
+  .chess-menu-page > div > section { grid-template-columns: minmax(0,.8fr) minmax(0,1.2fr); }
+  .chess-menu-page > div > section > div { padding: 20px; }
+}

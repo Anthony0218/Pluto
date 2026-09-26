@@ -1,3 +1,5 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
+import { useAppLanguage } from "@/i18n/languageStore";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Chess, type Square } from "chess.js";
@@ -20,8 +22,6 @@ import GameControls from "./GameControls.tsx";
 
 import { useAuth } from "../../../context/AuthContext.tsx";
 
-import playButton from "../../../assets/trash-button.svg";
-import loadButton from "../../../assets/load-button.svg";
 
 import { useStockfishAnalysis } from "../../../hooks/useStockfishAnalysis.tsx";
 
@@ -572,21 +572,15 @@ const russianTranslations: Record<string, string> = {
   "Black in check": "Чёрные под шахом",
 };
 
-function getInitialChessLanguage(): Language {
-  if (typeof window === "undefined") return "en";
-  const stored = window.localStorage.getItem("chess-language");
-  return languageOptions.some((option) => option.value === stored)
-    ? (stored as Language)
-    : "en";
-}
+
 
 function translateChess(language: Language, key: string): string {
   if (language === "en") return key;
-  if (language === "de") return deTranslations[key] ?? key;
+  if (language === "de") return deTranslations[key] ?? ui(key);
   if (language === "bar")
-    return bavarianTranslations[key] ?? deTranslations[key] ?? key;
-  if (language === "ko") return koreanTranslations[key] ?? key;
-  return russianTranslations[key] ?? key;
+    return bavarianTranslations[key] ?? deTranslations[key] ?? ui(key);
+  if (language === "ko") return koreanTranslations[key] ?? ui(key);
+  return russianTranslations[key] ?? ui(key);
 }
 
 function ChessLanguageSelector({
@@ -598,6 +592,7 @@ function ChessLanguageSelector({
   onChange: (language: Language) => void;
   label: string;
 }) {
+  useUiLanguage();
   return (
     <label
       className="
@@ -616,7 +611,7 @@ function ChessLanguageSelector({
       "
     >
       <span>🌐</span>
-      <span className="hidden lg:inline">{label}</span>
+      <span className="hidden lg:inline">{ui(label)}</span>
       <select
         value={language}
         onChange={(event) => onChange(event.target.value as Language)}
@@ -636,7 +631,7 @@ function ChessLanguageSelector({
             value={option.value}
             className="bg-zinc-900 text-zinc-100"
           >
-            {option.label}
+            {ui(option.label)}
           </option>
         ))}
       </select>
@@ -700,9 +695,10 @@ const pieceValueList = [
    ========================================================= */
 
 export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
+  useUiLanguage();
   const { user, profile } = useAuth();
 
-  const [language, setLanguage] = useState<Language>(getInitialChessLanguage);
+  const { language, setLanguage } = useAppLanguage();
   const t = (key: string) => translateChess(language, key);
 
   function changeLanguage(nextLanguage: Language) {
@@ -2154,7 +2150,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
             gap-4
             xl:h-[calc(100%-2.75rem)]
             xl:min-h-0
-            xl:grid-cols-[minmax(260px,19vw)_minmax(0,1fr)_minmax(260px,19vw)]
+            chess-game-grid classic-game-grid xl:grid-cols-[minmax(260px,19vw)_minmax(0,1fr)_minmax(260px,19vw)]
           "
         >
           {/* ===============================================
@@ -2224,9 +2220,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                       </p>
 
                       <p className="mt-0.5 text-xs text-zinc-500">
-                        {coachModeEnabled
-                          ? t("Live analysis enabled")
-                          : t("Enable Stockfish feedback")}
+                        {coachModeEnabled ? t("Live analysis enabled") : t("Enable Stockfish feedback")}
                       </p>
                     </div>
                   </div>
@@ -2343,9 +2337,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                           "
                           >
                             {t("Last move")} ·{" "}
-                            {moveFeedback.color === "w"
-                              ? t("White")
-                              : t("Black")}
+                            {moveFeedback.color === "w" ? t("White") : t("Black")}
                           </p>
 
                           <div className="mt-2 flex items-center justify-between gap-3">
@@ -2423,11 +2415,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                         disabled:opacity-40
                       `}
                       >
-                        {analyzing && helpVisible
-                          ? "Analyzing..."
-                          : helpVisible
-                            ? "Hide Help"
-                            : "Help · Best Moves"}
+                        {analyzing && helpVisible ? ui("Analyzing...") : helpVisible ? ui("Hide Help") : ui("Help · Best Moves")}
                       </button>
 
                       {/* SUGGESTIONS */}
@@ -2446,9 +2434,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                               text-zinc-500
                             "
                             >
-                              {analyzing
-                                ? t("Stockfish is analyzing...")
-                                : t("No analysis available.")}
+                              {analyzing ? t("Stockfish is analyzing...") : t("No analysis available.")}
                             </div>
                           ) : (
                             suggestions.map((suggestion, index) => {
@@ -2516,9 +2502,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                                       </p>
 
                                       <p className="text-[10px] text-zinc-600">
-                                        {selected
-                                          ? t("Shown on board")
-                                          : t("Click to show")}
+                                        {selected ? t("Shown on board") : t("Click to show")}
                                       </p>
                                     </div>
                                   </div>
@@ -2558,7 +2542,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                       {savedGames.length}
                     </span>
                     <span className="rounded-lg border border-amber-400/20 bg-amber-400/10 px-3 py-1.5 text-xs font-black text-amber-300">
-                      {savedGamesOpen ? "Hide" : "Show"}
+                      {savedGamesOpen ? ui("Hide") : ui("Show")}
                     </span>
                   </div>
                 </button>
@@ -2585,7 +2569,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                               </p>
                               <p className="mt-1 truncate text-[10px] text-zinc-600">
                                 {savedGame.white_player || t("White")}{" "}
-                                <span className="px-1 text-zinc-700">vs</span>{" "}
+                                <span className="px-1 text-zinc-700">{ui("vs")}</span>{" "}
                                 {savedGame.black_player || t("Black")}
                               </p>
                             </div>
@@ -2595,9 +2579,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                                 onClick={() => loadSpecificGame(savedGame.id)}
                                 className="rounded-lg border border-amber-400/10 bg-amber-400/[0.04] px-2 py-1.5 text-[10px] font-bold text-amber-200/80 transition hover:bg-amber-400/10"
                                 title={t("Load game")}
-                              >
-                                Load
-                              </button>
+                              >{ui("Load")}</button>
                               <button
                                 type="button"
                                 onClick={() => deleteGame(savedGame.id)}
@@ -2688,7 +2670,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                     </p>
                   </div>
                   <span className="rounded-lg border border-amber-400/20 bg-amber-400/10 px-3 py-1.5 text-xs font-black text-amber-300">
-                    {pieceValuesOpen ? "Hide" : "Show"}
+                    {pieceValuesOpen ? ui("Hide") : ui("Show")}
                   </span>
                 </button>
                 {pieceValuesOpen && (
@@ -2714,11 +2696,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                       ))}
                     </div>
                     <div className="mt-3 rounded-xl bg-black/20 px-3 py-2 text-right text-xs font-bold text-zinc-400">
-                      {materialDifference === 0
-                        ? t("Equal")
-                        : materialDifference > 0
-                          ? `${t("White")} +${materialDifference}`
-                          : `${t("Black")} +${Math.abs(materialDifference)}`}
+                      {materialDifference === 0 ? t("Equal") : materialDifference > 0 ? `${t("White")} +${materialDifference}` : `${t("Black")} +${Math.abs(materialDifference)}`}
                     </div>
                   </div>
                 )}
@@ -2786,7 +2764,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
              =============================================== */}
 
           <section className="order-1 min-w-0 xl:order-2 xl:h-full xl:min-h-0">
-            <div className="mx-auto w-full max-w-[820px] xl:flex xl:h-full xl:min-h-0 xl:max-w-[min(804px,calc(100dvh-24rem))] xl:flex-col">
+            <div className="mx-auto w-full max-w-[820px] xl:flex xl:h-full xl:min-h-0 xl:max-w-none xl:flex-col">
               <section className="mb-2 shrink-0 rounded-2xl border border-amber-400/30 bg-[#08111c]/90 px-4 py-2.5 text-center shadow-[0_0_40px_rgba(245,158,11,0.08)] backdrop-blur-xl">
                 <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-400">
                   {t("Classic Chess")}
@@ -2795,9 +2773,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                   {t("Hotseat")}
                 </h1>
                 <p className="mt-1 text-xs text-zinc-500">
-                  {game.turn() === "w"
-                    ? t("White to move")
-                    : t("Black to move")}
+                  {game.turn() === "w" ? t("White to move") : t("Black to move")}
                 </p>
               </section>
 
@@ -2827,11 +2803,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                     </div>
 
                     <span className="text-sm font-bold text-zinc-300">
-                      {winner === "draw"
-                        ? t("Draw")
-                        : winner === "white"
-                          ? t("White wins")
-                          : t("Black wins")}
+                      {winner === "draw" ? t("Draw") : winner === "white" ? t("White wins") : t("Black wins")}
                     </span>
                     <button
                       type="button"
@@ -2897,8 +2869,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                       {t("History Preview")}
                     </p>
 
-                    <p className="mt-1 text-sm font-bold text-white">
-                      Move {historyPreview.moveNumber}
+                    <p className="mt-1 text-sm font-bold text-white">{ui("Move")}{historyPreview.moveNumber}
                       {historyPreview.color === "w" ? "." : "..."}{" "}
                       {historyPreview.san}
                     </p>
@@ -2929,7 +2900,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                 event={hotseatMatchStatus.event}
                 message={hotseatMatchStatus.message}
                 detail={hotseatMatchStatus.detail}
-                label="Match status"
+                label={ui("Match status")}
                 className="mb-2"
                 effects={
                   hotseatFlipPending
@@ -3053,9 +3024,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
               {/* WAITING PLAYER MINI BOARD */}
               <section className="relative aspect-square w-full shrink-0 overflow-hidden rounded-3xl border border-amber-400/20 bg-[#07101a] shadow-2xl shadow-black/40">
                 <div className="pointer-events-none absolute left-2 top-2 z-20 rounded-lg border border-amber-300/15 bg-black/65 px-2 py-1 backdrop-blur-md">
-                  <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-amber-100/90">
-                    Waiting board
-                  </p>
+                  <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-amber-100/90">{ui("Waiting board")}</p>
                 </div>
 
                 <div className="pointer-events-none h-full w-full">
@@ -3098,9 +3067,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
                           <div className="min-w-0 flex-1">
                             <p className="truncate font-serif text-lg font-semibold text-[#f7ead0]">
-                              {isWhite
-                                ? whitePlayer || t("White")
-                                : blackPlayer || t("Black")}
+                              {isWhite ? whitePlayer || t("White") : blackPlayer || t("Black")}
                             </p>
                             <p className="mt-0.5 text-xs text-zinc-500">
                               {isWhite ? t("White") : t("Black")}
@@ -3116,9 +3083,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                       {index === 0 && (
                         <div className="flex items-center gap-2 px-2">
                           <span className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-white/20" />
-                          <span className="rounded-full border border-amber-400/15 bg-amber-400/[0.06] px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-amber-200/75">
-                            VS
-                          </span>
+                          <span className="rounded-full border border-amber-400/15 bg-amber-400/[0.06] px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-amber-200/75">{ui("VS")}</span>
                           <span className="h-px flex-1 bg-gradient-to-l from-transparent via-white/10 to-white/20" />
                         </div>
                       )}
@@ -3185,9 +3150,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                     </p>
                   </div>
 
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">
-                    Material
-                  </span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">{ui("Material")}</span>
                 </div>
 
                 <div className="space-y-1">
@@ -3333,6 +3296,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
    ========================================================= */
 
 function QualityBadge({ quality }: { quality: MoveReview["quality"] }) {
+  useUiLanguage();
   const styles: Record<MoveReview["quality"], string> = {
     Best: "border-emerald-500/20 bg-emerald-500/15 text-emerald-300",
 
@@ -3397,6 +3361,7 @@ function getHistoryPieceSymbol(color: "w" | "b", piece: PieceType) {
 }
 
 function PlayerSilhouette({ tone }: { tone: "amber" | "sky" }) {
+  useUiLanguage();
   const toneClasses =
     tone === "amber"
       ? "border-amber-300/25 bg-amber-300/[0.08] text-amber-100 ring-amber-400/5"
@@ -3433,6 +3398,7 @@ function CapturedPiecesGrid({
   capturedWhite: PieceType[];
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   const symbols: Record<"white" | "black", Record<PieceType, string>> = {
     white: {
       p: "♙",

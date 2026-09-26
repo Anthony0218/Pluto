@@ -1,3 +1,4 @@
+import { useAppLanguage } from "@/i18n/languageStore";
 import { useCallback, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
@@ -6,7 +7,6 @@ import { useAuth } from "../../context/AuthContext";
 import type { WattenVariant } from "../../utils/types";
 import { ProfileAvatar } from "../social/ProfileAvatarPicker";
 import {
-  getInitialWattenLanguage,
   setStoredWattenLanguage,
   translateWatten,
   WattenLanguageSelector,
@@ -20,9 +20,7 @@ export default function WattenMultiplayerLobby() {
   const [searchParams] = useSearchParams();
   const { user, profile } = useAuth();
 
-  const [language, setLanguage] = useState<WattenLanguage>(
-    getInitialWattenLanguage,
-  );
+  const { language, setLanguage } = useAppLanguage();
   const [variant, setVariant] = useState<WattenVariant>("three-player");
   const [roomCode, setRoomCode] = useState(() => (searchParams.get("code") ?? "").trim().toUpperCase());
   const [loading, setLoading] = useState<LoadingAction>(null);

@@ -1,3 +1,4 @@
+import { useAppLanguage } from "@/i18n/languageStore";
 import {
   useCallback,
   useEffect,
@@ -35,7 +36,6 @@ import {
 } from "../../utils/watten";
 
 import {
-  getInitialWattenLanguage,
   setStoredWattenLanguage,
   translateWatten,
   translateWattenPair,
@@ -500,9 +500,7 @@ export function WattenThreePlayerMultiplayerLobby() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
 
-  const [language, setLanguage] = useState<WattenLanguage>(
-    getInitialWattenLanguage,
-  );
+  const { language, setLanguage } = useAppLanguage();
   const [joinCode, setJoinCode] = useState("");
   const [targetScore, setTargetScore] = useState(15);
   const [loading, setLoading] = useState<"create" | "join" | null>(null);
@@ -727,9 +725,7 @@ export function WattenThreePlayerMultiplayerGame() {
   const { user } = useAuth();
   const { tableTheme } = useTableTheme();
 
-  const [language, setLanguage] = useState<WattenLanguage>(
-    getInitialWattenLanguage,
-  );
+  const { language, setLanguage } = useAppLanguage();
 
   const [room, setRoom] = useState<Room | null>(null);
   const [players, setPlayers] = useState<RoomPlayer[]>([]);

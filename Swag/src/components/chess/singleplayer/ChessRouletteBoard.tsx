@@ -1,3 +1,6 @@
+import RouletteInfo from "@/components/chess/singleplayer/RouletteInfo";
+import { ui, useUiLanguage } from "@/i18n/ui";
+import { useAppLanguage } from "@/i18n/languageStore";
 import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { Chess, type Square } from "chess.js";
@@ -15,6 +18,10 @@ import {
 
 import {
   clonePortalState,
+  applyRouletteCard,
+  getRouletteMoves,
+  moveRoulette,
+  isPortalKingAttacked,
   createInitialPortalState,
   createPortalSeed,
   finalizePortalPromotionEvent,
@@ -416,17 +423,7 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
   },
 };
 
-function getInitialLanguage(): Language {
-  if (typeof window === "undefined") {
-    return "en";
-  }
 
-  const stored = window.localStorage.getItem(CHESS_LANGUAGE_STORAGE_KEY);
-
-  return ["en", "de", "bar", "ko", "ru"].includes(stored ?? "")
-    ? (stored as Language)
-    : "en";
-}
 
 function Panel({
   title,
@@ -437,6 +434,7 @@ function Panel({
   subtitle?: string;
   children: ReactNode;
 }) {
+  useUiLanguage();
   return (
     <section
       className="
@@ -457,7 +455,7 @@ function Panel({
             text-white
           "
         >
-          {title}
+          {ui(title)}
         </h2>
 
         {subtitle && (
@@ -468,7 +466,7 @@ function Panel({
               text-zinc-500
             "
           >
-            {subtitle}
+            {ui(subtitle)}
           </p>
         )}
       </div>
@@ -511,6 +509,7 @@ function PortalPromotionModal({
   t: (key: string) => string;
   onResolve: (card: PortalPromotionCard) => void;
 }) {
+  useUiLanguage();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   const [stage, setStage] = useState<"choose" | "reveal" | "prank">("choose");
@@ -560,7 +559,7 @@ function PortalPromotionModal({
   const resultText =
     selectedCard === "k"
       ? stage === "prank"
-        ? t("There are no bonus Kings. Your piece disappears.")
+        ? piece === "k" ? ui("King card drawn") : t("There are no bonus Kings. Your piece disappears.")
         : t("No way... you pulled a King!")
       : selectedCard
         ? `${originalPieceName} → ${selectedPieceName}`
@@ -569,6 +568,14 @@ function PortalPromotionModal({
   const canContinue =
     (selectedCard !== null && stage === "reveal" && selectedCard !== "k") ||
     (selectedCard === "k" && stage === "prank");
+
+  // A Lucky Square must never leave the game blocked behind its reveal.
+  // Keep the result visible briefly, then commit the already chosen card.
+  useEffect(() => {
+    if (!canContinue || !selectedCard) return;
+    const timer = window.setTimeout(() => onResolve(selectedCard), 1800);
+    return () => window.clearTimeout(timer);
+  }, [canContinue, onResolve, selectedCard]);
 
   return (
     <div
@@ -654,9 +661,7 @@ function PortalPromotionModal({
               text-zinc-400
             "
           >
-            {stage === "choose"
-              ? t("One card decides your piece's fate.")
-              : resultText}
+            {stage === "choose" ? t("One card decides your piece's fate.") : ui(resultText)}
           </p>
 
           <div className="mt-3 flex items-center justify-center gap-2 text-sm font-black text-zinc-200">
@@ -857,9 +862,7 @@ function PortalPromotionModal({
                   }
                 `}
             >
-              {selectedCard === "k" && stage === "prank"
-                ? "💀"
-                : cardSymbol(selectedCard, color)}
+              {selectedCard === "k" && stage === "prank" ? "💀" : cardSymbol(selectedCard, color)}
             </div>
 
             <h3
@@ -880,7 +883,7 @@ function PortalPromotionModal({
                   text-zinc-300
                 "
             >
-              {resultText}
+              {ui(resultText)}
             </p>
           </div>
         )}
@@ -923,7 +926,8 @@ export default function ChessRouletteBoard({
   playerColor = "white",
   difficulty = "casual",
 }: VariantAiBoardProps) {
-  const [language, setLanguage] = useState<Language>(getInitialLanguage);
+  useUiLanguage();
+  const { language, setLanguage } = useAppLanguage();
 
   const t = (key: string) => {
     if (language === "en") {
@@ -931,10 +935,10 @@ export default function ChessRouletteBoard({
     }
 
     if (language === "bar") {
-      return translations.bar[key] ?? translations.de[key] ?? key;
+      return translations.bar[key] ?? translations.de[key] ?? ui(key);
     }
 
-    return translations[language][key] ?? key;
+    return translations[language][key] ?? ui(key);
   };
 
   function changeLanguage(next: Language) {
@@ -1030,7 +1034,9 @@ export default function ChessRouletteBoard({
 
     const timer = window.setTimeout(async () => {
       try {
-        const move = await chooseAiMove(game);
+        const available = getRouletteMoves(game, portalState);
+        const suggested = await chooseAiMove(game, available.map((m) => `${m.from}${m.to}${m.promotion ?? ""}`));
+        const move = suggested ?? available[Math.floor(Math.random() * available.length)];
 
         if (
           cancelled ||
@@ -1041,7 +1047,7 @@ export default function ChessRouletteBoard({
           return;
         }
 
-        commitAiMove(move.from, move.to, move.promotion);
+        commitAiMove(move.from, move.to, move.promotion as "q" | "r" | "b" | "n" | undefined);
       } finally {
         aiMovePendingRef.current = false;
       }
@@ -1198,7 +1204,16 @@ export default function ChessRouletteBoard({
     nextRecords: PortalMoveRecord[],
     playResultSound: boolean,
   ) {
-    if (game.isCheckmate()) {
+    const current = nextRecords.at(-1)?.portalAfter ?? portalState;
+    if (current.loser) {
+      setGameOver(true);
+      setGameOverReason("King card drawn");
+      setWinner(current.loser === "w" ? "black" : "white");
+      return true;
+    }
+    const noMoves = getRouletteMoves(game, current).length === 0;
+    const inCheck = isPortalKingAttacked(game, game.turn(), current);
+    if (noMoves && inCheck) {
       setGameOver(true);
       setGameOverReason("Checkmate");
 
@@ -1211,7 +1226,7 @@ export default function ChessRouletteBoard({
       return true;
     }
 
-    if (game.isStalemate()) {
+    if (noMoves && !inCheck) {
       setGameOver(true);
       setGameOverReason("Stalemate");
       setWinner("draw");
@@ -1223,7 +1238,7 @@ export default function ChessRouletteBoard({
       return true;
     }
 
-    if (game.isInsufficientMaterial()) {
+    if (!Object.values(current.kingPowers ?? {}).some((power) => power.movesLeft > 0) && game.isInsufficientMaterial()) {
       setGameOver(true);
       setGameOverReason("Insufficient material");
       setWinner("draw");
@@ -1429,33 +1444,7 @@ export default function ChessRouletteBoard({
 
     const square = pending.portalSquare;
 
-    if (card === "k") {
-      /*
-       * The fake King prize is still the prank:
-       * there can be no second King, so the triggering piece disappears.
-       */
-      game.remove(square);
-    } else {
-      /*
-       * Promotion Roulette is really a piece mutation now.
-       *
-       * Every non-King trigger is replaced by the selected card type.
-       * This deliberately allows demotion, e.g. Queen -> Pawn.
-       */
-      const currentPiece = game.get(square);
-
-      if (currentPiece && currentPiece.type !== card) {
-        game.remove(square);
-
-        game.put(
-          {
-            type: card,
-            color: move.color,
-          },
-          square,
-        );
-      }
-    }
+    applyRouletteCard(game, square, card);
 
     const event: PortalEvent = {
       ply: records.length + 1,
@@ -1493,7 +1482,7 @@ export default function ChessRouletteBoard({
       const beforeFen = game.fen();
       const portalBefore = clonePortalState(portalState);
 
-      const move = game.move({
+      const move = moveRoulette(game, portalState, {
         from,
         to,
         ...(promotion ? { promotion } : {}),
@@ -1545,11 +1534,7 @@ export default function ChessRouletteBoard({
       playPieceSelectSound(clickedPiece.type);
 
       setLegalMoves(
-        game
-          .moves({
-            square,
-            verbose: true,
-          })
+        getRouletteMoves(game, portalState, square)
           .map((move) => move.to),
       );
 
@@ -1562,11 +1547,7 @@ export default function ChessRouletteBoard({
       playPieceSelectSound(clickedPiece.type);
 
       setLegalMoves(
-        game
-          .moves({
-            square,
-            verbose: true,
-          })
+        getRouletteMoves(game, portalState, square)
           .map((move) => move.to),
       );
 
@@ -1596,7 +1577,7 @@ export default function ChessRouletteBoard({
 
       const portalBefore = clonePortalState(portalState);
 
-      const move = game.move({
+      const move = moveRoulette(game, portalState, {
         from: selectedSquare,
         to: square,
       });
@@ -1641,7 +1622,7 @@ export default function ChessRouletteBoard({
 
       const portalBefore = clonePortalState(portalState);
 
-      const move = game.move({
+      const move = moveRoulette(game, portalState, {
         from: promotionFrom,
 
         to: promotionSquare,
@@ -1771,7 +1752,7 @@ export default function ChessRouletteBoard({
   return (
     <div
       className="
-        min-h-screen
+        chess-variant-page min-h-[calc(100dvh-4rem)]
         bg-transparent
         px-4
         py-6
@@ -1882,11 +1863,11 @@ export default function ChessRouletteBoard({
                   [color-scheme:dark]
                 "
               >
-                <option value="en">English</option>
+                <option value="en">{ui("English")}</option>
 
-                <option value="de">Deutsch</option>
+                <option value="de">{ui("Deutsch")}</option>
 
-                <option value="bar">Boarisch</option>
+                <option value="bar">{ui("Boarisch")}</option>
 
                 <option value="ko">한국어</option>
 
@@ -1901,7 +1882,7 @@ export default function ChessRouletteBoard({
           className="
             grid
             gap-5
-            xl:grid-cols-[290px_minmax(0,1fr)_320px]
+            chess-game-grid xl:grid-cols-[290px_minmax(0,1fr)_320px]
           "
         >
           {/* LEFT */}
@@ -2017,8 +1998,7 @@ export default function ChessRouletteBoard({
                             }
                           `}
                       >
-                        {portal.revealed
-                          ? t(
+                        {portal.revealed ? t(
                               portal.effect === "destroy"
                                 ? "Destroy"
                                 : portal.effect === "teleport"
@@ -2026,8 +2006,7 @@ export default function ChessRouletteBoard({
                                   : portal.effect === "swap"
                                     ? "Swap"
                                     : "Promote",
-                            )
-                          : "Lucky Square"}
+                            ) : ui("Lucky Square")}
                       </p>
                     </div>
                   ))}
@@ -2054,9 +2033,7 @@ export default function ChessRouletteBoard({
                     tracking-[0.12em]
                     text-amber-300/70
                   "
-                >
-                  ✨ Spawn countdown
-                </p>
+                >{ui("✨ Spawn countdown")}</p>
 
                 <p
                   className="
@@ -2106,11 +2083,9 @@ export default function ChessRouletteBoard({
                       text-2xl
                     "
                   >
-                    {capturedWhite.length
-                      ? capturedWhite
+                    {capturedWhite.length ? capturedWhite
                           .map((piece) => whiteSymbols[piece])
-                          .join(" ")
-                      : "—"}
+                          .join(" ") : "—"}
                   </div>
                 </div>
 
@@ -2134,11 +2109,9 @@ export default function ChessRouletteBoard({
                       text-2xl
                     "
                   >
-                    {capturedBlack.length
-                      ? capturedBlack
+                    {capturedBlack.length ? capturedBlack
                           .map((piece) => blackSymbols[piece])
-                          .join(" ")
-                      : "—"}
+                          .join(" ") : "—"}
                   </div>
                 </div>
 
@@ -2154,11 +2127,7 @@ export default function ChessRouletteBoard({
                     text-zinc-300
                   "
                 >
-                  {materialDifference === 0
-                    ? t("Equal")
-                    : materialDifference > 0
-                      ? `White +${materialDifference}`
-                      : `Black +${Math.abs(materialDifference)}`}
+                  {materialDifference === 0 ? t("Equal") : materialDifference > 0 ? `White +${materialDifference}` : `Black +${Math.abs(materialDifference)}`}
                 </div>
               </div>
             </Panel>
@@ -2374,11 +2343,7 @@ export default function ChessRouletteBoard({
                           text-white
                         "
                     >
-                      {winner === "white"
-                        ? t("White wins")
-                        : winner === "black"
-                          ? t("Black wins")
-                          : t("Draw")}
+                      {winner === "white" ? t("White wins") : winner === "black" ? t("Black wins") : t("Draw")}
                     </h2>
 
                     <p
@@ -2422,6 +2387,7 @@ export default function ChessRouletteBoard({
               space-y-4
             "
           >
+            <RouletteInfo state={displayedPortalState} />
             <Panel
               title={t("Lucky Square Info")}
               subtitle={t("What can happen on a Lucky Square?")}
@@ -2673,9 +2639,7 @@ export default function ChessRouletteBoard({
                         {event.result}
                         {event.destination ? ` → ${event.destination}` : ""}
                         {event.swapSquare ? ` ↔ ${event.swapSquare}` : ""}
-                        {event.promotionCard
-                          ? ` · ${t(promotionCardNames[event.promotionCard])}`
-                          : ""}
+                        {event.promotionCard ? ` · ${t(promotionCardNames[event.promotionCard])}` : ""}
                       </p>
                     </div>
                   ))}

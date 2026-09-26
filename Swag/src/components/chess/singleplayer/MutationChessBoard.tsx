@@ -1,3 +1,5 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
+import { useAppLanguage } from "@/i18n/languageStore";
 import { useRef, useEffect, useMemo, useState } from "react";
 
 import { Chess, type Square } from "chess.js";
@@ -373,23 +375,7 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
   },
 };
 
-function getInitialLanguage(): Language {
-  if (typeof window === "undefined") return "en";
 
-  const stored = window.localStorage.getItem(CHESS_LANGUAGE_STORAGE_KEY);
-
-  if (
-    stored === "en" ||
-    stored === "de" ||
-    stored === "bar" ||
-    stored === "ko" ||
-    stored === "ru"
-  ) {
-    return stored;
-  }
-
-  return "en";
-}
 
 /* =========================================================
    COMPONENT
@@ -407,16 +393,17 @@ export default function MutationChessBoard({
   playerColor = "white",
   difficulty = "casual",
 }: VariantAiBoardProps) {
-  const [language, setLanguage] = useState<Language>(getInitialLanguage);
+  useUiLanguage();
+  const { language, setLanguage } = useAppLanguage();
 
   const t = (key: string) => {
     if (language === "en") return key;
 
     if (language === "bar") {
-      return translations.bar[key] ?? translations.de[key] ?? key;
+      return translations.bar[key] ?? translations.de[key] ?? ui(key);
     }
 
-    return translations[language][key] ?? key;
+    return translations[language][key] ?? ui(key);
   };
 
   function changeLanguage(nextLanguage: Language) {
@@ -968,7 +955,7 @@ export default function MutationChessBoard({
   return (
     <div
       className="
-        min-h-screen
+        chess-variant-page min-h-[calc(100dvh-4rem)]
         bg-transparent
         px-4
         py-6
@@ -1128,9 +1115,7 @@ export default function MutationChessBoard({
                 {t("Same color · different piece")}
               </p>
 
-              <p className="mt-1 text-[10px] text-zinc-600">
-                Pawn · Knight · Bishop · Rook · Queen
-              </p>
+              <p className="mt-1 text-[10px] text-zinc-600">{ui("Pawn · Knight · Bishop · Rook · Queen")}</p>
             </div>
           </div>
         </section>
@@ -1141,7 +1126,7 @@ export default function MutationChessBoard({
           className="
             grid
             gap-6
-            xl:grid-cols-[300px_minmax(0,1fr)_300px]
+            chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]
           "
         >
           {/* LEFT */}
@@ -1278,9 +1263,7 @@ export default function MutationChessBoard({
 
                               <td className="px-2 py-2.5">
                                 <span className="text-xs text-zinc-500">
-                                  {record.color === "w"
-                                    ? `♔ ${t("White")}`
-                                    : `♚ ${t("Black")}`}
+                                  {record.color === "w" ? `♔ ${t("White")}` : `♚ ${t("Black")}`}
                                 </span>
                               </td>
 
@@ -1333,11 +1316,7 @@ export default function MutationChessBoard({
                     </div>
 
                     <span className="text-sm font-bold text-zinc-300">
-                      {winner === "draw"
-                        ? t("Draw")
-                        : winner === "white"
-                          ? t("White wins")
-                          : t("Black wins")}
+                      {winner === "draw" ? t("Draw") : winner === "white" ? t("White wins") : t("Black wins")}
                     </span>
                   </div>
                 </div>
@@ -1625,11 +1604,9 @@ export default function MutationChessBoard({
                         </span>
 
                         <span className="text-sm font-black text-violet-200">
-                          {mutationStats.favoriteTarget
-                            ? `${
+                          {mutationStats.favoriteTarget ? `${
                                 whiteSymbols[mutationStats.favoriteTarget]
-                              } ${t(pieceNames[mutationStats.favoriteTarget])}`
-                            : "—"}
+                              } ${t(pieceNames[mutationStats.favoriteTarget])}` : "—"}
                         </span>
                       </div>
                     </div>
@@ -1784,6 +1761,7 @@ function formatSigned(value: number): string {
 }
 
 function Panel({ children }: { children: React.ReactNode }) {
+  useUiLanguage();
   return (
     <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
       {children}
@@ -1800,11 +1778,12 @@ function PanelTitle({
   subtitle: string;
   compact?: boolean;
 }) {
+  useUiLanguage();
   return (
     <div className={compact ? "" : "mb-5"}>
-      <h2 className="text-sm font-bold text-zinc-100">{title}</h2>
+      <h2 className="text-sm font-bold text-zinc-100">{ui(title)}</h2>
 
-      <p className="mt-1.5 text-xs text-zinc-500">{subtitle}</p>
+      <p className="mt-1.5 text-xs text-zinc-500">{ui(subtitle)}</p>
     </div>
   );
 }
@@ -1820,6 +1799,7 @@ function MutationGameControls({
   undoDisabled: boolean;
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-2">
@@ -1858,6 +1838,7 @@ function CapturedPiecesGrid({
   capturedWhite: PieceType[];
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   const renderPieces = (pieces: PieceType[], color: "w" | "b") => (
     <div className="mt-2 flex min-h-8 flex-wrap gap-1">
       {pieces.length === 0 ? (
@@ -1907,6 +1888,7 @@ function StatCard({
   value: string;
   detail: string;
 }) {
+  useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3">
       <div className="flex items-center justify-between gap-2">
@@ -1916,7 +1898,7 @@ function StatCard({
       </div>
 
       <p className="mt-2 text-[10px] font-black uppercase tracking-wider text-zinc-600">
-        {label}
+        {ui(label)}
       </p>
 
       <p className="mt-1 text-[10px] text-zinc-700">{detail}</p>
@@ -1925,16 +1907,18 @@ function StatCard({
 }
 
 function MiniStat({ label, value }: { label: string; value: number }) {
+  useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-2 py-3 text-center">
       <p className="text-lg font-black text-zinc-200">{value}</p>
 
-      <p className="mt-1 text-[9px] font-bold text-zinc-600">{label}</p>
+      <p className="mt-1 text-[9px] font-bold text-zinc-600">{ui(label)}</p>
     </div>
   );
 }
 
 function MutationGlyph({ event }: { event: MutationEvent }) {
+  useUiLanguage();
   return (
     <div className="flex shrink-0 items-center gap-1 text-xl">
       <span>{mutationPieceSymbol(event.color, event.fromType)}</span>
@@ -1961,6 +1945,7 @@ function MutationMomentCard({
   onSelect: (ply: number) => void;
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   return (
     <button
       type="button"
@@ -1971,7 +1956,7 @@ function MutationMomentCard({
       className="w-full rounded-xl border border-white/5 bg-black/20 px-3 py-3 text-left transition enabled:hover:border-violet-400/20 enabled:hover:bg-violet-400/[0.05] disabled:cursor-default"
     >
       <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
-        {title}
+        {ui(title)}
       </p>
 
       {event ? (
@@ -2023,26 +2008,21 @@ function ChessLanguageSelector({
   onChange: (language: Language) => void;
   label: string;
 }) {
+  useUiLanguage();
   return (
     <label className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-400">
       <span>🌐</span>
 
-      <span className="hidden sm:inline">{label}</span>
+      <span className="hidden sm:inline">{ui(label)}</span>
 
       <select
         value={language}
         onChange={(event) => onChange(event.target.value as Language)}
         className="bg-transparent text-xs font-bold text-zinc-200 outline-none [color-scheme:dark]"
       >
-        <option value="en" className="bg-zinc-900">
-          English
-        </option>
-        <option value="de" className="bg-zinc-900">
-          Deutsch
-        </option>
-        <option value="bar" className="bg-zinc-900">
-          Boarisch
-        </option>
+        <option value="en" className="bg-zinc-900">{ui("English")}</option>
+        <option value="de" className="bg-zinc-900">{ui("Deutsch")}</option>
+        <option value="bar" className="bg-zinc-900">{ui("Boarisch")}</option>
         <option value="ko" className="bg-zinc-900">
           한국어
         </option>

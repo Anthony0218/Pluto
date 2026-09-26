@@ -1,3 +1,5 @@
+import RouletteInfo from "@/components/chess/singleplayer/RouletteInfo";
+import { ui, useUiLanguage } from "@/i18n/ui";
 import {
   useCallback,
   useEffect,
@@ -22,12 +24,17 @@ import {
 
 import {
   clonePortalState,
+  applyRouletteCard,
+  getRouletteMoves,
+  moveRoulette,
+  isPortalKingAttacked,
   createInitialPortalState,
   createPortalSeed,
   expireTriggeredLuckySquares,
   finalizePortalPromotionEvent,
   getLuckySquareSquares,
   resolvePortalAfterMove,
+  roulettePositionKey,
   spawnLuckySquaresAfterMove,
   type PendingPortalPromotion,
   type Portal,
@@ -59,6 +66,7 @@ type RouletteRecord = {
   fenBefore: string;
   fenAfter: string;
   portalsAfter: Portal[];
+  portalStateAfter?: PortalState;
   portalEvent: PortalEvent | null;
 };
 
@@ -158,6 +166,8 @@ function normalizeStoredState(
 
   const portalState: PortalState = rawPortalState
     ? {
+        kingPowers: rawPortalState.kingPowers,
+        loser: rawPortalState.loser,
         seed:
           typeof rawPortalState.seed === "number" ? rawPortalState.seed : seed,
         portals: Array.isArray(rawPortalState.portals)
@@ -215,6 +225,7 @@ function stateAtPly(
   const boundedPly = Math.min(ply, records.length);
   const record = records[boundedPly - 1];
 
+  if (record?.portalStateAfter) return clonePortalState(record.portalStateAfter);
   return {
     seed,
     portals: clonePortals(record?.portalsAfter ?? []),
@@ -238,25 +249,15 @@ function buildStoredStateAtPly(
   };
 }
 
-function repetitionKey(fen: string) {
-  return fen.split(" ").slice(0, 4).join(" ");
-}
-
-function isThreefoldRoulette(
-  initialFen: string,
-  records: RouletteRecord[],
-  currentFen: string,
-) {
+function isThreefoldRoulette(initialFen: string, records: RouletteRecord[], currentFen: string, state: PortalState) {
   const counts = new Map<string, number>();
-  const add = (fen: string) => {
-    const key = repetitionKey(fen);
+  const add = (fen: string, portal: PortalState) => {
+    const key = roulettePositionKey(fen, portal);
     counts.set(key, (counts.get(key) ?? 0) + 1);
   };
-
-  add(initialFen);
-  for (const record of records) add(record.fenAfter);
-  if (records.at(-1)?.fenAfter !== currentFen) add(currentFen);
-
+  add(initialFen, createInitialPortalState(state.seed));
+  for (const record of records) add(record.fenAfter, record.portalStateAfter ?? { seed: state.seed, portals: record.portalsAfter, events: [] });
+  if (records.at(-1)?.fenAfter !== currentFen) add(currentFen, state);
   return [...counts.values()].some((count) => count >= 3);
 }
 
@@ -264,8 +265,12 @@ function getOutcome(
   game: Chess,
   initialFen: string,
   records: RouletteRecord[],
+  state: PortalState,
 ) {
-  if (game.isCheckmate()) {
+  if (state.loser) return { finished: true, winner: state.loser === "w" ? "black" as const : "white" as const, reason: "King card drawn" };
+  const noMoves = getRouletteMoves(game, state).length === 0;
+  const inCheck = isPortalKingAttacked(game, game.turn(), state);
+  if (noMoves && inCheck) {
     return {
       finished: true,
       winner: game.turn() === "w" ? ("black" as const) : ("white" as const),
@@ -273,11 +278,11 @@ function getOutcome(
     };
   }
 
-  if (game.isStalemate()) {
+  if (noMoves && !inCheck) {
     return { finished: true, winner: "draw" as const, reason: "stalemate" };
   }
 
-  if (game.isInsufficientMaterial()) {
+  if (!Object.values(state.kingPowers ?? {}).some((power) => power.movesLeft > 0) && game.isInsufficientMaterial()) {
     return {
       finished: true,
       winner: "draw" as const,
@@ -293,7 +298,7 @@ function getOutcome(
     };
   }
 
-  if (isThreefoldRoulette(initialFen, records, game.fen())) {
+  if (isThreefoldRoulette(initialFen, records, game.fen(), state)) {
     return {
       finished: true,
       winner: "draw" as const,
@@ -318,6 +323,7 @@ function findCheckedKing(game: Chess): Square | null {
 }
 
 function effectIcon(effect: PortalEffect) {
+  if (effect === "extra-turn") return "↻";
   if (effect === "destroy") return "💥";
   if (effect === "teleport") return "🌀";
   if (effect === "swap") return "🔄";
@@ -346,12 +352,13 @@ function Panel({
   subtitle?: string;
   children: ReactNode;
 }) {
+  useUiLanguage();
   return (
     <section className="rounded-2xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/15 backdrop-blur">
       <div className="mb-3">
-        <h2 className="text-sm font-black text-white">{title}</h2>
+        <h2 className="text-sm font-black text-white">{ui(title)}</h2>
         {subtitle && (
-          <p className="mt-1 text-[11px] text-zinc-500">{subtitle}</p>
+          <p className="mt-1 text-[11px] text-zinc-500">{ui(subtitle)}</p>
         )}
       </div>
       {children}
@@ -370,6 +377,7 @@ function PromotionRouletteModal({
   piece: PortalPieceType;
   onResolve: (card: PortalPromotionCard) => void;
 }) {
+  useUiLanguage();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [stage, setStage] = useState<"choose" | "reveal" | "prank">("choose");
 
@@ -406,7 +414,7 @@ function PromotionRouletteModal({
   const result =
     selectedCard === "k"
       ? stage === "prank"
-        ? "There are no bonus Kings. Your piece disappears."
+        ? piece === "k" ? ui("King card drawn") : "There are no bonus Kings. Your piece disappears."
         : "No way... you pulled a King!"
       : selectedCard
         ? `${promotionCardNames[piece]} → ${promotionCardNames[selectedCard]}`
@@ -416,6 +424,14 @@ function PromotionRouletteModal({
     (selectedCard !== null && stage === "reveal" && selectedCard !== "k") ||
     (selectedCard === "k" && stage === "prank");
 
+  // Resolve automatically after the reveal so a player cannot strand the
+  // shared game behind this modal if they do not press Continue.
+  useEffect(() => {
+    if (!canContinue || !selectedCard) return;
+    const timer = window.setTimeout(() => onResolve(selectedCard), 1800);
+    return () => window.clearTimeout(timer);
+  }, [canContinue, onResolve, selectedCard]);
+
   return (
     <div className="fixed inset-0 z-[120] flex items-center justify-center bg-zinc-950/85 p-4 backdrop-blur-md">
       <div className="w-full max-w-3xl overflow-hidden rounded-[28px] border border-violet-300/20 bg-gradient-to-br from-zinc-900 via-zinc-950 to-violet-950/70 p-5 shadow-[0_30px_100px_rgba(0,0,0,0.7)] sm:p-7">
@@ -423,10 +439,8 @@ function PromotionRouletteModal({
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-violet-200/25 bg-violet-400/10 text-3xl shadow-[0_0_30px_rgba(167,139,250,0.3)]">
             🎴
           </div>
-          <h2 className="mt-3 text-2xl font-black text-white">
-            Promotion Roulette!
-          </h2>
-          <p className="mt-1 text-sm font-bold text-violet-200">{title}</p>
+          <h2 className="mt-3 text-2xl font-black text-white">{ui("Promotion Roulette!")}</h2>
+          <p className="mt-1 text-sm font-bold text-violet-200">{ui(title)}</p>
           <p className="mt-1 text-xs text-zinc-400">{result}</p>
           <div className="mt-3 flex items-center justify-center gap-2 text-sm font-black text-zinc-200">
             <span className="font-serif text-2xl">
@@ -489,9 +503,7 @@ function PromotionRouletteModal({
             type="button"
             onClick={() => onResolve(selectedCard)}
             className="mt-6 w-full rounded-xl bg-violet-300 px-4 py-3 text-sm font-black text-zinc-950 transition hover:bg-violet-200"
-          >
-            Continue
-          </button>
+          >{ui("Continue")}</button>
         )}
       </div>
     </div>
@@ -499,10 +511,11 @@ function PromotionRouletteModal({
 }
 
 export function RouletteMultiplayerLobby() {
+  useUiLanguage();
   const navigate = useNavigate();
   const { user, profile } = useAuth();
   const [hostColor, setHostColor] = useState<TwoPlayerColor>("white");
-  const [joinCode, setJoinCode] = useState("");
+  const [joinCode, setJoinCode] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
   const [loading, setLoading] = useState<"create" | "join" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -562,7 +575,7 @@ export function RouletteMultiplayerLobby() {
   }
 
   return (
-    <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
+    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-5xl">
         <header className="mb-7 rounded-3xl border border-violet-400/15 bg-zinc-900/70 p-6 shadow-2xl shadow-black/30">
           <div className="flex items-center gap-4">
@@ -570,29 +583,20 @@ export function RouletteMultiplayerLobby() {
               🎲
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-300">
-                ChessRoulette · Multiplayer
-              </p>
-              <h1 className="mt-1 text-3xl font-black text-white">
-                Shared Lucky Squares
-              </h1>
-              <p className="mt-1 text-sm text-zinc-500">
-                The seed, Lucky Squares, effects and Roulette events stay
-                synchronized for both players.
-              </p>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-300">{ui("ChessRoulette · Multiplayer")}</p>
+              <h1 className="mt-1 text-3xl font-black text-white">{ui("Shared Lucky Squares")}</h1>
+              <p className="mt-1 text-sm text-zinc-500">{ui("The seed, Lucky Squares, effects and Roulette events stay synchronized for both players.")}</p>
             </div>
           </div>
         </header>
 
         {!user ? (
-          <Panel title="Sign in required">
-            <p className="text-sm text-zinc-400">
-              Multiplayer rooms use your existing Supabase account.
-            </p>
+          <Panel title={ui("Sign in required")}>
+            <p className="text-sm text-zinc-400">{ui("Multiplayer rooms use your existing Supabase account.")}</p>
           </Panel>
         ) : (
           <div className="grid gap-5 lg:grid-cols-2">
-            <Panel title="Create room" subtitle="Choose your side">
+            <Panel title={ui("Create room")} subtitle={ui("Choose your side")}>
               <div className="grid grid-cols-2 gap-2">
                 {(["white", "black"] as TwoPlayerColor[]).map((color) => (
                   <button
@@ -611,11 +615,7 @@ export function RouletteMultiplayerLobby() {
                 ))}
               </div>
 
-              <div className="mt-4 rounded-xl border border-violet-300/10 bg-violet-400/[0.05] p-3 text-xs leading-5 text-zinc-400">
-                A single Roulette seed is stored with the room. Both browsers
-                therefore use the exact same Lucky Squares and deterministic
-                effects.
-              </div>
+              <div className="mt-4 rounded-xl border border-violet-300/10 bg-violet-400/[0.05] p-3 text-xs leading-5 text-zinc-400">{ui("A single Roulette seed is stored with the room. Both browsers therefore use the exact same Lucky Squares and deterministic effects.")}</div>
 
               <button
                 type="button"
@@ -623,13 +623,11 @@ export function RouletteMultiplayerLobby() {
                 onClick={() => void createRoom()}
                 className="mt-5 w-full rounded-xl bg-violet-300 px-5 py-3 font-black text-zinc-950 transition hover:bg-violet-200 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {loading === "create"
-                  ? "Creating..."
-                  : "Create Multiplayer Room"}
+                {loading === "create" ? ui("Creating...") : ui("Create Multiplayer Room")}
               </button>
             </Panel>
 
-            <Panel title="Join room" subtitle="Enter the room code">
+            <Panel title={ui("Join room")} subtitle={ui("Enter the room code")}>
               <input
                 value={joinCode}
                 onChange={(event) =>
@@ -638,14 +636,12 @@ export function RouletteMultiplayerLobby() {
                 onKeyDown={(event) => {
                   if (event.key === "Enter") void joinRoom();
                 }}
-                placeholder="ABC123"
+                placeholder={ui("ABC123")}
                 maxLength={6}
                 className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-center font-mono text-2xl font-black uppercase tracking-[0.3em] text-white outline-none transition placeholder:text-zinc-700 focus:border-violet-400/40"
               />
 
-              <p className="mt-3 text-xs leading-5 text-zinc-500">
-                The joining player automatically receives the opposite color.
-              </p>
+              <p className="mt-3 text-xs leading-5 text-zinc-500">{ui("The joining player automatically receives the opposite color.")}</p>
 
               <button
                 type="button"
@@ -653,7 +649,7 @@ export function RouletteMultiplayerLobby() {
                 onClick={() => void joinRoom()}
                 className="mt-5 w-full rounded-xl border border-white/10 bg-white/5 px-5 py-3 font-black text-zinc-200 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {loading === "join" ? "Joining..." : "Join Room"}
+                {loading === "join" ? ui("Joining...") : ui("Join Room")}
               </button>
             </Panel>
           </div>
@@ -661,7 +657,7 @@ export function RouletteMultiplayerLobby() {
 
         {error && (
           <div className="mt-5 rounded-2xl border border-red-400/20 bg-red-400/[0.07] px-4 py-3 text-sm font-semibold text-red-200">
-            {error}
+            {ui(error)}
           </div>
         )}
       </div>
@@ -670,6 +666,7 @@ export function RouletteMultiplayerLobby() {
 }
 
 export function RouletteMultiplayerGame() {
+  useUiLanguage();
   const { roomCode } = useParams();
   const { user } = useAuth();
 
@@ -1049,6 +1046,7 @@ export function RouletteMultiplayerGame() {
       fenBefore: beforeFen,
       fenAfter: workingGame.fen(),
       portalsAfter: clonePortals(finalPortalState.portals),
+      portalStateAfter: clonePortalState(finalPortalState),
       portalEvent: cloneEvent(portalEvent),
     };
 
@@ -1058,7 +1056,7 @@ export function RouletteMultiplayerGame() {
       records: nextRecords,
     };
 
-    const outcome = getOutcome(workingGame, initialFen, nextRecords);
+    const outcome = getOutcome(workingGame, initialFen, nextRecords, finalPortalState);
     const previous = gameState;
     const optimistic: VariantGame = {
       ...gameState,
@@ -1084,7 +1082,7 @@ export function RouletteMultiplayerGame() {
     setHistoryPreviewPly(null);
     if (portalEvent) flashPortal(portalEvent.square);
 
-    const { error: moveError } = await supabase.rpc("play_roulette_move", {
+    const { error: moveError } = await supabase.rpc("play_roulette_move_v2", {
       p_room_id: room.id,
       p_from: move.from,
       p_to: move.to,
@@ -1129,7 +1127,7 @@ export function RouletteMultiplayerGame() {
 
     let move;
     try {
-      move = workingGame.move({ from, to, promotion });
+      move = moveRoulette(workingGame, portalBefore, { from, to, promotion });
     } catch {
       setError("Illegal move.");
       return;
@@ -1190,15 +1188,7 @@ export function RouletteMultiplayerGame() {
     const workingGame = new Chess(pending.workingFen);
     const square = pending.pending.portalSquare;
 
-    if (card === "k") {
-      workingGame.remove(square);
-    } else {
-      const currentPiece = workingGame.get(square);
-      if (currentPiece && currentPiece.type !== card) {
-        workingGame.remove(square);
-        workingGame.put({ type: card, color: pending.move.color }, square);
-      }
-    }
+    applyRouletteCard(workingGame, square, card);
 
     const event: PortalEvent = {
       ply: records.length + 1,
@@ -1247,7 +1237,7 @@ export function RouletteMultiplayerGame() {
       setSelectedSquare(square);
       playPieceSelectSound(piece.type);
       setLegalMoves(
-        liveChess.moves({ square, verbose: true }).map((move) => move.to),
+        getRouletteMoves(liveChess, storedState.portalState, square).map((move) => move.to),
       );
       return;
     }
@@ -1256,7 +1246,7 @@ export function RouletteMultiplayerGame() {
       setSelectedSquare(square);
       playPieceSelectSound(piece.type);
       setLegalMoves(
-        liveChess.moves({ square, verbose: true }).map((move) => move.to),
+        getRouletteMoves(liveChess, storedState.portalState, square).map((move) => move.to),
       );
       return;
     }
@@ -1402,22 +1392,18 @@ export function RouletteMultiplayerGame() {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-transparent text-zinc-400">
-        Loading ChessRoulette room...
-      </main>
+      <main className="flex chess-variant-page min-h-[calc(100dvh-4rem)] items-center justify-center bg-transparent text-zinc-400">{ui("Loading ChessRoulette room...")}</main>
     );
   }
 
   if (!user) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-transparent p-6 text-zinc-200">
-        <Panel title="Sign in required">
+      <main className="flex chess-variant-page min-h-[calc(100dvh-4rem)] items-center justify-center bg-transparent p-6 text-zinc-200">
+        <Panel title={ui("Sign in required")}>
           <Link
             className="text-violet-300"
             to="/games/chess/variants/roulette/multiplayer"
-          >
-            Back to Roulette multiplayer
-          </Link>
+          >{ui("Back to Roulette multiplayer")}</Link>
         </Panel>
       </main>
     );
@@ -1425,8 +1411,8 @@ export function RouletteMultiplayerGame() {
 
   if (!room || !gameState) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-transparent p-6 text-zinc-200">
-        <Panel title="Room unavailable">
+      <main className="flex chess-variant-page min-h-[calc(100dvh-4rem)] items-center justify-center bg-transparent p-6 text-zinc-200">
+        <Panel title={ui("Room unavailable")}>
           <p className="text-sm text-zinc-400">
             {error ?? "Could not load the room."}
           </p>
@@ -1453,44 +1439,32 @@ export function RouletteMultiplayerGame() {
     records.at(-1)?.color === mySide;
 
   return (
-    <main className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
+    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1600px]">
         <header className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-violet-400/10 bg-zinc-900/50 px-5 py-4">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.25em] text-violet-300">
-              Chess Variant · Multiplayer
-            </p>
-            <h1 className="mt-1 text-2xl font-black text-white">
-              🎲 ChessRoulette
-            </h1>
-            <p className="mt-1 text-sm text-zinc-500">
-              Visible Lucky Squares · synchronized deterministic outcomes
-            </p>
+            <p className="text-xs font-black uppercase tracking-[0.25em] text-violet-300">{ui("Chess Variant · Multiplayer")}</p>
+            <h1 className="mt-1 text-2xl font-black text-white">{ui("🎲 ChessRoulette")}</h1>
+            <p className="mt-1 text-sm text-zinc-500">{ui("Visible Lucky Squares · synchronized deterministic outcomes")}</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full border border-violet-300/15 bg-violet-400/[0.06] px-3 py-1.5 text-xs font-black text-violet-200">
-              Room {room.code}
+            <span className="rounded-full border border-violet-300/15 bg-violet-400/[0.06] px-3 py-1.5 text-xs font-black text-violet-200">{ui("Room")}{room.code}
             </span>
             <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-300">
-              {gameState.status === "playing"
-                ? `${liveChess.turn() === "w" ? "White" : "Black"} to move`
-                : gameState.status === "waiting"
-                  ? "Waiting for opponent"
-                  : "Game finished"}
+              {gameState.status === "playing" ? `${liveChess.turn() === "w" ? "White" : "Black"} to move` : gameState.status === "waiting" ? ui("Waiting for opponent") : ui("Game finished")}
             </span>
           </div>
         </header>
 
         {error && (
           <div className="mb-4 rounded-2xl border border-red-400/20 bg-red-400/[0.07] px-4 py-3 text-sm font-semibold text-red-200">
-            {error}
+            {ui(error)}
           </div>
         )}
 
         {gameState.status === "waiting" && (
-          <div className="mb-4 rounded-2xl border border-amber-400/20 bg-amber-400/[0.06] px-4 py-3 text-sm text-amber-100">
-            Waiting for the second player. Share room code <b>{room.code}</b>.
+          <div className="mb-4 rounded-2xl border border-amber-400/20 bg-amber-400/[0.06] px-4 py-3 text-sm text-amber-100">{ui("Waiting for the second player. Share room code")}<b>{room.code}</b>.
           </div>
         )}
 
@@ -1499,23 +1473,16 @@ export function RouletteMultiplayerGame() {
             {undoRequesterIsMe ? (
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="font-black text-violet-200">Undo requested</p>
-                  <p className="mt-1 text-xs text-zinc-500">
-                    Waiting for your opponent.
-                  </p>
+                  <p className="font-black text-violet-200">{ui("Undo requested")}</p>
+                  <p className="mt-1 text-xs text-zinc-500">{ui("Waiting for your opponent.")}</p>
                 </div>
                 <span className="text-2xl">↶</span>
               </div>
             ) : (
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="font-black text-violet-200">
-                    Opponent requests Undo
-                  </p>
-                  <p className="mt-1 text-xs text-zinc-500">
-                    Restore the exact board and Lucky Square state before the
-                    latest move?
-                  </p>
+                  <p className="font-black text-violet-200">{ui("Opponent requests Undo")}</p>
+                  <p className="mt-1 text-xs text-zinc-500">{ui("Restore the exact board and Lucky Square state before the latest move?")}</p>
                 </div>
                 <div className="flex gap-2">
                   <button
@@ -1523,26 +1490,22 @@ export function RouletteMultiplayerGame() {
                     disabled={Boolean(actionLoading)}
                     onClick={() => void respondUndo(false)}
                     className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-black text-zinc-300 hover:bg-white/10 disabled:opacity-50"
-                  >
-                    Decline
-                  </button>
+                  >{ui("Decline")}</button>
                   <button
                     type="button"
                     disabled={Boolean(actionLoading)}
                     onClick={() => void respondUndo(true)}
                     className="rounded-xl bg-violet-300 px-4 py-2 text-xs font-black text-zinc-950 hover:bg-violet-200 disabled:opacity-50"
-                  >
-                    Accept Undo
-                  </button>
+                  >{ui("Accept Undo")}</button>
                 </div>
               </div>
             )}
           </div>
         )}
 
-        <div className="grid gap-5 xl:grid-cols-[290px_minmax(0,1fr)_320px]">
+        <div className="grid gap-5 chess-game-grid xl:grid-cols-[290px_minmax(0,1fr)_320px]">
           <aside className="space-y-4">
-            <Panel title="Players" subtitle="Supabase Realtime">
+            <Panel title={ui("Players")} subtitle={ui("Supabase Realtime")}>
               <div className="space-y-2">
                 {players.map((player) => {
                   const mine = player.user_id === user.id;
@@ -1559,7 +1522,7 @@ export function RouletteMultiplayerGame() {
                         <div>
                           <p className="text-xs font-black text-zinc-200">
                             {player.display_name}
-                            {mine ? " · You" : ""}
+                            {mine ? ui(" · You") : ""}
                           </p>
                           <p className="mt-1 text-[10px] uppercase tracking-wider text-zinc-600">
                             {player.chosen_color ?? "—"}
@@ -1574,18 +1537,14 @@ export function RouletteMultiplayerGame() {
                 })}
               </div>
               <div className="mt-3 rounded-xl border border-white/5 bg-black/20 p-3 text-[10px] leading-5 text-zinc-500">
-                {myPlayer
-                  ? `You are ${myColor ?? "waiting"}.`
-                  : "Loading your seat..."}
-                {opponent
-                  ? ` Opponent: ${opponent.display_name}.`
-                  : " Waiting for opponent."}
+                {myPlayer ? `You are ${myColor ?? "waiting"}.` : ui("Loading your seat...")}
+                {opponent ? ` Opponent: ${opponent.display_name}.` : ui(" Waiting for opponent.")}
               </div>
             </Panel>
 
             <Panel
-              title="Game Controls"
-              subtitle="Negotiated multiplayer actions"
+              title={ui("Game Controls")}
+              subtitle={ui("Negotiated multiplayer actions")}
             >
               <div className="grid grid-cols-2 gap-2">
                 <button
@@ -1593,9 +1552,7 @@ export function RouletteMultiplayerGame() {
                   onClick={() => void requestUndo()}
                   disabled={!canRequestUndo || Boolean(actionLoading)}
                   className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs font-black text-zinc-200 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:border-white/5 disabled:bg-white/[0.02] disabled:text-zinc-600 disabled:opacity-40"
-                >
-                  ↶ Undo
-                </button>
+                >{ui("↶ Undo")}</button>
                 <button
                   type="button"
                   onClick={() => void resign()}
@@ -1603,26 +1560,20 @@ export function RouletteMultiplayerGame() {
                     gameState.status !== "playing" || Boolean(actionLoading)
                   }
                   className="rounded-xl border border-red-400/15 bg-red-400/[0.06] px-3 py-2.5 text-xs font-black text-red-200 transition hover:bg-red-400/10 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  Resign
-                </button>
+                >{ui("Resign")}</button>
               </div>
             </Panel>
 
-            <Panel title="Lucky Square Status" subtitle="Shared room state">
+            <Panel title={ui("Lucky Square Status")} subtitle={ui("Shared room state")}>
               <div className="grid grid-cols-2 gap-2">
                 <div className="rounded-xl border border-white/5 bg-black/20 p-3">
-                  <p className="text-[9px] font-black uppercase tracking-wider text-zinc-600">
-                    Active
-                  </p>
+                  <p className="text-[9px] font-black uppercase tracking-wider text-zinc-600">{ui("Active")}</p>
                   <p className="mt-2 text-2xl font-black text-violet-200">
                     {storedState.portalState.portals.length}
                   </p>
                 </div>
                 <div className="rounded-xl border border-white/5 bg-black/20 p-3">
-                  <p className="text-[9px] font-black uppercase tracking-wider text-zinc-600">
-                    Next spawn
-                  </p>
+                  <p className="text-[9px] font-black uppercase tracking-wider text-zinc-600">{ui("Next spawn")}</p>
                   <p className="mt-2 text-2xl font-black text-violet-200">
                     {movesUntilNextLuckySpawn}
                   </p>
@@ -1630,9 +1581,7 @@ export function RouletteMultiplayerGame() {
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
                 {storedState.portalState.portals.length === 0 ? (
-                  <span className="text-xs text-zinc-600">
-                    No active Lucky Squares
-                  </span>
+                  <span className="text-xs text-zinc-600">{ui("No active Lucky Squares")}</span>
                 ) : (
                   storedState.portalState.portals.map((portal) => (
                     <span
@@ -1648,8 +1597,8 @@ export function RouletteMultiplayerGame() {
             </Panel>
 
             <Panel
-              title="Move History"
-              subtitle="Click a move to preview it locally"
+              title={ui("Move History")}
+              subtitle={ui("Click a move to preview it locally")}
             >
               <div className="max-h-[320px] overflow-y-auto pr-1">
                 <button
@@ -1661,14 +1610,12 @@ export function RouletteMultiplayerGame() {
                       : "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
                   }`}
                 >
-                  <span>Start</span>
-                  <span className="text-[9px]">Initial position</span>
+                  <span>{ui("Start")}</span>
+                  <span className="text-[9px]">{ui("Initial position")}</span>
                 </button>
 
                 {records.length === 0 ? (
-                  <p className="px-3 py-3 text-xs text-zinc-600">
-                    No moves yet
-                  </p>
+                  <p className="px-3 py-3 text-xs text-zinc-600">{ui("No moves yet")}</p>
                 ) : (
                   records.map((record) => (
                     <button
@@ -1691,9 +1638,7 @@ export function RouletteMultiplayerGame() {
                         </span>
                       </div>
                       <span className="text-sm">
-                        {record.portalEvent
-                          ? effectIcon(record.portalEvent.effect)
-                          : ""}
+                        {record.portalEvent ? effectIcon(record.portalEvent.effect) : ""}
                       </span>
                     </button>
                   ))
@@ -1707,22 +1652,16 @@ export function RouletteMultiplayerGame() {
               {historyPreviewPly !== null && (
                 <div className="mb-3 flex items-center justify-between gap-3 rounded-xl border border-violet-300/15 bg-violet-400/[0.06] px-4 py-3">
                   <div>
-                    <p className="text-xs font-black text-violet-200">
-                      History Preview
-                    </p>
+                    <p className="text-xs font-black text-violet-200">{ui("History Preview")}</p>
                     <p className="mt-1 text-[11px] text-zinc-500">
-                      {historyPreviewPly === 0
-                        ? "Initial position"
-                        : records[historyPreviewPly - 1]?.san}
+                      {historyPreviewPly === 0 ? ui("Initial position") : records[historyPreviewPly - 1]?.san}
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => setHistoryPreviewPly(null)}
                     className="rounded-lg bg-white/10 px-3 py-2 text-xs font-black text-zinc-200 transition hover:bg-white/20"
-                  >
-                    Back to Live Board
-                  </button>
+                  >{ui("Back to Live Board")}</button>
                 </div>
               )}
 
@@ -1760,27 +1699,19 @@ export function RouletteMultiplayerGame() {
                       type="button"
                       onClick={() => void copyRoomCode()}
                       className="w-full max-w-lg rounded-[30px] border border-white/15 bg-zinc-900/95 px-8 py-8 text-center shadow-2xl shadow-black/60 transition hover:border-amber-300/35 hover:bg-zinc-900 active:scale-[0.99]"
-                      title="Copy room code"
+                      title={ui("Copy room code")}
                     >
                       <div className="text-4xl">🌐</div>
 
-                      <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">
-                        Waiting for players
-                      </p>
+                      <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">{ui("Waiting for players")}</p>
 
                       <h2 className="mt-2 text-2xl font-black text-white">
-                        {players.length}/2 players connected
-                      </h2>
+                        {players.length}{ui("/2 players connected")}</h2>
 
-                      <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">
-                        Share this room code. The game starts automatically when
-                        everyone has joined.
-                      </p>
+                      <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">{ui("Share this room code. The game starts automatically when everyone has joined.")}</p>
 
                       <div className="mt-6 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-5 py-5">
-                        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">
-                          Room Code
-                        </p>
+                        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">{ui("Room Code")}</p>
 
                         <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">
                           {room.code}
@@ -1788,9 +1719,7 @@ export function RouletteMultiplayerGame() {
                       </div>
 
                       <p className="mt-4 text-xs font-bold text-zinc-400">
-                        {copied
-                          ? "✓ Copied to clipboard"
-                          : "Click this box to copy the code"}
+                        {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
                       </p>
                     </button>
                   </div>
@@ -1806,9 +1735,7 @@ export function RouletteMultiplayerGame() {
                   historyPreviewPly === null && (
                     <div className="absolute inset-0 z-[90] flex items-center justify-center bg-zinc-950/75 p-6 backdrop-blur-sm">
                       <div className="w-full max-w-sm rounded-3xl border border-violet-300/20 bg-zinc-900/95 p-7 text-center shadow-2xl">
-                        <p className="text-xs font-black uppercase tracking-[0.2em] text-violet-300">
-                          Game Over
-                        </p>
+                        <p className="text-xs font-black uppercase tracking-[0.2em] text-violet-300">{ui("Game Over")}</p>
                         <h2 className="mt-2 text-2xl font-black text-white">
                           {resultLabel(gameState)}
                         </h2>
@@ -1818,16 +1745,12 @@ export function RouletteMultiplayerGame() {
                           onClick={() => void requestRematch()}
                           className="mt-5 w-full rounded-xl bg-violet-300 px-4 py-3 text-sm font-black text-zinc-950 transition hover:bg-violet-200 disabled:cursor-not-allowed disabled:opacity-50"
                         >
-                          {myRematchReady
-                            ? "Waiting for opponent..."
-                            : "↺ Request Rematch"}
+                          {myRematchReady ? ui("Waiting for opponent...") : ui("↺ Request Rematch")}
                         </button>
                         <Link
                           to="/games/chess/variants/roulette/multiplayer"
                           className="mt-2 block rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-black text-zinc-300 hover:bg-white/10"
-                        >
-                          Back to Lobby
-                        </Link>
+                        >{ui("Back to Lobby")}</Link>
                       </div>
                     </div>
                   )}
@@ -1835,37 +1758,24 @@ export function RouletteMultiplayerGame() {
 
               <div className="mt-3 flex items-center justify-between rounded-2xl border border-white/5 bg-zinc-900/50 px-4 py-3 text-xs">
                 <span className="text-zinc-500">
-                  {gameState.status === "playing"
-                    ? isMyTurn
-                      ? "Your turn"
-                      : "Opponent's turn"
-                    : gameState.status === "waiting"
-                      ? "Waiting for opponent"
-                      : "Game finished"}
+                  {gameState.status === "playing" ? isMyTurn ? ui("Your turn") : ui("Opponent's turn") : gameState.status === "waiting" ? ui("Waiting for opponent") : ui("Game finished")}
                 </span>
-                <span className="font-black text-violet-200">Seed {seed}</span>
+                <span className="font-black text-violet-200">{ui("Seed ")}{seed}</span>
               </div>
             </div>
           </section>
 
           <aside className="space-y-4">
+            <RouletteInfo state={storedState.portalState} />
             <Panel
-              title="Lucky Square Info"
-              subtitle="What can happen on a Lucky Square?"
+              title={ui("Lucky Square Info")}
+              subtitle={ui("What can happen on a Lucky Square?")}
             >
-              <p className="mb-3 rounded-xl border border-violet-300/10 bg-violet-400/[0.05] px-3 py-2 text-[11px] font-bold text-violet-100">
-                Lucky Squares are visible. Their actual effect stays hidden
-                until triggered.
-              </p>
+              <p className="mb-3 rounded-xl border border-violet-300/10 bg-violet-400/[0.05] px-3 py-2 text-[11px] font-bold text-violet-100">{ui("Lucky Squares are visible. Their actual effect stays hidden until triggered.")}</p>
 
               <div className="mb-3 space-y-1 rounded-xl border border-amber-300/10 bg-amber-300/[0.05] px-3 py-2 text-[10px] font-bold leading-relaxed text-amber-100/90">
-                <p>
-                  ⏳ Triggered squares survive the opponent's reply, then
-                  disappear.
-                </p>
-                <p>
-                  ✨ Every 15 played plies, up to 2 new Lucky Squares spawn.
-                </p>
+                <p>{ui("⏳ Triggered squares survive the opponent's reply, then disappear.")}</p>
+                <p>{ui("✨ Every 15 played plies, up to 2 new Lucky Squares spawn.")}</p>
               </div>
 
               <div className="space-y-2">
@@ -1893,9 +1803,9 @@ export function RouletteMultiplayerGame() {
                   >
                     <div className="text-2xl">{icon}</div>
                     <div>
-                      <p className="text-xs font-black text-white">{title}</p>
+                      <p className="text-xs font-black text-white">{ui(title)}</p>
                       <p className="mt-0.5 text-[10px] leading-relaxed text-zinc-500">
-                        {description}
+                        {ui(description)}
                       </p>
                     </div>
                   </div>
@@ -1903,7 +1813,7 @@ export function RouletteMultiplayerGame() {
               </div>
             </Panel>
 
-            <Panel title="Promotion Card Pool">
+            <Panel title={ui("Promotion Card Pool")}>
               <div className="grid grid-cols-3 gap-2">
                 {[
                   ["♙", "8", "Pawn"],
@@ -1924,16 +1834,12 @@ export function RouletteMultiplayerGame() {
                   </div>
                 ))}
               </div>
-              <p className="mt-3 text-[10px] font-bold text-red-300/80">
-                ⚠ The King card is still the prank card.
-              </p>
+              <p className="mt-3 text-[10px] font-bold text-red-300/80">{ui("⚠ The King card is still the prank card.")}</p>
             </Panel>
 
-            <Panel title="Roulette Events">
+            <Panel title={ui("Roulette Events")}>
               {storedState.portalState.events.length === 0 ? (
-                <p className="text-xs text-zinc-500">
-                  No Lucky Square has fired yet
-                </p>
+                <p className="text-xs text-zinc-500">{ui("No Lucky Square has fired yet")}</p>
               ) : (
                 <div className="max-h-[300px] space-y-2 overflow-y-auto pr-1">
                   {[...storedState.portalState.events]
@@ -1955,9 +1861,7 @@ export function RouletteMultiplayerGame() {
                           {event.result}
                           {event.destination ? ` → ${event.destination}` : ""}
                           {event.swapSquare ? ` ↔ ${event.swapSquare}` : ""}
-                          {event.promotionCard
-                            ? ` · ${promotionCardNames[event.promotionCard]}`
-                            : ""}
+                          {event.promotionCard ? ` · ${promotionCardNames[event.promotionCard]}` : ""}
                         </p>
                       </div>
                     ))}

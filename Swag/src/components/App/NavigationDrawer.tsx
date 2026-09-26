@@ -1,8 +1,10 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import SideBar from "./SideBar";
 
 export default function NavigationDrawer({ onClose }: { onClose: () => void }) {
+  useUiLanguage();
   const dialog = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     dialog.current?.showModal();
@@ -17,7 +19,7 @@ export default function NavigationDrawer({ onClose }: { onClose: () => void }) {
     <dialog
       ref={dialog}
       id="app-navigation"
-      aria-label="Pluto navigation"
+      aria-label={ui("Pluto navigation")}
       onCancel={onClose}
       onClick={(event) => {
         if (event.target === event.currentTarget) onClose();
@@ -29,7 +31,7 @@ export default function NavigationDrawer({ onClose }: { onClose: () => void }) {
           type="button"
           autoFocus
           onClick={onClose}
-          aria-label="Close navigation"
+          aria-label={ui("Close navigation")}
           className="absolute right-3 top-5 z-10 rounded-lg p-2 text-zinc-300 hover:bg-white/10"
         >
           <X size={20} />

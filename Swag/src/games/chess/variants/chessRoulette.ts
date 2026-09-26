@@ -1,10 +1,10 @@
-import { Chess, type Square } from "chess.js";
+import { Chess, type Square, type Move } from "chess.js";
 
 export type PortalSide = "w" | "b";
 
 export type PortalPieceType = "p" | "n" | "b" | "r" | "q" | "k";
 
-export type PortalEffect = "destroy" | "teleport" | "swap" | "promote";
+export type PortalEffect = "destroy" | "teleport" | "swap" | "promote" | "extra-turn";
 
 export type PortalPromotionCard = "p" | "n" | "b" | "r" | "q" | "k";
 
@@ -13,7 +13,8 @@ export type PortalResult =
   | "teleported"
   | "swapped"
   | "promotion-card"
-  | "fizzled";
+  | "fizzled"
+  | "extra-turn";
 
 export type Portal = {
   id: string;
@@ -54,6 +55,8 @@ export type PortalState = {
   seed: number;
   portals: Portal[];
   events: PortalEvent[];
+  kingPowers?: Partial<Record<PortalSide, { piece: "n" | "b" | "r" | "q"; movesLeft: number }>>;
+  loser?: PortalSide;
 };
 
 export type PortalMoveRecord = {
@@ -78,7 +81,8 @@ export type PendingPortalPromotion = {
 
 const files = "abcdefgh";
 
-const effectPool: PortalEffect[] = ["destroy", "teleport", "swap", "promote"];
+export const ROULETTE_PROBABILITIES = { destroy: 10, promote: 60, teleport: 20, swap: 10 } as const;
+const effectPool: PortalEffect[] = ["destroy", "promote", "promote", "promote", "promote", "promote", "promote", "teleport", "teleport", "swap"];
 
 export const PORTAL_PROMOTION_DECK: PortalPromotionCard[] = [
   "p",
@@ -171,6 +175,8 @@ function shuffled<T>(values: T[], seed: number): T[] {
 export function clonePortalState(state: PortalState): PortalState {
   return {
     seed: state.seed,
+    loser: state.loser,
+    kingPowers: Object.fromEntries(Object.entries(state.kingPowers ?? {}).map(([side, power]) => [side, { ...power }])),
 
     portals: state.portals.map((portal) => ({
       ...portal,
@@ -363,6 +369,7 @@ function pieceAttacksSquare(
 export function isPortalKingAttacked(
   game: Chess,
   kingSide: PortalSide,
+  state?: PortalState,
 ): boolean {
   const board = game.board();
 
@@ -413,6 +420,11 @@ export function isPortalKingAttacked(
     }
   }
 
+  const power = state?.kingPowers?.[enemySide];
+  if (power?.movesLeft) {
+    const king = game.board().flat().find((p) => p?.type === "k" && p.color === enemySide);
+    if (king && pieceAttacksSquare(game, king.square, { type: power.piece, color: enemySide }, kingSquare)) return true;
+  }
   return false;
 }
 
@@ -606,6 +618,9 @@ export function resolvePortalAfterMove(
   },
   ply: number,
 ): PortalResolution {
+  state = clonePortalState(state);
+  const power = state.kingPowers?.[move.color];
+  if (move.piece === "k" && power && --power.movesLeft <= 0) delete state.kingPowers![move.color];
   const portalIndex = state.portals.findIndex(
     (portal) => portal.square === landingSquare,
   );
@@ -636,36 +651,21 @@ export function resolvePortalAfterMove(
    */
   portal.expiresAfterPly = ply + 1;
 
-  /*
-   * Kings reveal portals but are immune to their effects.
-   * This keeps normal chess king legality intact.
-   */
   if (move.piece === "k") {
-    const event: PortalEvent = {
-      ply,
-      square: landingSquare,
-      effect: portal.effect,
-      result: "fizzled",
-      color: move.color,
-      piece: move.piece,
-    };
-
-    next.events.push(event);
-
-    return {
-      state: next,
-      event,
-      pendingPromotion: null,
-    };
+    const draw = mulberry32(mixSeed(next.seed, portalIndex, portal.triggerCount, ply, 0x4b))();
+    if (draw < 0.8) {
+      portal.effect = "promote";
+    } else {
+      const parts = game.fen().split(" ");
+      parts[1] = move.color;
+      parts[3] = "-";
+      game.load(parts.join(" "));
+      const event: PortalEvent = { ply, square: landingSquare, effect: "extra-turn", result: "extra-turn", color: move.color, piece: "k" };
+      next.events.push(event);
+      return { state: next, event, pendingPromotion: null };
+    }
   }
 
-  /*
-   * Promote works for every NON-KING piece.
-   *
-   * Kings are handled by the immunity branch above, so they can never
-   * enter Promotion Roulette. Every other piece draws from the same deck:
-   * a Queen can become a Pawn, a Rook can become a Bishop, etc.
-   */
   if (portal.effect === "promote") {
     return {
       state: next,
@@ -891,36 +891,97 @@ export function finalizePortalPromotionEvent(
   const next = clonePortalState(state);
 
   next.events.push(event);
-
+  if (event.piece === "k" && event.promotionCard) {
+    if (event.promotionCard === "k") next.loser = event.color;
+    else if (event.promotionCard !== "p") {
+      next.kingPowers ??= {};
+      next.kingPowers[event.color] = { piece: event.promotionCard, movesLeft: 3 };
+    }
+  }
   return next;
 }
 
-function repetitionKey(fen: string): string {
-  return fen.split(" ").slice(0, 4).join(" ");
+export function roulettePositionKey(fen: string, state: PortalState): string {
+  return JSON.stringify([
+    fen.split(" ").slice(0, 4).join(" "),
+    state.portals.map(({ square, effect, revealed, triggerCount, expiresAfterPly }) => [square, effect, revealed, triggerCount, expiresAfterPly]),
+    [state.kingPowers?.w ?? null, state.kingPowers?.b ?? null],
+  ]);
 }
 
-export function isThreefoldPortal(
-  records: PortalMoveRecord[],
-  initialFen: string,
-  currentFen: string,
-): boolean {
+export function isThreefoldPortal(records: PortalMoveRecord[], initialFen: string, currentFen: string): boolean {
   const counts = new Map<string, number>();
-
-  const add = (fen: string) => {
-    const key = repetitionKey(fen);
-
+  const add = (fen: string, state: PortalState) => {
+    const key = roulettePositionKey(fen, state);
     counts.set(key, (counts.get(key) ?? 0) + 1);
   };
-
-  add(initialFen);
-
-  for (const record of records) {
-    add(record.fenAfter);
-  }
-
-  if (records[records.length - 1]?.fenAfter !== currentFen) {
-    add(currentFen);
-  }
-
+  const first = records[0]?.portalBefore;
+  if (!first) return false;
+  add(initialFen, first);
+  for (const record of records) add(record.fenAfter, record.portalAfter);
+  if (records.at(-1)?.fenAfter !== currentFen) add(currentFen, records.at(-1)!.portalAfter);
   return [...counts.values()].some((count) => count >= 3);
+}
+
+/** Keep the real king in the FEN. Its additional movement belongs to variant state. */
+export function applyRouletteCard(game: Chess, square: Square, card: PortalPromotionCard) {
+  const current = game.get(square);
+  if (!current || current.type === "k") return;
+  game.remove(square);
+  if (card !== "k") game.put({ type: card, color: current.color }, square);
+}
+
+function extraKingMove(game: Chess, from: Square, to: Square): Move {
+  const color = game.turn();
+  const captured = game.get(to)?.type;
+  game.remove(from);
+  game.remove(to);
+  game.put({ type: "k", color }, to);
+  const parts = game.fen().split(" ");
+  parts[1] = color === "w" ? "b" : "w";
+  parts[2] = parts[2].replace(color === "w" ? /[KQ]/g : /[kq]/g, "") || "-";
+  parts[3] = "-";
+  parts[4] = captured ? "0" : String(Number(parts[4]) + 1);
+  if (color === "b") parts[5] = String(Number(parts[5]) + 1);
+  game.load(parts.join(" "));
+  return { from, to, color, piece: "k", captured, san: `K${from}${captured ? "x" : "-"}${to}`, flags: captured ? "c" : "n" } as Move;
+}
+
+export function getRouletteMoves(game: Chess, state: PortalState, square?: Square): Move[] {
+  if (state.loser) return [];
+  const color = game.turn();
+  const moves = game.moves({ verbose: true, ...(square ? { square } : {}) }).filter((move) => {
+    if (game.get(move.to)?.type === "k") return false;
+    const next = new Chess(game.fen());
+    next.move(move);
+    // Castling must also cross a square safe from the empowered enemy king.
+    if (move.flags.includes("k") || move.flags.includes("q")) {
+      if (isPortalKingAttacked(game, color, state)) return false;
+      const middle = `${move.flags.includes("k") ? "f" : "d"}${color === "w" ? "1" : "8"}` as Square;
+      const crossing = new Chess(game.fen());
+      crossing.remove(move.from); crossing.put({ type: "k", color }, middle);
+      if (isPortalKingAttacked(crossing, color, state)) return false;
+    }
+    return !isPortalKingAttacked(next, color, state);
+  });
+  const power = state.kingPowers?.[color];
+  const king = game.board().flat().find((p) => p?.type === "k" && p.color === color);
+  if (!king || !power?.movesLeft || (square && square !== king.square)) return moves;
+  for (const file of files) for (let rank = 1; rank <= 8; rank++) {
+    const to = `${file}${rank}` as Square;
+    const target = game.get(to);
+    if (target?.color === color || target?.type === "k" || moves.some((m) => m.from === king.square && m.to === to)) continue;
+    if (!pieceAttacksSquare(game, king.square, { type: power.piece, color }, to)) continue;
+    const next = new Chess(game.fen());
+    const move = extraKingMove(next, king.square, to);
+    if (!isPortalKingAttacked(next, color, state)) moves.push(move);
+  }
+  return moves;
+}
+
+export function moveRoulette(game: Chess, state: PortalState, input: { from: Square; to: Square; promotion?: string }): Move {
+  const move = getRouletteMoves(game, state, input.from).find((m) => m.to === input.to && (!m.promotion || m.promotion === (input.promotion ?? "q")));
+  if (!move) throw new Error("Illegal move");
+  const standard = game.moves({ square: input.from, verbose: true }).some((m) => m.to === input.to);
+  return standard ? game.move(input) : extraKingMove(game, input.from, input.to);
 }

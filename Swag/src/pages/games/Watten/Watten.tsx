@@ -1,9 +1,9 @@
-import { useCallback, useState } from "react";
+import { useAppLanguage } from "@/i18n/languageStore";
+import { useCallback } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, BookOpen, Gamepad2, Users } from "lucide-react";
 
 import {
-  getInitialWattenLanguage,
   setStoredWattenLanguage,
   translateWatten,
   WattenLanguageSelector,
@@ -11,9 +11,7 @@ import {
 } from "@/games/watten/i18n/wattenLanguage";
 
 export default function Watten() {
-  const [language, setLanguage] = useState<WattenLanguage>(
-    getInitialWattenLanguage,
-  );
+  const { language, setLanguage } = useAppLanguage();
 
   const t = useCallback(
     (key: string) => translateWatten(language, key),

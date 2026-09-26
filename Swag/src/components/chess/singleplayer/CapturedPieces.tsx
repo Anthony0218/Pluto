@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import "./ChessBoard.css";
 
 type PieceType = "p" | "n" | "b" | "r" | "q" | "k";
@@ -27,20 +28,17 @@ export default function CapturedPieces({
   capturedWhite,
   capturedBlack,
 }: CapturedPiecesProps) {
+  useUiLanguage();
   return (
     <div className="captured-pieces">
-      <div>
-        Captured White:
-        {capturedWhite.map((piece, index) => (
+      <div>{ui("Captured White:")}{capturedWhite.map((piece, index) => (
           <span key={index}>
             {pieceSymbols[`w${piece}` as keyof typeof pieceSymbols]}
           </span>
         ))}
       </div>
 
-      <div>
-        Captured Black:
-        {capturedBlack.map((piece, index) => (
+      <div>{ui("Captured Black:")}{capturedBlack.map((piece, index) => (
           <span key={index}>
             {pieceSymbols[`b${piece}` as keyof typeof pieceSymbols]}
           </span>

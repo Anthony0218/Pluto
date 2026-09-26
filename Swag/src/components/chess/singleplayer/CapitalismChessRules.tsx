@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { ui, useUiLanguage } from "@/i18n/ui";
+import { useAppLanguage } from "@/i18n/languageStore";
 
 type Language = "en" | "de" | "bar" | "ko" | "ru";
 
@@ -167,25 +168,7 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
   ru: {},
 };
 
-function getInitialLanguage(): Language {
-  if (typeof window === "undefined") {
-    return "en";
-  }
 
-  const stored = window.localStorage.getItem(CHESS_LANGUAGE_STORAGE_KEY);
-
-  if (
-    stored === "en" ||
-    stored === "de" ||
-    stored === "bar" ||
-    stored === "ko" ||
-    stored === "ru"
-  ) {
-    return stored;
-  }
-
-  return "en";
-}
 
 const shopCosts = [
   ["Pawn", "3"],
@@ -196,14 +179,15 @@ const shopCosts = [
 ];
 
 export default function CapitalismChessRules() {
-  const [language, setLanguage] = useState<Language>(getInitialLanguage);
+  useUiLanguage();
+  const { language, setLanguage } = useAppLanguage();
 
   const t = (key: string) => {
     if (language === "en") return key;
     if (language === "bar")
-      return translations.bar[key] ?? translations.de[key] ?? key;
-    if (language === "ru") return translations.ru[key] ?? key;
-    return translations[language][key] ?? key;
+      return translations.bar[key] ?? translations.de[key] ?? ui(key);
+    if (language === "ru") return translations.ru[key] ?? ui(key);
+    return translations[language][key] ?? ui(key);
   };
 
   function changeLanguage(nextLanguage: Language) {
@@ -219,9 +203,7 @@ export default function CapitalismChessRules() {
         <header className="mb-6 rounded-3xl border border-amber-400/15 bg-zinc-900/75 p-6 shadow-xl shadow-black/20">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.25em] text-amber-400">
-                Chess Variant III
-              </p>
+              <p className="text-[10px] font-black uppercase tracking-[0.25em] text-amber-400">{ui("Chess Variant III")}</p>
               <h1 className="mt-2 text-3xl font-black text-white">
                 {t("Capitalism Chess Rulebook")}
               </h1>
@@ -243,9 +225,9 @@ export default function CapitalismChessRules() {
                 }
                 className="rounded-full border border-white/10 bg-zinc-900 px-3 py-2 text-xs font-bold text-zinc-200 outline-none"
               >
-                <option value="en">English</option>
-                <option value="de">Deutsch</option>
-                <option value="bar">Boarisch</option>
+                <option value="en">{ui("English")}</option>
+                <option value="de">{ui("Deutsch")}</option>
+                <option value="bar">{ui("Boarisch")}</option>
                 <option value="ko">한국어</option>
                 <option value="ru">Русский</option>
               </select>
@@ -444,6 +426,7 @@ function RuleSection({
   children: React.ReactNode;
   accent: "amber" | "emerald" | "sky" | "violet" | "blue";
 }) {
+  useUiLanguage();
   const accentClass = {
     amber: "border-amber-400/15",
     emerald: "border-emerald-400/15",
@@ -456,7 +439,7 @@ function RuleSection({
     <section
       className={`mb-4 rounded-3xl border bg-zinc-900/70 p-5 shadow-lg shadow-black/10 ${accentClass}`}
     >
-      <h2 className="text-lg font-black text-white">{title}</h2>
+      <h2 className="text-lg font-black text-white">{ui(title)}</h2>
 
       <div className="mt-4">{children}</div>
     </section>
@@ -464,6 +447,7 @@ function RuleSection({
 }
 
 function RuleParagraph({ children }: { children: React.ReactNode }) {
+  useUiLanguage();
   return (
     <p className="mt-3 text-sm leading-7 text-zinc-400 first:mt-0">
       {children}
@@ -478,6 +462,7 @@ function RuleCallout({
   icon: string;
   children: React.ReactNode;
 }) {
+  useUiLanguage();
   return (
     <div className="mt-4 flex items-center gap-3 rounded-2xl border border-amber-400/10 bg-amber-400/[0.04] px-4 py-3">
       <span className="text-xl font-black text-amber-300">{icon}</span>
@@ -494,6 +479,7 @@ function TwoColumnTable({
   headers: [string, string];
   rows: Array<[string, string]>;
 }) {
+  useUiLanguage();
   return (
     <div className="overflow-hidden rounded-2xl border border-white/5">
       <table className="w-full border-collapse">
@@ -530,10 +516,11 @@ function SpawnCard({
   label: string;
   squares: string;
 }) {
+  useUiLanguage();
   return (
     <div className="rounded-2xl border border-emerald-400/10 bg-emerald-400/[0.04] p-4">
       <p className="text-xs font-black text-zinc-300">
-        {side === "white" ? "♔" : "♚"} {label}
+        {side === "white" ? "♔" : "♚"} {ui(label)}
       </p>
 
       <p className="mt-2 font-mono text-xl font-black text-emerald-300">
@@ -552,6 +539,7 @@ function JourneyMarkerCard({
   title: string;
   symbol: string;
 }) {
+  useUiLanguage();
   return (
     <div
       className={`
@@ -566,7 +554,7 @@ function JourneyMarkerCard({
         }
       `}
     >
-      <p className="text-xs font-black text-zinc-300">{title}</p>
+      <p className="text-xs font-black text-zinc-300">{ui(title)}</p>
 
       <div className="mt-3 flex items-center gap-3">
         <span
@@ -606,10 +594,11 @@ function PowerRule({
   cost: string;
   children: React.ReactNode;
 }) {
+  useUiLanguage();
   return (
     <div className="mb-2 rounded-2xl border border-white/5 bg-black/20 px-4 py-3">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-sm font-black text-zinc-200">{title}</p>
+        <p className="text-sm font-black text-zinc-200">{ui(title)}</p>
 
         <span className="rounded-lg bg-amber-400/10 px-2 py-1 text-xs font-black text-amber-300">
           {cost}

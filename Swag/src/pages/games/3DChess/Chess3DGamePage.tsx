@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Chess, type Move } from "chess.js";
 
@@ -37,6 +38,7 @@ export default function Chess3DGamePage({
   mode,
   difficulty = "medium",
 }: Props) {
+  useUiLanguage();
   const [fen, setFen] = useState(SWAPPED_KING_QUEEN_START_FEN);
   const [resetToken, setResetToken] = useState(0);
   const [fenHistory, setFenHistory] = useState<string[]>([
@@ -253,20 +255,14 @@ export default function Chess3DGamePage({
       <div className="mx-auto max-w-[1400px]">
         <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.28em] text-sky-400">
-              3D Chess
-            </p>
+            <p className="text-xs font-black uppercase tracking-[0.28em] text-sky-400">{ui("3D Chess")}</p>
 
             <h1 className="mt-2 text-3xl font-black text-white">
-              {isAiMode
-                ? `Vs Stockfish · ${difficultyConfig.label}`
-                : "Hotseat"}
+              {isAiMode ? `Vs Stockfish · ${difficultyConfig.label}` : ui("Hotseat")}
             </h1>
 
             <p className="mt-2 text-sm text-zinc-500">
-              {isAiMode
-                ? "You play White. Stockfish controls Black."
-                : "Two players share the same board locally."}
+              {isAiMode ? ui("You play White. Stockfish controls Black.") : ui("Two players share the same board locally.")}
             </p>
           </div>
 
@@ -276,39 +272,31 @@ export default function Chess3DGamePage({
               onClick={undoGame}
               disabled={fenHistory.length <= 1 || stockfishThinking}
               className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-black text-zinc-300 transition hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              ↶ Undo
-            </button>
+            >{ui("↶ Undo")}</button>
 
             <button
               type="button"
               onClick={resetGame}
               className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-black text-zinc-300 transition hover:bg-white/10 hover:text-white"
-            >
-              ↺ Reset
-            </button>
+            >{ui("↺ Reset")}</button>
           </div>
         </div>
 
         <div className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl border border-white/10 bg-zinc-900/60 px-4 py-3">
-          <span className="text-xs font-black uppercase tracking-widest text-zinc-500">
-            Status
-          </span>
+          <span className="text-xs font-black uppercase tracking-widest text-zinc-500">{ui("Status")}</span>
 
           <span className="rounded-lg bg-white/5 px-3 py-1.5 text-sm font-black text-white">
             {statusText}
           </span>
 
           {game.isCheck() && !game.isCheckmate() && (
-            <span className="rounded-lg border border-red-400/20 bg-red-400/10 px-3 py-1.5 text-xs font-black text-red-200">
-              Check
-            </span>
+            <span className="rounded-lg border border-red-400/20 bg-red-400/10 px-3 py-1.5 text-xs font-black text-red-200">{ui("Check")}</span>
           )}
 
           {isAiMode && (
             <>
               <span className="rounded-lg border border-violet-400/20 bg-violet-400/10 px-3 py-1.5 text-xs font-black text-violet-200">
-                {difficultyConfig.label}
+                {ui(difficultyConfig.label)}
               </span>
 
               <span
@@ -318,7 +306,7 @@ export default function Chess3DGamePage({
                     : "border-amber-400/20 bg-amber-400/10 text-amber-200"
                 }`}
               >
-                {stockfishReady ? "Stockfish ready" : "Engine loading"}
+                {stockfishReady ? ui("Stockfish ready") : ui("Engine loading")}
               </span>
             </>
           )}
@@ -326,9 +314,7 @@ export default function Chess3DGamePage({
 
         <div className="mb-4 grid gap-3 lg:grid-cols-2">
           <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-3">
-            <div className="mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
-              Camera
-            </div>
+            <div className="mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">{ui("Camera")}</div>
 
             <div className="flex flex-wrap gap-2">
               {CHESS_3D_CAMERA_PRESETS.map((preset) => (
@@ -342,16 +328,14 @@ export default function Chess3DGamePage({
                       : "border-white/10 bg-white/[0.04] text-zinc-400 hover:bg-white/[0.08] hover:text-white"
                   }`}
                 >
-                  {preset.label}
+                  {ui(preset.label)}
                 </button>
               ))}
             </div>
           </section>
 
           <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-3">
-            <div className="mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
-              Piece skin
-            </div>
+            <div className="mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">{ui("Piece skin")}</div>
 
             <div className="flex flex-wrap gap-2">
               {CHESS_3D_SKINS.map((skin) => (
@@ -366,7 +350,7 @@ export default function Chess3DGamePage({
                       : "border-white/10 bg-white/[0.04] text-zinc-400 hover:bg-white/[0.08] hover:text-white"
                   }`}
                 >
-                  {skin.label}
+                  {ui(skin.label)}
                 </button>
               ))}
             </div>

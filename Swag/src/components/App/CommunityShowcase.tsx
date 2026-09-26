@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { Link } from "react-router-dom";
 import { Target, Users } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
@@ -5,6 +6,7 @@ import { useDashboardData } from "../../hooks/useDashboardData";
 import FriendAvatar from "../social/FriendAvatar";
 
 export default function CommunityShowcase() {
+  useUiLanguage();
   const { user } = useAuth();
   const { activity, friends, onlineIds, loading, friendsError } =
     useDashboardData();
@@ -18,11 +20,9 @@ export default function CommunityShowcase() {
     <div className="grid gap-3 sm:grid-cols-2">
       <div className={card}>
         <Target size={24} className="text-indigo-300" />
-        <h3 className="mt-5 font-semibold">Daily Challenge</h3>
+        <h3 className="mt-5 font-semibold">{ui("Daily Challenge")}</h3>
         <p className="mt-2 text-sm text-zinc-400">
-          {loading
-            ? "Loading challenge…"
-            : challenge?.title ||
+          {loading ? ui("Loading challenge…") : challenge?.title ||
               (user
                 ? "Check your dashboard for daily challenges."
                 : "Log in to track your daily goal.")}
@@ -30,7 +30,7 @@ export default function CommunityShowcase() {
         {challenge && (
           <div className="mt-4">
             <progress
-              aria-label="Daily challenge progress"
+              aria-label={ui("Daily challenge progress")}
               value={Math.min(challenge.progress, challenge.target)}
               max={challenge.target}
               className="h-2 w-full accent-indigo-500"
@@ -44,39 +44,23 @@ export default function CommunityShowcase() {
         <Link
           to="/dashboard"
           className="mt-5 inline-block text-sm text-indigo-300"
-        >
-          View your challenge →
-        </Link>
+        >{ui("View your challenge →")}</Link>
       </div>
       <div className={card}>
         <Users size={24} className="text-indigo-300" />
-        <h3 className="mt-5 font-semibold">Play with friends</h3>
-        <p className="mt-2 text-sm text-zinc-400">
-          Create a multiplayer room and share its code in your friend chat.
-        </p>
+        <h3 className="mt-5 font-semibold">{ui("Play with friends")}</h3>
+        <p className="mt-2 text-sm text-zinc-400">{ui("Create a multiplayer room and share its code in your friend chat.")}</p>
         <Link
           to="/friends"
           className="mt-5 inline-block text-sm text-indigo-300"
-        >
-          Open friends →
-        </Link>
+        >{ui("Open friends →")}</Link>
       </div>
       <div className={`${card} sm:col-span-2`}>
-        <h3 className="font-semibold">
-          Friends online
-          {user && !loading && !friendsError
-            ? ` (${onlineFriends.length})`
-            : ""}
+        <h3 className="font-semibold">{ui("Friends online")}{user && !loading && !friendsError ? ` (${onlineFriends.length})` : ""}
         </h3>
         {loading || friendsError || !onlineFriends.length ? (
           <p className="mt-3 text-sm text-zinc-400">
-            {loading
-              ? "Loading friends…"
-              : friendsError
-                ? "Online status is temporarily unavailable."
-                : !user
-                  ? "Log in to connect with friends."
-                  : "No friends online right now."}
+            {loading ? ui("Loading friends…") : friendsError ? ui("Online status is temporarily unavailable.") : !user ? ui("Log in to connect with friends.") : ui("No friends online right now.")}
           </p>
         ) : (
           <div className="mt-4 space-y-3">
@@ -91,9 +75,9 @@ export default function CommunityShowcase() {
                   <p className="truncate text-sm font-semibold">
                     {friend.username || friend.display_name || "Player"}
                   </p>
-                  <p className="text-xs text-emerald-400">Online</p>
+                  <p className="text-xs text-emerald-400">{ui("Online")}</p>
                 </div>
-                <span className="text-sm text-indigo-300">Chat →</span>
+                <span className="text-sm text-indigo-300">{ui("Chat →")}</span>
               </Link>
             ))}
           </div>

@@ -1,9 +1,11 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { gameList } from "../../data/games";
 
 export default function PlayShowcase() {
+  useUiLanguage();
   const visibleGames = gameList.slice(0, 4);
 
   return (
@@ -94,7 +96,7 @@ export default function PlayShowcase() {
                       text-zinc-400
                     "
                   >
-                    {visibleGames[0].description}
+                    {ui(visibleGames[0].description)}
                   </p>
                 </div>
 
@@ -168,9 +170,7 @@ export default function PlayShowcase() {
             px-2 py-2
           "
         >
-          <p className="text-xs text-zinc-600">
-            Classic games, variants and more.
-          </p>
+          <p className="text-xs text-zinc-600">{ui("Classic games, variants and more.")}</p>
 
           <Link
             to="/games"
@@ -180,9 +180,7 @@ export default function PlayShowcase() {
               transition
               hover:text-indigo-200
             "
-          >
-            All games →
-          </Link>
+          >{ui("All games →")}</Link>
         </div>
       </div>
     </div>

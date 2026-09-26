@@ -1,9 +1,11 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { ArrowRight, BookOpen, Gamepad2, Target, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import FriendAvatar from "../social/FriendAvatar";
 
 export default function VisitPlutoPreview() {
+  useUiLanguage();
   const { user, profile } = useAuth();
   return (
     <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#080d1d]/90 shadow-2xl shadow-black/50 backdrop-blur-xl">
@@ -18,7 +20,7 @@ export default function VisitPlutoPreview() {
             {profile?.username || profile?.display_name || "Pluto"}
           </p>
           <p className="mt-1 text-xs text-zinc-400">
-            {user ? "Your dashboard" : "Your place to play and learn"}
+            {user ? ui("Your dashboard") : ui("Your place to play and learn")}
           </p>
         </div>
       </div>
@@ -37,15 +39,13 @@ export default function VisitPlutoPreview() {
                 <p className="font-bold text-white">
                   {value?.toLocaleString() ?? "—"}
                 </p>
-                <p className="mt-1 text-xs text-zinc-400">{label}</p>
+                <p className="mt-1 text-xs text-zinc-400">{ui(label)}</p>
               </div>
             ))}
           </div>
         ) : (
           <p className="mb-4 text-sm text-zinc-400">
-            {user
-              ? "Your profile stats are currently unavailable."
-              : "Log in to keep your profile, game activity and friends together."}
+            {user ? ui("Your profile stats are currently unavailable.") : ui("Log in to keep your profile, game activity and friends together.")}
           </p>
         )}
         <div className="space-y-3">
@@ -82,8 +82,8 @@ export default function VisitPlutoPreview() {
             >
               <Icon className="shrink-0 text-indigo-300" size={22} />
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold">{title}</p>
-                <p className="mt-1 text-xs text-zinc-400">{description}</p>
+                <p className="text-sm font-semibold">{ui(title)}</p>
+                <p className="mt-1 text-xs text-zinc-400">{ui(description)}</p>
               </div>
               <ArrowRight size={16} className="text-zinc-400" />
             </Link>
@@ -91,15 +91,11 @@ export default function VisitPlutoPreview() {
         </div>
       </div>
       <div className="flex items-center justify-between gap-4 border-t border-white/10 px-5 py-4">
-        <p className="text-xs text-zinc-400">
-          Your games, learning and progress.
-        </p>
+        <p className="text-xs text-zinc-400">{ui("Your games, learning and progress.")}</p>
         <Link
           to="/dashboard"
           className="shrink-0 rounded-xl bg-indigo-500 px-4 py-2.5 text-xs font-semibold text-white hover:bg-indigo-400"
-        >
-          Open Pluto
-        </Link>
+        >{ui("Open Pluto")}</Link>
       </div>
     </div>
   );

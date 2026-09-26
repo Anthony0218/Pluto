@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { ArrowRight, ChevronLeft, ChevronRight, Gamepad2 } from "lucide-react";
 
 import { useEffect, useState } from "react";
@@ -7,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { games } from "../../data/games";
 
 export default function DashboardPlayCarousel() {
+  useUiLanguage();
   const navigate = useNavigate();
 
   const [currentGame, setCurrentGame] = useState(0);
@@ -45,7 +47,7 @@ export default function DashboardPlayCarousel() {
 
   return (
     <section
-      aria-label="Available games"
+      aria-label={ui("Available games")}
       aria-roledescription="carousel"
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={(event) => {
@@ -174,9 +176,7 @@ export default function DashboardPlayCarousel() {
                     tracking-[0.2em]
                     text-indigo-300
                   "
-                >
-                  Play
-                </span>
+                >{ui("Play")}</span>
               </div>
 
               <p
@@ -186,7 +186,7 @@ export default function DashboardPlayCarousel() {
                   text-zinc-400
                 "
               >
-                {item.subtitle}
+                {ui(item.subtitle)}
               </p>
 
               <h2
@@ -201,7 +201,7 @@ export default function DashboardPlayCarousel() {
                   sm:text-5xl
                 "
               >
-                {item.title}
+                {ui(item.title)}
               </h2>
 
               <p
@@ -215,7 +215,7 @@ export default function DashboardPlayCarousel() {
                   sm:text-base
                 "
               >
-                {item.description}
+                {ui(item.description)}
               </p>
 
               {/* FEATURES */}
@@ -280,8 +280,7 @@ export default function DashboardPlayCarousel() {
 
                   active:scale-[0.98]
                 "
-              >
-                Play {item.title}
+              >{ui("Play")}{ui(item.title)}
                 <ArrowRight
                   size={16}
                   className="
@@ -302,7 +301,7 @@ export default function DashboardPlayCarousel() {
       <button
         type="button"
         onClick={previous}
-        aria-label="Previous game"
+        aria-label={ui("Previous game")}
         className="
           absolute
           left-4
@@ -345,7 +344,7 @@ export default function DashboardPlayCarousel() {
       <button
         type="button"
         onClick={next}
-        aria-label="Next game"
+        aria-label={ui("Next game")}
         className="
           absolute
           right-4

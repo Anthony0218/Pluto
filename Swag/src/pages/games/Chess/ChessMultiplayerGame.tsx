@@ -1,3 +1,5 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
+import { useAppLanguage } from "@/i18n/languageStore";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Link, useParams } from "react-router-dom";
@@ -671,21 +673,15 @@ const russianTranslations: Record<string, string> = {
   "Black in check": "Чёрные под шахом",
 };
 
-function getInitialChessLanguage(): Language {
-  if (typeof window === "undefined") return "en";
-  const stored = window.localStorage.getItem("chess-language");
-  return languageOptions.some((option) => option.value === stored)
-    ? (stored as Language)
-    : "en";
-}
+
 
 function translateChess(language: Language, key: string): string {
   if (language === "en") return key;
-  if (language === "de") return deTranslations[key] ?? key;
+  if (language === "de") return deTranslations[key] ?? ui(key);
   if (language === "bar")
-    return bavarianTranslations[key] ?? deTranslations[key] ?? key;
-  if (language === "ko") return koreanTranslations[key] ?? key;
-  return russianTranslations[key] ?? key;
+    return bavarianTranslations[key] ?? deTranslations[key] ?? ui(key);
+  if (language === "ko") return koreanTranslations[key] ?? ui(key);
+  return russianTranslations[key] ?? ui(key);
 }
 
 function ChessLanguageSelector({
@@ -697,6 +693,7 @@ function ChessLanguageSelector({
   onChange: (language: Language) => void;
   label: string;
 }) {
+  useUiLanguage();
   return (
     <label
       className="
@@ -715,7 +712,7 @@ function ChessLanguageSelector({
       "
     >
       <span>🌐</span>
-      <span className="hidden lg:inline">{label}</span>
+      <span className="hidden lg:inline">{ui(label)}</span>
       <select
         value={language}
         onChange={(event) => onChange(event.target.value as Language)}
@@ -735,7 +732,7 @@ function ChessLanguageSelector({
             value={option.value}
             className="bg-zinc-900 text-zinc-100"
           >
-            {option.label}
+            {ui(option.label)}
           </option>
         ))}
       </select>
@@ -824,11 +821,12 @@ function getGameOutcome(game: Chess): GameOutcome {
 }
 
 export default function ChessMultiplayerGame() {
+  useUiLanguage();
   const { roomCode } = useParams();
 
   const { user, profile } = useAuth();
 
-  const [language, setLanguage] = useState<Language>(getInitialChessLanguage);
+  const { language, setLanguage } = useAppLanguage();
   const t = (key: string) => translateChess(language, key);
 
   function changeLanguage(nextLanguage: Language) {
@@ -2206,9 +2204,7 @@ export default function ChessMultiplayerGame() {
           bg-zinc-950
           text-zinc-400
         "
-      >
-        Loading multiplayer game...
-      </main>
+      >{ui("Loading multiplayer game...")}</main>
     );
   }
 
@@ -2518,7 +2514,7 @@ export default function ChessMultiplayerGame() {
           gap-4
           xl:h-[calc(100%-2.75rem)]
           xl:min-h-0
-          xl:grid-cols-[minmax(260px,19vw)_minmax(0,1fr)_minmax(260px,19vw)]
+          chess-game-grid classic-game-grid xl:grid-cols-[minmax(260px,19vw)_minmax(0,1fr)_minmax(260px,19vw)]
         "
         >
           {/* =========================================================
@@ -2678,7 +2674,7 @@ export default function ChessMultiplayerGame() {
                     </p>
                   </div>
                   <span className="rounded-lg border border-amber-400/20 bg-amber-400/10 px-3 py-1.5 text-xs font-black text-amber-300">
-                    {pieceValuesOpen ? "Hide" : "Show"}
+                    {pieceValuesOpen ? ui("Hide") : ui("Show")}
                   </span>
                 </button>
                 {pieceValuesOpen && (
@@ -2704,11 +2700,7 @@ export default function ChessMultiplayerGame() {
                       ))}
                     </div>
                     <div className="mt-3 rounded-xl bg-black/20 px-3 py-2 text-right text-xs font-bold text-zinc-400">
-                      {materialState.materialDifference === 0
-                        ? t("Equal")
-                        : materialState.materialDifference > 0
-                          ? `${t("White")} +${materialState.materialDifference}`
-                          : `${t("Black")} +${Math.abs(materialState.materialDifference)}`}
+                      {materialState.materialDifference === 0 ? t("Equal") : materialState.materialDifference > 0 ? `${t("White")} +${materialState.materialDifference}` : `${t("Black")} +${Math.abs(materialState.materialDifference)}`}
                     </div>
                   </div>
                 )}
@@ -2734,7 +2726,7 @@ export default function ChessMultiplayerGame() {
                       {savedGames.length}
                     </span>
                     <span className="rounded-lg border border-amber-400/20 bg-amber-400/10 px-3 py-1.5 text-xs font-black text-amber-300">
-                      {savedGamesOpen ? "Hide" : "Show"}
+                      {savedGamesOpen ? ui("Hide") : ui("Show")}
                     </span>
                   </div>
                 </button>
@@ -2774,7 +2766,7 @@ export default function ChessMultiplayerGame() {
                               </p>
                               <p className="mt-1 truncate text-[10px] text-zinc-600">
                                 {savedGame.white_player || t("White")}{" "}
-                                <span className="px-1 text-zinc-700">vs</span>{" "}
+                                <span className="px-1 text-zinc-700">{ui("vs")}</span>{" "}
                                 {savedGame.black_player || t("Black")}
                               </p>
                             </div>
@@ -2898,9 +2890,7 @@ export default function ChessMultiplayerGame() {
                       {t("Connected")}
                     </p>
 
-                    <p className="mt-0.5 text-[11px] text-zinc-500">
-                      Supabase Realtime
-                    </p>
+                    <p className="mt-0.5 text-[11px] text-zinc-500">{ui("Supabase Realtime")}</p>
                   </div>
                 </div>
               </section>
@@ -2912,7 +2902,7 @@ export default function ChessMultiplayerGame() {
            ========================================================= */}
 
           <section className="order-1 min-w-0 xl:order-2 xl:h-full xl:min-h-0">
-            <div className="mx-auto w-full max-w-[820px] xl:flex xl:h-full xl:min-h-0 xl:max-w-[min(820px,calc(100dvh-23rem))] xl:flex-col">
+            <div className="mx-auto w-full max-w-[820px] xl:flex xl:h-full xl:min-h-0 xl:max-w-none xl:flex-col">
               <section className="mb-2 shrink-0 rounded-2xl border border-amber-400/30 bg-[#08111c]/90 px-4 py-2.5 text-center shadow-[0_0_40px_rgba(245,158,11,0.08)] backdrop-blur-xl">
                 <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-400">
                   {t("Classic Chess")}
@@ -2945,7 +2935,7 @@ export default function ChessMultiplayerGame() {
                   text-red-300
                 "
                 >
-                  {error}
+                  {ui(error)}
                 </div>
               )}
 
@@ -2997,7 +2987,7 @@ export default function ChessMultiplayerGame() {
                 event={multiplayerMatchStatus.event}
                 message={multiplayerMatchStatus.message}
                 detail={multiplayerMatchStatus.detail}
-                label="Match status"
+                label={ui("Match status")}
                 className="mb-2"
                 effects={[
                   {
@@ -3142,9 +3132,7 @@ export default function ChessMultiplayerGame() {
                       {index === 0 && (
                         <div className="flex items-center gap-2 px-2">
                           <span className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-white/20" />
-                          <span className="rounded-full border border-amber-400/15 bg-amber-400/[0.06] px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-amber-200/75">
-                            VS
-                          </span>
+                          <span className="rounded-full border border-amber-400/15 bg-amber-400/[0.06] px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-amber-200/75">{ui("VS")}</span>
                           <span className="h-px flex-1 bg-gradient-to-l from-transparent via-white/10 to-white/20" />
                         </div>
                       )}
@@ -3214,13 +3202,11 @@ export default function ChessMultiplayerGame() {
                           </div>
 
                           <span className="rounded-lg bg-white/5 px-2 py-1 text-[10px] font-bold text-zinc-500">
-                            {myPlayer?.chosen_color
-                              ? `${t("Chosen")}: ${
+                            {myPlayer?.chosen_color ? `${t("Chosen")}: ${
                                   myPlayer.chosen_color === "white"
                                     ? t("White")
                                     : t("Black")
-                                }`
-                              : `${t("Current")}: ${
+                                }` : `${t("Current")}: ${
                                   mySeat === 0 ? t("White") : t("Black")
                                 }`}
                           </span>
@@ -3316,16 +3302,12 @@ export default function ChessMultiplayerGame() {
                           disabled:opacity-40
                         "
                         >
-                          {actionLoading === "undo-request"
-                            ? t("Undo request sent")
-                            : t("Undo Move")}
+                          {actionLoading === "undo-request" ? t("Undo request sent") : t("Undo Move")}
                         </button>
 
                         {!canRequestUndo && gameState.moves.length > 0 && (
                           <p className="px-1 text-center text-[10px] leading-4 text-zinc-600">
-                            {alreadyRequestedUndoForCurrentMove
-                              ? t("You already requested undo for this move.")
-                              : t(
+                            {alreadyRequestedUndoForCurrentMove ? t("You already requested undo for this move.") : t(
                                   "Only the player who made the last move can request undo.",
                                 )}
                           </p>
@@ -3757,7 +3739,7 @@ export default function ChessMultiplayerGame() {
                       {savedGames.length}
                     </span>
                     <span className="rounded-lg border border-amber-400/20 bg-amber-400/10 px-3 py-1.5 text-xs font-black text-amber-300">
-                      {savedGamesOpen ? "Hide" : "Show"}
+                      {savedGamesOpen ? ui("Hide") : ui("Show")}
                     </span>
                   </div>
                 </button>
@@ -3797,7 +3779,7 @@ export default function ChessMultiplayerGame() {
                               </p>
                               <p className="mt-1 truncate text-[10px] text-zinc-600">
                                 {savedGame.white_player || t("White")}{" "}
-                                <span className="px-1 text-zinc-700">vs</span>{" "}
+                                <span className="px-1 text-zinc-700">{ui("vs")}</span>{" "}
                                 {savedGame.black_player || t("Black")}
                               </p>
                             </div>
@@ -3949,6 +3931,7 @@ function CapturedPiecesGrid({
   capturedWhite: PieceType[];
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   const symbols: Record<"white" | "black", Record<PieceType, string>> = {
     white: {
       p: "♙",
@@ -4071,6 +4054,7 @@ function PlayerBar({
   me?: boolean;
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   return (
     <div
       className={`

@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Chess, type Square } from "chess.js";
@@ -226,15 +227,17 @@ function Panel({
   title: string;
   children: React.ReactNode;
 }) {
+  useUiLanguage();
   return (
     <section className="rounded-3xl border border-white/5 bg-zinc-900/75 p-4 shadow-xl shadow-black/20">
-      <h2 className="font-black text-zinc-100">{title}</h2>
+      <h2 className="font-black text-zinc-100">{ui(title)}</h2>
       <div className="mt-4">{children}</div>
     </section>
   );
 }
 
 export function CollapseMultiplayerLobby() {
+  useUiLanguage();
   const navigate = useNavigate();
   const { user, profile } = useAuth();
   const [displayName, setDisplayName] = useState(
@@ -242,7 +245,7 @@ export function CollapseMultiplayerLobby() {
   );
   const [hostColor, setHostColor] = useState<PlayerColor>("white");
   const [collapseMode, setCollapseMode] = useState<CollapseMode>("squares");
-  const [joinCode, setJoinCode] = useState("");
+  const [joinCode, setJoinCode] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
   const [busy, setBusy] = useState<"create" | "join" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -298,7 +301,7 @@ export function CollapseMultiplayerLobby() {
   }
 
   return (
-    <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100">
+    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-8 text-zinc-100">
       <div className="mx-auto max-w-3xl">
         <div className="rounded-[32px] border border-red-400/15 bg-zinc-900/80 p-6 shadow-2xl shadow-black/30">
           <div className="flex items-center gap-4">
@@ -306,19 +309,13 @@ export function CollapseMultiplayerLobby() {
               ⚠
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-red-400">
-                Multiplayer Variant
-              </p>
-              <h1 className="mt-1 text-3xl font-black">Chess Collapse</h1>
-              <p className="mt-1 text-sm text-zinc-500">
-                The same battlefield collapses for both players.
-              </p>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-red-400">{ui("Multiplayer Variant")}</p>
+              <h1 className="mt-1 text-3xl font-black">{ui("Chess Collapse")}</h1>
+              <p className="mt-1 text-sm text-zinc-500">{ui("The same battlefield collapses for both players.")}</p>
             </div>
           </div>
 
-          <label className="mt-8 block text-xs font-black uppercase tracking-wider text-zinc-500">
-            Display name
-          </label>
+          <label className="mt-8 block text-xs font-black uppercase tracking-wider text-zinc-500">{ui("Display name")}</label>
           <input
             value={displayName}
             onChange={(event) => setDisplayName(event.target.value)}
@@ -327,16 +324,14 @@ export function CollapseMultiplayerLobby() {
 
           {error && (
             <div className="mt-4 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200">
-              {error}
+              {ui(error)}
             </div>
           )}
 
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <section className="rounded-2xl border border-white/5 bg-black/20 p-4">
-              <h2 className="font-black">Create room</h2>
-              <p className="mt-1 text-xs text-zinc-500">
-                Choose your starting color.
-              </p>
+              <h2 className="font-black">{ui("Create room")}</h2>
+              <p className="mt-1 text-xs text-zinc-500">{ui("Choose your starting color.")}</p>
               <div className="mt-4 grid grid-cols-2 gap-2">
                 {(["white", "black"] as PlayerColor[]).map((color) => (
                   <button
@@ -345,14 +340,12 @@ export function CollapseMultiplayerLobby() {
                     onClick={() => setHostColor(color)}
                     className={`rounded-xl border px-3 py-3 text-sm font-black ${hostColor === color ? "border-red-300/30 bg-red-400/15 text-red-100" : "border-white/10 bg-white/5 text-zinc-400"}`}
                   >
-                    {color === "white" ? "♔ White" : "♚ Black"}
+                    {color === "white" ? ui("♔ White") : ui("♚ Black")}
                   </button>
                 ))}
               </div>
 
-              <p className="mt-4 text-[10px] font-black uppercase tracking-wider text-zinc-500">
-                Collapse mode
-              </p>
+              <p className="mt-4 text-[10px] font-black uppercase tracking-wider text-zinc-500">{ui("Collapse mode")}</p>
               <div className="mt-2 grid grid-cols-2 gap-2">
                 {(
                   [
@@ -370,7 +363,7 @@ export function CollapseMultiplayerLobby() {
                         : "border-white/10 bg-white/5 text-zinc-500"
                     }`}
                   >
-                    {label}
+                    {ui(label)}
                   </button>
                 ))}
               </div>
@@ -381,21 +374,19 @@ export function CollapseMultiplayerLobby() {
                 disabled={busy !== null}
                 className="mt-4 w-full rounded-xl bg-red-400 px-4 py-3 font-black text-red-950 disabled:opacity-50"
               >
-                {busy === "create" ? "Creating..." : "Create Collapse room"}
+                {busy === "create" ? ui("Creating...") : ui("Create Collapse room")}
               </button>
             </section>
 
             <section className="rounded-2xl border border-white/5 bg-black/20 p-4">
-              <h2 className="font-black">Join room</h2>
-              <p className="mt-1 text-xs text-zinc-500">
-                Enter the room code from the other player.
-              </p>
+              <h2 className="font-black">{ui("Join room")}</h2>
+              <p className="mt-1 text-xs text-zinc-500">{ui("Enter the room code from the other player.")}</p>
               <input
                 value={joinCode}
                 onChange={(event) =>
                   setJoinCode(event.target.value.toUpperCase())
                 }
-                placeholder="ROOM CODE"
+                placeholder={ui("ROOM CODE")}
                 className="mt-4 w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 font-mono uppercase tracking-widest outline-none focus:border-red-400/40"
               />
               <button
@@ -404,7 +395,7 @@ export function CollapseMultiplayerLobby() {
                 disabled={busy !== null || !joinCode.trim()}
                 className="mt-4 w-full rounded-xl border border-red-300/20 bg-red-400/10 px-4 py-3 font-black text-red-200 disabled:opacity-50"
               >
-                {busy === "join" ? "Joining..." : "Join room"}
+                {busy === "join" ? ui("Joining...") : ui("Join room")}
               </button>
             </section>
           </div>
@@ -415,6 +406,7 @@ export function CollapseMultiplayerLobby() {
 }
 
 export function CollapseMultiplayerGame() {
+  useUiLanguage();
   const { roomCode = "" } = useParams();
   const { user } = useAuth();
 
@@ -926,10 +918,10 @@ export function CollapseMultiplayerGame() {
     !displayedLives
   ) {
     return (
-      <main className="min-h-screen bg-transparent p-8 text-zinc-100">
+      <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent p-8 text-zinc-100">
         <div className="mx-auto max-w-xl rounded-3xl border border-white/10 bg-zinc-900 p-6">
-          <p className="font-black">Loading Collapse room…</p>
-          {error && <p className="mt-3 text-sm text-red-300">{error}</p>}
+          <p className="font-black">{ui("Loading Collapse room…")}</p>
+          {error && <p className="mt-3 text-sm text-red-300">{ui(error)}</p>}
         </div>
       </main>
     );
@@ -974,7 +966,7 @@ export function CollapseMultiplayerGame() {
       : `Next warning in ${displayedCollapse.movesUntilWarning}`;
 
   return (
-    <main className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
+    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1460px]">
         <header className="mb-6 flex flex-col gap-4 rounded-3xl border border-red-400/10 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
@@ -982,54 +974,43 @@ export function CollapseMultiplayerGame() {
               ⚠
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-red-400">
-                Multiplayer Variant
-              </p>
-              <h1 className="text-2xl font-black">Chess Collapse</h1>
-              <p className="text-sm text-zinc-500">
-                Room <span className="font-mono">{room.code}</span>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-red-400">{ui("Multiplayer Variant")}</p>
+              <h1 className="text-2xl font-black">{ui("Chess Collapse")}</h1>
+              <p className="text-sm text-zinc-500">{ui("Room")}<span className="font-mono">{room.code}</span>
               </p>
             </div>
           </div>
           <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-2 text-sm">
-            {gameState.status === "waiting"
-              ? "Waiting for opponent…"
-              : gameState.status === "finished"
-                ? "Game finished"
-                : canMove
-                  ? "Your turn"
-                  : "Opponent's turn"}
+            {gameState.status === "waiting" ? ui("Waiting for opponent…") : gameState.status === "finished" ? ui("Game finished") : canMove ? ui("Your turn") : ui("Opponent's turn")}
           </div>
         </header>
 
         {error && (
           <div className="mb-4 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200">
-            {error}
+            {ui(error)}
           </div>
         )}
 
-        <div className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
+        <div className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="space-y-4">
-            <Panel title="Players">
+            <Panel title={ui("Players")}>
               <div className="space-y-2 text-sm">
                 <div className="rounded-xl bg-white/5 p-3">
                   <p className="font-black">
                     {me.display_name} · {myColor}
                   </p>
-                  <p className="text-xs text-zinc-500">You</p>
+                  <p className="text-xs text-zinc-500">{ui("You")}</p>
                 </div>
                 <div className="rounded-xl bg-white/5 p-3">
                   <p className="font-black">
-                    {opponent
-                      ? `${opponent.display_name} · ${opponent.chosen_color}`
-                      : "Waiting…"}
+                    {opponent ? `${opponent.display_name} · ${opponent.chosen_color}` : ui("Waiting…")}
                   </p>
-                  <p className="text-xs text-zinc-500">Opponent</p>
+                  <p className="text-xs text-zinc-500">{ui("Opponent")}</p>
                 </div>
               </div>
             </Panel>
 
-            <Panel title="Actions">
+            <Panel title={ui("Actions")}>
               <div className="grid gap-2">
                 <button
                   type="button"
@@ -1041,9 +1022,7 @@ export function CollapseMultiplayerGame() {
                     Boolean(actionBusy)
                   }
                   className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm font-black disabled:opacity-40"
-                >
-                  ↶ Request Undo
-                </button>
+                >{ui("↶ Request Undo")}</button>
                 <button
                   type="button"
                   onClick={resign}
@@ -1051,24 +1030,18 @@ export function CollapseMultiplayerGame() {
                     gameState.status !== "playing" || Boolean(actionBusy)
                   }
                   className="rounded-xl border border-red-400/15 bg-red-400/[0.06] px-3 py-2.5 text-sm font-black text-red-300 disabled:opacity-40"
-                >
-                  Resign
-                </button>
+                >{ui("Resign")}</button>
                 <Link
                   to="/games/chess/variants/collapse/multiplayer"
                   className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-center text-sm font-black text-zinc-300"
-                >
-                  Leave room
-                </Link>
+                >{ui("Leave room")}</Link>
               </div>
             </Panel>
 
-            <Panel title="Move History">
+            <Panel title={ui("Move History")}>
               <div className="max-h-80 overflow-y-auto rounded-xl border border-white/5 bg-black/20">
                 {state.records.length === 0 ? (
-                  <p className="px-4 py-7 text-center text-xs text-zinc-600">
-                    No moves yet
-                  </p>
+                  <p className="px-4 py-7 text-center text-xs text-zinc-600">{ui("No moves yet")}</p>
                 ) : (
                   state.records.map((record) => (
                     <button
@@ -1086,9 +1059,7 @@ export function CollapseMultiplayerGame() {
                         {record.color === "w" ? "." : "..."} {record.san}
                       </span>
                       <span>
-                        {record.collapseAfter.lastImpactSquares.length > 0
-                          ? "💥"
-                          : ""}
+                        {record.collapseAfter.lastImpactSquares.length > 0 ? "💥" : ""}
                         {record.kingHits.length > 0 ? "♥−" : ""}
                         {record.trappedKings.length > 0 ? "☠" : ""}
                       </span>
@@ -1103,20 +1074,15 @@ export function CollapseMultiplayerGame() {
             {historyPreviewPly !== null && (
               <div className="mb-3 flex items-center justify-between rounded-xl border border-red-400/20 bg-red-400/[0.07] px-4 py-3">
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-wider text-red-300">
-                    History Preview
-                  </p>
-                  <p className="text-sm text-zinc-400">
-                    Position after move {historyPreviewPly}
+                  <p className="text-[10px] font-black uppercase tracking-wider text-red-300">{ui("History Preview")}</p>
+                  <p className="text-sm text-zinc-400">{ui("Position after move")}{historyPreviewPly}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setHistoryPreviewPly(null)}
                   className="rounded-lg bg-white/10 px-3 py-2 text-xs font-black"
-                >
-                  Back to live board
-                </button>
+                >{ui("Back to live board")}</button>
               </div>
             )}
 
@@ -1155,27 +1121,19 @@ export function CollapseMultiplayerGame() {
                     type="button"
                     onClick={() => void copyRoomCode()}
                     className="w-full max-w-lg rounded-[30px] border border-white/15 bg-zinc-900/95 px-8 py-8 text-center shadow-2xl shadow-black/60 transition hover:border-amber-300/35 hover:bg-zinc-900 active:scale-[0.99]"
-                    title="Copy room code"
+                    title={ui("Copy room code")}
                   >
                     <div className="text-4xl">🌐</div>
 
-                    <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">
-                      Waiting for players
-                    </p>
+                    <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">{ui("Waiting for players")}</p>
 
                     <h2 className="mt-2 text-2xl font-black text-white">
-                      {players.length}/2 players connected
-                    </h2>
+                      {players.length}{ui("/2 players connected")}</h2>
 
-                    <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">
-                      Share this room code. The game starts automatically when
-                      everyone has joined.
-                    </p>
+                    <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">{ui("Share this room code. The game starts automatically when everyone has joined.")}</p>
 
                     <div className="mt-6 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-5 py-5">
-                      <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">
-                        Room Code
-                      </p>
+                      <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">{ui("Room Code")}</p>
 
                       <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">
                         {room.code}
@@ -1183,9 +1141,7 @@ export function CollapseMultiplayerGame() {
                     </div>
 
                     <p className="mt-4 text-xs font-bold text-zinc-400">
-                      {copied
-                        ? "✓ Copied to clipboard"
-                        : "Click this box to copy the code"}
+                      {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
                     </p>
                   </button>
                 </div>
@@ -1194,26 +1150,12 @@ export function CollapseMultiplayerGame() {
               {finished && historyPreviewPly === null && (
                 <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[28px] bg-zinc-950/80 p-6 backdrop-blur-sm">
                   <div className="max-w-sm rounded-3xl border border-red-300/20 bg-zinc-900 p-6 text-center shadow-2xl">
-                    <p className="text-xs font-black uppercase tracking-[0.25em] text-red-300">
-                      Game Over
-                    </p>
+                    <p className="text-xs font-black uppercase tracking-[0.25em] text-red-300">{ui("Game Over")}</p>
                     <h2 className="mt-3 text-3xl font-black">
-                      {finished.outcome === "draw"
-                        ? "Draw"
-                        : finished.outcome === myColor
-                          ? "You win"
-                          : "You lose"}
+                      {finished.outcome === "draw" ? ui("Draw") : finished.outcome === myColor ? ui("You win") : ui("You lose")}
                     </h2>
                     <p className="mt-3 text-sm text-zinc-500">
-                      {finished.reason === "trapped"
-                        ? "A king was trapped by the collapsing edge."
-                        : finished.reason === "lives"
-                          ? "A king ran out of Collapse lives."
-                          : finished.reason === "resignation"
-                            ? "The game ended by resignation."
-                            : finished.reason === "checkmate"
-                              ? "Checkmate."
-                              : "Draw."}
+                      {finished.reason === "trapped" ? ui("A king was trapped by the collapsing edge.") : finished.reason === "lives" ? ui("A king ran out of Collapse lives.") : finished.reason === "resignation" ? ui("The game ended by resignation.") : finished.reason === "checkmate" ? ui("Checkmate.") : ui("Draw.")}
                     </p>
                     <button
                       type="button"
@@ -1221,12 +1163,10 @@ export function CollapseMultiplayerGame() {
                       disabled={myRematchReady || Boolean(actionBusy)}
                       className="mt-5 w-full rounded-xl bg-red-400 px-4 py-3 font-black text-red-950 disabled:opacity-50"
                     >
-                      {myRematchReady ? "Waiting for opponent…" : "Play again"}
+                      {myRematchReady ? ui("Waiting for opponent…") : ui("Play again")}
                     </button>
                     {opponentRematchReady && !myRematchReady && (
-                      <p className="mt-3 text-xs text-emerald-300">
-                        Opponent wants a rematch.
-                      </p>
+                      <p className="mt-3 text-xs text-emerald-300">{ui("Opponent wants a rematch.")}</p>
                     )}
                   </div>
                 </div>
@@ -1235,22 +1175,19 @@ export function CollapseMultiplayerGame() {
           </section>
 
           <aside className="space-y-4">
-            <Panel title="Collapse Status">
+            <Panel title={ui("Collapse Status")}>
               <div className="rounded-2xl border border-red-300/15 bg-red-400/[0.05] p-4">
                 <p className="text-xs font-black text-red-200">{statusText}</p>
                 {displayedCollapse.warningEdge && (
-                  <p className="mt-2 text-[10px] leading-4 text-zinc-500">
-                    The cracked edge disappears after {COLLAPSE_WARNING_MOVES}{" "}
-                    completed moves.
-                  </p>
+                  <p className="mt-2 text-[10px] leading-4 text-zinc-500">{ui("The cracked edge disappears after")}{COLLAPSE_WARNING_MOVES}{" "}{ui("completed moves.")}</p>
                 )}
               </div>
             </Panel>
 
-            <Panel title="King Lives">
+            <Panel title={ui("King Lives")}>
               <div className="grid grid-cols-2 gap-2 text-center">
                 <div className="rounded-xl bg-black/20 p-3">
-                  <p className="text-sm font-black">White</p>
+                  <p className="text-sm font-black">{ui("White")}</p>
                   <p className="mt-1 text-xl">
                     {"♥".repeat(displayedLives.w)}
                     {"♡".repeat(
@@ -1259,7 +1196,7 @@ export function CollapseMultiplayerGame() {
                   </p>
                 </div>
                 <div className="rounded-xl bg-black/20 p-3">
-                  <p className="text-sm font-black">Black</p>
+                  <p className="text-sm font-black">{ui("Black")}</p>
                   <p className="mt-1 text-xl">
                     {"♥".repeat(displayedLives.b)}
                     {"♡".repeat(
@@ -1270,48 +1207,40 @@ export function CollapseMultiplayerGame() {
               </div>
             </Panel>
 
-            <Panel title="Collapse Stats">
+            <Panel title={ui("Collapse Stats")}>
               <div className="grid grid-cols-2 gap-2 text-center">
                 <div className="rounded-xl bg-black/20 p-3">
                   <p className="text-xl font-black text-red-300">
                     {state.collapse.collapseCount}
                   </p>
-                  <p className="text-[9px] text-zinc-600">Collapses</p>
+                  <p className="text-[9px] text-zinc-600">{ui("Collapses")}</p>
                 </div>
                 <div className="rounded-xl bg-black/20 p-3">
                   <p className="text-xl font-black text-red-300">
                     {collapseDestroyedCount}
                   </p>
-                  <p className="text-[9px] text-zinc-600">Pieces lost</p>
+                  <p className="text-[9px] text-zinc-600">{ui("Pieces lost")}</p>
                 </div>
                 <div className="rounded-xl bg-black/20 p-3">
                   <p className="text-xl font-black text-red-300">{whiteHits}</p>
-                  <p className="text-[9px] text-zinc-600">White hits</p>
+                  <p className="text-[9px] text-zinc-600">{ui("White hits")}</p>
                 </div>
                 <div className="rounded-xl bg-black/20 p-3">
                   <p className="text-xl font-black text-red-300">{blackHits}</p>
-                  <p className="text-[9px] text-zinc-600">Black hits</p>
+                  <p className="text-[9px] text-zinc-600">{ui("Black hits")}</p>
                 </div>
               </div>
             </Panel>
 
-            <Panel title="Rules">
+            <Panel title={ui("Rules")}>
               <div className="space-y-2 text-xs leading-5 text-zinc-400">
-                <p>
-                  ⚠ A seeded random outer edge is warned every{" "}
-                  {COLLAPSE_MIN_DELAY_MOVES}–{COLLAPSE_MAX_DELAY_MOVES}{" "}
-                  completed moves.
-                </p>
-                <p>
-                  4 The warning lasts {COLLAPSE_WARNING_MOVES} completed moves.
-                </p>
-                <p>💥 Pieces still on the edge are destroyed.</p>
-                <p>
-                  ♥ A hit king loses one of {COLLAPSE_KING_MAX_LIVES} Collapse
-                  lives and must escape one king step.
-                </p>
-                <p>☠ No legal adjacent escape means immediate elimination.</p>
-                <p>▣ Collapse stops at the central c3–f6 core.</p>
+                <p>{ui("⚠ A seeded random outer edge is warned every")}{" "}
+                  {COLLAPSE_MIN_DELAY_MOVES}–{COLLAPSE_MAX_DELAY_MOVES}{" "}{ui("completed moves.")}</p>
+                <p>{ui("4 The warning lasts")}{COLLAPSE_WARNING_MOVES}{ui("completed moves.")}</p>
+                <p>{ui("💥 Pieces still on the edge are destroyed.")}</p>
+                <p>{ui("♥ A hit king loses one of")}{COLLAPSE_KING_MAX_LIVES}{ui("Collapse lives and must escape one king step.")}</p>
+                <p>{ui("☠ No legal adjacent escape means immediate elimination.")}</p>
+                <p>{ui("▣ Collapse stops at the central c3–f6 core.")}</p>
               </div>
             </Panel>
           </aside>
@@ -1322,34 +1251,24 @@ export function CollapseMultiplayerGame() {
             <div className="w-full max-w-md rounded-3xl border border-white/10 bg-zinc-900 p-6 shadow-2xl">
               {gameState.undo_requested_by === user?.id ? (
                 <>
-                  <h2 className="text-xl font-black">Undo requested</h2>
-                  <p className="mt-2 text-sm text-zinc-500">
-                    Waiting for your opponent to accept or decline.
-                  </p>
+                  <h2 className="text-xl font-black">{ui("Undo requested")}</h2>
+                  <p className="mt-2 text-sm text-zinc-500">{ui("Waiting for your opponent to accept or decline.")}</p>
                 </>
               ) : (
                 <>
-                  <h2 className="text-xl font-black">Opponent requests Undo</h2>
-                  <p className="mt-2 text-sm text-zinc-500">
-                    Accepting restores the board bounds, warning timer, king
-                    lives, destroyed pieces and relocation state from before the
-                    latest move.
-                  </p>
+                  <h2 className="text-xl font-black">{ui("Opponent requests Undo")}</h2>
+                  <p className="mt-2 text-sm text-zinc-500">{ui("Accepting restores the board bounds, warning timer, king lives, destroyed pieces and relocation state from before the latest move.")}</p>
                   <div className="mt-5 grid grid-cols-2 gap-2">
                     <button
                       type="button"
                       onClick={() => void respondUndo(false)}
                       className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 font-black"
-                    >
-                      Decline
-                    </button>
+                    >{ui("Decline")}</button>
                     <button
                       type="button"
                       onClick={() => void respondUndo(true)}
                       className="rounded-xl bg-red-400 px-4 py-3 font-black text-red-950"
-                    >
-                      Accept
-                    </button>
+                    >{ui("Accept")}</button>
                   </div>
                 </>
               )}

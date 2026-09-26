@@ -1,3 +1,6 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
+import { useAppLanguage } from "@/i18n/languageStore";
+import { LanguageSelector } from "@/games/chess/i18n/chessLanguage";
 import { useRef, useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -12,7 +15,9 @@ export default function PublicHeader({
   navigationOpen: boolean;
   onToggleNavigation: () => void;
 }) {
+  useUiLanguage();
   const { user, profile } = useAuth();
+  const { language, setLanguage } = useAppLanguage();
   const [open, setOpen] = useState<string | null>(null);
   const triggers = useRef(new Map<string, HTMLButtonElement>());
 
@@ -33,10 +38,10 @@ export default function PublicHeader({
             onClick={() => setOpen(null)}
           >
             <img src="/pluto-icon.png" alt="" className="h-9 w-9 rounded-xl" />
-            <span className="text-lg font-bold">Pluto</span>
+            <span className="text-lg font-bold">{ui("Pluto")}</span>
           </Link>
           <nav
-            aria-label="Explore Pluto"
+            aria-label={ui("Explore Pluto")}
             className="hidden h-full items-center gap-2 lg:flex"
             onMouseLeave={() => setOpen(null)}
             onBlur={(event) => {
@@ -82,7 +87,7 @@ export default function PublicHeader({
                     }}
                     className={`flex items-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-medium transition ${expanded ? "bg-white/10 text-white" : "text-zinc-300 hover:bg-white/5"}`}
                   >
-                    {section.title}
+                    {ui(section.title)}
                     <ChevronDown
                       size={14}
                       className={expanded ? "rotate-180" : ""}
@@ -95,7 +100,7 @@ export default function PublicHeader({
                     >
                       <div className="max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-2xl border border-white/10 bg-[#0c1226] p-4 shadow-2xl shadow-black/40">
                         <p className="px-3 pb-3 pt-1 text-xs font-bold uppercase tracking-widest text-indigo-300">
-                          {section.title}
+                          {ui(section.title)}
                         </p>
                         <div className="grid gap-1">
                           {section.items.map((item) => (
@@ -105,9 +110,9 @@ export default function PublicHeader({
                               onClick={() => setOpen(null)}
                               className="rounded-xl p-3 transition hover:bg-indigo-500/15 focus-visible:bg-indigo-500/15"
                             >
-                              <p className="font-semibold">{item.title}</p>
+                              <p className="font-semibold">{ui(item.title)}</p>
                               <p className="mt-1 text-sm text-zinc-400">
-                                {item.description}
+                                {ui(item.description)}
                               </p>
                             </Link>
                           ))}
@@ -120,6 +125,7 @@ export default function PublicHeader({
             })}
           </nav>
           <div className="flex items-center gap-2 sm:gap-3">
+            <LanguageSelector language={language} onChange={setLanguage} />
             {user && profile && (
               <Link
                 to="/profile"
@@ -136,16 +142,12 @@ export default function PublicHeader({
               <Link
                 to="/login"
                 className="hidden text-sm text-zinc-300 sm:block"
-              >
-                Log in
-              </Link>
+              >{ui("Log in")}</Link>
             )}
             <Link
               to="/dashboard"
-              className="rounded-xl bg-indigo-500 px-3 py-2 text-sm font-semibold hover:bg-indigo-400 sm:px-4"
-            >
-              Open Pluto
-            </Link>
+              className="hidden sm:block rounded-xl bg-indigo-500 px-3 py-2 text-sm font-semibold hover:bg-indigo-400 sm:px-4"
+            >{ui("Open Pluto")}</Link>
             <button
               id="navigation-toggle"
               type="button"

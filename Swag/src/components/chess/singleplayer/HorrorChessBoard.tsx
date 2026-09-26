@@ -1,3 +1,5 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
+import { useAppLanguage } from "@/i18n/languageStore";
 import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { Chess, type Square } from "chess.js";
@@ -328,25 +330,7 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
   },
 };
 
-function getInitialLanguage(): Language {
-  if (typeof window === "undefined") {
-    return "en";
-  }
 
-  const stored = window.localStorage.getItem(CHESS_LANGUAGE_STORAGE_KEY);
-
-  if (
-    stored === "en" ||
-    stored === "de" ||
-    stored === "bar" ||
-    stored === "ko" ||
-    stored === "ru"
-  ) {
-    return stored;
-  }
-
-  return "en";
-}
 
 type VariantAiBoardProps = {
   aiMode?: boolean;
@@ -360,7 +344,8 @@ export default function HorrorChessBoard({
   playerColor = "white",
   difficulty = "casual",
 }: VariantAiBoardProps) {
-  const [language, setLanguage] = useState<Language>(getInitialLanguage);
+  useUiLanguage();
+  const { language, setLanguage } = useAppLanguage();
 
   const t = (key: string) => {
     if (language === "en") {
@@ -368,10 +353,10 @@ export default function HorrorChessBoard({
     }
 
     if (language === "bar") {
-      return translations.bar[key] ?? translations.de[key] ?? key;
+      return translations.bar[key] ?? translations.de[key] ?? ui(key);
     }
 
-    return translations[language][key] ?? key;
+    return translations[language][key] ?? ui(key);
   };
 
   function changeLanguage(nextLanguage: Language) {
@@ -1122,43 +1107,41 @@ export default function HorrorChessBoard({
 
         <section className="mb-6 rounded-2xl border border-white/5 bg-zinc-900/55 px-4 py-3">
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-            <span className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-600">
-              Board legend
-            </span>
+            <span className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-600">{ui("Board legend")}</span>
 
             <HorrorLegendItem
               icon="☣"
-              label="Infected piece"
+              label={ui("Infected piece")}
               className="border-emerald-400/20 bg-emerald-400/10 text-emerald-200"
             />
 
             <HorrorLegendItem
               icon="☠"
-              label="Cursed piece"
+              label={ui("Cursed piece")}
               className="border-fuchsia-400/20 bg-fuchsia-400/10 text-fuchsia-200"
             />
 
             <HorrorLegendItem
               icon="🔥"
-              label="Burning square"
+              label={ui("Burning square")}
               className="border-orange-400/20 bg-orange-400/10 text-orange-200"
             />
 
             <HorrorLegendItem
               icon="❄"
-              label="Frozen piece"
+              label={ui("Frozen piece")}
               className="border-cyan-300/20 bg-cyan-300/10 text-cyan-100"
             />
 
             <HorrorLegendItem
               icon="×"
-              label="Doomed piece"
+              label={ui("Doomed piece")}
               className="border-red-300/30 bg-red-400/10 text-red-200"
             />
 
             <HorrorLegendItem
               icon="🪦"
-              label="Piece vanished here"
+              label={ui("Piece vanished here")}
               className="border-zinc-400/20 bg-zinc-400/10 text-zinc-200"
             />
           </div>
@@ -1298,11 +1281,7 @@ export default function HorrorChessBoard({
                     </div>
 
                     <span className="text-sm font-bold text-zinc-300">
-                      {winner === "draw"
-                        ? t("Draw")
-                        : winner === "white"
-                          ? t("White wins")
-                          : t("Black wins")}
+                      {winner === "draw" ? t("Draw") : winner === "white" ? t("White wins") : t("Black wins")}
                     </span>
                   </div>
                 </div>
@@ -1433,9 +1412,7 @@ export default function HorrorChessBoard({
                     </span>
 
                     <span className="font-mono text-xs font-black text-white">
-                      {displayedState.frozen
-                        ? displayedState.frozen.square
-                        : "—"}
+                      {displayedState.frozen ? displayedState.frozen.square : "—"}
                     </span>
                   </div>
                 </div>
@@ -1855,6 +1832,7 @@ function HorrorMessageChip({
   text: string;
   tone: HorrorMessageTone;
 }) {
+  useUiLanguage();
   const toneClass = {
     infection: "border-emerald-400/20 bg-emerald-400/[0.08] text-emerald-100",
     curse: "border-fuchsia-400/20 bg-fuchsia-400/[0.08] text-fuchsia-100",
@@ -1881,12 +1859,13 @@ function HorrorMessageChip({
     >
       <span className="text-base leading-none">{icon}</span>
 
-      <span>{text}</span>
+      <span>{ui(text)}</span>
     </div>
   );
 }
 
 function Panel({ children }: { children: ReactNode }) {
+  useUiLanguage();
   return (
     <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
       {children}
@@ -1903,11 +1882,12 @@ function PanelTitle({
   subtitle: string;
   compact?: boolean;
 }) {
+  useUiLanguage();
   return (
     <div className={compact ? "" : "mb-5"}>
-      <h2 className="text-sm font-bold text-zinc-100">{title}</h2>
+      <h2 className="text-sm font-bold text-zinc-100">{ui(title)}</h2>
 
-      <p className="mt-1.5 text-xs text-zinc-500">{subtitle}</p>
+      <p className="mt-1.5 text-xs text-zinc-500">{ui(subtitle)}</p>
     </div>
   );
 }
@@ -1923,6 +1903,7 @@ function HorrorGameControls({
   undoDisabled: boolean;
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   return (
     <div className="grid grid-cols-2 gap-2">
       <button
@@ -1959,6 +1940,7 @@ function CapturedPiecesGrid({
   capturedWhite: PieceType[];
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   function renderPieces(pieces: PieceType[], color: "w" | "b") {
     return (
       <div className="mt-2 flex min-h-8 flex-wrap gap-1">
@@ -2008,6 +1990,7 @@ function HorrorLegendItem({
   label: string;
   className: string;
 }) {
+  useUiLanguage();
   return (
     <div className="flex items-center gap-2">
       <span
@@ -2027,7 +2010,7 @@ function HorrorLegendItem({
         {icon}
       </span>
 
-      <span className="text-[10px] font-bold text-zinc-400">{label}</span>
+      <span className="text-[10px] font-bold text-zinc-400">{ui(label)}</span>
     </div>
   );
 }
@@ -2041,6 +2024,7 @@ function HazardRule({
   title: string;
   detail: string;
 }) {
+  useUiLanguage();
   return (
     <div className="flex items-center gap-3">
       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-rose-400/10 text-lg font-black text-rose-200">
@@ -2048,7 +2032,7 @@ function HazardRule({
       </span>
 
       <div>
-        <p className="text-xs font-black text-zinc-200">{title}</p>
+        <p className="text-xs font-black text-zinc-200">{ui(title)}</p>
 
         <p className="mt-1 text-[10px] leading-4 text-zinc-600">{detail}</p>
       </div>
@@ -2065,6 +2049,7 @@ function HazardStat({
   label: string;
   value: number;
 }) {
+  useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3">
       <div className="flex items-center justify-between gap-2">
@@ -2074,19 +2059,20 @@ function HazardStat({
       </div>
 
       <p className="mt-2 text-[9px] font-black uppercase tracking-wider text-zinc-600">
-        {label}
+        {ui(label)}
       </p>
     </div>
   );
 }
 
 function StatCard({ label, value }: { label: string; value: number }) {
+  useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3">
       <p className="text-xl font-black text-zinc-100">{value}</p>
 
       <p className="mt-2 text-[9px] font-black uppercase tracking-wider text-zinc-600">
-        {label}
+        {ui(label)}
       </p>
     </div>
   );
@@ -2101,20 +2087,21 @@ function LanguageSelector({
   onChange: (language: Language) => void;
   label: string;
 }) {
+  useUiLanguage();
   return (
     <label className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-400">
       <span>🌐</span>
 
-      <span className="hidden sm:inline">{label}</span>
+      <span className="hidden sm:inline">{ui(label)}</span>
 
       <select
         value={language}
         onChange={(event) => onChange(event.target.value as Language)}
         className="bg-transparent text-xs font-bold text-zinc-200 outline-none [color-scheme:dark]"
       >
-        <option value="en">English</option>
-        <option value="de">Deutsch</option>
-        <option value="bar">Boarisch</option>
+        <option value="en">{ui("English")}</option>
+        <option value="de">{ui("Deutsch")}</option>
+        <option value="bar">{ui("Boarisch")}</option>
         <option value="ko">한국어</option>
         <option value="ru">Русский</option>
       </select>

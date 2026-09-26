@@ -1,3 +1,4 @@
+import { useAppLanguage } from "@/i18n/languageStore";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -6,7 +7,6 @@ import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../context/AuthContext";
 import { ProfileAvatar } from "../social/ProfileAvatarPicker";
 import {
-  getInitialWattenLanguage,
   setStoredWattenLanguage,
   translateWatten,
   translateWattenPair,
@@ -41,9 +41,7 @@ export default function WattenMultiplayerRoom() {
 
   const { user, profile } = useAuth();
 
-  const [language, setLanguage] = useState<WattenLanguage>(
-    getInitialWattenLanguage,
-  );
+  const { language, setLanguage } = useAppLanguage();
   const [targetScore, setTargetScore] = useState(15);
 
   const t = useCallback(

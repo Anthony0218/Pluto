@@ -1,3 +1,5 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
+import { useAppLanguage } from "@/i18n/languageStore";
 import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { Chess, type Square } from "chess.js";
@@ -348,25 +350,7 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
   },
 };
 
-function getInitialLanguage(): Language {
-  if (typeof window === "undefined") {
-    return "en";
-  }
 
-  const stored = window.localStorage.getItem(CHESS_LANGUAGE_STORAGE_KEY);
-
-  if (
-    stored === "en" ||
-    stored === "de" ||
-    stored === "bar" ||
-    stored === "ko" ||
-    stored === "ru"
-  ) {
-    return stored;
-  }
-
-  return "en";
-}
 
 type VariantAiBoardProps = {
   aiMode?: boolean;
@@ -380,7 +364,8 @@ export default function MirrorChessBoard({
   playerColor = "white",
   difficulty = "casual",
 }: VariantAiBoardProps) {
-  const [language, setLanguage] = useState<Language>(getInitialLanguage);
+  useUiLanguage();
+  const { language, setLanguage } = useAppLanguage();
 
   const t = (key: string) => {
     if (language === "en") {
@@ -388,10 +373,10 @@ export default function MirrorChessBoard({
     }
 
     if (language === "bar") {
-      return translations.bar[key] ?? translations.de[key] ?? key;
+      return translations.bar[key] ?? translations.de[key] ?? ui(key);
     }
 
-    return translations[language][key] ?? key;
+    return translations[language][key] ?? ui(key);
   };
 
   function changeLanguage(nextLanguage: Language) {
@@ -1120,7 +1105,7 @@ export default function MirrorChessBoard({
   }
 
   return (
-    <div className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
+    <div className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1500px]">
         <header className="mb-7 flex flex-col gap-4 rounded-3xl border border-zinc-400/10 bg-zinc-900/50 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
@@ -1152,9 +1137,7 @@ export default function MirrorChessBoard({
 
             {phase === "setup" && (
               <div className="rounded-full border border-violet-400/15 bg-violet-400/[0.06] px-3 py-1.5 text-xs font-black text-violet-200">
-                {setupFlipPending
-                  ? t("Switching sides...")
-                  : `${t("Placement turn")}: ${
+                {setupFlipPending ? t("Switching sides...") : `${t("Placement turn")}: ${
                       setupState.turn === "w" ? t("White") : t("Black")
                     }`}
               </div>
@@ -1193,7 +1176,7 @@ export default function MirrorChessBoard({
           </section>
         )}
 
-        <main className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
+        <main className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           {/* LEFT */}
 
           <aside className="min-w-0">
@@ -1224,9 +1207,7 @@ export default function MirrorChessBoard({
                       ) : currentPiece ? (
                         <>
                           <div className="mt-3 text-6xl leading-none">
-                            {setupState.turn === "w"
-                              ? whiteSymbols[currentPiece]
-                              : blackSymbols[currentPiece]}
+                            {setupState.turn === "w" ? whiteSymbols[currentPiece] : blackSymbols[currentPiece]}
                           </div>
 
                           <p className="mt-3 text-sm font-black text-white">
@@ -1472,8 +1453,7 @@ export default function MirrorChessBoard({
                           {t("Random bag")}
                         </h2>
 
-                        <p className="mt-1 text-xs text-zinc-500">
-                          Seed {setupState.seed}
+                        <p className="mt-1 text-xs text-zinc-500">{ui("Seed")}{setupState.seed}
                         </p>
                       </div>
 
@@ -1500,9 +1480,7 @@ export default function MirrorChessBoard({
                             `}
                         >
                           <div className="text-lg leading-none">
-                            {setupState.turn === "w"
-                              ? whiteSymbols[piece]
-                              : blackSymbols[piece]}
+                            {setupState.turn === "w" ? whiteSymbols[piece] : blackSymbols[piece]}
                           </div>
                         </div>
                       ))}
@@ -1603,7 +1581,7 @@ export default function MirrorChessBoard({
                         value={gameStats.promotions}
                       />
 
-                      <SetupStat label="Moves" value={gameStats.moves} />
+                      <SetupStat label={ui("Moves")} value={gameStats.moves} />
                     </div>
                   )}
                 </section>
@@ -1647,6 +1625,7 @@ function RuleStrip({
   title: string;
   detail: string;
 }) {
+  useUiLanguage();
   return (
     <div className="flex items-center gap-3">
       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-400/10 text-lg font-black text-violet-200">
@@ -1654,7 +1633,7 @@ function RuleStrip({
       </span>
 
       <div>
-        <p className="text-xs font-black text-zinc-200">{title}</p>
+        <p className="text-xs font-black text-zinc-200">{ui(title)}</p>
 
         <p className="mt-1 text-[10px] leading-4 text-zinc-600">{detail}</p>
       </div>
@@ -1673,6 +1652,7 @@ function MoveHistory({
   onSelect: (ply: number) => void;
   emptyLabel: string;
 }) {
+  useUiLanguage();
   if (records.length === 0) {
     return (
       <div className="rounded-2xl border border-white/5 bg-black/20 px-4 py-8 text-center text-xs text-zinc-600">
@@ -1708,9 +1688,7 @@ function MoveHistory({
               </td>
 
               <td className="px-2 py-2.5 text-lg">
-                {record.color === "w"
-                  ? (whiteSymbols[record.piece] ?? "")
-                  : (blackSymbols[record.piece] ?? "")}
+                {record.color === "w" ? (whiteSymbols[record.piece] ?? "") : (blackSymbols[record.piece] ?? "")}
               </td>
 
               <td className="px-2 py-2.5 font-mono text-xs font-bold text-zinc-200">
@@ -1725,6 +1703,7 @@ function MoveHistory({
 }
 
 function Panel({ children }: { children: ReactNode }) {
+  useUiLanguage();
   return (
     <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
       {children}
@@ -1741,11 +1720,12 @@ function PanelTitle({
   subtitle: string;
   compact?: boolean;
 }) {
+  useUiLanguage();
   return (
     <div className={compact ? "" : "mb-5"}>
-      <h2 className="text-sm font-bold text-zinc-100">{title}</h2>
+      <h2 className="text-sm font-bold text-zinc-100">{ui(title)}</h2>
 
-      <p className="mt-1.5 text-xs text-zinc-500">{subtitle}</p>
+      <p className="mt-1.5 text-xs text-zinc-500">{ui(subtitle)}</p>
     </div>
   );
 }
@@ -1757,12 +1737,13 @@ function SetupStat({
   label: string;
   value: number | string;
 }) {
+  useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3">
       <p className="text-lg font-black text-zinc-100">{value}</p>
 
       <p className="mt-1 text-[9px] font-black uppercase tracking-wider text-zinc-600">
-        {label}
+        {ui(label)}
       </p>
     </div>
   );
@@ -1779,6 +1760,7 @@ function GameControls({
   undoDisabled: boolean;
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   return (
     <div className="grid grid-cols-2 gap-2">
       <button
@@ -1815,6 +1797,7 @@ function CapturedPiecesGrid({
   capturedWhite: PieceType[];
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   function renderPieces(pieces: PieceType[], color: "w" | "b") {
     return (
       <div className="mt-2 flex min-h-8 flex-wrap gap-1">
@@ -1864,6 +1847,7 @@ function GameOverBanner({
   winner: Winner;
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   return (
     <div className="mb-3 rounded-2xl border border-violet-400/20 bg-violet-400/[0.07] px-4 py-3">
       <div className="flex items-center justify-between gap-4">
@@ -1872,15 +1856,11 @@ function GameOverBanner({
             {t("Game Over")}
           </p>
 
-          <p className="mt-1 font-black text-white">{reason}</p>
+          <p className="mt-1 font-black text-white">{ui(reason)}</p>
         </div>
 
         <span className="text-sm font-bold text-zinc-300">
-          {winner === "draw"
-            ? t("Draw")
-            : winner === "white"
-              ? t("White wins")
-              : t("Black wins")}
+          {winner === "draw" ? t("Draw") : winner === "white" ? t("White wins") : t("Black wins")}
         </span>
       </div>
     </div>
@@ -1896,20 +1876,21 @@ function LanguageSelector({
   onChange: (language: Language) => void;
   label: string;
 }) {
+  useUiLanguage();
   return (
     <label className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-400">
       <span>🌐</span>
 
-      <span className="hidden sm:inline">{label}</span>
+      <span className="hidden sm:inline">{ui(label)}</span>
 
       <select
         value={language}
         onChange={(event) => onChange(event.target.value as Language)}
         className="bg-transparent text-xs font-bold text-zinc-200 outline-none [color-scheme:dark]"
       >
-        <option value="en">English</option>
-        <option value="de">Deutsch</option>
-        <option value="bar">Boarisch</option>
+        <option value="en">{ui("English")}</option>
+        <option value="de">{ui("Deutsch")}</option>
+        <option value="bar">{ui("Boarisch")}</option>
         <option value="ko">한국어</option>
         <option value="ru">Русский</option>
       </select>

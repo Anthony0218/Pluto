@@ -1,3 +1,5 @@
+import MyGames from "../../components/App/MyGames";
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   ArrowRight,
@@ -29,6 +31,7 @@ const friendName = (friend: Friend) =>
   friend.username || friend.display_name || "Player";
 
 export default function DashboardPage() {
+  useUiLanguage();
   const { user, profile, loading: authLoading } = useAuth();
   const { activity, friends, onlineIds, loading, activityError, friendsError } =
     useDashboardData();
@@ -84,11 +87,11 @@ export default function DashboardPage() {
                 className="absolute left-4 top-3.5 text-zinc-400"
               />
               <input
-                aria-label="Search games, learning resources and friends"
+                aria-label={ui("Search games, learning resources and friends")}
                 type="search"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search games, learning resources, friends..."
+                placeholder={ui("Search games, learning resources, friends...")}
                 className="h-11 w-full rounded-xl border border-white/10 bg-[#0b1020]/75 pl-11 pr-4 text-sm outline-none placeholder:text-zinc-500 focus:border-indigo-400/50"
               />
               {query && (
@@ -121,60 +124,47 @@ export default function DashboardPage() {
                     >
                       <FriendAvatar profile={friend} size="sm" />
                       <span>{friendName(friend)}</span>
-                      <span className="ml-auto text-xs text-zinc-400">
-                        Chat
-                      </span>
+                      <span className="ml-auto text-xs text-zinc-400">{ui("Chat")}</span>
                     </button>
                   ))}
                   {!matchingGames.length &&
                     !matchingLessons.length &&
                     !matchingFriends.length && (
-                      <p className="p-3 text-sm text-zinc-400">
-                        No results found.
-                      </p>
+                      <p className="p-3 text-sm text-zinc-400">{ui("No results found.")}</p>
                     )}
                 </div>
               )}
             </div>
             <section className="mb-6">
               <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                {greeting}
+                {ui(greeting)}
                 {displayName ? `, ${displayName}` : ""} 👋
               </h1>
-              <p className="mt-2 text-zinc-400">
-                A little progress each day leads to big results.
-              </p>
+              <p className="mt-2 text-zinc-400">{ui("A little progress each day leads to big results.")}</p>
               {!user && !authLoading && (
                 <p className="mt-3 text-sm text-zinc-300">
-                  <Link to="/login" className="text-indigo-300 underline">
-                    Log in
-                  </Link>{" "}
-                  to see your progress and friends.
-                </p>
+                  <Link to="/login" className="text-indigo-300 underline">{ui("Log in")}</Link>{" "}{ui("to see your progress and friends.")}</p>
               )}
               {user && !profile && !authLoading && (
-                <p className="mt-3 text-sm text-zinc-400">
-                  Your profile couldn’t be loaded.{" "}
-                  <Link to="/profile" className="text-indigo-300">
-                    Open profile
-                  </Link>
+                <p className="mt-3 text-sm text-zinc-400">{ui("Your profile couldn’t be loaded.")}{" "}
+                  <Link to="/profile" className="text-indigo-300">{ui("Open profile")}</Link>
                 </p>
               )}
               <div className="mt-5 flex flex-wrap gap-3">
                 <StatChip
                   icon={<Flame size={17} className="text-orange-400" />}
                   value={activity?.streak}
-                  label="day activity streak"
+                  label={ui("day activity streak")}
                 />
                 <StatChip
                   icon={<Trophy size={17} className="text-indigo-300" />}
                   value={played}
-                  label="games played"
+                  label={ui("games played")}
                 />
                 <StatChip
                   icon={<BarChart3 size={17} className="text-violet-300" />}
                   value={profile?.rating}
-                  label="rating"
+                  label={ui("rating")}
                 />
                 <StatChip
                   icon={<Users size={17} className="text-emerald-400" />}
@@ -183,26 +173,22 @@ export default function DashboardPage() {
                       ? null
                       : onlineFriends.length
                   }
-                  label="friends online"
+                  label={ui("friends online")}
                 />
               </div>
             </section>
+            <MyGames />
             <DashboardPlayCarousel />
             <section className="mt-6">
               <SectionHeader
-                title="Recently explored"
-                action="View all games"
+                title={ui("Recently explored")}
+                action={ui("View all games")}
                 to="/games"
               />
               {loading ? (
-                <p className={`${panel} text-sm text-zinc-400`}>
-                  Loading your games…
-                </p>
+                <p className={`${panel} text-sm text-zinc-400`}>{ui("Loading your games…")}</p>
               ) : activityError ? (
-                <p className={`${panel} text-sm text-zinc-400`}>
-                  Your recent activity is unavailable. You can still browse all
-                  games.
-                </p>
+                <p className={`${panel} text-sm text-zinc-400`}>{ui("Your recent activity is unavailable. You can still browse all games.")}</p>
               ) : recentGames.length ? (
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {recentGames.slice(0, 3).map((game) => (
@@ -218,9 +204,9 @@ export default function DashboardPage() {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
                       <div className="relative flex min-h-44 flex-col justify-end p-5">
-                        <h3 className="text-xl font-semibold">{game.title}</h3>
+                        <h3 className="text-xl font-semibold">{ui(game.title)}</h3>
                         <p className="mt-1 text-sm text-zinc-300">
-                          {game.subtitle}
+                          {ui(game.subtitle)}
                         </p>
                       </div>
                     </Link>
@@ -229,17 +215,15 @@ export default function DashboardPage() {
               ) : (
                 <div className={panel}>
                   <p className="text-sm text-zinc-400">
-                    {user
-                      ? "Games you explore will appear here. Choose a game above to get started."
-                      : "Log in to keep your game activity across visits."}
+                    {user ? ui("Games you explore will appear here. Choose a game above to get started.") : ui("Log in to keep your game activity across visits.")}
                   </p>
                 </div>
               )}
             </section>
             <section className="mt-6">
               <SectionHeader
-                title="Learn something new"
-                action="View all resources"
+                title={ui("Learn something new")}
+                action={ui("View all resources")}
                 to="/learn"
               />
               <div className="grid gap-3 sm:grid-cols-2">
@@ -249,12 +233,11 @@ export default function DashboardPage() {
                     to={resource.route}
                     className={`${panel} transition hover:border-indigo-400/30`}
                   >
-                    <h3 className="font-semibold">{resource.title}</h3>
+                    <h3 className="font-semibold">{ui(resource.title)}</h3>
                     <p className="mt-2 text-sm text-zinc-400">
-                      {resource.description}
+                      {ui(resource.description)}
                     </p>
-                    <span className={`${textLink} mt-4`}>
-                      Start learning <ArrowRight size={14} />
+                    <span className={`${textLink} mt-4`}>{ui("Start learning")}<ArrowRight size={14} />
                     </span>
                   </Link>
                 ))}
@@ -264,8 +247,8 @@ export default function DashboardPage() {
           <aside className="space-y-4 xl:sticky xl:top-24 xl:self-start">
             <section className={panel}>
               <SectionHeader
-                title="Your Progress"
-                action="See details"
+                title={ui("Your Progress")}
+                action={ui("See details")}
                 to="/profile"
               />
               {profile ? (
@@ -276,9 +259,7 @@ export default function DashboardPage() {
                       <p className="truncate font-semibold">
                         {displayName || "Player"}
                       </p>
-                      <p className="text-xs text-zinc-400">
-                        Your saved profile stats
-                      </p>
+                      <p className="text-xs text-zinc-400">{ui("Your saved profile stats")}</p>
                     </div>
                   </Link>
                   <div className="mt-5 flex items-center gap-4">
@@ -295,11 +276,9 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <div>
-                      <p className="font-semibold">Win rate</p>
+                      <p className="font-semibold">{ui("Win rate")}</p>
                       <p className="mt-1 text-sm text-zinc-400">
-                        {played
-                          ? `${wins ?? 0} wins in ${played} recorded games`
-                          : "No completed games recorded yet."}
+                        {played ? `${wins ?? 0} wins in ${played} recorded games` : ui("No completed games recorded yet.")}
                       </p>
                     </div>
                   </div>
@@ -314,18 +293,14 @@ export default function DashboardPage() {
                         className="rounded-xl border border-white/10 bg-white/[0.025] p-3 text-center"
                       >
                         <p className="font-bold">{value ?? "—"}</p>
-                        <p className="mt-1 text-xs text-zinc-400">{label}</p>
+                        <p className="mt-1 text-xs text-zinc-400">{ui(label)}</p>
                       </div>
                     ))}
                   </div>
                 </>
               ) : (
                 <p className="mt-4 text-sm text-zinc-400">
-                  {authLoading
-                    ? "Loading profile…"
-                    : user
-                      ? "Your profile stats are unavailable."
-                      : "Log in to see your saved stats."}
+                  {authLoading ? ui("Loading profile…") : user ? ui("Your profile stats are unavailable.") : ui("Log in to see your saved stats.")}
                 </p>
               )}
             </section>
@@ -339,15 +314,13 @@ export default function DashboardPage() {
             <section className={panel}>
               <SectionHeader
                 title={`Friends Online${!user || loading || friendsError ? "" : ` (${onlineFriends.length})`}`}
-                action="View all"
+                action={ui("View all")}
                 to="/friends"
               />
               {loading ? (
-                <p className="mt-4 text-sm text-zinc-400">Loading friends…</p>
+                <p className="mt-4 text-sm text-zinc-400">{ui("Loading friends…")}</p>
               ) : friendsError ? (
-                <p className="mt-4 text-sm text-zinc-400">
-                  Online status is temporarily unavailable.
-                </p>
+                <p className="mt-4 text-sm text-zinc-400">{ui("Online status is temporarily unavailable.")}</p>
               ) : onlineFriends.length ? (
                 <div className="mt-4 space-y-2">
                   {onlineFriends.map((friend) => (
@@ -363,23 +336,15 @@ export default function DashboardPage() {
                           {friendName(friend)}
                         </p>
                         <p className="mt-1 flex items-center gap-1.5 text-xs text-zinc-400">
-                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                          Online
-                        </p>
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />{ui("Online")}</p>
                       </div>
-                      <span className="rounded-lg border border-indigo-400/20 px-3 py-2 text-xs text-indigo-300">
-                        Chat
-                      </span>
+                      <span className="rounded-lg border border-indigo-400/20 px-3 py-2 text-xs text-indigo-300">{ui("Chat")}</span>
                     </button>
                   ))}
                 </div>
               ) : (
                 <p className="mt-4 text-sm text-zinc-400">
-                  {!user
-                    ? "Log in to connect with your friends."
-                    : friends.length
-                      ? "None of your friends are online right now. You can still message them from Friends."
-                      : "No friends yet. Find someone by username on the Friends page."}
+                  {!user ? ui("Log in to connect with your friends.") : friends.length ? ui("None of your friends are online right now. You can still message them from Friends.") : ui("No friends yet. Find someone by username on the Friends page.")}
                 </p>
               )}
             </section>
@@ -410,6 +375,7 @@ function DailyChallenge({
   unavailable: boolean;
   signedIn: boolean;
 }) {
+  useUiLanguage();
   const minutes = challenge
     ? Math.max(0, Math.ceil((Date.parse(challenge.expires_at) - now) / 60_000))
     : 0;
@@ -420,48 +386,42 @@ function DailyChallenge({
   return (
     <section className={panel}>
       <div className="flex items-center justify-between gap-3">
-        <h2 className="font-semibold">Daily Challenge</h2>
+        <h2 className="font-semibold">{ui("Daily Challenge")}</h2>
         {challenge && (
           <span className="text-xs text-zinc-400">
-            {minutes > 0
-              ? `${Math.floor(minutes / 60)}h ${minutes % 60}m left`
-              : "Refreshing…"}
+            {minutes > 0 ? `${Math.floor(minutes / 60)}h ${minutes % 60}m left` : ui("Refreshing…")}
           </span>
         )}
       </div>
       {loading ? (
-        <p className="mt-4 text-sm text-zinc-400">Loading challenge…</p>
+        <p className="mt-4 text-sm text-zinc-400">{ui("Loading challenge…")}</p>
       ) : !challenge ? (
         <p className="mt-4 text-sm text-zinc-400">
-          {!signedIn
-            ? "Log in to track your daily challenge."
-            : unavailable
-              ? "Your daily challenge is temporarily unavailable."
-              : "No challenge is available today."}
+          {!signedIn ? ui("Log in to track your daily challenge.") : unavailable ? ui("Your daily challenge is temporarily unavailable.") : ui("No challenge is available today.")}
         </p>
       ) : (
         <>
           <div className="mt-4 flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.025] p-4">
             <Target size={30} className="shrink-0 text-indigo-300" />
             <div className="min-w-0 flex-1">
-              <h3 className="text-sm font-semibold">{challenge.title}</h3>
+              <h3 className="text-sm font-semibold">{ui(challenge.title)}</h3>
               <p className="mt-1 text-xs leading-relaxed text-zinc-400">
-                {challenge.description}
+                {ui(challenge.description)}
               </p>
               <progress
-                aria-label="Daily challenge progress"
+                aria-label={ui("Daily challenge progress")}
                 max={challenge.target}
                 value={progress}
                 className="mt-3 h-2 w-full accent-indigo-500"
               />
               <p className="mt-1 text-xs text-zinc-300">
                 {progress} / {challenge.target}
-                {completed ? " · Completed!" : ""}
+                {completed ? ui(" · Completed!") : ""}
               </p>
             </div>
           </div>
           <Link to="/games" className={`${textLink} mt-4`}>
-            {completed ? "Explore more games" : "Choose a game"}
+            {completed ? ui("Explore more games") : ui("Choose a game")}
             <ArrowRight size={14} />
           </Link>
         </>
@@ -479,11 +439,12 @@ function SectionHeader({
   action: string;
   to: string;
 }) {
+  useUiLanguage();
   return (
     <div className="mb-3 flex items-center justify-between gap-3">
-      <h2 className="text-lg font-semibold">{title}</h2>
+      <h2 className="text-lg font-semibold">{ui(title)}</h2>
       <Link to={to} className={`${textLink} shrink-0`}>
-        {action}
+        {ui(action)}
         <ArrowRight size={13} />
       </Link>
     </div>
@@ -498,13 +459,14 @@ function StatChip({
   value: number | null | undefined;
   label: string;
 }) {
+  useUiLanguage();
   return (
     <div className="flex items-center gap-2.5 rounded-xl border border-white/[0.08] bg-[#0b1020]/70 px-4 py-2.5">
       {icon}
       <span className="text-sm font-semibold">
         {value?.toLocaleString() ?? "—"}
       </span>
-      <span className="text-xs text-zinc-400">{label}</span>
+      <span className="text-xs text-zinc-400">{ui(label)}</span>
     </div>
   );
 }
@@ -517,12 +479,13 @@ function SearchLink({
   type: string;
   route: string;
 }) {
+  useUiLanguage();
   return (
     <Link
       to={route}
       className="flex items-center justify-between gap-3 rounded-lg p-3 text-sm hover:bg-white/5"
     >
-      {title}
+      {ui(title)}
       <span className="text-xs text-zinc-400">{type}</span>
     </Link>
   );
@@ -534,6 +497,7 @@ function ChatDialog({
   friend: Friend;
   onClose: () => void;
 }) {
+  useUiLanguage();
   const dialog = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const previousFocus = document.activeElement as HTMLElement | null;
@@ -561,7 +525,7 @@ function ChatDialog({
             autoFocus
             type="button"
             onClick={onClose}
-            aria-label="Close chat"
+            aria-label={ui("Close chat")}
             className="rounded-lg p-2 hover:bg-white/10"
           >
             <X size={20} />

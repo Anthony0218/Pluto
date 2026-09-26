@@ -1,8 +1,10 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { Moon, Orbit } from "lucide-react";
 
 import { useTheme } from "../../context/ThemeContext";
 
 export default function ThemeToggle() {
+  useUiLanguage();
   const { theme, setTheme } = useTheme();
 
   return (
@@ -32,9 +34,7 @@ export default function ThemeToggle() {
           }
         `}
       >
-        <Moon size={15} />
-        Black
-      </button>
+        <Moon size={15} />{ui("Black")}</button>
 
       <button
         type="button"
@@ -60,9 +60,7 @@ export default function ThemeToggle() {
           }
         `}
       >
-        <Orbit size={15} />
-        Pluto
-      </button>
+        <Orbit size={15} />{ui("Pluto")}</button>
     </div>
   );
 }

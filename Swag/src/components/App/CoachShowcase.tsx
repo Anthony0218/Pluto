@@ -1,7 +1,9 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { Link } from "react-router-dom";
 import { BrainCircuit, Check, ChevronRight, Lightbulb } from "lucide-react";
 
 export default function CoachShowcase() {
+  useUiLanguage();
   return (
     <div className="relative">
       <div
@@ -47,9 +49,9 @@ export default function CoachShowcase() {
             </div>
 
             <div>
-              <p className="text-sm font-semibold">Chess Coach</p>
+              <p className="text-sm font-semibold">{ui("Chess Coach")}</p>
 
-              <p className="text-[10px] text-zinc-600">Powered by Stockfish</p>
+              <p className="text-[10px] text-zinc-600">{ui("Powered by Stockfish")}</p>
             </div>
           </div>
 
@@ -62,9 +64,7 @@ export default function CoachShowcase() {
               text-[10px]
               text-emerald-300
             "
-          >
-            Example position
-          </div>
+          >{ui("Example position")}</div>
         </div>
 
         <div
@@ -164,17 +164,15 @@ export default function CoachShowcase() {
                     uppercase tracking-[0.18em]
                     text-zinc-600
                   "
-                >
-                  Evaluation
-                </p>
+                >{ui("Evaluation")}</p>
 
                 <p className="mt-1 text-lg font-bold text-white">+0.8</p>
               </div>
 
               <div className="text-right">
-                <p className="text-xs text-zinc-600">Best move</p>
+                <p className="text-xs text-zinc-600">{ui("Best move")}</p>
 
-                <p className="mt-1 font-mono text-lg font-semibold">Nf3</p>
+                <p className="mt-1 font-mono text-lg font-semibold">{ui("Nf3")}</p>
               </div>
             </div>
           </div>
@@ -196,9 +194,9 @@ export default function CoachShowcase() {
               </div>
 
               <div>
-                <p className="text-xs text-zinc-500">Coach says</p>
+                <p className="text-xs text-zinc-500">{ui("Coach says")}</p>
 
-                <h3 className="mt-1 font-semibold">Develop your knight.</h3>
+                <h3 className="mt-1 font-semibold">{ui("Develop your knight.")}</h3>
               </div>
             </div>
 
@@ -208,15 +206,12 @@ export default function CoachShowcase() {
                 text-sm leading-6
                 text-zinc-500
               "
-            >
-              Nf3 improves your position while developing a piece toward the
-              center and preparing to castle.
-            </p>
+            >{ui("Nf3 improves your position while developing a piece toward the center and preparing to castle.")}</p>
 
             <div className="mt-6 space-y-3">
-              <Reason text="Develops a minor piece" />
-              <Reason text="Controls central squares" />
-              <Reason text="Prepares kingside castling" />
+              <Reason text={ui("Develops a minor piece")} />
+              <Reason text={ui("Controls central squares")} />
+              <Reason text={ui("Prepares kingside castling")} />
             </div>
 
             <Link
@@ -235,9 +230,7 @@ export default function CoachShowcase() {
                 hover:bg-white/[0.05]
               "
             >
-              <span className="text-xs font-medium">
-                Practice with Stockfish
-              </span>
+              <span className="text-xs font-medium">{ui("Practice with Stockfish")}</span>
 
               <ChevronRight
                 size={15}
@@ -256,6 +249,7 @@ export default function CoachShowcase() {
 }
 
 function Reason({ text }: { text: string }) {
+  useUiLanguage();
   return (
     <div className="flex items-center gap-3">
       <div
@@ -270,7 +264,7 @@ function Reason({ text }: { text: string }) {
         <Check size={11} />
       </div>
 
-      <span className="text-xs text-zinc-400">{text}</span>
+      <span className="text-xs text-zinc-400">{ui(text)}</span>
     </div>
   );
 }

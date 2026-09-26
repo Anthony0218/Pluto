@@ -1,3 +1,5 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
+import { useAppLanguage } from "@/i18n/languageStore";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Chess, type Square } from "chess.js";
@@ -622,21 +624,15 @@ const russianTranslations: Record<string, string> = {
   "Black in check": "Чёрные под шахом",
 };
 
-function getInitialChessLanguage(): Language {
-  if (typeof window === "undefined") return "en";
-  const stored = window.localStorage.getItem("chess-language");
-  return languageOptions.some((option) => option.value === stored)
-    ? (stored as Language)
-    : "en";
-}
+
 
 function translateChess(language: Language, key: string): string {
   if (language === "en") return key;
-  if (language === "de") return deTranslations[key] ?? key;
+  if (language === "de") return deTranslations[key] ?? ui(key);
   if (language === "bar")
-    return bavarianTranslations[key] ?? deTranslations[key] ?? key;
-  if (language === "ko") return koreanTranslations[key] ?? key;
-  return russianTranslations[key] ?? key;
+    return bavarianTranslations[key] ?? deTranslations[key] ?? ui(key);
+  if (language === "ko") return koreanTranslations[key] ?? ui(key);
+  return russianTranslations[key] ?? ui(key);
 }
 
 function ChessLanguageSelector({
@@ -648,6 +644,7 @@ function ChessLanguageSelector({
   onChange: (language: Language) => void;
   label: string;
 }) {
+  useUiLanguage();
   return (
     <label
       className="
@@ -666,7 +663,7 @@ function ChessLanguageSelector({
       "
     >
       <span>🌐</span>
-      <span className="hidden lg:inline">{label}</span>
+      <span className="hidden lg:inline">{ui(label)}</span>
       <select
         value={language}
         onChange={(event) => onChange(event.target.value as Language)}
@@ -686,7 +683,7 @@ function ChessLanguageSelector({
             value={option.value}
             className="bg-zinc-900 text-zinc-100"
           >
-            {option.label}
+            {ui(option.label)}
           </option>
         ))}
       </select>
@@ -864,13 +861,14 @@ export default function ChessComputerBoard({
   randomMoveChance,
   onChangeSettings,
 }: ChessComputerBoardProps) {
+  useUiLanguage();
   const { user, profile } = useAuth();
 
   const [humanAvatarId, setHumanAvatarId] = useState(
     () => (profile as { avatar_id?: string | null } | null)?.avatar_id ?? "m1",
   );
 
-  const [language, setLanguage] = useState<Language>(getInitialChessLanguage);
+  const { language, setLanguage } = useAppLanguage();
   const t = (key: string) => translateChess(language, key);
   const difficultyLabel = getDifficultyLabel(skillLevel);
 
@@ -2176,7 +2174,7 @@ export default function ChessComputerBoard({
           gap-4
           xl:h-[calc(100%-2.75rem)]
           xl:min-h-0
-          xl:grid-cols-[minmax(260px,19vw)_minmax(0,1fr)_minmax(260px,19vw)]
+          chess-game-grid classic-game-grid xl:grid-cols-[minmax(260px,19vw)_minmax(0,1fr)_minmax(260px,19vw)]
         "
       >
         {/* =====================================================
@@ -2215,9 +2213,7 @@ export default function ChessComputerBoard({
                     {t("Chess Coach")}
                   </p>
                   <p className="mt-0.5 text-xs text-zinc-500">
-                    {coachModeEnabled
-                      ? t("Live analysis enabled")
-                      : t("Enable Chess Coach")}
+                    {coachModeEnabled ? t("Live analysis enabled") : t("Enable Chess Coach")}
                   </p>
                 </div>
               </div>
@@ -2373,11 +2369,7 @@ export default function ChessComputerBoard({
                     disabled:opacity-40
                   `}
                 >
-                  {analyzing
-                    ? t("Analyzing...")
-                    : helpVisible
-                      ? t("Hide Help")
-                      : t("Help · Best Moves")}
+                  {analyzing ? t("Analyzing...") : helpVisible ? t("Hide Help") : t("Help · Best Moves")}
                 </button>
 
                 {/* BEST MOVES */}
@@ -2396,9 +2388,7 @@ export default function ChessComputerBoard({
                           text-zinc-500
                         "
                       >
-                        {analyzing
-                          ? t("Stockfish is analyzing...")
-                          : t("No analysis available.")}
+                        {analyzing ? t("Stockfish is analyzing...") : t("No analysis available.")}
                       </div>
                     ) : (
                       suggestedMoves.map((suggestion, index) => {
@@ -2488,9 +2478,7 @@ export default function ChessComputerBoard({
                                   selected ? "text-amber-300" : "text-zinc-700"
                                 }`}
                               >
-                                {selected
-                                  ? t("Shown on board")
-                                  : t("Click to show")}
+                                {selected ? t("Shown on board") : t("Click to show")}
                               </span>
                             </div>
                           </button>
@@ -2578,7 +2566,7 @@ export default function ChessComputerBoard({
                   </p>
                 </div>
                 <span className="rounded-lg border border-amber-400/20 bg-amber-400/10 px-3 py-1.5 text-xs font-black text-amber-300">
-                  {pieceValuesOpen ? "Hide" : "Show"}
+                  {pieceValuesOpen ? ui("Hide") : ui("Show")}
                 </span>
               </button>
               {pieceValuesOpen && (
@@ -2604,11 +2592,7 @@ export default function ChessComputerBoard({
                     ))}
                   </div>
                   <div className="mt-3 rounded-xl bg-black/20 px-3 py-2 text-right text-xs font-bold text-zinc-400">
-                    {materialDifference === 0
-                      ? t("Equal")
-                      : materialDifference > 0
-                        ? `${t("White")} +${materialDifference}`
-                        : `${t("Black")} +${Math.abs(materialDifference)}`}
+                    {materialDifference === 0 ? t("Equal") : materialDifference > 0 ? `${t("White")} +${materialDifference}` : `${t("Black")} +${Math.abs(materialDifference)}`}
                   </div>
                 </div>
               )}
@@ -2678,14 +2662,12 @@ export default function ChessComputerBoard({
            ===================================================== */}
 
         <section className="order-1 min-w-0 xl:order-2 xl:h-full xl:min-h-0">
-          <div className="mx-auto w-full max-w-[820px] xl:flex xl:h-full xl:min-h-0 xl:max-w-[min(820px,calc(100dvh-23rem))] xl:flex-col">
+          <div className="mx-auto w-full max-w-[820px] xl:flex xl:h-full xl:min-h-0 xl:max-w-none xl:flex-col">
             <section className="mb-2 shrink-0 rounded-2xl border border-amber-400/30 bg-[#08111c]/90 px-4 py-2.5 text-center shadow-[0_0_40px_rgba(245,158,11,0.08)] backdrop-blur-xl">
               <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-400">
                 {t("Classic Chess")}
               </p>
-              <h1 className="mt-0.5 font-serif text-2xl font-semibold text-[#f7ead0]">
-                Singleplayer
-              </h1>
+              <h1 className="mt-0.5 font-serif text-2xl font-semibold text-[#f7ead0]">{ui("Singleplayer")}</h1>
             </section>
 
             {/* STATUS */}
@@ -2763,7 +2745,7 @@ export default function ChessComputerBoard({
               event={singleplayerMatchStatus.event}
               message={singleplayerMatchStatus.message}
               detail={singleplayerMatchStatus.detail}
-              label="Match status"
+              label={ui("Match status")}
               className="mb-2"
               actions={
                 gameResult && !historyPreview ? (
@@ -2857,7 +2839,7 @@ export default function ChessComputerBoard({
                         ) : (
                           <div
                             className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-sky-300/20 bg-sky-300/[0.07] text-xl ring-4 ring-sky-400/5"
-                            aria-label="Stockfish"
+                            aria-label={ui("Stockfish")}
                           >
                             🤖
                           </div>
@@ -2865,7 +2847,7 @@ export default function ChessComputerBoard({
 
                         <div className="min-w-0 flex-1">
                           <p className="truncate font-serif text-lg font-semibold text-[#f7ead0]">
-                            {isHuman ? t("You") : "Stockfish"}
+                            {isHuman ? t("You") : ui("Stockfish")}
                           </p>
                           <p className="mt-0.5 text-xs text-zinc-500">
                             {color === "w" ? t("White") : t("Black")}
@@ -2881,9 +2863,7 @@ export default function ChessComputerBoard({
                     {index === 0 && (
                       <div className="flex items-center gap-2 px-2">
                         <span className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-white/20" />
-                        <span className="rounded-full border border-amber-400/15 bg-amber-400/[0.06] px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-amber-200/75">
-                          VS
-                        </span>
+                        <span className="rounded-full border border-amber-400/15 bg-amber-400/[0.06] px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-amber-200/75">{ui("VS")}</span>
                         <span className="h-px flex-1 bg-gradient-to-l from-transparent via-white/10 to-white/20" />
                       </div>
                     )}
@@ -3199,8 +3179,7 @@ export default function ChessComputerBoard({
                   <div className="text-4xl">⚑</div>
 
                   <h2 className="mt-4 text-2xl font-black text-white">
-                    {t("Resign")} game?
-                  </h2>
+                    {t("Resign")}{ui("game?")}</h2>
 
                   <p className="mt-2 text-sm text-zinc-400">
                     {t("Stockfish will win the game.")}
@@ -3270,6 +3249,7 @@ function CapturedPiecesGrid({
   capturedWhite: PieceType[];
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   const symbols: Record<"white" | "black", Record<PieceType, string>> = {
     white: {
       p: "♙",
@@ -3382,6 +3362,7 @@ function getHistoryPieceSymbol(color: "w" | "b", piece: PieceType) {
    ========================================================= */
 
 function MoveQualityBadge({ quality }: { quality: MoveQuality }) {
+  useUiLanguage();
   const styles: Record<MoveQuality, string> = {
     Best: "border-emerald-500/20 bg-emerald-500/15 text-emerald-300",
 

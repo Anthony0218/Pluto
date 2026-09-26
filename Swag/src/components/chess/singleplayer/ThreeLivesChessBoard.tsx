@@ -1,3 +1,5 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
+import { useAppLanguage } from "@/i18n/languageStore";
 import { useRef, useEffect, useMemo, useState } from "react";
 
 import { Chess, type Square } from "chess.js";
@@ -762,21 +764,15 @@ const russianTranslations: Record<string, string> = {
   "Black in check": "Чёрные под шахом",
 };
 
-function getInitialChessLanguage(): Language {
-  if (typeof window === "undefined") return "en";
-  const stored = window.localStorage.getItem("chess-language");
-  return languageOptions.some((option) => option.value === stored)
-    ? (stored as Language)
-    : "en";
-}
+
 
 function translateChess(language: Language, key: string): string {
   if (language === "en") return key;
-  if (language === "de") return deTranslations[key] ?? key;
+  if (language === "de") return deTranslations[key] ?? ui(key);
   if (language === "bar")
-    return bavarianTranslations[key] ?? deTranslations[key] ?? key;
-  if (language === "ko") return koreanTranslations[key] ?? key;
-  return russianTranslations[key] ?? key;
+    return bavarianTranslations[key] ?? deTranslations[key] ?? ui(key);
+  if (language === "ko") return koreanTranslations[key] ?? ui(key);
+  return russianTranslations[key] ?? ui(key);
 }
 
 function ChessLanguageSelector({
@@ -788,6 +784,7 @@ function ChessLanguageSelector({
   onChange: (language: Language) => void;
   label: string;
 }) {
+  useUiLanguage();
   return (
     <label
       className="
@@ -806,7 +803,7 @@ function ChessLanguageSelector({
       "
     >
       <span>🌐</span>
-      <span className="hidden lg:inline">{label}</span>
+      <span className="hidden lg:inline">{ui(label)}</span>
       <select
         value={language}
         onChange={(event) => onChange(event.target.value as Language)}
@@ -826,7 +823,7 @@ function ChessLanguageSelector({
             value={option.value}
             className="bg-zinc-900 text-zinc-100"
           >
-            {option.label}
+            {ui(option.label)}
           </option>
         ))}
       </select>
@@ -863,7 +860,8 @@ export default function ThreeLivesChessBoard({
   playerColor = "white",
   difficulty = "casual",
 }: VariantAiBoardProps) {
-  const [language, setLanguage] = useState<Language>(getInitialChessLanguage);
+  useUiLanguage();
+  const { language, setLanguage } = useAppLanguage();
   const t = (key: string) => translateChess(language, key);
 
   function changeLanguage(nextLanguage: Language) {
@@ -2292,11 +2290,7 @@ export default function ThreeLivesChessBoard({
                     </div>
 
                     <span className="text-sm font-bold text-zinc-300">
-                      {winner === "draw"
-                        ? t("Draw")
-                        : winner === "white"
-                          ? t("White wins")
-                          : t("Black wins")}
+                      {winner === "draw" ? t("Draw") : winner === "white" ? t("White wins") : t("Black wins")}
                     </span>
                   </div>
                 </div>
@@ -2343,8 +2337,7 @@ export default function ThreeLivesChessBoard({
                       {t("History Preview")}
                     </p>
 
-                    <p className="mt-1 text-sm font-bold text-white">
-                      Move {historyPreview.moveNumber}
+                    <p className="mt-1 text-sm font-bold text-white">{ui("Move")}{historyPreview.moveNumber}
                       {historyPreview.color === "w" ? "." : "..."}{" "}
                       {historyPreview.san}
                     </p>
@@ -2760,11 +2753,7 @@ export default function ThreeLivesChessBoard({
                       <div className="mt-2 flex items-end justify-between gap-3">
                         <div>
                           <p className="text-xl font-black text-white">
-                            {matchStats.pressureLeader === "even"
-                              ? t("Dead even")
-                              : matchStats.pressureLeader === "white"
-                                ? `♔ ${t("White")}`
-                                : `♚ ${t("Black")}`}
+                            {matchStats.pressureLeader === "even" ? t("Dead even") : matchStats.pressureLeader === "white" ? `♔ ${t("White")}` : `♚ ${t("Black")}`}
                           </p>
 
                           <p className="mt-1 text-[10px] text-zinc-700">
@@ -2813,9 +2802,7 @@ export default function ThreeLivesChessBoard({
                         </span>
 
                         <span className="text-sm font-black text-zinc-200">
-                          {matchStats.longestCheckRun.count === 0
-                            ? "—"
-                            : `${
+                          {matchStats.longestCheckRun.count === 0 ? "—" : `${
                                 matchStats.longestCheckRun.side === "white"
                                   ? "♔"
                                   : "♚"
@@ -2942,9 +2929,7 @@ export default function ThreeLivesChessBoard({
 
                                   <p className="mt-0.5 text-[9px] text-zinc-700">
                                     {t("Move")} {moment.moveNumber} ·{" "}
-                                    {moment.attacker === "white"
-                                      ? t("White")
-                                      : t("Black")}{" "}
+                                    {moment.attacker === "white" ? t("White") : t("Black")}{" "}
                                     {t("hit")}
                                   </p>
                                 </div>
@@ -3014,9 +2999,7 @@ export default function ThreeLivesChessBoard({
                                   </p>
 
                                   <p className="mt-0.5 text-[9px] text-zinc-700">
-                                    {pickup.side === "white"
-                                      ? t("White")
-                                      : t("Black")}{" "}
+                                    {pickup.side === "white" ? t("White") : t("Black")}{" "}
                                     · {pickup.square}
                                   </p>
                                 </div>
@@ -3055,6 +3038,7 @@ function ThreeLivesGameControls({
   undoDisabled: boolean;
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-2">
@@ -3125,6 +3109,7 @@ function StatCard({
   value: string;
   detail: string;
 }) {
+  useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3">
       <div className="flex items-center justify-between gap-2">
@@ -3133,7 +3118,7 @@ function StatCard({
       </div>
 
       <p className="mt-2 text-[10px] font-black uppercase tracking-wider text-zinc-600">
-        {label}
+        {ui(label)}
       </p>
 
       <p className="mt-1 text-[10px] text-zinc-700">{detail}</p>
@@ -3170,28 +3155,21 @@ function DangerPieceCard({
   } | null;
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   return (
     <div className="flex items-center justify-between gap-3 rounded-xl border border-white/5 bg-black/20 px-3 py-3">
       <div className="flex items-center gap-3">
         <span className="text-2xl">
-          {dangerousPiece
-            ? statsPieceSymbols[side][dangerousPiece.piece]
-            : side === "white"
-              ? "♔"
-              : "♚"}
+          {dangerousPiece ? statsPieceSymbols[side][dangerousPiece.piece] : side === "white" ? "♔" : "♚"}
         </span>
 
         <div>
           <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
-            {side === "white"
-              ? t("White danger piece")
-              : t("Black danger piece")}
+            {side === "white" ? t("White danger piece") : t("Black danger piece")}
           </p>
 
           <p className="mt-1 text-xs font-bold text-zinc-300">
-            {dangerousPiece
-              ? t(statsPieceNames[dangerousPiece.piece])
-              : t("No checks yet")}
+            {dangerousPiece ? t(statsPieceNames[dangerousPiece.piece]) : t("No checks yet")}
           </p>
         </div>
       </div>
@@ -3216,6 +3194,7 @@ function MomentCard({
   onSelect: (ply: number) => void;
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   return (
     <button
       type="button"
@@ -3239,7 +3218,7 @@ function MomentCard({
       "
     >
       <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
-        {title}
+        {ui(title)}
       </p>
 
       {moment ? (
@@ -3311,6 +3290,7 @@ function CapturedPiecesGrid({
   capturedWhite: PieceType[];
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   const symbols: Record<"white" | "black", Record<PieceType, string>> = {
     white: {
       p: "♙",

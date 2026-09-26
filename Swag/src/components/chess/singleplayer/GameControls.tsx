@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 type GameControlsProps = {
   gameName: string;
   whitePlayer: string;
@@ -21,6 +22,7 @@ export default function GameControls({
   onRestart,
   onSave,
 }: GameControlsProps) {
+  useUiLanguage();
   const inputClass =
     "w-full rounded-xl border border-zinc-700 bg-zinc-950/70 px-3.5 py-2.5 " +
     "text-sm text-zinc-100 placeholder:text-zinc-600 " +
@@ -33,23 +35,19 @@ export default function GameControls({
       {/* Inputs */}
       <div className="space-y-3">
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-zinc-400">
-            Game name
-          </label>
+          <label className="mb-1.5 block text-xs font-medium text-zinc-400">{ui("Game name")}</label>
 
           <input
             type="text"
             value={gameName}
             onChange={(e) => onGameNameChange(e.target.value)}
-            placeholder="My chess game"
+            placeholder={ui("My chess game")}
             className={inputClass}
           />
         </div>
 
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-zinc-400">
-            White player
-          </label>
+          <label className="mb-1.5 block text-xs font-medium text-zinc-400">{ui("White player")}</label>
 
           <div className="relative">
             <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-lg text-zinc-300">
@@ -60,16 +58,14 @@ export default function GameControls({
               type="text"
               value={whitePlayer}
               onChange={(e) => onWhitePlayerChange(e.target.value)}
-              placeholder="White"
+              placeholder={ui("White")}
               className={`${inputClass} pl-10`}
             />
           </div>
         </div>
 
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-zinc-400">
-            Black player
-          </label>
+          <label className="mb-1.5 block text-xs font-medium text-zinc-400">{ui("Black player")}</label>
 
           <div className="relative">
             <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-lg text-zinc-300">
@@ -80,7 +76,7 @@ export default function GameControls({
               type="text"
               value={blackPlayer}
               onChange={(e) => onBlackPlayerChange(e.target.value)}
-              placeholder="Black"
+              placeholder={ui("Black")}
               className={`${inputClass} pl-10`}
             />
           </div>
@@ -106,9 +102,7 @@ export default function GameControls({
             hover:shadow-sky-500/25
             active:scale-[0.98]
           "
-        >
-          Undo
-        </button>
+        >{ui("Undo")}</button>
 
         <button
           type="button"
@@ -124,9 +118,7 @@ export default function GameControls({
             hover:shadow-amber-500/25
             active:scale-[0.98]
           "
-        >
-          Restart
-        </button>
+        >{ui("Restart")}</button>
 
         <button
           type="button"
@@ -143,9 +135,7 @@ export default function GameControls({
             hover:shadow-emerald-500/25
             active:scale-[0.98]
           "
-        >
-          Save Game
-        </button>
+        >{ui("Save Game")}</button>
       </div>
     </div>
   );

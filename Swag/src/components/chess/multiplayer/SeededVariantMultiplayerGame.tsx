@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import {
   useCallback,
   useEffect,
@@ -287,11 +288,12 @@ function Panel({
   subtitle?: string;
   children: ReactNode;
 }) {
+  useUiLanguage();
   return (
     <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/15 backdrop-blur-md">
       <div className="mb-4">
-        <h2 className="text-sm font-black text-zinc-100">{title}</h2>
-        {subtitle && <p className="mt-1 text-xs text-zinc-500">{subtitle}</p>}
+        <h2 className="text-sm font-black text-zinc-100">{ui(title)}</h2>
+        {subtitle && <p className="mt-1 text-xs text-zinc-500">{ui(subtitle)}</p>}
       </div>
       {children}
     </section>
@@ -299,19 +301,21 @@ function Panel({
 }
 
 function InfoRow({ label, value }: { label: string; value: string }) {
+  useUiLanguage();
   return (
     <div className="flex items-center justify-between gap-3 border-b border-white/5 py-2 text-xs last:border-0">
-      <span className="text-zinc-500">{label}</span>
+      <span className="text-zinc-500">{ui(label)}</span>
       <span className="font-black text-zinc-200">{value}</span>
     </div>
   );
 }
 
 function MiniStat({ label, value }: { label: string; value: number | string }) {
+  useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 p-3">
       <p className="text-[9px] font-black uppercase tracking-wider text-zinc-600">
-        {label}
+        {ui(label)}
       </p>
       <p className="mt-2 text-xl font-black text-zinc-200">{value}</p>
     </div>
@@ -319,10 +323,11 @@ function MiniStat({ label, value }: { label: string; value: number | string }) {
 }
 
 function Lineup({ title, value }: { title: string; value: string }) {
+  useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 p-3">
       <p className="text-[9px] font-black uppercase tracking-wider text-zinc-600">
-        {title}
+        {ui(title)}
       </p>
       <p className="mt-2 break-words font-mono text-sm font-black tracking-[0.12em] text-zinc-300">
         {value}
@@ -332,17 +337,19 @@ function Lineup({ title, value }: { title: string; value: string }) {
 }
 
 function RuleLine({ icon, text }: { icon: string; text: string }) {
+  useUiLanguage();
   return (
     <div className="flex gap-3 rounded-xl border border-white/5 bg-black/20 p-3">
       <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/5 text-xs font-black text-zinc-300">
         {icon}
       </span>
-      <p className="text-xs leading-5 text-zinc-500">{text}</p>
+      <p className="text-xs leading-5 text-zinc-500">{ui(text)}</p>
     </div>
   );
 }
 
 export default function SeededVariantMultiplayerGame({ variant }: Props) {
+  useUiLanguage();
   const { roomCode } = useParams();
   const { user } = useAuth();
   const page = variantInfo[variant];
@@ -1023,27 +1030,23 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
 
   if (!user) {
     return (
-      <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100">
-        <div className="mx-auto max-w-2xl rounded-3xl border border-amber-400/20 bg-amber-400/[0.06] p-6">
-          Sign in to open this multiplayer room.
-        </div>
+      <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-8 text-zinc-100">
+        <div className="mx-auto max-w-2xl rounded-3xl border border-amber-400/20 bg-amber-400/[0.06] p-6">{ui("Sign in to open this multiplayer room.")}</div>
       </main>
     );
   }
 
   if (loading && !gameState) {
     return (
-      <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100">
-        <div className="mx-auto max-w-2xl rounded-3xl border border-white/10 bg-zinc-900/70 p-6 text-center">
-          Loading multiplayer room...
-        </div>
+      <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-8 text-zinc-100">
+        <div className="mx-auto max-w-2xl rounded-3xl border border-white/10 bg-zinc-900/70 p-6 text-center">{ui("Loading multiplayer room...")}</div>
       </main>
     );
   }
 
   if (!room || !gameState) {
     return (
-      <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100">
+      <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-8 text-zinc-100">
         <div className="mx-auto max-w-2xl rounded-3xl border border-red-400/20 bg-red-400/[0.06] p-6">
           <p className="font-black text-red-200">
             {error ?? "Room could not be loaded."}
@@ -1051,9 +1054,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
           <Link
             to={page.lobby}
             className="mt-4 inline-block rounded-xl border border-white/10 bg-white/5 px-4 py-2 font-bold text-zinc-200"
-          >
-            Back to lobby
-          </Link>
+          >{ui("Back to lobby")}</Link>
         </div>
       </main>
     );
@@ -1086,7 +1087,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
     : "—";
 
   return (
-    <main className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
+    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1460px]">
         <header
           className={`mb-6 rounded-3xl border ${page.accentBorder} bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20`}
@@ -1102,13 +1103,11 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
               <div>
                 <p
                   className={`text-[10px] font-black uppercase tracking-[0.28em] ${page.accentText}`}
-                >
-                  Chess Variant · Multiplayer
-                </p>
+                >{ui("Chess Variant · Multiplayer")}</p>
                 <h1 className="mt-0.5 text-2xl font-black text-white">
-                  {page.title}
+                  {ui(page.title)}
                 </h1>
-                <p className="mt-1 text-sm text-zinc-500">{page.subtitle}</p>
+                <p className="mt-1 text-sm text-zinc-500">{ui(page.subtitle)}</p>
               </div>
             </div>
 
@@ -1118,7 +1117,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                 onClick={() => void copyRoomCode()}
                 className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-zinc-300 transition hover:bg-white/10"
               >
-                {copied ? "Copied" : `Room ${room.code}`}
+                {copied ? ui("Copied") : `Room ${room.code}`}
               </button>
 
               <span
@@ -1136,10 +1135,10 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
           </div>
         </header>
 
-        <div className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
+        <div className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              <Panel title="Players" subtitle="Online room">
+              <Panel title={ui("Players")} subtitle={ui("Online room")}>
                 <div className="space-y-2">
                   {players.map((player) => {
                     const mine = player.user_id === user.id;
@@ -1155,7 +1154,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                         <div className="min-w-0">
                           <p className="truncate text-sm font-black text-zinc-200">
                             {player.display_name}
-                            {mine ? " · You" : ""}
+                            {mine ? ui(" · You") : ""}
                           </p>
                           <p className="mt-0.5 text-[10px] font-black uppercase tracking-wider text-zinc-600">
                             {player.chosen_color ?? "Waiting"}
@@ -1170,16 +1169,14 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                 </div>
               </Panel>
 
-              <Panel title="Game Controls" subtitle="Players and actions">
+              <Panel title={ui("Game Controls")} subtitle={ui("Players and actions")}>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => void requestUndo()}
                     disabled={!canRequestUndo}
                     className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs font-black text-zinc-300 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:border-white/5 disabled:bg-white/[0.02] disabled:text-zinc-600 disabled:opacity-45 disabled:hover:bg-white/[0.02]"
-                  >
-                    ↶ Undo
-                  </button>
+                  >{ui("↶ Undo")}</button>
 
                   <button
                     type="button"
@@ -1191,50 +1188,36 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                       undoPending
                     }
                     className="rounded-xl border border-red-400/15 bg-red-400/[0.05] px-3 py-2.5 text-xs font-black text-red-300 transition hover:bg-red-400/10 disabled:cursor-not-allowed disabled:opacity-35"
-                  >
-                    Resign
-                  </button>
+                  >{ui("Resign")}</button>
                 </div>
 
                 {alreadyRequestedUndoForThisMove && !undoPending && (
-                  <p className="mt-2 text-[10px] leading-4 text-zinc-600">
-                    You already requested undo for this move.
-                  </p>
+                  <p className="mt-2 text-[10px] leading-4 text-zinc-600">{ui("You already requested undo for this move.")}</p>
                 )}
 
                 {myUndoRequest && (
                   <div className="mt-3 rounded-xl border border-amber-400/15 bg-amber-400/[0.06] p-3">
-                    <p className="text-xs font-black text-amber-200">
-                      Undo request sent
-                    </p>
-                    <p className="mt-1 text-[10px] text-zinc-500">
-                      Waiting for opponent response...
-                    </p>
+                    <p className="text-xs font-black text-amber-200">{ui("Undo request sent")}</p>
+                    <p className="mt-1 text-[10px] text-zinc-500">{ui("Waiting for opponent response...")}</p>
                   </div>
                 )}
 
                 {opponentUndoRequest && (
                   <div className="mt-3 rounded-xl border border-amber-400/20 bg-amber-400/[0.07] p-3">
-                    <p className="text-xs font-black text-amber-200">
-                      Opponent requests to undo the last move.
-                    </p>
+                    <p className="text-xs font-black text-amber-200">{ui("Opponent requests to undo the last move.")}</p>
                     <div className="mt-3 grid grid-cols-2 gap-2">
                       <button
                         type="button"
                         disabled={actionLoading !== null}
                         onClick={() => void respondToUndo(true)}
                         className="rounded-lg bg-emerald-400 px-3 py-2 text-xs font-black text-emerald-950 disabled:opacity-40"
-                      >
-                        Accept
-                      </button>
+                      >{ui("Accept")}</button>
                       <button
                         type="button"
                         disabled={actionLoading !== null}
                         onClick={() => void respondToUndo(false)}
                         className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-zinc-300 disabled:opacity-40"
-                      >
-                        Decline
-                      </button>
+                      >{ui("Decline")}</button>
                     </div>
                   </div>
                 )}
@@ -1242,45 +1225,40 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                 <Link
                   to={page.lobby}
                   className="mt-3 block w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-center text-xs font-bold text-zinc-400 transition hover:bg-white/10"
-                >
-                  Leave room
-                </Link>
+                >{ui("Leave room")}</Link>
               </Panel>
 
               {variant === "randomstart" ? (
                 <Panel
-                  title="Starting Position"
-                  subtitle="This game's independent shuffle"
+                  title={ui("Starting Position")}
+                  subtitle={ui("This game's independent shuffle")}
                 >
-                  <Lineup title="White back rank" value={whiteLineup} />
+                  <Lineup title={ui("White back rank")} value={whiteLineup} />
                   <div className="mt-3">
-                    <Lineup title="Black back rank" value={blackLineup} />
+                    <Lineup title={ui("Black back rank")} value={blackLineup} />
                   </div>
-                  <p className="mt-3 text-[10px] leading-5 text-zinc-600">
-                    The two back ranks are shuffled separately, so Black is not
-                    a reflection of White.
-                  </p>
+                  <p className="mt-3 text-[10px] leading-5 text-zinc-600">{ui("The two back ranks are shuffled separately, so Black is not a reflection of White.")}</p>
                 </Panel>
               ) : (
                 <Panel
-                  title="Chaos Setup"
-                  subtitle="The opening book is useless"
+                  title={ui("Chaos Setup")}
+                  subtitle={ui("The opening book is useless")}
                 >
                   <InfoRow
-                    label="Chaos seed"
+                    label={ui("Chaos seed")}
                     value={String(gameState.seed ?? "—")}
                   />
                   <InfoRow
-                    label="Orthodox matches"
+                    label={ui("Orthodox matches")}
                     value={String(chaosMeta?.orthodoxMatches ?? "—")}
                   />
                   <div className="mt-3 grid grid-cols-2 gap-2">
                     <MiniStat
-                      label="White pieces in Black half"
+                      label={ui("White pieces in Black half")}
                       value={chaosZoneStats?.whiteInEnemyHalf ?? "—"}
                     />
                     <MiniStat
-                      label="Black pieces in White half"
+                      label={ui("Black pieces in White half")}
                       value={chaosZoneStats?.blackInEnemyHalf ?? "—"}
                     />
                   </div>
@@ -1297,13 +1275,9 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                 <div>
                   <p
                     className={`text-[9px] font-black uppercase tracking-widest ${page.accentText}`}
-                  >
-                    History Preview · Frontend only
-                  </p>
+                  >{ui("History Preview · Frontend only")}</p>
                   <p className="mt-1 text-sm font-bold text-white">
-                    {historyPreviewPly === 0
-                      ? "Starting position"
-                      : `${historyRows[historyPreviewPly - 1]?.moveNumber}${
+                    {historyPreviewPly === 0 ? ui("Starting position") : `${historyRows[historyPreviewPly - 1]?.moveNumber}${
                           historyRows[historyPreviewPly - 1]?.color === "w"
                             ? "."
                             : "..."
@@ -1315,9 +1289,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                   type="button"
                   onClick={() => setHistoryPreviewPly(null)}
                   className="rounded-lg bg-white/10 px-3 py-2 text-xs font-bold text-zinc-200 transition hover:bg-white/20"
-                >
-                  Back to Live Board
-                </button>
+                >{ui("Back to Live Board")}</button>
               </div>
             )}
 
@@ -1342,27 +1314,19 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                     type="button"
                     onClick={() => void copyRoomCode()}
                     className="w-full max-w-lg rounded-[30px] border border-white/15 bg-zinc-900/95 px-8 py-8 text-center shadow-2xl shadow-black/60 transition hover:border-amber-300/35 hover:bg-zinc-900 active:scale-[0.99]"
-                    title="Copy room code"
+                    title={ui("Copy room code")}
                   >
                     <div className="text-4xl">🌐</div>
 
-                    <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">
-                      Waiting for players
-                    </p>
+                    <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">{ui("Waiting for players")}</p>
 
                     <h2 className="mt-2 text-2xl font-black text-white">
-                      {players.length}/2 players connected
-                    </h2>
+                      {players.length}{ui("/2 players connected")}</h2>
 
-                    <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">
-                      Share this room code. The game starts automatically when
-                      everyone has joined.
-                    </p>
+                    <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">{ui("Share this room code. The game starts automatically when everyone has joined.")}</p>
 
                     <div className="mt-6 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-5 py-5">
-                      <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">
-                        Room Code
-                      </p>
+                      <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">{ui("Room Code")}</p>
 
                       <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">
                         {room.code}
@@ -1370,9 +1334,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                     </div>
 
                     <p className="mt-4 text-xs font-bold text-zinc-400">
-                      {copied
-                        ? "✓ Copied to clipboard"
-                        : "Click this box to copy the code"}
+                      {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
                     </p>
                   </button>
                 </div>
@@ -1385,16 +1347,10 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                   >
                     <p
                       className={`text-xs font-black uppercase tracking-[0.25em] ${page.overlayEyebrow}`}
-                    >
-                      Game Over
-                    </p>
+                    >{ui("Game Over")}</p>
 
                     <h2 className="mt-3 text-3xl font-black text-white">
-                      {gameState.winner === "draw"
-                        ? "Draw"
-                        : gameState.winner === myColor
-                          ? "You win"
-                          : "You lose"}
+                      {gameState.winner === "draw" ? ui("Draw") : gameState.winner === myColor ? ui("You win") : ui("You lose")}
                     </h2>
 
                     <p className="mt-2 text-sm text-zinc-500">
@@ -1407,29 +1363,23 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                       onClick={() => void requestRematch()}
                       className={`mt-5 w-full rounded-xl px-4 py-3 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-50 ${page.accentButton}`}
                     >
-                      {myRematchReady ? "Rematch requested" : "Rematch"}
+                      {myRematchReady ? ui("Rematch requested") : ui("Rematch")}
                     </button>
 
                     {myRematchReady && !opponentRematchReady && (
-                      <p className="mt-3 text-xs font-semibold text-zinc-500">
-                        Waiting for opponent...
-                      </p>
+                      <p className="mt-3 text-xs font-semibold text-zinc-500">{ui("Waiting for opponent...")}</p>
                     )}
 
                     {opponentRematchReady && !myRematchReady && (
                       <p
                         className={`mt-3 text-xs font-semibold ${page.accentText}`}
-                      >
-                        Opponent wants a rematch.
-                      </p>
+                      >{ui("Opponent wants a rematch.")}</p>
                     )}
 
                     <Link
                       to={page.lobby}
                       className="mt-3 block w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-bold text-zinc-300 transition hover:bg-white/10"
-                    >
-                      Back to lobby
-                    </Link>
+                    >{ui("Back to lobby")}</Link>
                   </div>
                 </div>
               )}
@@ -1439,7 +1389,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
               <Panel
-                title="Move History"
+                title={ui("Move History")}
                 subtitle={`${historyRows.length} plies · click to preview`}
               >
                 <div className="max-h-[380px] overflow-y-auto rounded-xl border border-white/5 bg-black/20">
@@ -1455,21 +1405,19 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                         : "text-zinc-500 hover:bg-white/5"
                     }`}
                   >
-                    <span>Start</span>
-                    <span className="font-black">Initial position</span>
+                    <span>{ui("Start")}</span>
+                    <span className="font-black">{ui("Initial position")}</span>
                   </button>
 
                   {historyRows.length === 0 ? (
-                    <p className="px-4 py-7 text-center text-xs text-zinc-600">
-                      No moves yet
-                    </p>
+                    <p className="px-4 py-7 text-center text-xs text-zinc-600">{ui("No moves yet")}</p>
                   ) : (
                     <table className="w-full border-collapse text-left">
                       <thead className="sticky top-0 bg-zinc-950/95 text-[9px] font-black uppercase tracking-wider text-zinc-600 backdrop-blur">
                         <tr>
-                          <th className="px-3 py-2">Move</th>
-                          <th className="px-2 py-2">Side</th>
-                          <th className="px-3 py-2 text-right">Played</th>
+                          <th className="px-3 py-2">{ui("Move")}</th>
+                          <th className="px-2 py-2">{ui("Side")}</th>
+                          <th className="px-3 py-2 text-right">{ui("Played")}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1518,54 +1466,51 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                 </div>
 
                 {historyPreviewPly !== null && (
-                  <p className="mt-2 text-[10px] leading-4 text-zinc-600">
-                    Preview is local only. It never changes the multiplayer game
-                    state.
-                  </p>
+                  <p className="mt-2 text-[10px] leading-4 text-zinc-600">{ui("Preview is local only. It never changes the multiplayer game state.")}</p>
                 )}
               </Panel>
 
               {variant === "randomstart" ? (
-                <Panel title="Random Start" subtitle="Random setup only">
+                <Panel title={ui("Random Start")} subtitle={ui("Random setup only")}>
                   <div className="space-y-2">
                     <RuleLine
                       icon="8"
-                      text="Each side keeps the normal set of 8 back-rank pieces."
+                      text={ui("Each side keeps the normal set of 8 back-rank pieces.")}
                     />
                     <RuleLine
                       icon="↯"
-                      text="White and Black are shuffled independently."
+                      text={ui("White and Black are shuffled independently.")}
                     />
-                    <RuleLine icon="♙" text="Pawns remain on ranks 2 and 7." />
+                    <RuleLine icon="♙" text={ui("Pawns remain on ranks 2 and 7.")} />
                     <RuleLine
                       icon="♖"
-                      text="Castling is disabled for the entire game."
+                      text={ui("Castling is disabled for the entire game.")}
                     />
                     <RuleLine
                       icon="✓"
-                      text="After setup, normal chess rules apply."
+                      text={ui("After setup, normal chess rules apply.")}
                     />
                   </div>
                 </Panel>
               ) : (
-                <Panel title="Total Chaos" subtitle="Full-board random setup">
+                <Panel title={ui("Total Chaos")} subtitle={ui("Full-board random setup")}>
                   <div className="space-y-2">
                     <RuleLine
                       icon="32"
-                      text="The normal 32 pieces are scattered across the full board."
+                      text={ui("The normal 32 pieces are scattered across the full board.")}
                     />
                     <RuleLine
                       icon="♔"
-                      text="Kings never begin in check and never begin adjacent."
+                      text={ui("Kings never begin in check and never begin adjacent.")}
                     />
                     <RuleLine
                       icon="♙"
-                      text="Pawns may begin anywhere except ranks 1 and 8."
+                      text={ui("Pawns may begin anywhere except ranks 1 and 8.")}
                     />
-                    <RuleLine icon="♖" text="Castling is disabled." />
+                    <RuleLine icon="♖" text={ui("Castling is disabled.")} />
                     <RuleLine
                       icon="✓"
-                      text="After setup, normal chess rules apply."
+                      text={ui("After setup, normal chess rules apply.")}
                     />
                   </div>
                 </Panel>
@@ -1573,7 +1518,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
 
               {error && (
                 <section className="rounded-2xl border border-red-400/20 bg-red-400/[0.06] px-4 py-3 text-sm font-semibold text-red-200">
-                  {error}
+                  {ui(error)}
                 </section>
               )}
             </div>

@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { Link } from "react-router-dom";
 
 type ChessMode = {
@@ -34,12 +35,13 @@ const modes: ChessMode[] = [
 ];
 
 export default function ChessMenu() {
+  useUiLanguage();
   return (
     /*
       `left-1/2 w-screen -translate-x-1/2` deliberately breaks out of a parent
       max-width/container so this page always fills the full viewport width.
     */
-    <main className="relative left-1/2 min-h-[100dvh] w-screen -translate-x-1/2 overflow-hidden bg-[#07090b] text-zinc-100">
+    <main className="chess-menu-page relative left-1/2 min-h-[calc(100dvh-4rem)] w-screen -translate-x-1/2 overflow-hidden bg-[#07090b] text-zinc-100">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_13%_68%,rgba(245,158,11,.09),transparent_28%),radial-gradient(circle_at_76%_23%,rgba(255,255,255,.045),transparent_30%),linear-gradient(to_bottom,#0a0d10,#07090b_58%,#040506)]" />
       <div className="pointer-events-none absolute -bottom-28 -left-24 text-[390px] leading-none text-amber-100/[0.035]">
         ♚
@@ -51,15 +53,13 @@ export default function ChessMenu() {
         ♝
       </div>
 
-      <div className="relative flex min-h-[100dvh] w-full flex-col">
+      <div className="relative flex min-h-[calc(100dvh-4rem)] w-full flex-col">
         <nav className="flex min-h-20 w-full items-center justify-between border-b border-white/[0.07] px-6 sm:px-10 lg:px-14 xl:px-20">
           <div className="inline-flex items-center gap-3">
             <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-amber-300/20 bg-amber-300/10 text-lg text-amber-300">
               ♛
             </span>
-            <span className="font-serif text-sm tracking-[0.28em] text-zinc-200">
-              CHESS
-            </span>
+            <span className="font-serif text-sm tracking-[0.28em] text-zinc-200">{ui("CHESS")}</span>
           </div>
 
           <Link
@@ -67,7 +67,7 @@ export default function ChessMenu() {
             className="inline-flex items-center gap-2 text-sm text-zinc-500 transition hover:text-white"
           >
             <span className="text-base">♔</span>
-            <span className="hidden sm:inline">Rules & Tips</span>
+            <span className="hidden sm:inline">{ui("Rules & Tips")}</span>
           </Link>
         </nav>
 
@@ -76,24 +76,13 @@ export default function ChessMenu() {
             <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-px bg-gradient-to-b from-transparent via-white/10 to-transparent lg:block" />
 
             <div className="max-w-[620px]">
-              <p className="text-[11px] font-black uppercase tracking-[0.34em] text-amber-400">
-                Chess
-              </p>
-              <h1 className="mt-5 font-serif text-[52px] leading-[.94] tracking-[-0.035em] text-white sm:text-[66px] xl:text-[82px]">
-                Choose
-                <br />
-                your game
-              </h1>
-              <p className="mt-6 max-w-[500px] font-serif text-[18px] leading-8 text-zinc-400 sm:text-[20px]">
-                Three ways to play. Same timeless game. Pick the experience that
-                fits you.
-              </p>
+              <p className="text-[11px] font-black uppercase tracking-[0.34em] text-amber-400">{ui("Chess")}</p>
+              <h1 className="mt-5 font-serif text-[52px] leading-[.94] tracking-[-0.035em] text-white sm:text-[66px] xl:text-[82px]">{ui("Choose your game")}</h1>
+              <p className="mt-6 max-w-[500px] font-serif text-[18px] leading-8 text-zinc-400 sm:text-[20px]">{ui("Three ways to play. Same timeless game. Pick the experience that fits you.")}</p>
             </div>
 
             <div className="mt-12 flex items-center gap-4 text-[9px] font-black uppercase tracking-[0.28em] text-zinc-700">
-              <span className="h-px w-14 bg-amber-400/45" />
-              Classic · Variants · Custom
-            </div>
+              <span className="h-px w-14 bg-amber-400/45" />{ui("Classic · Variants · Custom")}</div>
           </header>
 
           <div className="relative flex min-h-[560px] items-center border-t border-white/[0.06] px-5 py-8 sm:px-8 lg:min-h-0 lg:border-t-0 lg:px-10 lg:py-12 xl:px-14 2xl:px-20">
@@ -125,13 +114,13 @@ export default function ChessMenu() {
                       <p
                         className={`text-[9px] font-black uppercase tracking-[0.26em] ${index === 0 ? "text-amber-300/70" : "text-zinc-600"}`}
                       >
-                        {mode.eyebrow}
+                        {ui(mode.eyebrow)}
                       </p>
                       <h2 className="mt-1.5 font-serif text-[27px] leading-tight text-white sm:text-[31px] xl:text-[34px]">
-                        {mode.title}
+                        {ui(mode.title)}
                       </h2>
                       <p className="mt-2 max-w-[650px] text-sm leading-6 text-zinc-500 sm:text-[15px]">
-                        {mode.description}
+                        {ui(mode.description)}
                       </p>
                     </div>
 
@@ -153,9 +142,7 @@ export default function ChessMenu() {
                 className="group mt-2 flex items-center justify-between border-t border-white/[0.08] px-2 pt-6 text-sm text-zinc-500 transition hover:text-white"
               >
                 <span className="inline-flex items-center gap-3">
-                  <span className="text-lg">♔</span>
-                  Rules & Tips
-                </span>
+                  <span className="text-lg">♔</span>{ui("Rules & Tips")}</span>
                 <span className="transition duration-300 group-hover:translate-x-1">
                   →
                 </span>

@@ -1,8 +1,8 @@
+import { useAppLanguage } from "@/i18n/languageStore";
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { WattenVariant, WattenPlayerInfo } from "../../../utils/types";
 import {
-  getInitialWattenLanguage,
   setStoredWattenLanguage,
   translateWatten,
   WattenLanguageSelector,
@@ -11,9 +11,7 @@ import {
 
 export default function WattenHotseat() {
   const navigate = useNavigate();
-  const [language, setLanguage] = useState<WattenLanguage>(
-    getInitialWattenLanguage,
-  );
+  const { language, setLanguage } = useAppLanguage();
   const t = useCallback(
     (key: string) => translateWatten(language, key),
     [language],

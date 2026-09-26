@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 
@@ -261,6 +262,7 @@ export default function TotalChaosChess({
   playerColor = "white",
   difficulty = "casual",
 }: VariantAiBoardProps) {
+  useUiLanguage();
   const { language, setLanguage } = useChessLanguage();
 
   const t = (key: string) => translateChess(language, key, translations);
@@ -607,7 +609,7 @@ export default function TotalChaosChess({
       : t("The game ended in a draw.");
 
   return (
-    <div className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
+    <div className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1460px]">
         <header className="mb-6 rounded-3xl border border-pink-400/10 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -634,9 +636,7 @@ export default function TotalChaosChess({
 
               {!finishedGame && (
                 <span className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-zinc-300">
-                  {game.turn() === "w"
-                    ? t("White to move")
-                    : t("Black to move")}
+                  {game.turn() === "w" ? t("White to move") : t("Black to move")}
                 </span>
               )}
             </div>
@@ -644,7 +644,7 @@ export default function TotalChaosChess({
           </div>
         </header>
 
-        <main className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
+        <main className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
               <Panel
@@ -819,14 +819,10 @@ export default function TotalChaosChess({
                     </p>
 
                     <h2 className="mt-3 text-3xl font-black text-white">
-                      {finishedGame.winner === "white"
-                        ? t("White wins")
-                        : finishedGame.winner === "black"
-                          ? t("Black wins")
-                          : t("Draw")}
+                      {finishedGame.winner === "white" ? t("White wins") : finishedGame.winner === "black" ? t("Black wins") : t("Draw")}
                     </h2>
 
-                    <p className="mt-3 text-sm text-zinc-500">{resultText}</p>
+                    <p className="mt-3 text-sm text-zinc-500">{ui(resultText)}</p>
 
                     <button
                       type="button"
@@ -912,11 +908,12 @@ function Panel({
   subtitle: string;
   children: ReactNode;
 }) {
+  useUiLanguage();
   return (
     <section className="rounded-3xl border border-white/5 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
-      <h2 className="font-black text-zinc-100">{title}</h2>
+      <h2 className="font-black text-zinc-100">{ui(title)}</h2>
 
-      <p className="mt-1 mb-4 text-xs text-zinc-600">{subtitle}</p>
+      <p className="mt-1 mb-4 text-xs text-zinc-600">{ui(subtitle)}</p>
 
       {children}
     </section>
@@ -924,9 +921,10 @@ function Panel({
 }
 
 function InfoRow({ label, value }: { label: string; value: string }) {
+  useUiLanguage();
   return (
     <div className="mb-2 flex items-center justify-between gap-3 rounded-xl border border-white/5 bg-black/20 px-3 py-2.5 last:mb-0">
-      <span className="text-[10px] font-bold text-zinc-600">{label}</span>
+      <span className="text-[10px] font-bold text-zinc-600">{ui(label)}</span>
 
       <span className="max-w-[52%] truncate font-mono text-xs font-black text-pink-200">
         {value}
@@ -936,25 +934,27 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 }
 
 function MiniStat({ label, value }: { label: string; value: number }) {
+  useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 p-3 text-center">
       <div className="text-2xl font-black text-pink-200">{value}</div>
 
       <div className="mt-1 text-[9px] font-bold leading-4 text-zinc-600">
-        {label}
+        {ui(label)}
       </div>
     </div>
   );
 }
 
 function RuleLine({ icon, text }: { icon: string; text: string }) {
+  useUiLanguage();
   return (
     <div className="flex items-start gap-3 rounded-xl border border-white/5 bg-black/20 px-3 py-2.5 text-xs leading-5 text-zinc-400">
       <span className="flex min-w-7 justify-center font-black text-pink-300">
         {icon}
       </span>
 
-      <span>{text}</span>
+      <span>{ui(text)}</span>
     </div>
   );
 }

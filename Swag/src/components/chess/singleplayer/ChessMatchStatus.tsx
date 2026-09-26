@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import type { ReactNode } from "react";
 
 export type ChessMatchStatusEvent =
@@ -115,6 +116,7 @@ export default function ChessMatchStatus({
   label = "Match event",
   className = "",
 }: ChessMatchStatusProps) {
+  useUiLanguage();
   const style = eventStyles[event];
 
   return (
@@ -173,7 +175,7 @@ export default function ChessMatchStatus({
               ${style.label}
             `}
           >
-            {label}
+            {ui(label)}
           </p>
 
           <div className="mt-0.5 flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
@@ -212,7 +214,7 @@ export default function ChessMatchStatus({
                     {effect.icon && (
                       <span aria-hidden="true">{effect.icon}</span>
                     )}
-                    <span>{effect.label}</span>
+                    <span>{ui(effect.label)}</span>
                     {effect.value !== undefined && (
                       <span className="font-black text-current">
                         {effect.value}

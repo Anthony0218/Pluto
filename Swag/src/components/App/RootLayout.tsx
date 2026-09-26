@@ -1,3 +1,6 @@
+import "../chess/chessLayout.css";
+import ChessLayoutControls from "../chess/ChessLayoutControls";
+import RoomFriends from "../social/RoomFriends";
 import { useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 
@@ -43,6 +46,8 @@ export default function RootLayout() {
         "
       >
         <Outlet />
+        <RoomFriends />
+        <ChessLayoutControls />
       </div>
     </div>
   );

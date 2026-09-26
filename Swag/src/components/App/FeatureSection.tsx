@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import type { ReactNode } from "react";
 
 import { ArrowRight } from "lucide-react";
@@ -30,6 +31,7 @@ export default function FeatureSection({
   children,
   reverse = false,
 }: FeatureSectionProps) {
+  useUiLanguage();
   return (
     <section
       className="
@@ -107,7 +109,7 @@ export default function FeatureSection({
                   text-indigo-300
                 "
               >
-                {eyebrow}
+                {ui(eyebrow)}
               </p>
 
               <h2
@@ -128,7 +130,7 @@ export default function FeatureSection({
                   xl:text-6xl
                 "
               >
-                {title}
+                {ui(title)}
               </h2>
 
               <p
@@ -146,7 +148,7 @@ export default function FeatureSection({
                   sm:leading-8
                 "
               >
-                {description}
+                {ui(description)}
               </p>
 
               <Link
@@ -178,7 +180,7 @@ export default function FeatureSection({
                   active:scale-[0.98]
                 "
               >
-                {action}
+                {ui(action)}
 
                 <ArrowRight
                   size={16}

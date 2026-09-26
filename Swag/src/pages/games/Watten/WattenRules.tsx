@@ -1,3 +1,4 @@
+import { useAppLanguage } from "@/i18n/languageStore";
 import { useCallback, useMemo, useState, type ReactNode } from "react";
 import {
   BookOpen,
@@ -29,7 +30,6 @@ import CardThemeSelector from "@/components/Watten/WattenCardGameSelector";
 import TableThemeSelector from "@/components/App/TableThemeSelector";
 
 import {
-  getInitialWattenLanguage,
   setStoredWattenLanguage,
   translateWatten,
   translateWattenPair,
@@ -598,9 +598,7 @@ function PriorityRow({
 }
 
 export default function WattenRule() {
-  const [language, setLanguage] = useState<WattenLanguage>(
-    getInitialWattenLanguage,
-  );
+  const { language, setLanguage } = useAppLanguage();
   const t = useCallback(
     (key: string) => translateWatten(language, key),
     [language],

@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import {
   useCallback,
   useEffect,
@@ -275,11 +276,12 @@ function Panel({
   subtitle?: string;
   children: ReactNode;
 }) {
+  useUiLanguage();
   return (
     <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
       <div className="mb-4">
-        <h2 className="text-sm font-black text-zinc-100">{title}</h2>
-        {subtitle && <p className="mt-1 text-xs text-zinc-500">{subtitle}</p>}
+        <h2 className="text-sm font-black text-zinc-100">{ui(title)}</h2>
+        {subtitle && <p className="mt-1 text-xs text-zinc-500">{ui(subtitle)}</p>}
       </div>
       {children}
     </section>
@@ -287,6 +289,7 @@ function Panel({
 }
 
 function ErrorBox({ children }: { children: ReactNode }) {
+  useUiLanguage();
   return (
     <div className="mt-4 rounded-2xl border border-red-400/20 bg-red-400/[0.07] px-4 py-3 text-sm font-semibold text-red-200">
       {children}
@@ -295,6 +298,7 @@ function ErrorBox({ children }: { children: ReactNode }) {
 }
 
 function CapturedPieces({ rows }: { rows: MutationMoveRecord[] }) {
+  useUiLanguage();
   const capturedWhite = rows
     .filter((row) => row.color === "b" && row.captured)
     .map((row) => row.captured as PieceType);
@@ -336,14 +340,10 @@ function CapturedPieces({ rows }: { rows: MutationMoveRecord[] }) {
             : "Material equal"}
       </div>
       <div className="rounded-2xl border border-white/5 bg-black/20 p-3">
-        <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
-          Black pieces captured
-        </p>
+        <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">{ui("Black pieces captured")}</p>
         {render(capturedBlack, "b")}
         <div className="mt-3 border-t border-white/5 pt-3">
-          <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
-            White pieces captured
-          </p>
+          <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">{ui("White pieces captured")}</p>
           {render(capturedWhite, "w")}
         </div>
       </div>
@@ -352,10 +352,11 @@ function CapturedPieces({ rows }: { rows: MutationMoveRecord[] }) {
 }
 
 export function MutationMultiplayerLobby() {
+  useUiLanguage();
   const navigate = useNavigate();
   const { user, profile } = useAuth();
   const [hostColor, setHostColor] = useState<TwoPlayerColor>("white");
-  const [joinCode, setJoinCode] = useState("");
+  const [joinCode, setJoinCode] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
   const [loading, setLoading] = useState<"create" | "join" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -410,7 +411,7 @@ export function MutationMultiplayerLobby() {
   }
 
   return (
-    <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
+    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-5xl">
         <header className="mb-7 rounded-3xl border border-violet-400/15 bg-zinc-900/65 p-6 shadow-2xl shadow-black/30">
           <div className="flex items-center gap-4">
@@ -418,29 +419,20 @@ export function MutationMultiplayerLobby() {
               🧬
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-300">
-                Mutation Chess · Multiplayer
-              </p>
-              <h1 className="mt-1 text-3xl font-black text-white">
-                Every fifth full move can rewrite the board.
-              </h1>
-              <p className="mt-1 text-sm text-zinc-500">
-                One shared seed makes every scheduled mutation identical for
-                both players.
-              </p>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-300">{ui("Mutation Chess · Multiplayer")}</p>
+              <h1 className="mt-1 text-3xl font-black text-white">{ui("Every fifth full move can rewrite the board.")}</h1>
+              <p className="mt-1 text-sm text-zinc-500">{ui("One shared seed makes every scheduled mutation identical for both players.")}</p>
             </div>
           </div>
         </header>
 
         {!user ? (
-          <Panel title="Sign in required">
-            <p className="text-sm text-zinc-400">
-              Multiplayer rooms use your existing Supabase account.
-            </p>
+          <Panel title={ui("Sign in required")}>
+            <p className="text-sm text-zinc-400">{ui("Multiplayer rooms use your existing Supabase account.")}</p>
           </Panel>
         ) : (
           <div className="grid gap-5 lg:grid-cols-2">
-            <Panel title="Create room" subtitle="Choose your side">
+            <Panel title={ui("Create room")} subtitle={ui("Choose your side")}>
               <div className="grid grid-cols-2 gap-2">
                 {(["white", "black"] as TwoPlayerColor[]).map((color) => (
                   <button
@@ -454,16 +446,12 @@ export function MutationMultiplayerLobby() {
                     }`}
                   >
                     {color === "white" ? "♔" : "♚"}{" "}
-                    {color === "white" ? "White" : "Black"}
+                    {color === "white" ? ui("White") : ui("Black")}
                   </button>
                 ))}
               </div>
 
-              <div className="mt-4 rounded-xl border border-violet-300/10 bg-violet-400/[0.05] p-3 text-xs leading-5 text-zinc-400">
-                The room stores one mutation seed. Every 10 plies, both browsers
-                derive the same legal mutation from that seed and the same board
-                position.
-              </div>
+              <div className="mt-4 rounded-xl border border-violet-300/10 bg-violet-400/[0.05] p-3 text-xs leading-5 text-zinc-400">{ui("The room stores one mutation seed. Every 10 plies, both browsers derive the same legal mutation from that seed and the same board position.")}</div>
 
               <button
                 type="button"
@@ -471,18 +459,18 @@ export function MutationMultiplayerLobby() {
                 onClick={() => void createRoom()}
                 className="mt-5 w-full rounded-xl bg-violet-300 px-5 py-3 font-black text-zinc-950 transition hover:bg-violet-200 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {loading === "create" ? "Creating..." : "Create Mutation Room"}
+                {loading === "create" ? ui("Creating...") : ui("Create Mutation Room")}
               </button>
             </Panel>
 
-            <Panel title="Join room" subtitle="You receive the opposite side">
+            <Panel title={ui("Join room")} subtitle={ui("You receive the opposite side")}>
               <input
                 value={joinCode}
                 onChange={(event) =>
                   setJoinCode(normalizeCode(event.target.value))
                 }
                 onKeyDown={(event) => event.key === "Enter" && void joinRoom()}
-                placeholder="ABC123"
+                placeholder={ui("ABC123")}
                 maxLength={6}
                 className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-center font-mono text-2xl font-black uppercase tracking-[0.3em] text-white outline-none transition placeholder:text-zinc-700 focus:border-violet-400/40"
               />
@@ -492,19 +480,20 @@ export function MutationMultiplayerLobby() {
                 onClick={() => void joinRoom()}
                 className="mt-3 w-full rounded-xl border border-violet-400/20 bg-violet-400/[0.07] px-5 py-3 font-black text-violet-200 transition hover:bg-violet-400/10 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {loading === "join" ? "Joining..." : "Join Mutation Room"}
+                {loading === "join" ? ui("Joining...") : ui("Join Mutation Room")}
               </button>
             </Panel>
           </div>
         )}
 
-        {error && <ErrorBox>{error}</ErrorBox>}
+        {error && <ErrorBox>{ui(error)}</ErrorBox>}
       </div>
     </main>
   );
 }
 
 export function MutationMultiplayerGame() {
+  useUiLanguage();
   const { roomCode } = useParams();
   const { user } = useAuth();
 
@@ -1124,25 +1113,21 @@ export function MutationMultiplayerGame() {
 
   if (!user) {
     return (
-      <main className="min-h-screen bg-transparent p-8 text-zinc-100">
-        Sign in required.
-      </main>
+      <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent p-8 text-zinc-100">{ui("Sign in required.")}</main>
     );
   }
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-transparent p-8 text-zinc-400">
-        Loading Mutation room...
-      </main>
+      <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent p-8 text-zinc-400">{ui("Loading Mutation room...")}</main>
     );
   }
 
   if (!room || !gameState) {
     return (
-      <main className="min-h-screen bg-transparent p-8 text-zinc-100">
-        <p>Mutation room unavailable.</p>
-        {error && <ErrorBox>{error}</ErrorBox>}
+      <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent p-8 text-zinc-100">
+        <p>{ui("Mutation room unavailable.")}</p>
+        {error && <ErrorBox>{ui(error)}</ErrorBox>}
       </main>
     );
   }
@@ -1150,7 +1135,7 @@ export function MutationMultiplayerGame() {
   const activeTurnColor = liveGame.turn() === "w" ? "white" : "black";
 
   return (
-    <div className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
+    <div className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1500px]">
         <header className="mb-7 flex flex-col gap-4 rounded-3xl border border-violet-400/10 bg-zinc-900/50 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
@@ -1158,15 +1143,9 @@ export function MutationMultiplayerGame() {
               🧬
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-300">
-                Chess Variant · Multiplayer
-              </p>
-              <h1 className="mt-0.5 text-2xl font-black text-white">
-                Mutation Chess
-              </h1>
-              <p className="mt-0.5 text-sm text-zinc-500">
-                Every 5 full moves, one legal non-King piece changes.
-              </p>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-300">{ui("Chess Variant · Multiplayer")}</p>
+              <h1 className="mt-0.5 text-2xl font-black text-white">{ui("Mutation Chess")}</h1>
+              <p className="mt-0.5 text-sm text-zinc-500">{ui("Every 5 full moves, one legal non-King piece changes.")}</p>
             </div>
           </div>
 
@@ -1174,30 +1153,26 @@ export function MutationMultiplayerGame() {
             {gameState.status === "playing" && (
               <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-300">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-violet-400" />
-                {activeTurnColor === "white" ? "White" : "Black"} to move
-              </div>
+                {activeTurnColor === "white" ? ui("White") : ui("Black")}{ui("to move")}</div>
             )}
             <button
               type="button"
               onClick={() => void copyRoomCode()}
               className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 font-mono text-xs font-black text-zinc-300"
-            >
-              Room {room.code} {copied ? "✓" : ""}
+            >{ui("Room")}{room.code} {copied ? "✓" : ""}
             </button>
             <Link
               to="/games/chess/variants/mutation/multiplayer"
               className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-400 hover:bg-white/10"
-            >
-              Lobby
-            </Link>
+            >{ui("Lobby")}</Link>
           </div>
         </header>
 
-        <main className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
+        <main className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
               <Panel
-                title="Players"
+                title={ui("Players")}
                 subtitle={
                   players.length < 2 ? "Waiting for opponent..." : "Connected"
                 }
@@ -1222,7 +1197,7 @@ export function MutationMultiplayerGame() {
                         </span>
                       </div>
                       <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-zinc-600">
-                        {player.user_id === user.id ? "You" : "Opponent"} ·{" "}
+                        {player.user_id === user.id ? ui("You") : ui("Opponent")} ·{" "}
                         {player.chosen_color ?? "waiting"}
                       </p>
                     </div>
@@ -1230,16 +1205,14 @@ export function MutationMultiplayerGame() {
                 </div>
               </Panel>
 
-              <Panel title="Game Controls" subtitle="Players, game and actions">
+              <Panel title={ui("Game Controls")} subtitle={ui("Players, game and actions")}>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     disabled={!canRequestUndo}
                     onClick={() => void requestUndo()}
                     className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm font-bold text-zinc-300 disabled:cursor-not-allowed disabled:opacity-35"
-                  >
-                    ↶ Undo
-                  </button>
+                  >{ui("↶ Undo")}</button>
                   <button
                     type="button"
                     disabled={
@@ -1249,15 +1222,13 @@ export function MutationMultiplayerGame() {
                     }
                     onClick={() => void resign()}
                     className="rounded-xl border border-red-400/15 bg-red-400/[0.06] px-3 py-2.5 text-sm font-bold text-red-200 disabled:opacity-35"
-                  >
-                    Resign
-                  </button>
+                  >{ui("Resign")}</button>
                 </div>
               </Panel>
 
               {gameState.undo_requested_by && (
                 <Panel
-                  title="Undo request"
+                  title={ui("Undo request")}
                   subtitle={
                     myUndoRequest
                       ? "Waiting for opponent"
@@ -1270,24 +1241,20 @@ export function MutationMultiplayerGame() {
                         type="button"
                         onClick={() => void respondUndo(true)}
                         className="rounded-xl bg-emerald-300 px-3 py-2.5 font-black text-zinc-950"
-                      >
-                        Accept
-                      </button>
+                      >{ui("Accept")}</button>
                       <button
                         type="button"
                         onClick={() => void respondUndo(false)}
                         className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 font-black text-zinc-300"
-                      >
-                        Decline
-                      </button>
+                      >{ui("Decline")}</button>
                     </div>
                   ) : (
-                    <p className="text-sm text-zinc-400">Request sent.</p>
+                    <p className="text-sm text-zinc-400">{ui("Request sent.")}</p>
                   )}
                 </Panel>
               )}
 
-              <Panel title="Captured Pieces" subtitle="Material overview">
+              <Panel title={ui("Captured Pieces")} subtitle={ui("Material overview")}>
                 <CapturedPieces rows={historyRows} />
               </Panel>
             </div>
@@ -1297,9 +1264,7 @@ export function MutationMultiplayerGame() {
             <div className="mx-auto max-w-[820px]">
               {gameState.status === "finished" && (
                 <div className="mb-3 rounded-2xl border border-violet-400/20 bg-violet-400/[0.07] p-4">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-violet-300">
-                    Game Over
-                  </p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-violet-300">{ui("Game Over")}</p>
                   <p className="mt-1 text-lg font-black text-white">
                     {resultLabel(gameState)}
                   </p>
@@ -1310,12 +1275,10 @@ export function MutationMultiplayerGame() {
                       onClick={() => void requestRematch()}
                       className="rounded-xl bg-violet-300 px-4 py-2.5 text-sm font-black text-zinc-950 disabled:opacity-40"
                     >
-                      {myRematchReady ? "Rematch requested" : "Play Again"}
+                      {myRematchReady ? ui("Rematch requested") : ui("Play Again")}
                     </button>
                     {opponentRematchReady && (
-                      <span className="rounded-xl bg-white/5 px-3 py-2 text-xs text-zinc-400">
-                        Opponent ready
-                      </span>
+                      <span className="rounded-xl bg-white/5 px-3 py-2 text-xs text-zinc-400">{ui("Opponent ready")}</span>
                     )}
                   </div>
                 </div>
@@ -1324,13 +1287,9 @@ export function MutationMultiplayerGame() {
               {historyPreviewPly !== null && (
                 <div className="mb-3 flex items-center justify-between rounded-xl border border-violet-400/20 bg-violet-400/[0.06] px-4 py-3">
                   <div>
-                    <p className="text-[9px] font-black uppercase tracking-widest text-violet-300">
-                      History Preview
-                    </p>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-violet-300">{ui("History Preview")}</p>
                     <p className="mt-1 text-sm font-bold text-white">
-                      {historyPreviewPly === 0
-                        ? "Initial position"
-                        : `${historyRows[historyPreviewPly - 1]?.moveNumber}${
+                      {historyPreviewPly === 0 ? ui("Initial position") : `${historyRows[historyPreviewPly - 1]?.moveNumber}${
                             historyRows[historyPreviewPly - 1]?.color === "w"
                               ? "."
                               : "..."
@@ -1346,9 +1305,7 @@ export function MutationMultiplayerGame() {
                     type="button"
                     onClick={() => setHistoryPreviewPly(null)}
                     className="rounded-lg bg-white/10 px-3 py-2 text-xs font-bold"
-                  >
-                    Back to Live Board
-                  </button>
+                  >{ui("Back to Live Board")}</button>
                 </div>
               )}
 
@@ -1373,27 +1330,19 @@ export function MutationMultiplayerGame() {
                       type="button"
                       onClick={() => void copyRoomCode()}
                       className="w-full max-w-lg rounded-[30px] border border-white/15 bg-zinc-900/95 px-8 py-8 text-center shadow-2xl shadow-black/60 transition hover:border-amber-300/35 hover:bg-zinc-900 active:scale-[0.99]"
-                      title="Copy room code"
+                      title={ui("Copy room code")}
                     >
                       <div className="text-4xl">🌐</div>
 
-                      <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">
-                        Waiting for players
-                      </p>
+                      <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">{ui("Waiting for players")}</p>
 
                       <h2 className="mt-2 text-2xl font-black text-white">
-                        {players.length}/2 players connected
-                      </h2>
+                        {players.length}{ui("/2 players connected")}</h2>
 
-                      <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">
-                        Share this room code. The game starts automatically when
-                        everyone has joined.
-                      </p>
+                      <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">{ui("Share this room code. The game starts automatically when everyone has joined.")}</p>
 
                       <div className="mt-6 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-5 py-5">
-                        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">
-                          Room Code
-                        </p>
+                        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">{ui("Room Code")}</p>
 
                         <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">
                           {room.code}
@@ -1401,9 +1350,7 @@ export function MutationMultiplayerGame() {
                       </div>
 
                       <p className="mt-4 text-xs font-bold text-zinc-400">
-                        {copied
-                          ? "✓ Copied to clipboard"
-                          : "Click this box to copy the code"}
+                        {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
                       </p>
                     </button>
                   </div>
@@ -1412,9 +1359,7 @@ export function MutationMultiplayerGame() {
                 {pendingPromotion && historyPreviewPly === null && (
                   <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/45 p-4 backdrop-blur-[4px]">
                     <div className="w-full max-w-sm rounded-3xl border border-violet-400/20 bg-zinc-900/95 p-4 shadow-2xl">
-                      <p className="mb-3 text-center text-sm font-black text-violet-200">
-                        Choose promotion
-                      </p>
+                      <p className="mb-3 text-center text-sm font-black text-violet-200">{ui("Choose promotion")}</p>
                       <PromotionBar onPromote={promotePawn} />
                     </div>
                   </div>
@@ -1426,41 +1371,33 @@ export function MutationMultiplayerGame() {
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
               <Panel
-                title="Mutation Status"
-                subtitle="Shared deterministic chaos"
+                title={ui("Mutation Status")}
+                subtitle={ui("Shared deterministic chaos")}
               >
                 <div className="rounded-2xl border border-violet-400/10 bg-violet-400/[0.05] p-3">
-                  <p className="text-[9px] font-black uppercase tracking-wider text-violet-300">
-                    Next mutation
-                  </p>
+                  <p className="text-[9px] font-black uppercase tracking-wider text-violet-300">{ui("Next mutation")}</p>
                   <p className="mt-1 text-2xl font-black text-white">
                     {pliesUntilMutation}{" "}
-                    <span className="text-sm text-zinc-500">plies</span>
+                    <span className="text-sm text-zinc-500">{ui("plies")}</span>
                   </p>
-                  <p className="mt-1 text-xs text-zinc-500">
-                    about {fullMovesUntilMutation} full{" "}
-                    {fullMovesUntilMutation === 1 ? "move" : "moves"}
+                  <p className="mt-1 text-xs text-zinc-500">{ui("about")}{fullMovesUntilMutation}{ui(" full")}{" "}
+                    {fullMovesUntilMutation === 1 ? ui("move") : ui("moves")}
                   </p>
                 </div>
 
                 <div className="mt-3 rounded-2xl border border-white/5 bg-black/20 p-3">
-                  <p className="text-[9px] font-black uppercase tracking-wider text-zinc-600">
-                    Last mutation
-                  </p>
+                  <p className="text-[9px] font-black uppercase tracking-wider text-zinc-600">{ui("Last mutation")}</p>
                   {lastMutation ? (
                     <>
                       <p className="mt-2 text-xs font-black text-fuchsia-300">
                         ✦ {formatMutation(lastMutation)}
                       </p>
-                      <p className="mt-1 text-[10px] text-zinc-600">
-                        Mutation #{lastMutation.mutationNumber} · ply{" "}
+                      <p className="mt-1 text-[10px] text-zinc-600">{ui("Mutation #")}{lastMutation.mutationNumber}{ui(" · ply")}{" "}
                         {lastMutation.ply}
                       </p>
                     </>
                   ) : (
-                    <p className="mt-2 text-xs text-zinc-600">
-                      No mutation yet
-                    </p>
+                    <p className="mt-2 text-xs text-zinc-600">{ui("No mutation yet")}</p>
                   )}
                 </div>
 
@@ -1469,35 +1406,28 @@ export function MutationMultiplayerGame() {
                     <p className="text-lg font-black text-emerald-300">
                       {upgrades}
                     </p>
-                    <p className="text-[8px] font-black uppercase text-zinc-600">
-                      Upgrades
-                    </p>
+                    <p className="text-[8px] font-black uppercase text-zinc-600">{ui("Upgrades")}</p>
                   </div>
                   <div className="rounded-xl border border-white/5 bg-black/20 p-2 text-center">
                     <p className="text-lg font-black text-red-300">
                       {downgrades}
                     </p>
-                    <p className="text-[8px] font-black uppercase text-zinc-600">
-                      Downgrades
-                    </p>
+                    <p className="text-[8px] font-black uppercase text-zinc-600">{ui("Downgrades")}</p>
                   </div>
                   <div className="rounded-xl border border-white/5 bg-black/20 p-2 text-center">
                     <p className="text-lg font-black text-violet-300">
                       {sidegrades}
                     </p>
-                    <p className="text-[8px] font-black uppercase text-zinc-600">
-                      Sidegrades
-                    </p>
+                    <p className="text-[8px] font-black uppercase text-zinc-600">{ui("Sidegrades")}</p>
                   </div>
                 </div>
 
-                <p className="mt-3 font-mono text-[10px] text-zinc-700">
-                  Mutation seed {seed}
+                <p className="mt-3 font-mono text-[10px] text-zinc-700">{ui("Mutation seed")}{seed}
                 </p>
               </Panel>
 
               <Panel
-                title="Move History"
+                title={ui("Move History")}
                 subtitle={`${historyRows.length} plies · click to preview`}
               >
                 <div className="max-h-[470px] overflow-y-auto rounded-2xl border border-white/5 bg-black/20">
@@ -1509,14 +1439,10 @@ export function MutationMultiplayerGame() {
                         ? "bg-violet-400/10 text-violet-200"
                         : "text-zinc-500 hover:bg-white/5"
                     }`}
-                  >
-                    Start · standard position
-                  </button>
+                  >{ui("Start · standard position")}</button>
 
                   {historyRows.length === 0 ? (
-                    <p className="px-3 py-6 text-center text-xs text-zinc-700">
-                      No moves yet
-                    </p>
+                    <p className="px-3 py-6 text-center text-xs text-zinc-700">{ui("No moves yet")}</p>
                   ) : (
                     historyRows.map((row) => (
                       <button
@@ -1538,15 +1464,13 @@ export function MutationMultiplayerGame() {
                             {row.san}
                           </span>
                           {row.mutation && (
-                            <span className="ml-auto rounded-full border border-fuchsia-400/20 bg-fuchsia-400/[0.08] px-2 py-0.5 text-[9px] font-black text-fuchsia-300">
-                              🧬 MUTATION
-                            </span>
+                            <span className="ml-auto rounded-full border border-fuchsia-400/20 bg-fuchsia-400/[0.08] px-2 py-0.5 text-[9px] font-black text-fuchsia-300">{ui("🧬 MUTATION")}</span>
                           )}
                         </div>
                         {row.mutation && (
                           <p className="mt-1 pl-[52px] text-[9px] text-zinc-600">
                             {pieceNames[row.mutation.fromType]} →{" "}
-                            {pieceNames[row.mutation.toType]} on{" "}
+                            {pieceNames[row.mutation.toType]}{ui(" on")}{" "}
                             {row.mutation.square}
                           </p>
                         )}
@@ -1560,13 +1484,12 @@ export function MutationMultiplayerGame() {
         </main>
 
         {players.length < 2 && (
-          <div className="mt-5 rounded-2xl border border-violet-400/20 bg-violet-400/[0.06] px-4 py-3 text-sm font-semibold text-violet-100">
-            Waiting for a second player. Share room code{" "}
+          <div className="mt-5 rounded-2xl border border-violet-400/20 bg-violet-400/[0.06] px-4 py-3 text-sm font-semibold text-violet-100">{ui("Waiting for a second player. Share room code")}{" "}
             <span className="font-mono font-black">{room.code}</span>.
           </div>
         )}
 
-        {error && <ErrorBox>{error}</ErrorBox>}
+        {error && <ErrorBox>{ui(error)}</ErrorBox>}
       </div>
     </div>
   );

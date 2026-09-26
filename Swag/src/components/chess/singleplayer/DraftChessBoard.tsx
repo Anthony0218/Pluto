@@ -1,3 +1,5 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
+import { useAppLanguage } from "@/i18n/languageStore";
 import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { Chess, type Square } from "chess.js";
@@ -392,25 +394,7 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
   },
 };
 
-function getInitialLanguage(): Language {
-  if (typeof window === "undefined") {
-    return "en";
-  }
 
-  const stored = window.localStorage.getItem(CHESS_LANGUAGE_STORAGE_KEY);
-
-  if (
-    stored === "en" ||
-    stored === "de" ||
-    stored === "bar" ||
-    stored === "ko" ||
-    stored === "ru"
-  ) {
-    return stored;
-  }
-
-  return "en";
-}
 
 type VariantAiBoardProps = {
   aiMode?: boolean;
@@ -424,7 +408,8 @@ export default function DraftChessBoard({
   playerColor = "white",
   difficulty = "casual",
 }: VariantAiBoardProps) {
-  const [language, setLanguage] = useState<Language>(getInitialLanguage);
+  useUiLanguage();
+  const { language, setLanguage } = useAppLanguage();
 
   const t = (key: string) => {
     if (language === "en") {
@@ -432,10 +417,10 @@ export default function DraftChessBoard({
     }
 
     if (language === "bar") {
-      return translations.bar[key] ?? translations.de[key] ?? key;
+      return translations.bar[key] ?? translations.de[key] ?? ui(key);
     }
 
-    return translations[language][key] ?? key;
+    return translations[language][key] ?? ui(key);
   };
 
   function changeLanguage(nextLanguage: Language) {
@@ -1257,7 +1242,7 @@ export default function DraftChessBoard({
   const board = phase === "setup" ? setupBoard : playingBoard;
 
   return (
-    <div className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
+    <div className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1500px]">
         <header className="mb-7 flex flex-col gap-4 rounded-3xl border border-emerald-400/10 bg-zinc-900/50 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
@@ -1312,9 +1297,7 @@ export default function DraftChessBoard({
                 </p>
 
                 <p className="mt-1 text-sm text-zinc-400">
-                  {setupSide === "w"
-                    ? t("White may use ranks 1–2. King must be on rank 1.")
-                    : t("Black may use ranks 7–8. King must be on rank 8.")}
+                  {setupSide === "w" ? t("White may use ranks 1–2. King must be on rank 1.") : t("Black may use ranks 7–8. King must be on rank 8.")}
                 </p>
               </div>
 
@@ -1327,7 +1310,7 @@ export default function DraftChessBoard({
           </section>
         )}
 
-        <main className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
+        <main className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           {/* LEFT */}
 
           <aside className="min-w-0">
@@ -1423,9 +1406,7 @@ export default function DraftChessBoard({
                   {autoRandomFallbackUsed && (
                     <Panel>
                       <div className="rounded-2xl border border-amber-400/20 bg-amber-400/[0.07] px-3 py-3">
-                        <p className="text-[10px] font-black uppercase tracking-wider text-amber-300">
-                          ⚠ Start position corrected
-                        </p>
+                        <p className="text-[10px] font-black uppercase tracking-wider text-amber-300">{ui("⚠ Start position corrected")}</p>
                         <p className="mt-2 text-xs font-bold leading-5 text-amber-100">
                           {t(
                             "A King started in check, so both armies were replaced with independent random legal armies.",
@@ -1720,7 +1701,7 @@ export default function DraftChessBoard({
                         value={gameStats.promotions}
                       />
 
-                      <SetupStat label="Moves" value={gameStats.moves} />
+                      <SetupStat label={ui("Moves")} value={gameStats.moves} />
                     </div>
                   )}
                 </section>
@@ -1768,6 +1749,7 @@ function PiecePalette({
   onSelect: (tool: SetupTool) => void;
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   const pieces: DraftPieceType[] = ["p", "n", "b", "r", "q", "k"];
 
   return (
@@ -1853,6 +1835,7 @@ function PrivacyOverlay({
   t: (key: string) => string;
   onContinue: () => void;
 }) {
+  useUiLanguage();
   const toBlack = step === "to-black";
 
   return (
@@ -1897,6 +1880,7 @@ function MoveHistory({
   onSelect: (ply: number) => void;
   emptyLabel: string;
 }) {
+  useUiLanguage();
   if (records.length === 0) {
     return (
       <div className="rounded-2xl border border-white/5 bg-black/20 px-4 py-8 text-center text-xs text-zinc-600">
@@ -1932,9 +1916,7 @@ function MoveHistory({
               </td>
 
               <td className="px-2 py-2.5 text-lg">
-                {record.color === "w"
-                  ? (whiteSymbols[record.piece] ?? "")
-                  : (blackSymbols[record.piece] ?? "")}
+                {record.color === "w" ? (whiteSymbols[record.piece] ?? "") : (blackSymbols[record.piece] ?? "")}
               </td>
 
               <td className="px-2 py-2.5 font-mono text-xs font-bold text-zinc-200">
@@ -1949,6 +1931,7 @@ function MoveHistory({
 }
 
 function Panel({ children }: { children: ReactNode }) {
+  useUiLanguage();
   return (
     <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
       {children}
@@ -1965,20 +1948,22 @@ function PanelTitle({
   subtitle: string;
   compact?: boolean;
 }) {
+  useUiLanguage();
   return (
     <div className={compact ? "" : "mb-5"}>
-      <h2 className="text-sm font-bold text-zinc-100">{title}</h2>
+      <h2 className="text-sm font-bold text-zinc-100">{ui(title)}</h2>
 
-      <p className="mt-1.5 text-xs text-zinc-500">{subtitle}</p>
+      <p className="mt-1.5 text-xs text-zinc-500">{ui(subtitle)}</p>
     </div>
   );
 }
 
 function BudgetPill({ label, value }: { label: string; value: number }) {
+  useUiLanguage();
   return (
     <div className="rounded-xl border border-emerald-400/10 bg-emerald-400/[0.05] px-3 py-2 text-center">
       <p className="text-[9px] font-black uppercase tracking-wider text-zinc-600">
-        {label}
+        {ui(label)}
       </p>
 
       <p className="mt-1 text-lg font-black text-emerald-200">{value}</p>
@@ -1993,18 +1978,20 @@ function SetupStat({
   label: string;
   value: number | string;
 }) {
+  useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3">
       <p className="text-lg font-black text-zinc-100">{value}</p>
 
       <p className="mt-1 text-[9px] font-black uppercase tracking-wider text-zinc-600">
-        {label}
+        {ui(label)}
       </p>
     </div>
   );
 }
 
 function TinyPieceStat({ symbol, value }: { symbol: string; value: number }) {
+  useUiLanguage();
   return (
     <div className="rounded-lg border border-white/5 bg-black/20 px-1 py-2 text-center">
       <div className="text-xl leading-none">{symbol}</div>
@@ -2023,10 +2010,11 @@ function ArmySummary({
   stats: ReturnType<typeof buildDraftArmyStats>;
   symbol: string;
 }) {
+  useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-black text-zinc-300">{title}</span>
+        <span className="text-xs font-black text-zinc-300">{ui(title)}</span>
 
         <span className="text-xl">{symbol}</span>
       </div>
@@ -2035,19 +2023,19 @@ function ArmySummary({
         <div>
           <p className="text-lg font-black text-white">{stats.pieces}</p>
 
-          <p className="text-[8px] uppercase text-zinc-600">pieces</p>
+          <p className="text-[8px] uppercase text-zinc-600">{ui("pieces")}</p>
         </div>
 
         <div>
           <p className="text-lg font-black text-emerald-200">{stats.spent}</p>
 
-          <p className="text-[8px] uppercase text-zinc-600">spent</p>
+          <p className="text-[8px] uppercase text-zinc-600">{ui("spent")}</p>
         </div>
 
         <div>
           <p className="text-lg font-black text-zinc-400">{stats.remaining}</p>
 
-          <p className="text-[8px] uppercase text-zinc-600">left</p>
+          <p className="text-[8px] uppercase text-zinc-600">{ui("left")}</p>
         </div>
       </div>
     </div>
@@ -2065,6 +2053,7 @@ function GameControls({
   undoDisabled: boolean;
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   return (
     <div className="grid grid-cols-2 gap-2">
       <button
@@ -2101,6 +2090,7 @@ function CapturedPiecesGrid({
   capturedWhite: PieceType[];
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   function renderPieces(pieces: PieceType[], color: "w" | "b") {
     return (
       <div className="mt-2 flex min-h-8 flex-wrap gap-1">
@@ -2150,6 +2140,7 @@ function GameOverBanner({
   winner: Winner;
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   return (
     <div className="mb-3 rounded-2xl border border-emerald-400/20 bg-emerald-400/[0.07] px-4 py-3">
       <div className="flex items-center justify-between gap-4">
@@ -2158,15 +2149,11 @@ function GameOverBanner({
             {t("Game Over")}
           </p>
 
-          <p className="mt-1 font-black text-white">{reason}</p>
+          <p className="mt-1 font-black text-white">{ui(reason)}</p>
         </div>
 
         <span className="text-sm font-bold text-zinc-300">
-          {winner === "draw"
-            ? t("Draw")
-            : winner === "white"
-              ? t("White wins")
-              : t("Black wins")}
+          {winner === "draw" ? t("Draw") : winner === "white" ? t("White wins") : t("Black wins")}
         </span>
       </div>
     </div>
@@ -2182,20 +2169,21 @@ function LanguageSelector({
   onChange: (language: Language) => void;
   label: string;
 }) {
+  useUiLanguage();
   return (
     <label className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-400">
       <span>🌐</span>
 
-      <span className="hidden sm:inline">{label}</span>
+      <span className="hidden sm:inline">{ui(label)}</span>
 
       <select
         value={language}
         onChange={(event) => onChange(event.target.value as Language)}
         className="bg-transparent text-xs font-bold text-zinc-200 outline-none [color-scheme:dark]"
       >
-        <option value="en">English</option>
-        <option value="de">Deutsch</option>
-        <option value="bar">Boarisch</option>
+        <option value="en">{ui("English")}</option>
+        <option value="de">{ui("Deutsch")}</option>
+        <option value="bar">{ui("Boarisch")}</option>
         <option value="ko">한국어</option>
         <option value="ru">Русский</option>
       </select>

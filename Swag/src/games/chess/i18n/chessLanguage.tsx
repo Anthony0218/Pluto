@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { translateUi } from "@/i18n/ui";
 
 export type ChessLanguage = "en" | "de" | "bar" | "ko" | "ru";
 
@@ -263,39 +263,7 @@ const commonTranslations: TranslationTable = {
   },
 };
 
-function getInitialChessLanguage(): ChessLanguage {
-  if (typeof window === "undefined") return "en";
-
-  const saved = window.localStorage.getItem(CHESS_LANGUAGE_STORAGE_KEY);
-
-  if (
-    saved === "en" ||
-    saved === "de" ||
-    saved === "bar" ||
-    saved === "ko" ||
-    saved === "ru"
-  ) {
-    return saved;
-  }
-
-  return "en";
-}
-
-export function useChessLanguage() {
-  const [language, setLanguageState] = useState<ChessLanguage>(
-    getInitialChessLanguage,
-  );
-
-  function setLanguage(next: ChessLanguage) {
-    setLanguageState(next);
-
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(CHESS_LANGUAGE_STORAGE_KEY, next);
-    }
-  }
-
-  return { language, setLanguage };
-}
+export { useAppLanguage as useChessLanguage } from "@/i18n/languageStore";
 
 export function translateChess(
   language: ChessLanguage,
@@ -313,11 +281,11 @@ export function translateChess(
       local?.de?.[key] ??
       commonLanguage[key] ??
       commonTranslations.de[key] ??
-      key
+      translateUi(language, key)
     );
   }
 
-  return localLanguage?.[key] ?? commonLanguage[key] ?? key;
+  return localLanguage?.[key] ?? commonLanguage[key] ?? translateUi(language, key);
 }
 
 export function LanguageSelector({

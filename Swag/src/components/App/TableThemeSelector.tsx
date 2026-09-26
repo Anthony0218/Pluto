@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { Check, ChevronDown, PanelsTopLeft } from "lucide-react";
 import { useState } from "react";
 
@@ -41,6 +42,7 @@ const tableThemes: {
 ];
 
 export default function TableThemeSelector() {
+  useUiLanguage();
   const [open, setOpen] = useState(false);
 
   const { tableTheme, setTableTheme } = useTableTheme();
@@ -70,7 +72,7 @@ export default function TableThemeSelector() {
       >
         <PanelsTopLeft size={17} className="text-emerald-400" />
 
-        <span className="text-slate-400">Tischdesign:</span>
+        <span className="text-slate-400">{ui("Tischdesign:")}</span>
 
         <span>{current.name}</span>
 

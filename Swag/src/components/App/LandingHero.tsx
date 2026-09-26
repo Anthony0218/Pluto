@@ -1,8 +1,10 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { BookOpen, Gamepad2, TrendingUp } from "lucide-react";
 
 import VisitPlutoPreview from "./VisitPlutoPreview";
 
 export default function LandingHero() {
+  useUiLanguage();
   return (
     <section
       className="
@@ -83,9 +85,7 @@ export default function LandingHero() {
               tracking-[0.32em]
               text-indigo-300
             "
-          >
-            Games + Learning
-          </p>
+          >{ui("Games + Learning")}</p>
 
           <h1
             className="
@@ -100,11 +100,7 @@ export default function LandingHero() {
               lg:text-7xl
               xl:text-[86px]
             "
-          >
-            Play.
-            <br />
-            Learn.
-            <br />
+          >{ui("Play.")}<br />{ui("Learn.")}<br />
             <span
               className="
                 bg-gradient-to-r
@@ -114,9 +110,7 @@ export default function LandingHero() {
                 bg-clip-text
                 text-transparent
               "
-            >
-              Improve.
-            </span>
+            >{ui("Improve.")}</span>
           </h1>
 
           <p
@@ -130,10 +124,7 @@ export default function LandingHero() {
               sm:text-lg
               sm:leading-8
             "
-          >
-            Play games, learn new skills and use powerful tools to understand
-            how you can get better.
-          </p>
+          >{ui("Play games, learn new skills and use powerful tools to understand how you can get better.")}</p>
 
           {/* PLAY / LEARN / IMPROVE */}
           <div
@@ -148,20 +139,20 @@ export default function LandingHero() {
           >
             <HeroFeature
               icon={<Gamepad2 size={19} />}
-              title="Play"
-              description="Games and variants"
+              title={ui("Play")}
+              description={ui("Games and variants")}
             />
 
             <HeroFeature
               icon={<BookOpen size={19} />}
-              title="Learn"
-              description="Interactive lessons"
+              title={ui("Learn")}
+              description={ui("Interactive lessons")}
             />
 
             <HeroFeature
               icon={<TrendingUp size={19} />}
-              title="Improve"
-              description="Track your progress"
+              title={ui("Improve")}
+              description={ui("Track your progress")}
             />
           </div>
         </div>
@@ -182,6 +173,7 @@ function HeroFeature({
   title: string;
   description: string;
 }) {
+  useUiLanguage();
   return (
     <div className="flex items-start gap-3">
       <div
@@ -206,9 +198,9 @@ function HeroFeature({
       </div>
 
       <div>
-        <p className="text-sm font-semibold text-white">{title}</p>
+        <p className="text-sm font-semibold text-white">{ui(title)}</p>
 
-        <p className="mt-1 text-xs text-zinc-500">{description}</p>
+        <p className="mt-1 text-xs text-zinc-500">{ui(description)}</p>
       </div>
     </div>
   );

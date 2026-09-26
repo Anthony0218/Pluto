@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { ui, useUiLanguage } from "@/i18n/ui";
+import { useAppLanguage } from "@/i18n/languageStore";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 type Language = "en" | "de" | "bar" | "ko" | "ru";
@@ -41,15 +43,7 @@ const languageOptions: Array<{ value: Language; label: string }> = [
   { value: "ru", label: "Русский" },
 ];
 
-function getInitialChessLanguage(): Language {
-  if (typeof window === "undefined") return "en";
 
-  const stored = window.localStorage.getItem("chess-language");
-
-  return languageOptions.some((option) => option.value === stored)
-    ? (stored as Language)
-    : "en";
-}
 
 const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
   de: {
@@ -503,10 +497,10 @@ function t(language: Language, key: string): string {
   if (language === "en") return key;
 
   if (language === "bar") {
-    return translations.bar[key] ?? translations.de[key] ?? key;
+    return translations.bar[key] ?? translations.de[key] ?? ui(key);
   }
 
-  return translations[language][key] ?? key;
+  return translations[language][key] ?? ui(key);
 }
 
 const variants: VariantCard[] = [
@@ -833,6 +827,7 @@ function LanguageSelector({
   language: Language;
   onChange: (language: Language) => void;
 }) {
+  useUiLanguage();
   return (
     <div className="flex flex-wrap gap-2" aria-label={t(language, "Language")}>
       {languageOptions.map((option) => (
@@ -846,7 +841,7 @@ function LanguageSelector({
               : "border-white/12 bg-black/20 text-zinc-400 hover:border-white/25 hover:text-white"
           }`}
         >
-          {option.label}
+          {ui(option.label)}
         </button>
       ))}
     </div>
@@ -937,6 +932,7 @@ function VariantArtwork({
   variant: VariantCard;
   compact?: boolean;
 }) {
+  useUiLanguage();
   const art = variantArtwork[variant.id] ?? {
     main: variant.icon,
     left: "♜",
@@ -973,14 +969,15 @@ function VariantArtwork({
       <span
         className={`absolute bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap font-black uppercase tracking-[0.22em] opacity-45 ${compact ? "text-[7px]" : "text-[9px]"}`}
       >
-        {art.footer}
+        {ui(art.footer)}
       </span>
     </div>
   );
 }
 
 function VariantPreviewCarousel({ language }: { language: Language }) {
-  const [previewOrder, setPreviewOrder] = useState<VariantCard[]>(() => [
+  useUiLanguage();
+  const [previewOrder] = useState<VariantCard[]>(() => [
     ...availableVariants,
   ]);
   const [previewIndex, setPreviewIndex] = useState(0);
@@ -1056,7 +1053,7 @@ function VariantPreviewCarousel({ language }: { language: Language }) {
                     type="button"
                     onClick={() => goTo(previewIndex - 1)}
                     className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/30 text-2xl text-zinc-300 transition hover:border-white/35 hover:text-white"
-                    aria-label="Previous variant"
+                    aria-label={ui("Previous variant")}
                   >
                     ‹
                   </button>
@@ -1064,7 +1061,7 @@ function VariantPreviewCarousel({ language }: { language: Language }) {
                     type="button"
                     onClick={() => goTo(previewIndex + 1)}
                     className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/30 text-2xl text-zinc-300 transition hover:border-white/35 hover:text-white"
-                    aria-label="Next variant"
+                    aria-label={ui("Next variant")}
                   >
                     ›
                   </button>
@@ -1105,6 +1102,7 @@ function VariantActionButtons({
   variant: VariantCard;
   language: Language;
 }) {
+  useUiLanguage();
   if (!variant.available) {
     return (
       <div className="grid grid-cols-4 gap-1.5 opacity-45">
@@ -1146,15 +1144,11 @@ function VariantActionButtons({
         <Link
           to={variant.multiplayerRoute}
           className={`${base} border-white/15 bg-black/25 text-zinc-300 hover:bg-white/[0.07] hover:text-white`}
-        >
-          Multiplayer
-        </Link>
+        >{ui("Multiplayer")}</Link>
       ) : (
         <span
           className={`${base} border-white/[0.06] bg-black/10 text-zinc-700`}
-        >
-          Multiplayer
-        </span>
+        >{ui("Multiplayer")}</span>
       )}
 
       {/* 3. Hotseat */}
@@ -1163,7 +1157,7 @@ function VariantActionButtons({
           to={variant.route}
           className={`${base} border-white/15 bg-black/25 text-zinc-300 hover:bg-white/[0.07] hover:text-white`}
         >
-          {variant.id === "3d-chess" ? "Play" : t(language, "Hotseat")}
+          {variant.id === "3d-chess" ? ui("Play") : t(language, "Hotseat")}
         </Link>
       ) : (
         <span
@@ -1201,6 +1195,7 @@ function VariantCardView({
   language: Language;
   number: number;
 }) {
+  useUiLanguage();
   return (
     <article
       className={`group relative overflow-hidden rounded-[13px] border bg-black/50 transition duration-300 hover:-translate-y-0.5 ${accentClasses[variant.accent]} ${accentShadow[variant.accent]}`}
@@ -1259,7 +1254,13 @@ function VariantCardView({
 }
 
 export default function ChessVariantsMenu() {
-  const [language, setLanguage] = useState<Language>(getInitialChessLanguage);
+  useUiLanguage();
+  const { language, setLanguage } = useAppLanguage();
+  const [libraryOpen, setLibraryOpen] = useState(false);
+  const libraryRef = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    if (libraryOpen) libraryRef.current?.showModal();
+  }, [libraryOpen]);
 
   function changeLanguage(nextLanguage: Language) {
     setLanguage(nextLanguage);
@@ -1270,7 +1271,7 @@ export default function ChessVariantsMenu() {
   }
 
   return (
-    <main className="relative left-1/2 min-h-[100dvh] w-screen -translate-x-1/2 overflow-hidden bg-[#07090b] text-zinc-100">
+    <main className="chess-menu-page relative left-1/2 min-h-[calc(100dvh-4rem)] w-screen -translate-x-1/2 overflow-hidden bg-[#07090b] text-zinc-100">
       {/* Same full-screen atmosphere as ChessMenu / ChessClassicalMenu. */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_13%_68%,rgba(245,158,11,.09),transparent_28%),radial-gradient(circle_at_76%_23%,rgba(217,70,239,.07),transparent_30%),linear-gradient(to_bottom,#0a0d10,#07090b_58%,#040506)]" />
 
@@ -1286,16 +1287,14 @@ export default function ChessVariantsMenu() {
         ♝
       </div>
 
-      <div className="relative flex min-h-[100dvh] w-full flex-col">
+      <div className="relative flex min-h-[calc(100dvh-4rem)] w-full flex-col">
         {/* Same compact top bar used on the other menu pages. */}
         <nav className="flex min-h-20 w-full items-center justify-between border-b border-white/[0.07] px-6 sm:px-10 lg:px-14 xl:px-20">
           <Link to="/games/chess" className="inline-flex items-center gap-3">
             <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-amber-300/20 bg-amber-300/10 text-lg text-amber-300">
               ♛
             </span>
-            <span className="font-serif text-sm tracking-[0.28em] text-zinc-200">
-              CHESS
-            </span>
+            <span className="font-serif text-sm tracking-[0.28em] text-zinc-200">{ui("CHESS")}</span>
           </Link>
 
           <Link
@@ -1330,11 +1329,10 @@ export default function ChessVariantsMenu() {
               </h1>
 
               <p className="mt-6 max-w-[520px] font-serif text-[18px] leading-8 text-zinc-400 sm:text-[20px]">
-                {variants.length} ways to turn classic chess into something
-                completely different.
-              </p>
+                {variants.length}{ui("ways to turn classic chess into something completely different.")}</p>
 
-              <div className="mt-7">
+              <button type="button" onClick={() => setLibraryOpen(true)} className="mt-7 rounded-xl border border-amber-300/30 bg-amber-300/10 px-5 py-3 font-semibold text-amber-100">{ui("All variants")}</button>
+              <div className="mt-7 hidden">
                 <p className="mb-3 text-[9px] font-black uppercase tracking-[0.28em] text-zinc-700">
                   {t(language, "Language")}
                 </p>
@@ -1348,8 +1346,7 @@ export default function ChessVariantsMenu() {
 
             <div className="mt-12 flex items-center gap-4 text-[9px] font-black uppercase tracking-[0.28em] text-zinc-700">
               <span className="h-px w-14 bg-amber-400/45" />
-              {variants.length} unique ways to play
-            </div>
+              {variants.length}{ui("unique ways to play")}</div>
 
             <div className="pointer-events-none absolute bottom-[5%] right-[4%] hidden text-[190px] leading-none text-amber-100/[0.022] xl:block">
               ♞
@@ -1360,17 +1357,11 @@ export default function ChessVariantsMenu() {
             <div className="mx-auto w-full max-w-[980px]">
               <div className="mb-4 flex items-center justify-between gap-4 px-1">
                 <div>
-                  <p className="text-[9px] font-black uppercase tracking-[0.28em] text-fuchsia-300/60">
-                    Featured
-                  </p>
-                  <h2 className="mt-1 font-serif text-[24px] text-white sm:text-[28px]">
-                    Explore a variant
-                  </h2>
+                  <p className="text-[9px] font-black uppercase tracking-[0.28em] text-fuchsia-300/60">{ui("Featured")}</p>
+                  <h2 className="mt-1 font-serif text-[24px] text-white sm:text-[28px]">{ui("Explore a variant")}</h2>
                 </div>
 
-                <span className="hidden text-[9px] font-black uppercase tracking-[0.25em] text-zinc-700 sm:inline">
-                  Auto preview
-                </span>
+                <span className="hidden text-[9px] font-black uppercase tracking-[0.25em] text-zinc-700 sm:inline">{ui("Auto preview")}</span>
               </div>
 
               <VariantPreviewCarousel language={language} />
@@ -1379,22 +1370,18 @@ export default function ChessVariantsMenu() {
         </section>
 
         {/* FULL VARIANT LIBRARY */}
-        <section className="relative border-t border-white/[0.07] px-4 pb-12 pt-8 sm:px-6 lg:px-10 lg:pb-16 lg:pt-10 xl:px-14 2xl:px-20">
+        {libraryOpen && <dialog ref={libraryRef} onCancel={() => setLibraryOpen(false)} aria-label={ui("All variants")} className="m-auto max-h-[calc(100dvh-6rem)] w-[min(1560px,96vw)] overflow-y-auto rounded-2xl border border-white/10 bg-[#07090b] p-5 text-zinc-100 backdrop:bg-black/70 sm:p-8">
+          <button autoFocus type="button" onClick={() => setLibraryOpen(false)} className="sticky top-0 z-10 mb-4 rounded-xl border border-white/20 bg-zinc-900 px-4 py-3">{ui("Close library")}</button>
           <div className="mx-auto w-full max-w-[1560px]">
             <div className="mb-5 flex flex-wrap items-end justify-between gap-4 px-1">
               <div>
-                <p className="text-[9px] font-black uppercase tracking-[0.28em] text-amber-300/65">
-                  Variant Library
-                </p>
+                <p className="text-[9px] font-black uppercase tracking-[0.28em] text-amber-300/65">{ui("Variant Library")}</p>
 
-                <h2 className="mt-1.5 font-serif text-[30px] leading-tight text-white sm:text-[36px]">
-                  All Variants
-                </h2>
+                <h2 className="mt-1.5 font-serif text-[30px] leading-tight text-white sm:text-[36px]">{ui("All Variants")}</h2>
               </div>
 
               <p className="text-[9px] font-black uppercase tracking-[0.30em] text-zinc-600">
-                {variants.length} unique ways to play
-              </p>
+                {variants.length}{ui("unique ways to play")}</p>
             </div>
 
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -1408,7 +1395,7 @@ export default function ChessVariantsMenu() {
               ))}
             </div>
           </div>
-        </section>
+        </dialog>}
       </div>
     </main>
   );

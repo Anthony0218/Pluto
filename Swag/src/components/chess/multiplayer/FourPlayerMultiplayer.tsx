@@ -1,3 +1,5 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
+import { chooseFourPlayerAiMove } from "@/games/chess/ai/fourPlayerAi";
 import {
   useCallback,
   useEffect,
@@ -184,11 +186,12 @@ function checkedKing(state: FourPlayerState): FourPlayerSquare | null {
 }
 
 export function FourPlayerMultiplayerLobby() {
+  useUiLanguage();
   const navigate = useNavigate();
   const { user, profile } = useAuth();
   const [hostColor, setHostColor] = useState<FourPlayerColor>("red");
   const [joinColor, setJoinColor] = useState<FourPlayerColor>("blue");
-  const [joinCode, setJoinCode] = useState("");
+  const [joinCode, setJoinCode] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
   const [loading, setLoading] = useState<"create" | "join" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -239,7 +242,7 @@ export function FourPlayerMultiplayerLobby() {
   }
 
   return (
-    <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
+    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] overflow-y-auto bg-transparent px-4 py-8 pb-12 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-6xl">
         <header className="mb-7 rounded-3xl border border-cyan-400/15 bg-zinc-900/70 p-6 shadow-2xl shadow-black/30">
           <div className="flex items-center gap-4">
@@ -247,28 +250,20 @@ export function FourPlayerMultiplayerLobby() {
               ✣
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-cyan-300">
-                Four Player Chess · Multiplayer
-              </p>
-              <h1 className="mt-1 text-3xl font-black text-white">
-                Four armies. Four browsers.
-              </h1>
-              <p className="mt-1 text-sm text-zinc-500">
-                Red → Blue → Yellow → Green · last player standing wins
-              </p>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-cyan-300">{ui("Four Player Chess · Multiplayer")}</p>
+              <h1 className="mt-1 text-3xl font-black text-white">{ui("Four armies. Four browsers.")}</h1>
+              <p className="mt-1 text-sm text-zinc-500">{ui("Red → Blue → Yellow → Green · last player standing wins")}</p>
             </div>
           </div>
         </header>
 
         {!user ? (
-          <Panel title="Sign in required">
-            <p className="text-sm text-zinc-400">
-              Multiplayer rooms use your existing Supabase account.
-            </p>
+          <Panel title={ui("Sign in required")}>
+            <p className="text-sm text-zinc-400">{ui("Multiplayer rooms use your existing Supabase account.")}</p>
           </Panel>
         ) : (
           <div className="grid gap-5 lg:grid-cols-2">
-            <Panel title="Create room" subtitle="Pick any of the four armies">
+            <Panel title={ui("Create room")} subtitle={ui("Pick any of the four armies")}>
               <ColorPicker value={hostColor} onChange={setHostColor} />
               <button
                 type="button"
@@ -276,17 +271,17 @@ export function FourPlayerMultiplayerLobby() {
                 onClick={() => void createRoom()}
                 className="mt-5 w-full rounded-xl bg-cyan-300 px-5 py-3 font-black text-zinc-950 hover:bg-cyan-200 disabled:opacity-40"
               >
-                {loading === "create" ? "Creating..." : "Create 4-Player Room"}
+                {loading === "create" ? ui("Creating...") : ui("Create 4-Player Room")}
               </button>
             </Panel>
 
-            <Panel title="Join room" subtitle="Choose a free army color">
+            <Panel title={ui("Join room")} subtitle={ui("Choose a free army color")}>
               <input
                 value={joinCode}
                 onChange={(event) =>
                   setJoinCode(normalizeCode(event.target.value))
                 }
-                placeholder="ABC123"
+                placeholder={ui("ABC123")}
                 className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-center font-mono text-2xl font-black uppercase tracking-[0.3em] text-white outline-none focus:border-cyan-400/40"
               />
               <div className="mt-4">
@@ -298,18 +293,19 @@ export function FourPlayerMultiplayerLobby() {
                 onClick={() => void joinRoom()}
                 className="mt-4 w-full rounded-xl border border-cyan-400/20 bg-cyan-400/[0.07] px-5 py-3 font-black text-cyan-200 hover:bg-cyan-400/10 disabled:opacity-40"
               >
-                {loading === "join" ? "Joining..." : "Join Room"}
+                {loading === "join" ? ui("Joining...") : ui("Join Room")}
               </button>
             </Panel>
           </div>
         )}
-        {error && <ErrorBox>{error}</ErrorBox>}
+        {error && <ErrorBox>{ui(error)}</ErrorBox>}
       </div>
     </main>
   );
 }
 
 export function FourPlayerMultiplayerGame() {
+  useUiLanguage();
   const { roomCode } = useParams();
   const { user } = useAuth();
   const [room, setRoom] = useState<VariantRoom | null>(null);
@@ -325,6 +321,9 @@ export function FourPlayerMultiplayerGame() {
   const [actionLoading, setActionLoading] = useState<ActionLoading>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [selectedBotColors, setSelectedBotColors] = useState<FourPlayerColor[]>(
+    [],
+  );
   const lastSeenActionCountRef = useRef(0);
 
   const myPlayer = useMemo(
@@ -364,6 +363,18 @@ export function FourPlayerMultiplayerGame() {
     [displayedState],
   );
 
+  const botColors = room?.bot_colors ?? [];
+  const plannedBotColors = selectedBotColors.filter(
+    (color) => !players.some((player) => player.chosen_color === color),
+  );
+  const unassignedHumanSlots = FOUR_PLAYER_ORDER.filter(
+    (color) =>
+      !players.some((player) => player.chosen_color === color) &&
+      !plannedBotColors.includes(color),
+  );
+  const mixedGame = botColors.length > 0;
+  const filledSeats = players.length + botColors.length;
+  const botTurn = !!room && room.host_id === user?.id && botColors.includes(liveState.turn) && room.status === "playing" && gameState?.status === "playing" && !gameState.undo_requested_by && actionLoading === null;
   const myActive = myColor ? liveState.activePlayers.includes(myColor) : false;
   const undoPending = Boolean(gameState?.undo_requested_by);
   const canMove =
@@ -389,8 +400,7 @@ export function FourPlayerMultiplayerGame() {
     gameState?.undo_last_requested_version === gameState?.version;
   const canRequestUndo =
     gameState?.status === "playing" &&
-    gameState.last_action_kind === "move" &&
-    gameState.last_action_user_id === user?.id &&
+    (mixedGame ? gameState.bot_undo_snapshot?.user_id === user?.id : gameState.last_action_kind === "move" && gameState.last_action_user_id === user?.id) &&
     !undoPending &&
     !alreadyRequestedThisVersion &&
     actionLoading === null;
@@ -432,7 +442,7 @@ export function FourPlayerMultiplayerGame() {
 
       const { data: roomData, error: roomError } = await supabase
         .from("variant_rooms")
-        .select("id, code, host_id, variant, max_players, status, created_at")
+        .select("id, code, host_id, variant, max_players, bot_colors, status, created_at")
         .eq("code", roomCode.toUpperCase())
         .eq("variant", "four-player")
         .single();
@@ -471,7 +481,7 @@ export function FourPlayerMultiplayerGame() {
           rematch_ready, undo_requested_by, undo_requested_version,
           undo_previous_fen, undo_previous_last_from, undo_previous_last_to,
           undo_last_requested_by, undo_last_requested_version, undo_votes,
-          last_action_user_id, last_action_kind
+          last_action_user_id, last_action_kind, bot_undo_snapshot
         `,
         )
         .eq("room_id", loadedRoom.id)
@@ -548,12 +558,43 @@ export function FourPlayerMultiplayerGame() {
     return () => window.clearInterval(id);
   }, [actionLoading, loadRoom, room?.id]);
 
+  const botVersion = useRef<number | null>(null);
+  useEffect(() => {
+    if (!botTurn || !gameState || botVersion.current === gameState.version) return;
+    const version = gameState.version;
+    const timer = window.setTimeout(() => {
+      const move = chooseFourPlayerAiMove(liveState, "casual");
+      if (!move) return;
+      botVersion.current = version;
+      void commitMove(move.from, move.to, true).finally(() => { botVersion.current = null; });
+    }, 550);
+    return () => window.clearTimeout(timer);
+  }, [botTurn, gameState?.version, liveState]);
+
+  async function startWithBots(colors = plannedBotColors) {
+    if (!room || room.host_id !== user?.id || actionLoading) return;
+    setActionLoading("move"); setError(null);
+    const { error } = await supabase.rpc("start_four_player_with_bots", { p_room_id: room.id, p_bot_colors: colors });
+    if (error) setError(error.message);
+    await loadRoom(true);
+    setActionLoading(null);
+  }
+
+  function setBotSlot(color: FourPlayerColor, isBot: boolean) {
+    if (players.some((player) => player.chosen_color === color)) return;
+    setSelectedBotColors((current) =>
+      isBot
+        ? current.includes(color) ? current : [...current, color]
+        : current.filter((candidate) => candidate !== color),
+    );
+  }
+
   function clearSelection() {
     setSelectedSquare(null);
   }
 
-  async function commitMove(from: FourPlayerSquare, to: FourPlayerSquare) {
-    if (!room || !gameState || !canMove || !myColor) return;
+  async function commitMove(from: FourPlayerSquare, to: FourPlayerSquare, bot = false) {
+    if (!room || !gameState || (bot ? !botTurn : !canMove) || !myColor) return;
     const previous = gameState;
     const nextState = applyFourPlayerMove(liveState, from, to);
     if (nextState === liveState || nextState.moveCount === liveState.moveCount)
@@ -582,7 +623,7 @@ export function FourPlayerMultiplayerGame() {
     setActionLoading("move");
     setError(null);
 
-    const { error: rpcError } = await supabase.rpc("play_four_player_move", {
+    const { error: rpcError } = await supabase.rpc(mixedGame ? "play_four_player_mixed_move" : "play_four_player_move", {
       p_room_id: room.id,
       p_from: from,
       p_to: to,
@@ -630,8 +671,9 @@ export function FourPlayerMultiplayerGame() {
     if (!room || !canRequestUndo) return;
     setActionLoading("undo-request");
     setError(null);
-    const { error: rpcError } = await supabase.rpc("request_four_player_undo", {
+    const { error: rpcError } = await supabase.rpc(mixedGame ? "four_player_mixed_action" : "request_four_player_undo", {
       p_room_id: room.id,
+      ...(mixedGame ? { p_action: "undo-request" } : {}),
     });
     if (rpcError) setError(rpcError.message);
     await loadRoom(true);
@@ -642,8 +684,9 @@ export function FourPlayerMultiplayerGame() {
     if (!room || !opponentUndoRequest || alreadyVotedUndo || actionLoading)
       return;
     setActionLoading("undo-response");
-    const { error: rpcError } = await supabase.rpc("respond_four_player_undo", {
+    const { error: rpcError } = await supabase.rpc(mixedGame ? "four_player_mixed_action" : "respond_four_player_undo", {
       p_room_id: room.id,
+      ...(mixedGame ? { p_action: "undo-response" } : {}),
       p_accept: accept,
     });
     if (rpcError) setError(rpcError.message);
@@ -663,10 +706,9 @@ export function FourPlayerMultiplayerGame() {
       return;
     const next = applyResignation(liveState, myColor);
     setActionLoading("resign");
-    const { error: rpcError } = await supabase.rpc("resign_four_player_game", {
+    const { error: rpcError } = await supabase.rpc(mixedGame ? "four_player_mixed_action" : "resign_four_player_game", {
       p_room_id: room.id,
-      p_new_state: next,
-      p_action_label: `${fourPlayerLabel(myColor)} resigns`,
+      ...(mixedGame ? { p_action: "resign", p_state: next } : { p_new_state: next, p_action_label: `${fourPlayerLabel(myColor)} resigns` }),
     });
     if (rpcError) setError(rpcError.message);
     await loadRoom(true);
@@ -683,9 +725,10 @@ export function FourPlayerMultiplayerGame() {
       return;
     setActionLoading("rematch");
     const { error: rpcError } = await supabase.rpc(
-      "request_four_player_rematch",
+      mixedGame ? "four_player_mixed_action" : "request_four_player_rematch",
       {
         p_room_id: room.id,
+        ...(mixedGame ? { p_action: "rematch" } : {}),
       },
     );
     if (rpcError) setError(rpcError.message);
@@ -705,19 +748,69 @@ export function FourPlayerMultiplayerGame() {
   }
 
   if (!user)
-    return <SimplePage text="Sign in to open this Four Player room." />;
+    return <SimplePage text={ui("Sign in to open this Four Player room.")} />;
   if (loading && !gameState)
-    return <SimplePage text="Loading Four Player multiplayer..." />;
+    return <SimplePage text={ui("Loading Four Player multiplayer...")} />;
   if (!room || !gameState)
     return <SimplePage text={error ?? "Four Player room unavailable."} />;
 
   const orderedPlayers = FOUR_PLAYER_ORDER.map((color) => ({
     color,
-    player: players.find((player) => player.chosen_color === color) ?? null,
+    player: players.find((player) => player.chosen_color === color) ?? (botColors.includes(color) ? { user_id: `bot-${color}`, display_name: `${fourPlayerLabel(color)} AI`, chosen_color: color } : null),
   }));
 
+  // Do not place the invite UI over the 14×14 board. The board surface is
+  // deliberately viewport-bound on desktop, so a large code card can be
+  // clipped on short displays. This dedicated waiting screen scrolls normally.
+  if (room.status === "waiting" && filledSeats < 4) {
+    return (
+      <main className="chess-variant-page min-h-[calc(100dvh-4rem)] overflow-y-auto bg-transparent px-4 py-6 pb-12 text-zinc-100 sm:px-6">
+        <div className="mx-auto w-full max-w-3xl">
+          <header className="mb-6 flex flex-col gap-4 rounded-3xl border border-cyan-400/15 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-400/20 bg-cyan-400/10 text-3xl">✣</div>
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.28em] text-cyan-300">{ui("Four Player Chess · Multiplayer")}</p>
+                <h1 className="mt-1 text-2xl font-black text-white">{ui("Invite your players")}</h1>
+                <p className="mt-1 text-sm text-zinc-500">{ui("The game starts when all four armies are filled.")}</p>
+              </div>
+            </div>
+            <Link to="/games/chess/variants/4-players/multiplayer" className="self-start rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-zinc-400 hover:bg-white/10 sm:self-auto">{ui("Leave")}</Link>
+          </header>
+
+          {error && <ErrorBox>{ui(error)}</ErrorBox>}
+
+          <section className="rounded-3xl border border-amber-300/25 bg-zinc-900/80 p-5 text-center shadow-2xl shadow-black/25 sm:p-8">
+            <div className="text-4xl">🌐</div>
+            <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">{ui("Waiting for players")}</p>
+            <h2 className="mt-2 text-3xl font-black text-white">{filledSeats}{ui("/4 players connected")}</h2>
+            <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-zinc-400">{ui("Share this room code. The game starts automatically when everyone has joined.")}</p>
+            <button type="button" onClick={() => void copyCode()} className="mx-auto mt-6 block w-full max-w-xl rounded-2xl border border-amber-300/25 bg-amber-300/[0.07] px-5 py-5 transition hover:border-amber-200/50 hover:bg-amber-300/[0.1]" title={ui("Copy room code")}>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">{ui("Room Code")}</p>
+              <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">{room.code}</p>
+              <p className="mt-4 text-xs font-bold text-zinc-400">{copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}</p>
+            </button>
+          </section>
+
+          <section className="mt-5 rounded-3xl border border-white/10 bg-zinc-900/75 p-5 shadow-xl shadow-black/15 sm:p-6">
+            <div className="mb-4 flex items-center justify-between gap-3"><div><h2 className="text-sm font-black text-white">{ui("Players")}</h2><p className="mt-1 text-xs text-zinc-500">{ui("Red → Blue → Yellow → Green")}</p></div><span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs font-black text-cyan-100">{filledSeats}/4</span></div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {orderedPlayers.map(({ color, player }) => {
+                const isBot = plannedBotColors.includes(color);
+                const isHost = room.host_id === user?.id;
+                return <div key={color} className={`rounded-xl border ${playerStyles[color].border} ${playerStyles[color].soft} px-4 py-3`}><div className="flex items-center justify-between gap-3"><div><p className={`text-xs font-black ${playerStyles[color].text}`}>{fourPlayerLabel(color)}</p><p className="mt-1 text-xs text-zinc-400">{player?.display_name ?? (isBot ? ui("AI bot") : ui("Waiting for player"))}</p></div>{myColor === color && <span className="rounded-full bg-white/10 px-2 py-1 text-[9px] font-black text-white">{ui("YOU")}</span>}</div>{isHost && !player && <div className="mt-3 grid grid-cols-2 gap-2"><button type="button" onClick={() => setBotSlot(color, false)} aria-pressed={!isBot} className={`rounded-lg px-2 py-2 text-[10px] font-black ${!isBot ? "bg-cyan-300 text-zinc-950" : "bg-white/5 text-zinc-400"}`}>{ui("Player")}</button><button type="button" onClick={() => setBotSlot(color, true)} aria-pressed={isBot} className={`rounded-lg px-2 py-2 text-[10px] font-black ${isBot ? "bg-amber-300 text-zinc-950" : "bg-white/5 text-zinc-400"}`}>{ui("AI bot")}</button></div>}</div>;
+              })}
+            </div>
+          </section>
+
+          {room.host_id === user?.id && <section className="mt-5 rounded-3xl border border-amber-300/20 bg-amber-400/5 p-5 text-center"><p className="text-sm text-zinc-300">{unassignedHumanSlots.length ? ui("Choose AI for each open slot you do not want a person to fill.") : ui("Every slot is assigned. Start when you are ready.")}</p><button type="button" disabled={actionLoading !== null || unassignedHumanSlots.length > 0} onClick={() => void startWithBots()} className="mt-4 rounded-xl bg-amber-300 px-5 py-3 font-bold text-zinc-950 disabled:opacity-50">{actionLoading ? ui("Starting...") : ui("Start assigned game")}</button></section>}
+        </div>
+      </main>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
+    <div className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1580px]">
         <header className="mb-6 flex flex-col gap-4 rounded-3xl border border-cyan-400/15 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
@@ -725,17 +818,12 @@ export function FourPlayerMultiplayerGame() {
               ✣
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-cyan-300">
-                Four Player Chess · Multiplayer
-              </p>
-              <h1 className="mt-1 text-2xl font-black text-white">
-                Four armies. One battlefield.
-              </h1>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-cyan-300">{ui("Four Player Chess · Multiplayer")}</p>
+              <h1 className="mt-1 text-2xl font-black text-white">{ui("Four armies. One battlefield.")}</h1>
               <p
                 className={`mt-1 text-sm ${playerStyles[liveState.turn].text}`}
               >
-                {fourPlayerLabel(liveState.turn)} to move
-              </p>
+                {fourPlayerLabel(liveState.turn)}{ui("to move")}</p>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -744,30 +832,28 @@ export function FourPlayerMultiplayerGame() {
               onClick={() => void copyCode()}
               className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 font-mono text-xs font-black text-zinc-300"
             >
-              {copied ? "Copied" : `Room ${room.code}`}
+              {copied ? ui("Copied") : `Room ${room.code}`}
             </button>
             <Link
               to="/games/chess/variants/4-players/multiplayer"
               className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-zinc-400 hover:bg-white/10"
-            >
-              Leave
-            </Link>
+            >{ui("Leave")}</Link>
           </div>
         </header>
 
-        {error && <ErrorBox>{error}</ErrorBox>}
+        {error && <ErrorBox>{ui(error)}</ErrorBox>}
 
-        {players.length < 4 && (
-          <div className="mb-5 rounded-2xl border border-cyan-400/20 bg-cyan-400/[0.06] px-4 py-3 text-sm text-cyan-100">
-            Waiting for players: <b>{players.length}/4</b>. Share room code{" "}
+        {mixedGame && <p className="mb-3 text-sm text-amber-200">{ui("Bots: ")}{botColors.map(fourPlayerLabel).join(", ")}{ui(" · The host keeps this room open to run bot turns.")}</p>}
+        {filledSeats < 4 && (
+          <div className="mb-5 rounded-2xl border border-cyan-400/20 bg-cyan-400/[0.06] px-4 py-3 text-sm text-cyan-100">{ui("Waiting for players:")}<b>{filledSeats}/4</b>{ui(". Share room code")}{" "}
             <b>{room.code}</b>.
           </div>
         )}
 
-        <main className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
+        <main className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              <Panel title="Players" subtitle="Red → Blue → Yellow → Green">
+              <Panel title={ui("Players")} subtitle={ui("Red → Blue → Yellow → Green")}>
                 <div className="space-y-2">
                   {orderedPlayers.map(({ color, player }) => (
                     <div
@@ -786,14 +872,10 @@ export function FourPlayerMultiplayerGame() {
                       </div>
                       <div className="text-right">
                         {myColor === color && (
-                          <span className="rounded-full bg-white/10 px-2 py-1 text-[9px] font-black text-white">
-                            YOU
-                          </span>
+                          <span className="rounded-full bg-white/10 px-2 py-1 text-[9px] font-black text-white">{ui("YOU")}</span>
                         )}
                         {!liveState.activePlayers.includes(color) && player && (
-                          <span className="ml-1 rounded-full bg-red-400/10 px-2 py-1 text-[9px] font-black text-red-300">
-                            OUT
-                          </span>
+                          <span className="ml-1 rounded-full bg-red-400/10 px-2 py-1 text-[9px] font-black text-red-300">{ui("OUT")}</span>
                         )}
                       </div>
                     </div>
@@ -801,16 +883,14 @@ export function FourPlayerMultiplayerGame() {
                 </div>
               </Panel>
 
-              <Panel title="Game Controls" subtitle="Online actions">
+              <Panel title={ui("Game Controls")} subtitle={ui("Online actions")}>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     disabled={!canRequestUndo}
                     onClick={() => void requestUndo()}
                     className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm font-bold text-zinc-300 disabled:cursor-not-allowed disabled:opacity-30"
-                  >
-                    ↶ Undo
-                  </button>
+                  >{ui("↶ Undo")}</button>
                   <button
                     type="button"
                     disabled={
@@ -818,53 +898,37 @@ export function FourPlayerMultiplayerGame() {
                     }
                     onClick={() => void resign()}
                     className="rounded-xl border border-red-400/15 bg-red-400/[0.06] px-3 py-2.5 text-sm font-bold text-red-200 disabled:cursor-not-allowed disabled:opacity-30"
-                  >
-                    Resign
-                  </button>
+                  >{ui("Resign")}</button>
                 </div>
                 {myUndoRequest && (
-                  <p className="mt-3 text-xs text-amber-200">
-                    Undo vote: {undoVotes.length}/{requiredUndoApprovals}{" "}
-                    approvals.
-                  </p>
+                  <p className="mt-3 text-xs text-amber-200">{ui("Undo vote:")}{undoVotes.length}/{requiredUndoApprovals}{" "}{ui("approvals.")}</p>
                 )}
                 {opponentUndoRequest && (
                   <div className="mt-3 rounded-xl border border-amber-400/20 bg-amber-400/[0.06] p-3">
-                    <p className="text-xs font-black text-amber-100">
-                      Latest mover requests an undo.
-                    </p>
+                    <p className="text-xs font-black text-amber-100">{ui("Latest mover requests an undo.")}</p>
                     {alreadyVotedUndo ? (
-                      <p className="mt-2 text-xs text-zinc-400">
-                        Your approval was recorded. Waiting for the other
-                        players.
-                      </p>
+                      <p className="mt-2 text-xs text-zinc-400">{ui("Your approval was recorded. Waiting for the other players.")}</p>
                     ) : (
                       <div className="mt-2 grid grid-cols-2 gap-2">
                         <button
                           onClick={() => void respondUndo(true)}
                           className="rounded-lg bg-emerald-300 px-3 py-2 text-xs font-black text-zinc-950"
-                        >
-                          Accept
-                        </button>
+                        >{ui("Accept")}</button>
                         <button
                           onClick={() => void respondUndo(false)}
                           className="rounded-lg bg-white/10 px-3 py-2 text-xs font-black text-zinc-200"
-                        >
-                          Decline
-                        </button>
+                        >{ui("Decline")}</button>
                       </div>
                     )}
                     <p className="mt-2 text-[10px] text-zinc-500">
-                      {undoVotes.length}/{requiredUndoApprovals} approvals · all
-                      other players must agree
-                    </p>
+                      {undoVotes.length}/{requiredUndoApprovals}{ui("approvals · all other players must agree")}</p>
                   </div>
                 )}
               </Panel>
 
               <Panel
-                title="Move History"
-                subtitle="Click any action to preview the board locally"
+                title={ui("Move History")}
+                subtitle={ui("Click any action to preview the board locally")}
               >
                 <FourPlayerHistory
                   moves={gameState.moves}
@@ -880,13 +944,9 @@ export function FourPlayerMultiplayerGame() {
             {historyPreviewIndex !== null && (
               <div className="mb-3 flex items-center justify-between rounded-xl border border-blue-400/20 bg-blue-400/[0.07] px-4 py-3">
                 <div>
-                  <p className="text-[9px] font-black uppercase tracking-widest text-blue-300">
-                    History Preview
-                  </p>
+                  <p className="text-[9px] font-black uppercase tracking-widest text-blue-300">{ui("History Preview")}</p>
                   <p className="mt-1 text-sm font-bold text-white">
-                    {historyPreviewIndex === 0
-                      ? "Initial position"
-                      : (gameState.moves[historyPreviewIndex - 1] ??
+                    {historyPreviewIndex === 0 ? ui("Initial position") : (gameState.moves[historyPreviewIndex - 1] ??
                         `Action ${historyPreviewIndex}`)}
                   </p>
                 </div>
@@ -894,9 +954,7 @@ export function FourPlayerMultiplayerGame() {
                   type="button"
                   onClick={() => setHistoryPreviewIndex(null)}
                   className="rounded-lg bg-white/10 px-3 py-2 text-xs font-bold text-zinc-200"
-                >
-                  Back to Live Board
-                </button>
+                >{ui("Back to Live Board")}</button>
               </div>
             )}
 
@@ -919,33 +977,25 @@ export function FourPlayerMultiplayerGame() {
                 }
               />
 
-              {players.length < 4 && (
+              {filledSeats < 4 && (
                 <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[28px] bg-zinc-950/70 p-4 backdrop-blur-[3px]">
                   <button
                     type="button"
                     onClick={() => void copyCode()}
                     className="w-full max-w-lg rounded-[30px] border border-white/15 bg-zinc-900/95 px-8 py-8 text-center shadow-2xl shadow-black/60 transition hover:border-amber-300/35 hover:bg-zinc-900 active:scale-[0.99]"
-                    title="Copy room code"
+                    title={ui("Copy room code")}
                   >
                     <div className="text-4xl">🌐</div>
 
-                    <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">
-                      Waiting for players
-                    </p>
+                    <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">{ui("Waiting for players")}</p>
 
                     <h2 className="mt-2 text-2xl font-black text-white">
-                      {players.length}/4 players connected
-                    </h2>
+                      {filledSeats}{ui("/4 players connected")}</h2>
 
-                    <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">
-                      Share this room code. The game starts automatically when
-                      everyone has joined.
-                    </p>
+                    <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">{ui("Share this room code. The game starts automatically when everyone has joined.")}</p>
 
                     <div className="mt-6 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-5 py-5">
-                      <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">
-                        Room Code
-                      </p>
+                      <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">{ui("Room Code")}</p>
 
                       <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">
                         {room.code}
@@ -953,9 +1003,7 @@ export function FourPlayerMultiplayerGame() {
                     </div>
 
                     <p className="mt-4 text-xs font-bold text-zinc-400">
-                      {copied
-                        ? "✓ Copied to clipboard"
-                        : "Click this box to copy the code"}
+                      {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
                     </p>
                   </button>
                 </div>
@@ -966,25 +1014,21 @@ export function FourPlayerMultiplayerGame() {
                   <div
                     className={`max-w-sm rounded-3xl border bg-zinc-900 p-6 text-center shadow-2xl ${playerStyles[liveState.winner].border}`}
                   >
-                    <p className="text-xs font-black uppercase tracking-[0.25em] text-zinc-500">
-                      Last Player Standing
-                    </p>
+                    <p className="text-xs font-black uppercase tracking-[0.25em] text-zinc-500">{ui("Last Player Standing")}</p>
                     <h2
                       className={`mt-3 text-3xl font-black ${playerStyles[liveState.winner].text}`}
                     >
-                      {fourPlayerLabel(liveState.winner)} wins
-                    </h2>
+                      {fourPlayerLabel(liveState.winner)}{ui("wins")}</h2>
                     <button
                       type="button"
                       disabled={myRematchReady}
                       onClick={() => void rematch()}
                       className="mt-5 rounded-xl bg-white px-4 py-2.5 text-sm font-black text-zinc-950 disabled:opacity-40"
                     >
-                      {myRematchReady ? "Rematch requested" : "Request rematch"}
+                      {myRematchReady ? ui("Rematch requested") : ui("Request rematch")}
                     </button>
                     <p className="mt-3 text-[10px] text-zinc-500">
-                      {rematchReady.length}/{players.length} players ready
-                    </p>
+                      {rematchReady.length}/{players.length}{ui("players ready")}</p>
                   </div>
                 </div>
               )}
@@ -993,38 +1037,35 @@ export function FourPlayerMultiplayerGame() {
 
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              <Panel title="Status" subtitle="Live custom-engine state">
+              <Panel title={ui("Status")} subtitle={ui("Live custom-engine state")}>
                 <InfoRow
-                  label="Your army"
+                  label={ui("Your army")}
                   value={myColor ? fourPlayerLabel(myColor) : "—"}
                   valueClass={myColor ? playerStyles[myColor].text : undefined}
                 />
                 <InfoRow
-                  label="Turn"
+                  label={ui("Turn")}
                   value={fourPlayerLabel(liveState.turn)}
                   valueClass={playerStyles[liveState.turn].text}
                 />
                 <InfoRow
-                  label="Active armies"
+                  label={ui("Active armies")}
                   value={String(liveState.activePlayers.length)}
                 />
                 <InfoRow
-                  label="Actions"
+                  label={ui("Actions")}
                   value={String(gameState.moves.length)}
                 />
               </Panel>
 
-              <Panel title="Rules" subtitle="Four-way free-for-all">
-                <Rule text="Turn order is Red → Blue → Yellow → Green, skipping eliminated armies." />
-                <Rule text="No castling or en passant. Pawns promote automatically to queens on the opposite edge." />
-                <Rule text="Checkmated or stalemated armies are eliminated. The last active player wins." />
+              <Panel title={ui("Rules")} subtitle={ui("Four-way free-for-all")}>
+                <Rule text={ui("Turn order is Red → Blue → Yellow → Green, skipping eliminated armies.")} />
+                <Rule text={ui("No castling or en passant. Pawns promote automatically to queens on the opposite edge.")} />
+                <Rule text={ui("Checkmated or stalemated armies are eliminated. The last active player wins.")} />
               </Panel>
 
-              <Panel title="Board" subtitle="14 × 14 cross">
-                <p className="text-xs leading-6 text-zinc-500">
-                  The four 3×3 corners are outside the board. Sliding pieces
-                  cannot pass through them.
-                </p>
+              <Panel title={ui("Board")} subtitle={ui("14 × 14 cross")}>
+                <p className="text-xs leading-6 text-zinc-500">{ui("The four 3×3 corners are outside the board. Sliding pieces cannot pass through them.")}</p>
               </Panel>
             </div>
           </aside>
@@ -1041,6 +1082,7 @@ function ColorPicker({
   value: FourPlayerColor;
   onChange: (color: FourPlayerColor) => void;
 }) {
+  useUiLanguage();
   return (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
       {FOUR_PLAYER_ORDER.map((color) => (
@@ -1068,6 +1110,7 @@ function FourPlayerHistory({
   selected: number | null;
   onSelect: (index: number) => void;
 }) {
+  useUiLanguage();
   return (
     <div className="max-h-80 overflow-y-auto rounded-xl border border-white/5 bg-black/20">
       <button
@@ -1076,12 +1119,10 @@ function FourPlayerHistory({
         className={`flex w-full items-center justify-between border-b border-white/5 px-3 py-2.5 text-xs ${selected === 0 ? "bg-blue-400/10" : "hover:bg-white/5"}`}
       >
         <span className="text-zinc-600">0</span>
-        <span className="font-bold text-zinc-300">Initial position</span>
+        <span className="font-bold text-zinc-300">{ui("Initial position")}</span>
       </button>
       {moves.length === 0 ? (
-        <div className="px-4 py-6 text-center text-xs text-zinc-600">
-          No actions yet
-        </div>
+        <div className="px-4 py-6 text-center text-xs text-zinc-600">{ui("No actions yet")}</div>
       ) : (
         moves.map((notation, index) => {
           const snapshot = history[index + 1];
@@ -1097,7 +1138,7 @@ function FourPlayerHistory({
               <span
                 className={`min-w-14 text-xs font-black ${color ? playerStyles[color].text : "text-zinc-500"}`}
               >
-                {color ? fourPlayerLabel(color) : "Event"}
+                {color ? fourPlayerLabel(color) : ui("Event")}
               </span>
               <span className="truncate font-mono text-xs text-zinc-300">
                 {notation}
@@ -1123,6 +1164,7 @@ function FourPlayerBoard({
   checkedKingSquare: FourPlayerSquare | null;
   onSquareClick: (row: number, column: number) => void;
 }) {
+  useUiLanguage();
   return (
     <div className="w-full rounded-[28px] border border-[#5f412d] bg-gradient-to-br from-[#493323] via-[#2d1e15] to-[#160e09] p-3 shadow-[0_30px_80px_rgba(0,0,0,0.55)] sm:p-4">
       <div className="rounded-[18px] border border-black/40 bg-[#160e09] p-1.5 shadow-inner sm:p-2">
@@ -1192,6 +1234,7 @@ function FourPlayerBoard({
 }
 
 function FourPlayerPieceView({ piece }: { piece: FourPlayerPiece }) {
+  useUiLanguage();
   return (
     <span
       className={`pointer-events-none relative z-10 flex h-full w-full select-none items-center justify-center font-serif text-[clamp(1.15rem,3.5vw,3.2rem)] leading-none drop-shadow-[0_3px_3px_rgba(0,0,0,0.75)] transition-transform duration-150 group-hover:scale-105 ${playerStyles[piece.color].piece}`}
@@ -1210,11 +1253,12 @@ function Panel({
   subtitle?: string;
   children: ReactNode;
 }) {
+  useUiLanguage();
   return (
     <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/15 backdrop-blur-md">
       <div className="mb-4">
-        <h2 className="text-sm font-black text-zinc-100">{title}</h2>
-        {subtitle && <p className="mt-1 text-xs text-zinc-500">{subtitle}</p>}
+        <h2 className="text-sm font-black text-zinc-100">{ui(title)}</h2>
+        {subtitle && <p className="mt-1 text-xs text-zinc-500">{ui(subtitle)}</p>}
       </div>
       {children}
     </section>
@@ -1230,23 +1274,26 @@ function InfoRow({
   value: string;
   valueClass?: string;
 }) {
+  useUiLanguage();
   return (
     <div className="flex items-center justify-between gap-3 border-b border-white/5 py-2 text-xs last:border-0">
-      <span className="text-zinc-500">{label}</span>
+      <span className="text-zinc-500">{ui(label)}</span>
       <span className={`font-black ${valueClass}`}>{value}</span>
     </div>
   );
 }
 
 function Rule({ text }: { text: string }) {
+  useUiLanguage();
   return (
     <div className="mb-2 rounded-xl border border-white/5 bg-black/20 px-3 py-2.5 text-xs leading-5 text-zinc-400 last:mb-0">
-      {text}
+      {ui(text)}
     </div>
   );
 }
 
 function ErrorBox({ children }: { children: ReactNode }) {
+  useUiLanguage();
   return (
     <div className="mb-5 mt-4 rounded-2xl border border-red-400/20 bg-red-400/[0.07] px-4 py-3 text-sm font-semibold text-red-200">
       {children}
@@ -1255,10 +1302,11 @@ function ErrorBox({ children }: { children: ReactNode }) {
 }
 
 function SimplePage({ text }: { text: string }) {
+  useUiLanguage();
   return (
-    <main className="min-h-screen bg-zinc-950 px-4 py-8 text-zinc-100">
+    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-zinc-950 px-4 py-8 text-zinc-100">
       <div className="mx-auto max-w-2xl rounded-3xl border border-white/10 bg-zinc-900/70 p-6 text-center">
-        {text}
+        {ui(text)}
       </div>
     </main>
   );

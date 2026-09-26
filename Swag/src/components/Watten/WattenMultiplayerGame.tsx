@@ -1,3 +1,4 @@
+import { useAppLanguage } from "@/i18n/languageStore";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Link, useParams } from "react-router-dom";
@@ -28,7 +29,6 @@ import { ProfileAvatar } from "../social/ProfileAvatarPicker";
 
 import { useTableTheme, type TableTheme } from "@/context/TableThemeContext";
 import {
-  getInitialWattenLanguage,
   setStoredWattenLanguage,
   translateWatten,
   translateWattenPair,
@@ -316,9 +316,7 @@ export default function WattenMultiplayerGame() {
 
   const { tableTheme } = useTableTheme();
 
-  const [language, setLanguage] = useState<WattenLanguage>(
-    getInitialWattenLanguage,
-  );
+  const { language, setLanguage } = useAppLanguage();
   const [waitingTargetScore, setWaitingTargetScore] = useState(15);
 
   const t = useCallback(

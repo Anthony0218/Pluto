@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -7,6 +8,7 @@ import {
 } from "@/games/chess/3d/chess3dDifficulty.ts";
 
 export default function Chess3DMenu() {
+  useUiLanguage();
   const navigate = useNavigate();
   const [difficulty, setDifficulty] = useState<Chess3DDifficulty>("medium");
 
@@ -15,7 +17,7 @@ export default function Chess3DMenu() {
   )!;
 
   return (
-    <main className="min-h-screen bg-transparent px-4 py-10 text-white sm:px-6">
+    <main className="chess-settings-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-10 text-white sm:px-6">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8">
           <div className="flex items-center gap-4">
@@ -26,18 +28,13 @@ export default function Chess3DMenu() {
             />
 
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.3em] text-sky-400">
-                3D Chess
-              </p>
+              <p className="text-xs font-black uppercase tracking-[0.3em] text-sky-400">{ui("3D Chess")}</p>
 
-              <h1 className="mt-1 text-4xl font-black">Choose your game</h1>
+              <h1 className="mt-1 text-4xl font-black">{ui("Choose your game")}</h1>
             </div>
           </div>
 
-          <p className="mt-4 max-w-2xl text-sm leading-6 text-zinc-500">
-            Play cinematic 3D chess locally or challenge Stockfish with the same
-            five difficulty levels used across the rest of the chess modes.
-          </p>
+          <p className="mt-4 max-w-2xl text-sm leading-6 text-zinc-500">{ui("Play cinematic 3D chess locally or challenge Stockfish with the same five difficulty levels used across the rest of the chess modes.")}</p>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
@@ -50,7 +47,7 @@ export default function Chess3DMenu() {
             <div className="relative aspect-[16/10] overflow-hidden">
               <img
                 src="/images/chess3d.png"
-                alt="3D Chess Hotseat"
+                alt={ui("3D Chess Hotseat")}
                 className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
               />
 
@@ -58,43 +55,29 @@ export default function Chess3DMenu() {
 
               <div className="absolute left-4 top-4 flex items-center gap-2 rounded-full border border-sky-300/20 bg-black/45 px-3 py-1.5 backdrop-blur-md">
                 <span className="text-sm">♙</span>
-                <span className="text-[10px] font-black uppercase tracking-[0.22em] text-sky-100">
-                  Local 2 Players
-                </span>
+                <span className="text-[10px] font-black uppercase tracking-[0.22em] text-sky-100">{ui("Local 2 Players")}</span>
                 <span className="text-sm">♟</span>
               </div>
 
               <div className="absolute bottom-0 left-0 right-0 p-5">
-                <p className="text-xs font-black uppercase tracking-[0.24em] text-sky-300">
-                  Face to face
-                </p>
+                <p className="text-xs font-black uppercase tracking-[0.24em] text-sky-300">{ui("Face to face")}</p>
 
-                <h2 className="mt-1 text-3xl font-black text-white">Hotseat</h2>
+                <h2 className="mt-1 text-3xl font-black text-white">{ui("Hotseat")}</h2>
 
-                <p className="mt-2 max-w-md text-sm leading-6 text-zinc-300">
-                  Share one device and play on the full animated 3D board.
-                </p>
+                <p className="mt-2 max-w-md text-sm leading-6 text-zinc-300">{ui("Share one device and play on the full animated 3D board.")}</p>
               </div>
             </div>
 
             <div className="flex items-center justify-between gap-4 border-t border-white/10 bg-gradient-to-r from-sky-400/[0.08] to-transparent p-5">
               <div className="flex flex-wrap gap-2">
-                <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[10px] font-black uppercase tracking-wider text-zinc-300">
-                  3D Pieces
-                </span>
+                <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[10px] font-black uppercase tracking-wider text-zinc-300">{ui("3D Pieces")}</span>
 
-                <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[10px] font-black uppercase tracking-wider text-zinc-300">
-                  Capture FX
-                </span>
+                <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[10px] font-black uppercase tracking-wider text-zinc-300">{ui("Capture FX")}</span>
 
-                <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[10px] font-black uppercase tracking-wider text-zinc-300">
-                  Undo
-                </span>
+                <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[10px] font-black uppercase tracking-wider text-zinc-300">{ui("Undo")}</span>
               </div>
 
-              <span className="shrink-0 rounded-xl bg-sky-400 px-4 py-2.5 text-sm font-black text-sky-950 shadow-lg shadow-sky-950/20 transition group-hover:bg-sky-300">
-                Play →
-              </span>
+              <span className="shrink-0 rounded-xl bg-sky-400 px-4 py-2.5 text-sm font-black text-sky-950 shadow-lg shadow-sky-950/20 transition group-hover:bg-sky-300">{ui("Play →")}</span>
             </div>
           </button>
 
@@ -110,19 +93,14 @@ export default function Chess3DMenu() {
               <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/65 to-zinc-950/20" />
 
               <div className="absolute inset-0 flex flex-col justify-end p-5">
-                <p className="text-xs font-black uppercase tracking-[0.24em] text-violet-300">
-                  Challenge the engine
-                </p>
+                <p className="text-xs font-black uppercase tracking-[0.24em] text-violet-300">{ui("Challenge the engine")}</p>
 
-                <h2 className="mt-1 text-3xl font-black">Vs Stockfish</h2>
+                <h2 className="mt-1 text-3xl font-black">{ui("Vs Stockfish")}</h2>
               </div>
             </div>
 
             <div className="p-6">
-              <p className="text-sm leading-6 text-zinc-500">
-                You play White. Choose how strong and consistent Stockfish
-                should be.
-              </p>
+              <p className="text-sm leading-6 text-zinc-500">{ui("You play White. Choose how strong and consistent Stockfish should be.")}</p>
 
               <div className="mt-5 grid gap-2 sm:grid-cols-2">
                 {CHESS_3D_DIFFICULTIES.map((entry) => {
@@ -141,7 +119,7 @@ export default function Chess3DMenu() {
                     >
                       <div className="flex items-center justify-between gap-3">
                         <span className="font-black text-white">
-                          {entry.label}
+                          {ui(entry.label)}
                         </span>
 
                         {active && (
@@ -150,7 +128,7 @@ export default function Chess3DMenu() {
                       </div>
 
                       <p className="mt-1 text-xs leading-5 text-zinc-500">
-                        {entry.description}
+                        {ui(entry.description)}
                       </p>
                     </button>
                   );
@@ -164,7 +142,7 @@ export default function Chess3DMenu() {
                 }
                 className="mt-5 flex w-full items-center justify-between rounded-2xl bg-violet-400 px-5 py-4 text-sm font-black text-violet-950 shadow-lg shadow-violet-950/30 transition hover:bg-violet-300"
               >
-                <span>Play vs {selected.label} Stockfish</span>
+                <span>{ui("Play vs ")}{ui(selected.label)}{ui(" Stockfish")}</span>
                 <span className="text-lg">→</span>
               </button>
             </div>

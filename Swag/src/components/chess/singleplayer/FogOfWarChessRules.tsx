@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { ui, useUiLanguage } from "@/i18n/ui";
+import { useAppLanguage } from "@/i18n/languageStore";
 import { Link } from "react-router-dom";
 
 type Language = "en" | "de" | "bar" | "ko" | "ru";
@@ -239,17 +240,7 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
   },
 };
 
-function getInitialLanguage(): Language {
-  if (typeof window === "undefined") {
-    return "en";
-  }
 
-  const stored = window.localStorage.getItem("chess-language");
-
-  return languageOptions.some((option) => option.value === stored)
-    ? (stored as Language)
-    : "en";
-}
 
 function t(language: Language, key: string): string {
   if (language === "en") {
@@ -257,10 +248,10 @@ function t(language: Language, key: string): string {
   }
 
   if (language === "bar") {
-    return translations.bar[key] ?? translations.de[key] ?? key;
+    return translations.bar[key] ?? translations.de[key] ?? ui(key);
   }
 
-  return translations[language][key] ?? key;
+  return translations[language][key] ?? ui(key);
 }
 
 const rookVisionBoard: ExampleBoard = {
@@ -376,7 +367,8 @@ const randomStartBoard: ExampleBoard = {
 };
 
 export default function FogOfWarChessRules() {
-  const [language, setLanguage] = useState<Language>(getInitialLanguage);
+  useUiLanguage();
+  const { language, setLanguage } = useAppLanguage();
 
   function changeLanguage(nextLanguage: Language) {
     setLanguage(nextLanguage);
@@ -592,6 +584,7 @@ function RuleCard({
   title: string;
   children: React.ReactNode;
 }) {
+  useUiLanguage();
   return (
     <section className="rounded-3xl border border-white/10 bg-zinc-900/70 p-5 shadow-lg shadow-black/10">
       <div className="flex items-start gap-4">
@@ -600,7 +593,7 @@ function RuleCard({
         </span>
 
         <div className="min-w-0">
-          <h2 className="font-black text-white">{title}</h2>
+          <h2 className="font-black text-white">{ui(title)}</h2>
 
           <div className="mt-2 text-sm leading-7 text-zinc-400">{children}</div>
         </div>
@@ -618,16 +611,15 @@ function VisualRuleCard({
   text: string;
   children: React.ReactNode;
 }) {
+  useUiLanguage();
   return (
     <section className="grid gap-5 rounded-3xl border border-sky-400/10 bg-zinc-900/60 p-5 md:grid-cols-[minmax(0,1fr)_360px] md:items-center">
       <div>
-        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-sky-300">
-          Visual example
-        </p>
+        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-sky-300">{ui("Visual example")}</p>
 
-        <h3 className="mt-2 text-lg font-black text-white">{title}</h3>
+        <h3 className="mt-2 text-lg font-black text-white">{ui(title)}</h3>
 
-        <p className="mt-2 text-sm leading-7 text-zinc-400">{text}</p>
+        <p className="mt-2 text-sm leading-7 text-zinc-400">{ui(text)}</p>
       </div>
 
       <div className="flex justify-center">{children}</div>
@@ -642,6 +634,7 @@ function MiniBoard({
   board: ExampleBoard;
   fogByDefault: boolean;
 }) {
+  useUiLanguage();
   const files = "abcdefgh";
 
   const squares: React.ReactNode[] = [];
@@ -763,6 +756,7 @@ function MiniBoard({
 }
 
 function PrivacyExample({ language }: { language: Language }) {
+  useUiLanguage();
   return (
     <div className="mt-4 max-w-sm rounded-2xl border border-sky-400/15 bg-zinc-950/70 p-5 text-center">
       <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-xl bg-sky-400/10 text-2xl">
@@ -796,6 +790,7 @@ function LegendItem({
   label: string;
   className: string;
 }) {
+  useUiLanguage();
   return (
     <div className="flex items-center gap-2">
       <span
@@ -815,7 +810,7 @@ function LegendItem({
         {sample}
       </span>
 
-      <span className="text-[10px] font-bold text-zinc-400">{label}</span>
+      <span className="text-[10px] font-bold text-zinc-400">{ui(label)}</span>
     </div>
   );
 }
@@ -827,6 +822,7 @@ function LanguageSelector({
   language: Language;
   onChange: (language: Language) => void;
 }) {
+  useUiLanguage();
   return (
     <label className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-400">
       <span>🌐</span>
@@ -845,7 +841,7 @@ function LanguageSelector({
             value={option.value}
             className="bg-zinc-900 text-zinc-100"
           >
-            {option.label}
+            {ui(option.label)}
           </option>
         ))}
       </select>

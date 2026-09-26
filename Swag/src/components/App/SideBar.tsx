@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import {
   BookOpen,
   Gamepad2,
@@ -21,6 +22,7 @@ const links = [
 ];
 
 export default function SideBar({ onNavigate }: { onNavigate: () => void }) {
+  useUiLanguage();
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
   return (
@@ -37,15 +39,15 @@ export default function SideBar({ onNavigate }: { onNavigate: () => void }) {
               <p className="truncate font-semibold">
                 {profile.username || profile.display_name || "Player"}
               </p>
-              <p className="text-xs text-zinc-400">Your Pluto account</p>
+              <p className="text-xs text-zinc-400">{ui("Your Pluto account")}</p>
             </div>
           </Link>
         ) : (
-          <p className="font-semibold">Explore Pluto</p>
+          <p className="font-semibold">{ui("Explore Pluto")}</p>
         )}
       </div>
       <nav
-        aria-label="Main navigation"
+        aria-label={ui("Main navigation")}
         className="flex-1 space-y-1 overflow-y-auto p-3"
       >
         {links.map(({ label, href, icon: Icon }) => (
@@ -58,13 +60,11 @@ export default function SideBar({ onNavigate }: { onNavigate: () => void }) {
             }
           >
             <Icon size={18} />
-            {label}
+            {ui(label)}
           </NavLink>
         ))}
         <details className="pt-3">
-          <summary className="cursor-pointer px-3 py-2 text-xs font-semibold text-zinc-400">
-            Browse games
-          </summary>
+          <summary className="cursor-pointer px-3 py-2 text-xs font-semibold text-zinc-400">{ui("Browse games")}</summary>
           {games.map((game) => (
             <Link
               key={game.route}
@@ -72,13 +72,13 @@ export default function SideBar({ onNavigate }: { onNavigate: () => void }) {
               onClick={onNavigate}
               className="block rounded-xl px-5 py-2.5 text-sm text-zinc-300 hover:bg-white/5"
             >
-              {game.title}
+              {ui(game.title)}
             </Link>
           ))}
         </details>
       </nav>
       <div className="space-y-3 border-t border-white/10 p-4">
-        <p className="text-xs text-zinc-400">Appearance</p>
+        <p className="text-xs text-zinc-400">{ui("Appearance")}</p>
         <ThemeToggle />
         {user ? (
           <button
@@ -90,17 +90,13 @@ export default function SideBar({ onNavigate }: { onNavigate: () => void }) {
             }}
             className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-zinc-300 hover:bg-red-500/10 hover:text-red-300"
           >
-            <LogOut size={18} />
-            Log out
-          </button>
+            <LogOut size={18} />{ui("Log out")}</button>
         ) : (
           <Link
             to="/login"
             onClick={onNavigate}
             className="block rounded-xl bg-indigo-500 px-3 py-2.5 text-center text-sm font-semibold"
-          >
-            Log in
-          </Link>
+          >{ui("Log in")}</Link>
         )}
       </div>
     </div>

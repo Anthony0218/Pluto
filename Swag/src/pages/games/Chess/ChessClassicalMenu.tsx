@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { Link } from "react-router-dom";
 
 type Accent = "sky" | "emerald" | "amber";
@@ -86,6 +87,7 @@ const accentStyles: Record<
 };
 
 function SingleplayerIcon() {
+  useUiLanguage();
   return (
     <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" aria-hidden="true">
       <circle cx="12" cy="8" r="3.25" stroke="currentColor" strokeWidth="1.7" />
@@ -112,6 +114,7 @@ function SingleplayerIcon() {
 }
 
 function GlobeIcon() {
+  useUiLanguage();
   return (
     <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" aria-hidden="true">
       <circle
@@ -131,6 +134,7 @@ function GlobeIcon() {
 }
 
 function PlayersIcon() {
+  useUiLanguage();
   return (
     <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" aria-hidden="true">
       <circle cx="9" cy="8" r="2.75" stroke="currentColor" strokeWidth="1.6" />
@@ -158,12 +162,14 @@ function PlayersIcon() {
 }
 
 function ModeIcon({ kind }: { kind: ModeKind }) {
+  useUiLanguage();
   if (kind === "singleplayer") return <SingleplayerIcon />;
   if (kind === "multiplayer") return <GlobeIcon />;
   return <PlayersIcon />;
 }
 
 function ModeDecoration({ kind }: { kind: ModeKind }) {
+  useUiLanguage();
   if (kind === "singleplayer") {
     return (
       <>
@@ -197,8 +203,9 @@ function ModeDecoration({ kind }: { kind: ModeKind }) {
 }
 
 export default function ChessClassicalMenu() {
+  useUiLanguage();
   return (
-    <main className="relative left-1/2 min-h-[100dvh] w-screen -translate-x-1/2 overflow-hidden bg-[#07090b] text-zinc-100">
+    <main className="chess-menu-page relative left-1/2 min-h-[calc(100dvh-4rem)] w-screen -translate-x-1/2 overflow-hidden bg-[#07090b] text-zinc-100">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_13%_68%,rgba(245,158,11,.09),transparent_28%),radial-gradient(circle_at_76%_23%,rgba(255,255,255,.045),transparent_30%),linear-gradient(to_bottom,#0a0d10,#07090b_58%,#040506)]" />
 
       <div className="pointer-events-none absolute -bottom-28 -left-24 text-[390px] leading-none text-amber-100/[0.035]">
@@ -211,15 +218,13 @@ export default function ChessClassicalMenu() {
         ♝
       </div>
 
-      <div className="relative flex min-h-[100dvh] w-full flex-col">
+      <div className="relative flex min-h-[calc(100dvh-4rem)] w-full flex-col">
         <nav className="flex min-h-20 w-full items-center justify-between border-b border-white/[0.07] px-6 sm:px-10 lg:px-14 xl:px-20">
           <Link to="/games/chess" className="inline-flex items-center gap-3">
             <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-amber-300/20 bg-amber-300/10 text-lg text-amber-300">
               ♛
             </span>
-            <span className="font-serif text-sm tracking-[0.28em] text-zinc-200">
-              CHESS
-            </span>
+            <span className="font-serif text-sm tracking-[0.28em] text-zinc-200">{ui("CHESS")}</span>
           </Link>
 
           <Link
@@ -227,7 +232,7 @@ export default function ChessClassicalMenu() {
             className="inline-flex items-center gap-2 text-sm text-zinc-500 transition hover:text-white"
           >
             <span className="text-base">♔</span>
-            <span className="hidden sm:inline">Rules & Tips</span>
+            <span className="hidden sm:inline">{ui("Rules & Tips")}</span>
           </Link>
         </nav>
 
@@ -241,30 +246,19 @@ export default function ChessClassicalMenu() {
                 to="/games/chess"
                 className="mb-8 inline-flex items-center gap-2 text-sm text-zinc-600 transition hover:text-white"
               >
-                <span>←</span>
-                Chess
-              </Link>
+                <span>←</span>{ui("Chess")}</Link>
 
-              <p className="text-[11px] font-black uppercase tracking-[0.34em] text-amber-400">
-                Classic Chess
-              </p>
+              <p className="text-[11px] font-black uppercase tracking-[0.34em] text-amber-400">{ui("Classic Chess")}</p>
 
-              <h1 className="mt-5 font-serif text-[52px] leading-[.94] tracking-[-0.035em] text-white sm:text-[66px] xl:text-[82px]">
-                Choose
-                <br />
-                <span className="text-amber-200">game mode</span>
+              <h1 className="mt-5 font-serif text-[52px] leading-[.94] tracking-[-0.035em] text-white sm:text-[66px] xl:text-[82px]">{ui("Choose")}<br />
+                <span className="text-amber-200">{ui("game mode")}</span>
               </h1>
 
-              <p className="mt-6 max-w-[520px] font-serif text-[18px] leading-8 text-zinc-400 sm:text-[20px]">
-                Play solo, connect with another player online, or share one
-                screen locally.
-              </p>
+              <p className="mt-6 max-w-[520px] font-serif text-[18px] leading-8 text-zinc-400 sm:text-[20px]">{ui("Play solo, connect with another player online, or share one screen locally.")}</p>
             </div>
 
             <div className="mt-12 flex items-center gap-4 text-[9px] font-black uppercase tracking-[0.28em] text-zinc-700">
-              <span className="h-px w-14 bg-amber-400/45" />
-              Solo · Online · Local
-            </div>
+              <span className="h-px w-14 bg-amber-400/45" />{ui("Solo · Online · Local")}</div>
 
             <div className="pointer-events-none absolute bottom-[7%] right-[7%] hidden text-[185px] leading-none text-amber-100/[0.025] xl:block">
               ♔
@@ -297,19 +291,19 @@ export default function ChessClassicalMenu() {
                         <p
                           className={`text-[9px] font-black uppercase tracking-[0.26em] ${styles.eyebrow}`}
                         >
-                          {mode.eyebrow}
+                          {ui(mode.eyebrow)}
                         </p>
 
                         <h2 className="mt-1.5 font-serif text-[27px] leading-tight text-white sm:text-[31px] xl:text-[34px]">
-                          {mode.title}
+                          {ui(mode.title)}
                         </h2>
 
                         <p className="mt-2 max-w-[650px] text-sm leading-6 text-zinc-500 sm:text-[15px]">
-                          {mode.description}
+                          {ui(mode.description)}
                         </p>
 
                         <p className="mt-3 text-[8px] font-black uppercase tracking-[0.24em] text-zinc-700">
-                          {mode.footer}
+                          {ui(mode.footer)}
                         </p>
                       </div>
 
@@ -328,9 +322,7 @@ export default function ChessClassicalMenu() {
                 className="group mt-2 flex items-center justify-between border-t border-white/[0.08] px-2 pt-6 text-sm text-zinc-500 transition hover:text-white"
               >
                 <span className="inline-flex items-center gap-3">
-                  <span className="text-lg">♔</span>
-                  Rules & Tips
-                </span>
+                  <span className="text-lg">♔</span>{ui("Rules & Tips")}</span>
                 <span className="transition duration-300 group-hover:translate-x-1">
                   →
                 </span>

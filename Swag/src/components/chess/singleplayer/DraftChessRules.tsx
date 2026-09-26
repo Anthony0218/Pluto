@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { ui, useUiLanguage } from "@/i18n/ui";
+import { useAppLanguage } from "@/i18n/languageStore";
 import { Link } from "react-router-dom";
 
 type Language = "en" | "de" | "bar" | "ko" | "ru";
@@ -266,17 +267,7 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
   },
 };
 
-function getInitialLanguage(): Language {
-  if (typeof window === "undefined") {
-    return "en";
-  }
 
-  const stored = window.localStorage.getItem("chess-language");
-
-  return languageOptions.some((option) => option.value === stored)
-    ? (stored as Language)
-    : "en";
-}
 
 function t(language: Language, key: string): string {
   if (language === "en") {
@@ -284,10 +275,10 @@ function t(language: Language, key: string): string {
   }
 
   if (language === "bar") {
-    return translations.bar[key] ?? translations.de[key] ?? key;
+    return translations.bar[key] ?? translations.de[key] ?? ui(key);
   }
 
-  return translations[language][key] ?? key;
+  return translations[language][key] ?? ui(key);
 }
 
 const whiteSetupExample: MiniBoardState = {
@@ -365,7 +356,8 @@ const budgetExample: MiniBoardState = {
 };
 
 export default function DraftChessRules() {
-  const [language, setLanguage] = useState<Language>(getInitialLanguage);
+  useUiLanguage();
+  const { language, setLanguage } = useAppLanguage();
 
   function changeLanguage(nextLanguage: Language) {
     setLanguage(nextLanguage);
@@ -576,6 +568,7 @@ function RuleCard({
   title: string;
   children: React.ReactNode;
 }) {
+  useUiLanguage();
   return (
     <section className="rounded-3xl border border-white/10 bg-zinc-900/70 p-5 shadow-lg shadow-black/10">
       <div className="flex items-start gap-4">
@@ -584,7 +577,7 @@ function RuleCard({
         </span>
 
         <div className="min-w-0">
-          <h2 className="font-black text-white">{title}</h2>
+          <h2 className="font-black text-white">{ui(title)}</h2>
 
           <div className="mt-2 text-sm leading-7 text-zinc-400">{children}</div>
         </div>
@@ -602,15 +595,14 @@ function VisualBoardCard({
   text?: string;
   children: React.ReactNode;
 }) {
+  useUiLanguage();
   return (
     <section className="rounded-3xl border border-emerald-400/10 bg-zinc-900/60 p-5">
-      <p className="text-[10px] font-black uppercase tracking-[0.18em] text-emerald-300">
-        Visual example
-      </p>
+      <p className="text-[10px] font-black uppercase tracking-[0.18em] text-emerald-300">{ui("Visual example")}</p>
 
-      <h3 className="mt-2 text-lg font-black text-white">{title}</h3>
+      <h3 className="mt-2 text-lg font-black text-white">{ui(title)}</h3>
 
-      {text && <p className="mt-2 text-sm leading-7 text-zinc-400">{text}</p>}
+      {text && <p className="mt-2 text-sm leading-7 text-zinc-400">{ui(text)}</p>}
 
       <div className="mt-4 flex justify-center">{children}</div>
     </section>
@@ -626,6 +618,7 @@ function CostCard({
   name: string;
   cost: number;
 }) {
+  useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3 text-center">
       <div className="text-3xl leading-none">{symbol}</div>
@@ -644,6 +637,7 @@ function MiniBoard({
   board: MiniBoardState;
   setupSide: "w" | "b";
 }) {
+  useUiLanguage();
   const files = "abcdefgh";
   const squares: React.ReactNode[] = [];
 
@@ -748,6 +742,7 @@ function MiniBoard({
 }
 
 function PrivateSetupFlow({ language }: { language: Language }) {
+  useUiLanguage();
   const steps = [
     ["♔", t(language, "White builds")],
     ["🛡", t(language, "Pass device")],
@@ -764,7 +759,7 @@ function PrivateSetupFlow({ language }: { language: Language }) {
         >
           <div className="text-2xl">{icon}</div>
 
-          <p className="mt-2 text-[10px] font-black text-zinc-300">{label}</p>
+          <p className="mt-2 text-[10px] font-black text-zinc-300">{ui(label)}</p>
 
           {index < steps.length - 1 && (
             <span className="absolute -right-2 top-1/2 hidden -translate-y-1/2 text-zinc-700 sm:block">
@@ -786,6 +781,7 @@ function LegendItem({
   label: string;
   className: string;
 }) {
+  useUiLanguage();
   return (
     <div className="flex items-center gap-2">
       <span
@@ -805,7 +801,7 @@ function LegendItem({
         {sample}
       </span>
 
-      <span className="text-[10px] font-bold text-zinc-400">{label}</span>
+      <span className="text-[10px] font-bold text-zinc-400">{ui(label)}</span>
     </div>
   );
 }
@@ -817,6 +813,7 @@ function LanguageSelector({
   language: Language;
   onChange: (language: Language) => void;
 }) {
+  useUiLanguage();
   return (
     <label className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-400">
       <span>🌐</span>
@@ -835,7 +832,7 @@ function LanguageSelector({
             value={option.value}
             className="bg-zinc-900 text-zinc-100"
           >
-            {option.label}
+            {ui(option.label)}
           </option>
         ))}
       </select>

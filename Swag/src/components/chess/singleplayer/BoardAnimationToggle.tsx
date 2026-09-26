@@ -1,13 +1,15 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { useChessSettings } from "../../../context/ChessSettingsContext";
 
 export default function BoardAnimationToggle() {
+  useUiLanguage();
   const { boardAnimationEnabled, setBoardAnimationEnabled } =
     useChessSettings();
 
   return (
     <div
       className="
-      mt-3
+      chess-animation-control
       flex
       items-center
       justify-between
@@ -21,16 +23,15 @@ export default function BoardAnimationToggle() {
     "
     >
       <div className="min-w-0">
-        <p className="text-xs font-bold text-zinc-200">Board animation</p>
+        <p className="text-xs font-bold text-zinc-200">{ui("Board animation")}</p>
 
-        <p className="mt-0.5 text-[10px] text-zinc-500">
-          Animate board rotation
-        </p>
+        <p className="mt-0.5 text-[10px] text-zinc-500">{ui("Animate board rotation")}</p>
       </div>
 
       <button
         type="button"
         onClick={() => setBoardAnimationEnabled((enabled) => !enabled)}
+        aria-label={ui("Animate board rotation")}
         aria-pressed={boardAnimationEnabled}
         className={`
           relative

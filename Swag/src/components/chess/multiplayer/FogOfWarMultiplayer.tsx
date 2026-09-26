@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import {
   useCallback,
   useEffect,
@@ -153,11 +154,12 @@ function Panel({
   subtitle?: string;
   children: ReactNode;
 }) {
+  useUiLanguage();
   return (
     <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
       <div className="mb-4">
-        <h2 className="text-sm font-black text-zinc-100">{title}</h2>
-        {subtitle && <p className="mt-1 text-xs text-zinc-500">{subtitle}</p>}
+        <h2 className="text-sm font-black text-zinc-100">{ui(title)}</h2>
+        {subtitle && <p className="mt-1 text-xs text-zinc-500">{ui(subtitle)}</p>}
       </div>
       {children}
     </section>
@@ -165,6 +167,7 @@ function Panel({
 }
 
 function ErrorBox({ children }: { children: ReactNode }) {
+  useUiLanguage();
   return (
     <div className="mt-4 rounded-2xl border border-red-400/20 bg-red-400/[0.07] px-4 py-3 text-sm font-semibold text-red-200">
       {children}
@@ -220,11 +223,12 @@ function resultText(snapshot: FogSnapshot) {
 }
 
 export function FogOfWarMultiplayerLobby() {
+  useUiLanguage();
   const navigate = useNavigate();
   const { user, profile } = useAuth();
   const [hostColor, setHostColor] = useState<TwoPlayerColor>("white");
   const [randomStart, setRandomStart] = useState(true);
-  const [joinCode, setJoinCode] = useState("");
+  const [joinCode, setJoinCode] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
   const [loading, setLoading] = useState<"create" | "join" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -282,7 +286,7 @@ export function FogOfWarMultiplayerLobby() {
   }
 
   return (
-    <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
+    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-5xl">
         <header className="mb-7 rounded-3xl border border-sky-400/15 bg-zinc-900/65 p-6 shadow-2xl shadow-black/30">
           <div className="flex items-center gap-4">
@@ -290,29 +294,20 @@ export function FogOfWarMultiplayerLobby() {
               🌫
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-sky-300">
-                Fog of War Chess · Multiplayer
-              </p>
-              <h1 className="mt-1 text-3xl font-black text-white">
-                Your opponent cannot inspect what the fog hides.
-              </h1>
-              <p className="mt-1 text-sm text-zinc-500">
-                The real board stays on the server. Each browser receives only
-                its own masked view.
-              </p>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-sky-300">{ui("Fog of War Chess · Multiplayer")}</p>
+              <h1 className="mt-1 text-3xl font-black text-white">{ui("Your opponent cannot inspect what the fog hides.")}</h1>
+              <p className="mt-1 text-sm text-zinc-500">{ui("The real board stays on the server. Each browser receives only its own masked view.")}</p>
             </div>
           </div>
         </header>
 
         {!user ? (
-          <Panel title="Sign in required">
-            <p className="text-sm text-zinc-400">
-              Multiplayer rooms use your existing Supabase account.
-            </p>
+          <Panel title={ui("Sign in required")}>
+            <p className="text-sm text-zinc-400">{ui("Multiplayer rooms use your existing Supabase account.")}</p>
           </Panel>
         ) : (
           <div className="grid gap-5 lg:grid-cols-2">
-            <Panel title="Create room" subtitle="Choose your side">
+            <Panel title={ui("Create room")} subtitle={ui("Choose your side")}>
               <div className="grid grid-cols-2 gap-2">
                 {(["white", "black"] as TwoPlayerColor[]).map((color) => (
                   <button
@@ -326,15 +321,13 @@ export function FogOfWarMultiplayerLobby() {
                     }`}
                   >
                     {color === "white" ? "♔" : "♚"}{" "}
-                    {color === "white" ? "White" : "Black"}
+                    {color === "white" ? ui("White") : ui("Black")}
                   </button>
                 ))}
               </div>
 
               <div className="mt-4">
-                <p className="mb-2 text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">
-                  Starting position
-                </p>
+                <p className="mb-2 text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">{ui("Starting position")}</p>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
@@ -344,9 +337,7 @@ export function FogOfWarMultiplayerLobby() {
                         ? "border-sky-400/30 bg-sky-400/10 text-sky-200"
                         : "border-white/10 bg-black/20 text-zinc-400 hover:bg-white/5"
                     }`}
-                  >
-                    ♜ Standard
-                  </button>
+                  >{ui("♜ Standard")}</button>
                   <button
                     type="button"
                     onClick={() => setRandomStart(true)}
@@ -355,34 +346,29 @@ export function FogOfWarMultiplayerLobby() {
                         ? "border-violet-400/30 bg-violet-400/10 text-violet-200"
                         : "border-white/10 bg-black/20 text-zinc-400 hover:bg-white/5"
                     }`}
-                  >
-                    🎲 Random
-                  </button>
+                  >{ui("🎲 Random")}</button>
                 </div>
               </div>
 
-              <div className="mt-4 rounded-xl border border-sky-300/10 bg-sky-400/[0.05] p-3 text-xs leading-5 text-zinc-400">
-                Hidden pieces, the true FEN and full move history never enter
-                either player's browser.
-              </div>
+              <div className="mt-4 rounded-xl border border-sky-300/10 bg-sky-400/[0.05] p-3 text-xs leading-5 text-zinc-400">{ui("Hidden pieces, the true FEN and full move history never enter either player's browser.")}</div>
               <button
                 type="button"
                 disabled={loading !== null}
                 onClick={() => void createRoom()}
                 className="mt-5 w-full rounded-xl bg-sky-300 px-5 py-3 font-black text-zinc-950 transition hover:bg-sky-200 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {loading === "create" ? "Creating..." : "Create Fog Room"}
+                {loading === "create" ? ui("Creating...") : ui("Create Fog Room")}
               </button>
             </Panel>
 
-            <Panel title="Join room" subtitle="You receive the opposite side">
+            <Panel title={ui("Join room")} subtitle={ui("You receive the opposite side")}>
               <input
                 value={joinCode}
                 onChange={(event) =>
                   setJoinCode(normalizeCode(event.target.value))
                 }
                 onKeyDown={(event) => event.key === "Enter" && void joinRoom()}
-                placeholder="ABC123"
+                placeholder={ui("ABC123")}
                 maxLength={6}
                 className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-center font-mono text-2xl font-black uppercase tracking-[0.3em] text-white outline-none transition placeholder:text-zinc-700 focus:border-sky-400/40"
               />
@@ -392,19 +378,20 @@ export function FogOfWarMultiplayerLobby() {
                 onClick={() => void joinRoom()}
                 className="mt-3 w-full rounded-xl border border-sky-400/20 bg-sky-400/[0.07] px-5 py-3 font-black text-sky-200 transition hover:bg-sky-400/10 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {loading === "join" ? "Joining..." : "Join Fog Room"}
+                {loading === "join" ? ui("Joining...") : ui("Join Fog Room")}
               </button>
             </Panel>
           </div>
         )}
 
-        {error && <ErrorBox>{error}</ErrorBox>}
+        {error && <ErrorBox>{ui(error)}</ErrorBox>}
       </div>
     </main>
   );
 }
 
 export function FogOfWarMultiplayerGame() {
+  useUiLanguage();
   const { roomCode } = useParams();
   const { user } = useAuth();
 
@@ -693,17 +680,13 @@ export function FogOfWarMultiplayerGame() {
 
   if (!user) {
     return (
-      <main className="min-h-screen bg-transparent p-8 text-zinc-100">
-        Sign in to open this room.
-      </main>
+      <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent p-8 text-zinc-100">{ui("Sign in to open this room.")}</main>
     );
   }
 
   if (loading || !snapshot) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-transparent text-zinc-400">
-        Loading Fog of War room…
-      </main>
+      <main className="flex chess-variant-page min-h-[calc(100dvh-4rem)] items-center justify-center bg-transparent text-zinc-400">{ui("Loading Fog of War room…")}</main>
     );
   }
 
@@ -718,7 +701,7 @@ export function FogOfWarMultiplayerGame() {
   const materialDiff = whiteMaterial - blackMaterial;
 
   return (
-    <main className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
+    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1500px]">
         <header className="mb-7 flex flex-col gap-4 rounded-3xl border border-sky-400/10 bg-zinc-900/55 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
@@ -726,16 +709,10 @@ export function FogOfWarMultiplayerGame() {
               🌫
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-sky-300">
-                Fog of War Chess · Multiplayer
-              </p>
-              <h1 className="mt-0.5 text-2xl font-black text-white">
-                You cannot see everything
-              </h1>
-              <p className="mt-0.5 text-sm text-zinc-500">
-                Private server-side fog ·{" "}
-                {snapshot.myColor === "white" ? "White" : "Black"} view
-              </p>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-sky-300">{ui("Fog of War Chess · Multiplayer")}</p>
+              <h1 className="mt-0.5 text-2xl font-black text-white">{ui("You cannot see everything")}</h1>
+              <p className="mt-0.5 text-sm text-zinc-500">{ui("Private server-side fog ·")}{" "}
+                {snapshot.myColor === "white" ? ui("White") : ui("Black")}{ui("view")}</p>
             </div>
           </div>
 
@@ -745,16 +722,10 @@ export function FogOfWarMultiplayerGame() {
               onClick={() => void copyRoomCode()}
               className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 font-mono text-xs font-black tracking-widest text-zinc-300"
             >
-              {copied ? "COPIED" : snapshot.room.code}
+              {copied ? ui("COPIED") : snapshot.room.code}
             </button>
             <span className="rounded-full border border-sky-400/15 bg-sky-400/[0.06] px-3 py-1.5 text-xs font-bold text-sky-200">
-              {snapshot.status === "waiting"
-                ? "Waiting for opponent"
-                : snapshot.status === "finished"
-                  ? "Game over"
-                  : snapshot.turn === "w"
-                    ? "White to move"
-                    : "Black to move"}
+              {snapshot.status === "waiting" ? ui("Waiting for opponent") : snapshot.status === "finished" ? ui("Game over") : snapshot.turn === "w" ? ui("White to move") : ui("Black to move")}
             </span>
           </div>
         </header>
@@ -762,26 +733,24 @@ export function FogOfWarMultiplayerGame() {
         <section className="mb-6 grid gap-3 rounded-3xl border border-sky-400/10 bg-sky-400/[0.03] px-5 py-4 md:grid-cols-3">
           <RuleStrip
             icon="♙"
-            title="Own army"
+            title={ui("Own army")}
             detail="Your own pieces are always visible"
           />
           <RuleStrip
             icon="◌"
-            title="Reachable squares"
+            title={ui("Reachable squares")}
             detail="Attacked and legal squares reveal the fog"
           />
           <RuleStrip
             icon="?"
-            title="Hidden enemy"
+            title={ui("Hidden enemy")}
             detail="The real enemy position remains server-side"
           />
         </section>
 
         {snapshot.status === "finished" && (
           <div className="mb-5 rounded-2xl border border-sky-400/20 bg-sky-400/[0.07] px-4 py-3">
-            <p className="text-xs font-black uppercase tracking-widest text-sky-300">
-              Game Over
-            </p>
+            <p className="text-xs font-black uppercase tracking-widest text-sky-300">{ui("Game Over")}</p>
             <p className="mt-1 font-black text-white">{resultText(snapshot)}</p>
           </div>
         )}
@@ -789,12 +758,8 @@ export function FogOfWarMultiplayerGame() {
         {snapshot.undo.opponent && (
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-4 py-3">
             <div>
-              <p className="text-xs font-black uppercase tracking-widest text-amber-300">
-                Undo request
-              </p>
-              <p className="mt-1 text-sm text-zinc-300">
-                Your opponent wants to undo the latest move.
-              </p>
+              <p className="text-xs font-black uppercase tracking-widest text-amber-300">{ui("Undo request")}</p>
+              <p className="mt-1 text-sm text-zinc-300">{ui("Your opponent wants to undo the latest move.")}</p>
             </div>
             <div className="flex gap-2">
               <button
@@ -807,9 +772,7 @@ export function FogOfWarMultiplayerGame() {
                   })
                 }
                 className="rounded-xl bg-emerald-300 px-4 py-2 text-xs font-black text-zinc-950 disabled:opacity-40"
-              >
-                Accept
-              </button>
+              >{ui("Accept")}</button>
               <button
                 type="button"
                 disabled={actionLoading !== null}
@@ -820,17 +783,15 @@ export function FogOfWarMultiplayerGame() {
                   })
                 }
                 className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-black text-zinc-300 disabled:opacity-40"
-              >
-                Decline
-              </button>
+              >{ui("Decline")}</button>
             </div>
           </div>
         )}
 
-        <div className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
+        <div className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              <Panel title="Players" subtitle="Private Fog room">
+              <Panel title={ui("Players")} subtitle={ui("Private Fog room")}>
                 <div className="space-y-2">
                   {snapshot.players.map((player) => (
                     <div
@@ -838,9 +799,7 @@ export function FogOfWarMultiplayerGame() {
                       className="flex items-center justify-between rounded-xl border border-white/5 bg-black/20 px-3 py-2.5"
                     >
                       <span className="truncate text-sm font-bold text-zinc-200">
-                        {player.user_id === user.id
-                          ? `${player.display_name} · You`
-                          : player.display_name}
+                        {player.user_id === user.id ? `${player.display_name} · You` : player.display_name}
                       </span>
                       <span className="text-xl">
                         {player.chosen_color === "white" ? "♔" : "♚"}
@@ -849,19 +808,16 @@ export function FogOfWarMultiplayerGame() {
                   ))}
                 </div>
                 {snapshot.status === "waiting" && (
-                  <p className="mt-3 rounded-xl border border-sky-400/10 bg-sky-400/[0.04] px-3 py-3 text-xs text-zinc-500">
-                    Share room code{" "}
+                  <p className="mt-3 rounded-xl border border-sky-400/10 bg-sky-400/[0.04] px-3 py-3 text-xs text-zinc-500">{ui("Share room code")}{" "}
                     <span className="font-mono font-black text-sky-200">
                       {snapshot.room.code}
-                    </span>{" "}
-                    with your opponent.
-                  </p>
+                    </span>{" "}{ui("with your opponent.")}</p>
                 )}
               </Panel>
 
               <Panel
-                title="Game Controls"
-                subtitle="Negotiated multiplayer actions"
+                title={ui("Game Controls")}
+                subtitle={ui("Negotiated multiplayer actions")}
               >
                 <div className="grid grid-cols-2 gap-2">
                   <button
@@ -875,9 +831,7 @@ export function FogOfWarMultiplayerGame() {
                       void doAction("undo-request", { action: "undo-request" })
                     }
                     className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm font-bold text-zinc-300 disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    ↶ Undo
-                  </button>
+                  >{ui("↶ Undo")}</button>
                   <button
                     type="button"
                     disabled={
@@ -890,15 +844,11 @@ export function FogOfWarMultiplayerGame() {
                       void doAction("resign", { action: "resign" })
                     }
                     className="rounded-xl border border-red-400/15 bg-red-400/[0.05] px-3 py-2.5 text-sm font-bold text-red-300 disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    Flag Resign
-                  </button>
+                  >{ui("Flag Resign")}</button>
                 </div>
 
                 {snapshot.undo.mine && (
-                  <p className="mt-3 rounded-xl border border-amber-300/10 bg-amber-300/[0.04] px-3 py-2 text-xs text-amber-200">
-                    Waiting for your opponent to answer the undo request…
-                  </p>
+                  <p className="mt-3 rounded-xl border border-amber-300/10 bg-amber-300/[0.04] px-3 py-2 text-xs text-amber-200">{ui("Waiting for your opponent to answer the undo request…")}</p>
                 )}
 
                 {snapshot.status === "finished" && (
@@ -911,18 +861,16 @@ export function FogOfWarMultiplayerGame() {
                       }
                       className="w-full rounded-xl bg-sky-300 px-4 py-3 text-sm font-black text-zinc-950 disabled:cursor-not-allowed disabled:opacity-40"
                     >
-                      {myReady ? "Rematch requested" : "Play Again"}
+                      {myReady ? ui("Rematch requested") : ui("Play Again")}
                     </button>
                     {opponentReady && !myReady && (
-                      <p className="mt-2 text-center text-xs font-bold text-emerald-300">
-                        Opponent is ready for a rematch.
-                      </p>
+                      <p className="mt-2 text-center text-xs font-bold text-emerald-300">{ui("Opponent is ready for a rematch.")}</p>
                     )}
                   </div>
                 )}
               </Panel>
 
-              <Panel title="Captured Pieces" subtitle="Material overview">
+              <Panel title={ui("Captured Pieces")} subtitle={ui("Material overview")}>
                 <div className="mb-3 rounded-xl border border-white/5 bg-black/20 px-3 py-2 text-xs font-bold text-zinc-400">
                   {materialDiff > 0
                     ? `White +${materialDiff}`
@@ -937,8 +885,8 @@ export function FogOfWarMultiplayerGame() {
               </Panel>
 
               <Panel
-                title="Move History"
-                subtitle="Click a move for your historical fog view"
+                title={ui("Move History")}
+                subtitle={ui("Click a move for your historical fog view")}
               >
                 <button
                   type="button"
@@ -951,14 +899,10 @@ export function FogOfWarMultiplayerGame() {
                       ? "border-sky-400/20 bg-sky-400/[0.08] text-sky-200"
                       : "border-white/5 bg-black/20 text-zinc-500 hover:bg-white/5"
                   }`}
-                >
-                  Start · Initial position
-                </button>
+                >{ui("Start · Initial position")}</button>
                 <div className="max-h-80 overflow-y-auto rounded-2xl border border-white/5 bg-black/20">
                   {snapshot.history.length === 0 ? (
-                    <div className="px-4 py-8 text-center text-xs text-zinc-600">
-                      No moves yet
-                    </div>
+                    <div className="px-4 py-8 text-center text-xs text-zinc-600">{ui("No moves yet")}</div>
                   ) : (
                     snapshot.history.map((entry) => (
                       <button
@@ -981,7 +925,7 @@ export function FogOfWarMultiplayerGame() {
                         <span
                           className={`font-mono text-xs font-black ${entry.label === "Hidden move" ? "text-zinc-600" : "text-zinc-200"}`}
                         >
-                          {entry.label}
+                          {ui(entry.label)}
                         </span>
                       </button>
                     ))
@@ -996,13 +940,9 @@ export function FogOfWarMultiplayerGame() {
               {historyPreviewPly !== null && (
                 <div className="mb-3 flex items-center justify-between rounded-xl border border-sky-400/20 bg-sky-400/[0.07] px-4 py-3">
                   <div>
-                    <p className="text-[9px] font-black uppercase tracking-widest text-sky-300">
-                      History Preview
-                    </p>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-sky-300">{ui("History Preview")}</p>
                     <p className="mt-1 text-sm font-bold text-white">
-                      {historyPreviewPly === 0
-                        ? "Initial position"
-                        : (snapshot.history.find(
+                      {historyPreviewPly === 0 ? ui("Initial position") : (snapshot.history.find(
                             (entry) => entry.ply === historyPreviewPly,
                           )?.label ?? "Historical position")}
                     </p>
@@ -1011,9 +951,7 @@ export function FogOfWarMultiplayerGame() {
                     type="button"
                     onClick={() => setHistoryPreviewPly(null)}
                     className="rounded-lg bg-white/10 px-3 py-2 text-xs font-bold"
-                  >
-                    Back to Live Board
-                  </button>
+                  >{ui("Back to Live Board")}</button>
                 </div>
               )}
 
@@ -1040,27 +978,19 @@ export function FogOfWarMultiplayerGame() {
                       type="button"
                       onClick={() => void copyRoomCode()}
                       className="w-full max-w-lg rounded-[30px] border border-white/15 bg-zinc-900/95 px-8 py-8 text-center shadow-2xl shadow-black/60 transition hover:border-amber-300/35 hover:bg-zinc-900 active:scale-[0.99]"
-                      title="Copy room code"
+                      title={ui("Copy room code")}
                     >
                       <div className="text-4xl">🌐</div>
 
-                      <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">
-                        Waiting for players
-                      </p>
+                      <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">{ui("Waiting for players")}</p>
 
                       <h2 className="mt-2 text-2xl font-black text-white">
-                        {snapshot.players.length}/2 players connected
-                      </h2>
+                        {snapshot.players.length}{ui("/2 players connected")}</h2>
 
-                      <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">
-                        Share this room code. The game starts automatically when
-                        everyone has joined.
-                      </p>
+                      <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">{ui("Share this room code. The game starts automatically when everyone has joined.")}</p>
 
                       <div className="mt-6 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-5 py-5">
-                        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">
-                          Room Code
-                        </p>
+                        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">{ui("Room Code")}</p>
 
                         <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">
                           {snapshot.room.code}
@@ -1068,9 +998,7 @@ export function FogOfWarMultiplayerGame() {
                       </div>
 
                       <p className="mt-4 text-xs font-bold text-zinc-400">
-                        {copied
-                          ? "✓ Copied to clipboard"
-                          : "Click this box to copy the code"}
+                        {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
                       </p>
                     </button>
                   </div>
@@ -1079,9 +1007,7 @@ export function FogOfWarMultiplayerGame() {
                 {pendingPromotion && historyPreviewPly === null && (
                   <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/45 p-4 backdrop-blur-[4px]">
                     <div className="w-full max-w-md rounded-3xl border border-sky-400/20 bg-zinc-900/95 p-5 shadow-2xl shadow-black/60">
-                      <p className="mb-4 text-center text-xs font-black uppercase tracking-[0.24em] text-sky-300">
-                        Choose promotion
-                      </p>
+                      <p className="mb-4 text-center text-xs font-black uppercase tracking-[0.24em] text-sky-300">{ui("Choose promotion")}</p>
                       <PromotionBar onPromote={promotePawn} />
                     </div>
                   </div>
@@ -1093,19 +1019,19 @@ export function FogOfWarMultiplayerGame() {
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
               <Panel
-                title="Fog Status"
+                title={ui("Fog Status")}
                 subtitle={`${snapshot.myColor === "white" ? "White" : "Black"}'s private vision`}
               >
                 <div className="grid grid-cols-2 gap-2">
                   <StatCard
-                    label="Visible"
+                    label={ui("Visible")}
                     value={
                       preview?.visibleSquares.length ??
                       snapshot.visibleSquares.length
                     }
                   />
                   <StatCard
-                    label="Hidden"
+                    label={ui("Hidden")}
                     value={
                       64 -
                       (preview?.visibleSquares.length ??
@@ -1114,62 +1040,52 @@ export function FogOfWarMultiplayerGame() {
                   />
                 </div>
                 <div className="mt-3 rounded-xl border border-violet-400/10 bg-violet-400/[0.04] px-3 py-3">
-                  <p className="text-[10px] font-black uppercase tracking-wider text-violet-300">
-                    Random Start
-                  </p>
-                  <p className="mt-1 text-xs text-zinc-500">
-                    Same formation for both sides
-                  </p>
-                  <p className="mt-2 font-mono text-[10px] text-zinc-700">
-                    Seed {snapshot.seed}
+                  <p className="text-[10px] font-black uppercase tracking-wider text-violet-300">{ui("Random Start")}</p>
+                  <p className="mt-1 text-xs text-zinc-500">{ui("Same formation for both sides")}</p>
+                  <p className="mt-2 font-mono text-[10px] text-zinc-700">{ui("Seed")}{snapshot.seed}
                   </p>
                 </div>
               </Panel>
 
               <Panel
-                title="Fog Stats"
-                subtitle="Only information your side is allowed to know"
+                title={ui("Fog Stats")}
+                subtitle={ui("Only information your side is allowed to know")}
               >
                 <div className="grid grid-cols-2 gap-2">
                   <StatCard
-                    label="Captures"
+                    label={ui("Captures")}
                     value={
                       snapshot.history.filter((entry) => entry.captured).length
                     }
                   />
                   <StatCard
-                    label="Checks"
+                    label={ui("Checks")}
                     value={
                       snapshot.history.filter((entry) => entry.gaveCheck).length
                     }
                   />
-                  <StatCard label="Moves" value={snapshot.history.length} />
+                  <StatCard label={ui("Moves")} value={snapshot.history.length} />
                   <StatCard
-                    label="Visible now"
+                    label={ui("Visible now")}
                     value={snapshot.visibleSquares.length}
                   />
                 </div>
               </Panel>
 
               <Panel
-                title="Privacy"
-                subtitle="Why this multiplayer mode is different"
+                title={ui("Privacy")}
+                subtitle={ui("Why this multiplayer mode is different")}
               >
                 <div className="space-y-2 text-xs leading-5 text-zinc-500">
-                  <p className="rounded-xl border border-sky-400/10 bg-sky-400/[0.04] px-3 py-2">
-                    The browser never receives the full FEN.
-                  </p>
-                  <p className="rounded-xl border border-white/5 bg-black/20 px-3 py-2">
-                    Opponent history entries remain “Hidden move” and historical
-                    previews are re-masked for your color.
-                  </p>
+                  <p className="rounded-xl border border-sky-400/10 bg-sky-400/[0.04] px-3 py-2">{ui("The browser never receives the full FEN.")}</p>
+                  <p className="rounded-xl border border-white/5 bg-black/20 px-3 py-2">{ui("Opponent history entries remain “Hidden move” and historical previews are re-masked for your color.")}</p>
                 </div>
               </Panel>
             </div>
           </aside>
         </div>
 
-        {error && <ErrorBox>{error}</ErrorBox>}
+        {error && <ErrorBox>{ui(error)}</ErrorBox>}
       </div>
     </main>
   );
@@ -1182,6 +1098,7 @@ function CapturedPieces({
   capturedBlack: PieceType[];
   capturedWhite: PieceType[];
 }) {
+  useUiLanguage();
   const render = (pieces: PieceType[], color: "w" | "b") => (
     <div className="mt-2 flex min-h-8 flex-wrap gap-1">
       {pieces.length === 0 ? (
@@ -1198,14 +1115,10 @@ function CapturedPieces({
 
   return (
     <div className="rounded-2xl border border-white/5 bg-black/20 p-3">
-      <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
-        Black
-      </p>
+      <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">{ui("Black")}</p>
       {render(capturedBlack, "b")}
       <div className="mt-3 border-t border-white/5 pt-3">
-        <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
-          White
-        </p>
+        <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">{ui("White")}</p>
         {render(capturedWhite, "w")}
       </div>
     </div>
@@ -1221,13 +1134,14 @@ function RuleStrip({
   title: string;
   detail: string;
 }) {
+  useUiLanguage();
   return (
     <div className="flex items-center gap-3">
       <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-400/10 text-lg font-black text-sky-200">
         {icon}
       </span>
       <div>
-        <p className="text-xs font-black text-zinc-200">{title}</p>
+        <p className="text-xs font-black text-zinc-200">{ui(title)}</p>
         <p className="mt-1 text-[10px] leading-4 text-zinc-600">{detail}</p>
       </div>
     </div>
@@ -1235,11 +1149,12 @@ function RuleStrip({
 }
 
 function StatCard({ label, value }: { label: string; value: number }) {
+  useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3">
       <p className="text-xl font-black text-zinc-100">{value}</p>
       <p className="mt-2 text-[9px] font-black uppercase tracking-wider text-zinc-600">
-        {label}
+        {ui(label)}
       </p>
     </div>
   );
