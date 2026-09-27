@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { chooseFourPlayerAiMove } from "@/games/chess/ai/fourPlayerAi";
 import {
@@ -242,20 +243,11 @@ export function FourPlayerMultiplayerLobby() {
   }
 
   return (
-    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] overflow-y-auto bg-transparent px-4 py-8 pb-12 text-zinc-100 sm:px-6">
+    <main className="chess-variant-page min-h-[var(--app-height)] overflow-y-auto bg-transparent px-4 py-8 pb-12 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-6xl">
-        <header className="mb-7 rounded-3xl border border-cyan-400/15 bg-zinc-900/70 p-6 shadow-2xl shadow-black/30">
-          <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-400/20 bg-cyan-400/10 text-3xl">
-              ✣
-            </div>
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-cyan-300">{ui("Four Player Chess · Multiplayer")}</p>
-              <h1 className="mt-1 text-3xl font-black text-white">{ui("Four armies. Four browsers.")}</h1>
-              <p className="mt-1 text-sm text-zinc-500">{ui("Red → Blue → Yellow → Green · last player standing wins")}</p>
-            </div>
-          </div>
-        </header>
+        <ChessPageHeader className="mb-7 rounded-3xl border border-cyan-400/15 bg-zinc-900/70 p-6 shadow-2xl shadow-black/30" description={<> {ui("Red → Blue → Yellow → Green · last player standing wins")} </>}>
+
+        </ChessPageHeader>
 
         {!user ? (
           <Panel title={ui("Sign in required")}>
@@ -764,19 +756,12 @@ export function FourPlayerMultiplayerGame() {
   // clipped on short displays. This dedicated waiting screen scrolls normally.
   if (room.status === "waiting" && filledSeats < 4) {
     return (
-      <main className="chess-variant-page min-h-[calc(100dvh-4rem)] overflow-y-auto bg-transparent px-4 py-6 pb-12 text-zinc-100 sm:px-6">
+      <main className="chess-variant-page min-h-[var(--app-height)] overflow-y-auto bg-transparent px-4 py-6 pb-12 text-zinc-100 sm:px-6">
         <div className="mx-auto w-full max-w-3xl">
-          <header className="mb-6 flex flex-col gap-4 rounded-3xl border border-cyan-400/15 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-400/20 bg-cyan-400/10 text-3xl">✣</div>
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.28em] text-cyan-300">{ui("Four Player Chess · Multiplayer")}</p>
-                <h1 className="mt-1 text-2xl font-black text-white">{ui("Invite your players")}</h1>
-                <p className="mt-1 text-sm text-zinc-500">{ui("The game starts when all four armies are filled.")}</p>
-              </div>
-            </div>
+          <ChessPageHeader className="mb-6 flex flex-col gap-4 rounded-3xl border border-cyan-400/15 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20 sm:flex-row sm:items-center sm:justify-between" description={<> {ui("The game starts when all four armies are filled.")} </>}>
+
             <Link to="/games/chess/variants/4-players/multiplayer" className="self-start rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-zinc-400 hover:bg-white/10 sm:self-auto">{ui("Leave")}</Link>
-          </header>
+          </ChessPageHeader>
 
           {error && <ErrorBox>{ui(error)}</ErrorBox>}
 
@@ -810,22 +795,10 @@ export function FourPlayerMultiplayerGame() {
   }
 
   return (
-    <div className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
+    <div className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1580px]">
-        <header className="mb-6 flex flex-col gap-4 rounded-3xl border border-cyan-400/15 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-400/20 bg-cyan-400/10 text-3xl">
-              ✣
-            </div>
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-cyan-300">{ui("Four Player Chess · Multiplayer")}</p>
-              <h1 className="mt-1 text-2xl font-black text-white">{ui("Four armies. One battlefield.")}</h1>
-              <p
-                className={`mt-1 text-sm ${playerStyles[liveState.turn].text}`}
-              >
-                {fourPlayerLabel(liveState.turn)}{ui("to move")}</p>
-            </div>
-          </div>
+        <ChessPageHeader className="mb-6 flex flex-col gap-4 rounded-3xl border border-cyan-400/15 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20 sm:flex-row sm:items-center sm:justify-between" description={<> {fourPlayerLabel(liveState.turn)}{ui("to move")} </>}>
+
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
@@ -839,7 +812,7 @@ export function FourPlayerMultiplayerGame() {
               className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-zinc-400 hover:bg-white/10"
             >{ui("Leave")}</Link>
           </div>
-        </header>
+        </ChessPageHeader>
 
         {error && <ErrorBox>{ui(error)}</ErrorBox>}
 
@@ -1304,7 +1277,8 @@ function ErrorBox({ children }: { children: ReactNode }) {
 function SimplePage({ text }: { text: string }) {
   useUiLanguage();
   return (
-    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-zinc-950 px-4 py-8 text-zinc-100">
+    <main className="chess-variant-page min-h-[var(--app-height)] bg-zinc-950 px-4 py-8 text-zinc-100">
+      <ChessPageHeader className="mb-4" />
       <div className="mx-auto max-w-2xl rounded-3xl border border-white/10 bg-zinc-900/70 p-6 text-center">
         {ui(text)}
       </div>

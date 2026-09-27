@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import {
   useCallback,
@@ -286,20 +287,11 @@ export function FogOfWarMultiplayerLobby() {
   }
 
   return (
-    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
+    <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-5xl">
-        <header className="mb-7 rounded-3xl border border-sky-400/15 bg-zinc-900/65 p-6 shadow-2xl shadow-black/30">
-          <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-sky-400/20 bg-sky-400/10 text-3xl">
-              🌫
-            </div>
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-sky-300">{ui("Fog of War Chess · Multiplayer")}</p>
-              <h1 className="mt-1 text-3xl font-black text-white">{ui("Your opponent cannot inspect what the fog hides.")}</h1>
-              <p className="mt-1 text-sm text-zinc-500">{ui("The real board stays on the server. Each browser receives only its own masked view.")}</p>
-            </div>
-          </div>
-        </header>
+        <ChessPageHeader className="mb-7 rounded-3xl border border-sky-400/15 bg-zinc-900/65 p-6 shadow-2xl shadow-black/30" description={<> {ui("The real board stays on the server. Each browser receives only its own masked view.")} </>}>
+
+        </ChessPageHeader>
 
         {!user ? (
           <Panel title={ui("Sign in required")}>
@@ -680,13 +672,15 @@ export function FogOfWarMultiplayerGame() {
 
   if (!user) {
     return (
-      <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent p-8 text-zinc-100">{ui("Sign in to open this room.")}</main>
+      <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent p-8 text-zinc-100">
+      <ChessPageHeader className="mb-4" />{ui("Sign in to open this room.")}</main>
     );
   }
 
   if (loading || !snapshot) {
     return (
-      <main className="flex chess-variant-page min-h-[calc(100dvh-4rem)] items-center justify-center bg-transparent text-zinc-400">{ui("Loading Fog of War room…")}</main>
+      <main className="flex chess-variant-page min-h-[var(--app-height)] items-center justify-center bg-transparent text-zinc-400">
+      <ChessPageHeader className="mb-4" />{ui("Loading Fog of War room…")}</main>
     );
   }
 
@@ -701,20 +695,11 @@ export function FogOfWarMultiplayerGame() {
   const materialDiff = whiteMaterial - blackMaterial;
 
   return (
-    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
+    <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1500px]">
-        <header className="mb-7 flex flex-col gap-4 rounded-3xl border border-sky-400/10 bg-zinc-900/55 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-sky-400/20 bg-sky-400/10 text-3xl">
-              🌫
-            </div>
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-sky-300">{ui("Fog of War Chess · Multiplayer")}</p>
-              <h1 className="mt-0.5 text-2xl font-black text-white">{ui("You cannot see everything")}</h1>
-              <p className="mt-0.5 text-sm text-zinc-500">{ui("Private server-side fog ·")}{" "}
-                {snapshot.myColor === "white" ? ui("White") : ui("Black")}{ui("view")}</p>
-            </div>
-          </div>
+        <ChessPageHeader className="mb-7 flex flex-col gap-4 rounded-3xl border border-sky-400/10 bg-zinc-900/55 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between" description={<> {ui("Private server-side fog ·")}{" "}
+                {snapshot.myColor === "white" ? ui("White") : ui("Black")}{ui("view")} </>}>
+
 
           <div className="flex flex-wrap items-center gap-2">
             <button
@@ -728,7 +713,7 @@ export function FogOfWarMultiplayerGame() {
               {snapshot.status === "waiting" ? ui("Waiting for opponent") : snapshot.status === "finished" ? ui("Game over") : snapshot.turn === "w" ? ui("White to move") : ui("Black to move")}
             </span>
           </div>
-        </header>
+        </ChessPageHeader>
 
         <section className="mb-6 grid gap-3 rounded-3xl border border-sky-400/10 bg-sky-400/[0.03] px-5 py-4 md:grid-cols-3">
           <RuleStrip

@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import {
   useCallback,
@@ -1030,7 +1031,8 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
 
   if (!user) {
     return (
-      <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-8 text-zinc-100">
+      <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-8 text-zinc-100">
+      <ChessPageHeader className="mb-4" />
         <div className="mx-auto max-w-2xl rounded-3xl border border-amber-400/20 bg-amber-400/[0.06] p-6">{ui("Sign in to open this multiplayer room.")}</div>
       </main>
     );
@@ -1038,7 +1040,8 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
 
   if (loading && !gameState) {
     return (
-      <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-8 text-zinc-100">
+      <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-8 text-zinc-100">
+      <ChessPageHeader className="mb-4" />
         <div className="mx-auto max-w-2xl rounded-3xl border border-white/10 bg-zinc-900/70 p-6 text-center">{ui("Loading multiplayer room...")}</div>
       </main>
     );
@@ -1046,7 +1049,8 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
 
   if (!room || !gameState) {
     return (
-      <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-8 text-zinc-100">
+      <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-8 text-zinc-100">
+      <ChessPageHeader className="mb-4" />
         <div className="mx-auto max-w-2xl rounded-3xl border border-red-400/20 bg-red-400/[0.06] p-6">
           <p className="font-black text-red-200">
             {error ?? "Room could not be loaded."}
@@ -1087,11 +1091,9 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
     : "—";
 
   return (
-    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
+    <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1460px]">
-        <header
-          className={`mb-6 rounded-3xl border ${page.accentBorder} bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20`}
-        >
+        <ChessPageHeader className={`mb-6 rounded-3xl border ${page.accentBorder} bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20`} description={<> {ui(page.subtitle)} </>}>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex items-center gap-4">
               <div
@@ -1133,7 +1135,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
               </span>
             </div>
           </div>
-        </header>
+        </ChessPageHeader>
 
         <div className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">

@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import {
   useCallback,
@@ -306,20 +307,11 @@ export function DraftMultiplayerLobby() {
   }
 
   return (
-    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
+    <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-5xl">
-        <header className="mb-7 rounded-3xl border border-emerald-400/15 bg-zinc-900/70 p-6 shadow-2xl shadow-black/30">
-          <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-emerald-400/20 bg-emerald-400/10 text-3xl">
-              ⚔
-            </div>
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-300">{ui("Draft Chess · Multiplayer")}</p>
-              <h1 className="mt-1 text-3xl font-black text-white">{ui("Build your army privately")}</h1>
-              <p className="mt-1 text-sm text-zinc-500">{ui("39 points · separate hidden setups · reveal only when both armies are locked")}</p>
-            </div>
-          </div>
-        </header>
+        <ChessPageHeader className="mb-7 rounded-3xl border border-emerald-400/15 bg-zinc-900/70 p-6 shadow-2xl shadow-black/30" description={<> {ui("39 points · separate hidden setups · reveal only when both armies are locked")} </>}>
+
+        </ChessPageHeader>
 
         {!user ? (
           <Panel title={ui("Sign in required")}>
@@ -1072,21 +1064,10 @@ export function DraftMultiplayerGame() {
   const ownPieces = mySide ? countDraftPieces(setupState, mySide) : 0;
 
   return (
-    <div className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
+    <div className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1500px]">
-        <header className="mb-6 flex flex-col gap-4 rounded-3xl border border-emerald-400/15 bg-zinc-900/60 px-5 py-4 shadow-xl shadow-black/20 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-400/20 bg-emerald-400/10 text-3xl">
-              ⚔
-            </div>
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-300">{ui("Draft Chess · Multiplayer")}</p>
-              <h1 className="mt-1 text-2xl font-black text-white">{ui("Build your own army")}</h1>
-              <p className="mt-1 text-sm text-zinc-500">
-                {phase === "playing" ? `${liveGame.turn() === "w" ? "White" : "Black"} to move` : `Private setup · round ${round}`}
-              </p>
-            </div>
-          </div>
+        <ChessPageHeader className="mb-6 flex flex-col gap-4 rounded-3xl border border-emerald-400/15 bg-zinc-900/60 px-5 py-4 shadow-xl shadow-black/20 sm:flex-row sm:items-center sm:justify-between" description={<> {phase === "playing" ? `${liveGame.turn() === "w" ? "White" : "Black"} to move` : `Private setup · round ${round}`} </>}>
+
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
@@ -1100,7 +1081,7 @@ export function DraftMultiplayerGame() {
               className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-zinc-400 hover:bg-white/10"
             >{ui("Leave")}</Link>
           </div>
-        </header>
+        </ChessPageHeader>
 
         {error && <ErrorBox>{ui(error)}</ErrorBox>}
         {setupError && <ErrorBox>{setupError}</ErrorBox>}
@@ -1578,7 +1559,8 @@ function ErrorBox({ children }: { children: ReactNode }) {
 function SimplePage({ text }: { text: string }) {
   useUiLanguage();
   return (
-    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-zinc-950 px-4 py-8 text-zinc-100">
+    <main className="chess-variant-page min-h-[var(--app-height)] bg-zinc-950 px-4 py-8 text-zinc-100">
+      <ChessPageHeader className="mb-4" />
       <div className="mx-auto max-w-2xl rounded-3xl border border-white/10 bg-zinc-900/70 p-6 text-center">
         {ui(text)}
       </div>

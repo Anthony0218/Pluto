@@ -1,7 +1,9 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { Link } from "react-router-dom";
 import { gameList } from "../../data/games";
 
 export default function GamesPage() {
+  useUiLanguage();
   return (
     <main className="min-h-screen bg-transparent px-4 py-10 text-white sm:px-6">
       <div className="mx-auto max-w-7xl">
@@ -90,7 +92,7 @@ export default function GamesPage() {
                         : "border-amber-400/25 bg-amber-400/15 text-amber-200"
                     }`}
                   >
-                    {game.finished ? "Fertig" : "In Entwicklung"}
+                    {ui(game.finished ? "Ready to play" : "In progress")}
                   </span>
                 </div>
               </div>

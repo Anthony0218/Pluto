@@ -1,4 +1,5 @@
 import { useAppLanguage } from "@/i18n/languageStore";
+import "./wattenMenus.css";
 import { useCallback, useMemo, useState, type ReactNode } from "react";
 import {
   BookOpen,
@@ -739,7 +740,7 @@ export default function WattenRule() {
   }
 
   return (
-    <main className="min-h-screen bg-transparent px-4 py-7 text-white md:px-8">
+    <main className="watten-menu watten-menu--rules min-h-screen px-4 py-7 text-white md:px-8">
       <div className="mx-auto max-w-[1500px]">
         <div className="ml-10 relative z-[200] mb-5 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/10 bg-zinc-900/80 px-5 py-3 shadow-xl backdrop-blur">
           <div className="flex items-center gap-3">

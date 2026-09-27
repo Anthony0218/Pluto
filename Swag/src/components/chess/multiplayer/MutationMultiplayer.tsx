@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import {
   useCallback,
@@ -411,20 +412,11 @@ export function MutationMultiplayerLobby() {
   }
 
   return (
-    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
+    <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-5xl">
-        <header className="mb-7 rounded-3xl border border-violet-400/15 bg-zinc-900/65 p-6 shadow-2xl shadow-black/30">
-          <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-violet-400/20 bg-violet-400/10 text-3xl">
-              🧬
-            </div>
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-300">{ui("Mutation Chess · Multiplayer")}</p>
-              <h1 className="mt-1 text-3xl font-black text-white">{ui("Every fifth full move can rewrite the board.")}</h1>
-              <p className="mt-1 text-sm text-zinc-500">{ui("One shared seed makes every scheduled mutation identical for both players.")}</p>
-            </div>
-          </div>
-        </header>
+        <ChessPageHeader className="mb-7 rounded-3xl border border-violet-400/15 bg-zinc-900/65 p-6 shadow-2xl shadow-black/30" description={<> {ui("One shared seed makes every scheduled mutation identical for both players.")} </>}>
+
+        </ChessPageHeader>
 
         {!user ? (
           <Panel title={ui("Sign in required")}>
@@ -1113,19 +1105,22 @@ export function MutationMultiplayerGame() {
 
   if (!user) {
     return (
-      <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent p-8 text-zinc-100">{ui("Sign in required.")}</main>
+      <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent p-8 text-zinc-100">
+      <ChessPageHeader className="mb-4" />{ui("Sign in required.")}</main>
     );
   }
 
   if (loading) {
     return (
-      <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent p-8 text-zinc-400">{ui("Loading Mutation room...")}</main>
+      <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent p-8 text-zinc-400">
+      <ChessPageHeader className="mb-4" />{ui("Loading Mutation room...")}</main>
     );
   }
 
   if (!room || !gameState) {
     return (
-      <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent p-8 text-zinc-100">
+      <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent p-8 text-zinc-100">
+      <ChessPageHeader className="mb-4" />
         <p>{ui("Mutation room unavailable.")}</p>
         {error && <ErrorBox>{ui(error)}</ErrorBox>}
       </main>
@@ -1135,19 +1130,10 @@ export function MutationMultiplayerGame() {
   const activeTurnColor = liveGame.turn() === "w" ? "white" : "black";
 
   return (
-    <div className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
+    <div className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1500px]">
-        <header className="mb-7 flex flex-col gap-4 rounded-3xl border border-violet-400/10 bg-zinc-900/50 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-violet-400/20 bg-violet-400/10 text-3xl">
-              🧬
-            </div>
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-300">{ui("Chess Variant · Multiplayer")}</p>
-              <h1 className="mt-0.5 text-2xl font-black text-white">{ui("Mutation Chess")}</h1>
-              <p className="mt-0.5 text-sm text-zinc-500">{ui("Every 5 full moves, one legal non-King piece changes.")}</p>
-            </div>
-          </div>
+        <ChessPageHeader className="mb-7 flex flex-col gap-4 rounded-3xl border border-violet-400/10 bg-zinc-900/50 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between" description={<> {ui("Every 5 full moves, one legal non-King piece changes.")} </>}>
+
 
           <div className="flex flex-wrap items-center gap-2">
             {gameState.status === "playing" && (
@@ -1166,7 +1152,7 @@ export function MutationMultiplayerGame() {
               className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-400 hover:bg-white/10"
             >{ui("Lobby")}</Link>
           </div>
-        </header>
+        </ChessPageHeader>
 
         <main className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">

@@ -1,7 +1,8 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Chess, type Square } from "chess.js";
 import {
   getCompletedLichessPuzzles,
@@ -5359,7 +5360,10 @@ function PuzzlesTab() {
 
 export default function ChessRulesAndTips() {
   useUiLanguage();
-  const [activeTab, setActiveTab] = useState<TabKey>("rules");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedTab = searchParams.get("tab");
+  const activeTab: TabKey = requestedTab === "puzzles" || requestedTab === "openings" || requestedTab === "situations" ? requestedTab : "rules";
+  const setActiveTab = (tab: TabKey) => setSearchParams(current => { const next = new URLSearchParams(current); next.set("tab", tab); return next; }, { replace: true });
   const { language, setLanguage } = useAppLanguage();
   const t = (value: string) => translate(language, value);
 
@@ -5397,7 +5401,7 @@ export default function ChessRulesAndTips() {
 
   return (
     <LanguageContext.Provider value={language}>
-      <div className="relative left-1/2 min-h-[calc(100dvh-4rem)] w-screen -translate-x-1/2 overflow-x-hidden bg-[#03070d] text-zinc-100">
+      <div className="relative left-1/2 min-h-[var(--app-height)] w-screen -translate-x-1/2 overflow-x-hidden bg-[#03070d] text-zinc-100">
         {/* CINEMATIC BACKDROP */}
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_17%_12%,rgba(181,132,46,.11),transparent_30%),radial-gradient(circle_at_82%_24%,rgba(52,83,116,.10),transparent_28%),linear-gradient(180deg,#050a11_0%,#020509_52%,#04080d_100%)]" />
@@ -5410,7 +5414,7 @@ export default function ChessRulesAndTips() {
 
         <div className="relative mx-auto w-full max-w-[1640px] px-4 pb-12 pt-4 sm:px-6 lg:px-8">
           {/* TOP STRIP */}
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.06] pb-4">
+          <ChessPageHeader className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.06] pb-4">
             <Link
               to="/games/chess"
               className="group inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.20em] text-zinc-500 transition hover:text-amber-200"
@@ -5442,7 +5446,7 @@ export default function ChessRulesAndTips() {
                 ))}
               </select>
             </label>
-          </div>
+          </ChessPageHeader>
 
           {/* HERO */}
           <section className="grid gap-8 py-9 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-end lg:py-12">

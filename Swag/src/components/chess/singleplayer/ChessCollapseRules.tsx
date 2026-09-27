@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -5989,8 +5990,7 @@ export default function ChessRulesAndTips() {
       "
       >
         <div className="mx-auto max-w-[1500px]">
-          <header
-            className="
+          <ChessPageHeader className="
             mb-6
             flex
             flex-col
@@ -6007,51 +6007,8 @@ export default function ChessRulesAndTips() {
             sm:flex-row
             sm:items-center
             sm:justify-between
-          "
-          >
-            <div className="flex items-center gap-4">
-              <div
-                className="
-                flex
-                h-14
-                w-14
-                shrink-0
-                items-center
-                justify-center
-                rounded-2xl
-                border
-                border-amber-500/20
-                bg-amber-400/10
-                font-serif
-                text-4xl
-                text-amber-100
-              "
-              >
-                ♞
-              </div>
+          " description={<> {t("Rules, openings, and common chess patterns")} </>}>
 
-              <div>
-                <p
-                  className="
-                  text-[10px]
-                  font-bold
-                  uppercase
-                  tracking-[0.28em]
-                  text-amber-400
-                "
-                >
-                  {t("Learn Chess")}
-                </p>
-
-                <h1 className="mt-1 text-2xl font-black tracking-tight text-white sm:text-3xl">
-                  {t("Chess Rules & Tips")}
-                </h1>
-
-                <p className="mt-1 text-sm text-zinc-500">
-                  {t("Rules, openings, and common chess patterns")}
-                </p>
-              </div>
-            </div>
 
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <label
@@ -6121,7 +6078,7 @@ export default function ChessRulesAndTips() {
                 ← {t("Back to Chess")}
               </Link>
             </div>
-          </header>
+          </ChessPageHeader>
 
           <nav
             className="

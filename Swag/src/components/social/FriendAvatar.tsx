@@ -29,9 +29,9 @@ export default function FriendAvatar({
       <span
         role="img"
         aria-label={`${label} avatar`}
-        className={`${sizeClasses[size]} shrink-0 overflow-hidden rounded-full border border-white/10`}
+        className={`${sizeClasses[size]} inline-flex shrink-0 overflow-hidden rounded-full border border-white/10`}
       >
-        <ProfileAvatar avatarId={profile.avatar_id} className="h-full w-full" />
+        <ProfileAvatar avatarId={profile.avatar_id} className="block h-full w-full" />
       </span>
     );
   }

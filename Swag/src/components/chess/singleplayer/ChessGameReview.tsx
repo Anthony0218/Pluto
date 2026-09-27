@@ -1,9 +1,12 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Chess, type Color, type PieceSymbol, type Square } from "chess.js";
 
 import Board from "./Board";
+import QualityBadge from "./ReviewQualityBadge";
+import { qualityList } from "./reviewQualities";
 
 import { useStockfishAnalysis } from "@/hooks/useStockfishAnalysis";
 
@@ -153,15 +156,6 @@ const qualitySortOrder: Record<MoveQuality, number> = {
   Mistake: 4,
   Blunder: 5,
 };
-
-const qualityList: MoveQuality[] = [
-  "Best",
-  "Excellent",
-  "Good",
-  "Inaccuracy",
-  "Mistake",
-  "Blunder",
-];
 
 const phaseList: GamePhase[] = ["Opening", "Middlegame", "Endgame"];
 
@@ -1141,7 +1135,7 @@ export default function ChessGameReview({
         fixed
         inset-x-0
         bottom-0
-        top-16
+        top-[var(--public-header-height)]
         z-[100]
         flex
         items-center
@@ -1155,7 +1149,7 @@ export default function ChessGameReview({
       <div
         className="
           flex
-          h-[calc(100vh-5rem)]
+          h-[calc(var(--app-height)-1rem)]
           w-full
           max-w-[1980px]
           flex-col
@@ -1179,18 +1173,8 @@ export default function ChessGameReview({
 
         {/* HEADER */}
 
-        <header className="relative flex shrink-0 items-center justify-between border-b border-amber-100/[0.08] bg-[#08111b]/88 px-5 py-3.5 backdrop-blur-xl">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-amber-300/15 bg-amber-300/[0.06] text-2xl text-amber-100 shadow-inner shadow-amber-200/[0.03]">
-              ♞
-            </div>
+        <ChessPageHeader className="relative flex shrink-0 items-center justify-between border-b border-amber-100/[0.08] bg-[#08111b]/88 px-5 py-3.5 backdrop-blur-xl" title="Game Review">
 
-            <div>
-              <p className="text-[9px] font-black uppercase tracking-[0.28em] text-amber-300/75">{ui("Post-Game Analysis")}</p>
-
-              <h2 className="font-serif text-xl font-semibold tracking-wide text-[#f3e7cf]">{ui("Game Review")}</h2>
-            </div>
-          </div>
 
           <div className="flex items-center gap-2">
             {reviews.length > 0 && (
@@ -1221,7 +1205,7 @@ export default function ChessGameReview({
               ×
             </button>
           </div>
-        </header>
+        </ChessPageHeader>
 
         {trainingPuzzleStatus && (
           <div className="mx-4 mt-3 rounded-2xl border border-amber-300/15 bg-[linear-gradient(135deg,rgba(111,76,32,.14),rgba(7,14,22,.68))] px-4 py-3 text-xs leading-5 text-amber-100/80 shadow-inner shadow-black/20">
@@ -2641,25 +2625,5 @@ function SideBadge({ color }: { color: "w" | "b" }) {
     <span className="inline-flex items-center gap-1 rounded-full bg-[#fff3d5]/10 px-2 py-1 text-[9px] font-black text-[#fff3d5]">{ui("♔ White")}</span>
   ) : (
     <span className="inline-flex items-center gap-1 rounded-full bg-white/5 px-2 py-1 text-[9px] font-black text-zinc-300">{ui("♚ Black")}</span>
-  );
-}
-
-function QualityBadge({ quality }: { quality: MoveQuality }) {
-  useUiLanguage();
-  const styles: Record<MoveQuality, string> = {
-    Best: "bg-emerald-500/15 text-emerald-300",
-    Excellent: "bg-cyan-500/15 text-cyan-300",
-    Good: "bg-blue-500/15 text-blue-300",
-    Inaccuracy: "bg-yellow-500/15 text-yellow-300",
-    Mistake: "bg-orange-500/15 text-orange-300",
-    Blunder: "bg-red-500/15 text-red-300",
-  };
-
-  return (
-    <span
-      className={`inline-flex rounded-full px-2 py-1 text-[8px] font-black uppercase ${styles[quality]}`}
-    >
-      {quality}
-    </span>
   );
 }

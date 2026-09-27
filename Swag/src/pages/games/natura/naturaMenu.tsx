@@ -1,4 +1,6 @@
 import { useCallback, useState } from "react";
+import { Bird, Bug, Fish, Waves } from "lucide-react";
+import "./naturaMenu.css";
 import NaturaGame from "../../../components/natura/NaturaGame";
 import DidYouKnow from "../../../components/natura/DidYouKnow";
 import { SCENARIOS } from "../../../games/natura/naturaData";
@@ -14,6 +16,18 @@ import {
   awardPoints,
   getAnswerPoints,
 } from "../../../games/natura/naturafunctions";
+
+const menuScenarios = [
+  SCENARIOS.find(scenario => scenario.id === "meadow")!,
+  ...SCENARIOS.filter(scenario => scenario.id !== "meadow"),
+];
+
+function HabitatIcon({ id }: { id: ScenarioId }) {
+  if (["meadow", "alarm", "greenheron"].includes(id)) return <Bird aria-hidden="true" />;
+  if (["archerfish", "flyingfish"].includes(id)) return <Fish aria-hidden="true" />;
+  if (["humpback", "cuttlefish", "coconut", "echo"].includes(id)) return <Waves aria-hidden="true" />;
+  return <Bug aria-hidden="true" />;
+}
 
 type Match = {
   stage: Stage;
@@ -170,7 +184,7 @@ export default function NaturaMenu() {
   const meadowRole =
     match.round % 2 === 1 ? "kestrel (WASD + Space)" : "vole (arrows + Enter)";
   return (
-    <div className="natura">
+    <div className="natura natura-experience">
       <style>{NATURA_CSS}</style>
       <div className="natura-shell">
         <header className="natura-header">
@@ -190,66 +204,44 @@ export default function NaturaMenu() {
           </span>
         </div>
         {match.stage === "menu" && (
-          <main className="natura-panel">
-            <p className="natura-eyebrow">
-              {SCENARIOS.length} HABITATS · {SCENARIOS.length} WAYS TO PLAY
-            </p>
-            <h1>Life in the wild.</h1>
-            <p>
-              Chase, bluff, build, launch and disguise. Discover an animal
-              behaviour in every round.
-            </p>
-            <div className="natura-cards">
-              {SCENARIOS.map((s) => (
-                <button
-                  key={s.id}
-                  aria-pressed={match.selected === s.id}
-                  className={match.selected === s.id ? "selected" : ""}
-                  onClick={() => select(s.id)}
-                >
-                  <strong>
-                    {s.icon} {s.title}
-                  </strong>
-                  <span>{s.setting}</span>
-                  <small>PLAYABLE</small>
-                </button>
-              ))}
+          <main className="natura-panel natura-menu-panel">
+            <section className="natura-menu-hero" aria-labelledby="natura-menu-title">
+              <div className="natura-menu-hero__copy">
+                <p className="natura-eyebrow">FIELD NOTES / VOL. 01</p>
+                <h1 id="natura-menu-title">The wild is full of tactics.</h1>
+                <p>Observe real animal behaviour. Choose a habitat. Then play the experiment.</p>
+                <div className="natura-menu-hero__meta"><span>{SCENARIOS.length} living worlds</span><span>Play · Learn · Discover</span></div>
+              </div>
+            </section>
+            <div className="natura-menu-content">
+              <div className="natura-menu-heading"><div><p className="natura-eyebrow">01 / CHOOSE A HABITAT</p><h2>Explore the field guide</h2></div><span>SELECT A SPECIMEN TO PREVIEW</span></div>
+              <div className="natura-menu-grid">
+                <div className="natura-cards" aria-label="Habitats">
+                  {menuScenarios.map((s, index) => (
+                    <button key={s.id} type="button" aria-pressed={match.selected === s.id} className={match.selected === s.id ? "selected" : ""} onClick={() => select(s.id)}>
+                      <span className="natura-card-number">{String(index + 1).padStart(2, "0")}</span>
+                      <span className="natura-card-icon"><HabitatIcon id={s.id} /></span>
+                      <span className="natura-card-copy"><strong>{s.title}</strong><span>{s.setting}</span></span>
+                      <span className="natura-card-arrow" aria-hidden="true">↗</span>
+                    </button>
+                  ))}
+                </div>
+                <aside className="natura-spotlight" aria-label={`${scenario.title} field notes`}>
+                  <div className="natura-spotlight-top"><span>SPECIMEN / {String(menuScenarios.findIndex(s => s.id === scenario.id) + 1).padStart(2, "0")}</span><span>● LIVE STUDY</span></div>
+                  <div className="natura-spotlight-icon"><HabitatIcon id={scenario.id} /></div>
+                  <p className="natura-eyebrow">{scenario.setting}</p>
+                  <h2>{scenario.title}</h2>
+                  <p className="natura-spotlight-behaviour">{scenario.behaviour}</p>
+                  <a href={scenario.source.url} target="_blank" rel="noreferrer">Field source: {scenario.source.label} ↗</a>
+                  <DidYouKnow key={scenario.id} scenario={scenario.id} />
+                  <div className="natura-spotlight-opponents"><p className="natura-eyebrow">02 / CHOOSE YOUR OPPONENT</p><div className="natura-options">
+                    <button type="button" disabled={match.round > 1} aria-pressed={match.mode === "hotseat"} className={match.mode === "hotseat" ? "active" : ""} onClick={() => setMatch(prev => ({ ...prev, mode: "hotseat" }))}>Local two players<small>One device · shared adventure</small></button>
+                    <button type="button" disabled={match.round > 1} aria-pressed={match.mode === "ai"} className={match.mode === "ai" ? "active" : ""} onClick={() => setMatch(prev => ({ ...prev, mode: "ai" }))}>Vs AI<small>Play against the computer</small></button>
+                  </div>{match.round > 1 && <p className="natura-note">Start a new match to change opponents.</p>}</div>
+                  <button type="button" className="natura-primary" onClick={begin}>Read rules & play {scenario.title} <span aria-hidden="true">→</span></button>
+                </aside>
+              </div>
             </div>
-            <AnimalBox scenario={scenario} />
-            <DidYouKnow key={scenario.id} scenario={scenario.id} />
-            <h2>Choose your opponent</h2>
-            <div className="natura-options">
-              <button
-                disabled={match.round > 1}
-                aria-pressed={match.mode === "hotseat"}
-                className={match.mode === "hotseat" ? "active" : ""}
-                onClick={() =>
-                  setMatch((prev) => ({ ...prev, mode: "hotseat" }))
-                }
-              >
-                Local two players
-                <small>One device · shared controls or private turns</small>
-              </button>
-              <button
-                disabled={match.round > 1}
-                aria-pressed={match.mode === "ai"}
-                className={match.mode === "ai" ? "active" : ""}
-                onClick={() => setMatch((prev) => ({ ...prev, mode: "ai" }))}
-              >
-                Vs AI<small>Take on a computer opponent</small>
-              </button>
-              <button disabled>
-                Online<small>Not connected yet</small>
-              </button>
-            </div>
-            {match.round > 1 && (
-              <p className="natura-note">
-                Start a new match to change opponents.
-              </p>
-            )}
-            <button className="natura-primary" onClick={begin}>
-              Read rules & play {scenario.title} →
-            </button>
           </main>
         )}
         {match.stage === "briefing" && (

@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -62,7 +63,7 @@ const difficultyLevels: Record<Difficulty, DifficultySettings> = {
 function ChessPageShell({ children }: { children: React.ReactNode }) {
   useUiLanguage();
   return (
-    <main className="chess-menu-page relative left-1/2 min-h-[calc(100dvh-4rem)] w-screen -translate-x-1/2 overflow-hidden bg-[#07090b] text-zinc-100">
+    <main className="chess-menu-page chess-singleplayer-setup relative left-1/2 min-h-[var(--app-height)] w-screen -translate-x-1/2 overflow-x-hidden bg-[#07090b] text-zinc-100">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_13%_68%,rgba(245,158,11,.09),transparent_28%),radial-gradient(circle_at_76%_23%,rgba(255,255,255,.045),transparent_30%),linear-gradient(to_bottom,#0a0d10,#07090b_58%,#040506)]" />
       <div className="pointer-events-none absolute -bottom-28 -left-24 text-[390px] leading-none text-amber-100/[0.035]">
         ♚
@@ -74,14 +75,9 @@ function ChessPageShell({ children }: { children: React.ReactNode }) {
         ♝
       </div>
 
-      <div className="relative flex min-h-[calc(100dvh-4rem)] w-full flex-col">
-        <nav className="flex min-h-20 w-full items-center justify-between border-b border-white/[0.07] px-6 sm:px-10 lg:px-14 xl:px-20">
-          <Link to="/games/chess" className="inline-flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-amber-300/20 bg-amber-300/10 text-lg text-amber-300">
-              ♛
-            </span>
-            <span className="font-serif text-sm tracking-[0.28em] text-zinc-200">{ui("CHESS")}</span>
-          </Link>
+      <div className="relative flex min-h-[var(--app-height)] w-full flex-col">
+        <ChessPageHeader className="chess-menu-header">
+
 
           <Link
             to="/games/chess/rules"
@@ -90,7 +86,7 @@ function ChessPageShell({ children }: { children: React.ReactNode }) {
             <span className="text-base">♔</span>
             <span className="hidden sm:inline">{ui("Rules & Tips")}</span>
           </Link>
-        </nav>
+        </ChessPageHeader>
 
         {children}
       </div>
@@ -145,7 +141,7 @@ export default function ChessComputer() {
 
           <div className="max-w-[620px]">
             <Link
-              to="/chess/classic"
+              to="/games/chess/classic"
               className="mb-8 inline-flex items-center gap-2 text-sm text-zinc-600 transition hover:text-white"
             >
               <span>←</span>{ui("Classic Chess")}</Link>
@@ -163,7 +159,7 @@ export default function ChessComputer() {
 
         <div className="relative flex min-h-[620px] items-center border-t border-white/[0.06] px-5 py-8 sm:px-8 lg:min-h-0 lg:border-t-0 lg:px-10 lg:py-12 xl:px-14 2xl:px-20">
           <div className="mx-auto flex w-full max-w-[980px] flex-col gap-4 xl:gap-5">
-            <section className="rounded-[22px] border border-white/[0.09] bg-black/20 p-5 shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md sm:p-6">
+            <section className="rounded-[22px] border border-white/[0.09] bg-black/20 p-5 shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md sm:p-6 xl:p-5">
               <p className="text-[9px] font-black uppercase tracking-[0.26em] text-amber-300/70">{ui("Choose your side")}</p>
               <h2 className="mt-1.5 font-serif text-[27px] leading-tight text-white sm:text-[31px]">{ui("Color")}</h2>
 
@@ -215,11 +211,11 @@ export default function ChessComputer() {
               </div>
             </section>
 
-            <section className="rounded-[22px] border border-white/[0.09] bg-black/20 p-5 shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md sm:p-6">
+            <section className="rounded-[22px] border border-white/[0.09] bg-black/20 p-5 shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md sm:p-6 xl:p-5">
               <p className="text-[9px] font-black uppercase tracking-[0.26em] text-amber-300/70">{ui("Choose the challenge")}</p>
               <h2 className="mt-1.5 font-serif text-[27px] leading-tight text-white sm:text-[31px]">{ui("Difficulty")}</h2>
 
-              <div className="mt-5 grid gap-2.5">
+              <div className="mt-5 grid gap-2.5 lg:grid-cols-2 xl:grid-cols-5">
                 {(
                   ["beginner", "easy", "medium", "hard", "expert"] as const
                 ).map((value) => {
@@ -231,14 +227,14 @@ export default function ChessComputer() {
                       key={value}
                       type="button"
                       onClick={() => setDifficulty(value)}
-                      className={`group flex items-center gap-4 rounded-[18px] border p-3.5 text-left transition duration-300 hover:-translate-y-0.5 sm:p-4 ${
+                      className={`group relative flex items-center gap-4 rounded-[18px] border p-3.5 text-left transition duration-300 hover:-translate-y-0.5 sm:p-4 xl:block xl:min-h-[142px] xl:p-3 ${
                         active
                           ? "border-amber-300/45 bg-amber-300/[0.045]"
                           : "border-white/[0.08] bg-black/15 hover:border-amber-300/30 hover:bg-white/[0.025]"
                       }`}
                     >
                       <span
-                        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border text-2xl ${
+                        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border text-2xl xl:h-10 xl:w-10 xl:text-xl ${
                           active
                             ? "border-amber-300/35 bg-amber-300/10"
                             : "border-white/10 bg-white/[0.035]"
@@ -247,7 +243,7 @@ export default function ChessComputer() {
                         {settings.emoji}
                       </span>
 
-                      <span className="min-w-0 flex-1">
+                      <span className="min-w-0 flex-1 xl:mt-3 xl:block">
                         <span
                           className={`block text-[8px] font-black uppercase tracking-[0.22em] ${
                             active ? "text-amber-300/70" : "text-zinc-700"
@@ -258,13 +254,13 @@ export default function ChessComputer() {
                         <span className="mt-1 block font-serif text-xl text-white">
                           {ui(settings.label)}
                         </span>
-                        <span className="mt-1 block text-xs leading-5 text-zinc-500">
+                        <span className="mt-1 block text-xs leading-5 text-zinc-500 xl:hidden">
                           {ui(settings.description)}
                         </span>
                       </span>
 
                       <span
-                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-lg transition duration-300 ${
+                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-lg transition duration-300 xl:absolute xl:right-3 xl:top-3 xl:h-8 xl:w-8 ${
                           active
                             ? "border-amber-300/45 text-amber-300"
                             : "border-white/10 text-zinc-600 group-hover:border-amber-300/35 group-hover:text-amber-300"
@@ -281,7 +277,7 @@ export default function ChessComputer() {
             <button
               type="button"
               onClick={startGame}
-              className="group flex w-full items-center justify-between rounded-[22px] border border-amber-300/45 bg-amber-300/[0.045] p-5 text-left shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:bg-amber-300/[0.07] sm:p-6"
+              className="group flex w-full items-center justify-between rounded-[22px] border border-amber-300/45 bg-amber-300/[0.045] p-5 text-left shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:bg-amber-300/[0.07] sm:p-6 xl:p-4"
             >
               <span>
                 <span className="text-[9px] font-black uppercase tracking-[0.26em] text-amber-300/70">{ui("Ready")}</span>

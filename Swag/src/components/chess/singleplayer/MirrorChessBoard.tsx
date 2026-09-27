@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
 import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
@@ -1105,28 +1106,10 @@ export default function MirrorChessBoard({
   }
 
   return (
-    <div className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
+    <div className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1500px]">
-        <header className="mb-7 flex flex-col gap-4 rounded-3xl border border-zinc-400/10 bg-zinc-900/50 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-violet-400/20 bg-violet-400/10 text-3xl shadow-inner">
-              ◈
-            </div>
+        <ChessPageHeader className="mb-7 flex flex-col gap-4 rounded-3xl border border-zinc-400/10 bg-zinc-900/50 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between" description={<> {t("Build one army together")} </>}>
 
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-violet-300">
-                {t("Chess Variant")}
-              </p>
-
-              <h1 className="mt-0.5 text-2xl font-black tracking-tight text-white">
-                {t("Mirror Chess")}
-              </h1>
-
-              <p className="mt-0.5 text-sm text-zinc-500">
-                {t("Build one army together")}
-              </p>
-            </div>
-          </div>
 
           <div className="flex flex-wrap items-center justify-end gap-2">
             <LanguageSelector
@@ -1152,7 +1135,7 @@ export default function MirrorChessBoard({
             )}
           </div>
           <BoardAnimationToggle />
-        </header>
+        </ChessPageHeader>
 
         {phase === "setup" && (
           <section className="mb-6 grid gap-3 rounded-3xl border border-violet-400/10 bg-violet-400/[0.03] px-5 py-4 md:grid-cols-3">

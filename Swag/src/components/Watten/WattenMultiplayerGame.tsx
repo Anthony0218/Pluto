@@ -26,6 +26,7 @@ import { useCardTheme } from "@/context/CardThemeContext";
 import { getWattenCardImage } from "@/utils/WattenCardImages";
 import TableThemeSelector from "../App/TableThemeSelector";
 import { ProfileAvatar } from "../social/ProfileAvatarPicker";
+import "./wattenGameScreen.css";
 
 import { useTableTheme, type TableTheme } from "@/context/TableThemeContext";
 import {
@@ -1918,7 +1919,7 @@ export default function WattenMultiplayerGame() {
   }
 
   return (
-    <main className="min-h-screen bg-transparent px-4 py-6 text-white md:px-8">
+    <main className="watten-game-screen min-h-screen bg-transparent px-4 py-6 text-white md:px-8">
       {actionError && (
         <div className="fixed left-1/2 top-5 z-[250] -translate-x-1/2 rounded-xl border border-red-400/30 bg-red-950/95 px-5 py-3 text-sm font-bold text-red-200 shadow-2xl">
           {actionError}
@@ -2103,7 +2104,7 @@ export default function WattenMultiplayerGame() {
             </div>
           </div>
         )}
-      <div className="mx-auto w-full max-w-[1800px] max-md:px-2">
+      <div className="watten-game-content mx-auto w-full max-w-[1800px] max-md:px-2">
         {/* HEADER */}
 
         <div className="relative z-30 mb-3 flex items-start justify-between gap-2 max-md:flex-col md:mb-4 md:items-center">
@@ -2166,7 +2167,7 @@ export default function WattenMultiplayerGame() {
         {/* TABLE + SIDEBARS */}
 
         <div
-          className="
+          className="watten-game-grid
     grid
     w-full
     grid-cols-[16rem_minmax(0,1fr)_16rem]

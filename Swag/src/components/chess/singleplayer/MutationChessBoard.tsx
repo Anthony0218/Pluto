@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
 import { useRef, useEffect, useMemo, useState } from "react";
@@ -955,7 +956,7 @@ export default function MutationChessBoard({
   return (
     <div
       className="
-        chess-variant-page min-h-[calc(100dvh-4rem)]
+        chess-variant-page min-h-[var(--app-height)]
         bg-transparent
         px-4
         py-6
@@ -966,8 +967,7 @@ export default function MutationChessBoard({
       <div className="mx-auto max-w-[1500px]">
         {/* HEADER */}
 
-        <header
-          className="
+        <ChessPageHeader className="
             mb-7
             flex
             flex-col
@@ -984,49 +984,8 @@ export default function MutationChessBoard({
             sm:flex-row
             sm:items-center
             sm:justify-between
-          "
-        >
-          <div className="flex items-center gap-4">
-            <div
-              className="
-                flex
-                h-12
-                w-12
-                items-center
-                justify-center
-                rounded-2xl
-                border
-                border-violet-400/20
-                bg-violet-400/10
-                text-3xl
-                shadow-inner
-              "
-            >
-              🧬
-            </div>
+          " description={<> {t("Every 5 full moves, one piece changes")} </>}>
 
-            <div>
-              <p
-                className="
-                  text-[10px]
-                  font-bold
-                  uppercase
-                  tracking-[0.28em]
-                  text-violet-300
-                "
-              >
-                {t("Chess Variant")}
-              </p>
-
-              <h1 className="mt-0.5 text-2xl font-black tracking-tight text-white">
-                {t("Mutation Chess")}
-              </h1>
-
-              <p className="mt-0.5 text-sm text-zinc-500">
-                {t("Every 5 full moves, one piece changes")}
-              </p>
-            </div>
-          </div>
 
           <div className="flex flex-wrap items-center justify-end gap-2">
             <ChessLanguageSelector
@@ -1075,7 +1034,7 @@ export default function MutationChessBoard({
             )}
           </div>
           <BoardAnimationToggle />
-        </header>
+        </ChessPageHeader>
 
         {/* RULE STRIP */}
 

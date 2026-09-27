@@ -154,6 +154,16 @@ import SchafKopfMenuPage from "./pages/schafkopf/SchafKopfMenuPage.tsx";
 import SchafKopfLobbyPage from "./pages/schafkopf/SchafKopfLobbyPage.tsx";
 import SchafkopfGame from "./components/Schafkopf/SchafkopfGame.tsx";
 import SchafkopfMultiplayerGame from "./components/Schafkopf/SchafkopfMultiplayerGame.tsx";
+import GoMenu from "./pages/games/Go/GoMenu.tsx";
+import GoGamePage from "./pages/games/Go/GoGamePage.tsx";
+import ShogiMenu from "./pages/games/Shogi/ShogiMenu.tsx";
+import ShogiGamePage from "./pages/games/Shogi/ShogiGamePage.tsx";
+import StrategyMultiplayer from "./components/strategy/StrategyMultiplayer.tsx";
+import GoRules from "./components/strategy/GoRules.tsx";
+import ShogiRules from "./components/strategy/ShogiRules.tsx";
+const AtlasArenaPage = React.lazy(() => import("./pages/games/AtlasArena/AtlasArenaPage.tsx"));
+const AtlasMultiplayerPage = React.lazy(() => import("./pages/games/AtlasArena/AtlasMultiplayerPage.tsx"));
+const atlasPage = (page: React.ReactNode) => <React.Suspense fallback={<main className="min-h-[var(--app-height)] bg-[#06101f] p-10 text-zinc-400">Loading Atlas Arena…</main>}>{page}</React.Suspense>;
 
 const router = createBrowserRouter([
   {
@@ -195,6 +205,21 @@ const router = createBrowserRouter([
             path: "/games",
             element: <GamesPage />,
           },
+          { path: "/games/atlas-arena", element: atlasPage(<AtlasArenaPage />) },
+          { path: "/games/atlas-arena/multiplayer", element: atlasPage(<AtlasMultiplayerPage />) },
+          { path: "/games/atlas-arena/multiplayer/:roomCode", element: atlasPage(<AtlasMultiplayerPage />) },
+          { path: "/games/go", element: <GoMenu /> },
+          { path: "/games/go/rules", element: <GoRules /> },
+          { path: "/games/go/ai", element: <GoGamePage mode="ai" /> },
+          { path: "/games/go/hotseat", element: <GoGamePage mode="hotseat" /> },
+          { path: "/games/go/multiplayer", element: <StrategyMultiplayer gameType="go" /> },
+          { path: "/games/go/multiplayer/:roomCode", element: <StrategyMultiplayer gameType="go" /> },
+          { path: "/games/shogi", element: <ShogiMenu /> },
+          { path: "/games/shogi/rules", element: <ShogiRules /> },
+          { path: "/games/shogi/ai", element: <ShogiGamePage mode="ai" /> },
+          { path: "/games/shogi/hotseat", element: <ShogiGamePage mode="hotseat" /> },
+          { path: "/games/shogi/multiplayer", element: <StrategyMultiplayer gameType="shogi" /> },
+          { path: "/games/shogi/multiplayer/:roomCode", element: <StrategyMultiplayer gameType="shogi" /> },
           {
             path: "/profile",
             element: <ProfilePage />,

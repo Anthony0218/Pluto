@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675">
+  <defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="#e8bd70"/><stop offset="1" stop-color="#a45e24"/></linearGradient></defs><rect width="1200" height="675" fill="#090b0d"/><rect x="260" y="35" width="680" height="605" fill="url(#g)" stroke="#6b3d18" stroke-width="16"/>
+  <g stroke="#68401e" stroke-width="3"><path d="M335 35v605M410 35v605M485 35v605M560 35v605M635 35v605M710 35v605M785 35v605M860 35v605"/><path d="M260 102h680M260 169h680M260 236h680M260 303h680M260 370h680M260 437h680M260 504h680M260 571h680"/></g>
+  <g font-family="serif" font-size="58" font-weight="bold" text-anchor="middle" fill="#2c1808"><path d="M518 519l42-12 42 12-7 95h-70z" fill="#f4ce82"/><text x="560" y="582">王</text><path d="M643 183l42-12 42 12-7 95h-70z" fill="#f4ce82" transform="rotate(180 685 225)"/><text x="685" y="232" transform="rotate(180 685 225)">飛</text><path d="M393 385l42-12 42 12-7 95h-70z" fill="#f4ce82"/><text x="435" y="448">角</text></g>
+</svg>

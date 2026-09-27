@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
 import { Link } from "react-router-dom";
@@ -370,7 +371,7 @@ export default function DraftChessRules() {
   return (
     <main className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-5xl">
-        <header className="mb-6 rounded-3xl border border-emerald-400/15 bg-zinc-900/75 p-6 shadow-xl shadow-black/20">
+        <ChessPageHeader className="mb-6 rounded-3xl border border-emerald-400/15 bg-zinc-900/75 p-6 shadow-xl shadow-black/20" description={<> {t(language, "Rules & Examples")} </>}>
           <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-300">
@@ -397,7 +398,7 @@ export default function DraftChessRules() {
               </Link>
             </div>
           </div>
-        </header>
+        </ChessPageHeader>
 
         <section className="mb-6 rounded-3xl border border-emerald-400/10 bg-emerald-400/[0.035] p-5">
           <div className="flex items-start gap-4">

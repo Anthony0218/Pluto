@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 import {
@@ -527,7 +528,7 @@ export default function RandomStartChess({
   return (
     <div className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1460px]">
-        <header className="mb-6 rounded-3xl border border-violet-400/10 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20">
+        <ChessPageHeader className="mb-6 rounded-3xl border border-violet-400/10 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20">
           <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-300">
             {t("Chess Variant")}
           </p>
@@ -558,7 +559,7 @@ export default function RandomStartChess({
             </div>
             <BoardAnimationToggle />
           </div>
-        </header>
+        </ChessPageHeader>
 
         <main className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">

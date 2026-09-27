@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -28,7 +29,7 @@ type ProfileRow = {
 function ChessPageShell({ children }: { children: React.ReactNode }) {
   useUiLanguage();
   return (
-    <main className="chess-menu-page relative left-1/2 min-h-[calc(100dvh-4rem)] w-screen -translate-x-1/2 overflow-hidden bg-[#07090b] text-zinc-100">
+    <main className="chess-menu-page relative left-1/2 min-h-[var(--app-height)] w-screen -translate-x-1/2 overflow-hidden bg-[#07090b] text-zinc-100">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_13%_68%,rgba(245,158,11,.09),transparent_28%),radial-gradient(circle_at_76%_23%,rgba(255,255,255,.045),transparent_30%),linear-gradient(to_bottom,#0a0d10,#07090b_58%,#040506)]" />
       <div className="pointer-events-none absolute -bottom-28 -left-24 text-[390px] leading-none text-amber-100/[0.035]">
         ♚
@@ -40,14 +41,9 @@ function ChessPageShell({ children }: { children: React.ReactNode }) {
         ♝
       </div>
 
-      <div className="relative flex min-h-[calc(100dvh-4rem)] w-full flex-col">
-        <nav className="flex min-h-20 w-full items-center justify-between border-b border-white/[0.07] px-6 sm:px-10 lg:px-14 xl:px-20">
-          <Link to="/games/chess" className="inline-flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-amber-300/20 bg-amber-300/10 text-lg text-amber-300">
-              ♛
-            </span>
-            <span className="font-serif text-sm tracking-[0.28em] text-zinc-200">{ui("CHESS")}</span>
-          </Link>
+      <div className="relative flex min-h-[var(--app-height)] w-full flex-col">
+        <ChessPageHeader className="chess-menu-header">
+
 
           <Link
             to="/games/chess/rules"
@@ -56,7 +52,7 @@ function ChessPageShell({ children }: { children: React.ReactNode }) {
             <span className="text-base">♔</span>
             <span className="hidden sm:inline">{ui("Rules & Tips")}</span>
           </Link>
-        </nav>
+        </ChessPageHeader>
 
         {children}
       </div>

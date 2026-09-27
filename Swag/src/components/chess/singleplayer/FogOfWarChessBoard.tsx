@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
 import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
@@ -662,25 +663,10 @@ export default function FogOfWarChessBoard({
     gameOver || record.color === liveSide ? record.san : t("Hidden move");
 
   return (
-    <div className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
+    <div className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1500px]">
-        <header className="mb-7 flex flex-col gap-4 rounded-3xl border border-sky-400/10 bg-zinc-900/50 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-sky-400/20 bg-sky-400/10 text-3xl">
-              🌫
-            </div>
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-sky-300">
-                {t("Chess Variant")}
-              </p>
-              <h1 className="mt-0.5 text-2xl font-black text-white">
-                {t("Fog of War Chess")}
-              </h1>
-              <p className="mt-0.5 text-sm text-zinc-500">
-                {t("You cannot see everything")}
-              </p>
-            </div>
-          </div>
+        <ChessPageHeader className="mb-7 flex flex-col gap-4 rounded-3xl border border-sky-400/10 bg-zinc-900/50 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between" description={<> {t("You cannot see everything")} </>}>
+
           <div className="flex flex-wrap items-center gap-2">
             <LanguageSelector
               language={language}
@@ -694,7 +680,7 @@ export default function FogOfWarChessBoard({
             )}
           </div>
           <BoardAnimationToggle />
-        </header>
+        </ChessPageHeader>
 
         <section className="mb-6 grid gap-3 rounded-3xl border border-sky-400/10 bg-sky-400/[0.03] px-5 py-4 md:grid-cols-3">
           <RuleStrip

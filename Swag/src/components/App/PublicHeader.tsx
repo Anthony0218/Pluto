@@ -1,172 +1,62 @@
+import { useDashboardData } from "@/hooks/useDashboardData";
+import FriendNotifications from "./dashboard/FriendNotifications";
+import "./dashboard/dashboard.css";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
 import { LanguageSelector } from "@/games/chess/i18n/chessLanguage";
-import { useRef, useState } from "react";
-import { ChevronDown, Menu, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { House, Menu } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { headerSections } from "../../data/navigation";
 import FriendAvatar from "../social/FriendAvatar";
+import { useTheme } from "../../context/ThemeContext";
+import NavigationDrawer from "./NavigationDrawer";
 
-export default function PublicHeader({
-  navigationOpen,
-  onToggleNavigation,
-}: {
-  navigationOpen: boolean;
-  onToggleNavigation: () => void;
-}) {
+const gameMenuBranding: Record<string, { name: string; symbol: string; surface: string }> = {
+  "/games/atlas-arena": { name: "Atlas Arena", symbol: "◎", surface: "#101b2c" },
+  "/games/go": { name: "Go", symbol: "●", surface: "#0b0e11" },
+  "/games/shogi": { name: "Shogi", symbol: "王", surface: "#0b0e11" },
+  "/games/schafkopf": { name: "Schafkopf", symbol: "♣", surface: "#141518" },
+  "/games/watten": { name: "Watten", symbol: "W", surface: "#173d2e" },
+  "/games/medieval-kingdoms": { name: "Medieval Kingdoms", symbol: "♛", surface: "#211a10" },
+  "/games/natura": { name: "Natura", symbol: "✺", surface: "#193b3b" },
+};
+
+export function PlutoHomeLink({ className = "" }: { className?: string }) {
+  useUiLanguage();
+  return <Link to="/" className={`shrink-0 text-lg font-bold tracking-tight text-indigo-100 hover:text-white ${className}`}>{ui("Pluto")}</Link>;
+}
+
+export function NavigationControls() {
   useUiLanguage();
   const { user, profile } = useAuth();
   const { language, setLanguage } = useAppLanguage();
-  const [open, setOpen] = useState<string | null>(null);
-  const triggers = useRef(new Map<string, HTMLButtonElement>());
+  const [open, setOpen] = useState(false);
+  const { notifications } = useDashboardData();
+  return <>
+    <div className="navigation-controls flex min-w-0 items-center gap-1.5 sm:gap-2">
+      <div className="public-header-language"><LanguageSelector language={language} onChange={setLanguage} /></div>
+      <Link to="/dashboard" aria-label={ui("Home")} title={ui("Home")} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] text-zinc-200 hover:bg-white/10"><House size={18} /></Link>
+      {user && <FriendNotifications key={user.id} items={notifications} userId={user.id} />}
+      {user ? <Link to="/profile" aria-label={profile?.display_name?.trim() || profile?.username?.trim() || ui("Player")} className="flex h-10 max-w-28 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] px-2 text-xs font-semibold hover:bg-white/10 sm:max-w-44 sm:px-2.5"><FriendAvatar profile={profile ?? { display_name: user.email?.split("@")[0] ?? ui("Player"), username: null, avatar_url: null, avatar_id: null }} size="sm" /><span className="hidden min-w-0 truncate sm:inline">{profile?.display_name?.trim() || profile?.username?.trim() || user.email?.split("@")[0] || ui("Player")}</span></Link> : <Link to="/login" className="flex h-10 items-center rounded-xl bg-indigo-500 px-3 text-xs font-semibold hover:bg-indigo-400">{ui("Log in")}</Link>}
+      <button id="navigation-toggle" type="button" aria-label={ui("Open navigation")} aria-expanded={open} aria-controls="app-navigation" onClick={() => setOpen(true)} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 text-zinc-200 hover:bg-white/10"><Menu size={19} /></button>
+    </div>
+    {open && <NavigationDrawer onClose={() => setOpen(false)} />}
+  </>;
+}
 
-  return (
-    <>
-      {open && (
-        <div
-          aria-hidden="true"
-          onPointerDown={() => setOpen(null)}
-          className="fixed inset-0 top-16 z-[290] bg-black/45 backdrop-blur-md"
-        />
-      )}
-      <header className="fixed inset-x-0 top-0 z-[300] h-16 border-b border-white/[0.06] bg-[#060816]/95 text-white backdrop-blur-xl">
-        <div className="mx-auto flex h-full max-w-[1800px] items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
-          <Link
-            to="/"
-            className="flex items-center gap-3"
-            onClick={() => setOpen(null)}
-          >
-            <img src="/pluto-icon.png" alt="" className="h-9 w-9 rounded-xl" />
-            <span className="text-lg font-bold">{ui("Pluto")}</span>
-          </Link>
-          <nav
-            aria-label={ui("Explore Pluto")}
-            className="hidden h-full items-center gap-2 lg:flex"
-            onMouseLeave={() => setOpen(null)}
-            onBlur={(event) => {
-              if (!event.currentTarget.contains(event.relatedTarget))
-                setOpen(null);
-            }}
-            onKeyDown={(event) => {
-              if (event.key === "Escape" && open) {
-                const active = open;
-                setOpen(null);
-                triggers.current.get(active)?.focus();
-              }
-            }}
-          >
-            {headerSections.map((section) => {
-              const expanded = open === section.title;
-              const id = `header-${section.title.replaceAll(" ", "-").toLowerCase()}`;
-              return (
-                <div
-                  key={section.title}
-                  className="relative flex h-full items-center"
-                  onMouseEnter={() => setOpen(section.title)}
-                >
-                  <button
-                    ref={(element) => {
-                      if (element) triggers.current.set(section.title, element);
-                    }}
-                    type="button"
-                    aria-expanded={expanded}
-                    aria-controls={id}
-                    onClick={() => setOpen(expanded ? null : section.title)}
-                    onKeyDown={(event) => {
-                      if (event.key === "ArrowDown") {
-                        event.preventDefault();
-                        setOpen(section.title);
-                        window.requestAnimationFrame(() =>
-                          document
-                            .getElementById(id)
-                            ?.querySelector<HTMLAnchorElement>("a")
-                            ?.focus(),
-                        );
-                      }
-                    }}
-                    className={`flex items-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-medium transition ${expanded ? "bg-white/10 text-white" : "text-zinc-300 hover:bg-white/5"}`}
-                  >
-                    {ui(section.title)}
-                    <ChevronDown
-                      size={14}
-                      className={expanded ? "rotate-180" : ""}
-                    />
-                  </button>
-                  {expanded && (
-                    <div
-                      id={id}
-                      className="absolute left-1/2 top-full w-[min(430px,90vw)] -translate-x-1/2 pt-3"
-                    >
-                      <div className="max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-2xl border border-white/10 bg-[#0c1226] p-4 shadow-2xl shadow-black/40">
-                        <p className="px-3 pb-3 pt-1 text-xs font-bold uppercase tracking-widest text-indigo-300">
-                          {ui(section.title)}
-                        </p>
-                        <div className="grid gap-1">
-                          {section.items.map((item) => (
-                            <Link
-                              key={item.route}
-                              to={item.route}
-                              onClick={() => setOpen(null)}
-                              className="rounded-xl p-3 transition hover:bg-indigo-500/15 focus-visible:bg-indigo-500/15"
-                            >
-                              <p className="font-semibold">{ui(item.title)}</p>
-                              <p className="mt-1 text-sm text-zinc-400">
-                                {ui(item.description)}
-                              </p>
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </nav>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <LanguageSelector language={language} onChange={setLanguage} />
-            {user && profile && (
-              <Link
-                to="/profile"
-                aria-label={`${profile.username || "Your"} profile`}
-                className="hidden items-center gap-2 rounded-xl p-1.5 hover:bg-white/5 xl:flex"
-              >
-                <FriendAvatar profile={profile} size="sm" />
-                <span className="max-w-28 truncate text-sm">
-                  {profile.username || profile.display_name || "Player"}
-                </span>
-              </Link>
-            )}
-            {!user && (
-              <Link
-                to="/login"
-                className="hidden text-sm text-zinc-300 sm:block"
-              >{ui("Log in")}</Link>
-            )}
-            <Link
-              to="/dashboard"
-              className="hidden sm:block rounded-xl bg-indigo-500 px-3 py-2 text-sm font-semibold hover:bg-indigo-400 sm:px-4"
-            >{ui("Open Pluto")}</Link>
-            <button
-              id="navigation-toggle"
-              type="button"
-              aria-label={
-                navigationOpen ? "Close navigation" : "Open navigation"
-              }
-              aria-expanded={navigationOpen}
-              aria-controls="app-navigation"
-              onClick={() => {
-                setOpen(null);
-                onToggleNavigation();
-              }}
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 text-zinc-200 hover:bg-white/10"
-            >
-              {navigationOpen ? <X size={19} /> : <Menu size={19} />}
-            </button>
-          </div>
-        </div>
-      </header>
-    </>
-  );
+export default function PublicHeader({ compact = false }: { compact?: boolean }) {
+  const { plutoMode } = useTheme();
+  const { pathname } = useLocation();
+  const dashboard = pathname === "/dashboard";
+  const gameMenu = compact ? gameMenuBranding[pathname] : undefined;
+  return <header style={gameMenu ? { backgroundColor: gameMenu.surface } : undefined} className={compact ? "compact-app-header absolute inset-x-0 top-0 z-[200] h-[var(--public-header-height)] text-white" : `fixed inset-x-0 top-0 z-[200] h-[var(--public-header-height)] border-b border-white/[0.08] text-white backdrop-blur-xl ${plutoMode ? "bg-[#060816]/95" : "bg-zinc-950/95"}`}>
+    <div className={`mx-auto flex h-full max-w-[1800px] flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2 sm:px-6 sm:py-0 ${gameMenu ? "lg:flex-nowrap" : "sm:flex-nowrap"}`}>
+      <PlutoHomeLink className={gameMenu ? "game-menu-pluto" : ""} />
+      {gameMenu && <div className="game-menu-brand" aria-label={ui(gameMenu.name)}><span className="game-menu-symbol" aria-hidden="true">{gameMenu.symbol}</span><span>{ui(gameMenu.name)}</span></div>}
+      {dashboard && <div id="dashboard-search-slot" className="order-3 min-w-0 basis-full sm:order-none sm:mx-auto sm:flex-1 sm:basis-auto" />}
+      {!dashboard && <div className="flex-1" />}
+      <div className="ml-auto"><NavigationControls /></div>
+    </div>
+  </header>;
 }

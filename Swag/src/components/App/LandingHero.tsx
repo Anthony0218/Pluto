@@ -1,10 +1,12 @@
 import { ui, useUiLanguage } from "@/i18n/ui";
-import { BookOpen, Gamepad2, TrendingUp } from "lucide-react";
-
-import VisitPlutoPreview from "./VisitPlutoPreview";
+import { ArrowRight, BookOpen, Check, Gamepad2, TrendingUp, UserRound } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
+import QuickNavigation from "./QuickNavigation";
 
 export default function LandingHero() {
   useUiLanguage();
+  const { user } = useAuth();
   return (
     <section
       className="
@@ -56,7 +58,7 @@ export default function LandingHero() {
           relative
           mx-auto
           grid
-          min-h-[760px]
+          min-h-[520px]
           max-w-[1500px]
           items-center
           gap-16
@@ -66,12 +68,11 @@ export default function LandingHero() {
 
           sm:px-8
 
-          lg:grid-cols-[0.82fr_1.18fr]
+          lg:grid-cols-[minmax(0,1.1fr)_minmax(340px,.9fr)]
           lg:px-10
-          lg:py-28
+          lg:py-20
 
-          xl:min-h-[820px]
-          xl:gap-24
+          xl:min-h-[560px]
         "
       >
         {/* LEFT SIDE */}
@@ -126,6 +127,10 @@ export default function LandingHero() {
             "
           >{ui("Play games, learn new skills and use powerful tools to understand how you can get better.")}</p>
 
+          <div className="mt-8 w-full max-w-xl">
+            <Link to="/dashboard" className="inline-flex min-h-16 w-full items-center justify-center gap-6 rounded-2xl border border-indigo-300/40 bg-gradient-to-r from-indigo-500 to-violet-600 px-8 py-5 text-lg font-bold tracking-widest text-white shadow-lg shadow-indigo-500/20 transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-indigo-300">{ui("HOME")}<ArrowRight size={21} /></Link>
+          </div>
+
           {/* PLAY / LEARN / IMPROVE */}
           <div
             className="
@@ -157,8 +162,27 @@ export default function LandingHero() {
           </div>
         </div>
 
-        {/* RIGHT SIDE */}
-        <VisitPlutoPreview />
+        <section className="relative overflow-hidden rounded-[28px] border border-indigo-300/20 bg-[#10172a]/95 p-6 shadow-2xl shadow-black/30 sm:p-8" aria-label={ui("Your account")}>
+          <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-indigo-500/15 blur-3xl" />
+          <div className="relative flex min-h-[390px] flex-col">
+            <span className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl border border-indigo-300/20 bg-indigo-400/10 text-indigo-200"><UserRound size={24} /></span>
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-indigo-300">{ui("Your space to play")}</p>
+            <h2 className="mt-3 font-serif text-3xl font-semibold leading-tight text-white sm:text-4xl">{ui(user ? "Welcome back." : "Make every game count.")}</h2>
+            <p className="mt-4 max-w-md text-sm leading-6 text-zinc-400">{ui(user ? "Your games, friends and progress are ready on your dashboard." : "Create a free account to keep your favorites, follow your progress and play with friends.")}</p>
+            {user ? <QuickNavigation key={user.id} userId={user.id} /> : <ul className="mt-6 space-y-3 text-sm text-zinc-200">
+              <li className="flex items-center gap-3"><Check size={17} className="shrink-0 text-emerald-300" />{ui("Save your favorite games and progress")}</li>
+              <li className="flex items-center gap-3"><Check size={17} className="shrink-0 text-emerald-300" />{ui("Follow daily challenges")}</li>
+              <li className="flex items-center gap-3"><Check size={17} className="shrink-0 text-emerald-300" />{ui("Connect and play with friends")}</li>
+            </ul>}
+            <div className="mt-auto grid gap-3 pt-8 sm:grid-cols-2">
+              {user ? <Link to="/dashboard" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-indigo-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-400 sm:col-span-2">{ui("Go to dashboard")}<ArrowRight size={16} /></Link> : <>
+                <Link to="/login" className="flex min-h-12 items-center justify-center rounded-xl border border-indigo-300/30 bg-white/[0.06] px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10">{ui("Log in")}</Link>
+                <Link to="/login?mode=register" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-indigo-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-400">{ui("Register")}<ArrowRight size={16} /></Link>
+              </>}
+            </div>
+          </div>
+        </section>
+
       </div>
     </section>
   );

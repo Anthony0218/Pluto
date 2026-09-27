@@ -1,21 +1,28 @@
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 import type { Friend } from "../types/social";
+import type { DailyChallenge } from "../data/dashboard";
+import { getCompletedLichessPuzzles } from "../components/chess/singleplayer/lichessPuzzleSource";
 
 export type DashboardActivity = {
   streak: number;
   recent_games: { game_route: string; last_visited_at: string }[];
-  challenge: {
-    title: string;
-    description: string;
-    target: number;
-    progress: number;
-    expires_at: string;
-  } | null;
+  challenge: DailyChallenge | null;
+};
+export type DashboardNotification = {
+  id: string;
+  kind: "message" | "friend_request";
+  title: string;
+  detail: string;
+  createdAt: string;
+  gameCode?: string | null;
+  gameRoute?: string | null;
+  senderName?: string;
+  senderId?: string;
 };
 
-export function useDashboardData() {
+export function useDashboardDataSource() {
   const { user } = useAuth();
   const userId = user?.id;
   const [state, setState] = useState<{
@@ -26,6 +33,7 @@ export function useDashboardData() {
     loading: boolean;
     activityError: boolean;
     friendsError: boolean;
+    notifications: DashboardNotification[];
   }>({
     activity: null,
     friends: [],
@@ -33,6 +41,7 @@ export function useDashboardData() {
     loading: true,
     activityError: false,
     friendsError: false,
+    notifications: [],
   });
 
   useEffect(() => {
@@ -43,13 +52,23 @@ export function useDashboardData() {
       if (running) return;
       running = true;
       try {
-        const [activityResult, friendships] = await Promise.all([
+        const [activityResult, friendships, messages, requests] = await Promise.all([
           supabase.rpc("get_dashboard_activity"),
           supabase
             .from("friendships")
             .select("user_a,user_b")
             .or(`user_a.eq.${userId},user_b.eq.${userId}`),
+          supabase.from("friend_messages").select("id,sender_id,message_type,game_code,game_route,created_at").eq("receiver_id", userId).order("created_at", { ascending: false }).limit(12),
+          supabase.from("friend_requests").select("id,sender_id,created_at").eq("receiver_id", userId).eq("status", "pending").order("created_at", { ascending: false }).limit(12),
         ]);
+        const activity = activityResult.error ? null : activityResult.data as DashboardActivity;
+        if (activity?.challenge?.category === "puzzle") {
+          try {
+            const completed = await getCompletedLichessPuzzles(100);
+            const dayStart = Date.parse(activity.challenge.expires_at) - 86_400_000;
+            activity.challenge.progress = completed.filter(puzzle => Date.parse(puzzle.completedAt) >= dayStart && Date.parse(puzzle.completedAt) < Date.parse(activity.challenge!.expires_at)).length;
+          } catch { activity.challenge.progress = null; }
+        }
         const ids = [
           ...new Set(
             (friendships.data ?? []).map((row) =>
@@ -57,12 +76,14 @@ export function useDashboardData() {
             ),
           ),
         ];
-        const [profiles, presence] = ids.length
+        const notificationSenderIds = [...(messages.data ?? []).map((row) => row.sender_id), ...(requests.data ?? []).map((row) => row.sender_id)];
+        const profileIds = [...new Set([...ids, ...notificationSenderIds])];
+        const [profiles, presence] = profileIds.length
           ? await Promise.all([
               supabase
                 .from("profiles")
                 .select("id,username,display_name,avatar_url,avatar_id")
-                .in("id", ids),
+                .in("id", profileIds),
               supabase
                 .from("user_presence")
                 .select("user_id")
@@ -76,13 +97,22 @@ export function useDashboardData() {
               { data: [], error: null },
               { data: [], error: null },
             ];
+        const profileById = new Map((profiles.data ?? []).map((profile) => [profile.id, profile]));
+        const notifications: DashboardNotification[] = [
+          ...(requests.data ?? []).map((request) => ({ id: `request-${request.id}`, kind: "friend_request" as const, title: "Friend request", detail: profileById.get(request.sender_id)?.display_name || profileById.get(request.sender_id)?.username || "A Pluto player", createdAt: request.created_at })),
+          ...(messages.data ?? []).map((message) => ({ id: `message-${message.id}`, kind: "message" as const, title: message.message_type === "game_code" ? "Game invite" : "New message", detail: message.message_type === "game_code" ? `${profileById.get(message.sender_id)?.display_name || profileById.get(message.sender_id)?.username || "A friend"} sent code ${message.game_code || ""}` : `${profileById.get(message.sender_id)?.display_name || profileById.get(message.sender_id)?.username || "A friend"} messaged you`, createdAt: message.created_at, gameCode: message.game_code, gameRoute: message.game_route })),
+        ].map(notification => {
+          const source = notification.kind === "friend_request"
+            ? (requests.data ?? []).find(row => `request-${row.id}` === notification.id)
+            : (messages.data ?? []).find(row => `message-${row.id}` === notification.id);
+          const sender = source ? profileById.get(source.sender_id) : undefined;
+          return { ...notification, senderName: sender?.display_name || sender?.username || undefined, senderId: source?.sender_id };
+        }).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
         if (!disposed)
           setState({
             userId: userId,
-            activity: activityResult.error
-              ? null
-              : (activityResult.data as DashboardActivity),
-            friends: (profiles.data ?? []) as Friend[],
+            activity,
+            friends: (profiles.data ?? []).filter(profile => ids.includes(profile.id)) as Friend[],
             onlineIds: (presence.data ?? []).map((row) => row.user_id),
             loading: false,
             activityError: !!activityResult.error,
@@ -91,6 +121,7 @@ export function useDashboardData() {
               profiles.error ||
               presence.error
             ),
+            notifications,
           });
       } catch {
         if (!disposed)
@@ -102,6 +133,7 @@ export function useDashboardData() {
             loading: false,
             activityError: true,
             friendsError: true,
+            notifications: [],
           });
       } finally {
         running = false;
@@ -116,6 +148,16 @@ export function useDashboardData() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "friendships" },
+        onFocus,
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "friend_messages" },
+        onFocus,
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "friend_requests" },
         onFocus,
       )
       .subscribe();
@@ -136,5 +178,13 @@ export function useDashboardData() {
         loading: !!userId,
         activityError: false,
         friendsError: false,
+        notifications: [],
       };
+}
+
+export const DashboardDataContext = createContext<ReturnType<typeof useDashboardDataSource> | null>(null);
+export function useDashboardData() {
+  const data = useContext(DashboardDataContext);
+  if (!data) throw new Error("DashboardDataProvider is required");
+  return data;
 }

@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useRef, useEffect, useMemo, useState } from "react";
 import {
@@ -874,7 +875,7 @@ export default function ChessCollapseBoard({
   return (
     <div
       className="
-        chess-variant-page min-h-[calc(100dvh-4rem)]
+        chess-variant-page min-h-[var(--app-height)]
         bg-transparent
         px-4
         py-6
@@ -884,58 +885,8 @@ export default function ChessCollapseBoard({
       "
     >
       <div className="mx-auto max-w-[1500px]">
-        <header
-          className="
-            mb-7
-            flex
-            flex-col
-            gap-4
-            rounded-3xl
-            border
-            border-white/5
-            bg-zinc-900/50
-            px-5
-            py-4
-            shadow-xl
-            shadow-black/20
-            backdrop-blur-md
-            sm:flex-row
-            sm:items-center
-            sm:justify-between
-          "
-        >
-          <div className="flex items-center gap-4">
-            <div
-              className="
-                flex
-                h-12
-                w-12
-                items-center
-                justify-center
-                rounded-2xl
-                border
-                border-red-500/20
-                bg-red-400/10
-                text-3xl
-                shadow-inner
-              "
-              aria-hidden="true"
-            >
-              ◫
-            </div>
+        <ChessPageHeader className="collapse-game-header mb-7 shadow-xl shadow-black/20 backdrop-blur-md" description={<> {ui("The board shrinks · kings have 3 lives · checkmate still wins")} </>}>
 
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-red-400">
-                {t("Chess Variant")}
-              </p>
-
-              <h1 className="mt-0.5 text-2xl font-black tracking-tight text-white">
-                {t("Chess Collapse")}
-              </h1>
-
-              <p className="mt-0.5 text-sm text-zinc-500">{ui("The board shrinks · kings have 3 lives · checkmate still wins")}</p>
-            </div>
-          </div>
 
           <div className="flex flex-wrap items-center justify-end gap-2">
             <LanguageSelector
@@ -966,7 +917,7 @@ export default function ChessCollapseBoard({
             )}
           </div>
           <BoardAnimationToggle />
-        </header>
+        </ChessPageHeader>
 
         <main className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">

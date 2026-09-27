@@ -1,5 +1,18 @@
 # Dashboard data setup
 
+## September 27 redesign
+
+Apply `migrations/20260927120000_dashboard_redesign.sql` after the existing migrations. This migration is provided locally; it is not automatically deployed.
+
+- Favorites reuse `user_game_favorites` and the atomic `set_favorite_games` RPC. The limit is six; the first three appear prominently. `dashboard_preferences` records whether a user has saved even an empty selection. `get_favorite_games` returns null for an unconfigured account, allowing Chess → Watten → Schafkopf defaults. Existing selections retain their order. Guests use `pluto-favorite-games` in localStorage; signed-in cache keys include the user ID. Server failures are shown and do not silently replace server storage with a local save.
+- The existing `dashboard_challenges` catalog now includes category, destination, and CTA. `get_dashboard_activity` deterministically selects an active row using the UTC date and user ID. Existing streak and recent activity calculations are retained in `get_dashboard_activity_base`. Changing the catalog can change the selection; ordinary refreshes cannot.
+- Exploration counts existing daily game visits. Learning and variant goals explicitly ask users to open a resource; `dashboard_resource_visits` records that action, not lesson completion. Social goals count actual room invitations sent via the existing chat. Puzzle goals use the existing `get_completed_chess_puzzles` RPC and count library completions within the selected UTC day. If that RPC is unavailable, progress is marked unavailable rather than fabricated.
+- The typed UI supports puzzle, learning, play, win, explore, social, and variant categories. Play/win goals are not seeded because profile totals cannot establish today's match results. No XP is awarded or invented. Friend presence exposes online/offline only, so the dashboard does not invent playing/learning statuses or joinable rooms.
+- Desktop sidebar visibility uses `pluto-dashboard-sidebar-{userId}` (or `guest`) in localStorage. Small screens use a modal drawer without changing the desktop preference.
+- Existing installations awaiting migration still load their three stored favorites and the original exploration challenge. Saving more than three favorites requires the new migration. New resource tracking also requires it.
+
+Verification after migration: save and reorder six favorites, refresh, sign in on another browser, then save an empty list and verify it stays empty. Confirm daily challenges are unchanged across refreshes. Open a learning destination or send an invitation when selected, then return to the dashboard and allow its 30-second refresh. Complete a library puzzle when the puzzle goal is selected. Verify resets at midnight UTC and test RLS isolation with two accounts.
+
 Apply `migrations/20260925120000_dashboard.sql` to the same Supabase project used by the app, using the Supabase SQL editor or your normal migration workflow. It depends on the existing `profiles`, `friendships`, and authentication schema. This change does not deploy the migration automatically.
 
 The dashboard uses the existing profile username, avatar, rating, games played, wins, losses, and draws. Profile edits refresh the shared auth state. XP, levels, and lesson completion are not shown because this app does not currently record them.
