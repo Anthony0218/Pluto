@@ -4,6 +4,14 @@
   min-height: 660px;
 }
 
+.landing-preview--bare {
+  background: transparent;
+}
+
+.learning-preview__stage--bare {
+  min-height: 0;
+}
+
 .learning-preview__cards { display: flex; justify-content: center; padding: 22px 0 12px; }
 .learning-preview__cards img { width: 24%; max-width: 80px; height: 118px; object-fit: contain; border-radius: 8px; box-shadow: 0 8px 24px #0008; }
 .learning-preview__cards img:first-child { transform: rotate(-14deg) translate(8px, 6px); }

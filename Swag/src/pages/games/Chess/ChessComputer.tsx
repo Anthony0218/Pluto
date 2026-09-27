@@ -122,7 +122,6 @@ export default function ChessComputer() {
   if (gameStarted) {
     return (
       <main className="w-full bg-transparent p-0 text-zinc-100">
-      <ChessPageHeader className="mb-4" />
         <ChessComputerBoard
           playerColor={playerColor}
           skillLevel={selectedDifficulty.skillLevel}

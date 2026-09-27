@@ -885,24 +885,7 @@ export default function ChessCollapseBoard({
       "
     >
       <div className="mx-auto max-w-[1500px]">
-        <ChessPageHeader className="
-            mb-7
-            flex
-            flex-col
-            gap-4
-            rounded-3xl
-            border
-            border-white/5
-            bg-zinc-900/50
-            px-5
-            py-4
-            shadow-xl
-            shadow-black/20
-            backdrop-blur-md
-            sm:flex-row
-            sm:items-center
-            sm:justify-between
-          " description={<> {ui("The board shrinks · kings have 3 lives · checkmate still wins")} </>}>
+        <ChessPageHeader className="collapse-game-header mb-7 shadow-xl shadow-black/20 backdrop-blur-md" description={<> {ui("The board shrinks · kings have 3 lives · checkmate still wins")} </>}>
 
 
           <div className="flex flex-wrap items-center justify-end gap-2">

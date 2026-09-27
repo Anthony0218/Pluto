@@ -21,6 +21,7 @@ export default function FriendNotifications({ items, userId }: { items: Dashboar
     setOpen(true);
     try { localStorage.setItem(readKey, String(time)); }
     catch { /* The dialog still works when storage is unavailable. */ }
+    window.dispatchEvent(new Event("pluto-notifications-read"));
   }
 
   return <>

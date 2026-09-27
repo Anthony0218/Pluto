@@ -38,7 +38,7 @@ export default function LandingPage() {
         href="/learn"
         action={ui("Start learning")}
       >
-        <LearnShowcase />
+        <LearnShowcase bare />
       </FeatureSection>
 
       <FeatureSection

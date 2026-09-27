@@ -12,7 +12,7 @@ const slides = [
   { title: "Watten Rules", route: "/games/watten/rules", action: "Explore the rules" },
 ] as const;
 
-export default function LearnShowcase({ compact = false }: { compact?: boolean }) {
+export default function LearnShowcase({ compact = false, bare = false }: { compact?: boolean; bare?: boolean }) {
   useUiLanguage();
   const [slide, setSlide] = useState(0);
   const [selected, setSelected] = useState<Square | null>(null);
@@ -90,20 +90,20 @@ export default function LearnShowcase({ compact = false }: { compact?: boolean }
   }
 
   return (
-    <section aria-roledescription="carousel" aria-label={ui("Featured lessons")} className={`landing-preview overflow-hidden rounded-[28px] border border-white/10 bg-[#0b101d] shadow-2xl shadow-black/30 ${compact ? "learning-preview--compact" : ""}`}>
-      <div className="flex items-center justify-between gap-3 border-b border-white/10 px-5 py-4 sm:px-6">
+    <section aria-roledescription="carousel" aria-label={ui("Featured lessons")} className={`landing-preview ${bare ? "landing-preview--bare" : "overflow-hidden rounded-[28px] border border-white/10 bg-[#0b101d] shadow-2xl shadow-black/30"} ${compact ? "learning-preview--compact" : ""}`}>
+      {!bare && <div className="flex items-center justify-between gap-3 border-b border-white/10 px-5 py-4 sm:px-6">
         <div className="flex items-center gap-2 text-sm font-semibold text-amber-100"><BookOpen size={17} className="text-amber-400" />{ui("Learn by doing")}</div>
         <div className="flex gap-2">
           <button type="button" onClick={() => changeSlide(slide - 1)} aria-label={ui("Previous lesson")} className="rounded-full border border-white/15 p-2 text-zinc-300 hover:bg-white/10"><ChevronLeft size={17} /></button>
           <button type="button" onClick={() => changeSlide(slide + 1)} aria-label={ui("Next lesson")} className="rounded-full border border-white/15 p-2 text-zinc-300 hover:bg-white/10"><ChevronRight size={17} /></button>
         </div>
-      </div>
-      <div className="p-5 sm:p-6">
-        <div className="mb-4 flex items-center justify-between gap-3" aria-live="polite">
+      </div>}
+      <div className={bare ? "" : "p-5 sm:p-6"}>
+        {!bare && <div className="mb-4 flex items-center justify-between gap-3" aria-live="polite">
           <div><p className="text-[10px] font-bold uppercase tracking-[0.24em] text-amber-400">{ui("Featured lesson")} / 0{slide + 1}</p><h3 className="mt-1 font-serif text-2xl text-white">{ui(current.title)}</h3></div>
           <div className="flex gap-1.5" aria-label={ui("Select lesson")}>{slides.map((item, index) => <button key={item.title} type="button" onClick={() => changeSlide(index)} aria-label={ui(item.title)} aria-current={slide === index ? "true" : undefined} className={`h-2 rounded-full transition-all ${slide === index ? "w-7 bg-amber-400" : "w-2 bg-white/25 hover:bg-white/50"}`} />)}</div>
-        </div>
-        <div className="learning-preview__stage">
+        </div>}
+        <div className={`learning-preview__stage${bare ? " learning-preview__stage--bare" : ""}`}>
         {slide === 0 ? (
           <div key="puzzle" className="learning-preview__lesson rounded-2xl border border-white/10 bg-zinc-900/65 p-3 sm:p-4">
             <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
@@ -131,7 +131,7 @@ export default function LearnShowcase({ compact = false }: { compact?: boolean }
           </div>
         )}
         </div>
-        <Link to={current.route} className="mt-5 inline-flex w-full items-center justify-between rounded-xl border border-amber-300/25 bg-amber-300/10 px-4 py-3 text-sm font-semibold text-amber-100 transition hover:bg-amber-300/20">{ui(current.action)}<ArrowRight size={16} /></Link>
+        {!bare && <Link to={current.route} className="mt-5 inline-flex w-full items-center justify-between rounded-xl border border-amber-300/25 bg-amber-300/10 px-4 py-3 text-sm font-semibold text-amber-100 transition hover:bg-amber-300/20">{ui(current.action)}<ArrowRight size={16} /></Link>}
       </div>
     </section>
   );
