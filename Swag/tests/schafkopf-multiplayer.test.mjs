@@ -3,6 +3,7 @@ import test from "node:test";
 import { readFileSync } from "node:fs";
 import ts from "typescript";
 import * as engine from "../src/games/schafkopf/schafkopf.ts";
+import * as announcements from "../src/games/schafkopf/announcements.ts";
 
 // Execute the real Edge handler with its auth/database boundaries replaced.
 // The database fake performs atomic version-filtered writes, including races.
@@ -10,13 +11,29 @@ const source = readFileSync(new URL("../supabase/functions/schafkopf-multiplayer
 const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2023 } }).outputText;
 function server() {
   const rows = new Map();
+  const hiddenRows = new Map();
   let handler;
   let nextId = 1;
   const db = {
     auth: { getUser: async token => ({ data: { user: token.startsWith("user-") ? { id: token } : null }, error: null }) },
     from(table) {
+      if (table === "schafkopf_room_hidden") {
+        let payload;
+        const filters = [];
+        const query = {
+          select() { return query; },
+          eq(key, value) { filters.push(row => row[key] === value); return query; },
+          upsert(value) { payload = value; return query; },
+          then(resolve, reject) {
+            if (payload) hiddenRows.set(`${payload.room_id}:${payload.user_id}`, structuredClone(payload));
+            return Promise.resolve({ data: [...hiddenRows.values()].filter(row => filters.every(filter => filter(row))), error: null }).then(resolve, reject);
+          },
+        };
+        return query;
+      }
       assert.equal(table, "schafkopf_rooms");
       let op = "read", payload, countOnly = false;
+      let orderBy, ascending = true, maximum = Infinity;
       const filters = [];
       const query = {
         select(_columns, options) { if (options?.count) countOnly = true; return query; },
@@ -25,8 +42,13 @@ function server() {
         delete() { op = "delete"; return query; },
         eq(key, value) { filters.push(row => row[key] === value); return query; },
         gte(key, value) { filters.push(row => row[key] >= value); return query; },
+        contains(key, value) { filters.push(row => value.every(expected => row[key].some(actual => Object.entries(expected).every(([field, val]) => actual[field] === val)))); return query; },
+        order(key, options) { orderBy = key; ascending = options?.ascending ?? true; return query; },
+        limit(value) { maximum = value; return query; },
         async run(single = false) {
           const matches = [...rows.values()].filter(row => filters.every(filter => filter(row)));
+          if (orderBy) matches.sort((a, b) => ascending ? String(a[orderBy]).localeCompare(String(b[orderBy])) : String(b[orderBy]).localeCompare(String(a[orderBy])));
+          matches.splice(maximum);
           if (countOnly) return { count: matches.length, error: null };
           if (op === "insert") {
             if ([...rows.values()].some(row => row.code === payload.code)) return { data: null, error: { code: "23505" } };
@@ -46,7 +68,7 @@ function server() {
     },
   };
   new Function("require", "Deno", "exports", compiled)(
-    name => name.includes("supabase-js") ? { createClient: () => db } : engine,
+    name => name.includes("supabase-js") ? { createClient: () => db } : name.includes("announcements") ? announcements : engine,
     { env: { get: () => "test-only" }, serve: value => { handler = value; } }, {},
   );
   async function request(user, body) {
@@ -88,7 +110,7 @@ test("only host starts; responses redact hands; concurrent moves commit only onc
   const s = server();
   const room = await fullRoom(s);
   assert.equal((await s.request("user-1", { op: "start", code: room.code, version: room.version })).status, 400);
-  const { body: started, status } = await s.request("user-0", { op: "start", code: room.code, version: room.version });
+  const { body: started, status } = await s.request("user-0", { op: "start", code: room.code, version: room.version, rules: { ...engine.DEFAULT_GAME_RULES, legen: false } });
   assert.equal(status, 200);
   assert.equal(started.game.hand.length, 8);
   assert.equal(started.game.hands, undefined);
@@ -107,6 +129,39 @@ test("only host starts; responses redact hands; concurrent moves commit only onc
   assert.equal((await s.request("user-0", action)).status, 409, "stale version cannot replay");
   assert.equal((await s.request("user-0", { op: "leave", code: room.code, version: latest.version })).status, 400);
   assert.equal((await s.request("user-3", { op: "join", code: room.code })).status, 200, "running seat reconnects");
+});
+
+test("online Legen accepts independent decisions and gives each player their second packet immediately", async () => {
+  const s = server();
+  const room = await fullRoom(s);
+  let state = (await s.request("user-0", { op: "start", code: room.code, version: room.version, rules: { ...engine.DEFAULT_GAME_RULES, legen: true } })).body;
+  assert.equal(state.game.phase, "legen");
+  assert.equal(state.game.hand.length, 4);
+  assert.equal(state.game.pendingHands, undefined);
+  for (const seat of [2, 0, 3, 1]) {
+    const response = await s.request(`user-${seat}`, { op: "action", code: room.code, version: state.version, action: { type: "legen", knock: seat < 2 } });
+    assert.equal(response.status, 200);
+    state = response.body;
+    assert.equal(state.game.pendingHands, undefined);
+    assert.equal(state.game.hand.length, 8);
+  }
+  assert.equal(state.game.phase, "intent");
+  assert.equal(state.game.hand.length, 8);
+  assert.equal(state.game.multiplier, 4);
+});
+
+test("online Legen timeout passes undecided players after 15 seconds", async () => {
+  const s = server();
+  const room = await fullRoom(s);
+  const started = await s.request("user-0", { op: "start", code: room.code, version: room.version, rules: { ...engine.DEFAULT_GAME_RULES, legen: true } });
+  assert.equal(started.status, 200);
+  const row = [...s.rows.values()][0];
+  row.game.legenDeadline = Date.now() - 1;
+  const resolved = await s.request("user-2", { op: "get", code: room.code });
+  assert.equal(resolved.status, 200);
+  assert.equal(resolved.body.game.phase, "intent");
+  assert.deepEqual(resolved.body.game.legenDecisions, [false, false, false, false]);
+  assert.equal(resolved.body.game.hand.length, 8);
 });
 
 test("waiting host can leave and ownership transfers; final player removes empty room", async () => {
@@ -135,4 +190,100 @@ test("endpoint enforces Zugeben even when a client bypasses disabled cards", asy
   assert.match(response.body.error, /zugeben/);
   assert.equal(row.version, room.version);
   assert.equal(row.game.hands[0].length, 2);
+});
+
+test("a host can start with three AI seats and the server advances their turns", async () => {
+  const s = server();
+  const created = (await s.request("user-0", { op: "create", name: "Host", title: "Sonntagsrunde", aiDifficulty: "pro" })).body;
+  const started = await s.request("user-0", { op: "start", code: created.code, version: created.version, rules: { ...engine.DEFAULT_GAME_RULES, legen: false }, title: "Sonntagsrunde", aiDifficulty: "pro" });
+  assert.equal(started.status, 200);
+  assert.equal(started.body.players.length, 4);
+  assert.equal(started.body.players.filter(player => player.bot).length, 3);
+  assert.equal(started.body.game.hands, undefined);
+  const afterHuman = await s.request("user-0", { op: "action", code: created.code, version: started.body.version, action: { type: "intent", play: false } });
+  assert.equal(afterHuman.status, 200);
+  const row = [...s.rows.values()][0];
+  assert.equal(row.game.turn, 1);
+  row.updated_at = new Date(Date.now() - 2000).toISOString();
+  const afterBot = await s.request("user-0", { op: "get", code: created.code });
+  assert.equal(afterBot.status, 200);
+  assert.equal(afterBot.body.version, afterHuman.body.version + 1);
+  assert.equal(afterBot.body.game.hands, undefined);
+});
+
+test("saved game days show scores, guests can hide them, and hosts can delete them", async () => {
+  const s = server();
+  const created = (await s.request("user-0", { op: "create", name: "Host", title: "Freitagsrunde", aiDifficulty: "normal" })).body;
+  const joined = (await s.request("user-1", { op: "join", code: created.code, name: "Gast" })).body;
+  const started = (await s.request("user-0", { op: "start", code: created.code, version: joined.version, rules: engine.DEFAULT_GAME_RULES, title: "Freitagsrunde", aiDifficulty: "normal" })).body;
+  const hostList = await s.request("user-0", { op: "list" });
+  assert.equal(hostList.status, 200);
+  assert.equal(hostList.body[0].title, "Freitagsrunde");
+  assert.equal(hostList.body[0].totals.length, 4);
+  assert.equal(hostList.body[0].game, undefined);
+  const hidden = await s.request("user-1", { op: "delete", code: created.code, version: started.version });
+  assert.equal(hidden.status, 200);
+  assert.equal((await s.request("user-1", { op: "list" })).body.length, 0);
+  assert.equal((await s.request("user-0", { op: "list" })).body.length, 1);
+  assert.equal((await s.request("user-0", { op: "delete", code: created.code, version: started.version - 1 })).status, 200, "deleting a saved day also works after a newer move");
+  assert.equal(s.rows.size, 0);
+});
+
+test("the host can hand a human seat to AI and the player can reclaim it", async () => {
+  const s = server();
+  const created = (await s.request("user-0", { op: "create", name: "Host" })).body;
+  const joined = (await s.request("user-1", { op: "join", code: created.code, name: "Gast" })).body;
+  const started = (await s.request("user-0", { op: "start", code: created.code, version: joined.version, rules: engine.DEFAULT_GAME_RULES })).body;
+  const replaced = await s.request("user-0", { op: "replace", code: created.code, version: started.version, seat: 1, bot: true });
+  assert.equal(replaced.status, 200);
+  assert.equal(replaced.body.players[1].bot, true);
+  const restored = await s.request("user-1", { op: "replace", code: created.code, version: replaced.body.version, seat: 1, bot: false });
+  assert.equal(restored.status, 200);
+  assert.equal(restored.body.players[1].bot, false);
+  assert.equal((await s.request("user-1", { op: "replace", code: created.code, version: restored.body.version, seat: 1, bot: true })).status, 400);
+});
+
+test("host changes a seat between games without passing its score to the replacement", async () => {
+  const s = server();
+  const created = (await s.request("user-0", { op: "create", name: "Host" })).body;
+  const joined = (await s.request("user-1", { op: "join", code: created.code, name: "Old guest" })).body;
+  const started = (await s.request("user-0", { op: "start", code: created.code, version: joined.version, rules: engine.DEFAULT_GAME_RULES })).body;
+  assert.equal((await s.request("user-0", { op: "vacate", code: created.code, version: started.version, seat: 1 })).status, 400);
+  const row = [...s.rows.values()][0];
+  row.game.phase = "finished";
+  row.game.totals[1] = 42;
+  assert.equal((await s.request("user-1", { op: "vacate", code: created.code, version: row.version, seat: 1 })).status, 400);
+  const freed = await s.request("user-0", { op: "vacate", code: created.code, version: row.version, seat: 1 });
+  assert.equal(freed.status, 200);
+  assert.match(freed.body.players[1].id, /^bot:/);
+  assert.deepEqual(freed.body.pendingSeats, [1]);
+  assert.equal((await s.request("user-1", { op: "get", code: created.code })).status, 403);
+  const oldList = (await s.request("user-1", { op: "list" })).body;
+  assert.equal(oldList.length, 1);
+  assert.deepEqual(oldList[0].formerPlayers, [{ id: "user-1", name: "Old guest", total: 42, round: 1 }]);
+  const replacement = await s.request("user-2", { op: "join", code: created.code, name: "New guest" });
+  assert.equal(replacement.status, 200);
+  assert.equal(replacement.body.players[1].name, "New guest");
+  const next = await s.request("user-0", { op: "action", code: created.code, version: replacement.body.version, action: { type: "next" } });
+  assert.equal(next.status, 200);
+  assert.equal(next.body.game.names[1], "New guest");
+  assert.equal(next.body.game.totals[1], 0);
+  assert.deepEqual(next.body.pendingSeats, []);
+  assert.equal((await s.request("user-1", { op: "delete", code: created.code, version: next.body.version })).status, 200);
+  assert.equal((await s.request("user-1", { op: "list" })).body.length, 0);
+  assert.equal((await s.request("user-0", { op: "get", code: created.code })).status, 200);
+});
+
+test("only the online host can set a valid trick collection delay", async () => {
+  const s = server();
+  const created = (await s.request("user-0", { op: "create", name: "Host", aiDifficulty: "legend" })).body;
+  const joined = (await s.request("user-1", { op: "join", code: created.code, name: "Guest" })).body;
+  const started = (await s.request("user-0", { op: "start", code: created.code, version: joined.version, rules: engine.DEFAULT_GAME_RULES, aiDifficulty: "legend" })).body;
+  assert.equal(started.collectSeconds, 2);
+  assert.equal((await s.request("user-1", { op: "timing", code: created.code, version: started.version, collectSeconds: 7 })).status, 400);
+  assert.equal((await s.request("user-0", { op: "timing", code: created.code, version: started.version, collectSeconds: 11 })).status, 400);
+  const changed = await s.request("user-0", { op: "timing", code: created.code, version: started.version, collectSeconds: 7 });
+  assert.equal(changed.status, 200);
+  assert.equal(changed.body.collectSeconds, 7);
+  assert.equal((await s.request("user-1", { op: "get", code: created.code })).body.collectSeconds, 7);
 });
