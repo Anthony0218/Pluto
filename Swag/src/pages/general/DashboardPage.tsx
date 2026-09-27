@@ -76,7 +76,7 @@ function Dashboard() {
     {searchTarget && createPortal(<DashboardSearch friends={friends} onChat={id => { markFriendMessagesRead(id); setFriendDialog({ id, view: "chat" }); }} />, searchTarget)}
     <div className="dashboard-workspace">
       <DashboardSidebar userId={user?.id} sidebar={sidebar} onlineFriendsCount={onlineIds.length} notifications={notifications} readMessageIds={readMessageIds}>
-        <DashboardHero profile={profile} signedIn={!!user} loading={authLoading} now={now} discovery={<DidYouKnowCarousel />} challenge={<DailyChallengeCard challenge={activity?.challenge ?? null} now={now} loading={loading} unavailable={activityError} signedIn={!!user} />} />
+        <div className="dashboard-top-layout"><DashboardHero profile={profile} signedIn={!!user} loading={authLoading} now={now} challenge={<DailyChallengeCard challenge={activity?.challenge ?? null} now={now} loading={loading} unavailable={activityError} signedIn={!!user} />} /><DidYouKnowCarousel /></div>
         <div className="dashboard-play-layout">
           <MyGames />
           <LearnSomethingNew />
