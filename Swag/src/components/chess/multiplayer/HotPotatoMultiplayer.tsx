@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -318,6 +319,7 @@ export function HotPotatoMultiplayerLobby() {
 
   return (
     <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-8 text-zinc-100">
+      <ChessPageHeader className="mb-4" />
       <div className="mx-auto max-w-3xl rounded-[32px] border border-orange-400/15 bg-zinc-900/80 p-6 shadow-2xl">
         <div className="flex items-center gap-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-orange-400/20 bg-orange-400/10 text-3xl">
@@ -949,6 +951,7 @@ export function HotPotatoMultiplayerGame() {
   if (!room || !gameState || !state || !me) {
     return (
       <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent p-8 text-zinc-100">
+      <ChessPageHeader className="mb-4" />
         <div className="mx-auto max-w-xl rounded-3xl border border-white/10 bg-zinc-900 p-6">
           <p className="font-black">{ui("Loading Hot Potato room…")}</p>
           {error && <p className="mt-3 text-sm text-red-300">{ui(error)}</p>}
@@ -976,19 +979,12 @@ export function HotPotatoMultiplayerGame() {
   return (
     <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1460px]">
-        <header className="mb-6 flex flex-col gap-4 rounded-3xl border border-orange-400/10 bg-zinc-900/70 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            <span className="text-3xl">💣</span>
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-orange-400">{ui("Multiplayer Variant")}</p>
-              <h1 className="text-2xl font-black">{ui("Chess Hot Potato")}</h1>
-              <p className="text-sm text-zinc-500">{ui("Room ")}{room.code}</p>
-            </div>
-          </div>
+        <ChessPageHeader className="mb-6 flex flex-col gap-4 rounded-3xl border border-orange-400/10 bg-zinc-900/70 px-5 py-4 sm:flex-row sm:items-center sm:justify-between" description={<> {ui("Room ")}{room.code} </>}>
+
           <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-2 text-sm">
             {gameState.status === "waiting" ? ui("Waiting for opponent…") : finished ? ui("Game finished") : canMove ? ui("Your turn") : ui("Opponent's turn")}
           </div>
-        </header>
+        </ChessPageHeader>
 
         {error && (
           <div className="mb-4 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200">

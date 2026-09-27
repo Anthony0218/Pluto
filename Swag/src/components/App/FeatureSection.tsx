@@ -29,7 +29,7 @@ export default function FeatureSection({
   href,
   action,
   children,
-  reverse = false,
+  reverse = Number(index) % 2 === 1,
 }: FeatureSectionProps) {
   useUiLanguage();
   return (
@@ -70,7 +70,7 @@ export default function FeatureSection({
         "
       >
         {/* TEXT */}
-        <div className={reverse ? "lg:order-2" : ""}>
+        <div className={reverse ? "lg:col-start-2 lg:row-start-1" : "lg:col-start-1 lg:row-start-1"}>
           <div
             className="
               grid
@@ -197,7 +197,7 @@ export default function FeatureSection({
         </div>
 
         {/* SHOWCASE */}
-        <div className={reverse ? "lg:order-1" : ""}>{children}</div>
+        <div className={reverse ? "lg:col-start-1 lg:row-start-1" : "lg:col-start-2 lg:row-start-1"}>{children}</div>
       </div>
     </section>
   );

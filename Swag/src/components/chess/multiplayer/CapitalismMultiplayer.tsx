@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -357,6 +358,7 @@ export function CapitalismMultiplayerLobby() {
 
   return (
     <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-8 text-zinc-100">
+      <ChessPageHeader className="mb-4" />
       <div className="mx-auto max-w-3xl">
         <div className="rounded-[32px] border border-amber-400/15 bg-zinc-900/80 p-6 shadow-2xl shadow-black/30">
           <div className="flex items-center gap-4">
@@ -1114,6 +1116,7 @@ export function CapitalismMultiplayerGame() {
   if (!room || !gameState || !stored || !me || !displayedCapital) {
     return (
       <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent p-8 text-zinc-100">
+      <ChessPageHeader className="mb-4" />
         <div className="mx-auto max-w-xl rounded-3xl border border-white/10 bg-zinc-900 p-6">
           <p className="font-black">{ui("Loading Capitalism room…")}</p>
           {error && <p className="mt-3 text-sm text-red-300">{ui(error)}</p>}
@@ -1190,23 +1193,13 @@ export function CapitalismMultiplayerGame() {
   return (
     <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1500px]">
-        <header className="mb-6 flex flex-col gap-4 rounded-3xl border border-amber-400/10 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-amber-400/20 bg-amber-400/10 text-3xl">
-              🪙
-            </div>
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-400">{ui("Multiplayer Variant")}</p>
-              <h1 className="text-2xl font-black">{ui("Capitalism Chess")}</h1>
-              <p className="text-sm text-zinc-500">{ui("Room")}<span className="font-mono">{room.code}</span>
-              </p>
-            </div>
-          </div>
+        <ChessPageHeader className="mb-6 flex flex-col gap-4 rounded-3xl border border-amber-400/10 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20 sm:flex-row sm:items-center sm:justify-between" description={<> {ui("Room")}<span className="font-mono">{room.code}</span> </>}>
+
 
           <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-2 text-sm font-black">
             {gameState.status === "waiting" ? ui("Waiting for opponent…") : gameState.status === "finished" ? ui("Game finished") : canAct ? ui("Your turn · market open") : ui("Opponent's turn")}
           </div>
-        </header>
+        </ChessPageHeader>
 
         {error && (
           <div className="mb-4 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200">

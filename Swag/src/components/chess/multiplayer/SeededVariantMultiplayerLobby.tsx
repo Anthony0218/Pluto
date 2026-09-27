@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -168,29 +169,9 @@ export default function SeededVariantMultiplayerLobby({ variant }: Props) {
   return (
     <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-5xl">
-        <header
-          className={`mb-7 rounded-3xl border ${info.accentBorder} bg-zinc-900/70 p-6 shadow-2xl shadow-black/30`}
-        >
-          <div className="flex items-center gap-4">
-            <div
-              className={`flex h-14 w-14 items-center justify-center rounded-2xl border ${info.accentBorder} ${info.accentSoft} text-3xl`}
-            >
-              {info.icon}
-            </div>
+        <ChessPageHeader className={`mb-7 rounded-3xl border ${info.accentBorder} bg-zinc-900/70 p-6 shadow-2xl shadow-black/30`} description={<> {ui(info.subtitle)} </>}>
 
-            <div>
-              <p
-                className={`text-[10px] font-black uppercase tracking-[0.28em] ${info.accentText}`}
-              >
-                {ui(info.eyebrow)}
-              </p>
-              <h1 className="mt-1 text-3xl font-black text-white">
-                {ui(info.title)}
-              </h1>
-              <p className="mt-1 text-sm text-zinc-500">{ui(info.subtitle)}</p>
-            </div>
-          </div>
-        </header>
+        </ChessPageHeader>
 
         {!user ? (
           <section className="rounded-3xl border border-amber-400/20 bg-amber-400/[0.06] p-6">

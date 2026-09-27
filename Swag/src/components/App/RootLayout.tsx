@@ -1,3 +1,4 @@
+import { DashboardDataProvider } from "@/context/DashboardDataContext";
 import "../chess/chessLayout.css";
 import ChessLayoutControls from "../chess/ChessLayoutControls";
 import RoomFriends from "../social/RoomFriends";
@@ -8,9 +9,13 @@ import PublicHeader from "./PublicHeader";
 import { useTheme } from "../../context/ThemeContext";
 
 export default function RootLayout() {
+  return <DashboardDataProvider><RootContent /></DashboardDataProvider>;
+}
+
+function RootContent() {
   const location = useLocation();
   const fullHeader = location.pathname === "/" || location.pathname === "/dashboard";
-  const integratedNavigation = location.pathname === "/games/chess" || location.pathname === "/games/chess/classic";
+  const integratedNavigation = location.pathname === "/games/chess" || location.pathname.startsWith("/games/chess/");
   const viewport = useRef<HTMLDivElement>(null);
   const { plutoMode } = useTheme();
   useEffect(() => {

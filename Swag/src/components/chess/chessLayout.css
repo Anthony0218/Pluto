@@ -79,3 +79,49 @@ body:has(.chess-game-grid) .chess-sidebar-toggle { display: block; }
   .chess-menu-page > div > section { grid-template-columns: minmax(0,.8fr) minmax(0,1.2fr); }
   .chess-menu-page > div > section > div { padding: 20px; }
 }
+
+/* Each page owns its header; branding shares that mode's accent and surface. */
+.chess-page-header { display: flex !important; flex-direction: row !important; flex-wrap: wrap; align-items: center !important; justify-content: space-between; gap: 12px; min-width: 0; flex-shrink: 0; padding: 12px 16px; border-color: color-mix(in srgb,var(--chess-header-accent) 25%,transparent); }
+.chess-header-brand { display: flex; align-items: center; gap: 10px; min-width: 0; margin-right: auto; }
+.chess-pluto { flex-shrink: 0; border-radius: 10px; padding: 8px 10px; color: #f4f4f5; background: #0a0d10; font-size: 18px; font-weight: 750; letter-spacing: -.025em; }
+.chess-pluto:hover { background: #171c22; }
+.chess-header-icon { color: var(--chess-header-accent); font-size: 25px; flex-shrink: 0; }
+.chess-header-name { font: 600 16px Georgia,serif; color: #f4f4f5; overflow-wrap: anywhere; }
+.chess-header-details { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; min-width: 0; }
+.chess-header-details:empty { display: none; }
+.chess-menu-header { min-height: 64px; border-bottom: 1px solid #ffffff12; padding-inline: clamp(12px,3vw,48px); }
+.chess-page-header .navigation-controls { margin-left: auto; }
+.chess-variants-menu-page { height: var(--app-height); overflow: hidden; }
+.chess-variants-menu-page > div.relative { height: 100%; min-height: 0; }
+.chess-variants-menu-page > div.relative > section { min-height: 0; }
+.chess-variants-menu-page > div.relative > section > header,
+.chess-variants-menu-page > div.relative > section > div { min-height: 0; }
+.chess-variants-menu-page > div.relative > section > div > div { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.chess-variants-menu-page .variant-explorer-host { display: flex; flex: 1; flex-direction: column; min-height: 0; }
+.chess-variants-menu-page .variant-explorer-trigger { align-self: flex-start; flex-shrink: 0; }
+.chess-variants-menu-page .variant-explorer-stage { --explorer-height: 100%; flex: 1; min-height: 0; }
+.chess-variants-menu-page .variant-explorer-preview,
+.chess-variants-menu-page .variant-explorer { height: 100%; min-height: 0; }
+.chess-variants-menu-page .variant-explorer-preview > section { height: 100%; min-height: 0; overflow-y: auto; }
+.chess-variants-menu-page .variant-explorer-preview > section > div.relative.flex { height: auto; min-height: 100%; }
+.chess-variants-menu-page .variant-explorer-preview article > div { min-height: 0; }
+@media (max-width: 1023px) {
+  .chess-variants-menu-page > div.relative > section { display: flex; flex-direction: column; }
+  .chess-variants-menu-page > div.relative > section > header { flex: 0 0 auto; padding: 16px 24px; }
+  .chess-variants-menu-page > div.relative > section > header .mb-8 { margin-bottom: 8px; }
+  .chess-variants-menu-page > div.relative > section > header h1 { margin-top: 8px; font-size: clamp(30px, 5vw, 48px); }
+  .chess-variants-menu-page > div.relative > section > header p.mt-6 { margin-top: 8px; font-size: 14px; line-height: 1.4; }
+  .chess-variants-menu-page > div.relative > section > header button { margin-top: 10px; padding: 7px 12px; }
+  .chess-variants-menu-page > div.relative > section > header .mt-12 { display: none; }
+  .chess-variants-menu-page > div.relative > section > div { flex: 1; overflow: hidden; padding: 12px 24px; }
+  .chess-variants-menu-page > div.relative > section > div > div { transform: none; }
+}
+@media (max-width:639px) {
+  .chess-page-header { padding: 10px; gap: 10px; }
+  .chess-header-brand { flex: 1 1 100%; }
+  .chess-header-details { max-width: 100%; }
+  .chess-page-header .navigation-controls { flex-wrap: wrap; }
+  .chess-header-name { font-size: 15px; }
+}
+
+.chess-header-description { color: #a1a1aa; font-size: 11px; line-height: 1.4; margin-top: 3px; max-width: 320px; }

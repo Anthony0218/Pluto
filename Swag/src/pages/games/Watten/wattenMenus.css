@@ -199,3 +199,108 @@ body:has(.watten-menu--screen) { overflow: hidden; }
   .watten-menu--home .watten-menu__panel > a h2 { font-size: 20px; }
   .watten-menu--home .watten-menu__panel > a p.text-sm { display: none; }
 }
+
+/* Watten's home screen is a small, warm card room. */
+.watten-menu--home { padding: 22px; background: radial-gradient(circle at 79% 5%, #b77a3633, transparent 31%), linear-gradient(135deg, #130e0b, #29170f 54%, #10251c); }
+.watten-menu--home::before { opacity: .26; background-position: center; mask-image: linear-gradient(#000, #0009 65%, transparent); }
+.watten-menu--home > .watten-menu__layout { width: min(1320px, calc(100% - 44px)); }
+.watten-menu--home .watten-menu__panel { padding: 0; border: 1px solid #d4a7606b; border-radius: 26px; background: #1b1711; box-shadow: 0 34px 90px #000a, 0 0 0 6px #140e0ba8, inset 0 0 0 1px #f3d7a522; }
+.watten-menu--home .watten-menu__panel::before { height: 3px; }
+.watten-pub-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 78px; padding: 10px 28px; border-bottom: 1px solid #d9b87a35; background: linear-gradient(90deg, #2e1c12, #1a2419); }
+.watten-pub-brand { display: flex; align-items: center; gap: 18px; min-width: 0; }
+.watten-pub-brand .watten-menu__seal { width: 46px; height: 46px; flex: none; font-size: 28px; }
+.watten-pub-brand > span:last-child { display: grid; gap: 2px; }
+.watten-pub-brand strong { color: #f7e7c2; font: 800 20px "Bookman Old Style", Georgia, serif; letter-spacing: .2em; }
+.watten-pub-brand small { color: #caab77; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; }
+.watten-pub-grid { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(390px, .92fr); min-height: min(650px, calc(var(--app-height) - 130px)); }
+.watten-pub-story { position: relative; isolation: isolate; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; min-height: 0; padding: clamp(26px, 4vw, 60px); border-right: 1px solid #e7c6883b; background: linear-gradient(180deg, #0c291ec9, #0c201aed), url('/images/watten-home.png') center / cover; }
+.watten-pub-story::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(circle at 52% 56%, #8e5a2880, transparent 42%), repeating-linear-gradient(90deg, #fff1b704 0 1px, transparent 1px 6px); }
+.watten-pub-kicker { color: #e9bb70; font-size: 11px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; }
+.watten-pub-kicker span { color: #edcf9a; }
+.watten-pub-story h1 { max-width: 600px; margin: 16px 0 0; color: #fff0cc; font: 800 clamp(46px, 5.2vw, 82px)/.94 "Bookman Old Style", Georgia, serif; letter-spacing: -.065em; text-wrap: balance; text-shadow: 0 8px 25px #0008; }
+.watten-pub-lede { max-width: 420px; margin-top: 20px; color: #eadbb9; font: italic 18px/1.5 "Palatino Linotype", Georgia, serif; }
+.watten-pub-table { position: relative; display: grid; place-items: center; flex: 1; min-height: 155px; margin: 6px 0; }
+.watten-pub-table__ring { position: absolute; width: min(58%, 260px); aspect-ratio: 1; border: 1px solid #e8c79126; border-radius: 50%; box-shadow: 0 0 0 24px #dbb76a08, 0 0 0 54px #dbb76a05; }
+.watten-pub-hand { display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 24px 24px #000a); transition: transform .35s ease; }
+.watten-pub-story:hover .watten-pub-hand { transform: translateY(-6px); }
+.watten-pub-hand img { width: clamp(72px, 9vw, 122px); border: 2px solid #f5dfa4; border-radius: 8px; box-shadow: 0 5px 15px #0008; transition: transform .35s ease; }
+.watten-pub-hand img:first-child { transform: translate(25px, 14px) rotate(-18deg); }
+.watten-pub-hand img:nth-child(2) { z-index: 1; transform: translateY(-7px); }
+.watten-pub-hand img:last-child { transform: translate(-25px, 14px) rotate(18deg); }
+.watten-pub-story:hover .watten-pub-hand img:first-child { transform: translate(16px, 8px) rotate(-24deg); }
+.watten-pub-story:hover .watten-pub-hand img:last-child { transform: translate(-16px, 8px) rotate(24deg); }
+.watten-pub-table__stamp { position: absolute; bottom: 0; color: #e8cb9070; font: 800 9px "Bookman Old Style", Georgia, serif; letter-spacing: .3em; }
+.watten-pub-talk { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 70px; padding: 12px 16px; border: 1px solid #e5c58b65; border-radius: 12px; background: #130f0dbc; color: #f9e7bd; text-align: left; transition: background .2s, border-color .2s; }
+.watten-pub-talk:hover { background: #2d2117; border-color: #efcf91; }
+.watten-pub-talk__icon { color: #e9bf79; font-size: 24px; }
+.watten-pub-talk > span:nth-child(2) { display: grid; gap: 4px; flex: 1; }
+.watten-pub-talk small { color: #c99e5e; font-size: 9px; font-weight: 900; letter-spacing: .18em; }
+.watten-pub-talk strong { font: italic 15px "Palatino Linotype", Georgia, serif; }
+.watten-pub-choices { display: flex; flex-direction: column; justify-content: center; gap: 14px; padding: clamp(22px, 3.4vw, 48px); background: radial-gradient(circle at 100% 0, #91602122, transparent 43%), repeating-linear-gradient(0deg, #fff6d503 0 1px, transparent 1px 5px), #1c1812; }
+.watten-pub-choices__intro span { color: #d8ad68; font-size: 10px; font-weight: 900; letter-spacing: .23em; }
+.watten-pub-choices__intro p { margin-top: 8px; color: #fff0d1; font: 700 clamp(24px, 2.5vw, 35px) "Bookman Old Style", Georgia, serif; letter-spacing: -.04em; }
+.watten-pub-choice { display: flex; align-items: center; gap: 16px; min-width: 0; padding: 20px; border: 1px solid #d8ae6b54; border-radius: 16px; background: linear-gradient(120deg, #45301d, #251e16); box-shadow: inset 0 1px #f5d9a31b, 0 12px 26px #0003; transition: transform .2s, border-color .2s, box-shadow .2s; }
+.watten-pub-choice--online { border-color: #82ba8a53; background: linear-gradient(120deg, #243b2a, #1b231a); }
+.watten-pub-choice:hover { transform: translateX(5px); border-color: #e8c389; box-shadow: inset 0 1px #f5d9a32e, 0 16px 30px #0005; }
+.watten-pub-choice--online:hover { border-color: #a2d9aa; }
+.watten-pub-choice__icon { display: grid; place-items: center; width: 55px; height: 55px; flex: none; border: 1px solid #eac68561; border-radius: 13px; color: #f6d18c; background: #e7bc7714; }
+.watten-pub-choice--online .watten-pub-choice__icon { border-color: #8fc79d61; color: #a8e0b1; background: #a7dfa014; }
+.watten-pub-choice__text { display: grid; gap: 3px; flex: 1; min-width: 0; }
+.watten-pub-choice__text small { color: #ddb775; font-size: 9px; font-weight: 900; letter-spacing: .15em; }
+.watten-pub-choice--online .watten-pub-choice__text small { color: #9ccca4; }
+.watten-pub-choice__text strong { color: #fff2d8; font: 700 28px "Bookman Old Style", Georgia, serif; }
+.watten-pub-choice__text > span { color: #d2c2a7; font-size: 12px; line-height: 1.5; }
+.watten-pub-choice__arrow { display: grid; place-items: center; width: 37px; height: 37px; flex: none; border: 1px solid #efcc8a69; border-radius: 50%; color: #f5d390; transition: transform .2s; }
+.watten-pub-choice:hover .watten-pub-choice__arrow { transform: translateX(4px); }
+.watten-pub-rules { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border: 1px dashed #d8bd8d78; border-radius: 13px; color: #e8d7b5; transition: background .2s, border-color .2s; }
+.watten-pub-rules:hover { border-color: #f3d596; background: #e5c18110; }
+.watten-pub-rules > svg:first-child { flex: none; color: #ebbd7b; }
+.watten-pub-rules > svg:last-child { flex: none; margin-left: auto; }
+.watten-pub-rules span { display: grid; gap: 3px; min-width: 0; }
+.watten-pub-rules strong { font: 700 17px "Bookman Old Style", Georgia, serif; }
+.watten-pub-rules small { color: #bbae95; font-size: 11px; line-height: 1.4; }
+.watten-pub-choices__footer { color: #9d8056; font: italic 14px "Palatino Linotype", Georgia, serif; text-align: center; }
+.watten-pub-choices__footer span { margin: 0 12px; }
+@media (max-width: 900px) {
+  .watten-menu--home .watten-menu__panel { padding: 0; }
+  .watten-pub-grid { grid-template-columns: 1fr; min-height: 0; }
+  .watten-pub-story { min-height: 300px; border-right: 0; border-bottom: 1px solid #e7c6883b; }
+  .watten-pub-table { position: absolute; right: 4%; top: 20%; bottom: 20%; width: 42%; opacity: .82; }
+  .watten-pub-story__copy { position: relative; z-index: 1; max-width: 55%; }
+  .watten-pub-talk { position: relative; z-index: 1; max-width: 55%; }
+  .watten-pub-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 20px; }
+  .watten-pub-choices__intro, .watten-pub-rules, .watten-pub-choices__footer { grid-column: 1 / -1; }
+  .watten-pub-choice { padding: 14px; }
+  .watten-pub-choice__icon { display: none; }
+}
+@media (max-width: 640px) {
+  .watten-menu--home { padding: 8px; }
+  .watten-menu--home > .watten-menu__layout { width: calc(100% - 16px); }
+  .watten-pub-bar { min-height: 56px; padding: 7px 14px; }
+  .watten-pub-brand { gap: 10px; }
+  .watten-pub-brand .watten-menu__seal { width: 30px; height: 30px; font-size: 20px; }
+  .watten-pub-brand strong { font-size: 14px; }
+  .watten-pub-brand small { font-size: 8px; }
+  .watten-pub-story { min-height: 230px; padding: 20px; }
+  .watten-pub-story__copy { max-width: 72%; }
+  .watten-pub-story h1 { font-size: 37px; }
+  .watten-pub-lede { margin-top: 10px; font-size: 13px; line-height: 1.35; }
+  .watten-pub-table { right: -15%; top: 14%; width: 60%; opacity: .54; }
+  .watten-pub-hand img { width: 65px; }
+  .watten-pub-table__stamp { display: none; }
+  .watten-pub-talk { max-width: none; min-height: 46px; padding: 7px 10px; }
+  .watten-pub-talk strong { font-size: 12px; }
+  .watten-pub-talk__icon { font-size: 18px; }
+  .watten-pub-choices { padding: 15px; }
+  .watten-pub-choices__intro p { margin-top: 2px; font-size: 23px; }
+  .watten-pub-choice { gap: 7px; padding: 11px; }
+  .watten-pub-choice__text small, .watten-pub-choice__text > span { display: none; }
+  .watten-pub-choice__text strong { font-size: 18px; }
+  .watten-pub-choice__arrow { width: 25px; height: 25px; }
+  .watten-pub-rules { padding: 9px 11px; }
+  .watten-pub-rules small, .watten-pub-choices__footer { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .watten-pub-choice, .watten-pub-choice__arrow, .watten-pub-hand, .watten-pub-hand img { transition: none; }
+  .watten-pub-choice:hover, .watten-pub-story:hover .watten-pub-hand { transform: none; }
+}

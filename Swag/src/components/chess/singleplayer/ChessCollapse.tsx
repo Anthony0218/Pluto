@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useRef, useEffect, useMemo, useState } from "react";
 import {
@@ -884,8 +885,7 @@ export default function ChessCollapseBoard({
       "
     >
       <div className="mx-auto max-w-[1500px]">
-        <header
-          className="
+        <ChessPageHeader className="
             mb-7
             flex
             flex-col
@@ -902,40 +902,8 @@ export default function ChessCollapseBoard({
             sm:flex-row
             sm:items-center
             sm:justify-between
-          "
-        >
-          <div className="flex items-center gap-4">
-            <div
-              className="
-                flex
-                h-12
-                w-12
-                items-center
-                justify-center
-                rounded-2xl
-                border
-                border-red-500/20
-                bg-red-400/10
-                text-3xl
-                shadow-inner
-              "
-              aria-hidden="true"
-            >
-              ◫
-            </div>
+          " description={<> {ui("The board shrinks · kings have 3 lives · checkmate still wins")} </>}>
 
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-red-400">
-                {t("Chess Variant")}
-              </p>
-
-              <h1 className="mt-0.5 text-2xl font-black tracking-tight text-white">
-                {t("Chess Collapse")}
-              </h1>
-
-              <p className="mt-0.5 text-sm text-zinc-500">{ui("The board shrinks · kings have 3 lives · checkmate still wins")}</p>
-            </div>
-          </div>
 
           <div className="flex flex-wrap items-center justify-end gap-2">
             <LanguageSelector
@@ -966,7 +934,7 @@ export default function ChessCollapseBoard({
             )}
           </div>
           <BoardAnimationToggle />
-        </header>
+        </ChessPageHeader>
 
         <main className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">

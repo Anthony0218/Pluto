@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
 import { useRef, useEffect, useMemo, useState } from "react";
@@ -1778,8 +1779,7 @@ export default function ThreeLivesChessBoard({
             HEADER
            ================================================= */}
 
-        <header
-          className="
+        <ChessPageHeader className="
             mb-7
             flex
             flex-col
@@ -1796,58 +1796,8 @@ export default function ThreeLivesChessBoard({
             sm:flex-row
             sm:items-center
             sm:justify-between
-          "
-        >
-          <div className="flex items-center gap-4">
-            <div
-              className="
-                flex
-                h-12
-                w-12
-                items-center
-                justify-center
-                rounded-2xl
-                border
-                border-amber-500/20
-                bg-amber-400/10
-                text-3xl
-                text-amber-200
-                shadow-inner
-              "
-            >
-              ♞
-            </div>
+          " description={<> {t("Every check costs one life · Checkmate still wins")} </>}>
 
-            <div>
-              <p
-                className="
-                  text-[10px]
-                  font-bold
-                  uppercase
-                  tracking-[0.28em]
-                  text-amber-400
-                "
-              >
-                {t("Chess Variant")}
-              </p>
-
-              <h1
-                className="
-                  mt-0.5
-                  text-2xl
-                  font-black
-                  tracking-tight
-                  text-white
-                "
-              >
-                {t("Three Lives Chess")}
-              </h1>
-
-              <p className="mt-0.5 text-sm text-zinc-500">
-                {t("Every check costs one life · Checkmate still wins")}
-              </p>
-            </div>
-          </div>
 
           <div className="flex flex-wrap items-center justify-end gap-2">
             <ChessLanguageSelector
@@ -1928,7 +1878,7 @@ export default function ThreeLivesChessBoard({
             )}
           </div>
           <BoardAnimationToggle />
-        </header>
+        </ChessPageHeader>
 
         {/* =================================================
             MAIN LAYOUT

@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useRef, useEffect, useMemo, useState } from "react";
 import {
@@ -921,8 +922,7 @@ export default function ChessHotPotatoBoard({
             HEADER
            ================================================= */}
 
-        <header
-          className="
+        <ChessPageHeader className="
             mb-7
             flex
             flex-col
@@ -939,44 +939,10 @@ export default function ChessHotPotatoBoard({
             sm:flex-row
             sm:items-center
             sm:justify-between
-          "
-        >
-          <div className="flex items-center gap-4">
-            <div
-              className="
-                flex
-                h-12
-                w-12
-                items-center
-                justify-center
-                rounded-2xl
-                border
-                border-orange-500/20
-                bg-orange-400/10
-                text-3xl
-                shadow-inner
-              "
-              aria-hidden="true"
-            >
-              💣
-            </div>
-
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-orange-400">
-                {t("Chess Variant")}
-              </p>
-
-              <h1 className="mt-0.5 text-2xl font-black tracking-tight text-white">
-                {t("Chess Hot Potato")}
-              </h1>
-
-              <p className="mt-0.5 text-sm text-zinc-500">
-                {t("Pass the danger")} · {t("Random fuse")}{" "}
+          " description={<> {t("Pass the danger")} · {t("Random fuse")}{" "}
                 {HOT_POTATO_MIN_FUSE_MOVES}–{HOT_POTATO_MAX_FUSE_MOVES}{" "}
-                {t("moves")}
-              </p>
-            </div>
-          </div>
+                {t("moves")} </>}>
+
 
           <div className="flex flex-wrap items-center justify-end gap-2">
             <LanguageSelector
@@ -1038,7 +1004,7 @@ export default function ChessHotPotatoBoard({
             )}
           </div>
           <BoardAnimationToggle />
-        </header>
+        </ChessPageHeader>
 
         {/* =================================================
             MAIN LAYOUT — SAME 300px / BOARD / 300px SHELL

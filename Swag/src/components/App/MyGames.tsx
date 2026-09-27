@@ -44,6 +44,16 @@ function FavoriteGames({ userId }: { userId?: string }) {
   const visible = editing ? draft : routes.slice(0, visibleCount);
   const { dragAndDropHooks } = useDragAndDrop({
     getItems: keys => [...keys].map(key => ({ "text/plain": String(key) })),
+    renderDragPreview: items => {
+      const game = games.find(item => item.route === items[0]?.["text/plain"]);
+      const card = [...(gridRef.current?.querySelectorAll<HTMLElement>("[data-game-route]") ?? [])]
+        .find(item => item.dataset.gameRoute === game?.route);
+      const bounds = card?.getBoundingClientRect();
+      return <div className="favorite-card favorite-drag-preview" style={{ width: bounds?.width, height: bounds?.height }} aria-hidden="true">
+        <img src={game?.image} alt="" />
+        <div className="favorite-caption"><strong>{ui(game?.title ?? "Move game")}</strong><small>{ui(game?.subtitle ?? "")}</small></div>
+      </div>;
+    },
     getAllowedDropOperations: () => ["move"],
     onReorder: event => setDraft(current => reorderFavorites(current, new Set([...event.keys].map(String)), String(event.target.key), event.target.dropPosition === "after" ? "after" : "before")),
     isDisabled: saving,

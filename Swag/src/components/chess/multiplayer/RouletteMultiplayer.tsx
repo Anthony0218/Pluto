@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import RouletteInfo from "@/components/chess/singleplayer/RouletteInfo";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import {
@@ -577,18 +578,9 @@ export function RouletteMultiplayerLobby() {
   return (
     <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-5xl">
-        <header className="mb-7 rounded-3xl border border-violet-400/15 bg-zinc-900/70 p-6 shadow-2xl shadow-black/30">
-          <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-violet-400/20 bg-violet-400/10 text-3xl">
-              🎲
-            </div>
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-300">{ui("ChessRoulette · Multiplayer")}</p>
-              <h1 className="mt-1 text-3xl font-black text-white">{ui("Shared Lucky Squares")}</h1>
-              <p className="mt-1 text-sm text-zinc-500">{ui("The seed, Lucky Squares, effects and Roulette events stay synchronized for both players.")}</p>
-            </div>
-          </div>
-        </header>
+        <ChessPageHeader className="mb-7 rounded-3xl border border-violet-400/15 bg-zinc-900/70 p-6 shadow-2xl shadow-black/30" description={<> {ui("The seed, Lucky Squares, effects and Roulette events stay synchronized for both players.")} </>}>
+
+        </ChessPageHeader>
 
         {!user ? (
           <Panel title={ui("Sign in required")}>
@@ -1392,13 +1384,15 @@ export function RouletteMultiplayerGame() {
 
   if (loading) {
     return (
-      <main className="flex chess-variant-page min-h-[var(--app-height)] items-center justify-center bg-transparent text-zinc-400">{ui("Loading ChessRoulette room...")}</main>
+      <main className="flex chess-variant-page min-h-[var(--app-height)] items-center justify-center bg-transparent text-zinc-400">
+      <ChessPageHeader className="mb-4" />{ui("Loading ChessRoulette room...")}</main>
     );
   }
 
   if (!user) {
     return (
       <main className="flex chess-variant-page min-h-[var(--app-height)] items-center justify-center bg-transparent p-6 text-zinc-200">
+      <ChessPageHeader className="mb-4" />
         <Panel title={ui("Sign in required")}>
           <Link
             className="text-violet-300"
@@ -1412,6 +1406,7 @@ export function RouletteMultiplayerGame() {
   if (!room || !gameState) {
     return (
       <main className="flex chess-variant-page min-h-[var(--app-height)] items-center justify-center bg-transparent p-6 text-zinc-200">
+      <ChessPageHeader className="mb-4" />
         <Panel title={ui("Room unavailable")}>
           <p className="text-sm text-zinc-400">
             {error ?? "Could not load the room."}
@@ -1441,12 +1436,8 @@ export function RouletteMultiplayerGame() {
   return (
     <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1600px]">
-        <header className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-violet-400/10 bg-zinc-900/50 px-5 py-4">
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.25em] text-violet-300">{ui("Chess Variant · Multiplayer")}</p>
-            <h1 className="mt-1 text-2xl font-black text-white">{ui("🎲 ChessRoulette")}</h1>
-            <p className="mt-1 text-sm text-zinc-500">{ui("Visible Lucky Squares · synchronized deterministic outcomes")}</p>
-          </div>
+        <ChessPageHeader className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-violet-400/10 bg-zinc-900/50 px-5 py-4" description={<> {ui("Visible Lucky Squares · synchronized deterministic outcomes")} </>}>
+
 
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full border border-violet-300/15 bg-violet-400/[0.06] px-3 py-1.5 text-xs font-black text-violet-200">{ui("Room")}{room.code}
@@ -1455,7 +1446,7 @@ export function RouletteMultiplayerGame() {
               {gameState.status === "playing" ? `${liveChess.turn() === "w" ? "White" : "Black"} to move` : gameState.status === "waiting" ? ui("Waiting for opponent") : ui("Game finished")}
             </span>
           </div>
-        </header>
+        </ChessPageHeader>
 
         {error && (
           <div className="mb-4 rounded-2xl border border-red-400/20 bg-red-400/[0.07] px-4 py-3 text-sm font-semibold text-red-200">

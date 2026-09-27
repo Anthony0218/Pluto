@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -75,13 +76,8 @@ function ChessPageShell({ children }: { children: React.ReactNode }) {
       </div>
 
       <div className="relative flex min-h-[var(--app-height)] w-full flex-col">
-        <nav className="flex min-h-20 w-full items-center justify-between border-b border-white/[0.07] px-6 sm:px-10 lg:px-14 xl:px-20">
-          <Link to="/games/chess" className="inline-flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-amber-300/20 bg-amber-300/10 text-lg text-amber-300">
-              ♛
-            </span>
-            <span className="font-serif text-sm tracking-[0.28em] text-zinc-200">{ui("CHESS")}</span>
-          </Link>
+        <ChessPageHeader className="chess-menu-header">
+
 
           <Link
             to="/games/chess/rules"
@@ -90,7 +86,7 @@ function ChessPageShell({ children }: { children: React.ReactNode }) {
             <span className="text-base">♔</span>
             <span className="hidden sm:inline">{ui("Rules & Tips")}</span>
           </Link>
-        </nav>
+        </ChessPageHeader>
 
         {children}
       </div>
@@ -126,6 +122,7 @@ export default function ChessComputer() {
   if (gameStarted) {
     return (
       <main className="w-full bg-transparent p-0 text-zinc-100">
+      <ChessPageHeader className="mb-4" />
         <ChessComputerBoard
           playerColor={playerColor}
           skillLevel={selectedDifficulty.skillLevel}

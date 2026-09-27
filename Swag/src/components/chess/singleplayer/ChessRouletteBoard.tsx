@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import RouletteInfo from "@/components/chess/singleplayer/RouletteInfo";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
@@ -1765,50 +1766,15 @@ export default function ChessRouletteBoard({
           max-w-[1600px]
         "
       >
-        <header
-          className="
+        <ChessPageHeader className="
             mb-5
             flex
             flex-wrap
             items-center
             justify-between
             gap-3
-          "
-        >
-          <div>
-            <p
-              className="
-                text-xs
-                font-black
-                uppercase
-                tracking-[0.25em]
-                text-violet-300
-              "
-            >
-              {t("Chess Variant")}
-            </p>
+          " description={<> {t("Visible Lucky Squares on ranks 3 to 6")} </>}>
 
-            <h1
-              className="
-                mt-1
-                text-2xl
-                font-black
-                text-white
-              "
-            >
-              🎲 {t("ChessRoulette")}
-            </h1>
-
-            <p
-              className="
-                mt-1
-                text-sm
-                text-zinc-500
-              "
-            >
-              {t("Visible Lucky Squares on ranks 3 to 6")}
-            </p>
-          </div>
 
           <div
             className="
@@ -1876,7 +1842,7 @@ export default function ChessRouletteBoard({
             </label>
           </div>
           <BoardAnimationToggle />
-        </header>
+        </ChessPageHeader>
 
         <div
           className="

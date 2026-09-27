@@ -37,7 +37,6 @@ export default function LandingPage() {
         description={ui("Rules and strategies that help you understand the games you play.")}
         href="/learn"
         action={ui("Start learning")}
-        reverse
       >
         <LearnShowcase />
       </FeatureSection>
@@ -67,7 +66,6 @@ export default function LandingPage() {
         description={ui("Challenge friends, complete daily goals and share the experience with other players.")}
         href="/friends"
         action={ui("Explore community")}
-        reverse
       >
         <CommunityShowcase />
       </FeatureSection>

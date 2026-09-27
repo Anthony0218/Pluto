@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 import {
@@ -401,7 +402,7 @@ export default function FourPlayerChess({
   return (
     <div className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1580px]">
-        <header className="mb-6 rounded-3xl border border-white/5 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20">
+        <ChessPageHeader className="mb-6 rounded-3xl border border-white/5 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20">
           <p className="text-[10px] font-black uppercase tracking-[0.28em] text-fuchsia-300">
             {t("Chess Variant")}
           </p>
@@ -441,7 +442,7 @@ export default function FourPlayerChess({
             </div>
             <BoardAnimationToggle />
           </div>
-        </header>
+        </ChessPageHeader>
 
         <main className="grid gap-6 chess-game-grid xl:grid-cols-[290px_minmax(0,1fr)_290px]">
           <aside className="min-w-0">

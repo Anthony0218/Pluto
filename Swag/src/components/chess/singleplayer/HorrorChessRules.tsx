@@ -1,10 +1,11 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 export default function HorrorChessRules() {
   useUiLanguage();
   return (
     <div className="min-h-screen bg-zinc-950 px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-4xl">
-        <header className="mb-6 rounded-3xl border border-rose-400/15 bg-zinc-900/75 p-6 shadow-xl shadow-black/20">
+        <ChessPageHeader className="mb-6 rounded-3xl border border-rose-400/15 bg-zinc-900/75 p-6 shadow-xl shadow-black/20">
           <p className="text-[10px] font-black uppercase tracking-[0.25em] text-rose-300">{ui("Chess Variant IV")}</p>
 
           <h1 className="mt-2 text-3xl font-black text-white">{ui("Horror Chess Rulebook")}</h1>
@@ -15,7 +16,7 @@ export default function HorrorChessRules() {
             href="/games/chess/variants/horror/hotseat"
             className="mt-5 inline-flex rounded-full border border-rose-400/15 bg-rose-400/[0.07] px-4 py-2 text-xs font-black text-rose-200 transition hover:bg-rose-400/[0.13]"
           >{ui("← Back to Horror Chess")}</a>
-        </header>
+        </ChessPageHeader>
 
         <section className="mb-6 rounded-2xl border border-white/5 bg-zinc-900/55 px-4 py-3">
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">

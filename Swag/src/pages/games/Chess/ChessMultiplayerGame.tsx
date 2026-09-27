@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -2195,7 +2196,8 @@ export default function ChessMultiplayerGame() {
           bg-zinc-950
           text-zinc-400
         "
-      >{ui("Loading multiplayer game...")}</main>
+      >
+      <ChessPageHeader className="mb-4" />{ui("Loading multiplayer game...")}</main>
     );
   }
 
@@ -2374,58 +2376,15 @@ export default function ChessMultiplayerGame() {
           HEADER
          ========================================================= */}
 
-        <header
-          className="
+        <ChessPageHeader className="
           mb-2
           flex
           shrink-0
           items-center
           justify-end
           gap-2
-        "
-        >
-          <div className="hidden">
-            <div
-              className="
-              flex
-              h-12
-              w-12
-              items-center
-              justify-center
-              rounded-2xl
-              border
-              border-amber-500/20
-              bg-amber-400/10
-              text-3xl
-              text-amber-200
-              shadow-inner
-            "
-            >
-              ♞
-            </div>
+        ">
 
-            <div>
-              <p
-                className="
-                text-[10px]
-                font-bold
-                uppercase
-                tracking-[0.28em]
-                text-amber-400
-              "
-              >
-                {t("Classic Chess")}
-              </p>
-
-              <h1 className="mt-0.5 text-2xl font-black tracking-tight text-white">
-                {t("Multiplayer")}
-              </h1>
-
-              <p className="mt-0.5 text-sm text-zinc-500">
-                {t("Online game")} · {t("Room")} {room.code}
-              </p>
-            </div>
-          </div>
 
           <div className="flex flex-wrap items-center gap-2">
             <ChessLanguageSelector
@@ -2490,7 +2449,7 @@ export default function ChessMultiplayerGame() {
               {t("Leave")}
             </Link>
           </div>
-        </header>
+        </ChessPageHeader>
 
         {/* =========================================================
           MAIN

@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Chess, type Move } from "chess.js";
@@ -253,7 +254,7 @@ export default function Chess3DGamePage({
   return (
     <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1400px]">
-        <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <ChessPageHeader className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.28em] text-sky-400">{ui("3D Chess")}</p>
 
@@ -280,7 +281,7 @@ export default function Chess3DGamePage({
               className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-black text-zinc-300 transition hover:bg-white/10 hover:text-white"
             >{ui("↺ Reset")}</button>
           </div>
-        </div>
+        </ChessPageHeader>
 
         <div className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl border border-white/10 bg-zinc-900/60 px-4 py-3">
           <span className="text-xs font-black uppercase tracking-widest text-zinc-500">{ui("Status")}</span>

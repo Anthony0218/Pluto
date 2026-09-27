@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
 import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
@@ -1268,8 +1269,7 @@ export default function CapitalismChessBoard({
       <div className="mx-auto max-w-[1500px]">
         {/* HEADER */}
 
-        <header
-          className="
+        <ChessPageHeader icon={<CoinIcon />} className="
             mb-7
             flex
             flex-col
@@ -1286,49 +1286,8 @@ export default function CapitalismChessBoard({
             sm:flex-row
             sm:items-center
             sm:justify-between
-          "
-        >
-          <div className="flex items-center gap-4">
-            <div
-              className="
-                flex
-                h-12
-                w-12
-                items-center
-                justify-center
-                rounded-2xl
-                border
-                border-amber-400/20
-                bg-amber-400/10
-                text-3xl
-                shadow-inner
-              "
-            >
-              <CoinIcon size="lg" />
-            </div>
+          " description={<> {t("Earn coins. Chase bounties. Spend the treasury.")} </>}>
 
-            <div>
-              <p
-                className="
-                  text-[10px]
-                  font-bold
-                  uppercase
-                  tracking-[0.28em]
-                  text-amber-400
-                "
-              >
-                {t("Chess Variant")}
-              </p>
-
-              <h1 className="mt-0.5 text-2xl font-black tracking-tight text-white">
-                {t("Capitalism Chess")}
-              </h1>
-
-              <p className="mt-0.5 text-sm text-zinc-500">
-                {t("Earn coins. Chase bounties. Spend the treasury.")}
-              </p>
-            </div>
-          </div>
 
           <div className="flex flex-wrap items-center justify-end gap-2">
             <a
@@ -1365,7 +1324,7 @@ export default function CapitalismChessBoard({
             )}
           </div>
           <BoardAnimationToggle />
-        </header>
+        </ChessPageHeader>
 
         {/* ECONOMY STRIP */}
 

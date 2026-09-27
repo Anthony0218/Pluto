@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 import type { Friend } from "../types/social";
@@ -22,7 +22,7 @@ export type DashboardNotification = {
   senderId?: string;
 };
 
-export function useDashboardData() {
+export function useDashboardDataSource() {
   const { user } = useAuth();
   const userId = user?.id;
   const [state, setState] = useState<{
@@ -180,4 +180,11 @@ export function useDashboardData() {
         friendsError: false,
         notifications: [],
       };
+}
+
+export const DashboardDataContext = createContext<ReturnType<typeof useDashboardDataSource> | null>(null);
+export function useDashboardData() {
+  const data = useContext(DashboardDataContext);
+  if (!data) throw new Error("DashboardDataProvider is required");
+  return data;
 }

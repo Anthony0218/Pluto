@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
@@ -611,8 +612,8 @@ export default function TotalChaosChess({
   return (
     <div className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1460px]">
-        <header className="mb-6 rounded-3xl border border-pink-400/10 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <ChessPageHeader className="mb-6 rounded-3xl border border-pink-400/10 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20" description={<> {t("Every piece. Any part of the board.")} </>}>
+<div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.28em] text-pink-300">
                 {t("Chess Variant")}
@@ -642,7 +643,8 @@ export default function TotalChaosChess({
             </div>
             <BoardAnimationToggle />
           </div>
-        </header>
+
+        </ChessPageHeader>
 
         <main className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">

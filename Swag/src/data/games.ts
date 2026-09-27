@@ -19,7 +19,7 @@ export const games: Game[] = [
     route: "/games/atlas-arena",
     tag: "Geography",
     features: ["Map Click", "Speed Run", "Map Fill"],
-    finished: true,
+    finished: false,
   },
   {
     title: "Go",
@@ -30,7 +30,7 @@ export const games: Game[] = [
     route: "/games/go",
     tag: "Strategy",
     features: ["Vs Bot", "Hotseat", "Multiplayer"],
-    finished: true,
+    finished: false,
   },
   {
     title: "Shogi",
@@ -41,7 +41,7 @@ export const games: Game[] = [
     route: "/games/shogi",
     tag: "Strategy",
     features: ["Drops", "Vs Bot", "Multiplayer"],
-    finished: true,
+    finished: false,
   },
   {
     title: "Schafkopf",
@@ -52,7 +52,7 @@ export const games: Game[] = [
     route: "/games/schafkopf",
     tag: "Kartenspiel",
     features: ["Hotseat", "Gegen KI", "Multiplayer"],
-    finished: true,
+    finished: false,
   },
   {
     title: "Schach",
@@ -108,7 +108,7 @@ export const games: Game[] = [
     route: "/games/natura",
     tag: "Nature",
     features: ["Animals", "Discovery"],
-    finished: true,
+    finished: false,
   },
 ];
 export const gameList = games.map((game) => ({

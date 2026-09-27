@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -1172,18 +1173,8 @@ export default function ChessGameReview({
 
         {/* HEADER */}
 
-        <header className="relative flex shrink-0 items-center justify-between border-b border-amber-100/[0.08] bg-[#08111b]/88 px-5 py-3.5 backdrop-blur-xl">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-amber-300/15 bg-amber-300/[0.06] text-2xl text-amber-100 shadow-inner shadow-amber-200/[0.03]">
-              ♞
-            </div>
+        <ChessPageHeader className="relative flex shrink-0 items-center justify-between border-b border-amber-100/[0.08] bg-[#08111b]/88 px-5 py-3.5 backdrop-blur-xl" title="Game Review">
 
-            <div>
-              <p className="text-[9px] font-black uppercase tracking-[0.28em] text-amber-300/75">{ui("Post-Game Analysis")}</p>
-
-              <h2 className="font-serif text-xl font-semibold tracking-wide text-[#f3e7cf]">{ui("Game Review")}</h2>
-            </div>
-          </div>
 
           <div className="flex items-center gap-2">
             {reviews.length > 0 && (
@@ -1214,7 +1205,7 @@ export default function ChessGameReview({
               ×
             </button>
           </div>
-        </header>
+        </ChessPageHeader>
 
         {trainingPuzzleStatus && (
           <div className="mx-4 mt-3 rounded-2xl border border-amber-300/15 bg-[linear-gradient(135deg,rgba(111,76,32,.14),rgba(7,14,22,.68))] px-4 py-3 text-xs leading-5 text-amber-100/80 shadow-inner shadow-black/20">

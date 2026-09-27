@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import {
   useCallback,
@@ -377,18 +378,9 @@ export function ThreeLivesMultiplayerLobby() {
   return (
     <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-5xl">
-        <header className="mb-7 rounded-3xl border border-amber-400/15 bg-zinc-900/65 p-6 shadow-2xl shadow-black/30">
-          <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-amber-500/20 bg-amber-400/10 text-3xl text-amber-200">
-              ♞
-            </div>
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-400">{ui("Three Lives · Multiplayer")}</p>
-              <h1 className="mt-1 text-3xl font-black text-white">{ui("Checks hurt. Hearts heal.")}</h1>
-              <p className="mt-1 text-sm text-zinc-500">{ui("Every check costs one life · bonus hearts are synchronized · checkmate still wins")}</p>
-            </div>
-          </div>
-        </header>
+        <ChessPageHeader className="mb-7 rounded-3xl border border-amber-400/15 bg-zinc-900/65 p-6 shadow-2xl shadow-black/30" description={<> {ui("Every check costs one life · bonus hearts are synchronized · checkmate still wins")} </>}>
+
+        </ChessPageHeader>
 
         {!user ? (
           <Panel title={ui("Sign in required")}>
@@ -984,17 +976,20 @@ export function ThreeLivesMultiplayerGame() {
 
   if (!user) {
     return (
-      <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent p-8 text-zinc-100">{ui("Sign in required.")}</main>
+      <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent p-8 text-zinc-100">
+      <ChessPageHeader className="mb-4" />{ui("Sign in required.")}</main>
     );
   }
   if (loading) {
     return (
-      <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent p-8 text-zinc-400">{ui("Loading Three Lives room...")}</main>
+      <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent p-8 text-zinc-400">
+      <ChessPageHeader className="mb-4" />{ui("Loading Three Lives room...")}</main>
     );
   }
   if (!room || !gameState) {
     return (
       <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent p-8 text-zinc-100">
+      <ChessPageHeader className="mb-4" />
         <p>{ui("Three Lives room unavailable.")}</p>
         {error && <ErrorBox>{ui(error)}</ErrorBox>}
       </main>
@@ -1006,17 +1001,8 @@ export function ThreeLivesMultiplayerGame() {
   return (
     <div className="chess-variant-page min-h-[var(--app-height)] bg-[radial-gradient(circle_at_top,#21170f_0%,#111111_38%,#090909_100%)] px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1500px]">
-        <header className="mb-7 flex flex-col gap-4 rounded-3xl border border-white/5 bg-zinc-900/50 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-amber-500/20 bg-amber-400/10 text-3xl text-amber-200">
-              ♞
-            </div>
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-400">{ui("Chess Variant · Multiplayer")}</p>
-              <h1 className="mt-0.5 text-2xl font-black text-white">{ui("Three Lives Chess")}</h1>
-              <p className="mt-0.5 text-sm text-zinc-500">{ui("Every check costs one life · Checkmate still wins")}</p>
-            </div>
-          </div>
+        <ChessPageHeader className="mb-7 flex flex-col gap-4 rounded-3xl border border-white/5 bg-zinc-900/50 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between" description={<> {ui("Every check costs one life · Checkmate still wins")} </>}>
+
 
           <div className="flex flex-wrap items-center gap-2">
             <div className="flex items-center gap-2 rounded-full border border-red-400/15 bg-red-400/[0.06] px-3 py-1.5 text-xs font-bold">
@@ -1045,7 +1031,7 @@ export function ThreeLivesMultiplayerGame() {
               className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-400 hover:bg-white/10"
             >{ui("Lobby")}</Link>
           </div>
-        </header>
+        </ChessPageHeader>
 
         <main className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">

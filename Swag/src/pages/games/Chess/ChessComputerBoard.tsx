@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -2082,6 +2083,7 @@ export default function ChessComputerBoard({
 
   return (
     <div className="relative left-1/2 classic-game-page min-h-[var(--app-height)] w-screen -translate-x-1/2 overflow-x-hidden bg-[#05080d] bg-[radial-gradient(circle_at_50%_-10%,rgba(245,158,11,0.12),transparent_30%),radial-gradient(circle_at_12%_38%,rgba(14,165,233,0.08),transparent_28%),linear-gradient(180deg,#03070b_0%,#07111b_48%,#020509_100%)] px-3 py-3 sm:px-5 lg:px-6">
+      <ChessPageHeader className="mb-4" />
       <div className="mb-2 flex shrink-0 justify-end">
         <ChessLanguageSelector
           language={language}

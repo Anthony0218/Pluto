@@ -1,6 +1,6 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { Link } from "react-router-dom";
-import { NavigationControls, PlutoHomeLink } from "@/components/App/PublicHeader";
 
 type ChessMode = {
   title: string;
@@ -55,17 +55,11 @@ export default function ChessMenu() {
       </div>
 
       <div className="relative flex min-h-[var(--app-height)] w-full flex-col">
-        <nav className="flex min-h-20 w-full flex-wrap items-center justify-between gap-2 border-b border-white/[0.07] px-3 py-2 sm:px-10 lg:px-14 xl:px-20">
-          <div className="inline-flex items-center gap-3">
-            <PlutoHomeLink className="mr-2" />
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-amber-300/20 bg-amber-300/10 text-lg text-amber-300">
-              ♛
-            </span>
-            <span className="font-serif text-sm tracking-[0.28em] text-zinc-200">{ui("CHESS")}</span>
-          </div>
+        <ChessPageHeader className="chess-menu-header">
 
-          <NavigationControls />
-        </nav>
+
+
+        </ChessPageHeader>
 
         <section className="grid min-h-0 flex-1 lg:grid-cols-[minmax(360px,.88fr)_minmax(600px,1.12fr)]">
           <header className="relative flex min-h-[430px] flex-col justify-center px-7 py-14 sm:px-10 lg:min-h-0 lg:px-14 lg:py-16 xl:px-20 2xl:px-24">

@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
 import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
@@ -1671,50 +1672,15 @@ export default function PortalChessBoard({
           max-w-[1600px]
         "
       >
-        <header
-          className="
+        <ChessPageHeader className="
             mb-5
             flex
             flex-wrap
             items-center
             justify-between
             gap-3
-          "
-        >
-          <div>
-            <p
-              className="
-                text-xs
-                font-black
-                uppercase
-                tracking-[0.25em]
-                text-violet-300
-              "
-            >
-              {t("Chess Variant")}
-            </p>
+          " description={<> {t("Invisible chaos on ranks 4 and 5")} </>}>
 
-            <h1
-              className="
-                mt-1
-                text-2xl
-                font-black
-                text-white
-              "
-            >
-              🌀 {t("Portal Chess")}
-            </h1>
-
-            <p
-              className="
-                mt-1
-                text-sm
-                text-zinc-500
-              "
-            >
-              {t("Invisible chaos on ranks 4 and 5")}
-            </p>
-          </div>
 
           <div
             className="
@@ -1781,7 +1747,7 @@ export default function PortalChessBoard({
               </select>
             </label>
           </div>
-        </header>
+        </ChessPageHeader>
 
         <div
           className="

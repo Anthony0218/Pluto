@@ -11,7 +11,6 @@ import PlayWithFriends from "@/components/App/dashboard/PlayWithFriends";
 import DidYouKnowCarousel from "@/components/App/dashboard/DidYouKnowCarousel";
 import ProgressCard from "@/components/App/dashboard/ProgressCard";
 import DailyChallengeCard from "@/components/App/dashboard/DailyChallengeCard";
-import FriendsOnline from "@/components/App/dashboard/FriendsOnline";
 import DashboardQuickLinks from "@/components/App/dashboard/DashboardQuickLinks";
 import LearnSomethingNew from "@/components/App/dashboard/LearnSomethingNew";
 import DashboardFriendDialog from "@/components/App/dashboard/DashboardFriendDialog";
@@ -25,7 +24,7 @@ export default function DashboardPage() {
 function Dashboard() {
   useUiLanguage();
   const { user, profile, loading: authLoading } = useAuth();
-  const { activity, friends, onlineIds, notifications, loading, activityError, friendsError } = useDashboardData();
+  const { activity, friends, onlineIds, loading, activityError, friendsError } = useDashboardData();
   const [friendDialog, setFriendDialog] = useState<{ id: string; view: "actions" | "chat" | "profile" } | null>(null);
   const [now, setNow] = useState(Date.now);
   useEffect(() => {
@@ -34,12 +33,10 @@ function Dashboard() {
   }, []);
 
   const friend = friends.find((item) => item.id === friendDialog?.id);
-  const online = friends.filter((item) => onlineIds.includes(item.id));
   const searchTarget = typeof document === "undefined" ? null : document.getElementById("dashboard-search-slot");
   const sidebar = <>
-    <PlayWithFriends friends={friends} onlineIds={onlineIds} notifications={notifications} userId={user?.id} loading={loading} unavailable={friendsError} signedIn={!!user} onFriendSelect={id => setFriendDialog({ id, view: "actions" })} />
+    <PlayWithFriends friends={friends} onlineIds={onlineIds} loading={loading} unavailable={friendsError} signedIn={!!user} onFriendSelect={id => setFriendDialog({ id, view: "actions" })} />
     <DidYouKnowCarousel />
-    <FriendsOnline friends={online} loading={loading} unavailable={friendsError} signedIn={!!user} onFriendSelect={id => setFriendDialog({ id, view: "actions" })} />
     <DashboardQuickLinks />
   </>;
 

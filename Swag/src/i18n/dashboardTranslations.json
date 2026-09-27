@@ -98,7 +98,16 @@
     "Open the variant collection and discover a new way to play.": "Öffne die Variantensammlung und entdecke eine neue Spielweise.",
     "Explore variants": "Varianten entdecken",
     "Send a game room invitation through your friend chat today.": "Sende heute über den Freundeschat eine Einladung zu einem Spielraum.",
-    "Choose a friend": "Freund auswählen"
+    "Choose a friend": "Freund auswählen",
+    "Explore Variants": "Varianten entdecken",
+    "Variant Explorer": "Varianten-Explorer",
+    "Close explorer": "Explorer schlie?en",
+    "Filter variants": "Varianten filtern",
+    "variants": "Varianten",
+    "In progress": "In Entwicklung",
+    "Ready to play": "Spielbereit",
+    "Chess Classic": "Schachklassik",
+    "Chess Puzzle": "Schachaufgabe"
   },
   "bar": {},
   "ko": {
@@ -200,7 +209,16 @@
     "Open the variant collection and discover a new way to play.": "변형 모음을 열어 새로운 플레이 방식을 발견하세요.",
     "Explore variants": "변형 탐색",
     "Send a game room invitation through your friend chat today.": "오늘 친구 채팅으로 게임방 초대를 보내세요.",
-    "Choose a friend": "친구 선택"
+    "Choose a friend": "친구 선택",
+    "Explore Variants": "?? ??",
+    "Variant Explorer": "?? ???",
+    "Close explorer": "??? ??",
+    "Filter variants": "?? ??",
+    "variants": "??",
+    "In progress": "?? ?",
+    "Ready to play": "??? ??",
+    "Chess Classic": "??? ??",
+    "Chess Puzzle": "?? ??"
   },
   "ru": {
     "HOME": "ГЛАВНАЯ",
@@ -301,6 +319,15 @@
     "Open the variant collection and discover a new way to play.": "Откройте коллекцию вариантов и найдите новый способ игры.",
     "Explore variants": "Изучить варианты",
     "Send a game room invitation through your friend chat today.": "Отправьте сегодня приглашение в игровую комнату через чат с другом.",
-    "Choose a friend": "Выбрать друга"
+    "Choose a friend": "Выбрать друга",
+    "Explore Variants": "??????? ????????",
+    "Variant Explorer": "????? ?????????",
+    "Close explorer": "??????? ?????",
+    "Filter variants": "?????? ?????????",
+    "variants": "?????????",
+    "In progress": "? ??????????",
+    "Ready to play": "?????? ? ????",
+    "Chess Classic": "???????????? ???????",
+    "Chess Puzzle": "????????? ??????"
   }
 }

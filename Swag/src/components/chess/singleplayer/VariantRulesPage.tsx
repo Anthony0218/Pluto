@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { Link } from "react-router-dom";
 import type { ReactNode } from "react";
@@ -95,8 +96,7 @@ export default function VariantRulesPage({
   return (
     <main className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1100px]">
-        <header
-          className={`
+        <ChessPageHeader className={`
             mb-6
             rounded-3xl
             border
@@ -107,8 +107,7 @@ export default function VariantRulesPage({
             shadow-xl
             shadow-black/20
             backdrop-blur-md
-          `}
-        >
+          `} description={<> {ui(subtitle)} </>}>
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4">
               <div
@@ -181,7 +180,7 @@ export default function VariantRulesPage({
               </Link>
             </div>
           </div>
-        </header>
+        </ChessPageHeader>
 
         <section
           className={`

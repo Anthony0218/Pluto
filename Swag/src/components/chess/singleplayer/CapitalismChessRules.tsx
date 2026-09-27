@@ -1,3 +1,4 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
 
@@ -200,7 +201,7 @@ export default function CapitalismChessRules() {
   return (
     <div className="min-h-screen  bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-5xl">
-        <header className="mb-6 rounded-3xl border border-amber-400/15 bg-zinc-900/75 p-6 shadow-xl shadow-black/20">
+        <ChessPageHeader className="mb-6 rounded-3xl border border-amber-400/15 bg-zinc-900/75 p-6 shadow-xl shadow-black/20" description={<> {t("Economy, contracts, shopping and survival rules")} </>}>
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.25em] text-amber-400">{ui("Chess Variant III")}</p>
@@ -233,7 +234,7 @@ export default function CapitalismChessRules() {
               </select>
             </div>
           </div>
-        </header>
+        </ChessPageHeader>
 
         <RuleSection number="0" title={t("Core Goal")} accent="amber">
           <RuleParagraph>
