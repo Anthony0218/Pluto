@@ -317,7 +317,7 @@ export function HotPotatoMultiplayerLobby() {
   }
 
   return (
-    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-8 text-zinc-100">
+    <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-8 text-zinc-100">
       <div className="mx-auto max-w-3xl rounded-[32px] border border-orange-400/15 bg-zinc-900/80 p-6 shadow-2xl">
         <div className="flex items-center gap-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-orange-400/20 bg-orange-400/10 text-3xl">
@@ -948,7 +948,7 @@ export function HotPotatoMultiplayerGame() {
 
   if (!room || !gameState || !state || !me) {
     return (
-      <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent p-8 text-zinc-100">
+      <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent p-8 text-zinc-100">
         <div className="mx-auto max-w-xl rounded-3xl border border-white/10 bg-zinc-900 p-6">
           <p className="font-black">{ui("Loading Hot Potato room…")}</p>
           {error && <p className="mt-3 text-sm text-red-300">{ui(error)}</p>}
@@ -974,7 +974,7 @@ export function HotPotatoMultiplayerGame() {
       : Boolean(gameState.white_rematch_ready);
 
   return (
-    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
+    <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1460px]">
         <header className="mb-6 flex flex-col gap-4 rounded-3xl border border-orange-400/10 bg-zinc-900/70 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">

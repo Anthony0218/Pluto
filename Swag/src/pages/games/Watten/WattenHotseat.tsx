@@ -3,6 +3,9 @@ import "./wattenMenus.css";
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { WattenVariant, WattenPlayerInfo } from "../../../utils/types";
+import { useAuth } from "@/context/AuthContext";
+import { ProfileAvatar } from "@/components/social/ProfileAvatarPicker";
+import { useFitWattenScreen } from "@/games/watten/useFitWattenScreen";
 import {
   setStoredWattenLanguage,
   translateWatten,
@@ -11,6 +14,9 @@ import {
 } from "@/games/watten/i18n/wattenLanguage";
 
 export default function WattenHotseat() {
+  useFitWattenScreen();
+  const { profile } = useAuth();
+  const avatarId = (profile as { avatar_id?: string | null } | null)?.avatar_id ?? "m1";
   const navigate = useNavigate();
   const { language, setLanguage } = useAppLanguage();
   const t = useCallback(
@@ -58,7 +64,7 @@ export default function WattenHotseat() {
   }
 
   return (
-    <main className="watten-menu min-h-screen px-4 py-10 text-white">
+    <main className="watten-menu watten-menu--screen px-4 py-10 text-white">
       <div className="mx-auto max-w-2xl">
         <div className="watten-menu__panel rounded-3xl border border-white/10 bg-zinc-950/90 p-8 shadow-2xl">
           <div className="flex items-start justify-between gap-4">
@@ -150,6 +156,7 @@ export default function WattenHotseat() {
                     }`}
                   >
                     {/* PLAYER NUMBER */}
+                    {index === 0 && <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full border border-amber-300/40" title={t("Host")}><ProfileAvatar avatarId={avatarId} className="h-full w-full" /></div>}
                     <div
                       className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-black ${
                         isTeamA

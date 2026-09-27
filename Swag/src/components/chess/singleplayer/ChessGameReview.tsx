@@ -4,6 +4,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Chess, type Color, type PieceSymbol, type Square } from "chess.js";
 
 import Board from "./Board";
+import QualityBadge from "./ReviewQualityBadge";
+import { qualityList } from "./reviewQualities";
 
 import { useStockfishAnalysis } from "@/hooks/useStockfishAnalysis";
 
@@ -153,15 +155,6 @@ const qualitySortOrder: Record<MoveQuality, number> = {
   Mistake: 4,
   Blunder: 5,
 };
-
-const qualityList: MoveQuality[] = [
-  "Best",
-  "Excellent",
-  "Good",
-  "Inaccuracy",
-  "Mistake",
-  "Blunder",
-];
 
 const phaseList: GamePhase[] = ["Opening", "Middlegame", "Endgame"];
 
@@ -1141,7 +1134,7 @@ export default function ChessGameReview({
         fixed
         inset-x-0
         bottom-0
-        top-16
+        top-[var(--public-header-height)]
         z-[100]
         flex
         items-center
@@ -1155,7 +1148,7 @@ export default function ChessGameReview({
       <div
         className="
           flex
-          h-[calc(100vh-5rem)]
+          h-[calc(var(--app-height)-1rem)]
           w-full
           max-w-[1980px]
           flex-col
@@ -2641,25 +2634,5 @@ function SideBadge({ color }: { color: "w" | "b" }) {
     <span className="inline-flex items-center gap-1 rounded-full bg-[#fff3d5]/10 px-2 py-1 text-[9px] font-black text-[#fff3d5]">{ui("♔ White")}</span>
   ) : (
     <span className="inline-flex items-center gap-1 rounded-full bg-white/5 px-2 py-1 text-[9px] font-black text-zinc-300">{ui("♚ Black")}</span>
-  );
-}
-
-function QualityBadge({ quality }: { quality: MoveQuality }) {
-  useUiLanguage();
-  const styles: Record<MoveQuality, string> = {
-    Best: "bg-emerald-500/15 text-emerald-300",
-    Excellent: "bg-cyan-500/15 text-cyan-300",
-    Good: "bg-blue-500/15 text-blue-300",
-    Inaccuracy: "bg-yellow-500/15 text-yellow-300",
-    Mistake: "bg-orange-500/15 text-orange-300",
-    Blunder: "bg-red-500/15 text-red-300",
-  };
-
-  return (
-    <span
-      className={`inline-flex rounded-full px-2 py-1 text-[8px] font-black uppercase ${styles[quality]}`}
-    >
-      {quality}
-    </span>
   );
 }

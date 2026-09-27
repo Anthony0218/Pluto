@@ -2,7 +2,7 @@ import { games } from "./games.ts";
 
 export const defaultFavoriteRoutes = ["/games/chess", "/games/watten", "/games/schafkopf"];
 export const featuredGames = defaultFavoriteRoutes.flatMap(route => games.filter(game => game.route === route));
-export const favoriteLimit = 6;
+export const favoriteLimit = 8;
 export type ChallengeCategory = "puzzle" | "learning" | "play" | "win" | "explore" | "social" | "variant";
 export type DailyChallenge = {
   id?: string; category?: ChallengeCategory; title: string; description: string;

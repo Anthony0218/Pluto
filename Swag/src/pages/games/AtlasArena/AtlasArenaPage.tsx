@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Check, ChevronRight, Clock3, Flag, Globe2, Info, Map, MapPin, RotateCcw, Sparkles, Swords, Trophy, X, Zap } from "lucide-react";
+import { ArrowLeft, Check, ChevronRight, Clock3, Globe2, Info, Map, MapPin, RotateCcw, Swords, Trophy, X, Zap } from "lucide-react";
 import { AtlasWorldMap } from "../../../components/atlas/AtlasWorldMap";
 import { DIFFICULTY_RULES } from "../../../games/atlas/config";
 import { entitiesForScope, generateQuestions, validateAnswer } from "../../../games/atlas/engine";
@@ -20,10 +20,6 @@ const modeDetails = [
   { id: "speed_run" as const, title: "Speed Run", description: "Answer as many mixed questions as you can in 60 seconds.", icon: Zap, accent: "amber" },
   { id: "map_fill" as const, title: "Map Fill", description: "Fill every country in a region with no labels to guide you.", icon: Map, accent: "violet" },
 ];
-const multiplayerModes = [
-  ["Map Battle", "Race an opponent to the same target.", Swords], ["Closest Wins", "Place the nearest pin on Earth.", MapPin],
-  ["Higher or Lower", "Compare live sourced statistics.", Sparkles], ["Territory Battle", "Capture a 20-round world board.", Flag],
-] as const;
 const scopes = ["World", "Europe", "Asia", "Africa", "North America", "South America", "Oceania"];
 
 type Screen = "landing" | "setup" | "playing" | "result" | "about";
@@ -153,10 +149,6 @@ export default function AtlasArenaPage() {
 
 function AtlasHome({ onSolo, onAbout }: { onSolo: (mode: AtlasMode) => void; onAbout: () => void }) {
   return <main className="atlas-page atlas-home-page"><section className="atlas-home-intro"><div className="atlas-orbit"><Globe2 /></div><span className="atlas-eyebrow">Pluto geography laboratory</span><h1>Atlas <em>Arena</em></h1><p>A controlled, data-backed way to learn the world. Pick a protocol to begin.</p></section><section className="atlas-home-protocols" aria-label="Choose Atlas play mode"><button type="button" className="atlas-protocol-card is-solo" onClick={() => onSolo("map_click")}><MapPin /><span className="atlas-eyebrow">Protocol 01 · individual</span><strong>Singleplayer</strong><small>Run map, flag and fact expeditions at your own pace.</small><i>Begin solo analysis <ChevronRight /></i></button><Link className="atlas-protocol-card is-multi" to="/games/atlas-arena/multiplayer"><Swords /><span className="atlas-eyebrow">Protocol 02 · live sync</span><strong>Multiplayer</strong><small>Challenge a friend in synchronized, server-verified rounds.</small><i>Enter live arena <ChevronRight /></i></Link></section><div className="atlas-home-footer"><button type="button" onClick={onAbout}><Info size={15} /> Dataset & method</button><Link to="/games"><ArrowLeft size={15} /> Back to Pluto</Link><span>Natural Earth · UN · GeoNames · World Bank</span></div></main>;
-}
-
-function Landing({ onSolo, onAbout }: { onSolo: (mode: AtlasMode) => void; onAbout: () => void }) {
-  return <main className="atlas-page"><section className="atlas-hero"><div className="atlas-orbit"><Globe2 /></div><span className="atlas-eyebrow">Pluto presents</span><h1>Atlas <em>Arena</em></h1><p>Learn the world by playing it. Race across borders, capitals, flags and facts on a living global board.</p><div className="atlas-hero-actions"><button type="button" onClick={() => onSolo("map_click")}>Start exploring <ChevronRight /></button><button type="button" className="atlas-secondary" onClick={onAbout}><Info /> Data sources</button></div></section><section className="atlas-mode-section"><div className="atlas-section-title"><div><span className="atlas-eyebrow">Solo expeditions</span><h2>Choose your challenge</h2></div><span>10 knowledge categories</span></div><div className="atlas-card-grid">{modeDetails.map(({ id, title, description, icon: Icon, accent }) => <button type="button" key={id} className={`atlas-mode-card atlas-accent-${accent}`} onClick={() => onSolo(id)}><span className="atlas-mode-icon"><Icon /></span><span><strong>{title}</strong><small>{description}</small></span><ChevronRight /></button>)}</div></section><section className="atlas-mode-section"><div className="atlas-section-title"><div><span className="atlas-eyebrow">Live duels</span><h2>Multiplayer arenas</h2></div><span className="atlas-live"><i /> Supabase realtime</span></div><div className="atlas-multiplayer-grid">{multiplayerModes.map(([title, description, Icon]) => <Link to="/games/atlas-arena/multiplayer" key={title} className="atlas-duel-card"><Icon /><strong>{title}</strong><small>{description}</small></Link>)}</div></section><footer className="atlas-footer"><Link to="/games"><ArrowLeft /> Back to Pluto</Link><span>Dataset 2026-09 · Natural Earth / UN / GeoNames / World Bank</span></footer></main>;
 }
 
 function Setup({ mode, difficulty, setDifficulty, selectedCategories, setSelectedCategories, fillScope, setFillScope, onBack, onStart }: { mode: AtlasMode; difficulty: AtlasDifficulty; setDifficulty: (value: AtlasDifficulty) => void; selectedCategories: AtlasCategory[]; setSelectedCategories: (value: AtlasCategory[]) => void; fillScope: string; setFillScope: (value: string) => void; onBack: () => void; onStart: () => void }) {

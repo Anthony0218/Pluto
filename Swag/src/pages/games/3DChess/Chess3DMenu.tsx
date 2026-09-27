@@ -17,7 +17,7 @@ export default function Chess3DMenu() {
   )!;
 
   return (
-    <main className="chess-settings-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-10 text-white sm:px-6">
+    <main className="chess-settings-page min-h-[var(--app-height)] bg-transparent px-4 py-10 text-white sm:px-6">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8">
           <div className="flex items-center gap-4">

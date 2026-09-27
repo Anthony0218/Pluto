@@ -42,7 +42,7 @@ export default function VariantAiSettingsScreen({
   const [difficulty, setDifficulty] = useState<Difficulty>("noob");
 
   return (
-    <main className="chess-settings-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-8 text-zinc-100">
+    <main className="chess-settings-page min-h-[var(--app-height)] bg-transparent px-4 py-8 text-zinc-100">
       <section className="mx-auto max-w-4xl rounded-3xl border border-white/10 bg-zinc-900/75 p-6 shadow-2xl shadow-black/30">
         <div className="flex items-center gap-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-amber-400/20 bg-amber-400/10 text-3xl">

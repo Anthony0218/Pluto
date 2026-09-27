@@ -5,7 +5,7 @@ export default function AppLayout() {
   const { plutoMode } = useTheme();
   return (
     <div
-      className={`relative min-h-[calc(100vh-4rem)] w-full overflow-x-hidden text-zinc-100 ${plutoMode ? "bg-[#060816]" : "bg-zinc-950"}`}
+      className={`relative min-h-[var(--app-height)] w-full overflow-x-clip text-zinc-100 ${plutoMode ? "bg-[#060816]" : "bg-zinc-950"}`}
     >
       {plutoMode && (
         <div
@@ -91,7 +91,7 @@ export default function AppLayout() {
         </div>
       )}
 
-      <div className="relative z-10 mx-auto min-h-[calc(100vh-4rem)] w-full max-w-[1800px]">
+      <div className="relative z-10 mx-auto min-h-[var(--app-height)] w-full max-w-[1800px]">
         <Outlet />
       </div>
     </div>

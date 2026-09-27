@@ -166,7 +166,7 @@ export default function SeededVariantMultiplayerLobby({ variant }: Props) {
   }
 
   return (
-    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
+    <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-5xl">
         <header
           className={`mb-7 rounded-3xl border ${info.accentBorder} bg-zinc-900/70 p-6 shadow-2xl shadow-black/30`}

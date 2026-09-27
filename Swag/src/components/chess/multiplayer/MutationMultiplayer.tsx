@@ -411,7 +411,7 @@ export function MutationMultiplayerLobby() {
   }
 
   return (
-    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
+    <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-5xl">
         <header className="mb-7 rounded-3xl border border-violet-400/15 bg-zinc-900/65 p-6 shadow-2xl shadow-black/30">
           <div className="flex items-center gap-4">
@@ -1113,19 +1113,19 @@ export function MutationMultiplayerGame() {
 
   if (!user) {
     return (
-      <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent p-8 text-zinc-100">{ui("Sign in required.")}</main>
+      <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent p-8 text-zinc-100">{ui("Sign in required.")}</main>
     );
   }
 
   if (loading) {
     return (
-      <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent p-8 text-zinc-400">{ui("Loading Mutation room...")}</main>
+      <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent p-8 text-zinc-400">{ui("Loading Mutation room...")}</main>
     );
   }
 
   if (!room || !gameState) {
     return (
-      <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent p-8 text-zinc-100">
+      <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent p-8 text-zinc-100">
         <p>{ui("Mutation room unavailable.")}</p>
         {error && <ErrorBox>{ui(error)}</ErrorBox>}
       </main>
@@ -1135,7 +1135,7 @@ export function MutationMultiplayerGame() {
   const activeTurnColor = liveGame.turn() === "w" ? "white" : "black";
 
   return (
-    <div className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
+    <div className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1500px]">
         <header className="mb-7 flex flex-col gap-4 rounded-3xl border border-violet-400/10 bg-zinc-900/50 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">

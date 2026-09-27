@@ -1,4 +1,4 @@
-/* Shared chess surfaces start beneath the 64px public header. */
+/* Shared chess surfaces use the space available below the mobile header. */
 .chess-variant-page {
   background: radial-gradient(ellipse at 50% 0%,#f59e0b14,transparent 45%), linear-gradient(180deg,#05080d,#07111b 50%,#020509);
   width: 100%;
@@ -16,7 +16,7 @@
 .chess-sidebar-toggle { display: none; }
 body:has(.chess-game-grid) .chess-sidebar-toggle { display: block; }
 @media (min-width:1280px) {
-  .chess-variant-page:has(.chess-game-grid) { height: calc(100dvh - 4rem); min-height: 0; overflow: hidden; }
+  .chess-variant-page:has(.chess-game-grid) { height: var(--app-height); min-height: 0; overflow: hidden; }
   .chess-variant-page:has(.chess-game-grid) > div { height: 100%; display: flex; flex-direction: column; min-height: 0; }
   .chess-game-grid {
     grid-template-columns: var(--side-width) minmax(0,var(--board-size)) var(--side-width) !important;
@@ -26,11 +26,11 @@ body:has(.chess-game-grid) .chess-sidebar-toggle { display: block; }
   .chess-game-grid > aside { height: 100%; max-height: calc(100dvh - 12rem); overflow-y: auto !important; padding-bottom: 3rem; }
   .chess-game-grid > aside > div { position: static; }
   .chess-game-grid > :not(aside) { min-width: 0; width: 100%; max-width: none; }
-  .chess-menu-page { height: calc(100dvh - 4rem); min-height: 0; }
+  .chess-menu-page { height: var(--app-height); min-height: 0; }
   .chess-menu-page > div.relative { height: 100%; min-height: 0; }
   .chess-menu-page nav { min-height: 64px; flex-shrink: 0; }
   .chess-menu-page > div > section { min-height: 0; }
-  .chess-menu-page.chess-singleplayer-setup { height: calc(100dvh - 4rem); min-height: 0; overflow: hidden; }
+  .chess-menu-page.chess-singleplayer-setup { height: var(--app-height); min-height: 0; overflow: hidden; }
   .chess-menu-page.chess-singleplayer-setup > div.relative { height: 100%; min-height: 0; }
   .chess-menu-page.chess-singleplayer-setup > div > section { min-height: 0; }
 }
@@ -45,16 +45,35 @@ body:has(.chess-game-grid) .chess-sidebar-toggle { display: block; }
   .chess-game-grid > :not(aside) { order: 0; width: min(100%,800px); }
   .chess-game-grid > aside { order: 1; width: min(100%,800px); }
 }
+@media (max-width:639px) {
+  .chess-menu-page { overflow-y: auto; }
+}
 @media (prefers-reduced-motion:reduce) { .chess-game-grid * { scroll-behavior: auto; } }
 @media (min-width:1280px) {
+  .classic-game-page { height: var(--app-height); min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+  .classic-game-page > div.h-full { display: flex; flex-direction: column; min-height: 0; }
+  .classic-game-grid {
+    grid-template-columns: minmax(220px, 280px) minmax(0, var(--board-size)) minmax(220px, 280px) !important;
+    width: min(100%, calc(var(--board-size) + 592px));
+    flex: 1;
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .classic-game-grid > aside { height: 100%; max-height: 100%; overflow-y: auto !important; padding-bottom: 3rem; }
+  .classic-game-grid > aside > div { height: auto; min-height: 0; }
+  .classic-game-grid > aside > div > * { flex-shrink: 0; }
+  .classic-game-grid > aside:first-child { min-height: 0; overflow: hidden !important; padding-bottom: 0; }
+  .classic-game-grid > aside:first-child > div { display: flex; height: 100%; min-height: 0; flex-direction: column; }
+  .classic-game-grid > aside:first-child > div > section:last-child { flex: 1 1 0; min-height: 140px; }
+  .classic-game-grid > aside:first-child > div > section:last-child > div:last-child { min-height: 0; overflow-y: auto; }
+  .classic-game-grid > section, .classic-game-grid > section > div { height: auto; }
+  .classic-game-grid > section { max-height: 100%; overflow-y: auto; scrollbar-width: thin; }
   .classic-game-grid > section > div > section:first-child { padding-block: 6px; }
   .classic-game-grid > section > div > section:first-child h1 { font-size: 22px; line-height: 26px; margin-top: 2px; }
-  .classic-game-grid > section > div > section:first-child > p:last-child { display: none; }
   .chess-animation-control { padding-block: 5px; }
   .chess-animation-control p + p { display: none; }
 }
 @media (min-width:1024px) and (max-width:1279px) {
-  .chess-menu-page { height: calc(100dvh - 4rem); min-height: 0; }
+  .chess-menu-page { height: var(--app-height); min-height: 0; }
   .chess-menu-page > div.relative { height: 100%; min-height: 0; }
   .chess-menu-page nav { min-height: 56px; }
   .chess-menu-page > div > section { grid-template-columns: minmax(0,.8fr) minmax(0,1.2fr); }

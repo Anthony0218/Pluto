@@ -609,7 +609,7 @@ export default function TotalChaosChess({
       : t("The game ended in a draw.");
 
   return (
-    <div className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
+    <div className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1460px]">
         <header className="mb-6 rounded-3xl border border-pink-400/10 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">

@@ -360,7 +360,7 @@ export function HorrorMultiplayerLobby() {
   }
 
   return (
-    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-8 text-zinc-100">
+    <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-8 text-zinc-100">
       <div className="mx-auto max-w-3xl">
         <div className="rounded-[32px] border border-rose-400/15 bg-zinc-900/85 p-6 shadow-2xl shadow-black/30">
           <div className="flex items-center gap-4">
@@ -1137,7 +1137,7 @@ export function HorrorMultiplayerGame() {
 
   if (!room || !gameState || !storedState || !displayedState || !me) {
     return (
-      <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent p-8 text-zinc-100">
+      <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent p-8 text-zinc-100">
         <div className="mx-auto max-w-xl rounded-3xl border border-white/10 bg-zinc-900 p-6">
           <p className="font-black">{ui("Loading Horror room…")}</p>
           {error && <p className="mt-3 text-sm text-red-300">{ui(error)}</p>}
@@ -1170,7 +1170,7 @@ export function HorrorMultiplayerGame() {
       : HOT_SQUARE_INTERVAL_PLIES - fireRemainder;
 
   return (
-    <main className="chess-variant-page min-h-[calc(100dvh-4rem)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
+    <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1460px]">
         <header className="mb-6 flex flex-col gap-4 rounded-3xl border border-rose-400/10 bg-zinc-900/75 px-5 py-4 shadow-xl shadow-black/20 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">

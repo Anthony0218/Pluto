@@ -19,7 +19,7 @@ export default function ShogiRules() {
   const selected = pieces.find((piece) => piece.type === pieceType)!;
 
   return (
-    <main className="relative left-1/2 h-[calc(100dvh-4rem)] w-screen -translate-x-1/2 overflow-hidden bg-[#07090b] px-4 py-4 text-zinc-100 sm:px-7 sm:py-6">
+    <main className="relative left-1/2 h-[var(--app-height)] w-screen -translate-x-1/2 overflow-hidden bg-[#07090b] px-4 py-4 text-zinc-100 sm:px-7 sm:py-6">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_82%_20%,rgba(245,158,11,.11),transparent_30%),linear-gradient(to_bottom,#0b0e11,#050607)]" />
       <div className="relative mx-auto flex h-full max-w-6xl flex-col">
         <header className="flex shrink-0 items-center justify-between gap-4">

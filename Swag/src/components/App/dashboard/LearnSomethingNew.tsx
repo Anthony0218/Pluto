@@ -1,10 +1,17 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, BookOpen, Puzzle, Shuffle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ui, useUiLanguage } from "@/i18n/ui";
-import { learningResources } from "@/data/navigation";
-import { featuredGames } from "@/data/dashboard";
+
+const lessons = [
+  { title: "Chess puzzles", description: "Practice tactics one move at a time.", route: "/games/chess/rules?tab=puzzles", Icon: Puzzle },
+  { title: "Watten rules", description: "Learn the cards, trump and scoring.", route: "/games/watten/rules", Icon: BookOpen },
+  { title: "Chess variants", description: "Explore new ways to play chess.", route: "/games/chess/variants", Icon: Shuffle },
+];
 
 export default function LearnSomethingNew() {
   useUiLanguage();
-  return <section className="dash-panel learn-panel"><div className="dash-section-heading"><div><h2>{ui("Learn something new")}</h2><p>{ui("Small lessons. New perspectives. Your next move.")}</p></div><Link to="/learn" className="dash-text-link">{ui("View all")}<ArrowRight size={14} /></Link></div><div className="learning-row">{learningResources.slice(0, 3).map((resource, index) => <Link key={resource.route} to={resource.route} className="learning-card"><img src={featuredGames[index]?.image} alt="" /><div><h3>{ui(resource.title)}</h3><p>{ui(resource.description)}</p><span className="dash-text-link">{ui("Start learning")}<ArrowRight size={12} /></span></div></Link>)}</div></section>;
+  return <section className="dash-panel learn-panel" aria-labelledby="dashboard-learn-title">
+    <div className="dash-section-heading"><div><h2 id="dashboard-learn-title">{ui("Learn")}</h2><p>{ui("Pick something new to try.")}</p></div><Link to="/learn" className="dash-text-link">{ui("View all")}<ArrowRight size={14} /></Link></div>
+    <div className="dashboard-learning-links">{lessons.map(({ title, description, route, Icon }) => <Link key={route} to={route} className="dashboard-learning-link"><span className="dashboard-learning-icon"><Icon size={19} /></span><span className="min-w-0 flex-1"><strong>{ui(title)}</strong><small>{ui(description)}</small></span><ArrowRight size={15} className="text-indigo-300" /></Link>)}</div>
+  </section>;
 }

@@ -1,5 +1,5 @@
 .watten-menu {
-  min-height: calc(100dvh - 4rem);
+  min-height: var(--app-height);
   position: relative;
   isolation: isolate;
   background:
@@ -7,6 +7,42 @@
     radial-gradient(circle at 90% 72%, rgba(31, 102, 74, .19), transparent 36%),
     repeating-linear-gradient(92deg, #ffffff02 0 1px, transparent 1px 5px),
     linear-gradient(150deg, #20160f, #102e25 55%, #140f0d);
+}
+
+.watten-menu--screen {
+  box-sizing: border-box;
+  height: var(--app-height);
+  min-height: 0;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  align-items: center;
+}
+
+body:has(.watten-menu--screen) { overflow: hidden; }
+
+.watten-menu--screen > div {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(100% - 2rem);
+  max-height: none;
+  overflow: visible;
+  transform: translate(-50%, -50%) scale(var(--watten-fit-scale, 1));
+}
+
+@media (min-width: 768px) and (max-height: 900px) {
+  .watten-menu--screen { padding-block: 10px; }
+  .watten-menu--screen .watten-menu__panel { padding: 18px; }
+  .watten-menu--screen .watten-menu__masthead { height: 78px; margin: -18px -18px 12px; }
+  .watten-menu--screen .watten-menu__hand img { width: 52px; }
+  .watten-menu--screen .watten-menu__seal { width: 45px; height: 45px; font-size: 28px; }
+  .watten-menu--screen .watten-menu__panel :is(.mt-8, .mt-7) { margin-top: 12px; }
+  .watten-menu--screen .watten-menu__panel :is(.mt-6, .mt-5) { margin-top: 10px; }
+  .watten-menu--screen .watten-menu__panel :is(.p-6, .sm\:p-7, .p-5) { padding: 14px; }
+  .watten-menu--screen .watten-menu__panel :is(.space-y-3, .space-y-2) > * + * { margin-top: 5px; }
+  .watten-menu--screen .watten-menu__mode p { line-height: 1.35; }
+  .watten-menu--screen .watten-menu__panel h1 { font-size: 28px; }
 }
 
 .watten-menu::before {
@@ -103,6 +139,22 @@
 .watten-menu--rules h2, .watten-menu--rules h3 { font-family: Georgia, Cambria, serif; }
 
 @media (max-width: 640px) {
+  .watten-menu--screen { padding: 8px; }
+  .watten-menu--screen > div { width: calc(100% - 16px); }
+  .watten-menu--screen .watten-menu__panel { padding: 12px; }
+  .watten-menu--screen .watten-menu__panel h1 { font-size: 24px; }
+  .watten-menu--screen .watten-menu__panel :is(.mt-8, .mt-7, .mt-6, .mt-5) { margin-top: 9px; }
+  .watten-menu--screen .watten-menu__panel :is(.p-8, .p-7, .p-6, .p-5) { padding: 10px; }
+  .watten-menu--screen .watten-menu__panel section > .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+  .watten-menu--screen .watten-menu__panel section > .grid > button p { display: none; }
+  .watten-menu--screen .watten-menu__panel section > .grid > button .mt-4 { margin-top: 4px; }
+  .watten-menu--screen .watten-menu__panel section > .grid > button .text-xl { font-size: 16px; }
+  .watten-menu--screen .watten-menu__panel section > .grid > button .h-9 { width: 25px; height: 25px; }
+  .watten-menu--screen .watten-menu__panel section > .grid > button .rounded-full.border { padding: 3px 5px; font-size: 8px; }
+  .watten-menu--screen .watten-menu__panel > .mt-8.grid { gap: 8px; }
+  .watten-menu--screen .watten-menu__panel > .mt-8.grid > section > p.text-sm { display: none; }
+  .watten-menu--screen .watten-menu__panel > .mt-8.grid > section .h-12 { width: 32px; height: 32px; }
+  .watten-menu--screen .watten-menu__panel > .mt-8.grid h2 { font-size: 19px; }
   .watten-menu__masthead { height: 124px; margin: -1.5rem -1.5rem 1.5rem; padding-inline: 1.75rem; }
   .watten-menu__seal { width: 48px; height: 48px; font-size: 28px; }
   .watten-menu__hand img { width: 60px; }
@@ -122,4 +174,28 @@
 
 @media (prefers-reduced-motion: reduce) {
   .watten-menu__mode:hover { transform: none; }
+}
+
+/* Keep the mode choices readable on phones without scaling a long desktop card. */
+@media (max-width: 640px) {
+  .watten-menu--home .watten-menu__panel { padding: 12px; }
+  .watten-menu--home .watten-menu__masthead { height: 52px; margin: -12px -12px 12px; }
+  .watten-menu--home .watten-menu__seal { width: 30px; height: 30px; font-size: 22px; }
+  .watten-menu--home .watten-menu__hand img { width: 34px; }
+  .watten-menu--home .watten-menu__panel > .flex { gap: 8px; }
+  .watten-menu--home .watten-menu__panel h1 { font-size: 23px; margin-top: 4px; }
+  .watten-menu--home .watten-menu__panel > .flex > div > p.text-sm { display: none; }
+  .watten-menu--home .watten-menu__panel > section { margin-top: 12px; gap: 10px; }
+  .watten-menu--home .watten-menu__mode { display: grid; grid-template-columns: 1fr auto; align-items: center; padding: 12px; border-radius: 16px; }
+  .watten-menu--home .watten-menu__mode > .flex { grid-column: 2; grid-row: 1; gap: 8px; }
+  .watten-menu--home .watten-menu__mode > .flex > div { width: 30px; height: 30px; }
+  .watten-menu--home .watten-menu__mode > p,
+  .watten-menu--home .watten-menu__mode > .space-y-2 { display: none; }
+  .watten-menu--home .watten-menu__mode h2 { grid-column: 1; grid-row: 1; margin: 0; font-size: 22px; }
+  .watten-menu--home .watten-menu__mode > .mt-7 { grid-column: 1 / -1; grid-row: 2; margin-top: 8px; padding: 10px 12px; }
+  .watten-menu--home .watten-menu__panel > a { margin-top: 10px; border-radius: 16px; }
+  .watten-menu--home .watten-menu__panel > a > .relative { display: none; }
+  .watten-menu--home .watten-menu__panel > a > .flex { padding: 10px 12px; }
+  .watten-menu--home .watten-menu__panel > a h2 { font-size: 20px; }
+  .watten-menu--home .watten-menu__panel > a p.text-sm { display: none; }
 }

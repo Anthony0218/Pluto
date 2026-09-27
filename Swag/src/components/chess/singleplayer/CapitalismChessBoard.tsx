@@ -1257,7 +1257,7 @@ export default function CapitalismChessBoard({
   return (
     <div
       className="
-        chess-variant-page min-h-[calc(100dvh-4rem)]
+        chess-variant-page min-h-[var(--app-height)]
         bg-transparent
         px-4
         py-6

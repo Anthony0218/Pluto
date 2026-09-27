@@ -6,7 +6,7 @@ import { ui, useUiLanguage } from "@/i18n/ui";
 export default function LearnPage() {
   useUiLanguage();
   return (
-    <main className="mx-auto min-h-[calc(100vh-4rem)] max-w-6xl px-5 py-10 text-white">
+    <main className="mx-auto min-h-[var(--app-height)] max-w-6xl px-5 py-10 text-white">
       <BookOpen className="text-indigo-300" size={32} />
       <h1 className="mt-4 text-3xl font-bold">{ui("Learn")}</h1>
       <p className="mt-3 text-zinc-400">

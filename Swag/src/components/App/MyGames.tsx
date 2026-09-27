@@ -21,6 +21,7 @@ function FavoriteGames({ userId }: { userId?: string }) {
   const [editing, setEditing] = useState(false);
   const [selector, setSelector] = useState(false);
   const [filter, setFilter] = useState("");
+  const [visibleCount, setVisibleCount] = useState(4);
   const gridRef = useRef<HTMLDivElement>(null);
   const previousPositions = useRef(new Map<string, DOMRect>());
   useLayoutEffect(() => {
@@ -40,7 +41,7 @@ function FavoriteGames({ userId }: { userId?: string }) {
     previousPositions.current = nextPositions;
   }, [draft, editing]);
   const selected = editing ? draft : routes;
-  const visible = editing ? draft : routes;
+  const visible = editing ? draft : routes.slice(0, visibleCount);
   const { dragAndDropHooks } = useDragAndDrop({
     getItems: keys => [...keys].map(key => ({ "text/plain": String(key) })),
     getAllowedDropOperations: () => ["move"],
@@ -56,7 +57,9 @@ function FavoriteGames({ userId }: { userId?: string }) {
     <div className="dash-section-heading">
       <div><h2 id="my-games-title">{ui("My games")}</h2><p>{ui(editing ? "Drag to reorder, or use the arrow buttons. Save when you are ready." : "Your favorites, always one move away.")}</p></div>
       <div className="flex shrink-0 flex-wrap justify-end gap-2">
-        {editing ? <><button className="dash-button" disabled={saving} onClick={() => setEditing(false)}>{ui("Cancel")}</button><button className="dash-button primary" disabled={saving} onClick={() => void commit()}><Check size={15} />{ui(saving ? "Saving..." : "Save")}</button></> : <button className="dash-button primary" disabled={loading} onClick={() => customize()}><Pencil size={14} />{ui("Customize")}</button>}
+        {!editing && visibleCount < favoriteLimit && <button type="button" className="dash-icon-button" aria-label={ui("Show more games")} title={ui("Show more games")} onClick={() => setVisibleCount(Math.min(favoriteLimit, visibleCount + 2))}><Plus size={17} /></button>}
+        {!editing && visibleCount >= favoriteLimit && <button type="button" className="dash-icon-button" aria-label={ui("Show fewer games")} title={ui("Show fewer games")} onClick={() => setVisibleCount(4)}><span aria-hidden="true">−</span></button>}
+        {editing ? <><button className="dash-button" disabled={saving} onClick={() => setEditing(false)}>{ui("Cancel")}</button><button className="dash-button primary" disabled={saving} onClick={() => void commit()}><Check size={15} />{ui(saving ? "Saving..." : "Save")}</button></> : <><Link to="/games" className="dash-button">{ui("All games")}<ArrowRight size={14} /></Link><button className="dash-button primary" disabled={loading} onClick={() => customize()}><Pencil size={14} />{ui("Customize")}</button></>}
       </div>
     </div>
     {error && <p role="alert" className="mb-3 text-sm text-rose-300">{ui(error)}</p>}
@@ -69,7 +72,7 @@ function FavoriteGames({ userId }: { userId?: string }) {
             <div className="favorite-caption"><strong>{ui(game.title)}</strong><small>{ui(game.subtitle)}</small><div className="mt-2 flex gap-1"><Button className="dash-icon-button" isDisabled={saving || draft.indexOf(game.route) === 0} aria-label={ui("Move earlier") + ": " + ui(game.title)} onPress={() => setDraft(reorderFavorites(draft, new Set([game.route]), draft[draft.indexOf(game.route) - 1], "before"))}><ArrowLeft size={14} /></Button><Button className="dash-icon-button" isDisabled={saving || draft.indexOf(game.route) === draft.length - 1} aria-label={ui("Move later") + ": " + ui(game.title)} onPress={() => setDraft(reorderFavorites(draft, new Set([game.route]), draft[draft.indexOf(game.route) + 1], "after"))}><ArrowRight size={14} /></Button></div></div>
           </GridListItem>}
         </GridList> : visible.map(route => { const game = games.find(item => item.route === route)!; return <Link key={route} to={route} className="favorite-card"><img src={game.image} alt="" /><div className="favorite-caption"><strong>{ui(game.title)}</strong><small>{ui(game.subtitle)}</small></div></Link>; })}
-        {Array.from({ length: Math.max(0, favoriteLimit - visible.length) }, (_, index) => <button key={index} className="favorite-card favorite-empty" disabled={saving || selected.length >= favoriteLimit} onClick={() => customize(true)}><span className="favorite-plus"><Plus size={27} /></span><strong>{ui("Add game")}</strong><small>{selected.length} / {favoriteLimit} {ui("selected")}</small></button>)}
+        {selected.length < favoriteLimit && <button className="favorite-card favorite-empty" disabled={saving} onClick={() => customize(true)}><span className="favorite-plus"><Plus size={27} /></span><strong>{ui("Add game")}</strong><small>{selected.length} / {favoriteLimit} {ui("selected")}</small></button>}
       </div>
       {editing && <p className="sr-only" aria-live="polite">{draft.map(route => ui(games.find(game => game.route === route)!.title)).join(", ")}</p>}
     </>}

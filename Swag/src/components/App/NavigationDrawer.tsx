@@ -32,7 +32,7 @@ export default function NavigationDrawer({ onClose }: { onClose: () => void }) {
           autoFocus
           onClick={onClose}
           aria-label={ui("Close navigation")}
-          className="absolute left-3 top-5 z-10 rounded-lg p-2 text-zinc-300 hover:bg-white/10"
+          className="absolute right-3 top-5 z-10 rounded-lg p-2 text-zinc-300 hover:bg-white/10"
         >
           <X size={20} />
         </button>

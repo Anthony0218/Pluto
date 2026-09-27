@@ -72,7 +72,7 @@ export default function Auth() {
         <div className="absolute bottom-[-15%] right-[-10%] h-[460px] w-[460px] rounded-full bg-amber-300/[0.06] blur-3xl" />
       </div>
 
-      <div className="relative mx-auto flex min-h-[calc(100vh-4rem)] max-w-6xl items-center justify-center">
+      <div className="relative mx-auto flex min-h-[var(--app-height)] max-w-6xl items-center justify-center">
         <div className="grid w-full overflow-hidden rounded-[32px] border border-white/10 bg-zinc-900/75 shadow-2xl shadow-black/40 backdrop-blur-xl lg:grid-cols-[1.1fr_0.9fr]">
           <section className="relative hidden min-h-[680px] overflow-hidden border-r border-white/10 p-10 lg:block">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(52,211,153,0.12),transparent_34%),radial-gradient(circle_at_80%_75%,rgba(251,191,36,0.08),transparent_28%)]" />

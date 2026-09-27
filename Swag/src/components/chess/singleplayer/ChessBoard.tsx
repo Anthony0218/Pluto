@@ -652,43 +652,6 @@ const pieceValues: Record<string, number> = {
   k: 0,
 };
 
-const pieceValueList = [
-  {
-    type: "p",
-    symbol: "♙",
-    name: "Pawn",
-  },
-
-  {
-    type: "n",
-    symbol: "♘",
-    name: "Knight",
-  },
-
-  {
-    type: "b",
-    symbol: "♗",
-    name: "Bishop",
-  },
-
-  {
-    type: "r",
-    symbol: "♖",
-    name: "Rook",
-  },
-
-  {
-    type: "q",
-    symbol: "♕",
-    name: "Queen",
-  },
-
-  {
-    type: "k",
-    symbol: "♔",
-    name: "King",
-  },
-];
 
 /* =========================================================
    COMPONENT
@@ -804,7 +767,6 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
    * is shown and Stockfish can grade moves / suggest best moves.
    */
   const [coachModeEnabled, setCoachModeEnabled] = useState(false);
-  const [pieceValuesOpen, setPieceValuesOpen] = useState(false);
   const [savedGamesOpen, setSavedGamesOpen] = useState(false);
 
   /*
@@ -2015,7 +1977,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
       className="
         relative
         left-1/2
-        min-h-[calc(100dvh-4rem)]
+        classic-game-page min-h-[var(--app-height)]
         w-screen
         -translate-x-1/2
         overflow-x-hidden
@@ -2026,9 +1988,6 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
         text-zinc-100
         sm:px-6
         lg:px-6
-        xl:h-[calc(100dvh-4rem)]
-        xl:min-h-0
-        xl:overflow-hidden
       "
     >
       <div className="h-full w-full max-w-none">
@@ -2148,8 +2107,6 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
           className="
             grid
             gap-4
-            xl:h-[calc(100%-2.75rem)]
-            xl:min-h-0
             chess-game-grid classic-game-grid xl:grid-cols-[minmax(260px,19vw)_minmax(0,1fr)_minmax(260px,19vw)]
           "
         >
@@ -2157,7 +2114,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
               LEFT SIDEBAR
              =============================================== */}
 
-          <aside className="order-4 min-w-0 xl:order-1 xl:h-full xl:min-h-0 xl:overflow-hidden xl:pr-1">
+          <aside className="order-4 min-w-0 xl:order-1 xl:pr-1">
             <div className="flex h-full min-h-0 flex-col gap-3">
               {/* ===========================================
                   CHESS COACH — LEFT SIDEBAR TOP
@@ -2549,7 +2506,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
                 {savedGamesOpen && (
                   <div className="border-t border-white/5">
-                    <div className="max-h-44 space-y-1 overflow-y-auto p-2 [scrollbar-width:thin]">
+                    <div className="max-h-80 space-y-1 overflow-y-auto p-2 [scrollbar-width:thin]">
                       {savedGames.length === 0 ? (
                         <div className="py-6 text-center">
                           <div className="mb-2 text-2xl text-zinc-700">♟</div>
@@ -2654,53 +2611,6 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                   />
                 </div>
               </section>
-
-              <section className="order-2 overflow-hidden rounded-3xl border border-amber-400/15 bg-[#091019]/90 shadow-2xl shadow-black/30 backdrop-blur-xl">
-                <button
-                  type="button"
-                  onClick={() => setPieceValuesOpen((open) => !open)}
-                  className="flex w-full items-center justify-between px-4 py-4 text-left transition hover:bg-white/[0.03]"
-                >
-                  <div>
-                    <h2 className="font-serif text-lg font-semibold text-[#f6ead1]">
-                      {t("Piece Values")}
-                    </h2>
-                    <p className="mt-0.5 text-[10px] uppercase tracking-[0.2em] text-zinc-600">
-                      {t("Standard values")}
-                    </p>
-                  </div>
-                  <span className="rounded-lg border border-amber-400/20 bg-amber-400/10 px-3 py-1.5 text-xs font-black text-amber-300">
-                    {pieceValuesOpen ? ui("Hide") : ui("Show")}
-                  </span>
-                </button>
-                {pieceValuesOpen && (
-                  <div className="max-h-52 overflow-y-auto border-t border-white/5 p-3 [scrollbar-width:thin]">
-                    <div className="space-y-1">
-                      {pieceValueList.map((piece) => (
-                        <div
-                          key={piece.type}
-                          className="flex items-center justify-between rounded-xl px-2 py-2 hover:bg-white/[0.04]"
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="text-2xl text-[#f8e7c0]">
-                              {piece.symbol}
-                            </span>
-                            <span className="text-sm text-zinc-400">
-                              {t(piece.name)}
-                            </span>
-                          </div>
-                          <span className="text-sm font-black text-zinc-200">
-                            {pieceValues[piece.type]}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="mt-3 rounded-xl bg-black/20 px-3 py-2 text-right text-xs font-bold text-zinc-400">
-                      {materialDifference === 0 ? t("Equal") : materialDifference > 0 ? `${t("White")} +${materialDifference}` : `${t("Black")} +${Math.abs(materialDifference)}`}
-                    </div>
-                  </div>
-                )}
-              </section>
               {/* MOVE HISTORY */}
               <section className="order-4 flex min-h-[140px] flex-1 flex-col overflow-hidden rounded-3xl border border-amber-400/15 bg-[#091019]/90 shadow-2xl shadow-black/30 backdrop-blur-xl">
                 <div className="flex items-center justify-between border-b border-white/5 px-4 py-3">
@@ -2763,8 +2673,8 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
               CENTER
              =============================================== */}
 
-          <section className="order-1 min-w-0 xl:order-2 xl:h-full xl:min-h-0">
-            <div className="mx-auto w-full max-w-[820px] xl:flex xl:h-full xl:min-h-0 xl:max-w-none xl:flex-col">
+          <section className="order-1 min-w-0 xl:order-2">
+            <div className="mx-auto w-full max-w-[820px] xl:flex xl:max-w-none xl:flex-col">
               <section className="mb-2 shrink-0 rounded-2xl border border-amber-400/30 bg-[#08111c]/90 px-4 py-2.5 text-center shadow-[0_0_40px_rgba(245,158,11,0.08)] backdrop-blur-xl">
                 <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-400">
                   {t("Classic Chess")}
@@ -3137,146 +3047,6 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
               {/* ===========================================
                   PIECE VALUES
                  =========================================== */}
-
-              <section className="hidden">
-                <div className="mb-4 flex items-start justify-between">
-                  <div>
-                    <h2 className="text-sm font-bold text-zinc-100">
-                      {t("Piece Values")}
-                    </h2>
-
-                    <p className="mt-1 text-xs text-zinc-500">
-                      {t("Standard values")}
-                    </p>
-                  </div>
-
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">{ui("Material")}</span>
-                </div>
-
-                <div className="space-y-1">
-                  {pieceValueList.map((piece) => (
-                    <div
-                      key={piece.type}
-                      className="
-                          flex
-                          items-center
-                          justify-between
-                          rounded-xl
-                          px-3
-                          py-2
-                          transition
-                          hover:bg-white/5
-                        "
-                    >
-                      <div className="flex items-center gap-3">
-                        <span
-                          className="
-                              flex
-                              h-8
-                              w-8
-                              items-center
-                              justify-center
-                              text-2xl
-                              text-[#fff3d5]
-                              [text-shadow:0_2px_3px_rgba(0,0,0,0.6)]
-                            "
-                        >
-                          {piece.symbol}
-                        </span>
-
-                        <span className="text-sm text-zinc-300">
-                          {t(piece.name)}
-                        </span>
-                      </div>
-
-                      <span
-                        className="
-                            rounded-lg
-                            border
-                            border-white/5
-                            bg-black/20
-                            px-2.5
-                            py-1
-                            text-xs
-                            font-bold
-                            text-amber-200
-                          "
-                      >
-                        {pieceValues[piece.type]}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* ADVANTAGE */}
-
-                <div className="mt-4 border-t border-white/5 pt-4">
-                  <div
-                    className="
-                      flex
-                      items-center
-                      justify-between
-                      rounded-2xl
-                      border
-                      border-white/5
-                      bg-black/20
-                      px-3
-                      py-3
-                    "
-                  >
-                    <span className="text-sm text-zinc-500">
-                      {t("Advantage")}
-                    </span>
-
-                    <span
-                      className={`
-                        text-sm
-                        font-bold
-
-                        ${
-                          materialDifference > 0
-                            ? "text-amber-200"
-                            : materialDifference < 0
-                              ? "text-zinc-300"
-                              : "text-zinc-500"
-                        }
-                      `}
-                    >
-                      {materialDifference > 0 &&
-                        `${t("White")} +${materialDifference}`}
-
-                      {materialDifference < 0 &&
-                        `${t("Black")} +${Math.abs(materialDifference)}`}
-
-                      {materialDifference === 0 && t("Equal")}
-                    </span>
-                  </div>
-                </div>
-
-                {/* CHECK COUNTERS */}
-
-                <div className="mt-3 grid grid-cols-2 gap-2">
-                  <div className="rounded-xl bg-black/20 px-3 py-2">
-                    <p className="text-[10px] uppercase tracking-wider text-zinc-600">
-                      {t("White in check")}
-                    </p>
-
-                    <p className="mt-1 font-bold text-zinc-300">
-                      {whiteCheckCounter}
-                    </p>
-                  </div>
-
-                  <div className="rounded-xl bg-black/20 px-3 py-2">
-                    <p className="text-[10px] uppercase tracking-wider text-zinc-600">
-                      {t("Black in check")}
-                    </p>
-
-                    <p className="mt-1 font-bold text-zinc-300">
-                      {blackCheckCounter}
-                    </p>
-                  </div>
-                </div>
-              </section>
             </div>
           </aside>
         </main>

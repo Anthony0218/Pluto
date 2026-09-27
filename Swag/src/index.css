@@ -9,6 +9,39 @@
   box-sizing: border-box;
 }
 
+:root {
+  --public-header-height: 4rem;
+  --app-height: calc(100dvh - var(--public-header-height));
+}
+@media (max-width: 639px) {
+  .app-shell:not(.integrated-navigation) { --public-header-height: 7rem; }
+  .app-shell:has(.dashboard-page) { --public-header-height: 9rem; }
+}
+html:has(.app-shell), body:has(.app-shell) {
+  height: 100%;
+  overflow: hidden;
+}
+.app-shell { height: 100dvh; overflow: hidden; padding-top: var(--public-header-height); }
+.app-shell.integrated-navigation { --public-header-height: 0px; --app-height: 100dvh; padding-top: 0; }
+#app-navigation[open] { animation: navigation-enter .25s ease-out both; }
+@keyframes navigation-enter { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@media (prefers-reduced-motion: reduce) { #app-navigation[open] { animation: none; } }
+.app-viewport { height: var(--app-height); min-height: 0; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+.app-viewport .min-h-screen { min-height: var(--app-height); }
+.app-viewport .h-screen { height: var(--app-height); }
+@media (max-width: 639px) {
+  .public-header-language label > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+}
+
 html,
 body,
 #root {

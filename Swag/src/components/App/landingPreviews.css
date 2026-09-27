@@ -1,7 +1,7 @@
 .learning-preview__stage {
   display: grid;
   align-items: center;
-  min-height: 400px;
+  min-height: 660px;
 }
 
 .learning-preview__cards { display: flex; justify-content: center; padding: 22px 0 12px; }
@@ -12,10 +12,14 @@
 .landing-preview :is(button, a):focus-visible { outline: 2px solid #fcd34d; outline-offset: 3px; }
 .landing-preview button:disabled { cursor: default; }
 .learning-preview__lesson { animation: lesson-reveal .25s ease-out; }
+.learning-preview--compact .learning-preview__stage { min-height: 330px; }
+.learning-preview--compact .learning-preview__stage .chess-preview-board { max-width: 260px; margin-inline: auto; }
+.learning-preview--compact .learning-preview__lesson:last-child { min-height: 310px; }
 @keyframes lesson-reveal { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 @media (max-width: 639px) {
   .learning-preview__stage { min-height: 520px; }
   .learning-preview__stage .chess-preview-board { max-width: 320px; margin-inline: auto; }
+  .learning-preview--compact .learning-preview__stage { min-height: 520px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .learning-preview__lesson { animation: none; }

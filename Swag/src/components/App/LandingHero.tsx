@@ -1,16 +1,12 @@
 import { ui, useUiLanguage } from "@/i18n/ui";
-import { ArrowRight, BookOpen, Gamepad2, TrendingUp } from "lucide-react";
+import { ArrowRight, BookOpen, Check, Gamepad2, TrendingUp, UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
-
-const heroGames = [
-  { title: "Chess", subtitle: "Classic modes", route: "/games/chess/classic", icon: "♟", image: "/images/chess-game-icon.png", accent: "sky" },
-  { title: "Watten", subtitle: "Choose a table", route: "/games/watten", icon: "♦", image: "/images/watten-game-icon.png", accent: "rose" },
-  { title: "Schafkopfen", subtitle: "Bavarian cards", route: "/games/schafkopf", icon: "♣", image: "/images/watten-game-icon.png", accent: "emerald" },
-  { title: "Chess Variants", subtitle: "New rules, new tactics", route: "/games/chess/variants", icon: "♞", image: "/images/chess-variant.png", accent: "amber", variant: true },
-] as const;
+import { useAuth } from "@/context/AuthContext";
+import QuickNavigation from "./QuickNavigation";
 
 export default function LandingHero() {
   useUiLanguage();
+  const { user } = useAuth();
   return (
     <section
       className="
@@ -62,7 +58,7 @@ export default function LandingHero() {
           relative
           mx-auto
           grid
-          min-h-[680px]
+          min-h-[520px]
           max-w-[1500px]
           items-center
           gap-16
@@ -72,12 +68,11 @@ export default function LandingHero() {
 
           sm:px-8
 
-          lg:grid-cols-[0.82fr_1.18fr]
+          lg:grid-cols-[minmax(0,1.1fr)_minmax(340px,.9fr)]
           lg:px-10
-          lg:py-28
+          lg:py-20
 
-          xl:min-h-[720px]
-          xl:gap-24
+          xl:min-h-[560px]
         "
       >
         {/* LEFT SIDE */}
@@ -167,32 +162,30 @@ export default function LandingHero() {
           </div>
         </div>
 
-        {/* RIGHT SIDE */}
-        <nav className="grid w-full max-w-[480px] grid-cols-2 gap-3 justify-self-center sm:gap-4" aria-label={ui("Choose a game")}>
-          {heroGames.map((game) => <LandingGameCard key={game.route} {...game} />)}
-        </nav>
+        <section className="relative overflow-hidden rounded-[28px] border border-indigo-300/20 bg-[#10172a]/95 p-6 shadow-2xl shadow-black/30 sm:p-8" aria-label={ui("Your account")}>
+          <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-indigo-500/15 blur-3xl" />
+          <div className="relative flex min-h-[390px] flex-col">
+            <span className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl border border-indigo-300/20 bg-indigo-400/10 text-indigo-200"><UserRound size={24} /></span>
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-indigo-300">{ui("Your space to play")}</p>
+            <h2 className="mt-3 font-serif text-3xl font-semibold leading-tight text-white sm:text-4xl">{ui(user ? "Welcome back." : "Make every game count.")}</h2>
+            <p className="mt-4 max-w-md text-sm leading-6 text-zinc-400">{ui(user ? "Your games, friends and progress are ready on your dashboard." : "Create a free account to keep your favorites, follow your progress and play with friends.")}</p>
+            {user ? <QuickNavigation key={user.id} userId={user.id} /> : <ul className="mt-6 space-y-3 text-sm text-zinc-200">
+              <li className="flex items-center gap-3"><Check size={17} className="shrink-0 text-emerald-300" />{ui("Save your favorite games and progress")}</li>
+              <li className="flex items-center gap-3"><Check size={17} className="shrink-0 text-emerald-300" />{ui("Follow daily challenges")}</li>
+              <li className="flex items-center gap-3"><Check size={17} className="shrink-0 text-emerald-300" />{ui("Connect and play with friends")}</li>
+            </ul>}
+            <div className="mt-auto grid gap-3 pt-8 sm:grid-cols-2">
+              {user ? <Link to="/dashboard" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-indigo-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-400 sm:col-span-2">{ui("Go to dashboard")}<ArrowRight size={16} /></Link> : <>
+                <Link to="/login" className="flex min-h-12 items-center justify-center rounded-xl border border-indigo-300/30 bg-white/[0.06] px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10">{ui("Log in")}</Link>
+                <Link to="/login?mode=register" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-indigo-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-400">{ui("Register")}<ArrowRight size={16} /></Link>
+              </>}
+            </div>
+          </div>
+        </section>
+
       </div>
     </section>
   );
-}
-
-function LandingGameCard({ title, subtitle, route, icon, image, accent, variant }: (typeof heroGames)[number] & { variant?: boolean }) {
-  const accents = {
-    sky: "border-sky-300/20 from-sky-400/[0.13] group-hover:border-sky-300/55 group-hover:shadow-sky-500/15",
-    rose: "border-rose-300/20 from-rose-400/[0.13] group-hover:border-rose-300/55 group-hover:shadow-rose-500/15",
-    emerald: "border-emerald-300/20 from-emerald-400/[0.13] group-hover:border-emerald-300/55 group-hover:shadow-emerald-500/15",
-    amber: "border-amber-300/35 from-amber-400/[0.16] group-hover:border-amber-200/70 group-hover:shadow-amber-500/20",
-  } as const;
-
-  return <Link to={route} className={`group relative flex aspect-[1.35/1] min-h-36 flex-col justify-between overflow-hidden rounded-2xl border bg-gradient-to-br ${accents[accent]} to-slate-950/80 p-3.5 shadow-xl shadow-black/20 transition duration-300 hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-indigo-300 motion-reduce:transform-none sm:p-4`}>
-    <img src={image} alt="" className={`pointer-events-none absolute inset-0 h-full w-full object-cover opacity-50 transition duration-500 group-hover:scale-105 group-hover:opacity-65 ${variant ? "object-[center_55%]" : "object-center"}`} />
-    <span className={`pointer-events-none absolute inset-0 ${variant ? "bg-[linear-gradient(135deg,rgba(31,15,3,.58),rgba(8,10,20,.24)_48%,rgba(4,7,15,.9))]" : "bg-[linear-gradient(135deg,rgba(4,11,26,.84),rgba(4,11,26,.25)_55%,rgba(4,7,15,.88))]"}`} />
-    <span className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-black/25 font-serif text-3xl text-white shadow-inner sm:h-11 sm:w-11">{icon}</span>
-    <span className="relative">
-      <strong className="block font-serif text-lg text-white sm:text-xl">{ui(title)}</strong>
-      <span className="mt-1 flex items-center justify-between gap-2 text-[10px] font-bold uppercase tracking-[0.12em] text-zinc-300"><span>{ui(subtitle)}</span><ArrowRight className="shrink-0 text-zinc-300 transition group-hover:translate-x-1" size={15} /></span>
-    </span>
-  </Link>;
 }
 
 function HeroFeature({

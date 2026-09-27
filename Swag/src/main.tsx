@@ -163,7 +163,7 @@ import GoRules from "./components/strategy/GoRules.tsx";
 import ShogiRules from "./components/strategy/ShogiRules.tsx";
 const AtlasArenaPage = React.lazy(() => import("./pages/games/AtlasArena/AtlasArenaPage.tsx"));
 const AtlasMultiplayerPage = React.lazy(() => import("./pages/games/AtlasArena/AtlasMultiplayerPage.tsx"));
-const atlasPage = (page: React.ReactNode) => <React.Suspense fallback={<main className="min-h-[calc(100dvh-4rem)] bg-[#06101f] p-10 text-zinc-400">Loading Atlas Arena…</main>}>{page}</React.Suspense>;
+const atlasPage = (page: React.ReactNode) => <React.Suspense fallback={<main className="min-h-[var(--app-height)] bg-[#06101f] p-10 text-zinc-400">Loading Atlas Arena…</main>}>{page}</React.Suspense>;
 
 const router = createBrowserRouter([
   {

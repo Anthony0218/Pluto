@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Chess, type Square } from "chess.js";
 import { ArrowRight, BookOpen, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -12,27 +12,77 @@ const slides = [
   { title: "Watten Rules", route: "/games/watten/rules", action: "Explore the rules" },
 ] as const;
 
-export default function LearnShowcase() {
+export default function LearnShowcase({ compact = false }: { compact?: boolean }) {
   useUiLanguage();
   const [slide, setSlide] = useState(0);
   const [selected, setSelected] = useState<Square | null>(null);
   const [solved, setSolved] = useState(false);
   const [hint, setHint] = useState(false);
   const [feedback, setFeedback] = useState("");
+  const [wrongMove, setWrongMove] = useState<[Square, Square] | null>(null);
+  const [animatedMove, setAnimatedMove] = useState<{ from: Square; to: Square; atDestination: boolean } | null>(null);
+  const animating = useRef(false);
+  const timers = useRef<number[]>([]);
+  const frames = useRef<number[]>([]);
+  useEffect(() => () => {
+    timers.current.forEach(window.clearTimeout);
+    frames.current.forEach(window.cancelAnimationFrame);
+  }, []);
   const current = slides[slide];
   const game = new Chess(puzzleFen);
   if (solved) game.move({ from: "h5", to: "f7" });
+  const legalSquares = selected && !solved ? game.moves({ square: selected, verbose: true }).map(move => move.to) : [];
+
+  function attemptMove(from: Square, to: Square) {
+    if (solved || animating.current || !game.get(from) || from === to) return;
+    animating.current = true;
+    setSelected(null);
+    setWrongMove(null);
+    setFeedback("");
+    const schedule = (callback: () => void, delay: number) => { timers.current.push(window.setTimeout(callback, delay)); };
+    const animate = (moveFrom: Square, moveTo: Square, done: () => void) => {
+      setAnimatedMove({ from: moveFrom, to: moveTo, atDestination: false });
+      frames.current.push(window.requestAnimationFrame(() => {
+        frames.current.push(window.requestAnimationFrame(() => setAnimatedMove({ from: moveFrom, to: moveTo, atDestination: true })));
+      }));
+      schedule(done, 360);
+    };
+    const finishCorrectMove = () => {
+        setSolved(true);
+        setWrongMove(null);
+        setFeedback("");
+        setAnimatedMove(null);
+        animating.current = false;
+    };
+    const showCorrectMove = () => {
+      setAnimatedMove(null);
+      schedule(() => animate("h5", "f7", finishCorrectMove), 80);
+    };
+    if (from === "h5" && to === "f7") {
+      animate(from, to, finishCorrectMove);
+    } else {
+      animate(from, to, () => {
+      setWrongMove([from, to]);
+      setFeedback("That move misses mate. Watch the correct move.");
+      schedule(showCorrectMove, 650);
+      });
+    }
+  }
 
   function chooseSquare(square: Square) {
-    if (solved) return;
-    if (selected === "h5" && square === "f7") {
-      setSolved(true);
-      setSelected(null);
-      setFeedback("");
+    if (solved || animating.current) return;
+    if (selected && selected !== square) {
+      attemptMove(selected, square);
       return;
     }
-    setFeedback(selected === "h5" && square !== "h5" ? "Try another square. Look for a check the king cannot escape." : "");
-    setSelected(square === "h5" ? square : null);
+    const piece = game.get(square);
+    if (piece?.color === game.turn()) {
+      setSelected(square);
+      setWrongMove(null);
+      setFeedback("");
+    } else {
+      setSelected(null);
+    }
   }
 
   function changeSlide(next: number) {
@@ -40,7 +90,7 @@ export default function LearnShowcase() {
   }
 
   return (
-    <section aria-roledescription="carousel" aria-label={ui("Featured lessons")} className="landing-preview overflow-hidden rounded-[28px] border border-white/10 bg-[#0b101d] shadow-2xl shadow-black/30">
+    <section aria-roledescription="carousel" aria-label={ui("Featured lessons")} className={`landing-preview overflow-hidden rounded-[28px] border border-white/10 bg-[#0b101d] shadow-2xl shadow-black/30 ${compact ? "learning-preview--compact" : ""}`}>
       <div className="flex items-center justify-between gap-3 border-b border-white/10 px-5 py-4 sm:px-6">
         <div className="flex items-center gap-2 text-sm font-semibold text-amber-100"><BookOpen size={17} className="text-amber-400" />{ui("Learn by doing")}</div>
         <div className="flex gap-2">
@@ -55,8 +105,13 @@ export default function LearnShowcase() {
         </div>
         <div className="learning-preview__stage">
         {slide === 0 ? (
-          <div key="puzzle" className="learning-preview__lesson grid items-center gap-5 sm:grid-cols-[minmax(0,1fr)_minmax(150px,.8fr)]">
-            <ChessPreviewBoard fen={game.fen()} selected={selected} lastMove={solved ? ["h5", "f7"] : null} onSquareClick={chooseSquare} label={ui("Chess puzzle: white to move")} />
+          <div key="puzzle" className="learning-preview__lesson rounded-2xl border border-white/10 bg-zinc-900/65 p-3 sm:p-4">
+            <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+              <div><div className="flex flex-wrap items-center gap-2"><span className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-400">{ui("Sample puzzle")}</span><span className="rounded-full border border-sky-400/15 bg-sky-400/[0.06] px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.14em] text-sky-300">{ui("Elo")} 1200</span></div><h4 className="mt-1 font-serif text-xl font-semibold text-[#f5e8cf]">{ui("Queen and bishop mate")}</h4><p className="mt-1 text-xs text-zinc-500">{ui("Find the best continuation.")}</p></div>
+              <div className="flex gap-2"><span className="rounded-full border border-violet-400/15 bg-violet-400/[0.06] px-2.5 py-1 text-[10px] font-black text-violet-300">{ui("Easy")}</span><span className="rounded-full border border-amber-400/15 bg-amber-400/[0.06] px-2.5 py-1 text-[10px] font-black text-amber-300">{ui("Checkmate")}</span></div>
+            </div>
+            <div className="grid items-center gap-5 sm:grid-cols-[minmax(0,1fr)_minmax(150px,.8fr)]">
+            <ChessPreviewBoard fen={game.fen()} selected={selected} legalSquares={legalSquares} lastMove={solved ? ["h5", "f7"] : null} wrongSquare={wrongMove?.[1]} wrongFrom={wrongMove?.[0]} correctSquare={wrongMove ? "f7" : null} correctFrom={wrongMove ? "h5" : null} animatedMove={animatedMove} onSquareClick={chooseSquare} onMoveAttempt={attemptMove} label={ui("Chess puzzle: white to move")} />
             <div aria-live="polite">
               <p className="text-xs font-bold uppercase tracking-widest text-amber-300">{ui("White to move")}</p>
               <p className="mt-2 font-serif text-xl text-white">{solved ? ui("Checkmate!") : ui("Find mate in one.")}</p>
@@ -64,7 +119,8 @@ export default function LearnShowcase() {
               {!solved && <button type="button" onClick={() => setHint(true)} className="mt-4 text-xs font-semibold text-amber-300 underline underline-offset-4 hover:text-amber-200">{ui("Need a hint?")}</button>}
               {hint && !solved && <p className="mt-2 text-xs text-amber-200">{ui("Look at f7 beside the black king.")}</p>}
               {feedback && <p className="mt-2 text-xs text-amber-200">{ui(feedback)}</p>}
-              {solved && <button type="button" onClick={() => { setSolved(false); setHint(false); }} className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-amber-300 hover:text-amber-200"><RotateCcw size={14} />{ui("Try again")}</button>}
+              {solved && <button type="button" onClick={() => { setSolved(false); setHint(false); setSelected(null); setWrongMove(null); setFeedback(""); }} className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-amber-300 hover:text-amber-200"><RotateCcw size={14} />{ui("Try again")}</button>}
+            </div>
             </div>
           </div>
         ) : (

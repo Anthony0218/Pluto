@@ -5400,7 +5400,7 @@ export default function ChessRulesAndTips() {
 
   return (
     <LanguageContext.Provider value={language}>
-      <div className="relative left-1/2 min-h-[calc(100dvh-4rem)] w-screen -translate-x-1/2 overflow-x-hidden bg-[#03070d] text-zinc-100">
+      <div className="relative left-1/2 min-h-[var(--app-height)] w-screen -translate-x-1/2 overflow-x-hidden bg-[#03070d] text-zinc-100">
         {/* CINEMATIC BACKDROP */}
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_17%_12%,rgba(181,132,46,.11),transparent_30%),radial-gradient(circle_at_82%_24%,rgba(52,83,116,.10),transparent_28%),linear-gradient(180deg,#050a11_0%,#020509_52%,#04080d_100%)]" />

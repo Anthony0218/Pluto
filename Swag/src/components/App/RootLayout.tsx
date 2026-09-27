@@ -1,54 +1,33 @@
 import "../chess/chessLayout.css";
 import ChessLayoutControls from "../chess/ChessLayoutControls";
 import RoomFriends from "../social/RoomFriends";
-import { useState } from "react";
+import { useEffect, useRef } from "react";
 import { Outlet, useLocation } from "react-router-dom";
-
 import AccountActivity from "./AccountActivity";
-import NavigationDrawer from "./NavigationDrawer";
 import PublicHeader from "./PublicHeader";
 import { useTheme } from "../../context/ThemeContext";
 
 export default function RootLayout() {
   const location = useLocation();
-  const [openAt, setOpenAt] = useState<string | null>(null);
-  const navigationOpen = openAt === location.key;
+  const fullHeader = location.pathname === "/" || location.pathname === "/dashboard";
+  const integratedNavigation = location.pathname === "/games/chess" || location.pathname === "/games/chess/classic";
+  const viewport = useRef<HTMLDivElement>(null);
   const { plutoMode } = useTheme();
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      if (location.hash) document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView();
+      else viewport.current?.scrollTo(0, 0);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [location.key, location.hash]);
 
-  return (
-    <div
-      className={`
-        min-h-screen
-        w-full
-        text-zinc-100
-        ${plutoMode ? "bg-[#060816]" : "bg-zinc-950"}
-      `}
-    >
-      {/* GLOBAL HEADER */}
-      <AccountActivity />
-      <PublicHeader
-        key={location.key}
-        navigationOpen={navigationOpen}
-        onToggleNavigation={() =>
-          setOpenAt(navigationOpen ? null : location.key)
-        }
-      />
-      {navigationOpen && <NavigationDrawer onClose={() => setOpenAt(null)} />}
-
-      {/* 
-        PublicHeader is fixed and h-16 = 64px.
-        Everything below therefore starts after 64px.
-      */}
-      <div
-        className="
-          min-h-[calc(100vh-4rem)]
-          pt-16
-        "
-      >
-        <Outlet />
-        <RoomFriends />
-        <ChessLayoutControls />
-      </div>
+  return <div className={"app-shell w-full text-zinc-100 " + (integratedNavigation ? "integrated-navigation " : "") + (plutoMode ? "bg-[#060816]" : "bg-zinc-950")} data-app-theme={plutoMode ? "pluto" : "black"}>
+    <AccountActivity />
+    {!integratedNavigation && <PublicHeader compact={!fullHeader} />}
+    <div ref={viewport} className="app-viewport">
+      <Outlet />
     </div>
-  );
+    <RoomFriends />
+    <ChessLayoutControls />
+  </div>;
 }

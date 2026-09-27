@@ -3,6 +3,7 @@ import "./wattenMenus.css";
 import { useCallback } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, BookOpen, Gamepad2, Users } from "lucide-react";
+import { useFitWattenScreen } from "@/games/watten/useFitWattenScreen";
 
 import {
   setStoredWattenLanguage,
@@ -12,6 +13,7 @@ import {
 } from "@/games/watten/i18n/wattenLanguage";
 
 export default function Watten() {
+  useFitWattenScreen();
   const { language, setLanguage } = useAppLanguage();
 
   const t = useCallback(
@@ -27,7 +29,7 @@ export default function Watten() {
   const heroImage = "/images/watten-game-icon.png";
 
   return (
-    <main className="watten-menu min-h-screen px-4 py-10 text-white sm:px-6">
+    <main className="watten-menu watten-menu--screen watten-menu--home px-4 py-10 text-white sm:px-6">
       <div className="mx-auto max-w-5xl">
         <div className="watten-menu__panel rounded-[30px] border border-white/10 bg-zinc-950/90 p-6 shadow-2xl shadow-black/30 sm:p-8">
           <div className="watten-menu__masthead" aria-hidden="true">
