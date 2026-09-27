@@ -1,0 +1,56 @@
+body:has(.watten-game-screen) { overflow: hidden; }
+
+.watten-game-screen {
+  box-sizing: border-box;
+  height: var(--app-height);
+  min-height: 0 !important;
+  overflow: hidden;
+}
+
+.watten-game-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.watten-game-grid {
+  flex: 1;
+  min-height: 0;
+  align-items: stretch;
+}
+
+.watten-game-grid > aside {
+  min-height: 0;
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  padding-top: 0;
+}
+
+.watten-game-grid > aside > div { max-height: 100%; }
+.watten-game-grid > :not(aside) { height: 100% !important; min-height: 0 !important; }
+
+@media (max-width: 1023px) {
+  .watten-game-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: minmax(0, 1fr) clamp(96px, 17dvh, 145px);
+    gap: 8px;
+  }
+
+  .watten-game-grid > :not(aside) {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .watten-game-grid > aside {
+    grid-row: 2;
+    width: 100% !important;
+    max-height: 100%;
+  }
+
+  .watten-game-grid > aside:first-of-type { grid-column: 1; }
+  .watten-game-grid > aside:last-of-type { grid-column: 2; }
+  .watten-game-grid > aside > div { height: 100% !important; }
+}

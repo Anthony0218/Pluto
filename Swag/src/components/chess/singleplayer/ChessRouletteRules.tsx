@@ -1,3 +1,5 @@
+import RouletteInfo from "./RouletteInfo";
+import { ui, useUiLanguage } from "@/i18n/ui";
 import VariantRulesPage, { EffectGrid, VisualCard } from "./VariantRulesPage";
 import {
   translateChess,
@@ -202,6 +204,7 @@ const translations: Partial<TranslationTable> = {
 };
 
 export default function ChessRouletteRules() {
+  useUiLanguage();
   const { language, setLanguage } = useChessLanguage();
   const t = (key: string) => translateChess(language, key, translations);
 
@@ -216,9 +219,7 @@ export default function ChessRouletteRules() {
       accent="fuchsia"
       backRoute="/games/chess/variants/chess-roulette/hotseat"
       backLabel={t("Back to ChessRoulette")}
-      coreIdea={t(
-        "Normal chess is interrupted by visible Lucky Squares on the middle ranks. Landing on one reveals a random effect: Destroy, Teleport, Swap or Promote. Kings are protected from Lucky Square effects.",
-      )}
+      coreIdea={ui("Lucky Squares are visible. Their actual effect stays hidden until triggered.")}
       language={language}
       onLanguageChange={setLanguage}
       languageLabel={t("Language")}
@@ -296,10 +297,8 @@ export default function ChessRouletteRules() {
         },
         {
           icon: "♚",
-          title: t("Actual Kings are immune"),
-          text: t(
-            "A King may occupy or reveal a Lucky Square, but the random Lucky Square effect is not applied to the King.",
-          ),
+          title: ui("King: 80% card, 20% extra turn."),
+          text: ui("A king keeps its normal moves and gains the drawn piece’s movement for its next three king moves. Pawn: no change. King: you lose."),
         },
         {
           icon: "⌛",
@@ -317,6 +316,7 @@ export default function ChessRouletteRules() {
         },
       ]}
     >
+      <RouletteInfo />
       <VisualCard
         accent="fuchsia"
         eyebrow={t("Lucky Square outcomes")}

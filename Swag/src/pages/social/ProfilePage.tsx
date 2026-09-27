@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import ProfileAvatarPicker, {
   ProfileAvatar,
 } from "../../components/social/ProfileAvatarPicker";
+import ProfileFriends from "../../components/social/ProfileFriends";
 
 type ProfileStats = {
   savedChessGames: number;
@@ -37,14 +38,14 @@ function StatCard({
   label: string;
 }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
+    <div className="rounded-2xl border border-indigo-300/10 bg-[#101d35]/80 p-5 transition hover:border-indigo-300/25">
       <div className="flex items-center justify-between">
         <span className="text-2xl">{icon}</span>
 
         <span className="text-2xl font-black text-amber-300">{value}</span>
       </div>
 
-      <p className="mt-3 text-xs font-bold uppercase tracking-wider text-zinc-500">
+      <p className="mt-3 text-xs font-bold uppercase tracking-wider text-slate-400">
         {label}
       </p>
     </div>
@@ -52,7 +53,7 @@ function StatCard({
 }
 
 export default function ProfilePage() {
-  const { user, profile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
 
   const [username, setUsername] = useState("");
   const [avatarId, setAvatarId] = useState("m1");
@@ -82,7 +83,7 @@ export default function ProfilePage() {
         ? typedProfile.username.trim()
         : "";
 
-    setUsername(currentName || user?.email?.split("@")[0]?.trim() || "Player");
+    setUsername(currentName || "");
 
     setAvatarId(typedProfile?.avatar_id ?? "m1");
   }, [profile, user?.email]);
@@ -210,6 +211,7 @@ export default function ProfilePage() {
       return;
     }
 
+    await refreshProfile();
     setUsername(nextName);
     setEditing(false);
     setMessage("Name gespeichert.");
@@ -254,6 +256,7 @@ export default function ProfilePage() {
       return;
     }
 
+    await refreshProfile();
     setMessage("Avatar gespeichert.");
 
     window.setTimeout(() => {
@@ -286,30 +289,30 @@ export default function ProfilePage() {
      ========================================================= */
 
   return (
-    <main className="min-h-screen bg-transparent px-4 py-10 text-white sm:px-6">
-      <div className="mx-auto max-w-5xl">
+    <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_rgba(79,70,229,.15),_transparent_52%)] px-4 py-10 text-white sm:px-6">
+      <div className="mx-auto max-w-6xl">
         {/* HEADER */}
 
-        <div className="mb-8">
-          <p className="text-xs font-black uppercase tracking-[0.3em] text-amber-400">
+        <div className="mb-8 rounded-[28px] border border-indigo-300/10 bg-[#0b1529]/70 px-6 py-5 shadow-xl shadow-black/10">
+          <p className="text-xs font-black uppercase tracking-[0.3em] text-indigo-300">
             Account
           </p>
 
           <h1 className="mt-2 text-4xl font-black">Dein Profil</h1>
 
-          <p className="mt-2 text-sm text-zinc-500">
+          <p className="mt-2 text-sm text-slate-400">
             Verwalte deinen Spielernamen, deinen Avatar und deine
             Spielstatistiken.
           </p>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">
+        <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
           {/* =================================================
               LEFT PROFILE CARD
               ================================================= */}
 
           <aside>
-            <div className="rounded-[30px] border border-white/10 bg-zinc-900/80 p-6 shadow-2xl shadow-black/30">
+            <div className="sticky top-24 rounded-[26px] border border-indigo-300/15 bg-[#0b1529]/90 p-5 shadow-2xl shadow-black/30">
               {/* AVATAR */}
 
               <div>
@@ -319,10 +322,10 @@ export default function ProfilePage() {
                   className="
                     group
                     relative
-                    h-28
-                    w-28
+                    h-16
+                    w-16
                     overflow-hidden
-                    rounded-[30px]
+                    rounded-2xl
                     border
                     border-white/10
                     bg-black/20
@@ -333,7 +336,7 @@ export default function ProfilePage() {
                 >
                   <ProfileAvatar
                     avatarId={avatarId}
-                    className="h-full w-full rounded-[25px]"
+                    className="h-full w-full rounded-xl"
                   />
 
                   <div
@@ -341,7 +344,7 @@ export default function ProfilePage() {
                       absolute
                       inset-x-1
                       bottom-1
-                      rounded-b-[23px]
+                      rounded-b-xl
                       bg-black/70
                       py-1.5
                       text-[10px]
@@ -366,7 +369,7 @@ export default function ProfilePage() {
 
               {/* NAME */}
 
-              <div className="mt-6">
+              <div className="mt-5">
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600">
                   Spielername
                 </p>
@@ -642,6 +645,8 @@ export default function ProfilePage() {
                 />
               </div>
             </div>
+
+            <ProfileFriends userId={user.id} />
 
             {/* QUICK LINKS */}
 

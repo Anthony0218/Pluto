@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import VariantRulesPage, { Flow, VisualCard } from "./VariantRulesPage";
 import {
   translateChess,
@@ -215,12 +216,13 @@ function ExplosionPatternCard({
   detail: string;
   pattern: ExplosionPattern;
 }) {
+  useUiLanguage();
   const rows = Array.from({ length: 5 }, (_, index) => index);
   const cols = Array.from({ length: 5 }, (_, index) => index);
 
   return (
     <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-      <h3 className="text-sm font-black text-white">{title}</h3>
+      <h3 className="text-sm font-black text-white">{ui(title)}</h3>
       <p className="mt-1 text-xs leading-5 text-zinc-400">{detail}</p>
 
       <div className="mt-4 inline-block rounded-xl border border-white/10 bg-zinc-950 p-2">
@@ -257,6 +259,7 @@ function ExplosionPatternCard({
 }
 
 export default function ChessHotPotatoRules() {
+  useUiLanguage();
   const { language, setLanguage } = useChessLanguage();
   const t = (key: string) => translateChess(language, key, translations);
 
@@ -300,6 +303,7 @@ export default function ChessHotPotatoRules() {
         },
       ]}
       rules={[
+        { icon: "💣", title: ui("Dropped bombs"), text: ui("If another bomb’s blast kills a carrier, its undetonated bomb drops onto that square. Its remaining fuse pauses until a piece lands there and picks it up. A bomb that has exploded still respawns normally.") },
         {
           icon: "♙♟",
           title: t("Each side starts with one bomb"),

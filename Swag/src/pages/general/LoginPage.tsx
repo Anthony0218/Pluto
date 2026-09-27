@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 type LoginMode = "login" | "register";
@@ -105,8 +105,9 @@ function getInitialLanguage(): Language {
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { signIn, signUp } = useAuth();
-  const [mode, setMode] = useState<LoginMode>("login");
+  const [mode, setMode] = useState<LoginMode>(() => searchParams.get("mode") === "register" ? "register" : "login");
   const [language, setLanguage] = useState<Language>(getInitialLanguage);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -178,7 +179,7 @@ export default function LoginPage() {
         <div className="absolute bottom-[-15%] right-[-10%] h-[460px] w-[460px] rounded-full bg-amber-300/[0.06] blur-3xl" />
       </div>
 
-      <div className="relative mx-auto flex min-h-[calc(100vh-4rem)] max-w-6xl items-center justify-center">
+      <div className="relative mx-auto flex min-h-[var(--app-height)] max-w-6xl items-center justify-center">
         <div className="relative grid w-full overflow-hidden rounded-[32px] border border-white/10 bg-zinc-900/75 shadow-2xl shadow-black/40 backdrop-blur-xl lg:grid-cols-[1.1fr_0.9fr]">
           {/* Language switch */}
           <div className="absolute right-5 top-5 z-30 flex rounded-xl border border-white/10 bg-black/35 p-1 backdrop-blur-md">

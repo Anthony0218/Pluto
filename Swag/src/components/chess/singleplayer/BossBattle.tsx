@@ -1,3 +1,5 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { useRef, useEffect, useMemo, useState } from "react";
 import {
   LanguageSelector,
@@ -415,6 +417,7 @@ export default function BossBattleBoard({
   playerColor = "white",
   difficulty = "casual",
 }: VariantAiBoardProps) {
+  useUiLanguage();
   const { language, setLanguage } = useChessLanguage();
   const t = (key: string) => translateChess(language, key, translations);
   const [game, setGame] = useState(() => new Chess(BOSS_STARTING_FEN));
@@ -964,26 +967,10 @@ export default function BossBattleBoard({
   }
 
   return (
-    <div className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6 lg:px-8">
+    <div className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-[1500px]">
-        <header className="mb-7 flex flex-col gap-4 rounded-3xl border border-red-400/10 bg-zinc-900/55 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-red-400/20 bg-red-400/10 text-3xl shadow-inner">
-              ♚
-            </div>
+        <ChessPageHeader className="mb-7 flex flex-col gap-4 rounded-3xl border border-red-400/10 bg-zinc-900/55 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between" description={<> {t("One normal army versus a five-life Boss with powers")} </>}>
 
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-red-400">
-                {t("Chess Variant")}
-              </p>
-              <h1 className="mt-0.5 text-2xl font-black tracking-tight text-white">
-                {t("Boss Battle Chess")}
-              </h1>
-              <p className="mt-0.5 text-sm text-zinc-500">
-                {t("One normal army versus a five-life Boss with powers")}
-              </p>
-            </div>
-          </div>
 
           <div className="flex flex-wrap items-center justify-end gap-2">
             <LanguageSelector
@@ -1015,9 +1002,9 @@ export default function BossBattleBoard({
             )}
           </div>
           <BoardAnimationToggle />
-        </header>
+        </ChessPageHeader>
 
-        <main className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
+        <main className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
               <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
@@ -1164,9 +1151,7 @@ export default function BossBattleBoard({
                       {t("Boss Power Targeting")}
                     </p>
                     <p className="mt-1 text-sm font-bold text-white">
-                      {bossTargetMode === "summon"
-                        ? t("Choose a pawn summon square")
-                        : t("Choose a Dark Step destination")}
+                      {bossTargetMode === "summon" ? t("Choose a pawn summon square") : t("Choose a Dark Step destination")}
                     </p>
                   </div>
                   <button
@@ -1253,9 +1238,7 @@ export default function BossBattleBoard({
 
                 <div className="rounded-2xl border border-red-400/15 bg-red-400/[0.05] p-4">
                   <div className="flex items-center justify-between gap-3">
-                    <span className="text-xs font-black uppercase tracking-wider text-zinc-500">
-                      HP
-                    </span>
+                    <span className="text-xs font-black uppercase tracking-wider text-zinc-500">{ui("HP")}</span>
                     <span className="text-sm font-black text-red-300">
                       {displayedBossState.hp}/{BOSS_MAX_HP}
                     </span>
@@ -1421,10 +1404,11 @@ function PanelTitle({
   subtitle: string;
   compact?: boolean;
 }) {
+  useUiLanguage();
   return (
     <div className={compact ? "" : "mb-4"}>
-      <h2 className="text-sm font-black text-zinc-100">{title}</h2>
-      <p className="mt-1 text-xs text-zinc-500">{subtitle}</p>
+      <h2 className="text-sm font-black text-zinc-100">{ui(title)}</h2>
+      <p className="mt-1 text-xs text-zinc-500">{ui(subtitle)}</p>
     </div>
   );
 }
@@ -1446,6 +1430,7 @@ function PowerButton({
   onClick: () => void;
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   const cooldown = state.cooldowns[power];
   const nextCooldown = getBossPowerCooldown(power, liveState);
 
@@ -1483,11 +1468,7 @@ function PowerButton({
         <span
           className={`shrink-0 rounded-lg px-2 py-1 text-[9px] font-black uppercase ${cooldown > 0 ? "bg-zinc-800 text-zinc-500" : "bg-emerald-400/10 text-emerald-300"}`}
         >
-          {cooldown > 0
-            ? `${cooldown} ${t("turns")}`
-            : selected
-              ? t("Choose")
-              : t("Ready")}
+          {cooldown > 0 ? `${cooldown} ${t("turns")}` : selected ? t("Choose") : t("Ready")}
         </span>
       </div>
 
@@ -1507,6 +1488,7 @@ function StatusCard({
   label: string;
   value: string;
 }) {
+  useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 p-3">
       <div className="flex items-start justify-between gap-2">
@@ -1514,19 +1496,20 @@ function StatusCard({
         <span className="text-sm font-black text-white">{value}</span>
       </div>
       <p className="mt-2 text-[9px] font-black uppercase tracking-wider text-zinc-600">
-        {label}
+        {ui(label)}
       </p>
     </div>
   );
 }
 
 function RuleLine({ icon, text }: { icon: string; text: string }) {
+  useUiLanguage();
   return (
     <div className="flex gap-2 rounded-xl border border-white/[0.04] bg-black/15 px-3 py-2">
       <span className="w-7 shrink-0 text-center font-black text-red-300">
         {icon}
       </span>
-      <span>{text}</span>
+      <span>{ui(text)}</span>
     </div>
   );
 }
@@ -1540,13 +1523,14 @@ function MiniRule({
   title: string;
   text: string;
 }) {
+  useUiLanguage();
   return (
     <div className="rounded-2xl border border-white/5 bg-zinc-900/55 p-3">
       <div className="flex items-center gap-2">
         <span className="text-lg">{icon}</span>
-        <span className="text-xs font-black text-zinc-200">{title}</span>
+        <span className="text-xs font-black text-zinc-200">{ui(title)}</span>
       </div>
-      <p className="mt-2 text-[10px] leading-4 text-zinc-600">{text}</p>
+      <p className="mt-2 text-[10px] leading-4 text-zinc-600">{ui(text)}</p>
     </div>
   );
 }
@@ -1560,6 +1544,7 @@ function CapturedPiecesGrid({
   capturedWhite: PieceType[];
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   const whiteSymbols: Record<PieceType, string> = {
     p: "♙",
     n: "♘",

@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Gamepad2, Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -10,7 +11,7 @@ import type {
 } from "../../types/social";
 import FriendAvatar from "./FriendAvatar";
 
-type FriendChatProps = { friend: Friend };
+type FriendChatProps = { friend: Friend; roomInvite?: { code: string; lobbyRoute: string } };
 
 const PRESET_LABELS: Record<Exclude<PresetMessageType, "game_code">, string> = {
   hey: "Hey",
@@ -19,15 +20,18 @@ const PRESET_LABELS: Record<Exclude<PresetMessageType, "game_code">, string> = {
   no: "No",
 };
 
-export default function FriendChat({ friend }: FriendChatProps) {
+export default function FriendChat({ friend, roomInvite }: FriendChatProps) {
+  useUiLanguage();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [messages, setMessages] = useState<FriendMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [inviteSent, setInviteSent] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteGame, setInviteGame] = useState<"chess" | "watten">("chess");
-  const [gameCode, setGameCode] = useState("");
+  const [gameCode, setGameCode] = useState(roomInvite?.code ?? "");
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   const friendName =
@@ -51,7 +55,7 @@ export default function FriendChat({ friend }: FriendChatProps) {
       const { data, error } = await supabase
         .from("friend_messages")
         .select(
-          "id,sender_id,receiver_id,message_type,game,game_code,created_at",
+          "id,sender_id,receiver_id,message_type,game,game_code,game_route,created_at",
         )
         .or(
           `and(sender_id.eq.${user?.id},receiver_id.eq.${friend.id}),and(sender_id.eq.${friend.id},receiver_id.eq.${user?.id})`,
@@ -59,8 +63,19 @@ export default function FriendChat({ friend }: FriendChatProps) {
         .order("created_at", { ascending: true });
 
       if (!disposed) {
-        if (error) console.error("Could not load friend messages:", error);
-        setMessages((data ?? []) as FriendMessage[]);
+        if (error) {
+          setErrorMessage(
+            "Messages could not be loaded. Please reopen this chat to retry.",
+          );
+        } else {
+          setMessages((current) => [
+            ...new Map(
+              [...current, ...((data ?? []) as FriendMessage[])].map(
+                (message) => [message.id, message],
+              ),
+            ).values(),
+          ]);
+        }
         setLoading(false);
       }
     }
@@ -98,7 +113,8 @@ export default function FriendChat({ friend }: FriendChatProps) {
   }, [friend.id, user]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const messages = bottomRef.current?.parentElement;
+    if (messages) messages.scrollTop = messages.scrollHeight;
   }, [orderedMessages.length]);
 
   async function sendPreset(
@@ -106,16 +122,27 @@ export default function FriendChat({ friend }: FriendChatProps) {
   ) {
     if (!user || sending) return;
     setSending(true);
+    setErrorMessage(null);
 
-    const { error } = await supabase.from("friend_messages").insert({
-      sender_id: user.id,
-      receiver_id: friend.id,
-      message_type: messageType,
-      game: null,
-      game_code: null,
-    });
+    const { data, error } = await supabase
+      .from("friend_messages")
+      .insert({
+        sender_id: user.id,
+        receiver_id: friend.id,
+        message_type: messageType,
+        game: null,
+        game_code: null,
+      })
+      .select("id,sender_id,receiver_id,message_type,game,game_code,game_route,created_at")
+      .single();
 
-    if (error) console.error("Could not send message:", error);
+    if (error) setErrorMessage("Message could not be sent. Please try again.");
+    else if (data)
+      setMessages((current) =>
+        current.some((message) => message.id === data.id)
+          ? current
+          : [...current, data as FriendMessage],
+      );
     setSending(false);
   }
 
@@ -125,19 +152,32 @@ export default function FriendChat({ friend }: FriendChatProps) {
     if (!/^[A-Z0-9_-]{3,20}$/.test(normalizedCode)) return;
 
     setSending(true);
-    const { error } = await supabase.from("friend_messages").insert({
-      sender_id: user.id,
-      receiver_id: friend.id,
-      message_type: "game_code",
-      game: inviteGame,
-      game_code: normalizedCode,
-    });
+    setErrorMessage(null);
+    const { data, error } = await supabase
+      .from("friend_messages")
+      .insert({
+        sender_id: user.id,
+        receiver_id: friend.id,
+        message_type: "game_code",
+        game: inviteGame,
+        game_code: normalizedCode,
+        game_route: roomInvite?.lobbyRoute ?? null,
+      })
+      .select("id,sender_id,receiver_id,message_type,game,game_code,game_route,created_at")
+      .single();
 
     if (!error) {
-      setGameCode("");
+      if (data)
+        setMessages((current) =>
+          current.some((message) => message.id === data.id)
+            ? current
+            : [...current, data as FriendMessage],
+        );
+      setInviteSent(true);
+      setGameCode(roomInvite?.code ?? "");
       setInviteOpen(false);
     } else {
-      console.error("Could not send game invite:", error);
+      setErrorMessage("Game invite could not be sent. Please try again.");
     }
 
     setSending(false);
@@ -146,12 +186,26 @@ export default function FriendChat({ friend }: FriendChatProps) {
   function joinInvite(message: FriendMessage) {
     if (!message.game || !message.game_code) return;
 
-    if (message.game === "watten") {
-      navigate(`/games/watten/multiplayer/${message.game_code}`);
+    if (message.game_route === "/games/atlas-arena/multiplayer") {
+      navigate(`${message.game_route}/${encodeURIComponent(message.game_code)}`);
       return;
     }
 
-    navigate(`/games/chess/classic/multiplayer/${message.game_code}`);
+    if (message.game_route && /^\/games\/chess\/(?:classic|variants\/[a-z0-9-]+)\/multiplayer$/.test(message.game_route)) {
+      navigate(`${message.game_route}?code=${encodeURIComponent(message.game_code)}`);
+      return;
+    }
+
+    if (message.game === "watten") {
+      navigate(
+        `/games/watten/multiplayer?code=${encodeURIComponent(message.game_code)}`,
+      );
+      return;
+    }
+
+    navigate(
+      `/games/chess/classic/multiplayer?code=${encodeURIComponent(message.game_code)}`,
+    );
   }
 
   function renderMessage(message: FriendMessage) {
@@ -160,7 +214,7 @@ export default function FriendChat({ friend }: FriendChatProps) {
         <div>
           <div className="flex items-center gap-2 font-semibold">
             <Gamepad2 size={16} />
-            {message.game === "watten" ? "Watten invite" : "Chess invite"}
+            {message.game_route === "/games/atlas-arena/multiplayer" ? ui("Atlas Arena invite") : message.game === "watten" ? ui("Watten invite") : ui("Chess invite")}
           </div>
           <div className="mt-2 font-mono text-lg font-black tracking-widest">
             {message.game_code}
@@ -170,9 +224,7 @@ export default function FriendChat({ friend }: FriendChatProps) {
               type="button"
               onClick={() => joinInvite(message)}
               className="mt-3 rounded-lg bg-sky-500 px-3 py-2 text-xs font-bold text-white transition hover:bg-sky-400"
-            >
-              Join game
-            </button>
+            >{ui("Open lobby")}</button>
           )}
         </div>
       );
@@ -182,7 +234,7 @@ export default function FriendChat({ friend }: FriendChatProps) {
   }
 
   return (
-    <section className="flex min-h-[640px] flex-col overflow-hidden rounded-3xl border border-white/10 bg-zinc-900/80 shadow-2xl shadow-black/20 backdrop-blur-md">
+    <section className="flex h-[min(640px,65dvh)] min-h-0 flex-col overflow-hidden rounded-3xl border border-white/10 bg-zinc-900/80 shadow-2xl shadow-black/20 backdrop-blur-md">
       <header className="flex items-center gap-3 border-b border-white/10 px-5 py-4">
         <FriendAvatar profile={friend} />
         <div className="min-w-0">
@@ -193,16 +245,22 @@ export default function FriendChat({ friend }: FriendChatProps) {
         </div>
       </header>
 
-      <div className="flex-1 space-y-3 overflow-y-auto p-5">
+      {errorMessage && (
+        <p
+          role="alert"
+          className="border-b border-red-400/20 bg-red-400/10 px-5 py-3 text-sm text-red-200"
+        >
+          {ui(errorMessage)}
+        </p>
+      )}
+      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-5">
         {loading ? (
-          <p className="text-sm text-zinc-500">Loading messages...</p>
+          <p className="text-sm text-zinc-500">{ui("Loading messages...")}</p>
         ) : orderedMessages.length === 0 ? (
           <div className="flex h-full min-h-56 items-center justify-center text-center">
             <div>
-              <p className="font-semibold text-zinc-300">No messages yet</p>
-              <p className="mt-1 text-sm text-zinc-500">
-                Say Hey or send a game invite.
-              </p>
+              <p className="font-semibold text-zinc-300">{ui("No messages yet")}</p>
+              <p className="mt-1 text-sm text-zinc-500">{ui("Say Hey or send a game invite.")}</p>
             </div>
           </div>
         ) : (
@@ -235,61 +293,57 @@ export default function FriendChat({ friend }: FriendChatProps) {
             disabled={sending}
             onClick={() => void sendPreset("hey")}
             className="rounded-xl border border-white/10 bg-zinc-800 px-3 py-2.5 text-sm font-semibold text-zinc-200 hover:bg-zinc-700 disabled:opacity-50"
-          >
-            👋 Hey
-          </button>
+          >{ui("👋 Hey")}</button>
           <button
             disabled={sending}
             onClick={() => void sendPreset("play")}
             className="rounded-xl border border-white/10 bg-zinc-800 px-3 py-2.5 text-sm font-semibold text-zinc-200 hover:bg-zinc-700 disabled:opacity-50"
-          >
-            🎮 Play?
-          </button>
+          >{ui("🎮 Play?")}</button>
           <button
             disabled={sending}
             onClick={() => void sendPreset("yes")}
             className="rounded-xl border border-white/10 bg-zinc-800 px-3 py-2.5 text-sm font-semibold text-zinc-200 hover:bg-zinc-700 disabled:opacity-50"
-          >
-            ✅ Yes
-          </button>
+          >{ui("✅ Yes")}</button>
           <button
             disabled={sending}
             onClick={() => void sendPreset("no")}
             className="rounded-xl border border-white/10 bg-zinc-800 px-3 py-2.5 text-sm font-semibold text-zinc-200 hover:bg-zinc-700 disabled:opacity-50"
-          >
-            ❌ No
-          </button>
+          >{ui("❌ No")}</button>
         </div>
 
         <button
           type="button"
-          onClick={() => setInviteOpen((current) => !current)}
+          disabled={sending}
+          onClick={() => roomInvite ? void sendGameInvite() : setInviteOpen((current) => !current)}
           className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 via-indigo-500 to-fuchsia-500 px-4 py-3 text-sm font-black text-white hover:brightness-110"
         >
-          <Send size={16} /> Send game code
+          <Send size={16} /> {sending ? ui("Sending...") : ui("Send game code")}
         </button>
 
+        {inviteSent && <p role="status" className="mt-2 text-sm text-emerald-300">{ui("Room code sent.")}</p>}
         {inviteOpen && (
           <div className="mt-3 rounded-2xl border border-white/10 bg-black/20 p-3">
             <div className="grid gap-2 sm:grid-cols-[140px_1fr_auto]">
               <select
+                aria-label={ui("Invite game")}
                 value={inviteGame}
                 onChange={(event) =>
                   setInviteGame(event.target.value as "chess" | "watten")
                 }
                 className="rounded-xl border border-white/10 bg-zinc-950 px-3 py-2.5 text-sm text-white outline-none"
               >
-                <option value="chess">Chess</option>
-                <option value="watten">Watten</option>
+                <option value="chess">{ui("Chess")}</option>
+                <option value="watten">{ui("Watten")}</option>
               </select>
 
               <input
+                aria-label={ui("Room code")}
                 value={gameCode}
                 onChange={(event) =>
                   setGameCode(event.target.value.toUpperCase())
                 }
                 maxLength={20}
-                placeholder="Room code"
+                placeholder={ui("Room code")}
                 className="rounded-xl border border-white/10 bg-zinc-950 px-3 py-2.5 font-mono text-sm uppercase text-white outline-none focus:border-sky-400/50"
               />
 
@@ -301,9 +355,7 @@ export default function FriendChat({ friend }: FriendChatProps) {
                 }
                 onClick={() => void sendGameInvite()}
                 className="rounded-xl bg-sky-500 px-4 py-2.5 text-sm font-bold text-white hover:bg-sky-400 disabled:opacity-40"
-              >
-                Send
-              </button>
+              >{ui("Send")}</button>
             </div>
           </div>
         )}

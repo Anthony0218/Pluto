@@ -1,6 +1,6 @@
 import {
-  createContext,
-  useContext,
+  useCallback,
+  useRef,
   useEffect,
   useState,
   type ReactNode,
@@ -8,109 +8,90 @@ import {
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
 
-type Profile = {
-  id: string;
-  username: string;
-  display_name: string | null;
-  avatar_url: string | null;
-  rating: number;
-  games_played: number;
-  wins: number;
-  losses: number;
-  draws: number;
-};
-
-type AuthContextType = {
-  user: User | null;
-  profile: Profile | null;
-  loading: boolean;
-
-  signUp: (
-    email: string,
-    password: string,
-  ) => Promise<{
-    error: Error | null;
-  }>;
-
-  signIn: (
-    email: string,
-    password: string,
-  ) => Promise<{
-    error: Error | null;
-  }>;
-
-  updateProfile: (
-    username: string,
-    displayName: string,
-  ) => Promise<{
-    error: Error | null;
-  }>;
-
-  signOut: () => Promise<void>;
-};
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+import { AuthContext, type Profile } from "./authState";
+export type { Profile } from "./authState";
+// Keep the existing import path for all auth consumers.
+// eslint-disable-next-line react-refresh/only-export-components
+export { useAuth } from "./authState";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  async function loadProfile(userId: string) {
+  const userId = user?.id;
+  const currentUserId = useRef<string | null>(null);
+
+  const loadProfile = useCallback(async (userId: string) => {
     const { data, error } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", userId)
       .single();
+    if (currentUserId.current !== userId) return;
+    if (error) console.error("Error loading profile:", error);
+    setProfile(error ? null : data);
+    setLoading(false);
+  }, []);
 
-    if (error) {
-      console.error("Error loading profile:", error);
-      setProfile(null);
-      return;
-    }
-
-    setProfile(data);
-  }
+  const refreshProfile = useCallback(async () => {
+    if (currentUserId.current) await loadProfile(currentUserId.current);
+  }, [loadProfile]);
 
   useEffect(() => {
-    async function initializeAuth() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      const currentUser = session?.user ?? null;
-
-      setUser(currentUser);
-
-      if (currentUser) {
-        await loadProfile(currentUser.id);
+    let disposed = false;
+    let authEventReceived = false;
+    const applyUser = (next: User | null) => {
+      if (disposed) return;
+      if (currentUserId.current !== (next?.id ?? null)) {
+        setProfile(null);
+        setLoading(!!next);
       }
-
-      setLoading(false);
-    }
-
-    initializeAuth();
-
+      currentUserId.current = next?.id ?? null;
+      setUser(next);
+      if (!next) {
+        setProfile(null);
+        setLoading(false);
+      }
+    };
+    void supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!authEventReceived) applyUser(session?.user ?? null);
+    });
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      const currentUser = session?.user ?? null;
-
-      setUser(currentUser);
-
-      if (currentUser) {
-        await loadProfile(currentUser.id);
-      } else {
-        setProfile(null);
-      }
-
-      setLoading(false);
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      authEventReceived = true;
+      applyUser(session?.user ?? null);
     });
-
     return () => {
+      disposed = true;
       subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    if (!userId) return;
+    void loadProfile(userId);
+    const refresh = () => void loadProfile(userId);
+    window.addEventListener("focus", refresh);
+    const channel = supabase
+      .channel(`own-profile-${userId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "profiles",
+          filter: `id=eq.${userId}`,
+        },
+        refresh,
+      )
+      .subscribe();
+    return () => {
+      window.removeEventListener("focus", refresh);
+      void supabase.removeChannel(channel);
+    };
+  }, [userId, loadProfile]);
 
   async function signUp(email: string, password: string) {
     const { error } = await supabase.auth.signUp({
@@ -180,6 +161,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         profile,
         loading,
+        refreshProfile,
         signUp,
         signIn,
         updateProfile,
@@ -189,14 +171,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error("useAuth must be used inside an AuthProvider");
-  }
-
-  return context;
 }

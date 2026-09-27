@@ -1,3 +1,4 @@
+import { useAppLanguage } from "@/i18n/languageStore";
 import { useCallback, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import type { WattenPlayerInfo, WattenVariant } from "../../utils/types";
@@ -27,9 +28,11 @@ import { useCardTheme } from "@/context/CardThemeContext";
 import { getWattenCardImage } from "@/utils/WattenCardImages";
 import TableThemeSelector from "../App/TableThemeSelector";
 import { useTableTheme, type TableTheme } from "@/context/TableThemeContext";
+import { useAuth } from "@/context/AuthContext";
+import { ProfileAvatar } from "../social/ProfileAvatarPicker";
+import "./wattenGameScreen.css";
 
 import {
-  getInitialWattenLanguage,
   setStoredWattenLanguage,
   translateWatten,
   translateWattenPair,
@@ -56,6 +59,10 @@ type Player = {
   name: string;
   cards: WattenCard[];
 };
+
+function HostAvatar({ player, avatarId }: { player: Player; avatarId: string }) {
+  return player.id === "1" ? <span className="mx-auto mb-1 block h-9 w-9 overflow-hidden rounded-full border border-amber-300/50"><ProfileAvatar avatarId={avatarId} className="h-full w-full" /></span> : null;
+}
 
 type PlayedCard = {
   playerId: string;
@@ -112,10 +119,10 @@ function MiniWattenCard({ card }: { card: DisplayWattenCard }) {
 }
 
 export default function WattenGame() {
+  const { profile } = useAuth();
+  const hostAvatarId = (profile as { avatar_id?: string | null } | null)?.avatar_id ?? "m1";
   const { tableTheme } = useTableTheme();
-  const [language, setLanguage] = useState<WattenLanguage>(
-    getInitialWattenLanguage,
-  );
+  const { language, setLanguage } = useAppLanguage();
   const t = useCallback(
     (key: string) => translateWatten(language, key),
     [language],
@@ -1286,8 +1293,8 @@ export default function WattenGame() {
     }
 
     return (
-      <main className="min-h-screen bg-transparent px-2 py-3 text-white sm:px-4 sm:py-4 md:px-8 md:py-6">
-        <div className="mx-auto w-full max-w-[1800px]">
+      <main className="watten-game-screen min-h-screen bg-transparent px-2 py-3 text-white sm:px-4 sm:py-4 md:px-8 md:py-6">
+        <div className="watten-game-content mx-auto w-full max-w-[1800px]">
           {/* HEADER */}
           <div className="relative z-30 mb-3 flex items-start justify-between gap-2 max-md:flex-col md:mb-4 md:items-center">
             <div className="max-md:ml-0 max-md:pl-0 ml-5 pl-5">
@@ -1371,7 +1378,7 @@ export default function WattenGame() {
             </div>
           </div>
           {/* TABLE + SIDEBARS */}
-          <div className="grid w-full grid-cols-[16rem_minmax(0,1fr)_16rem] items-start gap-5 max-md:grid-cols-1 max-md:gap-3">
+          <div className="watten-game-grid grid w-full grid-cols-[16rem_minmax(0,1fr)_16rem] items-start gap-5 max-md:grid-cols-1 max-md:gap-3">
             {/* LEFT SIDEBAR: HELP + TEAM SCORE */}
             <aside className="relative w-64 pt-15 max-md:order-2 max-md:w-full max-md:pt-0">
               {/* CARD PRIORITY HELP */}
@@ -2424,6 +2431,7 @@ export default function WattenGame() {
                     </div>
 
                     <div className="mt-1 text-lg font-bold">
+                      <HostAvatar player={topPlayer} avatarId={hostAvatarId} />
                       {topPlayer.name}
                     </div>
 
@@ -2443,7 +2451,7 @@ export default function WattenGame() {
                       {l("Nächster Spieler", "Next player")}
                     </div>
 
-                    <div className="text-lg font-bold">{leftPlayer.name}</div>
+                    <div className="text-lg font-bold"><HostAvatar player={leftPlayer} avatarId={hostAvatarId} />{leftPlayer.name}</div>
 
                     <div
                       className={`mx-auto mt-1 w-fit rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${leftTeam.badge}`}
@@ -2457,7 +2465,7 @@ export default function WattenGame() {
                   <div
                     className={`absolute right-3 top-1/2 z-20 w-44 -translate-y-1/2 rounded-2xl border p-3 text-center shadow-xl backdrop-blur max-md:right-1 max-md:w-28 max-md:p-2 ${rightTeam.box}`}
                   >
-                    <div className="text-lg font-bold">{rightPlayer.name}</div>
+                    <div className="text-lg font-bold"><HostAvatar player={rightPlayer} avatarId={hostAvatarId} />{rightPlayer.name}</div>
 
                     <div
                       className={`mx-auto mt-1 w-fit rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${rightTeam.badge}`}
@@ -2514,6 +2522,7 @@ export default function WattenGame() {
                     >
                       {bottomTeam.label}
                     </div>
+                    <HostAvatar player={fourCurrentPlayer} avatarId={hostAvatarId} />
 
                     {fourTrumpfOderKritischActive && (
                       <div
@@ -2853,8 +2862,8 @@ export default function WattenGame() {
   }
 
   return (
-    <main className="min-h-screen bg-transparent px-2 py-3 text-white sm:px-4 sm:py-4 md:px-8 md:py-6">
-      <div className="mx-auto w-full max-w-[1800px]">
+    <main className="watten-game-screen min-h-screen bg-transparent px-2 py-3 text-white sm:px-4 sm:py-4 md:px-8 md:py-6">
+      <div className="watten-game-content mx-auto w-full max-w-[1800px]">
         {/* Header */}
         <div className="max-md:ml-0 max-md:pl-0 ml-5 pl-5">
           <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
@@ -2866,7 +2875,7 @@ export default function WattenGame() {
           </h1>
         </div>
 
-        <div className="relative pb-5 z-30 flex items-center justify-end gap-3 pr-2">
+        <div className="relative pb-5 z-30 flex items-center justify-end gap-3 pr-2 max-md:justify-start max-md:overflow-x-auto max-md:pb-2">
           <button
             type="button"
             onClick={() => setHelpMode((current) => !current)}
@@ -3575,7 +3584,7 @@ export default function WattenGame() {
         )}
 
         {/* Table + round score */}
-        <div className="grid w-full grid-cols-[16rem_minmax(0,1fr)_16rem] items-start gap-5 max-md:grid-cols-1 max-md:gap-3">
+        <div className="watten-game-grid grid w-full grid-cols-[16rem_minmax(0,1fr)_16rem] items-start gap-5 max-md:grid-cols-1 max-md:gap-3">
           {/* LEFT SIDEBAR: PUNKTESTAND */}
           <aside className="relative w-64 pt-15 max-md:order-2 max-md:w-full max-md:pt-0">
             {/* CARD PRIORITY HELP */}
@@ -3997,7 +4006,8 @@ export default function WattenGame() {
                     </div>
                   )}
 
-                  <div className="text-lg font-bold text-white">
+                    <div className="text-lg font-bold text-white">
+                    <HostAvatar player={leftOpponent} avatarId={hostAvatarId} />
                     {leftOpponent.name}
                   </div>
 
@@ -4041,6 +4051,7 @@ export default function WattenGame() {
                     </div>
                   )}
                   <div className="text-lg font-bold text-white">
+                    <HostAvatar player={rightOpponent} avatarId={hostAvatarId} />
                     {rightOpponent.name}
                   </div>
 
@@ -4165,6 +4176,7 @@ export default function WattenGame() {
                     </div>
                     {/* Current player */}
                     <div className="mb-1 text-center">
+                      <HostAvatar player={currentPlayerData} avatarId={hostAvatarId} />
                       <div className="mb-1 text-center">
                         <span className="text-xs font-semibold uppercase tracking-widest text-emerald-300">
                           {l("Handkarten von", "Hand of")}

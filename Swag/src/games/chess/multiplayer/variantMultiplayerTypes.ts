@@ -19,6 +19,7 @@ export type VariantRoom = {
   host_id: string;
   variant: MultiplayerVariantId;
   max_players: number;
+  bot_colors?: FourPlayerRoomColor[];
   status: "waiting" | "playing" | "finished";
   created_at?: string;
 };
@@ -83,6 +84,7 @@ export type VariantGame = {
 
   last_action_user_id?: string | null;
   last_action_kind?: string | null;
+  bot_undo_snapshot?: { user_id: string } | null;
 };
 
 export type DraftPrivateSetup = {

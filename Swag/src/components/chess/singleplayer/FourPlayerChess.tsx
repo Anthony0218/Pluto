@@ -1,3 +1,5 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   LanguageSelector,
@@ -247,6 +249,7 @@ export default function FourPlayerChess({
   humanColor = "red",
   difficulty = "casual",
 }: FourPlayerAiProps) {
+  useUiLanguage();
   const { language, setLanguage } = useChessLanguage();
   const t = (key: string) => translateChess(language, key, translations);
   const [state, setState] = useState<FourPlayerState>(
@@ -397,9 +400,9 @@ export default function FourPlayerChess({
   }
 
   return (
-    <div className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
+    <div className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1580px]">
-        <header className="mb-6 rounded-3xl border border-white/5 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20">
+        <ChessPageHeader className="mb-6 rounded-3xl border border-white/5 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20">
           <p className="text-[10px] font-black uppercase tracking-[0.28em] text-fuchsia-300">
             {t("Chess Variant")}
           </p>
@@ -433,17 +436,15 @@ export default function FourPlayerChess({
                   }`}
                 >
                   {t(fourPlayerLabel(state.turn))} {t("to move")}
-                  {isFourPlayerKingInCheck(state.board, state.turn)
-                    ? ` · ${t("CHECK")}`
-                    : ""}
+                  {isFourPlayerKingInCheck(state.board, state.turn) ? ` · ${t("CHECK")}` : ""}
                 </div>
               )}
             </div>
             <BoardAnimationToggle />
           </div>
-        </header>
+        </ChessPageHeader>
 
-        <main className="grid gap-6 xl:grid-cols-[290px_minmax(0,1fr)_290px]">
+        <main className="grid gap-6 chess-game-grid xl:grid-cols-[290px_minmax(0,1fr)_290px]">
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
               <Panel
@@ -497,11 +498,7 @@ export default function FourPlayerChess({
                         </span>
 
                         <span className="text-[10px] font-bold text-zinc-600">
-                          {!active
-                            ? t("Eliminated")
-                            : current
-                              ? t("Turn")
-                              : t("Active")}
+                          {!active ? t("Eliminated") : current ? t("Turn") : t("Active")}
                         </span>
                       </div>
                     );
@@ -651,6 +648,7 @@ function FourPlayerBoard({
   checkedKingSquare: FourPlayerSquare | null;
   onSquareClick: (row: number, column: number) => void;
 }) {
+  useUiLanguage();
   return (
     <div className="w-full rounded-[28px] border border-[#5f412d] bg-gradient-to-br from-[#493323] via-[#2d1e15] to-[#160e09] p-3 shadow-[0_30px_80px_rgba(0,0,0,0.55)] sm:p-4">
       <div className="rounded-[18px] border border-black/40 bg-[#160e09] p-1.5 shadow-inner sm:p-2">
@@ -734,6 +732,7 @@ function FourPlayerBoard({
 }
 
 function FourPlayerPieceView({ piece }: { piece: FourPlayerPiece }) {
+  useUiLanguage();
   return (
     <span
       className={`pointer-events-none relative z-10 flex h-full w-full select-none items-center justify-center font-serif text-[clamp(1.15rem,3.5vw,3.2rem)] leading-none drop-shadow-[0_3px_3px_rgba(0,0,0,0.75)] transition-transform duration-150 group-hover:scale-105 ${
@@ -754,19 +753,21 @@ function Panel({
   subtitle: string;
   children: ReactNode;
 }) {
+  useUiLanguage();
   return (
     <section className="rounded-3xl border border-white/5 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
-      <h2 className="font-black text-zinc-100">{title}</h2>
-      <p className="mt-1 mb-4 text-xs text-zinc-600">{subtitle}</p>
+      <h2 className="font-black text-zinc-100">{ui(title)}</h2>
+      <p className="mt-1 mb-4 text-xs text-zinc-600">{ui(subtitle)}</p>
       {children}
     </section>
   );
 }
 
 function Rule({ text }: { text: string }) {
+  useUiLanguage();
   return (
     <div className="mb-2 rounded-xl border border-white/5 bg-black/20 px-3 py-2.5 text-xs leading-5 text-zinc-400 last:mb-0">
-      {text}
+      {ui(text)}
     </div>
   );
 }

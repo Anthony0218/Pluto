@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import VariantAiLauncher from "./VariantAiLauncher";
 
 import TotalChaosChess from "../singleplayer/TotalChaosChess";
@@ -17,9 +18,10 @@ import TectonicChess from "../singleplayer/TectonicChess";
 import ThreeLivesChessBoard from "../singleplayer/ThreeLivesChessBoard";
 
 export function TotalChaosAiPage() {
+  useUiLanguage();
   return (
     <VariantAiLauncher
-      title="Total Chaos Chess"
+      title={ui("Total Chaos Chess")}
       icon="🌀"
       Board={TotalChaosChess}
     />
@@ -27,9 +29,10 @@ export function TotalChaosAiPage() {
 }
 
 export function BossBattleAiPage() {
+  useUiLanguage();
   return (
     <VariantAiLauncher
-      title="Boss Battle Chess"
+      title={ui("Boss Battle Chess")}
       icon="♚"
       Board={BossBattleBoard}
       sideLabels={{
@@ -41,9 +44,10 @@ export function BossBattleAiPage() {
 }
 
 export function CapitalismAiPage() {
+  useUiLanguage();
   return (
     <VariantAiLauncher
-      title="Capitalism Chess"
+      title={ui("Capitalism Chess")}
       icon="🪙"
       Board={CapitalismChessBoard}
     />
@@ -51,9 +55,10 @@ export function CapitalismAiPage() {
 }
 
 export function CollapseAiPage() {
+  useUiLanguage();
   return (
     <VariantAiLauncher
-      title="Chess Collapse"
+      title={ui("Chess Collapse")}
       icon="⚠"
       Board={ChessCollapseBoard}
     />
@@ -61,9 +66,10 @@ export function CollapseAiPage() {
 }
 
 export function HotPotatoAiPage() {
+  useUiLanguage();
   return (
     <VariantAiLauncher
-      title="Hot Potato Chess"
+      title={ui("Hot Potato Chess")}
       icon="💣"
       Board={ChessHotPotatoBoard}
     />
@@ -71,9 +77,10 @@ export function HotPotatoAiPage() {
 }
 
 export function RouletteAiPage() {
+  useUiLanguage();
   return (
     <VariantAiLauncher
-      title="Chess Roulette"
+      title={ui("Chess Roulette")}
       icon="🎰"
       Board={ChessRouletteBoard}
     />
@@ -81,15 +88,17 @@ export function RouletteAiPage() {
 }
 
 export function DraftAiPage() {
+  useUiLanguage();
   return (
-    <VariantAiLauncher title="Draft Chess" icon="⚔" Board={DraftChessBoard} />
+    <VariantAiLauncher title={ui("Draft Chess")} icon="⚔" Board={DraftChessBoard} />
   );
 }
 
 export function FogOfWarAiPage() {
+  useUiLanguage();
   return (
     <VariantAiLauncher
-      title="Fog of War Chess"
+      title={ui("Fog of War Chess")}
       icon="🌫"
       Board={FogOfWarChessBoard}
     />
@@ -97,21 +106,24 @@ export function FogOfWarAiPage() {
 }
 
 export function HorrorAiPage() {
+  useUiLanguage();
   return (
-    <VariantAiLauncher title="Horror Chess" icon="☠" Board={HorrorChessBoard} />
+    <VariantAiLauncher title={ui("Horror Chess")} icon="☠" Board={HorrorChessBoard} />
   );
 }
 
 export function MirrorAiPage() {
+  useUiLanguage();
   return (
-    <VariantAiLauncher title="Mirror Chess" icon="◈" Board={MirrorChessBoard} />
+    <VariantAiLauncher title={ui("Mirror Chess")} icon="◈" Board={MirrorChessBoard} />
   );
 }
 
 export function MutationAiPage() {
+  useUiLanguage();
   return (
     <VariantAiLauncher
-      title="Mutation Chess"
+      title={ui("Mutation Chess")}
       icon="🧬"
       Board={MutationChessBoard}
     />
@@ -119,9 +131,10 @@ export function MutationAiPage() {
 }
 
 export function PortalAiPage() {
+  useUiLanguage();
   return (
     <VariantAiLauncher
-      title="Portal Chess"
+      title={ui("Portal Chess")}
       icon="🌀"
       Board={PortalChessBoard}
     />
@@ -129,9 +142,10 @@ export function PortalAiPage() {
 }
 
 export function RandomStartAiPage() {
+  useUiLanguage();
   return (
     <VariantAiLauncher
-      title="Random Start Chess"
+      title={ui("Random Start Chess")}
       icon="🎲"
       Board={RandomStartChess}
     />
@@ -139,15 +153,17 @@ export function RandomStartAiPage() {
 }
 
 export function TectonicAiPage() {
+  useUiLanguage();
   return (
-    <VariantAiLauncher title="Tectonic Chess" icon="↻" Board={TectonicChess} />
+    <VariantAiLauncher title={ui("Tectonic Chess")} icon="↻" Board={TectonicChess} />
   );
 }
 
 export function ThreeLivesAiPage() {
+  useUiLanguage();
   return (
     <VariantAiLauncher
-      title="Three Lives Chess"
+      title={ui("Three Lives Chess")}
       icon="♥"
       Board={ThreeLivesChessBoard}
     />

@@ -1,3 +1,5 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { Chess, type Square } from "chess.js";
@@ -424,6 +426,7 @@ export default function TectonicChess({
   playerColor = "white",
   difficulty = "casual",
 }: VariantAiBoardProps) {
+  useUiLanguage();
   const { language, setLanguage } = useChessLanguage();
 
   const t = (key: string) => translateChess(language, key, translations);
@@ -945,10 +948,10 @@ export default function TectonicChess({
   const shifterName = game.turn() === "w" ? t("White") : t("Black");
 
   return (
-    <div className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
+    <div className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1460px]">
-        <header className="mb-6 rounded-3xl border border-violet-400/10 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <ChessPageHeader className="mb-6 rounded-3xl border border-violet-400/10 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20" description={<> {t("Move pieces. Then move the board.")} </>}>
+<div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-300">
                 {t("Chess Variant")}
@@ -978,21 +981,16 @@ export default function TectonicChess({
                       : "border-white/10 bg-white/5 text-zinc-300"
                   }`}
                 >
-                  {tectonic.pendingShift
-                    ? `${t("TECTONIC SHIFT")} · ${shifterName}`
-                    : moveAfterSkippedShift
-                      ? `${shifterName} · normal move after skip`
-                      : game.turn() === "w"
-                        ? t("White to move")
-                        : t("Black to move")}
+                  {tectonic.pendingShift ? `${t("TECTONIC SHIFT")} · ${shifterName}` : moveAfterSkippedShift ? `${shifterName} · normal move after skip` : game.turn() === "w" ? t("White to move") : t("Black to move")}
                 </div>
               )}
             </div>
             <BoardAnimationToggle />
           </div>
-        </header>
 
-        <main className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
+        </ChessPageHeader>
+
+        <main className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
               <Panel
@@ -1048,7 +1046,7 @@ export default function TectonicChess({
                       >
                         <div className="flex items-center gap-2">
                           <span className="w-6 text-[10px] text-zinc-600">
-                            {entry.action}
+                            {ui(entry.action)}
                           </span>
 
                           <span>{entry.color === "w" ? "♙" : "♟"}</span>
@@ -1167,11 +1165,7 @@ export default function TectonicChess({
                     </p>
 
                     <h2 className="mt-3 text-3xl font-black text-white">
-                      {finishedGame.winner === "white"
-                        ? t("White wins")
-                        : finishedGame.winner === "black"
-                          ? t("Black wins")
-                          : t("Draw")}
+                      {finishedGame.winner === "white" ? t("White wins") : finishedGame.winner === "black" ? t("Black wins") : t("Draw")}
                     </h2>
 
                     <p className="mt-3 text-sm leading-6 text-zinc-500">
@@ -1264,11 +1258,7 @@ export default function TectonicChess({
                             </p>
 
                             <p className="mt-1 text-[9px] font-black uppercase tracking-wider text-zinc-600">
-                              {locked
-                                ? t("Locked")
-                                : legal
-                                  ? t("Rotate 90° clockwise")
-                                  : t("Illegal")}
+                              {locked ? t("Locked") : legal ? t("Rotate 90° clockwise") : t("Illegal")}
                             </p>
                           </button>
                         );
@@ -1421,6 +1411,7 @@ function QuadrantOverlay({
   hovered: TectonicQuadrant | null;
   locked: TectonicQuadrant | null;
 }) {
+  useUiLanguage();
   const cells = [
     ["topLeft", "left-[25%] top-[25%]"],
     ["topRight", "left-[75%] top-[25%]"],
@@ -1470,11 +1461,12 @@ function Panel({
   subtitle: string;
   children: ReactNode;
 }) {
+  useUiLanguage();
   return (
     <section className="rounded-3xl border border-white/5 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
-      <h2 className="font-black text-zinc-100">{title}</h2>
+      <h2 className="font-black text-zinc-100">{ui(title)}</h2>
 
-      <p className="mt-1 mb-4 text-xs text-zinc-600">{subtitle}</p>
+      <p className="mt-1 mb-4 text-xs text-zinc-600">{ui(subtitle)}</p>
 
       {children}
     </section>
@@ -1482,21 +1474,23 @@ function Panel({
 }
 
 function Stat({ label, value }: { label: string; value: number }) {
+  useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-2 py-3 text-center">
       <p className="text-xl font-black text-violet-200">{value}</p>
       <p className="mt-1 text-[9px] font-bold leading-4 text-zinc-600">
-        {label}
+        {ui(label)}
       </p>
     </div>
   );
 }
 
 function StatusMini({ label, value }: { label: string; value: string }) {
+  useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 p-3">
       <p className="text-[9px] font-black uppercase tracking-wider text-zinc-600">
-        {label}
+        {ui(label)}
       </p>
       <p className="mt-1 text-sm font-black text-zinc-300">{value}</p>
     </div>
@@ -1504,12 +1498,13 @@ function StatusMini({ label, value }: { label: string; value: string }) {
 }
 
 function RuleLine({ icon, text }: { icon: string; text: string }) {
+  useUiLanguage();
   return (
     <div className="flex items-start gap-3 rounded-xl border border-white/5 bg-black/20 px-3 py-2.5 text-xs leading-5 text-zinc-400">
       <span className="flex min-w-7 justify-center font-black text-violet-300">
         {icon}
       </span>
-      <span>{text}</span>
+      <span>{ui(text)}</span>
     </div>
   );
 }

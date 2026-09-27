@@ -1,3 +1,5 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   LanguageSelector,
@@ -145,6 +147,7 @@ export default function RandomStartChess({
   playerColor = "white",
   difficulty = "casual",
 }: VariantAiBoardProps) {
+  useUiLanguage();
   const { language, setLanguage } = useChessLanguage();
   const t = (key: string) => translateChess(language, key, translations);
   const [startPosition, setStartPosition] = useState<RandomStartPosition>(() =>
@@ -525,7 +528,7 @@ export default function RandomStartChess({
   return (
     <div className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1460px]">
-        <header className="mb-6 rounded-3xl border border-violet-400/10 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20">
+        <ChessPageHeader className="mb-6 rounded-3xl border border-violet-400/10 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20">
           <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-300">
             {t("Chess Variant")}
           </p>
@@ -550,15 +553,13 @@ export default function RandomStartChess({
 
               {!gameOver && (
                 <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-black text-zinc-300">
-                  {game.turn() === "w"
-                    ? t("White to move")
-                    : t("Black to move")}
+                  {game.turn() === "w" ? t("White to move") : t("Black to move")}
                 </span>
               )}
             </div>
             <BoardAnimationToggle />
           </div>
-        </header>
+        </ChessPageHeader>
 
         <main className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">
@@ -708,11 +709,7 @@ export default function RandomStartChess({
                     </p>
 
                     <h2 className="mt-3 text-3xl font-black text-white">
-                      {winner === "white"
-                        ? t("White wins")
-                        : winner === "black"
-                          ? t("Black wins")
-                          : t("Draw")}
+                      {winner === "white" ? t("White wins") : winner === "black" ? t("Black wins") : t("Draw")}
                     </h2>
 
                     <p className="mt-2 text-sm text-zinc-500">
@@ -773,20 +770,22 @@ function Panel({
   subtitle: string;
   children: ReactNode;
 }) {
+  useUiLanguage();
   return (
     <section className="rounded-3xl border border-white/5 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
-      <h2 className="font-black text-zinc-100">{title}</h2>
-      <p className="mt-1 mb-4 text-xs text-zinc-600">{subtitle}</p>
+      <h2 className="font-black text-zinc-100">{ui(title)}</h2>
+      <p className="mt-1 mb-4 text-xs text-zinc-600">{ui(subtitle)}</p>
       {children}
     </section>
   );
 }
 
 function Lineup({ title, value }: { title: string; value: string }) {
+  useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3">
       <p className="text-[9px] font-black uppercase tracking-wider text-zinc-600">
-        {title}
+        {ui(title)}
       </p>
       <p className="mt-2 font-mono text-sm font-black tracking-widest text-zinc-200">
         {value}
@@ -796,9 +795,10 @@ function Lineup({ title, value }: { title: string; value: string }) {
 }
 
 function Rule({ text }: { text: string }) {
+  useUiLanguage();
   return (
     <div className="mb-2 rounded-xl border border-white/5 bg-black/20 px-3 py-2.5 text-xs leading-5 text-zinc-400 last:mb-0">
-      {text}
+      {ui(text)}
     </div>
   );
 }

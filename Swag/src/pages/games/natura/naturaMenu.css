@@ -1,0 +1,86 @@
+.natura.natura-experience { min-height: var(--app-height); background: #e9e9de; color: #183b34; }
+.natura.natura-experience .natura-shell { max-width: 1440px; padding: 0 24px 44px; }
+.natura.natura-experience .natura-header { padding: 15px 0; border-color: #31574b33; color: #23473d; font-family: Georgia, serif; font-size: 19px; letter-spacing: .17em; }
+.natura.natura-experience .natura-header small { color: #587c6c; font-family: Inter, ui-sans-serif, sans-serif; font-size: 9px; letter-spacing: .18em; }
+.natura.natura-experience .natura-header button { border: 1px solid #3866545c; border-radius: 999px; padding: 8px 13px; color: #285441; text-decoration: none; font-family: Inter, ui-sans-serif, sans-serif; font-size: 11px; letter-spacing: 0; transition: background .2s; }
+.natura.natura-experience .natura-header button:hover { background: #d7e6d6; }
+.natura.natura-experience .natura-score { justify-content: space-between; max-width: 470px; margin: auto; padding: 11px 0; color: #567060; font-size: 11px; letter-spacing: .08em; }
+.natura.natura-experience .natura-score b { color: #b76a42; font-size: 20px; }
+.natura .natura-menu-panel { max-width: none; margin: 0 auto; padding: 0; overflow: hidden; border: 1px solid #52756261; border-radius: 20px; background: #f7f4e8; box-shadow: 0 25px 65px #1c483026; }
+.natura-menu-hero { position: relative; isolation: isolate; display: flex; align-items: center; min-height: 350px; overflow: hidden; padding: clamp(28px, 5vw, 70px); color: #f4efdc; background: #142b25 url('/images/natura-field-guide.png') center 50% / cover no-repeat; }
+.natura-menu-hero::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(90deg, #0d271ff2 0%, #0c281dcb 33%, transparent 76%); }
+.natura-menu-hero__copy { max-width: 570px; }
+.natura .natura-menu-hero .natura-eyebrow { color: #b6e0b1; font-size: 10px; letter-spacing: .3em; }
+.natura .natura-menu-hero h1 { margin: 17px 0 14px; color: #fff5de; font: 500 clamp(44px, 5vw, 74px)/.99 Georgia, serif; letter-spacing: -.06em; text-wrap: balance; }
+.natura .natura-menu-hero__copy > p:not(.natura-eyebrow) { max-width: 445px; color: #d7e3cd; font: 17px/1.6 Georgia, serif; }
+.natura-menu-hero__meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+.natura-menu-hero__meta span { padding: 7px 11px; border: 1px solid #d4e4be75; border-radius: 999px; background: #15392d91; color: #e4efda; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.natura-menu-content { padding: clamp(24px, 3vw, 42px); background: radial-gradient(circle at 100% 0%, #c8dcb927, transparent 30%), repeating-linear-gradient(0deg, #224c3305 0 1px, transparent 1px 28px), #f7f4e8; }
+.natura-menu-heading { display: flex; align-items: end; justify-content: space-between; gap: 15px; margin-bottom: 20px; }
+.natura .natura-menu-heading h2 { margin: 6px 0 0; color: #173c31; font: 500 clamp(28px, 3vw, 38px) Georgia, serif; }
+.natura-menu-heading > span { color: #829284; font-size: 9px; font-weight: 800; letter-spacing: .16em; }
+.natura-menu-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(330px, .84fr); align-items: start; gap: clamp(18px, 3vw, 34px); }
+.natura .natura-menu-panel .natura-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin: 0; }
+.natura .natura-menu-panel .natura-cards button { position: relative; display: flex; flex-direction: row; align-items: center; gap: 11px; min-width: 0; min-height: 86px; padding: 10px 12px; border: 1px solid #a9c2ab; border-radius: 12px; background: #fffdf5e8; color: #1f4539; text-align: left; box-shadow: 0 6px 14px #25452b0a; transition: transform .2s, border-color .2s, background .2s, box-shadow .2s; }
+.natura .natura-menu-panel .natura-cards button:hover { transform: translateY(-2px); border-color: #538a67; box-shadow: 0 10px 22px #25452b1b; }
+.natura .natura-menu-panel .natura-cards button.selected { border: 2px solid #337b61; background: #e4f0dd; box-shadow: 0 0 0 3px #5a9d7024; }
+.natura-card-number { position: absolute; top: 8px; right: 10px; color: #91a69a; font: 700 10px Georgia, serif; }
+.natura-card-icon { display: grid; place-items: center; width: 41px; height: 41px; flex: none; border: 1px solid #acc4ae; border-radius: 11px; background: #e5ecdb; font-size: 23px; }
+.natura-card-icon svg { width: 23px; height: 23px; stroke-width: 1.6; }
+.natura-card-copy { display: grid; gap: 5px; min-width: 0; }
+.natura .natura-card-copy strong { overflow: hidden; color: #214837; font: 600 16px Georgia, serif; text-overflow: ellipsis; white-space: nowrap; }
+.natura .natura-card-copy > span { overflow: hidden; color: #688073; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.natura-card-arrow { align-self: end; margin-left: auto; color: #2f8065; font-size: 17px; opacity: 0; transform: translate(-3px, 3px); transition: opacity .2s, transform .2s; }
+.natura .natura-menu-panel .natura-cards button:hover .natura-card-arrow,
+.natura .natura-menu-panel .natura-cards button.selected .natura-card-arrow { opacity: 1; transform: none; }
+.natura-spotlight { position: sticky; top: 14px; padding: 24px; border: 1px solid #aec4aa; border-radius: 16px; background: linear-gradient(155deg, #f8f4e8, #e9eddd); box-shadow: 0 14px 36px #214c3319; }
+.natura-spotlight-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-bottom: 12px; border-bottom: 1px solid #9eb5a25c; color: #607d69; font-size: 9px; font-weight: 850; letter-spacing: .16em; }
+.natura-spotlight-top span:last-child { color: #398568; }
+.natura-spotlight-icon { display: grid; place-items: center; width: 80px; height: 80px; margin: 18px 0 15px; border: 1px solid #acc6b0; border-radius: 18px; background: #dce9d5; box-shadow: inset 0 0 30px #fff9d25e; font-size: 45px; }
+.natura-spotlight-icon svg { width: 44px; height: 44px; stroke-width: 1.3; }
+.natura .natura-spotlight .natura-eyebrow { color: #b26a43; }
+.natura .natura-spotlight h2 { margin: 7px 0 12px; color: #193e32; font: 500 clamp(30px, 3vw, 42px) Georgia, serif; letter-spacing: -.045em; }
+.natura-spotlight-behaviour { color: #4d6756; font-size: 12px; line-height: 1.65; }
+.natura-spotlight > a { display: inline-block; margin-top: 10px; color: #29745c; font-size: 10px; font-weight: 750; text-decoration: underline; text-underline-offset: 2px; }
+.natura .natura-spotlight .nw-fact { margin: 18px 0 0; padding: 15px; border-color: #d7cba5; background: #f4edda; }
+.natura .natura-spotlight .nw-fact h3 { margin: 5px 0; font-size: 18px; }
+.natura .natura-spotlight .nw-fact p { margin-bottom: 7px; line-height: 1.45; }
+.natura .natura-spotlight .nw-fact-body > small { margin-top: 9px; }
+.natura .natura-spotlight .nw-fact > button { margin-top: 9px; padding-top: 8px; }
+.natura-spotlight-opponents { margin-top: 19px; padding-top: 15px; border-top: 1px solid #9eb5a25c; }
+.natura .natura-spotlight .natura-options { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin: 11px 0 0; }
+.natura .natura-spotlight .natura-options button { min-width: 0; padding: 11px; border-radius: 10px; background: #fffdf4; color: #24473b; font-size: 12px; }
+.natura .natura-spotlight .natura-options button.active { border: 2px solid #337b61; background: #deeedb; }
+.natura .natura-spotlight .natura-options small { margin-top: 5px; font-size: 10px; line-height: 1.35; }
+.natura .natura-spotlight .natura-primary { display: flex; align-items: center; justify-content: space-between; gap: 15px; width: 100%; margin-top: 16px; padding: 14px 16px; border-radius: 10px; background: #235b46; color: #f7f4de; font-size: 12px; text-align: left; transition: background .2s, transform .2s; }
+.natura .natura-spotlight .natura-primary:hover { background: #33775a; transform: translateY(-2px); }
+.natura .natura-spotlight .natura-primary span { font-size: 20px; }
+.natura-menu-panel :is(button,a):focus-visible { outline: 3px solid #a65d37; outline-offset: 3px; }
+@media (max-width: 900px) {
+  .natura-menu-grid { grid-template-columns: 1fr; }
+  .natura-spotlight { position: static; }
+}
+@media (max-width: 640px) {
+  .natura.natura-experience .natura-shell { padding: 0 12px 25px; }
+  .natura.natura-experience .natura-header { padding: 10px 0; }
+  .natura .natura-menu-panel { border-radius: 14px; }
+  .natura-menu-hero { min-height: 270px; padding: 22px; background-position: 63% center; }
+  .natura-menu-hero::after { background: linear-gradient(90deg, #0d271ff2 0%, #0c281dd9 53%, #0c281d55); }
+  .natura .natura-menu-hero h1 { max-width: 250px; font-size: 43px; }
+  .natura .natura-menu-hero__copy > p:not(.natura-eyebrow) { max-width: 235px; font-size: 13px; line-height: 1.45; }
+  .natura-menu-hero__meta { gap: 6px; margin-top: 15px; }
+  .natura-menu-hero__meta span { padding: 5px 8px; font-size: 8px; }
+  .natura-menu-content { padding: 19px 13px; }
+  .natura-menu-heading { align-items: start; margin-bottom: 14px; }
+  .natura-menu-heading > span { display: block; align-self: end; max-width: 70px; font-size: 8px; line-height: 1.4; }
+  .natura .natura-menu-panel .natura-cards { display: flex; gap: 9px; margin: 0 -13px; padding: 3px 13px 13px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+  .natura .natura-menu-panel .natura-cards::-webkit-scrollbar { display: none; }
+  .natura .natura-menu-panel .natura-cards button { flex: 0 0 205px; min-height: 84px; scroll-snap-align: start; }
+  .natura-spotlight { padding: 18px; }
+  .natura-spotlight-icon { width: 58px; height: 58px; font-size: 35px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .natura-menu-panel *, .natura-header button { transition: none !important; scroll-behavior: auto !important; }
+  .natura .natura-menu-panel .natura-cards button:hover,
+  .natura .natura-spotlight .natura-primary:hover { transform: none; }
+}

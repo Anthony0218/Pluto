@@ -1,0 +1,35 @@
+.learning-preview__stage {
+  display: grid;
+  align-items: center;
+  min-height: 660px;
+}
+
+.landing-preview--bare {
+  background: transparent;
+}
+
+.learning-preview__stage--bare {
+  min-height: 0;
+}
+
+.learning-preview__cards { display: flex; justify-content: center; padding: 22px 0 12px; }
+.learning-preview__cards img { width: 24%; max-width: 80px; height: 118px; object-fit: contain; border-radius: 8px; box-shadow: 0 8px 24px #0008; }
+.learning-preview__cards img:first-child { transform: rotate(-14deg) translate(8px, 6px); }
+.learning-preview__cards img:nth-child(2) { z-index: 1; transform: translateY(-6px); }
+.learning-preview__cards img:last-child { transform: rotate(14deg) translate(-8px, 6px); }
+.landing-preview :is(button, a):focus-visible { outline: 2px solid #fcd34d; outline-offset: 3px; }
+.landing-preview button:disabled { cursor: default; }
+.learning-preview__lesson { animation: lesson-reveal .25s ease-out; }
+.learning-preview--compact .learning-preview__stage { min-height: 330px; }
+.learning-preview--compact .learning-preview__stage .chess-preview-board { max-width: 260px; margin-inline: auto; }
+.learning-preview--compact .learning-preview__lesson:last-child { min-height: 310px; }
+@keyframes lesson-reveal { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 639px) {
+  .learning-preview__stage { min-height: 520px; }
+  .learning-preview__stage .chess-preview-board { max-width: 320px; margin-inline: auto; }
+  .learning-preview--compact .learning-preview__stage { min-height: 520px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .learning-preview__lesson { animation: none; }
+  .landing-preview * { transition: none !important; }
+}

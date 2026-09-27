@@ -3,6 +3,7 @@ export type PublicProfile = {
   username: string | null;
   display_name: string | null;
   avatar_url: string | null;
+  avatar_id?: string | null;
 };
 
 export type Friend = PublicProfile;
@@ -29,5 +30,6 @@ export type FriendMessage = {
   message_type: PresetMessageType;
   game: "chess" | "watten" | null;
   game_code: string | null;
+  game_route?: string | null;
   created_at: string;
 };

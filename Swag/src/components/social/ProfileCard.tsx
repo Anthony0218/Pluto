@@ -1,18 +1,8 @@
 import type { User } from "@supabase/supabase-js";
 import type { Dispatch, SetStateAction } from "react";
-import "../pages/Profile.css";
 
-type Profile = {
-  id: string;
-  username: string;
-  display_name: string | null;
-  avatar_url: string | null;
-  rating: number;
-  games_played: number;
-  wins: number;
-  losses: number;
-  draws: number;
-};
+import type { Profile } from "../../context/AuthContext";
+import FriendAvatar from "./FriendAvatar";
 
 type ProfileCardProps = {
   profile: Profile | null;
@@ -44,9 +34,7 @@ export default function ProfileCard({
   return (
     <div className="profile-card">
       <div className="profile-header">
-        <div className="avatar">
-          {profile?.username?.charAt(0).toUpperCase() ?? "?"}
-        </div>
+        {profile && <FriendAvatar profile={profile} size="lg" />}
 
         <div>
           <h1>{profile?.username ?? "Player"}</h1>
@@ -57,7 +45,7 @@ export default function ProfileCard({
 
       <div className="rating">
         <span>Rating</span>
-        <strong>{profile?.rating ?? 1200}</strong>
+        <strong>{profile?.rating ?? "—"}</strong>
       </div>
 
       <div className="stats">

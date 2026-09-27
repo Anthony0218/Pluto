@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
@@ -260,6 +261,7 @@ function createCustomCastleMove(
 }
 
 function BoardFurniture() {
+  useUiLanguage();
   return (
     <>
       <mesh position={[0, -0.13, 0]} receiveShadow castShadow>
@@ -365,7 +367,16 @@ function CameraEffects({ effect }: { effect: CameraEffect }) {
   return null;
 }
 
-function CameraPresetRig({ view }: { view: Chess3DCameraView }) {
+function CameraPresetRig({
+  view,
+  controlsRef,
+  userInteractingRef,
+}: {
+  view: Chess3DCameraView;
+  controlsRef: React.MutableRefObject<any>;
+  userInteractingRef: React.MutableRefObject<boolean>;
+}) {
+  useUiLanguage();
   const { camera } = useThree();
   const startRef = useRef(new THREE.Vector3());
   const targetRef = useRef(new THREE.Vector3());
@@ -379,10 +390,15 @@ function CameraPresetRig({ view }: { view: Chess3DCameraView }) {
     startRef.current.copy(camera.position);
     targetRef.current.set(...CHESS_3D_CAMERA_POSITIONS[view.preset]);
     progressRef.current = 0;
-  }, [view, camera]);
+
+    if (controlsRef.current) {
+      controlsRef.current.target.set(0, 0.15, 0);
+      controlsRef.current.update();
+    }
+  }, [view, camera, controlsRef]);
 
   useFrame((_, delta) => {
-    if (progressRef.current >= 1) return;
+    if (progressRef.current >= 1 || userInteractingRef.current) return;
 
     progressRef.current = Math.min(1, progressRef.current + delta / 0.58);
 
@@ -391,13 +407,19 @@ function CameraPresetRig({ view }: { view: Chess3DCameraView }) {
 
     camera.position.lerpVectors(startRef.current, targetRef.current, eased);
 
-    camera.lookAt(0, 0.15, 0);
+    if (controlsRef.current) {
+      controlsRef.current.target.set(0, 0.15, 0);
+      controlsRef.current.update();
+    } else {
+      camera.lookAt(0, 0.15, 0);
+    }
   });
 
   return null;
 }
 
 function LastMoveTrail({ move }: { move: Move | null }) {
+  useUiLanguage();
   const materialRef = useRef<THREE.MeshStandardMaterial>(null);
   const [curve, geometry] = useMemo(() => {
     if (!move) return [null, null] as const;
@@ -466,6 +488,8 @@ function Scene({
   lastMove,
   pieceSkin,
   cameraView,
+  controlsRef,
+  userInteractingRef,
 }: {
   visualPieces: VisualPiece[];
   selectedSquare: Square | null;
@@ -481,7 +505,10 @@ function Scene({
   lastMove: Move | null;
   pieceSkin: Chess3DPieceSkin;
   cameraView: Chess3DCameraView;
+  controlsRef: React.MutableRefObject<any>;
+  userInteractingRef: React.MutableRefObject<boolean>;
 }) {
+  useUiLanguage();
   const legalMoveMap = useMemo(
     () => new Map(legalMoves.map((move) => [move.to, move])),
     [legalMoves],
@@ -556,20 +583,34 @@ function Scene({
       </Suspense>
 
       <CameraEffects effect={cameraEffect} />
-      <CameraPresetRig view={cameraView} />
+      <CameraPresetRig
+        view={cameraView}
+        controlsRef={controlsRef}
+        userInteractingRef={userInteractingRef}
+      />
 
       <OrbitControls
+        ref={controlsRef}
         target={[0, 0.15, 0]}
         enablePan={false}
+        enableDamping
+        dampingFactor={0.08}
         minDistance={6}
         maxDistance={17}
         maxPolarAngle={Math.PI / 2.02}
+        onStart={() => {
+          userInteractingRef.current = true;
+        }}
+        onEnd={() => {
+          userInteractingRef.current = false;
+        }}
       />
     </>
   );
 }
 
 function CapturedTray({ moveHistory }: { moveHistory: Move[] }) {
+  useUiLanguage();
   const capturedByWhite = moveHistory
     .filter((move) => move.color === "w" && move.captured)
     .map((move) => move.captured!) as PieceSymbol[];
@@ -590,12 +631,12 @@ function CapturedTray({ moveHistory }: { moveHistory: Move[] }) {
     return (
       <div className="rounded-2xl border border-white/10 bg-black/25 p-3">
         <div className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
-          {label}
+          {ui(label)}
         </div>
 
         <div className="mt-2 flex min-h-12 flex-wrap content-start gap-1.5">
           {pieces.length === 0 ? (
-            <span className="text-xs text-zinc-600">None</span>
+            <span className="text-xs text-zinc-600">{ui("None")}</span>
           ) : (
             pieces.map((piece, index) => (
               <span
@@ -616,23 +657,19 @@ function CapturedTray({ moveHistory }: { moveHistory: Move[] }) {
     <aside className="flex flex-col gap-3">
       <div className="rounded-2xl border border-amber-200/15 bg-zinc-950/80 p-4 shadow-xl shadow-black/30 backdrop-blur">
         <div className="mb-3">
-          <div className="text-xs font-black uppercase tracking-[0.22em] text-amber-200">
-            Captured
-          </div>
-          <p className="mt-1 text-xs leading-5 text-zinc-500">
-            Trophies from the current game.
-          </p>
+          <div className="text-xs font-black uppercase tracking-[0.22em] text-amber-200">{ui("Captured")}</div>
+          <p className="mt-1 text-xs leading-5 text-zinc-500">{ui("Trophies from the current game.")}</p>
         </div>
 
         <div className="space-y-3">
           <Tray
-            label="White captured"
+            label={ui("White captured")}
             pieces={capturedByWhite}
             capturedColor="b"
           />
 
           <Tray
-            label="Black captured"
+            label={ui("Black captured")}
             pieces={capturedByBlack}
             capturedColor="w"
           />
@@ -653,6 +690,7 @@ export default function ChessBoard3D({
   pieceSkin = "classic",
   cameraView = { id: 0, preset: "classic" },
 }: Props) {
+  useUiLanguage();
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [legalMoves, setLegalMoves] = useState<Move[]>([]);
   const [customCastleTargets, setCustomCastleTargets] = useState<
@@ -670,6 +708,8 @@ export default function ChessBoard3D({
     kind: "none",
   });
 
+  const controlsRef = useRef<any>(null);
+  const userInteractingRef = useRef(false);
   const lastExternalMoveIdRef = useRef<number | null>(null);
   const lastMove = moveHistory.at(-1) ?? null;
 
@@ -988,6 +1028,8 @@ export default function ChessBoard3D({
             lastMove={lastMove}
             pieceSkin={pieceSkin}
             cameraView={cameraView}
+            controlsRef={controlsRef}
+            userInteractingRef={userInteractingRef}
           />
         </Canvas>
       </div>

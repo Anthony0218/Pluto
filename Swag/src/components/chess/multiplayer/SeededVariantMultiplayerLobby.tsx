@@ -1,3 +1,5 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -57,12 +59,13 @@ function normalizeRoomCode(value: string) {
 }
 
 export default function SeededVariantMultiplayerLobby({ variant }: Props) {
+  useUiLanguage();
   const navigate = useNavigate();
   const { user, profile } = useAuth();
   const info = variantInfo[variant];
 
   const [hostColor, setHostColor] = useState<TwoPlayerColor>("white");
-  const [joinCode, setJoinCode] = useState("");
+  const [joinCode, setJoinCode] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
   const [loading, setLoading] = useState<"create" | "join" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -164,56 +167,30 @@ export default function SeededVariantMultiplayerLobby({ variant }: Props) {
   }
 
   return (
-    <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
+    <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-5xl">
-        <header
-          className={`mb-7 rounded-3xl border ${info.accentBorder} bg-zinc-900/70 p-6 shadow-2xl shadow-black/30`}
-        >
-          <div className="flex items-center gap-4">
-            <div
-              className={`flex h-14 w-14 items-center justify-center rounded-2xl border ${info.accentBorder} ${info.accentSoft} text-3xl`}
-            >
-              {info.icon}
-            </div>
+        <ChessPageHeader className={`mb-7 rounded-3xl border ${info.accentBorder} bg-zinc-900/70 p-6 shadow-2xl shadow-black/30`} description={<> {ui(info.subtitle)} </>}>
 
-            <div>
-              <p
-                className={`text-[10px] font-black uppercase tracking-[0.28em] ${info.accentText}`}
-              >
-                {info.eyebrow}
-              </p>
-              <h1 className="mt-1 text-3xl font-black text-white">
-                {info.title}
-              </h1>
-              <p className="mt-1 text-sm text-zinc-500">{info.subtitle}</p>
-            </div>
-          </div>
-        </header>
+        </ChessPageHeader>
 
         {!user ? (
           <section className="rounded-3xl border border-amber-400/20 bg-amber-400/[0.06] p-6">
-            <p className="font-black text-amber-200">Sign in required</p>
-            <p className="mt-2 text-sm text-zinc-400">
-              Multiplayer rooms use your existing Supabase account.
-            </p>
+            <p className="font-black text-amber-200">{ui("Sign in required")}</p>
+            <p className="mt-2 text-sm text-zinc-400">{ui("Multiplayer rooms use your existing Supabase account.")}</p>
           </section>
         ) : (
           <div className="grid gap-5 lg:grid-cols-2">
             <section className="rounded-3xl border border-white/10 bg-zinc-900/70 p-6 shadow-xl shadow-black/20">
               <p
                 className={`text-xs font-black uppercase tracking-[0.2em] ${info.accentText}`}
-              >
-                Create room
-              </p>
-              <h2 className="mt-2 text-xl font-black">Start a new match</h2>
+              >{ui("Create room")}</p>
+              <h2 className="mt-2 text-xl font-black">{ui("Start a new match")}</h2>
               <p className="mt-2 text-sm leading-6 text-zinc-500">
-                {info.description}
+                {ui(info.description)}
               </p>
 
               <div className="mt-6">
-                <p className="mb-2 text-xs font-black text-zinc-400">
-                  Your color
-                </p>
+                <p className="mb-2 text-xs font-black text-zinc-400">{ui("Your color")}</p>
 
                 <div className="grid grid-cols-2 gap-2">
                   {(["white", "black"] as TwoPlayerColor[]).map((color) => (
@@ -240,22 +217,16 @@ export default function SeededVariantMultiplayerLobby({ variant }: Props) {
                 onClick={() => void createRoom()}
                 className={`mt-6 w-full rounded-xl px-5 py-3 font-black transition disabled:cursor-not-allowed disabled:opacity-50 ${info.accentButton}`}
               >
-                {loading === "create"
-                  ? "Creating..."
-                  : "Create Multiplayer Room"}
+                {loading === "create" ? ui("Creating...") : ui("Create Multiplayer Room")}
               </button>
             </section>
 
             <section className="rounded-3xl border border-white/10 bg-zinc-900/70 p-6 shadow-xl shadow-black/20">
               <p
                 className={`text-xs font-black uppercase tracking-[0.2em] ${info.accentText}`}
-              >
-                Join room
-              </p>
-              <h2 className="mt-2 text-xl font-black">Enter room code</h2>
-              <p className="mt-2 text-sm leading-6 text-zinc-500">
-                The second player automatically receives the opposite color.
-              </p>
+              >{ui("Join room")}</p>
+              <h2 className="mt-2 text-xl font-black">{ui("Enter room code")}</h2>
+              <p className="mt-2 text-sm leading-6 text-zinc-500">{ui("The second player automatically receives the opposite color.")}</p>
 
               <input
                 value={joinCode}
@@ -265,7 +236,7 @@ export default function SeededVariantMultiplayerLobby({ variant }: Props) {
                 onKeyDown={(event) => {
                   if (event.key === "Enter") void joinRoom();
                 }}
-                placeholder="ABC123"
+                placeholder={ui("ABC123")}
                 maxLength={6}
                 className={`mt-6 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-center font-mono text-2xl font-black uppercase tracking-[0.3em] text-white outline-none transition placeholder:text-zinc-700 ${info.focusBorder}`}
               />
@@ -276,7 +247,7 @@ export default function SeededVariantMultiplayerLobby({ variant }: Props) {
                 onClick={() => void joinRoom()}
                 className="mt-3 w-full rounded-xl border border-white/10 bg-white/5 px-5 py-3 font-black text-zinc-200 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {loading === "join" ? "Joining..." : "Join Room"}
+                {loading === "join" ? ui("Joining...") : ui("Join Room")}
               </button>
             </section>
           </div>
@@ -284,7 +255,7 @@ export default function SeededVariantMultiplayerLobby({ variant }: Props) {
 
         {error && (
           <div className="mt-5 rounded-2xl border border-red-400/20 bg-red-400/[0.07] px-4 py-3 text-sm font-semibold text-red-200">
-            {error}
+            {ui(error)}
           </div>
         )}
       </div>

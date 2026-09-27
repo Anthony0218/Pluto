@@ -1,3 +1,6 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { ui, useUiLanguage } from "@/i18n/ui";
+import { useAppLanguage } from "@/i18n/languageStore";
 import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { Chess, type Square } from "chess.js";
@@ -371,17 +374,7 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
   },
 };
 
-function getInitialLanguage(): Language {
-  if (typeof window === "undefined") {
-    return "en";
-  }
 
-  const stored = window.localStorage.getItem(CHESS_LANGUAGE_STORAGE_KEY);
-
-  return ["en", "de", "bar", "ko", "ru"].includes(stored ?? "")
-    ? (stored as Language)
-    : "en";
-}
 
 function Panel({
   title,
@@ -392,6 +385,7 @@ function Panel({
   subtitle?: string;
   children: ReactNode;
 }) {
+  useUiLanguage();
   return (
     <section
       className="
@@ -412,7 +406,7 @@ function Panel({
             text-white
           "
         >
-          {title}
+          {ui(title)}
         </h2>
 
         {subtitle && (
@@ -423,7 +417,7 @@ function Panel({
               text-zinc-500
             "
           >
-            {subtitle}
+            {ui(subtitle)}
           </p>
         )}
       </div>
@@ -464,6 +458,7 @@ function PortalPromotionModal({
   t: (key: string) => string;
   onResolve: (card: PortalPromotionCard) => void;
 }) {
+  useUiLanguage();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   const [stage, setStage] = useState<"choose" | "reveal" | "prank">("choose");
@@ -605,9 +600,7 @@ function PortalPromotionModal({
               text-zinc-400
             "
           >
-            {stage === "choose"
-              ? t("One card decides your Pawn's fate.")
-              : resultText}
+            {stage === "choose" ? t("One card decides your Pawn's fate.") : ui(resultText)}
           </p>
         </div>
 
@@ -799,9 +792,7 @@ function PortalPromotionModal({
                   }
                 `}
             >
-              {selectedCard === "k" && stage === "prank"
-                ? "💀"
-                : cardSymbol(selectedCard, color)}
+              {selectedCard === "k" && stage === "prank" ? "💀" : cardSymbol(selectedCard, color)}
             </div>
 
             <h3
@@ -822,7 +813,7 @@ function PortalPromotionModal({
                   text-zinc-300
                 "
             >
-              {resultText}
+              {ui(resultText)}
             </p>
           </div>
         )}
@@ -865,7 +856,8 @@ export default function PortalChessBoard({
   playerColor = "white",
   difficulty = "casual",
 }: VariantAiBoardProps) {
-  const [language, setLanguage] = useState<Language>(getInitialLanguage);
+  useUiLanguage();
+  const { language, setLanguage } = useAppLanguage();
 
   const t = (key: string) => {
     if (language === "en") {
@@ -873,10 +865,10 @@ export default function PortalChessBoard({
     }
 
     if (language === "bar") {
-      return translations.bar[key] ?? translations.de[key] ?? key;
+      return translations.bar[key] ?? translations.de[key] ?? ui(key);
     }
 
-    return translations[language][key] ?? key;
+    return translations[language][key] ?? ui(key);
   };
 
   function changeLanguage(next: Language) {
@@ -1680,50 +1672,15 @@ export default function PortalChessBoard({
           max-w-[1600px]
         "
       >
-        <header
-          className="
+        <ChessPageHeader className="
             mb-5
             flex
             flex-wrap
             items-center
             justify-between
             gap-3
-          "
-        >
-          <div>
-            <p
-              className="
-                text-xs
-                font-black
-                uppercase
-                tracking-[0.25em]
-                text-violet-300
-              "
-            >
-              {t("Chess Variant")}
-            </p>
+          " description={<> {t("Invisible chaos on ranks 4 and 5")} </>}>
 
-            <h1
-              className="
-                mt-1
-                text-2xl
-                font-black
-                text-white
-              "
-            >
-              🌀 {t("Portal Chess")}
-            </h1>
-
-            <p
-              className="
-                mt-1
-                text-sm
-                text-zinc-500
-              "
-            >
-              {t("Invisible chaos on ranks 4 and 5")}
-            </p>
-          </div>
 
           <div
             className="
@@ -1778,11 +1735,11 @@ export default function PortalChessBoard({
                   [color-scheme:dark]
                 "
               >
-                <option value="en">English</option>
+                <option value="en">{ui("English")}</option>
 
-                <option value="de">Deutsch</option>
+                <option value="de">{ui("Deutsch")}</option>
 
-                <option value="bar">Boarisch</option>
+                <option value="bar">{ui("Boarisch")}</option>
 
                 <option value="ko">한국어</option>
 
@@ -1790,7 +1747,7 @@ export default function PortalChessBoard({
               </select>
             </label>
           </div>
-        </header>
+        </ChessPageHeader>
 
         <div
           className="
@@ -1886,11 +1843,9 @@ export default function PortalChessBoard({
                       text-2xl
                     "
                   >
-                    {capturedWhite.length
-                      ? capturedWhite
+                    {capturedWhite.length ? capturedWhite
                           .map((piece) => whiteSymbols[piece])
-                          .join(" ")
-                      : "—"}
+                          .join(" ") : "—"}
                   </div>
                 </div>
 
@@ -1914,11 +1869,9 @@ export default function PortalChessBoard({
                       text-2xl
                     "
                   >
-                    {capturedBlack.length
-                      ? capturedBlack
+                    {capturedBlack.length ? capturedBlack
                           .map((piece) => blackSymbols[piece])
-                          .join(" ")
-                      : "—"}
+                          .join(" ") : "—"}
                   </div>
                 </div>
 
@@ -1934,11 +1887,7 @@ export default function PortalChessBoard({
                     text-zinc-300
                   "
                 >
-                  {materialDifference === 0
-                    ? t("Equal")
-                    : materialDifference > 0
-                      ? `White +${materialDifference}`
-                      : `Black +${Math.abs(materialDifference)}`}
+                  {materialDifference === 0 ? t("Equal") : materialDifference > 0 ? `White +${materialDifference}` : `Black +${Math.abs(materialDifference)}`}
                 </div>
               </div>
             </Panel>
@@ -2153,11 +2102,7 @@ export default function PortalChessBoard({
                           text-white
                         "
                     >
-                      {winner === "white"
-                        ? t("White wins")
-                        : winner === "black"
-                          ? t("Black wins")
-                          : t("Draw")}
+                      {winner === "white" ? t("White wins") : winner === "black" ? t("Black wins") : t("Draw")}
                     </h2>
 
                     <p
@@ -2480,9 +2425,7 @@ export default function PortalChessBoard({
                         {event.result}
                         {event.destination ? ` → ${event.destination}` : ""}
                         {event.swapSquare ? ` ↔ ${event.swapSquare}` : ""}
-                        {event.promotionCard
-                          ? ` · ${t(promotionCardNames[event.promotionCard])}`
-                          : ""}
+                        {event.promotionCard ? ` · ${t(promotionCardNames[event.promotionCard])}` : ""}
                       </p>
                     </div>
                   ))}

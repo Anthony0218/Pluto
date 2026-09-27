@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Atlas Arena</title><desc id="desc">A glowing globe over a dark star map</desc>
+  <defs>
+    <radialGradient id="bg"><stop stop-color="#163752"/><stop offset="1" stop-color="#050a17"/></radialGradient>
+    <linearGradient id="sea" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#123d58"/><stop offset="1" stop-color="#071b2c"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="14" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <g fill="#9cebe7" opacity=".45"><circle cx="110" cy="95" r="2"/><circle cx="260" cy="160" r="1.5"/><circle cx="930" cy="100" r="2"/><circle cx="1080" cy="240" r="1.5"/><circle cx="160" cy="510" r="1.5"/><circle cx="970" cy="535" r="2"/></g>
+  <circle cx="600" cy="328" r="220" fill="url(#sea)" stroke="#54e4dd" stroke-opacity=".65" stroke-width="3" filter="url(#glow)"/>
+  <g fill="none" stroke="#5ee9e2" stroke-opacity=".22"><ellipse cx="600" cy="328" rx="220" ry="78"/><ellipse cx="600" cy="328" rx="220" ry="150"/><ellipse cx="600" cy="328" rx="85" ry="220"/><ellipse cx="600" cy="328" rx="160" ry="220"/></g>
+  <g fill="#4ec5af" stroke="#8ff5e9" stroke-width="2" opacity=".9">
+    <path d="M458 211l42-33 60 12 28 34-22 31-52 11-18 47-42-12-29-41z"/>
+    <path d="M513 323l55 5 25 51-21 88-31 55-25-47 13-58-30-51z"/>
+    <path d="M632 204l58-26 74 26 46 50-24 29-56-8-30 25-42-15-41-35z"/>
+    <path d="M647 304l70 8 32 48-26 92-51 45-39-66-10-74z"/>
+    <path d="M774 432l42-17 43 25-13 31-56 1z"/>
+  </g>
+  <circle cx="468" cy="238" r="8" fill="#ffc968" filter="url(#glow)"/><path d="M468 245v47" stroke="#ffc968" stroke-width="3"/>
+  <text x="600" y="620" fill="#eefeff" font-family="Georgia,serif" font-size="68" text-anchor="middle" letter-spacing="-2">ATLAS ARENA</text>
+</svg>

@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import "./ChessBoard.css";
 
 type MoveHistoryProps = {
@@ -5,9 +6,10 @@ type MoveHistoryProps = {
 };
 
 export default function MoveHistory({ moves }: MoveHistoryProps) {
+  useUiLanguage();
   return (
     <div className="move-history">
-      <h3>Moves</h3>
+      <h3>{ui("Moves")}</h3>
 
       {Array.from({ length: Math.ceil(moves.length / 2) }, (_, index) => {
         const whiteMove = moves[index * 2];

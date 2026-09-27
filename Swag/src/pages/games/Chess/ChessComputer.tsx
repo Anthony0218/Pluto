@@ -1,10 +1,11 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import ChessComputerBoard from "./ChessComputerBoard";
 
 type PlayerColor = "white" | "black" | "random";
-
 type Difficulty = "beginner" | "easy" | "medium" | "hard" | "expert";
 
 type DifficultySettings = {
@@ -13,6 +14,7 @@ type DifficultySettings = {
   randomMoveChance: number;
   label: string;
   description: string;
+  emoji: string;
 };
 
 const difficultyLevels: Record<Difficulty, DifficultySettings> = {
@@ -21,63 +23,95 @@ const difficultyLevels: Record<Difficulty, DifficultySettings> = {
     thinkTime: 80,
     randomMoveChance: 0.6,
     label: "Beginner",
-    description: "Very forgiving. Makes frequent mistakes and weak moves.",
+    description: "Very forgiving. Frequent weak moves and clear chances.",
+    emoji: "🌱",
   },
   easy: {
     skillLevel: 0,
     thinkTime: 80,
     randomMoveChance: 0.4,
     label: "Easy",
-    description: "Forgiving. Makes mistakes and weak moves.",
+    description: "Relaxed play with enough mistakes to punish.",
+    emoji: "🙂",
   },
-
   medium: {
     skillLevel: 1,
     thinkTime: 300,
     randomMoveChance: 0.15,
     label: "Normal",
-    description: "Solid play with occasional inaccuracies.",
+    description: "Balanced play with occasional inaccuracies.",
+    emoji: "⚔️",
   },
-
   hard: {
     skillLevel: 5,
     thinkTime: 500,
     randomMoveChance: 0.02,
     label: "Hard",
-    description: "Strong tactical play with few mistakes.",
+    description: "Strong tactical play with very few easy mistakes.",
+    emoji: "🔥",
   },
-
   expert: {
     skillLevel: 18,
     thinkTime: 800,
     randomMoveChance: 0,
     label: "Expert",
-    description: "Very strong Stockfish play.",
+    description: "Maximum strength. A serious Stockfish challenge.",
+    emoji: "👑",
   },
 };
 
+function ChessPageShell({ children }: { children: React.ReactNode }) {
+  useUiLanguage();
+  return (
+    <main className="chess-menu-page chess-singleplayer-setup relative left-1/2 min-h-[var(--app-height)] w-screen -translate-x-1/2 overflow-x-hidden bg-[#07090b] text-zinc-100">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_13%_68%,rgba(245,158,11,.09),transparent_28%),radial-gradient(circle_at_76%_23%,rgba(255,255,255,.045),transparent_30%),linear-gradient(to_bottom,#0a0d10,#07090b_58%,#040506)]" />
+      <div className="pointer-events-none absolute -bottom-28 -left-24 text-[390px] leading-none text-amber-100/[0.035]">
+        ♚
+      </div>
+      <div className="pointer-events-none absolute bottom-[-72px] left-[25%] text-[250px] leading-none text-white/[0.018]">
+        ♞
+      </div>
+      <div className="pointer-events-none absolute right-[-50px] top-[15%] text-[290px] leading-none text-white/[0.014]">
+        ♝
+      </div>
+
+      <div className="relative flex min-h-[var(--app-height)] w-full flex-col">
+        <ChessPageHeader className="chess-menu-header">
+
+
+          <Link
+            to="/games/chess/rules"
+            className="inline-flex items-center gap-2 text-sm text-zinc-500 transition hover:text-white"
+          >
+            <span className="text-base">♔</span>
+            <span className="hidden sm:inline">{ui("Rules & Tips")}</span>
+          </Link>
+        </ChessPageHeader>
+
+        {children}
+      </div>
+    </main>
+  );
+}
+
 export default function ChessComputer() {
+  useUiLanguage();
   const [selectedColor, setSelectedColor] = useState<PlayerColor>("white");
-
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
-
   const [gameStarted, setGameStarted] = useState(false);
-
   const [playerColor, setPlayerColor] = useState<"white" | "black">("white");
 
   const selectedDifficulty = difficultyLevels[difficulty];
 
   function startGame() {
-    let resolvedColor: "white" | "black";
-
-    if (selectedColor === "random") {
-      resolvedColor = Math.random() < 0.5 ? "white" : "black";
-    } else {
-      resolvedColor = selectedColor;
-    }
+    const resolvedColor =
+      selectedColor === "random"
+        ? Math.random() < 0.5
+          ? "white"
+          : "black"
+        : selectedColor;
 
     setPlayerColor(resolvedColor);
-
     setGameStarted(true);
   }
 
@@ -85,299 +119,182 @@ export default function ChessComputer() {
     setGameStarted(false);
   }
 
+  if (gameStarted) {
+    return (
+      <main className="w-full bg-transparent p-0 text-zinc-100">
+        <ChessComputerBoard
+          playerColor={playerColor}
+          skillLevel={selectedDifficulty.skillLevel}
+          thinkTime={selectedDifficulty.thinkTime}
+          randomMoveChance={selectedDifficulty.randomMoveChance}
+          onChangeSettings={leaveGame}
+        />
+      </main>
+    );
+  }
+
   return (
-    <main
-      className="
-        min-h-screen
-        bg-transparent
-        px-4
-        py-6
-        text-zinc-100
-        sm:px-6
-        lg:px-8
-      "
-    >
-      <div className="mx-auto w-full max-w-[1500px]">
-        <Link
-          to="/chess/classic"
-          className="
-            text-sm
-            font-semibold
-            text-zinc-400
-            transition
-            hover:text-white
-          "
-        >
-          ← Classic Chess
-        </Link>
+    <ChessPageShell>
+      <section className="grid min-h-0 flex-1 lg:grid-cols-[minmax(360px,.82fr)_minmax(620px,1.18fr)]">
+        <header className="relative flex min-h-[430px] flex-col justify-center px-7 py-14 sm:px-10 lg:min-h-0 lg:px-14 lg:py-16 xl:px-20 2xl:px-24">
+          <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-px bg-gradient-to-b from-transparent via-white/10 to-transparent lg:block" />
 
-        {!gameStarted ? (
-          <div className="mx-auto mt-12 max-w-xl">
-            {/* HEADER */}
+          <div className="max-w-[620px]">
+            <Link
+              to="/games/chess/classic"
+              className="mb-8 inline-flex items-center gap-2 text-sm text-zinc-600 transition hover:text-white"
+            >
+              <span>←</span>{ui("Classic Chess")}</Link>
 
-            <div className="text-center">
-              <div
-                className="
-                  mx-auto
-                  flex
-                  h-16
-                  w-16
-                  items-center
-                  justify-center
-                  rounded-2xl
-                  border
-                  border-amber-500/20
-                  bg-amber-400/10
-                  text-4xl
-                  text-amber-200
-                "
-              >
-                ♞
-              </div>
+            <p className="text-[11px] font-black uppercase tracking-[0.34em] text-amber-400">{ui("Singleplayer")}</p>
 
-              <p
-                className="
-                  mt-6
-                  text-xs
-                  font-bold
-                  uppercase
-                  tracking-[0.3em]
-                  text-amber-400
-                "
-              >
-                Classic Chess
-              </p>
+            <h1 className="mt-5 font-serif text-[52px] leading-[.94] tracking-[-0.035em] text-white sm:text-[66px] xl:text-[82px]">{ui("Play vs")}<br />{ui("Stockfish")}</h1>
 
-              <h1 className="mt-3 text-4xl font-black">Play vs Stockfish</h1>
+            <p className="mt-6 max-w-[500px] font-serif text-[18px] leading-8 text-zinc-400 sm:text-[20px]">{ui("Pick your side, choose the challenge, then step onto the board.")}</p>
+          </div>
 
-              <p className="mt-3 text-zinc-400">
-                Choose your side and difficulty.
-              </p>
-            </div>
+          <div className="mt-12 flex items-center gap-4 text-[9px] font-black uppercase tracking-[0.28em] text-zinc-700">
+            <span className="h-px w-14 bg-amber-400/45" />{ui("Color · Difficulty · Play")}</div>
+        </header>
 
-            {/* COLOR */}
+        <div className="relative flex min-h-[620px] items-center border-t border-white/[0.06] px-5 py-8 sm:px-8 lg:min-h-0 lg:border-t-0 lg:px-10 lg:py-12 xl:px-14 2xl:px-20">
+          <div className="mx-auto flex w-full max-w-[980px] flex-col gap-4 xl:gap-5">
+            <section className="rounded-[22px] border border-white/[0.09] bg-black/20 p-5 shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md sm:p-6 xl:p-5">
+              <p className="text-[9px] font-black uppercase tracking-[0.26em] text-amber-300/70">{ui("Choose your side")}</p>
+              <h2 className="mt-1.5 font-serif text-[27px] leading-tight text-white sm:text-[31px]">{ui("Color")}</h2>
 
-            <section className="mt-10">
-              <h2
-                className="
-                  text-sm
-                  font-bold
-                  uppercase
-                  tracking-widest
-                  text-zinc-400
-                "
-              >
-                Choose Color
-              </h2>
-
-              <div className="mt-4 grid grid-cols-3 gap-3">
+              <div className="mt-5 grid grid-cols-3 gap-3">
                 {(
                   [
                     ["white", "♙", "White"],
-
                     ["random", "◐", "Random"],
-
                     ["black", "♟", "Black"],
                   ] as const
-                ).map(([value, icon, label]) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => setSelectedColor(value)}
-                    className={`
-                        rounded-2xl
-                        border
-                        p-5
-                        transition-all
-                        duration-200
-
-                        ${
-                          selectedColor === value
-                            ? `
-                              border-amber-400
-                              bg-amber-400/10
-                              shadow-[0_0_25px_rgba(251,191,36,0.08)]
-                            `
-                            : `
-                              border-white/10
-                              bg-zinc-900/75
-                              hover:border-white/20
-                              hover:bg-zinc-800
-                            `
-                        }
-                      `}
-                  >
-                    <div className="text-4xl">{icon}</div>
-
-                    <div className="mt-2 font-bold">{label}</div>
-                  </button>
-                ))}
-              </div>
-            </section>
-
-            {/* DIFFICULTY */}
-
-            <section className="mt-8">
-              <h2
-                className="
-                  text-sm
-                  font-bold
-                  uppercase
-                  tracking-widest
-                  text-zinc-400
-                "
-              >
-                Difficulty
-              </h2>
-
-              <div className="mt-4 grid gap-3">
-                {(
-                  ["beginner", "easy", "medium", "hard", "expert"] as const
-                ).map((value) => {
-                  const settings = difficultyLevels[value];
+                ).map(([value, icon, label]) => {
+                  const active = selectedColor === value;
 
                   return (
                     <button
                       key={value}
                       type="button"
-                      onClick={() => setDifficulty(value)}
-                      className={`
-                          flex
-                          items-center
-                          justify-between
-                          gap-4
-                          rounded-2xl
-                          border
-                          px-5
-                          py-4
-                          text-left
-                          transition-all
-                          duration-200
-
-                          ${
-                            difficulty === value
-                              ? `
-                                border-amber-400
-                                bg-amber-400/10
-                                shadow-[0_0_25px_rgba(251,191,36,0.06)]
-                              `
-                              : `
-                                border-white/10
-                                bg-zinc-900/75
-                                hover:border-white/20
-                                hover:bg-zinc-800
-                              `
-                          }
-                        `}
+                      onClick={() => setSelectedColor(value)}
+                      className={`group relative overflow-hidden rounded-[18px] border p-4 text-left transition duration-300 hover:-translate-y-0.5 sm:p-5 ${
+                        active
+                          ? "border-amber-300/45 bg-amber-300/[0.045]"
+                          : "border-white/[0.09] bg-black/15 hover:border-amber-300/30 hover:bg-white/[0.025]"
+                      }`}
                     >
-                      <div className="min-w-0">
-                        <div className="font-bold text-zinc-100">
-                          {settings.label}
-                        </div>
-
-                        <p className="mt-1 text-xs leading-5 text-zinc-500">
-                          {settings.description}
-                        </p>
+                      <div
+                        className={`flex h-14 w-14 items-center justify-center rounded-2xl border text-3xl ${
+                          active
+                            ? "border-amber-300/35 bg-amber-300/10 text-amber-200"
+                            : "border-white/10 bg-white/[0.035] text-zinc-400"
+                        }`}
+                      >
+                        {icon}
                       </div>
+
+                      <p
+                        className={`mt-4 text-[8px] font-black uppercase tracking-[0.24em] ${
+                          active ? "text-amber-300/70" : "text-zinc-700"
+                        }`}
+                      >
+                        {active ? ui("Selected") : ui("Side")}
+                      </p>
+
+                      <p className="mt-1 font-serif text-xl text-white sm:text-2xl">
+                        {ui(label)}
+                      </p>
                     </button>
                   );
                 })}
               </div>
             </section>
 
-            {/* START GAME */}
+            <section className="rounded-[22px] border border-white/[0.09] bg-black/20 p-5 shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md sm:p-6 xl:p-5">
+              <p className="text-[9px] font-black uppercase tracking-[0.26em] text-amber-300/70">{ui("Choose the challenge")}</p>
+              <h2 className="mt-1.5 font-serif text-[27px] leading-tight text-white sm:text-[31px]">{ui("Difficulty")}</h2>
+
+              <div className="mt-5 grid gap-2.5 lg:grid-cols-2 xl:grid-cols-5">
+                {(
+                  ["beginner", "easy", "medium", "hard", "expert"] as const
+                ).map((value) => {
+                  const settings = difficultyLevels[value];
+                  const active = difficulty === value;
+
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setDifficulty(value)}
+                      className={`group relative flex items-center gap-4 rounded-[18px] border p-3.5 text-left transition duration-300 hover:-translate-y-0.5 sm:p-4 xl:block xl:min-h-[142px] xl:p-3 ${
+                        active
+                          ? "border-amber-300/45 bg-amber-300/[0.045]"
+                          : "border-white/[0.08] bg-black/15 hover:border-amber-300/30 hover:bg-white/[0.025]"
+                      }`}
+                    >
+                      <span
+                        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border text-2xl xl:h-10 xl:w-10 xl:text-xl ${
+                          active
+                            ? "border-amber-300/35 bg-amber-300/10"
+                            : "border-white/10 bg-white/[0.035]"
+                        }`}
+                      >
+                        {settings.emoji}
+                      </span>
+
+                      <span className="min-w-0 flex-1 xl:mt-3 xl:block">
+                        <span
+                          className={`block text-[8px] font-black uppercase tracking-[0.22em] ${
+                            active ? "text-amber-300/70" : "text-zinc-700"
+                          }`}
+                        >
+                          {active ? ui("Selected") : ui("Stockfish")}
+                        </span>
+                        <span className="mt-1 block font-serif text-xl text-white">
+                          {ui(settings.label)}
+                        </span>
+                        <span className="mt-1 block text-xs leading-5 text-zinc-500 xl:hidden">
+                          {ui(settings.description)}
+                        </span>
+                      </span>
+
+                      <span
+                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-lg transition duration-300 xl:absolute xl:right-3 xl:top-3 xl:h-8 xl:w-8 ${
+                          active
+                            ? "border-amber-300/45 text-amber-300"
+                            : "border-white/10 text-zinc-600 group-hover:border-amber-300/35 group-hover:text-amber-300"
+                        }`}
+                      >
+                        {active ? "✓" : "→"}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
 
             <button
               type="button"
               onClick={startGame}
-              className="
-                mt-10
-                w-full
-                rounded-xl
-                bg-amber-400
-                px-6
-                py-4
-                text-lg
-                font-black
-                text-zinc-950
-                transition
-                hover:bg-amber-300
-              "
+              className="group flex w-full items-center justify-between rounded-[22px] border border-amber-300/45 bg-amber-300/[0.045] p-5 text-left shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:bg-amber-300/[0.07] sm:p-6 xl:p-4"
             >
-              Start Game
+              <span>
+                <span className="text-[9px] font-black uppercase tracking-[0.26em] text-amber-300/70">{ui("Ready")}</span>
+                <span className="mt-1.5 block font-serif text-[27px] leading-tight text-white sm:text-[31px]">{ui("Start Game")}</span>
+                <span className="mt-2 block text-sm text-zinc-500">
+                  {selectedColor === "random" ? ui("Random side") : `Play as ${selectedColor === "white" ? "White" : "Black"}`}{" "}
+                  · {ui(selectedDifficulty.label)}
+                </span>
+              </span>
+
+              <span className="flex h-12 w-12 items-center justify-center rounded-full border border-amber-300/45 text-xl text-amber-300 transition duration-300 group-hover:translate-x-1">
+                →
+              </span>
             </button>
           </div>
-        ) : (
-          <>
-            {/* GAME HEADER */}
-
-            <div className="mt-6 text-center">
-              <p
-                className="
-                  text-xs
-                  font-bold
-                  uppercase
-                  tracking-[0.3em]
-                  text-amber-400
-                "
-              >
-                Classic Chess
-              </p>
-
-              <h1 className="mt-2 text-3xl font-black">Play vs Stockfish</h1>
-
-              <p className="mt-2 text-sm text-zinc-400">
-                You play{" "}
-                <strong className="text-white">
-                  {playerColor === "white" ? "White" : "Black"}
-                </strong>
-                {" · "}
-                Difficulty:{" "}
-                <strong className="text-white">
-                  {selectedDifficulty.label}
-                </strong>
-              </p>
-            </div>
-
-            {/* CHESS GAME */}
-
-            <div className="mt-8">
-              <ChessComputerBoard
-                playerColor={playerColor}
-                skillLevel={selectedDifficulty.skillLevel}
-                thinkTime={selectedDifficulty.thinkTime}
-                randomMoveChance={selectedDifficulty.randomMoveChance}
-                onChangeSettings={leaveGame}
-              />
-            </div>
-
-            {/* CHANGE SETTINGS */}
-
-            <div className="mt-8 text-center">
-              <button
-                type="button"
-                onClick={leaveGame}
-                className="
-                  rounded-xl
-                  border
-                  border-white/10
-                  bg-white/5
-                  px-5
-                  py-3
-                  text-sm
-                  font-bold
-                  text-zinc-300
-                  transition
-                  hover:bg-white/10
-                  hover:text-white
-                "
-              >
-                Change Settings
-              </button>
-            </div>
-          </>
-        )}
-      </div>
-    </main>
+        </div>
+      </section>
+    </ChessPageShell>
   );
 }

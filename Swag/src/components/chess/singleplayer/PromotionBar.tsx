@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 type PromotionBarProps = {
   onPromote: (piece: "q" | "r" | "b" | "n") => void;
 };
@@ -26,6 +27,7 @@ const promotionPieces = [
 ] as const;
 
 export default function PromotionBar({ onPromote }: PromotionBarProps) {
+  useUiLanguage();
   return (
     <div
       className="
@@ -82,9 +84,7 @@ export default function PromotionBar({ onPromote }: PromotionBarProps) {
               tracking-[0.25em]
               text-amber-300
             "
-          >
-            Pawn Promotion
-          </p>
+          >{ui("Pawn Promotion")}</p>
 
           <h3
             className="
@@ -93,13 +93,9 @@ export default function PromotionBar({ onPromote }: PromotionBarProps) {
               font-black
               text-white
             "
-          >
-            Choose your piece
-          </h3>
+          >{ui("Choose your piece")}</h3>
 
-          <p className="mt-1 text-sm text-zinc-500">
-            Select the piece your pawn should become.
-          </p>
+          <p className="mt-1 text-sm text-zinc-500">{ui("Select the piece your pawn should become.")}</p>
         </div>
 
         <div className="mt-6 grid grid-cols-4 gap-3">
@@ -157,7 +153,7 @@ export default function PromotionBar({ onPromote }: PromotionBarProps) {
                   group-hover:text-amber-200
                 "
               >
-                {piece.label}
+                {ui(piece.label)}
               </span>
             </button>
           ))}

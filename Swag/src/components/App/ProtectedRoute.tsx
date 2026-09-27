@@ -1,3 +1,4 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
@@ -6,10 +7,11 @@ type ProtectedRouteProps = {
 };
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
+  useUiLanguage();
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>{ui("Loading...")}</div>;
   }
 
   if (!user) {

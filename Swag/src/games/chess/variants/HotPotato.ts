@@ -10,6 +10,7 @@ export type HotPotatoBlastPattern = "ring" | "cross2" | "diagonal2";
 
 export type HotPotatoState = {
   owner: HotPotatoOwner;
+  dropped?: boolean;
   square: Square | null;
   movesUntilExplosion: number;
   fuseMovesTotal: number;
@@ -380,4 +381,20 @@ export function isChessInCheck(game: Chess): boolean {
   }
 
   return false;
+}
+
+/** A surviving bomb stays where its carrier was destroyed; its fuse is preserved. */
+export function dropHotPotatoAfterBlast(game: Chess, potato: HotPotatoState, blast: Square[]) {
+  if (potato.square && blast.includes(potato.square) && !game.get(potato.square)) {
+    potato.dropped = true;
+  }
+}
+
+/** Returns false while a grounded bomb is waiting to be picked up. */
+export function pickUpHotPotato(potato: HotPotatoState, move: HotPotatoMove): boolean {
+  if (!potato.dropped) return true;
+  const rookLanding = move.flags.includes("k") ? `${move.color === "w" ? "f1" : "f8"}` : move.flags.includes("q") ? `${move.color === "w" ? "d1" : "d8"}` : null;
+  if (move.to !== potato.square && rookLanding !== potato.square) return false;
+  potato.dropped = false;
+  return true;
 }

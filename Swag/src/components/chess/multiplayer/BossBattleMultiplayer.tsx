@@ -1,3 +1,5 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Chess, type Square } from "chess.js";
@@ -287,9 +289,10 @@ function Panel({
   title: string;
   children: React.ReactNode;
 }) {
+  useUiLanguage();
   return (
     <section className="rounded-3xl border border-white/5 bg-zinc-900/80 p-4 shadow-xl shadow-black/20">
-      <h2 className="font-black text-zinc-100">{title}</h2>
+      <h2 className="font-black text-zinc-100">{ui(title)}</h2>
       <div className="mt-4">{children}</div>
     </section>
   );
@@ -304,13 +307,14 @@ function StatusCard({
   label: string;
   value: string | number;
 }) {
+  useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 p-3">
       <div className="flex items-center justify-between gap-2">
         <span className="text-lg">{icon}</span>
         <span className="font-black text-violet-200">{value}</span>
       </div>
-      <p className="mt-1 text-[10px] text-zinc-600">{label}</p>
+      <p className="mt-1 text-[10px] text-zinc-600">{ui(label)}</p>
     </div>
   );
 }
@@ -320,6 +324,7 @@ function StatusCard({
    ========================================================= */
 
 export function BossBattleMultiplayerLobby() {
+  useUiLanguage();
   const navigate = useNavigate();
   const { user, profile } = useAuth();
 
@@ -327,7 +332,7 @@ export function BossBattleMultiplayerLobby() {
     (profile as { username?: string | null } | null)?.username ?? "Player",
   );
   const [hostColor, setHostColor] = useState<PlayerColor>("white");
-  const [joinCode, setJoinCode] = useState("");
+  const [joinCode, setJoinCode] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
   const [busy, setBusy] = useState<"create" | "join" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -382,7 +387,8 @@ export function BossBattleMultiplayerLobby() {
   }
 
   return (
-    <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100">
+    <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-8 text-zinc-100">
+      <ChessPageHeader className="mb-4" />
       <div className="mx-auto max-w-3xl">
         <div className="rounded-[32px] border border-violet-400/15 bg-zinc-900/85 p-6 shadow-2xl shadow-black/30">
           <div className="flex items-center gap-4">
@@ -391,19 +397,13 @@ export function BossBattleMultiplayerLobby() {
             </div>
 
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-400">
-                Asymmetric Multiplayer
-              </p>
-              <h1 className="mt-1 text-3xl font-black">Boss Battle Chess</h1>
-              <p className="mt-1 text-sm text-zinc-500">
-                White commands the full army. Black becomes the Boss.
-              </p>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-400">{ui("Asymmetric Multiplayer")}</p>
+              <h1 className="mt-1 text-3xl font-black">{ui("Boss Battle Chess")}</h1>
+              <p className="mt-1 text-sm text-zinc-500">{ui("White commands the full army. Black becomes the Boss.")}</p>
             </div>
           </div>
 
-          <label className="mt-8 block text-xs font-black uppercase tracking-wider text-zinc-500">
-            Display name
-          </label>
+          <label className="mt-8 block text-xs font-black uppercase tracking-wider text-zinc-500">{ui("Display name")}</label>
 
           <input
             value={displayName}
@@ -413,16 +413,14 @@ export function BossBattleMultiplayerLobby() {
 
           {error && (
             <div className="mt-4 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200">
-              {error}
+              {ui(error)}
             </div>
           )}
 
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <section className="rounded-2xl border border-white/5 bg-black/20 p-4">
-              <h2 className="font-black">Create room</h2>
-              <p className="mt-1 text-xs text-zinc-500">
-                Choose White or the Black Boss.
-              </p>
+              <h2 className="font-black">{ui("Create room")}</h2>
+              <p className="mt-1 text-xs text-zinc-500">{ui("Choose White or the Black Boss.")}</p>
 
               <div className="mt-4 grid grid-cols-2 gap-2">
                 <button
@@ -433,9 +431,7 @@ export function BossBattleMultiplayerLobby() {
                       ? "border-zinc-200/30 bg-white/10 text-white"
                       : "border-white/10 bg-white/5 text-zinc-500"
                   }`}
-                >
-                  ♔ White Army
-                </button>
+                >{ui("♔ White Army")}</button>
 
                 <button
                   type="button"
@@ -445,9 +441,7 @@ export function BossBattleMultiplayerLobby() {
                       ? "border-violet-300/30 bg-violet-400/15 text-violet-100"
                       : "border-white/10 bg-white/5 text-zinc-500"
                   }`}
-                >
-                  ♚ Boss
-                </button>
+                >{ui("♚ Boss")}</button>
               </div>
 
               <button
@@ -456,22 +450,20 @@ export function BossBattleMultiplayerLobby() {
                 disabled={busy !== null}
                 className="mt-4 w-full rounded-xl bg-violet-400 px-4 py-3 font-black text-violet-950 disabled:opacity-50"
               >
-                {busy === "create" ? "Creating..." : "Create Boss Battle room"}
+                {busy === "create" ? ui("Creating...") : ui("Create Boss Battle room")}
               </button>
             </section>
 
             <section className="rounded-2xl border border-white/5 bg-black/20 p-4">
-              <h2 className="font-black">Join room</h2>
-              <p className="mt-1 text-xs text-zinc-500">
-                The other side is assigned automatically.
-              </p>
+              <h2 className="font-black">{ui("Join room")}</h2>
+              <p className="mt-1 text-xs text-zinc-500">{ui("The other side is assigned automatically.")}</p>
 
               <input
                 value={joinCode}
                 onChange={(event) =>
                   setJoinCode(event.target.value.toUpperCase())
                 }
-                placeholder="ROOM CODE"
+                placeholder={ui("ROOM CODE")}
                 className="mt-4 w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 font-mono uppercase tracking-widest outline-none focus:border-violet-400/40"
               />
 
@@ -481,7 +473,7 @@ export function BossBattleMultiplayerLobby() {
                 disabled={busy !== null || !joinCode.trim()}
                 className="mt-4 w-full rounded-xl border border-violet-300/20 bg-violet-400/10 px-4 py-3 font-black text-violet-200 disabled:opacity-50"
               >
-                {busy === "join" ? "Joining..." : "Join room"}
+                {busy === "join" ? ui("Joining...") : ui("Join room")}
               </button>
             </section>
           </div>
@@ -496,6 +488,7 @@ export function BossBattleMultiplayerLobby() {
    ========================================================= */
 
 export function BossBattleMultiplayerGame() {
+  useUiLanguage();
   const { roomCode = "" } = useParams();
   const { user } = useAuth();
 
@@ -1294,10 +1287,11 @@ export function BossBattleMultiplayerGame() {
 
   if (!room || !gameState || !storedState || !me) {
     return (
-      <main className="min-h-screen bg-transparent p-8 text-zinc-100">
+      <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent p-8 text-zinc-100">
+      <ChessPageHeader className="mb-4" />
         <div className="mx-auto max-w-xl rounded-3xl border border-white/10 bg-zinc-900 p-6">
-          <p className="font-black">Loading Boss Battle room…</p>
-          {error && <p className="mt-3 text-sm text-red-300">{error}</p>}
+          <p className="font-black">{ui("Loading Boss Battle room…")}</p>
+          {error && <p className="mt-3 text-sm text-red-300">{ui(error)}</p>}
         </div>
       </main>
     );
@@ -1346,70 +1340,48 @@ export function BossBattleMultiplayerGame() {
   }
 
   return (
-    <main className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
+    <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1460px]">
-        <header className="mb-6 flex flex-col gap-4 rounded-3xl border border-violet-400/10 bg-zinc-900/75 px-5 py-4 shadow-xl shadow-black/20 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-violet-400/20 bg-violet-400/10 text-3xl">
-              ♚
-            </div>
+        <ChessPageHeader className="mb-6 flex flex-col gap-4 rounded-3xl border border-violet-400/10 bg-zinc-900/75 px-5 py-4 shadow-xl shadow-black/20 sm:flex-row sm:items-center sm:justify-between" description={<> {ui("Room")}<span className="font-mono">{room.code}</span> </>}>
 
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-400">
-                Asymmetric Multiplayer
-              </p>
-              <h1 className="text-2xl font-black">Boss Battle Chess</h1>
-              <p className="text-sm text-zinc-500">
-                Room <span className="font-mono">{room.code}</span>
-              </p>
-            </div>
-          </div>
 
           <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-2 text-sm">
-            {gameState.status === "waiting"
-              ? "Waiting for opponent…"
-              : gameState.status === "finished"
-                ? "Game finished"
-                : canMove
-                  ? "Your turn"
-                  : "Opponent's turn"}
+            {gameState.status === "waiting" ? ui("Waiting for opponent…") : gameState.status === "finished" ? ui("Game finished") : canMove ? ui("Your turn") : ui("Opponent's turn")}
           </div>
-        </header>
+        </ChessPageHeader>
 
         {error && (
           <div className="mb-4 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200">
-            {error}
+            {ui(error)}
           </div>
         )}
 
-        <div className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
+        <div className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="space-y-4">
-            <Panel title="Players">
+            <Panel title={ui("Players")}>
               <div className="space-y-2 text-sm">
                 <div className="rounded-xl bg-white/5 p-3">
                   <p className="font-black">
                     {me.display_name} ·{" "}
-                    {myColor === "black" ? "Boss" : "White Army"}
+                    {myColor === "black" ? ui("Boss") : ui("White Army")}
                   </p>
-                  <p className="text-xs text-zinc-500">You</p>
+                  <p className="text-xs text-zinc-500">{ui("You")}</p>
                 </div>
 
                 <div className="rounded-xl bg-white/5 p-3">
                   <p className="font-black">
-                    {opponent
-                      ? `${opponent.display_name} · ${
+                    {opponent ? `${opponent.display_name} · ${
                           opponent.chosen_color === "black"
                             ? "Boss"
                             : "White Army"
-                        }`
-                      : "Waiting…"}
+                        }` : ui("Waiting…")}
                   </p>
-                  <p className="text-xs text-zinc-500">Opponent</p>
+                  <p className="text-xs text-zinc-500">{ui("Opponent")}</p>
                 </div>
               </div>
             </Panel>
 
-            <Panel title="Actions">
+            <Panel title={ui("Actions")}>
               <div className="grid gap-2">
                 <button
                   type="button"
@@ -1421,9 +1393,7 @@ export function BossBattleMultiplayerGame() {
                     Boolean(actionBusy)
                   }
                   className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm font-black disabled:opacity-40"
-                >
-                  ↶ Request Undo
-                </button>
+                >{ui("↶ Request Undo")}</button>
 
                 <button
                   type="button"
@@ -1432,25 +1402,19 @@ export function BossBattleMultiplayerGame() {
                     gameState.status !== "playing" || Boolean(actionBusy)
                   }
                   className="rounded-xl border border-red-400/15 bg-red-400/[0.06] px-3 py-2.5 text-sm font-black text-red-300 disabled:opacity-40"
-                >
-                  Resign
-                </button>
+                >{ui("Resign")}</button>
 
                 <Link
                   to="/games/chess/variants/boss/multiplayer"
                   className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-center text-sm font-black text-zinc-300"
-                >
-                  Leave room
-                </Link>
+                >{ui("Leave room")}</Link>
               </div>
             </Panel>
 
-            <Panel title="Action History">
+            <Panel title={ui("Action History")}>
               <div className="max-h-80 overflow-y-auto rounded-xl border border-white/5 bg-black/20">
                 {storedState.history.length === 0 ? (
-                  <p className="px-4 py-7 text-center text-xs text-zinc-600">
-                    No actions yet
-                  </p>
+                  <p className="px-4 py-7 text-center text-xs text-zinc-600">{ui("No actions yet")}</p>
                 ) : (
                   storedState.history.map((entry) => (
                     <button
@@ -1484,11 +1448,8 @@ export function BossBattleMultiplayerGame() {
             {historyPreviewPly !== null && (
               <div className="mb-3 flex items-center justify-between rounded-xl border border-violet-400/20 bg-violet-400/[0.07] px-4 py-3">
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-wider text-violet-300">
-                    History Preview
-                  </p>
-                  <p className="text-sm text-zinc-400">
-                    Position after action {historyPreviewPly}
+                  <p className="text-[10px] font-black uppercase tracking-wider text-violet-300">{ui("History Preview")}</p>
+                  <p className="text-sm text-zinc-400">{ui("Position after action")}{historyPreviewPly}
                   </p>
                 </div>
 
@@ -1496,22 +1457,16 @@ export function BossBattleMultiplayerGame() {
                   type="button"
                   onClick={() => setHistoryPreviewPly(null)}
                   className="rounded-lg bg-white/10 px-3 py-2 text-xs font-black"
-                >
-                  Back to live board
-                </button>
+                >{ui("Back to live board")}</button>
               </div>
             )}
 
             {bossTargetMode && historyPreviewPly === null && mySide === "b" && (
               <div className="mb-3 flex items-center justify-between rounded-xl border border-violet-400/20 bg-violet-400/[0.07] px-4 py-3">
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-wider text-violet-300">
-                    Boss Power Targeting
-                  </p>
+                  <p className="text-[10px] font-black uppercase tracking-wider text-violet-300">{ui("Boss Power Targeting")}</p>
                   <p className="text-sm text-zinc-400">
-                    {bossTargetMode === "summon"
-                      ? "Choose an empty square on rank 6 or 7."
-                      : "Choose a safe Dark Step destination."}
+                    {bossTargetMode === "summon" ? ui("Choose an empty square on rank 6 or 7.") : ui("Choose a safe Dark Step destination.")}
                   </p>
                 </div>
 
@@ -1519,9 +1474,7 @@ export function BossBattleMultiplayerGame() {
                   type="button"
                   onClick={clearPowerTarget}
                   className="rounded-lg bg-white/10 px-3 py-2 text-xs font-black"
-                >
-                  Cancel
-                </button>
+                >{ui("Cancel")}</button>
               </div>
             )}
 
@@ -1571,27 +1524,19 @@ export function BossBattleMultiplayerGame() {
                     type="button"
                     onClick={() => void copyRoomCode()}
                     className="w-full max-w-lg rounded-[30px] border border-white/15 bg-zinc-900/95 px-8 py-8 text-center shadow-2xl shadow-black/60 transition hover:border-amber-300/35 hover:bg-zinc-900 active:scale-[0.99]"
-                    title="Copy room code"
+                    title={ui("Copy room code")}
                   >
                     <div className="text-4xl">🌐</div>
 
-                    <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">
-                      Waiting for players
-                    </p>
+                    <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">{ui("Waiting for players")}</p>
 
                     <h2 className="mt-2 text-2xl font-black text-white">
-                      {players.length}/2 players connected
-                    </h2>
+                      {players.length}{ui("/2 players connected")}</h2>
 
-                    <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">
-                      Share this room code. The game starts automatically when
-                      everyone has joined.
-                    </p>
+                    <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">{ui("Share this room code. The game starts automatically when everyone has joined.")}</p>
 
                     <div className="mt-6 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-5 py-5">
-                      <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">
-                        Room Code
-                      </p>
+                      <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">{ui("Room Code")}</p>
 
                       <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">
                         {room.code}
@@ -1599,9 +1544,7 @@ export function BossBattleMultiplayerGame() {
                     </div>
 
                     <p className="mt-4 text-xs font-bold text-zinc-400">
-                      {codeCopied
-                        ? "✓ Copied to clipboard"
-                        : "Click this box to copy the code"}
+                      {codeCopied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
                     </p>
                   </button>
                 </div>
@@ -1610,16 +1553,10 @@ export function BossBattleMultiplayerGame() {
               {finishedGame && historyPreviewPly === null && (
                 <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[28px] bg-zinc-950/80 p-6 backdrop-blur-sm">
                   <div className="max-w-sm rounded-3xl border border-violet-300/20 bg-zinc-900 p-6 text-center shadow-2xl">
-                    <p className="text-xs font-black uppercase tracking-[0.25em] text-violet-300">
-                      Game Over
-                    </p>
+                    <p className="text-xs font-black uppercase tracking-[0.25em] text-violet-300">{ui("Game Over")}</p>
 
                     <h2 className="mt-3 text-3xl font-black">
-                      {finishedGame.winner === "draw"
-                        ? "Draw"
-                        : finishedGame.winner === myColor
-                          ? "You win"
-                          : "You lose"}
+                      {finishedGame.winner === "draw" ? ui("Draw") : finishedGame.winner === myColor ? ui("You win") : ui("You lose")}
                     </h2>
 
                     <p className="mt-3 text-sm text-zinc-500">
@@ -1632,13 +1569,11 @@ export function BossBattleMultiplayerGame() {
                       disabled={myRematchReady || Boolean(actionBusy)}
                       className="mt-5 w-full rounded-xl bg-violet-400 px-4 py-3 font-black text-violet-950 disabled:opacity-50"
                     >
-                      {myRematchReady ? "Waiting for opponent…" : "Play again"}
+                      {myRematchReady ? ui("Waiting for opponent…") : ui("Play again")}
                     </button>
 
                     {opponentRematchReady && !myRematchReady && (
-                      <p className="mt-3 text-xs text-emerald-300">
-                        Opponent wants a rematch.
-                      </p>
+                      <p className="mt-3 text-xs text-emerald-300">{ui("Opponent wants a rematch.")}</p>
                     )}
                   </div>
                 </div>
@@ -1647,11 +1582,9 @@ export function BossBattleMultiplayerGame() {
           </section>
 
           <aside className="space-y-4">
-            <Panel title="Boss Status">
+            <Panel title={ui("Boss Status")}>
               <div className="rounded-2xl border border-violet-400/15 bg-violet-400/[0.06] p-4">
-                <p className="text-[10px] font-black uppercase tracking-wider text-zinc-500">
-                  Boss HP
-                </p>
+                <p className="text-[10px] font-black uppercase tracking-wider text-zinc-500">{ui("Boss HP")}</p>
 
                 <p className="mt-2 text-2xl font-black tracking-widest text-red-300">
                   {bossHearts(displayedBossState.hp)}
@@ -1665,7 +1598,7 @@ export function BossBattleMultiplayerGame() {
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <StatusCard
                   icon="🛡"
-                  label="Armor"
+                  label={ui("Armor")}
                   value={
                     displayedBossState.armorPliesRemaining > 0
                       ? `${displayedBossState.armorPliesRemaining} plies`
@@ -1675,39 +1608,34 @@ export function BossBattleMultiplayerGame() {
 
                 <StatusCard
                   icon="🔥"
-                  label="Rage"
+                  label={ui("Rage")}
                   value={`${rage}/${BOSS_MAX_RAGE}`}
                 />
 
                 <StatusCard
                   icon="👹"
-                  label="Summons"
+                  label={ui("Summons")}
                   value={displayedBossState.summons}
                 />
 
                 <StatusCard
                   icon="♚"
-                  label="Boss turns"
+                  label={ui("Boss turns")}
                   value={displayedBossState.bossTurnsCompleted}
                 />
               </div>
             </Panel>
 
-            <Panel title="Boss Powers">
+            <Panel title={ui("Boss Powers")}>
               {!isBossPlayer && (
-                <p className="mb-3 text-xs text-zinc-600">
-                  Only the Black Boss player can activate powers.
-                </p>
+                <p className="mb-3 text-xs text-zinc-600">{ui("Only the Black Boss player can activate powers.")}</p>
               )}
 
               {isBossPlayer &&
                 liveGame.turn() === "b" &&
                 liveGame.isCheck() &&
                 gameState.status === "playing" && (
-                  <div className="mb-3 rounded-xl border border-red-400/15 bg-red-400/[0.06] p-3 text-xs text-red-300">
-                    The Boss is in check. Powers are locked until the check is
-                    answered normally.
-                  </div>
+                  <div className="mb-3 rounded-xl border border-red-400/15 bg-red-400/[0.06] p-3 text-xs text-red-300">{ui("The Boss is in check. Powers are locked until the check is answered normally.")}</div>
                 )}
 
               <div className="space-y-2">
@@ -1735,20 +1663,15 @@ export function BossBattleMultiplayerGame() {
                             {bossPowerIcon(power)} {bossPowerLabel(power)}
                           </p>
                           <p className="mt-1 text-[10px] text-zinc-600">
-                            {power === "shockwave"
-                              ? "Push adjacent White pieces away"
-                              : power === "summon"
-                                ? "Create a Black pawn"
-                                : "Relocate the Boss safely"}
+                            {power === "shockwave" ? ui("Push adjacent White pieces away") : power === "summon" ? ui("Create a Black pawn") : ui("Relocate the Boss safely")}
                           </p>
                         </div>
 
                         <div className="text-right">
                           <p className="text-xs font-black text-violet-200">
-                            {cooldown > 0 ? `CD ${cooldown}` : "READY"}
+                            {cooldown > 0 ? `CD ${cooldown}` : ui("READY")}
                           </p>
-                          <p className="mt-1 text-[9px] text-zinc-700">
-                            next CD{" "}
+                          <p className="mt-1 text-[9px] text-zinc-700">{ui("next CD")}{" "}
                             {getBossPowerCooldown(power, displayedBossState)}
                           </p>
                         </div>
@@ -1759,33 +1682,16 @@ export function BossBattleMultiplayerGame() {
               </div>
             </Panel>
 
-            <Panel title="Rules">
+            <Panel title={ui("Rules")}>
               <div className="space-y-2 text-xs leading-5 text-zinc-400">
-                <p>♔ White begins with the normal full army.</p>
-                <p>
-                  ♚ Black begins with the Boss, six pawns, one knight and one
-                  bishop.
-                </p>
-                <p>
-                  ♥ A non-mating White check removes 1 Boss HP when armor is
-                  inactive.
-                </p>
-                <p>
-                  🛡 After damage, the Boss receives 2 completed plies of
-                  HP-damage immunity.
-                </p>
-                <p>
-                  💥 Shockwave pushes adjacent non-King White pieces outward
-                  when possible.
-                </p>
-                <p>
-                  👹 Summon creates a Black pawn on an empty rank-6/7 square.
-                </p>
-                <p>
-                  🌑 Dark Step moves the Boss up to two squares to a safe empty
-                  square.
-                </p>
-                <p>⚡ Using a Boss power replaces Black's normal turn.</p>
+                <p>{ui("♔ White begins with the normal full army.")}</p>
+                <p>{ui("♚ Black begins with the Boss, six pawns, one knight and one bishop.")}</p>
+                <p>{ui("♥ A non-mating White check removes 1 Boss HP when armor is inactive.")}</p>
+                <p>{ui("🛡 After damage, the Boss receives 2 completed plies of HP-damage immunity.")}</p>
+                <p>{ui("💥 Shockwave pushes adjacent non-King White pieces outward when possible.")}</p>
+                <p>{ui("👹 Summon creates a Black pawn on an empty rank-6/7 square.")}</p>
+                <p>{ui("🌑 Dark Step moves the Boss up to two squares to a safe empty square.")}</p>
+                <p>{ui("⚡ Using a Boss power replaces Black's normal turn.")}</p>
               </div>
             </Panel>
           </aside>
@@ -1796,37 +1702,27 @@ export function BossBattleMultiplayerGame() {
             <div className="w-full max-w-md rounded-3xl border border-white/10 bg-zinc-900 p-6 shadow-2xl">
               {gameState.undo_requested_by === user?.id ? (
                 <>
-                  <h2 className="text-xl font-black">Undo requested</h2>
-                  <p className="mt-2 text-sm text-zinc-500">
-                    Waiting for your opponent.
-                  </p>
+                  <h2 className="text-xl font-black">{ui("Undo requested")}</h2>
+                  <p className="mt-2 text-sm text-zinc-500">{ui("Waiting for your opponent.")}</p>
                 </>
               ) : (
                 <>
-                  <h2 className="text-xl font-black">Opponent requests Undo</h2>
+                  <h2 className="text-xl font-black">{ui("Opponent requests Undo")}</h2>
 
-                  <p className="mt-2 text-sm text-zinc-500">
-                    Accepting restores the complete previous action. This
-                    includes Boss HP, armor, Rage progress, cooldowns, summons
-                    and power effects.
-                  </p>
+                  <p className="mt-2 text-sm text-zinc-500">{ui("Accepting restores the complete previous action. This includes Boss HP, armor, Rage progress, cooldowns, summons and power effects.")}</p>
 
                   <div className="mt-5 grid grid-cols-2 gap-2">
                     <button
                       type="button"
                       onClick={() => void respondUndo(false)}
                       className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 font-black"
-                    >
-                      Decline
-                    </button>
+                    >{ui("Decline")}</button>
 
                     <button
                       type="button"
                       onClick={() => void respondUndo(true)}
                       className="rounded-xl bg-violet-400 px-4 py-3 font-black text-violet-950"
-                    >
-                      Accept
-                    </button>
+                    >{ui("Accept")}</button>
                   </div>
                 </>
               )}

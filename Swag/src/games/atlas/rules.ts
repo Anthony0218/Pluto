@@ -1,0 +1,43 @@
+import { ATLAS_SCORING } from "./config.ts";
+import type { Coordinates } from "./types.ts";
+
+export function normalScore(correct: boolean, remainingMs: number, roundMs: number): number {
+  if (!correct) return 0;
+  const ratio = Math.max(0, Math.min(1, remainingMs / Math.max(1, roundMs)));
+  return ATLAS_SCORING.normalCorrect + Math.round(ATLAS_SCORING.maxSpeedBonus * ratio);
+}
+
+export function speedRunScore(correct: boolean, streak: number): number {
+  if (!correct) return 0;
+  return ATLAS_SCORING.speedRunCorrect * Math.min(ATLAS_SCORING.speedRunMaxMultiplier, 1 + Math.floor(streak / 3) * 0.5);
+}
+
+export function haversineKm(first: Coordinates, second: Coordinates): number {
+  const radians = (degrees: number) => degrees * Math.PI / 180;
+  const [longitude1, latitude1] = first.map(radians), [longitude2, latitude2] = second.map(radians);
+  const latitudeDelta = latitude2 - latitude1, longitudeDelta = longitude2 - longitude1;
+  const a = Math.sin(latitudeDelta / 2) ** 2 + Math.cos(latitude1) * Math.cos(latitude2) * Math.sin(longitudeDelta / 2) ** 2;
+  return 6371.0088 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+export type MapFillState = { targets: string[]; found: string[]; mistakes: number; streak: number; bestStreak: number; score: number; complete: boolean };
+export function createMapFillState(targets: string[]): MapFillState {
+  return { targets: [...new Set(targets)], found: [], mistakes: 0, streak: 0, bestStreak: 0, score: 0, complete: targets.length === 0 };
+}
+export function applyMapFillSelection(state: MapFillState, selectedId: string, expectedId: string): MapFillState {
+  if (state.complete || state.found.includes(selectedId)) return state;
+  if (selectedId !== expectedId) return { ...state, mistakes: state.mistakes + 1, streak: 0 };
+  const found = [...state.found, selectedId], streak = state.streak + 1, complete = found.length === state.targets.length;
+  return { ...state, found, streak, bestStreak: Math.max(state.bestStreak, streak), complete, score: state.score + ATLAS_SCORING.mapFillCountry + streak * ATLAS_SCORING.mapFillStreak + (complete ? ATLAS_SCORING.mapFillCompletion : 0) };
+}
+
+export type TerritoryState = { ownership: Record<string, "player_a" | "player_b">; scores: { player_a: number; player_b: number } };
+export function captureTerritory(state: TerritoryState, entityId: string, winner: "player_a" | "player_b", allowSteal = true, quizPoints = 0): TerritoryState {
+  const current = state.ownership[entityId];
+  if (current && current !== winner && !allowSteal) return state;
+  return { ownership: { ...state.ownership, [entityId]: winner }, scores: { ...state.scores, [winner]: state.scores[winner] + quizPoints } };
+}
+
+export function assertDatasetVersion(expected: string, received: string): void {
+  if (expected !== received) throw new Error(`Atlas dataset mismatch: match uses ${expected}, client has ${received}.`);
+}

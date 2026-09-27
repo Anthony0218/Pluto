@@ -6,40 +6,45 @@ import {
   type ReactNode,
 } from "react";
 
-type ThemeContextType = {
-  darkMode: boolean;
-  toggleDarkMode: () => void;
+export type AppTheme = "black" | "pluto";
+
+type ThemeContextValue = {
+  theme: AppTheme;
+  setTheme: (theme: AppTheme) => void;
+  plutoMode: boolean;
 };
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [darkMode, setDarkMode] = useState(() => {
-    const savedTheme = localStorage.getItem("theme");
+const THEME_STORAGE_KEY = "app-theme";
 
-    if (savedTheme) {
-      return savedTheme === "dark";
-    }
-
-    return window.matchMedia("(prefers-color-scheme: dark)").matches;
-  });
-
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [darkMode]);
-
-  function toggleDarkMode() {
-    setDarkMode((current) => !current);
+function getInitialTheme(): AppTheme {
+  if (typeof window === "undefined") {
+    return "pluto";
   }
 
+  const saved = window.localStorage.getItem(THEME_STORAGE_KEY);
+
+  return saved === "black" ? "black" : "pluto";
+}
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setTheme] = useState<AppTheme>(getInitialTheme);
+
+  useEffect(() => {
+    window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+  }, [theme]);
+
+  const plutoMode = theme === "pluto";
+
   return (
-    <ThemeContext.Provider value={{ darkMode, toggleDarkMode }}>
+    <ThemeContext.Provider
+      value={{
+        theme,
+        setTheme,
+        plutoMode,
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   );

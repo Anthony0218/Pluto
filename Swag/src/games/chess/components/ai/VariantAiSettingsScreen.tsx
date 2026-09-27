@@ -1,3 +1,5 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { useState, type ReactNode } from "react";
 
 import {
@@ -35,30 +37,29 @@ export default function VariantAiSettingsScreen({
     black: "Black",
   },
 }: VariantAiSettingsScreenProps) {
+  useUiLanguage();
   const [playerColor, setPlayerColor] = useState<ChessPlayerColor>("white");
 
   const [difficulty, setDifficulty] = useState<Difficulty>("noob");
 
   return (
-    <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100">
+    <main className="chess-settings-page min-h-[var(--app-height)] bg-transparent px-4 py-8 text-zinc-100">
       <section className="mx-auto max-w-4xl rounded-3xl border border-white/10 bg-zinc-900/75 p-6 shadow-2xl shadow-black/30">
-        <div className="flex items-center gap-4">
+        <ChessPageHeader className="flex items-center gap-4" title={title} icon={icon}>
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-amber-400/20 bg-amber-400/10 text-3xl">
             {icon}
           </div>
 
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-300">
-              Vs AI
-            </p>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-300">{ui("Vs AI")}</p>
 
-            <h1 className="mt-1 text-3xl font-black">{title}</h1>
+            <h1 className="mt-1 text-3xl font-black">{ui(title)}</h1>
           </div>
-        </div>
+        </ChessPageHeader>
 
         <div className="mt-7 grid gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
           <section>
-            <h2 className="text-sm font-black text-white">Your side</h2>
+            <h2 className="text-sm font-black text-white">{ui("Your side")}</h2>
 
             <div className="mt-3 grid grid-cols-2 gap-2 lg:grid-cols-1">
               {(["white", "black"] as ChessPlayerColor[]).map((color) => (
@@ -76,14 +77,14 @@ export default function VariantAiSettingsScreen({
                     {color === "white" ? "♔" : "♚"}
                   </span>
 
-                  <span className="font-bold">{sideLabels[color]}</span>
+                  <span className="font-bold">{ui(sideLabels[color])}</span>
                 </button>
               ))}
             </div>
           </section>
 
           <section>
-            <h2 className="text-sm font-black text-white">Difficulty</h2>
+            <h2 className="text-sm font-black text-white">{ui("Difficulty")}</h2>
 
             <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
               {difficultyOrder.map((key) => {
@@ -108,11 +109,11 @@ export default function VariantAiSettingsScreen({
                           : "font-black text-white"
                       }
                     >
-                      {item.label}
+                      {ui(item.label)}
                     </p>
 
                     <p className="mt-1 text-xs leading-5 text-zinc-500">
-                      {item.description}
+                      {ui(item.description)}
                     </p>
                   </button>
                 );
@@ -127,9 +128,7 @@ export default function VariantAiSettingsScreen({
               type="button"
               onClick={onBack}
               className="rounded-xl border border-white/10 bg-white/5 px-5 py-3 font-bold text-zinc-300 transition hover:bg-white/10"
-            >
-              Back
-            </button>
+            >{ui("Back")}</button>
           )}
 
           <button
@@ -141,9 +140,7 @@ export default function VariantAiSettingsScreen({
               })
             }
             className="flex-1 rounded-xl bg-amber-300 px-5 py-3 font-black text-zinc-950 transition hover:bg-amber-200"
-          >
-            Start vs AI
-          </button>
+          >{ui("Start vs AI")}</button>
         </div>
       </section>
     </main>

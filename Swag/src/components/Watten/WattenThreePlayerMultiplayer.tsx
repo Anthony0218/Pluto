@@ -1,3 +1,4 @@
+import { useAppLanguage } from "@/i18n/languageStore";
 import {
   useCallback,
   useEffect,
@@ -15,6 +16,7 @@ import WattenCardComponent from "./WattenCard";
 import CardThemeSelector from "./WattenCardGameSelector";
 import TableThemeSelector from "../App/TableThemeSelector";
 import { ProfileAvatar } from "../social/ProfileAvatarPicker";
+import "./wattenGameScreen.css";
 
 import { useCardTheme } from "@/context/CardThemeContext";
 import { useTableTheme, type TableTheme } from "@/context/TableThemeContext";
@@ -35,7 +37,6 @@ import {
 } from "../../utils/watten";
 
 import {
-  getInitialWattenLanguage,
   setStoredWattenLanguage,
   translateWatten,
   translateWattenPair,
@@ -500,9 +501,7 @@ export function WattenThreePlayerMultiplayerLobby() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
 
-  const [language, setLanguage] = useState<WattenLanguage>(
-    getInitialWattenLanguage,
-  );
+  const { language, setLanguage } = useAppLanguage();
   const [joinCode, setJoinCode] = useState("");
   const [targetScore, setTargetScore] = useState(15);
   const [loading, setLoading] = useState<"create" | "join" | null>(null);
@@ -727,9 +726,7 @@ export function WattenThreePlayerMultiplayerGame() {
   const { user } = useAuth();
   const { tableTheme } = useTableTheme();
 
-  const [language, setLanguage] = useState<WattenLanguage>(
-    getInitialWattenLanguage,
-  );
+  const { language, setLanguage } = useAppLanguage();
 
   const [room, setRoom] = useState<Room | null>(null);
   const [players, setPlayers] = useState<RoomPlayer[]>([]);
@@ -1440,7 +1437,7 @@ export function WattenThreePlayerMultiplayerGame() {
       .join(" & ") ?? "";
 
   return (
-    <main className="min-h-screen bg-transparent px-4 py-5 text-white md:px-6 max-md:px-2 max-md:py-3">
+    <main className="watten-game-screen min-h-screen bg-transparent px-4 py-5 text-white md:px-6 max-md:px-2 max-md:py-3">
       {actionError && (
         <div className="fixed left-1/2 top-5 z-[250] -translate-x-1/2 rounded-xl border border-red-400/30 bg-red-950/95 px-5 py-3 text-sm font-bold text-red-200 shadow-2xl">
           {actionError}
@@ -1511,7 +1508,7 @@ export function WattenThreePlayerMultiplayerGame() {
           </div>
         )}
 
-      <div className="mx-auto max-w-[1780px]">
+      <div className="watten-game-content mx-auto w-full max-w-[1780px]">
         <header className="mb-4 flex flex-wrap items-center justify-between gap-4 max-md:mb-3 max-md:gap-2">
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.25em] text-amber-300">
@@ -1557,7 +1554,7 @@ export function WattenThreePlayerMultiplayerGame() {
           </div>
         </header>
 
-        <div className="grid grid-cols-1 gap-4 xl:grid-cols-[270px_minmax(0,1fr)_270px] max-md:gap-3">
+        <div className="watten-game-grid grid grid-cols-1 gap-4 xl:grid-cols-[270px_minmax(0,1fr)_270px] max-md:gap-3">
           {/* PLAYERS SIDEBAR */}
           <aside className="max-md:order-2">
             <Panel title={t("Players")} subtitle="1 vs 2">

@@ -1,3 +1,6 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { ui, useUiLanguage } from "@/i18n/ui";
+import { useAppLanguage } from "@/i18n/languageStore";
 import { createContext, useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Chess, type Square } from "chess.js";
@@ -1831,6 +1834,7 @@ function MiniChessBoard({
   example: MiniBoardExample;
   compact?: boolean;
 }) {
+  useUiLanguage();
   const t = useT();
   const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
   const ranks = [8, 7, 6, 5, 4, 3, 2, 1];
@@ -1939,6 +1943,7 @@ function MiniChessBoard({
 }
 
 function MiniBoardLegend({ showDanger = true }: { showDanger?: boolean }) {
+  useUiLanguage();
   const t = useT();
   const items = [
     {
@@ -2005,6 +2010,7 @@ function MiniBoardPair({
   rightTitle: string;
   showArrow?: boolean;
 }) {
+  useUiLanguage();
   const t = useT();
 
   return (
@@ -2114,6 +2120,7 @@ function openingToStepExamples(moves: string): OpeningStep[] {
 }
 
 function OpeningSequenceBoards({ moves }: { moves: string }) {
+  useUiLanguage();
   const t = useT();
   const steps = openingToStepExamples(moves);
 
@@ -2136,9 +2143,7 @@ function OpeningSequenceBoards({ moves }: { moves: string }) {
             </span>
 
             <span className="font-mono text-[11px] font-bold text-zinc-300">
-              {step.color === "w"
-                ? `${step.moveNumber}. ${step.move}`
-                : `${step.moveNumber}... ${step.move}`}
+              {step.color === "w" ? `${step.moveNumber}. ${step.move}` : `${step.moveNumber}... ${step.move}`}
             </span>
           </div>
 
@@ -2661,6 +2666,7 @@ function SectionHeading({
   title: string;
   description: string;
 }) {
+  useUiLanguage();
   const t = useT();
 
   return (
@@ -2687,6 +2693,7 @@ function InfoCard({
   children: React.ReactNode;
   accent?: boolean;
 }) {
+  useUiLanguage();
   const t = useT();
 
   return (
@@ -2711,12 +2718,13 @@ function InfoCard({
 }
 
 function RulesTab() {
+  useUiLanguage();
   const t = useT();
 
   return (
     <div className="space-y-8">
       <div className="grid gap-4 lg:grid-cols-3">
-        <InfoCard title="Goal of the Game" accent>
+        <InfoCard title={ui("Goal of the Game")} accent>
           <p>
             {t(
               "Your goal is to checkmate the opponent's king. Checkmate means the king is under attack and there is no legal move that removes the threat.",
@@ -2724,7 +2732,7 @@ function RulesTab() {
           </p>
         </InfoCard>
 
-        <InfoCard title="How a Turn Works">
+        <InfoCard title={ui("How a Turn Works")}>
           <p>
             {t(
               "White moves first. Players then alternate one move at a time. On your turn, move exactly one piece, except during castling where the king and rook move together.",
@@ -2732,7 +2740,7 @@ function RulesTab() {
           </p>
         </InfoCard>
 
-        <InfoCard title="A Good Beginner Plan">
+        <InfoCard title={ui("A Good Beginner Plan")}>
           <p>
             {t(
               "Control the center, develop knights and bishops, castle early, avoid moving the same piece repeatedly without a reason, and check whether your opponent threatens something before every move.",
@@ -2743,9 +2751,9 @@ function RulesTab() {
 
       <section>
         <SectionHeading
-          eyebrow="The Pieces"
-          title="How every chess piece moves"
-          description="Piece values are useful estimates for comparing trades. They are not strict rules: position, king safety, and activity can make a piece more or less valuable."
+          eyebrow={ui("The Pieces")}
+          title={ui("How every chess piece moves")}
+          description={ui("Piece values are useful estimates for comparing trades. They are not strict rules: position, king safety, and activity can make a piece more or less valuable.")}
         />
 
         <MiniBoardLegend />
@@ -2853,13 +2861,13 @@ function RulesTab() {
 
       <section>
         <SectionHeading
-          eyebrow="King Safety"
-          title="Check and checkmate"
-          description="Understanding the difference between check and checkmate is the most important rule in chess."
+          eyebrow={ui("King Safety")}
+          title={ui("Check and checkmate")}
+          description={ui("Understanding the difference between check and checkmate is the most important rule in chess.")}
         />
 
         <div className="mt-5 grid gap-4 lg:grid-cols-2">
-          <InfoCard title="Check">
+          <InfoCard title={ui("Check")}>
             <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-center">
               <div>
                 <p>
@@ -2889,7 +2897,7 @@ function RulesTab() {
             </div>
           </InfoCard>
 
-          <InfoCard title="Checkmate" accent>
+          <InfoCard title={ui("Checkmate")} accent>
             <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-center">
               <div>
                 <p>
@@ -2914,13 +2922,13 @@ function RulesTab() {
 
       <section>
         <SectionHeading
-          eyebrow="Special Rules"
-          title="Castling, en passant, and promotion"
-          description="These are the three special move rules every chess player should know."
+          eyebrow={ui("Special Rules")}
+          title={ui("Castling, en passant, and promotion")}
+          description={ui("These are the three special move rules every chess player should know.")}
         />
 
         <div className="mt-5 grid gap-4 lg:grid-cols-3">
-          <InfoCard title="Castling">
+          <InfoCard title={ui("Castling")}>
             <p>
               {t(
                 "Castling moves the king two squares toward a rook, then places the rook on the square next to the king.",
@@ -2963,7 +2971,7 @@ function RulesTab() {
             </div>
           </InfoCard>
 
-          <InfoCard title="En Passant">
+          <InfoCard title={ui("En Passant")}>
             <p>
               {t(
                 "If an enemy pawn moves two squares from its starting position and lands directly beside your pawn, your pawn may capture it as if it had moved only one square.",
@@ -2984,7 +2992,7 @@ function RulesTab() {
             />
           </InfoCard>
 
-          <InfoCard title="Promotion">
+          <InfoCard title={ui("Promotion")}>
             <p>
               {t(
                 "When a pawn reaches the last rank, it must immediately become a queen, rook, bishop, or knight.",
@@ -3009,9 +3017,9 @@ function RulesTab() {
 
       <section>
         <SectionHeading
-          eyebrow="Piece Values"
-          title="A simple guide to material"
-          description="Use values as a quick guide when deciding whether a trade is favorable."
+          eyebrow={ui("Piece Values")}
+          title={ui("A simple guide to material")}
+          description={ui("Use values as a quick guide when deciding whether a trade is favorable.")}
         />
 
         <div
@@ -3062,9 +3070,9 @@ function RulesTab() {
 
       <section>
         <SectionHeading
-          eyebrow="Quick Tips"
-          title="Six habits that immediately improve beginner play"
-          description="You do not need to memorize hundreds of moves. These simple habits already prevent many common mistakes."
+          eyebrow={ui("Quick Tips")}
+          title={ui("Six habits that immediately improve beginner play")}
+          description={ui("You do not need to memorize hundreds of moves. These simple habits already prevent many common mistakes.")}
         />
 
         <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -3116,14 +3124,15 @@ function RulesTab() {
 }
 
 function OpeningsTab() {
+  useUiLanguage();
   const t = useT();
 
   return (
     <div>
       <SectionHeading
-        eyebrow="Chess Openings"
-        title="Important openings worth recognizing"
-        description="You do not need to memorize every variation. First learn the basic idea behind each opening and understand why the opening moves fight for development, king safety, and central control."
+        eyebrow={ui("Chess Openings")}
+        title={ui("Important openings worth recognizing")}
+        description={ui("You do not need to memorize every variation. First learn the basic idea behind each opening and understand why the opening moves fight for development, king safety, and central control.")}
       />
 
       <div
@@ -3240,9 +3249,9 @@ function OpeningsTab() {
 
       <section className="mt-8">
         <SectionHeading
-          eyebrow="Opening Principles"
-          title="What matters more than memorization"
-          description="If your opponent leaves theory early, these principles tell you what to do next."
+          eyebrow={ui("Opening Principles")}
+          title={ui("What matters more than memorization")}
+          description={ui("If your opponent leaves theory early, these principles tell you what to do next.")}
         />
 
         <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -3275,6 +3284,7 @@ function OpeningsTab() {
 }
 
 function SituationsTab() {
+  useUiLanguage();
   const t = useT();
   const [filter, setFilter] = useState<"All" | SituationInfo["category"]>(
     "All",
@@ -3288,9 +3298,9 @@ function SituationsTab() {
   return (
     <div>
       <SectionHeading
-        eyebrow="Typical Chess Situations"
-        title="Patterns you will see again and again"
-        description="Recognizing patterns is one of the fastest ways to improve. These ideas appear in games at every level."
+        eyebrow={ui("Typical Chess Situations")}
+        title={ui("Patterns you will see again and again")}
+        description={ui("Recognizing patterns is one of the fastest ways to improve. These ideas appear in games at every level.")}
       />
 
       <div className="mt-5 flex flex-wrap gap-2">
@@ -5030,6 +5040,7 @@ function InteractivePuzzleBoard({
   disabled: boolean;
   onSquareClick: (square: Square) => void;
 }) {
+  useUiLanguage();
   const game = new Chess(fen);
   const checkedSquare = checkedKingSquare(game);
 
@@ -5253,6 +5264,7 @@ function feedbackRankClass(rank: PuzzleRank) {
 }
 
 function PuzzlesTab() {
+  useUiLanguage();
   const t = useT();
 
   const [filter, setFilter] = useState<"All" | PuzzleCategory>("All");
@@ -5540,9 +5552,9 @@ function PuzzlesTab() {
   return (
     <div>
       <SectionHeading
-        eyebrow="Interactive Chess Puzzles"
-        title="Find the best move"
-        description="Play the position, get instant feedback, and learn why moves work."
+        eyebrow={ui("Interactive Chess Puzzles")}
+        title={ui("Find the best move")}
+        description={ui("Play the position, get instant feedback, and learn why moves work.")}
       />
 
       <div className="mt-5 flex flex-wrap gap-2">
@@ -5751,13 +5763,7 @@ function PuzzlesTab() {
           <div className="mt-4 rounded-2xl border border-white/8 bg-black/20 p-3">
             <div className="flex items-center justify-between gap-3">
               <p className="text-xs font-bold text-zinc-400">
-                {autoReplying
-                  ? t("Opponent reply")
-                  : solved
-                    ? t("Solved!")
-                    : lineStep > 0
-                      ? t("Your move again")
-                      : t("Select a piece and make your move.")}
+                {autoReplying ? t("Opponent reply") : solved ? t("Solved!") : lineStep > 0 ? t("Your move again") : t("Select a piece and make your move.")}
               </p>
 
               {puzzle.line.length > 1 && (
@@ -5902,7 +5908,7 @@ function PuzzlesTab() {
                           )}
 
                           <span className="font-mono text-sm font-black text-white">
-                            {candidate.label}
+                            {ui(candidate.label)}
                           </span>
                         </span>
                       </div>
@@ -5933,8 +5939,9 @@ function PuzzlesTab() {
 }
 
 export default function ChessRulesAndTips() {
+  useUiLanguage();
   const [activeTab, setActiveTab] = useState<TabKey>("rules");
-  const [language, setLanguage] = useState<Language>("en");
+  const { language, setLanguage } = useAppLanguage();
   const t = (value: string) => translate(language, value);
 
   const tabs: Array<{
@@ -5983,8 +5990,7 @@ export default function ChessRulesAndTips() {
       "
       >
         <div className="mx-auto max-w-[1500px]">
-          <header
-            className="
+          <ChessPageHeader className="
             mb-6
             flex
             flex-col
@@ -6001,51 +6007,8 @@ export default function ChessRulesAndTips() {
             sm:flex-row
             sm:items-center
             sm:justify-between
-          "
-          >
-            <div className="flex items-center gap-4">
-              <div
-                className="
-                flex
-                h-14
-                w-14
-                shrink-0
-                items-center
-                justify-center
-                rounded-2xl
-                border
-                border-amber-500/20
-                bg-amber-400/10
-                font-serif
-                text-4xl
-                text-amber-100
-              "
-              >
-                ♞
-              </div>
+          " description={<> {t("Rules, openings, and common chess patterns")} </>}>
 
-              <div>
-                <p
-                  className="
-                  text-[10px]
-                  font-bold
-                  uppercase
-                  tracking-[0.28em]
-                  text-amber-400
-                "
-                >
-                  {t("Learn Chess")}
-                </p>
-
-                <h1 className="mt-1 text-2xl font-black tracking-tight text-white sm:text-3xl">
-                  {t("Chess Rules & Tips")}
-                </h1>
-
-                <p className="mt-1 text-sm text-zinc-500">
-                  {t("Rules, openings, and common chess patterns")}
-                </p>
-              </div>
-            </div>
 
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <label
@@ -6088,7 +6051,7 @@ export default function ChessRulesAndTips() {
                       value={option.value}
                       className="bg-zinc-900 text-zinc-100"
                     >
-                      {option.label}
+                      {ui(option.label)}
                     </option>
                   ))}
                 </select>
@@ -6115,7 +6078,7 @@ export default function ChessRulesAndTips() {
                 ← {t("Back to Chess")}
               </Link>
             </div>
-          </header>
+          </ChessPageHeader>
 
           <nav
             className="

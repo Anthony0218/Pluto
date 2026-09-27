@@ -1,6 +1,26 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { ui, useUiLanguage } from "@/i18n/ui";
+import { useAppLanguage } from "@/i18n/languageStore";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { Chess, type Square } from "chess.js";
+import {
+  getCompletedLichessPuzzles,
+  getRandomLichessPuzzle,
+  getSuggestedLichessPuzzles,
+  recordLichessPuzzleCompletion,
+  renameLichessPuzzle,
+  type CompletedPuzzle,
+  type PuzzleLibrarySort,
+} from "./lichessPuzzleSource.ts";
+import {
+  getCompletedPersonalGamePuzzles,
+  getPersonalGamePuzzles,
+  recordPersonalGamePuzzleCompletion,
+  renamePersonalGamePuzzle,
+  type CompletedPersonalPuzzle,
+} from "./personalGamePuzzleSource.ts";
+import { useAuth } from "../../../context/AuthContext";
 
 type TabKey = "rules" | "openings" | "situations" | "puzzles";
 type Language = "en" | "de" | "bar" | "ko" | "ru";
@@ -1831,6 +1851,7 @@ function MiniChessBoard({
   example: MiniBoardExample;
   compact?: boolean;
 }) {
+  useUiLanguage();
   const t = useT();
   const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
   const ranks = [8, 7, 6, 5, 4, 3, 2, 1];
@@ -1939,6 +1960,7 @@ function MiniChessBoard({
 }
 
 function MiniBoardLegend({ showDanger = true }: { showDanger?: boolean }) {
+  useUiLanguage();
   const t = useT();
   const items = [
     {
@@ -2005,6 +2027,7 @@ function MiniBoardPair({
   rightTitle: string;
   showArrow?: boolean;
 }) {
+  useUiLanguage();
   const t = useT();
 
   return (
@@ -2114,6 +2137,7 @@ function openingToStepExamples(moves: string): OpeningStep[] {
 }
 
 function OpeningSequenceBoards({ moves }: { moves: string }) {
+  useUiLanguage();
   const t = useT();
   const steps = openingToStepExamples(moves);
 
@@ -2136,9 +2160,7 @@ function OpeningSequenceBoards({ moves }: { moves: string }) {
             </span>
 
             <span className="font-mono text-[11px] font-bold text-zinc-300">
-              {step.color === "w"
-                ? `${step.moveNumber}. ${step.move}`
-                : `${step.moveNumber}... ${step.move}`}
+              {step.color === "w" ? `${step.moveNumber}. ${step.move}` : `${step.moveNumber}... ${step.move}`}
             </span>
           </div>
 
@@ -2661,19 +2683,31 @@ function SectionHeading({
   title: string;
   description: string;
 }) {
+  useUiLanguage();
   const t = useT();
 
   return (
-    <div>
-      <p className="text-[10px] font-black uppercase tracking-[0.24em] text-amber-400">
-        {t(eyebrow)}
-      </p>
-      <h2 className="mt-1 text-2xl font-black tracking-tight text-white">
-        {t(title)}
-      </h2>
-      <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-500">
-        {t(description)}
-      </p>
+    <div className="relative overflow-hidden rounded-[1.75rem] border border-amber-400/10 bg-[linear-gradient(135deg,rgba(13,22,33,.78),rgba(5,10,17,.42))] px-5 py-5 sm:px-6">
+      <div className="pointer-events-none absolute -right-8 -top-14 font-serif text-[9rem] leading-none text-amber-200/[0.025]">
+        ♞
+      </div>
+
+      <div className="relative">
+        <div className="mb-3 flex items-center gap-3">
+          <span className="h-px w-8 bg-amber-300/45" />
+          <p className="text-[9px] font-black uppercase tracking-[0.30em] text-amber-300/85">
+            {t(eyebrow)}
+          </p>
+        </div>
+
+        <h2 className="max-w-4xl font-serif text-2xl font-semibold tracking-[-0.02em] text-[#f6ead1] sm:text-3xl">
+          {t(title)}
+        </h2>
+
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-400">
+          {t(description)}
+        </p>
+      </div>
     </div>
   );
 }
@@ -2687,36 +2721,48 @@ function InfoCard({
   children: React.ReactNode;
   accent?: boolean;
 }) {
+  useUiLanguage();
   const t = useT();
 
   return (
     <section
       className={`
-        rounded-3xl
+        group
+        relative
+        overflow-hidden
+        rounded-[1.6rem]
         border
         p-5
-        shadow-xl
-        shadow-black/10
+        shadow-2xl
+        shadow-black/20
+        backdrop-blur-xl
+        transition
+        duration-300
+        hover:-translate-y-0.5
         ${
           accent
-            ? "border-amber-400/20 bg-amber-400/[0.06]"
-            : "border-white/10 bg-zinc-900/75"
+            ? "border-amber-400/25 bg-[linear-gradient(145deg,rgba(52,39,16,.42),rgba(7,14,22,.96))]"
+            : "border-white/10 bg-[linear-gradient(145deg,rgba(10,18,28,.94),rgba(5,10,17,.90))] hover:border-amber-400/15"
         }
       `}
     >
-      <h3 className="text-base font-black text-zinc-100">{t(title)}</h3>
+      <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-amber-200/20 to-transparent" />
+      <h3 className="font-serif text-lg font-semibold text-[#f5e8cf]">
+        {t(title)}
+      </h3>
       <div className="mt-3 text-sm leading-6 text-zinc-400">{children}</div>
     </section>
   );
 }
 
 function RulesTab() {
+  useUiLanguage();
   const t = useT();
 
   return (
     <div className="space-y-8">
       <div className="grid gap-4 lg:grid-cols-3">
-        <InfoCard title="Goal of the Game" accent>
+        <InfoCard title={ui("Goal of the Game")} accent>
           <p>
             {t(
               "Your goal is to checkmate the opponent's king. Checkmate means the king is under attack and there is no legal move that removes the threat.",
@@ -2724,7 +2770,7 @@ function RulesTab() {
           </p>
         </InfoCard>
 
-        <InfoCard title="How a Turn Works">
+        <InfoCard title={ui("How a Turn Works")}>
           <p>
             {t(
               "White moves first. Players then alternate one move at a time. On your turn, move exactly one piece, except during castling where the king and rook move together.",
@@ -2732,7 +2778,7 @@ function RulesTab() {
           </p>
         </InfoCard>
 
-        <InfoCard title="A Good Beginner Plan">
+        <InfoCard title={ui("A Good Beginner Plan")}>
           <p>
             {t(
               "Control the center, develop knights and bishops, castle early, avoid moving the same piece repeatedly without a reason, and check whether your opponent threatens something before every move.",
@@ -2743,9 +2789,9 @@ function RulesTab() {
 
       <section>
         <SectionHeading
-          eyebrow="The Pieces"
-          title="How every chess piece moves"
-          description="Piece values are useful estimates for comparing trades. They are not strict rules: position, king safety, and activity can make a piece more or less valuable."
+          eyebrow={ui("The Pieces")}
+          title={ui("How every chess piece moves")}
+          description={ui("Piece values are useful estimates for comparing trades. They are not strict rules: position, king safety, and activity can make a piece more or less valuable.")}
         />
 
         <MiniBoardLegend />
@@ -2853,13 +2899,13 @@ function RulesTab() {
 
       <section>
         <SectionHeading
-          eyebrow="King Safety"
-          title="Check and checkmate"
-          description="Understanding the difference between check and checkmate is the most important rule in chess."
+          eyebrow={ui("King Safety")}
+          title={ui("Check and checkmate")}
+          description={ui("Understanding the difference between check and checkmate is the most important rule in chess.")}
         />
 
         <div className="mt-5 grid gap-4 lg:grid-cols-2">
-          <InfoCard title="Check">
+          <InfoCard title={ui("Check")}>
             <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-center">
               <div>
                 <p>
@@ -2889,7 +2935,7 @@ function RulesTab() {
             </div>
           </InfoCard>
 
-          <InfoCard title="Checkmate" accent>
+          <InfoCard title={ui("Checkmate")} accent>
             <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-center">
               <div>
                 <p>
@@ -2914,13 +2960,13 @@ function RulesTab() {
 
       <section>
         <SectionHeading
-          eyebrow="Special Rules"
-          title="Castling, en passant, and promotion"
-          description="These are the three special move rules every chess player should know."
+          eyebrow={ui("Special Rules")}
+          title={ui("Castling, en passant, and promotion")}
+          description={ui("These are the three special move rules every chess player should know.")}
         />
 
         <div className="mt-5 grid gap-4 lg:grid-cols-3">
-          <InfoCard title="Castling">
+          <InfoCard title={ui("Castling")}>
             <p>
               {t(
                 "Castling moves the king two squares toward a rook, then places the rook on the square next to the king.",
@@ -2963,7 +3009,7 @@ function RulesTab() {
             </div>
           </InfoCard>
 
-          <InfoCard title="En Passant">
+          <InfoCard title={ui("En Passant")}>
             <p>
               {t(
                 "If an enemy pawn moves two squares from its starting position and lands directly beside your pawn, your pawn may capture it as if it had moved only one square.",
@@ -2984,7 +3030,7 @@ function RulesTab() {
             />
           </InfoCard>
 
-          <InfoCard title="Promotion">
+          <InfoCard title={ui("Promotion")}>
             <p>
               {t(
                 "When a pawn reaches the last rank, it must immediately become a queen, rook, bishop, or knight.",
@@ -3009,9 +3055,9 @@ function RulesTab() {
 
       <section>
         <SectionHeading
-          eyebrow="Piece Values"
-          title="A simple guide to material"
-          description="Use values as a quick guide when deciding whether a trade is favorable."
+          eyebrow={ui("Piece Values")}
+          title={ui("A simple guide to material")}
+          description={ui("Use values as a quick guide when deciding whether a trade is favorable.")}
         />
 
         <div
@@ -3062,9 +3108,9 @@ function RulesTab() {
 
       <section>
         <SectionHeading
-          eyebrow="Quick Tips"
-          title="Six habits that immediately improve beginner play"
-          description="You do not need to memorize hundreds of moves. These simple habits already prevent many common mistakes."
+          eyebrow={ui("Quick Tips")}
+          title={ui("Six habits that immediately improve beginner play")}
+          description={ui("You do not need to memorize hundreds of moves. These simple habits already prevent many common mistakes.")}
         />
 
         <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -3116,14 +3162,15 @@ function RulesTab() {
 }
 
 function OpeningsTab() {
+  useUiLanguage();
   const t = useT();
 
   return (
     <div>
       <SectionHeading
-        eyebrow="Chess Openings"
-        title="Important openings worth recognizing"
-        description="You do not need to memorize every variation. First learn the basic idea behind each opening and understand why the opening moves fight for development, king safety, and central control."
+        eyebrow={ui("Chess Openings")}
+        title={ui("Important openings worth recognizing")}
+        description={ui("You do not need to memorize every variation. First learn the basic idea behind each opening and understand why the opening moves fight for development, king safety, and central control.")}
       />
 
       <div
@@ -3240,9 +3287,9 @@ function OpeningsTab() {
 
       <section className="mt-8">
         <SectionHeading
-          eyebrow="Opening Principles"
-          title="What matters more than memorization"
-          description="If your opponent leaves theory early, these principles tell you what to do next."
+          eyebrow={ui("Opening Principles")}
+          title={ui("What matters more than memorization")}
+          description={ui("If your opponent leaves theory early, these principles tell you what to do next.")}
         />
 
         <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -3275,6 +3322,7 @@ function OpeningsTab() {
 }
 
 function SituationsTab() {
+  useUiLanguage();
   const t = useT();
   const [filter, setFilter] = useState<"All" | SituationInfo["category"]>(
     "All",
@@ -3288,9 +3336,9 @@ function SituationsTab() {
   return (
     <div>
       <SectionHeading
-        eyebrow="Typical Chess Situations"
-        title="Patterns you will see again and again"
-        description="Recognizing patterns is one of the fastest ways to improve. These ideas appear in games at every level."
+        eyebrow={ui("Typical Chess Situations")}
+        title={ui("Patterns you will see again and again")}
+        description={ui("Recognizing patterns is one of the fastest ways to improve. These ideas appear in games at every level.")}
       />
 
       <div className="mt-5 flex flex-wrap gap-2">
@@ -3441,15 +3489,26 @@ type PuzzleLineMove = {
 
 type InteractivePuzzle = {
   id: string;
+  sourceId: string;
+  origin: "lichess" | "singleplayer" | "multiplayer";
+  sourceLabel: string;
   title: string;
   category: PuzzleCategory;
   difficulty: PuzzleDifficulty;
+  rating: number;
+  popularity: number;
+  themes: string[];
   objective: string;
   goal: string;
   fen: string;
   orientation: "white" | "black";
   line: PuzzleLineMove[];
   candidates: PuzzleCandidate[];
+  quality?: "Inaccuracy" | "Mistake" | "Blunder";
+  centipawnLoss?: number;
+  moveNumber?: number;
+  playedMoveSan?: string;
+  createdAt?: string;
 };
 
 type PuzzleFeedback = {
@@ -3459,1471 +3518,6 @@ type PuzzleFeedback = {
   moveLabel?: string;
   rank?: PuzzleRank;
 };
-
-const interactivePuzzles: InteractivePuzzle[] = [
-  {
-    id: "royal-fork",
-    title: "Royal Fork",
-    category: "Tactic",
-    difficulty: "Beginner",
-    objective: "Win material",
-    goal: "Win the queen with a knight fork.",
-    fen: "q3k3/8/8/1N6/8/8/8/6K1 w - - 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "b5c7",
-        label: "Nc7+",
-        note: "This is the key move of the puzzle.",
-      },
-      {
-        uci: "e8d7",
-        label: "...Kd7",
-        note: "Representative reply",
-      },
-      {
-        uci: "c7a8",
-        label: "Nxa8",
-        note: "You found the full combination.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "b5c7",
-        label: "Nc7+",
-        rank: 1,
-        explanation:
-          "Best: the knight checks the king on e8 and attacks the queen on a8 at the same time. The king must respond, so the queen falls next.",
-      },
-      {
-        uci: "b5d6",
-        label: "Nd6+",
-        rank: 2,
-        explanation:
-          "A useful forcing check, but it does not attack the queen. You gain time, not material.",
-      },
-      {
-        uci: "b5a7",
-        label: "Na7",
-        rank: 3,
-        explanation:
-          "The knight stays active, but the move misses the immediate tactical fork.",
-      },
-      {
-        uci: "b5c3",
-        label: "Nc3",
-        rank: "worst",
-        explanation:
-          "The knight retreats from the action and gives Black time to save the queen. The tactical opportunity disappears.",
-      },
-    ],
-  },
-  {
-    id: "back-rank-mate",
-    title: "Back-Rank Mate",
-    category: "Checkmate",
-    difficulty: "Beginner",
-    objective: "Mate in 1",
-    goal: "Find checkmate in one.",
-    fen: "6k1/5ppp/8/8/8/8/8/K3R3 w - - 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "e1e8",
-        label: "Re8#",
-        note: "You found the full combination.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "e1e8",
-        label: "Re8#",
-        rank: 1,
-        explanation:
-          "Best: the rook reaches the eighth rank with check. The king has no escape because its own pawns seal the seventh rank.",
-      },
-      {
-        uci: "e1e7",
-        label: "Re7",
-        rank: 2,
-        explanation:
-          "The rook stays active and keeps pressure, but there is no reason to postpone an immediate checkmate.",
-      },
-      {
-        uci: "e1f1",
-        label: "Rf1",
-        rank: 3,
-        explanation:
-          "A legal rook move, but it gives Black a tempo to create an escape square or defend.",
-      },
-      {
-        uci: "e1e2",
-        label: "Re2",
-        rank: "worst",
-        explanation:
-          "The rook retreats from the mating rank and throws away a forced win immediately.",
-      },
-    ],
-  },
-  {
-    id: "smothered-mate",
-    title: "Smothered Mate",
-    category: "Checkmate",
-    difficulty: "Intermediate",
-    objective: "Mate in 1",
-    goal: "Find checkmate in one.",
-    fen: "6rk/6pr/7N/8/8/8/8/K7 w - - 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "h6f7",
-        label: "Nf7#",
-        note: "You found the full combination.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "h6f7",
-        label: "Nf7#",
-        rank: 1,
-        explanation:
-          "Best: the knight attacks h8. The black king is trapped by its own rook and pawn structure, so the knight check is mate.",
-      },
-      {
-        uci: "h6g8",
-        label: "Nxg8",
-        rank: 2,
-        explanation:
-          "Winning the rook is good materially, but checkmate is stronger than winning material.",
-      },
-      {
-        uci: "h6f5",
-        label: "Nf5",
-        rank: 3,
-        explanation:
-          "The knight remains active, but the move ignores a mating pattern that is available right now.",
-      },
-      {
-        uci: "h6g4",
-        label: "Ng4",
-        rank: "worst",
-        explanation:
-          "The knight retreats far from the king and loses both the mate and the rook-winning opportunity.",
-      },
-    ],
-  },
-  {
-    id: "back-rank-deflection",
-    title: "Deflection to the Back Rank",
-    category: "Checkmate",
-    difficulty: "Intermediate",
-    objective: "Mate in 2",
-    goal: "Force mate in two by deflecting the queen.",
-    fen: "3qr1k1/4Rppp/8/8/8/8/8/K3R3 w - - 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "e7e8",
-        label: "Rxe8+",
-        note: "This is the key move of the puzzle.",
-      },
-      {
-        uci: "d8e8",
-        label: "...Qxe8",
-        note: "The opponent reply is played automatically.",
-      },
-      {
-        uci: "e1e8",
-        label: "Rxe8#",
-        note: "You found the full combination.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "e7e8",
-        label: "Rxe8+",
-        rank: 1,
-        explanation:
-          "Best: the first rook sacrifices itself with check and drags the black queen onto e8. That clears the e-file for the second rook.",
-      },
-      {
-        uci: "e7f7",
-        label: "Rxf7",
-        rank: 2,
-        explanation:
-          "You win a pawn, but Black keeps the back rank defended. Material is less important than the forced mating sequence.",
-      },
-      {
-        uci: "e7e6",
-        label: "Re6",
-        rank: 3,
-        explanation:
-          "The rook remains active, but the forcing check is lost and Black gets time to defend.",
-      },
-      {
-        uci: "e7e2",
-        label: "Re2",
-        rank: "worst",
-        explanation:
-          "This blocks the second rook on e1 and destroys the geometry of your own mating attack.",
-      },
-    ],
-  },
-  {
-    id: "queen-sac-smothered",
-    title: "Queen Sacrifice Smothered Mate",
-    category: "Checkmate",
-    difficulty: "Advanced",
-    objective: "Mate in 2",
-    goal: "Force mate in two with a queen sacrifice.",
-    fen: "5r1k/6pp/4Q2N/8/8/8/8/K7 w - - 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "e6g8",
-        label: "Qg8+",
-        note: "This is the key move of the puzzle.",
-      },
-      {
-        uci: "f8g8",
-        label: "...Rxg8",
-        note: "The opponent reply is played automatically.",
-      },
-      {
-        uci: "h6f7",
-        label: "Nf7#",
-        note: "You found the full combination.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "e6g8",
-        label: "Qg8+",
-        rank: 1,
-        explanation:
-          "Best: the queen is deliberately offered on g8. The king cannot take it because the knight on h6 protects g8, so the rook is forced to capture.",
-      },
-      {
-        uci: "e6f5",
-        label: "Qf5",
-        rank: 2,
-        explanation:
-          "The queen keeps attacking chances, but the forcing sacrifice is much stronger because it controls Black's reply.",
-      },
-      {
-        uci: "e6d5",
-        label: "Qd5",
-        rank: 3,
-        explanation:
-          "A central queen move preserves pressure, but it lets Black reorganize instead of forcing the mating net.",
-      },
-      {
-        uci: "e6a2",
-        label: "Qa2",
-        rank: "worst",
-        explanation:
-          "The queen abandons the kingside and removes the tactical pressure that makes the smothered-mate pattern possible.",
-      },
-    ],
-  },
-
-  {
-    id: "absolute-pin",
-    title: "Absolute Pin",
-    category: "Tactic",
-    difficulty: "Beginner",
-    objective: "Exploit a pin",
-    goal: "Win the pinned knight before it can escape.",
-    fen: "4k3/4n3/3P4/8/8/8/8/4R1K1 w - - 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "d6e7",
-        label: "dxe7",
-        note: "You found the tactical point.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "d6e7",
-        label: "dxe7",
-        rank: 1,
-        explanation:
-          "Best: the knight on e7 is absolutely pinned to the king by the rook on e1. It cannot move, so the pawn can simply take it.",
-      },
-      {
-        uci: "d6d7",
-        label: "d7",
-        rank: 2,
-        explanation:
-          "The passed pawn becomes dangerous, but you are leaving a free pinned knight on the board.",
-      },
-      {
-        uci: "e1e2",
-        label: "Re2",
-        rank: 3,
-        explanation:
-          "The rook remains active, but moving it away releases the pin and lets the knight escape.",
-      },
-      {
-        uci: "e1a1",
-        label: "Ra1",
-        rank: "worst",
-        explanation:
-          "Worst: the rook completely abandons the e-file, immediately freeing the pinned knight and wasting the tactical opportunity.",
-      },
-    ],
-  },
-  {
-    id: "king-queen-skewer",
-    title: "King and Queen Skewer",
-    category: "Tactic",
-    difficulty: "Intermediate",
-    objective: "Skewer",
-    goal: "Check the king and win the queen behind it.",
-    fen: "4q3/4k3/8/8/8/8/8/R5K1 w - - 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "a1e1",
-        label: "Re1+",
-        note: "This is the key move of the puzzle.",
-      },
-      {
-        uci: "e7d7",
-        label: "...Kd7",
-        note: "Representative reply",
-      },
-      {
-        uci: "e1e8",
-        label: "Rxe8",
-        note: "You found the full combination.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "a1e1",
-        label: "Re1+",
-        rank: 1,
-        explanation:
-          "Best: the rook checks the king on e7. The queen sits directly behind the king on e8, so after the king moves the rook wins the queen.",
-      },
-      {
-        uci: "a1a7",
-        label: "Ra7+",
-        rank: 2,
-        explanation:
-          "A forcing check, but it attacks from the side and does not line the king up with the queen.",
-      },
-      {
-        uci: "g1f2",
-        label: "Kf2",
-        rank: 3,
-        explanation:
-          "A harmless improving king move, but the tactical skewer is available immediately and should not be postponed.",
-      },
-      {
-        uci: "a1a2",
-        label: "Ra2",
-        rank: "worst",
-        explanation:
-          "The rook becomes passive and gives Black time to separate the king and queen, removing the skewer completely.",
-      },
-    ],
-  },
-  {
-    id: "discovered-attack",
-    title: "Discovered Attack",
-    category: "Tactic",
-    difficulty: "Intermediate",
-    objective: "Discovered attack",
-    goal: "Move the bishop with tempo and uncover the rook against the queen.",
-    fen: "3k4/3q4/8/4p3/3B4/8/8/3R2K1 w - - 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "d4b6",
-        label: "Bb6+!",
-        note: "This is the key move of the puzzle.",
-      },
-      {
-        uci: "d8e8",
-        label: "...Ke8",
-        note: "Representative reply",
-      },
-      {
-        uci: "d1d7",
-        label: "Rxd7",
-        note: "You found the full combination.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "d4b6",
-        label: "Bb6+!",
-        rank: 1,
-        explanation:
-          "Best: Bb6+ moves the bishop off the d-file with check. Black must answer the check, and the rook then wins the queen on d7. The pawn on e5 also removes the old Bf6+ alternative.",
-      },
-      {
-        uci: "d4c3",
-        label: "Bc3",
-        rank: 2,
-        explanation:
-          "The bishop clears the d-file and attacks the queen indirectly, but without check Black can simply move the queen.",
-      },
-      {
-        uci: "d4e3",
-        label: "Be3",
-        rank: 3,
-        explanation:
-          "This also uncovers the rook, but it gives Black time to save the queen because the move is not forcing.",
-      },
-      {
-        uci: "d1d2",
-        label: "Rd2",
-        rank: "worst",
-        explanation:
-          "The rook leaves the attacking file while the bishop still blocks the queen. The tactical opportunity disappears.",
-      },
-    ],
-  },
-  {
-    id: "rook-behind-pawn",
-    title: "Rook Behind the Passed Pawn",
-    category: "Endgame",
-    difficulty: "Beginner",
-    objective: "Improve the rook",
-    goal: "Place your rook behind the passed pawn.",
-    fen: "6k1/8/3P4/8/8/8/6K1/R7 w - - 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "a1d1",
-        label: "Rd1",
-        note: "You found the strategic setup.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "a1d1",
-        label: "Rd1",
-        rank: 1,
-        explanation:
-          "Best: the rook belongs behind the passed pawn. From d1 it supports every advance while staying active as the pawn moves up the d-file.",
-      },
-      {
-        uci: "a1a6",
-        label: "Ra6",
-        rank: 2,
-        explanation:
-          "The rook supports the pawn from the side, but it can become awkward as the pawn advances and may be attacked more easily.",
-      },
-      {
-        uci: "g2f3",
-        label: "Kf3",
-        rank: 3,
-        explanation:
-          "Improving the king is useful in an endgame, but activating the rook behind the passed pawn is the more urgent structural improvement.",
-      },
-      {
-        uci: "a1h1",
-        label: "Rh1",
-        rank: "worst",
-        explanation:
-          "The rook moves far away from the passed pawn and contributes almost nothing to its advance.",
-      },
-    ],
-  },
-  {
-    id: "create-luft",
-    title: "Create Luft",
-    category: "Strategy",
-    difficulty: "Beginner",
-    objective: "King safety",
-    goal: "Create a safe escape square for your king without overextending the pawns.",
-    fen: "k5r1/8/8/8/8/8/5PPP/6K1 w - - 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "h2h3",
-        label: "h3",
-        note: "You improved the king's safety.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "h2h3",
-        label: "h3",
-        rank: 1,
-        explanation:
-          "Best: h3 quietly gives the king an escape square on h2 and reduces the danger of future back-rank mating ideas.",
-      },
-      {
-        uci: "h2h4",
-        label: "h4",
-        rank: 2,
-        explanation:
-          "This also vacates h2, but advancing two squares weakens more dark squares and places the pawn farther from the king.",
-      },
-      {
-        uci: "f2f3",
-        label: "f3",
-        rank: 3,
-        explanation:
-          "It creates an escape square on f2, but it also weakens the diagonal around the king more than h3 does.",
-      },
-      {
-        uci: "g1h1",
-        label: "Kh1",
-        rank: "worst",
-        explanation:
-          "Worst: the king moves deeper into the corner without creating any escape square. The back-rank problem remains.",
-      },
-    ],
-  },
-
-  {
-    id: "clearance-promotion",
-    title: "Clearance Sacrifice for Promotion",
-    category: "Tactic",
-    difficulty: "Advanced",
-    objective: "Clear the promotion square",
-    goal: "Sacrifice the rook so the pawn can promote with tempo.",
-    fen: "6r1/4k1P1/8/8/8/8/8/K6R w - - 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "h1h8",
-        label: "Rh8!",
-        note: "This is the key move of the puzzle.",
-      },
-      {
-        uci: "g8h8",
-        label: "...Rxh8",
-        note: "The opponent reply is played automatically.",
-      },
-      {
-        uci: "g7h8q",
-        label: "gxh8=Q",
-        note: "You found the full combination.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "h1h8",
-        label: "Rh8!",
-        rank: 1,
-        explanation:
-          "Best: the rook deliberately enters h8. If Black captures it, the g7-pawn recaptures on h8 and promotes immediately. The rook sacrifice clears the promotion square.",
-      },
-      {
-        uci: "h1h7",
-        label: "Rh7",
-        rank: 2,
-        explanation:
-          "The rook becomes active and attacks along the seventh rank, but it does not force the black rook away from g8.",
-      },
-      {
-        uci: "h1h6",
-        label: "Rh6",
-        rank: 3,
-        explanation:
-          "The rook stays near the pawn, but the promotion problem remains unsolved because g8 is still occupied.",
-      },
-      {
-        uci: "h1h2",
-        label: "Rh2",
-        rank: "worst",
-        explanation:
-          "The rook retreats from the critical eighth rank and gives Black time to blockade the pawn permanently.",
-      },
-    ],
-  },
-  {
-    id: "opera-deflection",
-    title: "Deflection Before the Back-Rank Mate",
-    category: "Checkmate",
-    difficulty: "Advanced",
-    objective: "Mate in 2",
-    goal: "Sacrifice the queen to remove the last defender of the back rank.",
-    fen: "4k3/2Bnpp2/8/8/8/1Q6/8/3R2K1 w - - 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "b3b8",
-        label: "Qb8+!",
-        note: "This is the key move of the puzzle.",
-      },
-      {
-        uci: "d7b8",
-        label: "...Nxb8",
-        note: "The opponent reply is played automatically.",
-      },
-      {
-        uci: "d1d8",
-        label: "Rd8#",
-        note: "You found the full combination.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "b3b8",
-        label: "Qb8+!",
-        rank: 1,
-        explanation:
-          "Best: the queen sacrifice forces the knight away from d7. Once the knight captures on b8, the d-file is completely open and Rd8 is mate.",
-      },
-      {
-        uci: "b3b7",
-        label: "Qb7",
-        rank: 2,
-        explanation:
-          "The queen enters the seventh rank and keeps pressure, but the knight remains on d7 and continues to block the mating rook.",
-      },
-      {
-        uci: "b3a3",
-        label: "Qa3",
-        rank: 3,
-        explanation:
-          "The queen remains active, but the move does nothing to remove the defender on d7.",
-      },
-      {
-        uci: "b3c3",
-        label: "Qc3",
-        rank: "worst",
-        explanation:
-          "The queen steps away from the forcing line and gives Black time to consolidate the back rank.",
-      },
-    ],
-  },
-  {
-    id: "bodens-mate",
-    title: "Boden's Mate",
-    category: "Checkmate",
-    difficulty: "Advanced",
-    objective: "Mate in 2",
-    goal: "Sacrifice the queen to open both diagonals around the king.",
-    fen: "2k5/1p1p4/2n1N3/2Q5/8/8/8/1R3BK1 w - - 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "c5c6",
-        label: "Qxc6+!",
-        note: "This is the key move of the puzzle.",
-      },
-      {
-        uci: "b7c6",
-        label: "...bxc6",
-        note: "The opponent reply is played automatically.",
-      },
-      {
-        uci: "f1a6",
-        label: "Ba6#",
-        note: "You found the full combination.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "c5c6",
-        label: "Qxc6+!",
-        rank: 1,
-        explanation:
-          "Best: the queen sacrifice drags the b7-pawn onto c6. That vacates b7, opening the bishop diagonal a6-b7-c8 and the rook's access to b8. Ba6 then creates the classic Boden mating net.",
-      },
-      {
-        uci: "c5a7",
-        label: "Qa7",
-        rank: 2,
-        explanation:
-          "The queen stays near the king and creates pressure, but the b7-pawn continues to block the decisive bishop diagonal.",
-      },
-      {
-        uci: "c5c3",
-        label: "Qc3",
-        rank: 3,
-        explanation:
-          "The queen centralizes safely, but the immediate mating geometry disappears.",
-      },
-      {
-        uci: "c5c1",
-        label: "Qc1",
-        rank: "worst",
-        explanation:
-          "The queen retreats all the way from the attack, surrendering the forcing opportunity around the exposed king.",
-      },
-    ],
-  },
-  {
-    id: "legals-mate",
-    title: "Légal's Mate",
-    category: "Checkmate",
-    difficulty: "Really Hard",
-    objective: "Mate in 3",
-    goal: "Ignore the attacked queen and calculate the mating combination to the end.",
-    fen: "r2qkbnr/ppp2ppp/2np4/4p3/2B1P1b1/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 0 5",
-    orientation: "white",
-    line: [
-      {
-        uci: "f3e5",
-        label: "Nxe5!",
-        note: "This is the key move of the puzzle.",
-      },
-      {
-        uci: "g4d1",
-        label: "...Bxd1",
-        note: "The opponent accepts the queen.",
-      },
-      {
-        uci: "c4f7",
-        label: "Bxf7+",
-        note: "Combination continues",
-      },
-      {
-        uci: "e8e7",
-        label: "...Ke7",
-        note: "The opponent reply is played automatically.",
-      },
-      {
-        uci: "c3d5",
-        label: "Nd5#",
-        note: "You found the full combination.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "f3e5",
-        label: "Nxe5!",
-        rank: 1,
-        explanation:
-          "Best: White appears to abandon the queen, but the point is a forcing mating attack. After ...Bxd1, Bxf7+ drives the king to e7 and Nd5 is mate.",
-      },
-      {
-        uci: "h2h3",
-        label: "h3",
-        rank: 2,
-        explanation:
-          "A sensible move that questions the bishop and preserves the queen, but it misses the tactical chance to end the game immediately.",
-      },
-      {
-        uci: "d2d3",
-        label: "d3",
-        rank: 3,
-        explanation:
-          "A normal developing move, but the position contains a concrete combination that is much stronger than quiet development.",
-      },
-      {
-        uci: "a2a3",
-        label: "a3",
-        rank: "worst",
-        explanation:
-          "A slow flank move ignores the tactical concentration around f7 and allows Black to stabilize the pin on the queen.",
-      },
-    ],
-  },
-  {
-    id: "greek-gift",
-    title: "Greek Gift Attack",
-    category: "Tactic",
-    difficulty: "Really Hard",
-    objective: "Build a mating attack",
-    goal: "Sacrifice the bishop, force the king out, and bring the queen into the attack.",
-    fen: "6k1/5ppp/8/8/8/3B1N2/8/3QR1K1 w - - 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "d3h7",
-        label: "Bxh7+!",
-        note: "This is the key move of the puzzle.",
-      },
-      {
-        uci: "g8h7",
-        label: "...Kxh7",
-        note: "The opponent accepts the bishop.",
-      },
-      {
-        uci: "f3g5",
-        label: "Ng5+",
-        note: "Combination continues",
-      },
-      {
-        uci: "h7g8",
-        label: "...Kg8",
-        note: "The opponent reply is played automatically.",
-      },
-      {
-        uci: "d1h5",
-        label: "Qh5!",
-        note: "You built the classic Greek Gift attacking setup.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "d3h7",
-        label: "Bxh7+!",
-        rank: 1,
-        explanation:
-          "Best: the bishop sacrifice destroys the h7 shelter and forces the king away from its normal defensive structure. Ng5+ then gains another tempo and Qh5 brings the queen into the attack.",
-      },
-      {
-        uci: "f3g5",
-        label: "Ng5",
-        rank: 2,
-        explanation:
-          "The knight heads toward the king, but without first removing h7 the attack is less forcing and Black has more defensive resources.",
-      },
-      {
-        uci: "d1e2",
-        label: "Qe2",
-        rank: 3,
-        explanation:
-          "The queen improves, but slowly. The position rewards a forcing sacrifice before Black can reinforce the kingside.",
-      },
-      {
-        uci: "d3c4",
-        label: "Bc4",
-        rank: "worst",
-        explanation:
-          "The bishop leaves the critical h7 diagonal and gives up the defining tactical idea of the position.",
-      },
-    ],
-  },
-
-  {
-    id: "trade-queens-when-ahead",
-    title: "Trade Queens When You Are Ahead",
-    category: "Strategy",
-    difficulty: "Beginner",
-    objective: "Simplify when ahead",
-    goal: "You are up a rook. Remove the opponent's queen and reduce counterplay.",
-    fen: "r2q2k1/8/8/8/8/8/8/R2Q2KR w - - 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "d1d8",
-        label: "Qxd8+",
-        note: "This is the clean simplifying move.",
-      },
-      {
-        uci: "a8d8",
-        label: "...Rxd8",
-        note: "The queens are gone and your extra rook becomes much easier to use.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "d1d8",
-        label: "Qxd8+",
-        rank: 1,
-        explanation:
-          "Best: when you are clearly ahead in material, trading queens usually reduces the opponent's tactical chances. After ...Rxd8, White still has two rooks against one rook and almost no mating danger.",
-      },
-      {
-        uci: "d1f3",
-        label: "Qf3",
-        rank: 2,
-        explanation:
-          "The queen stays active, but keeping queens on the board gives the losing side more chances for checks, forks and perpetual attacks.",
-      },
-      {
-        uci: "d1e2",
-        label: "Qe2",
-        rank: 3,
-        explanation:
-          "A safe move, but it misses the simplest path. When ahead, ask whether a queen trade can turn a complicated game into an easy endgame.",
-      },
-      {
-        uci: "d1h5",
-        label: "Qh5",
-        rank: "worst",
-        explanation:
-          "The queen moves far from the trade and keeps the position unnecessarily tactical. The player who is ahead usually benefits from reducing danger, not increasing it.",
-      },
-    ],
-  },
-  {
-    id: "keep-queens-when-behind",
-    title: "Keep Queens When You Are Behind",
-    category: "Strategy",
-    difficulty: "Intermediate",
-    objective: "Create counterplay",
-    goal: "Use a forcing queen check to stay active and attack the extra rook.",
-    fen: "r2q2k1/8/8/7Q/8/8/8/6K1 w - - 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "h5d5",
-        label: "Qd5+!",
-        note: "You kept the queen and forced Black to react.",
-      },
-      {
-        uci: "g8h8",
-        label: "...Kh8",
-        note: "Representative reply",
-      },
-      {
-        uci: "d5a8",
-        label: "Qxa8",
-        note: "The active queen recovers the extra rook.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "h5d5",
-        label: "Qd5+!",
-        rank: 1,
-        explanation:
-          "Best: when behind, look for forcing activity rather than automatic simplification. Qd5+ checks the king and attacks the rook on a8 along the diagonal.",
-      },
-      {
-        uci: "h5e5",
-        label: "Qe5",
-        rank: 2,
-        explanation:
-          "The queen stays active, but without check Black gets time to protect the rook or force a queen trade.",
-      },
-      {
-        uci: "h5h3",
-        label: "Qh3",
-        rank: 3,
-        explanation:
-          "Keeping queens is sensible, but retreating gives away the immediate tactical chance to recover material.",
-      },
-      {
-        uci: "h5d1",
-        label: "Qd1",
-        rank: "worst",
-        explanation:
-          "The queen becomes passive and offers Black exactly what the materially stronger side wants: time to consolidate and simplify.",
-      },
-    ],
-  },
-  {
-    id: "open-center-against-king",
-    title: "Open the Center Against an Exposed King",
-    category: "Strategy",
-    difficulty: "Beginner",
-    objective: "Open the center",
-    goal: "The enemy king is stuck in the middle. Open lines before it can become safe.",
-    fen: "4k3/8/8/3p4/2B1P3/8/8/4R1K1 w - - 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "e4d5",
-        label: "exd5+",
-        note: "Opening the e-file immediately exposes the king.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "e4d5",
-        label: "exd5+",
-        rank: 1,
-        explanation:
-          "Best: the pawn leaves e4 and opens the e-file for the rook. Because the black king is still on e8, opening the center comes with check and creates immediate pressure.",
-      },
-      {
-        uci: "c4d5",
-        label: "Bxd5",
-        rank: 2,
-        explanation:
-          "You remove the central pawn, but your own e4-pawn still blocks the rook. The center opens less effectively.",
-      },
-      {
-        uci: "c4d3",
-        label: "Bd3",
-        rank: 3,
-        explanation:
-          "The bishop remains useful, but this gives the king time to escape. When the enemy king is exposed, time matters.",
-      },
-      {
-        uci: "e4e5",
-        label: "e5",
-        rank: "worst",
-        explanation:
-          "Worst: e5 closes the center and blocks your own rook. That is exactly what the exposed king wants — fewer open lines and more time.",
-      },
-    ],
-  },
-  {
-    id: "keep-center-closed-own-king",
-    title: "Keep the Center Closed When Your King Is Unsafe",
-    category: "Strategy",
-    difficulty: "Beginner",
-    objective: "Do not open too early",
-    goal: "Your king is still exposed and Black's pieces are ready. Keep the center closed until you are safer.",
-    fen: "4r1k1/8/8/2bp4/4P2q/8/5P1P/4RK2 w - - 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "e4e5",
-        label: "e5",
-        note: "You kept the dangerous central file closed.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "e4e5",
-        label: "e5",
-        rank: 1,
-        explanation:
-          "Best: the pawn remains on the e-file and keeps Black's rook from entering. When your own king is vulnerable and the opponent has more active pieces, closing the center can buy the time you need.",
-      },
-      {
-        uci: "f2f3",
-        label: "f3",
-        rank: 2,
-        explanation:
-          "This gives the king some breathing room and attacks the center indirectly, but it weakens dark squares and does not solve the e-file problem as cleanly.",
-      },
-      {
-        uci: "f1g1",
-        label: "Kg1",
-        rank: 3,
-        explanation:
-          "Moving the king toward safety is sensible, but Black still has the option to open the center immediately.",
-      },
-      {
-        uci: "e4d5",
-        label: "exd5",
-        rank: "worst",
-        explanation:
-          "Worst: the e-pawn leaves the file and exposes the rook on e1 to Black's rook on e8. With your king still unsafe, opening lines helps the better-developed attacker.",
-      },
-    ],
-  },
-  {
-    id: "castle-before-center-opens",
-    title: "Castle Before the Center Opens",
-    category: "Strategy",
-    difficulty: "Advanced",
-    objective: "King safety",
-    goal: "Complete development before the central tension turns tactical.",
-    fen: "r3k2r/ppp2ppp/2n2n2/3pp3/3PP3/2N2N2/PPP2PPP/R3K2R w KQkq - 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "e1g1",
-        label: "O-O",
-        note: "You secured the king before opening the center.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "e1g1",
-        label: "O-O",
-        rank: 1,
-        explanation:
-          "Best: both sides are ready for central exchanges. Castling finishes king safety first and connects the rook to the coming fight.",
-      },
-      {
-        uci: "e4d5",
-        label: "exd5",
-        rank: 2,
-        explanation:
-          "Opening the center is playable, but doing it before securing the king makes every check and central file more dangerous.",
-      },
-      {
-        uci: "a2a3",
-        label: "a3",
-        rank: 3,
-        explanation:
-          "Useful in some structures, but it spends a tempo while the king is still in the center.",
-      },
-      {
-        uci: "e1d2",
-        label: "Kd2",
-        rank: "worst",
-        explanation:
-          "Walking the king into the center voluntarily makes the coming central exchanges much harder to handle.",
-      },
-    ],
-  },
-  {
-    id: "underpromotion-knight-fork",
-    title: "Underpromotion Knight Fork",
-    category: "Tactic",
-    difficulty: "Advanced",
-    objective: "Win the queen",
-    goal: "Promote to the only piece that creates a fork.",
-    fen: "8/4k1P1/5q2/8/8/8/8/K7 w - - 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "g7g8n",
-        label: "g8=N+!",
-        note: "The knight promotion checks the king and attacks the queen.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "g7g8n",
-        label: "g8=N+!",
-        rank: 1,
-        explanation:
-          "Best: the new knight checks the king on e7 and simultaneously attacks the queen on f6. Promotion is not always about choosing the strongest piece.",
-      },
-      {
-        uci: "g7g8q",
-        label: "g8=Q",
-        rank: 2,
-        explanation:
-          "A queen is normally strongest, but here it misses the immediate knight fork that wins Black's queen.",
-      },
-      {
-        uci: "g7g8r",
-        label: "g8=R",
-        rank: 3,
-        explanation:
-          "The rook promotion gains material value but does not create the tactical double attack.",
-      },
-      {
-        uci: "g7g8b",
-        label: "g8=B",
-        rank: "worst",
-        explanation:
-          "The bishop neither checks the king nor attacks the queen. It throws away the special tactical point of the position.",
-      },
-    ],
-  },
-  {
-    id: "en-passant-discovered-check",
-    title: "En Passant Discovered Check",
-    category: "Tactic",
-    difficulty: "Advanced",
-    objective: "Use the special rule tactically",
-    goal: "Capture en passant and open the e-file with check.",
-    fen: "4k3/8/8/4Pp2/8/8/8/4R1K1 w - f6 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "e5f6",
-        label: "exf6 e.p.+",
-        note: "The pawn leaves the e-file and the rook check is revealed.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "e5f6",
-        label: "exf6 e.p.+",
-        rank: 1,
-        explanation:
-          "Best: en passant removes the pawn on f5 while your pawn leaves e5. That clears the entire e-file, so the rook on e1 gives a discovered check.",
-      },
-      {
-        uci: "e5e6",
-        label: "e6",
-        rank: 2,
-        explanation:
-          "The passed pawn advances, but the e-file stays blocked and the immediate discovered-check opportunity disappears.",
-      },
-      {
-        uci: "g1f2",
-        label: "Kf2",
-        rank: 3,
-        explanation:
-          "A legal king move, but the special en-passant window exists for only one move and should be used immediately.",
-      },
-      {
-        uci: "e1e2",
-        label: "Re2",
-        rank: "worst",
-        explanation:
-          "Moving the rook abandons the tactical alignment, and the en-passant opportunity will vanish after this move.",
-      },
-    ],
-  },
-  {
-    id: "zwischenzug-before-capture",
-    title: "Zwischenzug Before the Capture",
-    category: "Tactic",
-    difficulty: "Advanced",
-    objective: "Win the queen cleanly",
-    goal: "Insert a forcing check before taking the attacked queen.",
-    fen: "4k3/3q4/8/7Q/8/8/8/3R2K1 w - - 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "h5e5",
-        label: "Qe5+!",
-        note: "Check first — do not rush the capture.",
-      },
-      {
-        uci: "e8f8",
-        label: "...Kf8",
-        note: "Representative reply",
-      },
-      {
-        uci: "d1d7",
-        label: "Rxd7",
-        note: "Now the queen falls without sacrificing the rook.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "h5e5",
-        label: "Qe5+!",
-        rank: 1,
-        explanation:
-          "Best: the zwischenzug check forces the king away from d7. Only then does Rxd7 win the queen without allowing Kxd7.",
-      },
-      {
-        uci: "d1d7",
-        label: "Rxd7",
-        rank: 2,
-        explanation:
-          "This wins the queen for a rook, but Black can answer Kxd7. The intermediate check lets you win the queen much more cleanly.",
-      },
-      {
-        uci: "h5h3",
-        label: "Qh3",
-        rank: 3,
-        explanation:
-          "The queen remains safe, but the tactical chance to improve the capture with tempo is missed.",
-      },
-      {
-        uci: "d1d2",
-        label: "Rd2",
-        rank: "worst",
-        explanation:
-          "The rook abandons the attack on d7 and gives Black time to move the queen.",
-      },
-    ],
-  },
-  {
-    id: "castle-away-from-attack",
-    title: "Choose the Safer Castle",
-    category: "Strategy",
-    difficulty: "Advanced",
-    objective: "Choose the right king shelter",
-    goal: "Castle away from the side where Black has already built attacking pressure.",
-    fen: "2kr2r1/ppp2ppp/2n2n2/2b1p3/7q/2N2N2/PPP2PPP/R3K2R w KQ - 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "e1c1",
-        label: "O-O-O!",
-        note: "You chose the side with less immediate attacking pressure.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "e1c1",
-        label: "O-O-O!",
-        rank: 1,
-        explanation:
-          "Best teaching choice: Black's queen and rook are already aimed at the kingside. Castling long places the king away from that concentration of force.",
-      },
-      {
-        uci: "e1g1",
-        label: "O-O?!",
-        rank: 2,
-        explanation:
-          "Castling is normally good, but not automatically. Here it places the king on the side where Black's queen, rook and bishop are already active.",
-      },
-      {
-        uci: "a2a3",
-        label: "a3",
-        rank: 3,
-        explanation:
-          "A useful move in some positions, but delaying king safety while Black is already active is risky.",
-      },
-      {
-        uci: "e1f1",
-        label: "Kf1",
-        rank: "worst",
-        explanation:
-          "The king loses castling rights and remains awkwardly placed while Black keeps the initiative.",
-      },
-    ],
-  },
-  {
-    id: "anastasias-net",
-    title: "Anastasia's Net",
-    category: "Checkmate",
-    difficulty: "Really Hard",
-    objective: "Mate in 2",
-    goal: "Sacrifice the queen to drag the king onto the h-file, then finish with the rook.",
-    fen: "7k/4N1pp/8/7Q/8/8/8/K3R3 w - - 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "h5h7",
-        label: "Qxh7+!",
-        note: "The queen sacrifice forces the king onto h7.",
-      },
-      {
-        uci: "h8h7",
-        label: "...Kxh7",
-        note: "The opponent accepts the queen.",
-      },
-      {
-        uci: "e1h1",
-        label: "Rh1#",
-        note: "The knight seals g8 and g6 while the rook controls the h-file.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "h5h7",
-        label: "Qxh7+!",
-        rank: 1,
-        explanation:
-          "Best: the queen is deliberately sacrificed. After ...Kxh7, Rh1# works because the knight on e7 controls the king's escape squares g8 and g6.",
-      },
-      {
-        uci: "e7g8",
-        label: "Ng8",
-        rank: 2,
-        explanation:
-          "The knight moves near the king, but the forcing queen sacrifice is the move that creates the mating geometry.",
-      },
-      {
-        uci: "h5e5",
-        label: "Qe5",
-        rank: 3,
-        explanation:
-          "The queen stays active but gives Black time to improve the king's shelter.",
-      },
-      {
-        uci: "e1e2",
-        label: "Re2",
-        rank: "worst",
-        explanation:
-          "The rook leaves the first rank and can no longer swing to h1 for the mating finish.",
-      },
-    ],
-  },
-  {
-    id: "force-perpetual",
-    title: "Force the Perpetual",
-    category: "Strategy",
-    difficulty: "Really Hard",
-    objective: "Save the game",
-    goal: "When winning is unrealistic, recognize the forced perpetual-check resource.",
-    fen: "qr5k/8/4N3/5Q2/8/8/8/6K1 w - - 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "f5h5",
-        label: "Qh5+!",
-        note: "Start the forcing checking sequence.",
-      },
-      {
-        uci: "h8g8",
-        label: "...Kg8",
-        note: "The knight controls g7 and f8.",
-      },
-      {
-        uci: "h5g6",
-        label: "Qg6+!",
-        note: "Keep checking instead of trying to win material.",
-      },
-      {
-        uci: "g8h8",
-        label: "...Kh8",
-        note: "The king is driven back.",
-      },
-      {
-        uci: "g6h5",
-        label: "Qh5+",
-        note: "The position repeats: White has secured perpetual check.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "f5h5",
-        label: "Qh5+!",
-        rank: 1,
-        explanation:
-          "Best: White is materially worse, so the correct objective changes. The queen checks and the knight on e6 removes key escape squares, creating a repeatable checking net.",
-      },
-      {
-        uci: "f5e5",
-        label: "Qe5",
-        rank: 2,
-        explanation:
-          "The queen stays centralized, but without a forcing check Black can coordinate the extra rook and queen.",
-      },
-      {
-        uci: "e6c7",
-        label: "Nc7",
-        rank: 3,
-        explanation:
-          "The knight attacks material, but the move abandons the immediate drawing mechanism.",
-      },
-      {
-        uci: "f5a5",
-        label: "Qa5",
-        rank: "worst",
-        explanation:
-          "The queen moves away from the king and gives Black time to convert the material advantage.",
-      },
-    ],
-  },
-  {
-    id: "do-not-castle-into-attack",
-    title: "Do Not Castle Into the Attack",
-    category: "Strategy",
-    difficulty: "Really Hard",
-    objective: "King safety",
-    goal: "Recognize that castling is a tool, not a rule: choose the safer side.",
-    fen: "2kr2r1/pp3ppp/2n2n2/2b1p3/6bq/2N2N2/PPP2PPP/R3K2R w KQ - 0 1",
-    orientation: "white",
-    line: [
-      {
-        uci: "e1c1",
-        label: "O-O-O!",
-        note: "The king escapes the concentration of pieces on the kingside.",
-      },
-    ],
-    candidates: [
-      {
-        uci: "e1c1",
-        label: "O-O-O!",
-        rank: 1,
-        explanation:
-          "Best practical decision: Black has queen, rook and bishop pressure directed toward the kingside. Long castling moves the king away from the attack and activates the rook.",
-      },
-      {
-        uci: "e1g1",
-        label: "O-O??",
-        rank: "worst",
-        explanation:
-          "The move follows a good general rule in the wrong position. Castling directly into an already concentrated attack can be worse than leaving the king in the center for one more move.",
-      },
-      {
-        uci: "h2h3",
-        label: "h3",
-        rank: 2,
-        explanation:
-          "This questions the bishop and gives the king some luft, but it does not solve the larger problem of where the king belongs.",
-      },
-      {
-        uci: "e1f1",
-        label: "Kf1",
-        rank: 3,
-        explanation:
-          "The king avoids the kingside castle but gives up castling rights and leaves the rook undeveloped.",
-      },
-    ],
-  },
-];
-
-const puzzleDifficultyOrder: Record<PuzzleDifficulty, number> = {
-  Beginner: 0,
-  Intermediate: 1,
-  Advanced: 2,
-  "Really Hard": 3,
-};
-
-const orderedPuzzleIndexes = interactivePuzzles
-  .map((_, index) => index)
-  .sort(
-    (leftIndex, rightIndex) =>
-      puzzleDifficultyOrder[interactivePuzzles[leftIndex].difficulty] -
-      puzzleDifficultyOrder[interactivePuzzles[rightIndex].difficulty],
-  );
 
 function puzzleMoveParts(uci: string) {
   return {
@@ -4963,6 +3557,7 @@ type CandidatePreview = {
   to: Square;
   rank: PuzzleRank;
   label: string;
+  enginePreview?: boolean;
 };
 
 function candidatePreviewMarker(rank: PuzzleRank) {
@@ -5004,13 +3599,6 @@ function candidateToClass(rank: PuzzleRank) {
   return "ring-4 ring-inset ring-red-200 bg-red-400/48";
 }
 
-function selectedCandidateCardClass(rank: PuzzleRank) {
-  if (rank === 1) return "ring-2 ring-emerald-300/80";
-  if (rank === 2) return "ring-2 ring-orange-200/90";
-  if (rank === 3) return "ring-2 ring-amber-400/75";
-  return "ring-2 ring-red-300/80";
-}
-
 function InteractivePuzzleBoard({
   fen,
   orientation,
@@ -5018,6 +3606,8 @@ function InteractivePuzzleBoard({
   legalSquares,
   lastMove,
   candidatePreview,
+  wrongMove,
+  correctMove,
   disabled,
   onSquareClick,
 }: {
@@ -5027,9 +3617,12 @@ function InteractivePuzzleBoard({
   legalSquares: Square[];
   lastMove: { from: Square; to: Square } | null;
   candidatePreview: CandidatePreview | null;
+  wrongMove?: { from: Square; to: Square } | null;
+  correctMove?: { from: Square; to: Square } | null;
   disabled: boolean;
   onSquareClick: (square: Square) => void;
 }) {
+  useUiLanguage();
   const game = new Chess(fen);
   const checkedSquare = checkedKingSquare(game);
 
@@ -5060,6 +3653,10 @@ function InteractivePuzzleBoard({
               const isChecked = checkedSquare === square;
               const isCandidateFrom = candidatePreview?.from === square;
               const isCandidateTo = candidatePreview?.to === square;
+              const isWrongFrom = wrongMove?.from === square;
+              const isWrongTo = wrongMove?.to === square;
+              const isCorrectFrom = correctMove?.from === square;
+              const isCorrectTo = correctMove?.to === square;
 
               const pieceCode = piece
                 ? (`${piece.color}${piece.type}` as MiniPieceCode)
@@ -5088,6 +3685,26 @@ function InteractivePuzzleBoard({
                     <span className="pointer-events-none absolute inset-0 bg-amber-300/28" />
                   )}
 
+                  {(isCorrectFrom || isCorrectTo) && (
+                    <span className="pointer-events-none absolute inset-0 z-[5] bg-emerald-400/24 ring-4 ring-inset ring-emerald-300/90" />
+                  )}
+
+                  {isCorrectTo && (
+                    <span className="pointer-events-none absolute right-1 top-1 z-20 flex h-5 w-5 items-center justify-center rounded-full border border-emerald-100/40 bg-emerald-950/85 text-[11px] font-black text-emerald-200 shadow">
+                      ✓
+                    </span>
+                  )}
+
+                  {(isWrongFrom || isWrongTo) && (
+                    <span className="pointer-events-none absolute inset-0 z-[6] bg-rose-500/18 ring-4 ring-inset ring-rose-400/85" />
+                  )}
+
+                  {isWrongTo && (
+                    <span className="pointer-events-none absolute bottom-1 right-1 z-20 flex h-5 w-5 items-center justify-center rounded-full border border-rose-100/35 bg-rose-950/85 text-[11px] font-black text-rose-200 shadow">
+                      ×
+                    </span>
+                  )}
+
                   {isCandidateFrom && candidatePreview && (
                     <span
                       className={`
@@ -5095,7 +3712,11 @@ function InteractivePuzzleBoard({
                         absolute
                         inset-0
                         z-[4]
-                        ${candidateFromClass(candidatePreview.rank)}
+                        ${
+                          candidatePreview.enginePreview
+                            ? "ring-4 ring-inset ring-yellow-300/95 bg-yellow-300/24"
+                            : candidateFromClass(candidatePreview.rank)
+                        }
                       `}
                     />
                   )}
@@ -5108,35 +3729,41 @@ function InteractivePuzzleBoard({
                           absolute
                           inset-0
                           z-[4]
-                          ${candidateToClass(candidatePreview.rank)}
+                          ${
+                            candidatePreview.enginePreview
+                              ? "ring-4 ring-inset ring-yellow-200/95 bg-yellow-300/44"
+                              : candidateToClass(candidatePreview.rank)
+                          }
                         `}
                       />
 
-                      <span
-                        className="
-                          pointer-events-none
-                          absolute
-                          right-1
-                          top-1
-                          z-20
-                          flex
-                          h-5
-                          min-w-5
-                          items-center
-                          justify-center
-                          rounded-full
-                          border
-                          border-black/20
-                          bg-zinc-950/80
-                          px-1
-                          text-[9px]
-                          font-black
-                          text-white
-                          shadow
-                        "
-                      >
-                        {candidatePreviewMarker(candidatePreview.rank)}
-                      </span>
+                      {!candidatePreview.enginePreview && (
+                        <span
+                          className="
+                            pointer-events-none
+                            absolute
+                            right-1
+                            top-1
+                            z-20
+                            flex
+                            h-5
+                            min-w-5
+                            items-center
+                            justify-center
+                            rounded-full
+                            border
+                            border-black/20
+                            bg-zinc-950/80
+                            px-1
+                            text-[9px]
+                            font-black
+                            text-white
+                            shadow
+                          "
+                        >
+                          {candidatePreviewMarker(candidatePreview.rank)}
+                        </span>
+                      )}
                     </>
                   )}
 
@@ -5199,29 +3826,6 @@ function InteractivePuzzleBoard({
   );
 }
 
-function candidateRankLabel(rank: PuzzleRank) {
-  if (rank === 1) return "Best move";
-  if (rank === 2) return "2nd choice";
-  if (rank === 3) return "3rd choice";
-  return "Worst move";
-}
-
-function candidateRankClass(rank: PuzzleRank) {
-  if (rank === 1) {
-    return "border-emerald-400/20 bg-emerald-400/[0.07] text-emerald-300";
-  }
-
-  if (rank === 2) {
-    return "border-orange-300/35 bg-orange-300/[0.11] text-orange-200";
-  }
-
-  if (rank === 3) {
-    return "border-amber-500/20 bg-amber-600/[0.055] text-amber-400";
-  }
-
-  return "border-red-400/20 bg-red-400/[0.07] text-red-300";
-}
-
 function compactPuzzleTitle(title: string) {
   if (title.length <= 24) {
     return title;
@@ -5236,96 +3840,442 @@ function compactPuzzleTitle(title: string) {
   return `${words.slice(0, 3).join(" ")}…`;
 }
 
-function feedbackRankClass(rank: PuzzleRank) {
-  if (rank === 1) {
-    return "border-emerald-400/30 bg-emerald-400/[0.10]";
-  }
-
-  if (rank === 2) {
-    return "border-orange-300/40 bg-orange-300/[0.12]";
-  }
-
-  if (rank === 3) {
-    return "border-amber-500/25 bg-amber-600/[0.065]";
-  }
-
-  return "border-red-400/30 bg-red-400/[0.10]";
-}
-
 function PuzzlesTab() {
-  const t = useT();
+  useUiLanguage();
+  const { user } = useAuth();
 
-  const [filter, setFilter] = useState<"All" | PuzzleCategory>("All");
-  const [puzzleIndex, setPuzzleIndex] = useState(0);
-  const puzzle = interactivePuzzles[puzzleIndex];
+  type LibraryTab = "suggested" | "from-games" | "completed";
 
-  const [fen, setFen] = useState(puzzle.fen);
+  const [libraryTab, setLibraryTab] = useState<LibraryTab>("suggested");
+  const [categoryFilter, setCategoryFilter] = useState<"All" | PuzzleCategory>(
+    "All",
+  );
+  const [difficultyFilter, setDifficultyFilter] = useState<
+    "All" | PuzzleDifficulty
+  >("All");
+  const [sortBy, setSortBy] = useState<PuzzleLibrarySort>("random");
+  const [categoryFilterOpen, setCategoryFilterOpen] = useState(false);
+  const [difficultyFilterOpen, setDifficultyFilterOpen] = useState(false);
+  const [sortOpen, setSortOpen] = useState(false);
+  const [loadingMoreSuggestions, setLoadingMoreSuggestions] = useState(false);
+
+  const [suggestions, setSuggestions] = useState<InteractivePuzzle[]>([]);
+  const [personalPuzzles, setPersonalPuzzles] = useState<InteractivePuzzle[]>(
+    [],
+  );
+  const [completedPuzzles, setCompletedPuzzles] = useState<CompletedPuzzle[]>(
+    [],
+  );
+  const [completedPersonalPuzzles, setCompletedPersonalPuzzles] = useState<
+    CompletedPersonalPuzzle[]
+  >([]);
+
+  const [puzzle, setPuzzle] = useState<InteractivePuzzle | null>(null);
+  const [remotePuzzleLoading, setRemotePuzzleLoading] = useState(false);
+  const [libraryLoading, setLibraryLoading] = useState(true);
+  const [personalLibraryLoading, setPersonalLibraryLoading] = useState(false);
+  const [remotePuzzleError, setRemotePuzzleError] = useState<string | null>(
+    null,
+  );
+  const [editingPuzzleTitle, setEditingPuzzleTitle] = useState(false);
+  const [puzzleTitleDraft, setPuzzleTitleDraft] = useState("");
+  const [puzzleTitleSaving, setPuzzleTitleSaving] = useState(false);
+  const [puzzleTitleError, setPuzzleTitleError] = useState<string | null>(null);
+
+  const [fen, setFen] = useState(new Chess().fen());
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [legalSquares, setLegalSquares] = useState<Square[]>([]);
   const [lastMove, setLastMove] = useState<{
     from: Square;
     to: Square;
   } | null>(null);
+  const [wrongMove, setWrongMove] = useState<{
+    from: Square;
+    to: Square;
+  } | null>(null);
+  const [correctMove, setCorrectMove] = useState<{
+    from: Square;
+    to: Square;
+  } | null>(null);
   const [lineStep, setLineStep] = useState(0);
   const [feedback, setFeedback] = useState<PuzzleFeedback | null>(null);
-  const [showAnalysis, setShowAnalysis] = useState(false);
   const [autoReplying, setAutoReplying] = useState(false);
+  const [mistakes, setMistakes] = useState(0);
   const [candidatePreview, setCandidatePreview] =
     useState<CandidatePreview | null>(null);
 
-  const solved = lineStep >= puzzle.line.length;
+  const completionRecordedRef = useRef<string | null>(null);
 
-  const visiblePuzzleIndexes = orderedPuzzleIndexes
-    .map((index) => ({
-      item: interactivePuzzles[index],
-      index,
-    }))
-    .filter(({ item }) => filter === "All" || item.category === filter);
+  const solved = Boolean(puzzle) && lineStep >= (puzzle?.line.length ?? 0);
 
-  const displayedPuzzleNumber = orderedPuzzleIndexes.indexOf(puzzleIndex) + 1;
+  const completedTotal =
+    completedPuzzles.length + completedPersonalPuzzles.length;
 
-  function resetPuzzle(nextIndex = puzzleIndex) {
-    const nextPuzzle = interactivePuzzles[nextIndex];
+  const sortLabel: Record<PuzzleLibrarySort, string> = {
+    random: "Random",
+    "popularity-desc": "Popularity · high → low",
+    "popularity-asc": "Popularity · low → high",
+    "elo-desc": "Elo · high → low",
+    "elo-asc": "Elo · low → high",
+    "difficulty-desc": "Difficulty · hard → easy",
+    "difficulty-asc": "Difficulty · easy → hard",
+  };
 
-    setPuzzleIndex(nextIndex);
+  function resetInteraction(nextPuzzle: InteractivePuzzle) {
     setFen(nextPuzzle.fen);
     setSelectedSquare(null);
     setLegalSquares([]);
     setLastMove(null);
+    setWrongMove(null);
+    setCorrectMove(null);
     setLineStep(0);
     setFeedback(null);
-    setShowAnalysis(false);
     setAutoReplying(false);
+    setMistakes(0);
     setCandidatePreview(null);
+    setRemotePuzzleError(null);
+    completionRecordedRef.current = null;
   }
 
-  function changeFilter(nextFilter: "All" | PuzzleCategory) {
-    setFilter(nextFilter);
+  function loadPuzzle(nextPuzzle: InteractivePuzzle) {
+    setPuzzle(nextPuzzle);
+    setEditingPuzzleTitle(false);
+    setPuzzleTitleDraft(nextPuzzle.title);
+    setPuzzleTitleError(null);
+    resetInteraction(nextPuzzle);
+  }
 
-    if (nextFilter === "All" || puzzle.category === nextFilter) {
+  function beginPuzzleTitleEdit() {
+    if (!puzzle || !user) {
       return;
     }
 
-    const firstMatch = interactivePuzzles.findIndex(
-      (item) => item.category === nextFilter,
-    );
+    setPuzzleTitleDraft(puzzle.title);
+    setPuzzleTitleError(null);
+    setEditingPuzzleTitle(true);
+  }
 
-    if (firstMatch >= 0) {
-      resetPuzzle(firstMatch);
+  function cancelPuzzleTitleEdit() {
+    setEditingPuzzleTitle(false);
+    setPuzzleTitleDraft(puzzle?.title ?? "");
+    setPuzzleTitleError(null);
+  }
+
+  async function savePuzzleTitle() {
+    if (!puzzle || !user || puzzleTitleSaving) {
+      return;
+    }
+
+    const nextTitle = puzzleTitleDraft.trim();
+
+    if (!nextTitle) {
+      setPuzzleTitleError("Puzzle title cannot be empty.");
+      return;
+    }
+
+    setPuzzleTitleSaving(true);
+    setPuzzleTitleError(null);
+
+    try {
+      if (puzzle.origin === "lichess") {
+        await renameLichessPuzzle(puzzle.sourceId, nextTitle);
+      } else {
+        await renamePersonalGamePuzzle(puzzle.sourceId, nextTitle);
+      }
+
+      setPuzzle((current) =>
+        current
+          ? {
+              ...current,
+              title: nextTitle.slice(0, 80),
+            }
+          : current,
+      );
+
+      setSuggestions((current) =>
+        current.map((item) =>
+          item.origin === "lichess" && item.sourceId === puzzle.sourceId
+            ? {
+                ...item,
+                title: nextTitle.slice(0, 80),
+              }
+            : item,
+        ),
+      );
+
+      setCompletedPuzzles((current) =>
+        current.map((item) =>
+          item.puzzle.origin === "lichess" &&
+          item.puzzle.sourceId === puzzle.sourceId
+            ? {
+                ...item,
+                puzzle: {
+                  ...item.puzzle,
+                  title: nextTitle.slice(0, 80),
+                },
+              }
+            : item,
+        ),
+      );
+
+      setPersonalPuzzles((current) =>
+        current.map((item) =>
+          item.sourceId === puzzle.sourceId
+            ? {
+                ...item,
+                title: nextTitle.slice(0, 80),
+              }
+            : item,
+        ),
+      );
+
+      setCompletedPersonalPuzzles((current) =>
+        current.map((item) =>
+          item.puzzle.sourceId === puzzle.sourceId
+            ? {
+                ...item,
+                puzzle: {
+                  ...item.puzzle,
+                  title: nextTitle.slice(0, 80),
+                },
+              }
+            : item,
+        ),
+      );
+
+      setEditingPuzzleTitle(false);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+
+      console.error("Could not rename puzzle:", message);
+      setPuzzleTitleError(message);
+    } finally {
+      setPuzzleTitleSaving(false);
     }
   }
 
-  function nextPuzzle() {
-    const currentOrderedIndex = orderedPuzzleIndexes.indexOf(puzzleIndex);
+  function resetCurrentPuzzle() {
+    if (!puzzle) {
+      return;
+    }
 
-    const nextOrderedIndex =
-      (currentOrderedIndex + 1) % orderedPuzzleIndexes.length;
+    resetInteraction(puzzle);
+  }
 
-    resetPuzzle(orderedPuzzleIndexes[nextOrderedIndex]);
+  async function loadCompletedLibrary() {
+    if (!user) {
+      setCompletedPuzzles([]);
+      return;
+    }
+
+    try {
+      const completed = await getCompletedLichessPuzzles(100);
+      setCompletedPuzzles(completed);
+    } catch (error) {
+      console.error("Could not load completed Lichess puzzles:", error);
+    }
+  }
+
+  async function loadPersonalLibraries() {
+    if (!user) {
+      setPersonalPuzzles([]);
+      setCompletedPersonalPuzzles([]);
+      return;
+    }
+
+    setPersonalLibraryLoading(true);
+
+    try {
+      const [unsolved, completed] = await Promise.all([
+        getPersonalGamePuzzles(100),
+        getCompletedPersonalGamePuzzles(100),
+      ]);
+
+      setPersonalPuzzles(unsolved);
+      setCompletedPersonalPuzzles(completed);
+    } catch (error) {
+      console.error("Could not load personal game puzzles:", error);
+    } finally {
+      setPersonalLibraryLoading(false);
+    }
+  }
+
+  async function loadSuggestionSet({
+    keepCurrent = false,
+  }: {
+    keepCurrent?: boolean;
+  } = {}) {
+    setLibraryLoading(true);
+    setRemotePuzzleError(null);
+
+    try {
+      const nextSuggestions = await getSuggestedLichessPuzzles({
+        category: categoryFilter,
+        difficulty: difficultyFilter,
+        sort: sortBy,
+        count: 5,
+      });
+
+      setSuggestions(nextSuggestions);
+
+      if (!keepCurrent && nextSuggestions[0]) {
+        loadPuzzle(nextSuggestions[0]);
+      }
+
+      if (nextSuggestions.length === 0) {
+        setRemotePuzzleError(
+          "No unsolved puzzles matched these filters. Try widening them.",
+        );
+      }
+    } catch (error) {
+      console.error("Could not load puzzle suggestions:", error);
+      setRemotePuzzleError("Could not load puzzle suggestions from Supabase.");
+    } finally {
+      setLibraryLoading(false);
+    }
+  }
+
+  async function loadMoreSuggestions() {
+    if (libraryLoading || loadingMoreSuggestions || suggestions.length >= 20) {
+      return;
+    }
+
+    const remaining = 20 - suggestions.length;
+    const count = Math.min(5, remaining);
+
+    setLoadingMoreSuggestions(true);
+    setRemotePuzzleError(null);
+
+    try {
+      const more = await getSuggestedLichessPuzzles({
+        category: categoryFilter,
+        difficulty: difficultyFilter,
+        sort: sortBy,
+        count,
+        excludeIds: suggestions.map((item) => item.sourceId),
+      });
+
+      const existingIds = new Set(suggestions.map((item) => item.sourceId));
+
+      const uniqueMore = more.filter((item) => !existingIds.has(item.sourceId));
+
+      setSuggestions((current) => [...current, ...uniqueMore].slice(0, 20));
+
+      if (uniqueMore.length === 0) {
+        setRemotePuzzleError("No more unsolved puzzles matched these filters.");
+      }
+    } catch (error) {
+      console.error("Could not load more puzzle suggestions:", error);
+      setRemotePuzzleError(
+        "Could not load more puzzle suggestions from Supabase.",
+      );
+    } finally {
+      setLoadingMoreSuggestions(false);
+    }
+  }
+
+  useEffect(() => {
+    void loadSuggestionSet();
+  }, [categoryFilter, difficultyFilter, sortBy, user?.id]);
+
+  useEffect(() => {
+    void Promise.all([loadCompletedLibrary(), loadPersonalLibraries()]);
+  }, [user?.id]);
+
+  async function nextPuzzle() {
+    if (remotePuzzleLoading) {
+      return;
+    }
+
+    /*
+     * "From My Games" is a separate private queue. Keep Next Puzzle
+     * inside that queue instead of unexpectedly jumping to Lichess.
+     */
+    if (libraryTab === "from-games" && puzzle && puzzle.origin !== "lichess") {
+      const nextPersonal = personalPuzzles.find(
+        (item) => item.sourceId !== puzzle.sourceId,
+      );
+
+      if (nextPersonal) {
+        loadPuzzle(nextPersonal);
+        return;
+      }
+
+      setRemotePuzzleError(
+        "No other unsolved puzzles from your games are available yet.",
+      );
+      return;
+    }
+
+    setRemotePuzzleLoading(true);
+    setRemotePuzzleError(null);
+
+    try {
+      const excludeIds = [
+        ...suggestions.map((item) => item.sourceId),
+        ...(puzzle?.origin === "lichess" && puzzle.sourceId
+          ? [puzzle.sourceId]
+          : []),
+      ];
+
+      const next = await getRandomLichessPuzzle({
+        category: categoryFilter,
+        difficulty: difficultyFilter,
+        excludeIds,
+      });
+
+      if (!next) {
+        setRemotePuzzleError("No new unsolved puzzle matched these filters.");
+        return;
+      }
+
+      loadPuzzle(next);
+    } catch (error) {
+      console.error("Error loading next puzzle:", error);
+      setRemotePuzzleError("Could not load the next puzzle.");
+    } finally {
+      setRemotePuzzleLoading(false);
+    }
+  }
+
+  async function recordCompletion() {
+    if (!puzzle?.sourceId) {
+      return;
+    }
+
+    const completionKey = `${puzzle.origin}:${puzzle.sourceId}`;
+
+    if (completionRecordedRef.current === completionKey) {
+      return;
+    }
+
+    completionRecordedRef.current = completionKey;
+
+    if (!user) {
+      return;
+    }
+
+    try {
+      if (puzzle.origin === "lichess") {
+        await recordLichessPuzzleCompletion(puzzle.sourceId, mistakes);
+
+        await Promise.all([
+          loadCompletedLibrary(),
+          loadSuggestionSet({ keepCurrent: true }),
+        ]);
+      } else {
+        await recordPersonalGamePuzzleCompletion(puzzle.sourceId, mistakes);
+
+        await loadPersonalLibraries();
+      }
+    } catch (error) {
+      console.error("Could not record puzzle completion:", error);
+      completionRecordedRef.current = null;
+    }
   }
 
   function attemptMove(from: Square, to: Square) {
-    if (autoReplying || solved || lineStep % 2 === 1) {
+    if (!puzzle || autoReplying || solved || lineStep % 2 === 1) {
       return;
     }
 
@@ -5356,42 +4306,48 @@ function PuzzlesTab() {
     if (!move) {
       setFeedback({
         tone: "warning",
-        title: "Try another move.",
-        text: "That move is not legal in this position.",
+        title: "Illegal move",
+        text: "That move cannot be played in this position.",
       });
       return;
     }
 
-    const playedUci = puzzleMoveUci(move);
     const expected = puzzle.line[lineStep];
-    const candidate =
-      lineStep === 0
-        ? puzzle.candidates.find((item) => item.uci === playedUci)
-        : undefined;
+    const playedUci = puzzleMoveUci(move);
 
     setSelectedSquare(null);
     setLegalSquares([]);
     setCandidatePreview(null);
-    setShowAnalysis(true);
 
-    if (playedUci !== expected.uci) {
+    if (!expected || playedUci !== expected.uci) {
+      const expectedParts = expected ? puzzleMoveParts(expected.uci) : null;
+
+      setMistakes((value) => value + 1);
+      setWrongMove({
+        from: move.from,
+        to: move.to,
+      });
+      setCorrectMove(
+        expectedParts
+          ? {
+              from: expectedParts.from,
+              to: expectedParts.to,
+            }
+          : null,
+      );
+
       setFeedback({
         tone: "warning",
-        rank: candidate?.rank,
-        title: candidate
-          ? candidateRankLabel(candidate.rank)
-          : "Try another move.",
-        moveLabel: candidate?.label ?? move.san,
-        text:
-          lineStep > 0
-            ? "The combination breaks here. Return to the forcing line."
-            : (candidate?.explanation ??
-              "Legal move, but not one of the four teaching candidates."),
+        title: "Not quite",
+        moveLabel: move.san,
+        text: "Your move is marked red. The correct move is highlighted in green — try it on the board.",
       });
 
       return;
     }
 
+    setWrongMove(null);
+    setCorrectMove(null);
     setFen(game.fen());
     setLastMove({
       from: move.from,
@@ -5407,24 +4363,27 @@ function PuzzlesTab() {
         rank: 1,
         title: "Solved!",
         moveLabel: expected.label,
-        text: "You found the full combination.",
+        text:
+          mistakes === 0
+            ? "Perfect. You found the full continuation without a mistake."
+            : "Correct. You recovered and finished the full continuation.",
       });
+
+      void recordCompletion();
       return;
     }
 
     setFeedback({
       tone: "success",
       rank: 1,
-      title: lineStep === 0 ? "Correct!" : "Combination continues",
+      title: "Correct!",
       moveLabel: expected.label,
-      text:
-        expected.note ??
-        (lineStep === 0 ? "Excellent move." : "Now finish the combination."),
+      text: "Clean move. The opponent reply is coming next.",
     });
   }
 
   function handleSquareClick(square: Square) {
-    if (autoReplying || solved || lineStep % 2 === 1) {
+    if (!puzzle || autoReplying || solved || lineStep % 2 === 1) {
       return;
     }
 
@@ -5476,7 +4435,12 @@ function PuzzlesTab() {
   }
 
   useEffect(() => {
-    if (solved || lineStep >= puzzle.line.length || lineStep % 2 === 0) {
+    if (
+      !puzzle ||
+      solved ||
+      lineStep >= puzzle.line.length ||
+      lineStep % 2 === 0
+    ) {
       return;
     }
 
@@ -5505,427 +4469,889 @@ function PuzzlesTab() {
         from: move.from,
         to: move.to,
       });
+      setWrongMove(null);
+      setCorrectMove(null);
 
       const nextStep = lineStep + 1;
       setLineStep(nextStep);
       setAutoReplying(false);
 
+      if (nextStep >= puzzle.line.length) {
+        setFeedback({
+          tone: "success",
+          rank: 1,
+          title: "Solved!",
+          moveLabel: reply.label,
+          text: "You found the full continuation.",
+        });
+
+        void recordCompletion();
+        return;
+      }
+
       setFeedback({
         tone: "info",
         title: "Opponent reply",
         moveLabel: reply.label,
-        text:
-          nextStep < puzzle.line.length
-            ? "Your move again"
-            : (reply.note ?? "Combination continues"),
+        text: "Your move again.",
       });
-    }, 700);
+    }, 650);
 
     return () => {
       window.clearTimeout(timer);
     };
   }, [fen, lineStep, puzzle, solved]);
 
-  const activeFeedbackRank = candidatePreview?.rank ?? feedback?.rank;
+  const completedLibraryItems = [
+    ...completedPuzzles.map((item) => ({
+      puzzle: item.puzzle as InteractivePuzzle,
+      completedAt: item.completedAt,
+      mistakes: item.mistakes,
+    })),
+    ...completedPersonalPuzzles.map((item) => ({
+      puzzle: item.puzzle as InteractivePuzzle,
+      completedAt: item.completedAt,
+      mistakes: item.mistakes,
+    })),
+  ].sort(
+    (left, right) =>
+      new Date(right.completedAt).getTime() -
+      new Date(left.completedAt).getTime(),
+  );
 
-  const feedbackClass =
-    activeFeedbackRank !== undefined
-      ? feedbackRankClass(activeFeedbackRank)
-      : feedback?.tone === "success"
-        ? "border-emerald-400/20 bg-emerald-400/[0.07]"
-        : feedback?.tone === "warning"
-          ? "border-red-400/20 bg-red-400/[0.07]"
-          : "border-violet-400/20 bg-violet-400/[0.07]";
+  const libraryItems =
+    libraryTab === "suggested"
+      ? suggestions.map((item) => ({
+          puzzle: item,
+          completedAt: null as string | null,
+          mistakes: null as number | null,
+        }))
+      : libraryTab === "from-games"
+        ? personalPuzzles.map((item) => ({
+            puzzle: item,
+            completedAt: null as string | null,
+            mistakes: null as number | null,
+          }))
+        : completedLibraryItems;
+
+  const feedbackVisual =
+    feedback?.tone === "success"
+      ? {
+          icon: "✓",
+          shell:
+            "border-emerald-400/25 bg-[linear-gradient(135deg,rgba(16,82,57,.20),rgba(4,18,16,.72))]",
+          iconClass: "border-emerald-300/25 bg-emerald-300/10 text-emerald-200",
+          titleClass: "text-emerald-100",
+        }
+      : feedback?.tone === "warning"
+        ? {
+            icon: "×",
+            shell:
+              "border-rose-400/25 bg-[linear-gradient(135deg,rgba(105,25,45,.20),rgba(20,5,11,.72))]",
+            iconClass: "border-rose-300/25 bg-rose-300/10 text-rose-200",
+            titleClass: "text-rose-100",
+          }
+        : {
+            icon: "•",
+            shell:
+              "border-sky-400/15 bg-[linear-gradient(135deg,rgba(20,59,87,.14),rgba(4,12,20,.70))]",
+            iconClass: "border-sky-300/20 bg-sky-300/[0.07] text-sky-200",
+            titleClass: "text-sky-100",
+          };
 
   return (
     <div>
       <SectionHeading
-        eyebrow="Interactive Chess Puzzles"
-        title="Find the best move"
-        description="Play the position, get instant feedback, and learn why moves work."
+        eyebrow={ui("Interactive Chess Puzzles")}
+        title={ui("Find the best move")}
+        description={ui("Fresh Lichess challenges plus positions you personally missed in Singleplayer and Multiplayer games.")}
       />
 
-      <div className="mt-5 flex flex-wrap gap-2">
-        {(
-          [
-            ["All", "All puzzles"],
-            ["Tactic", "Tactics"],
-            ["Checkmate", "Checkmates"],
-            ["Strategy", "Strategy"],
-            ["Endgame", "Endgame"],
-          ] as const
-        ).map(([value, label]) => (
-          <button
-            key={value}
-            type="button"
-            onClick={() => changeFilter(value)}
-            className={`
-              rounded-full
-              border
-              px-3
-              py-1.5
-              text-xs
-              font-black
-              transition
-              ${
-                filter === value
-                  ? "border-amber-400/25 bg-amber-400/10 text-amber-200"
-                  : "border-white/10 bg-white/5 text-zinc-500 hover:bg-white/10"
-              }
-            `}
-          >
-            {t(label)}
-          </button>
-        ))}
-      </div>
-
-      <div className="mt-5 grid gap-5 xl:grid-cols-[360px_minmax(0,1fr)_360px] 2xl:grid-cols-[400px_minmax(0,1fr)_360px]">
-        <aside className="rounded-3xl border border-white/10 bg-zinc-900/55 p-4">
-          <div className="rounded-2xl border border-white/8 bg-black/20 p-3">
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600">
-                {t("Difficulty progression")}
-              </p>
-
-              <span className="rounded-full border border-white/8 bg-white/[0.04] px-2 py-1 text-[9px] font-black text-zinc-500">
-                {visiblePuzzleIndexes.length} / {interactivePuzzles.length}
-              </span>
+      <section className="mt-5 overflow-hidden rounded-[1.8rem] border border-white/[0.08] bg-[linear-gradient(145deg,rgba(9,16,25,.90),rgba(4,9,15,.88))] p-4 shadow-xl shadow-black/20">
+        {libraryTab === "suggested" ? (
+          <div>
+            <p className="text-[9px] font-black uppercase tracking-[0.22em] text-amber-300/80">{ui("Puzzle Library")}</p>
+            <h3 className="mt-1 font-serif text-xl font-semibold text-[#f5e8cf]">{ui("Five fresh challenges")}</h3>
+            <p className="mt-1 text-xs text-zinc-600">{ui("Filter and sort directly inside the puzzle list. Completed Lichess puzzles stay excluded automatically.")}</p>
+          </div>
+        ) : libraryTab === "from-games" ? (
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-violet-300/80">{ui("Personal Training")}</p>
+              <h3 className="mt-1 font-serif text-xl font-semibold text-[#f5e8cf]">{ui("Positions from your games")}</h3>
+              <p className="mt-1 max-w-3xl text-xs leading-5 text-zinc-600">{ui("One meaningful missed position is created automatically when you analyze a finished Singleplayer or Multiplayer game in Game Review. Hotseat never creates personal puzzles.")}</p>
             </div>
 
-            <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[9px] font-black">
-              <span className="rounded-full border border-emerald-400/15 bg-emerald-400/[0.06] px-2 py-1 text-emerald-300">
-                {t("Beginner")}
-              </span>
-
-              <span className="text-zinc-700">→</span>
-
-              <span className="rounded-full border border-sky-400/15 bg-sky-400/[0.06] px-2 py-1 text-sky-300">
-                {t("Intermediate")}
-              </span>
-
-              <span className="text-zinc-700">→</span>
-
-              <span className="rounded-full border border-violet-400/15 bg-violet-400/[0.06] px-2 py-1 text-violet-300">
-                {t("Advanced")}
-              </span>
-
-              <span className="text-zinc-700">→</span>
-
-              <span className="rounded-full border border-red-400/15 bg-red-400/[0.06] px-2 py-1 text-red-300">
-                {t("Really Hard")}
-              </span>
+            <div className="flex flex-wrap gap-2 text-[9px] font-black uppercase tracking-[0.11em]">
+              <span className="rounded-full border border-sky-400/15 bg-sky-400/[0.06] px-3 py-1.5 text-sky-200">{ui("Singleplayer")}</span>
+              <span className="rounded-full border border-violet-400/15 bg-violet-400/[0.06] px-3 py-1.5 text-violet-200">{ui("Multiplayer")}</span>
             </div>
           </div>
+        ) : (
+          <div>
+            <p className="text-[9px] font-black uppercase tracking-[0.22em] text-emerald-300/80">{ui("Training History")}</p>
+            <h3 className="mt-1 font-serif text-xl font-semibold text-[#f5e8cf]">{ui("Completed puzzles")}</h3>
+            <p className="mt-1 text-xs leading-5 text-zinc-600">{ui("Your solved Lichess puzzles and solved positions from your own games are kept together here.")}</p>
+          </div>
+        )}
+      </section>
 
-          <div className="mt-3 max-h-[800px] overflow-y-auto pr-1">
-            <div className="grid grid-cols-2 gap-2">
-              {visiblePuzzleIndexes.map(({ item, index }) => {
-                const isActive = index === puzzleIndex;
+      <div className="mt-5 grid gap-5 xl:grid-cols-[380px_minmax(0,1fr)_340px] 2xl:grid-cols-[420px_minmax(0,1fr)_360px]">
+        <aside className="min-w-0 rounded-3xl border border-white/10 bg-zinc-900/55 p-4">
+          <div className="grid grid-cols-3 rounded-2xl border border-white/8 bg-black/20 p-1">
+            <button
+              type="button"
+              onClick={() => setLibraryTab("suggested")}
+              className={`rounded-xl px-2 py-2 text-[9px] font-black uppercase tracking-[0.08em] transition ${
+                libraryTab === "suggested"
+                  ? "bg-amber-400/10 text-amber-200"
+                  : "text-zinc-600 hover:text-zinc-300"
+              }`}
+            >{ui("Suggested ·")}{suggestions.length}
+            </button>
 
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => resetPuzzle(index)}
-                    className={`
-                      group
-                      relative
-                      min-h-[146px]
-                      rounded-[1.4rem]
-                      border
-                      p-3
-                      text-left
-                      transition
-                      hover:-translate-y-0.5
-                      ${
-                        isActive
-                          ? "border-amber-400/30 bg-amber-400/[0.09] shadow-[0_0_0_1px_rgba(251,191,36,0.08)]"
-                          : "border-white/8 bg-black/20 hover:bg-white/[0.045]"
-                      }
-                    `}
+            <button
+              type="button"
+              onClick={() => setLibraryTab("from-games")}
+              className={`rounded-xl px-2 py-2 text-[9px] font-black uppercase tracking-[0.08em] transition ${
+                libraryTab === "from-games"
+                  ? "bg-violet-400/[0.08] text-violet-200"
+                  : "text-zinc-600 hover:text-zinc-300"
+              }`}
+            >{ui("My Games ·")}{user ? personalPuzzles.length : "—"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setLibraryTab("completed")}
+              className={`rounded-xl px-2 py-2 text-[9px] font-black uppercase tracking-[0.08em] transition ${
+                libraryTab === "completed"
+                  ? "bg-emerald-400/[0.08] text-emerald-200"
+                  : "text-zinc-600 hover:text-zinc-300"
+              }`}
+            >{ui("Completed ·")}{user ? completedTotal : "—"}
+            </button>
+          </div>
+
+          {libraryTab === "suggested" && (
+            <div className="mt-3 space-y-2 rounded-[1.35rem] border border-amber-300/[0.10] bg-[linear-gradient(145deg,rgba(78,52,23,.10),rgba(0,0,0,.20))] p-3">
+              <div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCategoryFilterOpen((open) => !open);
+                    setDifficultyFilterOpen(false);
+                    setSortOpen(false);
+                  }}
+                  className={`flex w-full items-center justify-between rounded-xl border px-3 py-2.5 text-left transition ${
+                    categoryFilterOpen
+                      ? "border-amber-300/25 bg-amber-300/[0.08]"
+                      : "border-white/[0.07] bg-[#050a10] hover:border-amber-200/15 hover:bg-[#09121b]"
+                  }`}
+                >
+                  <span>
+                    <span className="block text-[8px] font-black uppercase tracking-[0.16em] text-amber-200/50">{ui("Category")}</span>
+                    <span className="mt-0.5 block text-[11px] font-black text-zinc-300">
+                      {categoryFilter === "All" ? ui("All") : categoryFilter === "Tactic" ? ui("Tactics") : categoryFilter === "Checkmate" ? ui("Checkmates") : categoryFilter === "Endgame" ? ui("Endgames") : categoryFilter}
+                    </span>
+                  </span>
+
+                  <span
+                    className={`text-xs text-amber-200/65 transition-transform ${
+                      categoryFilterOpen ? "rotate-180" : ""
+                    }`}
                   >
-                    <span className="pointer-events-none absolute -right-1 -top-1 h-5 w-5 rounded-full border border-white/10 bg-zinc-950/85" />
-                    <span className="pointer-events-none absolute -left-1 bottom-4 h-4 w-4 rounded-full border border-white/8 bg-zinc-950/85" />
+                    ▾
+                  </span>
+                </button>
 
-                    <div className="flex items-start justify-between gap-2">
-                      <span
-                        className={`
-                          rounded-full
-                          border
-                          px-2
-                          py-1
-                          text-[9px]
-                          font-black
-                          ${
-                            item.difficulty === "Beginner"
-                              ? "border-emerald-400/15 bg-emerald-400/[0.06] text-emerald-300"
-                              : item.difficulty === "Intermediate"
-                                ? "border-sky-400/15 bg-sky-400/[0.06] text-sky-300"
-                                : item.difficulty === "Advanced"
-                                  ? "border-violet-400/15 bg-violet-400/[0.06] text-violet-300"
-                                  : "border-red-400/15 bg-red-400/[0.06] text-red-300"
-                          }
-                        `}
-                      >
-                        {t(item.difficulty)}
-                      </span>
+                {categoryFilterOpen && (
+                  <div className="mt-1.5 grid grid-cols-2 gap-1.5 rounded-xl border border-amber-300/[0.10] bg-[#03070c] p-2 shadow-[0_14px_35px_rgba(0,0,0,.35)]">
+                    {(
+                      [
+                        ["All", "All"],
+                        ["Tactic", "Tactics"],
+                        ["Checkmate", "Checkmates"],
+                        ["Strategy", "Strategy"],
+                        ["Endgame", "Endgames"],
+                      ] as const
+                    ).map(([value, label]) => {
+                      const active = categoryFilter === value;
 
-                      <span className="rounded-full border border-white/8 bg-white/[0.04] px-2 py-1 text-[9px] font-black text-zinc-500">
-                        {index + 1}
-                      </span>
-                    </div>
+                      return (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => {
+                            setCategoryFilter(value);
+                            setCategoryFilterOpen(false);
+                          }}
+                          className={`rounded-lg border px-2.5 py-2 text-left text-[10px] font-black transition ${
+                            active
+                              ? "border-amber-300/30 bg-amber-300/[0.11] text-amber-100"
+                              : "border-white/[0.055] bg-[#071018] text-zinc-500 hover:border-amber-200/15 hover:bg-[#0b1621] hover:text-zinc-300"
+                          }`}
+                        >
+                          <span className="flex items-center justify-between gap-2">
+                            {ui(label)}
+                            {active && (
+                              <span className="text-amber-300">✓</span>
+                            )}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
 
-                    <div className="mt-2">
-                      <p className="line-clamp-2 text-[13px] font-black leading-[1.15rem] text-zinc-100">
-                        {t(compactPuzzleTitle(item.title))}
-                      </p>
+              <div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDifficultyFilterOpen((open) => !open);
+                    setCategoryFilterOpen(false);
+                    setSortOpen(false);
+                  }}
+                  className={`flex w-full items-center justify-between rounded-xl border px-3 py-2.5 text-left transition ${
+                    difficultyFilterOpen
+                      ? "border-violet-300/20 bg-violet-300/[0.07]"
+                      : "border-white/[0.07] bg-[#050a10] hover:border-violet-200/15 hover:bg-[#09121b]"
+                  }`}
+                >
+                  <span>
+                    <span className="block text-[8px] font-black uppercase tracking-[0.16em] text-violet-200/50">{ui("Difficulty")}</span>
+                    <span className="mt-0.5 block text-[11px] font-black text-zinc-300">
+                      {difficultyFilter}
+                    </span>
+                  </span>
 
-                      <p className="mt-2 line-clamp-2 text-[10px] leading-[1rem] text-zinc-500">
-                        {t(item.objective)}
-                      </p>
-                    </div>
+                  <span
+                    className={`text-xs text-violet-200/65 transition-transform ${
+                      difficultyFilterOpen ? "rotate-180" : ""
+                    }`}
+                  >
+                    ▾
+                  </span>
+                </button>
 
-                    <div className="mt-3 flex items-end justify-between gap-2">
-                      <span className="rounded-full border border-white/8 bg-black/20 px-2 py-1 text-[9px] font-black text-zinc-500">
-                        {t(item.category)}
-                      </span>
+                {difficultyFilterOpen && (
+                  <div className="mt-1.5 grid grid-cols-2 gap-1.5 rounded-xl border border-violet-300/[0.09] bg-[#03070c] p-2 shadow-[0_14px_35px_rgba(0,0,0,.35)]">
+                    {(
+                      [
+                        ["All", "All"],
+                        ["Beginner", "Beginner"],
+                        ["Intermediate", "Intermediate"],
+                        ["Advanced", "Advanced"],
+                        ["Really Hard", "Really Hard"],
+                      ] as const
+                    ).map(([value, label]) => {
+                      const active = difficultyFilter === value;
 
-                      <span
-                        className={`
-                          text-[10px]
-                          font-black
-                          transition
-                          ${isActive ? "text-amber-300" : "text-zinc-600 group-hover:text-zinc-400"}
-                        `}
-                      >
-                        {isActive ? t("Selected") : "→"}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
+                      return (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => {
+                            setDifficultyFilter(value);
+                            setDifficultyFilterOpen(false);
+                          }}
+                          className={`rounded-lg border px-2.5 py-2 text-left text-[10px] font-black transition ${
+                            active
+                              ? "border-violet-300/25 bg-violet-300/[0.10] text-violet-100"
+                              : "border-white/[0.055] bg-[#071018] text-zinc-500 hover:border-violet-200/15 hover:bg-[#0b1621] hover:text-zinc-300"
+                          }`}
+                        >
+                          <span className="flex items-center justify-between gap-2">
+                            {ui(label)}
+                            {active && (
+                              <span className="text-violet-300">✓</span>
+                            )}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSortOpen((open) => !open);
+                    setCategoryFilterOpen(false);
+                    setDifficultyFilterOpen(false);
+                  }}
+                  className={`flex w-full items-center justify-between rounded-xl border px-3 py-2.5 text-left transition ${
+                    sortOpen
+                      ? "border-sky-300/20 bg-sky-300/[0.06]"
+                      : "border-white/[0.07] bg-[#050a10] hover:border-sky-200/15 hover:bg-[#09121b]"
+                  }`}
+                >
+                  <span>
+                    <span className="block text-[8px] font-black uppercase tracking-[0.16em] text-sky-200/45">{ui("Sort")}</span>
+                    <span className="mt-0.5 block text-[10px] font-black text-zinc-300">
+                      {sortLabel[sortBy]}
+                    </span>
+                  </span>
+
+                  <span
+                    className={`text-xs text-sky-200/60 transition-transform ${
+                      sortOpen ? "rotate-180" : ""
+                    }`}
+                  >
+                    ▾
+                  </span>
+                </button>
+
+                {sortOpen && (
+                  <div className="mt-1.5 space-y-1 rounded-xl border border-sky-300/[0.08] bg-[#03070c] p-2 shadow-[0_14px_35px_rgba(0,0,0,.35)]">
+                    {(
+                      [
+                        ["random", "Random"],
+                        ["popularity-desc", "Popularity · high → low"],
+                        ["popularity-asc", "Popularity · low → high"],
+                        ["elo-desc", "Elo · high → low"],
+                        ["elo-asc", "Elo · low → high"],
+                        ["difficulty-desc", "Difficulty · hard → easy"],
+                        ["difficulty-asc", "Difficulty · easy → hard"],
+                      ] as const
+                    ).map(([value, label]) => {
+                      const active = sortBy === value;
+
+                      return (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => {
+                            setSortBy(value);
+                            setSortOpen(false);
+                          }}
+                          className={`flex w-full items-center justify-between rounded-lg border px-2.5 py-2 text-left text-[10px] font-black transition ${
+                            active
+                              ? "border-sky-300/20 bg-sky-300/[0.08] text-sky-100"
+                              : "border-white/[0.05] bg-[#071018] text-zinc-500 hover:border-sky-200/15 hover:bg-[#0b1621] hover:text-zinc-300"
+                          }`}
+                        >
+                          <span>{ui(label)}</span>
+                          {active && <span className="text-sky-300">✓</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => void loadSuggestionSet()}
+                disabled={libraryLoading || loadingMoreSuggestions}
+                className="w-full rounded-xl border border-amber-300/20 bg-amber-300/[0.07] px-3 py-2.5 text-[9px] font-black uppercase tracking-[0.10em] text-amber-200 transition hover:bg-amber-300/[0.12] disabled:cursor-wait disabled:opacity-40"
+              >
+                {libraryLoading ? ui("Loading...") : ui("Refresh first 5")}
+              </button>
             </div>
-          </div>
+          )}
+
+          {(libraryTab === "completed" || libraryTab === "from-games") &&
+          !user ? (
+            <div className="mt-3 rounded-2xl border border-amber-400/15 bg-amber-400/[0.05] p-4">
+              <p className="font-serif text-base font-semibold text-[#f2e4c7]">{ui("Sign in to use personal training")}</p>
+              <p className="mt-2 text-xs leading-5 text-zinc-500">{ui("Personal game puzzles and completion history are private to your account.")}</p>
+            </div>
+          ) : (
+            <div className="mt-3 max-h-[760px] overflow-y-auto pr-1 [scrollbar-width:thin]">
+              {(libraryTab === "suggested" && libraryLoading) ||
+              (libraryTab !== "suggested" && personalLibraryLoading) ? (
+                <div className="space-y-2">
+                  {Array.from({
+                    length: libraryTab === "suggested" ? 5 : 3,
+                  }).map((_, index) => (
+                    <div
+                      key={index}
+                      className="h-[126px] animate-pulse rounded-[1.35rem] border border-white/[0.06] bg-white/[0.025]"
+                    />
+                  ))}
+                </div>
+              ) : libraryItems.length === 0 ? (
+                <div className="rounded-2xl border border-white/8 bg-black/20 p-4 text-center">
+                  <p className="text-xs font-bold text-zinc-500">
+                    {libraryTab === "completed" ? ui("No completed puzzles yet.") : libraryTab === "from-games" ? ui("No personal puzzles yet. Finish a Singleplayer or Multiplayer game, open Game Review, and run the analysis.") : ui("No puzzles match these filters.")}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {libraryItems.map((entry) => {
+                    const item = entry.puzzle;
+                    const isActive =
+                      puzzle?.origin === item.origin &&
+                      puzzle?.sourceId === item.sourceId;
+                    const isPersonal = item.origin !== "lichess";
+
+                    return (
+                      <button
+                        key={`${libraryTab}-${item.origin}-${item.sourceId}`}
+                        type="button"
+                        onClick={() => loadPuzzle(item)}
+                        className={`group w-full rounded-[1.35rem] border p-3 text-left transition hover:-translate-y-0.5 ${
+                          isActive
+                            ? "border-amber-400/30 bg-amber-400/[0.085]"
+                            : "border-white/8 bg-black/20 hover:border-amber-400/15 hover:bg-white/[0.035]"
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <span
+                                className={`rounded-full border px-2 py-0.5 text-[8px] font-black uppercase tracking-wider ${
+                                  item.origin === "singleplayer"
+                                    ? "border-sky-400/15 bg-sky-400/[0.06] text-sky-300"
+                                    : item.origin === "multiplayer"
+                                      ? "border-violet-400/15 bg-violet-400/[0.06] text-violet-300"
+                                      : "border-amber-400/15 bg-amber-400/[0.06] text-amber-300"
+                                }`}
+                              >
+                                {item.sourceLabel}
+                              </span>
+
+                              {isPersonal ? (
+                                <span className="rounded-full border border-rose-400/15 bg-rose-400/[0.06] px-2 py-0.5 text-[8px] font-black text-rose-300">
+                                  {item.quality}
+                                </span>
+                              ) : (
+                                <>
+                                  <span className="rounded-full border border-white/8 bg-white/[0.035] px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-zinc-500">
+                                    {item.category}
+                                  </span>
+                                  <span
+                                    className={`rounded-full border px-2 py-0.5 text-[8px] font-black ${
+                                      item.difficulty === "Beginner"
+                                        ? "border-emerald-400/15 bg-emerald-400/[0.06] text-emerald-300"
+                                        : item.difficulty === "Intermediate"
+                                          ? "border-sky-400/15 bg-sky-400/[0.06] text-sky-300"
+                                          : item.difficulty === "Advanced"
+                                            ? "border-violet-400/15 bg-violet-400/[0.06] text-violet-300"
+                                            : "border-red-400/15 bg-red-400/[0.06] text-red-300"
+                                    }`}
+                                  >
+                                    {item.difficulty}
+                                  </span>
+                                </>
+                              )}
+                            </div>
+
+                            <p className="mt-2 truncate font-serif text-[15px] font-semibold text-[#eee1c8]">
+                              {compactPuzzleTitle(item.title)}
+                            </p>
+
+                            {isPersonal && item.playedMoveSan && (
+                              <p className="mt-1 text-[9px] text-zinc-600">{ui("You played")}{item.playedMoveSan}
+                              </p>
+                            )}
+                          </div>
+
+                          <span className="shrink-0 font-mono text-[11px] font-black text-amber-200/80">
+                            {isPersonal ? `${((item.centipawnLoss ?? 0) / 100).toFixed(1)}Δ` : item.rating}
+                          </span>
+                        </div>
+
+                        <div className="mt-3 flex items-center justify-between gap-3 border-t border-white/[0.05] pt-2">
+                          <span className="text-[9px] text-zinc-600">
+                            {entry.completedAt ? new Date(entry.completedAt).toLocaleDateString() : isPersonal ? `Move ${item.moveNumber ?? "?"}` : `${item.themes.slice(0, 2).join(" · ")} · Popularity ${item.popularity}`}
+                          </span>
+
+                          <span className="text-[9px] font-black text-zinc-500">
+                            {entry.mistakes !== null ? entry.mistakes === 0 ? ui("Perfect ✓") : `${entry.mistakes} mistake${entry.mistakes === 1 ? "" : "s"}` : isActive ? ui("Selected") : ui("Solve →")}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+
+                  {libraryTab === "suggested" && (
+                    <div className="pt-2">
+                      {suggestions.length < 20 ? (
+                        <button
+                          type="button"
+                          onClick={() => void loadMoreSuggestions()}
+                          disabled={
+                            libraryLoading ||
+                            loadingMoreSuggestions ||
+                            suggestions.length >= 20
+                          }
+                          className="w-full rounded-[1.1rem] border border-amber-300/15 bg-[linear-gradient(145deg,rgba(86,57,24,.10),rgba(0,0,0,.22))] px-4 py-3 text-[10px] font-black uppercase tracking-[0.12em] text-amber-200 transition hover:border-amber-300/25 hover:bg-amber-300/[0.07] disabled:cursor-wait disabled:opacity-40"
+                        >
+                          {loadingMoreSuggestions ? ui("Loading 5 more...") : `Load 5 more · ${suggestions.length}/20`}
+                        </button>
+                      ) : (
+                        <div className="rounded-[1.1rem] border border-emerald-300/10 bg-emerald-300/[0.035] px-4 py-3 text-center">
+                          <p className="text-[9px] font-black uppercase tracking-[0.12em] text-emerald-200/70">{ui("20 puzzle limit reached")}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </aside>
 
         <section className="min-w-0 rounded-3xl border border-white/10 bg-zinc-900/65 p-4 sm:p-5">
-          <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-400">
-                {t("Puzzle")} {displayedPuzzleNumber} /{" "}
-                {interactivePuzzles.length}
-              </p>
+          {puzzle ? (
+            <>
+              <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p
+                      className={`text-[10px] font-black uppercase tracking-[0.22em] ${
+                        puzzle.origin === "singleplayer"
+                          ? "text-sky-300"
+                          : puzzle.origin === "multiplayer"
+                            ? "text-violet-300"
+                            : "text-amber-400"
+                      }`}
+                    >
+                      {puzzle.sourceLabel}
+                    </p>
 
-              <h3 className="mt-1 text-xl font-black text-white">
-                {t(puzzle.title)}
-              </h3>
+                    {/* Lichess-only Elo. Personal Singleplayer/Multiplayer
+                        puzzles use review quality + eval loss instead. */}
+                    {puzzle.origin === "lichess" ? (
+                      <span className="rounded-full border border-sky-400/15 bg-sky-400/[0.06] px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.14em] text-sky-300">{ui("Elo")}{puzzle.rating}
+                      </span>
+                    ) : (
+                      <span className="rounded-full border border-rose-400/15 bg-rose-400/[0.06] px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.14em] text-rose-300">
+                        {puzzle.quality}{ui(" · Move ")}{puzzle.moveNumber}
+                      </span>
+                    )}
+                  </div>
 
-              <p className="mt-1 text-xs text-zinc-500">
-                <span className="font-black text-zinc-400">{t("Goal")}:</span>{" "}
-                {t(puzzle.goal)}
-              </p>
-            </div>
+                  {editingPuzzleTitle ? (
+                    <div className="mt-2 max-w-xl">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={puzzleTitleDraft}
+                          maxLength={80}
+                          autoFocus
+                          onChange={(event) => {
+                            setPuzzleTitleDraft(event.target.value);
+                            setPuzzleTitleError(null);
+                          }}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                              event.preventDefault();
+                              void savePuzzleTitle();
+                            }
 
-            <div className="flex flex-wrap gap-2">
-              <span className="rounded-full border border-violet-400/15 bg-violet-400/[0.06] px-2.5 py-1 text-[10px] font-black text-violet-300">
-                {t(puzzle.difficulty)}
-              </span>
+                            if (event.key === "Escape") {
+                              cancelPuzzleTitleEdit();
+                            }
+                          }}
+                          className="min-w-0 flex-1 rounded-xl border border-amber-300/25 bg-black/30 px-3 py-2 font-serif text-lg font-semibold text-[#f5e8cf] outline-none transition placeholder:text-zinc-700 focus:border-amber-300/45"
+                          placeholder={ui("Puzzle title")}
+                        />
 
-              <span className="rounded-full border border-amber-400/15 bg-amber-400/[0.06] px-2.5 py-1 text-[10px] font-black text-amber-300">
-                {t(puzzle.objective)}
-              </span>
-            </div>
-          </div>
+                        <button
+                          type="button"
+                          disabled={puzzleTitleSaving}
+                          onClick={() => void savePuzzleTitle()}
+                          className="rounded-xl border border-emerald-300/20 bg-emerald-300/[0.08] px-3 py-2 text-[10px] font-black uppercase tracking-wider text-emerald-200 transition hover:bg-emerald-300/[0.13] disabled:opacity-40"
+                        >
+                          {puzzleTitleSaving ? ui("Saving...") : ui("Save")}
+                        </button>
 
-          <InteractivePuzzleBoard
-            fen={fen}
-            orientation={puzzle.orientation}
-            selectedSquare={selectedSquare}
-            legalSquares={legalSquares}
-            lastMove={lastMove}
-            candidatePreview={candidatePreview}
-            disabled={autoReplying || solved || lineStep % 2 === 1}
-            onSquareClick={handleSquareClick}
-          />
+                        <button
+                          type="button"
+                          disabled={puzzleTitleSaving}
+                          onClick={cancelPuzzleTitleEdit}
+                          className="rounded-xl border border-white/[0.08] bg-white/[0.035] px-3 py-2 text-[10px] font-black uppercase tracking-wider text-zinc-500 transition hover:bg-white/[0.07] hover:text-zinc-300 disabled:opacity-40"
+                        >{ui("Cancel")}</button>
+                      </div>
 
-          <div className="mt-4 rounded-2xl border border-white/8 bg-black/20 p-3">
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-xs font-bold text-zinc-400">
-                {autoReplying
-                  ? t("Opponent reply")
-                  : solved
-                    ? t("Solved!")
-                    : lineStep > 0
-                      ? t("Your move again")
-                      : t("Select a piece and make your move.")}
-              </p>
+                      {puzzleTitleError && (
+                        <p className="mt-1.5 text-[10px] text-rose-300">
+                          {puzzleTitleError}
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="mt-1 flex flex-wrap items-center gap-2">
+                      <h3 className="font-serif text-xl font-semibold text-[#f5e8cf]">
+                        {ui(puzzle.title)}
+                      </h3>
 
-              {puzzle.line.length > 1 && (
-                <span className="text-[10px] font-bold text-zinc-600">
-                  {t("The opponent reply is played automatically.")}
-                </span>
-              )}
-            </div>
-          </div>
+                      {user && (
+                        <button
+                          type="button"
+                          onClick={beginPuzzleTitleEdit}
+                          className="rounded-lg border border-white/[0.08] bg-white/[0.03] px-2 py-1 text-[9px] font-black uppercase tracking-wider text-zinc-500 transition hover:border-amber-300/20 hover:bg-amber-300/[0.06] hover:text-amber-200"
+                          title={ui("Rename puzzle")}
+                        >{ui("✎ Rename")}</button>
+                      )}
+                    </div>
+                  )}
 
-          <div className="mt-4 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => resetPuzzle()}
-              className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-zinc-400 transition hover:bg-white/10 hover:text-white"
-            >
-              ↺ {t("Reset puzzle")}
-            </button>
+                  <p className="mt-1 text-xs text-zinc-500">
+                    {puzzle.origin === "lichess" ? ui("Find the best continuation.") : ui("Replay the position and find what you missed during the game.")}
+                  </p>
+                </div>
 
-            <button
-              type="button"
-              onClick={nextPuzzle}
-              className="rounded-xl border border-amber-400/20 bg-amber-400/10 px-3 py-2 text-xs font-black text-amber-200 transition hover:bg-amber-400/20"
-            >
-              {t("Next puzzle")} →
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setShowAnalysis((value) => !value)}
-              className="rounded-xl border border-sky-400/15 bg-sky-400/[0.06] px-3 py-2 text-xs font-black text-sky-300 transition hover:bg-sky-400/10"
-            >
-              {showAnalysis ? t("Hide move analysis") : t("Show move analysis")}
-            </button>
-          </div>
-        </section>
-
-        <aside className="space-y-4">
-          <section className={`rounded-3xl border p-4 ${feedbackClass}`}>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
-              {t("Feedback")}
-            </p>
-
-            {feedback ? (
-              <>
-                <div className="mt-2 flex items-center justify-between gap-3">
-                  <h3 className="font-black text-white">{t(feedback.title)}</h3>
-
-                  {feedback.moveLabel && (
-                    <span className="rounded-lg border border-white/10 bg-black/20 px-2 py-1 font-mono text-xs font-black text-zinc-200">
-                      {feedback.moveLabel}
+                <div className="flex flex-wrap gap-2">
+                  {puzzle.origin === "lichess" ? (
+                    <>
+                      <span className="rounded-full border border-violet-400/15 bg-violet-400/[0.06] px-2.5 py-1 text-[10px] font-black text-violet-300">
+                        {puzzle.difficulty}
+                      </span>
+                      <span className="rounded-full border border-amber-400/15 bg-amber-400/[0.06] px-2.5 py-1 text-[10px] font-black text-amber-300">
+                        {puzzle.category}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="rounded-full border border-rose-400/15 bg-rose-400/[0.06] px-2.5 py-1 text-[10px] font-black text-rose-300">
+                      {(puzzle.centipawnLoss ?? 0) / 100 >= 1 ? `${((puzzle.centipawnLoss ?? 0) / 100).toFixed(1)} pawns missed` : `${puzzle.centipawnLoss ?? 0} cp missed`}
                     </span>
                   )}
                 </div>
+              </div>
 
-                <p className="mt-2 text-xs leading-5 text-zinc-400">
-                  {t(feedback.text)}
-                </p>
-              </>
+              <InteractivePuzzleBoard
+                fen={fen}
+                orientation={puzzle.orientation}
+                selectedSquare={selectedSquare}
+                legalSquares={legalSquares}
+                lastMove={lastMove}
+                candidatePreview={candidatePreview}
+                wrongMove={wrongMove}
+                correctMove={correctMove}
+                disabled={autoReplying || solved || lineStep % 2 === 1}
+                onSquareClick={handleSquareClick}
+              />
+
+              <div
+                className={`mt-4 rounded-2xl border p-3.5 transition ${feedbackVisual.shell}`}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border text-lg font-black ${feedbackVisual.iconClass}`}
+                  >
+                    {autoReplying ? "…" : feedbackVisual.icon}
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p
+                        className={`font-serif text-base font-semibold ${feedbackVisual.titleClass}`}
+                      >
+                        {autoReplying ? ui("Opponent reply") : (feedback?.title ?? "Your move")}
+                      </p>
+
+                      {feedback?.moveLabel && (
+                        <span className="rounded-lg border border-white/10 bg-black/20 px-2 py-1 font-mono text-[10px] font-black text-zinc-300">
+                          {feedback.moveLabel}
+                        </span>
+                      )}
+                    </div>
+
+                    <p className="mt-1 text-xs leading-5 text-zinc-400">
+                      {autoReplying ? ui("The reply is being played automatically.") : (feedback?.text ??
+                          "Select a piece and calculate the strongest continuation.")}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={resetCurrentPuzzle}
+                  className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-zinc-400 transition hover:bg-white/10 hover:text-white"
+                >{ui("↺ Reset")}</button>
+
+                <button
+                  type="button"
+                  onClick={() => void nextPuzzle()}
+                  disabled={remotePuzzleLoading}
+                  className="rounded-xl border border-amber-400/20 bg-amber-400/10 px-3 py-2 text-xs font-black text-amber-200 transition hover:bg-amber-400/20 disabled:cursor-wait disabled:opacity-50"
+                >
+                  {remotePuzzleLoading ? ui("Finding puzzle...") : ui("Next puzzle →")}
+                </button>
+
+                <div className="ml-auto flex items-center gap-2 rounded-xl border border-white/8 bg-black/20 px-3 py-2">
+                  <span className="text-[9px] font-black uppercase tracking-wider text-zinc-700">{ui("Mistakes")}</span>
+                  <span
+                    className={`font-mono text-xs font-black ${
+                      mistakes > 0 ? "text-rose-300" : "text-emerald-300"
+                    }`}
+                  >
+                    {mistakes}
+                  </span>
+                </div>
+              </div>
+
+              {remotePuzzleError && (
+                <div className="mt-3 rounded-2xl border border-red-400/20 bg-red-400/[0.06] px-3 py-2.5 text-xs leading-5 text-red-200">
+                  {remotePuzzleError}
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="flex min-h-[520px] items-center justify-center text-center">
+              <div>
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-amber-400/15 bg-amber-400/[0.05] font-serif text-3xl text-amber-100">
+                  ♞
+                </div>
+                <p className="mt-4 font-serif text-lg font-semibold text-[#eee1c8]">{ui("Loading your puzzle set")}</p>
+                <p className="mt-1 text-xs text-zinc-600">{ui("Completed puzzles are filtered out automatically.")}</p>
+              </div>
+            </div>
+          )}
+        </section>
+
+        <aside className="space-y-4">
+          <section className="rounded-3xl border border-white/10 bg-[linear-gradient(145deg,rgba(10,18,28,.92),rgba(5,10,17,.88))] p-4">
+            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600">{ui("Puzzle details")}</p>
+
+            {puzzle ? (
+              puzzle.origin === "lichess" ? (
+                <>
+                  <div className="mt-3 rounded-2xl border border-white/8 bg-black/20 p-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-[8px] font-black uppercase tracking-wider text-zinc-700">{ui("Puzzle title")}</p>
+                        <p className="mt-1 truncate font-serif text-sm font-semibold text-[#eee1c8]">
+                          {ui(puzzle.title)}
+                        </p>
+                      </div>
+
+                      {user && (
+                        <button
+                          type="button"
+                          onClick={beginPuzzleTitleEdit}
+                          className="shrink-0 rounded-lg border border-amber-300/15 bg-amber-300/[0.055] px-2.5 py-1.5 text-[9px] font-black text-amber-200 transition hover:bg-amber-300/[0.10]"
+                        >{ui("Rename")}</button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="mt-3 grid grid-cols-3 gap-2">
+                    <div className="rounded-2xl border border-white/8 bg-black/20 p-3">
+                      <p className="text-[8px] font-black uppercase tracking-wider text-zinc-700">{ui("Elo")}</p>
+                      <p className="mt-1 font-mono text-lg font-black text-amber-200">
+                        {puzzle.rating}
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-white/8 bg-black/20 p-3">
+                      <p className="text-[8px] font-black uppercase tracking-wider text-zinc-700">{ui("Difficulty")}</p>
+                      <p className="mt-1 text-xs font-black text-zinc-300">
+                        {puzzle.difficulty}
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-white/8 bg-black/20 p-3">
+                      <p className="text-[8px] font-black uppercase tracking-wider text-zinc-700">{ui("Popularity")}</p>
+                      <p className="mt-1 font-mono text-lg font-black text-emerald-200">
+                        {puzzle.popularity}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 rounded-2xl border border-white/8 bg-black/20 p-3">
+                    <p className="text-[8px] font-black uppercase tracking-wider text-zinc-700">{ui("Themes")}</p>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {puzzle.themes.slice(0, 6).map((theme) => (
+                        <span
+                          key={theme}
+                          className="rounded-full border border-white/8 bg-white/[0.035] px-2 py-1 text-[9px] font-bold text-zinc-500"
+                        >
+                          {theme.replace(/([a-z])([A-Z])/g, "$1 $2")}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="mt-3 rounded-2xl border border-violet-400/15 bg-violet-400/[0.045] p-3">
+                    <p className="text-[8px] font-black uppercase tracking-wider text-violet-300/60">{ui("Source")}</p>
+                    <p className="mt-1 text-xs font-black text-violet-100">
+                      {puzzle.sourceLabel}
+                    </p>
+                  </div>
+
+                  <div className="mt-3 rounded-2xl border border-white/8 bg-black/20 p-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-[8px] font-black uppercase tracking-wider text-zinc-700">{ui("Puzzle title")}</p>
+                        <p className="mt-1 truncate font-serif text-sm font-semibold text-[#eee1c8]">
+                          {ui(puzzle.title)}
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={beginPuzzleTitleEdit}
+                        className="shrink-0 rounded-lg border border-amber-300/15 bg-amber-300/[0.055] px-2.5 py-1.5 text-[9px] font-black text-amber-200 transition hover:bg-amber-300/[0.10]"
+                      >{ui("Rename")}</button>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 grid grid-cols-2 gap-2">
+                    <div className="rounded-2xl border border-white/8 bg-black/20 p-3">
+                      <p className="text-[8px] font-black uppercase tracking-wider text-zinc-700">{ui("Missed on")}</p>
+                      <p className="mt-1 font-mono text-lg font-black text-amber-200">{ui("Move")}{puzzle.moveNumber}
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-white/8 bg-black/20 p-3">
+                      <p className="text-[8px] font-black uppercase tracking-wider text-zinc-700">{ui("Eval loss")}</p>
+                      <p className="mt-1 font-mono text-lg font-black text-rose-200">
+                        {((puzzle.centipawnLoss ?? 0) / 100).toFixed(1)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {puzzle.playedMoveSan && (
+                    <div className="mt-3 rounded-2xl border border-white/8 bg-black/20 p-3">
+                      <p className="text-[8px] font-black uppercase tracking-wider text-zinc-700">{ui("Move you played")}</p>
+                      <p className="mt-1 font-mono text-base font-black text-zinc-300">
+                        {puzzle.playedMoveSan}
+                      </p>
+                    </div>
+                  )}
+                </>
+              )
             ) : (
-              <p className="mt-2 text-xs leading-5 text-zinc-500">
-                {t("Select a piece and make your move.")}
-              </p>
+              <p className="mt-3 text-xs text-zinc-600">{ui("No puzzle selected.")}</p>
             )}
           </section>
 
-          {showAnalysis && (
-            <section className="rounded-3xl border border-white/10 bg-zinc-900/65 p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h3 className="font-black text-white">
-                    {t("Candidate move analysis")}
-                  </h3>
-
-                  <p className="mt-1 text-[10px] leading-4 text-zinc-600">
-                    {t(
-                      "Curated teaching ranking — not a live engine evaluation.",
-                    )}
-                  </p>
-
-                  <p className="mt-1 text-[10px] font-bold leading-4 text-zinc-500">
-                    {t("Click a move to highlight it on the board.")}
-                  </p>
-                </div>
-
-                <span className="text-xl">♟</span>
-              </div>
-
-              <div className="mt-4 space-y-2">
-                {puzzle.candidates.map((candidate) => {
-                  const parts = puzzleMoveParts(candidate.uci);
-                  const selected =
-                    candidatePreview?.from === parts.from &&
-                    candidatePreview?.to === parts.to &&
-                    candidatePreview?.rank === candidate.rank;
-
-                  return (
-                    <button
-                      key={candidate.uci}
-                      type="button"
-                      onClick={() =>
-                        setCandidatePreview((current) =>
-                          current?.from === parts.from &&
-                          current?.to === parts.to &&
-                          current?.rank === candidate.rank
-                            ? null
-                            : {
-                                from: parts.from,
-                                to: parts.to,
-                                rank: candidate.rank,
-                                label: candidate.label,
-                              },
-                        )
-                      }
-                      className={`
-                        w-full
-                        rounded-2xl
-                        border
-                        p-3
-                        text-left
-                        transition
-                        hover:-translate-y-0.5
-                        hover:brightness-110
-                        ${candidateRankClass(candidate.rank)}
-                        ${
-                          selected
-                            ? selectedCandidateCardClass(candidate.rank)
-                            : ""
-                        }
-                      `}
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="text-[10px] font-black uppercase tracking-wider">
-                          {t(candidateRankLabel(candidate.rank))}
-                        </span>
-
-                        <span className="flex items-center gap-2">
-                          {selected && (
-                            <span className="text-[9px] font-black uppercase tracking-wider text-white/70">
-                              {t("Highlighted")}
-                            </span>
-                          )}
-
-                          <span className="font-mono text-sm font-black text-white">
-                            {candidate.label}
-                          </span>
-                        </span>
-                      </div>
-
-                      <p className="mt-2 text-[11px] leading-5 text-zinc-400">
-                        {t(candidate.explanation)}
-                      </p>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="mt-4 rounded-2xl border border-white/8 bg-black/20 p-3">
-                <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
-                  {t("Line")}
-                </p>
-
-                <p className="mt-1 font-mono text-xs font-black text-zinc-300">
-                  {puzzle.line.map((move) => move.label).join("  ")}
+          <section className="rounded-3xl border border-white/10 bg-[linear-gradient(145deg,rgba(10,18,28,.92),rgba(5,10,17,.88))] p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600">{ui("Your progress")}</p>
+                <p className="mt-1 font-serif text-base font-semibold text-[#eee1c8]">
+                  {user ? `${completedTotal} completed` : ui("Not signed in")}
                 </p>
               </div>
-            </section>
-          )}
+
+              <div
+                className={`flex h-10 w-10 items-center justify-center rounded-xl border ${
+                  user
+                    ? "border-emerald-400/15 bg-emerald-400/[0.06] text-emerald-300"
+                    : "border-white/8 bg-white/[0.03] text-zinc-600"
+                }`}
+              >
+                ✓
+              </div>
+            </div>
+
+            <p className="mt-3 text-xs leading-5 text-zinc-600">
+              {user ? ui("Lichess completions and personal training puzzles are saved privately to your account.") : ui("Sign in to keep permanent puzzle progress and create training positions from your games.")}
+            </p>
+          </section>
         </aside>
       </div>
     </div>
@@ -5933,8 +5359,12 @@ function PuzzlesTab() {
 }
 
 export default function ChessRulesAndTips() {
-  const [activeTab, setActiveTab] = useState<TabKey>("rules");
-  const [language, setLanguage] = useState<Language>("en");
+  useUiLanguage();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedTab = searchParams.get("tab");
+  const activeTab: TabKey = requestedTab === "puzzles" || requestedTab === "openings" || requestedTab === "situations" ? requestedTab : "rules";
+  const setActiveTab = (tab: TabKey) => setSearchParams(current => { const next = new URLSearchParams(current); next.set("tab", tab); return next; }, { replace: true });
+  const { language, setLanguage } = useAppLanguage();
   const t = (value: string) => translate(language, value);
 
   const tabs: Array<{
@@ -5958,7 +5388,7 @@ export default function ChessRulesAndTips() {
     {
       key: "puzzles",
       label: "Puzzles",
-      icon: "🧩",
+      icon: "✦",
       description: "Solve interactively",
     },
     {
@@ -5971,166 +5401,111 @@ export default function ChessRulesAndTips() {
 
   return (
     <LanguageContext.Provider value={language}>
-      <div
-        className="
-        min-h-screen
-        bg-transparent
-        px-4
-        py-6
-        text-zinc-100
-        sm:px-6
-        lg:px-8
-      "
-      >
-        <div className="mx-auto max-w-[1500px]">
-          <header
-            className="
-            mb-6
-            flex
-            flex-col
-            gap-4
-            rounded-3xl
-            border
-            border-white/5
-            bg-zinc-900/50
-            px-5
-            py-5
-            shadow-xl
-            shadow-black/20
-            backdrop-blur-md
-            sm:flex-row
-            sm:items-center
-            sm:justify-between
-          "
-          >
-            <div className="flex items-center gap-4">
-              <div
-                className="
-                flex
-                h-14
-                w-14
-                shrink-0
-                items-center
-                justify-center
-                rounded-2xl
-                border
-                border-amber-500/20
-                bg-amber-400/10
-                font-serif
-                text-4xl
-                text-amber-100
-              "
-              >
-                ♞
-              </div>
+      <div className="relative left-1/2 min-h-[var(--app-height)] w-screen -translate-x-1/2 overflow-x-hidden bg-[#03070d] text-zinc-100">
+        {/* CINEMATIC BACKDROP */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_17%_12%,rgba(181,132,46,.11),transparent_30%),radial-gradient(circle_at_82%_24%,rgba(52,83,116,.10),transparent_28%),linear-gradient(180deg,#050a11_0%,#020509_52%,#04080d_100%)]" />
+          <div className="absolute left-[7%] top-24 h-[34rem] w-px bg-gradient-to-b from-transparent via-amber-200/10 to-transparent" />
+          <div className="absolute right-[10%] top-0 h-[42rem] w-px bg-gradient-to-b from-amber-100/5 via-white/5 to-transparent" />
+          <div className="absolute -right-12 top-16 font-serif text-[24rem] leading-none text-amber-100/[0.018] sm:text-[34rem]">
+            ♞
+          </div>
+        </div>
 
-              <div>
-                <p
-                  className="
-                  text-[10px]
-                  font-bold
-                  uppercase
-                  tracking-[0.28em]
-                  text-amber-400
-                "
-                >
+        <div className="relative mx-auto w-full max-w-[1640px] px-4 pb-12 pt-4 sm:px-6 lg:px-8">
+          {/* TOP STRIP */}
+          <ChessPageHeader className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.06] pb-4">
+            <Link
+              to="/games/chess"
+              className="group inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.20em] text-zinc-500 transition hover:text-amber-200"
+            >
+              <span className="transition group-hover:-translate-x-1">←</span>
+              {t("Back to Chess")}
+            </Link>
+
+            <label className="flex items-center gap-2 rounded-full border border-white/10 bg-black/20 px-3 py-1.5 text-xs font-bold text-zinc-500 backdrop-blur-xl">
+              <span className="text-amber-300/80">◎</span>
+              <span className="hidden sm:inline">{t("Language")}</span>
+
+              <select
+                value={language}
+                onChange={(event) =>
+                  setLanguage(event.target.value as Language)
+                }
+                className="bg-transparent text-xs font-bold text-zinc-300 outline-none [color-scheme:dark]"
+                aria-label={t("Language")}
+              >
+                {languageOptions.map((option) => (
+                  <option
+                    key={option.value}
+                    value={option.value}
+                    className="bg-zinc-950 text-zinc-100"
+                  >
+                    {ui(option.label)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </ChessPageHeader>
+
+          {/* HERO */}
+          <section className="grid gap-8 py-9 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-end lg:py-12">
+            <div>
+              <div className="flex items-center gap-3">
+                <span className="h-px w-10 bg-amber-300/55" />
+                <p className="text-[10px] font-black uppercase tracking-[0.34em] text-amber-300/90">
                   {t("Learn Chess")}
                 </p>
+              </div>
 
-                <h1 className="mt-1 text-2xl font-black tracking-tight text-white sm:text-3xl">
+              <h1 className="mt-5 max-w-5xl font-serif text-[clamp(3rem,7vw,6.6rem)] font-medium leading-[0.88] tracking-[-0.05em] text-[#f2e4c7]">
+                {t("Chess Rules")}
+                <span className="block italic text-amber-200/80">{ui("& Tips")}</span>
+              </h1>
+
+              <p className="mt-5 max-w-2xl text-sm leading-7 text-zinc-400 sm:text-base">
+                {t("Rules, openings, and common chess patterns")}
+              </p>
+            </div>
+
+            <div className="relative overflow-hidden rounded-[2rem] border border-amber-400/15 bg-[linear-gradient(145deg,rgba(24,18,8,.72),rgba(6,12,19,.92))] p-5 shadow-2xl shadow-black/30 backdrop-blur-xl">
+              <div className="absolute -right-8 -top-10 font-serif text-[9rem] text-amber-100/[0.035]">
+                ♜
+              </div>
+
+              <div className="relative">
+                <p className="text-[9px] font-black uppercase tracking-[0.25em] text-amber-300/70">
                   {t("Chess Rules & Tips")}
-                </h1>
-
-                <p className="mt-1 text-sm text-zinc-500">
-                  {t("Rules, openings, and common chess patterns")}
                 </p>
+
+                <p className="mt-3 font-serif text-xl leading-7 text-[#eadcc0]">{ui("Study the rule. See the pattern. Play the position.")}</p>
+
+                <div className="mt-5 grid grid-cols-3 gap-2">
+                  {[
+                    ["01", "Rules"],
+                    ["02", "Patterns"],
+                    ["03", "Practice"],
+                  ].map(([number, label]) => (
+                    <div
+                      key={number}
+                      className="rounded-2xl border border-white/[0.07] bg-black/20 px-3 py-3"
+                    >
+                      <p className="font-mono text-[9px] text-amber-300/70">
+                        {number}
+                      </p>
+                      <p className="mt-1 text-[10px] font-bold text-zinc-400">
+                        {ui(label)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
+          </section>
 
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-              <label
-                className="
-                flex
-                items-center
-                gap-2
-                rounded-full
-                border
-                border-white/10
-                bg-white/5
-                px-3
-                py-1.5
-                text-xs
-                font-bold
-                text-zinc-400
-              "
-              >
-                <span>🌐</span>
-                <span className="hidden lg:inline">{t("Language")}</span>
-
-                <select
-                  value={language}
-                  onChange={(event) =>
-                    setLanguage(event.target.value as Language)
-                  }
-                  className="
-                  bg-transparent
-                  text-xs
-                  font-bold
-                  text-zinc-200
-                  outline-none
-                  [color-scheme:dark]
-                "
-                  aria-label={t("Language")}
-                >
-                  {languageOptions.map((option) => (
-                    <option
-                      key={option.value}
-                      value={option.value}
-                      className="bg-zinc-900 text-zinc-100"
-                    >
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              <Link
-                to="/games/chess"
-                className="
-                rounded-full
-                border
-                border-white/10
-                bg-white/5
-                px-4
-                py-2
-                text-center
-                text-xs
-                font-bold
-                text-zinc-400
-                transition
-                hover:bg-white/10
-                hover:text-white
-              "
-              >
-                ← {t("Back to Chess")}
-              </Link>
-            </div>
-          </header>
-
-          <nav
-            className="
-            mb-6
-            grid
-            gap-2
-            rounded-3xl
-            border
-            border-white/10
-            bg-zinc-900/70
-            p-2
-            md:grid-cols-2 xl:grid-cols-4
-          "
-          >
-            {tabs.map((tab) => {
+          {/* LESSON SELECTOR */}
+          <nav className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {tabs.map((tab, index) => {
               const active = activeTab === tab.key;
 
               return (
@@ -6138,81 +5513,60 @@ export default function ChessRulesAndTips() {
                   key={tab.key}
                   type="button"
                   onClick={() => setActiveTab(tab.key)}
-                  className={`
-                  flex
-                  items-center
-                  gap-3
-                  rounded-2xl
-                  border
-                  px-4
-                  py-3
-                  text-left
-                  transition
-
-                  ${
+                  className={`group relative overflow-hidden rounded-[1.65rem] border px-4 py-4 text-left shadow-xl shadow-black/10 transition duration-300 hover:-translate-y-0.5 ${
                     active
-                      ? "border-amber-400/25 bg-amber-400/[0.08]"
-                      : "border-transparent bg-transparent hover:bg-white/5"
-                  }
-                `}
+                      ? "border-amber-400/30 bg-[linear-gradient(145deg,rgba(47,35,14,.55),rgba(7,14,22,.96))] shadow-[0_0_34px_rgba(251,191,36,.045)]"
+                      : "border-white/[0.08] bg-[linear-gradient(145deg,rgba(9,16,25,.9),rgba(4,9,15,.86))] hover:border-amber-400/15"
+                  }`}
                 >
-                  <span
-                    className={`
-                    flex
-                    h-10
-                    w-10
-                    shrink-0
-                    items-center
-                    justify-center
-                    rounded-xl
-                    font-serif
-                    text-2xl
+                  <div className="pointer-events-none absolute inset-x-5 top-0 h-px bg-gradient-to-r from-transparent via-amber-200/20 to-transparent" />
 
-                    ${
-                      active
-                        ? "bg-amber-400/10 text-amber-200"
-                        : "bg-white/5 text-zinc-500"
-                    }
-                  `}
-                  >
-                    {tab.icon}
-                  </span>
-
-                  <span className="min-w-0">
-                    <span
-                      className={`
-                      block
-                      text-sm
-                      font-black
-
-                      ${active ? "text-white" : "text-zinc-400"}
-                    `}
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border font-serif text-2xl transition ${
+                        active
+                          ? "border-amber-300/20 bg-amber-300/[0.09] text-amber-100"
+                          : "border-white/[0.07] bg-white/[0.03] text-zinc-600 group-hover:text-amber-200/70"
+                      }`}
                     >
-                      {t(tab.label)}
-                    </span>
+                      {tab.icon}
+                    </div>
 
-                    <span className="mt-0.5 block text-[10px] text-zinc-600">
-                      {t(tab.description)}
-                    </span>
-                  </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <span
+                          className={`font-serif text-lg font-semibold ${
+                            active ? "text-[#f5e8cf]" : "text-zinc-300"
+                          }`}
+                        >
+                          {t(tab.label)}
+                        </span>
+
+                        <span className="font-mono text-[9px] text-zinc-700">
+                          0{index + 1}
+                        </span>
+                      </div>
+
+                      <span className="mt-0.5 block text-[10px] text-zinc-600">
+                        {t(tab.description)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div
+                    className={`mt-3 h-px transition ${
+                      active
+                        ? "bg-gradient-to-r from-amber-300/55 via-amber-300/15 to-transparent"
+                        : "bg-white/[0.04]"
+                    }`}
+                  />
                 </button>
               );
             })}
           </nav>
 
-          <main
-            className="
-            rounded-3xl
-            border
-            border-white/10
-            bg-zinc-950/55
-            p-4
-            shadow-2xl
-            shadow-black/20
-            backdrop-blur-md
-            sm:p-6
-          "
-          >
+          {/* CONTENT */}
+          <main className="mt-5 rounded-[2rem] border border-white/[0.08] bg-[linear-gradient(180deg,rgba(6,12,19,.88),rgba(3,8,13,.92))] p-4 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-6 lg:p-7">
             {activeTab === "rules" && <RulesTab />}
             {activeTab === "situations" && <SituationsTab />}
             {activeTab === "puzzles" && <PuzzlesTab />}

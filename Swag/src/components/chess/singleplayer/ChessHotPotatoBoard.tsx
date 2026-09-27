@@ -1,3 +1,5 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { useRef, useEffect, useMemo, useState } from "react";
 import {
   LanguageSelector,
@@ -25,6 +27,8 @@ import {
   HOT_POTATO_MIN_FUSE_MOVES,
   HOT_POTATO_MAX_FUSE_MOVES,
   createCoolingHotPotatoState,
+  dropHotPotatoAfterBlast,
+  pickUpHotPotato,
   createInitialHotPotatoStates,
   createRespawnedHotPotatoState,
   findKingSquare,
@@ -343,6 +347,7 @@ export default function ChessHotPotatoBoard({
   playerColor = "white",
   difficulty = "casual",
 }: VariantAiBoardProps) {
+  useUiLanguage();
   const { language, setLanguage } = useChessLanguage();
   const t = (key: string) => translateChess(language, key, translations);
   /* =======================================================
@@ -621,6 +626,7 @@ export default function ChessHotPotatoBoard({
       const potato = nextHotPotatoes[owner];
 
       if (potato.square) {
+        if (!pickUpHotPotato(potato, move)) continue;
         const carrierBeforeMove = potato.square;
 
         const carrierWasCaptured =
@@ -689,20 +695,8 @@ export default function ChessHotPotatoBoard({
       );
     }
 
-    // If one blast physically destroyed the carrier of the other bomb,
-    // that bomb starts its own cooldown from this ply.
     for (const owner of ["w", "b"] as const) {
-      const potato = nextHotPotatoes[owner];
-      if (
-        potato.square &&
-        nextExplosionSquares.includes(potato.square) &&
-        !nextGame.get(potato.square)
-      ) {
-        nextHotPotatoes[owner] = createCoolingHotPotatoState(
-          owner,
-          nextHotPotatoes[owner].blastPattern,
-        );
-      }
+      dropHotPotatoAfterBlast(nextGame, nextHotPotatoes[owner], nextExplosionSquares);
     }
 
     const whiteKingSquare = findKingSquare(nextGame, "w");
@@ -914,7 +908,7 @@ export default function ChessHotPotatoBoard({
   return (
     <div
       className="
-        min-h-screen
+        chess-variant-page min-h-[var(--app-height)]
         bg-transparent
         px-4
         py-6
@@ -928,8 +922,7 @@ export default function ChessHotPotatoBoard({
             HEADER
            ================================================= */}
 
-        <header
-          className="
+        <ChessPageHeader className="
             mb-7
             flex
             flex-col
@@ -946,44 +939,10 @@ export default function ChessHotPotatoBoard({
             sm:flex-row
             sm:items-center
             sm:justify-between
-          "
-        >
-          <div className="flex items-center gap-4">
-            <div
-              className="
-                flex
-                h-12
-                w-12
-                items-center
-                justify-center
-                rounded-2xl
-                border
-                border-orange-500/20
-                bg-orange-400/10
-                text-3xl
-                shadow-inner
-              "
-              aria-hidden="true"
-            >
-              💣
-            </div>
-
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-orange-400">
-                {t("Chess Variant")}
-              </p>
-
-              <h1 className="mt-0.5 text-2xl font-black tracking-tight text-white">
-                {t("Chess Hot Potato")}
-              </h1>
-
-              <p className="mt-0.5 text-sm text-zinc-500">
-                {t("Pass the danger")} · {t("Random fuse")}{" "}
+          " description={<> {t("Pass the danger")} · {t("Random fuse")}{" "}
                 {HOT_POTATO_MIN_FUSE_MOVES}–{HOT_POTATO_MAX_FUSE_MOVES}{" "}
-                {t("moves")}
-              </p>
-            </div>
-          </div>
+                {t("moves")} </>}>
+
 
           <div className="flex flex-wrap items-center justify-end gap-2">
             <LanguageSelector
@@ -1015,7 +974,7 @@ export default function ChessHotPotatoBoard({
                     const potato = displayedHotPotatoes[owner];
 
                     return potato.square
-                      ? `${owner === "w" ? "W" : "B"} ${potato.movesUntilExplosion}`
+                      ? `${owner === "w" ? "W" : "B"} ${potato.movesUntilExplosion}{potato.dropped ? " · Paused on ground" : ""}`
                       : `${owner === "w" ? "W" : "B"} ❄${potato.respawnMovesRemaining}`;
                   })
                   .join(" · ")}
@@ -1045,7 +1004,7 @@ export default function ChessHotPotatoBoard({
             )}
           </div>
           <BoardAnimationToggle />
-        </header>
+        </ChessPageHeader>
 
         {/* =================================================
             MAIN LAYOUT — SAME 300px / BOARD / 300px SHELL
@@ -1056,7 +1015,7 @@ export default function ChessHotPotatoBoard({
           className="
             grid
             gap-6
-            xl:grid-cols-[300px_minmax(0,1fr)_300px]
+            chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]
           "
         >
           {/* ===============================================
@@ -1234,7 +1193,7 @@ export default function ChessHotPotatoBoard({
                                   {move.explosionSquaresAfter.length > 0 && (
                                     <span
                                       className="text-xs"
-                                      aria-label="Explosion"
+                                      aria-label={ui("Explosion")}
                                     >
                                       💥
                                     </span>
@@ -1262,9 +1221,7 @@ export default function ChessHotPotatoBoard({
                 <div className="mb-3 rounded-2xl border border-amber-500/20 bg-amber-400/[0.07] px-4 py-3">
                   <div className="flex items-center justify-between gap-4">
                     <div>
-                      <p className="text-xs font-bold uppercase tracking-widest text-amber-400">
-                        Game Over
-                      </p>
+                      <p className="text-xs font-bold uppercase tracking-widest text-amber-400">{ui("Game Over")}</p>
                       <p className="mt-1 font-black text-white">
                         {resultText(finishedGame, t)}
                       </p>
@@ -1309,7 +1266,7 @@ export default function ChessHotPotatoBoard({
                         .map((owner) => {
                           const potato = historyPreview.hotPotatoesAfter[owner];
                           return potato.square
-                            ? `${owner === "w" ? "W" : "B"} 💣 ${potato.movesUntilExplosion}`
+                            ? `${owner === "w" ? "W" : "B"} 💣 ${potato.movesUntilExplosion}{potato.dropped ? " · Paused on ground" : ""}`
                             : `${owner === "w" ? "W" : "B"} ${t("Cooldown")} ${potato.respawnMovesRemaining}`;
                         })
                         .join(" · ")}
@@ -1365,7 +1322,7 @@ export default function ChessHotPotatoBoard({
                     .map((owner) => {
                       const potato = displayedHotPotatoes[owner];
                       return potato.square
-                        ? `${owner === "w" ? "W" : "B"} 💣 ${potato.movesUntilExplosion}`
+                        ? `${owner === "w" ? "W" : "B"} 💣 ${potato.movesUntilExplosion}{potato.dropped ? " · Paused on ground" : ""}`
                         : `${owner === "w" ? "W" : "B"} ❄ ${potato.respawnMovesRemaining}`;
                     })
                     .join(" · ")}
@@ -1387,9 +1344,7 @@ export default function ChessHotPotatoBoard({
                   <h2 className="text-base font-black text-zinc-100">
                     {t("Hot Potato")}
                   </h2>
-                  <p className="mt-1 text-xs text-zinc-500">
-                    Two independent bombs
-                  </p>
+                  <p className="mt-1 text-xs text-zinc-500">{ui("Two independent bombs")}</p>
                 </div>
 
                 <div className="space-y-3">
@@ -1413,7 +1368,7 @@ export default function ChessHotPotatoBoard({
                       >
                         <div className="flex items-center justify-between gap-3">
                           <p className="text-xs font-black uppercase tracking-wider text-zinc-400">
-                            {owner === "w" ? "White bomb" : "Black bomb"}
+                            {owner === "w" ? ui("White bomb") : ui("Black bomb")}
                           </p>
                           <span className="rounded-full border border-white/10 bg-black/25 px-2 py-1 text-[10px] font-black text-zinc-300">
                             {patternLabel}
@@ -1424,20 +1379,16 @@ export default function ChessHotPotatoBoard({
                           <>
                             <div className="mt-3 flex items-end justify-between gap-4">
                               <div>
-                                <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-600">
-                                  Carrier
-                                </p>
+                                <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-600">{ui("Carrier")}</p>
                                 <p className="mt-1 font-mono text-xl font-black uppercase text-white">
                                   {potato.square}
                                 </p>
                               </div>
 
                               <div className="text-right">
-                                <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-600">
-                                  Explodes in
-                                </p>
+                                <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-600">{ui("Explodes in")}</p>
                                 <p className="mt-1 text-3xl font-black text-orange-200">
-                                  {potato.movesUntilExplosion}
+                                  {potato.movesUntilExplosion}{potato.dropped ? ui(" · Paused on ground") : ""}
                                 </p>
                               </div>
                             </div>
@@ -1462,12 +1413,8 @@ export default function ChessHotPotatoBoard({
                         ) : (
                           <div className="mt-3 flex items-center justify-between rounded-xl border border-white/5 bg-black/20 px-3 py-3">
                             <div>
-                              <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-600">
-                                Cooling down
-                              </p>
-                              <p className="mt-1 text-xs text-zinc-500">
-                                A new random bomb will spawn for this side.
-                              </p>
+                              <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-600">{ui("Cooling down")}</p>
+                              <p className="mt-1 text-xs text-zinc-500">{ui("A new random bomb will spawn for this side.")}</p>
                             </div>
                             <span className="text-2xl font-black text-cyan-200">
                               {potato.respawnMovesRemaining}
@@ -1601,6 +1548,7 @@ function StatCard({
   value: string;
   detail?: string;
 }) {
+  useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 p-3">
       <div className="flex items-start justify-between gap-2">
@@ -1611,7 +1559,7 @@ function StatCard({
       </div>
 
       <p className="mt-2 text-[9px] font-black uppercase tracking-wider text-zinc-600">
-        {label}
+        {ui(label)}
       </p>
 
       {detail && <p className="mt-0.5 text-[10px] text-zinc-700">{detail}</p>}
@@ -1620,12 +1568,13 @@ function StatCard({
 }
 
 function RuleLine({ icon, text }: { icon: string; text: string }) {
+  useUiLanguage();
   return (
     <div className="flex gap-2 rounded-xl border border-white/[0.04] bg-black/15 px-3 py-2">
       <span className="w-7 shrink-0 text-center font-black text-orange-300">
         {icon}
       </span>
-      <span>{text}</span>
+      <span>{ui(text)}</span>
     </div>
   );
 }
@@ -1639,6 +1588,7 @@ function CapturedPiecesGrid({
   capturedWhite: PieceType[];
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   const whiteSymbols: Record<PieceType, string> = {
     p: "♙",
     n: "♘",

@@ -1,3 +1,5 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { ui, useUiLanguage } from "@/i18n/ui";
 import { useRef, useEffect, useMemo, useState } from "react";
 import {
   LanguageSelector,
@@ -384,6 +386,7 @@ export default function ChessCollapseBoard({
   playerColor = "white",
   difficulty = "casual",
 }: VariantAiBoardProps) {
+  useUiLanguage();
   const { language, setLanguage } = useChessLanguage();
   const t = (key: string) => translateChess(language, key, translations);
   const initialFen = useMemo(() => new Chess().fen(), []);
@@ -872,7 +875,7 @@ export default function ChessCollapseBoard({
   return (
     <div
       className="
-        min-h-screen
+        chess-variant-page min-h-[var(--app-height)]
         bg-transparent
         px-4
         py-6
@@ -882,60 +885,8 @@ export default function ChessCollapseBoard({
       "
     >
       <div className="mx-auto max-w-[1500px]">
-        <header
-          className="
-            mb-7
-            flex
-            flex-col
-            gap-4
-            rounded-3xl
-            border
-            border-white/5
-            bg-zinc-900/50
-            px-5
-            py-4
-            shadow-xl
-            shadow-black/20
-            backdrop-blur-md
-            sm:flex-row
-            sm:items-center
-            sm:justify-between
-          "
-        >
-          <div className="flex items-center gap-4">
-            <div
-              className="
-                flex
-                h-12
-                w-12
-                items-center
-                justify-center
-                rounded-2xl
-                border
-                border-red-500/20
-                bg-red-400/10
-                text-3xl
-                shadow-inner
-              "
-              aria-hidden="true"
-            >
-              ◫
-            </div>
+        <ChessPageHeader className="collapse-game-header mb-7 shadow-xl shadow-black/20 backdrop-blur-md" description={<> {ui("The board shrinks · kings have 3 lives · checkmate still wins")} </>}>
 
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-red-400">
-                {t("Chess Variant")}
-              </p>
-
-              <h1 className="mt-0.5 text-2xl font-black tracking-tight text-white">
-                {t("Chess Collapse")}
-              </h1>
-
-              <p className="mt-0.5 text-sm text-zinc-500">
-                The board shrinks · kings have 3 lives · checkmate still wins
-              </p>
-            </div>
-          </div>
 
           <div className="flex flex-wrap items-center justify-end gap-2">
             <LanguageSelector
@@ -966,9 +917,9 @@ export default function ChessCollapseBoard({
             )}
           </div>
           <BoardAnimationToggle />
-        </header>
+        </ChessPageHeader>
 
-        <main className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
+        <main className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
               <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
@@ -986,9 +937,7 @@ export default function ChessCollapseBoard({
 
                 <div className="space-y-3">
                   <div>
-                    <p className="mb-2 text-[10px] font-black uppercase tracking-wider text-zinc-500">
-                      Collapse mode
-                    </p>
+                    <p className="mb-2 text-[10px] font-black uppercase tracking-wider text-zinc-500">{ui("Collapse mode")}</p>
                     <div className="grid grid-cols-2 gap-2">
                       {(
                         [
@@ -1007,7 +956,7 @@ export default function ChessCollapseBoard({
                               : "border-white/10 bg-black/20 text-zinc-500 hover:bg-white/5"
                           }`}
                         >
-                          {label}
+                          {ui(label)}
                         </button>
                       ))}
                     </div>
@@ -1173,11 +1122,7 @@ export default function ChessCollapseBoard({
                       </p>
                     </div>
                     <span className="text-2xl" aria-hidden="true">
-                      {finishedGame.reason === "trapped"
-                        ? "☠"
-                        : finishedGame.reason === "lives"
-                          ? "💥"
-                          : "♚"}
+                      {finishedGame.reason === "trapped" ? "☠" : finishedGame.reason === "lives" ? "💥" : "♚"}
                     </span>
                   </div>
                 </div>
@@ -1334,29 +1279,19 @@ export default function ChessCollapseBoard({
 
                 {displayedCollapse.mode === "squares" ? (
                   <div className="rounded-2xl border border-red-300/15 bg-red-400/[0.05] p-4">
-                    <p className="text-xs font-black uppercase tracking-widest text-red-300">
-                      Standard Squares
-                    </p>
+                    <p className="text-xs font-black uppercase tracking-widest text-red-300">{ui("Standard Squares")}</p>
                     <div className="mt-3 flex items-end justify-between gap-4">
                       <div>
-                        <p className="text-sm font-black text-white">
-                          Next:{" "}
-                          {displayedCollapse.nextSquareHalf === "lower"
-                            ? "ranks 1–4"
-                            : "ranks 5–8"}
+                        <p className="text-sm font-black text-white">{ui("Next:")}{" "}
+                          {displayedCollapse.nextSquareHalf === "lower" ? ui("ranks 1–4") : ui("ranks 5–8")}
                         </p>
-                        <p className="mt-1 text-[10px] text-zinc-600">
-                          One non-king square disappears every 3 moves.
-                        </p>
+                        <p className="mt-1 text-[10px] text-zinc-600">{ui("One non-king square disappears every 3 moves.")}</p>
                       </div>
                       <span className="text-4xl font-black leading-none text-red-200">
                         {displayedCollapse.movesUntilWarning}
                       </span>
                     </div>
-                    <p className="mt-3 text-[10px] text-zinc-600">
-                      Dead squares cannot be entered and kings are never
-                      selected.
-                    </p>
+                    <p className="mt-3 text-[10px] text-zinc-600">{ui("Dead squares cannot be entered and kings are never selected.")}</p>
                   </div>
                 ) : collapseCoreReached(displayedCollapse.bounds) ? (
                   <div className="rounded-2xl border border-emerald-300/15 bg-emerald-400/[0.05] p-4">
@@ -1525,15 +1460,16 @@ function KingLifeCard({
   lives: number;
   hits: number;
 }) {
+  useUiLanguage();
   return (
     <div className="rounded-2xl border border-red-300/10 bg-red-400/[0.04] p-3">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <span className="text-2xl">{symbol}</span>
           <div>
-            <p className="text-xs font-black text-white">{label}</p>
+            <p className="text-xs font-black text-white">{ui(label)}</p>
             <p className="mt-0.5 text-[9px] uppercase tracking-wider text-zinc-600">
-              {hits} collapse hit{hits === 1 ? "" : "s"}
+              {hits}{ui(" collapse hit")}{hits === 1 ? "" : "s"}
             </p>
           </div>
         </div>
@@ -1554,6 +1490,7 @@ function StatCard({
   label: string;
   value: string;
 }) {
+  useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 p-3">
       <div className="flex items-start justify-between gap-2">
@@ -1563,19 +1500,20 @@ function StatCard({
         <span className="text-xl font-black text-white">{value}</span>
       </div>
       <p className="mt-2 text-[9px] font-black uppercase tracking-wider text-zinc-600">
-        {label}
+        {ui(label)}
       </p>
     </div>
   );
 }
 
 function RuleLine({ icon, text }: { icon: string; text: string }) {
+  useUiLanguage();
   return (
     <div className="flex gap-2 rounded-xl border border-white/[0.04] bg-black/15 px-3 py-2">
       <span className="w-7 shrink-0 text-center font-black text-red-300">
         {icon}
       </span>
-      <span>{text}</span>
+      <span>{ui(text)}</span>
     </div>
   );
 }
@@ -1589,6 +1527,7 @@ function CapturedPiecesGrid({
   capturedWhite: PieceType[];
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   const whiteSymbols: Record<PieceType, string> = {
     p: "♙",
     n: "♘",

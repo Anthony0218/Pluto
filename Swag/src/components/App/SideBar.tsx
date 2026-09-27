@@ -1,150 +1,81 @@
+import { ui, useUiLanguage } from "@/i18n/ui";
 import {
-  BarChart3,
-  Home,
-  Settings,
-  Trophy,
-  Users,
+  BookOpen,
+  Gamepad2,
+  LayoutDashboard,
   LogOut,
-  UserRoundPlus,
+  UserRound,
+  Users,
 } from "lucide-react";
-
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { games } from "../../data/games";
+import { learningResources } from "../../data/navigation";
+import ThemeToggle from "./ThemeToggle";
 
-const navigation = [
-  {
-    label: "Home",
-    href: "/",
-    icon: Home,
-  },
-  {
-    label: "Profile",
-    href: "/profile",
-    icon: Users,
-  },
-  {
-    label: "Friends",
-    href: "/friends",
-    icon: UserRoundPlus,
-  },
-  {
-    label: "Games",
-    href: "/games",
-    icon: Trophy,
-  },
-  {
-    label: "Chess",
-    href: "/games/chess",
-    icon: BarChart3,
-  },
-  {
-    label: "Watten",
-    href: "/games/watten",
-    icon: BarChart3,
-  },
-  {
-    label: "Medieval Kingdoms",
-    href: "/games/medieval-kingdoms",
-    icon: Trophy,
-  },
-  {
-    label: "Credits",
-    href: "/credits",
-    icon: Trophy,
-  },
+const links = [
+  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Friends", href: "/friends", icon: Users },
+  { label: "Profile", href: "/profile", icon: UserRound },
 ];
+const sidebarLessons = ["Chess Puzzles", "Chess rules", "Schafkopfen Rules"].flatMap((title) =>
+  learningResources.filter((resource) => resource.title === title),
+);
 
-export default function SideBar() {
-  const { signOut } = useAuth();
+export default function SideBar({ onNavigate }: { onNavigate: () => void }) {
+  useUiLanguage();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
-
-  async function handleLogout() {
-    await signOut();
-    navigate("/login");
-  }
-
   return (
-    <aside className="flex min-h-screen w-64 flex-col border-r border-zinc-200 bg-white">
-      <div className="flex h-16 items-center border-b border-zinc-200 px-6">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-indigo-600">
-            <img
-              src="/pluto-icon.png"
-              alt="Pluto icon"
-              className="h-full w-full object-cover"
-            />
-          </div>
-
-          <span className="text-lg font-bold tracking-tight text-zinc-900">
-            Pluto
-          </span>
-        </div>
-      </div>
-
-      <nav className="flex-1 space-y-1 px-3 py-5">
-        <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
-          Navigation
-        </p>
-
-        {navigation.map((item) => {
-          const Icon = item.icon;
-
-          return (
-            <NavLink
-              key={item.href}
-              to={item.href}
-              className={({ isActive }) =>
-                `group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-                  isActive
-                    ? "bg-indigo-50 text-indigo-700"
-                    : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
-                }`
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  <Icon
-                    size={19}
-                    strokeWidth={isActive ? 2.3 : 2}
-                    className={
-                      isActive
-                        ? "text-indigo-600"
-                        : "text-zinc-400 group-hover:text-zinc-600"
-                    }
-                  />
-
-                  <span>{item.label}</span>
-                </>
-              )}
-            </NavLink>
-          );
-        })}
+    <div className="flex h-full flex-col bg-[#080d1c] text-white">
+      <nav
+        aria-label={ui("Main navigation")}
+        className="flex-1 space-y-2 overflow-y-auto p-4 pt-16"
+      >
+        {links.map(({ label, href, icon: Icon }) => (
+          <NavLink
+            key={href}
+            to={href}
+            onClick={onNavigate}
+            className={({ isActive }) =>
+              `flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium ${isActive ? "bg-indigo-500/15 text-indigo-200" : "text-zinc-300 hover:bg-white/5"}`
+            }
+          >
+            <Icon size={18} />
+            {ui(label)}
+          </NavLink>
+        ))}
+        <details className="rounded-xl border border-white/[0.06] bg-white/[0.025]">
+          <summary className="flex cursor-pointer list-none items-center gap-3 px-3 py-3 text-sm font-medium text-zinc-300 marker:content-none hover:text-white"><Gamepad2 size={18} />{ui("Games")}</summary>
+          <div className="border-t border-white/[0.06] p-1.5">{games.map((game) => <Link key={game.route} to={game.route} onClick={onNavigate} className="block rounded-lg px-3 py-2 text-sm text-zinc-400 hover:bg-white/5 hover:text-white">{ui(game.title)}</Link>)}</div>
+        </details>
+        <details className="rounded-xl border border-white/[0.06] bg-white/[0.025]">
+          <summary className="flex cursor-pointer list-none items-center gap-3 px-3 py-3 text-sm font-medium text-zinc-300 marker:content-none hover:text-white"><BookOpen size={18} />{ui("Learn")}</summary>
+          <div className="border-t border-white/[0.06] p-1.5">{sidebarLessons.map((resource) => <Link key={resource.route} to={resource.route} onClick={onNavigate} className="block rounded-lg px-3 py-2 text-sm text-zinc-400 hover:bg-white/5 hover:text-white">{ui(resource.title)}</Link>)}</div>
+        </details>
       </nav>
-
-      <div className="border-t border-zinc-200 p-3">
-        <NavLink
-          to="/settings"
-          className={({ isActive }) =>
-            `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-              isActive
-                ? "bg-zinc-100 text-zinc-900"
-                : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
-            }`
-          }
-        >
-          <Settings size={19} />
-          Settings
-        </NavLink>
-
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-red-50 hover:text-red-600"
-        >
-          <LogOut size={19} />
-          Log out
-        </button>
+      <div className="space-y-3 border-t border-white/10 p-4">
+        <p className="text-xs text-zinc-400">{ui("Appearance")}</p>
+        <ThemeToggle />
+        {user ? (
+          <button
+            type="button"
+            onClick={async () => {
+              await signOut();
+              onNavigate();
+              navigate("/login");
+            }}
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-zinc-300 hover:bg-red-500/10 hover:text-red-300"
+          >
+            <LogOut size={18} />{ui("Log out")}</button>
+        ) : (
+          <Link
+            to="/login"
+            onClick={onNavigate}
+            className="block rounded-xl bg-indigo-500 px-3 py-2.5 text-center text-sm font-semibold"
+          >{ui("Log in")}</Link>
+        )}
       </div>
-    </aside>
+    </div>
   );
 }

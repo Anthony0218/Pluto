@@ -1,3 +1,6 @@
+import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { ui, useUiLanguage } from "@/i18n/ui";
+import { useAppLanguage } from "@/i18n/languageStore";
 import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { Chess, type Square } from "chess.js";
@@ -557,25 +560,7 @@ const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
   },
 };
 
-function getInitialLanguage(): Language {
-  if (typeof window === "undefined") {
-    return "en";
-  }
 
-  const stored = window.localStorage.getItem(CHESS_LANGUAGE_STORAGE_KEY);
-
-  if (
-    stored === "en" ||
-    stored === "de" ||
-    stored === "bar" ||
-    stored === "ko" ||
-    stored === "ru"
-  ) {
-    return stored;
-  }
-
-  return "en";
-}
 
 /* =========================================================
    COMPONENT
@@ -593,7 +578,8 @@ export default function CapitalismChessBoard({
   playerColor = "white",
   difficulty = "casual",
 }: VariantAiBoardProps) {
-  const [language, setLanguage] = useState<Language>(getInitialLanguage);
+  useUiLanguage();
+  const { language, setLanguage } = useAppLanguage();
 
   const t = (key: string) => {
     if (language === "en") {
@@ -601,10 +587,10 @@ export default function CapitalismChessBoard({
     }
 
     if (language === "bar") {
-      return translations.bar[key] ?? translations.de[key] ?? key;
+      return translations.bar[key] ?? translations.de[key] ?? ui(key);
     }
 
-    return translations[language][key] ?? key;
+    return translations[language][key] ?? ui(key);
   };
 
   function changeLanguage(nextLanguage: Language) {
@@ -1272,7 +1258,7 @@ export default function CapitalismChessBoard({
   return (
     <div
       className="
-        min-h-screen
+        chess-variant-page min-h-[var(--app-height)]
         bg-transparent
         px-4
         py-6
@@ -1283,8 +1269,7 @@ export default function CapitalismChessBoard({
       <div className="mx-auto max-w-[1500px]">
         {/* HEADER */}
 
-        <header
-          className="
+        <ChessPageHeader icon={<CoinIcon />} className="
             mb-7
             flex
             flex-col
@@ -1301,49 +1286,8 @@ export default function CapitalismChessBoard({
             sm:flex-row
             sm:items-center
             sm:justify-between
-          "
-        >
-          <div className="flex items-center gap-4">
-            <div
-              className="
-                flex
-                h-12
-                w-12
-                items-center
-                justify-center
-                rounded-2xl
-                border
-                border-amber-400/20
-                bg-amber-400/10
-                text-3xl
-                shadow-inner
-              "
-            >
-              <CoinIcon size="lg" />
-            </div>
+          " description={<> {t("Earn coins. Chase bounties. Spend the treasury.")} </>}>
 
-            <div>
-              <p
-                className="
-                  text-[10px]
-                  font-bold
-                  uppercase
-                  tracking-[0.28em]
-                  text-amber-400
-                "
-              >
-                {t("Chess Variant")}
-              </p>
-
-              <h1 className="mt-0.5 text-2xl font-black tracking-tight text-white">
-                {t("Capitalism Chess")}
-              </h1>
-
-              <p className="mt-0.5 text-sm text-zinc-500">
-                {t("Earn coins. Chase bounties. Spend the treasury.")}
-              </p>
-            </div>
-          </div>
 
           <div className="flex flex-wrap items-center justify-end gap-2">
             <a
@@ -1380,20 +1324,20 @@ export default function CapitalismChessBoard({
             )}
           </div>
           <BoardAnimationToggle />
-        </header>
+        </ChessPageHeader>
 
         {/* ECONOMY STRIP */}
 
         <section className="mb-6 grid gap-3 rounded-3xl border border-amber-400/10 bg-amber-400/[0.035] px-5 py-4 sm:grid-cols-2 lg:grid-cols-4">
           <EconomyRule
             icon="🪙"
-            title="No passive income"
+            title={ui("No passive income")}
             detail="Moving and normal captures give no automatic coins."
           />
 
           <EconomyRule
             icon="⚔"
-            title="Earn through contracts"
+            title={ui("Earn through contracts")}
             detail="Coins come only from missions and bounty targets."
           />
 
@@ -1412,7 +1356,7 @@ export default function CapitalismChessBoard({
 
         {/* MAIN */}
 
-        <main className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)_320px]">
+        <main className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_320px]">
           {/* LEFT */}
 
           <aside className="min-w-0">
@@ -1452,9 +1396,7 @@ export default function CapitalismChessBoard({
 
                 <div className="mb-3 flex items-center justify-between rounded-xl bg-amber-400/[0.06] px-3 py-2">
                   <span className="text-xs font-black text-zinc-300">
-                    {currentSide === "white"
-                      ? `♔ ${t("White")}`
-                      : `♚ ${t("Black")}`}
+                    {currentSide === "white" ? `♔ ${t("White")}` : `♚ ${t("Black")}`}
                   </span>
 
                   <span className="flex items-center gap-1.5 text-sm font-black text-amber-200">
@@ -1523,9 +1465,7 @@ export default function CapitalismChessBoard({
                 </div>
 
                 <div className="mb-3 rounded-xl bg-amber-400/[0.06] px-3 py-2 text-xs font-black text-amber-200">
-                  {currentSide === "white"
-                    ? `♔ ${t("White")}`
-                    : `♚ ${t("Black")}`}{" "}
+                  {currentSide === "white" ? `♔ ${t("White")}` : `♚ ${t("Black")}`}{" "}
                   · {capitalState.coins[currentSide]} $
                 </div>
 
@@ -1690,9 +1630,7 @@ export default function CapitalismChessBoard({
 
                               <td className="px-2 py-2.5">
                                 <span className="text-xs text-zinc-500">
-                                  {record.color === "w"
-                                    ? `♔ ${t("White")}`
-                                    : `♚ ${t("Black")}`}
+                                  {record.color === "w" ? `♔ ${t("White")}` : `♚ ${t("Black")}`}
                                 </span>
                               </td>
 
@@ -1745,11 +1683,7 @@ export default function CapitalismChessBoard({
                     </div>
 
                     <span className="text-sm font-bold text-zinc-300">
-                      {winner === "draw"
-                        ? t("Draw")
-                        : winner === "white"
-                          ? t("White wins")
-                          : t("Black wins")}
+                      {winner === "draw" ? t("Draw") : winner === "white" ? t("White wins") : t("Black wins")}
                     </span>
                   </div>
                 </div>
@@ -1852,8 +1786,7 @@ export default function CapitalismChessBoard({
                 </div>
 
                 <p className="mt-3 text-center text-[9px] text-zinc-700">
-                  <span className="inline-flex items-center gap-1">
-                    Start: <CoinIcon size="xs" /> {STARTING_COINS}
+                  <span className="inline-flex items-center gap-1">{ui("Start:")}<CoinIcon size="xs" /> {STARTING_COINS}
                   </span>
                 </p>
               </section>
@@ -1863,7 +1796,7 @@ export default function CapitalismChessBoard({
               <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
                 <PanelTitle
                   title={t("Contracts")}
-                  subtitle="Bounties + missions"
+                  subtitle={ui("Bounties + missions")}
                 />
 
                 <div className="space-y-3">
@@ -2127,6 +2060,7 @@ function EconomyRule({
   title: string;
   detail: string;
 }) {
+  useUiLanguage();
   return (
     <div className="flex items-center gap-3">
       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-400/10 text-lg font-black text-amber-300">
@@ -2134,7 +2068,7 @@ function EconomyRule({
       </span>
 
       <div>
-        <p className="text-xs font-black text-zinc-200">{title}</p>
+        <p className="text-xs font-black text-zinc-200">{ui(title)}</p>
 
         <p className="mt-1 text-[10px] text-zinc-600">{detail}</p>
       </div>
@@ -2143,6 +2077,7 @@ function EconomyRule({
 }
 
 function Panel({ children }: { children: ReactNode }) {
+  useUiLanguage();
   return (
     <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
       {children}
@@ -2159,11 +2094,12 @@ function PanelTitle({
   subtitle: string;
   compact?: boolean;
 }) {
+  useUiLanguage();
   return (
     <div className={compact ? "" : "mb-5"}>
-      <h2 className="text-sm font-bold text-zinc-100">{title}</h2>
+      <h2 className="text-sm font-bold text-zinc-100">{ui(title)}</h2>
 
-      <p className="mt-1.5 text-xs text-zinc-500">{subtitle}</p>
+      <p className="mt-1.5 text-xs text-zinc-500">{ui(subtitle)}</p>
     </div>
   );
 }
@@ -2179,6 +2115,7 @@ function CapitalismGameControls({
   undoDisabled: boolean;
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   return (
     <div className="grid grid-cols-2 gap-2">
       <button
@@ -2215,6 +2152,7 @@ function CapturedPiecesGrid({
   capturedWhite: PieceType[];
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   function renderPieces(pieces: PieceType[], color: "w" | "b") {
     return (
       <div className="mt-2 flex min-h-8 flex-wrap gap-1">
@@ -2256,6 +2194,7 @@ function CapturedPiecesGrid({
 }
 
 function CoinIcon({ size = "sm" }: { size?: "xs" | "sm" | "md" | "lg" }) {
+  useUiLanguage();
   const sizeClass = {
     xs: "h-4 w-4 text-[9px]",
     sm: "h-5 w-5 text-[10px]",
@@ -2265,7 +2204,7 @@ function CoinIcon({ size = "sm" }: { size?: "xs" | "sm" | "md" | "lg" }) {
 
   return (
     <span
-      aria-label="coin"
+      aria-label={ui("coin")}
       className={`
         inline-flex
         shrink-0
@@ -2307,6 +2246,7 @@ function ShopPieceRow({
   side: CapitalSide;
   onBuy: (square: Square) => void;
 }) {
+  useUiLanguage();
   const color = side === "white" ? "w" : "b";
 
   return (
@@ -2318,7 +2258,7 @@ function ShopPieceRow({
           </span>
 
           <div className="min-w-0">
-            <p className="truncate text-xs font-black text-zinc-200">{label}</p>
+            <p className="truncate text-xs font-black text-zinc-200">{ui(label)}</p>
 
             <span className="mt-1 inline-flex items-center gap-1 text-[10px] font-black text-amber-300">
               <CoinIcon size="xs" />
@@ -2373,6 +2313,7 @@ function TreasuryCard({
   name: string;
   coins: number;
 }) {
+  useUiLanguage();
   return (
     <div
       className={`
@@ -2411,6 +2352,7 @@ function ContractCard({
   chess: Chess;
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   const target = state.bountyTargets[side];
 
   const mission = state.missions[side];
@@ -2448,9 +2390,7 @@ function ContractCard({
         </div>
 
         <p className="mt-1 text-xs font-black text-zinc-200">
-          {target && targetPiece
-            ? `${pieceSymbol(targetPiece.color, targetPiece.type)} ${target}`
-            : t("No target")}
+          {target && targetPiece ? `${pieceSymbol(targetPiece.color, targetPiece.type)} ${target}` : t("No target")}
         </p>
       </div>
 
@@ -2508,6 +2448,7 @@ function PowerButton({
   onClick: () => void;
   t: (key: string) => string;
 }) {
+  useUiLanguage();
   return (
     <button
       type="button"
@@ -2532,7 +2473,7 @@ function PowerButton({
       `}
     >
       <div className="flex items-center justify-between gap-3">
-        <span className="text-xs font-black text-zinc-200">{title}</span>
+        <span className="text-xs font-black text-zinc-200">{ui(title)}</span>
 
         <span
           className={`
@@ -2572,6 +2513,7 @@ function StatCard({
   value: string;
   detail: string;
 }) {
+  useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3">
       <div className="flex items-center justify-between gap-2">
@@ -2581,7 +2523,7 @@ function StatCard({
       </div>
 
       <p className="mt-2 text-[10px] font-black uppercase tracking-wider text-zinc-600">
-        {label}
+        {ui(label)}
       </p>
 
       <p className="mt-1 text-[10px] text-zinc-700">{detail}</p>
@@ -2590,9 +2532,10 @@ function StatCard({
 }
 
 function MarketRow({ label, value }: { label: string; value: number }) {
+  useUiLanguage();
   return (
     <div className="flex items-center justify-between gap-3 rounded-xl border border-white/5 bg-black/20 px-3 py-2.5">
-      <span className="text-xs text-zinc-500">{label}</span>
+      <span className="text-xs text-zinc-500">{ui(label)}</span>
 
       <span className="text-xs font-black text-amber-300">{value} $</span>
     </div>
@@ -2639,28 +2582,23 @@ function ChessLanguageSelector({
   onChange: (language: Language) => void;
   label: string;
 }) {
+  useUiLanguage();
   return (
     <label className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-400">
       <span>🌐</span>
 
-      <span className="hidden sm:inline">{label}</span>
+      <span className="hidden sm:inline">{ui(label)}</span>
 
       <select
         value={language}
         onChange={(event) => onChange(event.target.value as Language)}
         className="bg-transparent text-xs font-bold text-zinc-200 outline-none [color-scheme:dark]"
       >
-        <option value="en" className="bg-zinc-900">
-          English
-        </option>
+        <option value="en" className="bg-zinc-900">{ui("English")}</option>
 
-        <option value="de" className="bg-zinc-900">
-          Deutsch
-        </option>
+        <option value="de" className="bg-zinc-900">{ui("Deutsch")}</option>
 
-        <option value="bar" className="bg-zinc-900">
-          Boarisch
-        </option>
+        <option value="bar" className="bg-zinc-900">{ui("Boarisch")}</option>
 
         <option value="ko" className="bg-zinc-900">
           한국어
