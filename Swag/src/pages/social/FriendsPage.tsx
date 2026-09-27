@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Check, Search, UserPlus, Users, X } from "lucide-react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Bell, Check, Gamepad2, Mail, Search, UserPlus, Users, X } from "lucide-react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../context/AuthContext";
 import type { Friend, FriendRequest, PublicProfile } from "../../types/social";
 import FriendAvatar from "../../components/social/FriendAvatar";
 import FriendChat from "../../components/social/FriendChat";
+import { useDashboardData, type DashboardNotification } from "@/hooks/useDashboardData";
+import { ui, useUiLanguage } from "@/i18n/ui";
 
 type IncomingRequest = FriendRequest & {
   sender: PublicProfile | null;
@@ -19,7 +21,9 @@ function profileLabel(profile: PublicProfile) {
 }
 
 export default function FriendsPage() {
+  useUiLanguage();
   const { user, loading: authLoading } = useAuth();
+  const { notifications } = useDashboardData();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const requestedFriendId = searchParams.get("friend");
@@ -245,6 +249,7 @@ export default function FriendsPage() {
 
         <div className="grid gap-5 lg:grid-cols-[360px_1fr]">
           <aside className="space-y-4">
+            <FriendNotifications items={notifications} />
             <section className="rounded-3xl border border-white/10 bg-zinc-900/80 p-4 shadow-xl shadow-black/10 backdrop-blur-md">
               <div className="flex items-center gap-2">
                 <UserPlus size={18} className="text-sky-400" />
@@ -425,4 +430,15 @@ export default function FriendsPage() {
       </div>
     </main>
   );
+}
+
+function FriendNotifications({ items }: { items: DashboardNotification[] }) {
+  return <section className="overflow-hidden rounded-3xl border border-indigo-400/20 bg-gradient-to-br from-indigo-500/10 to-zinc-900/80 shadow-xl shadow-black/10 backdrop-blur-md">
+    <div className="flex items-center gap-2 border-b border-white/10 px-4 py-4"><Bell size={18} className="text-indigo-300" /><h2 className="font-bold text-white">{ui("Friend notifications")}</h2>{items.length > 0 && <span className="ml-auto rounded-full bg-indigo-400/15 px-2 py-1 text-[10px] font-black text-indigo-200">{items.length}</span>}</div>
+    {items.length ? <div className="divide-y divide-white/[0.06]">{items.slice(0, 6).map((item) => {
+      const Icon = item.kind === "friend_request" ? Users : item.gameCode ? Gamepad2 : Mail;
+      const destination = item.kind === "friend_request" ? "/friends" : `/friends${item.senderId ? `?friend=${encodeURIComponent(item.senderId)}` : ""}`;
+      return <Link key={item.id} to={destination} className="flex items-center gap-3 px-4 py-3 transition hover:bg-white/[0.04]"><Icon size={17} className="shrink-0 text-indigo-300" /><span className="min-w-0 flex-1"><strong className="block text-sm text-white">{ui(item.title)}</strong><small className="block truncate text-xs text-zinc-400">{item.senderName || ui("Player")}{item.gameCode ? ` · ${ui("Room code")}: ${item.gameCode}` : ""}</small></span></Link>;
+    })}</div> : <p className="px-4 py-5 text-sm text-zinc-400">{ui("No friend notifications yet.")}</p>}
+  </section>;
 }

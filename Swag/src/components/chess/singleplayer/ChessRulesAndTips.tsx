@@ -1,7 +1,7 @@
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Chess, type Square } from "chess.js";
 import {
   getCompletedLichessPuzzles,
@@ -5359,7 +5359,10 @@ function PuzzlesTab() {
 
 export default function ChessRulesAndTips() {
   useUiLanguage();
-  const [activeTab, setActiveTab] = useState<TabKey>("rules");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedTab = searchParams.get("tab");
+  const activeTab: TabKey = requestedTab === "puzzles" || requestedTab === "openings" || requestedTab === "situations" ? requestedTab : "rules";
+  const setActiveTab = (tab: TabKey) => setSearchParams(current => { const next = new URLSearchParams(current); next.set("tab", tab); return next; }, { replace: true });
   const { language, setLanguage } = useAppLanguage();
   const t = (value: string) => translate(language, value);
 

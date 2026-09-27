@@ -2,14 +2,24 @@ import { games } from "./games";
 
 export const learningResources = [
   {
-    title: "Chess rules",
-    description: "Learn the board, pieces and legal moves.",
-    route: "/games/chess/rules",
+    title: "Chess Puzzles",
+    description: "Sharpen your tactics and pattern recognition.",
+    route: "/games/chess/rules?tab=puzzles",
   },
   {
     title: "Watten rules",
     description: "Discover the cards, scoring and strategy.",
     route: "/games/watten/rules",
+  },
+  {
+    title: "Schafkopfen Rules",
+    description: "Learn the cards, trump order and team play.",
+    route: "/games/schafkopf?rules=open#rules",
+  },
+  {
+    title: "Chess rules",
+    description: "Learn the board, pieces and legal moves.",
+    route: "/games/chess/rules",
   },
   {
     title: "Chess variants",

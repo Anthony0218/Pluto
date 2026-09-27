@@ -9,7 +9,7 @@ export default function PlayShowcase() {
   const visibleGames = gameList.slice(0, 4);
 
   return (
-    <div className="relative">
+    <div className="relative mx-auto w-full max-w-[540px]">
       {/* GLOW */}
       <div
         className="
@@ -42,7 +42,7 @@ export default function PlayShowcase() {
               group
               relative
               block
-              min-h-[300px]
+              min-h-[240px]
               overflow-hidden
               rounded-[22px]
               border border-white/[0.07]
@@ -122,7 +122,7 @@ export default function PlayShowcase() {
         )}
 
         {/* OTHER GAMES */}
-        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+        <div className="mt-3 grid grid-cols-3 gap-2 sm:gap-3">
           {visibleGames.slice(1).map((game) => (
             <Link
               key={game.route}
@@ -138,7 +138,7 @@ export default function PlayShowcase() {
                 hover:bg-white/[0.04]
               "
             >
-              <div className="aspect-[16/10] overflow-hidden bg-black/20">
+              <div className="aspect-[16/9] overflow-hidden bg-black/20">
                 <img
                   src={game.image}
                   alt={game.name}
@@ -151,7 +151,7 @@ export default function PlayShowcase() {
                 />
               </div>
 
-              <div className="p-4">
+              <div className="p-2.5 sm:p-3">
                 <p className="text-sm font-semibold text-white">{game.name}</p>
 
                 <p className="mt-1 text-[11px] text-zinc-600">

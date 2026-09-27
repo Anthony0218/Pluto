@@ -27,7 +27,7 @@ export default function CommunityShowcase() {
                 ? "Check your dashboard for daily challenges."
                 : "Log in to track your daily goal.")}
         </p>
-        {challenge && (
+        {challenge && challenge.progress !== null && (
           <div className="mt-4">
             <progress
               aria-label={ui("Daily challenge progress")}

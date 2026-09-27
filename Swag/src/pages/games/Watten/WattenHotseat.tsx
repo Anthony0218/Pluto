@@ -1,4 +1,5 @@
 import { useAppLanguage } from "@/i18n/languageStore";
+import "./wattenMenus.css";
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { WattenVariant, WattenPlayerInfo } from "../../../utils/types";
@@ -57,9 +58,9 @@ export default function WattenHotseat() {
   }
 
   return (
-    <main className="min-h-screen bg-transparent px-4 py-10 text-white">
+    <main className="watten-menu min-h-screen px-4 py-10 text-white">
       <div className="mx-auto max-w-2xl">
-        <div className="rounded-3xl border border-white/10 bg-zinc-950/90 p-8 shadow-2xl">
+        <div className="watten-menu__panel rounded-3xl border border-white/10 bg-zinc-950/90 p-8 shadow-2xl">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">

@@ -2,17 +2,13 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 import type { Friend } from "../types/social";
+import type { DailyChallenge } from "../data/dashboard";
+import { getCompletedLichessPuzzles } from "../components/chess/singleplayer/lichessPuzzleSource";
 
 export type DashboardActivity = {
   streak: number;
   recent_games: { game_route: string; last_visited_at: string }[];
-  challenge: {
-    title: string;
-    description: string;
-    target: number;
-    progress: number;
-    expires_at: string;
-  } | null;
+  challenge: DailyChallenge | null;
 };
 export type DashboardNotification = {
   id: string;
@@ -22,6 +18,8 @@ export type DashboardNotification = {
   createdAt: string;
   gameCode?: string | null;
   gameRoute?: string | null;
+  senderName?: string;
+  senderId?: string;
 };
 
 export function useDashboardData() {
@@ -63,6 +61,14 @@ export function useDashboardData() {
           supabase.from("friend_messages").select("id,sender_id,message_type,game_code,game_route,created_at").eq("receiver_id", userId).order("created_at", { ascending: false }).limit(12),
           supabase.from("friend_requests").select("id,sender_id,created_at").eq("receiver_id", userId).eq("status", "pending").order("created_at", { ascending: false }).limit(12),
         ]);
+        const activity = activityResult.error ? null : activityResult.data as DashboardActivity;
+        if (activity?.challenge?.category === "puzzle") {
+          try {
+            const completed = await getCompletedLichessPuzzles(100);
+            const dayStart = Date.parse(activity.challenge.expires_at) - 86_400_000;
+            activity.challenge.progress = completed.filter(puzzle => Date.parse(puzzle.completedAt) >= dayStart && Date.parse(puzzle.completedAt) < Date.parse(activity.challenge!.expires_at)).length;
+          } catch { activity.challenge.progress = null; }
+        }
         const ids = [
           ...new Set(
             (friendships.data ?? []).map((row) =>
@@ -95,14 +101,18 @@ export function useDashboardData() {
         const notifications: DashboardNotification[] = [
           ...(requests.data ?? []).map((request) => ({ id: `request-${request.id}`, kind: "friend_request" as const, title: "Friend request", detail: profileById.get(request.sender_id)?.display_name || profileById.get(request.sender_id)?.username || "A Pluto player", createdAt: request.created_at })),
           ...(messages.data ?? []).map((message) => ({ id: `message-${message.id}`, kind: "message" as const, title: message.message_type === "game_code" ? "Game invite" : "New message", detail: message.message_type === "game_code" ? `${profileById.get(message.sender_id)?.display_name || profileById.get(message.sender_id)?.username || "A friend"} sent code ${message.game_code || ""}` : `${profileById.get(message.sender_id)?.display_name || profileById.get(message.sender_id)?.username || "A friend"} messaged you`, createdAt: message.created_at, gameCode: message.game_code, gameRoute: message.game_route })),
-        ].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
+        ].map(notification => {
+          const source = notification.kind === "friend_request"
+            ? (requests.data ?? []).find(row => `request-${row.id}` === notification.id)
+            : (messages.data ?? []).find(row => `message-${row.id}` === notification.id);
+          const sender = source ? profileById.get(source.sender_id) : undefined;
+          return { ...notification, senderName: sender?.display_name || sender?.username || undefined, senderId: source?.sender_id };
+        }).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
         if (!disposed)
           setState({
             userId: userId,
-            activity: activityResult.error
-              ? null
-              : (activityResult.data as DashboardActivity),
-            friends: (profiles.data ?? []) as Friend[],
+            activity,
+            friends: (profiles.data ?? []).filter(profile => ids.includes(profile.id)) as Friend[],
             onlineIds: (presence.data ?? []).map((row) => row.user_id),
             loading: false,
             activityError: !!activityResult.error,

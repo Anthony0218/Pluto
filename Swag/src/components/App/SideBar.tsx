@@ -10,45 +10,27 @@ import {
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { games } from "../../data/games";
-import FriendAvatar from "../social/FriendAvatar";
+import { learningResources } from "../../data/navigation";
 import ThemeToggle from "./ThemeToggle";
 
 const links = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Games", href: "/games", icon: Gamepad2 },
-  { label: "Learn", href: "/learn", icon: BookOpen },
   { label: "Friends", href: "/friends", icon: Users },
   { label: "Profile", href: "/profile", icon: UserRound },
 ];
+const sidebarLessons = ["Chess Puzzles", "Chess rules", "Schafkopfen Rules"].flatMap((title) =>
+  learningResources.filter((resource) => resource.title === title),
+);
 
 export default function SideBar({ onNavigate }: { onNavigate: () => void }) {
   useUiLanguage();
-  const { user, profile, signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
   return (
     <div className="flex h-full flex-col bg-[#080d1c] text-white">
-      <div className="border-b border-white/10 p-5 pr-14">
-        {profile ? (
-          <Link
-            to="/profile"
-            onClick={onNavigate}
-            className="flex items-center gap-3"
-          >
-            <FriendAvatar profile={profile} />
-            <div className="min-w-0">
-              <p className="truncate font-semibold">
-                {profile.username || profile.display_name || "Player"}
-              </p>
-              <p className="text-xs text-zinc-400">{ui("Your Pluto account")}</p>
-            </div>
-          </Link>
-        ) : (
-          <p className="font-semibold">{ui("Explore Pluto")}</p>
-        )}
-      </div>
       <nav
         aria-label={ui("Main navigation")}
-        className="flex-1 space-y-1 overflow-y-auto p-3"
+        className="flex-1 space-y-2 overflow-y-auto p-4 pt-16"
       >
         {links.map(({ label, href, icon: Icon }) => (
           <NavLink
@@ -63,18 +45,13 @@ export default function SideBar({ onNavigate }: { onNavigate: () => void }) {
             {ui(label)}
           </NavLink>
         ))}
-        <details className="pt-3">
-          <summary className="cursor-pointer px-3 py-2 text-xs font-semibold text-zinc-400">{ui("Browse games")}</summary>
-          {games.map((game) => (
-            <Link
-              key={game.route}
-              to={game.route}
-              onClick={onNavigate}
-              className="block rounded-xl px-5 py-2.5 text-sm text-zinc-300 hover:bg-white/5"
-            >
-              {ui(game.title)}
-            </Link>
-          ))}
+        <details className="rounded-xl border border-white/[0.06] bg-white/[0.025]">
+          <summary className="flex cursor-pointer list-none items-center gap-3 px-3 py-3 text-sm font-medium text-zinc-300 marker:content-none hover:text-white"><Gamepad2 size={18} />{ui("Games")}</summary>
+          <div className="border-t border-white/[0.06] p-1.5">{games.map((game) => <Link key={game.route} to={game.route} onClick={onNavigate} className="block rounded-lg px-3 py-2 text-sm text-zinc-400 hover:bg-white/5 hover:text-white">{ui(game.title)}</Link>)}</div>
+        </details>
+        <details className="rounded-xl border border-white/[0.06] bg-white/[0.025]">
+          <summary className="flex cursor-pointer list-none items-center gap-3 px-3 py-3 text-sm font-medium text-zinc-300 marker:content-none hover:text-white"><BookOpen size={18} />{ui("Learn")}</summary>
+          <div className="border-t border-white/[0.06] p-1.5">{sidebarLessons.map((resource) => <Link key={resource.route} to={resource.route} onClick={onNavigate} className="block rounded-lg px-3 py-2 text-sm text-zinc-400 hover:bg-white/5 hover:text-white">{ui(resource.title)}</Link>)}</div>
         </details>
       </nav>
       <div className="space-y-3 border-t border-white/10 p-4">

@@ -1,4 +1,5 @@
 import { useAppLanguage } from "@/i18n/languageStore";
+import "./wattenMenus.css";
 import { useCallback } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, BookOpen, Gamepad2, Users } from "lucide-react";
@@ -26,9 +27,18 @@ export default function Watten() {
   const heroImage = "/images/watten-game-icon.png";
 
   return (
-    <main className="min-h-screen bg-transparent px-4 py-10 text-white sm:px-6">
+    <main className="watten-menu min-h-screen px-4 py-10 text-white sm:px-6">
       <div className="mx-auto max-w-5xl">
-        <div className="rounded-[30px] border border-white/10 bg-zinc-950/90 p-6 shadow-2xl shadow-black/30 sm:p-8">
+        <div className="watten-menu__panel rounded-[30px] border border-white/10 bg-zinc-950/90 p-6 shadow-2xl shadow-black/30 sm:p-8">
+          <div className="watten-menu__masthead" aria-hidden="true">
+            <span className="watten-menu__seal">W</span>
+            <div className="watten-menu__hand">
+              <img src="/images/bavarian/herz-king.png" alt="" />
+              <img src="/images/bavarian/schellen-7.png" alt="" />
+              <img src="/images/bavarian/eichel-7.png" alt="" />
+            </div>
+            <span className="watten-menu__ornament">✦</span>
+          </div>
           <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-400">
@@ -56,7 +66,7 @@ export default function Watten() {
           <section className="mt-8 grid gap-5 lg:grid-cols-2">
             <Link
               to="/games/watten/hotseat"
-              className="group rounded-3xl border border-amber-400/20 bg-black/20 p-6 shadow-xl transition hover:border-amber-400/40 hover:bg-amber-400/[0.04] sm:p-7"
+              className="watten-menu__mode watten-menu__mode--local group rounded-3xl border border-amber-400/20 bg-black/20 p-6 shadow-xl transition hover:border-amber-400/40 hover:bg-amber-400/[0.04] sm:p-7"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-amber-400/20 bg-amber-400/10 text-amber-300">
@@ -108,7 +118,7 @@ export default function Watten() {
 
             <Link
               to="/games/watten/multiplayer"
-              className="group rounded-3xl border border-emerald-400/20 bg-black/20 p-6 shadow-xl transition hover:border-emerald-400/40 hover:bg-emerald-400/[0.04] sm:p-7"
+              className="watten-menu__mode watten-menu__mode--online group rounded-3xl border border-emerald-400/20 bg-black/20 p-6 shadow-xl transition hover:border-emerald-400/40 hover:bg-emerald-400/[0.04] sm:p-7"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-400/20 bg-emerald-400/10 text-emerald-300">

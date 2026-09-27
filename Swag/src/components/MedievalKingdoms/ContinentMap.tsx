@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Crown, Flag, Swords } from "lucide-react";
 
 import {
   CONTINENT_MAP,
@@ -39,15 +40,7 @@ export default function ContinentMap() {
 
   const [hoveredPath, setHoveredPath] = useState<WorldPathRegion | null>(null);
 
-  const [debugMask, setDebugMask] = useState<{
-    r: number;
-    g: number;
-    b: number;
-    x: number;
-    y: number;
-    place: string | null;
-    path: string | null;
-  } | null>(null);
+  const [selectedCampaign, setSelectedCampaign] = useState("brickstone-fortress");
   const borderCanvasRef = useRef<HTMLCanvasElement | null>(null);
   function drawHoveredRegionBorder(maskColor: [number, number, number] | null) {
     const maskCanvas = maskCanvasRef.current;
@@ -210,18 +203,6 @@ export default function ContinentMap() {
 
     const path = findWorldPathByColor(r, g, b);
 
-    setDebugMask({
-      r,
-      g,
-      b,
-      x,
-      y,
-
-      place: place?.name ?? null,
-
-      path: path?.id ?? null,
-    });
-
     return {
       place,
       path,
@@ -253,36 +234,21 @@ export default function ContinentMap() {
     : false;
 
   return (
-    <div className="mx-auto w-full max-w-[1600px] text-[#f5e4c1]">
-      <div className="mb-4">
+    <div className="medieval-world__content text-[#f5e4c1]">
+      <div className="medieval-world__heading">
+        <span className="medieval-world__crest" aria-hidden="true"><Crown size={28} /></span>
         <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#d3a448]">
           Medieval Kingdoms
         </p>
 
-        <h1 className="text-3xl font-black text-[#ffe7ad]">Campaign Map</h1>
+        <h1 className="text-3xl font-black text-[#ffe7ad]">The Kingdoms Await</h1>
 
         <p className="mt-1 text-sm text-[#bda77f]">
-          Begin in Moon Ville. Completing a campaign unlocks the next region.
-          First Light is the final campaign.
+          Raise your banner. Choose a stronghold. Write your kingdom's story.
         </p>
       </div>
 
-      {debugMask && (
-        <div className="fixed left-4 top-4 z-[300] rounded-xl border border-yellow-400 bg-black/90 p-3 font-mono text-xs text-white shadow-2xl">
-          <div>
-            Pixel: {debugMask.x}, {debugMask.y}
-          </div>
-
-          <div>
-            RGB: {debugMask.r}, {debugMask.g}, {debugMask.b}
-          </div>
-
-          <div>Place: {debugMask.place ?? "none"}</div>
-
-          <div>Path: {debugMask.path ?? "none"}</div>
-        </div>
-      )}
-
+      <div className="medieval-world__map-stage">
       <div
         onMouseMove={(event) => {
           const hit = getMaskHitAtEvent(event);
@@ -294,7 +260,6 @@ export default function ContinentMap() {
           setHoveredPlace(null);
           setHoveredPath(null);
 
-          setDebugMask(null);
         }}
         onClick={(event) => {
           const hit = getMaskHitAtEvent(event);
@@ -304,7 +269,7 @@ export default function ContinentMap() {
           }
         }}
         className={`
-          relative
+          medieval-world__map relative
           overflow-hidden
           rounded-2xl
           border-2
@@ -354,6 +319,7 @@ export default function ContinentMap() {
                 openCampaign(place);
               }}
               disabled={!unlocked}
+              aria-label={completed ? `${place.name} — campaign complete` : place.name}
               title={
                 unlocked
                   ? place.name
@@ -381,7 +347,7 @@ export default function ContinentMap() {
     completed
       ? "border-emerald-300 bg-emerald-950/90 text-emerald-100"
       : unlocked
-        ? "border-[#f1c968] bg-[#62451f]/95 text-[#ffe8aa] opacity-0 hover:opacity-100 hover:scale-110 hover:bg-[#7a5626]"
+        ? "border-[#f1c968] bg-[#62451f]/95 text-[#ffe8aa] opacity-80 hover:opacity-100 hover:scale-110 hover:bg-[#7a5626] focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-200"
         : "border-stone-500 bg-stone-900/80 text-stone-300 opacity-0 hover:opacity-100"
   }
 `}
@@ -410,7 +376,7 @@ export default function ContinentMap() {
               <ContinentHoverArrow marker={hoveredPlace.marker} />
             )}
 
-            <div className="pointer-events-none absolute bottom-5 left-1/2 z-50 w-[min(90%,460px)] -translate-x-1/2 rounded-2xl border-2 border-[#b98a45]/80 bg-[#302116]/95 p-4 text-center shadow-2xl backdrop-blur-md">
+            <div className="medieval-world__tooltip pointer-events-none absolute bottom-5 left-1/2 z-50 w-[min(90%,460px)] -translate-x-1/2 rounded-2xl border-2 border-[#b98a45]/80 bg-[#302116]/95 p-4 text-center shadow-2xl backdrop-blur-md">
               <div
                 className={`
                   text-[10px]
@@ -460,6 +426,18 @@ export default function ContinentMap() {
           </>
         )}
       </div>
+      </div>
+      <footer className="medieval-world__council">
+        <Link to="/games" className="medieval-world__back">← Games</Link>
+        <div className="medieval-world__progress"><Flag size={16} /><span>{WORLD_PLACES.filter((place) => isCampaignCompleted(place.campaignId, progress)).length} / {WORLD_PLACES.length} realms conquered</span></div>
+        <div className="medieval-world__travel">
+          <label className="sr-only" htmlFor="campaign-destination">Choose a realm</label>
+          <select id="campaign-destination" value={selectedCampaign} onChange={(event) => setSelectedCampaign(event.target.value)}>
+            {WORLD_PLACES.map((place) => <option key={place.id} value={place.campaignId} disabled={!isPlaceUnlocked(place)}>{place.name}{!isPlaceUnlocked(place) ? " · Locked" : ""}</option>)}
+          </select>
+          <button type="button" onClick={() => { const place = WORLD_PLACES.find((item) => item.campaignId === selectedCampaign); if (place) openCampaign(place); }}><Swords size={16} /><span>Enter realm</span></button>
+        </div>
+      </footer>
     </div>
   );
 }

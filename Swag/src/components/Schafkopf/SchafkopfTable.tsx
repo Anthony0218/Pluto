@@ -9,8 +9,8 @@ function CardFace({ card }: { card: Card }) {
   return <img src={getWattenCardImage(card, cardTheme)} alt={cardName(card)} draggable={false} />;
 }
 
-export function SchafkopfRules() {
-  return <details className="sk-panel sk-rules">
+export function SchafkopfRules({ initiallyOpen = false }: { initiallyOpen?: boolean }) {
+  return <details id="rules" open={initiallyOpen || undefined} className="sk-panel sk-rules">
     <summary>Spielregeln & Wertung</summary>
     <div className="sk-rule-grid">
       <section><h3>Vier Spieler · 32 Karten</h3><p>Jeder erhält acht Karten. Links vom Geber beginnt Ansage und Ausspiel; danach spielt der Stichgewinner aus. Sau 11, Zehn 10, König 4, Ober 3, Unter 2 Augen. Neun, Acht und Sieben zählen 0. Die Spielerpartei braucht 61, die Gegenpartei 60 Augen.</p></section>

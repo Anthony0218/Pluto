@@ -1,5 +1,6 @@
 import existing from "./existingTranslations.json";
 import extra from "./uiTranslations.json";
+import dashboard from "./dashboardTranslations.json";
 import { getAppLanguage, useAppLanguage, type AppLanguage } from "./languageStore";
 
 export const useUiLanguage = useAppLanguage;
@@ -10,6 +11,7 @@ const lookup: Table = {};
 for (const language of ["de", "bar", "ko", "ru"]) {
   lookup[language] = Object.fromEntries(Object.entries((existing as Table)[language] ?? {}).map(([key, value]) => [normalized(key), value]));
   Object.assign(lookup[language], (extra as Table)[language]);
+  Object.assign(lookup[language], (dashboard as Table)[language]);
 }
 
 export function translateUi(language: AppLanguage, input: string): string {

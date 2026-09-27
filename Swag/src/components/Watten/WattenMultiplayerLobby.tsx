@@ -1,4 +1,5 @@
 import { useAppLanguage } from "@/i18n/languageStore";
+import "../../pages/games/Watten/wattenMenus.css";
 import { useCallback, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
@@ -254,9 +255,9 @@ export default function WattenMultiplayerLobby() {
   }
 
   return (
-    <main className="min-h-screen bg-transparent px-4 py-10 text-white sm:px-6">
+    <main className="watten-menu min-h-screen px-4 py-10 text-white sm:px-6">
       <div className="mx-auto max-w-5xl">
-        <div className="rounded-[30px] border border-white/10 bg-zinc-950/90 p-6 shadow-2xl shadow-black/30 sm:p-8">
+        <div className="watten-menu__panel rounded-[30px] border border-white/10 bg-zinc-950/90 p-6 shadow-2xl shadow-black/30 sm:p-8">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-400">

@@ -6,7 +6,7 @@ import { supabase } from "../../lib/supabase";
 
 export default function AccountActivity() {
   const { user } = useAuth();
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   const userId = user?.id;
   const game = [...games]
     .sort((a, b) => b.route.length - a.route.length)
@@ -43,5 +43,20 @@ export default function AccountActivity() {
     const timer = window.setInterval(visit, 60_000);
     return () => window.clearInterval(timer);
   }, [userId, game]);
+  const resourceRoute = pathname === "/games/schafkopf" && new URLSearchParams(search).get("rules") === "open"
+    ? "/games/schafkopf?rules=open#rules"
+    : pathname === "/games/chess/rules" && new URLSearchParams(search).get("tab") === "puzzles"
+      ? null
+      : ["/games/chess/rules", "/games/watten/rules", "/games/go/rules", "/games/chess/variants"].includes(pathname) ? pathname : null;
+  useEffect(() => {
+    if (!userId || !resourceRoute) return;
+    const visit = () => {
+      if (document.visibilityState === "visible") void supabase.rpc("record_dashboard_resource_visit", { p_route: resourceRoute }).then(() => {});
+    };
+    visit();
+    const timer = window.setInterval(visit, 60_000);
+    document.addEventListener("visibilitychange", visit);
+    return () => { window.clearInterval(timer); document.removeEventListener("visibilitychange", visit); };
+  }, [userId, resourceRoute]);
   return null;
 }

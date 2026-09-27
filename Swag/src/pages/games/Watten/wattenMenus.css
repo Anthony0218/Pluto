@@ -1,0 +1,125 @@
+.watten-menu {
+  min-height: calc(100dvh - 4rem);
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(160, 100, 44, .24), transparent 38%),
+    radial-gradient(circle at 90% 72%, rgba(31, 102, 74, .19), transparent 36%),
+    repeating-linear-gradient(92deg, #ffffff02 0 1px, transparent 1px 5px),
+    linear-gradient(150deg, #20160f, #102e25 55%, #140f0d);
+}
+
+.watten-menu::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .18;
+  background: url("/images/watten-home.png") center top / cover no-repeat;
+  mask-image: linear-gradient(#000, transparent 78%);
+}
+
+.watten-menu__panel {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(218, 173, 99, .26);
+  background: radial-gradient(ellipse at 100% 0, #54775b22, transparent 60%), linear-gradient(145deg, rgba(37, 29, 23, .97), rgba(15, 35, 28, .97));
+  box-shadow: 0 28px 90px rgba(0, 0, 0, .42), inset 0 1px rgba(255, 226, 164, .08);
+}
+
+.watten-menu__panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: linear-gradient(90deg, #8d572e, #e7bf70 42%, #587e54 76%, #214d42);
+}
+
+.watten-menu__panel h1,
+.watten-menu__panel h2,
+.watten-menu--rules h1 {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  letter-spacing: -.025em;
+  color: #fff0d1;
+}
+
+.watten-menu__mode {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(145deg, rgba(119, 78, 39, .15), rgba(7, 17, 15, .62));
+  box-shadow: inset 0 1px rgba(255, 237, 199, .08), 0 14px 35px rgba(0, 0, 0, .16);
+}
+
+.watten-menu__mode::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(235, 184, 100, .75), transparent);
+}
+
+.watten-menu__mode:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 22px 45px rgba(0, 0, 0, .28);
+}
+
+.watten-menu__masthead {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 144px;
+  margin: -2rem -2rem 2rem;
+  padding: 1rem 3rem;
+  overflow: hidden;
+  border-bottom: 1px solid #d7b37440;
+  background: linear-gradient(90deg, #0b201ce6, #173d2eb3, #0b201ce6), url('/images/watten-home.png') center 42% / cover;
+}
+.watten-menu__seal {
+  display: grid;
+  place-items: center;
+  width: 66px;
+  height: 66px;
+  border: 1px solid #d7b37480;
+  border-radius: 50%;
+  outline: 1px solid #d7b37430;
+  outline-offset: 5px;
+  color: #ecd3a0;
+  font: italic 38px Georgia, serif;
+}
+.watten-menu__hand { display: flex; align-self: flex-start; padding-top: 5px; }
+.watten-menu__hand img { width: 76px; border-radius: 6px; box-shadow: 0 5px 20px #0009; }
+.watten-menu__hand img:first-child { transform: translate(15px, 12px) rotate(-16deg); }
+.watten-menu__hand img:nth-child(2) { z-index: 1; }
+.watten-menu__hand img:last-child { transform: translate(-15px, 12px) rotate(16deg); }
+.watten-menu__ornament { color: #dfbf80; font-size: 34px; }
+.watten-menu__mode--online { background: radial-gradient(ellipse at 100% 0, #3e926a25, transparent 70%), #0b211c99; }
+.watten-menu__mode--local { background: radial-gradient(ellipse at 100% 0, #bc904126, transparent 70%), #231b1199; }
+.watten-menu :is(a, button, input, select):focus-visible { outline: 2px solid #edcf92; outline-offset: 4px; }
+.watten-menu__panel input { border-color: #d7b37440; background-color: #071a1466; }
+.watten-menu__panel input::placeholder { color: #aaa393; }
+.watten-menu__panel > section > .grid > button { box-shadow: inset 0 1px #f5dfb017; }
+.watten-menu--rules h2, .watten-menu--rules h3 { font-family: Georgia, Cambria, serif; }
+
+@media (max-width: 640px) {
+  .watten-menu__masthead { height: 124px; margin: -1.5rem -1.5rem 1.5rem; padding-inline: 1.75rem; }
+  .watten-menu__seal { width: 48px; height: 48px; font-size: 28px; }
+  .watten-menu__hand img { width: 60px; }
+  .watten-menu__ornament { display: none; }
+}
+
+.watten-menu--rules > div > section:first-of-type {
+  border: 1px solid rgba(230, 191, 116, .4);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, .4), inset 0 0 0 1px rgba(255, 226, 170, .13);
+}
+
+.watten-menu--rules > div > div:first-child {
+  margin-left: 0;
+  border-color: rgba(230, 191, 116, .23);
+  background: rgba(36, 28, 22, .88);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .watten-menu__mode:hover { transform: none; }
+}

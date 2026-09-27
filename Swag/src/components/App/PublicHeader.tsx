@@ -6,7 +6,6 @@ import { ChevronDown, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { headerSections } from "../../data/navigation";
-import FriendAvatar from "../social/FriendAvatar";
 
 export default function PublicHeader({
   navigationOpen,
@@ -16,7 +15,7 @@ export default function PublicHeader({
   onToggleNavigation: () => void;
 }) {
   useUiLanguage();
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
   const { language, setLanguage } = useAppLanguage();
   const [open, setOpen] = useState<string | null>(null);
   const triggers = useRef(new Map<string, HTMLButtonElement>());
@@ -32,14 +31,12 @@ export default function PublicHeader({
       )}
       <header className="fixed inset-x-0 top-0 z-[300] h-16 border-b border-white/[0.06] bg-[#060816]/95 text-white backdrop-blur-xl">
         <div className="mx-auto flex h-full max-w-[1800px] items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
-          <Link
-            to="/"
-            className="flex items-center gap-3"
-            onClick={() => setOpen(null)}
-          >
-            <img src="/pluto-icon.png" alt="" className="h-9 w-9 rounded-xl" />
-            <span className="text-lg font-bold">{ui("Pluto")}</span>
-          </Link>
+          <div className="flex items-center gap-3">
+            <button id="navigation-toggle" type="button" aria-label={navigationOpen ? "Close navigation" : "Open navigation"} aria-expanded={navigationOpen} aria-controls="app-navigation" onClick={() => { setOpen(null); onToggleNavigation(); }} className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 text-zinc-200 hover:bg-white/10">
+              {navigationOpen ? <X size={19} /> : <Menu size={19} />}
+            </button>
+            <Link to="/" className="text-lg font-bold" onClick={() => setOpen(null)}>{ui("Pluto")}</Link>
+          </div>
           <nav
             aria-label={ui("Explore Pluto")}
             className="hidden h-full items-center gap-2 lg:flex"
@@ -126,18 +123,6 @@ export default function PublicHeader({
           </nav>
           <div className="flex items-center gap-2 sm:gap-3">
             <LanguageSelector language={language} onChange={setLanguage} />
-            {user && profile && (
-              <Link
-                to="/profile"
-                aria-label={`${profile.username || "Your"} profile`}
-                className="hidden items-center gap-2 rounded-xl p-1.5 hover:bg-white/5 xl:flex"
-              >
-                <FriendAvatar profile={profile} size="sm" />
-                <span className="max-w-28 truncate text-sm">
-                  {profile.username || profile.display_name || "Player"}
-                </span>
-              </Link>
-            )}
             {!user && (
               <Link
                 to="/login"
@@ -147,23 +132,7 @@ export default function PublicHeader({
             <Link
               to="/dashboard"
               className="hidden sm:block rounded-xl bg-indigo-500 px-3 py-2 text-sm font-semibold hover:bg-indigo-400 sm:px-4"
-            >{ui("Open Pluto")}</Link>
-            <button
-              id="navigation-toggle"
-              type="button"
-              aria-label={
-                navigationOpen ? "Close navigation" : "Open navigation"
-              }
-              aria-expanded={navigationOpen}
-              aria-controls="app-navigation"
-              onClick={() => {
-                setOpen(null);
-                onToggleNavigation();
-              }}
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 text-zinc-200 hover:bg-white/10"
-            >
-              {navigationOpen ? <X size={19} /> : <Menu size={19} />}
-            </button>
+            >{ui("HOME")}</Link>
           </div>
         </div>
       </header>
