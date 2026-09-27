@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { schafkopfRequest, type RoomSnapshot } from "../../games/schafkopf/multiplayer";
-import type { Action } from "../../games/schafkopf/schafkopf";
+import { AI_DIFFICULTY_OPTIONS, type Action, type AiDifficulty, type GameRules } from "../../games/schafkopf/schafkopf";
+import { savedSchafkopfRules } from "./schafkopfRulesPreference";
 import SchafkopfTable from "./SchafkopfTable";
 
 export default function SchafkopfMultiplayerGame() {
@@ -17,6 +18,8 @@ export default function SchafkopfMultiplayerGame() {
   const [copied, setCopied] = useState(false);
   const inFlight = useRef(false);
   const mounted = useRef(true);
+  const titleRef = useRef<HTMLInputElement>(null);
+  const difficultyRef = useRef<HTMLSelectElement>(null);
   const accept = useCallback((snapshot: RoomSnapshot | null) => {
     if (snapshot) setRoom(current => !current || snapshot.code !== current.code || snapshot.version >= current.version ? snapshot : current);
   }, []);
@@ -38,12 +41,22 @@ export default function SchafkopfMultiplayerGame() {
     return () => { cancelled = true; mounted.current = false; clearTimeout(timer); };
   }, [code, user, accept]);
 
-  async function send(op: "action" | "start" | "leave", action?: Action) {
+  async function send(op: "action" | "start" | "leave" | "rules" | "configure" | "replace" | "vacate" | "timing", action?: Action, rules?: GameRules, replacement?: { seat: number; bot: boolean }, collectSeconds?: number) {
     if (!room || inFlight.current) return;
     inFlight.current = true;
     setBusy(true); setError(null);
     try {
-      const request = op === "action" ? { op, code, version: room.version, action: action! } as const : { op, code, version: room.version };
+      let request;
+      if (op === "action") request = { op, code, version: room.version, action: action! } as const;
+      else if (op === "rules") request = { op, code, version: room.version, rules: rules! } as const;
+      else if (op === "replace") request = { op, code, version: room.version, seat: replacement!.seat, bot: replacement!.bot } as const;
+      else if (op === "vacate") request = { op, code, version: room.version, seat: replacement!.seat } as const;
+      else if (op === "timing") request = { op, code, version: room.version, collectSeconds: collectSeconds! } as const;
+      else if (op === "configure") request = { op, code, version: room.version, title: titleRef.current?.value ?? room.title, aiDifficulty: (difficultyRef.current?.value ?? room.aiDifficulty) as AiDifficulty } as const;
+      else if (op === "start") {
+        const saved = savedSchafkopfRules();
+        request = { op, code, version: room.version, rules: saved, title: titleRef.current?.value ?? room.title, aiDifficulty: (difficultyRef.current?.value ?? room.aiDifficulty) as AiDifficulty } as const;
+      } else request = { op, code, version: room.version } as const;
       const snapshot = await schafkopfRequest(request);
       if (mounted.current) {
         if (op === "leave") navigate("/games/schafkopf/multiplayer");
@@ -63,11 +76,23 @@ export default function SchafkopfMultiplayerGame() {
   if (!user) return <main className="sk-page"><h1>Bitte anmelden</h1><Link className="sk-back" to="/login">Zur Anmeldung</Link></main>;
   if (!room || room.code !== code) return <main className="sk-page"><h1>Tisch {code}</h1><p>{connectionError ?? "Tisch wird geladen …"}</p><Link className="sk-back" to="/games/schafkopf/multiplayer">Zur Lobby / mit Code beitreten</Link></main>;
   const host = room.hostId === user.id;
-  if (room.game) return <><div className="sk-connection"><span>Raum {code} · {connectionError ? "Verbindung wird wiederhergestellt …" : "Tisch verbunden"}</span><span>Bei Unterbrechung bleibt dein Platz erhalten. Öffne diesen Raum erneut.</span></div><SchafkopfTable view={room.game} onAction={action => void send("action", action)} busy={busy || Boolean(connectionError)} error={error ?? connectionError} allowNext={host} subtitle={`Online · Raum ${code}`} /></>;
-  return <main className="sk-page"><header className="sk-header"><div><span className="sk-eyebrow">Dein Schafkopf-Tisch</span><h1>Warte auf Mitspieler</h1><p>Teile den Code mit drei Freunden.</p></div><Link className="sk-button sk-secondary" to="/games/schafkopf">Menü</Link></header>
+  if (room.game) {
+    const betweenGames = room.game.phase === "finished" || room.game.phase === "redeal";
+    return <>
+      <div className="sk-connection">
+        <span>{room.title} · Raum {code} · {connectionError ? "Verbindung wird wiederhergestellt …" : "Tisch verbunden"}</span>
+        <span>Bei Unterbrechung bleibt dein Platz erhalten. Öffne diesen Raum erneut.</span>
+        {(host || room.players[room.game.seat]?.bot) && <details className="sk-backup-settings"><summary>KI-Ersatz verwalten</summary><div>{room.players.map((player, seat) => !player.id.startsWith("bot:") && (host || (player.id === user.id && player.bot)) ? <button key={player.id} type="button" className="sk-button sk-secondary" disabled={busy || Boolean(connectionError)} onClick={() => void send("replace", undefined, undefined, { seat, bot: !player.bot })}>{player.bot ? `${player.name} wieder übernehmen` : `KI für ${player.name}`}</button> : null)}</div></details>}
+        {betweenGames && <div className="sk-seat-manager"><strong>Besetzung für die nächste Runde</strong><p>Der Gastgeber kann Mitspieler freigeben. Ein freier KI-Platz kann mit dem Raumcode von einem anderen Konto übernommen werden. Neue Spieler beginnen bei 0 Cent; bisherige Ergebnisse bleiben gespeichert.</p><div className="sk-seat-manager-list">{room.players.map((player, seat) => <div key={seat}><span>Platz {seat + 1}: {player.name}{player.id.startsWith("bot:") ? " · frei für Mitspieler" : player.bot ? " · KI-Ersatz aktiv" : ""}{room.pendingSeats?.includes(seat) ? " · ab nächster Runde" : ""}</span>{host && seat > 0 && !player.id.startsWith("bot:") && <button type="button" className="sk-button sk-secondary" disabled={busy || Boolean(connectionError)} onClick={() => void send("vacate", undefined, undefined, { seat, bot: true })}>Platz freigeben</button>}</div>)}</div><button type="button" className="sk-button sk-secondary" onClick={() => void copyCode()}>{copied ? "Code kopiert" : `Code ${code} kopieren`}</button></div>}
+      </div>
+      <SchafkopfTable view={room.game} onAction={action => void send("action", action)} onRulesChange={host ? rules => void send("rules", undefined, rules) : undefined} busy={busy || Boolean(connectionError) || Boolean(room.players[room.game.seat]?.bot)} error={error ?? connectionError} allowNext={host} subtitle={`Online · ${room.title}`} onlineSession onlineCode={code} aiDifficulty={room.aiDifficulty} collectSecondsValue={room.collectSeconds} onCollectSecondsChange={host ? seconds => send("timing", undefined, undefined, undefined, seconds) : undefined} />
+    </>;
+  }
+  return <main className="sk-page"><header className="sk-header"><div><span className="sk-eyebrow">Dein Schafkopf-Tisch</span><h1>{room.title}</h1><p>Teile den Code mit Freunden oder starte mit KI auf den freien Plätzen.</p></div><Link className="sk-button sk-secondary" to="/games/schafkopf/multiplayer">Spieltage</Link></header>
     <section className="sk-panel"><strong className="sk-room-code">{code}</strong><div className="sk-actions"><button className="sk-button sk-secondary" onClick={() => void copyCode()}>{copied ? "Kopiert" : "Code kopieren"}</button></div>
-      <ul className="sk-waiting-list">{Array.from({ length: 4 }, (_, seat) => <li key={seat}>{seat + 1}. {room.players[seat]?.name ?? "Freier Platz"}{room.players[seat]?.id === room.hostId ? " · Gastgeber" : ""}{room.players[seat]?.id === user.id ? " · Du" : ""}</li>)}</ul>
-      <div className="sk-actions">{host ? <button className="sk-button" disabled={busy || room.players.length !== 4 || Boolean(connectionError)} onClick={() => void send("start")}>Spiel starten ({room.players.length}/4)</button> : <p>Der Gastgeber startet, sobald alle vier Plätze besetzt sind.</p>}<button className="sk-button sk-secondary" disabled={busy} onClick={() => void send("leave")}>Tisch verlassen</button></div>
+      <ul className="sk-waiting-list">{Array.from({ length: 4 }, (_, seat) => <li key={seat}>{seat + 1}. {room.players[seat]?.name ?? "Freier Platz · wird beim Start KI"}{room.players[seat]?.id === room.hostId ? " · Gastgeber" : ""}{room.players[seat]?.id === user.id ? " · Du" : ""}</li>)}</ul>
+      {host && <div className="sk-waiting-settings"><label className="sk-lobby-field" htmlFor="sk-room-title">Spieltag<input ref={titleRef} id="sk-room-title" defaultValue={room.title} maxLength={60} /></label><label className="sk-lobby-field" htmlFor="sk-room-ai">KI-Spielstärke<select ref={difficultyRef} id="sk-room-ai" defaultValue={room.aiDifficulty === "normal" ? "amateur" : room.aiDifficulty}>{AI_DIFFICULTY_OPTIONS.map(option => <option key={option.id} value={option.id}>{option.label}</option>)}</select></label><button className="sk-button sk-secondary" disabled={busy || Boolean(connectionError)} onClick={() => void send("configure")}>Einstellungen speichern</button></div>}
+      <div className="sk-actions">{host ? <button className="sk-button" disabled={busy || Boolean(connectionError)} onClick={() => void send("start")}>Spiel starten · {room.players.length} Mensch{room.players.length === 1 ? "" : "en"}, {4 - room.players.length} KI</button> : <p>Der Gastgeber startet, wenn alle gewünschten Menschen beigetreten sind.</p>}<button className="sk-button sk-secondary" disabled={busy} onClick={() => void send("leave")}>Tisch verlassen</button></div>
       <p>Nach Spielbeginn bleiben die Plätze reserviert. Unterbrochene Verbindungen können diesem Raum wieder beitreten.</p>
     </section>{(error || connectionError) && <p className="sk-error" role="alert">{error || connectionError}</p>}</main>;
 }
