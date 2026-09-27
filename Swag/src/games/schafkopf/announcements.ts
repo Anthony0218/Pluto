@@ -14,19 +14,20 @@ export type AnnouncementSettings = {
 type CallName = { id: string; label: string; bare: string; auf: string; mit: string };
 export const CALL_NAME_OPTIONS: Record<CallSuit, CallName[]> = {
   Eichel: [
-    { id: "ass", label: "Eichel-Ass", bare: "Eichel-Ass", auf: "das Eichel-Ass", mit: "dem Eichel-Ass" },
+    { id: "ass", label: "Eichel-Ass", bare: "Eichel-Ass", auf: "die Eichel-Ass", mit: "der Eichel-Ass" },
     { id: "alte", label: "Alte / mit der Alten", bare: "Alte", auf: "die Alte", mit: "der Alten" },
     { id: "oide", label: "Oide / mit der Oiden", bare: "Oide", auf: "die Oide", mit: "der Oiden" },
   ],
   Gras: [
-    { id: "ass", label: "Gras-Ass", bare: "Gras-Ass", auf: "das Gras-Ass", mit: "dem Gras-Ass" },
+    { id: "ass", label: "Gras-Ass", bare: "Gras-Ass", auf: "die Gras-Ass", mit: "der Gras-Ass" },
     { id: "blaue", label: "Blaue / mit der Blauen", bare: "Blaue", auf: "die Blaue", mit: "der Blauen" },
   ],
   Schellen: [
-    { id: "ass", label: "Schellen-Ass", bare: "Schellen-Ass", auf: "das Schellen-Ass", mit: "dem Schellen-Ass" },
+    { id: "ass", label: "Schellen-Ass", bare: "Schellen-Ass", auf: "die Schellen-Ass", mit: "der Schellen-Ass" },
     { id: "schellige", label: "Schellige / mit der Schelligen", bare: "Schellige", auf: "die Schellige", mit: "der Schelligen" },
     { id: "bums", label: "Bums", bare: "Bums", auf: "den Bums", mit: "dem Bums" },
     { id: "pumpe", label: "Pumpe", bare: "Pumpe", auf: "die Pumpe", mit: "der Pumpe" },
+    { id: "kugel-bauer-theres", label: "Kugel-Bauer-Theres", bare: "Kugel-Bauer-Theres", auf: "die Kugel-Bauer-Theres", mit: "der Kugel-Bauer-Theres" },
     { id: "hundsgfickte", label: "Hundsgfickte / mit der Hundsgfickten", bare: "Hundsgfickte", auf: "die Hundsgfickte", mit: "der Hundsgfickten" },
   ],
 };
@@ -67,8 +68,8 @@ export function formatDeclarationAnnouncement(contract: Contract, settings: Anno
     if (!choices) return contractName(contract);
     const selected = choices.find(choice => choice.id === settings.callNames[suit]) ?? choices[Math.floor(random() * choices.length)];
     const prefix = settings.callPrefix === "random" ? (["auf", "mit", "none"] as const)[Math.floor(random() * 3)] : settings.callPrefix;
-    if (prefix === "auf") return `Ich spiele auf ${selected.auf}.`;
-    if (prefix === "mit") return `Ich spiele mit ${selected.mit}.`;
+    if (prefix === "auf") return `I spui auf ${selected.auf}.`;
+    if (prefix === "mit") return `I spui mit ${selected.mit}.`;
     return `${selected.bare}.`;
   }
   if (contract.kind === "solo" && contract.suit) {

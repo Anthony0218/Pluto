@@ -1448,6 +1448,47 @@
 .sk-ledger-page-arrow { position: absolute; top: 50%; display: grid; place-items: center; width: 34px; height: 46px; padding: 0 !important; border-color: #315f86; border-radius: 10px; background: #edf8f8; color: #194d78; font-family: Georgia, serif; font-size: 34px !important; line-height: 1; pointer-events: auto; transform: translateY(-50%); }
 .sk-ledger-page-arrow-previous { left: -17px; }
 .sk-ledger-page-arrow-next { right: -17px; }
+
+/* The fullscreen button is also introduced in context, before the table gets
+   crowded by cards and dialogs. */
+.sk-fullscreen-hint { display: flex; align-items: center; justify-content: center; gap: 8px 12px; margin: -17px auto 13px; padding: 7px 12px; border: 1px solid #c4b5fd77; border-radius: 999px; background: #312e8159; color: #ede9fe; font-size: 12px; text-align: center; }
+.sk-fullscreen-hint svg { color: #c4b5fd; filter: drop-shadow(0 0 5px #a855f7); }
+.sk-fullscreen-hint button { border: 0; border-bottom: 1px solid currentColor; padding: 0; background: transparent; color: #fff; font: inherit; font-weight: 800; cursor: pointer; }
+.sk-fullscreen-hint button:hover { color: #d8b4fe; }
+
+/* The same instrument writes the ledger and the matching note. */
+.sk-ledger-header-actions { display: flex; align-items: center; gap: 10px; }
+.sk-ledger-header-actions .sk-toggle { color: #4e381f; font-size: 11px; font-weight: 800; }
+.sk-ledger-ink-pen .sk-ledger td,
+.sk-ledger-notepad-pen textarea { color: #194f92; font-family: "Bradley Hand", "Comic Sans MS", cursive; letter-spacing: .015em; }
+.sk-ledger-ink-pencil .sk-ledger td,
+.sk-ledger-notepad-pencil textarea { color: #575b5f; font-family: "Marker Felt", "Comic Sans MS", cursive; font-weight: 600; letter-spacing: .025em; text-shadow: .25px .25px #777; }
+.sk-ledger-notepad-heading > span { color: #72522d; font-family: Georgia, serif; font-size: 12px; font-style: italic; font-weight: 700; }
+
+/* Page controls remain easy to spot without competing with the scores. */
+.sk-ledger-page-arrow { border-color: #c4b5fd; background: linear-gradient(145deg, #faf5ff, #ddd6fe); color: #6d28d9; box-shadow: 0 0 0 1px #7c3aed55, 0 0 12px #a855f799, 0 5px 12px #312e8155; transition: transform .16s ease, box-shadow .16s ease, background .16s ease; }
+.sk-ledger-page-arrow:hover:not(:disabled) { background: linear-gradient(145deg, #fff, #c4b5fd); box-shadow: 0 0 0 2px #c4b5fd, 0 0 20px #a855f7cc, 0 7px 16px #312e8188; transform: translateY(-50%) scale(1.08); }
+.sk-ledger-page-arrow:focus-visible { outline: 3px solid #d8b4fe; outline-offset: 3px; }
+.sk-ledger-page-arrow:disabled { opacity: .3; box-shadow: none; }
+
+/* Bar seats move up by two card heights, leaving room for the held cards. */
+.sk-page.sk-ambience-bar { --sk-avatar-raise: calc(clamp(126px, 13.5vw, 177px) + (2 * var(--sk-opponent-card-height))); }
+
+/* Keep the information line beneath the hand readable: status stays together,
+   while actions take their own full-width row. */
+.sk-hand-area .sk-table-sidebar { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+.sk-hand-area .sk-table-heading { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: center; gap: 5px 12px; text-align: left; }
+.sk-hand-area .sk-table-heading > span { white-space: nowrap; }
+.sk-hand-area .sk-table-heading strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sk-hand-area .sk-table-heading small { margin: 0; white-space: nowrap; }
+.sk-hand-area .sk-table-actions { display: flex; width: 100%; }
+.sk-hand-area .sk-table-actions > p { margin: 0; }
+@media (max-width: 700px) {
+  .sk-fullscreen-hint { margin: -13px 0 10px; border-radius: 12px; flex-wrap: wrap; }
+  .sk-ledger-header-actions .sk-toggle { max-width: 142px; }
+  .sk-hand-area .sk-table-heading { grid-template-columns: auto minmax(0, 1fr) auto; gap: 4px 8px; }
+  .sk-hand-area .sk-table-heading small { grid-column: 2 / -1; }
+}
 @media (max-width: 700px) {
   .sk-score-breakdown { padding: 7px 8px; }
   .sk-score-breakdown span { font-size: 12px; }

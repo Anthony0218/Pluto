@@ -19,6 +19,7 @@ export type Phase = "legen" | "intent" | "auction" | "declare" | "kontra" | "re"
 export type Result = {
   declarerPoints: number; opponentPoints: number; declarerWon: boolean;
   schneider: boolean; schwarz: boolean; laufende: number; value: number; deltas: number[]; team: number[];
+  ramschDoubleWinners?: number[];
 };
 export type RoundRecord = { round: number; dealer: number; names: string[]; contract: string; deltas: number[]; totals: number[]; price?: string };
 export type GameState = {
@@ -163,15 +164,15 @@ export function forcedCallsFor(hand: Card[], rules: GameRules = DEFAULT_GAME_RUL
   });
   return calls.length ? calls : contractsFor(hand, rules).filter(contract => contract.kind === "solo" && !contract.tout);
 }
-function hasEveryPlainSuitAce(hand: Card[]): boolean {
-  const plainSuits = (["Eichel", "Gras", "Schellen"] as Suit[]).filter(suit => hand.some(card => card.suit === suit && !isTrump(card, { kind: "rufspiel" })));
-  return plainSuits.every(suit => hand.some(card => card.suit === suit && card.rank === "Ass"));
-}
 function forcedContracts(state: GameState, seat: number): Contract[] {
   const hand = state.hands[seat];
-  // A player who knocked cannot call a partner when every held plain suit is protected by its ace.
-  // In that case the forced game is an individual game (Solo, Wenz, Farbwenz, …).
-  if (state.forcedCallerReason === "legen" && hasEveryPlainSuitAce(hand)) return contractsFor(hand, state.rules).filter(contract => contract.kind !== "rufspiel");
+  // A knock is binding after four passes, but it never limits the player to a
+  // partner game. They can still call a legal card or choose every available
+  // individual game (Solo, Wenz, Farbwenz, …).
+  if (state.forcedCallerReason === "legen") {
+    const individualGames = contractsFor(hand, state.rules).filter(contract => contract.kind !== "rufspiel");
+    return [...forcedCallsFor(hand, state.rules), ...individualGames];
+  }
   return forcedCallsFor(hand, state.rules);
 }
 const sameContract = (a: Contract, b: Contract) => a.kind === b.kind && a.suit === b.suit && Boolean(a.tout) === Boolean(b.tout) && (a.calledRank ?? "Ass") === (b.calledRank ?? "Ass");
@@ -230,7 +231,11 @@ export function scoreRound(state: GameState): Result {
   if (contract.kind === "ramsch") {
     const loser = state.points.indexOf(Math.max(...state.points));
     const value = rules.ramschValue * state.multiplier;
-    return { declarerPoints: state.points[loser], opponentPoints: 120 - state.points[loser], declarerWon: false, schneider: false, schwarz: false, laufende: 0, value, deltas: state.names.map((_, seat) => seat === loser ? -3 * value : value), team: [loser] };
+    const wonTricks = state.names.map((_, seat) => state.tricks.filter(trick => trick.winner === seat).length);
+    const ramschDoubleWinners = wonTricks.flatMap((tricks, seat) => tricks === 0 && seat !== loser ? [seat] : []);
+    const winnings = state.names.map((_, seat) => seat === loser ? 0 : value * (ramschDoubleWinners.includes(seat) ? 2 : 1));
+    const loss = winnings.reduce((sum, amount) => sum + amount, 0);
+    return { declarerPoints: state.points[loser], opponentPoints: 120 - state.points[loser], declarerWon: false, schneider: false, schwarz: false, laufende: 0, value, deltas: winnings.map((amount, seat) => seat === loser ? -loss : amount), team: [loser], ramschDoubleWinners };
   }
   const team = declarerTeam(state);
   const points = team.reduce((sum, seat) => sum + state.points[seat], 0);
@@ -261,7 +266,7 @@ export function scoreRound(state: GameState): Result {
 function priceBreakdown(state: GameState, result: Result): string {
   const contract = state.contract!;
   const rules = state.rules ?? DEFAULT_GAME_RULES;
-  if (contract.kind === "ramsch") return `Ramsch ${rules.ramschValue} ¢${state.multiplier > 1 ? ` × ${state.multiplier} (Klopfen/Spritzen)` : ""} = ${result.value} ¢`;
+  if (contract.kind === "ramsch") return `Ramsch ${rules.ramschValue} ¢${state.multiplier > 1 ? ` × ${state.multiplier} (Klopfen/Spritzen)` : ""}${result.ramschDoubleWinners?.length ? ` · Jungfrau ×2: ${result.ramschDoubleWinners.map(seat => state.names[seat]).join(", ")}` : ""} = ${result.value} ¢`;
   const base = contract.kind === "rufspiel" ? rules.rufspielValue : contract.kind === "wenz" ? rules.wenzValue : rules.soloValue;
   const baseName = contract.kind === "rufspiel" ? "Sauspiel" : contract.kind === "wenz" ? "Wenz" : "Einzelspiel";
   const parts = [`${baseName} ${base} ¢`];
@@ -420,7 +425,7 @@ export function applyAction(previous: GameState, seat: number, action: Action, r
     if (reason) throw new Error(reason);
     if (action.spritz) {
       if (!canDouble(state, seat)) throw new Error("Spritzen ist bei diesem Zug nicht möglich.");
-      say(cleanPhrase(action.phrase) ?? ["Kontra / Spritze!", "Re!", "Sub!", "Hirsch!"][state.spritzCount]);
+      say(cleanPhrase(action.phrase) ?? ["I geb a Spritzn!", "Re!", "Sub!", "Hirsch!"][state.spritzCount]);
       state.multiplier *= 2;
       state.lastSpritzTrick = state.tricks.length;
       state.spritzCount = (state.spritzCount ?? 0) + 1;
