@@ -11,6 +11,16 @@ export type Game = {
 
 export const games: Game[] = [
   {
+    title: "Eat It",
+    subtitle: "Small circle. Big appetite.",
+    description: "Eat, grow, and be the last circle standing in colorful City and Nature arenas.",
+    image: "/images/eat-it.svg",
+    route: "/games/eat-it",
+    tag: "Arcade",
+    features: ["2–8 players", "Friends & bots", "Two worlds"],
+    finished: false,
+  },
+  {
     title: "Atlas Arena",
     subtitle: "The world is your board",
     description:

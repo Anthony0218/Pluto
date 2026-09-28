@@ -36,7 +36,7 @@ export default function LandingHero() {
         <Link to="/dashboard" className="mt-8 inline-flex min-h-12 items-center gap-4 rounded-xl bg-indigo-500 px-6 py-3 font-bold text-white transition hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-indigo-300">{ui("HOME")}<ArrowRight size={18} /></Link>
       </div>
       <div className="min-w-0">
-        <div className="relative h-[350px] overflow-hidden rounded-[28px] border border-indigo-300/20 bg-[#0c1325] shadow-2xl shadow-black/30 sm:h-[470px] lg:h-[600px]" role="img" aria-label="Orbiting planets representing available games">
+        <div className="relative h-[350px] overflow-hidden rounded-[28px] bg-[#0c1325] shadow-2xl shadow-black/30 sm:h-[470px] lg:h-[600px]" role="img" aria-label="Orbiting planets representing available games">
           {webgl ? <SceneBoundary><Suspense fallback={<div className="grid h-full place-items-center text-indigo-200/70">♔</div>}><PlanetScene reducedMotion={reducedMotion || hidden} /></Suspense></SceneBoundary> : <div className="grid h-full place-items-center text-sm text-indigo-200/70">♔ Chess Universe</div>}
           <div className="pointer-events-none absolute bottom-4 left-4 rounded-full border border-white/10 bg-black/30 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-200">Chess Universe</div>
         </div>

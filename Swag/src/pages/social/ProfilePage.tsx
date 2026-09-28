@@ -55,6 +55,7 @@ const trackedGames = new Set([
   "atlas",
   "go",
   "shogi",
+  "eat-it",
 ]);
 const statTabs = [
   { id: "general", label: "General" },
@@ -67,6 +68,7 @@ const statTabs = [
   { id: "medieval", label: "Medieval Kingdoms" },
   { id: "go", label: "Go" },
   { id: "shogi", label: "Shogi" },
+  { id: "eat-it", label: "Eat It" },
 ] as const;
 
 function StatCard({

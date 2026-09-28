@@ -10,7 +10,7 @@ import { supabase } from "@/lib/supabase";
 export default function RoomFriends() {
   useUiLanguage();
   const { pathname } = useLocation();
-  const match = pathname.match(/^(\/games\/chess\/(?:.+\/multiplayer|ranked)|\/games\/atlas-arena\/multiplayer)\/([A-Z0-9]{6})(?:\/game)?$/i);
+  const match = pathname.match(/^(\/games\/chess\/(?:.+\/multiplayer|ranked)|\/games\/(?:atlas-arena|eat-it)\/multiplayer)\/([A-Z0-9]{6})(?:\/game)?$/i);
   if (!match) return null;
   return <RoomFriendsPanel key={pathname} lobbyRoute={match[1]} code={match[2].toUpperCase()} />;
 }

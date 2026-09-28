@@ -6,6 +6,7 @@ export type PlanetConfig = {
   color: string; emissive: string; startAngle: number;
 };
 const symbols: Record<string, string> = {
+  "/games/eat-it": "◔",
   "/games/chess": "♞", "/games/chess/3dchess": "♜", "/games/shogi": "王",
   "/games/watten": "♦", "/games/schafkopf": "♣", "/games/go": "●",
   "/games/atlas-arena": "◈", "/games/medieval-kingdoms": "⚔", "/games/natura": "✿",

@@ -170,6 +170,8 @@ import StrategyMultiplayer from "./components/strategy/StrategyMultiplayer.tsx";
 import GoRules from "./components/strategy/GoRules.tsx";
 import ShogiRules from "./components/strategy/ShogiRules.tsx";
 const AtlasArenaPage = React.lazy(() => import("./pages/games/AtlasArena/AtlasArenaPage.tsx"));
+const EatItPage = React.lazy(() => import("./pages/games/EatIt/EatItPage.tsx"));
+const eatItPage = <React.Suspense fallback={<main className="min-h-[var(--app-height)] bg-[#18201d]" />}><EatItPage /></React.Suspense>;
 const AtlasMultiplayerPage = React.lazy(() => import("./pages/games/AtlasArena/AtlasMultiplayerPage.tsx"));
 const atlasPage = (page: React.ReactNode) => <React.Suspense fallback={<main className="min-h-[var(--app-height)] bg-[#06101f] p-10 text-zinc-400">Loading Atlas Arena…</main>}>{page}</React.Suspense>;
 
@@ -214,6 +216,8 @@ const router = createBrowserRouter([
             element: <GamesPage />,
           },
           { path: "/games/atlas-arena", element: atlasPage(<AtlasArenaPage />) },
+          { path: "/games/eat-it", element: eatItPage },
+          { path: "/games/eat-it/multiplayer/:roomCode", element: eatItPage },
           { path: "/games/atlas-arena/multiplayer", element: atlasPage(<AtlasMultiplayerPage />) },
           { path: "/games/atlas-arena/multiplayer/:roomCode", element: atlasPage(<AtlasMultiplayerPage />) },
           { path: "/games/go", element: <GoMenu /> },
