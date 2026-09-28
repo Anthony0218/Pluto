@@ -11,12 +11,12 @@ const tableThemes: {
 }[] = [
   {
     id: "classic",
-    name: "Klassisch",
+    name: "Classic",
     image: "/images/tables/classic.webp",
   },
   {
     id: "bavarian",
-    name: "Bayerische Stube",
+    name: "Bavarian room",
     image: "/images/tables/bavarian.webp",
   },
   {
@@ -31,7 +31,7 @@ const tableThemes: {
   },
   {
     id: "alpine",
-    name: "Alpen",
+    name: "Alpine",
     image: "/images/tables/alpine.webp",
   },
   {
@@ -72,9 +72,9 @@ export default function TableThemeSelector() {
       >
         <PanelsTopLeft size={17} className="text-emerald-400" />
 
-        <span className="text-slate-400">{ui("Tischdesign:")}</span>
+        <span className="text-slate-400">{ui("Table design")}:</span>
 
-        <span>{current.name}</span>
+        <span>{ui(current.name)}</span>
 
         <ChevronDown
           size={16}
@@ -129,13 +129,13 @@ export default function TableThemeSelector() {
                 <div className="h-10 w-16 shrink-0 overflow-hidden rounded-md border border-white/10">
                   <img
                     src={theme.image}
-                    alt={theme.name}
+                    alt={ui(theme.name)}
                     className="h-full w-full object-cover"
                   />
                 </div>
 
                 <span className="flex-1 text-sm font-semibold text-slate-200">
-                  {theme.name}
+                  {ui(theme.name)}
                 </span>
 
                 {selected && <Check size={16} className="text-emerald-400" />}

@@ -1,8 +1,8 @@
 import { useSyncExternalStore } from "react";
 
-export type AppLanguage = "en" | "de" | "bar" | "ko" | "ru";
+export type AppLanguage = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 const listeners = new Set<() => void>();
-const valid = (value: string | null): value is AppLanguage => !!value && ["en", "de", "bar", "ko", "ru"].includes(value);
+const valid = (value: string | null): value is AppLanguage => !!value && ["en", "de", "bar", "ko", "ru", "es", "pt"].includes(value);
 let language: AppLanguage = "en";
 try {
   const saved = localStorage.getItem("pluto-language") ?? localStorage.getItem("chess-language") ?? localStorage.getItem("watten-language");

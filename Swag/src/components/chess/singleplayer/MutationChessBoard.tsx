@@ -1,3 +1,5 @@
+import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
+import { emitGameEffect } from "@/games/chess/effects/gameEffects";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
@@ -13,7 +15,6 @@ import {
   playPieceCaptureSound,
   playPieceMoveSound,
   playPieceSelectSound,
-  playRandomSound,
 } from "../../../utils/sound.ts";
 
 import PromotionBar from "./PromotionBar";
@@ -45,7 +46,7 @@ import {
    TYPES
    ========================================================= */
 
-type Language = "en" | "de" | "bar" | "ko" | "ru";
+type Language = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 type StatsTab = "overview" | "chaos" | "moments";
 
 type Winner = "white" | "black" | "draw";
@@ -95,7 +96,7 @@ const pieceNames: Record<MutationPieceType, string> = {
    TRANSLATIONS
    ========================================================= */
 
-const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
+const translations: Record<"de" | "bar" | "ko" | "ru", Record<string, string>> & Partial<Record<"es" | "pt", Record<string, string>>> = {
   de: {
     "Chess Variant": "Schachvariante",
     "Mutation Chess": "Mutationsschach",
@@ -404,7 +405,7 @@ export default function MutationChessBoard({
       return translations.bar[key] ?? translations.de[key] ?? ui(key);
     }
 
-    return translations[language][key] ?? ui(key);
+    return translations[language]?.[key] ?? ui(key);
   };
 
   function changeLanguage(nextLanguage: Language) {
@@ -602,11 +603,7 @@ export default function MutationChessBoard({
      SOUND
      ======================================================= */
 
-  function playSound(sound: string) {
-    const audio = new Audio(`/sounds/${sound}.mp3`);
-
-    audio.play().catch(() => {});
-  }
+  function playSound(sound: string) { playChessSound(sound as ChessSoundEvent); }
 
   /* =======================================================
      GAME OVER
@@ -750,6 +747,10 @@ export default function MutationChessBoard({
           Math.floor(nextPly / MUTATION_INTERVAL_PLIES),
           nextPly,
         );
+        if (mutation) {
+          playChessSound("mutation");
+          emitGameEffect({ type: "MUTATION", square: mutation.square });
+        }
       }
 
       const record: MutationMoveRecord = {
@@ -793,7 +794,7 @@ export default function MutationChessBoard({
         if (game.isCheck()) {
           playSound("check");
         } else if (move.isKingsideCastle() || move.isQueensideCastle()) {
-          playRandomSound(["castle-1", "castle-2"]);
+          playChessSound("castle");
         }
       }
     } catch {

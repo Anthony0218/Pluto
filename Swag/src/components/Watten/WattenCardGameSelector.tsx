@@ -2,6 +2,7 @@ import { Check, ChevronDown, Palette } from "lucide-react";
 import { useState } from "react";
 
 import { useCardTheme, type CardTheme } from "@/context/CardThemeContext";
+import { ui, useUiLanguage } from "@/i18n/ui";
 
 type ThemeOption = {
   id: CardTheme;
@@ -11,11 +12,11 @@ type ThemeOption = {
 const themes: ThemeOption[] = [
   {
     id: "bavarian",
-    name: "Bayerisch",
+    name: "Bavarian",
   },
   {
     id: "traditional",
-    name: "Traditionell",
+    name: "Traditional",
   },
   {
     id: "modern",
@@ -36,6 +37,7 @@ const themes: ThemeOption[] = [
 ];
 
 export default function CardThemeSelector() {
+  useUiLanguage();
   const [open, setOpen] = useState(false);
 
   const { cardTheme, setCardTheme } = useCardTheme();
@@ -67,9 +69,9 @@ export default function CardThemeSelector() {
       >
         <Palette size={17} className="text-sky-400" />
 
-        <span className="text-slate-400">Kartendesign:</span>
+        <span className="text-slate-400">{ui("Card design")}:</span>
 
-        <span>{currentTheme.name}</span>
+        <span>{ui(currentTheme.name)}</span>
 
         <ChevronDown
           size={16}
@@ -101,7 +103,7 @@ export default function CardThemeSelector() {
         >
           <div className="px-3 pb-2 pt-1">
             <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">
-              Kartendesign auswählen
+              {ui("Select card design")}
             </p>
           </div>
 
@@ -161,7 +163,7 @@ export default function CardThemeSelector() {
                       ${selected ? "text-sky-300" : "text-slate-200"}
                     `}
                   >
-                    {theme.name}
+                    {ui(theme.name)}
                   </span>
 
                   {selected && <Check size={16} className="text-sky-400" />}

@@ -1,3 +1,4 @@
+import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
@@ -15,7 +16,6 @@ import {
   playPieceSelectSound,
   playPieceMoveSound,
   playPieceCaptureSound,
-  playRandomSound,
 } from "../../../utils/sound.ts";
 
 import PromotionBar from "./PromotionBar";
@@ -69,7 +69,7 @@ type ChessBoardProps = {
   onlineGameId?: string;
 };
 
-type Language = "en" | "de" | "bar" | "ko" | "ru";
+type Language = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 
 const languageOptions: Array<{ value: Language; label: string }> = [
   { value: "en", label: "English" },
@@ -77,6 +77,8 @@ const languageOptions: Array<{ value: Language; label: string }> = [
   { value: "bar", label: "Boarisch" },
   { value: "ko", label: "한국어" },
   { value: "ru", label: "Русский" },
+  { value: "es", label: "Español" },
+  { value: "pt", label: "Português" },
 ];
 
 const deTranslations: Record<string, string> = {
@@ -581,7 +583,8 @@ function translateChess(language: Language, key: string): string {
   if (language === "bar")
     return bavarianTranslations[key] ?? deTranslations[key] ?? ui(key);
   if (language === "ko") return koreanTranslations[key] ?? ui(key);
-  return russianTranslations[key] ?? ui(key);
+  if (language === "ru") return russianTranslations[key] ?? ui(key);
+  return ui(key);
 }
 
 function ChessLanguageSelector({
@@ -936,11 +939,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
      SOUND
      ======================================================= */
 
-  function playSound(sound: string) {
-    const audio = new Audio(`/sounds/${sound}.mp3`);
-
-    audio.play().catch(() => {});
-  }
+  function playSound(sound: string) { playChessSound(sound as ChessSoundEvent); }
 
   /* =======================================================
      CLEAR COACH
@@ -1588,6 +1587,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
       });
 
       const afterFen = game.fen();
+      if (game.history().length === 1) playChessSound("gameStart");
 
       const playedUci = `${move.from}${move.to}${piece}`;
 
@@ -1852,7 +1852,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
         playSound("check");
       } else if (move.isKingsideCastle() || move.isQueensideCastle()) {
-        playRandomSound(["castle-1", "castle-2"]);
+        playChessSound("castle");
       }
 
       setPosition(afterFen);

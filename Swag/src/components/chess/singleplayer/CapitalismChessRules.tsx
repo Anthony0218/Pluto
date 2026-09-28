@@ -2,11 +2,11 @@ import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
 
-type Language = "en" | "de" | "bar" | "ko" | "ru";
+type Language = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 
 const CHESS_LANGUAGE_STORAGE_KEY = "chess-language";
 
-const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
+const translations: Record<"de" | "bar" | "ko" | "ru", Record<string, string>> & Partial<Record<"es" | "pt", Record<string, string>>> = {
   de: {
     "Capitalism Chess Rulebook": "Regelbuch für Kapitalismus-Schach",
     "Economy, contracts, shopping and survival rules":
@@ -188,7 +188,7 @@ export default function CapitalismChessRules() {
     if (language === "bar")
       return translations.bar[key] ?? translations.de[key] ?? ui(key);
     if (language === "ru") return translations.ru[key] ?? ui(key);
-    return translations[language][key] ?? ui(key);
+    return translations[language]?.[key] ?? ui(key);
   };
 
   function changeLanguage(nextLanguage: Language) {

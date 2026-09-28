@@ -1,4 +1,7 @@
+import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { useVariantRecordAudio } from "@/games/chess/audio/useVariantRecordAudio";
+import type { ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import RouletteInfo from "@/components/chess/singleplayer/RouletteInfo";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import {
@@ -708,6 +711,15 @@ export function RouletteMultiplayerGame() {
     [gameState?.state, seed],
   );
   const records = storedState.records;
+  useVariantRecordAudio(gameState ? records : null, record => {
+    const event = record.portalEvent;
+    if (!event) return [];
+    const sounds: ChessSoundEvent[] = ["rouletteEvent"];
+    if (event.promotionCard === "k") sounds.push("rouletteKing");
+    else if (event.promotionCard === "p" || event.promotionCard === record.piece) sounds.push("roulettePromotionFailure");
+    else if (event.promotionCard) sounds.push("roulettePromotionSuccess");
+    return sounds;
+  });
 
   const liveFen =
     pendingRoulettePromotion?.workingFen ?? gameState?.fen ?? initialFen;
@@ -1713,6 +1725,7 @@ export function RouletteMultiplayerGame() {
                         {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
                       </p>
                     </button>
+                    <InviteFriendButton overlay />
                   </div>
                 )}
 

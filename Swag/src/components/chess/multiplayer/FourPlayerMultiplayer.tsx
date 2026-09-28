@@ -1,3 +1,4 @@
+import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { chooseFourPlayerAiMove } from "@/games/chess/ai/fourPlayerAi";
@@ -775,6 +776,7 @@ export function FourPlayerMultiplayerGame() {
               <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">{room.code}</p>
               <p className="mt-4 text-xs font-bold text-zinc-400">{copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}</p>
             </button>
+                    <InviteFriendButton />
           </section>
 
           <section className="mt-5 rounded-3xl border border-white/10 bg-zinc-900/75 p-5 shadow-xl shadow-black/15 sm:p-6">
@@ -783,7 +785,7 @@ export function FourPlayerMultiplayerGame() {
               {orderedPlayers.map(({ color, player }) => {
                 const isBot = plannedBotColors.includes(color);
                 const isHost = room.host_id === user?.id;
-                return <div key={color} className={`rounded-xl border ${playerStyles[color].border} ${playerStyles[color].soft} px-4 py-3`}><div className="flex items-center justify-between gap-3"><div><p className={`text-xs font-black ${playerStyles[color].text}`}>{fourPlayerLabel(color)}</p><p className="mt-1 text-xs text-zinc-400">{player?.display_name ?? (isBot ? ui("AI bot") : ui("Waiting for player"))}</p></div>{myColor === color && <span className="rounded-full bg-white/10 px-2 py-1 text-[9px] font-black text-white">{ui("YOU")}</span>}</div>{isHost && !player && <div className="mt-3 grid grid-cols-2 gap-2"><button type="button" onClick={() => setBotSlot(color, false)} aria-pressed={!isBot} className={`rounded-lg px-2 py-2 text-[10px] font-black ${!isBot ? "bg-cyan-300 text-zinc-950" : "bg-white/5 text-zinc-400"}`}>{ui("Player")}</button><button type="button" onClick={() => setBotSlot(color, true)} aria-pressed={isBot} className={`rounded-lg px-2 py-2 text-[10px] font-black ${isBot ? "bg-amber-300 text-zinc-950" : "bg-white/5 text-zinc-400"}`}>{ui("AI bot")}</button></div>}</div>;
+                return <div key={color} className={`rounded-xl border ${playerStyles[color].border} ${playerStyles[color].soft} px-4 py-3`}><div className="flex items-center justify-between gap-3"><div><p className={`text-xs font-black ${playerStyles[color].text}`}>{fourPlayerLabel(color)}</p><p className="mt-1 text-xs text-zinc-400">{player?.display_name ?? (isBot ? ui("AI bot") : ui("Waiting for player"))}</p></div>{myColor === color && <span className="rounded-full bg-white/10 px-2 py-1 text-[9px] font-black text-white">{ui("YOU")}</span>}</div>{isHost && !player && <div className="mt-3 grid grid-cols-2 gap-2"><button type="button" onClick={() => setBotSlot(color, false)} aria-pressed={!isBot} className={`rounded-lg px-2 py-2 text-[10px] font-black ${!isBot ? "bg-cyan-300 text-zinc-950" : "bg-white/5 text-zinc-400"}`}>{ui("Player")}</button><button type="button" onClick={() => setBotSlot(color, true)} aria-pressed={isBot} className={`rounded-lg px-2 py-2 text-[10px] font-black ${isBot ? "bg-amber-300 text-zinc-950" : "bg-white/5 text-zinc-400"}`}>{ui("AI bot")}</button></div>}{!player && !isBot && <InviteFriendButton />}</div>;
               })}
             </div>
           </section>
@@ -979,6 +981,7 @@ export function FourPlayerMultiplayerGame() {
                       {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
                     </p>
                   </button>
+                    <InviteFriendButton overlay />
                 </div>
               )}
 

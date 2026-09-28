@@ -3,7 +3,7 @@ import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
 import { Link } from "react-router-dom";
 
-type Language = "en" | "de" | "bar" | "ko" | "ru";
+type Language = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 
 type MiniSquare = {
   piece?: string;
@@ -24,9 +24,11 @@ const languageOptions: Array<{
   { value: "bar", label: "Boarisch" },
   { value: "ko", label: "한국어" },
   { value: "ru", label: "Русский" },
+  { value: "es", label: "Español" },
+  { value: "pt", label: "Português" },
 ];
 
-const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
+const translations: Record<"de" | "bar" | "ko" | "ru", Record<string, string>> & Partial<Record<"es" | "pt", Record<string, string>>> = {
   de: {
     "Chess Variant VI": "Schachvariante VI",
     "Draft Chess": "Draft-Schach",
@@ -279,7 +281,7 @@ function t(language: Language, key: string): string {
     return translations.bar[key] ?? translations.de[key] ?? ui(key);
   }
 
-  return translations[language][key] ?? ui(key);
+  return translations[language]?.[key] ?? ui(key);
 }
 
 const whiteSetupExample: MiniBoardState = {

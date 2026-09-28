@@ -1,4 +1,6 @@
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { playChessSound, stopSound } from "@/games/chess/audio/chessAudio";
+import { emitGameEffect } from "@/games/chess/effects/gameEffects";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useRef, useEffect, useMemo, useState } from "react";
 import {
@@ -377,6 +379,12 @@ export default function ChessHotPotatoBoard({
     const initialGame = new Chess();
     return createInitialHotPotatoStates(initialGame);
   });
+  useEffect(() => {
+    const active = (Object.values(hotPotatoes)).some(potato => potato.square !== null && !potato.dropped && potato.movesUntilExplosion > 0);
+    if (active && !finishedGame) playChessSound("bombFuse");
+    else stopSound("bombFuse");
+    return () => stopSound("bombFuse");
+  }, [hotPotatoes, finishedGame]);
 
   const [explosionSquares, setExplosionSquares] = useState<Square[]>([]);
   const [blownUpKingSquares, setBlownUpKingSquares] = useState<Square[]>([]);
@@ -758,6 +766,12 @@ export default function ChessHotPotatoBoard({
     setUndoStack((stack) => [...stack, beforeMove]);
     setGame(nextGame);
     setHotPotatoes(nextHotPotatoes);
+    if (potatoTransferred) stopSound("bombFuse");
+    if (explosionsThisMove > 0) {
+      stopSound("bombFuse");
+      playChessSound("bombExplosion");
+      emitGameEffect({ type: "BOMB_EXPLODE", square: nextExplosionSquares[0] });
+    }
     setExplosionSquares(nextExplosionSquares);
     setBlownUpKingSquares(nextBlownUpKingSquares);
     setLastMove({

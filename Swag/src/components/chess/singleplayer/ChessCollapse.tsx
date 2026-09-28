@@ -1,4 +1,6 @@
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { playChessSound } from "@/games/chess/audio/chessAudio";
+import { emitGameEffect } from "@/games/chess/effects/gameEffects";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useRef, useEffect, useMemo, useState } from "react";
 import {
@@ -692,6 +694,10 @@ export default function ChessCollapseBoard({
       );
 
       nextCollapse = collapseResult.state;
+      if (nextCollapse.lastImpactSquares.length > 0) {
+        playChessSound("collapse");
+        emitGameEffect({ type: "COLLAPSE", square: nextCollapse.lastImpactSquares[0] });
+      }
       nextLives = collapseResult.lives;
       kingHits = collapseResult.kingHits;
       trappedKings = collapseResult.trappedKings;

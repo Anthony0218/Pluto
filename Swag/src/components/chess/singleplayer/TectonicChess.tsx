@@ -1,4 +1,6 @@
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { playChessSound } from "@/games/chess/audio/chessAudio";
+import { emitGameEffect } from "@/games/chess/effects/gameEffects";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
@@ -877,6 +879,10 @@ export default function TectonicChess({
     setHoveredQuadrant(null);
     setFinishedGame(nextFinished);
     clearSelection();
+    if (quadrant !== null) {
+      playChessSound("boardRotate");
+      emitGameEffect({ type: "BOARD_ROTATE", quadrant });
+    }
   }
 
   function undo() {

@@ -1,3 +1,4 @@
+import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import {
@@ -1205,6 +1206,7 @@ export function ThreeLivesMultiplayerGame() {
                         {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
                       </p>
                     </button>
+                    <InviteFriendButton overlay />
                   </div>
                 )}
 

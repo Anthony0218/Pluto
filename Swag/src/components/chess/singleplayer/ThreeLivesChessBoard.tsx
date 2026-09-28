@@ -1,3 +1,4 @@
+import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
@@ -13,7 +14,6 @@ import {
   playPieceSelectSound,
   playPieceMoveSound,
   playPieceCaptureSound,
-  playRandomSound,
 } from "../../../utils/sound.ts";
 
 import PromotionBar from "./PromotionBar";
@@ -44,7 +44,7 @@ import {
    TYPES
    ========================================================= */
 
-type Language = "en" | "de" | "bar" | "ko" | "ru";
+type Language = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 type StatsTab = "overview" | "pressure" | "moments";
 
 const languageOptions: Array<{ value: Language; label: string }> = [
@@ -53,6 +53,8 @@ const languageOptions: Array<{ value: Language; label: string }> = [
   { value: "bar", label: "Boarisch" },
   { value: "ko", label: "한국어" },
   { value: "ru", label: "Русский" },
+  { value: "es", label: "Español" },
+  { value: "pt", label: "Português" },
 ];
 
 const deTranslations: Record<string, string> = {
@@ -773,7 +775,8 @@ function translateChess(language: Language, key: string): string {
   if (language === "bar")
     return bavarianTranslations[key] ?? deTranslations[key] ?? ui(key);
   if (language === "ko") return koreanTranslations[key] ?? ui(key);
-  return russianTranslations[key] ?? ui(key);
+  if (language === "ru") return russianTranslations[key] ?? ui(key);
+  return ui(key);
 }
 
 function ChessLanguageSelector({
@@ -1163,11 +1166,7 @@ export default function ThreeLivesChessBoard({
      SOUND
      ======================================================= */
 
-  function playSound(sound: string) {
-    const audio = new Audio(`/sounds/${sound}.mp3`);
-
-    audio.play().catch(() => {});
-  }
+  function playSound(sound: string) { playChessSound(sound as ChessSoundEvent); }
 
   /* =======================================================
      REBUILD DERIVED GAME STATE
@@ -1567,7 +1566,7 @@ export default function ThreeLivesChessBoard({
           playSound("check");
         }
       } else if (move.isKingsideCastle() || move.isQueensideCastle()) {
-        playRandomSound(["castle-1", "castle-2"]);
+        playChessSound("castle");
       }
 
       setPosition(afterFen);
@@ -1733,7 +1732,7 @@ export default function ThreeLivesChessBoard({
           playSound("check");
         }
       } else if (move.isKingsideCastle() || move.isQueensideCastle()) {
-        playRandomSound(["castle-1", "castle-2"]);
+        playChessSound("castle");
       }
 
       setPosition(afterFen);

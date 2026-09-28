@@ -1,4 +1,8 @@
+import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { playChessSound } from "@/games/chess/audio/chessAudio";
+import { useVariantRecordAudio } from "@/games/chess/audio/useVariantRecordAudio";
+import type { ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -497,6 +501,12 @@ export function CapitalismMultiplayerGame() {
         : null,
     [gameState],
   );
+  useVariantRecordAudio(stored?.records ?? null, record => {
+    const sounds: ChessSoundEvent[] = [];
+    if (record.economy.bountyClaimed) sounds.push("bountyComplete");
+    if (record.economy.missionCompleted) sounds.push("missionComplete");
+    return sounds;
+  });
 
   const liveGame = useMemo(
     () => (gameState?.fen ? new Chess(gameState.fen) : new Chess()),
@@ -968,6 +978,8 @@ export function CapitalismMultiplayerGame() {
     if (rpcError) {
       setError(rpcError.message);
       await loadAll();
+    } else {
+      playChessSound("marketSpawn");
     }
 
     setActionBusy(null);
@@ -1345,6 +1357,7 @@ export function CapitalismMultiplayerGame() {
                       {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
                     </p>
                   </button>
+                    <InviteFriendButton overlay />
                 </div>
               )}
 

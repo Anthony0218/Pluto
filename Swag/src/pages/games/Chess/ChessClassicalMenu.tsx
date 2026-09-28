@@ -27,9 +27,9 @@ const modes: ClassicMode[] = [
   },
   {
     title: "Multiplayer",
-    description: "Create or join an online chess room.",
+    description: "Play a friend or enter the ranked queue.",
     path: "/games/chess/classic/multiplayer",
-    footer: "ROOMS · ONLINE · LIVE",
+    footer: "FRIENDS · RANKED · LIVE",
     eyebrow: "Play online",
     accent: "emerald",
     kind: "multiplayer",
@@ -257,7 +257,7 @@ export default function ChessClassicalMenu() {
 
           {/* RIGHT — MODE BUTTONS */}
           <div className="relative flex min-h-[560px] items-center border-t border-white/[0.06] px-5 py-8 sm:px-8 lg:min-h-0 lg:border-t-0 lg:px-10 lg:py-12 xl:px-14 2xl:px-20">
-            <div className="mx-auto flex w-full max-w-[980px] flex-col gap-4 xl:gap-5">
+            <div className="mx-auto grid w-full max-w-[980px] gap-4 sm:grid-cols-2 xl:gap-5">
               {modes.map((mode) => {
                 const styles = accentStyles[mode.accent];
 
@@ -309,7 +309,7 @@ export default function ChessClassicalMenu() {
 
               <Link
                 to="/games/chess/rules"
-                className="group mt-2 flex items-center justify-between border-t border-white/[0.08] px-2 pt-6 text-sm text-zinc-500 transition hover:text-white"
+                className="group mt-2 flex items-center justify-between border-t border-white/[0.08] px-2 pt-4 text-sm text-zinc-500 transition hover:text-white sm:col-span-2"
               >
                 <span className="inline-flex items-center gap-3">
                   <span className="text-lg">♔</span>{ui("Rules & Tips")}</span>

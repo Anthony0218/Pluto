@@ -124,6 +124,11 @@ export default function Watten() {
 
           <section className="watten-pub-choices" aria-label={t("How would you like to play?")}>
             <div className="watten-pub-choices__intro"><span>{t("CHOOSE YOUR TABLE")}</span><p>{t("How would you like to play?")}</p></div>
+            <Link to="/games/watten/singleplayer" className="watten-pub-choice watten-pub-choice--local">
+              <span className="watten-pub-choice__icon"><Gamepad2 size={24} aria-hidden="true" /></span>
+              <span className="watten-pub-choice__text"><small>{t("3 OR 4 PLAYERS · BOTS")}</small><strong>{t("Singleplayer")}</strong><span>{t("Play against bots filling the remaining seats.")}</span></span>
+              <span className="watten-pub-choice__arrow"><ArrowRight size={21} aria-hidden="true" /></span>
+            </Link>
             <Link to="/games/watten/hotseat" className="watten-pub-choice watten-pub-choice--local">
               <span className="watten-pub-choice__icon"><Gamepad2 size={24} aria-hidden="true" /></span>
               <span className="watten-pub-choice__text"><small>{t("ONE DEVICE · 3 OR 4 PLAYERS")}</small><strong>Hotseat</strong><span>{t("Pass the device around the table and play together.")}</span></span>

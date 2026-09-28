@@ -12,6 +12,7 @@ type ChessRoom = {
   code: string;
   host_id: string;
   status: "waiting" | "ready" | "playing" | "finished";
+  match_kind: "casual" | "ranked";
 };
 
 type RoomPlayer = {
@@ -84,7 +85,7 @@ export default function ChessMultiplayerRoom() {
 
     const { data: roomData, error: roomError } = await supabase
       .from("chess_rooms")
-      .select("id, code, host_id, status")
+      .select("id, code, host_id, status, match_kind")
       .eq("code", roomCode.toUpperCase())
       .single();
 
@@ -150,9 +151,9 @@ export default function ChessMultiplayerRoom() {
 
   useEffect(() => {
     if (room?.status === "playing") {
-      navigate(`/games/chess/classic/multiplayer/${room.code}/game`);
+      navigate(`${room.match_kind === "ranked" ? "/games/chess/ranked" : "/games/chess/classic/multiplayer"}/${room.code}/game`);
     }
-  }, [room?.status, room?.code, navigate]);
+  }, [room?.status, room?.code, room?.match_kind, navigate]);
 
   useEffect(() => {
     if (!roomCode || !user) return;
@@ -243,7 +244,7 @@ export default function ChessMultiplayerRoom() {
           <div className="w-full max-w-[700px] rounded-[22px] border border-red-400/20 bg-black/25 p-8 text-center backdrop-blur-md">
             <p className="font-serif text-2xl text-red-200">{ui(error)}</p>
             <Link
-              to="/chess/classic/multiplayer"
+              to="/games/chess/classic/multiplayer"
               className="mt-6 inline-flex items-center gap-2 text-sm text-zinc-500 transition hover:text-white"
             >{ui("← Back to Multiplayer")}</Link>
           </div>
@@ -267,7 +268,7 @@ export default function ChessMultiplayerRoom() {
 
           <div className="max-w-[620px]">
             <Link
-              to="/chess/classic/multiplayer"
+              to={room?.match_kind === "ranked" ? "/games/chess/ranked" : "/games/chess/classic/multiplayer"}
               className="mb-8 inline-flex items-center gap-2 text-sm text-zinc-600 transition hover:text-white"
             >
               <span>←</span>{ui("Multiplayer")}</Link>
@@ -312,6 +313,7 @@ export default function ChessMultiplayerRoom() {
                 label={white?.user_id === user?.id ? "White · You" : "White"}
                 pieceSymbol="♙"
                 highlighted={Boolean(white)}
+                canInvite={room.status === "waiting" && !white}
               />
 
               <PlayerCard
@@ -321,6 +323,7 @@ export default function ChessMultiplayerRoom() {
                 label={black?.user_id === user?.id ? "Black · You" : "Black"}
                 pieceSymbol="♟"
                 highlighted={Boolean(black)}
+                canInvite={room.status === "waiting" && !black}
               />
             </div>
 
@@ -387,6 +390,7 @@ function PlayerCard({
   label,
   pieceSymbol,
   highlighted,
+  canInvite = false,
 }: {
   player: RoomPlayer | undefined;
   avatarId?: string;
@@ -394,6 +398,7 @@ function PlayerCard({
   label: string;
   pieceSymbol: string;
   highlighted: boolean;
+  canInvite?: boolean;
 }) {
   useUiLanguage();
   const isCurrentUser = player?.user_id === currentUserId;
@@ -449,6 +454,7 @@ function PlayerCard({
               {player ? isCurrentUser ? ui("You are ready") : ui("Player joined") : ui("Waiting for player")}
             </span>
           </div>
+          {canInvite && <button type="button" onClick={() => window.dispatchEvent(new Event("open-room-friends"))} className="mt-3 rounded-lg border border-amber-300/40 bg-amber-300/10 px-3 py-2 text-xs font-bold text-amber-200 transition hover:bg-amber-300/20 focus-visible:outline-2 focus-visible:outline-amber-300">{ui("Invite Friend")}</button>}
         </div>
       </div>
     </section>

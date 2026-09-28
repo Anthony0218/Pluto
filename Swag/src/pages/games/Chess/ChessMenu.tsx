@@ -73,6 +73,7 @@ export default function ChessMenu() {
 
             <div className="mt-12 flex items-center gap-4 text-[9px] font-black uppercase tracking-[0.28em] text-zinc-700">
               <span className="h-px w-14 bg-amber-400/45" />{ui("Classic · Variants · Custom")}</div>
+            <Link to="/games/chess/audio" className="mt-6 w-fit rounded-xl border border-white/15 px-4 py-3 text-sm text-zinc-300 hover:border-indigo-300/40 hover:text-white focus-visible:outline-2 focus-visible:outline-indigo-300">{ui("Audio settings")}</Link>
           </header>
 
           <div className="relative flex min-h-[560px] items-center border-t border-white/[0.06] px-5 py-8 sm:px-8 lg:min-h-0 lg:border-t-0 lg:px-10 lg:py-12 xl:px-14 2xl:px-20">

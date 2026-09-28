@@ -1,19 +1,30 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
+import { ui, useUiLanguage } from "@/i18n/ui";
 
 import ProfileAvatarPicker, {
   ProfileAvatar,
 } from "../../components/social/ProfileAvatarPicker";
 import ProfileFriends from "../../components/social/ProfileFriends";
+import MyGroupsCard from "../../components/social/MyGroupsCard";
 
+type GameStat = {
+  games_played: number;
+  multiplayer_games: number;
+  multiplayer_wins: number;
+  wins: number;
+  draws: number;
+  score_difference: number;
+};
 type ProfileStats = {
-  savedChessGames: number;
-  classicMultiplayer: number;
-  variantMultiplayer: number;
-  wattenMultiplayer: number;
+  general: { games_played: number; wins: number };
+  games: Record<string, GameStat>;
+  streak: number;
+  puzzles: number | null;
+  perfectReallyHard: number | null;
+  chessElo: number | null;
 };
 
 type ProfileWithAvatar = {
@@ -22,11 +33,41 @@ type ProfileWithAvatar = {
 };
 
 const emptyStats: ProfileStats = {
-  savedChessGames: 0,
-  classicMultiplayer: 0,
-  variantMultiplayer: 0,
-  wattenMultiplayer: 0,
+  general: { games_played: 0, wins: 0 },
+  games: {},
+  streak: 0,
+  puzzles: null,
+  perfectReallyHard: null,
+  chessElo: null,
 };
+const emptyGameStat: GameStat = {
+  games_played: 0,
+  multiplayer_games: 0,
+  multiplayer_wins: 0,
+  wins: 0,
+  draws: 0,
+  score_difference: 0,
+};
+const trackedGames = new Set([
+  "chess",
+  "schafkopf",
+  "watten",
+  "atlas",
+  "go",
+  "shogi",
+]);
+const statTabs = [
+  { id: "general", label: "General" },
+  { id: "chess", label: "Chess" },
+  { id: "chess3d", label: "Chess 3D" },
+  { id: "schafkopf", label: "Schafkopfen" },
+  { id: "watten", label: "Watten" },
+  { id: "natura", label: "Natura" },
+  { id: "atlas", label: "Atlas Arena" },
+  { id: "medieval", label: "Medieval Kingdoms" },
+  { id: "go", label: "Go" },
+  { id: "shogi", label: "Shogi" },
+] as const;
 
 function StatCard({
   icon,
@@ -46,19 +87,21 @@ function StatCard({
       </div>
 
       <p className="mt-3 text-xs font-bold uppercase tracking-wider text-slate-400">
-        {label}
+        {ui(label)}
       </p>
     </div>
   );
 }
 
 export default function ProfilePage() {
+  const { language } = useUiLanguage();
   const { user, profile, refreshProfile } = useAuth();
 
   const [username, setUsername] = useState("");
   const [avatarId, setAvatarId] = useState("m1");
 
   const [stats, setStats] = useState<ProfileStats>(emptyStats);
+  const [statTab, setStatTab] = useState<string>("general");
 
   const [editing, setEditing] = useState(false);
   const [avatarPickerOpen, setAvatarPickerOpen] = useState(false);
@@ -66,6 +109,7 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [savingAvatar, setSavingAvatar] = useState(false);
   const [loadingStats, setLoadingStats] = useState(true);
+  const [statsError, setStatsError] = useState<string | null>(null);
 
   const [message, setMessage] = useState<string | null>(null);
 
@@ -83,26 +127,24 @@ export default function ProfilePage() {
         ? typedProfile.username.trim()
         : "";
 
-    setUsername(currentName || "");
-
-    setAvatarId(typedProfile?.avatar_id ?? "m1");
+    const timer = window.setTimeout(() => {
+      setUsername(currentName || "");
+      setAvatarId(typedProfile?.avatar_id ?? "m1");
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [profile, user?.email]);
 
   /* =========================================================
      MEMBER SINCE
      ========================================================= */
 
-  const memberSince = useMemo(() => {
-    if (!user?.created_at) {
-      return "—";
-    }
-
-    return new Intl.DateTimeFormat("de-DE", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }).format(new Date(user.created_at));
-  }, [user?.created_at]);
+  const memberSince = user?.created_at
+    ? new Intl.DateTimeFormat(language === "bar" ? "de" : language, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }).format(new Date(user.created_at))
+    : "—";
 
   /* =========================================================
      STATS
@@ -112,53 +154,40 @@ export default function ProfilePage() {
     if (!user) {
       return;
     }
-
     const userId = user.id;
 
     async function loadStats() {
       setLoadingStats(true);
 
-      const [savedResult, classicResult, variantResult, wattenResult] =
-        await Promise.all([
-          supabase
-            .from("games")
-            .select("id", {
-              count: "exact",
-              head: true,
-            })
-            .eq("user_id", userId),
-
-          supabase
-            .from("chess_room_players")
-            .select("room_id", {
-              count: "exact",
-              head: true,
-            })
-            .eq("user_id", userId),
-
-          supabase
-            .from("variant_room_players")
-            .select("room_id", {
-              count: "exact",
-              head: true,
-            })
-            .eq("user_id", userId),
-
-          supabase
-            .from("watten_room_players")
-            .select("room_id", {
-              count: "exact",
-              head: true,
-            })
-            .eq("user_id", userId),
-        ]);
-
-      setStats({
-        savedChessGames: savedResult.count ?? 0,
-        classicMultiplayer: classicResult.count ?? 0,
-        variantMultiplayer: variantResult.count ?? 0,
-        wattenMultiplayer: wattenResult.count ?? 0,
-      });
+      const [result, activity, puzzles, rating] = await Promise.all([
+        supabase.rpc("get_my_game_stats"),
+        supabase.rpc("get_dashboard_activity"),
+        supabase.rpc("get_my_chess_puzzle_stats"),
+        supabase
+          .from("chess_ratings")
+          .select("rating")
+          .eq("user_id", userId)
+          .maybeSingle(),
+      ]);
+      if (!result.error) {
+        setStatsError(null);
+        const data = result.data as Pick<ProfileStats, "general" | "games">;
+        setStats({
+          general: data?.general ?? emptyStats.general,
+          games: data?.games ?? {},
+          streak: Number(activity.data?.streak ?? 0),
+          puzzles: puzzles.error ? null : Number(puzzles.data?.completed ?? 0),
+          perfectReallyHard: puzzles.error
+            ? null
+            : Number(puzzles.data?.perfect_really_hard ?? 0),
+          chessElo: rating.data?.rating ?? null,
+        });
+      } else
+        setStatsError(
+          ui(
+            "Verified game statistics are unavailable until the database migrations are applied.",
+          ),
+        );
 
       setLoadingStats(false);
     }
@@ -166,11 +195,13 @@ export default function ProfilePage() {
     void loadStats();
   }, [user]);
 
-  const totalGames =
-    stats.savedChessGames +
-    stats.classicMultiplayer +
-    stats.variantMultiplayer +
-    stats.wattenMultiplayer;
+  const totalGames = stats.general.games_played;
+  const mostPlayed = Object.entries(stats.games)
+    .filter(([, value]) => value.games_played > 0)
+    .sort((a, b) => b[1].games_played - a[1].games_played)
+    .slice(0, 3);
+  const gameName = (id: string) =>
+    statTabs.find((tab) => tab.id === id)?.label ?? id;
 
   /* =========================================================
      USERNAME
@@ -184,12 +215,12 @@ export default function ProfilePage() {
     const nextName = username.trim();
 
     if (nextName.length < 2) {
-      setError("Der Name muss mindestens 2 Zeichen lang sein.");
+      setError(ui("Name must be at least 2 characters long."));
       return;
     }
 
     if (nextName.length > 30) {
-      setError("Der Name darf maximal 30 Zeichen lang sein.");
+      setError(ui("Name must be at most 30 characters long."));
       return;
     }
 
@@ -214,7 +245,7 @@ export default function ProfilePage() {
     await refreshProfile();
     setUsername(nextName);
     setEditing(false);
-    setMessage("Name gespeichert.");
+    setMessage(ui("Name saved."));
 
     window.setTimeout(() => {
       setMessage(null);
@@ -257,7 +288,7 @@ export default function ProfilePage() {
     }
 
     await refreshProfile();
-    setMessage("Avatar gespeichert.");
+    setMessage(ui("Avatar saved."));
 
     window.setTimeout(() => {
       setMessage(null);
@@ -274,10 +305,10 @@ export default function ProfilePage() {
         <div className="mx-auto max-w-xl rounded-3xl border border-white/10 bg-zinc-900 p-8 text-center">
           <div className="text-5xl">👤</div>
 
-          <h1 className="mt-5 text-2xl font-black">Nicht angemeldet</h1>
+          <h1 className="mt-5 text-2xl font-black">{ui("Not signed in")}</h1>
 
           <p className="mt-2 text-sm text-zinc-500">
-            Melde dich an, um dein Profil zu sehen.
+            {ui("Sign in to view your profile.")}
           </p>
         </div>
       </main>
@@ -289,30 +320,29 @@ export default function ProfilePage() {
      ========================================================= */
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_rgba(79,70,229,.15),_transparent_52%)] px-4 py-10 text-white sm:px-6">
-      <div className="mx-auto max-w-6xl">
+    <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_rgba(79,70,229,.15),_transparent_52%)] px-4 py-5 text-white sm:px-6 lg:h-[var(--app-height)] lg:min-h-0 lg:overflow-hidden lg:py-3">
+      <div className="mx-auto max-w-6xl lg:flex lg:h-full lg:min-h-0 lg:flex-col">
         {/* HEADER */}
 
-        <div className="mb-8 rounded-[28px] border border-indigo-300/10 bg-[#0b1529]/70 px-6 py-5 shadow-xl shadow-black/10">
+        <div className="mb-3 rounded-[28px] border border-indigo-300/10 bg-[#0b1529]/70 px-6 py-4 shadow-xl shadow-black/10 lg:shrink-0">
           <p className="text-xs font-black uppercase tracking-[0.3em] text-indigo-300">
-            Account
+            {ui("Account")}
           </p>
 
-          <h1 className="mt-2 text-4xl font-black">Dein Profil</h1>
+          <h1 className="mt-1 text-3xl font-black">{ui("Your profile")}</h1>
 
           <p className="mt-2 text-sm text-slate-400">
-            Verwalte deinen Spielernamen, deinen Avatar und deine
-            Spielstatistiken.
+            {ui("Manage your player name, avatar and game statistics.")}
           </p>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
+        <div className="grid min-h-0 gap-4 lg:flex-1 lg:grid-cols-[250px_minmax(0,1fr)]">
           {/* =================================================
               LEFT PROFILE CARD
               ================================================= */}
 
-          <aside>
-            <div className="sticky top-24 rounded-[26px] border border-indigo-300/15 bg-[#0b1529]/90 p-5 shadow-2xl shadow-black/30">
+          <aside className="min-h-0 lg:overflow-y-auto">
+            <div className="rounded-[26px] border border-indigo-300/15 bg-[#0b1529]/90 p-5 shadow-2xl shadow-black/30">
               {/* AVATAR */}
 
               <div>
@@ -356,13 +386,13 @@ export default function ProfilePage() {
                       group-hover:opacity-100
                     "
                   >
-                    Avatar ändern
+                    {ui("Change avatar")}
                   </div>
                 </button>
 
                 {savingAvatar && (
                   <p className="mt-2 text-xs text-zinc-600">
-                    Avatar wird gespeichert...
+                    {ui("Saving avatar...")}
                   </p>
                 )}
               </div>
@@ -371,7 +401,7 @@ export default function ProfilePage() {
 
               <div className="mt-5">
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600">
-                  Spielername
+                  {ui("Player name")}
                 </p>
 
                 {!editing ? (
@@ -401,7 +431,7 @@ export default function ProfilePage() {
                         hover:text-white
                       "
                     >
-                      Ändern
+                      {ui("Edit")}
                     </button>
                   </div>
                 ) : (
@@ -473,7 +503,7 @@ export default function ProfilePage() {
                           hover:bg-white/10
                         "
                       >
-                        Abbrechen
+                        {ui("Cancel")}
                       </button>
 
                       <button
@@ -493,7 +523,7 @@ export default function ProfilePage() {
                           disabled:opacity-50
                         "
                       >
-                        {saving ? "Speichern..." : "Speichern"}
+                        {saving ? ui("Saving...") : ui("Save")}
                       </button>
                     </div>
                   </div>
@@ -516,7 +546,7 @@ export default function ProfilePage() {
 
               <div className="mt-5 border-t border-white/5 pt-5">
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600">
-                  Mitglied seit
+                  {ui("Member since")}
                 </p>
 
                 <p className="mt-2 text-sm font-semibold text-zinc-300">
@@ -544,7 +574,7 @@ export default function ProfilePage() {
               RIGHT CONTENT
               ================================================= */}
 
-          <section className="space-y-6">
+          <section className="min-h-0 space-y-3 lg:overflow-y-auto">
             {/* AVATAR PICKER */}
 
             {avatarPickerOpen && (
@@ -556,11 +586,11 @@ export default function ProfilePage() {
                     </p>
 
                     <h2 className="mt-1 text-xl font-black">
-                      Avatar auswählen
+                      {ui("Choose avatar")}
                     </h2>
 
                     <p className="mt-1 text-xs text-zinc-500">
-                      Wähle einen von 12 Charakteren.
+                      {ui("Choose one of 12 characters.")}
                     </p>
                   </div>
 
@@ -569,7 +599,7 @@ export default function ProfilePage() {
                     onClick={() => setAvatarPickerOpen(false)}
                     className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-zinc-400 transition hover:bg-white/10 hover:text-white"
                   >
-                    Schließen
+                    {ui("Close")}
                   </button>
                 </div>
 
@@ -588,116 +618,220 @@ export default function ProfilePage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-400">
-                    Statistik
+                    {ui("Statistics")}
                   </p>
 
-                  <h2 className="mt-1 text-2xl font-black">Deine Spiele</h2>
+                  <h2 className="mt-1 text-2xl font-black">
+                    {ui("Your stats")}
+                  </h2>
                 </div>
 
                 {loadingStats && (
-                  <span className="text-xs text-zinc-600">Lade...</span>
+                  <span className="text-xs text-zinc-600">
+                    {ui("Loading...")}
+                  </span>
                 )}
               </div>
 
-              <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                <StatCard
-                  icon="🎮"
-                  label="Spiele insgesamt"
-                  value={loadingStats ? "…" : totalGames}
-                />
-
-                <StatCard
-                  icon="♟"
-                  label="Schach Multiplayer"
-                  value={loadingStats ? "…" : stats.classicMultiplayer}
-                />
-
-                <StatCard
-                  icon="⚡"
-                  label="Schach Varianten"
-                  value={loadingStats ? "…" : stats.variantMultiplayer}
-                />
-
-                <StatCard
-                  icon="🃏"
-                  label="Watten Multiplayer"
-                  value={loadingStats ? "…" : stats.wattenMultiplayer}
-                />
-
-                <StatCard
-                  icon="💾"
-                  label="Gespeicherte Schachpartien"
-                  value={loadingStats ? "…" : stats.savedChessGames}
-                />
-
-                <StatCard
-                  icon="🏆"
-                  label="Account Level"
-                  value={
-                    totalGames >= 100
-                      ? "Veteran"
-                      : totalGames >= 30
-                        ? "Regular"
-                        : totalGames >= 10
-                          ? "Player"
-                          : "Beginner"
-                  }
-                />
+              <div
+                role="tablist"
+                aria-label={ui("Game statistics")}
+                className="mt-4 flex gap-2 overflow-x-auto pb-2"
+                onKeyDown={(event) => {
+                  if (event.key !== "ArrowRight" && event.key !== "ArrowLeft")
+                    return;
+                  event.preventDefault();
+                  const current = statTabs.findIndex(
+                    (tab) => tab.id === statTab,
+                  );
+                  const next =
+                    statTabs[
+                      (current +
+                        (event.key === "ArrowRight" ? 1 : -1) +
+                        statTabs.length) %
+                        statTabs.length
+                    ];
+                  setStatTab(next.id);
+                  document.getElementById(`stats-tab-${next.id}`)?.focus();
+                }}
+              >
+                {statTabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    role="tab"
+                    id={`stats-tab-${tab.id}`}
+                    aria-selected={statTab === tab.id}
+                    aria-controls="stats-panel"
+                    tabIndex={statTab === tab.id ? 0 : -1}
+                    onClick={() => setStatTab(tab.id)}
+                    className={`shrink-0 rounded-xl border px-4 py-2 text-sm font-bold focus-visible:outline-2 focus-visible:outline-amber-300 ${statTab === tab.id ? "border-amber-300 bg-amber-300/15 text-amber-200" : "border-white/10 text-slate-400 hover:text-white"}`}
+                  >
+                    {ui(tab.label)}
+                  </button>
+                ))}
               </div>
+              <div
+                id="stats-panel"
+                role="tabpanel"
+                aria-labelledby={`stats-tab-${statTab}`}
+                className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
+              >
+                {statsError ? (
+                  <p
+                    role="alert"
+                    className="col-span-full text-sm text-amber-200"
+                  >
+                    {statsError}
+                  </p>
+                ) : statTab === "general" ? (
+                  <>
+                    <StatCard
+                      icon="🎮"
+                      label="Completed games"
+                      value={loadingStats ? "…" : totalGames}
+                    />
+                    <StatCard
+                      icon="🏆"
+                      label="Total wins"
+                      value={loadingStats ? "…" : stats.general.wins}
+                    />
+                    <StatCard
+                      icon="🔥"
+                      label="Day streak"
+                      value={loadingStats ? "…" : stats.streak}
+                    />
+                  </>
+                ) : statTab === "chess" ? (
+                  <>
+                    <StatCard
+                      icon="♟"
+                      label="Completed games"
+                      value={
+                        loadingStats
+                          ? "…"
+                          : (stats.games.chess?.games_played ?? 0)
+                      }
+                    />
+                    <StatCard
+                      icon="🏆"
+                      label="Multiplayer wins"
+                      value={
+                        loadingStats
+                          ? "…"
+                          : (stats.games.chess?.multiplayer_wins ?? 0)
+                      }
+                    />
+                    <StatCard
+                      icon="📈"
+                      label="Multiplayer win rate"
+                      value={
+                        loadingStats
+                          ? "…"
+                          : stats.games.chess?.multiplayer_games
+                            ? `${Math.round((stats.games.chess.multiplayer_wins / stats.games.chess.multiplayer_games) * 100)}%`
+                            : "—"
+                      }
+                    />
+                    <StatCard
+                      icon="🧩"
+                      label="Completed puzzles"
+                      value={loadingStats ? "…" : (stats.puzzles ?? "—")}
+                    />
+                    <StatCard
+                      icon="✨"
+                      label="Really Hard · zero mistakes"
+                      value={
+                        loadingStats ? "…" : (stats.perfectReallyHard ?? "—")
+                      }
+                    />
+                    <StatCard
+                      icon="♕"
+                      label="Ranked ELO"
+                      value={loadingStats ? "…" : (stats.chessElo ?? "—")}
+                    />
+                  </>
+                ) : trackedGames.has(statTab) ? (
+                  <>
+                    <StatCard
+                      icon="🎮"
+                      label="Completed games"
+                      value={
+                        loadingStats
+                          ? "…"
+                          : (stats.games[statTab] ?? emptyGameStat).games_played
+                      }
+                    />
+                    <StatCard
+                      icon="🏆"
+                      label="Multiplayer wins"
+                      value={
+                        loadingStats
+                          ? "…"
+                          : (stats.games[statTab] ?? emptyGameStat)
+                              .multiplayer_wins
+                      }
+                    />
+                    {(statTab === "schafkopf" || statTab === "watten") && (
+                      <StatCard
+                        icon="➕"
+                        label="Total score difference"
+                        value={
+                          loadingStats
+                            ? "…"
+                            : `${(stats.games[statTab] ?? emptyGameStat).score_difference >= 0 ? "+" : ""}${(stats.games[statTab] ?? emptyGameStat).score_difference}`
+                        }
+                      />
+                    )}
+                  </>
+                ) : (
+                  <p className="col-span-full text-sm text-slate-400">
+                    {ui(
+                      "No verified completion data is available for this game yet.",
+                    )}
+                  </p>
+                )}
+              </div>
+              <p className="mt-4 text-xs text-slate-500">
+                {ui(
+                  "Games played counts completed server-recorded results. The streak follows daily game visits. Puzzle totals come from saved puzzle completions.",
+                )}
+              </p>
             </div>
 
-            <ProfileFriends userId={user.id} />
+            <div className="grid gap-3 xl:grid-cols-2">
+              <ProfileFriends userId={user.id} />
+              <MyGroupsCard userId={user.id} />
 
-            {/* QUICK LINKS */}
-
-            <div className="rounded-[30px] border border-white/10 bg-zinc-900/80 p-6">
-              <h2 className="text-xl font-black">Weiterspielen</h2>
-
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                <Link
-                  to="/games/chess"
-                  className="
-                    rounded-2xl
-                    border
-                    border-white/10
-                    bg-white/5
-                    p-4
-                    transition
-                    hover:border-amber-400/25
-                    hover:bg-amber-400/[0.06]
-                  "
-                >
-                  <span className="text-2xl">♟</span>
-
-                  <p className="mt-3 font-black">Schach</p>
-
-                  <p className="mt-1 text-xs text-zinc-500">
-                    Klassisch, Varianten oder Multiplayer
+              <section className="rounded-[26px] border border-indigo-400/15 bg-[#0b1529]/90 p-5 shadow-xl shadow-black/20">
+                <h2 className="text-lg font-black">
+                  {ui("Most Played Games")}
+                </h2>
+                {loadingStats ? (
+                  <p className="mt-3 text-sm text-slate-400">
+                    {ui("Loading...")}
                   </p>
-                </Link>
-
-                <Link
-                  to="/games/watten"
-                  className="
-                    rounded-2xl
-                    border
-                    border-white/10
-                    bg-white/5
-                    p-4
-                    transition
-                    hover:border-emerald-400/25
-                    hover:bg-emerald-400/[0.06]
-                  "
-                >
-                  <span className="text-2xl">🃏</span>
-
-                  <p className="mt-3 font-black">Watten</p>
-
-                  <p className="mt-1 text-xs text-zinc-500">
-                    Bayerisches Kartenspiel
+                ) : mostPlayed.length ? (
+                  <ol className="mt-3 grid gap-2">
+                    {mostPlayed.map(([id, value], index) => (
+                      <li
+                        key={id}
+                        className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm"
+                      >
+                        <span className="text-amber-300">{index + 1}.</span>{" "}
+                        {ui(gameName(id))}{" "}
+                        <span className="text-slate-400">
+                          — {value.games_played} {ui("games")}
+                        </span>
+                      </li>
+                    ))}
+                  </ol>
+                ) : (
+                  <p className="mt-3 text-sm text-slate-400">
+                    {ui("No completed games yet.")}
                   </p>
-                </Link>
-              </div>
+                )}
+              </section>
             </div>
           </section>
         </div>

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
+import { translateUi } from "@/i18n/ui";
 
-export type WattenLanguage = "en" | "de" | "bar" | "ko" | "ru";
+export type WattenLanguage = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 
 export const wattenLanguageOptions: Array<{
   value: WattenLanguage;
@@ -11,6 +12,8 @@ export const wattenLanguageOptions: Array<{
   { value: "bar", label: "Boarisch" },
   { value: "ko", label: "한국어" },
   { value: "ru", label: "Русский" },
+  { value: "es", label: "Español" },
+  { value: "pt", label: "Português" },
 ];
 
 const de: Record<string, string> = {
@@ -481,7 +484,7 @@ const ru: Record<string, string> = {
 };
 
 const rulebookTranslations: Partial<
-  Record<WattenLanguage, Record<string, string>>
+  Partial<Record<WattenLanguage, Record<string, string>>>
 > = {
   de: {
     Design: "Design",
@@ -798,7 +801,7 @@ const rulebookTranslations: Partial<
 };
 
 const extraTranslations: Partial<
-  Record<WattenLanguage, Record<string, string>>
+  Partial<Record<WattenLanguage, Record<string, string>>>
 > = {
   de: {
     "How would you like to play?": "Wie möchtest du spielen?",
@@ -1094,7 +1097,7 @@ const extraTranslations: Partial<
 };
 
 const menuAndSituationTranslations: Partial<
-  Record<WattenLanguage, Record<string, string>>
+  Partial<Record<WattenLanguage, Record<string, string>>>
 > = {
   de: {
     "Choose between local Hotseat, online Multiplayer, or review the rules first.":
@@ -1514,7 +1517,8 @@ export function translateWatten(language: WattenLanguage, key: string): string {
   if (language === "de") return de[key] ?? key;
   if (language === "bar") return bar[key] ?? de[key] ?? key;
   if (language === "ko") return ko[key] ?? key;
-  return ru[key] ?? key;
+  if (language === "ru") return ru[key] ?? key;
+  return translateUi(language, key);
 }
 
 /**

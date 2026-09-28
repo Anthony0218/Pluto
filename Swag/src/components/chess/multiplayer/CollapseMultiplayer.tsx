@@ -1,4 +1,6 @@
+import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { useVariantRecordAudio } from "@/games/chess/audio/useVariantRecordAudio";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -457,6 +459,7 @@ export function CollapseMultiplayerGame() {
         : null,
     [gameState],
   );
+  useVariantRecordAudio(state?.records ?? null, record => record.collapseAfter.lastImpactSquares.length ? ["collapse"] : []);
 
   const liveGame = useMemo(
     () =>
@@ -1137,6 +1140,7 @@ export function CollapseMultiplayerGame() {
                       {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
                     </p>
                   </button>
+                    <InviteFriendButton overlay />
                 </div>
               )}
 

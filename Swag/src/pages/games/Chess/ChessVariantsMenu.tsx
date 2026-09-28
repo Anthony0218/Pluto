@@ -6,7 +6,7 @@ import { useAppLanguage } from "@/i18n/languageStore";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-type Language = "en" | "de" | "bar" | "ko" | "ru";
+type Language = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 
 const languageOptions: Array<{ value: Language; label: string }> = [
   { value: "en", label: "English" },
@@ -14,11 +14,13 @@ const languageOptions: Array<{ value: Language; label: string }> = [
   { value: "bar", label: "Boarisch" },
   { value: "ko", label: "한국어" },
   { value: "ru", label: "Русский" },
+  { value: "es", label: "Español" },
+  { value: "pt", label: "Português" },
 ];
 
 
 
-const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
+const translations: Record<"de" | "bar" | "ko" | "ru", Record<string, string>> & Partial<Record<"es" | "pt", Record<string, string>>> = {
   de: {
     Rules: "Regeln",
     Singleplayer: "Einzelspieler",
@@ -473,7 +475,7 @@ function t(language: Language, key: string): string {
     return translations.bar[key] ?? translations.de[key] ?? ui(key);
   }
 
-  return translations[language][key] ?? ui(key);
+  return translations[language]?.[key] ?? ui(key);
 }
 
 const availableVariants = variants.filter((variant) => variant.available);

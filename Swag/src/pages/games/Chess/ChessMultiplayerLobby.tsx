@@ -110,6 +110,7 @@ export default function ChessMultiplayerLobby() {
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const roomBase = "/games/chess/classic/multiplayer";
 
   const displayName = useMemo(
     () =>
@@ -126,12 +127,7 @@ export default function ChessMultiplayerLobby() {
     setLoading(true);
     setError(null);
 
-    const { data, error: createError } = await supabase.rpc(
-      "create_chess_room",
-      {
-        p_display_name: displayName,
-      },
-    );
+    const { data, error: createError } = await supabase.rpc("create_chess_room", { p_display_name: displayName });
 
     setLoading(false);
 
@@ -141,12 +137,13 @@ export default function ChessMultiplayerLobby() {
       return;
     }
 
-    if (!data) {
+    const createdCode = data;
+    if (!createdCode) {
       setError("Room could not be created.");
       return;
     }
 
-    navigate(`/games/chess/classic/multiplayer/${data}`);
+    navigate(`${roomBase}/${createdCode}`);
   }
 
   async function joinRoom() {
@@ -154,6 +151,13 @@ export default function ChessMultiplayerLobby() {
 
     setLoading(true);
     setError(null);
+
+    const { data: matchKind, error: lookupError } = await supabase.rpc("get_chess_room_match_kind", { p_code: roomCode.trim().toUpperCase() });
+    if (lookupError || matchKind !== "casual") {
+      setLoading(false);
+      setError(ui("Enter a casual room code."));
+      return;
+    }
 
     const { data, error: joinError } = await supabase.rpc("join_chess_room", {
       p_code: roomCode.trim().toUpperCase(),
@@ -173,7 +177,7 @@ export default function ChessMultiplayerLobby() {
       return;
     }
 
-    navigate(`/games/chess/classic/multiplayer/${data}`);
+    navigate(`${roomBase}/${data}`);
   }
 
   if (!user) {
@@ -204,7 +208,7 @@ export default function ChessMultiplayerLobby() {
 
           <div className="max-w-[620px]">
             <Link
-              to="/chess/classic"
+              to="/games/chess/classic/multiplayer"
               className="mb-8 inline-flex items-center gap-2 text-sm text-zinc-600 transition hover:text-white"
             >
               <span>←</span>{ui("Classic Chess")}</Link>

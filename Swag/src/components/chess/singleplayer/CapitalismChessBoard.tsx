@@ -1,3 +1,5 @@
+import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
+import { emitGameEffect } from "@/games/chess/effects/gameEffects";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
@@ -13,7 +15,6 @@ import {
   playPieceCaptureSound,
   playPieceMoveSound,
   playPieceSelectSound,
-  playRandomSound,
 } from "../../../utils/sound.ts";
 
 import PromotionBar from "./PromotionBar";
@@ -61,7 +62,7 @@ import {
    TYPES
    ========================================================= */
 
-type Language = "en" | "de" | "bar" | "ko" | "ru";
+type Language = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 
 type StatsTab = "overview" | "market" | "moments";
 
@@ -95,7 +96,7 @@ const blackSymbols: Record<string, string> = {
    TRANSLATIONS
    ========================================================= */
 
-const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
+const translations: Record<"de" | "bar" | "ko" | "ru", Record<string, string>> & Partial<Record<"es" | "pt", Record<string, string>>> = {
   de: {
     Rulebook: "Regelbuch",
     "King Journey": "Königsreise",
@@ -590,7 +591,7 @@ export default function CapitalismChessBoard({
       return translations.bar[key] ?? translations.de[key] ?? ui(key);
     }
 
-    return translations[language][key] ?? ui(key);
+    return translations[language]?.[key] ?? ui(key);
   };
 
   function changeLanguage(nextLanguage: Language) {
@@ -814,11 +815,7 @@ export default function CapitalismChessBoard({
      SOUND
      ======================================================= */
 
-  function playSound(sound: string) {
-    const audio = new Audio(`/sounds/${sound}.mp3`);
-
-    audio.play().catch(() => {});
-  }
+  function playSound(sound: string) { playChessSound(sound as ChessSoundEvent); }
 
   /* =======================================================
      GAME OVER
@@ -973,6 +970,8 @@ export default function CapitalismChessBoard({
           isKingsideCastle: move.isKingsideCastle(),
         },
       });
+      if (economyResult.event.bountyClaimed) playChessSound("bountyComplete");
+      if (economyResult.event.missionCompleted) playChessSound("missionComplete");
 
       const nextPly = records.length + 1;
 
@@ -1020,7 +1019,7 @@ export default function CapitalismChessBoard({
         if (game.isCheck()) {
           playSound("check");
         } else if (move.isKingsideCastle() || move.isQueensideCastle()) {
-          playRandomSound(["castle-1", "castle-2"]);
+          playChessSound("castle");
         }
       }
     } catch {
@@ -1155,6 +1154,8 @@ export default function CapitalismChessBoard({
     });
 
     setCapitalState(nextState);
+    playChessSound("marketSpawn");
+    emitGameEffect({ type: "PIECE_SPAWN", square });
 
     setSelectedSquare(null);
     setLegalMoves([]);

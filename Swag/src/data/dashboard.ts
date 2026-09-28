@@ -8,6 +8,7 @@ export type DailyChallenge = {
   id?: string; category?: ChallengeCategory; title: string; description: string;
   progress: number | null; target: number; expires_at: string;
   route?: string; cta?: string; reward?: string;
+  difficulty?: string | null; progress_type?: string;
 };
 type DiscoverySlide = { title: string; description: string; route: string; gameRoute: string };
 export const discoverySlides: DiscoverySlide[] = [

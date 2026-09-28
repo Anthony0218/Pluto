@@ -1,3 +1,4 @@
+import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
@@ -14,7 +15,6 @@ import {
   playPieceCaptureSound,
   playPieceMoveSound,
   playPieceSelectSound,
-  playRandomSound,
 } from "../../../utils/sound.ts";
 
 import {
@@ -53,7 +53,7 @@ import {
   type ChessPlayerColor,
 } from "../../../games/chess/ai/variantAi.ts";
 
-type Language = "en" | "de" | "bar" | "ko" | "ru";
+type Language = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 
 type Winner = "white" | "black" | "draw";
 
@@ -103,7 +103,7 @@ const pieceNames: Record<DraftPieceType, string> = {
   k: "King",
 };
 
-const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
+const translations: Record<"de" | "bar" | "ko" | "ru", Record<string, string>> & Partial<Record<"es" | "pt", Record<string, string>>> = {
   de: {
     Random: "Zufall",
     "A King started in check, so both armies were replaced with independent random legal armies.":
@@ -421,7 +421,7 @@ export default function DraftChessBoard({
       return translations.bar[key] ?? translations.de[key] ?? ui(key);
     }
 
-    return translations[language][key] ?? ui(key);
+    return translations[language]?.[key] ?? ui(key);
   };
 
   function changeLanguage(nextLanguage: Language) {
@@ -641,11 +641,7 @@ export default function DraftChessBoard({
 
   const materialDifference = whiteMaterial - blackMaterial;
 
-  function playSound(sound: string) {
-    const audio = new Audio(`/sounds/${sound}.mp3`);
-
-    audio.play().catch(() => {});
-  }
+  function playSound(sound: string) { playChessSound(sound as ChessSoundEvent); }
 
   function applySetupAction(
     action: Parameters<typeof applyDraftSetupAction>[1],
@@ -707,7 +703,7 @@ export default function DraftChessBoard({
     setSetupTool("p");
     setSetupError("");
 
-    playRandomSound(["castle-1", "castle-2"]);
+    playChessSound("castle");
   }
 
   function confirmCurrentArmy() {
@@ -1049,7 +1045,7 @@ export default function DraftChessBoard({
         if (game.isCheck()) {
           playSound("check");
         } else if (move.isKingsideCastle() || move.isQueensideCastle()) {
-          playRandomSound(["castle-1", "castle-2"]);
+          playChessSound("castle");
         }
       }
     } catch {

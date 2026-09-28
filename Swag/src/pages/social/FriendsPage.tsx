@@ -6,6 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 import type { Friend, FriendRequest, PublicProfile } from "../../types/social";
 import FriendAvatar from "../../components/social/FriendAvatar";
 import FriendChat from "../../components/social/FriendChat";
+import MyGroupsCard from "../../components/social/MyGroupsCard";
 import { useDashboardData, type DashboardNotification } from "@/hooks/useDashboardData";
 import { ui, useUiLanguage } from "@/i18n/ui";
 
@@ -114,7 +115,7 @@ export default function FriendsPage() {
       return;
     }
 
-    void loadSocialData();
+    void Promise.resolve().then(() => loadSocialData());
 
     const channel = supabase
       .channel(`friends-page-${user.id}`)
@@ -139,9 +140,11 @@ export default function FriendsPage() {
     if (!user) return;
     const query = search.trim().replace(/^@/, "");
     if (query.length < 2) {
-      setSearchResults([]);
-      setSearching(false);
-      return;
+      let active = true;
+      void Promise.resolve().then(() => {
+        if (active) { setSearchResults([]); setSearching(false); }
+      });
+      return () => { active = false; };
     }
 
     const timeout = window.setTimeout(() => {
@@ -250,6 +253,7 @@ export default function FriendsPage() {
         <div className="grid gap-5 lg:grid-cols-[360px_1fr]">
           <aside className="space-y-4">
             <FriendNotifications items={notifications} />
+            <MyGroupsCard userId={user.id} />
             <section className="rounded-3xl border border-white/10 bg-zinc-900/80 p-4 shadow-xl shadow-black/10 backdrop-blur-md">
               <div className="flex items-center gap-2">
                 <UserPlus size={18} className="text-sky-400" />

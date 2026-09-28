@@ -1,4 +1,6 @@
+import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { useVariantRecordAudio } from "@/games/chess/audio/useVariantRecordAudio";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import {
   useCallback,
@@ -529,6 +531,7 @@ export function MutationMultiplayerGame() {
     () => buildMutationHistory(initialFen, gameState?.moves ?? [], seed),
     [gameState?.moves, initialFen, seed],
   );
+  useVariantRecordAudio(gameState ? historyRows : null, record => record.mutation ? ["mutation"] : []);
 
   const liveGame = useMemo(() => {
     try {
@@ -1339,6 +1342,7 @@ export function MutationMultiplayerGame() {
                         {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
                       </p>
                     </button>
+                    <InviteFriendButton overlay />
                   </div>
                 )}
 

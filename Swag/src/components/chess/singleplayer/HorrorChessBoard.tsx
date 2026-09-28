@@ -1,3 +1,4 @@
+import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
@@ -14,7 +15,6 @@ import {
   playPieceCaptureSound,
   playPieceMoveSound,
   playPieceSelectSound,
-  playRandomSound,
 } from "../../../utils/sound.ts";
 
 import {
@@ -45,7 +45,7 @@ import {
   type ChessPlayerColor,
 } from "../../../games/chess/ai/variantAi.ts";
 
-type Language = "en" | "de" | "bar" | "ko" | "ru";
+type Language = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 
 type StatsTab = "survival" | "plague" | "moments";
 
@@ -80,7 +80,7 @@ const blackSymbols: Record<string, string> = {
   k: "♚",
 };
 
-const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
+const translations: Record<"de" | "bar" | "ko" | "ru", Record<string, string>> & Partial<Record<"es" | "pt", Record<string, string>>> = {
   de: {
     "Chess Variant": "Schachvariante",
     "Horror Chess": "Horror-Schach",
@@ -357,7 +357,7 @@ export default function HorrorChessBoard({
       return translations.bar[key] ?? translations.de[key] ?? ui(key);
     }
 
-    return translations[language][key] ?? ui(key);
+    return translations[language]?.[key] ?? ui(key);
   };
 
   function changeLanguage(nextLanguage: Language) {
@@ -590,11 +590,7 @@ export default function HorrorChessBoard({
       ? HOT_SQUARE_INTERVAL_PLIES
       : HOT_SQUARE_INTERVAL_PLIES - fireRemainder;
 
-  function playSound(sound: string) {
-    const audio = new Audio(`/sounds/${sound}.mp3`);
-
-    audio.play().catch(() => {});
-  }
+  function playSound(sound: string) { playChessSound(sound as ChessSoundEvent); }
 
   function updateGameOver(
     nextRecords: HorrorMoveRecord[],
@@ -864,7 +860,7 @@ export default function HorrorChessBoard({
         if (game.isCheck()) {
           playSound("check");
         } else if (move.isKingsideCastle() || move.isQueensideCastle()) {
-          playRandomSound(["castle-1", "castle-2"]);
+          playChessSound("castle");
         }
       }
     } catch {

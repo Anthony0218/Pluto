@@ -1,4 +1,7 @@
+import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { playChessSound, stopSound } from "@/games/chess/audio/chessAudio";
+import { useVariantRecordAudio } from "@/games/chess/audio/useVariantRecordAudio";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -438,6 +441,12 @@ export function HotPotatoMultiplayerGame() {
         : null,
     [gameState],
   );
+  useVariantRecordAudio(state?.records ?? null, record => record.explosionSquaresAfter.length ? ["bombExplosion"] : []);
+  useEffect(() => {
+    if (state && gameState?.status === "playing" && Object.values(state.hotPotatoes).some(potato => potato.square !== null && !potato.dropped && potato.movesUntilExplosion > 0)) playChessSound("bombFuse");
+    else stopSound("bombFuse");
+    return () => stopSound("bombFuse");
+  }, [state, gameState?.status]);
   const liveGame = useMemo(
     () =>
       gameState?.fen
@@ -1146,6 +1155,7 @@ export function HotPotatoMultiplayerGame() {
                       {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
                     </p>
                   </button>
+                    <InviteFriendButton overlay />
                 </div>
               )}
 

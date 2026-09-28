@@ -3,12 +3,12 @@ import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 import type { Friend } from "../types/social";
 import type { DailyChallenge } from "../data/dashboard";
-import { getCompletedLichessPuzzles } from "../components/chess/singleplayer/lichessPuzzleSource";
 
 export type DashboardActivity = {
   streak: number;
   recent_games: { game_route: string; last_visited_at: string }[];
   challenge: DailyChallenge | null;
+  quests?: DailyChallenge[];
 };
 export type DashboardNotification = {
   id: string;
@@ -52,8 +52,9 @@ export function useDashboardDataSource() {
       if (running) return;
       running = true;
       try {
-        const [activityResult, friendships, messages, requests] = await Promise.all([
+        const [activityResult, questResult, friendships, messages, requests] = await Promise.all([
           supabase.rpc("get_dashboard_activity"),
+          supabase.rpc("get_daily_quests"),
           supabase
             .from("friendships")
             .select("user_a,user_b")
@@ -62,13 +63,7 @@ export function useDashboardDataSource() {
           supabase.from("friend_requests").select("id,sender_id,created_at").eq("receiver_id", userId).eq("status", "pending").order("created_at", { ascending: false }).limit(12),
         ]);
         const activity = activityResult.error ? null : activityResult.data as DashboardActivity;
-        if (activity?.challenge?.category === "puzzle") {
-          try {
-            const completed = await getCompletedLichessPuzzles(100);
-            const dayStart = Date.parse(activity.challenge.expires_at) - 86_400_000;
-            activity.challenge.progress = completed.filter(puzzle => Date.parse(puzzle.completedAt) >= dayStart && Date.parse(puzzle.completedAt) < Date.parse(activity.challenge!.expires_at)).length;
-          } catch { activity.challenge.progress = null; }
-        }
+        if (activity && !questResult.error && Array.isArray(questResult.data)) activity.quests = questResult.data as DailyChallenge[];
         const ids = [
           ...new Set(
             (friendships.data ?? []).map((row) =>
@@ -115,7 +110,7 @@ export function useDashboardDataSource() {
             friends: (profiles.data ?? []).filter(profile => ids.includes(profile.id)) as Friend[],
             onlineIds: (presence.data ?? []).map((row) => row.user_id),
             loading: false,
-            activityError: !!activityResult.error,
+            activityError: !!(activityResult.error || questResult.error),
             friendsError: !!(
               friendships.error ||
               profiles.error ||

@@ -93,11 +93,12 @@ body:has(.chess-game-grid) .chess-sidebar-toggle { display: block; }
 .chess-page-header .navigation-controls { margin-left: auto; }
 .chess-page-header:has(.chess-header-details label select) .public-header-language { display: none; }
 /* Keep gameplay controls below the title and navigation in every variant. */
-.chess-page-header:has(.chess-animation-control) { display: grid !important; grid-template-columns: minmax(0, 1fr) auto; align-items: center !important; gap: 10px 16px; }
+.chess-page-header:has(.chess-animation-control) { display: grid !important; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center !important; gap: 10px 16px; }
 .chess-page-header:has(.chess-animation-control) .chess-header-brand { grid-column: 1; grid-row: 1; margin-right: 0; }
 .chess-page-header:has(.chess-animation-control) .chess-header-details { grid-column: 1 / -1; grid-row: 2; width: 100%; padding-top: 10px; border-top: 1px solid color-mix(in srgb,var(--chess-header-accent) 18%,transparent); }
 .chess-page-header:has(.chess-animation-control) .chess-header-details > div:first-child { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
-.chess-page-header:has(.chess-animation-control) .navigation-controls { grid-column: 2; grid-row: 1; margin-left: 0; }
+.chess-page-header:has(.chess-animation-control) .chess-appearance { grid-column: 2; grid-row: 1; }
+.chess-page-header:has(.chess-animation-control) .navigation-controls { grid-column: 3; grid-row: 1; margin-left: 0; }
 .collapse-game-header .chess-header-details > .chess-animation-control { margin-left: auto; }
 .chess-variants-menu-page { height: var(--app-height); overflow: hidden; }
 .chess-variants-menu-page > div.relative { height: 100%; min-height: 0; }
@@ -136,7 +137,8 @@ body:has(.chess-game-grid) .chess-sidebar-toggle { display: block; }
   .chess-page-header:has(.chess-animation-control) .chess-header-brand { grid-column: 1; }
   .chess-page-header:has(.chess-animation-control) .chess-header-details { grid-column: 1; grid-row: 2; }
   .chess-page-header:has(.chess-animation-control) .chess-header-details > div:first-child { justify-content: flex-start; }
-  .chess-page-header:has(.chess-animation-control) .navigation-controls { grid-column: 1; grid-row: 3; margin-left: 0; }
+  .chess-page-header:has(.chess-animation-control) .chess-appearance { grid-column: 1; grid-row: 3; }
+  .chess-page-header:has(.chess-animation-control) .navigation-controls { grid-column: 1; grid-row: 4; margin-left: 0; }
   .collapse-game-header .chess-header-details > .chess-animation-control { margin-left: 0; }
   .collapse-game-header .chess-header-details > div:first-child > div { max-width: 100%; padding: 5px 8px; font-size: 10px; }
 }

@@ -1,3 +1,4 @@
+import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
@@ -14,7 +15,6 @@ import {
   playPieceCaptureSound,
   playPieceMoveSound,
   playPieceSelectSound,
-  playRandomSound,
 } from "../../../utils/sound.ts";
 
 import {
@@ -44,7 +44,7 @@ import {
   type ChessPlayerColor,
 } from "../../../games/chess/ai/variantAi.ts";
 
-type Language = "en" | "de" | "bar" | "ko" | "ru";
+type Language = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 
 type Winner = "white" | "black" | "draw";
 
@@ -86,7 +86,7 @@ const promotionCardNames: Record<PortalPromotionCard, string> = {
   k: "King",
 };
 
-const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
+const translations: Record<"de" | "bar" | "ko" | "ru", Record<string, string>> & Partial<Record<"es" | "pt", Record<string, string>>> = {
   de: {
     "Chess Variant": "Schachvariante",
     "Portal Chess": "Portal-Schach",
@@ -868,7 +868,7 @@ export default function PortalChessBoard({
       return translations.bar[key] ?? translations.de[key] ?? ui(key);
     }
 
-    return translations[language][key] ?? ui(key);
+    return translations[language]?.[key] ?? ui(key);
   };
 
   function changeLanguage(next: Language) {
@@ -1112,11 +1112,7 @@ export default function PortalChessBoard({
 
   const materialDifference = whiteMaterial - blackMaterial;
 
-  function playSound(sound: string) {
-    const audio = new Audio(`/sounds/${sound}.mp3`);
-
-    audio.play().catch(() => {});
-  }
+  function playSound(sound: string) { playChessSound(sound as ChessSoundEvent); }
 
   function checkGameOver(
     nextRecords: PortalMoveRecord[],
@@ -1308,7 +1304,7 @@ export default function PortalChessBoard({
         portalAfterReveal: clonePortalState(resolution.state),
       });
 
-      playRandomSound(["castle-1", "castle-2"]);
+      playChessSound("castle");
 
       return;
     }

@@ -4,6 +4,7 @@ import { Gamepad2, Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../context/AuthContext";
+import { variants } from "@/data/chessVariants";
 import type {
   Friend,
   FriendMessage,
@@ -191,7 +192,7 @@ export default function FriendChat({ friend, roomInvite }: FriendChatProps) {
       return;
     }
 
-    if (message.game_route && /^\/games\/chess\/(?:classic|variants\/[a-z0-9-]+)\/multiplayer$/.test(message.game_route)) {
+    if (message.game_route && /^\/games\/chess\/(?:(?:classic|variants\/[a-z0-9-]+)\/multiplayer|ranked)$/.test(message.game_route)) {
       navigate(`${message.game_route}?code=${encodeURIComponent(message.game_code)}`);
       return;
     }
@@ -210,11 +211,15 @@ export default function FriendChat({ friend, roomInvite }: FriendChatProps) {
 
   function renderMessage(message: FriendMessage) {
     if (message.message_type === "game_code") {
+      const chessMode = message.game_route === "/games/chess/ranked" ? ui("Ranked Chess")
+        : message.game_route?.includes("/variants/") ? ui(variants.find(variant => variant.multiplayerRoute === message.game_route)?.title ?? "Chess variant")
+        : ui("Classic Chess");
       return (
         <div>
+          <p className="mb-1 text-xs opacity-75">{message.sender_id === user?.id ? `${ui("You invited")} ${friendName}` : `${friendName} ${ui("invited you")}`}</p>
           <div className="flex items-center gap-2 font-semibold">
             <Gamepad2 size={16} />
-            {message.game_route === "/games/atlas-arena/multiplayer" ? ui("Atlas Arena invite") : message.game === "watten" ? ui("Watten invite") : ui("Chess invite")}
+            {message.game_route === "/games/atlas-arena/multiplayer" ? ui("Atlas Arena invite") : message.game === "watten" ? ui("Watten invite") : `${ui("Chess invite")} · ${chessMode}`}
           </div>
           <div className="mt-2 font-mono text-lg font-black tracking-widest">
             {message.game_code}

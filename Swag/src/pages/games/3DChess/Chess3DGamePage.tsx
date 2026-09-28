@@ -1,4 +1,5 @@
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { playChessMoveOutcome, playChessSound } from "@/games/chess/audio/chessAudio";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Chess, type Move } from "chess.js";
@@ -156,6 +157,7 @@ export default function Chess3DGamePage({
         });
 
         const nextFen = currentGame.fen();
+        playChessMoveOutcome(executedMove, currentGame);
         setFen(nextFen);
         setFenHistory((current) => [...current, nextFen]);
         setMoveHistory((current) => [...current, executedMove]);
@@ -186,6 +188,8 @@ export default function Chess3DGamePage({
     }
 
     setFen(nextFen);
+    if (moveHistory.length === 0) playChessSound("gameStart");
+    playChessMoveOutcome(move, new Chess(nextFen));
     setFenHistory((current) => [...current, nextFen]);
     setMoveHistory((current) => [...current, move]);
   }

@@ -1,9 +1,10 @@
+import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { Chess, type Square } from "chess.js";
 
@@ -18,10 +19,10 @@ import {
   playPieceSelectSound,
   playPieceMoveSound,
   playPieceCaptureSound,
-  playRandomSound,
 } from "../../../utils/sound.ts";
 
 import { supabase } from "../../../lib/supabase.ts";
+import { invokeRankedChess } from "@/games/chess/ranked/client";
 import { useAuth } from "../../../context/AuthContext.tsx";
 
 type ChessRoom = {
@@ -29,7 +30,17 @@ type ChessRoom = {
   code: string;
   host_id: string;
   status: "waiting" | "ready" | "playing" | "finished";
+  match_kind: "casual" | "ranked";
 };
+
+async function rankedRequest(body: Record<string, unknown>): Promise<{ error: { message: string; code?: string; details?: string; hint?: string } | null }> {
+  try {
+    const data = await invokeRankedChess<{ error?: string }>(body);
+    return { error: data?.error ? { message: data.error } : null };
+  } catch (cause) {
+    return { error: { message: cause instanceof Error ? cause.message : "Ranked request failed." } };
+  }
+}
 
 type RoomPlayer = {
   room_id: string;
@@ -66,6 +77,7 @@ type MultiplayerGame = {
   end_reason: string | null;
 
   version: number;
+  ranked_round: number;
 
   last_move_from: string | null;
 
@@ -94,7 +106,7 @@ type GameOutcome = {
   reason: string | null;
 };
 
-type Language = "en" | "de" | "bar" | "ko" | "ru";
+type Language = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 
 const languageOptions: Array<{ value: Language; label: string }> = [
   { value: "en", label: "English" },
@@ -102,6 +114,8 @@ const languageOptions: Array<{ value: Language; label: string }> = [
   { value: "bar", label: "Boarisch" },
   { value: "ko", label: "한국어" },
   { value: "ru", label: "Русский" },
+  { value: "es", label: "Español" },
+  { value: "pt", label: "Português" },
 ];
 
 const deTranslations: Record<string, string> = {
@@ -116,6 +130,7 @@ const deTranslations: Record<string, string> = {
   "You already requested undo for this move.":
     "Für diesen Zug hast du bereits eine Rücknahme angefragt.",
   "Choose Side": "Seite wählen",
+  "First choose a side!": "Wähle zuerst eine Seite!",
   "Side selection locks after the first move.":
     "Die Seitenwahl wird nach dem ersten Zug gesperrt.",
   Chosen: "Gewählt",
@@ -282,6 +297,7 @@ const bavarianTranslations: Record<string, string> = {
   "You already requested undo for this move.":
     "Für den Zug host scho a Zrucknehma angfragt.",
   "Choose Side": "Seitn aussuacha",
+  "First choose a side!": "Such da z'erst a Seitn aus!",
   "Side selection locks after the first move.":
     "Nachm ersten Zug is d Seitnwahl gspeichert.",
   Chosen: "G'wählt",
@@ -359,6 +375,7 @@ const koreanTranslations: Record<string, string> = {
   "You already requested undo for this move.":
     "이 수에 대해서는 이미 되돌리기를 요청했습니다.",
   "Choose Side": "진영 선택",
+  "First choose a side!": "먼저 진영을 선택하세요!",
   "Side selection locks after the first move.":
     "첫 수가 두어진 뒤에는 진영을 바꿀 수 없습니다.",
   Chosen: "선택",
@@ -522,6 +539,7 @@ const russianTranslations: Record<string, string> = {
   "You already requested undo for this move.":
     "Вы уже запрашивали отмену этого хода.",
   "Choose Side": "Выбрать сторону",
+  "First choose a side!": "Сначала выберите сторону!",
   "Side selection locks after the first move.":
     "Выбор стороны блокируется после первого хода.",
   Chosen: "Выбрано",
@@ -682,7 +700,8 @@ function translateChess(language: Language, key: string): string {
   if (language === "bar")
     return bavarianTranslations[key] ?? deTranslations[key] ?? ui(key);
   if (language === "ko") return koreanTranslations[key] ?? ui(key);
-  return russianTranslations[key] ?? ui(key);
+  if (language === "ru") return russianTranslations[key] ?? ui(key);
+  return ui(key);
 }
 
 function ChessLanguageSelector({
@@ -816,6 +835,7 @@ function getGameOutcome(game: Chess): GameOutcome {
 export default function ChessMultiplayerGame() {
   useUiLanguage();
   const { roomCode } = useParams();
+  const navigate = useNavigate();
 
   const { user, profile } = useAuth();
 
@@ -836,6 +856,8 @@ export default function ChessMultiplayerGame() {
   const [playerAvatarIds, setPlayerAvatarIds] = useState<
     Record<string, string>
   >({});
+  const [playerRatings, setPlayerRatings] = useState<Record<string, number>>({});
+  const [ratingChange, setRatingChange] = useState<Record<string, { before: number; after: number }>>({});
 
   const [gameState, setGameState] = useState<MultiplayerGame | null>(null);
 
@@ -854,8 +876,14 @@ export default function ChessMultiplayerGame() {
   const [moving, setMoving] = useState(false);
 
   const [error, setError] = useState<string | null>(null);
+  const [showChooseSidePrompt, setShowChooseSidePrompt] = useState(false);
 
   const [showResignConfirm, setShowResignConfirm] = useState(false);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [forfeitQuote, setForfeitQuote] = useState<{ roomId: string; loss: number } | null>(null);
+  const [forfeitQuoteErrorRoom, setForfeitQuoteErrorRoom] = useState<string | null>(null);
+  const [revealedRankedRoom, setRevealedRankedRoom] = useState<string | null>(null);
+  const [selectedRankedCard, setSelectedRankedCard] = useState<number | null>(null);
 
   const [reviewOpen, setReviewOpen] = useState(false);
 
@@ -884,6 +912,39 @@ export default function ChessMultiplayerGame() {
       [...new Set(players.map((player) => player.user_id))].sort().join(","),
     [players],
   );
+  useEffect(() => {
+    if (room?.match_kind !== "ranked" || !playerUserIdsKey) return;
+    let active = true;
+    async function loadRatings() {
+      if (gameState?.status === "finished") {
+        const settled = await rankedRequest({ op: "settle", code: room!.code });
+        if (settled.error && active) setError(settled.error.message);
+      }
+      const ids = playerUserIdsKey.split(",").filter(Boolean);
+      const [{ data: ratings }, { data: matches }] = await Promise.all([
+        supabase.from("chess_ratings").select("user_id,rating").in("user_id", ids),
+        gameState?.status === "finished" ? supabase.from("ranked_chess_matches").select("white_id,black_id,white_before,white_after,black_before,black_after").eq("source_id", `${room!.id}:${gameState.ranked_round}`).limit(1) : Promise.resolve({ data: [] }),
+      ]);
+      if (!active) return;
+      setPlayerRatings(Object.fromEntries((ratings ?? []).map(row => [row.user_id, row.rating])));
+      const latest = matches?.[0];
+      setRatingChange(latest ? { [latest.white_id]: { before: latest.white_before, after: latest.white_after }, [latest.black_id]: { before: latest.black_before, after: latest.black_after } } : {});
+    }
+    void loadRatings();
+    return () => { active = false; };
+  }, [room?.id, room?.code, room?.match_kind, playerUserIdsKey, gameState?.status, gameState?.version, gameState?.ranked_round]);
+
+  const rankedQuoteRoomId = room?.id;
+  const rankedQuoteRoomCode = room?.code;
+  const rankedQuoteRoomKind = room?.match_kind;
+  useEffect(() => {
+    if (rankedQuoteRoomKind !== "ranked" || !rankedQuoteRoomId || !rankedQuoteRoomCode || gameState?.status !== "playing") return;
+    let active = true;
+    void invokeRankedChess<{ eloLoss: number }>({ op: "forfeitQuote", code: rankedQuoteRoomCode })
+      .then(result => { if (active) setForfeitQuote({ roomId: rankedQuoteRoomId, loss: result.eloLoss }); })
+      .catch(cause => { if (active) { setForfeitQuoteErrorRoom(rankedQuoteRoomId); console.error("Could not load ranked forfeit quote:", cause); } });
+    return () => { active = false; };
+  }, [rankedQuoteRoomId, rankedQuoteRoomCode, rankedQuoteRoomKind, gameState?.status]);
 
   useEffect(() => {
     const userIds = playerUserIdsKey
@@ -1045,10 +1106,7 @@ export default function ChessMultiplayerGame() {
    */
   const lastGameEndSoundKeyRef = useRef<string | null>(null);
 
-  function playSound(sound: string) {
-    const audio = new Audio(`/sounds/${sound}.mp3`);
-    audio.play().catch(() => {});
-  }
+  function playSound(sound: string) { playChessSound(sound as ChessSoundEvent); }
 
   function getGameEndSoundKey(game: MultiplayerGame): string | null {
     if (game.status !== "finished") {
@@ -1083,7 +1141,22 @@ export default function ChessMultiplayerGame() {
     lastGameEndSoundKeyRef.current = soundKey;
     playSound(game.winner === "draw" ? "draw" : "checkmate");
   }
-  async function resignGame() {
+  function requestLeaveGame() {
+    if (!room || !gameState) return;
+    if (room.match_kind === "ranked" && gameState.status === "playing") {
+      setShowLeaveConfirm(true);
+      return;
+    }
+    navigate(room.match_kind === "ranked" ? "/games/chess/ranked" : "/games/chess/classic/multiplayer");
+  }
+
+  function drawRankedCard(index: number) {
+    if (!room || !user || selectedRankedCard !== null) return;
+    setSelectedRankedCard(index);
+    window.setTimeout(() => { setRevealedRankedRoom(room.id); setSelectedRankedCard(null); }, 1600);
+  }
+
+  async function resignGame(leaveAfter = false) {
     if (!room || gameState?.status !== "playing" || actionLoading) {
       return;
     }
@@ -1092,13 +1165,14 @@ export default function ChessMultiplayerGame() {
 
     setError(null);
 
-    const { error: resignError } = await supabase.rpc("resign_chess_game", {
-      p_room_id: room.id,
-    });
+    const { error: resignError } = room.match_kind === "ranked"
+      ? await rankedRequest({ op: "resign", code: room.code, version: gameState.version })
+      : await supabase.rpc("resign_chess_game", { p_room_id: room.id });
 
     setActionLoading(null);
 
     setShowResignConfirm(false);
+    setShowLeaveConfirm(false);
 
     if (resignError) {
       console.error(resignError);
@@ -1108,6 +1182,7 @@ export default function ChessMultiplayerGame() {
     }
 
     await refreshChessGameState();
+    if (leaveAfter) navigate("/games/chess/ranked");
   }
   async function requestRematch() {
     if (!room || gameState?.status !== "finished" || actionLoading) {
@@ -1150,6 +1225,7 @@ export default function ChessMultiplayerGame() {
           winner,
           end_reason,
           version,
+          ranked_round,
           last_move_from,
           last_move_to,
           white_rematch_ready,
@@ -1261,6 +1337,7 @@ export default function ChessMultiplayerGame() {
 
     setActionLoading("side");
     setError(null);
+    setShowChooseSidePrompt(false);
 
     const { error: sideError } = await supabase.rpc("choose_chess_side", {
       p_room_id: room.id,
@@ -1316,12 +1393,12 @@ export default function ChessMultiplayerGame() {
 
     /*
      * One SAN entry equals one ply:
-     *   odd number of plies  -> White made the latest move (seat 0)
-     *   even number of plies -> Black made the latest move (seat 1)
+     *   odd number of plies  -> White made the latest move
+     *   even number of plies -> Black made the latest move
      */
-    const requestLastMoverSeat = gameState.moves.length % 2 === 1 ? 0 : 1;
+    const requestLastMoverColor = gameState.moves.length % 2 === 1 ? "w" : "b";
 
-    if (mySeat !== requestLastMoverSeat) {
+    if (myColor !== requestLastMoverColor) {
       setError(t("Only the player who made the last move can request undo."));
       return;
     }
@@ -1345,12 +1422,14 @@ export default function ChessMultiplayerGame() {
     setActionLoading("undo-request");
     setError(null);
 
-    const { error: undoError } = await supabase.rpc("request_chess_undo", {
-      p_room_id: room.id,
-      p_previous_fen: snapshot.previousFen,
-      p_previous_last_from: snapshot.previousLastFrom,
-      p_previous_last_to: snapshot.previousLastTo,
-    });
+    const { error: undoError } = room.match_kind === "ranked"
+      ? await rankedRequest({ op: "requestUndo", code: room.code, version: gameState.version })
+      : await supabase.rpc("request_chess_undo", {
+          p_room_id: room.id,
+          p_previous_fen: snapshot.previousFen,
+          p_previous_last_from: snapshot.previousLastFrom,
+          p_previous_last_to: snapshot.previousLastTo,
+        });
 
     if (undoError) {
       console.error(undoError);
@@ -1391,10 +1470,9 @@ export default function ChessMultiplayerGame() {
     setActionLoading("undo-response");
     setError(null);
 
-    const { error: undoError } = await supabase.rpc("respond_chess_undo", {
-      p_room_id: room.id,
-      p_accept: accept,
-    });
+    const { error: undoError } = room.match_kind === "ranked"
+      ? await rankedRequest({ op: "respondUndo", code: room.code, version: gameState.version, accept })
+      : await supabase.rpc("respond_chess_undo", { p_room_id: room.id, p_accept: accept });
 
     if (undoError) {
       console.error(undoError);
@@ -1541,7 +1619,7 @@ export default function ChessMultiplayerGame() {
       if (!replay.isCheckmate() && replay.isCheck()) {
         playSound("check");
       } else if (last.isKingsideCastle() || last.isQueensideCastle()) {
-        playRandomSound(["castle-1", "castle-2"]);
+        playChessSound("castle");
       }
     } catch {
       // Sound must never block multiplayer state updates.
@@ -1596,10 +1674,12 @@ export default function ChessMultiplayerGame() {
     }
   }, [historyPreviewPly, historyRows.length]);
 
-  const myColor: "w" | "b" | null =
-    mySeat === 0 ? "w" : mySeat === 1 ? "b" : null;
+  const assignedColor = players.find((player) => player.user_id === user?.id)?.chosen_color;
+  const myColor: "w" | "b" | null = room?.match_kind === "ranked" && assignedColor
+    ? assignedColor === "white" ? "w" : "b"
+    : mySeat === 0 ? "w" : mySeat === 1 ? "b" : null;
 
-  const orientation: "white" | "black" = mySeat === 1 ? "black" : "white";
+  const orientation: "white" | "black" = myColor === "b" ? "black" : "white";
 
   const gameEndedForReview =
     gameState !== null &&
@@ -1699,7 +1779,8 @@ export default function ChessMultiplayerGame() {
             id,
             code,
             host_id,
-            status
+            status,
+            match_kind
           `,
       )
       .eq("code", roomCode.toUpperCase())
@@ -1780,6 +1861,7 @@ export default function ChessMultiplayerGame() {
   winner,
   end_reason,
   version,
+  ranked_round,
   last_move_from,
   last_move_to,
   white_rematch_ready,
@@ -1964,25 +2046,19 @@ export default function ChessMultiplayerGame() {
     setMoving(true);
     setError(null);
 
-    const { error: moveError } = await supabase.rpc("play_chess_move", {
-      p_room_id: room.id,
-
-      p_from: move.from,
-
-      p_to: move.to,
-
-      p_move_san: move.san,
-
-      p_new_fen: localGame.fen(),
-
-      p_expected_version: gameState.version,
-
-      p_is_finished: outcome.finished,
-
-      p_winner: outcome.winner,
-
-      p_end_reason: outcome.reason,
-    });
+    const { error: moveError } = room.match_kind === "ranked"
+      ? await rankedRequest({ op: "move", code: room.code, version: gameState.version, from: move.from, to: move.to, promotion: move.promotion ?? "q" })
+      : await supabase.rpc("play_chess_move", {
+          p_room_id: room.id,
+          p_from: move.from,
+          p_to: move.to,
+          p_move_san: move.san,
+          p_new_fen: localGame.fen(),
+          p_expected_version: gameState.version,
+          p_is_finished: outcome.finished,
+          p_winner: outcome.winner,
+          p_end_reason: outcome.reason,
+        });
 
     setMoving(false);
 
@@ -2063,6 +2139,7 @@ export default function ChessMultiplayerGame() {
   function handleSquareClick(row: number, column: number) {
     if (
       historyPreviewPly !== null ||
+      !room ||
       !gameState ||
       !myColor ||
       moving ||
@@ -2075,18 +2152,28 @@ export default function ChessMultiplayerGame() {
       return;
     }
 
+    const files = "abcdefgh";
+
+    const square = `${files[column]}${8 - row}` as Square;
+
+    const clickedPiece = chess.get(square);
+
+    if (
+      room.match_kind !== "ranked" &&
+      gameState.moves.length === 0 &&
+      !players.find((player) => player.user_id === user?.id)?.chosen_color &&
+      clickedPiece?.color === myColor
+    ) {
+      setShowChooseSidePrompt(true);
+      return;
+    }
+
     /*
      * Only allow moves on our turn.
      */
     if (chess.turn() !== myColor) {
       return;
     }
-
-    const files = "abcdefgh";
-
-    const square = `${files[column]}${8 - row}` as Square;
-
-    const clickedPiece = chess.get(square);
 
     /*
      * Nothing selected yet.
@@ -2201,9 +2288,12 @@ export default function ChessMultiplayerGame() {
     );
   }
 
-  const white = players.find((player) => player.seat === 0);
+  const white = players.find((player) => player.chosen_color === "white") ?? players.find((player) => player.seat === 0);
+  const lobbyPath = room.match_kind === "ranked" ? "/games/chess/ranked" : "/games/chess/classic/multiplayer";
+  const forfeitEloLoss = forfeitQuote?.roomId === room.id ? forfeitQuote.loss : null;
+  const forfeitQuoteFailed = forfeitQuoteErrorRoom === room.id;
 
-  const black = players.find((player) => player.seat === 1);
+  const black = players.find((player) => player.chosen_color === "black") ?? players.find((player) => player.seat === 1);
 
   const isMyTurn = chess.turn() === myColor;
 
@@ -2229,8 +2319,6 @@ export default function ChessMultiplayerGame() {
    *   odd  -> White moved last (seat 0)
    *   even -> Black moved last (seat 1)
    */
-  const lastMoverSeat = gameState.moves.length % 2 === 1 ? 0 : 1;
-
   const alreadyRequestedUndoForCurrentMove =
     Boolean(user?.id) &&
     gameState.undo_last_requested_by === user?.id &&
@@ -2240,7 +2328,7 @@ export default function ChessMultiplayerGame() {
     gameState.status === "playing" &&
     gameState.moves.length > 0 &&
     !gameState.undo_requested_by &&
-    mySeat === lastMoverSeat &&
+    myColor === (gameState.moves.length % 2 === 1 ? "w" : "b") &&
     !alreadyRequestedUndoForCurrentMove;
 
   const myRematchReady =
@@ -2296,6 +2384,14 @@ export default function ChessMultiplayerGame() {
               ? t("White has won!")
               : t("Black has won!"),
         detail: t(gameState.end_reason ?? ""),
+      };
+    }
+
+    if (showChooseSidePrompt && gameState.moves.length === 0 && !myPlayer?.chosen_color) {
+      return {
+        event: "info" as const,
+        message: t("First choose a side!"),
+        detail: t("Choose Side"),
       };
     }
 
@@ -2376,7 +2472,7 @@ export default function ChessMultiplayerGame() {
           HEADER
          ========================================================= */}
 
-        <ChessPageHeader className="
+        <ChessPageHeader title={room.match_kind === "ranked" ? "Ranked Chess" : undefined} className="
           mb-2
           flex
           shrink-0
@@ -2429,8 +2525,9 @@ export default function ChessMultiplayerGame() {
               )}
             </div>
 
-            <Link
-              to="/chess/classic/multiplayer"
+            <button
+              type="button"
+              onClick={requestLeaveGame}
               className="
               rounded-full
               border
@@ -2447,7 +2544,7 @@ export default function ChessMultiplayerGame() {
             "
             >
               {t("Leave")}
-            </Link>
+            </button>
           </div>
         </ChessPageHeader>
 
@@ -2763,7 +2860,7 @@ export default function ChessMultiplayerGame() {
                     </span>
 
                     <span className="text-sm font-bold text-zinc-200">
-                      {mySeat === 0 ? t("White") : t("Black")}
+                      {myColor === "w" ? t("White") : t("Black")}
                     </span>
                   </div>
                 </div>
@@ -2894,7 +2991,7 @@ export default function ChessMultiplayerGame() {
                     value: room.code,
                     tone: "blue",
                   },
-                  ...(myRematchReady && !opponentRematchReady
+                  ...(room.match_kind !== "ranked" && myRematchReady && !opponentRematchReady
                     ? [
                         {
                           id: "rematch-waiting",
@@ -2902,7 +2999,7 @@ export default function ChessMultiplayerGame() {
                           tone: "amber" as const,
                         },
                       ]
-                    : opponentRematchReady && !myRematchReady
+                    : room.match_kind !== "ranked" && opponentRematchReady && !myRematchReady
                       ? [
                           {
                             id: "rematch-offer",
@@ -2927,17 +3024,17 @@ export default function ChessMultiplayerGame() {
                         {t("Open Game Review")}
                       </button>
 
-                      <button
+                      {room.match_kind !== "ranked" && <button
                         type="button"
                         disabled={myRematchReady || actionLoading === "rematch"}
                         onClick={requestRematch}
                         className="rounded-lg border border-emerald-300/20 bg-emerald-300/[0.08] px-3 py-2 text-[10px] font-black text-emerald-100 transition hover:bg-emerald-300/[0.14] disabled:cursor-not-allowed disabled:opacity-40"
                       >
                         {myRematchReady ? t("Rematch requested") : t("Rematch")}
-                      </button>
+                      </button>}
 
                       <Link
-                        to="/chess/classic/multiplayer"
+                        to={lobbyPath}
                         className="rounded-lg border border-white/10 bg-white/[0.045] px-3 py-2 text-[10px] font-black text-zinc-300 transition hover:bg-white/[0.08] hover:text-white"
                       >
                         {t("Back to lobby")}
@@ -3024,6 +3121,8 @@ export default function ChessMultiplayerGame() {
                           chess.turn() === (color === "white" ? "w" : "b")
                         }
                         me={player?.user_id === user?.id}
+                        rating={room.match_kind === "ranked" ? player ? playerRatings[player.user_id] ?? 1200 : 1200 : undefined}
+                        ratingChange={gameState.status === "finished" && player ? ratingChange[player.user_id] : undefined}
                         t={t}
                       />
 
@@ -3077,7 +3176,7 @@ export default function ChessMultiplayerGame() {
                     </span>
                   </button>
 
-                  {gameState.status === "playing" &&
+                  {room.match_kind !== "ranked" && gameState.status === "playing" &&
                     gameState.moves.length === 0 && (
                       <div
                         className="
@@ -3355,8 +3454,9 @@ export default function ChessMultiplayerGame() {
                     </button>
                   )}
 
-                  <Link
-                    to="/chess/classic/multiplayer"
+                  <button
+                    type="button"
+                    onClick={requestLeaveGame}
                     className="
                     block
                     w-full
@@ -3376,7 +3476,7 @@ export default function ChessMultiplayerGame() {
                   "
                   >
                     {t("Leave game")}
-                  </Link>
+                  </button>
                 </div>
               </section>
 
@@ -3664,15 +3764,18 @@ export default function ChessMultiplayerGame() {
         </main>
 
         {/* =========================================================
-          RESIGN MODAL
+          RESIGN / RANKED LEAVE MODAL
          ========================================================= */}
 
-        {showResignConfirm && gameState.status === "playing" && (
+        {(showResignConfirm || showLeaveConfirm) && gameState.status === "playing" && (
           <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={showLeaveConfirm ? ui("Leave ranked game?") : t("Resign game?")}
             className="
               fixed
               inset-0
-              z-50
+              z-[70]
               flex
               items-center
               justify-center
@@ -3681,20 +3784,7 @@ export default function ChessMultiplayerGame() {
               backdrop-blur-sm
             "
           >
-            <div
-              className="
-                w-full
-                max-w-sm
-                rounded-3xl
-                border
-                border-white/10
-                bg-zinc-900
-                p-7
-                text-center
-                shadow-2xl
-                shadow-black/50
-              "
-            >
+            <div className={`w-full rounded-3xl border border-white/10 bg-zinc-900 text-center shadow-2xl shadow-black/50 ${showLeaveConfirm ? "max-w-xl p-8 sm:p-11" : "max-w-sm p-7"}`}>
               <div
                 className="
                   mx-auto
@@ -3713,18 +3803,23 @@ export default function ChessMultiplayerGame() {
                 ⚑
               </div>
 
-              <h2 className="mt-5 text-2xl font-black text-white">
-                {t("Resign game?")}
+              <h2 className={`${showLeaveConfirm ? "mt-7 text-3xl sm:text-4xl" : "mt-5 text-2xl"} font-black text-white`}>
+                {showLeaveConfirm ? ui("Leave ranked game?") : t("Resign game?")}
               </h2>
 
-              <p className="mt-2 text-sm leading-6 text-zinc-500">
-                {t("Your opponent wins the game.")}
+              <p className={`${showLeaveConfirm ? "mt-4 text-base leading-7" : "mt-2 text-sm leading-6"} text-zinc-400`}>
+                {showLeaveConfirm
+                  ? ui("If you leave now, you lose the game. Are you sure?")
+                  : t("Your opponent wins the game.")}
               </p>
+              {room.match_kind === "ranked" && <p className="mt-4 rounded-xl border border-red-400/25 bg-red-400/10 px-4 py-3 text-lg font-black text-red-200" aria-live="polite">
+                {forfeitEloLoss === null ? forfeitQuoteFailed ? ui("Elo loss is unavailable right now. Leaving still counts as a loss.") : ui("Calculating Elo loss…") : `${ui("You will lose")} ${forfeitEloLoss} ${ui("Elo")}`}
+              </p>}
 
               <div className="mt-7 grid grid-cols-2 gap-3">
                 <button
                   type="button"
-                  onClick={() => setShowResignConfirm(false)}
+                  onClick={() => { setShowResignConfirm(false); setShowLeaveConfirm(false); }}
                   className="
                     rounded-xl
                     border
@@ -3743,8 +3838,8 @@ export default function ChessMultiplayerGame() {
 
                 <button
                   type="button"
-                  disabled={actionLoading === "resign"}
-                  onClick={resignGame}
+                  disabled={actionLoading === "resign" || (room.match_kind === "ranked" && forfeitEloLoss === null && !forfeitQuoteFailed)}
+                  onClick={() => void resignGame(showLeaveConfirm)}
                   className="
                     rounded-xl
                     bg-red-500
@@ -3757,10 +3852,30 @@ export default function ChessMultiplayerGame() {
                     disabled:opacity-40
                   "
                 >
-                  {t("Resign now")}
+                  {showLeaveConfirm ? ui("Leave and lose") : t("Resign now")}
                 </button>
               </div>
             </div>
+          </div>
+        )}
+
+        {room.match_kind === "ranked" && gameState.status === "playing" && revealedRankedRoom !== room.id && (
+          <div role="dialog" aria-modal="true" aria-label={ui("Draw your color card")} className="fixed inset-0 z-[60] flex items-center justify-center bg-[#05070b]/95 px-5 py-10 backdrop-blur-xl">
+            <section className="w-full max-w-2xl rounded-[30px] border border-amber-300/25 bg-[radial-gradient(circle_at_50%_0%,rgba(245,158,11,.16),transparent_55%),#0d111a] p-7 text-center shadow-2xl shadow-black sm:p-11" aria-label={ui("Draw your color card")}>
+              <p className="text-xs font-black uppercase tracking-[.3em] text-amber-300">{ui("Ranked Chess")}</p>
+              <h2 className="mt-4 font-serif text-4xl text-white sm:text-5xl">{selectedRankedCard === null ? ui("Draw your color") : ui("Your color is revealed")}</h2>
+              <p className="mx-auto mt-4 max-w-lg text-sm leading-6 text-zinc-400">{ui("Pick one of the two cards. White and black were assigned at random when the match began.")}</p>
+              <div className="mt-9 grid grid-cols-2 gap-4 sm:gap-7">
+                {[0, 1].map(index => {
+                  const revealedColor = selectedRankedCard === index ? myColor : myColor === "w" ? "b" : "w";
+                  return <button key={index} type="button" disabled={selectedRankedCard !== null} onClick={() => drawRankedCard(index)} className={`flex aspect-[.72] flex-col items-center justify-center rounded-[24px] border p-5 shadow-xl transition duration-300 ${selectedRankedCard === null ? "border-amber-300/35 bg-gradient-to-br from-[#38312a] to-[#11131a] hover:-translate-y-2 hover:border-amber-200 hover:shadow-amber-300/10" : revealedColor === "w" ? "border-amber-200 bg-gradient-to-br from-[#fff9e8] to-[#c9ae80] text-[#211a11]" : "border-zinc-500 bg-gradient-to-br from-[#4d4d52] to-[#111114] text-white"}`}>
+                    <span className="text-[clamp(4rem,13vw,8rem)] leading-none">{selectedRankedCard === null ? "?" : revealedColor === "w" ? "♔" : "♚"}</span>
+                    <span className="mt-5 text-sm font-black uppercase tracking-[.23em]">{selectedRankedCard === null ? ui("Draw card") : revealedColor === "w" ? ui("White") : ui("Black")}</span>
+                  </button>;
+                })}
+              </div>
+              <p className="mt-7 text-xs text-zinc-500">{selectedRankedCard === null ? ui("Both players draw a card before playing.") : ui("Opening the board…")}</p>
+            </section>
           </div>
         )}
 
@@ -3906,6 +4021,8 @@ function PlayerBar({
   color,
   active,
   me = false,
+  rating,
+  ratingChange,
   t,
 }: {
   name: string;
@@ -3913,6 +4030,8 @@ function PlayerBar({
   color: "white" | "black";
   active: boolean;
   me?: boolean;
+  rating?: number;
+  ratingChange?: { before: number; after: number };
   t: (key: string) => string;
 }) {
   useUiLanguage();
@@ -3983,6 +4102,7 @@ function PlayerBar({
           <p className="mt-0.5 text-[11px] text-zinc-500">
             {color === "white" ? t("White") : t("Black")}
           </p>
+          {rating !== undefined && <p className="mt-1 text-xs font-bold text-amber-200">{ui("Elo")} {ratingChange ? `${ratingChange.before} → ${ratingChange.after} (${ratingChange.after - ratingChange.before >= 0 ? "+" : ""}${ratingChange.after - ratingChange.before})` : rating}</p>}
         </div>
 
         {active && (

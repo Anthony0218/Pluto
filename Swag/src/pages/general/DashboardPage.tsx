@@ -9,9 +9,9 @@ import DashboardSearch from "@/components/App/dashboard/DashboardSearch";
 import DashboardSidebar from "@/components/App/dashboard/DashboardSidebar";
 import PlayWithFriends from "@/components/App/dashboard/PlayWithFriends";
 import DidYouKnowCarousel from "@/components/App/dashboard/DidYouKnowCarousel";
+import RankedChessCallout from "@/components/App/dashboard/RankedChessCallout";
 import ProgressCard from "@/components/App/dashboard/ProgressCard";
-import DailyChallengeCard from "@/components/App/dashboard/DailyChallengeCard";
-import DashboardQuickLinks from "@/components/App/dashboard/DashboardQuickLinks";
+import DailyQuestsCard from "@/components/App/dashboard/DailyQuestsCard";
 import LearnSomethingNew from "@/components/App/dashboard/LearnSomethingNew";
 import DashboardFriendDialog from "@/components/App/dashboard/DashboardFriendDialog";
 import "@/components/App/dashboard/dashboard.css";
@@ -69,14 +69,13 @@ function Dashboard() {
   const sidebar = <>
     <PlayWithFriends friends={friends} onlineIds={onlineIds} unreadMessageSenderIds={unreadMessageSenderIds} loading={loading} unavailable={friendsError} signedIn={!!user} onFriendSelect={id => setFriendDialog({ id, view: "actions" })} />
     <div className="sidebar-progress"><ProgressCard profile={profile} streak={activity?.streak} loading={authLoading} signedIn={!!user} /></div>
-    <DashboardQuickLinks />
   </>;
 
   return <main className="dashboard-page">
     {searchTarget && createPortal(<DashboardSearch friends={friends} onChat={id => { markFriendMessagesRead(id); setFriendDialog({ id, view: "chat" }); }} />, searchTarget)}
     <div className="dashboard-workspace">
       <DashboardSidebar userId={user?.id} sidebar={sidebar} onlineFriendsCount={onlineIds.length} notifications={notifications} readMessageIds={readMessageIds}>
-        <div className="dashboard-top-layout"><DashboardHero profile={profile} signedIn={!!user} loading={authLoading} now={now} challenge={<DailyChallengeCard challenge={activity?.challenge ?? null} now={now} loading={loading} unavailable={activityError} signedIn={!!user} />} /><DidYouKnowCarousel /></div>
+        <div className="dashboard-top-layout"><DashboardHero profile={profile} signedIn={!!user} loading={authLoading} now={now} challenge={<DailyQuestsCard quests={activity?.quests} loading={loading} unavailable={activityError} signedIn={!!user} />} /><div className="dashboard-top-side"><DidYouKnowCarousel /><RankedChessCallout /></div></div>
         <div className="dashboard-play-layout">
           <MyGames />
           <LearnSomethingNew />

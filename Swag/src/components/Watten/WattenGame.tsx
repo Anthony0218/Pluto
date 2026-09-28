@@ -987,6 +987,9 @@ export default function WattenGame() {
     }
 
     if (card.rank === schlag) {
+      if (language === "es" || language === "pt") {
+        return t("Schlag ({rank}) — stronger than normal trump cards. If two equal Schlag cards are played, the first one wins.").replace("{rank}", schlag);
+      }
       return l(
         `Schlag (${schlag}) — stärker als normale Trumpfkarten. Werden zwei gleichwertige Schläge gespielt, gewinnt der zuerst gespielte.`,
         `Schlag (${schlag}) — stronger than normal trump cards. If two equal Schlag cards are played, the first one wins.`,
@@ -994,6 +997,9 @@ export default function WattenGame() {
     }
 
     if (card.suit === Farbe) {
+      if (language === "es" || language === "pt") {
+        return t("Trump ({suit}) — this card beats ordinary non-trump cards.").replace("{suit}", Farbe);
+      }
       return l(
         `Trumpf (${Farbe}) — Diese Karte schlägt gewöhnliche Karten, die keine Trümpfe sind.`,
         `Trump (${Farbe}) — this card beats ordinary non-trump cards.`,
@@ -1073,14 +1079,18 @@ export default function WattenGame() {
       },
       {
         title: "Schläge",
-        description: l(
-          `Alle anderen ${schlag}. Sie sind gleich stark; der zuerst gespielte gewinnt.`,
-          `All other ${schlag}. They are equal in strength; the first played wins.`,
-        ),
+        description: language === "es" || language === "pt"
+          ? t("All other {rank}. They are equal in strength; the first played wins.").replace("{rank}", schlag)
+          : l(
+            `Alle anderen ${schlag}. Sie sind gleich stark; der zuerst gespielte gewinnt.`,
+            `All other ${schlag}. They are equal in strength; the first played wins.`,
+          ),
         cards: schlaege,
       },
       {
-        title: l(`Trumpf / Farbe (${Farbe})`, `Trump / suit (${Farbe})`),
+        title: language === "es" || language === "pt"
+          ? t("Trump / suit ({suit})").replace("{suit}", Farbe)
+          : l(`Trumpf / Farbe (${Farbe})`, `Trump / suit (${Farbe})`),
         description: l(
           "Danach folgen die übrigen Karten der Trumpffarbe.",
           "Then come the remaining cards of the trump suit.",

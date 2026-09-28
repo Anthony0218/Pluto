@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from "react";
 
 import { type Square } from "chess.js";
 import { getSquareName } from "../../../utils/chessUtils";
-import { useChessSettings } from "@/context/ChessSettingsContext";
+import { boardColors, useChessSettings } from "@/context/ChessSettingsContext";
+import ChessPiece from "@/components/chess/ChessPiece";
 
 type BoardPiece = {
   type: "p" | "n" | "b" | "r" | "q" | "k";
@@ -232,7 +233,8 @@ export default function Board({
     "white" | "black"
   >(orientation);
 
-  const { boardAnimationEnabled } = useChessSettings();
+  const { boardAnimationEnabled, pieceTheme, boardTheme } = useChessSettings();
+  const colors = boardColors[boardTheme];
 
   type RotationPhase = "idle" | "rotating" | "reset";
 
@@ -423,6 +425,7 @@ export default function Board({
           sm:p-4
         "
         style={{
+          background: colors.frame,
           transform: boardTransform,
 
           transition: boardTransition,
@@ -629,6 +632,7 @@ export default function Board({
                     key={square}
                     type="button"
                     aria-label={square}
+                    style={{ background: isLight ? colors.light : colors.dark }}
                     onClick={() => {
                       if (orientationAnimating) {
                         return;
@@ -1796,6 +1800,11 @@ export default function Board({
                             className={`
                           pointer-events-none
                           relative
+                          flex
+                          h-full
+                          w-full
+                          items-center
+                          justify-center
                           select-none
 
                           font-serif
@@ -1820,7 +1829,7 @@ export default function Board({
                           }
                         `}
                           >
-                            {symbol}
+                            {pieceTheme === "classic" ? symbol : <ChessPiece type={piece.type} color={piece.color} theme={pieceTheme} />}
                           </span>
                         </span>
                       )}

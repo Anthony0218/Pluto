@@ -1,4 +1,5 @@
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { playChessSound } from "@/games/chess/audio/chessAudio";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -113,6 +114,7 @@ export default function ChessComputer() {
 
     setPlayerColor(resolvedColor);
     setGameStarted(true);
+    playChessSound("gameStart");
   }
 
   function leaveGame() {

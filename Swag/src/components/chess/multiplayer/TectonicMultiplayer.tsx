@@ -1,4 +1,6 @@
+import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { useVariantRecordAudio } from "@/games/chess/audio/useVariantRecordAudio";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import {
   useCallback,
@@ -682,6 +684,7 @@ export function TectonicMultiplayerGame() {
   const stored = useMemo(() => extractStoredState(gameState), [gameState]);
   const tectonic = stored.tectonic;
   const history = stored.history;
+  useVariantRecordAudio(gameState ? history : null, entry => entry.kind === "shift" && entry.notation !== "SKIP" ? ["boardRotate"] : []);
 
   const liveGame = useMemo(() => {
     try {
@@ -1668,6 +1671,7 @@ export function TectonicMultiplayerGame() {
                         {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
                       </p>
                     </button>
+                    <InviteFriendButton overlay />
                   </div>
                 )}
 

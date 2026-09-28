@@ -1,3 +1,4 @@
+import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
@@ -10,7 +11,6 @@ import {
   playPieceCaptureSound,
   playPieceMoveSound,
   playPieceSelectSound,
-  playRandomSound,
 } from "../../../utils/sound.ts";
 import {
   createFogGame,
@@ -34,7 +34,7 @@ import {
   type ChessPlayerColor,
 } from "../../../games/chess/ai/variantAi.ts";
 
-type Language = "en" | "de" | "bar" | "ko" | "ru";
+type Language = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 type Winner = "white" | "black" | "draw";
 type StatsTab = "vision" | "battle" | "moments";
 const CHESS_LANGUAGE_STORAGE_KEY = "chess-language";
@@ -63,7 +63,7 @@ const blackSymbols: Record<string, string> = {
   k: "♚",
 };
 
-const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
+const translations: Record<"de" | "bar" | "ko" | "ru", Record<string, string>> & Partial<Record<"es" | "pt", Record<string, string>>> = {
   de: {
     "Chess Variant": "Schachvariante",
     "Fog of War Chess": "Nebel-des-Krieges-Schach",
@@ -297,7 +297,7 @@ export default function FogOfWarChessBoard({
       ? key
       : language === "bar"
         ? (translations.bar[key] ?? translations.de[key] ?? ui(key))
-        : (translations[language][key] ?? ui(key));
+        : (translations[language]?.[key] ?? ui(key));
   const changeLanguage = (next: Language) => {
     setLanguage(next);
     if (typeof window !== "undefined")
@@ -450,10 +450,7 @@ export default function FogOfWarChessBoard({
   const materialDifference = whiteMaterial - blackMaterial;
   const fogStats = useMemo(() => buildFogStats(records), [records]);
 
-  const playSound = (sound: string) => {
-    const audio = new Audio(`/sounds/${sound}.mp3`);
-    audio.play().catch(() => {});
-  };
+  const playSound = (sound: string) => playChessSound(sound as ChessSoundEvent);
 
   function updateGameOver(
     nextRecords: FogMoveRecord[],
@@ -550,7 +547,7 @@ export default function FogOfWarChessBoard({
       if (!ended) {
         if (game.isCheck()) playSound("check");
         else if (move.isKingsideCastle() || move.isQueensideCastle())
-          playRandomSound(["castle-1", "castle-2"]);
+          playChessSound("castle");
       }
     } catch {
       playSound("illegal");
