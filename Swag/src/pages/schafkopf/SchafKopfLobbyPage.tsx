@@ -15,7 +15,9 @@ export default function SchafKopfLobbyPage() {
     if (busy || !user) return;
     setBusy(true); setError(null);
     try {
-      const room = await schafkopfRequest(create ? { op: "create", name } : { op: "join", code, name });
+      const room = await schafkopfRequest(create
+        ? { op: "create", name, title: "Spieltag", aiDifficulty: "amateur" }
+        : { op: "join", code, name });
       if (room) navigate(`/games/schafkopf/multiplayer/${room.code}`);
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Raum konnte nicht geöffnet werden."); }
     finally { setBusy(false); }

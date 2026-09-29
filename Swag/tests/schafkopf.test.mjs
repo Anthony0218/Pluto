@@ -310,6 +310,7 @@ test("Kontra and Re enforce teams, timing, and the normal winning threshold", ()
   assert.equal(canDouble(game, 1), true);
   let doubled = applyAction(game, 1, { type: "play", cardId: legalCards(game, 1)[0].id, spritz: true });
   assert.equal(doubled.multiplier, 2);
+  assert.deepEqual(doubled.spritzSeats, [1]);
   assert.equal(doubled.turn, 2);
   assert.equal(canDouble(doubled, 1), false);
   doubled = applyAction(doubled, 2, { type: "play", cardId: legalCards(doubled, 2)[0].id });

@@ -1,5 +1,5 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { applyAction, chooseAiAction, collectSecondsFor, createGame, LEGEN_DECISION_MILLISECONDS, resolveLegenTimeout, shuffledDeck, viewFor, DEFAULT_GAME_RULES, type Action, type AiDifficulty, type GameRules, type GameState } from "../../../src/games/schafkopf/schafkopf.ts";
+import { applyAction, chooseAiAction, collectSecondsFor, createGame, MULTIPLAYER_LEGEN_DECISION_MILLISECONDS, MULTIPLAYER_TURN_MILLISECONDS, resolveLegenTimeout, shuffledDeck, viewFor, DEFAULT_GAME_RULES, type Action, type AiDifficulty, type GameRules, type GameState } from "../../../src/games/schafkopf/schafkopf.ts";
 import { DEFAULT_ANNOUNCEMENT_SETTINGS, SIMPLE_ANNOUNCEMENT_SETTINGS, formatDeclarationAnnouncement } from "../../../src/games/schafkopf/announcements.ts";
 
 const cors = {
@@ -46,6 +46,24 @@ function validRules(value: unknown): GameRules {
   if (input.spritzen !== "nie" && input.spritzen !== "vor-ausspiel" && input.spritzen !== "jederzeit") throw new Error("Ungültige Spritzregel.");
   rules.spritzen = input.spritzen;
   return rules;
+}
+function hasTimedTurn(game: GameState) {
+  return ["intent", "auction", "declare", "kontra", "re", "play"].includes(game.phase);
+}
+/**
+ * Online clocks are shared state so every seat sees the same countdown. A
+ * reached turn clock deliberately does not choose a card or an announcement:
+ * for now it only signals that the player has used their allotted time.
+ */
+function scheduleMultiplayerTimers(game: GameState, resetTurn = true, resetLegen = false) {
+  if (game.phase === "legen") {
+    if (resetLegen || !Number.isFinite(game.legenDeadline)) game.legenDeadline = Date.now() + MULTIPLAYER_LEGEN_DECISION_MILLISECONDS;
+    game.turnDeadline = null;
+    return;
+  }
+  game.legenDeadline = null;
+  if (!hasTimedTurn(game)) { game.turnDeadline = null; return; }
+  if (resetTurn || !Number.isFinite(game.turnDeadline)) game.turnDeadline = Date.now() + MULTIPLAYER_TURN_MILLISECONDS;
 }
 function fillBots(players: Player[]): Player[] {
   const names = ["KI Sepp", "KI Resi", "KI Franz"];
@@ -118,8 +136,11 @@ Deno.serve(async req => {
         if (seat < 0 && !(body.op === "delete" && formerPlayer)) return response({ error: formerPlayer ? "Du wurdest zwischen den Runden ersetzt. Dein Spielstand bleibt unter Spieltage gespeichert." : "Du sitzt nicht an diesem Tisch. Bitte über die Lobby beitreten." }, 403);
         if (body.op === "get") {
           if (room.game?.phase === "legen") {
-            if (!Number.isFinite(room.game.legenDeadline)) room.game.legenDeadline = Date.now() + LEGEN_DECISION_MILLISECONDS;
-            if (room.game.legenDeadline && Date.now() >= room.game.legenDeadline) room.game = resolveLegenTimeout(room.game);
+            if (!Number.isFinite(room.game.legenDeadline)) room.game.legenDeadline = Date.now() + MULTIPLAYER_LEGEN_DECISION_MILLISECONDS;
+            if (room.game.legenDeadline && Date.now() >= room.game.legenDeadline) {
+              room.game = resolveLegenTimeout(room.game);
+              scheduleMultiplayerTimers(room.game);
+            }
             else if (Date.now() - new Date(room.updated_at).getTime() >= 700) {
               // Bots decide independently as well; humans do not have to wait
               // for them or for the player left of the dealer.
@@ -129,12 +150,14 @@ Deno.serve(async req => {
               }
             }
           }
+          if (room.game) scheduleMultiplayerTimers(room.game, false);
           const botSeat = room.game?.turn ?? -1;
           const isBotTurn = room.game?.phase !== "legen" && botSeat >= 0 && room.players[botSeat]?.bot && room.game?.phase !== "finished" && room.game?.phase !== "redeal";
           const delay = room.game?.phase === "trick" ? (room.collect_seconds || collectSecondsFor(room.ai_difficulty)) * 1000 : 700;
           if (!isBotTurn || Date.now() - new Date(room.updated_at).getTime() < delay) return response(snapshot(room, user.id));
           const aiAction = chooseAiAction(viewFor(room.game!, botSeat), room.ai_difficulty, random);
           room.game = applyAction(room.game!, botSeat, aiAction.type === "declare" ? { ...aiAction, phrase: formatDeclarationAnnouncement(aiAction.contract, room.ai_difficulty === "beginner" || room.ai_difficulty === "amateur" ? SIMPLE_ANNOUNCEMENT_SETTINGS : DEFAULT_ANNOUNCEMENT_SETTINGS, random) } : aiAction, random);
+          scheduleMultiplayerTimers(room.game);
         } else {
           if (body.op !== "delete" && body.version !== room.version) return response({ error: "Der Tisch hat sich geändert. Bitte erneut versuchen." }, 409);
           if (body.op === "start") {
@@ -143,6 +166,7 @@ Deno.serve(async req => {
             room.ai_difficulty = difficultyFor(body.aiDifficulty);
             room.players = fillBots(room.players);
             room.game = createGame(room.players.map(player => player.name), 3, shuffledDeck(random), undefined, 1, validRules(body.rules ?? DEFAULT_GAME_RULES));
+            scheduleMultiplayerTimers(room.game, true, true);
           } else if (body.op === "configure") {
             if (room.host_id !== user.id || room.game) throw new Error("Nur der Gastgeber kann den Wartetisch einstellen.");
             room.title = titleFor(body.title);
@@ -177,6 +201,7 @@ Deno.serve(async req => {
             if (room.players[seat]?.bot) throw new Error("Die KI spielt gerade deinen Platz. Übernimm ihn zuerst wieder.");
             if (body.action.type === "next" && room.host_id !== user.id) throw new Error("Nur der Gastgeber startet die nächste Runde.");
             room.game = applyAction(room.game, seat, body.action as Action, random);
+            scheduleMultiplayerTimers(room.game, true, body.action.type === "next");
             if (body.action.type === "next") {
               room.game.names = room.players.map(player => player.name);
               for (const target of room.pending_seats) room.game.totals[target] = 0;

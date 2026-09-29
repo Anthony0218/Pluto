@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { applyAction, chooseAiAction, collectSecondsFor, createGame, LEGEN_DECISION_MILLISECONDS, resolveLegenTimeout, viewFor, type Action, type AiDifficulty, type GameRules, type GameState } from "../../games/schafkopf/schafkopf";
+import { applyAction, chooseAiAction, collectSecondsFor, createGame, resolveLegenTimeout, viewFor, type Action, type AiDifficulty, type GameRules, type GameState } from "../../games/schafkopf/schafkopf";
 import { DEFAULT_ANNOUNCEMENT_SETTINGS, SIMPLE_ANNOUNCEMENT_SETTINGS, formatDeclarationAnnouncement } from "../../games/schafkopf/announcements";
 import SchafkopfTable from "./SchafkopfTable";
 import { savedSchafkopfRules } from "./schafkopfRulesPreference";
@@ -24,11 +24,18 @@ export default function SchafkopfGame({ mode = "hotseat" }: { mode?: "hotseat" |
     try {
       const saved = JSON.parse(localStorage.getItem(`schafkopf-game-${mode}`) ?? "null") as GameState | null;
       if (saved && Array.isArray(saved.hands) && saved.hands.length === 4 && Array.isArray(saved.totals) && saved.totals.length === 4 && Number.isInteger(saved.round)) {
-        if (saved.phase === "legen" && !Number.isFinite(saved.legenDeadline)) saved.legenDeadline = Date.now() + LEGEN_DECISION_MILLISECONDS;
+        // The single-player table is deliberately untimed. Old saved games
+        // may still carry the former Legen deadline, so remove it on load too.
+        if (mode === "ai") {
+          saved.legenDeadline = null;
+          saved.rules = { ...saved.rules, legen: true };
+        }
         return saved;
       }
     } catch { /* Start a new table if the saved game is invalid. */ }
-    return createGame(mode === "ai" ? savedAiNames() : undefined, 3, undefined, undefined, 1, savedSchafkopfRules());
+    const freshGame = createGame(mode === "ai" ? savedAiNames() : undefined, 3, undefined, undefined, 1, { ...savedSchafkopfRules(), ...(mode === "ai" ? { legen: true } : {}) });
+    if (mode === "ai") freshGame.legenDeadline = null;
+    return freshGame;
   });
   const [revealed, setRevealed] = useState(-1);
   const [error, setError] = useState<string | null>(null);
@@ -46,10 +53,18 @@ export default function SchafkopfGame({ mode = "hotseat" }: { mode?: "hotseat" |
   }, [game, mode]);
 
   useEffect(() => {
-    if (game.phase !== "legen" || !game.legenDeadline) return;
+    if (mode === "ai" || game.phase !== "legen" || !game.legenDeadline) return;
     const timeout = window.setTimeout(() => setGame(current => current.phase === "legen" ? resolveLegenTimeout(current) : current), Math.max(0, game.legenDeadline - Date.now()));
     return () => window.clearTimeout(timeout);
-  }, [game.phase, game.legenDeadline]);
+  }, [game.phase, game.legenDeadline, mode]);
+
+  // `next` creates a fresh engine state, which normally includes the local
+  // Legen deadline. Strip it again for every single-player deal, including
+  // games that were already open during an app update.
+  useEffect(() => {
+    if (mode !== "ai" || game.phase !== "legen" || !game.legenDeadline) return;
+    setGame(current => current.phase === "legen" && current.legenDeadline ? { ...current, legenDeadline: null } : current);
+  }, [game.phase, game.legenDeadline, mode]);
 
   useEffect(() => {
     if (mode !== "ai" || game.phase === "finished" || game.phase === "redeal") return;
@@ -72,7 +87,9 @@ export default function SchafkopfGame({ mode = "hotseat" }: { mode?: "hotseat" |
 
   function act(action: Action) {
     try {
-      const updated = applyAction(game, seat, action);
+      const currentGame = mode === "ai" && game.phase === "legen" ? { ...game, legenDeadline: null } : game;
+      let updated = applyAction(currentGame, seat, action);
+      if (mode === "ai" && updated.phase === "legen") updated = { ...updated, legenDeadline: null };
       // Keep the same player's hand open when winning a negotiation or starting a trick.
       if (updated.turn === seat && action.type !== "next") setRevealed(updated.revision);
       else setRevealed(-1);
@@ -91,5 +108,5 @@ export default function SchafkopfGame({ mode = "hotseat" }: { mode?: "hotseat" |
       return { ...current, names, announcements: current.announcements.map(text => text.startsWith(`${previous}: `) ? `${clean}: ${text.slice(previous.length + 2)}` : text) };
     });
   };
-  return <SchafkopfTable view={viewFor(game, seat)} onAction={act} error={error} hidden={hidden} onReveal={() => setRevealed(game.revision)} onRulesChange={(rules: GameRules) => setGame(current => ({ ...current, rules }))} onRename={mode === "ai" ? renameAi : undefined} aiDifficulty={mode === "ai" ? aiDifficulty : undefined} onAiDifficultyChange={mode === "ai" ? changeAiDifficulty : undefined} collectSecondsValue={collectSeconds} onCollectSecondsChange={setCustomCollectSeconds} subtitle={mode === "ai" ? "Du gegen drei KI-Spieler" : "Hotseat · Vier Spieler"} />;
+  return <SchafkopfTable view={viewFor(game, seat)} onAction={act} error={error} hidden={hidden} onReveal={() => setRevealed(game.revision)} onRulesChange={(rules: GameRules) => setGame(current => ({ ...current, rules: mode === "ai" ? { ...rules, legen: true } : rules }))} onRename={mode === "ai" ? renameAi : undefined} aiDifficulty={mode === "ai" ? aiDifficulty : undefined} onAiDifficultyChange={mode === "ai" ? changeAiDifficulty : undefined} collectSecondsValue={collectSeconds} onCollectSecondsChange={setCustomCollectSeconds} alwaysLegen={mode === "ai"} untimedLegen={mode === "ai"} subtitle={mode === "ai" ? "Du gegen drei KI-Spieler" : "Hotseat · Vier Spieler"} />;
 }

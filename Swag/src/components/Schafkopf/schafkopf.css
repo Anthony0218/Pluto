@@ -352,7 +352,7 @@
 .sk-avatar-option img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
 .sk-avatar-option.is-selected, .sk-avatar-option:focus-visible { border-color: #fbbf24; outline: none; box-shadow: 0 0 0 1px #fbbf24; }
 .sk-hand-slot-dragging { opacity: 1; }
-.sk-card > img, .sk-trick .sk-played img, .sk-held-trick img, .sk-deck-option img { box-sizing: border-box; border: 1px solid #111; border-radius: 8px; background: #fff; }
+.sk-card > img, .sk-trick .sk-played img, .sk-held-trick img, .sk-deck-option img { box-sizing: border-box; border: 0; border-radius: 8px; background: transparent; }
 .sk-trick:not(.sk-trick-collecting) .sk-played-north img { animation: sk-lay-north .42s cubic-bezier(.2,.75,.2,1) both; }
 .sk-trick:not(.sk-trick-collecting) .sk-played-east img { animation: sk-lay-east .42s cubic-bezier(.2,.75,.2,1) both; }
 .sk-trick:not(.sk-trick-collecting) .sk-played-south img { animation: sk-lay-south .42s cubic-bezier(.2,.75,.2,1) both; }
@@ -457,8 +457,9 @@
 }
 
 /* The rulebook keeps reading, setup, and house rules in separate tabs. */
-.sk-rule-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 18px; padding: 5px; border: 1px solid #f3d68644; border-radius: 13px; background: #081b12; }
-.sk-rule-tabs button { flex: 1 1 145px; min-height: 40px; padding: 8px 10px; border: 0; border-radius: 9px; background: transparent; color: #d8dfd0; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }
+.sk-rule-tabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; margin-top: 18px; padding: 5px; border: 1px solid #f3d68644; border-radius: 13px; background: #081b12; }
+.sk-rule-tabs button { display: grid; place-items: center; min-height: 40px; padding: 8px 10px; border: 0; border-radius: 9px; background: transparent; color: #d8dfd0; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }
+.sk-rule-tabs button span { display: none; }
 .sk-rule-tabs button:hover, .sk-rule-tabs button:focus-visible { background: #ffffff13; outline: 2px solid #f3d686; outline-offset: -2px; }
 .sk-rule-tabs button.is-selected { background: #f3d686; color: #211802; }
 .sk-rule-panel { padding-top: 14px; }
@@ -466,7 +467,8 @@
 .sk-rule-panel .sk-rules-content { margin-top: 0; padding-top: 0; border-top: 0; }
 .sk-rule-panel .sk-rules-content a { color: #fbbf24; }
 @media (max-width: 700px) {
-  .sk-rule-tabs button { flex-basis: 110px; font-size: 12px; }
+  .sk-rule-tabs { gap: 3px; padding: 3px; }
+  .sk-rule-tabs button { min-height: 36px; padding: 6px; }
   .sk-page:is(.sk-ambience-garden, .sk-ambience-beach) .sk-avatar-own { width: clamp(82px, 22vw, 115px); height: clamp(45px, 11vw, 64px); }
 }
 
@@ -1004,6 +1006,8 @@
 }
 .sk-legen-actions { flex-wrap: nowrap; }
 .sk-legen-actions .sk-button { flex: 1 1 0; min-width: 0; }
+.sk-intent-actions { flex-wrap: nowrap; }
+.sk-intent-actions .sk-button { flex: 1 1 0; min-width: 0; }
 .sk-page .sk-hand-area .sk-table-sidebar {
   box-sizing: border-box;
   min-height: 118px;
@@ -1280,6 +1284,18 @@
 .sk-ledger-notepad-pencil textarea { color: #575b5f; text-shadow: .2px .2px #777; }
 .sk-bavarian-ledger-book .sk-review-link { position: relative; z-index: 2; color: #1e5c90; }
 .sk-bavarian-ledger-book .sk-ledger-actions { position: relative; z-index: 2; }
+.sk-bavarian-summary .sk-review-button { border-color: #7b5c31; background: #fff7df; color: #111; }
+.sk-bavarian-summary .sk-review-button:hover:not(:disabled) { background: #ffe7a8; color: #111; }
+.sk-summary-review { position: relative; z-index: 2; margin-top: 15px; padding: 14px; border: 1px solid #b89559; border-radius: 10px; background: #fffdf0e8; color: #1d1a15; }
+.sk-summary-review header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dotted #9b7544; }
+.sk-summary-review h3 { margin: 0; color: #000; font-family: Georgia, serif; font-size: 19px; }
+.sk-summary-review .sk-close-button { width: 32px; height: 32px; border-color: #85643977; color: #392716; background: #fff8e8aa; }
+.sk-summary-review .sk-review-guide { border-color: #a98045; background: #f2e2b9; color: #2c2418; }
+.sk-summary-review .sk-review-guide strong { color: #111; }
+.sk-summary-review .sk-review-guide b { color: #111; }
+.sk-summary-review .sk-review-list li { border-color: #b89559; background: #fff9e8; }
+.sk-summary-review .sk-review-list li > strong { color: #111; }
+.sk-summary-review .sk-review-list p { color: #312719; }
 @media (max-width: 700px) {
   .sk-bavarian-ledger-book { max-height: calc(100dvh - 18px); padding: 8px 8px 8px 18px; border-radius: 5px 13px 13px 5px; }
   .sk-bavarian-ledger-book::before { top: 8px; bottom: 8px; left: 4px; width: 9px; }
@@ -1483,6 +1499,218 @@
 .sk-hand-area .sk-table-heading small { margin: 0; white-space: nowrap; }
 .sk-hand-area .sk-table-actions { display: flex; width: 100%; }
 .sk-hand-area .sk-table-actions > p { margin: 0; }
+
+/* The action panel below the hand is deliberately a fixed, quiet control
+   surface. Turn-taking is shown on the table itself, so this area never needs
+   a status feed or an internal scrollbar. */
+.sk-hand-area .sk-table-sidebar {
+  grid-template-rows: minmax(0, 1fr);
+  height: 224px;
+  min-height: 224px;
+  overflow: hidden;
+}
+.sk-hand-area .sk-table-actions {
+  min-height: 0;
+  overflow: hidden;
+  align-content: center;
+}
+.sk-hand-area .sk-table-actions h2 {
+  width: 100%;
+  margin: 0 0 8px;
+  text-align: center;
+}
+.sk-game-stage { position: relative; }
+.sk-trick-progress {
+  position: absolute;
+  z-index: 8;
+  top: 12px;
+  left: 12px;
+  padding: 5px 8px;
+  border: 1px solid #bfdbfe99;
+  border-radius: 999px;
+  background: #071b15d9;
+  color: #dbeafe;
+  box-shadow: 0 0 12px #2563eb66;
+  font-size: 11px;
+  font-weight: 800;
+}
+.sk-avatar-active .sk-avatar-image {
+  filter: drop-shadow(0 0 4px #dbeafe) drop-shadow(0 0 14px #3b82f6) drop-shadow(0 9px 10px #1a100abc);
+}
+.sk-table-sidebar-turn {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 2px #3b82f6aa, 0 0 18px #2563eb99, 0 12px 30px #17170daa;
+}
+.sk-your-turn {
+  margin: 0 0 6px;
+  color: #dbeafe;
+  font-size: 15px;
+  font-weight: 900;
+  text-align: center;
+  text-shadow: 0 0 10px #2563eb;
+}
+.sk-action-timer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin: 0 0 6px;
+  color: #fde68a;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  text-align: center;
+}
+.sk-action-timer strong { color: #fff7d0; font-size: 15px; letter-spacing: .04em; }
+.sk-action-timer.is-expired { color: #fecaca; }
+.sk-action-timer.is-expired strong { color: #fca5a5; }
+.sk-legen-timer { display: inline-flex; margin: 0 0 0 8px; vertical-align: middle; }
+.sk-hand-area .sk-table-sidebar-compact {
+  height: 78px;
+  min-height: 78px;
+}
+.sk-table-sidebar-compact .sk-table-actions {
+  display: grid;
+  place-items: center;
+}
+.sk-table-sidebar-compact .sk-trick-result {
+  margin: 0;
+  text-align: center;
+}
+.sk-hand-area .sk-table-sidebar-detail {
+  height: 252px;
+  min-height: 252px;
+}
+.sk-hand-area .sk-table-sidebar-in-game {
+  width: 50%;
+  height: 112px;
+  min-height: 112px;
+  align-self: center;
+}
+.sk-table-sidebar-in-game,
+.sk-table-sidebar-in-game .sk-table-actions,
+.sk-table-sidebar-in-game .sk-trump-counter,
+.sk-table-sidebar-in-game .sk-trick-result {
+  text-align: center;
+}
+.sk-table-sidebar-in-game .sk-table-actions {
+  display: grid;
+  place-items: center;
+}
+.sk-table-sidebar-detail .sk-suit-picker {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  align-items: center;
+  min-height: 100px;
+  padding-block: 10px;
+}
+.sk-table-sidebar-detail .sk-suit-picker > strong {
+  text-align: center;
+  line-height: 1.3;
+}
+.sk-table-sidebar-detail .sk-suit-cards {
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+}
+.sk-table-sidebar-detail .sk-suit-card > span { display: none; }
+.sk-page .sk-trick-stack-west {
+  top: calc(var(--sk-side-top) + clamp(96px, 15dvh, 180px) + var(--sk-opponent-card-height));
+}
+.sk-page .sk-legen-coin-west {
+  top: calc(var(--sk-stack-side-top) + 6% + var(--sk-opponent-card-height));
+}
+.sk-table-sidebar-detail .sk-table-actions {
+  position: relative;
+  display: block;
+  padding-right: 208px;
+}
+.sk-table-sidebar-detail .sk-contract-confirm {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  display: grid;
+  width: 194px;
+  gap: 6px;
+  transform: translateY(-50%);
+}
+.sk-table-sidebar-detail .sk-contract-confirm .sk-button { width: 100%; }
+.sk-turn-reminder { width: min(340px, 100%); text-align: center; }
+.sk-turn-reminder h2 { margin: 0; }
+.sk-turn-reminder p { margin: 8px 0 16px; color: #d6eddf; }
+
+/* Decision rows use the open part of the info box.  They remain one horizontal
+   row, centred below their prompt instead of collecting at the top edge. */
+.sk-hand-area .sk-table-sidebar-intent .sk-table-actions,
+.sk-hand-area .sk-table-sidebar-declare:not(.sk-table-sidebar-detail) .sk-table-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  height: 100%;
+}
+.sk-hand-area .sk-table-sidebar-intent .sk-intent-actions,
+.sk-hand-area .sk-table-sidebar-declare:not(.sk-table-sidebar-detail) .sk-contract-kinds {
+  align-self: center;
+  justify-content: center;
+  margin-block: auto;
+}
+.sk-hand-area .sk-table-sidebar-intent .sk-intent-actions {
+  width: min(400px, 100%);
+  justify-self: center;
+}
+.sk-hand-area .sk-table-sidebar-declare:not(.sk-table-sidebar-detail) .sk-contract-kinds {
+  flex-wrap: nowrap;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 2px;
+}
+.sk-hand-area .sk-table-sidebar-declare:not(.sk-table-sidebar-detail) .sk-contract-kind {
+  flex: 0 0 auto;
+}
+.sk-table-sidebar-turn-only {
+  grid-template-rows: minmax(0, 1fr) 0 !important;
+}
+.sk-table-sidebar-turn-only .sk-your-turn {
+  display: grid;
+  place-items: center;
+  align-self: stretch;
+  margin: 0;
+}
+.sk-bottom-fullscreen-button {
+  align-self: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+/* Outside fullscreen the tabletop uses the same viewport-based proportions;
+   the document simply remains scrollable around it. */
+.sk-page:not(:fullscreen) .sk-game-stage {
+  flex: 0 0 min(51dvh, 560px);
+  height: min(51dvh, 560px);
+  min-height: min(51dvh, 560px);
+}
+
+@media (max-width: 700px) {
+  .sk-hand-area .sk-table-sidebar { height: 250px; min-height: 250px; }
+  .sk-hand-area .sk-table-sidebar-compact { height: 76px; min-height: 76px; }
+  .sk-hand-area .sk-table-sidebar-detail { height: 268px; min-height: 268px; }
+  .sk-hand-area .sk-table-sidebar-in-game { width: 50%; height: 125px; min-height: 125px; }
+  .sk-trick-progress { top: 7px; left: 7px; }
+  .sk-table-sidebar-detail .sk-suit-picker { grid-template-columns: 78px minmax(0, 1fr); min-height: 82px; padding-block: 8px; }
+  .sk-table-sidebar-detail .sk-suit-cards { gap: 4px; }
+  .sk-table-sidebar-detail .sk-suit-card { width: 50px; padding: 2px; font-size: 9px; }
+  .sk-table-sidebar-detail .sk-suit-card img { width: 34px; }
+  .sk-page .sk-trick-stack-west { top: calc(var(--sk-side-top) + 74px + var(--sk-opponent-card-height)); }
+  .sk-table-sidebar-detail .sk-table-actions { display: grid; padding-right: 0; }
+  .sk-table-sidebar-detail .sk-contract-confirm {
+    position: static;
+    display: flex;
+    width: 100%;
+    margin-top: 8px;
+    transform: none;
+  }
+  .sk-table-sidebar-detail .sk-contract-confirm .sk-button { flex: 1; padding-inline: 4px; }
+}
 @media (max-width: 700px) {
   .sk-fullscreen-hint { margin: -13px 0 10px; border-radius: 12px; flex-wrap: wrap; }
   .sk-ledger-header-actions .sk-toggle { max-width: 142px; }
@@ -1538,4 +1766,466 @@
   .sk-mode-card { min-height: 0; padding: 21px; }
   .sk-mode-card-icon { margin-bottom: 16px; }
   .sk-mode-card strong { margin-top: 22px; padding-top: 0; }
+}
+
+/* Windowed play is document-sized, so the app viewport can scroll below the
+   table. The scene image is pinned to the viewport; its landmarks therefore
+   stay aligned with the fullscreen scene while the controls below can scroll. */
+.app-viewport:has(.sk-page:is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain)) {
+  overscroll-behavior-y: auto;
+}
+.sk-page:not(:fullscreen):is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain) {
+  height: auto !important;
+  min-height: var(--app-height);
+  justify-content: flex-start;
+  overflow-x: clip;
+  overflow-y: visible;
+  padding-bottom: clamp(28px, 5dvh, 64px);
+  background-attachment: fixed;
+}
+.sk-page:not(:fullscreen):is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain) .sk-game-stage {
+  flex: 0 0 min(51dvh, 560px);
+  height: min(51dvh, 560px);
+  min-height: min(51dvh, 560px);
+}
+
+/* Phone layout: keep the playing scene compact, put all primary tap targets
+   in thumb-sized controls, and allow the surrounding app to scroll naturally. */
+@media (max-width: 700px) {
+  .app-viewport:has(.sk-page:is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain)) {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: auto;
+  }
+  .sk-page:not(:fullscreen):is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain) {
+    width: 100%;
+    min-height: var(--app-height);
+    padding: max(6px, env(safe-area-inset-top)) 0 max(28px, env(safe-area-inset-bottom));
+    background-attachment: scroll;
+  }
+  .sk-page:not(:fullscreen):is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain) .sk-game-stage {
+    flex-basis: clamp(300px, 52dvh, 430px);
+    height: clamp(300px, 52dvh, 430px);
+    min-height: clamp(300px, 52dvh, 430px);
+  }
+  .sk-page:not(:fullscreen) > .sk-game-menu {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+  }
+  .sk-game-menu-title strong { font-size: 15px; }
+  .sk-game-menu-title span { font-size: 10px; }
+  .sk-hand-area .sk-table-sidebar { width: min(100% - 12px, 560px); margin-inline: auto; }
+  .sk-hand-area .sk-table-sidebar .sk-button,
+  .sk-hand-area .sk-contract-kind,
+  .sk-bottom-fullscreen-button { min-height: 44px; touch-action: manipulation; }
+  .sk-bottom-fullscreen-button { width: min(100% - 24px, 360px); margin: 10px auto 0; }
+  .sk-hand-area .sk-table-sidebar-declare:not(.sk-table-sidebar-detail) .sk-contract-kinds {
+    justify-content: flex-start;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+  }
+  .sk-hand-area .sk-table-sidebar-declare:not(.sk-table-sidebar-detail) .sk-contract-kind { scroll-snap-align: center; }
+}
+
+/* Legen is another binary decision: its two choices occupy one centred row in
+   the free space beneath the question. */
+.sk-hand-area .sk-table-sidebar-legen .sk-table-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  height: 100%;
+}
+.sk-hand-area .sk-table-sidebar-legen .sk-legen-actions {
+  align-self: center;
+  width: min(420px, 100%);
+  justify-content: center;
+  margin-block: auto;
+}
+
+/* In landscape fullscreen on phones, every live control surface starts just
+   10px below the compact game menu; the background remains edge-to-edge. */
+@media (max-width: 900px) and (orientation: landscape) {
+  .sk-page:fullscreen:is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain) {
+    gap: 10px;
+    padding: 10px;
+  }
+  .sk-page:fullscreen:is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain) > .sk-game-menu {
+    width: 100%;
+    margin: 0;
+  }
+  .sk-page:fullscreen:is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain) > :not(.sk-game-menu) {
+    margin-top: 0;
+  }
+  .sk-page:fullscreen:is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain) > .sk-game-stage,
+  .sk-page:fullscreen:is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain) > .sk-hand-area {
+    margin: 0;
+  }
+}
+
+/* Hand and trick use separate accessibility scales. */
+.sk-page .sk-hand { zoom: var(--sk-own-card-scale, 1); }
+.sk-page .sk-trick { zoom: var(--sk-trick-card-scale, 1); }
+.sk-ui-setting { display: grid; gap: 12px; }
+.sk-ui-setting label { display: grid; grid-template-columns: minmax(120px, 1fr) minmax(140px, 2fr) 52px; align-items: center; gap: 12px; color: #fff4d4; font-weight: 700; }
+.sk-ui-setting input { width: 100%; accent-color: #f3d686; }
+.sk-ui-setting output { text-align: right; }
+.sk-ui-setting small { color: #c8d3bf; line-height: 1.45; }
+.sk-card-scale-reset { justify-self: start; }
+@media (max-width: 700px) {
+  .sk-ui-setting label { grid-template-columns: 1fr 46px; gap: 8px; }
+  .sk-ui-setting label > span { grid-column: 1 / -1; }
+}
+
+/* Phone-only game geometry. Desktop selectors above remain unchanged. */
+@media (max-width: 700px), (max-height: 500px) and (pointer: coarse) {
+  .app-viewport:has(.sk-page:is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain)) {
+    overflow: hidden;
+  }
+  .sk-page:is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain),
+  .sk-page:not(:fullscreen):is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain) {
+    display: grid;
+    grid-template-rows: 42px minmax(110px, 1fr) auto;
+    align-items: stretch;
+    gap: 4px;
+    width: 100%;
+    height: var(--app-height) !important;
+    min-height: 0;
+    padding: 4px 6px max(4px, env(safe-area-inset-bottom));
+    overflow: hidden;
+  }
+  .sk-page:fullscreen:is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain) {
+    grid-template-rows: 42px minmax(110px, 1fr) auto;
+    width: 100%;
+    height: 100dvh !important;
+    padding: 4px 6px max(4px, env(safe-area-inset-bottom));
+  }
+  .sk-page .sk-fullscreen-hint,
+  .sk-page .sk-bottom-fullscreen-button { display: none; }
+
+  .sk-page:is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain) > .sk-game-menu {
+    position: relative;
+    top: auto;
+    z-index: 30;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+    height: 42px;
+    min-height: 42px;
+    margin: 0;
+    padding: 3px 5px;
+  }
+  .sk-game-menu-title { gap: 0; }
+  .sk-game-menu-title strong { font-size: 12px; }
+  .sk-game-menu-title span { display: none; }
+  .sk-game-menu .sk-header-actions {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: 2px;
+    width: 100%;
+    min-width: 0;
+  }
+  .sk-game-menu .sk-header-actions .sk-button {
+    width: 100%;
+    min-width: 0;
+    min-height: 32px;
+    padding: 3px 2px;
+    overflow: hidden;
+    font-size: 9px;
+  }
+  .sk-game-menu .sk-header-actions svg { width: 14px; height: 14px; flex: none; }
+
+  .sk-page > .sk-game-stage,
+  .sk-page:not(:fullscreen) > .sk-game-stage {
+    grid-row: 2;
+    width: 100%;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0;
+    overflow: hidden;
+  }
+  .sk-page .sk-game-stage > .sk-table {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  .sk-page .sk-game-stage .sk-table .sk-trick {
+    top: 52%;
+    right: auto;
+    bottom: auto;
+    left: 50%;
+    width: 130px;
+    height: 96px;
+    min-height: 0;
+    zoom: 1;
+    transform: translate(-50%, -50%) scale(var(--sk-trick-card-scale, 1.5));
+    transform-origin: center;
+  }
+  .sk-page .sk-trick .sk-played,
+  .sk-page .sk-trick .sk-played img { width: 42px; }
+  .sk-page .sk-trick .sk-played img { height: auto; }
+  .sk-page .sk-table-mark { font-size: 58px; }
+
+  .sk-page .sk-avatar { width: clamp(58px, 18vw, 72px); scale: 1; transform: none; }
+  .sk-page .sk-avatar-north { top: 0; }
+  .sk-page .sk-avatar-west { top: 34%; left: 1%; }
+  .sk-page .sk-avatar-east { top: 34%; right: 1%; }
+  .sk-page .sk-avatar-north .sk-avatar-image { clip-path: inset(0 0 52% 0); }
+  .sk-page .sk-avatar .sk-held-cards { transform: translateY(15px); }
+  .sk-page .sk-avatar .sk-card-back { width: 18px; height: 28px; border-width: 1px; }
+  .sk-page .sk-avatar .sk-card-back::after { font-size: 6px; }
+  .sk-page .sk-avatar .sk-player-speech,
+  .sk-page .sk-avatar-east .sk-player-speech {
+    max-width: 92px;
+    padding: 5px 7px;
+    font-size: 8px;
+    line-height: 1.2;
+  }
+  .sk-page .sk-trick-stack { scale: .72; }
+
+  .sk-page > .sk-hand-area,
+  .sk-page .sk-hand-area:has(.sk-hand-toolbar) {
+    position: relative;
+    grid-row: 3;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    justify-items: center;
+    align-items: center;
+    gap: 2px;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+  }
+  .sk-page .sk-hand-area:has(.sk-hand-toolbar) > .sk-hand,
+  .sk-page .sk-hand {
+    --fan-card-width: clamp(38px, 12vw, 50px);
+    position: relative;
+    top: 0;
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: center;
+    align-self: center;
+    width: max-content;
+    max-width: none;
+    min-height: 92px;
+    margin: 0 auto;
+    padding: 0 2px 7px;
+    overflow: visible;
+    transform-origin: center bottom;
+  }
+  .sk-page .sk-hand-spread { --fan-card-width: clamp(38px, 12vw, 50px); gap: 0; justify-content: center; }
+  .sk-page .sk-hand-slot,
+  .sk-page .sk-hand-slot:hover,
+  .sk-page .sk-hand-slot:focus-within { transform: rotate(var(--fan-angle, 0deg)); }
+  .sk-page .sk-hand-spread .sk-hand-slot {
+    flex: 0 0 var(--fan-card-width);
+    width: var(--fan-card-width);
+    margin-left: calc(var(--fan-card-width) * -.42);
+  }
+  .sk-page .sk-hand-spread .sk-hand-slot:first-child { margin-left: 0; }
+  .sk-page .sk-trick-stack-hand { right: -26px; scale: .65; }
+  .sk-page .sk-legen-coin-hand { top: 52px; right: -18px; scale: .75; }
+
+  .sk-page .sk-hand-toolbar {
+    position: relative;
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: center;
+    width: auto;
+    min-height: 28px;
+    margin: 0;
+    padding: 2px 4px;
+  }
+  .sk-page .sk-sort-trigger { min-width: 96px; min-height: 28px; padding: 4px 7px !important; }
+  .sk-page .sk-sort-popover { position: fixed; right: 8px; bottom: max(8px, env(safe-area-inset-bottom)); transform: none; }
+
+  .sk-page .sk-hand-area .sk-table-sidebar {
+    grid-column: 1;
+    grid-row: 3;
+    width: min(100%, 560px);
+    height: 96px;
+    min-height: 96px;
+    max-height: 96px;
+    margin: 0;
+    padding: 6px 9px;
+    overflow: hidden;
+  }
+  .sk-page .sk-hand-area .sk-table-sidebar-compact { height: 60px; min-height: 60px; max-height: 60px; }
+  .sk-page .sk-hand-area .sk-table-sidebar-in-game { width: min(100%, 420px); height: 76px; min-height: 76px; max-height: 76px; }
+  .sk-page .sk-hand-area .sk-table-sidebar-intent,
+  .sk-page .sk-hand-area .sk-table-sidebar-legen,
+  .sk-page .sk-hand-area .sk-table-sidebar-declare:not(.sk-table-sidebar-detail) { height: 112px; min-height: 112px; max-height: 112px; }
+  .sk-page .sk-hand-area .sk-table-sidebar-detail { height: 178px; min-height: 178px; max-height: 178px; }
+  .sk-page .sk-hand-area .sk-table-actions { overflow: hidden; }
+  .sk-page .sk-hand-area .sk-table-actions h2 { margin: 0; font-size: 12px; }
+  .sk-page .sk-hand-area .sk-table-actions .sk-actions { margin-top: 3px; }
+  .sk-page .sk-hand-area .sk-table-sidebar .sk-button { min-height: 32px; padding: 5px 8px; font-size: 10px; }
+}
+
+@media (max-height: 500px) and (pointer: coarse) {
+  .sk-page:is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain),
+  .sk-page:not(:fullscreen):is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain),
+  .sk-page:fullscreen:is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain) {
+    grid-template-rows: 32px minmax(70px, 1fr) auto;
+    gap: 2px;
+    padding: 2px 4px max(2px, env(safe-area-inset-bottom));
+  }
+  .sk-page:is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain) > .sk-game-menu {
+    height: 32px;
+    min-height: 32px;
+    padding-block: 1px;
+  }
+  .sk-game-menu-title strong { font-size: 11px; }
+  .sk-game-menu .sk-header-actions .sk-button { min-height: 26px; }
+  .sk-page .sk-game-stage .sk-table .sk-trick { top: 50%; width: 70px; height: 46px; }
+  .sk-page .sk-trick .sk-played,
+  .sk-page .sk-trick .sk-played img { width: 20px; }
+  .sk-page .sk-avatar { width: 38px; }
+  .sk-page .sk-avatar-west,
+  .sk-page .sk-avatar-east { top: 25%; }
+  .sk-page .sk-avatar .sk-held-cards { transform: translateY(10px); }
+  .sk-page .sk-avatar .sk-card-back { width: 13px; height: 20px; }
+  .sk-page .sk-avatar .sk-player-speech,
+  .sk-page .sk-avatar-east .sk-player-speech { max-width: 72px; padding: 3px 5px; font-size: 7px; }
+  .sk-page .sk-hand-area:has(.sk-hand-toolbar) > .sk-hand,
+  .sk-page .sk-hand {
+    --fan-card-width: 28px;
+    min-height: 48px;
+    padding-bottom: 3px;
+  }
+  .sk-page .sk-hand-spread { --fan-card-width: 28px; }
+  .sk-page .sk-hand-toolbar { min-height: 18px; padding: 0 3px; }
+  .sk-page .sk-sort-trigger { min-width: 72px; min-height: 18px; padding: 1px 4px !important; font-size: 8px; }
+  .sk-page .sk-hand-area .sk-table-sidebar { height: 48px; min-height: 48px; max-height: 48px; padding: 2px 6px; }
+  .sk-page .sk-hand-area .sk-table-sidebar-compact { height: 36px; min-height: 36px; max-height: 36px; }
+  .sk-page .sk-hand-area .sk-table-sidebar-in-game { height: 44px; min-height: 44px; max-height: 44px; }
+  .sk-page .sk-hand-area .sk-table-sidebar-intent,
+  .sk-page .sk-hand-area .sk-table-sidebar-legen,
+  .sk-page .sk-hand-area .sk-table-sidebar-declare:not(.sk-table-sidebar-detail) { height: 58px; min-height: 58px; max-height: 58px; }
+  .sk-page .sk-hand-area .sk-table-sidebar-detail { height: 78px; min-height: 78px; max-height: 78px; }
+  .sk-page .sk-hand-area .sk-table-sidebar .sk-button { min-height: 22px; padding: 2px 5px; font-size: 8px; }
+  .sk-page .sk-hand-area .sk-table-actions h2 { font-size: 10px; }
+  .sk-page .sk-table-sidebar-detail .sk-suit-picker { min-height: 42px; padding-block: 0; }
+  .sk-page .sk-table-sidebar-detail .sk-suit-card { width: 32px; }
+  .sk-page .sk-table-sidebar-detail .sk-suit-card img { width: 21px; }
+}
+
+@media (max-width: 700px) and (min-height: 501px) and (max-height: 650px) {
+  .sk-page:is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain),
+  .sk-page:not(:fullscreen):is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain),
+  .sk-page:fullscreen:is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain) {
+    grid-template-rows: 36px minmax(110px, 1fr) auto;
+    gap: 2px;
+    padding-block: 2px max(2px, env(safe-area-inset-bottom));
+  }
+  .sk-page:is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain) > .sk-game-menu {
+    height: 36px;
+    min-height: 36px;
+    padding-block: 1px;
+  }
+  .sk-game-menu .sk-header-actions .sk-button { min-height: 29px; }
+  .sk-page .sk-game-stage .sk-table .sk-trick { width: 100px; height: 70px; }
+  .sk-page .sk-trick .sk-played,
+  .sk-page .sk-trick .sk-played img { width: 30px; }
+  .sk-page .sk-avatar { width: 50px; }
+  .sk-page .sk-hand-area:has(.sk-hand-toolbar) > .sk-hand,
+  .sk-page .sk-hand { --fan-card-width: 34px; min-height: 70px; }
+  .sk-page .sk-hand-spread { --fan-card-width: 34px; }
+  .sk-page .sk-hand-toolbar { min-height: 22px; padding-block: 0; }
+  .sk-page .sk-sort-trigger { min-height: 22px; padding-block: 2px !important; }
+  .sk-page .sk-hand-area .sk-table-sidebar { height: 72px; min-height: 72px; max-height: 72px; }
+  .sk-page .sk-hand-area .sk-table-sidebar-compact { height: 46px; min-height: 46px; max-height: 46px; }
+  .sk-page .sk-hand-area .sk-table-sidebar-in-game { height: 58px; min-height: 58px; max-height: 58px; }
+  .sk-page .sk-hand-area .sk-table-sidebar-intent,
+  .sk-page .sk-hand-area .sk-table-sidebar-legen,
+  .sk-page .sk-hand-area .sk-table-sidebar-declare:not(.sk-table-sidebar-detail) { height: 86px; min-height: 86px; max-height: 86px; }
+  .sk-page .sk-hand-area .sk-table-sidebar-detail { height: 120px; min-height: 120px; max-height: 120px; }
+}
+
+/* The scene has a capped desktop width. Centre that cap itself so the table,
+   the current trick, the hand and the information field share one axis. */
+.sk-page > .sk-game-stage {
+  margin-inline: auto;
+}
+.sk-page > .sk-hand-area:has(.sk-hand-toolbar) {
+  align-self: center;
+  margin-inline: auto;
+}
+.sk-page .sk-hand-area .sk-table-sidebar {
+  align-self: center;
+  justify-self: center;
+  margin-inline: auto;
+}
+
+/* A phone may lock the table to the viewport only after the user has entered
+   real fullscreen. In the normal app view the document remains as tall as its
+   contents, so longer action panels can always be reached by scrolling. */
+@media (max-width: 700px), (max-height: 500px) and (pointer: coarse) {
+  .app-viewport:has(.sk-page:not(:fullscreen):is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain)) {
+    overflow-x: clip;
+    overflow-y: auto;
+    overscroll-behavior-y: auto;
+  }
+  .sk-page:not(:fullscreen):is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain) {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    height: auto !important;
+    min-height: var(--app-height);
+    overflow-x: clip;
+    overflow-y: visible;
+  }
+  .sk-page:not(:fullscreen):is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain) > .sk-game-menu {
+    position: sticky;
+    top: 0;
+  }
+  .sk-page:not(:fullscreen) > .sk-game-stage {
+    flex: 0 0 clamp(300px, 52dvh, 430px);
+    height: clamp(300px, 52dvh, 430px) !important;
+    min-height: clamp(300px, 52dvh, 430px) !important;
+    grid-row: auto;
+  }
+  .sk-page:not(:fullscreen) > .sk-hand-area {
+    grid-row: auto;
+    min-height: max-content;
+  }
+  .sk-page:not(:fullscreen) .sk-hand-area .sk-table-sidebar,
+  .sk-page:not(:fullscreen) .sk-hand-area .sk-table-actions {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+/* In a short, landscape phone viewport the game picker is intentionally kept
+   within the fixed fullscreen grid rather than becoming a scroll target. */
+@media (max-height: 500px) and (orientation: landscape) and (pointer: coarse) {
+  .sk-page:fullscreen:is(.sk-ambience-garden, .sk-ambience-beach, .sk-ambience-bar, .sk-ambience-mountain) {
+    overflow: hidden;
+  }
+  .sk-page:fullscreen .sk-hand-area .sk-table-sidebar-declare:not(.sk-table-sidebar-detail) {
+    height: 64px;
+    min-height: 64px;
+    max-height: 64px;
+    overflow: visible;
+  }
+  .sk-page:fullscreen .sk-hand-area .sk-table-sidebar-declare:not(.sk-table-sidebar-detail) .sk-table-actions,
+  .sk-page:fullscreen .sk-hand-area .sk-table-sidebar-declare:not(.sk-table-sidebar-detail) .sk-contract-kinds {
+    overflow: visible;
+  }
+  .sk-page:fullscreen .sk-hand-area .sk-table-sidebar-declare:not(.sk-table-sidebar-detail) .sk-contract-kinds {
+    gap: 3px;
+  }
+  .sk-page:fullscreen .sk-hand-area .sk-table-sidebar-declare:not(.sk-table-sidebar-detail) .sk-contract-kind {
+    min-height: 24px;
+    padding: 2px 5px;
+    font-size: 8px;
+  }
 }
