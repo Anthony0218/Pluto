@@ -196,7 +196,7 @@
 .notification-item small { display: block; color: #9eaccf; font-size: 12px; }
 .dashboard-dialog { margin: auto; width: min(660px, 94vw); max-height: 90dvh; border: 1px solid #7274c366; border-radius: 20px; color: #edf2ff; background: #0a1529; box-shadow: 0 30px 100px #0009; padding: 0; overflow-y: auto; }
 .dashboard-dialog::backdrop { background: #02050ec4; backdrop-filter: blur(5px); }
-.dashboard-drawer { margin: 0 0 0 auto; height: 100dvh; max-height: 100dvh; width: min(410px, 95vw); border-radius: 20px 0 0 20px; }
+.dashboard-drawer { margin: 0 auto 0 0; height: 100dvh; max-height: 100dvh; width: min(410px, 95vw); border-radius: 0 20px 20px 0; }
 .dashboard-drawer[open] { animation: navigation-enter .25s ease-out both; }
 .app-shell[data-app-theme="black"] .dashboard-page { background: #09090b; --dash-border: #ffffff20; }
 .app-shell[data-app-theme="black"] .dash-panel { background: #141416; }
@@ -292,22 +292,19 @@
 .dashboard-content-item > :last-child { flex: 1; }
 .dashboard-content-move { display: flex; align-items: center; justify-content: space-between; color: #c4bbfb; font-size: 12px; }
 .dashboard-content-move .dashboard-move-controls { padding: 0 0 6px; }
+.dashboard-sortable-grid [data-dragging] { opacity: .55; }
+.dashboard-sortable-grid .react-aria-DropIndicator[data-drop-target] { outline: 3px solid #67e8f9; border-radius: 12px; box-shadow: 0 0 18px #67e8f988; }
+.dashboard-action-card.editing, .dashboard-content-item.editing > :last-child { border-color: #9b8cff; box-shadow: 0 0 0 1px #8b7dff55, 0 0 18px #6f5dff30; }
+.dashboard-edit-tools { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 10px 9px; }
+.dashboard-edit-tools .dashboard-move-controls { padding: 0; }
+.dashboard-content-tools { display: flex; align-items: center; gap: 6px; }
+.dashboard-content-tools .dashboard-move-controls { padding-left: 0; }
+.dashboard-drag-handle { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid #aaa4e66b; border-radius: 8px; background: #171d4a; color: #e5e1ff; cursor: grab; }
+.dashboard-drag-handle:active { cursor: grabbing; }
+.dashboard-drag-preview, .dashboard-content-preview { display: grid; place-items: center; border: 1px solid #a99cff; border-radius: 16px; background: #111b3d; color: #f4f1ff; font-size: 14px; font-weight: 700; box-shadow: 0 18px 45px #000a, 0 0 22px #7668ff66; pointer-events: none; }
 .friend-avatar-button.has-unread-message > span:first-child { border-radius: 50%; outline: 2px solid #f04460; outline-offset: 2px; filter: drop-shadow(0 0 8px #ef4444a8); }
 .friend-message-indicator { width: auto; min-width: 20px; height: 20px; padding: 0 3px; top: -7px; right: -8px; font-style: normal; font-size: 10px; font-weight: 800; }
 .friend-avatar-button.has-unread-message small { color: #ff929e; }
-.sidebar-edge-toggle { left: -35px; right: auto; border-left: 1px solid #9893ffb3; border-right: 0; border-radius: 999px 0 0 999px; }
-.sidebar-online-count, .sidebar-message-count { right: auto; left: -7px; }
-@media (min-width: 1280px) {
-  .dashboard-columns { grid-template-columns: minmax(0, 1fr) 320px; }
-  .dashboard-columns.sidebar-closed { grid-template-columns: minmax(0, 1fr) 0px; }
-  .dashboard-main { grid-column: 1; grid-row: 1; }
-  .sidebar-track { grid-column: 2; grid-row: 1; }
-  .sidebar-closed .dashboard-floating-sidebar { transform: translateX(340px); }
-  .sidebar-closed .sidebar-edge-toggle { left: auto; right: 0; border-radius: 999px 0 0 999px; }
-}
-@media (max-width: 1279px) {
-  .sidebar-edge-toggle-mobile { left: auto; right: 0; border-radius: 999px 0 0 999px; }
-}
 @media (max-width: 1000px) { .dashboard-actions-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .dashboard-content-grid { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 560px) { .dashboard-actions-grid { grid-template-columns: minmax(0, 1fr); } .dashboard-page .hero-content { padding: 23px 18px; } .dashboard-page .dashboard-games .favorite-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .notification-filters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 14px; }

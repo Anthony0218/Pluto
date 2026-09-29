@@ -37,7 +37,7 @@ export default function NavigationDrawer({ onClose }: { onClose: () => void }) {
       onClick={(event) => {
         if (event.target === event.currentTarget) close();
       }}
-      className="fixed inset-y-0 left-auto right-0 m-0 h-dvh max-h-none w-80 max-w-[90vw] border-l border-white/10 bg-transparent p-0 text-white shadow-2xl backdrop:bg-black/55 backdrop:backdrop-blur-md"
+      className="fixed inset-y-0 left-0 right-auto m-0 h-dvh max-h-none w-80 max-w-[90vw] border-r border-white/10 bg-transparent p-0 text-white shadow-2xl backdrop:bg-black/55 backdrop:backdrop-blur-md"
     >
       <div className="relative h-full">
         <button

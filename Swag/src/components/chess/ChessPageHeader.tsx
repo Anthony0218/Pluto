@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Puzzle } from "lucide-react";
 import { variants } from "@/data/chessVariants";
 import { ui, useUiLanguage } from "@/i18n/ui";
-import { NavigationControls } from "@/components/App/PublicHeader";
+import { NavigationControls, NavigationToggle } from "@/components/App/PublicHeader";
 import { boardThemes, pieceThemes, useChessSettings, type BoardTheme, type PieceTheme } from "@/context/ChessSettingsContext";
 import ChessPiece from "@/components/chess/ChessPiece";
 
@@ -38,6 +38,7 @@ export default function ChessPageHeader({ children, className = "", title, icon,
   const accent = accents[variant?.accent ?? (puzzle ? "violet" : "amber")];
   return <header className={`chess-page-header ${className}`} style={{ "--chess-header-accent": accent } as CSSProperties}>
     <div className="chess-header-brand">
+      <NavigationToggle />
       <Link to="/" className="chess-pluto">{ui("Pluto")}</Link>
       <span className="chess-header-icon" aria-hidden="true">{icon ?? (puzzle ? <Puzzle size={22} /> : variant?.icon ?? "♞")}</span>
       <div className="min-w-0"><span className="chess-header-name">{ui(name)}</span>{description && <p className="chess-header-description">{description}</p>}</div>

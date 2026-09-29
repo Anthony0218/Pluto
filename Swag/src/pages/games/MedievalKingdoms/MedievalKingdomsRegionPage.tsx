@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 
 import RegionMap from "../../../components/MedievalKingdoms/RegionMap";
+import BrickstoneFortressPage from "./BrickstoneFortressPage";
 
 import { getCampaign } from "../../../games/MedievalKingdoms/campaignData";
 
@@ -38,6 +39,10 @@ export default function MedievalKingdomsRegionPage() {
       </main>
     );
   }
+
+  // The continent map already makes Brickstone available independently of
+  // campaign completion. Keep this location preview consistent with that entry.
+  if (campaignId === "brickstone-fortress") return <BrickstoneFortressPage />;
 
   if (!isCampaignUnlocked(campaign.id, progress)) {
     return (
@@ -88,13 +93,6 @@ export default function MedievalKingdomsRegionPage() {
       </main>
     );
   }
-  if (campaignId === "brickstone-fortress")
-    return (
-      <main className="min-h-screen bg-[#21170f] px-4 py-8">
-        <MoonvilleMinigames />
-      </main>
-    );
-
   return (
     <main className="min-h-screen bg-[#21170f] px-4 py-8">
       <RegionMap campaign={campaign} progress={progress} />

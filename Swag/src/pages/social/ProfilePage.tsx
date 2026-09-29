@@ -338,14 +338,19 @@ export default function ProfilePage() {
      ========================================================= */
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_rgba(79,70,229,.15),_transparent_52%)] px-4 py-5 text-white sm:px-6 lg:h-[var(--app-height)] lg:min-h-0 lg:overflow-hidden lg:py-3">
+    <main className="min-h-[var(--app-height)] overflow-x-hidden bg-[radial-gradient(ellipse_at_top,_rgba(79,70,229,.15),_transparent_52%)] px-3 py-4 text-white sm:px-6 sm:py-5 lg:h-[var(--app-height)] lg:min-h-0 lg:overflow-hidden lg:py-3">
       <div className="mx-auto max-w-6xl lg:flex lg:h-full lg:min-h-0 lg:flex-col">
         {/* HEADER */}
 
-        <section className="relative mb-3 min-h-[190px] overflow-hidden rounded-[28px] border border-indigo-300/25 bg-[#0b1529] shadow-2xl shadow-black/30 lg:shrink-0">
+        <section className="relative mb-3 overflow-hidden rounded-[24px] border border-indigo-300/25 bg-[#0b1529] shadow-2xl shadow-black/30 sm:min-h-[190px] sm:rounded-[28px] lg:shrink-0">
           <img src={featuredGames[0]?.image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-45" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#071024] via-[#071024]/90 to-[#071024]/20" />
-          <div className="relative flex flex-wrap items-center gap-5 px-6 py-7 sm:px-8"><button type="button" onClick={() => setAvatarPickerOpen(true)} className="group relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl border-2 border-indigo-300/70 bg-[#121d3d] p-1 shadow-[0_0_24px_rgba(129,140,248,.3)]" aria-label={ui("Change avatar")}><ProfileAvatar avatarId={avatarId} className="h-full w-full rounded-xl" /></button><div className="min-w-0 flex-1"><p className="text-[10px] font-black uppercase tracking-[.28em] text-indigo-200">{ui("Pluto player profile")}</p><h1 className="mt-1 truncate text-3xl font-black text-white sm:text-4xl">{username}</h1><p className="mt-1 text-sm text-indigo-100/80">{ui("Play. Learn. Grow together.")}</p><div className="mt-4 max-w-sm"><div className="mb-1 flex justify-between text-xs font-semibold text-indigo-100"><span>{ui("Activity level")} {Math.floor((stats.general.games_played * 100 + (stats.puzzles ?? 0) * 50) / 1000) + 1}</span><span>{(stats.general.games_played * 100 + (stats.puzzles ?? 0) * 50) % 1000} / 1,000 XP</span></div><div className="h-2 overflow-hidden rounded-full bg-indigo-200/15"><div className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-violet-300" style={{ width: `${((stats.general.games_played * 100 + (stats.puzzles ?? 0) * 50) % 1000) / 10}%` }} /></div><p className="mt-1 text-[10px] text-indigo-100/60">{ui("100 XP per completed game · 50 XP per completed puzzle")}</p></div></div>{stats.chessElo !== null && <div className="flex items-center gap-3 rounded-2xl border border-amber-300/30 bg-[#06101e]/75 p-3 backdrop-blur"><RankEmblem family={getChessRank(stats.chessElo).family} size="sm" /><div><strong className="block text-sm text-amber-100">{ui(getChessRank(stats.chessElo).name)}</strong><small className="text-amber-200/70">{stats.chessElo} Elo</small></div></div>}</div>
+          <div className="absolute inset-0 bg-gradient-to-r from-[#071024] via-[#071024]/90 to-[#071024]/35 max-sm:bg-gradient-to-b max-sm:from-[#071024]/75 max-sm:to-[#071024]" />
+          <div className="relative grid grid-cols-[72px_minmax(0,1fr)] items-center gap-4 px-4 py-5 sm:flex sm:flex-wrap sm:gap-5 sm:px-8 sm:py-7">
+            <button type="button" onClick={() => setAvatarPickerOpen(true)} className="group relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-2xl border-2 border-indigo-300/70 bg-[#121d3d] p-1 shadow-[0_0_24px_rgba(129,140,248,.3)] sm:h-24 sm:w-24" aria-label={ui("Change avatar")}><ProfileAvatar avatarId={avatarId} className="h-full w-full rounded-xl" /></button>
+            <div className="min-w-0 flex-1"><p className="text-[9px] font-black uppercase tracking-[.22em] text-indigo-200 sm:text-[10px] sm:tracking-[.28em]">{ui("Pluto player profile")}</p><h1 className="mt-1 break-words text-2xl font-black leading-tight text-white sm:text-4xl">{username}</h1><p className="mt-1 text-xs text-indigo-100/80 sm:text-sm">{ui("Play. Learn. Grow together.")}</p></div>
+            <div className="col-span-2 min-w-0 sm:ml-0 sm:max-w-sm sm:flex-1"><div className="mb-1 flex flex-wrap justify-between gap-x-3 text-[11px] font-semibold text-indigo-100 sm:text-xs"><span>{ui("Activity level")} {Math.floor((stats.general.games_played * 100 + (stats.puzzles ?? 0) * 50) / 1000) + 1}</span><span>{(stats.general.games_played * 100 + (stats.puzzles ?? 0) * 50) % 1000} / 1,000 XP</span></div><div className="h-2 overflow-hidden rounded-full bg-indigo-200/15"><div className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-violet-300" style={{ width: `${((stats.general.games_played * 100 + (stats.puzzles ?? 0) * 50) % 1000) / 10}%` }} /></div><p className="mt-1 text-[9px] leading-4 text-indigo-100/60 sm:text-[10px]">{ui("100 XP per completed game · 50 XP per completed puzzle")}</p></div>
+            {stats.chessElo !== null && <div className="col-span-2 flex items-center gap-3 rounded-2xl border border-amber-300/30 bg-[#06101e]/75 p-3 backdrop-blur sm:col-span-1"><RankEmblem family={getChessRank(stats.chessElo).family} size="sm" /><div><strong className="block text-sm text-amber-100">{ui(getChessRank(stats.chessElo).name)}</strong><small className="text-amber-200/70">{stats.chessElo} Elo</small></div></div>}
+          </div>
         </section>
 
         <div className="grid min-h-0 gap-4 lg:flex-1 lg:grid-cols-[250px_minmax(0,1fr)]">
@@ -354,10 +359,10 @@ export default function ProfilePage() {
               ================================================= */}
 
           <aside className="min-h-0 lg:overflow-y-auto">
-            <div className="rounded-[26px] border border-indigo-300/15 bg-[#0b1529]/90 p-5 shadow-2xl shadow-black/30">
+            <div className="rounded-[22px] border border-indigo-300/15 bg-[#0b1529]/90 p-4 shadow-2xl shadow-black/30 sm:rounded-[26px] sm:p-5">
               {/* AVATAR */}
 
-              <div>
+              <div className="hidden lg:block">
                 <button
                   type="button"
                   onClick={() => setAvatarPickerOpen((current) => !current)}
@@ -411,7 +416,7 @@ export default function ProfilePage() {
 
               {/* NAME */}
 
-              <div className="mt-5">
+              <div className="lg:mt-5">
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600">
                   {ui("Player name")}
                 </p>

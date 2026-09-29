@@ -23,11 +23,10 @@ html:has(.app-shell), body:has(.app-shell) {
 }
 .app-shell { height: 100dvh; overflow: hidden; padding-top: var(--public-header-height); }
 .app-shell.integrated-navigation { --public-header-height: 0px; --app-height: 100dvh; padding-top: 0; }
-#app-navigation[open] { animation: navigation-right-enter .25s ease-out both; }
-#app-navigation[open][data-closing] { animation: navigation-right-exit .2s ease-in both; }
-@keyframes navigation-right-enter { from { transform: translateX(100%); } to { transform: translateX(0); } }
-@keyframes navigation-right-exit { from { transform: translateX(0); } to { transform: translateX(100%); } }
+#app-navigation[open] { animation: navigation-enter .25s ease-out both; }
+#app-navigation[open][data-closing] { animation: navigation-exit .2s ease-in both; }
 @keyframes navigation-enter { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@keyframes navigation-exit { from { transform: translateX(0); } to { transform: translateX(-100%); } }
 @media (prefers-reduced-motion: reduce) { #app-navigation[open] { animation: none; } }
 .app-viewport { height: var(--app-height); min-height: 0; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; }
 .app-viewport .min-h-screen { min-height: var(--app-height); }
