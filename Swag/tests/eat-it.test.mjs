@@ -9,15 +9,15 @@ import { botInput } from '../src/games/eat-it/bots.ts';
 import { advanceRoom, applyRoomAction, parseSettings } from '../src/games/eat-it/authority.ts';
 
 function arena(count = 2, map = 'city') {
-  const s = createGame(map, Array.from({ length: count }, (_, i) => ({ id: `p${i}`, name: `P${i}` })), 5721);
+  const s = createGame(map, Array.from({ length: count }, (_, i) => ({ id: `p${i}`, name: `P${i}` })), 5721, 'legacy-rules', { livesEnabled: false, hellEnabled: false });
   s.food = []; s.powerups = []; s.nextFood = 1000; s.nextPower = 1000;
   s.players.forEach((p, i) => { p.x = 1000 + i * 150; p.y = 800; p.facing = 0; }); return s;
 }
 function steps(s, seconds) { for (let i = 0; i < seconds * EAT.network.tickRate; i++) stepGame(s); }
-function food(s, kind = 'apple', x = 1034, y = 800) { const f = { id: s.nextId++, kind, x, y, vx: 0, vy: 0, z: 0, vz: 0, rotation: 0, target: null, capturedAt: 0 }; s.food.push(f); return f; }
-test('mass/radius is square-root based, capped, and distinct from radius threshold', () => {
+function food(s, kind = 'apple', x = 1012, y = 800) { const f = { id: s.nextId++, kind, x, y, vx: 0, vy: 0, z: 0, vz: 0, rotation: 0, target: null, capturedAt: 0 }; s.food.push(f); return f; }
+test('mass/radius is square-root based, uncapped, and distinct from radius threshold', () => {
   assert.equal(massToRadius(36), 24); assert.equal(massToRadius(144), 48);
-  assert.equal(massToRadius(-100), EAT.player.minRadius); assert.equal(massToRadius(1e9), EAT.player.maxRadius);
+  assert.equal(massToRadius(-100), EAT.player.minRadius); assert.ok(massToRadius(1e9) > massToRadius(1e8));
   for (const ratio of [1.15, 1.20, 1.25, 1.30]) assert.ok(Math.abs(massToRadius(36 * ratio ** 2) / massToRadius(36) - ratio) < 1e-10);
   assert.ok(massToRadius(36 * 1.2) < 24 * EAT.eating.playerEatRadiusRatio);
 });
@@ -31,41 +31,41 @@ test('movement accelerates, decelerates, limits diagonal speed and turns smoothl
   steps(s, 1); assert.ok(Math.hypot(p.vx, p.vy) <= EAT.player.baseSpeed + 1e-8);
   p.input = { x: 0, y: 0 }; const before = Math.hypot(p.vx, p.vy); steps(s, 1); assert.ok(Math.hypot(p.vx, p.vy) < before / 10);
 });
-test('food is pulled into the mouth, rewards growth once, and cannot be eaten twice', () => {
+test('food crossing the mouth falls into depth, rewards growth once, and cannot be eaten twice', () => {
   const s = arena(), p = s.players[0], f = food(s), initialX = f.x;
-  stepGame(s); assert.equal(p.foodEaten, 0); assert.ok(f.x < initialX); assert.equal(f.target, p.id);
+  stepGame(s); assert.equal(p.foodEaten, 0); assert.ok(f.x <= initialX); assert.equal(f.target, p.id); assert.ok(f.z < 0);
   steps(s, 1); assert.equal(p.foodEaten, 1); assert.equal(p.mass, 36 + FOOD.apple.mass); assert.equal(p.score, FOOD.apple.score); assert.equal(s.food.length, 0);
   steps(s, 1); assert.equal(p.foodEaten, 1); assert.equal(p.mass, 41);
 });
 test('only one player can claim a shared food object', () => {
-  const s = arena(), [a, b] = s.players; b.x = a.x; b.y = a.y; food(s); steps(s, 2);
+  const s = arena(), [a, b] = s.players; b.x = a.x + 24; b.y = a.y; b.facing = Math.PI; food(s, 'apple', 1003); steps(s, 2);
   assert.equal(a.foodEaten + b.foodEaten, 1); assert.equal(a.mass + b.mass, 77);
 });
 test('large food needs sufficient mouth capacity; burger and pizza are real consumables', () => {
-  for (const kind of ['burger', 'pizza', 'apple']) {
-    const s = arena(), p = s.players[0], f = food(s, kind, 1045);
+  for (const kind of ['vendingMachine', 'pizza', 'apple']) {
+    const s = arena(), p = s.players[0], f = food(s, kind, 1020);
     if (kind !== 'apple') assert.equal(foodFits(p, f), false);
-    p.mass = 120; assert.equal(foodFits(p, f), true); steps(s, 1);
-    assert.equal(p.mass, 120 + FOOD[kind].mass); assert.equal(p.foodEaten, 1);
+    p.mass = 900; assert.equal(foodFits(p, f), true); steps(s, 1.5);
+    assert.equal(p.mass, 900 + FOOD[kind].growth); assert.equal(p.foodEaten, 1);
   }
 });
 test('smaller and similar-sized attackers cannot eat a target', () => {
-  const s = arena(), [a, b] = s.players; b.x = 1040;
-  for (const mass of [20, 36, 36 * 1.2, 36 * 1.2 ** 2 - 0.01]) { a.mass = mass; assert.equal(canEatPlayer(a, b, 0, s.map), false); }
-  a.mass = 36 * 1.2 ** 2; assert.equal(canEatPlayer(a, b, 0, s.map), true);
+  const s = arena(), [a, b] = s.players; b.x = 1015;
+  for (const mass of [20, 36, 36 * 1.2, 36 * 1.3 ** 2 - 0.01]) { a.mass = mass; assert.equal(canEatPlayer(a, b, 0, s.map), false); }
+  a.mass = 36 * 1.3 ** 2; assert.equal(canEatPlayer(a, b, 0, s.map), true);
 });
 test('mouth direction matters; rear/body overlap does not kill', () => {
   const s = arena(), [a, b] = s.players; a.mass = 144; b.x = a.x - 35;
   assert.equal(canEatPlayer(a, b, 0, s.map), false); stepGame(s); assert.equal(b.alive, true);
   b.x = a.x; b.y = a.y + 35; assert.equal(canEatPlayer(a, b, 0, s.map), false);
-  b.y = a.y; b.x = a.x + 50; assert.equal(canEatPlayer(a, b, 0, s.map), true);
+  b.y = a.y; b.x = a.x + 20; assert.equal(canEatPlayer(a, b, 0, s.map), true);
 });
 test('shield prevents consumption and expires on authoritative time', () => {
-  const s = arena(), [a, b] = s.players; a.mass = 100; b.x = a.x + 50; b.effects.shield = 5;
+  const s = arena(), [a, b] = s.players; a.mass = 100; b.x = a.x + 20; b.effects.shield = 5;
   assert.equal(canEatPlayer(a, b, 4.99, s.map), false); assert.equal(canEatPlayer(a, b, 5, s.map), true);
 });
 test('a successful bite transfers 70% mass once, eliminates and ends last-player-standing', () => {
-  const s = arena(), [a, b] = s.players; a.mass = 100; b.x = a.x + 50; stepGame(s);
+  const s = arena(), [a, b] = s.players; a.mass = 100; b.x = a.x + 20; stepGame(s);
   assert.equal(b.alive, false); assert.equal(b.placement, 2); assert.equal(a.mass, 100 + 36 * 0.7);
   assert.equal(a.playersEaten, 1); assert.equal(s.winnerId, a.id); assert.equal(a.placement, 1); assert.equal(s.status, 'finished');
   assert.equal(eliminate(s, b, a), false); steps(s, 2); assert.equal(a.mass, 125.2);
@@ -74,18 +74,17 @@ test('victim is unavailable during its cosmetic consumption animation', () => {
   const s = arena(3), [a, b, c] = s.players; a.mass = 100; c.mass = 200; b.x = 1045; c.x = 1050; c.facing = Math.PI;
   eliminate(s, b, a); assert.equal(canEatPlayer(c, b, s.time, s.map), false); assert.equal(b.alive, false);
 });
-test('all power-ups collect exactly once; growth is permanent and timers expire', () => {
-  for (const kind of ['speed', 'shield', 'magnet', 'growth']) {
+test('timed power-ups collect exactly once and timers expire', () => {
+  for (const kind of ['speed', 'shield', 'magnet']) {
     const s = arena(), p = s.players[0], power = { id: 1000, x: 1010, y: 800, kind }; s.powerups = [power];
     collectPower(s, p, power); collectPower(s, p, power); assert.equal(p.powerupsCollected, 1); assert.equal(p.score, 40);
-    if (kind === 'growth') { assert.equal(p.mass, 66); steps(s, 8); assert.equal(p.mass, 66); }
-    else { assert.equal(p.effects[kind], EAT.powerups[kind].duration); steps(s, 8); assert.ok(p.effects[kind] < s.time); }
+    assert.equal(p.effects[kind], EAT.powerups[kind].duration); steps(s, EAT.powerups[kind].duration + .1); assert.ok(p.effects[kind] < s.time);
   }
 });
 test('magnet attracts edible neutral food but not enemies or oversized food', () => {
-  const s = arena(), [p, enemy] = s.players; p.effects.magnet = 7; enemy.x = 1170;
-  const apple = food(s, 'apple', 1150, 810), burger = food(s, 'burger', 1150, 790); const x = apple.x;
-  steps(s, .4); assert.ok(apple.x < x); assert.equal(burger.x, 1150); assert.equal(enemy.x, 1170);
+  const s = arena(), [p, enemy] = s.players; p.effects.magnet = 7; enemy.x = 1700;
+  const apple = food(s, 'apple', 1150, 810), burger = food(s, 'vendingMachine', 1150, 690); const x = apple.x;
+  steps(s, .4); assert.ok(apple.x < x); assert.equal(burger.x, 1150); assert.equal(enemy.x, 1700);
 });
 test('bots flee larger visible enemies and hunt edible targets', () => {
   const s = arena(), [bot, other] = s.players; bot.bot = true; other.x = 1140; other.mass = 150; other.facing = Math.PI;
@@ -95,7 +94,7 @@ test('bots flee larger visible enemies and hunt edible targets', () => {
 test('bots forage food and seek power-ups, without map-wide food vision', () => {
   const s = arena(), p = s.players[0]; s.players[1].x = 2000;
   food(s, 'apple', 1100); botInput(s, p); assert.equal(p.botState, 'FORAGE');
-  s.powerups.push({ id: 4000, kind: 'growth', x: 1060, y: 800 }); botInput(s, p); assert.equal(p.botState, 'POWERUP');
+  s.powerups.push({ id: 4000, kind: 'multiplier', x: 1060, y: 800 }); botInput(s, p); assert.equal(p.botState, 'POWERUP');
   s.powerups = []; s.food[0].x = 2000; botInput(s, p); assert.equal(p.botState, 'REPOSITION');
 });
 for (const map of ['city', 'nature']) test(`${map} spawning avoids walls, players, boundaries and accumulation`, () => {
@@ -110,9 +109,9 @@ test('simulation is deterministic for identical seeds and input streams', () => 
   const a = createGame('nature', fillBots([], 4), 99), b = createGame('nature', fillBots([], 4), 99);
   steps(a, 15); steps(b, 15); assert.deepEqual(a, b);
 });
-test('closing boundary ends a stalled match with one survivor', () => {
-  const s = arena(4); s.time = 299; s.players.forEach((p, i) => { p.mass = 20 + i * 10; });
-  steps(s, 10); assert.equal(s.status, 'finished'); assert.equal(s.players.filter(p => p.alive).length, 1);
+test('normal timer ranks surviving contenders by size', () => {
+  const s = arena(4); s.time = EAT.hell.normalDuration - 1; s.players.forEach((p, i) => { p.mass = 20 + i * 10; });
+  steps(s, 10); assert.equal(s.status, 'finished'); assert.equal(s.winnerId, 'p3');
   assert.deepEqual(s.players.map(p => p.placement).sort(), [1, 2, 3, 4]);
 });
 function room() { return { id: 'r', room_code: 'ABC123', host_id: 'p0', players: [{ id: 'p0', name: 'P0', ready: true, lastSeen: 1000 }], settings: { map: 'city', count: 4 }, game_state: null, status: 'waiting', version: 0, last_tick: 1000 }; }
@@ -150,12 +149,12 @@ test('host transfer, leave, and rematch use existing participants safely', () =>
   applyRoomAction(r, 'p1', 'P1', { op: 'rematch' }, 1000, 44, 'next'); assert.equal(r.game_state, null); assert.equal(r.status, 'waiting'); assert.equal(r.players[0].ready, false);
 });
 test('food and player sensors cannot bite through scenery', () => {
-  const s = arena(), [a, b] = s.players; a.x = 185; a.y = 265; b.x = 235; b.y = 265; a.mass = 144;
+  const s = arena(2, 'nature'), [a, b] = s.players; a.x = 2555; a.y = 265; b.x = 2575; b.y = 265; a.mass = 144;
   assert.equal(inMouth(a, b, massToRadius(b.mass)), true); assert.equal(canEatPlayer(a, b, 0, s.map), false);
 });
 
 for (const map of ['city', 'nature']) for (const count of [2, 4, 8]) test(`${map}: a complete ${count}-bot match reaches results without invalid state`, () => {
-  const s = createGame(map, fillBots([], count), 2700 + count);
+  const s = createGame(map, fillBots([], count), 2700 + count, 'legacy-bots', { matchDuration: 120, livesEnabled: false, hellEnabled: false });
   for (let tick = 0; tick < 30 * 480 && s.status === 'playing'; tick++) {
     stepGame(s);
     if (tick % 300 === 0) {
@@ -163,7 +162,7 @@ for (const map of ['city', 'nature']) for (const count of [2, 4, 8]) test(`${map
       assert.ok(s.players.every(p => Number.isFinite(p.mass) && Number.isFinite(p.x) && Number.isFinite(p.y)));
     }
   }
-  assert.equal(s.status, 'finished'); assert.equal(s.players.filter(p => p.alive).length, 1);
-  assert.equal(new Set(s.players.map(p => p.placement)).size, count);
+  assert.equal(s.status, 'finished'); assert.ok(s.winnerId || s.result === 'tie');
+  assert.ok(s.players.every(p => p.placement >= 1 && p.placement <= count));
   assert.ok(s.players.reduce((n, p) => n + p.foodEaten, 0) > 0);
 });

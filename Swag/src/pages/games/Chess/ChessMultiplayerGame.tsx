@@ -22,6 +22,9 @@ import {
 } from "../../../utils/sound.ts";
 
 import { supabase } from "../../../lib/supabase.ts";
+import { acceptChessPosition, compareChessRevision, visibleChessPosition } from "@/games/chess/multiplayer/position";
+import RankedClock from "@/components/chess/multiplayer/RankedClock";
+import { reconcileClock, type ClockSample } from "@/games/chess/ranked/clock";
 import { invokeRankedChess } from "@/games/chess/ranked/client";
 import { useAuth } from "../../../context/AuthContext.tsx";
 
@@ -78,6 +81,9 @@ type MultiplayerGame = {
 
   version: number;
   ranked_round: number;
+  white_time_ms: number | null;
+  black_time_ms: number | null;
+  clock_started_at: string | null;
 
   last_move_from: string | null;
 
@@ -98,13 +104,6 @@ type MultiplayerGame = {
   undo_last_requested_version: number | null;
 };
 
-type GameOutcome = {
-  finished: boolean;
-
-  winner: "white" | "black" | "draw" | null;
-
-  reason: string | null;
-};
 
 type Language = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 
@@ -770,67 +769,6 @@ const pieceValues: Record<string, number> = {
 };
 
 
-function getGameOutcome(game: Chess): GameOutcome {
-  if (game.isCheckmate()) {
-    return {
-      finished: true,
-
-      /*
-       * game.turn() is the player
-       * who has been checkmated.
-       */
-      winner: game.turn() === "w" ? "black" : "white",
-
-      reason: "checkmate",
-    };
-  }
-
-  if (game.isStalemate()) {
-    return {
-      finished: true,
-      winner: "draw",
-      reason: "stalemate",
-    };
-  }
-
-  if (game.isThreefoldRepetition()) {
-    return {
-      finished: true,
-      winner: "draw",
-      reason: "threefold repetition",
-    };
-  }
-
-  if (game.isInsufficientMaterial()) {
-    return {
-      finished: true,
-      winner: "draw",
-      reason: "insufficient material",
-    };
-  }
-
-  if (game.isDrawByFiftyMoves()) {
-    return {
-      finished: true,
-      winner: "draw",
-      reason: "50-move rule",
-    };
-  }
-
-  if (game.isDraw()) {
-    return {
-      finished: true,
-      winner: "draw",
-      reason: "draw",
-    };
-  }
-
-  return {
-    finished: false,
-    winner: null,
-    reason: null,
-  };
-}
 
 export default function ChessMultiplayerGame() {
   useUiLanguage();
@@ -859,7 +797,46 @@ export default function ChessMultiplayerGame() {
   const [playerRatings, setPlayerRatings] = useState<Record<string, number>>({});
   const [ratingChange, setRatingChange] = useState<Record<string, { before: number; after: number }>>({});
 
-  const [gameState, setGameState] = useState<MultiplayerGame | null>(null);
+  const [serverGame, setServerGame] = useState<MultiplayerGame | null>(null);
+  const [pendingMove, setPendingMove] = useState<{ game: MultiplayerGame; at: number; clock: ClockSample | null } | null>(null);
+  const moveInFlight = useRef(false);
+  const latestServer = useRef<MultiplayerGame | null>(null);
+  // Gate snapshots before audio, history and rendering as well as React state.
+  const setGameState = useCallback((value: MultiplayerGame | ((current: MultiplayerGame | null) => MultiplayerGame | null)) => {
+    const next = typeof value === "function" ? value(latestServer.current) : value;
+    if (!next) return false;
+    const accepted = acceptChessPosition(latestServer.current, next);
+    if (accepted !== next) return false;
+    latestServer.current = next;
+    setServerGame(next);
+    if (next.white_time_ms != null) setClockSample(current => reconcileClock(current, next, performance.now()));
+    return true;
+  }, []);
+  const gameState = visibleChessPosition(serverGame, pendingMove?.game ?? null);
+  const pending = gameState === pendingMove?.game ? pendingMove : null;
+  const [clockSample, setClockSample] = useState<ClockSample | null>(null);
+  useEffect(() => {
+    if (room?.match_kind !== "ranked") return;
+    let active = true, running = false;
+    const sync = async () => {
+      if (running) return;
+      running = true;
+      try {
+        const value = await invokeRankedChess<{ game: MultiplayerGame; serverNow: string }>({ op: "clock", code: room.code });
+        if (active) {
+          setGameState(value.game);
+          setClockSample(current => current && compareChessRevision(current.game, value.game) > 0 ? current : { ...value, receivedAt: performance.now() });
+        }
+      } catch { /* Realtime and the next read recover; only the server flags a clock. */ }
+      finally { running = false; }
+    };
+    void sync();
+    const timer = serverGame?.status === "finished" ? undefined : window.setInterval(() => void sync(), 1000);
+    const visible = () => { if (!document.hidden) void sync(); };
+    window.addEventListener("focus", sync);
+    document.addEventListener("visibilitychange", visible);
+    return () => { active = false; clearInterval(timer); window.removeEventListener("focus", sync); document.removeEventListener("visibilitychange", visible); };
+  }, [room?.code, room?.match_kind, serverGame?.version, serverGame?.status, setGameState]);
 
   const [mySeat, setMySeat] = useState<number | null>(null);
 
@@ -1166,7 +1143,7 @@ export default function ChessMultiplayerGame() {
     setError(null);
 
     const { error: resignError } = room.match_kind === "ranked"
-      ? await rankedRequest({ op: "resign", code: room.code, version: gameState.version })
+      ? await rankedRequest({ op: "resign", code: room.code, version: gameState.version, round: gameState.ranked_round })
       : await supabase.rpc("resign_chess_game", { p_room_id: room.id });
 
     setActionLoading(null);
@@ -1225,7 +1202,7 @@ export default function ChessMultiplayerGame() {
           winner,
           end_reason,
           version,
-          ranked_round,
+          ranked_round, white_time_ms, black_time_ms, clock_started_at,
           last_move_from,
           last_move_to,
           white_rematch_ready,
@@ -1246,36 +1223,10 @@ export default function ChessMultiplayerGame() {
 
     const refreshedGame = data as MultiplayerGame;
 
-    setGameState((current) => {
-      if (
-        current &&
-        current.version === refreshedGame.version &&
-        current.fen === refreshedGame.fen &&
-        current.status === refreshedGame.status &&
-        current.winner === refreshedGame.winner &&
-        current.end_reason === refreshedGame.end_reason &&
-        current.undo_requested_by === refreshedGame.undo_requested_by &&
-        current.undo_requested_version ===
-          refreshedGame.undo_requested_version &&
-        current.undo_last_requested_by ===
-          refreshedGame.undo_last_requested_by &&
-        current.undo_last_requested_version ===
-          refreshedGame.undo_last_requested_version &&
-        current.white_rematch_ready === refreshedGame.white_rematch_ready &&
-        current.black_rematch_ready === refreshedGame.black_rematch_ready &&
-        current.moves.length === refreshedGame.moves.length &&
-        current.moves.every(
-          (move, index) => move === refreshedGame.moves[index],
-        )
-      ) {
-        return current;
-      }
-
-      return refreshedGame;
-    });
+    if (!setGameState(refreshedGame)) return;
 
     maybePlayGameEndSound(refreshedGame);
-    lastSeenMoveCountRef.current = (refreshedGame.moves ?? []).length;
+    if (!moveInFlight.current || refreshedGame.moves.length > lastSeenMoveCountRef.current) lastSeenMoveCountRef.current = refreshedGame.moves.length;
 
     if (
       refreshedGame.moves.length > 0 &&
@@ -1423,7 +1374,7 @@ export default function ChessMultiplayerGame() {
     setError(null);
 
     const { error: undoError } = room.match_kind === "ranked"
-      ? await rankedRequest({ op: "requestUndo", code: room.code, version: gameState.version })
+      ? await rankedRequest({ op: "requestUndo", code: room.code, version: gameState.version, round: gameState.ranked_round })
       : await supabase.rpc("request_chess_undo", {
           p_room_id: room.id,
           p_previous_fen: snapshot.previousFen,
@@ -1434,7 +1385,7 @@ export default function ChessMultiplayerGame() {
     if (undoError) {
       console.error(undoError);
       setError(undoError.message);
-    } else if (user?.id) {
+    } else if (user?.id && room.match_kind !== "ranked") {
       setGameState((current) =>
         current
           ? {
@@ -1471,7 +1422,7 @@ export default function ChessMultiplayerGame() {
     setError(null);
 
     const { error: undoError } = room.match_kind === "ranked"
-      ? await rankedRequest({ op: "respondUndo", code: room.code, version: gameState.version, accept })
+      ? await rankedRequest({ op: "respondUndo", code: room.code, version: gameState.version, round: gameState.ranked_round, accept })
       : await supabase.rpc("respond_chess_undo", { p_room_id: room.id, p_accept: accept });
 
     if (undoError) {
@@ -1682,12 +1633,12 @@ export default function ChessMultiplayerGame() {
   const orientation: "white" | "black" = myColor === "b" ? "black" : "white";
 
   const gameEndedForReview =
+    pending === null &&
     gameState !== null &&
     gameState.moves.length > 0 &&
     (gameState.status === "finished" ||
       gameState.winner !== null ||
-      gameState.end_reason !== null ||
-      chess.isGameOver());
+      gameState.end_reason !== null);
 
   const reviewMoves =
     completedGameMoves.length > 0
@@ -1861,7 +1812,7 @@ export default function ChessMultiplayerGame() {
   winner,
   end_reason,
   version,
-  ranked_round,
+  ranked_round, white_time_ms, black_time_ms, clock_started_at,
   last_move_from,
   last_move_to,
   white_rematch_ready,
@@ -1897,7 +1848,7 @@ export default function ChessMultiplayerGame() {
     lastGameEndSoundKeyRef.current = getGameEndSoundKey(loadedGame);
 
     setLoading(false);
-  }, [roomCode, user]);
+  }, [roomCode, user, setGameState]);
 
   useEffect(() => {
     void loadGame();
@@ -1955,6 +1906,7 @@ export default function ChessMultiplayerGame() {
 
         (payload) => {
           const updated = payload.new as MultiplayerGame;
+          if (!setGameState(updated)) return;
           const nextMoveCount = updated.moves?.length ?? 0;
 
           if (nextMoveCount > lastSeenMoveCountRef.current) {
@@ -1962,7 +1914,7 @@ export default function ChessMultiplayerGame() {
           }
 
           maybePlayGameEndSound(updated);
-          lastSeenMoveCountRef.current = nextMoveCount;
+          if (!moveInFlight.current || nextMoveCount > lastSeenMoveCountRef.current) lastSeenMoveCountRef.current = nextMoveCount;
 
           if (
             nextMoveCount > 0 &&
@@ -1975,8 +1927,6 @@ export default function ChessMultiplayerGame() {
             setCompletedGameMoves([]);
             setReviewOpen(false);
           }
-
-          setGameState(updated);
 
           /*
            * Clear selection after
@@ -2003,7 +1953,7 @@ export default function ChessMultiplayerGame() {
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, [room]);
+  }, [room, setGameState]);
 
   /*
    * ----------------------------------
@@ -2016,7 +1966,7 @@ export default function ChessMultiplayerGame() {
     to: Square,
     promotion?: "q" | "r" | "b" | "n",
   ) {
-    if (!room || !gameState || moving || gameState.undo_requested_by) {
+    if (!room || !gameState || moving || moveInFlight.current || gameState.undo_requested_by) {
       return;
     }
 
@@ -2042,92 +1992,37 @@ export default function ChessMultiplayerGame() {
     if (!move) {
       return;
     }
-    const outcome = getGameOutcome(localGame);
+    const previous = gameState;
+    const submittedMoves = [...previous.moves, move.san];
+    moveInFlight.current = true;
     setMoving(true);
     setError(null);
+    setPendingMove({ at: performance.now(), clock: clockSample, game: {
+      ...previous, fen: localGame.fen(), moves: submittedMoves,
+      last_move_from: from, last_move_to: to,
+      // Results, ratings and the committed version remain server-owned.
+    } });
+    setSelectedSquare(null); setLegalMoves([]); setPromotionFrom(null); setPromotionSquare(null);
+    playMoveFeedbackSound(submittedMoves);
+    lastSeenMoveCountRef.current = submittedMoves.length;
+    try {
+      const result = await invokeRankedChess<{ game: MultiplayerGame; serverNow: string }>({
+        op: room.match_kind === "ranked" ? "move" : "casualMove", code: room.code,
+        version: previous.version, round: previous.ranked_round, from: move.from, to: move.to, promotion: move.promotion ?? "q",
+      });
+      const accepted = setGameState(result.game);
+      if (room.match_kind === "ranked") setClockSample(current => current && compareChessRevision(current.game, result.game) > 0 ? current : { game: result.game, serverNow: result.serverNow, receivedAt: performance.now() });
+      if (accepted) maybePlayGameEndSound(result.game);
 
-    const { error: moveError } = room.match_kind === "ranked"
-      ? await rankedRequest({ op: "move", code: room.code, version: gameState.version, from: move.from, to: move.to, promotion: move.promotion ?? "q" })
-      : await supabase.rpc("play_chess_move", {
-          p_room_id: room.id,
-          p_from: move.from,
-          p_to: move.to,
-          p_move_san: move.san,
-          p_new_fen: localGame.fen(),
-          p_expected_version: gameState.version,
-          p_is_finished: outcome.finished,
-          p_winner: outcome.winner,
-          p_end_reason: outcome.reason,
-        });
-
-    setMoving(false);
-
-    if (moveError) {
-      const fullMoveError = {
-        code: moveError.code,
-        message: moveError.message,
-        details: moveError.details,
-        hint: moveError.hint,
-      };
-
-      console.error(
-        "play_chess_move failed:",
-        JSON.stringify(fullMoveError, null, 2),
-      );
-
-      setError(
-        [moveError.code, moveError.message, moveError.details, moveError.hint]
-          .filter(Boolean)
-          .join(" · "),
-      );
-
-      await loadGame();
-
-      return;
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Move could not be confirmed.");
+      // Roll back immediately even if the recovery request also loses connectivity.
+      setPendingMove(null);
+      lastSeenMoveCountRef.current = latestServer.current?.moves.length ?? previous.moves.length;
+      await refreshChessGameState();
+    } finally {
+      setPendingMove(null); moveInFlight.current = false; setMoving(false);
     }
-
-    const submittedMoves = [...gameState.moves, move.san];
-
-    /*
-     * IMPORTANT:
-     *
-     * Do NOT append the move locally with setGameState here.
-     *
-     * The Supabase UPDATE can reach the Realtime subscription before this
-     * RPC promise resolves. If we then append the same SAN move locally,
-     * the player who made the move can end up with the move twice:
-     *
-     *   server / opponent: [e4]
-     *   local mover:       [e4, e4]
-     *
-     * That breaks last-mover detection (especially visible for White) and
-     * also corrupts the move list passed into Game Review.
-     *
-     * chess_games is therefore the single authoritative source after every
-     * successful multiplayer move.
-     */
-    if (lastSeenMoveCountRef.current < submittedMoves.length) {
-      playMoveFeedbackSound(submittedMoves);
-      lastSeenMoveCountRef.current = submittedMoves.length;
-    }
-
-    /*
-     * Preserve the exact completed move list immediately so the Game Review
-     * entry point is available even before the follow-up SELECT finishes.
-     */
-    if (outcome.finished) {
-      setCompletedGameMoves(submittedMoves);
-    }
-
-    await refreshChessGameState();
-
-    setSelectedSquare(null);
-
-    setLegalMoves([]);
-
-    setPromotionFrom(null);
-
-    setPromotionSquare(null);
   }
 
   /*
@@ -3126,6 +3021,7 @@ export default function ChessMultiplayerGame() {
                         t={t}
                       />
 
+                      {room.match_kind === "ranked" && <RankedClock color={color} sample={pending?.clock ?? clockSample} pendingAt={pending?.clock && compareChessRevision(pending.clock.game, pending.game) === 0 ? pending.at : undefined} />}
                       {index === 0 && (
                         <div className="flex items-center gap-2 px-2">
                           <span className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-white/20" />

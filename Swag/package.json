@@ -11,7 +11,8 @@
     "test:atlas": "node --test tests/atlas-arena.test.mjs",
     "test:eat-it": "node --test tests/eat-it*.test.mjs",
     "geography:sync": "node scripts/geography/sync-atlas.mjs",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:ranked": "node --test tests/chess-ranked*.test.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
@@ -46,6 +47,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
+    "@electric-sql/pglite": "^0.5.8",
     "@eslint/js": "^10.0.1",
     "@rolldown/plugin-babel": "^0.2.3",
     "@types/babel__core": "^7.20.5",

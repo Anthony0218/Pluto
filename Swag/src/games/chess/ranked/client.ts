@@ -27,7 +27,7 @@ async function invokeWithToken<T>(body: Record<string, unknown>, token: string):
 
 export async function invokeRankedChess<T>(body: Record<string, unknown>): Promise<T> {
   const { data: { session }, error } = await supabase.auth.getSession();
-  if (error || !session?.access_token) throw new RankedAuthError("Sign in again to play ranked chess.");
+  if (error || !session?.access_token) throw new RankedAuthError("Sign in again to play multiplayer chess.");
   try {
     return await invokeWithToken<T>(body, session.access_token);
   } catch (cause) {
@@ -41,4 +41,17 @@ export async function invokeRankedChess<T>(body: Record<string, unknown>): Promi
       throw retryCause;
     }
   }
+}
+
+// Cache the token while the page is alive: pagehide cannot await getSession().
+let queueToken: string | undefined;
+void supabase.auth.getSession().then(({ data }) => { queueToken = data.session?.access_token; });
+supabase.auth.onAuthStateChange((_event, session) => { queueToken = session?.access_token; });
+export function leaveRankedQueue(sessionId: string) {
+  if (!queueToken) { void invokeRankedChess({ op: "leaveQueue", sessionId }).catch(() => {}); return; }
+  void fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ranked-chess`, {
+    method: "POST", keepalive: true,
+    headers: { Authorization: `Bearer ${queueToken}`, apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY, "Content-Type": "application/json" },
+    body: JSON.stringify({ op: "leaveQueue", sessionId }),
+  }).catch(() => { /* The server lease expires even if the browser cannot send. */ });
 }

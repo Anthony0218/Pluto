@@ -1,22 +1,11 @@
 import { EAT } from './config.ts';
 import type { MapId, Obstacle, Vec } from './types.ts';
-const city: Obstacle[] = [
-  { x: 190, y: 210, w: 200, h: 110, kind: 'stall' }, { x: 1810, y: 240, w: 200, h: 110, kind: 'stall' },
-  { x: 300, y: 1240, w: 190, h: 110, kind: 'stall' }, { x: 1680, y: 1300, w: 190, h: 110, kind: 'stall' },
-  { x: 680, y: 330, w: 130, h: 85, kind: 'planter' }, { x: 1430, y: 1130, w: 130, h: 85, kind: 'planter' },
-  { x: 1010, y: 170, w: 180, h: 150, kind: 'fountain' },
-  { x: 310, y: 900, w: 125, h: 35, kind: 'bench' }, { x: 1740, y: 780, w: 125, h: 35, kind: 'bench' },
-  { x: 615, y: 1260, w: 65, h: 65, kind: 'crate' }, { x: 1620, y: 325, w: 65, h: 65, kind: 'crate' },
-];
+// Water is terrain. All ordinary raised scenery lives in the physical food catalog.
 const nature: Obstacle[] = [
-  { x: 1410, y: 0, w: 130, h: 550, kind: 'water' }, { x: 1410, y: 860, w: 130, h: 740, kind: 'water' },
-  { x: 210, y: 230, w: 130, h: 130, kind: 'tree' }, { x: 480, y: 190, w: 105, h: 105, kind: 'tree' },
-  { x: 1830, y: 300, w: 130, h: 130, kind: 'tree' }, { x: 340, y: 1240, w: 130, h: 130, kind: 'tree' },
-  { x: 1840, y: 1260, w: 130, h: 130, kind: 'tree' }, { x: 1000, y: 1320, w: 110, h: 110, kind: 'tree' },
-  { x: 730, y: 370, w: 100, h: 65, kind: 'rock' }, { x: 670, y: 1090, w: 130, h: 45, kind: 'log' },
-  { x: 1700, y: 1020, w: 85, h: 70, kind: 'rock' },
+  { x: 2560, y: 0, w: 190, h: 1040, kind: 'water' },
+  { x: 2560, y: 1760, w: 190, h: 1280, kind: 'water' },
 ];
-export const obstaclesFor = (map: MapId): readonly Obstacle[] => map === 'city' ? city : nature;
+export const obstaclesFor = (map: MapId): readonly Obstacle[] => map === 'city' ? [] : nature;
 export const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 export const distance = (a: Vec, b: Vec) => Math.hypot(a.x - b.x, a.y - b.y);
 export function circleHitsRect(p: Vec, radius: number, rect: Obstacle): boolean {
@@ -48,5 +37,5 @@ export function clearPath(map: MapId, a: Vec, b: Vec, radius = 2): boolean {
   return true;
 }
 export function zoneRadius(time: number): number {
-  return Math.max(0, 1400 * (1 - Math.max(0, time - EAT.match.zoneStart) / (EAT.match.zoneEnd - EAT.match.zoneStart)));
+  return Math.max(0, Math.hypot(EAT.match.width, EAT.match.height) / 2 * (1 - Math.max(0, time - EAT.match.zoneStart) / (EAT.match.zoneEnd - EAT.match.zoneStart)));
 }

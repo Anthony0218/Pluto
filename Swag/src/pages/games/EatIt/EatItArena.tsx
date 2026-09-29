@@ -1,8 +1,13 @@
+import { ABILITY_KEYS, activateAbility, abilityAvailable, type HeldAbility } from '../../../games/eat-it/abilities';
+import { activateEscape, escapeAvailable } from '../../../games/eat-it/escape';
+import { respawn, activateGrowth, liveLeaders } from '../../../games/eat-it/progression';
+import { questAlert } from '../../../games/eat-it/quests';
+import { isChoking } from '../../../games/eat-it/rules';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowLeft, Maximize, Volume2, VolumeX, Trophy, Pause, Play, Settings2 } from 'lucide-react';
 import { ui, useUiLanguage } from '../../../i18n/ui';
-import { EAT, POWER_KINDS } from '../../../games/eat-it/config';
+import { EAT, POWER_KINDS, POWER_NAME, matchDuration } from '../../../games/eat-it/config';
 import { stepGame } from '../../../games/eat-it/engine';
 import { ArenaRenderer, POWER_SYMBOL } from '../../../games/eat-it/renderer';
 import { EatAudio } from '../../../games/eat-it/audio';
@@ -10,12 +15,24 @@ import { EatConnection } from '../../../games/eat-it/network';
 import { getAudioSettings, setAudioSettings, subscribeAudioSettings } from '../../../games/chess/audio/chessAudio';
 import type { GameState, Input, Player, Room } from '../../../games/eat-it/types';
 
-const powerName = { speed: 'Speed Boost', shield: 'Shield', magnet: 'Magnet', growth: 'Growth Boost' };
-type Hud = { time: number; status: GameState['status']; winnerId: string | null; players: Player[]; event: string };
-const hudFor = (s: GameState, localId: string): Hud => {
-  const event = [...s.events].reverse().find(e => e.type === 'eat' && (e.playerId === localId || e.victimId === localId));
-  return { time: s.time, status: s.status, winnerId: s.winnerId, players: s.players.map(p => ({ ...p, effects: { ...p.effects } })),
-    event: event ? event.playerId === localId ? ui('You ate {player}').replace('{player}', s.players.find(p => p.id === event.victimId)?.name ?? '') : ui('{player} ate you').replace('{player}', s.players.find(p => p.id === event.playerId)?.name ?? '') : '' };
+const powerName = POWER_NAME;
+type Hud = { jumpReady: boolean; strikeReady: boolean; soloRemaining: number; phase: GameState['phase']; escapeReady: boolean; helperName: string; escapeUntil: number; time: number; status: GameState['status']; winnerId: string | null; players: Player[]; event: string; quest: string; questVisible: boolean };
+const hudFor = (s: GameState, localId: string, wasVisible = false): Hud => {
+  const event = [...s.events].reverse().find(e => (e.playerId === localId || e.victimId === localId) && ['eat','power','escape','respawn','hellAssist'].includes(e.type) || e.playerId === localId && e.type === 'food' && e.food?.startsWith('pluto'));
+  const player = s.players.find(p => p.id === localId)!, e = s.encounter;
+  const questVisible = questAlert(s, player, wasVisible);
+  let quest = '';
+  if ((!s.phase || s.phase === 'normal') && player.alive) {
+    if (isChoking(player, s.time)) quest = `${ui('Choking…')} ${Math.ceil((player.chokingUntil ?? 0) - s.time)}s`;
+    else if (e && e.npc.targetId === localId && ['friendly', 'hostile', 'emerging', 'devoured'].includes(e.npc.phase)) {
+      const key = e.npc.phase === 'friendly' ? e.npc.kind === 'pigeon' ? 'Friendly pigeon · bonus food' : 'Friendly cat · bonus food' : 'Revenge! Watch out for attacks';
+      quest = `${ui(key)} · ${Math.max(0, Math.ceil(e.npc.until - s.time))}s`;
+      if (e.npc.phase === 'friendly') quest = s.time - e.npc.since < 2 ? `${ui('Quest completed!')} ${ui(key)}` : '';
+    } else if (e?.item.ownerId === localId) quest = ui(e.item.kind === 'scroll' ? 'Golden Scroll collected · bring it to the pigeon' : 'Cat Tree collected · bring it to the cat');
+    else if (questVisible && e) quest = ui(e.npc.kind === 'pigeon' ? 'Bring the pigeon the Golden Scroll' : 'Bring the cat the Cat Tree');
+  }
+  return { jumpReady: abilityAvailable(s,player,'jump'), strikeReady: abilityAvailable(s,player,'strike'), soloRemaining: s.hell ? Math.max(0,EAT.hell.soloDuration-(s.time-s.hell.readyAt)) : 0, phase: s.phase ?? 'normal', escapeReady: escapeAvailable(s, player), helperName: (s.phase === 'hell' ? player.helper?.kind : e?.npc.kind) === 'cat' ? 'Cat' : 'Pigeon', escapeUntil: e?.npc.targetId === localId && e.npc.phase === 'friendly' ? e.npc.until : 0, quest, questVisible, time: s.time, status: s.status, winnerId: s.winnerId, players: s.players.map(p => ({ ...p, effects: { ...p.effects } })),
+    event: event && event.type !== 'eat' ? ui(event.type === 'power' ? powerName[event.power!] : event.type === 'respawn' ? 'Respawning' : event.type === 'food' ? 'Pluto Bonus' : 'Escape') : event ? event.playerId === localId ? ui('You ate {player}').replace('{player}', s.players.find(p => p.id === event.victimId)?.name ?? '') : ui('{player} ate you').replace('{player}', s.players.find(p => p.id === event.playerId)?.name ?? '') : '' };
 };
 export function AudioControls() {
   useUiLanguage(); const audio = useSyncExternalStore(subscribeAudioSettings, getAudioSettings);
@@ -28,8 +45,12 @@ export default function EatItArena({ initial, localId, room, onRoom, onExit, onF
   const { language } = useUiLanguage(); const canvas = useRef<HTMLCanvasElement>(null), container = useRef<HTMLDivElement>(null);
   const input = useRef<Input>({ x: 0, y: 0 }), paused = useRef(false), source = useRef(initial);
   const [hud, setHud] = useState(() => hudFor(initial, localId)), [isPaused, setPaused] = useState(false);
+  const [graphicsError, setGraphicsError] = useState(false);
   const [error, setError] = useState(''), [audioOpen, setAudioOpen] = useState(false), [help, setHelp] = useState(true);
   const [stick, setStick] = useState<{ x: number; y: number; dx: number; dy: number } | null>(null);
+  const abilityCommand = useRef<(kind: HeldAbility) => void>(() => {});
+  const growthCommand = useRef<() => void>(() => {});
+  const escapeCommand = useRef<() => void>(() => {}), respawnCommand = useRef<() => void>(() => {});
   const settings = useSyncExternalStore(subscribeAudioSettings, getAudioSettings);
   const callbacks = useRef({ onRoom, onFinished });
   useEffect(() => { callbacks.current = { onRoom, onFinished }; }, [onRoom, onFinished]);
@@ -37,8 +58,15 @@ export default function EatItArena({ initial, localId, room, onRoom, onExit, onF
   const isOnline = !!room;
   useEffect(() => {
     if (!canvas.current || !container.current) return;
-    const renderer = new ArenaRenderer(canvas.current, initial.map), audio = new EatAudio();
+    let renderer: ArenaRenderer;
+    try { renderer = new ArenaRenderer(canvas.current, initial.map); }
+    catch { const notice = requestAnimationFrame(() => setGraphicsError(true)); return () => cancelAnimationFrame(notice); }
+    const audio = new EatAudio();
     const connection = room ? new EatConnection(room, r => callbacks.current.onRoom?.(r), setError) : null;
+    abilityCommand.current = kind => { if (paused.current) return; if (connection && room) void connection.escape(room.room_code, kind); else { const p=source.current.players.find(p=>p.id===localId); if(p) activateAbility(source.current,p,kind); } };
+    growthCommand.current = () => { if (paused.current) return; if (connection && room) void connection.escape(room.room_code, 'growth'); else { const p = source.current.players.find(p => p.id === localId); if (p) activateGrowth(source.current, p); } };
+    respawnCommand.current = () => { if (paused.current) return; if (connection && room) void connection.escape(room.room_code, 'respawn'); else { const p = source.current.players.find(p => p.id === localId); if (p) respawn(source.current, p); } };
+    escapeCommand.current = () => { if (paused.current) return; if (connection && room) void connection.escape(room.room_code); else { const p = source.current.players.find(p => p.id === localId); if (p) activateEscape(source.current, p); } };
     const node = container.current, keys = new Set<string>();
     const shell = document.querySelector<HTMLElement>('.app-shell'), wasInert = shell?.inert;
     if (shell) shell.inert = true;
@@ -50,6 +78,7 @@ export default function EatItArena({ initial, localId, room, onRoom, onExit, onF
     const keydown = (event: KeyboardEvent) => {
       if ((event.target as HTMLElement)?.closest('input,select,textarea,[contenteditable="true"]')) return;
       if (validKeys.includes(event.key.toLowerCase())) { event.preventDefault(); keys.add(event.key.toLowerCase()); audio.unlock(); }
+      for (const kind of ['jump','strike'] as const) if (event.code === ABILITY_KEYS[kind]) { event.preventDefault(); if(!event.repeat) { audio.unlock(); abilityCommand.current(kind); } }
       if (event.key === 'Escape' && !room) { paused.current = !paused.current; setPaused(paused.current); stop(); }
       if (import.meta.env.DEV && event.key === 'F3') { event.preventDefault(); debug = !debug; }
     };
@@ -73,12 +102,12 @@ export default function EatItArena({ initial, localId, room, onRoom, onExit, onF
       renderer.draw(connection ? connection.presentation(now, localId) : state, localId, dt, you.current, debug, !!connection);
       for (const e of state.events) if (!heard.has(e.id)) {
         heard.add(e.id);
-        if (e.playerId === localId) audio.play(e.type);
+        if (e.playerId === localId || !e.playerId) audio.play(e.type);
         else if (e.victimId === localId && e.type === 'eat') audio.play('eliminated');
       }
       if (heard.size > 200) { heard.clear(); state.events.forEach(e => heard.add(e.id)); }
-      if (!paused.current) audio.ambient(state.map, state.time);
-      if (now - lastHud > EAT.visuals.hudIntervalMs) { setHud(hudFor(state, localId)); lastHud = now; }
+      if (!paused.current) audio.ambient(state.hell ? 'hell' : state.map, state.time);
+      if (now - lastHud > EAT.visuals.hudIntervalMs) { setHud(previousHud => hudFor(state, localId, previousHud.questVisible)); lastHud = now; }
       if (state.status === 'finished') {
         finishedAt ??= now;
         if (now - finishedAt > 1100) { callbacks.current.onFinished(structuredClone(state)); return; }
@@ -87,15 +116,15 @@ export default function EatItArena({ initial, localId, room, onRoom, onExit, onF
     };
     frame = requestAnimationFrame(run); canvas.current.focus();
     const helpTimer = setTimeout(() => setHelp(false), 10000);
-    return () => { cancelAnimationFrame(frame); observer.disconnect(); connection?.close(); audio.close(); clearTimeout(helpTimer);
+    return () => { cancelAnimationFrame(frame); observer.disconnect(); renderer.dispose(); connection?.close(); audio.close(); clearTimeout(helpTimer);
       if (shell) shell.inert = wasInert ?? false;
       window.removeEventListener('keydown', keydown); window.removeEventListener('keyup', keyup); window.removeEventListener('blur', stop); document.removeEventListener('visibilitychange', visibility); node.removeEventListener('pointerdown', unlock); };
   // A game instance owns one loop. Parent callbacks are read through refs.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initial.id, localId]);
   const local = hud.players.find(p => p.id === localId)!, alive = hud.players.filter(p => p.alive);
-  const leaders = [...hud.players].sort((a, b) => Number(b.alive) - Number(a.alive) || b.mass - a.mass);
-  const shownLeaders = leaders.slice(0, 5);
+  const leaders = liveLeaders(hud.players);
+  const shownLeaders = leaders;
   if (!shownLeaders.some(p => p.id === localId)) shownLeaders[shownLeaders.length - 1] = local;
   const pointer = useRef<{ id: number; x: number; y: number } | null>(null);
   const pause = () => { paused.current = !paused.current; setPaused(paused.current); input.current = { x: 0, y: 0 }; canvas.current?.focus(); };
@@ -108,18 +137,33 @@ export default function EatItArena({ initial, localId, room, onRoom, onExit, onF
       const dx = e.clientX - p.x, dy = e.clientY - p.y, length = Math.max(48, Math.hypot(dx, dy)); input.current = { x: dx / length, y: dy / length };
       setStick(s => s && ({ ...s, dx: dx / length * 32, dy: dy / length * 32 }));
     }} onPointerUp={() => { pointer.current = null; input.current = { x: 0, y: 0 }; setStick(null); }} onPointerCancel={() => { pointer.current = null; input.current = { x: 0, y: 0 }; setStick(null); }} />
+    {graphicsError && <div className="eat-pause" role="alert"><h2>{ui('3D graphics unavailable')}</h2><p>{ui('Enable WebGL2 in your browser to play Eat It.')}</p><button className="eat-primary" onClick={onExit}>{ui('Return to Lobby')}</button></div>}
     {stick && <div className="eat-stick" style={{ left: stick.x, top: stick.y }}><i style={{ transform: `translate(${stick.dx}px, ${stick.dy}px)` }} /></div>}
-    <div className="eat-top-left eat-glass"><button aria-label={ui('Return to Lobby')} onClick={onExit}><ArrowLeft size={18} /></button><strong>{ui('Eat It')}<small>{ui(initial.map === 'city' ? 'City' : 'Nature')}</small></strong></div>
-    <div className="eat-match-info eat-glass"><span className="eat-live-dot" /><strong>{alive.length}<span> / {hud.players.length}</span></strong><span>{ui('Players Remaining')}</span><i /><time>{Math.floor(hud.time / 60)}:{String(Math.floor(hud.time % 60)).padStart(2, '0')}</time></div>
-    <aside className="eat-leaderboard eat-glass" aria-label={ui('Leaderboard')}><h2><Trophy size={13} />{ui('Leaderboard')}</h2>{shownLeaders.map(p => <div key={p.id} className={p.id === localId ? 'is-you' : ''}><span>{leaders.indexOf(p) + 1}</span><i style={{ background: p.color }} /><span>{p.id === localId ? ui('You') : p.name}{!p.alive && ' ×'}</span><b>{Math.round(p.mass)}</b></div>)}</aside>
+    <div className="eat-top-left eat-glass"><button aria-label={ui('Return to Lobby')} onClick={onExit}><ArrowLeft size={18} /></button><strong>{ui('Eat It')}<small>{ui(hud.phase !== 'normal' ? 'Hell' : initial.map === 'city' ? 'City' : 'Nature')}</small></strong></div>
+    <div className="eat-match-info eat-glass"><span className="eat-live-dot" /><strong>{alive.length}<span> / {hud.players.length}</span></strong><span>{ui('Players Remaining')}</span><i /><time>{hud.phase !== 'normal' ? ui('Sudden Death') : `${Math.floor(Math.max(0, Math.ceil(matchDuration(initial) - hud.time)) / 60)}:${String(Math.floor(Math.max(0, Math.ceil(matchDuration(initial) - hud.time)) % 60)).padStart(2, '0')}`}</time></div>
+    <aside className="eat-leaderboard eat-glass" aria-label={ui('Leaderboard')}><h2><Trophy size={13} />{ui('Leaderboard')}</h2>{shownLeaders.map(p => <div key={p.id} className={p.id === localId ? 'is-you' : ''}><span>{leaders.indexOf(p) + 1}</span><i style={{ background: p.color }} /><span>{p.id === localId ? ui('You') : p.name}{!p.alive && ' ×'}</span><b>{Math.round(p.mass).toLocaleString()} <span key={p.lives} className="eat-life-change" aria-label={`${ui('Lives')}: ${p.lives ?? 0}`}>{'♥'.repeat(p.lives ?? 0) || '×'}</span></b></div>)}</aside>
     <div className="eat-game-buttons eat-glass"><button aria-label={ui(settings.muted ? 'Unmute' : 'Mute')} onClick={() => setAudioSettings({ muted: !settings.muted })}>{settings.muted ? <VolumeX size={17} /> : <Volume2 size={17} />}</button><button aria-label={ui('Audio settings')} onClick={() => setAudioOpen(!audioOpen)}><Settings2 size={17} /></button>{!isOnline && <button aria-label={ui(isPaused ? 'Resume' : 'Pause')} onClick={pause}>{isPaused ? <Play size={17} /> : <Pause size={17} />}</button>}<button aria-label={ui('Fullscreen')} onClick={() => { if (document.fullscreenElement) void document.exitFullscreen(); else void container.current?.requestFullscreen().catch(() => {}); }}><Maximize size={17} /></button></div>
     {audioOpen && <div className="eat-game-audio eat-glass"><AudioControls /></div>}
-    <div className="eat-mass-card eat-glass"><div className="eat-mini-face" style={{ background: local.color }}>●</div><div><span>{ui('Mass')}</span><strong>{Math.round(local.mass)}<small>g</small></strong></div><i /><div><span>{ui('Score')}</span><strong>{local.score.toLocaleString()}</strong></div></div>
-    <div className="eat-effects">{POWER_KINDS.filter(k => local.effects[k] > hud.time).map(k => <div className={`eat-effect eat-effect-${k}`} key={k}><b>{POWER_SYMBOL[k]}</b><div>{ui(powerName[k])}<small>{k === 'growth' ? ui('Permanent +{mass} mass').replace('{mass}', String(EAT.powerups.growth.mass)) : `${(local.effects[k] - hud.time).toFixed(1)}s`}</small></div></div>)}</div>
-    {help && local.alive && <div className="eat-control-hint eat-glass">{ui('WASD / arrows to move · Drag on touch screens')}<span>{ui('Face your food. Watch your back.')}</span></div>}
-    {hud.time > EAT.match.zoneStart && <div className="eat-zone-note">{ui('The arena is closing. Stay inside the ring!')}</div>}
+    <div className="eat-mass-card eat-glass"><div className="eat-mini-face" style={{ background: local.color }}>●</div><div><span>{ui('Growth')}</span><strong>{Math.round(local.mass).toLocaleString()}</strong></div><i /><div><span>{ui('Score')}</span><strong>{local.score.toLocaleString()}</strong></div></div>
+    {hud.phase === 'normal' && <div className="eat-lives eat-glass" role="status">{ui('Lives')} <b key={local.lives} className="eat-life-change">{'♥'.repeat(local.lives ?? 0)}{'♡'.repeat(Math.max(0, (initial.settings?.livesEnabled === false ? 1 : 3) - (local.lives ?? 0)))}</b></div>}
+    {(hud.escapeReady || local.escape || hud.escapeUntil > hud.time || (hud.phase === 'hell' && local.helper)) && local.alive && <button className="eat-escape eat-primary" disabled={!hud.escapeReady || isPaused} onClick={() => escapeCommand.current()}>{ui('Escape')} – {ui(hud.helperName)}<small>{local.escape ? ui('Riding…') : hud.phase === 'hell' ? (local.helper?.used ? ui('Used') : ui('Final assist · {seconds}s · one use').replace('{seconds}',String(local.helper?.kind==='pigeon'?EAT.escape.pigeonHellDuration:EAT.escape.hellDuration))) : ui(local.helper?.used ? 'Used' : 'Ready')}</small></button>}
+    {hud.phase === 'transition' && <div className="eat-hell-transition" role="status"><span>{ui('Sudden Death')}</span><strong>{ui('Hell')}</strong><p>{ui('Avoid lava and disappearing ground')}</p></div>}
+    {hud.phase === 'normal' && local.alive && (local.storedGrowth || local.effects.multiplier > hud.time) && <button className="eat-growth-action eat-primary" disabled={isPaused || local.effects.multiplier > hud.time || !!local.escape} onClick={() => growthCommand.current()}><strong>{local.effects.multiplier > hud.time ? `${ui('2x Growth')} · ${Math.ceil(local.effects.multiplier - hud.time)}s` : ui('USE 2x NOW')}</strong><small>{ui(local.storedGrowth ? '2x Growth Ready' : '2x ACTIVE!')}</small></button>}
+    {local.alive && (local.storedJump || local.storedStrike) && <div className="eat-held-abilities">{(['strike','jump'] as const).filter(kind=>kind==='jump'?local.storedJump:local.storedStrike).map(kind=><button className={`eat-primary eat-held-${kind}`} key={kind} disabled={isPaused || !(kind==='jump'?hud.jumpReady:hud.strikeReady)} onClick={()=>abilityCommand.current(kind)}><b>{POWER_SYMBOL[kind]}</b><span>{ui(kind==='jump'?'Jump Ready':'Strike Ready')}<small>{kind==='jump'?'J':'SPACE'}</small></span></button>)}</div>}
+    {hud.escapeUntil>hud.time && local.alive && <div className="eat-companion-timer eat-glass" role="status">{ui('{animal} ♥ {seconds}s').replace('{animal}',ui(hud.helperName)).replace('{seconds}',String(Math.ceil(hud.escapeUntil-hud.time)))}</div>}
+    <nav className="eat-item-legend eat-glass" aria-label={ui('Item Legend')}>
+      <span className="eat-legend-label">{ui('Item Legend')}</span>
+      {POWER_KINDS.map(kind=><button type="button" key={kind} aria-label={ui(POWER_NAME[kind])} title={ui(POWER_NAME[kind])}><b>{POWER_SYMBOL[kind]}</b><span role="tooltip">{ui(POWER_NAME[kind])}</span></button>)}
+      {initial.settings?.plutoEnabled !== false && <button type="button" aria-label={ui('Pluto Bonus')} title={ui('Pluto Bonus')}><b>♇</b><span role="tooltip">{ui('Pluto Bonus')}</span></button>}
+    </nav>
+    {initial.players.length === 1 && hud.phase === 'hell' && <div className="eat-solo-objective eat-glass" role="status">{ui('Survive Hell for {seconds}s').replace('{seconds}',String(Math.ceil(hud.soloRemaining)))}</div>}
+    <div className="eat-effects">{(local.growthModifier ?? 1) < 1 && <div className="eat-effect eat-effect-divider">{ui('Growth /2')}</div>}{(local.stunnedUntil ?? 0) > hud.time && <div className="eat-effect">{ui('Stunned')} · {((local.stunnedUntil ?? 0)-hud.time).toFixed(1)}s</div>}{POWER_KINDS.filter(k => local.effects[k] > hud.time).map(k => <div className={`eat-effect eat-effect-${k}`} key={k}><b>{POWER_SYMBOL[k]}</b><div>{ui(powerName[k])}<small>{`${(local.effects[k] - hud.time).toFixed(1)}s`}</small></div></div>)}</div>
+    {help && local.alive && <div className="eat-control-hint eat-glass">{ui('WASD / arrows to move · Drag on touch screens')}<span>{ui('SPACE: Strike · J: Jump in Hell')}</span><span>{ui(hud.phase === 'normal' ? 'Face your food. Watch your back.' : 'Avoid lava and disappearing ground')}</span></div>}
+    {!initial.settings?.matchDuration && !initial.settings?.hellEnabled && hud.phase === 'normal' && hud.time > EAT.match.zoneStart && <div className="eat-zone-note">{ui('The arena is closing. Stay inside the ring!')}</div>}
+    {hud.quest && <div className={`eat-quest-note eat-glass ${isChoking(local, hud.time) ? 'eat-choking' : ''}`} role="status">{hud.quest}</div>}
     <div className="eat-announcement" role="status">{hud.event}</div>
-    {!local.alive && hud.status !== 'finished' && <div className="eat-spectating eat-glass"><strong>{ui('Placement')} #{local.placement}</strong><span>{ui('Spectating the survivors')}</span></div>}
+    {!local.alive && hud.phase === 'normal' && (local.lives ?? 0) > 0 && initial.settings?.livesEnabled !== false && <div className="eat-respawn eat-glass" role="status"><strong>{ui('Lives')}: {local.lives}</strong><p>{hud.time < (local.respawnAt ?? Infinity) ? ui('Respawn available in {seconds}').replace('{seconds}', String(Math.ceil((local.respawnAt ?? 0) - hud.time))) : ui('Ready to return')}</p><button className="eat-primary" disabled={isPaused || hud.time + 1e-6 < (local.respawnAt ?? Infinity)} onClick={() => respawnCommand.current()}>{ui('Respawn')}</button></div>}
+    {!local.alive && (hud.phase !== 'normal' || !local.lives) && hud.status !== 'finished' && <div className="eat-spectating eat-glass"><strong>{ui('Placement')} #{local.placement}</strong><span>{ui('Spectating the survivors')}</span></div>}
     {error && <div className="eat-network-error" role="alert">{ui('Reconnecting…')} {ui(error)}</div>}
     {isPaused && <div className="eat-pause"><h2>{ui('Paused')}</h2><button className="eat-primary" onClick={pause}><Play size={18} />{ui('Resume')}</button></div>}
   </div>, document.body);

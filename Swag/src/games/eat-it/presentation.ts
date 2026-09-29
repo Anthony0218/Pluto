@@ -21,7 +21,7 @@ export class SnapshotBuffer {
     const latest = this.frames.at(-1);
     if (!latest) throw new Error('No authoritative snapshot');
     const state = latest.state;
-    if (state.status === 'finished') return state;
+    if (state.status === 'finished' || state.phase === 'transition') return state;
     const renderAt = now - EAT.network.interpolationMs;
     let before = this.frames[0], after = before;
     for (const frame of this.frames) {
@@ -38,8 +38,26 @@ export class SnapshotBuffer {
       }
       return predicted;
     };
-    return { ...state, players: state.players.map(p => {
-      if (!p.alive) return p;
+    // Only presentation time advances between packets, smoothing falling/chewing.
+    // Simulation, ownership, mass and rewards always remain in the server snapshot.
+    const visualTime = state.time + clamp(now - latest.receivedAt, 0, EAT.network.maxExtrapolationMs) / 1000;
+    const encounter = state.encounter ? { ...state.encounter, npc: { ...state.encounter.npc } } : undefined;
+    if (encounter) {
+      const a = before.state.encounter?.npc, b = after.state.encounter?.npc;
+      if (a && b && a.phase === b.phase && b.phase === encounter.npc.phase) {
+        encounter.npc.x = a.x + (b.x - a.x) * fraction;
+        encounter.npc.y = a.y + (b.y - a.y) * fraction;
+        encounter.npc.facing = a.facing + angleDelta(a.facing, b.facing) * fraction;
+      }
+    }
+    return { ...state, encounter, time: visualTime, players: state.players.map(p => {
+      if (!p.alive || p.fallingAt !== undefined || before.state.phase !== state.phase) return p;
+      if (p.escape || p.ability) {
+        const a = before.state.players.find(other => other.id === p.id), b = after.state.players.find(other => other.id === p.id);
+        if (a && b && (p.escape ? a.escape?.startedAt === p.escape.startedAt && b.escape?.startedAt === p.escape.startedAt : a.ability?.startedAt === p.ability?.startedAt && b.ability?.startedAt === p.ability?.startedAt)) return { ...p,
+          x: a.x + (b.x - a.x) * fraction, y: a.y + (b.y - a.y) * fraction, facing: a.facing + angleDelta(a.facing, b.facing) * fraction };
+        return p;
+      }
       if (p.id === localId) {
         // Respond to local direction changes while awaiting the next input acknowledgement.
         // Only the transform is predicted; collisions with food/players are never simulated.

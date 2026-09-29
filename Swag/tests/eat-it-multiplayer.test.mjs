@@ -120,8 +120,9 @@ test('simultaneous input packets commit a bite and its mass/score reward exactly
   const s = server(), room = await create(s, 2);
   const joined = (await s.request('user-1', { op: 'join', code: room.room_code })).body; await start(s, joined);
   const row = s.rows.get(room.id), state = row.game_state, [a, b] = state.players;
-  state.food = []; state.powerups = []; state.nextFood = 1000; state.nextPower = 1000;
-  Object.assign(a, { x: 1000, y: 800, mass: 100, facing: 0 }); Object.assign(b, { x: 1045, y: 800, mass: 36 });
+  state.settings.livesEnabled = false; state.players.forEach(p => { p.lives = 1; });
+  state.food = []; state.powerups = []; state.nextFood = 1000; state.nextPower = 1000; state.encounter = undefined;
+  Object.assign(a, { x: 1000, y: 800, mass: 100, facing: 0 }); Object.assign(b, { x: 1020, y: 800, mass: 36 });
   s.clock.now += 100;
   const responses = await Promise.all([0, 1, 0, 1].map(i => s.request(`user-${i}`, { op: 'input', code: room.room_code, input: { x: 0, y: 0 }, mass: 100000, score: 999999, ate: 'user-0', dt: 500 })));
   assert.ok(responses.every(r => r.status === 200));
@@ -164,4 +165,46 @@ test('stale inputs stop and newer inputs do not retroactively move the elapsed i
   assert.ok(row.game_state.players[0].x > originalX);
   s.clock.now += 1000; await s.request('user-0', { op: 'get', code: room.room_code });
   assert.deepEqual(row.game_state.players[0].input, { x: 0, y: 0 });
+});
+test('two clients racing for the same food agree on one reservation and one growth award', async () => {
+  const s = server(), room = await create(s, 2);
+  const joined = (await s.request('user-1', { op: 'join', code: room.room_code })).body; await start(s, joined);
+  const row = s.rows.get(room.id), state = row.game_state, [a, b] = state.players;
+  Object.assign(a, { x: 1000, y: 800, facing: 0 }); Object.assign(b, { x: 1400, y: 800 });
+  state.food = [{id:state.nextId++,kind:'apple',x:1012,y:800,vx:0,vy:0,z:0,vz:0,rotation:0,target:null,capturedAt:0}];
+  // This isolates mouth/CAS behavior from the randomly positioned shrine.
+  state.encounter=undefined;state.powerups=[];state.nextFood=1000;state.nextPower=1000;
+  s.clock.now += 100;
+  await Promise.all([0,1,0,1].map(i=>s.request(`user-${i}`,{op:'input',code:room.room_code,input:{x:0,y:0}})));
+  assert.equal(row.game_state.food[0].target,'user-0');assert.equal(row.game_state.players[0].mass,36);
+  s.clock.now += 700;
+  await Promise.all([0,1,0,1].map(i=>s.request(`user-${i}`,{op:'input',code:room.room_code,input:{x:0,y:0}})));
+  const snapshots=await Promise.all([0,1].map(i=>s.request(`user-${i}`,{op:'get',code:room.room_code})));
+  for(const response of snapshots){assert.equal(response.body.game_state.food.length,0);assert.equal(response.body.game_state.players[0].mass,41);assert.equal(response.body.game_state.players[0].foodEaten,1)}
+});
+
+test('concurrent clients reserve one quest item and CAS retries cannot duplicate handover, feeding or revenge hits', async () => {
+  const s=server(),room=await create(s,2);
+  const joined=(await s.request('user-1',{op:'join',code:room.room_code})).body;await start(s,joined);
+  const row=s.rows.get(room.id),state=row.game_state,[a,b]=state.players;
+  state.food=[];state.powerups=[];state.nextFood=1000;state.nextPower=1000;
+  Object.assign(a,{x:1000,y:1100,facing:0});Object.assign(b,{x:1120,y:1100,facing:Math.PI});
+  state.encounter.shrine=null;Object.assign(state.encounter.item,{x:1060,y:1100,home:{x:1060,y:1100}});
+  Object.assign(state.encounter.npc,{x:1450,y:1100,phase:'idle',until:100});
+  const race=()=>Promise.all([0,1,0,1].map(i=>s.request(`user-${i}`,{op:'input',code:room.room_code,input:{x:0,y:0},encounter:{phase:'friendly',nextAction:0}})));
+  s.clock.now+=100;await race();assert.equal(row.game_state.encounter.item.ownerId,'user-0');
+  assert.equal(row.game_state.events.filter(e=>e.type==='questPickup').length,1);
+  Object.assign(row.game_state.encounter.npc,{x:1060,y:1100});s.clock.now+=100;await race();
+  assert.equal(row.game_state.encounter.completedBy,'user-0');assert.equal(row.game_state.encounter.npc.phase,'friendly');
+  assert.equal(row.game_state.events.filter(e=>e.type==='questComplete').length,1);
+  row.game_state.encounter.npc.nextAction=row.game_state.time+.02;s.clock.now+=100;await race();
+  assert.equal(row.game_state.encounter.npc.feeds,1);assert.equal(row.game_state.food.filter(f=>f.rewardOwner==='user-0').length,1);
+  // Drive a separate valid hostile snapshot to its attack deadline and race inputs.
+  row.game_state.food=[];const n=row.game_state.encounter.npc;
+  Object.assign(n,{phase:'hostile',targetId:'user-0',until:row.game_state.time+30,nextAction:row.game_state.time+.02,x:1000,y:1100});
+  const mass=row.game_state.players[0].mass;s.clock.now+=100;await race();
+  assert.equal(row.game_state.players[0].mass,mass);assert.ok(row.game_state.players[0].stunnedUntil>row.game_state.time);assert.equal(row.game_state.encounter.npc.attacks,1);
+  const snapshots=await Promise.all([0,1].map(i=>s.request(`user-${i}`,{op:'get',code:room.room_code})));
+  assert.deepEqual(snapshots[0].body.game_state,snapshots[1].body.game_state);
+  assert.ok(s.failedWrites>0);
 });

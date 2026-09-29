@@ -54,6 +54,10 @@ export class EatConnection {
     }
     if (room.status !== 'playing') this.onRoom(room);
   }
+  async escape(code: string, op: 'escape' | 'respawn' | 'growth' | 'jump' | 'strike' = 'escape') {
+    try { const room = await roomAction({ op, code }, this.abort.signal); if (!this.stopped) this.accept(room); }
+    catch (cause) { if (!this.stopped) this.onError(cause instanceof Error ? cause.message : 'Connection interrupted'); }
+  }
   presentation(now: number, localId: string) { return this.snapshots.sample(now, localId, this.input); }
   close() { this.stopped = true; this.abort.abort(); clearTimeout(this.timer); void supabase.removeChannel(this.channel); }
 }

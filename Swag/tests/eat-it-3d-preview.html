@@ -1,0 +1,28 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Eat It — 3D visual checks</title>
+<style>body{margin:0;background:#182c2a;color:#fff;font:14px system-ui}nav{position:absolute;z-index:2;display:flex;gap:12px;align-items:center;padding:12px;background:#182c2ae8;flex-wrap:wrap}label{display:flex;gap:6px}canvas{display:block;width:100vw;height:100vh}#status{position:absolute;z-index:2;bottom:12px;left:12px;background:#182c2adf;padding:10px;border-radius:8px}</style>
+<nav><label>Map<select id="map"><option>city</option><option>nature</option></select></label><label>Object<select id="kind"><option>car</option><option>house</option><option>apple</option><option>tree</option><option>tractor</option><option>barn</option></select></label><label>Side<select id="side"><option value="0">Right</option><option value="1">Below</option><option value="2">Left</option><option value="3">Above</option></select></label><label>Fall<input id="time" type="range" min="0" max="100" value="0"></label><button id="start">Reset</button></nav><canvas id="arena"></canvas><output id="status"></output>
+<script type="module">
+import {ArenaRenderer} from '/src/games/eat-it/renderer.ts';
+import {createGame} from '/src/games/eat-it/engine.ts';
+import {FOOD,playerRadius} from '/src/games/eat-it/config.ts';
+import {beginFall} from '/src/games/eat-it/falling.ts';
+import {mouthPosition,MOUTH,consumptionDuration} from '/src/games/eat-it/rules.ts';
+const map=document.querySelector('#map'),kind=document.querySelector('#kind'),side=document.querySelector('#side'),time=document.querySelector('#time');
+let renderer,state,food,frames=0,previous=performance.now();
+function reset(){
+ renderer?.dispose();document.querySelector('#arena').replaceWith(Object.assign(document.createElement('canvas'),{id:'arena'}));
+ renderer=new ArenaRenderer(document.querySelector('#arena'),map.value);renderer.resize(innerWidth,innerHeight);
+ state=createGame(map.value,[{id:'a',name:'Support test'},{id:'b',name:'Other'}],91);state.powerups=[];state.nextFood=1e6;state.nextPower=1e6;
+ const p=state.players[0],info=FOOD[kind.value];
+ Object.assign(p,{x:1100,y:800,mass:Math.max(36,info.width*info.height/(Math.PI*(4*MOUTH.radius)**2)*1.6),facing:0});
+ Object.assign(state.players[1],{x:1900,y:1000});
+ const m=mouthPosition(p,playerRadius(p,0)),r=playerRadius(p,0)*MOUTH.radius,a=Number(side.value)*Math.PI/2;
+ food={id:9999,kind:kind.value,x:m.x+Math.cos(a)*r*.94,y:m.y+Math.sin(a)*r*.94,vx:0,vy:0,z:0,vz:0,rotation:0,target:'a',capturedAt:10};
+ beginFall(food,p,0);state.food=[food];time.value=0;
+}
+for(const el of [map,kind,side])el.addEventListener('change',reset);document.querySelector('#start').onclick=reset;
+window.addEventListener('resize',()=>renderer.resize(innerWidth,innerHeight));reset();
+function frame(now){state.time=10+Number(time.value)/100*consumptionDuration(food);renderer.draw(state,'a',1/60,'You',false);frames++;
+ if(now-previous>1000){document.querySelector('#status').textContent=`${map.value} · ${food.kind} · fall ${time.value}% · ${Math.round(frames*1000/(now-previous))} fps`;frames=0;previous=now;}requestAnimationFrame(frame);}
+requestAnimationFrame(frame);
+</script></html>

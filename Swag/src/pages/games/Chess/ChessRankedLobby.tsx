@@ -6,7 +6,7 @@ import LeaderboardTable, { type LeaderboardRow } from "@/components/social/Leade
 import { useAuth } from "@/context/AuthContext";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { supabase } from "@/lib/supabase";
-import { invokeRankedChess, RankedAuthError } from "@/games/chess/ranked/client";
+import { invokeRankedChess, leaveRankedQueue, RankedAuthError } from "@/games/chess/ranked/client";
 
 type QueueStatus = "idle" | "waiting" | "found" | "matched";
 type QueueResponse = { status?: QueueStatus; code?: string; error?: string };
@@ -24,6 +24,24 @@ export default function ChessRankedLobby() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const polling = useRef(false);
+  const lease = useRef({ id: crypto.randomUUID(), active: false });
+  useEffect(() => {
+    const current = { id: crypto.randomUUID(), active: true };
+    lease.current = current;
+    const leave = () => {
+      current.active = false;
+      const latest = lease.current;
+      if (!latest.active && latest !== current) return;
+      latest.active = false;
+      leaveRankedQueue(latest.id);
+    };
+    const restore = (event: PageTransitionEvent) => {
+      if (event.persisted) { lease.current = { id: crypto.randomUUID(), active: true }; setStatus("idle"); }
+    };
+    window.addEventListener("pagehide", leave);
+    window.addEventListener("pageshow", restore);
+    return () => { leave(); window.removeEventListener("pagehide", leave); window.removeEventListener("pageshow", restore); };
+  }, [user?.id]);
   const name = profile?.display_name || profile?.username || user?.email?.split("@")[0] || "Player";
 
   useEffect(() => {
@@ -42,7 +60,10 @@ export default function ChessRankedLobby() {
   }, [user]);
 
   const request = useCallback(async (op: "queue" | "queueStatus" | "leaveQueue") => {
-    const result = await invokeRankedChess<QueueResponse>({ op, name });
+    const current = lease.current;
+    if (!current.active) return;
+    const result = await invokeRankedChess<QueueResponse>({ op, name, sessionId: current.id });
+    if (!current.active || current !== lease.current) { leaveRankedQueue(current.id); return; }
     if (result?.status) setStatus(result.status);
     setError(result?.error ?? null);
     if (result?.status === "matched" && result.code) {
@@ -70,7 +91,10 @@ export default function ChessRankedLobby() {
   async function changeQueue(op: "queue" | "leaveQueue") {
     setBusy(true);
     setError(null);
-    try { await request(op); if (op === "leaveQueue") setStatus("idle"); }
+    try {
+      await request(op);
+      if (op === "leaveQueue" && lease.current.active) { lease.current = { id: crypto.randomUUID(), active: true }; setStatus("idle"); }
+    }
     catch (cause) { setError(cause instanceof Error ? cause.message : "Matchmaking failed."); }
     finally { setBusy(false); }
   }

@@ -1,3 +1,6 @@
+import { activateAbility } from './abilities.ts';
+import { activateEscape } from './escape.ts';
+import { matchSettings, respawn, activateGrowth } from './progression.ts';
 import { EAT } from './config.ts';
 import { checkWinner, createGame, eliminate, fillBots, sanitizeInput, stepGame } from './engine.ts';
 import type { MapId, Room } from './types.ts';
@@ -5,7 +8,8 @@ import type { MapId, Room } from './types.ts';
 export function parseSettings(body: Record<string, unknown>): Room['settings'] {
   if (body.map !== 'city' && body.map !== 'nature') throw new Error('Unknown map');
   if (typeof body.count !== 'number' || !Number.isInteger(body.count) || body.count < 2 || body.count > EAT.match.maxPlayers) throw new Error('Choose 2–8 players');
-  return { map: body.map as MapId, count: body.count };
+  const config = matchSettings({ matchDuration: body.matchDuration as number, plutoMultiplier: body.plutoMultiplier as number, plutoEnabled: body.plutoEnabled !== false, hellEnabled: body.hellEnabled !== false, animalsEnabled: body.animalsEnabled !== false, livesEnabled: body.livesEnabled !== false });
+  return { map: body.map as MapId, count: body.count, matchDuration: config.matchDuration, plutoMultiplier: config.plutoMultiplier, plutoEnabled: config.plutoEnabled, hellEnabled: config.hellEnabled, animalsEnabled: config.animalsEnabled, livesEnabled: config.livesEnabled };
 }
 /** Server clock only. Replayed/faster requests cannot advance simulation faster. */
 export function advanceRoom(room: Room, now: number): boolean {
@@ -19,9 +23,10 @@ export function advanceRoom(room: Room, now: number): boolean {
     if (!p) continue;
     if (now - member.lastSeen > EAT.network.inputTimeoutMs && (p.input.x !== 0 || p.input.y !== 0)) { p.input = { x: 0, y: 0 }; changed = true; }
     if (now - member.lastSeen > EAT.network.disconnectMs && !member.departed) {
-      member.departed = true; changed = true; eliminate(state, p); checkWinner(state);
+      member.departed = true; changed = true; p.lives = 0; delete p.respawnAt; eliminate(state, p);
     }
   }
+  checkWinner(state);
   for (let i = 0; i < ticks; i++) stepGame(state);
   room.last_tick = elapsed > 1000 * EAT.network.maxCatchupSeconds ? now : room.last_tick + ticks * tickMs;
   if (state.status === 'finished') room.status = 'finished';
@@ -31,7 +36,7 @@ export function advanceRoom(room: Room, now: number): boolean {
 /** Mutates a private copy; the Edge Function commits with a version comparison. */
 export function applyRoomAction(room: Room, userId: string, name: string, body: Record<string, unknown>, now: number, seed: number, matchId: string): boolean {
   const op = body.op;
-  if (!['get', 'join', 'ready', 'start', 'input', 'leave', 'rematch'].includes(String(op))) throw new Error('Unknown operation');
+  if (!['get', 'join', 'ready', 'start', 'input', 'leave', 'rematch', 'escape', 'respawn', 'growth', 'jump', 'strike'].includes(String(op))) throw new Error('Unknown operation');
   let member = room.players.find(p => p.id === userId);
   let changed = false;
   if (!member) {
@@ -47,7 +52,19 @@ export function applyRoomAction(room: Room, userId: string, name: string, body: 
   if (now !== member.lastSeen && (room.status === 'playing' || now - member.lastSeen >= EAT.network.lobbyPollMs * 3)) {
     member.lastSeen = now; changed = true;
   }
-  if (op === 'input') {
+  if (op === 'jump' || op === 'strike') {
+    const state = room.game_state, player = state?.players.find(p => p.id === userId);
+    if (state && player && !member.departed && room.status === 'playing') changed = activateAbility(state, player, op) || changed;
+  } else if (op === 'growth') {
+    const state = room.game_state, player = state?.players.find(p => p.id === userId);
+    if (state && player && !member.departed && room.status === 'playing') changed = activateGrowth(state, player) || changed;
+  } else if (op === 'respawn') {
+    const state = room.game_state, player = state?.players.find(p => p.id === userId);
+    if (state && player && !member.departed && room.status === 'playing') changed = respawn(state, player) || changed;
+  } else if (op === 'escape') {
+    const state = room.game_state, player = state?.players.find(p => p.id === userId);
+    if (state && player && !member.departed && room.status === 'playing') changed = activateEscape(state, player) || changed;
+  } else if (op === 'input') {
     const player = room.game_state?.players.find(p => p.id === userId);
     if (player?.alive && !member.departed && room.status === 'playing') {
       const next = sanitizeInput(body.input);
@@ -59,7 +76,7 @@ export function applyRoomAction(room: Room, userId: string, name: string, body: 
   } else if (op === 'start') {
     if (room.host_id !== userId) throw new Error('Only the host can start');
     if (room.status !== 'waiting' || !room.players.every(p => p.ready)) throw new Error('Every player must be ready');
-    room.game_state = createGame(room.settings.map, fillBots(room.players, room.settings.count), seed, matchId);
+    room.game_state = createGame(room.settings.map, fillBots(room.players, room.settings.count), seed, matchId, { ...room.settings, mode: 'multiplayer' });
     room.status = 'playing'; room.last_tick = now; room.players.forEach(p => { p.lastSeen = now; p.departed = false; }); changed = true;
   } else if (op === 'rematch') {
     if (room.host_id !== userId || room.status !== 'finished') throw new Error('Only the host can reopen a finished room');
@@ -69,7 +86,7 @@ export function applyRoomAction(room: Room, userId: string, name: string, body: 
     member.departed = true; changed = true;
     if (room.status === 'playing' && room.game_state) {
       const player = room.game_state.players.find(p => p.id === userId);
-      if (player) eliminate(room.game_state, player);
+      if (player) { player.lives = 0; delete player.respawnAt; eliminate(room.game_state, player); }
       checkWinner(room.game_state); if (room.game_state.status === 'finished') room.status = 'finished';
     }
     // Keep participants in completed matches so the result trigger can identify humans.

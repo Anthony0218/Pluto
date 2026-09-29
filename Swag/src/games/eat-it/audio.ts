@@ -20,15 +20,23 @@ export class EatAudio {
     const volume = settings.masterVolume * settings.effectsVolume * 0.13;
     if (event === 'food') { this.tone(260, 490, 0.07, volume); this.tone(190, 95, 0.1, volume * 0.5, 0.07); }
     if (event === 'eat') { this.tone(180, 50, 0.22, volume, 0, 'triangle'); this.tone(300, 100, 0.15, volume * 0.7, 0.23); }
-    if (event === 'power') { this.tone(430, 720, 0.16, volume); this.tone(650, 1040, 0.2, volume, 0.12); }
+    if (event === 'power' || event === 'questPickup' || event === 'questComplete' || event === 'npcFeed') { this.tone(430, 720, 0.16, volume); this.tone(650, 1040, 0.2, volume, 0.12); }
+    if (event === 'choke') { this.tone(170, 80, .12, volume, 0, 'triangle'); this.tone(150, 65, .12, volume, .2, 'triangle'); }
+    if (event === 'npcEmerge' || event === 'npcAttack') this.tone(400, 95, .25, volume, 0, 'triangle');
     if (event === 'collision') this.tone(100, 55, 0.06, volume * 0.3);
     if (event === 'eliminated') this.tone(350, 65, 0.45, volume, 0, 'triangle');
+    if (event === 'hellStart' || event === 'sweep') this.tone(75, 38, .7, volume, 0, 'sawtooth');
+    if (event === 'groundWarning' || event === 'groundDestroyed') this.tone(140, 45, .15, volume * .5, 0, 'triangle');
+    if (event === 'fall' || event === 'lava') this.tone(220, 30, .5, volume, 0, 'triangle');
+    if (event === 'tie') { this.tone(330, 220, .6, volume); this.tone(440, 330, .6, volume, .2); }
+    if (event === 'escape' || event === 'hellAssist' || event === 'respawn') this.tone(240, 800, .3, volume);
     if (event === 'win') [523, 659, 784, 1047].forEach((hz, i) => this.tone(hz, hz, 0.3, volume, i * 0.12));
   }
-  ambient(map: MapId, time: number) {
+  ambient(map: MapId | 'hell', time: number) {
     const s = getAudioSettings(); if (s.muted || !s.backgroundMusic || s.musicCategory === 'off' || time - this.lastAmbient < 4) return;
     this.lastAmbient = time; const volume = s.masterVolume * s.musicVolume * 0.025;
-    if (map === 'nature') { this.tone(1600, 2400, 0.12, volume); this.tone(1900, 1400, 0.16, volume, 0.22); }
+    if (map === 'hell') { this.tone(42, 55, 2, volume, 0, 'triangle'); this.tone(67, 40, 2, volume * .4, .5); }
+    else if (map === 'nature') { this.tone(1600, 2400, 0.12, volume); this.tone(1900, 1400, 0.16, volume, 0.22); }
     else { this.tone(261, 261, 1.5, volume); this.tone(392, 392, 1.5, volume * 0.5, 0.1); }
   }
   close() { void this.context?.close(); this.context = null; }
