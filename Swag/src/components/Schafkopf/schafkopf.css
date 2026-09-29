@@ -1496,3 +1496,46 @@
   .sk-ledger-page-arrow-previous { left: -9px; }
   .sk-ledger-page-arrow-next { right: -9px; }
 }
+
+/* Game selection carries the felt, brass and warm table light of the game scene. */
+.sk-menu-page { min-height: min(880px, 100dvh); padding-top: clamp(34px, 6vw, 70px); background: radial-gradient(ellipse at 50% 46%, #245c48 0, #11352a 36%, #071711 73%, #040a07 100%); }
+.sk-menu-page::before { background: linear-gradient(90deg, #060d09cc, transparent 24%, transparent 76%, #060d09cc), repeating-linear-gradient(116deg, #ffffff05 0 1px, transparent 1px 17px); }
+.sk-menu-table-glow { position: absolute; z-index: -1; top: 176px; left: 50%; width: min(930px, 96%); height: 480px; border: 13px solid #50301d; border-radius: 46% 46% 41% 41% / 19% 19% 26% 26%; background: radial-gradient(ellipse at 50% 42%, #276d52 0, #154937 57%, #0b2a20 100%); box-shadow: inset 0 0 55px #03150d, 0 0 0 5px #251309, 0 35px 70px #0009; transform: translateX(-50%); }
+.sk-menu-header { position: relative; max-width: 950px; margin: 0 auto clamp(28px, 4vw, 48px); padding: 19px 23px; border: 1px solid #f5d98a66; border-radius: 22px; background: #0a1e17c4; box-shadow: 0 16px 34px #0007; backdrop-filter: blur(8px); }
+.sk-menu-header h1 { color: #fff4c7; text-shadow: 0 3px 0 #3e2110, 0 0 22px #f6c65b44; }
+.sk-menu-header p { max-width: 610px; color: #d2e5d8; }
+.sk-mode-chooser { position: relative; max-width: 950px; margin: 0 auto; }
+.sk-mode-chooser-heading { margin: 0 0 15px 8px; color: #f8e7ae; text-shadow: 0 2px 7px #000; }
+.sk-mode-chooser-heading span, .sk-mode-card-kicker { color: #f6c75b; font-size: 10px; font-weight: 900; letter-spacing: .15em; text-transform: uppercase; }
+.sk-mode-chooser-heading h2 { margin: 5px 0 0; font-size: clamp(22px, 3vw, 31px); }
+.sk-mode-grid-polished { gap: 14px; margin: 0; }
+.sk-mode-card { position: relative; display: flex; min-height: 285px; flex-direction: column; overflow: hidden; padding: 24px; border: 1px solid #f5db8c55; border-radius: 20px; color: #f7f1df; text-decoration: none; box-shadow: 0 16px 30px #0007; transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
+.sk-mode-card::before { position: absolute; inset: 0; content: ""; opacity: .72; pointer-events: none; }
+.sk-mode-card > * { position: relative; z-index: 1; }
+.sk-mode-hotseat { background: linear-gradient(145deg, #275b49e8, #123229ee); }
+.sk-mode-hotseat::before { background: radial-gradient(circle at 88% 9%, #ffd87552, transparent 28%), linear-gradient(130deg, transparent 70%, #083d2d99); }
+.sk-mode-ai { background: linear-gradient(145deg, #253b68e8, #111d3ced); }
+.sk-mode-ai::before { background: radial-gradient(circle at 88% 9%, #c4b5fd55, transparent 30%), linear-gradient(130deg, transparent 70%, #43206c66); }
+.sk-mode-online { background: linear-gradient(145deg, #643f2ae8, #301b22ef); }
+.sk-mode-online::before { background: radial-gradient(circle at 88% 9%, #f8c86c5c, transparent 30%), linear-gradient(130deg, transparent 70%, #7b215666); }
+.sk-mode-card:hover { border-color: #ffe29a; box-shadow: 0 0 0 2px #f6c75b33, 0 22px 42px #0009; transform: translateY(-7px); }
+.sk-mode-card:focus-visible { outline: 3px solid #d8b4fe; outline-offset: 4px; }
+.sk-mode-card-icon { display: grid; width: 45px; height: 45px; margin-bottom: 23px; place-items: center; border: 1px solid #fff3bd77; border-radius: 13px; background: #0a170f88; color: #fff0b6; box-shadow: 0 5px 14px #0005; }
+.sk-mode-card-icon svg { width: 23px; height: 23px; }
+.sk-mode-card h3 { margin: 8px 0 5px; color: #fff7d8; font-size: 23px; line-height: 1.15; }
+.sk-mode-card p { margin: 0; color: #e3eee3; font-size: 14px; line-height: 1.58; }
+.sk-mode-card strong { display: inline-flex; align-items: center; gap: 8px; margin-top: auto; padding-top: 22px; color: #ffe199; font-size: 13px; }
+.sk-mode-card strong svg { width: 16px; transition: transform .2s ease; }
+.sk-mode-card:hover strong svg { transform: translateX(4px); }
+.sk-menu-rulebook { position: relative; max-width: 950px; margin: 30px auto 0; }
+.sk-menu-rulebook .sk-rules { background: #071d16d9; border-color: #f5d98a40; box-shadow: 0 12px 28px #0006; }
+@media (max-width: 700px) {
+  .sk-menu-page { min-height: 0; padding-top: 25px; }
+  .sk-menu-table-glow { top: 148px; height: 720px; border-width: 8px; border-radius: 37% 37% 25% 25% / 10% 10% 16% 16%; }
+  .sk-menu-header { padding: 16px; }
+  .sk-mode-chooser-heading { margin-left: 3px; }
+  .sk-mode-grid-polished { gap: 12px; }
+  .sk-mode-card { min-height: 0; padding: 21px; }
+  .sk-mode-card-icon { margin-bottom: 16px; }
+  .sk-mode-card strong { margin-top: 22px; padding-top: 0; }
+}
