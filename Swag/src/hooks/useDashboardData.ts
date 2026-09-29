@@ -59,7 +59,7 @@ export function useDashboardDataSource() {
             .from("friendships")
             .select("user_a,user_b")
             .or(`user_a.eq.${userId},user_b.eq.${userId}`),
-          supabase.from("friend_messages").select("id,sender_id,message_type,game_code,game_route,created_at").eq("receiver_id", userId).order("created_at", { ascending: false }).limit(12),
+          supabase.from("friend_messages").select("id,sender_id,message_type,game_code,game_route,created_at").eq("receiver_id", userId).order("created_at", { ascending: false }).limit(100),
           supabase.from("friend_requests").select("id,sender_id,created_at").eq("receiver_id", userId).eq("status", "pending").order("created_at", { ascending: false }).limit(12),
         ]);
         const activity = activityResult.error ? null : activityResult.data as DashboardActivity;

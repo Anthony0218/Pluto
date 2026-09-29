@@ -1,5 +1,7 @@
 import { ui, useUiLanguage } from "@/i18n/ui";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { ReviewQualityIcon } from "./ReviewQualityBadge";
+import { qualityColor, type ReviewVisualQuality } from "./reviewQualityVisuals";
 
 import { type Square } from "chess.js";
 import { getSquareName } from "../../../utils/chessUtils";
@@ -137,6 +139,7 @@ type BoardProps = {
    * changing the normal game board.
    */
   pieceScale?: number;
+  reviewAnnotation?: { from: Square; to: Square; quality: ReviewVisualQuality } | null;
 };
 
 const pieceSymbols = {
@@ -203,8 +206,10 @@ export default function Board({
   bossRage = 0,
   orientation = "white",
   pieceScale = 1,
+  reviewAnnotation = null,
 }: BoardProps) {
   useUiLanguage();
+  const arrowId = `review-arrow-${useId().replace(/:/g, "")}`;
   /*
    * Orientation animation lives INSIDE Board.tsx.
    *
@@ -399,6 +404,14 @@ export default function Board({
     return () => { observer.disconnect(); window.removeEventListener("resize", fit); };
   }, []);
 
+  const reviewPoint = (square: Square) => {
+    const file = square.charCodeAt(0) - 97;
+    const row = 8 - Number(square[1]);
+    return displayedOrientation === "white" ? { x: (file + .5) * 100, y: (row + .5) * 100 } : { x: (7.5 - file) * 100, y: (7.5 - row) * 100 };
+  };
+  const reviewFrom = reviewAnnotation ? reviewPoint(reviewAnnotation.from) : null;
+  const reviewTo = reviewAnnotation ? reviewPoint(reviewAnnotation.to) : null;
+
   return (
     /*
      * ROTATION WRAPPER
@@ -456,6 +469,7 @@ export default function Board({
 
           <div
             className="
+            relative
             grid
             aspect-square
             w-full
@@ -685,6 +699,7 @@ export default function Board({
                     hover:brightness-105
                   `}
                   >
+                    {reviewAnnotation && (reviewAnnotation.from === square || reviewAnnotation.to === square) && <span className="pointer-events-none absolute inset-0 z-[12] ring-4 ring-inset" style={{ color: qualityColor(reviewAnnotation.quality), boxShadow: `inset 0 0 0 4px ${qualityColor(reviewAnnotation.quality)}, inset 0 0 24px ${qualityColor(reviewAnnotation.quality)}77` }} />}
                     {isDraftSetupSquare && (
                       <span
                         className="
@@ -1921,10 +1936,12 @@ export default function Board({
                         {rank}
                       </span>
                     )}
+                    {reviewAnnotation?.to === square && <span className="pointer-events-none absolute right-1 top-1 z-[32] grid h-6 w-6 place-items-center rounded-full border border-white/35 bg-[#06131e] shadow-lg" style={{ color: qualityColor(reviewAnnotation.quality), boxShadow: `0 0 12px ${qualityColor(reviewAnnotation.quality)}` }}><ReviewQualityIcon quality={reviewAnnotation.quality} size={14} /></span>}
                   </button>
                 );
               }),
             )}
+            {reviewAnnotation && reviewFrom && reviewTo && <svg className="pointer-events-none absolute inset-0 z-[8] h-full w-full" viewBox="0 0 800 800" aria-hidden="true"><defs><marker id={arrowId} markerWidth="4" markerHeight="4" refX="3" refY="2" orient="auto"><path d="M0,0 L4,2 L0,4 Z" fill={qualityColor(reviewAnnotation.quality)} /></marker></defs><line x1={reviewFrom.x} y1={reviewFrom.y} x2={reviewTo.x} y2={reviewTo.y} stroke={qualityColor(reviewAnnotation.quality)} strokeWidth="12" strokeLinecap="round" markerEnd={`url(#${arrowId})`} opacity=".84" /></svg>}
           </div>
         </div>
       </div>

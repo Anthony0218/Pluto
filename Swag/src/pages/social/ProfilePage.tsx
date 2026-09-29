@@ -3,6 +3,10 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
 import { ui, useUiLanguage } from "@/i18n/ui";
+import { getChessRank } from "@/games/chess/ranked/tiers";
+import RankEmblem from "@/components/chess/RankEmblem";
+import { featuredGames } from "@/data/dashboard";
+import { Award, Crown, Flame, Gamepad2, Puzzle, Sparkles } from "lucide-react";
 
 import ProfileAvatarPicker, {
   ProfileAvatar,
@@ -31,6 +35,7 @@ type ProfileWithAvatar = {
   username?: string | null;
   avatar_id?: string | null;
 };
+type RecentResult = { game: string; outcome: "win" | "loss" | "draw"; multiplayer: boolean; completed_at: string; score_difference: number };
 
 const emptyStats: ProfileStats = {
   general: { games_played: 0, wins: 0 },
@@ -103,6 +108,7 @@ export default function ProfilePage() {
   const [avatarId, setAvatarId] = useState("m1");
 
   const [stats, setStats] = useState<ProfileStats>(emptyStats);
+  const [recentResults, setRecentResults] = useState<RecentResult[]>([]);
   const [statTab, setStatTab] = useState<string>("general");
 
   const [editing, setEditing] = useState(false);
@@ -161,7 +167,7 @@ export default function ProfilePage() {
     async function loadStats() {
       setLoadingStats(true);
 
-      const [result, activity, puzzles, rating] = await Promise.all([
+      const [result, activity, puzzles, rating, recent] = await Promise.all([
         supabase.rpc("get_my_game_stats"),
         supabase.rpc("get_dashboard_activity"),
         supabase.rpc("get_my_chess_puzzle_stats"),
@@ -170,7 +176,9 @@ export default function ProfilePage() {
           .select("rating")
           .eq("user_id", userId)
           .maybeSingle(),
+        supabase.from("user_game_results").select("game,outcome,multiplayer,completed_at,score_difference").eq("user_id", userId).order("completed_at", { ascending: false }).limit(4),
       ]);
+      if (!recent.error) setRecentResults((recent.data ?? []) as RecentResult[]);
       if (!result.error) {
         setStatsError(null);
         const data = result.data as Pick<ProfileStats, "general" | "games">;
@@ -204,6 +212,14 @@ export default function ProfilePage() {
     .slice(0, 3);
   const gameName = (id: string) =>
     statTabs.find((tab) => tab.id === id)?.label ?? id;
+  const achievements = [
+    { label: "First Victory", detail: "Win your first game", earned: stats.general.wins >= 1, Icon: Award, tone: "text-amber-300" },
+    { label: "Chess Adept", detail: "Complete 10 chess games", earned: (stats.games.chess?.games_played ?? 0) >= 10, Icon: Crown, tone: "text-sky-300" },
+    { label: "Streak Master", detail: "Reach a 7-day streak", earned: stats.streak >= 7, Icon: Flame, tone: "text-orange-300" },
+    { label: "Puzzle Solver", detail: "Solve 10 puzzles", earned: (stats.puzzles ?? 0) >= 10, Icon: Puzzle, tone: "text-violet-300" },
+    { label: "Versatile Player", detail: "Complete games in 3 categories", earned: Object.values(stats.games).filter(game => game.games_played > 0).length >= 3, Icon: Sparkles, tone: "text-teal-300" },
+    { label: "Dedicated", detail: "Complete 100 games", earned: stats.general.games_played >= 100, Icon: Gamepad2, tone: "text-rose-300" },
+  ];
 
   /* =========================================================
      USERNAME
@@ -326,17 +342,11 @@ export default function ProfilePage() {
       <div className="mx-auto max-w-6xl lg:flex lg:h-full lg:min-h-0 lg:flex-col">
         {/* HEADER */}
 
-        <div className="mb-3 rounded-[28px] border border-indigo-300/10 bg-[#0b1529]/70 px-6 py-4 shadow-xl shadow-black/10 lg:shrink-0">
-          <p className="text-xs font-black uppercase tracking-[0.3em] text-indigo-300">
-            {ui("Account")}
-          </p>
-
-          <h1 className="mt-1 text-3xl font-black">{ui("Your profile")}</h1>
-
-          <p className="mt-2 text-sm text-slate-400">
-            {ui("Manage your player name, avatar and game statistics.")}
-          </p>
-        </div>
+        <section className="relative mb-3 min-h-[190px] overflow-hidden rounded-[28px] border border-indigo-300/25 bg-[#0b1529] shadow-2xl shadow-black/30 lg:shrink-0">
+          <img src={featuredGames[0]?.image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-45" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#071024] via-[#071024]/90 to-[#071024]/20" />
+          <div className="relative flex flex-wrap items-center gap-5 px-6 py-7 sm:px-8"><button type="button" onClick={() => setAvatarPickerOpen(true)} className="group relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl border-2 border-indigo-300/70 bg-[#121d3d] p-1 shadow-[0_0_24px_rgba(129,140,248,.3)]" aria-label={ui("Change avatar")}><ProfileAvatar avatarId={avatarId} className="h-full w-full rounded-xl" /></button><div className="min-w-0 flex-1"><p className="text-[10px] font-black uppercase tracking-[.28em] text-indigo-200">{ui("Pluto player profile")}</p><h1 className="mt-1 truncate text-3xl font-black text-white sm:text-4xl">{username}</h1><p className="mt-1 text-sm text-indigo-100/80">{ui("Play. Learn. Grow together.")}</p><div className="mt-4 max-w-sm"><div className="mb-1 flex justify-between text-xs font-semibold text-indigo-100"><span>{ui("Activity level")} {Math.floor((stats.general.games_played * 100 + (stats.puzzles ?? 0) * 50) / 1000) + 1}</span><span>{(stats.general.games_played * 100 + (stats.puzzles ?? 0) * 50) % 1000} / 1,000 XP</span></div><div className="h-2 overflow-hidden rounded-full bg-indigo-200/15"><div className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-violet-300" style={{ width: `${((stats.general.games_played * 100 + (stats.puzzles ?? 0) * 50) % 1000) / 10}%` }} /></div><p className="mt-1 text-[10px] text-indigo-100/60">{ui("100 XP per completed game · 50 XP per completed puzzle")}</p></div></div>{stats.chessElo !== null && <div className="flex items-center gap-3 rounded-2xl border border-amber-300/30 bg-[#06101e]/75 p-3 backdrop-blur"><RankEmblem family={getChessRank(stats.chessElo).family} size="sm" /><div><strong className="block text-sm text-amber-100">{ui(getChessRank(stats.chessElo).name)}</strong><small className="text-amber-200/70">{stats.chessElo} Elo</small></div></div>}</div>
+        </section>
 
         <div className="grid min-h-0 gap-4 lg:flex-1 lg:grid-cols-[250px_minmax(0,1fr)]">
           {/* =================================================
@@ -752,6 +762,7 @@ export default function ProfilePage() {
                       label="Ranked ELO"
                       value={loadingStats ? "…" : (stats.chessElo ?? "—")}
                     />
+                    {stats.chessElo !== null && <div className="flex items-center gap-3 rounded-2xl border border-amber-300/25 bg-amber-300/[.06] p-3"><RankEmblem family={getChessRank(stats.chessElo).family} size="sm" /><div><strong className="block text-sm text-amber-100">{ui(getChessRank(stats.chessElo).name)}</strong><span className="text-xs text-zinc-400">{stats.chessElo} Elo</span></div></div>}
                   </>
                 ) : trackedGames.has(statTab) ? (
                   <>
@@ -804,6 +815,10 @@ export default function ProfilePage() {
             <div className="grid gap-3 xl:grid-cols-2">
               <ProfileFriends userId={user.id} />
               <MyGroupsCard userId={user.id} />
+
+              <section className="rounded-[26px] border border-indigo-400/15 bg-[#0b1529]/90 p-5 shadow-xl shadow-black/20"><div className="mb-3 flex items-center gap-2"><Award size={19} className="text-violet-300" /><h2 className="text-lg font-black">{ui("Achievements")}</h2></div><div className="grid grid-cols-2 gap-2">{achievements.map(item => <div key={item.label} className={`rounded-xl border p-3 ${item.earned ? "border-violet-300/30 bg-violet-400/10" : "border-white/5 bg-white/[.025] opacity-55"}`}><item.Icon size={24} className={item.tone} aria-hidden="true" /><strong className="mt-2 block text-xs text-white">{ui(item.label)}</strong><small className="text-[10px] text-slate-400">{ui(item.detail)}</small></div>)}</div></section>
+
+              <section className="rounded-[26px] border border-indigo-400/15 bg-[#0b1529]/90 p-5 shadow-xl shadow-black/20"><h2 className="text-lg font-black">{ui("Recent matches")}</h2>{recentResults.length ? <ol className="mt-3 grid gap-2">{recentResults.map((result, index) => <li key={`${result.game}-${result.completed_at}-${index}`} className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[.035] px-3 py-2"><div className="min-w-0"><strong className="block truncate text-sm text-white">{ui(gameName(result.game))}</strong><small className="text-xs text-slate-400">{new Date(result.completed_at).toLocaleDateString()} · {ui(result.multiplayer ? "Multiplayer" : "Singleplayer")}</small></div><span className={`rounded-lg border px-2 py-1 text-xs font-bold ${result.outcome === "win" ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300" : result.outcome === "loss" ? "border-rose-400/30 bg-rose-400/10 text-rose-300" : "border-slate-400/30 bg-slate-400/10 text-slate-300"}`}>{ui(result.outcome)}</span></li>)}</ol> : <p className="mt-3 text-sm text-slate-400">{ui("No completed matches yet.")}</p>}</section>
 
               <section className="rounded-[26px] border border-indigo-400/15 bg-[#0b1529]/90 p-5 shadow-xl shadow-black/20">
                 <h2 className="text-lg font-black">

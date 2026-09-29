@@ -3645,10 +3645,18 @@ function InteractivePuzzleBoard({
       ? [8, 7, 6, 5, 4, 3, 2, 1]
       : [1, 2, 3, 4, 5, 6, 7, 8];
 
+  const arrow = (move: { from: Square; to: Square } | null | undefined, color: string, id: string) => {
+    if (!move) return null;
+    const point = (square: Square) => ({ x: (files.indexOf(square[0]) + .5) * 100, y: (ranks.indexOf(Number(square[1])) + .5) * 100 });
+    const from = point(move.from);
+    const to = point(move.to);
+    return <svg className="pointer-events-none absolute inset-0 z-[18] h-full w-full" viewBox="0 0 800 800" aria-hidden="true"><defs><marker id={id} markerWidth="4" markerHeight="4" refX="3" refY="2" orient="auto"><path d="M0,0 L4,2 L0,4 Z" fill={color} /></marker></defs><line x1={from.x} y1={from.y} x2={to.x} y2={to.y} stroke={color} strokeWidth="11" strokeLinecap="round" markerEnd={`url(#${id})`} opacity=".9" /></svg>;
+  };
+
   return (
     <div className="mx-auto w-full max-w-[560px]">
       <div className="overflow-hidden rounded-3xl border border-white/10 p-2 shadow-2xl shadow-black/30" style={{ backgroundColor: palette.frame }}>
-        <div className="grid grid-cols-8 overflow-hidden rounded-2xl">
+        <div className="relative grid grid-cols-8 overflow-hidden rounded-2xl">
           {ranks.flatMap((rank, rankIndex) =>
             files.map((file, fileIndex) => {
               const square = `${file}${rank}` as Square;
@@ -3830,6 +3838,8 @@ function InteractivePuzzleBoard({
               );
             }),
           )}
+          {arrow(wrongMove, "#fb5165", "puzzle-wrong-arrow")}
+          {arrow(correctMove, "#38ef8e", "puzzle-correct-arrow")}
         </div>
       </div>
     </div>
@@ -3915,6 +3925,9 @@ function PuzzlesTab({ compact = false }: { compact?: boolean }) {
     useState<CandidatePreview | null>(null);
 
   const completionRecordedRef = useRef<string | null>(null);
+  const correctRevealTimer = useRef<number | null>(null);
+
+  useEffect(() => () => { if (correctRevealTimer.current !== null) window.clearTimeout(correctRevealTimer.current); }, []);
 
   const solved = Boolean(puzzle) && lineStep >= (puzzle?.line.length ?? 0);
 
@@ -3932,6 +3945,7 @@ function PuzzlesTab({ compact = false }: { compact?: boolean }) {
   };
 
   function resetInteraction(nextPuzzle: InteractivePuzzle) {
+    if (correctRevealTimer.current !== null) window.clearTimeout(correctRevealTimer.current);
     setFen(nextPuzzle.fen);
     setSelectedSquare(null);
     setLegalSquares([]);
@@ -4337,25 +4351,24 @@ function PuzzlesTab({ compact = false }: { compact?: boolean }) {
         from: move.from,
         to: move.to,
       });
-      setCorrectMove(
-        expectedParts
-          ? {
-              from: expectedParts.from,
-              to: expectedParts.to,
-            }
-          : null,
-      );
+      setCorrectMove(null);
+      if (correctRevealTimer.current !== null) window.clearTimeout(correctRevealTimer.current);
+      if (expectedParts) correctRevealTimer.current = window.setTimeout(() => {
+        setCorrectMove({ from: expectedParts.from, to: expectedParts.to });
+        correctRevealTimer.current = null;
+      }, 700);
 
       setFeedback({
         tone: "warning",
         title: "Not quite",
         moveLabel: move.san,
-        text: "Your move is marked red. The correct move is highlighted in green — try it on the board.",
+        text: "Your move is marked red. Watch for the green correct move, then try it on the board.",
       });
 
       return;
     }
 
+    if (correctRevealTimer.current !== null) window.clearTimeout(correctRevealTimer.current);
     setWrongMove(null);
     setCorrectMove(null);
     setFen(game.fen());
@@ -4606,7 +4619,7 @@ function PuzzlesTab({ compact = false }: { compact?: boolean }) {
         )}
       </section>}
 
-      <div className={`${compact ? "mt-1" : "mt-5"} grid gap-5 xl:grid-cols-[380px_minmax(0,1fr)_340px] 2xl:grid-cols-[420px_minmax(0,1fr)_360px]`}>
+      <div className={`${compact ? "mt-1" : "mt-5"} grid items-start gap-4 lg:grid-cols-[270px_minmax(0,1fr)_260px] xl:grid-cols-[330px_minmax(0,1fr)_300px] 2xl:grid-cols-[390px_minmax(0,1fr)_340px]`}>
         <aside className="min-w-0 rounded-3xl border border-white/10 bg-zinc-900/55 p-4">
           <div className="grid grid-cols-3 rounded-2xl border border-white/8 bg-black/20 p-1">
             <button

@@ -9,11 +9,12 @@ import DashboardSearch from "@/components/App/dashboard/DashboardSearch";
 import DashboardSidebar from "@/components/App/dashboard/DashboardSidebar";
 import PlayWithFriends from "@/components/App/dashboard/PlayWithFriends";
 import DidYouKnowCarousel from "@/components/App/dashboard/DidYouKnowCarousel";
-import RankedChessCallout from "@/components/App/dashboard/RankedChessCallout";
+import DashboardActionRow, { DashboardContentGrid } from "@/components/App/dashboard/DashboardActionRow";
 import ProgressCard from "@/components/App/dashboard/ProgressCard";
 import DailyQuestsCard from "@/components/App/dashboard/DailyQuestsCard";
 import LearnSomethingNew from "@/components/App/dashboard/LearnSomethingNew";
 import DashboardFriendDialog from "@/components/App/dashboard/DashboardFriendDialog";
+import { getFriendMessageBaseline } from "@/components/App/dashboard/messageReadState";
 import "@/components/App/dashboard/dashboard.css";
 
 export default function DashboardPage() {
@@ -27,12 +28,8 @@ function Dashboard() {
   const { activity, friends, onlineIds, loading, activityError, friendsError, notifications } = useDashboardData();
   const [friendDialog, setFriendDialog] = useState<{ id: string; view: "actions" | "chat" | "profile" } | null>(null);
   const [now, setNow] = useState(Date.now);
-  const notificationReadKey = `pluto-notifications-read-${user?.id ?? "guest"}`;
   const messageReadKey = `pluto-read-message-ids-${user?.id ?? "guest"}`;
-  const [notificationsReadAt, setNotificationsReadAt] = useState(() => {
-    try { return Number(localStorage.getItem(notificationReadKey) || 0); }
-    catch { return 0; }
-  });
+  const [messageBaseline] = useState(() => getFriendMessageBaseline(user?.id));
   const [readMessageIds, setReadMessageIds] = useState<string[]>(() => {
     try {
       const saved = JSON.parse(localStorage.getItem(messageReadKey) || "[]");
@@ -43,18 +40,14 @@ function Dashboard() {
     const timer = window.setInterval(() => setNow(Date.now()), 30_000);
     return () => window.clearInterval(timer);
   }, []);
-  useEffect(() => {
-    const syncReadAt = () => {
-      try { setNotificationsReadAt(Number(localStorage.getItem(notificationReadKey) || 0)); }
-      catch { setNotificationsReadAt(0); }
-    };
-    syncReadAt();
-    window.addEventListener("pluto-notifications-read", syncReadAt);
-    return () => window.removeEventListener("pluto-notifications-read", syncReadAt);
-  }, [notificationReadKey]);
-
   const friend = friends.find((item) => item.id === friendDialog?.id);
-  const unreadMessageSenderIds = notifications.filter(notification => notification.kind === "message" && notification.senderId && Date.parse(notification.createdAt) > notificationsReadAt && !readMessageIds.includes(notification.id)).map(notification => notification.senderId!);
+  const friendIds = new Set(friends.map(friend => friend.id));
+  const unreadMessagesByFriend = notifications.reduce<Record<string, number>>((counts, notification) => {
+    if (notification.kind === "message" && notification.senderId && friendIds.has(notification.senderId) && Date.parse(notification.createdAt) > messageBaseline && !readMessageIds.includes(notification.id)) {
+      counts[notification.senderId] = (counts[notification.senderId] ?? 0) + 1;
+    }
+    return counts;
+  }, {});
   const markFriendMessagesRead = (friendId: string) => {
     const messageIds = notifications.filter(notification => notification.kind === "message" && notification.senderId === friendId).map(notification => notification.id);
     if (!messageIds.length) return;
@@ -67,7 +60,7 @@ function Dashboard() {
   };
   const searchTarget = typeof document === "undefined" ? null : document.getElementById("dashboard-search-slot");
   const sidebar = <>
-    <PlayWithFriends friends={friends} onlineIds={onlineIds} unreadMessageSenderIds={unreadMessageSenderIds} loading={loading} unavailable={friendsError} signedIn={!!user} onFriendSelect={id => setFriendDialog({ id, view: "actions" })} />
+    <PlayWithFriends friends={friends} onlineIds={onlineIds} unreadMessagesByFriend={unreadMessagesByFriend} loading={loading} unavailable={friendsError} signedIn={!!user} onFriendSelect={id => setFriendDialog({ id, view: "actions" })} />
     <div className="sidebar-progress"><ProgressCard profile={profile} streak={activity?.streak} loading={authLoading} signedIn={!!user} /></div>
   </>;
 
@@ -75,11 +68,14 @@ function Dashboard() {
     {searchTarget && createPortal(<DashboardSearch friends={friends} onChat={id => { markFriendMessagesRead(id); setFriendDialog({ id, view: "chat" }); }} />, searchTarget)}
     <div className="dashboard-workspace">
       <DashboardSidebar userId={user?.id} sidebar={sidebar} onlineFriendsCount={onlineIds.length} notifications={notifications} readMessageIds={readMessageIds}>
-        <div className="dashboard-top-layout"><DashboardHero profile={profile} signedIn={!!user} loading={authLoading} now={now} challenge={<DailyQuestsCard quests={activity?.quests} loading={loading} unavailable={activityError} signedIn={!!user} />} /><div className="dashboard-top-side"><DidYouKnowCarousel /><RankedChessCallout /></div></div>
-        <div className="dashboard-play-layout">
-          <MyGames />
-          <LearnSomethingNew />
-        </div>
+        <DashboardHero profile={profile} signedIn={!!user} loading={authLoading} now={now} challenge={null} />
+        <MyGames />
+        <DashboardActionRow userId={user?.id} />
+        <DashboardContentGrid userId={user?.id} sections={[
+          { id: "quests", label: "Daily quests", content: <DailyQuestsCard quests={activity?.quests} loading={loading} unavailable={activityError} signedIn={!!user} /> },
+          { id: "discover", label: "Did you know?", content: <DidYouKnowCarousel /> },
+          { id: "learning", label: "Continue learning", content: <LearnSomethingNew /> },
+        ]} />
       </DashboardSidebar>
     </div>
     {friend && friendDialog && <DashboardFriendDialog friend={friend} online={onlineIds.includes(friend.id)} view={friendDialog.view} onViewChange={view => { if (view === "chat") markFriendMessagesRead(friend.id); setFriendDialog({ id: friend.id, view }); }} onClose={() => setFriendDialog(null)} />}

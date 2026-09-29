@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import ts from 'typescript';
+import {getChessRank} from '../src/games/chess/ranked/tiers.ts';
 const compiled=ts.transpileModule(readFileSync(new URL('../src/pages/games/Chess/ChessRankedLobby.tsx',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2023,jsx:ts.JsxEmit.ReactJSX}}).outputText;
 // Execute the actual component lifecycle and async callbacks without a browser
 // or remote account. Only React scheduling and transport are test doubles.
@@ -15,11 +16,13 @@ function mount(){
   '@/context/AuthContext':{useAuth:()=>({user:{id:'user',email:'user@example.test'},profile:null})},
   '@/i18n/ui':{ui:s=>s,useUiLanguage:()=>{}},'@/lib/supabase':{supabase:{from:()=>query,rpc:async()=>({data:[]})}},
   '@/games/chess/ranked/client':{RankedAuthError:class extends Error{},leaveRankedQueue:id=>leaves.push(id),invokeRankedChess:body=>new Promise(resolve=>requests.push({body,resolve}))},
+  '@/games/chess/ranked/tiers':{getChessRank},
+  '@/components/chess/RankEmblem':{default:()=>null},
  };
  const exports={};new Function('require','exports','window',compiled)(name=>deps[name]??{default:()=>null},exports,win);
  const tree=exports.default();effects.forEach(fn=>{const cleanup=fn();if(cleanup)cleanups.push(cleanup)});
  function all(node){if(!node||typeof node!=='object')return [];if(Array.isArray(node))return node.flatMap(all);return [node,...all(node.props?.children)]}
- const join=all(tree).find(n=>n.type==='button'&&n.props.children?.includes?.('Join ranked queue'));
+ const join=all(tree).find(n=>n.type==='button'&&n.props.children?.includes?.('Find match'));
  assert.ok(join);
  return {requests,leaves,navigations,win,join:()=>join.props.onClick(),unmount:()=>cleanups.forEach(fn=>fn())};
 }

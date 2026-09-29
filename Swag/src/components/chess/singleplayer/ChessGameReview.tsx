@@ -6,6 +6,7 @@ import { Chess, type Color, type PieceSymbol, type Square } from "chess.js";
 
 import Board from "./Board";
 import QualityBadge from "./ReviewQualityBadge";
+import type { ReviewVisualQuality } from "./reviewQualityVisuals";
 import { qualityList } from "./reviewQualities";
 
 import { useStockfishAnalysis } from "@/hooks/useStockfishAnalysis";
@@ -75,6 +76,11 @@ type EnrichedReviewRow = {
   criticalLabel: string | null;
   missedOpportunity: string | null;
 };
+
+function displayQuality(row: EnrichedReviewRow): ReviewVisualQuality {
+  if (row.review.centipawnLoss >= 80 && row.moverEvalBefore !== null && row.moverEvalAfter !== null && row.moverEvalBefore >= 5 && row.moverEvalAfter < 3) return "Missed Win";
+  return row.review.quality;
+}
 
 type PiecePerformanceRow = {
   piece: PieceSymbol;
@@ -1098,7 +1104,7 @@ export default function ChessGameReview({
                       </td>
 
                       <td className="px-1.5 py-2">
-                        <QualityBadge quality={review.quality} />
+                        <QualityBadge quality={displayQuality(row)} />
                       </td>
 
                       {showLoss && (
@@ -1357,6 +1363,7 @@ export default function ChessGameReview({
                    =============================================== */}
 
               <aside className="min-h-0 flex-1 overflow-y-auto rounded-2xl border border-white/10 bg-[#09121c]/78 backdrop-blur-xl p-4">
+                <details className="mb-4 rounded-xl border border-white/10 bg-white/[.035] p-3"><summary className="cursor-pointer text-xs font-bold text-[#f2e4c9]">{ui("Move quality legend")}</summary><div className="mt-3 grid grid-cols-2 gap-2">{(["Best", "Brilliant", "Excellent", "Good", "Inaccuracy", "Mistake", "Blunder", "Missed Win"] as ReviewVisualQuality[]).map(quality => <QualityBadge key={quality} quality={quality} />)}</div></details>
                 {selected && selectedRow && (
                   <>
                     <p className="text-[9px] font-black uppercase tracking-[0.18em] text-amber-200/45">{ui("Current Move")}</p>
@@ -1374,7 +1381,7 @@ export default function ChessGameReview({
                         </div>
                       </div>
 
-                      <QualityBadge quality={selected.quality} />
+                      <QualityBadge quality={displayQuality(selectedRow)} />
                     </div>
 
                     <div className="mt-3 flex flex-wrap gap-1.5">
@@ -1794,6 +1801,7 @@ export default function ChessGameReview({
                 <div className="w-full max-w-[min(100%,calc(100vh-15rem))]">
                   <Board
                     board={board}
+                    reviewAnnotation={selected && selectedRow && !continuationMove && !alternativeMove ? { from: selected.from, to: selected.to, quality: displayQuality(selectedRow) } : null}
                     selectedSquare={
                       continuationMove
                         ? continuationMove.from
@@ -1855,7 +1863,7 @@ export default function ChessGameReview({
                       </div>
                     </div>
 
-                    <QualityBadge quality={selected.quality} />
+                    <QualityBadge quality={selectedRow ? displayQuality(selectedRow) : selected.quality} />
                   </div>
 
                   <div className="mt-4 rounded-xl bg-black/20 p-3 text-xs text-zinc-500">{ui("Evaluation loss")}{" "}
@@ -2039,6 +2047,7 @@ export default function ChessGameReview({
               <div className="w-full max-w-[min(100%,calc(100vh-10rem))]">
                 <Board
                   board={board}
+                  reviewAnnotation={selected && selectedRow && !continuationMove && !alternativeMove ? { from: selected.from, to: selected.to, quality: displayQuality(selectedRow) } : null}
                   selectedSquare={
                     continuationMove
                       ? continuationMove.from

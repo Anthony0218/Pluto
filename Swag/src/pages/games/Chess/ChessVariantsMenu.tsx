@@ -5,6 +5,7 @@ import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { BookOpen } from "lucide-react";
 
 type Language = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 
@@ -768,6 +769,11 @@ function VariantPreviewCarousel({ language }: { language: Language }) {
                   ))}
                 </div>
 
+                <div className="mt-6 grid grid-cols-2 gap-2">
+                  {variant.aiRoute ? <Link to={variant.aiRoute} className="flex min-h-11 items-center justify-center rounded-xl border border-amber-300/55 bg-amber-300 px-3 text-center text-xs font-black text-black shadow-lg shadow-amber-500/15 transition hover:bg-amber-200">{t(language, "Singleplayer")}</Link> : <span aria-disabled="true" className="flex min-h-11 items-center justify-center rounded-xl border border-white/10 bg-white/[.04] px-3 text-center text-xs font-bold text-zinc-600">{t(language, "Singleplayer")}</span>}
+                  {variant.multiplayerRoute ? <Link to={variant.multiplayerRoute} className="flex min-h-11 items-center justify-center rounded-xl border border-fuchsia-300/40 bg-fuchsia-300/15 px-3 text-center text-xs font-black text-fuchsia-100 transition hover:bg-fuchsia-300/25">{ui("Multiplayer")}</Link> : <span aria-disabled="true" className="flex min-h-11 items-center justify-center rounded-xl border border-white/10 bg-white/[.04] px-3 text-center text-xs font-bold text-zinc-600">{ui("Multiplayer")}</span>}
+                </div>
+
                 <div className="mt-auto flex items-end gap-3 pt-6">
                   <button
                     type="button"
@@ -825,8 +831,8 @@ function VariantActionButtons({
   useUiLanguage();
   if (!variant.available) {
     return (
-      <div className="grid grid-cols-4 gap-1.5 opacity-45">
-        {["Singleplayer", "Multiplayer", "Hotseat", "Rules"].map((label) => (
+      <div className="grid grid-cols-3 gap-1.5 opacity-45">
+        {["Singleplayer", "Multiplayer", "Hotseat"].map((label) => (
           <span
             key={label}
             className="rounded-lg border border-white/12 bg-black/20 px-2 py-2 text-center text-[9px] font-semibold text-zinc-500"
@@ -842,18 +848,18 @@ function VariantActionButtons({
     "flex min-h-9 items-center justify-center rounded-lg border px-2 py-2 text-center text-[9px] font-semibold transition";
 
   return (
-    <div className="grid grid-cols-4 gap-1.5">
+    <div className="flex gap-1.5">
       {/* 1. Singleplayer (formerly Vs AI) */}
       {variant.aiRoute ? (
         <Link
           to={variant.aiRoute}
-          className={`${base} border-white/15 bg-black/25 text-zinc-300 hover:bg-white/[0.07] hover:text-white`}
+          className={`${base} min-w-0 flex-1 border-white/15 bg-black/25 text-zinc-300 hover:bg-white/[0.07] hover:text-white`}
         >
           {t(language, "Singleplayer")}
         </Link>
       ) : (
         <span
-          className={`${base} border-white/[0.06] bg-black/10 text-zinc-700`}
+          className="hidden"
         >
           {t(language, "Singleplayer")}
         </span>
@@ -863,11 +869,11 @@ function VariantActionButtons({
       {variant.multiplayerRoute ? (
         <Link
           to={variant.multiplayerRoute}
-          className={`${base} border-white/15 bg-black/25 text-zinc-300 hover:bg-white/[0.07] hover:text-white`}
+          className={`${base} min-w-0 flex-1 border-white/15 bg-black/25 text-zinc-300 hover:bg-white/[0.07] hover:text-white`}
         >{ui("Multiplayer")}</Link>
       ) : (
         <span
-          className={`${base} border-white/[0.06] bg-black/10 text-zinc-700`}
+          className="hidden"
         >{ui("Multiplayer")}</span>
       )}
 
@@ -875,33 +881,18 @@ function VariantActionButtons({
       {variant.route ? (
         <Link
           to={variant.route}
-          className={`${base} border-white/15 bg-black/25 text-zinc-300 hover:bg-white/[0.07] hover:text-white`}
+          className={`${base} min-w-0 flex-1 border-white/15 bg-black/25 text-zinc-300 hover:bg-white/[0.07] hover:text-white`}
         >
           {variant.id === "3d-chess" ? ui("Play") : t(language, "Hotseat")}
         </Link>
       ) : (
         <span
-          className={`${base} border-white/[0.06] bg-black/10 text-zinc-700`}
+          className="hidden"
         >
           {t(language, "Hotseat")}
         </span>
       )}
 
-      {/* 4. Rules stays last */}
-      {variant.rulesRoute ? (
-        <Link
-          to={variant.rulesRoute}
-          className={`${base} border-white/15 bg-black/25 text-zinc-300 hover:bg-white/[0.07] hover:text-white`}
-        >
-          {t(language, "Rules")}
-        </Link>
-      ) : (
-        <span
-          className={`${base} border-white/[0.06] bg-black/10 text-zinc-700`}
-        >
-          {t(language, "Rules")}
-        </span>
-      )}
     </div>
   );
 }
@@ -953,7 +944,7 @@ function VariantCardView({
             {t(language, variant.description)}
           </p>
 
-          <div className="mt-2.5 flex flex-wrap gap-1.5">
+          <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
             {variant.tags.slice(0, 2).map((tag) => (
               <span
                 key={tag}
@@ -962,6 +953,7 @@ function VariantCardView({
                 {t(language, tag)}
               </span>
             ))}
+            {variant.rulesRoute && <Link to={variant.rulesRoute} className="ml-auto inline-flex items-center gap-1 rounded-lg border border-white/15 bg-white/[.05] px-2 py-1 text-[9px] font-semibold text-zinc-300 transition hover:bg-white/10 hover:text-white"><BookOpen size={12} />{t(language, "Rules")}</Link>}
           </div>
 
           <div className="mt-auto pt-3">

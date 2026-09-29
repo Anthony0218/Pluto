@@ -2627,13 +2627,13 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
             <div className="mx-auto w-full max-w-[820px] xl:flex xl:max-w-none xl:flex-col">
               <section className="mb-2 shrink-0 rounded-2xl border border-amber-400/30 bg-[#08111c]/90 px-4 py-2.5 text-center shadow-[0_0_40px_rgba(245,158,11,0.08)] backdrop-blur-xl">
                 <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-400">
-                  {t("Classic Chess")}
+                  {t("Classic Chess")} · {ui("Active board")}
                 </p>
                 <h1 className="mt-1 font-serif text-3xl font-semibold text-[#f7ead0]">
                   {t("Hotseat")}
                 </h1>
                 <p className="mt-1 text-xs text-zinc-500">
-                  {game.turn() === "w" ? t("White to move") : t("Black to move")}
+                  {hotseatFlipPending ? ui("Changing sides") : game.turn() === "w" ? t("White to move") : t("Black to move")} · {ui("Two players · One device")}
                 </p>
               </section>
 
@@ -2884,7 +2884,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
               {/* WAITING PLAYER MINI BOARD */}
               <section className="relative aspect-square w-full shrink-0 overflow-hidden rounded-3xl border border-amber-400/20 bg-[#07101a] shadow-2xl shadow-black/40">
                 <div className="pointer-events-none absolute left-2 top-2 z-20 rounded-lg border border-amber-300/15 bg-black/65 px-2 py-1 backdrop-blur-md">
-                  <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-amber-100/90">{ui("Waiting board")}</p>
+                  <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-amber-100/90">{ui("Waiting player")} · {boardOrientation === "white" ? t("Black") : t("White")}</p>
                 </div>
 
                 <div className="pointer-events-none h-full w-full">

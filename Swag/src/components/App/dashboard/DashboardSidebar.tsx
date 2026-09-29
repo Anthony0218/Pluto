@@ -1,8 +1,9 @@
-import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useState, useSyncExternalStore, type ReactNode } from "react";
 import { Users } from "lucide-react";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import type { DashboardNotification } from "@/hooks/useDashboardData";
 import DashboardDialog from "./DashboardDialog";
+import { getFriendMessageBaseline } from "./messageReadState";
 
 const subscribe = (listener: () => void) => {
   const query = window.matchMedia("(min-width: 1280px)");
@@ -13,27 +14,13 @@ const subscribe = (listener: () => void) => {
 export default function DashboardSidebar({ children, sidebar, userId, onlineFriendsCount, notifications, readMessageIds }: { children: ReactNode; sidebar: ReactNode; userId?: string; onlineFriendsCount: number; notifications: DashboardNotification[]; readMessageIds: string[] }) {
   useUiLanguage();
   const key = `pluto-dashboard-sidebar-${userId ?? "guest"}`;
-  const notificationReadKey = `pluto-notifications-read-${userId ?? "guest"}`;
   const [open, setOpen] = useState(() => { try { return localStorage.getItem(key) !== "closed"; } catch { return true; } });
   const [drawer, setDrawer] = useState(false);
-  const [notificationsReadAt, setNotificationsReadAt] = useState(() => {
-    try { return Number(localStorage.getItem(notificationReadKey) || 0); }
-    catch { return 0; }
-  });
   const desktop = useSyncExternalStore(subscribe, () => window.matchMedia("(min-width: 1280px)").matches, () => false);
-  const unreadMessagesCount = notifications.filter(notification => notification.kind === "message" && Date.parse(notification.createdAt) > notificationsReadAt && !readMessageIds.includes(notification.id)).length;
+  const [messageBaseline] = useState(() => getFriendMessageBaseline(userId));
+  const unreadMessagesCount = notifications.filter(notification => notification.kind === "message" && notification.senderId && Date.parse(notification.createdAt) > messageBaseline && !readMessageIds.includes(notification.id)).length;
   const notificationSummary = unreadMessagesCount > 0 ? `, ${unreadMessagesCount} ${ui("New message")}${unreadMessagesCount === 1 ? "" : "s"}` : "";
   const onlineSummary = onlineFriendsCount > 0 ? `, ${onlineFriendsCount} ${ui("Online")}` : "";
-
-  useEffect(() => {
-    const syncReadAt = () => {
-      try { setNotificationsReadAt(Number(localStorage.getItem(notificationReadKey) || 0)); }
-      catch { setNotificationsReadAt(0); }
-    };
-    syncReadAt();
-    window.addEventListener("pluto-notifications-read", syncReadAt);
-    return () => window.removeEventListener("pluto-notifications-read", syncReadAt);
-  }, [notificationReadKey]);
 
   function toggle() {
     setOpen(!open);
