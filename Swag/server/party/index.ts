@@ -9,6 +9,7 @@ import { parseMessage } from "../../src/games/party/network/protocol.ts";
 import type { ServerMessage } from "../../src/games/party/types.ts";
 // Configuration (all optional; see .env.example):
 //   PARTY_PORT, PARTY_HOST          listen address (default 127.0.0.1:8787)
+//   PORT                            fallback for PARTY_PORT (set by Render, Railway, Fly, …)
 //   PARTY_ORIGINS                   comma-separated browser origins allowed to open the socket
 //   PARTY_TRUST_PROXY=1             use X-Forwarded-For for rate limiting behind a reverse proxy
 //   PARTY_LOG_LEVEL                 debug | info | warn | error | silent
@@ -27,7 +28,7 @@ function clientAddress(request: IncomingMessage): string {
   return request.socket.remoteAddress ?? "unknown";
 }
 export function startPartyServer(
-  port = Number(process.env.PARTY_PORT ?? 8787),
+  port = Number(process.env.PARTY_PORT ?? process.env.PORT ?? 8787),
   host = process.env.PARTY_HOST ?? "127.0.0.1",
 ) {
   const rooms = new PartyRooms();

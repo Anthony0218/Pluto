@@ -1,0 +1,17 @@
+# Render blueprint for the Pluto Party authority (the Netlify site only serves static files).
+services:
+  - type: web
+    name: pluto-party-server
+    runtime: node
+    plan: free # sleeps when idle and loses in-memory matches; use "starter" for always-on
+    startCommand: node server/party/index.ts
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 24
+      - key: PARTY_HOST
+        value: 0.0.0.0
+      - key: PARTY_TRUST_PROXY
+        value: "1"
+      - key: PARTY_ORIGINS
+        sync: false # set to https://<your-site>.netlify.app
