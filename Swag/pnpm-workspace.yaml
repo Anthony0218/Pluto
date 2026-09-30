@@ -4,3 +4,5 @@ allowBuilds:
   core-js: false
   pnpm: false
   stockfish: false
+minimumReleaseAgeExclude:
+  - '@types/ws@8.18.2'

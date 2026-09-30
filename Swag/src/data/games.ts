@@ -11,6 +11,16 @@ export type Game = {
 
 export const games: Game[] = [
   {
+    title: "Pluto Party",
+    subtitle: "Good friends. Questionable decisions.",
+    description: "Explore six tropical islands in a four-player board adventure with branching paths, friends and bots.",
+    image: "/images/pluto-party.svg",
+    route: "/games/pluto-party",
+    tag: "Party",
+    features: ["4 players", "Friends & bots", "60 spaces"],
+    finished: false,
+  },
+  {
     title: "Eat It",
     subtitle: "Small circle. Big appetite.",
     description: "Eat, grow, and be the last circle standing in colorful City and Nature arenas.",

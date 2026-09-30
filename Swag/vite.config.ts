@@ -6,6 +6,7 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   plugins: [react(),tailwindcss()],
   server: {
+    proxy: { "/party-socket": { target: "ws://127.0.0.1:8787", ws: true } },
     // Do not silently fall back to another port: that can leave the browser on
     // a previous Vite instance serving an older version of the landing page.
     port: 5173,

@@ -169,6 +169,7 @@ import ShogiGamePage from "./pages/games/Shogi/ShogiGamePage.tsx";
 import StrategyMultiplayer from "./components/strategy/StrategyMultiplayer.tsx";
 import GoRules from "./components/strategy/GoRules.tsx";
 import ShogiRules from "./components/strategy/ShogiRules.tsx";
+const PartyPage = React.lazy(() => import("./pages/games/Party/PartyPage.tsx"));
 const AtlasArenaPage = React.lazy(() => import("./pages/games/AtlasArena/AtlasArenaPage.tsx"));
 const EatItPage = React.lazy(() => import("./pages/games/EatIt/EatItPage.tsx"));
 const eatItPage = <React.Suspense fallback={<main className="min-h-[var(--app-height)] bg-[#18201d]" />}><EatItPage /></React.Suspense>;
@@ -215,6 +216,7 @@ const router = createBrowserRouter([
             path: "/games",
             element: <GamesPage />,
           },
+          { path: "/games/pluto-party", element: <React.Suspense fallback={<main>Loading Pluto Party…</main>}><PartyPage /></React.Suspense> },
           { path: "/games/atlas-arena", element: atlasPage(<AtlasArenaPage />) },
           { path: "/games/eat-it", element: eatItPage },
           { path: "/games/eat-it/multiplayer/:roomCode", element: eatItPage },
