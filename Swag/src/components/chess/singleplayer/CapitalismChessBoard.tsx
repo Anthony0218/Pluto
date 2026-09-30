@@ -1,3 +1,4 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import { emitGameEffect } from "@/games/chess/effects/gameEffects";
@@ -621,9 +622,9 @@ export default function CapitalismChessBoard({
 
   const [gameOver, setGameOver] = useState(false);
 
-  const [gameOverReason, setGameOverReason] = useState("");
+  const [, setGameOverReason] = useState("");
 
-  const [winner, setWinner] = useState<Winner>("white");
+  const [, setWinner] = useState<Winner>("white");
 
   const [historyPreviewPly, setHistoryPreviewPly] = useState<number | null>(
     null,
@@ -1583,23 +1584,7 @@ export default function CapitalismChessBoard({
           <section className="min-w-0">
             <div className="mx-auto max-w-[820px]">
               {gameOver && (
-                <div className="mb-3 rounded-2xl border border-amber-400/20 bg-amber-400/[0.07] px-4 py-3">
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-widest text-amber-300">
-                        {t("Game Over")}
-                      </p>
-
-                      <p className="mt-1 font-black text-white">
-                        {t(gameOverReason)}
-                      </p>
-                    </div>
-
-                    <span className="text-sm font-bold text-zinc-300">
-                      {winner === "draw" ? t("Draw") : winner === "white" ? t("White wins") : t("Black wins")}
-                    </span>
-                  </div>
-                </div>
+                <VisibleGameResult />
               )}
 
               {promotionSquare && promotionFrom && !historyPreview && (

@@ -1,3 +1,4 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import { ui, useUiLanguage } from "@/i18n/ui";
@@ -168,8 +169,8 @@ export default function RandomStartChess({
   const [records, setRecords] = useState<MoveRecord[]>([]);
 
   const [gameOver, setGameOver] = useState(false);
-  const [gameOverReason, setGameOverReason] = useState("");
-  const [winner, setWinner] = useState<Winner>("draw");
+  const [, setGameOverReason] = useState("");
+  const [, setWinner] = useState<Winner>("draw");
 
   const [historyPreviewPly, setHistoryPreviewPly] = useState<number | null>(
     null,
@@ -659,6 +660,20 @@ export default function RandomStartChess({
               </div>
             )}
 
+            {gameOver && !historyPreview && (
+              <VisibleGameResult
+                actions={
+                  <button
+                    type="button"
+                    onClick={newRandomGame}
+                    className="mt-5 rounded-xl bg-violet-400 px-4 py-2.5 text-sm font-black text-violet-950"
+                  >
+                    {t("New random game")}
+                  </button>
+                }
+              />
+            )}
+
             <div className="relative">
               <Board
                 board={displayedBoard}
@@ -678,32 +693,6 @@ export default function RandomStartChess({
                 }
                 orientation={boardOrientation}
               />
-
-              {gameOver && !historyPreview && (
-                <div className="absolute inset-0 z-40 flex items-center justify-center rounded-[28px] bg-zinc-950/80 p-6 backdrop-blur-sm">
-                  <div className="max-w-sm rounded-3xl border border-violet-300/20 bg-zinc-900 p-6 text-center shadow-2xl">
-                    <p className="text-xs font-black uppercase tracking-[0.25em] text-violet-300">
-                      {t("Game Over")}
-                    </p>
-
-                    <h2 className="mt-3 text-3xl font-black text-white">
-                      {winner === "white" ? t("White wins") : winner === "black" ? t("Black wins") : t("Draw")}
-                    </h2>
-
-                    <p className="mt-2 text-sm text-zinc-500">
-                      {t(gameOverReason)}
-                    </p>
-
-                    <button
-                      type="button"
-                      onClick={newRandomGame}
-                      className="mt-5 rounded-xl bg-violet-400 px-4 py-2.5 text-sm font-black text-violet-950"
-                    >
-                      {t("New random game")}
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </section>
 

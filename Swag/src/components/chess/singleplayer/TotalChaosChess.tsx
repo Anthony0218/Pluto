@@ -1,3 +1,4 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import { ui, useUiLanguage } from "@/i18n/ui";
@@ -601,12 +602,6 @@ export default function TotalChaosChess({
     snapToSide("w");
   }
 
-  const resultText =
-    finishedGame?.reason === "checkmate"
-      ? finishedGame.winner === "white"
-        ? t("White wins by checkmate.")
-        : t("Black wins by checkmate.")
-      : t("The game ended in a draw.");
 
   return (
     <div className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
@@ -768,6 +763,20 @@ export default function TotalChaosChess({
               </div>
             )}
 
+            {finishedGame && !historyPreview && (
+              <VisibleGameResult
+                actions={
+                  <button
+                    type="button"
+                    onClick={newChaos}
+                    className="mt-5 rounded-xl bg-pink-300 px-4 py-2.5 text-sm font-black text-zinc-950"
+                  >
+                    🌀 {t("New Chaos")}
+                  </button>
+                }
+              />
+            )}
+
             <div className="relative">
               <Board
                 board={displayedChess.board()}
@@ -787,30 +796,6 @@ export default function TotalChaosChess({
                 }
                 orientation={boardOrientation}
               />
-
-              {finishedGame && !historyPreview && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[28px] bg-zinc-950/82 p-6 backdrop-blur-sm">
-                  <div className="max-w-sm rounded-3xl border border-pink-300/20 bg-zinc-900 p-6 text-center shadow-2xl">
-                    <p className="text-xs font-black uppercase tracking-[0.25em] text-pink-300">
-                      {t("Game Over")}
-                    </p>
-
-                    <h2 className="mt-3 text-3xl font-black text-white">
-                      {finishedGame.winner === "white" ? t("White wins") : finishedGame.winner === "black" ? t("Black wins") : t("Draw")}
-                    </h2>
-
-                    <p className="mt-3 text-sm text-zinc-500">{ui(resultText)}</p>
-
-                    <button
-                      type="button"
-                      onClick={newChaos}
-                      className="mt-5 rounded-xl bg-pink-300 px-4 py-2.5 text-sm font-black text-zinc-950"
-                    >
-                      🌀 {t("New Chaos")}
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </section>
 

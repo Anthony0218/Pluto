@@ -1,3 +1,4 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
@@ -340,14 +341,6 @@ function cardSymbol(card: PortalPromotionCard, color: PortalSide) {
   return color === "w" ? whiteSymbols[card] : blackSymbols[card];
 }
 
-function resultLabel(game: VariantGame) {
-  if (game.winner === "draw") return `Draw · ${game.end_reason ?? "Game over"}`;
-  if (game.winner === "white")
-    return `White wins · ${game.end_reason ?? "Game over"}`;
-  if (game.winner === "black")
-    return `Black wins · ${game.end_reason ?? "Game over"}`;
-  return game.end_reason ?? "Game over";
-}
 
 function Panel({
   title,
@@ -1646,6 +1639,31 @@ export function RouletteMultiplayerGame() {
                 </div>
               )}
 
+              {gameState.status === "finished" &&
+                historyPreviewPly === null && (
+                  <VisibleGameResult
+                    winner={gameState.winner}
+                    playerColor={myColor}
+                    reason={gameState.end_reason}
+                    actions={
+                      <>
+                        <button
+                          type="button"
+                          disabled={Boolean(actionLoading) || myRematchReady}
+                          onClick={() => void requestRematch()}
+                          className="mt-5 w-full rounded-xl bg-violet-300 px-4 py-3 text-sm font-black text-zinc-950 transition hover:bg-violet-200 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          {myRematchReady ? ui("Waiting for opponent...") : ui("↺ Request Rematch")}
+                        </button>
+                        <Link
+                          to="/games/chess/variants/roulette/multiplayer"
+                          className="mt-2 block rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-black text-zinc-300 hover:bg-white/10"
+                        >{ui("Back to Lobby")}</Link>
+                      </>
+                    }
+                  />
+                )}
+
               <div className="relative overflow-hidden rounded-[28px] shadow-2xl shadow-black/35">
                 <Board
                   board={displayedBoard}
@@ -1713,29 +1731,7 @@ export function RouletteMultiplayerGame() {
                     <PromotionBar onPromote={promotePawn} />
                   )}
 
-                {gameState.status === "finished" &&
-                  historyPreviewPly === null && (
-                    <div className="absolute inset-0 z-[90] flex items-center justify-center bg-zinc-950/75 p-6 backdrop-blur-sm">
-                      <div className="w-full max-w-sm rounded-3xl border border-violet-300/20 bg-zinc-900/95 p-7 text-center shadow-2xl">
-                        <p className="text-xs font-black uppercase tracking-[0.2em] text-violet-300">{ui("Game Over")}</p>
-                        <h2 className="mt-2 text-2xl font-black text-white">
-                          {resultLabel(gameState)}
-                        </h2>
-                        <button
-                          type="button"
-                          disabled={Boolean(actionLoading) || myRematchReady}
-                          onClick={() => void requestRematch()}
-                          className="mt-5 w-full rounded-xl bg-violet-300 px-4 py-3 text-sm font-black text-zinc-950 transition hover:bg-violet-200 disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                          {myRematchReady ? ui("Waiting for opponent...") : ui("↺ Request Rematch")}
-                        </button>
-                        <Link
-                          to="/games/chess/variants/roulette/multiplayer"
-                          className="mt-2 block rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-black text-zinc-300 hover:bg-white/10"
-                        >{ui("Back to Lobby")}</Link>
-                      </div>
-                    </div>
-                  )}
+
               </div>
 
               <div className="mt-3 flex items-center justify-between rounded-2xl border border-white/5 bg-zinc-900/50 px-4 py-3 text-xs">

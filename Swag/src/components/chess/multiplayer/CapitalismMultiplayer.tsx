@@ -1,3 +1,4 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
@@ -1182,10 +1183,6 @@ export function CapitalismMultiplayerGame() {
     mySide === "white"
       ? Boolean(gameState.white_rematch_ready)
       : Boolean(gameState.black_rematch_ready);
-  const opponentRematchReady =
-    mySide === "white"
-      ? Boolean(gameState.black_rematch_ready)
-      : Boolean(gameState.white_rematch_ready);
 
   if (room.status === "waiting") {
     return (
@@ -1290,6 +1287,24 @@ export function CapitalismMultiplayerGame() {
               </div>
             )}
 
+            {liveFinish && historyPreviewPly === null && (
+              <VisibleGameResult
+                winner={liveFinish.winner}
+                playerColor={myColor}
+                reason={liveFinish.reason}
+                actions={
+                  <button
+                    type="button"
+                    onClick={requestRematch}
+                    disabled={myRematchReady || Boolean(actionBusy)}
+                    className="mt-5 w-full rounded-xl bg-amber-400 px-4 py-3 font-black text-amber-950 disabled:opacity-50"
+                  >
+                    {myRematchReady ? ui("Waiting for opponent…") : ui("Play again")}
+                  </button>
+                }
+              />
+            )}
+
             <div className="relative">
               <Board
                 board={displayedGame.board()}
@@ -1344,32 +1359,7 @@ export function CapitalismMultiplayerGame() {
                 </div>
               )}
 
-              {liveFinish && historyPreviewPly === null && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[28px] bg-zinc-950/80 p-6 backdrop-blur-sm">
-                  <div className="max-w-sm rounded-3xl border border-amber-300/20 bg-zinc-900 p-6 text-center shadow-2xl">
-                    <p className="text-xs font-black uppercase tracking-[0.25em] text-amber-300">{ui("Market Closed")}</p>
-                    <h2 className="mt-3 text-3xl font-black">
-                      {liveFinish.winner === "draw" ? ui("Draw") : liveFinish.winner === mySide ? ui("You win") : ui("You lose")}
-                    </h2>
-                    <p className="mt-3 text-sm text-zinc-500">
-                      {liveFinish.reason.replaceAll("_", " ")}
-                    </p>
 
-                    <button
-                      type="button"
-                      onClick={requestRematch}
-                      disabled={myRematchReady || Boolean(actionBusy)}
-                      className="mt-5 w-full rounded-xl bg-amber-400 px-4 py-3 font-black text-amber-950 disabled:opacity-50"
-                    >
-                      {myRematchReady ? ui("Waiting for opponent…") : ui("Play again")}
-                    </button>
-
-                    {opponentRematchReady && !myRematchReady && (
-                      <p className="mt-3 text-xs text-emerald-300">{ui("Opponent wants a rematch.")}</p>
-                    )}
-                  </div>
-                </div>
-              )}
             </div>
           </section>
 

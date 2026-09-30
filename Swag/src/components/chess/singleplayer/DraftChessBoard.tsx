@@ -1,3 +1,4 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
@@ -471,9 +472,9 @@ export default function DraftChessBoard({
 
   const [gameOver, setGameOver] = useState(false);
 
-  const [gameOverReason, setGameOverReason] = useState("");
+  const [, setGameOverReason] = useState("");
 
-  const [winner, setWinner] = useState<Winner>("white");
+  const [, setWinner] = useState<Winner>("white");
 
   const [historyPreviewPly, setHistoryPreviewPly] = useState<number | null>(
     null,
@@ -1454,11 +1455,7 @@ export default function DraftChessBoard({
           <section className="min-w-0">
             <div className="mx-auto max-w-[820px]">
               {phase === "playing" && gameOver && (
-                <GameOverBanner
-                  reason={t(gameOverReason)}
-                  winner={winner}
-                  t={t}
-                />
+                <VisibleGameResult />
               )}
 
               {phase === "playing" &&
@@ -2062,35 +2059,6 @@ function CapturedPiecesGrid({
         </p>
 
         {renderPieces(capturedWhite, "w")}
-      </div>
-    </div>
-  );
-}
-
-function GameOverBanner({
-  reason,
-  winner,
-  t,
-}: {
-  reason: string;
-  winner: Winner;
-  t: (key: string) => string;
-}) {
-  useUiLanguage();
-  return (
-    <div className="mb-3 rounded-2xl border border-emerald-400/20 bg-emerald-400/[0.07] px-4 py-3">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-widest text-emerald-300">
-            {t("Game Over")}
-          </p>
-
-          <p className="mt-1 font-black text-white">{ui(reason)}</p>
-        </div>
-
-        <span className="text-sm font-bold text-zinc-300">
-          {winner === "draw" ? t("Draw") : winner === "white" ? t("White wins") : t("Black wins")}
-        </span>
       </div>
     </div>
   );

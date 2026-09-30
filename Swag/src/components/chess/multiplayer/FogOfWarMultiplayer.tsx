@@ -1,3 +1,4 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
@@ -213,18 +214,6 @@ function optimisticMoveBoard(board: MaskedBoard, from: Square, to: Square) {
   return next;
 }
 
-function resultText(snapshot: FogSnapshot) {
-  if (snapshot.winner === "draw") {
-    return `Draw · ${snapshot.endReason ?? "Game over"}`;
-  }
-  if (snapshot.winner === "white") {
-    return `White wins · ${snapshot.endReason ?? "Game over"}`;
-  }
-  if (snapshot.winner === "black") {
-    return `Black wins · ${snapshot.endReason ?? "Game over"}`;
-  }
-  return snapshot.endReason ?? "Game over";
-}
 
 export function FogOfWarMultiplayerLobby() {
   useUiLanguage();
@@ -730,10 +719,11 @@ export function FogOfWarMultiplayerGame() {
         </section>
 
         {snapshot.status === "finished" && (
-          <div className="mb-5 rounded-2xl border border-sky-400/20 bg-sky-400/[0.07] px-4 py-3">
-            <p className="text-xs font-black uppercase tracking-widest text-sky-300">{ui("Game Over")}</p>
-            <p className="mt-1 font-black text-white">{resultText(snapshot)}</p>
-          </div>
+          <VisibleGameResult
+            winner={snapshot.winner}
+            playerColor={snapshot.myColor}
+            reason={snapshot.endReason}
+          />
         )}
 
         {snapshot.undo.opponent && (

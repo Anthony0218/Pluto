@@ -1,3 +1,4 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
@@ -262,26 +263,6 @@ function playLatestMoveSound(initialFen: string, moves: string[]) {
   }
 }
 
-function resultReasonLabel(reason: string | null) {
-  switch (reason) {
-    case "checkmate":
-      return "Checkmate";
-    case "stalemate":
-      return "Stalemate";
-    case "threefold repetition":
-      return "Threefold repetition";
-    case "insufficient material":
-      return "Insufficient material";
-    case "50-move rule":
-      return "50-move rule";
-    case "resignation":
-      return "Resignation";
-    case "draw":
-      return "Draw";
-    default:
-      return reason ?? "Game over";
-  }
-}
 
 function Panel({
   title,
@@ -388,10 +369,6 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
     [players, user?.id],
   );
 
-  const opponent = useMemo(
-    () => players.find((player) => player.user_id !== user?.id) ?? null,
-    [players, user?.id],
-  );
 
   const myColor = myPlayer?.chosen_color ?? null;
   const orientation: "white" | "black" =
@@ -456,15 +433,15 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
 
   const undoPending = Boolean(gameState?.undo_requested_by);
 
-  const canMove =
+  const canSubmitMove =
     room?.status === "playing" &&
     gameState?.status === "playing" &&
     isMyTurn &&
     !moving &&
     actionLoading === null &&
-    !pendingPromotion &&
     historyPreviewPly === null &&
     !undoPending;
+  const canMove = canSubmitMove && !pendingPromotion;
 
   const lastHistoryMove = historyRows[historyRows.length - 1] ?? null;
   const lastMoverColor = lastHistoryMove
@@ -498,12 +475,6 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
         ? Boolean(gameState?.black_rematch_ready)
         : false;
 
-  const opponentRematchReady =
-    opponent?.chosen_color === "white"
-      ? Boolean(gameState?.white_rematch_ready)
-      : opponent?.chosen_color === "black"
-        ? Boolean(gameState?.black_rematch_ready)
-        : false;
 
   const randomStartMeta: RandomStartPosition | null = useMemo(() => {
     if (
@@ -753,7 +724,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
     to: Square,
     promotion?: PromotionPiece,
   ) {
-    if (!room || !gameState || !gameState.initial_fen || !canMove) {
+    if (!room || !gameState || !gameState.initial_fen || !canSubmitMove) {
       return;
     }
 
@@ -1309,6 +1280,30 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
               </div>
             )}
 
+            {finished && historyPreviewPly === null && (
+              <VisibleGameResult
+                winner={gameState.winner}
+                playerColor={myColor}
+                reason={gameState.end_reason}
+                actions={
+                  <>
+                    <button
+                      type="button"
+                      disabled={myRematchReady || actionLoading !== null}
+                      onClick={() => void requestRematch()}
+                      className={`mt-5 w-full rounded-xl px-4 py-3 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-50 ${page.accentButton}`}
+                    >
+                      {myRematchReady ? ui("Rematch requested") : ui("Rematch")}
+                    </button>
+                    <Link
+                      to={page.lobby}
+                      className="mt-3 block w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-bold text-zinc-300 transition hover:bg-white/10"
+                    >{ui("Back to lobby")}</Link>
+                  </>
+                }
+              />
+            )}
+
             <div className="relative">
               <Board
                 board={board}
@@ -1357,49 +1352,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                 </div>
               )}
 
-              {finished && historyPreviewPly === null && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[28px] bg-zinc-950/82 p-6 backdrop-blur-sm">
-                  <div
-                    className={`w-full max-w-sm rounded-3xl border ${page.overlayBorder} bg-zinc-900/95 p-7 text-center shadow-2xl`}
-                  >
-                    <p
-                      className={`text-xs font-black uppercase tracking-[0.25em] ${page.overlayEyebrow}`}
-                    >{ui("Game Over")}</p>
 
-                    <h2 className="mt-3 text-3xl font-black text-white">
-                      {gameState.winner === "draw" ? ui("Draw") : gameState.winner === myColor ? ui("You win") : ui("You lose")}
-                    </h2>
-
-                    <p className="mt-2 text-sm text-zinc-500">
-                      {resultReasonLabel(gameState.end_reason)}
-                    </p>
-
-                    <button
-                      type="button"
-                      disabled={myRematchReady || actionLoading !== null}
-                      onClick={() => void requestRematch()}
-                      className={`mt-5 w-full rounded-xl px-4 py-3 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-50 ${page.accentButton}`}
-                    >
-                      {myRematchReady ? ui("Rematch requested") : ui("Rematch")}
-                    </button>
-
-                    {myRematchReady && !opponentRematchReady && (
-                      <p className="mt-3 text-xs font-semibold text-zinc-500">{ui("Waiting for opponent...")}</p>
-                    )}
-
-                    {opponentRematchReady && !myRematchReady && (
-                      <p
-                        className={`mt-3 text-xs font-semibold ${page.accentText}`}
-                      >{ui("Opponent wants a rematch.")}</p>
-                    )}
-
-                    <Link
-                      to={page.lobby}
-                      className="mt-3 block w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-bold text-zinc-300 transition hover:bg-white/10"
-                    >{ui("Back to lobby")}</Link>
-                  </div>
-                </div>
-              )}
             </div>
           </section>
 

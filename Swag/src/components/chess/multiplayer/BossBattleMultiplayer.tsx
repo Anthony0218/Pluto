@@ -1,3 +1,4 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
@@ -269,21 +270,6 @@ function getFinish(
   return null;
 }
 
-function finishLabel(result: FinishedGame): string {
-  if (!result) return "";
-
-  if (result.reason === "boss_hp") {
-    return "The Boss has lost all 5 HP.";
-  }
-
-  if (result.reason === "checkmate") return "Checkmate.";
-  if (result.reason === "stalemate") return "Stalemate.";
-  if (result.reason === "fifty") return "50-move rule.";
-  if (result.reason === "repetition") return "Threefold repetition.";
-  if (result.reason === "resignation") return "Resignation.";
-
-  return "Game finished.";
-}
 
 function Panel({
   title,
@@ -1298,10 +1284,6 @@ export function BossBattleMultiplayerGame() {
       ? Boolean(gameState.white_rematch_ready)
       : Boolean(gameState.black_rematch_ready);
 
-  const opponentRematchReady =
-    myColor === "white"
-      ? Boolean(gameState.black_rematch_ready)
-      : Boolean(gameState.white_rematch_ready);
 
   const rage = getBossRage(displayedBossState);
   async function copyRoomCode() {
@@ -1473,6 +1455,24 @@ export function BossBattleMultiplayerGame() {
               </div>
             )}
 
+            {finishedGame && historyPreviewPly === null && (
+              <VisibleGameResult
+                winner={finishedGame.winner}
+                playerColor={myColor}
+                reason={finishedGame.reason}
+                actions={
+                  <button
+                    type="button"
+                    onClick={requestRematch}
+                    disabled={myRematchReady || Boolean(actionBusy)}
+                    className="mt-5 w-full rounded-xl bg-violet-400 px-4 py-3 font-black text-violet-950 disabled:opacity-50"
+                  >
+                    {myRematchReady ? ui("Waiting for opponent…") : ui("Play again")}
+                  </button>
+                }
+              />
+            )}
+
             <div className="relative">
               <Board
                 board={displayedGame.board()}
@@ -1532,34 +1532,7 @@ export function BossBattleMultiplayerGame() {
                 </div>
               )}
 
-              {finishedGame && historyPreviewPly === null && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[28px] bg-zinc-950/80 p-6 backdrop-blur-sm">
-                  <div className="max-w-sm rounded-3xl border border-violet-300/20 bg-zinc-900 p-6 text-center shadow-2xl">
-                    <p className="text-xs font-black uppercase tracking-[0.25em] text-violet-300">{ui("Game Over")}</p>
 
-                    <h2 className="mt-3 text-3xl font-black">
-                      {finishedGame.winner === "draw" ? ui("Draw") : finishedGame.winner === myColor ? ui("You win") : ui("You lose")}
-                    </h2>
-
-                    <p className="mt-3 text-sm text-zinc-500">
-                      {finishLabel(finishedGame)}
-                    </p>
-
-                    <button
-                      type="button"
-                      onClick={requestRematch}
-                      disabled={myRematchReady || Boolean(actionBusy)}
-                      className="mt-5 w-full rounded-xl bg-violet-400 px-4 py-3 font-black text-violet-950 disabled:opacity-50"
-                    >
-                      {myRematchReady ? ui("Waiting for opponent…") : ui("Play again")}
-                    </button>
-
-                    {opponentRematchReady && !myRematchReady && (
-                      <p className="mt-3 text-xs text-emerald-300">{ui("Opponent wants a rematch.")}</p>
-                    )}
-                  </div>
-                </div>
-              )}
             </div>
           </section>
 

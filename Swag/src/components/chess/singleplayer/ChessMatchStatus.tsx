@@ -166,17 +166,19 @@ export default function ChessMatchStatus({
         </div>
 
         <div className="min-w-0">
-          <p
-            className={`
-              text-[9px]
-              font-black
-              uppercase
-              tracking-[0.2em]
-              ${style.label}
-            `}
-          >
-            {ui(label)}
-          </p>
+          {label && (
+            <p
+              className={`
+                text-[9px]
+                font-black
+                uppercase
+                tracking-[0.2em]
+                ${style.label}
+              `}
+            >
+              {ui(label)}
+            </p>
+          )}
 
           <div className="mt-0.5 flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
             <p className="min-w-0 text-sm font-semibold text-[#f5e8cf]">

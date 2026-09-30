@@ -1,3 +1,4 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
@@ -341,13 +342,6 @@ function findCheckedKing(game: Chess): Square | null {
   return findTectonicKingSquare(game, game.turn());
 }
 
-function resultLabel(game: VariantGame) {
-  const reason = game.end_reason ?? "Game over";
-  if (game.winner === "draw") return `Draw · ${reason}`;
-  if (game.winner === "white") return `White wins · ${reason}`;
-  if (game.winner === "black") return `Black wins · ${reason}`;
-  return reason;
-}
 
 function Panel({
   title,
@@ -656,10 +650,6 @@ export function TectonicMultiplayerGame() {
     () => players.find((player) => player.user_id === user?.id) ?? null,
     [players, user?.id],
   );
-  const opponent = useMemo(
-    () => players.find((player) => player.user_id !== user?.id) ?? null,
-    [players, user?.id],
-  );
   const myColor = myPlayer?.chosen_color ?? null;
   const orientation: "white" | "black" =
     myColor === "black" ? "black" : "white";
@@ -758,16 +748,16 @@ export function TectonicMultiplayerGame() {
   const isMyTurn = Boolean(myChessColor) && liveGame.turn() === myChessColor;
   const undoPending = Boolean(gameState?.undo_requested_by);
 
-  const canNormalMove =
+  const canSubmitNormalMove =
     room?.status === "playing" &&
     gameState?.status === "playing" &&
     isMyTurn &&
     !tectonic.pendingShift &&
     !moving &&
     actionLoading === null &&
-    !pendingPromotion &&
     historyPreviewIndex === null &&
     !undoPending;
+  const canNormalMove = canSubmitNormalMove && !pendingPromotion;
 
   const canShift =
     room?.status === "playing" &&
@@ -810,12 +800,6 @@ export function TectonicMultiplayerGame() {
         ? Boolean(gameState?.black_rematch_ready)
         : false;
 
-  const opponentRematchReady =
-    opponent?.chosen_color === "white"
-      ? Boolean(gameState?.white_rematch_ready)
-      : opponent?.chosen_color === "black"
-        ? Boolean(gameState?.black_rematch_ready)
-        : false;
 
   const shiftHistory = history.filter((entry) => entry.kind === "shift");
   const rotations = shiftHistory.filter(
@@ -1085,7 +1069,7 @@ export function TectonicMultiplayerGame() {
     to: Square,
     promotion?: PromotionPiece,
   ) {
-    if (!gameState || !canNormalMove) return;
+    if (!gameState || !canSubmitNormalMove) return;
 
     const nextGame = new Chess(liveGame.fen(), { skipValidation: true });
     let move: ReturnType<Chess["move"]>;
@@ -1545,12 +1529,11 @@ export function TectonicMultiplayerGame() {
           <section className="min-w-0">
             <div className="mx-auto max-w-[820px]">
               {gameState.status === "finished" && (
-                <div className="mb-3 rounded-2xl border border-violet-400/20 bg-violet-400/[0.07] p-4">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-violet-300">{ui("Game Over")}</p>
-                  <p className="mt-1 text-lg font-black text-white">
-                    {resultLabel(gameState)}
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
+                <VisibleGameResult
+                  winner={gameState.winner}
+                  playerColor={myColor}
+                  reason={gameState.end_reason}
+                  actions={
                     <button
                       type="button"
                       disabled={myRematchReady || actionLoading !== null}
@@ -1559,11 +1542,8 @@ export function TectonicMultiplayerGame() {
                     >
                       {myRematchReady ? ui("Rematch requested") : ui("Play Again")}
                     </button>
-                    {opponentRematchReady && (
-                      <span className="rounded-xl bg-white/5 px-3 py-2 text-xs text-zinc-400">{ui("Opponent ready")}</span>
-                    )}
-                  </div>
-                </div>
+                  }
+                />
               )}
 
               {historyPreviewIndex !== null && (

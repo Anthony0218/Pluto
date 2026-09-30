@@ -5,7 +5,6 @@ const games: Array<[prefix: string, brand: Omit<PageBrand, "mode">]> = [
   ["/games/atlas-arena", { name: "Atlas Arena", accent: "#38bdf8", surface: "#101b2c" }],
   ["/games/eat-it", { name: "Eat It", accent: "#fb923c" }],
   ["/games/go", { name: "Go", accent: "#d4d4d8", surface: "#0b0e11" }],
-  ["/games/shogi", { name: "Shogi", accent: "#f87171", surface: "#0b0e11" }],
   ["/games/schafkopf", { name: "Schafkopf", accent: "#fbbf24", surface: "#141518" }],
   ["/games/watten", { name: "Watten", accent: "#34d399", surface: "#173d2e" }],
   ["/games/medieval-kingdoms", { name: "Medieval Kingdoms", accent: "#fbbf24", surface: "#211a10" }],

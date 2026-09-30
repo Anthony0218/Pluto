@@ -1,3 +1,4 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import { playChessSound } from "@/games/chess/audio/chessAudio";
@@ -383,37 +384,6 @@ function getCheckedKingSquare(game: Chess): Square | null {
   return findTectonicKingSquare(game, game.turn());
 }
 
-function resultText(result: FinishedGame, t: (key: string) => string): string {
-  if (!result) {
-    return "";
-  }
-
-  if (result.reason === "checkmate") {
-    return result.winner === "white"
-      ? t("White wins by checkmate.")
-      : t("Black wins by checkmate.");
-  }
-
-  if (result.reason === "tectonic_lock") {
-    return result.winner === "white"
-      ? t("White wins: Black has no legal Tectonic escape.")
-      : t("Black wins: White has no legal Tectonic escape.");
-  }
-
-  if (result.reason === "stalemate") {
-    return t("Stalemate. Draw.");
-  }
-
-  if (result.reason === "insufficient") {
-    return t("Insufficient material. Draw.");
-  }
-
-  if (result.reason === "fifty") {
-    return t("50-move rule. Draw.");
-  }
-
-  return t("Threefold repetition. Draw.");
-}
 
 type VariantAiBoardProps = {
   aiMode?: boolean;
@@ -1108,6 +1078,20 @@ export default function TectonicChess({
               </div>
             )}
 
+            {finishedGame && !historyPreview && (
+              <VisibleGameResult
+                actions={
+                  <button
+                    type="button"
+                    onClick={restart}
+                    className="mt-5 rounded-xl bg-violet-400 px-4 py-2.5 text-sm font-black text-violet-950"
+                  >
+                    {t("Play again")}
+                  </button>
+                }
+              />
+            )}
+
             <div className="relative">
               <Board
                 board={displayedBoard}
@@ -1134,32 +1118,6 @@ export default function TectonicChess({
                 hovered={hoveredQuadrant}
                 locked={tectonic.lockedQuadrant}
               />
-
-              {finishedGame && !historyPreview && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[28px] bg-zinc-950/82 p-6 backdrop-blur-sm">
-                  <div className="max-w-sm rounded-3xl border border-violet-300/20 bg-zinc-900 p-6 text-center shadow-2xl">
-                    <p className="text-xs font-black uppercase tracking-[0.25em] text-violet-300">
-                      {t("Game Over")}
-                    </p>
-
-                    <h2 className="mt-3 text-3xl font-black text-white">
-                      {finishedGame.winner === "white" ? t("White wins") : finishedGame.winner === "black" ? t("Black wins") : t("Draw")}
-                    </h2>
-
-                    <p className="mt-3 text-sm leading-6 text-zinc-500">
-                      {resultText(finishedGame, t)}
-                    </p>
-
-                    <button
-                      type="button"
-                      onClick={restart}
-                      className="mt-5 rounded-xl bg-violet-400 px-4 py-2.5 text-sm font-black text-violet-950"
-                    >
-                      {t("Play again")}
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </section>
 

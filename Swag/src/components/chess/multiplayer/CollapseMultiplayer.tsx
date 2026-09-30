@@ -1,3 +1,4 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
@@ -949,10 +950,6 @@ export function CollapseMultiplayerGame() {
     myColor === "white"
       ? Boolean(gameState.white_rematch_ready)
       : Boolean(gameState.black_rematch_ready);
-  const opponentRematchReady =
-    myColor === "white"
-      ? Boolean(gameState.black_rematch_ready)
-      : Boolean(gameState.white_rematch_ready);
 
   const statusText = collapseCoreReached(displayedCollapse.bounds)
     ? "Central core reached"
@@ -1081,6 +1078,24 @@ export function CollapseMultiplayerGame() {
               </div>
             )}
 
+            {finished && historyPreviewPly === null && (
+              <VisibleGameResult
+                winner={finished.outcome}
+                playerColor={myColor}
+                reason={finished.reason}
+                actions={
+                  <button
+                    type="button"
+                    onClick={requestRematch}
+                    disabled={myRematchReady || Boolean(actionBusy)}
+                    className="mt-5 w-full rounded-xl bg-red-400 px-4 py-3 font-black text-red-950 disabled:opacity-50"
+                  >
+                    {myRematchReady ? ui("Waiting for opponent…") : ui("Play again")}
+                  </button>
+                }
+              />
+            )}
+
             <div className="relative">
               <Board
                 board={displayedGame.board()}
@@ -1133,30 +1148,7 @@ export function CollapseMultiplayerGame() {
                 </div>
               )}
 
-              {finished && historyPreviewPly === null && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[28px] bg-zinc-950/80 p-6 backdrop-blur-sm">
-                  <div className="max-w-sm rounded-3xl border border-red-300/20 bg-zinc-900 p-6 text-center shadow-2xl">
-                    <p className="text-xs font-black uppercase tracking-[0.25em] text-red-300">{ui("Game Over")}</p>
-                    <h2 className="mt-3 text-3xl font-black">
-                      {finished.outcome === "draw" ? ui("Draw") : finished.outcome === myColor ? ui("You win") : ui("You lose")}
-                    </h2>
-                    <p className="mt-3 text-sm text-zinc-500">
-                      {finished.reason === "trapped" ? ui("A king was trapped by the collapsing edge.") : finished.reason === "lives" ? ui("A king ran out of Collapse lives.") : finished.reason === "resignation" ? ui("The game ended by resignation.") : finished.reason === "checkmate" ? ui("Checkmate.") : ui("Draw.")}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={requestRematch}
-                      disabled={myRematchReady || Boolean(actionBusy)}
-                      className="mt-5 w-full rounded-xl bg-red-400 px-4 py-3 font-black text-red-950 disabled:opacity-50"
-                    >
-                      {myRematchReady ? ui("Waiting for opponent…") : ui("Play again")}
-                    </button>
-                    {opponentRematchReady && !myRematchReady && (
-                      <p className="mt-3 text-xs text-emerald-300">{ui("Opponent wants a rematch.")}</p>
-                    )}
-                  </div>
-                </div>
-              )}
+
             </div>
           </section>
 

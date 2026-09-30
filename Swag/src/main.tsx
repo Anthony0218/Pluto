@@ -164,11 +164,8 @@ import SchafkopfGame from "./components/Schafkopf/SchafkopfGame.tsx";
 import SchafkopfMultiplayerGame from "./components/Schafkopf/SchafkopfMultiplayerGame.tsx";
 import GoMenu from "./pages/games/Go/GoMenu.tsx";
 import GoGamePage from "./pages/games/Go/GoGamePage.tsx";
-import ShogiMenu from "./pages/games/Shogi/ShogiMenu.tsx";
-import ShogiGamePage from "./pages/games/Shogi/ShogiGamePage.tsx";
 import StrategyMultiplayer from "./components/strategy/StrategyMultiplayer.tsx";
 import GoRules from "./components/strategy/GoRules.tsx";
-import ShogiRules from "./components/strategy/ShogiRules.tsx";
 const PartyPage = React.lazy(() => import("./pages/games/Party/PartyPage.tsx"));
 const AtlasArenaPage = React.lazy(() => import("./pages/games/AtlasArena/AtlasArenaPage.tsx"));
 const EatItPage = React.lazy(() => import("./pages/games/EatIt/EatItPage.tsx"));
@@ -228,12 +225,6 @@ const router = createBrowserRouter([
           { path: "/games/go/hotseat", element: <GoGamePage mode="hotseat" /> },
           { path: "/games/go/multiplayer", element: <StrategyMultiplayer gameType="go" /> },
           { path: "/games/go/multiplayer/:roomCode", element: <StrategyMultiplayer gameType="go" /> },
-          { path: "/games/shogi", element: <ShogiMenu /> },
-          { path: "/games/shogi/rules", element: <ShogiRules /> },
-          { path: "/games/shogi/ai", element: <ShogiGamePage mode="ai" /> },
-          { path: "/games/shogi/hotseat", element: <ShogiGamePage mode="hotseat" /> },
-          { path: "/games/shogi/multiplayer", element: <StrategyMultiplayer gameType="shogi" /> },
-          { path: "/games/shogi/multiplayer/:roomCode", element: <StrategyMultiplayer gameType="shogi" /> },
           {
             path: "/profile",
             element: <ProfilePage />,

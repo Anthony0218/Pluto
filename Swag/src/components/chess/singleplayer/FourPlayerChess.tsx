@@ -1,3 +1,4 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import { FOUR_PLAYER_HISTORY_SIDES } from "../moveHistorySides";
@@ -526,6 +527,20 @@ export default function FourPlayerChess({
               </div>
             )}
 
+            {state.winner && (
+              <VisibleGameResult
+                actions={
+                  <button
+                    type="button"
+                    onClick={restart}
+                    className="mt-5 rounded-xl bg-white px-4 py-2.5 text-sm font-black text-zinc-950"
+                  >
+                    {t("Play again")}
+                  </button>
+                }
+              />
+            )}
+
             <div className="relative">
               <FourPlayerBoard
                 state={state}
@@ -534,36 +549,6 @@ export default function FourPlayerChess({
                 checkedKingSquare={checkedKingSquare}
                 onSquareClick={selectOrMove}
               />
-
-              {state.winner && (
-                <div className="absolute inset-0 z-40 flex items-center justify-center rounded-[28px] bg-zinc-950/80 p-6 backdrop-blur-sm">
-                  <div
-                    className={`max-w-sm rounded-3xl border bg-zinc-900 p-6 text-center shadow-2xl ${
-                      playerStyles[state.winner].border
-                    }`}
-                  >
-                    <p className="text-xs font-black uppercase tracking-[0.25em] text-zinc-500">
-                      {t("Last Player Standing")}
-                    </p>
-
-                    <h2
-                      className={`mt-3 text-3xl font-black ${
-                        playerStyles[state.winner].text
-                      }`}
-                    >
-                      {t(fourPlayerLabel(state.winner))} {t("wins")}
-                    </h2>
-
-                    <button
-                      type="button"
-                      onClick={restart}
-                      className="mt-5 rounded-xl bg-white px-4 py-2.5 text-sm font-black text-zinc-950"
-                    >
-                      {t("Play again")}
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </section>
 

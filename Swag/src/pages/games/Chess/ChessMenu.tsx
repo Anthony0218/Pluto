@@ -8,6 +8,7 @@ type ChessMode = {
   path: string;
   icon: string;
   eyebrow: string;
+  disabled?: boolean;
 };
 
 const modes: ChessMode[] = [
@@ -32,6 +33,7 @@ const modes: ChessMode[] = [
     path: "/games/chess/custom",
     icon: "⚙",
     eyebrow: "Build your own",
+    disabled: true,
   },
 ];
 
@@ -76,24 +78,23 @@ export default function ChessMenu() {
 
           <div className="relative flex min-h-[560px] items-center border-t border-white/[0.06] px-5 py-8 sm:px-8 lg:min-h-0 lg:border-t-0 lg:px-10 lg:py-12 xl:px-14 2xl:px-20">
             <div className="mx-auto flex w-full max-w-[980px] flex-col gap-4 xl:gap-5">
-              {modes.map((mode, index) => (
-                <Link
-                  key={mode.path}
-                  to={mode.path}
-                  className={`group relative overflow-hidden rounded-[22px] border bg-black/20 p-5 shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 sm:p-6 xl:p-7 ${
+              {modes.map((mode, index) => {
+                const cardClassName = `group relative overflow-hidden rounded-[22px] border bg-black/20 p-5 shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md sm:p-6 xl:p-7 ${mode.disabled ? "cursor-not-allowed border-white/[0.06]" : "transition duration-300 hover:-translate-y-0.5"} ${
                     index === 0
                       ? "border-amber-300/45 bg-amber-300/[0.035]"
-                      : "border-white/[0.09] hover:border-amber-300/30 hover:bg-white/[0.035]"
-                  }`}
-                >
-                  <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(105deg,rgba(245,158,11,.065),transparent_38%)] opacity-0 transition duration-300 group-hover:opacity-100" />
+                      : mode.disabled ? "" : "border-white/[0.09] hover:border-amber-300/30 hover:bg-white/[0.035]"
+                  }`;
+                const content = <>
+                  {!mode.disabled && <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(105deg,rgba(245,158,11,.065),transparent_38%)] opacity-0 transition duration-300 group-hover:opacity-100" />}
 
                   <div className="relative flex items-center gap-4 sm:gap-6">
                     <div
                       className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border text-[30px] shadow-inner transition duration-300 sm:h-[74px] sm:w-[74px] ${
                         index === 0
                           ? "border-amber-300/35 bg-amber-300/10 text-amber-200"
-                          : "border-white/10 bg-white/[0.035] text-zinc-400 group-hover:border-amber-300/25 group-hover:text-zinc-100"
+                          : mode.disabled
+                            ? "border-white/[0.06] bg-white/[0.02] text-zinc-600"
+                            : "border-white/10 bg-white/[0.035] text-zinc-400 group-hover:border-amber-300/25 group-hover:text-zinc-100"
                       }`}
                     >
                       {mode.icon}
@@ -105,15 +106,15 @@ export default function ChessMenu() {
                       >
                         {ui(mode.eyebrow)}
                       </p>
-                      <h2 className="mt-1.5 font-serif text-[27px] leading-tight text-white sm:text-[31px] xl:text-[34px]">
-                        {ui(mode.title)}
+                      <h2 className={`mt-1.5 font-serif text-[27px] leading-tight sm:text-[31px] xl:text-[34px] ${mode.disabled ? "text-zinc-500" : "text-white"}`}>
+                        {ui(mode.title)} {mode.disabled && <span className="ml-2 inline-block align-middle rounded-full border border-amber-300/30 bg-amber-300/10 px-2 py-1 font-sans text-[10px] font-bold uppercase tracking-wider text-amber-200">{ui("Coming soon")}</span>}
                       </h2>
                       <p className="mt-2 max-w-[650px] text-sm leading-6 text-zinc-500 sm:text-[15px]">
                         {ui(mode.description)}
                       </p>
                     </div>
 
-                    <span
+                    {!mode.disabled && <span
                       className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border text-xl transition duration-300 group-hover:translate-x-1 sm:h-12 sm:w-12 ${
                         index === 0
                           ? "border-amber-300/45 text-amber-300"
@@ -121,10 +122,13 @@ export default function ChessMenu() {
                       }`}
                     >
                       →
-                    </span>
+                    </span>}
                   </div>
-                </Link>
-              ))}
+                </>;
+                return mode.disabled
+                  ? <div key={mode.path} aria-disabled="true" className={cardClassName}>{content}</div>
+                  : <Link key={mode.path} to={mode.path} className={cardClassName}>{content}</Link>;
+              })}
 
               <Link
                 to="/games/chess/rules"

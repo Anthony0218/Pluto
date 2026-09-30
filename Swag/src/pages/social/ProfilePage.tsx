@@ -59,20 +59,17 @@ const trackedGames = new Set([
   "watten",
   "atlas",
   "go",
-  "shogi",
   "eat-it",
 ]);
 const statTabs = [
   { id: "general", label: "General" },
   { id: "chess", label: "Chess" },
-  { id: "chess3d", label: "Chess 3D" },
   { id: "schafkopf", label: "Schafkopfen" },
   { id: "watten", label: "Watten" },
   { id: "natura", label: "Natura" },
   { id: "atlas", label: "Atlas Arena" },
   { id: "medieval", label: "Medieval Kingdoms" },
   { id: "go", label: "Go" },
-  { id: "shogi", label: "Shogi" },
   { id: "eat-it", label: "Eat It" },
 ] as const;
 

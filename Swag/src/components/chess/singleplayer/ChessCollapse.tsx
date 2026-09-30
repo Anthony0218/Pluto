@@ -1,3 +1,4 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import { playChessSound } from "@/games/chess/audio/chessAudio";
@@ -296,39 +297,6 @@ function hearts(lives: number): string {
   )}`;
 }
 
-function resultText(
-  result: FinishedGame,
-  lives: CollapseKingLives,
-  t: (key: string) => string,
-): string {
-  if (!result) return "";
-  if (result.outcome === "draw") {
-    return result.reason === "lives"
-      ? t("Both kings lost their final life. Draw.")
-      : t("The game ended in a draw.");
-  }
-  if (result.reason === "checkmate") {
-    return result.outcome === "white"
-      ? t("White wins by checkmate.")
-      : t("Black wins by checkmate.");
-  }
-  if (result.reason === "trapped") {
-    return result.outcome === "white"
-      ? t(
-          "Black king was trapped in the collapsing danger zone with no legal escape! White wins.",
-        )
-      : t(
-          "White king was trapped in the collapsing danger zone with no legal escape! Black wins.",
-        );
-  }
-  const loserLives = result.outcome === "white" ? lives.b : lives.w;
-  if (loserLives <= 0) {
-    return result.outcome === "white"
-      ? t("Black king has no lives left! White wins.")
-      : t("White king has no lives left! Black wins.");
-  }
-  return result.outcome === "white" ? t("White wins") : t("Black wins");
-}
 
 function getHistoryPieceSymbol(color: CollapseSide, piece: PieceType) {
   const symbols: Record<CollapseSide, Record<PieceType, string>> = {
@@ -1056,21 +1024,7 @@ export default function ChessCollapseBoard({
           <section className="min-w-0">
             <div className="mx-auto max-w-[820px]">
               {finishedGame && !historyPreview && (
-                <div className="mb-3 rounded-2xl border border-red-500/20 bg-red-400/[0.07] px-4 py-3">
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-widest text-red-400">
-                        {t("Game Over")}
-                      </p>
-                      <p className="mt-1 font-black text-white">
-                        {resultText(finishedGame, kingLives, t)}
-                      </p>
-                    </div>
-                    <span className="text-2xl" aria-hidden="true">
-                      {finishedGame.reason === "trapped" ? "☠" : finishedGame.reason === "lives" ? "💥" : "♚"}
-                    </span>
-                  </div>
-                </div>
+                <VisibleGameResult />
               )}
 
               {pendingPromotion && !historyPreview && (

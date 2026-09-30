@@ -1,3 +1,4 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
@@ -232,14 +233,6 @@ function findCheckedKing(game: Chess): Square | null {
   return null;
 }
 
-function resultLabel(game: VariantGame) {
-  if (game.winner === "draw") return `Draw · ${game.end_reason ?? "Game over"}`;
-  if (game.winner === "white")
-    return `White wins · ${game.end_reason ?? "Game over"}`;
-  if (game.winner === "black")
-    return `Black wins · ${game.end_reason ?? "Game over"}`;
-  return game.end_reason ?? "Game over";
-}
 
 function localSetupKey(roomId: string, userId: string, round: number) {
   return `draft-multiplayer:${roomId}:${userId}:round-${round}`;
@@ -490,16 +483,16 @@ export function DraftMultiplayerGame() {
 
   const undoPending = Boolean(gameState?.undo_requested_by);
   const isMyTurn = Boolean(mySide) && liveGame.turn() === mySide;
-  const canMove =
+  const canSubmitMove =
     phase === "playing" &&
     room?.status === "playing" &&
     gameState?.status === "playing" &&
     isMyTurn &&
     !moving &&
     actionLoading === null &&
-    !pendingPromotion &&
     historyPreviewPly === null &&
     !undoPending;
+  const canMove = canSubmitMove && !pendingPromotion;
 
   const lastMove = historyRows[historyRows.length - 1] ?? null;
   const lastMoverColor = lastMove ? sideToColor(lastMove.color) : null;
@@ -525,12 +518,6 @@ export function DraftMultiplayerGame() {
     myColor === "white"
       ? Boolean(gameState?.white_rematch_ready)
       : myColor === "black"
-        ? Boolean(gameState?.black_rematch_ready)
-        : false;
-  const opponentRematchReady =
-    opponent?.chosen_color === "white"
-      ? Boolean(gameState?.white_rematch_ready)
-      : opponent?.chosen_color === "black"
         ? Boolean(gameState?.black_rematch_ready)
         : false;
 
@@ -856,7 +843,7 @@ export function DraftMultiplayerGame() {
     to: Square,
     promotion?: PromotionPiece,
   ) {
-    if (!room || !gameState || !gameState.fen || !canMove) return;
+    if (!room || !gameState || !gameState.fen || !canSubmitMove) return;
     const local = new Chess(gameState.fen);
     let move;
     try {
@@ -1228,12 +1215,11 @@ export function DraftMultiplayerGame() {
               )}
 
               {gameState.status === "finished" && (
-                <div className="mb-4 rounded-3xl border border-emerald-400/20 bg-emerald-400/[0.06] p-5">
-                  <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-300">{ui("Game Over")}</p>
-                  <h2 className="mt-2 text-xl font-black text-white">
-                    {resultLabel(gameState)}
-                  </h2>
-                  <div className="mt-4 flex flex-wrap gap-2">
+                <VisibleGameResult
+                  winner={gameState.winner}
+                  playerColor={myColor}
+                  reason={gameState.end_reason}
+                  actions={
                     <button
                       disabled={myRematchReady}
                       onClick={() => void rematch()}
@@ -1241,11 +1227,8 @@ export function DraftMultiplayerGame() {
                     >
                       {myRematchReady ? ui("Rematch requested") : ui("Rematch")}
                     </button>
-                    {opponentRematchReady && (
-                      <span className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs font-bold text-zinc-300">{ui("Opponent ready")}</span>
-                    )}
-                  </div>
-                </div>
+                  }
+                />
               )}
 
               <div className="relative">

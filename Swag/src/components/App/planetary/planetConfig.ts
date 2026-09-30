@@ -1,21 +1,30 @@
 import { games } from "@/data/games";
 
 export type PlanetConfig = {
-  id: string; label: string; route: string; description: string; symbol: string;
-  radius: number; orbitRadius: number; orbitSpeed: number; rotationSpeed: number;
-  color: string; emissive: string; startAngle: number;
+  id: string;
+  label: string;
+  route: string;
+  symbol: string;
+  tone: string;
+  position: string;
+  primary?: boolean;
+  ring?: boolean;
 };
-const symbols: Record<string, string> = {
-  "/games/eat-it": "◔",
-  "/games/chess": "♞", "/games/chess/3dchess": "♜", "/games/shogi": "王",
-  "/games/watten": "♦", "/games/schafkopf": "♣", "/games/go": "●",
-  "/games/atlas-arena": "◈", "/games/medieval-kingdoms": "⚔", "/games/natura": "✿",
-};
-const colors = ["#8faaff", "#f5d99f", "#bdabf9", "#e9a9ae", "#9fd9bd", "#a4d9e7", "#d3b48e", "#c5b0e2", "#b4d5a2"];
-export const planets: PlanetConfig[] = games.map((game, index) => ({
-  id: game.route, label: game.title, route: game.route, description: game.subtitle,
-  symbol: symbols[game.route] ?? "✦", radius: 0.34 + index % 3 * 0.045,
-  orbitRadius: 2.0 + index % 3 * 0.62, orbitSpeed: (index % 2 ? -1 : 1) * (0.06 + index % 3 * 0.013),
-  rotationSpeed: 0.16 + index % 4 * 0.04, color: colors[index % colors.length],
-  emissive: colors[index % colors.length], startAngle: index * Math.PI * 2 / games.length,
+
+const sceneGames = [
+  { route: "/games/atlas-arena", symbol: "◈", tone: "atlas", position: "atlas", ring: true },
+  { route: "/games/go", symbol: "●", tone: "go", position: "go", ring: true },
+  { route: "/games/schafkopf", symbol: "♣", tone: "schafkopf", position: "schafkopf", ring: true, primary: true },
+  { route: "/games/chess", symbol: "♘", tone: "chess", position: "chess", ring: true, primary: true },
+  { route: "/games/watten", symbol: "♦", tone: "watten", position: "watten", ring: true, primary: true },
+  { route: "/games/natura", symbol: "✿", tone: "natura", position: "natura", ring: true },
+  { route: "/games/medieval-kingdoms", symbol: "♜", tone: "kingdoms", position: "kingdoms" },
+  { route: "/games/pluto-party", symbol: "✦", tone: "party", position: "party", ring: true },
+  { route: "/games/eat-it", symbol: "◕", tone: "eat-it", position: "eat-it", ring: true },
+] as const;
+
+export const planets: PlanetConfig[] = sceneGames.map(scene => ({
+  ...scene,
+  id: scene.route,
+  label: games.find(game => game.route === scene.route)?.title ?? scene.route,
 }));

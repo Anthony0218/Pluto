@@ -1,3 +1,4 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import { FOUR_PLAYER_HISTORY_SIDES } from "../moveHistorySides";
@@ -941,6 +942,24 @@ export function FourPlayerMultiplayerGame() {
               </div>
             )}
 
+            {liveState.winner && historyPreviewIndex === null && (
+              <VisibleGameResult
+                winner={liveState.winner}
+                playerColor={myColor}
+                reason="last player standing"
+                actions={
+                  <button
+                    type="button"
+                    disabled={myRematchReady}
+                    onClick={() => void rematch()}
+                    className="mt-5 rounded-xl bg-white px-4 py-2.5 text-sm font-black text-zinc-950 disabled:opacity-40"
+                  >
+                    {myRematchReady ? ui("Rematch requested") : ui("Request rematch")}
+                  </button>
+                }
+              />
+            )}
+
             <div className="relative">
               <FourPlayerBoard
                 state={displayedState}
@@ -987,29 +1006,7 @@ export function FourPlayerMultiplayerGame() {
                 </div>
               )}
 
-              {liveState.winner && historyPreviewIndex === null && (
-                <div className="absolute inset-0 z-40 flex items-center justify-center rounded-[28px] bg-zinc-950/80 p-6 backdrop-blur-sm">
-                  <div
-                    className={`max-w-sm rounded-3xl border bg-zinc-900 p-6 text-center shadow-2xl ${playerStyles[liveState.winner].border}`}
-                  >
-                    <p className="text-xs font-black uppercase tracking-[0.25em] text-zinc-500">{ui("Last Player Standing")}</p>
-                    <h2
-                      className={`mt-3 text-3xl font-black ${playerStyles[liveState.winner].text}`}
-                    >
-                      {fourPlayerLabel(liveState.winner)}{ui("wins")}</h2>
-                    <button
-                      type="button"
-                      disabled={myRematchReady}
-                      onClick={() => void rematch()}
-                      className="mt-5 rounded-xl bg-white px-4 py-2.5 text-sm font-black text-zinc-950 disabled:opacity-40"
-                    >
-                      {myRematchReady ? ui("Rematch requested") : ui("Request rematch")}
-                    </button>
-                    <p className="mt-3 text-[10px] text-zinc-500">
-                      {rematchReady.length}/{players.length}{ui("players ready")}</p>
-                  </div>
-                </div>
-              )}
+
             </div>
           </section>
 

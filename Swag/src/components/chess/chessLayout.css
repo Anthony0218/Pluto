@@ -13,6 +13,7 @@
 .chess-game-grid { --board-size: min(820px,calc(100dvh - 16rem)); --side-width: clamp(240px,18vw,320px); gap: 16px; }
 .chess-game-grid > aside section { border-color: #fbbf2426; background-color: #091019e6; border-radius: 20px; }
 .chess-game-grid > aside { min-width: 0; scrollbar-width: thin; }
+.chess-variant-result-actions > * { width: auto !important; max-width: 100%; margin: 0 !important; }
 .chess-sidebar-toggle { display: none; }
 body:has(.chess-game-grid) .chess-sidebar-toggle { display: block; }
 @media (min-width:1280px) {

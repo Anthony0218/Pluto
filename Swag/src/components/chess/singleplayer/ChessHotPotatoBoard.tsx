@@ -1,3 +1,4 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import { playChessSound, stopSound } from "@/games/chess/audio/chessAudio";
@@ -278,25 +279,6 @@ const pieceValues: Record<PieceType, number> = {
    HELPERS
    ========================================================= */
 
-function resultText(result: FinishedGame, t: (key: string) => string): string {
-  if (!result) return "";
-
-  if (result.outcome === "draw") {
-    return result.reason === "explosion"
-      ? t("Both kings blown up! Draw.")
-      : t("The game ended in a draw.");
-  }
-
-  if (result.reason === "explosion") {
-    return result.outcome === "white"
-      ? t("King blown up! White wins.")
-      : t("King blown up! Black wins.");
-  }
-
-  return result.outcome === "white"
-    ? t("White wins by checkmate.")
-    : t("Black wins by checkmate.");
-}
 
 function getHistoryPieceSymbol(color: "w" | "b", piece: PieceType) {
   const symbols: Record<"w" | "b", Record<PieceType, string>> = {
@@ -1170,20 +1152,7 @@ export default function ChessHotPotatoBoard({
           <section className="min-w-0">
             <div className="mx-auto max-w-[820px]">
               {finishedGame && !historyPreview && (
-                <div className="mb-3 rounded-2xl border border-amber-500/20 bg-amber-400/[0.07] px-4 py-3">
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-widest text-amber-400">{ui("Game Over")}</p>
-                      <p className="mt-1 font-black text-white">
-                        {resultText(finishedGame, t)}
-                      </p>
-                    </div>
-
-                    <span className="text-2xl" aria-hidden="true">
-                      {finishedGame.reason === "explosion" ? "💥" : "♚"}
-                    </span>
-                  </div>
-                </div>
+                <VisibleGameResult />
               )}
 
               {pendingPromotion && !historyPreview && (

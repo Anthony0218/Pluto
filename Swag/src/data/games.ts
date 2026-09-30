@@ -53,17 +53,6 @@ export const games: Game[] = [
     finished: false,
   },
   {
-    title: "Shogi",
-    subtitle: "Japanese chess",
-    description:
-      "Promote pieces and return captures to the board in a complete game of Japanese Shogi.",
-    image: "/images/shogi-home.svg",
-    route: "/games/shogi",
-    tag: "Strategy",
-    features: ["Drops", "Vs Bot", "Multiplayer"],
-    finished: false,
-  },
-  {
     title: "Schafkopf",
     subtitle: "Bayerisches Partnerspiel",
     description:
@@ -97,17 +86,6 @@ export const games: Game[] = [
     finished: true,
   },
 
-  {
-    title: "Schach 3D",
-    subtitle: "Schach in einer neuen Dimension",
-    description:
-      "Erlebe klassisches Schach auf einem animierten 3D-Brett – lokal im Hotseat oder gegen Stockfish mit mehreren Schwierigkeitsstufen.",
-    image: "/images/chess3d.png",
-    route: "/games/chess/3dchess",
-    tag: "Strategie · 3D",
-    features: ["3D-Brett", "Hotseat", "Stockfish AI"],
-    finished: true,
-  },
   {
     title: "Medieval Kingdoms",
     subtitle: "Rundenbasierte Strategie",

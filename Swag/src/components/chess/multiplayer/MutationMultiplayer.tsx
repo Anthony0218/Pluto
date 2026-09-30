@@ -1,3 +1,4 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
@@ -263,14 +264,6 @@ function formatMutation(event: MutationEvent) {
   return `${color} ${pieceNames[event.fromType]} on ${event.square} → ${pieceNames[event.toType]}`;
 }
 
-function resultLabel(game: VariantGame) {
-  if (game.winner === "draw") return `Draw · ${game.end_reason ?? "Game over"}`;
-  if (game.winner === "white")
-    return `White wins · ${game.end_reason ?? "Game over"}`;
-  if (game.winner === "black")
-    return `Black wins · ${game.end_reason ?? "Game over"}`;
-  return game.end_reason ?? "Game over";
-}
 
 function Panel({
   title,
@@ -500,10 +493,6 @@ export function MutationMultiplayerGame() {
     () => players.find((player) => player.user_id === user?.id) ?? null,
     [players, user?.id],
   );
-  const opponent = useMemo(
-    () => players.find((player) => player.user_id !== user?.id) ?? null,
-    [players, user?.id],
-  );
   const myColor = myPlayer?.chosen_color ?? null;
   const orientation: "white" | "black" =
     myColor === "black" ? "black" : "white";
@@ -574,15 +563,15 @@ export function MutationMultiplayerGame() {
     Boolean(myColor) && liveGame.turn() === colorToChess(myColor!);
   const undoPending = Boolean(gameState?.undo_requested_by);
 
-  const canMove =
+  const canSubmitMove =
     room?.status === "playing" &&
     gameState?.status === "playing" &&
     isMyTurn &&
     !moving &&
     actionLoading === null &&
-    !pendingPromotion &&
     historyPreviewPly === null &&
     !undoPending;
+  const canMove = canSubmitMove && !pendingPromotion;
 
   const lastHistoryMove = historyRows.at(-1) ?? null;
   const lastMoverColor = lastHistoryMove
@@ -615,12 +604,6 @@ export function MutationMultiplayerGame() {
         ? Boolean(gameState?.black_rematch_ready)
         : false;
 
-  const opponentRematchReady =
-    opponent?.chosen_color === "white"
-      ? Boolean(gameState?.white_rematch_ready)
-      : opponent?.chosen_color === "black"
-        ? Boolean(gameState?.black_rematch_ready)
-        : false;
 
   const mutations = useMemo(
     () => historyRows.filter((row) => row.mutation).map((row) => row.mutation!),
@@ -812,7 +795,7 @@ export function MutationMultiplayerGame() {
     to: Square,
     promotion?: PromotionPiece,
   ) {
-    if (!room || !gameState || !gameState.fen || !canMove) return;
+    if (!room || !gameState || !gameState.fen || !canSubmitMove) return;
 
     const localGame = new Chess(gameState.fen);
     let move: ReturnType<Chess["move"]>;
@@ -1247,12 +1230,11 @@ export function MutationMultiplayerGame() {
           <section className="min-w-0">
             <div className="mx-auto max-w-[820px]">
               {gameState.status === "finished" && (
-                <div className="mb-3 rounded-2xl border border-violet-400/20 bg-violet-400/[0.07] p-4">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-violet-300">{ui("Game Over")}</p>
-                  <p className="mt-1 text-lg font-black text-white">
-                    {resultLabel(gameState)}
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
+                <VisibleGameResult
+                  winner={gameState.winner}
+                  playerColor={myColor}
+                  reason={gameState.end_reason}
+                  actions={
                     <button
                       type="button"
                       disabled={myRematchReady || actionLoading !== null}
@@ -1261,11 +1243,8 @@ export function MutationMultiplayerGame() {
                     >
                       {myRematchReady ? ui("Rematch requested") : ui("Play Again")}
                     </button>
-                    {opponentRematchReady && (
-                      <span className="rounded-xl bg-white/5 px-3 py-2 text-xs text-zinc-400">{ui("Opponent ready")}</span>
-                    )}
-                  </div>
-                </div>
+                  }
+                />
               )}
 
               {historyPreviewPly !== null && (

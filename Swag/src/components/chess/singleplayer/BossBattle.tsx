@@ -1,3 +1,4 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import { ui, useUiLanguage } from "@/i18n/ui";
@@ -333,20 +334,6 @@ function bossHearts(hp: number): string {
   )}`;
 }
 
-function resultText(result: FinishedGame, t: (key: string) => string): string {
-  if (!result) return "";
-  if (result.winner === "draw") {
-    if (result.reason === "stalemate") return t("Stalemate. Draw.");
-    if (result.reason === "fifty") return t("50-move rule. Draw.");
-    if (result.reason === "repetition") return t("Threefold repetition. Draw.");
-    return t("Draw");
-  }
-  if (result.reason === "boss_hp")
-    return t("The Boss has lost all 5 HP. White wins!");
-  return result.winner === "white"
-    ? t("Boss checkmated. White wins!")
-    : t("White king checkmated. The Boss wins!");
-}
 
 function historySymbol(color: BossSide, piece: PieceType | null) {
   if (!piece) return color === "w" ? "♔" : "♚";
@@ -1140,14 +1127,7 @@ export default function BossBattleBoard({
               )}
 
               {finishedGame && !historyPreview && (
-                <div className="mb-3 rounded-2xl border border-red-400/20 bg-red-400/[0.07] px-5 py-4 text-center">
-                  <p className="text-[10px] font-black uppercase tracking-[0.24em] text-red-300">
-                    {t("Game Over")}
-                  </p>
-                  <p className="mt-2 text-lg font-black text-white">
-                    {resultText(finishedGame, t)}
-                  </p>
-                </div>
+                <VisibleGameResult />
               )}
 
               <Board

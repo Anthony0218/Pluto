@@ -126,18 +126,27 @@ export default function VariantRoomSetup({ roomId, variantName, lobbyPath, onSta
       <div className="mx-auto max-w-[1100px]">
         <ChessPageHeader className="mb-7 flex flex-col gap-4 rounded-3xl border border-white/5 bg-zinc-900/50 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between" description={<>{ui(variantName)} · {ui("Room setup")}</>}>
           <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={() => void copyCode()}
-              className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 font-mono text-xs font-black text-zinc-300 transition hover:bg-white/10"
-            >
-              {ui("Room")} {room?.code ?? "······"} {copied ? "✓" : ""}
-            </button>
             <Link to={lobbyPath} className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-400 hover:bg-white/10">
               {ui("Lobby")}
             </Link>
           </div>
         </ChessPageHeader>
+
+        <button
+          type="button"
+          onClick={() => void copyCode()}
+          disabled={!room}
+          aria-label={copied ? ui("Copied") : ui("Copy room code")}
+          className="mb-5 block w-full rounded-3xl border border-amber-300/25 bg-amber-300/[0.07] px-5 py-5 text-center shadow-xl shadow-black/15 transition hover:border-amber-200/50 hover:bg-amber-300/[0.1] focus-visible:outline-2 focus-visible:outline-amber-200 disabled:cursor-wait disabled:opacity-60 sm:px-8 sm:py-6"
+        >
+          <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">{ui("Room Code")}</p>
+          <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">
+            {room?.code ?? "······"}
+          </p>
+          <p className="mt-4 text-xs font-bold text-zinc-400" aria-live="polite">
+            {copied ? `✓ ${ui("Copied")}` : ui("Click this box to copy the code")}
+          </p>
+        </button>
 
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
           <section className="space-y-3">

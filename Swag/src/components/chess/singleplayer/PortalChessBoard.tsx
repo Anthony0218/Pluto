@@ -1,3 +1,4 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
@@ -932,7 +933,7 @@ export default function PortalChessBoard({
 
   const [gameOver, setGameOver] = useState(false);
 
-  const [gameOverReason, setGameOverReason] = useState("");
+  const [, setGameOverReason] = useState("");
 
   const humanColor = chessColorFromPlayerColor(playerColor);
   const computerColor = oppositeChessColor(humanColor);
@@ -1027,7 +1028,7 @@ export default function PortalChessBoard({
     return () => window.clearTimeout(timer);
   }, [aiMode, computerColor, pendingPortalPromotion]);
 
-  const [winner, setWinner] = useState<Winner>("white");
+  const [, setWinner] = useState<Winner>("white");
 
   const historyPreview =
     historyPreviewPly === null
@@ -1976,6 +1977,31 @@ export default function PortalChessBoard({
               </div>
             )}
 
+            {gameOver && !historyPreview && (
+              <VisibleGameResult
+                actions={
+                  <button
+                    type="button"
+                    onClick={restartGame}
+                    className="
+                        mt-5
+                        w-full
+                        rounded-xl
+                        bg-violet-300
+                        px-4
+                        py-3
+                        text-sm
+                        font-black
+                        text-zinc-950
+                        hover:bg-violet-200
+                      "
+                  >
+                    ↺ {t("Restart")}
+                  </button>
+                }
+              />
+            )}
+
             <div
               className="
                 relative
@@ -2010,89 +2036,6 @@ export default function PortalChessBoard({
                   activePortalSquare ? [activePortalSquare] : []
                 }
               />
-
-              {gameOver && !historyPreview && (
-                <div
-                  className="
-                      absolute
-                      inset-0
-                      z-40
-                      flex
-                      items-center
-                      justify-center
-                      rounded-[28px]
-                      bg-zinc-950/75
-                      p-6
-                      backdrop-blur-sm
-                    "
-                >
-                  <div
-                    className="
-                        w-full
-                        max-w-sm
-                        rounded-3xl
-                        border
-                        border-white/10
-                        bg-zinc-900/95
-                        p-7
-                        text-center
-                        shadow-2xl
-                      "
-                  >
-                    <p
-                      className="
-                          text-xs
-                          font-black
-                          uppercase
-                          tracking-[0.2em]
-                          text-violet-300
-                        "
-                    >
-                      {t("Game Over")}
-                    </p>
-
-                    <h2
-                      className="
-                          mt-2
-                          text-2xl
-                          font-black
-                          text-white
-                        "
-                    >
-                      {winner === "white" ? t("White wins") : winner === "black" ? t("Black wins") : t("Draw")}
-                    </h2>
-
-                    <p
-                      className="
-                          mt-2
-                          text-sm
-                          text-zinc-400
-                        "
-                    >
-                      {t(gameOverReason)}
-                    </p>
-
-                    <button
-                      type="button"
-                      onClick={restartGame}
-                      className="
-                          mt-5
-                          w-full
-                          rounded-xl
-                          bg-violet-300
-                          px-4
-                          py-3
-                          text-sm
-                          font-black
-                          text-zinc-950
-                          hover:bg-violet-200
-                        "
-                    >
-                      ↺ {t("Restart")}
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </main>
 

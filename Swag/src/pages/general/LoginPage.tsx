@@ -19,8 +19,8 @@ const translations = {
     chessText: "Klassisch und Varianten",
     watten: "Watten",
     wattenText: "Lokal- und Mehrspielermodi",
-    chess3d: "3D-Schach",
-    chess3dText: "Klassisches Schach auf einem interaktiven 3D-Brett",
+    schafkopf: "Schafkopf",
+    schafkopfText: "Traditionelles bayerisches Kartenspiel",
     medievalKingdoms: "Medieval Kingdoms",
     medievalKingdomsText: "Rundenbasierte mittelalterliche Strategie",
     multiplayerOnly: "Nur angemeldete Benutzer können Multiplayer spielen!",
@@ -59,8 +59,8 @@ const translations = {
     chessText: "Classic and variants",
     watten: "Watten",
     wattenText: "Local and multiplayer modes",
-    chess3d: "3D Chess",
-    chess3dText: "Classic chess on an interactive 3D board",
+    schafkopf: "Schafkopf",
+    schafkopfText: "Traditional Bavarian card game",
     medievalKingdoms: "Medieval Kingdoms",
     medievalKingdomsText: "Turn-based medieval strategy",
     multiplayerOnly: "Only logged in users can play multiplayer!",
@@ -228,7 +228,7 @@ export default function LoginPage() {
                   {[
                     ["♟", t.chess, t.chessText],
                     ["🃏", t.watten, t.wattenText],
-                    ["♞", t.chess3d, t.chess3dText],
+                    ["♣", t.schafkopf, t.schafkopfText],
                     ["⚔", t.medievalKingdoms, t.medievalKingdomsText],
                   ].map(([icon, title, text]) => (
                     <div
