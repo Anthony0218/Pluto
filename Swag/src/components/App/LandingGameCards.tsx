@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ui, useUiLanguage } from "@/i18n/ui";
 
 const games = [
-  { title: "Chess", subtitle: "Classic modes", route: "/games/chess/classic", icon: "♟", image: "/images/chess-game-icon.png", accent: "sky" },
+  { title: "Chess", subtitle: "Classic modes", route: "/games/chess", icon: "♟", image: "/images/chess-game-icon.png", accent: "sky" },
   { title: "Watten", subtitle: "Choose a table", route: "/games/watten", icon: "♦", image: "/images/watten-game-icon.png", accent: "rose" },
   { title: "Schafkopfen", subtitle: "Bavarian cards", route: "/games/schafkopf", icon: "♣", image: "/images/watten-game-icon.png", accent: "emerald" },
   { title: "Chess Variants", subtitle: "New rules, new tactics", route: "/games/chess/variants", icon: "♞", image: "/images/chess-variant.png", accent: "amber", variant: true },

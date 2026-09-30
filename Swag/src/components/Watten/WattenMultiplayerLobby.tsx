@@ -9,10 +9,7 @@ import type { WattenVariant } from "../../utils/types";
 import { ProfileAvatar } from "../social/ProfileAvatarPicker";
 import { useFitWattenScreen } from "@/games/watten/useFitWattenScreen";
 import {
-  setStoredWattenLanguage,
   translateWatten,
-  WattenLanguageSelector,
-  type WattenLanguage,
 } from "@/games/watten/i18n/wattenLanguage";
 
 type LoadingAction = "create" | "join" | null;
@@ -23,7 +20,7 @@ export default function WattenMultiplayerLobby() {
   const [searchParams] = useSearchParams();
   const { user, profile } = useAuth();
 
-  const { language, setLanguage } = useAppLanguage();
+  const { language } = useAppLanguage();
   const [variant, setVariant] = useState<WattenVariant>("three-player");
   const [roomCode, setRoomCode] = useState(() => (searchParams.get("code") ?? "").trim().toUpperCase());
   const [loading, setLoading] = useState<LoadingAction>(null);
@@ -34,11 +31,6 @@ export default function WattenMultiplayerLobby() {
     [language],
   );
 
-  function changeLanguage(next: WattenLanguage) {
-    setLanguage(next);
-    setStoredWattenLanguage(next);
-    setError(null);
-  }
 
   const playerCount = variant === "three-player" ? 3 : 4;
 
@@ -278,11 +270,6 @@ export default function WattenMultiplayerLobby() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <WattenLanguageSelector
-                language={language}
-                onChange={changeLanguage}
-                label={t("Language")}
-              />
 
               <Link
                 to="/games/watten"

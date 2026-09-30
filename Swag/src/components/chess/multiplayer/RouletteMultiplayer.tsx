@@ -1,4 +1,9 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
+import InviteFriendButton from "@/components/chess/InviteFriendButton";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { useVariantRecordAudio } from "@/games/chess/audio/useVariantRecordAudio";
+import type { ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import RouletteInfo from "@/components/chess/singleplayer/RouletteInfo";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import {
@@ -53,6 +58,7 @@ import type {
   VariantRoom,
   VariantRoomPlayer,
 } from "@/games/chess/multiplayer/variantMultiplayerTypes";
+import VariantRoomSetup from "./VariantRoomSetup";
 
 type PromotionPiece = "q" | "r" | "b" | "n";
 
@@ -335,14 +341,6 @@ function cardSymbol(card: PortalPromotionCard, color: PortalSide) {
   return color === "w" ? whiteSymbols[card] : blackSymbols[card];
 }
 
-function resultLabel(game: VariantGame) {
-  if (game.winner === "draw") return `Draw · ${game.end_reason ?? "Game over"}`;
-  if (game.winner === "white")
-    return `White wins · ${game.end_reason ?? "Game over"}`;
-  if (game.winner === "black")
-    return `Black wins · ${game.end_reason ?? "Game over"}`;
-  return game.end_reason ?? "Game over";
-}
 
 function Panel({
   title,
@@ -515,7 +513,6 @@ export function RouletteMultiplayerLobby() {
   useUiLanguage();
   const navigate = useNavigate();
   const { user, profile } = useAuth();
-  const [hostColor, setHostColor] = useState<TwoPlayerColor>("white");
   const [joinCode, setJoinCode] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
   const [loading, setLoading] = useState<"create" | "join" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -542,7 +539,7 @@ export function RouletteMultiplayerLobby() {
         p_seed: seed,
         p_initial_state: initialState,
         p_display_name: displayName,
-        p_host_color: hostColor,
+        p_host_color: "black",
       },
     );
 
@@ -588,24 +585,7 @@ export function RouletteMultiplayerLobby() {
           </Panel>
         ) : (
           <div className="grid gap-5 lg:grid-cols-2">
-            <Panel title={ui("Create room")} subtitle={ui("Choose your side")}>
-              <div className="grid grid-cols-2 gap-2">
-                {(["white", "black"] as TwoPlayerColor[]).map((color) => (
-                  <button
-                    key={color}
-                    type="button"
-                    onClick={() => setHostColor(color)}
-                    className={`rounded-xl border px-4 py-3 font-black transition ${
-                      hostColor === color
-                        ? "border-violet-400/30 bg-violet-400/10 text-violet-200"
-                        : "border-white/10 bg-black/20 text-zinc-400 hover:bg-white/5"
-                    }`}
-                  >
-                    {color === "white" ? "♔" : "♚"}{" "}
-                    {color[0].toUpperCase() + color.slice(1)}
-                  </button>
-                ))}
-              </div>
+            <Panel title={ui("Create room")} subtitle={ui("Colors are picked in the room")}>
 
               <div className="mt-4 rounded-xl border border-violet-300/10 bg-violet-400/[0.05] p-3 text-xs leading-5 text-zinc-400">{ui("A single Roulette seed is stored with the room. Both browsers therefore use the exact same Lucky Squares and deterministic effects.")}</div>
 
@@ -633,7 +613,7 @@ export function RouletteMultiplayerLobby() {
                 className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-center font-mono text-2xl font-black uppercase tracking-[0.3em] text-white outline-none transition placeholder:text-zinc-700 focus:border-violet-400/40"
               />
 
-              <p className="mt-3 text-xs leading-5 text-zinc-500">{ui("The joining player automatically receives the opposite color.")}</p>
+              <p className="mt-3 text-xs leading-5 text-zinc-500">{ui("Both players pick their color in the room and press Ready.")}</p>
 
               <button
                 type="button"
@@ -708,6 +688,15 @@ export function RouletteMultiplayerGame() {
     [gameState?.state, seed],
   );
   const records = storedState.records;
+  useVariantRecordAudio(gameState ? records : null, record => {
+    const event = record.portalEvent;
+    if (!event) return [];
+    const sounds: ChessSoundEvent[] = ["rouletteEvent"];
+    if (event.promotionCard === "k") sounds.push("rouletteKing");
+    else if (event.promotionCard === "p" || event.promotionCard === record.piece) sounds.push("roulettePromotionFailure");
+    else if (event.promotionCard) sounds.push("roulettePromotionSuccess");
+    return sounds;
+  });
 
   const liveFen =
     pendingRoulettePromotion?.workingFen ?? gameState?.fen ?? initialFen;
@@ -1433,6 +1422,17 @@ export function RouletteMultiplayerGame() {
     Boolean(mySide) &&
     records.at(-1)?.color === mySide;
 
+  if (room.status === "waiting") {
+    return (
+      <VariantRoomSetup
+        roomId={room.id}
+        variantName={"Chess Roulette"}
+        lobbyPath={"/games/chess/variants/roulette/multiplayer"}
+        onStarted={() => void loadRoom()}
+      />
+    );
+  }
+
   return (
     <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1600px]">
@@ -1591,50 +1591,33 @@ export function RouletteMultiplayerGame() {
               title={ui("Move History")}
               subtitle={ui("Click a move to preview it locally")}
             >
-              <div className="max-h-[320px] overflow-y-auto pr-1">
-                <button
-                  type="button"
-                  onClick={() => setHistoryPreviewPly(0)}
-                  className={`mb-1 flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs transition ${
-                    historyPreviewPly === 0
-                      ? "bg-violet-400/10 text-violet-200"
-                      : "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
-                  }`}
-                >
-                  <span>{ui("Start")}</span>
-                  <span className="text-[9px]">{ui("Initial position")}</span>
-                </button>
-
-                {records.length === 0 ? (
-                  <p className="px-3 py-3 text-xs text-zinc-600">{ui("No moves yet")}</p>
-                ) : (
-                  records.map((record) => (
-                    <button
-                      key={record.ply}
-                      type="button"
-                      onClick={() => setHistoryPreviewPly(record.ply)}
-                      className={`mb-1 flex w-full items-center justify-between rounded-lg px-3 py-2 text-left transition ${
-                        historyPreviewPly === record.ply
-                          ? "bg-violet-400/10 text-violet-200"
-                          : "hover:bg-white/5"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="w-7 text-[9px] font-black text-zinc-600">
-                          {Math.floor((record.ply - 1) / 2) + 1}
-                          {record.color === "w" ? "." : "..."}
-                        </span>
-                        <span className="font-mono text-xs font-black text-zinc-200">
-                          {record.san}
-                        </span>
-                      </div>
-                      <span className="text-sm">
-                        {record.portalEvent ? effectIcon(record.portalEvent.effect) : ""}
-                      </span>
-                    </button>
-                  ))
-                )}
-              </div>
+              <ChessMoveHistoryList
+                listClassName="max-h-[320px] pr-1"
+                selectedPly={historyPreviewPly}
+                emptyLabel="No moves yet"
+                leading={
+                  <button
+                    type="button"
+                    onClick={() => setHistoryPreviewPly(0)}
+                    className={`mb-1 flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs transition ${
+                      historyPreviewPly === 0
+                        ? "bg-violet-400/10 text-violet-200"
+                        : "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
+                    }`}
+                  >
+                    <span>{ui("Start")}</span>
+                    <span className="text-[9px]">{ui("Initial position")}</span>
+                  </button>
+                }
+                entries={records.map((record) => ({
+                  ply: record.ply,
+                  side: record.color,
+                  moveNumber: Math.floor((record.ply - 1) / 2) + 1,
+                  content: <span className="truncate font-mono text-xs font-black text-zinc-200">{record.san}</span>,
+                  trailing: record.portalEvent ? <span className="text-sm">{effectIcon(record.portalEvent.effect)}</span> : null,
+                }))}
+                onSelect={setHistoryPreviewPly}
+              />
             </Panel>
           </aside>
 
@@ -1655,6 +1638,31 @@ export function RouletteMultiplayerGame() {
                   >{ui("Back to Live Board")}</button>
                 </div>
               )}
+
+              {gameState.status === "finished" &&
+                historyPreviewPly === null && (
+                  <VisibleGameResult
+                    winner={gameState.winner}
+                    playerColor={myColor}
+                    reason={gameState.end_reason}
+                    actions={
+                      <>
+                        <button
+                          type="button"
+                          disabled={Boolean(actionLoading) || myRematchReady}
+                          onClick={() => void requestRematch()}
+                          className="mt-5 w-full rounded-xl bg-violet-300 px-4 py-3 text-sm font-black text-zinc-950 transition hover:bg-violet-200 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          {myRematchReady ? ui("Waiting for opponent...") : ui("↺ Request Rematch")}
+                        </button>
+                        <Link
+                          to="/games/chess/variants/roulette/multiplayer"
+                          className="mt-2 block rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-black text-zinc-300 hover:bg-white/10"
+                        >{ui("Back to Lobby")}</Link>
+                      </>
+                    }
+                  />
+                )}
 
               <div className="relative overflow-hidden rounded-[28px] shadow-2xl shadow-black/35">
                 <Board
@@ -1713,6 +1721,7 @@ export function RouletteMultiplayerGame() {
                         {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
                       </p>
                     </button>
+                    <InviteFriendButton overlay />
                   </div>
                 )}
 
@@ -1722,29 +1731,7 @@ export function RouletteMultiplayerGame() {
                     <PromotionBar onPromote={promotePawn} />
                   )}
 
-                {gameState.status === "finished" &&
-                  historyPreviewPly === null && (
-                    <div className="absolute inset-0 z-[90] flex items-center justify-center bg-zinc-950/75 p-6 backdrop-blur-sm">
-                      <div className="w-full max-w-sm rounded-3xl border border-violet-300/20 bg-zinc-900/95 p-7 text-center shadow-2xl">
-                        <p className="text-xs font-black uppercase tracking-[0.2em] text-violet-300">{ui("Game Over")}</p>
-                        <h2 className="mt-2 text-2xl font-black text-white">
-                          {resultLabel(gameState)}
-                        </h2>
-                        <button
-                          type="button"
-                          disabled={Boolean(actionLoading) || myRematchReady}
-                          onClick={() => void requestRematch()}
-                          className="mt-5 w-full rounded-xl bg-violet-300 px-4 py-3 text-sm font-black text-zinc-950 transition hover:bg-violet-200 disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                          {myRematchReady ? ui("Waiting for opponent...") : ui("↺ Request Rematch")}
-                        </button>
-                        <Link
-                          to="/games/chess/variants/roulette/multiplayer"
-                          className="mt-2 block rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-black text-zinc-300 hover:bg-white/10"
-                        >{ui("Back to Lobby")}</Link>
-                      </div>
-                    </div>
-                  )}
+
               </div>
 
               <div className="mt-3 flex items-center justify-between rounded-2xl border border-white/5 bg-zinc-900/50 px-4 py-3 text-xs">

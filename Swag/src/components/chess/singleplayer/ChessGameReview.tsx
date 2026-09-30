@@ -5,8 +5,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Chess, type Color, type PieceSymbol, type Square } from "chess.js";
 
 import Board from "./Board";
-import QualityBadge from "./ReviewQualityBadge";
-import { qualityList } from "./reviewQualities";
+import QualityBadge, { ReviewQualityIcon } from "./ReviewQualityBadge";
+import { AlternativeMoveButton } from "./ReviewMoveButtons";
+import { qualityColor, type ReviewVisualQuality } from "./reviewQualityVisuals";
+import { alternativeQuality, qualityList } from "./reviewQualities";
+import { reviewMoveAnnotations, type BoardAnnotations } from "./boardAnnotations";
 
 import { useStockfishAnalysis } from "@/hooks/useStockfishAnalysis";
 
@@ -32,6 +35,7 @@ type Props = {
   puzzlePlayerColor?: "white" | "black";
 };
 
+type SideFilter = "all" | "w" | "b";
 type PieceFilter = "all" | PieceSymbol;
 type QualityFilter = "all" | MoveQuality;
 type MoveTypeFilter =
@@ -75,6 +79,11 @@ type EnrichedReviewRow = {
   criticalLabel: string | null;
   missedOpportunity: string | null;
 };
+
+function displayQuality(row: EnrichedReviewRow): ReviewVisualQuality {
+  if (row.review.centipawnLoss >= 80 && row.moverEvalBefore !== null && row.moverEvalAfter !== null && row.moverEvalBefore >= 5 && row.moverEvalAfter < 3) return "Missed Win";
+  return row.review.quality;
+}
 
 type PiecePerformanceRow = {
   piece: PieceSymbol;
@@ -159,6 +168,12 @@ const qualitySortOrder: Record<MoveQuality, number> = {
 
 const phaseList: GamePhase[] = ["Opening", "Middlegame", "Endgame"];
 
+const sideOptions: Array<{ key: SideFilter; label: string }> = [
+  { key: "all", label: "All moves" },
+  { key: "w", label: "White's moves" },
+  { key: "b", label: "Black's moves" },
+];
+
 const presetOptions: Array<{
   key: ReviewPreset;
   label: string;
@@ -209,6 +224,7 @@ export default function ChessGameReview({
   const [error, setError] = useState<string | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
 
+  const [sideFilter, setSideFilter] = useState<SideFilter>("all");
   const [pieceFilter, setPieceFilter] = useState<PieceFilter>("all");
   const [qualityFilter, setQualityFilter] = useState<QualityFilter>("all");
   const [moveTypeFilter, setMoveTypeFilter] = useState<MoveTypeFilter>("all");
@@ -245,6 +261,7 @@ export default function ChessGameReview({
     setProgress(0);
     setError(null);
 
+    setSideFilter("all");
     setPieceFilter("all");
     setQualityFilter("all");
     setMoveTypeFilter("all");
@@ -267,6 +284,7 @@ export default function ChessGameReview({
   useEffect(() => {
     if (open) {
       setDetailsOpen(false);
+      setSideFilter("all");
       setPieceFilter("all");
       setQualityFilter("all");
       setMoveTypeFilter("all");
@@ -594,33 +612,76 @@ export default function ChessGameReview({
     };
   }, [selected, continuation, continuationPreviewIndex]);
 
+  // A clicked engine alternative is played out on the board, like the played move.
+  const alternativePreview = useMemo(() => {
+    if (!selected || !highlightedBestMove || continuationPreview) {
+      return null;
+    }
+
+    const index = selected.bestMoves.findIndex((suggestion) => suggestion.uci === highlightedBestMove);
+    const game = new Chess(selected.fenBefore);
+
+    try {
+      const move = game.move({
+        from: highlightedBestMove.slice(0, 2) as Square,
+        to: highlightedBestMove.slice(2, 4) as Square,
+        promotion: highlightedBestMove[4] as "q" | "r" | "b" | "n" | undefined,
+      });
+
+      return {
+        game,
+        move: { from: move.from, to: move.to },
+        quality: index >= 0 ? alternativeQuality(selected.bestMoves, index) : ("Best" as MoveQuality),
+      };
+    } catch {
+      return null;
+    }
+  }, [selected, highlightedBestMove, continuationPreview]);
+
   const reviewChess = useMemo(() => {
     if (continuationPreview) {
       return continuationPreview.game;
+    }
+
+    if (alternativePreview) {
+      return alternativePreview.game;
     }
 
     if (!selected) {
       return new Chess();
     }
 
-    if (highlightedBestMove) {
-      return new Chess(selected.fenBefore);
-    }
-
     return new Chess(selected.fenAfter);
-  }, [selected, highlightedBestMove, continuationPreview]);
+  }, [selected, alternativePreview, continuationPreview]);
 
   const board = reviewChess.board();
 
-  const alternativeMove =
-    highlightedBestMove && !continuationPreview
-      ? {
-          from: highlightedBestMove.slice(0, 2) as Square,
-          to: highlightedBestMove.slice(2, 4) as Square,
-        }
-      : null;
+  const alternativeMove = alternativePreview?.move ?? null;
 
   const continuationMove = continuationPreview?.move ?? null;
+
+  const selectedAnnotations: BoardAnnotations | null = continuationMove
+    ? {
+        // The clicked continuation move: border its target square.
+        marks: [{ square: continuationMove.to, kind: "outline", color: "#fcd34d", opacity: 1 }],
+        arrows: [],
+      }
+    : alternativePreview
+      ? reviewMoveAnnotations({
+          from: alternativePreview.move.from,
+          to: alternativePreview.move.to,
+          quality: alternativePreview.quality,
+          fenAfter: alternativePreview.game.fen(),
+        })
+      : selected && selectedRow
+        ? reviewMoveAnnotations({
+            from: selected.from,
+            to: selected.to,
+            quality: displayQuality(selectedRow),
+            fenAfter: selected.fenAfter,
+            bestMoveUci: selected.bestMoveUci,
+          })
+        : null;
 
   const playedMove =
     selected && !continuationPreview
@@ -656,7 +717,7 @@ export default function ChessGameReview({
     const filtered = reviewRows.filter((row) => {
       const { review, pieceType, moveTags, phase, critical } = row;
 
-      if (review.color !== "w") {
+      if (sideFilter !== "all" && review.color !== sideFilter) {
         return false;
       }
 
@@ -757,6 +818,7 @@ export default function ChessGameReview({
     });
   }, [
     reviewRows,
+    sideFilter,
     pieceFilter,
     qualityFilter,
     moveTypeFilter,
@@ -765,6 +827,37 @@ export default function ChessGameReview({
     sortKey,
     sortDirection,
   ]);
+
+  /*
+   * "All moves" in move order reads like a score sheet:
+   * White's move on the left, Black's reply on the right.
+   */
+  const pairedReviews = useMemo(() => {
+    if (sideFilter !== "all" || sortKey !== "move") {
+      return null;
+    }
+
+    const pairs: Array<{
+      moveNumber: number;
+      white: EnrichedReviewRow | null;
+      black: EnrichedReviewRow | null;
+    }> = [];
+    const byMoveNumber = new Map<number, (typeof pairs)[number]>();
+
+    for (const row of filteredReviews) {
+      let pair = byMoveNumber.get(row.review.moveNumber);
+
+      if (!pair) {
+        pair = { moveNumber: row.review.moveNumber, white: null, black: null };
+        byMoveNumber.set(row.review.moveNumber, pair);
+        pairs.push(pair);
+      }
+
+      pair[row.review.color === "w" ? "white" : "black"] = row;
+    }
+
+    return pairs;
+  }, [filteredReviews, sideFilter, sortKey]);
 
   function changeSort(key: SortKey) {
     if (sortKey === key) {
@@ -777,6 +870,7 @@ export default function ChessGameReview({
   }
 
   function resetFilters() {
+    setSideFilter("all");
     setPieceFilter("all");
     setQualityFilter("all");
     setMoveTypeFilter("all");
@@ -831,7 +925,25 @@ export default function ChessGameReview({
      ======================================================= */
 
   async function loadContinuation() {
-    if (!selected || continuationLoading || analyzing || reviewing || !ready) {
+    if (!selected || continuationLoading || analyzing || reviewing) {
+      return;
+    }
+
+    // Reuse the review's own top line so the eval matches the first alternative.
+    const reviewedLine = selected.bestMoves[0];
+
+    if (reviewedLine?.pv?.length) {
+      continuationGenerationRef.current++;
+      setContinuationPreviewIndex(null);
+      setContinuationError(null);
+      setContinuation({
+        evaluation: reviewedLine.evaluation,
+        moves: pvToSan(selected.fenBefore, reviewedLine.pv.slice(0, 8)),
+      });
+      return;
+    }
+
+    if (!ready) {
       return;
     }
 
@@ -883,16 +995,40 @@ export default function ChessGameReview({
           <div className="flex items-center justify-between gap-3">
             <div>
               <h3 className="font-serif text-base font-semibold text-[#eee0c5]">{ui("Move Review")}</h3>
-              <p className="mt-0.5 text-[10px] text-zinc-500">{ui("Filter, sort and inspect White's moves")}</p>
+              <p className="mt-0.5 text-[10px] text-zinc-500">{ui("Filter, sort and inspect every move")}</p>
             </div>
 
             <div className="flex items-center gap-1.5">
-              <span className="rounded-full border border-[#fff3d5]/10 bg-[#fff3d5]/[0.05] px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-[#f0dfbd]/75">{ui("White moves only")}</span>
               <span className="rounded-full bg-white/5 px-2 py-0.5 text-[9px] font-bold text-zinc-500">
-                {filteredReviews.length}/
-                {reviewRows.filter((row) => row.review.color === "w").length}
+                {filteredReviews.length}/{reviewRows.length}
               </span>
             </div>
+          </div>
+
+          {/* SIDE */}
+
+          <div className="mt-2 grid grid-cols-3 gap-1 rounded-lg border border-white/5 bg-black/25 p-0.5" role="group" aria-label={ui("Moves to show")}>
+            {sideOptions.map((option) => (
+              <button
+                key={option.key}
+                type="button"
+                aria-pressed={sideFilter === option.key}
+                onClick={() => setSideFilter(option.key)}
+                className={`flex items-center justify-center gap-1 rounded-md px-1.5 py-1 text-[9px] font-black transition ${
+                  sideFilter === option.key
+                    ? "bg-[#fff3d5]/[0.12] text-[#f6e6c6] shadow-inner"
+                    : "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
+                }`}
+              >
+                {option.key !== "all" && (
+                  <span
+                    aria-hidden="true"
+                    className={`h-2 w-2 rounded-full border ${option.key === "w" ? "border-white/60 bg-zinc-100" : "border-zinc-500 bg-zinc-900"}`}
+                  />
+                )}
+                {ui(option.label)}
+              </button>
+            ))}
           </div>
 
           {/* QUICK PRESETS */}
@@ -972,6 +1108,18 @@ export default function ChessGameReview({
               ]}
             />
 
+            <FilterSelect
+              label={ui("Sort")}
+              value={sortKey}
+              onChange={(value) => setSortKey(value as SortKey)}
+              options={[
+                ["move", "Move order"],
+                ["piece", "Figure"],
+                ["quality", "Review"],
+                ...(showLoss ? [["loss", "Loss"] as [string, string]] : []),
+              ]}
+            />
+
             <div className="flex items-end">
               <button
                 type="button"
@@ -985,133 +1133,196 @@ export default function ChessGameReview({
         {/* TABLE */}
 
         <div className="min-h-0 flex-1 overflow-y-auto">
-          <table className="w-full border-collapse text-left">
-            <thead className="sticky top-0 z-10 bg-[#081019]/95 backdrop-blur-xl">
-              <tr className="border-b border-white/5 text-[8px] font-black uppercase tracking-wider text-zinc-600">
-                <SortableHeader
-                  label={ui("#")}
-                  active={sortKey === "move"}
-                  direction={sortDirection}
-                  onClick={() => changeSort("move")}
-                  className="px-2"
-                />
-
-                <SortableHeader
-                  label={ui("Figure")}
-                  active={sortKey === "piece"}
-                  direction={sortDirection}
-                  onClick={() => changeSort("piece")}
-                />
-
-                <th className="px-1.5 py-2">{ui("Played")}</th>
-
-                <SortableHeader
-                  label={ui("Review")}
-                  active={sortKey === "quality"}
-                  direction={sortDirection}
-                  onClick={() => changeSort("quality")}
-                />
-
-                {showLoss && (
+          {pairedReviews ? (
+            <table className="w-full table-fixed border-collapse text-left">
+              <thead className="sticky top-0 z-10 bg-[#081019]/95">
+                <tr className="border-b border-white/5 text-[8px] font-black uppercase tracking-wider text-zinc-600">
                   <SortableHeader
-                    label={ui("Loss")}
-                    active={sortKey === "loss"}
+                    label={ui("#")}
+                    active
                     direction={sortDirection}
-                    onClick={() => changeSort("loss")}
+                    onClick={() => changeSort("move")}
+                    className="w-9 px-2"
                   />
-                )}
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredReviews.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={showLoss ? 5 : 4}
-                    className="px-4 py-8 text-center"
-                  >
-                    <div className="text-2xl text-zinc-700">♟</div>
-
-                    <p className="mt-2 text-[10px] font-semibold text-zinc-500">{ui("No matching moves")}</p>
-
-                    <button
-                      type="button"
-                      onClick={resetFilters}
-                      className="mt-2 text-[10px] font-bold text-amber-300 hover:text-amber-200"
-                    >{ui("Clear filters")}</button>
-                  </td>
+                  <th className="px-1.5 py-2">
+                    <span className="inline-flex items-center gap-1">
+                      <span aria-hidden="true" className="h-2 w-2 rounded-full border border-white/60 bg-zinc-100" />
+                      {ui("White")}
+                    </span>
+                  </th>
+                  <th className="px-1.5 py-2">
+                    <span className="inline-flex items-center gap-1">
+                      <span aria-hidden="true" className="h-2 w-2 rounded-full border border-zinc-500 bg-zinc-900" />
+                      {ui("Black")}
+                    </span>
+                  </th>
                 </tr>
-              ) : (
-                filteredReviews.map((row) => {
-                  const { review, pieceType } = row;
+              </thead>
 
-                  return (
-                    <tr
-                      key={review.ply}
-                      onClick={() => selectReviewMove(review.ply)}
-                      className={`cursor-pointer border-b border-white/5 transition last:border-0 ${
-                        selectedPly === review.ply
-                          ? "bg-amber-300/[0.075]"
-                          : "hover:bg-amber-100/[0.025]"
-                      }`}
-                    >
-                      <td className="px-2 py-2 text-[10px] text-zinc-600">
-                        {review.moveNumber}
-                        {review.color === "w" ? "." : "..."}
-                      </td>
-
-                      <td className="px-1.5 py-2">
-                        {pieceType ? (
-                          <div className="flex items-center gap-1">
-                            <span className="w-5 text-center text-lg leading-none">
-                              {pieceSymbols[review.color][pieceType]}
-                            </span>
-
-                            <span className="hidden text-[8px] text-zinc-600 2xl:inline">
-                              {pieceNames[pieceType]}
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="text-zinc-700">·</span>
-                        )}
-                      </td>
-
-                      <td className="px-1.5 py-2">
-                        <p className="font-mono text-xs font-bold text-zinc-200">
-                          {review.san}
-                        </p>
-
-                        <div className="mt-0.5 flex flex-wrap gap-1">
-                          <span className="text-[7px] text-zinc-600">
-                            {row.phase}
-                          </span>
-
-                          {row.moveTags.slice(0, 2).map((tag) => (
-                            <span
-                              key={tag}
-                              className="text-[7px] text-zinc-700"
-                            >
-                              · {formatMoveTag(tag)}
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-
-                      <td className="px-1.5 py-2">
-                        <QualityBadge quality={review.quality} />
-                      </td>
-
-                      {showLoss && (
-                        <td className="px-1.5 py-2 text-[9px] font-bold text-zinc-500">
-                          {(review.centipawnLoss / 100).toFixed(2)}
+              <tbody>
+                {pairedReviews.length === 0 ? (
+                  <tr>
+                    <td colSpan={3} className="px-4 py-8 text-center">
+                      <div className="text-2xl text-zinc-700">♟</div>
+                      <p className="mt-2 text-[10px] font-semibold text-zinc-500">{ui("No matching moves")}</p>
+                      <button
+                        type="button"
+                        onClick={resetFilters}
+                        className="mt-2 text-[10px] font-bold text-amber-300 hover:text-amber-200"
+                      >{ui("Clear filters")}</button>
+                    </td>
+                  </tr>
+                ) : (
+                  pairedReviews.map((pair) => (
+                    <tr key={pair.moveNumber} className="border-b border-white/5 last:border-0">
+                      <td className="px-2 py-1.5 text-[10px] text-zinc-600">{pair.moveNumber}.</td>
+                      {[pair.white, pair.black].map((row, index) => (
+                        <td key={index} className="px-1 py-1">
+                          {row && (
+                            <PairedReviewCell
+                              row={row}
+                              quality={displayQuality(row)}
+                              selected={selectedPly === row.review.ply}
+                              showLoss={showLoss}
+                              onSelect={() => selectReviewMove(row.review.ply)}
+                            />
+                          )}
                         </td>
-                      )}
+                      ))}
                     </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+                  ))
+                )}
+              </tbody>
+            </table>
+          ) : (
+            <table className="w-full border-collapse text-left">
+              <thead className="sticky top-0 z-10 bg-[#081019]/95">
+                <tr className="border-b border-white/5 text-[8px] font-black uppercase tracking-wider text-zinc-600">
+                  <SortableHeader
+                    label={ui("#")}
+                    active={sortKey === "move"}
+                    direction={sortDirection}
+                    onClick={() => changeSort("move")}
+                    className="px-2"
+                  />
+
+                  <SortableHeader
+                    label={ui("Figure")}
+                    active={sortKey === "piece"}
+                    direction={sortDirection}
+                    onClick={() => changeSort("piece")}
+                  />
+
+                  <th className="px-1.5 py-2">{ui("Played")}</th>
+
+                  <SortableHeader
+                    label={ui("Review")}
+                    active={sortKey === "quality"}
+                    direction={sortDirection}
+                    onClick={() => changeSort("quality")}
+                  />
+
+                  {showLoss && (
+                    <SortableHeader
+                      label={ui("Loss")}
+                      active={sortKey === "loss"}
+                      direction={sortDirection}
+                      onClick={() => changeSort("loss")}
+                    />
+                  )}
+                </tr>
+              </thead>
+
+              <tbody>
+                {filteredReviews.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={showLoss ? 5 : 4}
+                      className="px-4 py-8 text-center"
+                    >
+                      <div className="text-2xl text-zinc-700">♟</div>
+
+                      <p className="mt-2 text-[10px] font-semibold text-zinc-500">{ui("No matching moves")}</p>
+
+                      <button
+                        type="button"
+                        onClick={resetFilters}
+                        className="mt-2 text-[10px] font-bold text-amber-300 hover:text-amber-200"
+                      >{ui("Clear filters")}</button>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredReviews.map((row) => {
+                    const { review, pieceType } = row;
+
+                    return (
+                      <tr
+                        key={review.ply}
+                        onClick={() => selectReviewMove(review.ply)}
+                        className={`cursor-pointer border-b border-white/5 transition last:border-0 ${
+                          selectedPly === review.ply
+                            ? "bg-amber-300/[0.075]"
+                            : "hover:bg-amber-100/[0.025]"
+                        }`}
+                      >
+                        <td className="px-2 py-2 text-[10px] text-zinc-600">
+                          {review.moveNumber}
+                          {review.color === "w" ? "." : "..."}
+                        </td>
+
+                        <td className="px-1.5 py-2">
+                          {pieceType ? (
+                            <div className="flex items-center gap-1">
+                              <span className="w-5 text-center text-lg leading-none">
+                                {pieceSymbols[review.color][pieceType]}
+                              </span>
+
+                              <span className="hidden text-[8px] text-zinc-600 2xl:inline">
+                                {pieceNames[pieceType]}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-zinc-700">·</span>
+                          )}
+                        </td>
+
+                        <td className="px-1.5 py-2">
+                          <p className="font-mono text-xs font-bold text-zinc-200">
+                            {review.san}
+                          </p>
+
+                          <div className="mt-0.5 flex flex-wrap gap-1">
+                            <span className="text-[7px] text-zinc-600">
+                              {row.phase}
+                            </span>
+
+                            {row.moveTags.slice(0, 2).map((tag) => (
+                              <span
+                                key={tag}
+                                className="text-[7px] text-zinc-700"
+                              >
+                                · {formatMoveTag(tag)}
+                              </span>
+                            ))}
+                          </div>
+                        </td>
+
+                        <td className="px-1.5 py-2">
+                          <QualityBadge quality={displayQuality(row)} />
+                        </td>
+
+                        {showLoss && (
+                          <td className="px-1.5 py-2 text-[9px] font-bold text-zinc-500">
+                            {(review.centipawnLoss / 100).toFixed(2)}
+                          </td>
+                        )}
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          )}
         </div>
       </aside>
     );
@@ -1142,7 +1353,6 @@ export default function ChessGameReview({
         justify-center
         bg-[radial-gradient(circle_at_50%_0%,rgba(126,88,37,.16),transparent_34%),radial-gradient(circle_at_20%_30%,rgba(34,62,91,.16),transparent_30%),rgba(1,4,8,.91)]
         p-2
-        backdrop-blur-xl
         sm:p-2.5
       "
     >
@@ -1173,7 +1383,8 @@ export default function ChessGameReview({
 
         {/* HEADER */}
 
-        <ChessPageHeader className="relative flex shrink-0 items-center justify-between border-b border-amber-100/[0.08] bg-[#08111b]/88 px-5 py-3.5 backdrop-blur-xl" title="Game Review">
+        {/* z-20: the Audio / Appearance menus drop down over the review body. */}
+        <ChessPageHeader className="relative z-20 flex shrink-0 items-center justify-between border-b border-amber-100/[0.08] bg-[#08111b]/88 px-5 py-3.5" title="Game Review">
 
 
           <div className="flex items-center gap-2">
@@ -1346,7 +1557,7 @@ export default function ChessGameReview({
             </section>
           </div>
         ) : detailsOpen ? (
-          <div className="grid min-h-0 flex-1 gap-2 overflow-hidden bg-[radial-gradient(circle_at_50%_12%,rgba(176,126,61,.035),transparent_28%)] p-4 xl:grid-cols-[330px_minmax(0,1fr)_460px]">
+          <div className="grid min-h-0 flex-1 auto-rows-max gap-2 overflow-y-auto bg-[radial-gradient(circle_at_50%_12%,rgba(176,126,61,.035),transparent_28%)] p-4 xl:auto-rows-auto xl:grid-cols-[330px_minmax(0,1fr)_460px] xl:overflow-hidden">
             {/* ===============================================
                 LEFT — WHITE SUMMARY + EDUCATIONAL DETAILS
                =============================================== */}
@@ -1356,26 +1567,19 @@ export default function ChessGameReview({
                     LEFT SIDEBAR — EDUCATIONAL DETAILS
                    =============================================== */}
 
-              <aside className="min-h-0 flex-1 overflow-y-auto rounded-2xl border border-white/10 bg-[#09121c]/78 backdrop-blur-xl p-4">
+              <aside className="min-h-0 flex-1 overflow-y-auto rounded-2xl border border-white/10 bg-[#09121c]/78 p-4">
+                <details className="mb-4 rounded-xl border border-white/10 bg-white/[.035] p-3"><summary className="cursor-pointer text-xs font-bold text-[#f2e4c9]">{ui("Move quality legend")}</summary><div className="mt-3 grid grid-cols-2 gap-2">{(["Best", "Excellent", "Good", "Inaccuracy", "Mistake", "Blunder", "Missed Win"] as ReviewVisualQuality[]).map(quality => <QualityBadge key={quality} quality={quality} />)}</div></details>
                 {selected && selectedRow && (
                   <>
-                    <p className="text-[9px] font-black uppercase tracking-[0.18em] text-amber-200/45">{ui("Current Move")}</p>
-
-                    <div className="mt-3 flex items-start justify-between gap-3">
-                      <div>
-                        <SideBadge color={selected.color} />
-
-                        <div className="mt-3 flex items-center gap-2">
-                          <MovePiece review={selected} />
-
-                          <span className="font-mono text-2xl font-black text-[#f1e4ca]">
-                            {selected.san}
-                          </span>
-                        </div>
-                      </div>
-
-                      <QualityBadge quality={selected.quality} />
-                    </div>
+                    <CurrentMoveButton
+                      review={selected}
+                      quality={displayQuality(selectedRow)}
+                      active={highlightedBestMove === null && continuationPreviewIndex === null}
+                      onClick={() => {
+                        setContinuationPreviewIndex(null);
+                        setHighlightedBestMove(null);
+                      }}
+                    />
 
                     <div className="mt-3 flex flex-wrap gap-1.5">
                       <PhaseBadge phase={selectedRow.phase} />
@@ -1390,7 +1594,7 @@ export default function ChessGameReview({
                         <span className="text-xs text-zinc-500">{ui("Evaluation loss")}</span>
 
                         <strong className="text-sm text-zinc-200">
-                          {(selected.centipawnLoss / 100).toFixed(2)}{ui("pawns")}</strong>
+                          {(selected.centipawnLoss / 100).toFixed(2)}</strong>
                       </div>
 
                       {selectedRow.criticalLabel && (
@@ -1446,119 +1650,26 @@ export default function ChessGameReview({
                       </div>
                     )}
 
-                    {/* PLAYED MOVE */}
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setContinuationPreviewIndex(null);
-                        setHighlightedBestMove(null);
-                      }}
-                      className={`
-                          mt-5
-                          flex
-                          w-full
-                          items-center
-                          justify-between
-                          rounded-xl
-                          border
-                          px-3
-                          py-3
-                          text-left
-                          transition
-
-                          ${
-                            highlightedBestMove === null
-                              ? "border-blue-400/30 bg-blue-400/10"
-                              : "border-white/5 bg-black/20 hover:bg-white/5"
-                          }
-                        `}
-                    >
-                      <div>
-                        <p className="text-[9px] font-black uppercase tracking-wider text-zinc-500">{ui("Played")}</p>
-
-                        <p className="mt-1 font-mono font-bold">
-                          {selected.san}
-                        </p>
-                      </div>
-
-                      <span className="text-lg">↪</span>
-                    </button>
-
                     {/* TOP 3 */}
 
                     <div className="mt-5">
                       <p className="text-[10px] font-black uppercase tracking-widest text-amber-400">{ui("Best Alternatives")}</p>
 
                       <div className="mt-3 space-y-2">
-                        {selected.bestMoves.map((suggestion, index) => {
-                          const active = highlightedBestMove === suggestion.uci;
-
-                          return (
-                            <button
-                              key={`${suggestion.uci}-${index}`}
-                              type="button"
-                              onClick={() => {
-                                setContinuationPreviewIndex(null);
-                                setHighlightedBestMove(suggestion.uci);
-                              }}
-                              className={`
-                                  flex
-                                  w-full
-                                  items-center
-                                  justify-between
-                                  rounded-xl
-                                  border
-                                  px-3
-                                  py-3
-                                  text-left
-                                  transition
-
-                                  ${
-                                    active
-                                      ? "border-amber-400/40 bg-amber-400/10"
-                                      : "border-white/5 bg-black/20 hover:bg-white/5"
-                                  }
-                                `}
-                            >
-                              <div className="flex items-center gap-3">
-                                <span
-                                  className={`
-                                      flex
-                                      h-7
-                                      w-7
-                                      items-center
-                                      justify-center
-                                      rounded-lg
-                                      text-xs
-                                      font-black
-                                      ${
-                                        active
-                                          ? "bg-amber-400 text-zinc-950"
-                                          : "bg-amber-400/10 text-amber-300"
-                                      }
-                                    `}
-                                >
-                                  {index + 1}
-                                </span>
-
-                                <div>
-                                  <p className="font-mono font-bold text-zinc-100">
-                                    {suggestion.san}
-                                  </p>
-
-                                  <p className="mt-0.5 text-[10px] text-zinc-600">
-                                    {active ? ui("Highlighted on board") : ui("Click to highlight")}
-                                  </p>
-                                </div>
-                              </div>
-
-                              <span className="text-xs text-zinc-500">
-                                {suggestion.evaluation}
-                              </span>
-                            </button>
-                          );
-                        })}
+                        {selected.bestMoves.map((suggestion, index) => (
+                          <AlternativeMoveButton
+                            key={`${suggestion.uci}-${index}`}
+                            index={index}
+                            san={suggestion.san}
+                            evaluation={suggestion.evaluation}
+                            quality={alternativeQuality(selected.bestMoves, index)}
+                            active={highlightedBestMove === suggestion.uci}
+                            onClick={() => {
+                              setContinuationPreviewIndex(null);
+                              setHighlightedBestMove(suggestion.uci);
+                            }}
+                          />
+                        ))}
                       </div>
                     </div>
 
@@ -1735,8 +1846,8 @@ export default function ChessGameReview({
                 CENTER — QUICK NAVIGATION + BOARD
                =============================================== */}
 
-            <div className="flex min-h-0 flex-col gap-3">
-              <section className="shrink-0 rounded-2xl border border-white/10 bg-[#09121c]/78 backdrop-blur-xl px-3 py-2.5">
+            <div className="order-first flex min-h-0 flex-col gap-3 xl:order-none">
+              <section className="shrink-0 rounded-2xl border border-white/10 bg-[#09121c]/78 px-3 py-2.5">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>
                     <p className="text-[9px] font-black uppercase tracking-widest text-zinc-600">{ui("Quick Navigation")}</p>
@@ -1794,21 +1905,10 @@ export default function ChessGameReview({
                 <div className="w-full max-w-[min(100%,calc(100vh-15rem))]">
                   <Board
                     board={board}
-                    selectedSquare={
-                      continuationMove
-                        ? continuationMove.from
-                        : alternativeMove
-                          ? alternativeMove.from
-                          : null
-                    }
-                    legalMoves={alternativeMove ? [alternativeMove.to] : []}
-                    lastMove={
-                      continuationMove
-                        ? continuationMove
-                        : alternativeMove
-                          ? null
-                          : playedMove
-                    }
+                    annotations={selectedAnnotations}
+                    selectedSquare={null}
+                    legalMoves={[]}
+                    lastMove={continuationMove ?? alternativeMove ?? playedMove}
                     checkedKingSquare={checkedKingSquare}
                     onSquareClick={() => {}}
                     orientation={orientation}
@@ -1833,103 +1933,47 @@ export default function ChessGameReview({
             <div className="min-h-0">{renderMoveReviewPanel(true)}</div>
           </div>
         ) : (
-          <div className="grid min-h-0 flex-1 gap-2 overflow-hidden bg-[radial-gradient(circle_at_50%_12%,rgba(176,126,61,.035),transparent_28%)] p-4 xl:grid-cols-[290px_minmax(0,1fr)_450px]">
+          <div className="grid min-h-0 flex-1 auto-rows-max gap-2 overflow-y-auto bg-[radial-gradient(circle_at_50%_12%,rgba(176,126,61,.035),transparent_28%)] p-4 xl:auto-rows-auto xl:grid-cols-[290px_minmax(0,1fr)_450px] xl:overflow-hidden">
             {/* ===============================================
                 SIMPLE — CURRENT MOVE
                =============================================== */}
 
-            <aside className="min-h-0 overflow-y-auto rounded-2xl border border-white/10 bg-[#09121c]/78 backdrop-blur-xl p-4">
+            <aside className="min-h-0 overflow-y-auto rounded-2xl border border-white/10 bg-[#09121c]/78 p-4">
               {selected && (
                 <>
-                  <p className="text-[9px] font-black uppercase tracking-[0.18em] text-amber-200/45">{ui("Current Move")}</p>
-
-                  <div className="mt-3 flex items-center justify-between gap-3">
-                    <div>
-                      <SideBadge color={selected.color} />
-
-                      <div className="mt-3 flex items-center gap-2">
-                        <MovePiece review={selected} />
-                        <span className="font-mono text-2xl font-black text-[#f1e4ca]">
-                          {selected.san}
-                        </span>
-                      </div>
-                    </div>
-
-                    <QualityBadge quality={selected.quality} />
-                  </div>
-
-                  <div className="mt-4 rounded-xl bg-black/20 p-3 text-xs text-zinc-500">{ui("Evaluation loss")}{" "}
-                    <strong className="text-zinc-200">
-                      {(selected.centipawnLoss / 100).toFixed(2)}{ui("pawns")}</strong>
-                  </div>
-
-                  <button
-                    type="button"
+                  <CurrentMoveButton
+                    review={selected}
+                    quality={selectedRow ? displayQuality(selectedRow) : selected.quality}
+                    active={highlightedBestMove === null && continuationPreviewIndex === null}
                     onClick={() => {
                       setContinuationPreviewIndex(null);
                       setHighlightedBestMove(null);
                     }}
-                    className={`mt-5 flex w-full items-center justify-between rounded-xl border px-3 py-3 text-left transition ${
-                      highlightedBestMove === null
-                        ? "border-amber-300/25 bg-amber-300/[0.07]"
-                        : "border-white/[0.06] bg-black/20 hover:border-amber-200/10 hover:bg-amber-100/[0.025]"
-                    }`}
-                  >
-                    <div>
-                      <p className="text-[9px] font-black uppercase tracking-wider text-zinc-500">{ui("Played")}</p>
-                      <p className="mt-1 font-mono font-bold">{selected.san}</p>
-                    </div>
-                    <span className="text-lg">↪</span>
-                  </button>
+                  />
+
+                  <div className="mt-4 rounded-xl bg-black/20 p-3 text-xs text-zinc-500">{ui("Evaluation loss")}{" "}
+                    <strong className="text-zinc-200">
+                      {(selected.centipawnLoss / 100).toFixed(2)}</strong>
+                  </div>
 
                   <div className="mt-5">
                     <p className="text-[10px] font-black uppercase tracking-widest text-amber-400">{ui("Best Alternatives")}</p>
 
                     <div className="mt-3 space-y-2">
-                      {selected.bestMoves.map((suggestion, index) => {
-                        const active = highlightedBestMove === suggestion.uci;
-
-                        return (
-                          <button
+                      {selected.bestMoves.map((suggestion, index) => (
+                          <AlternativeMoveButton
                             key={`${suggestion.uci}-${index}`}
-                            type="button"
+                            index={index}
+                            san={suggestion.san}
+                            evaluation={suggestion.evaluation}
+                            quality={alternativeQuality(selected.bestMoves, index)}
+                            active={highlightedBestMove === suggestion.uci}
                             onClick={() => {
                               setContinuationPreviewIndex(null);
                               setHighlightedBestMove(suggestion.uci);
                             }}
-                            className={`flex w-full items-center justify-between rounded-xl border px-3 py-3 text-left transition ${
-                              active
-                                ? "border-amber-400/40 bg-amber-400/10"
-                                : "border-white/5 bg-black/20 hover:bg-white/5"
-                            }`}
-                          >
-                            <div className="flex items-center gap-3">
-                              <span
-                                className={`flex h-7 w-7 items-center justify-center rounded-lg text-xs font-black ${
-                                  active
-                                    ? "bg-amber-400 text-zinc-950"
-                                    : "bg-amber-400/10 text-amber-300"
-                                }`}
-                              >
-                                {index + 1}
-                              </span>
-
-                              <div>
-                                <p className="font-mono font-bold text-zinc-100">
-                                  {suggestion.san}
-                                </p>
-                                <p className="mt-0.5 text-[10px] text-zinc-600">
-                                  {active ? ui("Highlighted on board") : ui("Click to highlight")}
-                                </p>
-                              </div>
-                            </div>
-
-                            <span className="text-xs text-zinc-500">
-                              {suggestion.evaluation}
-                            </span>
-                          </button>
-                        );
-                      })}
+                          />
+                        ))}
                     </div>
                   </div>
 
@@ -2035,25 +2079,14 @@ export default function ChessGameReview({
                 SIMPLE — BOARD
                =============================================== */}
 
-            <main className="flex min-h-0 items-center justify-center overflow-hidden px-1 xl:px-0">
+            <main className="order-first flex min-h-0 items-center justify-center overflow-hidden px-1 xl:order-none xl:px-0">
               <div className="w-full max-w-[min(100%,calc(100vh-10rem))]">
                 <Board
                   board={board}
-                  selectedSquare={
-                    continuationMove
-                      ? continuationMove.from
-                      : alternativeMove
-                        ? alternativeMove.from
-                        : null
-                  }
-                  legalMoves={alternativeMove ? [alternativeMove.to] : []}
-                  lastMove={
-                    continuationMove
-                      ? continuationMove
-                      : alternativeMove
-                        ? null
-                        : playedMove
-                  }
+                  annotations={selectedAnnotations}
+                  selectedSquare={null}
+                  legalMoves={[]}
+                  lastMove={continuationMove ?? alternativeMove ?? playedMove}
                   checkedKingSquare={checkedKingSquare}
                   onSquareClick={() => {}}
                   orientation={orientation}
@@ -2309,7 +2342,7 @@ function buildEducationBullets(row: EnrichedReviewRow) {
     bullets.push("This matched Stockfish's first choice in the position.");
   } else {
     bullets.push(
-      `This move lost about ${(review.centipawnLoss / 100).toFixed(2)} pawns compared with best play.`,
+      `This move lost about ${(review.centipawnLoss / 100).toFixed(2)} evaluation points compared with best play.`,
     );
 
     if (review.bestMoveSan) {
@@ -2583,6 +2616,95 @@ function MovePiece({ review }: { review: MoveReview }) {
     <span className="w-6 text-center text-xl leading-none">
       {pieceSymbols[piece.color][piece.type]}
     </span>
+  );
+}
+
+function PairedReviewCell({
+  row,
+  quality,
+  selected,
+  showLoss,
+  onSelect,
+}: {
+  row: EnrichedReviewRow;
+  quality: ReviewVisualQuality;
+  selected: boolean;
+  showLoss: boolean;
+  onSelect: () => void;
+}) {
+  useUiLanguage();
+  const { review, pieceType } = row;
+  const color = qualityColor(quality);
+
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      title={ui(quality)}
+      aria-pressed={selected}
+      className={`group/quality flex w-full min-w-0 items-center gap-1.5 rounded-lg border-l-2 px-1.5 py-1.5 text-left transition ${
+        selected ? "bg-amber-300/[0.09]" : "hover:bg-amber-100/[0.035]"
+      }`}
+      style={{ borderLeftColor: color }}
+    >
+      <span className="w-4 shrink-0 text-center text-base leading-none">
+        {pieceType ? pieceSymbols[review.color][pieceType] : "·"}
+      </span>
+
+      <span className="min-w-0 flex-1 truncate font-mono text-xs font-bold text-zinc-200">
+        {review.san}
+      </span>
+
+      {showLoss && review.centipawnLoss > 0 && (
+        <span className="shrink-0 text-[8px] font-bold text-zinc-600">
+          {(review.centipawnLoss / 100).toFixed(2)}
+        </span>
+      )}
+
+      <span className="shrink-0" style={{ color }}>
+        <ReviewQualityIcon quality={quality} size={12} />
+      </span>
+    </button>
+  );
+}
+
+function CurrentMoveButton({
+  review,
+  quality,
+  active,
+  onClick,
+}: {
+  review: MoveReview;
+  quality: ReviewVisualQuality;
+  active: boolean;
+  onClick: () => void;
+}) {
+  useUiLanguage();
+  const color = qualityColor(quality);
+
+  return (
+    <button
+      type="button"
+      aria-pressed={active}
+      onClick={onClick}
+      className={`flex w-full flex-col gap-3 rounded-2xl border p-4 text-left transition ${
+        active ? "" : "border-white/5 bg-black/20 hover:bg-white/5"
+      }`}
+      style={active ? { borderColor: `${color}66`, background: `${color}1a` } : undefined}
+    >
+      <span className="flex items-center justify-between gap-3">
+        <span className="text-[9px] font-black uppercase tracking-[0.18em] text-amber-200/60">{ui("Current Move")}</span>
+        <SideBadge color={review.color} />
+      </span>
+
+      <span className="flex items-center justify-between gap-3">
+        <span className="flex items-center gap-3">
+          <MovePiece review={review} />
+          <span className="font-mono text-3xl font-black text-[#f1e4ca]">{review.san}</span>
+        </span>
+        <QualityBadge quality={quality} />
+      </span>
+    </button>
   );
 }
 

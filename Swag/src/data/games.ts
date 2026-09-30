@@ -11,6 +11,26 @@ export type Game = {
 
 export const games: Game[] = [
   {
+    title: "Pluto Party",
+    subtitle: "Good friends. Questionable decisions.",
+    description: "Explore six tropical islands in a four-player board adventure with branching paths, friends and bots.",
+    image: "/images/pluto-party.svg",
+    route: "/games/pluto-party",
+    tag: "Party",
+    features: ["4 players", "Friends & bots", "60 spaces"],
+    finished: false,
+  },
+  {
+    title: "Eat It",
+    subtitle: "Small circle. Big appetite.",
+    description: "Eat, grow, and be the last circle standing in colorful City and Nature arenas.",
+    image: "/images/eat-it.svg",
+    route: "/games/eat-it",
+    tag: "Arcade",
+    features: ["2–8 players", "Friends & bots", "Two worlds"],
+    finished: false,
+  },
+  {
     title: "Atlas Arena",
     subtitle: "The world is your board",
     description:
@@ -30,17 +50,6 @@ export const games: Game[] = [
     route: "/games/go",
     tag: "Strategy",
     features: ["Vs Bot", "Hotseat", "Multiplayer"],
-    finished: false,
-  },
-  {
-    title: "Shogi",
-    subtitle: "Japanese chess",
-    description:
-      "Promote pieces and return captures to the board in a complete game of Japanese Shogi.",
-    image: "/images/shogi-home.svg",
-    route: "/games/shogi",
-    tag: "Strategy",
-    features: ["Drops", "Vs Bot", "Multiplayer"],
     finished: false,
   },
   {
@@ -77,17 +86,6 @@ export const games: Game[] = [
     finished: true,
   },
 
-  {
-    title: "Schach 3D",
-    subtitle: "Schach in einer neuen Dimension",
-    description:
-      "Erlebe klassisches Schach auf einem animierten 3D-Brett – lokal im Hotseat oder gegen Stockfish mit mehreren Schwierigkeitsstufen.",
-    image: "/images/chess3d.png",
-    route: "/games/chess/3dchess",
-    tag: "Strategie · 3D",
-    features: ["3D-Brett", "Hotseat", "Stockfish AI"],
-    finished: true,
-  },
   {
     title: "Medieval Kingdoms",
     subtitle: "Rundenbasierte Strategie",

@@ -11,12 +11,12 @@ const tableThemes: {
 }[] = [
   {
     id: "classic",
-    name: "Klassisch",
+    name: "Classic",
     image: "/images/tables/classic.webp",
   },
   {
     id: "bavarian",
-    name: "Bayerische Stube",
+    name: "Bavarian room",
     image: "/images/tables/bavarian.webp",
   },
   {
@@ -31,7 +31,7 @@ const tableThemes: {
   },
   {
     id: "alpine",
-    name: "Alpen",
+    name: "Alpine",
     image: "/images/tables/alpine.webp",
   },
   {
@@ -54,13 +54,15 @@ export default function TableThemeSelector() {
     <div className="relative z-[150]">
       <button
         type="button"
+        aria-expanded={open}
+        title={ui("Table design")}
         onClick={() => setOpen((prev) => !prev)}
         className="
-          flex items-center gap-3
+          flex h-10 items-center gap-2 xl:gap-3
           rounded-xl
           border border-slate-700/70
           bg-slate-800/90
-          px-4 py-2
+          px-3 xl:px-4
           text-sm font-semibold
           text-slate-100
           shadow-lg
@@ -72,9 +74,9 @@ export default function TableThemeSelector() {
       >
         <PanelsTopLeft size={17} className="text-emerald-400" />
 
-        <span className="text-slate-400">{ui("Tischdesign:")}</span>
+        <span className="hidden text-slate-400 xl:inline">{ui("Table design")}:</span>
 
-        <span>{current.name}</span>
+        <span>{ui(current.name)}</span>
 
         <ChevronDown
           size={16}
@@ -89,12 +91,12 @@ export default function TableThemeSelector() {
         <div
           className="
             absolute
-            left-1/2
+            right-0
             top-full
             z-[200]
             mt-2
             w-64
-            -translate-x-1/2
+            max-w-[calc(100vw-1rem)]
             rounded-2xl
             border border-slate-700
             bg-slate-900/95
@@ -129,13 +131,13 @@ export default function TableThemeSelector() {
                 <div className="h-10 w-16 shrink-0 overflow-hidden rounded-md border border-white/10">
                   <img
                     src={theme.image}
-                    alt={theme.name}
+                    alt={ui(theme.name)}
                     className="h-full w-full object-cover"
                   />
                 </div>
 
                 <span className="flex-1 text-sm font-semibold text-slate-200">
-                  {theme.name}
+                  {ui(theme.name)}
                 </span>
 
                 {selected && <Check size={16} className="text-emerald-400" />}

@@ -1,0 +1,21 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Eat It — encounters and expanded maps</title>
+<style>body{margin:0;font:14px system-ui;background:#182c2a;color:white}nav{position:absolute;z-index:3;padding:12px;background:#182c2aee;display:flex;gap:14px;flex-wrap:wrap}label{display:flex;gap:7px;align-items:center}canvas{display:block;width:100vw;height:100vh}output{position:absolute;z-index:3;bottom:12px;left:12px;padding:10px;border-radius:9px;background:#182c2aee;pointer-events:none}button,select{font:inherit}#note{position:absolute;top:65px;left:20px;z-index:3;padding:8px;background:#182c2abb}</style>
+<nav><label>Map<select id="map"><option>city</option><option>nature</option></select></label><label>Scenario<select id="scenario"><option>World</option><option>Quest item</option><option>Carrying</option><option>Friendly</option><option>Revenge</option><option>Choking</option><option>Oversized</option></select></label><button id="reset">Reset</button><button id="pause">Pause</button></nav><div id="note">WASD / arrow keys · eight participants · shared simulation</div><canvas id="arena"></canvas><output id="status"></output>
+<script type="module">
+import{ArenaRenderer}from'/src/games/eat-it/renderer.ts';
+import{createGame,fillBots,stepGame}from'/src/games/eat-it/engine.ts';
+import{stepEncounter}from'/src/games/eat-it/quests.ts';
+import{EAT}from'/src/games/eat-it/config.ts';
+const map=document.querySelector('#map'),scenario=document.querySelector('#scenario'),keys=new Set();let renderer,state,previous=performance.now(),acc=0,paused=false,frames=0,fps=0,stamp=previous;
+function reset(){renderer?.dispose();renderer=new ArenaRenderer(document.querySelector('#arena'),map.value);renderer.resize(innerWidth,innerHeight);state=createGame(map.value,fillBots([{id:'a',name:'You'}],8),91);const p=state.players[0],e=state.encounter,n=e.npc;
+ if(scenario.value!=='World'){
+ Object.assign(p,{x:1200,y:1100,facing:0});state.players.slice(1).forEach((p,i)=>Object.assign(p,{x:2600+i*50,y:1800,bot:false}));state.food=state.food.filter(f=>Math.hypot(f.x-p.x,f.y-p.y)>500);state.nextFood=1e6;state.nextPower=1e6;
+ if(e.shrine)e.shrine={x:1400,y:1000};Object.assign(e.item,{x:p.x+60,y:p.y,home:{x:p.x+60,y:p.y}});Object.assign(n,{x:1350,y:1200,phase:'idle',until:3});
+ if(['Carrying','Friendly'].includes(scenario.value))stepEncounter(state,1/30);
+ if(scenario.value==='Friendly'){Object.assign(n,{x:p.x+60,y:p.y});stepEncounter(state,1/30);}
+ if(scenario.value==='Revenge'){p.mass=144;Object.assign(n,{x:p.x+10,y:p.y});stepEncounter(state,1/30);}
+ if(['Choking','Oversized'].includes(scenario.value))state.food.push({id:99999,kind:scenario.value==='Choking'?'tree':'car',x:p.x+(scenario.value==='Choking'?8:100),y:p.y,vx:0,vy:0,z:0,vz:0,rotation:0,target:null,capturedAt:0});
+ }acc=0;}
+for(const el of[map,scenario])el.onchange=reset;document.querySelector('#reset').onclick=reset;document.querySelector('#pause').onclick=()=>{paused=!paused;document.querySelector('#pause').textContent=paused?'Resume':'Pause';};onresize=()=>renderer.resize(innerWidth,innerHeight);onkeydown=e=>{if(['w','a','s','d','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)){e.preventDefault();keys.add(e.key);}};onkeyup=e=>keys.delete(e.key);onblur=()=>keys.clear();reset();
+function frame(now){const dt=Math.min(.1,(now-previous)/1000);previous=now;const p=state.players[0];p.input={x:Number(keys.has('d')||keys.has('ArrowRight'))-Number(keys.has('a')||keys.has('ArrowLeft')),y:Number(keys.has('s')||keys.has('ArrowDown'))-Number(keys.has('w')||keys.has('ArrowUp'))};if(!paused){acc+=dt;while(acc>=1/30){stepGame(state);acc-=1/30;}}renderer.draw(state,'a',dt,'You',false);frames++;if(now-stamp>1000){fps=Math.round(frames*1000/(now-stamp));frames=0;stamp=now;}document.querySelector('#status').textContent=`${map.value} · 3200 × 2400 · ${state.food.length} props · ${state.encounter.npc.kind}: ${state.encounter.npc.phase} · item: ${state.encounter.item.status} · mass ${p.mass.toFixed(0)} · feeds ${state.encounter.npc.feeds} · hits ${state.encounter.npc.attacks} · ${state.time.toFixed(1)}s · ${fps} fps`;requestAnimationFrame(frame);}requestAnimationFrame(frame);
+</script></html>

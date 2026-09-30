@@ -23,20 +23,14 @@ html:has(.app-shell), body:has(.app-shell) {
 }
 .app-shell { height: 100dvh; overflow: hidden; padding-top: var(--public-header-height); }
 .app-shell.integrated-navigation { --public-header-height: 0px; --app-height: 100dvh; padding-top: 0; }
-#app-navigation[open] { animation: navigation-right-enter .25s ease-out both; }
-#app-navigation[open][data-closing] { animation: navigation-right-exit .2s ease-in both; }
-@keyframes navigation-right-enter { from { transform: translateX(100%); } to { transform: translateX(0); } }
-@keyframes navigation-right-exit { from { transform: translateX(0); } to { transform: translateX(100%); } }
+#app-navigation[open] { animation: navigation-enter .25s ease-out both; }
+#app-navigation[open][data-closing] { animation: navigation-exit .2s ease-in both; }
 @keyframes navigation-enter { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@keyframes navigation-exit { from { transform: translateX(0); } to { transform: translateX(-100%); } }
 @media (prefers-reduced-motion: reduce) { #app-navigation[open] { animation: none; } }
 .app-viewport { height: var(--app-height); min-height: 0; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; }
 .app-viewport .min-h-screen { min-height: var(--app-height); }
 .app-viewport .h-screen { height: var(--app-height); }
-.game-menu-pluto { display: inline-flex; min-height: 40px; align-items: center; border-radius: 10px; padding: 0 10px; background: #ffffff0c; color: #f4f4f5; }
-.game-menu-brand { display: inline-flex; min-width: 0; align-items: center; gap: 8px; color: #f4f4f5; font-size: 15px; font-weight: 650; }
-.game-menu-symbol { display: inline-grid; height: 32px; width: 32px; flex-shrink: 0; place-items: center; border-radius: 8px; background: #ffffff12; font-size: 20px; }
-@media (max-width: 639px) { .game-menu-brand { font-size: 13px; } }
-@media (min-width: 640px) and (max-width: 1023px) { .app-shell:has(.game-menu-brand) { --public-header-height: 7rem; } }
 @media (max-width: 639px) {
   .public-header-language label > span {
     position: absolute;

@@ -1,3 +1,6 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
+import InviteFriendButton from "@/components/chess/InviteFriendButton";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -41,6 +44,7 @@ import {
   type BossSide,
   type BossTargetMode,
 } from "../../../games/chess/variants/bossBattle";
+import VariantRoomSetup from "./VariantRoomSetup";
 
 type PlayerColor = "white" | "black";
 type PromotionPiece = "q" | "r" | "b" | "n";
@@ -266,21 +270,6 @@ function getFinish(
   return null;
 }
 
-function finishLabel(result: FinishedGame): string {
-  if (!result) return "";
-
-  if (result.reason === "boss_hp") {
-    return "The Boss has lost all 5 HP.";
-  }
-
-  if (result.reason === "checkmate") return "Checkmate.";
-  if (result.reason === "stalemate") return "Stalemate.";
-  if (result.reason === "fifty") return "50-move rule.";
-  if (result.reason === "repetition") return "Threefold repetition.";
-  if (result.reason === "resignation") return "Resignation.";
-
-  return "Game finished.";
-}
 
 function Panel({
   title,
@@ -331,7 +320,6 @@ export function BossBattleMultiplayerLobby() {
   const [displayName, setDisplayName] = useState(
     (profile as { username?: string | null } | null)?.username ?? "Player",
   );
-  const [hostColor, setHostColor] = useState<PlayerColor>("white");
   const [joinCode, setJoinCode] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
   const [busy, setBusy] = useState<"create" | "join" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -347,7 +335,7 @@ export function BossBattleMultiplayerLobby() {
       {
         p_initial_state: initialStoredState(),
         p_display_name: displayName.trim() || "Player",
-        p_host_color: hostColor,
+        p_host_color: "black",
       },
     );
 
@@ -420,29 +408,8 @@ export function BossBattleMultiplayerLobby() {
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <section className="rounded-2xl border border-white/5 bg-black/20 p-4">
               <h2 className="font-black">{ui("Create room")}</h2>
-              <p className="mt-1 text-xs text-zinc-500">{ui("Choose White or the Black Boss.")}</p>
+              <p className="mt-1 text-xs text-zinc-500">{ui("Pick White or the Black Boss in the room.")}</p>
 
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setHostColor("white")}
-                  className={`rounded-xl border px-3 py-3 text-sm font-black ${
-                    hostColor === "white"
-                      ? "border-zinc-200/30 bg-white/10 text-white"
-                      : "border-white/10 bg-white/5 text-zinc-500"
-                  }`}
-                >{ui("♔ White Army")}</button>
-
-                <button
-                  type="button"
-                  onClick={() => setHostColor("black")}
-                  className={`rounded-xl border px-3 py-3 text-sm font-black ${
-                    hostColor === "black"
-                      ? "border-violet-300/30 bg-violet-400/15 text-violet-100"
-                      : "border-white/10 bg-white/5 text-zinc-500"
-                  }`}
-                >{ui("♚ Boss")}</button>
-              </div>
 
               <button
                 type="button"
@@ -1317,10 +1284,6 @@ export function BossBattleMultiplayerGame() {
       ? Boolean(gameState.white_rematch_ready)
       : Boolean(gameState.black_rematch_ready);
 
-  const opponentRematchReady =
-    myColor === "white"
-      ? Boolean(gameState.black_rematch_ready)
-      : Boolean(gameState.white_rematch_ready);
 
   const rage = getBossRage(displayedBossState);
   async function copyRoomCode() {
@@ -1337,6 +1300,17 @@ export function BossBattleMultiplayerGame() {
     } catch {
       setError("Could not copy room code.");
     }
+  }
+
+  if (room.status === "waiting") {
+    return (
+      <VariantRoomSetup
+        roomId={room.id}
+        variantName={"Boss Battle"}
+        lobbyPath={"/games/chess/variants/boss/multiplayer"}
+        onStarted={() => void loadAll()}
+      />
+    );
   }
 
   return (
@@ -1412,35 +1386,24 @@ export function BossBattleMultiplayerGame() {
             </Panel>
 
             <Panel title={ui("Action History")}>
-              <div className="max-h-80 overflow-y-auto rounded-xl border border-white/5 bg-black/20">
-                {storedState.history.length === 0 ? (
-                  <p className="px-4 py-7 text-center text-xs text-zinc-600">{ui("No actions yet")}</p>
-                ) : (
-                  storedState.history.map((entry) => (
-                    <button
-                      key={entry.ply}
-                      type="button"
-                      onClick={() => {
-                        setHistoryPreviewPly(entry.ply);
-                        clearSelection();
-                        clearPowerTarget();
-                        setPendingPromotion(null);
-                      }}
-                      className={`flex w-full items-center justify-between border-b border-white/5 px-3 py-2.5 text-left text-xs last:border-0 ${
-                        historyPreviewPly === entry.ply
-                          ? "bg-violet-400/10 text-violet-200"
-                          : "text-zinc-400 hover:bg-white/5"
-                      }`}
-                    >
-                      <span>
-                        {entry.moveNumber}
-                        {entry.color === "w" ? "." : "..."} {entry.san}
-                      </span>
-                      <span>{entry.bossDamaged ? "♥−1" : ""}</span>
-                    </button>
-                  ))
-                )}
-              </div>
+              <ChessMoveHistoryList
+                listClassName="max-h-80 rounded-xl border border-white/5 bg-black/20"
+                selectedPly={historyPreviewPly}
+                emptyLabel="No actions yet"
+                entries={storedState.history.map((entry) => ({
+                  ply: entry.ply,
+                  side: entry.color,
+                  moveNumber: entry.moveNumber,
+                  content: <span className="truncate font-mono text-xs font-bold text-zinc-200">{entry.san}</span>,
+                  trailing: entry.bossDamaged ? <span className="text-red-300">♥−1</span> : null,
+                }))}
+                onSelect={(ply) => {
+                  setHistoryPreviewPly(ply);
+                  clearSelection();
+                  clearPowerTarget();
+                  setPendingPromotion(null);
+                }}
+              />
             </Panel>
           </aside>
 
@@ -1490,6 +1453,24 @@ export function BossBattleMultiplayerGame() {
                   }
                 />
               </div>
+            )}
+
+            {finishedGame && historyPreviewPly === null && (
+              <VisibleGameResult
+                winner={finishedGame.winner}
+                playerColor={myColor}
+                reason={finishedGame.reason}
+                actions={
+                  <button
+                    type="button"
+                    onClick={requestRematch}
+                    disabled={myRematchReady || Boolean(actionBusy)}
+                    className="mt-5 w-full rounded-xl bg-violet-400 px-4 py-3 font-black text-violet-950 disabled:opacity-50"
+                  >
+                    {myRematchReady ? ui("Waiting for opponent…") : ui("Play again")}
+                  </button>
+                }
+              />
             )}
 
             <div className="relative">
@@ -1547,37 +1528,11 @@ export function BossBattleMultiplayerGame() {
                       {codeCopied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
                     </p>
                   </button>
+                    <InviteFriendButton overlay />
                 </div>
               )}
 
-              {finishedGame && historyPreviewPly === null && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[28px] bg-zinc-950/80 p-6 backdrop-blur-sm">
-                  <div className="max-w-sm rounded-3xl border border-violet-300/20 bg-zinc-900 p-6 text-center shadow-2xl">
-                    <p className="text-xs font-black uppercase tracking-[0.25em] text-violet-300">{ui("Game Over")}</p>
 
-                    <h2 className="mt-3 text-3xl font-black">
-                      {finishedGame.winner === "draw" ? ui("Draw") : finishedGame.winner === myColor ? ui("You win") : ui("You lose")}
-                    </h2>
-
-                    <p className="mt-3 text-sm text-zinc-500">
-                      {finishLabel(finishedGame)}
-                    </p>
-
-                    <button
-                      type="button"
-                      onClick={requestRematch}
-                      disabled={myRematchReady || Boolean(actionBusy)}
-                      className="mt-5 w-full rounded-xl bg-violet-400 px-4 py-3 font-black text-violet-950 disabled:opacity-50"
-                    >
-                      {myRematchReady ? ui("Waiting for opponent…") : ui("Play again")}
-                    </button>
-
-                    {opponentRematchReady && !myRematchReady && (
-                      <p className="mt-3 text-xs text-emerald-300">{ui("Opponent wants a rematch.")}</p>
-                    )}
-                  </div>
-                </div>
-              )}
             </div>
           </section>
 

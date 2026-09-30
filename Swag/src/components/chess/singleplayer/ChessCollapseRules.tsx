@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { Chess, type Square } from "chess.js";
 
 type TabKey = "rules" | "openings" | "situations" | "puzzles";
-type Language = "en" | "de" | "bar" | "ko" | "ru";
+type Language = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 
 const languageOptions: Array<{ value: Language; label: string }> = [
   { value: "en", label: "English" },
@@ -14,9 +14,11 @@ const languageOptions: Array<{ value: Language; label: string }> = [
   { value: "bar", label: "Boarisch" },
   { value: "ko", label: "한국어" },
   { value: "ru", label: "Русский" },
+  { value: "es", label: "Español" },
+  { value: "pt", label: "Português" },
 ];
 
-const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
+const translations: Record<"de" | "bar" | "ko" | "ru", Record<string, string>> & Partial<Record<"es" | "pt", Record<string, string>>> = {
   de: {
     Language: "Sprache",
     "Learn Chess": "Schach lernen",
@@ -1751,7 +1753,7 @@ function translate(language: Language, text: string): string {
     return translations.bar[text] ?? translations.de[text] ?? text;
   }
 
-  return translations[language][text] ?? text;
+  return translations[language]?.[text] ?? ui(text);
 }
 
 const LanguageContext = createContext<Language>("en");

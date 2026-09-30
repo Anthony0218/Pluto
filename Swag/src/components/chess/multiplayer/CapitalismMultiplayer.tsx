@@ -1,4 +1,10 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
+import InviteFriendButton from "@/components/chess/InviteFriendButton";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { playChessSound } from "@/games/chess/audio/chessAudio";
+import { useVariantRecordAudio } from "@/games/chess/audio/useVariantRecordAudio";
+import type { ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -36,6 +42,7 @@ import {
   type RoyalPowerId,
   type ShopPieceType,
 } from "../../../games/chess/variants/capitalismChess";
+import VariantRoomSetup from "./VariantRoomSetup";
 
 type PlayerColor = "white" | "black";
 type PromotionPiece = "q" | "r" | "b" | "n";
@@ -294,7 +301,6 @@ export function CapitalismMultiplayerLobby() {
   const [displayName, setDisplayName] = useState(
     (profile as { username?: string | null } | null)?.username ?? "Player",
   );
-  const [hostColor, setHostColor] = useState<PlayerColor>("white");
   const [joinCode, setJoinCode] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
   const [busy, setBusy] = useState<"create" | "join" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -314,7 +320,7 @@ export function CapitalismMultiplayerLobby() {
         p_seed: seed,
         p_initial_state: state,
         p_display_name: displayName.trim() || "Player",
-        p_host_color: hostColor,
+        p_host_color: "black",
       },
     );
 
@@ -388,24 +394,8 @@ export function CapitalismMultiplayerLobby() {
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <section className="rounded-2xl border border-white/5 bg-black/20 p-4">
               <h2 className="font-black">{ui("Create room")}</h2>
-              <p className="mt-1 text-xs text-zinc-500">{ui("Choose your starting color.")}</p>
+              <p className="mt-1 text-xs text-zinc-500">{ui("Colors are picked in the room.")}</p>
 
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                {(["white", "black"] as PlayerColor[]).map((color) => (
-                  <button
-                    key={color}
-                    type="button"
-                    onClick={() => setHostColor(color)}
-                    className={`rounded-xl border px-3 py-3 text-sm font-black ${
-                      hostColor === color
-                        ? "border-amber-300/30 bg-amber-400/15 text-amber-100"
-                        : "border-white/10 bg-white/5 text-zinc-400"
-                    }`}
-                  >
-                    {color === "white" ? ui("♔ White") : ui("♚ Black")}
-                  </button>
-                ))}
-              </div>
 
               <button
                 type="button"
@@ -497,6 +487,12 @@ export function CapitalismMultiplayerGame() {
         : null,
     [gameState],
   );
+  useVariantRecordAudio(stored?.records ?? null, record => {
+    const sounds: ChessSoundEvent[] = [];
+    if (record.economy.bountyClaimed) sounds.push("bountyComplete");
+    if (record.economy.missionCompleted) sounds.push("missionComplete");
+    return sounds;
+  });
 
   const liveGame = useMemo(
     () => (gameState?.fen ? new Chess(gameState.fen) : new Chess()),
@@ -968,6 +964,8 @@ export function CapitalismMultiplayerGame() {
     if (rpcError) {
       setError(rpcError.message);
       await loadAll();
+    } else {
+      playChessSound("marketSpawn");
     }
 
     setActionBusy(null);
@@ -1185,10 +1183,17 @@ export function CapitalismMultiplayerGame() {
     mySide === "white"
       ? Boolean(gameState.white_rematch_ready)
       : Boolean(gameState.black_rematch_ready);
-  const opponentRematchReady =
-    mySide === "white"
-      ? Boolean(gameState.black_rematch_ready)
-      : Boolean(gameState.white_rematch_ready);
+
+  if (room.status === "waiting") {
+    return (
+      <VariantRoomSetup
+        roomId={room.id}
+        variantName={"Capitalism Chess"}
+        lobbyPath={"/games/chess/variants/capitalism/multiplayer"}
+        onStarted={() => void loadAll()}
+      />
+    );
+  }
 
   return (
     <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
@@ -1236,36 +1241,23 @@ export function CapitalismMultiplayerGame() {
             </Panel>
 
             <Panel title={ui("Move History")}>
-              <div className="max-h-80 overflow-y-auto rounded-xl border border-white/5 bg-black/20">
-                {stored.records.length === 0 ? (
-                  <p className="px-4 py-7 text-center text-xs text-zinc-600">{ui("No moves yet")}</p>
-                ) : (
-                  stored.records.map((record) => (
-                    <button
-                      key={record.ply}
-                      type="button"
-                      onClick={() => {
-                        setHistoryPreviewPly(record.ply);
-                        clearSelection();
-                        setPromotion(null);
-                      }}
-                      className={`flex w-full items-center justify-between gap-3 border-b border-white/5 px-3 py-2.5 text-left text-xs last:border-0 ${
-                        historyPreviewPly === record.ply
-                          ? "bg-amber-400/10 text-amber-200"
-                          : "text-zinc-400 hover:bg-white/5"
-                      }`}
-                    >
-                      <span>
-                        {record.moveNumber}
-                        {record.color === "w" ? "." : "..."} {record.san}
-                      </span>
-                      <span className="font-black text-emerald-300">
-                        {record.economy.totalEarned > 0 ? `+$${record.economy.totalEarned}` : ""}
-                      </span>
-                    </button>
-                  ))
-                )}
-              </div>
+              <ChessMoveHistoryList
+                listClassName="max-h-80 rounded-xl border border-white/5 bg-black/20"
+                selectedPly={historyPreviewPly}
+                emptyLabel="No moves yet"
+                entries={stored.records.map((record) => ({
+                  ply: record.ply,
+                  side: record.color,
+                  moveNumber: record.moveNumber,
+                  content: <span className="truncate font-mono text-xs font-bold text-zinc-200">{record.san}</span>,
+                  trailing: <span className="font-black text-emerald-300">{record.economy.totalEarned > 0 ? `+$${record.economy.totalEarned}` : ""}</span>,
+                }))}
+                onSelect={(ply) => {
+                  setHistoryPreviewPly(ply);
+                  clearSelection();
+                  setPromotion(null);
+                }}
+              />
             </Panel>
           </aside>
 
@@ -1293,6 +1285,24 @@ export function CapitalismMultiplayerGame() {
                   }
                 />
               </div>
+            )}
+
+            {liveFinish && historyPreviewPly === null && (
+              <VisibleGameResult
+                winner={liveFinish.winner}
+                playerColor={myColor}
+                reason={liveFinish.reason}
+                actions={
+                  <button
+                    type="button"
+                    onClick={requestRematch}
+                    disabled={myRematchReady || Boolean(actionBusy)}
+                    className="mt-5 w-full rounded-xl bg-amber-400 px-4 py-3 font-black text-amber-950 disabled:opacity-50"
+                  >
+                    {myRematchReady ? ui("Waiting for opponent…") : ui("Play again")}
+                  </button>
+                }
+              />
             )}
 
             <div className="relative">
@@ -1345,35 +1355,11 @@ export function CapitalismMultiplayerGame() {
                       {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
                     </p>
                   </button>
+                    <InviteFriendButton overlay />
                 </div>
               )}
 
-              {liveFinish && historyPreviewPly === null && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[28px] bg-zinc-950/80 p-6 backdrop-blur-sm">
-                  <div className="max-w-sm rounded-3xl border border-amber-300/20 bg-zinc-900 p-6 text-center shadow-2xl">
-                    <p className="text-xs font-black uppercase tracking-[0.25em] text-amber-300">{ui("Market Closed")}</p>
-                    <h2 className="mt-3 text-3xl font-black">
-                      {liveFinish.winner === "draw" ? ui("Draw") : liveFinish.winner === mySide ? ui("You win") : ui("You lose")}
-                    </h2>
-                    <p className="mt-3 text-sm text-zinc-500">
-                      {liveFinish.reason.replaceAll("_", " ")}
-                    </p>
 
-                    <button
-                      type="button"
-                      onClick={requestRematch}
-                      disabled={myRematchReady || Boolean(actionBusy)}
-                      className="mt-5 w-full rounded-xl bg-amber-400 px-4 py-3 font-black text-amber-950 disabled:opacity-50"
-                    >
-                      {myRematchReady ? ui("Waiting for opponent…") : ui("Play again")}
-                    </button>
-
-                    {opponentRematchReady && !myRematchReady && (
-                      <p className="mt-3 text-xs text-emerald-300">{ui("Opponent wants a rematch.")}</p>
-                    )}
-                  </div>
-                </div>
-              )}
             </div>
           </section>
 

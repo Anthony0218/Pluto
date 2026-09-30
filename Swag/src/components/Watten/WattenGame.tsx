@@ -27,17 +27,15 @@ import CardThemeSelector from "./WattenCardGameSelector";
 import { useCardTheme } from "@/context/CardThemeContext";
 import { getWattenCardImage } from "@/utils/WattenCardImages";
 import TableThemeSelector from "../App/TableThemeSelector";
+import { HeaderTools } from "@/components/App/PublicHeader";
 import { useTableTheme, type TableTheme } from "@/context/TableThemeContext";
 import { useAuth } from "@/context/AuthContext";
 import { ProfileAvatar } from "../social/ProfileAvatarPicker";
 import "./wattenGameScreen.css";
 
 import {
-  setStoredWattenLanguage,
   translateWatten,
   translateWattenPair,
-  WattenLanguageSelector,
-  type WattenLanguage,
 } from "@/games/watten/i18n/wattenLanguage";
 
 const tableBackgrounds: Record<TableTheme, string> = {
@@ -122,7 +120,7 @@ export default function WattenGame() {
   const { profile } = useAuth();
   const hostAvatarId = (profile as { avatar_id?: string | null } | null)?.avatar_id ?? "m1";
   const { tableTheme } = useTableTheme();
-  const { language, setLanguage } = useAppLanguage();
+  const { language } = useAppLanguage();
   const t = useCallback(
     (key: string) => translateWatten(language, key),
     [language],
@@ -133,10 +131,6 @@ export default function WattenGame() {
     [language],
   );
 
-  function changeLanguage(next: WattenLanguage) {
-    setLanguage(next);
-    setStoredWattenLanguage(next);
-  }
   const location = useLocation();
   const [phase, setPhase] = useState<
     | "setup"
@@ -987,6 +981,9 @@ export default function WattenGame() {
     }
 
     if (card.rank === schlag) {
+      if (language === "es" || language === "pt") {
+        return t("Schlag ({rank}) — stronger than normal trump cards. If two equal Schlag cards are played, the first one wins.").replace("{rank}", schlag);
+      }
       return l(
         `Schlag (${schlag}) — stärker als normale Trumpfkarten. Werden zwei gleichwertige Schläge gespielt, gewinnt der zuerst gespielte.`,
         `Schlag (${schlag}) — stronger than normal trump cards. If two equal Schlag cards are played, the first one wins.`,
@@ -994,6 +991,9 @@ export default function WattenGame() {
     }
 
     if (card.suit === Farbe) {
+      if (language === "es" || language === "pt") {
+        return t("Trump ({suit}) — this card beats ordinary non-trump cards.").replace("{suit}", Farbe);
+      }
       return l(
         `Trumpf (${Farbe}) — Diese Karte schlägt gewöhnliche Karten, die keine Trümpfe sind.`,
         `Trump (${Farbe}) — this card beats ordinary non-trump cards.`,
@@ -1073,14 +1073,18 @@ export default function WattenGame() {
       },
       {
         title: "Schläge",
-        description: l(
-          `Alle anderen ${schlag}. Sie sind gleich stark; der zuerst gespielte gewinnt.`,
-          `All other ${schlag}. They are equal in strength; the first played wins.`,
-        ),
+        description: language === "es" || language === "pt"
+          ? t("All other {rank}. They are equal in strength; the first played wins.").replace("{rank}", schlag)
+          : l(
+            `Alle anderen ${schlag}. Sie sind gleich stark; der zuerst gespielte gewinnt.`,
+            `All other ${schlag}. They are equal in strength; the first played wins.`,
+          ),
         cards: schlaege,
       },
       {
-        title: l(`Trumpf / Farbe (${Farbe})`, `Trump / suit (${Farbe})`),
+        title: language === "es" || language === "pt"
+          ? t("Trump / suit ({suit})").replace("{suit}", Farbe)
+          : l(`Trumpf / Farbe (${Farbe})`, `Trump / suit (${Farbe})`),
         description: l(
           "Danach folgen die übrigen Karten der Trumpffarbe.",
           "Then come the remaining cards of the trump suit.",
@@ -1319,13 +1323,7 @@ export default function WattenGame() {
               >
                 {helpMode ? "💡 Help On" : "💡 Help"}
               </button>
-              <WattenLanguageSelector
-                language={language}
-                onChange={changeLanguage}
-                label={t("Language")}
-              />
-              <CardThemeSelector />
-              <TableThemeSelector />
+              <HeaderTools><CardThemeSelector /><TableThemeSelector /></HeaderTools>
 
               <Link
                 to="/watten/hotseat"
@@ -2898,8 +2896,7 @@ export default function WattenGame() {
           >
             {l("📖 Spielregeln", "📖 Rules")}
           </button>
-          <CardThemeSelector />
-          <TableThemeSelector />
+          <HeaderTools><CardThemeSelector /><TableThemeSelector /></HeaderTools>
           <Link
             to="/watten"
             className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium transition hover:bg-white/20"

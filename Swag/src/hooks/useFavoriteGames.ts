@@ -48,7 +48,8 @@ export function useFavoriteGames(userId?: string) {
       catch { if (!userId) throw new Error("storage"); }
       setRoutes(selection);
       return true;
-    } catch {
+    } catch (cause) {
+      console.error("Saving favorite games failed", cause);
       setError(userId ? "Your games could not be saved. Please try again." : "Your browser could not save this selection.");
       return false;
     } finally { setSaving(false); }

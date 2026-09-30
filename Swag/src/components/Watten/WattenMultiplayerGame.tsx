@@ -25,16 +25,14 @@ import CardThemeSelector from "./WattenCardGameSelector";
 import { useCardTheme } from "@/context/CardThemeContext";
 import { getWattenCardImage } from "@/utils/WattenCardImages";
 import TableThemeSelector from "../App/TableThemeSelector";
+import { HeaderTools } from "@/components/App/PublicHeader";
 import { ProfileAvatar } from "../social/ProfileAvatarPicker";
 import "./wattenGameScreen.css";
 
 import { useTableTheme, type TableTheme } from "@/context/TableThemeContext";
 import {
-  setStoredWattenLanguage,
   translateWatten,
   translateWattenPair,
-  WattenLanguageSelector,
-  type WattenLanguage,
 } from "@/games/watten/i18n/wattenLanguage";
 
 type Room = {
@@ -317,7 +315,7 @@ export default function WattenMultiplayerGame() {
 
   const { tableTheme } = useTableTheme();
 
-  const { language, setLanguage } = useAppLanguage();
+  const { language } = useAppLanguage();
   const [waitingTargetScore, setWaitingTargetScore] = useState(15);
 
   const t = useCallback(
@@ -330,10 +328,6 @@ export default function WattenMultiplayerGame() {
     [language],
   );
 
-  function changeLanguage(next: WattenLanguage) {
-    setLanguage(next);
-    setStoredWattenLanguage(next);
-  }
 
   const [room, setRoom] = useState<Room | null>(null);
 
@@ -1295,11 +1289,6 @@ export default function WattenMultiplayerGame() {
             </div>
 
             <div className="flex items-center gap-3 max-md:w-full max-md:gap-2 max-md:overflow-x-auto max-md:pb-1">
-              <WattenLanguageSelector
-                language={language}
-                onChange={changeLanguage}
-                label={t("Language")}
-              />
 
               <Link
                 to="/games/watten/multiplayer"
@@ -2123,11 +2112,6 @@ export default function WattenMultiplayerGame() {
           </div>
 
           <div className="flex items-center gap-3 max-md:w-full max-md:gap-2 max-md:overflow-x-auto max-md:pb-1">
-            <WattenLanguageSelector
-              language={language}
-              onChange={changeLanguage}
-              label={t("Language")}
-            />
 
             <button
               type="button"
@@ -2151,9 +2135,7 @@ export default function WattenMultiplayerGame() {
                 : l("💡 Hilfe", "💡 Help")}
             </button>
 
-            <CardThemeSelector />
-
-            <TableThemeSelector />
+            <HeaderTools><CardThemeSelector /><TableThemeSelector /></HeaderTools>
 
             <Link
               to="/games/watten/multiplayer"

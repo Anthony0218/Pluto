@@ -4,7 +4,7 @@ export const learningResources = [
   {
     title: "Chess Puzzles",
     description: "Sharpen your tactics and pattern recognition.",
-    route: "/games/chess/rules?tab=puzzles",
+    route: "/games/chess/puzzles",
   },
   {
     title: "Watten rules",

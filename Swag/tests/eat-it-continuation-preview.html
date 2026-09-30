@@ -1,0 +1,35 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Eat It continuation visual checks</title>
+<style>body{margin:0;background:#182c2a;color:white;font:14px system-ui}nav{position:absolute;z-index:3;display:flex;gap:10px;flex-wrap:wrap;padding:10px;background:#192637ed}label{display:flex;gap:6px;align-items:center}canvas{display:block;width:100vw;height:100vh}output{position:absolute;z-index:3;bottom:12px;left:12px;background:#192637ed;padding:8px;max-width:60%}</style>
+<nav><label>Scenario<select id="scenario"><option>City</option><option>Nature</option><option>Growth</option><option>Shield</option><option>Hell</option><option>Eruption</option><option>Swallow</option></select></label><label>Growth<select id="growth"><option>100</option><option>200</option><option>1000</option><option>2000</option><option selected>4000</option><option>8000</option></select></label><label>Object<select id="kind"><option>house</option><option>car</option><option>tree</option><option>shrine</option></select></label><label>Progress<input id="progress" type="range" min="0" max="100" value="25"></label><button id="reset">Reset</button></nav><canvas id="arena"></canvas><output id="status"></output>
+<script type="module">
+import {ArenaRenderer} from '/src/games/eat-it/renderer.ts';
+import {createGame} from '/src/games/eat-it/engine.ts';
+import {EAT,FOOD,playerRadius,cameraZoom} from '/src/games/eat-it/config.ts';
+import {startHell,blackHoles,cellCenter,cellIndex,stepEruptions,stepHell} from '/src/games/eat-it/hell.ts';
+import {mouthPosition,mouthOpening,consumptionDuration} from '/src/games/eat-it/rules.ts';
+import {beginFall} from '/src/games/eat-it/falling.ts';
+const scenario=document.querySelector('#scenario'),growth=document.querySelector('#growth'),kind=document.querySelector('#kind'),progress=document.querySelector('#progress'),status=document.querySelector('#status');
+let state,renderer,baseTime=0,food,frames=0,previous=performance.now(),fps=0;
+function reset(){
+ renderer?.dispose();document.querySelector('#arena').replaceWith(Object.assign(document.createElement('canvas'),{id:'arena'}));
+ const map=scenario.value==='Nature'?'nature':'city';renderer=new ArenaRenderer(document.querySelector('#arena'),map);renderer.resize(innerWidth,innerHeight);
+ state=createGame(map,[{id:'a',name:'Visual check'}],44,'visual',{mode:'solo',botsEnabled:false});const p=state.players[0];Object.assign(p,{x:1600,y:1520,mass:Number(growth.value),facing:0});delete state.encounter;state.powerups=[];state.time=10;baseTime=10;food=null;
+ if(['Hell','Eruption'].includes(scenario.value)){
+  startHell(state);state.time=state.hell.readyAt;state.phase='hell';baseTime=state.time;p.x=2000;p.y=1500;p.mass=800;p.hellScale=1;
+  blackHoles(state).forEach((b,i)=>{Object.assign(b,{x:1700+i*300,y:1350+(i%2)*350,from:{x:1700+i*300,y:1350+(i%2)*350},destination:{x:1750+i*240,y:1850-(i%2)*650},warnUntil:1000,speedCategory:['normal','fast','slow'][i],progress:0});if(i===2)b.control={x:2050,y:1050};else delete b.control;});
+  if(scenario.value==='Eruption'){const at=cellCenter(cellIndex({x:2000,y:1700}));state.hell.nextEruption=1e9;state.hell.eruptions=[{...at,id:999,warningAt:baseTime,eruptAt:baseTime+2,endsAt:baseTime+3.2,hit:['a']}];const target=baseTime+Number(progress.value)/100*4;while(state.time<target){state.time=Math.min(target,state.time+1/30);stepEruptions(state);stepHell(state,1/30);}}
+ }
+ if(scenario.value==='Swallow'){
+  const m=mouthPosition(p),extent=FOOD[kind.value].width/2;food={id:99999,kind:kind.value,x:m.x+mouthOpening(p)/2+extent*.48,y:m.y,vx:0,vy:0,z:0,vz:0,rotation:0,target:p.id,capturedAt:10};beginFall(food,p,10);state.food=[food];
+ }
+}
+for(const el of [scenario,growth,kind])el.onchange=reset;document.querySelector('#reset').onclick=reset;progress.oninput=()=>{if(scenario.value==='Eruption')reset();};window.onresize=()=>renderer.resize(innerWidth,innerHeight);reset();
+function draw(now){
+ const p=state.players[0];state.time=baseTime+(scenario.value==='Swallow'?Number(progress.value)/100*consumptionDuration(food):scenario.value==='Eruption'?Number(progress.value)/100*4:0);
+ if(scenario.value==='Shield'){state.time=10+now/1000%2;p.effects.shield=state.time+(Number(progress.value)<75?20:2);p.shieldHitAt=Number(progress.value)<40?state.time-.2:-10;}
+ if(scenario.value==='Eruption'){stepEruptions(state);stepHell(state,0);}
+ renderer.draw(state,'a',1/60,'You');frames++;if(now-previous>1000){fps=Math.round(frames*1000/(now-previous));frames=0;previous=now;}
+ status.textContent=`${scenario.value} · Growth ${p.mass} · radius ${playerRadius(p).toFixed(1)} · screen scale ${(playerRadius(p)*cameraZoom(p.mass)).toFixed(1)} · ${state.food.length} objects · ${blackHoles(state).length} holes · ${fps} fps`;
+ requestAnimationFrame(draw);
+}requestAnimationFrame(draw);
+</script></html>

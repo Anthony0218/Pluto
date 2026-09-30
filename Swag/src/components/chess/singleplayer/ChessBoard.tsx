@@ -1,3 +1,4 @@
+import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
@@ -10,12 +11,12 @@ import { supabase } from "../../../lib/supabase.ts";
 import { getSquareName, type PieceType } from "../../../utils/chessUtils.ts";
 
 import Board from "./Board.tsx";
+import { liveCoachAnnotations } from "./boardAnnotations";
 
 import {
   playPieceSelectSound,
   playPieceMoveSound,
   playPieceCaptureSound,
-  playRandomSound,
 } from "../../../utils/sound.ts";
 
 import PromotionBar from "./PromotionBar";
@@ -36,8 +37,10 @@ import {
 import ChessGameReview from "./ChessGameReview";
 
 import { useDelayedBoardOrientation } from "../../../hooks/useDelayedBoardOrientation.ts";
-import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
 import ChessMatchStatus from "./ChessMatchStatus.tsx";
+import ChessMoveHistoryList from "../ChessMoveHistoryList.tsx";
+import MoveClassificationGuide from "./MoveClassificationGuide.tsx";
+import { ReviewQualityIcon } from "./ReviewQualityBadge.tsx";
 
 /* =========================================================
    TYPES
@@ -69,15 +72,8 @@ type ChessBoardProps = {
   onlineGameId?: string;
 };
 
-type Language = "en" | "de" | "bar" | "ko" | "ru";
+type Language = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 
-const languageOptions: Array<{ value: Language; label: string }> = [
-  { value: "en", label: "English" },
-  { value: "de", label: "Deutsch" },
-  { value: "bar", label: "Boarisch" },
-  { value: "ko", label: "한국어" },
-  { value: "ru", label: "Русский" },
-];
 
 const deTranslations: Record<string, string> = {
   Language: "Sprache",
@@ -122,7 +118,7 @@ const deTranslations: Record<string, string> = {
   "Analyzing last move...": "Letzten Zug analysieren...",
   "Analyzing...": "Analyse...",
   "Hide Help": "Hilfe ausblenden",
-  "Help · Best Moves": "Hilfe · Beste Züge",
+  "Help · Next Best Moves": "Hilfe · Nächste beste Züge",
   "Stockfish is analyzing...": "Stockfish analysiert...",
   "No analysis available.": "Keine Analyse verfügbar.",
   "Shown on board": "Auf dem Brett angezeigt",
@@ -327,7 +323,7 @@ const koreanTranslations: Record<string, string> = {
   "Analyzing last move...": "마지막 수 분석 중...",
   "Analyzing...": "분석 중...",
   "Hide Help": "도움말 숨기기",
-  "Help · Best Moves": "도움말 · 최선의 수",
+  "Help · Next Best Moves": "도움말 · 다음 최선의 수",
   "Stockfish is analyzing...": "Stockfish 분석 중...",
   "No analysis available.": "분석 결과가 없습니다.",
   "Shown on board": "보드에 표시됨",
@@ -471,7 +467,7 @@ const russianTranslations: Record<string, string> = {
   "Analyzing last move...": "Анализ последнего хода...",
   "Analyzing...": "Анализ...",
   "Hide Help": "Скрыть помощь",
-  "Help · Best Moves": "Помощь · Лучшие ходы",
+  "Help · Next Best Moves": "Помощь · Следующие лучшие ходы",
   "Stockfish is analyzing...": "Stockfish анализирует...",
   "No analysis available.": "Анализ недоступен.",
   "Shown on board": "Показано на доске",
@@ -581,63 +577,8 @@ function translateChess(language: Language, key: string): string {
   if (language === "bar")
     return bavarianTranslations[key] ?? deTranslations[key] ?? ui(key);
   if (language === "ko") return koreanTranslations[key] ?? ui(key);
-  return russianTranslations[key] ?? ui(key);
-}
-
-function ChessLanguageSelector({
-  language,
-  onChange,
-  label,
-}: {
-  language: Language;
-  onChange: (language: Language) => void;
-  label: string;
-}) {
-  useUiLanguage();
-  return (
-    <label
-      className="
-        flex
-        items-center
-        gap-2
-        rounded-full
-        border
-        border-white/10
-        bg-white/5
-        px-3
-        py-1.5
-        text-xs
-        font-bold
-        text-zinc-400
-      "
-    >
-      <span>🌐</span>
-      <span className="hidden lg:inline">{ui(label)}</span>
-      <select
-        value={language}
-        onChange={(event) => onChange(event.target.value as Language)}
-        className="
-          bg-transparent
-          text-xs
-          font-bold
-          text-zinc-200
-          outline-none
-          [color-scheme:dark]
-        "
-        aria-label={label}
-      >
-        {languageOptions.map((option) => (
-          <option
-            key={option.value}
-            value={option.value}
-            className="bg-zinc-900 text-zinc-100"
-          >
-            {ui(option.label)}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
+  if (language === "ru") return russianTranslations[key] ?? ui(key);
+  return ui(key);
 }
 
 /* =========================================================
@@ -662,15 +603,8 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
   useUiLanguage();
   const { user, profile } = useAuth();
 
-  const { language, setLanguage } = useAppLanguage();
+  const { language } = useAppLanguage();
   const t = (key: string) => translateChess(language, key);
-
-  function changeLanguage(nextLanguage: Language) {
-    setLanguage(nextLanguage);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("chess-language", nextLanguage);
-    }
-  }
 
   /* =======================================================
      CHESS GAME
@@ -742,6 +676,9 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
   } = useStockfishAnalysis();
 
   const [moveFeedback, setMoveFeedback] = useState<MoveReview | null>(null);
+
+  // Coach grade of every graded move by ply, shown in the move history.
+  const [coachGrades, setCoachGrades] = useState<Record<number, { quality: MoveReview["quality"]; san: string }>>({});
 
   const [helpVisible, setHelpVisible] = useState(false);
 
@@ -874,6 +811,21 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
       }
     : null;
 
+  // Live Coach grade of the latest move, or of the move picked in the history, drawn on its squares like in the game review.
+  const historyGrade = historyPreview ? coachGrades[historyPreview.ply] : undefined;
+  const coachAnnotation =
+    !coachAllowed || helpMove
+      ? null
+      : historyPreview
+        ? liveCoachAnnotations({
+            to: historyPreview.to,
+            quality: historyGrade?.san === historyPreview.san ? historyGrade.quality : null,
+            fenAfter: historyPreview.fenAfter,
+          })
+        : moveFeedback
+          ? liveCoachAnnotations({ to: moveFeedback.to, quality: moveFeedback.quality, fenAfter: moveFeedback.fenAfter })
+          : null;
+
   const historyPreviewCheckedKingSquare: Square | null =
     historyPreviewChess?.isCheck()
       ? (() => {
@@ -936,11 +888,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
      SOUND
      ======================================================= */
 
-  function playSound(sound: string) {
-    const audio = new Audio(`/sounds/${sound}.mp3`);
-
-    audio.play().catch(() => {});
-  }
+  function playSound(sound: string) { playChessSound(sound as ChessSoundEvent); }
 
   /* =======================================================
      CLEAR COACH
@@ -1148,6 +1096,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
     afterFen: string,
     playedUci: string,
     playedSan: string,
+    ply: number,
   ) {
     if (!coachAllowed || !analysisReady) {
       return;
@@ -1174,6 +1123,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
     if (review) {
       setMoveFeedback(review);
+      setCoachGrades((grades) => ({ ...grades, [ply]: { quality: review.quality, san: review.san } }));
     }
   }
 
@@ -1452,6 +1402,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
   function restartGame() {
     clearCoach();
+    setCoachGrades({});
 
     setHistoryPreviewPly(null);
 
@@ -1588,6 +1539,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
       });
 
       const afterFen = game.fen();
+      if (game.history().length === 1) playChessSound("gameStart");
 
       const playedUci = `${move.from}${move.to}${piece}`;
 
@@ -1603,7 +1555,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
       setMoveFeedback(null);
 
-      void analyzeCompletedMove(beforeFen, afterFen, playedUci, move.san);
+      void analyzeCompletedMove(beforeFen, afterFen, playedUci, move.san, game.history().length);
 
       setLastMove({
         from: move.from,
@@ -1801,7 +1753,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
       /*
        * Grade this completed move.
        */
-      void analyzeCompletedMove(beforeFen, afterFen, playedUci, move.san);
+      void analyzeCompletedMove(beforeFen, afterFen, playedUci, move.san, game.history().length);
 
       setLastMove({
         from: move.from,
@@ -1852,7 +1804,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
         playSound("check");
       } else if (move.isKingsideCastle() || move.isQueensideCastle()) {
-        playRandomSound(["castle-1", "castle-2"]);
+        playChessSound("castle");
       }
 
       setPosition(afterFen);
@@ -1996,58 +1948,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
             HEADER
            ================================================= */}
 
-        <ChessPageHeader className="
-            mb-2
-            flex
-            shrink-0
-            items-center
-            justify-end
-            gap-2
-          ">
-
-
-          <div className="flex flex-wrap items-center justify-end gap-2">
-            <ChessLanguageSelector
-              language={language}
-              onChange={changeLanguage}
-              label={t("Language")}
-            />
-
-            {/* CURRENT TURN */}
-
-            {!gameOver && (
-              <div
-                className="
-                  flex
-                  items-center
-                  gap-2
-                  rounded-full
-                  border
-                  border-white/10
-                  bg-white/5
-                  px-3
-                  py-1.5
-                  text-xs
-                  font-bold
-                  text-zinc-300
-                "
-              >
-                <span
-                  className="
-                    h-2
-                    w-2
-                    animate-pulse
-                    rounded-full
-                    bg-amber-400
-                  "
-                />
-
-                {game.turn() === "w" ? t("White to move") : t("Black to move")}
-              </div>
-            )}
-          </div>
-          <BoardAnimationToggle />
-        </ChessPageHeader>
+        <ChessPageHeader className="mb-2 shrink-0" />
 
         {/* =================================================
             MAIN LAYOUT
@@ -2186,20 +2087,24 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                       </p>
                     </div>
 
-                    <div
-                      className="
-                      flex
-                      h-9
-                      w-9
-                      items-center
-                      justify-center
-                      rounded-xl
-                      bg-amber-400/10
-                      text-xl
-                      text-amber-200
-                    "
-                    >
-                      ♞
+                    <div className="flex items-center gap-2">
+                      <MoveClassificationGuide />
+
+                      <div
+                        className="
+                        flex
+                        h-9
+                        w-9
+                        items-center
+                        justify-center
+                        rounded-xl
+                        bg-amber-400/10
+                        text-xl
+                        text-amber-200
+                      "
+                      >
+                        ♞
+                      </div>
                     </div>
                   </div>
 
@@ -2322,7 +2227,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                         disabled:opacity-40
                       `}
                       >
-                        {analyzing && helpVisible ? ui("Analyzing...") : helpVisible ? ui("Hide Help") : ui("Help · Best Moves")}
+                        {analyzing && helpVisible ? ui("Analyzing...") : helpVisible ? ui("Hide Help") : ui("Help · Next Best Moves")}
                       </button>
 
                       {/* SUGGESTIONS */}
@@ -2576,45 +2481,39 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                     {moveHistory.length}
                   </span>
                 </div>
-                <div className="max-h-64 min-h-0 flex-1 overflow-y-auto [scrollbar-width:thin] xl:max-h-none">
-                  {historyRows.length === 0 ? (
-                    <div className="px-4 py-8 text-center text-xs text-zinc-600">
-                      {t("No moves yet")}
-                    </div>
-                  ) : (
-                    <div className="divide-y divide-white/5">
-                      {historyRows.map((move) => {
-                        const selected = historyPreviewPly === move.ply;
-                        return (
-                          <button
-                            key={move.ply}
-                            type="button"
-                            onClick={() => {
-                              setHistoryPreviewPly(move.ply);
-                              setHelpVisible(false);
-                              setSuggestions([]);
-                              setHighlightedSuggestionUci(null);
-                              setSelectedSquare(null);
-                              setLegalMoves([]);
-                            }}
-                            className={`flex w-full items-center gap-3 px-4 py-2.5 text-left transition hover:bg-white/[0.04] ${selected ? "bg-blue-400/10" : ""}`}
-                          >
-                            <span className="w-8 text-[10px] font-black text-zinc-600">
-                              {move.moveNumber}
-                              {move.color === "w" ? "." : "..."}
-                            </span>
-                            <span className="text-lg leading-none">
-                              {getHistoryPieceSymbol(move.color, move.piece)}
-                            </span>
-                            <span className="font-mono text-xs font-bold text-zinc-200">
-                              {move.san}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
+                <ChessMoveHistoryList
+                  className="flex-1 px-2 pt-2"
+                  listClassName="max-h-64 xl:max-h-none"
+                  selectedPly={historyPreviewPly}
+                  emptyLabel={t("No moves yet")}
+                  entries={historyRows.map((move) => {
+                    const grade = coachGrades[move.ply];
+                    return {
+                      ply: move.ply,
+                      side: move.color,
+                      moveNumber: move.moveNumber,
+                      content: (
+                        <>
+                          <span className="text-base leading-none">
+                            {getHistoryPieceSymbol(move.color, move.piece)}
+                          </span>
+                          <span className="truncate font-mono text-xs font-bold text-zinc-200">
+                            {move.san}
+                          </span>
+                        </>
+                      ),
+                      quality: coachAllowed && grade?.san === move.san ? grade.quality : null,
+                    };
+                  })}
+                  onSelect={(ply) => {
+                    setHistoryPreviewPly(ply);
+                    setHelpVisible(false);
+                    setSuggestions([]);
+                    setHighlightedSuggestionUci(null);
+                    setSelectedSquare(null);
+                    setLegalMoves([]);
+                  }}
+                />
               </section>
             </div>
           </aside>
@@ -2625,18 +2524,6 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
           <section className="order-1 min-w-0 xl:order-2">
             <div className="mx-auto w-full max-w-[820px] xl:flex xl:max-w-none xl:flex-col">
-              <section className="mb-2 shrink-0 rounded-2xl border border-amber-400/30 bg-[#08111c]/90 px-4 py-2.5 text-center shadow-[0_0_40px_rgba(245,158,11,0.08)] backdrop-blur-xl">
-                <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-400">
-                  {t("Classic Chess")}
-                </p>
-                <h1 className="mt-1 font-serif text-3xl font-semibold text-[#f7ead0]">
-                  {t("Hotseat")}
-                </h1>
-                <p className="mt-1 text-xs text-zinc-500">
-                  {game.turn() === "w" ? t("White to move") : t("Black to move")}
-                </p>
-              </section>
-
               {/* GAME OVER STATUS */}
 
               {gameOver && (
@@ -2807,6 +2694,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                       : handleSquareClick
                   }
                   orientation={boardOrientation}
+                  annotations={coachAnnotation}
                 />
               </div>
 
@@ -2884,7 +2772,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
               {/* WAITING PLAYER MINI BOARD */}
               <section className="relative aspect-square w-full shrink-0 overflow-hidden rounded-3xl border border-amber-400/20 bg-[#07101a] shadow-2xl shadow-black/40">
                 <div className="pointer-events-none absolute left-2 top-2 z-20 rounded-lg border border-amber-300/15 bg-black/65 px-2 py-1 backdrop-blur-md">
-                  <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-amber-100/90">{ui("Waiting board")}</p>
+                  <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-amber-100/90">{ui("Waiting player")} · {boardOrientation === "white" ? t("Black") : t("White")}</p>
                 </div>
 
                 <div className="pointer-events-none h-full w-full">
@@ -2902,7 +2790,8 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                     orientation={
                       boardOrientation === "white" ? "black" : "white"
                     }
-                    pieceScale={0.5}
+                    pieceScale={1}
+                    coordinateFontSize="6px"
                   />
                 </div>
               </section>
@@ -3034,7 +2923,11 @@ function QualityBadge({ quality }: { quality: MoveReview["quality"] }) {
   return (
     <span
       className={`
+        group/quality
+        inline-flex
         shrink-0
+        items-center
+        gap-1.5
         rounded-full
         border
         px-2.5
@@ -3047,7 +2940,8 @@ function QualityBadge({ quality }: { quality: MoveReview["quality"] }) {
         ${styles[quality]}
       `}
     >
-      {quality}
+      <ReviewQualityIcon quality={quality} size={12} />
+      {ui(quality)}
     </span>
   );
 }

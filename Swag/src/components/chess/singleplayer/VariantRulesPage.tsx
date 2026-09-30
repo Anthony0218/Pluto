@@ -3,7 +3,6 @@ import { ui, useUiLanguage } from "@/i18n/ui";
 import { Link } from "react-router-dom";
 import type { ReactNode } from "react";
 import {
-  LanguageSelector,
   type ChessLanguage,
 } from "../../../games/chess/i18n/chessLanguage";
 
@@ -84,9 +83,6 @@ export default function VariantRulesPage({
   features = [],
   rules,
   children,
-  language,
-  onLanguageChange,
-  languageLabel,
   coreIdeaLabel,
   playLabel,
 }: VariantRulesPageProps) {
@@ -150,12 +146,6 @@ export default function VariantRulesPage({
             </div>
 
             <div className="flex flex-wrap items-center justify-end gap-2">
-              <LanguageSelector
-                language={language}
-                onChange={onLanguageChange}
-                label={languageLabel}
-              />
-
               <Link
                 to={backRoute}
                 className={`

@@ -1,3 +1,4 @@
+import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
@@ -6,14 +7,17 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Chess, type Square } from "chess.js";
 
 import Board from "../../../components/chess/singleplayer/Board.tsx";
+import { liveCoachAnnotations } from "../../../components/chess/singleplayer/boardAnnotations";
 import PromotionBar from "../../../components/chess/singleplayer/PromotionBar.tsx";
 import ChessMatchStatus from "../../../components/chess/singleplayer/ChessMatchStatus.tsx";
+import ChessMoveHistoryList from "../../../components/chess/ChessMoveHistoryList.tsx";
+import MoveClassificationGuide from "../../../components/chess/singleplayer/MoveClassificationGuide.tsx";
+import { ReviewQualityIcon } from "../../../components/chess/singleplayer/ReviewQualityBadge.tsx";
 
 import {
   playPieceSelectSound,
   playPieceMoveSound,
   playPieceCaptureSound,
-  playRandomSound,
 } from "../../../utils/sound.ts";
 
 import { getSquareName, type PieceType } from "../../../utils/chessUtils.ts";
@@ -40,8 +44,12 @@ type GameResult = {
   winner: "human" | "stockfish" | "draw";
 };
 
+export type DifficultyLabel = "Beginner" | "Easy" | "Normal" | "Hard" | "Expert";
+
 type ChessComputerBoardProps = {
   playerColor: "white" | "black";
+
+  difficultyLabel: DifficultyLabel;
 
   skillLevel: number;
 
@@ -63,11 +71,17 @@ type MoveQuality =
 type MoveFeedback = {
   quality: MoveQuality;
 
+  from: Square;
+
+  to: Square;
+
   centipawnLoss: number;
 
   bestMove: string | null;
 
   playedMove: string;
+
+  fenAfter: string;
 };
 
 type SuggestedMove = {
@@ -85,15 +99,8 @@ type EngineMove = {
   promotion?: "q" | "r" | "b" | "n";
 };
 
-type Language = "en" | "de" | "bar" | "ko" | "ru";
+type Language = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 
-const languageOptions: Array<{ value: Language; label: string }> = [
-  { value: "en", label: "English" },
-  { value: "de", label: "Deutsch" },
-  { value: "bar", label: "Boarisch" },
-  { value: "ko", label: "한국어" },
-  { value: "ru", label: "Русский" },
-];
 
 const deTranslations: Record<string, string> = {
   "Available after the game ends": "Nach Spielende verfügbar",
@@ -140,7 +147,7 @@ const deTranslations: Record<string, string> = {
   "Analyzing last move...": "Letzten Zug analysieren...",
   "Analyzing...": "Analyse...",
   "Hide Help": "Hilfe ausblenden",
-  "Help · Best Moves": "Hilfe · Beste Züge",
+  "Help · Next Best Moves": "Hilfe · Nächste beste Züge",
   "Stockfish is analyzing...": "Stockfish analysiert...",
   "No analysis available.": "Keine Analyse verfügbar.",
   "Shown on board": "Auf dem Brett angezeigt",
@@ -363,7 +370,7 @@ const koreanTranslations: Record<string, string> = {
   "Analyzing last move...": "마지막 수 분석 중...",
   "Analyzing...": "분석 중...",
   "Hide Help": "도움말 숨기기",
-  "Help · Best Moves": "도움말 · 최선의 수",
+  "Help · Next Best Moves": "도움말 · 다음 최선의 수",
   "Stockfish is analyzing...": "Stockfish 분석 중...",
   "No analysis available.": "분석 결과가 없습니다.",
   "Shown on board": "보드에 표시됨",
@@ -516,7 +523,7 @@ const russianTranslations: Record<string, string> = {
   "Analyzing last move...": "Анализ последнего хода...",
   "Analyzing...": "Анализ...",
   "Hide Help": "Скрыть помощь",
-  "Help · Best Moves": "Помощь · Лучшие ходы",
+  "Help · Next Best Moves": "Помощь · Следующие лучшие ходы",
   "Stockfish is analyzing...": "Stockfish анализирует...",
   "No analysis available.": "Анализ недоступен.",
   "Shown on board": "Показано на доске",
@@ -633,63 +640,8 @@ function translateChess(language: Language, key: string): string {
   if (language === "bar")
     return bavarianTranslations[key] ?? deTranslations[key] ?? ui(key);
   if (language === "ko") return koreanTranslations[key] ?? ui(key);
-  return russianTranslations[key] ?? ui(key);
-}
-
-function ChessLanguageSelector({
-  language,
-  onChange,
-  label,
-}: {
-  language: Language;
-  onChange: (language: Language) => void;
-  label: string;
-}) {
-  useUiLanguage();
-  return (
-    <label
-      className="
-        flex
-        items-center
-        gap-2
-        rounded-full
-        border
-        border-white/10
-        bg-white/5
-        px-3
-        py-1.5
-        text-xs
-        font-bold
-        text-zinc-400
-      "
-    >
-      <span>🌐</span>
-      <span className="hidden lg:inline">{ui(label)}</span>
-      <select
-        value={language}
-        onChange={(event) => onChange(event.target.value as Language)}
-        className="
-          bg-transparent
-          text-xs
-          font-bold
-          text-zinc-200
-          outline-none
-          [color-scheme:dark]
-        "
-        aria-label={label}
-      >
-        {languageOptions.map((option) => (
-          <option
-            key={option.value}
-            value={option.value}
-            className="bg-zinc-900 text-zinc-100"
-          >
-            {ui(option.label)}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
+  if (language === "ru") return russianTranslations[key] ?? ui(key);
+  return ui(key);
 }
 
 /* =========================================================
@@ -809,22 +761,13 @@ function getRandomLegalMove(game: Chess): EngineMove | null {
   };
 }
 
-type DifficultyLabel = "Beginner" | "Easy" | "Normal" | "Hard" | "Expert";
-
-function getDifficultyLabel(skillLevel: number): DifficultyLabel {
-  if (skillLevel <= 3) return "Beginner";
-  if (skillLevel <= 7) return "Easy";
-  if (skillLevel <= 11) return "Normal";
-  if (skillLevel <= 15) return "Hard";
-  return "Expert";
-}
-
 /* =========================================================
    COMPONENT
    ========================================================= */
 
 export default function ChessComputerBoard({
   playerColor,
+  difficultyLabel,
   skillLevel,
   thinkTime,
   randomMoveChance,
@@ -837,16 +780,8 @@ export default function ChessComputerBoard({
     () => (profile as { avatar_id?: string | null } | null)?.avatar_id ?? "m1",
   );
 
-  const { language, setLanguage } = useAppLanguage();
+  const { language } = useAppLanguage();
   const t = (key: string) => translateChess(language, key);
-  const difficultyLabel = getDifficultyLabel(skillLevel);
-
-  function changeLanguage(nextLanguage: Language) {
-    setLanguage(nextLanguage);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("chess-language", nextLanguage);
-    }
-  }
 
   useEffect(() => {
     const contextAvatar =
@@ -970,6 +905,9 @@ export default function ChessComputerBoard({
 
   const [moveFeedback, setMoveFeedback] = useState<MoveFeedback | null>(null);
 
+  // Coach grade of every graded move by ply, shown in the move history.
+  const [coachGrades, setCoachGrades] = useState<Record<number, { quality: MoveQuality; san: string }>>({});
+
   /*
    * Protect against late Stockfish
    * game responses after resignation.
@@ -998,10 +936,7 @@ export default function ChessComputerBoard({
     setCoachModeEnabled((enabled) => !enabled);
   }
 
-  function playSound(sound: string) {
-    const audio = new Audio(`/sounds/${sound}.mp3`);
-    audio.play().catch(() => {});
-  }
+  function playSound(sound: string) { playChessSound(sound as ChessSoundEvent); }
 
   const board = game.board();
 
@@ -1175,10 +1110,14 @@ export default function ChessComputerBoard({
     afterFen: string,
     playedUci: string,
     playedSan: string,
+    ply: number,
   ) {
     if (!coachModeEnabled || !analysisReady) {
       return;
     }
+
+    // The previous grade belongs to an older move; drop it (and its board marker).
+    setMoveFeedback(null);
 
     /*
      * Every move gets a generation number.
@@ -1211,29 +1150,46 @@ export default function ChessComputerBoard({
      * so negate the result to get the
      * human player's perspective.
      */
-    const after = await analyzePosition(afterFen, {
-      multiPV: 1,
-      moveTime: 500,
-    });
+    // A finished game has nothing left to search: mate is the best possible result.
+    const afterGame = new Chess(afterFen);
+    let scoreAfterMove: number;
 
-    if (generation !== coachGenerationRef.current || after.length === 0) {
-      return;
+    if (afterGame.isGameOver()) {
+      scoreAfterMove = afterGame.isCheckmate() ? 100000 : 0;
+    } else {
+      const after = await analyzePosition(afterFen, {
+        multiPV: 1,
+        moveTime: 500,
+      });
+
+      if (generation !== coachGenerationRef.current || after.length === 0) {
+        return;
+      }
+
+      scoreAfterMove = -analysisScore(after[0]);
     }
-
-    const scoreAfterMove = -analysisScore(after[0]);
 
     const centipawnLoss = Math.max(0, bestScore - scoreAfterMove);
 
     const isBestMove = bestMove === playedUci;
+    const quality = classifyMove(centipawnLoss, isBestMove);
+
+    setCoachGrades((grades) => ({ ...grades, [ply]: { quality, san: playedSan } }));
 
     setMoveFeedback({
-      quality: classifyMove(centipawnLoss, isBestMove),
+      quality,
+
+      from: playedUci.slice(0, 2) as Square,
+
+      to: playedUci.slice(2, 4) as Square,
 
       centipawnLoss,
 
       bestMove,
 
       playedMove: playedSan,
+
+      fenAfter: afterFen,
     });
   }
 
@@ -1399,7 +1355,7 @@ export default function ChessComputerBoard({
       if (!game.isCheckmate() && game.isCheck()) {
         playSound("check");
       } else if (move.isKingsideCastle() || move.isQueensideCastle()) {
-        playRandomSound(["castle-1", "castle-2"]);
+        playChessSound("castle");
       }
 
       setMoveHistory(game.history());
@@ -1671,7 +1627,7 @@ export default function ChessComputerBoard({
        * Computer uses a DIFFERENT
        * Stockfish worker.
        */
-      void gradeHumanMove(beforeFen, afterFen, playedUci, move.san);
+      void gradeHumanMove(beforeFen, afterFen, playedUci, move.san, game.history().length);
 
       /*
        * Existing hint belongs to
@@ -1703,7 +1659,7 @@ export default function ChessComputerBoard({
       if (!game.isCheckmate() && game.isCheck()) {
         playSound("check");
       } else if (move.isKingsideCastle() || move.isQueensideCastle()) {
-        playRandomSound(["castle-1", "castle-2"]);
+        playChessSound("castle");
       }
 
       setMoveHistory(game.history());
@@ -1782,7 +1738,7 @@ export default function ChessComputerBoard({
 
       const playedUci = `${move.from}${move.to}${piece}`;
 
-      void gradeHumanMove(beforeFen, afterFen, playedUci, move.san);
+      void gradeHumanMove(beforeFen, afterFen, playedUci, move.san, game.history().length);
 
       setHelpVisible(false);
 
@@ -1810,7 +1766,7 @@ export default function ChessComputerBoard({
       if (!game.isCheckmate() && game.isCheck()) {
         playSound("check");
       } else if (move.isKingsideCastle() || move.isQueensideCastle()) {
-        playRandomSound(["castle-1", "castle-2"]);
+        playChessSound("castle");
       }
 
       setMoveHistory(game.history());
@@ -1877,6 +1833,8 @@ export default function ChessComputerBoard({
     setHighlightedSuggestionUci(null);
 
     setMoveFeedback(null);
+
+    setCoachGrades({});
 
     setPosition(game.fen());
   }
@@ -2083,14 +2041,11 @@ export default function ChessComputerBoard({
 
   return (
     <div className="relative left-1/2 classic-game-page min-h-[var(--app-height)] w-screen -translate-x-1/2 overflow-x-hidden bg-[#05080d] bg-[radial-gradient(circle_at_50%_-10%,rgba(245,158,11,0.12),transparent_30%),radial-gradient(circle_at_12%_38%,rgba(14,165,233,0.08),transparent_28%),linear-gradient(180deg,#03070b_0%,#07111b_48%,#020509_100%)] px-3 py-3 sm:px-5 lg:px-6">
-      <ChessPageHeader className="mb-4" />
-      <div className="mb-2 flex shrink-0 justify-end">
-        <ChessLanguageSelector
-          language={language}
-          onChange={changeLanguage}
-          label={t("Language")}
-        />
-      </div>
+      <ChessPageHeader
+        className="chess-menu-header -mx-3 -mt-3 mb-3 sm:-mx-5 lg:-mx-6"
+        title={t("Classic Chess")}
+        description={<>{t("Difficulty")}: {t(difficultyLabel)}</>}
+      />
 
       <main
         className="
@@ -2170,20 +2125,24 @@ export default function ChessComputerBoard({
                     </p>
                   </div>
 
-                  <div
-                    className="
-                      flex
-                      h-9
-                      w-9
-                      items-center
-                      justify-center
-                      rounded-xl
-                      bg-amber-400/10
-                      text-xl
-                      text-amber-200
-                    "
-                  >
-                    ♞
+                  <div className="flex items-center gap-2">
+                    <MoveClassificationGuide />
+
+                    <div
+                      className="
+                        flex
+                        h-9
+                        w-9
+                        items-center
+                        justify-center
+                        rounded-xl
+                        bg-amber-400/10
+                        text-xl
+                        text-amber-200
+                      "
+                    >
+                      ♞
+                    </div>
                   </div>
                 </div>
 
@@ -2291,7 +2250,7 @@ export default function ChessComputerBoard({
                     disabled:opacity-40
                   `}
                 >
-                  {analyzing ? t("Analyzing...") : helpVisible ? t("Hide Help") : t("Help · Best Moves")}
+                  {analyzing ? t("Analyzing...") : helpVisible ? t("Hide Help") : t("Help · Next Best Moves")}
                 </button>
 
                 {/* BEST MOVES */}
@@ -2487,47 +2446,41 @@ export default function ChessComputerBoard({
                   {currentMoveHistory.length}
                 </span>
               </div>
-              <div className="max-h-64 min-h-0 flex-1 overflow-y-auto [scrollbar-width:thin] xl:max-h-none">
-                {historyRows.length === 0 ? (
-                  <div className="px-4 py-8 text-center text-xs text-zinc-600">
-                    {t("No moves yet")}
-                  </div>
-                ) : (
-                  <div className="divide-y divide-white/5">
-                    {historyRows.map((move) => {
-                      const selected = historyPreviewPly === move.ply;
-                      return (
-                        <button
-                          key={move.ply}
-                          type="button"
-                          onClick={() => {
-                            setHistoryPreviewPly(move.ply);
-                            setHelpVisible(false);
-                            setSuggestedMoves([]);
-                            setHighlightedSuggestionUci(null);
-                            setSelectedSquare(null);
-                            setLegalMoves([]);
-                            setPromotionFrom(null);
-                            setPromotionSquare(null);
-                          }}
-                          className={`flex w-full items-center gap-3 px-4 py-2.5 text-left transition hover:bg-white/[0.04] ${selected ? "bg-blue-400/10" : ""}`}
-                        >
-                          <span className="w-8 text-[10px] font-black text-zinc-600">
-                            {move.moveNumber}
-                            {move.color === "w" ? "." : "..."}
-                          </span>
-                          <span className="text-lg leading-none">
-                            {getHistoryPieceSymbol(move.color, move.piece)}
-                          </span>
-                          <span className="font-mono text-xs font-bold text-zinc-200">
-                            {move.san}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+              <ChessMoveHistoryList
+                className="flex-1 px-2 pt-2"
+                listClassName="max-h-64 xl:max-h-none"
+                selectedPly={historyPreviewPly}
+                emptyLabel={t("No moves yet")}
+                entries={historyRows.map((move) => {
+                  const grade = coachGrades[move.ply];
+                  return {
+                    ply: move.ply,
+                    side: move.color,
+                    moveNumber: move.moveNumber,
+                    content: (
+                      <>
+                        <span className="text-base leading-none">
+                          {getHistoryPieceSymbol(move.color, move.piece)}
+                        </span>
+                        <span className="truncate font-mono text-xs font-bold text-zinc-200">
+                          {move.san}
+                        </span>
+                      </>
+                    ),
+                    quality: coachModeEnabled && grade?.san === move.san ? grade.quality : null,
+                  };
+                })}
+                onSelect={(ply) => {
+                  setHistoryPreviewPly(ply);
+                  setHelpVisible(false);
+                  setSuggestedMoves([]);
+                  setHighlightedSuggestionUci(null);
+                  setSelectedSquare(null);
+                  setLegalMoves([]);
+                  setPromotionFrom(null);
+                  setPromotionSquare(null);
+                }}
+              />
             </section>
           </div>
         </aside>
@@ -2538,14 +2491,6 @@ export default function ChessComputerBoard({
 
         <section className="order-1 min-w-0 xl:order-2">
           <div className="mx-auto w-full max-w-[820px] xl:flex xl:max-w-none xl:flex-col">
-            <section className="mb-2 shrink-0 rounded-2xl border border-amber-400/30 bg-[#08111c]/90 px-4 py-2.5 text-center shadow-[0_0_40px_rgba(245,158,11,0.08)] backdrop-blur-xl">
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-400">
-                {t("Classic Chess")}
-              </p>
-              <h1 className="mt-0.5 font-serif text-2xl font-semibold text-[#f7ead0]">{ui("Singleplayer")}</h1>
-              <p className="mt-1 text-xs text-zinc-400">{t("Difficulty")}: {t(difficultyLabel)}</p>
-            </section>
-
             {/* HISTORY PREVIEW STATUS */}
 
             {historyPreview && (
@@ -2641,6 +2586,19 @@ export default function ChessComputerBoard({
                 }
                 onSquareClick={historyPreview ? () => {} : handleSquareClick}
                 orientation={playerColor}
+                annotations={
+                  !coachModeEnabled || helpMove
+                    ? null
+                    : historyPreview
+                      ? liveCoachAnnotations({
+                          to: historyPreview.to,
+                          quality: coachGrades[historyPreview.ply]?.san === historyPreview.san ? coachGrades[historyPreview.ply].quality : null,
+                          fenAfter: historyPreview.fenAfter,
+                        })
+                      : moveFeedback
+                        ? liveCoachAnnotations({ to: moveFeedback.to, quality: moveFeedback.quality, fenAfter: moveFeedback.fenAfter })
+                        : null
+                }
               />
             </div>
           </div>
@@ -3129,6 +3087,10 @@ function MoveQualityBadge({ quality }: { quality: MoveQuality }) {
   return (
     <span
       className={`
+        group/quality
+        inline-flex
+        items-center
+        gap-1.5
         rounded-full
         border
         px-2.5
@@ -3141,7 +3103,8 @@ function MoveQualityBadge({ quality }: { quality: MoveQuality }) {
         ${styles[quality]}
       `}
     >
-      {quality}
+      <ReviewQualityIcon quality={quality} size={12} />
+      {ui(quality)}
     </span>
   );
 }

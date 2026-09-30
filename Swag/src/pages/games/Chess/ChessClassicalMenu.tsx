@@ -27,9 +27,9 @@ const modes: ClassicMode[] = [
   },
   {
     title: "Multiplayer",
-    description: "Create or join an online chess room.",
+    description: "Play a friend or enter the ranked queue.",
     path: "/games/chess/classic/multiplayer",
-    footer: "ROOMS · ONLINE · LIVE",
+    footer: "FRIENDS · RANKED · LIVE",
     eyebrow: "Play online",
     accent: "emerald",
     kind: "multiplayer",
@@ -257,7 +257,7 @@ export default function ChessClassicalMenu() {
 
           {/* RIGHT — MODE BUTTONS */}
           <div className="relative flex min-h-[560px] items-center border-t border-white/[0.06] px-5 py-8 sm:px-8 lg:min-h-0 lg:border-t-0 lg:px-10 lg:py-12 xl:px-14 2xl:px-20">
-            <div className="mx-auto flex w-full max-w-[980px] flex-col gap-4 xl:gap-5">
+            <div className="mx-auto grid w-full max-w-[760px] grid-cols-1 gap-3">
               {modes.map((mode) => {
                 const styles = accentStyles[mode.accent];
 
@@ -265,12 +265,12 @@ export default function ChessClassicalMenu() {
                   <Link
                     key={mode.path}
                     to={mode.path}
-                    className={`group relative overflow-hidden rounded-[22px] border bg-black/20 p-5 shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 sm:p-6 xl:p-7 ${styles.border} ${styles.hoverGlow}`}
+                    className={`group relative flex min-h-[140px] items-center overflow-hidden rounded-[22px] border bg-black/20 p-5 shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 sm:p-6 ${styles.border} ${styles.hoverGlow}`}
                   >
                     <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(105deg,rgba(245,158,11,.04),transparent_42%)] opacity-0 transition duration-300 group-hover:opacity-100" />
                     <ModeDecoration kind={mode.kind} />
 
-                    <div className="relative flex items-center gap-4 sm:gap-6">
+                    <div className="relative flex w-full items-center gap-4 sm:gap-6">
                       <div
                         className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border shadow-inner transition duration-300 sm:h-[74px] sm:w-[74px] ${styles.iconBorder} ${styles.iconBg} ${styles.iconText}`}
                       >
@@ -309,7 +309,7 @@ export default function ChessClassicalMenu() {
 
               <Link
                 to="/games/chess/rules"
-                className="group mt-2 flex items-center justify-between border-t border-white/[0.08] px-2 pt-6 text-sm text-zinc-500 transition hover:text-white"
+                className="group mt-1 flex items-center justify-between border-t border-white/[0.08] px-2 pt-4 text-sm text-zinc-500 transition hover:text-white"
               >
                 <span className="inline-flex items-center gap-3">
                   <span className="text-lg">♔</span>{ui("Rules & Tips")}</span>

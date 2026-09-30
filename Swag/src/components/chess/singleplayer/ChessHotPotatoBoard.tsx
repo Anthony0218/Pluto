@@ -1,8 +1,11 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
+import { playChessSound, stopSound } from "@/games/chess/audio/chessAudio";
+import { emitGameEffect } from "@/games/chess/effects/gameEffects";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useRef, useEffect, useMemo, useState } from "react";
 import {
-  LanguageSelector,
   translateChess,
   useChessLanguage,
   type TranslationTable,
@@ -40,7 +43,6 @@ import {
   type HotPotatoOutcome,
   type HotPotatoStates,
 } from "../../../games/chess/variants/HotPotato.ts";
-import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
 import { useVariantChessAi } from "@/hooks/useVariantChessAi";
 import {
   chessColorFromPlayerColor,
@@ -277,25 +279,6 @@ const pieceValues: Record<PieceType, number> = {
    HELPERS
    ========================================================= */
 
-function resultText(result: FinishedGame, t: (key: string) => string): string {
-  if (!result) return "";
-
-  if (result.outcome === "draw") {
-    return result.reason === "explosion"
-      ? t("Both kings blown up! Draw.")
-      : t("The game ended in a draw.");
-  }
-
-  if (result.reason === "explosion") {
-    return result.outcome === "white"
-      ? t("King blown up! White wins.")
-      : t("King blown up! Black wins.");
-  }
-
-  return result.outcome === "white"
-    ? t("White wins by checkmate.")
-    : t("Black wins by checkmate.");
-}
 
 function getHistoryPieceSymbol(color: "w" | "b", piece: PieceType) {
   const symbols: Record<"w" | "b", Record<PieceType, string>> = {
@@ -348,7 +331,7 @@ export default function ChessHotPotatoBoard({
   difficulty = "casual",
 }: VariantAiBoardProps) {
   useUiLanguage();
-  const { language, setLanguage } = useChessLanguage();
+  const { language } = useChessLanguage();
   const t = (key: string) => translateChess(language, key, translations);
   /* =======================================================
      CHESS GAME
@@ -377,6 +360,12 @@ export default function ChessHotPotatoBoard({
     const initialGame = new Chess();
     return createInitialHotPotatoStates(initialGame);
   });
+  useEffect(() => {
+    const active = (Object.values(hotPotatoes)).some(potato => potato.square !== null && !potato.dropped && potato.movesUntilExplosion > 0);
+    if (active && !finishedGame) playChessSound("bombFuse");
+    else stopSound("bombFuse");
+    return () => stopSound("bombFuse");
+  }, [hotPotatoes, finishedGame]);
 
   const [explosionSquares, setExplosionSquares] = useState<Square[]>([]);
   const [blownUpKingSquares, setBlownUpKingSquares] = useState<Square[]>([]);
@@ -758,6 +747,12 @@ export default function ChessHotPotatoBoard({
     setUndoStack((stack) => [...stack, beforeMove]);
     setGame(nextGame);
     setHotPotatoes(nextHotPotatoes);
+    if (potatoTransferred) stopSound("bombFuse");
+    if (explosionsThisMove > 0) {
+      stopSound("bombFuse");
+      playChessSound("bombExplosion");
+      emitGameEffect({ type: "BOMB_EXPLODE", square: nextExplosionSquares[0] });
+    }
     setExplosionSquares(nextExplosionSquares);
     setBlownUpKingSquares(nextBlownUpKingSquares);
     setLastMove({
@@ -945,11 +940,6 @@ export default function ChessHotPotatoBoard({
 
 
           <div className="flex flex-wrap items-center justify-end gap-2">
-            <LanguageSelector
-              language={language}
-              onChange={setLanguage}
-              label={t("Language")}
-            />
             <div
               className="
                 flex
@@ -1003,7 +993,6 @@ export default function ChessHotPotatoBoard({
               </div>
             )}
           </div>
-          <BoardAnimationToggle />
         </ChessPageHeader>
 
         {/* =================================================
@@ -1124,89 +1113,34 @@ export default function ChessHotPotatoBoard({
                   </span>
                 </div>
 
-                <div className="max-h-80 overflow-y-auto rounded-2xl border border-white/5 bg-black/20">
-                  {history.length === 0 ? (
-                    <div className="px-4 py-8 text-center text-xs text-zinc-600">
-                      {t("No moves yet")}
-                    </div>
-                  ) : (
-                    <table className="w-full border-collapse">
-                      <thead className="sticky top-0 z-10 bg-zinc-900">
-                        <tr className="border-b border-white/5 text-left text-[9px] font-black uppercase tracking-wider text-zinc-600">
-                          <th className="px-3 py-2">{t("Move")}</th>
-                          <th className="px-2 py-2">{t("Side")}</th>
-                          <th className="px-2 py-2">{t("Played")}</th>
-                        </tr>
-                      </thead>
-
-                      <tbody>
-                        {history.map((move) => {
-                          const selected = historyPreviewPly === move.ply;
-
-                          return (
-                            <tr
-                              key={move.ply}
-                              tabIndex={0}
-                              onClick={() => setHistoryPreviewPly(move.ply)}
-                              onKeyDown={(event) => {
-                                if (
-                                  event.key === "Enter" ||
-                                  event.key === " "
-                                ) {
-                                  setHistoryPreviewPly(move.ply);
-                                }
-                              }}
-                              className={`cursor-pointer border-b border-white/[0.04] transition last:border-b-0 ${
-                                selected
-                                  ? "bg-orange-400/[0.08]"
-                                  : "hover:bg-white/[0.04]"
-                              }`}
-                            >
-                              <td className="px-3 py-2.5 text-[10px] font-black text-zinc-500">
-                                {move.moveNumber}
-                                {move.color === "w" ? "." : "..."}
-                              </td>
-
-                              <td className="px-2 py-2.5 text-xs text-zinc-500">
-                                {move.color === "w" ? "♔" : "♚"}
-                              </td>
-
-                              <td className="px-2 py-2.5">
-                                <div className="flex items-center gap-2">
-                                  <span className="w-5 text-center text-lg leading-none">
-                                    {getHistoryPieceSymbol(
-                                      move.color,
-                                      move.piece,
-                                    )}
-                                  </span>
-
-                                  <span className="font-mono text-xs font-bold text-zinc-200">
-                                    {move.san}
-                                  </span>
-
-                                  {move.potatoTransferred && (
-                                    <span className="rounded-full bg-orange-400/10 px-1.5 py-0.5 text-[9px] font-black text-orange-300">
-                                      💣↔
-                                    </span>
-                                  )}
-
-                                  {move.explosionSquaresAfter.length > 0 && (
-                                    <span
-                                      className="text-xs"
-                                      aria-label={ui("Explosion")}
-                                    >
-                                      💥
-                                    </span>
-                                  )}
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  )}
-                </div>
+                <ChessMoveHistoryList
+                  listClassName="max-h-80 rounded-2xl border border-white/5 bg-black/20"
+                  selectedPly={historyPreviewPly}
+                  emptyLabel={t("No moves yet")}
+                  entries={history.map((move) => ({
+                    ply: move.ply,
+                    side: move.color,
+                    moveNumber: move.moveNumber,
+                    content: (
+                      <>
+                        <span className="text-base leading-none">{getHistoryPieceSymbol(move.color, move.piece)}</span>
+                        <span className="truncate font-mono text-xs font-bold text-zinc-200">{move.san}</span>
+                      </>
+                    ),
+                    trailing:
+                      move.potatoTransferred || move.explosionSquaresAfter.length > 0 ? (
+                        <span className="flex items-center gap-1">
+                          {move.potatoTransferred && (
+                            <span className="rounded-full bg-orange-400/10 px-1.5 py-0.5 font-black text-orange-300">💣↔</span>
+                          )}
+                          {move.explosionSquaresAfter.length > 0 && (
+                            <span className="text-xs" aria-label={ui("Explosion")}>💥</span>
+                          )}
+                        </span>
+                      ) : null,
+                  }))}
+                  onSelect={setHistoryPreviewPly}
+                />
               </section>
             </div>
           </aside>
@@ -1218,20 +1152,7 @@ export default function ChessHotPotatoBoard({
           <section className="min-w-0">
             <div className="mx-auto max-w-[820px]">
               {finishedGame && !historyPreview && (
-                <div className="mb-3 rounded-2xl border border-amber-500/20 bg-amber-400/[0.07] px-4 py-3">
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-widest text-amber-400">{ui("Game Over")}</p>
-                      <p className="mt-1 font-black text-white">
-                        {resultText(finishedGame, t)}
-                      </p>
-                    </div>
-
-                    <span className="text-2xl" aria-hidden="true">
-                      {finishedGame.reason === "explosion" ? "💥" : "♚"}
-                    </span>
-                  </div>
-                </div>
+                <VisibleGameResult />
               )}
 
               {pendingPromotion && !historyPreview && (

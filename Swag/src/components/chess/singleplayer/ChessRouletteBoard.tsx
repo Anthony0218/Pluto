@@ -1,3 +1,7 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
+import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
+import { emitGameEffect } from "@/games/chess/effects/gameEffects";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import RouletteInfo from "@/components/chess/singleplayer/RouletteInfo";
 import { ui, useUiLanguage } from "@/i18n/ui";
@@ -42,7 +46,6 @@ import {
 } from "../../../games/chess/variants/chessRoulette.ts";
 
 import { useDelayedBoardOrientation } from "../../../hooks/useDelayedBoardOrientation.ts";
-import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
 import { useVariantChessAi } from "@/hooks/useVariantChessAi";
 import {
   chessColorFromPlayerColor,
@@ -51,7 +54,7 @@ import {
   type ChessPlayerColor,
 } from "../../../games/chess/ai/variantAi.ts";
 
-type Language = "en" | "de" | "bar" | "ko" | "ru";
+type Language = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 
 type Winner = "white" | "black" | "draw";
 
@@ -93,7 +96,7 @@ const promotionCardNames: Record<PortalPromotionCard, string> = {
   k: "King",
 };
 
-const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
+const translations: Record<"de" | "bar" | "ko" | "ru", Record<string, string>> & Partial<Record<"es" | "pt", Record<string, string>>> = {
   de: {
     "Next 2 Lucky Squares in": "Nächste 2 Glücksfelder in",
     move: "Zug",
@@ -939,7 +942,7 @@ export default function ChessRouletteBoard({
       return translations.bar[key] ?? translations.de[key] ?? ui(key);
     }
 
-    return translations[language][key] ?? ui(key);
+    return translations[language]?.[key] ?? ui(key);
   };
 
   function changeLanguage(next: Language) {
@@ -1002,7 +1005,7 @@ export default function ChessRouletteBoard({
 
   const [gameOver, setGameOver] = useState(false);
 
-  const [gameOverReason, setGameOverReason] = useState("");
+  const [, setGameOverReason] = useState("");
 
   const humanColor = chessColorFromPlayerColor(playerColor);
   const computerColor = oppositeChessColor(humanColor);
@@ -1099,7 +1102,7 @@ export default function ChessRouletteBoard({
     return () => window.clearTimeout(timer);
   }, [aiMode, computerColor, pendingPortalPromotion]);
 
-  const [winner, setWinner] = useState<Winner>("white");
+  const [, setWinner] = useState<Winner>("white");
 
   const historyPreview =
     historyPreviewPly === null
@@ -1195,11 +1198,7 @@ export default function ChessRouletteBoard({
 
   const materialDifference = whiteMaterial - blackMaterial;
 
-  function playSound(sound: string) {
-    const audio = new Audio(`/sounds/${sound}.mp3`);
-
-    audio.play().catch(() => {});
-  }
+  function playSound(sound: string) { playChessSound(sound as ChessSoundEvent); }
 
   function checkGameOver(
     nextRecords: PortalMoveRecord[],
@@ -1355,6 +1354,8 @@ export default function ChessRouletteBoard({
     setActivePortalSquare(portalEvent ? portalEvent.square : null);
 
     if (portalEvent) {
+      playChessSound("rouletteEvent");
+      if (portalEvent.effect === "teleport") emitGameEffect({ type: "TELEPORT", square: portalEvent.square });
       window.setTimeout(() => {
         setActivePortalSquare(null);
       }, 900);
@@ -1464,6 +1465,9 @@ export default function ChessRouletteBoard({
     };
 
     const finalState = finalizePortalPromotionEvent(portalAfterReveal, event);
+    if (card === "k") playChessSound("rouletteKing");
+    else if (card === "p" || card === move.piece) playChessSound("roulettePromotionFailure");
+    else playChessSound("roulettePromotionSuccess");
 
     setPendingPortalPromotion(null);
 
@@ -1841,7 +1845,6 @@ export default function ChessRouletteBoard({
               </select>
             </label>
           </div>
-          <BoardAnimationToggle />
         </ChessPageHeader>
 
         <div
@@ -2099,59 +2102,19 @@ export default function ChessRouletteBoard({
             </Panel>
 
             <Panel title={t("Move History")}>
-              <div
-                className="
-                  max-h-[360px]
-                  space-y-1
-                  overflow-y-auto
-                  pr-1
-                "
-              >
-                {records.length === 0 ? (
-                  <p
-                    className="
-                      text-xs
-                      text-zinc-500
-                    "
-                  >
-                    {t("No moves yet")}
-                  </p>
-                ) : (
-                  records.map((record, index) => (
-                    <button
-                      key={record.ply}
-                      type="button"
-                      onClick={() => setHistoryPreviewPly(record.ply)}
-                      className={`
-                          flex
-                          w-full
-                          items-center
-                          justify-between
-                          rounded-lg
-                          px-2.5
-                          py-2
-                          text-left
-                          text-xs
-                          transition
-                          ${
-                            historyPreviewPly === record.ply
-                              ? "bg-violet-400/15 text-violet-100"
-                              : "bg-white/[0.03] text-zinc-300 hover:bg-white/[0.07]"
-                          }
-                        `}
-                    >
-                      <span>
-                        {Math.floor(index / 2) + 1}
-                        {record.color === "w" ? "." : "..."} {record.san}
-                      </span>
-
-                      {record.portalEvent && (
-                        <span>{effectIcon(record.portalEvent.effect)}</span>
-                      )}
-                    </button>
-                  ))
-                )}
-              </div>
+              <ChessMoveHistoryList
+                listClassName="max-h-[360px] pr-1"
+                selectedPly={historyPreviewPly}
+                emptyLabel={t("No moves yet")}
+                entries={records.map((record, index) => ({
+                  ply: record.ply,
+                  side: record.color,
+                  moveNumber: Math.floor(index / 2) + 1,
+                  content: <span className="truncate text-xs font-bold text-zinc-200">{record.san}</span>,
+                  trailing: record.portalEvent ? <span className="text-xs">{effectIcon(record.portalEvent.effect)}</span> : null,
+                }))}
+                onSelect={setHistoryPreviewPly}
+              />
             </Panel>
           </aside>
 
@@ -2225,6 +2188,31 @@ export default function ChessRouletteBoard({
               </div>
             )}
 
+            {gameOver && !historyPreview && (
+              <VisibleGameResult
+                actions={
+                  <button
+                    type="button"
+                    onClick={restartGame}
+                    className="
+                        mt-5
+                        w-full
+                        rounded-xl
+                        bg-violet-300
+                        px-4
+                        py-3
+                        text-sm
+                        font-black
+                        text-zinc-950
+                        hover:bg-violet-200
+                      "
+                  >
+                    ↺ {t("Restart")}
+                  </button>
+                }
+              />
+            )}
+
             <div
               className="
                 relative
@@ -2260,89 +2248,6 @@ export default function ChessRouletteBoard({
                   activePortalSquare ? [activePortalSquare] : []
                 }
               />
-
-              {gameOver && !historyPreview && (
-                <div
-                  className="
-                      absolute
-                      inset-0
-                      z-40
-                      flex
-                      items-center
-                      justify-center
-                      rounded-[28px]
-                      bg-zinc-950/75
-                      p-6
-                      backdrop-blur-sm
-                    "
-                >
-                  <div
-                    className="
-                        w-full
-                        max-w-sm
-                        rounded-3xl
-                        border
-                        border-white/10
-                        bg-zinc-900/95
-                        p-7
-                        text-center
-                        shadow-2xl
-                      "
-                  >
-                    <p
-                      className="
-                          text-xs
-                          font-black
-                          uppercase
-                          tracking-[0.2em]
-                          text-violet-300
-                        "
-                    >
-                      {t("Game Over")}
-                    </p>
-
-                    <h2
-                      className="
-                          mt-2
-                          text-2xl
-                          font-black
-                          text-white
-                        "
-                    >
-                      {winner === "white" ? t("White wins") : winner === "black" ? t("Black wins") : t("Draw")}
-                    </h2>
-
-                    <p
-                      className="
-                          mt-2
-                          text-sm
-                          text-zinc-400
-                        "
-                    >
-                      {t(gameOverReason)}
-                    </p>
-
-                    <button
-                      type="button"
-                      onClick={restartGame}
-                      className="
-                          mt-5
-                          w-full
-                          rounded-xl
-                          bg-violet-300
-                          px-4
-                          py-3
-                          text-sm
-                          font-black
-                          text-zinc-950
-                          hover:bg-violet-200
-                        "
-                    >
-                      ↺ {t("Restart")}
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </main>
 

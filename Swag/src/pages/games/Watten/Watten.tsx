@@ -5,9 +5,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, BookOpen, ChevronRight, Gamepad2, Users } from "lucide-react";
 import { useFitWattenScreen } from "@/games/watten/useFitWattenScreen";
 import {
-  setStoredWattenLanguage,
   translateWatten,
-  WattenLanguageSelector,
   type WattenLanguage,
 } from "@/games/watten/i18n/wattenLanguage";
 
@@ -82,21 +80,16 @@ const homeCopy: Partial<Record<WattenLanguage, Record<string, string>>> = {
 
 export default function Watten() {
   useFitWattenScreen();
-  const { language, setLanguage } = useAppLanguage();
+  const { language } = useAppLanguage();
   const [tip, setTip] = useState(0);
   const t = useCallback((key: string) => homeCopy[language]?.[key] ?? translateWatten(language, key), [language]);
 
-  function changeLanguage(next: WattenLanguage) {
-    setLanguage(next);
-    setStoredWattenLanguage(next);
-  }
 
   return <main className="watten-menu watten-menu--screen watten-menu--home">
     <div className="watten-menu__layout">
       <div className="watten-menu__panel">
         <div className="watten-pub-bar">
           <div className="watten-pub-brand"><span className="watten-menu__seal">W</span><span><strong>WATTEN</strong><small>{t("Bavarian Watten")}</small></span></div>
-          <WattenLanguageSelector language={language} onChange={changeLanguage} label={t("Language")} />
         </div>
 
         <div className="watten-pub-grid">
@@ -124,6 +117,11 @@ export default function Watten() {
 
           <section className="watten-pub-choices" aria-label={t("How would you like to play?")}>
             <div className="watten-pub-choices__intro"><span>{t("CHOOSE YOUR TABLE")}</span><p>{t("How would you like to play?")}</p></div>
+            <Link to="/games/watten/singleplayer" className="watten-pub-choice watten-pub-choice--local">
+              <span className="watten-pub-choice__icon"><Gamepad2 size={24} aria-hidden="true" /></span>
+              <span className="watten-pub-choice__text"><small>{t("3 OR 4 PLAYERS · BOTS")}</small><strong>{t("Singleplayer")}</strong><span>{t("Play against bots filling the remaining seats.")}</span></span>
+              <span className="watten-pub-choice__arrow"><ArrowRight size={21} aria-hidden="true" /></span>
+            </Link>
             <Link to="/games/watten/hotseat" className="watten-pub-choice watten-pub-choice--local">
               <span className="watten-pub-choice__icon"><Gamepad2 size={24} aria-hidden="true" /></span>
               <span className="watten-pub-choice__text"><small>{t("ONE DEVICE · 3 OR 4 PLAYERS")}</small><strong>Hotseat</strong><span>{t("Pass the device around the table and play together.")}</span></span>

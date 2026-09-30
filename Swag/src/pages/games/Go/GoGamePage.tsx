@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { HeaderDescription } from "@/components/App/PublicHeader";
+import { ui, useUiLanguage } from "@/i18n/ui";
 import GoBoard from "../../../components/strategy/GoBoard";
 import { goBot, type BotDifficulty } from "../../../games/go/bot";
 import { applyGoMove, createInitialGoState, scoreGo, type GoMove, type GoState } from "../../../games/go/rules";
 export default function GoGamePage({ mode }: { mode: "ai" | "hotseat" }) {
+  useUiLanguage();
   const [boardSize, setBoardSize] = useState<GoState["boardSize"]>(9);
   const [difficulty, setDifficulty] = useState<BotDifficulty>("medium");
   const [state, setState] = useState(() => createInitialGoState(9));
@@ -26,6 +29,7 @@ export default function GoGamePage({ mode }: { mode: "ai" | "hotseat" }) {
   const score = useMemo(() => scoreGo(state), [state]);
   const disabled = state.status !== "playing" || thinking || (mode === "ai" && state.currentPlayer === "white");
   return <main className="relative left-1/2 h-[var(--app-height)] w-screen -translate-x-1/2 overflow-hidden bg-[#07090b] px-3 py-3 text-zinc-100 sm:px-4 sm:py-4">
+    {mode === "ai" && <HeaderDescription>{ui("Difficulty")}: {ui(difficulty[0].toUpperCase() + difficulty.slice(1))}</HeaderDescription>}
     <div className="mx-auto flex h-full max-w-7xl flex-col overflow-hidden">
       <header className="mb-3 flex shrink-0 flex-wrap items-center justify-between gap-2"><Link to="/games/go" className="text-sm text-zinc-500 hover:text-white">← Go</Link><div className="flex flex-wrap gap-2">
         <label className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm">Board <select value={boardSize} onChange={(event) => { const size = Number(event.target.value) as GoState["boardSize"]; setBoardSize(size); restart(size); }} className="ml-2 bg-transparent"><option className="bg-zinc-900">9</option><option className="bg-zinc-900">13</option><option className="bg-zinc-900">19</option></select></label>

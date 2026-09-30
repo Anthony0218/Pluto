@@ -7,11 +7,8 @@ import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../context/AuthContext";
 import { ProfileAvatar } from "../social/ProfileAvatarPicker";
 import {
-  setStoredWattenLanguage,
   translateWatten,
   translateWattenPair,
-  WattenLanguageSelector,
-  type WattenLanguage,
 } from "@/games/watten/i18n/wattenLanguage";
 
 type Room = {
@@ -41,7 +38,7 @@ export default function WattenMultiplayerRoom() {
 
   const { user, profile } = useAuth();
 
-  const { language, setLanguage } = useAppLanguage();
+  const { language } = useAppLanguage();
   const [targetScore, setTargetScore] = useState(15);
 
   const t = useCallback(
@@ -54,10 +51,6 @@ export default function WattenMultiplayerRoom() {
     [language],
   );
 
-  function changeLanguage(next: WattenLanguage) {
-    setLanguage(next);
-    setStoredWattenLanguage(next);
-  }
 
   const [room, setRoom] = useState<Room | null>(null);
   const [players, setPlayers] = useState<RoomPlayer[]>([]);
@@ -544,11 +537,6 @@ export default function WattenMultiplayerRoom() {
           </div>
 
           <div className="flex items-center gap-3">
-            <WattenLanguageSelector
-              language={language}
-              onChange={changeLanguage}
-              label={t("Language")}
-            />
 
             <Link
               to="/games/watten/multiplayer"

@@ -16,6 +16,7 @@ import NotFoundPage from "./pages/general/NotFoundPage.tsx";
 import Watten from "./pages/games/Watten/Watten.tsx";
 import WattenHotseat from "./pages/games/Watten/WattenHotseat.tsx";
 import WattenHotseatPage from "./pages/games/Watten/WattenGamePage.tsx";
+import WattenSingleplayer from "./pages/games/Watten/WattenSingleplayer.tsx";
 
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext.tsx";
@@ -28,9 +29,16 @@ import ChessClassicMenu from "./pages/games/Chess/ChessClassicalMenu.tsx";
 import ChessMenu from "./pages/games/Chess/ChessMenu.tsx";
 import ChessComputer from "./pages/games/Chess/ChessComputer.tsx";
 import ChessMultiplayerLobby from "./pages/games/Chess/ChessMultiplayerLobby.tsx";
+import ChessMultiplayerModeMenu from "./pages/games/Chess/ChessMultiplayerModeMenu.tsx";
+import ChessRankedLobby from "./pages/games/Chess/ChessRankedLobby.tsx";
 import ChessMultiplayerRoom from "./pages/games/Chess/ChessMultiplayerRoom.tsx";
 import ChessMultiplayerGame from "./pages/games/Chess/ChessMultiplayerGame.tsx";
+import GroupsPage from "./pages/social/GroupsPage.tsx";
+import LeaderboardsPage from "./pages/social/LeaderboardsPage.tsx";
 import ChessRulesAndTips from "./components/chess/singleplayer/ChessRulesAndTips.tsx";
+import ChessPuzzlesPage from "./components/chess/singleplayer/ChessPuzzlesPage.tsx";
+import ChessAudioSettings from "./components/chess/ChessAudioSettings.tsx";
+import { unlockChessAudio } from "./games/chess/audio/chessAudio.ts";
 import ChessVariantsMenu from "./pages/games/Chess/ChessVariantsMenu.tsx";
 import ThreeLivesChessBoard from "./components/chess/singleplayer/ThreeLivesChessBoard.tsx";
 import MutationChessBoard from "./components/chess/singleplayer/MutationChessBoard.tsx";
@@ -156,12 +164,12 @@ import SchafkopfGame from "./components/Schafkopf/SchafkopfGame.tsx";
 import SchafkopfMultiplayerGame from "./components/Schafkopf/SchafkopfMultiplayerGame.tsx";
 import GoMenu from "./pages/games/Go/GoMenu.tsx";
 import GoGamePage from "./pages/games/Go/GoGamePage.tsx";
-import ShogiMenu from "./pages/games/Shogi/ShogiMenu.tsx";
-import ShogiGamePage from "./pages/games/Shogi/ShogiGamePage.tsx";
 import StrategyMultiplayer from "./components/strategy/StrategyMultiplayer.tsx";
 import GoRules from "./components/strategy/GoRules.tsx";
-import ShogiRules from "./components/strategy/ShogiRules.tsx";
+const PartyPage = React.lazy(() => import("./pages/games/Party/PartyPage.tsx"));
 const AtlasArenaPage = React.lazy(() => import("./pages/games/AtlasArena/AtlasArenaPage.tsx"));
+const EatItPage = React.lazy(() => import("./pages/games/EatIt/EatItPage.tsx"));
+const eatItPage = <React.Suspense fallback={<main className="min-h-[var(--app-height)] bg-[#18201d]" />}><EatItPage /></React.Suspense>;
 const AtlasMultiplayerPage = React.lazy(() => import("./pages/games/AtlasArena/AtlasMultiplayerPage.tsx"));
 const atlasPage = (page: React.ReactNode) => <React.Suspense fallback={<main className="min-h-[var(--app-height)] bg-[#06101f] p-10 text-zinc-400">Loading Atlas Arena…</main>}>{page}</React.Suspense>;
 
@@ -205,7 +213,10 @@ const router = createBrowserRouter([
             path: "/games",
             element: <GamesPage />,
           },
+          { path: "/games/pluto-party", element: <React.Suspense fallback={<main>Loading Pluto Party…</main>}><PartyPage /></React.Suspense> },
           { path: "/games/atlas-arena", element: atlasPage(<AtlasArenaPage />) },
+          { path: "/games/eat-it", element: eatItPage },
+          { path: "/games/eat-it/multiplayer/:roomCode", element: eatItPage },
           { path: "/games/atlas-arena/multiplayer", element: atlasPage(<AtlasMultiplayerPage />) },
           { path: "/games/atlas-arena/multiplayer/:roomCode", element: atlasPage(<AtlasMultiplayerPage />) },
           { path: "/games/go", element: <GoMenu /> },
@@ -214,12 +225,6 @@ const router = createBrowserRouter([
           { path: "/games/go/hotseat", element: <GoGamePage mode="hotseat" /> },
           { path: "/games/go/multiplayer", element: <StrategyMultiplayer gameType="go" /> },
           { path: "/games/go/multiplayer/:roomCode", element: <StrategyMultiplayer gameType="go" /> },
-          { path: "/games/shogi", element: <ShogiMenu /> },
-          { path: "/games/shogi/rules", element: <ShogiRules /> },
-          { path: "/games/shogi/ai", element: <ShogiGamePage mode="ai" /> },
-          { path: "/games/shogi/hotseat", element: <ShogiGamePage mode="hotseat" /> },
-          { path: "/games/shogi/multiplayer", element: <StrategyMultiplayer gameType="shogi" /> },
-          { path: "/games/shogi/multiplayer/:roomCode", element: <StrategyMultiplayer gameType="shogi" /> },
           {
             path: "/profile",
             element: <ProfilePage />,
@@ -228,6 +233,8 @@ const router = createBrowserRouter([
             path: "/friends",
             element: <FriendsPage />,
           },
+          { path: "/groups", element: <GroupsPage /> },
+          { path: "/leaderboards", element: <LeaderboardsPage /> },
 
           {
             path: "/games/chess",
@@ -278,6 +285,7 @@ const router = createBrowserRouter([
             path: "/games/watten/hotseat/game",
             element: <WattenHotseatPage />,
           },
+          { path: "/games/watten/singleplayer", element: <WattenSingleplayer /> },
 
           {
             path: "/games/watten/rules",
@@ -302,6 +310,10 @@ const router = createBrowserRouter([
           },
           {
             path: "/games/chess/classic/multiplayer",
+            element: <ChessMultiplayerModeMenu />,
+          },
+          {
+            path: "/games/chess/classic/multiplayer/friends",
             element: <ChessMultiplayerLobby />,
           },
           {
@@ -312,9 +324,20 @@ const router = createBrowserRouter([
             path: "/games/chess/classic/multiplayer/:roomCode/game",
             element: <ChessMultiplayerGame />,
           },
+          { path: "/games/chess/ranked", element: <ChessRankedLobby /> },
+          { path: "/games/chess/ranked/:roomCode", element: <ChessMultiplayerRoom /> },
+          { path: "/games/chess/ranked/:roomCode/game", element: <ChessMultiplayerGame /> },
           {
             path: "/games/chess/rules",
             element: <ChessRulesAndTips />,
+          },
+          {
+            path: "/games/chess/puzzles",
+            element: <ChessPuzzlesPage />,
+          },
+          {
+            path: "/games/chess/audio",
+            element: <ChessAudioSettings />,
           },
           {
             path: "/games/chess/variants",
@@ -654,6 +677,9 @@ const router = createBrowserRouter([
     ],
   },
 ]);
+
+window.addEventListener("pointerdown", unlockChessAudio, { once: true });
+window.addEventListener("keydown", unlockChessAudio, { once: true });
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

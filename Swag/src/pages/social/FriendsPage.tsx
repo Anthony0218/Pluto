@@ -6,8 +6,10 @@ import { useAuth } from "../../context/AuthContext";
 import type { Friend, FriendRequest, PublicProfile } from "../../types/social";
 import FriendAvatar from "../../components/social/FriendAvatar";
 import FriendChat from "../../components/social/FriendChat";
+import MyGroupsCard from "../../components/social/MyGroupsCard";
 import { useDashboardData, type DashboardNotification } from "@/hooks/useDashboardData";
 import { ui, useUiLanguage } from "@/i18n/ui";
+import { getFriendMessageBaseline } from "@/components/App/dashboard/messageReadState";
 
 type IncomingRequest = FriendRequest & {
   sender: PublicProfile | null;
@@ -21,9 +23,14 @@ function profileLabel(profile: PublicProfile) {
 }
 
 export default function FriendsPage() {
+  const { user } = useAuth();
+  return <FriendsPageContent key={user?.id ?? "guest"} />;
+}
+
+function FriendsPageContent() {
   useUiLanguage();
   const { user, loading: authLoading } = useAuth();
-  const { notifications } = useDashboardData();
+  const { notifications, onlineIds } = useDashboardData();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const requestedFriendId = searchParams.get("friend");
@@ -34,6 +41,34 @@ export default function FriendsPage() {
   const [searchResults, setSearchResults] = useState<PublicProfile[]>([]);
   const [searching, setSearching] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
+  const messageReadKey = `pluto-read-message-ids-${user?.id ?? "guest"}`;
+  const [messageBaseline] = useState(() => getFriendMessageBaseline(user?.id));
+  const [readMessageIds, setReadMessageIds] = useState<string[]>(() => {
+    try {
+      const saved: unknown = JSON.parse(localStorage.getItem(messageReadKey) || "[]");
+      return Array.isArray(saved) ? saved.filter((id): id is string => typeof id === "string") : [];
+    } catch { return []; }
+  });
+
+  function openFriend(friendId: string) {
+    setSelectedFriendId(friendId);
+  }
+
+  useEffect(() => {
+    if (!selectedFriendId) return;
+    const unreadIds = notifications
+      .filter(item => item.kind === "message" && item.senderId === selectedFriendId && !readMessageIds.includes(item.id))
+      .map(item => item.id);
+    if (!unreadIds.length) return;
+    const next = [...readMessageIds, ...unreadIds];
+    let active = true;
+    void Promise.resolve().then(() => {
+      if (!active) return;
+      setReadMessageIds(next);
+      try { localStorage.setItem(messageReadKey, JSON.stringify(next)); } catch { /* The open chat still works. */ }
+    });
+    return () => { active = false; };
+  }, [messageReadKey, notifications, readMessageIds, selectedFriendId]);
 
   const selectedFriend = useMemo(
     () => friends.find((friend) => friend.id === selectedFriendId) ?? null,
@@ -100,10 +135,10 @@ export default function FriendsPage() {
     );
 
     setSelectedFriendId((current) => {
-      if (!current && requestedFriendId && loadedFriends.some(friend => friend.id === requestedFriendId)) return requestedFriendId;
+      if (requestedFriendId && loadedFriends.some(friend => friend.id === requestedFriendId)) return requestedFriendId;
       if (current && loadedFriends.some((friend) => friend.id === current))
         return current;
-      return loadedFriends[0]?.id ?? null;
+      return null;
     });
   }, [user, requestedFriendId]);
 
@@ -114,7 +149,7 @@ export default function FriendsPage() {
       return;
     }
 
-    void loadSocialData();
+    void Promise.resolve().then(() => loadSocialData());
 
     const channel = supabase
       .channel(`friends-page-${user.id}`)
@@ -139,9 +174,11 @@ export default function FriendsPage() {
     if (!user) return;
     const query = search.trim().replace(/^@/, "");
     if (query.length < 2) {
-      setSearchResults([]);
-      setSearching(false);
-      return;
+      let active = true;
+      void Promise.resolve().then(() => {
+        if (active) { setSearchResults([]); setSearching(false); }
+      });
+      return () => { active = false; };
     }
 
     const timeout = window.setTimeout(() => {
@@ -234,6 +271,8 @@ export default function FriendsPage() {
 
   if (!user) return null;
 
+  const onlineFriendCount = friends.filter(friend => onlineIds.includes(friend.id)).length;
+
   return (
     <main className="min-h-screen px-5 py-8 text-zinc-100 sm:px-8">
       <div className="mx-auto max-w-7xl">
@@ -250,6 +289,7 @@ export default function FriendsPage() {
         <div className="grid gap-5 lg:grid-cols-[360px_1fr]">
           <aside className="space-y-4">
             <FriendNotifications items={notifications} />
+            <MyGroupsCard userId={user.id} />
             <section className="rounded-3xl border border-white/10 bg-zinc-900/80 p-4 shadow-xl shadow-black/10 backdrop-blur-md">
               <div className="flex items-center gap-2">
                 <UserPlus size={18} className="text-sky-400" />
@@ -361,6 +401,7 @@ export default function FriendsPage() {
               <div className="flex items-center gap-2 border-b border-white/10 px-4 py-4">
                 <Users size={18} className="text-sky-400" />
                 <h2 className="font-bold text-white">Friends</h2>
+                {onlineFriendCount > 0 && <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2 py-1 text-[10px] font-bold text-emerald-300">{onlineFriendCount} {ui("Online")}</span>}
                 <span className="ml-auto rounded-full bg-white/5 px-2 py-1 text-[10px] font-black text-zinc-500">
                   {friends.length}
                 </span>
@@ -377,31 +418,29 @@ export default function FriendsPage() {
                 </div>
               ) : (
                 <div className="p-2">
-                  {friends.map((friend) => {
+                  {[...friends].sort((a, b) => Number(onlineIds.includes(b.id)) - Number(onlineIds.includes(a.id))).map((friend) => {
                     const active = friend.id === selectedFriendId;
+                    const online = onlineIds.includes(friend.id);
+                    const unreadCount = notifications.filter(item => item.kind === "message" && item.senderId === friend.id && Date.parse(item.createdAt) > messageBaseline && !readMessageIds.includes(item.id)).length;
                     return (
                       <button
                         type="button"
                         key={friend.id}
-                        onClick={() => setSelectedFriendId(friend.id)}
-                        className={`flex w-full items-center gap-3 rounded-xl p-3 text-left transition ${
+                        onClick={() => openFriend(friend.id)}
+                        className={`flex w-full items-center gap-3 rounded-xl border p-3 text-left transition ${
                           active
-                            ? "bg-sky-500/10 ring-1 ring-sky-400/20"
-                            : "hover:bg-white/5"
+                            ? "border-violet-400/35 bg-violet-400/10"
+                            : "border-transparent hover:border-white/10 hover:bg-white/5"
                         }`}
                       >
-                        <FriendAvatar profile={friend} />
+                        <span className={`relative rounded-full ${unreadCount ? "ring-2 ring-rose-400 shadow-[0_0_15px_rgba(244,63,94,.5)]" : ""}`}><FriendAvatar profile={friend} />{online && <i className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-[#0b142a] bg-emerald-400" />}{unreadCount > 0 && <span className="absolute -right-2 -top-2 grid min-h-5 min-w-5 place-items-center rounded-full bg-rose-500 px-1 text-[10px] font-black text-white">{unreadCount > 9 ? "9+" : unreadCount}</span>}</span>
                         <div className="min-w-0 flex-1">
                           <p
                             className={`truncate text-sm font-bold ${active ? "text-sky-200" : "text-white"}`}
                           >
                             {friend.display_name || friend.username || "Player"}
                           </p>
-                          {friend.username && (
-                            <p className="truncate text-xs text-zinc-500">
-                              @{friend.username}
-                            </p>
-                          )}
+                          <p className={`truncate text-xs ${online ? "text-emerald-300" : "text-zinc-500"}`}>{online ? ui("Online now") : ui("Offline")}{unreadCount ? ` · ${unreadCount} ${ui("New message")}${unreadCount === 1 ? "" : "s"}` : ""}</p>
                         </div>
                       </button>
                     );

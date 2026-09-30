@@ -1,8 +1,9 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useRef, useEffect, useMemo, useState } from "react";
 import {
-  LanguageSelector,
   translateChess,
   useChessLanguage,
   type TranslationTable,
@@ -12,7 +13,6 @@ import { Chess, type Square } from "chess.js";
 
 import Board from "./Board.tsx";
 import PromotionBar from "./PromotionBar";
-import BoardAnimationToggle from "@/components/chess/singleplayer/BoardAnimationToggle.tsx";
 
 import { getSquareName, type PieceType } from "../../../utils/chessUtils.ts";
 
@@ -334,20 +334,6 @@ function bossHearts(hp: number): string {
   )}`;
 }
 
-function resultText(result: FinishedGame, t: (key: string) => string): string {
-  if (!result) return "";
-  if (result.winner === "draw") {
-    if (result.reason === "stalemate") return t("Stalemate. Draw.");
-    if (result.reason === "fifty") return t("50-move rule. Draw.");
-    if (result.reason === "repetition") return t("Threefold repetition. Draw.");
-    return t("Draw");
-  }
-  if (result.reason === "boss_hp")
-    return t("The Boss has lost all 5 HP. White wins!");
-  return result.winner === "white"
-    ? t("Boss checkmated. White wins!")
-    : t("White king checkmated. The Boss wins!");
-}
 
 function historySymbol(color: BossSide, piece: PieceType | null) {
   if (!piece) return color === "w" ? "♔" : "♚";
@@ -418,7 +404,7 @@ export default function BossBattleBoard({
   difficulty = "casual",
 }: VariantAiBoardProps) {
   useUiLanguage();
-  const { language, setLanguage } = useChessLanguage();
+  const { language } = useChessLanguage();
   const t = (key: string) => translateChess(language, key, translations);
   const [game, setGame] = useState(() => new Chess(BOSS_STARTING_FEN));
 
@@ -973,11 +959,6 @@ export default function BossBattleBoard({
 
 
           <div className="flex flex-wrap items-center justify-end gap-2">
-            <LanguageSelector
-              language={language}
-              onChange={setLanguage}
-              label={t("Language")}
-            />
             <div className="rounded-full border border-red-400/20 bg-red-400/[0.07] px-3 py-1.5 text-xs font-black text-red-200">
               ♚ {bossHearts(displayedBossState.hp)}
             </div>
@@ -1001,7 +982,6 @@ export default function BossBattleBoard({
               </div>
             )}
           </div>
-          <BoardAnimationToggle />
         </ChessPageHeader>
 
         <main className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
@@ -1062,46 +1042,28 @@ export default function BossBattleBoard({
                   </span>
                 </div>
 
-                <div className="max-h-96 overflow-y-auto rounded-2xl border border-white/5 bg-black/20">
-                  {history.length === 0 ? (
-                    <div className="px-4 py-8 text-center text-xs text-zinc-600">
-                      {t("No actions yet")}
-                    </div>
-                  ) : (
-                    <table className="w-full border-collapse">
-                      <tbody>
-                        {history.map((entry) => {
-                          const selected = historyPreviewPly === entry.ply;
-                          return (
-                            <tr
-                              key={entry.ply}
-                              onClick={() => {
-                                setHistoryPreviewPly(entry.ply);
-                                clearSelection();
-                                clearPowerTarget();
-                              }}
-                              className={`cursor-pointer border-b border-white/5 transition last:border-0 ${selected ? "bg-blue-400/10" : "hover:bg-white/5"}`}
-                            >
-                              <td className="w-12 px-3 py-2.5 text-[10px] text-zinc-600">
-                                {entry.moveNumber}
-                                {entry.color === "w" ? "." : "..."}
-                              </td>
-                              <td className="w-8 px-1 py-2.5 text-lg">
-                                {historySymbol(entry.color, entry.piece)}
-                              </td>
-                              <td className="px-2 py-2.5 text-xs font-bold text-zinc-300">
-                                {entry.san}
-                                {entry.bossDamaged && (
-                                  <span className="ml-2 text-red-300">♥−1</span>
-                                )}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  )}
-                </div>
+                <ChessMoveHistoryList
+                  listClassName="max-h-96 rounded-2xl border border-white/5 bg-black/20"
+                  selectedPly={historyPreviewPly}
+                  emptyLabel={t("No actions yet")}
+                  entries={history.map((entry) => ({
+                    ply: entry.ply,
+                    side: entry.color,
+                    moveNumber: entry.moveNumber,
+                    content: (
+                      <>
+                        <span className="text-base leading-none">{historySymbol(entry.color, entry.piece)}</span>
+                        <span className="truncate text-xs font-bold text-zinc-300">{entry.san}</span>
+                      </>
+                    ),
+                    trailing: entry.bossDamaged ? <span className="text-red-300">♥−1</span> : null,
+                  }))}
+                  onSelect={(ply) => {
+                    setHistoryPreviewPly(ply);
+                    clearSelection();
+                    clearPowerTarget();
+                  }}
+                />
               </section>
             </div>
           </aside>
@@ -1165,14 +1127,7 @@ export default function BossBattleBoard({
               )}
 
               {finishedGame && !historyPreview && (
-                <div className="mb-3 rounded-2xl border border-red-400/20 bg-red-400/[0.07] px-5 py-4 text-center">
-                  <p className="text-[10px] font-black uppercase tracking-[0.24em] text-red-300">
-                    {t("Game Over")}
-                  </p>
-                  <p className="mt-2 text-lg font-black text-white">
-                    {resultText(finishedGame, t)}
-                  </p>
-                </div>
+                <VisibleGameResult />
               )}
 
               <Board

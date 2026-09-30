@@ -18,7 +18,7 @@ export default function DashboardHero({ profile, signedIn, loading, now, challen
         {!signedIn && !loading && <p className="mt-2 text-sm text-slate-300"><Link to="/login" className="underline">{ui("Log in")}</Link> {ui("to see your progress and friends.")}</p>}
         {signedIn && !profile && !loading && <p className="mt-2 text-sm text-slate-300">{ui("Your profile stats are unavailable.")}</p>}
       </div>
-      <div className="hero-dashboard-cards"><div className="hero-challenge">{challenge}</div></div>
+      {challenge && <div className="hero-dashboard-cards"><div className="hero-challenge">{challenge}</div></div>}
     </div>
   </section>;
 }

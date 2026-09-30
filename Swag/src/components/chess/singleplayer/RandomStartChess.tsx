@@ -1,8 +1,9 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 import {
-  LanguageSelector,
   translateChess,
   useChessLanguage,
   type TranslationTable,
@@ -23,7 +24,6 @@ import {
   createRandomStartPosition,
   type RandomStartPosition,
 } from "../../../games/chess/variants/randomStartChess.ts";
-import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
 import { useVariantChessAi } from "@/hooks/useVariantChessAi";
 import {
   chessColorFromPlayerColor,
@@ -148,7 +148,7 @@ export default function RandomStartChess({
   difficulty = "casual",
 }: VariantAiBoardProps) {
   useUiLanguage();
-  const { language, setLanguage } = useChessLanguage();
+  const { language } = useChessLanguage();
   const t = (key: string) => translateChess(language, key, translations);
   const [startPosition, setStartPosition] = useState<RandomStartPosition>(() =>
     createRandomStartPosition(),
@@ -169,8 +169,8 @@ export default function RandomStartChess({
   const [records, setRecords] = useState<MoveRecord[]>([]);
 
   const [gameOver, setGameOver] = useState(false);
-  const [gameOverReason, setGameOverReason] = useState("");
-  const [winner, setWinner] = useState<Winner>("draw");
+  const [, setGameOverReason] = useState("");
+  const [, setWinner] = useState<Winner>("draw");
 
   const [historyPreviewPly, setHistoryPreviewPly] = useState<number | null>(
     null,
@@ -545,19 +545,12 @@ export default function RandomStartChess({
             </div>
 
             <div className="flex flex-wrap items-center justify-end gap-2">
-              <LanguageSelector
-                language={language}
-                onChange={setLanguage}
-                label={t("Language")}
-              />
-
               {!gameOver && (
                 <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-black text-zinc-300">
                   {game.turn() === "w" ? t("White to move") : t("Black to move")}
                 </span>
               )}
             </div>
-            <BoardAnimationToggle />
           </div>
         </ChessPageHeader>
 
@@ -613,36 +606,22 @@ export default function RandomStartChess({
                 title={t("Move History")}
                 subtitle={`${records.length} ${t("plies")}`}
               >
-                <div className="max-h-72 overflow-y-auto rounded-xl border border-white/5 bg-black/20">
-                  {records.length === 0 ? (
-                    <p className="px-4 py-7 text-center text-xs text-zinc-600">
-                      {t("No moves yet")}
-                    </p>
-                  ) : (
-                    records.map((record) => (
-                      <button
-                        key={record.ply}
-                        type="button"
-                        onClick={() => {
-                          setHistoryPreviewPly(record.ply);
-                          setSelectedSquare(null);
-                          setLegalMoves([]);
-                        }}
-                        className={`flex w-full items-center justify-between border-b border-white/5 px-3 py-2 text-left text-xs transition last:border-0 ${
-                          historyPreviewPly === record.ply
-                            ? "bg-violet-400/10 text-violet-200"
-                            : "text-zinc-400 hover:bg-white/5"
-                        }`}
-                      >
-                        <span>
-                          {record.moveNumber}
-                          {record.color === "w" ? "." : "..."}
-                        </span>
-                        <span className="font-black">{record.san}</span>
-                      </button>
-                    ))
-                  )}
-                </div>
+                <ChessMoveHistoryList
+                  listClassName="max-h-72 rounded-xl border border-white/5 bg-black/20"
+                  selectedPly={historyPreviewPly}
+                  emptyLabel={t("No moves yet")}
+                  entries={records.map((record) => ({
+                    ply: record.ply,
+                    side: record.color,
+                    moveNumber: record.moveNumber,
+                    content: <span className="truncate text-xs font-black text-zinc-200">{record.san}</span>,
+                  }))}
+                  onSelect={(ply) => {
+                    setHistoryPreviewPly(ply);
+                    setSelectedSquare(null);
+                    setLegalMoves([]);
+                  }}
+                />
               </Panel>
             </div>
           </aside>
@@ -681,6 +660,20 @@ export default function RandomStartChess({
               </div>
             )}
 
+            {gameOver && !historyPreview && (
+              <VisibleGameResult
+                actions={
+                  <button
+                    type="button"
+                    onClick={newRandomGame}
+                    className="mt-5 rounded-xl bg-violet-400 px-4 py-2.5 text-sm font-black text-violet-950"
+                  >
+                    {t("New random game")}
+                  </button>
+                }
+              />
+            )}
+
             <div className="relative">
               <Board
                 board={displayedBoard}
@@ -700,32 +693,6 @@ export default function RandomStartChess({
                 }
                 orientation={boardOrientation}
               />
-
-              {gameOver && !historyPreview && (
-                <div className="absolute inset-0 z-40 flex items-center justify-center rounded-[28px] bg-zinc-950/80 p-6 backdrop-blur-sm">
-                  <div className="max-w-sm rounded-3xl border border-violet-300/20 bg-zinc-900 p-6 text-center shadow-2xl">
-                    <p className="text-xs font-black uppercase tracking-[0.25em] text-violet-300">
-                      {t("Game Over")}
-                    </p>
-
-                    <h2 className="mt-3 text-3xl font-black text-white">
-                      {winner === "white" ? t("White wins") : winner === "black" ? t("Black wins") : t("Draw")}
-                    </h2>
-
-                    <p className="mt-2 text-sm text-zinc-500">
-                      {t(gameOverReason)}
-                    </p>
-
-                    <button
-                      type="button"
-                      onClick={newRandomGame}
-                      className="mt-5 rounded-xl bg-violet-400 px-4 py-2.5 text-sm font-black text-violet-950"
-                    >
-                      {t("New random game")}
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </section>
 

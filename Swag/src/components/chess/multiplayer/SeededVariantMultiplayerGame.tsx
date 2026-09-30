@@ -1,3 +1,6 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
+import InviteFriendButton from "@/components/chess/InviteFriendButton";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import {
@@ -43,6 +46,7 @@ import type {
   VariantRoom,
   VariantRoomPlayer,
 } from "@/games/chess/multiplayer/variantMultiplayerTypes";
+import VariantRoomSetup from "./VariantRoomSetup";
 
 type Props = {
   variant: Extract<MultiplayerVariantId, "randomstart" | "complete-chaos">;
@@ -259,26 +263,6 @@ function playLatestMoveSound(initialFen: string, moves: string[]) {
   }
 }
 
-function resultReasonLabel(reason: string | null) {
-  switch (reason) {
-    case "checkmate":
-      return "Checkmate";
-    case "stalemate":
-      return "Stalemate";
-    case "threefold repetition":
-      return "Threefold repetition";
-    case "insufficient material":
-      return "Insufficient material";
-    case "50-move rule":
-      return "50-move rule";
-    case "resignation":
-      return "Resignation";
-    case "draw":
-      return "Draw";
-    default:
-      return reason ?? "Game over";
-  }
-}
 
 function Panel({
   title,
@@ -385,10 +369,6 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
     [players, user?.id],
   );
 
-  const opponent = useMemo(
-    () => players.find((player) => player.user_id !== user?.id) ?? null,
-    [players, user?.id],
-  );
 
   const myColor = myPlayer?.chosen_color ?? null;
   const orientation: "white" | "black" =
@@ -453,15 +433,15 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
 
   const undoPending = Boolean(gameState?.undo_requested_by);
 
-  const canMove =
+  const canSubmitMove =
     room?.status === "playing" &&
     gameState?.status === "playing" &&
     isMyTurn &&
     !moving &&
     actionLoading === null &&
-    !pendingPromotion &&
     historyPreviewPly === null &&
     !undoPending;
+  const canMove = canSubmitMove && !pendingPromotion;
 
   const lastHistoryMove = historyRows[historyRows.length - 1] ?? null;
   const lastMoverColor = lastHistoryMove
@@ -495,12 +475,6 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
         ? Boolean(gameState?.black_rematch_ready)
         : false;
 
-  const opponentRematchReady =
-    opponent?.chosen_color === "white"
-      ? Boolean(gameState?.white_rematch_ready)
-      : opponent?.chosen_color === "black"
-        ? Boolean(gameState?.black_rematch_ready)
-        : false;
 
   const randomStartMeta: RandomStartPosition | null = useMemo(() => {
     if (
@@ -750,7 +724,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
     to: Square,
     promotion?: PromotionPiece,
   ) {
-    if (!room || !gameState || !gameState.initial_fen || !canMove) {
+    if (!room || !gameState || !gameState.initial_fen || !canSubmitMove) {
       return;
     }
 
@@ -1090,6 +1064,17 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
         .join(" ")
     : "—";
 
+  if (room.status === "waiting") {
+    return (
+      <VariantRoomSetup
+        roomId={room.id}
+        variantName={page.title}
+        lobbyPath={page.lobby}
+        onStarted={() => void loadRoom(true)}
+      />
+    );
+  }
+
   return (
     <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1460px]">
@@ -1295,6 +1280,30 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
               </div>
             )}
 
+            {finished && historyPreviewPly === null && (
+              <VisibleGameResult
+                winner={gameState.winner}
+                playerColor={myColor}
+                reason={gameState.end_reason}
+                actions={
+                  <>
+                    <button
+                      type="button"
+                      disabled={myRematchReady || actionLoading !== null}
+                      onClick={() => void requestRematch()}
+                      className={`mt-5 w-full rounded-xl px-4 py-3 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-50 ${page.accentButton}`}
+                    >
+                      {myRematchReady ? ui("Rematch requested") : ui("Rematch")}
+                    </button>
+                    <Link
+                      to={page.lobby}
+                      className="mt-3 block w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-bold text-zinc-300 transition hover:bg-white/10"
+                    >{ui("Back to lobby")}</Link>
+                  </>
+                }
+              />
+            )}
+
             <div className="relative">
               <Board
                 board={board}
@@ -1339,52 +1348,11 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                       {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
                     </p>
                   </button>
+                    <InviteFriendButton overlay />
                 </div>
               )}
 
-              {finished && historyPreviewPly === null && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[28px] bg-zinc-950/82 p-6 backdrop-blur-sm">
-                  <div
-                    className={`w-full max-w-sm rounded-3xl border ${page.overlayBorder} bg-zinc-900/95 p-7 text-center shadow-2xl`}
-                  >
-                    <p
-                      className={`text-xs font-black uppercase tracking-[0.25em] ${page.overlayEyebrow}`}
-                    >{ui("Game Over")}</p>
 
-                    <h2 className="mt-3 text-3xl font-black text-white">
-                      {gameState.winner === "draw" ? ui("Draw") : gameState.winner === myColor ? ui("You win") : ui("You lose")}
-                    </h2>
-
-                    <p className="mt-2 text-sm text-zinc-500">
-                      {resultReasonLabel(gameState.end_reason)}
-                    </p>
-
-                    <button
-                      type="button"
-                      disabled={myRematchReady || actionLoading !== null}
-                      onClick={() => void requestRematch()}
-                      className={`mt-5 w-full rounded-xl px-4 py-3 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-50 ${page.accentButton}`}
-                    >
-                      {myRematchReady ? ui("Rematch requested") : ui("Rematch")}
-                    </button>
-
-                    {myRematchReady && !opponentRematchReady && (
-                      <p className="mt-3 text-xs font-semibold text-zinc-500">{ui("Waiting for opponent...")}</p>
-                    )}
-
-                    {opponentRematchReady && !myRematchReady && (
-                      <p
-                        className={`mt-3 text-xs font-semibold ${page.accentText}`}
-                      >{ui("Opponent wants a rematch.")}</p>
-                    )}
-
-                    <Link
-                      to={page.lobby}
-                      className="mt-3 block w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-bold text-zinc-300 transition hover:bg-white/10"
-                    >{ui("Back to lobby")}</Link>
-                  </div>
-                </div>
-              )}
             </div>
           </section>
 
@@ -1394,78 +1362,38 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                 title={ui("Move History")}
                 subtitle={`${historyRows.length} plies · click to preview`}
               >
-                <div className="max-h-[380px] overflow-y-auto rounded-xl border border-white/5 bg-black/20">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setHistoryPreviewPly(0);
-                      clearSelection();
-                    }}
-                    className={`flex w-full items-center justify-between border-b border-white/5 px-3 py-2.5 text-left text-xs transition ${
-                      historyPreviewPly === 0
-                        ? page.accentSelected
-                        : "text-zinc-500 hover:bg-white/5"
-                    }`}
-                  >
-                    <span>{ui("Start")}</span>
-                    <span className="font-black">{ui("Initial position")}</span>
-                  </button>
-
-                  {historyRows.length === 0 ? (
-                    <p className="px-4 py-7 text-center text-xs text-zinc-600">{ui("No moves yet")}</p>
-                  ) : (
-                    <table className="w-full border-collapse text-left">
-                      <thead className="sticky top-0 bg-zinc-950/95 text-[9px] font-black uppercase tracking-wider text-zinc-600 backdrop-blur">
-                        <tr>
-                          <th className="px-3 py-2">{ui("Move")}</th>
-                          <th className="px-2 py-2">{ui("Side")}</th>
-                          <th className="px-3 py-2 text-right">{ui("Played")}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {historyRows.map((row) => {
-                          const selected = historyPreviewPly === row.ply;
-
-                          return (
-                            <tr
-                              key={row.ply}
-                              tabIndex={0}
-                              onClick={() => {
-                                setHistoryPreviewPly(row.ply);
-                                clearSelection();
-                              }}
-                              onKeyDown={(event) => {
-                                if (
-                                  event.key === "Enter" ||
-                                  event.key === " "
-                                ) {
-                                  setHistoryPreviewPly(row.ply);
-                                  clearSelection();
-                                }
-                              }}
-                              className={`cursor-pointer border-b border-white/5 transition last:border-0 ${
-                                selected
-                                  ? page.accentSelected
-                                  : "text-zinc-400 hover:bg-white/5"
-                              }`}
-                            >
-                              <td className="px-3 py-2.5 text-[10px] text-zinc-600">
-                                {row.moveNumber}
-                                {row.color === "w" ? "." : "..."}
-                              </td>
-                              <td className="px-2 py-2.5 text-lg">
-                                {row.color === "w" ? "♔" : "♚"}
-                              </td>
-                              <td className="px-3 py-2.5 text-right font-mono text-xs font-black">
-                                {row.san}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  )}
-                </div>
+                <ChessMoveHistoryList
+                  listClassName="max-h-[380px] rounded-xl border border-white/5 bg-black/20"
+                  selectedPly={historyPreviewPly}
+                  emptyLabel="No moves yet"
+                  leading={
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setHistoryPreviewPly(0);
+                        clearSelection();
+                      }}
+                      className={`flex w-full items-center justify-between border-b border-white/5 px-3 py-2.5 text-left text-xs transition ${
+                        historyPreviewPly === 0
+                          ? page.accentSelected
+                          : "text-zinc-500 hover:bg-white/5"
+                      }`}
+                    >
+                      <span>{ui("Start")}</span>
+                      <span className="font-black">{ui("Initial position")}</span>
+                    </button>
+                  }
+                  entries={historyRows.map((row) => ({
+                    ply: row.ply,
+                    side: row.color,
+                    moveNumber: row.moveNumber,
+                    content: <span className="truncate font-mono text-xs font-black text-zinc-200">{row.san}</span>,
+                  }))}
+                  onSelect={(ply) => {
+                    setHistoryPreviewPly(ply);
+                    clearSelection();
+                  }}
+                />
 
                 {historyPreviewPly !== null && (
                   <p className="mt-2 text-[10px] leading-4 text-zinc-600">{ui("Preview is local only. It never changes the multiplayer game state.")}</p>

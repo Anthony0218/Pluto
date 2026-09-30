@@ -1,3 +1,6 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
+import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
@@ -14,7 +17,6 @@ import {
   playPieceCaptureSound,
   playPieceMoveSound,
   playPieceSelectSound,
-  playRandomSound,
 } from "../../../utils/sound.ts";
 
 import {
@@ -36,7 +38,6 @@ import {
 
 import { buildHorrorStats } from "../../../games/chess/variants/horrorStats.ts";
 import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.ts";
-import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
 import { useVariantChessAi } from "@/hooks/useVariantChessAi";
 import {
   chessColorFromPlayerColor,
@@ -45,13 +46,11 @@ import {
   type ChessPlayerColor,
 } from "../../../games/chess/ai/variantAi.ts";
 
-type Language = "en" | "de" | "bar" | "ko" | "ru";
 
 type StatsTab = "survival" | "plague" | "moments";
 
 type Winner = "white" | "black" | "draw";
 
-const CHESS_LANGUAGE_STORAGE_KEY = "chess-language";
 
 const pieceValues: Record<string, number> = {
   p: 1,
@@ -80,7 +79,7 @@ const blackSymbols: Record<string, string> = {
   k: "♚",
 };
 
-const translations: Record<Exclude<Language, "en">, Record<string, string>> = {
+const translations: Record<"de" | "bar" | "ko" | "ru", Record<string, string>> & Partial<Record<"es" | "pt", Record<string, string>>> = {
   de: {
     "Chess Variant": "Schachvariante",
     "Horror Chess": "Horror-Schach",
@@ -346,7 +345,7 @@ export default function HorrorChessBoard({
   difficulty = "casual",
 }: VariantAiBoardProps) {
   useUiLanguage();
-  const { language, setLanguage } = useAppLanguage();
+  const { language } = useAppLanguage();
 
   const t = (key: string) => {
     if (language === "en") {
@@ -357,16 +356,8 @@ export default function HorrorChessBoard({
       return translations.bar[key] ?? translations.de[key] ?? ui(key);
     }
 
-    return translations[language][key] ?? ui(key);
+    return translations[language]?.[key] ?? ui(key);
   };
-
-  function changeLanguage(nextLanguage: Language) {
-    setLanguage(nextLanguage);
-
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(CHESS_LANGUAGE_STORAGE_KEY, nextLanguage);
-    }
-  }
 
   const [game] = useState(() => new Chess());
 
@@ -393,9 +384,9 @@ export default function HorrorChessBoard({
 
   const [gameOver, setGameOver] = useState(false);
 
-  const [gameOverReason, setGameOverReason] = useState("");
+  const [, setGameOverReason] = useState("");
 
-  const [winner, setWinner] = useState<Winner>("white");
+  const [, setWinner] = useState<Winner>("white");
 
   const [historyPreviewPly, setHistoryPreviewPly] = useState<number | null>(
     null,
@@ -590,11 +581,7 @@ export default function HorrorChessBoard({
       ? HOT_SQUARE_INTERVAL_PLIES
       : HOT_SQUARE_INTERVAL_PLIES - fireRemainder;
 
-  function playSound(sound: string) {
-    const audio = new Audio(`/sounds/${sound}.mp3`);
-
-    audio.play().catch(() => {});
-  }
+  function playSound(sound: string) { playChessSound(sound as ChessSoundEvent); }
 
   function updateGameOver(
     nextRecords: HorrorMoveRecord[],
@@ -864,7 +851,7 @@ export default function HorrorChessBoard({
         if (game.isCheck()) {
           playSound("check");
         } else if (move.isKingsideCastle() || move.isQueensideCastle()) {
-          playRandomSound(["castle-1", "castle-2"]);
+          playChessSound("castle");
         }
       }
     } catch {
@@ -1045,12 +1032,6 @@ export default function HorrorChessBoard({
               📖 {t("Rulebook")}
             </a>
 
-            <LanguageSelector
-              language={language}
-              onChange={changeLanguage}
-              label={t("Language")}
-            />
-
             {!gameOver && (
               <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-300">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-rose-400" />
@@ -1059,7 +1040,6 @@ export default function HorrorChessBoard({
               </div>
             )}
           </div>
-          <BoardAnimationToggle />
         </ChessPageHeader>
 
         <section className="mb-6 grid gap-3 rounded-3xl border border-rose-400/10 bg-rose-400/[0.025] px-5 py-4 md:grid-cols-2 xl:grid-cols-4">
@@ -1188,60 +1168,28 @@ export default function HorrorChessBoard({
                   </span>
                 </div>
 
-                <div className="max-h-80 overflow-y-auto rounded-2xl border border-white/5 bg-black/20">
-                  {records.length === 0 ? (
-                    <div className="px-4 py-8 text-center text-xs text-zinc-600">
-                      {t("No moves yet")}
-                    </div>
-                  ) : (
-                    <table className="w-full border-collapse">
-                      <tbody>
-                        {records.map((record) => (
-                          <tr
-                            key={record.ply}
-                            tabIndex={0}
-                            onClick={() => {
-                              setHistoryPreviewPly(record.ply);
-                              setSelectedSquare(null);
-                              setLegalMoves([]);
-                            }}
-                            className={`
-                              cursor-pointer
-                              border-b
-                              border-white/5
-                              transition
-                              last:border-0
-                              ${
-                                historyPreviewPly === record.ply
-                                  ? "bg-blue-400/10"
-                                  : "hover:bg-white/5"
-                              }
-                            `}
-                          >
-                            <td className="px-3 py-2.5 text-[10px] text-zinc-600">
-                              {record.moveNumber}
-                              {record.color === "w" ? "." : "..."}
-                            </td>
-
-                            <td className="px-2 py-2.5">
-                              <span className="text-lg">
-                                {historyPieceSymbol(record.color, record.piece)}
-                              </span>
-                            </td>
-
-                            <td className="px-2 py-2.5 font-mono text-xs font-bold text-zinc-200">
-                              {record.san}
-                            </td>
-
-                            <td className="px-2 py-2.5 text-right text-[10px]">
-                              {eventIcons(record)}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  )}
-                </div>
+                <ChessMoveHistoryList
+                  listClassName="max-h-80 rounded-2xl border border-white/5 bg-black/20"
+                  selectedPly={historyPreviewPly}
+                  emptyLabel={t("No moves yet")}
+                  entries={records.map((record) => ({
+                    ply: record.ply,
+                    side: record.color,
+                    moveNumber: record.moveNumber,
+                    content: (
+                      <>
+                        <span className="text-base leading-none">{historyPieceSymbol(record.color, record.piece)}</span>
+                        <span className="truncate font-mono text-xs font-bold text-zinc-200">{record.san}</span>
+                      </>
+                    ),
+                    trailing: eventIcons(record),
+                  }))}
+                  onSelect={(ply) => {
+                    setHistoryPreviewPly(ply);
+                    setSelectedSquare(null);
+                    setLegalMoves([]);
+                  }}
+                />
               </Panel>
             </div>
           </aside>
@@ -1251,23 +1199,7 @@ export default function HorrorChessBoard({
           <section className="min-w-0">
             <div className="mx-auto max-w-[820px]">
               {gameOver && (
-                <div className="mb-3 rounded-2xl border border-rose-400/20 bg-rose-400/[0.07] px-4 py-3">
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-widest text-rose-300">
-                        {t("Game Over")}
-                      </p>
-
-                      <p className="mt-1 font-black text-white">
-                        {t(gameOverReason)}
-                      </p>
-                    </div>
-
-                    <span className="text-sm font-bold text-zinc-300">
-                      {winner === "draw" ? t("Draw") : winner === "white" ? t("White wins") : t("Black wins")}
-                    </span>
-                  </div>
-                </div>
+                <VisibleGameResult />
               )}
 
               {promotionSquare && promotionFrom && !historyPreview && (
@@ -2061,33 +1993,3 @@ function StatCard({ label, value }: { label: string; value: number }) {
   );
 }
 
-function LanguageSelector({
-  language,
-  onChange,
-  label,
-}: {
-  language: Language;
-  onChange: (language: Language) => void;
-  label: string;
-}) {
-  useUiLanguage();
-  return (
-    <label className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-400">
-      <span>🌐</span>
-
-      <span className="hidden sm:inline">{ui(label)}</span>
-
-      <select
-        value={language}
-        onChange={(event) => onChange(event.target.value as Language)}
-        className="bg-transparent text-xs font-bold text-zinc-200 outline-none [color-scheme:dark]"
-      >
-        <option value="en">{ui("English")}</option>
-        <option value="de">{ui("Deutsch")}</option>
-        <option value="bar">{ui("Boarisch")}</option>
-        <option value="ko">한국어</option>
-        <option value="ru">Русский</option>
-      </select>
-    </label>
-  );
-}

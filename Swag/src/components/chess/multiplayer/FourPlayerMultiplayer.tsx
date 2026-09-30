@@ -1,3 +1,7 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
+import InviteFriendButton from "@/components/chess/InviteFriendButton";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
+import { FOUR_PLAYER_HISTORY_SIDES } from "../moveHistorySides";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { chooseFourPlayerAiMove } from "@/games/chess/ai/fourPlayerAi";
@@ -775,6 +779,7 @@ export function FourPlayerMultiplayerGame() {
               <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">{room.code}</p>
               <p className="mt-4 text-xs font-bold text-zinc-400">{copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}</p>
             </button>
+                    <InviteFriendButton />
           </section>
 
           <section className="mt-5 rounded-3xl border border-white/10 bg-zinc-900/75 p-5 shadow-xl shadow-black/15 sm:p-6">
@@ -783,7 +788,7 @@ export function FourPlayerMultiplayerGame() {
               {orderedPlayers.map(({ color, player }) => {
                 const isBot = plannedBotColors.includes(color);
                 const isHost = room.host_id === user?.id;
-                return <div key={color} className={`rounded-xl border ${playerStyles[color].border} ${playerStyles[color].soft} px-4 py-3`}><div className="flex items-center justify-between gap-3"><div><p className={`text-xs font-black ${playerStyles[color].text}`}>{fourPlayerLabel(color)}</p><p className="mt-1 text-xs text-zinc-400">{player?.display_name ?? (isBot ? ui("AI bot") : ui("Waiting for player"))}</p></div>{myColor === color && <span className="rounded-full bg-white/10 px-2 py-1 text-[9px] font-black text-white">{ui("YOU")}</span>}</div>{isHost && !player && <div className="mt-3 grid grid-cols-2 gap-2"><button type="button" onClick={() => setBotSlot(color, false)} aria-pressed={!isBot} className={`rounded-lg px-2 py-2 text-[10px] font-black ${!isBot ? "bg-cyan-300 text-zinc-950" : "bg-white/5 text-zinc-400"}`}>{ui("Player")}</button><button type="button" onClick={() => setBotSlot(color, true)} aria-pressed={isBot} className={`rounded-lg px-2 py-2 text-[10px] font-black ${isBot ? "bg-amber-300 text-zinc-950" : "bg-white/5 text-zinc-400"}`}>{ui("AI bot")}</button></div>}</div>;
+                return <div key={color} className={`rounded-xl border ${playerStyles[color].border} ${playerStyles[color].soft} px-4 py-3`}><div className="flex items-center justify-between gap-3"><div><p className={`text-xs font-black ${playerStyles[color].text}`}>{fourPlayerLabel(color)}</p><p className="mt-1 text-xs text-zinc-400">{player?.display_name ?? (isBot ? ui("AI bot") : ui("Waiting for player"))}</p></div>{myColor === color && <span className="rounded-full bg-white/10 px-2 py-1 text-[9px] font-black text-white">{ui("YOU")}</span>}</div>{isHost && !player && <div className="mt-3 grid grid-cols-2 gap-2"><button type="button" onClick={() => setBotSlot(color, false)} aria-pressed={!isBot} className={`rounded-lg px-2 py-2 text-[10px] font-black ${!isBot ? "bg-cyan-300 text-zinc-950" : "bg-white/5 text-zinc-400"}`}>{ui("Player")}</button><button type="button" onClick={() => setBotSlot(color, true)} aria-pressed={isBot} className={`rounded-lg px-2 py-2 text-[10px] font-black ${isBot ? "bg-amber-300 text-zinc-950" : "bg-white/5 text-zinc-400"}`}>{ui("AI bot")}</button></div>}{!player && !isBot && <InviteFriendButton />}</div>;
               })}
             </div>
           </section>
@@ -937,6 +942,24 @@ export function FourPlayerMultiplayerGame() {
               </div>
             )}
 
+            {liveState.winner && historyPreviewIndex === null && (
+              <VisibleGameResult
+                winner={liveState.winner}
+                playerColor={myColor}
+                reason="last player standing"
+                actions={
+                  <button
+                    type="button"
+                    disabled={myRematchReady}
+                    onClick={() => void rematch()}
+                    className="mt-5 rounded-xl bg-white px-4 py-2.5 text-sm font-black text-zinc-950 disabled:opacity-40"
+                  >
+                    {myRematchReady ? ui("Rematch requested") : ui("Request rematch")}
+                  </button>
+                }
+              />
+            )}
+
             <div className="relative">
               <FourPlayerBoard
                 state={displayedState}
@@ -979,32 +1002,11 @@ export function FourPlayerMultiplayerGame() {
                       {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
                     </p>
                   </button>
+                    <InviteFriendButton overlay />
                 </div>
               )}
 
-              {liveState.winner && historyPreviewIndex === null && (
-                <div className="absolute inset-0 z-40 flex items-center justify-center rounded-[28px] bg-zinc-950/80 p-6 backdrop-blur-sm">
-                  <div
-                    className={`max-w-sm rounded-3xl border bg-zinc-900 p-6 text-center shadow-2xl ${playerStyles[liveState.winner].border}`}
-                  >
-                    <p className="text-xs font-black uppercase tracking-[0.25em] text-zinc-500">{ui("Last Player Standing")}</p>
-                    <h2
-                      className={`mt-3 text-3xl font-black ${playerStyles[liveState.winner].text}`}
-                    >
-                      {fourPlayerLabel(liveState.winner)}{ui("wins")}</h2>
-                    <button
-                      type="button"
-                      disabled={myRematchReady}
-                      onClick={() => void rematch()}
-                      className="mt-5 rounded-xl bg-white px-4 py-2.5 text-sm font-black text-zinc-950 disabled:opacity-40"
-                    >
-                      {myRematchReady ? ui("Rematch requested") : ui("Request rematch")}
-                    </button>
-                    <p className="mt-3 text-[10px] text-zinc-500">
-                      {rematchReady.length}/{players.length}{ui("players ready")}</p>
-                  </div>
-                </div>
-              )}
+
             </div>
           </section>
 
@@ -1081,46 +1083,42 @@ function FourPlayerHistory({
   moves: string[];
   history: FourPlayerState[];
   selected: number | null;
-  onSelect: (index: number) => void;
+  onSelect: (index: number | null) => void;
 }) {
   useUiLanguage();
   return (
-    <div className="max-h-80 overflow-y-auto rounded-xl border border-white/5 bg-black/20">
-      <button
-        type="button"
-        onClick={() => onSelect(0)}
-        className={`flex w-full items-center justify-between border-b border-white/5 px-3 py-2.5 text-xs ${selected === 0 ? "bg-blue-400/10" : "hover:bg-white/5"}`}
-      >
-        <span className="text-zinc-600">0</span>
-        <span className="font-bold text-zinc-300">{ui("Initial position")}</span>
-      </button>
-      {moves.length === 0 ? (
-        <div className="px-4 py-6 text-center text-xs text-zinc-600">{ui("No actions yet")}</div>
-      ) : (
-        moves.map((notation, index) => {
-          const snapshot = history[index + 1];
-          const color = snapshot?.lastMove?.color;
-          return (
-            <button
-              key={`${index}-${notation}`}
-              type="button"
-              onClick={() => onSelect(index + 1)}
-              className={`flex w-full items-center justify-between gap-2 border-b border-white/5 px-3 py-2.5 text-left last:border-0 ${selected === index + 1 ? "bg-blue-400/10" : "hover:bg-white/5"}`}
-            >
-              <span className="w-6 text-[10px] text-zinc-600">{index + 1}</span>
-              <span
-                className={`min-w-14 text-xs font-black ${color ? playerStyles[color].text : "text-zinc-500"}`}
-              >
-                {color ? fourPlayerLabel(color) : ui("Event")}
-              </span>
-              <span className="truncate font-mono text-xs text-zinc-300">
-                {notation}
-              </span>
-            </button>
-          );
-        })
-      )}
-    </div>
+    <ChessMoveHistoryList
+      sides={FOUR_PLAYER_HISTORY_SIDES}
+      listClassName="max-h-80 rounded-xl border border-white/5 bg-black/20"
+      selectedPly={selected}
+      emptyLabel="No actions yet"
+      leading={
+        <button
+          type="button"
+          onClick={() => onSelect(0)}
+          className={`flex w-full items-center justify-between border-b border-white/5 px-3 py-2.5 text-xs ${selected === 0 ? "bg-blue-400/10" : "hover:bg-white/5"}`}
+        >
+          <span className="text-zinc-600">0</span>
+          <span className="font-bold text-zinc-300">{ui("Initial position")}</span>
+        </button>
+      }
+      entries={moves.map((notation, index) => {
+        const color = history[index + 1]?.lastMove?.color ?? null;
+        return {
+          ply: index + 1,
+          side: color,
+          title: notation,
+          content: color ? (
+            <span className="truncate font-mono text-[10px] font-bold text-zinc-300">{notation}</span>
+          ) : (
+            <span className="truncate text-xs text-zinc-400">
+              <span className="font-black text-zinc-500">{ui("Event")}</span> · {notation}
+            </span>
+          ),
+        };
+      })}
+      onSelect={onSelect}
+    />
   );
 }
 

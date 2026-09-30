@@ -1,6 +1,6 @@
 import { translateUi } from "@/i18n/ui";
 
-export type ChessLanguage = "en" | "de" | "bar" | "ko" | "ru";
+export type ChessLanguage = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 
 export const CHESS_LANGUAGE_STORAGE_KEY = "chess-language";
 
@@ -13,12 +13,11 @@ export const chessLanguageOptions: Array<{
   { value: "bar", label: "Boarisch" },
   { value: "ko", label: "한국어" },
   { value: "ru", label: "Русский" },
+  { value: "es", label: "Español" },
+  { value: "pt", label: "Português" },
 ];
 
-export type TranslationTable = Record<
-  Exclude<ChessLanguage, "en">,
-  Record<string, string>
->;
+export type TranslationTable = Record<"de" | "bar" | "ko" | "ru", Record<string, string>> & Partial<Record<"es" | "pt", Record<string, string>>>;
 
 const commonTranslations: TranslationTable = {
   de: {
@@ -273,7 +272,7 @@ export function translateChess(
   if (language === "en") return key;
 
   const localLanguage = local?.[language];
-  const commonLanguage = commonTranslations[language];
+  const commonLanguage = commonTranslations[language] ?? {};
 
   if (language === "bar") {
     return (

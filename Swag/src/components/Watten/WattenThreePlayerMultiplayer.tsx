@@ -15,6 +15,7 @@ import { useAuth } from "../../context/AuthContext";
 import WattenCardComponent from "./WattenCard";
 import CardThemeSelector from "./WattenCardGameSelector";
 import TableThemeSelector from "../App/TableThemeSelector";
+import { HeaderTools } from "@/components/App/PublicHeader";
 import { ProfileAvatar } from "../social/ProfileAvatarPicker";
 import "./wattenGameScreen.css";
 
@@ -37,11 +38,8 @@ import {
 } from "../../utils/watten";
 
 import {
-  setStoredWattenLanguage,
   translateWatten,
   translateWattenPair,
-  WattenLanguageSelector,
-  type WattenLanguage,
 } from "@/games/watten/i18n/wattenLanguage";
 
 type WattenSuit = "Herz" | "Schellen" | "Eichel" | "Gras";
@@ -501,7 +499,7 @@ export function WattenThreePlayerMultiplayerLobby() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
 
-  const { language, setLanguage } = useAppLanguage();
+  const { language } = useAppLanguage();
   const [joinCode, setJoinCode] = useState("");
   const [targetScore, setTargetScore] = useState(15);
   const [loading, setLoading] = useState<"create" | "join" | null>(null);
@@ -521,10 +519,6 @@ export function WattenThreePlayerMultiplayerLobby() {
   const avatarId =
     (profile as { avatar_id?: string | null } | null)?.avatar_id ?? "m1";
 
-  function changeLanguage(next: WattenLanguage) {
-    setLanguage(next);
-    setStoredWattenLanguage(next);
-  }
 
   async function createRoom() {
     if (!user) {
@@ -603,11 +597,6 @@ export function WattenThreePlayerMultiplayerLobby() {
               </p>
             </div>
 
-            <WattenLanguageSelector
-              language={language}
-              onChange={changeLanguage}
-              label={t("Language")}
-            />
           </div>
         </header>
 
@@ -726,7 +715,7 @@ export function WattenThreePlayerMultiplayerGame() {
   const { user } = useAuth();
   const { tableTheme } = useTableTheme();
 
-  const { language, setLanguage } = useAppLanguage();
+  const { language } = useAppLanguage();
 
   const [room, setRoom] = useState<Room | null>(null);
   const [players, setPlayers] = useState<RoomPlayer[]>([]);
@@ -798,10 +787,6 @@ export function WattenThreePlayerMultiplayerGame() {
     }, 2750);
   }, []);
 
-  function changeLanguage(next: WattenLanguage) {
-    setLanguage(next);
-    setStoredWattenLanguage(next);
-  }
 
   const loadAll = useCallback(async () => {
     if (!roomCode || !user) return;
@@ -1536,14 +1521,8 @@ export function WattenThreePlayerMultiplayerGame() {
               💡 {t(helpMode ? "Help On" : "Help")}
             </button>
 
-            <CardThemeSelector />
-            <TableThemeSelector />
+            <HeaderTools><CardThemeSelector /><TableThemeSelector /></HeaderTools>
 
-            <WattenLanguageSelector
-              language={language}
-              onChange={changeLanguage}
-              label={t("Language")}
-            />
 
             <Link
               to="/games/watten/multiplayer"

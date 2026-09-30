@@ -430,3 +430,15 @@ enabled = true
 # The function authenticates every request with auth.getUser before using service_role.
 verify_jwt = false
 entrypoint = "./functions/schafkopf-multiplayer/index.ts"
+
+[functions.ranked-chess]
+enabled = true
+# The function verifies the bearer token with auth.getUser before each action.
+verify_jwt = false
+entrypoint = "./functions/ranked-chess/index.ts"
+
+[functions.eat-it-match]
+enabled = true
+# Every request is authenticated with auth.getUser before reading or writing rooms.
+verify_jwt = false
+entrypoint = "./functions/eat-it-match/index.ts"

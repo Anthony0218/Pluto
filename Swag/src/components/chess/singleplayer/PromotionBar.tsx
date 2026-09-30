@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { ui, useUiLanguage } from "@/i18n/ui";
 type PromotionBarProps = {
   onPromote: (piece: "q" | "r" | "b" | "n") => void;
@@ -28,33 +29,17 @@ const promotionPieces = [
 
 export default function PromotionBar({ onPromote }: PromotionBarProps) {
   useUiLanguage();
-  return (
+
+  const promotionDialog = (
     <div
-      className="
-        absolute
-        inset-0
-        z-[100]
-        flex
-        items-center
-        justify-center
-        rounded-xl
-        bg-black/45
-        p-4
-        backdrop-blur-[4px]
-      "
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="pawn-promotion-title"
+      className="fixed inset-0 z-[200] flex items-center justify-center overflow-y-auto bg-black/70 p-3 backdrop-blur-[5px] sm:p-6"
+      onPointerDown={(event) => event.stopPropagation()}
     >
       <div
-        className="
-          w-full
-          max-w-md
-          rounded-3xl
-          border
-          border-white/10
-          bg-zinc-900/95
-          p-6
-          shadow-2xl
-          shadow-black/60
-        "
+        className="max-h-[calc(100dvh-1.5rem)] w-full max-w-md overflow-y-auto rounded-3xl border border-amber-300/20 bg-zinc-950/95 p-4 shadow-2xl shadow-black/70 ring-1 ring-white/5 sm:p-6"
       >
         <div className="text-center">
           <div
@@ -87,26 +72,34 @@ export default function PromotionBar({ onPromote }: PromotionBarProps) {
           >{ui("Pawn Promotion")}</p>
 
           <h3
+            id="pawn-promotion-title"
             className="
               mt-1
-              text-xl
+              text-lg
               font-black
               text-white
+              sm:text-xl
             "
           >{ui("Choose your piece")}</h3>
 
           <p className="mt-1 text-sm text-zinc-500">{ui("Select the piece your pawn should become.")}</p>
         </div>
 
-        <div className="mt-6 grid grid-cols-4 gap-3">
+        <div className="mt-5 grid grid-cols-4 gap-1.5 sm:mt-6 sm:gap-3">
           {promotionPieces.map((piece) => (
             <button
               key={piece.type}
               type="button"
-              onClick={() => onPromote(piece.type)}
+              aria-label={ui(piece.label)}
+              onClick={(event) => {
+                event.stopPropagation();
+                onPromote(piece.type);
+              }}
               className="
                 group
                 flex
+                min-h-20
+                min-w-0
                 flex-col
                 items-center
                 justify-center
@@ -114,9 +107,16 @@ export default function PromotionBar({ onPromote }: PromotionBarProps) {
                 border
                 border-white/10
                 bg-white/[0.04]
-                px-2
-                py-4
+                px-1
+                py-3
                 transition
+
+                focus-visible:outline-none
+                focus-visible:ring-2
+                focus-visible:ring-amber-300
+                sm:min-h-28
+                sm:px-2
+                sm:py-4
 
                 hover:-translate-y-1
                 hover:border-amber-400/30
@@ -130,12 +130,13 @@ export default function PromotionBar({ onPromote }: PromotionBarProps) {
             >
               <span
                 className="
-                  text-5xl
+                  text-4xl
                   leading-none
                   text-[#fff3d5]
                   drop-shadow-lg
                   transition
                   group-hover:scale-110
+                  sm:text-5xl
                 "
               >
                 {piece.symbol}
@@ -143,14 +144,19 @@ export default function PromotionBar({ onPromote }: PromotionBarProps) {
 
               <span
                 className="
-                  mt-3
-                  text-[10px]
+                  mt-2
+                  max-w-full
+                  truncate
+                  text-[8px]
                   font-black
                   uppercase
-                  tracking-wider
+                  tracking-wide
                   text-zinc-500
                   transition
                   group-hover:text-amber-200
+                  sm:mt-3
+                  sm:text-[10px]
+                  sm:tracking-wider
                 "
               >
                 {ui(piece.label)}
@@ -161,4 +167,8 @@ export default function PromotionBar({ onPromote }: PromotionBarProps) {
       </div>
     </div>
   );
+
+  return typeof document === "undefined"
+    ? promotionDialog
+    : createPortal(promotionDialog, document.body);
 }

@@ -7,10 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { ProfileAvatar } from "@/components/social/ProfileAvatarPicker";
 import { useFitWattenScreen } from "@/games/watten/useFitWattenScreen";
 import {
-  setStoredWattenLanguage,
   translateWatten,
-  WattenLanguageSelector,
-  type WattenLanguage,
 } from "@/games/watten/i18n/wattenLanguage";
 
 export default function WattenHotseat() {
@@ -18,16 +15,12 @@ export default function WattenHotseat() {
   const { profile } = useAuth();
   const avatarId = (profile as { avatar_id?: string | null } | null)?.avatar_id ?? "m1";
   const navigate = useNavigate();
-  const { language, setLanguage } = useAppLanguage();
+  const { language } = useAppLanguage();
   const t = useCallback(
     (key: string) => translateWatten(language, key),
     [language],
   );
 
-  function changeLanguage(next: WattenLanguage) {
-    setLanguage(next);
-    setStoredWattenLanguage(next);
-  }
 
   const [variant, setVariant] = useState<WattenVariant>("three-player");
 
@@ -76,11 +69,6 @@ export default function WattenHotseat() {
               <h1 className="mt-2 text-3xl font-black">Hotseat</h1>
             </div>
 
-            <WattenLanguageSelector
-              language={language}
-              onChange={changeLanguage}
-              label={t("Language")}
-            />
           </div>
 
           <p className="mt-2 text-sm text-zinc-400">

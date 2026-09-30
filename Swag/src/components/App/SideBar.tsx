@@ -6,6 +6,7 @@ import {
   LogOut,
   UserRound,
   Users,
+  Trophy,
 } from "lucide-react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -16,6 +17,8 @@ import ThemeToggle from "./ThemeToggle";
 const links = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Friends", href: "/friends", icon: Users },
+  { label: "Groups", href: "/groups", icon: Users },
+  { label: "Leaderboards", href: "/leaderboards", icon: Trophy },
   { label: "Profile", href: "/profile", icon: UserRound },
 ];
 const sidebarLessons = ["Chess Puzzles", "Chess rules", "Schafkopfen Rules"].flatMap((title) =>

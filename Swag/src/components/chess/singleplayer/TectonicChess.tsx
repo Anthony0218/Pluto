@@ -1,4 +1,8 @@
+import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
+import { playChessSound } from "@/games/chess/audio/chessAudio";
+import { emitGameEffect } from "@/games/chess/effects/gameEffects";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
@@ -6,7 +10,6 @@ import { Chess, type Square } from "chess.js";
 
 import Board from "./Board";
 import PromotionBar from "./PromotionBar";
-import BoardAnimationToggle from "@/components/chess/singleplayer/BoardAnimationToggle";
 
 import { getSquareName, type PieceType } from "../../../utils/chessUtils";
 
@@ -19,7 +22,6 @@ import {
 import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation";
 
 import {
-  LanguageSelector,
   translateChess,
   useChessLanguage,
   type TranslationTable,
@@ -382,37 +384,6 @@ function getCheckedKingSquare(game: Chess): Square | null {
   return findTectonicKingSquare(game, game.turn());
 }
 
-function resultText(result: FinishedGame, t: (key: string) => string): string {
-  if (!result) {
-    return "";
-  }
-
-  if (result.reason === "checkmate") {
-    return result.winner === "white"
-      ? t("White wins by checkmate.")
-      : t("Black wins by checkmate.");
-  }
-
-  if (result.reason === "tectonic_lock") {
-    return result.winner === "white"
-      ? t("White wins: Black has no legal Tectonic escape.")
-      : t("Black wins: White has no legal Tectonic escape.");
-  }
-
-  if (result.reason === "stalemate") {
-    return t("Stalemate. Draw.");
-  }
-
-  if (result.reason === "insufficient") {
-    return t("Insufficient material. Draw.");
-  }
-
-  if (result.reason === "fifty") {
-    return t("50-move rule. Draw.");
-  }
-
-  return t("Threefold repetition. Draw.");
-}
 
 type VariantAiBoardProps = {
   aiMode?: boolean;
@@ -427,7 +398,7 @@ export default function TectonicChess({
   difficulty = "casual",
 }: VariantAiBoardProps) {
   useUiLanguage();
-  const { language, setLanguage } = useChessLanguage();
+  const { language } = useChessLanguage();
 
   const t = (key: string) => translateChess(language, key, translations);
 
@@ -877,6 +848,10 @@ export default function TectonicChess({
     setHoveredQuadrant(null);
     setFinishedGame(nextFinished);
     clearSelection();
+    if (quadrant !== null) {
+      playChessSound("boardRotate");
+      emitGameEffect({ type: "BOARD_ROTATE", quadrant });
+    }
   }
 
   function undo() {
@@ -967,12 +942,6 @@ export default function TectonicChess({
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <LanguageSelector
-                language={language}
-                onChange={setLanguage}
-                label={t("Language")}
-              />
-
               {!finishedGame && (
                 <div
                   className={`rounded-xl border px-3 py-2 text-xs font-black ${
@@ -985,7 +954,6 @@ export default function TectonicChess({
                 </div>
               )}
             </div>
-            <BoardAnimationToggle />
           </div>
 
         </ChessPageHeader>
@@ -1023,46 +991,26 @@ export default function TectonicChess({
               </Panel>
 
               <Panel title={t("Move History")} subtitle={t("Game history")}>
-                <div className="max-h-80 overflow-y-auto rounded-xl border border-white/5 bg-black/20">
-                  {history.length === 0 ? (
-                    <p className="px-4 py-8 text-center text-xs text-zinc-600">
-                      {t("No moves yet")}
-                    </p>
-                  ) : (
-                    history.map((entry, index) => (
-                      <button
-                        key={entry.action}
-                        type="button"
-                        onClick={() => {
-                          setHistoryPreviewIndex(index);
-                          clearSelection();
-                          setHoveredQuadrant(null);
-                        }}
-                        className={`flex w-full items-center justify-between border-b border-white/5 px-3 py-2.5 text-left text-xs transition last:border-0 ${
-                          historyPreviewIndex === index
-                            ? "bg-violet-400/10 text-violet-200"
-                            : "text-zinc-400 hover:bg-white/5"
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="w-6 text-[10px] text-zinc-600">
-                            {ui(entry.action)}
-                          </span>
-
-                          <span>{entry.color === "w" ? "♙" : "♟"}</span>
-
-                          <span className="font-black">
-                            {entry.kind === "shift" ? "↻" : "·"}
-                          </span>
-                        </div>
-
-                        <span className="font-mono font-black">
-                          {entry.notation}
-                        </span>
-                      </button>
-                    ))
-                  )}
-                </div>
+                <ChessMoveHistoryList
+                  listClassName="max-h-80 rounded-xl border border-white/5 bg-black/20"
+                  selectedPly={historyPreviewIndex === null ? null : historyPreviewIndex + 1}
+                  emptyLabel={t("No moves yet")}
+                  entries={history.map((entry, index) => ({
+                    ply: index + 1,
+                    side: entry.color,
+                    content: (
+                      <>
+                        <span className="font-black text-zinc-500">{entry.kind === "shift" ? "↻" : "·"}</span>
+                        <span className="truncate font-mono text-xs font-black text-zinc-200">{entry.notation}</span>
+                      </>
+                    ),
+                  }))}
+                  onSelect={(ply) => {
+                    setHistoryPreviewIndex(ply === null ? null : ply - 1);
+                    clearSelection();
+                    setHoveredQuadrant(null);
+                  }}
+                />
               </Panel>
 
               <Panel title={t("Shift Stats")} subtitle={t("Tectonic actions")}>
@@ -1130,6 +1078,20 @@ export default function TectonicChess({
               </div>
             )}
 
+            {finishedGame && !historyPreview && (
+              <VisibleGameResult
+                actions={
+                  <button
+                    type="button"
+                    onClick={restart}
+                    className="mt-5 rounded-xl bg-violet-400 px-4 py-2.5 text-sm font-black text-violet-950"
+                  >
+                    {t("Play again")}
+                  </button>
+                }
+              />
+            )}
+
             <div className="relative">
               <Board
                 board={displayedBoard}
@@ -1156,32 +1118,6 @@ export default function TectonicChess({
                 hovered={hoveredQuadrant}
                 locked={tectonic.lockedQuadrant}
               />
-
-              {finishedGame && !historyPreview && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[28px] bg-zinc-950/82 p-6 backdrop-blur-sm">
-                  <div className="max-w-sm rounded-3xl border border-violet-300/20 bg-zinc-900 p-6 text-center shadow-2xl">
-                    <p className="text-xs font-black uppercase tracking-[0.25em] text-violet-300">
-                      {t("Game Over")}
-                    </p>
-
-                    <h2 className="mt-3 text-3xl font-black text-white">
-                      {finishedGame.winner === "white" ? t("White wins") : finishedGame.winner === "black" ? t("Black wins") : t("Draw")}
-                    </h2>
-
-                    <p className="mt-3 text-sm leading-6 text-zinc-500">
-                      {resultText(finishedGame, t)}
-                    </p>
-
-                    <button
-                      type="button"
-                      onClick={restart}
-                      className="mt-5 rounded-xl bg-violet-400 px-4 py-2.5 text-sm font-black text-violet-950"
-                    >
-                      {t("Play again")}
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </section>
 

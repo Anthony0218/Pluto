@@ -1,9 +1,10 @@
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import { playChessSound } from "@/games/chess/audio/chessAudio";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-import ChessComputerBoard from "./ChessComputerBoard";
+import ChessComputerBoard, { type DifficultyLabel } from "./ChessComputerBoard";
 
 type PlayerColor = "white" | "black" | "random";
 type Difficulty = "beginner" | "easy" | "medium" | "hard" | "expert";
@@ -12,7 +13,7 @@ type DifficultySettings = {
   skillLevel: number;
   thinkTime: number;
   randomMoveChance: number;
-  label: string;
+  label: DifficultyLabel;
   description: string;
   emoji: string;
 };
@@ -113,6 +114,7 @@ export default function ChessComputer() {
 
     setPlayerColor(resolvedColor);
     setGameStarted(true);
+    playChessSound("gameStart");
   }
 
   function leaveGame() {
@@ -124,6 +126,7 @@ export default function ChessComputer() {
       <main className="w-full bg-transparent p-0 text-zinc-100">
         <ChessComputerBoard
           playerColor={playerColor}
+          difficultyLabel={selectedDifficulty.label}
           skillLevel={selectedDifficulty.skillLevel}
           thinkTime={selectedDifficulty.thinkTime}
           randomMoveChance={selectedDifficulty.randomMoveChance}
