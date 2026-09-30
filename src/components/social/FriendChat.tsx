@@ -1,5 +1,5 @@
 import { ui, useUiLanguage } from "@/i18n/ui";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { Gamepad2, Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabase";
@@ -22,7 +22,7 @@ const PRESET_LABELS: Record<Exclude<PresetMessageType, "game_code">, string> = {
 };
 
 export default function FriendChat({ friend, roomInvite }: FriendChatProps) {
-  useUiLanguage();
+  const { language } = useUiLanguage();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [messages, setMessages] = useState<FriendMessage[]>([]);
@@ -46,6 +46,21 @@ export default function FriendChat({ friend, roomInvite }: FriendChatProps) {
       ),
     [messages],
   );
+
+  const dateLocale = language === "bar" ? "de" : language;
+  const formatMessageTime = (createdAt: string) =>
+    new Intl.DateTimeFormat(dateLocale, {
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(new Date(createdAt));
+  const formatMessageDate = (createdAt: string) =>
+    new Intl.DateTimeFormat(dateLocale, { dateStyle: "full" }).format(
+      new Date(createdAt),
+    );
+  const dayKey = (createdAt: string) => {
+    const date = new Date(createdAt);
+    return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -269,23 +284,46 @@ export default function FriendChat({ friend, roomInvite }: FriendChatProps) {
             </div>
           </div>
         ) : (
-          orderedMessages.map((message) => {
+          orderedMessages.map((message, index) => {
             const mine = message.sender_id === user?.id;
+            const showDate =
+              index === 0 ||
+              dayKey(message.created_at) !==
+                dayKey(orderedMessages[index - 1].created_at);
             return (
-              <div
-                key={message.id}
-                className={`flex ${mine ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={`max-w-[78%] rounded-2xl px-4 py-3 text-sm ${
-                    mine
-                      ? "bg-sky-500 text-white"
-                      : "border border-white/10 bg-zinc-800 text-zinc-200"
-                  }`}
-                >
-                  {renderMessage(message)}
+              <Fragment key={message.id}>
+                {showDate && (
+                  <div className="flex items-center gap-3 py-1" role="separator">
+                    <span className="h-px flex-1 bg-white/10" />
+                    <time
+                      dateTime={message.created_at}
+                      className="shrink-0 text-xs font-medium text-zinc-500"
+                    >
+                      {formatMessageDate(message.created_at)}
+                    </time>
+                    <span className="h-px flex-1 bg-white/10" />
+                  </div>
+                )}
+                <div className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+                  <div
+                    className={`max-w-[78%] rounded-2xl px-4 py-3 text-sm ${
+                      mine
+                        ? "bg-sky-500 text-white"
+                        : "border border-white/10 bg-zinc-800 text-zinc-200"
+                    }`}
+                  >
+                    {renderMessage(message)}
+                    <time
+                      dateTime={message.created_at}
+                      className={`mt-1.5 block text-right text-[11px] leading-none ${
+                        mine ? "text-sky-100/80" : "text-zinc-500"
+                      }`}
+                    >
+                      {formatMessageTime(message.created_at)}
+                    </time>
+                  </div>
                 </div>
-              </div>
+              </Fragment>
             );
           })
         )}

@@ -1,6 +1,8 @@
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
+import FourPlayerThemedPiece from "../FourPlayerThemedPiece";
+import { boardColors, useChessSettings } from "@/context/ChessSettingsContext";
 import { FOUR_PLAYER_HISTORY_SIDES } from "../moveHistorySides";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
@@ -11,7 +13,6 @@ import {
 } from "../../../games/chess/i18n/chessLanguage";
 
 import {
-  FOUR_PLAYER_ORDER,
   applyFourPlayerMove,
   cloneFourPlayerState,
   createInitialFourPlayerState,
@@ -21,8 +22,6 @@ import {
   isFourPlayerKingInCheck,
   isPlayableFourPlayerSquare,
   type FourPlayerColor,
-  type FourPlayerPiece,
-  type FourPlayerPieceType,
   type FourPlayerSquare,
   type FourPlayerState,
 } from "../../../games/chess/variants/fourPlayerChess";
@@ -143,44 +142,30 @@ const translations: Partial<TranslationTable> = {
   },
 };
 
-const pieceSymbols: Record<FourPlayerPieceType, string> = {
-  p: "♟",
-  n: "♞",
-  b: "♝",
-  r: "♜",
-  q: "♛",
-  k: "♚",
-};
-
 const playerStyles: Record<
   FourPlayerColor,
   {
-    piece: string;
     text: string;
     soft: string;
     border: string;
   }
 > = {
   red: {
-    piece: "text-red-400",
     text: "text-red-300",
     soft: "bg-red-400/10",
     border: "border-red-400/20",
   },
   blue: {
-    piece: "text-sky-400",
     text: "text-sky-300",
     soft: "bg-sky-400/10",
     border: "border-sky-400/20",
   },
   yellow: {
-    piece: "text-amber-300",
     text: "text-amber-200",
     soft: "bg-amber-300/10",
     border: "border-amber-300/20",
   },
   green: {
-    piece: "text-emerald-400",
     text: "text-emerald-300",
     soft: "bg-emerald-400/10",
     border: "border-emerald-400/20",
@@ -402,7 +387,7 @@ export default function FourPlayerChess({
 
   return (
     <div className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
-      <div className="mx-auto max-w-[1580px]">
+      <div className="mx-auto max-w-[1780px]">
         <ChessPageHeader className="mb-6 rounded-3xl border border-white/5 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20">
           <p className="text-[10px] font-black uppercase tracking-[0.28em] text-fuchsia-300">
             {t("Chess Variant")}
@@ -438,7 +423,7 @@ export default function FourPlayerChess({
           </div>
         </ChessPageHeader>
 
-        <main className="grid gap-6 chess-game-grid xl:grid-cols-[290px_minmax(0,1fr)_290px]">
+        <main className="grid gap-5 chess-game-grid four-player-game-grid xl:grid-cols-[260px_minmax(0,1fr)]">
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
               <Panel
@@ -470,36 +455,6 @@ export default function FourPlayerChess({
                 </div>
               </Panel>
 
-              <Panel title={t("Players")} subtitle={t("Clockwise turn order")}>
-                <div className="space-y-2">
-                  {FOUR_PLAYER_ORDER.map((color) => {
-                    const active = state.activePlayers.includes(color);
-                    const current = state.turn === color && !state.winner;
-
-                    return (
-                      <div
-                        key={color}
-                        className={`flex items-center justify-between rounded-xl border px-3 py-2.5 ${
-                          playerStyles[color].border
-                        } ${
-                          current ? playerStyles[color].soft : "bg-black/20"
-                        } ${active ? "" : "opacity-35"}`}
-                      >
-                        <span
-                          className={`text-xs font-black ${playerStyles[color].text}`}
-                        >
-                          ♚ {t(fourPlayerLabel(color))}
-                        </span>
-
-                        <span className="text-[10px] font-bold text-zinc-600">
-                          {!active ? t("Eliminated") : current ? t("Turn") : t("Active")}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </Panel>
-
               <Panel
                 title={t("Move History")}
                 subtitle={`${history.length} ${t("turns")}`}
@@ -520,7 +475,7 @@ export default function FourPlayerChess({
             </div>
           </aside>
 
-          <section className="mx-auto w-full max-w-[900px] min-w-0">
+          <section className="mx-auto w-full min-w-0">
             {state.event && (
               <div className="mb-3 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-center text-xs font-bold text-zinc-400">
                 {translateFourPlayerEvent(state.event, t)}
@@ -544,6 +499,9 @@ export default function FourPlayerChess({
             <div className="relative">
               <FourPlayerBoard
                 state={state}
+                viewerColor={aiMode ? humanColor : "red"}
+                humanColor={aiMode ? humanColor : null}
+                aiMode={aiMode}
                 selectedSquare={selectedSquare}
                 legalMoves={legalMoves}
                 checkedKingSquare={checkedKingSquare}
@@ -552,38 +510,6 @@ export default function FourPlayerChess({
             </div>
           </section>
 
-          <aside className="min-w-0">
-            <div className="space-y-4 xl:sticky xl:top-6">
-              <Panel title={t("Rules")} subtitle={t("Four-way free-for-all")}>
-                <Rule text={t("Turn order: Red → Blue → Yellow → Green.")} />
-                <Rule text={t("Each army has the normal 16 chess pieces.")} />
-                <Rule
-                  text={t("Pawns move toward the opposite side of the cross.")}
-                />
-                <Rule text={t("No castling and no en-passant.")} />
-                <Rule
-                  text={t(
-                    "A pawn reaching the opposite outer edge automatically becomes a Queen.",
-                  )}
-                />
-                <Rule text={t("You may not leave your own King in check.")} />
-                <Rule
-                  text={t(
-                    "A checkmated or stalemated player is eliminated and all of their pieces disappear.",
-                  )}
-                />
-                <Rule text={t("The last active player wins.")} />
-              </Panel>
-
-              <Panel title={t("Board")} subtitle={t("14 × 14 cross")}>
-                <p className="text-xs leading-6 text-zinc-500">
-                  {t(
-                    "The four 3×3 corners are outside the board. Sliding pieces cannot move through them. Each army enters from one arm of the cross.",
-                  )}
-                </p>
-              </Panel>
-            </div>
-          </aside>
         </main>
       </div>
     </div>
@@ -592,21 +518,56 @@ export default function FourPlayerChess({
 
 function FourPlayerBoard({
   state,
+  viewerColor,
+  humanColor,
+  aiMode,
   selectedSquare,
   legalMoves,
   checkedKingSquare,
   onSquareClick,
 }: {
   state: FourPlayerState;
+  viewerColor: FourPlayerColor;
+  humanColor: FourPlayerColor | null;
+  aiMode: boolean;
   selectedSquare: FourPlayerSquare | null;
   legalMoves: FourPlayerSquare[];
   checkedKingSquare: FourPlayerSquare | null;
   onSquareClick: (row: number, column: number) => void;
 }) {
   useUiLanguage();
+  const { boardTheme } = useChessSettings();
+  const colors = boardColors[boardTheme];
+
+  function boardSquareForViewer(row: number, column: number): FourPlayerSquare {
+    switch (viewerColor) {
+      case "yellow":
+        return { row: 13 - row, column: 13 - column };
+      case "blue":
+        return { row: column, column: 13 - row };
+      case "green":
+        return { row: 13 - column, column: row };
+      case "red":
+        return { row, column };
+    }
+  }
+
+  const cornerSlots = [
+    { row: 0, column: 0 },
+    { row: 0, column: 11 },
+    { row: 11, column: 0 },
+    { row: 11, column: 11 },
+  ].map((slot) => {
+    const original = boardSquareForViewer(slot.row, slot.column);
+    const color: FourPlayerColor = original.row < 3
+      ? (original.column < 3 ? "yellow" : "green")
+      : (original.column < 3 ? "blue" : "red");
+    return { ...slot, color };
+  });
+
   return (
-    <div className="w-full rounded-[28px] border border-[#5f412d] bg-gradient-to-br from-[#493323] via-[#2d1e15] to-[#160e09] p-3 shadow-[0_30px_80px_rgba(0,0,0,0.55)] sm:p-4">
-      <div className="rounded-[18px] border border-black/40 bg-[#160e09] p-1.5 shadow-inner sm:p-2">
+    <div className="w-full rounded-[28px] border p-2 shadow-[0_30px_80px_rgba(0,0,0,0.55)] sm:p-3" style={{ borderColor: colors.frame, backgroundColor: colors.frame }}>
+      <div className="rounded-[18px] border border-black/40 p-1 shadow-inner sm:p-1.5" style={{ backgroundColor: colors.frame }}>
         <div
           className="grid aspect-square w-full overflow-hidden rounded-xl bg-zinc-950 shadow-[0_12px_30px_rgba(0,0,0,0.45)]"
           style={{
@@ -614,21 +575,33 @@ function FourPlayerBoard({
             gridTemplateRows: "repeat(14, minmax(0, 1fr))",
           }}
         >
+          {cornerSlots.map((slot) => (
+            <div
+              key={slot.color}
+              style={{
+                gridColumn: `${slot.column + 1} / span 3`,
+                gridRow: `${slot.row + 1} / span 3`,
+              }}
+              className={`relative z-10 flex min-w-0 flex-col justify-between overflow-hidden border p-1.5 shadow-inner sm:p-2.5 ${playerStyles[slot.color].border} ${playerStyles[slot.color].soft} ${state.activePlayers.includes(slot.color) ? "" : "opacity-40"} ${!state.winner && state.turn === slot.color ? "ring-2 ring-inset ring-white/80" : ""}`}
+            >
+              <div className="flex items-start justify-between gap-1">
+                <span className={`text-[8px] font-black uppercase tracking-[0.14em] sm:text-[10px] ${playerStyles[slot.color].text}`}>
+                  {fourPlayerLabel(slot.color)}
+                </span>
+                {!state.winner && state.turn === slot.color && <span className="rounded bg-white/20 px-1 text-[7px] font-black text-white sm:text-[9px]">{ui("Turn")}</span>}
+              </div>
+              <span className="text-[9px] font-bold text-zinc-100 sm:text-xs">
+                {!state.activePlayers.includes(slot.color) ? ui("Eliminated") : aiMode ? (humanColor === slot.color ? ui("YOU") : ui("AI bot")) : ui("Player")}
+              </span>
+            </div>
+          ))}
           {Array.from({ length: 14 }, (_, row) =>
             Array.from({ length: 14 }, (_, column) => {
-              const playable = isPlayableFourPlayerSquare(row, column);
+              const square = boardSquareForViewer(row, column);
+              if (!isPlayableFourPlayerSquare(square.row, square.column))
+                return null;
 
-              if (!playable) {
-                return (
-                  <div
-                    key={`${row}-${column}`}
-                    className="aspect-square bg-zinc-950"
-                  />
-                );
-              }
-
-              const piece = state.board[row][column];
-              const square = { row, column };
+              const piece = state.board[square.row][square.column];
 
               const selected =
                 selectedSquare && sameSquare(selectedSquare, square);
@@ -645,19 +618,16 @@ function FourPlayerBoard({
               const checked =
                 checkedKingSquare && sameSquare(checkedKingSquare, square);
 
-              const light = (row + column) % 2 === 0;
+              const light = (square.row + square.column) % 2 === 0;
 
               return (
                 <button
                   key={`${row}-${column}`}
                   type="button"
                   aria-label={fourPlayerSquareName(square)}
-                  onClick={() => onSquareClick(row, column)}
-                  className={`group relative flex aspect-square items-center justify-center overflow-hidden border-0 p-0 transition ${
-                    light
-                      ? "bg-gradient-to-br from-[#ead7b7] to-[#d5b78b]"
-                      : "bg-gradient-to-br from-[#9a6746] to-[#724a31]"
-                  } ${selected ? "z-10 ring-4 ring-inset ring-fuchsia-300" : ""}`}
+                  onClick={() => onSquareClick(square.row, square.column)}
+                  className={`group relative flex aspect-square items-center justify-center overflow-hidden border-0 p-0 transition ${selected ? "z-10 ring-4 ring-inset ring-fuchsia-300" : ""}`}
+                  style={{ backgroundColor: light ? colors.light : colors.dark }}
                 >
                   {last && (
                     <span className="pointer-events-none absolute inset-0 z-[2] bg-yellow-300/25" />
@@ -675,7 +645,7 @@ function FourPlayerBoard({
                     <span className="pointer-events-none absolute inset-[7%] z-[6] rounded-full border-[3px] border-black/30" />
                   )}
 
-                  {piece && <FourPlayerPieceView piece={piece} />}
+                  {piece && <FourPlayerThemedPiece piece={piece} />}
                 </button>
               );
             }),
@@ -683,19 +653,6 @@ function FourPlayerBoard({
         </div>
       </div>
     </div>
-  );
-}
-
-function FourPlayerPieceView({ piece }: { piece: FourPlayerPiece }) {
-  useUiLanguage();
-  return (
-    <span
-      className={`pointer-events-none relative z-10 flex h-full w-full select-none items-center justify-center font-serif text-[clamp(1.15rem,3.5vw,3.2rem)] leading-none drop-shadow-[0_3px_3px_rgba(0,0,0,0.75)] transition-transform duration-150 group-hover:scale-105 ${
-        playerStyles[piece.color].piece
-      }`}
-    >
-      {pieceSymbols[piece.type]}
-    </span>
   );
 }
 
@@ -715,14 +672,5 @@ function Panel({
       <p className="mt-1 mb-4 text-xs text-zinc-600">{ui(subtitle)}</p>
       {children}
     </section>
-  );
-}
-
-function Rule({ text }: { text: string }) {
-  useUiLanguage();
-  return (
-    <div className="mb-2 rounded-xl border border-white/5 bg-black/20 px-3 py-2.5 text-xs leading-5 text-zinc-400 last:mb-0">
-      {ui(text)}
-    </div>
   );
 }

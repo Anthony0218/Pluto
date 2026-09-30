@@ -162,6 +162,7 @@
 .sidebar-edge-toggle:hover { color: #fff; background: linear-gradient(270deg, #4c43b8, #222c61); box-shadow: -6px 0 22px #7671ff80, inset -1px 0 #ffffff35; }
 .sidebar-edge-toggle:active { background: #292376; }
 .sidebar-edge-toggle-mobile { position: fixed; top: 50%; right: 0; left: auto; transform: translateY(-50%); }
+.sidebar-edge-toggle-global { position: fixed; z-index: 100; top: 50%; right: 0; left: auto; transform: translateY(-50%); }
 .progress-overview { display: flex; align-items: center; gap: 17px; margin-top: 15px; }
 .progress-ring { width: 90px; height: 90px; flex: 0 0 90px; padding: 9px; border-radius: 50%; box-shadow: 0 0 16px #34c7ee13; }
 .progress-ring > div { display: grid; place-items: center; width: 100%; height: 100%; background: #0b172c; border-radius: 50%; font-size: 24px; font-weight: 700; }
