@@ -7,7 +7,7 @@ Atlas Arena, Eat It, …). Accounts, dashboards and some multiplayer modes use a
 **Pluto Party** (`/games/pluto-party`) is an original four-player online party board game: lobbies, bots,
 two maps (Tropical Islands and Mountain), items, properties, Golden Plutos, duels, rare items, animals and
 realtime minigames. It runs on its own small Node.js WebSocket authority and keeps live matches in memory; it
-has **no database tables**.
+has **no database tables**..
 
 - Game rules: [`GAME_SPEC.md`](GAME_SPEC.md)
 - Architecture and development contracts: [`ARCHITECTURE.md`](ARCHITECTURE.md)
@@ -15,12 +15,12 @@ has **no database tables**.
 
 ## Technology
 
-| Area | Stack |
-| --- | --- |
-| Client | React 19, Vite 8, TypeScript (strict for Pluto Party), Tailwind (site), PixiJS 8 (Pluto Party board) |
-| Pluto Party server | Node.js ≥ 24 running TypeScript directly (type stripping), [`ws`](https://github.com/websockets/ws) |
-| Persistence (site) | Supabase (PostgreSQL 17) with SQL migrations in `supabase/migrations/` |
-| Tests | `node --test` (`tests/*.test.mjs`), PGlite for the database tests |
+| Area               | Stack                                                                                                |
+| ------------------ | ---------------------------------------------------------------------------------------------------- |
+| Client             | React 19, Vite 8, TypeScript (strict for Pluto Party), Tailwind (site), PixiJS 8 (Pluto Party board) |
+| Pluto Party server | Node.js ≥ 24 running TypeScript directly (type stripping), [`ws`](https://github.com/websockets/ws)  |
+| Persistence (site) | Supabase (PostgreSQL 17) with SQL migrations in `supabase/migrations/`                               |
+| Tests              | `node --test` (`tests/*.test.mjs`), PGlite for the database tests                                    |
 
 ## Prerequisites
 
@@ -69,17 +69,17 @@ The authority does not hot-reload: restart `npm run party:server` after changing
 
 ## Scripts
 
-| Command | What it does |
-| --- | --- |
-| `npm run dev` | Vite dev server (port 5173) |
-| `npm run party:server` | Pluto Party WebSocket authority (port 8787, `GET /health`) |
-| `npm run build` | `tsc -b`, strict Pluto Party typecheck, production Vite build into `dist/` |
-| `npm run preview` | Serve the production build locally |
-| `npm run test:party` | Pluto Party engine, server and integration tests |
-| `npm run check:party` | Strict TypeScript check of Pluto Party (client, engine, server) |
-| `npm run lint` | ESLint for the whole repository |
-| `npm run test:natura` | Every test file in `tests/` (all games) |
-| `npm run test:ranked`, `test:eat-it`, `test:atlas` | Per-game test subsets |
+| Command                                            | What it does                                                               |
+| -------------------------------------------------- | -------------------------------------------------------------------------- |
+| `npm run dev`                                      | Vite dev server (port 5173)                                                |
+| `npm run party:server`                             | Pluto Party WebSocket authority (port 8787, `GET /health`)                 |
+| `npm run build`                                    | `tsc -b`, strict Pluto Party typecheck, production Vite build into `dist/` |
+| `npm run preview`                                  | Serve the production build locally                                         |
+| `npm run test:party`                               | Pluto Party engine, server and integration tests                           |
+| `npm run check:party`                              | Strict TypeScript check of Pluto Party (client, engine, server)            |
+| `npm run lint`                                     | ESLint for the whole repository                                            |
+| `npm run test:natura`                              | Every test file in `tests/` (all games)                                    |
+| `npm run test:ranked`, `test:eat-it`, `test:atlas` | Per-game test subsets                                                      |
 
 ## Pluto Party in production
 
