@@ -1033,7 +1033,7 @@ export default function ChessVariantsMenu() {
               </h1>
 
               <p className="mt-6 max-w-[520px] font-serif text-[18px] leading-8 text-zinc-400 sm:text-[20px]">
-                {variants.length}{ui("ways to turn classic chess into something completely different.")}</p>
+                {availableVariants.length}{ui("ways to turn classic chess into something completely different.")}</p>
 
               <div className="mt-7 hidden">
                 <p className="mb-3 text-[9px] font-black uppercase tracking-[0.28em] text-zinc-700">

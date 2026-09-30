@@ -4,6 +4,7 @@ services:
     name: pluto-party-server
     runtime: node
     plan: free # sleeps when idle and loses in-memory matches; use "starter" for always-on
+    buildCommand: npm ci --omit=dev
     startCommand: node server/party/index.ts
     healthCheckPath: /health
     envVars:
