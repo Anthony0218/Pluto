@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { ui } from "@/i18n/ui";
 
@@ -21,7 +21,8 @@ export default function ReviewDemoDialog({ moves, onClose }: { moves: string[]; 
   }, []);
 
   return createPortal(
-    <dialog ref={dialog} aria-label={ui("Sample game review")} onCancel={onClose} className="m-0 h-dvh max-h-none w-screen max-w-none bg-transparent p-0 text-white backdrop:bg-black/70">
+    // The modal covers the site header, so the review (which has its own header) fills the whole screen.
+    <dialog ref={dialog} aria-label={ui("Sample game review")} onCancel={onClose} style={{ "--public-header-height": "0px", "--app-height": "100dvh" } as CSSProperties} className="m-0 h-dvh max-h-none w-screen max-w-none bg-transparent p-0 text-white backdrop:bg-black/70">
       <ChessGameReview moves={moves} open onClose={onClose} />
     </dialog>, document.body,
   );

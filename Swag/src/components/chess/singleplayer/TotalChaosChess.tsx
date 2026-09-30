@@ -1,4 +1,5 @@
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
@@ -7,7 +8,6 @@ import { Chess, type Square } from "chess.js";
 
 import Board from "./Board";
 import PromotionBar from "./PromotionBar";
-import BoardAnimationToggle from "@/components/chess/singleplayer/BoardAnimationToggle";
 
 import { getSquareName } from "../../../utils/chessUtils";
 
@@ -20,7 +20,6 @@ import {
 import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation";
 
 import {
-  LanguageSelector,
   translateChess,
   useChessLanguage,
   type TranslationTable,
@@ -264,7 +263,7 @@ export default function TotalChaosChess({
   difficulty = "casual",
 }: VariantAiBoardProps) {
   useUiLanguage();
-  const { language, setLanguage } = useChessLanguage();
+  const { language } = useChessLanguage();
 
   const t = (key: string) => translateChess(language, key, translations);
 
@@ -629,19 +628,12 @@ export default function TotalChaosChess({
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <LanguageSelector
-                language={language}
-                onChange={setLanguage}
-                label={t("Language")}
-              />
-
               {!finishedGame && (
                 <span className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-zinc-300">
                   {game.turn() === "w" ? t("White to move") : t("Black to move")}
                 </span>
               )}
             </div>
-            <BoardAnimationToggle />
           </div>
 
         </ChessPageHeader>
@@ -681,7 +673,6 @@ export default function TotalChaosChess({
                   {t("Generate another full-board setup")}
                 </p>
 
-                <BoardAnimationToggle />
               </Panel>
 
               <Panel
@@ -719,37 +710,21 @@ export default function TotalChaosChess({
                 title={t("Move History")}
                 subtitle={`${records.length} plies`}
               >
-                <div className="max-h-80 overflow-y-auto rounded-xl border border-white/5 bg-black/20">
-                  {records.length === 0 ? (
-                    <p className="px-4 py-8 text-center text-xs text-zinc-600">
-                      {t("No moves yet")}
-                    </p>
-                  ) : (
-                    records.map((record) => (
-                      <button
-                        key={record.ply}
-                        type="button"
-                        onClick={() => {
-                          setHistoryPreviewPly(record.ply);
-
-                          clearSelection();
-                        }}
-                        className={`flex w-full items-center justify-between border-b border-white/5 px-3 py-2.5 text-left text-xs transition last:border-0 ${
-                          historyPreviewPly === record.ply
-                            ? "bg-pink-400/10 text-pink-200"
-                            : "text-zinc-400 hover:bg-white/5"
-                        }`}
-                      >
-                        <span className="text-zinc-600">
-                          {record.moveNumber}
-                          {record.color === "w" ? "." : "..."}
-                        </span>
-
-                        <span className="font-black">{record.san}</span>
-                      </button>
-                    ))
-                  )}
-                </div>
+                <ChessMoveHistoryList
+                  listClassName="max-h-80 rounded-xl border border-white/5 bg-black/20"
+                  selectedPly={historyPreviewPly}
+                  emptyLabel={t("No moves yet")}
+                  entries={records.map((record) => ({
+                    ply: record.ply,
+                    side: record.color,
+                    moveNumber: record.moveNumber,
+                    content: <span className="truncate text-xs font-black text-zinc-200">{record.san}</span>,
+                  }))}
+                  onSelect={(ply) => {
+                    setHistoryPreviewPly(ply);
+                    clearSelection();
+                  }}
+                />
               </Panel>
             </div>
           </aside>

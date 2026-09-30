@@ -5,9 +5,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, BookOpen, ChevronRight, Gamepad2, Users } from "lucide-react";
 import { useFitWattenScreen } from "@/games/watten/useFitWattenScreen";
 import {
-  setStoredWattenLanguage,
   translateWatten,
-  WattenLanguageSelector,
   type WattenLanguage,
 } from "@/games/watten/i18n/wattenLanguage";
 
@@ -82,21 +80,16 @@ const homeCopy: Partial<Record<WattenLanguage, Record<string, string>>> = {
 
 export default function Watten() {
   useFitWattenScreen();
-  const { language, setLanguage } = useAppLanguage();
+  const { language } = useAppLanguage();
   const [tip, setTip] = useState(0);
   const t = useCallback((key: string) => homeCopy[language]?.[key] ?? translateWatten(language, key), [language]);
 
-  function changeLanguage(next: WattenLanguage) {
-    setLanguage(next);
-    setStoredWattenLanguage(next);
-  }
 
   return <main className="watten-menu watten-menu--screen watten-menu--home">
     <div className="watten-menu__layout">
       <div className="watten-menu__panel">
         <div className="watten-pub-bar">
           <div className="watten-pub-brand"><span className="watten-menu__seal">W</span><span><strong>WATTEN</strong><small>{t("Bavarian Watten")}</small></span></div>
-          <WattenLanguageSelector language={language} onChange={changeLanguage} label={t("Language")} />
         </div>
 
         <div className="watten-pub-grid">

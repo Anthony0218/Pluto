@@ -1,4 +1,5 @@
 import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
@@ -25,7 +26,6 @@ import {
 import { buildFogStats } from "../../../games/chess/variants/fogOfWarStats.ts";
 
 import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.ts";
-import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
 import { chooseFogAiMove } from "../../../games/chess/ai/fogOfWarAi.ts";
 import {
   chessColorFromPlayerColor,
@@ -34,10 +34,8 @@ import {
   type ChessPlayerColor,
 } from "../../../games/chess/ai/variantAi.ts";
 
-type Language = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 type Winner = "white" | "black" | "draw";
 type StatsTab = "vision" | "battle" | "moments";
-const CHESS_LANGUAGE_STORAGE_KEY = "chess-language";
 const pieceValues: Record<string, number> = {
   p: 1,
   n: 3,
@@ -291,18 +289,13 @@ export default function FogOfWarChessBoard({
   difficulty = "casual",
 }: VariantAiBoardProps) {
   useUiLanguage();
-  const { language, setLanguage } = useAppLanguage();
+  const { language } = useAppLanguage();
   const t = (key: string) =>
     language === "en"
       ? key
       : language === "bar"
         ? (translations.bar[key] ?? translations.de[key] ?? ui(key))
         : (translations[language]?.[key] ?? ui(key));
-  const changeLanguage = (next: Language) => {
-    setLanguage(next);
-    if (typeof window !== "undefined")
-      window.localStorage.setItem(CHESS_LANGUAGE_STORAGE_KEY, next);
-  };
 
   const [randomStart, setRandomStart] = useState(true);
   const [fogSeed, setFogSeed] = useState<number>(createFogSeed);
@@ -665,18 +658,12 @@ export default function FogOfWarChessBoard({
         <ChessPageHeader className="mb-7 flex flex-col gap-4 rounded-3xl border border-sky-400/10 bg-zinc-900/50 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between" description={<> {t("You cannot see everything")} </>}>
 
           <div className="flex flex-wrap items-center gap-2">
-            <LanguageSelector
-              language={language}
-              onChange={changeLanguage}
-              label={t("Language")}
-            />
             {!gameOver && (
               <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-300">
                 {game.turn() === "w" ? t("White to move") : t("Black to move")}
               </div>
             )}
           </div>
-          <BoardAnimationToggle />
         </ChessPageHeader>
 
         <section className="mb-6 grid gap-3 rounded-3xl border border-sky-400/10 bg-sky-400/[0.03] px-5 py-4 md:grid-cols-3">
@@ -747,47 +734,30 @@ export default function FogOfWarChessBoard({
                     {records.length}
                   </span>
                 </div>
-                <div className="max-h-80 overflow-y-auto rounded-2xl border border-white/5 bg-black/20">
-                  {records.length === 0 ? (
-                    <div className="px-4 py-8 text-center text-xs text-zinc-600">
-                      {t("No moves yet")}
-                    </div>
-                  ) : (
-                    <table className="w-full border-collapse">
-                      <tbody>
-                        {records.map((record) => {
-                          const canPreview = safePreview(record);
-                          return (
-                            <tr
-                              key={record.ply}
-                              onClick={() => {
-                                if (!canPreview) return;
-                                setHistoryPreviewPly(record.ply);
-                                setSelectedSquare(null);
-                                setLegalMoves([]);
-                              }}
-                              className={`border-b border-white/5 last:border-0 ${canPreview ? "cursor-pointer hover:bg-white/5" : "cursor-not-allowed opacity-55"} ${historyPreviewPly === record.ply ? "bg-blue-400/10" : ""}`}
-                            >
-                              <td className="px-3 py-2.5 text-[10px] text-zinc-600">
-                                {record.moveNumber}
-                                {record.color === "w" ? "." : "..."}
-                              </td>
-                              <td className="px-2 py-2.5 text-lg">
-                                {gameOver || record.color === liveSide ? historyPieceSymbol(
-                                      record.color,
-                                      record.piece,
-                                    ) : "?"}
-                              </td>
-                              <td className="px-2 py-2.5 font-mono text-xs font-bold text-zinc-200">
-                                {displayRecordSan(record)}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  )}
-                </div>
+                <ChessMoveHistoryList
+                  listClassName="max-h-80 rounded-2xl border border-white/5 bg-black/20"
+                  selectedPly={historyPreviewPly}
+                  emptyLabel={t("No moves yet")}
+                  entries={records.map((record) => ({
+                    ply: record.ply,
+                    side: record.color,
+                    moveNumber: record.moveNumber,
+                    disabled: !safePreview(record),
+                    content: (
+                      <>
+                        <span className="text-base leading-none">
+                          {gameOver || record.color === liveSide ? historyPieceSymbol(record.color, record.piece) : "?"}
+                        </span>
+                        <span className="truncate font-mono text-xs font-bold text-zinc-200">{displayRecordSan(record)}</span>
+                      </>
+                    ),
+                  }))}
+                  onSelect={(ply) => {
+                    setHistoryPreviewPly(ply);
+                    setSelectedSquare(null);
+                    setLegalMoves([]);
+                  }}
+                />
               </Panel>
             </div>
           </aside>
@@ -1178,33 +1148,5 @@ function StatCard({ label, value }: { label: string; value: number }) {
         {ui(label)}
       </p>
     </div>
-  );
-}
-function LanguageSelector({
-  language,
-  onChange,
-  label,
-}: {
-  language: Language;
-  onChange: (language: Language) => void;
-  label: string;
-}) {
-  useUiLanguage();
-  return (
-    <label className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-400">
-      <span>🌐</span>
-      <span className="hidden sm:inline">{ui(label)}</span>
-      <select
-        value={language}
-        onChange={(e) => onChange(e.target.value as Language)}
-        className="bg-transparent text-xs font-bold text-zinc-200 outline-none [color-scheme:dark]"
-      >
-        <option value="en">{ui("English")}</option>
-        <option value="de">{ui("Deutsch")}</option>
-        <option value="bar">{ui("Boarisch")}</option>
-        <option value="ko">한국어</option>
-        <option value="ru">Русский</option>
-      </select>
-    </label>
   );
 }

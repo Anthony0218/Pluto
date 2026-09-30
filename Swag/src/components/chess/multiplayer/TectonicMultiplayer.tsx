@@ -1,4 +1,5 @@
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { useVariantRecordAudio } from "@/games/chess/audio/useVariantRecordAudio";
 import { ui, useUiLanguage } from "@/i18n/ui";
@@ -50,6 +51,7 @@ import type {
   VariantRoom,
   VariantRoomPlayer,
 } from "@/games/chess/multiplayer/variantMultiplayerTypes";
+import VariantRoomSetup from "./VariantRoomSetup";
 
 type PromotionPiece = "q" | "r" | "b" | "n";
 type ActionLoading =
@@ -514,7 +516,6 @@ export function TectonicMultiplayerLobby() {
   useUiLanguage();
   const navigate = useNavigate();
   const { user, profile } = useAuth();
-  const [hostColor, setHostColor] = useState<TwoPlayerColor>("white");
   const [joinCode, setJoinCode] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
   const [loading, setLoading] = useState<"create" | "join" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -535,7 +536,7 @@ export function TectonicMultiplayerLobby() {
       "create_tectonic_variant_room",
       {
         p_display_name: displayName,
-        p_host_color: hostColor,
+        p_host_color: "black",
       },
     );
 
@@ -581,24 +582,7 @@ export function TectonicMultiplayerLobby() {
           </Panel>
         ) : (
           <div className="grid gap-5 lg:grid-cols-2">
-            <Panel title={ui("Create room")} subtitle={ui("Choose your side")}>
-              <div className="grid grid-cols-2 gap-2">
-                {(["white", "black"] as TwoPlayerColor[]).map((color) => (
-                  <button
-                    key={color}
-                    type="button"
-                    onClick={() => setHostColor(color)}
-                    className={`rounded-xl border px-4 py-3 font-black transition ${
-                      hostColor === color
-                        ? "border-violet-400/30 bg-violet-400/10 text-violet-200"
-                        : "border-white/10 bg-black/20 text-zinc-400 hover:bg-white/5"
-                    }`}
-                  >
-                    {color === "white" ? "♔" : "♚"}{" "}
-                    {color === "white" ? ui("White") : ui("Black")}
-                  </button>
-                ))}
-              </div>
+            <Panel title={ui("Create room")} subtitle={ui("Colors are picked in the room")}>
 
               <div className="mt-4 rounded-xl border border-violet-300/10 bg-violet-400/[0.05] p-3 text-xs leading-5 text-zinc-400">{ui("Normal moves and quadrant rotations are both authoritative multiplayer actions. Undo therefore rolls back exactly one action — including a shift.")}</div>
 
@@ -612,7 +596,7 @@ export function TectonicMultiplayerLobby() {
               </button>
             </Panel>
 
-            <Panel title={ui("Join room")} subtitle={ui("You receive the opposite side")}>
+            <Panel title={ui("Join room")} subtitle={ui("Pick your color in the room")}>
               <input
                 value={joinCode}
                 onChange={(event) =>
@@ -1381,6 +1365,17 @@ export function TectonicMultiplayerGame() {
   const activeTurnColor = liveGame.turn() === "w" ? "white" : "black";
   const shifterName = liveGame.turn() === "w" ? "White" : "Black";
 
+  if (room.status === "waiting") {
+    return (
+      <VariantRoomSetup
+        roomId={room.id}
+        variantName={"Tectonic Chess"}
+        lobbyPath={"/games/chess/variants/tectonic/multiplayer"}
+        onStarted={() => void loadRoom(true)}
+      />
+    );
+  }
+
   return (
     <div className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1500px]">
@@ -1501,51 +1496,44 @@ export function TectonicMultiplayerGame() {
               )}
 
               <Panel title={ui("Action History")} subtitle={ui("Moves and board shifts")}>
-                <div className="max-h-80 overflow-y-auto rounded-xl border border-white/5 bg-black/20">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setHistoryPreviewIndex(-1);
-                      clearSelection();
-                      setHoveredQuadrant(null);
-                    }}
-                    className={`flex w-full items-center justify-between border-b border-white/5 px-3 py-2.5 text-left text-xs ${
-                      historyPreviewIndex === -1
-                        ? "bg-violet-400/10 text-violet-200"
-                        : "text-zinc-500 hover:bg-white/5"
-                    }`}
-                  >
-                    <span>{ui("0 · Initial position")}</span>
-                    <span>◎</span>
-                  </button>
-                  {history.map((entry, index) => (
+                <ChessMoveHistoryList
+                  listClassName="max-h-80 rounded-xl border border-white/5 bg-black/20"
+                  selectedPly={historyPreviewIndex !== null && historyPreviewIndex >= 0 ? historyPreviewIndex + 1 : null}
+                  emptyLabel="No moves yet"
+                  leading={
                     <button
-                      key={`${entry.action}-${entry.notation}`}
                       type="button"
                       onClick={() => {
-                        setHistoryPreviewIndex(index);
+                        setHistoryPreviewIndex(-1);
                         clearSelection();
                         setHoveredQuadrant(null);
                       }}
-                      className={`flex w-full items-center justify-between border-b border-white/5 px-3 py-2.5 text-left text-xs last:border-0 ${
-                        historyPreviewIndex === index
+                      className={`flex w-full items-center justify-between border-b border-white/5 px-3 py-2.5 text-left text-xs ${
+                        historyPreviewIndex === -1
                           ? "bg-violet-400/10 text-violet-200"
-                          : "text-zinc-400 hover:bg-white/5"
+                          : "text-zinc-500 hover:bg-white/5"
                       }`}
                     >
-                      <span className="flex items-center gap-2">
-                        <span className="w-6 text-[10px] text-zinc-600">
-                          {ui(entry.action)}
-                        </span>
-                        <span>{entry.color === "w" ? "♙" : "♟"}</span>
-                        <span>{entry.kind === "shift" ? "↻" : "·"}</span>
-                      </span>
-                      <span className="font-mono font-black">
-                        {entry.notation}
-                      </span>
+                      <span>{ui("0 · Initial position")}</span>
+                      <span>◎</span>
                     </button>
-                  ))}
-                </div>
+                  }
+                  entries={history.map((entry, index) => ({
+                    ply: index + 1,
+                    side: entry.color,
+                    content: (
+                      <>
+                        <span className="font-black text-zinc-500">{entry.kind === "shift" ? "↻" : "·"}</span>
+                        <span className="truncate font-mono text-xs font-black text-zinc-200">{entry.notation}</span>
+                      </>
+                    ),
+                  }))}
+                  onSelect={(ply) => {
+                    setHistoryPreviewIndex(ply === null ? null : ply - 1);
+                    clearSelection();
+                    setHoveredQuadrant(null);
+                  }}
+                />
               </Panel>
 
               <Panel title={ui("Captured Pieces")} subtitle={ui("Normal moves only")}>

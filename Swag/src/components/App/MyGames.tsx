@@ -21,7 +21,6 @@ function FavoriteGames({ userId }: { userId?: string }) {
   const [editing, setEditing] = useState(false);
   const [selector, setSelector] = useState(false);
   const [filter, setFilter] = useState("");
-  const [visibleCount, setVisibleCount] = useState(4);
   const gridRef = useRef<HTMLDivElement>(null);
   const previousPositions = useRef(new Map<string, DOMRect>());
   useLayoutEffect(() => {
@@ -41,7 +40,7 @@ function FavoriteGames({ userId }: { userId?: string }) {
     previousPositions.current = nextPositions;
   }, [draft, editing]);
   const selected = editing ? draft : routes;
-  const visible = editing ? draft : routes.slice(0, visibleCount);
+  const visible = selected;
   const { dragAndDropHooks } = useDragAndDrop({
     getItems: keys => [...keys].map(key => ({ "text/plain": String(key) })),
     renderDragPreview: items => {
@@ -67,8 +66,6 @@ function FavoriteGames({ userId }: { userId?: string }) {
     <div className="dash-section-heading">
       <div><h2 id="my-games-title">{ui("My games")}</h2><p>{ui(editing ? "Drag to reorder, or use the arrow buttons. Save when you are ready." : "Your favorites, always one move away.")}</p></div>
       <div className="flex shrink-0 flex-wrap justify-end gap-2">
-        {!editing && visibleCount < favoriteLimit && <button type="button" className="dash-icon-button" aria-label={ui("Show more games")} title={ui("Show more games")} onClick={() => setVisibleCount(Math.min(favoriteLimit, visibleCount + 2))}><Plus size={17} /></button>}
-        {!editing && visibleCount >= favoriteLimit && <button type="button" className="dash-icon-button" aria-label={ui("Show fewer games")} title={ui("Show fewer games")} onClick={() => setVisibleCount(4)}><span aria-hidden="true">−</span></button>}
         {editing ? <><button className="dash-button" disabled={saving} onClick={() => setEditing(false)}>{ui("Cancel")}</button><button className="dash-button primary" disabled={saving} onClick={() => void commit()}><Check size={15} />{ui(saving ? "Saving..." : "Save")}</button></> : <><Link to="/games" className="dash-button">{ui("All games")}<ArrowRight size={14} /></Link><button className="dash-button primary" disabled={loading} onClick={() => customize()}><Pencil size={14} />{ui("Customize")}</button></>}
       </div>
     </div>
@@ -87,8 +84,9 @@ function FavoriteGames({ userId }: { userId?: string }) {
       {editing && <p className="sr-only" aria-live="polite">{draft.map(route => ui(games.find(game => game.route === route)!.title)).join(", ")}</p>}
     </>}
     {selector && <DashboardDialog title={ui("Choose a game")} onClose={() => setSelector(false)}>
+      <div className="mb-3 flex items-center justify-between gap-3 text-sm text-slate-400"><span aria-live="polite">{draft.length} / {favoriteLimit} {ui("selected")}</span><button type="button" className="dash-button primary" onClick={() => setSelector(false)}><Check size={14} />{ui("Done")}</button></div>
       <input className="dash-input mb-4" aria-label={ui("Search games")} placeholder={ui("Search games")} value={filter} onChange={event => setFilter(event.target.value)} />
-      <div className="grid gap-2 sm:grid-cols-2">{games.filter(game => ui(game.title).toLocaleLowerCase().includes(filter.toLocaleLowerCase())).map(game => <button key={game.route} disabled={draft.includes(game.route) || draft.length >= favoriteLimit} className="game-choice" onClick={() => { setDraft([...draft, game.route]); setSelector(false); }}><img src={game.image} alt="" /><span>{ui(game.title)}</span>{draft.includes(game.route) ? <Check size={16} /> : <Plus size={16} />}</button>)}</div>
+      <div className="grid gap-2 sm:grid-cols-2">{games.filter(game => ui(game.title).toLocaleLowerCase().includes(filter.toLocaleLowerCase())).map(game => <button key={game.route} disabled={draft.includes(game.route) || draft.length >= favoriteLimit} className="game-choice" onClick={() => { const next = [...draft, game.route]; setDraft(next); if (next.length >= favoriteLimit) setSelector(false); }}><img src={game.image} alt="" /><span>{ui(game.title)}</span>{draft.includes(game.route) ? <Check size={16} /> : <Plus size={16} />}</button>)}</div>
       {!games.some(game => ui(game.title).toLocaleLowerCase().includes(filter.toLocaleLowerCase())) && <p className="text-sm text-slate-400">{ui("No results found.")}</p>}
     </DashboardDialog>}
   </section>;

@@ -3,6 +3,7 @@ import { ui, useUiLanguage } from "@/i18n/ui";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
 import { useState } from "react";
 import ChessRankedLobby from "./ChessRankedLobby";
+import { FriendRoomPanel } from "./ChessMultiplayerLobby";
 
 const modes = [
   {
@@ -31,7 +32,6 @@ export default function ChessMultiplayerModeMenu() {
   useUiLanguage();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<0 | 1>(0);
-  const [roomCode, setRoomCode] = useState("");
   const inviteCode = searchParams.get("code");
   if (inviteCode) return <Navigate replace to={`/games/chess/classic/multiplayer/friends?code=${encodeURIComponent(inviteCode)}`} />;
 
@@ -51,18 +51,9 @@ export default function ChessMultiplayerModeMenu() {
           <div className="mt-12 flex items-center gap-4 text-[9px] font-black uppercase tracking-[0.28em] text-zinc-700"><span className="h-px w-14 bg-amber-400/45" />{ui("Friends · Ranked")}</div>
         </header>
         <div className="relative flex min-h-[560px] min-w-0 items-center border-t border-white/[0.06] px-5 py-8 sm:px-8 lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain lg:border-t-0 lg:px-10 lg:py-12 xl:px-14">
-          <div className={`mx-auto my-auto w-full flex-none ${activeTab === 0 ? "max-w-[760px]" : "max-w-[920px]"}`}>
+          <div className="mx-auto my-auto w-full max-w-[920px] flex-none">
             <ModeTabs activeTab={activeTab} onChange={setActiveTab} />
-            {activeTab === 0 && modes.map((mode, index) => activeTab === index && <Link key={mode.path} to={mode.path} role="tabpanel" className={`group relative block overflow-hidden rounded-[22px] border bg-black/20 p-6 shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 ${index === 0 ? "border-emerald-400/35 hover:border-emerald-300/65" : "border-amber-400/40 hover:border-amber-300/70"}`}>
-              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(105deg,rgba(245,158,11,.055),transparent_55%)] opacity-0 transition group-hover:opacity-100" />
-              <div className="relative flex h-full flex-col"><div className={`flex h-[74px] w-[74px] items-center justify-center rounded-2xl border text-[37px] ${index === 0 ? "border-emerald-300/30 bg-emerald-400/[.08] text-emerald-100" : "border-amber-300/35 bg-amber-400/[.09] text-amber-100"}`}>{mode.icon}</div>
-                <p className="mt-6 text-[9px] font-black uppercase tracking-[.26em] text-amber-300/70">{ui(mode.eyebrow)}</p>
-                <h2 className="mt-2 font-serif text-[31px] leading-tight text-white">{ui(mode.title)}</h2>
-                <p className="mt-3 min-h-16 text-sm leading-6 text-zinc-500">{ui(mode.description)}</p>
-                <div className="mt-auto flex items-center justify-between gap-3 pt-5"><p className="text-[8px] font-black uppercase tracking-[.24em] text-zinc-700">{ui(mode.footer)}</p><span className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 text-xl text-amber-300 transition group-hover:translate-x-1 group-hover:border-amber-300/35">→</span></div>
-              </div>
-            </Link>)}
-            {activeTab === 0 && <div className="mt-4 rounded-2xl border border-white/10 bg-white/[.035] p-4"><label htmlFor="friend-room-code" className="mb-2 block text-xs font-bold text-zinc-300">{ui("Have a room code?")}</label><div className="flex gap-2"><input id="friend-room-code" value={roomCode} onChange={event => setRoomCode(event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6))} maxLength={6} placeholder="ABC123" className="min-w-0 flex-1 rounded-xl border border-white/15 bg-black/30 px-4 py-3 font-mono text-sm tracking-widest text-white outline-none focus:border-emerald-300/60" /><Link to={`/games/chess/classic/multiplayer/friends?code=${encodeURIComponent(roomCode)}`} aria-disabled={roomCode.length !== 6} tabIndex={roomCode.length === 6 ? 0 : -1} className={`inline-flex items-center rounded-xl px-5 text-sm font-bold ${roomCode.length === 6 ? "bg-emerald-400 text-[#041911] hover:bg-emerald-300" : "pointer-events-none bg-white/10 text-zinc-600"}`}>{ui("Join room")}</Link></div></div>}
+            {activeTab === 0 && <div role="tabpanel"><FriendRoomPanel embedded /></div>}
             {activeTab === 1 && <div role="tabpanel"><ChessRankedLobby embedded /></div>}
           </div>
         </div>

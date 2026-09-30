@@ -1,4 +1,5 @@
 import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import { emitGameEffect } from "@/games/chess/effects/gameEffects";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
@@ -49,7 +50,6 @@ import {
 
 import { buildCapitalismStats } from "../../../games/chess/variants/capitalismStats.ts";
 import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.ts";
-import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
 import { useVariantChessAi } from "@/hooks/useVariantChessAi";
 import {
   chessColorFromPlayerColor,
@@ -62,13 +62,11 @@ import {
    TYPES
    ========================================================= */
 
-type Language = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 
 type StatsTab = "overview" | "market" | "moments";
 
 type Winner = "white" | "black" | "draw";
 
-const CHESS_LANGUAGE_STORAGE_KEY = "chess-language";
 
 /* =========================================================
    PIECE DISPLAY
@@ -580,7 +578,7 @@ export default function CapitalismChessBoard({
   difficulty = "casual",
 }: VariantAiBoardProps) {
   useUiLanguage();
-  const { language, setLanguage } = useAppLanguage();
+  const { language } = useAppLanguage();
 
   const t = (key: string) => {
     if (language === "en") {
@@ -593,14 +591,6 @@ export default function CapitalismChessBoard({
 
     return translations[language]?.[key] ?? ui(key);
   };
-
-  function changeLanguage(nextLanguage: Language) {
-    setLanguage(nextLanguage);
-
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(CHESS_LANGUAGE_STORAGE_KEY, nextLanguage);
-    }
-  }
 
   /* =======================================================
      GAME + ECONOMY STATE
@@ -1270,7 +1260,7 @@ export default function CapitalismChessBoard({
       <div className="mx-auto max-w-[1500px]">
         {/* HEADER */}
 
-        <ChessPageHeader icon={<CoinIcon />} className="
+        <ChessPageHeader className="
             mb-7
             flex
             flex-col
@@ -1310,12 +1300,6 @@ export default function CapitalismChessBoard({
               📖 {t("Rulebook")}
             </a>
 
-            <ChessLanguageSelector
-              language={language}
-              onChange={changeLanguage}
-              label={t("Language")}
-            />
-
             {!gameOver && (
               <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-300">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-amber-400" />
@@ -1324,7 +1308,6 @@ export default function CapitalismChessBoard({
               </div>
             )}
           </div>
-          <BoardAnimationToggle />
         </ChessPageHeader>
 
         {/* ECONOMY STRIP */}
@@ -1566,102 +1549,31 @@ export default function CapitalismChessBoard({
                   </span>
                 </div>
 
-                <div className="max-h-80 overflow-y-auto rounded-2xl border border-white/5 bg-black/20">
-                  {records.length === 0 ? (
-                    <div className="px-4 py-8 text-center text-xs text-zinc-600">
-                      {t("No moves yet")}
-                    </div>
-                  ) : (
-                    <table className="w-full border-collapse">
-                      <thead className="sticky top-0 z-10 bg-zinc-900">
-                        <tr className="border-b border-white/5 text-left text-[9px] font-black uppercase tracking-wider text-zinc-600">
-                          <th className="px-3 py-2">{t("Move")}</th>
-
-                          <th className="px-2 py-2">{t("Side")}</th>
-
-                          <th className="px-2 py-2">{t("Played")}</th>
-                        </tr>
-                      </thead>
-
-                      <tbody>
-                        {records.map((record) => {
-                          const selected = historyPreviewPly === record.ply;
-
-                          return (
-                            <tr
-                              key={record.ply}
-                              tabIndex={0}
-                              onClick={() => {
-                                setHistoryPreviewPly(record.ply);
-
-                                setSelectedSquare(null);
-
-                                setLegalMoves([]);
-                              }}
-                              onKeyDown={(event) => {
-                                if (
-                                  event.key === "Enter" ||
-                                  event.key === " "
-                                ) {
-                                  setHistoryPreviewPly(record.ply);
-
-                                  setSelectedSquare(null);
-
-                                  setLegalMoves([]);
-                                }
-                              }}
-                              className={`
-                                  cursor-pointer
-                                  border-b
-                                  border-white/5
-                                  transition
-                                  last:border-0
-
-                                  ${
-                                    selected
-                                      ? "bg-blue-400/10"
-                                      : "hover:bg-white/5"
-                                  }
-                                `}
-                            >
-                              <td className="px-3 py-2.5 text-[10px] text-zinc-600">
-                                {record.moveNumber}
-                                {record.color === "w" ? "." : "..."}
-                              </td>
-
-                              <td className="px-2 py-2.5">
-                                <span className="text-xs text-zinc-500">
-                                  {record.color === "w" ? `♔ ${t("White")}` : `♚ ${t("Black")}`}
-                                </span>
-                              </td>
-
-                              <td className="px-2 py-2.5">
-                                <div className="flex flex-wrap items-center gap-2">
-                                  <span className="w-5 text-center text-lg leading-none">
-                                    {historyPieceSymbol(
-                                      record.color,
-                                      record.piece,
-                                    )}
-                                  </span>
-
-                                  <span className="font-mono text-xs font-bold text-zinc-200">
-                                    {record.san}
-                                  </span>
-
-                                  {record.economy.totalEarned > 0 && (
-                                    <span className="rounded-full bg-amber-400/10 px-2 py-0.5 text-[9px] font-black text-amber-300">
-                                      +{record.economy.totalEarned} $
-                                    </span>
-                                  )}
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  )}
-                </div>
+                <ChessMoveHistoryList
+                  listClassName="max-h-80 rounded-2xl border border-white/5 bg-black/20"
+                  selectedPly={historyPreviewPly}
+                  emptyLabel={t("No moves yet")}
+                  entries={records.map((record) => ({
+                    ply: record.ply,
+                    side: record.color,
+                    moveNumber: record.moveNumber,
+                    content: (
+                      <>
+                        <span className="text-base leading-none">{historyPieceSymbol(record.color, record.piece)}</span>
+                        <span className="truncate font-mono text-xs font-bold text-zinc-200">{record.san}</span>
+                      </>
+                    ),
+                    trailing:
+                      record.economy.totalEarned > 0 ? (
+                        <span className="rounded-full bg-amber-400/10 px-1.5 py-0.5 font-black text-amber-300">+{record.economy.totalEarned} $</span>
+                      ) : null,
+                  }))}
+                  onSelect={(ply) => {
+                    setHistoryPreviewPly(ply);
+                    setSelectedSquare(null);
+                    setLegalMoves([]);
+                  }}
+                />
               </Panel>
             </div>
           </aside>
@@ -2574,41 +2486,3 @@ function pieceSymbol(color: "w" | "b", type: string): string {
     : (blackSymbols[type] ?? "");
 }
 
-function ChessLanguageSelector({
-  language,
-  onChange,
-  label,
-}: {
-  language: Language;
-  onChange: (language: Language) => void;
-  label: string;
-}) {
-  useUiLanguage();
-  return (
-    <label className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-400">
-      <span>🌐</span>
-
-      <span className="hidden sm:inline">{ui(label)}</span>
-
-      <select
-        value={language}
-        onChange={(event) => onChange(event.target.value as Language)}
-        className="bg-transparent text-xs font-bold text-zinc-200 outline-none [color-scheme:dark]"
-      >
-        <option value="en" className="bg-zinc-900">{ui("English")}</option>
-
-        <option value="de" className="bg-zinc-900">{ui("Deutsch")}</option>
-
-        <option value="bar" className="bg-zinc-900">{ui("Boarisch")}</option>
-
-        <option value="ko" className="bg-zinc-900">
-          한국어
-        </option>
-
-        <option value="ru" className="bg-zinc-900">
-          Русский
-        </option>
-      </select>
-    </label>
-  );
-}

@@ -1,4 +1,5 @@
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { useVariantRecordAudio } from "@/games/chess/audio/useVariantRecordAudio";
 import { ui, useUiLanguage } from "@/i18n/ui";
@@ -42,6 +43,7 @@ import {
   type CollapseSide,
   type CollapseState,
 } from "../../../games/chess/variants/chessCollapse";
+import VariantRoomSetup from "./VariantRoomSetup";
 
 type PlayerColor = "white" | "black";
 type PromotionPiece = "q" | "r" | "b" | "n";
@@ -246,7 +248,6 @@ export function CollapseMultiplayerLobby() {
   const [displayName, setDisplayName] = useState(
     (profile as { username?: string | null } | null)?.username ?? "Player",
   );
-  const [hostColor, setHostColor] = useState<PlayerColor>("white");
   const [collapseMode, setCollapseMode] = useState<CollapseMode>("squares");
   const [joinCode, setJoinCode] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
   const [busy, setBusy] = useState<"create" | "join" | null>(null);
@@ -265,7 +266,7 @@ export function CollapseMultiplayerLobby() {
         p_seed: seed,
         p_initial_state: initialState,
         p_display_name: displayName.trim() || "Player",
-        p_host_color: hostColor,
+        p_host_color: "black",
       },
     );
 
@@ -335,19 +336,7 @@ export function CollapseMultiplayerLobby() {
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <section className="rounded-2xl border border-white/5 bg-black/20 p-4">
               <h2 className="font-black">{ui("Create room")}</h2>
-              <p className="mt-1 text-xs text-zinc-500">{ui("Choose your starting color.")}</p>
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                {(["white", "black"] as PlayerColor[]).map((color) => (
-                  <button
-                    key={color}
-                    type="button"
-                    onClick={() => setHostColor(color)}
-                    className={`rounded-xl border px-3 py-3 text-sm font-black ${hostColor === color ? "border-red-300/30 bg-red-400/15 text-red-100" : "border-white/10 bg-white/5 text-zinc-400"}`}
-                  >
-                    {color === "white" ? ui("♔ White") : ui("♚ Black")}
-                  </button>
-                ))}
-              </div>
+              <p className="mt-1 text-xs text-zinc-500">{ui("Colors are picked in the room.")}</p>
 
               <p className="mt-4 text-[10px] font-black uppercase tracking-wider text-zinc-500">{ui("Collapse mode")}</p>
               <div className="mt-2 grid grid-cols-2 gap-2">
@@ -971,6 +960,17 @@ export function CollapseMultiplayerGame() {
       ? `${collapseEdgeLabel(displayedCollapse.warningEdge)} collapses in ${displayedCollapse.warningMovesRemaining}`
       : `Next warning in ${displayedCollapse.movesUntilWarning}`;
 
+  if (room.status === "waiting") {
+    return (
+      <VariantRoomSetup
+        roomId={room.id}
+        variantName={"Chess Collapse"}
+        lobbyPath={"/games/chess/variants/collapse/multiplayer"}
+        onStarted={() => void loadAll()}
+      />
+    );
+  }
+
   return (
     <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1460px]">
@@ -1035,34 +1035,23 @@ export function CollapseMultiplayerGame() {
             </Panel>
 
             <Panel title={ui("Move History")}>
-              <div className="max-h-80 overflow-y-auto rounded-xl border border-white/5 bg-black/20">
-                {state.records.length === 0 ? (
-                  <p className="px-4 py-7 text-center text-xs text-zinc-600">{ui("No moves yet")}</p>
-                ) : (
-                  state.records.map((record) => (
-                    <button
-                      key={record.ply}
-                      type="button"
-                      onClick={() => {
-                        setHistoryPreviewPly(record.ply);
-                        clearSelection();
-                        setPromotion(null);
-                      }}
-                      className={`flex w-full items-center justify-between border-b border-white/5 px-3 py-2.5 text-left text-xs last:border-0 ${historyPreviewPly === record.ply ? "bg-red-400/10 text-red-200" : "text-zinc-400 hover:bg-white/5"}`}
-                    >
-                      <span>
-                        {record.moveNumber}
-                        {record.color === "w" ? "." : "..."} {record.san}
-                      </span>
-                      <span>
-                        {record.collapseAfter.lastImpactSquares.length > 0 ? "💥" : ""}
-                        {record.kingHits.length > 0 ? "♥−" : ""}
-                        {record.trappedKings.length > 0 ? "☠" : ""}
-                      </span>
-                    </button>
-                  ))
-                )}
-              </div>
+              <ChessMoveHistoryList
+                listClassName="max-h-80 rounded-xl border border-white/5 bg-black/20"
+                selectedPly={historyPreviewPly}
+                emptyLabel="No moves yet"
+                entries={state.records.map((record) => ({
+                  ply: record.ply,
+                  side: record.color,
+                  moveNumber: record.moveNumber,
+                  content: <span className="truncate font-mono text-xs font-bold text-zinc-200">{record.san}</span>,
+                  trailing: <span>{`${record.collapseAfter.lastImpactSquares.length > 0 ? "💥" : ""}${record.kingHits.length > 0 ? "♥−" : ""}${record.trappedKings.length > 0 ? "☠" : ""}`}</span>,
+                }))}
+                onSelect={(ply) => {
+                  setHistoryPreviewPly(ply);
+                  clearSelection();
+                  setPromotion(null);
+                }}
+              />
             </Panel>
           </aside>
 

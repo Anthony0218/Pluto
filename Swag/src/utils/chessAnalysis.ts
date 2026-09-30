@@ -20,6 +20,9 @@ export type MoveSuggestion = {
   san: string;
 
   evaluation: string;
+
+  /** Engine principal variation in UCI, starting with this move. */
+  pv?: string[];
 };
 
 export type MoveReview = {
@@ -64,8 +67,24 @@ export type AnalyzePosition = (
     multiPV?: number;
 
     moveTime?: number;
+
+    depth?: number;
+
+    newGame?: boolean;
   },
 ) => Promise<StockfishAnalysisLine[]>;
+
+/*
+ * Full reviews search every position to a fixed depth
+ * from a cleared hash, so the same moves always get the
+ * same scores on every device. A time budget made the
+ * search depth (and the scores) vary run to run.
+ * The sample review on the landing page was generated
+ * with these exact settings, so keep them in sync.
+ */
+export const REVIEW_DEPTH = 14;
+
+export const REVIEW_MULTI_PV = 3;
 
 /* =========================================================
    ENGINE SCORE
@@ -209,6 +228,8 @@ function linesToSuggestions(
         san: uciToSan(fen, uci),
 
         evaluation: formatEvaluation(line),
+
+        pv: line.pv,
       };
     });
 }
@@ -408,9 +429,8 @@ export async function reviewGameMoves(
   ];
 
   /*
-   * Each position now stores
-   * MultiPV 3 instead of just
-   * one engine line.
+   * Each position stores several engine lines;
+   * the top three become the suggestions.
    */
   const analyses: StockfishAnalysisLine[][] = [];
 
@@ -427,9 +447,11 @@ export async function reviewGameMoves(
       analyses.push([]);
     } else {
       const lines = await analyzePosition(fen, {
-        multiPV: 3,
+        multiPV: REVIEW_MULTI_PV,
 
-        moveTime: 400,
+        depth: REVIEW_DEPTH,
+
+        newGame: index === 0,
       });
 
       analyses.push(lines);

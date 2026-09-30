@@ -1,7 +1,9 @@
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useEffect, useId, useRef, useState } from "react";
+import { Shield } from "lucide-react";
 import { ReviewQualityIcon } from "./ReviewQualityBadge";
-import { qualityColor, type ReviewVisualQuality } from "./reviewQualityVisuals";
+import { qualityColor } from "./reviewQualityVisuals";
+import type { BoardAnnotations } from "./boardAnnotations";
 
 import { type Square } from "chess.js";
 import { getSquareName } from "../../../utils/chessUtils";
@@ -139,7 +141,13 @@ type BoardProps = {
    * changing the normal game board.
    */
   pieceScale?: number;
-  reviewAnnotation?: { from: Square; to: Square; quality: ReviewVisualQuality } | null;
+  /*
+   * Font size of the a–h / 1–8 square labels. Small preview boards
+   * pass a smaller value so the labels do not crowd the pieces.
+   */
+  coordinateFontSize?: string;
+  /** Move-quality icon, square marks and arrows (Chess Coach and Game Review). */
+  annotations?: BoardAnnotations | null;
 };
 
 const pieceSymbols = {
@@ -206,7 +214,8 @@ export default function Board({
   bossRage = 0,
   orientation = "white",
   pieceScale = 1,
-  reviewAnnotation = null,
+  coordinateFontSize = "clamp(8px,1vw,12px)",
+  annotations = null,
 }: BoardProps) {
   useUiLanguage();
   const arrowId = `review-arrow-${useId().replace(/:/g, "")}`;
@@ -409,8 +418,17 @@ export default function Board({
     const row = 8 - Number(square[1]);
     return displayedOrientation === "white" ? { x: (file + .5) * 100, y: (row + .5) * 100 } : { x: (7.5 - file) * 100, y: (7.5 - row) * 100 };
   };
-  const reviewFrom = reviewAnnotation ? reviewPoint(reviewAnnotation.from) : null;
-  const reviewTo = reviewAnnotation ? reviewPoint(reviewAnnotation.to) : null;
+  const annotationIcon = annotations?.icon ?? null;
+  const annotationMarks = annotations?.marks ?? [];
+  const annotationBadges = annotations?.badges ?? [];
+  const annotationArrows = (annotations?.arrows ?? []).map((arrow) => {
+    const from = reviewPoint(arrow.from);
+    const to = reviewPoint(arrow.to);
+    // Stop short of the square centre so the arrow head does not cover the piece.
+    const length = Math.hypot(to.x - from.x, to.y - from.y) || 1;
+    const trim = 22;
+    return { ...arrow, x1: from.x, y1: from.y, x2: to.x - ((to.x - from.x) / length) * trim, y2: to.y - ((to.y - from.y) / length) * trim };
+  });
 
   return (
     /*
@@ -699,7 +717,15 @@ export default function Board({
                     hover:brightness-105
                   `}
                   >
-                    {reviewAnnotation && (reviewAnnotation.from === square || reviewAnnotation.to === square) && <span className="pointer-events-none absolute inset-0 z-[12] ring-4 ring-inset" style={{ color: qualityColor(reviewAnnotation.quality), boxShadow: `inset 0 0 0 4px ${qualityColor(reviewAnnotation.quality)}, inset 0 0 24px ${qualityColor(reviewAnnotation.quality)}77` }} />}
+                    {annotationMarks.filter((mark) => mark.square === square).map((mark, index) =>
+                      mark.kind === "outline" ? (
+                        <span key={`mark-${index}`} className="pointer-events-none absolute inset-0 z-[12]" style={{ opacity: mark.opacity, boxShadow: `inset 0 0 0 3px ${mark.color}, inset 0 0 18px ${mark.color}66` }} />
+                      ) : (
+                        <span key={`mark-${index}`} className="pointer-events-none absolute inset-0 z-[12] grid place-items-center" style={{ opacity: mark.opacity }}>
+                          <span className="h-[30%] w-[30%] rounded-full border-2 border-dashed" style={{ borderColor: mark.color, background: `${mark.color}1f` }} />
+                        </span>
+                      ),
+                    )}
                     {isDraftSetupSquare && (
                       <span
                         className="
@@ -1734,7 +1760,7 @@ export default function Board({
                         inset-0
                         z-[3]
                         bg-[radial-gradient(circle,rgba(239,68,68,0.85)_0%,rgba(185,28,28,0.52)_45%,rgba(127,29,29,0.05)_80%)]
-                        shadow-[inset_0_0_20px_rgba(239,68,68,0.85)]
+                        shadow-[inset_0_0_0_3px_#ef4444,inset_0_0_20px_rgba(239,68,68,0.85)]
                       "
                       />
                     )}
@@ -1889,6 +1915,8 @@ export default function Board({
                     {displayRow === 7 && (
                       <span
                         style={{
+                          fontSize: coordinateFontSize,
+
                           opacity: orientationAnimating ? 0 : 1,
 
                           transition: "opacity 120ms ease",
@@ -1899,7 +1927,6 @@ export default function Board({
                         bottom-1
                         right-1.5
                         z-20
-                        text-[clamp(8px,1vw,12px)]
                         font-black
 
                         ${isLight ? "text-[#66452f]/70" : "text-[#f1ddbe]/70"}
@@ -1917,6 +1944,8 @@ export default function Board({
                     {displayColumn === 0 && (
                       <span
                         style={{
+                          fontSize: coordinateFontSize,
+
                           opacity: orientationAnimating ? 0 : 1,
 
                           transition: "opacity 120ms ease",
@@ -1927,7 +1956,6 @@ export default function Board({
                         left-1.5
                         top-1
                         z-20
-                        text-[clamp(8px,1vw,12px)]
                         font-black
 
                         ${isLight ? "text-[#66452f]/70" : "text-[#f1ddbe]/70"}
@@ -1936,12 +1964,43 @@ export default function Board({
                         {rank}
                       </span>
                     )}
-                    {reviewAnnotation?.to === square && <span className="pointer-events-none absolute right-1 top-1 z-[32] grid h-6 w-6 place-items-center rounded-full border border-white/35 bg-[#06131e] shadow-lg" style={{ color: qualityColor(reviewAnnotation.quality), boxShadow: `0 0 12px ${qualityColor(reviewAnnotation.quality)}` }}><ReviewQualityIcon quality={reviewAnnotation.quality} size={14} /></span>}
+                    {annotationBadges.filter((badge) => badge.square === square).map((badge, index) => (
+                      // Top-left, opposite the quality icon in the top-right.
+                      <span
+                        key={`badge-${index}`}
+                        className="pointer-events-none absolute left-1 top-1 z-[31] grid h-6 w-6 place-items-center rounded-full border border-white/35 bg-[#06131e] shadow-lg"
+                        style={{ color: badge.color, boxShadow: `0 0 10px ${badge.color}aa` }}
+                      >
+                        <Shield size={14} strokeWidth={2.5} />
+                      </span>
+                    ))}
+                    {annotationIcon?.square === square && (
+                      <span
+                        title={ui(annotationIcon.quality)}
+                        className="group/quality absolute right-1 top-1 z-[32] grid h-6 w-6 place-items-center rounded-full border border-white/35 bg-[#06131e] shadow-lg transition-[transform,box-shadow] duration-200 ease-out hover:scale-110 motion-reduce:transition-none"
+                        style={{ color: qualityColor(annotationIcon.quality), boxShadow: `0 0 10px ${qualityColor(annotationIcon.quality)}aa` }}
+                      >
+                        <ReviewQualityIcon quality={annotationIcon.quality} size={14} />
+                      </span>
+                    )}
                   </button>
                 );
               }),
             )}
-            {reviewAnnotation && reviewFrom && reviewTo && <svg className="pointer-events-none absolute inset-0 z-[8] h-full w-full" viewBox="0 0 800 800" aria-hidden="true"><defs><marker id={arrowId} markerWidth="4" markerHeight="4" refX="3" refY="2" orient="auto"><path d="M0,0 L4,2 L0,4 Z" fill={qualityColor(reviewAnnotation.quality)} /></marker></defs><line x1={reviewFrom.x} y1={reviewFrom.y} x2={reviewTo.x} y2={reviewTo.y} stroke={qualityColor(reviewAnnotation.quality)} strokeWidth="12" strokeLinecap="round" markerEnd={`url(#${arrowId})`} opacity=".84" /></svg>}
+            {annotationArrows.length > 0 && (
+              <svg className="pointer-events-none absolute inset-0 z-[8] h-full w-full" viewBox="0 0 800 800" aria-hidden="true">
+                <defs>
+                  {annotationArrows.map((arrow, index) => (
+                    <marker key={index} id={`${arrowId}-${index}`} markerWidth="4" markerHeight="4" refX="1.5" refY="2" orient="auto">
+                      <path d="M0,0 L4,2 L0,4 Z" fill={arrow.color} />
+                    </marker>
+                  ))}
+                </defs>
+                {annotationArrows.map((arrow, index) => (
+                  <line key={index} x1={arrow.x1} y1={arrow.y1} x2={arrow.x2} y2={arrow.y2} stroke={arrow.color} strokeWidth="6" strokeLinecap="round" markerEnd={`url(#${arrowId}-${index})`} opacity={arrow.opacity} />
+                ))}
+              </svg>
+            )}
           </div>
         </div>
       </div>

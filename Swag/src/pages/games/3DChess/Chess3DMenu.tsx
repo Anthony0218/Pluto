@@ -18,7 +18,7 @@ export default function Chess3DMenu() {
       <div className="pointer-events-none absolute right-[-42px] top-[16%] text-[265px] leading-none text-violet-100/[0.025]">♜</div>
 
       <div className="relative flex min-h-[var(--app-height)] w-full flex-col">
-        <ChessPageHeader className="chess-menu-header" title="3D Chess" icon={<img src="/images/chess3d-icon.png" alt="" className="h-7 w-7 rounded-md object-cover" />} />
+        <ChessPageHeader className="chess-menu-header" title="3D Chess" />
         <section className="grid min-h-0 flex-1 lg:grid-cols-[minmax(340px,.82fr)_minmax(520px,1.18fr)]">
           <header className="relative flex min-h-[360px] flex-col justify-center px-7 py-12 sm:px-10 lg:min-h-0 lg:px-14 xl:px-20">
             <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-px bg-gradient-to-b from-transparent via-white/10 to-transparent lg:block" />

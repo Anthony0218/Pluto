@@ -6,6 +6,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { supabase } from "../../../lib/supabase";
 import { useAuth } from "../../../context/AuthContext";
 import { ProfileAvatar } from "../../../components/social/ProfileAvatarPicker.tsx";
+import { ColorChoice, ReadyButton, type PlayerColor } from "../../../components/chess/RoomColorControls";
 
 type ChessRoom = {
   id: string;
@@ -20,7 +21,10 @@ type RoomPlayer = {
   user_id: string;
   seat: number;
   display_name: string;
+  preferred_color?: "white" | "black" | null;
+  ready?: boolean;
 };
+
 
 type ProfileRow = {
   id: string;
@@ -75,6 +79,8 @@ export default function ChessMultiplayerRoom() {
   const [loading, setLoading] = useState(true);
   const [starting, setStarting] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [colorSaving, setColorSaving] = useState(false);
+  const [readySaving, setReadySaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const currentUserAvatarId =
@@ -101,7 +107,7 @@ export default function ChessMultiplayerRoom() {
 
     const { data: playerData, error: playerError } = await supabase
       .from("chess_room_players")
-      .select("room_id, user_id, seat, display_name")
+      .select("*")
       .eq("room_id", loadedRoom.id)
       .order("seat", { ascending: true });
 
@@ -214,6 +220,46 @@ export default function ChessMultiplayerRoom() {
     }
   }
 
+  async function chooseColor(color: PlayerColor | null) {
+    if (!room || colorSaving) return;
+
+    setColorSaving(true);
+    setError(null);
+
+    const { error: colorError } = await supabase.rpc("set_chess_room_color", {
+      p_room_id: room.id,
+      p_color: color,
+    });
+
+    if (colorError) {
+      console.error(colorError);
+      setError(colorError.message);
+    }
+
+    await loadRoom();
+    setColorSaving(false);
+  }
+
+  async function setReady(ready: boolean) {
+    if (!room || readySaving) return;
+
+    setReadySaving(true);
+    setError(null);
+
+    const { error: readyError } = await supabase.rpc("set_chess_room_ready", {
+      p_room_id: room.id,
+      p_ready: ready,
+    });
+
+    if (readyError) {
+      console.error(readyError);
+      setError(readyError.message);
+    }
+
+    await loadRoom();
+    setReadySaving(false);
+  }
+
   async function copyCode() {
     if (!room) return;
 
@@ -255,10 +301,20 @@ export default function ChessMultiplayerRoom() {
 
   if (!room) return null;
 
+  const isCasual = room.match_kind === "casual";
+  const isHost = room.host_id === user?.id;
+  const myPlayer = players.find((player) => player.user_id === user?.id);
+  const opponent = players.find((player) => player.user_id !== user?.id);
+  const inSetup = room.status === "waiting" || room.status === "ready";
+  const canChooseColor = isCasual && inSetup && Boolean(myPlayer);
+  const myColor = myPlayer?.preferred_color ?? null;
+  const myReady = Boolean(myPlayer?.ready);
+  const bothReady = players.length === 2 && players.every((player) => player.ready);
+  // Ranked rooms keep their seat order; ranked colors are revealed in the game.
   const white = players.find((player) => player.seat === 0);
   const black = players.find((player) => player.seat === 1);
-  const isHost = room.host_id === user?.id;
-  const roomReady = players.length === 2 || room.status === "ready";
+  const host = players.find((player) => player.user_id === room.host_id);
+  const guest = players.find((player) => player.user_id !== room.host_id);
 
   return (
     <ChessPageShell>
@@ -306,64 +362,106 @@ export default function ChessMultiplayerRoom() {
         <div className="relative flex min-h-[620px] items-center border-t border-white/[0.06] px-5 py-8 sm:px-8 lg:min-h-0 lg:border-t-0 lg:px-10 lg:py-12 xl:px-14 2xl:px-20">
           <div className="mx-auto flex w-full max-w-[980px] flex-col gap-4 xl:gap-5">
             <div className="grid gap-4 sm:grid-cols-2">
-              <PlayerCard
-                player={white}
-                avatarId={white ? avatarIdsByUserId[white.user_id] : undefined}
-                currentUserId={user?.id}
-                label={white?.user_id === user?.id ? "White · You" : "White"}
-                pieceSymbol="♙"
-                highlighted={Boolean(white)}
-                canInvite={room.status === "waiting" && !white}
-              />
-
-              <PlayerCard
-                player={black}
-                avatarId={black ? avatarIdsByUserId[black.user_id] : undefined}
-                currentUserId={user?.id}
-                label={black?.user_id === user?.id ? "Black · You" : "Black"}
-                pieceSymbol="♟"
-                highlighted={Boolean(black)}
-                canInvite={room.status === "waiting" && !black}
-              />
+              {isCasual ? (
+                <>
+                  <PlayerCard
+                    player={host}
+                    avatarId={host ? avatarIdsByUserId[host.user_id] : undefined}
+                    label={host?.user_id === user?.id ? "Host · You" : "Host"}
+                    color={host?.preferred_color ?? null}
+                    ready={Boolean(host?.ready)}
+                  />
+                  <PlayerCard
+                    player={guest}
+                    avatarId={guest ? avatarIdsByUserId[guest.user_id] : undefined}
+                    label={guest?.user_id === user?.id ? "Guest · You" : "Guest"}
+                    color={guest?.preferred_color ?? null}
+                    ready={Boolean(guest?.ready)}
+                    canInvite={room.status === "waiting" && !guest}
+                  />
+                </>
+              ) : (
+                <>
+                  <PlayerCard
+                    player={white}
+                    avatarId={white ? avatarIdsByUserId[white.user_id] : undefined}
+                    label={white?.user_id === user?.id ? "Seat 1 · You" : "Seat 1"}
+                  />
+                  <PlayerCard
+                    player={black}
+                    avatarId={black ? avatarIdsByUserId[black.user_id] : undefined}
+                    label={black?.user_id === user?.id ? "Seat 2 · You" : "Seat 2"}
+                    canInvite={room.status === "waiting" && !black}
+                  />
+                </>
+              )}
             </div>
+
+            {canChooseColor && (
+              <section className="rounded-[22px] border border-white/[0.09] bg-black/20 p-5 shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md sm:p-6">
+                <div className="flex items-baseline justify-between gap-3">
+                  <p className="text-[9px] font-black uppercase tracking-[0.28em] text-amber-300/65">{ui("Your color")}</p>
+                  <p className="text-[11px] text-zinc-600">{ui("Tick a color · untick it to free it")}</p>
+                </div>
+                <ColorChoice
+                  myColor={myColor}
+                  opponentColor={opponent?.preferred_color ?? null}
+                  opponentName={opponent?.display_name ?? null}
+                  disabled={colorSaving}
+                  onChange={(color) => void chooseColor(color)}
+                />
+              </section>
+            )}
 
             <section className="rounded-[22px] border border-white/[0.09] bg-black/20 p-5 shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md sm:p-6 xl:p-7">
               <p className="text-[9px] font-black uppercase tracking-[0.28em] text-amber-300/65">{ui("Room status")}</p>
 
               <h2 className="mt-2 font-serif text-[27px] leading-tight text-white sm:text-[31px]">
-                {room.status === "ready" ? ui("Both players are ready") : room.status === "playing" ? ui("Game is starting") : ui("Waiting for another player")}
+                {room.status === "playing"
+                  ? ui("Game is starting")
+                  : players.length < 2
+                    ? ui("Waiting for another player")
+                    : !isCasual || bothReady
+                      ? ui("Both players are ready")
+                      : ui("Waiting for both players to be ready")}
               </h2>
 
               <p className="mt-2 text-sm leading-6 text-zinc-500">
-                {room.status === "ready" ? isHost ? ui("Your opponent is here. Start whenever you are ready.") : ui("Both seats are occupied. Waiting for the host to start.") : room.status === "playing" ? ui("Opening the synchronized board...") : ui("The second player card will fill automatically when your opponent joins.")}
+                {room.status === "playing"
+                  ? ui("Opening the synchronized board...")
+                  : players.length < 2
+                    ? ui("The second player card will fill automatically when your opponent joins.")
+                    : !isCasual || bothReady
+                      ? isHost ? ui("Your opponent is here. Start whenever you are ready.") : ui("Both seats are occupied. Waiting for the host to start.")
+                      : ui("Each player picks a different color and presses Ready. Then the host can start.")}
               </p>
 
-              {room.status === "waiting" && (
-                <button
-                  type="button"
-                  disabled
-                  className="mt-6 flex w-full items-center justify-between rounded-xl border border-white/[0.08] bg-white/[0.02] px-4 py-3.5 text-sm font-black text-zinc-700"
-                >
-                  <span>{ui("Start Game")}</span>
-                  <span>→</span>
-                </button>
+              {isCasual && inSetup && myPlayer && (
+                <ReadyButton
+                  ready={myReady}
+                  hasColor={Boolean(myColor)}
+                  saving={readySaving}
+                  onToggle={() => void setReady(!myReady)}
+                />
               )}
 
-              {room.status === "ready" &&
+              {inSetup &&
                 (isHost ? (
                   <button
                     type="button"
-                    disabled={starting || !roomReady}
+                    disabled={starting || players.length < 2 || (isCasual && !bothReady)}
                     onClick={startGame}
-                    className="group mt-6 flex w-full items-center justify-between rounded-xl border border-amber-300/45 bg-amber-300/[0.06] px-4 py-3.5 text-sm font-black text-amber-200 transition hover:bg-amber-300/[0.10] disabled:opacity-40"
+                    className="group mt-3 flex w-full items-center justify-between rounded-xl border border-amber-300/45 bg-amber-300/[0.06] px-4 py-3.5 text-sm font-black text-amber-200 transition hover:bg-amber-300/[0.10] disabled:cursor-not-allowed disabled:border-white/[0.08] disabled:bg-white/[0.02] disabled:text-zinc-600"
                   >
                     <span>{starting ? ui("Starting...") : ui("Start Game")}</span>
-                    <span className="text-xl transition group-hover:translate-x-1">
-                      →
-                    </span>
+                    <span className="text-xl transition group-enabled:group-hover:translate-x-1">→</span>
                   </button>
                 ) : (
-                  <div className="mt-6 rounded-xl border border-white/[0.08] bg-white/[0.025] px-4 py-3 text-sm text-zinc-500">{ui("Waiting for host...")}</div>
+                  players.length === 2 && (
+                    <div className="mt-3 rounded-xl border border-white/[0.08] bg-white/[0.025] px-4 py-3 text-sm text-zinc-500">
+                      {!isCasual || bothReady ? ui("Waiting for host...") : ui("The host can start once both players are ready.")}
+                    </div>
+                  )
                 ))}
 
               {room.status === "playing" && (
@@ -386,22 +484,21 @@ export default function ChessMultiplayerRoom() {
 function PlayerCard({
   player,
   avatarId,
-  currentUserId,
   label,
-  pieceSymbol,
-  highlighted,
+  color,
+  ready,
   canInvite = false,
 }: {
   player: RoomPlayer | undefined;
   avatarId?: string;
-  currentUserId: string | undefined;
   label: string;
-  pieceSymbol: string;
-  highlighted: boolean;
+  color?: PlayerColor | null;
+  ready?: boolean;
   canInvite?: boolean;
 }) {
   useUiLanguage();
-  const isCurrentUser = player?.user_id === currentUserId;
+  const highlighted = Boolean(player);
+  const symbol = color === "black" ? "♚" : color === "white" ? "♔" : "♙";
 
   return (
     <section
@@ -425,7 +522,7 @@ function PlayerCard({
               className="block h-full w-full"
             />
           ) : (
-            <span>{pieceSymbol}</span>
+            <span>{symbol}</span>
           )}
         </div>
 
@@ -439,21 +536,48 @@ function PlayerCard({
           </p>
 
           <h2 className="mt-1.5 truncate font-serif text-[25px] leading-tight text-white sm:text-[29px]">
-            {player?.display_name ?? "Waiting..."}
+            {player?.display_name ?? ui("Waiting...")}
           </h2>
 
-          <div className="mt-2 flex items-center gap-2 text-xs text-zinc-500">
-            <span
-              className={`h-2 w-2 rounded-full ${
-                player
-                  ? "bg-emerald-400 shadow-[0_0_10px_rgba(74,222,128,.45)]"
-                  : "bg-zinc-700"
-              }`}
-            />
-            <span>
-              {player ? isCurrentUser ? ui("You are ready") : ui("Player joined") : ui("Waiting for player")}
-            </span>
-          </div>
+          {player && color !== undefined && (
+            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+              <span
+                className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-bold ${
+                  color === "white"
+                    ? "border-zinc-200/30 bg-zinc-100/10 text-zinc-100"
+                    : color === "black"
+                      ? "border-zinc-500/40 bg-black/40 text-zinc-300"
+                      : "border-dashed border-white/15 text-zinc-500"
+                }`}
+              >
+                {color && <span aria-hidden="true">{symbol}</span>}
+                {color === "white" ? ui("White") : color === "black" ? ui("Black") : ui("No color")}
+              </span>
+              <span
+                className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-bold ${
+                  ready
+                    ? "border-emerald-400/30 bg-emerald-400/[0.08] text-emerald-200"
+                    : "border-white/10 text-zinc-500"
+                }`}
+              >
+                <span className={`h-1.5 w-1.5 rounded-full ${ready ? "bg-emerald-400" : "bg-zinc-600"}`} />
+                {ready ? ui("Ready") : ui("Not ready")}
+              </span>
+            </div>
+          )}
+
+          {(!player || color === undefined) && (
+            <div className="mt-2 flex items-center gap-2 text-xs text-zinc-500">
+              <span
+                className={`h-2 w-2 rounded-full ${
+                  player
+                    ? "bg-emerald-400 shadow-[0_0_10px_rgba(74,222,128,.45)]"
+                    : "bg-zinc-700"
+                }`}
+              />
+              <span>{player ? ui("Player joined") : ui("Waiting for player")}</span>
+            </div>
+          )}
           {canInvite && <button type="button" onClick={() => window.dispatchEvent(new Event("open-room-friends"))} className="mt-3 rounded-lg border border-amber-300/40 bg-amber-300/10 px-3 py-2 text-xs font-bold text-amber-200 transition hover:bg-amber-300/20 focus-visible:outline-2 focus-visible:outline-amber-300">{ui("Invite Friend")}</button>}
         </div>
       </div>

@@ -1,7 +1,7 @@
 import { useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { Button, GridList, GridListItem, I18nProvider, useDragAndDrop } from "react-aria-components";
-import { ArrowDown, ArrowRight, ArrowUp, Gamepad2, GripVertical, Pencil, Swords, Trophy, Users } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUp, Check, Gamepad2, GripVertical, Pencil, Swords, Trophy, Users } from "lucide-react";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { reorderFavorites } from "@/data/dashboard";
 
@@ -12,33 +12,51 @@ const actions = [
   { id: "ranked", label: "Play competitive (Chess)", detail: "Climb the ranked ladder", route: "/games/chess/ranked", Icon: Trophy },
 ] as const;
 
+/** Saved order plus an editable draft: changes only persist on Save and Cancel restores the saved order. */
 function useStoredOrder(key: string, defaults: string[]) {
-  const [order, setOrder] = useState<string[]>(() => {
+  const [saved, setSaved] = useState<string[]>(() => {
     try {
-      const saved: unknown = JSON.parse(localStorage.getItem(key) || "null");
-      if (Array.isArray(saved)) {
-        const valid = [...new Set(saved.filter((id): id is string => typeof id === "string" && defaults.includes(id)))];
+      const stored: unknown = JSON.parse(localStorage.getItem(key) || "null");
+      if (Array.isArray(stored)) {
+        const valid = [...new Set(stored.filter((id): id is string => typeof id === "string" && defaults.includes(id)))];
         return [...valid, ...defaults.filter(id => !valid.includes(id))];
       }
     } catch { /* Use the default order when storage is unavailable. */ }
     return defaults;
   });
-  function save(next: string[]) {
-    setOrder(next);
-    try { localStorage.setItem(key, JSON.stringify(next)); } catch { /* Reordering still works for this visit. */ }
+  const [draft, setDraft] = useState<string[] | null>(null);
+  const editing = draft !== null;
+  const order = draft ?? saved;
+  function start() { setDraft(saved); }
+  function cancel() { setDraft(null); }
+  function save() {
+    if (!draft) return;
+    setSaved(draft);
+    setDraft(null);
+    try { localStorage.setItem(key, JSON.stringify(draft)); } catch { /* Reordering still works for this visit. */ }
   }
   function move(id: string, direction: -1 | 1) {
-    const index = order.indexOf(id);
-    const nextIndex = index + direction;
-    if (index < 0 || nextIndex < 0 || nextIndex >= order.length) return;
-    const next = [...order];
-    [next[index], next[nextIndex]] = [next[nextIndex], next[index]];
-    save(next);
+    setDraft(current => {
+      if (!current) return current;
+      const index = current.indexOf(id);
+      const nextIndex = index + direction;
+      if (index < 0 || nextIndex < 0 || nextIndex >= current.length) return current;
+      const next = [...current];
+      [next[index], next[nextIndex]] = [next[nextIndex], next[index]];
+      return next;
+    });
   }
   function reorder(keys: Set<string>, target: string, position: "before" | "after") {
-    save(reorderFavorites(order, keys, target, position));
+    setDraft(current => current && reorderFavorites(current, keys, target, position));
   }
-  return { order, move, reorder };
+  return { order, editing, start, cancel, save, move, reorder };
+}
+
+function CustomizeControls({ editing, onStart, onCancel, onSave }: { editing: boolean; onStart: () => void; onCancel: () => void; onSave: () => void }) {
+  return <div className="flex shrink-0 gap-2">
+    {editing ? <><button type="button" className="dash-button" onClick={onCancel}>{ui("Cancel")}</button><button type="button" className="dash-button primary" onClick={onSave}><Check size={14} />{ui("Save")}</button></>
+      : <button type="button" className="dash-button" onClick={onStart}><Pencil size={14} />{ui("Customize")}</button>}
+  </div>;
 }
 
 function MoveControls({ label, first, last, onMove }: { label: string; first: boolean; last: boolean; onMove: (direction: -1 | 1) => void }) {
@@ -54,9 +72,8 @@ export default function DashboardActionRow({ userId }: { userId?: string }) {
 }
 
 function SortableActionRow({ userId }: { userId?: string }) {
-  const [editing, setEditing] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
-  const { order, move, reorder } = useStoredOrder(`pluto-dashboard-actions-${userId ?? "guest"}`, actions.map(action => action.id));
+  const { order, editing, start, cancel, save, move, reorder } = useStoredOrder(`pluto-dashboard-actions-${userId ?? "guest"}`, actions.map(action => action.id));
   const orderedActions = order.map(id => actions.find(item => item.id === id)).filter((item): item is (typeof actions)[number] => Boolean(item));
   const { dragAndDropHooks } = useDragAndDrop({
     getItems: keys => [...keys].map(key => ({ "text/plain": String(key) })),
@@ -70,8 +87,8 @@ function SortableActionRow({ userId }: { userId?: string }) {
     isDisabled: !editing,
   });
   return <section className="dashboard-actions" aria-labelledby="dashboard-actions-title">
-    <div className="dash-section-heading"><h2 id="dashboard-actions-title">{ui("Play together")}</h2><button type="button" className="dash-button" aria-pressed={editing} onClick={() => setEditing(value => !value)}><Pencil size={14} />{ui(editing ? "Done" : "Customize")}</button></div>
-    <GridList ref={gridRef} aria-label={ui("Reorder play together actions")} items={orderedActions} layout="grid" orientation="horizontal" selectionMode="none" dragAndDropHooks={dragAndDropHooks} className="dashboard-actions-grid dashboard-sortable-grid">
+    <div className="dash-section-heading"><h2 id="dashboard-actions-title">{ui("Play together")}</h2><CustomizeControls editing={editing} onStart={start} onCancel={cancel} onSave={save} /></div>
+    <GridList ref={gridRef} dependencies={[editing, order]} aria-label={ui("Reorder play together actions")} items={orderedActions} layout="grid" orientation="horizontal" selectionMode="none" dragAndDropHooks={dragAndDropHooks} className="dashboard-actions-grid dashboard-sortable-grid">
       {(action) => {
         const index = order.indexOf(action.id);
         const content = <><action.Icon size={27} aria-hidden="true" /><span><strong>{ui(action.label)}</strong><small>{ui(action.detail)}</small></span><ArrowRight size={18} aria-hidden="true" /></>;
@@ -90,9 +107,8 @@ export function DashboardContentGrid({ userId, sections }: { userId?: string; se
 }
 
 function SortableContentGrid({ userId, sections }: { userId?: string; sections: { id: string; label: string; content: ReactNode }[] }) {
-  const [editing, setEditing] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
-  const { order, move, reorder } = useStoredOrder(`pluto-dashboard-panels-${userId ?? "guest"}`, sections.map(section => section.id));
+  const { order, editing, start, cancel, save, move, reorder } = useStoredOrder(`pluto-dashboard-panels-${userId ?? "guest"}`, sections.map(section => section.id));
   const orderedSections = order.map(id => sections.find(item => item.id === id)).filter((item): item is (typeof sections)[number] => Boolean(item));
   const { dragAndDropHooks } = useDragAndDrop({
     getItems: keys => [...keys].map(key => ({ "text/plain": String(key) })),
@@ -106,8 +122,8 @@ function SortableContentGrid({ userId, sections }: { userId?: string; sections: 
     isDisabled: !editing,
   });
   return <section className="dashboard-content" aria-labelledby="dashboard-content-title">
-    <div className="dash-section-heading"><h2 id="dashboard-content-title">{ui("Your dashboard")}</h2><button type="button" className="dash-button" aria-pressed={editing} onClick={() => setEditing(value => !value)}><Pencil size={14} />{ui(editing ? "Done" : "Customize")}</button></div>
-    <GridList ref={gridRef} aria-label={ui("Reorder dashboard panels")} items={orderedSections} layout="grid" orientation="horizontal" selectionMode="none" dragAndDropHooks={dragAndDropHooks} className="dashboard-content-grid dashboard-sortable-grid">
+    <div className="dash-section-heading"><h2 id="dashboard-content-title">{ui("Your dashboard")}</h2><CustomizeControls editing={editing} onStart={start} onCancel={cancel} onSave={save} /></div>
+    <GridList ref={gridRef} dependencies={[editing, order, sections]} aria-label={ui("Reorder dashboard panels")} items={orderedSections} layout="grid" orientation="horizontal" selectionMode="none" dragAndDropHooks={dragAndDropHooks} className="dashboard-content-grid dashboard-sortable-grid">
       {(section) => {
         const index = order.indexOf(section.id);
         return <GridListItem id={section.id} data-section-id={section.id} textValue={ui(section.label)} className={`dashboard-content-item${editing ? " editing" : ""}`}>

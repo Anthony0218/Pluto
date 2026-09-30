@@ -1,4 +1,5 @@
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import {
@@ -44,6 +45,7 @@ import type {
   VariantRoom,
   VariantRoomPlayer,
 } from "@/games/chess/multiplayer/variantMultiplayerTypes";
+import VariantRoomSetup from "./VariantRoomSetup";
 
 type Props = {
   variant: Extract<MultiplayerVariantId, "randomstart" | "complete-chaos">;
@@ -1091,6 +1093,17 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
         .join(" ")
     : "—";
 
+  if (room.status === "waiting") {
+    return (
+      <VariantRoomSetup
+        roomId={room.id}
+        variantName={page.title}
+        lobbyPath={page.lobby}
+        onStarted={() => void loadRoom(true)}
+      />
+    );
+  }
+
   return (
     <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1460px]">
@@ -1396,78 +1409,38 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                 title={ui("Move History")}
                 subtitle={`${historyRows.length} plies · click to preview`}
               >
-                <div className="max-h-[380px] overflow-y-auto rounded-xl border border-white/5 bg-black/20">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setHistoryPreviewPly(0);
-                      clearSelection();
-                    }}
-                    className={`flex w-full items-center justify-between border-b border-white/5 px-3 py-2.5 text-left text-xs transition ${
-                      historyPreviewPly === 0
-                        ? page.accentSelected
-                        : "text-zinc-500 hover:bg-white/5"
-                    }`}
-                  >
-                    <span>{ui("Start")}</span>
-                    <span className="font-black">{ui("Initial position")}</span>
-                  </button>
-
-                  {historyRows.length === 0 ? (
-                    <p className="px-4 py-7 text-center text-xs text-zinc-600">{ui("No moves yet")}</p>
-                  ) : (
-                    <table className="w-full border-collapse text-left">
-                      <thead className="sticky top-0 bg-zinc-950/95 text-[9px] font-black uppercase tracking-wider text-zinc-600 backdrop-blur">
-                        <tr>
-                          <th className="px-3 py-2">{ui("Move")}</th>
-                          <th className="px-2 py-2">{ui("Side")}</th>
-                          <th className="px-3 py-2 text-right">{ui("Played")}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {historyRows.map((row) => {
-                          const selected = historyPreviewPly === row.ply;
-
-                          return (
-                            <tr
-                              key={row.ply}
-                              tabIndex={0}
-                              onClick={() => {
-                                setHistoryPreviewPly(row.ply);
-                                clearSelection();
-                              }}
-                              onKeyDown={(event) => {
-                                if (
-                                  event.key === "Enter" ||
-                                  event.key === " "
-                                ) {
-                                  setHistoryPreviewPly(row.ply);
-                                  clearSelection();
-                                }
-                              }}
-                              className={`cursor-pointer border-b border-white/5 transition last:border-0 ${
-                                selected
-                                  ? page.accentSelected
-                                  : "text-zinc-400 hover:bg-white/5"
-                              }`}
-                            >
-                              <td className="px-3 py-2.5 text-[10px] text-zinc-600">
-                                {row.moveNumber}
-                                {row.color === "w" ? "." : "..."}
-                              </td>
-                              <td className="px-2 py-2.5 text-lg">
-                                {row.color === "w" ? "♔" : "♚"}
-                              </td>
-                              <td className="px-3 py-2.5 text-right font-mono text-xs font-black">
-                                {row.san}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  )}
-                </div>
+                <ChessMoveHistoryList
+                  listClassName="max-h-[380px] rounded-xl border border-white/5 bg-black/20"
+                  selectedPly={historyPreviewPly}
+                  emptyLabel="No moves yet"
+                  leading={
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setHistoryPreviewPly(0);
+                        clearSelection();
+                      }}
+                      className={`flex w-full items-center justify-between border-b border-white/5 px-3 py-2.5 text-left text-xs transition ${
+                        historyPreviewPly === 0
+                          ? page.accentSelected
+                          : "text-zinc-500 hover:bg-white/5"
+                      }`}
+                    >
+                      <span>{ui("Start")}</span>
+                      <span className="font-black">{ui("Initial position")}</span>
+                    </button>
+                  }
+                  entries={historyRows.map((row) => ({
+                    ply: row.ply,
+                    side: row.color,
+                    moveNumber: row.moveNumber,
+                    content: <span className="truncate font-mono text-xs font-black text-zinc-200">{row.san}</span>,
+                  }))}
+                  onSelect={(ply) => {
+                    setHistoryPreviewPly(ply);
+                    clearSelection();
+                  }}
+                />
 
                 {historyPreviewPly !== null && (
                   <p className="mt-2 text-[10px] leading-4 text-zinc-600">{ui("Preview is local only. It never changes the multiplayer game state.")}</p>

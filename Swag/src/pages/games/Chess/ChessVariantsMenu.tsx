@@ -734,7 +734,7 @@ function VariantPreviewCarousel({ language }: { language: Language }) {
         {previewOrder.map((variant, index) => (
           <article
             key={`${variant.id}-${index}`}
-            className="min-w-full p-5 sm:p-6 lg:p-7"
+            className="variant-slide min-w-full p-5 sm:p-6 lg:p-7"
           >
             <div className="grid min-h-[374px] gap-5 md:grid-cols-[minmax(0,1fr)_44%]">
               <div className="relative z-10 flex min-w-0 flex-col py-1">
@@ -748,17 +748,18 @@ function VariantPreviewCarousel({ language }: { language: Language }) {
                   </span>
                 </div>
 
-                <p className="mt-7 text-[10px] font-black uppercase tracking-[0.30em] text-amber-300/90">
+                {/* Fixed-height regions keep the play and navigation buttons in the same place for every variant. */}
+                <p className="mt-5 h-4 truncate text-[10px] font-black uppercase tracking-[0.30em] text-amber-300/90">
                   {t(language, variant.subtitle)}
                 </p>
-                <h2 className="mt-2 font-serif text-4xl leading-[1.02] tracking-[-0.025em] text-white sm:text-5xl">
+                <h2 className="variant-slide-title mt-2 line-clamp-2 h-[2.1em] overflow-hidden font-serif text-4xl leading-[1.02] tracking-[-0.025em] text-white sm:text-5xl">
                   {t(language, variant.title)}
                 </h2>
-                <p className="mt-4 max-w-xl font-serif text-[16px] leading-7 text-zinc-300/80">
+                <p className="variant-slide-desc mt-3 line-clamp-3 h-[5.25rem] max-w-xl font-serif text-[16px] leading-7 text-zinc-300/80">
                   {t(language, variant.description)}
                 </p>
 
-                <div className="mt-5 flex flex-wrap gap-2">
+                <div className="variant-slide-tags mt-4 flex h-[26px] flex-wrap gap-2 overflow-hidden">
                   {variant.tags.slice(0, 3).map((tag) => (
                     <span
                       key={tag}
@@ -769,12 +770,13 @@ function VariantPreviewCarousel({ language }: { language: Language }) {
                   ))}
                 </div>
 
-                <div className="mt-6 grid grid-cols-2 gap-2">
-                  {variant.aiRoute ? <Link to={variant.aiRoute} className="flex min-h-11 items-center justify-center rounded-xl border border-amber-300/55 bg-amber-300 px-3 text-center text-xs font-black text-black shadow-lg shadow-amber-500/15 transition hover:bg-amber-200">{t(language, "Singleplayer")}</Link> : <span aria-disabled="true" className="flex min-h-11 items-center justify-center rounded-xl border border-white/10 bg-white/[.04] px-3 text-center text-xs font-bold text-zinc-600">{t(language, "Singleplayer")}</span>}
-                  {variant.multiplayerRoute ? <Link to={variant.multiplayerRoute} className="flex min-h-11 items-center justify-center rounded-xl border border-fuchsia-300/40 bg-fuchsia-300/15 px-3 text-center text-xs font-black text-fuchsia-100 transition hover:bg-fuchsia-300/25">{ui("Multiplayer")}</Link> : <span aria-disabled="true" className="flex min-h-11 items-center justify-center rounded-xl border border-white/10 bg-white/[.04] px-3 text-center text-xs font-bold text-zinc-600">{ui("Multiplayer")}</span>}
+                <div className="variant-slide-actions mt-5 grid gap-2">
+                  {variant.aiRoute ? <Link to={variant.aiRoute} className="flex min-h-10 items-center justify-center rounded-xl border border-amber-300/55 bg-amber-300 px-3 text-center text-xs font-black text-black shadow-lg shadow-amber-500/15 transition hover:bg-amber-200">{t(language, "Singleplayer")}</Link> : <span aria-disabled="true" className="flex min-h-10 items-center justify-center rounded-xl border border-white/10 bg-white/[.04] px-3 text-center text-xs font-bold text-zinc-600">{t(language, "Singleplayer")}</span>}
+                  {variant.multiplayerRoute ? <Link to={variant.multiplayerRoute} className="flex min-h-10 items-center justify-center rounded-xl border border-fuchsia-300/40 bg-fuchsia-300/15 px-3 text-center text-xs font-black text-fuchsia-100 transition hover:bg-fuchsia-300/25">{ui("Multiplayer")}</Link> : <span aria-disabled="true" className="flex min-h-10 items-center justify-center rounded-xl border border-white/10 bg-white/[.04] px-3 text-center text-xs font-bold text-zinc-600">{ui("Multiplayer")}</span>}
+                  {variant.route && <Link to={variant.route} className="flex min-h-10 items-center justify-center rounded-xl border border-white/20 bg-white/[.06] px-3 text-center text-xs font-black text-zinc-100 transition hover:bg-white/[.12]">{variant.id === "3d-chess" ? ui("Play") : t(language, "Hotseat")}</Link>}
                 </div>
 
-                <div className="mt-auto flex items-end gap-3 pt-6">
+                <div className="variant-slide-nav mt-auto flex items-end gap-3 pt-5">
                   <button
                     type="button"
                     onClick={() => goTo(previewIndex - 1)}
@@ -794,7 +796,7 @@ function VariantPreviewCarousel({ language }: { language: Language }) {
                 </div>
               </div>
 
-              <div className="relative hidden overflow-hidden rounded-[14px] border border-white/10 md:block">
+              <div className="variant-slide-art relative hidden overflow-hidden rounded-[14px] border border-white/10 md:block">
                 <VariantArtwork variant={variant} />
               </div>
             </div>

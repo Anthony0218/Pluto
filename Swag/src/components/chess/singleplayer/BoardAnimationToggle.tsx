@@ -1,73 +1,33 @@
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useChessSettings } from "../../../context/ChessSettingsContext";
 
+/** Compact switch for the header of every hotseat page: animate the board flip between turns. */
 export default function BoardAnimationToggle() {
   useUiLanguage();
-  const { boardAnimationEnabled, setBoardAnimationEnabled } =
-    useChessSettings();
+  const { boardAnimationEnabled, setBoardAnimationEnabled } = useChessSettings();
 
   return (
-    <div
-      className="
-      chess-animation-control
-      flex
-      items-center
-      justify-between
-      gap-3
-      rounded-xl
-      border
-      border-white/10
-      bg-black/20
-      px-3
-      py-2.5
-    "
+    <button
+      type="button"
+      role="switch"
+      aria-checked={boardAnimationEnabled}
+      title={ui("Animate board rotation")}
+      onClick={() => setBoardAnimationEnabled((enabled) => !enabled)}
+      className="chess-animation-control flex items-center gap-2 rounded-lg border border-white/15 px-3 py-2 text-sm text-zinc-200 transition hover:border-amber-300/50 focus-visible:outline-2 focus-visible:outline-amber-300"
     >
-      <div className="min-w-0">
-        <p className="text-xs font-bold text-zinc-200">{ui("Board animation")}</p>
-
-        <p className="mt-0.5 text-[10px] text-zinc-500">{ui("Animate board rotation")}</p>
-      </div>
-
-      <button
-        type="button"
-        onClick={() => setBoardAnimationEnabled((enabled) => !enabled)}
-        aria-label={ui("Animate board rotation")}
-        aria-pressed={boardAnimationEnabled}
-        className={`
-          relative
-          h-7
-          w-12
-          shrink-0
-          rounded-full
-          border
-          transition-colors
-          duration-200
-
-          ${
-            boardAnimationEnabled
-              ? "border-amber-300/40 bg-amber-400"
-              : "border-white/10 bg-zinc-700"
-          }
-        `}
+      <span className="whitespace-nowrap">{ui("Board animation")}</span>
+      <span
+        aria-hidden="true"
+        className={`relative h-5 w-9 shrink-0 rounded-full border transition-colors duration-200 ${
+          boardAnimationEnabled ? "border-amber-300/40 bg-amber-400" : "border-white/10 bg-zinc-700"
+        }`}
       >
         <span
-          className={`
-            absolute
-            left-1
-            top-1/2
-            h-5
-            w-5
-            -translate-y-1/2
-            rounded-full
-            bg-white
-            shadow-md
-            transition-transform
-            duration-200
-
-            ${boardAnimationEnabled ? "translate-x-5" : "translate-x-0"}
-          `}
+          className={`absolute left-0.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 rounded-full bg-white shadow-md transition-transform duration-200 ${
+            boardAnimationEnabled ? "translate-x-4" : "translate-x-0"
+          }`}
         />
-      </button>
-    </div>
+      </span>
+    </button>
   );
 }

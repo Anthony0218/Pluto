@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { HeaderDescription } from "@/components/App/PublicHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import ShogiBoard from "../../../components/strategy/ShogiBoard";
 import type { BotDifficulty } from "../../../games/go/bot";
@@ -29,6 +30,7 @@ export default function ShogiGamePage({ mode }: { mode: "ai" | "hotseat" }) {
     ? `${ui(state.winner === "white" ? "White" : "Black")} ${ui(state.lastMove?.type === "resign" ? "wins by resignation" : state.check ? "wins by checkmate" : "wins (no legal moves)")}`
     : state.result ? ui(state.result) : null;
   return <main className="relative left-1/2 h-[var(--app-height)] w-screen -translate-x-1/2 overflow-hidden bg-[#07090b] px-3 py-3 text-zinc-100 sm:px-4 sm:py-4"><div className="mx-auto flex h-full max-w-7xl flex-col overflow-hidden">
+    {mode === "ai" && <HeaderDescription>{ui("Difficulty")}: {ui(difficulty[0].toUpperCase() + difficulty.slice(1))}</HeaderDescription>}
     <header className="mb-3 flex shrink-0 flex-wrap items-center justify-between gap-2"><Link to="/games/shogi" className="text-sm text-zinc-500 hover:text-white">← {ui("Shogi")}</Link><div className="flex gap-2">{mode === "ai" && <label className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm">{ui("Bot")} <select value={difficulty} onChange={(event) => setDifficulty(event.target.value as BotDifficulty)} className="ml-2 bg-transparent"><option className="bg-zinc-900" value="easy">{ui("Easy")}</option><option className="bg-zinc-900" value="medium">{ui("Medium")}</option><option className="bg-zinc-900" value="hard">{ui("Hard")}</option></select></label>}<button type="button" onClick={restart} className="rounded-xl bg-amber-400 px-4 py-2 font-bold text-black">{ui("New Game")}</button></div></header>
     <div className="grid min-h-0 flex-1 content-center gap-3 overflow-hidden lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-5"><section className="flex min-h-0 items-center justify-center"><ShogiBoard state={state} onMove={play} disabled={disabled} /></section>
       <aside className="space-y-2 overflow-hidden rounded-2xl border border-white/10 bg-white/[.035] p-3 lg:self-center lg:space-y-4 lg:rounded-3xl lg:p-5"><div className="hidden lg:block"><p className="text-xs font-black uppercase tracking-[.2em] text-amber-400">{ui("Standard Japanese rules")}</p><h1 className="mt-2 font-serif text-3xl">{ui("Shogi")} · {ui(mode === "ai" ? "Vs Bot" : "Hotseat")}</h1></div>

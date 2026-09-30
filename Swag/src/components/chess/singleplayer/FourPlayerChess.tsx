@@ -1,8 +1,9 @@
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
+import { FOUR_PLAYER_HISTORY_SIDES } from "../moveHistorySides";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 import {
-  LanguageSelector,
   translateChess,
   useChessLanguage,
   type TranslationTable,
@@ -24,7 +25,6 @@ import {
   type FourPlayerSquare,
   type FourPlayerState,
 } from "../../../games/chess/variants/fourPlayerChess";
-import BoardAnimationToggle from "./BoardAnimationToggle";
 import { chooseFourPlayerAiMove } from "../../../games/chess/ai/fourPlayerAi";
 import { type Difficulty } from "../../../games/chess/ai/variantAi";
 
@@ -250,7 +250,7 @@ export default function FourPlayerChess({
   difficulty = "casual",
 }: FourPlayerAiProps) {
   useUiLanguage();
-  const { language, setLanguage } = useChessLanguage();
+  const { language } = useChessLanguage();
   const t = (key: string) => translateChess(language, key, translations);
   const [state, setState] = useState<FourPlayerState>(
     createInitialFourPlayerState,
@@ -421,12 +421,6 @@ export default function FourPlayerChess({
             </div>
 
             <div className="flex flex-wrap items-center justify-end gap-2">
-              <LanguageSelector
-                language={language}
-                onChange={setLanguage}
-                label={t("Language")}
-              />
-
               {!state.winner && (
                 <div
                   className={`rounded-full border px-3 py-1.5 text-xs font-black ${
@@ -440,7 +434,6 @@ export default function FourPlayerChess({
                 </div>
               )}
             </div>
-            <BoardAnimationToggle />
           </div>
         </ChessPageHeader>
 
@@ -510,41 +503,18 @@ export default function FourPlayerChess({
                 title={t("Move History")}
                 subtitle={`${history.length} ${t("turns")}`}
               >
-                <div className="max-h-80 overflow-y-auto rounded-xl border border-white/5 bg-black/20">
-                  {history.length === 0 ? (
-                    <div className="px-4 py-8 text-center text-xs text-zinc-600">
-                      {t("No moves yet")}
-                    </div>
-                  ) : (
-                    history
-                      .slice()
-                      .reverse()
-                      .map((entry) => {
-                        const color = entry.state.lastMove?.color ?? "red";
-
-                        return (
-                          <div
-                            key={entry.index}
-                            className="flex items-center justify-between border-b border-white/5 px-3 py-2.5 last:border-0"
-                          >
-                            <span className="text-[10px] text-zinc-600">
-                              {entry.index}
-                            </span>
-
-                            <span
-                              className={`text-xs font-black ${playerStyles[color].text}`}
-                            >
-                              {t(fourPlayerLabel(color))}
-                            </span>
-
-                            <span className="font-mono text-xs text-zinc-300">
-                              {entry.notation}
-                            </span>
-                          </div>
-                        );
-                      })
-                  )}
-                </div>
+                <ChessMoveHistoryList
+                  sides={FOUR_PLAYER_HISTORY_SIDES}
+                  newestFirst
+                  listClassName="max-h-80 rounded-xl border border-white/5 bg-black/20"
+                  emptyLabel={t("No moves yet")}
+                  entries={history.map((entry) => ({
+                    ply: entry.index,
+                    side: entry.state.lastMove?.color ?? null,
+                    title: entry.notation,
+                    content: <span className="truncate font-mono text-[10px] font-bold text-zinc-300">{entry.notation}</span>,
+                  }))}
+                />
               </Panel>
             </div>
           </aside>

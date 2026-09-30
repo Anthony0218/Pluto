@@ -29,12 +29,11 @@ import {
 import { getWattenCardImage } from "@/utils/WattenCardImages";
 import CardThemeSelector from "@/components/Watten/WattenCardGameSelector";
 import TableThemeSelector from "@/components/App/TableThemeSelector";
+import { HeaderTools } from "@/components/App/PublicHeader";
 
 import {
-  setStoredWattenLanguage,
   translateWatten,
   translateWattenPair,
-  WattenLanguageSelector,
   type WattenLanguage,
 } from "@/games/watten/i18n/wattenLanguage";
 
@@ -599,7 +598,7 @@ function PriorityRow({
 }
 
 export default function WattenRule() {
-  const { language, setLanguage } = useAppLanguage();
+  const { language } = useAppLanguage();
   const t = useCallback(
     (key: string) => translateWatten(language, key),
     [language],
@@ -610,10 +609,6 @@ export default function WattenRule() {
     [language],
   );
 
-  function changeLanguage(next: WattenLanguage) {
-    setLanguage(next);
-    setStoredWattenLanguage(next);
-  }
 
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [situationMode, setSituationMode] = useState<SituationMode>("three");
@@ -758,13 +753,7 @@ export default function WattenRule() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <WattenLanguageSelector
-              language={language}
-              onChange={changeLanguage}
-              label={t("Language")}
-            />
-            <CardThemeSelector />
-            <TableThemeSelector />
+            <HeaderTools><CardThemeSelector /><TableThemeSelector /></HeaderTools>
           </div>
         </div>
         {/* HERO */}

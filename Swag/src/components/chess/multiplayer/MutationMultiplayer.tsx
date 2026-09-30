@@ -1,4 +1,5 @@
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { useVariantRecordAudio } from "@/games/chess/audio/useVariantRecordAudio";
 import { ui, useUiLanguage } from "@/i18n/ui";
@@ -39,6 +40,7 @@ import type {
   VariantRoom,
   VariantRoomPlayer,
 } from "@/games/chess/multiplayer/variantMultiplayerTypes";
+import VariantRoomSetup from "./VariantRoomSetup";
 
 type PromotionPiece = "q" | "r" | "b" | "n";
 type ActionLoading =
@@ -358,7 +360,6 @@ export function MutationMultiplayerLobby() {
   useUiLanguage();
   const navigate = useNavigate();
   const { user, profile } = useAuth();
-  const [hostColor, setHostColor] = useState<TwoPlayerColor>("white");
   const [joinCode, setJoinCode] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
   const [loading, setLoading] = useState<"create" | "join" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -380,7 +381,7 @@ export function MutationMultiplayerLobby() {
       {
         p_seed: createMutationSeed(),
         p_display_name: displayName,
-        p_host_color: hostColor,
+        p_host_color: "black",
       },
     );
 
@@ -426,24 +427,7 @@ export function MutationMultiplayerLobby() {
           </Panel>
         ) : (
           <div className="grid gap-5 lg:grid-cols-2">
-            <Panel title={ui("Create room")} subtitle={ui("Choose your side")}>
-              <div className="grid grid-cols-2 gap-2">
-                {(["white", "black"] as TwoPlayerColor[]).map((color) => (
-                  <button
-                    key={color}
-                    type="button"
-                    onClick={() => setHostColor(color)}
-                    className={`rounded-xl border px-4 py-3 font-black transition ${
-                      hostColor === color
-                        ? "border-violet-400/30 bg-violet-400/10 text-violet-200"
-                        : "border-white/10 bg-black/20 text-zinc-400 hover:bg-white/5"
-                    }`}
-                  >
-                    {color === "white" ? "♔" : "♚"}{" "}
-                    {color === "white" ? ui("White") : ui("Black")}
-                  </button>
-                ))}
-              </div>
+            <Panel title={ui("Create room")} subtitle={ui("Colors are picked in the room")}>
 
               <div className="mt-4 rounded-xl border border-violet-300/10 bg-violet-400/[0.05] p-3 text-xs leading-5 text-zinc-400">{ui("The room stores one mutation seed. Every 10 plies, both browsers derive the same legal mutation from that seed and the same board position.")}</div>
 
@@ -457,7 +441,7 @@ export function MutationMultiplayerLobby() {
               </button>
             </Panel>
 
-            <Panel title={ui("Join room")} subtitle={ui("You receive the opposite side")}>
+            <Panel title={ui("Join room")} subtitle={ui("Pick your color in the room")}>
               <input
                 value={joinCode}
                 onChange={(event) =>
@@ -1132,6 +1116,17 @@ export function MutationMultiplayerGame() {
 
   const activeTurnColor = liveGame.turn() === "w" ? "white" : "black";
 
+  if (room.status === "waiting") {
+    return (
+      <VariantRoomSetup
+        roomId={room.id}
+        variantName={"Mutation Chess"}
+        lobbyPath={"/games/chess/variants/mutation/multiplayer"}
+        onStarted={() => void loadRoom(true)}
+      />
+    );
+  }
+
   return (
     <div className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1500px]">
@@ -1420,54 +1415,35 @@ export function MutationMultiplayerGame() {
                 title={ui("Move History")}
                 subtitle={`${historyRows.length} plies · click to preview`}
               >
-                <div className="max-h-[470px] overflow-y-auto rounded-2xl border border-white/5 bg-black/20">
-                  <button
-                    type="button"
-                    onClick={() => setHistoryPreviewPly(0)}
-                    className={`w-full border-b border-white/5 px-3 py-2 text-left text-xs font-bold ${
-                      historyPreviewPly === 0
-                        ? "bg-violet-400/10 text-violet-200"
-                        : "text-zinc-500 hover:bg-white/5"
-                    }`}
-                  >{ui("Start · standard position")}</button>
-
-                  {historyRows.length === 0 ? (
-                    <p className="px-3 py-6 text-center text-xs text-zinc-700">{ui("No moves yet")}</p>
-                  ) : (
-                    historyRows.map((row) => (
-                      <button
-                        key={row.ply}
-                        type="button"
-                        onClick={() => setHistoryPreviewPly(row.ply)}
-                        className={`w-full border-b border-white/5 px-3 py-2.5 text-left last:border-0 ${
-                          historyPreviewPly === row.ply
-                            ? "bg-violet-400/10"
-                            : "hover:bg-white/5"
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="w-10 text-[10px] text-zinc-600">
-                            {row.moveNumber}
-                            {row.color === "w" ? "." : "..."}
-                          </span>
-                          <span className="font-mono text-xs font-black text-zinc-200">
-                            {row.san}
-                          </span>
-                          {row.mutation && (
-                            <span className="ml-auto rounded-full border border-fuchsia-400/20 bg-fuchsia-400/[0.08] px-2 py-0.5 text-[9px] font-black text-fuchsia-300">{ui("🧬 MUTATION")}</span>
-                          )}
-                        </div>
-                        {row.mutation && (
-                          <p className="mt-1 pl-[52px] text-[9px] text-zinc-600">
-                            {pieceNames[row.mutation.fromType]} →{" "}
-                            {pieceNames[row.mutation.toType]}{ui(" on")}{" "}
-                            {row.mutation.square}
-                          </p>
-                        )}
-                      </button>
-                    ))
-                  )}
-                </div>
+                <ChessMoveHistoryList
+                  listClassName="max-h-[470px] rounded-2xl border border-white/5 bg-black/20"
+                  selectedPly={historyPreviewPly}
+                  emptyLabel="No moves yet"
+                  leading={
+                    <button
+                      type="button"
+                      onClick={() => setHistoryPreviewPly(0)}
+                      className={`w-full border-b border-white/5 px-3 py-2 text-left text-xs font-bold ${
+                        historyPreviewPly === 0
+                          ? "bg-violet-400/10 text-violet-200"
+                          : "text-zinc-500 hover:bg-white/5"
+                      }`}
+                    >{ui("Start · standard position")}</button>
+                  }
+                  entries={historyRows.map((row) => ({
+                    ply: row.ply,
+                    side: row.color,
+                    moveNumber: row.moveNumber,
+                    title: row.mutation
+                      ? `${pieceNames[row.mutation.fromType]} → ${pieceNames[row.mutation.toType]} ${ui("on")} ${row.mutation.square}`
+                      : undefined,
+                    content: <span className="truncate font-mono text-xs font-black text-zinc-200">{row.san}</span>,
+                    trailing: row.mutation ? (
+                      <span className="rounded-full border border-fuchsia-400/20 bg-fuchsia-400/[0.08] px-1.5 py-0.5 font-black text-fuchsia-300">🧬</span>
+                    ) : null,
+                  }))}
+                  onSelect={setHistoryPreviewPly}
+                />
               </Panel>
             </div>
           </aside>

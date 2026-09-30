@@ -1,4 +1,5 @@
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { playChessSound, stopSound } from "@/games/chess/audio/chessAudio";
 import { useVariantRecordAudio } from "@/games/chess/audio/useVariantRecordAudio";
@@ -32,6 +33,7 @@ import {
   type HotPotatoState,
   type HotPotatoStates,
 } from "../../../games/chess/variants/HotPotato";
+import VariantRoomSetup from "./VariantRoomSetup";
 
 type PlayerColor = "white" | "black";
 type ChessSide = "w" | "b";
@@ -280,7 +282,6 @@ export function HotPotatoMultiplayerLobby() {
   const profileName = (profile as { username?: string | null } | null)
     ?.username;
   const [displayName, setDisplayName] = useState(profileName ?? "Player");
-  const [hostColor, setHostColor] = useState<PlayerColor>("white");
   const [joinCode, setJoinCode] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -296,7 +297,7 @@ export function HotPotatoMultiplayerLobby() {
         p_seed: seed,
         p_initial_state: initialStoredState(seed),
         p_display_name: displayName.trim() || "Player",
-        p_host_color: hostColor,
+        p_host_color: "black",
       },
     );
     setBusy(false);
@@ -351,18 +352,6 @@ export function HotPotatoMultiplayerLobby() {
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           <section className="rounded-2xl border border-white/5 bg-black/20 p-4">
             <h2 className="font-black">{ui("Create room")}</h2>
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              {(["white", "black"] as PlayerColor[]).map((color) => (
-                <button
-                  key={color}
-                  type="button"
-                  onClick={() => setHostColor(color)}
-                  className={`rounded-xl border px-3 py-3 font-black ${hostColor === color ? "border-orange-300/30 bg-orange-400/15" : "border-white/10 bg-white/5 text-zinc-400"}`}
-                >
-                  {color === "white" ? ui("♔ White") : ui("♚ Black")}
-                </button>
-              ))}
-            </div>
 
             <button
               type="button"
@@ -985,6 +974,17 @@ export function HotPotatoMultiplayerGame() {
       ? Boolean(gameState.black_rematch_ready)
       : Boolean(gameState.white_rematch_ready);
 
+  if (room.status === "waiting") {
+    return (
+      <VariantRoomSetup
+        roomId={room.id}
+        variantName={"Hot Potato Chess"}
+        lobbyPath={"/games/chess/variants/hot-potato/multiplayer"}
+        onStarted={() => void loadAll()}
+      />
+    );
+  }
+
   return (
     <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1460px]">
@@ -1042,33 +1042,23 @@ export function HotPotatoMultiplayerGame() {
               </div>
             </Panel>
             <Panel title={ui("Move History")}>
-              <div className="max-h-80 overflow-y-auto rounded-xl border border-white/5 bg-black/20">
-                {state.records.length === 0 ? (
-                  <p className="px-4 py-7 text-center text-xs text-zinc-600">{ui("No moves yet")}</p>
-                ) : (
-                  state.records.map((r) => (
-                    <button
-                      key={r.ply}
-                      type="button"
-                      onClick={() => {
-                        setHistoryPreviewPly(r.ply);
-                        clearSelection();
-                        setPromotion(null);
-                      }}
-                      className={`flex w-full items-center justify-between border-b border-white/5 px-3 py-2.5 text-left text-xs last:border-0 ${historyPreviewPly === r.ply ? "bg-orange-400/10 text-orange-200" : "text-zinc-400 hover:bg-white/5"}`}
-                    >
-                      <span>
-                        {r.moveNumber}
-                        {r.color === "w" ? "." : "..."} {r.san}
-                      </span>
-                      <span>
-                        {r.potatoTransferred ? "💣→" : ""}
-                        {r.explosionSquaresAfter.length ? "💥" : ""}
-                      </span>
-                    </button>
-                  ))
-                )}
-              </div>
+              <ChessMoveHistoryList
+                listClassName="max-h-80 rounded-xl border border-white/5 bg-black/20"
+                selectedPly={historyPreviewPly}
+                emptyLabel="No moves yet"
+                entries={state.records.map((record) => ({
+                  ply: record.ply,
+                  side: record.color,
+                  moveNumber: record.moveNumber,
+                  content: <span className="truncate font-mono text-xs font-bold text-zinc-200">{record.san}</span>,
+                  trailing: <span>{`${record.potatoTransferred ? "💣→" : ""}${record.explosionSquaresAfter.length ? "💥" : ""}`}</span>,
+                }))}
+                onSelect={(ply) => {
+                  setHistoryPreviewPly(ply);
+                  clearSelection();
+                  setPromotion(null);
+                }}
+              />
             </Panel>
           </aside>
 

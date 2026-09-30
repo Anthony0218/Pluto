@@ -1,4 +1,6 @@
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
+import { FOUR_PLAYER_HISTORY_SIDES } from "../moveHistorySides";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { chooseFourPlayerAiMove } from "@/games/chess/ai/fourPlayerAi";
@@ -1084,46 +1086,42 @@ function FourPlayerHistory({
   moves: string[];
   history: FourPlayerState[];
   selected: number | null;
-  onSelect: (index: number) => void;
+  onSelect: (index: number | null) => void;
 }) {
   useUiLanguage();
   return (
-    <div className="max-h-80 overflow-y-auto rounded-xl border border-white/5 bg-black/20">
-      <button
-        type="button"
-        onClick={() => onSelect(0)}
-        className={`flex w-full items-center justify-between border-b border-white/5 px-3 py-2.5 text-xs ${selected === 0 ? "bg-blue-400/10" : "hover:bg-white/5"}`}
-      >
-        <span className="text-zinc-600">0</span>
-        <span className="font-bold text-zinc-300">{ui("Initial position")}</span>
-      </button>
-      {moves.length === 0 ? (
-        <div className="px-4 py-6 text-center text-xs text-zinc-600">{ui("No actions yet")}</div>
-      ) : (
-        moves.map((notation, index) => {
-          const snapshot = history[index + 1];
-          const color = snapshot?.lastMove?.color;
-          return (
-            <button
-              key={`${index}-${notation}`}
-              type="button"
-              onClick={() => onSelect(index + 1)}
-              className={`flex w-full items-center justify-between gap-2 border-b border-white/5 px-3 py-2.5 text-left last:border-0 ${selected === index + 1 ? "bg-blue-400/10" : "hover:bg-white/5"}`}
-            >
-              <span className="w-6 text-[10px] text-zinc-600">{index + 1}</span>
-              <span
-                className={`min-w-14 text-xs font-black ${color ? playerStyles[color].text : "text-zinc-500"}`}
-              >
-                {color ? fourPlayerLabel(color) : ui("Event")}
-              </span>
-              <span className="truncate font-mono text-xs text-zinc-300">
-                {notation}
-              </span>
-            </button>
-          );
-        })
-      )}
-    </div>
+    <ChessMoveHistoryList
+      sides={FOUR_PLAYER_HISTORY_SIDES}
+      listClassName="max-h-80 rounded-xl border border-white/5 bg-black/20"
+      selectedPly={selected}
+      emptyLabel="No actions yet"
+      leading={
+        <button
+          type="button"
+          onClick={() => onSelect(0)}
+          className={`flex w-full items-center justify-between border-b border-white/5 px-3 py-2.5 text-xs ${selected === 0 ? "bg-blue-400/10" : "hover:bg-white/5"}`}
+        >
+          <span className="text-zinc-600">0</span>
+          <span className="font-bold text-zinc-300">{ui("Initial position")}</span>
+        </button>
+      }
+      entries={moves.map((notation, index) => {
+        const color = history[index + 1]?.lastMove?.color ?? null;
+        return {
+          ply: index + 1,
+          side: color,
+          title: notation,
+          content: color ? (
+            <span className="truncate font-mono text-[10px] font-bold text-zinc-300">{notation}</span>
+          ) : (
+            <span className="truncate text-xs text-zinc-400">
+              <span className="font-black text-zinc-500">{ui("Event")}</span> · {notation}
+            </span>
+          ),
+        };
+      })}
+      onSelect={onSelect}
+    />
   );
 }
 

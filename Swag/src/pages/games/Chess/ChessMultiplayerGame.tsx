@@ -27,6 +27,7 @@ import RankedClock from "@/components/chess/multiplayer/RankedClock";
 import { reconcileClock, type ClockSample } from "@/games/chess/ranked/clock";
 import { invokeRankedChess } from "@/games/chess/ranked/client";
 import { useAuth } from "../../../context/AuthContext.tsx";
+import ChessMoveHistoryList from "../../../components/chess/ChessMoveHistoryList.tsx";
 
 type ChessRoom = {
   id: string;
@@ -107,15 +108,6 @@ type MultiplayerGame = {
 
 type Language = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 
-const languageOptions: Array<{ value: Language; label: string }> = [
-  { value: "en", label: "English" },
-  { value: "de", label: "Deutsch" },
-  { value: "bar", label: "Boarisch" },
-  { value: "ko", label: "한국어" },
-  { value: "ru", label: "Русский" },
-  { value: "es", label: "Español" },
-  { value: "pt", label: "Português" },
-];
 
 const deTranslations: Record<string, string> = {
   "Undo request sent": "Rücknahme angefragt",
@@ -703,62 +695,6 @@ function translateChess(language: Language, key: string): string {
   return ui(key);
 }
 
-function ChessLanguageSelector({
-  language,
-  onChange,
-  label,
-}: {
-  language: Language;
-  onChange: (language: Language) => void;
-  label: string;
-}) {
-  useUiLanguage();
-  return (
-    <label
-      className="
-        flex
-        items-center
-        gap-2
-        rounded-full
-        border
-        border-white/10
-        bg-white/5
-        px-3
-        py-1.5
-        text-xs
-        font-bold
-        text-zinc-400
-      "
-    >
-      <span>🌐</span>
-      <span className="hidden lg:inline">{ui(label)}</span>
-      <select
-        value={language}
-        onChange={(event) => onChange(event.target.value as Language)}
-        className="
-          bg-transparent
-          text-xs
-          font-bold
-          text-zinc-200
-          outline-none
-          [color-scheme:dark]
-        "
-        aria-label={label}
-      >
-        {languageOptions.map((option) => (
-          <option
-            key={option.value}
-            value={option.value}
-            className="bg-zinc-900 text-zinc-100"
-          >
-            {ui(option.label)}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
-}
-
 const pieceValues: Record<string, number> = {
   p: 1,
   n: 3,
@@ -777,15 +713,8 @@ export default function ChessMultiplayerGame() {
 
   const { user, profile } = useAuth();
 
-  const { language, setLanguage } = useAppLanguage();
+  const { language } = useAppLanguage();
   const t = (key: string) => translateChess(language, key);
-
-  function changeLanguage(nextLanguage: Language) {
-    setLanguage(nextLanguage);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("chess-language", nextLanguage);
-    }
-  }
 
   const [room, setRoom] = useState<ChessRoom | null>(null);
 
@@ -853,7 +782,6 @@ export default function ChessMultiplayerGame() {
   const [moving, setMoving] = useState(false);
 
   const [error, setError] = useState<string | null>(null);
-  const [showChooseSidePrompt, setShowChooseSidePrompt] = useState(false);
 
   const [showResignConfirm, setShowResignConfirm] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
@@ -881,7 +809,7 @@ export default function ChessMultiplayerGame() {
   const [savedGamesOpen, setSavedGamesOpen] = useState(false);
 
   const [actionLoading, setActionLoading] = useState<
-    "resign" | "rematch" | "undo-request" | "undo-response" | "side" | null
+    "resign" | "rematch" | "undo-request" | "undo-response" | null
   >(null);
 
   const playerUserIdsKey = useMemo(
@@ -1273,39 +1201,6 @@ export default function ChessMultiplayerGame() {
     if (me) {
       setMySeat(me.seat);
     }
-  }
-
-  async function chooseSide(color: "white" | "black") {
-    if (
-      !room ||
-      !gameState ||
-      gameState.moves.length !== 0 ||
-      gameState.status !== "playing" ||
-      actionLoading
-    ) {
-      return;
-    }
-
-    setActionLoading("side");
-    setError(null);
-    setShowChooseSidePrompt(false);
-
-    const { error: sideError } = await supabase.rpc("choose_chess_side", {
-      p_room_id: room.id,
-      p_color: color,
-    });
-
-    if (sideError) {
-      console.error("choose_chess_side failed:", sideError);
-      setError(sideError.message);
-    }
-
-    await refreshRoomPlayers();
-    setSelectedSquare(null);
-    setLegalMoves([]);
-    setPromotionFrom(null);
-    setPromotionSquare(null);
-    setActionLoading(null);
   }
 
   function buildUndoSnapshot(moves: string[]) {
@@ -2053,16 +1948,6 @@ export default function ChessMultiplayerGame() {
 
     const clickedPiece = chess.get(square);
 
-    if (
-      room.match_kind !== "ranked" &&
-      gameState.moves.length === 0 &&
-      !players.find((player) => player.user_id === user?.id)?.chosen_color &&
-      clickedPiece?.color === myColor
-    ) {
-      setShowChooseSidePrompt(true);
-      return;
-    }
-
     /*
      * Only allow moves on our turn.
      */
@@ -2199,13 +2084,8 @@ export default function ChessMultiplayerGame() {
     Boolean(gameState.undo_requested_by) &&
     gameState.undo_requested_by !== user?.id;
 
-  const myPlayer = players.find((player) => player.user_id === user?.id);
-
   const opponentPlayer = players.find((player) => player.user_id !== user?.id);
 
-  const whiteClaimedByOpponent = opponentPlayer?.chosen_color === "white";
-
-  const blackClaimedByOpponent = opponentPlayer?.chosen_color === "black";
 
   /*
    * Only the player who made the latest move may request a takeback.
@@ -2279,14 +2159,6 @@ export default function ChessMultiplayerGame() {
               ? t("White has won!")
               : t("Black has won!"),
         detail: t(gameState.end_reason ?? ""),
-      };
-    }
-
-    if (showChooseSidePrompt && gameState.moves.length === 0 && !myPlayer?.chosen_color) {
-      return {
-        event: "info" as const,
-        message: t("First choose a side!"),
-        detail: t("Choose Side"),
       };
     }
 
@@ -2378,12 +2250,6 @@ export default function ChessMultiplayerGame() {
 
 
           <div className="flex flex-wrap items-center gap-2">
-            <ChessLanguageSelector
-              language={language}
-              onChange={changeLanguage}
-              label={t("Language")}
-            />
-
             <div
               className={`
               flex
@@ -2553,47 +2419,32 @@ export default function ChessMultiplayerGame() {
                     {gameState.moves.length}
                   </span>
                 </div>
-                <div className="max-h-64 min-h-0 flex-1 overflow-y-auto [scrollbar-width:thin] xl:max-h-none">
-                  {historyRows.length === 0 ? (
-                    <div className="px-4 py-8 text-center text-xs text-zinc-600">
-                      {t("No moves yet")}
-                    </div>
-                  ) : (
-                    <div className="divide-y divide-white/5">
-                      {historyRows.map((move) => {
-                        const selected = historyPreviewPly === move.ply;
-                        return (
-                          <button
-                            key={move.ply}
-                            type="button"
-                            onClick={() => {
-                              setHistoryPreviewPly(move.ply);
-                              setSelectedSquare(null);
-                              setLegalMoves([]);
-                              setPromotionFrom(null);
-                              setPromotionSquare(null);
-                            }}
-                            className={`flex w-full items-center gap-3 px-4 py-2.5 text-left transition hover:bg-white/[0.04] ${selected ? "bg-blue-400/10" : ""}`}
-                          >
-                            <span className="w-8 text-[10px] font-black text-zinc-600">
-                              {move.moveNumber}
-                              {move.color === "w" ? "." : "..."}
-                            </span>
-                            <span className="text-lg leading-none">
-                              {getMultiplayerHistoryPieceSymbol(
-                                move.color,
-                                move.piece,
-                              )}
-                            </span>
-                            <span className="font-mono text-xs font-bold text-zinc-200">
-                              {move.san}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
+                <ChessMoveHistoryList
+                  className="flex-1 px-2 pt-2"
+                  listClassName="max-h-64 xl:max-h-none"
+                  selectedPly={historyPreviewPly}
+                  emptyLabel={t("No moves yet")}
+                  entries={historyRows.map((move) => ({
+                    ply: move.ply,
+                    side: move.color,
+                    moveNumber: move.moveNumber,
+                    content: (
+                      <>
+                        <span className="text-base leading-none">
+                          {getMultiplayerHistoryPieceSymbol(move.color, move.piece)}
+                        </span>
+                        <span className="truncate font-mono text-xs font-bold text-zinc-200">{move.san}</span>
+                      </>
+                    ),
+                  }))}
+                  onSelect={(ply) => {
+                    setHistoryPreviewPly(ply);
+                    setSelectedSquare(null);
+                    setLegalMoves([]);
+                    setPromotionFrom(null);
+                    setPromotionSquare(null);
+                  }}
+                />
               </section>
 
               {/* SAVED GAMES */}
@@ -2793,21 +2644,6 @@ export default function ChessMultiplayerGame() {
 
           <section className="order-1 min-w-0 xl:order-2">
             <div className="mx-auto w-full max-w-[820px] xl:flex xl:max-w-none xl:flex-col">
-              <section className="mb-2 shrink-0 rounded-2xl border border-amber-400/30 bg-[#08111c]/90 px-4 py-2.5 text-center shadow-[0_0_40px_rgba(245,158,11,0.08)] backdrop-blur-xl">
-                <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-400">
-                  {t("Classic Chess")}
-                </p>
-                <h1 className="mt-1 font-serif text-3xl font-semibold text-[#f7ead0]">
-                  {t("Multiplayer")}
-                </h1>
-                <p className="mt-1 text-xs text-zinc-500">
-                  {t("Room")}{" "}
-                  <span className="font-black tracking-[0.18em] text-zinc-300">
-                    {room.code}
-                  </span>
-                </p>
-              </section>
-
               {/* ERROR */}
 
               {error && (
@@ -3072,105 +2908,6 @@ export default function ChessMultiplayerGame() {
                     </span>
                   </button>
 
-                  {room.match_kind !== "ranked" && gameState.status === "playing" &&
-                    gameState.moves.length === 0 && (
-                      <div
-                        className="
-                          mb-3
-                          rounded-2xl
-                          border
-                          border-white/10
-                          bg-black/20
-                          p-3
-                        "
-                      >
-                        <div className="flex items-center justify-between gap-3">
-                          <div>
-                            <p className="text-xs font-black text-zinc-200">
-                              {t("Choose Side")}
-                            </p>
-                            <p className="mt-1 text-[10px] leading-4 text-zinc-600">
-                              {t("Side selection locks after the first move.")}
-                            </p>
-                          </div>
-
-                          <span className="rounded-lg bg-white/5 px-2 py-1 text-[10px] font-bold text-zinc-500">
-                            {myPlayer?.chosen_color ? `${t("Chosen")}: ${
-                                  myPlayer.chosen_color === "white"
-                                    ? t("White")
-                                    : t("Black")
-                                }` : `${t("Current")}: ${
-                                  mySeat === 0 ? t("White") : t("Black")
-                                }`}
-                          </span>
-                        </div>
-
-                        <div className="mt-3 grid grid-cols-2 gap-2">
-                          <button
-                            type="button"
-                            disabled={
-                              actionLoading !== null || whiteClaimedByOpponent
-                            }
-                            onClick={() => void chooseSide("white")}
-                            className={`
-                              rounded-xl
-                              border
-                              px-3
-                              py-3
-                              text-sm
-                              font-black
-                              transition
-                              disabled:cursor-not-allowed
-                              disabled:opacity-35
-
-                              ${
-                                myPlayer?.chosen_color === "white"
-                                  ? "border-amber-400/30 bg-amber-400/15 text-amber-200"
-                                  : "border-white/10 bg-white/5 text-zinc-200 hover:bg-white/10"
-                              }
-                            `}
-                          >
-                            ♔ {t("White")}
-                          </button>
-
-                          <button
-                            type="button"
-                            disabled={
-                              actionLoading !== null || blackClaimedByOpponent
-                            }
-                            onClick={() => void chooseSide("black")}
-                            className={`
-                              rounded-xl
-                              border
-                              px-3
-                              py-3
-                              text-sm
-                              font-black
-                              transition
-                              disabled:cursor-not-allowed
-                              disabled:opacity-35
-
-                              ${
-                                myPlayer?.chosen_color === "black"
-                                  ? "border-amber-400/30 bg-amber-400/15 text-amber-200"
-                                  : "border-white/10 bg-white/5 text-zinc-200 hover:bg-white/10"
-                              }
-                            `}
-                          >
-                            ♚ {t("Black")}
-                          </button>
-                        </div>
-
-                        {(whiteClaimedByOpponent || blackClaimedByOpponent) && (
-                          <p className="mt-2 text-center text-[10px] text-zinc-600">
-                            {t(
-                              "A side already chosen by your opponent is locked.",
-                            )}
-                          </p>
-                        )}
-                      </div>
-                    )}
-
                   {gameState.status === "playing" &&
                     !gameState.undo_requested_by && (
                       <>
@@ -3395,99 +3132,31 @@ export default function ChessMultiplayerGame() {
                   </span>
                 </div>
 
-                <div className="max-h-[420px] overflow-y-auto rounded-2xl border border-white/5 bg-black/20">
-                  {historyRows.length === 0 ? (
-                    <div className="px-4 py-8 text-center text-xs text-zinc-600">
-                      {t("No moves yet")}
-                    </div>
-                  ) : (
-                    <table className="w-full border-collapse">
-                      <thead className="sticky top-0 z-10 bg-zinc-900">
-                        <tr className="border-b border-white/5 text-left text-[9px] font-black uppercase tracking-wider text-zinc-600">
-                          <th className="px-3 py-2">{t("Move")}</th>
-                          <th className="px-2 py-2">{t("Side")}</th>
-                          <th className="px-2 py-2">{t("Played")}</th>
-                        </tr>
-                      </thead>
-
-                      <tbody>
-                        {historyRows.map((move) => {
-                          const selected = historyPreviewPly === move.ply;
-
-                          return (
-                            <tr
-                              key={move.ply}
-                              tabIndex={0}
-                              onClick={() => {
-                                setHistoryPreviewPly(move.ply);
-                                setSelectedSquare(null);
-                                setLegalMoves([]);
-                                setPromotionFrom(null);
-                                setPromotionSquare(null);
-                              }}
-                              onKeyDown={(event) => {
-                                if (
-                                  event.key === "Enter" ||
-                                  event.key === " "
-                                ) {
-                                  setHistoryPreviewPly(move.ply);
-                                  setSelectedSquare(null);
-                                  setLegalMoves([]);
-                                  setPromotionFrom(null);
-                                  setPromotionSquare(null);
-                                }
-                              }}
-                              className={`
-                                cursor-pointer
-                                border-b
-                                border-white/5
-                                transition
-                                last:border-0
-                                ${
-                                  selected
-                                    ? "bg-blue-400/10"
-                                    : "hover:bg-white/5"
-                                }
-                              `}
-                            >
-                              <td className="px-3 py-2.5 text-[10px] text-zinc-600">
-                                {move.moveNumber}
-                                {move.color === "w" ? "." : "..."}
-                              </td>
-
-                              <td className="px-2 py-2.5">
-                                {move.color === "w" ? (
-                                  <span className="inline-flex items-center gap-1 rounded-full bg-[#fff3d5]/10 px-2 py-1 text-[9px] font-bold text-[#fff3d5]">
-                                    ♔ {t("White")}
-                                  </span>
-                                ) : (
-                                  <span className="inline-flex items-center gap-1 rounded-full bg-white/5 px-2 py-1 text-[9px] font-bold text-zinc-400">
-                                    ♚ {t("Black")}
-                                  </span>
-                                )}
-                              </td>
-
-                              <td className="px-2 py-2.5">
-                                <div className="flex items-center gap-2">
-                                  <span className="w-5 text-center text-lg leading-none">
-                                    {getMultiplayerHistoryPieceSymbol(
-                                      move.color,
-                                      move.piece,
-                                    )}
-                                  </span>
-
-                                  <span className="font-mono text-xs font-bold text-zinc-200">
-                                    {move.san}
-                                  </span>
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  )}
-                </div>
+                <ChessMoveHistoryList
+                  listClassName="max-h-[420px] rounded-2xl border border-white/5 bg-black/20"
+                  selectedPly={historyPreviewPly}
+                  emptyLabel={t("No moves yet")}
+                  entries={historyRows.map((move) => ({
+                    ply: move.ply,
+                    side: move.color,
+                    moveNumber: move.moveNumber,
+                    content: (
+                      <>
+                        <span className="text-base leading-none">
+                          {getMultiplayerHistoryPieceSymbol(move.color, move.piece)}
+                        </span>
+                        <span className="truncate font-mono text-xs font-bold text-zinc-200">{move.san}</span>
+                      </>
+                    ),
+                  }))}
+                  onSelect={(ply) => {
+                    setHistoryPreviewPly(ply);
+                    setSelectedSquare(null);
+                    setLegalMoves([]);
+                    setPromotionFrom(null);
+                    setPromotionSquare(null);
+                  }}
+                />
               </section>
 
               {/* GAME INFO */}

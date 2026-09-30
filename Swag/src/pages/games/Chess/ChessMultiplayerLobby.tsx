@@ -99,7 +99,8 @@ function ActionCard({
   );
 }
 
-export default function ChessMultiplayerLobby() {
+/** Create / join a private room, plus a short explanation; shared by the multiplayer menu tab and the standalone page. */
+export function FriendRoomPanel({ embedded = false }: { embedded?: boolean }) {
   useUiLanguage();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -182,6 +183,116 @@ export default function ChessMultiplayerLobby() {
 
   if (!user) {
     return (
+      <div className="mx-auto w-full max-w-[920px] rounded-[22px] border border-amber-300/35 bg-black/25 p-8 text-center shadow-[0_16px_40px_rgba(0,0,0,.24)] backdrop-blur-md">
+        <h2 className="font-serif text-[34px] leading-none tracking-[-0.03em] text-white">{ui("Sign in to play")}</h2>
+        <p className="mx-auto mt-4 max-w-[520px] text-sm leading-6 text-zinc-400">{ui("Online rooms are tied to your account so your name, avatar, and game can stay synchronized.")}</p>
+        <button type="button" onClick={() => navigate("/login")} className="mt-6 rounded-xl border border-amber-300/45 bg-amber-300/10 px-7 py-3.5 text-sm font-black text-amber-200 transition hover:bg-amber-300/15">{ui("Log in →")}</button>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`mx-auto flex w-full flex-col gap-4 xl:gap-5 ${embedded ? "max-w-[920px]" : "max-w-[980px]"}`}>
+      <div className={`grid gap-4 ${embedded ? "md:grid-cols-2" : "xl:grid-cols-2"}`}>
+        <ActionCard
+          active
+          icon="♔"
+          eyebrow={ui("Host a private game")}
+          title={ui("Create Room")}
+          description={ui("Create a new room and share the generated code with one friend.")}
+        >
+          <div className="mt-5 flex flex-wrap gap-2 text-[10px] font-black uppercase tracking-[0.16em] text-zinc-600">
+            <span className="rounded-full border border-white/[0.07] px-2.5 py-1">{ui("2 players")}</span>
+            <span className="rounded-full border border-white/[0.07] px-2.5 py-1">{ui("Private")}</span>
+            <span className="rounded-full border border-white/[0.07] px-2.5 py-1">{ui("Room code")}</span>
+          </div>
+
+          <button
+            type="button"
+            disabled={loading}
+            onClick={createRoom}
+            className="group mt-6 flex w-full items-center justify-between rounded-xl border border-amber-300/45 bg-amber-300/[0.06] px-4 py-3.5 text-sm font-black text-amber-200 transition hover:bg-amber-300/[0.10] disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <span>{ui("Create Room")}</span>
+            <span className="text-xl transition group-hover:translate-x-1">
+              →
+            </span>
+          </button>
+        </ActionCard>
+
+        <ActionCard
+          icon="♚"
+          eyebrow={ui("Enter an existing room")}
+          title={ui("Join Room")}
+          description={ui("Use the six-character code from the host to enter their room.")}
+        >
+          <label className="mt-5 block">
+            <span className="text-[9px] font-black uppercase tracking-[0.24em] text-zinc-600">{ui("Room code")}</span>
+            <input
+              value={roomCode}
+              onChange={(event) =>
+                setRoomCode(
+                  event.target.value
+                    .toUpperCase()
+                    .replace(/[^A-Z0-9]/g, "")
+                    .slice(0, 6),
+                )
+              }
+              placeholder={ui("ABC123")}
+              className="mt-2 w-full rounded-xl border border-white/[0.09] bg-black/30 px-4 py-3.5 font-mono text-xl font-black uppercase tracking-[0.22em] text-white outline-none transition placeholder:text-zinc-700 focus:border-amber-300/40 focus:bg-amber-300/[0.025]"
+            />
+          </label>
+
+          <button
+            type="button"
+            disabled={loading || roomCode.length !== 6}
+            onClick={joinRoom}
+            className="group mt-4 flex w-full items-center justify-between rounded-xl border border-white/[0.09] bg-white/[0.025] px-4 py-3.5 text-sm font-black text-zinc-300 transition hover:border-amber-300/30 hover:bg-amber-300/[0.04] hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <span>{ui("Join Room")}</span>
+            <span className="text-xl transition group-hover:translate-x-1">
+              →
+            </span>
+          </button>
+        </ActionCard>
+      </div>
+
+      <div className="rounded-[22px] border border-white/[0.08] bg-black/20 p-5 shadow-[0_16px_40px_rgba(0,0,0,.18)] backdrop-blur-md sm:p-6">
+        <p className="text-[9px] font-black uppercase tracking-[0.28em] text-amber-300/65">{ui("How it works")}</p>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div className="flex gap-4">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-amber-300/30 text-sm font-black text-amber-300">
+              1
+            </span>
+            <p className="text-sm leading-6 text-zinc-500">{ui("Create a room and send the code to your opponent.")}</p>
+          </div>
+
+          <div className="flex gap-4">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-amber-300/30 text-sm font-black text-amber-300">
+              2
+            </span>
+            <p className="text-sm leading-6 text-zinc-500">{ui("Once both players are inside, the host starts the game.")}</p>
+          </div>
+        </div>
+      </div>
+
+      {error && (
+        <div className="rounded-xl border border-red-400/20 bg-red-400/[0.05] px-4 py-3 text-sm text-red-200">
+          {ui(error)}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function ChessMultiplayerLobby() {
+  useUiLanguage();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  if (!user) {
+    return (
       <ChessPageShell>
         <section className="flex min-h-0 flex-1 items-center justify-center px-6 py-14">
           <div className="w-full max-w-[720px] rounded-[22px] border border-amber-300/35 bg-black/25 p-8 text-center shadow-[0_16px_40px_rgba(0,0,0,.24)] backdrop-blur-md sm:p-10">
@@ -225,97 +336,7 @@ export default function ChessMultiplayerLobby() {
         </header>
 
         <div className="relative flex min-h-[560px] items-center border-t border-white/[0.06] px-5 py-8 sm:px-8 lg:min-h-0 lg:border-t-0 lg:px-10 lg:py-12 xl:px-14 2xl:px-20">
-          <div className="mx-auto flex w-full max-w-[980px] flex-col gap-4 xl:gap-5">
-            <div className="grid gap-4 xl:grid-cols-2">
-              <ActionCard
-                active
-                icon="♔"
-                eyebrow={ui("Host a private game")}
-                title={ui("Create Room")}
-                description={ui("Create a new room and share the generated code with one friend.")}
-              >
-                <div className="mt-5 flex flex-wrap gap-2 text-[10px] font-black uppercase tracking-[0.16em] text-zinc-600">
-                  <span className="rounded-full border border-white/[0.07] px-2.5 py-1">{ui("2 players")}</span>
-                  <span className="rounded-full border border-white/[0.07] px-2.5 py-1">{ui("Private")}</span>
-                  <span className="rounded-full border border-white/[0.07] px-2.5 py-1">{ui("Room code")}</span>
-                </div>
-
-                <button
-                  type="button"
-                  disabled={loading}
-                  onClick={createRoom}
-                  className="group mt-6 flex w-full items-center justify-between rounded-xl border border-amber-300/45 bg-amber-300/[0.06] px-4 py-3.5 text-sm font-black text-amber-200 transition hover:bg-amber-300/[0.10] disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  <span>{ui("Create Room")}</span>
-                  <span className="text-xl transition group-hover:translate-x-1">
-                    →
-                  </span>
-                </button>
-              </ActionCard>
-
-              <ActionCard
-                icon="♚"
-                eyebrow={ui("Enter an existing room")}
-                title={ui("Join Room")}
-                description={ui("Use the six-character code from the host to enter their room.")}
-              >
-                <label className="mt-5 block">
-                  <span className="text-[9px] font-black uppercase tracking-[0.24em] text-zinc-600">{ui("Room code")}</span>
-                  <input
-                    value={roomCode}
-                    onChange={(event) =>
-                      setRoomCode(
-                        event.target.value
-                          .toUpperCase()
-                          .replace(/[^A-Z0-9]/g, "")
-                          .slice(0, 6),
-                      )
-                    }
-                    placeholder={ui("ABC123")}
-                    className="mt-2 w-full rounded-xl border border-white/[0.09] bg-black/30 px-4 py-3.5 font-mono text-xl font-black uppercase tracking-[0.22em] text-white outline-none transition placeholder:text-zinc-700 focus:border-amber-300/40 focus:bg-amber-300/[0.025]"
-                  />
-                </label>
-
-                <button
-                  type="button"
-                  disabled={loading || roomCode.length !== 6}
-                  onClick={joinRoom}
-                  className="group mt-4 flex w-full items-center justify-between rounded-xl border border-white/[0.09] bg-white/[0.025] px-4 py-3.5 text-sm font-black text-zinc-300 transition hover:border-amber-300/30 hover:bg-amber-300/[0.04] hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  <span>{ui("Join Room")}</span>
-                  <span className="text-xl transition group-hover:translate-x-1">
-                    →
-                  </span>
-                </button>
-              </ActionCard>
-            </div>
-
-            <div className="rounded-[22px] border border-white/[0.08] bg-black/20 p-5 shadow-[0_16px_40px_rgba(0,0,0,.18)] backdrop-blur-md sm:p-6">
-              <p className="text-[9px] font-black uppercase tracking-[0.28em] text-amber-300/65">{ui("How it works")}</p>
-
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <div className="flex gap-4">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-amber-300/30 text-sm font-black text-amber-300">
-                    1
-                  </span>
-                  <p className="text-sm leading-6 text-zinc-500">{ui("Create a room and send the code to your opponent.")}</p>
-                </div>
-
-                <div className="flex gap-4">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-amber-300/30 text-sm font-black text-amber-300">
-                    2
-                  </span>
-                  <p className="text-sm leading-6 text-zinc-500">{ui("Once both players are inside, the host starts the game.")}</p>
-                </div>
-              </div>
-            </div>
-
-            {error && (
-              <div className="rounded-xl border border-red-400/20 bg-red-400/[0.05] px-4 py-3 text-sm text-red-200">
-                {ui(error)}
-              </div>
-            )}
-          </div>
+          <FriendRoomPanel />
         </div>
       </section>
     </ChessPageShell>

@@ -1,4 +1,5 @@
 import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
@@ -40,7 +41,6 @@ import {
 } from "../../../games/chess/variants/mirrorStats.ts";
 
 import { useDelayedBoardOrientation } from "@/hooks/useDelayedBoardOrientation.ts";
-import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
 import { useVariantChessAi } from "@/hooks/useVariantChessAi";
 import {
   chessColorFromPlayerColor,
@@ -49,7 +49,6 @@ import {
   type ChessPlayerColor,
 } from "../../../games/chess/ai/variantAi.ts";
 
-type Language = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 
 type Phase = "setup" | "playing";
 
@@ -57,7 +56,6 @@ type Winner = "white" | "black" | "draw";
 
 type StatsTab = "setup" | "battle";
 
-const CHESS_LANGUAGE_STORAGE_KEY = "chess-language";
 
 const pieceValues: Record<string, number> = {
   p: 1,
@@ -366,7 +364,7 @@ export default function MirrorChessBoard({
   difficulty = "casual",
 }: VariantAiBoardProps) {
   useUiLanguage();
-  const { language, setLanguage } = useAppLanguage();
+  const { language } = useAppLanguage();
 
   const t = (key: string) => {
     if (language === "en") {
@@ -379,14 +377,6 @@ export default function MirrorChessBoard({
 
     return translations[language]?.[key] ?? ui(key);
   };
-
-  function changeLanguage(nextLanguage: Language) {
-    setLanguage(nextLanguage);
-
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(CHESS_LANGUAGE_STORAGE_KEY, nextLanguage);
-    }
-  }
 
   const [setupState, setSetupState] = useState<MirrorSetupState>(() =>
     createInitialMirrorSetupState(createMirrorSeed()),
@@ -1108,12 +1098,6 @@ export default function MirrorChessBoard({
 
 
           <div className="flex flex-wrap items-center justify-end gap-2">
-            <LanguageSelector
-              language={language}
-              onChange={changeLanguage}
-              label={t("Language")}
-            />
-
             {phase === "setup" && (
               <div className="rounded-full border border-violet-400/15 bg-violet-400/[0.06] px-3 py-1.5 text-xs font-black text-violet-200">
                 {setupFlipPending ? t("Switching sides...") : `${t("Placement turn")}: ${
@@ -1130,7 +1114,6 @@ export default function MirrorChessBoard({
               </div>
             )}
           </div>
-          <BoardAnimationToggle />
         </ChessPageHeader>
 
         {phase === "setup" && (
@@ -1628,56 +1611,30 @@ function MoveHistory({
 }: {
   records: MirrorMoveRecord[];
   selectedPly: number | null;
-  onSelect: (ply: number) => void;
+  onSelect: (ply: number | null) => void;
   emptyLabel: string;
 }) {
   useUiLanguage();
-  if (records.length === 0) {
-    return (
-      <div className="rounded-2xl border border-white/5 bg-black/20 px-4 py-8 text-center text-xs text-zinc-600">
-        {emptyLabel}
-      </div>
-    );
-  }
-
   return (
-    <div className="max-h-80 overflow-y-auto rounded-2xl border border-white/5 bg-black/20">
-      <table className="w-full border-collapse">
-        <tbody>
-          {records.map((record) => (
-            <tr
-              key={record.ply}
-              onClick={() => onSelect(record.ply)}
-              className={`
-                  cursor-pointer
-                  border-b
-                  border-white/5
-                  transition
-                  last:border-0
-                  ${
-                    selectedPly === record.ply
-                      ? "bg-blue-400/10"
-                      : "hover:bg-white/5"
-                  }
-                `}
-            >
-              <td className="px-3 py-2.5 text-[10px] text-zinc-600">
-                {record.moveNumber}
-                {record.color === "w" ? "." : "..."}
-              </td>
-
-              <td className="px-2 py-2.5 text-lg">
-                {record.color === "w" ? (whiteSymbols[record.piece] ?? "") : (blackSymbols[record.piece] ?? "")}
-              </td>
-
-              <td className="px-2 py-2.5 font-mono text-xs font-bold text-zinc-200">
-                {record.san}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <ChessMoveHistoryList
+      listClassName="max-h-80 rounded-2xl border border-white/5 bg-black/20"
+      selectedPly={selectedPly}
+      emptyLabel={emptyLabel}
+      entries={records.map((record) => ({
+        ply: record.ply,
+        side: record.color,
+        moveNumber: record.moveNumber,
+        content: (
+          <>
+            <span className="text-base leading-none">
+              {record.color === "w" ? (whiteSymbols[record.piece] ?? "") : (blackSymbols[record.piece] ?? "")}
+            </span>
+            <span className="truncate font-mono text-xs font-bold text-zinc-200">{record.san}</span>
+          </>
+        ),
+      }))}
+      onSelect={onSelect}
+    />
   );
 }
 
@@ -1846,33 +1803,3 @@ function GameOverBanner({
   );
 }
 
-function LanguageSelector({
-  language,
-  onChange,
-  label,
-}: {
-  language: Language;
-  onChange: (language: Language) => void;
-  label: string;
-}) {
-  useUiLanguage();
-  return (
-    <label className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-400">
-      <span>🌐</span>
-
-      <span className="hidden sm:inline">{ui(label)}</span>
-
-      <select
-        value={language}
-        onChange={(event) => onChange(event.target.value as Language)}
-        className="bg-transparent text-xs font-bold text-zinc-200 outline-none [color-scheme:dark]"
-      >
-        <option value="en">{ui("English")}</option>
-        <option value="de">{ui("Deutsch")}</option>
-        <option value="bar">{ui("Boarisch")}</option>
-        <option value="ko">한국어</option>
-        <option value="ru">Русский</option>
-      </select>
-    </label>
-  );
-}

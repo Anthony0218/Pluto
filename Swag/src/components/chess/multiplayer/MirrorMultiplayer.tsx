@@ -1,4 +1,5 @@
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import {
@@ -44,6 +45,7 @@ import type {
   VariantRoom,
   VariantRoomPlayer,
 } from "@/games/chess/multiplayer/variantMultiplayerTypes";
+import VariantRoomSetup from "./VariantRoomSetup";
 
 type PromotionPiece = "q" | "r" | "b" | "n";
 type ActionLoading =
@@ -296,7 +298,6 @@ export function MirrorMultiplayerLobby() {
   useUiLanguage();
   const navigate = useNavigate();
   const { user, profile } = useAuth();
-  const [hostColor, setHostColor] = useState<TwoPlayerColor>("white");
   const [joinCode, setJoinCode] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
   const [loading, setLoading] = useState<"create" | "join" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -321,7 +322,7 @@ export function MirrorMultiplayerLobby() {
         p_seed: seed,
         p_initial_state: { phase: "setup", setup },
         p_display_name: displayName,
-        p_host_color: hostColor,
+        p_host_color: "black",
       },
     );
 
@@ -365,23 +366,6 @@ export function MirrorMultiplayerLobby() {
         ) : (
           <div className="grid gap-5 lg:grid-cols-2">
             <Panel title={ui("Create room")} subtitle={ui("Choose which side you control")}>
-              <div className="grid grid-cols-2 gap-2">
-                {(["white", "black"] as TwoPlayerColor[]).map((color) => (
-                  <button
-                    key={color}
-                    type="button"
-                    onClick={() => setHostColor(color)}
-                    className={`rounded-xl border px-4 py-3 font-black transition ${
-                      hostColor === color
-                        ? "border-violet-400/30 bg-violet-400/10 text-violet-200"
-                        : "border-white/10 bg-black/20 text-zinc-400 hover:bg-white/5"
-                    }`}
-                  >
-                    {color === "white" ? "♔" : "♚"}{" "}
-                    {color === "white" ? ui("White") : ui("Black")}
-                  </button>
-                ))}
-              </div>
               <button
                 type="button"
                 disabled={loading !== null}
@@ -392,7 +376,7 @@ export function MirrorMultiplayerLobby() {
               </button>
             </Panel>
 
-            <Panel title={ui("Join room")} subtitle={ui("You receive the opposite side")}>
+            <Panel title={ui("Join room")} subtitle={ui("Pick your color in the room")}>
               <input
                 value={joinCode}
                 onChange={(event) =>
@@ -1129,6 +1113,17 @@ export function MirrorMultiplayerGame() {
   const mySetupTurn =
     myColor !== null && colorToSide(myColor) === setupState.turn;
 
+  if (room.status === "waiting") {
+    return (
+      <VariantRoomSetup
+        roomId={room.id}
+        variantName={"Mirror Chess"}
+        lobbyPath={"/games/chess/variants/mirror/multiplayer"}
+        onStarted={() => void loadRoom(true)}
+      />
+    );
+  }
+
   return (
     <div className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1500px]">
@@ -1429,33 +1424,25 @@ export function MirrorMultiplayerGame() {
                     ))}
                   </div>
                 ) : (
-                  <div className="max-h-[520px] overflow-y-auto rounded-2xl border border-white/5 bg-black/20">
-                    <button
-                      type="button"
-                      onClick={() => setHistoryPreviewPly(0)}
-                      className={`w-full border-b border-white/5 px-3 py-2 text-left text-xs font-bold ${historyPreviewPly === 0 ? "bg-violet-400/10 text-violet-200" : "text-zinc-500 hover:bg-white/5"}`}
-                    >{ui("Start · Mirrored position")}</button>
-                    {historyRows.length === 0 ? (
-                      <p className="px-3 py-6 text-center text-xs text-zinc-700">{ui("No moves yet")}</p>
-                    ) : (
-                      historyRows.map((row) => (
-                        <button
-                          key={row.ply}
-                          type="button"
-                          onClick={() => setHistoryPreviewPly(row.ply)}
-                          className={`flex w-full items-center gap-3 border-b border-white/5 px-3 py-2.5 text-left last:border-0 ${historyPreviewPly === row.ply ? "bg-violet-400/10" : "hover:bg-white/5"}`}
-                        >
-                          <span className="w-10 text-[10px] text-zinc-600">
-                            {row.moveNumber}
-                            {row.color === "w" ? "." : "..."}
-                          </span>
-                          <span className="font-mono text-xs font-black text-zinc-200">
-                            {row.san}
-                          </span>
-                        </button>
-                      ))
-                    )}
-                  </div>
+                  <ChessMoveHistoryList
+                    listClassName="max-h-[520px] rounded-2xl border border-white/5 bg-black/20"
+                    selectedPly={historyPreviewPly}
+                    emptyLabel="No moves yet"
+                    leading={
+                      <button
+                        type="button"
+                        onClick={() => setHistoryPreviewPly(0)}
+                        className={`w-full border-b border-white/5 px-3 py-2 text-left text-xs font-bold ${historyPreviewPly === 0 ? "bg-violet-400/10 text-violet-200" : "text-zinc-500 hover:bg-white/5"}`}
+                      >{ui("Start · Mirrored position")}</button>
+                    }
+                    entries={historyRows.map((row) => ({
+                      ply: row.ply,
+                      side: row.color,
+                      moveNumber: row.moveNumber,
+                      content: <span className="truncate font-mono text-xs font-black text-zinc-200">{row.san}</span>,
+                    }))}
+                    onSelect={setHistoryPreviewPly}
+                  />
                 )}
               </Panel>
 

@@ -27,17 +27,15 @@ import CardThemeSelector from "./WattenCardGameSelector";
 import { useCardTheme } from "@/context/CardThemeContext";
 import { getWattenCardImage } from "@/utils/WattenCardImages";
 import TableThemeSelector from "../App/TableThemeSelector";
+import { HeaderTools } from "@/components/App/PublicHeader";
 import { useTableTheme, type TableTheme } from "@/context/TableThemeContext";
 import { useAuth } from "@/context/AuthContext";
 import { ProfileAvatar } from "../social/ProfileAvatarPicker";
 import "./wattenGameScreen.css";
 
 import {
-  setStoredWattenLanguage,
   translateWatten,
   translateWattenPair,
-  WattenLanguageSelector,
-  type WattenLanguage,
 } from "@/games/watten/i18n/wattenLanguage";
 
 const tableBackgrounds: Record<TableTheme, string> = {
@@ -122,7 +120,7 @@ export default function WattenGame() {
   const { profile } = useAuth();
   const hostAvatarId = (profile as { avatar_id?: string | null } | null)?.avatar_id ?? "m1";
   const { tableTheme } = useTableTheme();
-  const { language, setLanguage } = useAppLanguage();
+  const { language } = useAppLanguage();
   const t = useCallback(
     (key: string) => translateWatten(language, key),
     [language],
@@ -133,10 +131,6 @@ export default function WattenGame() {
     [language],
   );
 
-  function changeLanguage(next: WattenLanguage) {
-    setLanguage(next);
-    setStoredWattenLanguage(next);
-  }
   const location = useLocation();
   const [phase, setPhase] = useState<
     | "setup"
@@ -1329,13 +1323,7 @@ export default function WattenGame() {
               >
                 {helpMode ? "💡 Help On" : "💡 Help"}
               </button>
-              <WattenLanguageSelector
-                language={language}
-                onChange={changeLanguage}
-                label={t("Language")}
-              />
-              <CardThemeSelector />
-              <TableThemeSelector />
+              <HeaderTools><CardThemeSelector /><TableThemeSelector /></HeaderTools>
 
               <Link
                 to="/watten/hotseat"
@@ -2908,8 +2896,7 @@ export default function WattenGame() {
           >
             {l("📖 Spielregeln", "📖 Rules")}
           </button>
-          <CardThemeSelector />
-          <TableThemeSelector />
+          <HeaderTools><CardThemeSelector /><TableThemeSelector /></HeaderTools>
           <Link
             to="/watten"
             className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium transition hover:bg-white/20"

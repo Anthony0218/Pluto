@@ -1,4 +1,5 @@
 import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
@@ -1889,59 +1890,19 @@ export default function PortalChessBoard({
             </Panel>
 
             <Panel title={t("Move History")}>
-              <div
-                className="
-                  max-h-[360px]
-                  space-y-1
-                  overflow-y-auto
-                  pr-1
-                "
-              >
-                {records.length === 0 ? (
-                  <p
-                    className="
-                      text-xs
-                      text-zinc-500
-                    "
-                  >
-                    {t("No moves yet")}
-                  </p>
-                ) : (
-                  records.map((record, index) => (
-                    <button
-                      key={record.ply}
-                      type="button"
-                      onClick={() => setHistoryPreviewPly(record.ply)}
-                      className={`
-                          flex
-                          w-full
-                          items-center
-                          justify-between
-                          rounded-lg
-                          px-2.5
-                          py-2
-                          text-left
-                          text-xs
-                          transition
-                          ${
-                            historyPreviewPly === record.ply
-                              ? "bg-violet-400/15 text-violet-100"
-                              : "bg-white/[0.03] text-zinc-300 hover:bg-white/[0.07]"
-                          }
-                        `}
-                    >
-                      <span>
-                        {Math.floor(index / 2) + 1}
-                        {record.color === "w" ? "." : "..."} {record.san}
-                      </span>
-
-                      {record.portalEvent && (
-                        <span>{effectIcon(record.portalEvent.effect)}</span>
-                      )}
-                    </button>
-                  ))
-                )}
-              </div>
+              <ChessMoveHistoryList
+                listClassName="max-h-[360px] pr-1"
+                selectedPly={historyPreviewPly}
+                emptyLabel={t("No moves yet")}
+                entries={records.map((record, index) => ({
+                  ply: record.ply,
+                  side: record.color,
+                  moveNumber: Math.floor(index / 2) + 1,
+                  content: <span className="truncate text-xs font-bold text-zinc-200">{record.san}</span>,
+                  trailing: record.portalEvent ? <span className="text-xs">{effectIcon(record.portalEvent.effect)}</span> : null,
+                }))}
+                onSelect={setHistoryPreviewPly}
+              />
             </Panel>
           </aside>
 

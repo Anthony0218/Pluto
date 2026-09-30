@@ -11,7 +11,6 @@ import { createTotalChaosPosition } from "@/games/chess/variants/totalChaosChess
 
 import type {
   MultiplayerVariantId,
-  TwoPlayerColor,
 } from "@/games/chess/multiplayer/variantMultiplayerTypes";
 
 type Props = {
@@ -64,7 +63,6 @@ export default function SeededVariantMultiplayerLobby({ variant }: Props) {
   const { user, profile } = useAuth();
   const info = variantInfo[variant];
 
-  const [hostColor, setHostColor] = useState<TwoPlayerColor>("white");
   const [joinCode, setJoinCode] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
   const [loading, setLoading] = useState<"create" | "join" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -108,7 +106,7 @@ export default function SeededVariantMultiplayerLobby({ variant }: Props) {
           p_initial_fen: initial.initialFen,
           p_seed: initial.seed,
           p_display_name: displayName,
-          p_host_color: hostColor,
+          p_host_color: "black",
         },
       );
 
@@ -189,28 +187,6 @@ export default function SeededVariantMultiplayerLobby({ variant }: Props) {
                 {ui(info.description)}
               </p>
 
-              <div className="mt-6">
-                <p className="mb-2 text-xs font-black text-zinc-400">{ui("Your color")}</p>
-
-                <div className="grid grid-cols-2 gap-2">
-                  {(["white", "black"] as TwoPlayerColor[]).map((color) => (
-                    <button
-                      key={color}
-                      type="button"
-                      onClick={() => setHostColor(color)}
-                      className={`rounded-xl border px-4 py-3 font-black transition ${
-                        hostColor === color
-                          ? info.selectedButton
-                          : "border-white/10 bg-black/20 text-zinc-400 hover:bg-white/5"
-                      }`}
-                    >
-                      {color === "white" ? "♔" : "♚"}{" "}
-                      {color[0].toUpperCase() + color.slice(1)}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               <button
                 type="button"
                 disabled={loading !== null}
@@ -226,7 +202,7 @@ export default function SeededVariantMultiplayerLobby({ variant }: Props) {
                 className={`text-xs font-black uppercase tracking-[0.2em] ${info.accentText}`}
               >{ui("Join room")}</p>
               <h2 className="mt-2 text-xl font-black">{ui("Enter room code")}</h2>
-              <p className="mt-2 text-sm leading-6 text-zinc-500">{ui("The second player automatically receives the opposite color.")}</p>
+              <p className="mt-2 text-sm leading-6 text-zinc-500">{ui("Both players pick their color in the room and press Ready.")}</p>
 
               <input
                 value={joinCode}

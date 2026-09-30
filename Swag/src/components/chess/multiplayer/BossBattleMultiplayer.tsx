@@ -1,4 +1,5 @@
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -42,6 +43,7 @@ import {
   type BossSide,
   type BossTargetMode,
 } from "../../../games/chess/variants/bossBattle";
+import VariantRoomSetup from "./VariantRoomSetup";
 
 type PlayerColor = "white" | "black";
 type PromotionPiece = "q" | "r" | "b" | "n";
@@ -332,7 +334,6 @@ export function BossBattleMultiplayerLobby() {
   const [displayName, setDisplayName] = useState(
     (profile as { username?: string | null } | null)?.username ?? "Player",
   );
-  const [hostColor, setHostColor] = useState<PlayerColor>("white");
   const [joinCode, setJoinCode] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
   const [busy, setBusy] = useState<"create" | "join" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -348,7 +349,7 @@ export function BossBattleMultiplayerLobby() {
       {
         p_initial_state: initialStoredState(),
         p_display_name: displayName.trim() || "Player",
-        p_host_color: hostColor,
+        p_host_color: "black",
       },
     );
 
@@ -421,29 +422,8 @@ export function BossBattleMultiplayerLobby() {
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <section className="rounded-2xl border border-white/5 bg-black/20 p-4">
               <h2 className="font-black">{ui("Create room")}</h2>
-              <p className="mt-1 text-xs text-zinc-500">{ui("Choose White or the Black Boss.")}</p>
+              <p className="mt-1 text-xs text-zinc-500">{ui("Pick White or the Black Boss in the room.")}</p>
 
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setHostColor("white")}
-                  className={`rounded-xl border px-3 py-3 text-sm font-black ${
-                    hostColor === "white"
-                      ? "border-zinc-200/30 bg-white/10 text-white"
-                      : "border-white/10 bg-white/5 text-zinc-500"
-                  }`}
-                >{ui("♔ White Army")}</button>
-
-                <button
-                  type="button"
-                  onClick={() => setHostColor("black")}
-                  className={`rounded-xl border px-3 py-3 text-sm font-black ${
-                    hostColor === "black"
-                      ? "border-violet-300/30 bg-violet-400/15 text-violet-100"
-                      : "border-white/10 bg-white/5 text-zinc-500"
-                  }`}
-                >{ui("♚ Boss")}</button>
-              </div>
 
               <button
                 type="button"
@@ -1340,6 +1320,17 @@ export function BossBattleMultiplayerGame() {
     }
   }
 
+  if (room.status === "waiting") {
+    return (
+      <VariantRoomSetup
+        roomId={room.id}
+        variantName={"Boss Battle"}
+        lobbyPath={"/games/chess/variants/boss/multiplayer"}
+        onStarted={() => void loadAll()}
+      />
+    );
+  }
+
   return (
     <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1460px]">
@@ -1413,35 +1404,24 @@ export function BossBattleMultiplayerGame() {
             </Panel>
 
             <Panel title={ui("Action History")}>
-              <div className="max-h-80 overflow-y-auto rounded-xl border border-white/5 bg-black/20">
-                {storedState.history.length === 0 ? (
-                  <p className="px-4 py-7 text-center text-xs text-zinc-600">{ui("No actions yet")}</p>
-                ) : (
-                  storedState.history.map((entry) => (
-                    <button
-                      key={entry.ply}
-                      type="button"
-                      onClick={() => {
-                        setHistoryPreviewPly(entry.ply);
-                        clearSelection();
-                        clearPowerTarget();
-                        setPendingPromotion(null);
-                      }}
-                      className={`flex w-full items-center justify-between border-b border-white/5 px-3 py-2.5 text-left text-xs last:border-0 ${
-                        historyPreviewPly === entry.ply
-                          ? "bg-violet-400/10 text-violet-200"
-                          : "text-zinc-400 hover:bg-white/5"
-                      }`}
-                    >
-                      <span>
-                        {entry.moveNumber}
-                        {entry.color === "w" ? "." : "..."} {entry.san}
-                      </span>
-                      <span>{entry.bossDamaged ? "♥−1" : ""}</span>
-                    </button>
-                  ))
-                )}
-              </div>
+              <ChessMoveHistoryList
+                listClassName="max-h-80 rounded-xl border border-white/5 bg-black/20"
+                selectedPly={historyPreviewPly}
+                emptyLabel="No actions yet"
+                entries={storedState.history.map((entry) => ({
+                  ply: entry.ply,
+                  side: entry.color,
+                  moveNumber: entry.moveNumber,
+                  content: <span className="truncate font-mono text-xs font-bold text-zinc-200">{entry.san}</span>,
+                  trailing: entry.bossDamaged ? <span className="text-red-300">♥−1</span> : null,
+                }))}
+                onSelect={(ply) => {
+                  setHistoryPreviewPly(ply);
+                  clearSelection();
+                  clearPowerTarget();
+                  setPendingPromotion(null);
+                }}
+              />
             </Panel>
           </aside>
 

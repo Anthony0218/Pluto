@@ -1,4 +1,5 @@
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import {
@@ -34,6 +35,7 @@ import type {
   VariantRoom,
   VariantRoomPlayer,
 } from "@/games/chess/multiplayer/variantMultiplayerTypes";
+import VariantRoomSetup from "./VariantRoomSetup";
 
 type PromotionPiece = "q" | "r" | "b" | "n";
 type ActionLoading =
@@ -327,7 +329,6 @@ export function ThreeLivesMultiplayerLobby() {
   useUiLanguage();
   const navigate = useNavigate();
   const { user, profile } = useAuth();
-  const [hostColor, setHostColor] = useState<TwoPlayerColor>("white");
   const [joinCode, setJoinCode] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
   const [loading, setLoading] = useState<"create" | "join" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -348,7 +349,7 @@ export function ThreeLivesMultiplayerLobby() {
       {
         p_seed: createThreeLivesHeartSeed(),
         p_display_name: displayName,
-        p_host_color: hostColor,
+        p_host_color: "black",
       },
     );
 
@@ -389,24 +390,7 @@ export function ThreeLivesMultiplayerLobby() {
           </Panel>
         ) : (
           <div className="grid gap-5 lg:grid-cols-2">
-            <Panel title={ui("Create room")} subtitle={ui("Choose your side")}>
-              <div className="grid grid-cols-2 gap-2">
-                {(["white", "black"] as TwoPlayerColor[]).map((color) => (
-                  <button
-                    key={color}
-                    type="button"
-                    onClick={() => setHostColor(color)}
-                    className={`rounded-xl border px-4 py-3 font-black transition ${
-                      hostColor === color
-                        ? "border-amber-400/30 bg-amber-400/10 text-amber-200"
-                        : "border-white/10 bg-black/20 text-zinc-400 hover:bg-white/5"
-                    }`}
-                  >
-                    {color === "white" ? "♔" : "♚"}{" "}
-                    {color === "white" ? ui("White") : ui("Black")}
-                  </button>
-                ))}
-              </div>
+            <Panel title={ui("Create room")} subtitle={ui("Colors are picked in the room")}>
               <button
                 type="button"
                 disabled={loading !== null}
@@ -417,7 +401,7 @@ export function ThreeLivesMultiplayerLobby() {
               </button>
             </Panel>
 
-            <Panel title={ui("Join room")} subtitle={ui("You receive the opposite side")}>
+            <Panel title={ui("Join room")} subtitle={ui("Pick your color in the room")}>
               <input
                 value={joinCode}
                 onChange={(event) =>
@@ -999,6 +983,17 @@ export function ThreeLivesMultiplayerGame() {
 
   const activeTurnColor = liveGame.turn() === "w" ? "white" : "black";
 
+  if (room.status === "waiting") {
+    return (
+      <VariantRoomSetup
+        roomId={room.id}
+        variantName={"Three Lives"}
+        lobbyPath={"/games/chess/variants/three-lives/multiplayer"}
+        onStarted={() => void loadRoom(true)}
+      />
+    );
+  }
+
   return (
     <div className="chess-variant-page min-h-[var(--app-height)] bg-[radial-gradient(circle_at_top,#21170f_0%,#111111_38%,#090909_100%)] px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1500px]">
@@ -1272,50 +1267,33 @@ export function ThreeLivesMultiplayerGame() {
                 title={ui("Move History")}
                 subtitle={`${historyRows.length} plies · click to preview`}
               >
-                <div className="max-h-[460px] overflow-y-auto rounded-2xl border border-white/5 bg-black/20">
-                  <button
-                    type="button"
-                    onClick={() => setHistoryPreviewPly(0)}
-                    className={`w-full border-b border-white/5 px-3 py-2 text-left text-xs font-bold ${historyPreviewPly === 0 ? "bg-amber-400/10 text-amber-200" : "text-zinc-500 hover:bg-white/5"}`}
-                  >{ui("Start ·")}{" "}
-                    {buildThreeLivesPowerupState([], seed).activeHearts.length}{" "}{ui("hearts")}</button>
-                  {historyRows.length === 0 ? (
-                    <p className="px-3 py-6 text-center text-xs text-zinc-700">{ui("No moves yet")}</p>
-                  ) : (
-                    historyRows.map((row) => (
-                      <button
-                        key={row.ply}
-                        type="button"
-                        onClick={() => setHistoryPreviewPly(row.ply)}
-                        className={`w-full border-b border-white/5 px-3 py-2.5 text-left last:border-0 ${historyPreviewPly === row.ply ? "bg-amber-400/10" : "hover:bg-white/5"}`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="w-10 text-[10px] text-zinc-600">
-                            {row.moveNumber}
-                            {row.color === "w" ? "." : "..."}
-                          </span>
-                          <span className="font-mono text-xs font-black text-zinc-200">
-                            {row.san}
-                          </span>
-                          {row.life?.damagedSide && (
-                            <span className="ml-auto text-xs text-red-300">
-                              −♥
-                            </span>
-                          )}
-                          {row.life?.heartPickedBy && (
-                            <span className="ml-auto text-xs text-emerald-300">
-                              +♥
-                            </span>
-                          )}
-                        </div>
-                        <p className="mt-1 pl-[52px] text-[9px] text-zinc-600">
-                          ♔ {row.life?.whiteHpAfter ?? THREE_LIVES_MAX_HP} · ♚{" "}
-                          {row.life?.blackHpAfter ?? THREE_LIVES_MAX_HP}
-                        </p>
-                      </button>
-                    ))
-                  )}
-                </div>
+                <ChessMoveHistoryList
+                  listClassName="max-h-[460px] rounded-2xl border border-white/5 bg-black/20"
+                  selectedPly={historyPreviewPly}
+                  emptyLabel="No moves yet"
+                  leading={
+                    <button
+                      type="button"
+                      onClick={() => setHistoryPreviewPly(0)}
+                      className={`w-full border-b border-white/5 px-3 py-2 text-left text-xs font-bold ${historyPreviewPly === 0 ? "bg-amber-400/10 text-amber-200" : "text-zinc-500 hover:bg-white/5"}`}
+                    >{ui("Start ·")}{" "}
+                      {buildThreeLivesPowerupState([], seed).activeHearts.length}{" "}{ui("hearts")}</button>
+                  }
+                  entries={historyRows.map((row) => ({
+                    ply: row.ply,
+                    side: row.color,
+                    moveNumber: row.moveNumber,
+                    title: `♔ ${row.life?.whiteHpAfter ?? THREE_LIVES_MAX_HP} · ♚ ${row.life?.blackHpAfter ?? THREE_LIVES_MAX_HP}`,
+                    content: <span className="truncate font-mono text-xs font-black text-zinc-200">{row.san}</span>,
+                    trailing: (
+                      <>
+                        {row.life?.damagedSide && <span className="text-xs text-red-300">−♥</span>}
+                        {row.life?.heartPickedBy && <span className="text-xs text-emerald-300">+♥</span>}
+                      </>
+                    ),
+                  }))}
+                  onSelect={setHistoryPreviewPly}
+                />
               </Panel>
             </div>
           </aside>

@@ -126,6 +126,10 @@ export function useStockfishAnalysis() {
       options?: {
         multiPV?: number;
         moveTime?: number;
+        /** Fixed search depth; overrides moveTime and makes results reproducible. */
+        depth?: number;
+        /** Clear the hash first so earlier searches cannot influence this one. */
+        newGame?: boolean;
       },
     ) => {
       const worker = workerRef.current;
@@ -154,11 +158,17 @@ export function useStockfishAnalysis() {
           lines: new Map(),
         };
 
+        if (options?.newGame) {
+          worker.postMessage("ucinewgame");
+        }
+
         worker.postMessage(`setoption name MultiPV value ${multiPV}`);
 
         worker.postMessage(`position fen ${fen}`);
 
-        worker.postMessage(`go movetime ${moveTime}`);
+        worker.postMessage(
+          options?.depth ? `go depth ${options.depth}` : `go movetime ${moveTime}`,
+        );
       });
     },
     [ready],

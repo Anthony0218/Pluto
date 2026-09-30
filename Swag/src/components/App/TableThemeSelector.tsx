@@ -54,13 +54,15 @@ export default function TableThemeSelector() {
     <div className="relative z-[150]">
       <button
         type="button"
+        aria-expanded={open}
+        title={ui("Table design")}
         onClick={() => setOpen((prev) => !prev)}
         className="
-          flex items-center gap-3
+          flex h-10 items-center gap-2 xl:gap-3
           rounded-xl
           border border-slate-700/70
           bg-slate-800/90
-          px-4 py-2
+          px-3 xl:px-4
           text-sm font-semibold
           text-slate-100
           shadow-lg
@@ -72,7 +74,7 @@ export default function TableThemeSelector() {
       >
         <PanelsTopLeft size={17} className="text-emerald-400" />
 
-        <span className="text-slate-400">{ui("Table design")}:</span>
+        <span className="hidden text-slate-400 xl:inline">{ui("Table design")}:</span>
 
         <span>{ui(current.name)}</span>
 
@@ -89,12 +91,12 @@ export default function TableThemeSelector() {
         <div
           className="
             absolute
-            left-1/2
+            right-0
             top-full
             z-[200]
             mt-2
             w-64
-            -translate-x-1/2
+            max-w-[calc(100vw-1rem)]
             rounded-2xl
             border border-slate-700
             bg-slate-900/95

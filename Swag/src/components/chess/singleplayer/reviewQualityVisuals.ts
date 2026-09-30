@@ -1,11 +1,11 @@
 import { ChevronsUp, Compass, Crown, Gem, ShieldX, Target, type LucideIcon } from "lucide-react";
 import type { MoveQuality } from "@/utils/chessAnalysis";
 
-export type ReviewVisualQuality = MoveQuality | "Brilliant" | "Missed Win";
+// "Missed Win" is derived in the game review from the evaluation swing.
+export type ReviewVisualQuality = MoveQuality | "Missed Win";
 
 export const qualityVisuals: Record<ReviewVisualQuality, { Icon: LucideIcon; color: string; classes: string }> = {
   Best: { Icon: Crown, color: "#31e794", classes: "border-emerald-400/40 bg-emerald-400/15 text-emerald-300" },
-  Brilliant: { Icon: Gem, color: "#31dff3", classes: "border-cyan-400/40 bg-cyan-400/15 text-cyan-300" },
   Excellent: { Icon: Gem, color: "#31dff3", classes: "border-cyan-400/40 bg-cyan-400/15 text-cyan-300" },
   Good: { Icon: ChevronsUp, color: "#389eff", classes: "border-blue-400/40 bg-blue-400/15 text-blue-300" },
   Inaccuracy: { Icon: Compass, color: "#ffc64c", classes: "border-amber-400/40 bg-amber-400/15 text-amber-300" },

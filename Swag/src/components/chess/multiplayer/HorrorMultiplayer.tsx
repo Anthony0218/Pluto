@@ -1,4 +1,5 @@
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -32,6 +33,7 @@ import {
   type HorrorPieceType,
   type HorrorState,
 } from "../../../games/chess/variants/horrorChess";
+import VariantRoomSetup from "./VariantRoomSetup";
 
 type PlayerColor = "white" | "black";
 type ChessSide = "w" | "b";
@@ -302,7 +304,6 @@ export function HorrorMultiplayerLobby() {
   const [displayName, setDisplayName] = useState(
     (profile as { username?: string | null } | null)?.username ?? "Player",
   );
-  const [hostColor, setHostColor] = useState<PlayerColor>("white");
   const [joinCode, setJoinCode] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
   const [busy, setBusy] = useState<"create" | "join" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -322,7 +323,7 @@ export function HorrorMultiplayerLobby() {
         p_seed: seed,
         p_initial_state: state,
         p_display_name: displayName.trim() || "Player",
-        p_host_color: hostColor,
+        p_host_color: "black",
       },
     );
 
@@ -394,24 +395,8 @@ export function HorrorMultiplayerLobby() {
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <section className="rounded-2xl border border-white/5 bg-black/20 p-4">
               <h2 className="font-black">{ui("Create room")}</h2>
-              <p className="mt-1 text-xs text-zinc-500">{ui("Choose your starting color.")}</p>
+              <p className="mt-1 text-xs text-zinc-500">{ui("Colors are picked in the room.")}</p>
 
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                {(["white", "black"] as PlayerColor[]).map((color) => (
-                  <button
-                    key={color}
-                    type="button"
-                    onClick={() => setHostColor(color)}
-                    className={`rounded-xl border px-3 py-3 text-sm font-black ${
-                      hostColor === color
-                        ? "border-rose-300/30 bg-rose-400/15 text-rose-100"
-                        : "border-white/10 bg-white/5 text-zinc-400"
-                    }`}
-                  >
-                    {color === "white" ? ui("♔ White") : ui("♚ Black")}
-                  </button>
-                ))}
-              </div>
 
               <button
                 type="button"
@@ -1173,6 +1158,17 @@ export function HorrorMultiplayerGame() {
       ? HOT_SQUARE_INTERVAL_PLIES
       : HOT_SQUARE_INTERVAL_PLIES - fireRemainder;
 
+  if (room.status === "waiting") {
+    return (
+      <VariantRoomSetup
+        roomId={room.id}
+        variantName={"Horror Chess"}
+        lobbyPath={"/games/chess/variants/horror/multiplayer"}
+        onStarted={() => void loadAll()}
+      />
+    );
+  }
+
   return (
     <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1460px]">
@@ -1241,34 +1237,23 @@ export function HorrorMultiplayerGame() {
             </Panel>
 
             <Panel title={ui("Move History")}>
-              <div className="max-h-80 overflow-y-auto rounded-xl border border-white/5 bg-black/20">
-                {storedState.records.length === 0 ? (
-                  <p className="px-4 py-7 text-center text-xs text-zinc-600">{ui("No moves yet")}</p>
-                ) : (
-                  storedState.records.map((record) => (
-                    <button
-                      key={record.ply}
-                      type="button"
-                      onClick={() => {
-                        setHistoryPreviewPly(record.ply);
-                        clearSelection();
-                        setPromotion(null);
-                      }}
-                      className={`flex w-full items-center justify-between border-b border-white/5 px-3 py-2.5 text-left text-xs last:border-0 ${
-                        historyPreviewPly === record.ply
-                          ? "bg-rose-400/10 text-rose-200"
-                          : "text-zinc-400 hover:bg-white/5"
-                      }`}
-                    >
-                      <span>
-                        {record.moveNumber}
-                        {record.color === "w" ? "." : "..."} {record.san}
-                      </span>
-                      <span>{eventIcons(record)}</span>
-                    </button>
-                  ))
-                )}
-              </div>
+              <ChessMoveHistoryList
+                listClassName="max-h-80 rounded-xl border border-white/5 bg-black/20"
+                selectedPly={historyPreviewPly}
+                emptyLabel="No moves yet"
+                entries={storedState.records.map((record) => ({
+                  ply: record.ply,
+                  side: record.color,
+                  moveNumber: record.moveNumber,
+                  content: <span className="truncate font-mono text-xs font-bold text-zinc-200">{record.san}</span>,
+                  trailing: <span>{eventIcons(record)}</span>,
+                }))}
+                onSelect={(ply) => {
+                  setHistoryPreviewPly(ply);
+                  clearSelection();
+                  setPromotion(null);
+                }}
+              />
             </Panel>
           </aside>
 

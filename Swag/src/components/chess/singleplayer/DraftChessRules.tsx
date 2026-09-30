@@ -15,18 +15,6 @@ type MiniSquare = {
 
 type MiniBoardState = Record<string, MiniSquare>;
 
-const languageOptions: Array<{
-  value: Language;
-  label: string;
-}> = [
-  { value: "en", label: "English" },
-  { value: "de", label: "Deutsch" },
-  { value: "bar", label: "Boarisch" },
-  { value: "ko", label: "한국어" },
-  { value: "ru", label: "Русский" },
-  { value: "es", label: "Español" },
-  { value: "pt", label: "Português" },
-];
 
 const translations: Record<"de" | "bar" | "ko" | "ru", Record<string, string>> & Partial<Record<"es" | "pt", Record<string, string>>> = {
   de: {
@@ -360,15 +348,7 @@ const budgetExample: MiniBoardState = {
 
 export default function DraftChessRules() {
   useUiLanguage();
-  const { language, setLanguage } = useAppLanguage();
-
-  function changeLanguage(nextLanguage: Language) {
-    setLanguage(nextLanguage);
-
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("chess-language", nextLanguage);
-    }
-  }
+  const { language } = useAppLanguage();
 
   return (
     <main className="min-h-screen bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
@@ -390,8 +370,6 @@ export default function DraftChessRules() {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <LanguageSelector language={language} onChange={changeLanguage} />
-
               <Link
                 to="/games/chess/variants/draft/hotseat"
                 className="inline-flex rounded-full border border-emerald-400/15 bg-emerald-400/[0.07] px-4 py-2 text-xs font-black text-emerald-200 transition hover:bg-emerald-400/[0.13]"
@@ -809,36 +787,3 @@ function LegendItem({
   );
 }
 
-function LanguageSelector({
-  language,
-  onChange,
-}: {
-  language: Language;
-  onChange: (language: Language) => void;
-}) {
-  useUiLanguage();
-  return (
-    <label className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-400">
-      <span>🌐</span>
-
-      <span className="hidden sm:inline">{t(language, "Language")}</span>
-
-      <select
-        value={language}
-        onChange={(event) => onChange(event.target.value as Language)}
-        className="bg-transparent text-xs font-bold text-zinc-200 outline-none [color-scheme:dark]"
-        aria-label={t(language, "Language")}
-      >
-        {languageOptions.map((option) => (
-          <option
-            key={option.value}
-            value={option.value}
-            className="bg-zinc-900 text-zinc-100"
-          >
-            {ui(option.label)}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
-}

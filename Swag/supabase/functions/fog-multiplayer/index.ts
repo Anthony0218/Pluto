@@ -461,9 +461,8 @@ async function roomContext(
   if (playerError) throw new Error("Players could not be loaded");
   const players = (playerData ?? []) as PlayerRow[];
   const me = players.find((player) => player.user_id === userId);
-  if (!me || (me.chosen_color !== "white" && me.chosen_color !== "black")) {
-    throw new Error("You are not a player in this room");
-  }
+  // Colors may still be open while the room is being set up.
+  if (!me) throw new Error("You are not a player in this room");
 
   const { data: gameData, error: gameError } = await admin
     .from("fog_multiplayer_games")
@@ -487,7 +486,7 @@ function buildSnapshot(
   me: PlayerRow,
   gameRow: PrivateGameRow,
 ) {
-  const color = me.chosen_color as TwoPlayerColor;
+  const color: TwoPlayerColor = me.chosen_color === "black" ? "black" : "white";
   const side = toSide(color);
   const game = new Chess(gameRow.fen);
   const records = Array.isArray(gameRow.moves) ? gameRow.moves : [];
@@ -577,7 +576,7 @@ async function createRoom(
   body: any,
 ) {
   const hostColor: TwoPlayerColor =
-    body.hostColor === "black" ? "black" : "white";
+    body.hostColor === "white" ? "white" : "black";
   const displayName = String(body.displayName ?? "Player").trim() || "Player";
   const seed = randomSeed();
   const initialFen = createRandomFogStartFen(seed);
@@ -669,9 +668,10 @@ async function joinRoom(
   }
   if (players.length >= 2) throw new Error("Room is full");
 
-  const host = players[0];
-  if (!host || !host.chosen_color) throw new Error("Host color is missing");
-  const guestColor = oppositeColor(host.chosen_color);
+  if (room.status !== "waiting") throw new Error("Room is no longer accepting players");
+
+  // The guest takes the color the host left free; both confirm it in the room.
+  const guestColor: TwoPlayerColor = players[0]?.chosen_color === "white" ? "black" : "white";
 
   const { error: insertError } = await admin
     .from("variant_room_players")
@@ -684,16 +684,7 @@ async function joinRoom(
     });
   if (insertError) throw new Error(insertError.message);
 
-  await admin
-    .from("variant_rooms")
-    .update({ status: "playing" })
-    .eq("id", room.id);
-  const { error: gameError } = await admin
-    .from("fog_multiplayer_games")
-    .update({ status: "playing", updated_at: new Date().toISOString() })
-    .eq("room_id", room.id);
-  if (gameError) throw new Error(gameError.message);
-
+  // The host starts the game with start_variant_room once both players are ready.
   return { ok: true, code: room.code };
 }
 

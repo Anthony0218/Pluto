@@ -1,8 +1,8 @@
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useRef, useEffect, useMemo, useState, type ReactNode } from "react";
 import {
-  LanguageSelector,
   translateChess,
   useChessLanguage,
   type TranslationTable,
@@ -23,7 +23,6 @@ import {
   createRandomStartPosition,
   type RandomStartPosition,
 } from "../../../games/chess/variants/randomStartChess.ts";
-import BoardAnimationToggle from "./BoardAnimationToggle.tsx";
 import { useVariantChessAi } from "@/hooks/useVariantChessAi";
 import {
   chessColorFromPlayerColor,
@@ -148,7 +147,7 @@ export default function RandomStartChess({
   difficulty = "casual",
 }: VariantAiBoardProps) {
   useUiLanguage();
-  const { language, setLanguage } = useChessLanguage();
+  const { language } = useChessLanguage();
   const t = (key: string) => translateChess(language, key, translations);
   const [startPosition, setStartPosition] = useState<RandomStartPosition>(() =>
     createRandomStartPosition(),
@@ -545,19 +544,12 @@ export default function RandomStartChess({
             </div>
 
             <div className="flex flex-wrap items-center justify-end gap-2">
-              <LanguageSelector
-                language={language}
-                onChange={setLanguage}
-                label={t("Language")}
-              />
-
               {!gameOver && (
                 <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-black text-zinc-300">
                   {game.turn() === "w" ? t("White to move") : t("Black to move")}
                 </span>
               )}
             </div>
-            <BoardAnimationToggle />
           </div>
         </ChessPageHeader>
 
@@ -613,36 +605,22 @@ export default function RandomStartChess({
                 title={t("Move History")}
                 subtitle={`${records.length} ${t("plies")}`}
               >
-                <div className="max-h-72 overflow-y-auto rounded-xl border border-white/5 bg-black/20">
-                  {records.length === 0 ? (
-                    <p className="px-4 py-7 text-center text-xs text-zinc-600">
-                      {t("No moves yet")}
-                    </p>
-                  ) : (
-                    records.map((record) => (
-                      <button
-                        key={record.ply}
-                        type="button"
-                        onClick={() => {
-                          setHistoryPreviewPly(record.ply);
-                          setSelectedSquare(null);
-                          setLegalMoves([]);
-                        }}
-                        className={`flex w-full items-center justify-between border-b border-white/5 px-3 py-2 text-left text-xs transition last:border-0 ${
-                          historyPreviewPly === record.ply
-                            ? "bg-violet-400/10 text-violet-200"
-                            : "text-zinc-400 hover:bg-white/5"
-                        }`}
-                      >
-                        <span>
-                          {record.moveNumber}
-                          {record.color === "w" ? "." : "..."}
-                        </span>
-                        <span className="font-black">{record.san}</span>
-                      </button>
-                    ))
-                  )}
-                </div>
+                <ChessMoveHistoryList
+                  listClassName="max-h-72 rounded-xl border border-white/5 bg-black/20"
+                  selectedPly={historyPreviewPly}
+                  emptyLabel={t("No moves yet")}
+                  entries={records.map((record) => ({
+                    ply: record.ply,
+                    side: record.color,
+                    moveNumber: record.moveNumber,
+                    content: <span className="truncate text-xs font-black text-zinc-200">{record.san}</span>,
+                  }))}
+                  onSelect={(ply) => {
+                    setHistoryPreviewPly(ply);
+                    setSelectedSquare(null);
+                    setLegalMoves([]);
+                  }}
+                />
               </Panel>
             </div>
           </aside>

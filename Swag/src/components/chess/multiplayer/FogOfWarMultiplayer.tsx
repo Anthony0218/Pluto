@@ -1,4 +1,5 @@
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
+import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import {
@@ -22,6 +23,7 @@ import {
   playPieceMoveSound,
   playPieceSelectSound,
 } from "@/utils/sound";
+import VariantRoomSetup from "./VariantRoomSetup";
 
 type TwoPlayerColor = "white" | "black";
 type FogSide = "w" | "b";
@@ -228,7 +230,6 @@ export function FogOfWarMultiplayerLobby() {
   useUiLanguage();
   const navigate = useNavigate();
   const { user, profile } = useAuth();
-  const [hostColor, setHostColor] = useState<TwoPlayerColor>("white");
   const [randomStart, setRandomStart] = useState(true);
   const [joinCode, setJoinCode] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
   const [loading, setLoading] = useState<"create" | "join" | null>(null);
@@ -248,7 +249,7 @@ export function FogOfWarMultiplayerLobby() {
     try {
       const result = await callFogFunction({
         action: "create",
-        hostColor,
+        hostColor: "black",
         randomStart,
         displayName,
       });
@@ -300,24 +301,7 @@ export function FogOfWarMultiplayerLobby() {
           </Panel>
         ) : (
           <div className="grid gap-5 lg:grid-cols-2">
-            <Panel title={ui("Create room")} subtitle={ui("Choose your side")}>
-              <div className="grid grid-cols-2 gap-2">
-                {(["white", "black"] as TwoPlayerColor[]).map((color) => (
-                  <button
-                    key={color}
-                    type="button"
-                    onClick={() => setHostColor(color)}
-                    className={`rounded-xl border px-4 py-3 font-black transition ${
-                      hostColor === color
-                        ? "border-sky-400/30 bg-sky-400/10 text-sky-200"
-                        : "border-white/10 bg-black/20 text-zinc-400 hover:bg-white/5"
-                    }`}
-                  >
-                    {color === "white" ? "♔" : "♚"}{" "}
-                    {color === "white" ? ui("White") : ui("Black")}
-                  </button>
-                ))}
-              </div>
+            <Panel title={ui("Create room")} subtitle={ui("Colors are picked in the room")}>
 
               <div className="mt-4">
                 <p className="mb-2 text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">{ui("Starting position")}</p>
@@ -354,7 +338,7 @@ export function FogOfWarMultiplayerLobby() {
               </button>
             </Panel>
 
-            <Panel title={ui("Join room")} subtitle={ui("You receive the opposite side")}>
+            <Panel title={ui("Join room")} subtitle={ui("Pick your color in the room")}>
               <input
                 value={joinCode}
                 onChange={(event) =>
@@ -685,6 +669,17 @@ export function FogOfWarMultiplayerGame() {
     );
   }
 
+  if (snapshot.room.status === "waiting") {
+    return (
+      <VariantRoomSetup
+        roomId={snapshot.room.id}
+        variantName="Fog of War"
+        lobbyPath="/games/chess/variants/fog-of-war/multiplayer"
+        onStarted={() => void loadSnapshot(true)}
+      />
+    );
+  }
+
   const myReady =
     snapshot.myColor === "white"
       ? snapshot.rematch.whiteReady
@@ -886,37 +881,25 @@ export function FogOfWarMultiplayerGame() {
                       : "border-white/5 bg-black/20 text-zinc-500 hover:bg-white/5"
                   }`}
                 >{ui("Start · Initial position")}</button>
-                <div className="max-h-80 overflow-y-auto rounded-2xl border border-white/5 bg-black/20">
-                  {snapshot.history.length === 0 ? (
-                    <div className="px-4 py-8 text-center text-xs text-zinc-600">{ui("No moves yet")}</div>
-                  ) : (
-                    snapshot.history.map((entry) => (
-                      <button
-                        key={entry.ply}
-                        type="button"
-                        onClick={() => {
-                          setHistoryPreviewPly(entry.ply);
-                          clearSelection();
-                        }}
-                        className={`flex w-full items-center gap-2 border-b border-white/5 px-3 py-2.5 text-left last:border-0 hover:bg-white/5 ${
-                          historyPreviewPly === entry.ply
-                            ? "bg-sky-400/[0.08]"
-                            : ""
-                        }`}
-                      >
-                        <span className="w-10 text-[10px] text-zinc-600">
-                          {entry.moveNumber}
-                          {entry.color === "w" ? "." : "..."}
-                        </span>
-                        <span
-                          className={`font-mono text-xs font-black ${entry.label === "Hidden move" ? "text-zinc-600" : "text-zinc-200"}`}
-                        >
-                          {ui(entry.label)}
-                        </span>
-                      </button>
-                    ))
-                  )}
-                </div>
+                <ChessMoveHistoryList
+                  listClassName="max-h-80 rounded-2xl border border-white/5 bg-black/20"
+                  selectedPly={historyPreviewPly}
+                  emptyLabel="No moves yet"
+                  entries={snapshot.history.map((entry) => ({
+                    ply: entry.ply,
+                    side: entry.color,
+                    moveNumber: entry.moveNumber,
+                    content: (
+                      <span className={`truncate font-mono text-xs font-black ${entry.label === "Hidden move" ? "text-zinc-600" : "text-zinc-200"}`}>
+                        {ui(entry.label)}
+                      </span>
+                    ),
+                  }))}
+                  onSelect={(ply) => {
+                    setHistoryPreviewPly(ply);
+                    clearSelection();
+                  }}
+                />
               </Panel>
             </div>
           </aside>
