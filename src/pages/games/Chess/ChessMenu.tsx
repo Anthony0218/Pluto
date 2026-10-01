@@ -1,3 +1,4 @@
+import { BookOpen } from "lucide-react";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { Link } from "react-router-dom";
@@ -72,6 +73,11 @@ export default function ChessMenu() {
               <p className="mt-6 max-w-[500px] font-serif text-[18px] leading-8 text-zinc-400 sm:text-[20px]">{ui("Three ways to play. Same timeless game. Pick the experience that fits you.")}</p>
             </div>
 
+            <Link to="/games/chess/rules" className="mt-8 inline-flex w-fit items-center gap-3 rounded-2xl border border-amber-300/25 bg-amber-300/[0.06] px-5 py-3.5 text-sm font-semibold text-amber-200 transition hover:border-amber-300/50 hover:bg-amber-300/[0.12] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200">
+              <BookOpen size={20} aria-hidden="true" />{ui("Rules & Tips")}
+              <span aria-hidden="true" className="ml-2">→</span>
+            </Link>
+
             <div className="mt-12 flex items-center gap-4 text-[9px] font-black uppercase tracking-[0.28em] text-zinc-700">
               <span className="h-px w-14 bg-amber-400/45" />{ui("Classic · Variants · Custom")}</div>          </header>
 
@@ -129,16 +135,7 @@ export default function ChessMenu() {
                   : <Link key={mode.path} to={mode.path} className={cardClassName}>{content}</Link>;
               })}
 
-              <Link
-                to="/games/chess/rules"
-                className="group mt-2 flex items-center justify-between border-t border-white/[0.08] px-2 pt-6 text-sm text-zinc-500 transition hover:text-white"
-              >
-                <span className="inline-flex items-center gap-3">
-                  <span className="text-lg">♔</span>{ui("Rules & Tips")}</span>
-                <span className="transition duration-300 group-hover:translate-x-1">
-                  →
-                </span>
-              </Link>
+
             </div>
           </div>
         </section>

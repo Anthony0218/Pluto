@@ -61,6 +61,11 @@ function TeamCard({ team, index, count }: { team: TeamDefinition; index: number;
             <span className={labelClass}>{ui("Team name")}</span>
             <input value={team.name} maxLength={24} onChange={(event) => update({ name: event.target.value }, "name")} className={`${inputClass} mt-1.5`} />
           </label>
+          <label className="block">
+            <span className={labelClass}>{ui("Alliance")}</span>
+            <input value={team.alliance ?? ""} maxLength={24} placeholder={ui("Independent")} onChange={(event) => update({ alliance: event.target.value || undefined }, "alliance")} onBlur={(event) => update({ alliance: event.target.value.trim() || undefined }, "alliance")} className={`${inputClass} mt-1.5`} />
+            <span className="mt-1 block text-xs text-zinc-500">{ui("Use the same alliance name for partners. With friendly fire off, they cannot capture each other. They share victory, even after elimination.")}</span>
+          </label>
           <div>
             <p className={labelClass}>{ui("Colour")}</p>
             <div className="mt-1.5 flex flex-wrap items-center gap-1.5">

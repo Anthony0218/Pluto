@@ -1,6 +1,6 @@
 import { ui, useUiLanguage } from "@/i18n/ui";
-import { useEffect, useId, useRef, useState } from "react";
-import { Shield } from "lucide-react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { Shield, X } from "lucide-react";
 import { ReviewQualityIcon } from "./ReviewQualityBadge";
 import { qualityColor } from "./reviewQualityVisuals";
 import type { BoardAnnotations } from "./boardAnnotations";
@@ -148,6 +148,8 @@ type BoardProps = {
   coordinateFontSize?: string;
   /** Move-quality icon, square marks and arrows (Chess Coach and Game Review). */
   annotations?: BoardAnnotations | null;
+  /** Slides the piece now standing on `to` in from `from`; a new `id` plays it again. */
+  moveAnimation?: { id: string; from: Square; to: Square; durationMs?: number } | null;
 };
 
 const pieceSymbols = {
@@ -216,6 +218,7 @@ export default function Board({
   pieceScale = 1,
   coordinateFontSize = "clamp(8px,1vw,12px)",
   annotations = null,
+  moveAnimation = null,
 }: BoardProps) {
   useUiLanguage();
   const arrowId = `review-arrow-${useId().replace(/:/g, "")}`;
@@ -418,9 +421,21 @@ export default function Board({
     const row = 8 - Number(square[1]);
     return displayedOrientation === "white" ? { x: (file + .5) * 100, y: (row + .5) * 100 } : { x: (7.5 - file) * 100, y: (7.5 - row) * 100 };
   };
-  const annotationIcon = annotations?.icon ?? null;
-  const annotationMarks = annotations?.marks ?? [];
-  const annotationBadges = annotations?.badges ?? [];
+  /*
+   * Move animation: the piece standing on `to` is drawn in a floating
+   * layer that slides in from `from`, while its square stays empty.
+   */
+  const [finishedSlideId, setFinishedSlideId] = useState<string | null>(null);
+  const slidingPieceRef = useRef<HTMLSpanElement>(null);
+  const slide = moveAnimation && moveAnimation.id !== finishedSlideId && !orientationAnimating ? moveAnimation : null;
+  const slidePiece = slide ? board[8 - Number(slide.to[1])]?.[slide.to.charCodeAt(0) - 97] ?? null : null;
+
+  // A square's border, icon and badges wait for the sliding piece to land there.
+  const awaitingPiece = (square: Square) => slide?.to === square;
+  const annotationIcon = annotations?.icon && !awaitingPiece(annotations.icon.square) ? annotations.icon : null;
+  const annotationCross = annotations?.cross && !awaitingPiece(annotations.cross.square) ? annotations.cross : null;
+  const annotationMarks = (annotations?.marks ?? []).filter((mark) => !awaitingPiece(mark.square));
+  const annotationBadges = (annotations?.badges ?? []).filter((badge) => !awaitingPiece(badge.square));
   const annotationArrows = (annotations?.arrows ?? []).map((arrow) => {
     const from = reviewPoint(arrow.from);
     const to = reviewPoint(arrow.to);
@@ -429,6 +444,98 @@ export default function Board({
     const trim = 22;
     return { ...arrow, x1: from.x, y1: from.y, x2: to.x - ((to.x - from.x) / length) * trim, y2: to.y - ((to.y - from.y) / length) * trim };
   });
+
+  const displayCell = (square: Square) => {
+    const column = square.charCodeAt(0) - 97;
+    const row = 8 - Number(square[1]);
+    return displayedOrientation === "white" ? { column, row } : { column: 7 - column, row: 7 - row };
+  };
+
+  useLayoutEffect(() => {
+    if (!slide) return;
+    const element = slidingPieceRef.current;
+    if (!element || !slidePiece || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setFinishedSlideId(slide.id);
+      return;
+    }
+    const from = displayCell(slide.from);
+    const to = displayCell(slide.to);
+    const animation = element.animate(
+      [{ transform: `translate(${(from.column - to.column) * 100}%, ${(from.row - to.row) * 100}%)` }, { transform: "translate(0, 0)" }],
+      { duration: slide.durationMs ?? 420, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
+    );
+    animation.onfinish = () => setFinishedSlideId(slide.id);
+    return () => animation.cancel();
+    // A new id starts a new slide; everything else is read from that render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slide?.id]);
+
+  const renderPiece = (piece: BoardPiece, hoverable: boolean) => (
+    /*
+     * Outer wrapper controls only
+     * the overall piece size.
+     *
+     * The inner span keeps the
+     * existing hover animation.
+     */
+    <span
+      className="
+                        pointer-events-none
+                        relative
+                        z-10
+                        flex
+                        h-full
+                        w-full
+                        items-center
+                        justify-center
+                      "
+      style={{
+        transform: `scale(${pieceScale}) rotate(${pieceCounterRotation}deg)`,
+
+        transformOrigin: "center center",
+
+        transition: pieceTransition,
+
+        willChange: "transform",
+      }}
+    >
+      <span
+        className={`
+                          pointer-events-none
+                          relative
+                          flex
+                          h-full
+                          w-full
+                          items-center
+                          justify-center
+                          select-none
+
+                          font-serif
+                          text-[10cqw]
+                          leading-none
+
+                          transition-transform
+                          duration-150
+
+                          ${hoverable ? "group-hover:scale-[1.06]" : ""}
+
+                          ${
+                            piece.color === "w"
+                              ? `
+                                text-[#fff3d5]
+                                [text-shadow:0_1px_0_#ffffff,0_2px_2px_rgba(0,0,0,0.75),0_5px_8px_rgba(0,0,0,0.45)]
+                              `
+                              : `
+                                text-[#1b1b1b]
+                                [text-shadow:0_1px_0_rgba(255,255,255,0.35),0_3px_3px_rgba(0,0,0,0.65),0_5px_8px_rgba(0,0,0,0.45)]
+                              `
+                          }
+                        `}
+      >
+        {pieceTheme === "classic" ? pieceSymbols[`${piece.color}${piece.type}`] : <ChessPiece type={piece.type} color={piece.color} theme={pieceTheme} />}
+      </span>
+    </span>
+  );
 
   return (
     /*
@@ -647,15 +754,6 @@ export default function Board({
                 const isCheckedKing =
                   piece?.type === "k" && checkedKingSquare === square;
 
-                let symbol = "";
-
-                if (piece) {
-                  const key =
-                    `${piece.color}${piece.type}` as keyof typeof pieceSymbols;
-
-                  symbol = pieceSymbols[key];
-                }
-
                 const file = square[0];
                 const rank = square[1];
 
@@ -720,6 +818,10 @@ export default function Board({
                     {annotationMarks.filter((mark) => mark.square === square).map((mark, index) =>
                       mark.kind === "outline" ? (
                         <span key={`mark-${index}`} className="pointer-events-none absolute inset-0 z-[12]" style={{ opacity: mark.opacity, boxShadow: `inset 0 0 0 3px ${mark.color}, inset 0 0 18px ${mark.color}66` }} />
+                      ) : mark.kind === "glow" ? (
+                        <span key={`mark-${index}`} className="pointer-events-none absolute inset-0 z-[2]" style={{ opacity: mark.opacity }}>
+                          <span className="absolute inset-0 animate-pulse motion-reduce:animate-none" style={{ background: `radial-gradient(circle, ${mark.color}dd 0%, ${mark.color}66 55%, ${mark.color}22 100%)`, boxShadow: `inset 0 0 22px ${mark.color}` }} />
+                        </span>
                       ) : (
                         <span key={`mark-${index}`} className="pointer-events-none absolute inset-0 z-[12] grid place-items-center" style={{ opacity: mark.opacity }}>
                           <span className="h-[30%] w-[30%] rounded-full border-2 border-dashed" style={{ borderColor: mark.color, background: `${mark.color}1f` }} />
@@ -1808,72 +1910,9 @@ export default function Board({
 
                     {piece &&
                       !isHotPotatoBlownUpKingSquare &&
-                      !isCollapsedSquare && (
-                        /*
-                         * Outer wrapper controls only
-                         * the overall piece size.
-                         *
-                         * The inner span keeps the
-                         * existing hover animation.
-                         */
-                        <span
-                          className="
-                        pointer-events-none
-                        relative
-                        z-10
-                        flex
-                        h-full
-                        w-full
-                        items-center
-                        justify-center
-                      "
-                          style={{
-                            transform: `scale(${pieceScale}) rotate(${pieceCounterRotation}deg)`,
-
-                            transformOrigin: "center center",
-
-                            transition: pieceTransition,
-
-                            willChange: "transform",
-                          }}
-                        >
-                          <span
-                            className={`
-                          pointer-events-none
-                          relative
-                          flex
-                          h-full
-                          w-full
-                          items-center
-                          justify-center
-                          select-none
-
-                          font-serif
-                          text-[10cqw]
-                          leading-none
-
-                          transition-transform
-                          duration-150
-
-                          group-hover:scale-[1.06]
-
-                          ${
-                            piece.color === "w"
-                              ? `
-                                text-[#fff3d5]
-                                [text-shadow:0_1px_0_#ffffff,0_2px_2px_rgba(0,0,0,0.75),0_5px_8px_rgba(0,0,0,0.45)]
-                              `
-                              : `
-                                text-[#1b1b1b]
-                                [text-shadow:0_1px_0_rgba(255,255,255,0.35),0_3px_3px_rgba(0,0,0,0.65),0_5px_8px_rgba(0,0,0,0.45)]
-                              `
-                          }
-                        `}
-                          >
-                            {pieceTheme === "classic" ? symbol : <ChessPiece type={piece.type} color={piece.color} theme={pieceTheme} />}
-                          </span>
-                        </span>
-                      )}
+                      !isCollapsedSquare &&
+                      slide?.to !== square &&
+                      renderPiece(piece, true)}
 
                     {isFogSquare && (
                       <>
@@ -1968,16 +2007,25 @@ export default function Board({
                       // Top-left, opposite the quality icon in the top-right.
                       <span
                         key={`badge-${index}`}
-                        className="pointer-events-none absolute left-1 top-1 z-[31] grid h-6 w-6 place-items-center rounded-full border border-white/35 bg-[#06131e] shadow-lg"
+                        className="pointer-events-none absolute left-1 top-1 z-[31] grid h-6 w-6 place-items-center rounded-full border border-white/35 bg-[#06131e] shadow-lg max-sm:left-0.5 max-sm:top-0.5 max-sm:h-4 max-sm:w-4 max-sm:[&_svg]:h-2.5 max-sm:[&_svg]:w-2.5"
                         style={{ color: badge.color, boxShadow: `0 0 10px ${badge.color}aa` }}
                       >
                         <Shield size={14} strokeWidth={2.5} />
                       </span>
                     ))}
+                    {annotationCross?.square === square && (
+                      <span
+                        title={ui("Played move")}
+                        className="pointer-events-none absolute right-1 top-1 z-[32] grid h-6 w-6 place-items-center rounded-full border border-white/35 bg-[#06131e] shadow-lg max-sm:right-0.5 max-sm:top-0.5 max-sm:h-4 max-sm:w-4 max-sm:[&_svg]:h-2.5 max-sm:[&_svg]:w-2.5"
+                        style={{ color: annotationCross.color, boxShadow: `0 0 10px ${annotationCross.color}aa` }}
+                      >
+                        <X size={15} strokeWidth={3} className="drop-shadow-[0_0_3px_currentColor]" />
+                      </span>
+                    )}
                     {annotationIcon?.square === square && (
                       <span
                         title={ui(annotationIcon.quality)}
-                        className="group/quality absolute right-1 top-1 z-[32] grid h-6 w-6 place-items-center rounded-full border border-white/35 bg-[#06131e] shadow-lg transition-[transform,box-shadow] duration-200 ease-out hover:scale-110 motion-reduce:transition-none"
+                        className="group/quality absolute right-1 top-1 z-[32] grid h-6 w-6 place-items-center rounded-full border border-white/35 bg-[#06131e] shadow-lg transition-[transform,box-shadow] duration-200 ease-out hover:scale-110 motion-reduce:transition-none max-sm:right-0.5 max-sm:top-0.5 max-sm:h-4 max-sm:w-4 max-sm:[&_svg]:h-2.5 max-sm:[&_svg]:w-2.5"
                         style={{ color: qualityColor(annotationIcon.quality), boxShadow: `0 0 10px ${qualityColor(annotationIcon.quality)}aa` }}
                       >
                         <ReviewQualityIcon quality={annotationIcon.quality} size={14} />
@@ -1986,6 +2034,20 @@ export default function Board({
                   </button>
                 );
               }),
+            )}
+            {slide && slidePiece && (
+              <span
+                ref={slidingPieceRef}
+                className="pointer-events-none absolute z-[25] flex"
+                style={{
+                  left: `${displayCell(slide.to).column * 12.5}%`,
+                  top: `${displayCell(slide.to).row * 12.5}%`,
+                  width: "12.5%",
+                  height: "12.5%",
+                }}
+              >
+                {renderPiece(slidePiece, false)}
+              </span>
             )}
             {annotationArrows.length > 0 && (
               <svg className="pointer-events-none absolute inset-0 z-[8] h-full w-full" viewBox="0 0 800 800" aria-hidden="true">

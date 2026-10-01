@@ -1,6 +1,9 @@
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useCallback, useEffect, useState } from "react";
+import { useChessTopRanks } from "@/games/chess/ranked/useChessTopRanks";
+import type { TimeControl } from "@/games/chess/ranked/timeControls";
+import TopRankBadge from "@/components/chess/TopRankBadge";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { supabase } from "../../../lib/supabase";
@@ -14,6 +17,7 @@ type ChessRoom = {
   host_id: string;
   status: "waiting" | "ready" | "playing" | "finished";
   match_kind: "casual" | "ranked";
+  time_control?: TimeControl | null;
 };
 
 type RoomPlayer = {
@@ -82,6 +86,7 @@ export default function ChessMultiplayerRoom() {
   const [colorSaving, setColorSaving] = useState(false);
   const [readySaving, setReadySaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const topRanks = useChessTopRanks(room?.match_kind === "ranked", room?.time_control ?? "rapid");
 
   const currentUserAvatarId =
     (profile as { avatar_id?: string | null } | null)?.avatar_id ?? "m1";
@@ -91,7 +96,7 @@ export default function ChessMultiplayerRoom() {
 
     const { data: roomData, error: roomError } = await supabase
       .from("chess_rooms")
-      .select("id, code, host_id, status, match_kind")
+      .select("id, code, host_id, status, match_kind, time_control")
       .eq("code", roomCode.toUpperCase())
       .single();
 
@@ -386,11 +391,13 @@ export default function ChessMultiplayerRoom() {
                     player={white}
                     avatarId={white ? avatarIdsByUserId[white.user_id] : undefined}
                     label={white?.user_id === user?.id ? "Seat 1 · You" : "Seat 1"}
+                    topRank={white ? topRanks[white.user_id] : undefined}
                   />
                   <PlayerCard
                     player={black}
                     avatarId={black ? avatarIdsByUserId[black.user_id] : undefined}
                     label={black?.user_id === user?.id ? "Seat 2 · You" : "Seat 2"}
+                    topRank={black ? topRanks[black.user_id] : undefined}
                     canInvite={room.status === "waiting" && !black}
                   />
                 </>
@@ -488,6 +495,7 @@ function PlayerCard({
   color,
   ready,
   canInvite = false,
+  topRank,
 }: {
   player: RoomPlayer | undefined;
   avatarId?: string;
@@ -495,6 +503,7 @@ function PlayerCard({
   color?: PlayerColor | null;
   ready?: boolean;
   canInvite?: boolean;
+  topRank?: number;
 }) {
   useUiLanguage();
   const highlighted = Boolean(player);
@@ -502,12 +511,13 @@ function PlayerCard({
 
   return (
     <section
-      className={`group relative overflow-hidden rounded-[22px] border bg-black/20 p-5 shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md sm:p-6 ${
+      className={`group relative overflow-hidden rounded-[22px] border bg-black/20 p-5 shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md sm:p-6 ${topRank ? "top-rank-glow " : ""}${
         highlighted
           ? "border-amber-300/35 bg-amber-300/[0.025]"
           : "border-white/[0.09]"
       }`}
     >
+      {topRank && <span className="absolute right-4 top-4 z-10"><TopRankBadge rank={topRank} size="sm" /></span>}
       <div className="relative flex items-center gap-4 sm:gap-5">
         <div
           className={`flex h-[74px] w-[74px] shrink-0 items-center justify-center overflow-hidden rounded-2xl border text-[32px] shadow-inner ${

@@ -327,3 +327,46 @@
 .notification-actions a { background: #6349d4; color: white; }
 .notification-actions :is(a, button):hover { filter: brightness(1.25); }
 .notification-dismiss { position: absolute; top: 10px; right: 10px; color: #91a0c3; }
+
+/* Incoming messages and invites: bottom-right stack, newest nearest the corner. */
+.incoming-toasts { position: fixed; z-index: 140; right: 16px; bottom: 16px; display: flex; flex-direction: column-reverse; gap: 10px; width: min(360px, calc(100vw - 32px)); pointer-events: none; }
+.incoming-toast { position: relative; display: flex; gap: 12px; padding: 14px 14px 14px 13px; border: 1px solid #8f8cff59; border-radius: 16px; background: linear-gradient(150deg, #1b2150f2, #0b1027f7); color: #eef0ff; box-shadow: 0 18px 42px #02041299, 0 0 0 1px #ffffff08 inset; backdrop-filter: blur(14px); pointer-events: auto; animation: incoming-toast-in .32s cubic-bezier(.2, .9, .3, 1.2) both; }
+.incoming-toast.is-invite { border-color: #fbbf2466; background: linear-gradient(150deg, #2b2213f5, #0d1226f7 62%); box-shadow: 0 18px 42px #02041299, 0 0 26px #fbbf241f; }
+.incoming-toast-avatar { display: grid; place-items: center; flex: 0 0 44px; width: 44px; height: 44px; border-radius: 999px; background: #6366f12e; color: #c7d2fe; }
+.incoming-toast-avatar.is-invite { background: #fbbf2424; color: #fcd34d; }
+.incoming-toast-copy { min-width: 0; flex: 1; }
+.incoming-toast-eyebrow { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #a5b4fc; }
+.incoming-toast.is-invite .incoming-toast-eyebrow { color: #fcd34d; }
+.incoming-toast-title { margin-top: 3px; padding-right: 18px; font-size: 14px; line-height: 1.35; color: #cbd5e1; overflow-wrap: anywhere; }
+.incoming-toast-title strong { color: #fff; }
+.incoming-toast-detail { margin-top: 2px; font-size: 12px; color: #94a3b8; }
+.incoming-toast-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.incoming-toast-actions button { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 13px; border: 1px solid #ffffff26; border-radius: 10px; background: #ffffff0d; color: #e2e8f0; font-size: 13px; font-weight: 700; transition: background .15s, border-color .15s; }
+.incoming-toast-actions button:hover { background: #ffffff1a; border-color: #ffffff40; }
+.incoming-toast-actions button.is-accept { border-color: transparent; background: #6366f1; color: #fff; }
+.incoming-toast-actions button.is-accept:hover { background: #818cf8; }
+.incoming-toast.is-invite .incoming-toast-actions button.is-accept { background: #fbbf24; color: #1c1404; }
+.incoming-toast.is-invite .incoming-toast-actions button.is-accept:hover { background: #fcd34d; }
+.incoming-toast-actions button:focus-visible, .incoming-toast-close:focus-visible { outline: 2px solid #fcd34d; outline-offset: 2px; }
+.incoming-toast-close { position: absolute; top: 8px; right: 8px; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 8px; color: #94a3b8; }
+.incoming-toast-close:hover { background: #ffffff14; color: #fff; }
+@keyframes incoming-toast-in { from { opacity: 0; transform: translateX(24px) scale(.96); } }
+@media (prefers-reduced-motion: reduce) { .incoming-toast { animation-duration: .01ms; } }
+
+/* Do Not Disturb switch, shared by the notifications dialog and the profile page. */
+.dnd-switch { display: flex; align-items: center; justify-content: space-between; gap: 14px; width: 100%; padding: 12px 14px; border: 1px solid #ffffff1a; border-radius: 12px; background: #ffffff08; text-align: left; transition: border-color .15s, background .15s; }
+.dnd-switch:hover { border-color: #ffffff33; }
+.dnd-switch:focus-visible { outline: 2px solid #fcd34d; outline-offset: 2px; }
+.dnd-switch[aria-checked="true"] { border-color: #a78bfa66; background: #7c3aed1f; }
+.dnd-switch-copy { display: flex; align-items: center; gap: 11px; min-width: 0; }
+.dnd-switch-copy strong { display: block; font-size: 14px; color: #fff; }
+.dnd-switch-copy small { display: block; margin-top: 1px; font-size: 12px; line-height: 1.4; color: #94a3b8; }
+.dnd-switch-track { position: relative; flex: 0 0 42px; height: 24px; border-radius: 999px; background: #334155; transition: background .2s; }
+.dnd-switch-track::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 999px; background: #fff; box-shadow: 0 1px 3px #0006; transition: transform .2s; }
+.dnd-switch[aria-checked="true"] .dnd-switch-track { background: #8b5cf6; }
+.dnd-switch[aria-checked="true"] .dnd-switch-track::after { transform: translateX(18px); }
+
+/* Room invite button sits bottom-left so the bottom-right corner stays free for toasts;
+   on game boards it stacks above the chess sidebar toggle. */
+.room-friends-trigger { position: fixed; z-index: 100; bottom: 16px; left: 16px; }
+body:has(.chess-game-grid) .room-friends-trigger { bottom: 62px; }

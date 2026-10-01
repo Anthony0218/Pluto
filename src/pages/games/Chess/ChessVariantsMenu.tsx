@@ -1,25 +1,13 @@
-import VariantExplorer from "@/components/chess/VariantExplorer";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { variants, type VariantCard } from "@/data/chessVariants";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { BookOpen } from "lucide-react";
+import { Search } from "lucide-react";
+import { VariantArtwork, VariantDesignCard } from "@/components/chess/VariantDesignCard";
 
 type Language = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
-
-const languageOptions: Array<{ value: Language; label: string }> = [
-  { value: "en", label: "English" },
-  { value: "de", label: "Deutsch" },
-  { value: "bar", label: "Boarisch" },
-  { value: "ko", label: "한국어" },
-  { value: "ru", label: "Русский" },
-  { value: "es", label: "Español" },
-  { value: "pt", label: "Português" },
-];
-
-
 
 const translations: Record<"de" | "bar" | "ko" | "ru", Record<string, string>> & Partial<Record<"es" | "pt", Record<string, string>>> = {
   de: {
@@ -479,228 +467,9 @@ function t(language: Language, key: string): string {
   return translations[language]?.[key] ?? ui(key);
 }
 
-const availableVariants = variants.filter((variant) => variant.available);
-
-const accentClasses: Record<VariantCard["accent"], string> = {
-  red: "border-red-400/45 bg-red-400/[0.055] text-red-300",
-  violet: "border-violet-400/45 bg-violet-400/[0.055] text-violet-300",
-  amber: "border-amber-400/45 bg-amber-400/[0.055] text-amber-300",
-  rose: "border-rose-400/45 bg-rose-400/[0.055] text-rose-300",
-  sky: "border-sky-400/45 bg-sky-400/[0.055] text-sky-300",
-  emerald: "border-emerald-400/45 bg-emerald-400/[0.055] text-emerald-300",
-  zinc: "border-zinc-400/30 bg-zinc-400/[0.045] text-zinc-300",
-  orange: "border-orange-400/45 bg-orange-400/[0.055] text-orange-300",
-  cyan: "border-cyan-400/45 bg-cyan-400/[0.055] text-cyan-300",
-  fuchsia: "border-fuchsia-400/45 bg-fuchsia-400/[0.055] text-fuchsia-300",
-  indigo: "border-indigo-400/45 bg-indigo-400/[0.055] text-indigo-300",
-  lime: "border-lime-400/45 bg-lime-400/[0.055] text-lime-300",
-  pink: "border-pink-400/45 bg-pink-400/[0.055] text-pink-300",
-  teal: "border-teal-400/45 bg-teal-400/[0.055] text-teal-300",
-  blue: "border-blue-400/45 bg-blue-400/[0.055] text-blue-300",
-};
-
-const accentGlow: Record<VariantCard["accent"], string> = {
-  red: "from-red-500/35 via-red-950/15 to-transparent",
-  violet: "from-violet-500/38 via-violet-950/16 to-transparent",
-  amber: "from-amber-500/38 via-amber-950/16 to-transparent",
-  rose: "from-rose-500/36 via-rose-950/16 to-transparent",
-  sky: "from-sky-500/38 via-sky-950/16 to-transparent",
-  emerald: "from-emerald-500/38 via-emerald-950/16 to-transparent",
-  zinc: "from-zinc-300/20 via-zinc-900/18 to-transparent",
-  orange: "from-orange-500/38 via-orange-950/16 to-transparent",
-  cyan: "from-cyan-500/38 via-cyan-950/16 to-transparent",
-  fuchsia: "from-fuchsia-500/38 via-fuchsia-950/16 to-transparent",
-  indigo: "from-indigo-500/38 via-indigo-950/16 to-transparent",
-  lime: "from-lime-500/34 via-lime-950/14 to-transparent",
-  pink: "from-pink-500/38 via-pink-950/16 to-transparent",
-  teal: "from-teal-500/38 via-teal-950/16 to-transparent",
-  blue: "from-blue-500/38 via-blue-950/16 to-transparent",
-};
-
-const accentShadow: Record<VariantCard["accent"], string> = {
-  red: "shadow-[0_0_30px_rgba(248,113,113,.08)] hover:shadow-[0_0_36px_rgba(248,113,113,.14)]",
-  violet:
-    "shadow-[0_0_30px_rgba(167,139,250,.08)] hover:shadow-[0_0_36px_rgba(167,139,250,.14)]",
-  amber:
-    "shadow-[0_0_30px_rgba(251,191,36,.08)] hover:shadow-[0_0_36px_rgba(251,191,36,.14)]",
-  rose: "shadow-[0_0_30px_rgba(251,113,133,.08)] hover:shadow-[0_0_36px_rgba(251,113,133,.14)]",
-  sky: "shadow-[0_0_30px_rgba(56,189,248,.08)] hover:shadow-[0_0_36px_rgba(56,189,248,.14)]",
-  emerald:
-    "shadow-[0_0_30px_rgba(52,211,153,.08)] hover:shadow-[0_0_36px_rgba(52,211,153,.14)]",
-  zinc: "shadow-[0_0_30px_rgba(212,212,216,.05)] hover:shadow-[0_0_36px_rgba(212,212,216,.09)]",
-  orange:
-    "shadow-[0_0_30px_rgba(251,146,60,.08)] hover:shadow-[0_0_36px_rgba(251,146,60,.14)]",
-  cyan: "shadow-[0_0_30px_rgba(34,211,238,.08)] hover:shadow-[0_0_36px_rgba(34,211,238,.14)]",
-  fuchsia:
-    "shadow-[0_0_30px_rgba(232,121,249,.08)] hover:shadow-[0_0_36px_rgba(232,121,249,.14)]",
-  indigo:
-    "shadow-[0_0_30px_rgba(129,140,248,.08)] hover:shadow-[0_0_36px_rgba(129,140,248,.14)]",
-  lime: "shadow-[0_0_30px_rgba(163,230,53,.08)] hover:shadow-[0_0_36px_rgba(163,230,53,.14)]",
-  pink: "shadow-[0_0_30px_rgba(244,114,182,.08)] hover:shadow-[0_0_36px_rgba(244,114,182,.14)]",
-  teal: "shadow-[0_0_30px_rgba(45,212,191,.08)] hover:shadow-[0_0_36px_rgba(45,212,191,.14)]",
-  blue: "shadow-[0_0_30px_rgba(96,165,250,.08)] hover:shadow-[0_0_36px_rgba(96,165,250,.14)]",
-};
-
-function LanguageSelector({
-  language,
-  onChange,
-}: {
-  language: Language;
-  onChange: (language: Language) => void;
-}) {
-  useUiLanguage();
-  return (
-    <div className="flex flex-wrap gap-2" aria-label={t(language, "Language")}>
-      {languageOptions.map((option) => (
-        <button
-          key={option.value}
-          type="button"
-          onClick={() => onChange(option.value)}
-          className={`rounded-full border px-4 py-2 text-[11px] font-semibold transition ${
-            option.value === language
-              ? "border-amber-300/65 bg-amber-300/[0.09] text-amber-100 shadow-[0_0_22px_rgba(251,191,36,.08)]"
-              : "border-white/12 bg-black/20 text-zinc-400 hover:border-white/25 hover:text-white"
-          }`}
-        >
-          {ui(option.label)}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-type VariantArtworkSpec = {
-  main: string;
-  left: string;
-  right: string;
-  footer: string;
-};
-
-const variantArtwork: Record<string, VariantArtworkSpec> = {
-  "complete-chaos": {
-    main: "♛",
-    left: "✦ ♟",
-    right: "♜ ✦",
-    footer: "PURE CHAOS",
-  },
-  draft: { main: "⚔", left: "♜ ♞", right: "♝ ♛", footer: "BUILD YOUR ARMY" },
-  mirror: { main: "◈", left: "♔", right: "♚", footer: "PERFECT SYMMETRY" },
-  "fog-of-war": {
-    main: "♚",
-    left: "░▒",
-    right: "▓░",
-    footer: "HIDDEN INFORMATION",
-  },
-  tectonic: {
-    main: "↻",
-    left: "A │ B",
-    right: "C │ D",
-    footer: "ROTATE THE BOARD",
-  },
-  roulette: {
-    main: "🎰",
-    left: "? 🎴",
-    right: "🌀 ✦",
-    footer: "LUCKY SQUARES",
-  },
-  "four-player": {
-    main: "✣",
-    left: "♜  ♞",
-    right: "♝  ♛",
-    footer: "FOUR ARMIES",
-  },
-  hotpotato: { main: "💣", left: "♟", right: "4…12", footer: "PASS THE BOMB" },
-  collapse: {
-    main: "⚠",
-    left: "▦",
-    right: "▣",
-    footer: "SURVIVE THE COLLAPSE",
-  },
-  mutation: { main: "♞", left: "♙ → ♘", right: "→ ♕", footer: "MUTATE" },
-  boss: { main: "♚", left: "♥♥♥", right: "⚡🔥", footer: "BOSS POWERS" },
-  capitalism: {
-    main: "♛",
-    left: "◉ ◉",
-    right: "♜ + ◉",
-    footer: "CAPTURE · EARN · SPEND",
-  },
-  "3d-chess": { main: "♜", left: "▦", right: "▦", footer: "MULTIPLE LAYERS" },
-  "king-of-the-hill": {
-    main: "♔",
-    left: "△",
-    right: "△",
-    footer: "CONTROL THE CENTER",
-  },
-  randomstart: {
-    main: "?",
-    left: "♜♝♞",
-    right: "♛♚♜",
-    footer: "RANDOM BACK RANK",
-  },
-  "three-lives": { main: "♥", left: "♔", right: "♥ ♥", footer: "THREE LIVES" },
-  horror: {
-    main: "☠",
-    left: "♞ ❄",
-    right: "♟ 🔥",
-    footer: "CURSE · INFECT · SURVIVE",
-  },
-};
-
-function VariantArtwork({
-  variant,
-  compact = false,
-}: {
-  variant: VariantCard;
-  compact?: boolean;
-}) {
-  useUiLanguage();
-  const art = variantArtwork[variant.id] ?? {
-    main: variant.icon,
-    left: "♜",
-    right: "♞",
-    footer: "CHESS VARIANT",
-  };
-
-  return (
-    <div
-      className={`relative overflow-hidden bg-gradient-to-br ${accentGlow[variant.accent]} ${
-        compact ? "h-full min-h-[126px]" : "h-full min-h-[300px]"
-      }`}
-    >
-      <div className="absolute inset-0 opacity-[0.09] [background-image:linear-gradient(rgba(255,255,255,.45)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.45)_1px,transparent_1px)] [background-size:42px_42px]" />
-      <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-black/75 to-transparent" />
-      <div className="absolute -right-10 -top-12 h-40 w-40 rounded-full bg-white/[0.035] blur-3xl" />
-      <span
-        className={`absolute left-4 top-4 font-black tracking-widest opacity-45 ${compact ? "text-[10px]" : "text-sm"}`}
-      >
-        {art.left}
-      </span>
-      <span
-        className={`absolute right-4 top-4 font-black tracking-widest opacity-45 ${compact ? "text-[10px]" : "text-sm"}`}
-      >
-        {art.right}
-      </span>
-      <span
-        className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[52%] select-none leading-none drop-shadow-[0_18px_28px_rgba(0,0,0,.65)] transition duration-500 group-hover:scale-105 ${
-          compact ? "text-[74px]" : "text-[145px]"
-        }`}
-      >
-        {art.main}
-      </span>
-      <span
-        className={`absolute bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap font-black uppercase tracking-[0.22em] opacity-45 ${compact ? "text-[7px]" : "text-[9px]"}`}
-      >
-        {ui(art.footer)}
-      </span>
-    </div>
-  );
-}
-
 function VariantPreviewCarousel({ language }: { language: Language }) {
   useUiLanguage();
-  const [previewOrder] = useState<VariantCard[]>(() => [
-    ...availableVariants,
-  ]);
+  const previewOrder = variants;
   const [previewIndex, setPreviewIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -721,7 +490,7 @@ function VariantPreviewCarousel({ language }: { language: Language }) {
 
   return (
     <section
-      className="group relative min-h-[430px] overflow-hidden rounded-[18px] border border-fuchsia-300/35 bg-black/55 shadow-[0_28px_90px_rgba(0,0,0,.42)] backdrop-blur-xl"
+      className="group relative w-full max-w-[680px] h-[228px] overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0d1014]/90 shadow-[0_28px_90px_rgba(0,0,0,.35)]"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -734,13 +503,13 @@ function VariantPreviewCarousel({ language }: { language: Language }) {
         {previewOrder.map((variant, index) => (
           <article
             key={`${variant.id}-${index}`}
-            className="variant-slide min-w-full p-5 sm:p-6 lg:p-7"
+            className="variant-slide min-w-full p-3 sm:p-4"
           >
-            <div className="grid min-h-[374px] gap-5 md:grid-cols-[minmax(0,1fr)_44%]">
-              <div className="relative z-10 flex min-w-0 flex-col py-1">
+            <div className="grid h-[196px] gap-3 md:grid-cols-[minmax(0,1fr)_35%]">
+              <div className="relative z-10 flex min-w-0 flex-col">
                 <div className="flex items-center justify-between gap-3">
-                  <span className="rounded-full border border-emerald-400/40 bg-emerald-400/10 px-3 py-1 text-[9px] font-black uppercase tracking-[0.17em] text-emerald-300">
-                    ● {t(language, "Available")}
+                  <span className={`rounded-full border px-3 py-1 text-[9px] font-black uppercase tracking-[0.17em] ${variant.available ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-300" : "border-amber-400/30 bg-amber-400/[0.08] text-amber-300"}`}>
+                    {t(language, variant.available ? "Available" : "Coming soon")}
                   </span>
                   <span className="text-[10px] font-black tracking-[0.2em] text-zinc-400">
                     {String(index + 1).padStart(2, "0")} /{" "}
@@ -749,38 +518,27 @@ function VariantPreviewCarousel({ language }: { language: Language }) {
                 </div>
 
                 {/* Fixed-height regions keep the play and navigation buttons in the same place for every variant. */}
-                <p className="mt-5 h-4 truncate text-[10px] font-black uppercase tracking-[0.30em] text-amber-300/90">
+                <p className="hidden h-4 truncate text-[10px] font-black uppercase tracking-[0.30em] text-amber-300/90">
                   {t(language, variant.subtitle)}
                 </p>
-                <h2 className="variant-slide-title mt-2 line-clamp-2 h-[2.1em] overflow-hidden font-serif text-4xl leading-[1.02] tracking-[-0.025em] text-white sm:text-5xl">
+                <h2 className="variant-slide-title mt-1 line-clamp-2 h-[2.1em] overflow-hidden font-serif text-2xl leading-[1.02] tracking-[-0.025em] text-white">
                   {t(language, variant.title)}
                 </h2>
-                <p className="variant-slide-desc mt-3 line-clamp-3 h-[5.25rem] max-w-xl font-serif text-[16px] leading-7 text-zinc-300/80">
+                <p className="variant-slide-desc mt-1 line-clamp-2 h-8 max-w-xl font-serif text-[11px] leading-4 text-zinc-300/80">
                   {t(language, variant.description)}
                 </p>
 
-                <div className="variant-slide-tags mt-4 flex h-[26px] flex-wrap gap-2 overflow-hidden">
-                  {variant.tags.slice(0, 3).map((tag) => (
-                    <span
-                      key={tag}
-                      className={`rounded-full border px-3 py-1 text-[10px] font-semibold ${accentClasses[variant.accent]}`}
-                    >
-                      {t(language, tag)}
-                    </span>
-                  ))}
+                <div className="variant-slide-actions mt-2 flex flex-wrap gap-1.5">
+                  {variant.available && variant.aiRoute && <Link to={variant.aiRoute} className="flex min-h-8 flex-1 items-center justify-center rounded-lg border border-amber-300/55 bg-amber-300 px-2 text-center text-[10px] font-black text-black transition hover:bg-amber-200">{t(language, "Singleplayer")}</Link>}
+                  {variant.available && variant.multiplayerRoute && <Link to={variant.multiplayerRoute} className="flex min-h-8 flex-1 items-center justify-center rounded-lg border border-fuchsia-300/40 bg-fuchsia-300/15 px-2 text-center text-[10px] font-black text-fuchsia-100 transition hover:bg-fuchsia-300/25">{ui("Multiplayer")}</Link>}
+                  {variant.available && variant.route && <Link to={variant.route} className="flex min-h-8 flex-1 items-center justify-center rounded-lg border border-white/20 bg-white/[.06] px-2 text-center text-[10px] font-black text-zinc-100 transition hover:bg-white/[.12]">{variant.id === "3d-chess" ? ui("Play") : t(language, "Hotseat")}</Link>}
                 </div>
 
-                <div className="variant-slide-actions mt-5 grid gap-2">
-                  {variant.aiRoute ? <Link to={variant.aiRoute} className="flex min-h-10 items-center justify-center rounded-xl border border-amber-300/55 bg-amber-300 px-3 text-center text-xs font-black text-black shadow-lg shadow-amber-500/15 transition hover:bg-amber-200">{t(language, "Singleplayer")}</Link> : <span aria-disabled="true" className="flex min-h-10 items-center justify-center rounded-xl border border-white/10 bg-white/[.04] px-3 text-center text-xs font-bold text-zinc-600">{t(language, "Singleplayer")}</span>}
-                  {variant.multiplayerRoute ? <Link to={variant.multiplayerRoute} className="flex min-h-10 items-center justify-center rounded-xl border border-fuchsia-300/40 bg-fuchsia-300/15 px-3 text-center text-xs font-black text-fuchsia-100 transition hover:bg-fuchsia-300/25">{ui("Multiplayer")}</Link> : <span aria-disabled="true" className="flex min-h-10 items-center justify-center rounded-xl border border-white/10 bg-white/[.04] px-3 text-center text-xs font-bold text-zinc-600">{ui("Multiplayer")}</span>}
-                  {variant.route && <Link to={variant.route} className="flex min-h-10 items-center justify-center rounded-xl border border-white/20 bg-white/[.06] px-3 text-center text-xs font-black text-zinc-100 transition hover:bg-white/[.12]">{variant.id === "3d-chess" ? ui("Play") : t(language, "Hotseat")}</Link>}
-                </div>
-
-                <div className="variant-slide-nav mt-auto flex items-end gap-3 pt-5">
+                <div className="variant-slide-nav mt-auto flex items-end gap-2 pt-1">
                   <button
                     type="button"
                     onClick={() => goTo(previewIndex - 1)}
-                    className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/30 text-2xl text-zinc-300 transition hover:border-white/35 hover:text-white"
+                    className="flex h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-black/30 text-lg text-zinc-300 transition hover:border-white/35 hover:text-white"
                     aria-label={ui("Previous variant")}
                   >
                     ‹
@@ -788,7 +546,7 @@ function VariantPreviewCarousel({ language }: { language: Language }) {
                   <button
                     type="button"
                     onClick={() => goTo(previewIndex + 1)}
-                    className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/30 text-2xl text-zinc-300 transition hover:border-white/35 hover:text-white"
+                    className="flex h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-black/30 text-lg text-zinc-300 transition hover:border-white/35 hover:text-white"
                     aria-label={ui("Next variant")}
                   >
                     ›
@@ -804,16 +562,16 @@ function VariantPreviewCarousel({ language }: { language: Language }) {
         ))}
       </div>
 
-      <div className="absolute bottom-6 left-1/2 z-20 hidden -translate-x-1/2 gap-2 md:flex">
+      <div className="absolute bottom-5 right-5 z-20 hidden max-w-[220px] justify-end gap-1 md:flex">
         {previewOrder.map((variant, index) => (
           <button
             key={`${variant.id}-dot`}
             type="button"
             onClick={() => goTo(index)}
-            className={`h-2 rounded-full transition-all ${
+            className={`h-1.5 rounded-full transition-all ${
               index === previewIndex
-                ? "w-7 bg-white/75"
-                : "w-2 bg-white/20 hover:bg-white/35"
+                ? "w-5 bg-white/75"
+                : "w-1.5 bg-white/20 hover:bg-white/35"
             }`}
             aria-label={`${t(language, variant.title)} ${index + 1}`}
           />
@@ -899,108 +657,24 @@ function VariantActionButtons({
   );
 }
 
-function VariantCardView({
-  variant,
-  language,
-  number,
-}: {
-  variant: VariantCard;
-  language: Language;
-  number: number;
-}) {
-  useUiLanguage();
-  return (
-    <article
-      className={`group relative overflow-hidden rounded-[13px] border bg-black/50 transition duration-300 hover:-translate-y-0.5 ${accentClasses[variant.accent]} ${accentShadow[variant.accent]}`}
-    >
-      <div className="grid min-h-[180px] grid-cols-[34%_minmax(0,1fr)]">
-        <div className="relative overflow-hidden border-r border-white/[0.08]">
-          <VariantArtwork variant={variant} compact />
-        </div>
-
-        <div className="relative flex min-w-0 flex-col p-3.5">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <p className="text-[8px] font-black uppercase tracking-[0.18em] text-zinc-600">
-                {String(number).padStart(2, "0")} ·{" "}
-                {t(language, variant.subtitle)}
-              </p>
-              <h3 className="mt-1.5 truncate font-serif text-[20px] leading-tight text-white">
-                {t(language, variant.title)}
-              </h3>
-            </div>
-
-            <span
-              className={`shrink-0 rounded-full border px-2 py-1 text-[7px] font-black uppercase tracking-wider ${
-                variant.available
-                  ? "border-emerald-400/35 bg-emerald-400/10 text-emerald-300"
-                  : "border-amber-400/30 bg-amber-400/[0.08] text-amber-300"
-              }`}
-            >
-              {variant.available ? "● " : "○ "}
-              {t(language, variant.available ? "Available" : "Coming soon")}
-            </span>
-          </div>
-
-          <p className="mt-2 line-clamp-2 font-serif text-[12px] leading-[1.45rem] text-zinc-400">
-            {t(language, variant.description)}
-          </p>
-
-          <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-            {variant.tags.slice(0, 2).map((tag) => (
-              <span
-                key={tag}
-                className={`rounded-full border px-2 py-0.5 text-[8px] font-semibold ${accentClasses[variant.accent]}`}
-              >
-                {t(language, tag)}
-              </span>
-            ))}
-            {variant.rulesRoute && <Link to={variant.rulesRoute} className="ml-auto inline-flex items-center gap-1 rounded-lg border border-white/15 bg-white/[.05] px-2 py-1 text-[9px] font-semibold text-zinc-300 transition hover:bg-white/10 hover:text-white"><BookOpen size={12} />{t(language, "Rules")}</Link>}
-          </div>
-
-          <div className="mt-auto pt-3">
-            <VariantActionButtons variant={variant} language={language} />
-          </div>
-        </div>
-      </div>
-    </article>
-  );
+function VariantCardView({ variant, language, number }: { variant: VariantCard; language: Language; number: number }) {
+  return <VariantDesignCard variant={variant} number={number} translate={(key) => t(language, key)} showConfigure={false} badge={ui(variant.configurable === false ? "Not configurable" : variant.available ? "Available" : "Coming soon")} actions={<VariantActionButtons variant={variant} language={language} />} />;
 }
 
 export default function ChessVariantsMenu() {
   useUiLanguage();
-  const { language, setLanguage } = useAppLanguage();
-
-  function changeLanguage(nextLanguage: Language) {
-    setLanguage(nextLanguage);
-
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("chess-language", nextLanguage);
-    }
-  }
+  const { language } = useAppLanguage();
+  const [query, setQuery] = useState("");
+  const search = query.trim().toLocaleLowerCase();
+  const shownVariants = variants.filter((variant) =>
+    [variant.title, variant.subtitle, variant.description, ...variant.tags]
+      .some((value) => value.toLocaleLowerCase().includes(search))
+  );
 
   return (
-    <main className="chess-menu-page chess-variants-menu-page relative left-1/2 min-h-[var(--app-height)] w-screen -translate-x-1/2 overflow-hidden bg-[#07090b] text-zinc-100">
-      {/* Same full-screen atmosphere as ChessMenu / ChessClassicalMenu. */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_13%_68%,rgba(245,158,11,.09),transparent_28%),radial-gradient(circle_at_76%_23%,rgba(217,70,239,.07),transparent_30%),linear-gradient(to_bottom,#0a0d10,#07090b_58%,#040506)]" />
-
-      <div className="pointer-events-none absolute -bottom-28 -left-24 text-[390px] leading-none text-amber-100/[0.035]">
-        ♚
-      </div>
-
-      <div className="pointer-events-none absolute bottom-[-72px] left-[25%] text-[250px] leading-none text-white/[0.018]">
-        ♞
-      </div>
-
-      <div className="pointer-events-none absolute right-[-50px] top-[15%] text-[290px] leading-none text-fuchsia-100/[0.018]">
-        ♝
-      </div>
-
-      <div className="relative flex min-h-[var(--app-height)] w-full flex-col">
-        {/* Same compact top bar used on the other menu pages. */}
-        <ChessPageHeader className="chess-menu-header">
-
-
+    <main className="chess-custom-page relative left-1/2 min-h-[var(--app-height)] w-screen -translate-x-1/2 bg-[#07090b] text-zinc-100">
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(245,158,11,.07),transparent_32%),radial-gradient(circle_at_88%_80%,rgba(56,189,248,.05),transparent_30%)]" />
+      <ChessPageHeader className="chess-menu-header" title="Chess Variants">
           <Link
             to="/games/chess/rules"
             className="inline-flex items-center gap-2 text-sm text-zinc-500 transition hover:text-white"
@@ -1008,70 +682,43 @@ export default function ChessVariantsMenu() {
             <span className="text-base">♔</span>
             <span className="hidden sm:inline">{t(language, "Rules")}</span>
           </Link>
-        </ChessPageHeader>
+      </ChessPageHeader>
 
-        {/* HERO: title fixed on the left, featured variant on the right. */}
-        <section className="grid min-h-0 flex-1 lg:grid-cols-[minmax(360px,.82fr)_minmax(620px,1.18fr)]">
-          <header className="relative flex min-h-[430px] flex-col justify-center px-7 py-14 sm:px-10 lg:min-h-0 lg:px-14 lg:py-16 xl:px-20 2xl:px-24">
-            <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-px bg-gradient-to-b from-transparent via-white/10 to-transparent lg:block" />
-
-            <div className="max-w-[620px]">
-              <Link
-                to="/games/chess"
-                className="mb-8 inline-flex items-center gap-2 text-sm text-zinc-600 transition hover:text-white"
-              >
-                <span>←</span>
-                {t(language, "Back to Chess")}
-              </Link>
-
-              <p className="text-[11px] font-black uppercase tracking-[0.34em] text-amber-400">
-                {t(language, "Different rules. Same board.")}
-              </p>
-
-              <h1 className="mt-5 font-serif text-[52px] leading-[.94] tracking-[-0.035em] text-white sm:text-[66px] xl:text-[82px]">
-                {t(language, "Chess Variants")}
-              </h1>
-
-              <p className="mt-6 max-w-[520px] font-serif text-[18px] leading-8 text-zinc-400 sm:text-[20px]">
-                {availableVariants.length}{ui("ways to turn classic chess into something completely different.")}</p>
-
-              <div className="mt-7 hidden">
-                <p className="mb-3 text-[9px] font-black uppercase tracking-[0.28em] text-zinc-700">
-                  {t(language, "Language")}
-                </p>
-
-                <LanguageSelector
-                  language={language}
-                  onChange={changeLanguage}
-                />
-              </div>
-            </div>
-
-            <div className="mt-12 flex items-center gap-4 text-[9px] font-black uppercase tracking-[0.28em] text-zinc-700">
-              <span className="h-px w-14 bg-amber-400/45" />
-              {variants.length}{ui("unique ways to play")}</div>
-
-            <div className="pointer-events-none absolute bottom-[5%] right-[4%] hidden text-[190px] leading-none text-amber-100/[0.022] xl:block">
-              ♞
-            </div>
-          </header>
-
-          <div className="relative flex min-h-[560px] items-center border-t border-white/[0.06] px-5 py-8 sm:px-8 lg:min-h-0 lg:border-t-0 lg:px-10 lg:py-12 xl:px-14 2xl:px-20">
-            <div className="mx-auto w-full max-w-[980px] lg:-translate-y-4">
-              <div className="mb-4 flex items-center justify-between gap-4 px-1">
-                <div>
-                  <p className="text-[9px] font-black uppercase tracking-[0.28em] text-fuchsia-300/60">{ui("Featured")}</p>
-                  <h2 className="mt-1 font-serif text-[24px] text-white sm:text-[28px]">{ui("Explore a variant")}</h2>
-                </div>
-
-                <span className="hidden text-[9px] font-black uppercase tracking-[0.25em] text-zinc-700 sm:inline">{ui("Auto preview")}</span>
-              </div>
-
-              <VariantExplorer renderVariant={(variant, index) => <VariantCardView key={variant.id} variant={variant} language={language} number={index + 1} />}><VariantPreviewCarousel language={language} /></VariantExplorer>
-            </div>
+      <div className="relative mx-auto w-full max-w-[1800px] px-4 pb-16 sm:px-6">
+        <header className="grid items-start gap-5 pt-6 lg:grid-cols-[minmax(0,320px)_minmax(0,680px)] lg:gap-10">
+          <div className="min-w-0 max-w-2xl">
+            <Link to="/games/chess" className="mb-6 inline-flex items-center gap-2 text-sm text-zinc-500 transition hover:text-white">
+              <span aria-hidden="true">←</span>{t(language, "Back to Chess")}
+            </Link>
+            <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-300/80">Pluto</p>
+            <h1 className="mt-1.5 font-serif text-[32px] leading-tight text-white sm:text-[40px]">{t(language, "Chess Variants")}</h1>
+            <p className="mt-2 text-sm leading-6 text-zinc-400">{t(language, "Different rules. Same board.")}</p>
+            <p className="mt-2 text-sm leading-6 text-zinc-500">{variants.length} {ui("unique ways to play")}</p>
           </div>
-        </section>
+          <VariantPreviewCarousel language={language} />
+        </header>
 
+        <section aria-label={t(language, "Chess Variants")} className="mt-5">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-zinc-500">{ui("Official Pluto games")}</p>
+            <label className="relative w-full sm:w-80">
+              <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+              <span className="sr-only">{ui("Search variants")}</span>
+              <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={ui("Search variants")} className="w-full rounded-xl border border-white/[0.12] bg-white/[0.04] py-2.5 pl-9 pr-3 text-sm text-zinc-100 outline-none placeholder:text-zinc-500 focus:border-amber-300/50" />
+            </label>
+          </div>
+          {shownVariants.length ? (
+            <ul className="grid gap-5 lg:grid-cols-2 2xl:grid-cols-3">
+              {shownVariants.map((variant) => (
+                <li key={variant.id} className="flex">
+                  <VariantCardView variant={variant} language={language} number={variants.indexOf(variant) + 1} />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="rounded-3xl border border-white/[0.08] bg-white/[0.02] px-6 py-10 text-center text-sm text-zinc-400">{ui("No variants match your search")}</p>
+          )}
+        </section>
       </div>
     </main>
   );

@@ -23,7 +23,7 @@ export default function ReviewDemoDialog({ moves, onClose }: { moves: string[]; 
   return createPortal(
     // The modal covers the site header, so the review (which has its own header) fills the whole screen.
     <dialog ref={dialog} aria-label={ui("Sample game review")} onCancel={onClose} style={{ "--public-header-height": "0px", "--app-height": "100dvh" } as CSSProperties} className="m-0 h-dvh max-h-none w-screen max-w-none bg-transparent p-0 text-white backdrop:bg-black/70">
-      <ChessGameReview moves={moves} open onClose={onClose} />
+      <ChessGameReview moves={moves} open inline onClose={onClose} />
     </dialog>, document.body,
   );
 }

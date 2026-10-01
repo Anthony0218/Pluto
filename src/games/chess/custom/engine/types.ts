@@ -6,7 +6,7 @@
  * here is JSON-serializable (no functions, classes, Maps or Dates).
  */
 
-export const VARIANT_SCHEMA_VERSION = 2;
+export const VARIANT_SCHEMA_VERSION = 3;
 
 /** Missing z in older saved variants means the ground board (z = 0). */
 export type Coord = { x: number; y: number; z?: number };
@@ -146,6 +146,8 @@ export interface PieceDefinition {
 /* ------------------------------------------------------------------ Teams */
 
 export interface TeamDefinition {
+  /** Armies with the same non-empty alliance cooperate and share victory. Omitted = independent. */
+  alliance?: string;
   id: TeamId;
   name: string;
   /** UI colour for chips and 2D pieces. */

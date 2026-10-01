@@ -1,3 +1,4 @@
+import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
@@ -251,6 +252,7 @@ export function CollapseMultiplayerLobby() {
   );
   const [collapseMode, setCollapseMode] = useState<CollapseMode>("squares");
   const [joinCode, setJoinCode] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
+  useInviteAutoJoin(() => joinRoom());
   const [busy, setBusy] = useState<"create" | "join" | null>(null);
   const [error, setError] = useState<string | null>(null);
 

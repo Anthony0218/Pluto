@@ -4,6 +4,16 @@ import { legacyChessCustomTarget } from "@/games/chess/custom/library/navigation
 
 // three.js pages load on demand so the rest of the app does not ship the 3D engine.
 const ChessCustomPage = lazy(() => import("./ChessCustom/ChessCustomPage.tsx"));
+const JanmannGame = lazy(() => import("@/components/chess/janmann/JanmannGame"));
+const JanmannRules = lazy(() => import("@/components/chess/janmann/JanmannRules"));
+
+export function JanmannGameRoute() {
+  return <Lazy><JanmannGame /></Lazy>;
+}
+
+export function JanmannRulesRoute() {
+  return <Lazy><JanmannRules /></Lazy>;
+}
 
 function Lazy({ children }: { children: ReactNode }) {
   return <Suspense fallback={<main className="min-h-[var(--app-height)] bg-[#07090b]" />}>{children}</Suspense>;

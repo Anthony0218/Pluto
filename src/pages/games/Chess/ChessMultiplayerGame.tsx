@@ -26,8 +26,15 @@ import { acceptChessPosition, compareChessRevision, visibleChessPosition } from 
 import RankedClock from "@/components/chess/multiplayer/RankedClock";
 import { reconcileClock, type ClockSample } from "@/games/chess/ranked/clock";
 import { invokeRankedChess } from "@/games/chess/ranked/client";
+import { useChessTopRanks } from "@/games/chess/ranked/useChessTopRanks";
+import { timeControlInfo, timeControlLabel, type TimeControl } from "@/games/chess/ranked/timeControls";
+import { premoveTargets, resolvePremove, type Premove } from "@/games/chess/ranked/premove";
+import type { BoardAnnotations } from "@/components/chess/singleplayer/boardAnnotations";
+import TopRankBadge from "@/components/chess/TopRankBadge";
 import { useAuth } from "../../../context/AuthContext.tsx";
 import ChessMoveHistoryList from "../../../components/chess/ChessMoveHistoryList.tsx";
+
+const PREMOVE_COLOR = "#fb7185";
 
 type ChessRoom = {
   id: string;
@@ -35,6 +42,7 @@ type ChessRoom = {
   host_id: string;
   status: "waiting" | "ready" | "playing" | "finished";
   match_kind: "casual" | "ranked";
+  time_control?: TimeControl | null;
 };
 
 async function rankedRequest(body: Record<string, unknown>): Promise<{ error: { message: string; code?: string; details?: string; hint?: string } | null }> {
@@ -85,6 +93,8 @@ type MultiplayerGame = {
   white_time_ms: number | null;
   black_time_ms: number | null;
   clock_started_at: string | null;
+  /** Ranked: players whose color card is drawn; the clocks wait for both. */
+  ranked_cards_drawn?: string[] | null;
 
   last_move_from: string | null;
 
@@ -827,7 +837,7 @@ export default function ChessMultiplayerGame() {
       }
       const ids = playerUserIdsKey.split(",").filter(Boolean);
       const [{ data: ratings }, { data: matches }] = await Promise.all([
-        supabase.from("chess_ratings").select("user_id,rating").in("user_id", ids),
+        supabase.from("chess_ratings").select("user_id,rating").in("user_id", ids).eq("time_control", room!.time_control ?? "rapid"),
         gameState?.status === "finished" ? supabase.from("ranked_chess_matches").select("white_id,black_id,white_before,white_after,black_before,black_after").eq("source_id", `${room!.id}:${gameState.ranked_round}`).limit(1) : Promise.resolve({ data: [] }),
       ]);
       if (!active) return;
@@ -837,8 +847,9 @@ export default function ChessMultiplayerGame() {
     }
     void loadRatings();
     return () => { active = false; };
-  }, [room?.id, room?.code, room?.match_kind, playerUserIdsKey, gameState?.status, gameState?.version, gameState?.ranked_round]);
+  }, [room?.id, room?.code, room?.match_kind, room?.time_control, playerUserIdsKey, gameState?.status, gameState?.version, gameState?.ranked_round]);
 
+  const topRanks = useChessTopRanks(room?.match_kind === "ranked", room?.time_control ?? "rapid");
   const rankedQuoteRoomId = room?.id;
   const rankedQuoteRoomCode = room?.code;
   const rankedQuoteRoomKind = room?.match_kind;
@@ -1057,8 +1068,20 @@ export default function ChessMultiplayerGame() {
 
   function drawRankedCard(index: number) {
     if (!room || !user || selectedRankedCard !== null) return;
+    const roundKey = `${room.id}:${gameState?.ranked_round ?? 1}`;
     setSelectedRankedCard(index);
-    window.setTimeout(() => { setRevealedRankedRoom(room.id); setSelectedRankedCard(null); }, 1600);
+    void sendRankedCardDraw();
+    window.setTimeout(() => { setRevealedRankedRoom(roundKey); setSelectedRankedCard(null); }, 1600);
+  }
+
+  /** Tells the server this player's card is drawn; the second card starts both clocks. */
+  async function sendRankedCardDraw() {
+    if (!room) return;
+    try {
+      const result = await invokeRankedChess<{ game: MultiplayerGame; serverNow: string }>({ op: "drawCard", code: room.code });
+      setGameState(result.game);
+      setClockSample(current => current && compareChessRevision(current.game, result.game) > 0 ? current : { game: result.game, serverNow: result.serverNow, receivedAt: performance.now() });
+    } catch { /* Retried below while the clock waits; the server deadline starts it regardless. */ }
   }
 
   async function resignGame(leaveAfter = false) {
@@ -1525,7 +1548,83 @@ export default function ChessMultiplayerGame() {
     ? assignedColor === "white" ? "w" : "b"
     : mySeat === 0 ? "w" : mySeat === 1 ? "b" : null;
 
+  /*
+   * Ranked clocks run only once both color cards are drawn. The clock sample
+   * always carries the full server row, so it is the source for the card state.
+   */
+  const rankedClockGame = room?.match_kind === "ranked" && clockSample && gameState && clockSample.game.ranked_round === gameState.ranked_round
+    ? clockSample.game
+    : null;
+  const rankedClockWaiting = !!rankedClockGame && rankedClockGame.status === "playing" && !rankedClockGame.clock_started_at;
+  const myRankedCardOnServer = !!user && !!rankedClockGame?.ranked_cards_drawn?.includes(user.id);
+  const rankedRoundKey = room && gameState ? `${room.id}:${gameState.ranked_round ?? 1}` : null;
+  const rankedCardRevealed = revealedRankedRoom === rankedRoundKey;
+  const showRankedCardDraw = room?.match_kind === "ranked" && gameState?.status === "playing" && !rankedCardRevealed
+    && (selectedRankedCard !== null || !myRankedCardOnServer);
+  // A revealed card the server missed (dropped request) is sent again on the next clock read.
+  const rankedCardResendKey = rankedCardRevealed && rankedClockWaiting && !myRankedCardOnServer ? clockSample?.receivedAt : undefined;
+  useEffect(() => {
+    if (rankedCardResendKey !== undefined) void sendRankedCardDraw();
+    // sendRankedCardDraw only reads the current room.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rankedCardResendKey]);
+
   const orientation: "white" | "black" = myColor === "b" ? "black" : "white";
+
+  /*
+   * Ranked premoves: during the opponent's turn a move can be queued. It is
+   * played the moment the turn comes back, without a second look, so it is a
+   * gamble on the opponent's reply. Until they move it can be taken back.
+   */
+  const premoveAllowed = room?.match_kind === "ranked" && gameState?.status === "playing" && !!myColor && !rankedClockWaiting;
+  const [premove, setPremove] = useState<Premove | null>(null);
+  const [premoveNotice, setPremoveNotice] = useState<string | null>(null);
+  const visibleFen = gameState?.fen;
+  const [selectionFen, setSelectionFen] = useState(visibleFen);
+
+  // A new position ends any half-made selection; its targets belonged to the old turn.
+  if (selectionFen !== visibleFen) {
+    setSelectionFen(visibleFen);
+    setSelectedSquare(null);
+    setLegalMoves([]);
+  }
+
+  if (premove && gameState?.status !== "playing") {
+    setPremove(null);
+  }
+
+  useEffect(() => {
+    if (!premoveNotice) return;
+    const timer = window.setTimeout(() => setPremoveNotice(null), 3200);
+    return () => window.clearTimeout(timer);
+  }, [premoveNotice]);
+
+  useEffect(() => {
+    if (!premove || !premoveAllowed || !gameState || !myColor) return;
+    if (gameState.fen.split(" ")[1] !== myColor || pending || moving || moveInFlight.current || gameState.undo_requested_by) return;
+    // Played (or dropped) the moment the turn comes back.
+    void Promise.resolve().then(() => {
+      const move = resolvePremove(gameState.fen, premove);
+      setPremove(null);
+      if (!move) {
+        setPremoveNotice("Premove cancelled: it is no longer legal.");
+        return;
+      }
+      void submitMove(move.from, move.to, move.promotion);
+    });
+    // submitMove reads the same render's state.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [premove, premoveAllowed, gameState?.fen, gameState?.undo_requested_by, myColor, pending, moving]);
+
+  const premoveAnnotations: BoardAnnotations | null = premove
+    ? {
+        marks: [
+          { square: premove.from, kind: "glow", color: PREMOVE_COLOR, opacity: 0.5 },
+          { square: premove.to, kind: "glow", color: PREMOVE_COLOR, opacity: 0.7 },
+        ],
+        arrows: [{ from: premove.from, to: premove.to, color: PREMOVE_COLOR, opacity: 0.85 }],
+      }
+    : null;
 
   const gameEndedForReview =
     pending === null &&
@@ -1626,7 +1725,8 @@ export default function ChessMultiplayerGame() {
             code,
             host_id,
             status,
-            match_kind
+            match_kind,
+            time_control
           `,
       )
       .eq("code", roomCode.toUpperCase())
@@ -1926,14 +2026,46 @@ export default function ChessMultiplayerGame() {
    * ----------------------------------
    */
 
+  /** Queues, changes or takes back a premove while the opponent is to move. */
+  function handlePremoveClick(square: Square) {
+    if (!gameState || !myColor) return;
+
+    const clickedPiece = chess.get(square);
+    const ownPiece = clickedPiece?.color === myColor;
+
+    // Any click takes a queued premove back; clicking one of your pieces starts a new one.
+    if (premove) {
+      setPremove(null);
+      if (!ownPiece) {
+        setSelectedSquare(null);
+        setLegalMoves([]);
+        return;
+      }
+    }
+
+    if (ownPiece && square !== selectedSquare) {
+      setSelectedSquare(square);
+      playPieceSelectSound(clickedPiece.type);
+      setLegalMoves(premoveTargets(gameState.fen, square, myColor));
+      return;
+    }
+
+    if (selectedSquare && legalMoves.includes(square)) {
+      setPremove({ from: selectedSquare, to: square });
+    }
+
+    setSelectedSquare(null);
+    setLegalMoves([]);
+  }
+
   function handleSquareClick(row: number, column: number) {
     if (
       historyPreviewPly !== null ||
       !room ||
       !gameState ||
       !myColor ||
-      moving ||
-      gameState.undo_requested_by
+      gameState.undo_requested_by ||
+      rankedClockWaiting
     ) {
       return;
     }
@@ -1945,6 +2077,15 @@ export default function ChessMultiplayerGame() {
     const files = "abcdefgh";
 
     const square = `${files[column]}${8 - row}` as Square;
+
+    if (premoveAllowed && chess.turn() !== myColor) {
+      handlePremoveClick(square);
+      return;
+    }
+
+    if (moving) {
+      return;
+    }
 
     const clickedPiece = chess.get(square);
 
@@ -2792,7 +2933,31 @@ export default function ChessMultiplayerGame() {
                   }
                   onSquareClick={historyPreview ? () => {} : handleSquareClick}
                   orientation={orientation}
+                  annotations={historyPreview ? null : premoveAnnotations}
                 />
+
+                {premoveAllowed && (premove || premoveNotice) && (
+                  <div role="status" className="pointer-events-none absolute inset-x-0 bottom-0 z-30 flex translate-y-1/2 justify-center px-3">
+                    <div className="pointer-events-auto flex items-center gap-2 rounded-full border border-rose-300/40 bg-[#1c0b11]/95 px-3 py-1.5 text-xs font-bold text-rose-100 shadow-[0_8px_24px_rgba(0,0,0,.45)] backdrop-blur">
+                      {premove ? (
+                        <>
+                          <span aria-hidden="true">⚡</span>
+                          <span>{ui("Premove")}</span>
+                          <span className="font-mono text-rose-50">{premove.from}→{premove.to}</span>
+                          <button
+                            type="button"
+                            onClick={() => setPremove(null)}
+                            className="rounded-full border border-rose-200/30 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-rose-100 transition hover:bg-rose-200/15"
+                          >
+                            {ui("Cancel")}
+                          </button>
+                        </>
+                      ) : (
+                        <span>{ui(premoveNotice)}</span>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* MOBILE INFO */}
@@ -2828,7 +2993,13 @@ export default function ChessMultiplayerGame() {
           <aside className="order-2 min-w-0 xl:order-3 xl:h-full xl:min-h-0 xl:overflow-y-auto xl:pl-1 [scrollbar-width:thin]">
             <div className="space-y-3">
               {/* PLAYERS — ordered to match the visible board */}
-              <div className="shrink-0 space-y-2">
+              <div className={`shrink-0 space-y-2 ${room.match_kind === "ranked" ? "pt-3" : ""}`}>
+                {room.match_kind === "ranked" && (
+                  <p className="flex items-center justify-between gap-2 px-1 text-[10px] font-black uppercase tracking-[0.2em] text-amber-200/70">
+                    <span>{ui("Ranked")} · {timeControlLabel(room.time_control, ui)}</span>
+                    <span className="font-semibold normal-case tracking-normal text-rose-200/60">{ui("Premoves on")}</span>
+                  </p>
+                )}
                 {multiplayerPlayerOrder.map((color, index) => {
                   const player = color === "white" ? white : black;
                   const fallbackAvatar = color === "white" ? "m1" : "f1";
@@ -2854,10 +3025,11 @@ export default function ChessMultiplayerGame() {
                         me={player?.user_id === user?.id}
                         rating={room.match_kind === "ranked" ? player ? playerRatings[player.user_id] ?? 1200 : 1200 : undefined}
                         ratingChange={gameState.status === "finished" && player ? ratingChange[player.user_id] : undefined}
+                        topRank={player ? topRanks[player.user_id] : undefined}
                         t={t}
                       />
 
-                      {room.match_kind === "ranked" && <RankedClock color={color} sample={pending?.clock ?? clockSample} pendingAt={pending?.clock && compareChessRevision(pending.clock.game, pending.game) === 0 ? pending.at : undefined} />}
+                      {room.match_kind === "ranked" && <RankedClock color={color} initialMs={timeControlInfo(room.time_control).initialMs} sample={pending?.clock ?? clockSample} pendingAt={pending?.clock && compareChessRevision(pending.clock.game, pending.game) === 0 ? pending.at : undefined} />}
                       {index === 0 && (
                         <div className="flex items-center gap-2 px-2">
                           <span className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-white/20" />
@@ -2869,6 +3041,12 @@ export default function ChessMultiplayerGame() {
                   );
                 })}
               </div>
+
+              {rankedClockWaiting && !showRankedCardDraw && (
+                <p role="status" className="rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-4 py-3 text-center text-xs font-semibold leading-5 text-amber-100/85">
+                  {ui("Waiting for your opponent to draw their color card. The clocks start once both cards are revealed.")}
+                </p>
+              )}
 
               {/* GAME CONTROLS */}
 
@@ -3424,7 +3602,7 @@ export default function ChessMultiplayerGame() {
           </div>
         )}
 
-        {room.match_kind === "ranked" && gameState.status === "playing" && revealedRankedRoom !== room.id && (
+        {showRankedCardDraw && (
           <div role="dialog" aria-modal="true" aria-label={ui("Draw your color card")} className="fixed inset-0 z-[60] flex items-center justify-center bg-[#05070b]/95 px-5 py-10 backdrop-blur-xl">
             <section className="w-full max-w-2xl rounded-[30px] border border-amber-300/25 bg-[radial-gradient(circle_at_50%_0%,rgba(245,158,11,.16),transparent_55%),#0d111a] p-7 text-center shadow-2xl shadow-black sm:p-11" aria-label={ui("Draw your color card")}>
               <p className="text-xs font-black uppercase tracking-[.3em] text-amber-300">{ui("Ranked Chess")}</p>
@@ -3588,6 +3766,7 @@ function PlayerBar({
   me = false,
   rating,
   ratingChange,
+  topRank,
   t,
 }: {
   name: string;
@@ -3597,12 +3776,14 @@ function PlayerBar({
   me?: boolean;
   rating?: number;
   ratingChange?: { before: number; after: number };
+  topRank?: number;
   t: (key: string) => string;
 }) {
   useUiLanguage();
   return (
     <div
       className={`
+        ${topRank ? "top-rank-glow" : ""}
         relative
         rounded-3xl
         border
@@ -3625,6 +3806,7 @@ function PlayerBar({
         }
       `}
     >
+      {topRank && <span className="absolute -top-2.5 right-4 z-10"><TopRankBadge rank={topRank} size="sm" /></span>}
       <div className="flex items-center gap-3">
         <div
           className={`

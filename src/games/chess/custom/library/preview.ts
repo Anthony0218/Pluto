@@ -9,7 +9,7 @@ import type { BoardDefinition, GameVariant, PositionSetup, TeamDefinition } from
 export interface VariantPreview {
   theme: string;
   layers: { z: number; width: number; height: number; cells: string }[];
-  pieces: { x: number; y: number; z: number; color: string; royal?: boolean }[];
+  pieces: { x: number; y: number; z: number; color: string; type?: string; icon?: string; royal?: boolean }[];
 }
 
 const TILE_CHAR: Record<string, string> = { normal: "o", blocked: "#", portal: "*" };
@@ -18,11 +18,13 @@ export function buildVariantPreview(source: {
   board: BoardDefinition;
   setup?: PositionSetup;
   teams?: TeamDefinition[];
+  pieces?: GameVariant["pieces"];
   theme?: GameVariant["theme"];
   royalTypes?: string[];
 }): VariantPreview {
   const colors = new Map((source.teams ?? []).map((team) => [team.id, team.color]));
-  const royal = new Set(source.royalTypes ?? ["king"]);
+  const definitions = new Map((source.pieces ?? []).map((piece) => [piece.id, piece]));
+  const royal = new Set(source.royalTypes ?? source.pieces?.filter((piece) => piece.royal).map((piece) => piece.id) ?? ["king"]);
   return {
     theme: source.theme?.boardTheme ?? "classic-wood",
     layers: boardLayers(source.board).map((layer) => {
@@ -37,6 +39,8 @@ export function buildVariantPreview(source: {
       x: piece.x,
       y: piece.y,
       z: piece.z ?? 0,
+      type: piece.type,
+      icon: definitions.get(piece.type)?.icon,
       color: colors.get(piece.team) ?? "#a1a1aa",
       ...(royal.has(piece.type) ? { royal: true } : {}),
     })),

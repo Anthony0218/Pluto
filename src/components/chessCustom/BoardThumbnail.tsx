@@ -1,4 +1,6 @@
 import { memo } from "react";
+import { chessPieceAssetThemes } from "@/assets/chess/themes";
+import { luminance } from "@/games/chess/custom/engine/teams";
 import type { VariantPreview } from "@/games/chess/custom/library/preview";
 import { getBoardTheme } from "@/games/chess/custom/themes";
 
@@ -13,7 +15,7 @@ function cellFill(char: string, light: boolean, theme: { light: string; dark: st
 
 /**
  * Card-sized picture of a variant: a flat board for single-layer variants,
- * an isometric stack for layered ones. Pieces are team-coloured dots.
+ * an isometric stack for layered ones. Pieces retain their authored icons and team colours.
  */
 function BoardThumbnail({ preview, label, className = "" }: { preview?: VariantPreview; label: string; className?: string }) {
   if (!preview || !preview.layers.length) {
@@ -54,15 +56,7 @@ function FlatBoard({ preview, theme, label, className }: { preview: VariantPrevi
       {preview.pieces
         .filter((piece) => piece.z === 0)
         .map((piece, index) => (
-          <circle
-            key={index}
-            cx={piece.x + 0.5}
-            cy={height - 1 - piece.y + 0.5}
-            r={piece.royal ? 0.36 : 0.28}
-            fill={piece.color}
-            stroke={piece.royal ? "#fcd34d" : "rgba(0,0,0,.55)"}
-            strokeWidth={piece.royal ? 0.1 : 0.07}
-          />
+          <PreviewPiece key={index} piece={piece} x={piece.x + 0.5} y={height - 1 - piece.y + 0.5} />
         ))}
     </svg>
   );
@@ -104,13 +98,28 @@ function StackedBoard({ preview, theme, label, className }: { preview: VariantPr
               .filter((piece) => piece.z === layer.z)
               .map((piece, pieceIndex) => {
                 const center = project(layer, index, piece.x + 0.5, layer.height - 1 - piece.y + 0.5);
-                return <ellipse key={pieceIndex} cx={center.x} cy={center.y - 0.18} rx={0.32} ry={0.26} fill={piece.color} stroke={piece.royal ? "#fcd34d" : "rgba(0,0,0,.55)"} strokeWidth={0.08} />;
+                return <PreviewPiece key={pieceIndex} piece={piece} x={center.x} y={center.y - 0.28} />;
               })}
           </g>
         );
       })}
     </svg>
   );
+}
+
+const STANDARD_ICONS: Record<string, string> = { pawn: "♟", knight: "♞", bishop: "♝", rook: "♜", queen: "♛", king: "♚" };
+const GLYPH_KIND: Record<string, "P" | "N" | "B" | "R" | "Q" | "K"> = { "♙": "P", "♟": "P", "♘": "N", "♞": "N", "♗": "B", "♝": "B", "♖": "R", "♜": "R", "♕": "Q", "♛": "Q", "♔": "K", "♚": "K" };
+
+function PreviewPiece({ piece, x, y }: { piece: VariantPreview["pieces"][number]; x: number; y: number }) {
+  const icon = piece.icon || STANDARD_ICONS[piece.type ?? ""] || (piece.royal ? "♚" : "?");
+  const kind = GLYPH_KIND[icon];
+  const light = luminance(piece.color) > 0.5;
+  const asset = kind ? chessPieceAssetThemes.elegant.pieces[`${light ? "w" : "b"}${kind}`] : undefined;
+  return <g>
+    {piece.royal && <rect x={x - 0.44} y={y - 0.44} width={0.88} height={0.88} rx={0.12} fill="#fcd34d" fillOpacity={0.14} stroke="#fcd34d" strokeWidth={0.035} />}
+    {asset ? <image href={asset} x={x - 0.45} y={y - 0.47} width={0.9} height={0.9} preserveAspectRatio="xMidYMid meet" /> : <text x={x} y={y + 0.03} textAnchor="middle" dominantBaseline="central" fontSize={0.68} fontFamily="'Segoe UI Symbol','Apple Symbols',serif" fill={piece.color} stroke={light ? "#1c1917" : "#d6d3d1"} strokeWidth={0.025} paintOrder="stroke">{icon}</text>}
+    <rect x={x - 0.22} y={y + 0.36} width={0.44} height={0.045} rx={0.02} fill={piece.color} />
+  </g>;
 }
 
 export default memo(BoardThumbnail);

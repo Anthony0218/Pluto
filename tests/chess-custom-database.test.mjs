@@ -7,6 +7,7 @@ try { ({ PGlite } = await import(process.env.PGLITE_MODULE || "@electric-sql/pgl
 const alice = "00000000-0000-0000-0000-00000000000a";
 const bob = "00000000-0000-0000-0000-00000000000b";
 const carol = "00000000-0000-0000-0000-00000000000c";
+const dave = "00000000-0000-0000-0000-00000000000d";
 const data = (name) => JSON.stringify({ schemaVersion: 1, name, board: { width: 8, height: 8, cells: [] }, pieces: [{ id: "king", name: "King" }] });
 
 async function setup() {
@@ -31,6 +32,22 @@ const save = (db, clientId, name) =>
   db.query("select * from save_chess_custom_variant($1,$2,$3,$4,$5,$6,$7::jsonb)", [clientId, name, "desc", "8x8", 6, 1, data(name)]);
 const publish = (db, clientId, name, description = "A fun one") =>
   db.query("select publish_chess_custom_variant($1,$2,$3,$4,$5,$6,$7::jsonb) as id", [clientId, name, description, "8x8", 6, 1, data(name)]);
+
+test("four-player room migration preserves existing host and guest seats", { skip: !PGlite }, async () => {
+  const db = new PGlite();
+  await db.exec(`create schema auth; create role authenticated; create role anon;
+    create table auth.users(id uuid primary key);
+    insert into auth.users values ('${alice}'), ('${bob}'), ('${carol}'), ('${dave}');`);
+  await db.exec(await fs.readFile(new URL("../supabase/migrations/20261005000000_chess_custom_matches.sql", import.meta.url), "utf8"));
+  await db.query("insert into chess_custom_matches(id,code,host_id,guest_id,variant_id,schema_version,revision,configuration_hash,variant,state) values ($1,'ABCDEF',$2,$3,'test',1,1,repeat('a',64),'{}','{}')", ["00000000-0000-0000-0000-000000000101", alice, bob]);
+  await db.query("insert into chess_custom_matches(id,code,host_id,variant_id,schema_version,revision,configuration_hash,variant,state) values ($1,'ABCDFG',$2,'test',1,1,repeat('a',64),'{}','{}')", ["00000000-0000-0000-0000-000000000102", carol]);
+  await db.exec(await fs.readFile(new URL("../supabase/migrations/20261011000000_chess_custom_four_player_matches.sql", import.meta.url), "utf8"));
+  const rows = (await db.query("select code,player_ids from chess_custom_matches order by code")).rows;
+  assert.deepEqual(rows, [{ code: "ABCDEF", player_ids: [alice, bob] }, { code: "ABCDFG", player_ids: [carol] }]);
+  await db.query("update chess_custom_matches set player_ids = array[$1,$2,$3,$4]::uuid[] where code = 'ABCDFG'", [carol, alice, bob, dave]);
+  assert.deepEqual((await db.query("select player_ids from chess_custom_matches where code = 'ABCDFG'")).rows[0].player_ids, [carol, alice, bob, dave]);
+  await assert.rejects(db.query("update chess_custom_matches set player_ids = array[$1,$2,$3,$1,$2]::uuid[] where code = 'ABCDEF'", [alice, bob, carol]));
+});
 
 test("variants are private, versioned and only writable through the RPCs", { skip: !PGlite }, async () => {
   const { db, as } = await setup();

@@ -5,11 +5,14 @@ import { ui, useUiLanguage } from "@/i18n/ui";
 import { HeaderBrand, NavigationControls } from "@/components/App/PublicHeader";
 import { boardColors, boardThemes, pieceThemes, useChessSettings, type BoardTheme, type PieceTheme } from "@/context/ChessSettingsContext";
 import ChessPiece from "@/components/chess/ChessPiece";
+import { chessPieceAssetThemes } from "@/assets/chess/themes";
 import { ChessAudioMenu } from "@/components/chess/ChessAudioSettings";
 import BoardAnimationToggle from "@/components/chess/singleplayer/BoardAnimationToggle";
 
 const previewSymbols = { k: ["♔", "♚"], q: ["♕", "♛"], r: ["♖", "♜"], b: ["♗", "♝"], n: ["♘", "♞"], p: ["♙", "♟"] } as const;
 const previewTypes = ["k", "q", "r", "b", "n", "p"] as const;
+// The PNGs have different transparent top margins. These heights align the visible knights.
+const knightPreviewHeights = { russian: 46, geometric: 49, elegant: 48, jazz: 53 } as const;
 
 /** A two-rank strip of the real board: white pieces over black, on the chosen board colours. */
 function AppearancePreview({ pieceTheme, boardTheme }: { pieceTheme: PieceTheme; boardTheme: BoardTheme }) {
@@ -26,11 +29,31 @@ function AppearancePreview({ pieceTheme, boardTheme }: { pieceTheme: PieceTheme;
 /** Themes are picked by number; the preview shows what each one looks like. */
 function ChessAppearance() {
   const { pieceTheme, setPieceTheme, boardTheme, setBoardTheme } = useChessSettings();
-  const select = "mt-1 w-full rounded-lg border border-white/20 bg-[#202020] px-2 py-2 text-white";
   return <details className="chess-appearance relative z-50 text-sm text-zinc-200"><summary className="cursor-pointer rounded-lg border border-white/15 px-3 py-2 transition hover:border-amber-300/50 focus-visible:outline-2 focus-visible:outline-amber-300">{ui("Appearance")}</summary>
-    <div className="absolute right-0 top-full mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-amber-300/30 bg-[#151515] p-3 shadow-2xl">
-      <label className="block text-xs font-bold text-amber-200">{ui("Piece theme")}<select value={pieceTheme} onChange={event => setPieceTheme(event.target.value as PieceTheme)} className={select}>{pieceThemes.map((theme, index) => <option key={theme} value={theme}>{index + 1}</option>)}</select></label>
-      <label className="mt-3 block text-xs font-bold text-amber-200">{ui("Board theme")}<select value={boardTheme} onChange={event => setBoardTheme(event.target.value as BoardTheme)} className={select}>{boardThemes.map((theme, index) => <option key={theme} value={theme}>{index + 1}</option>)}</select></label>
+    <div className="absolute right-0 top-full mt-2 w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-amber-300/30 bg-[#151515] p-3 shadow-2xl">
+      <fieldset>
+        <legend className="text-xs font-bold text-amber-200">{ui("Piece theme")}</legend>
+        <div className="mt-2 grid grid-cols-5 gap-1.5">
+          {pieceThemes.map((theme, index) => <button key={theme} type="button" aria-label={`${ui("Piece theme")} ${index + 1}`} aria-pressed={pieceTheme === theme} onClick={() => setPieceTheme(theme)} className={`flex min-w-0 flex-col items-center rounded-lg border p-1.5 transition hover:border-amber-300/60 focus-visible:outline-2 focus-visible:outline-amber-300 ${pieceTheme === theme ? "border-amber-300 bg-amber-300/15 text-amber-100" : "border-white/15 bg-white/[0.04] text-zinc-400"}`}>
+            <span aria-hidden="true" className="relative block h-10 w-10 overflow-hidden rounded-md bg-[#5a4938]">{theme === "classic" ? <span className="absolute inset-0 grid place-items-center font-serif text-[38px] leading-none text-[#fff3d5]">♘</span> : <img src={chessPieceAssetThemes[theme].pieces.wN} alt="" draggable={false} className="pointer-events-none absolute bottom-0 left-1/2 w-auto max-w-none -translate-x-1/2 select-none" style={{ height: knightPreviewHeights[theme] }} />}</span>
+            <span className="mt-1 text-[11px] font-semibold">{index + 1}</span>
+          </button>)}
+        </div>
+      </fieldset>
+      <fieldset className="mt-4">
+        <legend className="text-xs font-bold text-amber-200">{ui("Board theme")}</legend>
+        <div className="mt-2 grid grid-cols-4 gap-1.5">
+          {boardThemes.map((theme, index) => {
+            const colors = boardColors[theme];
+            return <button key={theme} type="button" aria-label={`${ui("Board theme")} ${index + 1}`} aria-pressed={boardTheme === theme} onClick={() => setBoardTheme(theme)} className={`flex min-w-0 flex-col items-center rounded-lg border p-1.5 transition hover:border-amber-300/60 focus-visible:outline-2 focus-visible:outline-amber-300 ${boardTheme === theme ? "border-amber-300 bg-amber-300/15 text-amber-100" : "border-white/15 bg-white/[0.04] text-zinc-400"}`}>
+              <span aria-hidden="true" className="grid h-10 w-full grid-cols-4 overflow-hidden rounded-[3px] border-2" style={{ borderColor: colors.frame }}>
+                {Array.from({ length: 16 }, (_, square) => <span key={square} style={{ backgroundColor: (Math.floor(square / 4) + square % 4) % 2 ? colors.dark : colors.light }} />)}
+              </span>
+              <span className="mt-1 text-[11px] font-semibold">{index + 1}</span>
+            </button>;
+          })}
+        </div>
+      </fieldset>
       <AppearancePreview pieceTheme={pieceTheme} boardTheme={boardTheme} />
     </div>
   </details>;

@@ -2,6 +2,11 @@ import { games } from "./games";
 
 export const learningResources = [
   {
+    title: "Chess Analysis",
+    description: "Review your saved games and improve move by move.",
+    route: "/games/chess/analysis",
+  },
+  {
     title: "Chess Puzzles",
     description: "Sharpen your tactics and pattern recognition.",
     route: "/games/chess/puzzles",

@@ -8,6 +8,8 @@ import {
   nearestEmptyCell,
   nextRandom,
   opponentsOf,
+  alliedTeams,
+  areAllies,
   teamName,
 } from "./position.ts";
 import type {
@@ -186,7 +188,10 @@ export function eliminateTeam(variant: GameVariant, state: GameState, team: Team
   if (state.eliminated.includes(team)) return;
   state.eliminated.push(team);
   const remaining = activeTeams(variant, state);
-  if (remaining.length === 1) finishGame(state, remaining, reason);
+  if (remaining.length && remaining.every((id) => areAllies(variant, remaining[0], id))) {
+    const winners = alliedTeams(variant, remaining[0]);
+    finishGame(state, winners, `${reason} — ${winners.map((id) => teamName(variant, id)).join(" & ")} win`);
+  }
   else if (remaining.length === 0) finishGame(state, [], reason, true);
   else {
     // The game goes on: a knocked-out army leaves the board.
@@ -299,16 +304,17 @@ function runAction(rt: EventRuntime, action: EventAction, context: EventContext)
         return;
       }
       if (action.type === "declareDraw") return finishGame(state, [], action.message || "Draw declared by an event", true);
-      if (action.type === "declareWinner" && team) return finishGame(state, [team], action.message || `${teamName(variant, team)} wins by event`);
+      if (action.type === "declareWinner" && team) return finishGame(state, alliedTeams(variant, team), action.message || `${teamName(variant, team)} wins by event`);
       if (action.type === "declareLoser" && team) return eliminateTeam(variant, state, team, action.message || `${teamName(variant, team)} loses by event`);
       if (action.type === "endGame") {
         const scores = activeTeams(variant, state).map((id) => ({
           id,
-          score: state.pieces.filter((piece) => piece.team === id).reduce((sum, piece) => sum + (getDefinition(variant, piece.type)?.value ?? 0), 0),
+          score: state.pieces.filter((piece) => areAllies(variant, piece.team, id)).reduce((sum, piece) => sum + (getDefinition(variant, piece.type)?.value ?? 0), 0),
         }));
         const best = Math.max(...scores.map((entry) => entry.score));
         const leaders = scores.filter((entry) => entry.score === best).map((entry) => entry.id);
-        finishGame(state, leaders.length === 1 ? leaders : [], action.message || "Game ended by event — material decides", leaders.length !== 1);
+        const shared = leaders.length > 0 && leaders.every((id) => areAllies(variant, leaders[0], id));
+        finishGame(state, shared ? alliedTeams(variant, leaders[0]) : [], action.message || "Game ended by event — material decides", !shared);
       }
       return;
     }

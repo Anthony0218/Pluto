@@ -12,6 +12,9 @@ import { getSquareName, type PieceType } from "../../../utils/chessUtils.ts";
 
 import Board from "./Board.tsx";
 import { liveCoachAnnotations } from "./boardAnnotations";
+import AutoBestMoveToggle from "./AutoBestMoveToggle";
+import { useAutoBestMove } from "./useAutoBestMove";
+import { useCoachBackfill } from "./useCoachBackfill";
 
 import {
   playPieceSelectSound,
@@ -35,6 +38,7 @@ import {
 } from "../../../utils/chessAnalysis.ts";
 
 import ChessGameReview from "./ChessGameReview";
+import { takePendingContinuation, type ReviewContinuation } from "./reviewContinuation";
 
 import { useDelayedBoardOrientation } from "../../../hooks/useDelayedBoardOrientation.ts";
 import ChessMatchStatus from "./ChessMatchStatus.tsx";
@@ -601,7 +605,7 @@ const pieceValues: Record<string, number> = {
 
 export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
   useUiLanguage();
-  const { user, profile } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
 
   const { language } = useAppLanguage();
   const t = (key: string) => translateChess(language, key);
@@ -688,8 +692,9 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
     string | null
   >(null);
 
+  // The highlighted suggestion is drawn on the board until the player picks up a piece of their own.
   const helpMove =
-    helpVisible && highlightedSuggestionUci
+    helpVisible && highlightedSuggestionUci && selectedSquare === null
       ? {
           from: highlightedSuggestionUci.slice(0, 2) as Square,
           to: highlightedSuggestionUci.slice(2, 4) as Square,
@@ -723,6 +728,22 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
    * an online game.
    */
   const coachAllowed = !onlineGameId && coachModeEnabled;
+
+  // Moves played before the coach was switched on get graded too.
+  const coachBackfill = useCoachBackfill({
+    active: coachAllowed,
+    ready: analysisReady,
+    game,
+    analyzePosition,
+    needsGrade: (ply, san) => coachGrades[ply]?.san !== san,
+    onGrade: (review) => {
+      setCoachGrades((grades) => ({ ...grades, [review.ply]: { quality: review.quality, san: review.san } }));
+
+      if (review.ply === game.history().length) {
+        setMoveFeedback(review);
+      }
+    },
+  });
 
   /* =======================================================
      BOARD
@@ -823,7 +844,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
             fenAfter: historyPreview.fenAfter,
           })
         : moveFeedback
-          ? liveCoachAnnotations({ to: moveFeedback.to, quality: moveFeedback.quality, fenAfter: moveFeedback.fenAfter })
+          ? liveCoachAnnotations({ to: moveFeedback.to, quality: moveFeedback.quality, fenAfter: moveFeedback.fenAfter, currentFen: game.fen() })
           : null;
 
   const historyPreviewCheckedKingSquare: Square | null =
@@ -1104,12 +1125,8 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
     const generation = coachGenerationRef.current;
 
-    const review = await gradeMove(
-      beforeFen,
-      afterFen,
-      playedUci,
-      playedSan,
-      analyzePosition,
+    const review = await coachBackfill.queue(() =>
+      gradeMove(beforeFen, afterFen, playedUci, playedSan, analyzePosition),
     );
 
     /*
@@ -1150,6 +1167,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
       !coachAllowed ||
       !analysisReady ||
       analyzing ||
+      coachBackfill.running ||
       gameOver ||
       game.isGameOver()
     ) {
@@ -1166,7 +1184,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
     setHighlightedSuggestionUci(null);
 
-    const result = await getBestSuggestions(fen, analyzePosition, 3);
+    const result = await coachBackfill.queue(() => getBestSuggestions(fen, analyzePosition, 3));
 
     if (generation !== coachGenerationRef.current || game.fen() !== fen) {
       return;
@@ -1180,6 +1198,21 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
      */
     setHighlightedSuggestionUci(result[0]?.uci ?? null);
   }
+
+  const autoBestMove = useAutoBestMove({
+    fen: game.fen(),
+    canShow:
+      coachAllowed &&
+      analysisReady &&
+      !analyzing &&
+      !gameOver &&
+      !game.isGameOver() &&
+      historyPreviewPly === null &&
+      !hotseatFlipPending &&
+      !helpVisible &&
+      !coachBackfill.running,
+    showHelp: () => void showBestMoves(),
+  });
 
   /* =======================================================
      LEGACY ONLINE GAME LOAD
@@ -1247,32 +1280,38 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
      SAVE GAME
      ======================================================= */
 
-  async function saveGame() {
+  /**
+   * `asNew` saves a game that was just loaded into `game` (a Game Review
+   * continuation), before the name and counter states have updated.
+   */
+  async function saveGame(asNew?: { name: string }) {
     if (!user) {
       console.error("You must be logged in to save a game.");
 
       return;
     }
 
+    const counters = asNew ? countChecks(game.history()) : null;
+
     const gameData = {
       user_id: user.id,
 
-      name: gameName || "Unnamed Game",
+      name: asNew?.name ?? (gameName || "Unnamed Game"),
 
-      white_player: whitePlayer || profile?.username || "White",
+      white_player: (asNew ? "" : whitePlayer) || profile?.username || "White",
 
-      black_player: blackPlayer || "Black",
+      black_player: (asNew ? "" : blackPlayer) || "Black",
 
       fen: game.fen(),
 
       moves: game.history(),
 
-      white_check_counter: whiteCheckCounter,
+      white_check_counter: counters?.white ?? whiteCheckCounter,
 
-      black_check_counter: blackCheckCounter,
+      black_check_counter: counters?.black ?? blackCheckCounter,
     };
 
-    if (currentGameId) {
+    if (currentGameId && !asNew) {
       const { data, error } = await supabase
         .from("games")
         .update(gameData)
@@ -1369,6 +1408,74 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
   }
 
   /* =======================================================
+     GAME REVIEW CONTINUATION
+     ======================================================= */
+
+  /** Loads a "Play from here" position from the Game Review and saves it as a new game. */
+  function loadReviewContinuation({ moves, name }: ReviewContinuation) {
+    setReviewOpen(false);
+
+    clearCoach();
+
+    setCoachGrades({});
+
+    setHistoryPreviewPly(null);
+
+    game.reset();
+
+    try {
+      for (const move of moves) {
+        game.move(move);
+      }
+    } catch (error) {
+      console.error("Invalid review continuation:", error);
+    }
+
+    setGameName(name);
+
+    setWhitePlayer("");
+
+    setBlackPlayer("");
+
+    setCurrentGameId(null);
+
+    setSelectedSquare(null);
+
+    setLegalMoves([]);
+
+    setIllegal(false);
+
+    setPromotionFrom(null);
+
+    setPromotionSquare(null);
+
+    snapToSide(game.turn());
+
+    rebuildDerivedState();
+
+    checkGameOver(false);
+
+    if (user) {
+      void saveGame({ name });
+    }
+  }
+
+  // A continuation picked in another page's Game Review (e.g. multiplayer) waits in storage.
+  useEffect(() => {
+    if (authLoading || onlineGameId) {
+      return;
+    }
+
+    const pending = takePendingContinuation();
+
+    if (pending) {
+      loadReviewContinuation(pending);
+    }
+    // Runs once auth is known, so the continuation can be saved to the account.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading]);
+
+  /* =======================================================
      LOAD SAVED GAME LIST
      ======================================================= */
 
@@ -1462,8 +1569,9 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
     /*
      * Do not mutate the position while
      * Coach Stockfish is evaluating it.
+     * Grading earlier moves stops by itself.
      */
-    if (analyzing) {
+    if (analyzing && !coachBackfill.running) {
       return;
     }
 
@@ -1522,8 +1630,13 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
      PROMOTION
      ======================================================= */
 
-  function promotePawn(piece: "q" | "r" | "b" | "n") {
-    if (!promotionFrom || !promotionSquare || gameOver || analyzing) {
+  /** `from` / `to` default to the promotion picked on the board; a Coach suggestion passes its own. */
+  function promotePawn(
+    piece: "q" | "r" | "b" | "n",
+    from: Square | null = promotionFrom,
+    to: Square | null = promotionSquare,
+  ) {
+    if (!from || !to || gameOver || (analyzing && !coachBackfill.running)) {
       return;
     }
 
@@ -1531,9 +1644,9 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
       const beforeFen = game.fen();
 
       const move = game.move({
-        from: promotionFrom,
+        from,
 
-        to: promotionSquare,
+        to,
 
         promotion: piece,
       });
@@ -1621,18 +1734,11 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
   function handleSquareClick(row: number, column: number) {
     if (
       gameOver ||
-      analyzing ||
+      (analyzing && !coachBackfill.running) ||
       historyPreviewPly !== null ||
       hotseatFlipPending
     ) {
       return;
-    }
-    if (helpVisible) {
-      setHelpVisible(false);
-
-      setSuggestions([]);
-
-      setHighlightedSuggestionUci(null);
     }
     if (promotionFrom && promotionSquare) {
       return;
@@ -1649,11 +1755,25 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
     const clickedPiece = game.get(square);
 
+    /*
+     * A click on the square the shown Coach
+     * suggestion points to plays that move.
+     */
+    const suggestionUci = helpMove && square === helpMove.to ? highlightedSuggestionUci : null;
+
+    if (helpMove && suggestionUci?.[4]) {
+      promotePawn(suggestionUci[4] as "q" | "r" | "b" | "n", helpMove.from, helpMove.to);
+
+      return;
+    }
+
+    const fromSquare = suggestionUci && helpMove ? helpMove.from : selectedSquare;
+
     /* =====================================================
        SELECT FIRST PIECE
        ===================================================== */
 
-    if (selectedSquare === null) {
+    if (fromSquare === null) {
       if (!clickedPiece) {
         return;
       }
@@ -1700,7 +1820,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
     }
 
     try {
-      const selectedPiece = game.get(selectedSquare);
+      const selectedPiece = game.get(fromSquare);
 
       /* ===================================================
          PROMOTION REQUEST
@@ -1711,7 +1831,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
         legalMoves.includes(square) &&
         (square[1] === "8" || square[1] === "1")
       ) {
-        setPromotionFrom(selectedSquare);
+        setPromotionFrom(fromSquare);
 
         setPromotionSquare(square);
 
@@ -1729,7 +1849,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
       const beforeFen = game.fen();
 
       const move = game.move({
-        from: selectedSquare,
+        from: fromSquare,
 
         to: square,
       });
@@ -2184,7 +2304,12 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
                       {/* ANALYZING */}
 
-                      {analyzing && !helpVisible && (
+                      {coachBackfill.progress ? (
+                        <div className="mt-3 flex items-center gap-2 text-xs text-zinc-500">
+                          <span className="h-2 w-2 animate-pulse rounded-full bg-amber-400" />
+                          {ui("Grading earlier moves...")} {coachBackfill.progress.done}/{coachBackfill.progress.total}
+                        </div>
+                      ) : analyzing && !helpVisible && (
                         <div className="mt-3 flex items-center gap-2 text-xs text-zinc-500">
                           <span className="h-2 w-2 animate-pulse rounded-full bg-amber-400" />
                           {t("Analyzing last move...")}
@@ -2195,7 +2320,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
                       <button
                         type="button"
-                        disabled={!analysisReady || analyzing || gameOver}
+                        disabled={!analysisReady || analyzing || gameOver || coachBackfill.running}
                         onClick={showBestMoves}
                         className={`
                         mt-4
@@ -2230,6 +2355,8 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                         {analyzing && helpVisible ? ui("Analyzing...") : helpVisible ? ui("Hide Help") : ui("Help · Next Best Moves")}
                       </button>
 
+                      <AutoBestMoveToggle enabled={autoBestMove.enabled} onToggle={autoBestMove.toggle} />
+
                       {/* SUGGESTIONS */}
 
                       {helpVisible && (
@@ -2257,9 +2384,11 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                                 <button
                                   key={`${suggestion.uci}-${index}`}
                                   type="button"
-                                  onClick={() =>
-                                    setHighlightedSuggestionUci(suggestion.uci)
-                                  }
+                                  onClick={() => {
+                                    setHighlightedSuggestionUci(suggestion.uci);
+                                    setSelectedSquare(null);
+                                    setLegalMoves([]);
+                                  }}
                                   className={`
           flex
           w-full
@@ -2314,7 +2443,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                                       </p>
 
                                       <p className="text-[10px] text-zinc-600">
-                                        {selected ? t("Shown on board") : t("Click to show")}
+                                        {selected ? ui("Click the marked square to play it") : t("Click to show")}
                                       </p>
                                     </div>
                                   </div>
@@ -2700,7 +2829,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
               {/* ANALYSIS BLOCKING MESSAGE */}
 
-              {analyzing && coachAllowed && (
+              {analyzing && coachAllowed && !coachBackfill.running && (
                 <div
                   className="
                       mt-3
@@ -2878,7 +3007,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                     onBlackPlayerChange={setBlackPlayer}
                     onUndo={undoMove}
                     onRestart={restartGame}
-                    onSave={saveGame}
+                    onSave={() => void saveGame()}
                   />
                 </div>
               </section>
@@ -2895,9 +3024,28 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
         orientation="white"
         open={reviewOpen}
         onClose={() => setReviewOpen(false)}
+        onPlayFromPosition={loadReviewContinuation}
       />
     </div>
   );
+}
+
+/** Checks given to each side over a game, as the check counters track them. */
+function countChecks(moves: string[]) {
+  const replay = new Chess();
+  let white = 0;
+  let black = 0;
+
+  for (const move of moves) {
+    replay.move(move);
+
+    if (replay.isCheck()) {
+      if (replay.turn() === "w") white += 1;
+      else black += 1;
+    }
+  }
+
+  return { white, black };
 }
 
 /* =========================================================

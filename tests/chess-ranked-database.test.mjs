@@ -20,7 +20,7 @@ create function public.create_chess_room(p_display_name text) returns text langu
 create function public.join_chess_room(p_code text,p_display_name text) returns text language plpgsql as $$ declare r uuid; begin select id into r from public.chess_rooms where code=p_code; insert into public.chess_room_players values(r,auth.uid(),1,null); update public.chess_rooms set status='ready' where id=r; return p_code; end $$;
 create function public.start_chess_game(p_room_id uuid) returns void language plpgsql as $$ begin insert into public.chess_games(room_id,fen) values(p_room_id,'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'); update public.chess_rooms set status='playing' where id=p_room_id; end $$;
  `);
- for(const file of ['20260928130000_ranked_foundation.sql','20260928180000_ranked_chess_guard.sql','20260928190000_ranked_chess_queue.sql','20260928200000_ranked_queue_autostart.sql','20260928210000_restore_ranked_round_guard.sql','20260928220000_ranked_color_draw.sql','20260929000000_ranked_lifecycle_clocks.sql']) {
+ for(const file of ['20260928130000_ranked_foundation.sql','20260928180000_ranked_chess_guard.sql','20260928190000_ranked_chess_queue.sql','20260928200000_ranked_queue_autostart.sql','20260928210000_restore_ranked_round_guard.sql','20260928220000_ranked_color_draw.sql','20260929000000_ranked_lifecycle_clocks.sql','20261009000000_ranked_card_draw_clock.sql','20261010000000_ranked_time_controls.sql']) {
   let sql=readFileSync(new URL('../supabase/migrations/'+file,import.meta.url),'utf8');
   // pg_cron is a server extension unavailable in WASM. Exercise its exact
   // maintenance function below; installation/scheduling remains deployment QA.
@@ -29,7 +29,7 @@ create function public.start_chess_game(p_room_id uuid) returns void language pl
  }
  const users=Array.from({length:4},(_,i)=>`00000000-0000-4000-8000-${String(i+1).padStart(12,'0')}`);
  for(const u of users)await db.query('insert into auth.users values($1)',[u]);
- const act=async(i,session,op)=> (await db.query('select public.ranked_queue_action($1,$2,$3) result',[users[i],session,op])).rows[0].result;
+ const act=async(i,session,op,timeControl)=> (await db.query(timeControl?'select public.ranked_queue_action($1,$2,$3,$4,$5) result':'select public.ranked_queue_action($1,$2,$3) result',timeControl?[users[i],session,op,'Player',timeControl]:[users[i],session,op])).rows[0].result;
  const count=async(table)=>(await db.query(`select count(*)::int n from public.${table}`)).rows[0].n;
  return {db,users,act,count};
 }
@@ -42,7 +42,7 @@ test('queue lifecycle: late join, duplicate joins, refresh sessions, lease clean
   const refreshed=crypto.randomUUID();assert.equal((await act(0,refreshed,'queueStatus')).status,'idle');
   await act(0,refreshed,'queue');await act(0,a,'leaveQueue');assert.equal(await count('ranked_chess_queue'),1);
   const match=await act(1,b,'queue');assert.equal(match.status,'matched');assert.equal((await act(0,refreshed,'queueStatus')).code,match.code);
-  const g=(await db.query('select * from chess_games')).rows[0];assert.equal(g.white_time_ms,300000);assert.equal(g.black_time_ms,300000);assert.ok(g.clock_started_at);
+  const g=(await db.query('select * from chess_games')).rows[0];assert.equal(g.white_time_ms,300000);assert.equal(g.black_time_ms,300000);assert.equal(g.clock_started_at,null);assert.ok(g.ranked_draw_deadline);
   await act(0,refreshed,'leaveQueue');assert.equal((await db.query('select status from chess_games')).rows[0].status,'playing');
   assert.equal((await act(0,crypto.randomUUID(),'queueStatus')).code,match.code);
   const c=crypto.randomUUID();await act(2,c,'queue');await db.exec("update ranked_chess_queue set last_seen_at=clock_timestamp()-interval '13 seconds' where claimed_by is null");
@@ -133,6 +133,66 @@ test('repeated timeout settlement awards Elo once and a rematch resets both cloc
   assert.equal((await db.query('select count(*)::int n from ranked_chess_matches')).rows[0].n,1);
   await db.query("update chess_games set status='playing',winner=null,end_reason=null,version=0 where room_id=$1",[g.room_id]);
   const next=(await db.query('select * from chess_games')).rows[0];
-  assert.equal(next.ranked_round,2);assert.equal(next.white_time_ms,300000);assert.equal(next.black_time_ms,300000);assert.ok(next.clock_started_at);
+  assert.equal(next.ranked_round,2);assert.equal(next.white_time_ms,300000);assert.equal(next.black_time_ms,300000);assert.equal(next.clock_started_at,null);assert.deepEqual(next.ranked_cards_drawn,[]);
+ }finally{await db.close()}
+});
+test('ranked clocks wait for both color cards, or start at the draw deadline',async()=>{
+ const {db,act,users}=await database();
+ try{
+  await act(0,crypto.randomUUID(),'queue');await act(1,crypto.randomUUID(),'queue');
+  const g=(await db.query('select * from chess_games')).rows[0];
+  const draw=async(i)=>(await db.query('select public.ranked_draw_card($1,$2) result',[g.room_id,users[i]])).rows[0].result.game;
+  // Time does not run while the cards are face down.
+  await db.query('select public.ranked_clock_snapshot($1)',[g.room_id]);
+  assert.equal((await db.query('select clock_started_at from chess_games')).rows[0].clock_started_at,null);
+  let state=await draw(0);assert.equal(state.clock_started_at,null);assert.deepEqual(state.ranked_cards_drawn,[users[0]]);assert.equal(state.version,g.version+1);
+  state=await draw(0);assert.equal(state.version,g.version+1);
+  await assert.rejects(draw(2),/Join the room/);
+  state=await draw(1);assert.ok(state.clock_started_at);assert.equal(state.white_time_ms,300000);assert.equal(state.version,g.version+2);
+  // A card drawn after the clock started changes nothing.
+  assert.equal((await draw(1)).version,g.version+2);
+  // Clients cannot mark cards themselves.
+  await db.query("update chess_games set status='finished',winner='white',end_reason='resignation',version=version+1");
+  await db.query('select apply_verified_ranked_chess_result($1)',[g.room_id]);
+  await db.query("update chess_games set status='playing',winner=null,end_reason=null,version=0");
+  await db.exec("select set_config('request.jwt.claim.role','authenticated',false)");
+  await assert.rejects(db.query('update chess_games set ranked_cards_drawn=$1,version=version+1',[[users[0],users[1]]]),/verified game service/);
+  await db.exec("select set_config('request.jwt.claim.role','service_role',false)");
+  state=(await db.query('select * from chess_games')).rows[0];assert.deepEqual(state.ranked_cards_drawn,[]);assert.equal(state.clock_started_at,null);
+  // An absent player cannot stall the match past the deadline.
+  await db.exec("alter table chess_games disable trigger z_ranked_clock_guard; update chess_games set ranked_draw_deadline=clock_timestamp()-interval '1 second'; alter table chess_games enable trigger z_ranked_clock_guard");
+  await db.exec('select public.maintain_ranked_chess()');
+  assert.ok((await db.query('select clock_started_at from chess_games')).rows[0].clock_started_at);
+  await db.exec("select set_config('request.jwt.claim.role','authenticated',false)");
+  await assert.rejects(db.query('select ranked_draw_card($1,$2)',[g.room_id,users[0]]),/Service only/);
+ }finally{await db.close()}
+});
+
+test('time controls keep separate queues, clocks and Elo',async()=>{
+ const {db,act,users}=await database();
+ try{
+  const sessions=users.map(()=>crypto.randomUUID());
+  assert.equal((await act(0,sessions[0],'queue','bullet')).status,'waiting');
+  // A Blitz player is not paired with a waiting Bullet player.
+  assert.equal((await act(1,sessions[1],'queue','blitz')).status,'waiting');
+  // Status polls keep the control the player queued for.
+  assert.equal((await act(0,sessions[0],'queueStatus')).timeControl,'bullet');
+  const match=await act(2,sessions[2],'queue','bullet');assert.equal(match.status,'matched');assert.equal(match.timeControl,'bullet');
+  const bullet=(await db.query("select g.*,r.time_control from chess_games g join chess_rooms r on r.id=g.room_id where r.code=$1",[match.code])).rows[0];
+  assert.equal(bullet.time_control,'bullet');assert.equal(bullet.white_time_ms,60000);assert.equal(bullet.black_time_ms,60000);
+  // Switching the waiting entry to Classical moves it to that queue and clock.
+  assert.equal((await act(1,sessions[1],'queue','classical')).timeControl,'classical');
+  const classical=await act(3,sessions[3],'queue','classical');assert.equal(classical.status,'matched');
+  assert.equal((await db.query("select g.white_time_ms from chess_games g join chess_rooms r on r.id=g.room_id where r.code=$1",[classical.code])).rows[0].white_time_ms,600000);
+  await assert.rejects(act(0,crypto.randomUUID(),'queue','hyperbullet'),/Unknown time control/);
+  // A Bullet result changes only Bullet ratings.
+  await db.query("update chess_games set status='finished',winner='white',end_reason='resignation',version=version+1 where room_id=$1",[bullet.room_id]);
+  await db.query('select apply_verified_ranked_chess_result($1)',[bullet.room_id]);
+  const ratings=(await db.query('select time_control,rated_games from chess_ratings order by user_id')).rows;
+  assert.ok(ratings.length===2&&ratings.every(r=>r.time_control==='bullet'&&r.rated_games===1));
+  assert.equal((await db.query('select time_control from ranked_chess_matches')).rows[0].time_control,'bullet');
+  await db.query("insert into profiles(id,username) select id,'p' from auth.users");
+  assert.equal((await db.query("select count(*)::int n from get_chess_elo_leaderboard('bullet')")).rows[0].n,2);
+  assert.equal((await db.query("select count(*)::int n from get_chess_elo_leaderboard()")).rows[0].n,0);
  }finally{await db.close()}
 });

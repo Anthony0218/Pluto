@@ -33,7 +33,7 @@ export default function ChessMultiplayerModeMenu() {
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<0 | 1>(0);
   const inviteCode = searchParams.get("code");
-  if (inviteCode) return <Navigate replace to={`/games/chess/classic/multiplayer/friends?code=${encodeURIComponent(inviteCode)}`} />;
+  if (inviteCode) return <Navigate replace to={`/games/chess/classic/multiplayer/friends?${searchParams.toString()}`} />;
 
   return <main className="chess-menu-page relative left-1/2 min-h-[var(--app-height)] w-screen -translate-x-1/2 overflow-hidden bg-[#07090b] text-zinc-100">
     <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_13%_68%,rgba(245,158,11,.09),transparent_28%),radial-gradient(circle_at_76%_23%,rgba(255,255,255,.045),transparent_30%),linear-gradient(to_bottom,#0a0d10,#07090b_58%,#040506)]" />

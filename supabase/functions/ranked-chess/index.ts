@@ -3,9 +3,10 @@ import { Chess } from "npm:chess.js@1.4.0";
 
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const response = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json", "Cache-Control": "no-store" } });
-type Room = { id: string; code: string; host_id: string; match_kind: string };
+type Room = { id: string; code: string; host_id: string; match_kind: string; time_control: string };
+const timeControls = ["bullet", "blitz", "rapid", "classical"];
 type Player = { user_id: string; seat: number; chosen_color: "white" | "black" | null };
-type Game = { room_id: string; fen: string; moves: string[]; status: string; winner: string | null; version: number; ranked_round: number; undo_requested_by: string | null; undo_requested_version: number | null; undo_last_requested_by: string | null; undo_last_requested_version: number | null };
+type Game = { room_id: string; fen: string; moves: string[]; status: string; winner: string | null; version: number; ranked_round: number; undo_requested_by: string | null; undo_requested_version: number | null; undo_last_requested_by: string | null; undo_last_requested_version: number | null; clock_started_at?: string | null };
 const validCode = (value: unknown) => typeof value === "string" && /^[A-Z0-9]{6}$/.test(value.toUpperCase());
 function replay(moves: string[]) {
   const chess = new Chess();
@@ -33,16 +34,19 @@ Deno.serve(async request => {
     const body = JSON.parse(raw) as Record<string, unknown>;
     if (body.op === "queue" || body.op === "queueStatus" || body.op === "leaveQueue") {
       if (typeof body.sessionId !== "string" || !/^[0-9a-f-]{36}$/i.test(body.sessionId)) throw new Error("Invalid queue session.");
+      const timeControl = body.timeControl ?? "rapid";
+      if (typeof timeControl !== "string" || !timeControls.includes(timeControl)) throw new Error("Unknown time control.");
       const { data, error } = await db.rpc("ranked_queue_action", {
         p_user: user.id, p_session: body.sessionId, p_op: body.op,
         p_name: typeof body.name === "string" ? body.name : "Player",
+        p_time_control: timeControl,
       });
       if (error) throw new Error(error.message);
       return response(data);
     }
     if (!validCode(body.code)) throw new Error("Invalid room code.");
     const code = (body.code as string).toUpperCase();
-    const { data: room, error: roomError } = await db.from("chess_rooms").select("id,code,host_id,match_kind").eq("code", code).maybeSingle();
+    const { data: room, error: roomError } = await db.from("chess_rooms").select("id,code,host_id,match_kind,time_control").eq("code", code).maybeSingle();
     if (body.op === "inspect") return roomError || !room ? response({ error: "Room not found." }, 404) : response({ matchKind: room.match_kind });
     if (roomError || !room || ((room as Room).match_kind !== "ranked" && body.op !== "casualMove")) return response({ error: "Ranked room not found." }, 404);
     const { data: players, error: playersError } = await db.from("chess_room_players").select("user_id,seat,chosen_color").eq("room_id", room.id);
@@ -69,7 +73,7 @@ Deno.serve(async request => {
       const opponent = (players as Player[]).find(entry => entry.user_id !== user.id);
       if (!opponent) throw new Error("Opponent not found.");
       const { data: ratings, error: ratingsError } = await db.from("chess_ratings")
-        .select("user_id,rating,rated_games").in("user_id", [user.id, opponent.user_id]);
+        .select("user_id,rating,rated_games").in("user_id", [user.id, opponent.user_id]).eq("time_control", (room as Room).time_control);
       if (ratingsError) throw new Error(ratingsError.message);
       const mine = ratings?.find(entry => entry.user_id === user.id);
       const theirs = ratings?.find(entry => entry.user_id === opponent.user_id);
@@ -88,12 +92,20 @@ Deno.serve(async request => {
       return response({ ok: true });
     }
     if (current.status !== "playing") throw new Error("Game is not active.");
+    if (body.op === "drawCard") {
+      if (!isRanked) throw new Error("Only ranked games use color cards.");
+      // The second card starts both clocks; drawing again is a no-op.
+      const { data, error } = await db.rpc("ranked_draw_card", { p_room_id: room.id, p_user: user.id });
+      if (error) throw new Error(error.message);
+      return response(data);
+    }
     if (body.version !== current.version || body.round !== current.ranked_round) return response({ error: "Stale position. Refresh the board." }, 409);
     const color = sideOf(player);
     if (!color) throw new Error("Choose a side before playing.");
     let update: Record<string, unknown>;
     if (body.op === "move" || body.op === "casualMove") {
       if (current.undo_requested_by) throw new Error("Answer the undo request first.");
+      if (isRanked && !current.clock_started_at) throw new Error("Both players must draw their color card first.");
       if (color !== chess.turn()) throw new Error("It is not your turn.");
       if (typeof body.from !== "string" || typeof body.to !== "string" || !/^[a-h][1-8]$/.test(body.from) || !/^[a-h][1-8]$/.test(body.to)) throw new Error("Invalid move.");
       const promotion = ["q", "r", "b", "n"].includes(String(body.promotion)) ? String(body.promotion) : "q";

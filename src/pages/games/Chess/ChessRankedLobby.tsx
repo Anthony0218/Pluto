@@ -10,10 +10,31 @@ import { supabase } from "@/lib/supabase";
 import { invokeRankedChess, leaveRankedQueue, RankedAuthError } from "@/games/chess/ranked/client";
 import { getChessRank, type RankFamily } from "@/games/chess/ranked/tiers";
 import RankEmblem from "@/components/chess/RankEmblem";
+import TopRankBadge from "@/components/chess/TopRankBadge";
+import { isTimeControl, timeControlLabel, timeControls, type TimeControl } from "@/games/chess/ranked/timeControls";
 
 type QueueStatus = "idle" | "waiting" | "found" | "matched";
-type QueueResponse = { status?: QueueStatus; code?: string; error?: string };
+type QueueResponse = { status?: QueueStatus; code?: string; error?: string; timeControl?: string };
 type EloRow = { rank: number; user_id: string; username: string; avatar_id: string | null; rating: number };
+type RatingRow = { time_control: string; rating: number; rated_games: number };
+
+const TIME_CONTROL_KEY = "chess-ranked-time-control";
+
+function storedTimeControl(): TimeControl {
+  try {
+    const stored = localStorage.getItem(TIME_CONTROL_KEY);
+    return isTimeControl(stored) ? stored : "rapid";
+  } catch {
+    return "rapid";
+  }
+}
+
+/** Mode tabs shared by the play card and the leaderboard. */
+function TimeControlTabs({ value, onChange, disabled = false, label }: { value: TimeControl; onChange: (next: TimeControl) => void; disabled?: boolean; label: string }) {
+  return <div role="tablist" aria-label={label} className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+    {timeControls.map(mode => <button key={mode.id} type="button" role="tab" aria-selected={value === mode.id} disabled={disabled && value !== mode.id} onClick={() => onChange(mode.id)} className={`rounded-xl border px-2 py-2 text-xs font-bold transition focus-visible:outline-2 focus-visible:outline-amber-300 disabled:opacity-40 ${value === mode.id ? "border-amber-300 bg-amber-300/15 text-amber-100" : "border-white/10 text-zinc-400 hover:border-amber-300/40 hover:text-white"}`}>{ui(mode.name)}<span className="mt-0.5 block font-mono">{mode.clock}</span></button>)}
+  </div>;
+}
 
 const rankLegend: { family: RankFamily; range: string; divisions: string; detail: string }[] = [
   { family: "Bronze", range: "Below 800 Elo", divisions: "Bronze V → I", detail: "The entry ranks. Bronze V covers the widest opening range; from Bronze IV onward, each division is 100 Elo." },
@@ -66,9 +87,15 @@ export default function ChessRankedLobby({ embedded = false }: { embedded?: bool
   const { user, profile } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState<"play" | "leaderboard">("play");
-  const [rating, setRating] = useState(1200);
-  const [games, setGames] = useState(0);
-  const [rows, setRows] = useState<LeaderboardRow[]>([]);
+  const [timeControl, setTimeControl] = useState<TimeControl>(storedTimeControl);
+  const [boardControl, setBoardControl] = useState<TimeControl>(timeControl);
+  const [ratings, setRatings] = useState<Partial<Record<TimeControl, { rating: number; games: number }>>>({});
+  const [boards, setBoards] = useState<Partial<Record<TimeControl, LeaderboardRow[]>>>({});
+  const timeControlRef = useRef(timeControl);
+  useEffect(() => { timeControlRef.current = timeControl; }, [timeControl]);
+  const rating = ratings[timeControl]?.rating ?? 1200;
+  const games = ratings[timeControl]?.games ?? 0;
+  const rows = boards[boardControl];
   const [status, setStatus] = useState<QueueStatus>("idle");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -94,27 +121,46 @@ export default function ChessRankedLobby({ embedded = false }: { embedded?: bool
   }, [user?.id]);
   const name = profile?.display_name || profile?.username || user?.email?.split("@")[0] || "Player";
   const rank = getChessRank(rating);
+  const topRank = user ? boards[timeControl]?.find(row => row.user_id === user.id)?.rank : undefined;
+
+  function chooseTimeControl(next: TimeControl) {
+    setTimeControl(next);
+    setBoardControl(next);
+    try { localStorage.setItem(TIME_CONTROL_KEY, next); } catch { /* Storage blocked: the choice lasts for this visit. */ }
+  }
 
   useEffect(() => {
     if (!user) return;
     let active = true;
-    void Promise.all([
-      supabase.from("chess_ratings").select("rating,rated_games").eq("user_id", user.id).maybeSingle(),
-      supabase.rpc("get_chess_elo_leaderboard"),
-    ]).then(([myRating, leaderboard]) => {
-      if (!active) return;
-      if (myRating.data) { setRating(myRating.data.rating); setGames(myRating.data.rated_games); }
-      if (leaderboard.error) setError(leaderboard.error.message);
-      else setRows(((leaderboard.data ?? []) as EloRow[]).map(row => ({ rank: row.rank, user_id: row.user_id, username: row.username, avatar_id: row.avatar_id, value: row.rating })));
+    void Promise.resolve(supabase.from("chess_ratings").select("time_control,rating,rated_games").eq("user_id", user.id)).then(result => {
+      if (!active || !Array.isArray(result?.data)) return;
+      setRatings(Object.fromEntries((result.data as RatingRow[]).filter(row => isTimeControl(row.time_control)).map(row => [row.time_control, { rating: row.rating, games: row.rated_games }])));
     });
     return () => { active = false; };
   }, [user]);
 
+  // Each mode's leaderboard loads once, when the play card or the leaderboard first needs it.
+  const neededBoards = [...new Set([timeControl, boardControl])].filter(control => !boards[control]).join(",");
+  useEffect(() => {
+    if (!user || !neededBoards) return;
+    let active = true;
+    for (const control of neededBoards.split(",") as TimeControl[]) {
+      void supabase.rpc("get_chess_elo_leaderboard", { p_time_control: control }).then(leaderboard => {
+        if (!active) return;
+        if (leaderboard.error) setError(leaderboard.error.message);
+        setBoards(current => ({ ...current, [control]: ((leaderboard.data ?? []) as EloRow[]).map(row => ({ rank: row.rank, user_id: row.user_id, username: row.username, avatar_id: row.avatar_id, value: row.rating })) }));
+      });
+    }
+    return () => { active = false; };
+  }, [user, neededBoards]);
+
   const request = useCallback(async (op: "queue" | "queueStatus" | "leaveQueue") => {
     const current = lease.current;
     if (!current.active) return;
-    const result = await invokeRankedChess<QueueResponse>({ op, name, sessionId: current.id });
+    const result = await invokeRankedChess<QueueResponse>({ op, name, sessionId: current.id, timeControl: timeControlRef.current });
     if (!current.active || current !== lease.current) { leaveRankedQueue(current.id); return; }
+    // A search restored after a reload shows the control it is running in.
+    if (result?.status === "waiting" && isTimeControl(result.timeControl)) setTimeControl(result.timeControl);
     if (result?.status) setStatus(result.status);
     setError(result?.error ?? null);
     if (result?.status === "matched" && result.code) {
@@ -161,11 +207,11 @@ export default function ChessRankedLobby({ embedded = false }: { embedded?: bool
       </div>
       {!user ? <section className="mt-6 rounded-3xl border border-white/10 bg-white/[.035] p-8"><p>{ui("Sign in to play ranked chess and view your rating.")}</p><Link to="/login" className="mt-5 inline-block rounded-xl bg-amber-300 px-6 py-3 font-bold text-black">{ui("Sign in")}</Link></section> : tab === "play" ? <div className="mt-6">
         <div className="grid gap-4 md:grid-cols-2">
-          <section className="rounded-[22px] border border-amber-300/25 bg-gradient-to-br from-amber-300/[.08] to-white/[.02] p-5 sm:p-6"><p className="text-[9px] font-black uppercase tracking-[.26em] text-amber-300/80">{ui("Your Rapid 5+0 Elo")}</p><div className="mt-5 flex items-center gap-5"><RankEmblem family={rank.family} size="lg" /><div><div className="font-serif text-6xl leading-none tabular-nums text-white">{rating}</div><p className="mt-1 text-lg font-semibold text-amber-200">{ui(rank.name)}</p></div></div><div className="mt-5 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-amber-500 to-yellow-200" style={{ width: `${rank.progress * 100}%` }} /></div><p className="mt-2 text-xs text-zinc-400">{rank.nextAt ? `${rank.nextAt - rating} ${ui("Elo to")} ${ui(getChessRank(rank.nextAt).name)}` : ui("Highest tier reached")}</p><p className="mt-4 text-sm text-zinc-400">{games ? `${games} ${ui("rated games")}` : ui("Starting rating · Play your first ranked match")}</p><button type="button" onClick={() => setTab("leaderboard")} className="mt-5 text-sm font-bold text-amber-300 hover:text-amber-200">{ui("View leaderboard →")}</button></section>
-          <section className="flex flex-col rounded-[22px] border border-white/[0.09] bg-black/20 p-5 sm:p-6"><p className="text-[9px] font-black uppercase tracking-[.26em] text-amber-300/70">{ui("Competitive game")}</p><h2 className="mt-1.5 font-serif text-[27px] leading-tight text-white sm:text-[31px]">{ui("Find match")}</h2><div className="mt-5"><p className="mb-2 text-xs font-bold uppercase tracking-widest text-zinc-400">{ui("Time control")}</p><div className="grid grid-cols-2 gap-2">{[{ name: "Bullet", clock: "1+0", ready: false }, { name: "Blitz", clock: "3+0", ready: false }, { name: "Rapid", clock: "5+0", ready: true }, { name: "Classical", clock: "10+0", ready: false }].map(mode => <button key={mode.name} type="button" disabled={!mode.ready} aria-pressed={mode.ready} title={mode.ready ? undefined : ui("Coming soon")} className={`rounded-xl border px-2 py-2 text-xs font-bold ${mode.ready ? "border-amber-300 bg-amber-300/15 text-amber-100" : "border-white/10 text-zinc-600"}`}>{ui(mode.name)}<span className="mt-0.5 block font-mono">{mode.clock}</span></button>)}</div><p className="mt-2 text-xs text-zinc-500">{ui("Rapid 5+0 is available now. Other time controls are coming soon.")}</p></div><div className="mt-auto pt-6"><button type="button" disabled={busy || status === "found"} onClick={() => void changeQueue(status === "waiting" ? "leaveQueue" : "queue")} className="flex w-full items-center justify-center gap-3 rounded-xl border border-amber-300/45 bg-amber-300 px-6 py-3.5 text-base font-black text-black transition hover:bg-amber-200 disabled:opacity-50"><Users size={20} />{busy ? ui("Please wait…") : status === "waiting" ? ui("Leave queue") : status === "found" ? ui("Starting match…") : ui("Find match")}</button><p className="mt-3 text-center text-xs text-zinc-400" aria-live="polite">{status === "waiting" ? ui("Searching for an opponent near your Elo…") : status === "found" ? ui("Opponent found. Opening your game…") : ui("Your game opens automatically when a match is ready.")}</p></div></section>
+          <section className={`relative rounded-[22px] border border-amber-300/25 bg-gradient-to-br from-amber-300/[.08] to-white/[.02] p-5 sm:p-6 ${topRank ? "top-rank-glow" : ""}`}>{topRank && <span className="absolute right-4 top-4"><TopRankBadge rank={topRank} /></span>}<p className="text-[9px] font-black uppercase tracking-[.26em] text-amber-300/80">{ui("Your Elo")} · {timeControlLabel(timeControl, ui)}</p><div className="mt-5 flex items-center gap-5"><RankEmblem family={rank.family} size="lg" /><div><div className="font-serif text-6xl leading-none tabular-nums text-white">{rating}</div><p className="mt-1 text-lg font-semibold text-amber-200">{ui(rank.name)}</p></div></div><div className="mt-5 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-amber-500 to-yellow-200" style={{ width: `${rank.progress * 100}%` }} /></div><p className="mt-2 text-xs text-zinc-400">{rank.nextAt ? `${rank.nextAt - rating} ${ui("Elo to")} ${ui(getChessRank(rank.nextAt).name)}` : ui("Highest tier reached")}</p><p className="mt-4 text-sm text-zinc-400">{games ? `${games} ${ui("rated games")}` : ui("Starting rating · Play your first ranked match")}</p><button type="button" onClick={() => setTab("leaderboard")} className="mt-5 text-sm font-bold text-amber-300 hover:text-amber-200">{ui("View leaderboard →")}</button></section>
+          <section className="flex flex-col rounded-[22px] border border-white/[0.09] bg-black/20 p-5 sm:p-6"><p className="text-[9px] font-black uppercase tracking-[.26em] text-amber-300/70">{ui("Competitive game")}</p><h2 className="mt-1.5 font-serif text-[27px] leading-tight text-white sm:text-[31px]">{ui("Find match")}</h2><div className="mt-5"><p className="mb-2 text-xs font-bold uppercase tracking-widest text-zinc-400">{ui("Time control")}</p><TimeControlTabs value={timeControl} onChange={chooseTimeControl} disabled={status !== "idle"} label={ui("Time control")} /><p className="mt-2 text-xs leading-5 text-zinc-500">{ui("Each time control has its own queue and Elo. Premoves are allowed in every ranked game.")}</p></div><div className="mt-auto pt-6"><button type="button" disabled={busy || status === "found"} onClick={() => void changeQueue(status === "waiting" ? "leaveQueue" : "queue")} className="flex w-full items-center justify-center gap-3 rounded-xl border border-amber-300/45 bg-amber-300 px-6 py-3.5 text-base font-black text-black transition hover:bg-amber-200 disabled:opacity-50"><Users size={20} />{busy ? ui("Please wait…") : status === "waiting" ? ui("Leave queue") : status === "found" ? ui("Starting match…") : ui("Find match")}</button><p className="mt-3 text-center text-xs text-zinc-400" aria-live="polite">{status === "waiting" ? ui("Searching for an opponent near your Elo…") : status === "found" ? ui("Opponent found. Opening your game…") : ui("Your game opens automatically when a match is ready.")}</p></div></section>
         </div>
         <div className="mt-4 rounded-[22px] border border-white/[0.08] bg-black/20 p-5 shadow-[0_16px_40px_rgba(0,0,0,.18)] sm:p-6"><p className="text-[9px] font-black uppercase tracking-[.28em] text-amber-300/65">{ui("How it works")}</p><div className="mt-4 grid gap-4 sm:grid-cols-2">{["Enter the queue and wait for an opponent near your Elo.", "Your game opens automatically and your rating updates afterwards."].map((step, index) => <div key={step} className="flex gap-4"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-amber-300/30 text-sm font-black text-amber-300">{index + 1}</span><p className="text-sm leading-6 text-zinc-500">{ui(step)}</p></div>)}</div></div>
-      </div> : <section className="mt-6 rounded-3xl border border-white/10 bg-white/[.035] p-6 sm:p-9"><div className="flex items-center gap-3"><Trophy className="text-amber-300" /><h2 className="font-serif text-3xl">{ui("Rapid 5+0 leaderboard")}</h2></div><div className="mt-6">{rows.length ? <LeaderboardTable rows={rows} valueLabel="Elo" currentUserId={user.id} /> : <p className="text-zinc-400">{ui("No verified ranked matches yet.")}</p>}</div><Link to="/leaderboards" className="mt-6 inline-block text-sm font-bold text-amber-300 hover:text-amber-200">{ui("All leaderboards →")}</Link></section>}
+      </div> : <section className="mt-6 rounded-3xl border border-white/10 bg-white/[.035] p-6 sm:p-9"><div className="flex items-center gap-3"><Trophy className="text-amber-300" /><h2 className="font-serif text-3xl">{ui("Leaderboard")} · {timeControlLabel(boardControl, ui)}</h2></div><div className="mt-5"><TimeControlTabs value={boardControl} onChange={setBoardControl} label={ui("Leaderboard time control")} /></div><div className="mt-6" role="tabpanel">{!rows ? <p className="text-zinc-400">{ui("Loading…")}</p> : rows.length ? <LeaderboardTable rows={rows} valueLabel="Elo" currentUserId={user.id} chessRanks /> : <p className="text-zinc-400">{ui("No verified ranked matches yet.")}</p>}</div><Link to="/leaderboards" className="mt-6 inline-block text-sm font-bold text-amber-300 hover:text-amber-200">{ui("All leaderboards →")}</Link></section>}
       {error && <p role="alert" className="mt-6 rounded-xl border border-red-400/25 bg-red-400/10 p-4 text-red-200">{error}</p>}
     </div>
     {rankGuideOpen && <EloRankGuide currentFamily={user ? rank.family : undefined} onClose={() => setRankGuideOpen(false)} />}

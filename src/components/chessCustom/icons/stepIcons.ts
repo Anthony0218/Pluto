@@ -20,7 +20,7 @@ import {
   type ChessIcon,
 } from "./ChessCustomIcons";
 
-export const AREA_ICONS: Record<TopLevelArea, ChessIcon> = { library: MyGamesIcon, create: CreateIcon, community: CommunityIcon };
+export const AREA_ICONS: Record<TopLevelArea, ChessIcon> = { library: MyGamesIcon, create: CreateIcon, pluto: OverviewIcon, community: CommunityIcon };
 
 export const STEP_ICONS: Record<CreateStep, ChessIcon> = {
   overview: OverviewIcon,

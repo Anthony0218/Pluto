@@ -31,6 +31,10 @@ export function migrateVariant(raw: Record<string, unknown>): { data: Record<str
     data.schemaVersion = 2;
     warnings.push("Upgraded the single-board variant to the layered v2 schema.");
   }
+  if (data.schemaVersion === 2) {
+    data.schemaVersion = 3;
+    // Missing alliances remain independent; existing games keep their rules.
+  }
   return { data, warnings };
 }
 
@@ -116,6 +120,11 @@ export function parseVariantJson(text: string, options: { keepIdentity?: boolean
   const keep = options.keepIdentity && typeof data.id === "string";
   const stringOrUndefined = (value: unknown) => (typeof value === "string" ? value : undefined);
   const teams = Array.isArray(data.teams) && data.teams.length >= 2 ? (data.teams as GameVariant["teams"]) : createDefaultTeams();
+  for (const team of teams) {
+    if (team.alliance !== undefined && (typeof team.alliance !== "string" || !team.alliance.trim() || team.alliance.length > 24)) {
+      return { variant: null, errors: ["Alliance must be a non-empty name of at most 24 characters."], warnings };
+    }
+  }
   const pieces = (data.pieces as GameVariant["pieces"]).map((piece) => ({
     ...piece,
     symbol: piece.symbol ?? "",

@@ -6,12 +6,13 @@ import { Chess } from 'chess.js';
 const source=readFileSync(new URL('../supabase/functions/ranked-chess/index.ts',import.meta.url),'utf8');
 const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2023}}).outputText;
 function server(ranked=true){
- let handler,clockReads=0;
+ let handler,clockReads=0;const cardDraws=[];
  const room={id:'room',code:'ABC123',host_id:'white',match_kind:ranked?'ranked':'casual',status:'playing'};
- const game={room_id:'room',fen:new Chess().fen(),moves:[],version:0,ranked_round:1,status:'playing',winner:null,undo_requested_by:null};
+ const game={room_id:'room',fen:new Chess().fen(),moves:[],version:0,ranked_round:1,status:'playing',winner:null,undo_requested_by:null,clock_started_at:ranked?new Date().toISOString():null};
  const players=[{room_id:'room',user_id:'white',seat:0,chosen_color:'white'},{room_id:'room',user_id:'black',seat:1,chosen_color:'black'}];
- const db={auth:{getUser:async token=>({data:{user:token?{id:token}:null}})},rpc:async name=>{
+ const db={auth:{getUser:async token=>({data:{user:token?{id:token}:null}})},rpc:async (name,args)=>{
   if(name==='ranked_clock_snapshot'){clockReads++;return {data:{game:structuredClone(game),serverNow:new Date().toISOString()}}}
+  if(name==='ranked_draw_card'){cardDraws.push(args);return {data:{game:structuredClone(game),serverNow:new Date().toISOString()}}}
   return {data:null,error:null};
  },from(table){let update;const predicates=[];
   const q={select(){return q},eq(k,v){predicates.push(r=>r[k]===v);return q},update(v){update=v;return q},delete(){return q},
@@ -22,7 +23,7 @@ function server(ranked=true){
  }};
  new Function('require','Deno','exports',compiled)(name=>name.includes('supabase-js')?{createClient:()=>db}:{Chess},{env:{get:()=>''},serve:fn=>{handler=fn}},{});
  const request=async(user,body)=>{const res=await handler(new Request('http://localhost/ranked-chess',{method:'POST',headers:user?{Authorization:`Bearer ${user}`}:{},body:JSON.stringify({code:'ABC123',round:1,...body})}));return {status:res.status,body:await res.json()}};
- return {game,room,request,get clockReads(){return clockReads}};
+ return {game,room,request,cardDraws,get clockReads(){return clockReads}};
 }
 for(const ranked of [true,false])test(`${ranked?'ranked':'casual'} server validates legal intent, ownership, version and ignores supplied FEN/results`,async()=>{
  const s=server(ranked),op=ranked?'move':'casualMove';
@@ -73,4 +74,16 @@ test('a delayed prior-round move is rejected even when the rematch resets its ve
   assert.deepEqual(s.game.moves,[]);
   assert.equal((await s.request('white',{op,version:0,round:2,from:'e2',to:'e4'})).status,200);
  }
+});
+
+test('ranked moves wait until both color cards are drawn; drawing a card needs no version',async()=>{
+ const s=server();s.game.clock_started_at=null;
+ const early=await s.request('white',{op:'move',version:0,from:'e2',to:'e4'});
+ assert.equal(early.status,400);assert.match(early.body.error,/color card/);assert.deepEqual(s.game.moves,[]);
+ const drawn=await s.request('black',{op:'drawCard'});
+ assert.equal(drawn.status,200);assert.deepEqual(s.cardDraws,[{p_room_id:'room',p_user:'black'}]);
+ assert.equal((await s.request('outsider',{op:'drawCard'})).status,403);
+ assert.equal((await server(false).request('white',{op:'drawCard'})).status,404);
+ s.game.clock_started_at=new Date().toISOString();
+ assert.equal((await s.request('white',{op:'move',version:0,from:'e2',to:'e4'})).status,200);
 });

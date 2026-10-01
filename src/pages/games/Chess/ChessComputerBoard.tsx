@@ -8,6 +8,9 @@ import { Chess, type Square } from "chess.js";
 
 import Board from "../../../components/chess/singleplayer/Board.tsx";
 import { liveCoachAnnotations } from "../../../components/chess/singleplayer/boardAnnotations";
+import AutoBestMoveToggle from "../../../components/chess/singleplayer/AutoBestMoveToggle";
+import { useAutoBestMove } from "../../../components/chess/singleplayer/useAutoBestMove";
+import { useCoachBackfill } from "../../../components/chess/singleplayer/useCoachBackfill";
 import PromotionBar from "../../../components/chess/singleplayer/PromotionBar.tsx";
 import ChessMatchStatus from "../../../components/chess/singleplayer/ChessMatchStatus.tsx";
 import ChessMoveHistoryList from "../../../components/chess/ChessMoveHistoryList.tsx";
@@ -25,6 +28,7 @@ import { getSquareName, type PieceType } from "../../../utils/chessUtils.ts";
 import { useStockfish } from "@/hooks/useStockfish";
 
 import ChessGameReview from "../../../components/chess/singleplayer/ChessGameReview.tsx";
+import type { ReviewContinuation } from "../../../components/chess/singleplayer/reviewContinuation";
 import { ProfileAvatar } from "../../../components/social/ProfileAvatarPicker.tsx";
 import { supabase } from "../../../lib/supabase.ts";
 import { useAuth } from "../../../context/AuthContext.tsx";
@@ -895,8 +899,9 @@ export default function ChessComputerBoard({
     string | null
   >(null);
 
+  // The highlighted suggestion is drawn on the board until the player picks up a piece of their own.
   const helpMove =
-    helpVisible && highlightedSuggestionUci
+    helpVisible && highlightedSuggestionUci && selectedSquare === null
       ? {
           from: highlightedSuggestionUci.slice(0, 2) as Square,
           to: highlightedSuggestionUci.slice(2, 4) as Square,
@@ -923,6 +928,35 @@ export default function ChessComputerBoard({
   const humanColor = playerColor === "white" ? "w" : "b";
 
   const computerColor = humanColor === "w" ? "b" : "w";
+
+  /** True for the plies (1-based) the human played. */
+  const isHumanPly = (ply: number) => (ply % 2 === 1) === (humanColor === "w");
+
+  // Moves played before the coach was switched on get graded too.
+  const coachBackfill = useCoachBackfill({
+    active: coachModeEnabled,
+    ready: analysisReady,
+    game,
+    analyzePosition,
+    needsGrade: (ply, san) => isHumanPly(ply) && coachGrades[ply]?.san !== san,
+    onGrade: (review) => {
+      setCoachGrades((grades) => ({ ...grades, [review.ply]: { quality: review.quality, san: review.san } }));
+
+      const plies = game.history().length;
+
+      if (review.ply === (isHumanPly(plies) ? plies : plies - 1)) {
+        setMoveFeedback({
+          quality: review.quality,
+          from: review.from,
+          to: review.to,
+          centipawnLoss: review.centipawnLoss,
+          bestMove: review.bestMoveUci,
+          playedMove: review.san,
+          fenAfter: review.fenAfter,
+        });
+      }
+    },
+  });
 
   function toggleCoachMode() {
     if (coachModeEnabled) {
@@ -1127,10 +1161,12 @@ export default function ChessComputerBoard({
      */
     const generation = ++coachGenerationRef.current;
 
-    const before = await analyzePosition(beforeFen, {
-      multiPV: 1,
-      moveTime: 500,
-    });
+    const before = await coachBackfill.queue(() =>
+      analyzePosition(beforeFen, {
+        multiPV: 1,
+        moveTime: 500,
+      }),
+    );
 
     if (generation !== coachGenerationRef.current || before.length === 0) {
       return;
@@ -1157,10 +1193,12 @@ export default function ChessComputerBoard({
     if (afterGame.isGameOver()) {
       scoreAfterMove = afterGame.isCheckmate() ? 100000 : 0;
     } else {
-      const after = await analyzePosition(afterFen, {
-        multiPV: 1,
-        moveTime: 500,
-      });
+      const after = await coachBackfill.queue(() =>
+        analyzePosition(afterFen, {
+          multiPV: 1,
+          moveTime: 500,
+        }),
+      );
 
       if (generation !== coachGenerationRef.current || after.length === 0) {
         return;
@@ -1212,6 +1250,7 @@ export default function ChessComputerBoard({
       !coachModeEnabled ||
       !analysisReady ||
       analyzing ||
+      coachBackfill.running ||
       thinking ||
       gameResult ||
       game.turn() !== humanColor
@@ -1228,10 +1267,12 @@ export default function ChessComputerBoard({
     /*
      * Analyze fresh position.
      */
-    const lines = await analyzePosition(fen, {
-      multiPV: 3,
-      moveTime: 700,
-    });
+    const lines = await coachBackfill.queue(() =>
+      analyzePosition(fen, {
+        multiPV: 3,
+        moveTime: 700,
+      }),
+    );
 
     /*
      * User may have moved while
@@ -1266,6 +1307,22 @@ export default function ChessComputerBoard({
      */
     setHighlightedSuggestionUci(suggestions[0]?.uci ?? null);
   }
+
+  const autoBestMove = useAutoBestMove({
+    fen: game.fen(),
+    canShow:
+      coachModeEnabled &&
+      analysisReady &&
+      !analyzing &&
+      !thinking &&
+      gameResult === null &&
+      historyPreviewPly === null &&
+      !helpVisible &&
+      !coachBackfill.running &&
+      game.turn() === humanColor &&
+      !game.isGameOver(),
+    showHelp: () => void toggleHelp(),
+  });
 
   /* =========================================================
      COMPUTER MOVE
@@ -1527,25 +1584,28 @@ export default function ChessComputerBoard({
       return;
     }
 
-    /*
-     * The Coach overlay uses selectedSquare/legalMoves only as a visual preview.
-     * Once the player clicks the board, return to normal board interaction
-     * and continue processing this same click.
-     */
-    if (helpVisible) {
-      setHelpVisible(false);
-      setSuggestedMoves([]);
-      setHighlightedSuggestionUci(null);
-    }
-
     const square = getSquareName(row, column);
 
     const clickedPiece = game.get(square);
 
     /*
+     * A click on the square the shown Coach
+     * suggestion points to plays that move.
+     */
+    const suggestionUci = helpMove && square === helpMove.to ? highlightedSuggestionUci : null;
+
+    if (helpMove && suggestionUci?.[4]) {
+      promotePawn(suggestionUci[4] as "q" | "r" | "b" | "n", helpMove.from, helpMove.to);
+
+      return;
+    }
+
+    const fromSquare = suggestionUci && helpMove ? helpMove.from : selectedSquare;
+
+    /*
      * Select first piece.
      */
-    if (selectedSquare === null) {
+    if (fromSquare === null) {
       if (!clickedPiece) {
         return;
       }
@@ -1587,7 +1647,7 @@ export default function ChessComputerBoard({
       return;
     }
 
-    const selectedPiece = game.get(selectedSquare);
+    const selectedPiece = game.get(fromSquare);
 
     /*
      * Promotion.
@@ -1597,7 +1657,7 @@ export default function ChessComputerBoard({
       legalMoves.includes(square) &&
       (square[1] === "8" || square[1] === "1")
     ) {
-      setPromotionFrom(selectedSquare);
+      setPromotionFrom(fromSquare);
 
       setPromotionSquare(square);
 
@@ -1612,7 +1672,7 @@ export default function ChessComputerBoard({
       const beforeFen = game.fen();
 
       const move = game.move({
-        from: selectedSquare,
+        from: fromSquare,
 
         to: square,
       });
@@ -1718,8 +1778,13 @@ export default function ChessComputerBoard({
      PROMOTION
      ========================================================= */
 
-  function promotePawn(piece: "q" | "r" | "b" | "n") {
-    if (!promotionFrom || !promotionSquare) {
+  /** `from` / `to` default to the promotion picked on the board; a Coach suggestion passes its own. */
+  function promotePawn(
+    piece: "q" | "r" | "b" | "n",
+    from: Square | null = promotionFrom,
+    to: Square | null = promotionSquare,
+  ) {
+    if (!from || !to) {
       return;
     }
 
@@ -1727,9 +1792,9 @@ export default function ChessComputerBoard({
       const beforeFen = game.fen();
 
       const move = game.move({
-        from: promotionFrom,
+        from,
 
-        to: promotionSquare,
+        to,
 
         promotion: piece,
       });
@@ -1882,8 +1947,36 @@ export default function ChessComputerBoard({
   }
   const hasHumanMove = currentMoveHistory.length > (humanColor === "b" ? 1 : 0);
 
+  /** "Play from here" in the Game Review: continue against Stockfish from that position. */
+  function playFromReviewPosition({ moves }: ReviewContinuation) {
+    setReviewOpen(false);
+    setHistoryPreviewPly(null);
+    gameEndedRef.current = false;
+    coachGenerationRef.current += 1;
+
+    game.reset();
+
+    for (const move of moves) {
+      game.move(move);
+    }
+
+    setGameResult(null);
+    setShowResignConfirm(false);
+    setSelectedSquare(null);
+    setLegalMoves([]);
+    setPromotionFrom(null);
+    setPromotionSquare(null);
+    setHelpVisible(false);
+    setSuggestedMoves([]);
+    setHighlightedSuggestionUci(null);
+    setMoveFeedback(null);
+    setCoachGrades({});
+
+    synchronizeGameState();
+  }
+
   function undoLastTurn() {
-    if (thinking || analyzing || !hasHumanMove) {
+    if (thinking || (analyzing && !coachBackfill.running) || !hasHumanMove) {
       return;
     }
 
@@ -2210,11 +2303,19 @@ export default function ChessComputerBoard({
 
                 {/* HELP BUTTON */}
 
+                {coachBackfill.progress && (
+                  <div className="mt-3 flex items-center gap-2 text-xs text-zinc-500">
+                    <span className="h-2 w-2 animate-pulse rounded-full bg-amber-400" />
+                    {ui("Grading earlier moves...")} {coachBackfill.progress.done}/{coachBackfill.progress.total}
+                  </div>
+                )}
+
                 <button
                   type="button"
                   disabled={
                     !analysisReady ||
                     analyzing ||
+                    coachBackfill.running ||
                     thinking ||
                     gameResult !== null ||
                     game.turn() !== humanColor
@@ -2253,6 +2354,8 @@ export default function ChessComputerBoard({
                   {analyzing ? t("Analyzing...") : helpVisible ? t("Hide Help") : t("Help · Next Best Moves")}
                 </button>
 
+                <AutoBestMoveToggle enabled={autoBestMove.enabled} onToggle={autoBestMove.toggle} />
+
                 {/* BEST MOVES */}
 
                 {helpVisible && (
@@ -2280,9 +2383,11 @@ export default function ChessComputerBoard({
                           <button
                             key={`${suggestion.uci}-${index}`}
                             type="button"
-                            onClick={() =>
-                              setHighlightedSuggestionUci(suggestion.uci)
-                            }
+                            onClick={() => {
+                              setHighlightedSuggestionUci(suggestion.uci);
+                              setSelectedSquare(null);
+                              setLegalMoves([]);
+                            }}
                             className={`
                               flex
                               w-full
@@ -2359,7 +2464,7 @@ export default function ChessComputerBoard({
                                   selected ? "text-amber-300" : "text-zinc-700"
                                 }`}
                               >
-                                {selected ? t("Shown on board") : t("Click to show")}
+                                {selected ? ui("Click the marked square to play it") : t("Click to show")}
                               </span>
                             </div>
                           </button>
@@ -2596,7 +2701,7 @@ export default function ChessComputerBoard({
                           fenAfter: historyPreview.fenAfter,
                         })
                       : moveFeedback
-                        ? liveCoachAnnotations({ to: moveFeedback.to, quality: moveFeedback.quality, fenAfter: moveFeedback.fenAfter })
+                        ? liveCoachAnnotations({ to: moveFeedback.to, quality: moveFeedback.quality, fenAfter: moveFeedback.fenAfter, currentFen: game.fen() })
                         : null
                 }
               />
@@ -2742,7 +2847,7 @@ export default function ChessComputerBoard({
                 </div>
                 <button
                   type="button"
-                  disabled={thinking || analyzing || !hasHumanMove}
+                  disabled={thinking || (analyzing && !coachBackfill.running) || !hasHumanMove}
                   onClick={undoLastTurn}
                   className="
     w-full
@@ -2938,6 +3043,7 @@ export default function ChessComputerBoard({
         onClose={() => setReviewOpen(false)}
         puzzleSource={gameResult ? "singleplayer" : undefined}
         puzzlePlayerColor={gameResult ? playerColor : undefined}
+        onPlayFromPosition={playFromReviewPosition}
       />
     </div>
   );

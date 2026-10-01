@@ -1,8 +1,9 @@
-import { ArrowRight, BookOpen, Puzzle, Shuffle } from "lucide-react";
+import { ArrowRight, BarChart3, BookOpen, Puzzle, Shuffle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ui, useUiLanguage } from "@/i18n/ui";
 
 const lessons = [
+  { title: "Chess Analysis", description: "Review your saved games and improve move by move.", route: "/games/chess/analysis", Icon: BarChart3 },
   { title: "Chess puzzles", description: "Practice tactics one move at a time.", route: "/games/chess/rules?tab=puzzles", Icon: Puzzle },
   { title: "Watten rules", description: "Learn the cards, trump and scoring.", route: "/games/watten/rules", Icon: BookOpen },
   { title: "Chess variants", description: "Explore new ways to play chess.", route: "/games/chess/variants", Icon: Shuffle },

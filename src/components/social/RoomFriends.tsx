@@ -19,7 +19,7 @@ function RoomFriendsPanel({ lobbyRoute, code }: { lobbyRoute: string; code: stri
   const [open, setOpen] = useState(false);
   useEffect(() => { const show = () => setOpen(true); window.addEventListener("open-room-friends", show); return () => window.removeEventListener("open-room-friends", show); }, []);
   return <>
-    <button type="button" onClick={() => setOpen(true)} className="fixed bottom-4 right-4 z-[100] flex items-center gap-2 rounded-xl border border-amber-300/30 bg-[#091019] px-4 py-3 text-sm font-semibold text-amber-100 shadow-xl">
+    <button type="button" onClick={() => setOpen(true)} className="room-friends-trigger flex items-center gap-2 rounded-xl border border-amber-300/30 bg-[#091019] px-4 py-3 text-sm font-semibold text-amber-100 shadow-xl">
       <Users size={17} />{ui("Invite friends")}</button>
     {open && <RoomFriendsDialog lobbyRoute={lobbyRoute} code={code} onClose={() => setOpen(false)} />}
   </>;

@@ -7,12 +7,14 @@ import { getChessRank } from "@/games/chess/ranked/tiers";
 import RankEmblem from "@/components/chess/RankEmblem";
 import { featuredGames } from "@/data/dashboard";
 import { Award, Crown, Flame, Gamepad2, Puzzle, Sparkles } from "lucide-react";
+import { isTimeControl, timeControlLabel, type TimeControl } from "@/games/chess/ranked/timeControls";
 
 import ProfileAvatarPicker, {
   ProfileAvatar,
 } from "../../components/social/ProfileAvatarPicker";
 import ProfileFriends from "../../components/social/ProfileFriends";
 import MyGroupsCard from "../../components/social/MyGroupsCard";
+import DoNotDisturbSwitch from "../../components/App/notifications/DoNotDisturbSwitch";
 
 type GameStat = {
   games_played: number;
@@ -29,6 +31,8 @@ type ProfileStats = {
   puzzles: number | null;
   perfectReallyHard: number | null;
   chessElo: number | null;
+  /** Time control of `chessElo`: the player's best ranked rating. */
+  chessEloMode: TimeControl | null;
 };
 
 type ProfileWithAvatar = {
@@ -44,7 +48,18 @@ const emptyStats: ProfileStats = {
   puzzles: null,
   perfectReallyHard: null,
   chessElo: null,
+  chessEloMode: null,
 };
+/** The highest rating among the time controls the player has played ranked. */
+function bestChessRating(rows: { time_control: string; rating: number; rated_games: number }[]) {
+  const best = rows
+    .filter((row) => row.rated_games > 0 && isTimeControl(row.time_control))
+    .sort((left, right) => right.rating - left.rating)[0];
+  return best
+    ? { chessElo: best.rating, chessEloMode: best.time_control as TimeControl }
+    : { chessElo: null, chessEloMode: null };
+}
+
 const emptyGameStat: GameStat = {
   games_played: 0,
   multiplayer_games: 0,
@@ -170,9 +185,8 @@ export default function ProfilePage() {
         supabase.rpc("get_my_chess_puzzle_stats"),
         supabase
           .from("chess_ratings")
-          .select("rating")
-          .eq("user_id", userId)
-          .maybeSingle(),
+          .select("time_control,rating,rated_games")
+          .eq("user_id", userId),
         supabase.from("user_game_results").select("game,outcome,multiplayer,completed_at,score_difference").eq("user_id", userId).order("completed_at", { ascending: false }).limit(4),
       ]);
       if (!recent.error) setRecentResults((recent.data ?? []) as RecentResult[]);
@@ -187,7 +201,7 @@ export default function ProfilePage() {
           perfectReallyHard: puzzles.error
             ? null
             : Number(puzzles.data?.perfect_really_hard ?? 0),
-          chessElo: rating.data?.rating ?? null,
+          ...bestChessRating(rating.data ?? []),
         });
       } else
         setStatsError(
@@ -346,7 +360,7 @@ export default function ProfilePage() {
             <button type="button" onClick={() => setAvatarPickerOpen(true)} className="group relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-2xl border-2 border-indigo-300/70 bg-[#121d3d] p-1 shadow-[0_0_24px_rgba(129,140,248,.3)] sm:h-24 sm:w-24" aria-label={ui("Change avatar")}><ProfileAvatar avatarId={avatarId} className="h-full w-full rounded-xl" /></button>
             <div className="min-w-0 flex-1"><p className="text-[9px] font-black uppercase tracking-[.22em] text-indigo-200 sm:text-[10px] sm:tracking-[.28em]">{ui("Pluto player profile")}</p><h1 className="mt-1 break-words text-2xl font-black leading-tight text-white sm:text-4xl">{username}</h1><p className="mt-1 text-xs text-indigo-100/80 sm:text-sm">{ui("Play. Learn. Grow together.")}</p></div>
             <div className="col-span-2 min-w-0 sm:ml-0 sm:max-w-sm sm:flex-1"><div className="mb-1 flex flex-wrap justify-between gap-x-3 text-[11px] font-semibold text-indigo-100 sm:text-xs"><span>{ui("Activity level")} {Math.floor((stats.general.games_played * 100 + (stats.puzzles ?? 0) * 50) / 1000) + 1}</span><span>{(stats.general.games_played * 100 + (stats.puzzles ?? 0) * 50) % 1000} / 1,000 XP</span></div><div className="h-2 overflow-hidden rounded-full bg-indigo-200/15"><div className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-violet-300" style={{ width: `${((stats.general.games_played * 100 + (stats.puzzles ?? 0) * 50) % 1000) / 10}%` }} /></div><p className="mt-1 text-[9px] leading-4 text-indigo-100/60 sm:text-[10px]">{ui("100 XP per completed game · 50 XP per completed puzzle")}</p></div>
-            {stats.chessElo !== null && <div className="col-span-2 flex items-center gap-3 rounded-2xl border border-amber-300/30 bg-[#06101e]/75 p-3 backdrop-blur sm:col-span-1"><RankEmblem family={getChessRank(stats.chessElo).family} size="sm" /><div><strong className="block text-sm text-amber-100">{ui(getChessRank(stats.chessElo).name)}</strong><small className="text-amber-200/70">{stats.chessElo} Elo</small></div></div>}
+            {stats.chessElo !== null && <div className="col-span-2 flex items-center gap-3 rounded-2xl border border-amber-300/30 bg-[#06101e]/75 p-3 backdrop-blur sm:col-span-1"><RankEmblem family={getChessRank(stats.chessElo).family} size="sm" /><div><strong className="block text-sm text-amber-100">{ui(getChessRank(stats.chessElo).name)}</strong><small className="text-amber-200/70">{stats.chessElo} Elo · {timeControlLabel(stats.chessEloMode, ui)}</small></div></div>}
           </div>
         </section>
 
@@ -568,6 +582,16 @@ export default function ProfilePage() {
                 </p>
               </div>
 
+              {/* NOTIFICATIONS */}
+
+              <div className="mt-5 border-t border-white/5 pt-5">
+                <p className="mb-3 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600">
+                  {ui("Notifications")}
+                </p>
+
+                <DoNotDisturbSwitch userId={user.id} />
+              </div>
+
               {/* FEEDBACK */}
 
               {message && (
@@ -764,7 +788,7 @@ export default function ProfilePage() {
                       label="Ranked ELO"
                       value={loadingStats ? "…" : (stats.chessElo ?? "—")}
                     />
-                    {stats.chessElo !== null && <div className="flex items-center gap-3 rounded-2xl border border-amber-300/25 bg-amber-300/[.06] p-3"><RankEmblem family={getChessRank(stats.chessElo).family} size="sm" /><div><strong className="block text-sm text-amber-100">{ui(getChessRank(stats.chessElo).name)}</strong><span className="text-xs text-zinc-400">{stats.chessElo} Elo</span></div></div>}
+                    {stats.chessElo !== null && <div className="flex items-center gap-3 rounded-2xl border border-amber-300/25 bg-amber-300/[.06] p-3"><RankEmblem family={getChessRank(stats.chessElo).family} size="sm" /><div><strong className="block text-sm text-amber-100">{ui(getChessRank(stats.chessElo).name)}</strong><span className="text-xs text-zinc-400">{stats.chessElo} Elo · {timeControlLabel(stats.chessEloMode, ui)}</span></div></div>}
                   </>
                 ) : trackedGames.has(statTab) ? (
                   <>

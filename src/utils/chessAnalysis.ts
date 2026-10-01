@@ -522,3 +522,117 @@ export async function reviewGameMoves(
     };
   });
 }
+
+/* =========================================================
+   GRADE EARLIER MOVES
+   ========================================================= */
+
+/**
+ * Grades moves that were played before the Chess Coach was switched on.
+ * Each position is searched once and shared by the moves on both sides of it.
+ * `plies` (1-based, ascending) picks the moves of `moves` to grade; each grade
+ * reaches `onGrade` as soon as it is known. The run stops when `stillWanted`
+ * turns false or the engine is busy with another search.
+ */
+export async function gradeEarlierMoves(
+  moves: string[],
+
+  plies: number[],
+
+  analyzePosition: AnalyzePosition,
+
+  {
+    moveTime = 250,
+    stillWanted,
+    onGrade,
+  }: {
+    moveTime?: number;
+    stillWanted: () => boolean;
+    onGrade: (review: MoveReview) => void;
+  },
+) {
+  const replay = new Chess();
+  const positions = [replay.fen()];
+  const played = moves.map((san) => {
+    const move = replay.move(san);
+    positions.push(replay.fen());
+    return move;
+  });
+
+  const analyses = new Map<number, StockfishAnalysisLine[]>();
+
+  async function analysis(index: number) {
+    const cached = analyses.get(index);
+
+    if (cached) {
+      return cached;
+    }
+
+    const fen = positions[index];
+    const lines = new Chess(fen).isGameOver() ? [] : await analyzePosition(fen, { multiPV: 1, moveTime });
+
+    analyses.set(index, lines);
+
+    return lines;
+  }
+
+  for (const ply of plies) {
+    if (!stillWanted()) {
+      return;
+    }
+
+    const move = played[ply - 1];
+    const fenBefore = positions[ply - 1];
+    const fenAfter = positions[ply];
+
+    if (!move) {
+      continue;
+    }
+
+    const beforeLines = await analysis(ply - 1);
+
+    if (beforeLines.length === 0 || !stillWanted()) {
+      return;
+    }
+
+    const afterLines = await analysis(ply);
+
+    if ((afterLines.length === 0 && !new Chess(fenAfter).isGameOver()) || !stillWanted()) {
+      return;
+    }
+
+    const playedUci = `${move.from}${move.to}${move.promotion ?? ""}`;
+    const loss = Math.max(0, positionScore(fenBefore, beforeLines[0]) + positionScore(fenAfter, afterLines[0]));
+    const bestMoveUci = beforeLines[0].pv[0] ?? null;
+
+    onGrade({
+      ply,
+
+      moveNumber: Math.floor((ply - 1) / 2) + 1,
+
+      color: move.color,
+
+      san: move.san,
+
+      uci: playedUci,
+
+      from: move.from,
+
+      to: move.to,
+
+      fenBefore,
+
+      fenAfter,
+
+      quality: classifyMove(loss, bestMoveUci === playedUci),
+
+      centipawnLoss: loss,
+
+      bestMoveUci,
+
+      bestMoveSan: bestMoveUci ? uciToSan(fenBefore, bestMoveUci) : null,
+
+      bestMoves: linesToSuggestions(fenBefore, beforeLines, 3),
+    });
+  }
+}

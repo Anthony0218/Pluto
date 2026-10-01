@@ -37,6 +37,7 @@ import GroupsPage from "./pages/social/GroupsPage.tsx";
 import LeaderboardsPage from "./pages/social/LeaderboardsPage.tsx";
 import ChessRulesAndTips from "./components/chess/singleplayer/ChessRulesAndTips.tsx";
 import ChessPuzzlesPage from "./components/chess/singleplayer/ChessPuzzlesPage.tsx";
+import ChessAnalysisPage from "./components/chess/singleplayer/ChessAnalysisPage.tsx";
 import ChessAudioSettings from "./components/chess/ChessAudioSettings.tsx";
 import { unlockChessAudio } from "./games/chess/audio/chessAudio.ts";
 import ChessVariantsMenu from "./pages/games/Chess/ChessVariantsMenu.tsx";
@@ -150,7 +151,7 @@ import ProfilePage from "./pages/social/ProfilePage.tsx";
 import { WattenThreePlayerMultiplayerGame } from "./components/Watten/WattenThreePlayerMultiplayer.tsx";
 import MedievalKingdomsWorldPage from "./pages/games/MedievalKingdoms/MedievalKingdomsWorldPage.tsx";
 import MedievalKingdomsBattlePage from "./pages/games/MedievalKingdoms/MedievalKingdomsBattlePage.tsx";
-import { Chess3DAiRoute, Chess3DHotseatRoute, Chess3DMenuRoute, ChessCustomLegacyRedirect, ChessCustomRoute } from "./pages/games/lazyChessRoutes.tsx";
+import { Chess3DAiRoute, Chess3DHotseatRoute, Chess3DMenuRoute, ChessCustomLegacyRedirect, ChessCustomRoute, JanmannGameRoute, JanmannRulesRoute } from "./pages/games/lazyChessRoutes.tsx";
 import { CardBuilderCreateRoute, CardBuilderHomeRoute, CardBuilderPlayRoute, CardBuilderRoomRoute, CardBuilderSimulationRoute, CardBuilderTemplateRoute } from "./pages/games/lazyCardBuilderRoutes.tsx";
 import CreditsPage from "./pages/general/CreditsPage.tsx";
 import MedievalKingdomsRegionPage from "./pages/games/MedievalKingdoms/MedievalKingdomsRegionPage.tsx";
@@ -341,6 +342,10 @@ const router = createBrowserRouter([
           {
             path: "/games/chess/puzzles",
             element: <ChessPuzzlesPage />,
+          },
+          {
+            path: "/games/chess/analysis",
+            element: <ChessAnalysisPage />,
           },
           {
             path: "/games/chess/audio",
@@ -663,6 +668,8 @@ const router = createBrowserRouter([
             element: <MedievalKingdomsBattlePage />,
           },
 
+          { path: "/chess-custom/janmanns-gambit", element: <JanmannGameRoute /> },
+          { path: "/chess-custom/janmanns-gambit/rules", element: <JanmannRulesRoute /> },
           { path: "/chess-custom/*", element: <ChessCustomRoute /> },
           { path: "/games/chess/custom", element: <ChessCustomLegacyRedirect /> },
           {

@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { ui } from "@/i18n/ui";
+import { createPlutoVariant, isPlutoCustomId } from "../library/plutoVariants.ts";
 import { createVariantFromPreset, PRESETS, type PresetId } from "../engine/presets.ts";
 import { parseVariantJson, serializeVariant } from "../engine/serialization.ts";
 import type { GameVariant } from "../engine/types.ts";
@@ -38,6 +39,7 @@ const slug = (name: string) => name.toLowerCase().replace(/[^a-z0-9]+/g, "-").re
 /** The working copy on first load: a requested preset, the autosaved draft, or a fresh variant. */
 function initialDocument(): { variant: GameVariant; pristine: boolean } {
   const requestedPreset = new URLSearchParams(window.location.search).get("preset");
+  if (isPlutoCustomId(requestedPreset)) return { variant: parseVariantJson(JSON.stringify(createPlutoVariant(requestedPreset))).variant!, pristine: true };
   const preset = PRESETS.find((entry) => entry.id === requestedPreset);
   if (preset) return { variant: createVariantFromPreset(preset.id), pristine: true };
   const draft = draftStorage.read();

@@ -18,6 +18,7 @@ export type DashboardNotification = {
   createdAt: string;
   gameCode?: string | null;
   gameRoute?: string | null;
+  game?: string | null;
   senderName?: string;
   senderId?: string;
 };
@@ -59,7 +60,7 @@ export function useDashboardDataSource() {
             .from("friendships")
             .select("user_a,user_b")
             .or(`user_a.eq.${userId},user_b.eq.${userId}`),
-          supabase.from("friend_messages").select("id,sender_id,message_type,game_code,game_route,created_at").eq("receiver_id", userId).order("created_at", { ascending: false }).limit(100),
+          supabase.from("friend_messages").select("id,sender_id,message_type,game,game_code,game_route,created_at").eq("receiver_id", userId).order("created_at", { ascending: false }).limit(100),
           supabase.from("friend_requests").select("id,sender_id,created_at").eq("receiver_id", userId).eq("status", "pending").order("created_at", { ascending: false }).limit(12),
         ]);
         const activity = activityResult.error ? null : activityResult.data as DashboardActivity;
@@ -95,7 +96,7 @@ export function useDashboardDataSource() {
         const profileById = new Map((profiles.data ?? []).map((profile) => [profile.id, profile]));
         const notifications: DashboardNotification[] = [
           ...(requests.data ?? []).map((request) => ({ id: `request-${request.id}`, kind: "friend_request" as const, title: "Friend request", detail: profileById.get(request.sender_id)?.display_name || profileById.get(request.sender_id)?.username || "A Pluto player", createdAt: request.created_at })),
-          ...(messages.data ?? []).map((message) => ({ id: `message-${message.id}`, kind: "message" as const, title: message.message_type === "game_code" ? "Game invite" : "New message", detail: message.message_type === "game_code" ? `${profileById.get(message.sender_id)?.display_name || profileById.get(message.sender_id)?.username || "A friend"} sent code ${message.game_code || ""}` : `${profileById.get(message.sender_id)?.display_name || profileById.get(message.sender_id)?.username || "A friend"} messaged you`, createdAt: message.created_at, gameCode: message.game_code, gameRoute: message.game_route })),
+          ...(messages.data ?? []).map((message) => ({ id: `message-${message.id}`, kind: "message" as const, title: message.message_type === "game_code" ? "Game invite" : "New message", detail: message.message_type === "game_code" ? `${profileById.get(message.sender_id)?.display_name || profileById.get(message.sender_id)?.username || "A friend"} sent code ${message.game_code || ""}` : `${profileById.get(message.sender_id)?.display_name || profileById.get(message.sender_id)?.username || "A friend"} messaged you`, createdAt: message.created_at, gameCode: message.game_code, gameRoute: message.game_route, game: message.game })),
         ].map(notification => {
           const source = notification.kind === "friend_request"
             ? (requests.data ?? []).find(row => `request-${row.id}` === notification.id)

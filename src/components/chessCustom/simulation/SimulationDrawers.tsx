@@ -174,7 +174,7 @@ export function PlayDrawer({
             <label key={team.id} className="flex items-center justify-between gap-3 text-xs text-zinc-400">
               <span className="flex items-center gap-1.5">
                 <span className="h-2.5 w-2.5 rounded-full ring-1 ring-white/30" style={{ background: team.color }} />
-                {team.name}
+                {team.name}{team.alliance ? ` · ${team.alliance}` : ""}
               </span>
               <select value={players[team.id] ?? "human"} onChange={(event) => onPlayers({ ...players, [team.id]: event.target.value as PlayerKind })} className="rounded-lg border border-white/10 bg-black/60 px-2 py-1 text-xs text-zinc-100">
                 <option value="human">{ui("Human")}</option>

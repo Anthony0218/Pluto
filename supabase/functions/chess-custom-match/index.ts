@@ -2,7 +2,7 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 import { createGameState, applyMove, moveNotation } from "../../../src/games/chess/custom/engine/game.ts";
 import { parseVariantJson } from "../../../src/games/chess/custom/engine/serialization.ts";
 import type { GameState, GameVariant } from "../../../src/games/chess/custom/engine/types.ts";
-import { resolveRequestedMove, sameVariantReference, validateOnlineVariant, variantReference, type MultiplayerVariantReference, type VariantMoveRequest } from "../../../src/games/chess/custom/multiplayer/protocol.ts";
+import { joinOnlineSeats, onlineSeat, resolveRequestedMove, sameVariantReference, validateOnlineVariant, variantReference, type MultiplayerVariantReference, type VariantMoveRequest } from "../../../src/games/chess/custom/multiplayer/protocol.ts";
 
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const respond = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json", "Cache-Control": "no-store" } });
@@ -12,6 +12,7 @@ type Match = {
   code: string;
   host_id: string;
   guest_id: string | null;
+  player_ids: string[];
   variant_id: string;
   schema_version: number;
   revision: number;
@@ -32,7 +33,8 @@ function reference(match: Match): MultiplayerVariantReference {
   return { variantId: match.variant_id, schemaVersion: match.schema_version, revision: match.revision, configurationHash: match.configuration_hash };
 }
 function snapshot(match: Match, userId: string) {
-  return { code: match.code, role: match.host_id === userId ? "host" : "guest", status: match.status, version: match.version, variantReference: reference(match), variant: match.variant, state: match.state, history: match.history, players: { host: match.host_id, guest: match.guest_id } };
+  const players = match.player_ids;
+  return { code: match.code, role: match.host_id === userId ? "host" : "guest", seat: onlineSeat(players, userId), status: match.status, version: match.version, variantReference: reference(match), variant: match.variant, state: match.state, history: match.history, players };
 }
 
 Deno.serve(async (request) => {
@@ -57,7 +59,7 @@ Deno.serve(async (request) => {
       const state = createGameState(variant);
       const ref = await variantReference(variant);
       for (let attempt = 0; attempt < 5; attempt++) {
-        const { data, error } = await db.from("chess_custom_matches").insert({ code: roomCode(), host_id: user.id, variant_id: ref.variantId, schema_version: ref.schemaVersion, revision: ref.revision, configuration_hash: ref.configurationHash, variant, state, status: "waiting" }).select().single();
+        const { data, error } = await db.from("chess_custom_matches").insert({ code: roomCode(), host_id: user.id, player_ids: [user.id], variant_id: ref.variantId, schema_version: ref.schemaVersion, revision: ref.revision, configuration_hash: ref.configurationHash, variant, state, status: "waiting" }).select().single();
         if (data) return respond(snapshot(data as Match, user.id));
         if (error?.code !== "23505") throw error ?? new Error("Could not create room.");
       }
@@ -72,25 +74,27 @@ Deno.serve(async (request) => {
     const match = existing as Match;
 
     if (body.op === "preview") {
-      return respond({ code: match.code, status: match.status, variant: match.variant, host: match.host_id });
+      return respond({ code: match.code, status: match.status, variant: match.variant, host: match.host_id, playersJoined: match.player_ids.length });
     }
 
     if (body.op === "join") {
-      if (match.host_id === user.id || match.guest_id === user.id) return respond(snapshot(match, user.id));
-      if (match.status !== "waiting" || match.guest_id) return respond({ error: "This room is already full." }, 409);
-      const { data: joined, error } = await db.from("chess_custom_matches").update({ guest_id: user.id, status: "playing", version: match.version + 1, updated_at: new Date().toISOString() }).eq("id", match.id).eq("version", match.version).is("guest_id", null).select().maybeSingle();
+      if (onlineSeat(match.player_ids, user.id) !== -1) return respond(snapshot(match, user.id));
+      const players = joinOnlineSeats(match.player_ids, user.id, match.variant.teams.length);
+      if (match.status !== "waiting" || !players) return respond({ error: "This room is already full." }, 409);
+      const { data: joined, error } = await db.from("chess_custom_matches").update({ player_ids: players, guest_id: match.guest_id ?? user.id, status: players.length === match.variant.teams.length ? "playing" : "waiting", version: match.version + 1, updated_at: new Date().toISOString() }).eq("id", match.id).eq("version", match.version).eq("status", "waiting").select().maybeSingle();
       if (error) throw error;
       return joined ? respond(snapshot(joined as Match, user.id)) : respond({ error: "The room changed. Try joining again." }, 409);
     }
 
-    if (match.host_id !== user.id && match.guest_id !== user.id) return respond({ error: "You are not a player in this room." }, 403);
+    const seat = onlineSeat(match.player_ids, user.id);
+    if (seat === -1) return respond({ error: "You are not a player in this room." }, 403);
     if (body.op === "get") return respond(snapshot(match, user.id));
     if (body.op !== "move") return respond({ error: "Unknown room action." }, 400);
     if (match.status !== "playing") return respond({ error: "This game is not accepting moves." }, 409);
     if (!body.variantReference || !sameVariantReference(reference(match), body.variantReference)) return respond({ error: "Variant version mismatch. Reload the room." }, 409);
     const actualReference = await variantReference(match.variant);
     if (!sameVariantReference(reference(match), actualReference)) return respond({ error: "Stored variant configuration does not match its hash." }, 409);
-    const team = match.variant.teams[match.host_id === user.id ? 0 : 1]?.id;
+    const team = match.variant.teams[seat]?.id;
     if (!team || match.state.turn !== team) return respond({ error: "It is not your turn." }, 409);
     if (!body.move || typeof body.move.pieceId !== "string" || !body.move.from || !body.move.to) return respond({ error: "Move coordinates are required." }, 400);
     const move = resolveRequestedMove(match.variant, match.state, body.move);

@@ -1,6 +1,6 @@
 /**
- * Chess Custom information architecture: three top-level areas (My Games,
- * Create, Community), an ordered Create flow, and the focused simulation.
+ * Chess Custom information architecture: My Games, Create, Pluto Variants,
+ * and Community, an ordered Create flow, and the focused simulation.
  * Everything here is pure so routing and state transitions can be tested
  * without a browser.
  */
@@ -53,10 +53,11 @@ export const isPlayMode = (value: unknown): value is PlayMode => PLAY_MODES.some
 export type ChessCustomRoute =
   | { view: "library" }
   | { view: "community" }
+  | { view: "pluto" }
   | { view: "create"; step: CreateStep }
   | { view: "play"; mode: PlayMode };
 
-export type TopLevelArea = "library" | "create" | "community";
+export type TopLevelArea = "library" | "create" | "pluto" | "community";
 
 /** The top-level tab a route belongs to (playing a variant sits under My Games). */
 export function routeArea(route: ChessCustomRoute): TopLevelArea {
@@ -69,6 +70,8 @@ export function chessCustomPath(route: ChessCustomRoute): string {
       return CHESS_CUSTOM_ROOT;
     case "community":
       return `${CHESS_CUSTOM_ROOT}/community`;
+    case "pluto":
+      return `${CHESS_CUSTOM_ROOT}/pluto-variants`;
     case "create":
       return `${CHESS_CUSTOM_ROOT}/create/${route.step}`;
     case "play":
@@ -81,6 +84,7 @@ export function parseChessCustomPath(pathname: string): ChessCustomRoute {
   const rest = pathname.replace(/\/+$/, "").slice(CHESS_CUSTOM_ROOT.length).split("/").filter(Boolean);
   const [area, detail] = rest;
   if (area === "community") return { view: "community" };
+  if (area === "pluto-variants") return { view: "pluto" };
   if (area === "create") return { view: "create", step: detail === "test" ? "position" : isCreateStep(detail) ? detail : "overview" };
   if (area === "play" && isPlayMode(detail)) return { view: "play", mode: detail };
   return { view: "library" };

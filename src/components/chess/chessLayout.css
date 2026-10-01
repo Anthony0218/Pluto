@@ -100,49 +100,6 @@ body:has(.chess-game-grid) .chess-sidebar-toggle { display: block; }
 /* Hotseat headers keep variant status pills on their own row below the title and controls. */
 .chess-page-header:has(.chess-animation-control) .chess-header-details { order: 99; flex: 1 1 100%; width: 100%; padding-top: 10px; border-top: 1px solid color-mix(in srgb,var(--chess-header-accent) 18%,transparent); }
 .chess-page-header:has(.chess-animation-control) .chess-header-details > div:first-child { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
-.chess-variants-menu-page { height: var(--app-height); overflow: hidden; }
-.chess-variants-menu-page > div.relative { height: 100%; min-height: 0; }
-.chess-variants-menu-page > div.relative > section { min-height: 0; }
-.chess-variants-menu-page > div.relative > section > header,
-.chess-variants-menu-page > div.relative > section > div { min-height: 0; }
-.chess-variants-menu-page > div.relative > section > div > div { display: flex; flex-direction: column; height: 100%; min-height: 0; }
-.chess-variants-menu-page .variant-explorer-host { display: flex; flex: 1; flex-direction: column; min-height: 0; }
-.chess-variants-menu-page .variant-explorer-trigger { align-self: flex-start; flex-shrink: 0; }
-.chess-variants-menu-page .variant-explorer-stage { --explorer-height: 100%; flex: 1; min-height: 0; }
-.chess-variants-menu-page .variant-explorer-preview,
-.chess-variants-menu-page .variant-explorer { height: 100%; min-height: 0; }
-.chess-variants-menu-page .variant-explorer-preview > section { height: 100%; min-height: 0; overflow: clip; }
-.chess-variants-menu-page .variant-explorer-preview > section > div.relative.flex { height: auto; min-height: 100%; }
-.chess-variants-menu-page .variant-explorer-preview article > div { min-height: 0; }
-/* The slide never scrolls: on shorter screens its parts compact instead, so the play buttons always stay visible. */
-@media (max-height: 860px) {
-  .chess-variants-menu-page .variant-slide { padding-block: 16px; }
-  .chess-variants-menu-page .variant-slide-art { contain: size; }
-  .chess-variants-menu-page .variant-slide-title { font-size: 36px; margin-top: 4px; }
-  .chess-variants-menu-page .variant-slide-desc { height: 4.5rem; margin-top: 6px; font-size: 14px; line-height: 1.5; }
-  .chess-variants-menu-page .variant-slide-tags { margin-top: 8px; }
-  .chess-variants-menu-page .variant-slide-actions { margin-top: 10px; gap: 6px; }
-  .chess-variants-menu-page .variant-slide-actions > * { min-height: 34px; }
-  .chess-variants-menu-page .variant-slide-nav { padding-top: 10px; }
-  .chess-variants-menu-page .variant-slide-nav > button { height: 36px; width: 36px; }
-}
-@media (max-height: 800px) {
-  .chess-variants-menu-page .variant-slide-desc, .chess-variants-menu-page .variant-slide-tags { display: none; }
-  .chess-variants-menu-page .variant-slide-title { height: auto; -webkit-line-clamp: 1; }
-  .chess-variants-menu-page .variant-slide-actions { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .chess-variants-menu-page .variant-slide-nav { padding-top: 8px; }
-}
-@media (max-width: 1023px) {
-  .chess-variants-menu-page > div.relative > section { display: flex; flex-direction: column; }
-  .chess-variants-menu-page > div.relative > section > header { flex: 0 0 auto; padding: 16px 24px; }
-  .chess-variants-menu-page > div.relative > section > header .mb-8 { margin-bottom: 8px; }
-  .chess-variants-menu-page > div.relative > section > header h1 { margin-top: 8px; font-size: clamp(30px, 5vw, 48px); }
-  .chess-variants-menu-page > div.relative > section > header p.mt-6 { margin-top: 8px; font-size: 14px; line-height: 1.4; }
-  .chess-variants-menu-page > div.relative > section > header button { margin-top: 10px; padding: 7px 12px; }
-  .chess-variants-menu-page > div.relative > section > header .mt-12 { display: none; }
-  .chess-variants-menu-page > div.relative > section > div { flex: 1; overflow: hidden; padding: 12px 24px; }
-  .chess-variants-menu-page > div.relative > section > div > div { transform: none; }
-}
 @media (max-width:639px) {
   .chess-page-header { padding: 10px; gap: 10px; }
   .chess-header-brand { flex: 1 1 100%; }
@@ -156,3 +113,20 @@ body:has(.chess-game-grid) .chess-sidebar-toggle { display: block; }
 }
 
 .chess-header-description { color: #a1a1aa; font-size: 12px; line-height: 1.4; min-width: 0; overflow-wrap: anywhere; }
+
+/* Ranked top-10 medallion: golden glow that breathes, with a light sweep. */
+.top-rank-badge { position: relative; isolation: isolate; display: inline-flex; align-items: center; gap: 5px; overflow: hidden; border: 1px solid #fde68a; border-radius: 999px; background: linear-gradient(135deg, #fff3b0 0%, #fbbf24 38%, #d97706 72%, #fcd34d 100%); color: #3b2503; font-weight: 900; line-height: 1; white-space: nowrap; padding: 6px 11px 6px 9px; font-size: 13px; box-shadow: 0 0 0 1px #78350f66 inset, 0 0 14px #fbbf2499, 0 0 30px #f59e0b4d; animation: top-rank-pop .55s cubic-bezier(.2, 1.4, .4, 1) both, top-rank-glow 2.6s ease-in-out .55s infinite; }
+.top-rank-badge::after { content: ""; position: absolute; inset: -2px; z-index: -1; background: linear-gradient(105deg, transparent 35%, #ffffffcc 50%, transparent 65%); transform: translateX(-120%); animation: top-rank-shine 3.2s ease-in-out 1s infinite; }
+
+.top-rank-badge-label { font-size: .68em; letter-spacing: .14em; text-transform: uppercase; opacity: .78; }
+/* Compact variant for in-game player boxes. */
+.top-rank-badge.is-small { gap: 3px; padding: 3px 7px 3px 6px; font-size: 10px; }
+.top-rank-badge.is-small .top-rank-badge-label { letter-spacing: .1em; }
+.top-rank-badge.is-podium { border-color: #fff7d1; box-shadow: 0 0 0 1px #78350f66 inset, 0 0 18px #fcd34dcc, 0 0 40px #f59e0b80; }
+/* Glow ring for the player box that wears the badge. */
+.top-rank-glow { border-color: #fbbf2499; box-shadow: 0 0 0 1px #fbbf2440, 0 0 26px #f59e0b40, inset 0 0 22px #fbbf2414; animation: top-rank-box-glow 2.6s ease-in-out infinite; }
+@keyframes top-rank-pop { from { opacity: 0; transform: scale(.4) rotate(-8deg); } }
+@keyframes top-rank-glow { 50% { box-shadow: 0 0 0 1px #78350f66 inset, 0 0 22px #fcd34dd9, 0 0 46px #f59e0b8c; } }
+@keyframes top-rank-shine { 0%, 55% { transform: translateX(-120%); } 85%, 100% { transform: translateX(120%); } }
+@keyframes top-rank-box-glow { 50% { box-shadow: 0 0 0 1px #fbbf2466, 0 0 38px #f59e0b66, inset 0 0 26px #fbbf2421; } }
+@media (prefers-reduced-motion: reduce) { .top-rank-badge, .top-rank-badge::after, .top-rank-glow { animation: none; } }

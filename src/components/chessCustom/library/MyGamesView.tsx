@@ -51,14 +51,14 @@ export default function MyGamesView() {
           type="button"
           data-guide="create-new"
           onClick={createNew}
-          className="group relative inline-flex items-center gap-3 overflow-hidden rounded-2xl border border-amber-200/70 bg-gradient-to-br from-amber-200 via-amber-300 to-amber-500 px-5 py-3.5 text-left font-semibold text-zinc-950 shadow-[0_12px_40px_rgba(252,211,77,.25)] transition hover:shadow-[0_16px_50px_rgba(252,211,77,.4)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200"
+          className="group relative inline-flex items-center gap-3 overflow-hidden rounded-2xl border border-violet-300/40 bg-gradient-to-br from-violet-500/25 via-indigo-500/20 to-sky-500/15 px-5 py-3.5 text-left font-semibold text-violet-100 shadow-[0_12px_40px_rgba(139,92,246,.12)] transition hover:border-violet-300/70 hover:from-violet-500/35 hover:shadow-[0_16px_50px_rgba(139,92,246,.22)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-200"
         >
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-950/10">
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-violet-300/20 bg-violet-300/10 text-violet-200">
             <CreateIcon size={24} />
           </span>
           <span>
             <span className="block text-base">{ui("Create New Chess Variant")}</span>
-            <span className="block text-xs font-medium text-zinc-900/70">{ui("Board, pieces, rules — step by step")}</span>
+            <span className="block text-xs font-medium text-violet-200/65">{ui("Board, pieces, rules — step by step")}</span>
           </span>
         </button>
       </header>
@@ -138,7 +138,7 @@ export default function MyGamesView() {
           </span>
           <h2 className="font-serif text-2xl text-white">{ui("Create your first Chess Variant")}</h2>
           <p className="mt-2 max-w-md text-sm leading-6 text-zinc-400">{ui("Design the board, redefine pieces, change the rules, and play it against other players.")}</p>
-          <Button tone="primary" className="mt-5" onClick={createNew}>
+          <Button tone="blue" className="mt-5" onClick={createNew}>
             <CreateIcon size={16} />
             {ui("Create New Chess Variant")}
           </Button>
@@ -183,6 +183,7 @@ export default function MyGamesView() {
       <PlayModeDialog
         open={Boolean(playing)}
         variantName={playing?.name ?? ""}
+        playerCount={playing?.teamCount}
         onClose={() => setPlaying(null)}
         onChoose={(mode) => {
           const entry = playing;
