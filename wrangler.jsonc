@@ -6,5 +6,7 @@
     "directory": "./dist",
     // Serve index.html for client-side routes like /games/card-builder/room/ABC.
     "not_found_handling": "single-page-application"
-  }
+  },
+  // Lets Workers Builds publish a preview URL for every non-production branch.
+  "previews": {}
 }
