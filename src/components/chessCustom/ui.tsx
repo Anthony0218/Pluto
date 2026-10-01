@@ -1,5 +1,6 @@
 import { Minus, Plus } from "lucide-react";
-import type { ReactNode } from "react";
+import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { stepNumber, type CreateStep } from "@/games/chess/custom/library/navigation";
 import { ui } from "@/i18n/ui";
 
 /* Small, consistent building blocks for the Chess Custom editor. */
@@ -39,11 +40,14 @@ export function Panel({
   );
 }
 
-export function SectionHeading({ eyebrow, title, description, actions }: { eyebrow: string; title: string; description?: ReactNode; actions?: ReactNode }) {
+export function SectionHeading({ eyebrow, title, description, actions, step }: { eyebrow: string; title: string; description?: ReactNode; actions?: ReactNode; step?: CreateStep }) {
   return (
     <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
       <div className="min-w-0 max-w-2xl">
-        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-300/80">{ui(eyebrow)}</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-300/80">
+          {step && <span className="mr-1.5 font-mono tracking-normal text-amber-300">{stepNumber(step)} ·</span>}
+          {ui(eyebrow)}
+        </p>
         <h2 className="mt-1.5 font-serif text-[28px] leading-tight text-white sm:text-[32px]">{ui(title)}</h2>
         {description && <p className="mt-2 text-sm leading-6 text-zinc-400">{description}</p>}
       </div>
@@ -61,6 +65,7 @@ export function Button({
   type = "button",
   className = "",
   size = "md",
+  ...rest
 }: {
   children: ReactNode;
   onClick?: () => void;
@@ -70,7 +75,7 @@ export function Button({
   type?: "button" | "submit";
   className?: string;
   size?: "sm" | "md";
-}) {
+} & Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onClick" | "type" | "children">) {
   const tones = {
     primary: "border-amber-300/60 bg-amber-300 text-zinc-950 hover:bg-amber-200",
     ghost: "border-white/10 bg-white/[0.04] text-zinc-200 hover:border-white/20 hover:bg-white/[0.08] hover:text-white",
@@ -80,6 +85,7 @@ export function Button({
   const sizes = { sm: "px-2.5 py-1.5 text-xs", md: "px-3.5 py-2 text-sm" };
   return (
     <button
+      {...rest}
       type={type}
       title={title}
       onClick={onClick}
@@ -98,6 +104,7 @@ export function IconButton({
   disabled,
   active,
   className = "",
+  ...rest
 }: {
   label: string;
   onClick?: () => void;
@@ -105,9 +112,10 @@ export function IconButton({
   disabled?: boolean;
   active?: boolean;
   className?: string;
-}) {
+} & Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onClick" | "type" | "children">) {
   return (
     <button
+      {...rest}
       type="button"
       aria-label={label}
       title={label}

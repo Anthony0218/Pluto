@@ -1,10 +1,10 @@
-import { findBoardRegions, getCell, inBounds, isPlayable, squareName } from "./board.ts";
+import { boardLayers, coordKey3D, findBoardRegions, getCell, inBounds, isPlayable, squareName } from "./board.ts";
 import { sideOf } from "./teams.ts";
 import { VICTORY_LABELS } from "./victory.ts";
 import type { Coord, GameVariant, PieceTypeId } from "./types.ts";
 
 export type IssueSeverity = "error" | "warning" | "info";
-export type IssueSection = "overview" | "board" | "teams" | "pieces" | "rules" | "events" | "victory" | "test";
+export type IssueSection = "overview" | "board" | "teams" | "pieces" | "rules" | "events" | "victory" | "position";
 
 export interface ValidationIssue {
   id: string;
@@ -27,6 +27,7 @@ export function validateVariant(variant: GameVariant): ValidationIssue[] {
   const teamIds = new Set(variant.teams.map((team) => team.id));
   const pieceName = (id: PieceTypeId) => variant.pieces.find((piece) => piece.id === id)?.name ?? id;
   const { board } = variant;
+  const allCells = boardLayers(board).flatMap((layer) => layer.cells.map((cell) => ({ ...cell, z: layer.z })));
 
   /* Victory */
   const enabled = variant.victoryConditions.filter((condition) => condition.enabled);
@@ -46,11 +47,11 @@ export function validateVariant(variant: GameVariant): ValidationIssue[] {
     if (condition.type === "reachSquare") {
       if (!condition.square || !isPlayable(board, condition.square)) add("error", "victory", `“${label}” points at a square that is not on the board.`, condition.id);
     }
-    if ((condition.type === "reachZone" || condition.type === "controlSquares") && !board.cells.some((cell) => cell.enabled && cell.tile === "goal")) {
+    if ((condition.type === "reachZone" || condition.type === "controlSquares") && !allCells.some((cell) => cell.enabled && cell.tile === "goal")) {
       add("error", "victory", `“${label}” needs goal tiles, but the board has none.`, condition.id);
     }
     if (condition.type === "controlSquares") {
-      const goals = board.cells.filter((cell) => cell.enabled && cell.tile === "goal").length;
+      const goals = allCells.filter((cell) => cell.enabled && cell.tile === "goal").length;
       if ((condition.count ?? 1) > goals && goals > 0) add("error", "victory", `“${label}” asks for ${condition.count} goal tiles but only ${goals} exist.`, condition.id);
     }
     if ((condition.type === "captureSpecific" || condition.type === "eliminateType") && condition.pieceType) {
@@ -74,18 +75,18 @@ export function validateVariant(variant: GameVariant): ValidationIssue[] {
   for (const [side, names] of sides) if (names.length > 1) add("info", "teams", `${names.join(" and ")} both play from the ${side} side — their armies may overlap.`);
   for (const team of variant.teams) {
     const pieces = variant.setup.pieces.filter((piece) => piece.team === team.id);
-    if (!pieces.length) add("warning", "test", `${team.name} has no pieces in the starting position.`);
+    if (!pieces.length) add("warning", "position", `${team.name} has no pieces in the starting position.`);
     else if (variant.settings.royalMode !== "none" && !pieces.some((piece) => variant.pieces.find((def) => def.id === piece.type)?.royal)) {
-      add("warning", "test", `King required but missing — ${team.name} has no royal piece.`);
+      add("warning", "position", `King required but missing — ${team.name} has no royal piece.`);
     }
   }
   const occupied = new Set<string>();
   for (const placed of variant.setup.pieces) {
-    const key = `${placed.x},${placed.y}`;
-    if (!pieceIds.has(placed.type)) add("error", "test", `Starting position uses a deleted piece type (${placed.type}) on ${squareName(placed)}.`);
-    if (!inBounds(board, placed)) add("warning", "test", `A ${pieceName(placed.type)} is outside the board and will be ignored.`);
-    else if (!isPlayable(board, placed)) add("warning", "test", `${pieceName(placed.type)} on ${squareName(placed)} stands on a disabled or blocked cell and will be ignored.`);
-    if (occupied.has(key)) add("warning", "test", `Two pieces share ${squareName(placed)}; only the first is used.`);
+    const key = coordKey3D(placed);
+    if (!pieceIds.has(placed.type)) add("error", "position", `Starting position uses a deleted piece type (${placed.type}) on ${squareName(placed)}.`);
+    if (!inBounds(board, placed)) add("warning", "position", `A ${pieceName(placed.type)} is outside the board and will be ignored.`);
+    else if (!isPlayable(board, placed)) add("warning", "position", `${pieceName(placed.type)} on ${squareName(placed)} stands on a disabled or blocked cell and will be ignored.`);
+    if (occupied.has(key)) add("warning", "position", `Two pieces share ${squareName(placed)}; only the first is used.`);
     occupied.add(key);
   }
 
@@ -101,7 +102,7 @@ export function validateVariant(variant: GameVariant): ValidationIssue[] {
       if (rule.kind === "slide" && rule.maxDistance && rule.minDistance && rule.minDistance > rule.maxDistance) {
         add("error", "pieces", `${piece.name}: a slide's minimum distance is larger than its maximum.`, piece.id);
       }
-      if (rule.kind === "teleport" && !board.cells.some((cell) => cell.enabled && cell.tile === "teleport")) {
+      if (rule.kind === "teleport" && !allCells.some((cell) => cell.enabled && cell.tile === "teleport")) {
         add("warning", "pieces", `${piece.name} teleports between teleport tiles, but the board has none.`, piece.id);
       }
     }
@@ -110,7 +111,7 @@ export function validateVariant(variant: GameVariant): ValidationIssue[] {
       for (const option of piece.promotion.options) {
         if (!pieceIds.has(option)) add("error", "pieces", `${piece.name} promotes to a missing piece (${option}).`, piece.id);
       }
-      if (piece.promotion.zone === "tiles" && !board.cells.some((cell) => cell.enabled && cell.tile === "promotion")) {
+      if (piece.promotion.zone === "tiles" && !allCells.some((cell) => cell.enabled && cell.tile === "promotion")) {
         add("warning", "pieces", `${piece.name} promotes on promotion tiles, but the board has none.`, piece.id);
       }
     }
@@ -131,8 +132,13 @@ export function validateVariant(variant: GameVariant): ValidationIssue[] {
 
   /* Board */
   if (board.cells.length !== board.width * board.height) add("error", "board", "The board data is corrupted (cell count mismatch).");
+  for (const layer of board.layers ?? []) {
+    if (layer.z <= 0 || !Number.isInteger(layer.z)) add("error", "board", `Layer ${layer.name} needs a positive integer z.`);
+    if (layer.cells.length !== layer.width * layer.height) add("error", "board", `Layer ${layer.name} has a cell count mismatch.`);
+  }
+  if (new Set((board.layers ?? []).map((layer) => layer.z)).size !== (board.layers ?? []).length) add("error", "board", "Two board layers share the same z coordinate.");
   const portalLinks: [Coord, Coord][] = [];
-  for (const cell of board.cells) {
+  for (const cell of allCells) {
     if (!cell.enabled || cell.tile !== "portal") continue;
     if (!cell.portalTarget) add("error", "board", `Portal on ${squareName(cell)} has no destination.`, `${cell.x},${cell.y}`);
     else if (!isPlayable(board, cell.portalTarget)) add("error", "board", `Portal on ${squareName(cell)} leads to ${squareName(cell.portalTarget)}, which is not playable.`, `${cell.x},${cell.y}`);

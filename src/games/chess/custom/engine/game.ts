@@ -1,4 +1,4 @@
-import { getCell, inBounds, isPlayable, sameCoord, squareName } from "./board.ts";
+import { coordKey3D, getCell, inBounds, isPlayable, sameCoord, squareName } from "./board.ts";
 import { createRuntime, eliminateTeam, finishGame, fireTrigger, onlyRoyalsRemain, pushMessage, runScheduled } from "./events.ts";
 import { generateCandidates, isSquareAttacked, type MoveCandidate } from "./movement.ts";
 import {
@@ -32,10 +32,10 @@ export function createGameState(variant: GameVariant, setup: PositionSetup = var
   const pieces: PieceInstance[] = [];
   let nextId = 1;
   for (const placed of setup.pieces) {
-    const key = `${placed.x},${placed.y}`;
+    const key = `${placed.x},${placed.y},${placed.z ?? 0}`;
     if (taken.has(key) || !teams.has(placed.team) || !getDefinition(variant, placed.type) || !isPlayable(variant.board, placed)) continue;
     taken.add(key);
-    pieces.push({ id: `p${nextId++}`, type: placed.type, team: placed.team, x: placed.x, y: placed.y, moveCount: placed.moved ? 1 : 0, origin: { x: placed.x, y: placed.y } });
+    pieces.push({ id: `p${nextId++}`, type: placed.type, team: placed.team, x: placed.x, y: placed.y, z: placed.z ?? 0, moveCount: placed.moved ? 1 : 0, origin: { x: placed.x, y: placed.y, z: placed.z ?? 0 } });
   }
   const initialCounts: GameState["initialCounts"] = {};
   for (const team of variant.teams) initialCounts[team.id] = {};
@@ -77,6 +77,7 @@ export function createGameState(variant: GameVariant, setup: PositionSetup = var
 /* -------------------------------------------------------------- Helpers */
 
 function unit(delta: Coord): Coord | null {
+  if (delta.z) return null;
   const ax = Math.abs(delta.x);
   const ay = Math.abs(delta.y);
   if (!(delta.x === 0 || delta.y === 0 || ax === ay) || (ax === 0 && ay === 0)) return null;
@@ -93,10 +94,10 @@ function isFreeFor(position: Position, coord: Coord, mover: PieceInstance, captu
 function resolveLanding(position: Position, mover: PieceInstance, to: Coord, path: Coord[], captureIds: string[]) {
   let at = to;
   const route = path.slice();
-  const direction = unit({ x: to.x - mover.x, y: to.y - mover.y });
+  const direction = unit({ x: to.x - mover.x, y: to.y - mover.y, z: (to.z ?? 0) - (mover.z ?? 0) });
   if (direction) {
     for (let guard = 0; guard < 32 && getCell(position.state.board, at)?.tile === "ice"; guard++) {
-      const next = { x: at.x + direction.x, y: at.y + direction.y };
+      const next = { x: at.x + direction.x, y: at.y + direction.y, z: at.z ?? 0 };
       const cell = getCell(position.state.board, next);
       if (!cell || !isFreeFor(position, next, mover, captureIds)) break;
       if (cell.tile === "oneWay" && cell.direction && cell.direction.x * direction.x + cell.direction.y * direction.y <= 0) break;
@@ -127,13 +128,13 @@ function candidateToMoves(position: Position, mover: PieceInstance, candidate: M
   const { landing, path } = resolveLanding(position, mover, candidate.to, candidate.path, candidate.captureIds);
   const base: Move = {
     pieceId: mover.id,
-    from: { x: mover.x, y: mover.y },
+    from: { x: mover.x, y: mover.y, z: mover.z ?? 0 },
     to: candidate.to,
     landing: sameCoord(landing, candidate.to) ? undefined : landing,
     captureIds: candidate.captureIds,
     source: candidate.source,
     ruleId: candidate.ruleId,
-    offset: { x: candidate.to.x - mover.x, y: candidate.to.y - mover.y },
+    offset: { x: candidate.to.x - mover.x, y: candidate.to.y - mover.y, z: (candidate.to.z ?? 0) - (mover.z ?? 0) },
     path,
   };
   const options = promotionOptions(position, mover, landing);
@@ -143,7 +144,7 @@ function candidateToMoves(position: Position, mover: PieceInstance, candidate: M
 function castlingMoves(position: Position, mover: PieceInstance): Move[] {
   const { variant, state } = position;
   const def = position.defs.get(mover.type);
-  if (!def?.abilities.includes("castling") || !ruleEnabled(variant, "castling") || mover.moveCount > 0) return [];
+  if (!def?.abilities.includes("castling") || !ruleEnabled(variant, "castling") || mover.moveCount > 0 || (mover.z ?? 0) !== 0) return [];
   const forward = variant.teams.find((team) => team.id === mover.team)?.forward ?? { x: 0, y: 1 };
   const right = { x: forward.y, y: -forward.x };
   const checkRules = state.royalMode === "checkmate";
@@ -188,7 +189,7 @@ function movePieces(state: GameState, move: Move): PieceInstance[] {
   return state.pieces
     .filter((piece) => !move.captureIds.includes(piece.id))
     .map((piece) => {
-      if (piece.id === move.pieceId) return { ...piece, x: landing.x, y: landing.y, type: move.promotion ?? piece.type, moveCount: piece.moveCount + 1 };
+      if (piece.id === move.pieceId) return { ...piece, x: landing.x, y: landing.y, z: landing.z ?? 0, type: move.promotion ?? piece.type, moveCount: piece.moveCount + 1 };
       if (move.castle && piece.id === move.castle.partnerId) return { ...piece, ...move.castle.partnerTo, moveCount: piece.moveCount + 1 };
       return piece;
     });
@@ -371,7 +372,7 @@ export function applyMove(variant: GameVariant, previous: GameState, move: Move)
   if (!mover || state.result) return previous;
 
   const actor = mover.team;
-  const from = { x: mover.x, y: mover.y };
+  const from = { x: mover.x, y: mover.y, z: mover.z ?? 0 };
   const movedType = mover.type;
   const countsBefore = pieceCounts(state);
   const royalsOnlyBefore = onlyRoyalsRemain(variant, state);
@@ -381,12 +382,13 @@ export function applyMove(variant: GameVariant, previous: GameState, move: Move)
   state.pieces = state.pieces.filter((piece) => !move.captureIds.includes(piece.id));
   for (const victim of captured) {
     state.captured.push({ type: victim.type, team: victim.team, by: actor });
-    state.effects.push({ kind: isRoyal(variant, victim) ? "royalCapture" : "capture", at: { x: victim.x, y: victim.y } });
+    state.effects.push({ kind: isRoyal(variant, victim) ? "royalCapture" : "capture", at: { x: victim.x, y: victim.y, z: victim.z ?? 0 } });
   }
 
   const landing = move.landing ?? move.to;
   mover.x = landing.x;
   mover.y = landing.y;
+  mover.z = landing.z ?? 0;
   mover.moveCount += 1;
   if (move.landing) state.effects.push({ kind: "portal", at: move.to, to: move.landing });
   if (move.castle) {
@@ -408,13 +410,13 @@ export function applyMove(variant: GameVariant, previous: GameState, move: Move)
   const rule = getDefinition(variant, movedType)?.movement.find((entry) => entry.id === move.ruleId);
   const step = unit(move.offset);
   if (rule?.firstMoveOnly && step && Math.max(Math.abs(move.offset.x), Math.abs(move.offset.y)) === 2 && !move.captureIds.length) {
-    state.enPassant = { square: { x: from.x + step.x, y: from.y + step.y }, pieceId: mover.id };
+    state.enPassant = { square: { x: from.x + step.x, y: from.y + step.y, z: from.z }, pieceId: mover.id };
   }
 
   // Explosive pieces take the capturer and every adjacent non-royal piece with them.
   for (const victim of captured) {
     if (!getDefinition(variant, victim.type)?.abilities.includes("explosive")) continue;
-    const blast = state.pieces.filter((piece) => Math.abs(piece.x - victim.x) <= 1 && Math.abs(piece.y - victim.y) <= 1 && !isRoyal(variant, piece));
+    const blast = state.pieces.filter((piece) => Math.abs(piece.x - victim.x) <= 1 && Math.abs(piece.y - victim.y) <= 1 && (piece.z ?? 0) === (victim.z ?? 0) && !isRoyal(variant, piece));
     state.pieces = state.pieces.filter((piece) => !blast.includes(piece));
     for (const piece of blast) state.captured.push({ type: piece.type, team: piece.team, by: actor });
     state.effects.push({ kind: "shake", at: { x: victim.x, y: victim.y } });
@@ -456,7 +458,7 @@ export function applyMove(variant: GameVariant, previous: GameState, move: Move)
   if (doomed.length) {
     state.pieces = state.pieces.filter((piece) => !doomed.includes(piece));
     for (const piece of doomed) {
-      state.effects.push({ kind: "capture", at: { x: piece.x, y: piece.y } });
+      state.effects.push({ kind: "capture", at: { x: piece.x, y: piece.y, z: piece.z ?? 0 } });
       pushMessage(state, `${getDefinition(variant, piece.type)?.name} was lost on a danger tile`);
     }
   }
@@ -501,6 +503,10 @@ export function moveNotation(variant: GameVariant, before: GameState, move: Move
     text = `${prefix}${capture}${squareName(move.to)}`;
     if (move.landing) text += `↯${squareName(move.landing)}`;
     if (move.promotion) text += `=${getDefinition(variant, move.promotion)?.symbol || getDefinition(variant, move.promotion)?.name || move.promotion}`;
+    if ((move.from.z ?? 0) !== (move.to.z ?? 0) || (move.to.z ?? 0) !== 0 || (move.landing?.z ?? move.to.z ?? 0) !== (move.to.z ?? 0)) {
+      const layerName = (coord: Coord) => `L${(coord.z ?? 0) + 1}:${squareName(coord)}`;
+      text = `${symbol || def?.name || "Piece"} ${layerName(move.from)}${capture ? "×" : "→"}${layerName(move.to)}${move.landing ? `↯${layerName(move.landing)}` : ""}${move.promotion ? `=${getDefinition(variant, move.promotion)?.name ?? move.promotion}` : ""}`;
+    }
   }
   if (after?.result && !after.result.draw && after.result.reason.startsWith("Checkmate")) text += "#";
   else if (after && !after.result && isInCheck(variant, after, after.turn)) text += "+";
@@ -528,10 +534,10 @@ export function explainPiece(variant: GameVariant, state: GameState, pieceId: st
   if (!piece) return [];
   const position = createPosition(variant, state);
   const legal = getLegalMoves(variant, { ...state, result: null }, { pieceId, asTeam: piece.team });
-  const legalKeys = new Set(legal.map((move) => `${move.to.x},${move.to.y}`));
+  const legalKeys = new Set(legal.map((move) => coordKey3D(move.to)));
   const forced = ruleEnabled(variant, "forcedCapture");
   const entries: MoveExplanation[] = generateCandidates(position, piece, { explain: true }).map((candidate) => {
-    const key = `${candidate.to.x},${candidate.to.y}`;
+    const key = coordKey3D(candidate.to);
     const special = candidate.source === "enPassant" || candidate.source === "teleport";
     if (candidate.legal && !legalKeys.has(key)) {
       return {
@@ -542,7 +548,7 @@ export function explainPiece(variant: GameVariant, state: GameState, pieceId: st
         ruleId: candidate.ruleId,
       };
     }
-    const landing = legal.find((move) => move.to.x === candidate.to.x && move.to.y === candidate.to.y && move.landing)?.landing;
+    const landing = legal.find((move) => sameCoord(move.to, candidate.to) && move.landing)?.landing;
     return {
       to: candidate.to,
       kind: special || landing ? "special" : candidate.kind,

@@ -116,7 +116,7 @@ function TeamCard({ team, index, count }: { team: TeamDefinition; index: number;
 }
 
 export default function TeamsSection() {
-  const { variant, dispatch, setSection } = useEditor();
+  const { variant, dispatch, goToStep } = useEditor();
   const theme = getBoardTheme(variant.theme.boardTheme);
   const bySide = useMemo(() => {
     const map: Record<TeamSide, TeamDefinition[]> = { bottom: [], top: [], left: [], right: [] };
@@ -144,6 +144,7 @@ export default function TeamsSection() {
   return (
     <div>
       <SectionHeading
+        step="teams"
         eyebrow="Teams"
         title="Who plays, and from where"
         description={ui("Up to four teams. Each team plays from one side of the board and its pieces advance away from it; turn order follows the list.")}
@@ -190,9 +191,9 @@ export default function TeamsSection() {
                   </Button>
                 </div>
               )}
-              <Button className="w-full" onClick={() => setSection("test")}>
+              <Button className="w-full" onClick={() => goToStep("position")}>
                 <Users size={15} />
-                {ui("Fine-tune in Test Position")}
+                {ui("Fine-tune in Position")}
               </Button>
             </div>
           </Panel>

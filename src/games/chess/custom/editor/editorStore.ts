@@ -2,6 +2,7 @@ import { resizeBoard } from "../engine/board.ts";
 import { arrangeArmies } from "../engine/teams.ts";
 import type {
   BoardDefinition,
+  Coord,
   GameEvent,
   GameRuleType,
   GameVariant,
@@ -39,6 +40,8 @@ export type EditorAction =
   | { type: "removePieceDefinition"; id: string }
   | { type: "updateBoard"; board: BoardDefinition; coalesceKey?: string }
   | { type: "resizeBoard"; width: number; height: number; coalesceKey?: string }
+  | { type: "deleteLayer"; z: number }
+  | { type: "swapLayers"; a: number; b: number }
   | { type: "addRule"; ruleType: GameRuleType }
   | { type: "removeRule"; ruleType: GameRuleType }
   | { type: "addEvent"; event: GameEvent }
@@ -52,6 +55,8 @@ export type EditorAction =
   | { type: "moveTeam"; id: string; delta: -1 | 1 }
   | { type: "arrangeArmies" }
   | { type: "replaceIdentity"; variant: GameVariant }
+  /** Swap in new gameplay content (e.g. a base preset) as one undoable step; the test position follows. */
+  | { type: "replaceContent"; variant: GameVariant }
   | { type: "undo" }
   | { type: "redo" };
 
@@ -105,6 +110,28 @@ export function editorReducer(history: EditorHistory, action: EditorAction): Edi
     }
     case "updateBoard":
       return withVariant(history, (variant) => ({ ...variant, board: action.board }), action.coalesceKey);
+    case "deleteLayer": {
+      if (action.z === 0) return history;
+      const strip = (setup: PositionSetup) => ({ ...setup, pieces: setup.pieces.filter((piece) => (piece.z ?? 0) !== action.z) });
+      const variant = history.present.variant;
+      const clean = (cell: BoardDefinition["cells"][number]) => cell.portalTarget?.z === action.z ? { ...cell, tile: "normal" as const, portalTarget: undefined } : cell;
+      const board = { ...variant.board, cells: variant.board.cells.map(clean), layers: variant.board.layers?.filter((layer) => layer.z !== action.z).map((layer) => ({ ...layer, cells: layer.cells.map(clean) })) };
+      return commit(history, { testSetup: strip(history.present.testSetup), variant: { ...variant, board, setup: strip(variant.setup) } });
+    }
+    case "swapLayers": {
+      const { a, b } = action;
+      if (a <= 0 || b <= 0 || a === b) return history;
+      const variant = history.present.variant;
+      if (!variant.board.layers?.some((layer) => layer.z === a) || !variant.board.layers.some((layer) => layer.z === b)) return history;
+      const swap = (z: number) => z === a ? b : z === b ? a : z;
+      const coord = (value: Coord): Coord => ({ ...value, z: swap(value.z ?? 0) });
+      const cells = (value: BoardDefinition["cells"]) => value.map((cell) => cell.portalTarget ? { ...cell, portalTarget: coord(cell.portalTarget) } : cell);
+      const setup = (value: PositionSetup): PositionSetup => ({ ...value, pieces: value.pieces.map((piece) => ({ ...piece, z: swap(piece.z ?? 0) })) });
+      const board = { ...variant.board, cells: cells(variant.board.cells), layers: variant.board.layers.map((layer) => ({ ...layer, z: swap(layer.z), cells: cells(layer.cells) })) };
+      const events = variant.events.map((event) => ({ ...event, trigger: { ...event.trigger, square: event.trigger.square && coord(event.trigger.square) }, conditions: event.conditions.map((condition) => ({ ...condition, square: condition.square && coord(condition.square) })), actions: event.actions.map((item) => ({ ...item, square: item.square && coord(item.square) })), elseActions: event.elseActions.map((item) => ({ ...item, square: item.square && coord(item.square) })) }));
+      const victoryConditions = variant.victoryConditions.map((condition) => ({ ...condition, square: condition.square && coord(condition.square) }));
+      return commit(history, { testSetup: setup(history.present.testSetup), variant: { ...variant, board, setup: setup(variant.setup), events, victoryConditions } });
+    }
     case "resizeBoard": {
       // Cells stay anchored bottom-left; armies that face down (top side) move with the top edge.
       const variant = history.present.variant;
@@ -193,6 +220,8 @@ export function editorReducer(history: EditorHistory, action: EditorAction): Edi
       const apply = (doc: EditorDocument) => ({ ...doc, variant: { ...doc.variant, ...patch } });
       return { ...history, past: history.past.map(apply), present: apply(history.present), future: history.future.map(apply) };
     }
+    case "replaceContent":
+      return commit(history, { variant: action.variant, testSetup: structuredClone(action.variant.setup) });
     case "undo": {
       const previous = history.past.at(-1);
       if (!previous) return history;

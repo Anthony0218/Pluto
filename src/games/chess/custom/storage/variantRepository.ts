@@ -1,15 +1,28 @@
+import { KING_BEHAVIORS, matchKingBehavior } from "../engine/presets.ts";
 import { parseVariantJson } from "../engine/serialization.ts";
 import type { GameVariant } from "../engine/types.ts";
+import { VICTORY_LABELS } from "../engine/victory.ts";
+import { buildVariantPreview, type VariantPreview } from "../library/preview.ts";
 
+/**
+ * What library cards need without loading whole variants. Fields added after
+ * the first release are optional so summaries from any backend still render.
+ */
 export interface VariantSummary {
   id: string;
   name: string;
   description?: string;
   updatedAt: string;
+  createdAt?: string;
   version: number;
   presetId?: string;
   boardSize: string;
   pieceCount: number;
+  layerCount?: number;
+  teamCount?: number;
+  kingRule?: string;
+  victory?: string[];
+  preview?: VariantPreview;
 }
 
 /**
@@ -26,6 +39,8 @@ export interface VariantRepository {
 
 const STORAGE_KEY = "chess-custom:variants:v1";
 const DRAFT_KEY = "chess-custom:draft:v1";
+/** Whether the autosaved draft matched its last save (or was untouched) when written. */
+const DRAFT_CLEAN_KEY = "chess-custom:draft-clean:v1";
 
 function readAll(): Record<string, GameVariant> {
   try {
@@ -47,16 +62,33 @@ function writeAll(all: Record<string, GameVariant>) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
 }
 
-export function summarize(variant: GameVariant): VariantSummary {
+/** The parts of a variant a summary is built from (a backend may only send these). */
+export type SummarySource = Pick<GameVariant, "id" | "name" | "updatedAt" | "version" | "board"> &
+  Partial<Pick<GameVariant, "description" | "createdAt" | "presetId" | "pieces" | "setup" | "teams" | "settings" | "victoryConditions" | "theme">> & { pieceCount?: number };
+
+export function summarize(variant: SummarySource): VariantSummary {
+  const behavior = variant.settings ? KING_BEHAVIORS.find((entry) => entry.id === matchKingBehavior(variant.settings!)) : undefined;
   return {
     id: variant.id,
     name: variant.name,
     description: variant.description,
     updatedAt: variant.updatedAt,
+    createdAt: variant.createdAt,
     version: variant.version,
     presetId: variant.presetId,
     boardSize: `${variant.board.width}×${variant.board.height}`,
-    pieceCount: variant.pieces.length,
+    pieceCount: variant.pieceCount ?? variant.pieces?.length ?? 0,
+    layerCount: 1 + (variant.board.layers?.length ?? 0),
+    teamCount: variant.teams?.length,
+    kingRule: behavior?.label ?? (variant.settings ? "Custom king rules" : undefined),
+    victory: variant.victoryConditions?.filter((condition) => condition.enabled && condition.type !== "eventOutcome").map((condition) => VICTORY_LABELS[condition.type]),
+    preview: buildVariantPreview({
+      board: variant.board,
+      setup: variant.setup,
+      teams: variant.teams,
+      theme: variant.theme,
+      royalTypes: variant.pieces?.filter((piece) => piece.royal).map((piece) => piece.id),
+    }),
   };
 }
 
@@ -98,9 +130,18 @@ export const draftStorage = {
       return null;
     }
   },
-  write(variant: GameVariant) {
+  /** True only when the stored draft was explicitly marked as having no unsaved edits. */
+  readClean(): boolean {
+    try {
+      return localStorage.getItem(DRAFT_CLEAN_KEY) === "clean";
+    } catch {
+      return false;
+    }
+  },
+  write(variant: GameVariant, clean = false) {
     try {
       localStorage.setItem(DRAFT_KEY, JSON.stringify(variant));
+      localStorage.setItem(DRAFT_CLEAN_KEY, clean ? "clean" : "dirty");
     } catch {
       /* Storage is optional. */
     }

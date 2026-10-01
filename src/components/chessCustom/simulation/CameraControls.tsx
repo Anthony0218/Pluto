@@ -8,6 +8,8 @@ const PRESETS: { id: Chess3DCameraPreset; label: string; short: string }[] = [
   { id: "white", label: "Player perspective", short: "P1" },
   { id: "black", label: "Opponent perspective", short: "P2" },
   { id: "low", label: "Low cinematic", short: "LOW" },
+  { id: "front", label: "Front", short: "FRT" },
+  { id: "side", label: "Side", short: "SIDE" },
 ];
 
 const button =

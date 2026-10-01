@@ -113,6 +113,7 @@ export default function VictorySection() {
   return (
     <div>
       <SectionHeading
+        step="victory"
         eyebrow="Victory"
         title="How the game is won"
         description={ui("Combine as many conditions as you like. Checkmate and event outcomes always end the game immediately; the others follow the ANY / ALL rule below.")}

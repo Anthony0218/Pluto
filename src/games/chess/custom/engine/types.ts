@@ -6,9 +6,11 @@
  * here is JSON-serializable (no functions, classes, Maps or Dates).
  */
 
-export const VARIANT_SCHEMA_VERSION = 1;
+export const VARIANT_SCHEMA_VERSION = 2;
 
-export type Coord = { x: number; y: number };
+/** Missing z in older saved variants means the ground board (z = 0). */
+export type Coord = { x: number; y: number; z?: number };
+export type Position3D = { x: number; y: number; z: number };
 export type TeamId = string;
 export type PieceTypeId = string;
 
@@ -43,9 +45,21 @@ export interface BoardCell {
 }
 
 export interface BoardDefinition {
+  name?: string;
   width: number;
   height: number;
   /** Row-major, exactly width × height entries. Index = y * width + x. */
+  cells: BoardCell[];
+  /** Additional boards above the ground board. z values are positive and unique. */
+  layers?: BoardLayer[];
+}
+
+export interface BoardLayer {
+  id: string;
+  name: string;
+  z: number;
+  width: number;
+  height: number;
   cells: BoardCell[];
 }
 
@@ -147,6 +161,7 @@ export interface PlacedPiece {
   team: TeamId;
   x: number;
   y: number;
+  z?: number;
   /** Treat as already moved (no first-move rules, no castling). */
   moved?: boolean;
 }
@@ -407,6 +422,7 @@ export interface PieceInstance {
   team: TeamId;
   x: number;
   y: number;
+  z?: number;
   moveCount: number;
   /** Where the piece started (used by respawn actions). */
   origin: Coord;

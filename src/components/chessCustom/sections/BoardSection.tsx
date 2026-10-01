@@ -6,7 +6,12 @@ import {
   MAX_BOARD_SIZE,
   MIN_BOARD_SIZE,
   applyBoardShape,
+  boardLayers,
+  createRectangularBoard,
   getCell,
+  getLayer,
+  replaceLayer,
+  resizeBoard,
   sameCoord,
   setTile,
   squareName,
@@ -18,23 +23,17 @@ import { getBoardTheme, TILE_STYLES } from "@/games/chess/custom/themes";
 import { ui } from "@/i18n/ui";
 import { coordKey } from "@/games/chess/custom/editor/editorUtils";
 import Board2D, { type CellHighlight } from "../Board2D";
-import ThemeSelector from "../ThemeSelector";
 import { Button, NumberField, Panel, SectionHeading, Select, Toggle, labelClass } from "../ui";
 
 type Tool = { kind: "select" } | { kind: "toggle" } | { kind: "tile"; tile: TileType };
 
 const SIZE_PRESETS: [number, number][] = [[8, 8], [10, 8], [10, 10], [12, 12]];
-const PIECE_SKINS = [
-  { id: "classic", label: "Classic" },
-  { id: "gilded", label: "Gilded" },
-  { id: "marble", label: "Marble" },
-  { id: "obsidian", label: "Obsidian" },
-  { id: "neon", label: "Neon" },
-];
 
 export default function BoardSection() {
   const { variant, dispatch, focusTarget } = useEditor();
-  const board = variant.board;
+  const [activeLayer, setActiveLayer] = useState(0);
+  const layers = boardLayers(variant.board);
+  const board = getLayer(variant.board, activeLayer) ?? variant.board;
   const theme = getBoardTheme(variant.theme.boardTheme);
   const focusedCell = focusTarget && /^\d+,\d+$/.test(focusTarget) ? focusTarget : null;
   const toCoord = (key: string): Coord => {
@@ -62,7 +61,9 @@ export default function BoardSection() {
     return () => window.removeEventListener("pointerup", stop);
   }, []);
 
-  const updateBoard = (next: BoardDefinition, coalesceKey?: string) => dispatch({ type: "updateBoard", board: next, coalesceKey });
+  const updateBoard = (next: BoardDefinition, coalesceKey?: string) => dispatch({ type: "update", recipe: (current) => ({ ...current, board: replaceLayer(current.board, activeLayer, next) }), coalesceKey });
+  const resizeLayer = (width: number, height: number) => updateBoard(resizeBoard(board, width, height), "resize-layer");
+  const updateLayers = (recipe: (current: BoardDefinition) => BoardDefinition) => dispatch({ type: "update", recipe: (current) => ({ ...current, board: recipe(current.board) }) });
   const selectedCell = selected ? getCell(board, selected) : null;
 
   /** Paint strokes read the latest board through a recipe, so fast drags never drop cells. */
@@ -78,27 +79,28 @@ export default function BoardSection() {
         coalesceKey: stroke.key,
         recipe: (current) => ({
           ...current,
-          board: getCell(current.board, coord)?.enabled === enabled ? current.board : updateCell(current.board, coord, enabled ? { enabled: true } : { enabled: false, tile: "normal", portalTarget: undefined }),
+          board: getCell(current.board, { ...coord, z: activeLayer })?.enabled === enabled ? current.board : updateCell(current.board, { ...coord, z: activeLayer }, enabled ? { enabled: true } : { enabled: false, tile: "normal", portalTarget: undefined }),
         }),
       });
     } else if (tool.kind === "tile" && tool.tile !== "portal") {
       const tile = tool.tile;
-      dispatch({ type: "update", coalesceKey: stroke.key, recipe: (current) => ({ ...current, board: getCell(current.board, coord)?.tile === tile ? current.board : setTile(current.board, coord, tile) }) });
+      dispatch({ type: "update", coalesceKey: stroke.key, recipe: (current) => ({ ...current, board: getCell(current.board, { ...coord, z: activeLayer })?.tile === tile ? current.board : setTile(current.board, { ...coord, z: activeLayer }, tile) }) });
     }
   }
 
   function handleClick(coord: Coord) {
     setSelected(coord);
     if (tool.kind !== "tile" || tool.tile !== "portal") return;
+    const global = { ...coord, z: activeLayer };
     if (!linkFrom) {
-      updateBoard(setTile(board, coord, "portal"));
-      setLinkFrom(coord);
+      dispatch({ type: "update", recipe: (current) => ({ ...current, board: setTile(current.board, global, "portal") }) });
+      setLinkFrom(global);
       return;
     }
-    if (sameCoord(linkFrom, coord)) return setLinkFrom(null);
-    let next = updateCell(board, linkFrom, { portalTarget: coord });
-    if (twoWay) next = updateCell(setTile(next, coord, "portal"), coord, { portalTarget: linkFrom });
-    updateBoard(next);
+    if (sameCoord(linkFrom, global)) return setLinkFrom(null);
+    let next = updateCell(variant.board, linkFrom, { portalTarget: global });
+    if (twoWay) next = updateCell(setTile(next, global, "portal"), global, { portalTarget: linkFrom });
+    dispatch({ type: "updateBoard", board: next });
     setLinkFrom(null);
   }
 
@@ -112,7 +114,7 @@ export default function BoardSection() {
     return map;
   }, [board.cells, selected, linkFrom]);
 
-  const setupPieces = useMemo(() => variant.setup.pieces.map((piece, index) => ({ ...piece, key: String(index) })), [variant.setup.pieces]);
+  const setupPieces = useMemo(() => variant.setup.pieces.filter((piece) => (piece.z ?? 0) === activeLayer).map((piece, index) => ({ ...piece, key: String(index) })), [variant.setup.pieces, activeLayer]);
 
   const toolButton = (active: boolean, label: string, onClick: () => void, swatch: ReactNode, title?: string) => (
     <button
@@ -142,16 +144,59 @@ export default function BoardSection() {
   return (
     <div>
       <SectionHeading
+        step="board"
         eyebrow="Board"
         title="Shape the battlefield"
-        description={ui("Resize the board, carve out any shape, and paint special tiles. Pieces standing on removed cells are ignored when the game starts.")}
+        description={ui("Resize the board, carve out any shape, stack layers and paint special tiles. Pieces standing on removed cells are ignored when the game starts. Board colours and piece finishes live in Simulation → Settings.")}
       />
+      <Panel title="Board layers" eyebrow={`${layers.length} layer${layers.length === 1 ? "" : "s"}`}>
+        <div className="flex flex-wrap gap-2">
+          {layers.map((layer) => <button key={layer.id} type="button" aria-pressed={activeLayer === layer.z} onClick={() => { setActiveLayer(layer.z); setSelected(null); }} className={`rounded-xl border px-3 py-2 text-left text-xs ${activeLayer === layer.z ? "border-sky-400 bg-sky-400/15 text-white" : "border-white/10 text-zinc-400"}`}><span className="block font-semibold">{layer.name}</span><span>{layer.width}×{layer.height} · z={layer.z}</span></button>)}
+          {layers.length < 8 && <Button size="sm" onClick={() => {
+            const z = Math.max(...layers.map((layer) => layer.z)) + 1;
+            updateLayers((current) => ({ ...current, layers: [...(current.layers ?? []), { ...createRectangularBoard(current.width, current.height), id: `layer-${Date.now()}`, name: `Layer ${z + 1}`, z }] }));
+            setActiveLayer(z);
+          }}>+ Add Layer</Button>}
+        </div>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <label className="text-xs text-zinc-400">Name <input value={layers.find((layer) => layer.z === activeLayer)?.name ?? "Ground"} onChange={(event) => {
+            const name = event.target.value;
+            updateLayers((current) => activeLayer === 0 ? { ...current, name } : { ...current, layers: current.layers?.map((layer) => layer.z === activeLayer ? { ...layer, name } : layer) });
+          }} className="ml-1 rounded-lg border border-white/10 bg-zinc-900 px-2 py-1 text-white" /></label>
+          <Button size="sm" onClick={() => {
+            const z = Math.max(...layers.map((layer) => layer.z)) + 1;
+            if (layers.length >= 8) return;
+            updateLayers((current) => ({ ...current, layers: [...(current.layers ?? []), { width: board.width, height: board.height, id: `layer-${Date.now()}`, name: `${layers.find((layer) => layer.z === activeLayer)?.name ?? "Ground"} Copy`, z, cells: board.cells.map((cell) => ({ ...cell, portalTarget: undefined, tile: cell.tile === "portal" ? "normal" : cell.tile })) }] }));
+            setActiveLayer(z);
+          }}>Duplicate</Button>
+          <Button size="sm" onClick={() => updateBoard({ ...board, cells: board.cells.map((cell) => ({ ...cell, x: board.width - 1 - cell.x, portalTarget: cell.portalTarget && (cell.portalTarget.z ?? activeLayer) === activeLayer ? { ...cell.portalTarget, x: board.width - 1 - cell.portalTarget.x } : cell.portalTarget })).sort((a, b) => a.y - b.y || a.x - b.x) })}>Mirror</Button>
+          <Button size="sm" onClick={() => updateBoard(createRectangularBoard(board.width, board.height))}>Clear Layer</Button>
+          {activeLayer > 0 && <>
+            <Button size="sm" disabled={layers.findIndex((layer) => layer.z === activeLayer) <= 1} onClick={() => {
+              const index = layers.findIndex((layer) => layer.z === activeLayer);
+              const nextZ = layers[index - 1].z;
+              dispatch({ type: "swapLayers", a: activeLayer, b: nextZ });
+              setActiveLayer(nextZ);
+            }}>Move Down</Button>
+            <Button size="sm" disabled={layers.findIndex((layer) => layer.z === activeLayer) >= layers.length - 1} onClick={() => {
+              const index = layers.findIndex((layer) => layer.z === activeLayer);
+              const nextZ = layers[index + 1].z;
+              dispatch({ type: "swapLayers", a: activeLayer, b: nextZ });
+              setActiveLayer(nextZ);
+            }}>Move Up</Button>
+          </>}
+          {activeLayer > 0 && <Button size="sm" tone="danger" onClick={() => {
+            dispatch({ type: "deleteLayer", z: activeLayer });
+            setActiveLayer(0);
+          }}>Delete Layer</Button>}
+        </div>
+      </Panel>
       <div className="grid gap-5 2xl:grid-cols-[260px_minmax(0,1fr)_300px] xl:grid-cols-[240px_minmax(0,1fr)]">
         <div className="space-y-4">
           <Panel title={ui("Size")}>
             <div className="grid grid-cols-2 gap-2">
               {SIZE_PRESETS.map(([width, height]) => (
-                <Button key={`${width}x${height}`} size="sm" tone={board.width === width && board.height === height ? "blue" : "ghost"} onClick={() => dispatch({ type: "resizeBoard", width, height })}>
+                <Button key={`${width}x${height}`} size="sm" tone={board.width === width && board.height === height ? "blue" : "ghost"} onClick={() => resizeLayer(width, height)}>
                   {width}×{height}
                 </Button>
               ))}
@@ -159,11 +204,11 @@ export default function BoardSection() {
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <div>
                 <p className={labelClass}>{ui("Width")}</p>
-                <NumberField label="Width" value={board.width} min={MIN_BOARD_SIZE} max={MAX_BOARD_SIZE} onChange={(width) => dispatch({ type: "resizeBoard", width, height: board.height, coalesceKey: "resize" })} />
+                <NumberField label="Width" value={board.width} min={MIN_BOARD_SIZE} max={MAX_BOARD_SIZE} onChange={(width) => resizeLayer(width, board.height)} />
               </div>
               <div>
                 <p className={labelClass}>{ui("Height")}</p>
-                <NumberField label="Height" value={board.height} min={MIN_BOARD_SIZE} max={MAX_BOARD_SIZE} onChange={(height) => dispatch({ type: "resizeBoard", width: board.width, height, coalesceKey: "resize" })} />
+                <NumberField label="Height" value={board.height} min={MIN_BOARD_SIZE} max={MAX_BOARD_SIZE} onChange={(height) => resizeLayer(board.width, height)} />
               </div>
             </div>
             <p className="mt-2 text-xs text-zinc-500">{ui("Maximum size, to keep the 3D simulation smooth:")} {MAX_BOARD_SIZE}×{MAX_BOARD_SIZE}</p>
@@ -318,22 +363,6 @@ export default function BoardSection() {
             )}
           </Panel>
 
-          <Panel title={ui("Look & feel")} eyebrow={ui("Cosmetic only")}>
-            <ThemeSelector
-              value={variant.theme.boardTheme}
-              onChange={(boardTheme) => dispatch({ type: "update", recipe: (current) => ({ ...current, theme: { ...current.theme, boardTheme } }) })}
-            />
-            <div className="mt-4">
-              <p className={labelClass}>{ui("3D piece finish")}</p>
-              <Select
-                label="3D piece finish"
-                value={variant.theme.pieceSkin}
-                onChange={(pieceSkin) => dispatch({ type: "update", recipe: (current) => ({ ...current, theme: { ...current.theme, pieceSkin } }) })}
-                options={PIECE_SKINS}
-                className="mt-1.5"
-              />
-            </div>
-          </Panel>
         </div>
       </div>
     </div>

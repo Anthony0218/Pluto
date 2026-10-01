@@ -9,6 +9,8 @@ export type Chess3DCameraPreset =
   | "classic"
   | "top"
   | "low"
+  | "front"
+  | "side"
   | "white"
   | "black";
 
@@ -56,6 +58,8 @@ export const CHESS_3D_CAMERA_PRESETS: Array<{
   { id: "classic", label: "Classic" },
   { id: "top", label: "Top" },
   { id: "low", label: "Low" },
+  { id: "front", label: "Front" },
+  { id: "side", label: "Side" },
   { id: "white", label: "White" },
   { id: "black", label: "Black" },
 ];
@@ -67,6 +71,8 @@ export const CHESS_3D_CAMERA_POSITIONS: Record<
   classic: [7.4, 7.6, 7.4],
   top: [0.2, 13.7, 0.2],
   low: [9.4, 4.0, 7.8],
+  front: [14, 4.2, 0.1],
+  side: [0.1, 4.2, 14],
   white: [8.7, 6.6, 0],
   black: [-8.7, 6.6, 0],
 };

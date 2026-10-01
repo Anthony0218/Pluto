@@ -27,6 +27,7 @@ export default function EventsSection() {
   return (
     <div>
       <SectionHeading
+        step="events"
         eyebrow="Events"
         title="When this happens…"
         description={ui("Events react to the game: WHEN something happens, optionally wait, check IF conditions hold, THEN run actions — or ELSE run others. King-capture consequences live here too.")}

@@ -1,8 +1,8 @@
 import { memo, Suspense, useEffect, useMemo, useRef, useState, type ComponentRef, type MutableRefObject } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Environment, Lightformer, OrbitControls, PerformanceMonitor, Sparkles } from "@react-three/drei";
+import { Environment, Lightformer, Line, OrbitControls, PerformanceMonitor, Sparkles } from "@react-three/drei";
 import * as THREE from "three";
-import type { BoardCell, Coord, EffectKind, PieceModelAccent, PieceModelBase } from "@/games/chess/custom/engine/types";
+import type { BoardCell, BoardLayer, Coord, EffectKind, PieceModelAccent, PieceModelBase } from "@/games/chess/custom/engine/types";
 import { cameraPositionFor, type Chess3DCameraView, type Chess3DPieceSkin } from "@/games/chess/3d/chess3dAppearance";
 import { cellToWorld } from "@/games/chess/3d/chess3dUtils";
 import ChessPiece3D, { type PieceMotion, type PieceSet } from "./ChessPiece3D";
@@ -13,6 +13,7 @@ export interface Board3DPiece {
   id: string;
   x: number;
   y: number;
+  z?: number;
   base: PieceModelBase;
   set: PieceSet;
   accent?: PieceModelAccent;
@@ -52,6 +53,10 @@ interface SceneProps {
   width: number;
   height: number;
   cells: BoardCell[];
+  layers?: BoardLayer[];
+  layerSpacing?: number;
+  visibleLayers?: number[];
+  focusLayer?: number;
   pieces: Board3DPiece[];
   marks: Map<string, Square3DMark>;
   selectedPieceId?: string | null;
@@ -71,7 +76,7 @@ interface SceneProps {
   atmosphere?: boolean;
   /** Multiplies the camera preset distance (e.g. to leave room for overlaid controls). */
   cameraScale?: number;
-  onCellClick: (x: number, y: number) => void;
+  onCellClick: (x: number, y: number, z?: number) => void;
 }
 
 /* ------------------------------------------------------------ Lighting */
@@ -145,21 +150,22 @@ function Atmosphere({ size, theme, sparkles }: { size: number; theme: Board3DThe
 
 /* ----------------------------------------------------------- Overlays */
 
-function MoveTrail({ path, width, height, jump }: { path: Coord[]; width: number; height: number; jump: boolean }) {
+function MoveTrail({ path, width, height, layers = [], jump, spacing = 2.8 }: { path: Coord[]; width: number; height: number; layers?: BoardLayer[]; jump: boolean; spacing?: number }) {
   const materialRef = useRef<THREE.MeshStandardMaterial>(null);
   const geometry = useMemo(() => {
     if (path.length < 2) return null;
     const points = path.map((coord) => {
-      const [x, , z] = cellToWorld(coord.x, coord.y, width, height);
-      return new THREE.Vector3(x, 0.18, z);
+      const layer = layers.find((entry) => entry.z === (coord.z ?? 0));
+      const [x, , z] = cellToWorld(coord.x, coord.y, layer?.width ?? width, layer?.height ?? height);
+      return new THREE.Vector3(x, (coord.z ?? 0) * spacing + 0.18, z);
     });
     if (points.length === 2) {
       const mid = points[0].clone().lerp(points[1], 0.5);
-      mid.y = jump ? 1.05 : 0.3;
+      mid.y += jump ? 1.05 : 0.12;
       points.splice(1, 0, mid);
     }
     return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), 32, 0.022, 8, false);
-  }, [path, width, height, jump]);
+  }, [path, width, height, layers, jump, spacing]);
   useEffect(() => () => geometry?.dispose(), [geometry]);
   useFrame((state) => {
     if (!materialRef.current) return;
@@ -228,11 +234,11 @@ function EffectLayer({ effects, width, height }: { effects: Board3DEffect[]; wid
   const [done, setDone] = useState<Set<number>>(() => new Set());
   const active = effects.filter((effect) => !done.has(effect.id));
   // Portal effects also flash at the exit square.
-  const expanded = active.flatMap((effect) => (effect.kind === "portal" && effect.to ? [effect, { ...effect, id: effect.id + 0.5, at: effect.to, to: undefined }] : [effect]));
+  const expanded = active.flatMap((effect) => (effect.kind === "portal" && effect.to && (effect.to.z ?? 0) === (effect.at.z ?? 0) ? [effect, { ...effect, id: effect.id + 0.5, at: effect.to, to: undefined }] : [effect]));
   return (
     <>
       {expanded.map((effect) => (
-        <EffectBurst key={effect.id} effect={effect} width={width} height={height} onDone={(id) => setDone((current) => new Set(current).add(Math.floor(id)))} />
+        <EffectBurst key={effect.id} effect={effect} width={width} height={height} onDone={(id) => setDone((current) => new Set(current).add(id).add(Math.floor(id)))} />
       ))}
     </>
   );
@@ -244,6 +250,7 @@ function CameraRig({
   view,
   size,
   scale,
+  centerY = 0.15,
   command,
   controlsRef,
   interactingRef,
@@ -251,6 +258,7 @@ function CameraRig({
   view: Chess3DCameraView;
   size: number;
   scale: number;
+  centerY?: number;
   command?: CameraCommand;
   controlsRef: MutableRefObject<OrbitControlsImpl | null>;
   interactingRef: MutableRefObject<boolean>;
@@ -275,10 +283,10 @@ function CameraRig({
     if (lastView.current === view.id) return;
     const first = lastView.current === -1;
     lastView.current = view.id;
-    const target = new THREE.Vector3(...cameraPositionFor(view.preset, size)).multiplyScalar(distance);
+    const target = new THREE.Vector3(...cameraPositionFor(view.preset, size)).multiplyScalar(distance).add(new THREE.Vector3(0, centerY - 0.15, 0));
     if (first) {
       camera.position.copy(target);
-      camera.lookAt(0, 0.15, 0);
+      camera.lookAt(0, centerY, 0);
     } else flyTo(target);
     // flyTo only touches refs.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -288,10 +296,10 @@ function CameraRig({
     if (!command || lastCommand.current === command.id) return;
     lastCommand.current = command.id;
     const controls = controlsRef.current;
-    const center = controls?.target ?? new THREE.Vector3(0, 0.15, 0);
+    const center = controls?.target ?? new THREE.Vector3(0, centerY, 0);
     if (command.kind === "reset") {
-      controls?.target.set(0, 0.15, 0);
-      flyTo(new THREE.Vector3(...cameraPositionFor(view.preset, size)).multiplyScalar(distance));
+      controls?.target.set(0, centerY, 0);
+      flyTo(new THREE.Vector3(...cameraPositionFor(view.preset, size)).multiplyScalar(distance).add(new THREE.Vector3(0, centerY - 0.15, 0)));
       return;
     }
     const offset = camera.position.clone().sub(center);
@@ -353,53 +361,53 @@ function MaterialAnimator({ reducedMotion }: { reducedMotion: boolean }) {
 /* -------------------------------------------------------------- Scene */
 
 function Scene(props: SceneProps & { controlsRef: MutableRefObject<OrbitControlsImpl | null> }) {
-  const { width, height, cells, pieces, marks, selectedPieceId, theme, skin, cameraView, cameraCommand, cameraShake, autoOrbit, enablePan, reducedMotion = false, quality = "high", effects = [], trail, trailJump, atmosphere = true, cameraScale = 1, onCellClick, controlsRef } = props;
+  const { width, height, cells, layers = [], layerSpacing = 2.8, visibleLayers, focusLayer, pieces, marks, selectedPieceId, theme, skin, cameraView, cameraCommand, cameraShake, autoOrbit, enablePan, reducedMotion = false, quality = "high", effects = [], trail, trailJump, atmosphere = true, cameraScale = 1, onCellClick, controlsRef } = props;
   const interactingRef = useRef(false);
-  const size = Math.max(width, height);
+  const maxZ = Math.max(0, ...layers.map((layer) => layer.z));
+  const size = Math.max(width, height, maxZ * layerSpacing + 3);
+  const centerY = maxZ * layerSpacing / 2 + 0.15;
   const palette = useMemo(() => ({ light: theme.light, dark: theme.dark, roughness: theme.roughness, metalness: theme.metalness }), [theme.light, theme.dark, theme.roughness, theme.metalness]);
+  const selected = pieces.find((piece) => piece.id === selectedPieceId);
+  const allLayers = [{ z: 0, id: "ground", width, height, cells }, ...layers];
+  const crossLayerLinks = selected ? [...marks].flatMap(([key, mark]) => {
+    if (mark !== "move" && mark !== "capture" && mark !== "special") return [];
+    const [x, y, z = 0] = key.split(",").map(Number);
+    if (z === (selected.z ?? 0) || (visibleLayers && (!visibleLayers.includes(z) || !visibleLayers.includes(selected.z ?? 0)))) return [];
+    const fromLayer = allLayers.find((layer) => layer.z === (selected.z ?? 0));
+    const toLayer = allLayers.find((layer) => layer.z === z);
+    if (!fromLayer || !toLayer) return [];
+    const [sx, , sz] = cellToWorld(selected.x, selected.y, fromLayer.width, fromLayer.height);
+    const [tx, , tz] = cellToWorld(x, y, toLayer.width, toLayer.height);
+    return [{ key, color: mark === "capture" ? "#ef4444" : mark === "special" ? "#fbbf24" : "#38bdf8", from: [sx, (selected.z ?? 0) * layerSpacing + 0.2, sz] as [number, number, number], to: [tx, z * layerSpacing + 0.2, tz] as [number, number, number] }];
+  }) : [];
 
   return (
     <>
       <Lights theme={theme} size={size} quality={quality} />
-      <BoardFurniture width={width} height={height} theme={theme} />
-      {atmosphere && <Atmosphere size={size} theme={theme} sparkles={quality === "high" && !reducedMotion} />}
-      {cells.map((cell) => (
-        <ChessSquare3D key={`${cell.x},${cell.y}`} cell={cell} width={width} height={height} palette={palette} mark={marks.get(`${cell.x},${cell.y}`)} onClick={onCellClick} />
+      {allLayers.filter((layer) => !visibleLayers || visibleLayers.includes(layer.z)).map((layer) => (
+        <group key={layer.id} position={[0, layer.z * layerSpacing, 0]}>
+          <BoardFurniture width={layer.width} height={layer.height} theme={theme} />
+          {layer.cells.map((cell) => (
+            <ChessSquare3D key={`${cell.x},${cell.y}`} cell={cell} width={layer.width} height={layer.height} palette={palette} mark={marks.get(`${cell.x},${cell.y}${layer.z ? `,${layer.z}` : ""}`)} onClick={(x, y) => onCellClick(x, y, layer.z)} />
+          ))}
+          <Suspense fallback={null}>
+            {pieces.filter((piece) => (piece.z ?? 0) === layer.z).map((piece) => (
+              <ChessPiece3D key={piece.id} x={piece.x} y={piece.y} boardWidth={layer.width} boardHeight={layer.height} base={piece.base} set={piece.set} skin={skin} accent={piece.accent} tint={piece.tint} scale={piece.scale} selected={piece.id === selectedPieceId && !piece.captured} captured={Boolean(piece.captured)} promotedKey={piece.promotedKey} inCheck={Boolean(piece.inCheck)} checkmated={Boolean(piece.checkmated)} motion={piece.motion} teamColor={piece.teamColor} reducedMotion={reducedMotion} onClick={(x, y) => onCellClick(x, y, layer.z)} />
+            ))}
+          </Suspense>
+          {!reducedMotion && <EffectLayer effects={[...effects.filter((effect) => (effect.at.z ?? 0) === layer.z), ...effects.filter((effect) => effect.kind === "portal" && effect.to && (effect.to.z ?? 0) === layer.z && (effect.at.z ?? 0) !== layer.z).map((effect) => ({ ...effect, id: effect.id + 0.5, at: effect.to!, to: undefined }))]} width={layer.width} height={layer.height} />}
+          {focusLayer !== undefined && focusLayer !== layer.z && <mesh position={[0, 1.45, 0]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[layer.height + 1, layer.width + 1]} /><meshBasicMaterial color="#050608" transparent opacity={0.52} depthWrite={false} side={THREE.DoubleSide} /></mesh>}
+        </group>
       ))}
-      {trail && trail.length > 1 && !reducedMotion && <MoveTrail path={trail} width={width} height={height} jump={Boolean(trailJump)} />}
-      <Suspense fallback={null}>
-        {pieces.map((piece) => (
-          <ChessPiece3D
-            key={piece.id}
-            x={piece.x}
-            y={piece.y}
-            boardWidth={width}
-            boardHeight={height}
-            base={piece.base}
-            set={piece.set}
-            skin={skin}
-            accent={piece.accent}
-            tint={piece.tint}
-            scale={piece.scale}
-            selected={piece.id === selectedPieceId && !piece.captured}
-            captured={Boolean(piece.captured)}
-            promotedKey={piece.promotedKey}
-            inCheck={Boolean(piece.inCheck)}
-            checkmated={Boolean(piece.checkmated)}
-            motion={piece.motion}
-            teamColor={piece.teamColor}
-            reducedMotion={reducedMotion}
-            onClick={onCellClick}
-          />
-        ))}
-      </Suspense>
-      {!reducedMotion && <EffectLayer effects={effects} width={width} height={height} />}
+      {atmosphere && <Atmosphere size={size} theme={theme} sparkles={quality === "high" && !reducedMotion} />}
+      {crossLayerLinks.map((link) => <Line key={link.key} points={[link.from, link.to]} color={link.color} lineWidth={2} transparent opacity={0.48} depthWrite={false} />)}
+      {trail && trail.length > 1 && !reducedMotion && <MoveTrail path={trail} width={width} height={height} layers={layers} jump={Boolean(trailJump)} spacing={layerSpacing} />}
       <MaterialAnimator reducedMotion={reducedMotion} />
-      <CameraRig view={cameraView} size={size} scale={cameraScale} command={cameraCommand} controlsRef={controlsRef} interactingRef={interactingRef} />
+      <CameraRig view={cameraView} size={size} scale={cameraScale} centerY={centerY} command={cameraCommand} controlsRef={controlsRef} interactingRef={interactingRef} />
       <CameraShake shake={cameraShake} reducedMotion={reducedMotion} />
       <OrbitControls
         ref={controlsRef}
-        target={[0, 0.15, 0]}
+        target={[0, centerY, 0]}
         enablePan={enablePan}
         enableDamping
         dampingFactor={0.08}
@@ -419,7 +427,7 @@ function Scene(props: SceneProps & { controlsRef: MutableRefObject<OrbitControls
   );
 }
 
-/** The shared 3D board used by both classic 3D chess and the Chess Custom simulation. */
+/** The shared 3D board for Chess Custom play and simulation. */
 function Board3DCanvas(props: SceneProps & { className?: string }) {
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
   const [dpr, setDpr] = useState(1.5);
@@ -433,7 +441,7 @@ function Board3DCanvas(props: SceneProps & { className?: string }) {
       gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
       onCreated={({ gl }) => {
         gl.setClearColor(0x000000, 0);
-        gl.shadowMap.type = THREE.PCFSoftShadowMap;
+        gl.shadowMap.type = THREE.PCFShadowMap;
         gl.toneMapping = THREE.ACESFilmicToneMapping;
       }}
       camera={{ position: initial, fov: 44, near: 0.1, far: 200 }}

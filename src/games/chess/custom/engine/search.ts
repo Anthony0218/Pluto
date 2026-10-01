@@ -1,4 +1,4 @@
-import { getCell } from "./board.ts";
+import { boardLayers, getCell, getLayer } from "./board.ts";
 import { applyMove, getLegalMoves } from "./game.ts";
 import { getDefinition, isFarRank } from "./position.ts";
 import type { Coord, GameState, GameVariant, Move, PieceInstance, TeamId } from "./types.ts";
@@ -40,8 +40,8 @@ interface TableEntry {
 const moveKey = (move: Move) => `${move.pieceId}>${move.to.x},${move.to.y}${move.promotion ?? ""}${move.castle ? "c" : ""}`;
 
 function stateKey(state: GameState) {
-  let key = `${state.turn}|${state.royalMode}|${state.suddenDeath ? 1 : 0}|${state.enPassant ? `${state.enPassant.square.x},${state.enPassant.square.y}` : "-"}|${state.scheduled.length}|${state.eliminated.join(",")}`;
-  for (const piece of state.pieces) key += `|${piece.id}${piece.type}${piece.team}${piece.x},${piece.y}${piece.moveCount ? "m" : ""}`;
+  let key = `${state.turn}|${state.royalMode}|${state.suddenDeath ? 1 : 0}|${state.enPassant ? `${state.enPassant.square.x},${state.enPassant.square.y},${state.enPassant.square.z ?? 0}` : "-"}|${state.scheduled.length}|${state.eliminated.join(",")}`;
+  for (const piece of state.pieces) key += `|${piece.id}${piece.type}${piece.team}${piece.x},${piece.y},${piece.z ?? 0}${piece.moveCount ? "m" : ""}`;
   return key;
 }
 
@@ -59,7 +59,7 @@ export function evaluatePosition(variant: GameVariant, state: GameState, team: T
   for (const condition of goalWinners) {
     if (condition.type === "reachSquare" && condition.square) goals.push({ coord: condition.square, team: condition.team, pieceType: condition.pieceType });
     if (condition.type === "reachZone")
-      for (const cell of state.board.cells) if (cell.enabled && cell.tile === "goal") goals.push({ coord: cell, team: cell.team ?? condition.team, pieceType: condition.pieceType });
+      for (const layer of boardLayers(state.board)) for (const cell of layer.cells) if (cell.enabled && cell.tile === "goal") goals.push({ coord: { x: cell.x, y: cell.y, z: layer.z }, team: cell.team ?? condition.team, pieceType: condition.pieceType });
   }
 
   let score = 0;
@@ -75,7 +75,7 @@ export function evaluatePosition(variant: GameVariant, state: GameState, team: T
     }
     for (const goal of goals) {
       if ((goal.team && goal.team !== "any" && goal.team !== piece.team) || (goal.pieceType && goal.pieceType !== piece.type)) continue;
-      const distance = Math.max(Math.abs(piece.x - goal.coord.x), Math.abs(piece.y - goal.coord.y));
+      const distance = Math.max(Math.abs(piece.x - goal.coord.x), Math.abs(piece.y - goal.coord.y), Math.abs((piece.z ?? 0) - (goal.coord.z ?? 0)));
       value += Math.max(0, Math.max(width, height) - distance) * 12;
     }
     score += sign * value;
@@ -86,7 +86,7 @@ export function evaluatePosition(variant: GameVariant, state: GameState, team: T
 /** 0..1: how far a promotable piece has travelled toward its promotion zone. */
 function promotionProgress(variant: GameVariant, state: GameState, piece: PieceInstance) {
   const forward = variant.teams.find((entry) => entry.id === piece.team)?.forward ?? { x: 0, y: 1 };
-  const { width, height } = state.board;
+  const { width, height } = getLayer(state.board, piece.z ?? 0) ?? state.board;
   if (isFarRank(variant, state, piece.team, piece)) return 1;
   if (forward.y > 0) return piece.y / (height - 1);
   if (forward.y < 0) return (height - 1 - piece.y) / (height - 1);

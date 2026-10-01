@@ -6,7 +6,7 @@ import PieceToken from "./PieceToken";
 
 type Reach = { move: boolean; capture: boolean; active: boolean; firstMove: boolean };
 
-function reachOf(rules: MovementRule[], radius: number, kind: "move" | "capture", activeId: string | undefined, out: Map<string, Reach>) {
+function reachOf(rules: MovementRule[], radius: number, layerDelta: number, kind: "move" | "capture", activeId: string | undefined, out: Map<string, Reach>) {
   for (const rule of rules) {
     if (rule.kind === "teleport") continue;
     for (const offset of rule.offsets) {
@@ -14,6 +14,7 @@ function reachOf(rules: MovementRule[], radius: number, kind: "move" | "capture"
       for (let k = rule.kind === "slide" ? Math.max(1, rule.minDistance ?? 1) : 1; k <= steps; k++) {
         const x = offset.x * k;
         const y = offset.y * k;
+        if ((offset.z ?? 0) * k !== layerDelta) continue;
         if (Math.abs(x) > radius || Math.abs(y) > radius) break;
         const key = `${x},${y}`;
         const entry = out.get(key) ?? { move: false, capture: false, active: false, firstMove: false };
@@ -40,6 +41,7 @@ export default function MovementGrid({
   onToggle,
   radius: fixedRadius,
   compact = false,
+  layerDelta = 0,
 }: {
   piece: PieceDefinition;
   team?: TeamDefinition;
@@ -49,11 +51,12 @@ export default function MovementGrid({
   onToggle?: (offset: Coord) => void;
   radius?: number;
   compact?: boolean;
+  layerDelta?: number;
 }) {
   const radius = fixedRadius ?? gridRadius([...moveRules, ...captureRules]);
   const reach = new Map<string, Reach>();
-  reachOf(moveRules, radius, "move", activeRuleId, reach);
-  reachOf(captureRules, radius, "capture", activeRuleId, reach);
+  reachOf(moveRules, radius, layerDelta, "move", activeRuleId, reach);
+  reachOf(captureRules, radius, layerDelta, "capture", activeRuleId, reach);
   const size = radius * 2 + 1;
   const hasTeleport = [...moveRules, ...captureRules].some((rule) => rule.kind === "teleport");
 
@@ -69,11 +72,11 @@ export default function MovementGrid({
           Array.from({ length: size }, (_, column) => {
             const x = column - radius;
             const y = radius - row;
-            const center = x === 0 && y === 0;
+            const center = x === 0 && y === 0 && layerDelta === 0;
             const entry = reach.get(`${x},${y}`);
             const light = (x + y) % 2 === 0;
             const color = entry?.move && entry.capture ? "168,85,247" : entry?.capture ? "239,68,68" : entry?.move ? "56,189,248" : null;
-            const label = center ? piece.name : `${formatOffset({ x, y })}${entry ? ` — ${entry.move && entry.capture ? "move & capture" : entry.capture ? "capture" : "move"}` : ""}`;
+            const label = center ? piece.name : `${formatOffset({ x, y, z: layerDelta })}${entry ? ` — ${entry.move && entry.capture ? "move & capture" : entry.capture ? "capture" : "move"}` : ""}`;
             return (
               <button
                 key={`${x},${y}`}
@@ -82,7 +85,7 @@ export default function MovementGrid({
                 disabled={!onToggle || center}
                 title={label}
                 aria-label={label}
-                onClick={() => onToggle?.({ x, y })}
+                onClick={() => onToggle?.({ x, y, z: layerDelta })}
                 className={`relative aspect-square transition ${onToggle && !center ? "cursor-pointer hover:brightness-150" : "cursor-default"}`}
                 style={{
                   background: color ? `rgba(${color}, ${entry?.active ? 0.62 : 0.3})` : light ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.02)",

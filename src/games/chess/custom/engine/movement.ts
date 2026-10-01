@@ -1,4 +1,4 @@
-import { getCell, inBounds, squareName } from "./board.ts";
+import { boardLayers, coordKey3D, getCell, inBounds, squareName } from "./board.ts";
 import { pieceAt, ruleEnabled, toBoardOffset, type Position } from "./position.ts";
 import type { Coord, MoveSource, MovementRule, PieceDefinition, PieceInstance } from "./types.ts";
 
@@ -25,9 +25,9 @@ export interface MoveCandidate {
 type Mode = "move" | "capture" | "both";
 
 const sign = (value: number) => Math.sign(value);
-const add = (a: Coord, b: Coord, k = 1): Coord => ({ x: a.x + b.x * k, y: a.y + b.y * k });
+const add = (a: Coord, b: Coord, k = 1): Coord => ({ x: a.x + b.x * k, y: a.y + b.y * k, z: (a.z ?? 0) + (b.z ?? 0) * k });
 const fmt = (value: number) => (value > 0 ? `+${value}` : `${value}`);
-export const formatOffset = (offset: Coord) => `(${fmt(offset.x)}, ${fmt(offset.y)})`;
+export const formatOffset = (offset: Coord) => `(${fmt(offset.x)}, ${fmt(offset.y)}${offset.z ? `, ${fmt(offset.z)}` : ""})`;
 
 export function ruleLabel(rule: MovementRule, offset: Coord) {
   if (rule.kind === "teleport") return "teleport between teleport tiles";
@@ -59,10 +59,17 @@ function enterCheck(position: Position, to: Coord, step: Coord): string | null {
 function leapPath(from: Coord, delta: Coord): Coord[] {
   const ax = Math.abs(delta.x);
   const ay = Math.abs(delta.y);
+  const az = Math.abs(delta.z ?? 0);
   const steps: Coord[] = [];
+  if (az && (delta.x === 0 && delta.y === 0 || az === ax && az === ay || az === ax && delta.y === 0 || az === ay && delta.x === 0)) {
+    const n = Math.max(ax, ay, az);
+    const unit = { x: sign(delta.x), y: sign(delta.y), z: sign(delta.z ?? 0) };
+    for (let k = 1; k < n; k++) steps.push(add(from, unit, k));
+    return steps;
+  }
   if (delta.x === 0 || delta.y === 0 || ax === ay) {
     const n = Math.max(ax, ay);
-    const unit = { x: sign(delta.x), y: sign(delta.y) };
+    const unit = { x: sign(delta.x), y: sign(delta.y), z: 0 };
     for (let k = 1; k < n; k++) steps.push(add(from, unit, k));
     return steps;
   }
@@ -95,7 +102,7 @@ function classify(
       mode !== "move" &&
       ep &&
       ep.square.x === to.x &&
-      ep.square.y === to.y &&
+      ep.square.y === to.y && (ep.square.z ?? 0) === (to.z ?? 0) &&
       def.abilities.includes("enPassant") &&
       ruleEnabled(variant, "enPassant");
     const victim = canEnPassant ? state.pieces.find((entry) => entry.id === ep!.pieceId) : undefined;
@@ -138,7 +145,7 @@ function generateForRule(
   explain: boolean,
   lean = false,
 ) {
-  const from = { x: piece.x, y: piece.y };
+  const from = { x: piece.x, y: piece.y, z: piece.z ?? 0 };
   const { board } = position.state;
   const source: MoveSource = mode === "capture" ? "capture" : "movement";
 
@@ -157,9 +164,9 @@ function generateForRule(
   if (rule.kind === "teleport") {
     const cell = getCell(board, from);
     if (cell?.tile !== "teleport") return;
-    for (const target of board.cells) {
-      if (target.tile !== "teleport" || !target.enabled || (target.x === from.x && target.y === from.y)) continue;
-      const to = { x: target.x, y: target.y };
+    for (const layer of boardLayers(board)) for (const target of layer.cells) {
+      if (target.tile !== "teleport" || !target.enabled || (target.x === from.x && target.y === from.y && layer.z === from.z)) continue;
+      const to = { x: target.x, y: target.y, z: layer.z };
       const base = { to, ruleId: rule.id, source: "teleport" as MoveSource, ruleOffset: { x: 0, y: 0 }, path: [from, to] };
       classify(position, piece, def, to, mode, base, "teleport tile link", emit, explain);
     }
@@ -167,7 +174,7 @@ function generateForRule(
   }
 
   for (const offset of rule.offsets) {
-    if (offset.x === 0 && offset.y === 0) continue;
+    if (offset.x === 0 && offset.y === 0 && !offset.z) continue;
     const delta = toBoardOffset(position.variant, piece.team, offset, rule.relativeTo === "team");
     const label = `custom ${rule.kind === "slide" ? "slide" : "movement offset"} ${formatOffset(offset)}`;
 
@@ -282,7 +289,7 @@ export function generateCandidates(
   // One entry per destination: a legal capture/move beats an explanation of why another rule failed.
   const best = new Map<string, MoveCandidate>();
   for (const candidate of out) {
-    const key = `${candidate.to.x},${candidate.to.y}`;
+    const key = coordKey3D(candidate.to);
     const current = best.get(key);
     if (!current || (!current.legal && candidate.legal) || (current.legal && candidate.legal && candidate.kind === "capture" && current.kind === "move")) {
       best.set(key, candidate);
@@ -296,22 +303,23 @@ export function generateCandidates(
 export function isSquareAttacked(position: Position, coord: Coord, byTeam: string, defenderTeam: string): boolean {
   let probe = position;
   if (!pieceAt(position, coord)) {
-    const occupancy = position.occupancy.slice();
-    occupancy[coord.y * position.state.board.width + coord.x] = {
+    const occupancy = new Map(position.occupancy);
+    occupancy.set(coordKey3D(coord), {
       id: "__probe__",
       type: "__probe__",
       team: defenderTeam,
       x: coord.x,
       y: coord.y,
+      z: coord.z ?? 0,
       moveCount: 0,
       origin: coord,
-    };
+    });
     probe = { ...position, occupancy };
   }
   for (const attacker of position.state.pieces) {
     if (attacker.team !== byTeam) continue;
     const hits = generateCandidates(probe, attacker, { capturesOnly: true });
-    if (hits.some((hit) => hit.kind === "capture" && hit.to.x === coord.x && hit.to.y === coord.y)) return true;
+    if (hits.some((hit) => hit.kind === "capture" && coordKey3D(hit.to) === coordKey3D(coord))) return true;
   }
   return false;
 }

@@ -10,11 +10,11 @@ import type { Coord, MovementRule, PieceDefinition } from "../engine/types.ts";
 export const SQUARE_BRUSHES = ["both", "move", "capture", "firstMove", "clearFirstMove", "line", "erase"] as const;
 export type SquareBrush = (typeof SQUARE_BRUSHES)[number];
 
-const same = (a: Coord, b: Coord) => a.x === b.x && a.y === b.y;
+const same = (a: Coord, b: Coord) => a.x === b.x && a.y === b.y && (a.z ?? 0) === (b.z ?? 0);
 const gcd = (a: number, b: number): number => (b === 0 ? Math.abs(a) : gcd(b, a % b));
 const direction = (offset: Coord) => {
-  const divisor = gcd(offset.x, offset.y) || 1;
-  return { x: offset.x / divisor, y: offset.y / divisor };
+  const divisor = gcd(gcd(offset.x, offset.y), offset.z ?? 0) || 1;
+  return { x: offset.x / divisor, y: offset.y / divisor, z: (offset.z ?? 0) / divisor };
 };
 
 const isPlainLeap = (rule: MovementRule, firstMove: boolean) => rule.kind === "leap" && Boolean(rule.firstMoveOnly) === firstMove && !rule.requiresScreen;
@@ -43,8 +43,8 @@ const hasLeap = (rules: MovementRule[], offset: Coord, firstMove?: boolean) =>
 function slideReaches(rule: MovementRule, offset: Coord) {
   if (rule.kind !== "slide") return false;
   return rule.offsets.some((step) => {
-    const k = step.x !== 0 ? offset.x / step.x : step.y !== 0 ? offset.y / step.y : 0;
-    return Number.isInteger(k) && k >= Math.max(1, rule.minDistance ?? 1) && (!rule.maxDistance || k <= rule.maxDistance) && step.x * k === offset.x && step.y * k === offset.y;
+    const k = step.x !== 0 ? offset.x / step.x : step.y !== 0 ? offset.y / step.y : step.z ? (offset.z ?? 0) / step.z : 0;
+    return Number.isInteger(k) && k >= Math.max(1, rule.minDistance ?? 1) && (!rule.maxDistance || k <= rule.maxDistance) && step.x * k === offset.x && step.y * k === offset.y && (step.z ?? 0) * k === (offset.z ?? 0);
   });
 }
 
@@ -69,7 +69,7 @@ export function squareRole(piece: PieceDefinition, offset: Coord) {
 }
 
 export function paintSquare(source: PieceDefinition, offset: Coord, brush: SquareBrush): PieceDefinition {
-  if (offset.x === 0 && offset.y === 0) return source;
+  if (offset.x === 0 && offset.y === 0 && !offset.z) return source;
   const frame = defaultFrame(source);
   let piece = source;
 

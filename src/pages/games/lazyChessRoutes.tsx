@@ -1,9 +1,8 @@
 import { lazy, Suspense, type ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
+import { legacyChessCustomTarget } from "@/games/chess/custom/library/navigation";
 
 // three.js pages load on demand so the rest of the app does not ship the 3D engine.
-const Chess3DAiPage = lazy(() => import("./Chess/Chess3DAiPage.tsx"));
-const Chess3DHotseatPage = lazy(() => import("./3DChess/Chess3DHotseatPage.tsx"));
 const ChessCustomPage = lazy(() => import("./ChessCustom/ChessCustomPage.tsx"));
 
 function Lazy({ children }: { children: ReactNode }) {
@@ -11,21 +10,21 @@ function Lazy({ children }: { children: ReactNode }) {
 }
 
 export function Chess3DAiRoute() {
-  return (
-    <Lazy>
-      <Chess3DAiPage />
-    </Lazy>
-  );
+  const { search } = useLocation();
+  const difficulty = new URLSearchParams(search).get("difficulty");
+  const ai = difficulty === "easy" || difficulty === "beginner" ? "random" : difficulty === "hard" || difficulty === "expert" ? "master" : difficulty === "medium" ? "strategist" : "greedy";
+  return <Navigate to={`/chess-custom/play/singleplayer?preset=3d-chess&ai=${ai}`} replace />;
 }
 
 export function Chess3DHotseatRoute() {
-  return (
-    <Lazy>
-      <Chess3DHotseatPage />
-    </Lazy>
-  );
+  return <Navigate to="/chess-custom/play/hotseat?preset=3d-chess" replace />;
 }
 
+export function Chess3DMenuRoute() {
+  return <Navigate to="/chess-custom/create/overview?preset=3d-chess" replace />;
+}
+
+/** `/chess-custom/*`: My Games, Create, Community and Play all live under one page. */
 export function ChessCustomRoute() {
   return (
     <Lazy>
@@ -34,8 +33,8 @@ export function ChessCustomRoute() {
   );
 }
 
-/** `/chess-custom` is a short alias for the Chess Custom editor; the query (e.g. ?section=board) is kept. */
-export function ChessCustomAlias() {
+/** Old `/games/chess/custom?section=…` links land on the matching new route. */
+export function ChessCustomLegacyRedirect() {
   const { search } = useLocation();
-  return <Navigate to={`/games/chess/custom${search}`} replace />;
+  return <Navigate to={legacyChessCustomTarget(search)} replace />;
 }

@@ -2,7 +2,7 @@ import type { Coord, GameVariant, MovementKind, MovementRule, PositionSetup } fr
 
 /* Pure helpers shared by the editor components. */
 
-export const coordKey = (coord: Coord) => `${coord.x},${coord.y}`;
+export const coordKey = (coord: Coord) => `${coord.x},${coord.y}${coord.z ? `,${coord.z}` : ""}`;
 
 /** dataTransfer type for drag-and-drop between the piece palette and boards. */
 export const DRAG_MIME = "application/x-chess-custom";

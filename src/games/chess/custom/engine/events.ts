@@ -157,9 +157,8 @@ function selectSquare(rt: EventRuntime, action: EventAction, context: EventConte
     case "originSquare":
       return context.origin ?? context.square;
     case "spawnTile": {
-      const position = createPosition(rt.variant, rt.state);
       const tile = rt.state.board.cells.find(
-        (cell) => cell.enabled && cell.tile === "spawn" && (!cell.team || cell.team === team) && !position.occupancy[cell.y * rt.state.board.width + cell.x],
+        (cell) => cell.enabled && cell.tile === "spawn" && (!cell.team || cell.team === team) && !findPieceAt(rt.state, cell),
       );
       return tile ? { x: tile.x, y: tile.y } : context.origin;
     }
@@ -207,7 +206,7 @@ function runAction(rt: EventRuntime, action: EventAction, context: EventContext)
       if (!type || !owner || !getDefinition(variant, type)) return;
       const at = freeCellNear(rt, selectSquare(rt, action, context, owner));
       if (!at) return pushMessage(state, `No free square to spawn ${getDefinition(variant, type)?.name}`, "warning");
-      state.pieces.push({ id: `p${state.nextId++}`, type, team: owner, x: at.x, y: at.y, moveCount: 0, origin: at });
+      state.pieces.push({ id: `p${state.nextId++}`, type, team: owner, x: at.x, y: at.y, z: at.z ?? 0, moveCount: 0, origin: at });
       state.effects.push({ kind: "spawn", at });
       return;
     }
@@ -215,7 +214,7 @@ function runAction(rt: EventRuntime, action: EventAction, context: EventContext)
       const piece = selectPiece(rt, action, context);
       if (!piece) return;
       state.pieces = state.pieces.filter((entry) => entry !== piece);
-      state.effects.push({ kind: "capture", at: { x: piece.x, y: piece.y } });
+      state.effects.push({ kind: "capture", at: { x: piece.x, y: piece.y, z: piece.z ?? 0 } });
       return;
     }
     case "transformPiece": {
@@ -223,7 +222,7 @@ function runAction(rt: EventRuntime, action: EventAction, context: EventContext)
       if (!piece || !action.toPieceType || !getDefinition(variant, action.toPieceType)) return;
       const before = getDefinition(variant, piece.type)?.name ?? piece.type;
       piece.type = action.toPieceType;
-      state.effects.push({ kind: "transform", at: { x: piece.x, y: piece.y } });
+      state.effects.push({ kind: "transform", at: { x: piece.x, y: piece.y, z: piece.z ?? 0 } });
       pushMessage(state, `${before} on ${squareName(piece)} becomes ${getDefinition(variant, piece.type)?.name}`);
       return;
     }
@@ -232,9 +231,10 @@ function runAction(rt: EventRuntime, action: EventAction, context: EventContext)
       const piece = selectPiece(rt, action, context);
       const to = selectSquare(rt, action, context, piece?.team);
       if (!piece || !to || !isPlayable(state.board, to) || findPieceAt(state, to)) return;
-      const from = { x: piece.x, y: piece.y };
+      const from = { x: piece.x, y: piece.y, z: piece.z ?? 0 };
       piece.x = to.x;
       piece.y = to.y;
+      piece.z = to.z ?? 0;
       state.effects.push({ kind: action.type === "teleportPiece" ? "portal" : "pulse", at: from, to });
       if (rt.depth < MAX_EVENT_DEPTH) {
         const nested = { ...context, pieceId: piece.id, pieceType: piece.type, square: to };
@@ -373,4 +373,3 @@ export function runScheduled(rt: EventRuntime) {
 export function onlyRoyalsRemain(variant: GameVariant, state: GameState) {
   return state.pieces.length > 0 && state.pieces.every((piece) => isRoyal(variant, piece));
 }
-

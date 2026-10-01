@@ -19,7 +19,7 @@ const RULE_INFO: Record<GameRuleType, { label: string; description: string }> = 
 };
 
 export default function RulesSection() {
-  const { variant, dispatch, setSection } = useEditor();
+  const { variant, dispatch, goToStep } = useEditor();
   const { settings } = variant;
   const behavior = matchKingBehavior(settings);
   const update = (recipe: (variant: GameVariant) => GameVariant, coalesceKey?: string) => dispatch({ type: "update", recipe, coalesceKey });
@@ -30,6 +30,7 @@ export default function RulesSection() {
   return (
     <div>
       <SectionHeading
+        step="rules"
         eyebrow="Rules"
         title="The rulebook"
         description={ui("Kings don't have to follow standard chess. Choose how royal pieces behave and what happens when one falls — the consequence is compiled into ordinary, editable events.")}
@@ -142,7 +143,7 @@ export default function RulesSection() {
                   {team.name}
                 </span>
               ))}
-              <Button size="sm" onClick={() => setSection("teams")}>
+              <Button size="sm" onClick={() => goToStep("teams")}>
                 {ui("Edit teams")}
                 <ArrowRight size={13} />
               </Button>
@@ -154,7 +155,7 @@ export default function RulesSection() {
           title={ui("When a king is captured")}
           eyebrow={ui("King capture consequence")}
           actions={
-            <Button size="sm" onClick={() => setSection("events")}>
+            <Button size="sm" onClick={() => goToStep("events")}>
               {generated} {ui("generated event(s)")}
               <ArrowRight size={13} />
             </Button>

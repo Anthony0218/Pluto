@@ -1,4 +1,4 @@
-import type { BoardCell, BoardDefinition, Coord, TileType } from "./types.ts";
+import type { BoardCell, BoardDefinition, BoardLayer, Coord, TileType } from "./types.ts";
 
 export const MIN_BOARD_SIZE = 3;
 /** Beyond 16×16 the 3D scene and legal-move search stop feeling instant. */
@@ -17,7 +17,22 @@ export function parseSquare(name: string): Coord | null {
 }
 
 export const sameCoord = (a: Coord | undefined | null, b: Coord | undefined | null) =>
-  Boolean(a && b && a.x === b.x && a.y === b.y);
+  Boolean(a && b && a.x === b.x && a.y === b.y && (a.z ?? 0) === (b.z ?? 0));
+
+export const coordKey3D = (coord: Coord) => `${coord.x},${coord.y},${coord.z ?? 0}`;
+
+export function getLayer(board: BoardDefinition, z = 0): BoardDefinition | BoardLayer | null {
+  return z === 0 ? board : board.layers?.find((layer) => layer.z === z) ?? null;
+}
+
+export function boardLayers(board: BoardDefinition): BoardLayer[] {
+  return [{ id: "ground", name: board.name ?? "Ground", z: 0, width: board.width, height: board.height, cells: board.cells }, ...(board.layers ?? [])].sort((a, b) => a.z - b.z);
+}
+
+export function replaceLayer(board: BoardDefinition, z: number, layer: BoardDefinition | BoardLayer): BoardDefinition {
+  if (z === 0) return { ...board, width: layer.width, height: layer.height, cells: layer.cells, ...(layer.name !== undefined || board.name !== undefined ? { name: layer.name ?? board.name } : {}) };
+  return { ...board, layers: (board.layers ?? []).map((entry) => entry.z === z ? { ...entry, ...layer, z } : entry) };
+}
 
 export function clampBoardSize(value: number) {
   return Math.max(MIN_BOARD_SIZE, Math.min(MAX_BOARD_SIZE, Math.round(value) || MIN_BOARD_SIZE));
@@ -31,12 +46,14 @@ export function createRectangularBoard(width: number, height: number): BoardDefi
   return { width: w, height: h, cells };
 }
 
-export function inBounds(board: BoardDefinition, { x, y }: Coord) {
-  return x >= 0 && y >= 0 && x < board.width && y < board.height;
+export function inBounds(board: BoardDefinition, { x, y, z }: Coord) {
+  const layer = getLayer(board, z ?? 0);
+  return Boolean(layer && x >= 0 && y >= 0 && x < layer.width && y < layer.height);
 }
 
 export function getCell(board: BoardDefinition, coord: Coord): BoardCell | null {
-  return inBounds(board, coord) ? board.cells[coord.y * board.width + coord.x] ?? null : null;
+  const layer = getLayer(board, coord.z ?? 0);
+  return layer && inBounds(board, coord) ? layer.cells[coord.y * layer.width + coord.x] ?? null : null;
 }
 
 /** A cell a piece could ever stand on. */
@@ -57,10 +74,11 @@ export function resizeBoard(board: BoardDefinition, width: number, height: numbe
 
 export function updateCell(board: BoardDefinition, coord: Coord, patch: Partial<BoardCell>): BoardDefinition {
   if (!inBounds(board, coord)) return board;
-  const index = coord.y * board.width + coord.x;
-  const cells = board.cells.slice();
+  const layer = getLayer(board, coord.z ?? 0)!;
+  const index = coord.y * layer.width + coord.x;
+  const cells = layer.cells.slice();
   cells[index] = { ...cells[index], ...patch, x: coord.x, y: coord.y };
-  return { ...board, cells };
+  return replaceLayer(board, coord.z ?? 0, { ...layer, cells });
 }
 
 export function setTile(board: BoardDefinition, coord: Coord, tile: TileType): BoardDefinition {
@@ -78,7 +96,7 @@ export const BOARD_SHAPES = ["rectangle", "cross", "diamond", "ring", "islands",
 export type BoardShape = (typeof BOARD_SHAPES)[number];
 
 export const BOARD_SHAPE_LABELS: Record<BoardShape, string> = {
-  rectangle: "Rectangle",
+  rectangle: "Standard",
   cross: "Cross",
   diamond: "Diamond",
   ring: "Ring",

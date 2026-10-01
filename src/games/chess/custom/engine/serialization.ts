@@ -26,10 +26,15 @@ export function migrateVariant(raw: Record<string, unknown>): { data: Record<str
     warnings.push("No schema version found — treated as version 1.");
     data.schemaVersion = 1;
   }
+  if (data.schemaVersion === 1) {
+    // v1 positions and offsets implicitly live on the ground board.
+    data.schemaVersion = 2;
+    warnings.push("Upgraded the single-board variant to the layered v2 schema.");
+  }
   return { data, warnings };
 }
 
-function repairBoard(input: unknown, errors: string[], warnings: string[]): BoardDefinition | null {
+function repairBoard(input: unknown, errors: string[], warnings: string[], depth = 0): BoardDefinition | null {
   if (!isObject(input)) {
     errors.push("board is missing.");
     return null;
@@ -41,6 +46,7 @@ function repairBoard(input: unknown, errors: string[], warnings: string[]): Boar
     return null;
   }
   const board = createRectangularBoard(width, height);
+  if (typeof input.name === "string") board.name = input.name;
   if (board.width !== width || board.height !== height) warnings.push(`Board resized to the supported range (${board.width}×${board.height}).`);
   const cells = Array.isArray(input.cells) ? input.cells : [];
   if (cells.length !== width * height) warnings.push("Board cells were incomplete and have been repaired.");
@@ -52,9 +58,23 @@ function repairBoard(input: unknown, errors: string[], warnings: string[]): Boar
     if (!target) continue;
     target.enabled = cell.enabled !== false;
     target.tile = TILE_TYPES.includes(cell.tile as (typeof TILE_TYPES)[number]) ? (cell.tile as (typeof TILE_TYPES)[number]) : "normal";
-    if (isObject(cell.portalTarget)) target.portalTarget = { x: Number(cell.portalTarget.x), y: Number(cell.portalTarget.y) };
+    if (isObject(cell.portalTarget)) target.portalTarget = { x: Number(cell.portalTarget.x), y: Number(cell.portalTarget.y), ...(cell.portalTarget.z === undefined ? {} : { z: Number(cell.portalTarget.z) }) };
     if (typeof cell.team === "string") target.team = cell.team;
     if (isObject(cell.direction)) target.direction = { x: Math.sign(Number(cell.direction.x)), y: Math.sign(Number(cell.direction.y)) };
+  }
+  if (depth === 0 && Array.isArray(input.layers)) {
+    board.layers = [];
+    const used = new Set<number>([0]);
+    for (const raw of input.layers.slice(0, 7)) {
+      if (!isObject(raw) || !Number.isInteger(Number(raw.z)) || Number(raw.z) <= 0 || used.has(Number(raw.z))) {
+        errors.push("Each additional board layer needs a unique positive integer z.");
+        continue;
+      }
+      const z = Number(raw.z);
+      used.add(z);
+      const repaired = repairBoard(raw, errors, warnings, 1);
+      if (repaired) board.layers.push({ ...repaired, id: typeof raw.id === "string" ? raw.id : `layer-${z}`, name: typeof raw.name === "string" ? raw.name : `Layer ${z + 1}`, z });
+    }
   }
   return board;
 }

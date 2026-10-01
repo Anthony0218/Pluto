@@ -1,6 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { parseVariantJson } from "../engine/serialization.ts";
 import type { GameVariant } from "../engine/types.ts";
+import type { PublishedRecord } from "../library/metadata.ts";
+import { buildVariantPreview, type VariantPreview } from "../library/preview.ts";
 import { variantMetadata } from "./supabaseVariantRepository.ts";
 
 export type CommunitySort = "top" | "new" | "played";
@@ -70,6 +72,55 @@ export function createCommunityService(client: SupabaseClient) {
       if (!result.variant) throw new Error(result.errors[0] ?? "This variant could not be read.");
       void client.rpc("record_chess_custom_play", { p_published_id: id });
       return result.variant;
+    },
+    /** Which of the owner's variants are currently public, keyed by the variant's own id. */
+    async listMine(ownerId: string): Promise<Record<string, PublishedRecord>> {
+      const { data, error } = await client.from("chess_custom_published").select("id,source_client_id,published_at,updated_at").eq("owner_id", ownerId);
+      if (error) throw error;
+      return Object.fromEntries(
+        ((data ?? []) as { id: string; source_client_id: string; published_at: string; updated_at: string }[]).map((row) => [
+          row.source_client_id,
+          { publishedId: row.id, publishedAt: row.published_at, updatedAt: row.updated_at },
+        ]),
+      );
+    },
+    /** Board previews for gallery cards; best effort, so a failure only hides thumbnails. */
+    async previews(ids: string[]): Promise<Record<string, { preview: VariantPreview; layerCount: number }>> {
+      if (!ids.length) return {};
+      const { data, error } = await client.from("chess_custom_published").select("id,board:data->board,setup:data->setup,teams:data->teams,theme:data->theme").in("id", ids);
+      if (error) throw error;
+      const out: Record<string, { preview: VariantPreview; layerCount: number }> = {};
+      for (const row of (data ?? []) as { id: string; board: GameVariant["board"] | null; setup: GameVariant["setup"] | null; teams: GameVariant["teams"] | null; theme: GameVariant["theme"] | null }[]) {
+        if (!row.board || !Array.isArray(row.board.cells)) continue;
+        try {
+          out[row.id] = {
+            preview: buildVariantPreview({ board: row.board, setup: row.setup ?? undefined, teams: row.teams ?? undefined, theme: row.theme ?? undefined }),
+            layerCount: 1 + (row.board.layers?.length ?? 0),
+          };
+        } catch {
+          /* Skip unreadable documents. */
+        }
+      }
+      return out;
+    },
+    /** Rules at a glance for the details view, without counting a play. */
+    async details(id: string): Promise<Pick<GameVariant, "settings" | "victoryConditions" | "teams"> & { tags: string[]; eventCount: number; pieceNames: string[] }> {
+      const { data, error } = await client
+        .from("chess_custom_published")
+        .select("settings:data->settings,victory:data->victoryConditions,teams:data->teams,tags:data->tags,events:data->events,pieces:data->pieces")
+        .eq("id", id)
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) throw new Error("This variant is no longer published.");
+      const row = data as unknown as { settings: GameVariant["settings"]; victory: GameVariant["victoryConditions"] | null; teams: GameVariant["teams"] | null; tags: unknown; events: unknown[] | null; pieces: { name?: string }[] | null };
+      return {
+        settings: row.settings,
+        victoryConditions: Array.isArray(row.victory) ? row.victory : [],
+        teams: Array.isArray(row.teams) ? row.teams : [],
+        tags: Array.isArray(row.tags) ? row.tags.filter((tag): tag is string => typeof tag === "string") : [],
+        eventCount: Array.isArray(row.events) ? row.events.length : 0,
+        pieceNames: Array.isArray(row.pieces) ? row.pieces.map((piece) => String(piece?.name ?? "")).filter(Boolean) : [],
+      };
     },
     async vote(id: string, value: -1 | 0 | 1) {
       const { data, error } = await client.rpc("vote_chess_custom_variant", { p_published_id: id, p_value: value });

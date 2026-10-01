@@ -99,6 +99,7 @@ export function useSimulationVisuals(variant: GameVariant, session: GameSession)
       id: piece.id,
       x: piece.x,
       y: piece.y,
+      z: piece.z ?? 0,
       base: def?.model.base ?? "pawn",
       set: team?.modelSet ?? "light",
       accent: def?.model.accent,

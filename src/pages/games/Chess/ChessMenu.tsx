@@ -30,7 +30,7 @@ const modes: ChessMode[] = [
   {
     title: "Chess Custom",
     description: "Design pieces, boards, rules and events — then watch your variant play in 3D.",
-    path: "/games/chess/custom",
+    path: "/chess-custom",
     icon: "⚙",
     eyebrow: "Build your own",
   },

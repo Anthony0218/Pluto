@@ -65,6 +65,7 @@ function PieceEditor({ piece }: { piece: PieceDefinition }) {
   const { variant, dispatch, setSelectedPieceId } = useEditor();
   const [activeRuleId, setActiveRuleId] = useState<string | undefined>();
   const [brush, setBrush] = useState<SquareBrush>("both");
+  const [movementView, setMovementView] = useState<"2d" | "3d">("2d");
   const [lastPiece, setLastPiece] = useState(piece.id);
   if (lastPiece !== piece.id) {
     setLastPiece(piece.id);
@@ -235,16 +236,19 @@ function PieceEditor({ piece }: { piece: PieceDefinition }) {
       <div className="order-first space-y-5 2xl:order-none">
         <Panel title={ui("Movement")} eyebrow={ui("Pick a brush, then click squares")}>
           <MovementBrushPalette value={brush} onChange={setBrush} />
+          <div className="mt-3 flex gap-2"><Button size="sm" tone={movementView === "2d" ? "blue" : "ghost"} onClick={() => setMovementView("2d")}>2D</Button><Button size="sm" tone={movementView === "3d" ? "blue" : "ghost"} onClick={() => setMovementView("3d")}>3D</Button></div>
           <div className="mt-4 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] 2xl:grid-cols-1">
             <div className="mx-auto w-full max-w-[380px]">
-              <MovementGrid
+              {(movementView === "3d" ? [{ z: 1, name: "Layer Above" }, { z: 0, name: "Current Layer" }, { z: -1, name: "Layer Below" }] : [{ z: 0, name: "Current Layer" }]).map((layer) => <div key={layer.z} className="mb-4"><p className="mb-2 text-xs font-semibold text-amber-200">{layer.name}</p><MovementGrid
                 piece={piece}
                 team={team}
                 moveRules={piece.movement}
                 captureRules={piece.captureSameAsMove ? piece.movement : piece.capture}
                 activeRuleId={activeRuleId}
+                layerDelta={layer.z}
+                radius={movementView === "3d" ? 2 : undefined}
                 onToggle={(offset) => update((current) => paintSquare(current, offset, brush))}
-              />
+              /></div>)}
             </div>
             <div>
               <p className={`${labelClass} mb-2`}>{ui("Patterns · advanced settings")}</p>
@@ -276,6 +280,7 @@ export default function PiecesSection() {
   return (
     <div>
       <SectionHeading
+        step="pieces"
         eyebrow="Pieces"
         title="Design your army"
         description={ui("Every piece — standard or invented — is defined by movement patterns, capture patterns and abilities. Clone a classic and bend it, or start from scratch.")}

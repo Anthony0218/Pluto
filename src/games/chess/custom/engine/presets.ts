@@ -475,10 +475,20 @@ export type PresetId =
   | "terrain"
   | "random-army"
   | "four-kingdoms"
+  | "3d-chess"
+  | "three-level"
+  | "tower"
+  | "portal-layers"
+  | "3d-sandbox"
   | "sandbox";
 
 export const PRESETS: { id: PresetId; name: string; tagline: string; icon: string; tags: string[] }[] = [
   { id: "standard", name: "Standard Chess", tagline: "The classic rules, expressed in the custom engine.", icon: "♔", tags: ["8×8", "Checkmate"] },
+  { id: "3d-chess", name: "3D Chess", tagline: "The former 3D Chess game, editable in Chess Custom.", icon: "♜", tags: ["3D view", "Classic rules"] },
+  { id: "three-level", name: "Three-Level Chess", tagline: "Three stacked boards with vertical rook movement.", icon: "▤", tags: ["3 layers", "Vertical moves"] },
+  { id: "tower", name: "Tower Chess", tagline: "Four boards that narrow toward the top.", icon: "♖", tags: ["4 layers", "8×8 to 2×2"] },
+  { id: "portal-layers", name: "Portal Layers", tagline: "Boards connected by cross-layer portals.", icon: "◎", tags: ["Portals", "2 layers"] },
+  { id: "3d-sandbox", name: "3D Sandbox", tagline: "An empty three-layer space for your rules.", icon: "✦", tags: ["Blank", "3 layers"] },
   { id: "king-capture", name: "King Capture Chess", tagline: "No check. Take the king to win.", icon: "♚", tags: ["Capturable king"] },
   { id: "no-check", name: "No Check Chess", tagline: "Kings are ordinary pieces — wipe out the army.", icon: "⚔", tags: ["No royals", "Capture all"] },
   { id: "large-board", name: "Large Board Chess", tagline: "10×10 with Wizards and Cannons.", icon: "▦", tags: ["10×10", "Custom pieces"] },
@@ -521,6 +531,33 @@ export function createVariantFromPreset(id: PresetId, seed = Date.now()): GameVa
   switch (preset.id) {
     case "standard":
       break;
+    case "3d-chess":
+      variant.theme = { boardTheme: "marble", pieceSkin: "classic" };
+      break;
+    case "three-level":
+    case "tower":
+    case "portal-layers":
+    case "3d-sandbox": {
+      const sizes = preset.id === "tower" ? [6, 4, 2] : preset.id === "portal-layers" ? [8] : [8, 8];
+      variant.board.layers = sizes.map((size, index) => ({ ...createRectangularBoard(size, size), id: `layer-${index + 1}`, name: `Layer ${index + 2}`, z: index + 1 }));
+      variant.rules = variant.rules.map((rule) => rule.type === "castling" ? { ...rule, enabled: false } : rule);
+      if (preset.id === "portal-layers") {
+        variant.board = updateCell(setTile(variant.board, { x: 3, y: 3, z: 0 }, "portal"), { x: 3, y: 3, z: 0 }, { portalTarget: { x: 3, y: 3, z: 1 } });
+        variant.board = updateCell(setTile(variant.board, { x: 3, y: 3, z: 1 }, "portal"), { x: 3, y: 3, z: 1 }, { portalTarget: { x: 3, y: 3, z: 0 } });
+      } else {
+        const rook = variant.pieces.find((piece) => piece.id === "rook")!;
+        rook.movement.push(slide("rook-vertical", [{ x: 0, y: 0, z: 1 }, { x: 0, y: 0, z: -1 }]));
+        const knight = variant.pieces.find((piece) => piece.id === "knight")!;
+        knight.movement.push(leap("knight-layer", leaperOffsets(2, 1).flatMap((offset) => [{ ...offset, z: 1 }, { ...offset, z: -1 }])));
+      }
+      if (preset.id === "3d-sandbox") {
+        variant.setup.pieces = [];
+        variant = applyKingBehavior(variant, "none");
+        variant.victoryConditions = [victory("captureAll"), victory("eventOutcome")];
+      }
+      variant.theme = { boardTheme: "marble", pieceSkin: "obsidian" };
+      break;
+    }
     case "king-capture":
       variant = applyKingBehavior(variant, "capturable");
       variant.theme = { boardTheme: "royal-gold", pieceSkin: "classic" };
@@ -602,4 +639,3 @@ export function createVariantFromPreset(id: PresetId, seed = Date.now()): GameVa
   }
   return variant;
 }
-

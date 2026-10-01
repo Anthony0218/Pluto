@@ -1,4 +1,4 @@
-import { getCell, isPlayable, sameCoord } from "./board.ts";
+import { coordKey3D, getCell, getLayer, isPlayable, sameCoord } from "./board.ts";
 import type {
   Coord,
   GameRuleType,
@@ -15,20 +15,18 @@ export interface Position {
   variant: GameVariant;
   state: GameState;
   defs: Map<PieceTypeId, PieceDefinition>;
-  occupancy: (PieceInstance | undefined)[];
+  occupancy: Map<string, PieceInstance>;
 }
 
 export function createPosition(variant: GameVariant, state: GameState): Position {
   const defs = new Map(variant.pieces.map((piece) => [piece.id, piece]));
-  const occupancy: (PieceInstance | undefined)[] = new Array(state.board.width * state.board.height);
-  for (const piece of state.pieces) occupancy[piece.y * state.board.width + piece.x] = piece;
+  const occupancy = new Map<string, PieceInstance>();
+  for (const piece of state.pieces) occupancy.set(coordKey3D(piece), piece);
   return { variant, state, defs, occupancy };
 }
 
 export function pieceAt(position: Position, coord: Coord): PieceInstance | undefined {
-  const { board } = position.state;
-  if (coord.x < 0 || coord.y < 0 || coord.x >= board.width || coord.y >= board.height) return undefined;
-  return position.occupancy[coord.y * board.width + coord.x];
+  return position.occupancy.get(coordKey3D(coord));
 }
 
 export function findPieceAt(state: GameState, coord: Coord) {
@@ -75,13 +73,14 @@ export function toBoardOffset(variant: GameVariant, team: TeamId, offset: Coord,
   return {
     x: offset.x * right.x + offset.y * forward.x,
     y: offset.x * right.y + offset.y * forward.y,
+    z: offset.z ?? 0,
   };
 }
 
 /** The last rank in the team's forward direction. */
 export function isFarRank(variant: GameVariant, state: GameState, team: TeamId, coord: Coord) {
   const forward = variant.teams.find((entry) => entry.id === team)?.forward ?? { x: 0, y: 1 };
-  const { width, height } = state.board;
+  const { width, height } = getLayer(state.board, coord.z ?? 0) ?? state.board;
   if (forward.y > 0) return coord.y === height - 1;
   if (forward.y < 0) return coord.y === 0;
   if (forward.x > 0) return coord.x === width - 1;
@@ -90,14 +89,16 @@ export function isFarRank(variant: GameVariant, state: GameState, team: TeamId, 
 
 export function nearestEmptyCell(position: Position, origin: Coord): Coord | null {
   const { board } = position.state;
+  const layer = getLayer(board, origin.z ?? 0) ?? board;
   let best: Coord | null = null;
   let bestDistance = Infinity;
-  for (const cell of board.cells) {
-    if (!isPlayable(board, cell) || pieceAt(position, cell)) continue;
+  for (const cell of layer.cells) {
+    const coord = { x: cell.x, y: cell.y, z: origin.z ?? 0 };
+    if (!isPlayable(board, coord) || pieceAt(position, coord)) continue;
     const distance = Math.max(Math.abs(cell.x - origin.x), Math.abs(cell.y - origin.y));
     if (distance < bestDistance) {
       bestDistance = distance;
-      best = { x: cell.x, y: cell.y };
+      best = coord;
     }
   }
   return best;

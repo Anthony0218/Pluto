@@ -1,6 +1,6 @@
-import { ArrowLeftRight, Box, Copy, Eraser, FlipVertical2, MousePointer2, Play, RotateCcw, Save, Trash2 } from "lucide-react";
+import { ArrowLeftRight, Copy, Eraser, FlipVertical2, MousePointer2, RotateCcw, Save, Trash2, Users } from "lucide-react";
 import { useMemo, useState } from "react";
-import { isPlayable, sameCoord, squareName } from "@/games/chess/custom/engine/board";
+import { boardLayers, getLayer, isPlayable, sameCoord, squareName } from "@/games/chess/custom/engine/board";
 import { setupFromFen } from "@/games/chess/custom/engine/fen";
 import type { Coord, PlacedPiece, PositionSetup } from "@/games/chess/custom/engine/types";
 import { useEditor } from "@/games/chess/custom/editor/editorContext";
@@ -9,29 +9,47 @@ import { getBoardTheme } from "@/games/chess/custom/themes";
 import { ui } from "@/i18n/ui";
 import Board2D from "../Board2D";
 import PieceToken from "../PieceToken";
-import { Button, IconButton, NumberField, Panel, SectionHeading, Select, Toggle, inputClass, labelClass } from "../ui";
+import { SimulationIcon } from "../icons/ChessCustomIcons";
+import { Button, IconButton, NumberField, Panel, SectionHeading, Segmented, Select, Toggle, inputClass, labelClass } from "../ui";
 
 type Brush = { kind: "piece"; type: string; team: string } | { kind: "eraser" } | { kind: "select" };
 type DragPayload = { kind: "new"; type: string; team: string } | { kind: "move"; index: number };
 
+/**
+ * Two positions can be edited: the variant's starting position (saved with
+ * it) and a scratch test position for trying a rule without changing the start.
+ */
+type Target = "start" | "test";
+
 function SetupEditor() {
-  const { variant, testSetup, dispatch, setSection, setSimulationSource, notify } = useEditor();
+  const { variant, testSetup, dispatch, go, setSimulationSource, notify } = useEditor();
+  const [target, setTarget] = useState<Target>("start");
   const theme = getBoardTheme(variant.theme.boardTheme);
   const [brush, setBrush] = useState<Brush>({ kind: "select" });
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [fen, setFen] = useState("");
   const [flipped, setFlipped] = useState(false);
-  const pieces = testSetup.pieces;
+  const [activeLayer, setActiveLayer] = useState(0);
+  const layers = boardLayers(variant.board);
+  const layer = getLayer(variant.board, activeLayer) ?? variant.board;
+  const onLayer = (coord: Coord) => ({ ...coord, z: activeLayer });
+  const setup = target === "start" ? variant.setup : testSetup;
+  const pieces = setup.pieces;
   const selected = selectedIndex !== null ? pieces[selectedIndex] : undefined;
 
-  const commit = (setup: PositionSetup, coalesceKey?: string) => dispatch({ type: "setTestSetup", setup, coalesceKey });
-  const withPieces = (next: PlacedPiece[]) => commit({ ...testSetup, pieces: next });
+  const commit = (next: PositionSetup, coalesceKey?: string) =>
+    target === "start" ? dispatch({ type: "update", recipe: (current) => ({ ...current, setup: next }), coalesceKey: coalesceKey && `start-${coalesceKey}` }) : dispatch({ type: "setTestSetup", setup: next, coalesceKey });
+  const withPieces = (next: PlacedPiece[]) => commit({ ...setup, pieces: next });
+  const simulate = (view: "3d" | "2d") => {
+    setSimulationSource(target);
+    go({ view: "create", step: "simulation" }, { search: view === "2d" ? "?view=2d" : "" });
+  };
   const indexAt = (coord: Coord) => pieces.findIndex((piece) => sameCoord(piece, coord));
 
   function place(coord: Coord, type: string, team: string) {
     if (!isPlayable(variant.board, coord)) return notify(`${squareName(coord)}: ${ui("not playable")}`, "error");
     const next = pieces.filter((piece) => !sameCoord(piece, coord));
-    next.push({ type, team, x: coord.x, y: coord.y });
+    next.push({ type, team, x: coord.x, y: coord.y, z: coord.z ?? 0 });
     withPieces(next);
     setSelectedIndex(next.length - 1);
   }
@@ -42,7 +60,7 @@ function SetupEditor() {
     const source = pieces[data.index];
     if (!source || sameCoord(source, coord)) return;
     if (!isPlayable(variant.board, coord)) return notify(`${squareName(coord)}: ${ui("not playable")}`, "error");
-    const moved: PlacedPiece = { ...source, x: coord.x, y: coord.y };
+    const moved: PlacedPiece = { ...source, x: coord.x, y: coord.y, z: coord.z ?? 0 };
     const next = pieces.filter((piece, index) => !sameCoord(piece, coord) && (duplicate || index !== data.index));
     next.push(moved);
     withPieces(next);
@@ -61,16 +79,16 @@ function SetupEditor() {
 
   function duplicateSelected() {
     if (!selected) return;
-    const spot = variant.board.cells
-      .filter((cell) => isPlayable(variant.board, cell) && indexAt(cell) < 0)
+    const spot = layer.cells
+      .filter((cell) => isPlayable(variant.board, { ...cell, z: activeLayer }) && indexAt({ ...cell, z: activeLayer }) < 0)
       .sort((a, b) => Math.max(Math.abs(a.x - selected.x), Math.abs(a.y - selected.y)) - Math.max(Math.abs(b.x - selected.x), Math.abs(b.y - selected.y)))[0];
     if (!spot) return notify(ui("No free square for a copy"), "error");
-    withPieces([...pieces, { ...selected, x: spot.x, y: spot.y }]);
+    withPieces([...pieces, { ...selected, x: spot.x, y: spot.y, z: activeLayer }]);
     setSelectedIndex(pieces.length);
   }
 
-  const boardPieces = useMemo(() => pieces.map((piece, index) => ({ ...piece, key: String(index) })), [pieces]);
-  const highlights = useMemo(() => new Map(selected ? [[`${selected.x},${selected.y}`, "selected" as const]] : []), [selected]);
+  const boardPieces = useMemo(() => pieces.flatMap((piece, index) => (piece.z ?? 0) === activeLayer ? [{ ...piece, key: String(index) }] : []), [pieces, activeLayer]);
+  const highlights = useMemo(() => new Map(selected && (selected.z ?? 0) === activeLayer ? [[`${selected.x},${selected.y}`, "selected" as const]] : []), [selected, activeLayer]);
 
   return (
     <div className="grid gap-5 xl:grid-cols-[260px_minmax(0,1fr)_280px]">
@@ -120,65 +138,76 @@ function SetupEditor() {
       </Panel>
 
       <div className="min-w-0 space-y-3">
+        {layers.length > 1 && <label className="flex items-center gap-2 text-xs text-zinc-300">Edit layer <select aria-label="Setup layer" value={activeLayer} onChange={(event) => { setActiveLayer(Number(event.target.value)); setSelectedIndex(null); }} className="rounded-lg border border-white/10 bg-zinc-900 px-2 py-1 text-white">{layers.map((entry) => <option key={entry.z} value={entry.z}>{entry.name} · {entry.width}×{entry.height}</option>)}</select></label>}
         <div className="flex flex-wrap items-center gap-2">
-          <Button
-            tone="primary"
-            onClick={() => {
-              setSimulationSource("test");
-              setSection("simulation2d");
+          <Segmented
+            label="Position to edit"
+            value={target}
+            onChange={(next) => {
+              setTarget(next);
+              setSelectedIndex(null);
             }}
-          >
-            <Play size={15} />
-            {ui("Simulate in 2D")}
-          </Button>
-          <Button
-            tone="blue"
-            onClick={() => {
-              setSimulationSource("test");
-              setSection("simulation");
-            }}
-          >
-            <Box size={15} />
+            options={[
+              { id: "start", label: "Starting position", title: "Saved with the variant: every game starts here." },
+              { id: "test", label: "Test position", title: "A scratch position for trying rules. Not saved." },
+            ]}
+          />
+          <span className="mx-1 hidden h-6 w-px bg-white/10 sm:block" />
+          <Button tone="primary" onClick={() => simulate("3d")}>
+            <SimulationIcon size={16} />
             {ui("Simulate in 3D")}
           </Button>
-          <span className="mx-1 h-6 w-px bg-white/10" />
-          <Button size="sm" onClick={() => commit(structuredClone(variant.setup))} title={ui("Reset to the variant's starting position")}>
-            <RotateCcw size={14} />
-            {ui("Reset Position")}
+          <Button tone="blue" onClick={() => simulate("2d")}>
+            {ui("Simulate in 2D")}
           </Button>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {target === "start" ? (
+            <Button size="sm" onClick={() => dispatch({ type: "arrangeArmies" })} title={ui("Place each team's suggested pieces on its home ranks")}>
+              <Users size={14} />
+              {ui("Arrange armies")}
+            </Button>
+          ) : (
+            <Button size="sm" onClick={() => commit(structuredClone(variant.setup))} title={ui("Reset to the variant's starting position")}>
+              <RotateCcw size={14} />
+              {ui("Reset to starting position")}
+            </Button>
+          )}
           <Button size="sm" onClick={() => withPieces([])}>
             <Trash2 size={14} />
             {ui("Clear board")}
           </Button>
-          <Button
-            size="sm"
-            onClick={() => {
-              dispatch({ type: "update", recipe: (current) => ({ ...current, setup: structuredClone(testSetup) }) });
-              notify(ui("Saved as the variant's starting position"));
-            }}
-          >
-            <Save size={14} />
-            {ui("Use as starting position")}
-          </Button>
+          {target === "test" && (
+            <Button
+              size="sm"
+              onClick={() => {
+                dispatch({ type: "update", recipe: (current) => ({ ...current, setup: structuredClone(testSetup) }) });
+                notify(ui("Saved as the variant's starting position"));
+              }}
+            >
+              <Save size={14} />
+              {ui("Use as starting position")}
+            </Button>
+          )}
           <IconButton label={ui("Flip board")} active={flipped} onClick={() => setFlipped((value) => !value)}>
             <FlipVertical2 size={15} />
           </IconButton>
         </div>
         <div className="mx-auto max-w-[min(100%,calc(var(--app-height)-300px))]">
           <Board2D
-            board={variant.board}
+            board={layer}
             variant={variant}
             theme={theme}
             pieces={boardPieces}
             highlights={highlights}
             flipped={flipped}
-            label={ui("Test position editor")}
-            onCellClick={(coord) => handleClick(coord)}
+            label={target === "start" ? ui("Starting position editor") : ui("Test position editor")}
+            onCellClick={(coord) => handleClick(onLayer(coord))}
             onCellContextMenu={(coord) => {
-              const index = indexAt(coord);
+              const index = indexAt(onLayer(coord));
               if (index >= 0) withPieces(pieces.filter((_, position) => position !== index));
             }}
-            onDropPayload={(coord, payload, event) => handleDrop(coord, payload, event.altKey)}
+            onDropPayload={(coord, payload, event) => handleDrop(onLayer(coord), payload, event.altKey)}
             onPieceDragStart={(piece, event) => {
               event.dataTransfer.effectAllowed = "copyMove";
               event.dataTransfer.setData(DRAG_MIME, JSON.stringify({ kind: "move", index: Number(piece.key) } satisfies DragPayload));
@@ -235,11 +264,11 @@ function SetupEditor() {
           <div className="space-y-3">
             <div>
               <p className={labelClass}>{ui("Side to move")}</p>
-              <Select label="Side to move" className="mt-1.5" value={testSetup.startingTeam} onChange={(startingTeam) => commit({ ...testSetup, startingTeam })} options={variant.teams.map((team) => ({ id: team.id, label: team.name }))} />
+              <Select label="Side to move" className="mt-1.5" value={setup.startingTeam} onChange={(startingTeam) => commit({ ...setup, startingTeam })} options={variant.teams.map((team) => ({ id: team.id, label: team.name }))} />
             </div>
             <div>
               <p className={labelClass}>{ui("Move counter")}</p>
-              <NumberField label="Move counter" value={testSetup.turnNumber} min={1} max={500} onChange={(turnNumber) => commit({ ...testSetup, turnNumber }, "turn-number")} />
+              <NumberField label="Move counter" value={setup.turnNumber} min={1} max={500} onChange={(turnNumber) => commit({ ...setup, turnNumber }, "turn-number")} />
             </div>
             <form
               onSubmit={(event) => {
@@ -268,13 +297,14 @@ function SetupEditor() {
   );
 }
 
-export default function TestSection() {
+export default function PositionSection() {
   return (
     <div>
       <SectionHeading
-        eyebrow="Test Position"
-        title="Set up any position"
-        description={ui("Build a position to try a rule without playing a whole game. Place several kings, custom pieces, anything — then simulate it in 2D or 3D.")}
+        step="position"
+        eyebrow="Position"
+        title="Set the starting position"
+        description={ui("Place, move, duplicate and remove pieces on every layer to define how your variant begins. Switch to Test position to try a rule from any layout without changing the start.")}
       />
       <SetupEditor />
     </div>

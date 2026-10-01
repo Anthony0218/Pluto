@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { parseVariantJson } from "../engine/serialization.ts";
 import type { GameVariant } from "../engine/types.ts";
-import type { VariantRepository, VariantSummary } from "./variantRepository.ts";
+import { summarize, type VariantRepository, type VariantSummary } from "./variantRepository.ts";
 
 /** Metadata the database keeps beside the JSON so lists never download whole variants. */
 export function variantMetadata(variant: GameVariant) {
@@ -22,6 +22,55 @@ interface VariantRow {
   piece_types: number;
   version: number;
   updated_at: string;
+  created_at?: string;
+  /* Card previews: only the small parts of the JSON document, never the piece rules. */
+  board?: GameVariant["board"] | null;
+  setup?: GameVariant["setup"] | null;
+  teams?: GameVariant["teams"] | null;
+  settings?: GameVariant["settings"] | null;
+  victory?: GameVariant["victoryConditions"] | null;
+  theme?: GameVariant["theme"] | null;
+  preset?: string | null;
+}
+
+const LIST_COLUMNS = "client_id,name,description,board_size,piece_types,version,updated_at,created_at,board:data->board,setup:data->setup,teams:data->teams,settings:data->settings,victory:data->victoryConditions,theme:data->theme,preset:data->>presetId";
+
+function rowSummary(row: VariantRow): VariantSummary {
+  const fallback: VariantSummary = {
+    id: row.client_id,
+    name: row.name,
+    description: row.description,
+    updatedAt: row.updated_at,
+    createdAt: row.created_at,
+    version: row.version,
+    boardSize: row.board_size.replace("x", "×"),
+    pieceCount: row.piece_types,
+  };
+  if (!row.board || typeof row.board !== "object" || !Array.isArray(row.board.cells)) return fallback;
+  try {
+    return {
+      ...summarize({
+        id: row.client_id,
+        name: row.name,
+        description: row.description,
+        updatedAt: row.updated_at,
+        createdAt: row.created_at,
+        version: row.version,
+        presetId: row.preset ?? undefined,
+        board: row.board,
+        setup: row.setup ?? undefined,
+        teams: row.teams ?? undefined,
+        settings: row.settings ?? undefined,
+        victoryConditions: row.victory ?? undefined,
+        theme: row.theme ?? undefined,
+        pieceCount: row.piece_types,
+      }),
+      boardSize: fallback.boardSize,
+    };
+  } catch {
+    // A malformed document still lists; it just has no preview.
+    return fallback;
+  }
 }
 
 /**
@@ -34,21 +83,11 @@ export function createSupabaseVariantRepository(client: SupabaseClient): Variant
     async list() {
       const { data, error } = await client
         .from("chess_custom_variants")
-        .select("client_id,name,description,board_size,piece_types,version,updated_at")
+        .select(LIST_COLUMNS)
         .order("updated_at", { ascending: false })
         .limit(200);
       if (error) throw error;
-      return (data as VariantRow[]).map(
-        (row): VariantSummary => ({
-          id: row.client_id,
-          name: row.name,
-          description: row.description,
-          updatedAt: row.updated_at,
-          version: row.version,
-          boardSize: row.board_size.replace("x", "×"),
-          pieceCount: row.piece_types,
-        }),
-      );
+      return (data as unknown as VariantRow[]).map(rowSummary);
     },
     async load(id) {
       const { data, error } = await client.from("chess_custom_variants").select("data,version,updated_at").eq("client_id", id).maybeSingle();
