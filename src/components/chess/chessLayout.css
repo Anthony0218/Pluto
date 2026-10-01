@@ -27,6 +27,11 @@ body:has(.chess-game-grid) .chess-sidebar-toggle { display: block; }
   .chess-game-grid > aside { height: 100%; max-height: calc(100dvh - 12rem); overflow-y: auto !important; padding-bottom: 3rem; }
   .chess-game-grid > aside > div { position: static; }
   .chess-game-grid > :not(aside) { min-width: 0; width: 100%; max-width: none; }
+  .four-player-game-grid {
+    --board-size: min(calc(100dvh - 12rem), calc(100vw - 320px));
+    grid-template-columns: var(--side-width) minmax(0,var(--board-size)) !important;
+    width: min(100%,calc(var(--board-size) + var(--side-width) + 16px));
+  }
   .chess-menu-page { height: var(--app-height); min-height: 0; }
   .chess-menu-page > div.relative { height: 100%; min-height: 0; }
   .chess-menu-page nav { min-height: 64px; flex-shrink: 0; }
@@ -45,6 +50,7 @@ body:has(.chess-game-grid) .chess-sidebar-toggle { display: block; }
   .chess-game-grid { display: flex; flex-direction: column; align-items: center; }
   .chess-game-grid > :not(aside) { order: 0; width: min(100%,800px); }
   .chess-game-grid > aside { order: 1; width: min(100%,800px); }
+  .four-player-game-grid > :not(aside), .four-player-game-grid > aside { width: 100%; }
 }
 @media (max-width:639px) {
   .chess-menu-page { overflow-y: auto; }

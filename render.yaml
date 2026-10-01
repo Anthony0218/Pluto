@@ -1,4 +1,4 @@
-# Render blueprint for the Pluto Party authority (the Netlify site only serves static files).
+# Render blueprint for the Pluto Party authority (the Cloudflare Pages site only serves static files).
 services:
   - type: web
     name: pluto-party-server
@@ -15,4 +15,4 @@ services:
       - key: PARTY_TRUST_PROXY
         value: "1"
       - key: PARTY_ORIGINS
-        sync: false # set to https://<your-site>.netlify.app
+        sync: false # set to https://<your-project>.pages.dev (plus any custom domain)

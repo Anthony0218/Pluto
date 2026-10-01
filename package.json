@@ -14,6 +14,8 @@
     "geography:sync": "node scripts/geography/sync-atlas.mjs",
     "preview": "vite preview",
     "test:ranked": "node --test tests/chess-ranked*.test.mjs",
+    "test:chess-custom": "node --test tests/chess-custom*.test.mjs",
+    "test:card-builder": "node --test tests/card-builder-*.test.mjs",
     "party:server": "node server/party/index.ts",
     "test:party": "node --test tests/party-*.test.mjs",
     "check:party": "tsc -p tsconfig.party.json"

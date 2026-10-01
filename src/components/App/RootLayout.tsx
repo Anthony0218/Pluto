@@ -2,6 +2,8 @@ import { DashboardDataProvider } from "@/context/DashboardDataContext";
 import "../chess/chessLayout.css";
 import ChessLayoutControls from "../chess/ChessLayoutControls";
 import RoomFriends from "../social/RoomFriends";
+import GlobalFriendsSidebar from "./GlobalFriendsSidebar";
+import "./dashboard/dashboard.css";
 import { useEffect, useRef } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import AccountActivity from "./AccountActivity";
@@ -33,6 +35,7 @@ function RootContent() {
       <Outlet />
     </div>
     <RoomFriends />
+    {location.pathname !== "/dashboard" && <GlobalFriendsSidebar key={location.pathname} />}
     <ChessLayoutControls />
   </div>;
 }

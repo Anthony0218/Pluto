@@ -48,7 +48,7 @@ function playMode(pathname: string) {
   const segments = pathname.split("/");
   if (segments.includes("rules")) return undefined;
   if (segments.includes("hotseat")) return "Hotseat";
-  if (segments.includes("ai")) return "Singleplayer";
+  if (segments.includes("ai") || segments.includes("singleplayer")) return "Singleplayer";
   if (segments.includes("multiplayer") || segments.includes("ranked")) return "Multiplayer";
   return undefined;
 }
@@ -68,7 +68,7 @@ export default function ChessPageHeader({ children, className = "", title, descr
   return <header className={`chess-page-header ${className}`} style={{ "--chess-header-accent": accent } as CSSProperties}>
     <HeaderBrand name={name} mode={mode} description={description} />
     {children && <div className="chess-header-details">{children}</div>}
-    {mode === "Hotseat" && !pathname.includes("/3dchess") && <BoardAnimationToggle />}
+    {mode === "Hotseat" && !pathname.includes("/3dchess") && !pathname.startsWith("/chess-custom") && <BoardAnimationToggle />}
     <ChessAudioMenu />
     <ChessAppearance />
     <NavigationControls />
