@@ -1,8 +1,13 @@
 import type { PlutoCustomId } from "../games/chess/custom/library/plutoVariants.ts";
+import { JANMANN } from "../games/chess/janmann/config.ts";
 
 export type VariantCard = {
   id: string;
   customId?: PlutoCustomId;
+  author?: string;
+  source?: "community";
+  configurable?: boolean;
+  collections?: readonly ("community" | "pluto")[];
   configureRoute?: string;
   icon: string;
   title: string;
@@ -129,6 +134,22 @@ export const variants: VariantCard[] = [
     rulesRoute: "/games/chess/variants/fogofwar/rules",
     multiplayerRoute: "/games/chess/variants/fog-of-war/multiplayer",
     accent: "sky",
+  },
+  {
+    id: JANMANN.id,
+    title: JANMANN.name,
+    author: JANMANN.author,
+    source: JANMANN.source,
+    configurable: JANMANN.configurable,
+    collections: JANMANN.collections,
+    icon: "◈",
+    subtitle: "Think differently...",
+    description: JANMANN.description,
+    tags: ["Community", "3D", "Pluto Variant", "Experimental"],
+    available: true,
+    accent: "amber",
+    route: "/chess-custom/janmanns-gambit",
+    rulesRoute: "/chess-custom/janmanns-gambit/rules",
   },
   {
     id: "tectonic",

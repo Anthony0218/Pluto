@@ -4,6 +4,8 @@ import { BookOpen } from "lucide-react";
 import type { VariantCard } from "@/data/chessVariants";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import CustomVariantArtwork from "./CustomVariantArtwork";
+import JanmannGambitArtwork from "./JanmannGambitArtwork";
+import { JANMANN } from "@/games/chess/janmann/config";
 
 import { accentClasses, accentGlow, accentShadow } from "./variantCardStyles";
 
@@ -99,6 +101,7 @@ export function VariantArtwork({
     footer: "CHESS VARIANT",
   };
 
+  if (variant.id === JANMANN.id) return <JanmannGambitArtwork compact={compact} />;
   if (variant.customId) return <CustomVariantArtwork variant={variant} compact={compact} />;
 
   return (
@@ -136,6 +139,35 @@ export function VariantArtwork({
   );
 }
 
+/** Shared compact card proportions for official and player-created variants. */
+export function VariantCardFrame({
+  artwork,
+  children,
+  accent = "sky",
+  labelledBy,
+}: {
+  artwork: ReactNode;
+  children: ReactNode;
+  accent?: VariantCard["accent"];
+  labelledBy?: string;
+}) {
+  return (
+    <article
+      aria-labelledby={labelledBy}
+      className={`group relative w-full overflow-hidden rounded-[13px] border bg-black/50 transition duration-300 hover:-translate-y-0.5 ${accentClasses[accent]} ${accentShadow[accent]}`}
+    >
+      <div className="grid min-h-[180px] grid-cols-[34%_minmax(0,1fr)]">
+        <div className="relative overflow-hidden border-r border-white/[0.08]">
+          {artwork}
+        </div>
+        <div className="relative flex min-w-0 flex-col p-3.5">
+          {children}
+        </div>
+      </div>
+    </article>
+  );
+}
+
 export function VariantDesignCard({
   variant,
   translate = ui,
@@ -153,60 +185,50 @@ export function VariantDesignCard({
 }) {
   useUiLanguage();
   return (
-    <article
-      className={`group relative w-full overflow-hidden rounded-[13px] border bg-black/50 transition duration-300 hover:-translate-y-0.5 ${accentClasses[variant.accent]} ${accentShadow[variant.accent]}`}
-    >
-      <div className="grid min-h-[180px] grid-cols-[34%_minmax(0,1fr)]">
-        <div className="relative overflow-hidden border-r border-white/[0.08]">
-          <VariantArtwork variant={variant} compact />
-        </div>
-
-        <div className="relative flex min-w-0 flex-col p-3.5">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <p className="text-[8px] font-black uppercase tracking-[0.18em] text-zinc-600">
-                {String(number).padStart(2, "0")} ·{" "}
-                {translate(variant.subtitle)}
-              </p>
-              <h3 className="mt-1.5 font-serif text-[20px] leading-tight text-white">
-                {translate(variant.title)}
-              </h3>
-            </div>
-
-            <span
-              className={`shrink-0 rounded-full border px-2 py-1 text-[7px] font-black uppercase tracking-wider ${
-                variant.available
-                  ? "border-emerald-400/35 bg-emerald-400/10 text-emerald-300"
-                  : "border-amber-400/30 bg-amber-400/[0.08] text-amber-300"
-              }`}
-            >
-              {badge ?? translate(variant.customId ? "Configurable" : variant.available ? "Available" : "Coming soon")}
-            </span>
-          </div>
-
-          <p className="mt-2 line-clamp-2 font-serif text-[12px] leading-[1.45rem] text-zinc-400">
-            {translate(variant.description)}
+    <VariantCardFrame accent={variant.accent} artwork={<VariantArtwork variant={variant} compact />}>
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-[8px] font-black uppercase tracking-[0.18em] text-zinc-600">
+            {String(number).padStart(2, "0")} ·{" "}
+            {translate(variant.subtitle)}
           </p>
-
-          <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-            {variant.tags.slice(0, 2).map((tag) => (
-              <span
-                key={tag}
-                className={`rounded-full border px-2 py-0.5 text-[8px] font-semibold ${accentClasses[variant.accent]}`}
-              >
-                {translate(tag)}
-              </span>
-            ))}
-            {showConfigure && variant.configureRoute && <Link to={variant.configureRoute} className="ml-auto text-[9px] font-semibold text-zinc-300 underline underline-offset-2">{translate("Customize")}</Link>}
-            {variant.rulesRoute && <Link to={variant.rulesRoute} className="ml-auto inline-flex items-center gap-1 rounded-lg border border-white/15 bg-white/[.05] px-2 py-1 text-[9px] font-semibold text-zinc-300 transition hover:bg-white/10 hover:text-white"><BookOpen size={12} />{translate("Rules")}</Link>}
-          </div>
-
-          <div className="mt-auto pt-3">
-            {actions}
-          </div>
+          <h3 className="mt-1.5 font-serif text-[20px] leading-tight text-white">
+            {translate(variant.title)}
+          </h3>
+          {variant.author && <p className="mt-1 text-[10px] text-zinc-400">{translate("by")} {variant.author}</p>}
         </div>
+
+        <span
+          className={`shrink-0 rounded-full border px-2 py-1 text-[7px] font-black uppercase tracking-wider ${
+            variant.available
+              ? "border-emerald-400/35 bg-emerald-400/10 text-emerald-300"
+              : "border-amber-400/30 bg-amber-400/[0.08] text-amber-300"
+          }`}
+        >
+          {badge ?? translate(variant.configurable === false ? "Not configurable" : variant.customId ? "Configurable" : variant.available ? "Available" : "Coming soon")}
+        </span>
       </div>
-    </article>
+
+      <p className="mt-2 line-clamp-2 font-serif text-[12px] leading-[1.45rem] text-zinc-400">
+        {translate(variant.description)}
+      </p>
+
+      <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+        {variant.tags.slice(0, 2).map((tag) => (
+          <span
+            key={tag}
+            className={`rounded-full border px-2 py-0.5 text-[8px] font-semibold ${accentClasses[variant.accent]}`}
+          >
+            {translate(tag)}
+          </span>
+        ))}
+        {showConfigure && variant.configureRoute && <Link to={variant.configureRoute} className="ml-auto text-[9px] font-semibold text-zinc-300 underline underline-offset-2">{translate("Customize")}</Link>}
+        {variant.rulesRoute && <Link to={variant.rulesRoute} className="ml-auto inline-flex items-center gap-1 rounded-lg border border-white/15 bg-white/[.05] px-2 py-1 text-[9px] font-semibold text-zinc-300 transition hover:bg-white/10 hover:text-white"><BookOpen size={12} />{translate("Rules")}</Link>}
+      </div>
+
+      <div className="mt-auto pt-3">
+        {actions}
+      </div>
+    </VariantCardFrame>
   );
 }
-

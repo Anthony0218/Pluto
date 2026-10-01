@@ -21,7 +21,7 @@ const links = [
   { label: "Leaderboards", href: "/leaderboards", icon: Trophy },
   { label: "Profile", href: "/profile", icon: UserRound },
 ];
-const sidebarLessons = ["Chess Puzzles", "Chess rules", "Schafkopfen Rules"].flatMap((title) =>
+const sidebarLessons = ["Chess Puzzles", "Chess Analysis", "Chess rules", "Schafkopfen Rules"].flatMap((title) =>
   learningResources.filter((resource) => resource.title === title),
 );
 

@@ -1,5 +1,5 @@
 import { variants } from "@/data/chessVariants";
-import { VariantArtwork, VariantDesignCard } from "@/components/chess/VariantDesignCard";
+import { VariantArtwork, VariantCardFrame, VariantDesignCard } from "@/components/chess/VariantDesignCard";
 import { Link, useNavigate } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import { KING_BEHAVIORS, matchKingBehavior } from "@/games/chess/custom/engine/presets";
@@ -324,7 +324,7 @@ export default function CommunityView({ scope = "players" }: { scope?: "pluto" |
       {status === "loading" && entries.length === 0 ? (
         <ul className="grid gap-5 lg:grid-cols-2 2xl:grid-cols-3" aria-busy="true" aria-label={ui("Loading community variants")}>
           {[0, 1, 2].map((index) => (
-            <li key={index} className="h-[400px] rounded-3xl border border-white/[0.06] bg-white/[0.02] motion-safe:animate-pulse" />
+            <li key={index} className="min-h-[180px] rounded-[13px] border border-white/[0.06] bg-white/[0.02] motion-safe:animate-pulse" />
           ))}
         </ul>
       ) : status === "error" ? (
@@ -346,7 +346,7 @@ export default function CommunityView({ scope = "players" }: { scope?: "pluto" |
                     <Button size="sm" tone="primary" disabled={busyId === entry.id || entry.builtin?.available === false} onClick={() => setPlaying(entry)}><PlayIcon size={14} />{ui(entry.builtin?.available === false ? "Coming soon" : "Play")}</Button>
                     <Button size="sm" onClick={() => setViewing(entry)}><ViewIcon size={14} />{ui("View")}</Button>
                     {entry.configurable !== false && <Button size="sm" disabled={busyId === entry.id} onClick={() => void doRemix(entry)}><RemixIcon size={14} />{ui("Remix")}</Button>}
-                    <span className="ml-auto self-center text-[10px] text-zinc-500">{ui("by")} Pluto</span>
+                    <span className="ml-auto self-center text-[10px] text-zinc-500">{ui("by")} {entry.authorName}</span>
                   </div>
                 } />
               </li>
@@ -355,57 +355,56 @@ export default function CommunityView({ scope = "players" }: { scope?: "pluto" |
             const extra = previews[entry.id];
             return (
               <li key={entry.id} className="flex">
-                <article aria-labelledby={`community-${entry.id}`} className="flex w-full flex-col overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0d1014]/90 transition hover:border-amber-300/30">
-                  <button type="button" onClick={() => setViewing(entry)} className="relative block bg-[radial-gradient(ellipse_at_50%_110%,rgba(56,189,248,.12),transparent_60%),#090b0e] px-8 pb-5 pt-8" aria-label={`${ui("View")} ${entry.name}`}>
+                <VariantCardFrame labelledBy={`community-${entry.id}`} artwork={
+                  <button type="button" onClick={() => setViewing(entry)} className="relative flex h-full min-h-[180px] w-full items-center justify-center bg-[radial-gradient(ellipse_at_50%_110%,rgba(56,189,248,.12),transparent_60%),#090b0e] p-3 transition hover:bg-sky-400/[0.06] focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-amber-300" aria-label={`${ui("View")} ${entry.name}`}>
                     <CommunityPreview entry={entry} preview={extra?.preview} className="mx-auto aspect-square w-full max-w-[180px] drop-shadow-[0_14px_22px_rgba(0,0,0,.55)]" />
                     {(extra?.layerCount ?? 1) > 1 && (
-                      <span className="absolute bottom-3 right-3 inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[11px] font-semibold text-sky-100">
-                        <LayersIcon size={13} />
+                      <span className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[9px] font-semibold text-sky-100">
+                        <LayersIcon size={12} />
                         {extra?.layerCount}
                       </span>
                     )}
-                    {own && <span className="absolute left-3 top-3 rounded-full border border-amber-300/40 bg-amber-300/15 px-2.5 py-1 text-[11px] font-bold text-amber-100">{ui("Yours")}</span>}
+                    {own && <span className="absolute left-2 top-2 rounded-full border border-amber-300/40 bg-amber-300/15 px-2 py-1 text-[9px] font-bold text-amber-100">{ui("Yours")}</span>}
                   </button>
-                  <div className="flex flex-1 flex-col p-4">
-                    <h3 id={`community-${entry.id}`} className="truncate font-serif text-xl text-white">
-                      {entry.name}
-                    </h3>
-                    <p className="text-xs text-zinc-500">
-                      {ui("by")} <span className="text-zinc-300">{entry.authorName}</span> · {timeAgo(entry.publishedAt)}
-                    </p>
-                    <p className="mt-2 line-clamp-2 text-sm leading-5 text-zinc-400">{entry.description || ui("No description.")}</p>
-                    <div className="mt-3 flex flex-wrap gap-1.5">
-                      {entry.boardSize && <Chip>{entry.boardSize}</Chip>}
-                      {(extra?.layerCount ?? 1) > 1 && <Chip tone="sky">{extra?.layerCount} {ui("Layers")}</Chip>}
-                      {!entry.builtin && <Chip>{entry.pieceTypes} {ui("piece types")}</Chip>}
-                      {!entry.official && <Chip>{entry.playCount} {ui("plays")}</Chip>}
-              <ConfigurationChip entry={entry} />
-                    </div>
-                    <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-4">
-                      <Button size="sm" tone="primary" disabled={busyId === entry.id || entry.builtin?.available === false} onClick={() => setPlaying(entry)}>
-                        <PlayIcon size={14} />
-                        {ui(entry.builtin?.available === false ? "Coming soon" : "Play")}
-                      </Button>
-                      <Button size="sm" onClick={() => setViewing(entry)}>
-                        <ViewIcon size={14} />
-                        {ui("View")}
-                      </Button>
-                      {entry.configurable !== false && <Button size="sm" disabled={busyId === entry.id} onClick={() => void doRemix(entry)}>
-                        <RemixIcon size={14} />
-                        {ui("Remix")}
-                      </Button>}
-                      {!entry.official && <div className="ml-auto">
-                        <VoteControl entry={entry} onVote={(value) => void vote(entry, value)} disabled={!userId || own} reason={!userId ? ui("Sign in to vote") : own ? ui("You can't vote on your own variant") : undefined} />
-                      </div>}
-                    </div>
-                    {own && (
-                      <button type="button" onClick={() => setUnpublishing(entry)} className="mt-3 inline-flex items-center gap-1.5 self-start text-xs font-semibold text-zinc-400 underline-offset-2 hover:text-red-200 hover:underline">
-                        <PrivateIcon size={13} />
-                        {ui("Make private")}
-                      </button>
-                    )}
+                }>
+                  <h3 id={`community-${entry.id}`} className="font-serif text-[20px] leading-tight text-white">
+                    {entry.name}
+                  </h3>
+                  <p className="mt-1 text-[10px] text-zinc-500">
+                    {ui("by")} <span className="text-zinc-300">{entry.authorName}</span> · {timeAgo(entry.publishedAt)}
+                  </p>
+                  <p className="mt-2 line-clamp-2 font-serif text-[12px] leading-[1.45rem] text-zinc-400">{entry.description || ui("No description.")}</p>
+                  <div className="mt-2.5 flex flex-wrap gap-1.5">
+                    {entry.boardSize && <Chip>{entry.boardSize}</Chip>}
+                    {(extra?.layerCount ?? 1) > 1 && <Chip tone="sky">{extra?.layerCount} {ui("Layers")}</Chip>}
+                    {!entry.builtin && <Chip>{entry.pieceTypes} {ui("piece types")}</Chip>}
+                    {!entry.official && <Chip>{entry.playCount} {ui("plays")}</Chip>}
+                    <ConfigurationChip entry={entry} />
                   </div>
-                </article>
+                  <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-3">
+                    <Button size="sm" tone="primary" disabled={busyId === entry.id || entry.builtin?.available === false} onClick={() => setPlaying(entry)}>
+                      <PlayIcon size={14} />
+                      {ui(entry.builtin?.available === false ? "Coming soon" : "Play")}
+                    </Button>
+                    <Button size="sm" onClick={() => setViewing(entry)}>
+                      <ViewIcon size={14} />
+                      {ui("View")}
+                    </Button>
+                    {entry.configurable !== false && <Button size="sm" disabled={busyId === entry.id} onClick={() => void doRemix(entry)}>
+                      <RemixIcon size={14} />
+                      {ui("Remix")}
+                    </Button>}
+                    {!entry.official && <div className="ml-auto">
+                      <VoteControl entry={entry} onVote={(value) => void vote(entry, value)} disabled={!userId || own} reason={!userId ? ui("Sign in to vote") : own ? ui("You can't vote on your own variant") : undefined} />
+                    </div>}
+                  </div>
+                  {own && (
+                    <button type="button" onClick={() => setUnpublishing(entry)} className="mt-2 inline-flex items-center gap-1.5 self-start text-xs font-semibold text-zinc-400 underline-offset-2 hover:text-red-200 hover:underline">
+                      <PrivateIcon size={13} />
+                      {ui("Make private")}
+                    </button>
+                  )}
+                </VariantCardFrame>
               </li>
             );
           })}

@@ -16,7 +16,7 @@ const play = (variant, state, from, to) => {
   return applyMove(variant, state, move);
 };
 
-test("every visible menu variant is a Pluto non-configurable Community card with its canonical launch route", async () => {
+test("every visible built-in variant preserves authored attribution and its canonical launch route", async () => {
   const catalog = plutoCommunityCatalog();
   const builtins = catalog.filter((entry) => entry.kind === "builtin");
   const visible = variants.filter((entry) => entry.available && !entry.customId);
@@ -24,7 +24,7 @@ test("every visible menu variant is a Pluto non-configurable Community card with
   const routes = readFileSync(new URL("../src/main.tsx", import.meta.url), "utf8");
   const service = createCommunityService(offline);
   for (const entry of builtins) {
-    assert.equal(entry.authorName, "Pluto");
+    assert.equal(entry.authorName, entry.builtin.author ?? "Pluto");
     assert.equal(entry.configurable, false);
     assert.equal(entry.builtin, variants.find((variant) => variant.id === entry.builtin.id));
     assert.ok(routes.includes(`path: "${entry.builtin.hotseatRoute ?? entry.builtin.route}"`), entry.name);
@@ -92,13 +92,13 @@ test("Community merges remote entries, searches, sorts and paginates without dup
     assert.deepEqual(actual.map((row) => row.id), expected.map((row) => row.id));
     assert.equal(new Set(actual.map((row) => row.id)).size, expected.length);
   }
-  assert.equal((await service.list("top", "Pluto", 100)).length, catalog.length);
+  assert.equal((await service.list("top", "Pluto", 100)).length, mergeCommunityEntries([], catalog, "top", "Pluto").length);
   const offlineService = createCommunityService(offline);
   const first = await offlineService.list("top");
   assert.equal(offlineService.remoteUnavailable, true);
   assert.deepEqual((await createCommunityService(offline).list("top")).map((row) => row.id), first.map((row) => row.id));
   assert.equal((await offlineService.list("top", "pluto team"))[0].id, "pluto-team-chess");
-  assert.ok(first.every((row) => row.authorName === "Pluto"));
+  assert.ok(first.every((row) => row.authorName === (row.builtin?.author ?? "Pluto")));
 });
 
 test("Pluto and player tabs have separate catalogs and pagination", async () => {
@@ -117,8 +117,10 @@ test("Pluto and player tabs have separate catalogs and pagination", async () => 
     ...await service.list("top", "", 24, 0, "players"),
     ...await service.list("top", "", 24, 24, "players"),
   ];
-  assert.equal(players.length, remote.length);
-  assert.ok(players.every((entry) => !entry.official && entry.authorName === "Player"));
+  const authored = catalog.filter((entry) => entry.builtin?.collections?.includes("community"));
+  assert.equal(players.length, remote.length + authored.length);
+  assert.deepEqual(players.slice(0, authored.length).map((entry) => entry.id), authored.map((entry) => entry.id));
+  assert.ok(players.slice(authored.length).every((entry) => !entry.official && entry.authorName === "Player"));
 });
 
 test("2v2 rotates armies, blocks allied captures and attacks, and allows enemy captures", () => {
@@ -246,7 +248,8 @@ test("all Pluto documents survive deterministic legal play without corrupting po
 
 test("official catalog follows the menu under every community sort, including editable games", () => {
   const catalog = plutoCommunityCatalog();
-  assert.deepEqual(variants.slice(1, 4).map((card) => card.id), ["four-player", "pluto-team-chess", "pluto-team-chess-long"]);
+  const teamIds = ["four-player", "pluto-team-chess", "pluto-team-chess-long"];
+  assert.deepEqual(variants.filter((card) => teamIds.includes(card.id)).map((card) => card.id), teamIds);
   const expected = variants.filter((card) => card.available).map((card) => card.customId ?? `pluto-builtin-${card.id}`);
   for (const sort of ["top", "new", "played"]) {
     assert.deepEqual(mergeCommunityEntries([], catalog, sort).map((entry) => entry.id), expected);

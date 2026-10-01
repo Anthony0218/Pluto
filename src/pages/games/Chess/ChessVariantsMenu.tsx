@@ -490,7 +490,7 @@ function VariantPreviewCarousel({ language }: { language: Language }) {
 
   return (
     <section
-      className="group relative w-full max-w-[680px] min-h-[250px] overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0d1014]/90 shadow-[0_28px_90px_rgba(0,0,0,.35)]"
+      className="group relative w-full max-w-[680px] h-[228px] overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0d1014]/90 shadow-[0_28px_90px_rgba(0,0,0,.35)]"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -505,7 +505,7 @@ function VariantPreviewCarousel({ language }: { language: Language }) {
             key={`${variant.id}-${index}`}
             className="variant-slide min-w-full p-3 sm:p-4"
           >
-            <div className="grid min-h-[218px] gap-3 md:grid-cols-[minmax(0,1fr)_35%]">
+            <div className="grid h-[196px] gap-3 md:grid-cols-[minmax(0,1fr)_35%]">
               <div className="relative z-10 flex min-w-0 flex-col">
                 <div className="flex items-center justify-between gap-3">
                   <span className={`rounded-full border px-3 py-1 text-[9px] font-black uppercase tracking-[0.17em] ${variant.available ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-300" : "border-amber-400/30 bg-amber-400/[0.08] text-amber-300"}`}>
@@ -518,13 +518,13 @@ function VariantPreviewCarousel({ language }: { language: Language }) {
                 </div>
 
                 {/* Fixed-height regions keep the play and navigation buttons in the same place for every variant. */}
-                <p className="mt-2 h-4 truncate text-[10px] font-black uppercase tracking-[0.30em] text-amber-300/90">
+                <p className="hidden h-4 truncate text-[10px] font-black uppercase tracking-[0.30em] text-amber-300/90">
                   {t(language, variant.subtitle)}
                 </p>
                 <h2 className="variant-slide-title mt-1 line-clamp-2 h-[2.1em] overflow-hidden font-serif text-2xl leading-[1.02] tracking-[-0.025em] text-white">
                   {t(language, variant.title)}
                 </h2>
-                <p className="variant-slide-desc mt-1 line-clamp-2 h-10 max-w-xl font-serif text-[12px] leading-5 text-zinc-300/80">
+                <p className="variant-slide-desc mt-1 line-clamp-2 h-8 max-w-xl font-serif text-[11px] leading-4 text-zinc-300/80">
                   {t(language, variant.description)}
                 </p>
 
@@ -562,16 +562,16 @@ function VariantPreviewCarousel({ language }: { language: Language }) {
         ))}
       </div>
 
-      <div className="absolute bottom-4 left-1/2 z-20 hidden -translate-x-1/2 gap-1.5 md:flex">
+      <div className="absolute bottom-5 right-5 z-20 hidden max-w-[220px] justify-end gap-1 md:flex">
         {previewOrder.map((variant, index) => (
           <button
             key={`${variant.id}-dot`}
             type="button"
             onClick={() => goTo(index)}
-            className={`h-2 rounded-full transition-all ${
+            className={`h-1.5 rounded-full transition-all ${
               index === previewIndex
-                ? "w-7 bg-white/75"
-                : "w-2 bg-white/20 hover:bg-white/35"
+                ? "w-5 bg-white/75"
+                : "w-1.5 bg-white/20 hover:bg-white/35"
             }`}
             aria-label={`${t(language, variant.title)} ${index + 1}`}
           />
@@ -658,7 +658,7 @@ function VariantActionButtons({
 }
 
 function VariantCardView({ variant, language, number }: { variant: VariantCard; language: Language; number: number }) {
-  return <VariantDesignCard variant={variant} number={number} translate={(key) => t(language, key)} showConfigure={false} badge={t(language, variant.available ? "Available" : "Coming soon")} actions={<VariantActionButtons variant={variant} language={language} />} />;
+  return <VariantDesignCard variant={variant} number={number} translate={(key) => t(language, key)} showConfigure={false} badge={ui(variant.configurable === false ? "Not configurable" : variant.available ? "Available" : "Coming soon")} actions={<VariantActionButtons variant={variant} language={language} />} />;
 }
 
 export default function ChessVariantsMenu() {
@@ -685,7 +685,7 @@ export default function ChessVariantsMenu() {
       </ChessPageHeader>
 
       <div className="relative mx-auto w-full max-w-[1800px] px-4 pb-16 sm:px-6">
-        <header className="grid items-start gap-5 pt-6 xl:grid-cols-[minmax(0,290px)_minmax(0,680px)] xl:gap-6">
+        <header className="grid items-start gap-5 pt-6 lg:grid-cols-[minmax(0,320px)_minmax(0,680px)] lg:gap-10">
           <div className="min-w-0 max-w-2xl">
             <Link to="/games/chess" className="mb-6 inline-flex items-center gap-2 text-sm text-zinc-500 transition hover:text-white">
               <span aria-hidden="true">←</span>{t(language, "Back to Chess")}

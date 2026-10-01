@@ -13,7 +13,7 @@ export function plutoCommunityCatalog(includeUpcoming = false): CatalogEntry[] {
       const variant = createPlutoVariant(card.customId);
       return { ...common, id: card.customId, kind: "custom", configurable: true, variant, playerCount: variant.teams.length, name: variant.name, description: variant.description ?? "", boardSize: `${variant.board.width}×${variant.board.height}`, pieceTypes: variant.pieces.length };
     }
-    return { ...common, id: `pluto-builtin-${card.id}`, kind: "builtin", configurable: false, builtin: card, playerCount: card.id === "four-player" ? 4 : 2, name: card.title, description: card.description, boardSize: "", pieceTypes: 0 };
+    return { ...common, ownerId: card.source === "community" ? null : common.ownerId, authorName: card.author ?? common.authorName, id: `pluto-builtin-${card.id}`, kind: "builtin", configurable: false, builtin: card, playerCount: card.id === "four-player" ? 4 : 2, name: card.title, description: card.description, boardSize: "", pieceTypes: 0 };
   });
 }
 

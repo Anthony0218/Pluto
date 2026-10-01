@@ -85,6 +85,7 @@ export function summarize(variant: SummarySource): VariantSummary {
     preview: buildVariantPreview({
       board: variant.board,
       setup: variant.setup,
+      pieces: variant.pieces,
       teams: variant.teams,
       theme: variant.theme,
       royalTypes: variant.pieces?.filter((piece) => piece.royal).map((piece) => piece.id),

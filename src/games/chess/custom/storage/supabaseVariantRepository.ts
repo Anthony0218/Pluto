@@ -23,9 +23,10 @@ interface VariantRow {
   version: number;
   updated_at: string;
   created_at?: string;
-  /* Card previews: only the small parts of the JSON document, never the piece rules. */
+  /* Card previews: board, setup and piece definitions, without event or runtime state. */
   board?: GameVariant["board"] | null;
   setup?: GameVariant["setup"] | null;
+  pieces?: GameVariant["pieces"] | null;
   teams?: GameVariant["teams"] | null;
   settings?: GameVariant["settings"] | null;
   victory?: GameVariant["victoryConditions"] | null;
@@ -33,7 +34,7 @@ interface VariantRow {
   preset?: string | null;
 }
 
-const LIST_COLUMNS = "client_id,name,description,board_size,piece_types,version,updated_at,created_at,board:data->board,setup:data->setup,teams:data->teams,settings:data->settings,victory:data->victoryConditions,theme:data->theme,preset:data->>presetId";
+const LIST_COLUMNS = "client_id,name,description,board_size,piece_types,version,updated_at,created_at,board:data->board,setup:data->setup,pieces:data->pieces,teams:data->teams,settings:data->settings,victory:data->victoryConditions,theme:data->theme,preset:data->>presetId";
 
 function rowSummary(row: VariantRow): VariantSummary {
   const fallback: VariantSummary = {
@@ -59,6 +60,7 @@ function rowSummary(row: VariantRow): VariantSummary {
         presetId: row.preset ?? undefined,
         board: row.board,
         setup: row.setup ?? undefined,
+        pieces: row.pieces ?? undefined,
         teams: row.teams ?? undefined,
         settings: row.settings ?? undefined,
         victoryConditions: row.victory ?? undefined,

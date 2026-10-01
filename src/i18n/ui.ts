@@ -4,6 +4,7 @@ import dashboard from "./dashboardTranslations.json";
 import esPt from "./esPtTranslations.json";
 import eatIt from "./eatItTranslations.json";
 import chessCustom from "./chessCustomTranslations.json";
+import janmann from "./janmannTranslations.json";
 import { getAppLanguage, useAppLanguage, type AppLanguage } from "./languageStore";
 
 export const useUiLanguage = useAppLanguage;
@@ -18,6 +19,7 @@ for (const language of ["de", "bar", "ko", "ru", "es", "pt"]) {
   Object.assign(lookup[language], (esPt as Table)[language]);
   Object.assign(lookup[language], (eatIt as Table)[language]);
   Object.assign(lookup[language], (chessCustom as Table)[language]);
+  Object.assign(lookup[language], (janmann as Table)[language]);
 }
 
 export function translateUi(language: AppLanguage, input: string): string {

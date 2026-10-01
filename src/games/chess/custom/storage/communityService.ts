@@ -17,7 +17,8 @@ export interface CommunityEntry {
   builtin?: VariantCard;
   playerCount?: number;
   id: string;
-  ownerId: string;
+  /** Authored display attribution may have no linked account. */
+  ownerId: string | null;
   authorName: string;
   name: string;
   description: string;
@@ -90,8 +91,9 @@ export function createCommunityService(client: SupabaseClient) {
       } catch {
         remoteUnavailable = true;
       }
-      return mergeCommunityEntries(remote, scope === "players" ? [] : catalog, sort, search)
-        .filter((entry) => scope !== "players" || !official(entry.id))
+      const scopedCatalog = scope === "players" ? catalog.filter((entry) => entry.builtin?.collections?.includes("community")) : catalog;
+      return mergeCommunityEntries(remote, scopedCatalog, sort, search)
+        .filter((entry) => scope !== "players" || !official(entry.id) || entry.builtin?.collections?.includes("community"))
         .slice(offset, offset + limit);
     },
     /** Loads a published variant as a fresh, validated remix the player can edit freely. */
@@ -127,13 +129,13 @@ export function createCommunityService(client: SupabaseClient) {
       }
       ids = ids.filter((id) => !official(id));
       if (!ids.length) return out;
-      const { data, error } = await client.from("chess_custom_published").select("id,board:data->board,setup:data->setup,teams:data->teams,theme:data->theme").in("id", ids);
+      const { data, error } = await client.from("chess_custom_published").select("id,board:data->board,setup:data->setup,pieces:data->pieces,teams:data->teams,theme:data->theme").in("id", ids);
       if (error) return out;
-      for (const row of (data ?? []) as { id: string; board: GameVariant["board"] | null; setup: GameVariant["setup"] | null; teams: GameVariant["teams"] | null; theme: GameVariant["theme"] | null }[]) {
+      for (const row of (data ?? []) as { id: string; board: GameVariant["board"] | null; setup: GameVariant["setup"] | null; pieces: GameVariant["pieces"] | null; teams: GameVariant["teams"] | null; theme: GameVariant["theme"] | null }[]) {
         if (!row.board || !Array.isArray(row.board.cells)) continue;
         try {
           out[row.id] = {
-            preview: buildVariantPreview({ board: row.board, setup: row.setup ?? undefined, teams: row.teams ?? undefined, theme: row.theme ?? undefined }),
+            preview: buildVariantPreview({ board: row.board, setup: row.setup ?? undefined, pieces: row.pieces ?? undefined, teams: row.teams ?? undefined, theme: row.theme ?? undefined }),
             layerCount: 1 + (row.board.layers?.length ?? 0),
           };
         } catch {
