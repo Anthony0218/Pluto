@@ -1,0 +1,10 @@
+// Cloudflare Workers static-assets deploy for the Vite build (no server code runs here).
+{
+  "name": "pluto",
+  "compatibility_date": "2026-09-30",
+  "assets": {
+    "directory": "./dist",
+    // Serve index.html for client-side routes like /games/card-builder/room/ABC.
+    "not_found_handling": "single-page-application"
+  }
+}
