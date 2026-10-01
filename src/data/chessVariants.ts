@@ -1,5 +1,9 @@
+import type { PlutoCustomId } from "../games/chess/custom/library/plutoVariants.ts";
+
 export type VariantCard = {
   id: string;
+  customId?: PlutoCustomId;
+  configureRoute?: string;
   icon: string;
   title: string;
   subtitle: string;
@@ -24,6 +28,8 @@ export type VariantCard = {
     | "pink"
     | "teal"
     | "blue";
+  /** Direct game route when route opens a setup/menu instead. */
+  hotseatRoute?: string;
   aiRoute?: string;
   multiplayerRoute?: string;
 };
@@ -43,6 +49,20 @@ export const variants: VariantCard[] = [
     rulesRoute: "/games/chess/variants/complete-chaos/rules",
     accent: "pink",
     multiplayerRoute: "/games/chess/variants/complete-chaos/multiplayer",
+  },
+  {
+    id: "four-player",
+    icon: "✣",
+    title: "Four Player Chess",
+    subtitle: "Four armies. One battlefield.",
+    description:
+      "Four players fight around a cross-shaped board. Checkmate eliminates a player; the last army standing wins.",
+    tags: ["4 Players", "Free-for-all", "Elimination"],
+    available: true,
+    route: "/games/chess/variants/4-players/hotseat",
+    aiRoute: "/games/chess/variants/4-players/ai",
+    accent: "cyan",
+    multiplayerRoute: "/games/chess/variants/4-players/multiplayer",
   },
   {
     id: "draft",
@@ -73,6 +93,26 @@ export const variants: VariantCard[] = [
     rulesRoute: "/games/chess/variants/mirror/rules",
     accent: "zinc",
     multiplayerRoute: "/games/chess/variants/mirror/multiplayer",
+  },
+  {
+    id: "pluto-team-chess", customId: "pluto-team-chess", icon: "♞",
+    title: "Pluto Team Chess", subtitle: "Four armies. Two alliances.",
+    description: "Allied armies fight across a cross-shaped board. Capture both enemy kings and win together.",
+    tags: ["4 players", "2v2"], available: true, accent: "cyan",
+    route: "/chess-custom/play/hotseat?preset=pluto-team-chess",
+    aiRoute: "/chess-custom/play/singleplayer?preset=pluto-team-chess",
+    multiplayerRoute: "/chess-custom/play/multiplayer?preset=pluto-team-chess",
+    configureRoute: "/chess-custom/create/overview?preset=pluto-team-chess",
+  },
+  {
+    id: "pluto-team-chess-long", customId: "pluto-team-chess-long", icon: "♞",
+    title: "Team Chess Long Edition", subtitle: "Stand together. Face the enemy.",
+    description: "Two armies side by side on each edge of a 16×8 board. Coordinate with your ally to break the opposing team.",
+    tags: ["16\u00d78", "2v2"], available: true, accent: "teal",
+    route: "/chess-custom/play/hotseat?preset=pluto-team-chess-long",
+    aiRoute: "/chess-custom/play/singleplayer?preset=pluto-team-chess-long",
+    multiplayerRoute: "/chess-custom/play/multiplayer?preset=pluto-team-chess-long",
+    configureRoute: "/chess-custom/create/overview?preset=pluto-team-chess-long",
   },
 
   {
@@ -119,21 +159,6 @@ export const variants: VariantCard[] = [
     rulesRoute: "/games/chess/variants/roulette/rules",
     accent: "fuchsia",
     multiplayerRoute: "/games/chess/variants/roulette/multiplayer",
-  },
-
-  {
-    id: "four-player",
-    icon: "✣",
-    title: "Four Player Chess",
-    subtitle: "Four armies. One battlefield.",
-    description:
-      "Four players fight around a cross-shaped board. Checkmate eliminates a player; the last army standing wins.",
-    tags: ["4 Players", "Free-for-all", "Elimination"],
-    available: true,
-    route: "/games/chess/variants/4-players/hotseat",
-    aiRoute: "/games/chess/variants/4-players/ai",
-    accent: "cyan",
-    multiplayerRoute: "/games/chess/variants/4-players/multiplayer",
   },
 
   {
@@ -220,9 +245,20 @@ export const variants: VariantCard[] = [
       "A future chess variant played across multiple vertical layers, where pieces can attack, defend and move through three-dimensional space.",
     tags: ["3D Board", "Multiple Layers", "Future"],
     route: "/games/chess/3dchess",
+    hotseatRoute: "/games/chess/3dchess/hotseat",
 
     available: true,
     accent: "blue",
+  },
+  {
+    id: "pluto-chaos-chess", customId: "pluto-chaos-chess", icon: "♞",
+    title: "Pluto Chaos Chess", subtitle: "A royal rumble with a twist",
+    description: "Dragons, Cannons and explosive Bombers battle across portals and ice. In round six, every pawn awakens with Dragon powers.",
+    tags: ["Fairy pieces", "Portals"], available: true, accent: "violet",
+    route: "/chess-custom/play/hotseat?preset=pluto-chaos-chess",
+    aiRoute: "/chess-custom/play/singleplayer?preset=pluto-chaos-chess",
+    configureRoute: "/chess-custom/create/overview?preset=pluto-chaos-chess",
+    multiplayerRoute: "/chess-custom/play/multiplayer?preset=pluto-chaos-chess",
   },
   {
     id: "king-of-the-hill",

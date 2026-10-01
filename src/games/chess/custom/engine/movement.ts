@@ -1,5 +1,5 @@
 import { boardLayers, coordKey3D, getCell, inBounds, squareName } from "./board.ts";
-import { pieceAt, ruleEnabled, toBoardOffset, type Position } from "./position.ts";
+import { areAllies, pieceAt, ruleEnabled, toBoardOffset, type Position } from "./position.ts";
 import type { Coord, MoveSource, MovementRule, PieceDefinition, PieceInstance } from "./types.ts";
 
 /**
@@ -106,7 +106,7 @@ function classify(
       def.abilities.includes("enPassant") &&
       ruleEnabled(variant, "enPassant");
     const victim = canEnPassant ? state.pieces.find((entry) => entry.id === ep!.pieceId) : undefined;
-    if (victim && victim.team !== piece.team) {
+    if (victim && !areAllies(variant, victim.team, piece.team)) {
       emit({ ...base, source: "enPassant", kind: "capture", legal: true, reason: `en passant capture (${label})`, captureIds: [victim.id] });
       return;
     }
@@ -118,9 +118,9 @@ function classify(
     return;
   }
 
-  const ally = occupant.team === piece.team;
+  const ally = areAllies(variant, occupant.team, piece.team);
   if (ally && !ruleEnabled(variant, "friendlyFire")) {
-    if (explain) emit({ ...base, kind: "move", legal: false, reason: `${squareName(to)} is occupied by your own piece`, captureIds: [] });
+    if (explain) emit({ ...base, kind: "move", legal: false, reason: `${squareName(to)} is occupied by ${occupant.team === piece.team ? "your own piece" : "an allied piece"}`, captureIds: [] });
     return;
   }
   if (mode === "move") {

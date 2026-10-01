@@ -1,6 +1,6 @@
 import { applyMove, getLegalMoves } from "./game.ts";
 import { generateCandidates } from "./movement.ts";
-import { createPosition, getDefinition, opponentsOf } from "./position.ts";
+import { areAllies, createPosition, getDefinition, opponentsOf } from "./position.ts";
 import { searchBestMove } from "./search.ts";
 import type { GameState, GameVariant, Move, TeamId } from "./types.ts";
 
@@ -24,7 +24,7 @@ export const SEARCH_LEVELS: Record<"strategist" | "master", { maxDepth: number; 
 };
 
 function material(variant: GameVariant, state: GameState, team: TeamId) {
-  return state.pieces.filter((piece) => piece.team === team).reduce((sum, piece) => sum + Math.min(getDefinition(variant, piece.type)?.value ?? 1, 50), 0);
+  return state.pieces.filter((piece) => areAllies(variant, piece.team, team)).reduce((sum, piece) => sum + Math.min(getDefinition(variant, piece.type)?.value ?? 1, 50), 0);
 }
 
 /** Highest value the opponents could capture next move (pseudo-legal, cheap). */
@@ -32,11 +32,11 @@ function worstThreat(variant: GameVariant, state: GameState, team: TeamId) {
   const position = createPosition(variant, state);
   let worst = 0;
   for (const piece of state.pieces) {
-    if (piece.team === team) continue;
+    if (areAllies(variant, piece.team, team)) continue;
     for (const hit of generateCandidates(position, piece, { capturesOnly: true })) {
       for (const id of hit.captureIds) {
         const victim = state.pieces.find((entry) => entry.id === id);
-        if (victim?.team === team) worst = Math.max(worst, Math.min(getDefinition(variant, victim.type)?.value ?? 1, 50));
+        if (victim && areAllies(variant, victim.team, team)) worst = Math.max(worst, Math.min(getDefinition(variant, victim.type)?.value ?? 1, 50));
       }
     }
   }
@@ -50,7 +50,7 @@ function scoreMove(variant: GameVariant, state: GameState, move: Move, team: Tea
     if (after.result.draw) return -50;
     return -100_000;
   }
-  const opponents = opponentsOf(variant, after, team);
+  const opponents = opponentsOf(variant, after, team).filter((id, index, all) => !all.slice(0, index).some((other) => areAllies(variant, id, other)));
   const balance = material(variant, after, team) - opponents.reduce((sum, opponent) => sum + material(variant, after, opponent), 0);
   const tempo = after.turn === team ? 0.5 : 0;
   return balance * 10 - worstThreat(variant, after, team) * 8 + tempo + random() * 2;

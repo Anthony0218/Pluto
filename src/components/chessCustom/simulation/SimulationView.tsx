@@ -286,7 +286,7 @@ export default function SimulationView({ context }: { context: "create" | "play"
                 ) : (
                   <span className="flex items-center gap-2">
                     <span className="h-2.5 w-2.5 rounded-full ring-1 ring-white/40" style={{ background: turnTeam?.color }} />
-                    <span className="font-semibold">{turnTeam?.name}</span>
+                    <span className="font-semibold">{turnTeam?.name}{turnTeam?.alliance ? ` · ${turnTeam.alliance}` : ""}</span>
                     <span className="text-zinc-400">
                       {ui("to move")} · {players[state.turn] === "human" ? ui("your move") : session.playing || !playback ? ui("AI thinking…") : ui("press Play")}
                     </span>

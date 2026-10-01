@@ -1,6 +1,6 @@
 import { boardLayers, getCell, getLayer } from "./board.ts";
 import { applyMove, getLegalMoves } from "./game.ts";
-import { getDefinition, isFarRank } from "./position.ts";
+import { areAllies, getDefinition, isFarRank } from "./position.ts";
 import type { Coord, GameState, GameVariant, Move, PieceInstance, TeamId } from "./types.ts";
 
 /**
@@ -65,7 +65,7 @@ export function evaluatePosition(variant: GameVariant, state: GameState, team: T
   let score = 0;
   for (const piece of state.pieces) {
     const def = getDefinition(variant, piece.type);
-    const sign = piece.team === team ? 1 : -1;
+    const sign = areAllies(variant, piece.team, team) ? 1 : -1;
     let value = Math.min(def?.value ?? 1, def?.royal ? 20 : 60) * 100;
     if (!def?.royal) {
       // Central pieces control more squares in almost every variant.
@@ -127,7 +127,7 @@ export function searchBestMove(variant: GameVariant, root: GameState, options: S
     tick();
     const standPat = evaluatePosition(variant, state, team);
     if (state.result || depth <= 0) return standPat;
-    const maximizing = state.turn === team;
+    const maximizing = areAllies(variant, state.turn, team);
     if (maximizing) {
       if (standPat >= beta) return standPat;
       alpha = Math.max(alpha, standPat);
@@ -167,7 +167,7 @@ export function searchBestMove(variant: GameVariant, root: GameState, options: S
 
     const moves = orderMoves(variant, state, getLegalMoves(variant, state), cached?.best);
     if (!moves.length) return evaluatePosition(variant, state, team);
-    const maximizing = state.turn === team;
+    const maximizing = areAllies(variant, state.turn, team);
     const alphaStart = alpha;
     const betaStart = beta;
     let best = maximizing ? -Infinity : Infinity;

@@ -3,6 +3,7 @@ import { createRuntime, eliminateTeam, finishGame, fireTrigger, onlyRoyalsRemain
 import { generateCandidates, isSquareAttacked, type MoveCandidate } from "./movement.ts";
 import {
   activeTeams,
+  alliedTeams,
   createPosition,
   getDefinition,
   isFarRank,
@@ -285,7 +286,7 @@ function resolveTurnStart(variant: GameVariant, state: GameState, passes = 0) {
         eliminateTeam(variant, state, state.turn, `${teamName(variant, state.turn)} is checkmated`);
         return continueWithNext(0);
       }
-      const winners = opponentsOf(variant, state, state.turn);
+      const winners = [...new Set(opponentsOf(variant, state, state.turn).flatMap((id) => alliedTeams(variant, id)))];
       finishGame(state, winners, `Checkmate — ${winners.map((team) => teamName(variant, team)).join(" & ")} wins`);
       return;
     }
@@ -447,7 +448,7 @@ export function applyMove(variant: GameVariant, previous: GameState, move: Move)
   }
   if (move.promotion) fireTrigger(rt, { type: "promotion", context: { ...context, pieceType: move.promotion } });
 
-  if (suddenDeathBefore && captured.length) finishGame(state, [actor], `Sudden death — ${teamName(variant, actor)} made the next capture`);
+  if (suddenDeathBefore && captured.length) finishGame(state, alliedTeams(variant, actor), `Sudden death — ${teamName(variant, actor)} made the next capture`);
 
   // Danger tiles: a piece still standing on one after a full turn is lost.
   for (const piece of state.pieces.filter((entry) => entry.team === actor)) {

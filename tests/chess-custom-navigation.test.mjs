@@ -47,12 +47,13 @@ test("/chess-custom opens My Games and unknown sub-paths fall back to it", () =>
 });
 
 test("every area and Create step round-trips through its URL", () => {
-  for (const route of [{ view: "community" }, { view: "play", mode: "singleplayer" }, { view: "play", mode: "multiplayer" }, { view: "play", mode: "hotseat" }, ...CREATE_STEP_IDS.map((step) => ({ view: "create", step }))]) {
+  for (const route of [{ view: "community" }, { view: "pluto" }, { view: "play", mode: "singleplayer" }, { view: "play", mode: "multiplayer" }, { view: "play", mode: "hotseat" }, ...CREATE_STEP_IDS.map((step) => ({ view: "create", step }))]) {
     assert.deepEqual(parseChessCustomPath(chessCustomPath(route)), route);
   }
   assert.deepEqual(parseChessCustomPath("/chess-custom/create"), { view: "create", step: "overview" });
   // Playing a variant belongs to My Games in the top navigation.
   assert.equal(routeArea({ view: "play", mode: "hotseat" }), "library");
+  assert.equal(routeArea({ view: "pluto" }), "pluto");
 });
 
 test("old /games/chess/custom?section= links map onto the new structure", () => {

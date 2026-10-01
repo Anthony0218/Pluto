@@ -5,13 +5,14 @@ import { sameVariantReference, variantReference, type MultiplayerVariantReferenc
 export interface OnlineSnapshot {
   code: string;
   role: "host" | "guest";
+  seat: number;
   status: "waiting" | "playing" | "finished";
   version: number;
   variantReference: MultiplayerVariantReference;
   variant: GameVariant;
   state: GameState;
   history: Array<{ move: VariantMoveRequest; notation: string; team: string }>;
-  players: { host: string; guest: string | null };
+  players: string[];
 }
 
 export interface OnlinePreview {
@@ -19,6 +20,7 @@ export interface OnlinePreview {
   status: OnlineSnapshot["status"];
   variant: GameVariant;
   host: string;
+  playersJoined: number;
 }
 
 async function call(body: Record<string, unknown>): Promise<OnlineSnapshot> {

@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 
 export type PieceTheme = "classic" | "russian" | "geometric" | "elegant" | "jazz";
 export type BoardTheme = "wood" | "green" | "walnut" | "dark" | "marble" | "minimal" | "vintage";
-export const pieceThemes: PieceTheme[] = ["classic", "russian", "geometric", "elegant", "jazz"];
+export const pieceThemes: PieceTheme[] = ["elegant", "geometric", "russian", "jazz", "classic"];
 export const boardThemes: BoardTheme[] = ["wood", "green", "walnut", "dark", "marble", "minimal", "vintage"];
 export const boardColors: Record<BoardTheme, { light: string; dark: string; frame: string }> = {
   wood: { light: "#ead7b7", dark: "#82583d", frame: "#493323" },
@@ -34,7 +34,7 @@ const ChessSettingsContext = createContext<ChessSettingsContextType | null>(
 
 export function ChessSettingsProvider({ children }: { children: ReactNode }) {
   const [boardAnimationEnabled, setBoardAnimationEnabled] = useState(true);
-  const [pieceTheme, setPieceTheme] = useState<PieceTheme>(() => savedValue("chess-piece-theme", pieceThemes, "classic"));
+  const [pieceTheme, setPieceTheme] = useState<PieceTheme>(() => savedValue("chess-piece-theme", pieceThemes, pieceThemes[0]));
   const [boardTheme, setBoardTheme] = useState<BoardTheme>(() => savedValue("chess-board-theme", boardThemes, "wood"));
   useEffect(() => { try { localStorage.setItem("chess-piece-theme", pieceTheme); } catch { /* Storage is optional. */ } }, [pieceTheme]);
   useEffect(() => { try { localStorage.setItem("chess-board-theme", boardTheme); } catch { /* Storage is optional. */ } }, [boardTheme]);

@@ -100,49 +100,6 @@ body:has(.chess-game-grid) .chess-sidebar-toggle { display: block; }
 /* Hotseat headers keep variant status pills on their own row below the title and controls. */
 .chess-page-header:has(.chess-animation-control) .chess-header-details { order: 99; flex: 1 1 100%; width: 100%; padding-top: 10px; border-top: 1px solid color-mix(in srgb,var(--chess-header-accent) 18%,transparent); }
 .chess-page-header:has(.chess-animation-control) .chess-header-details > div:first-child { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
-.chess-variants-menu-page { height: var(--app-height); overflow: hidden; }
-.chess-variants-menu-page > div.relative { height: 100%; min-height: 0; }
-.chess-variants-menu-page > div.relative > section { min-height: 0; }
-.chess-variants-menu-page > div.relative > section > header,
-.chess-variants-menu-page > div.relative > section > div { min-height: 0; }
-.chess-variants-menu-page > div.relative > section > div > div { display: flex; flex-direction: column; height: 100%; min-height: 0; }
-.chess-variants-menu-page .variant-explorer-host { display: flex; flex: 1; flex-direction: column; min-height: 0; }
-.chess-variants-menu-page .variant-explorer-trigger { align-self: flex-start; flex-shrink: 0; }
-.chess-variants-menu-page .variant-explorer-stage { --explorer-height: 100%; flex: 1; min-height: 0; }
-.chess-variants-menu-page .variant-explorer-preview,
-.chess-variants-menu-page .variant-explorer { height: 100%; min-height: 0; }
-.chess-variants-menu-page .variant-explorer-preview > section { height: 100%; min-height: 0; overflow: clip; }
-.chess-variants-menu-page .variant-explorer-preview > section > div.relative.flex { height: auto; min-height: 100%; }
-.chess-variants-menu-page .variant-explorer-preview article > div { min-height: 0; }
-/* The slide never scrolls: on shorter screens its parts compact instead, so the play buttons always stay visible. */
-@media (max-height: 860px) {
-  .chess-variants-menu-page .variant-slide { padding-block: 16px; }
-  .chess-variants-menu-page .variant-slide-art { contain: size; }
-  .chess-variants-menu-page .variant-slide-title { font-size: 36px; margin-top: 4px; }
-  .chess-variants-menu-page .variant-slide-desc { height: 4.5rem; margin-top: 6px; font-size: 14px; line-height: 1.5; }
-  .chess-variants-menu-page .variant-slide-tags { margin-top: 8px; }
-  .chess-variants-menu-page .variant-slide-actions { margin-top: 10px; gap: 6px; }
-  .chess-variants-menu-page .variant-slide-actions > * { min-height: 34px; }
-  .chess-variants-menu-page .variant-slide-nav { padding-top: 10px; }
-  .chess-variants-menu-page .variant-slide-nav > button { height: 36px; width: 36px; }
-}
-@media (max-height: 800px) {
-  .chess-variants-menu-page .variant-slide-desc, .chess-variants-menu-page .variant-slide-tags { display: none; }
-  .chess-variants-menu-page .variant-slide-title { height: auto; -webkit-line-clamp: 1; }
-  .chess-variants-menu-page .variant-slide-actions { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .chess-variants-menu-page .variant-slide-nav { padding-top: 8px; }
-}
-@media (max-width: 1023px) {
-  .chess-variants-menu-page > div.relative > section { display: flex; flex-direction: column; }
-  .chess-variants-menu-page > div.relative > section > header { flex: 0 0 auto; padding: 16px 24px; }
-  .chess-variants-menu-page > div.relative > section > header .mb-8 { margin-bottom: 8px; }
-  .chess-variants-menu-page > div.relative > section > header h1 { margin-top: 8px; font-size: clamp(30px, 5vw, 48px); }
-  .chess-variants-menu-page > div.relative > section > header p.mt-6 { margin-top: 8px; font-size: 14px; line-height: 1.4; }
-  .chess-variants-menu-page > div.relative > section > header button { margin-top: 10px; padding: 7px 12px; }
-  .chess-variants-menu-page > div.relative > section > header .mt-12 { display: none; }
-  .chess-variants-menu-page > div.relative > section > div { flex: 1; overflow: hidden; padding: 12px 24px; }
-  .chess-variants-menu-page > div.relative > section > div > div { transform: none; }
-}
 @media (max-width:639px) {
   .chess-page-header { padding: 10px; gap: 10px; }
   .chess-header-brand { flex: 1 1 100%; }

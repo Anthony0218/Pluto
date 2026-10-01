@@ -57,8 +57,19 @@ export function activeTeams(variant: GameVariant, state: GameState) {
   return variant.teams.map((team) => team.id).filter((id) => !state.eliminated.includes(id));
 }
 
+export function areAllies(variant: GameVariant, a: TeamId, b: TeamId): boolean {
+  if (a === b) return true;
+  const alliance = variant.teams.find((team) => team.id === a)?.alliance;
+  return Boolean(alliance && alliance === variant.teams.find((team) => team.id === b)?.alliance);
+}
+
+/** Includes eliminated partners: victory belongs to the whole alliance. */
+export function alliedTeams(variant: GameVariant, team: TeamId): TeamId[] {
+  return variant.teams.filter((entry) => areAllies(variant, entry.id, team)).map((entry) => entry.id);
+}
+
 export function opponentsOf(variant: GameVariant, state: GameState, team: TeamId) {
-  return activeTeams(variant, state).filter((id) => id !== team);
+  return activeTeams(variant, state).filter((id) => !areAllies(variant, id, team));
 }
 
 export function teamName(variant: GameVariant, team: TeamId | undefined) {

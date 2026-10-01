@@ -12,8 +12,9 @@ import {
   updateCell,
   validateVariant,
 } from "../src/games/chess/custom/engine/index.ts";
-import { resolveRequestedMove, sameVariantReference, validateOnlineVariant, variantReference } from "../src/games/chess/custom/multiplayer/protocol.ts";
+import { joinOnlineSeats, onlineSeat, resolveRequestedMove, sameVariantReference, validateOnlineVariant, variantReference } from "../src/games/chess/custom/multiplayer/protocol.ts";
 import { createHistory, editorReducer } from "../src/games/chess/custom/editor/editorStore.ts";
+import { createPlutoVariant } from "../src/games/chess/custom/library/plutoVariants.ts";
 
 function layered(pieces, sizes = [8, 8, 8]) {
   const variant = createVariantFromPreset("three-level");
@@ -96,6 +97,27 @@ test("online move validation rejects illegal coordinates and mismatched rulebook
   reordered.pieces.find((piece) => piece.id === "rook").movement.pop();
   assert.ok(!sameVariantReference(first, await variantReference(reordered)));
   assert.deepEqual(validateOnlineVariant(variant), []);
+});
+
+test("four-player Pluto editions assign one online seat per team and wait for all four players", () => {
+  for (const id of ["pluto-team-chess", "pluto-team-chess-long"]) {
+    const variant = createPlutoVariant(id);
+    assert.deepEqual(validateOnlineVariant(variant), []);
+    let players = ["host"];
+    for (const user of ["red-player", "black-player", "blue-player"]) {
+      players = joinOnlineSeats(players, user, variant.teams.length);
+      assert.equal(onlineSeat(players, user), players.length - 1);
+      assert.equal(variant.teams[onlineSeat(players, user)].id, ["white", "red", "black", "blue"][players.length - 1]);
+    }
+    assert.deepEqual(joinOnlineSeats(players, "red-player", 4), players, "rejoining keeps the same seat");
+    assert.equal(joinOnlineSeats(players, "fifth-player", 4), null, "a full room rejects another player");
+
+    const state = createGameState(variant);
+    const move = getLegalMoves(variant, state)[0];
+    assert.ok(move);
+    assert.equal(state.turn, variant.teams[0].id);
+    assert.equal(applyMove(variant, state, move).turn, variant.teams[1].id);
+  }
 });
 
 test("reordering and deleting layers update positions and portal destinations", () => {

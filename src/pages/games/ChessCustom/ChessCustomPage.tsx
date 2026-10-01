@@ -148,6 +148,7 @@ function ChessCustomShell() {
         <ChessCustomNav route={route} onShowGuide={() => setGuideOpen(true)} />
         {route.view === "library" && <MyGamesView />}
         {route.view === "community" && <CommunityView />}
+        {route.view === "pluto" && <CommunityView scope="pluto" />}
         {route.view === "play" && route.mode === "multiplayer" && <OnlineMatchView />}
         {Section && (
           <>

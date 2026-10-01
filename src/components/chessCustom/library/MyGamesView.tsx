@@ -183,6 +183,7 @@ export default function MyGamesView() {
       <PlayModeDialog
         open={Boolean(playing)}
         variantName={playing?.name ?? ""}
+        playerCount={playing?.teamCount}
         onClose={() => setPlaying(null)}
         onChoose={(mode) => {
           const entry = playing;

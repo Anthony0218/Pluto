@@ -111,6 +111,7 @@ export default function VariantToolbar() {
       <PlayModeDialog
         open={playOpen}
         variantName={variant.name}
+        playerCount={variant.teams.length}
         onClose={() => setPlayOpen(false)}
         onChoose={(mode) => {
           setPlayOpen(false);

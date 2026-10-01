@@ -1,6 +1,6 @@
 import { getCell, sameCoord } from "./board.ts";
 import { eliminateTeam } from "./events.ts";
-import { activeTeams, getDefinition, isRoyal, opponentsOf, teamName } from "./position.ts";
+import { alliedTeams, areAllies, activeTeams, getDefinition, isRoyal, opponentsOf, teamName } from "./position.ts";
 import type { GameState, GameVariant, TeamId, VictoryCondition, VictoryType } from "./types.ts";
 
 /** Conditions resolved elsewhere: checkmate at turn start, event outcomes by actions. */
@@ -79,7 +79,7 @@ export function conditionMet(variant: GameVariant, state: GameState, condition: 
     }
     case "lastTeamStanding": {
       const alive = activeTeams(variant, state).filter((id) => state.pieces.some((piece) => piece.team === id));
-      return alive.length === 1 && alive[0] === team ? `${teamName(variant, team)} is the last team standing` : null;
+      return alive.includes(team) && alive.every((id) => areAllies(variant, team, id)) ? `${teamName(variant, team)} is the last team standing` : null;
     }
     case "checkmate":
     case "eventOutcome":
@@ -113,9 +113,9 @@ export function evaluateVictory(variant: GameVariant, state: GameState) {
     }
   }
   if (!winners.length) return;
-  const draw = winners.length > 1;
+  const draw = winners.some((entry) => !areAllies(variant, winners[0].team, entry.team));
   state.result = {
-    winners: winners.map((entry) => entry.team),
+    winners: [...new Set(winners.flatMap((entry) => alliedTeams(variant, entry.team)))],
     draw,
     reason: draw ? `Draw — ${winners.map((entry) => entry.reason).join("; ")}` : winners[0].reason,
   };

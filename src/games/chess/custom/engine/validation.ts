@@ -70,6 +70,10 @@ export function validateVariant(variant: GameVariant): ValidationIssue[] {
   /* Teams & setup */
   if (variant.teams.length < 2) add("error", "teams", "A game needs at least two teams.");
   if (teamIds.size !== variant.teams.length) add("error", "teams", "Two teams share the same internal id.");
+  if (variant.teams.length > 1 && variant.teams.every((team) => team.alliance && team.alliance === variant.teams[0].alliance)) add("error", "teams", "At least two opposing alliances or independent armies are required.");
+  for (const team of variant.teams) {
+    if (team.alliance !== undefined && (typeof team.alliance !== "string" || !team.alliance.trim() || team.alliance.length > 24)) add("error", "teams", "Alliance names must contain 1–24 characters.");
+  }
   const sides = new Map<string, string[]>();
   for (const team of variant.teams) sides.set(sideOf(team), [...(sides.get(sideOf(team)) ?? []), team.name]);
   for (const [side, names] of sides) if (names.length > 1) add("info", "teams", `${names.join(" and ")} both play from the ${side} side — their armies may overlap.`);

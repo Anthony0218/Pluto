@@ -7,17 +7,18 @@ import { AREA_ICONS } from "./icons/stepIcons";
 const AREAS: { id: TopLevelArea; label: string; to: ChessCustomRoute }[] = [
   { id: "library", label: "My Games", to: { view: "library" } },
   { id: "create", label: "Create", to: { view: "create", step: "overview" } },
+  { id: "pluto", label: "Pluto Variants", to: { view: "pluto" } },
   { id: "community", label: "Community", to: { view: "community" } },
 ];
 
-/** The three Chess Custom areas. Editor steps live inside Create, never up here. */
+/** The Chess Custom areas. Editor steps live inside Create, never up here. */
 export default function ChessCustomNav({ route, onShowGuide }: { route: ChessCustomRoute; onShowGuide: () => void }) {
   const active = routeArea(route);
   return (
     <div className="relative z-30 -mx-4 border-b border-white/[0.06] bg-[#07090b]/90 px-4 backdrop-blur-xl sm:-mx-6 sm:px-6">
       <div className="flex items-center gap-2">
         <nav aria-label={ui("Chess Custom")} className="min-w-0 flex-1">
-          <ul className="grid grid-cols-3 gap-1 sm:flex sm:gap-2">
+          <ul className="grid grid-cols-4 gap-1 sm:flex sm:gap-2">
             {AREAS.map((area) => {
               const Icon = AREA_ICONS[area.id];
               const current = active === area.id;

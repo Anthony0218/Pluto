@@ -20,11 +20,21 @@ export interface MultiplayerVariantReference {
 
 export function validateOnlineVariant(variant: GameVariant): string[] {
   const errors = validateVariant(variant).filter((issue) => issue.severity === "error").map((issue) => issue.message);
-  if (variant.teams.length !== 2) errors.push("Online Chess Custom currently supports exactly two teams.");
+  if (variant.teams.length !== 2 && variant.teams.length !== 4) errors.push("Online Chess Custom supports two or four teams.");
   if ((variant.board.layers?.length ?? 0) > 7) errors.push("A multiplayer board supports at most eight layers.");
   if (variant.setup.pieces.length > 256) errors.push("The starting position has too many pieces.");
   for (const team of variant.teams) if (!variant.setup.pieces.some((piece) => piece.team === team.id)) errors.push(`${team.name} needs at least one starting piece for online play.`);
   return errors;
+}
+
+/** Seats follow the variant's team order and never change after a player joins. */
+export function onlineSeat(players: readonly string[], userId: string): number {
+  return players.indexOf(userId);
+}
+
+export function joinOnlineSeats(players: readonly string[], userId: string, capacity: number): string[] | null {
+  if (onlineSeat(players, userId) !== -1) return [...players];
+  return players.length < capacity ? [...players, userId] : null;
 }
 
 function canonical(value: unknown): unknown {
