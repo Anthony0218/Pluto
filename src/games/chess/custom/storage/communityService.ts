@@ -1,0 +1,97 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { parseVariantJson } from "../engine/serialization.ts";
+import type { GameVariant } from "../engine/types.ts";
+import { variantMetadata } from "./supabaseVariantRepository.ts";
+
+export type CommunitySort = "top" | "new" | "played";
+
+export interface CommunityEntry {
+  id: string;
+  ownerId: string;
+  authorName: string;
+  name: string;
+  description: string;
+  boardSize: string;
+  pieceTypes: number;
+  playCount: number;
+  publishedAt: string;
+  upvotes: number;
+  downvotes: number;
+  score: number;
+  myVote: -1 | 0 | 1;
+}
+
+interface CommunityRow {
+  id: string;
+  owner_id: string;
+  author_name: string;
+  name: string;
+  description: string;
+  board_size: string;
+  piece_types: number;
+  play_count: number;
+  published_at: string;
+  upvotes: number;
+  downvotes: number;
+  score: number;
+  my_vote: number;
+}
+
+const toEntry = (row: CommunityRow): CommunityEntry => ({
+  id: row.id,
+  ownerId: row.owner_id,
+  authorName: row.author_name,
+  name: row.name,
+  description: row.description,
+  boardSize: row.board_size.replace("x", "×"),
+  pieceTypes: row.piece_types,
+  playCount: row.play_count,
+  publishedAt: row.published_at,
+  upvotes: row.upvotes,
+  downvotes: row.downvotes,
+  score: row.score,
+  myVote: Math.sign(row.my_vote) as -1 | 0 | 1,
+});
+
+/** Public gallery of published variants (`chess_custom_published`) with one vote per user. */
+export function createCommunityService(client: SupabaseClient) {
+  return {
+    async list(sort: CommunitySort, search = "", limit = 24, offset = 0): Promise<CommunityEntry[]> {
+      const { data, error } = await client.rpc("list_chess_custom_community", { p_sort: sort, p_search: search.trim(), p_limit: limit, p_offset: offset });
+      if (error) throw error;
+      return ((data ?? []) as CommunityRow[]).map(toEntry);
+    },
+    /** Loads a published variant as a fresh, validated remix the player can edit freely. */
+    async load(id: string): Promise<GameVariant> {
+      const { data, error } = await client.from("chess_custom_published").select("data,name").eq("id", id).maybeSingle();
+      if (error) throw error;
+      if (!data) throw new Error("This variant is no longer published.");
+      const result = parseVariantJson(JSON.stringify(data.data));
+      if (!result.variant) throw new Error(result.errors[0] ?? "This variant could not be read.");
+      void client.rpc("record_chess_custom_play", { p_published_id: id });
+      return result.variant;
+    },
+    async vote(id: string, value: -1 | 0 | 1) {
+      const { data, error } = await client.rpc("vote_chess_custom_variant", { p_published_id: id, p_value: value });
+      if (error) throw error;
+      const row = (Array.isArray(data) ? data[0] : data) as { upvotes: number; downvotes: number; my_vote: number };
+      return { upvotes: row.upvotes, downvotes: row.downvotes, myVote: Math.sign(row.my_vote) as -1 | 0 | 1 };
+    },
+    async publish(variant: GameVariant, description: string): Promise<string> {
+      const { data, error } = await client.rpc("publish_chess_custom_variant", {
+        p_client_id: variant.id,
+        ...variantMetadata(variant),
+        p_description: description.slice(0, 600),
+        p_data: variant,
+      });
+      if (error) throw error;
+      return data as string;
+    },
+    async unpublish(id: string) {
+      const { error } = await client.rpc("unpublish_chess_custom_variant", { p_published_id: id });
+      if (error) throw error;
+    },
+  };
+}
+
+export type CommunityService = ReturnType<typeof createCommunityService>;

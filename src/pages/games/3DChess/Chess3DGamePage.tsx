@@ -2,7 +2,7 @@ import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { playChessMoveOutcome, playChessSound } from "@/games/chess/audio/chessAudio";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Chess, type Move } from "chess.js";
+import { Chess, type Move, type Square } from "chess.js";
 
 import ChessBoard3D from "@/components/chess3d/ChessBoard3D";
 import { useStockfish } from "@/hooks/useStockfish";
@@ -136,7 +136,7 @@ export default function Chess3DGamePage({
           if (requestId !== aiRequestIdRef.current) return;
           if (!result) return;
 
-          const movingPiece = currentGame.get(result.from as any);
+          const movingPiece = currentGame.get(result.from as Square);
 
           const isPromotion =
             movingPiece?.type === "p" &&

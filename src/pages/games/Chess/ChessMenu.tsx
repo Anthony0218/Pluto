@@ -29,11 +29,10 @@ const modes: ChessMode[] = [
   },
   {
     title: "Chess Custom",
-    description: "Create your own setup, rules, and chess concepts.",
+    description: "Design pieces, boards, rules and events — then watch your variant play in 3D.",
     path: "/games/chess/custom",
     icon: "⚙",
     eyebrow: "Build your own",
-    disabled: true,
   },
 ];
 
