@@ -98,6 +98,17 @@ export const games: Game[] = [
     finished: false,
   },
   {
+    title: "Card Builder",
+    subtitle: "Invent your own card game",
+    description:
+      "Design card games with zones, phases and WHEN/IF/THEN rules — start from Durak, Short-Deck Poker or High Card Battle and watch bots play them.",
+    image: "/images/card-builder.svg",
+    route: "/games/card-builder",
+    tag: "Creator",
+    features: ["Templates", "Rule builder", "Test with bots"],
+    finished: false,
+  },
+  {
     title: "Natura",
     subtitle: "Discover the natural world",
     description:

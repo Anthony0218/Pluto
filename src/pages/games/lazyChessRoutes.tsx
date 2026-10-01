@@ -13,11 +13,11 @@ export function Chess3DAiRoute() {
   const { search } = useLocation();
   const difficulty = new URLSearchParams(search).get("difficulty");
   const ai = difficulty === "easy" || difficulty === "beginner" ? "random" : difficulty === "hard" || difficulty === "expert" ? "master" : difficulty === "medium" ? "strategist" : "greedy";
-  return <Navigate to={`/chess-custom/play/singleplayer?preset=3d-chess&ai=${ai}`} replace />;
+  return <Navigate to={`/chess-custom/play/singleplayer?preset=3d-chess&ai=${ai}&view=3d`} replace />;
 }
 
 export function Chess3DHotseatRoute() {
-  return <Navigate to="/chess-custom/play/hotseat?preset=3d-chess" replace />;
+  return <Navigate to="/chess-custom/play/hotseat?preset=3d-chess&view=3d" replace />;
 }
 
 export function Chess3DMenuRoute() {

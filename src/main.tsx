@@ -151,6 +151,7 @@ import { WattenThreePlayerMultiplayerGame } from "./components/Watten/WattenThre
 import MedievalKingdomsWorldPage from "./pages/games/MedievalKingdoms/MedievalKingdomsWorldPage.tsx";
 import MedievalKingdomsBattlePage from "./pages/games/MedievalKingdoms/MedievalKingdomsBattlePage.tsx";
 import { Chess3DAiRoute, Chess3DHotseatRoute, Chess3DMenuRoute, ChessCustomLegacyRedirect, ChessCustomRoute } from "./pages/games/lazyChessRoutes.tsx";
+import { CardBuilderCreateRoute, CardBuilderHomeRoute, CardBuilderPlayRoute, CardBuilderRoomRoute, CardBuilderSimulationRoute, CardBuilderTemplateRoute } from "./pages/games/lazyCardBuilderRoutes.tsx";
 import CreditsPage from "./pages/general/CreditsPage.tsx";
 import MedievalKingdomsRegionPage from "./pages/games/MedievalKingdoms/MedievalKingdomsRegionPage.tsx";
 import LoginPage from "./pages/general/LoginPage.tsx";
@@ -211,6 +212,14 @@ const router = createBrowserRouter([
             path: "/games",
             element: <GamesPage />,
           },
+          { path: "/games/card-builder", element: <CardBuilderHomeRoute /> },
+          { path: "/games/card-builder/templates/:templateId", element: <CardBuilderTemplateRoute /> },
+          { path: "/games/card-builder/play", element: <CardBuilderPlayRoute /> },
+          { path: "/games/card-builder/simulation", element: <CardBuilderSimulationRoute /> },
+          { path: "/games/card-builder/room", element: <CardBuilderRoomRoute /> },
+          { path: "/games/card-builder/room/:code", element: <CardBuilderRoomRoute /> },
+          { path: "/games/create", element: <CardBuilderCreateRoute /> },
+          { path: "/games/create/:gameId", element: <CardBuilderCreateRoute /> },
           { path: "/games/pluto-party", element: <React.Suspense fallback={<main>Loading Pluto Party…</main>}><PartyPage /></React.Suspense> },
           { path: "/games/atlas-arena", element: atlasPage(<AtlasArenaPage />) },
           { path: "/games/eat-it", element: eatItPage },

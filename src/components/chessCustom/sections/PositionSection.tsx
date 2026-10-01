@@ -42,7 +42,7 @@ function SetupEditor() {
   const withPieces = (next: PlacedPiece[]) => commit({ ...setup, pieces: next });
   const simulate = (view: "3d" | "2d") => {
     setSimulationSource(target);
-    go({ view: "create", step: "simulation" }, { search: view === "2d" ? "?view=2d" : "" });
+    go({ view: "create", step: "simulation" }, { search: view === "3d" ? "?view=3d" : "" });
   };
   const indexAt = (coord: Coord) => pieces.findIndex((piece) => sameCoord(piece, coord));
 
@@ -153,12 +153,12 @@ function SetupEditor() {
             ]}
           />
           <span className="mx-1 hidden h-6 w-px bg-white/10 sm:block" />
-          <Button tone="primary" onClick={() => simulate("3d")}>
+          <Button tone="primary" onClick={() => simulate("2d")}>
             <SimulationIcon size={16} />
-            {ui("Simulate in 3D")}
-          </Button>
-          <Button tone="blue" onClick={() => simulate("2d")}>
             {ui("Simulate in 2D")}
+          </Button>
+          <Button tone="blue" onClick={() => simulate("3d")}>
+            {ui("Simulate in 3D")}
           </Button>
         </div>
         <div className="flex flex-wrap items-center gap-2">

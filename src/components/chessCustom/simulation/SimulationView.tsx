@@ -38,17 +38,18 @@ const playersFor = (teams: { id: string }[], mode: SimulationMode, level: AiKind
   Object.fromEntries(teams.map((team, index) => [team.id, mode === "hvh" || (mode === "hva" && index === 0) ? "human" : level]));
 
 /**
- * The focused simulation: one game, two views (3D and 2D). In Create it opens
+ * The focused simulation: one game, two views (2D by default, and 3D). In Create it opens
  * in AI vs AI to watch the variant; from Play it starts in the chosen mode.
  */
 export default function SimulationView({ context }: { context: "create" | "play" }) {
   const { variant, testSetup, simulationSource, go, goToStep, route, save, dirty, inLibrary, isDirty } = useEditor();
   const [params, setParams] = useSearchParams();
-  const view = params.get("view") === "2d" ? "2d" : "3d";
+  // 2D is the default; 3D is opt-in (?view=3d), e.g. from the 3D Chess entry points.
+  const view = params.get("view") === "3d" ? "3d" : "2d";
   const setView = (next: "3d" | "2d") =>
     setParams((current) => {
       const copy = new URLSearchParams(current);
-      if (next === "2d") copy.set("view", "2d");
+      if (next === "3d") copy.set("view", "3d");
       else copy.delete("view");
       return copy;
     }, { replace: true });
@@ -202,7 +203,7 @@ export default function SimulationView({ context }: { context: "create" | "play"
         <div className="relative flex min-h-0 flex-col">
           <div className="z-20 flex flex-wrap items-center gap-2 border-b border-white/[0.06] bg-black/35 px-3 py-2 backdrop-blur-xl">
             <div role="tablist" aria-label={ui("Simulation view")} className="inline-flex rounded-xl border border-white/10 bg-black/40 p-1">
-              {(["3d", "2d"] as const).map((id) => (
+              {(["2d", "3d"] as const).map((id) => (
                 <button
                   key={id}
                   type="button"

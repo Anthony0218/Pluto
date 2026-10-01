@@ -250,7 +250,7 @@ export function BoardDrawer({
     <DrawerShell title="Board" onClose={onClose}>
       <div>
         <p className={heading}>{ui("View")}</p>
-        <Segmented size="sm" label="View" value={view} onChange={onView} options={[{ id: "3d", label: "3D" }, { id: "2d", label: "2D" }]} />
+        <Segmented size="sm" label="View" value={view} onChange={onView} options={[{ id: "2d", label: "2D" }, { id: "3d", label: "3D" }]} />
       </div>
       {layers.length > 1 && (
         <>
