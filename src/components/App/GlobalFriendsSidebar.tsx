@@ -7,6 +7,7 @@ import DashboardDialog from "./dashboard/DashboardDialog";
 import DashboardFriendDialog from "./dashboard/DashboardFriendDialog";
 import PlayWithFriends from "./dashboard/PlayWithFriends";
 import { getFriendMessageBaseline } from "./dashboard/messageReadState";
+import { markNotificationsSeen, useSeenNotificationIds } from "./notifications/notificationState";
 
 type FriendView = "actions" | "chat" | "profile";
 
@@ -17,16 +18,10 @@ export default function GlobalFriendsSidebar() {
   const [open, setOpen] = useState(false);
   const [friendDialog, setFriendDialog] = useState<{ id: string; view: FriendView } | null>(null);
   const [messageBaseline] = useState(() => getFriendMessageBaseline(user?.id));
-  const readMessageKey = `pluto-read-message-ids-${user?.id ?? "guest"}`;
-  const [readMessageIds, setReadMessageIds] = useState<string[]>(() => {
-    try {
-      const saved: unknown = JSON.parse(localStorage.getItem(readMessageKey) || "[]");
-      return Array.isArray(saved) ? saved.filter((id): id is string => typeof id === "string") : [];
-    } catch { return []; }
-  });
+  const readMessageIds = useSeenNotificationIds(user?.id);
   const friendIds = new Set(friends.map((friend) => friend.id));
   const unreadMessagesByFriend = notifications.reduce<Record<string, number>>((counts, notification) => {
-    if (notification.kind === "message" && notification.senderId && friendIds.has(notification.senderId) && Date.parse(notification.createdAt) > messageBaseline && !readMessageIds.includes(notification.id)) {
+    if (notification.kind === "message" && notification.senderId && friendIds.has(notification.senderId) && Date.parse(notification.createdAt) > messageBaseline && !readMessageIds.has(notification.id)) {
       counts[notification.senderId] = (counts[notification.senderId] ?? 0) + 1;
     }
     return counts;
@@ -39,14 +34,7 @@ export default function GlobalFriendsSidebar() {
       const messageIds = notifications
         .filter((notification) => notification.kind === "message" && notification.senderId === id)
         .map((notification) => notification.id);
-      if (messageIds.length) {
-        setReadMessageIds((current) => {
-          const next = [...new Set([...current, ...messageIds])];
-          try { localStorage.setItem(readMessageKey, JSON.stringify(next)); }
-          catch { /* Keep the read state for this visit. */ }
-          return next;
-        });
-      }
+      markNotificationsSeen(user?.id, messageIds);
     }
     setOpen(false);
     setFriendDialog({ id, view });

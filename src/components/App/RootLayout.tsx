@@ -3,6 +3,7 @@ import "../chess/chessLayout.css";
 import ChessLayoutControls from "../chess/ChessLayoutControls";
 import RoomFriends from "../social/RoomFriends";
 import GlobalFriendsSidebar from "./GlobalFriendsSidebar";
+import IncomingNotificationToasts from "./notifications/IncomingNotificationToasts";
 import "./dashboard/dashboard.css";
 import { useEffect, useRef } from "react";
 import { Outlet, useLocation } from "react-router-dom";
@@ -17,7 +18,7 @@ export default function RootLayout() {
 function RootContent() {
   const location = useLocation();
   const fullHeader = location.pathname === "/" || location.pathname === "/dashboard";
-  const integratedNavigation = location.pathname === "/games/chess" || location.pathname.startsWith("/games/chess/");
+  const integratedNavigation = location.pathname === "/games/chess" || location.pathname.startsWith("/games/chess/") || location.pathname === "/chess-custom" || location.pathname.startsWith("/chess-custom/");
   const viewport = useRef<HTMLDivElement>(null);
   const { plutoMode } = useTheme();
   useEffect(() => {
@@ -37,5 +38,6 @@ function RootContent() {
     <RoomFriends />
     {location.pathname !== "/dashboard" && <GlobalFriendsSidebar key={location.pathname} />}
     <ChessLayoutControls />
+    <IncomingNotificationToasts />
   </div>;
 }

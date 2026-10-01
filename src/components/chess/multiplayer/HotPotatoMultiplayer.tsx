@@ -1,3 +1,4 @@
+import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
@@ -284,6 +285,7 @@ export function HotPotatoMultiplayerLobby() {
     ?.username;
   const [displayName, setDisplayName] = useState(profileName ?? "Player");
   const [joinCode, setJoinCode] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
+  useInviteAutoJoin(() => joinRoom());
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

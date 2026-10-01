@@ -1,3 +1,4 @@
+import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useMemo, useState } from "react";
@@ -64,6 +65,8 @@ export default function SeededVariantMultiplayerLobby({ variant }: Props) {
   const info = variantInfo[variant];
 
   const [joinCode, setJoinCode] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
+
+  useInviteAutoJoin(() => joinRoom());
   const [loading, setLoading] = useState<"create" | "join" | null>(null);
   const [error, setError] = useState<string | null>(null);
 

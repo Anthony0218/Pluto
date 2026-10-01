@@ -1,3 +1,4 @@
+import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useMemo, useState } from "react";
@@ -112,6 +113,7 @@ export function FriendRoomPanel({ embedded = false }: { embedded?: boolean }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const roomBase = "/games/chess/classic/multiplayer";
+  useInviteAutoJoin(() => joinRoom());
 
   const displayName = useMemo(
     () =>

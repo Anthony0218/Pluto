@@ -10,8 +10,9 @@ import BoardThumbnail from "../BoardThumbnail";
 import Dialog from "../dialogs/Dialog";
 import PlayModeDialog from "../dialogs/PlayModeDialog";
 import { errorText, timeAgo } from "../format";
-import { ChevronDownIcon, ChevronUpIcon, CommunityIcon, LayersIcon, MyGamesIcon, PlayIcon, PrivateIcon, RefreshIcon, RemixIcon, SearchIcon, ViewIcon } from "../icons/ChessCustomIcons";
+import { ChevronDownIcon, ChevronUpIcon, CommunityIcon, LayersIcon, PlayIcon, PrivateIcon, RefreshIcon, RemixIcon, SearchIcon, ShareIcon, ViewIcon } from "../icons/ChessCustomIcons";
 import { Button, Chip, EmptyState, Segmented, inputClass } from "../ui";
+import PublishVariantDialog from "./PublishVariantDialog";
 
 const PAGE = 24;
 type Previews = Record<string, { preview: VariantPreview; layerCount: number }>;
@@ -142,7 +143,7 @@ function DetailsDialog({ entry, preview, onClose, onPlay, onRemix, busy }: { ent
 
 /** Public discovery: variants other players have shared. */
 export default function CommunityView() {
-  const { community, userId, playCopy, remix, notify, go, refreshPublished } = useEditor();
+  const { community, userId, playCopy, remix, notify, refreshPublished } = useEditor();
   const [sort, setSort] = useState<CommunitySort>("top");
   const [query, setQuery] = useState("");
   const [search, setSearch] = useState("");
@@ -155,6 +156,7 @@ export default function CommunityView() {
   const [viewing, setViewing] = useState<CommunityEntry | null>(null);
   const [playing, setPlaying] = useState<CommunityEntry | null>(null);
   const [unpublishing, setUnpublishing] = useState<CommunityEntry | null>(null);
+  const [publishing, setPublishing] = useState(false);
   const [reload, setReload] = useState(0);
 
   // Debounce typing into the search box.
@@ -254,9 +256,9 @@ export default function CommunityView() {
           <p className="mt-2 text-sm leading-6 text-zinc-400">{ui("Chess variants shared publicly by players. Play them as they are, or remix your own copy.")}</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button onClick={() => go({ view: "library" })}>
-            <MyGamesIcon size={16} />
-            {ui("Share one of yours")}
+          <Button tone="primary" onClick={() => setPublishing(true)}>
+            <ShareIcon size={15} />
+            {ui("Publish your variant")}
           </Button>
           <Button onClick={refresh} aria-label={ui("Refresh")}>
             <RefreshIcon size={15} />
@@ -298,7 +300,7 @@ export default function CommunityView() {
         </EmptyState>
       ) : entries.length === 0 ? (
         <EmptyState icon={<CommunityIcon size={22} />} title={search ? ui("No variants match your search") : ui("Nothing published yet")}>
-          {ui("Be the first: share a variant from My Games.")}
+          {ui("Be the first: publish one of your variants.")}
         </EmptyState>
       ) : (
         <ul className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
@@ -368,6 +370,7 @@ export default function CommunityView() {
         </div>
       )}
 
+      <PublishVariantDialog open={publishing} onClose={() => setPublishing(false)} onPublished={refresh} />
       <DetailsDialog
         entry={viewing}
         preview={viewing ? previews[viewing.id] : undefined}

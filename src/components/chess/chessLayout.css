@@ -156,3 +156,20 @@ body:has(.chess-game-grid) .chess-sidebar-toggle { display: block; }
 }
 
 .chess-header-description { color: #a1a1aa; font-size: 12px; line-height: 1.4; min-width: 0; overflow-wrap: anywhere; }
+
+/* Ranked top-10 medallion: golden glow that breathes, with a light sweep. */
+.top-rank-badge { position: relative; isolation: isolate; display: inline-flex; align-items: center; gap: 5px; overflow: hidden; border: 1px solid #fde68a; border-radius: 999px; background: linear-gradient(135deg, #fff3b0 0%, #fbbf24 38%, #d97706 72%, #fcd34d 100%); color: #3b2503; font-weight: 900; line-height: 1; white-space: nowrap; padding: 6px 11px 6px 9px; font-size: 13px; box-shadow: 0 0 0 1px #78350f66 inset, 0 0 14px #fbbf2499, 0 0 30px #f59e0b4d; animation: top-rank-pop .55s cubic-bezier(.2, 1.4, .4, 1) both, top-rank-glow 2.6s ease-in-out .55s infinite; }
+.top-rank-badge::after { content: ""; position: absolute; inset: -2px; z-index: -1; background: linear-gradient(105deg, transparent 35%, #ffffffcc 50%, transparent 65%); transform: translateX(-120%); animation: top-rank-shine 3.2s ease-in-out 1s infinite; }
+
+.top-rank-badge-label { font-size: .68em; letter-spacing: .14em; text-transform: uppercase; opacity: .78; }
+/* Compact variant for in-game player boxes. */
+.top-rank-badge.is-small { gap: 3px; padding: 3px 7px 3px 6px; font-size: 10px; }
+.top-rank-badge.is-small .top-rank-badge-label { letter-spacing: .1em; }
+.top-rank-badge.is-podium { border-color: #fff7d1; box-shadow: 0 0 0 1px #78350f66 inset, 0 0 18px #fcd34dcc, 0 0 40px #f59e0b80; }
+/* Glow ring for the player box that wears the badge. */
+.top-rank-glow { border-color: #fbbf2499; box-shadow: 0 0 0 1px #fbbf2440, 0 0 26px #f59e0b40, inset 0 0 22px #fbbf2414; animation: top-rank-box-glow 2.6s ease-in-out infinite; }
+@keyframes top-rank-pop { from { opacity: 0; transform: scale(.4) rotate(-8deg); } }
+@keyframes top-rank-glow { 50% { box-shadow: 0 0 0 1px #78350f66 inset, 0 0 22px #fcd34dd9, 0 0 46px #f59e0b8c; } }
+@keyframes top-rank-shine { 0%, 55% { transform: translateX(-120%); } 85%, 100% { transform: translateX(120%); } }
+@keyframes top-rank-box-glow { 50% { box-shadow: 0 0 0 1px #fbbf2466, 0 0 38px #f59e0b66, inset 0 0 26px #fbbf2421; } }
+@media (prefers-reduced-motion: reduce) { .top-rank-badge, .top-rank-badge::after, .top-rank-glow { animation: none; } }

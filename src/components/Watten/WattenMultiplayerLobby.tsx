@@ -1,3 +1,4 @@
+import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
 import { useAppLanguage } from "@/i18n/languageStore";
 import "../../pages/games/Watten/wattenMenus.css";
 import { useCallback, useState } from "react";
@@ -23,6 +24,7 @@ export default function WattenMultiplayerLobby() {
   const { language } = useAppLanguage();
   const [variant, setVariant] = useState<WattenVariant>("three-player");
   const [roomCode, setRoomCode] = useState(() => (searchParams.get("code") ?? "").trim().toUpperCase());
+  useInviteAutoJoin(() => joinRoom());
   const [loading, setLoading] = useState<LoadingAction>(null);
   const [error, setError] = useState<string | null>(null);
 

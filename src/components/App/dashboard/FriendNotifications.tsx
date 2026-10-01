@@ -1,9 +1,12 @@
 import { useState } from "react";
-import { Bell, Gamepad2, Mail, Users, X } from "lucide-react";
+import { Bell, BellOff, Gamepad2, Mail, Users, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import type { DashboardNotification } from "@/hooks/useDashboardData";
 import DashboardDialog from "./DashboardDialog";
+import { getInviteDestination } from "@/components/social/inviteRoute";
+import DoNotDisturbSwitch from "../notifications/DoNotDisturbSwitch";
+import { markNotificationsSeen, useDoNotDisturb, useSeenNotificationIds } from "../notifications/notificationState";
 
 type Filter = "all" | "games" | "social";
 
@@ -24,9 +27,11 @@ export default function FriendNotifications({ items, userId }: { items: Dashboar
   const [filter, setFilter] = useState<Filter>("all");
   const [open, setOpen] = useState(false);
   const [openedReadAt, setOpenedReadAt] = useState(readAt);
+  const seen = useSeenNotificationIds(userId);
+  const [doNotDisturb] = useDoNotDisturb(userId);
   const visibleItems = items.filter(item => !dismissed.includes(item.id));
   const filteredItems = visibleItems.filter(item => filter === "all" || (filter === "games" ? !!item.gameCode : !item.gameCode));
-  const unreadCount = visibleItems.filter(item => Date.parse(item.createdAt) > readAt).length;
+  const unreadCount = visibleItems.filter(item => Date.parse(item.createdAt) > readAt && !seen.has(item.id)).length;
 
   function show() {
     const time = Date.now();
@@ -48,21 +53,22 @@ export default function FriendNotifications({ items, userId }: { items: Dashboar
   }
 
   return <>
-    <button type="button" className="dash-icon-button notification-trigger" aria-label={`${ui("Friend notifications")}${unreadCount ? `: ${unreadCount}` : ""}`} aria-haspopup="dialog" onClick={show}>
-      <Bell size={18} />{unreadCount > 0 && <span>{unreadCount > 99 ? "99+" : unreadCount}</span>}
+    <button type="button" className="dash-icon-button notification-trigger" aria-label={`${ui("Friend notifications")}${unreadCount ? `: ${unreadCount}` : ""}${doNotDisturb ? `, ${ui("Do not disturb")}` : ""}`} aria-haspopup="dialog" onClick={show}>
+      {doNotDisturb ? <BellOff size={18} /> : <Bell size={18} />}{unreadCount > 0 && <span>{unreadCount > 99 ? "99+" : unreadCount}</span>}
     </button>
     {open && <DashboardDialog title={`${ui("Notifications")}${visibleItems.length ? ` · ${visibleItems.length}` : ""}`} onClose={() => setOpen(false)}>
+      <DoNotDisturbSwitch userId={userId} className="mb-4" />
       <div className="notification-filters" role="tablist" aria-label={ui("Filter notifications")}>
         {(["all", "games", "social"] as const).map(value => <button key={value} type="button" role="tab" aria-selected={filter === value} onClick={() => setFilter(value)}>{value === "games" ? <Gamepad2 size={14} /> : value === "social" ? <Users size={14} /> : <Bell size={14} />}{ui(value === "all" ? "All" : value === "games" ? "Games" : "Social")}</button>)}
       </div>
       {filteredItems.length ? <div className="notification-list">{filteredItems.map(item => {
         const Icon = item.kind === "friend_request" ? Users : item.gameCode ? Gamepad2 : Mail;
-        const destination = item.gameCode ? `/games/chess/classic/multiplayer?code=${encodeURIComponent(item.gameCode)}` : item.kind === "friend_request" ? "/friends" : `/friends${item.senderId ? `?friend=${encodeURIComponent(item.senderId)}` : ""}`;
+        const destination = item.gameCode ? getInviteDestination({ game: item.game, gameCode: item.gameCode, gameRoute: item.gameRoute }, { autoJoin: true }) : item.kind === "friend_request" ? "/friends" : `/friends${item.senderId ? `?friend=${encodeURIComponent(item.senderId)}` : ""}`;
         const action = item.gameCode ? "Join" : item.kind === "friend_request" ? "Review" : "Reply";
-        return <article key={item.id} className={`notification-card${Date.parse(item.createdAt) > openedReadAt ? " is-new" : ""}`}>
+        return <article key={item.id} className={`notification-card${Date.parse(item.createdAt) > openedReadAt && !seen.has(item.id) ? " is-new" : ""}`}>
           <span className="notification-icon"><Icon size={20} /></span>
           <div className="notification-copy"><div className="notification-title"><strong>{ui(item.title)}</strong><time dateTime={item.createdAt}>{new Date(item.createdAt).toLocaleDateString()}</time></div><p>{item.detail || item.senderName || ui("Player")}</p>{item.gameCode && <small>{ui("Room code")}: {item.gameCode}</small>}
-            <div className="notification-actions"><Link to={destination} onClick={() => setOpen(false)}>{ui(action)}</Link><button type="button" onClick={() => dismiss(item.id)}>{ui("Dismiss")}</button></div>
+            <div className="notification-actions"><Link to={destination} onClick={() => { markNotificationsSeen(userId, [item.id]); setOpen(false); }}>{ui(action)}</Link><button type="button" onClick={() => dismiss(item.id)}>{ui("Dismiss")}</button></div>
           </div>
           <button type="button" className="notification-dismiss" aria-label={`${ui("Dismiss")}: ${ui(item.title)}`} onClick={() => dismiss(item.id)}><X size={14} /></button>
         </article>;

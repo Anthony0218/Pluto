@@ -11,6 +11,7 @@ import type {
   PresetMessageType,
 } from "../../types/social";
 import FriendAvatar from "./FriendAvatar";
+import { getInviteDestination } from "./inviteRoute";
 
 type FriendChatProps = { friend: Friend; roomInvite?: { code: string; lobbyRoute: string } };
 
@@ -201,27 +202,7 @@ export default function FriendChat({ friend, roomInvite }: FriendChatProps) {
 
   function joinInvite(message: FriendMessage) {
     if (!message.game || !message.game_code) return;
-
-    if (message.game_route === "/games/atlas-arena/multiplayer" || message.game_route === "/games/eat-it/multiplayer") {
-      navigate(`${message.game_route}/${encodeURIComponent(message.game_code)}`);
-      return;
-    }
-
-    if (message.game_route && /^\/games\/chess\/(?:(?:classic|variants\/[a-z0-9-]+)\/multiplayer|ranked)$/.test(message.game_route)) {
-      navigate(`${message.game_route}?code=${encodeURIComponent(message.game_code)}`);
-      return;
-    }
-
-    if (message.game === "watten") {
-      navigate(
-        `/games/watten/multiplayer?code=${encodeURIComponent(message.game_code)}`,
-      );
-      return;
-    }
-
-    navigate(
-      `/games/chess/classic/multiplayer?code=${encodeURIComponent(message.game_code)}`,
-    );
+    navigate(getInviteDestination({ game: message.game, gameCode: message.game_code, gameRoute: message.game_route }));
   }
 
   function renderMessage(message: FriendMessage) {

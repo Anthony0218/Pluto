@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import ts from 'typescript';
 import {getChessRank} from '../src/games/chess/ranked/tiers.ts';
+import * as timeControls from '../src/games/chess/ranked/timeControls.ts';
 const compiled=ts.transpileModule(readFileSync(new URL('../src/pages/games/Chess/ChessRankedLobby.tsx',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2023,jsx:ts.JsxEmit.ReactJSX}}).outputText;
 // Execute the actual component lifecycle and async callbacks without a browser
 // or remote account. Only React scheduling and transport are test doubles.
@@ -17,6 +18,7 @@ function mount(){
   '@/i18n/ui':{ui:s=>s,useUiLanguage:()=>{}},'@/lib/supabase':{supabase:{from:()=>query,rpc:async()=>({data:[]})}},
   '@/games/chess/ranked/client':{RankedAuthError:class extends Error{},leaveRankedQueue:id=>leaves.push(id),invokeRankedChess:body=>new Promise(resolve=>requests.push({body,resolve}))},
   '@/games/chess/ranked/tiers':{getChessRank},
+  '@/games/chess/ranked/timeControls':timeControls,
   '@/components/chess/RankEmblem':{default:()=>null},
  };
  const exports={};new Function('require','exports','window',compiled)(name=>deps[name]??{default:()=>null},exports,win);
@@ -29,7 +31,7 @@ function mount(){
 const tick=()=>new Promise(r=>setImmediate(r));
 test('unmount immediately leaves and a delayed matched response cannot navigate off the new route',async()=>{
  const m=mount();await tick();m.requests.find(r=>r.body.op==='queueStatus').resolve({status:'idle'});await tick();
- m.join();const request=m.requests.find(r=>r.body.op==='queue');assert.ok(request);
+ m.join();const request=m.requests.find(r=>r.body.op==='queue');assert.ok(request);assert.equal(request.body.timeControl,'rapid');
  m.unmount();assert.deepEqual(m.leaves,[request.body.sessionId]);
  request.resolve({status:'matched',code:'ABC123'});await tick();assert.deepEqual(m.navigations,[]);
  assert.equal(m.leaves.at(-1),request.body.sessionId);

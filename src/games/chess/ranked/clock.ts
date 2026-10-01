@@ -3,6 +3,7 @@ import { compareChessRevision } from '../multiplayer/position.ts';
 export type ClockGame = {
   white_time_ms: number | null; black_time_ms: number | null; clock_started_at: string | null;
   fen: string; status: string; version: number; ranked_round?: number;
+  ranked_cards_drawn?: string[] | null;
 };
 export type ClockSample = { game: ClockGame; serverNow: string; receivedAt: number };
 /** Wall-clock changes in the browser never affect the estimate or adjudicate a loss. */

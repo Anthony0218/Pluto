@@ -1,6 +1,9 @@
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { useNavigate } from "react-router-dom";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Pause, Play } from "lucide-react";
 
 import { Chess, type Color, type PieceSymbol, type Square } from "chess.js";
 
@@ -11,10 +14,11 @@ import { qualityColor, type ReviewVisualQuality } from "./reviewQualityVisuals";
 import { alternativeQuality, qualityList } from "./reviewQualities";
 import { reviewMoveAnnotations, type BoardAnnotations } from "./boardAnnotations";
 
-import { useStockfishAnalysis } from "@/hooks/useStockfishAnalysis";
+import { useStockfishAnalysis, type StockfishAnalysisLine } from "@/hooks/useStockfishAnalysis";
 
 import {
   reviewGameMoves,
+  type AnalyzePosition,
   type MoveQuality,
   type MoveReview,
 } from "@/utils/chessAnalysis";
@@ -25,6 +29,12 @@ import {
   type GamePuzzleSourceMode,
   type PersonalPuzzleQuality,
 } from "./personalGamePuzzleSource.ts";
+import {
+  HOTSEAT_PATH,
+  continuationGameName,
+  storePendingContinuation,
+  type ReviewContinuation,
+} from "./reviewContinuation";
 
 type Props = {
   moves: string[];
@@ -33,11 +43,18 @@ type Props = {
   onClose: () => void;
   puzzleSource?: GamePuzzleSourceMode;
   puzzlePlayerColor?: "white" | "black";
+  /**
+   * "Play from here" on a best-continuation move. Without it the position is
+   * stored as a pending game and the Hotseat board loads it.
+   */
+  onPlayFromPosition?: (continuation: ReviewContinuation) => void;
+  /** Render in place instead of portalling out of the page (e.g. inside a modal <dialog>). */
+  inline?: boolean;
 };
 
 type SideFilter = "all" | "w" | "b";
 type PieceFilter = "all" | PieceSymbol;
-type QualityFilter = "all" | MoveQuality;
+type QualityFilter = "all" | ReviewVisualQuality;
 type MoveTypeFilter =
   | "all"
   | "capture"
@@ -157,14 +174,78 @@ const pieceSortOrder: Record<PieceSymbol, number> = {
   k: 5,
 };
 
-const qualitySortOrder: Record<MoveQuality, number> = {
+const qualitySortOrder: Record<ReviewVisualQuality, number> = {
   Best: 0,
   Excellent: 1,
   Good: 2,
   Inaccuracy: 3,
   Mistake: 4,
   Blunder: 5,
+  "Missed Win": 6,
 };
+
+const PLAYBACK_STEP_MS = 1100;
+const REWIND_MS = 380;
+const LINE_MOVE_MS = 480;
+const LINE_GAP_MS = 140;
+/** How long the winning piece stays marked before it moves. */
+const MARK_BEFORE_MOVE_MS = 650;
+const CONTINUATION_COLOR = "#fcd34d";
+
+type MoveAnimation = { id: string; from: Square; to: Square; durationMs?: number };
+type LineMove = { from: Square; to: Square; promotion?: "q" | "r" | "b" | "n" };
+
+/**
+ * A position shown while the board plays from one preview to another;
+ * `line` holds the moves played from the position before the selected move.
+ */
+type ReviewFrame = {
+  fen: string;
+  line: LineMove[];
+  lastMove: { from: Square; to: Square } | null;
+  annotations: BoardAnnotations | null;
+};
+
+function uciMove(uci: string): LineMove {
+  return {
+    from: uci.slice(0, 2) as Square,
+    to: uci.slice(2, 4) as Square,
+    promotion: (uci[4] || undefined) as LineMove["promotion"],
+  };
+}
+
+function sanLine(fen: string, moves: string[]): LineMove[] {
+  const game = new Chess(fen);
+  const line: LineMove[] = [];
+
+  for (const san of moves) {
+    try {
+      const move = game.move(san);
+      line.push({ from: move.from, to: move.to, promotion: move.promotion as LineMove["promotion"] });
+    } catch {
+      break;
+    }
+  }
+
+  return line;
+}
+
+function sameLineMove(left: LineMove, right: LineMove) {
+  return left.from === right.from && left.to === right.to && (left.promotion ?? "") === (right.promotion ?? "");
+}
+
+/** The position after the first `count` moves of `line`, or null when a move does not fit. */
+function linePosition(fen: string, line: LineMove[], count: number) {
+  const game = new Chess(fen);
+
+  try {
+    for (const move of line.slice(0, count)) game.move(move);
+  } catch {
+    return null;
+  }
+
+  return game.fen();
+}
 
 const phaseList: GamePhase[] = ["Opening", "Middlegame", "Endgame"];
 
@@ -186,6 +267,54 @@ const presetOptions: Array<{
   { key: "captures", label: "Captures" },
   { key: "checks", label: "Checks" },
 ];
+
+/* =========================================================
+   REVIEW CACHE
+   =========================================================
+   A finished review is kept per game (also in sessionStorage), so closing
+   the review, leaving the page or a remount after tabbing out never makes
+   the player analyse the same game again. Engine lines are cached per
+   position, so an interrupted review resumes where it stopped.
+   ========================================================= */
+
+type CachedReview = {
+  reviews: MoveReview[];
+  puzzleStatus: string | null;
+  ply: number;
+};
+
+const REVIEW_STORAGE_KEY = "chess-game-review-cache";
+const MAX_STORED_REVIEWS = 6;
+
+const reviewCache = new Map<string, CachedReview>(readStoredReviews());
+const positionAnalysisCache = new Map<string, StockfishAnalysisLine[]>();
+/** Reviews that started but never finished, resumed on the next open. */
+const interruptedReviews = new Set<string>();
+
+function readStoredReviews(): Array<[string, CachedReview]> {
+  try {
+    const raw = sessionStorage.getItem(REVIEW_STORAGE_KEY);
+    const parsed = raw ? (JSON.parse(raw) as Array<[string, CachedReview]>) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function cacheReview(key: string, entry: CachedReview) {
+  reviewCache.delete(key);
+  reviewCache.set(key, entry);
+
+  while (reviewCache.size > MAX_STORED_REVIEWS) {
+    reviewCache.delete(reviewCache.keys().next().value as string);
+  }
+
+  try {
+    sessionStorage.setItem(REVIEW_STORAGE_KEY, JSON.stringify([...reviewCache]));
+  } catch {
+    // Storage full or blocked: the in-memory cache still covers this visit.
+  }
+}
 
 function defaultPersonalPuzzleName(source: GamePuzzleSourceMode) {
   const sourceName = source === "singleplayer" ? "Singleplayer" : "Multiplayer";
@@ -209,13 +338,26 @@ export default function ChessGameReview({
   onClose,
   puzzleSource,
   puzzlePlayerColor,
+  onPlayFromPosition,
+  inline = false,
 }: Props) {
   useUiLanguage();
   const { ready, analyzing, analyzePosition } = useStockfishAnalysis();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
-  const [reviews, setReviews] = useState<MoveReview[]>([]);
-  const [selectedPly, setSelectedPly] = useState(0);
+  const movesKey = moves.join("|");
+  const movesKeyRef = useRef(movesKey);
+  movesKeyRef.current = movesKey;
+  /** Game whose review this instance is currently running. */
+  const reviewRunRef = useRef<string | null>(null);
+
+  const [reviews, setReviews] = useState<MoveReview[]>(
+    () => reviewCache.get(movesKey)?.reviews ?? [],
+  );
+  const [selectedPly, setSelectedPly] = useState(
+    () => reviewCache.get(movesKey)?.ply ?? 0,
+  );
   const [highlightedBestMove, setHighlightedBestMove] = useState<string | null>(
     null,
   );
@@ -242,21 +384,30 @@ export default function ChessGameReview({
   );
   const [trainingPuzzleStatus, setTrainingPuzzleStatus] = useState<
     string | null
-  >(null);
+  >(() => reviewCache.get(movesKey)?.puzzleStatus ?? null);
   const [puzzleName, setPuzzleName] = useState("");
   const [continuationPreviewIndex, setContinuationPreviewIndex] = useState<
     number | null
   >(null);
   const continuationGenerationRef = useRef(0);
 
-  const movesKey = moves.join("|");
+  const [playing, setPlaying] = useState(false);
+  const [moveAnimation, setMoveAnimation] = useState<MoveAnimation | null>(null);
+  const [showingCorrectMove, setShowingCorrectMove] = useState(false);
+  const [frame, setFrame] = useState<ReviewFrame | null>(null);
+  const animationCounterRef = useRef(0);
+  const sequenceTimersRef = useRef<number[]>([]);
+
+  useEffect(() => () => sequenceTimersRef.current.forEach((timer) => window.clearTimeout(timer)), []);
 
   useEffect(() => {
     continuationGenerationRef.current += 1;
 
-    setReviews([]);
+    const cached = reviewCache.get(movesKey);
+
+    setReviews(cached?.reviews ?? []);
     setDetailsOpen(false);
-    setSelectedPly(0);
+    setSelectedPly(cached?.ply ?? 0);
     setHighlightedBestMove(null);
     setProgress(0);
     setError(null);
@@ -274,7 +425,8 @@ export default function ChessGameReview({
     setContinuationLoading(false);
     setContinuationError(null);
     setContinuationPreviewIndex(null);
-    setTrainingPuzzleStatus(null);
+    setTrainingPuzzleStatus(cached?.puzzleStatus ?? null);
+    stopBoardEffects();
   }, [movesKey]);
 
   useEffect(() => {
@@ -282,6 +434,8 @@ export default function ChessGameReview({
   }, [movesKey, puzzleSource]);
 
   useEffect(() => {
+    stopBoardEffects();
+
     if (open) {
       setDetailsOpen(false);
       setSideFilter("all");
@@ -295,9 +449,12 @@ export default function ChessGameReview({
     }
   }, [open]);
 
-  async function createTrainingPuzzleFromReview(result: MoveReview[]) {
+  /** Saves the personal puzzle and returns the status line to show (and cache). */
+  async function createTrainingPuzzleFromReview(
+    result: MoveReview[],
+  ): Promise<string | null> {
     if (!user || !puzzleSource || !puzzlePlayerColor) {
-      return;
+      return null;
     }
 
     const targetColor = puzzlePlayerColor === "white" ? "w" : "b";
@@ -318,10 +475,7 @@ export default function ChessGameReview({
       .sort((left, right) => right.centipawnLoss - left.centipawnLoss)[0];
 
     if (!missed) {
-      setTrainingPuzzleStatus(
-        "No meaningful missed opportunity was found for a personal puzzle.",
-      );
-      return;
+      return "No meaningful missed opportunity was found for a personal puzzle.";
     }
 
     try {
@@ -337,10 +491,7 @@ export default function ChessGameReview({
       const solutionMoves = lines[0]?.pv.slice(0, 8) ?? [];
 
       if (solutionMoves.length === 0) {
-        setTrainingPuzzleStatus(
-          "Review finished, but no stable puzzle continuation was returned.",
-        );
-        return;
+        return "Review finished, but no stable puzzle continuation was returned.";
       }
 
       const quality: PersonalPuzzleQuality =
@@ -368,11 +519,9 @@ export default function ChessGameReview({
         quality,
       });
 
-      setTrainingPuzzleStatus(
-        `Training puzzle “${resolvedPuzzleName}” saved from your ${
-          puzzleSource === "singleplayer" ? "Singleplayer" : "Multiplayer"
-        } game.`,
-      );
+      return `Training puzzle “${resolvedPuzzleName}” saved from your ${
+        puzzleSource === "singleplayer" ? "Singleplayer" : "Multiplayer"
+      } game.`;
     } catch (puzzleError) {
       const message =
         puzzleError instanceof Error
@@ -381,16 +530,38 @@ export default function ChessGameReview({
 
       console.error("Could not create personal game puzzle:", message);
 
-      setTrainingPuzzleStatus(
-        `Game review finished, but the personal training puzzle could not be saved. ${message}`,
-      );
+      return `Game review finished, but the personal training puzzle could not be saved. ${message}`;
     }
   }
 
+  /** Engine lines are cached per position, so a resumed review skips everything already analysed. */
+  const cachedAnalyzePosition: AnalyzePosition = async (fen, options) => {
+    const cacheKey = `${fen}|${options?.multiPV ?? 1}|${options?.depth ?? options?.moveTime ?? ""}`;
+    const cachedLines = positionAnalysisCache.get(cacheKey);
+
+    if (cachedLines) {
+      return cachedLines;
+    }
+
+    const lines = await analyzePosition(fen, options);
+
+    if (lines.length > 0) {
+      positionAnalysisCache.set(cacheKey, lines);
+    }
+
+    return lines;
+  };
+
   async function runReview() {
-    if (reviewing || !ready || moves.length === 0) {
+    if (reviewing || reviewRunRef.current || !ready || moves.length === 0) {
       return;
     }
+
+    const key = movesKey;
+    const isCurrentGame = () => movesKeyRef.current === key;
+
+    reviewRunRef.current = key;
+    interruptedReviews.add(key);
 
     setReviewing(true);
     setProgress(0);
@@ -400,24 +571,51 @@ export default function ChessGameReview({
     try {
       const result = await reviewGameMoves(
         moves,
-        analyzePosition,
+        cachedAnalyzePosition,
         (completed) => {
-          setProgress(completed);
+          if (isCurrentGame()) setProgress(completed);
         },
       );
 
-      setReviews(result);
-      setSelectedPly(result.length);
-      setHighlightedBestMove(null);
+      interruptedReviews.delete(key);
+      cacheReview(key, { reviews: result, puzzleStatus: null, ply: result.length });
 
-      await createTrainingPuzzleFromReview(result);
+      if (isCurrentGame()) {
+        setReviews(result);
+        setSelectedPly(result.length);
+        setHighlightedBestMove(null);
+      }
+
+      const puzzleStatus = await createTrainingPuzzleFromReview(result);
+      const cached = reviewCache.get(key);
+
+      cacheReview(key, { reviews: result, puzzleStatus, ply: cached?.ply ?? result.length });
+
+      if (isCurrentGame()) setTrainingPuzzleStatus(puzzleStatus);
     } catch (reviewError) {
       console.error(reviewError);
-      setError("Game review failed.");
+      interruptedReviews.delete(key);
+      if (isCurrentGame()) setError("Game review failed.");
     } finally {
+      reviewRunRef.current = null;
       setReviewing(false);
     }
   }
+
+  // A review cut off by a remount (tabbing out, leaving the page) continues by itself.
+  useEffect(() => {
+    if (
+      open &&
+      ready &&
+      interruptedReviews.has(movesKey) &&
+      !reviewCache.has(movesKey) &&
+      !reviewRunRef.current
+    ) {
+      void runReview();
+    }
+    // runReview reads the same render's state.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, ready, movesKey]);
 
   const selected = selectedPly > 0 ? reviews[selectedPly - 1] : null;
 
@@ -524,11 +722,24 @@ export default function ChessGameReview({
       ? reviewRows.find((row) => row.review.ply === selectedPly)
       : null;
 
+  // The move that would have kept the win, for a "Missed Win" move.
+  const winningMove =
+    selected &&
+    selectedRow &&
+    displayQuality(selectedRow) === "Missed Win" &&
+    selected.bestMoveUci &&
+    selected.bestMoveUci !== selected.uci
+      ? {
+          from: selected.bestMoveUci.slice(0, 2) as Square,
+          to: selected.bestMoveUci.slice(2, 4) as Square,
+          promotion: selected.bestMoveUci[4] as "q" | "r" | "b" | "n" | undefined,
+          san: selected.bestMoveSan,
+        }
+      : null;
+
   /* =======================================================
      SUMMARY DATA
      ======================================================= */
-
-  const totalCritical = reviewRows.filter((row) => row.critical).length;
 
   const piecePerformance = useMemo(
     () => buildPiecePerformance(reviewRows),
@@ -539,39 +750,6 @@ export default function ChessGameReview({
     () => buildPhasePerformance(reviewRows),
     [reviewRows],
   );
-
-  const criticalRows = useMemo(
-    () => reviewRows.filter((row) => row.critical),
-    [reviewRows],
-  );
-
-  const bestRow = useMemo(() => {
-    const bestMoves = reviewRows.filter((row) => row.review.quality === "Best");
-
-    if (bestMoves.length > 0) {
-      return [...bestMoves].sort(
-        (a, b) => a.review.centipawnLoss - b.review.centipawnLoss,
-      )[0];
-    }
-
-    return [...reviewRows].sort(
-      (a, b) => a.review.centipawnLoss - b.review.centipawnLoss,
-    )[0];
-  }, [reviewRows]);
-
-  const worstRow = useMemo(() => {
-    return [...reviewRows].sort(
-      (a, b) => b.review.centipawnLoss - a.review.centipawnLoss,
-    )[0];
-  }, [reviewRows]);
-
-  const biggestSwingRow = useMemo(() => {
-    return [...reviewRows]
-      .filter((row) => row.evalSwing !== null)
-      .sort(
-        (a, b) => Math.abs(b.evalSwing ?? 0) - Math.abs(a.evalSwing ?? 0),
-      )[0];
-  }, [reviewRows]);
 
   /* =======================================================
      BOARD POSITION
@@ -612,6 +790,9 @@ export default function ChessGameReview({
     };
   }, [selected, continuation, continuationPreviewIndex]);
 
+  // The board shows the move from the game, not an alternative, continuation or the correct move.
+  const showingPlayedMove = highlightedBestMove === null && continuationPreviewIndex === null && !showingCorrectMove;
+
   // A clicked engine alternative is played out on the board, like the played move.
   const alternativePreview = useMemo(() => {
     if (!selected || !highlightedBestMove || continuationPreview) {
@@ -638,7 +819,29 @@ export default function ChessGameReview({
     }
   }, [selected, highlightedBestMove, continuationPreview]);
 
+  // "Show correct move": the winning move played instead of the played move.
+  const correctMovePreview = useMemo(() => {
+    if (!selected || !winningMove || !showingCorrectMove || continuationPreview || alternativePreview) {
+      return null;
+    }
+
+    const game = new Chess(selected.fenBefore);
+
+    try {
+      const move = game.move({ from: winningMove.from, to: winningMove.to, promotion: winningMove.promotion });
+      return { game, move: { from: move.from, to: move.to } };
+    } catch {
+      return null;
+    }
+    // winningMove is derived from `selected`.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected, showingCorrectMove, continuationPreview, alternativePreview]);
+
   const reviewChess = useMemo(() => {
+    if (frame) {
+      return new Chess(frame.fen);
+    }
+
     if (continuationPreview) {
       return continuationPreview.game;
     }
@@ -647,12 +850,16 @@ export default function ChessGameReview({
       return alternativePreview.game;
     }
 
+    if (correctMovePreview) {
+      return correctMovePreview.game;
+    }
+
     if (!selected) {
       return new Chess();
     }
 
     return new Chess(selected.fenAfter);
-  }, [selected, alternativePreview, continuationPreview]);
+  }, [frame, selected, alternativePreview, continuationPreview, correctMovePreview]);
 
   const board = reviewChess.board();
 
@@ -660,10 +867,12 @@ export default function ChessGameReview({
 
   const continuationMove = continuationPreview?.move ?? null;
 
-  const selectedAnnotations: BoardAnnotations | null = continuationMove
+  const selectedAnnotations: BoardAnnotations | null = frame
+    ? frame.annotations
+    : continuationMove
     ? {
         // The clicked continuation move: border its target square.
-        marks: [{ square: continuationMove.to, kind: "outline", color: "#fcd34d", opacity: 1 }],
+        marks: [{ square: continuationMove.to, kind: "outline", color: CONTINUATION_COLOR, opacity: 1 }],
         arrows: [],
       }
     : alternativePreview
@@ -673,6 +882,13 @@ export default function ChessGameReview({
           quality: alternativePreview.quality,
           fenAfter: alternativePreview.game.fen(),
         })
+      : correctMovePreview?.move
+        ? reviewMoveAnnotations({
+            from: correctMovePreview.move.from,
+            to: correctMovePreview.move.to,
+            quality: "Missed Win",
+            fenAfter: correctMovePreview.game.fen(),
+          })
       : selected && selectedRow
         ? reviewMoveAnnotations({
             from: selected.from,
@@ -684,12 +900,16 @@ export default function ChessGameReview({
         : null;
 
   const playedMove =
-    selected && !continuationPreview
+    selected && !continuationPreview && !correctMovePreview
       ? {
           from: selected.from,
           to: selected.to,
         }
       : null;
+
+  const boardLastMove = frame
+    ? frame.lastMove
+    : continuationMove ?? alternativeMove ?? correctMovePreview?.move ?? playedMove;
 
   const checkedKingSquare: Square | null = reviewChess.isCheck()
     ? (() => {
@@ -725,7 +945,7 @@ export default function ChessGameReview({
         return false;
       }
 
-      if (qualityFilter !== "all" && review.quality !== qualityFilter) {
+      if (qualityFilter !== "all" && displayQuality(row) !== qualityFilter) {
         return false;
       }
 
@@ -801,8 +1021,8 @@ export default function ChessGameReview({
 
         case "quality":
           result =
-            qualitySortOrder[a.review.quality] -
-            qualitySortOrder[b.review.quality];
+            qualitySortOrder[displayQuality(a)] -
+            qualitySortOrder[displayQuality(b)];
           break;
 
         case "loss":
@@ -880,16 +1100,261 @@ export default function ChessGameReview({
     setSortDirection("asc");
   }
 
-  function selectReviewMove(ply: number) {
+  function animateMove(from: Square, to: Square, durationMs?: number) {
+    animationCounterRef.current += 1;
+    setMoveAnimation({ id: `review-move-${animationCounterRef.current}`, from, to, durationMs });
+  }
+
+  function clearSequence() {
+    sequenceTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+    sequenceTimersRef.current = [];
+  }
+
+  /** Stops playback and any move sequence, and drops any running piece slide. */
+  function stopBoardEffects() {
+    clearSequence();
+    setPlaying(false);
+    setShowingCorrectMove(false);
+    setFrame(null);
+    setMoveAnimation(null);
+  }
+
+  /** The moves, from the position before the selected move, behind what the board shows now. */
+  function shownLine(): LineMove[] {
+    if (frame) return frame.line;
+    if (!selected) return [];
+    if (continuationPreview && continuation && continuationPreviewIndex !== null) {
+      return sanLine(selected.fenBefore, continuation.moves.slice(0, continuationPreviewIndex + 1));
+    }
+    if (alternativePreview && highlightedBestMove) return [uciMove(highlightedBestMove)];
+    if (correctMovePreview && winningMove) return [winningMove];
+    return [uciMove(selected.uci)];
+  }
+
+  /**
+   * Plays the board from what it shows now to `target`: the moves that differ are
+   * taken back one by one, then the target moves are played. Board draws a square's
+   * border and icon only once the moving piece has landed there.
+   */
+  function playLine(target: LineMove[], markBeforeMove?: BoardAnnotations) {
+    if (!selected) return;
+
+    const base = selected.fenBefore;
+    const current = shownLine();
+    let shared = 0;
+
+    while (shared < current.length && shared < target.length && sameLineMove(current[shared], target[shared])) {
+      shared += 1;
+    }
+
+    // Asking for the line already shown plays its last move again.
+    if (shared === current.length && shared === target.length) {
+      shared = Math.max(0, shared - 1);
+    }
+
+    type Step = { frame: ReviewFrame | null; slide: { from: Square; to: Square; durationMs: number } | null; holdMs: number };
+    const steps: Step[] = [];
+
+    for (let index = current.length - 1; index >= shared; index -= 1) {
+      const fen = linePosition(base, current, index);
+      if (!fen) break;
+      steps.push({
+        frame: { fen, line: current.slice(0, index), lastMove: null, annotations: null },
+        slide: { from: current[index].to, to: current[index].from, durationMs: REWIND_MS },
+        holdMs: REWIND_MS + LINE_GAP_MS,
+      });
+    }
+
+    if (markBeforeMove) {
+      const fen = linePosition(base, target, shared);
+      if (fen) {
+        steps.push({
+          frame: { fen, line: target.slice(0, shared), lastMove: null, annotations: markBeforeMove },
+          slide: null,
+          holdMs: MARK_BEFORE_MOVE_MS,
+        });
+      }
+    }
+
+    for (let index = shared; index < target.length - 1; index += 1) {
+      const fen = linePosition(base, target, index + 1);
+      if (!fen) break;
+      const move = target[index];
+      steps.push({
+        frame: {
+          fen,
+          line: target.slice(0, index + 1),
+          lastMove: { from: move.from, to: move.to },
+          annotations: { marks: [{ square: move.to, kind: "outline", color: CONTINUATION_COLOR, opacity: 1 }], arrows: [] },
+        },
+        slide: { from: move.from, to: move.to, durationMs: LINE_MOVE_MS },
+        holdMs: LINE_MOVE_MS + LINE_GAP_MS,
+      });
+    }
+
+    const last = target.length > shared ? target[target.length - 1] : null;
+    steps.push({ frame: null, slide: last ? { from: last.from, to: last.to, durationMs: LINE_MOVE_MS } : null, holdMs: 0 });
+
+    clearSequence();
+    setPlaying(false);
+
+    let delay = 0;
+
+    for (const step of steps) {
+      const show = () => {
+        setFrame(step.frame);
+        if (step.slide) animateMove(step.slide.from, step.slide.to, step.slide.durationMs);
+        else setMoveAnimation(null);
+      };
+
+      if (delay === 0) show();
+      else sequenceTimersRef.current.push(window.setTimeout(show, delay));
+
+      delay += step.holdMs;
+    }
+  }
+
+  function selectReviewMove(ply: number, fromPlayback = false) {
     continuationGenerationRef.current += 1;
+
+    const next = ply === selectedPly + 1 ? reviews[ply - 1] : undefined;
+
+    if (!fromPlayback) {
+      setPlaying(false);
+    }
+
+    clearSequence();
+    setFrame(null);
+    setShowingCorrectMove(false);
+
+    // Stepping one move forward slides the moved piece; jumps just switch positions.
+    if (next) {
+      animateMove(next.from, next.to);
+    } else {
+      setMoveAnimation(null);
+    }
 
     setSelectedPly(ply);
     setHighlightedBestMove(null);
     setContinuation(null);
+
+    // Reopening the review returns to this move.
+    const cached = reviewCache.get(movesKey);
+    if (cached) cached.ply = ply;
     setContinuationLoading(false);
     setContinuationError(null);
     setContinuationPreviewIndex(null);
   }
+
+  function showPlayedMove() {
+    if (!selected) return;
+
+    playLine([uciMove(selected.uci)]);
+    setShowingCorrectMove(false);
+    setContinuationPreviewIndex(null);
+    setHighlightedBestMove(null);
+  }
+
+  function showAlternative(uci: string) {
+    // The engine's pick is the move from the game: the board already shows it, or goes back to it.
+    if (selected && uci === selected.uci) {
+      if (!showingPlayedMove) showPlayedMove();
+      return;
+    }
+
+    playLine([uciMove(uci)]);
+    setShowingCorrectMove(false);
+    setContinuationPreviewIndex(null);
+    setHighlightedBestMove(uci);
+  }
+
+  function showContinuationMove(index: number) {
+    if (!selected || !continuation) return;
+
+    playLine(sanLine(selected.fenBefore, continuation.moves.slice(0, index + 1)));
+    setShowingCorrectMove(false);
+    setHighlightedBestMove(null);
+    setContinuationPreviewIndex(index);
+  }
+
+  /** Continues the game from the clicked best-continuation move. */
+  function playFromContinuation() {
+    if (!selected || !continuation || continuationPreviewIndex === null) {
+      return;
+    }
+
+    const continuationGame: ReviewContinuation = {
+      moves: [
+        ...reviews.slice(0, selected.ply - 1).map((review) => review.san),
+        ...continuation.moves.slice(0, continuationPreviewIndex + 1),
+      ],
+      name: continuationGameName(selected.moveNumber),
+    };
+
+    stopBoardEffects();
+
+    if (onPlayFromPosition) {
+      onPlayFromPosition(continuationGame);
+      return;
+    }
+
+    storePendingContinuation(continuationGame);
+    onClose();
+    navigate(HOTSEAT_PATH);
+  }
+
+  function showCorrectMove() {
+    if (!selected || !winningMove) {
+      return;
+    }
+
+    const violet = qualityColor("Missed Win");
+
+    // The played piece walks back home, the winning piece is marked, then it moves.
+    playLine([winningMove], {
+      icon: { square: winningMove.from, quality: "Missed Win" },
+      marks: [{ square: winningMove.from, kind: "outline", color: violet, opacity: 0.95 }],
+      arrows: [],
+    });
+    setShowingCorrectMove(true);
+    setContinuationPreviewIndex(null);
+    setHighlightedBestMove(null);
+  }
+
+  function togglePlayback() {
+    if (playing) {
+      setPlaying(false);
+      return;
+    }
+
+    if (selectedPly >= reviews.length) {
+      selectReviewMove(0, true);
+    }
+
+    setPlaying(true);
+  }
+
+  useEffect(() => {
+    if (!playing) {
+      return;
+    }
+
+    if (selectedPly >= reviews.length) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      selectReviewMove(selectedPly + 1, true);
+
+      if (selectedPly + 1 >= reviews.length) {
+        setPlaying(false);
+      }
+    }, PLAYBACK_STEP_MS);
+
+    return () => window.clearTimeout(timer);
+    // selectReviewMove reads the same render's state.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playing, selectedPly, reviews.length]);
 
   function showSimpleReview() {
     setDetailsOpen(false);
@@ -898,26 +1363,6 @@ export default function ChessGameReview({
       setSortKey("move");
       setSortDirection("asc");
     }
-  }
-
-  function selectRelativeCritical(direction: -1 | 1) {
-    if (criticalRows.length === 0) {
-      return;
-    }
-
-    if (direction === 1) {
-      const next = criticalRows.find((row) => row.review.ply > selectedPly);
-      selectReviewMove(next?.review.ply ?? criticalRows[0].review.ply);
-      return;
-    }
-
-    const previous = [...criticalRows]
-      .reverse()
-      .find((row) => row.review.ply < selectedPly);
-
-    selectReviewMove(
-      previous?.review.ply ?? criticalRows[criticalRows.length - 1].review.ply,
-    );
   }
 
   /* =======================================================
@@ -990,7 +1435,7 @@ export default function ChessGameReview({
 
   function renderMoveReviewPanel(showLoss: boolean) {
     return (
-      <aside className="flex h-full min-h-0 flex-col overflow-hidden rounded-[1.35rem] border border-amber-100/[0.08] bg-[linear-gradient(145deg,rgba(9,18,28,.88),rgba(5,10,16,.86))] shadow-lg shadow-black/15">
+      <aside className="flex h-full min-h-0 flex-col overflow-hidden rounded-[1.35rem] max-xl:max-h-[75dvh] border border-amber-100/[0.08] bg-[linear-gradient(145deg,rgba(9,18,28,.88),rgba(5,10,16,.86))] shadow-lg shadow-black/15">
         <div className="shrink-0 border-b border-white/10 px-3 py-2.5">
           <div className="flex items-center justify-between gap-3">
             <div>
@@ -1074,8 +1519,8 @@ export default function ChessGameReview({
               onChange={(value) => setQualityFilter(value as QualityFilter)}
               options={[
                 ["all", "All"],
-                ...qualityList.map(
-                  (quality) => [quality, quality] as [string, string],
+                ...[...qualityList, "Missed Win"].map(
+                  (quality) => [quality, ui(quality)] as [string, string],
                 ),
               ]}
             />
@@ -1340,40 +1785,44 @@ export default function ChessGameReview({
     ? phasePerformance[selected.color]
     : [];
 
-  return (
+  /*
+   * The review is a page of its own: it covers the whole app viewport, and
+   * below xl it scrolls like a normal page. It is portalled out of the game
+   * page because game pages are horizontally translated, which would anchor
+   * this fixed layer to the page instead of the screen (the game showed first).
+   */
+  const reviewPage = (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={ui("Game Review")}
       className="
         fixed
         inset-x-0
         bottom-0
         top-[var(--public-header-height)]
         z-[100]
-        flex
-        items-center
-        justify-center
-        bg-[radial-gradient(circle_at_50%_0%,rgba(126,88,37,.16),transparent_34%),radial-gradient(circle_at_20%_30%,rgba(34,62,91,.16),transparent_30%),rgba(1,4,8,.91)]
-        p-2
-        sm:p-2.5
+        overflow-y-auto
+        overflow-x-hidden
+        overscroll-contain
+        bg-[#03070c]
+        xl:overflow-hidden
       "
     >
       <div
         className="
-          flex
-          h-[calc(var(--app-height)-1rem)]
-          w-full
-          max-w-[1980px]
-          flex-col
-          overflow-hidden
           relative
           isolate
-          rounded-[2rem]
-          border
-          border-amber-100/[0.10]
-          bg-[linear-gradient(145deg,rgba(5,10,16,.985),rgba(3,7,12,.98))]
-          shadow-[0_32px_110px_rgba(0,0,0,.78)]
+          flex
+          min-h-full
+          w-full
+          flex-col
+          bg-[radial-gradient(circle_at_50%_0%,rgba(126,88,37,.12),transparent_34%),linear-gradient(145deg,rgba(5,10,16,.985),rgba(3,7,12,.98))]
+          xl:h-full
+          xl:overflow-hidden
         "
       >
-        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden rounded-[2rem]">
+        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
           <div className="absolute -right-20 -top-32 select-none font-serif text-[27rem] leading-none text-amber-100/[0.018]">
             ♞
           </div>
@@ -1384,7 +1833,7 @@ export default function ChessGameReview({
         {/* HEADER */}
 
         {/* z-20: the Audio / Appearance menus drop down over the review body. */}
-        <ChessPageHeader className="relative z-20 flex shrink-0 items-center justify-between border-b border-amber-100/[0.08] bg-[#08111b]/88 px-5 py-3.5" title="Game Review">
+        <ChessPageHeader className="relative z-20 flex shrink-0 items-center justify-between border-b border-amber-100/[0.08] bg-[#08111b]/88 px-3 py-2.5 sm:px-5 sm:py-3.5" title="Game Review">
 
 
           <div className="flex items-center gap-2">
@@ -1418,17 +1867,31 @@ export default function ChessGameReview({
           </div>
         </ChessPageHeader>
 
-        {trainingPuzzleStatus && (
-          <div className="mx-4 mt-3 rounded-2xl border border-amber-300/15 bg-[linear-gradient(135deg,rgba(111,76,32,.14),rgba(7,14,22,.68))] px-4 py-3 text-xs leading-5 text-amber-100/80 shadow-inner shadow-black/20">
-            <span className="mr-2 text-amber-300">✦</span>
-            {trainingPuzzleStatus}
+        {(trainingPuzzleStatus || reviews.length > 0) && (
+          <div className="mx-3 mt-3 flex shrink-0 flex-col gap-2 sm:mx-4 lg:flex-row lg:items-stretch">
+            {trainingPuzzleStatus && (
+              <div className="flex items-center rounded-2xl border border-amber-300/15 bg-[linear-gradient(135deg,rgba(111,76,32,.14),rgba(7,14,22,.68))] px-4 py-2 text-xs leading-5 text-amber-100/80 shadow-inner shadow-black/20 lg:w-[34%] lg:max-w-[520px] lg:shrink-0">
+                <span className="mr-2 shrink-0 text-amber-300">✦</span>
+                <span className="min-w-0">{trainingPuzzleStatus}</span>
+              </div>
+            )}
+
+            {reviews.length > 0 && (
+              <ReviewPlaybackBar
+                rows={reviewRows}
+                ply={selectedPly}
+                playing={playing}
+                onTogglePlay={togglePlayback}
+                onSeek={(ply) => selectReviewMove(Math.max(0, Math.min(reviews.length, ply)))}
+              />
+            )}
           </div>
         )}
 
         {/* BEFORE ANALYSIS */}
 
         {reviews.length === 0 ? (
-          <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-7 lg:px-9">
+          <div className="min-h-0 flex-auto px-3 py-4 sm:px-7 sm:py-6 lg:px-9 xl:flex-1 xl:overflow-y-auto">
             <section className="relative mx-auto flex min-h-full max-w-7xl items-center overflow-hidden rounded-[2.1rem] border border-amber-100/[0.10] bg-[linear-gradient(145deg,rgba(10,20,31,.88),rgba(4,9,15,.94))] p-6 shadow-[0_28px_80px_rgba(0,0,0,.30)] sm:p-8 lg:p-10">
               <div className="pointer-events-none absolute -right-10 -top-20 font-serif text-[18rem] leading-none text-amber-100/[0.025]">
                 ♞
@@ -1557,7 +2020,7 @@ export default function ChessGameReview({
             </section>
           </div>
         ) : detailsOpen ? (
-          <div className="grid min-h-0 flex-1 auto-rows-max gap-2 overflow-y-auto bg-[radial-gradient(circle_at_50%_12%,rgba(176,126,61,.035),transparent_28%)] p-4 xl:auto-rows-auto xl:grid-cols-[330px_minmax(0,1fr)_460px] xl:overflow-hidden">
+          <div className="grid min-h-0 flex-auto auto-rows-max gap-2 bg-[radial-gradient(circle_at_50%_12%,rgba(176,126,61,.035),transparent_28%)] p-3 sm:p-4 xl:flex-1 xl:auto-rows-auto xl:grid-cols-[330px_minmax(0,1fr)_460px] xl:overflow-hidden">
             {/* ===============================================
                 LEFT — WHITE SUMMARY + EDUCATIONAL DETAILS
                =============================================== */}
@@ -1574,12 +2037,17 @@ export default function ChessGameReview({
                     <CurrentMoveButton
                       review={selected}
                       quality={displayQuality(selectedRow)}
-                      active={highlightedBestMove === null && continuationPreviewIndex === null}
-                      onClick={() => {
-                        setContinuationPreviewIndex(null);
-                        setHighlightedBestMove(null);
-                      }}
+                      active={showingPlayedMove}
+                      onClick={showPlayedMove}
                     />
+
+                    {winningMove && (
+                      <CorrectMoveButton
+                        san={winningMove.san}
+                        showing={showingCorrectMove}
+                        onClick={showingCorrectMove ? showPlayedMove : showCorrectMove}
+                      />
+                    )}
 
                     <div className="mt-3 flex flex-wrap gap-1.5">
                       <PhaseBadge phase={selectedRow.phase} />
@@ -1663,11 +2131,9 @@ export default function ChessGameReview({
                             san={suggestion.san}
                             evaluation={suggestion.evaluation}
                             quality={alternativeQuality(selected.bestMoves, index)}
-                            active={highlightedBestMove === suggestion.uci}
-                            onClick={() => {
-                              setContinuationPreviewIndex(null);
-                              setHighlightedBestMove(suggestion.uci);
-                            }}
+                            played={suggestion.uci === selected.uci}
+                            active={suggestion.uci === selected.uci ? showingPlayedMove : highlightedBestMove === suggestion.uci}
+                            onClick={() => showAlternative(suggestion.uci)}
                           />
                         ))}
                       </div>
@@ -1736,10 +2202,7 @@ export default function ChessGameReview({
 
                                     <button
                                       type="button"
-                                      onClick={() => {
-                                        setHighlightedBestMove(null);
-                                        setContinuationPreviewIndex(index);
-                                      }}
+                                      onClick={() => showContinuationMove(index)}
                                       className={`inline-flex items-center gap-1.5 rounded-lg border px-2 py-1 text-left transition ${
                                         continuationPreviewIndex === index
                                           ? "border-yellow-300/45 bg-yellow-300/15 text-yellow-100"
@@ -1843,80 +2306,37 @@ export default function ChessGameReview({
             </div>
 
             {/* ===============================================
-                CENTER — QUICK NAVIGATION + BOARD
+                CENTER — BOARD
                =============================================== */}
 
             <div className="order-first flex min-h-0 flex-col gap-3 xl:order-none">
-              <section className="shrink-0 rounded-2xl border border-white/10 bg-[#09121c]/78 px-3 py-2.5">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div>
-                    <p className="text-[9px] font-black uppercase tracking-widest text-zinc-600">{ui("Quick Navigation")}</p>
-                    <p className="mt-0.5 text-[9px] text-zinc-600">{ui("Jump directly to the most useful teaching moments")}</p>
-                  </div>
-
-                  <span className="rounded-full bg-amber-400/10 px-2 py-1 text-[9px] font-bold text-amber-300">
-                    {totalCritical}{ui("critical")}</span>
-                </div>
-
-                <div className="mt-2 grid grid-cols-5 gap-1.5">
-                  <JumpButton
-                    label={ui("★ Best")}
-                    disabled={!bestRow}
-                    onClick={() =>
-                      bestRow && selectReviewMove(bestRow.review.ply)
-                    }
-                  />
-
-                  <JumpButton
-                    label={ui("⚠ Worst")}
-                    disabled={!worstRow}
-                    onClick={() =>
-                      worstRow && selectReviewMove(worstRow.review.ply)
-                    }
-                  />
-
-                  <JumpButton
-                    label={ui("↕ Swing")}
-                    disabled={!biggestSwingRow}
-                    onClick={() =>
-                      biggestSwingRow &&
-                      selectReviewMove(biggestSwingRow.review.ply)
-                    }
-                  />
-
-                  <JumpButton
-                    label={ui("◀ Critical")}
-                    disabled={criticalRows.length === 0}
-                    onClick={() => selectRelativeCritical(-1)}
-                  />
-
-                  <JumpButton
-                    label={ui("Critical ▶")}
-                    disabled={criticalRows.length === 0}
-                    onClick={() => selectRelativeCritical(1)}
-                  />
-                </div>
-
-                <p className="mt-2 text-[9px] leading-4 text-zinc-600">
-                  <strong className="text-zinc-400">{ui("ACPL")}</strong>{ui("means Average Centipawn Loss: the average amount of engine evaluation a player loses per move. Lower ACPL is better. App accuracy is this app's own ACPL-based metric, not Chess.com accuracy.")}</p>
-              </section>
-
               <main className="flex min-h-0 flex-1 items-center justify-center overflow-hidden px-1 py-1 xl:px-0">
-                <div className="w-full max-w-[min(100%,calc(100vh-15rem))]">
+                <div className="w-full max-w-[min(100%,calc(var(--app-height)-15.5rem))]">
                   <Board
                     board={board}
                     annotations={selectedAnnotations}
                     selectedSquare={null}
                     legalMoves={[]}
-                    lastMove={continuationMove ?? alternativeMove ?? playedMove}
+                    lastMove={boardLastMove}
                     checkedKingSquare={checkedKingSquare}
                     onSquareClick={() => {}}
                     orientation={orientation}
-                    pieceScale={1.3}
+                    pieceScale={1.1}
+                    moveAnimation={moveAnimation}
                   />
 
                   {continuationMove && selected && (
-                    <div className="mt-2 rounded-xl border border-yellow-300/20 bg-yellow-300/[0.07] px-3 py-2 text-center text-xs text-yellow-100/85">{ui("Continuation preview · the yellow squares show the move you clicked")}</div>
+                    <div className="mt-2 flex flex-col items-center gap-2 rounded-xl border border-yellow-300/20 bg-yellow-300/[0.07] px-3 py-2 text-center text-xs text-yellow-100/85 sm:flex-row sm:justify-between sm:text-left">
+                      <span>{ui("Continuation preview · the yellow squares show the move you clicked")}</span>
+                      <button
+                        type="button"
+                        onClick={playFromContinuation}
+                        className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-amber-200/25 bg-[linear-gradient(180deg,rgba(245,190,92,.98),rgba(207,145,53,.96))] px-3 py-1.5 text-[11px] font-black text-[#161007] transition hover:brightness-105"
+                      >
+                        <Play size={12} aria-hidden="true" />
+                        {ui("Play from here")}
+                      </button>
+                    </div>
                   )}
 
                   {!continuationMove && alternativeMove && selected && (
@@ -1933,7 +2353,7 @@ export default function ChessGameReview({
             <div className="min-h-0">{renderMoveReviewPanel(true)}</div>
           </div>
         ) : (
-          <div className="grid min-h-0 flex-1 auto-rows-max gap-2 overflow-y-auto bg-[radial-gradient(circle_at_50%_12%,rgba(176,126,61,.035),transparent_28%)] p-4 xl:auto-rows-auto xl:grid-cols-[290px_minmax(0,1fr)_450px] xl:overflow-hidden">
+          <div className="grid min-h-0 flex-auto auto-rows-max gap-2 bg-[radial-gradient(circle_at_50%_12%,rgba(176,126,61,.035),transparent_28%)] p-3 sm:p-4 xl:flex-1 xl:auto-rows-auto xl:grid-cols-[290px_minmax(0,1fr)_450px] xl:overflow-hidden">
             {/* ===============================================
                 SIMPLE — CURRENT MOVE
                =============================================== */}
@@ -1944,12 +2364,17 @@ export default function ChessGameReview({
                   <CurrentMoveButton
                     review={selected}
                     quality={selectedRow ? displayQuality(selectedRow) : selected.quality}
-                    active={highlightedBestMove === null && continuationPreviewIndex === null}
-                    onClick={() => {
-                      setContinuationPreviewIndex(null);
-                      setHighlightedBestMove(null);
-                    }}
+                    active={showingPlayedMove}
+                    onClick={showPlayedMove}
                   />
+
+                  {winningMove && (
+                    <CorrectMoveButton
+                      san={winningMove.san}
+                      showing={showingCorrectMove}
+                      onClick={showingCorrectMove ? showPlayedMove : showCorrectMove}
+                    />
+                  )}
 
                   <div className="mt-4 rounded-xl bg-black/20 p-3 text-xs text-zinc-500">{ui("Evaluation loss")}{" "}
                     <strong className="text-zinc-200">
@@ -1967,11 +2392,9 @@ export default function ChessGameReview({
                             san={suggestion.san}
                             evaluation={suggestion.evaluation}
                             quality={alternativeQuality(selected.bestMoves, index)}
-                            active={highlightedBestMove === suggestion.uci}
-                            onClick={() => {
-                              setContinuationPreviewIndex(null);
-                              setHighlightedBestMove(suggestion.uci);
-                            }}
+                            played={suggestion.uci === selected.uci}
+                            active={suggestion.uci === selected.uci ? showingPlayedMove : highlightedBestMove === suggestion.uci}
+                            onClick={() => showAlternative(suggestion.uci)}
                           />
                         ))}
                     </div>
@@ -2038,10 +2461,7 @@ export default function ChessGameReview({
 
                                   <button
                                     type="button"
-                                    onClick={() => {
-                                      setHighlightedBestMove(null);
-                                      setContinuationPreviewIndex(index);
-                                    }}
+                                    onClick={() => showContinuationMove(index)}
                                     className={`inline-flex items-center gap-1.5 rounded-lg border px-2 py-1 text-left transition ${
                                       continuationPreviewIndex === index
                                         ? "border-yellow-300/45 bg-yellow-300/15 text-yellow-100"
@@ -2080,21 +2500,32 @@ export default function ChessGameReview({
                =============================================== */}
 
             <main className="order-first flex min-h-0 items-center justify-center overflow-hidden px-1 xl:order-none xl:px-0">
-              <div className="w-full max-w-[min(100%,calc(100vh-10rem))]">
+              <div className="w-full max-w-[min(100%,calc(var(--app-height)-15.5rem))]">
                 <Board
                   board={board}
                   annotations={selectedAnnotations}
                   selectedSquare={null}
                   legalMoves={[]}
-                  lastMove={continuationMove ?? alternativeMove ?? playedMove}
+                  lastMove={boardLastMove}
                   checkedKingSquare={checkedKingSquare}
                   onSquareClick={() => {}}
                   orientation={orientation}
-                  pieceScale={1.3}
+                  pieceScale={1.2}
+                  moveAnimation={moveAnimation}
                 />
 
                 {continuationMove && selected && (
-                  <div className="mt-2 rounded-xl border border-yellow-300/20 bg-yellow-300/[0.07] px-3 py-2 text-center text-xs text-yellow-100/85">{ui("Continuation preview · the yellow squares show the move you clicked")}</div>
+                  <div className="mt-2 flex flex-col items-center gap-2 rounded-xl border border-yellow-300/20 bg-yellow-300/[0.07] px-3 py-2 text-center text-xs text-yellow-100/85 sm:flex-row sm:justify-between sm:text-left">
+                    <span>{ui("Continuation preview · the yellow squares show the move you clicked")}</span>
+                    <button
+                      type="button"
+                      onClick={playFromContinuation}
+                      className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-amber-200/25 bg-[linear-gradient(180deg,rgba(245,190,92,.98),rgba(207,145,53,.96))] px-3 py-1.5 text-[11px] font-black text-[#161007] transition hover:brightness-105"
+                    >
+                      <Play size={12} aria-hidden="true" />
+                      {ui("Play from here")}
+                    </button>
+                  </div>
                 )}
 
                 {!continuationMove && alternativeMove && selected && (
@@ -2113,6 +2544,11 @@ export default function ChessGameReview({
       </div>
     </div>
   );
+
+  // The app shell carries the header-height variables and has no transform.
+  return inline
+    ? reviewPage
+    : createPortal(reviewPage, document.querySelector(".app-shell") ?? document.body);
 }
 
 /* =========================================================
@@ -2530,28 +2966,6 @@ function pvToSan(fen: string, pv: string[]) {
    EVALUATION GRAPH
    ========================================================= */
 
-function JumpButton({
-  label,
-  disabled,
-  onClick,
-}: {
-  label: string;
-  disabled: boolean;
-  onClick: () => void;
-}) {
-  useUiLanguage();
-  return (
-    <button
-      type="button"
-      disabled={disabled}
-      onClick={onClick}
-      className="rounded-lg border border-white/10 bg-black/20 px-2 py-2 text-[10px] font-bold text-zinc-400 transition hover:bg-white/5 hover:text-zinc-200 disabled:opacity-30"
-    >
-      {ui(label)}
-    </button>
-  );
-}
-
 function PhaseBadge({ phase }: { phase: GamePhase }) {
   useUiLanguage();
   return (
@@ -2663,6 +3077,322 @@ function PairedReviewCell({
 
       <span className="shrink-0" style={{ color }}>
         <ReviewQualityIcon quality={quality} size={12} />
+      </span>
+    </button>
+  );
+}
+
+const phaseColors: Record<GamePhase, string> = {
+  Opening: "#38bdf8",
+  Middlegame: "#f5b94c",
+  Endgame: "#b862ff",
+};
+
+const playbackMarkerQualities: ReviewVisualQuality[] = ["Mistake", "Blunder", "Missed Win"];
+
+/** Play/pause plus a scrubber whose track is split into the game's phases. */
+function ReviewPlaybackBar({
+  rows,
+  ply,
+  playing,
+  onTogglePlay,
+  onSeek,
+}: {
+  rows: EnrichedReviewRow[];
+  ply: number;
+  playing: boolean;
+  onTogglePlay: () => void;
+  onSeek: (ply: number) => void;
+}) {
+  useUiLanguage();
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [hoverPly, setHoverPly] = useState<number | null>(null);
+  const total = rows.length;
+
+  // Consecutive moves of the same phase form one track segment.
+  const segments = useMemo(() => {
+    const result: Array<{ phase: GamePhase; start: number; end: number }> = [];
+
+    for (const row of rows) {
+      const last = result[result.length - 1];
+
+      if (last && last.phase === row.phase) {
+        last.end = row.review.ply;
+      } else {
+        result.push({ phase: row.phase, start: row.review.ply - 1, end: row.review.ply });
+      }
+    }
+
+    return result;
+  }, [rows]);
+
+  const markers = rows.filter((row) => playbackMarkerQualities.includes(displayQuality(row)));
+  const progress = total > 0 ? (ply / total) * 100 : 0;
+  const shownPly = hoverPly ?? ply;
+  const current = shownPly > 0 ? rows[shownPly - 1] : null;
+
+  // Every move has a tick where a click lands on it; long games keep only White's moves.
+  const ticks = useMemo(
+    () => Array.from({ length: Math.max(0, total - 1) }, (_, index) => index + 1).filter((tick) => total <= 100 || tick % 2 === 1),
+    [total],
+  );
+
+  // Move numbers under the track, at most about eight of them.
+  const moveLabels = useMemo(() => {
+    const moves = Math.ceil(total / 2);
+    const step = [1, 2, 5, 10, 20, 25, 50, 100].find((candidate) => moves / candidate <= 8) ?? 200;
+    const labels: number[] = [];
+
+    for (let move = 1; move <= moves; move += move === 1 && step > 1 ? step - 1 : step) {
+      labels.push(move);
+    }
+
+    return labels;
+  }, [total]);
+
+  function plyAt(clientX: number) {
+    const rect = trackRef.current?.getBoundingClientRect();
+
+    if (!rect || rect.width === 0 || total === 0) {
+      return null;
+    }
+
+    const fraction = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+
+    return Math.round(fraction * total);
+  }
+
+  function seekTo(clientX: number) {
+    const target = plyAt(clientX);
+
+    if (target !== null && target !== ply) {
+      onSeek(target);
+    }
+  }
+
+  return (
+    <div className="flex min-w-0 flex-1 items-center gap-2 rounded-2xl border border-white/[0.08] bg-[#09121c]/78 px-2 py-2 shadow-inner shadow-black/20 sm:gap-3 sm:px-3">
+      <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
+        <button
+          type="button"
+          aria-label={ui("Go to start")}
+          title={ui("Go to start")}
+          disabled={ply === 0}
+          onClick={() => onSeek(0)}
+          className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-white/5 hover:text-zinc-200 disabled:opacity-30"
+        >
+          <ChevronsLeft size={16} />
+        </button>
+
+        <button
+          type="button"
+          aria-label={ui("Previous move")}
+          disabled={ply === 0}
+          onClick={() => onSeek(ply - 1)}
+          className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-white/5 hover:text-zinc-200 disabled:opacity-30"
+        >
+          <ChevronLeft size={16} />
+        </button>
+
+        <button
+          type="button"
+          aria-label={playing ? ui("Pause") : ui("Play")}
+          onClick={onTogglePlay}
+          className="grid h-9 w-9 place-items-center rounded-full border border-amber-200/25 bg-[linear-gradient(180deg,rgba(245,190,92,.98),rgba(207,145,53,.96))] text-[#161007] shadow-[0_6px_18px_rgba(190,126,40,.22)] transition hover:brightness-105"
+        >
+          {playing ? <Pause size={15} fill="currentColor" /> : <Play size={15} fill="currentColor" className="translate-x-px" />}
+        </button>
+
+        <button
+          type="button"
+          aria-label={ui("Next move")}
+          disabled={ply >= total}
+          onClick={() => onSeek(ply + 1)}
+          className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-white/5 hover:text-zinc-200 disabled:opacity-30"
+        >
+          <ChevronRight size={16} />
+        </button>
+
+        <button
+          type="button"
+          aria-label={ui("Go to end")}
+          title={ui("Go to end")}
+          disabled={ply >= total}
+          onClick={() => onSeek(total)}
+          className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-white/5 hover:text-zinc-200 disabled:opacity-30"
+        >
+          <ChevronsRight size={16} />
+        </button>
+      </div>
+
+      <div className="relative min-w-0 flex-1 pb-3">
+      <div
+        ref={trackRef}
+        role="slider"
+        tabIndex={0}
+        aria-label={ui("Game timeline")}
+        aria-valuemin={0}
+        aria-valuemax={total}
+        aria-valuenow={ply}
+        onPointerDown={(event) => {
+          event.currentTarget.setPointerCapture(event.pointerId);
+          seekTo(event.clientX);
+        }}
+        onPointerMove={(event) => {
+          if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+            seekTo(event.clientX);
+            setHoverPly(null);
+          } else if (event.pointerType === "mouse") {
+            setHoverPly(plyAt(event.clientX));
+          }
+        }}
+        onPointerLeave={() => setHoverPly(null)}
+        onKeyDown={(event) => {
+          const target =
+            event.key === "ArrowLeft" ? ply - 1
+              : event.key === "ArrowRight" ? ply + 1
+                : event.key === "Home" ? 0
+                  : event.key === "End" ? total
+                    : null;
+
+          if (target !== null) {
+            event.preventDefault();
+            onSeek(target);
+          }
+        }}
+        className="relative h-7 min-w-0 cursor-pointer touch-none select-none overflow-hidden rounded-lg border border-white/[0.06] bg-black/30 outline-none focus-visible:ring-2 focus-visible:ring-amber-300/40"
+      >
+        {segments.map((segment) => {
+          const width = ((segment.end - segment.start) / total) * 100;
+
+          return (
+            <div
+              key={segment.start}
+              title={ui(segment.phase)}
+              className="absolute inset-y-0 flex items-center justify-center overflow-hidden border-r border-black/40 last:border-r-0"
+              style={{
+                left: `${(segment.start / total) * 100}%`,
+                width: `${width}%`,
+                background: `${phaseColors[segment.phase]}24`,
+              }}
+            >
+              {width >= 9 && (
+                <span className="truncate px-1 text-[8px] font-black uppercase tracking-[0.14em]" style={{ color: `${phaseColors[segment.phase]}cc` }}>
+                  {ui(segment.phase)}
+                </span>
+              )}
+            </div>
+          );
+        })}
+
+        <div className="pointer-events-none absolute inset-y-0 left-0 bg-white/[0.09]" style={{ width: `${progress}%` }} />
+
+        {ticks.map((tick) => (
+          <span
+            key={tick}
+            className={`pointer-events-none absolute bottom-0 w-px -translate-x-1/2 ${tick % 2 === 1 ? "h-2" : "h-1"} ${
+              tick <= ply ? "bg-[#fff3d5]/45" : "bg-white/20"
+            }`}
+            style={{ left: `${(tick / total) * 100}%` }}
+          />
+        ))}
+
+        {hoverPly !== null && hoverPly !== ply && (
+          <span
+            className="pointer-events-none absolute inset-y-0 w-px -translate-x-1/2 bg-amber-200/70"
+            style={{ left: `${Math.min(99.6, Math.max(0.4, (hoverPly / total) * 100))}%` }}
+          />
+        )}
+
+        {markers.map((row) => {
+          const color = qualityColor(displayQuality(row));
+
+          return (
+            <span
+              key={row.review.ply}
+              className="pointer-events-none absolute top-1 h-1.5 w-1.5 -translate-x-1/2 rounded-full"
+              style={{ left: `${((row.review.ply - 0.5) / total) * 100}%`, background: color, boxShadow: `0 0 6px ${color}` }}
+            />
+          );
+        })}
+
+        <span
+          className="pointer-events-none absolute inset-y-0 w-[3px] -translate-x-1/2 rounded-full bg-[#fff3d5] shadow-[0_0_8px_rgba(255,243,213,.8)]"
+          style={{ left: `${Math.min(99.6, Math.max(0.4, progress))}%` }}
+        />
+      </div>
+
+      {total > 0 && (
+        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-3">
+          {moveLabels.map((move) => (
+            <span
+              key={move}
+              className="absolute top-0.5 -translate-x-1/2 font-mono text-[8px] font-bold leading-none text-zinc-500"
+              style={{ left: `${Math.min(97, Math.max(2, ((move * 2 - 1) / total) * 100))}%` }}
+            >
+              {move}
+            </span>
+          ))}
+        </div>
+      )}
+      </div>
+
+      <div className="w-14 shrink-0 text-right sm:w-20">
+        <p className="text-[8px] font-black uppercase tracking-wider text-zinc-600">
+          {shownPly}/{total}
+        </p>
+        <p className={`truncate font-mono text-xs font-bold ${hoverPly !== null && hoverPly !== ply ? "text-amber-200" : "text-zinc-300"}`}>
+          {current ? `${current.review.moveNumber}${current.review.color === "w" ? "." : "..."} ${current.review.san}` : ui("Start")}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function CorrectMoveButton({
+  san,
+  showing,
+  onClick,
+}: {
+  san: string | null;
+  showing: boolean;
+  onClick: () => void;
+}) {
+  useUiLanguage();
+  const violet = qualityColor("Missed Win");
+
+  return (
+    <button
+      type="button"
+      aria-pressed={showing}
+      onClick={onClick}
+      className="group/quality mt-3 flex w-full items-center gap-3 rounded-2xl border border-violet-400/30 bg-violet-400/[0.08] px-4 py-3 text-left transition hover:border-violet-300/50 hover:bg-violet-400/[0.14]"
+    >
+      <span
+        className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-violet-300/30 bg-[#06131e]"
+        style={{ color: violet, boxShadow: `0 0 12px ${violet}66` }}
+      >
+        <ReviewQualityIcon quality="Missed Win" size={16} />
+      </span>
+
+      <span className="min-w-0 flex-1">
+        <span className="block text-xs font-black text-violet-100">
+          {showing ? ui("Show played move") : ui("Show correct move")}
+        </span>
+        <span className="mt-0.5 block text-[10px] text-violet-200/60">
+          {showing ? (
+            ui("Back to the move from the game")
+          ) : (
+            <>
+              {ui("The winning move was")}{" "}
+              <strong className="font-mono text-violet-100">{san}</strong>
+            </>
+          )}
+        </span>
+      </span>
+
+      <span aria-hidden="true" className="text-violet-200/70">
+        {showing ? "↺" : "▶"}
       </span>
     </button>
   );

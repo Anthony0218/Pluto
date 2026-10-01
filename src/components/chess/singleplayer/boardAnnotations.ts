@@ -5,11 +5,12 @@ import { qualityColor, type ReviewVisualQuality } from "./reviewQualityVisuals";
 export type BoardArrow = { from: Square; to: Square; color: string; opacity: number };
 
 /**
- * "outline" borders a square; "origin" marks the square a piece left.
+ * "outline" borders a square; "origin" marks the square a piece left;
+ * "glow" softly pulses the whole square.
  */
 export type BoardSquareMark = {
   square: Square;
-  kind: "outline" | "origin";
+  kind: "outline" | "origin" | "glow";
   color: string;
   opacity: number;
 };
@@ -19,6 +20,8 @@ export type BoardBadge = { square: Square; kind: "shield"; color: string };
 
 export type BoardAnnotations = {
   icon?: { square: Square; quality: ReviewVisualQuality } | null;
+  /** Red cross in a square's top-right corner, in place of a quality icon. */
+  cross?: { square: Square; color: string } | null;
   marks?: BoardSquareMark[];
   arrows?: BoardArrow[];
   badges?: BoardBadge[];
@@ -27,6 +30,7 @@ export type BoardAnnotations = {
 const MOVE_COLOR = "#cbd5e1";
 const CHECK_COLOR = "#ff4d67";
 const SUPPORT_COLOR = "#4f9dff";
+const WRONG_COLOR = "#ff4d67";
 
 /** True when two squares touch, orthogonally or diagonally. */
 function adjacent(a: Square, b: Square) {
@@ -59,14 +63,31 @@ function checkmateAnnotations(fenAfter: string): Pick<BoardAnnotations, "arrows"
   return { arrows, badges };
 }
 
-/** Live Chess Coach: the grade icon, plus the mate markup on a checkmate; the engine's best move stays off the board. */
+/** True when the piece that landed on `square` in `fenAfter` still stands there in `currentFen`. */
+function pieceStillOn(square: Square, fenAfter: string, currentFen: string) {
+  try {
+    const moved = new Chess(fenAfter).get(square);
+    const current = new Chess(currentFen).get(square);
+    return Boolean(moved && current && moved.type === current.type && moved.color === current.color);
+  } catch {
+    return true;
+  }
+}
+
+/**
+ * Live Chess Coach: the grade icon, plus the mate markup on a checkmate; the engine's best move stays off the board.
+ * With `currentFen`, the icon disappears once the graded piece left its square (e.g. it was captured),
+ * so it is never mistaken for a grade of the capturing piece.
+ */
 export function liveCoachAnnotations(move: {
   to: Square;
   quality?: ReviewVisualQuality | null;
   fenAfter?: string;
+  currentFen?: string;
 }): BoardAnnotations {
+  const iconVisible = !move.currentFen || !move.fenAfter || pieceStillOn(move.to, move.fenAfter, move.currentFen);
   return {
-    icon: move.quality ? { square: move.to, quality: move.quality } : null,
+    icon: move.quality && iconVisible ? { square: move.to, quality: move.quality } : null,
     marks: [],
     ...(move.fenAfter ? checkmateAnnotations(move.fenAfter) : { arrows: [] }),
   };
@@ -80,13 +101,25 @@ export function reviewMoveAnnotations(move: {
   fenAfter: string;
   bestMoveUci?: string | null;
 }): BoardAnnotations {
-  const result: Required<Omit<BoardAnnotations, "icon">> = { marks: [], arrows: [], badges: [] };
+  const result: Required<Omit<BoardAnnotations, "icon" | "cross">> = { marks: [], arrows: [], badges: [] };
   const link = (from: Square, to: Square, color: string, opacity: number) => result.arrows.push({ from, to, color, opacity });
+
+  // A missed win crosses out the played move and points at the piece that would have won.
+  const winMove = move.quality === "Missed Win" && move.bestMoveUci && move.bestMoveUci.slice(0, 4) !== `${move.from}${move.to}`
+    ? { from: move.bestMoveUci.slice(0, 2) as Square, to: move.bestMoveUci.slice(2, 4) as Square }
+    : null;
 
   result.marks.push(
     { square: move.from, kind: "origin", color: MOVE_COLOR, opacity: 0.55 },
-    { square: move.to, kind: "outline", color: qualityColor(move.quality), opacity: 0.95 },
+    { square: move.to, kind: "outline", color: winMove ? WRONG_COLOR : qualityColor(move.quality), opacity: 0.95 },
   );
+  if (winMove) {
+    const violet = qualityColor("Missed Win");
+    result.marks.push(
+      { square: winMove.from, kind: "outline", color: violet, opacity: 0.95 },
+      { square: winMove.to, kind: "glow", color: violet, opacity: 0.32 },
+    );
+  }
   link(move.from, move.to, MOVE_COLOR, 0.35);
 
   try {
@@ -122,5 +155,8 @@ export function reviewMoveAnnotations(move: {
     // An unreadable position just skips the check arrows.
   }
 
+  if (winMove) {
+    return { icon: { square: winMove.from, quality: move.quality }, cross: { square: move.to, color: WRONG_COLOR }, ...result };
+  }
   return { icon: { square: move.to, quality: move.quality }, ...result };
 }

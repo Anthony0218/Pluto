@@ -10,6 +10,7 @@ export function AlternativeMoveButton({
   evaluation,
   quality,
   active,
+  played = false,
   onClick,
 }: {
   index: number;
@@ -17,6 +18,8 @@ export function AlternativeMoveButton({
   evaluation: string;
   quality: MoveQuality;
   active: boolean;
+  /** The alternative is the move that was played in the game. */
+  played?: boolean;
   onClick: () => void;
 }) {
   useUiLanguage();
@@ -47,10 +50,21 @@ export function AlternativeMoveButton({
               <ReviewQualityIcon quality={quality} size={12} />
               {ui(quality)}
             </span>
+            {played && (
+              <span className="rounded-md border border-amber-200/25 bg-amber-200/10 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wider text-amber-100">
+                {ui("Played")}
+              </span>
+            )}
           </p>
 
           <p className="mt-0.5 text-[10px] text-zinc-600">
-            {active ? ui("Highlighted on board") : ui("Click to highlight")}
+            {played
+              ? active
+                ? ui("Currently played · on the board")
+                : ui("Currently played · click to show")
+              : active
+                ? ui("Highlighted on board")
+                : ui("Click to highlight")}
           </p>
         </div>
       </div>
