@@ -177,7 +177,7 @@ test('two clients racing for the same food agree on one reservation and one grow
   s.clock.now += 100;
   await Promise.all([0,1,0,1].map(i=>s.request(`user-${i}`,{op:'input',code:room.room_code,input:{x:0,y:0}})));
   assert.equal(row.game_state.food[0].target,'user-0');assert.equal(row.game_state.players[0].mass,36);
-  s.clock.now += 700;
+  s.clock.now += 1100;
   await Promise.all([0,1,0,1].map(i=>s.request(`user-${i}`,{op:'input',code:room.room_code,input:{x:0,y:0}})));
   const snapshots=await Promise.all([0,1].map(i=>s.request(`user-${i}`,{op:'get',code:room.room_code})));
   for(const response of snapshots){assert.equal(response.body.game_state.food.length,0);assert.equal(response.body.game_state.players[0].mass,41);assert.equal(response.body.game_state.players[0].foodEaten,1)}

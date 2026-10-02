@@ -14,7 +14,9 @@ import ProfileAvatarPicker, {
 } from "../../components/social/ProfileAvatarPicker";
 import ProfileFriends from "../../components/social/ProfileFriends";
 import MyGroupsCard from "../../components/social/MyGroupsCard";
-import DoNotDisturbSwitch from "../../components/App/notifications/DoNotDisturbSwitch";
+import PixelAvatarEditor from "../../components/social/PixelAvatarEditor";
+import { isPixelAvatarId } from "../../components/social/pixelAvatar";
+import DoNotDisturbSwitch, { ClanPopupsSwitch } from "../../components/App/notifications/DoNotDisturbSwitch";
 
 type GameStat = {
   games_played: number;
@@ -125,6 +127,7 @@ export default function ProfilePage() {
 
   const [editing, setEditing] = useState(false);
   const [avatarPickerOpen, setAvatarPickerOpen] = useState(false);
+  const [avatarTab, setAvatarTab] = useState<"characters" | "draw">("characters");
 
   const [saving, setSaving] = useState(false);
   const [savingAvatar, setSavingAvatar] = useState(false);
@@ -590,6 +593,7 @@ export default function ProfilePage() {
                 </p>
 
                 <DoNotDisturbSwitch userId={user.id} />
+                <ClanPopupsSwitch userId={user.id} className="mt-2" />
               </div>
 
               {/* FEEDBACK */}
@@ -628,7 +632,7 @@ export default function ProfilePage() {
                     </h2>
 
                     <p className="mt-1 text-xs text-zinc-500">
-                      {ui("Choose one of 12 characters.")}
+                      {ui(avatarTab === "draw" ? "Draw your own 16×16 pixel avatar." : "Choose one of 12 characters.")}
                     </p>
                   </div>
 
@@ -641,12 +645,38 @@ export default function ProfilePage() {
                   </button>
                 </div>
 
-                <ProfileAvatarPicker
-                  selected={avatarId}
-                  onSelect={(nextAvatarId) => {
-                    void chooseAvatar(nextAvatarId);
-                  }}
-                />
+                <div role="tablist" aria-label={ui("Avatar type")} className="mb-5 inline-flex rounded-xl border border-white/10 p-1">
+                  {(["characters", "draw"] as const).map((tab) => (
+                    <button
+                      key={tab}
+                      type="button"
+                      role="tab"
+                      aria-selected={avatarTab === tab}
+                      onClick={() => setAvatarTab(tab)}
+                      className={`rounded-lg px-4 py-1.5 text-xs font-black ${avatarTab === tab ? "bg-amber-300 text-black" : "text-zinc-400 hover:text-white"}`}
+                    >
+                      {ui(tab === "draw" ? "Draw your own" : "Characters")}
+                    </button>
+                  ))}
+                </div>
+
+                {avatarTab === "draw" ? (
+                  <PixelAvatarEditor
+                    initialAvatarId={isPixelAvatarId(avatarId) ? avatarId : null}
+                    saving={savingAvatar}
+                    onCancel={() => setAvatarTab("characters")}
+                    onSave={(nextAvatarId) => {
+                      void chooseAvatar(nextAvatarId);
+                    }}
+                  />
+                ) : (
+                  <ProfileAvatarPicker
+                    selected={avatarId}
+                    onSelect={(nextAvatarId) => {
+                      void chooseAvatar(nextAvatarId);
+                    }}
+                  />
+                )}
               </div>
             )}
 

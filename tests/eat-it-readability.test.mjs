@@ -17,7 +17,7 @@ import { validPosition, distance } from '../src/games/eat-it/maps.ts';
 import { activateEscape } from '../src/games/eat-it/escape.ts';
 import { parseSettings, applyRoomAction } from '../src/games/eat-it/authority.ts';
 import { reviewSettings } from '../src/games/eat-it/review.ts';
-import { loadPreferences, savePreferences } from '../src/games/eat-it/preferences.ts';
+import { loadPreferences, savePreferences, SETTINGS_KEY } from '../src/games/eat-it/preferences.ts';
 import { readFileSync } from 'node:fs';
 const make=(options={},map='city')=>{
  const s=createGame(map,[{id:'a',name:'A'},{id:'b',name:'B',bot:true},{id:'c',name:'C'}],33,'test',{mode:'solo',...options});
@@ -32,7 +32,13 @@ test('defaults, persistence and sanitization keep one shared rules configuration
  const defaults=matchSettings();assert.equal(defaults.animalsEnabled,true);assert.equal(defaults.hellEnabled,true);assert.equal(defaults.livesEnabled,true);assert.equal(defaults.botDifficulty,'medium');
  const storage=new Map();globalThis.localStorage={getItem:k=>storage.get(k)??null,setItem:(k,v)=>storage.set(k,v)};
  const settings=matchSettings({mode:'solo',animalsEnabled:false,livesEnabled:false,hellEnabled:false,botDifficulty:'easy'});savePreferences(settings);assert.deepEqual(loadPreferences(),settings);
- storage.set('eat-it-settings','{bad');assert.equal(loadPreferences().botDifficulty,'medium');delete globalThis.localStorage;
+ storage.set(SETTINGS_KEY,'{bad');assert.equal(loadPreferences().botDifficulty,'medium');
+ // Fresh menu defaults: Animals ON, Hell OFF, Lives OFF, Bots ON. Legacy saves keep only duration/difficulty.
+ storage.clear();let menu=loadPreferences();assert.deepEqual([menu.animalsEnabled,menu.hellEnabled,menu.livesEnabled,menu.botsEnabled],[true,false,false,true]);
+ storage.set('eat-it-settings',JSON.stringify({hellEnabled:true,livesEnabled:true,botsEnabled:false,matchDuration:120,botDifficulty:'hard'}));menu=loadPreferences();
+ assert.deepEqual([menu.hellEnabled,menu.livesEnabled,menu.botsEnabled,menu.matchDuration,menu.botDifficulty],[false,false,true,600,'hard']);
+ // Each visit starts at 10 minutes with Hell OFF, whatever was saved.
+ savePreferences(matchSettings({mode:'solo',matchDuration:120,hellEnabled:true}));menu=loadPreferences();assert.deepEqual([menu.matchDuration,menu.hellEnabled],[600,false]);delete globalThis.localStorage;
  assert.equal(matchSettings({botDifficulty:'impossible'}).botDifficulty,'medium');
 });
 for(const animalsEnabled of [true,false])for(const hellEnabled of [true,false])for(const livesEnabled of [true,false])test(`combined rules animals=${animalsEnabled} hell=${hellEnabled} lives=${livesEnabled}`,()=>{
@@ -87,7 +93,7 @@ for(const map of ['city','nature'])test(`${map}: expanded coverage, NPC bounds, 
 });
 test('canopy regression: visible canopy fits even when old rectangular area test failed',()=>{
  const s=make(),p=s.players[0];p.mass=(65/4)**2;const f=tree(s),g=treeGeometry('tree');assert.ok(mouthOpening(p)>2*Math.max(g.canopyX,g.canopyZ));assert.ok(FOOD.tree.width*FOOD.tree.height>Math.PI*(mouthOpening(p)/2)**2);
- assert.ok(canopyFits(p,f));ticks(s,48);assert.equal(p.stats.chokes,0);assert.equal(p.stats.trees,1);
+ assert.ok(canopyFits(p,f));ticks(s,70);assert.equal(p.stats.chokes,0);assert.equal(p.stats.trees,1);
 });
 test('model canopy and authoritative cross-section share world dimensions at all orientations',()=>{
  const lib=new ModelLibrary();for(const kind of ['tree','smallTree','bush']){const model=lib.prop(kind),g=treeGeometry(kind),canopy=model.children[1];assert.equal(canopy.scale.x,g.canopyX);assert.equal(canopy.scale.z,g.canopyZ);const s=make(),p=s.players[0];p.mass=(Math.max(g.canopyX,g.canopyZ)/.82/4)**2;for(const rotation of [0,.5,1.5,3])assert.ok(canopyFits(p,{kind,rotation}));}lib.dispose();
@@ -97,7 +103,7 @@ test('trunk too wide cannot start swallowing, Hell scale affects both fit and vi
  p.mass=(50/4)**2;p.hellScale=1;assert.equal(canopyFits(p,f,s.time),false);p.hellScale=2;assert.ok(canopyFits(p,f,s.time));assert.equal(mouthOpening(p,s.time),2*.82*playerRadius(p,s.time));
 });
 test('choking keeps canopy stuck, then spits locally, settles in bounds and gives no reward',()=>{
- const s=make(),p=s.players[0],f=tree(s);ticks(s,21);assert.ok(isChoking(p,s.time));assert.equal(f.stuck.playerId,p.id);assert.ok(f.z<0&&distance(f,p)<10);const origin={x:p.x,y:p.y};p.input={x:1,y:0};ticks(s,80);assert.equal(p.x,origin.x);assert.ok(f.stuck);ticks(s,12);assert.ok(f.spit);assert.ok(f.spit.fromZ<0);ticks(s,27);assert.equal(f.stuck,undefined);assert.equal(f.spit,undefined);assert.equal(f.z,0);assert.ok(validPosition(s.map,f,FOOD.tree.radius));assert.ok(distance(f,origin)<400);assert.equal(p.mass,36);assert.equal(p.stats.trees,0);assert.ok(p.x>origin.x);
+ const s=make(),p=s.players[0],f=tree(s);ticks(s,21);assert.ok(isChoking(p,s.time));assert.equal(f.stuck.playerId,p.id);assert.ok(f.z<0&&distance(f,p)<10);const origin={x:p.x,y:p.y};p.input={x:1,y:0};ticks(s,Math.round(EAT.eating.chokeDuration*30)-10);assert.equal(p.x,origin.x);assert.ok(f.stuck);ticks(s,12);assert.ok(f.spit);assert.ok(f.spit.fromZ<0);ticks(s,27);assert.equal(f.stuck,undefined);assert.equal(f.spit,undefined);assert.equal(f.z,0);assert.ok(validPosition(s.map,f,FOOD.tree.radius));assert.ok(distance(f,origin)<400);assert.equal(p.mass,36);assert.equal(p.stats.trees,0);assert.ok(p.x>origin.x);
 });
 test('stuck/spit snapshots and mass expiry remain deterministic',()=>{
  const s=make();tree(s);ticks(s,10);const replica=JSON.parse(JSON.stringify(s));ticks(s,130);ticks(replica,130);assert.deepEqual(s,replica);
@@ -110,8 +116,10 @@ test('burps delay while dead, respawning, choking, swallowed, escaping or in Hel
  for(const block of [p=>p.alive=false,p=>p.respawnAt=5,p=>p.chokingUntil=10,p=>p.escape={},p=>p.fallingAt=0]){const s=make(),p=s.players[0];p.nextBurp=0;block(p);stepBurp(s,p);assert.equal(p.burpAt,undefined);assert.equal(p.nextBurp,1)}
  const s=make(),p=s.players[0];p.nextBurp=0;startHell(s);s.time=200;stepBurp(s,p);assert.equal(p.burpAt,undefined);
 });
-test('Hard policy preserves old capabilities; Medium/Easy slow decisions and reduce pursuit without changing physics',()=>{
- assert.equal(BOT_POLICY.hard.interval,EAT.bots.decisionInterval);assert.equal(BOT_POLICY.hard.prediction,.2);assert.equal(BOT_POLICY.hard.hellSamples,16);
+test('every difficulty is gentler than the original Hard policy; Medium/Easy slow decisions further',()=>{
+ assert.ok(BOT_POLICY.hard.interval>EAT.bots.decisionInterval);assert.ok(BOT_POLICY.hard.prediction<.2);assert.ok(BOT_POLICY.hard.hellSamples<16);
+ for(const level of ['easy','medium','hard'])assert.ok(BOT_POLICY[level].speed<1&&BOT_POLICY[level].growth<1,level);
+ assert.ok(BOT_POLICY.easy.speed<BOT_POLICY.medium.speed&&BOT_POLICY.medium.speed<BOT_POLICY.hard.speed);
  assert.ok(BOT_POLICY.easy.interval>BOT_POLICY.medium.interval&&BOT_POLICY.medium.interval>BOT_POLICY.hard.interval);
  for(const difficulty of ['easy','medium','hard']){const s=make({botDifficulty:difficulty}),p=s.players[0];p.bot=true;const mass=p.mass;p.nextDecision=0;stepGame(s);assert.equal(p.nextDecision,s.time+BOT_POLICY[difficulty].interval);assert.equal(p.mass,mass);assert.ok(Math.hypot(p.input.x,p.input.y)<=1.0001)}
  const solo=make({botDifficulty:'hard'}),multi=structuredClone(solo);multi.settings.mode='multiplayer';assert.deepEqual(botInput(solo,solo.players[0]),botInput(multi,multi.players[0]));

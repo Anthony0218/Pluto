@@ -26,8 +26,8 @@ test('2/10/20-minute settings persist through validation and authority; 10 is de
  }
  for(const duration of [0,-2,180,'120',NaN,Infinity])assert.equal(matchSettings({matchDuration:duration}).matchDuration,600);
 });
-test('shield 30s and magnet/speed 15s use exact simulation deadlines',()=>{
- for(const [kind,duration] of [['shield',30],['magnet',15],['speed',15]]){
+test('shield and magnet/speed use exact simulation deadlines',()=>{
+ for(const [kind,duration] of [['shield',EAT.powerups.shield.duration],['magnet',15],['speed',15]]){
   const s=scene(),p=s.players[0];s.time=10;pickup(s,kind);assert.equal(p.effects[kind],10+duration);
   s.time=10+duration-.001;assert.ok(p.effects[kind]>s.time);s.time=10+duration;assert.ok(!(p.effects[kind]>s.time));
   if(kind==='speed'){p.input={x:1,y:0};ticks(s,30);assert.ok(Math.hypot(p.vx,p.vy)<=EAT.player.baseSpeed+.001);}
@@ -50,7 +50,7 @@ test('/2 is immediate, nonstacking, preserves mass, composes with 2x, resets on 
 test('food, buildings, Pluto, friendly food, neutral animals and player rewards use the same modifiers',()=>{
  for(const kind of ['apple','house','plutoTiny']){
   const s=scene(),p=s.players[0];pickup(s,'multiplier');activateGrowth(s,p);const before=p.mass;
-  foodReward(s,p,{...apple(p),kind});const base=FOOD[kind].growth*(kind==='plutoTiny'?2:1);
+  foodReward(s,p,{...apple(p),kind});const base=FOOD[kind].growth*(kind==='plutoTiny'?EAT.pluto.multiplier:1);
   assert.equal(p.mass-before,base*2);assert.equal(s.events.at(-1).amount,base*2);assert.equal(p.stats.collected[kind],1);
  }
  const s=scene(),p=s.players[0];pickup(s,'multiplier');activateGrowth(s,p);foodReward(s,p,{...apple(p),rewardOwner:p.id,rewardMultiplier:3});assert.equal(p.stats.friendlyGrowth,30);
@@ -91,9 +91,10 @@ test('removed items are absent and old snapshots safely discard obsolete state',
  const s=scene(),p=s.players[0];p.effects.size=100;p.effects.growth=100;s.powerups=[{id:77,kind:'size',x:p.x,y:p.y},{id:78,kind:'growth',x:p.x,y:p.y}];stepGame(s);
  assert.equal(s.powerups.length,0);assert.equal('size' in p.effects,false);assert.equal('growth' in p.effects,false);assert.equal(playerRadius(p,s.time),24);
 });
-test('Hell has 3.086 times the floor area and consistent double-radius characters',()=>{
- const s=scene();startHell(s);assert.equal(s.hell.cells.length,864);assert.ok(864/280>3);
- assert.equal(EAT.hell.columns*EAT.hell.cellSize,2880);assert.equal(EAT.hell.rows*EAT.hell.cellSize,1920);
+test('enlarged Hell floor fits the arena and keeps consistent double-radius characters',()=>{
+ const s=scene();startHell(s);assert.equal(s.hell.cells.length,44*30);
+ assert.equal(EAT.hell.columns*EAT.hell.cellSize,3520);assert.equal(EAT.hell.rows*EAT.hell.cellSize,2400);
+ assert.ok(EAT.hell.left+3520<=EAT.match.width&&EAT.hell.top+2400<=EAT.match.height);
  for(const p of s.players){assert.equal(playerRadius(p,s.time),48);assert.ok(safeGround(s,p,48));}
 });
 test('Hell speed spawns only on reachable intact floor away from hole; uses 15s',()=>{
@@ -140,16 +141,16 @@ test('Hell bot decisions do not use hidden random generator or future pauses/eru
 });
 test('friendly food starts at the animal and falls into the mouth through ordinary reward events',()=>{
  const s=scene(),p=s.players[0],n=s.encounter.npc;Object.assign(n,{phase:'friendly',since:0,until:30,targetId:p.id,nextAction:0,x:p.x+65,y:p.y});s.encounter.completedBy=p.id;
- stepEncounter(s,1/30);assert.equal(p.mass,36);assert.ok(s.food[0].delivery);ticks(s,8);assert.ok(s.food[0].x>p.x);assert.equal(p.mass,36);ticks(s,35);assert.equal(p.mass,51);assert.equal(p.stats.collected.apple,1);
+ stepEncounter(s,1/30);assert.equal(p.mass,36);assert.ok(s.food[0].delivery);ticks(s,8);assert.ok(s.food[0].x>p.x);assert.equal(p.mass,36);ticks(s,50);assert.equal(p.mass,51);assert.equal(p.stats.collected.apple,1);
 });
-test('hostile animals attack at 5/10/15/20s, stun for 1s and never shrink the victim',()=>{
- assert.equal(QUEST.hostileDuration,20);assert.equal(QUEST.attackInterval,5);assert.equal(QUEST.stunDuration,1);
+test('hostile animals attack at 5/10/15/20s, stun for 0.5s and never shrink the victim',()=>{
+ assert.equal(QUEST.hostileDuration,20);assert.equal(QUEST.attackInterval,5);assert.equal(QUEST.stunDuration,.5);
  for(const kind of ['pigeon','cat']){
   const s=scene(),p=s.players[0],n=s.encounter.npc;Object.assign(n,{kind,phase:'hostile',since:0,until:20,targetId:p.id,nextAction:5});
   for(let i=1;i<=4;i++){
    s.time=i*5-.01;Object.assign(n,{x:p.x+10,y:p.y});stepEncounter(s,1/30);assert.equal(n.attacks,i-1);
-   s.time=i*5;stepEncounter(s,1/30);assert.equal(n.attacks,i);assert.equal(p.stunnedUntil,s.time+1);assert.equal(p.mass,36);
-   const before=p.x;movePlayer(s,p,{x:1,y:0},1/30);assert.equal(p.x,before);s.time+=1;movePlayer(s,p,{x:1,y:0},1/30);assert.ok(p.x>before);
+   s.time=i*5;stepEncounter(s,1/30);assert.equal(n.attacks,i);assert.equal(p.stunnedUntil,s.time+.5);assert.equal(p.mass,36);
+   const before=p.x;movePlayer(s,p,{x:1,y:0},1/30);assert.equal(p.x,before);s.time+=.5;movePlayer(s,p,{x:1,y:0},1/30);assert.ok(p.x>before);
   }
   assert.equal(n.phase,'leaving');s.time=21;stepEncounter(s,1/30);assert.equal(n.phase,'gone');assert.equal(n.targetId,null);assert.equal(n.nextAction,0);assert.equal(p.stats.hostileAttacks,4);
  }

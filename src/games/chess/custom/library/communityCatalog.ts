@@ -8,12 +8,19 @@ export type CatalogEntry = CommunityEntry & ({ kind: "builtin"; configurable: fa
 /** Reuses the menu registry; no copied built-in rules, routes or descriptions. */
 export function plutoCommunityCatalog(includeUpcoming = false): CatalogEntry[] {
   const common = { ownerId: "pluto", authorName: "Pluto", playCount: 0, publishedAt: PLUTO_PUBLISHED_AT, upvotes: 0, downvotes: 0, score: 0, myVote: 0 as const, official: true };
-  return variants.filter((card) => includeUpcoming || card.available).map((card): CatalogEntry => {
+  // Menu variants first, then the Custom-only ones, then upcoming entries.
+  const rank = (card: VariantCard) => (!card.available ? 2 : card.customOnly ? 1 : 0);
+  const ordered = variants
+    .filter((card) => includeUpcoming || card.available)
+    .map((card, index) => ({ card, index }))
+    .sort((a, b) => rank(a.card) - rank(b.card) || a.index - b.index)
+    .map(({ card }) => card);
+  return ordered.map((card): CatalogEntry => {
     if (card.customId) {
       const variant = createPlutoVariant(card.customId);
-      return { ...common, id: card.customId, kind: "custom", configurable: true, variant, playerCount: variant.teams.length, name: variant.name, description: variant.description ?? "", boardSize: `${variant.board.width}×${variant.board.height}`, pieceTypes: variant.pieces.length };
+      return { ...common, collections: card.collections, id: card.customId, kind: "custom", configurable: true, variant, playerCount: variant.teams.length, name: variant.name, description: variant.description ?? "", boardSize: `${variant.board.width}×${variant.board.height}`, pieceTypes: variant.pieces.length };
     }
-    return { ...common, ownerId: card.source === "community" ? null : common.ownerId, authorName: card.author ?? common.authorName, id: `pluto-builtin-${card.id}`, kind: "builtin", configurable: false, builtin: card, playerCount: card.id === "four-player" ? 4 : 2, name: card.title, description: card.description, boardSize: "", pieceTypes: 0 };
+    return { ...common, collections: card.collections, ownerId: card.source === "community" ? null : common.ownerId, authorName: card.author ?? common.authorName, id: `pluto-builtin-${card.id}`, kind: "builtin", configurable: false, builtin: card, playerCount: card.id === "four-player" ? 4 : 2, name: card.title, description: card.description, boardSize: "", pieceTypes: 0 };
   });
 }
 

@@ -6,15 +6,17 @@ import { canEatPlayer, entersMouth, foodFits, mouthOpening, MOUTH } from '../src
 import { collideObjects, objectContact } from '../src/games/eat-it/physics.ts';
 function scene(kind='apple', dx=12, dy=0) {
  const s=createGame('city',[{id:'a',name:'A'},{id:'b',name:'B'}],41,'mouth',{livesEnabled:false});
- s.food=[];s.powerups=[];s.nextFood=1e6;s.nextPower=1e6;
+ s.food=[];s.powerups=[];s.nextFood=1e6;s.nextPower=1e6;s.nextBig=1e9;
  Object.assign(s.players[0],{x:1050,y:800,facing:0});Object.assign(s.players[1],{x:1900,y:1000});
  const f={id:s.nextId++,kind,x:1050+dx,y:800+dy,vx:0,vy:0,z:0,vz:0,rotation:0,target:null,capturedAt:0};s.food.push(f);
  return {s,p:s.players[0],f};
 }
 const advance=(s,n=30)=>{for(let i=0;i<n;i++)stepGame(s)};
+// Ticks for a small prop to finish falling into the pit after capture.
+const SWALLOW=Math.ceil(EAT.eating.foodAnimation*EAT.network.tickRate)+3;
 test('entry reserves once, falls down, and awards only after crossing depth',()=>{
  const {s,p,f}=scene();stepGame(s);assert.equal(f.target,p.id);assert.ok(f.z<0);assert.equal(p.mass,36);
- advance(s,20);assert.equal(s.food.length,0);assert.equal(p.mass,41);advance(s);assert.equal(p.mass,41);
+ advance(s,SWALLOW-8);assert.equal(s.food.length,1);advance(s,8);assert.equal(s.food.length,0);assert.equal(p.mass,41);advance(s);assert.equal(p.mass,41);
 });
 test('food outside the visible opening stays still without Magnet, including body and grazing contacts',()=>{
  for(const [dx,dy] of [[50,0],[-24,0],[0,24],[12,19]]) {
@@ -26,7 +28,7 @@ test('fitting food over the opening is collected from any direction, including d
  for(const [dx,dy] of [[12,0],[-12,0],[0,12],[0,-12]]) {
   const {s,p,f}=scene('apple',dx,dy);f.vx=60;f.vy=40;
   assert.equal(entersMouth(p,f,0),true);stepGame(s);assert.equal(f.target,p.id);
-  advance(s,20);assert.equal(p.foodEaten,1);
+  advance(s,SWALLOW);assert.equal(p.foodEaten,1);
  }
 });
 test('starting-size players collect offset snacks without kicking them ahead',()=>{
@@ -38,12 +40,12 @@ test('starting-size players collect offset snacks without kicking them ahead',()
    if(!f.target)assert.deepEqual({x:f.x,y:f.y},start);
   }
   assert.equal(f.target,p.id,`${kind} at lateral offset ${side}`);
-  advance(s,20);assert.equal(p.foodEaten,1);
+  advance(s,SWALLOW);assert.equal(p.foodEaten,1);
  }
 });
 test('airborne props must fall to the lip, not disappear overhead',()=>{
  const {s,p,f}=scene();f.z=50;f.vz=-1;stepGame(s);assert.equal(f.target,null);
- advance(s,40);assert.equal(p.foodEaten,1);
+ advance(s,SWALLOW+25);assert.equal(p.foodEaten,1);
 });
 test('area alone determines fit, including equality and long objects at every orientation',()=>{
  const {p,f}=scene('bench');p.mass=100;
@@ -61,7 +63,7 @@ test('area alone determines fit, including equality and long objects at every or
 });
 test('an area-fitting sideways bench can actually be swallowed',()=>{
  const {s,p,f}=scene('bench');p.mass=100;f.rotation=Math.PI/2;
- stepGame(s);assert.equal(f.target,p.id);advance(s,20);assert.equal(p.foodEaten,1);
+ stepGame(s);assert.equal(f.target,p.id);advance(s,SWALLOW);assert.equal(p.foodEaten,1);
 });
 test('solid car contact follows its rotated footprint rather than its enclosing circle',()=>{
  const {p,f}=scene('car',0);const r=playerRadius(p,0);
@@ -83,12 +85,15 @@ test('an oversized building blocks movement, remains stable and cannot be magnet
 test('grown player can devour a house, with a longer collapse and a bounded significant reward',()=>{
  const {s,p,f}=scene('house',70);p.mass=1800;assert.ok(foodFits(p,f));
  stepGame(s);assert.equal(f.target,p.id);advance(s,20);assert.equal(p.foodEaten,0);assert.ok(f.z<0);
- advance(s,20);assert.equal(p.foodEaten,1);assert.ok(p.mass>=1950&&p.mass<=1980);assert.equal(s.food.length,0);
+ advance(s,40);assert.equal(p.foodEaten,1);assert.ok(p.mass>=1950&&p.mass<=1980);assert.equal(s.food.length,0);
 });
-test('130% size threshold, rear contact, shields, and physical victim fit are required',()=>{
+test('115% size threshold, front half of the mouth and shields decide a bite',()=>{
  const {s,p}=scene();s.food=[];const victim=s.players[1];Object.assign(victim,{x:p.x+15,y:p.y});
- p.mass=36*1.3**2-.01;assert.equal(canEatPlayer(p,victim,0,s.map),false);
- p.mass=36*1.3**2;assert.equal(canEatPlayer(p,victim,0,s.map),true);
+ p.mass=36*1.15**2-.01;assert.equal(canEatPlayer(p,victim,0,s.map),false);
+ p.mass=36*1.15**2;assert.equal(canEatPlayer(p,victim,0,s.map),true);
+ // Victim center anywhere over the front half of the opening, even well off-axis.
+ Object.assign(victim,{x:p.x+5,y:p.y+20});assert.equal(canEatPlayer(p,victim,0,s.map),true);
+ Object.assign(victim,{x:p.x+15,y:p.y+40});assert.equal(canEatPlayer(p,victim,0,s.map),false);Object.assign(victim,{x:p.x+15,y:p.y});
  victim.effects.shield=1;assert.equal(canEatPlayer(p,victim,0,s.map),false);victim.effects.shield=0;
  victim.x=p.x-15;assert.equal(canEatPlayer(p,victim,0,s.map),false);
 });

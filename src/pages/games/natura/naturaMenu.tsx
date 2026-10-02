@@ -23,9 +23,9 @@ const menuScenarios = [
 ];
 
 function HabitatIcon({ id }: { id: ScenarioId }) {
-  if (["meadow", "alarm", "greenheron"].includes(id)) return <Bird aria-hidden="true" />;
+  if (id === "meadow") return <Bird aria-hidden="true" />;
   if (["archerfish", "flyingfish"].includes(id)) return <Fish aria-hidden="true" />;
-  if (["humpback", "cuttlefish", "coconut", "echo"].includes(id)) return <Waves aria-hidden="true" />;
+  if (["cuttlefish", "coconut"].includes(id)) return <Waves aria-hidden="true" />;
   return <Bug aria-hidden="true" />;
 }
 
@@ -307,9 +307,6 @@ export default function NaturaMenu() {
               "flyingfish",
               "bolas",
               "coconut",
-              "humpback",
-              "dungbeetle",
-              "greenheron",
             ].includes(scenario.id) && (
               <DidYouKnow key={scenario.id} scenario={scenario.id} />
             )}

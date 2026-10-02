@@ -1,3 +1,5 @@
+import { decodePixelAvatar, PIXEL_PALETTE, PIXEL_SIZE } from "./pixelAvatar";
+
 type Mood = "happy" | "smile" | "calm" | "serious" | "wink" | "excited";
 
 type HairStyle =
@@ -294,6 +296,9 @@ export function ProfileAvatar({
   avatarId: string;
   className?: string;
 }) {
+  const pixels = decodePixelAvatar(avatarId);
+  if (pixels) return <PixelAvatarImage pixels={pixels} className={className} />;
+
   const avatar =
     avatarPresets.find((item) => item.id === avatarId) ?? avatarPresets[0];
 
@@ -741,6 +746,17 @@ export function ProfileAvatar({
       {avatar.mood === "excited" && (
         <ellipse cx="50" cy="62" rx="7" ry="5" fill="#7f4038" />
       )}
+    </svg>
+  );
+}
+
+export function PixelAvatarImage({ pixels, className = "" }: { pixels: number[]; className?: string }) {
+  return (
+    <svg viewBox={`0 0 ${PIXEL_SIZE} ${PIXEL_SIZE}`} className={className} role="img" aria-label="Pixel avatar" shapeRendering="crispEdges">
+      <rect width={PIXEL_SIZE} height={PIXEL_SIZE} fill={PIXEL_PALETTE[0]} />
+      {pixels.map((index, cell) => index === 0 ? null : (
+        <rect key={cell} x={cell % PIXEL_SIZE} y={Math.floor(cell / PIXEL_SIZE)} width="1.02" height="1.02" fill={PIXEL_PALETTE[index]} />
+      ))}
     </svg>
   );
 }

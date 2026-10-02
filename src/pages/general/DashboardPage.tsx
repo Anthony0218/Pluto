@@ -25,7 +25,7 @@ export default function DashboardPage() {
 function Dashboard() {
   useUiLanguage();
   const { user, profile, loading: authLoading } = useAuth();
-  const { activity, friends, onlineIds, loading, activityError, friendsError, notifications } = useDashboardData();
+  const { activity, friends, onlineIds, presence, loading, activityError, friendsError, notifications } = useDashboardData();
   const [friendDialog, setFriendDialog] = useState<{ id: string; view: "actions" | "chat" | "profile" } | null>(null);
   const [now, setNow] = useState(Date.now);
   const messageReadKey = `pluto-read-message-ids-${user?.id ?? "guest"}`;
@@ -60,7 +60,7 @@ function Dashboard() {
   };
   const searchTarget = typeof document === "undefined" ? null : document.getElementById("dashboard-search-slot");
   const sidebar = <>
-    <PlayWithFriends friends={friends} onlineIds={onlineIds} unreadMessagesByFriend={unreadMessagesByFriend} loading={loading} unavailable={friendsError} signedIn={!!user} onFriendSelect={id => setFriendDialog({ id, view: "actions" })} />
+    <PlayWithFriends friends={friends} onlineIds={onlineIds} presence={presence} unreadMessagesByFriend={unreadMessagesByFriend} loading={loading} unavailable={friendsError} signedIn={!!user} onFriendSelect={id => setFriendDialog({ id, view: "actions" })} />
     <div className="sidebar-progress"><ProgressCard profile={profile} streak={activity?.streak} loading={authLoading} signedIn={!!user} /></div>
   </>;
 

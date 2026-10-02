@@ -10,7 +10,7 @@ import { SnapshotBuffer } from '../src/games/eat-it/presentation.ts';
 
 function scene(map='city') {
  const s=createGame(map,[{id:'a',name:'A'},{id:'b',name:'B'},{id:'c',name:'C'}],99,'quests',{livesEnabled:false});
- s.food=[];s.powerups=[];s.nextFood=1e6;s.nextPower=1e6;
+ s.food=[];s.powerups=[];s.nextFood=1e6;s.nextPower=1e6;s.nextBig=1e9;
  const p=s.players[0];Object.assign(p,{x:1000,y:1100,facing:0});
  Object.assign(s.players[1],{x:2800,y:2000});Object.assign(s.players[2],{x:2700,y:400});
  const e=s.encounter;e.shrine=null;Object.assign(e.npc,{x:1450,y:1100,phase:'idle',until:100});
@@ -24,25 +24,25 @@ function help(s,p,e) {
  Object.assign(e.npc,{x:p.x+60,y:p.y});stepEncounter(s,1/30);
  assert.equal(e.npc.phase,'friendly');assert.equal(e.item.status,'delivered');
 }
-test('tree trunk enters, oversized canopy chokes, ejects without reward and locks movement for three seconds',()=>{
+test('tree trunk enters, oversized canopy chokes, ejects without reward and locks movement for the choke duration',()=>{
  const {s,p}=scene();const f=prop(s,'tree',p);
  assert.ok(foodFits(p,f));assert.equal(canopyFits(p,f),false);
  stepGame(s);assert.equal(f.target,p.id);assert.ok(f.z<0);
  while(!isChoking(p,s.time))stepGame(s);
- const start=s.time, at={x:p.x,y:p.y};assert.equal(p.chokingUntil,start+3);assert.equal(f.target,null);assert.equal(f.stuck.playerId,p.id);assert.ok(f.z<0);
+ const start=s.time, at={x:p.x,y:p.y};assert.equal(p.chokingUntil,start+EAT.eating.chokeDuration);assert.equal(f.target,null);assert.equal(f.stuck.playerId,p.id);assert.ok(f.z<0);
  assert.ok(distance(f,p)<playerRadius(p,s.time));assert.equal(p.mass,36);assert.equal(p.foodEaten,0);
- p.input={x:1,y:0};advance(s,2.9);assert.deepEqual({x:p.x,y:p.y},at);assert.equal(p.mass,36);
+ p.input={x:1,y:0};advance(s,EAT.eating.chokeDuration-.1);assert.deepEqual({x:p.x,y:p.y},at);assert.equal(p.mass,36);
  advance(s,.2);assert.ok(p.x>at.x);assert.equal(s.food.length,1);
 });
 test('large mouth eats complete tree and a bare trunk is a normal consumable',()=>{
- for(const kind of ['tree','treeTrunk','smallTree','bush']) {const {s,p}=scene();p.mass=1200;prop(s,kind,p);advance(s,1.6);assert.equal(p.foodEaten,1,kind);assert.equal(isChoking(p,s.time),false);}
+ for(const kind of ['tree','treeTrunk','smallTree','bush']) {const {s,p}=scene();p.mass=1200;prop(s,kind,p);advance(s,2.3);assert.equal(p.foodEaten,1,kind);assert.equal(isChoking(p,s.time),false);}
 });
 test('oversized finite-mass props resist prolonged small-player contact, then become edible',()=>{
  for(const kind of ['bench','car','house','vendingMachine','treeTrunk']) {
   const {s,p}=scene();const f=prop(s,kind,p);f.x=p.x+FOOD[kind].width/2+playerRadius(p,0)-2;
   const start={x:f.x,y:f.y};p.input={x:1,y:0};advance(s,3);
   assert.ok(distance(f,start)<.3,kind);assert.equal(f.target,null);assert.equal(p.foodEaten,0);
-  p.mass=2000;p.x=f.x;p.y=f.y;p.input={x:0,y:0};p.vx=0;advance(s,1.5);assert.equal(p.foodEaten,1,kind);
+  p.mass=2000;p.x=f.x;p.y=f.y;p.input={x:0,y:0};p.vx=0;advance(s,2.3);assert.equal(p.foodEaten,1,kind);
  }
 });
 for(const map of ['city','nature']) {
@@ -71,11 +71,11 @@ for(const map of ['city','nature']) {
  });
  test(`${map}: handover is exclusive, rewards are discrete food and expire after 60 seconds`,()=>{
   const {s,p,e,n}=scene(map);help(s,p,e);assert.equal(n.until,60);assert.equal(e.completedBy,p.id);assert.equal(npcCanEnter(s,p),false);
-  advance(s,3.8);assert.equal(p.mass,36);advance(s,1.5);assert.equal(p.mass,51);assert.equal(n.feeds,1);assert.equal(p.foodEaten,1);
-  advance(s,54.8);assert.equal(n.phase,'leaving');assert.equal(n.feeds,14);assert.equal(p.foodEaten,14);assert.equal(p.mass,246);
+  advance(s,3.8);assert.equal(p.mass,36);advance(s,2);assert.equal(p.mass,51);assert.equal(n.feeds,1);assert.equal(p.foodEaten,1);
+  advance(s,54.3);assert.equal(n.phase,'leaving');assert.equal(n.feeds,14);assert.equal(p.foodEaten,14);assert.equal(p.mass,246);
   advance(s,2);assert.equal(n.feeds,14);assert.equal(n.targetId,null);
  });
- test(`${map}: ground NPC swallows, waits two seconds, emerges and attacks four times with one-second stuns then leaves`,()=>{
+ test(`${map}: ground NPC swallows, waits two seconds, emerges and attacks four times with half-second stuns then leaves`,()=>{
   const {s,p,e,n}=scene(map);p.mass=144;Object.assign(n,{x:p.x+10,y:p.y});
   if(map==='city'){n.phase='flying';assert.equal(npcCanEnter(s,p),false);n.phase='idle';}
   assert.equal(npcCanEnter(s,p),true);stepEncounter(s,1/30);assert.equal(n.phase,'swallowing');
@@ -85,7 +85,7 @@ for(const map of ['city','nature']) {
   s.time=n.until+.001;stepEncounter(s,1/30);assert.equal(n.phase,'hostile');const began=s.time;
   for(let attack=1;attack<=4;attack++){
    s.time=began+attack*5;Object.assign(n,{x:p.x+10,y:p.y});const mass=p.mass;
-   stepEncounter(s,1/30);assert.equal(p.mass,mass);assert.equal(p.stunnedUntil,s.time+1);const after=p.mass;stepEncounter(s,1/30);assert.equal(p.mass,after,'no replayed hit');
+   stepEncounter(s,1/30);assert.equal(p.mass,mass);assert.equal(p.stunnedUntil,s.time+.5);const after=p.mass;stepEncounter(s,1/30);assert.equal(p.mass,after,'no replayed hit');
   }
   assert.equal(n.attacks,4);assert.equal(n.phase,'leaving');assert.ok(p.mass>=EAT.player.minMass);assert.equal(e.item.status,'removed');
  });
@@ -93,7 +93,7 @@ for(const map of ['city','nature']) {
 test('choking prevents quest pickup and handover while revenge attacks remain possible',()=>{
  const {s,p,e,n}=scene();p.chokingUntil=3;stepEncounter(s,1/30);assert.equal(e.item.status,'ground');
  p.chokingUntil=0;stepEncounter(s,1/30);p.chokingUntil=3;n.x=p.x+60;stepEncounter(s,1/30);assert.equal(n.phase,'idle');
- Object.assign(n,{phase:'hostile',targetId:p.id,until:30,nextAction:0});stepEncounter(s,1/30);assert.equal(p.mass,36);assert.equal(p.stunnedUntil,s.time+1);
+ Object.assign(n,{phase:'hostile',targetId:p.id,until:30,nextAction:0});stepEncounter(s,1/30);assert.equal(p.mass,36);assert.equal(p.stunnedUntil,s.time+.5);
  p.mass=12;n.nextAction=0;stepEncounter(s,1/30);assert.equal(p.mass,12);
 });
 test('two simultaneous hands reserve exactly one item, disconnect drops it at reserved home',()=>{

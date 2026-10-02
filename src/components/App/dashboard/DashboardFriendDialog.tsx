@@ -6,22 +6,28 @@ import FriendAvatar from "@/components/social/FriendAvatar";
 import FriendChat from "@/components/social/FriendChat";
 import DashboardDialog from "./DashboardDialog";
 import { supabase } from "@/lib/supabase";
+import { Link } from "react-router-dom";
+import { useDashboardData } from "@/hooks/useDashboardData";
+import { FriendPresenceText, SpectateRequestButton } from "@/components/social/FriendPresence";
+import { profileRoute } from "@/components/social/activity";
 
 type View = "actions" | "chat" | "profile";
 
 export default function DashboardFriendDialog({ friend, online, view, onViewChange, onClose }: { friend: Friend; online: boolean; view: View; onViewChange: (view: View) => void; onClose: () => void }) {
   useUiLanguage();
+  const { presence } = useDashboardData();
   const name = friend.display_name || friend.username || ui("Player");
   return <DashboardDialog title={view === "chat" ? `${ui("Chat")}: ${name}` : view === "profile" ? `${ui("Profile")}: ${name}` : name} onClose={onClose}>
     {view === "chat" ? <FriendChat friend={friend} /> : <>
       {view === "profile" && <button type="button" className="mb-4 inline-flex items-center gap-2 text-xs font-semibold text-indigo-200 hover:text-white" onClick={() => onViewChange("actions")}><ArrowLeft size={14} />{ui("Back")}</button>}
       <div className="flex items-center gap-4 rounded-xl border border-white/10 bg-white/[0.035] p-4">
         <FriendAvatar profile={friend} size="lg" />
-        <div className="min-w-0"><h3 className="truncate text-lg font-bold text-white">{name}</h3>{friend.username && <p className="truncate text-sm text-slate-400">@{friend.username}</p>}<p className={`mt-1 text-xs ${online ? "text-emerald-300" : "text-slate-400"}`}>{ui(online ? "Online" : "Offline")}</p></div>
+        <div className="min-w-0"><h3 className="truncate text-lg font-bold text-white">{name}</h3>{friend.username && <p className="truncate text-sm text-slate-400">@{friend.username}</p>}<p className="mt-1 text-xs"><FriendPresenceText presence={presence[friend.id]} online={online} /></p></div>
       </div>
       {view === "actions" ? <div className="mt-4 grid gap-2 sm:grid-cols-2">
         <button type="button" className="dash-button primary min-h-12" onClick={() => onViewChange("chat")}><MessageCircle size={18} />{ui("Chat")}</button>
-        <button type="button" className="dash-button min-h-12" onClick={() => onViewChange("profile")}><UserRound size={18} />{ui("See profile")}</button>
+        <Link to={profileRoute(friend.id)} className="dash-button min-h-12" onClick={onClose}><UserRound size={18} />{ui("See profile")}</Link>
+        <SpectateRequestButton friendId={friend.id} presence={presence[friend.id]} className="sm:col-span-2" />
       </div> : <div className="mt-4"><FriendProfileDetails friendId={friend.id} /><button type="button" className="dash-button primary mt-4 w-full" onClick={() => onViewChange("chat")}><MessageCircle size={17} />{ui("Chat")}</button></div>}
     </>}
   </DashboardDialog>;

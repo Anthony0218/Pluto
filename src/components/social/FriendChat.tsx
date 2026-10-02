@@ -12,6 +12,7 @@ import type {
 } from "../../types/social";
 import FriendAvatar from "./FriendAvatar";
 import { getInviteDestination } from "./inviteRoute";
+import UserLink from "./UserLink";
 
 type FriendChatProps = { friend: Friend; roomInvite?: { code: string; lobbyRoute: string } };
 
@@ -237,9 +238,9 @@ export default function FriendChat({ friend, roomInvite }: FriendChatProps) {
   return (
     <section className="flex h-[min(640px,65dvh)] min-h-0 flex-col overflow-hidden rounded-3xl border border-white/10 bg-zinc-900/80 shadow-2xl shadow-black/20 backdrop-blur-md">
       <header className="flex items-center gap-3 border-b border-white/10 px-5 py-4">
-        <FriendAvatar profile={friend} />
+        <UserLink userId={friend.id} className="shrink-0"><FriendAvatar profile={friend} /></UserLink>
         <div className="min-w-0">
-          <h2 className="truncate font-bold text-white">{friendName}</h2>
+          <h2 className="truncate font-bold text-white"><UserLink userId={friend.id}>{friendName}</UserLink></h2>
           {friend.username && (
             <p className="truncate text-xs text-zinc-500">@{friend.username}</p>
           )}

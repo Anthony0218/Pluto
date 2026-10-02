@@ -5,8 +5,10 @@ import { useCallback, useMemo, useSyncExternalStore } from "react";
    a message seen in one place clears it everywhere. */
 const SEEN_EVENT = "pluto-message-seen-change";
 const DND_EVENT = "pluto-do-not-disturb-change";
+const CLAN_MUTE_EVENT = "pluto-clan-popups-muted-change";
 const seenKey = (userId?: string) => `pluto-read-message-ids-${userId ?? "guest"}`;
 const dndKey = (userId?: string) => `pluto-do-not-disturb-${userId ?? "guest"}`;
+const clanMuteKey = (userId?: string) => `pluto-clan-popups-muted-${userId ?? "guest"}`;
 
 function readStorage(key: string) {
   try { return localStorage.getItem(key); }
@@ -32,6 +34,7 @@ function subscribeTo(event: string) {
 }
 const subscribeSeen = subscribeTo(SEEN_EVENT);
 const subscribeDnd = subscribeTo(DND_EVENT);
+const subscribeClanMute = subscribeTo(CLAN_MUTE_EVENT);
 
 export function markNotificationsSeen(userId: string | undefined, ids: string[]) {
   if (!ids.length) return;
@@ -49,13 +52,21 @@ export function useSeenNotificationIds(userId?: string) {
   return useMemo(() => new Set(parseIds(raw)), [raw]);
 }
 
-export function useDoNotDisturb(userId?: string) {
-  const key = dndKey(userId);
-  const enabled = useSyncExternalStore(subscribeDnd, () => readStorage(key) === "1");
+function useStoredFlag(key: string, event: string, subscribe: (onChange: () => void) => () => void) {
+  const enabled = useSyncExternalStore(subscribe, () => readStorage(key) === "1");
   const setEnabled = useCallback((next: boolean) => {
     try { localStorage.setItem(key, next ? "1" : "0"); }
     catch { /* Preference lasts for this visit only. */ }
-    window.dispatchEvent(new Event(DND_EVENT));
-  }, [key]);
+    window.dispatchEvent(new Event(event));
+  }, [key, event]);
   return [enabled, setEnabled] as const;
+}
+
+export function useDoNotDisturb(userId?: string) {
+  return useStoredFlag(dndKey(userId), DND_EVENT, subscribeDnd);
+}
+
+/** "Only allow non-clan chats": friend messages and invites still pop up, clan ones do not. */
+export function useClanPopupsMuted(userId?: string) {
+  return useStoredFlag(clanMuteKey(userId), CLAN_MUTE_EVENT, subscribeClanMute);
 }

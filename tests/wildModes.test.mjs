@@ -13,7 +13,7 @@ function advance(game, seconds, inputs = idle(), ai = false, fps = 60) {
 
 test("new scenarios are registered, have six questions, and preserve all existing modes", () => {
   assert.equal(new Set(SCENARIOS.map(s => s.id)).size, SCENARIOS.length);
-  for (const id of ["meadow", "alarm", "bridges", "echo", "archerfish", "flyingfish", "trapjaw", "cuttlefish", "bolas", "coconut"]) {
+  for (const id of ["meadow", "archerfish", "flyingfish", "trapjaw", "cuttlefish", "bolas", "coconut"]) {
     const scenario = SCENARIOS.find(s => s.id === id);
     assert.ok(scenario, id);
     assert.equal(scenario.questions.length, 6);

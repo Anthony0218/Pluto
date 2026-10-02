@@ -1,6 +1,6 @@
 # Atlas Arena third-party data
 
-Atlas Arena uses a versioned local snapshot. The application does not call these sources when a game starts. Run `npm run geography:sync` to rebuild `data/geography` and the optimized public snapshot.
+Atlas Arena uses a versioned local snapshot. The application does not call these sources when a game starts. Run `npm run geography:sync` to rebuild `data/geography` and the optimized public snapshot; `npm run geography:extras` refreshes only the cities and highest points (`extras.json`). Denali (USA) is a hand fill-in because Wikidata lacks a normalized elevation for it.
 
 | Source | Dataset/version | Fields consumed | License / attribution | Last sync |
 | --- | --- | --- | --- | --- |
@@ -9,6 +9,8 @@ Atlas Arena uses a versioned local snapshot. The application does not call these
 | GeoNames | `countryInfo.txt`, `cities15000.zip` | Names, capital, capital coordinates, language codes, currencies, neighbors, fallback population/area | CC BY 4.0; credit GeoNames | See manifest |
 | World Bank | Indicators `SP.POP.TOTL` and `AG.SRF.TOTL.K2` | Latest available value, observation year and source metadata | CC BY 4.0; credit World Bank | See manifest |
 | flag-icons | 7.5.0 | SVG country flags keyed by ISO alpha-2 | MIT, Copyright Panayiotis Lipiridis | Bundled dependency |
+| GeoNames (extras) | `cities15000.zip` | Top 160 cities (≤ 5 per country): name, population, elevation (DEM), coordinates — Higher or Lower | CC BY 4.0; credit GeoNames | See `data/geography/extras.json` |
+| Wikidata | SPARQL: country `P610` highest point with `P2044` elevation (normalized to metres) | Highest point name and elevation per UN member — Higher or Lower, Guess the Country | CC0 | See `data/geography/extras.json` |
 
 ## Political and boundary policy
 

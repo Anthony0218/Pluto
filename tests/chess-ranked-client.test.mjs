@@ -52,3 +52,9 @@ test('rematches accept reset versions and reject delayed positions and clocks fr
  assert.equal(remainingClock(sample,'white',1000),300000);assert.equal(remainingClock(sample,'black',1000),300000);
  assert.equal(reconcileClock(sample,old,2000),sample);
 });
+test('an open undo request freezes both displayed clocks at the banked time',()=>{
+ const game={fen:'position w - - 0 1',status:'playing',version:3,white_time_ms:250000,black_time_ms:280000,clock_started_at:'2026-09-28T10:00:00Z',undo_requested_by:'b'};
+ const sample={game,serverNow:'2026-09-28T10:00:20Z',receivedAt:1000};
+ assert.equal(remainingClock(sample,'white',9000),250000);assert.equal(remainingClock(sample,'black',9000),280000);
+ assert.equal(remainingClock({...sample,game:{...game,undo_requested_by:null}},'white',9000),222000);
+});

@@ -14,13 +14,13 @@ create function auth.uid() returns uuid language sql as $$ select nullif(current
 select set_config('request.jwt.claim.role','service_role',false);
 create table public.chess_rooms(id uuid primary key default gen_random_uuid(),code text unique,host_id uuid,status text default 'waiting');
 create table public.chess_room_players(room_id uuid,user_id uuid,seat integer,chosen_color text,primary key(room_id,user_id));
-create table public.chess_games(room_id uuid primary key,fen text,moves text[] default '{}',status text default 'playing',winner text,end_reason text,version integer default 0,last_move_from text,last_move_to text,undo_requested_by uuid,undo_requested_version integer);
+create table public.chess_games(room_id uuid primary key,fen text,moves text[] default '{}',status text default 'playing',winner text,end_reason text,version integer default 0,last_move_from text,last_move_to text,undo_requested_by uuid,undo_requested_version integer,undo_last_requested_by uuid,undo_last_requested_version integer);
 create table public.profiles(id uuid primary key,display_name text,username text,avatar_id text);
 create function public.create_chess_room(p_display_name text) returns text language plpgsql as $$ declare c text:=upper(substr(md5(random()::text),1,6)); r uuid; begin insert into public.chess_rooms(code,host_id) values(c,auth.uid()) returning id into r; insert into public.chess_room_players values(r,auth.uid(),0,null); return c; end $$;
 create function public.join_chess_room(p_code text,p_display_name text) returns text language plpgsql as $$ declare r uuid; begin select id into r from public.chess_rooms where code=p_code; insert into public.chess_room_players values(r,auth.uid(),1,null); update public.chess_rooms set status='ready' where id=r; return p_code; end $$;
 create function public.start_chess_game(p_room_id uuid) returns void language plpgsql as $$ begin insert into public.chess_games(room_id,fen) values(p_room_id,'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'); update public.chess_rooms set status='playing' where id=p_room_id; end $$;
  `);
- for(const file of ['20260928130000_ranked_foundation.sql','20260928180000_ranked_chess_guard.sql','20260928190000_ranked_chess_queue.sql','20260928200000_ranked_queue_autostart.sql','20260928210000_restore_ranked_round_guard.sql','20260928220000_ranked_color_draw.sql','20260929000000_ranked_lifecycle_clocks.sql','20261009000000_ranked_card_draw_clock.sql','20261010000000_ranked_time_controls.sql']) {
+ for(const file of ['20260928130000_ranked_foundation.sql','20260928180000_ranked_chess_guard.sql','20260928190000_ranked_chess_queue.sql','20260928200000_ranked_queue_autostart.sql','20260928210000_restore_ranked_round_guard.sql','20260928220000_ranked_color_draw.sql','20260929000000_ranked_lifecycle_clocks.sql','20261009000000_ranked_card_draw_clock.sql','20261010000000_ranked_time_controls.sql','20261012000000_ranked_undo_clock_pause.sql']) {
   let sql=readFileSync(new URL('../supabase/migrations/'+file,import.meta.url),'utf8');
   // pg_cron is a server extension unavailable in WASM. Exercise its exact
   // maintenance function below; installation/scheduling remains deployment QA.
@@ -194,5 +194,47 @@ test('time controls keep separate queues, clocks and Elo',async()=>{
   await db.query("insert into profiles(id,username) select id,'p' from auth.users");
   assert.equal((await db.query("select count(*)::int n from get_chess_elo_leaderboard('bullet')")).rows[0].n,2);
   assert.equal((await db.query("select count(*)::int n from get_chess_elo_leaderboard()")).rows[0].n,0);
+ }finally{await db.close()}
+});
+
+test('an open undo request pauses both clocks and expires after 30 seconds',async()=>{
+ const {db,act,users}=await database();
+ try{
+  await act(0,crypto.randomUUID(),'queue');await act(1,crypto.randomUUID(),'queue');
+  const g=(await db.query('select * from chess_games')).rows[0];
+  const backdate=async(seconds)=>db.exec(`alter table chess_games disable trigger z_ranked_clock_guard; update chess_games set clock_started_at=clock_timestamp()-interval '${seconds} seconds'; alter table chess_games enable trigger z_ranked_clock_guard`);
+  const row=async()=>(await db.query('select * from chess_games')).rows[0];
+  // Black asks to take back a move while White is on move with 4 seconds used.
+  await backdate(4);
+  await db.query('update chess_games set undo_requested_by=$1,undo_requested_version=version+1,undo_last_requested_by=$1,undo_last_requested_version=version+1,version=version+1',[users[1]]);
+  let state=await row();const banked=state.white_time_ms;
+  assert.ok(banked<296100&&banked>295000);assert.equal(state.black_time_ms,300000);
+  // Twenty seconds of deliberation cost nobody time and do not expire the request.
+  await backdate(20);
+  await db.query('select ranked_clock_snapshot($1)',[g.room_id]);await db.exec('select maintain_ranked_chess()');
+  state=await row();assert.equal(state.undo_requested_by,users[1]);assert.equal(state.white_time_ms,banked);
+  // A decline resumes White's clock from the banked time.
+  await db.query('update chess_games set undo_requested_by=null,undo_requested_version=null,version=version+1');
+  state=await row();assert.equal(state.white_time_ms,banked);assert.equal(state.black_time_ms,300000);
+  assert.ok(Date.now()-Date.parse(state.clock_started_at)<2000);
+  // An accepted undo switches the clock without charging the pause to either side.
+  await db.query('update chess_games set undo_requested_by=$1,version=version+1',[users[1]]);
+  const rebanked=(await row()).white_time_ms;assert.ok(rebanked<=banked&&rebanked>banked-1000);
+  await backdate(25);
+  await db.query("update chess_games set fen=replace(fen,' w ',' b '),undo_requested_by=null,version=version+1");
+  state=await row();assert.equal(state.white_time_ms,rebanked);assert.equal(state.black_time_ms,300000);
+  // A request outlasting the mover's remaining time cannot flag them.
+  await db.exec("alter table chess_games disable trigger z_ranked_clock_guard; update chess_games set black_time_ms=10000; alter table chess_games enable trigger z_ranked_clock_guard");
+  await db.query('update chess_games set undo_requested_by=$1,version=version+1',[users[0]]);
+  const blackBanked=(await row()).black_time_ms;assert.ok(blackBanked<=10000&&blackBanked>9000);
+  await backdate(31);
+  await db.exec('select maintain_ranked_chess()');
+  state=await row();assert.equal(state.status,'playing');assert.equal(state.undo_requested_by,null);
+  assert.equal(state.undo_last_requested_version,state.version);assert.equal(state.black_time_ms,blackBanked);
+  assert.ok(Date.now()-Date.parse(state.clock_started_at)<2000);
+  // Once resumed, the clock runs and flags as before.
+  await backdate(11);
+  await db.exec('select maintain_ranked_chess()');
+  state=await row();assert.equal(state.status,'finished');assert.equal(state.end_reason,'timeout');assert.equal(state.winner,'white');
  }finally{await db.close()}
 });

@@ -1,8 +1,8 @@
 export type AtlasDifficulty = "beginner" | "intermediate" | "expert";
 export type AtlasScope = "un195" | "territories" | "all_map_entities";
-export type AtlasCategory = "countries" | "locations" | "capitals" | "flags" | "population" | "area" | "continents" | "languages" | "borders" | "currency";
-export type AtlasInteraction = "single_choice" | "multi_select" | "map_click" | "closest_click" | "higher_lower" | "map_fill";
-export type AtlasMode = "map_click" | "speed_run" | "map_fill";
+export type AtlasCategory = "countries" | "locations" | "capitals" | "flags" | "population" | "area" | "continents" | "languages" | "borders" | "currency" | "statistics" | "clues";
+export type AtlasInteraction = "single_choice" | "multi_select" | "map_click" | "closest_click" | "higher_lower" | "map_fill" | "guess_country";
+export type AtlasMode = "map_click" | "speed_run" | "map_fill" | "flags" | "higher_lower" | "guess_country";
 
 export type SourcedNumber = { value: number; year: number; source: string; sourceUpdatedAt: string };
 export type Coordinates = [longitude: number, latitude: number];
@@ -52,6 +52,9 @@ export type ChoiceQuestion = QuestionBase & {
   answer: string;
   choices: { id: string; label: string; flagAsset?: string | null }[];
   targetGeometryId?: string | null;
+  /** Flag quiz: the flag to identify, or the lone country silhouette (geometry) and name whose flag is wanted. */
+  promptFlagAsset?: string | null;
+  promptShape?: { geometryId: string; label: string } | null;
 };
 
 export type MultiSelectQuestion = QuestionBase & {
@@ -73,6 +76,17 @@ export type HigherLowerQuestion = QuestionBase & {
   answer: "higher" | "lower";
   comparisonEntityId: string;
   stat: { key: AtlasStatKey; label: string; firstValue: number; secondValue: number; year?: number; unit: string };
+  /** Mixed-subject comparisons (cities, continents, subregions) carry their own display names. */
+  first?: { label: string; kind: ComparableKind; detail?: string; note?: string };
+  second?: { label: string; kind: ComparableKind; detail?: string; note?: string };
+};
+
+export type GuessClue = { kind: "numbers" | "summit" | "phrase" | "region" | "language" | "capital"; text: string; flagAsset?: string | null };
+export type GuessCountryQuestion = QuestionBase & {
+  interaction: "guess_country";
+  answer: string;
+  /** Ordered hardest → easiest; one more is revealed after every round nobody solves. */
+  clues: GuessClue[];
 };
 
 export type ClosestClickQuestion = QuestionBase & {
@@ -82,7 +96,11 @@ export type ClosestClickQuestion = QuestionBase & {
   targetGeometryId: string | null;
 };
 
-export type AtlasQuestion = ChoiceQuestion | MultiSelectQuestion | MapClickQuestion | HigherLowerQuestion | ClosestClickQuestion;
-export type AtlasStatKey = "population" | "areaKm2" | "neighborCount" | "officialLanguageCount";
+export type AtlasQuestion = ChoiceQuestion | MultiSelectQuestion | MapClickQuestion | HigherLowerQuestion | ClosestClickQuestion | GuessCountryQuestion;
+export type AtlasStatKey = "population" | "areaKm2" | "neighborCount" | "officialLanguageCount" | "highestPointM" | "elevationM" | "countryCount";
+export type ComparableKind = "country" | "city" | "continent" | "subregion";
 
-export type AtlasDataset = { countries: GeographicEntity[]; version: { atlasDataVersion: string; synchronizedAt: string }; topology: unknown };
+export type AtlasCity = { id: string; name: string; countryId: string; population: number; elevationM: number | null; coordinates: Coordinates; capital: boolean };
+export type AtlasExtras = { atlasDataVersion: string; synchronizedAt: string; cities: AtlasCity[]; highestPoints: Record<string, { name: string; elevationM: number }> };
+
+export type AtlasDataset = { countries: GeographicEntity[]; extras: AtlasExtras; version: { atlasDataVersion: string; synchronizedAt: string }; topology: unknown };

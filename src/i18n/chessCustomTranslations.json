@@ -739,7 +739,8 @@
     "yesterday": "gestern",
     "your copy to play and remix": "deine Kopie zum Spielen und Umbauen",
     "your move": "du bist am Zug",
-    "yours": "deine"
+    "yours": "deine",
+    "Best 3 Choices": "Beste 3 Züge"
   },
   "ko": {
     "10×10 with Wizards and Cannons.": "마법사와 대포가 있는 10×10 보드.",
@@ -1485,7 +1486,8 @@
     "yesterday": "어제",
     "your copy to play and remix": "플레이하고 리믹스할 내 사본",
     "your move": "내 차례",
-    "yours": "내 것"
+    "yours": "내 것",
+    "Best 3 Choices": "최선의 3수"
   },
   "ru": {
     "10×10 with Wizards and Cannons.": "10×10 с волшебниками и пушками.",
@@ -2233,7 +2235,8 @@
     "yesterday": "вчера",
     "your copy to play and remix": "ваша копия для игры и ремикса",
     "your move": "ваш ход",
-    "yours": "ваш"
+    "yours": "ваш",
+    "Best 3 Choices": "3 лучших хода"
   },
   "es": {
     "10×10 with Wizards and Cannons.": "10×10 con magos y cañones.",
@@ -2991,7 +2994,8 @@
     "yesterday": "ayer",
     "your copy to play and remix": "tu copia para jugar y remezclar",
     "your move": "tu turno",
-    "yours": "tuya"
+    "yours": "tuya",
+    "Best 3 Choices": "Las 3 mejores jugadas"
   },
   "pt": {
     "10×10 with Wizards and Cannons.": "10×10 com magos e canhões.",
@@ -3749,6 +3753,7 @@
     "yesterday": "ontem",
     "your copy to play and remix": "a sua cópia para jogar e remixar",
     "your move": "sua vez",
-    "yours": "sua"
+    "yours": "sua",
+    "Best 3 Choices": "As 3 melhores jogadas"
   }
 }

@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Bell, BellOff, Gamepad2, Mail, Users, X } from "lucide-react";
+import { Bell, BellOff, Eye, Gamepad2, Mail, Shield, Users, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import type { DashboardNotification } from "@/hooks/useDashboardData";
 import DashboardDialog from "./DashboardDialog";
-import { getInviteDestination } from "@/components/social/inviteRoute";
-import DoNotDisturbSwitch from "../notifications/DoNotDisturbSwitch";
+import { notificationActionLabel, notificationDestination, respondToSpectateRequest } from "@/components/social/notificationActions";
+import DoNotDisturbSwitch, { ClanPopupsSwitch } from "../notifications/DoNotDisturbSwitch";
 import { markNotificationsSeen, useDoNotDisturb, useSeenNotificationIds } from "../notifications/notificationState";
 
 type Filter = "all" | "games" | "social";
@@ -30,7 +30,7 @@ export default function FriendNotifications({ items, userId }: { items: Dashboar
   const seen = useSeenNotificationIds(userId);
   const [doNotDisturb] = useDoNotDisturb(userId);
   const visibleItems = items.filter(item => !dismissed.includes(item.id));
-  const filteredItems = visibleItems.filter(item => filter === "all" || (filter === "games" ? !!item.gameCode : !item.gameCode));
+  const filteredItems = visibleItems.filter(item => filter === "all" || (filter === "games" ? !!item.gameCode || item.kind === "spectate_request" || item.kind === "spectate_accepted" : !item.gameCode && item.kind !== "spectate_request" && item.kind !== "spectate_accepted"));
   const unreadCount = visibleItems.filter(item => Date.parse(item.createdAt) > readAt && !seen.has(item.id)).length;
 
   function show() {
@@ -57,18 +57,21 @@ export default function FriendNotifications({ items, userId }: { items: Dashboar
       {doNotDisturb ? <BellOff size={18} /> : <Bell size={18} />}{unreadCount > 0 && <span>{unreadCount > 99 ? "99+" : unreadCount}</span>}
     </button>
     {open && <DashboardDialog title={`${ui("Notifications")}${visibleItems.length ? ` · ${visibleItems.length}` : ""}`} onClose={() => setOpen(false)}>
-      <DoNotDisturbSwitch userId={userId} className="mb-4" />
+      <DoNotDisturbSwitch userId={userId} className="mb-2" />
+      <ClanPopupsSwitch userId={userId} className="mb-4" />
       <div className="notification-filters" role="tablist" aria-label={ui("Filter notifications")}>
         {(["all", "games", "social"] as const).map(value => <button key={value} type="button" role="tab" aria-selected={filter === value} onClick={() => setFilter(value)}>{value === "games" ? <Gamepad2 size={14} /> : value === "social" ? <Users size={14} /> : <Bell size={14} />}{ui(value === "all" ? "All" : value === "games" ? "Games" : "Social")}</button>)}
       </div>
       {filteredItems.length ? <div className="notification-list">{filteredItems.map(item => {
-        const Icon = item.kind === "friend_request" ? Users : item.gameCode ? Gamepad2 : Mail;
-        const destination = item.gameCode ? getInviteDestination({ game: item.game, gameCode: item.gameCode, gameRoute: item.gameRoute }, { autoJoin: true }) : item.kind === "friend_request" ? "/friends" : `/friends${item.senderId ? `?friend=${encodeURIComponent(item.senderId)}` : ""}`;
-        const action = item.gameCode ? "Join" : item.kind === "friend_request" ? "Review" : "Reply";
+        const Icon = item.kind === "friend_request" ? Users : item.kind === "clan_message" ? Shield : item.kind === "spectate_request" || item.kind === "spectate_accepted" ? Eye : item.gameCode ? Gamepad2 : Mail;
+        const destination = notificationDestination(item);
+        const action = notificationActionLabel(item);
         return <article key={item.id} className={`notification-card${Date.parse(item.createdAt) > openedReadAt && !seen.has(item.id) ? " is-new" : ""}`}>
           <span className="notification-icon"><Icon size={20} /></span>
-          <div className="notification-copy"><div className="notification-title"><strong>{ui(item.title)}</strong><time dateTime={item.createdAt}>{new Date(item.createdAt).toLocaleDateString()}</time></div><p>{item.detail || item.senderName || ui("Player")}</p>{item.gameCode && <small>{ui("Room code")}: {item.gameCode}</small>}
-            <div className="notification-actions"><Link to={destination} onClick={() => { markNotificationsSeen(userId, [item.id]); setOpen(false); }}>{ui(action)}</Link><button type="button" onClick={() => dismiss(item.id)}>{ui("Dismiss")}</button></div>
+          <div className="notification-copy"><div className="notification-title"><strong>{ui(item.title)}</strong><time dateTime={item.createdAt}>{new Date(item.createdAt).toLocaleDateString()}</time></div><p>{item.kind === "clan_message" ? <><strong className="text-white">{item.senderName || ui("Player")}</strong>{item.clanName ? ` · ${item.clanName}` : ""}: {item.body}</> : ui(item.detail) || item.senderName || ui("Player")}</p>{item.gameCode && <small>{ui("Room code")}: {item.gameCode}</small>}
+            <div className="notification-actions">{item.kind === "spectate_request" && item.spectateRequestId
+              ? <><button type="button" onClick={() => void respondToSpectateRequest(item.spectateRequestId!, true).then(error => { if (!error) { markNotificationsSeen(userId, [item.id]); dismiss(item.id); } else window.alert(ui(error)); })}>{ui("Allow")}</button><button type="button" onClick={() => void respondToSpectateRequest(item.spectateRequestId!, false).then(() => dismiss(item.id))}>{ui("Decline")}</button></>
+              : <><Link to={destination} onClick={() => { markNotificationsSeen(userId, [item.id]); setOpen(false); }}>{ui(action)}</Link><button type="button" onClick={() => dismiss(item.id)}>{ui("Dismiss")}</button></>}</div>
           </div>
           <button type="button" className="notification-dismiss" aria-label={`${ui("Dismiss")}: ${ui(item.title)}`} onClick={() => dismiss(item.id)}><X size={14} /></button>
         </article>;

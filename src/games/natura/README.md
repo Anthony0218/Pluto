@@ -108,3 +108,11 @@ Archerfish water jets and predictive interception are documented in
 [The archerfish predictive C-start](https://epub.uni-bayreuth.de/id/eprint/7360/).
 Timers, cooldowns, landing rings, food points, and insect respawns are game rules;
 the briefing explicitly distinguishes them from the animal behaviour.
+
+## Retired modes
+
+Bubble Corral (humpback), Milky Way Express (dung beetle), Bait & Wait (green heron),
+False Alarm (drongo), Living Bridges (army ants) and Echo Chase (bats) have been removed,
+along with their simulations, components, facts and quiz data. Natura now offers
+Wings & Whiskers, Spit & Sprint, Surface & Sprint, Snap Launch, Hide in Plain Sight
+and the two tool-animal modes.

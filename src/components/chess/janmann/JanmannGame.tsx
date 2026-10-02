@@ -8,6 +8,7 @@ import { ui, useUiLanguage } from "@/i18n/ui";
 import Dialog from "@/components/chessCustom/dialogs/Dialog";
 import JanmannBoard from "./JanmannBoard";
 import VolumeMeasurement from "./VolumeMeasurement";
+import UserLink from "@/components/social/UserLink";
 import { RulesContent } from "./JanmannRules";
 
 const glyphs: Record<PieceKind, string> = { king: "♚", queen: "♛", rook: "♜", bishop: "♝", knight: "♞", pawn: "♟" };
@@ -83,7 +84,7 @@ export default function JanmannGame() {
         <Link to="/chess-custom/community" className="text-xs text-zinc-400 hover:text-amber-100">← {ui("Community")}</Link>
         <p className="mt-4 text-[10px] uppercase tracking-[.2em] text-amber-200">{ui("Fixed Community variant")} · {ui("Experimental")}</p>
         <h1 className="mt-1 font-serif text-3xl sm:text-4xl">{JANMANN.name}</h1>
-        <p className="mt-1 text-sm text-zinc-400">{ui("by")} {JANMANN.author} · {ui("Think differently...")}</p>
+        <p className="mt-1 text-sm text-zinc-400">{ui("by")} <UserLink username={JANMANN.author} className="font-semibold text-zinc-200">{JANMANN.author}</UserLink> · {ui("Think differently...")}</p>
       </div>
       <div className="flex flex-wrap gap-2">
         <button className={buttonClass} onClick={() => setShowRules(true)}>{ui("Rules")}</button>

@@ -16,6 +16,13 @@ import { errorText, timeAgo } from "../format";
 import { ChevronDownIcon, ChevronUpIcon, CommunityIcon, LayersIcon, PlayIcon, PrivateIcon, RefreshIcon, RemixIcon, SearchIcon, ShareIcon, ViewIcon } from "../icons/ChessCustomIcons";
 import { Button, Chip, EmptyState, Segmented, inputClass } from "../ui";
 import PublishVariantDialog from "./PublishVariantDialog";
+import UserLink from "@/components/social/UserLink";
+
+/** Variant author, linked to their profile. Pluto's own variants have no player account. */
+function Author({ entry, className = "" }: { entry: CommunityEntry; className?: string }) {
+  if (entry.ownerId === "pluto") return <span className={className}>{entry.authorName}</span>;
+  return <UserLink userId={entry.ownerId} username={entry.ownerId ? null : entry.authorName} className={className}>{entry.authorName}</UserLink>;
+}
 
 const PAGE = 24;
 type Previews = Record<string, { preview: VariantPreview; layerCount: number }>;
@@ -89,7 +96,7 @@ function DetailsDialog({ entry, preview, onClose, onPlay, onRemix, busy }: { ent
       size="lg"
       eyebrow={ui("Community variant")}
       title={entry?.name ?? ""}
-      description={entry ? `${ui("by")} ${entry.authorName} · ${ui("published")} ${timeAgo(entry.publishedAt)}` : undefined}
+      description={entry ? <>{ui("by")} <Author entry={entry} className="font-semibold text-zinc-200" /> · {ui("published")} {timeAgo(entry.publishedAt)}</> : undefined}
       footer={
         <>
           {entry?.configurable !== false && <Button onClick={onRemix} disabled={busy}>
@@ -346,7 +353,7 @@ export default function CommunityView({ scope = "players" }: { scope?: "pluto" |
                     <Button size="sm" tone="primary" disabled={busyId === entry.id || entry.builtin?.available === false} onClick={() => setPlaying(entry)}><PlayIcon size={14} />{ui(entry.builtin?.available === false ? "Coming soon" : "Play")}</Button>
                     <Button size="sm" onClick={() => setViewing(entry)}><ViewIcon size={14} />{ui("View")}</Button>
                     {entry.configurable !== false && <Button size="sm" disabled={busyId === entry.id} onClick={() => void doRemix(entry)}><RemixIcon size={14} />{ui("Remix")}</Button>}
-                    <span className="ml-auto self-center text-[10px] text-zinc-500">{ui("by")} {entry.authorName}</span>
+                    <span className="ml-auto self-center text-[10px] text-zinc-500">{ui("by")} <Author entry={entry} className="text-zinc-300" /></span>
                   </div>
                 } />
               </li>
@@ -371,7 +378,7 @@ export default function CommunityView({ scope = "players" }: { scope?: "pluto" |
                     {entry.name}
                   </h3>
                   <p className="mt-1 text-[10px] text-zinc-500">
-                    {ui("by")} <span className="text-zinc-300">{entry.authorName}</span> · {timeAgo(entry.publishedAt)}
+                    {ui("by")} <Author entry={entry} className="text-zinc-300" /> · {timeAgo(entry.publishedAt)}
                   </p>
                   <p className="mt-2 line-clamp-2 font-serif text-[12px] leading-[1.45rem] text-zinc-400">{entry.description || ui("No description.")}</p>
                   <div className="mt-2.5 flex flex-wrap gap-1.5">

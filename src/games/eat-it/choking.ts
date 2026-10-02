@@ -2,13 +2,15 @@ import { FOOD, playerRadius } from './config.ts';
 import { distance, resolveWalls, validPosition } from './maps.ts';
 import { mouthPosition } from './rules.ts';
 import { resolveShrine } from './quests.ts';
-import { objectHeight } from './falling.ts';
+import { fallOffset, fallPose, objectHeight } from './falling.ts';
 import type { FoodObject, GameState } from './types.ts';
 export const SPIT_DURATION = .85;
 export function spitPose(f: FoodObject,time: number) {
   const spit=f.spit!,t=Math.min(1,Math.max(0,(time-spit.since)/SPIT_DURATION)),out=Math.min(1,t/.32),travel=Math.max(0,(t-.32)/.68),ease=1-(1-travel)**2;
   return {x:spit.origin.x+(spit.destination.x-spit.origin.x)*ease,y:spit.origin.y+(spit.destination.y-spit.origin.y)*ease,
-    z:(spit.fromZ??0)*(1-out)+Math.sin(travel*Math.PI)*35,rotation:spit.rotation+travel*Math.PI*2,tilt:Math.sin(travel*Math.PI)*.8,done:t>=1};
+    z:(spit.fromZ??0)*(1-out)+Math.sin(travel*Math.PI)*35,rotation:spit.rotation+travel*Math.PI*2,tilt:Math.sin(travel*Math.PI)*.8,
+    // A wedged prop is pushed back upright as it is forced out of the mouth.
+    lean:(spit.fromTilt??0)*(1-out),done:t>=1};
 }
 export function stepStuckTree(s: GameState, f: FoodObject): boolean {
   if (f.spit) {
@@ -19,6 +21,11 @@ export function stepStuckTree(s: GameState, f: FoodObject): boolean {
   if (!f.stuck) return false;
   const p = s.players.find(p => p.id === f.stuck!.playerId), info = FOOD[f.kind];
   if (p?.alive && s.time < f.stuck.until) {
+    if (f.stuck.age !== undefined) {
+      // A wedged prop stays frozen at the lean where its top caught the far rim, riding along with the mouth.
+      const offset = fallOffset(f, f.stuck.age), pose = fallPose(f, f.stuck.age);
+      f.x = p.x + offset.x + (f.fallX ?? 0) * pose.shift; f.y = p.y + offset.y + (f.fallY ?? 0) * pose.shift; f.z = pose.z; return true;
+    }
     Object.assign(f, mouthPosition(p, playerRadius(p, s.time)));
     // Trunk is inside the hole, while the full canopy rests above its rim.
     f.z = -(f.treeEntryDepth??objectHeight(f.kind)*.44); return true;
@@ -35,7 +42,7 @@ export function stepStuckTree(s: GameState, f: FoodObject): boolean {
     if (clearance >= 4) break;
   }
   if (best === -Infinity) return true;
-  f.spit = { since:s.time, origin, destination, rotation:f.rotation, fromZ:f.z }; delete f.stuck;
+  f.spit = { since:s.time, origin, destination, rotation:f.rotation, fromZ:f.z, ...(f.stuck.age !== undefined ? { fromTilt: fallPose(f, f.stuck.age).angle } : {}) }; delete f.stuck;
   f.availableAt=s.time+SPIT_DURATION+.7;
   return true;
 }

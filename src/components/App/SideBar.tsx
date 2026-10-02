@@ -17,7 +17,7 @@ import ThemeToggle from "./ThemeToggle";
 const links = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Friends", href: "/friends", icon: Users },
-  { label: "Groups", href: "/groups", icon: Users },
+  { label: "Clans", href: "/clans", icon: Users },
   { label: "Leaderboards", href: "/leaderboards", icon: Trophy },
   { label: "Profile", href: "/profile", icon: UserRound },
 ];

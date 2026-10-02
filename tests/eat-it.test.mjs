@@ -45,14 +45,14 @@ test('large food needs sufficient mouth capacity; burger and pizza are real cons
   for (const kind of ['vendingMachine', 'pizza', 'apple']) {
     const s = arena(), p = s.players[0], f = food(s, kind, 1020);
     if (kind !== 'apple') assert.equal(foodFits(p, f), false);
-    p.mass = 900; assert.equal(foodFits(p, f), true); steps(s, 1.5);
+    p.mass = 900; assert.equal(foodFits(p, f), true); steps(s, 2.5);
     assert.equal(p.mass, 900 + FOOD[kind].growth); assert.equal(p.foodEaten, 1);
   }
 });
 test('smaller and similar-sized attackers cannot eat a target', () => {
   const s = arena(), [a, b] = s.players; b.x = 1015;
-  for (const mass of [20, 36, 36 * 1.2, 36 * 1.3 ** 2 - 0.01]) { a.mass = mass; assert.equal(canEatPlayer(a, b, 0, s.map), false); }
-  a.mass = 36 * 1.3 ** 2; assert.equal(canEatPlayer(a, b, 0, s.map), true);
+  for (const mass of [20, 36, 36 * 1.15, 36 * 1.15 ** 2 - 0.01]) { a.mass = mass; assert.equal(canEatPlayer(a, b, 0, s.map), false); }
+  a.mass = 36 * 1.15 ** 2; assert.equal(canEatPlayer(a, b, 0, s.map), true);
 });
 test('mouth direction matters; rear/body overlap does not kill', () => {
   const s = arena(), [a, b] = s.players; a.mass = 144; b.x = a.x - 35;

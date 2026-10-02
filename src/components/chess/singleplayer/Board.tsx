@@ -152,6 +152,10 @@ type BoardProps = {
   moveAnimation?: { id: string; from: Square; to: Square; durationMs?: number } | null;
 };
 
+/** Move-quality badges sit on the square's top-right corner, overhanging it except along the board's top and right edges. */
+const cornerBadgeOffset = (displayRow: number, displayColumn: number) =>
+  `${displayColumn === 7 ? "" : "translate-x-[35%]"} ${displayRow === 0 ? "" : "-translate-y-[35%]"}`;
+
 const pieceSymbols = {
   wp: "♙",
   wn: "♘",
@@ -778,7 +782,7 @@ export default function Board({
                     aspect-square
                     items-center
                     justify-center
-                    overflow-hidden
+                    ${annotationIcon?.square === square || annotationCross?.square === square ? "overflow-visible" : "overflow-hidden"}
                     border-0
                     p-0
                     transition-[filter,box-shadow]
@@ -2016,7 +2020,7 @@ export default function Board({
                     {annotationCross?.square === square && (
                       <span
                         title={ui("Played move")}
-                        className="pointer-events-none absolute right-1 top-1 z-[32] grid h-6 w-6 place-items-center rounded-full border border-white/35 bg-[#06131e] shadow-lg max-sm:right-0.5 max-sm:top-0.5 max-sm:h-4 max-sm:w-4 max-sm:[&_svg]:h-2.5 max-sm:[&_svg]:w-2.5"
+                        className={`pointer-events-none absolute right-0 top-0 z-[32] grid h-6 w-6 place-items-center rounded-full border border-white/35 bg-[#06131e] shadow-lg max-sm:h-4 max-sm:w-4 max-sm:[&_svg]:h-2.5 max-sm:[&_svg]:w-2.5 ${cornerBadgeOffset(displayRow, displayColumn)}`}
                         style={{ color: annotationCross.color, boxShadow: `0 0 10px ${annotationCross.color}aa` }}
                       >
                         <X size={15} strokeWidth={3} className="drop-shadow-[0_0_3px_currentColor]" />
@@ -2025,7 +2029,7 @@ export default function Board({
                     {annotationIcon?.square === square && (
                       <span
                         title={ui(annotationIcon.quality)}
-                        className="group/quality absolute right-1 top-1 z-[32] grid h-6 w-6 place-items-center rounded-full border border-white/35 bg-[#06131e] shadow-lg transition-[transform,box-shadow] duration-200 ease-out hover:scale-110 motion-reduce:transition-none max-sm:right-0.5 max-sm:top-0.5 max-sm:h-4 max-sm:w-4 max-sm:[&_svg]:h-2.5 max-sm:[&_svg]:w-2.5"
+                        className={`group/quality absolute right-0 top-0 z-[32] grid h-6 w-6 place-items-center rounded-full border border-white/35 bg-[#06131e] shadow-lg transition-[transform,box-shadow] duration-200 ease-out hover:scale-110 motion-reduce:transition-none max-sm:h-4 max-sm:w-4 max-sm:[&_svg]:h-2.5 max-sm:[&_svg]:w-2.5 ${cornerBadgeOffset(displayRow, displayColumn)}`}
                         style={{ color: qualityColor(annotationIcon.quality), boxShadow: `0 0 10px ${qualityColor(annotationIcon.quality)}aa` }}
                       >
                         <ReviewQualityIcon quality={annotationIcon.quality} size={14} />

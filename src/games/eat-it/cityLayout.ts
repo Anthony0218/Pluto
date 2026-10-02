@@ -17,7 +17,9 @@ export function cityZone(p: Vec): 'street' | 'green' | 'block' | 'sidewalk' {
 export function citySlots(kind: FoodKind): (Vec & { rotation: number })[] {
   const f = FOOD[kind], slots: (Vec & { rotation: number })[] = [];
   if (f.building) {
-    for (let col=0;col<5;col++) for (let row=0;row<4;row++) for (const x of [240,560]) for (const y of [245,515]) {
+    // Narrow buildings (townhouses, kiosks, garages) pack three to a frontage row.
+    const columns = f.width <= 180 ? [205,400,595] : [240,560];
+    for (let col=0;col<5;col++) for (let row=0;row<4;row++) for (const x of columns) for (const y of [245,515]) {
       const at = { x:col*800+x,y:row*760+y,rotation:y<380?Math.PI:0 };
       if (cityZone(at)==='block' && f.width<=300 && f.height<=250) slots.push(at);
     }

@@ -11,11 +11,11 @@ const naturaFacts = readFileSync(
   "utf8",
 );
 
-test("natura includes the three new ocean-and-pond modes", () => {
-  assert.match(naturaData, /id:\s*"humpback"/);
-  assert.match(naturaData, /id:\s*"dungbeetle"/);
-  assert.match(naturaData, /id:\s*"greenheron"/);
-  assert.match(naturaFacts, /humpback/);
-  assert.match(naturaFacts, /dungbeetle/);
-  assert.match(naturaFacts, /greenheron/);
+test("retired natura modes are gone from scenarios and facts", () => {
+  for (const id of ["humpback", "dungbeetle", "greenheron", "alarm", "bridges", "echo"]) {
+    assert.doesNotMatch(naturaData, new RegExp(`id:\\s*"${id}"`));
+    assert.doesNotMatch(naturaFacts, new RegExp(`^  ${id}: \\[`, "m"));
+  }
+  for (const title of ["Bubble Corral", "Milky Way Express", "Bait & Wait", "False Alarm", "Living Bridges", "Echo Chase"])
+    assert.ok(!naturaData.includes(`title: "${title}"`), title);
 });

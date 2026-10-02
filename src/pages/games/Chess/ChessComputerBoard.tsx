@@ -24,6 +24,7 @@ import {
 } from "../../../utils/sound.ts";
 
 import { getSquareName, type PieceType } from "../../../utils/chessUtils.ts";
+import { gradePlayedMove } from "../../../utils/chessAnalysis.ts";
 
 import { useStockfish } from "@/hooks/useStockfish";
 
@@ -666,50 +667,6 @@ const pieceValues: Record<string, number> = {
    COACH HELPERS
    ========================================================= */
 
-function analysisScore(line: StockfishAnalysisLine | undefined) {
-  if (!line) {
-    return 0;
-  }
-
-  /*
-   * Convert mate into a very large
-   * centipawn-like value.
-   */
-  if (line.mate !== null) {
-    if (line.mate > 0) {
-      return 100000 - Math.abs(line.mate) * 100;
-    }
-
-    return -100000 + Math.abs(line.mate) * 100;
-  }
-
-  return line.scoreCp ?? 0;
-}
-
-function classifyMove(centipawnLoss: number, isBestMove: boolean): MoveQuality {
-  if (isBestMove) {
-    return "Best";
-  }
-
-  if (centipawnLoss <= 25) {
-    return "Excellent";
-  }
-
-  if (centipawnLoss <= 60) {
-    return "Good";
-  }
-
-  if (centipawnLoss <= 120) {
-    return "Inaccuracy";
-  }
-
-  if (centipawnLoss <= 250) {
-    return "Mistake";
-  }
-
-  return "Blunder";
-}
-
 function formatEvaluation(line: StockfishAnalysisLine) {
   if (line.mate !== null) {
     return line.mate > 0 ? `M${line.mate}` : `-M${Math.abs(line.mate)}`;
@@ -1174,25 +1131,10 @@ export default function ChessComputerBoard({
 
     const bestLine = before[0];
 
-    const bestMove = bestLine.pv[0] ?? null;
+    // A finished game has nothing left to search.
+    let afterLine: StockfishAnalysisLine | undefined;
 
-    const bestScore = analysisScore(bestLine);
-
-    /*
-     * afterFen has the opponent to move.
-     *
-     * Stockfish evaluates from the
-     * current side-to-move perspective,
-     * so negate the result to get the
-     * human player's perspective.
-     */
-    // A finished game has nothing left to search: mate is the best possible result.
-    const afterGame = new Chess(afterFen);
-    let scoreAfterMove: number;
-
-    if (afterGame.isGameOver()) {
-      scoreAfterMove = afterGame.isCheckmate() ? 100000 : 0;
-    } else {
+    if (!new Chess(afterFen).isGameOver()) {
       const after = await coachBackfill.queue(() =>
         analyzePosition(afterFen, {
           multiPV: 1,
@@ -1204,13 +1146,10 @@ export default function ChessComputerBoard({
         return;
       }
 
-      scoreAfterMove = -analysisScore(after[0]);
+      afterLine = after[0];
     }
 
-    const centipawnLoss = Math.max(0, bestScore - scoreAfterMove);
-
-    const isBestMove = bestMove === playedUci;
-    const quality = classifyMove(centipawnLoss, isBestMove);
+    const { quality, centipawnLoss, bestMoveUci: bestMove } = gradePlayedMove(beforeFen, afterFen, playedUci, bestLine, afterLine);
 
     setCoachGrades((grades) => ({ ...grades, [ply]: { quality, san: playedSan } }));
 
@@ -2692,7 +2631,9 @@ export default function ChessComputerBoard({
                 onSquareClick={historyPreview ? () => {} : handleSquareClick}
                 orientation={playerColor}
                 annotations={
-                  !coachModeEnabled || helpMove
+                  // The quality icon of your last move stays visible while the
+                  // coach also shows its best-move hint.
+                  !coachModeEnabled
                     ? null
                     : historyPreview
                       ? liveCoachAnnotations({

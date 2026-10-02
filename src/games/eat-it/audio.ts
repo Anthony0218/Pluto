@@ -21,6 +21,8 @@ export class EatAudio {
     if (event === 'food') { this.tone(260, 490, 0.07, volume); this.tone(190, 95, 0.1, volume * 0.5, 0.07); }
     if (event === 'eat') { this.tone(180, 50, 0.22, volume, 0, 'triangle'); this.tone(300, 100, 0.15, volume * 0.7, 0.23); }
     if (event === 'power' || event === 'questPickup' || event === 'questComplete' || event === 'npcFeed') { this.tone(430, 720, 0.16, volume); this.tone(650, 1040, 0.2, volume, 0.12); }
+    if (event === 'fireball') { this.tone(160, 620, .22, volume, 0, 'sawtooth'); this.tone(320, 980, .18, volume * .7, .08); }
+    if (event === 'blackHoleEaten') { this.tone(60, 900, .6, volume, 0, 'sawtooth'); this.tone(900, 120, .5, volume * .8, .35, 'triangle'); }
     if (event === 'choke') { this.tone(170, 80, .12, volume, 0, 'triangle'); this.tone(150, 65, .12, volume, .2, 'triangle'); }
     if (event === 'npcEmerge' || event === 'npcAttack') this.tone(400, 95, .25, volume, 0, 'triangle');
     if (event === 'collision') this.tone(100, 55, 0.06, volume * 0.3);

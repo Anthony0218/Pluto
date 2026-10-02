@@ -22,4 +22,11 @@ export const STAT_DEFINITIONS: Record<AtlasStatKey, { label: string; unit: strin
   areaKm2: { label: "Area", unit: "km²", timeSensitive: false },
   neighborCount: { label: "Land borders", unit: "neighbors", timeSensitive: false },
   officialLanguageCount: { label: "Official languages", unit: "languages", timeSensitive: false },
+  highestPointM: { label: "Highest point", unit: "m", timeSensitive: false },
+  elevationM: { label: "Elevation", unit: "m", timeSensitive: false },
+  countryCount: { label: "Countries", unit: "countries", timeSensitive: false },
 };
+
+/** Guess the Country: the first correct guesser earns `first`, every later correct guesser in the same tip `other`;
+ *  solving on tip 1 or 2 adds `tipBonus[tip]`. */
+export const GUESS_SCORING = { first: 3, other: 2, tipBonus: [2, 1] as readonly number[], tipSeconds: 25, afterFirstCorrectSeconds: 8 } as const;

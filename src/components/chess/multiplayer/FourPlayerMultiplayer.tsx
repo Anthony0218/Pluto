@@ -97,6 +97,7 @@ function sameSquare(a: FourPlayerSquare, b: FourPlayerSquare) {
 function moveNotation(state: FourPlayerState) {
   const move = state.lastMove;
   if (!move) return state.event ?? "Action";
+  if (move.castle) return move.castle === "king" ? "O-O" : "O-O-O";
   const capture = move.captured ? "×" : "–";
   const promotion = move.promoted ? "=Q" : "";
   return `${fourPlayerSquareName(move.from)}${capture}${fourPlayerSquareName(move.to)}${promotion}`;

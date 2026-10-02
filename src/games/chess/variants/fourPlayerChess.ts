@@ -19,7 +19,15 @@ export type FourPlayerMove = {
   color: FourPlayerColor;
   captured: FourPlayerPiece | null;
   promoted: boolean;
+  castle?: FourPlayerCastleSide;
 };
+
+export type FourPlayerCastleSide = "king" | "queen";
+
+export type FourPlayerCastlingRights = Record<
+  FourPlayerColor,
+  Record<FourPlayerCastleSide, boolean>
+>;
 
 export type FourPlayerState = {
   board: (FourPlayerPiece | null)[][];
@@ -29,6 +37,9 @@ export type FourPlayerState = {
   lastMove: FourPlayerMove | null;
   moveCount: number;
   event: string | null;
+  // Optional so states saved before castling existed still load; when it is
+  // missing, rights fall back to "king and rook still on their home squares".
+  castling?: FourPlayerCastlingRights;
 };
 
 export const FOUR_PLAYER_ORDER: FourPlayerColor[] = [
@@ -50,6 +61,33 @@ const HOME_ORDER: FourPlayerPieceType[] = [
 ];
 
 const BOARD_SIZE = 14;
+
+type CastleLayout = {
+  king: FourPlayerSquare;
+  rooks: Record<FourPlayerCastleSide, FourPlayerSquare>;
+};
+
+// Home squares derived from HOME_ORDER placement in createInitialFourPlayerState.
+const CASTLE_LAYOUT: Record<FourPlayerColor, CastleLayout> = {
+  red: {
+    king: { row: 13, column: 7 },
+    rooks: { king: { row: 13, column: 10 }, queen: { row: 13, column: 3 } },
+  },
+  yellow: {
+    king: { row: 0, column: 6 },
+    rooks: { king: { row: 0, column: 3 }, queen: { row: 0, column: 10 } },
+  },
+  blue: {
+    king: { row: 7, column: 0 },
+    rooks: { king: { row: 10, column: 0 }, queen: { row: 3, column: 0 } },
+  },
+  green: {
+    king: { row: 6, column: 13 },
+    rooks: { king: { row: 3, column: 13 }, queen: { row: 10, column: 13 } },
+  },
+};
+
+const CASTLE_SIDES: FourPlayerCastleSide[] = ["king", "queen"];
 
 const KNIGHT_STEPS = [
   [-2, -1],
@@ -120,6 +158,27 @@ export function fourPlayerSquareName(square: FourPlayerSquare) {
   return `${file}${rank}`;
 }
 
+function initialCastlingRights(): FourPlayerCastlingRights {
+  return {
+    red: { king: true, queen: true },
+    blue: { king: true, queen: true },
+    yellow: { king: true, queen: true },
+    green: { king: true, queen: true },
+  };
+}
+
+function cloneCastlingRights(
+  rights: FourPlayerCastlingRights | undefined,
+): FourPlayerCastlingRights | undefined {
+  if (!rights) return undefined;
+  return {
+    red: { ...rights.red },
+    blue: { ...rights.blue },
+    yellow: { ...rights.yellow },
+    green: { ...rights.green },
+  };
+}
+
 function cloneBoard(board: (FourPlayerPiece | null)[][]) {
   return board.map((row) => row.map((piece) => (piece ? { ...piece } : null)));
 }
@@ -129,6 +188,7 @@ export function cloneFourPlayerState(state: FourPlayerState): FourPlayerState {
     ...state,
     board: cloneBoard(state.board),
     activePlayers: [...state.activePlayers],
+    castling: cloneCastlingRights(state.castling),
     lastMove: state.lastMove
       ? {
           ...state.lastMove,
@@ -179,6 +239,7 @@ export function createInitialFourPlayerState(): FourPlayerState {
     lastMove: null,
     moveCount: 0,
     event: "Red moves first.",
+    castling: initialCastlingRights(),
   };
 }
 
@@ -546,6 +607,162 @@ function simulateMove(
   return next;
 }
 
+function stepToward(from: FourPlayerSquare, to: FourPlayerSquare) {
+  return {
+    row: Math.sign(to.row - from.row),
+    column: Math.sign(to.column - from.column),
+  };
+}
+
+function hasCastlingRight(
+  state: FourPlayerState,
+  color: FourPlayerColor,
+  side: FourPlayerCastleSide,
+) {
+  if (state.castling) return state.castling[color][side];
+  return true;
+}
+
+function castleSideForMove(
+  color: FourPlayerColor,
+  from: FourPlayerSquare,
+  to: FourPlayerSquare,
+): FourPlayerCastleSide | null {
+  const layout = CASTLE_LAYOUT[color];
+  if (!sameSquare(from, layout.king)) return null;
+
+  for (const side of CASTLE_SIDES) {
+    const step = stepToward(layout.king, layout.rooks[side]);
+    if (
+      to.row === layout.king.row + step.row * 2 &&
+      to.column === layout.king.column + step.column * 2
+    ) {
+      return side;
+    }
+  }
+
+  return null;
+}
+
+function castlingMoves(state: FourPlayerState, color: FourPlayerColor) {
+  const layout = CASTLE_LAYOUT[color];
+  const board = state.board;
+  const king = board[layout.king.row][layout.king.column];
+  const moves: FourPlayerSquare[] = [];
+
+  if (king?.color !== color || king.type !== "k") return moves;
+  if (isFourPlayerSquareAttacked(board, layout.king, color)) return moves;
+
+  for (const side of CASTLE_SIDES) {
+    if (!hasCastlingRight(state, color, side)) continue;
+
+    const rookSquare = layout.rooks[side];
+    const rook = board[rookSquare.row][rookSquare.column];
+    if (rook?.color !== color || rook.type !== "r") continue;
+
+    const step = stepToward(layout.king, rookSquare);
+    let row = layout.king.row + step.row;
+    let column = layout.king.column + step.column;
+    let clear = true;
+
+    while (row !== rookSquare.row || column !== rookSquare.column) {
+      if (board[row][column]) {
+        clear = false;
+        break;
+      }
+      row += step.row;
+      column += step.column;
+    }
+
+    if (!clear) continue;
+
+    const pass = {
+      row: layout.king.row + step.row,
+      column: layout.king.column + step.column,
+    };
+    const land = {
+      row: layout.king.row + step.row * 2,
+      column: layout.king.column + step.column * 2,
+    };
+
+    if (
+      isFourPlayerSquareAttacked(board, pass, color) ||
+      isFourPlayerSquareAttacked(board, land, color)
+    ) {
+      continue;
+    }
+
+    const castled = cloneBoard(board);
+    castled[layout.king.row][layout.king.column] = null;
+    castled[land.row][land.column] = king;
+    applyCastleRook(castled, color, side);
+    if (isFourPlayerKingInCheck(castled, color)) continue;
+
+    moves.push(land);
+  }
+
+  return moves;
+}
+
+function applyCastleRook(
+  board: (FourPlayerPiece | null)[][],
+  color: FourPlayerColor,
+  side: FourPlayerCastleSide,
+) {
+  const layout = CASTLE_LAYOUT[color];
+  const rookSquare = layout.rooks[side];
+  const step = stepToward(layout.king, rookSquare);
+  const rook = board[rookSquare.row][rookSquare.column];
+
+  board[rookSquare.row][rookSquare.column] = null;
+  board[layout.king.row + step.row][layout.king.column + step.column] = rook;
+}
+
+function nextCastlingRights(
+  state: FourPlayerState,
+  from: FourPlayerSquare,
+  to: FourPlayerSquare,
+): FourPlayerCastlingRights {
+  const rights: FourPlayerCastlingRights =
+    cloneCastlingRights(state.castling) ?? initialCastlingRights();
+
+  if (!state.castling) {
+    // Legacy state: drop any right whose king or rook already left home.
+    for (const color of FOUR_PLAYER_ORDER) {
+      const layout = CASTLE_LAYOUT[color];
+      const king = state.board[layout.king.row][layout.king.column];
+      for (const side of CASTLE_SIDES) {
+        const rookSquare = layout.rooks[side];
+        const rook = state.board[rookSquare.row][rookSquare.column];
+        if (
+          king?.color !== color ||
+          king.type !== "k" ||
+          rook?.color !== color ||
+          rook.type !== "r"
+        ) {
+          rights[color][side] = false;
+        }
+      }
+    }
+  }
+
+  for (const color of FOUR_PLAYER_ORDER) {
+    const layout = CASTLE_LAYOUT[color];
+    if (sameSquare(from, layout.king)) {
+      rights[color].king = false;
+      rights[color].queen = false;
+    }
+    for (const side of CASTLE_SIDES) {
+      const rookSquare = layout.rooks[side];
+      if (sameSquare(from, rookSquare) || sameSquare(to, rookSquare)) {
+        rights[color][side] = false;
+      }
+    }
+  }
+
+  return rights;
+}
+
 export function getFourPlayerLegalMoves(
   state: FourPlayerState,
   from: FourPlayerSquare,
@@ -560,11 +777,20 @@ export function getFourPlayerLegalMoves(
     return [];
   }
 
-  return pseudoMoves(state.board, from).filter((to) => {
+  const legal = pseudoMoves(state.board, from).filter((to) => {
     const simulated = simulateMove(state.board, from, to);
 
     return !isFourPlayerKingInCheck(simulated, piece.color);
   });
+
+  if (
+    piece.type === "k" &&
+    sameSquare(from, CASTLE_LAYOUT[piece.color].king)
+  ) {
+    legal.push(...castlingMoves(state, piece.color));
+  }
+
+  return legal;
 }
 
 function playerHasLegalMove(
@@ -714,6 +940,14 @@ export function applyFourPlayerMove(
     type: promoted ? "q" : piece.type,
   };
 
+  const castle =
+    piece.type === "k" ? castleSideForMove(piece.color, from, to) : null;
+
+  if (castle) {
+    applyCastleRook(board, piece.color, castle);
+  }
+
+  const castling = nextCastlingRights(state, from, to);
   const resolved = resolveNextTurn(board, piece.color, state.activePlayers);
 
   return {
@@ -728,12 +962,16 @@ export function applyFourPlayerMove(
       color: piece.color,
       captured,
       promoted,
+      ...(castle ? { castle } : {}),
     },
     moveCount: state.moveCount + 1,
+    castling,
     event:
       resolved.event ??
       (promoted
         ? `${fourPlayerLabel(piece.color)} promoted a pawn to Queen.`
-        : null),
+        : castle
+          ? `${fourPlayerLabel(piece.color)} castled.`
+          : null),
   };
 }

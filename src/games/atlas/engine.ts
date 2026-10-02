@@ -14,7 +14,7 @@ export function entitiesForDifficulty(entities: GeographicEntity[], difficulty: 
   return entities.filter((entity) => (entity.population?.value || 0) >= rules.minimumPopulation || (entity.areaKm2?.value || 0) >= rules.minimumArea);
 }
 
-function sourceMetadata(entity: GeographicEntity, category?: AtlasCategory) {
+export function sourceMetadata(entity: GeographicEntity, category?: AtlasCategory) {
   const metadata: { source: string; year?: number }[] = [];
   if (entity.population && (!category || category === "population")) metadata.push({ source: entity.population.source, year: entity.population.year });
   if (entity.areaKm2 && (!category || category === "area")) metadata.push({ source: entity.areaKm2.source, year: entity.areaKm2.year });
@@ -22,7 +22,7 @@ function sourceMetadata(entity: GeographicEntity, category?: AtlasCategory) {
   return metadata;
 }
 
-function plausibleEntities(target: GeographicEntity, pool: GeographicEntity[], difficulty: AtlasDifficulty, count: number, value?: (entity: GeographicEntity) => number): GeographicEntity[] {
+export function plausibleEntities(target: GeographicEntity, pool: GeographicEntity[], difficulty: AtlasDifficulty, count: number, value?: (entity: GeographicEntity) => number): GeographicEntity[] {
   return pool.filter((entity) => entity.id !== target.id).sort((left, right) => {
     const continentPenalty = DIFFICULTY_RULES[difficulty].sameContinentDistractors
       ? Number(right.continent === target.continent) - Number(left.continent === target.continent)
@@ -174,5 +174,6 @@ export function validateAnswer(question: AtlasQuestion, answer: string | string[
 export function statValue(entity: GeographicEntity, stat: AtlasStatKey): number | null {
   if (stat === "population" || stat === "areaKm2") return entity[stat]?.value ?? null;
   if (stat === "neighborCount") return entity.neighbors.length;
-  return entity.officialLanguages.length;
+  if (stat === "officialLanguageCount") return entity.officialLanguages.length;
+  return null;
 }

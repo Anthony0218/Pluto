@@ -98,6 +98,7 @@ type EnrichedReviewRow = {
 };
 
 function displayQuality(row: EnrichedReviewRow): ReviewVisualQuality {
+  if (row.review.missedMate) return "Missed Win";
   if (row.review.centipawnLoss >= 80 && row.moverEvalBefore !== null && row.moverEvalAfter !== null && row.moverEvalBefore >= 5 && row.moverEvalAfter < 3) return "Missed Win";
   return row.review.quality;
 }
@@ -283,7 +284,8 @@ type CachedReview = {
   ply: number;
 };
 
-const REVIEW_STORAGE_KEY = "chess-game-review-cache";
+// v2: mate scores are graded ply-accurately, so older cached grades are stale.
+const REVIEW_STORAGE_KEY = "chess-game-review-cache-v2";
 const MAX_STORED_REVIEWS = 6;
 
 const reviewCache = new Map<string, CachedReview>(readStoredReviews());
@@ -470,7 +472,7 @@ export default function ChessGameReview({
           review.color === targetColor &&
           review.bestMoveUci !== null &&
           review.bestMoveUci !== review.uci &&
-          review.centipawnLoss >= 61,
+          (review.missedMate || review.centipawnLoss >= 61),
       )
       .sort((left, right) => right.centipawnLoss - left.centipawnLoss)[0];
 
@@ -2121,7 +2123,7 @@ export default function ChessGameReview({
                     {/* TOP 3 */}
 
                     <div className="mt-5">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-amber-400">{ui("Best Alternatives")}</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-amber-400">{ui("Best 3 Choices")}</p>
 
                       <div className="mt-3 space-y-2">
                         {selected.bestMoves.map((suggestion, index) => (
@@ -2382,7 +2384,7 @@ export default function ChessGameReview({
                   </div>
 
                   <div className="mt-5">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-amber-400">{ui("Best Alternatives")}</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-amber-400">{ui("Best 3 Choices")}</p>
 
                     <div className="mt-3 space-y-2">
                       {selected.bestMoves.map((suggestion, index) => (
@@ -2732,6 +2734,14 @@ function classifyMissedOpportunity(
   moverEvalBefore: number | null,
   moverEvalAfter: number | null,
 ) {
+  if (review.missedMate) {
+    const best = review.bestMoveSan ? ` with ${review.bestMoveSan}` : "";
+
+    return review.bestMoves[0]?.evaluation === "M1"
+      ? `Checkmate in one was available${best}.`
+      : `A forced checkmate was available${best}, but this move let it slip.`;
+  }
+
   if (review.centipawnLoss < 80) {
     return null;
   }

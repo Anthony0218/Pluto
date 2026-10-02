@@ -15,6 +15,8 @@ export interface CommunityEntry {
   official?: boolean;
   configurable?: boolean;
   builtin?: VariantCard;
+  /** Catalog tabs a packaged entry appears in besides Pluto. */
+  collections?: VariantCard["collections"];
   playerCount?: number;
   id: string;
   /** Authored display attribution may have no linked account. */
@@ -91,9 +93,9 @@ export function createCommunityService(client: SupabaseClient) {
       } catch {
         remoteUnavailable = true;
       }
-      const scopedCatalog = scope === "players" ? catalog.filter((entry) => entry.builtin?.collections?.includes("community")) : catalog;
+      const scopedCatalog = scope === "players" ? catalog.filter((entry) => entry.collections?.includes("community")) : catalog;
       return mergeCommunityEntries(remote, scopedCatalog, sort, search)
-        .filter((entry) => scope !== "players" || !official(entry.id) || entry.builtin?.collections?.includes("community"))
+        .filter((entry) => scope !== "players" || !official(entry.id) || entry.collections?.includes("community"))
         .slice(offset, offset + limit);
     },
     /** Loads a published variant as a fresh, validated remix the player can edit freely. */

@@ -7,7 +7,7 @@ import { angleDelta, isChoking, mouthPosition, MOUTH, overFoodMouth } from './ru
 import { random, spawnPosition } from './spawn.ts';
 import type { Encounter, GameEvent, GameState, NpcPhase, Player, Vec } from './types.ts';
 
-export const QUEST = { alertRadius: 230, handReach: 42, handContact: 13, duration: EAT.escape.friendshipDuration, feedInterval: 4, attackInterval: 5, hostileDuration: 20, stunDuration: 1, shrineRadius: 66 } as const;
+export const QUEST = { alertRadius: 230, handReach: 42, handContact: 13, duration: EAT.escape.friendshipDuration, feedInterval: 4, attackInterval: 5, hostileDuration: 20, stunDuration: .5, shrineRadius: 66 } as const;
 const neutral = (phase: NpcPhase) => ['idle', 'wandering', 'running', 'flying'].includes(phase);
 export const npcRadius = (e: Encounter) => (e.npc.kind === 'pigeon' ? 16 : 22) * (e.npc.scale ?? 1);
 function event(s: GameState, type: GameEvent['type'], p: Player) {
@@ -195,7 +195,7 @@ export function stepEncounter(s: GameState, dt: number) {
   }
   for (const p of s.players) if (npcCanEnter(s, p)) {
     item.status = 'removed'; item.ownerId = null;
-    n.targetId = p.id; n.origin = { x: n.x, y: n.y }; phase(s, 'swallowing', EAT.eating.foodAnimation); return;
+    n.targetId = p.id; n.origin = { x: n.x, y: n.y }; phase(s, 'swallowing', EAT.eating.npcAnimation); return;
   }
   if (s.time >= n.until) {
     const choice = random(s);

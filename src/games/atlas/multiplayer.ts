@@ -1,10 +1,15 @@
 import { assertDatasetVersion, captureTerritory, haversineKm, normalScore, type TerritoryState } from "./rules.ts";
 import { validateAnswer } from "./engine.ts";
+import { scoreGuessTip, type GuessAward } from "./guessCountry.ts";
 import type { AtlasQuestion, Coordinates } from "./types.ts";
 
-export type AtlasMultiplayerMode = "map_battle" | "closest_wins" | "higher_lower" | "territory_battle";
+export type AtlasMultiplayerMode = "map_battle" | "closest_wins" | "higher_lower" | "territory_battle" | "flag_battle" | "guess_country";
+export const ATLAS_MULTIPLAYER_MODES: AtlasMultiplayerMode[] = ["map_battle", "closest_wins", "higher_lower", "territory_battle", "flag_battle", "guess_country"];
+/** Territory ownership is two-coloured; every other mode seats two to four players. */
+export const maxPlayersFor = (mode: AtlasMultiplayerMode) => mode === "territory_battle" ? 2 : 4;
+export const clampPlayers = (mode: AtlasMultiplayerMode, requested: unknown) => Math.min(maxPlayersFor(mode), Math.max(2, Math.trunc(Number(requested)) || 2));
 export type AtlasMatchStatus = "waiting" | "ready" | "countdown" | "round_active" | "round_resolving" | "next_round" | "finished";
-export type ServerSubmission = { userId: string; round: number; answer: string | Coordinates; submittedAt: number; correct: boolean; distanceKm?: number };
+export type ServerSubmission = { userId: string; round: number; answer: string | Coordinates; submittedAt: number; correct: boolean; distanceKm?: number; tip?: number };
 
 export function parseClientAnswer(value: unknown, mode: AtlasMultiplayerMode): string | Coordinates {
   if (mode === "closest_wins") {
@@ -47,4 +52,15 @@ export function applyTerritoryRound(state: TerritoryState, entityId: string, win
 
 export function verifyMatchDataset(serverVersion: string, clientVersion: string): void {
   assertDatasetVersion(serverVersion, clientVersion);
+}
+
+/**
+ * Resolves one Guess the Country tip. When anybody guessed right, the country is finished and the awards are added;
+ * otherwise `solved` is false and the next tip should be revealed.
+ */
+export function resolveGuessTip(options: { submissions: ServerSubmission[]; tip: number; currentScores: Record<string, number> }): { scores: Record<string, number>; awards: GuessAward[]; solved: boolean } {
+  const awards = scoreGuessTip(options.submissions.filter((submission) => submission.correct && (submission.tip ?? 0) === options.tip), options.tip);
+  const scores = { ...options.currentScores };
+  for (const award of awards) scores[award.userId] = (scores[award.userId] || 0) + award.total;
+  return { scores, awards, solved: awards.length > 0 };
 }

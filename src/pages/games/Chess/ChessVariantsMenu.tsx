@@ -1,5 +1,5 @@
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
-import { variants, type VariantCard } from "@/data/chessVariants";
+import { menuVariants as variants, type VariantCard } from "@/data/chessVariants";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
 import { useEffect, useState } from "react";

@@ -2,7 +2,7 @@ import LearnPage from "./pages/general/LearnPage";
 import React from "react";
 import ReactDOM from "react-dom/client";
 
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Navigate, RouterProvider, useLocation } from "react-router-dom";
 
 import "./index.css";
 
@@ -33,7 +33,9 @@ import ChessMultiplayerModeMenu from "./pages/games/Chess/ChessMultiplayerModeMe
 import ChessRankedLobby from "./pages/games/Chess/ChessRankedLobby.tsx";
 import ChessMultiplayerRoom from "./pages/games/Chess/ChessMultiplayerRoom.tsx";
 import ChessMultiplayerGame from "./pages/games/Chess/ChessMultiplayerGame.tsx";
-import GroupsPage from "./pages/social/GroupsPage.tsx";
+import ClansPage from "./pages/social/ClansPage.tsx";
+import PublicProfilePage from "./pages/social/PublicProfilePage.tsx";
+import SpectatePage from "./pages/social/SpectatePage.tsx";
 import LeaderboardsPage from "./pages/social/LeaderboardsPage.tsx";
 import ChessRulesAndTips from "./components/chess/singleplayer/ChessRulesAndTips.tsx";
 import ChessPuzzlesPage from "./components/chess/singleplayer/ChessPuzzlesPage.tsx";
@@ -173,6 +175,12 @@ const eatItPage = <React.Suspense fallback={<main className="min-h-[var(--app-he
 const AtlasMultiplayerPage = React.lazy(() => import("./pages/games/AtlasArena/AtlasMultiplayerPage.tsx"));
 const atlasPage = (page: React.ReactNode) => <React.Suspense fallback={<main className="min-h-[var(--app-height)] bg-[#06101f] p-10 text-zinc-400">Loading Atlas Arena…</main>}>{page}</React.Suspense>;
 
+/** Groups were renamed to Clans; keep old links working. */
+function GroupsRedirect() {
+  const { search } = useLocation();
+  return <Navigate to={`/clans${search}`} replace />;
+}
+
 const router = createBrowserRouter([
   {
     element: <RootLayout />,
@@ -237,11 +245,15 @@ const router = createBrowserRouter([
             path: "/profile",
             element: <ProfilePage />,
           },
+          { path: "/profile/name/:username", element: <PublicProfilePage /> },
+          { path: "/profile/:userId", element: <PublicProfilePage /> },
+          { path: "/spectate/:requestId", element: <SpectatePage /> },
           {
             path: "/friends",
             element: <FriendsPage />,
           },
-          { path: "/groups", element: <GroupsPage /> },
+          { path: "/clans", element: <ClansPage /> },
+          { path: "/groups", element: <GroupsRedirect /> },
           { path: "/leaderboards", element: <LeaderboardsPage /> },
 
           {

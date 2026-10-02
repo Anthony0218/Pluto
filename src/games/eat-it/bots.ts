@@ -5,11 +5,13 @@ import { shrineClear } from './quests.ts';
 import { EAT, FOOD, playerRadius } from './config.ts';
 import { clearPath, distance, validPosition, zoneRadius } from './maps.ts';
 import { angleDelta, foodFits, canopyFits, playerFits, isChoking } from './rules.ts';
+import { tooLongToSwallow } from './falling.ts';
 import type { GameState, Input, Player, Vec } from './types.ts';
 export const BOT_POLICY = {
-  hard: { interval: EAT.bots.decisionInterval, threat: 1, hunt: 1, prediction: .2, power: 260, reward: .5, hellSamples: 16, warningDelay: 0, escapeDelay: 0 },
-  medium: { interval: .42, threat: .82, hunt: .6, prediction: .1, power: 210, reward: .3, hellSamples: 12, warningDelay: .3, escapeDelay: .3 },
-  easy: { interval: .75, threat: .62, hunt: .22, prediction: 0, power: 150, reward: .12, hellSamples: 8, warningDelay: .65, escapeDelay: .7 },
+  // Tuned in the player's favour: slower reactions, weaker hunting, and small speed and normal-map growth handicaps.
+  hard: { interval: .3, threat: .85, hunt: .7, prediction: .12, power: 220, reward: .38, hellSamples: 12, warningDelay: .2, escapeDelay: 0, speed: .96, growth: .92 },
+  medium: { interval: .58, threat: .66, hunt: .34, prediction: .04, power: 170, reward: .2, hellSamples: 10, warningDelay: .5, escapeDelay: .55, speed: .9, growth: .82 },
+  easy: { interval: .95, threat: .48, hunt: .1, prediction: 0, power: 120, reward: .08, hellSamples: 8, warningDelay: .85, escapeDelay: .95, speed: .83, growth: .7 },
 } as const;
 export const botPolicy = (s: GameState) => BOT_POLICY[s.settings?.mode === 'solo' ? s.settings.botDifficulty ?? 'medium' : 'hard'];
 export function botInput(state: GameState, bot: Player): Input {
@@ -34,7 +36,7 @@ export function botInput(state: GameState, bot: Player): Input {
   } else {
     const edible = nearby.filter(p => playerFits(bot, p, state.time)).sort((a, b) => distance(a, bot) - distance(b, bot))[0];
     const power = state.powerups.filter(p => canStorePower(state,bot,p.kind) && (p.kind !== 'divider' || policy === BOT_POLICY.easy && (Math.floor(state.time / 5) + state.players.indexOf(bot)) % 3 === 0 || policy === BOT_POLICY.medium && distance(p, bot) < 30) && distance(p, bot) < policy.power && clearPath(state.map, bot, p, r)).sort((a, b) => distance(a, bot) - distance(b, bot))[0];
-    const food = state.food.filter(f => !f.target && canopyFits(bot, f, state.time) && foodFits(bot, f, state.time) && distance(f, bot) < EAT.bots.vision && clearPath(state.map, bot, f, r)).sort((a, b) => distance(a, bot) / FOOD[a.kind].growth ** policy.reward - distance(b, bot) / FOOD[b.kind].growth ** policy.reward)[0];
+    const food = state.food.filter(f => !f.target && canopyFits(bot, f, state.time) && foodFits(bot, f, state.time) && !tooLongToSwallow(bot, f.kind, state.time) && distance(f, bot) < EAT.bots.vision && clearPath(state.map, bot, f, r)).sort((a, b) => distance(a, bot) / FOOD[a.kind].growth ** policy.reward - distance(b, bot) / FOOD[b.kind].growth ** policy.reward)[0];
     if (power && (power.kind === 'multiplier' || power.kind === 'shield' || !edible)) { bot.botState = 'POWERUP'; target = power; }
     else if (edible && distance(edible, bot) < EAT.bots.huntRange * policy.hunt) { bot.botState = 'HUNT'; target = { x: edible.x + edible.vx * policy.prediction, y: edible.y + edible.vy * policy.prediction }; }
     else if (food) { bot.botState = 'FORAGE'; target = food; }
@@ -45,8 +47,9 @@ export function botInput(state: GameState, bot: Player): Input {
   const desired = Math.atan2(target.y - bot.y, target.x - bot.x);
   // Steer around solids using only visible geometry, with a stable side preference.
   const side = state.players.indexOf(bot) % 2 ? -1 : 1;
+  // Props that would jam (too tall to tip in) are steered around like solid ones.
   const blockers = state.food.filter(f => !f.target && distance(bot, f) < EAT.bots.vision &&
-    !foodFits(bot, f, state.time));
+    (!foodFits(bot, f, state.time) || tooLongToSwallow(bot, f.kind, state.time)));
   for (const offset of [0, side * 0.5, -side * 0.5, side, -side, side * 1.6, -side * 1.6, Math.PI]) {
     const angle = desired + offset, input = { x: Math.cos(angle), y: Math.sin(angle) };
     const ahead = { x: bot.x + input.x * (r + 65), y: bot.y + input.y * (r + 65) };
