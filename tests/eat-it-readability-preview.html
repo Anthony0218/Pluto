@@ -1,0 +1,30 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Eat It readability QA</title>
+<style>body{margin:0;background:#171522;color:#fff;font:14px system-ui}nav{position:absolute;top:0;left:0;z-index:5;display:flex;flex-wrap:wrap;gap:8px;padding:10px;background:#171522ed}button,select{padding:7px}canvas{display:block;width:100vw;height:100vh}output{position:absolute;bottom:12px;left:12px;background:#171522e8;padding:10px;z-index:5;max-width:70%}</style>
+<nav><label>Map <select id="map"><option value="city">City / pigeon</option><option value="nature">Nature / cat</option></select></label><label>Size <select id="size"><option value="36">Small</option><option value="625">Medium</option><option value="3600" selected>Huge</option></select></label><label>Scene <select id="scene"><option>Friendly</option><option>Neutral</option><option>Hostile</option><option>Carried quest</option><option>Escape</option><option>Choking</option><option>Spit</option><option>Tree fits</option><option>Burp</option><option>Hell</option><option>Eruption warning</option><option>Eruption active</option><option>Curve</option><option>Extreme</option><option>Paused sweep</option></select></label><button id="advance">Advance 0.25s</button><button id="play">Play / pause</button><button id="reset">Reset</button></nav><canvas id="arena"></canvas><output id="status"></output>
+<script type="module">
+import {ArenaRenderer} from '/src/games/eat-it/renderer.ts';
+import {createGame,stepGame} from '/src/games/eat-it/engine.ts';
+import {playerRadius,POWER_KINDS} from '/src/games/eat-it/config.ts';
+import {stepEncounter} from '/src/games/eat-it/quests.ts';
+import {activateEscape} from '/src/games/eat-it/escape.ts';
+import {startHell,cellCenter} from '/src/games/eat-it/hell.ts';
+import {stepBurp} from '/src/games/eat-it/expressions.ts';
+let s,renderer,playing=false;const map=document.querySelector('#map'),size=document.querySelector('#size'),scene=document.querySelector('#scene');
+function reset(){renderer?.dispose();document.querySelector('#arena').replaceWith(Object.assign(document.createElement('canvas'),{id:'arena'}));s=createGame(map.value,[{id:'a',name:'You'},{id:'b',name:'Mochi'}],41,'qa',{mode:'solo'});s.food=[];s.powerups=[];s.nextFood=s.nextPower=s.nextPluto=1e6;const p=s.players[0],e=s.encounter,n=e.npc;Object.assign(p,{x:1500,y:1400,mass:Number(size.value),facing:0});Object.assign(s.players[1],{x:3200,y:2400});e.shrine=null;const r=playerRadius(p,0);Object.assign(n,{x:p.x+r+100,y:p.y,phase:scene.value==='Hostile'?'hostile':scene.value==='Neutral'?'idle':'friendly',targetId:scene.value==='Neutral'?null:p.id,until:30,nextAction:scene.value==='Hostile'?5:4});e.completedBy=p.id;e.item.x=p.x+r+75;e.item.y=p.y-130;e.item.home={x:e.item.x,y:e.item.y};
+if(scene.value==='Carried quest'){e.item.ownerId=p.id;e.item.status='carried'}
+stepEncounter(s,0);
+POWER_KINDS.forEach((kind,i)=>s.powerups.push({kind,id:s.nextId++,x:p.x-200+i*90,y:p.y+r+120}));s.food.push({id:s.nextId++,kind:'plutoSmall',x:p.x-250,y:p.y-r-90,z:0,vz:0,vx:0,vy:0,rotation:0,target:null,capturedAt:0});
+if(['Choking','Spit','Tree fits'].includes(scene.value)){p.mass=scene.value==='Tree fits'?(65/4)**2:36;s.food=[{id:s.nextId++,kind:'tree',x:p.x+2,y:p.y,z:0,vz:0,vx:0,vy:0,rotation:0,target:null,capturedAt:0}];s.powerups=[];for(let i=0;i<(scene.value==='Spit'?103:14);i++)stepGame(s);}
+if(scene.value==='Burp'){p.nextBurp=0;stepBurp(s,p);s.time=.3}
+if(scene.value==='Escape'){activateEscape(s,p);for(let i=0;i<25;i++)stepGame(s)}
+if(['Hell','Eruption warning','Eruption active','Curve','Extreme','Paused sweep'].includes(scene.value)){startHell(s);s.time=s.hell.readyAt;s.phase='hell';const b=s.hell.blackHole;Object.assign(b,cellCenter(42));b.from={x:b.x,y:b.y};b.destination=cellCenter(195);b.warnUntil=s.time+1.1;
+const p=s.players[0];Object.assign(b,{x:p.x-430,y:p.y-220});b.from={x:b.x,y:b.y};b.destination={x:p.x+450,y:p.y+160};b.progress=0;
+s.powerups=[{id:s.nextId++,kind:'speed',x:p.x+210,y:p.y-100}];
+if(scene.value==='Curve')b.control={x:p.x+50,y:p.y-520};
+if(scene.value==='Extreme'){b.speedCategory='extreme';b.speed=900;b.warnUntil=s.time+2;}
+if(scene.value==='Paused sweep'){b.warnUntil=0;b.pauseUsed=true;b.pausedUntil=s.time+1;}
+if(scene.value.startsWith('Eruption')){const active=scene.value==='Eruption active';s.hell.eruptions=[{id:s.nextId++,x:p.x-180,y:p.y-110,warningAt:s.time-(active?2.3:1),eruptAt:s.time+(active?-.3:1),endsAt:s.time+2,hit:[]}];}
+}
+renderer=new ArenaRenderer(document.querySelector('#arena'),map.value);renderer.resize(innerWidth,innerHeight);playing=false;}
+map.onchange=size.onchange=scene.onchange=reset;document.querySelector('#reset').onclick=reset;document.querySelector('#play').onclick=()=>playing=!playing;document.querySelector('#advance').onclick=()=>{for(let i=0;i<8;i++)stepGame(s)};window.onresize=()=>renderer.resize(innerWidth,innerHeight);reset();let previous=performance.now(),acc=0;function frame(now){const dt=Math.min(.1,(now-previous)/1000);previous=now;if(playing){acc+=dt;while(acc>=1/30){stepGame(s);acc-=1/30}}renderer.draw(s,'a',dt,'You',false);document.querySelector('#status').textContent=`${scene.value} · ${s.time.toFixed(2)}s · mass ${s.players[0].mass.toFixed(0)} · chokes ${s.players[0].stats.chokes} · trees eaten ${s.players[0].stats.trees}`;requestAnimationFrame(frame)}requestAnimationFrame(frame);
+</script></html>

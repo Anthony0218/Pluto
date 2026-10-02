@@ -1,6 +1,0 @@
-packages:
-  - "."
-allowBuilds:
-  core-js: false
-  pnpm: false
-  stockfish: false

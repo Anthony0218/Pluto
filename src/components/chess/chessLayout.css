@@ -1,0 +1,132 @@
+/* Shared chess surfaces use the space available below the mobile header. */
+.chess-variant-page {
+  background: radial-gradient(ellipse at 50% 0%,#f59e0b14,transparent 45%), linear-gradient(180deg,#05080d,#07111b 50%,#020509);
+  width: 100%;
+  padding: 12px 16px;
+}
+.chess-variant-page > div { max-width: 1800px; margin-inline: auto; }
+.chess-variant-page > div > header {
+  border: 1px solid #fbbf2426; border-radius: 16px;
+  background: #091019e6; padding: 12px 20px; margin-bottom: 12px;
+}
+.chess-variant-page h1 { font-family: Georgia,serif; color: #f7ead0; font-weight: 500; }
+.chess-game-grid { --board-size: min(820px,calc(100dvh - 16rem)); --side-width: clamp(240px,18vw,320px); gap: 16px; }
+.chess-game-grid > aside section { border-color: #fbbf2426; background-color: #091019e6; border-radius: 20px; }
+.chess-game-grid > aside { min-width: 0; scrollbar-width: thin; }
+.chess-variant-result-actions > * { width: auto !important; max-width: 100%; margin: 0 !important; }
+.chess-sidebar-toggle { display: none; }
+body:has(.chess-game-grid) .chess-sidebar-toggle { display: block; }
+@media (min-width:1280px) {
+  .chess-variant-page:has(.chess-game-grid) { height: var(--app-height); min-height: 0; overflow: hidden; }
+  .chess-variant-page:has(.chess-game-grid) > div { height: 100%; display: flex; flex-direction: column; min-height: 0; }
+  .chess-game-grid {
+    grid-template-columns: var(--side-width) minmax(0,var(--board-size)) var(--side-width) !important;
+    width: min(100%,calc(var(--board-size) + var(--side-width) * 2 + 32px));
+    margin-inline: auto; min-height: 0; flex: 1; align-items: start;
+  }
+  .chess-game-grid > aside { height: 100%; max-height: calc(100dvh - 12rem); overflow-y: auto !important; padding-bottom: 3rem; }
+  .chess-game-grid > aside > div { position: static; }
+  .chess-game-grid > :not(aside) { min-width: 0; width: 100%; max-width: none; }
+  .four-player-game-grid {
+    --board-size: min(calc(100dvh - 12rem), calc(100vw - 320px));
+    grid-template-columns: var(--side-width) minmax(0,var(--board-size)) !important;
+    width: min(100%,calc(var(--board-size) + var(--side-width) + 16px));
+  }
+  .chess-menu-page { height: var(--app-height); min-height: 0; }
+  .chess-menu-page > div.relative { height: 100%; min-height: 0; }
+  .chess-menu-page nav { min-height: 64px; flex-shrink: 0; }
+  .chess-menu-page > div > section { min-height: 0; }
+  .chess-menu-page.chess-singleplayer-setup { height: var(--app-height); min-height: 0; overflow: hidden; }
+  .chess-menu-page.chess-singleplayer-setup > div.relative { height: 100%; min-height: 0; }
+  .chess-menu-page.chess-singleplayer-setup > div > section { min-height: 0; }
+}
+@media (max-height:850px) and (min-width:1024px) {
+  .chess-menu-page header { padding-block: 20px; }
+  .chess-menu-page h1 { font-size: clamp(32px,5vw,58px); }
+  .chess-menu-page header p { margin-top: 12px; }
+  .chess-menu-page header .mt-12 { margin-top: 20px; }
+}
+@media (max-width:1279px) {
+  .chess-game-grid { display: flex; flex-direction: column; align-items: center; }
+  .chess-game-grid > :not(aside) { order: 0; width: min(100%,800px); }
+  .chess-game-grid > aside { order: 1; width: min(100%,800px); }
+  .four-player-game-grid > :not(aside), .four-player-game-grid > aside { width: 100%; }
+}
+@media (max-width:639px) {
+  .chess-menu-page { overflow-y: auto; }
+}
+@media (prefers-reduced-motion:reduce) { .chess-game-grid * { scroll-behavior: auto; } }
+@media (min-width:1280px) {
+  .classic-game-page { height: var(--app-height); min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+  .classic-game-page > div.h-full { display: flex; flex-direction: column; min-height: 0; }
+  .classic-game-grid {
+    grid-template-columns: minmax(220px, 280px) minmax(0, var(--board-size)) minmax(220px, 280px) !important;
+    width: min(100%, calc(var(--board-size) + 592px));
+    flex: 1;
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .classic-game-grid > aside { height: 100%; max-height: 100%; overflow-y: auto !important; padding-bottom: 3rem; }
+  .classic-game-grid > aside > div { height: auto; min-height: 0; }
+  .classic-game-grid > aside > div > * { flex-shrink: 0; }
+  .classic-game-grid > aside:first-child { min-height: 0; overflow-y: auto !important; padding-bottom: 0; }
+  .classic-game-grid > aside:first-child > div { display: flex; height: auto; min-height: 100%; flex-direction: column; }
+  .classic-game-grid > aside:first-child > div > section:last-child { flex: 1 1 0; min-height: 280px; }
+  .classic-game-grid > aside:first-child > div > section:last-child > div:last-child { min-height: 0; overflow-y: auto; }
+  .classic-game-grid > section, .classic-game-grid > section > div { height: auto; }
+  .classic-game-grid > section { max-height: 100%; overflow-y: auto; scrollbar-width: thin; }
+}
+@media (min-width:1024px) and (max-width:1279px) {
+  .chess-menu-page { height: var(--app-height); min-height: 0; }
+  .chess-menu-page > div.relative { height: 100%; min-height: 0; }
+  .chess-menu-page nav { min-height: 56px; }
+  .chess-menu-page > div > section { grid-template-columns: minmax(0,.8fr) minmax(0,1.2fr); }
+  .chess-menu-page > div > section > div { padding: 20px; }
+}
+
+/* Each page owns its header; branding shares that mode's accent and surface. */
+.chess-page-header { display: flex !important; flex-direction: row !important; flex-wrap: wrap; align-items: center !important; justify-content: space-between; gap: 12px; min-width: 0; flex-shrink: 0; padding: 12px 16px; border-color: color-mix(in srgb,var(--chess-header-accent) 25%,transparent); }
+.chess-header-brand { display: flex; align-items: center; gap: 12px; min-width: 0; margin-right: auto; flex: 1 1 320px; }
+/* Description sits right after the name; when it does not fit it wraps to its own second line under the name. */
+.chess-header-text { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 12px; row-gap: 1px; min-width: 0; flex: 1 1 0; }
+.chess-header-logo { display: flex; align-items: baseline; gap: 6px; flex-shrink: 0; }
+.chess-header-colon { color: color-mix(in srgb,var(--chess-header-accent) 80%,#fff); font: 700 18px/1 Georgia,serif; }
+.chess-header-name { font: 600 16px Georgia,serif; color: #f4f4f5; overflow-wrap: anywhere; }
+.chess-header-details { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; min-width: 0; }
+.chess-header-details:empty { display: none; }
+/* Same horizontal inset and height as the shared app header, so the Pluto mark sits in the same place as on the dashboard. */
+.chess-menu-header { min-height: var(--chess-header-height, 64px); border-bottom: 1px solid #ffffff12; padding-block: 12px; padding-inline: 12px; }
+@media (min-width: 640px) { .chess-menu-header { padding-inline: max(24px, calc((100% - 1800px) / 2 + 24px)); } }
+.chess-page-header .navigation-controls { margin-left: auto; }
+/* Hotseat headers keep variant status pills on their own row below the title and controls. */
+.chess-page-header:has(.chess-animation-control) .chess-header-details { order: 99; flex: 1 1 100%; width: 100%; padding-top: 10px; border-top: 1px solid color-mix(in srgb,var(--chess-header-accent) 18%,transparent); }
+.chess-page-header:has(.chess-animation-control) .chess-header-details > div:first-child { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
+@media (max-width:639px) {
+  .chess-page-header { padding: 10px; gap: 10px; }
+  .chess-header-brand { flex: 1 1 100%; }
+  .chess-header-details { max-width: 100%; }
+  .chess-page-header .navigation-controls { flex-wrap: wrap; }
+  .chess-header-name { font-size: 15px; }
+}
+@media (max-width: 760px) {
+  .chess-page-header:has(.chess-animation-control) .chess-header-details > div:first-child { justify-content: flex-start; }
+  .collapse-game-header .chess-header-details > div:first-child > div { max-width: 100%; padding: 5px 8px; font-size: 10px; }
+}
+
+.chess-header-description { color: #a1a1aa; font-size: 12px; line-height: 1.4; min-width: 0; overflow-wrap: anywhere; }
+
+/* Ranked top-10 medallion: golden glow that breathes, with a light sweep. */
+.top-rank-badge { position: relative; isolation: isolate; display: inline-flex; align-items: center; gap: 5px; overflow: hidden; border: 1px solid #fde68a; border-radius: 999px; background: linear-gradient(135deg, #fff3b0 0%, #fbbf24 38%, #d97706 72%, #fcd34d 100%); color: #3b2503; font-weight: 900; line-height: 1; white-space: nowrap; padding: 6px 11px 6px 9px; font-size: 13px; box-shadow: 0 0 0 1px #78350f66 inset, 0 0 14px #fbbf2499, 0 0 30px #f59e0b4d; animation: top-rank-pop .55s cubic-bezier(.2, 1.4, .4, 1) both, top-rank-glow 2.6s ease-in-out .55s infinite; }
+.top-rank-badge::after { content: ""; position: absolute; inset: -2px; z-index: -1; background: linear-gradient(105deg, transparent 35%, #ffffffcc 50%, transparent 65%); transform: translateX(-120%); animation: top-rank-shine 3.2s ease-in-out 1s infinite; }
+
+.top-rank-badge-label { font-size: .68em; letter-spacing: .14em; text-transform: uppercase; opacity: .78; }
+/* Compact variant for in-game player boxes. */
+.top-rank-badge.is-small { gap: 3px; padding: 3px 7px 3px 6px; font-size: 10px; }
+.top-rank-badge.is-small .top-rank-badge-label { letter-spacing: .1em; }
+.top-rank-badge.is-podium { border-color: #fff7d1; box-shadow: 0 0 0 1px #78350f66 inset, 0 0 18px #fcd34dcc, 0 0 40px #f59e0b80; }
+/* Glow ring for the player box that wears the badge. */
+.top-rank-glow { border-color: #fbbf2499; box-shadow: 0 0 0 1px #fbbf2440, 0 0 26px #f59e0b40, inset 0 0 22px #fbbf2414; animation: top-rank-box-glow 2.6s ease-in-out infinite; }
+@keyframes top-rank-pop { from { opacity: 0; transform: scale(.4) rotate(-8deg); } }
+@keyframes top-rank-glow { 50% { box-shadow: 0 0 0 1px #78350f66 inset, 0 0 22px #fcd34dd9, 0 0 46px #f59e0b8c; } }
+@keyframes top-rank-shine { 0%, 55% { transform: translateX(-120%); } 85%, 100% { transform: translateX(120%); } }
+@keyframes top-rank-box-glow { 50% { box-shadow: 0 0 0 1px #fbbf2466, 0 0 38px #f59e0b66, inset 0 0 26px #fbbf2421; } }
+@media (prefers-reduced-motion: reduce) { .top-rank-badge, .top-rank-badge::after, .top-rank-glow { animation: none; } }

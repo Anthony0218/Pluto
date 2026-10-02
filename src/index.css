@@ -1,0 +1,222 @@
+@import "tailwindcss";
+@import "@fontsource-variable/geist";
+@custom-variant dark (&:where(.dark, .dark *));
+@theme {
+  --font-sans: "Geist Variable", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --public-header-height: 4rem;
+  --app-height: calc(100dvh - var(--public-header-height));
+}
+@media (max-width: 639px) {
+  .app-shell:not(.integrated-navigation) { --public-header-height: 7rem; }
+  .app-shell:has(.dashboard-page) { --public-header-height: 9rem; }
+}
+html:has(.app-shell), body:has(.app-shell) {
+  height: 100%;
+  overflow: hidden;
+}
+.app-shell { height: 100dvh; overflow: hidden; padding-top: var(--public-header-height); }
+.app-shell.integrated-navigation { --public-header-height: 0px; --app-height: 100dvh; padding-top: 0; }
+#app-navigation[open] { animation: navigation-enter .25s ease-out both; }
+#app-navigation[open][data-closing] { animation: navigation-exit .2s ease-in both; }
+@keyframes navigation-enter { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@keyframes navigation-exit { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+@media (prefers-reduced-motion: reduce) { #app-navigation[open] { animation: none; } }
+.app-viewport { height: var(--app-height); min-height: 0; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+.app-viewport .min-h-screen { min-height: var(--app-height); }
+.app-viewport .h-screen { height: var(--app-height); }
+@media (max-width: 639px) {
+  .public-header-language label > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  font-family: "Geist Variable", sans-serif;
+  background: #fafafa;
+  color: #18181b;
+}
+.abheben-card-scene {
+  perspective: 900px;
+}
+
+.abheben-card-flip {
+  transform-style: preserve-3d;
+  transition:
+    transform 0.65s ease,
+    opacity 0.7s ease;
+}
+
+.abheben-card-flip.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.abheben-card-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.abheben-card-front {
+  transform: rotateY(180deg);
+}
+@keyframes watten-deck-gather {
+  0% {
+    transform: translate(var(--deck-x), var(--deck-y)) rotate(var(--deck-r))
+      scale(0.85);
+    opacity: 0;
+  }
+
+  65% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+.watten-deck-gather-card {
+  animation: watten-deck-gather 700ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+
+  opacity: 0;
+}
+
+/* Cards come from different positions */
+.deck-gather-0 {
+  --deck-x: -130px;
+  --deck-y: -60px;
+  --deck-r: -16deg;
+  animation-delay: 0ms;
+}
+
+.deck-gather-1 {
+  --deck-x: 120px;
+  --deck-y: -50px;
+  --deck-r: 14deg;
+  animation-delay: 70ms;
+}
+
+.deck-gather-2 {
+  --deck-x: -100px;
+  --deck-y: 60px;
+  --deck-r: 10deg;
+  animation-delay: 140ms;
+}
+
+.deck-gather-3 {
+  --deck-x: 110px;
+  --deck-y: 65px;
+  --deck-r: -12deg;
+  animation-delay: 210ms;
+}
+
+.deck-gather-4 {
+  --deck-x: 0px;
+  --deck-y: -100px;
+  --deck-r: 8deg;
+  animation-delay: 280ms;
+}
+
+.deck-gather-5 {
+  --deck-x: 0px;
+  --deck-y: 90px;
+  --deck-r: -6deg;
+  animation-delay: 350ms;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes wattenCardInBottom {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 120px) scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+@keyframes wattenCardInTop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -120px) scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+@keyframes wattenCardInLeft {
+  from {
+    opacity: 0;
+    transform: translate(-120px, -50%) scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(0, -50%) scale(1);
+  }
+}
+
+@keyframes wattenCardInRight {
+  from {
+    opacity: 0;
+    transform: translate(120px, -50%) scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(0, -50%) scale(1);
+  }
+}
+
+.watten-card-in-bottom {
+  animation: wattenCardInBottom 280ms ease-out;
+}
+
+.watten-card-in-top {
+  animation: wattenCardInTop 280ms ease-out;
+}
+
+.watten-card-in-left {
+  animation: wattenCardInLeft 280ms ease-out;
+}
+
+.watten-card-in-right {
+  animation: wattenCardInRight 280ms ease-out;
+}
