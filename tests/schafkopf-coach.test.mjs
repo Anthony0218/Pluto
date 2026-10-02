@@ -47,6 +47,6 @@ test("beginner advice recommends a small trump when void in the led suit", () =>
 
 test("beginner and amateur declarations use the standard ace names", () => {
   for (const suit of ["Eichel", "Gras", "Schellen"]) {
-    assert.equal(formatDeclarationAnnouncement({ kind: "rufspiel", suit }, SIMPLE_ANNOUNCEMENT_SETTINGS), `Ich spiele auf das ${suit}-Ass.`);
+    assert.equal(formatDeclarationAnnouncement({ kind: "rufspiel", suit }, SIMPLE_ANNOUNCEMENT_SETTINGS), `I spui auf die ${suit}-Ass.`);
   }
 });

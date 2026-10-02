@@ -8,6 +8,7 @@
     "dev:all": "trap 'kill 0' EXIT; node server/party/index.ts & vite & wait",
     "build": "tsc -b && tsc -p tsconfig.party.json && vite build",
     "lint": "eslint .",
+    "test:schafkopf": "node --test tests/schafkopf*.test.mjs",
     "test:natura": "node --test tests/*.test.mjs",
     "test:atlas": "node --test tests/atlas-arena.test.mjs",
     "test:eat-it": "node --test tests/eat-it*.test.mjs",
