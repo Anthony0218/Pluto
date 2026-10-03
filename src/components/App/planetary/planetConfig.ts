@@ -18,8 +18,6 @@ const sceneGames = [
   { route: "/games/chess", symbol: "♘", tone: "chess", position: "chess", ring: true, primary: true },
   { route: "/games/watten", symbol: "♦", tone: "watten", position: "watten", ring: true, primary: true },
   { route: "/games/natura", symbol: "✿", tone: "natura", position: "natura", ring: true },
-  { route: "/games/medieval-kingdoms", symbol: "♜", tone: "kingdoms", position: "kingdoms" },
-  { route: "/games/pluto-party", symbol: "✦", tone: "party", position: "party", ring: true },
   { route: "/games/eat-it", symbol: "◕", tone: "eat-it", position: "eat-it", ring: true },
 ] as const;
 

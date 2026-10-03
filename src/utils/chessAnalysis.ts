@@ -1,4 +1,5 @@
 import { Chess, type Square } from "chess.js";
+import { openingBookMove } from "@/games/chess/openingBook";
 
 import type { StockfishAnalysisLine } from "@/hooks/useStockfishAnalysis";
 
@@ -7,6 +8,7 @@ import type { StockfishAnalysisLine } from "@/hooks/useStockfishAnalysis";
    ========================================================= */
 
 export type MoveQuality =
+  | "Book"
   | "Best"
   | "Excellent"
   | "Good"
@@ -45,8 +47,12 @@ export type MoveReview = {
   fenAfter: string;
 
   quality: MoveQuality;
+  openingName?: string | null;
 
   centipawnLoss: number;
+
+  /** A forced mate was available and this move let it go (or skipped a mate in 1). */
+  missedMate: boolean;
 
   bestMoveUci: string | null;
 
@@ -88,44 +94,141 @@ export const REVIEW_MULTI_PV = 3;
 
 /* =========================================================
    ENGINE SCORE
+   =========================================================
+   Scores are centipawns from the side to move. Normal evaluations are
+   capped at ten pawns: +14 instead of +18 is still a won game, and the
+   cap keeps every forced mate above any normal evaluation, so a missed
+   mate costs a few pawns of evaluation instead of a thousand.
+
+   Stockfish counts mate in full moves from the side to move ("mate 1":
+   it mates next move, "mate -1": it is mated after its reply). Counted in
+   plies instead, the position after a move is exactly one ply further
+   from the root, so a move that only delays the mate scores below the
+   shortest mate rather than the same.
    ========================================================= */
 
-export function engineScore(line: StockfishAnalysisLine | undefined) {
+export const EVAL_CAP = 1000;
+
+const MATE_SCORE = 1100;
+
+/** Each ply further from mate costs this much; a long mate still beats any normal evaluation. */
+const MATE_PLY_COST = 5;
+
+function mateScore(plies: number) {
+  return Math.max(EVAL_CAP + 1, MATE_SCORE - plies * MATE_PLY_COST);
+}
+
+/**
+ * `extraPlies` counts the moves already played since the position being
+ * graded: 1 for the position after the played move.
+ */
+export function engineScore(
+  line: Pick<StockfishAnalysisLine, "scoreCp" | "mate"> | undefined,
+
+  extraPlies = 0,
+) {
   if (!line) {
     return 0;
   }
 
   if (line.mate !== null) {
     if (line.mate > 0) {
-      return 100000 - Math.abs(line.mate) * 100;
+      return mateScore(line.mate * 2 - 1 + extraPlies);
     }
 
-    return -100000 + Math.abs(line.mate) * 100;
+    return -mateScore(Math.abs(line.mate) * 2 + extraPlies);
   }
 
-  return line.scoreCp ?? 0;
+  return Math.max(-EVAL_CAP, Math.min(EVAL_CAP, line.scoreCp ?? 0));
+}
+
+/** Engine evaluation text ("+0.35", "M3", "-M2") back to a score on the same scale. */
+export function evaluationScore(evaluation: string) {
+  const mate = /^(-)?M(\d+)$/.exec(evaluation);
+
+  if (mate) {
+    return engineScore({ scoreCp: null, mate: Number(mate[2]) * (mate[1] ? -1 : 1) });
+  }
+
+  const pawns = Number.parseFloat(evaluation);
+
+  return engineScore({ scoreCp: Number.isFinite(pawns) ? Math.round(pawns * 100) : 0, mate: null });
 }
 
 /* =========================================================
    POSITION SCORE
    ========================================================= */
 
-function positionScore(
+export function positionScore(
   fen: string,
 
   line?: StockfishAnalysisLine,
+
+  extraPlies = 0,
 ) {
   const game = new Chess(fen);
 
   if (game.isCheckmate()) {
-    return -100000;
+    return -mateScore(extraPlies);
   }
 
   if (game.isDraw() || game.isStalemate() || game.isInsufficientMaterial()) {
     return 0;
   }
 
-  return engineScore(line);
+  return engineScore(line, extraPlies);
+}
+
+/* =========================================================
+   GRADE FROM ENGINE LINES
+   ========================================================= */
+
+const qualityOrder: MoveQuality[] = ["Best", "Excellent", "Good", "Inaccuracy", "Mistake", "Blunder"];
+
+/**
+ * Grades a played move from the top engine line before it and the top
+ * line after it (none when the move ended the game).
+ */
+export function gradePlayedMove(
+  fenBefore: string,
+
+  fenAfter: string,
+
+  playedUci: string,
+
+  beforeLine: StockfishAnalysisLine | undefined,
+
+  afterLine: StockfishAnalysisLine | undefined,
+) {
+  const bestScore = positionScore(fenBefore, beforeLine);
+
+  // fenAfter has the opponent to move, one ply further from fenBefore.
+  const playedScore = -positionScore(fenAfter, afterLine, 1);
+
+  const centipawnLoss = Math.max(0, bestScore - playedScore);
+
+  const bestMoveUci = beforeLine?.pv[0] ?? null;
+
+  const deliveredMate = new Chess(fenAfter).isCheckmate();
+
+  const mateBefore = beforeLine?.mate ?? null;
+
+  const stillMating = afterLine?.mate != null && afterLine.mate < 0;
+
+  const missedMate =
+    !deliveredMate &&
+    mateBefore !== null &&
+    mateBefore > 0 &&
+    (mateBefore === 1 || !stillMating);
+
+  let quality = classifyMove(centipawnLoss, deliveredMate || bestMoveUci === playedUci);
+
+  // Letting a forced mate go is never better than an inaccuracy, even while still winning.
+  if (missedMate && qualityOrder.indexOf(quality) < qualityOrder.indexOf("Inaccuracy")) {
+    quality = "Inaccuracy";
+  }
+
+  return { quality, centipawnLoss, missedMate, bestMoveUci };
 }
 
 /* =========================================================
@@ -282,17 +385,17 @@ export async function gradeMove(
     afterLine = afterLines[0];
   }
 
-  const bestScore = positionScore(beforeFen, bestLine);
+  const { quality, centipawnLoss, missedMate, bestMoveUci } = gradePlayedMove(
+    beforeFen,
 
-  /*
-   * afterFen has the opponent
-   * to move.
-   */
-  const playedScore = -positionScore(afterFen, afterLine);
+    afterFen,
 
-  const loss = Math.max(0, bestScore - playedScore);
+    playedUci,
 
-  const bestMoveUci = bestLine.pv[0] ?? null;
+    bestLine,
+
+    afterLine,
+  );
 
   const bestMoveSan = bestMoveUci ? uciToSan(beforeFen, bestMoveUci) : null;
 
@@ -300,6 +403,8 @@ export async function gradeMove(
 
   const playedMove = moveGame.move(playedSan);
 
+  const movePly = (Number(beforeFen.split(" ")[5]) - 1) * 2 + (playedMove.color === "w" ? 1 : 2);
+  const opening = await openingBookMove(afterFen, movePly);
   return {
     ply: 0,
 
@@ -319,9 +424,12 @@ export async function gradeMove(
 
     fenAfter: afterFen,
 
-    quality: classifyMove(loss, bestMoveUci === playedUci),
+    quality: opening ? "Book" : quality,
+    openingName: opening?.name ?? null,
 
-    centipawnLoss: loss,
+    centipawnLoss,
+
+    missedMate,
 
     bestMoveUci,
 
@@ -468,26 +576,22 @@ export async function reviewGameMoves(
      BUILD REVIEW
      ------------------------------------------------------- */
 
-  return frames.map((frame, index) => {
+  return Promise.all(frames.map(async (frame, index) => {
     const beforeLines = analyses[index];
 
     const afterLines = analyses[index + 1];
 
-    const beforeLine = beforeLines[0];
+    const { quality, centipawnLoss, missedMate, bestMoveUci } = gradePlayedMove(
+      frame.fenBefore,
 
-    const afterLine = afterLines[0];
+      frame.fenAfter,
 
-    const bestScore = positionScore(frame.fenBefore, beforeLine);
+      frame.uci,
 
-    const playedScore = -positionScore(frame.fenAfter, afterLine);
+      beforeLines[0],
 
-    const loss = Math.max(
-      0,
-
-      bestScore - playedScore,
+      afterLines[0],
     );
-
-    const bestMoveUci = beforeLine?.pv[0] ?? null;
 
     const bestMoves = linesToSuggestions(
       frame.fenBefore,
@@ -497,16 +601,16 @@ export async function reviewGameMoves(
       3,
     );
 
+    const opening = await openingBookMove(frame.fenAfter, frame.ply);
     return {
       ...frame,
 
-      quality: classifyMove(
-        loss,
+      quality: opening ? "Book" : quality,
+      openingName: opening?.name ?? null,
 
-        bestMoveUci === frame.uci,
-      ),
+      centipawnLoss,
 
-      centipawnLoss: loss,
+      missedMate,
 
       bestMoveUci,
 
@@ -520,7 +624,7 @@ export async function reviewGameMoves(
 
       bestMoves,
     };
-  });
+  }));
 }
 
 /* =========================================================
@@ -602,8 +706,7 @@ export async function gradeEarlierMoves(
     }
 
     const playedUci = `${move.from}${move.to}${move.promotion ?? ""}`;
-    const loss = Math.max(0, positionScore(fenBefore, beforeLines[0]) + positionScore(fenAfter, afterLines[0]));
-    const bestMoveUci = beforeLines[0].pv[0] ?? null;
+    const { quality, centipawnLoss, missedMate, bestMoveUci } = gradePlayedMove(fenBefore, fenAfter, playedUci, beforeLines[0], afterLines[0]);
 
     onGrade({
       ply,
@@ -624,9 +727,11 @@ export async function gradeEarlierMoves(
 
       fenAfter,
 
-      quality: classifyMove(loss, bestMoveUci === playedUci),
+      quality,
 
-      centipawnLoss: loss,
+      centipawnLoss,
+
+      missedMate,
 
       bestMoveUci,
 

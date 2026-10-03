@@ -442,3 +442,9 @@ enabled = true
 # Every request is authenticated with auth.getUser before reading or writing rooms.
 verify_jwt = false
 entrypoint = "./functions/eat-it-match/index.ts"
+
+[functions.ranked-go]
+enabled = true
+# Every request authenticates with auth.getUser before service-role operations.
+verify_jwt = false
+entrypoint = "./functions/ranked-go/index.ts"

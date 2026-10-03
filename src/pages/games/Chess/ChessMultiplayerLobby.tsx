@@ -1,3 +1,5 @@
+import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
+import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
@@ -124,6 +126,8 @@ export function FriendRoomPanel({ embedded = false }: { embedded?: boolean }) {
     [profile?.display_name, profile?.username, user?.email],
   );
 
+  useInviteAutoCreate(() => createRoom());
+
   async function createRoom() {
     if (!user || loading) return;
 
@@ -146,7 +150,7 @@ export function FriendRoomPanel({ embedded = false }: { embedded?: boolean }) {
       return;
     }
 
-    navigate(`${roomBase}/${createdCode}`);
+    navigate(recordCreatedGameInvite(`${roomBase}/${createdCode}`));
   }
 
   async function joinRoom() {

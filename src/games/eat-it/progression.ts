@@ -1,6 +1,7 @@
 import { EAT, FOOD, MATCH_DURATIONS, isPluto, playerRadius, type FoodKind } from './config.ts';
 import { distance, validPosition } from './maps.ts';
 import { foodFits } from './rules.ts';
+import { botPolicy } from './bots.ts';
 import { spawnPosition } from './spawn.ts';
 import { releaseQuest } from './quests.ts';
 import type { FoodObject, GameEvent, GameState, MatchSettings, MatchStats, Player, Vec } from './types.ts';
@@ -9,9 +10,8 @@ export function matchSettings(options: Partial<MatchSettings> = {}): MatchSettin
   return { matchDuration: MATCH_DURATIONS.includes(options.matchDuration as 120 | 600 | 1200) ? options.matchDuration! : EAT.hell.normalDuration, mode: options.mode === 'solo' ? 'solo' : 'multiplayer', hellEnabled: options.hellEnabled !== false, animalsEnabled: options.animalsEnabled !== false, livesEnabled: options.livesEnabled !== false,
     botsEnabled: options.mode !== 'solo' || options.botsEnabled !== false,
     botDifficulty: options.botDifficulty === 'easy' || options.botDifficulty === 'hard' ? options.botDifficulty : 'medium',
-    plutoEnabled: options.plutoEnabled !== false,
-    plutoMultiplier: typeof options.plutoMultiplier === 'number' && Number.isFinite(options.plutoMultiplier)
-      ? Math.max(EAT.pluto.minMultiplier, Math.min(EAT.pluto.maxMultiplier, options.plutoMultiplier)) : EAT.pluto.multiplier };
+    // Pluto objects are always part of the game with a fixed strong bonus; old client values are ignored.
+    plutoEnabled: true, plutoMultiplier: EAT.pluto.multiplier };
 }
 export function newStats(): MatchStats {
   return { collected: {}, totalGrowth: 0, growthActivations: 0, hostileAttacks: 0, maxMass: EAT.player.startingMass, normalFinalMass: EAT.player.startingMass, deaths: 0, respawns: 0, plutos: 0, plutoBonus: 0,
@@ -58,7 +58,7 @@ export function foodReward(s: GameState, p: Player, f: FoodObject) {
 }
 
 /** All reward sources compose modifiers once; expiration never touches earned mass. */
-export const growthFactor = (s: GameState, p: Player) => (p.growthModifier ?? 1) * (p.effects.multiplier > s.time ? EAT.powerups.multiplier.strength : 1);
+export const growthFactor = (s: GameState, p: Player) => (p.growthModifier ?? 1) * (p.effects.multiplier > s.time ? EAT.powerups.multiplier.strength : 1) * (p.bot && !s.hell ? botPolicy(s).growth : 1);
 export function countCollected(p: Player, kind: string) {
   const stats = p.stats ??= newStats(), counts = stats.collected ??= {};
   counts[kind] = (counts[kind] ?? 0) + 1;

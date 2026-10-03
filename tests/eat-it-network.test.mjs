@@ -32,12 +32,12 @@ test('local direction changes predict movement without predicting rewards or kil
 });
 test('prediction is bounded during a network outage and respects solid scenery', () => {
   const buffer = new SnapshotBuffer(), state = snapshot();
-  const p = state.players[1]; p.input = { x: 1, y: 0 }; p.vx = 210;
+  const p = state.players[1]; p.input = { x: 1, y: 0 }; p.vx = EAT.player.baseSpeed;
   buffer.push(state, 1000);
   const early = buffer.sample(1300, 'me', { x: 1, y: 0 }), late = buffer.sample(20000, 'me', { x: 1, y: 0 });
   assert.equal(early.players[1].x, late.players[1].x); assert.equal(early.players[0].x, late.players[0].x);
-  assert.ok(late.players[1].x - p.x <= 210 * EAT.network.maxExtrapolationMs / 1000 + 1e-8);
-  const wall = snapshot(1); wall.encounter.shrine = { x: 1620, y: 350 }; Object.assign(wall.players[0], { x: 1620 - 66 - 25, y: 350, vx: 210 }); buffer.push(wall, 21000);
+  assert.ok(late.players[1].x - p.x <= EAT.player.baseSpeed * EAT.network.maxExtrapolationMs / 1000 + 1e-8);
+  const wall = snapshot(1); wall.encounter.shrine = { x: 1620, y: 350 }; Object.assign(wall.players[0], { x: 1620 - 66 - 25, y: 350, vx: EAT.player.baseSpeed }); buffer.push(wall, 21000);
   assert.ok(buffer.sample(22000, 'me', { x: 1, y: 0 }).players[0].x <= 1620 - 66 - 24);
 });
 test('elimination and completion immediately override buffered living-player transforms', () => {

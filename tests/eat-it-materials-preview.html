@@ -1,0 +1,17 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Eat It • Material study</title>
+<style>body{margin:0;background:#162b2d;color:#f4ead6;font:14px system-ui}header{position:absolute;top:32px;left:40px;pointer-events:none}h1{font-size:28px;margin:5px 0}small{letter-spacing:.18em;color:#a9c4b8}canvas{display:block;width:100vw;height:100vh}footer{position:absolute;bottom:25px;left:40px;color:#a9c4b8}</style>
+<header><small>EAT IT / MATERIAL STUDY</small><h1>A little more life in every object.</h1>Brick & tiled roofs · enamel & tire tread · tabby fur & feathers</header><canvas></canvas><footer>Drag to orbit · Scroll to zoom</footer>
+<script type="module">
+import * as T from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {ModelLibrary} from '/src/games/eat-it/models.ts';
+import {animalModel} from '/src/games/eat-it/questVisuals.ts';
+const r=new T.WebGLRenderer({canvas:document.querySelector('canvas'),antialias:true});r.setPixelRatio(Math.min(devicePixelRatio,2));r.setSize(innerWidth,innerHeight);r.shadowMap.enabled=true;r.shadowMap.type=T.PCFShadowMap;r.toneMapping=T.ACESFilmicToneMapping;
+const scene=new T.Scene();scene.background=new T.Color('#162b2d');
+const camera=new T.PerspectiveCamera(35,innerWidth/innerHeight,1,3000);camera.position.set(300,340,620).multiplyScalar(Math.max(1,1.4/camera.aspect));
+const controls=new OrbitControls(camera,r.domElement);controls.target.set(0,30,0);controls.update();
+scene.add(new T.HemisphereLight('#ddecff','#6d6450',2.5));const sun=new T.DirectionalLight('#fff0d7',4);sun.position.set(100,350,180);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-350,right:350,top:300,bottom:-300});scene.add(sun);
+const floor=new T.Mesh(new T.PlaneGeometry(1500,1500),new T.MeshStandardMaterial({color:'#294342',roughness:1}));floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;floor.position.y=-1;scene.add(floor);
+const lib=new ModelLibrary();for(const [kind,x,z,scale] of [['house',-135,-55,.95],['car',75,-35,1.2],['cat',-40,100,1.4],['pigeon',90,100,1.6]]){const model=kind==='cat'||kind==='pigeon'?animalModel(lib,kind):lib.prop(kind);model.position.set(x,0,z);model.scale.setScalar(scale);model.rotation.y=kind==='house'?.2:-.45;scene.add(model)}
+window.addEventListener('resize',()=>{r.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()});r.setAnimationLoop(()=>r.render(scene,camera));
+</script></html>

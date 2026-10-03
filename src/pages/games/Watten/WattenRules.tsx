@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 import { useCardTheme } from "@/context/CardThemeContext";
-import { useTableTheme, type TableTheme } from "@/context/TableThemeContext";
+import { useTableTheme } from "@/context/TableThemeContext";
 
 import {
   createDeck,
@@ -29,6 +29,8 @@ import {
 import { getWattenCardImage } from "@/utils/WattenCardImages";
 import CardThemeSelector from "@/components/Watten/WattenCardGameSelector";
 import TableThemeSelector from "@/components/App/TableThemeSelector";
+import { wattenTableStyle } from "@/games/watten/presentation";
+import "@/components/Watten/wattenGameScreen.css";
 import { HeaderTools } from "@/components/App/PublicHeader";
 
 import {
@@ -45,14 +47,7 @@ type Rank = "7" | "8" | "9" | "10" | "Unter" | "Ober" | "König" | "Ass";
 
 type DisplayCard = Pick<WattenCard, "suit" | "rank">;
 
-const tableBackgrounds: Record<TableTheme, string> = {
-  classic: "/images/tables/classic.webp",
-  bavarian: "/images/tables/bavarian.webp",
-  royal: "/images/tables/royal.webp",
-  steampunk: "/images/tables/steampunk.webp",
-  alpine: "/images/tables/alpine.webp",
-  midnight: "/images/tables/midnight.webp",
-};
+
 
 const suitIcons: Record<Suit, string> = {
   Herz: "/images/icons/herz.webp",
@@ -758,7 +753,7 @@ export default function WattenRule() {
         </div>
         {/* HERO */}
         <section
-          className="
+          className="watten-table
     relative
     mx-auto
     h-[340px]
@@ -769,11 +764,7 @@ export default function WattenRule() {
     shadow-2xl
     md:h-[400px]
   "
-          style={{
-            backgroundImage: `url(${tableBackgrounds[tableTheme]})`,
-            backgroundPosition: "center",
-            backgroundSize: "100% 100%",
-          }}
+          style={wattenTableStyle(tableTheme)}
         >
           <div className="absolute inset-0 bg-black/50" />
 

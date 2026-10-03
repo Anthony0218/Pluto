@@ -28,8 +28,10 @@ import TableThemeSelector from "../App/TableThemeSelector";
 import { HeaderTools } from "@/components/App/PublicHeader";
 import { ProfileAvatar } from "../social/ProfileAvatarPicker";
 import "./wattenGameScreen.css";
+import { wattenPlayAnimation, wattenTableStyle } from "@/games/watten/presentation";
+import WattenTurnNotice from "./WattenTurnNotice";
 
-import { useTableTheme, type TableTheme } from "@/context/TableThemeContext";
+import { useTableTheme } from "@/context/TableThemeContext";
 import {
   translateWatten,
   translateWattenPair,
@@ -273,19 +275,7 @@ function getTeamForSeat(seat: number): WattenTeam {
   return seat % 2 === 0 ? "team-a" : "team-b";
 }
 
-const tableBackgrounds: Record<TableTheme, string> = {
-  classic: "/images/tables/classic.webp",
 
-  bavarian: "/images/tables/bavarian.webp",
-
-  royal: "/images/tables/royal.webp",
-
-  steampunk: "/images/tables/steampunk.webp",
-
-  alpine: "/images/tables/alpine.webp",
-
-  midnight: "/images/tables/midnight.webp",
-};
 
 const suitIcons = {
   Herz: "/images/icons/herz.webp",
@@ -1435,13 +1425,8 @@ export default function WattenMultiplayerGame() {
 
             {/* TABLE / COPYABLE ROOM CODE */}
             <section
-              className="relative min-h-[620px] overflow-hidden rounded-[42px] border border-white/10 shadow-2xl max-md:min-h-[480px] max-md:rounded-[28px]"
-              style={{
-                backgroundImage: `url(${tableBackgrounds[tableTheme]})`,
-                backgroundSize: "100% 100%",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-              }}
+              className="watten-table relative min-h-[620px] overflow-hidden rounded-[42px] border border-white/10 shadow-2xl max-md:min-h-[480px] max-md:rounded-[28px]"
+              style={wattenTableStyle(tableTheme)}
             >
               <div className="absolute inset-0 flex items-center justify-center bg-zinc-950/55 p-4 backdrop-blur-[2px]">
                 <div className="w-full max-w-lg">
@@ -1725,24 +1710,7 @@ export default function WattenMultiplayerGame() {
     }
   }
   function playedCardAnimation(seat: number) {
-    const relativeSeat = (seat - resolvedMySeat + 4) % 4;
-
-    switch (relativeSeat) {
-      case 0:
-        return "watten-card-in-bottom";
-
-      case 1:
-        return "watten-card-in-left";
-
-      case 2:
-        return "watten-card-in-top";
-
-      case 3:
-        return "watten-card-in-right";
-
-      default:
-        return "";
-    }
+    return wattenPlayAnimation(seat, resolvedMySeat, 4);
   }
   function getBeginnerCardHint(card: WattenCard): string | undefined {
     if (!helpMode) {
@@ -2146,6 +2114,7 @@ export default function WattenMultiplayerGame() {
           </div>
         </div>
 
+        <WattenTurnNotice player={me?.display_name ?? l("Du", "You")} active={game.phase === "playing" && isMyTurn && mustPlayTrumpfOderKritisch} mustFollow={mustPlayTrumpfOderKritisch} />
         {/* TABLE + SIDEBARS */}
 
         <div
@@ -2408,7 +2377,7 @@ export default function WattenMultiplayerGame() {
             {/* TABLE */}
 
             <div
-              className="
+              className="watten-table
     relative
     min-h-[720px]
     min-w-0
@@ -2419,12 +2388,7 @@ export default function WattenMultiplayerGame() {
     max-md:min-h-[540px]
     max-md:rounded-[32px]
   "
-              style={{
-                backgroundImage: `url(${tableBackgrounds[tableTheme]})`,
-                backgroundSize: "100% 100%",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-              }}
+              style={wattenTableStyle(tableTheme)}
             >
               <div
                 className="
@@ -2897,6 +2861,7 @@ export default function WattenMultiplayerGame() {
                   transition-all
                   duration-300
 
+                  watten-played-card
                   ${playedCardPosition(played.seat)}
 
                   ${playedCardAnimation(played.seat)}
@@ -3333,21 +3298,9 @@ export default function WattenMultiplayerGame() {
                     {l("Du", "You")}
                   </p>
                 </div>
-                {game.phase === "playing" &&
-                  isMyTurn &&
-                  mustPlayTrumpfOderKritisch && (
-                    <div className="mx-auto mb-4 w-fit rounded-xl border border-red-400/40 bg-red-500/20 px-4 py-2 text-xs font-bold text-red-100">
-                      {l(
-                        "Trumpf oder Kritisch — du musst eine passende Karte",
-                        "Trump or Critical — you must play an eligible card",
-                      )}
-                      spielen.
-                    </div>
-                  )}
-
                 {/* PRIVATE HAND */}
 
-                <div className="mt-4 flex justify-center">
+                <div className="watten-hand mt-4 flex justify-center">
                   {!waitingForDeal &&
                     hand.map((card, index) => {
                       const legal = cardIsLegal(card);

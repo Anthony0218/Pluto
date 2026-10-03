@@ -53,7 +53,7 @@ function drawSnap(ctx: CanvasRenderingContext2D, game: SnapGame, ai: boolean) {
         const x = ant.x + ant.facing * Math.cos(radians) * SNAP_SPEED * time;
         const y = ant.y - Math.sin(radians) * SNAP_SPEED * time + SNAP_GRAVITY * time * time / 2;
         if (x < 0 || x > W || y > H) break;
-        oval(ctx, x, y - 6, 2, 2, INK[index] + "9c");
+        oval(ctx, x, y - 6, 3, 3, "#102a30");
         if (y > previousY && platforms.some(p => previousY <= p.y && y >= p.y && x >= p.x && x <= p.x + p.width)) break;
         previousY = y;
       }

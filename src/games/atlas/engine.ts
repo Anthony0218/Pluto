@@ -14,7 +14,7 @@ export function entitiesForDifficulty(entities: GeographicEntity[], difficulty: 
   return entities.filter((entity) => (entity.population?.value || 0) >= rules.minimumPopulation || (entity.areaKm2?.value || 0) >= rules.minimumArea);
 }
 
-function sourceMetadata(entity: GeographicEntity, category?: AtlasCategory) {
+export function sourceMetadata(entity: GeographicEntity, category?: AtlasCategory) {
   const metadata: { source: string; year?: number }[] = [];
   if (entity.population && (!category || category === "population")) metadata.push({ source: entity.population.source, year: entity.population.year });
   if (entity.areaKm2 && (!category || category === "area")) metadata.push({ source: entity.areaKm2.source, year: entity.areaKm2.year });
@@ -22,7 +22,7 @@ function sourceMetadata(entity: GeographicEntity, category?: AtlasCategory) {
   return metadata;
 }
 
-function plausibleEntities(target: GeographicEntity, pool: GeographicEntity[], difficulty: AtlasDifficulty, count: number, value?: (entity: GeographicEntity) => number): GeographicEntity[] {
+export function plausibleEntities(target: GeographicEntity, pool: GeographicEntity[], difficulty: AtlasDifficulty, count: number, value?: (entity: GeographicEntity) => number): GeographicEntity[] {
   return pool.filter((entity) => entity.id !== target.id).sort((left, right) => {
     const continentPenalty = DIFFICULTY_RULES[difficulty].sameContinentDistractors
       ? Number(right.continent === target.continent) - Number(left.continent === target.continent)
@@ -103,14 +103,14 @@ function makeChoiceQuestion(entity: GeographicEntity, category: AtlasCategory, p
       : category === "languages" ? `Which language is used in ${entity.shortName}?`
         : category === "currency" ? `Which currency is used in ${entity.shortName}?`
           : category === "flags" ? `Which flag belongs to ${entity.shortName}?`
-            : category === "countries" ? "Which country is highlighted on the map?" : `Which country is ${entity.shortName}?`;
+            : category === "countries" || category === "locations" ? `Which country has ${entity.capitalCities[0] || "this capital"} as its capital?` : `Which country is ${entity.shortName}?`;
   const rawChoices = category === "continents"
     ? [...new Set([entity.continent, ...distractors.map((candidate) => candidate.continent)])].slice(0, count).map((label) => ({ id: label, label }))
     : choiceEntities.map((candidate) => ({ id: propertyLabel(candidate, category) || candidate.id, label: propertyLabel(candidate, category) || candidate.shortName, flagAsset: category === "flags" ? candidate.flagAsset : undefined }));
   return { id: `${seed}:choice:${index}`, seed, entityId: entity.id, entityType: entity.entityType, category, interaction: "single_choice", difficulty, scope, prompt, answer: answerProperty, choices: rawChoices, targetGeometryId: entity.geometryId, sourceMetadata: sourceMetadata(entity, category) };
 }
 
-export function generateQuestions(options: { entities: GeographicEntity[]; datasetVersion: string; seed: string; difficulty: AtlasDifficulty; scope?: AtlasScope; categories: AtlasCategory[]; interaction?: "map_click" | "mixed"; count: number }): AtlasQuestion[] {
+export function generateQuestions(options: { entities: GeographicEntity[]; datasetVersion: string; seed: string; difficulty: AtlasDifficulty; scope?: AtlasScope; categories: AtlasCategory[]; interaction?: "map_click" | "mixed" | "choice"; count: number }): AtlasQuestion[] {
   const scope = options.scope || "un195";
   const scoped = entitiesForScope(options.entities, scope);
   const eligible = entitiesForDifficulty(scoped, options.difficulty).filter((entity) => entity.geometryId || entity.centroid);
@@ -121,7 +121,7 @@ export function generateQuestions(options: { entities: GeographicEntity[]; datas
   for (let index = 0; index < options.count; index += 1) {
     const entity = order[index % order.length];
     const category = categories[index % categories.length];
-    const isCompatible = (candidate: GeographicEntity) => category === "capitals" ? candidate.capitalCities.length > 0
+    const isCompatible = (candidate: GeographicEntity) => ["capitals", "countries", "locations"].includes(category) ? candidate.capitalCities.length > 0
       : category === "languages" ? candidate.officialLanguages.length > 0
         : category === "currency" ? candidate.currencies.length > 0
           : category === "population" ? Boolean(candidate.population)
@@ -174,5 +174,6 @@ export function validateAnswer(question: AtlasQuestion, answer: string | string[
 export function statValue(entity: GeographicEntity, stat: AtlasStatKey): number | null {
   if (stat === "population" || stat === "areaKm2") return entity[stat]?.value ?? null;
   if (stat === "neighborCount") return entity.neighbors.length;
-  return entity.officialLanguages.length;
+  if (stat === "officialLanguageCount") return entity.officialLanguages.length;
+  return null;
 }

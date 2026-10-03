@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { variants } from "../src/data/chessVariants.ts";
+import { menuVariants, variants } from "../src/data/chessVariants.ts";
 import { plutoCommunityCatalog, mergeCommunityEntries } from "../src/games/chess/custom/library/communityCatalog.ts";
 import { createPlutoVariant, PLUTO_CUSTOM_IDS } from "../src/games/chess/custom/library/plutoVariants.ts";
 import { createCommunityService } from "../src/games/chess/custom/storage/communityService.ts";
@@ -20,7 +20,9 @@ test("every visible built-in variant preserves authored attribution and its cano
   const catalog = plutoCommunityCatalog();
   const builtins = catalog.filter((entry) => entry.kind === "builtin");
   const visible = variants.filter((entry) => entry.available && !entry.customId);
-  assert.deepEqual(builtins.map((entry) => entry.builtin.id), visible.map((entry) => entry.id));
+  // Custom-only built-ins (Janmann's Gambit) follow the menu's built-ins.
+  const ordered = [...visible.filter((entry) => !entry.customOnly), ...visible.filter((entry) => entry.customOnly)];
+  assert.deepEqual(builtins.map((entry) => entry.builtin.id), ordered.map((entry) => entry.id));
   const routes = readFileSync(new URL("../src/main.tsx", import.meta.url), "utf8");
   const service = createCommunityService(offline);
   for (const entry of builtins) {
@@ -80,7 +82,8 @@ test("Pluto Create documents are stable, valid, playable and survive export, rem
 test("Community merges remote entries, searches, sorts and paginates without duplicate Pluto cards", async () => {
   const catalog = plutoCommunityCatalog();
   const remote = Array.from({ length: 130 }, (_, i) => ({ ...catalog[0], id: `user-${i}`, authorName: "Player", publishedAt: new Date(Date.UTC(2026, 9, 2 + i)).toISOString(), score: i % 4, playCount: i % 7, name: `Player game ${i}` }));
-  const client = { rpc: async (_, args) => {
+  const client = { rpc: async (name, args) => {
+    if (name === "list_chess_catalog_votes") return { data: [], error: null };
     const rows = mergeCommunityEntries(remote, [], args.p_sort, args.p_search).slice(args.p_offset, args.p_offset + args.p_limit);
     return { data: rows.map((row) => ({ ...row, owner_id: "user", author_name: row.authorName, board_size: "8x8", piece_types: 6, play_count: row.playCount, published_at: row.publishedAt, my_vote: 0 })), error: null };
   } };
@@ -105,7 +108,7 @@ test("Pluto and player tabs have separate catalogs and pagination", async () => 
   const catalog = plutoCommunityCatalog(true);
   assert.equal(catalog.length, variants.length);
   const remote = Array.from({ length: 35 }, (_, i) => ({ ...catalog[0], id: `player-${i}`, ownerId: "player", authorName: "Player", name: `Player ${i}`, official: false }));
-  const client = { rpc: async (_, args) => ({
+  const client = { rpc: async (name, args) => name === "list_chess_catalog_votes" ? { data: [], error: null } : ({
     data: mergeCommunityEntries(remote, [], args.p_sort, args.p_search).slice(args.p_offset, args.p_offset + args.p_limit).map((row) => ({ ...row, owner_id: row.ownerId, author_name: row.authorName, board_size: "8x8", piece_types: 6, play_count: 0, published_at: row.publishedAt, my_vote: 0 })),
     error: null,
   }) };
@@ -117,7 +120,7 @@ test("Pluto and player tabs have separate catalogs and pagination", async () => 
     ...await service.list("top", "", 24, 0, "players"),
     ...await service.list("top", "", 24, 24, "players"),
   ];
-  const authored = catalog.filter((entry) => entry.builtin?.collections?.includes("community"));
+  const authored = catalog.filter((entry) => entry.collections?.includes("community"));
   assert.equal(players.length, remote.length + authored.length);
   assert.deepEqual(players.slice(0, authored.length).map((entry) => entry.id), authored.map((entry) => entry.id));
   assert.ok(players.slice(authored.length).every((entry) => !entry.official && entry.authorName === "Player"));
@@ -246,11 +249,17 @@ test("all Pluto documents survive deterministic legal play without corrupting po
 });
 
 
-test("official catalog follows the menu under every community sort, including editable games", () => {
+test("official catalog follows the menu under every community sort, Custom-only games after it", () => {
   const catalog = plutoCommunityCatalog();
   const teamIds = ["four-player", "pluto-team-chess", "pluto-team-chess-long"];
   assert.deepEqual(variants.filter((card) => teamIds.includes(card.id)).map((card) => card.id), teamIds);
-  const expected = variants.filter((card) => card.available).map((card) => card.customId ?? `pluto-builtin-${card.id}`);
+  const id = (card) => card.customId ?? `pluto-builtin-${card.id}`;
+  const available = variants.filter((card) => card.available);
+  const expected = [...available.filter((card) => !card.customOnly), ...available.filter((card) => card.customOnly)].map(id);
+  assert.deepEqual(available.filter((card) => card.customOnly).map(id), ["pluto-team-chess", "pluto-team-chess-long", "pluto-builtin-volumeSphere"]);
+  // Custom-only games are not in the Chess Variants menu but are in Community.
+  assert.ok(menuVariants.every((card) => !card.customOnly));
+  assert.ok(available.filter((card) => card.customOnly).every((card) => card.collections?.includes("community")));
   for (const sort of ["top", "new", "played"]) {
     assert.deepEqual(mergeCommunityEntries([], catalog, sort).map((entry) => entry.id), expected);
   }

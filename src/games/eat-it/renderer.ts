@@ -10,8 +10,8 @@ import * as T from 'three';
 import { ui } from '../../i18n/ui';
 import { EAT, FOOD, playerRadius, cameraZoom } from './config.ts';
 import { clamp, obstaclesFor, zoneRadius } from './maps.ts';
-import { angleDelta, consumptionDuration, foodFits, eyeProportion, isChoking, MOUTH, mouthPosition } from './rules.ts';
-import { fallPose, objectHeight } from './falling.ts';
+import { angleDelta, foodFits, eyeProportion, isChoking, MOUTH, mouthPosition } from './rules.ts';
+import { fallOffset, fallPose, objectHeight } from './falling.ts';
 import { ModelLibrary } from './models.ts';
 import { background, POWER_COLOR, POWER_SYMBOL } from './terrain.ts';
 import type { GameState, MapId, Player } from './types.ts';
@@ -53,7 +53,8 @@ export class ArenaRenderer {
   private scene = new T.Scene();
   private hellVisuals = new HellVisuals(this.scene);
   private ground: T.Mesh;
-  private camera = new T.OrthographicCamera(-500, 500, 400, -400, 1, 5000);
+  // Far back along the tilt so a zoomed-out ortho view never clips the ground near the screen edges.
+  private camera = new T.OrthographicCamera(-500, 500, 400, -400, 1, 9000);
   private library = new ModelLibrary();
   private questVisuals = new QuestVisuals(this.scene, this.library);
   private terrain: HTMLCanvasElement;
@@ -73,6 +74,9 @@ export class ArenaRenderer {
   private resources: (T.BufferGeometry | T.Material)[] = [];
   private sun = new T.DirectionalLight('#fff2d6', 2.6);
   private focus = { x: EAT.match.width / 2, y: EAT.match.height / 2, zoom: 1.1, initialized: false };
+  /** Player zoom (wheel, pinch, +/-) multiplies the size-based automatic zoom. */
+  private userZoom = { target: 1, shown: 1 };
+  private shadowExtent = { x: 1300, y: 1100 };
   private width = 1;
   private height = 1;
   private dpr = 1;
@@ -93,7 +97,7 @@ export class ArenaRenderer {
     this.renderer.toneMapping = T.ACESFilmicToneMapping; this.renderer.toneMappingExposure = 1.15;
     this.scene.add(new T.HemisphereLight('#e6f4ff', '#8f9b78', 2.2));
     this.sun.castShadow = true; this.sun.shadow.mapSize.set(2048, 2048);
-    Object.assign(this.sun.shadow.camera, { left: -1300, right: 1300, top: 1100, bottom: -1100, near: 10, far: 3600 });
+    Object.assign(this.sun.shadow.camera, { left: -1300, right: 1300, top: 1100, bottom: -1100, near: 10, far: 7800 });
     this.sun.shadow.bias = -.0002; this.sun.shadow.normalBias = 1.2;
     this.scene.add(this.sun, this.sun.target);
     this.terrain = background(map); this.groundTexture = new T.CanvasTexture(this.terrain);
@@ -154,6 +158,11 @@ export class ArenaRenderer {
     }
     this.scene.add(group); return group;
   }
+  zoomBy(factor: number) {
+    this.userZoom.target = clamp(this.userZoom.target * factor, EAT.camera.minUserZoom, EAT.camera.maxUserZoom);
+    return this.userZoom.target;
+  }
+  get zoomLevel() { return this.userZoom.target; }
   private project(x: number, y: number, z = 0) {
     this.projected.set(x, z, y).project(this.camera);
     return { x: (this.projected.x + 1) * this.width / 2, y: (1 - this.projected.y) * this.height / 2 };
@@ -222,9 +231,17 @@ export class ArenaRenderer {
       const zoom = cameraZoom(followed.mass);
       this.focus.zoom += (zoom - this.focus.zoom) * follow;
     }
-    const zoom = state.hell ? Math.min(1, this.width / 1400, this.height / (1100 * Math.sin(TILT))) : this.focus.zoom * Math.min(1, this.width / 700 + .36);
+    this.userZoom.shown += (this.userZoom.target - this.userZoom.shown) * (1 - Math.exp(-14 * dt));
+    const zoom = (state.hell ? Math.min(1, this.width / 1400, this.height / (1100 * Math.sin(TILT))) : this.focus.zoom * Math.min(1, this.width / 700 + .36)) * this.userZoom.shown;
     const halfW = this.width / zoom / 2, halfH = this.height / zoom / 2;
     const groundHalfH = halfH / Math.sin(TILT);
+    // Shadows cover the whole view when zoomed out; resized only on real changes.
+    const shadowX = Math.max(1300, Math.ceil((halfW + 300) / 200) * 200), shadowY = Math.max(1100, Math.ceil((groundHalfH + 300) / 200) * 200);
+    if (shadowX !== this.shadowExtent.x || shadowY !== this.shadowExtent.y) {
+      this.shadowExtent = { x: shadowX, y: shadowY };
+      Object.assign(this.sun.shadow.camera, { left: -shadowX, right: shadowX, top: shadowY, bottom: -shadowY, far: 5400 + shadowX + shadowY });
+      this.sun.shadow.camera.updateProjectionMatrix();
+    }
     this.focus.x = halfW < EAT.match.width / 2 ? clamp(this.focus.x, halfW, EAT.match.width - halfW) : EAT.match.width / 2;
     this.focus.y = groundHalfH < EAT.match.height / 2 ? clamp(this.focus.y, groundHalfH, EAT.match.height - groundHalfH) : EAT.match.height / 2;
     if (state.hell) {
@@ -233,9 +250,10 @@ export class ArenaRenderer {
       this.focus.y=groundHalfH < H.rows*H.cellSize/2+120 ? clamp(this.focus.y,H.top-120+groundHalfH,H.top+H.rows*H.cellSize+120-groundHalfH) : centerY;
     }
     Object.assign(this.camera, { left: -halfW, right: halfW, top: halfH, bottom: -halfH });
-    this.camera.position.set(this.focus.x, 1800 * Math.sin(TILT), this.focus.y + 1800 * Math.cos(TILT));
+    this.camera.position.set(this.focus.x, 4000 * Math.sin(TILT), this.focus.y + 4000 * Math.cos(TILT));
     this.camera.lookAt(this.focus.x, 0, this.focus.y); this.camera.updateProjectionMatrix(); this.camera.updateMatrixWorld();
-    this.sun.position.set(this.focus.x - 650, 1500, this.focus.y - 700); this.sun.target.position.set(this.focus.x, 0, this.focus.y);
+    // Same light direction, placed far enough back that a zoomed-out shadow box stays in front of it.
+    this.sun.position.set(this.focus.x - 1950, 4500, this.focus.y - 2100); this.sun.target.position.set(this.focus.x, 0, this.focus.y);
     const present = new Set<number>();
     for (const f of state.food) {
       present.add(f.id); let group = this.props.get(f.id);
@@ -245,23 +263,33 @@ export class ArenaRenderer {
       this.yaw.setFromAxisAngle(UP, -f.rotation); group.quaternion.copy(this.yaw);
       if (owner) {
         const v = this.visuals.get(owner.id)!;
-        const age = Math.max(0, state.time - f.capturedAt), settle = Math.max(0, 1 - (age / (FOOD[f.kind].shape==='tree'?EAT.eating.treeEntryDuration:consumptionDuration(f))) ** 2);
+        const age = Math.max(0, state.time - f.capturedAt), offset = fallOffset(f, age + 1 / EAT.network.tickRate);
         const pose = fallPose(f, age + 1 / EAT.network.tickRate);
-        x = v.x + (f.fallOffsetX ?? f.x - owner.x) * settle + (f.fallX ?? 0) * pose.shift;
-        y = v.y + (f.fallOffsetY ?? f.y - owner.y) * settle + (f.fallY ?? 0) * pose.shift;
+        x = v.x + offset.x + (f.fallX ?? 0) * pose.shift;
+        y = v.y + offset.y + (f.fallY ?? 0) * pose.shift;
         z = pose.z;
         this.axis.set(f.fallY ?? 0, 0, -(f.fallX ?? 0));
         if (this.axis.lengthSq() > .001) { this.axis.normalize(); this.tilt.setFromAxisAngle(this.axis, pose.angle); group.quaternion.premultiply(this.tilt); }
       }
       if (f.stuck) {
-        const stuckOwner = this.visuals.get(f.stuck.playerId);
-        if (stuckOwner) { const p = state.players.find(p=>p.id===f.stuck!.playerId)!; const m = mouthPosition({ ...p, x: stuckOwner.x, y: stuckOwner.y }, stuckOwner.radius); x=m.x; y=m.y; }
-        const facing = state.players.find(p=>p.id===f.stuck!.playerId)?.facing ?? 0;
-        this.axis.set(Math.sin(facing),0,-Math.cos(facing));
-        this.tilt.setFromAxisAngle(this.axis,Math.sin(state.time*28)*.025); group.quaternion.premultiply(this.tilt);
+        const stuckOwner = this.visuals.get(f.stuck.playerId), wedged = f.stuck.age !== undefined;
+        if (stuckOwner && wedged) {
+          // Bridging the opening: frozen at the lean where its top hit the far rim, rocking as the eater strains.
+          const offset = fallOffset(f, f.stuck.age!), pose = fallPose(f, f.stuck.age!);
+          x = stuckOwner.x + offset.x + (f.fallX ?? 0) * pose.shift; y = stuckOwner.y + offset.y + (f.fallY ?? 0) * pose.shift; z = pose.z;
+          this.axis.set(f.fallY ?? 0, 0, -(f.fallX ?? 0));
+          if (this.axis.lengthSq() > .001) { this.axis.normalize(); this.tilt.setFromAxisAngle(this.axis, pose.angle + Math.sin(state.time * 22) * .035); group.quaternion.premultiply(this.tilt); }
+        } else {
+          if (stuckOwner) { const p = state.players.find(p=>p.id===f.stuck!.playerId)!; const m = mouthPosition({ ...p, x: stuckOwner.x, y: stuckOwner.y }, stuckOwner.radius); x=m.x; y=m.y; }
+          const facing = state.players.find(p=>p.id===f.stuck!.playerId)?.facing ?? 0;
+          this.axis.set(Math.sin(facing),0,-Math.cos(facing));
+          this.tilt.setFromAxisAngle(this.axis,Math.sin(state.time*28)*.025); group.quaternion.premultiply(this.tilt);
+        }
       } else if (f.spit) {
+        const pose = spitPose(f,state.time);
+        if (pose.lean) { this.axis.set(f.fallY ?? 0, 0, -(f.fallX ?? 0)); if (this.axis.lengthSq() > .001) { this.axis.normalize(); this.tilt.setFromAxisAngle(this.axis, pose.lean); group.quaternion.premultiply(this.tilt); } }
         this.axis.set(f.spit.destination.y-f.spit.origin.y,0,-(f.spit.destination.x-f.spit.origin.x)).normalize();
-        this.tilt.setFromAxisAngle(this.axis,spitPose(f,state.time).tilt); group.quaternion.premultiply(this.tilt);
+        this.tilt.setFromAxisAngle(this.axis,pose.tilt); group.quaternion.premultiply(this.tilt);
       }
       group.position.set(x, z, y);
       if (FOOD[f.kind].shape === 'pluto') group.traverse(child => { if (child instanceof T.Mesh && child.material instanceof T.MeshStandardMaterial && child.material.emissive.getHex() !== 0) child.material.emissiveIntensity = .5 + Math.sin(state.time * 2) * .12; });
@@ -372,15 +400,16 @@ export class ArenaRenderer {
       c.save(); c.globalAlpha=visual.intensity/.394; c.fillStyle=gradient; c.beginPath(); c.arc(at.x,at.y,glow,0,Math.PI*2); c.fill(); c.restore();
       notice(c,POWER_SYMBOL[p.kind],at.x,at.y,POWER_COLOR[p.kind],visual.indicator);
     }
+    if (state.hell && state.time >= state.hell.readyAt + EAT.hell.collapseAfter) notice(c,ui('The floor is collapsing!'),this.width/2,122,'#ffae5c',14);
     for (const [index,b] of blackHoles(state).entries()) if (state.time < b.warnUntil) {
-      const color=['#ff5366','#ff994c','#dc77f5'][index], from=this.project(b.x,b.y,26), to=this.project(b.destination.x,b.destination.y,26);
+      const color=b.harmless ? '#a69bc4' : ['#ff5366','#ff994c','#dc77f5'][index], from=this.project(b.x,b.y,26), to=this.project(b.destination.x,b.destination.y,26);
       const penultimate=sweepPath(b).at(-2)!, tail=this.project(penultimate.x,penultimate.y,26);
       const angle=Math.atan2(to.y-tail.y,to.x-tail.x), pulse=.8+Math.sin(state.time*9)*.15;
       c.save(); c.globalAlpha=pulse; c.shadowColor=color; c.shadowBlur=8; c.strokeStyle=color; c.lineWidth=5;
       c.beginPath(); c.moveTo(from.x,from.y); for (const point of sweepPath(b).slice(1)) { const screen=this.project(point.x,point.y,26); c.lineTo(screen.x,screen.y); } c.stroke();
       c.shadowBlur=0; c.strokeStyle='#fff0cc'; c.lineWidth=1.5; c.stroke();
       c.fillStyle='#ffad87'; c.beginPath(); c.moveTo(to.x,to.y); c.lineTo(to.x-Math.cos(angle-.45)*19,to.y-Math.sin(angle-.45)*19); c.lineTo(to.x-Math.cos(angle+.45)*19,to.y-Math.sin(angle+.45)*19); c.closePath(); c.fill(); c.restore();
-      if (index===0) notice(c,ui('Black hole incoming!'),this.width/2,92,'#ff665e',16);
+      if (!b.harmless && !blackHoles(state).slice(0,index).some(other=>!other.harmless && state.time<other.warnUntil)) notice(c,ui('Black hole incoming!'),this.width/2,92,'#ff665e',16);
     }
     if (!state.settings?.matchDuration && !state.settings?.hellEnabled && !state.hell && state.time >= EAT.match.zoneStart) {
       const at = this.project(EAT.match.width / 2, EAT.match.height / 2), edge = this.project(EAT.match.width / 2 + zoneRadius(state.time), EAT.match.height / 2), r = edge.x - at.x;
@@ -392,6 +421,7 @@ export class ArenaRenderer {
       if (state.hell) {
         c.fillStyle = '#bc3b18'; c.fillRect(x, y, w, h);
         state.hell.cells.forEach((_, i) => { if (cellPhase(state, i) === 'destroyed') return; const at = cellCenter(i); c.fillStyle = cellPhase(state, i) === 'intact' ? '#42333f' : '#ed9159'; c.fillRect(x + (at.x - 40) / EAT.match.width * w, y + (at.y - 40) / EAT.match.height * h, 80 / EAT.match.width * w, 80 / EAT.match.height * h); });
+        for (const f of state.hell.fireballs ?? []) { c.fillStyle='#ffc93d'; c.beginPath(); c.arc(x+f.x/EAT.match.width*w,y+f.y/EAT.match.height*h,2.5,0,Math.PI*2); c.fill(); }
         for(const [i,b] of blackHoles(state).entries()) {
           c.fillStyle=['#ff5366','#ff994c','#dc77f5'][i];c.beginPath();c.arc(x+b.x/EAT.match.width*w,y+b.y/EAT.match.height*h,3.5,0,Math.PI*2);c.fill();
           if(state.time<b.warnUntil){c.strokeStyle=c.fillStyle;c.lineWidth=1;c.beginPath();sweepPath(b).forEach((at,j)=>{const px=x+at.x/EAT.match.width*w,py=y+at.y/EAT.match.height*h;if(j)c.lineTo(px,py);else c.moveTo(px,py);});c.stroke();}

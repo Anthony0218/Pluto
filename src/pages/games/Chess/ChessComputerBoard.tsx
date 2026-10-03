@@ -24,6 +24,8 @@ import {
 } from "../../../utils/sound.ts";
 
 import { getSquareName, type PieceType } from "../../../utils/chessUtils.ts";
+import { gradePlayedMove } from "../../../utils/chessAnalysis.ts";
+import { openingBookMove } from "../../../games/chess/openingBook.ts";
 
 import { useStockfish } from "@/hooks/useStockfish";
 
@@ -65,6 +67,7 @@ type ChessComputerBoardProps = {
 };
 
 type MoveQuality =
+  | "Book"
   | "Best"
   | "Excellent"
   | "Good"
@@ -666,50 +669,6 @@ const pieceValues: Record<string, number> = {
    COACH HELPERS
    ========================================================= */
 
-function analysisScore(line: StockfishAnalysisLine | undefined) {
-  if (!line) {
-    return 0;
-  }
-
-  /*
-   * Convert mate into a very large
-   * centipawn-like value.
-   */
-  if (line.mate !== null) {
-    if (line.mate > 0) {
-      return 100000 - Math.abs(line.mate) * 100;
-    }
-
-    return -100000 + Math.abs(line.mate) * 100;
-  }
-
-  return line.scoreCp ?? 0;
-}
-
-function classifyMove(centipawnLoss: number, isBestMove: boolean): MoveQuality {
-  if (isBestMove) {
-    return "Best";
-  }
-
-  if (centipawnLoss <= 25) {
-    return "Excellent";
-  }
-
-  if (centipawnLoss <= 60) {
-    return "Good";
-  }
-
-  if (centipawnLoss <= 120) {
-    return "Inaccuracy";
-  }
-
-  if (centipawnLoss <= 250) {
-    return "Mistake";
-  }
-
-  return "Blunder";
-}
-
 function formatEvaluation(line: StockfishAnalysisLine) {
   if (line.mate !== null) {
     return line.mate > 0 ? `M${line.mate}` : `-M${Math.abs(line.mate)}`;
@@ -1174,25 +1133,10 @@ export default function ChessComputerBoard({
 
     const bestLine = before[0];
 
-    const bestMove = bestLine.pv[0] ?? null;
+    // A finished game has nothing left to search.
+    let afterLine: StockfishAnalysisLine | undefined;
 
-    const bestScore = analysisScore(bestLine);
-
-    /*
-     * afterFen has the opponent to move.
-     *
-     * Stockfish evaluates from the
-     * current side-to-move perspective,
-     * so negate the result to get the
-     * human player's perspective.
-     */
-    // A finished game has nothing left to search: mate is the best possible result.
-    const afterGame = new Chess(afterFen);
-    let scoreAfterMove: number;
-
-    if (afterGame.isGameOver()) {
-      scoreAfterMove = afterGame.isCheckmate() ? 100000 : 0;
-    } else {
+    if (!new Chess(afterFen).isGameOver()) {
       const after = await coachBackfill.queue(() =>
         analyzePosition(afterFen, {
           multiPV: 1,
@@ -1204,13 +1148,12 @@ export default function ChessComputerBoard({
         return;
       }
 
-      scoreAfterMove = -analysisScore(after[0]);
+      afterLine = after[0];
     }
 
-    const centipawnLoss = Math.max(0, bestScore - scoreAfterMove);
-
-    const isBestMove = bestMove === playedUci;
-    const quality = classifyMove(centipawnLoss, isBestMove);
+    const grade = gradePlayedMove(beforeFen, afterFen, playedUci, bestLine, afterLine);
+    const { centipawnLoss, bestMoveUci: bestMove } = grade;
+    const quality: MoveQuality = await openingBookMove(afterFen, ply) ? "Book" : grade.quality;
 
     setCoachGrades((grades) => ({ ...grades, [ply]: { quality, san: playedSan } }));
 
@@ -2272,7 +2215,7 @@ export default function ChessComputerBoard({
                       <MoveQualityBadge quality={moveFeedback.quality} />
                     </div>
 
-                    {moveFeedback.quality !== "Best" && (
+                    {moveFeedback.quality !== "Best" && moveFeedback.quality !== "Book" && (
                       <p className="mt-2 text-xs text-zinc-500">
                         {t("Evaluation loss")}:{" "}
                         {(moveFeedback.centipawnLoss / 100).toFixed(2)}{" "}
@@ -2281,7 +2224,7 @@ export default function ChessComputerBoard({
                     )}
 
                     {moveFeedback.bestMove &&
-                      moveFeedback.quality !== "Best" && (
+                      moveFeedback.quality !== "Best" && moveFeedback.quality !== "Book" && (
                         <p className="mt-1 text-[11px] text-zinc-600">
                           {t("Engine preferred")}:{" "}
                           <span className="font-mono text-zinc-400">
@@ -2691,8 +2634,11 @@ export default function ChessComputerBoard({
                 }
                 onSquareClick={historyPreview ? () => {} : handleSquareClick}
                 orientation={playerColor}
+                insetMoveQualityIcon
                 annotations={
-                  !coachModeEnabled || helpMove
+                  // The quality icon of your last move stays visible while the
+                  // coach also shows its best-move hint.
+                  !coachModeEnabled
                     ? null
                     : historyPreview
                       ? liveCoachAnnotations({
@@ -3177,6 +3123,7 @@ function getHistoryPieceSymbol(color: "w" | "b", piece: PieceType) {
 function MoveQualityBadge({ quality }: { quality: MoveQuality }) {
   useUiLanguage();
   const styles: Record<MoveQuality, string> = {
+    Book: "border-purple-500/20 bg-purple-500/15 text-purple-300",
     Best: "border-emerald-500/20 bg-emerald-500/15 text-emerald-300",
 
     Excellent: "border-cyan-500/20 bg-cyan-500/15 text-cyan-300",

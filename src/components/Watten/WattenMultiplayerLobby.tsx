@@ -1,3 +1,5 @@
+import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
+import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
 import { useAppLanguage } from "@/i18n/languageStore";
 import "../../pages/games/Watten/wattenMenus.css";
@@ -22,7 +24,7 @@ export default function WattenMultiplayerLobby() {
   const { user, profile } = useAuth();
 
   const { language } = useAppLanguage();
-  const [variant, setVariant] = useState<WattenVariant>("three-player");
+  const [variant, setVariant] = useState<WattenVariant>(searchParams.get("variant") === "four-player" ? "four-player" : "three-player");
   const [roomCode, setRoomCode] = useState(() => (searchParams.get("code") ?? "").trim().toUpperCase());
   useInviteAutoJoin(() => joinRoom());
   const [loading, setLoading] = useState<LoadingAction>(null);
@@ -92,6 +94,8 @@ export default function WattenMultiplayerLobby() {
     return message || t(fallbackKey);
   }
 
+  useInviteAutoCreate(() => createRoom());
+
   async function createRoom() {
     if (!user) {
       setError(t("You must be signed in."));
@@ -126,7 +130,7 @@ export default function WattenMultiplayerLobby() {
           throw new Error("No room code returned.");
         }
 
-        navigate(`/games/watten/multiplayer/3/${String(code)}`);
+        navigate(recordCreatedGameInvite(`/games/watten/multiplayer/3/${String(code)}`));
         return;
       }
 
@@ -151,7 +155,7 @@ export default function WattenMultiplayerLobby() {
         throw new Error("No room code returned.");
       }
 
-      navigate(`/games/watten/multiplayer/4/${String(code)}`);
+      navigate(recordCreatedGameInvite(`/games/watten/multiplayer/4/${String(code)}`));
     } catch (cause) {
       console.error("Create Watten room failed:", cause);
 

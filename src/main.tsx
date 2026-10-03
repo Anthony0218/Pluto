@@ -1,8 +1,9 @@
+import GoRankedGamePage from "./pages/games/Go/GoRankedGamePage";
 import LearnPage from "./pages/general/LearnPage";
 import React from "react";
 import ReactDOM from "react-dom/client";
 
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Navigate, RouterProvider, useLocation } from "react-router-dom";
 
 import "./index.css";
 
@@ -33,7 +34,9 @@ import ChessMultiplayerModeMenu from "./pages/games/Chess/ChessMultiplayerModeMe
 import ChessRankedLobby from "./pages/games/Chess/ChessRankedLobby.tsx";
 import ChessMultiplayerRoom from "./pages/games/Chess/ChessMultiplayerRoom.tsx";
 import ChessMultiplayerGame from "./pages/games/Chess/ChessMultiplayerGame.tsx";
-import GroupsPage from "./pages/social/GroupsPage.tsx";
+import ClansPage from "./pages/social/ClansPage.tsx";
+import PublicProfilePage from "./pages/social/PublicProfilePage.tsx";
+import SpectatePage from "./pages/social/SpectatePage.tsx";
 import LeaderboardsPage from "./pages/social/LeaderboardsPage.tsx";
 import ChessRulesAndTips from "./components/chess/singleplayer/ChessRulesAndTips.tsx";
 import ChessPuzzlesPage from "./components/chess/singleplayer/ChessPuzzlesPage.tsx";
@@ -156,6 +159,7 @@ import { CardBuilderCreateRoute, CardBuilderHomeRoute, CardBuilderPlayRoute, Car
 import CreditsPage from "./pages/general/CreditsPage.tsx";
 import MedievalKingdomsRegionPage from "./pages/games/MedievalKingdoms/MedievalKingdomsRegionPage.tsx";
 import LoginPage from "./pages/general/LoginPage.tsx";
+import InvitePage from "./pages/social/InvitePage";
 import FriendsPage from "./pages/social/FriendsPage.tsx";
 import NaturaMenu from "./pages/games/natura/naturaMenu.tsx";
 import SchafKopfMenuPage from "./pages/schafkopf/SchafKopfMenuPage.tsx";
@@ -164,6 +168,7 @@ import SchafkopfGame from "./components/Schafkopf/SchafkopfGame.tsx";
 import SchafkopfMultiplayerGame from "./components/Schafkopf/SchafkopfMultiplayerGame.tsx";
 import GoMenu from "./pages/games/Go/GoMenu.tsx";
 import GoGamePage from "./pages/games/Go/GoGamePage.tsx";
+import GoAnalysisPage from "./pages/games/Go/GoAnalysisPage.tsx";
 import StrategyMultiplayer from "./components/strategy/StrategyMultiplayer.tsx";
 import GoRules from "./components/strategy/GoRules.tsx";
 const PartyPage = React.lazy(() => import("./pages/games/Party/PartyPage.tsx"));
@@ -171,7 +176,16 @@ const AtlasArenaPage = React.lazy(() => import("./pages/games/AtlasArena/AtlasAr
 const EatItPage = React.lazy(() => import("./pages/games/EatIt/EatItPage.tsx"));
 const eatItPage = <React.Suspense fallback={<main className="min-h-[var(--app-height)] bg-[#18201d]" />}><EatItPage /></React.Suspense>;
 const AtlasMultiplayerPage = React.lazy(() => import("./pages/games/AtlasArena/AtlasMultiplayerPage.tsx"));
+const AtlasTrialsPage = React.lazy(() => import("./pages/games/AtlasArena/AtlasTrialsPage.tsx"));
+const AtlasSoloPage = React.lazy(() => import("./pages/games/AtlasArena/AtlasSoloPage.tsx"));
+const AtlasHotseatPage = React.lazy(() => import("./pages/games/AtlasArena/AtlasHotseatPage.tsx"));
 const atlasPage = (page: React.ReactNode) => <React.Suspense fallback={<main className="min-h-[var(--app-height)] bg-[#06101f] p-10 text-zinc-400">Loading Atlas Arena…</main>}>{page}</React.Suspense>;
+
+/** Groups were renamed to Clans; keep old links working. */
+function GroupsRedirect() {
+  const { search } = useLocation();
+  return <Navigate to={`/clans${search}`} replace />;
+}
 
 const router = createBrowserRouter([
   {
@@ -227,8 +241,15 @@ const router = createBrowserRouter([
           { path: "/games/eat-it/multiplayer/:roomCode", element: eatItPage },
           { path: "/games/atlas-arena/multiplayer", element: atlasPage(<AtlasMultiplayerPage />) },
           { path: "/games/atlas-arena/multiplayer/:roomCode", element: atlasPage(<AtlasMultiplayerPage />) },
+          { path: "/games/atlas-arena/solo/:modeId", element: atlasPage(<AtlasSoloPage />) },
+          { path: "/games/atlas-arena/hotseat/:modeId", element: atlasPage(<AtlasHotseatPage />) },
+          { path: "/games/atlas-arena/trials", element: atlasPage(<AtlasTrialsPage />) },
+          { path: "/games/atlas-arena/trials/:modeId", element: atlasPage(<AtlasTrialsPage />) },
           { path: "/games/go", element: <GoMenu /> },
           { path: "/games/go/rules", element: <GoRules /> },
+          { path: "/games/go/analysis", element: <GoAnalysisPage /> },
+          { path: "/games/go/ranked", element: <Navigate to="/games/go/multiplayer?tab=ranked" replace /> },
+          { path: "/games/go/ranked/:code/game", element: <GoRankedGamePage /> },
           { path: "/games/go/ai", element: <GoGamePage mode="ai" /> },
           { path: "/games/go/hotseat", element: <GoGamePage mode="hotseat" /> },
           { path: "/games/go/multiplayer", element: <StrategyMultiplayer gameType="go" /> },
@@ -237,11 +258,16 @@ const router = createBrowserRouter([
             path: "/profile",
             element: <ProfilePage />,
           },
+          { path: "/profile/name/:username", element: <PublicProfilePage /> },
+          { path: "/profile/:userId", element: <PublicProfilePage /> },
+          { path: "/spectate/:requestId", element: <SpectatePage /> },
           {
             path: "/friends",
             element: <FriendsPage />,
           },
-          { path: "/groups", element: <GroupsPage /> },
+          { path: "/invite", element: <InvitePage /> },
+          { path: "/clans", element: <ClansPage /> },
+          { path: "/groups", element: <GroupsRedirect /> },
           { path: "/leaderboards", element: <LeaderboardsPage /> },
 
           {
@@ -332,7 +358,7 @@ const router = createBrowserRouter([
             path: "/games/chess/classic/multiplayer/:roomCode/game",
             element: <ChessMultiplayerGame />,
           },
-          { path: "/games/chess/ranked", element: <ChessRankedLobby /> },
+          { path: "/games/chess/ranked", element: <ChessRankedLobby key="chess" /> },
           { path: "/games/chess/ranked/:roomCode", element: <ChessMultiplayerRoom /> },
           { path: "/games/chess/ranked/:roomCode/game", element: <ChessMultiplayerGame /> },
           {

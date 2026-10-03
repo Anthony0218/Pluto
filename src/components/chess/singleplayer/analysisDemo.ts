@@ -1,7 +1,7 @@
 import { Chess } from "chess.js";
 
-/** A legal 60-move sample, kept separate from the player's saved games. */
-export const ANALYSIS_DEMO_MOVES = "e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3 Nb8 d4 Nbd7 c4 Nc5 Nc3 Nd5 cxd5 Kh8 Qd3 f5 dxc5 Bh4 Nb1 Rf6 a4 f4 Qxb5 Bxf2+ Kf1 Qe7 g4 a5 Qd3 Bd7 g5 Bf5 Bc4 Bc8 h4 Qe8 Qe3 Rg6 Ke2 Bg4 Qd2 Bxe1 Qc3 h5 Qd2 Bxh4 Ra2 Re6 Na3 Be1 Bb5 Qxb5+ Kxe1 Ra7 b3 c6 Qxa5 Qxa5+ Rd2 Kh7 Kd1 g6 Bb2 Ra8 Bd4 Rc8 Ba1 Rh8 Bxe5 Ree8 Bg7 Qd8 Rc2 Bh3 Bf8 Qe7 Kc1 Bg4 Nh2 Qxg5 Rg2 Be2 Nf3 Qd8 Nd4 Qd7 Kb2 h4 Kc2 Qb7 Nb1 Re6 Nxe2 Qa7 Nbc3 Qf7 Nc1 Qf6 N1a2 f3 Nb1 Qf7 Nb4 Rg8 Rg4 Re8 e5 Qf5+".split(" ");
+/** A legal 49-move sample that ends in checkmate, kept separate from the player's saved games. */
+export const ANALYSIS_DEMO_MOVES = "e4 e6 Nc3 Nc6 d4 d5 e5 Nge7 Nf3 b6 h4 h6 a3 Na5 h5 Qd7 Bb5 Nac6 b4 a5 Na4 Qd8 Qd3 Bd7 Bd2 Nc8 Bxc6 Bxc6 b5 Bb7 Rh3 c6 Nc3 cxb5 Nxb5 Ba6 a4 Bb4 c3 Bf8 Kf1 Rb8 Kg1 Ne7 Ne1 Nc8 Nc2 Ra8 Rg3 Bxb5 Qxb5+ Qd7 Qd3 Ne7 Ne3 Qc6 Rb1 Rc8 Rb5 Ra8 Qb1 Ra6 Qb3 g5 hxg6 Nxg6 c4 Nf4 cxd5 Ne2+ Kh2 exd5 Nxd5 Nxd4 Qb1 Bc5 Qe4 Qc8 Be3 Nxb5 axb5 Ra8 e6 Qd8 exf7+ Kf8 Bxc5+ bxc5 Qe5 Qh4+ Kg1 Qxg3 Qe7+ Kg7 f8=Q+ Kg6 Qff7#".split(" ");
 
 /** Validate the entire history before passing it to the review engine. */
 export function analysisPositions(moves: readonly string[]) {

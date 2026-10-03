@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { JANMANN } from "@/games/chess/janmann/config";
 import JanmannGambitArtwork from "../JanmannGambitArtwork";
+import UserLink from "@/components/social/UserLink";
 
 export function RulesContent() {
   return <div className="space-y-5 text-sm leading-7 text-zinc-300">
@@ -42,7 +43,7 @@ export default function JanmannRules() {
       <div>
         <p className="text-xs uppercase tracking-widest text-amber-200">{ui("Not configurable")} · {ui("Experimental")}</p>
         <h1 className="mt-2 font-serif text-4xl">{JANMANN.name}</h1>
-        <p className="mt-1 text-sm text-zinc-400">{ui("by")} {JANMANN.author}</p>
+        <p className="mt-1 text-sm text-zinc-400">{ui("by")} <UserLink username={JANMANN.author} className="font-semibold text-zinc-200">{JANMANN.author}</UserLink></p>
         <h2 className="mb-5 mt-5 font-serif text-2xl text-amber-100">{ui("Think differently...")}</h2>
         <RulesContent />
         <Link to="/chess-custom/janmanns-gambit" className="mt-6 inline-flex rounded-xl bg-amber-200 px-5 py-3 font-semibold text-zinc-950">{ui("Play")}</Link>

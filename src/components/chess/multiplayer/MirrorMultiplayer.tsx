@@ -1,3 +1,5 @@
+import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
+import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
@@ -303,6 +305,8 @@ export function MirrorMultiplayerLobby() {
     return username || user?.email?.split("@")[0]?.trim() || "Player";
   }, [profile?.username, user?.email]);
 
+  useInviteAutoCreate(() => createRoom());
+
   async function createRoom() {
     if (!user) return setError("Sign in first.");
     setLoading("create");
@@ -323,7 +327,7 @@ export function MirrorMultiplayerLobby() {
 
     setLoading(null);
     if (rpcError) return setError(rpcError.message);
-    navigate(`/games/chess/variants/mirror/multiplayer/${String(data)}`);
+    navigate(recordCreatedGameInvite(`/games/chess/variants/mirror/multiplayer/${String(data)}`));
   }
 
   async function joinRoom() {

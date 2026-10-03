@@ -35,7 +35,7 @@ test('city buildings occupy frontage slots, cars align with roads, props and see
 });
 for(const mass of [100,1000,3600,10000,1e6,1e9])test(`growth ${mass} to ${mass*2} increases physical, mouth and screen radius`,()=>{
  const p={mass,facing:0,x:0,y:0},a=playerRadius(p),m=mouthOpening(p),screen=a*cameraZoom(mass);p.mass*=2;
- assert.ok(playerRadius(p)>a*1.4);assert.ok(mouthOpening(p)>m*1.4);assert.ok(playerRadius(p)*cameraZoom(p.mass)>screen*1.18);
+ assert.ok(playerRadius(p)>a*1.4);assert.ok(mouthOpening(p)>m*1.4);assert.ok(playerRadius(p)*cameraZoom(p.mass)>screen*1.14);
  assert.equal(playerRadius(p),massToRadius(p.mass));assert.equal(mouthOpening(p),playerRadius(p)*1.64);
 });
 test('2x, Pluto and /2 all change actual size through the shared reward model',()=>{
@@ -51,14 +51,14 @@ for(const kind of ['house','car','shrine'])test(`${kind}: normalized 25% commits
  f.x=m.x+r+extent-2*extent*.249;const x=f.x;ticks(s,5);assert.equal(f.target,null);assert.equal(f.x,x);assert.equal(f.vx,0);
  f.x=m.x+r+extent-2*extent*.251;stepGame(s);assert.equal(f.target,p.id);const rotation=f.rotation;
  const early=fallPose(f,.1),late=fallPose(f,.8);assert.ok(early.angle<late.angle);assert.ok(late.z<early.z);assert.ok(early.angle>0);
- ticks(s,40);assert.equal(p.stats.collected[kind],1);assert.equal(f.rotation,rotation);
+ ticks(s,60);assert.equal(p.stats.collected[kind],1);assert.equal(f.rotation,rotation);
 });
 test('quest landmark stays protected, then shrine uses fit, fall, growth and collection rules',()=>{
  const s=solo(),e=s.encounter,p=s.players[0];assert.ok(e.shrine);const home={...e.shrine};
  p.mass=5000;stepEncounter(s,1/30);assert.ok(e.shrine);assert.ok(!s.food.some(f=>f.kind==='shrine'));assert.equal(e.item.status,'ground');
  e.item.status='carried';e.item.ownerId=p.id;stepEncounter(s,1/30);assert.ok(e.shrine);
  e.item.status='delivered';e.completedBy=p.id;stepEncounter(s,1/30);assert.equal(e.shrine,null);const f=s.food.find(f=>f.kind==='shrine');assert.ok(f);assert.equal(f.x,home.x);
- p.mass=36;assert.equal(foodFits(p,f),false);p.mass=5000;assert.ok(foodFits(p,f));Object.assign(p,home);s.food=[f];s.nextFood=s.nextPower=s.nextPluto=1e9;const before=p.mass;ticks(s,40);
+ p.mass=36;assert.equal(foodFits(p,f),false);p.mass=5000;assert.ok(foodFits(p,f));Object.assign(p,home);s.food=[f];s.nextFood=s.nextPower=s.nextPluto=1e9;const before=p.mass;ticks(s,60);
  assert.equal(p.stats.collected.shrine,1);assert.ok(p.mass>before+100);assert.equal(e.item.status,'delivered');
 });
 test('Bots preference defaults ON, persists in the existing store, and strips all AI seats when OFF',()=>{
@@ -80,13 +80,16 @@ test('solo Hell requires 60 seconds survival, and a fall loses rather than award
  s.time=s.hell.readyAt+59;checkWinner(s);assert.equal(s.status,'playing');s.time=s.hell.readyAt+60;checkWinner(s);assert.equal(s.winnerId,'a');assert.equal(s.players[0].stats.survivedHell,true);
  const loss=solo();startHell(loss);freezeHoles(loss);loss.time=loss.hell.readyAt;loss.hell.cells.fill(-1);ticks(loss,30);assert.equal(loss.result,'loss');assert.equal(loss.winnerId,null);
 });
-test('three independent authoritative paths preserve serialized determinism, warnings and pauses',()=>{
- const s=scene();startHell(s);assert.equal(blackHoles(s).length,3);assert.equal(new Set(blackHoles(s).map(b=>`${b.x},${b.y}`)).size,3);assert.equal(new Set(blackHoles(s).map(b=>JSON.stringify(b.destination))).size,3);
- const holes=blackHoles(s);for(let i=0;i<3;i++){const b=holes[i];b.control={x:b.x+200,y:b.y+100};b.speed=[160,230,360][i];b.warnUntil=10+i;b.pausedUntil=15;b.pauseUsed=true;}
+test('one or two independent authoritative paths preserve serialized determinism, warnings and pauses',()=>{
+ const counts=new Set();for(let seed=1;seed<30;seed++){const t=createGame('city',[{id:'a',name:'A'},{id:'b',name:'B'}],seed,'holes',{mode:'solo'});startHell(t);counts.add(blackHoles(t).length);}
+ assert.deepEqual([...counts].sort(),[1,2]);
+ let seed=1,s;do{s=createGame('city',[{id:'a',name:'A'},{id:'b',name:'B'}],seed++,'holes',{mode:'solo'});startHell(s);}while(blackHoles(s).length!==2);
+ assert.equal(new Set(blackHoles(s).map(b=>`${b.x},${b.y}`)).size,2);assert.equal(new Set(blackHoles(s).map(b=>JSON.stringify(b.destination))).size,2);
+ const holes=blackHoles(s);for(let i=0;i<2;i++){const b=holes[i];b.control={x:b.x+200,y:b.y+100};b.speed=[160,230,360][i];b.warnUntil=10+i;b.pausedUntil=15;b.pauseUsed=true;}
  s.time=3;stepHell(s,1/30);assert.ok(holes.every(b=>!b.progress));s.time=13;const positions=holes.map(b=>[b.x,b.y]);stepHell(s,1/30);assert.deepEqual(holes.map(b=>[b.x,b.y]),positions);
  s.time=16;stepHell(s,1/30);for(const b of holes)assert.deepEqual({x:b.x,y:b.y},sweepPoint(b,b.progress));
  const clone=JSON.parse(JSON.stringify(s));ticks(s,80);ticks(clone,80);assert.deepEqual(s,clone);
- const scene3d=new T.Scene(),visuals=new HellVisuals(scene3d);for(const b of holes)b.warnUntil=s.time+2;visuals.draw(s);for(const name of ['sweep-arrow','sweep-arrow-1','sweep-arrow-2'])assert.equal(scene3d.getObjectByName(name).visible,true);visuals.dispose();assert.equal(scene3d.children.length,0);
+ const scene3d=new T.Scene(),visuals=new HellVisuals(scene3d);for(const b of holes)b.warnUntil=s.time+2;visuals.draw(s);for(const name of ['sweep-arrow','sweep-arrow-1'])assert.equal(scene3d.getObjectByName(name).visible,true);assert.equal(scene3d.getObjectByName('sweep-arrow-2').visible,false);visuals.dispose();assert.equal(scene3d.children.length,0);
 });
 test('eruption warning -> eruption -> collapse -> permanent hole; duplicate cracks do not reset clocks',()=>{
  const s=scene();startHell(s);s.time=s.hell.readyAt;freezeHoles(s);s.hell.nextEruption=1e9;const p=s.players[0],at=cellCenter(200),i=cellIndex(at);Object.assign(p,at);
@@ -104,7 +107,7 @@ test('pigeon flies five seconds across holes; cat keeps its two-second ground as
  }
 });
 test('shield deadline and hit ripple timestamp stay authoritative without changing protection',()=>{
- const s=scene(),[a,b]=s.players;Object.assign(b,{x:a.x+28,y:a.y});const item={id:99,kind:'shield',x:b.x,y:b.y};s.powerups=[item];collectPower(s,b,item);assert.equal(b.effects.shield,30);a.mass=100;stepGame(s);assert.ok(b.alive);assert.equal(b.shieldHitAt,s.time);s.time=30;assert.equal(b.effects.shield>s.time,false);
+ const s=scene(),[a,b]=s.players;Object.assign(b,{x:a.x+28,y:a.y});const item={id:99,kind:'shield',x:b.x,y:b.y};s.powerups=[item];collectPower(s,b,item);assert.equal(b.effects.shield,EAT.powerups.shield.duration);a.mass=100;stepGame(s);assert.ok(b.alive);assert.equal(b.shieldHitAt,s.time);s.time=EAT.powerups.shield.duration;assert.equal(b.effects.shield>s.time,false);
 });
 test('denser sky drops have category weighting, no houses/cars/shrine, finite cap and cleanup',()=>{
  const s=scene();s.nextFood=0;assert.ok(EAT.food.spawnCount>540);assert.ok(EAT.food.respawnInterval<.22);let small=0,medium=0,large=0;

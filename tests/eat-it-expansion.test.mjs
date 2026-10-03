@@ -37,12 +37,13 @@ test('raised render geometry clears the small monster; solid logs have no cleara
  }
  const s=make(),p=s.players[0],f=prop(s,'treeTrunk');p.x=920;p.input={x:1,y:0};assert.equal(canUnderpass(p,f,0),false);ticks(s,30);assert.ok(p.x<960);lib.dispose();
 });
-test('Pluto distribution, default and validated settings',()=>{
- const s=make();assert.equal(s.settings.plutoMultiplier,2);
+test('Pluto distribution and fixed always-on settings',()=>{
+ const s=make();assert.equal(s.settings.plutoMultiplier,4);assert.equal(s.settings.plutoEnabled,true);
  const counts={};for(let i=0;i<10000;i++){const k=choosePluto(s);counts[k]=(counts[k]??0)+1}
  assert.ok(counts.plutoTiny>5200&&counts.plutoTiny<5800);assert.ok(counts.plutoGiant<260&&counts.plutoGiant>140);
- assert.equal(parseSettings({map:'city',count:2,plutoMultiplier:99}).plutoMultiplier,5);
- assert.equal(parseSettings({map:'city',count:2,plutoMultiplier:NaN}).plutoMultiplier,2);
+ // Client-supplied Pluto values are ignored: the bonus is no longer a room setting.
+ assert.equal(parseSettings({map:'city',count:2,plutoMultiplier:99}).plutoMultiplier,4);
+ assert.equal(parseSettings({map:'city',count:2,plutoMultiplier:1.25,plutoEnabled:false}).plutoEnabled,true);
 });
 for(const map of ['city','nature'])test(`${map}: Pluto spawn clearance and cap`,()=>{
  const s=createGame(map,fillBots([],8),99,'test',{mode:'solo'});

@@ -13,7 +13,7 @@ const games: Array<[prefix: string, brand: Omit<PageBrand, "mode">]> = [
 ];
 
 const pages: Array<[path: string, name: string]> = [
-  ["/games", "Games"], ["/profile", "Profile"], ["/friends", "Friends"], ["/groups", "Groups"],
+  ["/games", "Games"], ["/profile", "Profile"], ["/friends", "Friends"], ["/clans", "Clans"],
   ["/leaderboards", "Leaderboards"], ["/learn", "Learn"], ["/credits", "Credits"],
 ];
 

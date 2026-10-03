@@ -1,0 +1,55 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Eat It fireballs and new objects visual checks</title>
+<style>body{margin:0;background:#182c2a;color:white;font:14px system-ui}nav{position:absolute;z-index:3;display:flex;gap:10px;flex-wrap:wrap;padding:10px;background:#192637ed}label{display:flex;gap:6px;align-items:center}canvas{display:block;width:100vw;height:100vh}output{position:absolute;z-index:3;bottom:12px;left:12px;background:#192637ed;padding:8px;max-width:60%}</style>
+<nav><label>Scenario<select id="scenario"><option>City</option><option>Nature</option><option>Props</option><option>Hell</option><option>Swallow</option><option>Jam</option></select></label><label>Growth<select id="growth"><option>100</option><option>1000</option><option selected>4000</option><option>8000</option></select></label><button id="reset">Reset</button></nav><canvas id="arena"></canvas><output id="status"></output>
+<script type="module">
+// Development-only fixture: new city towers, Nature landmarks, new props, the swallow fall path, a wedged skyscraper, Hell fireballs and a swollen black hole.
+import {ArenaRenderer} from '/src/games/eat-it/renderer.ts';
+import {createGame,stepGame} from '/src/games/eat-it/engine.ts';
+import {EAT,FOOD} from '/src/games/eat-it/config.ts';
+import {startHell,blackHoles,cellCenter,cellIndex} from '/src/games/eat-it/hell.ts';
+import {beginFall} from '/src/games/eat-it/falling.ts';
+import {mouthPosition,mouthOpening,MOUTH} from '/src/games/eat-it/rules.ts';
+import {playerRadius} from '/src/games/eat-it/config.ts';
+const scenario=document.querySelector('#scenario'),growth=document.querySelector('#growth'),status=document.querySelector('#status');
+const NEW=['townhouse','mansion','officeTower','skyscraper','bus','taxi','farmhouse','windmill','giantBoulder','canoe','mailbox','streetLamp','parkingMeter','scooter','campfire','scarecrow','wheelbarrow','pumpkin','beehive','hotDog','iceCream','newspaper','carrot'];
+let state,renderer,baseTime=0;
+const prop=(kind,x,y)=>({id:state.nextId++,kind,x,y,vx:0,vy:0,z:0,vz:0,rotation:0,target:null,capturedAt:0});
+function reset(){
+ renderer?.dispose();document.querySelector('#arena').replaceWith(Object.assign(document.createElement('canvas'),{id:'arena'}));
+ const map=scenario.value==='Nature'?'nature':'city';renderer=new ArenaRenderer(document.querySelector('#arena'),map);renderer.resize(innerWidth,innerHeight);
+ state=createGame(map,[{id:'a',name:'Visual check'}],44,'visual',{mode:'solo',botsEnabled:false});const p=state.players[0];Object.assign(p,{mass:Number(growth.value),facing:0});delete state.encounter;
+ const landmark=state.food.find(f=>['skyscraper','officeTower','windmill','giantBoulder'].includes(f.kind));
+ if(landmark&&scenario.value!=='Props')Object.assign(p,{x:landmark.x,y:landmark.y+260});
+ if(scenario.value==='Props'){
+  state.food=[];Object.assign(p,{x:1500,y:1700,mass:Number(growth.value)});
+  NEW.forEach((kind,i)=>state.food.push(prop(kind,1000+(i%8)*150+(FOOD[kind].width>200?60:0),1150+Math.floor(i/8)*260)));
+ }
+ if(scenario.value==='Swallow'){
+  // Props captured near the rim: they should tip in where they entered and sink out of sight, not slide to the center.
+  state.food=[];Object.assign(p,{x:2000,y:1500,mass:4000,facing:0});const r=playerRadius(p),m=mouthPosition(p,r);baseTime=state.time=10;
+  [['house',-.55,.45],['car',.75,0],['apple',.1,-.7],['bench',-.6,-.45],['taxi',.2,.72]].forEach(([kind,fx,fy])=>{const f=prop(kind,m.x+fx*r*MOUTH.radius,m.y+fy*r*MOUTH.radius);f.rotation=fx;state.food.push(f);beginFall(f,p,baseTime);Object.assign(f,{target:p.id,capturedAt:baseTime});});
+ }
+ if(scenario.value==='Jam'){
+  // A skyscraper tipped in at the lip of a mouth narrower than the tower is tall: it wedges, then is spat out.
+  state.food=[];state.nextFood=state.nextPower=state.nextPluto=state.nextBig=1e9;Object.assign(p,{x:2000,y:1500,mass:3000,facing:0});
+  const m=mouthPosition(p,playerRadius(p)),extent=FOOD.skyscraper.width/2;state.food.push(prop('skyscraper',m.x+mouthOpening(p)/2+extent-2*extent*.27,m.y));
+ }
+ if(scenario.value==='Hell'){
+  startHell(state);state.time=state.hell.readyAt;state.phase='hell';baseTime=state.time;
+  const center=cellCenter(cellIndex({x:2000,y:1500}));Object.assign(p,{x:center.x,y:center.y,mass:EAT.player.startingMass*EAT.hell.fireball.growth});
+  state.hell.fireballs=[[-240,-80],[-120,160],[160,-120],[260,120],[40,260],[-300,220]].map(([dx,dy],i)=>({...cellCenter(cellIndex({x:center.x+dx,y:center.y+dy})),id:500+i,spawnedAt:baseTime-1}));
+  blackHoles(state).forEach((b,i)=>Object.assign(b,{x:center.x-520+i*900,y:center.y-260,size:i?undefined:EAT.hell.fireball.holeMaxRadius,warnUntil:1e9}));
+ }
+}
+for(const el of [scenario,growth])el.onchange=reset;document.querySelector('#reset').onclick=reset;window.onresize=()=>renderer.resize(innerWidth,innerHeight);
+reset();
+function draw(now){
+ if(scenario.value==='Hell')state.time=baseTime+now/1000;
+ if(scenario.value==='Swallow')state.time=baseTime+(window.__swallowAge??(now/1000)%2.2);
+ if(scenario.value==='Jam'&&!window.__manual)stepGame(state);
+ renderer.draw(state,'a',1/60,'You');
+ status.textContent=`${scenario.value} · ${state.food.length} objects · ${state.food.filter(f=>FOOD[f.kind].building).length} buildings${state.hell?` · ${blackHoles(state).length} black hole(s) · ${state.hell.fireballs.length} fireballs`:''}`;
+ requestAnimationFrame(draw);
+}requestAnimationFrame(draw);
+window.__eatPreview=()=>({state,renderer,stepGame});
+</script></html>

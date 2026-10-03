@@ -9,7 +9,7 @@ import { ModelLibrary } from '../src/games/eat-it/models.ts';
 
 function scene(map, kind, side) {
   const s = createGame(map, [{id:'a',name:'A'}, {id:'b',name:'B'}], 91);
-  s.food=[]; s.powerups=[]; s.nextFood=1e6; s.nextPower=1e6;
+  s.food=[]; s.powerups=[]; s.nextFood=1e6; s.nextPower=1e6; s.nextBig=1e9;
   const p=s.players[0]; Object.assign(p,{x:1100,y:800,mass:kind==='house'?1800:kind==='car'?700:36,facing:0});
   Object.assign(s.players[1],{x:1900,y:1000});
   const mouth=mouthPosition(p,playerRadius(p,0)), radius=playerRadius(p,0)*MOUTH.radius;
@@ -63,13 +63,14 @@ test('serialized partial falls resume deterministically and grant a single rewar
  const {s,p,f}=scene('nature','house',[0,-1]);stepGame(s);assert.equal(f.target,p.id);
  for(let i=0;i<8;i++)stepGame(s);
  const clone=JSON.parse(JSON.stringify(s));
- for(let i=0;i<40;i++){stepGame(s);stepGame(clone);}
+ for(let i=0;i<60;i++){stepGame(s);stepGame(clone);}
  assert.deepEqual(s,clone);assert.equal(p.foodEaten,1);assert.equal(s.food.length,0);
 });
 
 test('building roofs have outward-facing slopes so they render above the walls',()=>{
  const library=new ModelLibrary();
- for(const kind of Object.keys(FOOD).filter(k=>FOOD[k].shape==='building')) {
+ // Towers and the windmill have flat/conical tops instead of a gabled prism.
+ for(const kind of Object.keys(FOOD).filter(k=>FOOD[k].shape==='building'&&!['skyscraper','officeTower','windmill'].includes(k))) {
   const roof=library.prop(kind).getObjectByName('roof');assert.ok(roof,kind);
   const normal=roof.geometry.getAttribute('normal');
   // First six vertices are gable ends; next twelve are the two pitched slopes.

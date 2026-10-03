@@ -1,3 +1,5 @@
+import GoRankedLeaderboard from "@/components/ranked/GoRankedLeaderboard";
+import { GO_RANKED_DEFAULT_MODE, goTimeControls, isGoTimeControl } from "@/games/go/ranked/config";
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Trophy } from "lucide-react";
@@ -47,7 +49,8 @@ export default function LeaderboardsPage() {
   const game: GameId = games.find(item => item.id === requested)?.id ?? "chess";
   const requestedMode = searchParams.get("mode");
   const chessBoard: ChessBoard = requestedMode === "puzzles" ? "puzzles" : isTimeControl(requestedMode) ? requestedMode : "rapid";
-  const boardKey: BoardKey | null = game !== "chess" ? game : chessBoard === "puzzles" ? null : `chess:${chessBoard}`;
+  const goMode = isGoTimeControl(requestedMode) ? requestedMode : GO_RANKED_DEFAULT_MODE;
+  const boardKey: BoardKey | null = game === "go" ? null : game !== "chess" ? game : chessBoard === "puzzles" ? null : `chess:${chessBoard}`;
   const [boards, setBoards] = useState<Partial<Record<BoardKey, Board>>>({});
   const board = boardKey ? boards[boardKey] : undefined;
 
@@ -80,10 +83,12 @@ export default function LeaderboardsPage() {
         {games.map(item => <button key={item.id} type="button" role="tab" id={`leaderboard-game-${item.id}`} aria-selected={game === item.id} aria-controls="leaderboard-panel" tabIndex={game === item.id ? 0 : -1} onClick={() => selectGame(item.id)} className={tabClass(game === item.id)}>{ui(item.label)}</button>)}
       </div>
       <div role="tabpanel" id="leaderboard-panel" aria-labelledby={`leaderboard-game-${game}`} className="mt-4">
+        {game === "go" && <div className="-mx-1 mb-4 overflow-x-auto px-1 pb-1"><div className="inline-flex rounded-xl border border-white/15 p-1" role="group" aria-label="Go leaderboard modes">{goTimeControls.map(mode => <button key={mode.id} type="button" className={`shrink-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-bold ${goMode === mode.id ? "bg-amber-300 text-black" : "text-slate-400 hover:text-white"}`} aria-pressed={goMode === mode.id} onClick={() => setSearchParams({ game: "go", mode: mode.id })}>{mode.name}<span className={`ml-1.5 font-mono text-[10px] ${goMode === mode.id ? "text-black/60" : "text-slate-500"}`}>{mode.clock}</span></button>)}</div><Link className="inline-block px-4 py-2 text-sm font-bold text-amber-300" to="/games/go/ranked">Play ranked Go →</Link></div>}
         {game === "chess" && <div className="-mx-1 mb-4 overflow-x-auto px-1 pb-1"><div className="inline-flex rounded-xl border border-white/15 p-1" role="group" aria-label={ui("Chess leaderboard")}>
           {[...timeControls.map(mode => ({ id: mode.id as ChessBoard, label: ui(mode.name), detail: mode.clock })), { id: "puzzles" as ChessBoard, label: ui("Perfect Really Hard puzzles"), detail: null }].map(item => <button key={item.id} type="button" aria-pressed={chessBoard === item.id} onClick={() => selectChessBoard(item.id)} className={`shrink-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-bold ${chessBoard === item.id ? "bg-amber-300 text-black" : "text-slate-400 hover:text-white"}`}>{item.label}{item.detail && <span className={`ml-1.5 font-mono text-[10px] ${chessBoard === item.id ? "text-black/60" : "text-slate-500"}`}>{item.detail}</span>}</button>)}
         </div></div>}
         {!user ? <p className="text-slate-400"><Link to="/login" className="text-amber-300 underline">{ui("Sign in")}</Link> {ui("to view leaderboards.")}</p>
+          : game === "go" ? <GoRankedLeaderboard mode={goMode} />
           : game === "chess" && chessBoard === "puzzles" ? <p className="rounded-xl border border-white/10 p-5 text-sm text-slate-400">{ui("This board will open when puzzle attempts have server-verified mistake records. Current puzzle completions cannot safely support a competitive ranking.")}</p>
           : !board ? <p className="text-slate-400">{ui("Loading…")}</p>
           : board.error ? <p role="alert" className="text-red-300">{board.error}</p>

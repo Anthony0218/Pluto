@@ -18,6 +18,15 @@ const cuttleSource = {
   url: "https://www.mbl.edu/news/how-cuttlefish-spikes-out-its-skin-neurological-study-reveals-surprising-control",
 };
 export const NATURA_FACTS: Record<ScenarioId, AnimalFact[]> = {
+  jumpingspider: [
+    { animal: "JUMPING SPIDER", title: "Silk is a safety line.", text: "Jumping spiders can attach a silk dragline before a leap. Silk has uses beyond building a capture web.", label: "Natural History Museum", url: "https://www.nhm.ac.uk/discover/what-are-spider-webs-made-of.html" },
+    { animal: "JUMPING SPIDER", title: "A leap with a lifeline.", text: "A jumping spider can anchor silk before leaping toward prey, helping it descend safely after a missed landing.", label: "Natural History Museum", url: "https://www.nhm.ac.uk/discover/finding-love-web.html" },
+  ],
+  spermwhale: [
+    { animal: "PHYSETER MACROCEPHALUS", title: "A hunter of the deep.", text: "Sperm whales eat deep-water animals including squid. They are mammals and must return to the surface to breathe air.", label: "NOAA Fisheries", url: "https://www.fisheries.noaa.gov/species/sperm-whale" },
+    { animal: "MESONYCHOTEUTHIS HAMILTONI", title: "Evidence in a whale’s stomach.", text: "Colossal squid remains have been recovered from sperm-whale stomachs. This is evidence of a real predator–prey relationship.", label: "Museum of New Zealand Te Papa Tongarewa", url: "https://collections.tepapa.govt.nz/topic/588" },
+    { animal: "COLOSSAL SQUID", title: "Two different giants.", text: "The colossal squid, Mesonychoteuthis hamiltoni, and giant squid, Architeuthis dux, are different species. The colossal squid lives in the Southern Ocean.", label: "Museum of New Zealand Te Papa Tongarewa", url: "https://collections.tepapa.govt.nz/topic/588" },
+  ],
   bolas: [
     {
       animal: "BOLAS SPIDER",
@@ -103,54 +112,6 @@ export const NATURA_FACTS: Record<ScenarioId, AnimalFact[]> = {
     },
   ],
   flyingfish: FLYING_FISH_FACTS,
-  humpback: [
-    {
-      animal: "HUMPBACK WHALE",
-      title: "A bubble ring can turn a shoal to jelly.",
-      text: "Whales use spiralling bubbles to herd schooling fish into a tighter cluster before a lunge. A brief, localized barrier can change the fish’s escape geometry.",
-      label: "University of Hawaiʻi",
-      url: "https://www.himb.hawaii.edu/news/whale-bubble-net-feeding-documented-by-uh-researchers-through-groundbreaking-video/",
-    },
-    {
-      animal: "HUMPBACK WHALE",
-      title: "The timing matters as much as the bubble wall.",
-      text: "The feeding burst is short and intense. Once the school is packed together, the whale can lunge quickly before the fish scatter again.",
-      label: "University of Hawaiʻi",
-      url: "https://www.himb.hawaii.edu/news/whale-bubble-net-feeding-documented-by-uh-researchers-through-groundbreaking-video/",
-    },
-  ],
-  dungbeetle: [
-    {
-      animal: "DUNG BEETLE",
-      title: "A night compass is part of the journey.",
-      text: "Nocturnal dung beetles can orient themselves using the Milky Way, helping them roll their balls in a straight line away from competitors.",
-      label: "Lund University",
-      url: "https://www.lu.se/publikation/6e6b0a11-b2b5-4d8b-b37d-2a1a7e675149",
-    },
-    {
-      animal: "DUNG BEETLE",
-      title: "A detour is easy; realignment is the hard part.",
-      text: "A temporary loss of the celestial reference can send a beetle off course, making the correction phase the true test of its navigation.",
-      label: "Lund University",
-      url: "https://www.lu.se/publikation/6e6b0a11-b2b5-4d8b-b37d-2a1a7e675149",
-    },
-  ],
-  greenheron: [
-    {
-      animal: "GREEN HERON",
-      title: "A lure can be a patient strategy.",
-      text: "Green herons sometimes drop floating objects to attract fish close enough for a strike. The bird chooses when the bait is good enough to make a short, high-value attack.",
-      label: "Audubon",
-      url: "https://www.audubon.org/field-guide/bird/green-heron",
-    },
-    {
-      animal: "GREEN HERON",
-      title: "Waiting can pay off, but only if the bait stays useful.",
-      text: "The risk is that the fish scatter, the drift carries the lure away, or the bird misses the best moment to strike.",
-      label: "Audubon",
-      url: "https://www.audubon.org/field-guide/bird/green-heron",
-    },
-  ],
   meadow: [
     {
       animal: "AMERICAN KESTREL",
@@ -165,54 +126,6 @@ export const NATURA_FACTS: Record<ScenarioId, AnimalFact[]> = {
       text: "Voles use surface runways beneath vegetation as well as burrows. Long grass is part of their living space, not just scenery.",
       label: "Penn State Extension",
       url: "https://extension.psu.edu/voles",
-    },
-  ],
-  alarm: [
-    {
-      animal: "FORK-TAILED DRONGO",
-      title: "A warning can hide a trick.",
-      text: "Drongos sometimes use false alarms to make other animals abandon food, which the bird can then steal.",
-      label: "Research: deceptive drongo alarms",
-      url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC3081750/",
-    },
-    {
-      animal: "DRONGO & MEERKAT",
-      title: "Trust has a trade-off.",
-      text: "Drongos also give genuine predator warnings. For an animal listening nearby, ignoring a call can mean missing real danger.",
-      label: "Research: deceptive drongo alarms",
-      url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC3081750/",
-    },
-  ],
-  bridges: [
-    {
-      animal: "ARMY ANTS",
-      title: "The workers are the bridge.",
-      text: "Army ants can link their bodies into a living bridge. Those ants shorten the route but cannot carry food while holding the structure.",
-      label: "Princeton University",
-      url: "https://www.princeton.edu/news/2015/11/30/ants-build-living-bridges-their-bodies-speak-volumes-about-group-intelligence",
-    },
-    {
-      animal: "ARMY ANTS",
-      title: "No architect needed.",
-      text: "A living bridge emerges from interactions between individual ants. There is no central planner assigning every ant a position.",
-      label: "Princeton University",
-      url: "https://www.princeton.edu/news/2015/11/30/ants-build-living-bridges-their-bodies-speak-volumes-about-group-intelligence",
-    },
-  ],
-  echo: [
-    {
-      animal: "TIGER MOTH",
-      title: "A tiny sonar jammer.",
-      text: "The tiger moth Bertholdia trigona produces ultrasonic clicks that can interfere with an attacking bat’s echolocation.",
-      label: "Research: tiger moths jam bat sonar",
-      url: "https://pubmed.ncbi.nlm.nih.gov/19608920/",
-    },
-    {
-      animal: "BAT & MOTH",
-      title: "Sound is information.",
-      text: "Bats use returning echoes to locate prey. The moth’s clicks interfere with that process; they do not form a physical shield.",
-      label: "Research: tiger moths jam bat sonar",
-      url: "https://pubmed.ncbi.nlm.nih.gov/19608920/",
     },
   ],
 };

@@ -1,3 +1,4 @@
+import GameInvitePanel from "@/components/social/GameInvitePanel";
 import { useState } from "react";
 import { Users } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -14,7 +15,7 @@ type FriendView = "actions" | "chat" | "profile";
 export default function GlobalFriendsSidebar() {
   useUiLanguage();
   const { user } = useAuth();
-  const { friends, onlineIds, loading, friendsError, notifications } = useDashboardData();
+  const { friends, onlineIds, presence, loading, friendsError, notifications } = useDashboardData();
   const [open, setOpen] = useState(false);
   const [friendDialog, setFriendDialog] = useState<{ id: string; view: FriendView } | null>(null);
   const [messageBaseline] = useState(() => getFriendMessageBaseline(user?.id));
@@ -57,12 +58,14 @@ export default function GlobalFriendsSidebar() {
       <PlayWithFriends
         friends={friends}
         onlineIds={onlineIds}
+        presence={presence}
         unreadMessagesByFriend={unreadMessagesByFriend}
         loading={loading}
         unavailable={friendsError}
         signedIn={!!user}
         onFriendSelect={(id) => showFriend(id, "actions")}
       />
+      <div className="mt-4"><GameInvitePanel compact onNavigate={() => setOpen(false)} /></div>
     </DashboardDialog>}
     {selectedFriend && friendDialog && <DashboardFriendDialog
       friend={selectedFriend}

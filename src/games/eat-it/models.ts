@@ -1,3 +1,4 @@
+import { surfaceTexture, type Surface } from './surfaceTextures.ts';
 import { treeGeometry } from './treeGeometry.ts';
 import * as T from 'three';
 import { FOOD, type FoodKind } from './config.ts';
@@ -7,12 +8,31 @@ import { objectHeight } from './falling.ts';
  * logos, product likenesses, or third-party character designs are loaded. */
 export class ModelLibrary {
   private materials = new Map<string, T.MeshStandardMaterial>();
+  private textures = new Map<Surface, T.DataTexture>();
   private geometries = new Map<string, T.BufferGeometry>();
   private templates = new Map<FoodKind, T.Group>();
   material(color: string) {
     let m = this.materials.get(color);
-    if (!m) { m = new T.MeshStandardMaterial({ color, roughness: .85, metalness: 0 }); this.materials.set(color, m); }
+    if (!m) { m = new T.MeshStandardMaterial({ color, roughness: color === '#a4d7da' ? .16 : .85, metalness: color === '#a4d7da' ? .35 : 0 }); this.materials.set(color, m); }
     return m;
+  }
+  surface(color: string, surface: Surface) {
+    const key = `${surface}:${color}`;
+    let material = this.materials.get(key);
+    if (!material) {
+      let map = this.textures.get(surface);
+      if (!map) { map = surfaceTexture(surface); this.textures.set(surface, map); }
+      material = new T.MeshStandardMaterial({ color, map, bumpMap: map,
+        bumpScale: surface === 'paint' ? .03 : surface === 'brick' || surface === 'roof' ? .65 : .18,
+        roughness: surface === 'paint' ? .28 : surface === 'rubber' ? .96 : .83,
+        metalness: surface === 'paint' ? .38 : 0 });
+      this.materials.set(key, material);
+    }
+    return material;
+  }
+  finish(mesh: T.Mesh, color: string, surface: Surface) {
+    mesh.material = this.surface(color, surface);
+    return mesh;
   }
   geometry(kind: 'box' | 'ball' | 'cylinder' | 'cone' | 'ring' | 'rock') {
     let g = this.geometries.get(kind);
@@ -98,9 +118,38 @@ export class ModelLibrary {
       const glow = ball('#ffd973', 0, h * .47, 0, w * .51, h * .51, d * .51); glow.castShadow = false; glow.receiveShadow = false;
       const halo = this.material('#ffd973'); halo.transparent = true; halo.opacity = .08; halo.depthWrite = false; halo.emissive.set('#ffbd44'); halo.emissiveIntensity = .6; halo.blending = T.AdditiveBlending;
       const gold = this.material('#ffc753'); gold.emissive.set('#d89422'); gold.emissiveIntensity = .5; gold.metalness = .45;
+    } else if (kind === 'skyscraper' || kind === 'officeTower') {
+      // Flat-roofed towers: stacked setbacks, window bands and a rooftop crown.
+      const tiers = kind === 'skyscraper' ? [[1, .55], [.78, .3], [.52, .15]] : [[1, .78], [.7, .22]];
+      let base = 0;
+      tiers.forEach(([scale, share], tier) => {
+        const height = h * share, tw = w * .94 * scale, td = d * .94 * scale;
+        box(tier % 2 ? '#93a9b8' : color, 0, base + height / 2, 0, tw, height, td);
+        for (let y = base + 14; y < base + height - 8; y += 22) for (const side of [-1, 1]) {
+          box(glass, 0, y, side * td * .502, tw * .86, 9, 2); box(glass, side * tw * .502, y, 0, 2, 9, td * .86);
+        }
+        base += height;
+      });
+      box('#5d6a72', 0, base + 4, 0, w * .4, 8, d * .4);
+      cylinder('#c9d0d4', 0, base + 36, 0, 2.5, 64);
+      if (kind === 'skyscraper') ball('#ff6b5a', 0, base + 70, 0, 4, 4, 4);
+      box('#e8dbbf', 0, 4, 0, w, 8, d);
+      box(dark, 0, 18, d * .48, w * .3, 30, 3);
+    } else if (kind === 'windmill') {
+      // Tapered stone tower, cone cap and four sail arms facing the camera.
+      cylinder(color, 0, h * .38, 0, w * .3, h * .76, d * .3);
+      cylinder('#cbbd9f', 0, h * .04, 0, w * .38, h * .08, d * .38);
+      this.part(group, 'cone', '#9a5b48', 0, h * .84, 0, w * .34, h * .18, d * .34);
+      box(timber, 0, h * .2, d * .3, w * .14, h * .2, 3);
+      for (const y of [.42, .6]) box(glass, 0, h * y, d * .3, w * .1, h * .07, 2);
+      for (let i = 0; i < 4; i++) {
+        const arm = box('#f3ead8', 0, h * .74, d * .36, w * .1, h * .46, 3);
+        arm.position.set(Math.sin(i * Math.PI / 2 + .4) * h * .23, h * .74 + Math.cos(i * Math.PI / 2 + .4) * h * .23, d * .36); arm.rotation.z = -(i * Math.PI / 2 + .4);
+      }
+      cylinder(dark, 0, h * .74, d * .34, 6, 8).rotation.x = Math.PI / 2;
     } else if (f.shape === 'building') {
       const wall = h * .72;
-      box(color, 0, wall / 2, 0, w * .94, wall, d * .94);
+      this.finish(box(color, 0, wall / 2, 0, w * .94, wall, d * .94), color, kind === 'barn' || kind === 'farmhouse' ? 'siding' : 'brick');
       box('#e8dbbf', 0, 4, 0, w, 8, d);
       // A custom triangular prism makes a pitched roof with genuine end faces.
       const roof = new T.BufferGeometry();
@@ -113,29 +162,52 @@ export class ModelLibrary {
       for (let i = 0; i < verts.length; i += 9) for (let axis = 0; axis < 3; axis++) {
         [verts[i + 3 + axis], verts[i + 6 + axis]] = [verts[i + 6 + axis], verts[i + 3 + axis]];
       }
-      roof.setAttribute('position', new T.Float32BufferAttribute(verts, 3)); roof.computeVertexNormals();
+      roof.setAttribute('position', new T.Float32BufferAttribute(verts, 3));
+      const uvs: number[] = [];
+      for (let i = 0; i < verts.length; i += 9) {
+        const endFace = verts[i + 2] === verts[i + 5] && verts[i + 2] === verts[i + 8];
+        for (let j = 0; j < 9; j += 3) uvs.push((endFace ? verts[i + j] / w : verts[i + j + 2] / d) + .5, endFace ? verts[i + j + 1] / h : verts[i + j] / w + .5);
+      }
+      roof.setAttribute('uv', new T.Float32BufferAttribute(uvs, 2)); roof.computeVertexNormals();
       this.geometries.set(`roof-${kind}`, roof);
-      const mesh = new T.Mesh(roof, this.material(kind === 'barn' ? '#814e4a' : '#657e7b')); mesh.name = 'roof'; mesh.castShadow = true; mesh.receiveShadow = true; group.add(mesh);
-      box(timber, 0, wall * .25, d * .474, w * .16, wall * .5, 2);
+      const mesh = new T.Mesh(roof, this.surface(kind === 'barn' ? '#814e4a' : '#526975', 'roof')); mesh.name = 'roof'; mesh.castShadow = true; mesh.receiveShadow = true; group.add(mesh);
+      this.finish(box(timber, 0, wall * .25, d * .474, w * .16, wall * .5, 2), timber, 'wood');
+      ball('#dbb56a', w * .05, wall * .25, d * .49, 1.4, 1.4, 1.4);
+      for (const side of [-1, 1]) box(cream, side * w * .47, wall * .5, d * .47, w * .035, wall, 3);
+      box('#d8cbb5', 0, wall * .025, d * .49, w * .23, wall * .05, d * .08);
       for (const side of [-1, 1]) {
-        for (let row = 0; row < (kind === 'apartment' ? 3 : 1); row++) {
+        for (let row = 0; row < (kind === 'apartment' ? 3 : kind === 'mansion' || kind === 'farmhouse' ? 2 : 1); row++) {
           box(cream, side * w * .29, wall * (.4 + row * .22), d * .477, w * .2, wall * .18, 3);
           box(glass, side * w * .29, wall * (.4 + row * .22), d * .49, w * .16, wall * .14, 2);
+          box(cream, side * w * .29, wall * (.4 + row * .22), d * .503, w * .012, wall * .14, 1);
+          box(cream, side * w * .29, wall * (.4 + row * .22), d * .503, w * .16, wall * .012, 1);
         }
         box(glass, side * w * .475, wall * .5, 0, 2, wall * .26, d * .32);
       }
+      if (kind === 'mansion') { for (const side of [-1, 1]) cylinder(cream, side * w * .1, wall * .3, d * .5, 5, wall * .6); box(cream, 0, wall * .62, d * .5, w * .3, 6, 14); }
+      if (kind === 'farmhouse') box(timber, 0, wall * .12, d * .52, w * .8, 6, 18);
       if (kind === 'cafe' || kind === 'kiosk') for (let i = 0; i < 8; i++) box(i % 2 ? cream : '#d78869', -w * .42 + i * w * .12, wall * .65, d * .47, w * .12, 5, d * .13);
       if (kind !== 'garage') box('#d4c6ae', w * .26, h * .84, -d * .2, w * .09, h * .27, d * .13);
     } else if (f.shape === 'vehicle') {
       const wheel = d * .18;
       box(dark, 0, wheel, 0, w * .82, h * .18, d * .75);
-      box(color, 0, h * .4, 0, w * .97, h * .4, d * .84);
+      this.finish(box(color, 0, h * .4, 0, w * .97, h * .4, d * .84), color, 'paint');
       box(glass, -w * .08, h * .7, 0, w * .43, h * .43, d * .72);
-      box(color, -w * .08, h * .96, 0, w * .47, h * .08, d * .79);
+      this.finish(box(color, -w * .08, h * .96, 0, w * .47, h * .08, d * .79), color, 'paint');
+      for (const side of [-1, 1]) {
+        box(color, -w * .08, h * .72, side * d * .37, w * .025, h * .43, d * .025);
+        box('#c9d5d7', w * .02, h * .45, side * d * .427, w * .09, h * .025, d * .025);
+        this.finish(box(color, w * .12, h * .67, side * d * .45, w * .09, h * .085, d * .11), color, 'paint');
+      }
+      box('#aeb9be', w * .49, h * .28, 0, 2, h * .07, d * .77);
+      box(dark, w * .492, h * .42, 0, 2, h * .12, d * .34);
+      box(cream, w * .502, h * .3, 0, 1, h * .07, d * .2);
       if (kind === 'foodTruck') box('#f2dcc1', -w * .25, h * .68, 0, w * .45, h * .55, d * .86);
       if (kind === 'tractor') box(color, w * .23, h * .6, 0, w * .4, h * .28, d * .6);
+      if (kind === 'bus') { box(color, 0, h * .66, 0, w * .97, h * .5, d * .84); for (let i = 0; i < 6; i++) for (const z of [-1, 1]) box(glass, -w * .4 + i * w * .15, h * .74, z * d * .425, w * .11, h * .2, 2); }
+      if (kind === 'taxi') { box(cream, -w * .08, h * 1.04, 0, w * .16, h * .1, d * .3); box(dark, 0, h * .42, d * .425, w * .6, h * .06, 1); }
       for (const x of [-1, 1]) for (const z of [-1, 1]) {
-        const tire = cylinder(dark, x * w * .31, wheel, z * d * .4, wheel, d * .17); tire.rotation.x = Math.PI / 2; tire.name = 'wheel';
+        const tire = cylinder(dark, x * w * .31, wheel, z * d * .4, wheel, d * .17); this.finish(tire, '#293139', 'rubber'); tire.rotation.x = Math.PI / 2; tire.name = 'wheel';
         const hub = cylinder('#d5cbbc', x * w * .31, wheel, z * d * .49, wheel * .48, 2); hub.rotation.x = Math.PI / 2; hub.name = 'wheel';
       }
       for (const z of [-1, 1]) { box(cream, w * .49, h * .42, z * d * .26, 2, h * .14, d * .16); box('#cd735e', -w * .49, h * .4, z * d * .26, 2, h * .12, d * .14); }
@@ -194,6 +266,47 @@ export class ModelLibrary {
       cylinder(color, 0, h / 2, 0, w / 2, h); cylinder('#ffe0a1', 0, h, 0, w * .35, 1);
     } else if (f.shape === 'stone' || f.shape === 'leaf') {
       this.part(group, 'rock', color, 0, h / 2, 0, w / 2, h / 2, d / 2);
+      if (kind === 'giantBoulder') {
+        this.part(group, 'rock', '#86918a', w * .28, h * .28, d * .22, w * .26, h * .28, d * .24);
+        this.part(group, 'rock', '#a9b3ac', -w * .3, h * .22, -d * .18, w * .2, h * .22, d * .2);
+        for (const [x, z] of [[-.12, .1], [.08, -.14], [.2, .05]]) ball('#7c9a5a', x * w, h * .92, z * d, w * .12, h * .05, d * .1);
+      }
+    } else if (f.shape === 'lamp') {
+      cylinder('#3d4a50', 0, 3, 0, w * .4, 6); cylinder(color, 0, h * .48, 0, 2.6, h * .92);
+      box(color, w * .18, h * .93, 0, w * .4, 3, 4); ball('#ffe9a8', w * .34, h * .88, 0, 6, 4, 6);
+    } else if (f.shape === 'meter') {
+      cylinder('#6c777d', 0, h * .32, 0, 2.5, h * .64); box(color, 0, h * .78, 0, w * .7, h * .36, d * .5);
+      box(glass, 0, h * .84, d * .26, w * .45, h * .12, 1);
+    } else if (f.shape === 'mailbox') {
+      for (const x of [-1, 1]) box(dark, x * w * .3, h * .12, 0, 3, h * .24, 3);
+      box(color, 0, h * .55, 0, w * .9, h * .55, d * .8); const top = cylinder(color, 0, h * .82, 0, w * .45, d * .8); top.rotation.x = Math.PI / 2;
+      box(cream, 0, h * .65, d * .41, w * .5, 3, 1);
+    } else if (f.shape === 'campfire') {
+      for (let i = 0; i < 5; i++) { const log = cylinder(timber, Math.cos(i * 1.26) * w * .18, 5, Math.sin(i * 1.26) * d * .18, 4, w * .6); log.rotation.set(Math.PI / 2, 0, i * 1.26); }
+      for (let i = 0; i < 8; i++) this.part(group, 'rock', '#8d8f88', Math.cos(i * .785) * w * .44, 4, Math.sin(i * .785) * d * .44, 6, 5, 6);
+      this.part(group, 'cone', '#ff8a2a', 0, h * .55, 0, w * .2, h * .9, d * .2); this.part(group, 'cone', '#ffd96a', 0, h * .45, 0, w * .11, h * .6, d * .11);
+    } else if (f.shape === 'scarecrow') {
+      cylinder(timber, 0, h * .45, 0, 2.5, h * .9); box(timber, 0, h * .72, 0, w * .9, 3, 3);
+      box('#6f8fb0', 0, h * .62, 0, w * .32, h * .3, d * .4); ball('#e8cf8f', 0, h * .86, 0, w * .12, h * .1, w * .12);
+      this.part(group, 'cone', color, 0, h * .98, 0, w * .2, h * .12, w * .2);
+      for (const x of [-1, 1]) box('#e0c46a', x * w * .46, h * .7, 0, w * .08, h * .1, 4);
+    } else if (f.shape === 'beehive') {
+      for (let i = 0; i < 4; i++) cylinder(i % 2 ? '#d7a43c' : color, 0, h * (.14 + i * .22), 0, w * (.46 - i * .07), h * .2, d * (.46 - i * .07));
+      cylinder(dark, 0, h * .2, d * .42, 3, 2).rotation.x = Math.PI / 2;
+    } else if (kind === 'hotDog') {
+      const bun = cylinder('#e2b071', 0, h * .4, 0, d * .48, w * .9, d * .48); bun.rotation.z = Math.PI / 2;
+      const sausage = cylinder('#b5513a', 0, h * .7, 0, d * .3, w, d * .3); sausage.rotation.z = Math.PI / 2;
+      box('#f2c84b', 0, h * .92, 0, w * .7, 1.5, 2);
+    } else if (kind === 'iceCream') {
+      const cone = this.part(group, 'cone', '#d9a66a', 0, h * .3, 0, w * .4, h * .6, d * .4); cone.rotation.x = Math.PI;
+      ball(color, 0, h * .7, 0, w * .48, h * .2, d * .48); ball('#fff0e0', 0, h * .86, 0, w * .36, h * .14, d * .36); ball('#d4473f', 0, h * .98, 0, 2.5, 2.5, 2.5);
+    } else if (kind === 'pumpkin') {
+      for (let i = 0; i < 6; i++) { const a = i * Math.PI / 3; ball(i % 2 ? color : '#d9862d', Math.cos(a) * w * .14, h * .45, Math.sin(a) * d * .14, w * .32, h * .42, d * .32); }
+      cylinder('#6b7d3e', 0, h * .92, 0, 2.5, h * .2);
+    } else if (kind === 'carrot') {
+      // Lies on its side: the root runs along the footprint's depth with leaves at the back.
+      const root = this.part(group, 'cone', color, 0, w * .5, 0, w * .5, d * .8, w * .5); root.rotation.x = Math.PI / 2;
+      for (const x of [-2, 0, 2]) { const leaf = box('#6aa04a', x, w * .6, -d * .45, 1.5, 1.5, 9); leaf.rotation.x = .4; }
     } else if (kind === 'donut') {
       const donut = this.part(group, 'ring', '#ce9864', 0, h * .3, 0, w * .39, d * .39, h * .8); donut.rotation.x = Math.PI / 2;
       const icing = this.part(group, 'ring', color, 0, h * .44, 0, w * .38, d * .38, h * .5); icing.rotation.x = Math.PI / 2;
@@ -223,5 +336,5 @@ export class ModelLibrary {
     }
     return group;
   }
-  dispose() { this.materials.forEach(m => m.dispose()); this.geometries.forEach(g => g.dispose()); this.templates.clear(); }
+  dispose() { this.materials.forEach(m => m.dispose()); this.textures.forEach(t => t.dispose()); this.textures.clear(); this.geometries.forEach(g => g.dispose()); this.templates.clear(); }
 }

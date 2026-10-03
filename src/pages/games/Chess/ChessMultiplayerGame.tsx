@@ -1,3 +1,4 @@
+import PlayerBar from "@/components/ranked/RankedPlayerBar";
 import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
@@ -12,7 +13,6 @@ import Board from "../../../components/chess/singleplayer/Board.tsx";
 import PromotionBar from "../../../components/chess/singleplayer/PromotionBar.tsx";
 import ChessGameReview from "../../../components/chess/singleplayer/ChessGameReview.tsx";
 import ChessMatchStatus from "../../../components/chess/singleplayer/ChessMatchStatus.tsx";
-import { ProfileAvatar } from "../../../components/social/ProfileAvatarPicker.tsx";
 
 import { type PieceType } from "../../../utils/chessUtils.ts";
 import {
@@ -30,7 +30,6 @@ import { useChessTopRanks } from "@/games/chess/ranked/useChessTopRanks";
 import { timeControlInfo, timeControlLabel, type TimeControl } from "@/games/chess/ranked/timeControls";
 import { premoveTargets, resolvePremove, type Premove } from "@/games/chess/ranked/premove";
 import type { BoardAnnotations } from "@/components/chess/singleplayer/boardAnnotations";
-import TopRankBadge from "@/components/chess/TopRankBadge";
 import { useAuth } from "../../../context/AuthContext.tsx";
 import ChessMoveHistoryList from "../../../components/chess/ChessMoveHistoryList.tsx";
 
@@ -122,6 +121,7 @@ type Language = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 const deTranslations: Record<string, string> = {
   "Undo request sent": "Rücknahme angefragt",
   "Waiting for opponent response...": "Warte auf Antwort des Gegners...",
+  "Both clocks are paused for up to 30 seconds.": "Beide Uhren sind bis zu 30 Sekunden pausiert.",
   "Opponent requests to undo the last move.":
     "Der Gegner möchte den letzten Zug zurücknehmen.",
   "Accept Undo": "Rücknahme akzeptieren",
@@ -289,6 +289,7 @@ const deTranslations: Record<string, string> = {
 const bavarianTranslations: Record<string, string> = {
   "Undo request sent": "Zrucknehma angfragt",
   "Waiting for opponent response...": "Wart auf de Antwort vom Gegner...",
+  "Both clocks are paused for up to 30 seconds.": "Beide Uhrn san bis zu 30 Sekundn pausiert.",
   "Opponent requests to undo the last move.":
     "Da Gegner mecht den letzten Zug zrucknehma.",
   "Accept Undo": "Zrucknehma erlaubn",
@@ -367,6 +368,7 @@ const bavarianTranslations: Record<string, string> = {
 const koreanTranslations: Record<string, string> = {
   "Undo request sent": "되돌리기 요청 전송됨",
   "Waiting for opponent response...": "상대의 응답을 기다리는 중...",
+  "Both clocks are paused for up to 30 seconds.": "두 시계가 최대 30초 동안 일시 정지됩니다.",
   "Opponent requests to undo the last move.":
     "상대가 마지막 수를 되돌리기를 요청했습니다.",
   "Accept Undo": "되돌리기 수락",
@@ -531,6 +533,7 @@ const koreanTranslations: Record<string, string> = {
 const russianTranslations: Record<string, string> = {
   "Undo request sent": "Запрос отмены отправлен",
   "Waiting for opponent response...": "Ожидание ответа соперника...",
+  "Both clocks are paused for up to 30 seconds.": "Часы обоих игроков остановлены максимум на 30 секунд.",
   "Opponent requests to undo the last move.":
     "Соперник просит отменить последний ход.",
   "Accept Undo": "Принять отмену",
@@ -1572,11 +1575,11 @@ export default function ChessMultiplayerGame() {
   const orientation: "white" | "black" = myColor === "b" ? "black" : "white";
 
   /*
-   * Ranked premoves: during the opponent's turn a move can be queued. It is
+   * Multiplayer premoves: during the opponent's turn a move can be queued. It is
    * played the moment the turn comes back, without a second look, so it is a
    * gamble on the opponent's reply. Until they move it can be taken back.
    */
-  const premoveAllowed = room?.match_kind === "ranked" && gameState?.status === "playing" && !!myColor && !rankedClockWaiting;
+  const premoveAllowed = gameState?.status === "playing" && !!myColor && !rankedClockWaiting;
   const [premove, setPremove] = useState<Premove | null>(null);
   const [premoveNotice, setPremoveNotice] = useState<string | null>(null);
   const visibleFen = gameState?.fen;
@@ -3000,6 +3003,7 @@ export default function ChessMultiplayerGame() {
                     <span className="font-semibold normal-case tracking-normal text-rose-200/60">{ui("Premoves on")}</span>
                   </p>
                 )}
+                {room.match_kind !== "ranked" && <p className="px-1 text-xs font-semibold text-rose-200/60">{ui("Premoves on")}</p>}
                 {multiplayerPlayerOrder.map((color, index) => {
                   const player = color === "white" ? white : black;
                   const fallbackAvatar = color === "white" ? "m1" : "f1";
@@ -3141,6 +3145,11 @@ export default function ChessMultiplayerGame() {
                       <p className="mt-1 text-[10px] text-zinc-500">
                         {t("Waiting for opponent response...")}
                       </p>
+                      {room.match_kind === "ranked" && (
+                        <p className="mt-1 text-[10px] text-zinc-500">
+                          {t("Both clocks are paused for up to 30 seconds.")}
+                        </p>
+                      )}
                     </div>
                   )}
 
@@ -3157,6 +3166,11 @@ export default function ChessMultiplayerGame() {
                       <p className="text-xs font-bold text-amber-200">
                         {t("Opponent requests to undo the last move.")}
                       </p>
+                      {room.match_kind === "ranked" && (
+                        <p className="mt-1 text-[10px] text-zinc-500">
+                          {t("Both clocks are paused for up to 30 seconds.")}
+                        </p>
+                      )}
 
                       <div className="mt-3 grid grid-cols-2 gap-2">
                         <button
@@ -3756,133 +3770,4 @@ function getMultiplayerHistoryPieceSymbol(color: "w" | "b", piece: string) {
   };
 
   return symbols[color][piece] ?? "";
-}
-
-function PlayerBar({
-  name,
-  avatarId,
-  color,
-  active,
-  me = false,
-  rating,
-  ratingChange,
-  topRank,
-  t,
-}: {
-  name: string;
-  avatarId: string;
-  color: "white" | "black";
-  active: boolean;
-  me?: boolean;
-  rating?: number;
-  ratingChange?: { before: number; after: number };
-  topRank?: number;
-  t: (key: string) => string;
-}) {
-  useUiLanguage();
-  return (
-    <div
-      className={`
-        ${topRank ? "top-rank-glow" : ""}
-        relative
-        rounded-3xl
-        border
-        px-4
-        py-3.5
-        transition-all
-        duration-200
-
-        ${
-          active
-            ? `
-              border-amber-400/30
-              bg-[linear-gradient(145deg,rgba(39,30,13,.52),rgba(7,14,22,.95))]
-              shadow-[0_0_26px_rgba(251,191,36,0.07)]
-            `
-            : `
-              border-white/10
-              bg-[linear-gradient(145deg,rgba(10,18,28,.96),rgba(5,10,17,.94))]
-            `
-        }
-      `}
-    >
-      {topRank && <span className="absolute -top-2.5 right-4 z-10"><TopRankBadge rank={topRank} size="sm" /></span>}
-      <div className="flex items-center gap-3">
-        <div
-          className={`
-            h-14
-            w-14
-            shrink-0
-            overflow-hidden
-            rounded-full
-            ring-4 ring-white/[0.025]
-            border
-            ${color === "white" ? "border-amber-100/25" : "border-white/10"}
-          `}
-        >
-          <ProfileAvatar avatarId={avatarId} className="h-full w-full" />
-        </div>
-
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <p className="truncate text-sm font-bold text-zinc-100">{name}</p>
-
-            {me && (
-              <span
-                className="
-                  rounded-full
-                  bg-amber-400/10
-                  px-2
-                  py-0.5
-                  text-[8px]
-                  font-black
-                  uppercase
-                  tracking-widest
-                  text-amber-300
-                "
-              >
-                {t("You")}
-              </span>
-            )}
-          </div>
-
-          <p className="mt-0.5 text-[11px] text-zinc-500">
-            {color === "white" ? t("White") : t("Black")}
-          </p>
-          {rating !== undefined && <p className="mt-1 text-xs font-bold text-amber-200">{ui("Elo")} {ratingChange ? `${ratingChange.before} → ${ratingChange.after} (${ratingChange.after - ratingChange.before >= 0 ? "+" : ""}${ratingChange.after - ratingChange.before})` : rating}</p>}
-        </div>
-
-        {active && (
-          <div
-            className="
-              flex
-              shrink-0
-              items-center
-              gap-1.5
-              rounded-full
-              bg-amber-400/10
-              px-2
-              py-1
-              text-[9px]
-              font-black
-              uppercase
-              tracking-wider
-              text-amber-300
-            "
-          >
-            <span
-              className="
-                h-1.5
-                w-1.5
-                animate-pulse
-                rounded-full
-                bg-amber-400
-              "
-            />
-            {t("Turn")}
-          </div>
-        )}
-      </div>
-    </div>
-  );
 }

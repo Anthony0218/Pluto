@@ -67,19 +67,18 @@ export function entersMouth(p: Player, f: FoodObject, time: number): boolean {
 }
 export function playerFits(attacker: Player, victim: Player, time: number): boolean {
   const a = playerRadius(attacker, time), b = playerRadius(victim, time);
-  // Size is radius/diameter, NOT mass: 130% size requires 1.30² = 1.69 times
-  // mass without size effects/caps. A victim also has to fit the visible opening.
+  // Size is radius/diameter, NOT mass: 115% size requires 1.15² ≈ 1.32 times
+  // mass without size effects/caps. Being that much bigger is enough on its own.
   return attacker.ability?.kind !== 'jump' && victim.ability?.kind !== 'jump' && !attacker.escape && !victim.escape && attacker.fallingAt === undefined && victim.fallingAt === undefined && !isChoking(attacker, time) && attacker.id !== victim.id && attacker.alive && victim.alive && victim.effects.shield <= time &&
-    a + 1e-6 >= b * EAT.eating.playerEatRadiusRatio && b * 2 < mouthOpening(attacker, time);
+    a + 1e-6 >= b * EAT.eating.playerEatRadiusRatio;
 }
 export function playerEntrance(attacker: Player, victim: Player, time: number): boolean {
   const local = mouthCoordinates(attacker, victim);
   return playerFits(attacker, victim, time) && local.forward > 0 &&
     Math.abs(local.side) + playerRadius(victim, time) * .8 < playerRadius(attacker, time) * MOUTH.radius;
 }
+/** A big enough eater swallows a rival as soon as the rival's center is over the front half of its open mouth. */
 export function canEatPlayer(attacker: Player, victim: Player, time: number, map?: MapId): boolean {
-  const inward = (victim.vx - attacker.vx) * Math.cos(attacker.facing) + (victim.vy - attacker.vy) * Math.sin(attacker.facing);
-  return playerFits(attacker, victim, time) && inward <= 1 &&
-    inMouth(attacker, victim, playerRadius(victim, time), 0, time) && (!map || clearPath(map, attacker, victim));
+  return playerFits(attacker, victim, time) && mouthCoordinates(attacker, victim).forward > 0 && overFoodMouth(attacker, victim, time) && (!map || clearPath(map, attacker, victim));
 }
-export const consumptionDuration = (f: Pick<FoodObject, 'kind'>) => FOOD[f.kind].shape === 'tree' ? EAT.eating.treeAnimation : largeSwallow(f) ? 1.15 : EAT.eating.foodAnimation;
+export const consumptionDuration = (f: Pick<FoodObject, 'kind'>) => FOOD[f.kind].shape === 'tree' ? EAT.eating.treeAnimation : largeSwallow(f) ? EAT.eating.largeAnimation : EAT.eating.foodAnimation;

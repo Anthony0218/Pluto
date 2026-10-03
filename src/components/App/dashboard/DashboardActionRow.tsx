@@ -7,8 +7,8 @@ import { reorderFavorites } from "@/data/dashboard";
 
 const actions = [
   { id: "match", label: "Find a match", detail: "Jump into a game now", route: "/games", Icon: Gamepad2 },
-  { id: "friend", label: "Challenge a friend", detail: "Play someone you know", route: "/friends", Icon: Swords },
-  { id: "group", label: "Play with group", detail: "Create or join a group", route: "/groups", Icon: Users },
+  { id: "friend", label: "Challenge a friend", detail: "Play someone you know", route: "/invite", Icon: Swords },
+  { id: "group", label: "Play with your clan", detail: "Create or join a clan", route: "/clans", Icon: Users },
   { id: "ranked", label: "Play competitive (Chess)", detail: "Climb the ranked ladder", route: "/games/chess/ranked", Icon: Trophy },
 ] as const;
 

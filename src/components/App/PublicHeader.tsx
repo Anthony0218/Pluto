@@ -79,7 +79,7 @@ export default function PublicHeader({ compact = false }: { compact?: boolean })
       {dashboard || !compact ? <><NavigationToggle /><PlutoHomeLink /></> : <HeaderBrand name={brand?.name} mode={brand?.mode} />}
       {dashboard && <div id="dashboard-search-slot" className="order-3 min-w-0 basis-full sm:order-none sm:mx-auto sm:flex-1 sm:basis-auto" />}
       {!dashboard && !brand && <div className="flex-1" />}
-      <div className="ml-auto"><NavigationControls /></div>
+      <div className="ml-auto min-w-0 max-w-full"><NavigationControls /></div>
     </div>
   </header>;
 }

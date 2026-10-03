@@ -1,6 +1,8 @@
 import * as T from 'three';
 import { EAT } from './config.ts';
-import { blackHoles, cellCenter, cellPhase, sweepPath } from './hell.ts';
+import { allBlackHoles, cellCenter, cellPhase, holeRadius, sweepPath } from './hell.ts';
+import { mouthPosition } from './rules.ts';
+import { playerRadius } from './config.ts';
 import type { GameState } from './types.ts';
 /** One instanced floor, one lava plane, and a bounded black-hole effect. */
 export class HellVisuals {
@@ -50,8 +52,24 @@ export class HellVisuals {
     const rings = this.rings.map(r=>new T.Mesh(this.rimGeometry,r.material));
     const laser=new T.Mesh(this.laserGeometry,laserMaterial),arrow=new T.Mesh(this.arrowGeometry,laserMaterial);
     laser.name=i ? `sweep-laser-${i}` : 'sweep-laser'; arrow.name=i ? `sweep-arrow-${i}` : 'sweep-arrow';
-    return { pathKey:'',hole,rim,rimMaterial,rings,particles,laser,arrow,path:new T.Line(pathGeometry,pathMaterial),pathGeometry,pathMaterial,laserMaterial };
+    return { color, pathKey:'',hole,rim,rimMaterial,rings,particles,laser,arrow,path:new T.Line(pathGeometry,pathMaterial),pathGeometry,pathMaterial,laserMaterial };
   });
+  // Fireballs: additive glow shells around a hot core, flickering flame tongues and rising embers.
+  private fireCoreGeometry = new T.IcosahedronGeometry(EAT.hell.fireball.radius * .55, 2);
+  private fireCoreMaterial = new T.MeshBasicMaterial({ color: '#fff3b0' });
+  private fireGlowGeometry = new T.SphereGeometry(EAT.hell.fireball.radius, 16, 12);
+  private fireGlowMaterials = ['#ffc23a', '#ff6a1c', '#ff3312'].map((color, i) => new T.MeshBasicMaterial({ color, transparent: true, opacity: [.9, .55, .26][i], blending: T.AdditiveBlending, depthWrite: false }));
+  private flameGeometry = new T.ConeGeometry(EAT.hell.fireball.radius * .45, EAT.hell.fireball.radius * 2.1, 8);
+  private flameMaterial = new T.MeshBasicMaterial({ color: '#ffa526', transparent: true, opacity: .9, blending: T.AdditiveBlending, depthWrite: false });
+  private fireballs = Array.from({ length: EAT.hell.fireball.maxActive }, () => {
+    const group = new T.Group(), core = new T.Mesh(this.fireCoreGeometry, this.fireCoreMaterial);
+    const glows = this.fireGlowMaterials.map((material, i) => { const glow = new T.Mesh(this.fireGlowGeometry, material); glow.scale.setScalar([.85, 1.35, 2.2][i]); return glow; });
+    const flames = Array.from({ length: 7 }, () => new T.Mesh(this.flameGeometry, this.flameMaterial));
+    const halo = new T.Mesh(new T.RingGeometry(EAT.hell.fireball.radius * 1.1, EAT.hell.fireball.radius * 2.1, 32), this.fireGlowMaterials[1]); halo.rotation.x = -Math.PI / 2;
+    group.add(core, ...glows, ...flames, halo); group.visible = false; return { group, core, glows, flames, halo };
+  });
+  private emberMaterial = new T.MeshBasicMaterial({ color: '#ffd36b', transparent: true, opacity: .9, blending: T.AdditiveBlending, depthWrite: false });
+  private embers = new T.InstancedMesh(this.particleGeometry, this.emberMaterial, EAT.hell.fireball.maxActive * 10);
   private transform = new T.Object3D();
   private color = new T.Color();
   constructor(scene: T.Scene) {
@@ -66,7 +84,7 @@ export class HellVisuals {
     this.laser.name = 'sweep-laser'; this.arrow.name = 'sweep-arrow';
     this.hole.scale.y = .2; this.rim.rotation.x = -Math.PI / 2;
     this.tiles.receiveShadow = true; this.tiles.frustumCulled = false;
-    this.geyserParticles.frustumCulled=false; this.group.add(this.geyserParticles,...this.geyserCores,...this.geysers,...this.warnings,this.tiles, this.lava); this.particles.frustumCulled = false; for (const v of this.effects) this.group.add(v.hole,v.rim,v.path,...v.rings,v.particles,v.laser,v.arrow); scene.add(this.group); this.group.visible = false;
+    this.geyserParticles.frustumCulled=false; this.group.add(this.geyserParticles,...this.geyserCores,...this.geysers,...this.warnings,this.tiles, this.lava); this.particles.frustumCulled = false; for (const v of this.effects) this.group.add(v.hole,v.rim,v.path,...v.rings,v.particles,v.laser,v.arrow); this.embers.frustumCulled = false; this.group.add(this.embers, ...this.fireballs.map(f => f.group)); scene.add(this.group); this.group.visible = false;
   }
   cutMouths(holes: T.Vector3[]) {
     this.tileMaterial.onBeforeCompile = shader => {
@@ -108,17 +126,45 @@ export class HellVisuals {
     });
     this.tiles.instanceMatrix.needsUpdate = true; if (this.tiles.instanceColor) this.tiles.instanceColor.needsUpdate = true;
     this.lavaMaterial.emissiveIntensity = .8 + Math.sin(s.time * 1.8) * .12;
-    const holes = blackHoles(s);
+    const fires = h.fireballs ?? [];
+    this.fireballs.forEach((v, i) => {
+      const f = fires[i]; v.group.visible = !!f; if (!f) return;
+      const t = s.time + f.id * .37, appear = Math.min(1, (s.time - f.spawnedAt) / .35), bob = 34 + Math.sin(t * 3.2) * 6;
+      v.group.position.set(f.x, bob, f.y); v.group.scale.setScalar(appear * (1 + Math.sin(t * 7) * .06));
+      v.core.rotation.set(t * 1.3, t * 2.1, 0);
+      v.glows.forEach((glow, j) => glow.scale.setScalar([.85, 1.35, 2.2][j] * (1 + Math.sin(t * (9 + j * 3) + j) * .09)));
+      v.flames.forEach((flame, j) => {
+        const angle = j * Math.PI * 2 / 7 + t * 2.4, lick = .75 + .45 * Math.abs(Math.sin(t * 11 + j * 1.7));
+        flame.position.set(Math.cos(angle) * 9, 14 + lick * 10, Math.sin(angle) * 9); flame.scale.set(.8, lick, .8); flame.rotation.set(Math.sin(angle) * .35, 0, -Math.cos(angle) * .35);
+      });
+      v.halo.position.y = 2 - bob; v.halo.scale.setScalar(1 + Math.sin(t * 5) * .12);
+    });
+    for (let i = 0; i < this.embers.count; i++) {
+      const f = fires[Math.floor(i / 10)], k = (s.time * .9 + i * .618) % 1, angle = i * 2.4 + s.time;
+      this.transform.position.set(f ? f.x + Math.cos(angle) * 14 * (1 - k) : 0, f ? 40 + k * 70 : -500, f ? f.y + Math.sin(angle) * 14 * (1 - k) : 0);
+      this.transform.rotation.set(0, 0, 0); this.transform.scale.setScalar(f ? 1.4 * (1 - k) : 0); this.transform.updateMatrix(); this.embers.setMatrixAt(i, this.transform.matrix);
+    }
+    this.embers.instanceMatrix.needsUpdate = true;
+    // A devoured hole stays visible briefly while it is sucked into its eater's mouth and shrinks away.
+    const F = H.fireball, holes = allBlackHoles(s).filter(b => b.eatenAt === undefined || s.time - b.eatenAt < F.holeEatAnimation);
     this.effects.forEach((v,index)=> {
-    const b=holes[index]; for(const node of [v.hole,v.rim,v.path,...v.rings,v.particles,v.laser,v.arrow]) node.visible=!!b; if(!b)return; v.hole.position.set(b.x, 12, b.y); v.rim.position.set(b.x, 18, b.y); v.rim.scale.setScalar(1 + Math.sin(s.time * 5) * .035);
+    const hole=holes[index]; for(const node of [v.hole,v.rim,v.path,...v.rings,v.particles,v.laser,v.arrow]) node.visible=!!hole; if(!hole)return;
+    let b = hole, shrink = 1;
+    if (hole.eatenAt !== undefined) {
+      const eater = s.players.find(p => p.id === hole.eatenBy), t = Math.min(1, (s.time - hole.eatenAt) / F.holeEatAnimation), m = eater ? mouthPosition(eater, playerRadius(eater, s.time)) : hole;
+      b = { ...hole, x: hole.x + (m.x - hole.x) * t * t, y: hole.y + (m.y - hole.y) * t * t, warnUntil: 0 }; shrink = 1 - t;
+    }
+    const grown = holeRadius(b) / H.radius * shrink; v.hole.position.set(b.x, 12, b.y); v.hole.scale.set(grown, .2 * grown, grown); v.rim.position.set(b.x, 18, b.y); v.rim.scale.setScalar(grown * (1 + Math.sin(s.time * 5) * .035));
     const warning = s.time < b.warnUntil, pulse = 1 + Math.sin(s.time*9)*.08;
+    // Harmless sweeps (no floor damage) telegraph in a muted lilac instead of the alarm colour.
+    v.laserMaterial.color.set(b.harmless ? '#a69bc4' : v.color); v.pathMaterial.color.set(b.harmless ? '#a69bc4' : v.color);
     const energy=b.speedCategory==='extreme'?2:b.speedCategory==='fast'?1.4:1;
     v.rimMaterial.color.set(b.speedCategory==='extreme' ? '#ffebe0' : warning ? '#ffab67' : '#b168ed');
-    v.rings.forEach((ring,i)=>{ ring.position.set(b.x,16+i*4,b.y); ring.rotation.set(-Math.PI/2+Math.sin(s.time+i)*.08,Math.cos(s.time*.6+i)*.08,s.time*(i%2?-.4:.3)*energy); ring.scale.set(1.08+i*.14,1.04+i*.12,1); });
+    v.rings.forEach((ring,i)=>{ ring.position.set(b.x,16+i*4,b.y); ring.rotation.set(-Math.PI/2+Math.sin(s.time+i)*.08,Math.cos(s.time*.6+i)*.08,s.time*(i%2?-.4:.3)*energy); ring.scale.set((1.08+i*.14)*Math.max(.001,grown),(1.04+i*.12)*Math.max(.001,grown),1); });
     for(let i=0;i<40;i++) {
-      const angle=i*Math.PI*2/40+s.time*(.35+i%3*.1), radius=H.radius*(1.12+(i%5)*.07);
+      const angle=i*Math.PI*2/40+s.time*(.35+i%3*.1), radius=holeRadius(b)*shrink*(1.12+(i%5)*.07);
       this.transform.position.set(b.x+Math.cos(angle)*radius,18+Math.sin(angle*3)*7,b.y+Math.sin(angle)*radius);
-      this.transform.rotation.set(0,0,0); this.transform.scale.setScalar((warning?1.6:1)*energy*(1+i%3*.3)); this.transform.updateMatrix(); v.particles.setMatrixAt(i,this.transform.matrix);
+      this.transform.rotation.set(0,0,0); this.transform.scale.setScalar((warning?1.6:1)*energy*(1+i%3*.3)*shrink); this.transform.updateMatrix(); v.particles.setMatrixAt(i,this.transform.matrix);
     }
     v.particles.instanceMatrix.needsUpdate=true;
     const dx=b.destination.x-b.x, dy=b.destination.y-b.y, length=Math.hypot(dx,dy), direction=new T.Vector3(b.destination.x-(b.control?.x??b.x),0,b.destination.y-(b.control?.y??b.y)).normalize();
@@ -131,6 +177,8 @@ export class HellVisuals {
     });
   }
   dispose() {
+    this.fireballs.forEach(v => v.halo.geometry.dispose()); this.embers.dispose();
+    for (const resource of [this.fireCoreGeometry, this.fireCoreMaterial, this.fireGlowGeometry, ...this.fireGlowMaterials, this.flameGeometry, this.flameMaterial, this.emberMaterial]) resource.dispose();
     this.effects.forEach(v=>{v.particles.dispose();v.rimMaterial.dispose();v.laserMaterial.dispose();v.pathGeometry.dispose();v.pathMaterial.dispose();});
     this.group.removeFromParent(); this.geyserParticles.dispose(); this.tiles.dispose(); this.particles.dispose(); this.rings.forEach(ring=>ring.material.dispose());
     for (const resource of [this.geyserGeometry,this.geyserMaterial,this.geyserCoreMaterial,this.warningGeometry,this.warningMaterial,this.particleGeometry, this.particleMaterial, this.laserGeometry, this.laserMaterial, this.arrowGeometry, this.tileGeometry, this.tileMaterial, this.lavaGeometry, this.lavaMaterial, this.holeGeometry, this.holeMaterial, this.rimGeometry, this.rimMaterial, this.pathGeometry, this.pathMaterial]) resource.dispose();

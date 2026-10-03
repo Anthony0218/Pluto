@@ -8,7 +8,7 @@ export const WILD_SCENARIOS: Scenario[] = [
     id: "trapjaw", icon: "🐜", title: "Snap Launch", setting: "Forest floor · trap-jaw ants",
     behaviour: "Trap-jaw ants such as Odontomachus bauri can strike a hard surface with their powerful mandibles and launch themselves into the air to escape danger.",
     rules: [
-      "Choose one of five courses, then race across its ledges to the nest. Walk into position, adjust your launch angle, then snap your jaws against the ground. You cannot jump again or steer until you land.",
+      "Choose one of ten courses, then race across its ledges to the nest. Walk into position, adjust your launch angle, then snap your jaws against the ground. You cannot jump again or steer until you land.",
       "Coral: A/D walk and face left/right, W/S aim steeper/flatter, Space snap. Gold: left/right arrows walk, up/down arrows aim, Enter snap. Release the snap button before the next launch. On-screen hold buttons also work.",
       "A steep angle gives more height and less distance. The dotted arc previews your launch. Each new ledge saves a checkpoint; missing a ledge costs a heart and returns you there. Three falls eliminate an ant.",
       "First to the nest, or last surviving ant, wins. After 60 seconds compare highest ledge, then remaining hearts; equal results draw. Both ants reaching the nest in the same simulation step are compared by hearts.",

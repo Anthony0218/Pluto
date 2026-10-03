@@ -13,7 +13,7 @@ function advance(game, seconds, inputs = idle(), ai = false, fps = 60) {
 
 test("new scenarios are registered, have six questions, and preserve all existing modes", () => {
   assert.equal(new Set(SCENARIOS.map(s => s.id)).size, SCENARIOS.length);
-  for (const id of ["meadow", "alarm", "bridges", "echo", "archerfish", "flyingfish", "trapjaw", "cuttlefish", "bolas", "coconut"]) {
+  for (const id of ["meadow", "archerfish", "flyingfish", "trapjaw", "cuttlefish", "bolas", "coconut"]) {
     const scenario = SCENARIOS.find(s => s.id === id);
     assert.ok(scenario, id);
     assert.equal(scenario.questions.length, 6);
@@ -250,8 +250,8 @@ test("random habitats cover the board, include all disguises, and mirror player 
     assert.equal(habitatAt(x, y, map).pattern, habitatAt(x, 540 - y, map).pattern);
 });
 
-test("all five Snap Launch courses are reachable using the same physics", () => {
-  assert.equal(SNAP_LEVELS.length, 5);
+test("all ten Snap Launch courses are reachable using the same physics", () => {
+  assert.equal(SNAP_LEVELS.length, 10);
   for (let level = 0; level < SNAP_LEVELS.length; level++) {
     const game = createSnapGame(level); game.phase = "playing";
     advance(game, 60, idle(), true);

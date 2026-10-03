@@ -9,8 +9,8 @@ export class RankedAuthError extends Error {
 
 type FunctionErrorBody = { error?: string; message?: string };
 
-async function invokeWithToken<T>(body: Record<string, unknown>, token: string): Promise<T> {
-  const { data, error } = await supabase.functions.invoke<T>("ranked-chess", {
+async function invokeWithToken<T>(body: Record<string, unknown>, token: string, game: "chess" | "go"): Promise<T> {
+  const { data, error } = await supabase.functions.invoke<T>(`ranked-${game}`, {
     body,
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -25,17 +25,17 @@ async function invokeWithToken<T>(body: Record<string, unknown>, token: string):
   throw new Error(error.message);
 }
 
-export async function invokeRankedChess<T>(body: Record<string, unknown>): Promise<T> {
+export async function invokeRankedGame<T>(body: Record<string, unknown>, game: "chess" | "go" = "chess"): Promise<T> {
   const { data: { session }, error } = await supabase.auth.getSession();
-  if (error || !session?.access_token) throw new RankedAuthError("Sign in again to play multiplayer chess.");
+  if (error || !session?.access_token) throw new RankedAuthError(`Sign in again to play multiplayer ${game}.`);
   try {
-    return await invokeWithToken<T>(body, session.access_token);
+    return await invokeWithToken<T>(body, session.access_token, game);
   } catch (cause) {
     if (!(cause instanceof RankedAuthError)) throw cause;
     const { data, error: refreshError } = await supabase.auth.refreshSession();
     if (refreshError || !data.session?.access_token) throw new RankedAuthError();
     try {
-      return await invokeWithToken<T>(body, data.session.access_token);
+      return await invokeWithToken<T>(body, data.session.access_token, game);
     } catch (retryCause) {
       if (retryCause instanceof RankedAuthError) throw new RankedAuthError();
       throw retryCause;
@@ -47,11 +47,15 @@ export async function invokeRankedChess<T>(body: Record<string, unknown>): Promi
 let queueToken: string | undefined;
 void supabase.auth.getSession().then(({ data }) => { queueToken = data.session?.access_token; });
 supabase.auth.onAuthStateChange((_event, session) => { queueToken = session?.access_token; });
-export function leaveRankedQueue(sessionId: string) {
-  if (!queueToken) { void invokeRankedChess({ op: "leaveQueue", sessionId }).catch(() => {}); return; }
-  void fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ranked-chess`, {
+export function leaveRankedGameQueue(sessionId: string, game: "chess" | "go" = "chess") {
+  if (!queueToken) { void invokeRankedGame({ op: "leaveQueue", sessionId }, game).catch(() => {}); return; }
+  void fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ranked-${game}`, {
     method: "POST", keepalive: true,
     headers: { Authorization: `Bearer ${queueToken}`, apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY, "Content-Type": "application/json" },
     body: JSON.stringify({ op: "leaveQueue", sessionId }),
   }).catch(() => { /* The server lease expires even if the browser cannot send. */ });
 }
+
+// Existing Chess callers retain their API and authentication/retry behavior.
+export const invokeRankedChess = <T>(body: Record<string, unknown>) => invokeRankedGame<T>(body, "chess");
+export const leaveRankedQueue = (sessionId: string) => leaveRankedGameQueue(sessionId, "chess");

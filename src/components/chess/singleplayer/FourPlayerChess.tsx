@@ -61,6 +61,7 @@ const translations: Partial<TranslationTable> = {
     "was checkmated and eliminated.": "wurde mattgesetzt und eliminiert.",
     "was stalemated and eliminated.": "wurde pattgesetzt und eliminiert.",
     "promoted a pawn to Queen.": "hat einen Bauern zur Dame umgewandelt.",
+    "castled.": "hat rochiert.",
   },
   bar: {
     "Four Player Chess": "Vier-Spieler-Schach",
@@ -73,6 +74,7 @@ const translations: Partial<TranslationTable> = {
     "was checkmated and eliminated.": "is matt und ausgschiedn.",
     "was stalemated and eliminated.": "is patt und ausgschiedn.",
     "promoted a pawn to Queen.": "hat an Baua zur Dame gmocht.",
+    "castled.": "hat rochiert.",
   },
   ko: {
     "Four Player Chess": "4인 체스",
@@ -106,6 +108,7 @@ const translations: Partial<TranslationTable> = {
     "was checkmated and eliminated.": "체크메이트되어 탈락했습니다.",
     "was stalemated and eliminated.": "스테일메이트되어 탈락했습니다.",
     "promoted a pawn to Queen.": "폰을 퀸으로 승격했습니다.",
+    "castled.": "캐슬링했습니다.",
   },
   ru: {
     "Four Player Chess": "Шахматы на четверых",
@@ -139,6 +142,7 @@ const translations: Partial<TranslationTable> = {
     "was checkmated and eliminated.": "получил мат и выбыл.",
     "was stalemated and eliminated.": "получил пат и выбыл.",
     "promoted a pawn to Queen.": "превратил пешку в ферзя.",
+    "castled.": "сделал рокировку.",
   },
 };
 
@@ -189,6 +193,7 @@ function moveNotation(state: FourPlayerState) {
     return "";
   }
 
+  if (move.castle) return move.castle === "king" ? "O-O" : "O-O-O";
   const capture = move.captured ? "×" : "–";
   const promotion = move.promoted ? "=Q" : "";
 
@@ -216,6 +221,9 @@ function translateFourPlayerEvent(
 
   match = text.match(new RegExp(`^${color} wins the game\.$`));
   if (match) return `${t(match[1])} ${t("wins")}.`;
+
+  match = text.match(new RegExp(`^${color} castled\.$`));
+  if (match) return `${t(match[1])} ${t("castled.")}`;
 
   match = text.match(new RegExp(`^${color} promoted a pawn to Queen\.$`));
   if (match) return `${t(match[1])} ${t("promoted a pawn to Queen.")}`;

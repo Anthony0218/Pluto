@@ -106,9 +106,16 @@ test("dataset version mismatch is rejected", () => {
   assert.throws(() => verifyMatchDataset(version, "old-snapshot"), /dataset mismatch/i);
 });
 
-test("Atlas Edge Function never accepts a client-computed score", async () => {
+test("Atlas Edge Function scores question rounds itself; only races report their own score", async () => {
   const source = await readFile(new URL("../supabase/functions/atlas-match/index.ts", import.meta.url), "utf8");
-  assert.doesNotMatch(source, /body\.score/);
   assert.match(source, /createAuthoritativeSubmission/);
   assert.match(source, /resolveRoundScores/);
+  // Races (Speed Run, Map Fill, the stat modes) run on each device, so their score is reported by the client —
+  // but only through the guarded "progress" operation, never for a server-run round.
+  const reads = [...source.matchAll(/body\.score/g)];
+  assert.equal(reads.length, 1);
+  const opening = 'body.op === "progress"';
+  const progress = source.slice(source.indexOf(opening) + opening.length, reads[0].index);
+  assert.match(progress, /if \(!isRaceMode\(match\.mode\)\) throw/);
+  assert.ok(!progress.includes("body.op ==="), "the client score is read inside the progress operation");
 });

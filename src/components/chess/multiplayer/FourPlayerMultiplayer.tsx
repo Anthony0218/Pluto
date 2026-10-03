@@ -1,3 +1,5 @@
+import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
+import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
@@ -97,6 +99,7 @@ function sameSquare(a: FourPlayerSquare, b: FourPlayerSquare) {
 function moveNotation(state: FourPlayerState) {
   const move = state.lastMove;
   if (!move) return state.event ?? "Action";
+  if (move.castle) return move.castle === "king" ? "O-O" : "O-O-O";
   const capture = move.captured ? "×" : "–";
   const promotion = move.promoted ? "=Q" : "";
   return `${fourPlayerSquareName(move.from)}${capture}${fourPlayerSquareName(move.to)}${promotion}`;
@@ -196,6 +199,8 @@ export function FourPlayerMultiplayerLobby() {
     return user?.email?.split("@")[0]?.trim() || "Player";
   }, [profile?.username, user?.email]);
 
+  useInviteAutoCreate(() => createRoom());
+
   async function createRoom() {
     if (!user) return setError("Sign in first.");
     setLoading("create");
@@ -210,7 +215,7 @@ export function FourPlayerMultiplayerLobby() {
     );
     setLoading(null);
     if (rpcError) return setError(rpcError.message);
-    navigate(`/games/chess/variants/4-players/multiplayer/${String(data)}`);
+    navigate(recordCreatedGameInvite(`/games/chess/variants/4-players/multiplayer/${String(data)}`));
   }
 
   async function joinRoom() {

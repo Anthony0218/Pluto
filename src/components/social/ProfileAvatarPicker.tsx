@@ -1,3 +1,5 @@
+import { decodePixelAvatar, PIXEL_PALETTE, PIXEL_SIZE } from "./pixelAvatar";
+
 type Mood = "happy" | "smile" | "calm" | "serious" | "wink" | "excited";
 
 type HairStyle =
@@ -43,7 +45,7 @@ type AvatarPreset = {
   muzzle?: string;
   nose?: string;
 };
-export const avatarPresets: AvatarPreset[] = [
+const avatarPresets: AvatarPreset[] = [
   {
     id: "m1",
     name: "Happy",
@@ -294,6 +296,9 @@ export function ProfileAvatar({
   avatarId: string;
   className?: string;
 }) {
+  const pixels = decodePixelAvatar(avatarId);
+  if (pixels) return <PixelAvatarImage pixels={pixels} className={className} />;
+
   const avatar =
     avatarPresets.find((item) => item.id === avatarId) ?? avatarPresets[0];
 
@@ -745,12 +750,25 @@ export function ProfileAvatar({
   );
 }
 
+export function PixelAvatarImage({ pixels, className = "" }: { pixels: number[]; className?: string }) {
+  return (
+    <svg viewBox={`0 0 ${PIXEL_SIZE} ${PIXEL_SIZE}`} className={className} role="img" aria-label="Pixel avatar" shapeRendering="crispEdges">
+      <rect width={PIXEL_SIZE} height={PIXEL_SIZE} fill={PIXEL_PALETTE[0]} />
+      {pixels.map((index, cell) => index === 0 ? null : (
+        <rect key={cell} x={cell % PIXEL_SIZE} y={Math.floor(cell / PIXEL_SIZE)} width="1.02" height="1.02" fill={PIXEL_PALETTE[index]} />
+      ))}
+    </svg>
+  );
+}
+
 export default function ProfileAvatarPicker({
   selected,
   onSelect,
+  disabled = false,
 }: {
   selected: string;
   onSelect: (avatarId: string) => void;
+  disabled?: boolean;
 }) {
   return (
     <div className="grid grid-cols-4 gap-3 sm:grid-cols-6">
@@ -763,6 +781,8 @@ export default function ProfileAvatarPicker({
             type="button"
             onClick={() => onSelect(avatar.id)}
             title={avatar.name}
+            aria-pressed={active}
+            disabled={disabled}
             className={`
               overflow-hidden
               rounded-2xl
@@ -784,7 +804,7 @@ export default function ProfileAvatarPicker({
 
             <p
               className={`py-1 text-[9px] font-bold ${
-                active ? "text-amber-300" : "text-zinc-600"
+                active ? "text-amber-300" : "text-zinc-400"
               }`}
             >
               {avatar.name}

@@ -1,31 +1,44 @@
 /** Gameplay values are shared by the browser and the authoritative Edge Function. */
 export const EAT = {
-  pluto: { multiplier: 2, minMultiplier: 1.25, maxMultiplier: 5, interval: 12, maxActive: 12, initialCount: 6 },
+  /** Pluto is always on: a fixed, strong bonus-growth object (no menu setting). */
+  pluto: { multiplier: 4, interval: 10, maxActive: 14, initialCount: 8 },
   lives: { count: 3, respawnDelay: 5 },
   escape: { friendshipDuration: 60, approachDuration: .65, travelDuration: 3, hellDuration: 2, pigeonHellDuration: 5 },
   hell: {
     normalDuration: 600, soloDuration: 60, transitionDuration: 2,
-    cellSize: 80, columns: 36, rows: 24, left: 560, top: 560, characterScale: 2, spawnRadius: 560,
+    cellSize: 80, columns: 44, rows: 30, left: 240, top: 320, characterScale: 2, spawnRadius: 700,
     eruptionInterval: 30, eruptionVariation: 3, eruptionWarning: 2, eruptionDuration: 1.2, eruptionRadius: 95, eruptionPush: 150,
     speedInterval: 12, warningDuration: .65, destructionDuration: .4, fallDuration: .75,
     sweepWarning: 1.1, extremeWarning: 2, baseSpeed: 230, maxSpeed: 390, radius: 90,
     slowChance: .16, fastThreshold: .76, extremeThreshold: .96, curveChance: .12,
     speedFactors: { slow: .7, normal: 1, fast: 1.55, extreme: 2.7 },
     pauseChancePerSecond: .16, pauseMin: .5, pauseMax: 1.5,
+    minBlackHoles: 1, maxBlackHoles: 2,
+    /** Share of sweeps whose path actually breaks the floor; the rest pass over harmlessly. */
+    destructiveChance: .5,
+    /** Late-game pressure: after this long in Hell the floor crumbles inward, one outer ring per interval. */
+    collapseAfter: 150, collapseInterval: 5,
+    /** Each fireball multiplies mass by `growth` (> 1.3225 = the 1.15x radius bite rule), so one fireball lead is enough to devour an equal rival.
+     *  Past `softMass` every fireball adds a fixed `softMass * (growth - 1)` instead, so growth slows but never stops. */
+    fireball: { radius: 24, growth: 1.45, softMass: 1200, initialCount: 6, interval: 2.4, maxActive: 9, holeGrowth: 7, holeMaxRadius: 150, holeEatCount: 10, holeEatAnimation: .8 },
   },
   player: { startingMass: 36, minMass: 12, minRadius: 14, radiusScale: 4,
-    acceleration: 760, friction: 6, baseSpeed: 210, sizeSpeedPenalty: 0.14, minSpeedFactor: 0.58, turnSpeed: 7, bodyPush: 0.48 },
-  eating: { playerEatRadiusRatio: 1.30, playerMassTransfer: 0.70,
-    treeEntryDuration: .65, treeAnimation: 1.5, foodAnimation: 0.48, playerAnimation: 0.56 },
-  food: { spawnCount: 680, respawnInterval: 0.15, maxObjects: 720, gravity: 310 },
-  powerups: { spawnInterval: 5, maxObjects: 18, radius: 15,
+    acceleration: 920, friction: 6, baseSpeed: 255, sizeSpeedPenalty: 0.14, minSpeedFactor: 0.58, turnSpeed: 7, bodyPush: 0.48 },
+  eating: { playerEatRadiusRatio: 1.15, playerMassTransfer: 0.70, chokeDuration: 1.5,
+    treeEntryDuration: .65, treeAnimation: 2.1, foodAnimation: 0.95, largeAnimation: 1.8, playerAnimation: 0.7, npcAnimation: .48 },
+  food: { spawnCount: 720, respawnInterval: 0.07, skyDropsPerTick: 3, maxObjects: 1000, gravity: 310, cityBuildings: 64,
+    /** Eaten houses, towers and vehicles come back; some of them crash down from the sky. */
+    bigRespawnInterval: 1.2, bigSkyChance: .45, bigReserve: 80 },
+  powerups: { spawnInterval: 8, maxObjects: 9, radius: 15,
     jump: { duration: 0, distance: 320, flightDuration: .95, height: 125, weight: 20, cooldown: 24, maxActive: 1 },
-    strike: { duration: 0, distance: 180, burstDuration: .45, windup: .06, weight: 4, hellWeight: 10, cooldown: 35, maxActive: 1 },
-    speed: { duration: 15, strength: 1.5 }, shield: { duration: 30 },
+    strike: { duration: 0, distance: 300, burstDuration: .52, windup: .06, weight: 40, cooldown: 10, maxActive: 3,
+      /** Hell runs its own frequent Strike spawner, independent of the speed/jump roll. */
+      hellInterval: 4, hellMaxActive: 3 },
+    speed: { duration: 15, strength: 1.5 }, shield: { duration: 15, weight: 8, cooldown: 45, maxActive: 1 },
     magnet: { duration: 15, range: 180, strength: 220 },
     multiplier: { duration: 20, strength: 2, weight: 2, cooldown: 60, maxActive: 1 }, divider: { duration: 0, strength: .5, weight: 1, cooldown: 90, maxActive: 1 } },
-  match: { maxPlayers: 8, width: 4000, height: 3040, zoneStart: 120, zoneEnd: 300, zoneMassLoss: 18 },
-  camera: { minZoom: 0.62, maxZoom: 1.32, zoomCurve: 0.25, followRate: 5, growthRate: 9 },
+  match: { maxPlayers: 8, width: 4000, height: 3040, zoneStart: 120, zoneEnd: 300, zoneMassLoss: 18, victoryLap: 10, resultsFadeMs: 700 },
+  camera: { minZoom: 0.8, maxZoom: 1.32, zoomCurve: 0.18, minUserZoom: 0.6, maxUserZoom: 2.5, followRate: 5, growthRate: 9 },
   network: { tickRate: 30, inputIntervalMs: 125, interpolationMs: 120, maxExtrapolationMs: 160,
     inputTimeoutMs: 650, disconnectMs: 20000, maxCatchupSeconds: 1, maxRetries: 6, lobbyPollMs: 1500,
     requestTimeoutMs: 5000, maxSnapshots: 32 },
@@ -34,7 +47,7 @@ export const EAT = {
 } as const;
 
 export type ObjectCategory = 'tiny' | 'small' | 'medium' | 'large' | 'very-large' | 'huge';
-export type ObjectShape = 'food' | 'coin' | 'leaf' | 'stone' | 'flower' | 'book' | 'ball' | 'pot' | 'chair' | 'bench' | 'bicycle' | 'bin' | 'sign' | 'barrel' | 'tree' | 'log' | 'vehicle' | 'sofa' | 'table' | 'machine' | 'boat' | 'building' | 'pluto' | 'cup' | 'cone' | 'box' | 'skateboard' | 'hydrant' | 'acorn' | 'pinecone' | 'nest' | 'tent' | 'hay' | 'cart' | 'phone' | 'shrine';
+export type ObjectShape = 'lamp' | 'mailbox' | 'meter' | 'campfire' | 'scarecrow' | 'beehive' | 'food' | 'coin' | 'leaf' | 'stone' | 'flower' | 'book' | 'ball' | 'pot' | 'chair' | 'bench' | 'bicycle' | 'bin' | 'sign' | 'barrel' | 'tree' | 'log' | 'vehicle' | 'sofa' | 'table' | 'machine' | 'boat' | 'building' | 'pluto' | 'cup' | 'cone' | 'box' | 'skateboard' | 'hydrant' | 'acorn' | 'pinecone' | 'nest' | 'tent' | 'hay' | 'cart' | 'phone' | 'shrine';
 function object(width: number, height: number, mass: number, growth: number, category: ObjectCategory, shape: ObjectShape, color: string, city: number, nature: number) {
   return { width, height, radius: Math.hypot(width, height) / 2, mass, growth, score: growth * 5, category, tier: category, shape, color,
     visualFootprint: { width, height }, physicalFootprint: { width, height },
@@ -112,12 +125,35 @@ export const FOOD = {
   kiosk: object(115, 108, 2200, 100, 'very-large', 'building', '#e3b375', 2, 0),
   shed: object(130, 112, 2400, 110, 'very-large', 'building', '#b39371', 1, 3),
   cabin: object(170, 140, 4000, 150, 'huge', 'building', '#ac8664', 0, 3),
-  house: object(195, 170, 5000, 180, 'huge', 'building', '#dbc39d', 2, 0),
-  cafe: object(205, 145, 5500, 190, 'huge', 'building', '#d89981', 2, 0),
-  garage: object(180, 152, 4600, 165, 'huge', 'building', '#9eacb1', 2, 0),
+  house: object(195, 170, 5000, 180, 'huge', 'building', '#dbc39d', 5, 0),
+  cafe: object(205, 145, 5500, 190, 'huge', 'building', '#d89981', 3, 0),
+  garage: object(180, 152, 4600, 165, 'huge', 'building', '#9eacb1', 3, 0),
   barn: object(235, 185, 7000, 230, 'huge', 'building', '#b67c69', 0, 2),
   cottage: object(205, 180, 6000, 200, 'huge', 'building', '#cfb78d', 0, 2),
-  apartment: object(290, 250, 12000, 300, 'huge', 'building', '#a8b6b9', 1, 0),
+  apartment: object(290, 250, 12000, 300, 'huge', 'building', '#a8b6b9', 2, 0),
+  townhouse: object(150, 150, 3400, 130, 'very-large', 'building', '#c9a08a', 4, 0),
+  mansion: object(285, 240, 11000, 290, 'huge', 'building', '#e6d2b0', 2, 0),
+  officeTower: object(230, 210, 16000, 360, 'huge', 'building', '#8fa7b8', 2, 0),
+  skyscraper: object(250, 245, 24000, 460, 'huge', 'building', '#7f97ad', 2, 0),
+  farmhouse: object(250, 205, 8000, 240, 'huge', 'building', '#d8c39a', 0, 2),
+  windmill: object(210, 210, 14000, 340, 'huge', 'building', '#e3d6bd', 0, 2),
+  giantBoulder: object(240, 200, 15000, 330, 'huge', 'stone', '#98a29b', 0, 2),
+  hotDog: object(34, 16, 4, 6, 'tiny', 'food', '#e0a65e', 6, 0),
+  iceCream: object(18, 30, 3, 5, 'tiny', 'food', '#f4c7d9', 6, 0),
+  newspaper: object(26, 20, 3, 4, 'tiny', 'book', '#e6e2d6', 6, 0),
+  mailbox: object(30, 30, 45, 22, 'medium', 'mailbox', '#5f86c4', 4, 0),
+  parkingMeter: object(18, 18, 30, 16, 'small', 'meter', '#8a9aa3', 4, 0),
+  scooter: object(56, 22, 20, 18, 'small', 'bicycle', '#e2795f', 4, 0),
+  streetLamp: object(26, 26, 70, 26, 'medium', 'lamp', '#4d5c63', 4, 0),
+  taxi: object(150, 74, 1100, 95, 'very-large', 'vehicle', '#f2c94c', 3, 0),
+  bus: object(250, 96, 3600, 170, 'huge', 'vehicle', '#d9654f', 2, 0),
+  pumpkin: object(36, 32, 10, 11, 'small', 'food', '#ec9a3c', 0, 6),
+  carrot: object(10, 28, 2, 3, 'tiny', 'food', '#f08a3a', 0, 8),
+  beehive: object(26, 32, 6, 9, 'small', 'beehive', '#e3b64a', 0, 5),
+  campfire: object(54, 54, 40, 24, 'medium', 'campfire', '#8a5a3c', 0, 4),
+  scarecrow: object(56, 30, 35, 26, 'medium', 'scarecrow', '#c9a25a', 0, 4),
+  wheelbarrow: object(72, 42, 50, 28, 'medium', 'cart', '#7d9a6a', 0, 4),
+  canoe: object(150, 42, 400, 70, 'large', 'boat', '#c4734f', 0, 3),
 } as const;
 export type FoodKind = keyof typeof FOOD;
 export type PowerKind = 'speed' | 'shield' | 'magnet' | 'multiplier' | 'divider' | 'jump' | 'strike';
@@ -130,10 +166,13 @@ export const massToSpeed = (mass: number) => EAT.player.baseSpeed * Math.max(EAT
 export const playerRadius = (p: { mass: number; hellScale?: number }, _time = 0) => { void _time; return massToRadius(p.mass) * (p.hellScale ?? 1); };
 export const MATCH_DURATIONS = [120, 600, 1200] as const;
 export const matchDuration = (s: { settings?: { matchDuration?: number } }) => s.settings?.matchDuration ?? EAT.hell.normalDuration;
+export const FIREBALL_NAME = 'Fireball';
 export const POWER_NAME: Record<PowerKind, string> = { speed: 'Speed Boost', shield: 'Shield', magnet: 'Magnet', multiplier: '2x Growth', divider: 'Growth /2', jump: 'Jump', strike: 'Strike' };
 
 export const PLUTO_TIERS = [{ kind: 'plutoTiny', weight: 55 }, { kind: 'plutoSmall', weight: 25 }, { kind: 'plutoMedium', weight: 12 }, { kind: 'plutoLarge', weight: 6 }, { kind: 'plutoGiant', weight: 2 }] as const;
 export const isPluto = (kind: FoodKind) => FOOD[kind].shape === 'pluto';
+/** Houses, towers, vehicles and other very large props: kept topped up by respawns. */
+export const isBigProp = (kind: FoodKind) => !['pluto', 'shrine'].includes(FOOD[kind].shape) && (FOOD[kind].building || FOOD[kind].shape === 'vehicle' || ['huge', 'very-large'].includes(FOOD[kind].category));
 
-/** Camera zoom only partially offsets growth; above the zoom floor, screen radius grows as mass^0.25. */
+/** Camera zoom only partially offsets growth; above the zoom floor, screen radius grows as mass^0.24. */
 export const cameraZoom = (mass: number) => Math.max(EAT.camera.minZoom, Math.min(EAT.camera.maxZoom, EAT.camera.maxZoom * (EAT.player.startingMass / Math.max(EAT.player.startingMass, mass)) ** EAT.camera.zoomCurve));

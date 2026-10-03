@@ -84,7 +84,7 @@ function finish(game: ToolGame) {
   }
   game.phase = "finished";
 }
-export function updateToolGame(game: ToolGame, inputs: [ToolInput, ToolInput], seconds: number, ai: boolean) {
+export function updateToolGame(game: ToolGame, inputs: [ToolInput, ToolInput], seconds: number, ai: boolean, difficulty: "easy" | "normal" | "hard" = "normal") {
   if (game.phase !== "playing" || !Number.isFinite(seconds) || seconds <= 0) return;
   let remaining = Math.min(seconds, 0.1);
   while (remaining > 0.000001 && game.phase === "playing") {
@@ -92,7 +92,7 @@ export function updateToolGame(game: ToolGame, inputs: [ToolInput, ToolInput], s
     game.time = Math.max(0, game.time - dt); game.elapsed += dt;
     if (ai) {
       game.aiThink -= dt;
-      if (game.aiThink <= 0) { game.aiInput = chooseToolInput(game, 1); game.aiThink = 0.2; }
+      if (game.aiThink <= 0) { game.aiInput = chooseToolInput(game, 1); game.aiThink = difficulty === "easy" ? 0.4 : difficulty === "hard" ? 0.1 : 0.2; }
     }
     const actual: [ToolInput, ToolInput] = [inputs[0], ai ? game.aiInput : inputs[1]];
     if (game.kind === "bolas") stepBolas(game, actual, dt); else stepCoconut(game, actual, dt);

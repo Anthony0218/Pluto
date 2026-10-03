@@ -340,6 +340,11 @@
 .incoming-toast-title { margin-top: 3px; padding-right: 18px; font-size: 14px; line-height: 1.35; color: #cbd5e1; overflow-wrap: anywhere; }
 .incoming-toast-title strong { color: #fff; }
 .incoming-toast-detail { margin-top: 2px; font-size: 12px; color: #94a3b8; }
+.incoming-toast-body { margin-top: 3px; font-size: 13px; line-height: 1.4; color: #e2e8f0; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.incoming-toast.is-clan { border-color: #2dd4bf59; background: linear-gradient(150deg, #0f2a33f2, #0b1027f7 62%); }
+.incoming-toast.is-clan .incoming-toast-eyebrow { color: #5eead4; }
+.incoming-toast.is-clan .incoming-toast-actions button.is-accept { background: #0d9488; }
+.incoming-toast.is-clan .incoming-toast-actions button.is-accept:hover { background: #14b8a6; }
 .incoming-toast-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .incoming-toast-actions button { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 13px; border: 1px solid #ffffff26; border-radius: 10px; background: #ffffff0d; color: #e2e8f0; font-size: 13px; font-weight: 700; transition: background .15s, border-color .15s; }
 .incoming-toast-actions button:hover { background: #ffffff1a; border-color: #ffffff40; }
@@ -358,6 +363,7 @@
 .dnd-switch:hover { border-color: #ffffff33; }
 .dnd-switch:focus-visible { outline: 2px solid #fcd34d; outline-offset: 2px; }
 .dnd-switch[aria-checked="true"] { border-color: #a78bfa66; background: #7c3aed1f; }
+.dnd-switch:disabled { opacity: .55; cursor: not-allowed; }
 .dnd-switch-copy { display: flex; align-items: center; gap: 11px; min-width: 0; }
 .dnd-switch-copy strong { display: block; font-size: 14px; color: #fff; }
 .dnd-switch-copy small { display: block; margin-top: 1px; font-size: 12px; line-height: 1.4; color: #94a3b8; }
@@ -370,3 +376,18 @@
    on game boards it stacks above the chess sidebar toggle. */
 .room-friends-trigger { position: fixed; z-index: 100; bottom: 16px; left: 16px; }
 body:has(.chess-game-grid) .room-friends-trigger { bottom: 62px; }
+
+/* A single fixed friends drawer for the dashboard and other routes. */
+.dashboard-workspace > .dashboard-main { width:100%; }
+.dashboard-drawer { overflow:hidden;width:min(460px,95vw);height:100dvh;max-height:100dvh;overscroll-behavior:none; }
+.dashboard-drawer > div { height:100%;display:flex;flex-direction:column;padding:16px; }
+.dashboard-drawer .play-friends { padding:12px;flex:none; }
+.dashboard-drawer .dash-section-heading { margin-bottom:10px;flex-wrap:wrap;gap:8px; }
+.dashboard-drawer .dash-section-heading h2 { font-size:16px; }
+.dashboard-drawer .dash-section-heading p,.dashboard-drawer .friend-actions { display:none; }
+.dashboard-drawer .friends-body { display:block; }
+.dashboard-drawer .friend-avatar-row { flex-wrap:wrap;overflow:visible;gap:8px; }
+.dashboard-drawer .game-invite-panel { padding:12px; }
+.dashboard-drawer .game-invite-panel h2 { font-size:16px; }
+@media(max-height:740px) { .dashboard-drawer .game-invite-panel .invite-game-preview { display:none; } .dashboard-drawer .game-invite-panel select,.dashboard-drawer .game-invite-panel input { padding-top:7px;padding-bottom:7px; } .dashboard-drawer .game-invite-panel label { margin-top:8px; } .dashboard-drawer .game-invite-panel button { padding-top:8px;padding-bottom:8px; } .dashboard-drawer > div > div:first-child { margin-bottom:8px; } }
+@media(max-height:590px) { .dashboard-drawer .play-friends .friends-body { display:none; } .dashboard-drawer .play-friends { padding:8px; } .dashboard-drawer .dash-section-heading { margin:0; } .dashboard-drawer .game-invite-panel > div { margin-top:8px; } }

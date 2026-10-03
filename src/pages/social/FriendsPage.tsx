@@ -1,3 +1,4 @@
+import GameInvitePanel from "@/components/social/GameInvitePanel";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Bell, Check, Gamepad2, Mail, Search, UserPlus, Users, X } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
@@ -10,6 +11,8 @@ import MyGroupsCard from "../../components/social/MyGroupsCard";
 import { useDashboardData, type DashboardNotification } from "@/hooks/useDashboardData";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { getFriendMessageBaseline } from "@/components/App/dashboard/messageReadState";
+import { FriendPresenceText, SpectateRequestButton } from "@/components/social/FriendPresence";
+import UserLink from "@/components/social/UserLink";
 
 type IncomingRequest = FriendRequest & {
   sender: PublicProfile | null;
@@ -30,7 +33,7 @@ export default function FriendsPage() {
 function FriendsPageContent() {
   useUiLanguage();
   const { user, loading: authLoading } = useAuth();
-  const { notifications, onlineIds } = useDashboardData();
+  const { notifications, onlineIds, presence } = useDashboardData();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const requestedFriendId = searchParams.get("friend");
@@ -325,9 +328,9 @@ function FriendsPageContent() {
                     >
                       <FriendAvatar profile={profile} size="sm" />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-white">
+                        <UserLink userId={profile.id} className="block truncate text-sm font-semibold text-white">
                           {profile.display_name || profile.username || "Player"}
-                        </p>
+                        </UserLink>
                         {profile.username && (
                           <p className="truncate text-xs text-zinc-500">
                             @{profile.username}
@@ -371,11 +374,11 @@ function FriendsPageContent() {
                         size="sm"
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-white">
+                        <UserLink userId={request.sender_id} className="block truncate text-sm font-semibold text-white">
                           {request.sender
                             ? profileLabel(request.sender)
                             : "Player"}
-                        </p>
+                        </UserLink>
                       </div>
                       <button
                         onClick={() => void acceptRequest(request.id)}
@@ -423,9 +426,9 @@ function FriendsPageContent() {
                     const online = onlineIds.includes(friend.id);
                     const unreadCount = notifications.filter(item => item.kind === "message" && item.senderId === friend.id && Date.parse(item.createdAt) > messageBaseline && !readMessageIds.includes(item.id)).length;
                     return (
+                      <div key={friend.id}>
                       <button
                         type="button"
-                        key={friend.id}
                         onClick={() => openFriend(friend.id)}
                         className={`flex w-full items-center gap-3 rounded-xl border p-3 text-left transition ${
                           active
@@ -440,9 +443,11 @@ function FriendsPageContent() {
                           >
                             {friend.display_name || friend.username || "Player"}
                           </p>
-                          <p className={`truncate text-xs ${online ? "text-emerald-300" : "text-zinc-500"}`}>{online ? ui("Online now") : ui("Offline")}{unreadCount ? ` · ${unreadCount} ${ui("New message")}${unreadCount === 1 ? "" : "s"}` : ""}</p>
+                          <p className="truncate text-xs"><FriendPresenceText presence={presence[friend.id]} online={online} />{unreadCount ? <span className="text-rose-300"> · {unreadCount} {ui("New message")}{unreadCount === 1 ? "" : "s"}</span> : ""}</p>
                         </div>
                       </button>
+                      <SpectateRequestButton friendId={friend.id} presence={presence[friend.id]} className="mb-2 ml-[68px]" />
+                      </div>
                     );
                   })}
                 </div>
@@ -450,6 +455,7 @@ function FriendsPageContent() {
             </section>
           </aside>
 
+          <div className="space-y-4">
           {selectedFriend ? (
             <FriendChat key={selectedFriend.id} friend={selectedFriend} />
           ) : (
@@ -465,6 +471,8 @@ function FriendsPageContent() {
               </div>
             </section>
           )}
+          <GameInvitePanel />
+          </div>
         </div>
       </div>
     </main>

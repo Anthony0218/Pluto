@@ -5,6 +5,17 @@ import { getWattenCardImage } from "@/utils/WattenCardImages";
 import { RANKS, SUITS, SUIT_SYMBOLS, WATTEN_CARD_CLIP, canPlayWattenCard, type Rank, type Suit, type WattenCard } from "@/utils/watten";
 import { botShouldHold, botShouldRaise, chooseBotCard } from "@/games/watten/bot";
 import { advanceSingleWatten, canRaiseSingleWatten, createSingleWattenRound, cutSingleWatten, declareSingleWatten, playSingleWattenCard, raiseSingleWatten, respondSingleWattenBid, teamOf, type SingleWattenState } from "@/games/watten/singleplayer";
+import { useTableTheme } from "@/context/TableThemeContext";
+import { useAuth } from "@/context/AuthContext";
+import { ProfileAvatar } from "@/components/social/ProfileAvatarPicker";
+import { HeaderTools } from "@/components/App/PublicHeader";
+import CardThemeSelector from "@/components/Watten/WattenCardGameSelector";
+import TableThemeSelector from "@/components/App/TableThemeSelector";
+import WattenTurnNotice from "@/components/Watten/WattenTurnNotice";
+import { wattenPlayAnimation, wattenSeatPosition, wattenTableStyle } from "@/games/watten/presentation";
+import { isTrumpfOderKritischActive, mustFollowTrumpfOderKritisch } from "@/utils/watten";
+import "@/components/Watten/wattenGameScreen.css";
+import "./wattenMenus.css";
 import { ui, useUiLanguage } from "@/i18n/ui";
 
 function CardImage({ card, className = "" }: { card: WattenCard; className?: string }) {
@@ -13,6 +24,9 @@ function CardImage({ card, className = "" }: { card: WattenCard; className?: str
 }
 export default function WattenSingleplayer() {
   useUiLanguage();
+  const { tableTheme } = useTableTheme();
+  const { profile } = useAuth();
+  const avatarId = profile?.avatar_id ?? "m1";
   const [count, setCount] = useState<3 | 4>(3);
   const [game, setGame] = useState<SingleWattenState | null>(null);
   const [trump, setTrump] = useState<Suit>("Herz");
@@ -55,25 +69,110 @@ export default function WattenSingleplayer() {
     try { setGame(playSingleWattenCard(game, card.id)); setNotice(null); }
     catch (error) { setNotice(error instanceof Error ? error.message : ui("Illegal card.")); }
   }
-  if (!game) return <main className="mx-auto min-h-[var(--app-height)] max-w-5xl px-4 py-12 text-white"><Link to="/games/watten" className="text-amber-200 hover:underline">← {ui("Watten")}</Link><section className="mt-8 rounded-3xl border border-amber-300/20 bg-[#14251d] p-7 shadow-2xl sm:p-10"><p className="text-xs font-black uppercase tracking-[.24em] text-amber-200">{ui("Watten")}</p><h1 className="mt-3 font-serif text-4xl">{ui("Singleplayer")}</h1><p className="mt-3 max-w-xl text-sm leading-6 text-zinc-300">{ui("Play against rule-aware bots. Choose three players for solo against two, or four players for teams.")}</p><div className="mt-7 grid gap-3 sm:grid-cols-2">{([3, 4] as const).map(value => <button key={value} type="button" aria-pressed={count === value} onClick={() => setCount(value)} className={`rounded-xl border p-5 text-left text-lg font-bold transition ${count === value ? "border-amber-300 bg-amber-300/15" : "border-white/10 bg-white/5 hover:border-amber-300/30"}`}>{value} {ui("Players")}<span className="mt-1 block text-sm font-normal text-zinc-400">{ui(value === 3 ? "One solo player against a team of two." : "Two fixed teams with partners sitting opposite each other.")}</span></button>)}</div><button type="button" onClick={() => setGame(createSingleWattenRound(count))} className="mt-7 rounded-xl bg-amber-300 px-6 py-3 font-black text-[#172015] hover:bg-amber-200">{ui("Start Game")}</button></section></main>;
+  if (!game) return (
+    <main className="watten-menu px-4 py-8 text-white sm:py-12">
+      <div className="mx-auto max-w-2xl">
+        <section className="watten-menu__panel rounded-3xl border p-5 sm:p-8">
+          <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">{ui("Bavarian Watten")}</p>
+          <h1 className="mt-2 text-3xl font-black">{ui("Singleplayer")}</h1>
+          <p className="mt-2 text-sm leading-6 text-zinc-400">{ui("Play against rule-aware bots. Choose three players for solo against two, or four players for teams.")}</p>
+          <p className="mb-3 mt-6 text-sm font-bold text-zinc-300">{ui("Number of players")}</p>
+          <div className="grid grid-cols-2 gap-3">
+            {([3, 4] as const).map(value => (
+              <button key={value} type="button" aria-pressed={count === value} onClick={() => setCount(value)} className={`rounded-2xl border p-4 text-left transition sm:p-5 ${count === value ? "border-amber-400 bg-amber-400/10" : "border-white/10 bg-white/5 hover:bg-white/10"}`}>
+                <span className="text-xl font-black">{value} {ui("Players")}</span>
+                <span className="mt-2 block text-xs leading-5 text-zinc-400">{ui(value === 3 ? "One solo player against a team of two." : "Two fixed teams with partners sitting opposite each other.")}</span>
+              </button>
+            ))}
+          </div>
+          <div className="mt-6 flex items-center gap-3 rounded-2xl border border-white/10 bg-black/20 p-4">
+            <ProfileAvatar avatarId={avatarId} className="h-12 w-12 shrink-0 rounded-xl" />
+            <div><p className="font-bold">{profile?.username || ui("You")}</p><p className="text-xs text-zinc-400">{count - 1} {ui("Bots")}</p></div>
+          </div>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <button type="button" onClick={() => { setGame(createSingleWattenRound(count)); document.querySelector(".app-viewport")?.scrollTo(0, 0); }} className="flex-1 rounded-xl bg-amber-400 px-6 py-3 font-black text-amber-950 hover:bg-amber-300">{ui("Start Game")}</button>
+            <Link to="/games/watten" className="rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-bold hover:bg-white/10">{ui("Back")}</Link>
+          </div>
+        </section>
+      </div>
+    </main>
+  );
   const team = teamOf("0", game.count, game.caller);
   const roundWinner = game.winnerSide;
   const legal = game.phase === "playing" && !game.pendingBid && game.turn === 0 && game.trump && game.schlag ? new Set(game.hands[0].filter(card => canPlayWattenCard(card, game.hands[0], game.trick, game.tricksWon, game.trump, game.schlag)).map(card => card.id)) : new Set<string>();
-  return <main className="min-h-[var(--app-height)] bg-[radial-gradient(circle_at_top,#254d36,#10251b_55%,#08140e)] px-3 py-4 text-white sm:px-6">
-    <div className="mx-auto max-w-7xl"><header className="flex flex-wrap items-center justify-between gap-3"><Link to="/games/watten" className="text-sm text-amber-200 hover:underline">← {ui("Watten")}</Link><h1 className="font-serif text-2xl">{ui("Singleplayer")} · {game.count} {ui("Players")}</h1><button type="button" onClick={() => setGame(null)} className="rounded-lg border border-white/20 px-3 py-2 text-sm hover:bg-white/10">{ui("New Game")}</button></header>
-      <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_300px]"><section className="min-w-0 rounded-3xl border border-amber-200/20 bg-[#16412e]/65 p-4 shadow-2xl sm:p-6">
-        <div className="grid gap-2 sm:grid-cols-3">{game.hands.slice(1).map((hand, index) => <div key={index} className="rounded-xl border border-white/15 bg-black/15 p-3 text-center"><p className="font-bold">{ui("Bot")} {index + 1} <span className="text-xs text-amber-200">{teamOf(String(index + 1), game.count, game.caller) === team ? ui("Teammate") : ui("Opponent")}</span></p><p className="mt-1 text-xs text-zinc-300">{hand.length} {ui("Cards")} · {game.scores[index + 1]} {ui("Points")} · {game.tricksWon[String(index + 1)]} {ui("Tricks")}</p></div>)}</div>
-        <div className="mt-4 flex min-h-40 flex-wrap items-center justify-center gap-2 rounded-2xl border border-amber-200/15 bg-[#0b2319]/65 p-4">{game.trick.length ? game.trick.map(entry => <div key={entry.playerId} className="text-center"><p className="mb-1 text-xs">{entry.playerId === "0" ? ui("You") : `${ui("Bot")} ${entry.playerId}`}</p><CardImage card={entry.card} /></div>) : game.lastTrick.length ? <div className="text-center"><p className="mb-2 text-sm text-amber-200">{ui("Last trick")} · {game.lastTrickWinner === 0 ? ui("You") : `${ui("Bot")} ${game.lastTrickWinner}`}</p><div className="flex flex-wrap justify-center gap-2">{game.lastTrick.map(entry => <CardImage key={entry.playerId} card={entry.card} className="h-20 w-14 sm:h-24 sm:w-16" />)}</div></div> : <p className="text-zinc-400">{ui("Waiting for the first card")}</p>}</div>
-        <div className="mt-5 rounded-xl border border-white/10 bg-black/20 p-3"><p className="font-bold">{ui("You")} · {game.scores[0]} {ui("Points")} · {game.tricksWon["0"]} {ui("Tricks")}</p><p className="mt-1 text-xs text-zinc-300">{game.phase === "playing" ? game.pendingBid ? ui("A raise is awaiting an answer") : game.turn === 0 ? ui("Your turn") : `${ui("Bot")} ${game.turn} ${ui("is thinking…")}` : game.phase === "cut" ? ui("Cut the deck") : game.phase === "declare" ? ui("Choose trump and Schlag") : game.phase === "trickPause" ? ui("Trick complete") : game.phase === "matchOver" ? ui("Match finished") : ui("Round finished")}</p></div>
-        <div className="mt-4 flex flex-wrap justify-center gap-2">{game.hands[0].map(card => <button type="button" key={card.id} disabled={!legal.has(card.id)} onClick={() => play(card)} className="rounded-md transition hover:-translate-y-2 focus-visible:outline-2 focus-visible:outline-amber-200 disabled:cursor-default disabled:opacity-45 motion-reduce:transform-none"><CardImage card={card} /></button>)}</div>
-        {notice && <p role="alert" className="mt-3 text-center text-red-200">{notice}</p>}
-      </section><aside className="space-y-4"><section className="rounded-2xl border border-amber-200/20 bg-black/25 p-5"><h2 className="font-serif text-xl">{ui("Round")} {game.round}</h2><p className="mt-3 text-sm">{ui("Trumpf")}: <strong>{game.trump ? `${SUIT_SYMBOLS[game.trump]} ${game.trump}` : "—"}</strong></p><p className="mt-1 text-sm">{ui("Schlag")}: <strong>{game.schlag ?? "—"}</strong></p><p className="mt-3 text-xs text-zinc-400">{ui("First to 15 points wins. Three tricks win a round.")}</p></section>
+  const humanTurn = game.phase === "playing" && game.turn === 0 && !game.pendingBid;
+  const mustFollow = mustFollowTrumpfOderKritisch(game.hands[0], game.trick, game.tricksWon, game.trump, game.schlag);
+  const trumpRuleActive = humanTurn && isTrumpfOderKritischActive(game.trick, game.tricksWon, game.trump, game.schlag);
+  const status = game.phase === "playing"
+    ? game.pendingBid ? ui("A raise is awaiting an answer") : humanTurn ? ui("Your turn") : `${ui("Bot")} ${game.turn} ${ui("is thinking…")}`
+    : ui(game.phase === "cut" ? "Cut the deck" : game.phase === "declare" ? "Choose trump and Schlag" : game.phase === "trickPause" ? "Trick complete" : game.phase === "matchOver" ? "Match finished" : "Round finished");
+
+  return (
+    <main className="watten-game-screen bg-transparent px-2 py-3 text-white sm:px-4 sm:py-4 md:px-8 md:py-6">
+      <div className="watten-game-content mx-auto w-full max-w-[1800px]">
+        <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div><p className="text-xs font-semibold uppercase tracking-widest text-amber-400">{ui("Bavarian Watten")}</p><h1 className="mt-1 text-2xl font-black">{game.count} {ui("Players")} · {ui("Singleplayer")}</h1></div>
+          <div className="flex flex-wrap items-center gap-2">
+            <HeaderTools><CardThemeSelector /><TableThemeSelector /></HeaderTools>
+            <button type="button" onClick={() => { setGame(null); setNotice(null); document.querySelector(".app-viewport")?.scrollTo(0, 0); }} className="rounded-lg bg-white/10 px-3 py-2 text-sm font-bold hover:bg-white/20">{ui("New Game")}</button>
+            <Link to="/games/watten" className="rounded-lg bg-white/10 px-3 py-2 text-sm font-bold hover:bg-white/20">{ui("Back")}</Link>
+          </div>
+        </header>
+        <WattenTurnNotice player={profile?.username || ui("You")} active={trumpRuleActive} mustFollow={mustFollow} />
+        <div className="watten-game-grid grid grid-cols-[16rem_minmax(0,1fr)_16rem] gap-4">
+          <aside className="space-y-3">
+            <section className="rounded-2xl border border-white/10 bg-zinc-950/80 p-4">
+              <h2 className="text-xs font-black uppercase tracking-widest text-amber-300">{ui("Scoreboard")}</h2>
+              <div className="mt-4 space-y-3">{game.scores.map((score, seat) => (
+                <div key={seat} className={`rounded-xl border p-3 ${seat === game.turn ? "border-amber-300/40 bg-amber-300/10" : "border-white/10 bg-white/5"}`}>
+                  <div className="flex items-center justify-between gap-2"><strong className="text-sm">{seat === 0 ? ui("You") : `${ui("Bot")} ${seat}`}</strong><b className="text-xl text-amber-200">{score}<span className="text-xs text-zinc-500"> / 15</span></b></div>
+                  <p className="mt-1 text-xs text-zinc-400">{ui(teamOf(String(seat), game.count, game.caller) === team ? "Your side" : "Opponent")} · {game.tricksWon[String(seat)] ?? 0} {ui("Tricks")}</p>
+                </div>
+              ))}</div>
+            </section>
+          </aside>
+          <section className="watten-table watten-single-table" style={wattenTableStyle(tableTheme)} aria-label={ui("Game table")}>
+            <div className="watten-single-status"><span>{ui("Round")} {game.round}</span><strong>{game.trump ? `${SUIT_SYMBOLS[game.trump]} ${game.trump}` : "—"} · {game.schlag ?? "—"}</strong><span>{ui("Round value")}: {game.roundValue}</span></div>
+            {game.hands.slice(1).map((hand, index) => {
+              const seat = index + 1;
+              const position = wattenSeatPosition(seat, 0, game.count);
+              return (
+                <div key={seat} className={`watten-single-seat is-${position} ${game.turn === seat && game.phase === "playing" ? "is-active" : ""}`}>
+                  <strong>{ui("Bot")} {seat}</strong>
+                  <span>{ui(teamOf(String(seat), game.count, game.caller) === team ? "Teammate" : "Opponent")} · {game.tricksWon[String(seat)]} {ui("Tricks")}</span>
+                  <div className="watten-single-card-backs" aria-label={`${hand.length} ${ui("Cards")}`}>{hand.map(card => <i key={card.id} />)}</div>
+                </div>
+              );
+            })}
+            <div className="watten-single-trick">
+              {game.trick.length ? game.trick.map(entry => (
+                <div key={`${entry.playerId}-${entry.card.id}`} className={`watten-single-played ${wattenPlayAnimation(Number(entry.playerId), 0, game.count)}`}>
+                  <CardImage card={entry.card} /><span>{entry.playerId === "0" ? ui("You") : `${ui("Bot")} ${entry.playerId}`}</span>
+                </div>
+              )) : game.lastTrick.length ? (
+                <div className="text-center"><p className="mb-3 text-xs font-bold text-amber-200">{ui("Last trick")} · {game.lastTrickWinner === 0 ? ui("You") : `${ui("Bot")} ${game.lastTrickWinner}`}</p><div className="flex justify-center gap-2">{game.lastTrick.map(entry => <CardImage key={entry.playerId} card={entry.card} className="!h-20 !w-14 sm:!h-24 sm:!w-16" />)}</div></div>
+              ) : <p className="text-center text-sm text-white/45">{ui("Waiting for the first card")}</p>}
+            </div>
+            {(game.phase === "cut" || game.phase === "declare") && <div className="watten-single-setup">
         {game.phase === "cut" && <section className="rounded-2xl border border-amber-200/30 bg-black/25 p-5"><h2 className="font-bold">{ui("Cut the deck")}</h2><p className="mt-2 text-sm text-zinc-300">{ui("Choose where to cut. Revealed critical cards go alternately to the cutter and dealer.")}</p><input aria-label={ui("Cut position")} type="range" min="1" max={game.deck.length - 1} value={cutIndex} onChange={event => setCutIndex(Number(event.target.value))} className="mt-4 w-full accent-amber-300" /><p className="mt-1 text-sm">{ui("Cut position")}: {cutIndex}</p><button type="button" onClick={() => setGame(cutSingleWatten(game, cutIndex))} className="mt-4 w-full rounded-lg bg-amber-300 p-2 font-bold text-black">{ui("Cut the deck")}</button></section>}
-        {game.cutCards.length > 0 && game.phase !== "cut" && <p className="rounded-xl border border-amber-200/20 bg-black/25 p-3 text-xs text-amber-100">{ui("Critical cards from the cut")}: {game.cutCards.map(card => `${SUIT_SYMBOLS[card.suit]} ${card.rank}`).join(" · ")}</p>}
         {game.phase === "declare" && <section className="rounded-2xl border border-amber-200/30 bg-black/25 p-5"><h2 className="font-bold">{ui("Choose trump and Schlag")}</h2><label className="mt-3 block text-sm">{ui("Trumpf")}<select value={trump} onChange={event => setTrump(event.target.value as Suit)} className="mt-1 block w-full rounded-lg border border-white/20 bg-[#173b2a] p-2">{SUITS.map(suit => <option key={suit}>{suit}</option>)}</select></label><label className="mt-3 block text-sm">{ui("Schlag")}<select value={schlag} onChange={event => setSchlag(event.target.value as Rank)} className="mt-1 block w-full rounded-lg border border-white/20 bg-[#173b2a] p-2">{RANKS.map(rank => <option key={rank}>{rank}</option>)}</select></label><button type="button" onClick={() => setGame(declareSingleWatten(game, trump, schlag))} className="mt-4 w-full rounded-lg bg-amber-300 p-2 font-bold text-black">{ui("Continue")}</button></section>}
+            </div>}
+            <div className="watten-single-hand">
+              <div className="mb-3 flex items-center justify-center gap-2"><ProfileAvatar avatarId={avatarId} className="h-9 w-9 rounded-xl" /><div><strong className="block text-sm">{profile?.username || ui("You")}</strong><p role="status" className="text-xs text-amber-200">{status}</p></div></div>
+              <div className="flex justify-center gap-2">{game.hands[0].map(card => <button type="button" key={card.id} disabled={!legal.has(card.id)} onClick={() => play(card)} aria-label={`${card.suit} ${card.rank}`} className={`watten-single-hand-card rounded-md transition hover:-translate-y-2 focus-visible:outline-2 focus-visible:outline-amber-200 disabled:cursor-default motion-reduce:transform-none ${humanTurn && mustFollow ? legal.has(card.id) ? "ring-2 ring-emerald-300" : "opacity-40 grayscale" : ""}`}><CardImage card={card} /></button>)}</div>
+              {notice && <p role="alert" className="mt-3 text-center text-sm text-red-200">{notice}</p>}
+            </div>
+          </section>
+          <aside className="watten-single-controls space-y-3"><section className="rounded-2xl border border-amber-200/20 bg-black/25 p-5"><h2 className="font-serif text-xl">{ui("Round")} {game.round}</h2><p className="mt-3 text-sm">{ui("Trumpf")}: <strong>{game.trump ? `${SUIT_SYMBOLS[game.trump]} ${game.trump}` : "—"}</strong></p><p className="mt-1 text-sm">{ui("Schlag")}: <strong>{game.schlag ?? "—"}</strong></p><p className="mt-3 text-xs text-zinc-400">{ui("First to 15 points wins. Three tricks win a round.")}</p></section>
+
+        {game.cutCards.length > 0 && game.phase !== "cut" && <p className="rounded-xl border border-amber-200/20 bg-black/25 p-3 text-xs text-amber-100">{ui("Critical cards from the cut")}: {game.cutCards.map(card => `${SUIT_SYMBOLS[card.suit]} ${card.rank}`).join(" · ")}</p>}
+
         {game.phase === "playing" && <section className="rounded-2xl border border-amber-200/20 bg-black/25 p-5"><h2 className="font-bold">{ui("Round value")}: {game.roundValue}</h2>{game.pendingBid ? <><p className="mt-2 text-sm text-zinc-300">{game.pendingBid.side === team ? ui("Your side raised the round.") : ui("Opponents raised the round.")}</p>{game.pendingBid.side !== team && <div className="mt-3 flex gap-2"><button type="button" onClick={() => setGame(respondSingleWattenBid(game, 0, true))} className="flex-1 rounded-lg bg-amber-300 p-2 font-bold text-black">{ui("Hold")}</button><button type="button" onClick={() => setGame(respondSingleWattenBid(game, 0, false))} className="flex-1 rounded-lg border border-white/20 p-2">{ui("Decline")}</button></div>}</> : canRaiseSingleWatten(game, 0) && <button type="button" onClick={() => setGame(raiseSingleWatten(game, 0))} className="mt-3 w-full rounded-lg border border-amber-300/50 p-2 font-bold text-amber-100 hover:bg-amber-300/10">{ui("Raise")}</button>}</section>}
         {game.phase === "trickPause" && <button type="button" onClick={() => setGame(advanceSingleWatten(game))} className="w-full rounded-xl bg-amber-300 p-3 font-bold text-black">{ui("Next trick")}</button>}
         {(game.phase === "roundOver" || game.phase === "matchOver") && <section className="rounded-2xl border border-amber-200/30 bg-black/25 p-5"><h2 className="font-serif text-xl">{roundWinner === team ? ui("Your side won the round") : ui("Opponents won the round")}</h2><p className="mt-2 text-sm text-zinc-300">{game.scores.map((score, index) => `${index === 0 ? ui("You") : `${ui("Bot")} ${index}`}: ${score}`).join(" · ")}</p>{game.phase === "roundOver" && <button type="button" onClick={() => setGame(advanceSingleWatten(game))} className="mt-4 rounded-lg bg-amber-300 px-4 py-2 font-bold text-black">{ui("Next round")}</button>}</section>}
-      </aside></div></div>
-  </main>;
+      </aside>
+        </div>
+      </div>
+    </main>
+  );
 }

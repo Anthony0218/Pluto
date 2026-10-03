@@ -29,6 +29,26 @@ export const SNAP_LEVELS = [
     { x: 15, y: 445, width: 150 }, { x: 205, y: 350, width: 100 }, { x: 370, y: 290, width: 95 },
     { x: 525, y: 345, width: 95 }, { x: 685, y: 245, width: 95 }, { x: 840, y: 155, width: 105 },
   ] },
+  { name: "Mossy Switchbacks", platforms: [
+    { x: 15, y: 450, width: 150 }, { x: 210, y: 360, width: 110 }, { x: 390, y: 405, width: 110 },
+    { x: 555, y: 300, width: 105 }, { x: 710, y: 235, width: 95 }, { x: 850, y: 150, width: 90 },
+  ] },
+  { name: "Amber Creek", platforms: [
+    { x: 15, y: 395, width: 150 }, { x: 225, y: 440, width: 105 }, { x: 405, y: 350, width: 100 },
+    { x: 590, y: 275, width: 100 }, { x: 790, y: 320, width: 140 },
+  ] },
+  { name: "Orchid Steps", platforms: [
+    { x: 15, y: 470, width: 140 }, { x: 190, y: 390, width: 100 }, { x: 350, y: 305, width: 100 },
+    { x: 510, y: 230, width: 100 }, { x: 675, y: 300, width: 95 }, { x: 840, y: 205, width: 105 },
+  ] },
+  { name: "Moonlit Roots", platforms: [
+    { x: 15, y: 400, width: 155 }, { x: 215, y: 320, width: 100 }, { x: 385, y: 400, width: 95 },
+    { x: 550, y: 310, width: 95 }, { x: 715, y: 220, width: 95 }, { x: 860, y: 135, width: 85 },
+  ] },
+  { name: "Crown of the Forest", platforms: [
+    { x: 15, y: 475, width: 140 }, { x: 190, y: 390, width: 95 }, { x: 350, y: 310, width: 90 },
+    { x: 510, y: 235, width: 90 }, { x: 675, y: 165, width: 90 }, { x: 845, y: 95, width: 100 },
+  ] },
 ];
 export const HABITATS = [
   { name: "Sand", pattern: 0 as Pattern, bumpy: false, color: "#d0bf93" },
@@ -186,7 +206,7 @@ export function chooseCuttleInput(game: CuttleGame, player: Player): WildInput {
     y: Math.abs(target.y - animal.y) > 8 ? Math.sign(target.y - animal.y) : 0 };
 }
 
-export function updateWildGame(game: WildGame, inputs: [WildInput, WildInput], seconds: number, ai: boolean) {
+export function updateWildGame(game: WildGame, inputs: [WildInput, WildInput], seconds: number, ai: boolean, difficulty: "easy" | "normal" | "hard" = "normal") {
   if (game.phase !== "playing" || !Number.isFinite(seconds) || seconds <= 0) return;
   let remaining = Math.min(seconds, 0.1);
   while (remaining > 0.000001 && game.phase === "playing") {
@@ -196,7 +216,7 @@ export function updateWildGame(game: WildGame, inputs: [WildInput, WildInput], s
       game.aiThink -= dt;
       if (game.aiThink <= 0) {
         game.aiInput = game.kind === "trapjaw" ? chooseSnapInput(game, 1) : chooseCuttleInput(game, 1);
-        game.aiThink = 0.2;
+        game.aiThink = difficulty === "easy" ? 0.4 : difficulty === "hard" ? 0.1 : 0.2;
       }
     }
     const actual: [WildInput, WildInput] = [inputs[0], ai ? game.aiInput : inputs[1]];

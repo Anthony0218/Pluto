@@ -6,6 +6,7 @@ import { ui, useUiLanguage } from "@/i18n/ui";
 import CustomVariantArtwork from "./CustomVariantArtwork";
 import JanmannGambitArtwork from "./JanmannGambitArtwork";
 import { JANMANN } from "@/games/chess/janmann/config";
+import UserLink from "@/components/social/UserLink";
 
 import { accentClasses, accentGlow, accentShadow } from "./variantCardStyles";
 
@@ -195,7 +196,7 @@ export function VariantDesignCard({
           <h3 className="mt-1.5 font-serif text-[20px] leading-tight text-white">
             {translate(variant.title)}
           </h3>
-          {variant.author && <p className="mt-1 text-[10px] text-zinc-400">{translate("by")} {variant.author}</p>}
+          {variant.author && <p className="mt-1 text-[10px] text-zinc-400">{translate("by")} <UserLink username={variant.author} className="font-semibold text-zinc-200">{variant.author}</UserLink></p>}
         </div>
 
         <span

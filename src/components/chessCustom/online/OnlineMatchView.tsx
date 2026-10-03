@@ -1,3 +1,5 @@
+import { recordCreatedGameInviteCode } from "@/components/social/GameInviteDelivery";
+import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import type { Chess3DCameraView } from "@/games/chess/3d/chess3dAppearance";
@@ -31,6 +33,7 @@ export default function OnlineMatchView() {
   const [stackView, setStackView] = useState<"full" | "focus" | "isolated">("full");
   const [cameraView, setCameraView] = useState<Chess3DCameraView>({ id: 0, preset: "front" });
   const heardVersion = useRef(0);
+  const inviteJoinStarted = useRef(false);
 
   useEffect(() => {
     if (!match) return;
@@ -45,7 +48,9 @@ export default function OnlineMatchView() {
     let cancelled = false;
     const refresh = async () => {
       try {
-        const snapshot = await getOnlineMatch(room);
+        const joining = params.get("join") === "1" && !inviteJoinStarted.current;
+        const snapshot = await (joining ? joinOnlineMatch(room) : getOnlineMatch(room));
+        if (joining) inviteJoinStarted.current = true;
         if (!cancelled) { setMatch((current) => !current || snapshot.version >= current.version ? snapshot : current); setError(null); }
       } catch (cause) {
         const message = cause instanceof Error ? cause.message : "Could not load room.";
@@ -55,7 +60,7 @@ export default function OnlineMatchView() {
     void refresh();
     const timer = window.setInterval(() => void refresh(), 1500);
     return () => { cancelled = true; window.clearInterval(timer); };
-  }, [room, userId]);
+  }, [room, userId, params]);
 
   useEffect(() => {
     if (!userId || code.length !== 6 || match) return;
@@ -68,6 +73,7 @@ export default function OnlineMatchView() {
     return () => { cancelled = true; window.clearTimeout(timer); };
   }, [code, match, userId]);
 
+  useInviteAutoCreate(() => perform(async () => { const created = await createOnlineMatch(draft); recordCreatedGameInviteCode(created.code, "/chess-custom/play/multiplayer"); return created; }), !!userId && validateOnlineVariant(draft).length === 0);
   async function perform(action: () => Promise<OnlineSnapshot>) {
     setBusy(true);
     setError(null);

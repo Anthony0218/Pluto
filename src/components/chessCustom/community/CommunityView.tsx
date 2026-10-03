@@ -1,7 +1,7 @@
 import { variants } from "@/data/chessVariants";
 import { VariantArtwork, VariantCardFrame, VariantDesignCard } from "@/components/chess/VariantDesignCard";
 import { Link, useNavigate } from "react-router-dom";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { KING_BEHAVIORS, matchKingBehavior } from "@/games/chess/custom/engine/presets";
 import { VICTORY_LABELS } from "@/games/chess/custom/engine/victory";
 import type { VariantPreview } from "@/games/chess/custom/library/preview";
@@ -16,6 +16,13 @@ import { errorText, timeAgo } from "../format";
 import { ChevronDownIcon, ChevronUpIcon, CommunityIcon, LayersIcon, PlayIcon, PrivateIcon, RefreshIcon, RemixIcon, SearchIcon, ShareIcon, ViewIcon } from "../icons/ChessCustomIcons";
 import { Button, Chip, EmptyState, Segmented, inputClass } from "../ui";
 import PublishVariantDialog from "./PublishVariantDialog";
+import UserLink from "@/components/social/UserLink";
+
+/** Variant author, linked to their profile. Pluto's own variants have no player account. */
+function Author({ entry, className = "" }: { entry: CommunityEntry; className?: string }) {
+  if (entry.ownerId === "pluto") return <span className={className}>{entry.authorName}</span>;
+  return <UserLink userId={entry.ownerId} username={entry.ownerId ? null : entry.authorName} className={className}>{entry.authorName}</UserLink>;
+}
 
 const PAGE = 24;
 type Previews = Record<string, { preview: VariantPreview; layerCount: number }>;
@@ -89,7 +96,7 @@ function DetailsDialog({ entry, preview, onClose, onPlay, onRemix, busy }: { ent
       size="lg"
       eyebrow={ui("Community variant")}
       title={entry?.name ?? ""}
-      description={entry ? `${ui("by")} ${entry.authorName} · ${ui("published")} ${timeAgo(entry.publishedAt)}` : undefined}
+      description={entry ? <>{ui("by")} <Author entry={entry} className="font-semibold text-zinc-200" /> · {ui("published")} {timeAgo(entry.publishedAt)}</> : undefined}
       footer={
         <>
           {entry?.configurable !== false && <Button onClick={onRemix} disabled={busy}>
@@ -116,7 +123,7 @@ function DetailsDialog({ entry, preview, onClose, onPlay, onRemix, busy }: { ent
               {!entry.builtin && <Chip>{entry.pieceTypes} {ui("piece types")}</Chip>}
               {!entry.official && <Chip>{entry.playCount} {ui("plays")}</Chip>}
               <ConfigurationChip entry={entry} />
-              {!entry.official && <Chip tone={entry.score > 0 ? "emerald" : "zinc"}>{entry.score} {ui("score")}</Chip>}
+              <Chip tone={entry.score > 0 ? "emerald" : "zinc"}>{entry.score} {ui("score")}</Chip>
               {(details?.tags ?? entry.builtin?.tags)?.map((tag) => <Chip key={tag} tone="violet">{tag}</Chip>)}
             </div>
             {details ? (
@@ -176,6 +183,8 @@ export default function CommunityView({ scope = "players" }: { scope?: "pluto" |
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [error, setError] = useState("");
   const [hasMore, setHasMore] = useState(false);
+  const pendingVotes = useRef(new Set<string>());
+  const [votingIds, setVotingIds] = useState(new Set<string>());
   const [busyId, setBusyId] = useState<string | null>(null);
   const [viewing, setViewing] = useState<CommunityEntry | null>(null);
   const [playing, setPlaying] = useState<CommunityEntry | null>(null);
@@ -234,7 +243,9 @@ export default function CommunityView({ scope = "players" }: { scope?: "pluto" |
   }
 
   async function vote(entry: CommunityEntry, value: -1 | 0 | 1) {
-    const previous = entries;
+    if (pendingVotes.current.has(entry.id)) return;
+    pendingVotes.current.add(entry.id);
+    setVotingIds(new Set(pendingVotes.current));
     // Optimistic update, then reconcile with the server's totals.
     const delta = (vote: number) => ({ up: vote === 1 ? 1 : 0, down: vote === -1 ? 1 : 0 });
     const before = delta(entry.myVote);
@@ -246,8 +257,11 @@ export default function CommunityView({ scope = "players" }: { scope?: "pluto" |
       const totals = await community.vote(entry.id, value);
       setEntries((current) => current.map((item) => (item.id === entry.id ? { ...item, ...totals, score: totals.upvotes - totals.downvotes } : item)));
     } catch (failure) {
-      setEntries(previous);
+      setEntries((current) => current.map((item) => item.id === entry.id ? entry : item));
       notify(`${ui("Vote failed")} — ${errorText(failure)}`, "error");
+    } finally {
+      pendingVotes.current.delete(entry.id);
+      setVotingIds(new Set(pendingVotes.current));
     }
   }
 
@@ -346,7 +360,7 @@ export default function CommunityView({ scope = "players" }: { scope?: "pluto" |
                     <Button size="sm" tone="primary" disabled={busyId === entry.id || entry.builtin?.available === false} onClick={() => setPlaying(entry)}><PlayIcon size={14} />{ui(entry.builtin?.available === false ? "Coming soon" : "Play")}</Button>
                     <Button size="sm" onClick={() => setViewing(entry)}><ViewIcon size={14} />{ui("View")}</Button>
                     {entry.configurable !== false && <Button size="sm" disabled={busyId === entry.id} onClick={() => void doRemix(entry)}><RemixIcon size={14} />{ui("Remix")}</Button>}
-                    <span className="ml-auto self-center text-[10px] text-zinc-500">{ui("by")} {entry.authorName}</span>
+                    <span className="ml-auto self-center text-[10px] text-zinc-500">{ui("by")} <Author entry={entry} className="text-zinc-300" /></span>
                   </div>
                 } />
               </li>
@@ -371,7 +385,7 @@ export default function CommunityView({ scope = "players" }: { scope?: "pluto" |
                     {entry.name}
                   </h3>
                   <p className="mt-1 text-[10px] text-zinc-500">
-                    {ui("by")} <span className="text-zinc-300">{entry.authorName}</span> · {timeAgo(entry.publishedAt)}
+                    {ui("by")} <Author entry={entry} className="text-zinc-300" /> · {timeAgo(entry.publishedAt)}
                   </p>
                   <p className="mt-2 line-clamp-2 font-serif text-[12px] leading-[1.45rem] text-zinc-400">{entry.description || ui("No description.")}</p>
                   <div className="mt-2.5 flex flex-wrap gap-1.5">
@@ -394,9 +408,9 @@ export default function CommunityView({ scope = "players" }: { scope?: "pluto" |
                       <RemixIcon size={14} />
                       {ui("Remix")}
                     </Button>}
-                    {!entry.official && <div className="ml-auto">
-                      <VoteControl entry={entry} onVote={(value) => void vote(entry, value)} disabled={!userId || own} reason={!userId ? ui("Sign in to vote") : own ? ui("You can't vote on your own variant") : undefined} />
-                    </div>}
+                    <div className="ml-auto">
+                      <VoteControl entry={entry} onVote={(value) => void vote(entry, value)} disabled={!userId || own || votingIds.has(entry.id)} reason={!userId ? ui("Sign in to vote") : own ? ui("You can't vote on your own variant") : undefined} />
+                    </div>
                   </div>
                   {own && (
                     <button type="button" onClick={() => setUnpublishing(entry)} className="mt-2 inline-flex items-center gap-1.5 self-start text-xs font-semibold text-zinc-400 underline-offset-2 hover:text-red-200 hover:underline">

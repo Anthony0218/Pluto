@@ -182,3 +182,73 @@ Friendly cats and pigeons last 60 seconds. Catch-up speed follows player speed/d
 Review adds paired collected/used ability counts, successful gap jumps, Strike-assisted devours, companion seconds/feeds and vehicles eaten alongside existing tree/choke/building counts. All new strings cover the seven existing languages. `tests/eat-it-abilities.test.mjs` verifies the authority and conflict rules; `/tests/eat-it-abilities-preview.html` and the `abilities` option in `/tests/eat-it-ui-preview.html` provide repeatable browser checks.
 
 This update adds **no migration**: inventory, motions, companion state and aggregate stats fit the existing snapshot/result JSON. Online play requires redeploying **`eat-it-match`** and the frontend together. Existing pending migrations from earlier updates still need to be applied if not already deployed. No remote deployment or remote schema verification was performed here.
+
+
+## Fireballs, denser maps and friendlier defaults
+
+**Menu defaults:** Animals ON, Hell Sudden Death OFF, Lives OFF, Bots ON. Preferences now live under `eat-it-settings-v2`; an older `eat-it-settings` save keeps only its duration and bot difficulty so existing players pick up the new defaults. The Pluto multiplier selector and the Pluto toggle are removed: Pluto objects are always present and `matchSettings` fixes their bonus at `EAT.pluto.multiplier` (**4×**, ignoring any client value), with 8 initial, a 10-second interval and up to 14 active.
+
+**Easier bots:** every level decides more slowly, hunts less and predicts less than before (Hard now uses 0.3 s decisions, Medium 0.58 s, Easy 0.95 s). Bots also move at 96% / 90% / 83% speed and receive 92% / 82% / 70% of normal-map growth (Hard / Medium / Easy). The growth handicap is not applied in Hell, so fireball maths stays exact. Online rooms keep using the Hard policy.
+
+**Hell:** each match rolls **one or two** black holes. Fireballs spawn on reachable intact floor (4 at the start, then one every 3 seconds, at most 6). Touching one multiplies mass by **1.75×**; because 1.75 exceeds the 1.69× mass needed for the 1.30× radius bite rule, a single fireball lead lets you devour an otherwise equal rival from the front. Fireball growth stops at mass 1,000 (devouring still adds mass). A black hole that sweeps over a fireball swallows it and grows by 7 units of radius, capped at 150; tile destruction, bot danger and visuals all use the per-hole radius. Bots chase visible fireballs, hunt smaller players and avoid bigger ones. Fireballs render as additive glow shells with flickering flame cones and rising embers, and appear on the minimap.
+
+**Normal maps:** City blocks are pre-filled with up to 64 buildings before loose props are placed (about 57 instead of about 36), narrow buildings pack three to a frontage row, and new Townhouse, Mansion, Office tower and Skyscraper models join Bus and Taxi. Nature adds a Farmhouse, Windmill and Giant boulder. New smaller props: hot dog, ice cream, newspaper, mailbox, parking meter, scooter, street lamp, pumpkin, carrot, beehive, campfire, scarecrow, wheelbarrow and canoe. Sky drops now come two at a time every 0.07 seconds, under a cap of 920 objects, and unclaimed drops away from players retire after 45 seconds (previously 90), so the rain stays continuous: about 900 drops per minute instead of about 350.
+
+**Items:** at most 9 on the map, with a spawn attempt every 8 seconds. Only Speed and Magnet are placed at the start. Shield has an 8% weight, a single world item, a 45-second cooldown and lasts 15 seconds (was 30). Strike has a 40% weight, up to 3 world items and a 10-second cooldown.
+
+`tests/eat-it-hell-fireballs.test.mjs` covers the fireball bite threshold, the growth cap, black-hole swallowing, spawn placement, Hell bots, the item and density changes, and fixed Pluto settings. `/tests/eat-it-hell-fireballs-preview.html` is a development-only visual fixture for the City towers, Nature landmarks, all new props, and Hell fireballs beside a swollen black hole. Online play requires redeploying the **`eat-it-match`** Edge Function together with the frontend (shared imports changed). No migration is needed.
+
+
+## Easier devouring, big-prop respawns, longer swallows and the black-hole finale
+
+**Devouring players:** you need **1.20×** the rival's radius (1.44× mass), down from 1.30×. The victim no longer has to fit through the opening, and inward motion is no longer checked. A bite only needs the victim's center over the **front half** of the open mouth, so dodging behind a mouth still works. Two players where one can eat the other no longer push each other apart, so the bigger one can move straight over its prey.
+
+**Swallowing:** `beginFall` stores a rest point (`fallRestX/Y`). The prop stays where it entered and only slides in far enough for its near edge to clear the lip, instead of being pulled to the mouth's center. `fallOffset` is shared by the authority and the renderer. Props then tumble in proportion to their tip, while a symmetric drop stays level. Gravity-like acceleration carries them 320–600 units into the pit before removal, so they disappear into the darkness instead of vanishing near the rim. Durations: small props 0.95 s (was 0.48), large props 1.8 s (was 1.15), trees 2.1 s (was 1.5). Animal NPC swallows keep their 0.48 s timing.
+
+**Big props:** creation records `bigTarget`, the number of houses, towers, vehicles and other very-large props. Every 1.2 s, up to two eaten ones respawn. 45% of them crash down from 520–760 units, and city buildings and vehicles still use their slots. Small loose props under a new footprint are cleared. Ordinary sky rain now drops 3 props per tick, up to 1,000 objects, and leaves 80 slots of headroom so big respawns always fit.
+
+**Hell:** the floor is now 44×30 cells (3,520×2,400), and up to 9 fireballs are active (6 at the start, then one every 2.4 s). Each sweep rolls `harmless` with 50% probability. A harmless sweep moves the hole and telegraphs its path in muted lilac, but never breaks the floor; bots ignore those paths. A player who has collected **10 fireballs** devours any black hole whose center passes over their mouth, and gains +50% mass. The hole is flagged `eatenAt`/`eatenBy`, leaves `blackHoles()` (`allBlackHoles()` keeps it for the 0.8 s suck-in animation) and stops acting. The HUD shows a fireball counter toward 10, and bots with 10 fireballs intercept holes. To keep matches finite on the bigger floor, after 150 s of Hell the floor collapses inward one ring every 5 s, with a "The floor is collapsing!" notice. Eight-bot Hell phases now end in about 2–3.5 minutes.
+
+**Menu:** every visit starts at 10 minutes with Hell OFF. Choosing 2 minutes switches Hell ON, and choosing any other duration switches it OFF; the toggle can still be changed afterwards.
+
+`tests/eat-it-devour.test.mjs` covers these rules. The `Swallow` option in `/tests/eat-it-hell-fireballs-preview.html` shows the fall path. Online play needs the **`eat-it-match`** Edge Function redeployed with the frontend; no migration is needed.
+
+
+## Too-long props wedge in the mouth
+
+A heavy prop (`largeSwallow`, not a tree) that tips over the lip swings its full model height across the opening. If `objectHeight` is greater than `mouthOpening`, the top catches the far rim and the prop bridges the hole (`tooLongToSwallow` / `jamsInMouth` in `falling.ts`). At `jamAge` (30% of the fall), the authority converts the claim into the tree choke: the eater is locked for 3 s, the prop stays frozen at the lean where it wedged (`stuck.age`) and rides along with the mouth, then it is pushed back upright (`spit.fromTilt`) and tossed aside with no reward. It cannot be re-claimed for 1.25 s after the choke ends. A straight, centered drop (`fallTip` 0) never wedges, because the pit is deeper than every model is tall. In practice this affects skyscrapers (needs mass ≈7,800 to swallow, versus ≈1,800 to fit by area), office towers (≈3,600), windmills (≈3,100), apartments and vending machines. Bots steer around props that would wedge them. The `Jam` option in `/tests/eat-it-hell-fireballs-preview.html` shows the sequence, and `tests/eat-it-devour.test.mjs` covers it.
+
+
+## Longer Strike, 1.15× bites, faster movement, zoom and clean tower falls
+
+**Strike** now lunges **300** units (was 180) over 0.52 s (was 0.45 s); bots and the Hell safe-ground check read the same distance. **Devouring players** needs **1.15×** the rival's radius (≈1.32× mass, was 1.20×); the menu guide, danger rings and bots follow `playerEatRadiusRatio`. **Movement:** base speed 255 (was 210) and acceleration 920 (was 760), so reaching top speed takes the same time.
+
+**Camera:** the automatic zoom keeps zooming out as you grow, down to 0.30 (was a 0.62 floor reached at mass ≈1,750), with a 0.28 curve (was 0.25), so screen radius grows as mass^0.22. Players can zoom 0.45×–2.5× on top of that with the mouse wheel or trackpad pinch, two-finger pinch on touch screens (the joystick releases while pinching), the `+`/`-` keys, or the new zoom buttons. The shadow box and camera clipping grow with the view so zoomed-out scenes keep their shadows.
+
+**Tower falls:** tall props tipping over the lip could swing their roof past the far rim and cut through the ground (up to ~125 units on apartments, mansions and office towers that were not tall enough to wedge). `beginFall` now stores `fallLean`, the largest lean at which the roof stays inside the far rim, measured from the actual pivot, footprint and rest point; the props then sink while leaning at most that much. Props that wedge (`fallWedge`, decided at capture) tip until their front face rests on the far rim by the jam age and freeze there instead of hovering or sinking. The rest point also keeps wide footprints' side corners inside the rim where possible. Only the unavoidable corner overhang of footprints that fit by area but not by shape remains (≤ ~30 units). Online play needs **`eat-it-match`** redeployed with the frontend; no migration is needed.
+
+
+## Shorter chokes, mouth-spanning wedges, Hell goal notice and the mobile HUD
+
+**Choking** lasts `EAT.eating.chokeDuration` = **1.5 s** (was 3 s) for both oversized tree canopies and wedged tall props; re-claiming still waits 1.25 s after it ends. **Wedges** no longer freeze where the prop entered (which showed the tower from the middle of the mouth outward): the base slides onto the near rim by the jam age, pivots on it, and the tower leans across the whole opening until its front face rests on the far rim (`fallLean = acos(depth / opening)`, at least 0.25 rad).
+
+**Hell:** for the first 5 seconds after Sudden Death begins, a centered notice says how many fireballs (`holeEatCount`, 10) devour a black hole; it hides once you have them. **Camera:** the automatic zoom-out is back to minimal (floor 0.56, curve 0.26) and manual zoom-out stops at 0.6× to keep render cost down. **Item legend** removed from the arena.
+
+**Mobile:** touch screens get touch-specific hints ("Drag anywhere to move · Pinch to zoom"), a 7 px joystick dead zone, no long-press menu/selection/tap highlight, and Strike/Jump fire on press rather than on click. Portrait phones show status along the top (title, timer, buttons, top-3 leaderboard plus you), effects on the left under the buttons, Growth/lives/mass in the bottom-left and large round Strike/Jump buttons plus Escape in the bottom-right, all respecting safe-area insets. Landscape phones get a thinner variant. Online play needs **`eat-it-match`** redeployed with the frontend; no migration.
+
+
+## Continuous tower falls, victory lap and a lighter mobile HUD
+
+**Tower falls:** tipping props used to lean to a fixed limit (`fallLean`, about 27° for a skyscraper), freeze there, and then drop straight down. Now the lean follows one accelerating curve (`tumble`) for the whole fall. `beginFall` stores the hole along the fall axis (`fallFar`, the far rim measured from the rest point, and `fallHole`, its radius). `fallTrack` steps the fall and keeps the prop's cut through the ground plane inside the hole. When the cut would cross the far rim, the prop slides back toward the near rim. That slide only grows and eases in 0.15 of the fall early, so it happens once. The lean holds only while its cut would be wider than the whole opening (briefly, for towers barely shorter than the mouth). Footprints that fit by area but not by shape keep their overhang centered. Snapshots without `fallFar` keep the old fixed limit. `tests/eat-it-finale.test.mjs` covers this.
+
+**Victory lap:** when the last rival is eaten (`lastStanding`), the arena freezes the result and keeps the world running on `stepEpilogue` for `EAT.match.victoryLap` = **10 s** of game time. Bots, eating and Hell continue, but nobody can be eliminated, respawn or win again. The HUD keeps the final standings. A "You win" / "{name} wins" banner counts down, then the arena fades out (`resultsFadeMs`, 0.7 s) and the results screen fades in, with Play Again and Return to Lobby. Online, the lap runs locally on a copy of the final snapshot. Other endings (size ranking, ties, solo losses) still go to results after about 1 s.
+
+**Mobile:** on portrait phones the HUD panels are smaller (tighter padding, smaller type and icons) and more see-through (about 55% instead of 91% opacity, lighter blur), and the stacked panels sit closer to the edges. Landscape phones get the same lighter panels. Online play needs **`eat-it-match`** redeployed with the frontend for the new fall fields; no migration is needed.
+
+## Hell growth, Strike spawns and held-item notice
+
+**Fireballs:** each fireball now multiplies mass by **1.45×** (still above the 1.3225× needed for the 1.15× bite rule) instead of 1.75×, and the hard 1,000-mass ceiling is gone. Below `softMass` (1,200) growth is multiplicative; past it every fireball adds a fixed `softMass × 0.45` = 540 mass, so players keep growing after the 6th fireball, just more slowly.
+
+**Strike in Hell:** Strike items no longer share the speed/jump roll. `spawnHellStrikes` drops one on reachable safe floor every `strike.hellInterval` = **4 s** while fewer than `hellMaxActive` = 3 are on the floor.
+
+**Held-item notice:** when your mouth touches a Strike, Jump or 2x Growth while you already hold one, the HUD shows "You already have a … — use it first!" for 1.6 s. It is computed client-side from the snapshot; the server rules are unchanged. Online play needs **`eat-it-match`** redeployed for the new spawn and growth values.

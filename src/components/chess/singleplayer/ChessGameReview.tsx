@@ -1,3 +1,4 @@
+import { isMissedWin, REVIEW_SPEEDS, playbackDelay } from "./reviewPlayback.ts";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -98,7 +99,8 @@ type EnrichedReviewRow = {
 };
 
 function displayQuality(row: EnrichedReviewRow): ReviewVisualQuality {
-  if (row.review.centipawnLoss >= 80 && row.moverEvalBefore !== null && row.moverEvalAfter !== null && row.moverEvalBefore >= 5 && row.moverEvalAfter < 3) return "Missed Win";
+  if (row.review.quality === "Book") return "Book";
+  if (isMissedWin(row.review, row.moverEvalBefore, row.moverEvalAfter)) return "Missed Win";
   return row.review.quality;
 }
 
@@ -175,6 +177,7 @@ const pieceSortOrder: Record<PieceSymbol, number> = {
 };
 
 const qualitySortOrder: Record<ReviewVisualQuality, number> = {
+  Book: -1,
   Best: 0,
   Excellent: 1,
   Good: 2,
@@ -184,7 +187,6 @@ const qualitySortOrder: Record<ReviewVisualQuality, number> = {
   "Missed Win": 6,
 };
 
-const PLAYBACK_STEP_MS = 1100;
 const REWIND_MS = 380;
 const LINE_MOVE_MS = 480;
 const LINE_GAP_MS = 140;
@@ -283,7 +285,8 @@ type CachedReview = {
   ply: number;
 };
 
-const REVIEW_STORAGE_KEY = "chess-game-review-cache";
+// v2: mate scores are graded ply-accurately, so older cached grades are stale.
+const REVIEW_STORAGE_KEY = "chess-game-review-cache-v2";
 const MAX_STORED_REVIEWS = 6;
 
 const reviewCache = new Map<string, CachedReview>(readStoredReviews());
@@ -392,6 +395,7 @@ export default function ChessGameReview({
   const continuationGenerationRef = useRef(0);
 
   const [playing, setPlaying] = useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [moveAnimation, setMoveAnimation] = useState<MoveAnimation | null>(null);
   const [showingCorrectMove, setShowingCorrectMove] = useState(false);
   const [frame, setFrame] = useState<ReviewFrame | null>(null);
@@ -470,7 +474,7 @@ export default function ChessGameReview({
           review.color === targetColor &&
           review.bestMoveUci !== null &&
           review.bestMoveUci !== review.uci &&
-          review.centipawnLoss >= 61,
+          (review.missedMate || review.centipawnLoss >= 61),
       )
       .sort((left, right) => right.centipawnLoss - left.centipawnLoss)[0];
 
@@ -1229,7 +1233,7 @@ export default function ChessGameReview({
 
     // Stepping one move forward slides the moved piece; jumps just switch positions.
     if (next) {
-      animateMove(next.from, next.to);
+      animateMove(next.from, next.to, fromPlayback ? Math.min(LINE_MOVE_MS, playbackDelay(playbackSpeed) * 0.7) : LINE_MOVE_MS);
     } else {
       setMoveAnimation(null);
     }
@@ -1349,12 +1353,12 @@ export default function ChessGameReview({
       if (selectedPly + 1 >= reviews.length) {
         setPlaying(false);
       }
-    }, PLAYBACK_STEP_MS);
+    }, playbackDelay(playbackSpeed));
 
     return () => window.clearTimeout(timer);
     // selectReviewMove reads the same render's state.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playing, selectedPly, reviews.length]);
+  }, [playing, selectedPly, reviews.length, playbackSpeed]);
 
   function showSimpleReview() {
     setDetailsOpen(false);
@@ -1881,6 +1885,8 @@ export default function ChessGameReview({
                 rows={reviewRows}
                 ply={selectedPly}
                 playing={playing}
+                speed={playbackSpeed}
+                onSpeedChange={setPlaybackSpeed}
                 onTogglePlay={togglePlayback}
                 onSeek={(ply) => selectReviewMove(Math.max(0, Math.min(reviews.length, ply)))}
               />
@@ -2031,7 +2037,7 @@ export default function ChessGameReview({
                    =============================================== */}
 
               <aside className="min-h-0 flex-1 overflow-y-auto rounded-2xl border border-white/10 bg-[#09121c]/78 p-4">
-                <details className="mb-4 rounded-xl border border-white/10 bg-white/[.035] p-3"><summary className="cursor-pointer text-xs font-bold text-[#f2e4c9]">{ui("Move quality legend")}</summary><div className="mt-3 grid grid-cols-2 gap-2">{(["Best", "Excellent", "Good", "Inaccuracy", "Mistake", "Blunder", "Missed Win"] as ReviewVisualQuality[]).map(quality => <QualityBadge key={quality} quality={quality} />)}</div></details>
+                <details className="mb-4 rounded-xl border border-white/10 bg-white/[.035] p-3"><summary className="cursor-pointer text-xs font-bold text-[#f2e4c9]">{ui("Move quality legend")}</summary><div className="mt-3 grid grid-cols-2 gap-2">{(["Book", "Best", "Excellent", "Good", "Inaccuracy", "Mistake", "Blunder", "Missed Win"] as ReviewVisualQuality[]).map(quality => <QualityBadge key={quality} quality={quality} />)}</div></details>
                 {selected && selectedRow && (
                   <>
                     <CurrentMoveButton
@@ -2040,6 +2046,7 @@ export default function ChessGameReview({
                       active={showingPlayedMove}
                       onClick={showPlayedMove}
                     />
+                    {selected.openingName && <p className="mt-2 text-xs font-semibold text-purple-300">{selected.openingName}</p>}
 
                     {winningMove && (
                       <CorrectMoveButton
@@ -2121,7 +2128,7 @@ export default function ChessGameReview({
                     {/* TOP 3 */}
 
                     <div className="mt-5">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-amber-400">{ui("Best Alternatives")}</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-amber-400">{ui("Best 3 Choices")}</p>
 
                       <div className="mt-3 space-y-2">
                         {selected.bestMoves.map((suggestion, index) => (
@@ -2382,7 +2389,7 @@ export default function ChessGameReview({
                   </div>
 
                   <div className="mt-5">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-amber-400">{ui("Best Alternatives")}</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-amber-400">{ui("Best 3 Choices")}</p>
 
                     <div className="mt-3 space-y-2">
                       {selected.bestMoves.map((suggestion, index) => (
@@ -2732,6 +2739,14 @@ function classifyMissedOpportunity(
   moverEvalBefore: number | null,
   moverEvalAfter: number | null,
 ) {
+  if (review.missedMate) {
+    const best = review.bestMoveSan ? ` with ${review.bestMoveSan}` : "";
+
+    return review.bestMoves[0]?.evaluation === "M1"
+      ? `Checkmate in one was available${best}.`
+      : `A forced checkmate was available${best}, but this move did not retain that mate line. The position may still be winning.`;
+  }
+
   if (review.centipawnLoss < 80) {
     return null;
   }
@@ -2740,9 +2755,9 @@ function classifyMissedOpportunity(
     moverEvalBefore !== null &&
     moverEvalAfter !== null &&
     moverEvalBefore >= 5 &&
-    moverEvalAfter < 3
+    moverEvalAfter <= 0.75
   ) {
-    return "A winning position was available, but this move gave away a large part of that advantage.";
+    return "Stockfish estimated a winning advantage before this move (at least +5), but no clear advantage afterward (+0.75 or less). This is an engine estimate, not proof of a forced win.";
   }
 
   if (
@@ -2881,6 +2896,7 @@ function buildPhasePerformance(rows: EnrichedReviewRow[]) {
 
       const goodOrBetter = phaseRows.filter(
         (row) =>
+          row.review.quality === "Book" ||
           row.review.quality === "Best" ||
           row.review.quality === "Excellent" ||
           row.review.quality === "Good",
@@ -3095,12 +3111,16 @@ function ReviewPlaybackBar({
   rows,
   ply,
   playing,
+  speed,
+  onSpeedChange,
   onTogglePlay,
   onSeek,
 }: {
   rows: EnrichedReviewRow[];
   ply: number;
   playing: boolean;
+  speed: number;
+  onSpeedChange: (speed: number) => void;
   onTogglePlay: () => void;
   onSeek: (ply: number) => void;
 }) {
@@ -3171,7 +3191,7 @@ function ReviewPlaybackBar({
   }
 
   return (
-    <div className="flex min-w-0 flex-1 items-center gap-2 rounded-2xl border border-white/[0.08] bg-[#09121c]/78 px-2 py-2 shadow-inner shadow-black/20 sm:gap-3 sm:px-3">
+    <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2 rounded-2xl border border-white/[0.08] bg-[#09121c]/78 sm:flex-nowrap px-2 py-2 shadow-inner shadow-black/20 sm:gap-3 sm:px-3">
       <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
         <button
           type="button"
@@ -3225,7 +3245,17 @@ function ReviewPlaybackBar({
         </button>
       </div>
 
-      <div className="relative min-w-0 flex-1 pb-3">
+      <select
+        aria-label={ui("Playback speed")}
+        title={ui("Playback speed")}
+        value={speed}
+        onChange={(event) => onSpeedChange(Number(event.target.value))}
+        className="h-8 shrink-0 rounded-lg border border-white/10 bg-[#101c29] px-1 text-xs font-semibold text-amber-100 focus-visible:outline-2 focus-visible:outline-amber-300"
+      >
+        {REVIEW_SPEEDS.map((value) => <option key={value} value={value}>{value}×</option>)}
+      </select>
+
+      <div className="relative order-last min-w-0 basis-full pb-3 sm:order-none sm:flex-1 sm:basis-auto">
       <div
         ref={trackRef}
         role="slider"
@@ -3337,7 +3367,7 @@ function ReviewPlaybackBar({
       )}
       </div>
 
-      <div className="w-14 shrink-0 text-right sm:w-20">
+      <div className="ml-auto w-14 shrink-0 text-right sm:ml-0 sm:w-20">
         <p className="text-[8px] font-black uppercase tracking-wider text-zinc-600">
           {shownPly}/{total}
         </p>

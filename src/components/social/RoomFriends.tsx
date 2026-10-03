@@ -3,16 +3,17 @@ import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Users, X } from "lucide-react";
 import { useDashboardData } from "@/hooks/useDashboardData";
+import { currentRoomInvite } from "./inviteRoute";
 import FriendChat from "./FriendChat";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
 
 export default function RoomFriends() {
   useUiLanguage();
-  const { pathname } = useLocation();
-  const match = pathname.match(/^(\/games\/chess\/(?:.+\/multiplayer|ranked)|\/games\/(?:atlas-arena|eat-it)\/multiplayer)\/([A-Z0-9]{6})(?:\/game)?$/i);
-  if (!match) return null;
-  return <RoomFriendsPanel key={pathname} lobbyRoute={match[1]} code={match[2].toUpperCase()} />;
+  const { pathname, search } = useLocation();
+  const invite = currentRoomInvite(pathname, search);
+  if (!invite) return null;
+  return <RoomFriendsPanel key={pathname + search} lobbyRoute={invite.lobbyRoute} code={invite.code} />;
 }
 function RoomFriendsPanel({ lobbyRoute, code }: { lobbyRoute: string; code: string }) {
   useUiLanguage();
@@ -40,7 +41,7 @@ function RoomFriendsDialog({ lobbyRoute, code, onClose }: { lobbyRoute: string; 
     setSending(true); setInviteError(null);
     const { error } = await supabase.from("friend_messages").insert({
       sender_id: user.id, receiver_id: friendId, message_type: "game_code",
-      game: "chess", game_code: code,
+      game: lobbyRoute.startsWith("/games/watten/") ? "watten" : "chess", game_code: code,
       game_route: lobbyRoute,
     });
     if (error) setInviteError(ui("Game invite could not be sent. Please try again."));

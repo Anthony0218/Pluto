@@ -1,3 +1,5 @@
+import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
+import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
@@ -90,6 +92,8 @@ export default function SeededVariantMultiplayerLobby({ variant }: Props) {
     return { seed: position.seed, initialFen: position.fen };
   }
 
+  useInviteAutoCreate(() => createRoom());
+
   async function createRoom() {
     if (!user) {
       setError("You must be logged in to create a room.");
@@ -118,7 +122,7 @@ export default function SeededVariantMultiplayerLobby({ variant }: Props) {
       const code = typeof data === "string" ? data : String(data ?? "");
       if (!code) throw new Error("Room code was not returned.");
 
-      navigate(`${info.baseRoute}/${code}`);
+      navigate(recordCreatedGameInvite(`${info.baseRoute}/${code}`));
     } catch (caught) {
       setError(
         caught instanceof Error ? caught.message : "Could not create room.",

@@ -1,3 +1,5 @@
+import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
+import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
@@ -334,6 +336,8 @@ export function ThreeLivesMultiplayerLobby() {
     return username || user?.email?.split("@")[0]?.trim() || "Player";
   }, [profile?.username, user?.email]);
 
+  useInviteAutoCreate(() => createRoom());
+
   async function createRoom() {
     if (!user) return setError("Sign in first.");
     setLoading("create");
@@ -350,7 +354,7 @@ export function ThreeLivesMultiplayerLobby() {
 
     setLoading(null);
     if (rpcError) return setError(rpcError.message);
-    navigate(`/games/chess/variants/three-lives/multiplayer/${String(data)}`);
+    navigate(recordCreatedGameInvite(`/games/chess/variants/three-lives/multiplayer/${String(data)}`));
   }
 
   async function joinRoom() {

@@ -5,14 +5,14 @@ import { botPolicy } from './bots.ts';
 import { matchSettings, newStats, clearTemporary, recordEvent, canUnderpass, unavailable, respawn, foodReward, grantGrowth, countCollected } from './progression.ts';
 import { startHell, stepHell } from './hell.ts';
 import { activateEscape, stepEscape } from './escape.ts';
-import { BOT_NAMES, COLORS, EAT, FOOD, POWER_KINDS, matchDuration, playerRadius, massToSpeed } from './config.ts';
+import { BOT_NAMES, COLORS, EAT, FOOD, POWER_KINDS, isBigProp, matchDuration, playerRadius, massToSpeed } from './config.ts';
 import { createEncounter, stepEncounter, finishEncounter, resolveShrine, shrineClear } from './quests.ts';
-import { beginFall, fallPose } from './falling.ts';
+import { beginFall, fallOffset, fallPose, jamAge, jamsInMouth } from './falling.ts';
 import { collideObjects, objectContact } from './physics.ts';
 import { botInput } from './bots.ts';
 import { clamp, clearPath, distance, resolveWalls, zoneRadius } from './maps.ts';
-import { angleDelta, canEatPlayer, consumptionDuration, entersMouth, foodFits, inMouth, mouthPosition, mouthCoordinates, playerEntrance, canopyFits, treeParts, isChoking } from './rules.ts';
-import { spawnFood, spawnPluto, spawnPosition, updateSpawns } from './spawn.ts';
+import { angleDelta, canEatPlayer, consumptionDuration, entersMouth, foodFits, inMouth, mouthPosition, mouthCoordinates, playerFits, canopyFits, treeParts, isChoking } from './rules.ts';
+import { spawnCityBuildings, spawnFood, spawnPluto, spawnPosition, updateSpawns } from './spawn.ts';
 import type { GameEvent, GameState, Input, MapId, Participant, Player, PowerObject, MatchSettings } from './types.ts';
 
 export function createGame(map: MapId, participants: Participant[], seed = 12345, id = `local-${seed}`, options: Partial<MatchSettings> = {}): GameState {
@@ -29,8 +29,11 @@ export function createGame(map: MapId, participants: Participant[], seed = 12345
   });
   state.spawnLocations = state.players.map(p => ({ x: p.x, y: p.y }));
   createEncounter(state);
+  if (map === 'city') spawnCityBuildings(state);
   for (let i = 0; i < EAT.food.spawnCount * 3 && state.food.length < EAT.food.spawnCount; i++) spawnFood(state, true);
-  for (const kind of POWER_KINDS.filter(k => k !== 'multiplier' && k !== 'divider' && k !== 'jump' && k !== 'strike')) {
+  state.bigTarget = state.food.filter(f => isBigProp(f.kind)).length; state.nextBig = EAT.food.bigRespawnInterval;
+  // Only common items start on the map; Shield, Strike and growth items arrive via weighted spawns.
+  for (const kind of ['speed', 'magnet'] as const) {
     const p = spawnPosition(state, EAT.powerups.radius);
     if (p) state.powerups.push({ ...p, id: state.nextId++, kind });
   }
@@ -54,7 +57,7 @@ function emit(state: GameState, event: Omit<GameEvent, 'id' | 'at'>) {
   recordEvent(state, event, ['eat', 'eliminated', 'win', 'tie'].includes(event.type));
 }
 export function eliminate(state: GameState, victim: Player, killer: Player | null = null): boolean {
-  if (!victim.alive || state.status !== 'playing') return false;
+  if (!victim.alive || state.status !== 'playing' || epilogue) return false;
   victim.placement = state.players.filter(p => p.alive || (state.phase === 'normal' && state.settings?.livesEnabled !== false && (p.lives ?? 0) > 0)).length;
   victim.alive = false; victim.eliminatedAt = state.time; victim.eliminatedBy = killer?.id ?? null;
   const stats = victim.stats ??= newStats(); stats.deaths++; stats.maxMass = Math.max(stats.maxMass, victim.mass);
@@ -71,7 +74,7 @@ export function eliminate(state: GameState, victim: Player, killer: Player | nul
   return true;
 }
 export function checkWinner(state: GameState): void {
-  if (state.status !== 'playing') return;
+  if (state.status !== 'playing' || epilogue) return;
   const eligible = state.players.filter(p => p.alive || (state.phase === 'normal' && state.settings?.livesEnabled !== false && (p.lives ?? 0) > 0));
   if (eligible.length > 1 || eligible.some(p => !p.alive || p.fallingAt !== undefined)) return;
   const solo = state.settings?.mode === 'solo' && state.players.length === 1;
@@ -138,14 +141,26 @@ export function movePlayer(state: Pick<GameState, 'map' | 'time' | 'encounter' |
   p.x += p.vx * dt; p.y += p.vy * dt; if (state.phase === 'hell') return; resolveWalls(state.map, p, playerRadius(p, state.time)); resolveShrine(state, p, playerRadius(p, state.time));
 }
 
+let epilogue = false;
+/** The winner's victory lap after the last rival is eaten. The finished world keeps moving
+ * (eating, bots, Hell) so the end screen can wait, but nobody is eliminated or respawns and
+ * the result never changes. Presentation only: callers step a copy of the final state. */
+export function stepEpilogue(state: GameState, dt = 1 / EAT.network.tickRate): void {
+  if (state.status !== 'finished') return;
+  epilogue = true; state.status = 'playing';
+  try { stepGame(state, dt); } finally { state.status = 'finished'; epilogue = false; }
+}
+/** A win by being the last mouth standing, which earns the victory lap. */
+export const lastStanding = (state: GameState) => state.status === 'finished' && state.result === 'winner' && state.players.length > 1 && state.players.filter(p => p.alive).length === 1;
+
 /** Mutates plain serializable state. Only local solo play or the server calls this. */
 export function stepGame(state: GameState, dt = 1 / EAT.network.tickRate): void {
   if (state.status !== 'playing' || !Number.isFinite(dt) || dt <= 0) return;
   dt = Math.min(dt, 1 / EAT.network.tickRate); state.time += dt;
   state.powerups = state.powerups.filter(p => POWER_KINDS.includes(p.kind));
   for (const p of state.players) for (const key of Object.keys(p.effects)) if (!POWER_KINDS.includes(key as typeof POWER_KINDS[number])) delete (p.effects as Record<string, number>)[key];
-  if (state.settings?.hellEnabled === false && state.phase === 'normal' && state.time >= matchDuration(state)) { finishNormal(state); return; }
-  if (state.settings?.hellEnabled && state.phase === 'normal' && state.time >= matchDuration(state)) startHell(state);
+  if (!epilogue && state.settings?.hellEnabled === false && state.phase === 'normal' && state.time >= matchDuration(state)) { finishNormal(state); return; }
+  if (!epilogue && state.settings?.hellEnabled && state.phase === 'normal' && state.time >= matchDuration(state)) startHell(state);
   if (state.hell && state.phase !== 'normal') { stepHell(state, dt); state.events = state.events.filter(e => state.time - e.at < 2).slice(-80); return; }
   for (const p of state.players) {
     if (!p.alive) { if (p.bot) respawn(state, p); continue; }
@@ -154,7 +169,7 @@ export function stepGame(state: GameState, dt = 1 / EAT.network.tickRate): void 
     if (p.escape) { stepEscape(state, p, dt); continue; }
     if (p.bot && state.time >= p.nextDecision) { const fleeing = p.botState === 'FLEE'; p.input = botInput(state, p); p.nextDecision = state.time + botPolicy(state).interval;
       if (p.botState === 'FLEE' && (fleeing || botPolicy(state).escapeDelay === 0) && activateEscape(state, p)) continue; }
-    movePlayer(state, p, p.input, dt);
+    movePlayer(state, p, p.input, dt, p.bot ? botPolicy(state).speed : 1);
   }
   // Resolve mouths before gentle body separation. A body collision never eliminates.
   for (const a of state.players) for (const b of state.players) {
@@ -162,7 +177,8 @@ export function stepGame(state: GameState, dt = 1 / EAT.network.tickRate): void 
   }
   for (let i = 0; i < state.players.length; i++) for (let j = i + 1; j < state.players.length; j++) {
     const a = state.players[i], b = state.players[j]; if (unavailable(a) || unavailable(b)) continue;
-    if ((playerEntrance(a, b, state.time) || playerEntrance(b, a, state.time)) && clearPath(state.map, a, b)) continue;
+    // A rival that is small enough to eat never pushes the bigger player away.
+    if ((playerFits(a, b, state.time) || playerFits(b, a, state.time)) && clearPath(state.map, a, b)) continue;
     const d = distance(a, b), overlap = (playerRadius(a, state.time) + playerRadius(b, state.time)) * 0.84 - d;
     if (overlap <= 0) continue;
     for (const p of [a, b]) if (p.effects.shield > state.time && state.time - (p.shieldHitAt ?? -10) > .45) p.shieldHitAt = state.time;
@@ -234,19 +250,20 @@ export function stepGame(state: GameState, dt = 1 / EAT.network.tickRate): void 
       // Reservation happens only AFTER physical entrance contact. Gravity/depth
       // drives the swallow; there is no world-space suction, even during a gulp.
       const age = state.time - f.capturedAt, duration = consumptionDuration(f);
-      if (treeParts(f.kind) && age >= EAT.eating.treeEntryDuration && !canopyFits(owner, f, state.time)) {
-        owner.chokingUntil = state.time + 3; if (owner.stats) owner.stats.chokes++; owner.vx = 0; owner.vy = 0;
+      // Oversized canopies and too-long leaning props jam: the eater chokes for `chokeDuration`, then spits them out.
+      const tree = !!treeParts(f.kind), jammed = tree ? age >= EAT.eating.treeEntryDuration && !canopyFits(owner, f, state.time) : age >= jamAge(f) && jamsInMouth(owner, f, state.time);
+      if (jammed) {
+        owner.chokingUntil = state.time + EAT.eating.chokeDuration; if (owner.stats) owner.stats.chokes++; owner.vx = 0; owner.vy = 0;
         f.target = null; f.vx = f.vy = f.vz = 0;
-        f.stuck = { playerId: owner.id, since: state.time, until: owner.chokingUntil };
+        f.stuck = { playerId: owner.id, since: state.time, until: owner.chokingUntil, ...(tree ? {} : { age: jamAge(f) }) };
         f.availableAt = owner.chokingUntil + 1.25;
         stepStuckTree(state, f);
         emit(state, { type: 'choke', playerId: owner.id, x: owner.x, y: owner.y });
         continue;
       }
       // Transport in world axes; turning the mouth never spins the falling prop.
-      const settle = Math.max(0, 1 - (age / (treeParts(f.kind) ? EAT.eating.treeEntryDuration : duration)) ** 2);
-      f.x = owner.x + (f.fallOffsetX ?? 0) * settle;
-      f.y = owner.y + (f.fallOffsetY ?? 0) * settle;
+      const offset = fallOffset(f, age);
+      f.x = owner.x + offset.x; f.y = owner.y + offset.y;
       const pose = fallPose(f, age + dt);
       f.vz = (pose.z - f.z) / dt; f.z = pose.z;
       if (age >= duration && f.z < -12) {

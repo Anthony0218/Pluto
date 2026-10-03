@@ -1,3 +1,5 @@
+import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
+import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
@@ -289,6 +291,8 @@ export function HotPotatoMultiplayerLobby() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useInviteAutoCreate(() => createRoom());
+
   async function createRoom() {
     if (!user || busy) return;
     setBusy(true);
@@ -305,9 +309,9 @@ export function HotPotatoMultiplayerLobby() {
     );
     setBusy(false);
     if (rpcError) return setError(rpcError.message);
-    navigate(
+    navigate(recordCreatedGameInvite(
       `/games/chess/variants/hot-potato/multiplayer/${String(data).toUpperCase()}`,
-    );
+    ));
   }
 
   async function joinRoom() {

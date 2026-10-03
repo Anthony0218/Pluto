@@ -8,6 +8,8 @@ export type VariantCard = {
   source?: "community";
   configurable?: boolean;
   collections?: readonly ("community" | "pluto")[];
+  /** Listed only in Custom Chess (Pluto + Community tabs), not the Chess Variants menu. */
+  customOnly?: boolean;
   configureRoute?: string;
   icon: string;
   title: string;
@@ -104,6 +106,7 @@ export const variants: VariantCard[] = [
     title: "Pluto Team Chess", subtitle: "Four armies. Two alliances.",
     description: "Allied armies fight across a cross-shaped board. Capture both enemy kings and win together.",
     tags: ["4 players", "2v2"], available: true, accent: "cyan",
+    customOnly: true, collections: ["pluto", "community"],
     route: "/chess-custom/play/hotseat?preset=pluto-team-chess",
     aiRoute: "/chess-custom/play/singleplayer?preset=pluto-team-chess",
     multiplayerRoute: "/chess-custom/play/multiplayer?preset=pluto-team-chess",
@@ -114,6 +117,7 @@ export const variants: VariantCard[] = [
     title: "Team Chess Long Edition", subtitle: "Stand together. Face the enemy.",
     description: "Two armies side by side on each edge of a 16×8 board. Coordinate with your ally to break the opposing team.",
     tags: ["16\u00d78", "2v2"], available: true, accent: "teal",
+    customOnly: true, collections: ["pluto", "community"],
     route: "/chess-custom/play/hotseat?preset=pluto-team-chess-long",
     aiRoute: "/chess-custom/play/singleplayer?preset=pluto-team-chess-long",
     multiplayerRoute: "/chess-custom/play/multiplayer?preset=pluto-team-chess-long",
@@ -142,6 +146,7 @@ export const variants: VariantCard[] = [
     source: JANMANN.source,
     configurable: JANMANN.configurable,
     collections: JANMANN.collections,
+    customOnly: true,
     icon: "◈",
     subtitle: "Think differently...",
     description: JANMANN.description,
@@ -339,3 +344,6 @@ export const variants: VariantCard[] = [
     multiplayerRoute: "/games/chess/variants/horror/multiplayer",
   },
 ];
+
+/** Entries shown in the Chess Variants menu. */
+export const menuVariants = variants.filter((variant) => !variant.customOnly);

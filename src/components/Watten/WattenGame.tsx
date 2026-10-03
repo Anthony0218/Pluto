@@ -28,24 +28,19 @@ import { useCardTheme } from "@/context/CardThemeContext";
 import { getWattenCardImage } from "@/utils/WattenCardImages";
 import TableThemeSelector from "../App/TableThemeSelector";
 import { HeaderTools } from "@/components/App/PublicHeader";
-import { useTableTheme, type TableTheme } from "@/context/TableThemeContext";
+import { useTableTheme } from "@/context/TableThemeContext";
 import { useAuth } from "@/context/AuthContext";
 import { ProfileAvatar } from "../social/ProfileAvatarPicker";
 import "./wattenGameScreen.css";
+import { wattenPlayAnimation, wattenTableStyle } from "@/games/watten/presentation";
+import WattenTurnNotice from "./WattenTurnNotice";
 
 import {
   translateWatten,
   translateWattenPair,
 } from "@/games/watten/i18n/wattenLanguage";
 
-const tableBackgrounds: Record<TableTheme, string> = {
-  classic: "/images/tables/classic.webp",
-  bavarian: "/images/tables/bavarian.webp",
-  royal: "/images/tables/royal.webp",
-  steampunk: "/images/tables/steampunk.webp",
-  alpine: "/images/tables/alpine.webp",
-  midnight: "/images/tables/midnight.webp",
-};
+
 const suitIcons = {
   Herz: "/images/icons/herz.webp",
   Schellen: "/images/icons/schellen.webp",
@@ -1375,6 +1370,7 @@ export default function WattenGame() {
               </div>
             </div>
           </div>
+          <WattenTurnNotice player={fourCurrentPlayer.name} active={phase === "playing" && !showPassScreen && fourTrumpfOderKritischActive} mustFollow={fourCurrentMustFollow} />
           {/* TABLE + SIDEBARS */}
           <div className="watten-game-grid grid w-full grid-cols-[16rem_minmax(0,1fr)_16rem] items-start gap-5 max-md:grid-cols-1 max-md:gap-3">
             {/* LEFT SIDEBAR: HELP + TEAM SCORE */}
@@ -1565,7 +1561,7 @@ export default function WattenGame() {
             </aside>
             {/* CENTER: 4 PLAYER TABLE */}
             <div
-              className="
+              className="watten-table
     relative
     min-h-[640px]
     min-w-0
@@ -1578,12 +1574,7 @@ export default function WattenGame() {
     transition-all
     duration-500
   "
-              style={{
-                backgroundImage: `url(${tableBackgrounds[tableTheme]})`,
-                backgroundSize: "100% 100%",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-              }}
+              style={wattenTableStyle(tableTheme)}
             >
               {/* TABLE SURFACE */}
               {phase === "setup" && (
@@ -2492,7 +2483,7 @@ export default function WattenGame() {
                     return (
                       <div
                         key={`${played.playerId}-${played.card.id}`}
-                        className="flex flex-col items-center gap-2 max-md:scale-[0.72]"
+                        className={`watten-played-card flex flex-col items-center gap-2 ${wattenPlayAnimation(players.findIndex(player => player.id === played.playerId), currentPlayer, players.length)}`}
                       >
                         <WattenCardComponent card={played.card} disabled />
 
@@ -2522,28 +2513,8 @@ export default function WattenGame() {
                     </div>
                     <HostAvatar player={fourCurrentPlayer} avatarId={hostAvatarId} />
 
-                    {fourTrumpfOderKritischActive && (
-                      <div
-                        className={`mx-auto mt-3 w-fit rounded-xl border px-4 py-2 text-xs font-bold ${
-                          fourCurrentMustFollow
-                            ? "border-red-400/40 bg-red-500/20 text-red-100"
-                            : "border-amber-400/40 bg-amber-400/20 text-amber-100"
-                        }`}
-                      >
-                        {fourCurrentMustFollow
-                          ? l(
-                              "Trumpf oder Kritisch — du musst eine passende Karte spielen.",
-                              "Trump or Critical — you must play an eligible card.",
-                            )
-                          : l(
-                              "Trumpf oder Kritisch — du hast keine passende Karte und darfst frei spielen.",
-                              "Trump or Critical — you have no eligible card, so you may play any card.",
-                            )}
-                      </div>
-                    )}
-
                     {/* LEFT: Help legend */}
-                    <div className="mt-5 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+                    <div className="mt-5 grid grid-cols-[1fr_auto_1fr] items-center gap-4 max-md:mt-2 max-md:grid-cols-1 max-md:gap-2">
                       <div className="flex justify-end">
                         {helpMode &&
                           playedCards.length > 0 &&
@@ -2569,7 +2540,7 @@ export default function WattenGame() {
                       </div>
 
                       {/* CARDS */}
-                      <div className="flex justify-center gap-2 max-md:gap-0">
+                      <div className="watten-hand flex justify-center gap-2 max-md:gap-0">
                         {fourCurrentPlayer.cards.map((card) => {
                           const legal =
                             !fourCurrentMustFollow ||
@@ -3265,7 +3236,7 @@ export default function WattenGame() {
                   {l("Deine Karten", "Your cards")}
                 </p>
 
-                <div className="flex justify-center gap-2 max-md:gap-0">
+                <div className="watten-hand flex justify-center gap-2 max-md:gap-0">
                   {players[trumpCaller].cards.map((card) => (
                     <div key={card.id} className="pointer-events-none">
                       <WattenCardComponent card={card} />
@@ -3344,7 +3315,7 @@ export default function WattenGame() {
                   {l("Deine Karten", "Your cards")}
                 </p>
 
-                <div className="flex justify-center gap-2 max-md:gap-0">
+                <div className="watten-hand flex justify-center gap-2 max-md:gap-0">
                   {players[trumpCaller].cards.map((card) => (
                     <div key={card.id} className="pointer-events-none">
                       <WattenCardComponent card={card} />
@@ -3580,6 +3551,7 @@ export default function WattenGame() {
           </div>
         )}
 
+        <WattenTurnNotice player={currentPlayerData.name} active={phase === "playing" && !showPassScreen && trumpfOderKritischActive} mustFollow={currentPlayerMustFollowTrumpfOderKritisch} />
         {/* Table + round score */}
         <div className="watten-game-grid grid w-full grid-cols-[16rem_minmax(0,1fr)_16rem] items-start gap-5 max-md:grid-cols-1 max-md:gap-3">
           {/* LEFT SIDEBAR: PUNKTESTAND */}
@@ -3731,7 +3703,7 @@ export default function WattenGame() {
 
           {/* CENTER: PLAYING TABLE */}
           <div
-            className="
+            className="watten-table
     relative
     h-[520px]
     overflow-hidden
@@ -3744,12 +3716,7 @@ export default function WattenGame() {
     transition-all
     duration-500
   "
-            style={{
-              backgroundImage: `url(${tableBackgrounds[tableTheme]})`,
-              backgroundSize: "100% 100%",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-            }}
+            style={wattenTableStyle(tableTheme)}
           >
             {/* DECK READY AFTER ABHEBEN */}
             {phase === "dealReady" && !winner && (
@@ -4087,7 +4054,7 @@ export default function WattenGame() {
             )}
 
             {/* PLAYED CARDS */}
-            <div className="absolute left-1/2 top-[46%] z-10 flex h-44 w-[380px] -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-3 rounded-3xl border border-white/10 bg-emerald-950/30 p-4 shadow-inner">
+            <div className="absolute left-1/2 top-[46%] z-10 flex h-44 w-[380px] max-md:h-36 max-md:w-[calc(100%-1rem)] max-md:gap-1 max-md:p-2 -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-3 rounded-3xl border border-white/10 bg-emerald-950/30 p-4 shadow-inner">
               {playedCards.length === 0 ? (
                 <div className="text-center">
                   <p className="mt-2 text-sm text-emerald-300/50">
@@ -4117,7 +4084,7 @@ export default function WattenGame() {
                   <div
                     onMouseEnter={playHoverSound}
                     key={`${played.playerId}-${played.card.id}`}
-                    className="flex flex-col items-center gap-2 max-md:scale-[0.72]"
+                    className={`watten-played-card flex flex-col items-center gap-2 ${wattenPlayAnimation(players.findIndex(player => player.id === played.playerId), currentPlayer, players.length)}`}
                   >
                     <WattenCardComponent card={played.card} disabled />
 
@@ -4142,26 +4109,10 @@ export default function WattenGame() {
                 </button>
               </div>
             )}
-            <div className="absolute bottom-60 left-50">
-              {trumpfOderKritischActive && (
-                <div
-                  className={`mx-auto mb-3 w-fit rounded-xl border px-4 py-2 text-center text-sm font-bold ${
-                    currentPlayerMustFollowTrumpfOderKritisch
-                      ? "border-red-400/50 bg-red-500/20 text-red-100"
-                      : "border-amber-400/50 bg-amber-400/20 text-amber-100"
-                  }`}
-                >
-                  {currentPlayerMustFollowTrumpfOderKritisch
-                    ? "Trumpf oder Kritisch! You must play one of the highlighted cards."
-                    : "Trumpf oder Kritisch — you have neither, so you may play any card."}
-                </div>
-              )}
-            </div>
-
             {!showPassScreen && phase === "playing" && (
               <>
                 {/* CURRENT PLAYER HAND */}
-                <div className="absolute bottom-3 left-1/2 z-30 w-full -translate-x-1/2 px-10">
+                <div className="absolute bottom-3 left-1/2 z-30 w-full -translate-x-1/2 px-10 max-md:px-1">
                   <div className="relative mx-auto min-h-40 max-w-3xl rounded-2xl p-2.5 shadow-2xl">
                     {/* Active player label */}
                     <div className="absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-amber-400 px-5 py-1.5 text-sm font-black text-amber-950 shadow-lg max-md:-top-4 max-md:px-3 max-md:py-1 max-md:text-[10px]">
@@ -4186,7 +4137,7 @@ export default function WattenGame() {
                     </div>
 
                     {/* Help + Cards + Finish Turn */}
-                    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+                    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 max-md:grid-cols-1 max-md:gap-2">
                       {/* LEFT: Help legend */}
                       <div className="flex justify-end">
                         {helpMode &&
@@ -4213,7 +4164,7 @@ export default function WattenGame() {
                       </div>
 
                       {/* CENTER: Cards */}
-                      <div className="flex justify-center gap-2 max-md:gap-0">
+                      <div className="watten-hand flex justify-center gap-2 max-md:gap-0">
                         {currentPlayerData.cards.map((card) => {
                           const mustFollow =
                             currentPlayerMustFollowTrumpfOderKritisch;

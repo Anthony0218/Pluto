@@ -21,7 +21,7 @@ html:has(.app-shell), body:has(.app-shell) {
   height: 100%;
   overflow: hidden;
 }
-.app-shell { height: 100dvh; overflow: hidden; padding-top: var(--public-header-height); }
+.app-shell { --app-height: calc(100dvh - var(--public-header-height)); height: 100dvh; overflow: hidden; padding-top: var(--public-header-height); }
 .app-shell.integrated-navigation { --public-header-height: 0px; --app-height: 100dvh; padding-top: 0; }
 #app-navigation[open] { animation: navigation-enter .25s ease-out both; }
 #app-navigation[open][data-closing] { animation: navigation-exit .2s ease-in both; }
@@ -32,6 +32,12 @@ html:has(.app-shell), body:has(.app-shell) {
 .app-viewport .min-h-screen { min-height: var(--app-height); }
 .app-viewport .h-screen { height: var(--app-height); }
 @media (max-width: 639px) {
+  .compact-app-header > div > .ml-auto { width: 100%; }
+  .compact-app-header .navigation-controls { justify-content: flex-end; }
+  .compact-app-header #header-tools-slot { flex: 1; }
+  .compact-app-header #header-tools-slot > div > button { width: 36px; padding: 0; gap: 0; justify-content: center; }
+  .compact-app-header #header-tools-slot > div > button > span,
+  .compact-app-header #header-tools-slot > div > button > svg:last-child { display: none; }
   .public-header-language label > span {
     position: absolute;
     width: 1px;
@@ -157,66 +163,15 @@ body {
     transform: translateX(0);
   }
 }
-@keyframes wattenCardInBottom {
-  from {
-    opacity: 0;
-    transform: translate(-50%, 120px) scale(0.8);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0) scale(1);
-  }
-}
-
-@keyframes wattenCardInTop {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -120px) scale(0.8);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0) scale(1);
-  }
-}
-
-@keyframes wattenCardInLeft {
-  from {
-    opacity: 0;
-    transform: translate(-120px, -50%) scale(0.8);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate(0, -50%) scale(1);
-  }
-}
-
-@keyframes wattenCardInRight {
-  from {
-    opacity: 0;
-    transform: translate(120px, -50%) scale(0.8);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate(0, -50%) scale(1);
-  }
-}
-
-.watten-card-in-bottom {
-  animation: wattenCardInBottom 280ms ease-out;
-}
-
-.watten-card-in-top {
-  animation: wattenCardInTop 280ms ease-out;
-}
-
-.watten-card-in-left {
-  animation: wattenCardInLeft 280ms ease-out;
-}
-
-.watten-card-in-right {
-  animation: wattenCardInRight 280ms ease-out;
+/* Animate only the flight transform; seat anchors and card scales stay intact. */
+@keyframes wattenCardInBottom { from { opacity: 0; transform: translateY(180px) rotate(-8deg); } to { opacity: 1; transform: none; } }
+@keyframes wattenCardInTop { from { opacity: 0; transform: translateY(-180px) rotate(8deg); } to { opacity: 1; transform: none; } }
+@keyframes wattenCardInLeft { from { opacity: 0; transform: translateX(-180px) rotate(-12deg); } to { opacity: 1; transform: none; } }
+@keyframes wattenCardInRight { from { opacity: 0; transform: translateX(180px) rotate(12deg); } to { opacity: 1; transform: none; } }
+.watten-card-in-bottom { animation: wattenCardInBottom 420ms cubic-bezier(.2,.75,.25,1); }
+.watten-card-in-top { animation: wattenCardInTop 420ms cubic-bezier(.2,.75,.25,1); }
+.watten-card-in-left { animation: wattenCardInLeft 420ms cubic-bezier(.2,.75,.25,1); }
+.watten-card-in-right { animation: wattenCardInRight 420ms cubic-bezier(.2,.75,.25,1); }
+@media (prefers-reduced-motion: reduce) {
+  [class*="watten-card-in-"] { animation: none; }
 }
