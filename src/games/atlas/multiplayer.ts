@@ -17,7 +17,7 @@ export const isRoundMode = (mode: string): mode is AtlasRoundMode => ATLAS_ROUND
 /** Territory ownership is two-coloured and Stat Battle is a duel; every other mode seats two to four players. */
 export const maxPlayersFor = (mode: AtlasMultiplayerMode) => mode === "territory_battle" || mode === "stat_battle" ? 2 : 4;
 export const clampPlayers = (mode: AtlasMultiplayerMode, requested: unknown) => Math.min(maxPlayersFor(mode), Math.max(2, Math.trunc(Number(requested)) || 2));
-export type AtlasMatchStatus = "waiting" | "ready" | "countdown" | "round_active" | "round_resolving" | "next_round" | "finished";
+export type AtlasMatchStatus = "waiting" | "draft" | "ready" | "intermission" | "countdown" | "round_active" | "round_resolving" | "next_round" | "finished" | "cancelled";
 export type ServerSubmission = { userId: string; round: number; answer: string | Coordinates; submittedAt: number; correct: boolean; distanceKm?: number; nearest?: Coordinates; tip?: number };
 
 export function parseClientAnswer(value: unknown, mode: AtlasMultiplayerMode): string | Coordinates {

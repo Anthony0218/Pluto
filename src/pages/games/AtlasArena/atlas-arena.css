@@ -88,6 +88,30 @@
 .atlas-hub-actions button span { overflow: hidden; max-width: 100%; text-overflow: ellipsis; white-space: nowrap; }
 .atlas-hub-actions button:hover, .atlas-hub-actions button:focus-visible { border-color: var(--accent, #52e7e0); color: #fff; background: rgba(var(--accent-rgb, 82, 231, 224), .14); outline: none; transform: translateY(-1px); }
 .atlas-hub-actions button:first-child { border-color: rgba(var(--accent-rgb, 82, 231, 224), .45); background: rgba(var(--accent-rgb, 82, 231, 224), .1); }
+.atlas-tabs { display: flex; gap: .4rem; justify-content: center; width: min(480px, 100%); padding: .35rem; border: 1px solid rgba(255,255,255,.11); border-radius: 18px; background: rgba(5,12,28,.72); }
+.atlas-tabs button { flex: 1; min-height: 43px; border: 0; border-radius: 13px; color: #a8b8cb; background: transparent; font-weight: 800; cursor: pointer; }
+.atlas-tabs button.active { color: #041014; background: var(--atlas-cyan); box-shadow: 0 8px 22px rgba(82,231,224,.16); }
+.atlas-play-home,.atlas-ranked-hero { display: grid; justify-items: center; width: min(760px,100%); padding: clamp(2rem,5vw,4rem); border: 1px solid rgba(82,231,224,.2); border-radius: 30px; background: radial-gradient(circle at 50% 0,rgba(82,231,224,.1),transparent 55%),rgba(7,14,31,.8); box-shadow: 0 30px 80px rgba(0,0,0,.2); text-align: center; }
+.atlas-play-home .trials-mode-icon,.atlas-ranked-hero .trials-mode-icon { margin-bottom: 1.5rem; }
+.atlas-play-home h2,.atlas-ranked-hero h2 { margin: .35rem 0; font-family: Georgia,serif; font-size: clamp(2.3rem,6vw,4rem); font-weight: 500; letter-spacing: -.04em; }
+.atlas-play-home p,.atlas-ranked-hero p,.atlas-ranked-bans p { color: #a8b8cb; line-height: 1.6; }
+.atlas-play-home-actions { display: flex; gap: .8rem; flex-wrap: wrap; justify-content: center; width: 100%; }
+.atlas-play-home-actions .atlas-start { width: auto; min-width: 190px; }
+.atlas-ranked-home { display: grid; justify-items: center; gap: 1.5rem; width: min(1050px,100%); }
+.atlas-ranked-hero .atlas-start { max-width: 260px; }
+.atlas-ranked-hero .atlas-start small { display: block; margin-top: .15rem; font-size: .7rem; font-weight: 600; opacity: .75; }
+.atlas-ranked-search { margin-top: 1.2rem; color: var(--atlas-cyan); font-weight: 800; }
+.atlas-ranked-bans { width: 100%; padding: clamp(1.25rem,3vw,2rem); border: 1px solid rgba(255,255,255,.1); border-radius: 25px; background: rgba(7,14,31,.7); }
+.atlas-ranked-bans h3 { margin: .35rem 0; font-family: Georgia,serif; font-size: 2rem; font-weight: 500; }
+.atlas-ranked-mode-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(175px,1fr)); gap: .8rem; margin-top: 1.4rem; }
+.atlas-ranked-mode-grid .atlas-duel-card { text-align: left; cursor: pointer; }
+.atlas-ranked-mode-grid .atlas-duel-card.is-banned { border-color: rgba(251,113,133,.55); background: rgba(251,113,133,.11); }
+.atlas-ranked-mode-grid .atlas-duel-card small { display: flex; align-items: center; gap: .3rem; }
+.atlas-ranked-mode-grid .atlas-duel-card:disabled { opacity: .6; cursor: not-allowed; }
+.atlas-ranked-result { margin: 1.5rem 0; padding: 1.2rem 2rem; border: 1px solid rgba(82,231,224,.3); border-radius: 20px; background: rgba(82,231,224,.08); }
+.atlas-ranked-result strong { display: block; font-family: Georgia,serif; font-size: 1.6rem; font-weight: 500; }
+.atlas-ranked-result span { display: block; margin-top: .35rem; color: #a8b8cb; }
+@media (max-width: 600px) { .atlas-play-home-actions { display: grid; } .atlas-play-home-actions .atlas-start { width: 100%; } .atlas-ranked-mode-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 
 /* Rules dialog */
 .atlas-rules-backdrop { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 1rem; background: rgba(2, 6, 16, .72); backdrop-filter: blur(6px); animation: trial-fade .2s backwards; }
@@ -172,3 +196,121 @@
   .atlas-rules > footer { padding: .7rem 1rem 1rem; }
 }
 @media (prefers-reduced-motion: reduce) { .atlas-rules-backdrop, .atlas-handoff, .atlas-standings li { animation: none; } }
+
+/* Play choices and compact Ranked entry */
+.atlas-play-home { display: grid; justify-items: stretch; width: min(1100px,100%); padding: 0; border: 0; background: none; box-shadow: none; text-align: left; gap: 1.4rem; }
+.atlas-play-intro { text-align: center; }
+.atlas-play-intro h2 { margin: .25rem 0; font: 500 clamp(2rem,5vw,3.2rem) Georgia,serif; letter-spacing: -.04em; }
+.atlas-play-intro p { margin: 0; color: #a8b8cb; }
+.atlas-play-choices { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1rem; }
+.atlas-play-choice { display: flex; flex-direction: column; min-width: 0; min-height: 375px; padding: clamp(1.25rem,3vw,2rem); border: 1px solid rgba(82,231,224,.3); border-radius: 28px; color: #f6f8ff; background: radial-gradient(circle at 5% 0,rgba(82,231,224,.17),transparent 50%),linear-gradient(145deg,#12243a,#071222); text-align: left; cursor: pointer; transition: transform .2s,border-color .2s,box-shadow .2s; }
+.atlas-play-choice.is-choose { border-color: rgba(255,200,107,.32); background: radial-gradient(circle at 95% 0,rgba(255,200,107,.15),transparent 50%),linear-gradient(145deg,#282138,#101421); }
+.atlas-play-choice:hover,.atlas-play-choice:focus-visible { transform: translateY(-4px); border-color: #82ece5; box-shadow: 0 20px 50px rgba(0,0,0,.25); outline: none; }
+.atlas-play-choice.is-choose:hover,.atlas-play-choice.is-choose:focus-visible { border-color: #ffd890; }
+.atlas-choice-top,.atlas-choice-bottom { display: flex; align-items: center; justify-content: space-between; gap: .7rem; }
+.atlas-play-choice-mark { display: grid; place-items: center; width: 50px; height: 50px; border-radius: 16px; color: #0b252a; background: #82ece5; }
+.atlas-play-choice-mark svg { width: 26px; height: 26px; }
+.is-choose .atlas-play-choice-mark { color: #312210; background: #ffd890; }
+.atlas-choice-tag { padding: .35rem .7rem; border: 1px solid currentColor; border-radius: 999px; color: #82ece5; font-size: .7rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.is-choose .atlas-choice-tag { color: #ffd890; }
+.atlas-play-choice > strong { margin-top: 1.35rem; font: 500 clamp(1.7rem,3vw,2.3rem) Georgia,serif; letter-spacing: -.035em; }
+.atlas-choice-description { max-width: 32ch; margin-top: .45rem; color: #b1c0d0; line-height: 1.5; }
+.atlas-choice-icons { display: grid; grid-template-columns: repeat(8,minmax(0,1fr)); gap: .38rem; margin: auto 0 1.3rem; padding-top: 1.7rem; }
+.atlas-choice-icons > span { display: grid; place-items: center; aspect-ratio: 1; border: 1px solid rgba(255,255,255,.13); border-radius: 10px; color: #a8e9e6; background: rgba(255,255,255,.055); }
+.is-choose .atlas-choice-icons > span { color: #e9cf9d; }
+.is-random .atlas-choice-icons > span:nth-child(3n) { transform: rotate(10deg) translateY(-3px); }
+.is-random .atlas-choice-icons > span:nth-child(4n) { transform: rotate(-9deg) translateY(3px); }
+.is-choose .atlas-choice-icons > span:first-child { border-color: #ffd890; background: rgba(255,200,107,.22); box-shadow: inset 0 0 0 2px rgba(255,200,107,.13); }
+.atlas-choice-icons svg { width: 19px; height: 19px; }
+.atlas-choice-bottom { padding-top: 1rem; border-top: 1px solid rgba(255,255,255,.15); color: #82ece5; font-weight: 800; }
+.atlas-choice-bottom > span { display: flex; align-items: center; gap: .5rem; }
+.is-choose .atlas-choice-bottom { color: #ffd890; }
+.atlas-ranked-home { gap: 1rem; }
+.atlas-ranked-hero { display: flex; align-items: center; justify-content: space-between; gap: 2rem; width: 100%; padding: clamp(1.25rem,3vw,2rem); text-align: left; }
+.atlas-ranked-hero h2 { font-size: clamp(1.8rem,4vw,2.8rem); }
+.atlas-ranked-hero p { margin: .3rem 0; }
+.atlas-ranked-hero-action { display: grid; justify-items: center; flex: none; width: min(245px,35%); }
+.atlas-ranked-hero-action .atlas-start { width: 100%; }
+.atlas-ranked-summary { display: block; margin-top: .8rem; color: #82ece5; font-size: .8rem; font-weight: 700; }
+.atlas-ranked-mode-preview { display: flex; flex-wrap: wrap; justify-content: center; gap: .45rem; width: 100%; }
+.atlas-ranked-mode-preview > span { display: inline-flex; align-items: center; gap: .35rem; padding: .45rem .65rem; border: 1px solid rgba(255,255,255,.12); border-radius: 999px; color: #cbd7e5; background: rgba(255,255,255,.04); font-size: .72rem; }
+.atlas-ranked-mode-preview svg { width: 15px; height: 15px; color: var(--accent,#82ece5); }
+.atlas-ranked-draft { width: min(1050px,100%); padding: clamp(1.2rem,3vw,2rem); border: 1px solid rgba(82,231,224,.24); border-radius: 26px; background: rgba(7,14,31,.82); }
+.atlas-ranked-draft h2 { margin: .35rem 0; font: 500 clamp(1.9rem,4vw,3rem) Georgia,serif; }
+.atlas-ranked-draft p { max-width: 76ch; color: #a8b8cb; line-height: 1.5; }
+.atlas-ranked-draft-count { color: #82ece5; font-size: .82rem; font-weight: 800; }
+.atlas-ranked-draft .atlas-ranked-mode-grid { grid-template-columns: repeat(auto-fit,minmax(150px,1fr)); }
+.atlas-ranked-lock { margin: 1.3rem auto 0; }
+.atlas-room-page:has(.atlas-series) { height: auto; min-height: var(--app-height); overflow: visible; }
+.atlas-series { width: min(820px,100%); padding: 1rem; border: 1px solid rgba(255,200,107,.3); border-radius: 20px; background: rgba(255,200,107,.055); text-align: left; }
+.atlas-series-players { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .8rem; }
+.atlas-series-players > div { display: grid; gap: .2rem; padding: .7rem; border-radius: 12px; background: rgba(255,255,255,.05); }
+.atlas-series-players strong { color: #fff; }
+.atlas-series-players span { color: #ffd890; font-size: .85rem; font-weight: 800; }
+.atlas-series-players small { color: #a8b8cb; line-height: 1.4; }
+.atlas-series-order { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .55rem; margin: .9rem 0; padding: 0; list-style: none; }
+.atlas-series-order li { display: flex; align-items: center; gap: .5rem; min-width: 0; padding: .65rem; border: 1px solid rgba(255,255,255,.12); border-radius: 12px; }
+.atlas-series-order li.is-current { border-color: #82ece5; background: rgba(82,231,224,.09); }
+.atlas-series-order svg { flex: none; width: 19px; height: 19px; color: #82ece5; }
+.atlas-series-order li span { display: grid; min-width: 0; }
+.atlas-series-order li small { color: #a8b8cb; font-size: .65rem; text-transform: uppercase; }
+.atlas-series-order li strong { overflow: hidden; font-size: .8rem; text-overflow: ellipsis; white-space: nowrap; }
+.atlas-series-order li em { margin-left: auto; color: #ffd890; font-size: .65rem; font-style: normal; white-space: nowrap; }
+.atlas-series p { margin: 0; color: #a8b8cb; font-size: .75rem; }
+@media (max-width: 720px) { .atlas-play-choices { grid-template-columns: 1fr; } .atlas-play-choice { min-height: 320px; } .atlas-ranked-hero { display: grid; gap: 1rem; } .atlas-ranked-hero-action { width: 100%; } .atlas-series-order { grid-template-columns: 1fr; } }
+
+/* Keep the Play choice screen inside the app viewport. Other tabs keep their normal scroll. */
+.atlas-hub.is-play-tab { box-sizing: border-box; height: var(--app-height); min-height: 0; grid-template-rows: auto auto auto minmax(0,1fr) auto; align-content: stretch; gap: clamp(.35rem,1vh,.7rem); overflow: hidden; padding: clamp(.5rem,1.5vh,1rem) clamp(.75rem,3vw,2rem); }
+.is-play-tab .trials-hub-intro h1 { font-size: clamp(2rem,6vh,3.5rem); }
+.is-play-tab .trials-hub-intro p { display: none; }
+.is-play-tab .atlas-tabs { padding: .2rem; }
+.is-play-tab .atlas-tabs button { min-height: 38px; }
+.is-play-tab .atlas-play-home { height: 100%; min-height: 0; grid-template-rows: auto minmax(0,1fr); gap: .5rem; }
+.is-play-tab .atlas-play-intro h2 { font-size: clamp(1.45rem,4vh,2.2rem); }
+.is-play-tab .atlas-play-intro p { font-size: .8rem; line-height: 1.25; }
+.is-play-tab .atlas-play-choices { height: 100%; min-height: 0; }
+.is-play-tab .atlas-play-choice { height: 100%; min-height: 0; padding: clamp(.85rem,2.2vh,1.4rem); }
+.is-play-tab .atlas-play-choice > strong { margin-top: .7rem; font-size: clamp(1.45rem,3vw,2rem); }
+.is-play-tab .atlas-choice-description { font-size: .85rem; line-height: 1.35; }
+.is-play-tab .atlas-choice-icons { padding-top: .45rem; margin-bottom: .6rem; }
+.is-play-tab .atlas-choice-icons > span { max-height: 42px; }
+.is-play-tab .atlas-choice-bottom { padding-top: .6rem; }
+.is-play-tab .atlas-home-footer { flex-wrap: nowrap; }
+@media (max-width: 720px) {
+  .is-play-tab .atlas-play-choices { grid-template-columns: minmax(0,1fr); grid-template-rows: repeat(2,minmax(0,1fr)); gap: .45rem; }
+  .is-play-tab .atlas-play-choice { padding: .65rem .85rem; border-radius: 18px; }
+  .is-play-tab .atlas-play-choice-mark { width: 28px; height: 28px; border-radius: 9px; }
+  .is-play-tab .atlas-play-choice-mark svg { width: 16px; height: 16px; }
+  .is-play-tab .atlas-choice-tag { padding: .2rem .45rem; font-size: .58rem; }
+  .is-play-tab .atlas-play-choice > strong { margin-top: .25rem; font-size: clamp(1.2rem,5vw,1.45rem); }
+  .is-play-tab .atlas-choice-description { display: none; }
+  .is-play-tab .atlas-choice-icons { gap: .2rem; padding-top: .15rem; margin: auto 0 .25rem; }
+  .is-play-tab .atlas-choice-icons > span { height: clamp(21px,3.6vh,27px); aspect-ratio: auto; border-radius: 6px; }
+  .is-play-tab .atlas-choice-icons svg { width: 14px; height: 14px; }
+  .is-play-tab .atlas-choice-bottom { padding-top: .25rem; font-size: .72rem; }
+  .is-play-tab .atlas-home-footer { gap: .5rem; font-size: .65rem; }
+  .is-play-tab .atlas-home-footer > span { display: none; }
+}
+@media (max-height: 640px) {
+  .is-play-tab .atlas-play-intro p { display: none; }
+  .is-play-tab .trials-hub-intro h1 { font-size: 2rem; }
+  .is-play-tab .atlas-play-intro h2 { font-size: 1.4rem; }
+  .is-play-tab .atlas-home-footer { display: none; }
+  .atlas-hub.is-play-tab { grid-template-rows: auto auto auto minmax(0,1fr); }
+}
+@media (max-width: 420px) {
+  .is-play-tab .atlas-play-intro p { display: none; }
+  .is-play-tab .atlas-play-choice { padding: .5rem .7rem; }
+  .is-play-tab .atlas-play-choice-mark { width: 26px; height: 26px; }
+  .is-play-tab .atlas-choice-icons > span { height: 22px; }
+}
+@media (max-width: 720px) and (max-height: 640px) {
+  .is-play-tab .atlas-play-intro .atlas-eyebrow { display: none; }
+  .is-play-tab .atlas-choice-icons > span { height: 18px; }
+}
+@media (max-height: 520px) {
+  .atlas-hub.is-play-tab { height: auto; min-height: var(--app-height); overflow: visible; grid-template-rows: auto auto auto auto; }
+  .is-play-tab .atlas-play-home { height: auto; }
+  .is-play-tab .atlas-play-choices { height: auto; }
+  .is-play-tab .atlas-play-choice { min-height: 112px; }
+}

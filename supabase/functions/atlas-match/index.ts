@@ -5,6 +5,8 @@ import extrasJson from "../../../data/geography/extras.json" with { type: "json"
 import topologyJson from "../../../public/data/geography/world-110m.json" with { type: "json" };
 import { COMPARISON_CATEGORIES, DEFAULT_COMPARISON_STATS, QUESTION_CATEGORIES, parseSelection, usesMapCategories } from "../../../src/games/atlas/categories.ts";
 import { generateMatchQuestions } from "../../../src/games/atlas/matchQuestions.ts";
+import { rankedModes, maxModeBans, sanitizeBans, chooseRankedSeries, RANKED_CONFIG } from "../../../src/games/atlas/ranked.ts";
+import { calculateMatchResult, type Rating } from "../../../src/games/atlas/rankedRating.ts";
 import { GUESS_SCORING } from "../../../src/games/atlas/config.ts";
 import { ATLAS_MULTIPLAYER_MODES, RACE_LIMIT_MS, applyRaceProgress, applyTerritoryRound, clampPlayers, createAuthoritativeSubmission, isRaceMode, isRoundMode, raceComplete, raceScores, resolveGuessTip, resolveRoundScores, territoryPlayerScores, verifyMatchDataset, type AtlasMatchStatus, type AtlasMultiplayerMode, type RaceEntry, type ServerSubmission } from "../../../src/games/atlas/multiplayer.ts";
 import { isFillScope, type FillScope } from "../../../src/games/atlas/scopes.ts";
@@ -31,9 +33,10 @@ const trialPool = (difficulty: AtlasDifficulty) => {
 };
 const trialById = () => new Map(trialPool("expert").map((country) => [country.id, country]));
 type Player = { id: string; name: string; ready: boolean };
-type Match = { id: string; room_code: string; mode: AtlasMultiplayerMode; host_id: string; players: Player[]; status: AtlasMatchStatus; dataset_version: string; seed: string; settings: { rounds?: number; allowSteal?: boolean; difficulty?: "beginner" | "intermediate" | "expert"; maxPlayers?: number; categories?: AtlasCategory[]; stats?: AtlasStatKey[]; scope?: FillScope }; round_index: number; tip_index?: number; round_started_at: string | null; round_ends_at: string | null; resolve_at: string | null; submissions: ServerSubmission[]; scores: Record<string, number>; ownership: Record<string, "player_a" | "player_b">; round_result: Record<string, unknown> | null; state?: MatchState | null; version: number };
+type Match = { id: string; room_code: string; mode: AtlasMultiplayerMode; match_kind: "casual" | "ranked"; created_at: string; host_id: string; players: Player[]; status: AtlasMatchStatus; dataset_version: string; seed: string; settings: { rounds?: number; allowSteal?: boolean; difficulty?: "beginner" | "intermediate" | "expert"; maxPlayers?: number; categories?: AtlasCategory[]; stats?: AtlasStatKey[]; scope?: FillScope }; round_index: number; tip_index?: number; round_started_at: string | null; round_ends_at: string | null; resolve_at: string | null; submissions: ServerSubmission[]; scores: Record<string, number>; ownership: Record<string, "player_a" | "player_b">; round_result: Record<string, unknown> | null; state?: MatchState | null; version: number };
 /** Live state of the modes that are not question rounds: race standings and the Stat Battle table. */
-type MatchState = { race?: Record<string, RaceEntry>; duel?: BattleMatchState };
+type RankedSeries = { bans: Record<string, string[]>; order: AtlasMultiplayerMode[]; gameIndex: number; wins: Record<string, number>; results: { mode: AtlasMultiplayerMode; winnerId: string; scores: Record<string, number> }[] };
+type MatchState = { race?: Record<string, RaceEntry>; duel?: BattleMatchState; ranked?: RankedSeries };
 
 const nameFor = (value: unknown) => typeof value === "string" ? value.trim().slice(0, 32) || "Player" : "Player";
 const maxPlayers = (match: Match) => match.settings.maxPlayers || 2;
@@ -64,7 +67,7 @@ const snapshot = (match: Match, userId: string) => {
   const thisTip = match.submissions.filter((item) => item.round === match.round_index && tipOf(item) === tip);
   // Earlier missed guesses of this country are public: they narrow the field for everyone.
   const missedGuesses = match.mode === "guess_country" ? match.submissions.filter((item) => item.round === match.round_index && (tipOf(item) < tip || resolved)).map((item) => ({ userId: item.userId, tip: tipOf(item), answer: String(item.answer), correct: resolved ? item.correct : false })) : [];
-  return { code: match.room_code, mode: match.mode, hostId: match.host_id, players: match.players, seat, maxPlayers: maxPlayers(match), status: match.status, datasetVersion: match.dataset_version, settings: match.settings, roundIndex: match.round_index, rounds: roundsFor(match).length, tipIndex: tip, tipCount: question?.interaction === "guess_country" ? question.clues.length : 1, roundStartedAt: match.round_started_at, roundEndsAt: match.round_ends_at, scores: match.scores, ownership: match.ownership, question: publicQuestion(question, match, resolved), submitted: thisTip.some((item) => item.userId === userId), submittedAnswer: thisTip.find((item) => item.userId === userId)?.answer ?? null, opponentSubmitted: thisTip.some((item) => item.userId !== userId), submittedIds: thisTip.map((item) => item.userId), guesses: missedGuesses, roundResult: resolved ? match.round_result : null, version: match.version,
+  return { id: match.id, code: match.room_code, mode: match.mode, ranked: match.match_kind === "ranked", series: match.state?.ranked ? { ...match.state.ranked, bans: match.status === "draft" ? { [userId]: match.state.ranked.bans[userId] ?? [] } : match.state.ranked.bans, submittedCount: Object.keys(match.state.ranked.bans).length } : undefined, hostId: match.host_id, players: match.players, seat, maxPlayers: maxPlayers(match), status: match.status, datasetVersion: match.dataset_version, settings: match.settings, roundIndex: match.round_index, rounds: roundsFor(match).length, tipIndex: tip, tipCount: question?.interaction === "guess_country" ? question.clues.length : 1, roundStartedAt: match.round_started_at, roundEndsAt: match.round_ends_at, scores: match.scores, ownership: match.ownership, question: publicQuestion(question, match, resolved), submitted: thisTip.some((item) => item.userId === userId), submittedAnswer: thisTip.find((item) => item.userId === userId)?.answer ?? null, opponentSubmitted: thisTip.some((item) => item.userId !== userId), submittedIds: thisTip.map((item) => item.userId), guesses: missedGuesses, roundResult: resolved ? match.round_result : null, version: match.version,
     // Races play client-side from the shared seed; Stat Battle shows each seat only its own hand.
     ...(isRaceMode(match.mode) ? { seed: match.seed, race: match.state?.race ?? {} } : {}),
     ...(match.mode === "stat_battle" && match.state?.duel && seat < 2 ? { battle: battleView(match.state.duel, seat as BattleSeat) } : {}) };
@@ -121,9 +124,18 @@ function revealDuel(match: Match, now: number, force: boolean): boolean {
 
 function advanceByClock(match: Match, now: number): boolean {
   let changed = false;
+  // Ranked rooms require both players to confirm readiness. If either disappears
+  // before the first round, the room expires without any rating change.
+  // During play the existing round clocks continue: a disconnected player can
+  // reconnect to the same room, but unanswered rounds earn no points. There is
+  // no client-declared forfeit or rating change on a transport error.
+  if (match.match_kind === "ranked" && ["waiting", "draft", "ready"].includes(match.status) && !match.state?.ranked?.results.length && now - Date.parse(match.created_at) > RANKED_CONFIG.prestartTimeoutMs * 4) {
+    match.status = "cancelled";
+    return true;
+  }
   if ((match.status === "countdown" || match.status === "next_round") && match.round_started_at && now >= Date.parse(match.round_started_at)) {
     match.status = "round_active"; changed = true;
-    if (isRaceMode(match.mode)) { match.state = { race: {} }; match.round_ends_at = new Date(now + RACE_LIMIT_MS).toISOString(); }
+    if (isRaceMode(match.mode)) { match.state = { ...match.state, race: {} }; match.round_ends_at = new Date(now + RACE_LIMIT_MS).toISOString(); }
     else if (match.mode === "stat_battle") { match.state = { duel: createBattleMatch(trialPool(match.settings.difficulty || "intermediate"), match.seed) }; syncDuelScores(match); match.round_ends_at = new Date(now + PICK_MS).toISOString(); }
     else match.round_ends_at = new Date(now + (match.mode === "guess_country" ? TIP_MS : ROUND_MS)).toISOString();
   }
@@ -152,6 +164,53 @@ function advanceByClock(match: Match, now: number): boolean {
   return changed;
 }
 
+function advanceRankedSeries(match: Match): void {
+  const series = match.state?.ranked;
+  if (match.match_kind !== "ranked" || match.status !== "finished" || !series || series.order.length !== 3 || series.results.length > series.gameIndex) return;
+  const [a, b] = match.players.map((player) => player.id);
+  const scoreA = match.scores[a] ?? 0, scoreB = match.scores[b] ?? 0;
+  // A tied game has a seeded deciding draw, so the best-of-three always has a winner.
+  const winnerId = scoreA === scoreB ? (match.seed.charCodeAt(0) % 2 ? a : b) : scoreA > scoreB ? a : b;
+  series.results.push({ mode: match.mode, winnerId, scores: { ...match.scores } });
+  series.wins[winnerId] = (series.wins[winnerId] ?? 0) + 1;
+  if (series.wins[winnerId] >= 2 || series.results.length === 3) {
+    match.scores = { [a]: series.wins[a] ?? 0, [b]: series.wins[b] ?? 0 };
+    return;
+  }
+  series.gameIndex += 1;
+  match.mode = series.order[series.gameIndex];
+  match.settings = { rounds: match.mode === "territory_battle" ? 20 : match.mode === "guess_country" ? 8 : 10, allowSteal: true, difficulty: "intermediate", maxPlayers: 2 };
+  match.seed = crypto.randomUUID();
+  match.status = "intermission";
+  match.players = match.players.map((player) => ({ ...player, ready: false }));
+  match.round_index = 0; match.tip_index = 0; match.round_started_at = null; match.round_ends_at = null; match.resolve_at = null;
+  match.submissions = []; match.scores = { [a]: 0, [b]: 0 }; match.ownership = {}; match.round_result = null;
+  match.state = { ranked: series };
+}
+
+async function settleRanked(db: ReturnType<typeof createClient>, match: Match): Promise<void> {
+  if (match.match_kind !== "ranked" || match.status !== "finished" || match.players.length !== 2 || !match.state?.ranked || Math.max(...Object.values(match.state.ranked.wins)) < 2) return;
+  const [a, b] = match.players.map((player) => player.id);
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const { data: existing, error: existingError } = await db.from("atlas_ranked_results").select("match_id").eq("match_id", match.id).maybeSingle();
+    if (existingError) throw new Error("Could not check Ranked result.");
+    if (existing) return;
+    const { data: profiles, error } = await db.from("atlas_ranked_profiles").select("*").in("user_id", [a, b]);
+    if (error) throw new Error("Could not load Ranked ratings.");
+    const asRating = (id: string): Rating => {
+      const row = profiles?.find((item) => item.user_id === id);
+      return row ? { rating: row.rating, deviation: row.deviation, volatility: row.volatility, matchesPlayed: row.matches_played } : { rating: 1500, deviation: 350, volatility: 0.06, matchesPlayed: 0 };
+    };
+    const beforeA = asRating(a), beforeB = asRating(b);
+    const result = (match.scores[a] ?? 0) > (match.scores[b] ?? 0) ? "a" : (match.scores[a] ?? 0) < (match.scores[b] ?? 0) ? "b" : "draw";
+    const after = calculateMatchResult(beforeA, beforeB, result);
+    const { error: applyError } = await db.rpc("atlas_apply_ranked_result", { p_match: match.id, p_before_a: beforeA, p_after_a: after.a, p_before_b: beforeB, p_after_b: after.b });
+    if (!applyError) return;
+    if (!applyError.message.includes("STALE_RATING")) throw new Error("Could not save Ranked result.");
+  }
+  throw new Error("Ranked rating changed during settlement. Retry loading the room.");
+}
+
 Deno.serve(async (request) => {
   if (request.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (request.method !== "POST") return respond({ error: "POST required." }, 405);
@@ -164,6 +223,31 @@ Deno.serve(async (request) => {
     const raw = await request.text();
     if (raw.length > 16_384) return respond({ error: "Request too large." }, 413);
     const body = JSON.parse(raw) as Record<string, unknown>;
+    if (body.op === "rankedProfile" || body.op === "rankedBans") {
+      const { error: createError } = await db.from("atlas_ranked_profiles").upsert({ user_id: user.id }, { onConflict: "user_id", ignoreDuplicates: true });
+      if (createError) throw new Error("Could not initialize Ranked profile.");
+      if (body.op === "rankedBans") {
+        if (!Array.isArray(body.bans) || !body.bans.every((item) => typeof item === "string")) throw new Error("Invalid mode bans.");
+        const bans = sanitizeBans(body.bans);
+        if (body.bans.length !== bans.length || bans.length > maxModeBans()) throw new Error(`Choose up to ${maxModeBans()} Ranked mode bans.`);
+        const { error } = await db.from("atlas_ranked_profiles").update({ mode_bans: bans, updated_at: new Date().toISOString() }).eq("user_id", user.id);
+        if (error) throw new Error("Could not save mode bans.");
+      }
+      const { data, error } = await db.from("atlas_ranked_profiles").select("*").eq("user_id", user.id).single();
+      if (error) throw new Error("Could not load Ranked profile.");
+      return respond(data);
+    }
+    if (body.op === "rankedQueue") {
+      if (!['queue', 'status', 'leave'].includes(String(body.action))) throw new Error("Invalid queue action.");
+      if (typeof body.session !== "string" || !/^[0-9a-f-]{36}$/i.test(body.session)) throw new Error("Invalid queue session.");
+      verifyMatchDataset(ATLAS_VERSION, String(body.datasetVersion || ""));
+      const { data, error } = await db.rpc("atlas_ranked_queue_action", {
+        p_user: user.id, p_session: body.session, p_op: body.action, p_name: nameFor(body.name),
+        p_modes: rankedModes().map((mode) => mode.online), p_dataset: ATLAS_VERSION,
+      });
+      if (error) throw new Error(`Could not update Ranked queue: ${error.message}`);
+      return respond(data);
+    }
     if (body.op === "create") {
       if (!modes.has(body.mode as AtlasMultiplayerMode)) throw new Error("Unknown Atlas mode.");
       verifyMatchDataset(ATLAS_VERSION, String(body.datasetVersion || ""));
@@ -195,14 +279,38 @@ Deno.serve(async (request) => {
       const seat = match.players.findIndex((player) => player.id === user.id);
       const now = Date.now();
       let changed = advanceByClock(match, now);
+      if (changed && match.status === "cancelled") {
+        const { data: cancelled, error: cancelError } = await db.from("atlas_matches").update({ status: "cancelled", version: match.version + 1, updated_at: new Date().toISOString() }).eq("id", match.id).eq("version", match.version).select().maybeSingle();
+        if (cancelError) throw new Error("Could not cancel expired Ranked match.");
+        if (cancelled) return respond(snapshot(cancelled as Match, user.id));
+        continue;
+      }
       if (body.op === "join") {
+        if (match.match_kind === "ranked" && seat < 0) throw new Error("Ranked rooms are assigned by matchmaking.");
         if (seat < 0) {
           if (match.players.length >= maxPlayers(match) || !["waiting", "ready"].includes(match.status)) throw new Error("This room is already full.");
           match.players.push({ id: user.id, name: nameFor(body.name), ready: false }); match.scores[user.id] = 0; changed = true;
         }
       } else if (seat < 0) return respond({ error: "Join this room first." }, 403);
-      else if (body.op === "ready") {
-        match.players[seat].ready = true; match.status = "ready"; changed = true;
+      else if (body.op === "ban") {
+        if (match.match_kind !== "ranked" || match.status !== "draft" || !match.state?.ranked) throw new Error("Mode bans are closed.");
+        if (match.state.ranked.bans[user.id]) throw new Error("Your bans are already locked.");
+        if (!Array.isArray(body.bans) || !body.bans.every((item) => typeof item === "string")) throw new Error("Invalid mode bans.");
+        const bans = sanitizeBans(body.bans);
+        if (bans.length !== body.bans.length || bans.length > maxModeBans()) throw new Error(`Choose up to ${maxModeBans()} mode bans.`);
+        match.state.ranked.bans[user.id] = bans;
+        if (Object.keys(match.state.ranked.bans).length === 2) {
+          const [a, b] = match.players.map((player) => player.id);
+          const order = chooseRankedSeries(rankedModes().map((item) => item.online), match.state.ranked.bans[a], match.state.ranked.bans[b], () => crypto.getRandomValues(new Uint32Array(1))[0] / 2 ** 32) as AtlasMultiplayerMode[];
+          match.state.ranked.order = order;
+          match.mode = order[0];
+          match.settings = { rounds: match.mode === "territory_battle" ? 20 : match.mode === "guess_country" ? 8 : 10, allowSteal: true, difficulty: "intermediate", maxPlayers: 2 };
+          match.status = "ready";
+        }
+        changed = true;
+      } else if (body.op === "ready") {
+        if (!["waiting", "ready", "intermission"].includes(match.status)) throw new Error("This room is not waiting for players.");
+        match.players[seat].ready = true; if (match.status !== "intermission") match.status = "ready"; changed = true;
         if (match.players.length === maxPlayers(match) && match.players.every((player) => player.ready)) { match.status = "countdown"; match.round_started_at = new Date(now + 3000).toISOString(); }
       } else if (body.op === "start") {
         // The host may begin a 3–4 seat room early once everybody present is ready.
@@ -221,7 +329,7 @@ Deno.serve(async (request) => {
         // The host can close a race when someone has left; unfinished runs keep their last reported score.
         if (!isRaceMode(match.mode)) throw new Error("Only races can be closed early.");
         if (match.host_id !== user.id) throw new Error("Only the host can end the race.");
-        if (match.status !== "round_active") throw new Error("The race is not running.");
+        if (match.status !== "round_active" || match.match_kind === "ranked") throw new Error("This race cannot be ended early.");
         match.status = "finished"; changed = true;
       } else if (body.op === "reroll") {
         if (match.mode !== "stat_battle" || !match.state?.duel) throw new Error("This room has no card table.");
@@ -255,13 +363,18 @@ Deno.serve(async (request) => {
           if (match.submissions.filter((item) => item.round === match.round_index && tipOf(item) === (match.tip_index || 0)).length === match.players.length) resolveCurrentRound(match, now);
         }
       } else if (body.op === "rematch") {
+        if (match.match_kind === "ranked") throw new Error("Queue again for a new Ranked match.");
         if (match.status !== "finished") throw new Error("Finish this match first.");
         match.seed = crypto.randomUUID(); match.players = match.players.map((player) => ({ ...player, ready: false })); match.status = "ready"; match.round_index = 0; match.tip_index = 0; match.round_started_at = null; match.round_ends_at = null; match.resolve_at = null; match.submissions = []; match.scores = Object.fromEntries(match.players.map((player) => [player.id, 0])); match.ownership = {}; match.round_result = null; match.state = {}; changed = true;
+      } else if (body.op === "cancel") {
+        if (match.match_kind !== "ranked" || !["waiting", "draft", "ready", "countdown"].includes(match.status) || match.state?.ranked?.results.length) throw new Error("This match has already started.");
+        match.status = "cancelled"; changed = true;
       } else if (body.op !== "get") throw new Error("Unknown operation.");
-      if (!changed) return respond(snapshot(match, user.id));
-      const { data: updated, error: updateError } = await db.from("atlas_matches").update({ players: match.players, status: match.status, seed: match.seed, round_index: match.round_index, tip_index: match.tip_index || 0, round_started_at: match.round_started_at, round_ends_at: match.round_ends_at, resolve_at: match.resolve_at, submissions: match.submissions, scores: match.scores, ownership: match.ownership, round_result: match.round_result, state: match.state ?? {}, version: match.version + 1, updated_at: new Date().toISOString() }).eq("id", match.id).eq("version", match.version).select().maybeSingle();
+      if (match.status === "finished" && match.match_kind === "ranked" && match.state?.ranked?.results.length === match.state.ranked.gameIndex) { advanceRankedSeries(match); changed = true; }
+      if (!changed) { await settleRanked(db, match); return respond(snapshot(match, user.id)); }
+      const { data: updated, error: updateError } = await db.from("atlas_matches").update({ mode: match.mode, settings: match.settings, players: match.players, status: match.status, seed: match.seed, round_index: match.round_index, tip_index: match.tip_index || 0, round_started_at: match.round_started_at, round_ends_at: match.round_ends_at, resolve_at: match.resolve_at, submissions: match.submissions, scores: match.scores, ownership: match.ownership, round_result: match.round_result, state: match.state ?? {}, version: match.version + 1, updated_at: new Date().toISOString() }).eq("id", match.id).eq("version", match.version).select().maybeSingle();
       if (updateError) throw new Error("Could not save match.");
-      if (updated) return respond(snapshot(updated as Match, user.id));
+      if (updated) { await settleRanked(db, updated as Match); return respond(snapshot(updated as Match, user.id)); }
       // Reads and race scores are safe to re-apply on the fresh row; anything else must be retried by the player.
       if (body.op !== "get" && body.op !== "progress") return respond({ error: "Room changed. Latest state restored." }, 409);
     }

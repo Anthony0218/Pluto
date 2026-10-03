@@ -2,7 +2,7 @@
 let bookPromise: Promise<Record<string, string[] | null>> | null = null;
 const loadBook = () => bookPromise ??= import("./openingBook.json", { with: { type: "json" } })
   .then(({ default: positions }) => positions as Record<string, string[] | null>)
-  .catch(() => ({}));
+  .catch(() => ({} as Record<string, string[] | null>));
 
 export async function openingBookMove(fenAfter: string, ply: number): Promise<{ eco: string; name: string | null } | null> {
   // Opening theory applies to the beginning of a standard game, not a late transposition.

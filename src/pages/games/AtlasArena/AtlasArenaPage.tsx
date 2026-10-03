@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, BookOpen, Globe2, Info, Trophy, User, Users, Wifi, X } from "lucide-react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { ArrowLeft, ArrowRight, BookOpen, Check, Globe2, Info, Shuffle, Trophy, User, Users, Wifi, X } from "lucide-react";
 import { bestKey } from "../../../games/atlas/arenaStorage";
 import { ARENA_MODES, hotseatPlayerLimit, onlinePlayerLimit, type ArenaModeDef } from "../../../games/atlas/modeCatalog";
 import { DIFFICULTY_LABELS } from "../../../games/atlas/soloSettings";
 import type { AtlasDifficulty } from "../../../games/atlas/types";
 import { useAtlasData } from "../../../games/atlas/useAtlasData";
 import { MODE_ICONS, useArenaStore } from "./useArenaStore";
+import { AtlasRankedTab } from "./AtlasRankedTab";
 import "./atlas-arena.css";
 import "../../../components/atlas/trials/atlas-trials.css";
 
@@ -20,21 +21,45 @@ type Launch = "solo" | "online" | "hotseat";
 export default function AtlasArenaPage() {
   const { data } = useAtlasData();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { stored, update } = useArenaStore();
   const [rulesFor, setRulesFor] = useState<ArenaModeDef | null>(null);
   const [about, setAbout] = useState(false);
+  const [tab, setTab] = useState<"play" | "modes" | "ranked">(() => searchParams.get("tab") === "ranked" ? "ranked" : "play");
   const { difficulty } = stored;
   const launch = (mode: ArenaModeDef, how: Launch) => navigate(how === "online" ? `/games/atlas-arena/multiplayer?mode=${mode.online}` : `/games/atlas-arena/${how}/${mode.id}`);
 
   if (about) return <AboutPanel version={data?.version.atlasDataVersion ?? "…"} onBack={() => setAbout(false)} />;
   return (
-    <main className="atlas-page atlas-trials-hub atlas-hub">
+    <main className={`atlas-page atlas-trials-hub atlas-hub${tab === "play" ? " is-play-tab" : ""}`}>
       <Link className="atlas-back" to="/games"><ArrowLeft /> Pluto</Link>
       <header className="trials-hub-intro">
         <span className="atlas-eyebrow">Pluto geography laboratory</span>
         <h1>Atlas <em>Arena</em></h1>
         <p>{ARENA_MODES.length} ways to test what you know about the world — play alone, race friends online, or pass one device around the table.</p>
       </header>
+      <nav className="atlas-tabs" aria-label="Atlas Arena tabs">
+        {(["play", "modes", "ranked"] as const).map((item) => <button key={item} type="button" className={tab === item ? "active" : ""} aria-current={tab === item ? "page" : undefined} onClick={() => setTab(item)}>{item[0].toUpperCase() + item.slice(1)}</button>)}
+      </nav>
+      {tab === "play" && <section className="atlas-play-home" aria-label="Play Atlas Arena">
+        <div className="atlas-play-intro"><span className="atlas-eyebrow">Your next expedition</span><h2>How do you want to play?</h2><p>Every Atlas mode is in the mix. Leave the choice to chance or pick your challenge.</p></div>
+        <div className="atlas-play-choices">
+          <button type="button" className="atlas-play-choice is-random" onClick={() => launch(ARENA_MODES[Math.floor(Math.random() * ARENA_MODES.length)], "solo")}>
+            <span className="atlas-choice-top"><span className="atlas-play-choice-mark"><Shuffle aria-hidden /></span><span className="atlas-choice-tag">Surprise me</span></span>
+            <strong>Play Random Mode</strong><span className="atlas-choice-description">One of {ARENA_MODES.length} modes is chosen at random when you play.</span>
+            <span className="atlas-choice-icons" aria-hidden>{ARENA_MODES.map((mode) => { const Icon = MODE_ICONS[mode.id]; return <span key={mode.id} title={mode.title}><Icon /></span>; })}</span>
+            <span className="atlas-choice-bottom"><span><Shuffle size={17} aria-hidden /> Random draw</span><ArrowRight size={20} aria-hidden /></span>
+          </button>
+          <button type="button" className="atlas-play-choice is-choose" onClick={() => setTab("modes")}>
+            <span className="atlas-choice-top"><span className="atlas-play-choice-mark"><Check aria-hidden /></span><span className="atlas-choice-tag">Your call</span></span>
+            <strong>Choose Mode</strong><span className="atlas-choice-description">Browse every mode and choose exactly what you want to play.</span>
+            <span className="atlas-choice-icons" aria-hidden>{ARENA_MODES.map((mode) => { const Icon = MODE_ICONS[mode.id]; return <span key={mode.id} title={mode.title}><Icon /></span>; })}</span>
+            <span className="atlas-choice-bottom"><span><Check size={17} aria-hidden /> You decide</span><ArrowRight size={20} aria-hidden /></span>
+          </button>
+        </div>
+      </section>}
+      {tab === "ranked" && <AtlasRankedTab />}
+      {tab === "modes" && <>
       <div className="trials-difficulty" role="radiogroup" aria-label="Difficulty">
         {DIFFICULTIES.map((item) => (
           <button type="button" role="radio" aria-checked={difficulty === item.id} key={item.id} className={difficulty === item.id ? "active" : ""} onClick={() => update({ difficulty: item.id })}>
@@ -60,6 +85,7 @@ export default function AtlasArenaPage() {
           );
         })}
       </section>
+      </>}
       <div className="atlas-home-footer">
         <button type="button" onClick={() => setAbout(true)}><Info size={15} /> Dataset & method</button>
         <Link to="/games"><ArrowLeft size={15} /> Back to Pluto</Link>
