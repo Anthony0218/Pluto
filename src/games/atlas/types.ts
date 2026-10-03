@@ -1,3 +1,5 @@
+import type { CountryHintKind } from "./countryHints.ts";
+
 export type AtlasDifficulty = "beginner" | "intermediate" | "expert";
 export type AtlasScope = "un195" | "territories" | "all_map_entities";
 export type AtlasCategory = "countries" | "locations" | "capitals" | "flags" | "population" | "area" | "continents" | "languages" | "borders" | "currency" | "statistics" | "clues";
@@ -81,11 +83,11 @@ export type HigherLowerQuestion = QuestionBase & {
   second?: { label: string; kind: ComparableKind; detail?: string; note?: string };
 };
 
-export type GuessClue = { kind: "numbers" | "summit" | "phrase" | "region" | "language" | "capital"; text: string; flagAsset?: string | null };
+export type GuessClue = { kind: CountryHintKind | "numbers"; text: string; flagAsset?: string | null };
 export type GuessCountryQuestion = QuestionBase & {
   interaction: "guess_country";
   answer: string;
-  /** Ordered hardest → easiest; one more is revealed after every round nobody solves. */
+  /** Four random hints and a fixed fifth reveal; one more is revealed after every unsolved round. */
   clues: GuessClue[];
 };
 

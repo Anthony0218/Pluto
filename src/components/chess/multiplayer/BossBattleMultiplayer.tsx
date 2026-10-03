@@ -1,3 +1,5 @@
+import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
+import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
@@ -326,6 +328,8 @@ export function BossBattleMultiplayerLobby() {
   const [busy, setBusy] = useState<"create" | "join" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  useInviteAutoCreate(() => createRoom());
+
   async function createRoom() {
     if (!user || busy) return;
 
@@ -348,9 +352,9 @@ export function BossBattleMultiplayerLobby() {
       return;
     }
 
-    navigate(
+    navigate(recordCreatedGameInvite(
       `/games/chess/variants/boss/multiplayer/${String(data).toUpperCase()}`,
-    );
+    ));
   }
 
   async function joinRoom() {

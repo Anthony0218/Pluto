@@ -219,12 +219,20 @@
 .battle-slot { display: grid; min-height: 184px; place-items: center; border: 1px dashed rgba(255, 255, 255, .12); border-radius: 20px; }
 .language-guesser { max-width: 780px; margin: 0 auto; }
 .language-guesser blockquote { margin: 1.5rem 0; padding: 1.5rem; border-left: 4px solid #a78bfa; border-radius: 12px; color: #f7f3ff; background: rgba(167,139,250,.1); font-size: clamp(1.25rem,3vw,1.8rem); line-height: 1.5; }
+.language-reveal { display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, .9fr); gap: 1rem; margin-top: 1rem; padding: 1rem; border: 1px solid rgba(167,139,250,.32); border-radius: 18px; background: rgba(167,139,250,.08); }
+.language-translation { align-self: center; }
+.language-translation p { margin: .45rem 0 0; color: #f3efff; font-size: 1rem; line-height: 1.55; }
+.language-country { display: grid; grid-template-columns: 1fr 104px; align-items: center; gap: .8rem; min-width: 0; }
+.language-country strong { display: block; margin-top: .35rem; color: #fff; font-family: Georgia,serif; font-size: 1.25rem; font-weight: 500; }
+.language-country img { display: block; width: 58px; max-height: 38px; margin-top: .7rem; border-radius: 4px; box-shadow: 0 5px 14px rgba(0,0,0,.3); }
+.language-country .atlas-country-shape { width: 104px; margin: 0; }
+.language-country .atlas-country-shape svg { width: 104px; height: 104px; }
 .language-options { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .7rem; margin-bottom: 1.2rem; }
 .language-options button { display: flex; align-items: center; gap: .8rem; min-height: 58px; padding: .8rem 1rem; border: 1px solid rgba(255,255,255,.18); border-radius: 12px; color: #f3f0ff; background: rgba(255,255,255,.05); text-align: left; cursor: pointer; }
 .language-options button.is-correct { border-color: #69d6a0; background: rgba(105,214,160,.2); }
 .language-options button.is-wrong { border-color: #f08f8f; background: rgba(240,143,143,.18); }
 .language-options kbd { color: #bca8f3; }
-@media(max-width:600px) { .language-options { grid-template-columns: 1fr; } }
+@media(max-width:600px) { .language-options,.language-reveal { grid-template-columns: 1fr; } }
 .battle-slot:has(.battle-arena-card) { border-color: transparent; }
 .battle-slot-empty { color: #55647b; font-size: .78rem; font-weight: 750; text-transform: uppercase; letter-spacing: .08em; }
 .battle-vs { display: grid; justify-items: center; gap: .1rem; color: #ffd890; font-size: .78rem; font-weight: 950; letter-spacing: .14em; }

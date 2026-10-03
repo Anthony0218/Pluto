@@ -1,3 +1,4 @@
+import GameInvitePanel from "@/components/social/GameInvitePanel";
 import { useState } from "react";
 import { Users } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -64,6 +65,7 @@ export default function GlobalFriendsSidebar() {
         signedIn={!!user}
         onFriendSelect={(id) => showFriend(id, "actions")}
       />
+      <div className="mt-4"><GameInvitePanel compact onNavigate={() => setOpen(false)} /></div>
     </DashboardDialog>}
     {selectedFriend && friendDialog && <DashboardFriendDialog
       friend={selectedFriend}

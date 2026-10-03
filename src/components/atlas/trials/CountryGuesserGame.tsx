@@ -1,3 +1,5 @@
+import { areaValuesFromText } from "@/games/atlas/areaReferences";
+import AtlasAreaReference from "../AtlasAreaReference";
 import { useState } from "react";
 import { ChevronRight, Eye, Lock } from "lucide-react";
 import { COUNTRY_GUESSER } from "../../../games/atlas/trials/config";
@@ -57,6 +59,7 @@ export function CountryGuesserGame({ pool, byId, seed, best, onRecord, onRestart
               <CountryOptionCard key={`${run.roundIndex}-${id}`} index={index} country={byId.get(id)!} state={stateOf(id)} disabled={run.phase !== "guessing" || run.wrong.includes(id)} onSelect={() => guess(id)} detail={<kbd>{index + 1}</kbd>} />
             ))}
           </div>
+          <AtlasAreaReference excludeIds={run.round.optionIds} values={run.round.clues.filter((_, index) => index < run.revealed || allClues).flatMap(clue => areaValuesFromText(clue.text))} />
           <div className="trial-feedback-slot">
             <ScoreBurst points={run.lastPoints} id={`${run.roundIndex}-${run.score}`} />
             {run.phase === "solved" && <TrialFeedback tone="good" title={`${answer.name} — +${run.lastPoints.toLocaleString("en")}`} detail={`Solved with ${run.revealed} clue${run.revealed === 1 ? "" : "s"}.`} action={<button type="button" className="trial-next" onClick={advance}>Next <ChevronRight size={16} /></button>} />}

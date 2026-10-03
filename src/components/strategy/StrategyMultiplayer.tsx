@@ -1,5 +1,7 @@
+import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
+import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabase";
 import type { GoMove, GoState } from "../../games/go/rules";
@@ -9,6 +11,8 @@ import type { ShogiMove, ShogiState } from "../../games/shogi/rules";
 import GoBoard from "./GoBoard";
 import GoGameReview from "./GoGameReview";
 import ShogiBoard from "./ShogiBoard";
+import ChessRankedLobby from "@/pages/games/Chess/ChessRankedLobby";
+import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
 type GameType = "go" | "shogi";
 type Snapshot = { code: string; gameType: GameType; hostId: string; players: { id: string; name: string }[]; side: "black" | "white"; settings: Record<string, unknown>; state: GoState | ShogiState | null; version: number };
 const messageFor = (error: unknown) => error instanceof Error ? error.message : "Request failed.";
@@ -16,8 +20,10 @@ export default function StrategyMultiplayer({ gameType }: { gameType: GameType }
   const { roomCode } = useParams();
   const navigate = useNavigate();
   const { user, profile, loading } = useAuth();
-  const [code, setCode] = useState("");
-  const [boardSize, setBoardSize] = useState<9 | 13 | 19>(9);
+  const [searchParams] = useSearchParams();
+  const [tab, setTab] = useState<"friends" | "ranked">(() => searchParams.get("tab") === "ranked" ? "ranked" : "friends");
+  const [code, setCode] = useState(searchParams.get("code") ?? "");
+  const [boardSize, setBoardSize] = useState<9 | 13 | 19>(() => { const size = Number(searchParams.get("boardSize")); return size === 13 || size === 19 ? size : 9; });
   const [room, setRoom] = useState<Snapshot | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -44,16 +50,18 @@ export default function StrategyMultiplayer({ gameType }: { gameType: GameType }
   useEffect(() => {
     if (gameType === "go" && room?.state && canReviewGoGame(room.state as GoState)) saveGoGame(room.state as GoState);
   }, [gameType, room?.state]);
+  useInviteAutoCreate(() => create());
   const create = async () => {
     setBusy(true); setError("");
-    try { const created = await invoke({ op: "create", gameType, name, boardSize }); navigate("/games/" + gameType + "/multiplayer/" + created.code); }
+    try { const created = await invoke({ op: "create", gameType, name, boardSize }); navigate(recordCreatedGameInvite("/games/" + gameType + "/multiplayer/" + created.code)); }
     catch (cause) { setError(messageFor(cause)); } finally { setBusy(false); }
   };
-  const join = async (event: FormEvent) => {
-    event.preventDefault(); setBusy(true); setError("");
+  const join = async (event?: FormEvent) => {
+    event?.preventDefault(); setBusy(true); setError("");
     try { const joined = await invoke({ op: "join", code: code.toUpperCase(), name }); navigate("/games/" + gameType + "/multiplayer/" + joined.code); }
     catch (cause) { setError(messageFor(cause)); } finally { setBusy(false); }
   };
+  useInviteAutoJoin(() => join());
   const move = async (gameMove: GoMove | ShogiMove) => {
     if (!room || busy) return;
     setBusy(true); setError("");
@@ -61,10 +69,12 @@ export default function StrategyMultiplayer({ gameType }: { gameType: GameType }
     catch (cause) { setError(messageFor(cause)); await refresh(); } finally { setBusy(false); }
   };
   if (loading) return <main className="h-[var(--app-height)] overflow-hidden bg-[#07090b] p-10 text-zinc-400">Loading account…</main>;
-  if (!user) return <main className="flex h-[var(--app-height)] items-center overflow-hidden bg-[#07090b] p-6 text-white"><div className="mx-auto max-w-lg rounded-3xl border border-white/10 bg-white/5 p-8"><h1 className="font-serif text-3xl">Sign in for multiplayer</h1><p className="mt-3 text-zinc-400">Pluto rooms use your account to reserve your side and restore the match after refresh.</p><Link to="/login" className="mt-6 inline-block rounded-xl bg-amber-400 px-5 py-3 font-bold text-black">Sign in</Link></div></main>;
-  if (!roomCode) return <main className="h-[var(--app-height)] overflow-hidden bg-[#07090b] px-4 py-5 text-white sm:py-8"><div className="mx-auto flex h-full max-w-4xl flex-col justify-center"><Link to={"/games/" + gameType} className="text-sm text-zinc-500 hover:text-white">← {gameType === "go" ? "Go" : "Shogi"}</Link><h1 className="mt-5 font-serif text-4xl capitalize sm:mt-8 sm:text-5xl">{gameType} multiplayer</h1><p className="mt-2 text-zinc-500">Create a private room or enter a six-character invite code.</p>
-    <div className="mt-5 grid gap-3 sm:mt-8 sm:gap-5 md:grid-cols-2"><section className="rounded-2xl border border-emerald-400/20 bg-white/[.035] p-4 sm:rounded-3xl sm:p-6"><h2 className="font-serif text-2xl sm:text-3xl">Create room</h2>{gameType === "go" && <label className="mt-3 block text-sm text-zinc-400 sm:mt-5">Board size <select value={boardSize} onChange={(event) => setBoardSize(Number(event.target.value) as 9 | 13 | 19)} className="ml-2 rounded-lg bg-zinc-800 p-2"><option>9</option><option>13</option><option>19</option></select></label>}<button type="button" disabled={busy} onClick={() => void create()} className="mt-4 min-h-11 w-full rounded-xl bg-emerald-400 font-bold text-black disabled:opacity-50 sm:mt-6">Create</button></section>
-      <form onSubmit={(event) => void join(event)} className="rounded-2xl border border-amber-400/20 bg-white/[.035] p-4 sm:rounded-3xl sm:p-6"><h2 className="font-serif text-2xl sm:text-3xl">Join room</h2><label className="mt-3 block text-sm text-zinc-400 sm:mt-5">Invite code<input value={code} onChange={(event) => setCode(event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6))} required minLength={6} className="mt-2 min-h-11 w-full rounded-xl border border-white/10 bg-black/30 px-4 text-xl font-black uppercase tracking-[.3em] text-white" /></label><button disabled={busy} className="mt-3 min-h-11 w-full rounded-xl bg-amber-400 font-bold text-black disabled:opacity-50 sm:mt-4">Join</button></form></div>{error && <p role="alert" className="mt-3 text-red-300">{error}</p>}</div></main>;
+  if (!user && roomCode) return <main className="flex h-[var(--app-height)] items-center overflow-hidden bg-[#07090b] p-6 text-white"><div className="mx-auto max-w-lg rounded-3xl border border-white/10 bg-white/5 p-8"><h1 className="font-serif text-3xl">Sign in for multiplayer</h1><p className="mt-3 text-zinc-400">Pluto rooms use your account to reserve your side and restore the match after refresh.</p><Link to="/login" className="mt-6 inline-block rounded-xl bg-amber-400 px-5 py-3 font-bold text-black">Sign in</Link></div></main>;
+  if (!roomCode) return <main className="min-h-[var(--app-height)] overflow-y-auto bg-[#07090b] px-4 py-5 text-white sm:py-8"><div className="mx-auto flex max-w-4xl flex-col"><Link to={"/games/" + gameType} className="text-sm text-zinc-500 hover:text-white">← {gameType === "go" ? "Go" : "Shogi"}</Link><h1 className="mt-5 font-serif text-4xl capitalize sm:mt-8 sm:text-5xl">{gameType} multiplayer</h1><p className="mt-2 text-zinc-500">Create a private room or enter a six-character invite code.</p>
+    {gameType === "go" && <div role="tablist" aria-label="Go multiplayer" className="mt-5 flex gap-2">{(["friends", "ranked"] as const).map(item => <button type="button" role="tab" key={item} aria-selected={tab === item} onClick={() => setTab(item)} className={`rounded-xl border px-5 py-3 text-sm font-bold ${tab === item ? "border-amber-300 bg-amber-300/15 text-amber-100" : "border-white/10 text-zinc-400"}`}>{item === "friends" ? "Invite a friend" : "Ranked"}</button>)}</div>}
+    {!user && <p className="mt-4 text-sm text-zinc-400">Sign in to create or join a room. <Link to="/login" className="text-amber-200">Sign in →</Link></p>}
+    {gameType === "go" && tab === "ranked" ? <div className="mt-6"><ChessRankedLobby embedded game="go" /></div> : <div className="mt-5 grid gap-3 sm:mt-8 sm:gap-5 md:grid-cols-2"><section className="rounded-2xl border border-emerald-400/20 bg-white/[.035] p-4 sm:rounded-3xl sm:p-6"><h2 className="font-serif text-2xl sm:text-3xl">Create room</h2>{gameType === "go" && <label className="mt-3 block text-sm text-zinc-400 sm:mt-5">Board size <select value={boardSize} onChange={(event) => setBoardSize(Number(event.target.value) as 9 | 13 | 19)} className="ml-2 rounded-lg bg-zinc-800 p-2"><option>9</option><option>13</option><option>19</option></select></label>}<button type="button" disabled={busy || !user} onClick={() => void create()} className="mt-4 min-h-11 w-full rounded-xl bg-emerald-400 font-bold text-black disabled:opacity-50 sm:mt-6">Create</button></section>
+      <form onSubmit={(event) => void join(event)} className="rounded-2xl border border-amber-400/20 bg-white/[.035] p-4 sm:rounded-3xl sm:p-6"><h2 className="font-serif text-2xl sm:text-3xl">Join room</h2><label className="mt-3 block text-sm text-zinc-400 sm:mt-5">Invite code<input value={code} onChange={(event) => setCode(event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6))} required minLength={6} className="mt-2 min-h-11 w-full rounded-xl border border-white/10 bg-black/30 px-4 text-xl font-black uppercase tracking-[.3em] text-white" /></label><button disabled={busy || !user} className="mt-3 min-h-11 w-full rounded-xl bg-amber-400 font-bold text-black disabled:opacity-50 sm:mt-4">Join</button></form></div>}{error && <p role="alert" className="mt-3 text-red-300">{error}</p>}</div></main>;
   const state = room?.state;
   const canMove = !!room && !!state && state.status === "playing" && state.currentPlayer === room.side && !busy;
   const reviewAvailable = gameType === "go" && room?.code === roomCode?.toUpperCase() && canReviewGoGame(state as GoState | null | undefined);

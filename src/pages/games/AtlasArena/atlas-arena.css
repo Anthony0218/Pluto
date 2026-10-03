@@ -76,20 +76,20 @@
 /* ---------- Unified menu: every mode with Singleplayer, Multiplayer, Hotseat and Rules ---------- */
 .atlas-hub { align-content: start; padding-bottom: 2.5rem; }
 .atlas-hub .trials-mode-grid { align-items: stretch; }
-.atlas-hub-card { display: flex; flex-direction: column; cursor: default; min-height: 0; }
+.atlas-hub-card { display: flex; flex-direction: column; cursor: default; min-height: 330px; }
 .atlas-hub-card:hover, .atlas-hub-card:focus-within { transform: translateY(-3px); }
 .atlas-hub-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: .5rem; }
 .atlas-hub-rules { display: inline-flex; align-items: center; gap: .3rem; padding: .35rem .65rem; border: 1px solid rgba(var(--accent-rgb), .3); border-radius: 999px; color: var(--accent); background: rgba(var(--accent-rgb), .07); font-size: .72rem; font-weight: 800; cursor: pointer; transition: background .2s, border-color .2s; }
 .atlas-hub-rules:hover, .atlas-hub-rules:focus-visible { border-color: var(--accent); background: rgba(var(--accent-rgb), .16); outline: none; }
-.atlas-hub-card .trials-mode-meta { margin-top: auto; padding-top: .3rem; }
+.atlas-hub-card .trials-mode-meta { margin-top: auto; min-height: 1.85rem; padding-top: .3rem; }
 .atlas-hub-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .4rem; margin-top: .35rem; }
 .atlas-hub-actions button { display: grid; justify-items: center; gap: .25rem; min-height: 58px; padding: .55rem .25rem; border: 1px solid rgba(255, 255, 255, .12); border-radius: 14px; color: #dfe8f5; background: rgba(255, 255, 255, .04); font-size: .72rem; font-weight: 800; cursor: pointer; transition: border-color .2s, background .2s, color .2s, transform .2s; }
 .atlas-hub-actions button svg { width: 18px; height: 18px; color: var(--accent, #52e7e0); }
 .atlas-hub-actions button span { overflow: hidden; max-width: 100%; text-overflow: ellipsis; white-space: nowrap; }
 .atlas-hub-actions button:hover, .atlas-hub-actions button:focus-visible { border-color: var(--accent, #52e7e0); color: #fff; background: rgba(var(--accent-rgb, 82, 231, 224), .14); outline: none; transform: translateY(-1px); }
 .atlas-hub-actions button:first-child { border-color: rgba(var(--accent-rgb, 82, 231, 224), .45); background: rgba(var(--accent-rgb, 82, 231, 224), .1); }
-.atlas-tabs { display: flex; gap: .4rem; justify-content: center; width: min(480px, 100%); padding: .35rem; border: 1px solid rgba(255,255,255,.11); border-radius: 18px; background: rgba(5,12,28,.72); }
-.atlas-tabs button { flex: 1; min-height: 43px; border: 0; border-radius: 13px; color: #a8b8cb; background: transparent; font-weight: 800; cursor: pointer; }
+.atlas-tabs { display: flex; gap: .4rem; justify-content: center; width: min(480px, 100%); min-height: 52px; padding: .35rem; border: 1px solid rgba(255,255,255,.11); border-radius: 18px; background: rgba(5,12,28,.72); box-sizing: border-box; }
+.atlas-tabs button { flex: 1; min-height: 43px; border: 0; border-radius: 13px; color: #a8b8cb; background: transparent; font-size: .9rem; font-weight: 800; line-height: 1; cursor: pointer; }
 .atlas-tabs button.active { color: #041014; background: var(--atlas-cyan); box-shadow: 0 8px 22px rgba(82,231,224,.16); }
 .atlas-play-home,.atlas-ranked-hero { display: grid; justify-items: center; width: min(760px,100%); padding: clamp(2rem,5vw,4rem); border: 1px solid rgba(82,231,224,.2); border-radius: 30px; background: radial-gradient(circle at 50% 0,rgba(82,231,224,.1),transparent 55%),rgba(7,14,31,.8); box-shadow: 0 30px 80px rgba(0,0,0,.2); text-align: center; }
 .atlas-play-home .trials-mode-icon,.atlas-ranked-hero .trials-mode-icon { margin-bottom: 1.5rem; }
@@ -215,7 +215,7 @@
 .is-choose .atlas-choice-tag { color: #ffd890; }
 .atlas-play-choice > strong { margin-top: 1.35rem; font: 500 clamp(1.7rem,3vw,2.3rem) Georgia,serif; letter-spacing: -.035em; }
 .atlas-choice-description { max-width: 32ch; margin-top: .45rem; color: #b1c0d0; line-height: 1.5; }
-.atlas-choice-icons { display: grid; grid-template-columns: repeat(8,minmax(0,1fr)); gap: .38rem; margin: auto 0 1.3rem; padding-top: 1.7rem; }
+.atlas-choice-icons { display: grid; grid-template-columns: repeat(8,minmax(0,1fr)); gap: .38rem; margin: .75rem 0; padding-top: 0; }
 .atlas-choice-icons > span { display: grid; place-items: center; aspect-ratio: 1; border: 1px solid rgba(255,255,255,.13); border-radius: 10px; color: #a8e9e6; background: rgba(255,255,255,.055); }
 .is-choose .atlas-choice-icons > span { color: #e9cf9d; }
 .is-random .atlas-choice-icons > span:nth-child(3n) { transform: rotate(10deg) translateY(-3px); }
@@ -263,8 +263,6 @@
 .atlas-hub.is-play-tab { box-sizing: border-box; height: var(--app-height); min-height: 0; grid-template-rows: auto auto auto minmax(0,1fr) auto; align-content: stretch; gap: clamp(.35rem,1vh,.7rem); overflow: hidden; padding: clamp(.5rem,1.5vh,1rem) clamp(.75rem,3vw,2rem); }
 .is-play-tab .trials-hub-intro h1 { font-size: clamp(2rem,6vh,3.5rem); }
 .is-play-tab .trials-hub-intro p { display: none; }
-.is-play-tab .atlas-tabs { padding: .2rem; }
-.is-play-tab .atlas-tabs button { min-height: 38px; }
 .is-play-tab .atlas-play-home { height: 100%; min-height: 0; grid-template-rows: auto minmax(0,1fr); gap: .5rem; }
 .is-play-tab .atlas-play-intro h2 { font-size: clamp(1.45rem,4vh,2.2rem); }
 .is-play-tab .atlas-play-intro p { font-size: .8rem; line-height: 1.25; }
@@ -284,7 +282,7 @@
   .is-play-tab .atlas-choice-tag { padding: .2rem .45rem; font-size: .58rem; }
   .is-play-tab .atlas-play-choice > strong { margin-top: .25rem; font-size: clamp(1.2rem,5vw,1.45rem); }
   .is-play-tab .atlas-choice-description { display: none; }
-  .is-play-tab .atlas-choice-icons { gap: .2rem; padding-top: .15rem; margin: auto 0 .25rem; }
+  .is-play-tab .atlas-choice-icons { gap: .2rem; padding-top: .15rem; margin: .35rem 0; }
   .is-play-tab .atlas-choice-icons > span { height: clamp(21px,3.6vh,27px); aspect-ratio: auto; border-radius: 6px; }
   .is-play-tab .atlas-choice-icons svg { width: 14px; height: 14px; }
   .is-play-tab .atlas-choice-bottom { padding-top: .25rem; font-size: .72rem; }
@@ -313,4 +311,146 @@
   .is-play-tab .atlas-play-home { height: auto; }
   .is-play-tab .atlas-play-choices { height: auto; }
   .is-play-tab .atlas-play-choice { min-height: 112px; }
+}
+
+.atlas-choice-actions { width: 100%; margin-top: auto; }
+.atlas-ranked-tools { display: flex; flex-wrap: wrap; gap: .6rem; margin-bottom: 1rem; }
+.atlas-ranked-tools button { display: inline-flex; align-items: center; gap: .4rem; border: 1px solid #ffd89055; border-radius: 12px; padding: .65rem 1rem; color: #ffd890; background: #ffd8900a; }
+.atlas-rank-badge { display: inline-flex; align-items: center; gap: .5rem; font-size: .75rem; font-weight: 700; color: #e8edf8; vertical-align: middle; }
+.atlas-rank-emblem { position: relative; display: inline-flex; }
+.atlas-rank-emblem > b { position: absolute; bottom: -5px; right: -6px; border: 1px solid #ffd890; border-radius: 7px; background: #111927; color: #ffd890; padding: 0 3px; font-size: 10px; }
+.atlas-ranked-hero-copy > .atlas-rank-badge { margin-bottom: .8rem; }
+.is-play-tab .atlas-choice-actions button { min-height: 42px; display: flex; justify-content: center; gap: .35rem; }
+@media(max-width:720px) { .is-play-tab .atlas-choice-actions button { min-height: 32px; padding: .25rem; font-size: .65rem; } .is-play-tab .atlas-choice-actions svg { width: 14px; height: 14px; } }
+@media(max-height:720px) { .atlas-hub.is-play-tab { height: auto; min-height: var(--app-height); overflow: visible; } .is-play-tab .atlas-play-choice { min-height: 220px; } }
+
+.atlas-area-reference { margin-top: .8rem; border: 1px solid #82ece530; border-radius: 15px; background: #82ece506; padding: .8rem; text-align: left; }
+.atlas-area-reference h3 { font-size: .85rem; color: #b5eeea; margin: 0; }
+.atlas-area-reference > p { font-size: .65rem; color: #8fa6b8; margin: .2rem 0 .6rem; }
+.atlas-area-reference > div { display: flex; gap: .75rem; }
+.atlas-area-reference article { flex: 1; min-width: 0; display: flex; align-items: center; flex-direction: column; gap: .3rem; text-align: center; }
+.atlas-area-reference article > strong { font-size: .8rem; }
+.atlas-area-reference article > span, .atlas-area-reference small { font-size: .65rem; color: #a9bac9; }
+.atlas-area-reference .atlas-country-shape { width: 100%; max-width: 150px; margin: 0 auto; padding: 0; border: 0; background: transparent; }
+.atlas-area-reference .atlas-country-shape svg { width: 100%; max-height: 130px; }
+
+.atlas-scoreboard > div > span { flex-wrap: wrap; }
+.atlas-scoreboard .atlas-rank-badge { flex-basis: 100%; margin: .2rem 0 .2rem 1rem; }
+
+/* Play cards: controls on the left, mystery/mode choices on the right. */
+.atlas-play-choice,.is-play-tab .atlas-play-choice { display:grid;grid-template-columns:minmax(0,1fr) minmax(115px,.85fr);gap:1rem;align-items:center;cursor:default; }
+.atlas-choice-copy { min-width:0;display:flex;flex-direction:column;align-items:flex-start; }
+.atlas-choice-copy h3 { margin:.8rem 0 0;font:500 clamp(1.4rem,2.6vw,2.2rem) Georgia,serif;line-height:1.12;letter-spacing:-.03em; }
+.atlas-choice-copy .atlas-choice-tag { display:inline-flex;gap:.4rem;align-items:center; }
+.atlas-choice-copy .atlas-choice-description { margin:.65rem 0; }
+.atlas-choice-copy .atlas-choice-actions { display:flex;flex-direction:column;gap:.5rem;margin-top:.65rem;width:100%; }
+.atlas-choice-copy .atlas-choice-actions button,.is-play-tab .atlas-choice-copy .atlas-choice-actions button { min-height:42px;justify-content:flex-start;padding:.65rem .85rem;font-size:.85rem; }
+.atlas-random-symbol { display:grid;place-items:center;color:#82ece5; }
+.atlas-random-symbol svg { width:clamp(90px,13vw,210px);height:auto;stroke-width:1.2;filter:drop-shadow(0 0 25px #82ece529); }
+.is-play-tab .is-choose .atlas-choice-icons,.is-choose .atlas-choice-icons { grid-template-columns:repeat(4,minmax(0,1fr));gap:.45rem;padding:0;margin:0; }
+.atlas-choice-icons > button { display:grid;place-items:center;min-width:0;min-height:38px;aspect-ratio:1;border:1px solid #e9cf9d33;border-radius:10px;color:#e9cf9d;background:#ffffff0b;cursor:pointer; }
+.atlas-choice-icons > button[aria-pressed=true] { border-color:#ffd890;background:#ffc86b30;box-shadow:inset 0 0 0 1px #ffd89040; }
+.atlas-choice-icons > button:hover,.atlas-choice-icons > button:focus-visible { border-color:#ffd890;outline:2px solid #ffd89080;outline-offset:2px; }
+.atlas-choice-icons > button svg { width:22px;height:22px; }
+.atlas-choose-button { width:100%;margin-top:1rem;min-height:64px;padding:.75rem 1rem;border:1px solid #ffd89070;border-radius:14px;background:#ffd890;color:#251b0f;font-size:1.1rem;font-weight:800;cursor:pointer; }
+@media(max-width:720px) { .is-play-tab .atlas-play-choice { min-height:255px; } .is-play-tab .atlas-play-choices { grid-template-rows:auto auto; } .atlas-hub.is-play-tab { height:auto;min-height:var(--app-height);overflow:visible; } .is-play-tab .atlas-choice-copy .atlas-choice-description { display:block;font-size:.8rem; } .atlas-choice-copy h3 { font-size:1.5rem; } .atlas-random-symbol svg { width:110px; } }
+
+/* The random card reveals its roulette only through the question-mark button. */
+button.atlas-random-symbol { width:100%;padding:.5rem;border:0;border-radius:16px;background:transparent;cursor:pointer; }
+button.atlas-random-symbol:hover { background:#82ece50a; }
+button.atlas-random-symbol:focus-visible { outline:2px solid #82ece5;outline-offset:4px; }
+.is-play-tab .atlas-roulette-icons,.atlas-roulette-icons { grid-template-columns:repeat(4,minmax(0,1fr));gap:.45rem;margin:0;padding:0; }
+.is-random .atlas-choice-icons.atlas-roulette-icons > span { min-height:38px;max-height:none;aspect-ratio:1;border-radius:10px;transform:none;color:#a8e9e6;transition:background .08s,border-color .08s,box-shadow .08s; }
+.is-random .atlas-roulette-icons > span.is-highlighted { color:#efffff;border-color:#82ece5;background:#82ece533;box-shadow:0 0 18px #82ece580,inset 0 0 0 1px #82ece5; }
+.atlas-roulette-icons svg { width:22px;height:22px; }
+.atlas-choice-actions button:disabled { opacity:.5;cursor:wait; }
+@media(max-width:720px) { .is-random .atlas-choice-icons.atlas-roulette-icons > span { min-height:30px;height:auto; } }
+@media(prefers-reduced-motion:reduce) { .atlas-roulette-icons > span { transition:none; } }
+
+/* The tab heading stays consistent; Casual and Ranked occupy the available viewport. */
+.atlas-hub.atlas-trials-hub { box-sizing:border-box; padding:clamp(.5rem,1.5vh,1rem) clamp(.75rem,3vw,2rem); gap:clamp(.35rem,1vh,.7rem); }
+.atlas-hub .trials-hub-intro h1 { font-size:clamp(2.8rem,5.5vh,5.4rem); }
+.atlas-hub.is-fixed-tab { height:var(--app-height); min-height:0; grid-template-rows:auto auto auto minmax(0,1fr) auto; align-content:stretch; overflow:hidden; }
+.app-viewport:has(.atlas-hub.is-fixed-tab) { overflow:hidden; }
+.atlas-hub.is-modes-tab { height:auto; min-height:var(--app-height); overflow:visible; padding-bottom:2rem; }
+.is-fixed-tab .atlas-home-footer { min-height:0; margin:0; gap:.5rem; font-size:.65rem; }
+.is-fixed-tab .atlas-home-footer > span { display:none; }
+.is-fixed-tab .atlas-play-home { height:100%; min-height:0; grid-template-rows:auto minmax(0,1fr); gap:.5rem; }
+.is-fixed-tab .atlas-play-intro h2 { font-size:clamp(1.35rem,3.5vh,2.2rem); }
+.is-fixed-tab .atlas-play-intro p { font-size:.8rem; line-height:1.25; }
+.is-fixed-tab .atlas-play-choices { height:100%; min-height:0; grid-template-columns:repeat(2,minmax(0,1fr)); grid-template-rows:minmax(0,1fr); gap:.7rem; }
+.is-fixed-tab .atlas-play-choice { height:100%; min-height:0; padding:clamp(.65rem,2vh,1.4rem); gap:.8rem; }
+.is-fixed-tab .atlas-play-choice:hover { transform:none; }
+.is-fixed-tab .atlas-choice-copy h3 { margin-top:.45rem; font-size:clamp(1.25rem,3vh,2.2rem); }
+.is-fixed-tab .atlas-choice-copy .atlas-choice-description { font-size:.8rem; line-height:1.3; margin:.45rem 0; }
+.is-fixed-tab .atlas-choice-copy .atlas-choice-actions { gap:.35rem; margin-top:.5rem; }
+.is-fixed-tab .atlas-choice-copy .atlas-choice-actions button { min-height:36px; padding:.45rem .65rem; font-size:.8rem; }
+.is-fixed-tab .atlas-choice-icons { min-height:0; padding:0; margin:0; gap:.3rem; }
+.is-fixed-tab .atlas-choice-icons > button,.is-fixed-tab .atlas-choice-icons > span { min-height:0; max-height:none; }
+.atlas-roulette-icons > span { pointer-events:none; cursor:default; }
+.atlas-roulette-icons > .atlas-roulette-reset { border-color:#82ece533; color:#a8e9e6; cursor:pointer; }
+.atlas-roulette-icons > .atlas-roulette-reset:hover,.atlas-roulette-icons > .atlas-roulette-reset:focus-visible { border-color:#82ece5; outline-color:#82ece580; }
+.is-fixed-tab .atlas-ranked-home { height:100%; min-height:0; align-content:center; gap:.7rem; }
+.is-fixed-tab .atlas-ranked-tools { margin:0; }
+.is-fixed-tab .atlas-ranked-hero { min-height:0; padding:clamp(.8rem,2vh,1.5rem); gap:1rem; }
+.is-fixed-tab .atlas-ranked-hero h2 { font-size:clamp(1.5rem,3.5vh,2.8rem); }
+.is-fixed-tab .atlas-ranked-mode-preview { gap:.3rem; }
+.is-fixed-tab .atlas-ranked-draft { height:100%; min-height:0; display:grid; grid-template-rows:auto auto auto auto minmax(0,1fr) auto; padding:.8rem; }
+.is-fixed-tab .atlas-ranked-draft h2 { font-size:1.5rem; }
+.is-fixed-tab .atlas-ranked-draft p { margin:.3rem 0; font-size:.75rem; line-height:1.3; }
+.is-fixed-tab .atlas-ranked-draft .atlas-ranked-mode-grid { min-height:0; grid-template-columns:repeat(5,minmax(0,1fr)); grid-auto-rows:minmax(0,1fr); margin-top:.5rem; gap:.4rem; }
+.is-fixed-tab .atlas-ranked-mode-grid .atlas-duel-card { min-height:0; padding:.45rem; }
+.is-fixed-tab .atlas-ranked-mode-grid .atlas-duel-card > svg { width:18px; height:18px; margin:0 0 .2rem; }
+.is-fixed-tab .atlas-ranked-mode-grid .atlas-duel-card strong { font-size:.75rem; }
+.is-fixed-tab .atlas-ranked-mode-grid .atlas-duel-card small { font-size:.65rem; margin-top:.15rem; }
+.is-fixed-tab .atlas-ranked-lock { min-height:34px; margin:.5rem auto 0; padding:.4rem .75rem; }
+@media(max-width:720px) {
+  .is-fixed-tab .atlas-play-choices { grid-template-columns:minmax(0,1fr); grid-template-rows:repeat(2,minmax(0,1fr)); gap:.45rem; }
+  .is-fixed-tab .atlas-play-intro p { display:none; }
+  .is-fixed-tab .atlas-ranked-mode-preview > span { padding:.4rem; }
+  .is-fixed-tab .atlas-ranked-mode-preview > span > span { display:none; }
+  .is-fixed-tab .atlas-ranked-tools button { padding:.45rem .65rem; font-size:.75rem; }
+  .is-fixed-tab .atlas-ranked-hero { grid-template-columns:minmax(0,1fr) auto; }
+  .is-fixed-tab .atlas-ranked-hero-action { width:auto; max-width:160px; }
+  .is-fixed-tab .atlas-ranked-summary { font-size:.7rem; margin-top:.35rem; }
+  .is-fixed-tab .atlas-ranked-draft .atlas-ranked-mode-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .is-fixed-tab .atlas-ranked-mode-grid .atlas-duel-card { display:flex; align-items:center; gap:.3rem; }
+  .is-fixed-tab .atlas-ranked-mode-grid .atlas-duel-card > svg { flex:none; width:15px; height:15px; margin:0; }
+  .is-fixed-tab .atlas-ranked-mode-grid .atlas-duel-card strong { font-size:.65rem; }
+  .is-fixed-tab .atlas-ranked-mode-grid .atlas-duel-card small { display:none; }
+}
+@media(max-width:720px),(max-height:650px) {
+  .is-fixed-tab .atlas-play-choice { grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); grid-template-rows:auto auto minmax(0,1fr) auto; gap:.2rem .6rem; padding:.6rem .75rem; border-radius:18px; }
+  .is-fixed-tab .atlas-choice-copy { display:contents; }
+  .is-fixed-tab .atlas-choice-copy .atlas-choice-tag { grid-column:1; grid-row:1; justify-self:start; padding:.15rem .4rem; font-size:.55rem; }
+  .is-fixed-tab .atlas-choice-copy h3 { grid-column:1; grid-row:2; margin:.1rem 0; font-size:1.25rem; }
+  .is-fixed-tab .atlas-choice-copy .atlas-choice-description { display:none; grid-column:1; grid-row:3; margin:0; font-size:.65rem; }
+  .is-fixed-tab .atlas-choice-description[data-selected=true] { display:block; }
+  .is-fixed-tab .atlas-choice-copy .atlas-choice-actions { grid-column:1/-1; grid-row:4; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.3rem; margin:0; }
+  .is-fixed-tab .atlas-choice-copy .atlas-choice-actions button { min-height:30px; padding:.25rem; justify-content:center; font-size:.65rem; }
+  .is-fixed-tab .atlas-choice-actions svg { width:13px; height:13px; }
+  .is-fixed-tab .atlas-choose-button { grid-column:1; grid-row:4; min-height:30px; padding:.25rem .5rem; margin:0; font-size:.8rem; }
+  .is-fixed-tab .atlas-choice-icons,.is-fixed-tab .atlas-random-symbol { grid-column:2; grid-row:1/4; align-self:stretch; }
+  .is-fixed-tab .atlas-choice-icons { grid-template-rows:repeat(4,minmax(0,1fr)); }
+  .is-fixed-tab .atlas-choice-icons > button,.is-fixed-tab .atlas-choice-icons > span { aspect-ratio:auto; height:auto; border-radius:6px; }
+  .is-fixed-tab .atlas-choice-icons svg { width:16px; height:16px; }
+  .is-fixed-tab .atlas-random-symbol svg { width:clamp(60px,12vh,100px); }
+}
+@media(max-height:650px) {
+  .atlas-hub .trials-hub-intro h1 { font-size:2rem; }
+  .is-fixed-tab .atlas-play-intro p,.is-fixed-tab .atlas-play-intro .atlas-eyebrow,.is-fixed-tab .atlas-home-footer { display:none; }
+  .atlas-hub.is-fixed-tab { grid-template-rows:auto auto auto minmax(0,1fr); padding:.4rem .75rem; gap:.3rem; }
+  .is-fixed-tab .atlas-ranked-summary { display:none; }
+  .is-fixed-tab .atlas-ranked-hero h2 { font-size:1.3rem; }
+  .is-fixed-tab .atlas-ranked-mode-preview > span { padding:.3rem; }
+  .is-fixed-tab .atlas-ranked-mode-preview > span > span { display:none; }
+  .is-fixed-tab .atlas-ranked-draft > p { display:none; }
+  .is-fixed-tab .atlas-ranked-draft h2 { font-size:1.1rem; margin:.2rem 0; }
+  .is-fixed-tab .atlas-ranked-mode-grid .atlas-duel-card small { display:none; }
+}
+@media(min-width:721px) and (max-height:650px) {
+  .is-fixed-tab .atlas-ranked-home { grid-template-columns:minmax(0,2fr) minmax(0,1fr); grid-template-rows:auto minmax(0,1fr); align-content:stretch; }
+  .is-fixed-tab .atlas-ranked-hero { grid-column:1; grid-row:1/3; height:100%; }
+  .is-fixed-tab .atlas-ranked-tools { grid-column:2; grid-row:1; }
+  .is-fixed-tab .atlas-ranked-mode-preview { grid-column:2; grid-row:2; align-content:center; }
 }

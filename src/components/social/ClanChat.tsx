@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Send } from "lucide-react";
+import { CHAT_PRESETS } from "./chatPresets";
 import { supabase } from "@/lib/supabase";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { markNotificationsSeen } from "@/components/App/notifications/notificationState";
@@ -9,14 +9,13 @@ import UserLink from "./UserLink";
 type Message = { id: string; group_id: string; sender_id: string; body: string; created_at: string };
 type Player = { id: string; username: string | null; display_name: string | null; avatar_id: string | null };
 
-const MAX_LENGTH = 500;
 
-/** Free-text chat for one clan. New messages arrive live and pop up for members elsewhere in the app. */
+
+/** Preset chat for one clan, shared with friend chat. */
 export default function ClanChat({ clanId, userId, players }: { clanId: string; userId: string; players: Player[] }) {
   useUiLanguage();
   const [messages, setMessages] = useState<Message[]>([]);
   const [status, setStatus] = useState<"loading" | "ready" | "unavailable">("loading");
-  const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const list = useRef<HTMLOListElement>(null);
@@ -61,15 +60,13 @@ export default function ClanChat({ clanId, userId, players }: { clanId: string; 
     list.current?.scrollTo({ top: list.current.scrollHeight });
   }, [messages.length]);
 
-  async function send() {
-    const body = draft.trim();
+  async function send(body: string) {
     if (!body || sending) return;
     setSending(true);
     setError(null);
     const { data, error: sendError } = await supabase.rpc("send_community_group_message", { p_group_id: clanId, p_body: body });
     setSending(false);
     if (sendError) { setError(sendError.message); return; }
-    setDraft("");
     setMessages((current) => current.some((row) => row.id === data) ? current : [...current, { id: data as string, group_id: clanId, sender_id: userId, body, created_at: new Date().toISOString() }]);
   }
 
@@ -97,17 +94,7 @@ export default function ClanChat({ clanId, userId, players }: { clanId: string; 
           );
         })}
       </ol>
-      <form className="mt-3 flex gap-2" onSubmit={(event) => { event.preventDefault(); void send(); }}>
-        <input
-          aria-label={ui("Message your clan")}
-          className="w-full rounded-xl border border-indigo-200/20 bg-slate-950/60 px-4 py-3 text-white outline-none focus:border-teal-300"
-          value={draft}
-          maxLength={MAX_LENGTH}
-          onChange={(event) => setDraft(event.target.value)}
-          placeholder={ui("Message your clan")}
-        />
-        <button disabled={sending || !draft.trim()} className="inline-flex items-center gap-2 rounded-xl bg-teal-400 px-4 py-2.5 text-sm font-black text-teal-950 transition hover:bg-teal-300 disabled:opacity-50"><Send size={16} aria-hidden="true" /><span className="sr-only sm:not-sr-only">{ui("Send")}</span></button>
-      </form>
+      <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label={ui("Preset messages")}>{Object.entries(CHAT_PRESETS).map(([key, label]) => <button key={key} type="button" disabled={sending || status !== "ready"} onClick={() => void send(label)} className="rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-bold text-white disabled:opacity-50">{ui(label)}</button>)}</div>
       {error && <p role="alert" className="mt-2 text-sm text-rose-300">{ui(error)}</p>}
     </div>
   );

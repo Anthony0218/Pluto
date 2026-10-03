@@ -37,7 +37,7 @@ function TrialSolo({ mode, data }: { mode: ArenaModeDef; data: AtlasDataset }) {
   const restart = useCallback(() => setSeed(freshSeed()), []);
   if (mode.solo.kind !== "trial" || !pools) return null;
   const { component: Game, fullPool } = TRIAL_GAMES[mode.solo.trial];
-  return <Game key={`${difficulty}:${seed}`} pool={fullPool ? pools.full : pools.difficulty} byId={pools.byId} seed={seed} difficulty={difficulty} best={stored.best[bestKey(mode.bestId, difficulty)] ?? 0} onRecord={record} onRestart={restart} onExit={exit} />;
+  return <Game key={`${difficulty}:${seed}`} pool={fullPool ? pools.full : pools.difficulty} byId={pools.byId} topology={data.topology} seed={seed} difficulty={difficulty} best={stored.best[bestKey(mode.bestId, difficulty)] ?? 0} onRecord={record} onRestart={restart} onExit={exit} />;
 }
 
 function ArenaSolo({ mode, data }: { mode: ArenaModeDef; data: AtlasDataset }) {

@@ -1,5 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
+import { recordCreatedGameInviteCode, useCreatedGameInvite } from "@/components/social/GameInviteDelivery";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Settings2, Sparkles, X } from "lucide-react";
 import { usePartyConnection } from "../../../games/party/network/usePartyConnection.ts";
 import PartyHome from "./PartyHome.tsx";
@@ -43,6 +45,21 @@ function useViewportFitCover() {
 }
 function PartyApp() {
   const connection = usePartyConnection();
+  const [params] = useSearchParams();
+  useInviteAutoCreate(() => connection.send({ type: "CREATE", name: "Friends party", playerName: "Explorer", public: false }), connection.status === "online" && !connection.lobby);
+  useEffect(() => {
+    if (connection.lobby && connection.lobby.hostId === connection.playerId) recordCreatedGameInviteCode(connection.lobby.code, "/games/pluto-party");
+  }, [connection.lobby, connection.playerId]);
+  const createdInvite = useCreatedGameInvite(connection.lobby ? { lobbyRoute: "/games/pluto-party", code: connection.lobby.code } : null);
+  const invitedCode = params.get("code");
+  const inviteStarted = useRef(false);
+  useEffect(() => {
+    if (connection.status !== "online" || connection.lobby || inviteStarted.current || params.get("join") !== "1" || !invitedCode) return;
+    inviteStarted.current = true;
+    let playerName = "Explorer";
+    try { playerName = localStorage.getItem("pluto-party-name") || playerName; } catch { /* The default name still joins. */ }
+    connection.send({ type: "JOIN", code: invitedCode, playerName });
+  }, [connection, invitedCode, params]);
   const { status, lobby, error, errorCode, clearError, playerId, serverOffset, retry } = connection;
   const [settingsOpen, setSettingsOpen] = useState(false);
   const closeSettings = useCallback(() => setSettingsOpen(false), []);
@@ -57,6 +74,7 @@ function PartyApp() {
       data-motion={reduced ? "reduce" : "full"}
       data-hints={prefs.controlHints ? "on" : "off"}
     >
+      {createdInvite.status && <div className="pp-alert" role={createdInvite.failed ? "alert" : "status"}>{createdInvite.status}{createdInvite.failed && <button onClick={createdInvite.retry}>Retry invite</button>}</div>}
       <header className="pp-header">
         <Link to="/games" className="pp-back">
           <ArrowLeft size={17} /> Games

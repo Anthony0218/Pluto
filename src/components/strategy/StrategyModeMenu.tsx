@@ -7,10 +7,10 @@ export default function StrategyModeMenu({ game, title, subtitle, mark }: Props)
   const modes = [
     { path: "ai", title: "Vs Bot", text: "Play solo with Easy, Medium, or Hard AI.", style: "border-sky-400/25 hover:border-sky-300/60" },
     { path: "hotseat", title: "Hotseat", text: "Two local players share this device.", style: "border-amber-400/25 hover:border-amber-300/60" },
-    { path: "multiplayer", title: "Multiplayer", text: "Create or join a live Pluto room.", style: "border-emerald-400/25 hover:border-emerald-300/60" },
+    { path: "multiplayer", title: "Multiplayer", text: game === "go" ? "Invite a friend or play ranked Go with byo-yomi clocks." : "Create or join a live Pluto room.", style: "border-emerald-400/25 hover:border-emerald-300/60" },
     ...(hasFinishedGoGame ? [{ path: "analysis", title: "Game Review", text: "Review your latest finished game with KataGo.", style: "border-teal-400/25 hover:border-teal-300/60" }] : []),
   ];
-  return <main className="relative left-1/2 h-[var(--app-height)] w-screen -translate-x-1/2 overflow-hidden bg-[#07090b] px-5 py-5 text-zinc-100 sm:py-8">
+  return <main className="relative left-1/2 h-[var(--app-height)] w-screen -translate-x-1/2 overflow-y-auto bg-[#07090b] px-5 py-5 text-zinc-100 sm:py-8">
     <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(245,158,11,.1),transparent_30%),linear-gradient(to_bottom,#0b0e11,#050607)]" />
     <div className="relative mx-auto flex h-full max-w-5xl flex-col">
       <div className="flex shrink-0 items-center justify-between"><Link to="/games" className="text-sm text-zinc-500 hover:text-white">← All games</Link><Link to={"/games/" + game + "/rules"} className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-zinc-300 transition hover:border-amber-300/40 hover:text-white">Rules</Link></div>
@@ -23,7 +23,7 @@ export default function StrategyModeMenu({ game, title, subtitle, mark }: Props)
         </header>
         <section className="space-y-2 sm:space-y-3" aria-label={title + " game modes"}>
           {modes.map((mode) => <Link key={mode.path} to={"/games/" + game + "/" + mode.path} className={"group block rounded-2xl border bg-white/[.035] p-3 transition hover:-translate-y-1 hover:bg-white/[.06] sm:p-5 " + mode.style}>
-            <p className="text-xs font-black uppercase tracking-[.25em] text-zinc-500">{mode.path === "multiplayer" ? "Online" : mode.path === "analysis" ? "Post-game" : "Singleplayer"}</p>
+            <p className="text-xs font-black uppercase tracking-[.25em] text-zinc-500">{mode.path === "multiplayer" || mode.path === "ranked" ? "Online" : mode.path === "analysis" ? "Post-game" : "Singleplayer"}</p>
             <div className="mt-1 flex items-center justify-between gap-4"><div><h2 className="font-serif text-2xl text-white sm:text-3xl">{mode.title}</h2><p className="mt-1 text-xs text-zinc-500 sm:mt-2 sm:text-sm">{mode.text}</p></div><span className="text-2xl text-amber-300">→</span></div>
           </Link>)}
         </section>

@@ -1,3 +1,5 @@
+import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
+import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Globe2 } from "lucide-react";
@@ -17,6 +19,19 @@ export default function CreateRoomPanel({ def, versionId }: { def: GameDefinitio
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const host = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      const room = await createRoom(versionId!, players, settings);
+      navigate(recordCreatedGameInvite(`/games/card-builder/room/${room.code}`));
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Could not create the room.");
+      setBusy(false);
+    }
+  };
+  useInviteAutoCreate(() => host(), !!versionId);
+
   if (!user) {
     return (
       <Panel title="Play online" eyebrow="Online room">
@@ -35,17 +50,7 @@ export default function CreateRoomPanel({ def, versionId }: { def: GameDefinitio
     );
   }
 
-  const host = async () => {
-    setBusy(true);
-    setError(null);
-    try {
-      const room = await createRoom(versionId, players, settings);
-      navigate(`/games/card-builder/room/${room.code}`);
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not create the room.");
-      setBusy(false);
-    }
-  };
+
 
   return (
     <Panel title="Host an online room" eyebrow="Online room">

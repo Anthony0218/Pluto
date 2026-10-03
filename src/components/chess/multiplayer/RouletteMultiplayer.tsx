@@ -1,3 +1,5 @@
+import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
+import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
@@ -526,6 +528,8 @@ export function RouletteMultiplayerLobby() {
     return user?.email?.split("@")[0]?.trim() || "Player";
   }, [profile?.username, user?.email]);
 
+  useInviteAutoCreate(() => createRoom());
+
   async function createRoom() {
     if (!user) return setError("Sign in first.");
 
@@ -548,7 +552,7 @@ export function RouletteMultiplayerLobby() {
     setLoading(null);
     if (rpcError) return setError(rpcError.message);
 
-    navigate(`/games/chess/variants/roulette/multiplayer/${String(data)}`);
+    navigate(recordCreatedGameInvite(`/games/chess/variants/roulette/multiplayer/${String(data)}`));
   }
 
   async function joinRoom() {

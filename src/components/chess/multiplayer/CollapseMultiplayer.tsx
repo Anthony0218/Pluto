@@ -1,3 +1,5 @@
+import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
+import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
@@ -256,6 +258,8 @@ export function CollapseMultiplayerLobby() {
   const [busy, setBusy] = useState<"create" | "join" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  useInviteAutoCreate(() => createRoom());
+
   async function createRoom() {
     if (!user || busy) return;
     setBusy("create");
@@ -279,9 +283,9 @@ export function CollapseMultiplayerLobby() {
       return;
     }
 
-    navigate(
+    navigate(recordCreatedGameInvite(
       `/games/chess/variants/collapse/multiplayer/${String(data).toUpperCase()}`,
-    );
+    ));
   }
 
   async function joinRoom() {

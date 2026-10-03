@@ -1,6 +1,7 @@
 import { DashboardDataProvider } from "@/context/DashboardDataContext";
 import "../chess/chessLayout.css";
 import ChessLayoutControls from "../chess/ChessLayoutControls";
+import GameInviteDelivery from "../social/GameInviteDelivery";
 import RoomFriends from "../social/RoomFriends";
 import GlobalFriendsSidebar from "./GlobalFriendsSidebar";
 import IncomingNotificationToasts from "./notifications/IncomingNotificationToasts";
@@ -36,7 +37,8 @@ function RootContent() {
       <Outlet />
     </div>
     <RoomFriends />
-    {location.pathname !== "/dashboard" && <GlobalFriendsSidebar key={location.pathname} />}
+    <GlobalFriendsSidebar key={location.pathname} />
+    <GameInviteDelivery />
     <ChessLayoutControls />
     <IncomingNotificationToasts />
   </div>;

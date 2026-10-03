@@ -1,5 +1,5 @@
 import { entitiesForDifficulty, entitiesForScope } from "../engine.ts";
-import type { AtlasDifficulty, AtlasExtras, GeographicEntity } from "../types.ts";
+import type { AtlasDifficulty, AtlasExtras, Coordinates, GeographicEntity } from "../types.ts";
 
 /**
  * Normalized country model for the Atlas Trials modes. Every number here comes from the bundled Atlas snapshot
@@ -9,6 +9,8 @@ import type { AtlasDifficulty, AtlasExtras, GeographicEntity } from "../types.ts
 export type TrialStatId = "population" | "areaKm2" | "density" | "neighborCount" | "highestPointM" | "meanTempC";
 export type TrialCountry = {
   id: string; iso3: string; name: string; flag: string;
+  geometryId: string | null; officialLanguages: string[];
+  otherNames?: string[]; currencies?: GeographicEntity["currencies"]; capitalCoordinates?: Coordinates | null;
   /** GeoNames files South America under "North America"; the UN subregion restores the everyday continent. */
   continent: string; subregion: string; capital: string | null; neighbors: string[];
   stats: Partial<Record<TrialStatId, number>>;
@@ -90,6 +92,8 @@ export function toTrialCountry(entity: GeographicEntity, extras: AtlasExtras): T
   if (HISTORICAL_MEAN_TEMP_C[entity.iso3] !== undefined) stats.meanTempC = HISTORICAL_MEAN_TEMP_C[entity.iso3];
   return {
     id: entity.id, iso3: entity.iso3, name: entity.shortName, flag: entity.flagAsset ?? "",
+    geometryId: entity.geometryId, officialLanguages: entity.officialLanguages,
+    otherNames: [entity.canonicalName, ...entity.aliases], currencies: entity.currencies, capitalCoordinates: entity.capitalCoordinates,
     continent: entity.subregion === "South America" ? "South America" : entity.continent,
     subregion: entity.subregion, capital: entity.capitalCities[0] ?? null, neighbors: entity.neighbors,
     stats, summitName: summit?.name ?? null,

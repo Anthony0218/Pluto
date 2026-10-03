@@ -73,12 +73,12 @@ export const ARENA_MODES: ArenaModeDef[] = [
     },
   },
   {
-    id: "guess-country", title: "Guess the Country", tagline: "Tip by tip", accent: "violet", meta: "8 countries · 6 tips each",
+    id: "guess-country", title: "Guess the Country", tagline: "Tip by tip", accent: "violet", meta: "8 countries · 5 tips each",
     description: "A new tip every round — numbers, summits, a sentence overheard on the street. Solve it early for bonus points.",
     solo: { kind: "arena", mode: "guess_country" }, online: "guess_country", hotseat: "turns", options: [], bestId: "guess-country",
     rules: {
-      goal: "Name the mystery country from tips that get easier one by one.",
-      play: ["The first tip is the hardest: numbers, a summit, a phrase you might hear on its streets. Later tips give the region, language and capital.", "Type a country, pick it from the list (or click it on the map) and submit. You have one guess per tip.", "A wrong guess reveals the next tip. After the last tip the answer is shown."],
+      goal: "Name the mystery country from four random tips and a final flag reveal.",
+      play: ["The first four tips are drawn in random order from population, geography, languages, currency and other facts. The fifth tip always shows the flag.", "Type a country, pick it from the list (or click it on the map) and submit. You have one guess per tip.", "A wrong guess reveals the next tip. After the last tip the answer is shown."],
       scoring: `${GUESS_SCORING.first} points for solving, +${GUESS_SCORING.tipBonus[0]} on the first tip and +${GUESS_SCORING.tipBonus[1]} on the second. Online, the first solver gets ${GUESS_SCORING.first} and everyone else who solves the same tip ${GUESS_SCORING.other}.`,
       solo: "8 countries.",
       multiplayer: `2–4 players share each tip with ${GUESS_SCORING.tipSeconds} seconds per tip. Once someone is right, the others get a short last call.`,
@@ -153,7 +153,7 @@ export const ARENA_MODES: ArenaModeDef[] = [
     solo: { kind: "trial", trial: "country-guesser" }, online: "country_guesser", hotseat: "turns", options: [], bestId: "country-guesser",
     rules: {
       goal: `Find the mystery country among ${COUNTRY_GUESSER.options} suspects with as few clues as possible.`,
-      play: ["You start with one clue. Reveal more only when you need them.", "Pick a suspect at any time. A wrong pick costs a life and rules that country out."],
+      play: ["The first four clues are drawn in random order from a varied set of country facts. Reveal more only when you need them; the fifth keeps the decisive capital clue.", "Pick a suspect at any time. A wrong pick costs a life and rules that country out."],
       scoring: `${COUNTRY_GUESSER.pointsByClues.map((points) => points.toLocaleString("en")).join(", ")} points when solved with 1, 2, 3, 4 or 5 clues.`,
       solo: `${COUNTRY_GUESSER.rounds} countries and ${COUNTRY_GUESSER.lives} lives.`,
       multiplayer: race, hotseat: turns(`their own ${COUNTRY_GUESSER.rounds} countries`),

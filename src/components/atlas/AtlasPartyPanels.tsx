@@ -1,3 +1,5 @@
+import { areaValuesFromText } from "@/games/atlas/areaReferences";
+import AtlasAreaReference from "./AtlasAreaReference";
 import { useMemo, useState } from "react";
 import { ArrowDown, ArrowUp, Building2, Check, Globe2, Lightbulb, Map as MapIcon, Mountain, Search, X } from "lucide-react";
 import { AtlasCountryShape } from "./AtlasCountryShape";
@@ -14,7 +16,7 @@ function formatStat(key: HigherLowerQuestion["stat"]["key"], value: number, unit
 
 /** The flag to identify, or the lone country outline whose flag is asked for. */
 export function FlagPrompt({ question, topology }: { question: WithoutAnswer<ChoiceQuestion>; topology: unknown }) {
-  if (question.promptShape) return <AtlasCountryShape topology={topology} geometryId={question.promptShape.geometryId} label={question.promptShape.label} />;
+  if (question.promptShape) return <AtlasCountryShape topology={topology} geometryId={question.promptShape.geometryId} label={question.promptShape.label} showLabel={false} />;
   return question.promptFlagAsset ? <img className="atlas-flag-hero" src={question.promptFlagAsset} alt="Flag to identify" /> : null;
 }
 
@@ -53,6 +55,7 @@ export function HigherLowerCards({ question, revealed, disabled, chosen, correct
         <strong>{first?.label ?? "Reference"}</strong>
         {first?.detail && <small>{first.detail}</small>}
         <b>{formatStat(stat.key, stat.firstValue, stat.unit)}</b>
+        {stat.key === "areaKm2" && <AtlasAreaReference values={[stat.firstValue]} />}
         <em>{stat.label}{first?.note ? ` · ${first.note}` : ""}</em>
       </article>
       <div className="atlas-versus-mark" aria-hidden="true">VS</div>
@@ -72,8 +75,9 @@ export function HigherLowerCards({ question, revealed, disabled, chosen, correct
   );
 }
 
-export function GuessClueList({ clues, total }: { clues: GuessClue[]; total: number }) {
+export function GuessClueList({ clues, total, entityId }: { clues: GuessClue[]; total: number; entityId?: string }) {
   return (
+    <>
     <ol className="atlas-clues">
       {clues.map((clue, index) => (
         <li key={index} className={index === clues.length - 1 ? "is-new" : ""}>
@@ -84,6 +88,8 @@ export function GuessClueList({ clues, total }: { clues: GuessClue[]; total: num
       ))}
       {total > clues.length && <li className="is-locked"><p>{total - clues.length} more {total - clues.length === 1 ? "tip" : "tips"}, revealed one per round while nobody solves it</p></li>}
     </ol>
+    <AtlasAreaReference values={clues.flatMap(clue => areaValuesFromText(clue.text))} excludeIds={entityId ? [entityId] : []} />
+    </>
   );
 }
 

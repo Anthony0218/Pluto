@@ -1,3 +1,4 @@
+import { seededRandom } from "../src/games/atlas/random.ts";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
@@ -74,11 +75,11 @@ test("guess-the-country clues never name the country and end with its flag", () 
   const questions = generateGuessCountryQuestions({ ...base, difficulty: "expert", count: 195 });
   for (const question of questions) {
     const country = byId.get(question.entityId);
-    assert.ok(question.clues.length >= 5 && question.clues.length <= 6, country.shortName);
+    assert.ok(question.clues.length === 5, country.shortName);
     assert.equal(question.clues.at(-1).flagAsset, country.flagAsset);
     for (const clue of question.clues) assert.ok(!clue.text.toLowerCase().includes(country.shortName.toLowerCase()), `${country.shortName}: ${clue.text}`);
   }
-  const kenya = countryClues(byId.get("country:KEN"), extras);
+  const kenya = Array.from({ length: 30 }, (_, index) => countryClues(byId.get("country:KEN"), extras, seededRandom(`kenya-${index}`))).flat();
   assert.ok(kenya.some((clue) => clue.kind === "phrase" && clue.text.includes("Habari")));
   assert.ok(!kenya.some((clue) => /Mount Kenya/.test(clue.text)));
 });

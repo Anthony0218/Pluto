@@ -7,7 +7,7 @@ import type { GeometryCollection, Topology } from "topojson-specification";
 const SIZE = 320;
 
 /** One country on its own, centred and scaled to fill the frame — no world map around it. */
-function AtlasCountryShapeComponent({ topology, geometryId, label }: { topology: unknown; geometryId: string; label: string }) {
+function AtlasCountryShapeComponent({ topology, geometryId, label, showLabel = true }: { topology: unknown; geometryId: string; label: string; showLabel?: boolean }) {
   const path = useMemo(() => {
     const typed = topology as Topology<{ countries: GeometryCollection }>;
     const collection = feature(typed, typed.objects.countries) as unknown as FeatureCollection;
@@ -23,7 +23,7 @@ function AtlasCountryShapeComponent({ topology, geometryId, label }: { topology:
       <svg viewBox={`0 0 ${SIZE} ${SIZE}`} role="img" aria-label={`Outline of ${label}`}>
         <path d={path} />
       </svg>
-      <figcaption>{label}</figcaption>
+      {showLabel && <figcaption>{label}</figcaption>}
     </figure>
   );
 }

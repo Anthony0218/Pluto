@@ -1,3 +1,5 @@
+import GoRankedHistory from "@/components/ranked/GoRankedHistory";
+import GoRankedProfile from "@/components/ranked/GoRankedProfile";
 import { useEffect, useState } from "react";
 
 import { supabase } from "@/lib/supabase";
@@ -893,6 +895,7 @@ export default function ProfilePage() {
 
               <section className="rounded-[26px] border border-indigo-400/15 bg-[#0b1529]/90 p-5 shadow-xl shadow-black/20"><div className="mb-3 flex items-center gap-2"><Award size={19} className="text-violet-300" /><h2 className="text-lg font-black">{ui("Achievements")}</h2></div><div className="grid grid-cols-2 gap-2">{achievements.map(item => <div key={item.label} className={`rounded-xl border p-3 ${item.earned ? "border-violet-300/30 bg-violet-400/10" : "border-white/5 bg-white/[.025] opacity-55"}`}><item.Icon size={24} className={item.tone} aria-hidden="true" /><strong className="mt-2 block text-xs text-white">{ui(item.label)}</strong><small className="text-[10px] text-slate-400">{ui(item.detail)}</small></div>)}</div></section>
 
+              {user && <><GoRankedProfile userId={user.id} /><GoRankedHistory userId={user.id} /></>}
               <section className="rounded-[26px] border border-indigo-400/15 bg-[#0b1529]/90 p-5 shadow-xl shadow-black/20"><h2 className="text-lg font-black">{ui("Recent matches")}</h2>{recentResults.length ? <ol className="mt-3 grid gap-2">{recentResults.map((result, index) => <li key={`${result.game}-${result.completed_at}-${index}`} className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[.035] px-3 py-2"><div className="min-w-0"><strong className="block truncate text-sm text-white">{ui(gameName(result.game))}</strong><small className="text-xs text-slate-400">{new Date(result.completed_at).toLocaleDateString()} · {ui(result.multiplayer ? "Multiplayer" : "Singleplayer")}</small></div><span className={`rounded-lg border px-2 py-1 text-xs font-bold ${result.outcome === "win" ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300" : result.outcome === "loss" ? "border-rose-400/30 bg-rose-400/10 text-rose-300" : "border-slate-400/30 bg-slate-400/10 text-slate-300"}`}>{ui(result.outcome)}</span></li>)}</ol> : <p className="mt-3 text-sm text-slate-400">{ui("No completed matches yet.")}</p>}</section>
 
               <section className="rounded-[26px] border border-indigo-400/15 bg-[#0b1529]/90 p-5 shadow-xl shadow-black/20">

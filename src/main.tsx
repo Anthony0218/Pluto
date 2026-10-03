@@ -1,3 +1,4 @@
+import GoRankedGamePage from "./pages/games/Go/GoRankedGamePage";
 import LearnPage from "./pages/general/LearnPage";
 import React from "react";
 import ReactDOM from "react-dom/client";
@@ -158,6 +159,7 @@ import { CardBuilderCreateRoute, CardBuilderHomeRoute, CardBuilderPlayRoute, Car
 import CreditsPage from "./pages/general/CreditsPage.tsx";
 import MedievalKingdomsRegionPage from "./pages/games/MedievalKingdoms/MedievalKingdomsRegionPage.tsx";
 import LoginPage from "./pages/general/LoginPage.tsx";
+import InvitePage from "./pages/social/InvitePage";
 import FriendsPage from "./pages/social/FriendsPage.tsx";
 import NaturaMenu from "./pages/games/natura/naturaMenu.tsx";
 import SchafKopfMenuPage from "./pages/schafkopf/SchafKopfMenuPage.tsx";
@@ -246,6 +248,8 @@ const router = createBrowserRouter([
           { path: "/games/go", element: <GoMenu /> },
           { path: "/games/go/rules", element: <GoRules /> },
           { path: "/games/go/analysis", element: <GoAnalysisPage /> },
+          { path: "/games/go/ranked", element: <Navigate to="/games/go/multiplayer?tab=ranked" replace /> },
+          { path: "/games/go/ranked/:code/game", element: <GoRankedGamePage /> },
           { path: "/games/go/ai", element: <GoGamePage mode="ai" /> },
           { path: "/games/go/hotseat", element: <GoGamePage mode="hotseat" /> },
           { path: "/games/go/multiplayer", element: <StrategyMultiplayer gameType="go" /> },
@@ -261,6 +265,7 @@ const router = createBrowserRouter([
             path: "/friends",
             element: <FriendsPage />,
           },
+          { path: "/invite", element: <InvitePage /> },
           { path: "/clans", element: <ClansPage /> },
           { path: "/groups", element: <GroupsRedirect /> },
           { path: "/leaderboards", element: <LeaderboardsPage /> },
@@ -353,7 +358,7 @@ const router = createBrowserRouter([
             path: "/games/chess/classic/multiplayer/:roomCode/game",
             element: <ChessMultiplayerGame />,
           },
-          { path: "/games/chess/ranked", element: <ChessRankedLobby /> },
+          { path: "/games/chess/ranked", element: <ChessRankedLobby key="chess" /> },
           { path: "/games/chess/ranked/:roomCode", element: <ChessMultiplayerRoom /> },
           { path: "/games/chess/ranked/:roomCode/game", element: <ChessMultiplayerGame /> },
           {

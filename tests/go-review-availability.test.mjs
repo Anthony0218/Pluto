@@ -39,3 +39,24 @@ test("The analysis route loads the latest completed game while a new game is und
     else globalThis.localStorage = previousStorage;
   }
 });
+
+test("Ranked timeout and off-turn resignation remain reviewable from the Go menu after replay", () => {
+  const entries = new Map();
+  const previousStorage = globalThis.localStorage;
+  globalThis.localStorage = { getItem: key => entries.get(key) ?? null, setItem: (key, value) => entries.set(key, value) };
+  try {
+    const position = applyGoMove(createInitialGoState(), { type: "place", row: 4, col: 4 });
+    for (const reason of ["timeout", "resignation"]) {
+      const finished = { ...position, status: "finished", winner: "white", result: `white wins by ${reason}` };
+      saveGoGame(finished);
+      assert.deepEqual(loadGoGame(), finished);
+      assert.equal(canReviewGoGame(loadGoGame()), true);
+    }
+    const invalid = { ...position, board: ["corrupt"], status: "finished", winner: "white", result: "white wins by timeout" };
+    saveGoGame(invalid);
+    assert.deepEqual(loadGoGame().board, position.board);
+  } finally {
+    if (previousStorage === undefined) delete globalThis.localStorage;
+    else globalThis.localStorage = previousStorage;
+  }
+});

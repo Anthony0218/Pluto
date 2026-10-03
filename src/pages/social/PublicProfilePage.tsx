@@ -1,3 +1,4 @@
+import GoRankedProfile from "@/components/ranked/GoRankedProfile";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, Gamepad2, Trophy } from "lucide-react";
@@ -137,6 +138,7 @@ export default function PublicProfilePage() {
           </div>
         </section>
 
+        <GoRankedProfile userId={profile.id} />
         <div className="grid gap-4 sm:grid-cols-2">
           <section className="rounded-[26px] border border-indigo-400/15 bg-[#0b1529]/90 p-5 shadow-xl shadow-black/20">
             <h2 className="flex items-center gap-2 text-lg font-black"><Trophy size={19} className="text-amber-300" />{ui("Rank")}</h2>

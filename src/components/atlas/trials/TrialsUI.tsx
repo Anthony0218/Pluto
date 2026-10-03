@@ -7,6 +7,7 @@ import { useTrialSession } from "./trialSession";
 /** What every mode receives from the Trials page. `best` is the stored personal best before this run. */
 export type TrialModeProps = {
   pool: TrialCountry[]; byId: Map<string, TrialCountry>; seed: string; difficulty: AtlasDifficulty; best: number;
+  topology: unknown;
   onRecord: (score: number) => void; onRestart: () => void; onExit: () => void;
 };
 export type TrialAccent = "cyan" | "amber" | "violet" | "emerald" | "rose" | "sky";

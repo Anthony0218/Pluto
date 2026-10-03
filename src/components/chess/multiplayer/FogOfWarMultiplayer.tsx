@@ -1,3 +1,5 @@
+import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
+import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
@@ -232,6 +234,8 @@ export function FogOfWarMultiplayerLobby() {
     return username || user?.email?.split("@")[0]?.trim() || "Player";
   }, [profile?.username, user?.email]);
 
+  useInviteAutoCreate(() => createRoom());
+
   async function createRoom() {
     if (!user) return setError("Sign in first.");
 
@@ -244,9 +248,9 @@ export function FogOfWarMultiplayerLobby() {
         randomStart,
         displayName,
       });
-      navigate(
+      navigate(recordCreatedGameInvite(
         `/games/chess/variants/fog-of-war/multiplayer/${String(result.code)}`,
-      );
+      ));
     } catch (cause) {
       setError(
         cause instanceof Error ? cause.message : "Could not create room.",

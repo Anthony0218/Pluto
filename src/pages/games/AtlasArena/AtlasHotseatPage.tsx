@@ -135,7 +135,7 @@ function TurnsHotseat({ mode, data, players, settings, onExit, onSetup }: GamePr
   const { component: Game, fullPool } = TRIAL_GAMES[mode.solo.trial];
   return (
     <TrialSessionContext.Provider value={session}>
-      <Game key={playerSeed} pool={fullPool ? pools.full : pools.difficulty} byId={pools.byId} seed={playerSeed} difficulty={settings.difficulty} best={0} onRecord={record} onRestart={() => commit(pending.current)} onExit={onExit} />
+      <Game key={playerSeed} pool={fullPool ? pools.full : pools.difficulty} byId={pools.byId} topology={data.topology} seed={playerSeed} difficulty={settings.difficulty} best={0} onRecord={record} onRestart={() => commit(pending.current)} onExit={onExit} />
     </TrialSessionContext.Provider>
   );
 }

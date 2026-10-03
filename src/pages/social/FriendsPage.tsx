@@ -1,3 +1,4 @@
+import GameInvitePanel from "@/components/social/GameInvitePanel";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Bell, Check, Gamepad2, Mail, Search, UserPlus, Users, X } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
@@ -454,6 +455,7 @@ function FriendsPageContent() {
             </section>
           </aside>
 
+          <div className="space-y-4">
           {selectedFriend ? (
             <FriendChat key={selectedFriend.id} friend={selectedFriend} />
           ) : (
@@ -469,6 +471,8 @@ function FriendsPageContent() {
               </div>
             </section>
           )}
+          <GameInvitePanel />
+          </div>
         </div>
       </div>
     </main>

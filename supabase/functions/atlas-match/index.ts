@@ -179,7 +179,7 @@ function advanceRankedSeries(match: Match): void {
   }
   series.gameIndex += 1;
   match.mode = series.order[series.gameIndex];
-  match.settings = { rounds: match.mode === "territory_battle" ? 20 : match.mode === "guess_country" ? 8 : 10, allowSteal: true, difficulty: "intermediate", maxPlayers: 2 };
+  match.settings = { rounds: match.mode === "territory_battle" ? 20 : match.mode === "guess_country" ? 8 : 10, allowSteal: true, difficulty: match.settings.difficulty || "intermediate", maxPlayers: 2 };
   match.seed = crypto.randomUUID();
   match.status = "intermission";
   match.players = match.players.map((player) => ({ ...player, ready: false }));
@@ -258,7 +258,7 @@ Deno.serve(async (request) => {
         const player = { id: user.id, name: nameFor(body.name), ready: false };
         const mode = body.mode as AtlasMultiplayerMode;
         const settings = { rounds: mode === "territory_battle" ? 20 : mode === "guess_country" ? 8 : 10, allowSteal: true, difficulty: body.difficulty === "expert" || body.difficulty === "beginner" ? body.difficulty : "intermediate", maxPlayers: clampPlayers(mode, body.maxPlayers),
-          ...(usesMapCategories(mode) ? { categories: parseSelection(body.categories, QUESTION_CATEGORIES, mode === "territory_battle" ? ["countries", "capitals", "flags"] : mode === "speed_run" ? ["countries", "locations", "capitals", "flags"] : ["locations", "countries", "capitals"]) } : {}),
+          ...(usesMapCategories(mode) ? { categories: parseSelection(body.categories, QUESTION_CATEGORIES, QUESTION_CATEGORIES.map(({ id }) => id)) } : {}),
           ...(mode === "map_fill" ? { scope: body.scope === undefined ? "Europe" : isFillScope(body.scope) ? body.scope : (() => { throw new Error("Unknown map region."); })() } : {}),
           ...(mode === "higher_lower" ? { stats: parseSelection(body.stats, COMPARISON_CATEGORIES, DEFAULT_COMPARISON_STATS) } : {}),
         };
@@ -304,7 +304,7 @@ Deno.serve(async (request) => {
           const order = chooseRankedSeries(rankedModes().map((item) => item.online), match.state.ranked.bans[a], match.state.ranked.bans[b], () => crypto.getRandomValues(new Uint32Array(1))[0] / 2 ** 32) as AtlasMultiplayerMode[];
           match.state.ranked.order = order;
           match.mode = order[0];
-          match.settings = { rounds: match.mode === "territory_battle" ? 20 : match.mode === "guess_country" ? 8 : 10, allowSteal: true, difficulty: "intermediate", maxPlayers: 2 };
+          match.settings = { rounds: match.mode === "territory_battle" ? 20 : match.mode === "guess_country" ? 8 : 10, allowSteal: true, difficulty: match.settings.difficulty || "intermediate", maxPlayers: 2 };
           match.status = "ready";
         }
         changed = true;

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, ArrowRight, BookOpen, Check, Globe2, Info, Shuffle, Trophy, User, Users, Wifi, X } from "lucide-react";
+import { ArrowLeft, BookOpen, Check, Globe2, Info, CircleHelp, Shuffle, Trophy, User, Users, Wifi, X } from "lucide-react";
 import { bestKey } from "../../../games/atlas/arenaStorage";
 import { ARENA_MODES, hotseatPlayerLimit, onlinePlayerLimit, type ArenaModeDef } from "../../../games/atlas/modeCatalog";
 import { DIFFICULTY_LABELS } from "../../../games/atlas/soloSettings";
@@ -23,39 +23,37 @@ export default function AtlasArenaPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { stored, update } = useArenaStore();
+  const [selectedMode, setSelectedMode] = useState<ArenaModeDef | null>(null);
   const [rulesFor, setRulesFor] = useState<ArenaModeDef | null>(null);
   const [about, setAbout] = useState(false);
-  const [tab, setTab] = useState<"play" | "modes" | "ranked">(() => searchParams.get("tab") === "ranked" ? "ranked" : "play");
+  const [tab, setTab] = useState<"casual" | "ranked" | "modes">(() => searchParams.get("tab") === "ranked" ? "ranked" : searchParams.get("tab") === "modes" ? "modes" : "casual");
   const { difficulty } = stored;
   const launch = (mode: ArenaModeDef, how: Launch) => navigate(how === "online" ? `/games/atlas-arena/multiplayer?mode=${mode.online}` : `/games/atlas-arena/${how}/${mode.id}`);
 
   if (about) return <AboutPanel version={data?.version.atlasDataVersion ?? "…"} onBack={() => setAbout(false)} />;
   return (
-    <main className={`atlas-page atlas-trials-hub atlas-hub${tab === "play" ? " is-play-tab" : ""}`}>
+    <main className={`atlas-page atlas-trials-hub atlas-hub${tab === "casual" ? " is-play-tab is-fixed-tab" : tab === "ranked" ? " is-ranked-tab is-fixed-tab" : " is-modes-tab"}`}>
       <Link className="atlas-back" to="/games"><ArrowLeft /> Pluto</Link>
       <header className="trials-hub-intro">
         <span className="atlas-eyebrow">Pluto geography laboratory</span>
         <h1>Atlas <em>Arena</em></h1>
-        <p>{ARENA_MODES.length} ways to test what you know about the world — play alone, race friends online, or pass one device around the table.</p>
       </header>
       <nav className="atlas-tabs" aria-label="Atlas Arena tabs">
-        {(["play", "modes", "ranked"] as const).map((item) => <button key={item} type="button" className={tab === item ? "active" : ""} aria-current={tab === item ? "page" : undefined} onClick={() => setTab(item)}>{item[0].toUpperCase() + item.slice(1)}</button>)}
+        {(["casual", "ranked", "modes"] as const).map((item) => <button key={item} type="button" className={tab === item ? "active" : ""} aria-current={tab === item ? "page" : undefined} onClick={() => setTab(item)}>{item[0].toUpperCase() + item.slice(1)}</button>)}
       </nav>
-      {tab === "play" && <section className="atlas-play-home" aria-label="Play Atlas Arena">
+      {tab === "casual" && <section className="atlas-play-home" aria-label="Casual Atlas Arena">
         <div className="atlas-play-intro"><span className="atlas-eyebrow">Your next expedition</span><h2>How do you want to play?</h2><p>Every Atlas mode is in the mix. Leave the choice to chance or pick your challenge.</p></div>
         <div className="atlas-play-choices">
-          <button type="button" className="atlas-play-choice is-random" onClick={() => launch(ARENA_MODES[Math.floor(Math.random() * ARENA_MODES.length)], "solo")}>
-            <span className="atlas-choice-top"><span className="atlas-play-choice-mark"><Shuffle aria-hidden /></span><span className="atlas-choice-tag">Surprise me</span></span>
-            <strong>Play Random Mode</strong><span className="atlas-choice-description">One of {ARENA_MODES.length} modes is chosen at random when you play.</span>
-            <span className="atlas-choice-icons" aria-hidden>{ARENA_MODES.map((mode) => { const Icon = MODE_ICONS[mode.id]; return <span key={mode.id} title={mode.title}><Icon /></span>; })}</span>
-            <span className="atlas-choice-bottom"><span><Shuffle size={17} aria-hidden /> Random draw</span><ArrowRight size={20} aria-hidden /></span>
-          </button>
-          <button type="button" className="atlas-play-choice is-choose" onClick={() => setTab("modes")}>
-            <span className="atlas-choice-top"><span className="atlas-play-choice-mark"><Check aria-hidden /></span><span className="atlas-choice-tag">Your call</span></span>
-            <strong>Choose Mode</strong><span className="atlas-choice-description">Browse every mode and choose exactly what you want to play.</span>
-            <span className="atlas-choice-icons" aria-hidden>{ARENA_MODES.map((mode) => { const Icon = MODE_ICONS[mode.id]; return <span key={mode.id} title={mode.title}><Icon /></span>; })}</span>
-            <span className="atlas-choice-bottom"><span><Check size={17} aria-hidden /> You decide</span><ArrowRight size={20} aria-hidden /></span>
-          </button>
+          <RandomModeChoice onLaunch={launch} />
+          <article className="atlas-play-choice is-choose" onClick={event => {
+            if (!(event.target as HTMLElement).closest("button, a")) setSelectedMode(null);
+          }}>
+            <div className="atlas-choice-copy"><span className="atlas-choice-tag"><Check size={14} aria-hidden /> Your call</span>
+              <h3>{selectedMode?.title ?? "Choose Mode"}</h3><p className="atlas-choice-description">{selectedMode ? selectedMode.description : "Browse every mode and choose exactly what you want to play."}</p>
+              {selectedMode ? <PlayChoiceActions onLaunch={how => launch(selectedMode, how)} /> : <button type="button" className="atlas-choose-button" onClick={() => setTab("modes")}>Choose</button>}
+            </div>
+            <div className="atlas-choice-icons" role="group" aria-label="Choose an Atlas mode">{ARENA_MODES.map(mode => { const Icon = MODE_ICONS[mode.id]; return <button type="button" key={mode.id} title={mode.title} aria-label={mode.title} aria-pressed={selectedMode?.id === mode.id} onClick={() => setSelectedMode(mode)}><Icon aria-hidden /></button>; })}<button type="button" title="Clear mode selection" aria-label="Clear mode selection" onClick={() => setSelectedMode(null)}><X aria-hidden /></button></div>
+          </article>
         </div>
       </section>}
       {tab === "ranked" && <AtlasRankedTab />}
@@ -96,12 +94,63 @@ export default function AtlasArenaPage() {
   );
 }
 
+function RandomModeChoice({ onLaunch }: { onLaunch: (mode: ArenaModeDef, how: Launch) => void }) {
+  const [selectedMode, setSelectedMode] = useState<ArenaModeDef | null>(null);
+  const [highlight, setHighlight] = useState<number | null>(null);
+  const [spinning, setSpinning] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const running = useRef(false);
+  useEffect(() => () => { if (timer.current !== null) clearTimeout(timer.current); }, []);
+
+  const reset = () => {
+    if (timer.current !== null) clearTimeout(timer.current);
+    timer.current = null;
+    running.current = false;
+    setSpinning(false);
+    setSelectedMode(null);
+    setHighlight(null);
+  };
+
+  const spin = () => {
+    if (running.current) return;
+    running.current = true;
+    setSpinning(true);
+    const winner = Math.floor(Math.random() * ARENA_MODES.length);
+    const finalStep = ARENA_MODES.length * 2 + winner;
+    const advance = (step: number) => {
+      setHighlight(step % ARENA_MODES.length);
+      if (step === finalStep) {
+        setSelectedMode(ARENA_MODES[winner]);
+        setSpinning(false);
+        running.current = false;
+        timer.current = null;
+      } else {
+        timer.current = setTimeout(() => advance(step + 1), 45 + 280 * (step / finalStep) ** 3);
+      }
+    };
+    advance(window.matchMedia("(prefers-reduced-motion: reduce)").matches ? finalStep : 0);
+  };
+
+  return <article className="atlas-play-choice is-random">
+    <div className="atlas-choice-copy"><span className="atlas-choice-tag"><Shuffle size={14} aria-hidden /> Surprise me</span>
+      <h3>Play Random Mode</h3><p className="atlas-choice-description" role="status" data-selected={Boolean(selectedMode)}>{spinning ? "Choosing your mode…" : selectedMode ? `Selected: ${selectedMode.title}` : `Play now for a random mode, or click ? to spin through all ${ARENA_MODES.length} modes.`}</p>
+      <PlayChoiceActions disabled={spinning} onLaunch={how => onLaunch(selectedMode ?? ARENA_MODES[Math.floor(Math.random() * ARENA_MODES.length)], how)} />
+    </div>
+    {highlight === null
+      ? <button type="button" className="atlas-random-symbol" aria-label="Spin for a random mode" onClick={spin}><CircleHelp aria-hidden /></button>
+      : <div className="atlas-choice-icons atlas-roulette-icons" role="group" aria-label="Random mode roulette" aria-busy={spinning}>{ARENA_MODES.map((mode, index) => {
+        const Icon = MODE_ICONS[mode.id];
+        return <span key={mode.id} className={highlight === index ? "is-highlighted" : ""} title={mode.title} aria-label={mode.title} aria-disabled="true" aria-current={highlight === index ? "true" : undefined}><Icon aria-hidden /></span>;
+      })}<button type="button" className="atlas-roulette-reset" title="Reset random mode" aria-label="Reset random mode" onClick={reset}><X aria-hidden /></button></div>}
+  </article>;
+}
+
 function LaunchButtons({ mode, onLaunch }: { mode: ArenaModeDef; onLaunch: (how: Launch) => void }) {
   return (
     <div className="atlas-hub-actions" role="group" aria-label={`Play ${mode.title}`}>
-      <button type="button" onClick={() => onLaunch("solo")}><User aria-hidden /><span>Singleplayer</span></button>
-      <button type="button" onClick={() => onLaunch("online")}><Wifi aria-hidden /><span>Multiplayer</span></button>
-      <button type="button" onClick={() => onLaunch("hotseat")}><Users aria-hidden /><span>Hotseat</span></button>
+      {<button type="button" onClick={() => onLaunch("solo")}><User aria-hidden /><span>Singleplayer</span></button>}
+      {<button type="button" onClick={() => onLaunch("online")}><Wifi aria-hidden /><span>Multiplayer</span></button>}
+      {<button type="button" onClick={() => onLaunch("hotseat")}><Users aria-hidden /><span>Hotseat</span></button>}
     </div>
   );
 }
@@ -145,4 +194,8 @@ function RulesDialog({ mode, onClose, onLaunch }: { mode: ArenaModeDef; onClose:
 
 function AboutPanel({ version, onBack }: { version: string; onBack: () => void }) {
   return <main className="atlas-page atlas-about"><button type="button" className="atlas-back" onClick={onBack}><ArrowLeft /> Atlas Arena</button><span className="atlas-eyebrow">Data & boundaries</span><h1>Built on traceable geography</h1><p>Atlas Arena uses a bundled snapshot—never a live API during a match. Every multiplayer room pins its dataset version so all players generate the same rounds.</p><div className="atlas-source-list"><article><strong>Natural Earth 1:110m</strong><span>Admin-0 boundary geometry · public domain</span></article><article><strong>United Nations M49</strong><span>Identifiers and statistical regions</span></article><article><strong>GeoNames</strong><span>Names, capitals, coordinates, languages and neighbors · CC BY 4.0</span></article><article><strong>World Bank</strong><span>Population (SP.POP.TOTL) and surface area (AG.SRF.TOTL.K2), including observation year</span></article><article><strong>Wikidata</strong><span>Highest summits used by the stat modes</span></article><article><strong>flag-icons</strong><span>Bundled SVG flags · MIT</span></article></div><div className="atlas-boundary-note"><Globe2 /><p>Natural Earth renders de facto boundaries. Rendering is separate from quiz eligibility: the default game uses an explicit UN 195 scope, while territories remain available in the data. Dataset: <strong>{version}</strong>.</p></div></main>;
+}
+
+function PlayChoiceActions({ onLaunch, disabled = false }: { onLaunch: (how: Launch) => void; disabled?: boolean }) {
+  return <div className="atlas-hub-actions atlas-choice-actions" role="group" aria-label="Choose how to play">{(["solo", "online", "hotseat"] as const).map(how => { const Icon = how === "solo" ? User : how === "online" ? Wifi : Users; return <button key={how} type="button" disabled={disabled} onClick={() => onLaunch(how)}><Icon aria-hidden /><span>{how === "solo" ? "Singleplayer" : how === "online" ? "Multiplayer" : "Hotseat"}</span></button>; })}</div>;
 }

@@ -1,3 +1,4 @@
+import AtlasAreaReference from "../AtlasAreaReference";
 import { useState, type CSSProperties } from "react";
 import { ChevronRight, ScanSearch } from "lucide-react";
 import { STAT_DETECTIVE } from "../../../games/atlas/trials/config";
@@ -50,6 +51,7 @@ export function StatDetectiveGame({ pool, byId, seed, difficulty, best, onRecord
                 detail={revealed ? `${STATS[lead].label}: ${formatCountryStat(lead, getCountryStat(country, lead))}` : <kbd>{index + 1}</kbd>} />;
             })}
           </div>
+          {run.round.statIds.includes("areaKm2") && <AtlasAreaReference excludeIds={run.round.optionIds} values={[getCountryStat(answer, "areaKm2") ?? 0]} />}
           <div className="trial-feedback-slot">
             <ScoreBurst points={run.lastPoints} id={`${run.roundIndex}-${run.score}`} />
             {revealed && run.phase !== "over" && (

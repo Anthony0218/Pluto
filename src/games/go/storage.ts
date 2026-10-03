@@ -18,6 +18,11 @@ export function loadGoGame(): GoState {
       if (!state || ![9, 13, 19].includes(state.boardSize) || state.komi !== 6.5 || !Array.isArray(state.moveHistory) || state.moveHistory.length > 1500) continue;
       const replayed = replayGo(state).at(-1)!;
       if (canReviewGoGame(replayed)) return replayed;
+      // Ranked clocks and off-turn resignations end a verified position without
+      // adding a board move. Keep that result when loading the existing review.
+      if (canReviewGoGame(state) && ["black", "white", "draw"].includes(state.winner ?? "") && /wins by (timeout|resignation)$/.test(state.result ?? "")) {
+        return { ...replayed, status: "finished", winner: state.winner, result: state.result };
+      }
     } catch { /* A corrupt saved game must not block the other completed-game slot. */ }
   }
   return createInitialGoState();

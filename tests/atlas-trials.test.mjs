@@ -69,7 +69,7 @@ test("Country Guesser clues come from data, never name the answer, and scoring f
     assert.equal(clues.length, 5);
     for (const clue of clues.slice(0, 4)) assert.ok(!clue.text.toLowerCase().includes(country.name.toLowerCase()), `${country.name}: ${clue.text}`);
   }
-  assert.match(guesserClues(byIso.get("PER"))[0].text, /South America/);
+  assert.match(guesserClues(byIso.get("PER"), () => .999).find(clue => clue.kind === "region").text, /South America/);
   assert.match(guesserClues(byIso.get("KWT"))[4].text, /shares its name/);
   let run = createGuesserRun(pool, "guess");
   run = revealGuesserClue(revealGuesserClue(run));

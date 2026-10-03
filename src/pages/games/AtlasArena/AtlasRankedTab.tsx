@@ -1,6 +1,9 @@
+import AtlasRankBadge from "@/components/atlas/AtlasRankBadge";
+import { AtlasRankGuide, AtlasLeaderboard } from "@/components/atlas/AtlasRankDialogs";
+import { useAtlasRanks } from "@/games/atlas/useAtlasRanks";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Check, Shield, Swords } from "lucide-react";
+import { BookOpen, Check, Shield, Swords, Trophy } from "lucide-react";
 import { useAuth } from "../../../context/AuthContext";
 import { getRankFromRating, maxModeBans, rankedModes, RANKED_CONFIG } from "../../../games/atlas/ranked";
 import { useAtlasData } from "../../../games/atlas/useAtlasData";
@@ -17,6 +20,8 @@ export function AtlasRankedTab() {
   const { user, profile: account } = useAuth();
   const { data: atlas } = useAtlasData();
   const navigate = useNavigate();
+  const [dialog, setDialog] = useState<"info" | "leaderboard" | null>(null);
+  const { rows: badges } = useAtlasRanks(user ? [user.id] : []);
   const [profile, setProfile] = useState<RankedProfile | null>(null);
   const [status, setStatus] = useState<QueueStatus["status"]>("idle");
   const [draftCode, setDraftCode] = useState("");
@@ -86,7 +91,7 @@ export function AtlasRankedTab() {
     catch (cause) { setError(errorText(cause)); }
     finally { setBusy(false); }
   };
-  if (!user) return <section className="atlas-ranked-home"><div className="atlas-ranked-hero"><div className="atlas-ranked-hero-copy"><span className="atlas-eyebrow">Competitive Atlas</span><h2>Ranked Arena</h2><p>Sign in to track your rating and find an opponent.</p></div><div className="atlas-ranked-hero-action"><Link className="atlas-start" to="/login"><Shield size={18} /> Sign in</Link></div></div></section>;
+  if (!user) return <section className="atlas-ranked-home"><div className="atlas-ranked-tools"><button type="button" onClick={() => setDialog("info")}><BookOpen size={16} /> Rank info</button><button type="button" onClick={() => setDialog("leaderboard")}><Trophy size={16} /> Leaderboard</button></div>{dialog === "info" && <AtlasRankGuide onClose={() => setDialog(null)} />}{dialog === "leaderboard" && <AtlasLeaderboard onClose={() => setDialog(null)} />}<div className="atlas-ranked-hero"><div className="atlas-ranked-hero-copy"><span className="atlas-eyebrow">Competitive Atlas</span><h2>Ranked Arena</h2><p>Sign in to track your rating and find an opponent.</p></div><div className="atlas-ranked-hero-action"><Link className="atlas-start" to="/login"><Shield size={18} /> Sign in</Link></div></div></section>;
   const rating = profile?.rating ?? 1500, rank = getRankFromRating(rating);
   if (draftCode) return <section className="atlas-ranked-draft" aria-label="Ranked mode bans">
     <span className="atlas-eyebrow">Opponent found · {draft?.players.find((player) => player.id !== user.id)?.name ?? "Explorer"}</span>
@@ -98,10 +103,12 @@ export function AtlasRankedTab() {
     {error && <p className="atlas-multiplayer-error" role="alert">{error}</p>}
   </section>;
   return <section className="atlas-ranked-home" aria-label="Ranked Atlas Arena">
-    <div className="atlas-ranked-hero"><div className="atlas-ranked-hero-copy"><span className="atlas-eyebrow">Competitive Atlas · best of three</span><h2>{profile && profile.matches_played < RANKED_CONFIG.provisionalMatches ? `Placement ${profile.matches_played} / ${RANKED_CONFIG.provisionalMatches}` : rank.displayName}</h2><p>{rank.displayName} · {Math.round(rating)} Rating</p><span className="atlas-ranked-summary">All {modes.length} modes in the draw · ban after matchmaking · first to two wins</span></div>
+    <div className="atlas-ranked-tools"><button type="button" onClick={() => setDialog("info")}><BookOpen size={16} /> Rank info</button><button type="button" onClick={() => setDialog("leaderboard")}><Trophy size={16} /> Leaderboard</button></div>
+    {dialog === "info" && <AtlasRankGuide onClose={() => setDialog(null)} />}{dialog === "leaderboard" && <AtlasLeaderboard onClose={() => setDialog(null)} />}
+    <div className="atlas-ranked-hero"><div className="atlas-ranked-hero-copy"><AtlasRankBadge rating={rating} position={badges[0]?.leaderboard_rank} /><span className="atlas-eyebrow">Competitive Atlas · best of three</span><h2>{profile && profile.matches_played < RANKED_CONFIG.provisionalMatches ? `Placement ${profile.matches_played} / ${RANKED_CONFIG.provisionalMatches}` : rank.displayName}</h2><p>{rank.displayName} · {Math.round(rating)} Rating</p><span className="atlas-ranked-summary">All {modes.length} modes in the draw · ban after matchmaking · first to two wins</span></div>
       <div className="atlas-ranked-hero-action">{status === "waiting" ? <><span className="atlas-ranked-search">Searching for an opponent…</span><button type="button" className="atlas-start atlas-secondary" disabled={busy} onClick={() => void act("leave")}>Cancel queue</button></> : <button type="button" className="atlas-start" disabled={busy || !profile || !datasetVersion} onClick={() => void act("queue")}><Swords size={19} /><span>Queue Ranked</span></button>}</div>
     </div>
-    <div className="atlas-ranked-mode-preview" aria-label="Modes in Ranked">{modes.map((mode) => { const Icon = MODE_ICONS[mode.id]; return <span key={mode.id} className={`trial-accent-${mode.accent}`} title={mode.title}><Icon aria-hidden /><span>{mode.title}</span></span>; })}</div>
+    <div className="atlas-ranked-mode-preview" aria-label="Modes in Ranked">{modes.map((mode) => { const Icon = MODE_ICONS[mode.id]; return <span key={mode.id} className={`trial-accent-${mode.accent}`} title={mode.title} aria-label={mode.title}><Icon aria-hidden /><span>{mode.title}</span></span>; })}</div>
     {error && <p className="atlas-multiplayer-error" role="alert">{error}</p>}
   </section>;
 }

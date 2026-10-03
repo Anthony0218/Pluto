@@ -1,3 +1,5 @@
+import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
+import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowUpRight, Check, ChevronRight, Copy, Leaf, Play, Plus, Shield, Sparkles, Trophy, Users, Zap } from 'lucide-react';
@@ -24,7 +26,7 @@ export default function EatItPage() {
 function EatItSession({ roomCode }: { roomCode?: string }) {
   useUiLanguage();
   const { user, profile, loading } = useAuth(), navigate = useNavigate();
-  const [map, setMap] = useState<MapId>('city'), [count, setCount] = useState(4), [mode, setMode] = useState<'solo' | 'online'>('solo');
+  const [map, setMap] = useState<MapId>(() => new URLSearchParams(window.location.search).get('map') === 'nature' ? 'nature' : 'city'), [count, setCount] = useState(4), [mode, setMode] = useState<'solo' | 'online'>(() => new URLSearchParams(window.location.search).get('create') === '1' ? 'online' : 'solo');
   const [settings, setSettings] = useState(loadPreferences);
   const { hellEnabled, livesEnabled, botDifficulty, botsEnabled } = settings;
   useEffect(() => savePreferences(settings), [settings]);
@@ -63,9 +65,10 @@ function EatItSession({ roomCode }: { roomCode?: string }) {
     finally { setBusy(false); }
   };
   const solo = () => { setResult(null); setGame(createGame(map, botsEnabled ? fillBots([{ id: 'local', name }], count) : [{ id: 'local', name }], crypto.getRandomValues(new Uint32Array(1))[0], crypto.randomUUID(), { ...settings, mode: 'solo' })); };
+  useInviteAutoCreate(() => createRoom());
   const createRoom = async () => {
     setBusy(true); setError('');
-    try { const next = await roomAction({ op: 'create', map, count, ...settings }); setRoom(next); navigate(`/games/eat-it/multiplayer/${next.room_code}`); }
+    try { const next = await roomAction({ op: 'create', map, count, ...settings }); setRoom(next); navigate(recordCreatedGameInvite(`/games/eat-it/multiplayer/${next.room_code}`)); }
     catch (cause) { setError(cause instanceof Error ? cause.message : ui('Room unavailable')); } finally { setBusy(false); }
   };
   const leave = async () => {

@@ -3,7 +3,7 @@ import { seededRandom, shuffled } from "../random.ts";
 import type { AtlasDifficulty } from "../types.ts";
 
 export const LANGUAGE_GUESSER = { rounds: 12, options: 6, correct: 200 } as const;
-export type LanguageRound = { language: string; sentence: string; options: string[] };
+export type LanguageRound = { language: string; sentence: string; translation: string; options: string[] };
 
 // Each displayed sentence has one answer. Alternate spellings and duplicate translations are omitted.
 const OMIT = new Set(["Serbian (Latin)", "Norwegian Bokmål", "Swati"]);
@@ -24,5 +24,11 @@ export function languageRound(seed: string, index: number, difficulty: AtlasDiff
   const nearCount = difficulty === "beginner" ? 1 : difficulty === "intermediate" ? 3 : 5;
   const near = shuffled(sameScript, random).slice(0, nearCount);
   const far = shuffled(others.filter((name) => !near.includes(name)), random).slice(0, LANGUAGE_GUESSER.options - 1 - near.length);
-  return { language, sentence, options: shuffled([language, ...near, ...far], random) };
+  return {
+    language,
+    sentence,
+    // The clue deck uses compact everyday greetings. The meaning appears only after the choice is locked.
+    translation: language === "English" ? sentence : "Good morning! How are you? Thank you very much.",
+    options: shuffled([language, ...near, ...far], random),
+  };
 }
