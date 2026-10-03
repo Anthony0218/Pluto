@@ -10,11 +10,12 @@ import type { GameState } from './types.ts';
 
 export function animalModel(library: ModelLibrary, kind: AnimalKind) {
     const group = new T.Group(), part = library.part.bind(library), cat = kind === 'cat';
-    part(group, 'ball', cat ? '#e8bb88' : '#a7b8cf', 0, 15, 0, cat ? 22 : 17, 15, 13);
+    library.finish(part(group, 'ball', cat ? '#e8bb88' : '#a7b8cf', 0, 15, 0, cat ? 22 : 17, 15, 13), cat ? '#e8bb88' : '#a7b8cf', cat ? 'fur' : 'feather');
     part(group, 'ball', cat ? '#f3d3a7' : '#b6cdd7', 13, 27, 0, 12, 12, 12);
     for (const side of [-1, 1]) {
       const wing = part(group, cat ? 'cone' : 'ball', cat ? '#d59e7b' : '#7c93b2', cat ? 13 : -3, cat ? 39 : 17, side * (cat ? 7 : 14), cat ? 5 : 14, cat ? 12 : 4, cat ? 5 : 10);
       wing.name = 'wing';
+      library.finish(wing, cat ? '#d59e7b' : '#7c93b2', cat ? 'fur' : 'feather');
       const eye = part(group, 'ball', '#263746', 22, 31, side * 7, 3, 4, 3); eye.name = 'eye';
       part(group, 'ball', '#fffbea', 24, 33, side * 7, 1, 1.3, 1);
       part(group, 'cylinder', cat ? '#f3d3a7' : '#dbad76', side * 10, 5, 0, 3, 10, 3);
@@ -23,10 +24,25 @@ export function animalModel(library: ModelLibrary, kind: AnimalKind) {
       for (const child of group.children) child.position.y += 8;
       for (const x of [-1, 1]) for (const z of [-1, 1]) { const leg = part(group, 'cylinder', '#d59e7b', x * 13, 9, z * 10, 4, 18, 4); leg.name = 'leg'; }
       const tail = part(group, 'cylinder', '#d59e7b', -25, 23, 0, 3, 25, 3); tail.rotation.z = -.7;
-      part(group, 'ball', '#ba817b', 25, 24, 0, 3, 2, 3);
+      for (const side of [-1, 1]) {
+        part(group, 'ball', '#fff0d6', 23, 32, side * 3, 4, 3, 4);
+        const innerEar = part(group, 'cone', '#dc9f9c', 15, 47, side * 7, 2.5, 7, 2.5);
+        innerEar.rotation.z = -.1;
+        for (const offset of [-1, 1]) {
+          const whisker = part(group, 'box', '#f8eedb', 24, 32 + offset, side * 8, .6, .6, 11);
+          whisker.rotation.x = side * offset * .16;
+        }
+      }
+      part(group, 'ball', '#ba817b', 27, 33, 0, 2, 1.6, 2);
     } else {
       const beak = part(group, 'cone', '#e4b366', 26, 25, 0, 4, 10, 4); beak.rotation.z = -Math.PI / 2;
-      part(group, 'ball', '#80a6a0', 10, 19, 0, 12, 4, 12);
+      library.finish(part(group, 'ball', '#80a6a0', 10, 19, 0, 12, 4, 12), '#729f99', 'feather');
+      for (const side of [-1, 1]) {
+        for (const x of [-5, 2]) part(group, 'ball', '#465d7b', x, 19, side * 20, 2, 2.5, 5);
+        for (const toe of [-1, 0, 1]) part(group, 'box', '#cd9277', side * 10 + 3, 1, toe * 2, 8, 1.5, 1.4);
+      }
+      const tail = part(group, 'ball', '#6b809d', -19, 14, 0, 12, 3, 8);
+      library.finish(tail, '#6b809d', 'feather');
     }
     return group;
 }

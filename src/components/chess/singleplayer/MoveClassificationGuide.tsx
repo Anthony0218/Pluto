@@ -7,13 +7,14 @@ import { ReviewQualityIcon } from "./ReviewQualityBadge";
 import { qualityColor, type ReviewVisualQuality } from "./reviewQualityVisuals";
 
 const classifications: Array<{ quality: ReviewVisualQuality; range: string; description: string }> = [
+  { quality: "Book", range: "Opening", description: "A move leading to a position in a known opening line from the Lichess opening database, within the first 30 plies." },
   { quality: "Best", range: "Engine's #1", description: "The strongest move Stockfish found in this position." },
   { quality: "Excellent", range: "≤ 0.25", description: "Almost as strong as the best move; practically no advantage lost." },
   { quality: "Good", range: "≤ 0.60", description: "A solid move that gives away only a little of the evaluation." },
   { quality: "Inaccuracy", range: "≤ 1.20", description: "A weaker move: playable, but a better option was available." },
   { quality: "Mistake", range: "≤ 2.50", description: "A clear error that hands over a noticeable part of your advantage." },
   { quality: "Blunder", range: "> 2.50", description: "A serious error that often loses material or the game." },
-  { quality: "Missed Win", range: "Game Review", description: "You had a winning position but played a move that let it slip." },
+  { quality: "Missed Win", range: "Game Review", description: "Stockfish estimated a winning advantage (at least +5 or a forced mate), then +0.75 or less after your move. This estimate does not prove a forced win; missing mate while still winning does not qualify." },
 ];
 
 /** Small info button that opens a window explaining the Chess Coach move classifications. */
@@ -57,7 +58,7 @@ export default function MoveClassificationGuide() {
                 <div>
                   <h2 className="font-serif text-xl font-semibold text-[#f6ead1]">{ui("Move classifications")}</h2>
                   <p className="mt-1 text-xs text-zinc-500">
-                    {ui("How the Chess Coach grades a move, by the evaluation lost compared to the best move (in pawns).")}
+                    {ui("Opening book matches are marked Book. Other moves are graded by evaluation lost compared to the best move (in pawns).")}
                   </p>
                 </div>
                 <button

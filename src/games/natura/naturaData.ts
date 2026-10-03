@@ -1,3 +1,4 @@
+import { EXPEDITION_SCENARIOS } from "./expeditionData.ts";
 import { WILD_SCENARIOS } from "./wildModesData.ts";
 
 export type Role = "falcon" | "mouse";
@@ -27,6 +28,9 @@ export type Game = {
   bossTimer: number;
   bossHits: number;
   dive: number;
+  attacks: number;
+  recovering: boolean;
+  actionHeld: boolean;
   diveCooldown: number;
   bossAttack: number;
   bossCooldown: number;
@@ -51,9 +55,9 @@ export const HUNT_SECONDS = 55,
   BOSS_SECONDS = 26,
   CAPTURE_SECONDS = 2.1;
 export const GRASS = [
-  { x: 104, width: 112 },
-  { x: 440, width: 105 },
-  { x: 770, width: 112 },
+  { x: 45, width: 95 }, { x: 170, width: 100 },
+  { x: 340, width: 90 }, { x: 470, width: 100 },
+  { x: 615, width: 95 }, { x: 765, width: 100 }, { x: 880, width: 65 },
 ];
 export const PERCH = { x: 343, width: 86, y: 152 };
 export const BURROW_EXITS = [288, 666] as const;
@@ -148,9 +152,12 @@ export type ScenarioId =
   | "bolas"
   | "coconut"
   | "trapjaw"
-  | "cuttlefish";
+  | "cuttlefish"
+  | "jumpingspider"
+  | "spermwhale";
 export type Stage = "menu" | "briefing" | "game" | "quiz" | "results";
 export type PlayMode = "hotseat" | "ai";
+export type BotDifficulty = "easy" | "normal" | "hard";
 export type GameResult = { winner: Player | null; detail: string };
 export type Scenario = {
   id: ScenarioId;
@@ -171,6 +178,7 @@ const quiz = (
 ): Question => ({ text, answers, correct, explanation });
 export const SCENARIOS: Scenario[] = [
   ...WILD_SCENARIOS,
+  ...EXPEDITION_SCENARIOS,
   {
     id: "archerfish",
     icon: "🐟",
@@ -258,10 +266,10 @@ export const SCENARIOS: Scenario[] = [
     behaviour:
       "Flying fish use enlarged fins to glide above the sea. Leaving the water can help them escape large predatory fish such as tuna, but it can also expose them to hunting seabirds.",
     rules: [
-      "The round alternates every 9 seconds between a sky phase and a water phase. Move only left and right: dodge seabirds while gliding above the waves, then dodge tuna after diving below the surface.",
+      "The round alternates every 9 seconds between a sky phase and a water phase. Tap left or right to switch between three lanes. Seabirds and tuna approach from ahead and grow larger as they near you. Each wave leaves at least one safe lane.",
       "Each fish has 3 hearts. A collision costs one heart and gives a short recovery window. Every predator that passes cleanly counts as one dodge.",
       "Vs AI is a solo survival run: A/D moves your coral fish and the ocean is the opponent. Hotseat activates a second gold fish on the same screen using left/right arrows. The round lasts 54 seconds; in hotseat, score breaks ties before remaining hearts.",
-      "Space or the Pause button pauses the round. Touch controls below the canvas let one or two players play without a keyboard.",
+      "Escape or the Pause button pauses the round. Touch controls below the canvas let one or two players play without a keyboard.",
     ],
     abstraction:
       "The fixed 9-second phase changes, three hearts, exact spawn rates, collision sizes, score system and 54-second round are game rules. The sky enemies are stylized seabirds rather than a claim that one specific gull species is the main predator.",
@@ -324,9 +332,9 @@ export const SCENARIOS: Scenario[] = [
     behaviour:
       "American kestrels hunt small animals, often watching from a perch. Meadow voles move through vegetation and use burrows as shelter.",
     rules: [
-      "Kestrel: catch the vole three times before the hunt ends. Vole: hide in grass or use the burrow to escape.",
+      "Kestrel: catch the vole three times before the hunt ends. Vole: use seven grass shelters or the burrow to escape. Each kestrel dive uses one of five attacks and automatically climbs back up. Rest still on the perch for 2 seconds to refill all five attacks.",
       "After 55 seconds, the fantasy giant-vole phase begins. The kestrel wins with three dives; the vole wins with a strike or survives another 26 seconds.",
-      "Local: kestrel uses WASD + Space; vole uses arrows + Enter. Vs AI: use WASD + Space for your assigned animal. A keyboard is required.",
+      "Local: kestrel uses WASD + Space; vole uses arrows + Enter. Vs AI: use WASD + Space for your assigned animal. On-screen controls also support touch.",
     ],
     abstraction:
       "The giant vole, cooldowns and three lives are invented game rules.",

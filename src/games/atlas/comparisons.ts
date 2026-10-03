@@ -73,19 +73,23 @@ const pickWeighted = <T,>(items: [T, number][], random: () => number): T => {
  * Higher or Lower across countries, cities, continents and subregions. With `chain`, each answer's subject
  * becomes the next reference card (classic streak play) for a few rounds before the subject type or stat changes.
  */
-export function generateComparisonQuestions(options: { entities: GeographicEntity[]; extras: AtlasExtras; datasetVersion: string; seed: string; difficulty: AtlasDifficulty; count: number; chain?: boolean }): HigherLowerQuestion[] {
+export function generateComparisonQuestions(options: { entities: GeographicEntity[]; extras: AtlasExtras; datasetVersion: string; seed: string; difficulty: AtlasDifficulty; count: number; chain?: boolean; stats?: AtlasStatKey[] }): HigherLowerQuestion[] {
   const items = buildComparables(options.entities, options.extras, options.difficulty);
   const random = seededRandom(`${options.datasetVersion}:${options.seed}:${options.difficulty}:comparisons`);
   const gap = MIN_GAP[options.difficulty];
   const questions: HigherLowerQuestion[] = [];
+  const kindStats = (kind: ComparableKind) => KIND_STATS[kind].filter((key) => !options.stats || options.stats.includes(key));
+  const kinds = KIND_WEIGHTS.filter(([kind]) => kindStats(kind).length > 0);
+  if (!kinds.length) throw new Error("Select at least one comparison category.");
   let current: Comparable | null = null, stat: AtlasStatKey = "population", segment = 0;
   const recent: string[] = [];
   // Only five continents exist, so they are exempt from the no-repeat window.
   const fresh = (item: Comparable) => item.kind === "continent" || !recent.includes(item.id);
   for (let attempt = 0; questions.length < options.count && attempt < options.count * 40; attempt += 1) {
     if (!current || segment <= 0 || !options.chain) {
-      const kind = pickWeighted(KIND_WEIGHTS, random);
-      stat = KIND_STATS[kind][Math.floor(random() * KIND_STATS[kind].length)];
+      const kind = pickWeighted(kinds, random);
+      const stats = kindStats(kind);
+      stat = stats[Math.floor(random() * stats.length)];
       const pool = items.filter((item) => item.kind === kind && item.stats[stat] && fresh(item));
       if (pool.length < 2) continue;
       current = pool[Math.floor(random() * pool.length)];
@@ -99,9 +103,11 @@ export function generateComparisonQuestions(options: { entities: GeographicEntit
     const first = reference.stats[stat]!, second = next.stats[stat]!;
     questions.push({
       id: `${options.seed}:compare:${questions.length}`, seed: options.seed, entityId: next.id,
-      entityType: next.kind === "subregion" ? "region" : next.kind, category: stat === "population" ? "population" : stat === "areaKm2" ? "area" : "statistics",
+      entityType: next.kind === "subregion" ? "region" : next.kind, category: stat === "population" ? "population" : stat === "areaKm2" ? "area" : stat === "officialLanguageCount" ? "languages" : stat === "neighborCount" ? "borders" : "statistics",
       interaction: "higher_lower", difficulty: options.difficulty, scope: "un195",
-      prompt: stat === "countryCount" ? `Does ${next.label} have more or fewer countries than ${reference.label}?` : `Is ${next.label}'s ${STAT_DEFINITIONS[stat].label.toLowerCase()} higher or lower than ${reference.label}'s?`,
+      prompt: ["countryCount", "officialLanguageCount", "neighborCount"].includes(stat)
+        ? `Does ${next.label} have more or fewer ${STAT_DEFINITIONS[stat].label.toLowerCase()} than ${reference.label}?`
+        : `Is ${next.label}'s ${STAT_DEFINITIONS[stat].label.toLowerCase()} higher or lower than ${reference.label}'s?`,
       answer: second.value > first.value ? "higher" : "lower", comparisonEntityId: reference.id,
       stat: { key: stat, label: STAT_DEFINITIONS[stat].label, firstValue: first.value, secondValue: second.value, year: second.year, unit: STAT_DEFINITIONS[stat].unit },
       first: { label: reference.label, kind: reference.kind, detail: reference.detail, note: first.note },

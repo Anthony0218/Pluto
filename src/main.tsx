@@ -166,6 +166,7 @@ import SchafkopfGame from "./components/Schafkopf/SchafkopfGame.tsx";
 import SchafkopfMultiplayerGame from "./components/Schafkopf/SchafkopfMultiplayerGame.tsx";
 import GoMenu from "./pages/games/Go/GoMenu.tsx";
 import GoGamePage from "./pages/games/Go/GoGamePage.tsx";
+import GoAnalysisPage from "./pages/games/Go/GoAnalysisPage.tsx";
 import StrategyMultiplayer from "./components/strategy/StrategyMultiplayer.tsx";
 import GoRules from "./components/strategy/GoRules.tsx";
 const PartyPage = React.lazy(() => import("./pages/games/Party/PartyPage.tsx"));
@@ -173,6 +174,9 @@ const AtlasArenaPage = React.lazy(() => import("./pages/games/AtlasArena/AtlasAr
 const EatItPage = React.lazy(() => import("./pages/games/EatIt/EatItPage.tsx"));
 const eatItPage = <React.Suspense fallback={<main className="min-h-[var(--app-height)] bg-[#18201d]" />}><EatItPage /></React.Suspense>;
 const AtlasMultiplayerPage = React.lazy(() => import("./pages/games/AtlasArena/AtlasMultiplayerPage.tsx"));
+const AtlasTrialsPage = React.lazy(() => import("./pages/games/AtlasArena/AtlasTrialsPage.tsx"));
+const AtlasSoloPage = React.lazy(() => import("./pages/games/AtlasArena/AtlasSoloPage.tsx"));
+const AtlasHotseatPage = React.lazy(() => import("./pages/games/AtlasArena/AtlasHotseatPage.tsx"));
 const atlasPage = (page: React.ReactNode) => <React.Suspense fallback={<main className="min-h-[var(--app-height)] bg-[#06101f] p-10 text-zinc-400">Loading Atlas Arena…</main>}>{page}</React.Suspense>;
 
 /** Groups were renamed to Clans; keep old links working. */
@@ -235,8 +239,13 @@ const router = createBrowserRouter([
           { path: "/games/eat-it/multiplayer/:roomCode", element: eatItPage },
           { path: "/games/atlas-arena/multiplayer", element: atlasPage(<AtlasMultiplayerPage />) },
           { path: "/games/atlas-arena/multiplayer/:roomCode", element: atlasPage(<AtlasMultiplayerPage />) },
+          { path: "/games/atlas-arena/solo/:modeId", element: atlasPage(<AtlasSoloPage />) },
+          { path: "/games/atlas-arena/hotseat/:modeId", element: atlasPage(<AtlasHotseatPage />) },
+          { path: "/games/atlas-arena/trials", element: atlasPage(<AtlasTrialsPage />) },
+          { path: "/games/atlas-arena/trials/:modeId", element: atlasPage(<AtlasTrialsPage />) },
           { path: "/games/go", element: <GoMenu /> },
           { path: "/games/go/rules", element: <GoRules /> },
+          { path: "/games/go/analysis", element: <GoAnalysisPage /> },
           { path: "/games/go/ai", element: <GoGamePage mode="ai" /> },
           { path: "/games/go/hotseat", element: <GoGamePage mode="hotseat" /> },
           { path: "/games/go/multiplayer", element: <StrategyMultiplayer gameType="go" /> },

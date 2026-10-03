@@ -92,8 +92,8 @@ export function drawArcherGame(ctx: CanvasRenderingContext2D, game: ArcherGame, 
   game.fish.forEach((fish, index) => {
     if (ai && index === 1) return;
     const path = archerTrajectory(fish);
-    ctx.save(); ctx.globalAlpha = fish.shotCooldown > 0 ? 0.25 : 0.65;
-    path.forEach((point, i) => { if (i % 2 === 0) ellipse(ctx, point.x, point.y, 2.5, 2.5, COLORS[index]); });
+    ctx.save(); ctx.globalAlpha = fish.shotCooldown > 0 ? 0.45 : 0.9;
+    path.forEach((point, i) => { if (i % 2 === 0) ellipse(ctx, point.x, point.y, 3, 3, "#15303b"); });
     ctx.restore();
   });
   for (const insect of game.insects) {

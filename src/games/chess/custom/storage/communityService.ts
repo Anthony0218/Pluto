@@ -11,7 +11,7 @@ export type CommunitySort = "top" | "new" | "played";
 export type CommunityScope = "all" | "pluto" | "players";
 
 export interface CommunityEntry {
-  /** Packaged entries cannot be voted on or unpublished. Built-ins launch existing routes. */
+  /** Packaged entries can receive votes but cannot be unpublished. Built-ins launch existing routes. */
   official?: boolean;
   configurable?: boolean;
   builtin?: VariantCard;
@@ -75,11 +75,21 @@ export function createCommunityService(client: SupabaseClient) {
   return {
     get remoteUnavailable() { return remoteUnavailable; },
     async list(sort: CommunitySort, search = "", limit = 24, offset = 0, scope: CommunityScope = "all"): Promise<CommunityEntry[]> {
-      if (scope === "pluto") return mergeCommunityEntries([], allPlutoVariants, sort, search).slice(offset, offset + limit);
+      remoteUnavailable = false;
+      let ratedCatalog = allPlutoVariants;
+      try {
+        const { data, error } = await client.rpc("list_chess_catalog_votes");
+        if (error) throw error;
+        const totals = new Map(((data ?? []) as { variant_id: string; upvotes: number; downvotes: number; my_vote: number }[]).map((row) => [row.variant_id, row]));
+        ratedCatalog = allPlutoVariants.map((entry) => {
+          const row = totals.get(entry.id);
+          return row ? { ...entry, upvotes: row.upvotes, downvotes: row.downvotes, score: row.upvotes - row.downvotes, myVote: Math.sign(row.my_vote) as -1 | 0 | 1 } : entry;
+        });
+      } catch { remoteUnavailable = true; }
+      if (scope === "pluto") return mergeCommunityEntries([], ratedCatalog, sort, search).slice(offset, offset + limit);
       // Only the first offset+limit remote rows can enter the merged page.
       // Respect the RPC's 100-row cap, including on deep gallery pages.
       const remote: CommunityEntry[] = [];
-      remoteUnavailable = false;
       try {
         const needed = offset + limit;
         while (remote.length < needed) {
@@ -93,7 +103,8 @@ export function createCommunityService(client: SupabaseClient) {
       } catch {
         remoteUnavailable = true;
       }
-      const scopedCatalog = scope === "players" ? catalog.filter((entry) => entry.collections?.includes("community")) : catalog;
+      const visibleCatalog = ratedCatalog.filter((entry) => catalog.some((item) => item.id === entry.id));
+      const scopedCatalog = scope === "players" ? visibleCatalog.filter((entry) => entry.collections?.includes("community")) : visibleCatalog;
       return mergeCommunityEntries(remote, scopedCatalog, sort, search)
         .filter((entry) => scope !== "players" || !official(entry.id) || entry.collections?.includes("community"))
         .slice(offset, offset + limit);
@@ -172,8 +183,9 @@ export function createCommunityService(client: SupabaseClient) {
       };
     },
     async vote(id: string, value: -1 | 0 | 1) {
-      if (official(id)) throw new Error("Voting is only available for player-published variants.");
-      const { data, error } = await client.rpc("vote_chess_custom_variant", { p_published_id: id, p_value: value });
+      const { data, error } = official(id)
+        ? await client.rpc("vote_chess_catalog_variant", { p_variant_id: id, p_value: value })
+        : await client.rpc("vote_chess_custom_variant", { p_published_id: id, p_value: value });
       if (error) throw error;
       const row = (Array.isArray(data) ? data[0] : data) as { upvotes: number; downvotes: number; my_vote: number };
       return { upvotes: row.upvotes, downvotes: row.downvotes, myVote: Math.sign(row.my_vote) as -1 | 0 | 1 };

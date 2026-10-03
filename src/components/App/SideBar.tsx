@@ -21,6 +21,7 @@ const links = [
   { label: "Leaderboards", href: "/leaderboards", icon: Trophy },
   { label: "Profile", href: "/profile", icon: UserRound },
 ];
+const sidebarGames = ["chess", "watten", "schafkopf", "go", "eat-it", "atlas-arena", "natura", "pluto-party", "medieval-kingdoms", "card-builder"].flatMap(slug => games.filter(game => game.route === `/games/${slug}`));
 const sidebarLessons = ["Chess Puzzles", "Chess Analysis", "Chess rules", "Schafkopfen Rules"].flatMap((title) =>
   learningResources.filter((resource) => resource.title === title),
 );
@@ -50,7 +51,7 @@ export default function SideBar({ onNavigate }: { onNavigate: () => void }) {
         ))}
         <details className="rounded-xl border border-white/[0.06] bg-white/[0.025]">
           <summary className="flex cursor-pointer list-none items-center gap-3 px-3 py-3 text-sm font-medium text-zinc-300 marker:content-none hover:text-white"><Gamepad2 size={18} />{ui("Games")}</summary>
-          <div className="border-t border-white/[0.06] p-1.5">{games.map((game) => <Link key={game.route} to={game.route} onClick={onNavigate} className="block rounded-lg px-3 py-2 text-sm text-zinc-400 hover:bg-white/5 hover:text-white">{ui(game.title)}</Link>)}</div>
+          <div className="border-t border-white/[0.06] p-1.5">{sidebarGames.map((game) => <Link key={game.route} to={game.route} onClick={onNavigate} className="block rounded-lg px-3 py-2 text-sm text-zinc-400 hover:bg-white/5 hover:text-white">{ui(game.title)}</Link>)}</div>
         </details>
         <details className="rounded-xl border border-white/[0.06] bg-white/[0.025]">
           <summary className="flex cursor-pointer list-none items-center gap-3 px-3 py-3 text-sm font-medium text-zinc-300 marker:content-none hover:text-white"><BookOpen size={18} />{ui("Learn")}</summary>

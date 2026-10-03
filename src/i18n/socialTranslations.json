@@ -125,7 +125,16 @@
     "Spectating is not available": "Zuschauen ist nicht verfügbar",
     "The game has ended": "Die Partie ist beendet",
     "Join this clan first": "Tritt zuerst diesem Clan bei",
-    "Slow down a little": "Etwas langsamer, bitte"
+    "Slow down a little": "Etwas langsamer, bitte",
+    "Create avatar": "Avatar erstellen",
+    "Custom avatar": "Eigener Avatar",
+    "Choose a saved avatar or create a new one.": "Wähle einen gespeicherten Avatar oder erstelle einen neuen.",
+    "Choose a preset avatar.": "Wähle einen vorgefertigten Avatar.",
+    "Your custom avatars will appear here.": "Deine eigenen Avatare erscheinen hier.",
+    "Pan map": "Karte verschieben",
+    "Scroll page": "Seite scrollen",
+    "Trumpf oder Kritisch! You must play one of the highlighted cards.": "Trumpf oder Kritisch! Du musst eine der hervorgehobenen Karten spielen.",
+    "Trumpf oder Kritisch — you have neither, so you may play any card.": "Trumpf oder Kritisch — du hast beides nicht und darfst jede Karte spielen."
   },
   "bar": {
     "Clans": "Clans",
@@ -133,7 +142,16 @@
     "Online now": "Grad online",
     "Request to spectate": "Zuaschaun ofragn",
     "Watch now": "Jetzt zuaschaun",
-    "Clan chat": "Clan-Ratsch"
+    "Clan chat": "Clan-Ratsch",
+    "Create avatar": "Avatar erstoin",
+    "Custom avatar": "Eigener Avatar",
+    "Choose a saved avatar or create a new one.": "Wähl an gspeicherten Avatar oder mach an neien.",
+    "Choose a preset avatar.": "Wähl an fertigen Avatar.",
+    "Your custom avatars will appear here.": "Deine eigenen Avatare stehgn do.",
+    "Pan map": "Kartn verschiebn",
+    "Scroll page": "Seitn scrolln",
+    "Trumpf oder Kritisch! You must play one of the highlighted cards.": "Trumpf oder Kritisch! Du muasst oane vo de markierten Kartn spuin.",
+    "Trumpf oder Kritisch — you have neither, so you may play any card.": "Trumpf oder Kritisch — du host koans und derfst jede Kartn spuin."
   },
   "ko": {
     "Only allow non-clan chats": "클랜 외 채팅만 허용",
@@ -262,7 +280,16 @@
     "Spectating is not available": "관전할 수 없습니다",
     "The game has ended": "게임이 끝났습니다",
     "Join this clan first": "먼저 이 클랜에 가입하세요",
-    "Slow down a little": "조금 천천히 보내 주세요"
+    "Slow down a little": "조금 천천히 보내 주세요",
+    "Create avatar": "아바타 만들기",
+    "Custom avatar": "사용자 지정 아바타",
+    "Choose a saved avatar or create a new one.": "저장한 아바타를 선택하거나 새로 만드세요.",
+    "Choose a preset avatar.": "기본 아바타를 선택하세요.",
+    "Your custom avatars will appear here.": "직접 만든 아바타가 여기에 표시됩니다.",
+    "Pan map": "지도 이동",
+    "Scroll page": "페이지 스크롤",
+    "Trumpf oder Kritisch! You must play one of the highlighted cards.": "트럼프 또는 크리티컬! 강조된 카드 중 하나를 내야 합니다.",
+    "Trumpf oder Kritisch — you have neither, so you may play any card.": "트럼프 또는 크리티컬 — 해당 카드가 없으므로 아무 카드나 낼 수 있습니다."
   },
   "ru": {
     "Only allow non-clan chats": "Только чаты вне клана",
@@ -391,7 +418,16 @@
     "Spectating is not available": "Просмотр недоступен",
     "The game has ended": "Партия окончена",
     "Join this clan first": "Сначала вступите в клан",
-    "Slow down a little": "Помедленнее, пожалуйста"
+    "Slow down a little": "Помедленнее, пожалуйста",
+    "Create avatar": "Создать аватар",
+    "Custom avatar": "Свой аватар",
+    "Choose a saved avatar or create a new one.": "Выберите сохранённый аватар или создайте новый.",
+    "Choose a preset avatar.": "Выберите готовый аватар.",
+    "Your custom avatars will appear here.": "Ваши аватары появятся здесь.",
+    "Pan map": "Перемещать карту",
+    "Scroll page": "Прокрутить страницу",
+    "Trumpf oder Kritisch! You must play one of the highlighted cards.": "Козырь или критическая карта! Вы должны сыграть одну из выделенных карт.",
+    "Trumpf oder Kritisch — you have neither, so you may play any card.": "Козырь или критическая карта — у вас их нет, поэтому можно сыграть любую карту."
   },
   "es": {
     "Only allow non-clan chats": "Solo chats fuera del clan",
@@ -521,7 +557,16 @@
     "Spectating is not available": "No se puede mirar",
     "The game has ended": "La partida ha terminado",
     "Join this clan first": "Únete primero a este clan",
-    "Slow down a little": "Más despacio, por favor"
+    "Slow down a little": "Más despacio, por favor",
+    "Create avatar": "Crear avatar",
+    "Custom avatar": "Avatar personalizado",
+    "Choose a saved avatar or create a new one.": "Elige un avatar guardado o crea uno nuevo.",
+    "Choose a preset avatar.": "Elige un avatar prediseñado.",
+    "Your custom avatars will appear here.": "Tus avatares personalizados aparecerán aquí.",
+    "Pan map": "Mover mapa",
+    "Scroll page": "Desplazar página",
+    "Trumpf oder Kritisch! You must play one of the highlighted cards.": "¡Triunfo o crítica! Debes jugar una de las cartas resaltadas.",
+    "Trumpf oder Kritisch — you have neither, so you may play any card.": "Triunfo o crítica — no tienes ninguna, así que puedes jugar cualquier carta."
   },
   "pt": {
     "Only allow non-clan chats": "Apenas chats fora do clã",
@@ -651,6 +696,15 @@
     "Spectating is not available": "Não é possível assistir",
     "The game has ended": "A partida terminou",
     "Join this clan first": "Entre neste clã primeiro",
-    "Slow down a little": "Mais devagar, por favor"
+    "Slow down a little": "Mais devagar, por favor",
+    "Create avatar": "Criar avatar",
+    "Custom avatar": "Avatar personalizado",
+    "Choose a saved avatar or create a new one.": "Escolhe um avatar guardado ou cria um novo.",
+    "Choose a preset avatar.": "Escolhe um avatar predefinido.",
+    "Your custom avatars will appear here.": "Os teus avatares personalizados aparecerão aqui.",
+    "Pan map": "Mover mapa",
+    "Scroll page": "Deslocar página",
+    "Trumpf oder Kritisch! You must play one of the highlighted cards.": "Trunfo ou crítica! Tens de jogar uma das cartas destacadas.",
+    "Trumpf oder Kritisch — you have neither, so you may play any card.": "Trunfo ou crítica — não tens nenhuma, por isso podes jogar qualquer carta."
   }
 }

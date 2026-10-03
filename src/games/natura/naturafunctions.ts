@@ -1,5 +1,5 @@
-import { W, H, GROUND, HUNT_SECONDS, BOSS_SECONDS, CAPTURE_SECONDS, GRASS, PERCH, BURROW_EXITS, QUESTIONS } from "./naturaData";
-import type { Role, Mode, Vec, Game, Player, PlayMode } from "./naturaData";
+import { W, H, GROUND, HUNT_SECONDS, BOSS_SECONDS, CAPTURE_SECONDS, GRASS, PERCH, BURROW_EXITS, QUESTIONS } from "./naturaData.ts";
+import type { Role, Mode, Vec, Game, Player, PlayMode } from "./naturaData.ts";
 
 const coverAt = (x: number) =>
   GRASS.findIndex((p) => x > p.x + 12 && x < p.x + p.width - 12);
@@ -25,6 +25,9 @@ export const initialGame = (mode: Mode = "solo", role: Role = "falcon"): Game =>
   bossTimer: BOSS_SECONDS,
   bossHits: 0,
   dive: 0,
+  attacks: 5,
+  recovering: false,
+  actionHeld: false,
   diveCooldown: 0,
   bossAttack: 0,
   bossCooldown: 0,
@@ -73,7 +76,7 @@ function burst(g: Game, x: number, y: number, colors: string[]) {
     });
   }
 }
-export function update(g: Game, keys: Set<string>, dt: number) {
+export function update(g: Game, keys: Set<string>, dt: number, botDifficulty: "easy" | "normal" | "hard" = "normal") {
   if (g.phase === "ready" || g.phase === "end") return;
   g.t += dt;
   g.particles = g.particles.filter((p) => p.life > 0);
@@ -98,6 +101,7 @@ export function update(g: Game, keys: Set<string>, dt: number) {
         g.phase = "hunt";
         g.mouse = { x: 115 + Math.random() * 730, y: GROUND - 12 };
         g.falcon.y = 105;
+        g.recovering = false;
         g.invincible = 1.6;
         g.flightTrail = [];
         g.coverPatch = -1;
@@ -135,59 +139,47 @@ export function update(g: Game, keys: Set<string>, dt: number) {
       ? key(keys, "Enter")
       : g.role === "mouse" && key(keys, "Space");
   const target = g.phase === "hunt" ? g.mouse : g.boss;
+  let requestDive = falconAction && !g.actionHeld;
+  g.actionHeld = falconAction;
   if (g.mode === "solo" && g.role === "mouse") {
-    // The computer circles overhead and periodically commits to a dive.
-    const side = Math.sign(target.x - g.falcon.x) || 1;
-    g.falcon.x = clamp(g.falcon.x + side * 110 * dt, 25, W - 25);
-    if (
-      g.dive <= 0 &&
-      g.diveCooldown <= 0 &&
-      Math.abs(target.x - g.falcon.x) < 145 &&
-      (g.phase === "boss" || g.burrowTravel <= 0)
-    )
-      g.dive = 0.55;
-    if (g.dive <= 0) g.falcon.y += (110 - g.falcon.y) * Math.min(1, dt * 2.7);
-    g.falconFacing = side;
-  } else {
-    move(
-      g.falcon,
-      fx,
-      fy,
-      g.dive > 0 ? 365 : 210,
-      dt,
-      22,
-      W - 22,
-      38,
-      GROUND - 31,
-    );
-    if (fx) g.falconFacing = Math.sign(fx);
-    const overPerch =
-      g.falcon.x > PERCH.x + 10 && g.falcon.x < PERCH.x + PERCH.width - 10;
-    if (
-      g.phase === "hunt" &&
-      overPerch &&
-      Math.abs(g.falcon.y - (PERCH.y - 16)) < 19 &&
-      g.dive <= 0 &&
-      fx === 0 &&
-      fy === 0
-    ) {
-      g.falcon.y = PERCH.y - 16;
-      g.perchFocus = Math.min(1.1, g.perchFocus + dt);
-      g.diveCooldown = Math.max(0, g.diveCooldown - dt); // resting on the perch refreshes the dive sooner
-    } else if (g.dive <= 0) g.perchFocus = 0;
-    if (falconAction && g.dive <= 0 && g.diveCooldown <= 0) {
-      g.dive = g.perchFocus >= 1 ? 0.72 : 0.55;
-      g.diveCooldown = 1.8;
-      g.perchFocus = 0;
-      burst(g, g.falcon.x, g.falcon.y, ["#ffe5a8", "#fff9d8"]);
+    const recharge = g.attacks === 0;
+    const targetX = recharge ? PERCH.x + PERCH.width / 2 : target.x;
+    const targetY = recharge ? PERCH.y - 16 : 110;
+    if (!g.recovering && g.dive <= 0) {
+      const dx = targetX - g.falcon.x, dy = targetY - g.falcon.y;
+      const length = Math.hypot(dx, dy);
+      if (length > 2) move(g.falcon, dx, dy, Math.min(botDifficulty === "easy" ? 115 : botDifficulty === "hard" ? 205 : 160, length / dt), dt, 22, W - 22, 38, GROUND - 28);
+      requestDive = !recharge && Math.abs(target.x - g.falcon.x) < (botDifficulty === "easy" ? 34 : botDifficulty === "hard" ? 75 : 55) && (g.phase === "boss" || g.burrowTravel <= 0);
     }
+    g.falconFacing = Math.sign(targetX - g.falcon.x) || g.falconFacing;
+  } else if (!g.recovering && g.dive <= 0) {
+    move(g.falcon, fx, fy, 210, dt, 22, W - 22, 38, GROUND - 31);
+    if (fx) g.falconFacing = Math.sign(fx);
+  } else if (g.dive > 0) {
+    g.falcon.x = clamp(g.falcon.x + fx * 180 * dt, 22, W - 22);
+  }
+  const onPerch = Math.abs(g.falcon.x - PERCH.x - PERCH.width / 2) < 32 && Math.abs(g.falcon.y - PERCH.y + 16) < 20;
+  const resting = onPerch && !g.recovering && g.dive <= 0 && (g.mode === "solo" && g.role === "mouse" || fx === 0 && fy === 0);
+  if (resting && g.attacks < 5) {
+    g.falcon.y = PERCH.y - 16;
+    g.perchFocus = Math.min(2, g.perchFocus + dt);
+    if (g.perchFocus >= 2) { g.attacks = 5; g.perchFocus = 0; }
+  } else g.perchFocus = 0;
+  if (requestDive && !g.recovering && g.dive <= 0 && g.diveCooldown <= 0 && g.attacks > 0) {
+    g.attacks--;
+    g.dive = 0.8;
+    g.diveCooldown = 1.4;
+    burst(g, g.falcon.x, g.falcon.y, ["#ffe5a8", "#fff9d8"]);
   }
   if (g.dive > 0) {
     g.dive = Math.max(0, g.dive - dt);
     g.falcon.y = clamp(g.falcon.y + 480 * dt, 38, GROUND - 28);
     g.flightTrail.push({ ...g.falcon });
     if (g.flightTrail.length > 17) g.flightTrail.shift();
-    if (g.dive === 0) g.diveCooldown = Math.max(g.diveCooldown, 1.1);
+    if (g.dive === 0) g.recovering = true;
+  } else if (g.recovering) {
+    g.falcon.y = Math.max(105, g.falcon.y - 260 * dt);
+    if (g.falcon.y <= 105) g.recovering = false;
   } else if (g.flightTrail.length) g.flightTrail.shift();
   if (g.phase === "hunt") {
     g.timer = Math.max(0, g.timer - dt);
@@ -206,7 +198,7 @@ export function update(g: Game, keys: Set<string>, dt: number) {
         if (
           exit >= 0 &&
           g.burrowCooldown <= 0 &&
-          Math.abs(threat) < 175 &&
+          Math.abs(threat) < (botDifficulty === "easy" ? 100 : botDifficulty === "hard" ? 230 : 175) &&
           g.falcon.y < 255
         ) {
           g.burrowTravel = 1.35;
@@ -234,7 +226,7 @@ export function update(g: Game, keys: Set<string>, dt: number) {
             g.mouse,
             flee,
             Math.sin(g.t * 2) * 0.22,
-            122,
+            botDifficulty === "easy" ? 88 : botDifficulty === "hard" ? 152 : 122,
             dt,
             24,
             W - 24,
@@ -336,7 +328,7 @@ export function update(g: Game, keys: Set<string>, dt: number) {
     if (g.invincible <= 0 && g.dive > 0 && distance(g.falcon, g.boss) < 61) {
       g.bossHits++;
       g.dive = 0;
-      g.falcon.y = Math.max(48, g.falcon.y - 105);
+      g.recovering = true;
       g.invincible = 1.15;
       burst(g, g.boss.x, g.boss.y, ["#fff5ca", "#ffc56a"]);
       if (g.bossHits >= 3) {

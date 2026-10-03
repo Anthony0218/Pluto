@@ -250,8 +250,8 @@ test("random habitats cover the board, include all disguises, and mirror player 
     assert.equal(habitatAt(x, y, map).pattern, habitatAt(x, 540 - y, map).pattern);
 });
 
-test("all five Snap Launch courses are reachable using the same physics", () => {
-  assert.equal(SNAP_LEVELS.length, 5);
+test("all ten Snap Launch courses are reachable using the same physics", () => {
+  assert.equal(SNAP_LEVELS.length, 10);
   for (let level = 0; level < SNAP_LEVELS.length; level++) {
     const game = createSnapGame(level); game.phase = "playing";
     advance(game, 60, idle(), true);

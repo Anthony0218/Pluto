@@ -1,26 +1,59 @@
-import { useMemo } from "react";
-import { isLegalGoMove, type GoMove, type GoState } from "../../games/go/rules";
-type Props = { state: GoState; onMove: (move: GoMove) => void; disabled?: boolean };
-const hoshiFor = (size: number) => {
-  const edge = size === 9 ? 2 : 3, center = Math.floor(size / 2);
-  return size === 9 ? [[edge,edge],[edge,6],[center,center],[6,edge],[6,6]] : [[edge,edge],[edge,center],[edge,size-1-edge],[center,edge],[center,center],[center,size-1-edge],[size-1-edge,edge],[size-1-edge,center],[size-1-edge,size-1-edge]];
-};
-export default function GoBoard({ state, onMove, disabled }: Props) {
-  const hoshi = useMemo(() => new Set(hoshiFor(state.boardSize).map(([r,c]) => r + ":" + c)), [state.boardSize]);
-  return <div className="aspect-square w-[min(92vw,calc(100dvh-22rem),720px)] min-w-60 rounded-xl border-8 border-[#7a4a20] bg-[#d7a657] p-[3.2%] shadow-2xl lg:w-[min(65vw,calc(100dvh-10rem),720px)]" style={{ backgroundImage: "radial-gradient(circle at 50% 50%,rgba(255,255,255,.13),transparent 60%)", touchAction: "manipulation" }}>
-    <div className="relative grid h-full w-full" style={{ gridTemplateColumns: "repeat(" + state.boardSize + ",1fr)", gridTemplateRows: "repeat(" + state.boardSize + ",1fr)" }}>
-      {state.board.map((stone, index) => {
-        const row = Math.floor(index / state.boardSize), col = index % state.boardSize;
-        const legal = isLegalGoMove(state, { type: "place", row, col });
-        const last = state.lastMove?.row === row && state.lastMove.col === col;
-        return <button key={index} type="button" disabled={disabled || !legal} onClick={() => onMove({ type: "place", row, col })} aria-label={(stone ?? "empty") + " intersection " + (row + 1) + ", " + (col + 1)} className="group relative flex min-h-0 min-w-0 items-center justify-center rounded-full focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-white">
-          <span className={"pointer-events-none absolute top-1/2 h-px bg-[#392612] " + (col === 0 ? "left-1/2 w-1/2" : col === state.boardSize - 1 ? "right-1/2 w-1/2" : "left-0 w-full")} />
-          <span className={"pointer-events-none absolute left-1/2 w-px bg-[#392612] " + (row === 0 ? "top-1/2 h-1/2" : row === state.boardSize - 1 ? "bottom-1/2 h-1/2" : "top-0 h-full")} />
-          {!stone && hoshi.has(row + ":" + col) && <span className="absolute h-[18%] w-[18%] rounded-full bg-[#392612]" />}
-          {stone && <span className={"relative h-[82%] w-[82%] rounded-full shadow-[inset_-3px_-4px_7px_rgba(0,0,0,.35),0_2px_4px_rgba(0,0,0,.5)] " + (stone === "black" ? "bg-zinc-950" : "bg-zinc-50")}>{last && <span className={"absolute left-1/2 top-1/2 h-[22%] w-[22%] -translate-x-1/2 -translate-y-1/2 rounded-full " + (stone === "black" ? "bg-white" : "bg-black")} />}</span>}
-          {!stone && legal && !disabled && <span className={"h-[72%] w-[72%] rounded-full opacity-0 transition group-hover:opacity-30 " + (state.currentPlayer === "black" ? "bg-black" : "bg-white")} />}
-        </button>;
-      })}
+import { useEffect, useMemo, useRef, useState } from "react";
+import { getGoGroup, isLegalGoMove, type GoMove, type GoState } from "../../games/go/rules";
+import { capturedGoPoints, GO_COLUMNS, goAtariPoints, goCoordinate, previewGoMove } from "../../games/go/analysis";
+import "./go.css";
+
+type Props = { state: GoState; onMove: (move: GoMove) => void; disabled?: boolean; help?: boolean; marked?: number; hint?: GoMove | null; suggestions?: GoMove[]; selectedSuggestion?: number; onAttempt?: (move: GoMove) => void };
+export default function GoBoard({ state, onMove, disabled, help = false, marked, hint, suggestions = [], selectedSuggestion, onAttempt }: Props) {
+  const [hover, setHover] = useState<number | null>(null);
+  const [ghosts, setGhosts] = useState<{ index: number; stone: string }[]>([]);
+  const previous = useRef(state);
+  useEffect(() => {
+    const before = previous.current;
+    previous.current = state;
+    if (before.boardSize !== state.boardSize || state.moveHistory.length !== before.moveHistory.length + 1) { setGhosts([]); return; }
+    setGhosts(capturedGoPoints(before, state).map(index => ({ index, stone: before.board[index]! })));
+    const timer = window.setTimeout(() => setGhosts([]), 750);
+    return () => window.clearTimeout(timer);
+  }, [state]);
+  const atari = useMemo(() => help ? goAtariPoints(state) : new Set<number>(), [state, help]);
+  const active = hover ?? marked ?? null;
+  const move: GoMove | null = active === null ? null : { type: "place", row: Math.floor(active / state.boardSize), col: active % state.boardSize };
+  const preview = help && active !== null && !state.board[active] && move ? previewGoMove(state, move) : null;
+  const group = help && active !== null && state.board[active] ? getGoGroup(state.board, state.boardSize, active) : null;
+  const liberties = group?.liberties ?? preview?.liberties ?? new Set<number>();
+  const edge = state.boardSize === 9 ? 2 : 3, center = Math.floor(state.boardSize / 2);
+  return <div className="go-board-wrap">
+    <div className="go-board" role="group" aria-label="Go board" data-board-size={state.boardSize}>
+      <div className="go-coordinates go-coordinates-columns" aria-hidden="true" style={{ gridTemplateColumns: `repeat(${state.boardSize}, 1fr)` }}>{Array.from({ length: state.boardSize }, (_, index) => <span key={index}>{GO_COLUMNS[index]}</span>)}</div>
+      <div className="go-coordinates go-coordinates-rows" aria-hidden="true" style={{ gridTemplateRows: `repeat(${state.boardSize}, 1fr)` }}>{Array.from({ length: state.boardSize }, (_, index) => <span key={index}>{state.boardSize - index}</span>)}</div>
+      <div className="go-grid" style={{ gridTemplateColumns: `repeat(${state.boardSize}, 1fr)` }}>
+        {state.board.map((stone, index) => {
+          const row = Math.floor(index / state.boardSize), col = index % state.boardSize;
+          const placement: GoMove = { type: "place", row, col };
+          const legal = isLegalGoMove(state, placement);
+          const last = state.lastMove?.row === row && state.lastMove.col === col;
+          const ghost = ghosts.find(item => item.index === index);
+          const star = [edge, center, state.boardSize - edge - 1].includes(row) && [edge, center, state.boardSize - edge - 1].includes(col) && (state.boardSize !== 9 || row === col || row + col === state.boardSize - 1);
+          const suggested = hint?.type === "place" && hint.row === row && hint.col === col;
+          const suggestionRank = suggestions.findIndex(candidate => candidate.type === "place" && candidate.row === row && candidate.col === col);
+          return <button key={index} type="button" className="go-point" aria-label={`${goCoordinate(placement, state.boardSize)}: ${stone ?? "empty"}${atari.has(index) ? ", in atari" : ""}${suggestionRank >= 0 ? `, best move ${suggestionRank + 1}${selectedSuggestion === suggestionRank ? ", selected" : ""}` : ""}`} aria-disabled={disabled || !legal}
+            onMouseEnter={() => setHover(index)} onMouseLeave={() => setHover(null)} onFocus={() => setHover(index)} onBlur={() => setHover(null)}
+            onClick={() => { setHover(index); if (onAttempt) onAttempt(placement); else if (!disabled && legal) onMove(placement); }}>
+            <span className="go-line go-line-h" style={{ left: col === 0 ? "50%" : 0, right: col === state.boardSize - 1 ? "50%" : 0 }} />
+            <span className="go-line go-line-v" style={{ top: row === 0 ? "50%" : 0, bottom: row === state.boardSize - 1 ? "50%" : 0 }} />
+            {star && <span className="go-star" />}
+            {stone && <span className={`go-stone go-stone--${stone}${atari.has(index) ? " go-atari" : ""}${preview?.captured.includes(index) ? " go-capture-preview" : ""}`} key={stone}>{last && <i className="go-last" />}</span>}
+            {!stone && ghost && <span className={`go-stone go-stone--${ghost.stone} go-captured`} />}
+            {!stone && liberties.has(index) && <span className="go-liberty" />}
+            {!stone && !liberties.has(index) && legal && !disabled && <span className={`go-hover go-stone go-stone--${state.currentPlayer}`} />}
+            {suggested && <span className="go-hint" />}
+            {suggestionRank >= 0 && <span className={`go-suggestion${selectedSuggestion === suggestionRank ? " go-suggestion--selected" : ""}`} aria-hidden="true">{suggestionRank + 1}</span>}
+            {marked === index && !stone && <span className="go-target" />}
+          </button>;
+        })}
+      </div>
     </div>
+    {help && <p className="go-board-note" role="status">{group ? `${group.stones.size} stone${group.stones.size === 1 ? "" : "s"} · ${group.liberties.size} liberties${group.liberties.size === 1 ? " · Atari" : ""}` : preview ? `${preview.captured.length} captured · ${preview.liberties.size} liberties${preview.selfAtari ? " · Warning: self-atari" : ""}` : active !== null && move && !isLegalGoMove(state, move) && !state.board[active] ? "Illegal move: suicide or a repeated position." : "Teal: liberties · Red: atari · Gold: suggested move"}</p>}
   </div>;
 }

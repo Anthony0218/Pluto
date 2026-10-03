@@ -2,7 +2,7 @@ body:has(.watten-game-screen) { overflow: hidden; }
 
 .watten-game-screen {
   box-sizing: border-box;
-  height: var(--app-height);
+  height: max(var(--app-height), 780px);
   min-height: 0 !important;
   overflow: hidden;
 }
@@ -32,25 +32,128 @@ body:has(.watten-game-screen) { overflow: hidden; }
 .watten-game-grid > aside > div { max-height: 100%; }
 .watten-game-grid > :not(aside) { height: 100% !important; min-height: 0 !important; }
 
-@media (max-width: 1023px) {
+/* Theme colors are independent of the table's aspect ratio. */
+.watten-table {
+  position: relative;
+  isolation: isolate;
+  min-width: 0;
+  border: 9px solid #382b23;
+  border-radius: 36px;
+  background-color: var(--watten-shade, #10383f);
+  background-image:
+    radial-gradient(ellipse at 50% 38%, #ffffff0c, transparent 65%),
+    repeating-linear-gradient(0deg, #ffffff02 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, #00000008 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at center, var(--watten-felt, #245b63), var(--watten-shade, #10383f));
+  box-shadow: inset 0 0 0 2px var(--watten-rim, #d3b477), inset 0 0 45px #0006, 0 16px 40px #0005;
+}
+
+.watten-table::before {
+  content: "";
+  position: absolute;
+  inset: 13px;
+  z-index: -1;
+  border: 1px solid var(--watten-rim, #d3b477);
+  border-radius: 20px;
+  opacity: .3;
+  pointer-events: none;
+}
+
+.watten-turn-notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: .3rem .75rem;
+  margin-bottom: .75rem;
+  padding: .7rem 1rem;
+  border: 1px solid #fbbf2455;
+  border-radius: 14px;
+  background: #392c18;
+  color: #fde8b3;
+  font-size: .8rem;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.watten-turn-notice.is-required { border-color: #fb718566; background: #3c2027; color: #ffe4e6; }
+.watten-turn-notice strong { font-weight: 900; }
+
+.watten-single-table { min-height: 640px; overflow: hidden; }
+.watten-single-status { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); display: flex; flex-wrap: wrap; justify-content: center; gap: .25rem 1rem; width: max-content; max-width: calc(100% - 32px); padding: .6rem 1rem; border: 1px solid #ffffff20; border-radius: 14px; background: #071a20b3; text-align: center; font-size: .75rem; }
+.watten-single-status strong { color: #fde3a7; }
+.watten-single-seat { position: absolute; top: 24%; display: grid; justify-items: center; gap: 5px; width: 140px; padding: 10px; border: 1px solid #ffffff20; border-radius: 16px; background: #071a2099; text-align: center; }
+.watten-single-seat.is-left { left: 20px; }
+.watten-single-seat.is-right { right: 20px; }
+.watten-single-seat.is-top { top: 90px; left: 50%; transform: translateX(-50%); }
+.watten-single-seat.is-active { border-color: #fcd34d99; box-shadow: 0 0 20px #fcd34d15; }
+.watten-single-seat strong { font-size: .8rem; }
+.watten-single-seat span { color: #bdcfca; font-size: .65rem; }
+.watten-single-card-backs { display: flex; justify-content: center; padding: 3px 0; }
+.watten-single-card-backs i { width: 25px; height: 37px; border: 1px solid #91afa2; border-radius: 4px; background: repeating-linear-gradient(45deg, #294e47 0 3px, #1a3934 3px 6px); box-shadow: 0 2px 5px #0005; }
+.watten-single-card-backs i + i { margin-left: -12px; }
+.watten-single-trick { position: absolute; top: 52%; left: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; gap: 10px; width: min(440px, calc(100% - 24px)); min-height: 160px; padding: 16px; border: 1px solid #ffffff15; border-radius: 22px; background: #00140c30; }
+.watten-single-played { display: grid; justify-items: center; gap: 6px; min-width: 0; }
+.watten-single-played img { width: 72px; height: 110px; }
+.watten-single-played span { color: #d5e5df; font-size: .65rem; }
+.watten-single-hand { position: absolute; bottom: 16px; inset-inline: 16px; padding: 16px 8px 8px; border: 1px solid #ffffff20; border-radius: 20px; background: #071a2080; }
+.watten-single-controls > section { border-color: #ffffff1a; background: #09090bcc; }
+
+@media (max-width: 1279px) {
+  .watten-game-screen { height: auto; min-height: var(--app-height) !important; overflow: visible; }
+  .watten-game-content { height: auto; }
   .watten-game-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    grid-template-rows: minmax(0, 1fr) clamp(96px, 17dvh, 145px);
+    grid-template-rows: auto auto;
     gap: 8px;
   }
 
   .watten-game-grid > :not(aside) {
     grid-column: 1 / -1;
     grid-row: 1;
+    height: max(640px, 85dvh) !important;
   }
 
   .watten-game-grid > aside {
     grid-row: 2;
     width: 100% !important;
-    max-height: 100%;
+    max-height: none;
+    overflow: visible;
   }
 
   .watten-game-grid > aside:first-of-type { grid-column: 1; }
   .watten-game-grid > aside:last-of-type { grid-column: 2; }
-  .watten-game-grid > aside > div { height: 100% !important; }
+  .watten-game-grid > aside > div { height: auto !important; max-height: none; }
+  .watten-table { border-width: 6px; }
+}
+
+@media (max-width: 600px) {
+  .watten-game-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .watten-game-grid > aside:first-of-type { grid-column: 1; grid-row: 2; }
+  .watten-game-grid > aside:last-of-type { grid-column: 1; grid-row: 3; }
+  .watten-turn-notice { flex-direction: column; padding: .65rem; }
+  .watten-single-seat { top: 25%; width: 110px; padding: 8px; }
+  .watten-single-seat.is-left { left: 12px; }
+  .watten-single-seat.is-right { right: 12px; }
+  .watten-single-seat.is-top { top: 86px; }
+  .watten-single-status { font-size: .65rem; }
+  .watten-single-trick { gap: 7px; padding-inline: 8px; }
+  .watten-single-played img { width: 57px; height: 87px; }
+  .watten-single-hand { inset-inline: 10px; }
+  .watten-single-hand-card img { width: 64px; height: 98px; }
+  .watten-single-hand-card + .watten-single-hand-card { margin-left: -12px; }
+}
+.watten-single-setup { position: absolute; inset: 80px 16px 180px; z-index: 40; display: flex; align-items: center; justify-content: center; }
+.watten-single-setup > section { width: min(360px, 100%); margin: 0; background: #0a191ef5; box-shadow: 0 12px 45px #0007; }
+@media (max-width: 767px) {
+  .watten-hand > button + button { margin-left: -18px; }
+  .watten-hand { gap: 0; }
+}
+.watten-table-preview { border-width: 3px; border-radius: 7px; box-shadow: inset 0 0 0 1px var(--watten-rim), inset 0 0 12px #0004; }
+.watten-table-preview::before { inset: 3px; border-radius: 3px; }
+@media (max-width: 767px) {
+  .watten-hand .group { width: 64px; height: 98px; }
+  .watten-played-card .group { width: 60px; height: 92px; }
+  .watten-played-card > div { scale: 1; }
+  .watten-played-card > span { max-width: 70px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: .6rem; }
 }

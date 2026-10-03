@@ -7,9 +7,14 @@ export function normalScore(correct: boolean, remainingMs: number, roundMs: numb
   return ATLAS_SCORING.normalCorrect + Math.round(ATLAS_SCORING.maxSpeedBonus * ratio);
 }
 
-export function speedRunScore(correct: boolean, streak: number): number {
-  if (!correct) return 0;
-  return ATLAS_SCORING.speedRunCorrect * Math.min(ATLAS_SCORING.speedRunMaxMultiplier, 1 + Math.floor(streak / 3) * 0.5);
+export function speedRunScore(correct: boolean): number {
+  return correct ? ATLAS_SCORING.speedRunCorrect : ATLAS_SCORING.speedRunWrong;
+}
+
+/** Solo Closest Wins: a pin inside the country earns 1,000; the reward halves roughly every 1,000 km beyond its border. */
+export function closestScore(distanceKm: number): number {
+  if (!Number.isFinite(distanceKm)) return 0;
+  return distanceKm < 0.5 ? 1000 : Math.max(0, Math.round(1000 * Math.exp(-distanceKm / 1500)));
 }
 
 export function haversineKm(first: Coordinates, second: Coordinates): number {
@@ -17,7 +22,8 @@ export function haversineKm(first: Coordinates, second: Coordinates): number {
   const [longitude1, latitude1] = first.map(radians), [longitude2, latitude2] = second.map(radians);
   const latitudeDelta = latitude2 - latitude1, longitudeDelta = longitude2 - longitude1;
   const a = Math.sin(latitudeDelta / 2) ** 2 + Math.cos(latitude1) * Math.cos(latitude2) * Math.sin(longitudeDelta / 2) ** 2;
-  return 6371.0088 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const bounded = Math.max(0, Math.min(1, a));
+  return 6371.0088 * 2 * Math.atan2(Math.sqrt(bounded), Math.sqrt(1 - bounded));
 }
 
 export type MapFillState = { targets: string[]; found: string[]; mistakes: number; streak: number; bestStreak: number; score: number; complete: boolean };

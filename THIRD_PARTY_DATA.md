@@ -11,6 +11,9 @@ Atlas Arena uses a versioned local snapshot. The application does not call these
 | flag-icons | 7.5.0 | SVG country flags keyed by ISO alpha-2 | MIT, Copyright Panayiotis Lipiridis | Bundled dependency |
 | GeoNames (extras) | `cities15000.zip` | Top 160 cities (≤ 5 per country): name, population, elevation (DEM), coordinates — Higher or Lower | CC BY 4.0; credit GeoNames | See `data/geography/extras.json` |
 | Wikidata | SPARQL: country `P610` highest point with `P2044` elevation (normalized to metres) | Highest point name and elevation per UN member — Higher or Lower, Guess the Country | CC0 | See `data/geography/extras.json` |
+| World Bank Climate Change Knowledge Portal | Historical annual mean temperature, 1995–2014; country summaries for Russia, Sweden, Estonia, Colombia, Yemen and Guinea | Small curated climate deck for Extreme Geography | World Bank attribution; see country links below and [methodology](https://climateknowledgeportal.worldbank.org/metadata) | 2026-10-03 |
+
+The Extreme Geography climate values come from these country pages: [Russia](https://climateknowledgeportal.worldbank.org/country/russian-federation), [Sweden](https://climateknowledgeportal.worldbank.org/country/sweden), [Estonia](https://climateknowledgeportal.worldbank.org/country/estonia), [Colombia](https://climateknowledgeportal.worldbank.org/sites/default/files/country-profiles/16698-WB_Colombia%20Country%20Profile-WEB.pdf), [Yemen](https://climateknowledgeportal.worldbank.org/sites/default/files/country-profiles/16696-WB_Yemen%20Country%20Profile-WEB.pdf), and [Guinea](https://climateknowledgeportal.worldbank.org/country/guinea).
 
 ## Political and boundary policy
 

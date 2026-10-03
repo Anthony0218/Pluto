@@ -18,9 +18,11 @@ import TableThemeSelector from "../App/TableThemeSelector";
 import { HeaderTools } from "@/components/App/PublicHeader";
 import { ProfileAvatar } from "../social/ProfileAvatarPicker";
 import "./wattenGameScreen.css";
+import { wattenPlayAnimation, wattenTableStyle } from "@/games/watten/presentation";
+import WattenTurnNotice from "./WattenTurnNotice";
 
 import { useCardTheme } from "@/context/CardThemeContext";
-import { useTableTheme, type TableTheme } from "@/context/TableThemeContext";
+import { useTableTheme } from "@/context/TableThemeContext";
 import { getWattenCardImage } from "@/utils/WattenCardImages";
 
 import {
@@ -122,14 +124,7 @@ type HandRow = {
   cards: WattenCard[];
 };
 
-const tableBackgrounds: Record<TableTheme, string> = {
-  classic: "/images/tables/classic.webp",
-  bavarian: "/images/tables/bavarian.webp",
-  royal: "/images/tables/royal.webp",
-  steampunk: "/images/tables/steampunk.webp",
-  alpine: "/images/tables/alpine.webp",
-  midnight: "/images/tables/midnight.webp",
-};
+
 
 const suitIcons = {
   Herz: "/images/icons/herz.webp",
@@ -1533,6 +1528,7 @@ export function WattenThreePlayerMultiplayerGame() {
           </div>
         </header>
 
+        <WattenTurnNotice player={me?.display_name ?? t("You")} active={game.phase === "playing" && game.current_player === mySeat && mustFollow} mustFollow={mustFollow} />
         <div className="watten-game-grid grid grid-cols-1 gap-4 xl:grid-cols-[270px_minmax(0,1fr)_270px] max-md:gap-3">
           {/* PLAYERS SIDEBAR */}
           <aside className="max-md:order-2">
@@ -1629,13 +1625,8 @@ export function WattenThreePlayerMultiplayerGame() {
 
           {/* TABLE */}
           <section
-            className="relative min-h-[690px] overflow-hidden rounded-[42px] border border-white/10 shadow-2xl max-md:order-1 max-md:min-h-[560px] max-md:rounded-[28px]"
-            style={{
-              backgroundImage: `url(${tableBackgrounds[tableTheme]})`,
-              backgroundSize: "100% 100%",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-            }}
+            className="watten-table relative min-h-[690px] overflow-hidden rounded-[42px] border border-white/10 shadow-2xl max-md:order-1 max-md:min-h-[560px] max-md:rounded-[28px]"
+            style={wattenTableStyle(tableTheme)}
           >
             {dealAnimating && <DealAnimation playerCount={3} />}
 
@@ -1903,7 +1894,7 @@ export function WattenThreePlayerMultiplayerGame() {
                     <div
                       key={`${played.seat}-${played.card.id}`}
                       onMouseEnter={playHoverSound}
-                      className="flex flex-col items-center gap-2 max-md:-mx-2 max-md:scale-[0.72]"
+                      className={`watten-played-card flex flex-col items-center gap-2 ${wattenPlayAnimation(played.seat, mySeat, 3)}`}
                     >
                       <WattenCardComponent card={played.card} disabled />
                       <span className="max-w-28 truncate text-[10px] font-bold text-emerald-100">
@@ -2416,14 +2407,7 @@ export function WattenThreePlayerMultiplayerGame() {
                   </div>
                 </div>
 
-                {mustFollow && (
-                  <div className="mx-auto mt-3 w-fit rounded-xl border border-red-300/30 bg-red-500/15 px-4 py-2 text-xs font-black text-red-100">
-                    {t("Trumpf oder Kritisch")} ·{" "}
-                    {t("You must play trump or a critical card.")}
-                  </div>
-                )}
-
-                <div className="mt-3 flex justify-center gap-2 max-md:mt-1 max-md:origin-bottom max-md:scale-[0.72] max-md:gap-0">
+                <div className="watten-hand mt-3 flex justify-center gap-2 max-md:mt-1 max-md:gap-0">
                   {!waitingForDeal &&
                     hand.map((card) => {
                       const legal =

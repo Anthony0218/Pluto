@@ -18,6 +18,15 @@ const cuttleSource = {
   url: "https://www.mbl.edu/news/how-cuttlefish-spikes-out-its-skin-neurological-study-reveals-surprising-control",
 };
 export const NATURA_FACTS: Record<ScenarioId, AnimalFact[]> = {
+  jumpingspider: [
+    { animal: "JUMPING SPIDER", title: "Silk is a safety line.", text: "Jumping spiders can attach a silk dragline before a leap. Silk has uses beyond building a capture web.", label: "Natural History Museum", url: "https://www.nhm.ac.uk/discover/what-are-spider-webs-made-of.html" },
+    { animal: "JUMPING SPIDER", title: "A leap with a lifeline.", text: "A jumping spider can anchor silk before leaping toward prey, helping it descend safely after a missed landing.", label: "Natural History Museum", url: "https://www.nhm.ac.uk/discover/finding-love-web.html" },
+  ],
+  spermwhale: [
+    { animal: "PHYSETER MACROCEPHALUS", title: "A hunter of the deep.", text: "Sperm whales eat deep-water animals including squid. They are mammals and must return to the surface to breathe air.", label: "NOAA Fisheries", url: "https://www.fisheries.noaa.gov/species/sperm-whale" },
+    { animal: "MESONYCHOTEUTHIS HAMILTONI", title: "Evidence in a whale’s stomach.", text: "Colossal squid remains have been recovered from sperm-whale stomachs. This is evidence of a real predator–prey relationship.", label: "Museum of New Zealand Te Papa Tongarewa", url: "https://collections.tepapa.govt.nz/topic/588" },
+    { animal: "COLOSSAL SQUID", title: "Two different giants.", text: "The colossal squid, Mesonychoteuthis hamiltoni, and giant squid, Architeuthis dux, are different species. The colossal squid lives in the Southern Ocean.", label: "Museum of New Zealand Te Papa Tongarewa", url: "https://collections.tepapa.govt.nz/topic/588" },
+  ],
   bolas: [
     {
       animal: "BOLAS SPIDER",

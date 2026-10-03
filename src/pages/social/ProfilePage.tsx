@@ -15,6 +15,7 @@ import ProfileAvatarPicker, {
 import ProfileFriends from "../../components/social/ProfileFriends";
 import MyGroupsCard from "../../components/social/MyGroupsCard";
 import PixelAvatarEditor from "../../components/social/PixelAvatarEditor";
+import { useCustomAvatars } from "@/components/social/useCustomAvatars";
 import { isPixelAvatarId } from "../../components/social/pixelAvatar";
 import DoNotDisturbSwitch, { ClanPopupsSwitch } from "../../components/App/notifications/DoNotDisturbSwitch";
 
@@ -127,7 +128,9 @@ export default function ProfilePage() {
 
   const [editing, setEditing] = useState(false);
   const [avatarPickerOpen, setAvatarPickerOpen] = useState(false);
-  const [avatarTab, setAvatarTab] = useState<"characters" | "draw">("characters");
+  const [avatarTab, setAvatarTab] = useState<"presets" | "custom">("presets");
+  const [creatingAvatar, setCreatingAvatar] = useState(false);
+  const { customAvatars, saveCustomAvatar } = useCustomAvatars(user?.id, profile?.id === user?.id ? profile?.avatar_id : null);
 
   const [saving, setSaving] = useState(false);
   const [savingAvatar, setSavingAvatar] = useState(false);
@@ -304,6 +307,8 @@ export default function ProfilePage() {
     setError(null);
     setMessage(null);
 
+    if (isPixelAvatarId(nextAvatarId)) await saveCustomAvatar(nextAvatarId);
+
     const { error: avatarError } = await supabase
       .from("profiles")
       .update({
@@ -311,15 +316,16 @@ export default function ProfilePage() {
       })
       .eq("id", user.id);
 
-    setSavingAvatar(false);
-
     if (avatarError) {
+      setSavingAvatar(false);
       setAvatarId(previousAvatar);
       setError(avatarError.message);
       return;
     }
 
     await refreshProfile();
+    setSavingAvatar(false);
+    setCreatingAvatar(false);
     setMessage(ui("Avatar saved."));
 
     window.setTimeout(() => {
@@ -620,7 +626,7 @@ export default function ProfilePage() {
             {/* AVATAR PICKER */}
 
             {avatarPickerOpen && (
-              <div className="rounded-[30px] border border-amber-400/15 bg-zinc-900/80 p-6 shadow-xl shadow-black/20">
+              <div className="rounded-[30px] border border-amber-400/15 bg-zinc-900/80 p-4 sm:p-6 shadow-xl shadow-black/20">
                 <div className="mb-5 flex items-center justify-between gap-4">
                   <div>
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-400">
@@ -632,7 +638,7 @@ export default function ProfilePage() {
                     </h2>
 
                     <p className="mt-1 text-xs text-zinc-500">
-                      {ui(avatarTab === "draw" ? "Draw your own 16×16 pixel avatar." : "Choose one of 12 characters.")}
+                      {ui(avatarTab === "custom" ? "Choose a saved avatar or create a new one." : "Choose a preset avatar.")}
                     </p>
                   </div>
 
@@ -646,36 +652,49 @@ export default function ProfilePage() {
                 </div>
 
                 <div role="tablist" aria-label={ui("Avatar type")} className="mb-5 inline-flex rounded-xl border border-white/10 p-1">
-                  {(["characters", "draw"] as const).map((tab) => (
+                  {(["presets", "custom"] as const).map((tab) => (
                     <button
                       key={tab}
                       type="button"
                       role="tab"
                       aria-selected={avatarTab === tab}
-                      onClick={() => setAvatarTab(tab)}
+                      onClick={() => { setAvatarTab(tab); setCreatingAvatar(false); }}
                       className={`rounded-lg px-4 py-1.5 text-xs font-black ${avatarTab === tab ? "bg-amber-300 text-black" : "text-zinc-400 hover:text-white"}`}
                     >
-                      {ui(tab === "draw" ? "Draw your own" : "Characters")}
+                      {ui(tab === "custom" ? "Custom" : "Presets")}
                     </button>
                   ))}
                 </div>
 
-                {avatarTab === "draw" ? (
-                  <PixelAvatarEditor
-                    initialAvatarId={isPixelAvatarId(avatarId) ? avatarId : null}
-                    saving={savingAvatar}
-                    onCancel={() => setAvatarTab("characters")}
-                    onSave={(nextAvatarId) => {
-                      void chooseAvatar(nextAvatarId);
-                    }}
-                  />
+                {avatarTab === "custom" ? (
+                  <div role="tabpanel" aria-label={ui("Custom")}>
+                    {creatingAvatar ? (
+                      <PixelAvatarEditor
+                        initialAvatarId={null}
+                        saving={savingAvatar}
+                        onCancel={() => setCreatingAvatar(false)}
+                        onSave={(nextAvatarId) => { void chooseAvatar(nextAvatarId); }}
+                      />
+                    ) : (
+                      <>
+                        <button type="button" onClick={() => setCreatingAvatar(true)} disabled={savingAvatar} className="mb-5 inline-flex min-h-11 items-center gap-2 rounded-xl bg-amber-300 px-4 py-2 text-sm font-black text-amber-950 transition hover:bg-amber-200 disabled:opacity-50"><Sparkles size={16} />{ui("Create avatar")}</button>
+                        {customAvatars.length ? (
+                          <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
+                            {customAvatars.map((customAvatar, index) => (
+                              <button key={customAvatar} type="button" disabled={savingAvatar} aria-pressed={avatarId === customAvatar} aria-label={`${ui("Custom avatar")} ${index + 1}`} onClick={() => { void chooseAvatar(customAvatar); }} className={`min-w-0 overflow-hidden rounded-2xl border p-1 transition hover:-translate-y-1 disabled:opacity-50 ${avatarId === customAvatar ? "border-amber-300 bg-amber-400/10 ring-2 ring-amber-400/20" : "border-white/10 bg-white/5 hover:border-white/25"}`}>
+                                <ProfileAvatar avatarId={customAvatar} className="aspect-square w-full rounded-xl" />
+                                <span className="block py-1 text-[10px] font-bold text-zinc-400">{ui("Avatar")} {index + 1}</span>
+                              </button>
+                            ))}
+                          </div>
+                        ) : <p className="text-sm text-zinc-400">{ui("Your custom avatars will appear here.")}</p>}
+                      </>
+                    )}
+                  </div>
                 ) : (
-                  <ProfileAvatarPicker
-                    selected={avatarId}
-                    onSelect={(nextAvatarId) => {
-                      void chooseAvatar(nextAvatarId);
-                    }}
-                  />
+                  <div role="tabpanel" aria-label={ui("Presets")}>
+                    <ProfileAvatarPicker selected={avatarId} disabled={savingAvatar} onSelect={(nextAvatarId) => { void chooseAvatar(nextAvatarId); }} />
+                  </div>
                 )}
               </div>
             )}

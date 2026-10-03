@@ -25,6 +25,7 @@ import {
 
 import { getSquareName, type PieceType } from "../../../utils/chessUtils.ts";
 import { gradePlayedMove } from "../../../utils/chessAnalysis.ts";
+import { openingBookMove } from "../../../games/chess/openingBook.ts";
 
 import { useStockfish } from "@/hooks/useStockfish";
 
@@ -66,6 +67,7 @@ type ChessComputerBoardProps = {
 };
 
 type MoveQuality =
+  | "Book"
   | "Best"
   | "Excellent"
   | "Good"
@@ -1149,7 +1151,9 @@ export default function ChessComputerBoard({
       afterLine = after[0];
     }
 
-    const { quality, centipawnLoss, bestMoveUci: bestMove } = gradePlayedMove(beforeFen, afterFen, playedUci, bestLine, afterLine);
+    const grade = gradePlayedMove(beforeFen, afterFen, playedUci, bestLine, afterLine);
+    const { centipawnLoss, bestMoveUci: bestMove } = grade;
+    const quality: MoveQuality = await openingBookMove(afterFen, ply) ? "Book" : grade.quality;
 
     setCoachGrades((grades) => ({ ...grades, [ply]: { quality, san: playedSan } }));
 
@@ -2211,7 +2215,7 @@ export default function ChessComputerBoard({
                       <MoveQualityBadge quality={moveFeedback.quality} />
                     </div>
 
-                    {moveFeedback.quality !== "Best" && (
+                    {moveFeedback.quality !== "Best" && moveFeedback.quality !== "Book" && (
                       <p className="mt-2 text-xs text-zinc-500">
                         {t("Evaluation loss")}:{" "}
                         {(moveFeedback.centipawnLoss / 100).toFixed(2)}{" "}
@@ -2220,7 +2224,7 @@ export default function ChessComputerBoard({
                     )}
 
                     {moveFeedback.bestMove &&
-                      moveFeedback.quality !== "Best" && (
+                      moveFeedback.quality !== "Best" && moveFeedback.quality !== "Book" && (
                         <p className="mt-1 text-[11px] text-zinc-600">
                           {t("Engine preferred")}:{" "}
                           <span className="font-mono text-zinc-400">
@@ -2630,6 +2634,7 @@ export default function ChessComputerBoard({
                 }
                 onSquareClick={historyPreview ? () => {} : handleSquareClick}
                 orientation={playerColor}
+                insetMoveQualityIcon
                 annotations={
                   // The quality icon of your last move stays visible while the
                   // coach also shows its best-move hint.
@@ -3118,6 +3123,7 @@ function getHistoryPieceSymbol(color: "w" | "b", piece: PieceType) {
 function MoveQualityBadge({ quality }: { quality: MoveQuality }) {
   useUiLanguage();
   const styles: Record<MoveQuality, string> = {
+    Book: "border-purple-500/20 bg-purple-500/15 text-purple-300",
     Best: "border-emerald-500/20 bg-emerald-500/15 text-emerald-300",
 
     Excellent: "border-cyan-500/20 bg-cyan-500/15 text-cyan-300",

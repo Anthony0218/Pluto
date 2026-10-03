@@ -2,7 +2,7 @@ export type AtlasDifficulty = "beginner" | "intermediate" | "expert";
 export type AtlasScope = "un195" | "territories" | "all_map_entities";
 export type AtlasCategory = "countries" | "locations" | "capitals" | "flags" | "population" | "area" | "continents" | "languages" | "borders" | "currency" | "statistics" | "clues";
 export type AtlasInteraction = "single_choice" | "multi_select" | "map_click" | "closest_click" | "higher_lower" | "map_fill" | "guess_country";
-export type AtlasMode = "map_click" | "speed_run" | "map_fill" | "flags" | "higher_lower" | "guess_country";
+export type AtlasMode = "map_click" | "closest_wins" | "speed_run" | "map_fill" | "flags" | "higher_lower" | "guess_country" | "territory_battle";
 
 export type SourcedNumber = { value: number; year: number; source: string; sourceUpdatedAt: string };
 export type Coordinates = [longitude: number, latitude: number];
@@ -94,6 +94,9 @@ export type ClosestClickQuestion = QuestionBase & {
   answer: Coordinates;
   targetCoordinates: Coordinates;
   targetGeometryId: string | null;
+  /** Capital rounds use a 20 km city target around the bundled capital coordinate. */
+  targetRadiusKm?: number;
+  flagAsset?: string | null;
 };
 
 export type AtlasQuestion = ChoiceQuestion | MultiSelectQuestion | MapClickQuestion | HigherLowerQuestion | ClosestClickQuestion | GuessCountryQuestion;

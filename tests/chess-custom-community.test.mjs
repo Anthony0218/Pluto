@@ -82,7 +82,8 @@ test("Pluto Create documents are stable, valid, playable and survive export, rem
 test("Community merges remote entries, searches, sorts and paginates without duplicate Pluto cards", async () => {
   const catalog = plutoCommunityCatalog();
   const remote = Array.from({ length: 130 }, (_, i) => ({ ...catalog[0], id: `user-${i}`, authorName: "Player", publishedAt: new Date(Date.UTC(2026, 9, 2 + i)).toISOString(), score: i % 4, playCount: i % 7, name: `Player game ${i}` }));
-  const client = { rpc: async (_, args) => {
+  const client = { rpc: async (name, args) => {
+    if (name === "list_chess_catalog_votes") return { data: [], error: null };
     const rows = mergeCommunityEntries(remote, [], args.p_sort, args.p_search).slice(args.p_offset, args.p_offset + args.p_limit);
     return { data: rows.map((row) => ({ ...row, owner_id: "user", author_name: row.authorName, board_size: "8x8", piece_types: 6, play_count: row.playCount, published_at: row.publishedAt, my_vote: 0 })), error: null };
   } };
@@ -107,7 +108,7 @@ test("Pluto and player tabs have separate catalogs and pagination", async () => 
   const catalog = plutoCommunityCatalog(true);
   assert.equal(catalog.length, variants.length);
   const remote = Array.from({ length: 35 }, (_, i) => ({ ...catalog[0], id: `player-${i}`, ownerId: "player", authorName: "Player", name: `Player ${i}`, official: false }));
-  const client = { rpc: async (_, args) => ({
+  const client = { rpc: async (name, args) => name === "list_chess_catalog_votes" ? { data: [], error: null } : ({
     data: mergeCommunityEntries(remote, [], args.p_sort, args.p_search).slice(args.p_offset, args.p_offset + args.p_limit).map((row) => ({ ...row, owner_id: row.ownerId, author_name: row.authorName, board_size: "8x8", piece_types: 6, play_count: 0, published_at: row.publishedAt, my_vote: 0 })),
     error: null,
   }) };

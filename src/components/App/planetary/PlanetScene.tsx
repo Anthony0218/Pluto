@@ -25,17 +25,6 @@ function Planet({ config }: { config: PlanetConfig }) {
   return <Link to={config.route} aria-label={`${ui("Open")} ${ui(config.label)}`} className={className}>{content}</Link>;
 }
 
-function GoldenPluto() {
-  return <div className="solar-planet solar-planet--gold solar-position--gold" role="note" aria-label={`Golden Pluto: ${ui("In progress")}`}>
-    <span className="solar-art" aria-hidden="true">
-      <span className="solar-atmosphere" /><span className="solar-ring" /><span className="solar-sphere" />
-      <span className="solar-symbol">✦</span>
-    </span>
-    <strong className="solar-label">GOLDEN PLUTO</strong>
-    <span className="solar-status">{ui("In progress")}</span>
-  </div>;
-}
-
 export default function PlanetScene() {
   useUiLanguage();
   return <section className="solar-scene" aria-label={ui("Choose a game")}>
@@ -43,7 +32,6 @@ export default function PlanetScene() {
     <div className="solar-orbits" aria-hidden="true" />
     <div className="solar-grid">
       {planets.map(config => <Planet key={config.id} config={config} />)}
-      <GoldenPluto />
     </div>
     <div className="solar-brand" aria-hidden="true"><span>PLUTO</span><small>GAME UNIVERSE</small><i /></div>
   </section>;

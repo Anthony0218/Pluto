@@ -2280,7 +2280,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                             <QualityBadge quality={moveFeedback.quality} />
                           </div>
 
-                          {moveFeedback.quality !== "Best" && (
+                          {moveFeedback.quality !== "Best" && moveFeedback.quality !== "Book" && (
                             <p className="mt-2 text-xs text-zinc-500">
                               {t("Evaluation loss")}:{" "}
                               <span className="font-semibold text-zinc-300">
@@ -2291,7 +2291,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                           )}
 
                           {moveFeedback.bestMoveSan &&
-                            moveFeedback.quality !== "Best" && (
+                            moveFeedback.quality !== "Best" && moveFeedback.quality !== "Book" && (
                               <p className="mt-1 text-xs text-zinc-500">
                                 {t("Engine preferred")}:{" "}
                                 <span className="font-mono font-bold text-amber-300">
@@ -2824,6 +2824,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                   }
                   orientation={boardOrientation}
                   annotations={coachAnnotation}
+                  insetMoveQualityIcon
                 />
               </div>
 
@@ -3055,6 +3056,7 @@ function countChecks(moves: string[]) {
 function QualityBadge({ quality }: { quality: MoveReview["quality"] }) {
   useUiLanguage();
   const styles: Record<MoveReview["quality"], string> = {
+    Book: "border-purple-500/20 bg-purple-500/15 text-purple-300",
     Best: "border-emerald-500/20 bg-emerald-500/15 text-emerald-300",
 
     Excellent: "border-cyan-500/20 bg-cyan-500/15 text-cyan-300",

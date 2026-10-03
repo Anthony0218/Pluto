@@ -1,4 +1,5 @@
 import { Chess, type Square } from "chess.js";
+import { openingBookMove } from "@/games/chess/openingBook";
 
 import type { StockfishAnalysisLine } from "@/hooks/useStockfishAnalysis";
 
@@ -7,6 +8,7 @@ import type { StockfishAnalysisLine } from "@/hooks/useStockfishAnalysis";
    ========================================================= */
 
 export type MoveQuality =
+  | "Book"
   | "Best"
   | "Excellent"
   | "Good"
@@ -45,6 +47,7 @@ export type MoveReview = {
   fenAfter: string;
 
   quality: MoveQuality;
+  openingName?: string | null;
 
   centipawnLoss: number;
 
@@ -400,6 +403,8 @@ export async function gradeMove(
 
   const playedMove = moveGame.move(playedSan);
 
+  const movePly = (Number(beforeFen.split(" ")[5]) - 1) * 2 + (playedMove.color === "w" ? 1 : 2);
+  const opening = await openingBookMove(afterFen, movePly);
   return {
     ply: 0,
 
@@ -419,7 +424,8 @@ export async function gradeMove(
 
     fenAfter: afterFen,
 
-    quality,
+    quality: opening ? "Book" : quality,
+    openingName: opening?.name ?? null,
 
     centipawnLoss,
 
@@ -570,7 +576,7 @@ export async function reviewGameMoves(
      BUILD REVIEW
      ------------------------------------------------------- */
 
-  return frames.map((frame, index) => {
+  return Promise.all(frames.map(async (frame, index) => {
     const beforeLines = analyses[index];
 
     const afterLines = analyses[index + 1];
@@ -595,10 +601,12 @@ export async function reviewGameMoves(
       3,
     );
 
+    const opening = await openingBookMove(frame.fenAfter, frame.ply);
     return {
       ...frame,
 
-      quality,
+      quality: opening ? "Book" : quality,
+      openingName: opening?.name ?? null,
 
       centipawnLoss,
 
@@ -616,7 +624,7 @@ export async function reviewGameMoves(
 
       bestMoves,
     };
-  });
+  }));
 }
 
 /* =========================================================

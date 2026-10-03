@@ -3,41 +3,36 @@ import { Check, ChevronDown, PanelsTopLeft } from "lucide-react";
 import { useState } from "react";
 
 import { useTableTheme, type TableTheme } from "@/context/TableThemeContext";
+import { wattenTableStyle } from "@/games/watten/presentation";
+import "@/components/Watten/wattenGameScreen.css";
 
 const tableThemes: {
   id: TableTheme;
   name: string;
-  image: string;
 }[] = [
   {
     id: "classic",
     name: "Classic",
-    image: "/images/tables/classic.webp",
   },
   {
     id: "bavarian",
     name: "Bavarian room",
-    image: "/images/tables/bavarian.webp",
   },
   {
     id: "royal",
     name: "Royal",
-    image: "/images/tables/royal.webp",
   },
   {
     id: "steampunk",
     name: "Steampunk",
-    image: "/images/tables/steampunk.webp",
   },
   {
     id: "alpine",
     name: "Alpine",
-    image: "/images/tables/alpine.webp",
   },
   {
     id: "midnight",
     name: "Midnight",
-    image: "/images/tables/midnight.webp",
   },
 ];
 
@@ -55,6 +50,7 @@ export default function TableThemeSelector() {
       <button
         type="button"
         aria-expanded={open}
+        aria-label={ui("Table design")}
         title={ui("Table design")}
         onClick={() => setOpen((prev) => !prev)}
         className="
@@ -128,13 +124,7 @@ export default function TableThemeSelector() {
                 `}
               >
                 {/* table preview */}
-                <div className="h-10 w-16 shrink-0 overflow-hidden rounded-md border border-white/10">
-                  <img
-                    src={theme.image}
-                    alt={ui(theme.name)}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
+                <div aria-hidden="true" className="watten-table watten-table-preview h-10 w-16 shrink-0" style={wattenTableStyle(theme.id)} />
 
                 <span className="flex-1 text-sm font-semibold text-slate-200">
                   {ui(theme.name)}

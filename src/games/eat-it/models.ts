@@ -1,3 +1,4 @@
+import { surfaceTexture, type Surface } from './surfaceTextures.ts';
 import { treeGeometry } from './treeGeometry.ts';
 import * as T from 'three';
 import { FOOD, type FoodKind } from './config.ts';
@@ -7,12 +8,31 @@ import { objectHeight } from './falling.ts';
  * logos, product likenesses, or third-party character designs are loaded. */
 export class ModelLibrary {
   private materials = new Map<string, T.MeshStandardMaterial>();
+  private textures = new Map<Surface, T.DataTexture>();
   private geometries = new Map<string, T.BufferGeometry>();
   private templates = new Map<FoodKind, T.Group>();
   material(color: string) {
     let m = this.materials.get(color);
-    if (!m) { m = new T.MeshStandardMaterial({ color, roughness: .85, metalness: 0 }); this.materials.set(color, m); }
+    if (!m) { m = new T.MeshStandardMaterial({ color, roughness: color === '#a4d7da' ? .16 : .85, metalness: color === '#a4d7da' ? .35 : 0 }); this.materials.set(color, m); }
     return m;
+  }
+  surface(color: string, surface: Surface) {
+    const key = `${surface}:${color}`;
+    let material = this.materials.get(key);
+    if (!material) {
+      let map = this.textures.get(surface);
+      if (!map) { map = surfaceTexture(surface); this.textures.set(surface, map); }
+      material = new T.MeshStandardMaterial({ color, map, bumpMap: map,
+        bumpScale: surface === 'paint' ? .03 : surface === 'brick' || surface === 'roof' ? .65 : .18,
+        roughness: surface === 'paint' ? .28 : surface === 'rubber' ? .96 : .83,
+        metalness: surface === 'paint' ? .38 : 0 });
+      this.materials.set(key, material);
+    }
+    return material;
+  }
+  finish(mesh: T.Mesh, color: string, surface: Surface) {
+    mesh.material = this.surface(color, surface);
+    return mesh;
   }
   geometry(kind: 'box' | 'ball' | 'cylinder' | 'cone' | 'ring' | 'rock') {
     let g = this.geometries.get(kind);
@@ -129,7 +149,7 @@ export class ModelLibrary {
       cylinder(dark, 0, h * .74, d * .34, 6, 8).rotation.x = Math.PI / 2;
     } else if (f.shape === 'building') {
       const wall = h * .72;
-      box(color, 0, wall / 2, 0, w * .94, wall, d * .94);
+      this.finish(box(color, 0, wall / 2, 0, w * .94, wall, d * .94), color, kind === 'barn' || kind === 'farmhouse' ? 'siding' : 'brick');
       box('#e8dbbf', 0, 4, 0, w, 8, d);
       // A custom triangular prism makes a pitched roof with genuine end faces.
       const roof = new T.BufferGeometry();
@@ -142,14 +162,25 @@ export class ModelLibrary {
       for (let i = 0; i < verts.length; i += 9) for (let axis = 0; axis < 3; axis++) {
         [verts[i + 3 + axis], verts[i + 6 + axis]] = [verts[i + 6 + axis], verts[i + 3 + axis]];
       }
-      roof.setAttribute('position', new T.Float32BufferAttribute(verts, 3)); roof.computeVertexNormals();
+      roof.setAttribute('position', new T.Float32BufferAttribute(verts, 3));
+      const uvs: number[] = [];
+      for (let i = 0; i < verts.length; i += 9) {
+        const endFace = verts[i + 2] === verts[i + 5] && verts[i + 2] === verts[i + 8];
+        for (let j = 0; j < 9; j += 3) uvs.push((endFace ? verts[i + j] / w : verts[i + j + 2] / d) + .5, endFace ? verts[i + j + 1] / h : verts[i + j] / w + .5);
+      }
+      roof.setAttribute('uv', new T.Float32BufferAttribute(uvs, 2)); roof.computeVertexNormals();
       this.geometries.set(`roof-${kind}`, roof);
-      const mesh = new T.Mesh(roof, this.material(kind === 'barn' ? '#814e4a' : '#657e7b')); mesh.name = 'roof'; mesh.castShadow = true; mesh.receiveShadow = true; group.add(mesh);
-      box(timber, 0, wall * .25, d * .474, w * .16, wall * .5, 2);
+      const mesh = new T.Mesh(roof, this.surface(kind === 'barn' ? '#814e4a' : '#526975', 'roof')); mesh.name = 'roof'; mesh.castShadow = true; mesh.receiveShadow = true; group.add(mesh);
+      this.finish(box(timber, 0, wall * .25, d * .474, w * .16, wall * .5, 2), timber, 'wood');
+      ball('#dbb56a', w * .05, wall * .25, d * .49, 1.4, 1.4, 1.4);
+      for (const side of [-1, 1]) box(cream, side * w * .47, wall * .5, d * .47, w * .035, wall, 3);
+      box('#d8cbb5', 0, wall * .025, d * .49, w * .23, wall * .05, d * .08);
       for (const side of [-1, 1]) {
         for (let row = 0; row < (kind === 'apartment' ? 3 : kind === 'mansion' || kind === 'farmhouse' ? 2 : 1); row++) {
           box(cream, side * w * .29, wall * (.4 + row * .22), d * .477, w * .2, wall * .18, 3);
           box(glass, side * w * .29, wall * (.4 + row * .22), d * .49, w * .16, wall * .14, 2);
+          box(cream, side * w * .29, wall * (.4 + row * .22), d * .503, w * .012, wall * .14, 1);
+          box(cream, side * w * .29, wall * (.4 + row * .22), d * .503, w * .16, wall * .012, 1);
         }
         box(glass, side * w * .475, wall * .5, 0, 2, wall * .26, d * .32);
       }
@@ -160,15 +191,23 @@ export class ModelLibrary {
     } else if (f.shape === 'vehicle') {
       const wheel = d * .18;
       box(dark, 0, wheel, 0, w * .82, h * .18, d * .75);
-      box(color, 0, h * .4, 0, w * .97, h * .4, d * .84);
+      this.finish(box(color, 0, h * .4, 0, w * .97, h * .4, d * .84), color, 'paint');
       box(glass, -w * .08, h * .7, 0, w * .43, h * .43, d * .72);
-      box(color, -w * .08, h * .96, 0, w * .47, h * .08, d * .79);
+      this.finish(box(color, -w * .08, h * .96, 0, w * .47, h * .08, d * .79), color, 'paint');
+      for (const side of [-1, 1]) {
+        box(color, -w * .08, h * .72, side * d * .37, w * .025, h * .43, d * .025);
+        box('#c9d5d7', w * .02, h * .45, side * d * .427, w * .09, h * .025, d * .025);
+        this.finish(box(color, w * .12, h * .67, side * d * .45, w * .09, h * .085, d * .11), color, 'paint');
+      }
+      box('#aeb9be', w * .49, h * .28, 0, 2, h * .07, d * .77);
+      box(dark, w * .492, h * .42, 0, 2, h * .12, d * .34);
+      box(cream, w * .502, h * .3, 0, 1, h * .07, d * .2);
       if (kind === 'foodTruck') box('#f2dcc1', -w * .25, h * .68, 0, w * .45, h * .55, d * .86);
       if (kind === 'tractor') box(color, w * .23, h * .6, 0, w * .4, h * .28, d * .6);
       if (kind === 'bus') { box(color, 0, h * .66, 0, w * .97, h * .5, d * .84); for (let i = 0; i < 6; i++) for (const z of [-1, 1]) box(glass, -w * .4 + i * w * .15, h * .74, z * d * .425, w * .11, h * .2, 2); }
       if (kind === 'taxi') { box(cream, -w * .08, h * 1.04, 0, w * .16, h * .1, d * .3); box(dark, 0, h * .42, d * .425, w * .6, h * .06, 1); }
       for (const x of [-1, 1]) for (const z of [-1, 1]) {
-        const tire = cylinder(dark, x * w * .31, wheel, z * d * .4, wheel, d * .17); tire.rotation.x = Math.PI / 2; tire.name = 'wheel';
+        const tire = cylinder(dark, x * w * .31, wheel, z * d * .4, wheel, d * .17); this.finish(tire, '#293139', 'rubber'); tire.rotation.x = Math.PI / 2; tire.name = 'wheel';
         const hub = cylinder('#d5cbbc', x * w * .31, wheel, z * d * .49, wheel * .48, 2); hub.rotation.x = Math.PI / 2; hub.name = 'wheel';
       }
       for (const z of [-1, 1]) { box(cream, w * .49, h * .42, z * d * .26, 2, h * .14, d * .16); box('#cd735e', -w * .49, h * .4, z * d * .26, 2, h * .12, d * .14); }
@@ -297,5 +336,5 @@ export class ModelLibrary {
     }
     return group;
   }
-  dispose() { this.materials.forEach(m => m.dispose()); this.geometries.forEach(g => g.dispose()); this.templates.clear(); }
+  dispose() { this.materials.forEach(m => m.dispose()); this.textures.forEach(t => t.dispose()); this.textures.clear(); this.geometries.forEach(g => g.dispose()); this.templates.clear(); }
 }

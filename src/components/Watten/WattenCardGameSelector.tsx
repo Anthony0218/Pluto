@@ -50,6 +50,7 @@ export default function CardThemeSelector() {
       <button
         type="button"
         aria-expanded={open}
+        aria-label={ui("Card design")}
         title={ui("Card design")}
         onClick={() => setOpen((prev) => !prev)}
         className="

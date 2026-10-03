@@ -45,7 +45,7 @@ type AvatarPreset = {
   muzzle?: string;
   nose?: string;
 };
-export const avatarPresets: AvatarPreset[] = [
+const avatarPresets: AvatarPreset[] = [
   {
     id: "m1",
     name: "Happy",
@@ -764,9 +764,11 @@ export function PixelAvatarImage({ pixels, className = "" }: { pixels: number[];
 export default function ProfileAvatarPicker({
   selected,
   onSelect,
+  disabled = false,
 }: {
   selected: string;
   onSelect: (avatarId: string) => void;
+  disabled?: boolean;
 }) {
   return (
     <div className="grid grid-cols-4 gap-3 sm:grid-cols-6">
@@ -779,6 +781,8 @@ export default function ProfileAvatarPicker({
             type="button"
             onClick={() => onSelect(avatar.id)}
             title={avatar.name}
+            aria-pressed={active}
+            disabled={disabled}
             className={`
               overflow-hidden
               rounded-2xl
@@ -800,7 +804,7 @@ export default function ProfileAvatarPicker({
 
             <p
               className={`py-1 text-[9px] font-bold ${
-                active ? "text-amber-300" : "text-zinc-600"
+                active ? "text-amber-300" : "text-zinc-400"
               }`}
             >
               {avatar.name}

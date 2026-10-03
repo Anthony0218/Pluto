@@ -1,6 +1,7 @@
 import { classifyMove, evaluationScore, type MoveQuality } from "@/utils/chessAnalysis";
 
 export const qualityList: MoveQuality[] = [
+  "Book",
   "Best",
   "Excellent",
   "Good",

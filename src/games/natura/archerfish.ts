@@ -104,7 +104,7 @@ export function archerShotAngle(fish: ArcherFish, target: Vec): number | null {
 }
 
 /** AI only uses the same visible insects and landing information as the player. */
-export function chooseArcherInput(game: ArcherGame, player: Player): ArcherInput {
+export function chooseArcherInput(game: ArcherGame, player: Player, difficulty: "easy" | "normal" | "hard" = "normal"): ArcherInput {
   const fish = game.fish[player];
   const falling = game.insects.filter(insect => insect.state !== "perched")
     .sort((a, b) => Math.abs(insectLanding(a).x - fish.x) - Math.abs(insectLanding(b).x - fish.x));
@@ -118,8 +118,8 @@ export function chooseArcherInput(game: ArcherGame, player: Player): ArcherInput
   const angle = archerShotAngle(fish, target);
   if (angle === null) return { ...emptyArcherInput(), move: Math.sign(target.x - fish.x) };
   // A small, visible aim wobble and reaction interval leave room for a human rival.
-  const difference = angle + Math.sin(game.elapsed * 2.4) * 0.035 - fish.angle;
-  return { move: 0, aim: Math.abs(difference) > 0.015 ? clamp(difference / (1.75 * 0.17), -1, 1) : 0, shoot: Math.abs(difference) < 0.055, dash: false };
+  const difference = angle + Math.sin(game.elapsed * 2.4) * (difficulty === "easy" ? 0.07 : difficulty === "hard" ? 0.012 : 0.035) - fish.angle;
+  return { move: 0, aim: Math.abs(difference) > 0.015 ? clamp(difference / (1.75 * 0.17), -1, 1) : 0, shoot: Math.abs(difference) < (difficulty === "easy" ? 0.035 : difficulty === "hard" ? 0.07 : 0.055), dash: false };
 }
 
 function segmentDistance(a: Vec, b: Vec, point: Vec): number {
@@ -135,17 +135,17 @@ function finishArcherGame(game: ArcherGame) {
 }
 
 /** Fixed substeps avoid tunnelling through insects or fish on slower displays. */
-export function updateArcherGame(game: ArcherGame, inputs: [ArcherInput, ArcherInput], seconds: number, ai = false) {
+export function updateArcherGame(game: ArcherGame, inputs: [ArcherInput, ArcherInput], seconds: number, ai = false, difficulty: "easy" | "normal" | "hard" = "normal") {
   if (game.phase !== "playing" || !Number.isFinite(seconds) || seconds <= 0) return;
   let remaining = Math.min(seconds, 0.1);
   while (remaining > 0.000001 && game.phase === "playing") {
     const dt = Math.min(remaining, 1 / 120, game.time);
-    stepArcherGame(game, inputs, dt, ai);
+    stepArcherGame(game, inputs, dt, ai, difficulty);
     remaining -= dt;
   }
 }
 
-function stepArcherGame(game: ArcherGame, inputs: [ArcherInput, ArcherInput], dt: number, ai: boolean) {
+function stepArcherGame(game: ArcherGame, inputs: [ArcherInput, ArcherInput], dt: number, ai: boolean, difficulty: "easy" | "normal" | "hard") {
   game.time = Math.max(0, game.time - dt);
   game.elapsed += dt;
   game.noticeTime = Math.max(0, game.noticeTime - dt);
@@ -153,8 +153,8 @@ function stepArcherGame(game: ArcherGame, inputs: [ArcherInput, ArcherInput], dt
   if (ai) {
     game.ai.think -= dt;
     if (game.ai.think <= 0) {
-      game.ai.input = chooseArcherInput(game, 1);
-      game.ai.think = 0.17;
+      game.ai.input = chooseArcherInput(game, 1, difficulty);
+      game.ai.think = difficulty === "easy" ? 0.35 : difficulty === "hard" ? 0.08 : 0.17;
     }
   }
   game.fish.forEach((fish, index) => {

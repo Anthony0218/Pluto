@@ -42,3 +42,133 @@
 @media(min-width:760px){.atlas-flag-choices.is-flags{grid-template-columns:repeat(4,minmax(0,1fr));width:min(860px,100%)}.atlas-flag-choices.is-flags button{min-height:104px}}
 @media(max-height:820px) and (min-width:760px){.atlas-country-shape svg{width:200px}.atlas-flag-hero{width:min(300px,70%)}.atlas-play-layout.is-panel-only .atlas-question-panel h1{margin:.3rem 0 .9rem}.atlas-play-layout.is-panel-only .atlas-progress{margin-bottom:1rem}}
 .atlas-guess-input{margin-bottom:.9rem}.atlas-question-panel h1+.atlas-guess-input{margin-top:-.4rem}
+
+.atlas-category-picker{min-width:0;margin:0;padding:0;border:0}.atlas-category-picker .atlas-label{float:none;width:100%;padding:0}.atlas-pin-controls p{color:#aab4c7;font-size:.85rem;line-height:1.6}.atlas-submit:disabled{opacity:.45;cursor:not-allowed}.atlas-map-pin{pointer-events:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6))}.atlas-map-pin path{fill:currentColor;stroke:#06131e;stroke-width:1.5}.atlas-map-pin circle{fill:#06131e;stroke:none}
+
+/* On narrow screens the map and question form one scrollable page. */
+.atlas-map-controls .atlas-map-pan-toggle { display: none; }
+@media (max-width: 950px) {
+  .atlas-game-page { height: auto; min-height: var(--app-height); overflow: visible; }
+  .atlas-game-header { height: auto; min-height: 68px; gap: .65rem; margin-bottom: 1rem; }
+  .atlas-play-layout, .atlas-play-layout.is-panel-only { height: auto; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; gap: .8rem; }
+  .atlas-question-panel { min-width: 0; max-height: none; overflow: visible; }
+  .atlas-play-layout .atlas-map-shell { order: 1; height: clamp(320px, 52dvh, 540px); min-height: 0; }
+  .atlas-map-shell svg { height: 100%; min-height: 0; }
+  .atlas-home-page, .atlas-room-page { height: auto; min-height: var(--app-height); overflow: visible; gap: 1.2rem; }
+  .atlas-home-protocols { margin: 1rem auto; }
+}
+@media (max-width: 950px), (pointer: coarse) {
+  .atlas-map-shell { touch-action: pan-y pinch-zoom; }
+  .atlas-map-shell.is-panning { touch-action: none; }
+  .atlas-map-controls .atlas-map-pan-toggle { display: flex; align-items: center; justify-content: center; gap: .35rem; width: auto; padding-inline: .7rem; font-size: .7rem; font-weight: 800; white-space: nowrap; }
+  .atlas-map-pan-toggle[aria-pressed="true"] { color: #52e7e0; background: #52e7e020; }
+}
+.atlas-map-pin-line{fill:none;stroke-width:1.8;stroke:currentColor;stroke-dasharray:5 4;stroke-linecap:round;pointer-events:none;opacity:.9}
+
+/* Landing: Singleplayer, Multiplayer and Atlas Trials side by side. */
+.atlas-home-protocols.has-three { grid-template-columns: repeat(3, minmax(0, 340px)); }
+.atlas-protocol-card.is-trials { border-color: rgba(255, 200, 107, .32); background: linear-gradient(145deg, rgba(84, 56, 18, .78), rgba(18, 12, 6, .95)); }
+.atlas-protocol-card.is-trials:hover { border-color: #ffc86b; box-shadow: inset 0 0 50px rgba(255, 200, 107, .1), 0 0 34px rgba(255, 200, 107, .2); }
+.atlas-protocol-card.is-trials > svg, .atlas-protocol-card.is-trials i { color: #ffd890; }
+@media (max-width: 1100px) { .atlas-home-page:has(.has-three) { height: auto; min-height: var(--app-height); overflow: visible; } .atlas-home-protocols.has-three { grid-template-columns: repeat(2, minmax(0, 390px)); } .atlas-home-protocols.has-three > :last-child { grid-column: 1 / -1; justify-self: center; width: min(390px, 100%); } }
+@media (max-width: 700px) { .atlas-home-protocols.has-three { grid-template-columns: minmax(0, 1fr); } .atlas-home-protocols.has-three > :last-child { grid-column: auto; width: auto; } }
+
+/* ---------- Unified menu: every mode with Singleplayer, Multiplayer, Hotseat and Rules ---------- */
+.atlas-hub { align-content: start; padding-bottom: 2.5rem; }
+.atlas-hub .trials-mode-grid { align-items: stretch; }
+.atlas-hub-card { display: flex; flex-direction: column; cursor: default; min-height: 0; }
+.atlas-hub-card:hover, .atlas-hub-card:focus-within { transform: translateY(-3px); }
+.atlas-hub-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: .5rem; }
+.atlas-hub-rules { display: inline-flex; align-items: center; gap: .3rem; padding: .35rem .65rem; border: 1px solid rgba(var(--accent-rgb), .3); border-radius: 999px; color: var(--accent); background: rgba(var(--accent-rgb), .07); font-size: .72rem; font-weight: 800; cursor: pointer; transition: background .2s, border-color .2s; }
+.atlas-hub-rules:hover, .atlas-hub-rules:focus-visible { border-color: var(--accent); background: rgba(var(--accent-rgb), .16); outline: none; }
+.atlas-hub-card .trials-mode-meta { margin-top: auto; padding-top: .3rem; }
+.atlas-hub-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .4rem; margin-top: .35rem; }
+.atlas-hub-actions button { display: grid; justify-items: center; gap: .25rem; min-height: 58px; padding: .55rem .25rem; border: 1px solid rgba(255, 255, 255, .12); border-radius: 14px; color: #dfe8f5; background: rgba(255, 255, 255, .04); font-size: .72rem; font-weight: 800; cursor: pointer; transition: border-color .2s, background .2s, color .2s, transform .2s; }
+.atlas-hub-actions button svg { width: 18px; height: 18px; color: var(--accent, #52e7e0); }
+.atlas-hub-actions button span { overflow: hidden; max-width: 100%; text-overflow: ellipsis; white-space: nowrap; }
+.atlas-hub-actions button:hover, .atlas-hub-actions button:focus-visible { border-color: var(--accent, #52e7e0); color: #fff; background: rgba(var(--accent-rgb, 82, 231, 224), .14); outline: none; transform: translateY(-1px); }
+.atlas-hub-actions button:first-child { border-color: rgba(var(--accent-rgb, 82, 231, 224), .45); background: rgba(var(--accent-rgb, 82, 231, 224), .1); }
+
+/* Rules dialog */
+.atlas-rules-backdrop { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 1rem; background: rgba(2, 6, 16, .72); backdrop-filter: blur(6px); animation: trial-fade .2s backwards; }
+.atlas-rules { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; width: min(680px, 100%); max-height: min(88dvh, 860px); overflow: hidden; border: 1px solid rgba(var(--accent-rgb), .35); border-radius: 26px; color: #f6f8ff; background: radial-gradient(circle at 100% 0%, rgba(var(--accent-rgb), .16), transparent 45%), linear-gradient(155deg, rgba(13, 25, 49, .98), rgba(6, 12, 27, .98)); box-shadow: 0 40px 100px rgba(0, 0, 0, .55); }
+.atlas-rules > header { display: flex; align-items: center; gap: .9rem; padding: 1.2rem 1.3rem .8rem; }
+.atlas-rules > header .trials-mode-icon { flex: none; margin: 0; }
+.atlas-rules > header > div { flex: 1; min-width: 0; }
+.atlas-rules > header .atlas-eyebrow { color: var(--accent); }
+.atlas-rules h2 { margin: .15rem 0 0; font-family: Georgia, serif; font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 500; line-height: 1.05; }
+.atlas-rules-body { overflow-y: auto; padding: 0 1.3rem 1rem; color: #b9c6d8; font-size: .92rem; line-height: 1.6; }
+.atlas-rules-goal { margin: 0 0 .6rem; color: #f2f6ff; font-size: 1.02rem; }
+.atlas-rules-body h3 { margin: 1rem 0 .3rem; color: var(--accent); font-size: .7rem; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; }
+.atlas-rules-body ol { margin: 0; padding-left: 1.2rem; list-style: decimal; }
+.atlas-rules-body li + li { margin-top: .3rem; }
+.atlas-rules-body p { margin: 0; }
+.atlas-rules-ways { display: grid; gap: .55rem; margin-top: 1.1rem; }
+.atlas-rules-ways article { padding: .75rem .9rem; border: 1px solid rgba(255, 255, 255, .09); border-radius: 15px; background: rgba(255, 255, 255, .03); }
+.atlas-rules-ways h4 { display: flex; align-items: center; gap: .45rem; margin: 0 0 .25rem; color: #eef3fb; font-size: .84rem; }
+.atlas-rules-ways h4 svg { width: 16px; height: 16px; color: var(--accent); }
+.atlas-rules-ways p { font-size: .86rem; }
+.atlas-rules > footer { padding: .8rem 1.3rem 1.2rem; border-top: 1px solid rgba(255, 255, 255, .07); }
+.atlas-rules > footer .atlas-hub-actions { margin: 0; padding: 0; }
+
+/* Whose turn it is (game headers, trial shells) */
+.atlas-turn-chip { display: inline-flex; align-items: center; gap: .4rem; padding: .3rem .7rem; border: 1px solid color-mix(in srgb, var(--player, #52e7e0) 55%, transparent); border-radius: 999px; color: #fff; background: color-mix(in srgb, var(--player, #52e7e0) 16%, transparent); font-size: .78rem; font-weight: 850; white-space: nowrap; }
+.atlas-turn-chip i, .atlas-turn-banner i, .atlas-handoff h2 i, .atlas-hotseat-names i, .atlas-standings span i, .atlas-race-ticker i { display: inline-block; flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--player, #52e7e0); box-shadow: 0 0 12px var(--player, #52e7e0); }
+.atlas-turn-banner { display: flex; align-items: center; gap: .55rem; margin: .4rem 0 .2rem; padding: .6rem .8rem; border: 1px solid color-mix(in srgb, var(--player) 50%, transparent); border-radius: 14px; color: #fff; background: color-mix(in srgb, var(--player) 14%, transparent); font-weight: 850; }
+
+/* Hotseat: pass-the-device cover, player names, standings */
+.atlas-handoff { display: grid; justify-items: center; gap: .8rem; width: min(520px, 100%); margin: 0 auto; padding: clamp(1.6rem, 5vw, 2.6rem); border: 1px solid color-mix(in srgb, var(--player, #ffc86b) 45%, transparent); border-radius: 28px; text-align: center; background: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--player, #ffc86b) 20%, transparent), transparent 60%), rgba(7, 14, 31, .9); box-shadow: 0 30px 80px rgba(0, 0, 0, .35); animation: trial-rise .4s backwards; }
+.atlas-handoff h2 { display: flex; align-items: center; gap: .6rem; margin: 0; font-family: Georgia, serif; font-size: clamp(2rem, 6vw, 3rem); font-weight: 500; line-height: 1.05; }
+.atlas-handoff h2 i { width: 14px; height: 14px; }
+.atlas-handoff p { margin: 0; color: #a8b8cb; line-height: 1.6; }
+.atlas-handoff .atlas-start { margin-top: .4rem; }
+.atlas-trials-page .atlas-handoff { margin-top: clamp(1rem, 6vh, 4rem); }
+.atlas-hotseat-names { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .55rem; margin: .7rem 0 .4rem; }
+.atlas-hotseat-names label { display: flex; align-items: center; gap: .55rem; padding: 0 .8rem; border: 1px solid rgba(255, 255, 255, .12); border-radius: 13px; background: #0b1528; }
+.atlas-hotseat-names label:focus-within { border-color: var(--player); }
+.atlas-hotseat-names input { flex: 1; min-width: 0; min-height: 46px; border: 0; color: #fff; background: none; font: inherit; font-weight: 750; outline: none; }
+.atlas-standings { display: grid; gap: .45rem; width: min(560px, 100%); margin: 1.2rem 0; padding: 0; list-style: none; }
+.atlas-standings li { display: grid; grid-template-columns: 2rem minmax(0, 1fr) auto; align-items: center; gap: .7rem; padding: .75rem 1rem; border: 1px solid rgba(255, 255, 255, .09); border-radius: 16px; background: rgba(255, 255, 255, .035); text-align: left; animation: trial-rise .4s backwards; }
+.atlas-standings li.is-winner { border-color: rgba(255, 211, 114, .55); background: rgba(255, 211, 114, .08); box-shadow: 0 0 30px rgba(255, 211, 114, .12); }
+.atlas-standings b { color: #ffd372; font-size: 1.1rem; }
+.atlas-standings span { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; font-weight: 800; }
+.atlas-standings span small { flex-basis: 100%; padding-left: 1.1rem; color: #7f90a8; font-size: .72rem; font-weight: 700; }
+.atlas-standings strong { font-size: 1.15rem; }
+.atlas-standings strong small { color: #7f90a8; font-size: .7rem; }
+
+/* Races: other players' live scores while you play */
+.atlas-race-ticker { position: fixed; right: 1rem; bottom: 1rem; z-index: 40; display: grid; gap: .3rem; min-width: 170px; padding: .65rem .8rem; border: 1px solid rgba(255, 255, 255, .12); border-radius: 16px; color: #e8eef8; background: rgba(5, 11, 25, .88); box-shadow: 0 16px 40px rgba(0, 0, 0, .4); backdrop-filter: blur(8px); font-size: .8rem; pointer-events: none; }
+.atlas-race-ticker > span:not(.atlas-eyebrow) { display: flex; align-items: center; gap: .45rem; }
+.atlas-race-ticker b { margin-left: auto; font-variant-numeric: tabular-nums; }
+.atlas-race-ticker svg { color: #4ade80; }
+.atlas-race-end { width: auto; min-width: 220px; padding-inline: 2.4rem; }
+
+/* Two-player Stat Battle */
+.duel-scoreline { display: flex; justify-content: center; align-items: baseline; gap: .8rem; margin-bottom: .6rem; color: #8193ab; font-weight: 850; }
+.duel-scoreline b { color: #fff; font-size: 1.4rem; }
+.duel-scoreline .is-player { color: #8fe9e4; }
+.duel-scoreline .is-opponent { color: #fdb0bd; }
+.duel-next { display: flex; justify-content: center; margin-top: .9rem; }
+.duel-next .atlas-start { width: auto; min-width: 220px; padding-inline: 2.4rem; }
+.duel-scoreline > span { display: inline-flex; align-items: baseline; gap: .45rem; }
+.battle-face-down { min-height: 150px; place-content: center; color: #fdb0bd; background: repeating-linear-gradient(45deg, rgba(255, 122, 154, .12) 0 8px, rgba(255, 122, 154, .04) 8px 16px), rgba(10, 14, 30, .9); }
+
+/* Multiplayer lobby for one chosen mode */
+.atlas-lobby .atlas-mode-section { width: min(860px, 100%); margin: 0 auto; }
+.atlas-lobby-mode { display: flex; align-items: flex-start; gap: 1rem; margin: 1rem 0 .4rem; }
+.atlas-lobby-mode .trials-mode-icon { flex: none; margin-top: .4rem; }
+.atlas-lobby-mode .atlas-eyebrow { color: var(--accent); }
+.atlas-lobby-mode .atlas-lobby-title { margin: .3rem 0 .4rem; }
+.atlas-lobby-mode p { margin: 0; color: #a8b8cb; line-height: 1.6; }
+.atlas-lobby .atlas-lobby-actions .atlas-label { display: block; margin: 1rem 0 .5rem; }
+.atlas-lobby .atlas-lobby-actions .atlas-start { margin-top: 1.2rem; }
+
+@media (max-width: 600px) {
+  .atlas-hotseat-names { grid-template-columns: minmax(0, 1fr); }
+  .atlas-race-ticker { right: .5rem; bottom: .5rem; min-width: 0; font-size: .72rem; }
+  .atlas-lobby-mode { flex-direction: column; gap: .4rem; }
+  .atlas-rules > header { padding: 1rem 1rem .6rem; }
+  .atlas-rules-body { padding: 0 1rem .9rem; }
+  .atlas-rules > footer { padding: .7rem 1rem 1rem; }
+}
+@media (prefers-reduced-motion: reduce) { .atlas-rules-backdrop, .atlas-handoff, .atlas-standings li { animation: none; } }

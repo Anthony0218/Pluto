@@ -3,8 +3,8 @@ import type { AtlasDifficulty, AtlasStatKey } from "./types.ts";
 export const ATLAS_SCORING = {
   normalCorrect: 1000,
   maxSpeedBonus: 500,
-  speedRunCorrect: 100,
-  speedRunMaxMultiplier: 3,
+  speedRunCorrect: 150,
+  speedRunWrong: -50,
   mapFillCountry: 100,
   mapFillCompletion: 2500,
   mapFillStreak: 10,
