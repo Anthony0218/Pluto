@@ -121,7 +121,7 @@ test('simultaneous input packets commit a bite and its mass/score reward exactly
   const joined = (await s.request('user-1', { op: 'join', code: room.room_code })).body; await start(s, joined);
   const row = s.rows.get(room.id), state = row.game_state, [a, b] = state.players;
   state.settings.livesEnabled = false; state.players.forEach(p => { p.lives = 1; });
-  state.food = []; state.powerups = []; state.nextFood = 1000; state.nextPower = 1000; state.encounter = undefined;
+  state.food = []; state.powerups = []; state.nextFactory=state.nextHumans=1e9;delete state.feast;state.nextFood = 1000; state.nextPower = 1000; state.encounter = undefined;
   Object.assign(a, { x: 1000, y: 800, mass: 100, facing: 0 }); Object.assign(b, { x: 1020, y: 800, mass: 36 });
   s.clock.now += 100;
   const responses = await Promise.all([0, 1, 0, 1].map(i => s.request(`user-${i}`, { op: 'input', code: room.room_code, input: { x: 0, y: 0 }, mass: 100000, score: 999999, ate: 'user-0', dt: 500 })));
@@ -173,7 +173,7 @@ test('two clients racing for the same food agree on one reservation and one grow
   Object.assign(a, { x: 1000, y: 800, facing: 0 }); Object.assign(b, { x: 1400, y: 800 });
   state.food = [{id:state.nextId++,kind:'apple',x:1012,y:800,vx:0,vy:0,z:0,vz:0,rotation:0,target:null,capturedAt:0}];
   // This isolates mouth/CAS behavior from the randomly positioned shrine.
-  state.encounter=undefined;state.powerups=[];state.nextFood=1000;state.nextPower=1000;
+  state.encounter=undefined;state.powerups=[];state.nextFactory=state.nextHumans=1e9;delete state.feast;state.nextFood=1000;state.nextPower=1000;
   s.clock.now += 100;
   await Promise.all([0,1,0,1].map(i=>s.request(`user-${i}`,{op:'input',code:room.room_code,input:{x:0,y:0}})));
   assert.equal(row.game_state.food[0].target,'user-0');assert.equal(row.game_state.players[0].mass,36);
@@ -187,7 +187,7 @@ test('concurrent clients reserve one quest item and CAS retries cannot duplicate
   const s=server(),room=await create(s,2);
   const joined=(await s.request('user-1',{op:'join',code:room.room_code})).body;await start(s,joined);
   const row=s.rows.get(room.id),state=row.game_state,[a,b]=state.players;
-  state.food=[];state.powerups=[];state.nextFood=1000;state.nextPower=1000;
+  state.food=[];state.powerups=[];state.nextFactory=state.nextHumans=1e9;delete state.feast;state.nextFood=1000;state.nextPower=1000;
   Object.assign(a,{x:1000,y:1100,facing:0});Object.assign(b,{x:1120,y:1100,facing:Math.PI});
   state.encounter.shrine=null;Object.assign(state.encounter.item,{x:1060,y:1100,home:{x:1060,y:1100}});
   Object.assign(state.encounter.npc,{x:1450,y:1100,phase:'idle',until:100});

@@ -1,6 +1,6 @@
 import { animalScale } from './scaling.ts';
 import { EAT, FOOD, playerRadius } from './config.ts';
-import { clamp, distance, validPosition } from './maps.ts';
+import { clamp, distance, validPosition, resolveWalls } from './maps.ts';
 import { isChoking } from './rules.ts';
 import { random, spawnPosition } from './spawn.ts';
 import { objectContact } from './physics.ts';
@@ -100,7 +100,17 @@ export function stepEscape(s: GameState, p: Player, dt: number) {
         const a = i * Math.PI / 8, at = { x: p.x + Math.cos(a) * ring * 35, y: p.y + Math.sin(a) * ring * 35 };
         if (safePosition(s, at, playerRadius(p, s.time), p.id) && (e.kind === 'pigeon' || clearSegment(s, p, p, at))) { Object.assign(p, at); landed = true; break; }
       }
-      if (!landed) { e.landing = true; e.endsAt = s.time + .2; return; }
+      if (!landed) {
+        e.landingSince ??= s.time;
+        if (s.time - e.landingSince < 2) { e.landing = true; e.endsAt = s.time + .2; return; }
+        // Try safe public spawn sectors once, then release on valid terrain. Ordinary
+        // collision resolution handles dense props; immunity must always expire.
+        for(let attempt=0;attempt<12&&!landed;attempt++){
+          const at=spawnPosition(s,playerRadius(p,s.time)+20);
+          if(at&&safePosition(s,at,playerRadius(p,s.time),p.id)){Object.assign(p,at);landed=true;}
+        }
+        if(!landed)resolveWalls(s.map,p,playerRadius(p,s.time));
+      }
     }
     delete p.escape; p.vx = 0; p.vy = 0;
   }

@@ -2,7 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { chooseBotCard, getLegalBotMoves } from "../src/games/watten/bot.ts";
 import { advanceSingleWatten, createSingleWattenRound, cutSingleWatten, declareSingleWatten, playSingleWattenCard, raiseSingleWatten, respondSingleWattenBid, teamOf } from "../src/games/watten/singleplayer.ts";
-import { canPlayWattenCard, createDeck } from "../src/utils/watten.ts";
+import { canPlayWattenCard, createDeck, getWattenCardRole } from "../src/utils/watten.ts";
+import { getWattenHelpComparison } from "../src/games/watten/help.ts";
 const card = (suit, rank) => ({ id: `${suit}-${rank}`, suit, rank });
 function knowledge(trick, count = 3) { return { seat: 1, playerCount: count, trick, playedCardIds: new Set(trick.map(item => item.card.id)), tricksWon: { "0": 0, "1": 0, "2": 0, "3": 0 }, trump: "Herz", schlag: "Ober", teamOf: id => teamOf(id, count, 0) }; }
 
@@ -68,4 +69,50 @@ test("declining a raise awards the previously accepted value only once", () => {
   assert.equal(game.scores[0], 2);
   assert.equal(game.scores[1], 0);
   assert.throws(() => respondSingleWattenBid(game, 1, false));
+});
+
+test("help compares only legal cards on the current public trick", () => {
+  const hand = [card("Gras", "Ass"), card("Herz", "9"), card("Herz", "König")];
+  const options = { hand, trick: [{ playerId: "1", card: card("Herz", "Ober") }], tricksWon: { "0": 0, "1": 0, "2": 0 }, trump: "Herz", schlag: "Ober", playerId: "0", active: true };
+  assert.equal(getWattenHelpComparison({ ...options, card: hand[0] }), null);
+  assert.equal(getWattenHelpComparison({ ...options, card: hand[1] }), false);
+  assert.equal(getWattenHelpComparison({ ...options, card: hand[2] }), true);
+  assert.equal(getWattenHelpComparison({ ...options, card: hand[2], active: false }), null);
+  assert.equal(getWattenHelpComparison({ ...options, card: hand[2], trick: [] }), null);
+  assert.equal(getWattenHelpComparison({ ...options, card: card("Schellen", "7") }), null);
+  assert.equal(getWattenCardRole(card("Gras", "König"), "", "Herz", "Ober"), "Normale Karte");
+});
+
+test("a bid cannot be answered outside play or by an absent seat", () => {
+  let game = declareSingleWatten(createSingleWattenRound(3), "Herz", "Ober");
+  game = raiseSingleWatten(game, 0);
+  assert.throws(() => respondSingleWattenBid(game, 3, true));
+  assert.throws(() => respondSingleWattenBid({ ...game, phase: "roundOver" }, 1, true));
+  assert.equal(respondSingleWattenBid(game, 1, true).roundValue, 3);
+});
+
+test("singleplayer rejects an illegal forced response without changing the trick", () => {
+  const game = { ...declareSingleWatten(createSingleWattenRound(3), "Herz", "Ober"), turn: 0,
+    hands: [[card("Gras", "Ass"), card("Herz", "9")], [], []],
+    trick: [{ playerId: "1", card: card("Herz", "Ober") }] };
+  assert.throws(() => playSingleWattenCard(game, "Gras-Ass"), /Illegal card/);
+  assert.equal(game.trick.length, 1);
+  assert.equal(playSingleWattenCard(game, "Herz-9").trick.length, 2);
+});
+
+test("singleplayer finishes at the target score and a fresh game resets scoring", () => {
+  const deck = createDeck();
+  const winningIds = ["Herz-König", "Schellen-7", "Eichel-7", "Gras-8", "Gras-9"];
+  const rest = deck.filter(item => !winningIds.includes(item.id));
+  let game = { ...declareSingleWatten(createSingleWattenRound(3), "Herz", "Ober"),
+    hands: [winningIds.map(id => deck.find(item => item.id === id)), rest.slice(0, 5), rest.slice(5, 10)],
+    scores: [14, 0, 0], turn: 0 };
+  while (game.phase !== "matchOver") {
+    if (game.phase === "trickPause") { game = advanceSingleWatten(game); continue; }
+    const hand = game.hands[game.turn];
+    game = playSingleWattenCard(game, hand.find(item => canPlayWattenCard(item, hand, game.trick, game.tricksWon, game.trump, game.schlag)).id);
+  }
+  assert.equal(game.scores[0], 16);
+  assert.throws(() => advanceSingleWatten(game));
+  assert.deepEqual(createSingleWattenRound(3).scores, [0, 0, 0]);
 });

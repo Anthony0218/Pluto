@@ -2,11 +2,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Pause, Play, ScanSearch, X } from "lucide-react";
 import { applyGoMove, isLegalGoMove, type GoState } from "../../games/go/rules";
 import { analyzeGo, goCoordinate, goMoveQuality, goPointLoss, parseGoCoordinate, replayGo, type GoAnalysis } from "../../games/go/analysis";
-import { canReviewGoGame } from "../../games/go/reviewAvailability";
+import { ReviewQualityIcon } from "../chess/singleplayer/ReviewQualityBadge";
 import GoBoard from "./GoBoard";
 
 export default function GoGameReview({ game }: { game: GoState }) {
-  if (!canReviewGoGame(game)) return <section className="go-review" role="status"><h2>Game Review</h2><p className="go-muted">Analysis is available after the game ends.</p></section>;
+  if (!game.moveHistory.length) return <section className="go-review" role="status"><h2>Game Review</h2><p className="go-muted">Play a move before reviewing the game.</p></section>;
   return <FinishedGoGameReview game={game} />;
 }
 
@@ -59,11 +59,16 @@ function FinishedGoGameReview({ game }: { game: GoState }) {
   }
   const rows = game.moveHistory.map((move, turn) => {
     const before = analyses[turn], after = analyses[turn + 1];
-    const loss = before && after && move.type !== "resign" ? goPointLoss(before, after, move.player) : null;
-    return { move, turn: turn + 1, loss, quality: loss === null ? null : goMoveQuality(loss) };
+    // The second pass ends the game and is scored exactly, rather than by the
+    // engine. Comparing that exact score with an estimate is not a move review.
+    const loss = before && after && move.type !== "resign" && !(move.type === "pass" && frames[turn + 1].status === "finished") ? goPointLoss(before, after, move.player) : null;
+    const topMove = before?.moveInfos.find(candidate => candidate.order === 0)?.move;
+    return { move, turn: turn + 1, loss, quality: loss === null ? null : goMoveQuality(loss, topMove === goCoordinate(move, game.boardSize)) };
   });
   const selected = rows[index - 1], evaluation = analyses[index];
   const alternatives = analyses[Math.max(0, index - 1)]?.moveInfos.slice().sort((a, b) => a.order - b.order).slice(0, 3) ?? [];
+  const recommended = alternatives[0]?.move;
+  const critical = rows.filter(row => row.loss !== null && row.loss >= 5).sort((a, b) => b.loss! - a.loss!).slice(0, 5);
   const board = variation ? variationFrames[Math.min(variationStep, variationFrames.length - 1)] : frames[index];
   const filtered = rows.filter(row => filter === "all" || (filter === "mistakes" ? row.loss !== null && row.loss >= 5 : filter === "captures" ? !!row.move.captured : row.move.player === filter));
   return <div className="go-review">
@@ -74,7 +79,7 @@ function FinishedGoGameReview({ game }: { game: GoState }) {
           const evaluated = rows.filter(row => row.move.player === color && row.loss !== null);
           return <div key={color} className="go-review-summary"><span className="capitalize">{color}</span><strong>{evaluated.length ? (evaluated.reduce((sum, row) => sum + row.loss!, 0) / evaluated.length).toFixed(1) : "--"}</strong><span>Average points lost · {evaluated.length} moves reviewed</span></div>;
         })}
-        <div className="go-review-summary"><strong>{game.boardSize} × {game.boardSize}</strong><span>Chinese area · 6.5 komi · Positional superko</span><p className="go-muted">{game.result ?? "Game in progress"}</p></div>
+        <div className="go-review-summary"><strong>{game.boardSize} × {game.boardSize}</strong><span>Chinese area · {game.komi} komi · Positional superko</span><p className="go-muted">{game.result ?? "Game in progress"}</p></div>
         <div>
           <button className="go-action" disabled={running || !game.moveHistory.length} onClick={() => void analyze()}><ScanSearch size={16} />{running ? `Analysing ${Object.keys(analyses).length}/${frames.length}` : "Analyse game"}</button>
           {running && <button className="go-action" onClick={() => { controller.current?.abort(); setRunning(false); }}><X size={16} /> Cancel</button>}
@@ -82,7 +87,9 @@ function FinishedGoGameReview({ game }: { game: GoState }) {
           <p className="go-muted">Lightweight analysis. Estimates may differ from full-strength KataGo.</p>
           {error && <p role="alert" className="go-engine-error">{error}</p>}
           {!game.moveHistory.length && <p className="go-muted">Play a game to review its moves.</p>}
+          <p className="go-muted">Go-style review: AI Move matches KataGo’s top choice. Other moves use estimated points lost: Good &lt;2 · Inaccuracy &lt;5 · Mistake &lt;10 · Blunder ≥10. The final scoring pass is unlabelled.</p>
         </div>
+        {critical.length > 0 && <div><h3>Critical moments</h3>{critical.map(row => <button className="go-move-row" key={row.turn} onClick={() => select(row.turn)}><small>{row.turn}</small><span>{goCoordinate(row.move, game.boardSize)}</span><span className="go-quality" data-quality={row.quality}><ReviewQualityIcon quality={row.quality === "AI Move" ? "Best" : row.quality!} /> {row.quality}</span></button>)}</div>}
       </aside>
       <section>
         <GoBoard state={board} disabled onMove={() => {}} help />
@@ -102,14 +109,15 @@ function FinishedGoGameReview({ game }: { game: GoState }) {
       </section>
       <aside>
         <h2>{index ? `${selected.move.player === "black" ? "Black" : "White"} · ${goCoordinate(selected.move, game.boardSize)}` : "Starting position"}</h2>
-        {selected && <p><span className="go-quality" data-quality={selected.quality}>{selected.quality ?? "Not analysed"}</span>{selected.loss !== null && <span className="go-muted"> · {selected.loss.toFixed(1)} points lost</span>}</p>}
+        {selected && <p><span className="go-quality" data-quality={selected.quality}>{selected.quality && <ReviewQualityIcon quality={selected.quality === "AI Move" ? "Best" : selected.quality} />} {selected.quality ?? "Not analysed"}</span>{selected.loss !== null && <span className="go-muted"> · {selected.loss.toFixed(1)} estimated points lost</span>}</p>}
+        {selected && recommended && <p className="go-muted">Played: {goCoordinate(selected.move, game.boardSize)} · Recommended: {recommended}</p>}
         <p className="go-muted">{selected?.move.type === "resign" ? "Game ended by resignation." : selected?.move.type === "pass" ? "The player passed." : selected?.move.captured ? `${selected.move.captured} stone(s) captured on this move.` : index ? "No captures on this move." : "Black plays first."}</p>
         {evaluation && <><h3>Estimated lead: {evaluation.rootInfo.scoreLead >= 0 ? "Black" : "White"} +{Math.abs(evaluation.rootInfo.scoreLead).toFixed(1)}</h3><div className="go-winbar"><span style={{ width: (evaluation.rootInfo.winrate * 100) + "%" }} /></div><p className="go-muted">Black {Math.round(evaluation.rootInfo.winrate * 100)}% · White {Math.round((1 - evaluation.rootInfo.winrate) * 100)}%</p></>}
         <h3>{index ? "Alternatives before this move" : "Opening candidates"}</h3>
         {alternatives.length ? alternatives.map(line => <button key={line.move} className="go-move-row" onClick={() => { setPlaying(false); setVariation(line.pv.length ? line.pv : [line.move]); setVariationStep(0); }}><Play size={14} /><span>{line.move}</span><small>{line.visits} visits</small></button>) : <p className="go-muted">Run analysis to see candidate moves.</p>}
         <h3>Moves</h3>
         <select aria-label="Filter moves" value={filter} onChange={event => setFilter(event.target.value)}><option value="all">All moves</option><option value="black">Black</option><option value="white">White</option><option value="mistakes">Mistakes</option><option value="captures">Captures</option></select>
-        <div className="go-move-list">{filtered.map(row => <button key={row.turn} className="go-move-row" aria-current={index === row.turn} onClick={() => select(row.turn)}><small>{row.turn}</small><span>{row.move.player === "black" ? "B" : "W"} {goCoordinate(row.move, game.boardSize)}</span><span className="go-quality" data-quality={row.quality}>{row.quality ?? (row.move.captured ? `+${row.move.captured}` : "--")}</span></button>)}</div>
+        <div className="go-move-list">{filtered.map(row => <button key={row.turn} className="go-move-row" aria-current={index === row.turn} onClick={() => select(row.turn)}><small>{row.turn}</small><span>{row.move.player === "black" ? "B" : "W"} {goCoordinate(row.move, game.boardSize)}</span><span className="go-quality" data-quality={row.quality}>{row.quality && <ReviewQualityIcon quality={row.quality === "AI Move" ? "Best" : row.quality} />}{row.quality ?? (row.move.captured ? `+${row.move.captured}` : "--")}</span></button>)}</div>
       </aside>
     </div>
   </div>;

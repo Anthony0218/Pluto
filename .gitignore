@@ -12,10 +12,13 @@ dist
 dist-ssr
 public/tfjs/
 *.local
+/.dashboard-check/
+/dashboard-lint-report.json
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json
 .idea
 .DS_Store
 *.suo
@@ -27,3 +30,7 @@ public/tfjs/
 .env.local
 
 data/lichess/lichess_db_puzzle.csv.zst
+
+# Atlas handler test modules and isolated preview cache
+.atlas-test/
+.vite-arena/

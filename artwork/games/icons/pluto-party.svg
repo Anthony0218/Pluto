@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Pluto Party icon">
+ <rect width="256" height="256" rx="48" fill="#123b49"/>
+ <path d="M49 173c18-54 38-89 81-89s62 34 78 89" fill="none" stroke="#74c9ad" stroke-width="24" stroke-linecap="round" stroke-dasharray="1 27"/>
+ <path d="M53 181c18-18 48-27 75-27s59 10 75 27" fill="none" stroke="#e6c77b" stroke-width="16" stroke-linecap="round"/>
+ <circle cx="128" cy="104" r="29" fill="#fa906d"/><circle cx="118" cy="100" r="3.5" fill="#153b43"/><circle cx="139" cy="100" r="3.5" fill="#153b43"/><path d="M119 114q9 9 18 0" fill="none" stroke="#153b43" stroke-width="4" stroke-linecap="round"/>
+ <path d="M128 60V44m0 0-14 12m14-12 14 12" stroke="#f7d477" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

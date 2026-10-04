@@ -10,8 +10,8 @@ export type AnimalFact = {
   url: string;
 };
 const antSource = {
-  label: "UC Berkeley",
-  url: "https://newsarchive.berkeley.edu/news/media/releases/2006/08/21_ant_video.shtml",
+  label: "PNAS: ballistic jaw propulsion",
+  url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC1568925/",
 };
 const cuttleSource = {
   label: "Marine Biological Laboratory",

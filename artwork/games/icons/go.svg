@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Go icon">
+ <rect width="256" height="256" rx="48" fill="#342b29"/>
+ <rect x="40" y="40" width="176" height="176" rx="19" fill="#c99a5d"/>
+ <path d="M74 48v160m54-160v160m54-160v160M48 74h160M48 128h160M48 182h160" stroke="#6f492b" stroke-width="5"/>
+ <circle cx="74" cy="74" r="18" fill="#242626"/><circle cx="128" cy="128" r="19" fill="#f6eee0" stroke="#a08059" stroke-width="2"/><circle cx="182" cy="128" r="18" fill="#242626"/><circle cx="128" cy="182" r="18" fill="#242626"/>
+</svg>

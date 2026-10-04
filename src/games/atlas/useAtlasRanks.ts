@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-export type AtlasRankRow = { user_id: string; username: string | null; rating: number; matches_played: number; leaderboard_rank: number | null };
+export type AtlasRankRow = { user_id: string; username: string | null; rating: number; deviation:number; matches_played: number; leaderboard_rank: number | null };
 /** Rank positions are computed across all rated players before filtering by IDs. */
 export function useAtlasRanks(ids?: string[]) {
   const key = ids ? [...new Set(ids)].sort().join(",") : "all";

@@ -27,14 +27,14 @@ export function objectContact(p: Vec, radius: number, f: FoodObject, footprint =
 export function collideObjects(food: FoodObject[]) {
   const grid = new Map<string, FoodObject[]>();
   for (const f of food) {
-    if (f.stuck || f.spit || f.target || f.z > 8) continue;
+    if (f.citizen || f.driverId || f.leap || f.stuck || f.spit || f.target || f.z > 8) continue;
     const key = `${Math.floor(f.x / CELL)},${Math.floor(f.y / CELL)}`;
     const bucket = grid.get(key); if (bucket) bucket.push(f); else grid.set(key, [f]);
   }
   const seen = new Set<string>();
   for (const a of food) {
     const ai = FOOD[a.kind];
-    if (a.stuck || a.spit || a.target || a.z > 8 || Math.hypot(a.vx, a.vy) < 1) continue;
+    if (a.citizen || a.driverId || a.leap || a.stuck || a.spit || a.target || a.z > 8 || Math.hypot(a.vx, a.vy) < 1) continue;
     const reach = ai.radius + MAX_RADIUS;
     for (let x = Math.floor((a.x - reach) / CELL); x <= Math.floor((a.x + reach) / CELL); x++) {
       for (let y = Math.floor((a.y - reach) / CELL); y <= Math.floor((a.y + reach) / CELL); y++) {

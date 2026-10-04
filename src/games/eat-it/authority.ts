@@ -6,7 +6,7 @@ import { checkWinner, createGame, eliminate, fillBots, sanitizeInput, stepGame }
 import type { MapId, Room } from './types.ts';
 
 export function parseSettings(body: Record<string, unknown>): Room['settings'] {
-  if (body.map !== 'city' && body.map !== 'nature') throw new Error('Unknown map');
+  if (!['city', 'nature', 'candy', 'frozen'].includes(String(body.map))) throw new Error('Unknown map');
   if (typeof body.count !== 'number' || !Number.isInteger(body.count) || body.count < 2 || body.count > EAT.match.maxPlayers) throw new Error('Choose 2–8 players');
   const config = matchSettings({ matchDuration: body.matchDuration as number, plutoMultiplier: body.plutoMultiplier as number, plutoEnabled: body.plutoEnabled !== false, hellEnabled: body.hellEnabled !== false, animalsEnabled: body.animalsEnabled !== false, livesEnabled: body.livesEnabled !== false });
   return { map: body.map as MapId, count: body.count, matchDuration: config.matchDuration, plutoMultiplier: config.plutoMultiplier, plutoEnabled: config.plutoEnabled, hellEnabled: config.hellEnabled, animalsEnabled: config.animalsEnabled, livesEnabled: config.livesEnabled };
@@ -36,7 +36,7 @@ export function advanceRoom(room: Room, now: number): boolean {
 /** Mutates a private copy; the Edge Function commits with a version comparison. */
 export function applyRoomAction(room: Room, userId: string, name: string, body: Record<string, unknown>, now: number, seed: number, matchId: string): boolean {
   const op = body.op;
-  if (!['get', 'join', 'ready', 'start', 'input', 'leave', 'rematch', 'escape', 'respawn', 'growth', 'jump', 'strike'].includes(String(op))) throw new Error('Unknown operation');
+  if (!['get', 'join', 'ready', 'start', 'input', 'leave', 'rematch', 'escape', 'respawn', 'growth', 'jump', 'strike', 'shock'].includes(String(op))) throw new Error('Unknown operation');
   let member = room.players.find(p => p.id === userId);
   let changed = false;
   if (!member) {
@@ -52,7 +52,7 @@ export function applyRoomAction(room: Room, userId: string, name: string, body: 
   if (now !== member.lastSeen && (room.status === 'playing' || now - member.lastSeen >= EAT.network.lobbyPollMs * 3)) {
     member.lastSeen = now; changed = true;
   }
-  if (op === 'jump' || op === 'strike') {
+  if (op === 'jump' || op === 'strike' || op === 'shock') {
     const state = room.game_state, player = state?.players.find(p => p.id === userId);
     if (state && player && !member.departed && room.status === 'playing') changed = activateAbility(state, player, op) || changed;
   } else if (op === 'growth') {

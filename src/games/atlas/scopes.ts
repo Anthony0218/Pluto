@@ -1,4 +1,4 @@
-import { entitiesForScope } from "./engine.ts";
+import { entitiesForScope, normalizedContinent } from "./engine.ts";
 import type { Coordinates, GeographicEntity } from "./types.ts";
 
 export const FILL_SCOPES = ["World", "Europe", "Asia", "Africa", "North America", "South America", "Oceania"] as const;
@@ -7,7 +7,7 @@ export const isFillScope = (value: unknown): value is FillScope => FILL_SCOPES.i
 
 /** GeoNames files South America under "North America"; the UN subregion restores the everyday continent. */
 export function continentOf(entity: GeographicEntity): string {
-  return entity.subregion === "South America" ? "South America" : entity.continent;
+  return normalizedContinent(entity);
 }
 
 export function entitiesInFillScope(entities: GeographicEntity[], scope: FillScope): GeographicEntity[] {
@@ -25,6 +25,6 @@ export const SCOPE_FOCUS: Record<Exclude<FillScope, "World">, [Coordinates, Coor
   Africa: [[-26, -36], [58, 38]],
   "North America": [[-170, 6], [-52, 72]],
   "South America": [[-82, -56], [-34, 13]],
-  Oceania: [[110, -48], [180, 10]],
+  Oceania: [[110, -48], [210, 10]],
 };
 export const focusForScope = (scope: string): [Coordinates, Coordinates] | null => scope in SCOPE_FOCUS ? SCOPE_FOCUS[scope as keyof typeof SCOPE_FOCUS] : null;

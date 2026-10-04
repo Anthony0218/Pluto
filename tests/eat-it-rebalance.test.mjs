@@ -11,7 +11,7 @@ import { stepEncounter, QUEST } from '../src/games/eat-it/quests.ts';
 import { readFileSync } from 'node:fs';
 function scene(options={}) {
  const s=createGame('city',[{id:'a',name:'A'},{id:'b',name:'B'},{id:'c',name:'C'}],937,'balance',{mode:'solo',...options});
- s.food=[];s.powerups=[];s.nextFood=s.nextPower=s.nextPluto=1e9;
+ s.food=[];s.powerups=[];s.nextFactory=s.nextHumans=1e9;delete s.feast;s.nextFood=s.nextPower=s.nextPluto=1e9;
  s.players.forEach((p,i)=>Object.assign(p,{x:1100+i*600,y:800}));return s;
 }
 function pickup(s,kind,p=s.players[0]) { const item={id:s.nextId++,kind,x:p.x,y:p.y};s.powerups.push(item);collectPower(s,p,item);return item; }
@@ -55,7 +55,7 @@ test('food, buildings, Pluto, friendly food, neutral animals and player rewards 
  }
  const s=scene(),p=s.players[0];pickup(s,'multiplier');activateGrowth(s,p);foodReward(s,p,{...apple(p),rewardOwner:p.id,rewardMultiplier:3});assert.equal(p.stats.friendlyGrowth,30);
  const before=p.mass;eliminate(s,s.players[1],p);assert.ok(Math.abs(p.mass-before-36*.7*2)<1e-9);assert.equal(p.stats.collected.player,1);
- Object.assign(s.encounter.npc,{phase:'swallowing',targetId:p.id,until:s.time});const mass=p.mass;stepEncounter(s,1/30);assert.equal(p.mass-mass,16);
+ Object.assign(s.encounter.npc,{phase:'swallowing',targetId:p.id,until:s.time});const mass=p.mass;stepEncounter(s,1/30);assert.ok(Math.abs(p.mass-mass-160)<1e-9);
 });
 test('rare item weights, caps and cooldowns are deterministic, without initial rare items',()=>{
  const s=scene();assert.ok(!createGame('city',[{id:'a',name:'A'},{id:'b',name:'B'}],2).powerups.some(p=>['multiplier','divider'].includes(p.kind)));
@@ -87,7 +87,7 @@ test('bots use stored growth from visible opportunities with difficulty-specific
  pickup(s,'divider');assert.equal(p.growthModifier,.5);
 });
 test('removed items are absent and old snapshots safely discard obsolete state',()=>{
- assert.deepEqual(POWER_KINDS,['speed','shield','magnet','multiplier','divider','jump','strike']);
+ assert.deepEqual(POWER_KINDS,['speed','shield','magnet','multiplier','divider','jump','strike','shock']);
  const s=scene(),p=s.players[0];p.effects.size=100;p.effects.growth=100;s.powerups=[{id:77,kind:'size',x:p.x,y:p.y},{id:78,kind:'growth',x:p.x,y:p.y}];stepGame(s);
  assert.equal(s.powerups.length,0);assert.equal('size' in p.effects,false);assert.equal('growth' in p.effects,false);assert.equal(playerRadius(p,s.time),24);
 });
@@ -98,8 +98,8 @@ test('enlarged Hell floor fits the arena and keeps consistent double-radius char
  for(const p of s.players){assert.equal(playerRadius(p,s.time),48);assert.ok(safeGround(s,p,48));}
 });
 test('Hell speed spawns only on reachable intact floor away from hole; uses 15s',()=>{
- const s=scene();startHell(s);s.time=s.hell.readyAt;s.nextPower=0;spawnHellSpeed(s);assert.equal(s.powerups.length,1);
- const item=s.powerups[0];assert.ok(safeGround(s,item,15));assert.ok(Math.hypot(item.x-s.hell.blackHole.x,item.y-s.hell.blackHole.y)>EAT.hell.radius+120);
+ const s=scene();startHell(s);s.time=s.hell.readyAt;s.nextPower=0;s.nextRare={jump:s.time+24};spawnHellSpeed(s);assert.equal(s.powerups.length,1);
+ const item=s.powerups[0];assert.equal(item.kind,'speed');assert.ok(safeGround(s,item,15));assert.ok(Math.hypot(item.x-s.hell.blackHole.x,item.y-s.hell.blackHole.y)>EAT.hell.radius+120);
  collectPower(s,s.players[0],item);assert.equal(s.players[0].effects.speed,s.time+15);
  s.hell.cells.fill(-1);s.nextPower=0;spawnHellSpeed(s);assert.equal(s.powerups.length,0);
 });
@@ -118,16 +118,16 @@ test('locked sweeps cover all speed categories, rare curves, pauses and matching
   s.hell.cells.fill(0);b.progress=1;b.warnUntil=s.time;b.pausedUntil=0;b.pauseUsed=true;stepHell(s,1/30);
   categories.add(b.speedCategory);if(b.control)curves++;if(b.speedCategory==='extreme'){extremes++;assert.ok(b.warnUntil-s.time>=2);}
   assert.deepEqual(sweepPoint(b,0),b.from);assert.deepEqual(sweepPoint(b,1),b.destination);
-  const locked=JSON.stringify({from:b.from,destination:b.destination,control:b.control,speed:b.speed});
+  const sweep=b.sweep,locked=JSON.stringify({from:b.from,destination:b.destination,control:b.control,speed:b.speed});
   s.time=b.warnUntil;b.progress=.2;b.pauseUsed=false;
-  for(let j=0;j<20;j++){stepHell(s,1/30);s.time+=1/30;if(b.pausedUntil>s.time){pauses++;break;}if(b.progress>=.8)break;}
-  if(b.progress<.8)assert.equal(JSON.stringify({from:b.from,destination:b.destination,control:b.control,speed:b.speed}),locked);
+  for(let j=0;j<20;j++){stepHell(s,1/30);s.time+=1/30;if(b.pausedUntil>s.time){pauses++;break;}if(b.sweep!==sweep||b.progress>=.8)break;}
+  if(b.sweep===sweep&&b.progress<.8)assert.equal(JSON.stringify({from:b.from,destination:b.destination,control:b.control,speed:b.speed}),locked);
  }
  assert.equal(categories.size,4);assert.ok(curves>10&&curves<70);assert.ok(extremes>2&&extremes<35);assert.ok(pauses>0);
 });
 test('curved movement lies on preview and random pause holds dangerous floor position',()=>{
  const s=scene();startHell(s);s.time=s.hell.readyAt+5;s.phase='hell';const b=s.hell.blackHole;
- Object.assign(b,{from:cellCenter(0),destination:cellCenter(35),control:cellCenter(400),progress:.25,warnUntil:0,speed:300,pauseUsed:true,pausedUntil:s.time+1});Object.assign(b,sweepPoint(b,.25));
+ Object.assign(b,{from:cellCenter(0),destination:cellCenter(35),control:cellCenter(400),progress:.25,warnUntil:0,speed:300,pauseUsed:true,pausedUntil:s.time+1,harmless:false});Object.assign(b,sweepPoint(b,.25));
  const before={x:b.x,y:b.y};stepHell(s,1/30);assert.deepEqual({x:b.x,y:b.y},before);assert.ok(s.hell.cells.some(v=>v>0));
  s.time+=1;stepHell(s,1/30);assert.deepEqual({x:b.x,y:b.y},sweepPoint(b,b.progress));assert.equal(sweepPath(b).length,25);
 });
@@ -141,7 +141,7 @@ test('Hell bot decisions do not use hidden random generator or future pauses/eru
 });
 test('friendly food starts at the animal and falls into the mouth through ordinary reward events',()=>{
  const s=scene(),p=s.players[0],n=s.encounter.npc;Object.assign(n,{phase:'friendly',since:0,until:30,targetId:p.id,nextAction:0,x:p.x+65,y:p.y});s.encounter.completedBy=p.id;
- stepEncounter(s,1/30);assert.equal(p.mass,36);assert.ok(s.food[0].delivery);ticks(s,8);assert.ok(s.food[0].x>p.x);assert.equal(p.mass,36);ticks(s,50);assert.equal(p.mass,51);assert.equal(p.stats.collected.apple,1);
+ stepEncounter(s,1/30);assert.equal(p.mass,36);assert.ok(s.food[0].delivery);ticks(s,8);assert.ok(s.food[0].x>p.x);assert.equal(p.mass,36);ticks(s,50);assert.equal(p.mass,66);assert.equal(p.stats.collected.apple,1);
 });
 test('hostile animals attack at 5/10/15/20s, stun for 0.5s and never shrink the victim',()=>{
  assert.equal(QUEST.hostileDuration,20);assert.equal(QUEST.attackInterval,5);assert.equal(QUEST.stunDuration,.5);

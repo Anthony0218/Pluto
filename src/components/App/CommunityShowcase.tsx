@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Plus, Swords, Users } from "lucide-react";
+import { ArrowRight, Gamepad2, Plus, Swords, Users } from "lucide-react";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { ProfileAvatar } from "@/components/social/ProfileAvatarPicker";
 
@@ -32,7 +32,7 @@ export default function CommunityShowcase() {
       </div>
       {selected && <p className="mb-4 rounded-lg border border-indigo-300/20 bg-indigo-400/10 px-3 py-2 text-xs text-indigo-100" aria-live="polite">{ui("Choose a friend to chat or send a challenge.")} {selected} {ui("is selected.")}</p>}
       <div className="grid gap-2 sm:grid-cols-2">
-        <Link to="/games/chess/classic/multiplayer" className="flex items-center justify-between gap-2 rounded-xl bg-indigo-500 px-4 py-3 text-xs font-semibold text-white hover:bg-indigo-400"><span className="flex items-center gap-2"><Users size={19} />{ui("Find a match")}</span><ArrowRight size={16} /></Link>
+        <Link to="/games" className="flex items-center justify-between gap-2 rounded-xl bg-indigo-500 px-4 py-3 text-xs font-semibold text-white hover:bg-indigo-400"><span className="flex items-center gap-2"><Gamepad2 size={19} />{ui("See all games")}</span><ArrowRight size={16} /></Link>
         <Link to="/friends" className="flex items-center justify-between gap-2 rounded-xl border border-indigo-300/25 px-4 py-3 text-xs font-semibold text-indigo-100 hover:bg-white/5"><span className="flex items-center gap-2"><Swords size={19} />{ui("Challenge a friend")}</span><ArrowRight size={16} /></Link>
       </div>
       <Link to="/clans" className="mt-3 flex items-center justify-between rounded-xl border border-violet-300/25 bg-violet-400/10 px-4 py-3 text-sm font-bold text-violet-100 hover:bg-violet-400/20"><span className="flex items-center gap-2"><Users size={18} />{ui("Play with your clan")}</span><ArrowRight size={16} /></Link>

@@ -1,5 +1,6 @@
 import { W, H, GROUND, HUNT_SECONDS, BOSS_SECONDS, CAPTURE_SECONDS, GRASS, PERCH, BURROW_EXITS, QUESTIONS } from "./naturaData.ts";
 import type { Role, Mode, Vec, Game, Player, PlayMode } from "./naturaData.ts";
+import { randomStep, worldRandom } from './random.ts';
 
 const coverAt = (x: number) =>
   GRASS.findIndex((p) => x > p.x + 12 && x < p.x + p.width - 12);
@@ -8,7 +9,9 @@ const nearExit = (x: number) =>
 const clamp = (n: number, min: number, max: number) =>
   Math.max(min, Math.min(max, n));
 const distance = (a: Vec, b: Vec) => Math.hypot(a.x - b.x, a.y - b.y);
-export const initialGame = (mode: Mode = "solo", role: Role = "falcon"): Game => ({
+export const initialGame = (mode: Mode = "solo", role: Role = "falcon", seed = 1): Game => ({
+  randomState: seed >>> 0,
+  visualRandomState: (seed^0x9e3779b9)>>>0,
   phase: "ready",
   winner: null,
   reason: "",
@@ -25,6 +28,8 @@ export const initialGame = (mode: Mode = "solo", role: Role = "falcon"): Game =>
   bossTimer: BOSS_SECONDS,
   bossHits: 0,
   dive: 0,
+  diveWindup: 0,
+  lastSeenPrey: { x: 480, y: GROUND - 12 },
   attacks: 5,
   recovering: false,
   actionHeld: false,
@@ -63,20 +68,31 @@ function move(
   v.y = clamp(v.y + (dy / norm) * speed * dt, yMin, yMax);
 }
 function burst(g: Game, x: number, y: number, colors: string[]) {
+  const random=()=>{const [state,value]=randomStep(g.visualRandomState);g.visualRandomState=state;return value;};
   for (let i = 0; i < 17; i++) {
     const a = (i / 17) * Math.PI * 2,
-      s = 35 + Math.random() * 100;
+      s = 35 + random() * 100;
     g.particles.push({
       x,
       y,
       vx: Math.cos(a) * s,
       vy: Math.sin(a) * s - 30,
-      life: 0.5 + Math.random() * 0.5,
+      life: 0.5 + random() * 0.5,
       color: colors[i % colors.length],
     });
   }
 }
-export function update(g: Game, keys: Set<string>, dt: number, botDifficulty: "easy" | "normal" | "hard" = "normal") {
+/** Concealment is a simulation contract, shared by renderer and predator AI. */
+export const voleConcealed = (g: Game) => g.phase === "hunt" && (g.burrowTravel > 0 || coverAt(g.mouse.x) >= 0 && g.coverTime > 0);
+export function update(g: Game, keys: Set<string>, seconds: number, botDifficulty: "easy" | "normal" | "hard" = "normal") {
+  if (!Number.isFinite(seconds) || seconds <= 0) return;
+  let remaining = Math.min(seconds, 0.1);
+  while (remaining > 0.000001 && g.phase !== "ready" && g.phase !== "end") {
+    const dt = Math.min(remaining, 1 / 120); remaining -= dt;
+    stepMeadow(g, keys, dt, botDifficulty);
+  }
+}
+function stepMeadow(g: Game, keys: Set<string>, dt: number, botDifficulty: "easy" | "normal" | "hard" = "normal") {
   if (g.phase === "ready" || g.phase === "end") return;
   g.t += dt;
   g.particles = g.particles.filter((p) => p.life > 0);
@@ -99,7 +115,7 @@ export function update(g: Game, keys: Set<string>, dt: number, botDifficulty: "e
         g.reason = "Three successful hunts!";
       } else {
         g.phase = "hunt";
-        g.mouse = { x: 115 + Math.random() * 730, y: GROUND - 12 };
+        g.mouse = { x: 115 + worldRandom(g) * 730, y: GROUND - 12 };
         g.falcon.y = 105;
         g.recovering = false;
         g.invincible = 1.6;
@@ -138,7 +154,8 @@ export function update(g: Game, keys: Set<string>, dt: number, botDifficulty: "e
     g.mode === "duo"
       ? key(keys, "Enter")
       : g.role === "mouse" && key(keys, "Space");
-  const target = g.phase === "hunt" ? g.mouse : g.boss;
+  if (!voleConcealed(g)) g.lastSeenPrey = { ...g.mouse };
+  const target = g.phase === "hunt" ? g.lastSeenPrey : g.boss;
   let requestDive = falconAction && !g.actionHeld;
   g.actionHeld = falconAction;
   if (g.mode === "solo" && g.role === "mouse") {
@@ -148,8 +165,8 @@ export function update(g: Game, keys: Set<string>, dt: number, botDifficulty: "e
     if (!g.recovering && g.dive <= 0) {
       const dx = targetX - g.falcon.x, dy = targetY - g.falcon.y;
       const length = Math.hypot(dx, dy);
-      if (length > 2) move(g.falcon, dx, dy, Math.min(botDifficulty === "easy" ? 115 : botDifficulty === "hard" ? 205 : 160, length / dt), dt, 22, W - 22, 38, GROUND - 28);
-      requestDive = !recharge && Math.abs(target.x - g.falcon.x) < (botDifficulty === "easy" ? 34 : botDifficulty === "hard" ? 75 : 55) && (g.phase === "boss" || g.burrowTravel <= 0);
+      if (length > 2) move(g.falcon, dx, dy, Math.min(botDifficulty === "easy" ? 115 : botDifficulty === "hard" ? 205 : 140, length / dt), dt, 22, W - 22, 38, GROUND - 28);
+      requestDive = !recharge && Math.abs(target.x - g.falcon.x) < (botDifficulty === "easy" ? 34 : botDifficulty === "hard" ? 75 : 45) && (g.phase === "boss" || !voleConcealed(g));
     }
     g.falconFacing = Math.sign(targetX - g.falcon.x) || g.falconFacing;
   } else if (!g.recovering && g.dive <= 0) {
@@ -165,15 +182,19 @@ export function update(g: Game, keys: Set<string>, dt: number, botDifficulty: "e
     g.perchFocus = Math.min(2, g.perchFocus + dt);
     if (g.perchFocus >= 2) { g.attacks = 5; g.perchFocus = 0; }
   } else g.perchFocus = 0;
-  if (requestDive && !g.recovering && g.dive <= 0 && g.diveCooldown <= 0 && g.attacks > 0) {
+  if (requestDive && g.diveWindup === 0 && !g.recovering && g.dive <= 0 && g.diveCooldown <= 0 && g.attacks > 0) {
     g.attacks--;
-    g.dive = 0.8;
+    g.diveWindup = 0.14;
     g.diveCooldown = 1.4;
     burst(g, g.falcon.x, g.falcon.y, ["#ffe5a8", "#fff9d8"]);
   }
+  if (g.diveWindup > 0) {
+    g.diveWindup = Math.max(0, g.diveWindup - dt);
+    if (g.diveWindup === 0) g.dive = 0.58;
+  }
   if (g.dive > 0) {
     g.dive = Math.max(0, g.dive - dt);
-    g.falcon.y = clamp(g.falcon.y + 480 * dt, 38, GROUND - 28);
+    g.falcon.y = clamp(g.falcon.y + 680 * dt, 38, GROUND - 28);
     g.flightTrail.push({ ...g.falcon });
     if (g.flightTrail.length > 17) g.flightTrail.shift();
     if (g.dive === 0) g.recovering = true;
@@ -198,7 +219,7 @@ export function update(g: Game, keys: Set<string>, dt: number, botDifficulty: "e
         if (
           exit >= 0 &&
           g.burrowCooldown <= 0 &&
-          Math.abs(threat) < (botDifficulty === "easy" ? 100 : botDifficulty === "hard" ? 230 : 175) &&
+          Math.abs(threat) < (botDifficulty === "easy" ? 100 : botDifficulty === "hard" ? 230 : 140) &&
           g.falcon.y < 255
         ) {
           g.burrowTravel = 1.35;
@@ -226,7 +247,7 @@ export function update(g: Game, keys: Set<string>, dt: number, botDifficulty: "e
             g.mouse,
             flee,
             Math.sin(g.t * 2) * 0.22,
-            botDifficulty === "easy" ? 88 : botDifficulty === "hard" ? 152 : 122,
+            botDifficulty === "easy" ? 88 : botDifficulty === "hard" ? 152 : 108,
             dt,
             24,
             W - 24,
@@ -313,7 +334,7 @@ export function update(g: Game, keys: Set<string>, dt: number, botDifficulty: "e
       g.bossAttack = Math.max(0, g.bossAttack - dt);
       // A clearly telegraphed vertical column above the boss.
       if (
-        g.invincible <= 0 &&
+        g.invincible <= 0 && g.bossAttack <= 0.4 &&
         Math.abs(g.falcon.x - g.boss.x) < 46 &&
         g.falcon.y < g.boss.y + 26 &&
         g.falcon.y > g.boss.y - 205

@@ -1,3 +1,5 @@
+import { CANDY_MACHINES, FISH_POOLS } from './world.ts';
+import { characterEmotion } from './characters.ts';
 import { jumpHeight } from './abilities.ts';
 import { spitPose } from './choking.ts';
 import { burpAmount } from './expressions.ts';
@@ -10,8 +12,8 @@ import * as T from 'three';
 import { ui } from '../../i18n/ui';
 import { EAT, FOOD, playerRadius, cameraZoom } from './config.ts';
 import { clamp, obstaclesFor, zoneRadius } from './maps.ts';
-import { angleDelta, foodFits, eyeProportion, isChoking, MOUTH, mouthPosition } from './rules.ts';
-import { fallOffset, fallPose, objectHeight } from './falling.ts';
+import { angleDelta, foodFits, playerFits, canopyFits, eyeProportion, isChoking, MOUTH, mouthPosition } from './rules.ts';
+import { fallOffset, fallPose, objectHeight, tooLongToSwallow } from './falling.ts';
 import { ModelLibrary } from './models.ts';
 import { background, POWER_COLOR, POWER_SYMBOL } from './terrain.ts';
 import type { GameState, MapId, Player } from './types.ts';
@@ -53,6 +55,7 @@ export class ArenaRenderer {
   private scene = new T.Scene();
   private hellVisuals = new HellVisuals(this.scene);
   private ground: T.Mesh;
+  private landscape = new T.Group();
   // Far back along the tilt so a zoomed-out ortho view never clips the ground near the screen edges.
   private camera = new T.OrthographicCamera(-500, 500, 400, -400, 1, 9000);
   private library = new ModelLibrary();
@@ -72,6 +75,8 @@ export class ArenaRenderer {
   private props = new Map<number, T.Group>();
   private powers = new Map<number, T.Group>();
   private resources: (T.BufferGeometry | T.Material)[] = [];
+  private eyeGeometry = new T.SphereGeometry(1, 32, 24);
+  private eyelidGeometry = new T.SphereGeometry(1, 32, 20, 0, Math.PI * 2, 0, Math.PI * .45);
   private sun = new T.DirectionalLight('#fff2d6', 2.6);
   private focus = { x: EAT.match.width / 2, y: EAT.match.height / 2, zoom: 1.1, initialized: false };
   /** Player zoom (wheel, pinch, +/-) multiplies the size-based automatic zoom. */
@@ -114,13 +119,17 @@ export class ArenaRenderer {
     };
     const ground = this.ground = new T.Mesh(this.groundGeometry, this.groundMaterial);
     ground.rotation.x = -Math.PI / 2; ground.position.set(EAT.match.width / 2, 0, EAT.match.height / 2); ground.receiveShadow = true; this.scene.add(ground);
-    this.scenery(map);
+    this.scene.add(this.landscape); this.scenery(map);
     this.overlay.className = 'eat-3d-overlay'; this.overlay.setAttribute('aria-hidden', 'true');
     Object.assign(this.overlay.style, { position: 'absolute', inset: '0', width: '100%', height: '100%', pointerEvents: 'none' });
     canvas.insertAdjacentElement('afterend', this.overlay); this.ctx = this.overlay.getContext('2d')!;
     canvas.addEventListener('webglcontextlost', this.onLost); canvas.addEventListener('webglcontextrestored', this.onRestored);
   }
   private scenery(map: MapId) {
+    if(map==='candy')for(const at of CANDY_MACHINES){
+      const machine=this.library.prop('vendingMachine');machine.position.set(at.x,0,at.y);machine.rotation.y=at.x<2000?-Math.PI/2:Math.PI/2;this.landscape.add(machine);
+      const globe=new T.Group();this.library.part(globe,'ball','#ed91c9',0,140,0,35,35,35);this.library.part(globe,'ring','#fff0ce',0,145,0,35,35,6).rotation.x=Math.PI/2;globe.position.set(at.x,0,at.y);this.landscape.add(globe);
+    }
     for (const o of obstaclesFor(map)) {
       if (o.kind === 'water') continue;
       const kind = o.kind === 'stall' ? 'kiosk' : o.kind === 'planter' ? 'plantPot' : o.kind === 'rock' ? 'stone' : o.kind === 'crate' ? 'barrel' : o.kind === 'fountain' ? null : o.kind;
@@ -134,7 +143,7 @@ export class ArenaRenderer {
         this.library.part(group, 'cylinder', '#e0ddc6', 0, 34, 0, 12, 40, 12);
         this.library.part(group, 'ball', '#aee4e2', 0, 57, 0, 20, 7, 20);
       }
-      group.position.set(o.x + o.w / 2, 0, o.y + o.h / 2); this.scene.add(group);
+      group.position.set(o.x + o.w / 2, 0, o.y + o.h / 2); this.landscape.add(group);
     }
   }
   resize(width: number, height: number) {
@@ -148,12 +157,47 @@ export class ArenaRenderer {
     ring.rotation.x = -Math.PI / 2; ring.position.y = .035; group.add(ring); this.resources.push(ring.geometry);
     const wall = new T.Mesh(this.pitGeometry, this.pitMaterial); wall.scale.set(MOUTH.radius, 1, MOUTH.radius); wall.position.y = -325; group.add(wall);
     const bottom = new T.Mesh(this.bottomGeometry, this.bottomMaterial); bottom.rotation.x = -Math.PI / 2; bottom.position.y = -649; bottom.scale.setScalar(MOUTH.radius); group.add(bottom);
-    // Two small, asymmetric stalk eyes give the ring a custom creature identity.
+    // Two sparse jaw arcs: four upper fangs behind the eyes, three lower fangs.
+    // Gaps between the teeth and bare side arcs keep the opening readable.
+    const teeth=new T.Group();teeth.name='teeth';
+    const jaws = [
+      { name: 'upper', angle: Math.PI, offsets: [-.56, -.21, .21, .56] },
+      { name: 'lower', angle: 0, offsets: [-.48, 0, .48] },
+    ];
+    for(const jaw of jaws)for(const offset of jaw.offsets){
+      const a=jaw.angle+offset, length=Math.abs(offset)<.3 ? .25 : .22;
+      const tooth=this.library.part(teeth,'cone','#fff2d5',Math.cos(a)*.8,.065,Math.sin(a)*.8,.055,length,.085);
+      tooth.name=`${jaw.name}-fang`;
+      // Cone tips point inward; the broad bases overlap the colored rim.
+      tooth.rotation.z=Math.PI/2;tooth.rotation.y=-a;
+    }
+    group.add(teeth);
+    const outline=new T.Mesh(new T.TorusGeometry(.985,.018,8,64),this.library.material('#344757'));
+    outline.position.y=.008;outline.rotation.x=-Math.PI/2;group.add(outline);this.resources.push(outline.geometry);
+    // Smooth whites and surface-mounted pupils keep the eyes readable at every angle.
+    const emotion=p.emotion ?? characterEmotion(0,p.id);
+    const pupilSize = emotion === 'hungry' ? .46 : emotion === 'surprised' ? .28 : .38;
+    const pupilGeometry = new T.SphereGeometry(1.018, 32, 12, 0, Math.PI * 2, 0, Math.asin(pupilSize));
+    this.resources.push(pupilGeometry);
     for (const side of [-1, 1]) {
       const eye = new T.Group(); eye.name = 'eye'; eye.position.set(-r * .88, .14, side * .37);
-      this.library.part(eye, 'ball', '#fff7df', 0, 0, 0, 1, 1.25, 1);
-      this.library.part(eye, 'ball', '#253346', .25, 1.10, .12, .43, .18, .55);
-      this.library.part(eye, 'ball', '#ffffff', .36, 1.28, -.08, .13, .06, .15);
+      const white = new T.Mesh(this.eyeGeometry, this.library.material('#fffaf0'));
+      white.scale.set(1, 1.12, 1); white.castShadow = true; eye.add(white);
+      const surface = new T.Group(); surface.scale.y = 1.12; eye.add(surface);
+      const gaze = new T.Group(); gaze.name = 'gaze'; surface.add(gaze);
+      const pupil = new T.Mesh(pupilGeometry, this.library.material('#202b3a')); gaze.add(pupil);
+      const highlight = new T.Mesh(this.eyeGeometry, this.library.material('#ffffff'));
+      const glint = pupilSize * .32;
+      highlight.position.set(-glint, Math.sqrt(1 - glint * glint * 2) * 1.018, -glint);
+      highlight.scale.set(.075, .018, .075); gaze.add(highlight);
+      if (emotion === 'bored' || emotion === 'angry' || emotion === 'sad' || emotion === 'happy') {
+        // A curved shell follows the white instead of floating above it as a bar.
+        const lid = new T.Group(); lid.name = 'lid'; lid.scale.setScalar(1.035);
+        const cap = new T.Mesh(this.eyelidGeometry, this.library.material(p.color));
+        const direction = emotion === 'happy' ? new T.Vector3(1, .05, 0)
+          : new T.Vector3(-.9, emotion === 'bored' ? .7 : .5, side * (emotion === 'angry' ? -.32 : emotion === 'sad' ? .32 : 0));
+        cap.quaternion.setFromUnitVectors(UP, direction.normalize()); lid.add(cap); surface.add(lid);
+      }
       group.add(eye);
     }
     this.scene.add(group); return group;
@@ -172,10 +216,11 @@ export class ArenaRenderer {
       const c = this.ctx; c.setTransform(this.dpr, 0, 0, this.dpr, 0, 0); c.clearRect(0, 0, this.width, this.height);
       c.fillStyle = '#152531'; c.fillRect(0, this.height / 2 - 30, this.width, 60); c.fillStyle = '#fff'; c.font = '16px system-ui'; c.textAlign = 'center'; c.fillText(ui('Restoring 3D graphics…'), this.width / 2, this.height / 2); return;
     }
-    this.ground.visible = !state.hell; this.hellVisuals.draw(state);
+    this.ground.visible = !state.hell; this.landscape.visible = !state.hell; this.hellVisuals.draw(state);
     this.renderer.setClearColor(state.hell ? '#170e1c' : state.map === 'nature' ? '#819b77' : '#a8b7b3');
     const smooth = 1 - Math.exp(-Math.max(dt, .001) * EAT.camera.growthRate);
     const local = state.players.find(p => p.id === localId);
+
     const followed = local?.alive ? local : state.players.filter(p => p.alive).sort((a, b) => b.mass - a.mass)[0] ?? local;
     this.holes.forEach(h => h.set(0, 0, 0));
     state.players.forEach((p, i) => {
@@ -196,10 +241,14 @@ export class ArenaRenderer {
       for (const eye of v.group.children) if (eye.name === 'eye') {
         eye.scale.set(eyeProportion(v.radius), eyeProportion(v.radius) * (choking ? 1.4 : blackHole ? 1.25 + fear*.3 : 1 + burp*.18), eyeProportion(v.radius));
         const a = blackHole ? Math.atan2(blackHole.y-p.y,blackHole.x-p.x)-v.facing : 0;
-        eye.children[1].position.x = blackHole ? Math.cos(a)*.4 : .25;
-        eye.children[1].position.z = blackHole ? Math.sin(a)*.4 : .12;
-        eye.children[2].position.x = eye.children[1].position.x+.1;
-        eye.children[2].position.z = eye.children[1].position.z-.2;
+        const gaze = eye.getObjectByName('gaze')!;
+        const gx = blackHole ? Math.cos(a) * .38 : .22, gz = blackHole ? Math.sin(a) * .38 : 0;
+        const gy = Math.sqrt(1 - gx * gx - gz * gz);
+        this.axis.set(gx, gy, gz);
+        gaze.quaternion.setFromUnitVectors(UP, this.axis);
+        // Gameplay reactions temporarily open the lids; the assigned mood returns afterward.
+        const alarm=choking||nervous||fear>.35;
+        const lid = eye.getObjectByName('lid'); if (lid) lid.visible = !alarm;
       }
       const coughAge=state.time-(p.chokingUntil??-100), cough=(p.chokingUntil??0)>0 && coughAge>=0 && coughAge<.27 ? Math.sin(coughAge/.27*Math.PI) : 0;
       const rim = v.group.children[0], strike = p.ability?.kind==='strike' ? Math.sin(Math.min(1,(state.time-p.ability.startedAt)/EAT.powerups.strike.burstDuration)*Math.PI) : 0;
@@ -257,7 +306,7 @@ export class ArenaRenderer {
     const present = new Set<number>();
     for (const f of state.food) {
       present.add(f.id); let group = this.props.get(f.id);
-      if (!group) { group = this.library.prop(f.kind); this.props.set(f.id, group); this.scene.add(group); }
+      if (!group) { group = this.library.prop(f.kind, f.golden); this.props.set(f.id, group); this.scene.add(group); }
       let x = f.x, y = f.y, z = f.z;
       const owner = f.target ? state.players.find(p => p.id === f.target && p.alive) : undefined;
       this.yaw.setFromAxisAngle(UP, -f.rotation); group.quaternion.copy(this.yaw);
@@ -291,17 +340,30 @@ export class ArenaRenderer {
         this.axis.set(f.spit.destination.y-f.spit.origin.y,0,-(f.spit.destination.x-f.spit.origin.x)).normalize();
         this.tilt.setFromAxisAngle(this.axis,pose.tilt); group.quaternion.premultiply(this.tilt);
       }
+      if(f.leap&&!owner){
+        const t=clamp((state.time-f.leap.startedAt)/f.leap.duration,0,1),horizontal=Math.hypot(f.leap.to.x-f.leap.from.x,f.leap.to.y-f.leap.from.y)/f.leap.duration;
+        this.axis.set(-Math.sin(f.rotation),0,Math.cos(f.rotation));this.tilt.setFromAxisAngle(this.axis,Math.atan2(Math.cos(t*Math.PI)*100*Math.PI/f.leap.duration,horizontal));group.quaternion.premultiply(this.tilt);
+      }
+      if(f.kind==='fish'){const tail=group.getObjectByName('tail');if(tail)tail.rotation.y=Math.sin(state.time*14+f.id)*.18;}
       group.position.set(x, z, y);
       if (FOOD[f.kind].shape === 'pluto') group.traverse(child => { if (child instanceof T.Mesh && child.material instanceof T.MeshStandardMaterial && child.material.emissive.getHex() !== 0) child.material.emissiveIntensity = .5 + Math.sin(state.time * 2) * .12; });
-      group.visible = Math.abs(x - this.focus.x) < halfW + FOOD[f.kind].radius + 220 && Math.abs(y - this.focus.y) < groundHalfH + objectHeight(f.kind) + 220;
-      group.traverse(child => { if (child instanceof T.Mesh) child.castShadow = !owner; });
+      if (f.kind==='human') {const shirt=group.getObjectByName('shirt');if(shirt instanceof T.Mesh)shirt.material=this.library.material(['#5bbcca','#b392ef','#f18878','#eec65f'][f.id%4]);}
+      if (f.citizen) for (const child of group.children) { const swing=Math.sin(state.time*12+f.id)*.55; if(child.name.startsWith('leg'))child.rotation.z=swing*(child.name==='leg1'?1:-1);if(child.name.startsWith('arm'))child.rotation.z=swing*(child.name==='arm1'?-1:1); }
+      group.visible = !(f.citizen?.carId && !f.target) && Math.abs(x - this.focus.x) < halfW + FOOD[f.kind].radius + 48 && Math.abs(y - this.focus.y) < groundHalfH + objectHeight(f.kind) + 48;
+      // Shadow eligibility changes only on capture/release. Avoid traversing
+      // every mesh of every prop on every frame.
+      const castsShadow = !owner;
+      if (group.userData.castsShadow !== castsShadow) {
+        group.traverse(child => { if (child instanceof T.Mesh) child.castShadow = castsShadow; });
+        group.userData.castsShadow = castsShadow;
+      }
     }
     for (const [id, group] of this.props) if (!present.has(id)) { this.scene.remove(group); this.props.delete(id); }
     const powers = new Set(state.powerups.map(p => p.id));
     for (const [id, group] of this.powers) if (!powers.has(id)) { this.scene.remove(group); this.powers.delete(id); }
     for (const p of state.powerups) {
       let group = this.powers.get(p.id);
-      if (!group) { group = new T.Group(); this.powers.set(p.id, group); this.scene.add(group); }
+      if (!group) { group = this.library.power(p.kind); this.powers.set(p.id, group); this.scene.add(group); }
       const scale = powerVisual(followed ? playerRadius(followed, state.time) : 24).scale; group.scale.setScalar(scale);
       group.position.set(p.x, 23 * scale + Math.sin(state.time * 3 + p.id) * 4, p.y); group.rotation.y = state.time * .7;
     }
@@ -313,6 +375,11 @@ export class ArenaRenderer {
     const c = this.ctx; c.setTransform(this.dpr, 0, 0, this.dpr, 0, 0); c.clearRect(0, 0, this.width, this.height);
     c.textAlign = 'center';
     const local = state.players.find(p => p.id === localId);
+    for (const shot of state.shockShots ?? []) {
+      const at = this.project(shot.x,shot.y,24), behind = this.project(shot.x-shot.dx*30,shot.y-shot.dy*30,24);
+      c.save(); c.strokeStyle='#a9e5ff'; c.lineWidth=3; c.shadowColor='#55aaff'; c.shadowBlur=8;
+      c.beginPath(); c.moveTo(behind.x,behind.y); c.lineTo((behind.x+at.x)/2+4,(behind.y+at.y)/2-5); c.lineTo(at.x,at.y); c.stroke(); c.restore();
+    }
     for (const p of state.players) {
       if (!p.alive) continue;
       const v = this.visuals.get(p.id)!, ride = ridePose(state, p), screen = this.project(v.x, v.y - v.radius, p.escape && ride.mounted ? ride.altitude + ride.scale * 42 : 16+jumpHeight(p,state.time));
@@ -320,6 +387,7 @@ export class ArenaRenderer {
       const w = c.measureText(label).width + 18;
       c.fillStyle = '#24383cdd'; c.beginPath(); c.roundRect(screen.x - w / 2, screen.y - 20, w, 22, 7); c.fill();
       c.fillStyle = '#fff9e9'; c.fillText(label, screen.x, screen.y - 5);
+      if (state.time - (p.shockedAt ?? -10) < .6) notice(c, ui('Shocked')+' −20%', screen.x, screen.y-50, '#8ddaff',12);
       if ((p.stunnedUntil ?? 0) > state.time) { notice(c, ui('Stunned'), screen.x, screen.y-36, '#ffca72'); c.font='bold 20px system-ui'; c.fillStyle='#ffe8a4'; c.fillText('✦  ✧  ✦', screen.x+Math.sin(state.time*16)*5,screen.y-58); }
       if (isChoking(p, state.time)) notice(c, ui('Choking…'), screen.x + Math.sin(state.time*28)*1.5, screen.y - 33, '#ff885f');
       if(p.ability?.kind==='strike') {
@@ -342,9 +410,13 @@ export class ArenaRenderer {
         c.beginPath(); c.ellipse(position.x, position.y, edge.x - position.x, (edge.x - position.x) * Math.sin(TILT), 0, 0, Math.PI * 2); c.stroke();
       }
       if (local?.alive && p.id !== localId) {
-        const danger = playerRadius(p, state.time) >= playerRadius(local, state.time) * EAT.eating.playerEatRadiusRatio;
-        const edible = playerRadius(local, state.time) >= playerRadius(p, state.time) * EAT.eating.playerEatRadiusRatio;
-        if (danger || edible) { c.fillStyle = danger ? '#a84441' : '#496f4e'; c.font = 'bold 15px system-ui'; c.fillText(danger ? '!' : '↓', screen.x + w / 2 + 12, screen.y - 5); }
+        const danger = playerFits(p, local, state.time);
+        const edible = playerFits(local, p, state.time);
+        const nearby=Math.hypot(p.x-local.x,p.y-local.y)<playerRadius(local,state.time)+v.radius+140;
+        const tooBig=playerRadius(local,state.time)+1e-6<v.radius*EAT.eating.playerEatRadiusRatio;
+        if(nearby&&tooBig)notice(c,ui('Too big'),screen.x,screen.y+19,'#ffb28f',11);
+        else if (danger || edible) notice(c,ui(danger ? 'Danger' : 'Devourable'),screen.x,screen.y+19,danger?'#ff8f7d':'#c3ee75',11);
+        else if(p.effects.shield>state.time)notice(c,ui('Shield'),screen.x,screen.y+19,'#70cfff',11);
       }
       if (debug) {
         const at = this.project(v.x, v.y), edge = this.project(v.x + v.radius, v.y), radius = edge.x - at.x;
@@ -358,10 +430,28 @@ export class ArenaRenderer {
         c.fillStyle = '#263e36'; c.fillText(`${p.botState} · r≥${(v.radius * EAT.eating.playerEatRadiusRatio).toFixed(1)}`, screen.x, screen.y - 27);
       }
     }
-    if (local?.alive) for (const f of state.food) {
-      if (f.target || foodFits(local, f, state.time) || Math.hypot(f.x - local.x, f.y - local.y) > 135 + FOOD[f.kind].radius) continue;
-      const at = this.project(f.x, f.y, objectHeight(f.kind) + 12);
-      c.fillStyle = '#786d5d'; c.font = 'bold 12px system-ui'; c.fillText('+', at.x, at.y);
+    if (local?.alive) {
+      const nearby=state.food.filter(f=>!f.target&&!f.leap&&!f.citizen?.carId&&Math.hypot(f.x-local.x,f.y-local.y)<playerRadius(local,state.time)+FOOD[f.kind].radius+110)
+        .sort((a,b)=>Math.hypot(a.x-local.x,a.y-local.y)-Math.hypot(b.x-local.x,b.y-local.y));
+      let warnings=0;const placed: {x:number;y:number}[]=[];
+      for(const f of nearby){
+        const fits=foodFits(local,f,state.time),risk=fits&&(!canopyFits(local,f,state.time)||tooLongToSwallow(local,f.kind,state.time));
+        const factory=FOOD[f.kind].shape==='factory';
+        if(fits&&!risk&&!factory&&f.kind!=='human'&&f.rewardGrowth===undefined)continue;
+        const at=this.project(f.x,f.y,objectHeight(f.kind)+16);
+        if(at.x<0||at.x>this.width||at.y<0||at.y>this.height||placed.some(other=>Math.abs(other.x-at.x)<120&&Math.abs(other.y-at.y)<28))continue;
+        if(warnings++>=5)break;placed.push(at);
+        notice(c,ui(!fits?'Too big':risk?'Choke risk':factory?'Monster factory':f.kind==='human'?'Human':f.kind==='fish'?'Fish':'Coin')+(fits&&!risk?` +${f.rewardGrowth ?? FOOD[f.kind].growth}`:''),at.x,at.y,!fits?'#ffb28f':risk?'#ffd174':'#c3ee75',11);
+      }
+    }
+    if(state.phase==='normal'&&state.feast&&['candy','nature'].includes(state.map)){
+      const remaining=Math.max(0,Math.ceil(state.feast.nextAt-state.time));
+      for(const at of state.map==='candy'?CANDY_MACHINES:FISH_POOLS){
+        const screen=this.project(at.x,at.y,state.map==='candy'?180:18);
+        if(screen.x<0||screen.x>this.width||screen.y<80||screen.y>this.height-80)continue;
+        notice(c,ui(state.map==='candy'?'Next treats':'Fish jump')+` · ${remaining}s`,screen.x,screen.y,state.map==='candy'?'#ffd892':'#94e8e4',11);
+        if(state.map==='nature'&&remaining<=3){const pulse=12+(state.time*35)%40;c.strokeStyle='#ddffff';c.lineWidth=2;c.beginPath();c.ellipse(screen.x,screen.y+24,pulse,pulse*.5,0,0,Math.PI*2);c.stroke();}
+      }
     }
     const encounter = state.encounter;
     if (encounter && encounter.item.status === 'ground') {
@@ -439,6 +529,7 @@ export class ArenaRenderer {
     this.renderer.domElement.removeEventListener('webglcontextlost', this.onLost); this.renderer.domElement.removeEventListener('webglcontextrestored', this.onRestored);
     this.questVisuals.dispose(); this.hellVisuals.dispose();
     this.overlay.remove(); this.library.dispose(); this.resources.forEach(r => r.dispose());
+    this.eyeGeometry.dispose(); this.eyelidGeometry.dispose();
     this.groundTexture.dispose(); this.groundMaterial.dispose(); this.groundGeometry.dispose(); this.pitGeometry.dispose(); this.pitMaterial.dispose(); this.bottomGeometry.dispose(); this.bottomMaterial.dispose();
     this.sun.shadow.dispose(); this.renderer.dispose(); this.scene.clear(); this.visuals.clear(); this.props.clear(); this.powers.clear();
   }

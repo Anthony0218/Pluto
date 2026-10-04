@@ -10,7 +10,7 @@ import { SnapshotBuffer } from '../src/games/eat-it/presentation.ts';
 
 function scene(map='city') {
  const s=createGame(map,[{id:'a',name:'A'},{id:'b',name:'B'},{id:'c',name:'C'}],99,'quests',{livesEnabled:false});
- s.food=[];s.powerups=[];s.nextFood=1e6;s.nextPower=1e6;s.nextBig=1e9;
+ s.food=[];s.powerups=[];s.nextFactory=s.nextHumans=1e9;delete s.feast;s.nextFood=1e6;s.nextPower=1e6;s.nextBig=1e9;
  const p=s.players[0];Object.assign(p,{x:1000,y:1100,facing:0});
  Object.assign(s.players[1],{x:2800,y:2000});Object.assign(s.players[2],{x:2700,y:400});
  const e=s.encounter;e.shrine=null;Object.assign(e.npc,{x:1450,y:1100,phase:'idle',until:100});
@@ -71,8 +71,8 @@ for(const map of ['city','nature']) {
  });
  test(`${map}: handover is exclusive, rewards are discrete food and expire after 60 seconds`,()=>{
   const {s,p,e,n}=scene(map);help(s,p,e);assert.equal(n.until,60);assert.equal(e.completedBy,p.id);assert.equal(npcCanEnter(s,p),false);
-  advance(s,3.8);assert.equal(p.mass,36);advance(s,2);assert.equal(p.mass,51);assert.equal(n.feeds,1);assert.equal(p.foodEaten,1);
-  advance(s,54.3);assert.equal(n.phase,'leaving');assert.equal(n.feeds,14);assert.equal(p.foodEaten,14);assert.equal(p.mass,246);
+  advance(s,3.8);assert.equal(p.mass,36);advance(s,2);assert.equal(p.mass,66);assert.equal(n.feeds,1);assert.equal(p.foodEaten,1);
+  advance(s,54.3);assert.equal(n.phase,'leaving');assert.equal(n.feeds,14);assert.equal(p.foodEaten,14);assert.equal(p.mass,456);
   advance(s,2);assert.equal(n.feeds,14);assert.equal(n.targetId,null);
  });
  test(`${map}: ground NPC swallows, waits two seconds, emerges and attacks four times with half-second stuns then leaves`,()=>{

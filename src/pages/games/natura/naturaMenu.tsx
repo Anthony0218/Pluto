@@ -1,29 +1,54 @@
-import { lazy, Suspense, useState } from 'react';
-import { Bird, Bug, Fish, Waves, BookOpen, Play, ArrowLeft } from 'lucide-react';
+import { lazy, Suspense, useState, type CSSProperties } from 'react';
+import { ArrowLeft, ArrowUpRight, BookOpen, Compass, Globe, Leaf, Play, Repeat2, Users } from 'lucide-react';
 import { SCENARIOS, type ScenarioId, type GameResult, type PlayMode, type BotDifficulty } from '../../../games/natura/naturaData';
+import { STUDIES, difficultyLabel } from '../../../games/natura/studies';
 import DidYouKnow from '../../../components/natura/DidYouKnow';
+import FieldQuiz from '../../../components/natura/FieldQuiz';
+import HabitatIcon from '../../../components/natura/HabitatIcon';
 import '../../../components/natura/natura3d.css';
+import '../../../components/natura/fieldStation.css';
 const NaturaGame = lazy(() => import('../../../components/natura/NaturaGame'));
-const scenarios=[SCENARIOS.find(s=>s.id==='meadow')!,...SCENARIOS.filter(s=>s.id!=='meadow')];
-function Icon({id}:{id:ScenarioId}) { return id==='meadow'?<Bird/>:['flyingfish','archerfish'].includes(id)?<Fish/>:['cuttlefish','coconut','spermwhale'].includes(id)?<Waves/>:<Bug/>; }
+const NaturaOnline = lazy(() => import('../../../components/natura/NaturaOnline'));
+const NaturaHotseat = lazy(() => import('../../../components/natura/NaturaHotseat'));
+const order: ScenarioId[] = ['meadow', 'bolas', 'coconut', 'trapjaw', 'cuttlefish', 'jumpingspider', 'spermwhale', 'archerfish', 'flyingfish'];
+const scenarios = order.map(id => SCENARIOS.find(s => s.id === id)!);
 export default function NaturaMenu() {
-  const [mode,setMode]=useState<PlayMode>('ai'),[botDifficulty,setBotDifficulty]=useState<BotDifficulty>('normal'),[selected,setSelected]=useState<ScenarioId>('meadow');
-  const [stage,setStage]=useState<'menu'|'game'|'results'>('menu'),[round,setRound]=useState(1),[scores,setScores]=useState<[number,number]>([0,0]);
-  const [result,setResult]=useState<GameResult|null>(null),[quiz,setQuiz]=useState<ScenarioId|null>(null);
-  const scenario=SCENARIOS.find(s=>s.id===selected)!;
-  const finish=(r:GameResult)=>{setResult(r);if(r.winner!==null)setScores(s=>{const next:[number,number]=[...s];next[r.winner!]+=3;return next;});setStage('results');};
-  if(stage==='game')return <Suspense fallback={<div className="n3-loading">Opening the habitat…</div>}><NaturaGame key={`${selected}-${round}`} scenario={selected} mode={mode} botDifficulty={botDifficulty} round={round} onComplete={finish} onExit={()=>setStage('menu')}/></Suspense>;
-  return <div className="nm-page"><div className="nm-shell"><header className="nm-heading"><div><p className="nm-eyebrow">NATURA / PLAY & DISCOVER</p><h1>The world is your playground.</h1><p>Nine animal adventures. Step into a habitat and learn its ways.</p></div><div className="nm-score"><small>MATCH SCORE</small><b>{scores[0]} <span>:</span> {scores[1]}</b><button onClick={()=>{setScores([0,0]);setRound(1);}}>Reset match</button></div></header>
-    {stage==='results'?<section className="nm-results"><p className="nm-eyebrow">{scenario.title} / ROUND {round}</p><h2>{result?.winner===null?'An even match.':`${mode==='ai'?(result?.winner===0?'You win':'Your opponent wins'):`Player ${(result?.winner??0)+1} wins`}.`}</h2><p>{result?.detail}</p><p>{result?.winner===null?'No points for a draw.':'Winner earns 3 Natura points.'}</p><DidYouKnow scenario={selected}/><div className="nm-result-actions"><button className="nm-play" onClick={()=>{setRound(r=>r+1);setStage('game');}}>Play again</button><button onClick={()=>{setRound(r=>r+1);setStage('menu');}}><ArrowLeft size={17}/> Choose habitat</button></div></section>:<>
-      <div className="nm-menu-tools"><div><p className="nm-eyebrow">CHOOSE YOUR HABITAT</p><h2>Follow your instincts.</h2></div><div className="nm-mode" aria-label="Players"><button aria-pressed={mode==='ai'} onClick={()=>setMode('ai')}>Solo / vs AI</button><button aria-pressed={mode==='hotseat'} onClick={()=>setMode('hotseat')}>Local two players</button></div></div>
-      {mode==='ai'&&<div className="nm-bot-level" role="group" aria-label="Bot difficulty"><span>BOT DIFFICULTY</span>{(['easy','normal','hard'] as const).map(level=><button key={level} type="button" aria-pressed={botDifficulty===level} onClick={()=>setBotDifficulty(level)}>{level}</button>)}<small>For AI rivals; ocean survival stays solo.</small></div>}
-      <div className="nm-cards">{scenarios.map((s,i)=><article className={`nm-card nm-${s.id}`} key={s.id}><div className="nm-card-top"><span>{String(i+1).padStart(2,'0')} / 3D HABITAT</span><Icon id={s.id}/></div><small>{s.setting}</small><h2>{s.title}</h2><p>{s.id==='meadow'?'Five dives. One perch. A meadow full of hiding places.':s.id==='flyingfish'?'Three lanes between sea and sky. Read the opening and escape.':s.id==='trapjaw'?'Aim your jaws. Launch across ten forest courses.':s.id==='jumpingspider'?'Leap through three sprawling courses with silk at your side.':s.id==='spermwhale'?'Follow the echoes into the deep. Remember to come up for air.':s.behaviour}</p><div className="nm-card-actions"><button className="nm-play" onClick={()=>{setSelected(s.id);setStage('game');}}><Play size={16}/> Play</button><button onClick={()=>setQuiz(s.id)} aria-label={`Quiz: ${s.title}`}><BookOpen size={16}/> Quiz</button></div></article>)}</div><p className="nm-footnote">Real animal behaviour, playful rules. Find source-linked facts inside every habitat. Quizzes are optional and have their own score.</p>
-    </>}
-  </div>{quiz&&<Quiz key={quiz} id={quiz} close={()=>setQuiz(null)}/>}</div>;
-}
-function Quiz({id,close}:{id:ScenarioId;close:()=>void}) {
-  const scenario=SCENARIOS.find(s=>s.id===id)!;
-  const [index,setIndex]=useState(0),[answer,setAnswer]=useState<number|null>(null),[score,setScore]=useState(0);
-  const done=index>=scenario.questions.length,q=scenario.questions[index];
-  return <div className="nm-modal"><section className="nm-quiz" role="dialog" aria-modal="true" aria-label={`${scenario.title} quiz`}><button className="nm-close" onClick={close}>Close quiz</button><p className="nm-eyebrow">{scenario.title} / OPTIONAL QUIZ</p>{done?<><h2>{score} / {scenario.questions.length}</h2><p>Field notes complete. Your game score stays separate.</p><DidYouKnow scenario={id}/><button className="nm-play" onClick={close}>Back to habitats</button></>:<><small>Question {index+1} / {scenario.questions.length} · Score {score}</small><h2>{q.text}</h2><div className="nm-answers">{q.answers.map((a,i)=><button key={a} disabled={answer!==null} className={answer!==null&&i===q.correct?'correct':answer===i?'incorrect':''} onClick={()=>{setAnswer(i);if(i===q.correct)setScore(s=>s+1);}}>{a}</button>)}</div>{answer!==null&&<div role="status"><p><b>{answer===q.correct?'Correct.':'Not quite.'}</b> {q.explanation}</p><button className="nm-play" onClick={()=>{setIndex(n=>n+1);setAnswer(null);}}>{index===scenario.questions.length-1?'See quiz score':'Next question'}</button></div>}</>}</section></div>;
+  const [format,setFormat]=useState<'solo'|'local'|'online'|'alternating'>(()=>new URLSearchParams(location.search).has('naturaRoom')?'online':'solo');
+  const mode:PlayMode=format==='local'?'hotseat':'ai';
+  const [botDifficulty, setBotDifficulty] = useState<BotDifficulty>('normal');
+  const [selected, setSelected] = useState<ScenarioId>('meadow');
+  const [stage, setStage] = useState<'menu' | 'game' | 'results'>(()=>new URLSearchParams(location.search).has('naturaRoom')?'game':'menu');
+  const [round, setRound] = useState(1);
+  const [scores, setScores] = useState<[number, number]>([0, 0]);
+  const [result, setResult] = useState<GameResult | null>(null);
+  const [quiz, setQuiz] = useState<ScenarioId | null>(null);
+  const scenario = SCENARIOS.find(s => s.id === selected)!;
+  const study = STUDIES[selected];
+  const finish = (r: GameResult) => {
+    setResult(r);
+    if (r.winner !== null) setScores(previous => { const next: [number, number] = [...previous]; next[r.winner!] += 3; return next; });
+    setStage('results');
+  };
+  if (stage === 'game') return <Suspense fallback={<div className="n3-loading"><div><Compass size={36}/><p className="nm-eyebrow">NATURA / PREPARING YOUR STUDY</p><h2>{scenario.title}</h2><p>Opening the {study.habitat.toLowerCase()} habitat…</p></div></div>}>{format==='online'?<NaturaOnline scenario={selected} onExit={()=>setStage('menu')}/>:format==='alternating'?<NaturaHotseat scenario={selected} difficulty={botDifficulty} onExit={()=>setStage('menu')} onComplete={finish}/>:<NaturaGame key={`${selected}-${round}`} scenario={selected} mode={mode} botDifficulty={botDifficulty} round={round} onComplete={finish} onExit={() => setStage('menu')}/>}</Suspense>;
+  return <main className="nm-page">
+    <div className="nm-shell">
+      <header className="nm-masthead"><div className="nm-wordmark"><Leaf aria-hidden="true"/><span>Natura</span><small>FIELD STATION</small></div><span className="nm-collection-label">PLAY · OBSERVE · DISCOVER</span></header>
+      {stage === 'results' ? <section className="nm-results" style={{ '--habitat-accent': study.accent } as CSSProperties}>
+        <p className="nm-eyebrow">STUDY COMPLETE / ROUND {round}</p><HabitatIcon id={selected}/><h1>{result?.winner === null ? 'An even match.' : format === 'solo' ? result?.winner === 0 ? 'You win.' : result?.opponent==='ocean' ? 'The ocean wins.' : 'Your rival wins.' : `Player ${(result?.winner ?? 0) + 1} wins.`}</h1><h2>{scenario.title}</h2><p>{result?.detail}</p>
+        <div className="nm-assessment"><b>{scores[0]} : {scores[1]}</b><span>Match record<br/>{result?.winner === null ? 'A draw adds no points.' : 'Three match points awarded to the winner.'}</span></div>
+        <DidYouKnow scenario={selected}/><div className="nm-result-actions"><button className="nf-primary" onClick={() => { setRound(r => r + 1); setStage('game'); }}><Play size={17}/> Play again</button><button className="nf-button" onClick={() => { setRound(r => r + 1); setStage('menu'); }}><ArrowLeft size={17}/> Choose habitat</button><button className="nf-button" onClick={() => setQuiz(selected)}><BookOpen size={17}/> Field quiz</button></div>
+      </section> : <>
+        <section className="nm-heading"><div className="nm-hero-copy"><p className="nm-eyebrow">THE NATURAL WORLD, IN PLAY</p><h1>Follow your<br/><em>curiosity.</em></h1><p>Think like a hunter. Move like a spider.<br/>Explore nine living worlds, one discovery at a time.</p><a className="nm-collection-link" href="#natura-collection">Explore the collection <ArrowUpRight size={18}/></a></div><div className="nm-hero-art" aria-hidden="true"><div className="nm-orbit nm-orbit-one"/><div className="nm-orbit nm-orbit-two"/><Leaf className="nm-hero-leaf" strokeWidth={1}/><span className="nm-art-label">01 / THE ART OF ADAPTATION</span><span className="nm-art-cross">+</span><span className="nm-art-note">A world worth<br/>looking closer at.</span></div></section>
+        <section id="natura-collection" aria-labelledby="collection-title">
+          <div className="nm-menu-tools"><div><p className="nm-eyebrow">INTERACTIVE COLLECTION / 09 STUDIES</p><h2 id="collection-title">Choose a habitat.</h2></div><div className="nm-mode" role="group" aria-label="Play format"><button aria-pressed={format === 'solo'} onClick={() => setFormat('solo')}><Compass size={17}/> Single-player</button><button aria-pressed={format==='online'} onClick={()=>setFormat('online')}><Globe size={17}/> Online</button><button aria-pressed={format==='alternating'} onClick={()=>setFormat('alternating')}><Repeat2 size={17}/> Hotseat</button><button aria-pressed={format === 'local'} onClick={() => setFormat('local')}><Users size={17}/> Local two players</button></div></div>
+          <div className="nm-settings"><p>{format==='online'?'Play on separate devices. Create an invite-code room or join a friend.':format==='alternating'?'Take turns on one device, with matching seeds, courses and animal roles.':format === 'solo' ? 'Play against an animal rival, or the ocean in survival studies.' : 'Simultaneous shared-screen play. Player 1 uses WASD; Player 2 uses arrows. Touch controls included.'}</p>{format!=='online'&&format!=='local' && <div className="nm-bot-level" role="group" aria-label="Bot difficulty"><span>AI RIVAL</span>{(['easy', 'normal', 'hard'] as const).map(level => <button key={level} aria-pressed={botDifficulty === level} onClick={() => setBotDifficulty(level)}>{difficultyLabel(level)}</button>)}</div>}</div>
+          <div className="nm-cards">{scenarios.map((s, index) => { const metadata = STUDIES[s.id]; return <article className="nm-card" key={s.id} style={{ '--habitat-accent': metadata.accent } as CSSProperties}>
+            <div className="nm-card-art" aria-hidden="true"><span className="nm-record">FIELD STUDY / {String(index + 1).padStart(2, '0')}</span><HabitatIcon id={s.id}/><span className="nm-art-scale">┃ ┃ ┃ ┃ ┃ ┃</span></div>
+            <div className="nm-card-copy"><small className="nm-eyebrow">{metadata.category}</small><h3>{s.title}</h3><p className="nm-habitat">{metadata.habitat} · {metadata.subjects}</p><p>{metadata.summary}</p><div className="nm-card-meta"><span>{metadata.difficulty}</span><span>1–2 players</span></div><div className="nm-card-actions"><button className="nf-primary" onClick={() => { setSelected(s.id); setStage('game'); }} aria-label={`Play ${s.title}`}><Play size={15}/> Play</button><button className="nf-button" onClick={() => setQuiz(s.id)} aria-label={`Quiz: ${s.title}`}><BookOpen size={16}/> Quiz</button></div></div>
+          </article>; })}</div>
+        </section>
+        <footer className="nm-footer"><div><Leaf size={20}/><p>Inspired by biology. Made for play.<br/><span>Game rules are simplified or fictional. Explore source-linked field notes in every habitat.</span></p></div><div className="nm-score"><small>MATCH RECORD</small><b>{scores[0]} <span>:</span> {scores[1]}</b><button onClick={() => { setScores([0, 0]); setRound(1); }}>Reset match</button></div></footer>
+      </>}
+    </div>{quiz && <FieldQuiz key={quiz} id={quiz} close={() => setQuiz(null)}/>}
+  </main>;
 }

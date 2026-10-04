@@ -19,6 +19,7 @@ export type Phase = "legen" | "intent" | "auction" | "declare" | "kontra" | "re"
 export type Result = {
   declarerPoints: number; opponentPoints: number; declarerWon: boolean;
   schneider: boolean; schwarz: boolean; laufende: number; value: number; deltas: number[]; team: number[];
+  ramschDoubleWinners?: number[];
 };
 export type RoundRecord = { round: number; dealer: number; names: string[]; contract: string; deltas: number[]; totals: number[]; price?: string };
 export type GameState = {
@@ -26,7 +27,7 @@ export type GameState = {
   names: string[]; hands: Card[][]; pendingHands: Card[][]; initialHands: Card[][]; totals: number[]; history: RoundRecord[];
   intents: number[]; declarations: number; incumbent: number; challengerIndex: number; bidLevel: number;
   contract: Contract | null; declarer: number; partner: number | null; partnerRevealed: boolean; escaped: boolean; forcedCaller: boolean; forcedCallerReason?: "eichel-ober" | "legen"; rules: GameRules;
-  trick: Play[]; tricks: Trick[]; points: number[]; multiplier: number; doublingVisits: number; spritzCount: number; lastSpritzTrick: number; legenDecisions: (boolean | null)[]; legenDeadline: number | null;
+  trick: Play[]; tricks: Trick[]; points: number[]; multiplier: number; doublingVisits: number; spritzCount: number; spritzSeats: number[]; lastSpritzTrick: number; legenDecisions: (boolean | null)[]; legenDeadline: number | null; turnDeadline: number | null;
   announcements: string[]; announcementTitles?: Record<number, string>; result: Result | null;
 };
 export type Action =
@@ -85,6 +86,8 @@ export function shuffledDeck(random: () => number = Math.random): Card[] {
   return deck;
 }
 export const LEGEN_DECISION_MILLISECONDS = 15_000;
+export const MULTIPLAYER_LEGEN_DECISION_MILLISECONDS = 20_000;
+export const MULTIPLAYER_TURN_MILLISECONDS = 60_000;
 
 export function createGame(names = ["Spieler 1", "Spieler 2", "Spieler 3", "Spieler 4"], dealer = 3, deck = shuffledDeck(), totals = [0, 0, 0, 0], round = 1, rules: GameRules = DEFAULT_GAME_RULES, history: RoundRecord[] = [], now = Date.now()): GameState {
   const ids = new Set(createDeck().map(card => card.id));
@@ -95,7 +98,7 @@ export function createGame(names = ["Spieler 1", "Spieler 2", "Spieler 3", "Spie
     phase: rules.legen ? "legen" : "intent", dealer, turn: next(dealer), round, revision: 0, names: [...names], hands: rules.legen ? hands.map(hand => hand.slice(0, 4)) : hands, pendingHands: rules.legen ? hands.map(hand => hand.slice(4)) : [[], [], [], []], initialHands: structuredClone(hands), totals: [...totals], history: structuredClone(history),
     intents: [], declarations: 0, incumbent: -1, challengerIndex: 1, bidLevel: 1,
     contract: null, declarer: -1, partner: null, partnerRevealed: false, escaped: false, forcedCaller: false, forcedCallerReason: undefined, rules: structuredClone(rules),
-    trick: [], tricks: [], points: [0, 0, 0, 0], multiplier: 1, doublingVisits: 0, spritzCount: 0, lastSpritzTrick: -1, legenDecisions: [null, null, null, null], legenDeadline: rules.legen ? now + LEGEN_DECISION_MILLISECONDS : null, announcements: [], announcementTitles: {}, result: null,
+    trick: [], tricks: [], points: [0, 0, 0, 0], multiplier: 1, doublingVisits: 0, spritzCount: 0, spritzSeats: [], lastSpritzTrick: -1, legenDecisions: [null, null, null, null], legenDeadline: rules.legen ? now + LEGEN_DECISION_MILLISECONDS : null, turnDeadline: null, announcements: [], announcementTitles: {}, result: null,
   };
 }
 export function contractLevel(c: Contract): number {
@@ -163,15 +166,15 @@ export function forcedCallsFor(hand: Card[], rules: GameRules = DEFAULT_GAME_RUL
   });
   return calls.length ? calls : contractsFor(hand, rules).filter(contract => contract.kind === "solo" && !contract.tout);
 }
-function hasEveryPlainSuitAce(hand: Card[]): boolean {
-  const plainSuits = (["Eichel", "Gras", "Schellen"] as Suit[]).filter(suit => hand.some(card => card.suit === suit && !isTrump(card, { kind: "rufspiel" })));
-  return plainSuits.every(suit => hand.some(card => card.suit === suit && card.rank === "Ass"));
-}
 function forcedContracts(state: GameState, seat: number): Contract[] {
   const hand = state.hands[seat];
-  // A player who knocked cannot call a partner when every held plain suit is protected by its ace.
-  // In that case the forced game is an individual game (Solo, Wenz, Farbwenz, …).
-  if (state.forcedCallerReason === "legen" && hasEveryPlainSuitAce(hand)) return contractsFor(hand, state.rules).filter(contract => contract.kind !== "rufspiel");
+  // A knock is binding after four passes, but it never limits the player to a
+  // partner game. They can still call a legal card or choose every available
+  // individual game (Solo, Wenz, Farbwenz, …).
+  if (state.forcedCallerReason === "legen") {
+    const individualGames = contractsFor(hand, state.rules).filter(contract => contract.kind !== "rufspiel");
+    return [...forcedCallsFor(hand, state.rules), ...individualGames];
+  }
   return forcedCallsFor(hand, state.rules);
 }
 const sameContract = (a: Contract, b: Contract) => a.kind === b.kind && a.suit === b.suit && Boolean(a.tout) === Boolean(b.tout) && (a.calledRank ?? "Ass") === (b.calledRank ?? "Ass");
@@ -230,7 +233,11 @@ export function scoreRound(state: GameState): Result {
   if (contract.kind === "ramsch") {
     const loser = state.points.indexOf(Math.max(...state.points));
     const value = rules.ramschValue * state.multiplier;
-    return { declarerPoints: state.points[loser], opponentPoints: 120 - state.points[loser], declarerWon: false, schneider: false, schwarz: false, laufende: 0, value, deltas: state.names.map((_, seat) => seat === loser ? -3 * value : value), team: [loser] };
+    const wonTricks = state.names.map((_, seat) => state.tricks.filter(trick => trick.winner === seat).length);
+    const ramschDoubleWinners = wonTricks.flatMap((tricks, seat) => tricks === 0 && seat !== loser ? [seat] : []);
+    const winnings = state.names.map((_, seat) => seat === loser ? 0 : value * (ramschDoubleWinners.includes(seat) ? 2 : 1));
+    const loss = winnings.reduce((sum, amount) => sum + amount, 0);
+    return { declarerPoints: state.points[loser], opponentPoints: 120 - state.points[loser], declarerWon: false, schneider: false, schwarz: false, laufende: 0, value, deltas: winnings.map((amount, seat) => seat === loser ? -loss : amount), team: [loser], ramschDoubleWinners };
   }
   const team = declarerTeam(state);
   const points = team.reduce((sum, seat) => sum + state.points[seat], 0);
@@ -261,7 +268,7 @@ export function scoreRound(state: GameState): Result {
 function priceBreakdown(state: GameState, result: Result): string {
   const contract = state.contract!;
   const rules = state.rules ?? DEFAULT_GAME_RULES;
-  if (contract.kind === "ramsch") return `Ramsch ${rules.ramschValue} ¢${state.multiplier > 1 ? ` × ${state.multiplier} (Klopfen/Spritzen)` : ""} = ${result.value} ¢`;
+  if (contract.kind === "ramsch") return `Ramsch ${rules.ramschValue} ¢${state.multiplier > 1 ? ` × ${state.multiplier} (Klopfen/Spritzen)` : ""}${result.ramschDoubleWinners?.length ? ` · Jungfrau ×2: ${result.ramschDoubleWinners.map(seat => state.names[seat]).join(", ")}` : ""} = ${result.value} ¢`;
   const base = contract.kind === "rufspiel" ? rules.rufspielValue : contract.kind === "wenz" ? rules.wenzValue : rules.soloValue;
   const baseName = contract.kind === "rufspiel" ? "Sauspiel" : contract.kind === "wenz" ? "Wenz" : "Einzelspiel";
   const parts = [`${baseName} ${base} ¢`];
@@ -405,6 +412,7 @@ export function applyAction(previous: GameState, seat: number, action: Action, r
       say(cleanPhrase(action.phrase) ?? (state.spritzCount === 0 ? "Kontra!" : "Re!"));
       state.multiplier *= 2;
       state.spritzCount = (state.spritzCount ?? 0) + 1;
+      if (!(state.spritzSeats ??= []).includes(seat)) state.spritzSeats.push(seat);
     }
     state.doublingVisits++;
     state.turn = next(seat);
@@ -420,10 +428,11 @@ export function applyAction(previous: GameState, seat: number, action: Action, r
     if (reason) throw new Error(reason);
     if (action.spritz) {
       if (!canDouble(state, seat)) throw new Error("Spritzen ist bei diesem Zug nicht möglich.");
-      say(cleanPhrase(action.phrase) ?? ["Kontra / Spritze!", "Re!", "Sub!", "Hirsch!"][state.spritzCount]);
+      say(cleanPhrase(action.phrase) ?? ["I geb a Spritzn!", "Re!", "Sub!", "Hirsch!"][state.spritzCount]);
       state.multiplier *= 2;
       state.lastSpritzTrick = state.tricks.length;
       state.spritzCount = (state.spritzCount ?? 0) + 1;
+      if (!(state.spritzSeats ??= []).includes(seat)) state.spritzSeats.push(seat);
     }
     const contract = state.contract!;
     if (contract.kind === "rufspiel" && seat === state.partner) {
@@ -466,7 +475,7 @@ export function viewFor(state: GameState, seat: number): GameView {
     partner: state.partnerRevealed || state.phase === "finished" || seat === state.partner ? state.partner : null,
     partnerRevealed: state.partnerRevealed, escaped: state.escaped, forcedCaller: state.forcedCaller ?? false, forcedCallerReason: state.forcedCallerReason, trick: state.trick,
     tricks: state.tricks, points: state.points, multiplier: state.multiplier, doublingVisits: state.doublingVisits,
-    spritzCount: state.spritzCount ?? 0, lastSpritzTrick: state.lastSpritzTrick ?? -1, legenDecisions: state.legenDecisions ?? [null, null, null, null], legenDeadline: state.legenDeadline ?? null,
+    spritzCount: state.spritzCount ?? 0, spritzSeats: state.spritzSeats ?? [], lastSpritzTrick: state.lastSpritzTrick ?? -1, legenDecisions: state.legenDecisions ?? [null, null, null, null], legenDeadline: state.legenDeadline ?? null, turnDeadline: state.turnDeadline ?? null,
     announcements: state.announcements, announcementTitles: state.announcementTitles ?? {}, result: state.result, seat, hand, counts: state.hands.map(h => h.length),
     legalCards: legalCards(state, seat).map(c => c.id),
     locks: Object.fromEntries(hand.flatMap(card => { const reason = cardLock(state, seat, card); return reason ? [[card.id, reason]] : []; })),

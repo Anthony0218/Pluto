@@ -18,9 +18,9 @@ export function botInput(state: GameState, bot: Player): Input {
   if (isChoking(bot, state.time)) return { x: 0, y: 0 };
   const policy = botPolicy(state);
   if (bot.storedGrowth) {
-    const meals = state.food.filter(f => !f.target && distance(f, bot) < 260 && foodFits(bot, f, state.time) && clearPath(state.map, bot, f));
+    const meals = state.food.filter(f => !f.target && !f.citizen?.carId && !f.leap && distance(f, bot) < 260 && foodFits(bot, f, state.time) && clearPath(state.map, bot, f));
     const friendly = state.encounter?.npc.phase === 'friendly' && state.encounter.npc.targetId === bot.id;
-    if (policy === BOT_POLICY.easy || meals.length >= (policy === BOT_POLICY.hard ? 5 : 2) || friendly || meals.some(f => FOOD[f.kind].growth >= 45)) activateGrowth(state, bot);
+    if (policy === BOT_POLICY.easy || meals.length >= (policy === BOT_POLICY.hard ? 5 : 2) || friendly || meals.some(f => (f.rewardGrowth ?? FOOD[f.kind].growth) >= 45)) activateGrowth(state, bot);
   }
   const r = playerRadius(bot, state.time), nearby = state.players.filter(p => p.alive && p.id !== bot.id && distance(p, bot) < EAT.bots.vision && clearPath(state.map, bot, p));
   const threats = nearby.filter(p => playerRadius(p, state.time) >= r * EAT.eating.playerEatRadiusRatio && bot.effects.shield <= state.time);
@@ -36,7 +36,7 @@ export function botInput(state: GameState, bot: Player): Input {
   } else {
     const edible = nearby.filter(p => playerFits(bot, p, state.time)).sort((a, b) => distance(a, bot) - distance(b, bot))[0];
     const power = state.powerups.filter(p => canStorePower(state,bot,p.kind) && (p.kind !== 'divider' || policy === BOT_POLICY.easy && (Math.floor(state.time / 5) + state.players.indexOf(bot)) % 3 === 0 || policy === BOT_POLICY.medium && distance(p, bot) < 30) && distance(p, bot) < policy.power && clearPath(state.map, bot, p, r)).sort((a, b) => distance(a, bot) - distance(b, bot))[0];
-    const food = state.food.filter(f => !f.target && canopyFits(bot, f, state.time) && foodFits(bot, f, state.time) && !tooLongToSwallow(bot, f.kind, state.time) && distance(f, bot) < EAT.bots.vision && clearPath(state.map, bot, f, r)).sort((a, b) => distance(a, bot) / FOOD[a.kind].growth ** policy.reward - distance(b, bot) / FOOD[b.kind].growth ** policy.reward)[0];
+    const food = state.food.filter(f => !f.target && !f.citizen?.carId && !f.leap && canopyFits(bot, f, state.time) && foodFits(bot, f, state.time) && !tooLongToSwallow(bot, f.kind, state.time) && distance(f, bot) < EAT.bots.vision && clearPath(state.map, bot, f, r)).sort((a, b) => distance(a, bot) / (a.rewardGrowth ?? FOOD[a.kind].growth) ** policy.reward - distance(b, bot) / (b.rewardGrowth ?? FOOD[b.kind].growth) ** policy.reward)[0];
     if (power && (power.kind === 'multiplier' || power.kind === 'shield' || !edible)) { bot.botState = 'POWERUP'; target = power; }
     else if (edible && distance(edible, bot) < EAT.bots.huntRange * policy.hunt) { bot.botState = 'HUNT'; target = { x: edible.x + edible.vx * policy.prediction, y: edible.y + edible.vy * policy.prediction }; }
     else if (food) { bot.botState = 'FORAGE'; target = food; }
@@ -48,7 +48,7 @@ export function botInput(state: GameState, bot: Player): Input {
   // Steer around solids using only visible geometry, with a stable side preference.
   const side = state.players.indexOf(bot) % 2 ? -1 : 1;
   // Props that would jam (too tall to tip in) are steered around like solid ones.
-  const blockers = state.food.filter(f => !f.target && distance(bot, f) < EAT.bots.vision &&
+  const blockers = state.food.filter(f => !f.target && !f.citizen?.carId && !f.leap && distance(bot, f) < EAT.bots.vision &&
     (!foodFits(bot, f, state.time) || tooLongToSwallow(bot, f.kind, state.time)));
   for (const offset of [0, side * 0.5, -side * 0.5, side, -side, side * 1.6, -side * 1.6, Math.PI]) {
     const angle = desired + offset, input = { x: Math.cos(angle), y: Math.sin(angle) };
@@ -65,6 +65,7 @@ export function botInput(state: GameState, bot: Player): Input {
     });
     if (!blocked && shrineClear(state, bot, ahead, r) && validPosition(state.map, ahead, r + 5) && clearPath(state.map, bot, ahead, r)) {
       const line = nearby.some(p=>playerFits(bot,p,state.time) && distance(p,bot)<r+EAT.powerups.strike.distance*(policy===BOT_POLICY.easy?1.6:policy===BOT_POLICY.medium?1.2:1) && Math.abs(angleDelta(angle,Math.atan2(p.y-bot.y,p.x-bot.x)))<(policy===BOT_POLICY.hard?.2:.4));
+      if ((bot.shockAmmo ?? 0) > 0 && nearby.some(p => distance(p,bot)<EAT.powerups.shock.range && Math.abs(angleDelta(angle,Math.atan2(p.y-bot.y,p.x-bot.x)))<.15)) { bot.input=input; activateAbility(state,bot,'shock'); }
       if(bot.storedStrike && (line || bot.botState==='FLEE' && policy===BOT_POLICY.hard)) {bot.input=input;activateAbility(state,bot,'strike');}
       return input;
     }

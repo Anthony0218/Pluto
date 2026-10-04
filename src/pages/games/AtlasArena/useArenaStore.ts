@@ -1,3 +1,4 @@
+import type { FillScope } from "../../../games/atlas/scopes";
 import { useCallback, useState } from "react";
 import { ArrowUpDown, Castle, Compass, Crosshair, Flag, Languages, LayoutGrid, Lightbulb, ListOrdered, Map as MapIcon, MapPin, Mountain, ScanSearch, Swords, Zap, type LucideIcon } from "lucide-react";
 import { bestKey, loadArenaStored, saveArenaStored, type ArenaStored } from "../../../games/atlas/arenaStorage";
@@ -21,8 +22,8 @@ export function useArenaStore() {
     saveArenaStored(next);
     return next;
   }), []);
-  const recordBest = useCallback((bestId: string, difficulty: AtlasDifficulty, score: number) => setStored((current) => {
-    const key = bestKey(bestId, difficulty);
+  const recordBest = useCallback((bestId: string, difficulty: AtlasDifficulty, score: number, scope?:FillScope) => setStored((current) => {
+    const key = bestKey(bestId, difficulty, scope);
     if (score <= (current.best[key] ?? 0)) return current;
     const next = { ...current, best: { ...current.best, [key]: score } };
     saveArenaStored(next);

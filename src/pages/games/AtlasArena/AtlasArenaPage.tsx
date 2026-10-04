@@ -1,3 +1,4 @@
+import { AtlasMastery } from "../../../components/atlas/AtlasMastery";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, BookOpen, Check, Globe2, Info, CircleHelp, Shuffle, Trophy, User, Users, Wifi, X } from "lucide-react";
@@ -26,7 +27,7 @@ export default function AtlasArenaPage() {
   const [selectedMode, setSelectedMode] = useState<ArenaModeDef | null>(null);
   const [rulesFor, setRulesFor] = useState<ArenaModeDef | null>(null);
   const [about, setAbout] = useState(false);
-  const [tab, setTab] = useState<"casual" | "ranked" | "modes">(() => searchParams.get("tab") === "ranked" ? "ranked" : searchParams.get("tab") === "modes" ? "modes" : "casual");
+  const [tab, setTab] = useState<"casual" | "ranked" | "modes" | "mastery">(() => searchParams.get("tab") === "mastery" ? "mastery" : searchParams.get("tab") === "ranked" ? "ranked" : searchParams.get("tab") === "modes" ? "modes" : "casual");
   const { difficulty } = stored;
   const launch = (mode: ArenaModeDef, how: Launch) => navigate(how === "online" ? `/games/atlas-arena/multiplayer?mode=${mode.online}` : `/games/atlas-arena/${how}/${mode.id}`);
 
@@ -39,7 +40,7 @@ export default function AtlasArenaPage() {
         <h1>Atlas <em>Arena</em></h1>
       </header>
       <nav className="atlas-tabs" aria-label="Atlas Arena tabs">
-        {(["casual", "ranked", "modes"] as const).map((item) => <button key={item} type="button" className={tab === item ? "active" : ""} aria-current={tab === item ? "page" : undefined} onClick={() => setTab(item)}>{item[0].toUpperCase() + item.slice(1)}</button>)}
+        {(["casual", "ranked", "modes", "mastery"] as const).map((item) => <button key={item} type="button" className={tab === item ? "active" : ""} aria-current={tab === item ? "page" : undefined} onClick={() => setTab(item)}>{item[0].toUpperCase() + item.slice(1)}</button>)}
       </nav>
       {tab === "casual" && <section className="atlas-play-home" aria-label="Casual Atlas Arena">
         <div className="atlas-play-intro"><span className="atlas-eyebrow">Your next expedition</span><h2>How do you want to play?</h2><p>Every Atlas mode is in the mix. Leave the choice to chance or pick your challenge.</p></div>
@@ -57,6 +58,7 @@ export default function AtlasArenaPage() {
         </div>
       </section>}
       {tab === "ranked" && <AtlasRankedTab />}
+      {tab === "mastery" && <AtlasMastery data={data}/>}
       {tab === "modes" && <>
       <div className="trials-difficulty" role="radiogroup" aria-label="Difficulty">
         {DIFFICULTIES.map((item) => (
@@ -67,7 +69,7 @@ export default function AtlasArenaPage() {
       </div>
       <section className="trials-mode-grid" aria-label="Atlas Arena modes">
         {ARENA_MODES.map((mode, index) => {
-          const Icon = MODE_ICONS[mode.id], best = stored.best[bestKey(mode.bestId, difficulty)];
+          const Icon = MODE_ICONS[mode.id], best = stored.best[bestKey(mode.bestId, difficulty, mode.id==="map-fill"?stored.settings.scope:undefined)];
           return (
             <article key={mode.id} className={`trials-mode-card atlas-hub-card trial-accent-${mode.accent}`} style={{ "--i": index } as CSSProperties} aria-labelledby={`mode-${mode.id}`}>
               <div className="atlas-hub-card-top">

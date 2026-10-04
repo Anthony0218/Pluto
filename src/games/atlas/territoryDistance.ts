@@ -45,15 +45,30 @@ function insideRing(point: Coordinates, ring: Coordinates[]): boolean {
   return inside;
 }
 
-/** Closest point of segment a–b to the pin, measured in a local equirectangular frame around the pin. */
+const vector = ([lng, lat]: Coordinates) => { const r = Math.PI / 180, c = Math.cos(lat * r); return [c * Math.cos(lng * r), c * Math.sin(lng * r), Math.sin(lat * r)]; };
+const dot = (a: number[], b: number[]) => a.reduce((sum, x, i) => sum + x * b[i], 0);
+const cross = (a: number[], b: number[]) => [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];
+const unit = (v: number[]) => { const length = Math.hypot(...v); return length > 1e-12 ? v.map(x => x / length) : null; };
+const coordinate = (v: number[]): Coordinates => [Math.atan2(v[1], v[0])*180/Math.PI, Math.atan2(v[2], Math.hypot(v[0], v[1]))*180/Math.PI];
+const angle = (a: number[], b: number[]) => Math.acos(Math.max(-1, Math.min(1, dot(a,b))));
+/** Project onto the shorter great-circle arc, including polar and dateline segments. */
 function nearestOnSegment(point: Coordinates, a: Coordinates, b: Coordinates): Coordinates {
-  const wrap = (longitude: number) => longitude - 360 * Math.round((longitude - point[0]) / 360);
-  const k = Math.cos(point[1] * Math.PI / 180);
-  const ax = wrap(a[0]) * k, ay = a[1], bx = wrap(b[0]) * k, by = b[1], px = point[0] * k, py = point[1];
-  const length = (bx - ax) ** 2 + (by - ay) ** 2;
-  const t = length ? Math.max(0, Math.min(1, ((px - ax) * (bx - ax) + (py - ay) * (by - ay)) / length)) : 0;
-  const longitude = (ax + t * (bx - ax)) / (k || 1);
-  return [((longitude + 540) % 360) - 180, ay + t * (by - ay)];
+  const p = vector(point), av = vector(a), bv = vector(b), normal = unit(cross(av,bv));
+  const endpoints = haversineKm(point,a) <= haversineKm(point,b) ? a : b;
+  if (!normal) return endpoints;
+  const projected = unit(p.map((x,i) => x - dot(p,normal)*normal[i]));
+  if (!projected) return endpoints;
+  for (const candidate of [projected, projected.map(x => -x)]) {
+    if (Math.abs(angle(av,candidate)+angle(candidate,bv)-angle(av,bv)) < 1e-7) return coordinate(candidate);
+  }
+  return endpoints;
+}
+export function pointAlongGreatCircle(a: Coordinates, b: Coordinates, distanceKm: number): Coordinates {
+  const av = vector(a), bv = vector(b), arc = angle(av,bv);
+  if (arc < 1e-12) return a;
+  const t = Math.min(1, Math.max(0, distanceKm / haversineKm(a,b)));
+  if (Math.abs(Math.sin(arc)) < 1e-10) return a;
+  return coordinate(av.map((x,i) => (x*Math.sin((1-t)*arc)+bv[i]*Math.sin(t*arc))/Math.sin(arc)));
 }
 
 /**
@@ -65,14 +80,12 @@ export function distanceToTerritory(pin: Coordinates, target: { geometryId: stri
   const polygons = target.geometryId ? shapes?.get(target.geometryId) : undefined;
   if (!polygons?.length) {
     if (!target.point) throw new Error("This round has no point target.");
-    const centerDistance = haversineKm(pin, target.point), radius = target.radiusKm ?? 0;
+    const centerDistance = haversineKm(pin, target.point), radius = target.radiusKm ?? 15;
     if (centerDistance <= radius) return { distanceKm: 0, nearest: pin };
     if (!radius) return { distanceKm: centerDistance, nearest: target.point };
     // The displayed distance line ends at the city target's edge, not its center.
-    const share = radius / centerDistance;
-    const wrappedLongitude = ((pin[0] - target.point[0] + 540) % 360) - 180;
-    const nearest: Coordinates = [((target.point[0] + wrappedLongitude * share + 540) % 360) - 180, target.point[1] + (pin[1] - target.point[1]) * share];
-    return { distanceKm: Math.max(0, haversineKm(pin, nearest)), nearest };
+    const nearest = pointAlongGreatCircle(target.point, pin, radius);
+    return { distanceKm: Math.max(0, centerDistance - radius), nearest };
   }
   // A ring inside the outer ring is a hole (lakes, enclaves such as Lesotho in South Africa).
   if (polygons.some(([outer, ...holes]) => insideRing(pin, outer) && !holes.some((hole) => insideRing(pin, hole)))) return { distanceKm: 0, nearest: pin };

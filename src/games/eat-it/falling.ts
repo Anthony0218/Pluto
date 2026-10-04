@@ -8,6 +8,12 @@ import type { FoodObject, Player } from './types.ts';
 export function objectHeight(kind: FoodKind): number {
   const f = FOOD[kind];
   switch (f.shape) {
+    case 'human': return 38;
+    case 'fish': return 14;
+    case 'candyLandmark': return f.height * (kind === 'giantCandy' ? .65 : .9);
+    case 'iceLandmark': return f.height * (kind === 'iceBlock' ? .7 : .95);
+    case 'forestLandmark': return f.height * (kind === 'giantMushroom' ? 1 : .75);
+    case 'factory': return f.height * (kind === 'factorySky' ? 1.6 : kind === 'factoryTower' ? 1.3 : .8) + f.underpassClearance * 1.15;
     case 'building': return f.height * (kind === 'skyscraper' ? 2.2 : kind === 'officeTower' ? 1.7 : kind === 'windmill' ? 1.55 : kind === 'apartment' ? 1.1 : kind === 'mansion' ? .85 : .75) + f.underpassClearance * 1.15;
     case 'lamp': return 96;
     case 'meter': return 44;
@@ -42,7 +48,7 @@ export function objectHeight(kind: FoodKind): number {
  * When that height is longer than the opening is wide, its top catches the far rim and
  * it bridges the hole instead of falling in. Trees use their own canopy rule. */
 export const tooLongToSwallow = (p: Player, kind: FoodKind, time = 0) =>
-  FOOD[kind].shape !== 'tree' && largeSwallow({ kind }) && objectHeight(kind) > mouthOpening(p, time);
+  !['tree', 'factory'].includes(FOOD[kind].shape) && largeSwallow({ kind }) && objectHeight(kind) > mouthOpening(p, time);
 /** Decided at capture (`fallWedge`); snapshots from before that field re-derive it. */
 export const jamsInMouth = (p: Player, f: FoodObject, time = 0) => f.fallLean !== undefined ? !!f.fallWedge : (f.fallTip ?? 0) > .1 && tooLongToSwallow(p, f.kind, time);
 /** Fall age (seconds) at which a too-long prop has leaned far enough to wedge against the far rim. */

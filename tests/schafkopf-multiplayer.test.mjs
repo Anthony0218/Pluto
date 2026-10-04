@@ -136,6 +136,9 @@ test("online Legen accepts independent decisions and gives each player their sec
   const room = await fullRoom(s);
   let state = (await s.request("user-0", { op: "start", code: room.code, version: room.version, rules: { ...engine.DEFAULT_GAME_RULES, legen: true } })).body;
   assert.equal(state.game.phase, "legen");
+  assert.ok(state.game.legenDeadline - Date.now() <= 20_000);
+  assert.ok(state.game.legenDeadline - Date.now() > 19_000);
+  assert.equal(state.game.turnDeadline, null);
   assert.equal(state.game.hand.length, 4);
   assert.equal(state.game.pendingHands, undefined);
   for (const seat of [2, 0, 3, 1]) {
@@ -150,7 +153,20 @@ test("online Legen accepts independent decisions and gives each player their sec
   assert.equal(state.game.multiplier, 4);
 });
 
-test("online Legen timeout passes undecided players after 15 seconds", async () => {
+test("online announcements and card turns receive a shared 60-second clock", async () => {
+  const s = server();
+  const room = await fullRoom(s);
+  const started = (await s.request("user-0", { op: "start", code: room.code, version: room.version, rules: { ...engine.DEFAULT_GAME_RULES, legen: false } })).body;
+  assert.equal(started.game.phase, "intent");
+  assert.ok(started.game.turnDeadline - Date.now() <= 60_000);
+  assert.ok(started.game.turnDeadline - Date.now() > 59_000);
+  const moved = (await s.request("user-0", { op: "action", code: room.code, version: started.version, action: { type: "intent", play: false } })).body;
+  assert.equal(moved.game.turn, 1);
+  assert.ok(moved.game.turnDeadline - Date.now() <= 60_000);
+  assert.ok(moved.game.turnDeadline - Date.now() > 59_000);
+});
+
+test("online Legen timeout passes undecided players after 20 seconds", async () => {
   const s = server();
   const room = await fullRoom(s);
   const started = await s.request("user-0", { op: "start", code: room.code, version: room.version, rules: { ...engine.DEFAULT_GAME_RULES, legen: true } });

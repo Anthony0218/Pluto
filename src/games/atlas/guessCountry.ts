@@ -1,5 +1,5 @@
 import { GUESS_SCORING } from "./config.ts";
-import { entitiesForDifficulty, entitiesForScope } from "./engine.ts";
+import { entitiesForDifficulty, entitiesForScope, normalizedContinent } from "./engine.ts";
 import { randomCountryHints } from "./countryHints.ts";
 import { seededRandom, shuffled } from "./random.ts";
 import type { AtlasDifficulty, AtlasExtras, GeographicEntity, GuessClue, GuessCountryQuestion } from "./types.ts";
@@ -9,7 +9,7 @@ export function countryClues(entity: GeographicEntity, extras: AtlasExtras, rand
   const summit = extras.highestPoints[entity.id];
   const clues: GuessClue[] = randomCountryHints({
     name: entity.shortName, otherNames: [entity.canonicalName, ...entity.aliases],
-    continent: entity.continent, subregion: entity.subregion,
+    continent: normalizedContinent(entity), subregion: entity.subregion,
     population: entity.population?.value, areaKm2: entity.areaKm2?.value, neighborCount: entity.neighbors.length,
     capital: entity.capitalCities[0] ?? null, capitalCoordinates: entity.capitalCoordinates,
     officialLanguages: entity.officialLanguages, currencies: entity.currencies,

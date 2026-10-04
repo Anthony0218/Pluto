@@ -32,7 +32,7 @@ has **no database tables**..
 
 ```bash
 git clone <repository-url>
-cd Swag
+cd swag2
 npm install
 cp .env.example .env
 ```

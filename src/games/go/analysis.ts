@@ -1,4 +1,4 @@
-import { applyGoMove, createInitialGoState, getGoGroup, isLegalGoMove, type GoMove, type GoState } from "./rules.ts";
+import { applyGoMove, createInitialGoState, getGoGroup, isLegalGoMove, toggleDeadGoGroup, type GoMove, type GoState } from "./rules.ts";
 
 export const GO_COLUMNS = "ABCDEFGHJKLMNOPQRST";
 export function goCoordinate(move: GoMove, size: number): string {
@@ -14,6 +14,19 @@ export function parseGoCoordinate(value: string, size: number): GoMove {
 export function replayGo(state: GoState): GoState[] {
   const frames = [createInitialGoState(state.boardSize, state.komi)];
   for (const move of state.moveHistory) frames.push(applyGoMove(frames.at(-1)!, move));
+  if (state.deadStones?.length) {
+    let final = frames.at(-1)!;
+    const seen = new Set<number>();
+    for (const index of state.deadStones) {
+      if (!Number.isInteger(index) || index < 0 || index >= final.board.length || !final.board[index]) throw new Error("Invalid dead stone marker");
+      if (seen.has(index)) continue;
+      const group = getGoGroup(final.board, final.boardSize, index);
+      if (![...group.stones].every(point => state.deadStones!.includes(point))) throw new Error("Incomplete dead group marker");
+      group.stones.forEach(point => seen.add(point));
+      final = toggleDeadGoGroup(final, index);
+    }
+    frames[frames.length - 1] = final;
+  }
   return frames;
 }
 export function capturedGoPoints(before: GoState, after: GoState): number[] {
@@ -43,8 +56,10 @@ export type GoAnalysis = {
 export function goPointLoss(before: GoAnalysis, after: GoAnalysis, player: "black" | "white") {
   return Math.max(0, (before.rootInfo.scoreLead - after.rootInfo.scoreLead) * (player === "black" ? 1 : -1));
 }
-export function goMoveQuality(loss: number): "Best" | "Excellent" | "Good" | "Inaccuracy" | "Mistake" | "Blunder" {
-  return loss < .5 ? "Best" : loss < 1 ? "Excellent" : loss < 2 ? "Good" : loss < 5 ? "Inaccuracy" : loss < 10 ? "Mistake" : "Blunder";
+export type GoMoveQuality = "AI Move" | "Good" | "Inaccuracy" | "Mistake" | "Blunder";
+/** Go review uses KataGo score loss; there is no universal rank-independent cutoff. */
+export function goMoveQuality(loss: number, matchesTopMove = false): GoMoveQuality {
+  return matchesTopMove ? "AI Move" : loss < 2 ? "Good" : loss < 5 ? "Inaccuracy" : loss < 10 ? "Mistake" : "Blunder";
 }
 export async function analyzeGo(state: GoState, signal?: AbortSignal): Promise<GoAnalysis> {
   const { analyzeInBrowser } = await import("./browserEngine");

@@ -1,6 +1,6 @@
 import { STAT_DEFINITIONS } from "./config.ts";
-import { entitiesForDifficulty, entitiesForScope } from "./engine.ts";
-import { seededRandom } from "./random.ts";
+import { entitiesForDifficulty, entitiesForScope, normalizedContinent } from "./engine.ts";
+import { seededRandom, shuffled } from "./random.ts";
 import type { AtlasDifficulty, AtlasExtras, AtlasStatKey, ComparableKind, GeographicEntity, HigherLowerQuestion } from "./types.ts";
 
 type StatValue = { value: number; year?: number; source: string; note?: string };
@@ -25,7 +25,7 @@ export function buildComparables(entities: GeographicEntity[], extras: AtlasExtr
     return point ? { value: point.elevationM, source: "Wikidata", note: point.name } : undefined;
   };
   const country = (entity: GeographicEntity): Comparable => ({
-    id: entity.id, label: entity.shortName, kind: "country", detail: entity.continent,
+    id: entity.id, label: entity.shortName, kind: "country", detail: normalizedContinent(entity),
     stats: {
       population: entity.population ? { value: entity.population.value, year: entity.population.year, source: entity.population.source } : undefined,
       areaKm2: entity.areaKm2 ? { value: entity.areaKm2.value, year: entity.areaKm2.year, source: entity.areaKm2.source } : undefined,
@@ -40,7 +40,7 @@ export function buildComparables(entities: GeographicEntity[], extras: AtlasExtr
     return [...groups].map(([name, members]) => {
       const peak = members.map((member) => ({ member, point: extras.highestPoints[member.id] })).filter((item) => item.point).sort((left, right) => right.point.elevationM - left.point.elevationM)[0];
       return {
-        id: `${kind}:${name}`, label: name, kind, detail: kind === "subregion" ? members[0].continent : undefined,
+        id: `${kind}:${name}`, label: name, kind, detail: kind === "subregion" ? normalizedContinent(members[0]) : undefined,
         stats: {
           population: { value: members.reduce((sum, member) => sum + (member.population?.value || 0), 0), source: "World Bank (sum of UN members)" },
           areaKm2: { value: members.reduce((sum, member) => sum + (member.areaKm2?.value || 0), 0), source: "World Bank (sum of UN members)" },
@@ -58,16 +58,10 @@ export function buildComparables(entities: GeographicEntity[], extras: AtlasExtr
   return [
     ...entitiesForDifficulty(countries, difficulty).map(country),
     ...cities,
-    ...group("continent", (entity) => entity.continent),
+    ...group("continent", normalizedContinent),
     ...group("subregion", (entity) => entity.subregion),
   ];
 }
-
-const pickWeighted = <T,>(items: [T, number][], random: () => number): T => {
-  let roll = random() * items.reduce((sum, [, weight]) => sum + weight, 0);
-  for (const [item, weight] of items) { roll -= weight; if (roll < 0) return item; }
-  return items[items.length - 1][0];
-};
 
 /**
  * Higher or Lower across countries, cities, continents and subregions. With `chain`, each answer's subject
@@ -81,13 +75,15 @@ export function generateComparisonQuestions(options: { entities: GeographicEntit
   const kindStats = (kind: ComparableKind) => KIND_STATS[kind].filter((key) => !options.stats || options.stats.includes(key));
   const kinds = KIND_WEIGHTS.filter(([kind]) => kindStats(kind).length > 0);
   if (!kinds.length) throw new Error("Select at least one comparison category.");
+  const schedule=shuffled(kinds.flatMap(([kind,weight])=>Array.from({length:Math.round(weight/10)},()=>kind)),random);
+  let kindIndex=0;
   let current: Comparable | null = null, stat: AtlasStatKey = "population", segment = 0;
   const recent: string[] = [];
   // Only five continents exist, so they are exempt from the no-repeat window.
   const fresh = (item: Comparable) => item.kind === "continent" || !recent.includes(item.id);
   for (let attempt = 0; questions.length < options.count && attempt < options.count * 40; attempt += 1) {
     if (!current || segment <= 0 || !options.chain) {
-      const kind = pickWeighted(kinds, random);
+      const kind = schedule[kindIndex++ % schedule.length];
       const stats = kindStats(kind);
       stat = stats[Math.floor(random() * stats.length)];
       const pool = items.filter((item) => item.kind === kind && item.stats[stat] && fresh(item));
@@ -99,7 +95,11 @@ export function generateComparisonQuestions(options: { entities: GeographicEntit
     const candidates = items.filter((item) => item.kind === reference.kind && item.id !== reference.id && fresh(item) && item.stats[stat]
       && Math.abs(item.stats[stat]!.value - value) >= gap * Math.max(Math.abs(item.stats[stat]!.value), Math.abs(value), 1));
     if (!candidates.length) { segment = 0; continue; }
-    const next = candidates[Math.floor(random() * candidates.length)];
+    const maxGap = options.difficulty === "expert" ? .35 : options.difficulty === "intermediate" ? .65 : 1;
+    const calibrated = candidates.filter(item => Math.abs(item.stats[stat]!.value - value) / Math.max(Math.abs(item.stats[stat]!.value), Math.abs(value), 1) <= maxGap);
+    if (options.difficulty === "expert" && !calibrated.length) { segment = 0; continue; }
+    const selection = calibrated.length ? calibrated : candidates;
+    const next = selection[Math.floor(random() * selection.length)];
     const first = reference.stats[stat]!, second = next.stats[stat]!;
     questions.push({
       id: `${options.seed}:compare:${questions.length}`, seed: options.seed, entityId: next.id,

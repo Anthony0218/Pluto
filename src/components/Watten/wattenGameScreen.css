@@ -131,6 +131,8 @@ body:has(.watten-game-screen) { overflow: hidden; }
   .watten-game-grid { grid-template-columns: minmax(0, 1fr) !important; }
   .watten-game-grid > aside:first-of-type { grid-column: 1; grid-row: 2; }
   .watten-game-grid > aside:last-of-type { grid-column: 1; grid-row: 3; }
+  .watten-single-grid > aside:first-of-type { grid-row: 3; }
+  .watten-single-grid > aside:last-of-type { grid-row: 2; }
   .watten-turn-notice { flex-direction: column; padding: .65rem; }
   .watten-single-seat { top: 25%; width: 110px; padding: 8px; }
   .watten-single-seat.is-left { left: 12px; }

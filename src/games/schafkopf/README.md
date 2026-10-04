@@ -21,7 +21,7 @@ Under Rulebook → Design, a player can choose the Ruf-Sau name, a grammatically
 
 ## Backend setup
 
-The multiplayer backend must be deployed to the same Supabase project used by `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`. From `Swag/`, with the CLI linked to your project:
+The multiplayer backend must be deployed to the same Supabase project used by `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`. From the repository root, with the CLI linked to your project:
 
 ```sh
 npx supabase db push

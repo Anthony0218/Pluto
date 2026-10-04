@@ -7,7 +7,7 @@ import { angleDelta, isChoking, mouthPosition, MOUTH, overFoodMouth } from './ru
 import { random, spawnPosition } from './spawn.ts';
 import type { Encounter, GameEvent, GameState, NpcPhase, Player, Vec } from './types.ts';
 
-export const QUEST = { alertRadius: 230, handReach: 42, handContact: 13, duration: EAT.escape.friendshipDuration, feedInterval: 4, attackInterval: 5, hostileDuration: 20, stunDuration: .5, shrineRadius: 66 } as const;
+export const QUEST = { pigeonGrowth: 80, catGrowth: 120, feedGrowth: 30, alertRadius: 230, handReach: 42, handContact: 13, duration: EAT.escape.friendshipDuration, feedInterval: 4, attackInterval: 5, hostileDuration: 20, stunDuration: .5, shrineRadius: 66 } as const;
 const neutral = (phase: NpcPhase) => ['idle', 'wandering', 'running', 'flying'].includes(phase);
 export const npcRadius = (e: Encounter) => (e.npc.kind === 'pigeon' ? 16 : 22) * (e.npc.scale ?? 1);
 function event(s: GameState, type: GameEvent['type'], p: Player) {
@@ -51,13 +51,13 @@ export function npcCanEnter(s: GameState, p: Player) {
 /** The shrine is the only fixed raised landmark. */
 export function resolveShrine(s: Pick<GameState, 'encounter'>, p: Vec, radius: number) {
   const shrine = s.encounter?.shrine;
-  if (!shrine) return;
+  if (!shrine || 'mass' in p) return;
   const d = distance(p, shrine), limit = radius + QUEST.shrineRadius;
   if (d < limit) { const nx = d > .001 ? (p.x - shrine.x) / d : 1, ny = d > .001 ? (p.y - shrine.y) / d : 0; p.x = shrine.x + nx * limit; p.y = shrine.y + ny * limit; }
 }
 export function shrineClear(s: GameState, a: Vec, b: Vec, radius = 0) {
   const shrine = s.encounter?.shrine;
-  if (!shrine) return true;
+  if (!shrine || 'mass' in a) return true;
   const dx = b.x - a.x, dy = b.y - a.y, t = clamp(((shrine.x - a.x) * dx + (shrine.y - a.y) * dy) / Math.max(.001, dx * dx + dy * dy), 0, 1);
   return distance(shrine, { x: a.x + dx * t, y: a.y + dy * t }) >= QUEST.shrineRadius + radius;
 }
@@ -145,7 +145,7 @@ export function stepEncounter(s: GameState, dt: number) {
   if (n.phase === 'swallowing' && target) {
     const m = mouthPosition(target, playerRadius(target, s.time)); n.x = m.x; n.y = m.y;
     if (s.time >= n.until) {
-      const reward = n.kind === 'pigeon' ? 8 : 12;
+      const reward = n.kind === 'pigeon' ? QUEST.pigeonGrowth : QUEST.catGrowth;
       grantGrowth(s, target, reward / Math.max(1, Math.sqrt(target.mass / 1800))); countCollected(target, n.kind);
       target.foodEaten++; target.score += reward * 5;
       phase(s, 'devoured', 2); event(s, 'food', target);
@@ -173,7 +173,7 @@ export function stepEncounter(s: GameState, dt: number) {
       if (n.phase === 'friendly') {
         if (s.food.length < EAT.food.maxObjects) {
           s.food.push({ x: n.x, y: n.y, id: s.nextId++, kind: 'apple', vx: 0, vy: 0, z: 38, vz: -35, rotation: 0,
-            target: null, capturedAt: 0, rewardMultiplier: 3, rewardOwner: target.id, delivery: { from: { x: n.x, y: n.y }, startedAt: s.time, duration: .65, height: n.kind === 'pigeon' ? 85 : 18 } });
+            target: null, capturedAt: 0, rewardGrowth: QUEST.feedGrowth, rewardOwner: target.id, delivery: { from: { x: n.x, y: n.y }, startedAt: s.time, duration: .65, height: n.kind === 'pigeon' ? 85 : 18 } });
           n.feeds++; const stats=target.stats??=newStats();stats.companionFeeds=(stats.companionFeeds??0)+1; event(s, 'npcFeed', target);
         }
         n.nextAction += QUEST.feedInterval;

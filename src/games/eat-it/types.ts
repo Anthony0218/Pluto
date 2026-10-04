@@ -1,27 +1,28 @@
 import type { FoodKind, PowerKind } from './config.ts';
-export type MapId = 'city' | 'nature';
+import type { CharacterEmotion } from './characters.ts';
+export type MapId = 'city' | 'nature' | 'candy' | 'frozen';
 export type Vec = { x: number; y: number };
 export type Input = Vec;
 export type BotState = 'FORAGE' | 'FLEE' | 'HUNT' | 'POWERUP' | 'REPOSITION';
 export type Player = Vec & {
-  id: string; name: string; bot: boolean; color: string; mass: number; vx: number; vy: number; facing: number;
-  storedJump?: boolean; storedStrike?: boolean; ability?: { kind: 'jump' | 'strike'; startedAt: number; endsAt: number; origin: Vec; direction: Vec; crossedGap?: boolean }; lastStrikeAt?: number; storedGrowth?: boolean; growthModifier?: number; stunnedUntil?: number; hellScale?: number; knockback?: Vec & { until: number };
+  id: string; name: string; bot: boolean; color: string; emotion?: CharacterEmotion; mass: number; vx: number; vy: number; facing: number;
+  shockAmmo?: number; nextShockAt?: number; shockedAt?: number; storedJump?: boolean; storedStrike?: boolean; ability?: { kind: 'jump' | 'strike'; startedAt: number; endsAt: number; origin: Vec; direction: Vec; crossedGap?: boolean }; lastStrikeAt?: number; storedGrowth?: boolean; growthModifier?: number; stunnedUntil?: number; hellScale?: number; knockback?: Vec & { until: number };
   shieldHitAt?: number; chokingUntil?: number; nextBurp?: number; burpAt?: number;
   lives?: number; respawnAt?: number; stats?: MatchStats; escape?: EscapeState; helper?: AnimalHelper; fallingAt?: number;
   alive: boolean; placement: number | null; eliminatedBy: string | null; eliminatedAt: number | null;
   score: number; foodEaten: number; playersEaten: number; powerupsCollected: number;
   effects: Record<PowerKind, number>; input: Input; botState: BotState; nextDecision: number;
 };
-export type FoodObject = Vec & { id: number; kind: FoodKind; vx: number; vy: number; z: number; vz: number; rotation: number; target: string | null; capturedAt: number; spawnedAt?: number; delivery?: { from: Vec; startedAt: number; duration: number; height: number }; rewardMultiplier?: number; rewardOwner?: string; availableAt?: number; stuck?: { playerId: string; since: number; until: number; age?: number }; spit?: { since: number; origin: Vec; destination: Vec; rotation: number; fromZ?: number; fromTilt?: number }; entryForward?: number; entrySide?: number; treeEntryDepth?: number; fallX?: number; fallY?: number; fallPivot?: number; fallTip?: number; fallOffsetX?: number; fallOffsetY?: number; fallRestX?: number; fallRestY?: number; fallLean?: number; fallWedge?: boolean; fallFar?: number; fallHole?: number };
+export type FoodObject = Vec & { id: number; kind: FoodKind; vx: number; vy: number; z: number; vz: number; rotation: number; target: string | null; capturedAt: number; spawnedAt?: number; expiresAt?: number; citizen?: { crowdId?: number; carId?: number; nextTurn: number; direction: number }; leap?: { from: Vec; to: Vec; startedAt: number; duration: number }; driverId?: number; delivery?: { from: Vec; startedAt: number; duration: number; height: number }; rewardGrowth?: number; golden?: boolean; rewardMultiplier?: number; rewardOwner?: string; availableAt?: number; stuck?: { playerId: string; since: number; until: number; age?: number }; spit?: { since: number; origin: Vec; destination: Vec; rotation: number; fromZ?: number; fromTilt?: number }; entryForward?: number; entrySide?: number; treeEntryDepth?: number; fallX?: number; fallY?: number; fallPivot?: number; fallTip?: number; fallOffsetX?: number; fallOffsetY?: number; fallRestX?: number; fallRestY?: number; fallLean?: number; fallWedge?: boolean; fallFar?: number; fallHole?: number };
 export type PowerObject = Vec & { id: number; kind: PowerKind };
-export type GameEvent = Vec & { id: number; at: number; amount?: number; status?: string; type: 'blackHoleEaten' | 'fireball' | 'jump' | 'strike' | 'growth' | 'growthActive' | 'eruption' | 'burp' | 'food' | 'eat' | 'power' | 'collision' | 'eliminated' | 'win' | 'choke' | 'questPickup' | 'questComplete' | 'npcFeed' | 'npcEmerge' | 'npcAttack' | 'escape' | 'hellAssist' | 'respawn' | 'hellStart' | 'sweep' | 'groundWarning' | 'groundDestroyed' | 'fall' | 'lava' | 'tie'; playerId: string; victimId?: string; food?: FoodKind; power?: PowerKind; radius?: number };
+export type GameEvent = Vec & { id: number; at: number; amount?: number; status?: string; type: 'blackHoleEaten' | 'fireball' | 'shock' | 'shockHit' | 'jump' | 'strike' | 'growth' | 'growthActive' | 'eruption' | 'burp' | 'food' | 'eat' | 'power' | 'collision' | 'eliminated' | 'win' | 'choke' | 'questPickup' | 'questComplete' | 'npcFeed' | 'npcEmerge' | 'npcAttack' | 'escape' | 'hellAssist' | 'respawn' | 'hellStart' | 'sweep' | 'groundWarning' | 'groundDestroyed' | 'fall' | 'lava' | 'tie'; playerId: string; victimId?: string; food?: FoodKind; power?: PowerKind; radius?: number };
 export type GameState = {
   id: string; map: MapId; rng: number; nextId: number; time: number; status: 'playing' | 'finished'; winnerId: string | null;
   players: Player[]; food: FoodObject[]; powerups: PowerObject[]; events: GameEvent[];
   encounter?: Encounter;
   settings?: MatchSettings; phase?: 'normal' | 'transition' | 'hell'; hell?: HellState; result?: 'winner' | 'tie' | 'loss'; tiedIds?: string[];
-  nextRare?: Partial<Record<'multiplier' | 'divider' | 'jump' | 'strike' | 'shield', number>>; timeline?: GameEvent[]; nextPluto?: number; spawnLocations?: Vec[];
-  nextFood: number; nextPower: number; spawnSector: number; bigTarget?: number; nextBig?: number;
+  nextRare?: Partial<Record<'multiplier' | 'divider' | 'jump' | 'strike' | 'shield' | 'shock', number>>; timeline?: GameEvent[]; nextPluto?: number; nextFactory?: number; nextHumans?: number; feast?: { nextAt: number; wave: number }; candyCoins?: { startAt: number; count: number; emitted: number; nextAt: number }; spawnLocations?: Vec[];
+  shockShots?: { id: number; ownerId: string; x: number; y: number; dx: number; dy: number; distance: number }[]; nextFood: number; nextPower: number; spawnSector: number; bigTarget?: number; nextBig?: number;
 };
 export type Obstacle = Vec & { w: number; h: number; kind: 'stall' | 'planter' | 'fountain' | 'bench' | 'tree' | 'rock' | 'water' | 'log' | 'crate' };
 export type Participant = { id: string; name: string; bot?: boolean };
@@ -39,7 +40,7 @@ export type Encounter = {
 
 export type AnimalKind = 'pigeon' | 'cat';
 export type AnimalHelper = { kind: AnimalKind; until: number; used: boolean; hell: boolean };
-export type EscapeState = { kind: AnimalKind; startedAt: number; endsAt: number; origin: Vec; animalOrigin: Vec; destination: Vec; path: Vec[]; pathIndex: number; hell: boolean; gapDistance: number; gapSince?: number; landing?: boolean };
+export type EscapeState = { kind: AnimalKind; startedAt: number; endsAt: number; origin: Vec; animalOrigin: Vec; destination: Vec; path: Vec[]; pathIndex: number; hell: boolean; gapDistance: number; gapSince?: number; landing?: boolean; landingSince?: number };
 export type BotDifficulty = 'easy' | 'medium' | 'hard';
 export type MatchSettings = { matchDuration: number; mode: 'solo' | 'multiplayer'; animalsEnabled: boolean; livesEnabled: boolean; botsEnabled: boolean; botDifficulty: BotDifficulty; hellEnabled: boolean; plutoEnabled: boolean; plutoMultiplier: number };
 export type MatchStats = { jumpUses?: number; gapJumps?: number; strikeUses?: number; strikeDevours?: number; companionSeconds?: number; companionFeeds?: number; vehicles?: number; collected?: Record<string, number>; totalGrowth?: number; growthActivations?: number; hostileAttacks?: number; maxMass: number; normalFinalMass: number; deaths: number; respawns: number; plutos: number; plutoBonus: number; pigeonQuest: boolean; catQuest: boolean; escapes: number; hellAssists: number; hellTime: number; hellCause: string | null; fellInLava: boolean; survivedHell: boolean; buildings: number; trees: number; chokes: number; friendlyGrowth: number; hostileLoss: number; fireballs?: number; blackHoles?: number };

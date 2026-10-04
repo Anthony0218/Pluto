@@ -31,6 +31,7 @@ export default function GoRules() {
   const target = lesson.blocked?.type === "place" ? lesson.blocked.row * 9 + lesson.blocked.col : lesson.target;
   return <main className="go-page">
     <header className="go-page-header"><Link to="/games/go"><ArrowLeft size={16} /> Go</Link><h1>Go rules</h1><span>Chinese area rules</span></header>
+    <div className="go-rules-intro"><strong>Goal: control more area than your opponent.</strong> Take turns placing stones on intersections. Surround empty points, protect your groups, and capture opposing stones by removing all their liberties. You may pass instead of placing a stone; two consecutive passes end the game. White receives 6.5 komi to offset Black’s first move.</div>
     <div className="go-lessons">
       <section>
         <nav className="go-tabs" aria-label="Rule topics">{goLessons.map((item, index) => <button key={item.id} aria-current={topic === index ? "page" : undefined} onClick={() => { setTopic(index); setStep(0); setPlaying(false); setFeedback(""); }}>{item.label}</button>)}</nav>

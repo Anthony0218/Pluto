@@ -1,160 +1,45 @@
-import { Link } from "react-router-dom";
+import { ui, useUiLanguage } from '@/i18n/ui';
+import InformationPage, { informationLink, informationPanel } from '@/components/App/InformationPage';
+import { engineCredits, atlasCredits, assetCredits, type CreditResource } from '@/data/credits';
+import atlasVersion from '../../../public/data/geography/version.json';
 
-type CreditItem = {
-  name: string;
-  category: string;
-  description: string;
-  license: string;
-  homepage: string;
-  source?: string;
-  note?: string;
-};
-
-const credits: CreditItem[] = [
-  {
-    name: "chess.js",
-    category: "Chess rules / move validation",
-    description:
-      "Used for legal move generation, game-state handling, FEN/PGN support and standard chess rule validation.",
-    license: "BSD-2-Clause",
-    homepage: "https://github.com/jhlywa/chess.js",
-    source: "https://github.com/jhlywa/chess.js/blob/master/LICENSE",
-  },
-  {
-    name: "Stockfish / stockfish.js",
-    category: "Chess engine",
-    description:
-      "Used for computer-opponent move calculation in chess AI modes.",
-    license: "GNU General Public License v3 (GPLv3)",
-    homepage: "https://stockfishchess.org/",
-    source: "https://github.com/nmrugg/stockfish.js/",
-    note: "When distributing Stockfish, keep the GPLv3 license available and provide the corresponding source code or an exact source pointer for the binary you distribute.",
-  },
-  {
-    name: "Free Stuff 1 - Chess Set",
-    category: "3D chess models",
-    description:
-      "Chess-piece models used in the 3D chess mode. Original model set created by Tinymen and distributed through CGTrader.",
-    license: "CGTrader Royalty Free License (no AI)",
-    homepage:
-      "https://www.cgtrader.com/free-3d-models/sports/game/free-stuff-1-chess-set",
-    source:
-      "https://help.cgtrader.com/hc/en-us/articles/360015124437-Royalty-Free-License",
-    note: "The model should remain incorporated into the game and should not be redistributed as a standalone downloadable model asset.",
-  },
-];
+function ResourceList({ title, resources }: { title: string; resources: CreditResource[] }) {
+  return <section aria-label={ui(title)}>
+    <h2 className="mb-4 px-1 text-xl font-black">{ui(title)}</h2>
+    <div className="grid gap-4">{resources.map(item => <article key={item.name} className={informationPanel}>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <h3 className="min-w-0 text-lg font-bold">{ui(item.name)}</h3>
+        <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs text-emerald-300">{ui(item.license)}</span>
+      </div>
+      <p className="mt-3 text-sm leading-7 text-zinc-400">{ui(item.description)}</p>
+      {item.detail && <p className="mt-2 break-all font-mono text-xs leading-6 text-zinc-500">{item.detail}</p>}
+      <div className="mt-4 flex flex-wrap gap-2">
+        <a href={item.homepage} target="_blank" rel="noreferrer" className={informationLink}>{ui('Source / project')} ↗</a>
+        {item.notices && <a href={item.notices} target="_blank" rel="noreferrer" className={informationLink}>{ui('License / notices')} ↗</a>}
+      </div>
+    </article>)}</div>
+  </section>;
+}
 
 export default function CreditsPage() {
-  return (
-    <main className="min-h-screen bg-transparent px-4 py-8 text-zinc-100 sm:px-6">
-      <div className="mx-auto max-w-5xl">
-        <header className="rounded-[28px] border border-white/10 bg-zinc-900/75 p-6 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-8">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-300">
-                About this project
-              </p>
-
-              <h1 className="mt-2 text-3xl font-black text-white sm:text-4xl">
-                Credits & References
-              </h1>
-
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-zinc-400">
-                This site combines original game code and interface work with
-                open-source software and licensed third-party assets. The
-                resources below are credited to their respective authors and
-                projects.
-              </p>
-            </div>
-
-            <Link
-              to="/"
-              className="inline-flex shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-black text-zinc-300 transition hover:bg-white/10 hover:text-white"
-            >
-              ← Back to home
-            </Link>
-          </div>
-        </header>
-
-        <section className="mt-6 grid gap-4">
-          {credits.map((item) => (
-            <article
-              key={item.name}
-              className="rounded-3xl border border-white/10 bg-zinc-900/65 p-6 shadow-lg shadow-black/10"
-            >
-              <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                <div className="min-w-0">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
-                    {item.category}
-                  </p>
-
-                  <h2 className="mt-1 text-xl font-black text-white">
-                    {item.name}
-                  </h2>
-
-                  <p className="mt-3 max-w-3xl text-sm leading-7 text-zinc-400">
-                    {item.description}
-                  </p>
-                </div>
-
-                <span className="w-fit shrink-0 rounded-full border border-emerald-400/20 bg-emerald-400/[0.07] px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-emerald-300">
-                  {item.license}
-                </span>
-              </div>
-
-              {item.note && (
-                <div className="mt-4 rounded-2xl border border-amber-400/15 bg-amber-400/[0.05] px-4 py-3 text-xs leading-6 text-amber-100/80">
-                  {item.note}
-                </div>
-              )}
-
-              <div className="mt-5 flex flex-wrap gap-2">
-                <a
-                  href={item.homepage}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-bold text-zinc-300 transition hover:bg-white/10 hover:text-white"
-                >
-                  Project page ↗
-                </a>
-
-                {item.source && (
-                  <a
-                    href={item.source}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-bold text-zinc-300 transition hover:bg-white/10 hover:text-white"
-                  >
-                    License / source ↗
-                  </a>
-                )}
-              </div>
-            </article>
-          ))}
-        </section>
-
-        <section className="mt-6 rounded-3xl border border-white/10 bg-zinc-900/60 p-6">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-300">
-            Project attribution
-          </p>
-
-          <h2 className="mt-2 text-xl font-black text-white">
-            Original site work
-          </h2>
-
-          <p className="mt-3 text-sm leading-7 text-zinc-400">
-            Game interfaces, chess variants, Watten gameplay, visual effects,
-            application structure and original site-specific logic are part of
-            this project except where third-party resources are explicitly
-            credited above.
-          </p>
-        </section>
-
-        <footer className="py-8 text-center text-[11px] text-zinc-600">
-          Credits and license information may be updated when dependencies or
-          assets change.
-        </footer>
-      </div>
-    </main>
-  );
+  useUiLanguage();
+  return <InformationPage title="Credits & references" intro="Thank you to the authors and communities behind the software, engines, datasets and assets used by Pluto.">
+    <section className={informationPanel}>
+      <h2 className="text-lg font-bold">{ui('Software licenses')}</h2>
+      <p className="mt-3 text-sm leading-7 text-zinc-400">{ui('Full license texts and copyright notices are available in their original language.')}</p>
+      <a href="/licenses/third-party-notices.txt" className={`${informationLink} mt-4`} download>{ui('Download third-party notices')}</a>
+    </section>
+    <ResourceList title="Chess & Go engines" resources={engineCredits} />
+    <section className={informationPanel}>
+      <h2 className="text-lg font-bold">Atlas Arena · {ui('Dataset')}</h2>
+      <p className="mt-3 text-sm leading-7 text-zinc-400">{ui('Atlas Arena uses a bundled snapshot. Source records are selected and normalized for quizzes; observation years remain attached to statistics. Multiplayer rooms pin their dataset version.')}</p>
+      <dl className="mt-4 flex flex-wrap gap-x-8 gap-y-3 text-sm">
+        <div><dt className="text-zinc-500">{ui('Dataset version')}</dt><dd className="mt-1 font-mono text-emerald-300">{atlasVersion.atlasDataVersion}</dd></div>
+        <div><dt className="text-zinc-500">{ui('Source snapshot (UTC)')}</dt><dd className="mt-1 font-mono text-zinc-300">{atlasVersion.synchronizedAt}</dd></div>
+      </dl>
+    </section>
+    <ResourceList title="Atlas Arena data sources" resources={atlasCredits} />
+    <ResourceList title="Assets & chess data" resources={assetCredits} />
+    <footer className="pb-8 text-center text-xs leading-6 text-zinc-500">{ui('Credits and notices are updated as dependencies, data and assets change.')}</footer>
+  </InformationPage>;
 }

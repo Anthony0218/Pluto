@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { applyGoMove, createInitialGoState, isLegalGoMove, scoreGo } from "../src/games/go/rules.ts";
+import { applyGoMove, createInitialGoState, isLegalGoMove, scoreGo, toggleDeadGoGroup } from "../src/games/go/rules.ts";
 import { capturedGoPoints, goAtariPoints, goCoordinate, goPointLoss, parseGoCoordinate, previewGoMove, replayGo } from "../src/games/go/analysis.ts";
 import { goLessons } from "../src/games/go/lessons.ts";
 import { browserGoRequest, browserGoResult } from "../src/games/go/browserProtocol.ts";
@@ -37,6 +37,18 @@ test("Replay reproduces captures, pass and resignation history", () => {
   for (const move of [{ type: "place", row: 0, col: 1 }, { type: "place", row: 0, col: 0 }, { type: "place", row: 1, col: 0 }, { type: "pass" }, { type: "resign" }]) state = applyGoMove(state, move);
   assert.deepEqual(replayGo(state).at(-1), state);
   assert.equal(replayGo(state)[3].captures.black, 1);
+});
+test("post-pass dead groups change area score and survive replay", () => {
+  let state = createInitialGoState();
+  state = applyGoMove(state, { type: "place", row: 0, col: 0 });
+  state = applyGoMove(state, { type: "place", row: 4, col: 4 });
+  state = applyGoMove(state, { type: "pass" });
+  state = applyGoMove(state, { type: "pass" });
+  const marked = toggleDeadGoGroup(state, 40);
+  assert.deepEqual(marked.deadStones, [40]);
+  assert.notDeepEqual(scoreGo(marked), scoreGo(state));
+  assert.deepEqual(replayGo(marked).at(-1), marked);
+  assert.deepEqual(toggleDeadGoGroup(marked, 40), { ...state, deadStones: [] });
 });
 test("Point loss uses black perspective for both players", () => {
   const before = { rootInfo: { scoreLead: 5 } }, after = { rootInfo: { scoreLead: 2 } };

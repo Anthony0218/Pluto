@@ -54,7 +54,7 @@ export class EatConnection {
     }
     if (room.status !== 'playing') this.onRoom(room);
   }
-  async escape(code: string, op: 'escape' | 'respawn' | 'growth' | 'jump' | 'strike' = 'escape') {
+  async escape(code: string, op: 'escape' | 'respawn' | 'growth' | 'jump' | 'strike' | 'shock' = 'escape') {
     try { const room = await roomAction({ op, code }, this.abort.signal); if (!this.stopped) this.accept(room); }
     catch (cause) { if (!this.stopped) this.onError(cause instanceof Error ? cause.message : 'Connection interrupted'); }
   }

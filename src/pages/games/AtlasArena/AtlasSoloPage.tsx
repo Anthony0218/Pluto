@@ -1,3 +1,4 @@
+import { AtlasTerritoryCampaign } from "../../../components/atlas/AtlasTerritoryCampaign";
 import { useCallback, useState } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, ChevronRight, Globe2, RotateCcw, SlidersHorizontal } from "lucide-react";
@@ -49,8 +50,8 @@ function ArenaSolo({ mode, data }: { mode: ArenaModeDef; data: AtlasDataset }) {
   const settings = stored.settings;
   const finish = useCallback((result: SoloSummary) => {
     setSummary(result); setPhase("result");
-    recordBest(mode.bestId, settings.difficulty, result.score);
-  }, [mode.bestId, recordBest, settings.difficulty]);
+    recordBest(mode.bestId, settings.difficulty, result.score, mode.id==="map-fill"?settings.scope:undefined);
+  }, [mode.bestId, mode.id, recordBest, settings.difficulty, settings.scope]);
   const start = () => { setSeed(freshSeed()); setSummary(null); setPhase("playing"); };
   const toHub = () => navigate("/games/atlas-arena");
   if (mode.solo.kind !== "arena") return null;
@@ -72,5 +73,6 @@ function ArenaSolo({ mode, data }: { mode: ArenaModeDef; data: AtlasDataset }) {
     {mode.options.length > 0 && <button type="button" className="atlas-secondary" onClick={() => setPhase("setup")}><SlidersHorizontal /> Settings</button>}
     <button type="button" className="atlas-secondary" onClick={toHub}>All modes</button>
   </>} />;
+  if (mode.solo.mode === "territory_battle") return <AtlasTerritoryCampaign key={seed} data={data} difficulty={settings.difficulty} seed={seed} onFinish={finish} onExit={toHub}/>;
   return <AtlasSoloGame key={seed} data={data} mode={mode.solo.mode} settings={settings} seed={seed} title={mode.title} onFinish={finish} onExit={() => mode.options.length ? setPhase("setup") : toHub()} />;
 }

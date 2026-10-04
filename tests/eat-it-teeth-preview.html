@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eat It · spaced fangs</title>
+<style>
+  body{margin:0;background:#192624;color:#eff5e6;font:14px system-ui}
+  nav{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:12px}
+  select{background:#eff5e6;border:0;border-radius:6px;padding:6px}
+  #arena{position:relative;height:calc(100vh - 122px)}
+  canvas{display:block;width:100%;height:100%}
+  p{margin:0 12px 10px;color:#c9d6cb;font-size:12px}
+</style>
+<nav><strong>Spaced fangs</strong>
+  <label>Size <select id="size"><option value="36">Small</option><option value="625" selected>Medium</option><option value="9000">Huge</option></select></label>
+  <label>Facing <select id="facing"><option value="1.5707963267948966">Forward</option><option value="0">Right</option><option value="3.141592653589793">Left</option><option value="-1.5707963267948966">Back</option></select></label>
+  <label>Mood <select id="emotion"><option>hungry</option><option>angry</option><option>sad</option><option>bored</option><option>happy</option><option>surprised</option></select></label>
+</nav>
+<p>4 upper / 3 lower · gaps between fangs · open side arcs</p>
+<div id="arena"><canvas></canvas></div>
+<script type="module">
+import { createGame } from '/src/games/eat-it/engine.ts';
+import { ArenaRenderer } from '/src/games/eat-it/renderer.ts';
+import { playerRadius, cameraZoom } from '/src/games/eat-it/config.ts';
+const canvas=document.querySelector('canvas'),size=document.querySelector('#size'),facing=document.querySelector('#facing'),emotion=document.querySelector('#emotion');
+const state=createGame('city',[{id:'a',name:'You'},{id:'b',name:'Bot'}],41,'teeth-preview',{mode:'solo',animalsEnabled:false,hellEnabled:false,livesEnabled:false});
+state.food=[];state.powerups=[];state.nextFood=state.nextFactory=state.nextHumans=state.nextPower=1e9;
+state.players[1].bot=true;
+function update(){
+  const mass=Number(size.value),r=playerRadius({...state.players[0],mass},0);
+  Object.assign(state.players[0],{x:2000-r*1.5,y:1500,mass,facing:Number(facing.value),emotion:emotion.value,color:'#c3ee75'});
+  Object.assign(state.players[1],{x:2000+r*1.5,y:1500,mass,facing:Number(facing.value),emotion:emotion.value,color:'#bd9ce9'});
+}
+update();
+let renderer=new ArenaRenderer(canvas,'city');
+function fitPreview(){
+  const p=state.players[0],width=canvas.clientWidth,height=canvas.clientHeight;
+  const target=Math.min(width*.38,height*.36)/(playerRadius(p,0)*cameraZoom(p.mass)*Math.min(1,width/700+.36));
+  renderer.zoomBy(target/renderer.zoomLevel);
+}
+size.onchange=facing.onchange=emotion.onchange=()=>{
+  update();renderer.dispose();renderer=new ArenaRenderer(canvas,'city');resize();
+};
+function resize(){renderer.resize(canvas.clientWidth,canvas.clientHeight);fitPreview()}
+window.addEventListener('resize',resize);resize();
+let last=performance.now();
+function frame(now){renderer.draw(state,'a',Math.min(.04,(now-last)/1000),'You',false);last=now;requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+</script>
+</html>

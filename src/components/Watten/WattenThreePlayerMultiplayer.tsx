@@ -35,9 +35,9 @@ import {
   mustFollowTrumpfOderKritisch,
   normalRankValue,
   WATTEN_CARD_CLIP,
-  wouldCardWin,
   type WattenCard,
 } from "../../utils/watten";
+import { getWattenHelpComparison } from "@/games/watten/help";
 
 import {
   translateWatten,
@@ -2415,20 +2415,11 @@ export function WattenThreePlayerMultiplayerGame() {
                         !game.farbe ||
                         isTrumpfOderKritischCard(card, game.farbe);
 
-                      const comparison =
-                        helpMode &&
-                        game.played_cards.length > 0 &&
-                        game.farbe &&
-                        game.schlag &&
-                        legal
-                          ? wouldCardWin(
-                              card,
-                              user.id,
-                              game.played_cards,
-                              game.farbe,
-                              game.schlag,
-                            )
-                          : null;
+                      const comparison = getWattenHelpComparison({
+                        card, hand, trick: game.played_cards, tricksWon: game.tricks_won,
+                        trump: game.farbe, schlag: game.schlag, playerId: user.id,
+                        active: helpMode && game.phase === "playing" && game.current_player === mySeat,
+                      });
 
                       return (
                         <div key={card.id} onMouseEnter={playHoverSound}>

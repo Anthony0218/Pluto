@@ -13,7 +13,7 @@ import { ModelLibrary } from '../src/games/eat-it/models.ts';
 import { reviewStats } from '../src/games/eat-it/review.ts';
 const make = (map = 'city', mode = 'solo') => {
  const s = createGame(map,[{id:'a',name:'A'},{id:'b',name:'B'},{id:'c',name:'C',bot:true}],543,'test',{mode,hellEnabled:true});
- s.food=[];s.powerups=[];s.nextFood=s.nextPower=s.nextPluto=1e6;
+ s.food=[];s.powerups=[];s.nextFactory=s.nextHumans=1e9;delete s.feast;s.nextFood=s.nextPower=s.nextPluto=1e6;
  s.players.forEach((p,i)=>Object.assign(p,{x:1000+i*600,y:1200,bot:false}));
  delete s.encounter;return s;
 };
@@ -29,24 +29,26 @@ for(const kind of ['car','house','garage','foodTruck'])test(`${kind}: underpass 
  p.mass=100;p.x=1000-FOOD[kind].width/2-42;p.input={x:1,y:0};assert.equal(canUnderpass(p,f,s.time),true);ticks(s,100);assert.ok(p.x>f.x+FOOD[kind].width/2);assert.equal(f.vx,0);
  p.mass=3000;p.x=1000;p.y=1200;p.input={x:0,y:0};p.vx=0;assert.ok(foodFits(p,f,s.time));ticks(s,75);assert.equal(p.foodEaten,1);
 });
-test('raised render geometry clears the small monster; solid logs have no clearance',()=>{
+test('raised geometry clears the small monster and ground-level logs also permit passage',()=>{
  const lib=new ModelLibrary();for(const kind of ['car','house']) {
   const model=lib.prop(kind),body=model.children[0];model.updateMatrixWorld(true);
   assert.ok(new T.Box3().setFromObject(body).min.y>25,kind);
   assert.equal(FOOD[kind].renderLayer,'raised');
  }
- const s=make(),p=s.players[0],f=prop(s,'treeTrunk');p.x=920;p.input={x:1,y:0};assert.equal(canUnderpass(p,f,0),false);ticks(s,30);assert.ok(p.x<960);lib.dispose();
+ const s=make(),p=s.players[0],f=prop(s,'treeTrunk');p.x=920;p.input={x:1,y:0};assert.equal(canUnderpass(p,f,0),true);ticks(s,50);assert.ok(p.x>1050);assert.equal(f.target,null);lib.dispose();
 });
-test('Pluto distribution and fixed always-on settings',()=>{
- const s=make();assert.equal(s.settings.plutoMultiplier,4);assert.equal(s.settings.plutoEnabled,true);
+test('legacy Pluto distribution stays readable but new rooms disable Pluto',()=>{
+ const s=make();assert.equal(s.settings.plutoMultiplier,4);assert.equal(s.settings.plutoEnabled,false);
  const counts={};for(let i=0;i<10000;i++){const k=choosePluto(s);counts[k]=(counts[k]??0)+1}
  assert.ok(counts.plutoTiny>5200&&counts.plutoTiny<5800);assert.ok(counts.plutoGiant<260&&counts.plutoGiant>140);
  // Client-supplied Pluto values are ignored: the bonus is no longer a room setting.
  assert.equal(parseSettings({map:'city',count:2,plutoMultiplier:99}).plutoMultiplier,4);
- assert.equal(parseSettings({map:'city',count:2,plutoMultiplier:1.25,plutoEnabled:false}).plutoEnabled,true);
+ assert.equal(parseSettings({map:'city',count:2,plutoMultiplier:1.25,plutoEnabled:false}).plutoEnabled,false);
 });
 for(const map of ['city','nature'])test(`${map}: Pluto spawn clearance and cap`,()=>{
  const s=createGame(map,fillBots([],8),99,'test',{mode:'solo'});
+ assert.equal(s.food.some(f=>FOOD[f.kind].shape==='pluto'),false);
+ s.settings.plutoEnabled=true; // Historical states can still render/replay their old objects.
  for(let i=0;i<100;i++)spawnPluto(s);
  const plutos=s.food.filter(f=>FOOD[f.kind].shape==='pluto');assert.ok(plutos.length>0&&plutos.length<=EAT.pluto.maxActive);
  for(const f of plutos){assert.ok(s.players.every(p=>Math.hypot(p.x-f.x,p.y-f.y)>playerRadius(p,0)+FOOD[f.kind].radius));assert.ok(!s.encounter.shrine||Math.hypot(f.x-s.encounter.shrine.x,f.y-s.encounter.shrine.y)>FOOD[f.kind].radius+135)}
@@ -94,7 +96,7 @@ test('expired or hostile NPCs cannot carry into Hell',()=>{
  for(const phase of ['hostile','devoured','gone','friendly']){const s=make();friendly(s);s.encounter.npc.phase=phase;if(phase==='friendly')s.encounter.npc.until=0;startHell(s);assert.equal(s.players[0].helper,undefined);assert.equal(s.encounter,undefined)}
 });
 test('black hole telegraphs, traverses, warns, destroys and never restores cells',()=>{
- const s=make();startHell(s);const b=s.hell.blackHole;s.time=s.hell.readyAt;b.x=cellCenter(0).x;b.y=cellCenter(0).y;b.destination=cellCenter(10);b.warnUntil=s.time+.2;
+ const s=make();startHell(s);const b=s.hell.blackHole;b.harmless=false;s.hell.blackHoles=[b];s.time=s.hell.readyAt;b.x=cellCenter(0).x;b.y=cellCenter(0).y;b.destination=cellCenter(10);b.warnUntil=s.time+.2;
  ticks(s,4);assert.ok(s.hell.cells.every(v=>v===0));ticks(s,5);assert.ok(s.hell.cells.some(v=>v>0));const i=s.hell.cells.findIndex(v=>v>0);assert.equal(cellPhase(s,i),'warning');ticks(s,20);assert.equal(cellPhase(s,i),'destroying');ticks(s,15);assert.equal(cellPhase(s,i),'destroyed');const destroyed=s.hell.cells.map((v,i)=>v<0?i:-1).filter(i=>i>=0);ticks(s,100);assert.ok(destroyed.every(i=>s.hell.cells[i]===-1));
 });
 test('unsupported characters visibly fall before lava death; same-tick final falls tie regardless of array order',()=>{
@@ -112,7 +114,7 @@ test('pigeon survives missing ground during flight; cat cannot cross an unlimite
 test('Hell bots use public safe geometry, and snapshots remain deterministic',()=>{
  const s=make();startHell(s);s.time=s.hell.readyAt;s.phase='hell';const p=s.players[0];const input=hellBotInput(s,p);assert.ok(supported(s,{x:p.x+input.x*50,y:p.y+input.y*50}));
  const clone=JSON.parse(JSON.stringify(s));ticks(s,200);ticks(clone,200);assert.deepEqual(s,clone);
- assert.ok(reviewStats(s,p).some(([key])=>key==='Pluto bonus growth'));
+ assert.ok(reviewStats(s,p).some(([key])=>key==='Monster factories eaten'));
 });
 test('server ignores client growth and Hell claims, and repeated escape cannot replay',()=>{
  const s=make('city','multiplayer'),p=friendly(s);s.settings.plutoMultiplier=3;

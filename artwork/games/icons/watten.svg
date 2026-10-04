@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Watten icon">
+ <rect width="256" height="256" rx="48" fill="#3e2e28"/>
+ <rect x="61" y="57" width="104" height="146" rx="12" transform="rotate(-13 61 57)" fill="#e8d9ba"/>
+ <rect x="98" y="47" width="104" height="146" rx="12" transform="rotate(10 98 47)" fill="#fff2db"/>
+ <path d="M144 84c-13 8-18 22-7 32-11 5-14 16-8 25 7 12 26 10 31-4 7 14 25 14 32 2 8-13 0-25-11-27 8-12 1-26-14-30-6 13-12 18-17 20-5-10-5-14-6-18z" fill="#e9b943"/>
+ <path d="M160 139v29" stroke="#7b562f" stroke-width="7" stroke-linecap="round"/>
+</svg>

@@ -5,7 +5,7 @@ const nature: Obstacle[] = [
   { x: 2560, y: 0, w: 190, h: 1040, kind: 'water' },
   { x: 2560, y: 1760, w: 190, h: 1280, kind: 'water' },
 ];
-export const obstaclesFor = (map: MapId): readonly Obstacle[] => map === 'city' ? [] : nature;
+export const obstaclesFor = (map: MapId): readonly Obstacle[] => map === 'nature' ? nature : [];
 export const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 export const distance = (a: Vec, b: Vec) => Math.hypot(a.x - b.x, a.y - b.y);
 export function circleHitsRect(p: Vec, radius: number, rect: Obstacle): boolean {

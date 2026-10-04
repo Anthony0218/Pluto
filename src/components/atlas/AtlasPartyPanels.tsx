@@ -5,7 +5,8 @@ import { ArrowDown, ArrowUp, Building2, Check, Globe2, Lightbulb, Map as MapIcon
 import { AtlasCountryShape } from "./AtlasCountryShape";
 import type { ChoiceQuestion, ComparableKind, GeographicEntity, GuessClue, HigherLowerQuestion } from "../../games/atlas/types";
 
-type WithoutAnswer<T> = T extends unknown ? Omit<T, "answer"> : never;
+type ChoiceDisplay = Pick<ChoiceQuestion,"choices"> & Partial<Pick<ChoiceQuestion,"promptShape"|"promptFlagAsset">>;
+type ComparisonDisplay = Pick<HigherLowerQuestion,"prompt"|"first"|"second"> & {stat:Omit<HigherLowerQuestion["stat"],"secondValue"> & {secondValue?:number}};
 
 /** Population reads best compact (8.1M); areas, heights and counts stay exact. */
 function formatStat(key: HigherLowerQuestion["stat"]["key"], value: number, unit: string) {
@@ -15,12 +16,12 @@ function formatStat(key: HigherLowerQuestion["stat"]["key"], value: number, unit
 }
 
 /** The flag to identify, or the lone country outline whose flag is asked for. */
-export function FlagPrompt({ question, topology }: { question: WithoutAnswer<ChoiceQuestion>; topology: unknown }) {
+export function FlagPrompt({ question, topology }: { question: ChoiceDisplay; topology: unknown }) {
   if (question.promptShape) return <AtlasCountryShape topology={topology} geometryId={question.promptShape.geometryId} label={question.promptShape.label} showLabel={false} />;
   return question.promptFlagAsset ? <img className="atlas-flag-hero" src={question.promptFlagAsset} alt="Flag to identify" /> : null;
 }
 
-export function FlagChoices({ question, disabled, selected, correctId, onAnswer }: { question: WithoutAnswer<ChoiceQuestion>; disabled: boolean; selected?: string | null; correctId?: string | null; onAnswer: (id: string) => void }) {
+export function FlagChoices({ question, disabled, selected, correctId, onAnswer }: { question: ChoiceDisplay; disabled: boolean; selected?: string | null; correctId?: string | null; onAnswer: (id: string) => void }) {
   const flags = question.choices.some((choice) => choice.flagAsset);
   return (
     <div className={`atlas-flag-choices ${flags ? "is-flags" : "is-names"}`}>
@@ -45,7 +46,7 @@ const kindLabel: Record<ComparableKind, string> = { country: "Country", city: "C
  * Two cards: the reference with its value, and the challenger whose value stays hidden until `revealed`.
  * `secondValue`/`note` may be absent in multiplayer snapshots, which hide them until the round resolves.
  */
-export function HigherLowerCards({ question, revealed, disabled, chosen, correct, onAnswer }: { question: Omit<HigherLowerQuestion, "answer"> | WithoutAnswer<HigherLowerQuestion>; revealed: boolean; disabled: boolean; chosen?: string | null; correct?: boolean | null; onAnswer: (answer: "higher" | "lower") => void }) {
+export function HigherLowerCards({ question, revealed, disabled, chosen, correct, onAnswer }: { question: ComparisonDisplay; revealed: boolean; disabled: boolean; chosen?: string | null; correct?: boolean | null; onAnswer: (answer: "higher" | "lower") => void }) {
   const { stat } = question, first = question.first, second = question.second;
   const counts = stat.key === "countryCount";
   return (

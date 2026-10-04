@@ -74,14 +74,18 @@ test('normal map: denser city, rare Shield, frequent Strike, heavier sky rain', 
     for (const f of s.food) if (!seen.has(f.id)) { seen.add(f.id); drops++; }
   }
   const kinds = Object.values(spawned), count = k => kinds.filter(x => x === k).length;
-  assert.ok(count('shield') <= 4, `shields ${count('shield')}`); assert.ok(count('strike') > count('shield'));
+  assert.ok(count('shield') <= 4, `shields ${count('shield')}`); // Sample eligible rolls across many cooldown windows, separately from a crowded
+  // map whose nine occupied pickup slots can legitimately skew a short run.
+  s.food=[];s.powerups=[];s.nextFood=s.nextFactory=s.nextBig=1e9;
+  const sampled={};for(let i=0;i<2000;i++){s.time=400+i*100;s.nextPower=0;s.nextRare={};s.powerups=[];updateSpawns(s);for(const p of s.powerups)sampled[p.kind]=(sampled[p.kind]??0)+1;}
+  assert.ok(sampled.strike>sampled.shield*3,JSON.stringify(sampled));
   assert.ok(s.powerups.length <= EAT.powerups.maxObjects);
   // Even with nobody eating (food at its cap), drops keep coming as old ones retire.
   assert.ok(drops > 600, `sky drops ${drops}`);
 });
 
-test('Pluto is always on with the fixed strong multiplier', () => {
+test('new matches disable Pluto while preserving legacy reward configuration', () => {
   const settings = matchSettings({ plutoEnabled: false, plutoMultiplier: 1.25 });
-  assert.equal(settings.plutoEnabled, true); assert.equal(settings.plutoMultiplier, EAT.pluto.multiplier);
+  assert.equal(settings.plutoEnabled, false); assert.equal(settings.plutoMultiplier, EAT.pluto.multiplier);
   assert.ok(EAT.pluto.multiplier >= 4);
 });

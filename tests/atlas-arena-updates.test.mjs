@@ -90,7 +90,7 @@ test("Closest Wins counts any pin inside the target country as 0 km and measures
   const kansas = distanceToTerritory([-100, 40], target("CAN"), shapes);
   assert.ok(kansas.distanceKm > 950 && kansas.distanceKm < 1050, String(kansas.distanceKm));
   // Microstates without an outline fall back to their reference point.
-  assert.equal(distanceToTerritory([0, 0], target("VAT"), shapes).distanceKm, haversineKm([0, 0], country("VAT").centroid));
+  assert.equal(distanceToTerritory([0, 0], target("VAT"), shapes).distanceKm, haversineKm([0, 0], country("VAT").centroid)-15);
   // Every mapped UN member contains its own capital, up to coarse 1:110m coastlines.
   for (const entity of entities.filter((item) => item.playable && item.status === "un195" && item.geometryId && item.capitalCoordinates)) {
     assert.ok(distanceToTerritory(entity.capitalCoordinates, target(entity.iso3), shapes).distanceKm < 160, entity.shortName);

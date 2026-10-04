@@ -28,21 +28,21 @@ export type ArenaModeDef = {
   rules: ModeRules;
 };
 
-const race = "A race: 2–4 players get exactly the same run at the same moment, each on their own device. Everyone sees the live scores; the highest final score wins.";
+const race = "Online uses a bounded, shared deck, a 3-minute limit (90 seconds for Speed Run), and server-graded answers. Runs resume after reconnecting. Ordinary correct answers earn 1,000, wrong answers zero; ranking uses partial placement credit, clues lower the award, and Map Fill mistakes cost 25. Speed Run is +150 / −150.";
 const turns = (what: string) => `2–4 players share one device and take turns, each playing ${what}. Pass the device when your run ends — the highest score wins.`;
 const speed = `${ATLAS_SCORING.normalCorrect.toLocaleString("en")} points for a correct answer plus up to ${ATLAS_SCORING.maxSpeedBonus} for speed`;
 
 export const ARENA_MODES: ArenaModeDef[] = [
   {
-    id: "map-battle", title: "Map Battle", tagline: "Find it fast", accent: "cyan", meta: "10 questions · speed bonus",
-    description: "Find countries on the map from names, capitals, flags and facts. The faster your correct click, the more it earns.",
+    id: "map-battle", title: "Map Battle", tagline: "Know the world", accent: "cyan", meta: "10 questions · knowledge first",
+    description: "Find countries on the map from names, capitals, flags and facts. Correct answers earn the points; speed adds at most 5%.",
     solo: { kind: "arena", mode: "map_click" }, online: "map_battle", hotseat: "turns", options: ["categories"], bestId: "map-battle",
     rules: {
       goal: "Click the country the question describes — by its name, capital, flag or a fact about it.",
       play: ["Read the prompt and click the matching country on the world map.", "Zoom with the buttons or the mouse wheel; very small states are drawn as dots.", "You get one click per question: the right country lights up green, a wrong one red."],
       scoring: `${speed}. Wrong clicks score nothing.`,
       solo: "10 questions from the categories you choose. Difficulty sets the speed-bonus window and how obscure the countries get.",
-      multiplayer: "2–4 players answer the same question at once with 15 seconds on the clock. Every correct click scores, and faster ones score more.",
+      multiplayer: "2–4 players answer the same question at once with 20 seconds on the clock. Every correct click scores; speed adds at most 5%.",
       hotseat: turns("their own 10 questions"),
     },
   },
@@ -55,7 +55,7 @@ export const ARENA_MODES: ArenaModeDef[] = [
       play: ["Click anywhere on land or sea to place your pin; click again to move it.", "Submit to lock it in. Inside a country's borders or within 20 km of a capital's center counts as 0 km.", "After the round, a dashed line shows where each distance was measured."],
       scoring: "Alone: 1,000 points for a zero-distance pin; outside, points fall with distance. Against others: only the closest pin scores 1,000 points.",
       solo: "10 rounds scored by distance.",
-      multiplayer: "2–4 players pin the same country within 15 seconds. The closest pin wins the round; on an exact tie the earlier pin wins.",
+      multiplayer: "2–4 players pin the same country within 20 seconds. The closest pin wins the round; equally close pins share the points.",
       hotseat: "2–4 players pin each country one after another. The map is covered between turns so nobody sees an earlier pin, then all pins are revealed and the closest wins the round.",
     },
   },
@@ -94,7 +94,7 @@ export const ARENA_MODES: ArenaModeDef[] = [
       play: ["Rounds alternate: name the country behind a flag, then choose the flag that belongs to a country outline.", "Pick one of four options."],
       scoring: `${speed}.`,
       solo: "12 rounds.",
-      multiplayer: "10 rounds for 2–4 players with 15 seconds each; faster correct answers earn more.",
+      multiplayer: "10 rounds for 2–4 players with 20 seconds each; speed adds at most 5%.",
       hotseat: turns("their own 12 rounds"),
     },
   },
@@ -172,20 +172,20 @@ export const ARENA_MODES: ArenaModeDef[] = [
     },
   },
   {
-    id: "territory-battle", title: "Territory Battle", tagline: "Conquer the map", accent: "rose", meta: `${ATLAS_SCORING.territoryRounds} rounds · steal in the 2nd half`,
-    description: "Capture countries by finding them on the map. In the second half they return — and can be stolen.",
-    solo: { kind: "arena", mode: "territory_battle" }, online: "territory_battle", hotseat: "territory", options: ["categories"], bestId: "territory-battle",
+    id: "territory-battle", title: "Territory Battle", tagline: "Command a frontier", accent: "rose", meta: "6 cycles · supplied borders · strategic hubs",
+    description: "Plan attacks and defenses across a connected regional map. Geographic knowledge makes your orders succeed.",
+    solo: { kind: "arena", mode: "territory_battle" }, online: "territory_battle", hotseat: "territory", options: [], bestId: "territory-battle",
     rules: {
-      goal: "Own the most countries when the last round ends.",
-      play: ["Each round names a country, its capital or its flag. Find it on the map to capture it.", "In the second half the same countries come back: capture one again to steal it."],
-      scoring: "Your score is the number of countries you own at the end.",
-      solo: `You against a rival empire, ${ATLAS_SCORING.territoryRounds} rounds. Every country you miss goes to the rival; in the second half you can win them back, or lose your own with a miss.`,
-      multiplayer: `Two players, ${ATLAS_SCORING.territoryRounds} rounds. The fastest correct click captures the country.`,
-      hotseat: `Two players take alternating turns on one device, ${ATLAS_SCORING.territoryRounds} rounds in all. A correct click captures (or steals) the country; a miss leaves it where it is.`,
+      goal: "Earn the most influence at the end of six cycles.",
+      play: ["Choose a neighboring country to attack from your supplied frontier, or an owned country to defend.", "Solve a capital, border or currency challenge to execute your order. Homes cannot be captured.", "A correct defense blocks an attack. If both solve the same neutral target, ownership does not change."],
+      scoring: "One influence per country; strategic hubs count as three. Navigation speed gives no advantage.",
+      solo: "Six cycles against a rival commander. The rival chooses before seeing your order and has knowledge calibrated to your difficulty.",
+      multiplayer: "Two players issue hidden simultaneous orders. Each cycle allows 40 seconds to plan and answer; both orders then resolve together.",
+      hotseat: "Two players issue hidden orders behind handoff screens. Both finish their knowledge challenge before the cycle resolves.",
     },
   },
   {
-    id: "speed-run", title: "Speed Run", tagline: "60-second sprint", accent: "amber", meta: "60 seconds · +150 / −50",
+    id: "speed-run", title: "Speed Run", tagline: "60-second sprint", accent: "amber", meta: "60 seconds · +150 / −150",
     description: "Answer as many choice questions as you can in 60 seconds, without a map.",
     solo: { kind: "arena", mode: "speed_run" }, online: "speed_run", hotseat: "turns", options: ["categories"], bestId: "speed-run",
     rules: {

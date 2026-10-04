@@ -50,7 +50,17 @@ export class SnapshotBuffer {
         encounter.npc.facing = a.facing + angleDelta(a.facing, b.facing) * fraction;
       }
     }
-    return { ...state, encounter, time: visualTime, players: state.players.map(p => {
+    const priorFood=new Map(before.state.food.map(f=>[f.id,f])), afterFood=new Map(after.state.food.map(f=>[f.id,f]));
+    const food=state.food.map(f=>{
+      if(f.target||(!f.citizen&&!f.driverId&&!f.leap))return f;
+      const a=priorFood.get(f.id),b=afterFood.get(f.id);if(!a||!b||a.target||b.target)return f;
+      return {...f,x:a.x+(b.x-a.x)*fraction,y:a.y+(b.y-a.y)*fraction,z:a.z+(b.z-a.z)*fraction,rotation:a.rotation+angleDelta(a.rotation,b.rotation)*fraction};
+    });
+    const shockShots = state.shockShots?.map(shot => {
+      const a = before.state.shockShots?.find(other => other.id === shot.id), b = after.state.shockShots?.find(other => other.id === shot.id);
+      return a && b ? {...shot,x:a.x+(b.x-a.x)*fraction,y:a.y+(b.y-a.y)*fraction} : shot;
+    });
+    return { ...state, shockShots, food, encounter, time: visualTime, players: state.players.map(p => {
       if (!p.alive || p.fallingAt !== undefined || before.state.phase !== state.phase) return p;
       if (p.escape || p.ability) {
         const a = before.state.players.find(other => other.id === p.id), b = after.state.players.find(other => other.id === p.id);

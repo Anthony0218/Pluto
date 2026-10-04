@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createToolGame, updateToolGame, idleToolInput, bolasTip, coconutFood, shellProtects, chooseToolInput } from '../src/games/natura/toolAnimals.ts';
+import { createToolGame, updateToolGame, idleToolInput, bolasTip, shellProtects, chooseToolInput } from '../src/games/natura/toolAnimals.ts';
 const idle = () => [idleToolInput(), idleToolInput()];
 const playing = kind => { const game = createToolGame(kind); game.phase = 'playing'; return game; };
 function advance(game, seconds, inputs = idle(), ai = false, fps = 60) {
@@ -68,14 +68,27 @@ test('warning captures current lanes before the raid begins', () => {
   advance(g,.1); assert.equal(g.raid.stage,'warning'); assert.equal(g.raid.lanes[0],260);
   g.players[0].y=90; advance(g,1.5); assert.equal(g.raid.stage,'attack'); assert.equal(g.raid.lanes[0],260);
 });
-test('food collection is personal, ordered, and unavailable while covered', () => {
-  const g = playing('coconut'); Object.assign(g.players[0],coconutFood(0,0)); g.players[0].hidden=true;
-  advance(g,.1); assert.equal(g.players[0].food,0); g.players[0].hidden=false;
-  advance(g,.1); assert.equal(g.players[0].food,1); assert.equal(g.players[1].food,0);
-  advance(g,.1); assert.equal(g.players[0].food,1);
-  g.players[0].food=5; Object.assign(g.players[0],coconutFood(0,5)); advance(g,.1);
+test('shared food is available to either forager and unavailable inside cover', () => {
+  const g = playing('coconut'); Object.assign(g.players[1], g.foodSites[0]); g.players[1].hidden=true;
+  advance(g,.1); assert.equal(g.players[1].food,0); g.players[1].hidden=false;
+  advance(g,.1); assert.equal(g.players[1].food,1); assert.equal(g.players[0].food,0);
+  advance(g,.1); assert.equal(g.players[1].food,1);
+  Object.assign(g.players[0],g.foodSites[1],{food:5}); advance(g,.1);
   assert.equal(g.phase,'finished'); assert.equal(g.winner,0);
 });
+test('equal-distance shell foragers split one shared meal', () => {
+  const g=playing('coconut'); g.players.forEach(p=>Object.assign(p,g.foodSites[0]));
+  advance(g,.1); assert.deepEqual(g.players.map(p=>p.food),[.5,.5]);
+});
+test('capture drags, respawns beside the shell, costs one heart and protects re-entry', () => {
+  const g=playing('coconut'); g.raid={stage:'attack',time:1.87,lanes:[180,360]};
+  advance(g,.1); assert.equal(g.players[0].lives,2); assert.ok(g.players[0].captured>0);
+  const x=g.players[0].x; advance(g,.2); assert.ok(g.players[0].x>x);
+  advance(g,1); assert.equal(g.players[0].captured,0); assert.equal(g.players[0].x,90);
+  assert.equal(g.players[0].shell.x,90); assert.ok(g.players[0].flash>2);
+  assert.equal(g.players[0].lives,2);
+});
+
 test('timer expiry handles a draw and either winner', () => {
   for (const kind of ['bolas','coconut']) for (const winner of [null,0,1]) {
     const g=playing(kind);g.time=.01;if(winner!==null)g.players[winner].food=2;

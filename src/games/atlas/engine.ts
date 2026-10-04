@@ -2,6 +2,8 @@ import { DIFFICULTY_RULES, STAT_DEFINITIONS } from "./config.ts";
 import { seededRandom, shuffled } from "./random.ts";
 import type { AtlasCategory, AtlasDifficulty, AtlasQuestion, AtlasScope, AtlasStatKey, ChoiceQuestion, GeographicEntity, HigherLowerQuestion, MapClickQuestion, MultiSelectQuestion } from "./types.ts";
 
+export const normalizedContinent = (entity: GeographicEntity) => entity.subregion === "South America" ? "South America" : entity.continent;
+
 export function entitiesForScope(entities: GeographicEntity[], scope: AtlasScope): GeographicEntity[] {
   if (scope === "un195") return entities.filter((entity) => entity.playable && entity.status === "un195");
   if (scope === "territories") return entities.filter((entity) => entity.status === "territory");
@@ -25,8 +27,8 @@ export function sourceMetadata(entity: GeographicEntity, category?: AtlasCategor
 export function plausibleEntities(target: GeographicEntity, pool: GeographicEntity[], difficulty: AtlasDifficulty, count: number, value?: (entity: GeographicEntity) => number): GeographicEntity[] {
   return pool.filter((entity) => entity.id !== target.id).sort((left, right) => {
     const continentPenalty = DIFFICULTY_RULES[difficulty].sameContinentDistractors
-      ? Number(right.continent === target.continent) - Number(left.continent === target.continent)
-      : Number(left.continent === target.continent) - Number(right.continent === target.continent);
+      ? Number(normalizedContinent(right) === normalizedContinent(target)) - Number(normalizedContinent(left) === normalizedContinent(target))
+      : Number(normalizedContinent(left) === normalizedContinent(target)) - Number(normalizedContinent(right) === normalizedContinent(target));
     if (continentPenalty) return continentPenalty;
     if (value) return Math.abs(value(left) - value(target)) - Math.abs(value(right) - value(target));
     return left.shortName.localeCompare(right.shortName);
@@ -38,7 +40,7 @@ const mapPrompt = (entity: GeographicEntity, category: AtlasCategory) => {
   if (category === "flags") return "Find the country represented by this flag.";
   if (category === "population" && entity.population) return `Find ${entity.shortName}, population ${new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(entity.population.value)} (${entity.population.year}).`;
   if (category === "area" && entity.areaKm2) return `Find ${entity.shortName}, with an area of ${new Intl.NumberFormat("en").format(Math.round(entity.areaKm2.value))} km².`;
-  if (category === "continents") return `Find ${entity.shortName} in ${entity.continent}.`;
+  if (category === "continents") return `Find ${entity.shortName} in ${normalizedContinent(entity)}.`;
   if (category === "languages" && entity.officialLanguages[0]) return `Find ${entity.shortName}, where ${entity.officialLanguages[0]} is spoken.`;
   if (category === "borders" && entity.neighbors[0]) return `Find ${entity.shortName}; it shares a land border with a neighboring country.`;
   if (category === "currency" && entity.currencies[0]) return `Find ${entity.shortName}, which uses the ${entity.currencies[0].name}.`;
@@ -57,14 +59,14 @@ function makeMapQuestion(entity: GeographicEntity, category: AtlasCategory, diff
 
 const propertyLabel = (entity: GeographicEntity, category: AtlasCategory) => {
   if (category === "capitals") return entity.capitalCities[0];
-  if (category === "continents") return entity.continent;
+  if (category === "continents") return normalizedContinent(entity);
   if (category === "languages") return entity.officialLanguages[0];
   if (category === "currency") return entity.currencies[0]?.name;
   if (category === "flags") return entity.id;
   return entity.shortName;
 };
 
-function makeChoiceQuestion(entity: GeographicEntity, category: AtlasCategory, pool: GeographicEntity[], difficulty: AtlasDifficulty, scope: AtlasScope, seed: string, index: number): ChoiceQuestion | MultiSelectQuestion | HigherLowerQuestion {
+export function makeChoiceQuestion(entity: GeographicEntity, category: AtlasCategory, pool: GeographicEntity[], difficulty: AtlasDifficulty, scope: AtlasScope, seed: string, index: number): ChoiceQuestion | MultiSelectQuestion | HigherLowerQuestion {
   const random = seededRandom(`${seed}:${index}:${category}`);
   if (category === "population" || category === "area") {
     const key: AtlasStatKey = category === "population" ? "population" : "areaKm2";
@@ -92,7 +94,7 @@ function makeChoiceQuestion(entity: GeographicEntity, category: AtlasCategory, p
   const seenProperties = new Set([propertyLabel(entity, category)]);
   for (const candidate of plausibleEntities(entity, valid, difficulty, valid.length)) {
     const property = propertyLabel(candidate, category);
-    if (!property || seenProperties.has(property)) continue;
+    if (!property || seenProperties.has(property) || (category === "languages" && entity.officialLanguages.includes(property)) || (category === "currency" && entity.currencies.some(currency => currency.name === property))) continue;
     seenProperties.add(property); distractors.push(candidate);
     if (distractors.length >= count - 1) break;
   }
@@ -105,8 +107,12 @@ function makeChoiceQuestion(entity: GeographicEntity, category: AtlasCategory, p
           : category === "flags" ? `Which flag belongs to ${entity.shortName}?`
             : category === "countries" || category === "locations" ? `Which country has ${entity.capitalCities[0] || "this capital"} as its capital?` : `Which country is ${entity.shortName}?`;
   const rawChoices = category === "continents"
-    ? [...new Set([entity.continent, ...distractors.map((candidate) => candidate.continent)])].slice(0, count).map((label) => ({ id: label, label }))
+    ? shuffled([...new Set([normalizedContinent(entity), ...distractors.map(normalizedContinent)])].slice(0, count), random).map((label) => ({ id: label, label }))
     : choiceEntities.map((candidate) => ({ id: propertyLabel(candidate, category) || candidate.id, label: propertyLabel(candidate, category) || candidate.shortName, flagAsset: category === "flags" ? candidate.flagAsset : undefined }));
+  if(category === "flags") {
+    const answer=`option:${choiceEntities.findIndex(candidate=>candidate.id===entity.id)}`;
+    return {id:`${seed}:choice:${index}`,seed,entityId:entity.id,entityType:entity.entityType,category,interaction:"single_choice",difficulty,scope,prompt,answer,choices:choiceEntities.map((candidate,i)=>({id:`option:${i}`,label:`Flag ${i+1}`,flagAsset:candidate.flagAsset})),sourceMetadata:sourceMetadata(entity,category)};
+  }
   return { id: `${seed}:choice:${index}`, seed, entityId: entity.id, entityType: entity.entityType, category, interaction: "single_choice", difficulty, scope, prompt, answer: answerProperty, choices: rawChoices, targetGeometryId: entity.geometryId, sourceMetadata: sourceMetadata(entity, category) };
 }
 
@@ -116,7 +122,9 @@ export function generateQuestions(options: { entities: GeographicEntity[]; datas
   const eligible = entitiesForDifficulty(scoped, options.difficulty).filter((entity) => entity.geometryId || entity.centroid);
   const random = seededRandom(`${options.datasetVersion}:${options.seed}:${options.difficulty}:${scope}:${options.categories.join(",")}`);
   const order = shuffled(eligible, random);
-  const categories = options.categories.length ? options.categories : ["countries" as const];
+  const categories = shuffled(options.categories.length ? options.categories : ["countries" as const], random);
+  if (!order.length) return [];
+  const used = new Set<string>();
   const questions: AtlasQuestion[] = [];
   for (let index = 0; index < options.count; index += 1) {
     const entity = order[index % order.length];
@@ -127,7 +135,10 @@ export function generateQuestions(options: { entities: GeographicEntity[]; datas
           : category === "population" ? Boolean(candidate.population)
             : category === "area" ? Boolean(candidate.areaKm2)
               : category === "borders" ? candidate.neighbors.length > 0 : true;
-    const target = isCompatible(entity) ? entity : [...order.slice(index + 1), ...order.slice(0, index)].find(isCompatible) || entity;
+    const candidates = [...order.slice(index % order.length), ...order.slice(0, index % order.length)];
+    const target = candidates.find(candidate => isCompatible(candidate) && !used.has(candidate.id)) || candidates.find(isCompatible) || entity;
+    used.add(target.id);
+    if (used.size >= order.length) used.clear();
     questions.push(options.interaction === "map_click" || (options.interaction === "mixed" && category === "locations")
       ? makeMapQuestion(target, category, options.difficulty, scope, options.seed, index)
       : makeChoiceQuestion(target, category, scoped, options.difficulty, scope, options.seed, index));
@@ -145,7 +156,8 @@ export function generateHigherLowerQuestions(options: { entities: GeographicEnti
     const stat = options.stats[index % options.stats.length];
     const available = order.filter((entity) => statValue(entity, stat) !== null);
     const first = available[index % available.length];
-    const candidates = plausibleEntities(first, available, options.difficulty, available.length, (entity) => statValue(entity, stat) || 0);
+    const candidates = plausibleEntities(first, available.filter(entity=>statValue(entity,stat)!==statValue(first,stat)), options.difficulty, available.length, (entity) => statValue(entity, stat) || 0);
+    if(!candidates.length)continue;
     const second = candidates[Math.floor(random() * Math.min(4, candidates.length))] || candidates[0];
     const firstValue = statValue(first, stat) || 0, secondValue = statValue(second, stat) || 0;
     const category: AtlasCategory = stat === "population" ? "population" : stat === "areaKm2" ? "area" : stat === "neighborCount" ? "borders" : "languages";
@@ -165,7 +177,7 @@ export function generateHigherLowerQuestions(options: { entities: GeographicEnti
 export function validateAnswer(question: AtlasQuestion, answer: string | string[]): boolean {
   if (question.interaction === "multi_select") {
     if (!Array.isArray(answer)) return false;
-    return [...answer].sort().join("|") === [...question.answer].sort().join("|");
+    return new Set(answer).size === answer.length && [...answer].sort().join("|") === [...question.answer].sort().join("|");
   }
   if (question.interaction === "closest_click") return false;
   return !Array.isArray(answer) && question.answer === answer;

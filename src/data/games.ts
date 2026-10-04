@@ -7,6 +7,7 @@ export type Game = {
   tag: string;
   features: string[];
   finished: boolean;
+  comingSoon?: boolean;
 };
 
 export const games: Game[] = [
@@ -19,6 +20,7 @@ export const games: Game[] = [
     tag: "Party",
     features: ["4 players", "Friends & bots", "60 spaces"],
     finished: false,
+    comingSoon: true,
   },
   {
     title: "Eat It",
@@ -35,7 +37,7 @@ export const games: Game[] = [
     subtitle: "The world is your board",
     description:
       "Master countries, capitals, flags and geographic facts on an interactive world map.",
-    image: "/images/atlas-arena.svg",
+    image: "/images/games/atlas-arena.png",
     route: "/games/atlas-arena",
     tag: "Geography",
     features: ["Map Click", "Speed Run", "Map Fill"],
@@ -46,7 +48,7 @@ export const games: Game[] = [
     subtitle: "Ancient territory strategy",
     description:
       "Claim territory and capture groups on 9×9, 13×13, or 19×19 boards — locally, against AI, or online.",
-    image: "/images/go-home.svg",
+    image: "/images/games/go.png",
     route: "/games/go",
     tag: "Strategy",
     features: ["Vs Bot", "Hotseat", "Multiplayer"],
@@ -57,7 +59,7 @@ export const games: Game[] = [
     subtitle: "Bayerisches Partnerspiel",
     description:
       "Rufspiel, Wenz und Solo mit verbindlichem Zugeben – im Hotseat, gegen KI oder online zu viert.",
-    image: "/images/watten-home.png",
+    image: "/images/games/schafkopf.png",
     route: "/games/schafkopf",
     tag: "Kartenspiel",
     features: ["Hotseat", "Gegen KI", "Multiplayer"],
@@ -79,7 +81,7 @@ export const games: Game[] = [
     subtitle: "Traditionelles Kartenspiel",
     description:
       "Spiele Watten mit taktischen Hinweisen, Punktewertung und einer einsteigerfreundlichen Hilfe.",
-    image: "/images/watten-home.png",
+    image: "/images/games/watten.png",
     route: "/games/watten",
     tag: "Kartenspiel",
     features: ["3 Spieler", "Hilfemodus", "Punktewertung"],
@@ -96,6 +98,7 @@ export const games: Game[] = [
     tag: "Strategie",
     features: ["Rundenbasiert", "Taktik", "Mittelalter"],
     finished: false,
+    comingSoon: true,
   },
   {
     title: "Card Builder",
@@ -107,13 +110,14 @@ export const games: Game[] = [
     tag: "Creator",
     features: ["Templates", "Rule builder", "Test with bots"],
     finished: false,
+    comingSoon: true,
   },
   {
     title: "Natura",
     subtitle: "Discover the natural world",
     description:
       "Explore animals and their remarkable abilities through interactive games.",
-    image: "/pluto-icon.png",
+    image: "/images/games/natura.png",
     route: "/games/natura",
     tag: "Nature",
     features: ["Animals", "Discovery"],
@@ -127,4 +131,5 @@ export const gameList = games.map((game) => ({
   category: game.tag,
   image: game.image,
   finished: game.finished,
+  comingSoon: game.comingSoon,
 }));

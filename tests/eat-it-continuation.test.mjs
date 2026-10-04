@@ -13,7 +13,7 @@ import { startHell, blackHoles, cellCenter, cellPhase, cellIndex, stepEruptions,
 import { activateEscape } from '../src/games/eat-it/escape.ts';
 import { HellVisuals } from '../src/games/eat-it/hellVisuals.ts';
 import { readFileSync } from 'node:fs';
-function scene(options={}) {const s=createGame('city',[{id:'a',name:'A'},{id:'b',name:'B'}],913,'regression',{mode:'solo',...options});s.food=[];s.powerups=[];s.nextFood=s.nextPower=s.nextPluto=1e9;delete s.encounter;s.players.forEach((p,i)=>Object.assign(p,{x:1500+i*1000,y:1500,facing:0}));return s;}
+function scene(options={}) {const s=createGame('city',[{id:'a',name:'A'},{id:'b',name:'B'}],913,'regression',{mode:'solo',...options});s.food=[];s.powerups=[];s.nextFactory=s.nextHumans=1e9;delete s.feast;s.nextFood=s.nextPower=s.nextPluto=1e9;delete s.encounter;s.players.forEach((p,i)=>Object.assign(p,{x:1500+i*1000,y:1500,facing:0}));return s;}
 function solo(options={}) {return createGame('city',fillBots([{id:'a',name:'A'}],4),221,'solo',{mode:'solo',botsEnabled:false,...options});}
 function prop(s,kind,p=s.players[0]) {const f={...p,id:s.nextId++,kind,x:p.x,y:p.y,vx:0,vy:0,z:0,vz:0,rotation:0,target:null,capturedAt:0};s.food.push(f);return f;}
 function ticks(s,n){for(let i=0;i<n;i++)stepGame(s);}
@@ -58,7 +58,7 @@ test('quest landmark stays protected, then shrine uses fit, fall, growth and col
  p.mass=5000;stepEncounter(s,1/30);assert.ok(e.shrine);assert.ok(!s.food.some(f=>f.kind==='shrine'));assert.equal(e.item.status,'ground');
  e.item.status='carried';e.item.ownerId=p.id;stepEncounter(s,1/30);assert.ok(e.shrine);
  e.item.status='delivered';e.completedBy=p.id;stepEncounter(s,1/30);assert.equal(e.shrine,null);const f=s.food.find(f=>f.kind==='shrine');assert.ok(f);assert.equal(f.x,home.x);
- p.mass=36;assert.equal(foodFits(p,f),false);p.mass=5000;assert.ok(foodFits(p,f));Object.assign(p,home);s.food=[f];s.nextFood=s.nextPower=s.nextPluto=1e9;const before=p.mass;ticks(s,60);
+ p.mass=36;assert.equal(foodFits(p,f),false);p.mass=5000;assert.ok(foodFits(p,f));Object.assign(p,home);s.food=[f];s.nextFactory=s.nextHumans=1e9;delete s.feast;s.nextFood=s.nextPower=s.nextPluto=1e9;const before=p.mass;ticks(s,60);
  assert.equal(p.stats.collected.shrine,1);assert.ok(p.mass>before+100);assert.equal(e.item.status,'delivered');
 });
 test('Bots preference defaults ON, persists in the existing store, and strips all AI seats when OFF',()=>{
@@ -110,7 +110,7 @@ test('shield deadline and hit ripple timestamp stay authoritative without changi
  const s=scene(),[a,b]=s.players;Object.assign(b,{x:a.x+28,y:a.y});const item={id:99,kind:'shield',x:b.x,y:b.y};s.powerups=[item];collectPower(s,b,item);assert.equal(b.effects.shield,EAT.powerups.shield.duration);a.mass=100;stepGame(s);assert.ok(b.alive);assert.equal(b.shieldHitAt,s.time);s.time=EAT.powerups.shield.duration;assert.equal(b.effects.shield>s.time,false);
 });
 test('denser sky drops have category weighting, no houses/cars/shrine, finite cap and cleanup',()=>{
- const s=scene();s.nextFood=0;assert.ok(EAT.food.spawnCount>540);assert.ok(EAT.food.respawnInterval<.22);let small=0,medium=0,large=0;
+ const s=scene();s.nextFactory=s.nextHumans=1e9;delete s.feast;s.nextFood=0;assert.ok(EAT.food.spawnCount>540);assert.ok(EAT.food.respawnInterval<.22);let small=0,medium=0,large=0;
  for(let i=0;i<300;i++){s.food=[];assert.ok(spawnFood(s));const f=s.food[0];assert.ok(f.z>=280);assert.ok(FOOD[f.kind].skyDrop);assert.ok(!FOOD[f.kind].building);assert.notEqual(FOOD[f.kind].shape,'vehicle');if(['tiny','small'].includes(FOOD[f.kind].category))small++;else if(FOOD[f.kind].category==='medium')medium++;else large++;}
  assert.ok(small>medium&&medium>large);s.food=Array.from({length:EAT.food.maxObjects},(_,i)=>({...s.food[0],id:i}));assert.equal(spawnFood(s),false);s.food=[{...s.food[0],x:NaN},{...s.food[0],x:-999}];updateSpawns(s);assert.ok(s.food.every(f=>Number.isFinite(f.x)&&f.x>=0));
  const fresh=solo();fresh.nextFood=0;const count=fresh.food.length;fresh.time=1;updateSpawns(fresh);assert.ok(fresh.food.length>count);assert.ok(fresh.food.some(f=>f.z>=280));
