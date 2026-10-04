@@ -12,10 +12,13 @@ dist
 dist-ssr
 public/tfjs/
 *.local
+/.dashboard-check/
+/dashboard-lint-report.json
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json
 .idea
 .DS_Store
 *.suo
