@@ -41,6 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let disposed = false;
     let authEventReceived = false;
+    let liveAuthEventReceived = false;
     const applyUser = (next: User | null) => {
       if (disposed) return;
       if (currentUserId.current !== (next?.id ?? null)) {
@@ -59,7 +60,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      // INITIAL_SESSION is an async snapshot. A login or logout that arrives
+      // first is newer and must not be overwritten by that snapshot.
+      if (event === "INITIAL_SESSION" && liveAuthEventReceived) return;
+      if (event !== "INITIAL_SESSION") liveAuthEventReceived = true;
       authEventReceived = true;
       applyUser(session?.user ?? null);
     });
