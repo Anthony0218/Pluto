@@ -3,6 +3,7 @@ import test from "node:test";
 import { readFileSync } from "node:fs";
 import ts from "typescript";
 import * as engine from "../src/games/schafkopf/schafkopf.ts";
+import * as botSettings from "../src/games/schafkopf/botConfig.ts";
 import * as announcements from "../src/games/schafkopf/announcements.ts";
 
 // Execute the real Edge handler with its auth/database boundaries replaced.
@@ -68,7 +69,7 @@ function server() {
     },
   };
   new Function("require", "Deno", "exports", compiled)(
-    name => name.includes("supabase-js") ? { createClient: () => db } : name.includes("announcements") ? announcements : engine,
+    name => name.includes("supabase-js") ? { createClient: () => db } : name.includes("announcements") ? announcements : name.includes("botConfig") ? botSettings : engine,
     { env: { get: () => "test-only" }, serve: value => { handler = value; } }, {},
   );
   async function request(user, body) {
@@ -302,4 +303,18 @@ test("only the online host can set a valid trick collection delay", async () => 
   assert.equal(changed.status, 200);
   assert.equal(changed.body.collectSeconds, 7);
   assert.equal((await s.request("user-1", { op: "get", code: created.code })).body.collectSeconds, 7);
+});
+
+test("host bot configuration survives validated online rules, but guests cannot change it", async () => {
+  const s=server(); const room=await fullRoom(s);
+  const configured={...engine.DEFAULT_GAME_RULES,bot:{legendIterations:350,legendTimeMs:250,proError:.01}};
+  const started=await s.request("user-0",{op:"start",code:room.code,version:room.version,rules:configured});
+  assert.equal(started.status,200);
+  assert.equal(started.body.game.rules.bot.legendIterations,350);
+  assert.equal(started.body.game.rules.bot.proError,.01);
+  const denied=await s.request("user-1",{op:"rules",code:room.code,version:started.body.version,rules:configured});
+  assert.equal(denied.status,400);
+  assert.match(denied.body.error,/Gastgeber/);
+  const invalid=await s.request("user-0",{op:"rules",code:room.code,version:started.body.version,rules:{...configured,bot:[]}});
+  assert.equal(invalid.status,400);
 });

@@ -1,0 +1,78 @@
+{
+  "seed": 20261003,
+  "profile": "quick",
+  "games": 10000,
+  "redeals": 598,
+  "moves": 320000,
+  "simulations": 35465,
+  "illegalMoves": 0,
+  "ruleCandidateViolations": 0,
+  "elapsedSeconds": 209.499,
+  "levels": {
+    "beginner": {
+      "games": 7980,
+      "wins": 4433,
+      "eyes": 213458,
+      "declarations": 1884,
+      "declarerWins": 710,
+      "delta": -89650,
+      "winRate": 0.5555137844611528,
+      "averageEyes": 26.749122807017542,
+      "announcementRate": 0.23609022556390977,
+      "declarerWinRate": 0.37685774946921446,
+      "averageDelta": -11.234335839598998
+    },
+    "amateur": {
+      "games": 7981,
+      "wins": 4585,
+      "eyes": 237855,
+      "declarations": 1998,
+      "declarerWins": 870,
+      "delta": -18630,
+      "winRate": 0.5744894123543416,
+      "averageEyes": 29.80265630873324,
+      "announcementRate": 0.2503445683498308,
+      "declarerWinRate": 0.43543543543543545,
+      "averageDelta": -2.3342939481268012
+    },
+    "advanced": {
+      "games": 8030,
+      "wins": 4705,
+      "eyes": 248606,
+      "declarations": 2049,
+      "declarerWins": 968,
+      "delta": 32840,
+      "winRate": 0.5859277708592777,
+      "averageEyes": 30.959651307596513,
+      "announcementRate": 0.25516811955168117,
+      "declarerWinRate": 0.47242557345046365,
+      "averageDelta": 4.089663760896638
+    },
+    "pro": {
+      "games": 8041,
+      "wins": 4771,
+      "eyes": 247991,
+      "declarations": 2056,
+      "declarerWins": 969,
+      "delta": 34820,
+      "winRate": 0.5933341624176097,
+      "averageEyes": 30.840815818927993,
+      "announcementRate": 0.25568959084690956,
+      "declarerWinRate": 0.4713035019455253,
+      "averageDelta": 4.330307175724412
+    },
+    "legend": {
+      "games": 7968,
+      "wins": 4736,
+      "eyes": 252090,
+      "declarations": 2013,
+      "declarerWins": 973,
+      "delta": 40620,
+      "winRate": 0.5943775100401606,
+      "averageEyes": 31.637801204819276,
+      "announcementRate": 0.2526355421686747,
+      "declarerWinRate": 0.48335817188276203,
+      "averageDelta": 5.09789156626506
+    }
+  }
+}

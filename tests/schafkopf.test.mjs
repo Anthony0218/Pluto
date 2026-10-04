@@ -100,12 +100,13 @@ test("AI knocks only with allowed high-trump combinations and weighs running tru
   assert.equal(shouldAiKnock([c("Unter"), c("Unter", "Gras"), c("Ass"), c("10")]), false);
 });
 
-test("only advanced AI levels consider a carefully supported Spritze", () => {
+test("Amateur spritzes rarely with exceptional hands; advanced uses A5", () => {
   const hand = [c("Ober"), c("Ober", "Gras"), c("Ober", "Herz"), c("Ober", "Schellen"), c("Unter"), c("Unter", "Gras"), c("Unter", "Herz"), c("Unter", "Schellen")];
   const base = viewFor(classicGame(), 0);
   const view = { ...base, phase: "play", seat: 1, turn: 1, contract: { kind: "solo", suit: "Herz" }, declarer: 0, partner: null, hand, legalCards: hand.map(card => card.id), canDouble: true, spritzCount: 0 };
   assert.equal(chooseAiAction(view, "beginner", () => 0).spritz, undefined);
-  assert.equal(chooseAiAction(view, "amateur", () => 0).spritz, undefined);
+  assert.equal(chooseAiAction(view, "amateur", () => .5).spritz, undefined);
+  assert.equal(chooseAiAction(view, "amateur", () => 0).spritz, true);
   assert.equal(chooseAiAction(view, "advanced", () => 0).spritz, true);
 });
 
@@ -129,21 +130,21 @@ test("AI opponents seek the called suit, trump when void, and pro draws trump", 
   assert.equal(chooseAiAction(declarer, "pro", () => 0).cardId, "Eichel-Ober");
   const partnerLast = { ...declarer, partner: 3, hand: [c("9"), c("Ass", "Gras")], legalCards: ["Eichel-9", "Gras-Ass"],
     tricks: [{ winner: 1, points: 0, plays: [{ seat: 1, card: c("7") }] }] };
-  assert.equal(chooseAiAction(partnerLast, "pro", () => 0.5).cardId, "Eichel-9");
+  assert.equal(chooseAiAction(partnerLast, "pro", () => 0.5).cardId, "Gras-Ass");
   assert.equal(chooseAiAction(partnerLast, "normal", () => 0.05).cardId, "Eichel-9");
-  assert.equal(chooseAiAction(partnerLast, "normal", () => 0.2).cardId, "Gras-Ass");
+  assert.equal(chooseAiAction(partnerLast, "normal", () => 0.2).cardId, "Eichel-9");
   const safeTrump = { ...declarer, trick: [{ seat: 1, card: c("Ass") }, { seat: 2, card: c("10") }, { seat: 3, card: c("König") }],
     hand: [c("7", "Herz"), c("10", "Herz"), c("9", "Gras")], legalCards: ["Herz-7", "Herz-10", "Gras-9"] };
-  assert.equal(chooseAiAction(safeTrump, "pro", () => 0).cardId, "Herz-7", "the lowest winning trump collects all eyes already in the trick");
+  assert.equal(chooseAiAction(safeTrump, "pro", () => 0).cardId, "Herz-10", "the called ace reveals the partner; R2 feeds their safe trick instead of stealing it");
   const safeGift = { ...safeTrump, partner: 3, trick: [{ seat: 1, card: c("7") }, { seat: 2, card: c("10") }, { seat: 3, card: c("Ober") }],
     hand: [c("Ass", "Gras"), c("7", "Gras")], legalCards: ["Gras-Ass", "Gras-7"] };
   assert.equal(chooseAiAction(safeGift, "beginner", () => 0).cardId, "Gras-Ass", "give maximum eyes when an ally is safely winning");
   const calledSuitVoid = { ...declarer, partner: 3, tricks: [{ winner: 1, points: 0, plays: [
     { seat: 0, card: c("7") }, { seat: 1, card: c("8", "Herz") }, { seat: 2, card: c("9") }, { seat: 3, card: c("10") },
   ] }] };
-  assert.equal(chooseAiAction(calledSuitVoid, "pro", () => 0).cardId, "Gras-Ass", "do not lead trump when an opponent is known void in the called suit");
+  assert.equal(chooseAiAction(calledSuitVoid, "pro", () => 0).cardId, "Eichel-Ober", "R1 draws trump until ALL opposing trumps are exhausted");
   const voidBehind = { ...calledSuitVoid, trick: [{ seat: 3, card: c("7") }], hand: [c("7", "Herz"), c("9", "Gras")], legalCards: ["Herz-7", "Gras-9"] };
-  assert.equal(chooseAiAction(voidBehind, "pro", () => 0).cardId, "Gras-9", "save trump when a void opponent still has to play");
+  assert.equal(chooseAiAction(voidBehind, "pro", () => 0).cardId, "Herz-7", "R5 trumps a plain trick unless the partner owns it safely");
 });
 
 test("deal: 32 unique cards, eight per seat, 120 eyes, dealer rotates after all pass", () => {
@@ -238,26 +239,26 @@ test("AI declares individual games only with sufficiently strong trumps", () => 
   const intent = (hand, contract) => chooseAiAction({ ...base, phase: "intent", hand, contracts: [contract], intents: [], canIntent: true }, "normal", () => 0.99).play;
   const solo = { kind: "solo", suit: "Herz" };
   const topFive = [c("Ober"), c("Ober", "Gras"), c("Ober", "Herz"), c("Ober", "Schellen"), c("Unter")];
-  assert.equal(intent([...topFive, c("7", "Herz"), c("7"), c("8")], solo), false);
+  assert.equal(intent([...topFive, c("7", "Herz"), c("7"), c("8")], solo), true, "A4 permits six trumps with two Ober and only one held plain suit without ace");
   assert.equal(intent([...topFive, c("Unter", "Gras"), c("7"), c("8")], solo), true);
   assert.equal(intent([...topFive, c("Ass", "Herz"), c("10", "Herz"), c("7")], solo), true);
   const farbwenz = { kind: "farbwenz", suit: "Herz" };
   const fourUnters = [c("Unter"), c("Unter", "Gras"), c("Unter", "Herz"), c("Unter", "Schellen")];
   assert.equal(intent([...fourUnters, c("Ass", "Herz"), c("7"), c("8"), c("9")], farbwenz), false);
-  assert.equal(intent([...fourUnters, c("Ass", "Herz"), c("Ass"), c("8"), c("9")], farbwenz), true);
-  assert.equal(intent([...fourUnters, c("Ass", "Herz"), c("10", "Herz"), c("8"), c("9")], farbwenz), true);
-  assert.equal(intent([...fourUnters, c("7"), c("8"), c("9"), c("Ass")], { kind: "wenz" }), true);
+  assert.equal(intent([...fourUnters, c("Ass", "Herz"), c("Ass"), c("8"), c("9")], farbwenz), false, "two missing nontrump aces plus position 1 exclude Farbwenz");
+  assert.equal(intent([...fourUnters, c("Ass", "Herz"), c("10", "Herz"), c("8"), c("9")], farbwenz), false);
+  assert.equal(intent([...fourUnters, c("7"), c("8"), c("9"), c("Ass")], { kind: "wenz" }), false, "two exclusion criteria also apply to Wenz");
 });
 
-test("AI Sauspiel follows trump, Ober and missing-ace limits", () => {
+test("AI Sauspiel uses the documented Bremser requirements", () => {
   const contract = { kind: "rufspiel", suit: "Eichel" };
   const view = viewFor(classicGame(undefined, 0), 0);
   const wantsToPlay = (hand, ramsch = false) => chooseAiAction({ ...view, phase: "intent", hand, contracts: [contract], intents: [], canIntent: true, rules: { ...view.rules, ramsch } }, "normal", () => .99).play;
   const four = [c("Ober"), c("Unter", "Gras"), c("7", "Herz"), c("8", "Herz"), c("7"), c("Ass", "Gras"), c("Ass", "Schellen"), c("7", "Schellen")];
   assert.equal(wantsToPlay(four), true);
-  assert.equal(wantsToPlay(four.map(card => card.id === "Herz-8" ? c("9", "Gras") : card)), true, "three trumps are possible only from last seat without Ramsch");
+  assert.equal(wantsToPlay(four.map(card => card.id === "Herz-8" ? c("9", "Gras") : card)), false, "A4 needs at least four trumps with Bremser");
   assert.equal(wantsToPlay(four.map(card => card.id === "Herz-8" ? c("9", "Gras") : card), true), false);
-  assert.equal(wantsToPlay(four.map(card => card.id === "Gras-Ass" ? c("9", "Gras") : card)), false, "two missing aces reject Sauspiel");
+  assert.equal(wantsToPlay(four.map(card => card.id === "Gras-Ass" ? c("9", "Gras") : card)), true, "the document does not exclude Sauspiel because of two missing aces");
 });
 
 test("auction: earlier seat may match, later seat must raise, final suit stays private", () => {

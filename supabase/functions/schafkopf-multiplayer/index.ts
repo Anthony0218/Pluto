@@ -1,3 +1,4 @@
+import { botConfig, type BotConfig } from "../../../src/games/schafkopf/botConfig.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { applyAction, chooseAiAction, collectSecondsFor, createGame, MULTIPLAYER_LEGEN_DECISION_MILLISECONDS, MULTIPLAYER_TURN_MILLISECONDS, resolveLegenTimeout, shuffledDeck, viewFor, DEFAULT_GAME_RULES, type Action, type AiDifficulty, type GameRules, type GameState } from "../../../src/games/schafkopf/schafkopf.ts";
 import { DEFAULT_ANNOUNCEMENT_SETTINGS, SIMPLE_ANNOUNCEMENT_SETTINGS, formatDeclarationAnnouncement } from "../../../src/games/schafkopf/announcements.ts";
@@ -45,6 +46,20 @@ function validRules(value: unknown): GameRules {
   }
   if (input.spritzen !== "nie" && input.spritzen !== "vor-ausspiel" && input.spritzen !== "jederzeit") throw new Error("Ungültige Spritzregel.");
   rules.spritzen = input.spritzen;
+  for (const key of ["davonlaufen", "toutAbbrechen", "toutSchneiderSchwarz"] as const) {
+    if (input[key] !== undefined) { if (typeof input[key] !== "boolean") throw new Error(`Ungültige Regel: ${key}.`); rules[key] = input[key]; }
+  }
+  for (const [key,min,max] of [["rufsauAbwerfenAbStich",1,8],["laufendeAbFarbspiel",1,14],["laufendeAbWenzGeier",1,4],["laufendeSoloLimit",1,14],["toutMultiplier",1,16],["sieMultiplier",1,16]] as const) {
+    if (input[key] !== undefined) { if (!Number.isInteger(input[key]) || Number(input[key]) < min || Number(input[key]) > max) throw new Error(`Ungültige Regel: ${key}.`); rules[key] = Number(input[key]); }
+  }
+  if (input.spritzSchwellen !== undefined) {
+    if (!["klassisch","letzter-spritzer"].includes(String(input.spritzSchwellen))) throw new Error("Ungültige Spritz-Punktgrenzen.");
+    rules.spritzSchwellen = input.spritzSchwellen as "klassisch" | "letzter-spritzer";
+  }
+  if (input.bot !== undefined) {
+    if (!input.bot || typeof input.bot !== "object" || Array.isArray(input.bot)) throw new Error("Ungültige Bot-Einstellungen.");
+    rules.bot = botConfig(input.bot as Partial<BotConfig>);
+  }
   return rules;
 }
 function hasTimedTurn(game: GameState) {

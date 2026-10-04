@@ -1,49 +1,61 @@
-import { POINTS, cardName, isTrump, trickWinner, type Card, type GameView, type Trick } from "./schafkopf.ts";
-
-/** Advice uses only a player's view and cards already face up on the table. */
-const plainName = (card: Card) => card.rank === "Ass" ? `${card.suit}-Ass` : cardName(card);
-
+import { POINTS, cardLock, cardName, isTrump, type Card, type GameState, type GameView, type Trick } from './schafkopf.ts';
+import { chooseCard, type ReasonCode } from './bot.ts';
+import { seededRandom } from './botConfig.ts';
+import { SCHAFKOPF_LESSONS, type Lesson } from './lessons.ts';
+const plainName = (card: Card) => card.rank === 'Ass' ? `${card.suit}-Ass` : cardName(card);
+/** Contextual advice and review share the exact same rule/tip pipeline as the bots. */
 export function liveSchafkopfTip(view: GameView): string | null {
-  if (view.phase === "legen" && view.turn === view.seat) {
-    const aces = view.hand.filter(card => card.rank === "Ass").length;
-    const hasTopOber = view.hand.some(card => card.rank === "Ober" && ["Eichel", "Gras", "Herz"].includes(card.suit));
-    if (aces >= 2 || !hasTopOber) return "Vorsicht beim Klopfen: Viele Asse oder keiner der drei höchsten Ober können dich nach viermal Weiter zum Spiel zwingen – gegen Laufende wird das dann schnell doppelt teuer.";
-    return "Klopfen verdoppelt den Wert. Überlege schon mit diesen vier Karten, ob dein Blatt auch nach viermal Weiter ein Pflichtspiel tragen würde.";
-  }
-  if (view.phase !== "play" || view.turn !== view.seat || !view.contract) return null;
-  const legal = view.hand.filter(card => view.legalCards.includes(card.id));
-  if (!legal.length) return null;
-  const playedTrumps = view.tricks.flatMap(trick => trick.plays).filter(play => isTrump(play.card, view.contract!)).length;
-  if (view.trick.length) {
-    const currentWinner = trickWinner(view.trick, view.contract);
-    const eyes = view.trick.reduce((sum, play) => sum + POINTS[play.card.rank], 0);
-    const canWin = legal.filter(card => trickWinner([...view.trick, { seat: view.seat, card }], view.contract!) === view.seat);
-    const lead = view.trick[0].card;
-    const freeInLedSuit = !isTrump(lead, view.contract) && !view.hand.some(card => !isTrump(card, view.contract!) && card.suit === lead.suit);
-    const legalTrumps = legal.filter(card => isTrump(card, view.contract!));
-    if (freeInLedSuit && legalTrumps.length && currentWinner !== view.partner) {
-      return "Du bist in der Fehlfarbe frei. Wenn du nicht sicher bist, dass dein Mitspieler den Stich hat, stich mit einem möglichst kleinen Trumpf ein.";
-    }
-    if (canWin.length && eyes >= 10) return `Im Stich liegen schon ${eyes} Punkte. Prüfe, ob du ihn mit einer möglichst kleinen passenden Karte gewinnen kannst.`;
-    if (!canWin.length) return "Du kannst den Stich gerade nicht gewinnen. Gib möglichst wenige Punkte ab.";
-    if (currentWinner === view.partner) return "Dein Mitspieler liegt vorn. Eine Karte mit vielen Punkten kann eurem Team helfen.";
-    return "Überlege, ob sich eine starke Karte für diesen Stich lohnt oder ob du sie aufheben solltest.";
-  }
-  if (playedTrumps >= 8) return `Schon ${playedTrumps} Trümpfe sind gefallen. Hohe übrige Trümpfe werden jetzt besonders wertvoll.`;
-  const safeAce = legal.find(card => card.rank === "Ass" && !isTrump(card, view.contract!));
-  if (safeAce) return `Mit ${plainName(safeAce)} kannst du oft früh Punkte holen. Achte darauf, ob jemand die Farbe noch bedienen kann.`;
-  return "Beim Anspiel hilft oft eine kleine Fehlkarte, wenn du deine starken Trümpfe noch brauchst.";
+  if (view.phase === 'legen') return 'Klopfen verdoppelt den Wert. Nach viermal Weiter verpflichtet der letzte Klopfer sich zum Spiel.';
+  if (view.phase !== 'play' || view.turn !== view.seat || !view.contract || !view.legalCards.length) return null;
+  const decision = chooseCard(view,'pro',seededRandom(42));
+  const lesson = SCHAFKOPF_LESSONS.find(item => item.code === decision.reasonCode);
+  return `${lesson?.text ?? 'Prüfe Bedienpflicht und Teamzugehörigkeit.'} Empfehlung: ${plainName(decision.card)}.`;
 }
-
+export type TrickReview = { summary:string; actual:Card | null; suggested:Card | null; withinRules:boolean; codes:ReasonCode[]; lessons:Lesson[] };
+/** Restore the own hand and public information immediately before the reviewed move. */
+export function reviewViewForTrick(view: GameView, trick: Trick): GameView | null {
+  if (!view.contract) return null;
+  const index = view.tricks.findIndex(item => item.plays[0]?.card.id === trick.plays[0]?.card.id);
+  const position = trick.plays.findIndex(play => play.seat === view.seat);
+  if (index < 0 || position < 0) return null;
+  const history = view.tricks.slice(0,index);
+  const prefix = trick.plays.slice(0,position);
+  const futureOwn = view.tricks.slice(index).flatMap(item => item.plays).filter(play => play.seat === view.seat).map(play => play.card);
+  const currentNotInHistory = view.trick.filter(play => play.seat === view.seat && !view.tricks.some(item => item.plays.some(other => other.card.id === play.card.id))).map(play => play.card);
+  const hand = [...new Map([...view.hand,...futureOwn,...currentNotInHistory].map(card => [card.id,card])).values()];
+  const points = [0,0,0,0]; history.forEach(item => { points[item.winner] += item.points; });
+  const past = [...history.flatMap(item => item.plays),...prefix];
+  const calledRank = view.contract.calledRank ?? 'Ass';
+  const called = past.find(play => play.card.suit === view.contract!.suit && play.card.rank === calledRank);
+  const ownHolder = view.contract.kind === 'rufspiel' && hand.some(card => card.suit === view.contract!.suit && card.rank === calledRank);
+  // The known final partner is used only to recognize a public past Davonlaufen, never as prior knowledge.
+  const escapedPlay = view.contract.kind === 'rufspiel' ? [...history,{plays:prefix}].flatMap(item => item.plays[0] && item.plays[0].seat === view.partner && item.plays[0].card.suit === view.contract!.suit && !isTrump(item.plays[0].card,view.contract!) && item.plays[0].card.rank !== calledRank ? [item.plays[0]] : []).at(0) : undefined;
+  const partner = view.contract.kind !== 'rufspiel' ? null : called?.seat ?? escapedPlay?.seat ?? (ownHolder ? view.seat : null);
+  const counts = [0,1,2,3].map(seat => 8-history.filter(item => item.plays.some(play => play.seat === seat)).length-Number(prefix.some(play => play.seat === seat)));
+  const spritzEvents = (view.spritzEvents ?? []).filter(event => event.trick < index || event.trick === index && event.position < position);
+  const before: GameView = { ...view,phase:'play',turn:view.seat,hand,trick:prefix,tricks:history,points,partner,partnerRevealed:!!called || !!escapedPlay,escaped:!!escapedPlay,counts,result:null,history:[],announcements:[],announcementTitles:{},legalCards:[],locks:{},spritzEvents,spritzCount:spritzEvents.at(-1)?.count ?? 0,spritzSeats:[...new Set(spritzEvents.map(event => event.seat))],lastSpritzTrick:spritzEvents.at(-1)?.trick ?? -1,canDouble:false };
+  // cardLock is a pure own-hand check. Dummy foreign hands remain empty.
+  const state = { ...before,hands:[0,1,2,3].map(seat => seat === view.seat ? hand : []),pendingHands:[[],[],[],[]],initialHands:[[],[],[],[]] } as GameState;
+  before.legalCards = hand.filter(card => cardLock(state,view.seat,card) === null).map(card => card.id);
+  before.locks = Object.fromEntries(hand.flatMap(card => { const reason = cardLock(state,view.seat,card); return reason ? [[card.id,reason]] : []; }));
+  return before;
+}
+export function analyzeSchafkopfTrick(view: GameView, trick: Trick): TrickReview {
+  const winning = trick.plays.find(play => play.seat === trick.winner);
+  const actual = trick.plays.find(play => play.seat === view.seat)?.card ?? null;
+  const summary = winning ? `${view.names[trick.winner]} holt ${trick.points} Punkte mit ${plainName(winning.card)}.` : 'Der Stich ist noch nicht vollständig.';
+  const before = reviewViewForTrick(view,trick);
+  if (!before || !before.legalCards.length) return {summary,actual,suggested:null,withinRules:true,codes:[],lessons:[]};
+  const decision = chooseCard(before,'pro',seededRandom(42),{...before.rules.bot,proError:0,deducedR6:{beginner:0,amateur:0,advanced:1,pro:1,legend:1},r6b:{beginner:0,amateur:0,advanced:1,pro:1,legend:1}});
+  const codes = [...new Set<ReasonCode>([...decision.debugInfo.rules,...decision.debugInfo.tips])].filter(code => code !== 'EXISTING');
+  const lessons = codes.flatMap(code => { const lesson = SCHAFKOPF_LESSONS.find(item => item.code === code); return lesson ? [lesson] : []; });
+  const withinRules = !!actual && decision.debugInfo.candidates.includes(actual.id);
+  return {summary,actual,suggested:decision.card,withinRules,codes,lessons};
+}
 export function reviewSchafkopfTrick(view: GameView, trick: Trick): string {
-  if (!view.contract) return "Dieser Stich kann ohne Spielansage nicht bewertet werden.";
-  const winningPlay = trick.plays.find(play => play.seat === trick.winner);
-  if (!winningPlay) return "Der Stich ist noch nicht vollständig.";
-  const trump = isTrump(winningPlay.card, view.contract);
-  const ownPlay = trick.plays.find(play => play.seat === view.seat);
-  const ownEyes = ownPlay ? POINTS[ownPlay.card.rank] : 0;
-  if (trick.points >= 20) return `${view.names[trick.winner]} holt ${trick.points} Punkte mit ${plainName(winningPlay.card)}. Bei so vielen Punkten lohnt es sich, einen sicheren Gewinner einzusetzen.`;
-  if (ownEyes >= 10 && trick.winner !== view.seat && trick.winner !== view.partner) return `Du hast ${ownEyes} Punkte abgegeben. Prüfe beim nächsten Mal, ob dein Team den Stich sicher gewinnt.`;
-  if (trump) return `${plainName(winningPlay.card)} gewinnt als Trumpf. Ein kleinerer Trumpf hätte vielleicht ebenfalls gereicht.`;
-  return `${view.names[trick.winner]} gewinnt mit ${plainName(winningPlay.card)} und erhält ${trick.points} Punkte. Merke dir, welche Farbe ausgespielt wurde.`;
+  if (!view.contract) return 'Dieser Stich kann ohne Spielansage nicht bewertet werden.';
+  const review = analyzeSchafkopfTrick(view,trick);
+  const recommendation = review.suggested && review.actual?.id !== review.suggested.id ? ` Aus deiner damaligen Sicht wäre ${plainName(review.suggested)} eine Empfehlung gewesen.` : '';
+  const points = review.actual ? POINTS[review.actual.rank] : 0;
+  return `${review.summary}${!review.withinRules ? ' Deine Karte weicht von den Bot-Grundsätzen ab.' : ''}${points >= 10 ? ' Volle Schmier ist besonders wertvoll für einen sicheren Teamstich.' : ''}${recommendation}${review.lessons.length ? ` ${review.lessons[0].code}: ${review.lessons[0].text}` : ''}`;
 }
