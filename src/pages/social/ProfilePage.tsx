@@ -119,7 +119,7 @@ function StatCard({
 
 export default function ProfilePage() {
   const { language } = useUiLanguage();
-  const { user, profile, refreshProfile } = useAuth();
+  const { user, profile, refreshProfile, loading: authLoading } = useAuth();
 
   const [username, setUsername] = useState("");
   const [avatarId, setAvatarId] = useState("m1");
@@ -338,6 +338,14 @@ export default function ProfilePage() {
   /* =========================================================
      NOT LOGGED IN
      ========================================================= */
+
+  if (!user && authLoading) {
+    return (
+      <main className="min-h-screen bg-transparent px-4 py-10 text-white" role="status">
+        {ui("Loading...")}
+      </main>
+    );
+  }
 
   if (!user) {
     return (
