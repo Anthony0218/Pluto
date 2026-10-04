@@ -10,8 +10,8 @@ export function matchSettings(options: Partial<MatchSettings> = {}): MatchSettin
   return { matchDuration: MATCH_DURATIONS.includes(options.matchDuration as 120 | 600 | 1200) ? options.matchDuration! : EAT.hell.normalDuration, mode: options.mode === 'solo' ? 'solo' : 'multiplayer', hellEnabled: options.hellEnabled !== false, animalsEnabled: options.animalsEnabled !== false, livesEnabled: options.livesEnabled !== false,
     botsEnabled: options.mode !== 'solo' || options.botsEnabled !== false,
     botDifficulty: options.botDifficulty === 'easy' || options.botDifficulty === 'hard' ? options.botDifficulty : 'medium',
-    // Pluto objects are always part of the game with a fixed strong bonus; old client values are ignored.
-    plutoEnabled: true, plutoMultiplier: EAT.pluto.multiplier };
+    // Legacy Pluto reward fields remain readable, but live games replace them with factories.
+    plutoEnabled: false, plutoMultiplier: EAT.pluto.multiplier };
 }
 export function newStats(): MatchStats {
   return { collected: {}, totalGrowth: 0, growthActivations: 0, hostileAttacks: 0, maxMass: EAT.player.startingMass, normalFinalMass: EAT.player.startingMass, deaths: 0, respawns: 0, plutos: 0, plutoBonus: 0,
@@ -22,8 +22,7 @@ export function recordEvent(s: GameState, event: Omit<GameEvent, 'id' | 'at'>, s
   const e = { ...event, id: s.nextId++, at: s.time }; s.events.push(e);
   if (significant) { s.timeline ??= []; s.timeline.push(e); if (s.timeline.length > 256) s.timeline.splice(0, s.timeline.length - 256); }
 }
-export const canUnderpass = (p: Player, f: Pick<FoodObject, 'kind'>, time: number) => !foodFits(p, f, time) &&
-  FOOD[f.kind].underpassClearance > 0;
+export const canUnderpass = (p: Player, f: Pick<FoodObject, 'kind'>, time: number) => !foodFits(p, f, time);
 export const raisedHeight = (kind: FoodKind) => FOOD[kind].underpassClearance * 1.15;
 export const unavailable = (p: Player) => !p.alive || !!p.escape || p.ability?.kind === 'jump' || p.fallingAt !== undefined;
 export function safePosition(s: GameState, at: Vec, radius: number, ignoredId?: string) {
@@ -32,9 +31,11 @@ export function safePosition(s: GameState, at: Vec, radius: number, ignoredId?: 
     s.food.every(f => f.target || distance(at, f) > radius + FOOD[f.kind].radius + 8);
 }
 export function clearTemporary(s: GameState, p: Player) {
+  p.shockAmmo = 0; delete p.nextShockAt; delete p.shockedAt;
+  if (s.shockShots) s.shockShots = s.shockShots.filter(shot => shot.ownerId !== p.id);
   delete p.ability; delete p.lastStrikeAt; p.storedJump = false; p.storedStrike = false;
   releaseQuest(s, p.id); p.storedGrowth = false; p.growthModifier = 1; p.stunnedUntil = 0; delete p.knockback; delete p.hellScale; p.chokingUntil = 0; delete p.burpAt; p.nextBurp = s.time + 27 + s.players.indexOf(p) * .73; delete p.escape; delete p.helper; delete p.fallingAt;
-  p.effects = { speed: 0, shield: 0, magnet: 0, multiplier: 0, divider: 0, jump: 0, strike: 0 }; p.vx = 0; p.vy = 0; p.input = { x: 0, y: 0 };
+  p.effects = { speed: 0, shield: 0, magnet: 0, multiplier: 0, divider: 0, jump: 0, strike: 0, shock: 0 }; p.vx = 0; p.vy = 0; p.input = { x: 0, y: 0 };
   for (const f of s.food) if (f.target === p.id) { f.target = null; f.z = 0; f.vz = 0; f.availableAt = s.time + 1; }
 }
 export function respawn(s: GameState, p: Player): boolean {
@@ -46,7 +47,7 @@ export function respawn(s: GameState, p: Player): boolean {
   (p.stats ??= newStats()).respawns++; recordEvent(s, { type: 'respawn', playerId: p.id, ...at }); return true;
 }
 export function foodReward(s: GameState, p: Player, f: FoodObject) {
-  const info = FOOD[f.kind], base = info.growth * (f.rewardMultiplier ?? 1) / Math.max(1, Math.sqrt(p.mass / 1800));
+  const info = FOOD[f.kind], base = (f.rewardGrowth ?? info.growth) * (f.rewardMultiplier ?? 1) / (f.rewardGrowth !== undefined || f.kind === 'human' || info.shape === 'factory' ? 1 : Math.max(1, Math.sqrt(p.mass / 1800)));
   const bonus = isPluto(f.kind) ? base * ((s.settings?.plutoMultiplier ?? EAT.pluto.multiplier) - 1) : 0;
   const gain = grantGrowth(s, p, base + bonus); countCollected(p, f.kind);
   const stats = p.stats ??= newStats(); stats.maxMass = Math.max(stats.maxMass, p.mass);

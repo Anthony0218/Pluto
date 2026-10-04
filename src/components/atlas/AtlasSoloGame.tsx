@@ -89,10 +89,9 @@ export function AtlasSoloGame({ data, mode, settings, seed, title, player, onFin
   useEffect(() => {
     if (over || mode !== "speed_run") return;
     const interval = window.setInterval(() => {
-      setRemainingMs((current) => {
-        if (current <= 100) { window.clearInterval(interval); setOver(true); return 0; }
-        return current - 100;
-      });
+      const remaining=Math.max(0,60_000-(Date.now()-startedAt.current));
+      setRemainingMs(remaining);
+      if(remaining===0){window.clearInterval(interval);setOver(true);}
     }, 100);
     return () => window.clearInterval(interval);
   }, [mode, over]);
@@ -232,12 +231,12 @@ export function SoloResults({ mode, summary, entities, eyebrow = "Expedition com
   const headline = mode === "map_fill" && summary.fill?.complete ? "Region mastered" : mode === "higher_lower" ? `Streak of ${summary.bestStreak}`
     : territory ? territory.mine > territory.rival ? "Your empire prevails" : territory.mine === territory.rival ? "A stalemate" : "The rival empire wins" : "Great run";
   const tiles = territory
-    ? [{ value: territory.mine, label: "Your countries" }, { value: territory.rival, label: "Rival countries" }, { value: summary.bestStreak, label: "Best streak" }, { value: `${Math.round(summary.elapsedMs / 1000)}s`, label: "Elapsed" }]
+    ? [{ value: territory.mine, label: "Your influence" }, { value: territory.rival, label: "Rival influence" }, { value: answered ? `${Math.round(summary.correct / answered * 100)}%` : "—", label: "Knowledge accuracy" }, { value: `${Math.round(summary.elapsedMs / 1000)}s`, label: "Elapsed" }]
     : mode === "closest_wins"
       ? [{ value: summary.correct, label: "Bullseyes" }, { value: `${Math.round(summary.averageKm ?? 0).toLocaleString("en")} km`, label: "Average distance" }, { value: answered, label: "Pins" }, { value: `${Math.round(summary.elapsedMs / 1000)}s`, label: "Elapsed" }]
       : [{ value: summary.correct, label: "Correct" }, { value: mode === "map_fill" ? summary.wrong : `${answered ? Math.round(summary.correct / answered * 100) : 0}%`, label: mode === "map_fill" ? "Mistakes" : "Accuracy" }, { value: summary.bestStreak, label: "Best streak" }, { value: `${Math.round(summary.elapsedMs / 1000)}s`, label: "Elapsed" }];
   return <main className="atlas-page atlas-center"><div className="atlas-result-orbit"><Trophy /></div><span className="atlas-eyebrow">{eyebrow}</span><h1>{headline}</h1>
-    <p className="atlas-result-score">{new Intl.NumberFormat("en").format(summary.score)} <small>{territory ? "countries" : "points"}</small></p>
+    <p className="atlas-result-score">{new Intl.NumberFormat("en").format(summary.score)} <small>{territory ? "influence" : "points"}</small></p>
     <div className="atlas-result-grid">{tiles.map((tile) => <div key={tile.label}><strong>{tile.value}</strong><span>{tile.label}</span></div>)}</div>
     {summary.missed.length > 0 && <p className="atlas-missed">Review: {[...new Set(summary.missed)].slice(0, 5).map((id) => entities.find((entity) => entity.id === id)?.shortName).filter(Boolean).join(", ")}</p>}
     <div className="atlas-result-actions">{actions}</div></main>;

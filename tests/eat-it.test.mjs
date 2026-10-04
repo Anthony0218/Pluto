@@ -10,7 +10,7 @@ import { advanceRoom, applyRoomAction, parseSettings } from '../src/games/eat-it
 
 function arena(count = 2, map = 'city') {
   const s = createGame(map, Array.from({ length: count }, (_, i) => ({ id: `p${i}`, name: `P${i}` })), 5721, 'legacy-rules', { livesEnabled: false, hellEnabled: false });
-  s.food = []; s.powerups = []; s.nextFood = 1000; s.nextPower = 1000;
+  s.food = []; s.powerups = []; s.nextFactory=s.nextHumans=1e9;delete s.feast;s.nextFood = 1000; s.nextPower = 1000;
   s.players.forEach((p, i) => { p.x = 1000 + i * 150; p.y = 800; p.facing = 0; }); return s;
 }
 function steps(s, seconds) { for (let i = 0; i < seconds * EAT.network.tickRate; i++) stepGame(s); }

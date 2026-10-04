@@ -12,6 +12,8 @@ export type Particle = Vec & {
   color: string;
 };
 export type Game = {
+  randomState: number;
+  visualRandomState: number;
   phase: Phase;
   winner: Role | null;
   reason: string;
@@ -28,6 +30,8 @@ export type Game = {
   bossTimer: number;
   bossHits: number;
   dive: number;
+  diveWindup: number;
+  lastSeenPrey: Vec;
   attacks: number;
   recovering: boolean;
   actionHeld: boolean;
@@ -158,7 +162,8 @@ export type ScenarioId =
 export type Stage = "menu" | "briefing" | "game" | "quiz" | "results";
 export type PlayMode = "hotseat" | "ai";
 export type BotDifficulty = "easy" | "normal" | "hard";
-export type GameResult = { winner: Player | null; detail: string };
+export type RunPerformance = { completed: boolean; progress: number; health: number; elapsed: number; label: string };
+export type GameResult = { winner: Player | null; detail: string; performance?: RunPerformance; opponent?:'ocean'|'rival' };
 export type Scenario = {
   id: ScenarioId;
   icon: string;
@@ -332,7 +337,7 @@ export const SCENARIOS: Scenario[] = [
     behaviour:
       "American kestrels hunt small animals, often watching from a perch. Meadow voles move through vegetation and use burrows as shelter.",
     rules: [
-      "Kestrel: catch the vole three times before the hunt ends. Vole: use seven grass shelters or the burrow to escape. Each kestrel dive uses one of five attacks and automatically climbs back up. Rest still on the perch for 2 seconds to refill all five attacks.",
+      "Kestrel: catch the vole three times before the hunt ends. Vole: use seven grass shelters or the burrow to escape; cover hides you from all shared-screen viewers for a limited time. Each kestrel dive consumes one of five attacks, briefly warns before accelerating, and automatically climbs back up. Rest still on the perch for 2 seconds to refill all five attacks.",
       "After 55 seconds, the fantasy giant-vole phase begins. The kestrel wins with three dives; the vole wins with a strike or survives another 26 seconds.",
       "Local: kestrel uses WASD + Space; vole uses arrows + Enter. Vs AI: use WASD + Space for your assigned animal. On-screen controls also support touch.",
     ],

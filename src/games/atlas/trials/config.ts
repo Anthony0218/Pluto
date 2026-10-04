@@ -27,7 +27,7 @@ export const STAT_RANKING = {
 } as const;
 
 export const EXTREME_GEOGRAPHY = {
-  correct: 300, maxSpeedBonus: 200, timeLimitMs: 10_000, rounds: 15,
+  correct: 300, maxSpeedBonus: 15, timeLimitMs: 10_000, rounds: 15,
   choices: 4, extremeChoices: 6, extremeMultiplier: 2, extremeEvery: 5,
   /** The winner must beat the runner-up by this share, so the question is never a coin flip. */
   minGap: { beginner: .3, intermediate: .15, expert: .07 } satisfies Record<AtlasDifficulty, number>,

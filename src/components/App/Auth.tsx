@@ -30,14 +30,14 @@ export default function Auth() {
 
     try {
       if (isRegistering) {
-        const { error } = await signUp(email.trim(), password);
+        const { error, needsEmailConfirmation } = await signUp(email.trim(), password);
 
         if (error) {
           setError(error.message);
           return;
         }
 
-        setMessage("Account created successfully!");
+        setMessage(needsEmailConfirmation ? "Check your email and confirm your account using the confirmation link. No email yet? Please also check your spam or junk folder." : "Account created successfully!");
       } else {
         const { error } = await signIn(email.trim(), password);
 
@@ -201,8 +201,8 @@ export default function Auth() {
                 )}
 
                 {message && (
-                  <div className="rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06] px-4 py-3 text-xs leading-5 text-emerald-200">
-                    {message}
+                  <div role="status" className="rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06] px-4 py-3 text-xs leading-5 text-emerald-200">
+                    {ui(message)}
                   </div>
                 )}
 

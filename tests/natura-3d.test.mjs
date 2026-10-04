@@ -50,7 +50,7 @@ test('new worlds stay frozen when paused and ignore invalid frame deltas',()=>{
   }
   const o=createLaneOcean();o.phase='paused';const before=structuredClone(o);updateLaneOcean(o,[1,1],0.1,false);assert.deepEqual(o,before);
 });
-test('all three large spider courses are completable by the rival using normal jumps',()=>{
+test('all eight large spider courses are completable by the rival using normal jumps',()=>{
   SPIDER_COURSES.forEach((_,level)=>{const g=createExpedition('jumpingspider',level);g.phase='playing';assert.equal(g.platforms.length,24);assert.ok(Math.abs(g.platforms.at(-1).z)>120);advance(dt=>updateExpedition(g,idle(),dt,true),180);assert.equal(g.winner,1);assert.equal(g.players[1].progress,23);});
 });
 test('silk rescue consumes silk before hearts; checkpoint landing restores silk',()=>{
@@ -77,5 +77,5 @@ test('surfacing refills breath and oxygen exhaustion costs health',()=>{
   const g=createExpedition('spermwhale');g.phase='playing';const p=g.players[0];p.oxygen=1;p.y=-30;advance(dt=>updateExpedition(g,idle(),dt,true),1.1);assert.equal(p.lives,2);p.y=-1;advance(dt=>updateExpedition(g,idle(),dt,true),2);assert.ok(p.oxygen>45);
 });
 test('spider traversal is stable across common frame rates',()=>{
-  const outcomes=[30,60,120].map(fps=>{const g=createExpedition('jumpingspider',2);g.phase='playing';advance(dt=>{const ai=spiderAI(g);updateExpedition(g,[ai,ai],dt,true);},70,fps);return [g.players[1].progress,g.players[1].lives];});assert.deepEqual(outcomes[0],outcomes[1]);assert.deepEqual(outcomes[1],outcomes[2]);
+  const outcomes=[30,60,120].map(fps=>{const g=createExpedition('jumpingspider',2);g.phase='playing';advance(dt=>updateExpedition(g,idle(),dt,true),70,fps);return [g.players[1].progress,g.players[1].lives];});assert.deepEqual(outcomes[0],outcomes[1]);assert.deepEqual(outcomes[1],outcomes[2]);
 });

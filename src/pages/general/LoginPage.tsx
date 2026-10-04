@@ -1,11 +1,10 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useAppLanguage } from "@/i18n/languageStore";
 
 type LoginMode = "login" | "register";
 type Language = "de" | "en";
-
-const LANGUAGE_STORAGE_KEY = "swag-language";
 
 const translations = {
   de: {
@@ -47,6 +46,10 @@ const translations = {
     terms:
       "Mit der Nutzung der Website stimmst du den Nutzungsbedingungen zu und bestätigst die Hinweise zu Drittsoftware und verwendeten Assets.",
     credits: "Credits & Lizenzen",
+    imprint: "Impressum",
+    confirmation: "Prüfe deine E-Mails und bestätige dein Konto über den Bestätigungslink.",
+    spam: "Keine E-Mail erhalten? Schau bitte auch in deinem Spam- oder Junk-Ordner nach.",
+    created: "Dein Konto wurde erstellt. Du kannst jetzt spielen.",
   },
   en: {
     backHome: "← Back to home",
@@ -86,43 +89,31 @@ const translations = {
     terms:
       "By using the site, you agree to the site terms and acknowledge the third-party software and asset credits.",
     credits: "Credits & licenses",
+    imprint: "Imprint",
+    confirmation: "Check your email and confirm your account using the confirmation link.",
+    spam: "No email yet? Please also check your spam or junk folder.",
+    created: "Your account has been created. You can now play.",
   },
 } as const;
-
-function getInitialLanguage(): Language {
-  if (typeof window === "undefined") {
-    return "de";
-  }
-
-  const saved = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
-
-  if (saved === "de" || saved === "en") {
-    return saved;
-  }
-
-  return window.navigator.language.toLowerCase().startsWith("de") ? "de" : "en";
-}
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { signIn, signUp } = useAuth();
   const [mode, setMode] = useState<LoginMode>(() => searchParams.get("mode") === "register" ? "register" : "login");
-  const [language, setLanguage] = useState<Language>(getInitialLanguage);
+  const { language: appLanguage, setLanguage } = useAppLanguage();
+  const language: Language = appLanguage === "de" || appLanguage === "bar" ? "de" : "en";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [registrationStatus, setRegistrationStatus] = useState<"confirmation" | "created" | null>(null);
 
   const t = translations[language];
 
   function changeLanguage(nextLanguage: Language) {
     setLanguage(nextLanguage);
-
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(LANGUAGE_STORAGE_KEY, nextLanguage);
-    }
 
     setMessage(null);
   }
@@ -130,6 +121,7 @@ export default function LoginPage() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage(null);
+    setRegistrationStatus(null);
 
     if (!email.trim() || !password) {
       setMessage(t.pleaseEnter);
@@ -153,17 +145,13 @@ export default function LoginPage() {
 
         navigate("/", { replace: true });
       } else {
-        const { error } = await signUp(email.trim(), password);
+        const { error, needsEmailConfirmation } = await signUp(email.trim(), password);
 
         if (error) {
           throw error;
         }
 
-        setMessage(
-          language === "de"
-            ? "Konto wurde erstellt. Prüfe gegebenenfalls deine E-Mails zur Bestätigung."
-            : "Account created. Check your email for confirmation if required.",
-        );
+        setRegistrationStatus(needsEmailConfirmation ? "confirmation" : "created");
       }
     } catch (error) {
       setMessage(error instanceof Error ? error.message : t.genericError);
@@ -294,6 +282,7 @@ export default function LoginPage() {
                   onClick={() => {
                     setMode("login");
                     setMessage(null);
+                    setRegistrationStatus(null);
                   }}
                   className={`rounded-lg px-4 py-2.5 text-xs font-black transition ${
                     mode === "login"
@@ -309,6 +298,7 @@ export default function LoginPage() {
                   onClick={() => {
                     setMode("register");
                     setMessage(null);
+                    setRegistrationStatus(null);
                   }}
                   className={`rounded-lg px-4 py-2.5 text-xs font-black transition ${
                     mode === "register"
@@ -370,8 +360,14 @@ export default function LoginPage() {
                 )}
 
                 {message && (
-                  <div className="rounded-xl border border-amber-400/20 bg-amber-400/[0.06] px-4 py-3 text-xs leading-5 text-amber-200">
+                  <div role="alert" className="rounded-xl border border-amber-400/20 bg-amber-400/[0.06] px-4 py-3 text-xs leading-5 text-amber-200">
                     {message}
+                  </div>
+                )}
+                {registrationStatus && (
+                  <div role="status" className="rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06] px-4 py-3 text-xs leading-5 text-emerald-200">
+                    <p>{registrationStatus === "confirmation" ? t.confirmation : t.created}</p>
+                    {registrationStatus === "confirmation" && <p className="mt-2 font-semibold">{t.spam}</p>}
                   </div>
                 )}
 
@@ -388,13 +384,14 @@ export default function LoginPage() {
                 {t.terms}
               </p>
 
-              <div className="mt-4 text-center">
+              <div className="mt-4 flex justify-center gap-5">
                 <Link
                   to="/credits"
                   className="text-xs font-bold text-zinc-500 transition hover:text-emerald-300"
                 >
                   {t.credits}
                 </Link>
+                <Link to="/imprint" className="text-xs font-bold text-zinc-500 transition hover:text-emerald-300">{t.imprint}</Link>
               </div>
             </div>
           </section>

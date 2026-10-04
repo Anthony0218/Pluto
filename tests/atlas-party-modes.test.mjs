@@ -84,17 +84,17 @@ test("guess-the-country clues never name the country and end with its flag", () 
   assert.ok(!kenya.some((clue) => /Mount Kenya/.test(clue.text)));
 });
 
-test("guess scoring: first solver 3, later solvers 2, early-tip bonuses +2/+1", () => {
-  assert.deepEqual(scoreGuessTip([{ userId: "b", submittedAt: 20 }, { userId: "a", submittedAt: 10 }], 0).map(({ userId, total, first }) => [userId, total, first]), [["a", 5, true], ["b", 4, false]]);
+test("guess scoring: all solvers 3, early-tip bonuses +2/+1", () => {
+  assert.deepEqual(scoreGuessTip([{ userId: "b", submittedAt: 20 }, { userId: "a", submittedAt: 10 }], 0).map(({ userId, total, first }) => [userId, total, first]), [["a", 5, true], ["b", 5, false]]);
   assert.deepEqual(scoreGuessTip([{ userId: "a", submittedAt: 1 }], 1).map((award) => award.total), [GUESS_SCORING.first + 1]);
-  assert.deepEqual(scoreGuessTip([{ userId: "a", submittedAt: 1 }, { userId: "c", submittedAt: 2 }], 3).map((award) => award.total), [3, 2]);
+  assert.deepEqual(scoreGuessTip([{ userId: "a", submittedAt: 1 }, { userId: "c", submittedAt: 2 }], 3).map((award) => award.total), [3, 3]);
   const [question] = generateGuessCountryQuestions({ ...base, count: 1 });
   const guess = (userId, answer, submittedAt, tip) => ({ ...createAuthoritativeSubmission({ userId, round: 0, answer, mode: "guess_country", question, submittedAt }), tip });
   const missed = resolveGuessTip({ submissions: [guess("a", "country:ZZZ", 1, 0), guess("b", "country:YYY", 2, 0)], tip: 0, currentScores: { a: 1, b: 0 } });
   assert.equal(missed.solved, false); assert.deepEqual(missed.scores, { a: 1, b: 0 });
   const solved = resolveGuessTip({ submissions: [guess("a", "country:ZZZ", 1, 0), guess("c", question.answer, 9, 1), guess("b", question.answer, 5, 1), guess("d", "country:ZZZ", 3, 1)], tip: 1, currentScores: { a: 1, b: 0, c: 0, d: 0 } });
   assert.equal(solved.solved, true);
-  assert.deepEqual(solved.scores, { a: 1, b: 4, c: 3, d: 0 });
+  assert.deepEqual(solved.scores, { a: 1, b: 4, c: 4, d: 0 });
 });
 
 test("rooms seat two to four players; Territory Battle stays one-on-one", () => {
@@ -108,8 +108,7 @@ test("rooms seat two to four players; Territory Battle stays one-on-one", () => 
 
 test("Atlas Edge Function keeps unrevealed tips and hidden values on the server", async () => {
   const source = await readFile(new URL("../supabase/functions/atlas-match/index.ts", import.meta.url), "utf8");
-  assert.match(source, /question\.clues\.slice\(0, \(match\.tip_index \|\| 0\) \+ 1\)/);
-  assert.match(source, /secondValue: undefined/);
+  assert.match(source, /toPublicQuestion/);
   assert.match(source, /resolveGuessTip/);
   const migration = await readFile(new URL("../supabase/migrations/20261013000000_atlas_party_modes.sql", import.meta.url), "utf8");
   assert.match(migration, /between 1 and 4/);

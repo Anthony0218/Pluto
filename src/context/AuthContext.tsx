@@ -94,13 +94,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [userId, loadProfile]);
 
   async function signUp(email: string, password: string) {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
     });
 
     return {
       error: error ? new Error(error.message) : null,
+      needsEmailConfirmation: !error && !data.session,
     };
   }
 

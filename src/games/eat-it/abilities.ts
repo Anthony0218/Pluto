@@ -4,20 +4,25 @@ import { isChoking } from './rules.ts';
 import { supported } from './hell.ts';
 import { newStats, recordEvent } from './progression.ts';
 import type { GameState, Player } from './types.ts';
-export type HeldAbility = 'jump' | 'strike';
-export const ABILITY_KEYS = { strike: 'Space', jump: 'KeyJ' } as const;
+export type HeldAbility = 'jump' | 'strike' | 'shock';
+export const ABILITY_KEYS = { shock: 'KeyK', strike: 'Space', jump: 'KeyJ' } as const;
 export function canStorePower(s: GameState, p: Player, kind: PowerKind) {
-  return kind === 'jump' ? s.phase === 'hell' && !p.storedJump : kind === 'strike' ? !p.storedStrike : kind === 'multiplier' ? !p.storedGrowth : true;
+  return kind === 'shock' ? s.phase === 'normal' && !(p.shockAmmo ?? 0) : kind === 'jump' ? s.phase === 'hell' && !p.storedJump : kind === 'strike' ? !p.storedStrike : kind === 'multiplier' ? !p.storedGrowth : true;
 }
 export function abilityAvailable(s: Pick<GameState,'status'|'phase'|'time'|'hell'>, p: Player, kind: HeldAbility) {
   if (s.status !== 'playing' || !p.alive || p.respawnAt !== undefined || p.fallingAt !== undefined || p.escape || p.ability || isChoking(p,s.time) || (p.stunnedUntil??0)>s.time || s.phase==='transition') return false;
   if (s.phase==='hell' && !supported(s as GameState,p)) return false;
-  return kind === 'jump' ? s.phase==='hell' && !!p.storedJump : !!p.storedStrike;
+  return kind === 'shock' ? s.phase === 'normal' && (p.shockAmmo ?? 0) > 0 && s.time + 1e-6 >= (p.nextShockAt ?? 0) : kind === 'jump' ? s.phase==='hell' && !!p.storedJump : !!p.storedStrike;
 }
 /** Inputs carry activation intent only. Direction, duration and charge use are server-owned. */
 export function activateAbility(s: GameState, p: Player, kind: HeldAbility) {
   if (!abilityAvailable(s,p,kind)) return false;
   const length=Math.hypot(p.input.x,p.input.y), direction=length>.1 ? {x:p.input.x/length,y:p.input.y/length} : {x:Math.cos(p.facing),y:Math.sin(p.facing)};
+  if (kind === 'shock') {
+    p.shockAmmo = (p.shockAmmo ?? 0) - 1; p.nextShockAt = s.time + EAT.powerups.shock.shotCooldown;
+    (s.shockShots ??= []).push({id:s.nextId++,ownerId:p.id,x:p.x,y:p.y,dx:direction.x,dy:direction.y,distance:0});
+    p.facing=Math.atan2(direction.y,direction.x);recordEvent(s,{type:'shock',playerId:p.id,x:p.x,y:p.y});return true;
+  }
   const duration=kind==='jump'?EAT.powerups.jump.flightDuration:EAT.powerups.strike.burstDuration;
   p.ability={kind,startedAt:s.time,endsAt:s.time+duration,origin:{x:p.x,y:p.y},direction};
   p.facing=Math.atan2(direction.y,direction.x);p.vx=p.vy=0;

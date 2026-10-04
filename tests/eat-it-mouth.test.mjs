@@ -6,7 +6,7 @@ import { canEatPlayer, entersMouth, foodFits, mouthOpening, MOUTH } from '../src
 import { collideObjects, objectContact } from '../src/games/eat-it/physics.ts';
 function scene(kind='apple', dx=12, dy=0) {
  const s=createGame('city',[{id:'a',name:'A'},{id:'b',name:'B'}],41,'mouth',{livesEnabled:false});
- s.food=[];s.powerups=[];s.nextFood=1e6;s.nextPower=1e6;s.nextBig=1e9;
+ s.food=[];s.powerups=[];s.nextFactory=s.nextHumans=1e9;delete s.feast;s.nextFood=1e6;s.nextPower=1e6;s.nextBig=1e9;
  Object.assign(s.players[0],{x:1050,y:800,facing:0});Object.assign(s.players[1],{x:1900,y:1000});
  const f={id:s.nextId++,kind,x:1050+dx,y:800+dy,vx:0,vy:0,z:0,vz:0,rotation:0,target:null,capturedAt:0};s.food.push(f);
  return {s,p:s.players[0],f};
@@ -77,7 +77,7 @@ test('solid car contact follows its rotated footprint rather than its enclosing 
   assert.ok(Math.abs(contact.ny+Math.cos(rotation))<1e-8);
  }
 });
-test('an oversized building blocks movement, remains stable and cannot be magnetized',()=>{
+test('an oversized building permits passage, remains stable and cannot be magnetized',()=>{
  const {s,p,f}=scene('house',80);p.effects.magnet=10;const before={x:f.x,y:f.y,rotation:f.rotation};
  p.input={x:1,y:0};advance(s,30);
  assert.equal(p.foodEaten,0);assert.equal(f.target,null);assert.ok(Math.hypot(f.x-before.x,f.y-before.y)<.05);assert.equal(f.z,0);

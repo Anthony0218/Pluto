@@ -454,3 +454,72 @@ button.atlas-random-symbol:focus-visible { outline:2px solid #82ece5;outline-off
   .is-fixed-tab .atlas-ranked-tools { grid-column:2; grid-row:1; }
   .is-fixed-tab .atlas-ranked-mode-preview { grid-column:2; grid-row:2; align-content:center; }
 }
+
+/* Navigation stays available at every skill level; zoom does not reveal an answer. */
+.atlas-map-shell { min-width: 0; background: #0a2133; background-image: none; }
+.atlas-map-region { position: absolute; top: 12px; left: 12px; z-index: 3; }
+.atlas-map-region select,.atlas-question-panel select { max-width: 100%; color: #edf6ff; background: #102d43; border: 1px solid #416278; border-radius: 10px; padding: 10px; font: inherit; }
+.atlas-map-overview { position: absolute; right: 12px; top: 12px; width: 120px !important; height: 72px !important; min-height: 0 !important; opacity: .85; pointer-events: none; background: #071724; border: 1px solid #395366; border-radius: 8px; }
+.atlas-map-overview path { fill: #6c8395; stroke: none; }
+.atlas-map-overview rect { fill: #ffd37233; stroke: #ffd372; stroke-width: 5px; }
+.atlas-map-cluster { position: absolute; inset: 15% 12%; padding: 18px; border: 1px solid #6286a0; border-radius: 18px; background: #102739f5; z-index: 8; overflow: auto; max-height: 75%; }
+.atlas-map-cluster>div { display: flex; flex-wrap: wrap; gap: 10px; }
+.atlas-map-cluster button { color: inherit; background: #1b3b50; padding: 10px; border-radius: 10px; border: 1px solid #54748a; min-height: 44px; }
+.atlas-map-cluster>div>button { flex: 1 1 90px; min-width: 0; }
+.atlas-map-cluster svg { width: 80px !important; height: 64px !important; min-height: 0 !important; }
+.atlas-map-cluster .atlas-country-shape { min-height: 0; }
+.atlas-strategy-map { min-width: 0; }
+.atlas-strategy-hubs { display: flex; flex-wrap: wrap; gap: 8px; }
+.atlas-strategy-hubs span { padding: 7px; border-radius: 8px; background: #ffd37219; color: #ffd372; }
+.atlas-map-legend { padding: 8px 16px; color: #b1c5d6; font-size: 13px; }
+.atlas-order-list { list-style: decimal; padding: 0 0 0 20px; }
+.atlas-order-list li { display: flex; gap: 10px; align-items: center; padding: 8px 0; }
+.atlas-order-list strong { flex: 1; }
+.atlas-order-list button { min-width: 44px; min-height: 44px; color: white; background: #24435c; border-radius: 8px; border: 1px solid #4f6b82; }
+.atlas-game-page { height: auto; min-height: 100dvh; overflow: visible; }
+.atlas-play-layout { min-height: 0; }
+.atlas-question-panel { overflow-wrap: anywhere; min-width: 0; }
+.atlas-country:focus-visible { stroke: #fff; stroke-width: 3px; outline: none; }
+@media(max-width: 650px) {
+  .atlas-map-shell { min-height: 350px; }
+  .atlas-map-shell>svg:first-child { min-height: 350px; }
+  .atlas-map-overview { width: 90px !important; height: 53px !important; }
+  .atlas-map-cluster { inset: 12% 4%; }
+  .atlas-game-header { flex-wrap: wrap; gap: 12px; }
+  .atlas-strategy-map { order: -1; }
+  .atlas-tabs { overflow-x: auto; }
+}
+.atlas-mastery { max-width: 1100px; margin: 28px auto; padding: 20px; }
+.atlas-mastery>p { color: #b6c9d9; line-height: 1.6; max-width: 760px; }
+.atlas-mastery-regions { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px; margin: 25px 0; }
+.atlas-mastery-regions button { display: grid; gap: 12px; text-align: left; padding: 20px; color: #f4f8fc; background: #153148; border: 1px solid #38576e; border-radius: 18px; }
+.atlas-mastery-regions button.active { border-color: #ffd372; background: #233c49; }
+.atlas-mastery-regions progress { width: 100%; accent-color: #ffd372; }
+.atlas-mastery-detail { border: 1px solid #3c586a; padding: 24px; border-radius: 18px; background: #102a3b; }
+.atlas-mastery-stages { display: flex; flex-wrap: wrap; gap: 12px; margin: 20px 0; }
+.atlas-mastery-stages span { padding: 10px; border: 1px solid #47637b; border-radius: 10px; }
+.atlas-mastery-stages .earned { color: #67e8ad; border-color: #67e8ad; }
+@media(max-width:650px) { .atlas-mastery-regions { grid-template-columns: repeat(2,minmax(0,1fr)); } .atlas-mastery { padding: 0; } .atlas-mastery-regions button { padding: 14px; } }
+
+/* Content-sized play surfaces stay usable inside both the hub and standalone games. */
+.atlas-play-layout { width: 100%; height: auto; grid-template-rows: auto; align-items: start; }
+.atlas-question-panel { overflow: visible; }
+.atlas-map-shell { height: clamp(500px, 72dvh, 800px); }
+.atlas-map-shell > svg:first-child { min-height: 0; height: 100%; }
+.atlas-strategy-map .atlas-map-shell { height: clamp(500px, 72dvh, 800px); }
+.atlas-country--legal { stroke: #b2ffde; stroke-width: 1.8px; }
+.atlas-country--chosen { stroke: #fff2a5; stroke-width: 3px; }
+.atlas-strategy-route { fill: none; stroke: #ffe0a1; stroke-width: 2px; stroke-dasharray: 6 4; pointer-events: none; }
+.atlas-strategy-objective { fill: #ffdb76; stroke: #392916; stroke-width: 1px; paint-order: stroke; font-size: 19px; text-anchor: middle; dominant-baseline: middle; pointer-events: none; }
+.atlas-game-header { height: auto; min-height: 68px; }
+.atlas-game-header .atlas-submit { margin: 0; }
+@media(max-width:950px) {
+  .atlas-play-layout { grid-template-columns: minmax(0,1fr); }
+  .atlas-map-shell,.atlas-strategy-map .atlas-map-shell { height: clamp(350px, 55dvh, 540px); }
+}
+
+.atlas-map-overview { top: auto; right: auto; bottom: 12px; left: 12px; }
+
+/* Make the playable campaign distinct from surrounding geographic context. */
+.atlas-strategy-map .atlas-country--unmapped { fill: #344c58; stroke: #243b47; opacity: .75; }
+.atlas-strategy-map .atlas-country--unmapped:hover { fill: #344c58; stroke: #243b47; }

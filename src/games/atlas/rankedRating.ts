@@ -1,4 +1,4 @@
-/** Standard Glicko-2, one game per rating period; simultaneous opponents are rated from their pre-match values. */
+/** Glicko-2 uncertainty with opponent-sensitive Arena promotion pacing, one series per rating period. */
 export type Rating = { rating: number; deviation: number; volatility: number; matchesPlayed: number };
 export const INITIAL_RATING: Rating = { rating: 1500, deviation: 350, volatility: 0.06, matchesPlayed: 0 };
 const SCALE = 173.7178, TAU = 0.5, EPSILON = 1e-6;
@@ -28,12 +28,17 @@ function update(player: Rating, opponent: Rating, score: number): Rating {
   const nextPhi = 1 / Math.sqrt(1 / (phiStar * phiStar) + 1 / variance);
   const nextMu = mu + nextPhi * nextPhi * factor * (score - e);
   const next = { rating: 1500 + SCALE * nextMu, deviation: SCALE * nextPhi, volatility, matchesPlayed: player.matchesPlayed + 1 };
-  // Established wins/losses move at least 20 points (100-point divisions take about five wins).
-  // Placements retain uncertainty-driven Glicko-2 movement; draws retain their strength adjustment.
-  if (player.matchesPlayed >= 10 && score !== 0.5) {
-    const movement = Math.max(20, Math.min(40, Math.abs(next.rating - player.rating)));
-    next.rating = Math.max(100, Math.min(10000, player.rating + (score === 1 ? movement : -movement)));
+  // Established ranks retain momentum even at low uncertainty. The pace scales with
+  // score minus expected score, so farming weak opponents does not earn a fixed reward.
+  // Higher ranks move more slowly; uncertainty still follows the Glicko update.
+  if (player.matchesPlayed >= 10) {
+    const cap = player.rating < 1600 ? 40 : player.rating < 1900 ? 32 : player.rating < 2200 ? 24 : 18;
+    const delta = next.rating - player.rating;
+    const pacedDelta = cap * (score - e);
+    const change = Math.sign(delta) * Math.max(Math.abs(delta), Math.abs(pacedDelta));
+    next.rating = player.rating + Math.max(-cap, Math.min(cap, change));
   }
+  next.rating = Math.max(100, Math.min(10000, next.rating));
   if (!Object.values(next).every(Number.isFinite)) throw new Error("Glicko-2 produced an invalid rating.");
   return next;
 }

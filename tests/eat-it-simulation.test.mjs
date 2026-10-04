@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { createGame, fillBots, stepGame } from '../src/games/eat-it/engine.ts';
 import { EAT } from '../src/games/eat-it/config.ts';
 
-for (const map of ['city', 'nature']) test(`eight bots finish a stable ${map} match with the two-minute normal phase and enlarged Hell`, t => {
+for (const map of ['city', 'nature', 'candy', 'frozen']) test(`eight bots finish a stable ${map} match with the two-minute normal phase and enlarged Hell`, t => {
   const state = createGame(map, fillBots([], 8), 42, `simulation-${map}`, { matchDuration: 120 });
   const travel = state.players.map(() => 0), times = [];
   let maxFood = 0, maxPowers = 0;

@@ -1,34 +1,45 @@
+import { stepWorld, spawnHumans, surfaceAt, stepLeap, ridingCar } from './world.ts';
+import { stepShockShots } from './shock.ts';
+import { characterEmotion } from './characters.ts';
 import { abilityVelocity, stepJump, canStorePower } from './abilities.ts';
 import { stepStuckTree } from './choking.ts';
 import { stepBurp } from './expressions.ts';
 import { botPolicy } from './bots.ts';
-import { matchSettings, newStats, clearTemporary, recordEvent, canUnderpass, unavailable, respawn, foodReward, grantGrowth, countCollected } from './progression.ts';
+import { matchSettings, newStats, clearTemporary, recordEvent, unavailable, respawn, foodReward, grantGrowth, countCollected } from './progression.ts';
 import { startHell, stepHell } from './hell.ts';
 import { activateEscape, stepEscape } from './escape.ts';
 import { BOT_NAMES, COLORS, EAT, FOOD, POWER_KINDS, isBigProp, matchDuration, playerRadius, massToSpeed } from './config.ts';
 import { createEncounter, stepEncounter, finishEncounter, resolveShrine, shrineClear } from './quests.ts';
 import { beginFall, fallOffset, fallPose, jamAge, jamsInMouth } from './falling.ts';
-import { collideObjects, objectContact } from './physics.ts';
+import { collideObjects } from './physics.ts';
 import { botInput } from './bots.ts';
-import { clamp, clearPath, distance, resolveWalls, zoneRadius } from './maps.ts';
+import { clamp, clearPath, distance, resolveWalls, validPosition, zoneRadius } from './maps.ts';
 import { angleDelta, canEatPlayer, consumptionDuration, entersMouth, foodFits, inMouth, mouthPosition, mouthCoordinates, playerFits, canopyFits, treeParts, isChoking } from './rules.ts';
-import { spawnCityBuildings, spawnFood, spawnPluto, spawnPosition, updateSpawns } from './spawn.ts';
+import { spawnCityBuildings, spawnFood, spawnFactory, spawnPosition, updateSpawns } from './spawn.ts';
 import type { GameEvent, GameState, Input, MapId, Participant, Player, PowerObject, MatchSettings } from './types.ts';
 
 export function createGame(map: MapId, participants: Participant[], seed = 12345, id = `local-${seed}`, options: Partial<MatchSettings> = {}): GameState {
   if (options.mode === 'solo' && options.botsEnabled === false) participants = participants.filter(p => !p.bot);
   if (participants.length < (options.mode === 'solo' ? 1 : 2) || participants.length > EAT.match.maxPlayers || new Set(participants.map(p => p.id)).size !== participants.length) throw new Error('Eat It requires 1–8 unique participants (at least two online).');
   const state: GameState = { id, map, rng: seed || 1, nextId: 1, time: 0, status: 'playing', winnerId: null,
-    settings: matchSettings(options), phase: 'normal', timeline: [], nextPluto: EAT.pluto.interval, players: [], food: [], powerups: [], events: [], nextFood: 1, nextPower: EAT.powerups.spawnInterval, spawnSector: 0 };
+    settings: matchSettings(options), phase: 'normal', timeline: [], nextFactory: EAT.factories.interval, nextHumans: 8, feast: { nextAt: 10, wave: 0 }, players: [], food: [], powerups: [], events: [], nextFood: 1, nextPower: EAT.powerups.spawnInterval, spawnSector: 0 };
   participants.forEach((participant, i) => {
     const p = spawnPosition(state, 90, Math.floor(i * 12 / participants.length)) ?? { x: 800 + (i % 4) * 170, y: 600 + Math.floor(i / 4) * 260 };
-    state.players.push({ ...p, id: participant.id, name: participant.name, bot: !!participant.bot, color: COLORS[i],
+    state.players.push({ ...p, id: participant.id, name: participant.name, bot: !!participant.bot, color: COLORS[i], emotion: characterEmotion(seed, participant.id),
       nextBurp: 27 + i * 6 / participants.length, lives: state.settings?.livesEnabled === false ? 1 : EAT.lives.count, stats: newStats(), mass: EAT.player.startingMass, vx: 0, vy: 0, facing: Math.atan2(EAT.match.height / 2 - p.y, EAT.match.width / 2 - p.x), alive: true, placement: null,
       eliminatedBy: null, eliminatedAt: null, score: 0, foodEaten: 0, playersEaten: 0, powerupsCollected: 0,
-      effects: { speed: 0, shield: 0, magnet: 0, multiplier: 0, divider: 0, jump: 0, strike: 0 }, input: { x: 0, y: 0 }, botState: 'FORAGE', nextDecision: 0 });
+      effects: { speed: 0, shield: 0, magnet: 0, multiplier: 0, divider: 0, jump: 0, strike: 0, shock: 0 }, input: { x: 0, y: 0 }, botState: 'FORAGE', nextDecision: 0 });
   });
   state.spawnLocations = state.players.map(p => ({ x: p.x, y: p.y }));
   createEncounter(state);
+  // Equal opening snacks around every seat prevent district-specific slow starts.
+  for (const player of state.players) for (let i=0;i<8;i++) {
+    const a=i*Math.PI/4,at={x:player.x+Math.cos(a)*70,y:player.y+Math.sin(a)*70};
+    if(!validPosition(map,at,FOOD.apple.radius+4))continue;
+    state.food.push({...at,id:state.nextId++,kind:'apple',vx:0,vy:0,z:0,vz:0,rotation:a,target:null,capturedAt:0});
+  }
+  if (map === 'city') for (let i = 0; i < EAT.humans.cityCrowds; i++) spawnHumans(state);
+  for (let i = 0; i < EAT.factories.initialCount; i++) spawnFactory(state, i % 4);
   if (map === 'city') spawnCityBuildings(state);
   for (let i = 0; i < EAT.food.spawnCount * 3 && state.food.length < EAT.food.spawnCount; i++) spawnFood(state, true);
   state.bigTarget = state.food.filter(f => isBigProp(f.kind)).length; state.nextBig = EAT.food.bigRespawnInterval;
@@ -37,7 +48,6 @@ export function createGame(map: MapId, participants: Participant[], seed = 12345
     const p = spawnPosition(state, EAT.powerups.radius);
     if (p) state.powerups.push({ ...p, id: state.nextId++, kind });
   }
-  for (let i = 0; i < EAT.pluto.initialCount; i++) spawnPluto(state);
   return state;
 }
 export function fillBots(humans: Participant[], count: number): Participant[] {
@@ -110,6 +120,7 @@ export function collectPower(state: GameState, p: Player, power: PowerObject): v
   state.powerups.splice(index, 1); p.powerupsCollected++;
   countCollected(p, power.kind);
   if (power.kind === 'jump') p.storedJump = true;
+  else if (power.kind === 'shock') p.shockAmmo = EAT.powerups.shock.ammo;
   else if (power.kind === 'strike') p.storedStrike = true;
   else if (power.kind === 'multiplier') p.storedGrowth = true;
   else if (power.kind === 'divider') p.growthModifier = EAT.powerups.divider.strength;
@@ -126,19 +137,21 @@ export function movePlayer(state: Pick<GameState, 'map' | 'time' | 'encounter' |
     return;
   }
   const direction = sanitizeInput(input), moving = Math.hypot(direction.x, direction.y) > 0.05;
-  const max = speedScale * massToSpeed(p.mass) * (p.effects.speed > state.time ? EAT.powerups.speed.strength : 1);
+  const surface = state.phase === 'hell' ? { drag: 1, speed: 1, x: 0, y: 0 } : surfaceAt(state.map, p);
+  const friction = EAT.player.friction * surface.drag;
+  const max = surface.speed * speedScale * massToSpeed(p.mass) * (p.effects.speed > state.time ? EAT.powerups.speed.strength : 1);
   if (moving) {
     p.vx += direction.x * EAT.player.acceleration * dt; p.vy += direction.y * EAT.player.acceleration * dt;
     // Drag perpendicular velocity so corners feel responsive without snapping.
     const along = p.vx * direction.x + p.vy * direction.y;
-    p.vx += (direction.x * along - p.vx) * Math.min(1, EAT.player.friction * dt);
-    p.vy += (direction.y * along - p.vy) * Math.min(1, EAT.player.friction * dt);
+    p.vx += (direction.x * along - p.vx) * Math.min(1, friction * dt);
+    p.vy += (direction.y * along - p.vy) * Math.min(1, friction * dt);
     const desired = Math.atan2(direction.y, direction.x), turn = EAT.player.turnSpeed * (max / EAT.player.baseSpeed) * dt;
     p.facing += clamp(angleDelta(p.facing, desired), -turn, turn);
-  } else { const drag = Math.exp(-EAT.player.friction * dt); p.vx *= drag; p.vy *= drag; }
+  } else { const drag = Math.exp(-friction * dt); p.vx *= drag; p.vy *= drag; }
   const speed = Math.hypot(p.vx, p.vy);
   if (speed > max) { p.vx *= max / speed; p.vy *= max / speed; }
-  p.x += p.vx * dt; p.y += p.vy * dt; if (state.phase === 'hell') return; resolveWalls(state.map, p, playerRadius(p, state.time)); resolveShrine(state, p, playerRadius(p, state.time));
+  p.x += (p.vx + surface.x) * dt; p.y += (p.vy + surface.y) * dt; if (state.phase === 'hell') return; resolveWalls(state.map, p, playerRadius(p, state.time)); resolveShrine(state, p, playerRadius(p, state.time));
 }
 
 let epilogue = false;
@@ -162,6 +175,8 @@ export function stepGame(state: GameState, dt = 1 / EAT.network.tickRate): void 
   if (!epilogue && state.settings?.hellEnabled === false && state.phase === 'normal' && state.time >= matchDuration(state)) { finishNormal(state); return; }
   if (!epilogue && state.settings?.hellEnabled && state.phase === 'normal' && state.time >= matchDuration(state)) startHell(state);
   if (state.hell && state.phase !== 'normal') { stepHell(state, dt); state.events = state.events.filter(e => state.time - e.at < 2).slice(-80); return; }
+  stepWorld(state, dt);
+  stepShockShots(state, dt);
   for (const p of state.players) {
     if (!p.alive) { if (p.bot) respawn(state, p); continue; }
     if (p.stats) p.stats.maxMass = Math.max(p.stats.maxMass, p.mass);
@@ -192,6 +207,7 @@ export function stepGame(state: GameState, dt = 1 / EAT.network.tickRate): void 
   const eaten = new Set<number>();
   for (const f of state.food) {
     const info = FOOD[f.kind];
+    if (stepLeap(state, f) || ridingCar(state, f)) continue;
     if (f.delivery) {
       const recipient = state.players.find(p => p.id === f.rewardOwner && !unavailable(p));
       if (recipient) {
@@ -227,23 +243,8 @@ export function stepGame(state: GameState, dt = 1 / EAT.network.tickRate): void 
           }
           if (entersMouth(p, f, state.time)) { beginFall(f, p, state.time); f.target = p.id; f.capturedAt = state.time; const entry = mouthCoordinates(p, f); f.entryForward = entry.forward / r; f.entrySide = entry.side / r; f.vx = 0; f.vy = 0; f.vz = 0; owner = p; break; }
         }
-        // Edible props stay put until the opening reaches them. Body impulses
-        // must never kick a snack away while approaching or turning over it.
-        const contact = !fits && f.z < r ? canUnderpass(p, f, state.time) ? null : objectContact(p, r, f) : null;
-        if (contact) {
-          const { nx, ny, overlap } = contact;
-          // Contact with an oversized object has very high effective resistance.
-          // It remains a finite-mass body and can still receive prop impulses.
-          const mobility = info.underpassClearance ? 0 : Math.min(.00002, p.mass / (p.mass + info.mass * 10000));
-          f.x += nx * overlap * mobility; f.y += ny * overlap * mobility;
-          p.x -= nx * overlap * (1 - mobility); p.y -= ny * overlap * (1 - mobility);
-          const impact = Math.max(0, (p.vx - f.vx) * nx + (p.vy - f.vy) * ny);
-          f.vx += nx * impact * mobility * (1 + info.bounce); f.vy += ny * impact * mobility * (1 + info.bounce);
-          p.vx -= nx * impact * (1 - mobility); p.vy -= ny * impact * (1 - mobility);
-          if (impact > 15) f.vz = Math.min(85, impact * mobility * info.bounce);
-          f.rotation += (p.vx * ny - p.vy * nx) * mobility * dt * .01;
-          resolveWalls(state.map, p, r); resolveShrine(state, p, r);
-        }
+        // Characters move beneath all unclaimed props. Only mouth fit/contact
+        // can reserve a prop; character bodies never push it or get pushed out.
       }
     }
     if (owner) {
@@ -274,12 +275,13 @@ export function stepGame(state: GameState, dt = 1 / EAT.network.tickRate): void 
       }
     } else {
       // Sleeping props skip integration and scenery checks until contact/magnet wakes them.
-      const awake = Math.abs(f.vx) + Math.abs(f.vy) > .1 || f.z !== 0 || f.vz !== 0;
+      const flow = state.map === 'candy' && !info.building && (info.shape !== 'vehicle' || f.driverId) && f.z === 0 ? surfaceAt(state.map, f) : { x: 0, y: 0 };
+      const awake = Math.abs(flow.x) + Math.abs(flow.y) + Math.abs(f.vx) + Math.abs(f.vy) > .1 || f.z !== 0 || f.vz !== 0;
       if (!awake) { f.vx = 0; f.vy = 0; continue; }
-      f.x += f.vx * dt; f.y += f.vy * dt;
+      f.x += (f.vx + flow.x) * dt; f.y += (f.vy + flow.y) * dt;
       const terrainDrag = state.map === 'nature' ? 1.3 : 1;
       const damping = Math.exp(-info.friction * terrainDrag * dt); f.vx *= damping; f.vy *= damping;
-      f.rotation += (f.vx + f.vy) / Math.max(20, info.mass) * dt * .12;
+      if (!f.citizen && !f.driverId) f.rotation += (f.vx + f.vy) / Math.max(20, info.mass) * dt * .12;
       if (f.z > 0 || f.vz !== 0) { f.vz -= EAT.food.gravity * dt; f.z += f.vz * dt; if (f.z < 0) { f.z = 0; f.vz = Math.abs(f.vz) > 28 ? -f.vz * info.bounce : 0; } }
       const before = { x: f.x, y: f.y }; resolveWalls(state.map, f, info.radius + 4); resolveShrine(state, f, info.radius + 4);
       if (before.x !== f.x) f.vx *= -info.bounce;

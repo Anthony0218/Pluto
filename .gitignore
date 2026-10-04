@@ -27,3 +27,7 @@ public/tfjs/
 .env.local
 
 data/lichess/lichess_db_puzzle.csv.zst
+
+# Atlas handler test modules and isolated preview cache
+.atlas-test/
+.vite-arena/

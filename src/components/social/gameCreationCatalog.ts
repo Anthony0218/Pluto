@@ -1,3 +1,4 @@
+import { MAPS } from "@/games/eat-it/mapCatalog";
 import { games } from "@/data/games";
 import { variants } from "@/data/chessVariants";
 import { ARENA_MODES } from "@/games/atlas/modeCatalog";
@@ -12,7 +13,7 @@ export const INVITE_GAMES: InviteGame[] = games.map(game => {
   if (id === "go") modes = [9, 13, 19].map(size => option(String(size), `${size} × ${size}`, `/games/go/multiplayer?boardSize=${size}`, "/games/go/multiplayer"));
   if (id === "watten") modes = [3, 4].map(size => option(String(size), `${size} players`, `/games/watten/multiplayer?variant=${size === 3 ? "three-player" : "four-player"}`, `/games/watten/multiplayer/${size}`));
   if (id === "schafkopf") modes = [option("standard", "Private table", "/games/schafkopf/multiplayer")];
-  if (id === "eat-it") modes = ["city", "nature"].map(map => option(map, map === "city" ? "City" : "Nature", `/games/eat-it?map=${map}`, "/games/eat-it/multiplayer"));
+  if (id === "eat-it") modes = Object.entries(MAPS).map(([id, map]) => option(id, map.name, `/games/eat-it?map=${id}`, "/games/eat-it/multiplayer"));
   if (id === "pluto-party") modes = [option("board", "Board party", "/games/pluto-party")];
   return { id, title: id === "chess" ? "Chess" : game.title, image: game.image, modes };
 });

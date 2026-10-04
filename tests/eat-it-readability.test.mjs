@@ -21,7 +21,7 @@ import { loadPreferences, savePreferences, SETTINGS_KEY } from '../src/games/eat
 import { readFileSync } from 'node:fs';
 const make=(options={},map='city')=>{
  const s=createGame(map,[{id:'a',name:'A'},{id:'b',name:'B',bot:true},{id:'c',name:'C'}],33,'test',{mode:'solo',...options});
- s.food=[];s.powerups=[];s.nextFood=s.nextPower=s.nextPluto=1e6;
+ s.food=[];s.powerups=[];s.nextFactory=s.nextHumans=1e9;delete s.feast;s.nextFood=s.nextPower=s.nextPluto=1e6;
  s.players.forEach((p,i)=>Object.assign(p,{x:900+i*600,y:1200,bot:false}));
  if(s.encounter)s.encounter.shrine=null;
  return s;
@@ -130,12 +130,13 @@ test('bot vision cannot see distant food and Hell reaction uses only revealed pa
  assert.ok(BOT_POLICY.easy.warningDelay>BOT_POLICY.medium.warningDelay&&BOT_POLICY.medium.warningDelay>BOT_POLICY.hard.warningDelay);
 });
 test('black-hole warning freezes origin/destination for 1.1s and actual sweep follows exact vector',()=>{
- const s=make();startHell(s);s.time=s.hell.readyAt;const b=s.hell.blackHole,origin={x:b.x,y:b.y},dest={...b.destination};assert.equal(EAT.hell.sweepWarning,1.1);
+ const s=make();startHell(s);s.time=s.hell.readyAt;const b=s.hell.blackHole;delete b.control;b.pauseUsed=true; // This regression checks the straight, uninterrupted branch.
+ const origin={x:b.x,y:b.y},dest={...b.destination};assert.equal(EAT.hell.sweepWarning,1.1);
  while(s.time+1/30<b.warnUntil){s.time+=1/30;stepHell(s,1/30);assert.deepEqual({x:b.x,y:b.y},origin);assert.deepEqual(b.destination,dest)}
  s.time=b.warnUntil+1/30;stepHell(s,1/30);const dx=b.x-origin.x,dy=b.y-origin.y;assert.ok(Math.hypot(dx,dy)>0);assert.ok(Math.abs(dx*(dest.y-origin.y)-dy*(dest.x-origin.x))<1e-7);assert.deepEqual(b.destination,dest);
 });
 test('rendered laser arrow matches the shared destination and disappears when sweeping',()=>{
- const scene=new T.Scene(),visuals=new HellVisuals(scene),s=make();startHell(s);s.time=s.hell.readyAt;visuals.draw(s);
+ const scene=new T.Scene(),visuals=new HellVisuals(scene),s=make();startHell(s);s.time=s.hell.readyAt;delete s.hell.blackHole.control;visuals.draw(s);
  const arrow=scene.getObjectByName('sweep-arrow'),laser=scene.getObjectByName('sweep-laser'),b=s.hell.blackHole;
  assert.ok(arrow.visible&&laser.visible);assert.equal(arrow.position.x,b.destination.x);assert.equal(arrow.position.z,b.destination.y);
  const direction=new T.Vector3(0,1,0).applyQuaternion(arrow.quaternion),expected=new T.Vector3(b.destination.x-b.x,0,b.destination.y-b.y).normalize();assert.ok(direction.distanceTo(expected)<1e-8);
@@ -143,5 +144,5 @@ test('rendered laser arrow matches the shared destination and disappears when sw
 });
 test('new player-facing settings and alerts translated into all supported languages',()=>{
  const strings=JSON.parse(readFileSync(new URL('../src/i18n/eatItTranslations.json',import.meta.url),'utf8'));
- for(const lang of ['en','de','bar','ko','ru','es','pt'])for(const key of ['Animals','Hell Sudden Death','Lives','Bot Difficulty','Easy','Medium','Hard','Choking…','Jump','Strike','Pluto Growth Multiplier','Respawn','Black hole incoming!','Match Settings'])assert.ok(strings[lang][key],`${lang}:${key}`);
+ for(const lang of ['en','de','bar','ko','ru','es','pt'])for(const key of ['Animals','Hell Sudden Death','Lives','Bot Difficulty','Easy','Medium','Hard','Choking…','Jump','Strike','Pluto Growth Multiplier','Respawn','Black hole incoming!','Match Settings','Candy','Frozen','Four playgrounds','Too big','Choke risk','Devourable','Restart','Human','Fish','Monster factory','Factory feast!','Humans eaten','Monster factories eaten'])assert.ok(strings[lang][key],`${lang}:${key}`);
 });

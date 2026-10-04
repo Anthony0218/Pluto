@@ -110,7 +110,7 @@ export function chooseArcherInput(game: ArcherGame, player: Player, difficulty: 
     .sort((a, b) => Math.abs(insectLanding(a).x - fish.x) - Math.abs(insectLanding(b).x - fish.x));
   if (falling.length) {
     const dx = insectLanding(falling[0]).x - fish.x;
-    return { ...emptyArcherInput(), move: Math.abs(dx) > 12 ? Math.sign(dx) : 0, dash: Math.abs(dx) > 145 };
+    return { ...emptyArcherInput(), move: Math.abs(dx) > 12 ? Math.sign(dx) : 0, dash: Math.abs(dx) > (difficulty === "normal" ? 210 : 145) };
   }
   const target = game.insects.filter(insect => insect.state === "perched")
     .sort((a, b) => Math.abs(a.x - fish.x) - Math.abs(b.x - fish.x))[0];
@@ -119,7 +119,7 @@ export function chooseArcherInput(game: ArcherGame, player: Player, difficulty: 
   if (angle === null) return { ...emptyArcherInput(), move: Math.sign(target.x - fish.x) };
   // A small, visible aim wobble and reaction interval leave room for a human rival.
   const difference = angle + Math.sin(game.elapsed * 2.4) * (difficulty === "easy" ? 0.07 : difficulty === "hard" ? 0.012 : 0.035) - fish.angle;
-  return { move: 0, aim: Math.abs(difference) > 0.015 ? clamp(difference / (1.75 * 0.17), -1, 1) : 0, shoot: Math.abs(difference) < (difficulty === "easy" ? 0.035 : difficulty === "hard" ? 0.07 : 0.055), dash: false };
+  return { move: 0, aim: Math.abs(difference) > 0.015 ? clamp(difference / (1.75 * (difficulty === "normal" ? 0.28 : 0.17)), -1, 1) : 0, shoot: Math.abs(difference) < (difficulty === "easy" ? 0.035 : difficulty === "hard" ? 0.07 : 0.055), dash: false };
 }
 
 function segmentDistance(a: Vec, b: Vec, point: Vec): number {
@@ -154,7 +154,7 @@ function stepArcherGame(game: ArcherGame, inputs: [ArcherInput, ArcherInput], dt
     game.ai.think -= dt;
     if (game.ai.think <= 0) {
       game.ai.input = chooseArcherInput(game, 1, difficulty);
-      game.ai.think = difficulty === "easy" ? 0.35 : difficulty === "hard" ? 0.08 : 0.17;
+      game.ai.think = difficulty === "easy" ? 0.35 : difficulty === "hard" ? 0.08 : 0.28;
     }
   }
   game.fish.forEach((fish, index) => {

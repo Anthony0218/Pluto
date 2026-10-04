@@ -9,6 +9,8 @@ import {
   UserRound,
   Users,
   Trophy,
+  Heart,
+  FileText,
 } from "lucide-react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -73,6 +75,9 @@ export default function SideBar({ onNavigate }: { onNavigate: () => void }) {
           </NavLink>
         ))}
         <NavLink to="/invite" onClick={onNavigate} className="flex items-center gap-3 rounded-xl border border-indigo-300/20 bg-indigo-500/10 px-3 py-3 text-sm font-medium text-indigo-200"><Gamepad2 size={18} />{ui("Invite a friend")}</NavLink>
+        {[{ href: "/credits", label: "Credits", Icon: Heart }, { href: "/imprint", label: "Imprint", Icon: FileText }].map(({ href, label, Icon }) => (
+          <NavLink key={href} to={href} onClick={onNavigate} className={({ isActive }) => `flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium ${isActive ? "bg-indigo-500/15 text-indigo-200" : "text-zinc-300 hover:bg-white/5"}`}><Icon size={18} aria-hidden />{ui(label)}</NavLink>
+        ))}
       </nav>
       <div className="space-y-3 border-t border-white/10 p-4">
         <p className="text-xs text-zinc-400">{ui("Appearance")}</p>

@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "target": "ES2023", "lib": ["ES2023", "DOM"], "module": "ESNext",
+    "moduleResolution": "bundler", "types": ["node", "vite/client"], "jsx": "react-jsx",
+    "strict": true, "noEmit": true, "allowImportingTsExtensions": true,
+    "skipLibCheck": true, "noUnusedLocals": true, "noUnusedParameters": true
+  },
+  "include": ["src/games/natura", "src/components/natura/NaturaGame.tsx", "src/components/natura/NaturaOnline.tsx", "src/components/natura/NaturaHotseat.tsx"]
+}

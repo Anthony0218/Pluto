@@ -15,7 +15,7 @@ import {stepEncounter,QUEST} from '../src/games/eat-it/quests.ts';
 import {escapeAvailable,activateEscape} from '../src/games/eat-it/escape.ts';
 import {applyRoomAction} from '../src/games/eat-it/authority.ts';
 import {SnapshotBuffer} from '../src/games/eat-it/presentation.ts';
-function scene(options={}){const s=createGame('city',[{id:'a',name:'A'},{id:'b',name:'B'}],84,'abilities',{mode:'solo',...options});s.food=[];s.powerups=[];delete s.encounter;s.nextFood=s.nextPower=s.nextPluto=s.nextBig=1e9;s.players.forEach((p,i)=>Object.assign(p,{x:1500+i*1000,y:1500,facing:0}));return s;}
+function scene(options={}){const s=createGame('city',[{id:'a',name:'A'},{id:'b',name:'B'}],84,'abilities',{mode:'solo',...options});s.food=[];s.powerups=[];delete s.encounter;s.nextFactory=s.nextHumans=1e9;delete s.feast;s.nextFood=s.nextPower=s.nextPluto=s.nextBig=1e9;s.players.forEach((p,i)=>Object.assign(p,{x:1500+i*1000,y:1500,facing:0}));return s;}
 function hell(options={}){const s=scene(options);startHell(s);s.time=s.hell.readyAt;s.phase='hell';for(const b of blackHoles(s))b.warnUntil=1e9;s.nextPower=s.hell.nextEruption=1e9;Object.assign(s.players[0],cellCenter(8*EAT.hell.columns+8));Object.assign(s.players[1],cellCenter(2*EAT.hell.columns+25));return s;}
 const ticks=(s,n)=>{for(let i=0;i<n;i++)stepGame(s)};
 function pickup(s,kind,p=s.players[0]){const item={id:s.nextId++,kind,x:p.x,y:p.y};s.powerups.push(item);collectPower(s,p,item);return item;}

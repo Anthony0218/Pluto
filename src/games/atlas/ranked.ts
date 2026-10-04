@@ -52,3 +52,15 @@ export function getRankFromRating(rating: number) {
   const rank = [...RANK_THRESHOLDS].reverse().find((entry) => rating >= entry.rating)!;
   return { tier: rank.tier, division: rank.division, displayName: rank.division === null ? rank.tier : `${rank.tier} ${roman[rank.division]}` };
 }
+
+export function certifiedRating(rating:number,deviation:number,matchesPlayed:number):number {
+  let value=rating>=1900 ? rating-.5*Math.max(0,deviation) : rating;
+  if(matchesPlayed<14)value=Math.min(value,1899);
+  if(matchesPlayed<20)value=Math.min(value,2199);
+  if(matchesPlayed<30)value=Math.min(value,2399);
+  return value;
+}
+export function getRankFromProfile(profile:{rating:number;deviation:number;matches_played:number}) {
+  const provisional=profile.matches_played<RANKED_CONFIG.provisionalMatches;
+  return {...getRankFromRating(provisional?profile.rating:certifiedRating(profile.rating,profile.deviation,profile.matches_played)),provisional,tentative:profile.matches_played>=3,confidence:Math.max(0,Math.min(100,Math.round((1-profile.deviation/350)*100)))};
+}

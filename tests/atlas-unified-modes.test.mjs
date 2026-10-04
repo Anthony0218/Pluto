@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { ARENA_MODES, hotseatPlayerLimit, modeForOnline, modeForTrial, onlinePlayerLimit } from "../src/games/atlas/modeCatalog.ts";
 import { generateMatchQuestions } from "../src/games/atlas/matchQuestions.ts";
-import { ATLAS_MULTIPLAYER_MODES, ATLAS_RACE_MODES, applyRaceProgress, isRaceMode, maxPlayersFor, raceComplete, raceScores } from "../src/games/atlas/multiplayer.ts";
+import { ATLAS_MULTIPLAYER_MODES, ATLAS_RACE_MODES, isRaceMode, maxPlayersFor, raceComplete, raceScores } from "../src/games/atlas/multiplayer.ts";
 import { closestScore, speedRunScore } from "../src/games/atlas/rules.ts";
 import { generateQuestions } from "../src/games/atlas/engine.ts";
 import { distanceToTerritory } from "../src/games/atlas/territoryDistance.ts";
@@ -95,7 +95,7 @@ test("Speed Run uses choice questions and exact win/loss points", () => {
   assert.ok(questions.every((question) => question.interaction === "single_choice"));
   assert.ok(questions.filter((question) => question.category === "countries" || question.category === "locations").every((question) => !question.prompt.includes("highlighted")));
   assert.equal(speedRunScore(true), 150);
-  assert.equal(speedRunScore(false), -50);
+  assert.equal(speedRunScore(false), -150);
 });
 
 test("Language Guesser deals six distinct choices with one answer", () => {
@@ -108,23 +108,13 @@ test("Language Guesser deals six distinct choices with one answer", () => {
   }
 });
 
-test("race progress is validated, final once done, and completes when everybody has finished", () => {
+test("race standings reflect saved, server-graded runs", () => {
   assert.ok(ATLAS_RACE_MODES.every(isRaceMode));
   assert.equal(isRaceMode("map_battle"), false);
-  let race = applyRaceProgress({}, "a", 120, false, 1);
-  race = applyRaceProgress(race, "a", 340.6, false, 2);
-  assert.equal(race.a.score, 341);
-  assert.throws(() => applyRaceProgress(race, "b", -5, false, 3));
-  assert.equal(applyRaceProgress(race, "b", -50, false, 3, true).b.score, -50, "Speed Run permits a loss below zero");
-  assert.throws(() => applyRaceProgress(race, "b", "100", false, 3));
-  assert.throws(() => applyRaceProgress(race, "b", Infinity, false, 3));
-  race = applyRaceProgress(race, "a", 500, true, 4);
-  assert.deepEqual(race.a, { score: 500, done: true, updatedAt: 4, finishedAt: 4 });
-  assert.throws(() => applyRaceProgress(race, "a", 900, true, 5), /already finished/);
-  assert.equal(raceComplete(race, ["a", "b"]), false);
-  race = applyRaceProgress(race, "b", 0, true, 6);
-  assert.equal(raceComplete(race, ["a", "b"]), true);
-  assert.deepEqual(raceScores(race, ["a", "b", "c"]), { a: 500, b: 0, c: 0 });
+  const race={a:{score:500,done:true,updatedAt:4,finishedAt:4},b:{score:-150,done:false,updatedAt:5}};
+  assert.equal(raceComplete(race,["a","b"]),false);
+  assert.equal(raceComplete({...race,b:{...race.b,done:true}},["a","b"]),true);
+  assert.deepEqual(raceScores(race,["a","b","c"]),{a:500,b:-150,c:0});
 });
 
 test("the AI duel still plays exactly as before through the shared two-card round", () => {

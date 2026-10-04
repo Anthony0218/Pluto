@@ -1,5 +1,5 @@
 import { citySlots, cityPropZone } from './cityLayout.ts';
-import { EAT, FOOD, isBigProp, playerRadius, PLUTO_TIERS, isPluto, type FoodKind, type PowerKind } from './config.ts';
+import { EAT, FOOD, isBigProp, playerRadius, FACTORY_TIERS, PLUTO_TIERS, isPluto, type FoodKind, type PowerKind } from './config.ts';
 import { distance, validPosition, zoneRadius } from './maps.ts';
 import type { GameState, Vec } from './types.ts';
 /** Unclaimed sky drops retire after this many seconds (away from players), keeping the rain continuous. */
@@ -12,6 +12,10 @@ const tables = (['city', 'nature'] as const).reduce((result, map) => {
   result[map] = (Object.keys(FOOD) as FoodKind[]).flatMap(kind => Array.from({ length: FOOD[kind].rarity[map] }, () => kind));
   return result;
 }, {} as Record<GameState['map'], FoodKind[]>);
+tables.nature.push('car', 'car', 'taxi');
+tables.nature = tables.nature.filter(k => !FOOD[k].building);
+tables.candy = [...tables.city.filter(k => !FOOD[k].building && FOOD[k].shape !== 'vehicle'), ...Array<FoodKind>(24).fill('candyMint'), ...Array<FoodKind>(18).fill('chocolate'), ...Array<FoodKind>(14).fill('jelly'), 'car', 'taxi', 'bus', 'giantCandy', 'giantCandy', 'chocolateStack', 'giantCupcake', 'jellyMountain'];
+tables.frozen = [...tables.nature.filter(k => FOOD[k].shape !== 'forestLandmark'), ...Array<FoodKind>(22).fill('snowCone'), ...Array<FoodKind>(16).fill('iceCrystal'), 'car', 'taxi', 'iceBlock', 'iceBlock', 'iceberg', 'iceberg', 'glacier'];
 export function spawnPosition(state: GameState, radius: number, sector = state.spawnSector++ % 12, kind?: FoodKind, ignoreSmall = false): (Vec & { rotation?: number }) | null {
   if (state.phase && state.phase !== 'normal') return null;
   const slots = state.map === 'city' && kind && (FOOD[kind].building || FOOD[kind].shape === 'vehicle') ? citySlots(kind) : null;
@@ -26,7 +30,7 @@ export function spawnPosition(state: GameState, radius: number, sector = state.s
     if (!validPosition(state.map, p, radius + 6)) continue;
     if (!state.settings?.matchDuration && !state.settings?.hellEnabled && distance(p, { x: EAT.match.width / 2, y: EAT.match.height / 2 }) > zoneRadius(state.time) - radius) continue;
     if (state.players.some(player => player.alive && distance(p, player) < playerRadius(player, state.time) + radius + (state.time === 0 && radius > 45 ? 110 : 28))) continue;
-    if (state.food.some(f => (!ignoreSmall || f.target || f.delivery || isBigProp(f.kind)) && distance(p, f) < FOOD[f.kind].radius + radius + 3) || state.powerups.some(f => distance(p, f) < radius + 30)) continue;
+    if (state.food.some(f => (!ignoreSmall || f.target || f.delivery || isBigProp(f.kind) || FOOD[f.kind].shape === 'factory') && distance(p, f) < FOOD[f.kind].radius + radius + 3) || state.powerups.some(f => distance(p, f) < radius + 30)) continue;
     return p;
   }
   return null;
@@ -69,7 +73,7 @@ export function spawnBig(state: GameState): boolean {
   if (!p) return false;
   // Small loose props under the new footprint are crushed/cleared rather than blocking the spot.
   const clear = FOOD[kind].radius + 3;
-  state.food = state.food.filter(f => f.target || f.delivery || isBigProp(f.kind) || distance(p, f) >= clear + FOOD[f.kind].radius);
+  state.food = state.food.filter(f => f.target || f.delivery || isBigProp(f.kind) || FOOD[f.kind].shape === 'factory' || distance(p, f) >= clear + FOOD[f.kind].radius);
   const sky = random(state) < EAT.food.bigSkyChance;
   state.food.push({ ...p, id: state.nextId++, kind, vx: 0, vy: 0, z: sky ? 520 + random(state) * 240 : 0, vz: 0, rotation: p.rotation ?? (random(state) - 0.5) * Math.PI, target: null, capturedAt: 0 });
   return true;
@@ -77,8 +81,8 @@ export function spawnBig(state: GameState): boolean {
 export function updateSpawns(state: GameState): void {
   // Only invalid or escaped bodies retire. Claimed and quest-delivery objects keep their authority lifecycle.
   state.food = state.food.filter(f => f.target || f.delivery || (Number.isFinite(f.x+f.y+f.z+f.vx+f.vy+f.vz) && f.x >= 0 && f.y >= 0 && f.x <= EAT.match.width && f.y <= EAT.match.height));
-  state.food = state.food.filter(f => f.target || f.delivery || f.spawnedAt === undefined || state.time-f.spawnedAt < SKY_LIFETIME || state.players.some(p=>p.alive && distance(p,f)<playerRadius(p,state.time)+180));
-  if (state.settings?.plutoEnabled !== false && state.time >= (state.nextPluto ?? 0)) { state.nextPluto = state.time + EAT.pluto.interval; spawnPluto(state); }
+  state.food = state.food.filter(f => f.target || f.delivery || f.expiresAt !== undefined || f.spawnedAt === undefined || state.time-f.spawnedAt < SKY_LIFETIME || state.players.some(p=>p.alive && distance(p,f)<playerRadius(p,state.time)+180));
+  if (state.nextFactory !== undefined && state.time >= state.nextFactory) { state.nextFactory = state.time + EAT.factories.interval; spawnFactory(state); }
   if (state.time >= state.nextFood) { state.nextFood = state.time + EAT.food.respawnInterval; // Ordinary sky rain leaves headroom under the cap so eaten big props can always come back.
     for (let i = 0; i < EAT.food.skyDropsPerTick && state.food.length < EAT.food.maxObjects - (state.bigTarget === undefined ? 0 : EAT.food.bigReserve); i++) spawnFood(state); }
   if (state.bigTarget !== undefined && state.time >= (state.nextBig ?? 0)) {
@@ -94,11 +98,11 @@ export function updateSpawns(state: GameState): void {
     if (p) {
       // Weighted per attempt: rare growth items, frequent Strike, a rare Shield, otherwise Speed/Magnet.
       let roll = random(state) * 100, kind: PowerKind = 'speed';
-      for (const rare of ['divider', 'multiplier', 'strike', 'shield'] as const) { roll -= EAT.powerups[rare].weight; if (roll < 0) { kind = rare; break; } }
+      for (const rare of ['shock', 'divider', 'multiplier', 'strike', 'shield'] as const) { roll -= EAT.powerups[rare].weight; if (roll < 0) { kind = rare; break; } }
       if (roll >= 0) kind = random(state) < .5 ? 'speed' : 'magnet';
-      if (kind === 'multiplier' || kind === 'divider' || kind === 'strike' || kind === 'shield') {
+      if (kind === 'shock' || kind === 'multiplier' || kind === 'divider' || kind === 'strike' || kind === 'shield') {
         const config = EAT.powerups[kind]; state.nextRare ??= {};
-        if (state.time < (state.nextRare[kind] ?? config.cooldown) || state.powerups.filter(p => p.kind === kind).length >= config.maxActive) return;
+        if (state.time < (state.nextRare[kind] ?? (kind === 'shock' ? 30 : config.cooldown)) || state.powerups.filter(p => p.kind === kind).length >= config.maxActive) return;
         state.nextRare[kind] = state.time + config.cooldown;
       }
       state.powerups.push({ ...p, id: state.nextId++, kind });
@@ -117,4 +121,17 @@ export function spawnPluto(state: GameState): boolean {
   const at = spawnPosition(state, radius + 20);
   if (!at || state.spawnLocations?.some(p => distance(at, p) < radius + 110)) return false;
   state.food.push({ ...at, kind, id: state.nextId++, vx: 0, vy: 0, z: 0, vz: 0, rotation: 0, target: null, capturedAt: 0 }); return true;
+}
+
+/** Four footprint tiers make the next generous meal visible throughout progression. */
+export function spawnFactory(state: GameState, tier?: number): boolean {
+  if (!['city', 'frozen'].includes(state.map) || state.phase !== 'normal' || state.food.length >= EAT.food.maxObjects || state.food.filter(f => FOOD[f.kind].shape === 'factory').length >= EAT.factories.maxActive) return false;
+  // Smaller factories are more common; the skyscraper remains a rare jackpot.
+  const roll = tier === undefined ? random(state) : 0;
+  const kind = FACTORY_TIERS[tier ?? (roll < .45 ? 0 : roll < .75 ? 1 : roll < .93 ? 2 : 3)];
+  const at = spawnPosition(state, FOOD[kind].radius, undefined, kind, true);
+  if (!at) return false;
+  state.food = state.food.filter(f => f.target || f.delivery || FOOD[f.kind].shape === 'factory' || isBigProp(f.kind) || distance(at, f) >= FOOD[kind].radius + FOOD[f.kind].radius + 8);
+  state.food.push({ ...at, kind, id: state.nextId++, vx: 0, vy: 0, z: 0, vz: 0, rotation: at.rotation ?? 0, target: null, capturedAt: 0 });
+  return true;
 }

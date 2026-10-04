@@ -43,12 +43,13 @@ function harness(query = '', reducedMotion = false) {
   };
   const modules = {
     react,
+    '../../../components/atlas/AtlasMastery': {AtlasMastery:()=>null},
     'react-router-dom': {Link: 'a', useNavigate: () => url => navigations.push(url), useSearchParams: () => [new URLSearchParams(query)]},
     '../../../games/atlas/arenaStorage': {bestKey: id => id},
     '../../../games/atlas/modeCatalog': {ARENA_MODES},
     '../../../games/atlas/soloSettings': {DIFFICULTY_LABELS: {}},
     '../../../games/atlas/useAtlasData': {useAtlasData: () => ({data: null})},
-    './useArenaStore': {MODE_ICONS: Object.fromEntries(ARENA_MODES.map(mode => [mode.id, 'svg'])), useArenaStore: () => ({stored: {difficulty: 'beginner', best: {}}, update() {}})},
+    './useArenaStore': {MODE_ICONS: Object.fromEntries(ARENA_MODES.map(mode => [mode.id, 'svg'])), useArenaStore: () => ({stored: {difficulty: 'beginner', best: {},settings:{scope:'Europe'}}, update() {}})},
     './AtlasRankedTab': {AtlasRankedTab: () => null},
     './atlas-arena.css': {}, '../../../components/atlas/trials/atlas-trials.css': {},
   };
@@ -84,7 +85,7 @@ test('Casual, Ranked, Modes tab order and choosing, clearing, background reset a
   const h = harness();
   let tree = h.render();
   const nav = find(tree, node => node.type === 'nav');
-  assert.deepEqual(buttons(nav).map(node => node.props.children), ['Casual', 'Ranked', 'Modes']);
+  assert.deepEqual(buttons(nav).map(node => node.props.children), ['Casual', 'Ranked', 'Modes', 'Mastery']);
   const mode = ARENA_MODES[4];
   const select = () => { buttons(chooseCard(h.render())).find(node => node.props['aria-label'] === mode.title).props.onClick(); tree = h.render(); };
   select();

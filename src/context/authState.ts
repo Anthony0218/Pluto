@@ -25,6 +25,7 @@ export type AuthContextType = {
     password: string,
   ) => Promise<{
     error: Error | null;
+    needsEmailConfirmation: boolean;
   }>;
 
   signIn: (

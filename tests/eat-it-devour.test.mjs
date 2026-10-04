@@ -11,7 +11,7 @@ import { startHell, stepHell, blackHoles, allBlackHoles, devourBlackHoles, cellP
 const F = EAT.hell.fireball, H = EAT.hell;
 const duel = () => {
   const s = createGame('city', [{ id: 'a', name: 'A' }, { id: 'b', name: 'B' }], 3, 'duel', { mode: 'solo' });
-  s.food = []; s.powerups = []; delete s.encounter; s.nextFood = s.nextPower = s.nextPluto = s.nextBig = 1e9;
+  s.food = []; s.powerups = []; delete s.encounter; s.nextFactory=s.nextHumans=1e9;delete s.feast;s.nextFood = s.nextPower = s.nextPluto = s.nextBig = 1e9;
   Object.assign(s.players[0], { x: 1000, y: 1000, facing: 0, vx: 0, vy: 0 }); Object.assign(s.players[1], { x: 2600, y: 2000 });
   return s;
 };
@@ -51,7 +51,7 @@ test('eaten houses, towers and vehicles respawn, some of them from the sky over 
   assert.ok(s.bigTarget > 40);
   s.food = s.food.filter((f, i) => !isBigProp(f.kind) || i % 3); const missing = s.bigTarget - s.food.filter(f => isBigProp(f.kind)).length;
   assert.ok(missing > 10);
-  let sky = 0; const seen = new Set(s.food.map(f => f.id)); s.nextFood = 1e9;
+  let sky = 0; const seen = new Set(s.food.map(f => f.id)); s.nextFactory=s.nextHumans=1e9;delete s.feast;s.nextFood = 1e9;
   for (let i = 0; i < 30 * 30; i++) {
     s.time += 1 / 30; updateSpawns(s);
     for (const f of s.food) if (!seen.has(f.id)) { seen.add(f.id); if (isBigProp(f.kind) && f.z > 0) sky++; }

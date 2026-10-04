@@ -1,7 +1,7 @@
 import { surfaceTexture, type Surface } from './surfaceTextures.ts';
 import { treeGeometry } from './treeGeometry.ts';
 import * as T from 'three';
-import { FOOD, type FoodKind } from './config.ts';
+import { FOOD, type FoodKind, type PowerKind } from './config.ts';
 import { objectHeight } from './falling.ts';
 
 /** All geometry is authored here from primitives. No external models, textures,
@@ -48,10 +48,38 @@ export class ModelLibrary {
     const mesh = new T.Mesh(this.geometry(kind), this.material(color));
     mesh.position.set(x, y, z); mesh.scale.set(w, h, d); mesh.castShadow = true; mesh.receiveShadow = true; group.add(mesh); return mesh;
   }
-  prop(kind: FoodKind): T.Group {
+  prop(kind: FoodKind, golden = false): T.Group {
     let template = this.templates.get(kind);
     if (!template) { template = this.build(kind); this.templates.set(kind, template); }
-    return template.clone(true);
+    const group = template.clone(true);
+    if (golden && kind === 'fish') {
+      const gold = this.material('#ffd34e'); gold.roughness = .25; gold.metalness = .7;
+      gold.emissive.set('#8c5500'); gold.emissiveIntensity = .2;
+      for (const name of ['fish-body', 'tail', 'fin']) {
+        const mesh = group.getObjectByName(name); if (mesh instanceof T.Mesh) mesh.material = gold;
+      }
+    }
+    return group;
+  }
+  power(kind: PowerKind): T.Group {
+    const group = new T.Group(), colors: Record<PowerKind, string> = { speed: '#bceb56', shield: '#70cfff', magnet: '#e6a0ff', multiplier: '#ffcc63', divider: '#ff665e', jump: '#65edce', strike: '#ff9754', shock: '#6ebfff' }, color = colors[kind];
+    const ring = this.part(group, 'ring', color, 0, 0, 0, 15, 15, 4); ring.rotation.x = Math.PI / 2;
+    this.part(group, 'cylinder', '#263c46', 0, 0, 0, 12, 5, 12);
+    if (kind === 'shield') {
+      this.part(group, 'ball', color, 0, 11, 0, 10, 13, 6); this.part(group, 'box', '#efffff', 0, 12, 6, 3, 15, 2);
+    } else if (kind === 'magnet') {
+      const arch = this.part(group, 'ring', color, 0, 12, 0, 8, 10, 3); arch.rotation.y = Math.PI / 2;
+      for (const side of [-1, 1]) this.part(group, 'box', '#fff9e6', side*7, 8, 0, 5, 9, 6);
+    } else if (kind === 'speed' || kind === 'strike' || kind === 'shock') {
+      for (const side of [-1, 1]) { const bolt = this.part(group, 'box', color, side*3, 10+side*4, 0, 6, 14, 5); bolt.rotation.z = -.5; }
+    } else if (kind === 'jump') {
+      this.part(group, 'box', color, 0, 12, 0, 5, 18, 5);
+      for (const side of [-1, 1]) { const wing = this.part(group, 'box', '#e8fff9', side*5, 18, 0, 4, 12, 4); wing.rotation.z = side*.7; }
+    } else {
+      for (const side of [-1, 1]) this.part(group, 'ball', color, side*6, 11, 0, 6, 6, 6);
+      const slash = this.part(group, 'box', '#fff4d0', 0, 12, 0, 3, 19, 3); slash.rotation.z = -.5;
+    }
+    return group;
   }
   private build(kind: FoodKind) {
     const group = new T.Group(), f = FOOD[kind], w = f.width, d = f.height, h = objectHeight(kind) - f.underpassClearance * 1.15, color = f.color;
@@ -59,7 +87,121 @@ export class ModelLibrary {
     const ball = (c: string, x: number, y: number, z: number, a: number, b: number, e: number) => this.part(group, 'ball', c, x, y, z, a, b, e);
     const cylinder = (c: string, x: number, y: number, z: number, a: number, b: number, e = a) => this.part(group, 'cylinder', c, x, y, z, a, b, e);
     const timber = '#936e52', dark = '#34434a', glass = '#a4d7da', cream = '#fff0ce';
-    if (f.shape === 'shrine') {
+    if (f.shape === 'human') {
+      const shirt = ['#5bbcca', '#b392ef', '#f18878', '#eec65f'][Math.round(w) % 4];
+      ball(color, 0, 31, 0, 5.5, 6, 5.5); ball('#65453b', -1, 35, 0, 5, 3, 5);
+      box(shirt, 0, 21, 0, 9, 13, 11).name='shirt';
+      for (const side of [-1, 1]) {
+        const leg = box('#344757', 0, 8, side*3.4, 4, 13, 4); leg.name = `leg${side}`;
+        const arm = box(color, 0, 22, side*7, 4, 12, 4); arm.name = `arm${side}`;
+        box('#fff3df', 2, 2, side*3.4, 7, 4, 5);
+        ball('#253346', 5, 32, side*2.2, 1, 1.2, 1);
+      }
+      ball('#f18c81', 5.8, 29, 0, .7, 1.4, 1.5);
+    } else if (f.shape === 'fish') {
+      ball(color, 1, 7, 0, w*.37, 6, d*.36).name = 'fish-body';
+      const tail = this.part(group, 'cone', '#f3b762', -w*.37, 7, 0, 6, 10, d*.4); tail.rotation.z = Math.PI/2; tail.name='tail';
+      const fin = this.part(group, 'cone', '#beece3', 0, 13, 0, 5, 6, 2); fin.rotation.z = -.3; fin.name = 'fin';
+      for (const side of [-1,1]) { ball(cream, w*.24, 9, side*d*.29, 3, 3, 1.4); ball(dark, w*.27, 9, side*d*.34, 1.4, 1.6, .6); }
+    } else if (f.shape === 'factory') {
+      const tower = kind === 'factorySky' || kind === 'factoryTower', wall = h * (tower ? .78 : .64);
+      this.finish(box(color, 0, wall/2, 0, w*.92, wall, d*.9), color, 'paint');
+      box('#364955', 0, 5, 0, w, 10, d);
+      box('#fff0ce', 0, wall+3, 0, w*.98, 6, d*.96);
+      // A roof-face badge is legible from the arena's overhead camera as well.
+      box(dark,0,wall+7,d*.2,w*.38,2,d*.25);
+      for(const side of [-1,1]){ball(cream,side*w*.14,wall+11,-d*.02,w*.08,4,d*.075);ball(dark,side*w*.14,wall+15,-d*.02,w*.034,1,d*.034);}
+      for(let i=0;i<5;i++){const fang=this.part(group,'cone',cream,(i-2)*w*.064,wall+9,d*.12,w*.022,2,d*.06);fang.rotation.x=Math.PI/2;}
+      for (const side of [-1,1]) {
+        cylinder('#45596a', side*w*.31, wall+(h-wall)*.45, -d*.22, w*.075, (h-wall)*.9);
+        cylinder('#f9c75c', side*w*.31, h-4, -d*.22, w*.095, 8);
+        ball(cream, side*w*.18, wall*.64, d*.457, w*.095, wall*.12, 3);
+        ball(dark, side*w*.18, wall*.64, d*.475, w*.035, wall*.06, 2);
+        box('#a4d7da', side*w*.465, wall*.56, 0, 2, wall*.28, d*.62);
+      }
+      box(dark, 0, wall*.24, d*.46, w*.5, wall*.36, 4);
+      for (let i=0;i<5;i++) {
+        const tooth=this.part(group,'cone',cream,(i-2)*w*.085,wall*.34,d*.48,w*.035,wall*.14,2); tooth.rotation.z=Math.PI;
+        box('#f9c75c',(i-2)*w*.16,wall*.88,d*.46,w*.07,wall*.07,3);
+      }
+      if(tower) for(let row=1;row<4;row++)box('#bce7e8',0,wall*(.48+row*.1),-d*.457,w*.65,wall*.025,2);
+    } else if (f.shape === 'candyLandmark') {
+      if (kind === 'giantCandy') {
+        ball(color,0,h*.48,0,w*.32,h*.46,d*.46);
+        for(const side of [-1,1]) {
+          const wrap=this.part(group,'cone','#fff0ce',side*w*.39,h*.48,0,h*.3,w*.2,d*.3);
+          wrap.rotation.z=side*Math.PI/2;
+        }
+        for(const x of [-1,0,1])box('#fff0ce',x*w*.12,h*.9,0,w*.035,h*.05,d*.52);
+      } else if (kind === 'chocolateStack') {
+        for(let row=0;row<3;row++) {
+          box(row%2?color:'#684639',0,h*(.15+row*.3),0,w*(.96-row*.14),h*.28,d*(.96-row*.14));
+          for(const x of [-1,0,1])for(const z of [-1,1])box('#b17b60',x*w*.21,h*(.3+row*.3),z*d*.17,w*.18,h*.035,d*.25);
+        }
+      } else if (kind === 'giantCupcake') {
+        cylinder(color,0,h*.27,0,w*.38,h*.54,d*.38);
+        for(let i=0;i<10;i++){const a=i*Math.PI/5;box('#dbc5ff',Math.cos(a)*w*.36,h*.28,Math.sin(a)*d*.36,w*.035,h*.46,d*.035);}
+        ball('#fff0e0',0,h*.65,0,w*.48,h*.25,d*.48);
+        ball('#efb5ce',0,h*.82,0,w*.3,h*.12,d*.3);
+        ball('#e87361',0,h*.96,0,w*.055,h*.04,d*.055);
+        for(const x of [-1,1])for(const z of [-1,1])box('#95e0d0',x*w*.24,h*.87,z*d*.18,w*.065,h*.025,d*.025);
+      } else {
+        ball(color,0,h*.44,0,w*.48,h*.44,d*.48);
+        ball('#ffd9eb',-w*.16,h*.77,-d*.1,w*.14,h*.08,d*.12);
+        const band=this.part(group,'ring','#b86fa5',0,h*.15,0,w*.38,d*.38,h*.08);band.rotation.x=Math.PI/2;
+        ball('#fff0ce',0,h*.93,0,w*.09,h*.07,d*.09);
+      }
+    } else if (f.shape === 'iceLandmark') {
+      if(kind==='iceBlock') {
+        this.finish(box(color,0,h*.48,0,w*.94,h*.96,d*.94),color,'paint');
+        box('#effcff',0,h*.98,0,w*.96,h*.04,d*.96);
+        for(const x of [-1,1])box('#dcfaff',x*w*.27,h*.52,d*.475,w*.025,h*.65,2);
+      } else if(kind==='iceberg') {
+        this.part(group,'rock',color,0,h*.28,0,w*.48,h*.28,d*.48);
+        for(const side of [-1,0,1]) {
+          const height=h*(side===0?.84:.56);
+          this.part(group,'cone',side===0?'#effcff':'#9cdded',side*w*.2,height/2,side*d*.12,w*.25,height,d*.28);
+        }
+        this.part(group,'rock','#ffffff',0,h*.88,0,w*.11,h*.1,d*.12);
+      } else {
+        for(const x of [-1,0,1])for(const z of [-1,1]) {
+          const height=h*(.52+(x===0?.38:.1)+(z===1?.06:0));
+          box(color,x*w*.31,height/2,z*d*.23,w*.3,height,d*.46);
+          box('#effcff',x*w*.31,height,z*d*.23,w*.3,h*.035,d*.46);
+          box('#c4f3ff',x*w*.31,height*.56,z*d*.46,w*.035,height*.7,2);
+        }
+      }
+    } else if (f.shape === 'forestLandmark') {
+      if(kind==='giantMushroom') {
+        cylinder('#e5d5b2',0,h*.34,0,w*.16,h*.68,d*.16);
+        ball(color,0,h*.76,0,w*.48,h*.24,d*.48);
+        for(const x of [-1,0,1])for(const z of [-1,1])ball('#fff0ce',x*w*.23,h*.92,z*d*.18,w*.055,h*.025,d*.055);
+      } else if(kind==='mossBoulder') {
+        this.part(group,'rock','#879083',0,h*.42,0,w*.48,h*.42,d*.48);
+        for(const side of [-1,0,1])ball(color,side*w*.18,h*.71,side*d*.12,w*.2,h*.12,d*.2);
+        for(const side of [-1,1])ball('#739a52',side*w*.3,h*.25,0,w*.14,h*.13,d*.25);
+      } else {
+        this.finish(cylinder(color,0,h*.45,0,w*.42,h*.9,d*.42),color,'wood');
+        cylinder('#d9b990',0,h*.91,0,w*.39,h*.025,d*.39);
+        for(const radius of [.12,.24,.35]){const ring=this.part(group,'ring','#936e52',0,h*.932,0,w*radius,d*radius,h*.022);ring.rotation.x=Math.PI/2;}
+        for(const side of [-1,1])ball('#739a52',side*w*.28,h*.22,side*d*.2,w*.18,h*.2,d*.17);
+      }
+    } else if (kind === 'candyMint') {
+      cylinder(cream,0,5,0,w*.48,10,d*.48);
+      for(let i=0;i<6;i++){ const stripe=box(color,0,10.2,0,w*.84,1,3); stripe.rotation.y=i*Math.PI/3; }
+    } else if (kind === 'chocolate') {
+      box('#684639',0,4,0,w,8,d);
+      for(let x=-1;x<=1;x++)for(const z of [-1,1])box(color,x*w*.31,9,z*d*.23,w*.28,5,d*.4);
+    } else if (kind === 'jelly') {
+      ball(color,0,11,0,w*.48,11,d*.48);ball('#ffe8f7',-w*.16,18,d*.1,4,2,3);
+      for(const side of [-1,1])ball(dark,side*w*.15,11,d*.46,2,2,1);
+    } else if (kind === 'snowCone') {
+      this.part(group,'cone',cream,0,9,0,7,18,7).rotation.z=Math.PI;
+      ball(color,0,20,0,10,9,10);ball('#fffaff',-3,26,2,5,3,4);
+    } else if (kind === 'iceCrystal') {
+      this.part(group,'rock',color,0,12,0,w*.36,12,d*.36);
+      for(const side of [-1,1]){const crystal=this.part(group,'cone',side===1?'#dfffff':'#8cc7eb',side*8,12,0,5,22,5);crystal.rotation.z=side*.3;}
+    } else if (f.shape === 'shrine') {
       box('#b0aaa0',0,4,0,w,8,d);
       box(color,0,38,0,w*.58,68,d*.6);
       box('#534f53',0,78,0,w*.9,10,d*.85);
@@ -310,6 +452,7 @@ export class ModelLibrary {
     } else if (kind === 'donut') {
       const donut = this.part(group, 'ring', '#ce9864', 0, h * .3, 0, w * .39, d * .39, h * .8); donut.rotation.x = Math.PI / 2;
       const icing = this.part(group, 'ring', color, 0, h * .44, 0, w * .38, d * .38, h * .5); icing.rotation.x = Math.PI / 2;
+      for(let i=0;i<8;i++){const a=i*Math.PI/4;const sprinkle=box(i%2?'#fff0ce':'#95e0d0',Math.cos(a)*w*.36,h*.55,Math.sin(a)*d*.36,3,1,1);sprinkle.rotation.y=a;}
     } else if (kind === 'mushroom') {
       cylinder(cream, 0, h * .35, 0, w * .14, h * .7); ball(color, 0, h * .7, 0, w / 2, h * .3, d / 2);
       for (const x of [-1, 1]) ball(cream, x * w * .2, h * .91, 0, 2, 1, 2);
@@ -317,6 +460,8 @@ export class ModelLibrary {
       cylinder(kind === 'burger' ? '#ad754d' : color, 0, h * .32, 0, w * .43, h * .6, d * .43);
       if (kind === 'burger') { cylinder('#80a45c', 0, h * .43, 0, w * .49, 3, d * .49); cylinder('#dc946c', 0, h * .57, 0, w * .45, 4, d * .45); }
       ball(kind === 'burger' ? '#e6bd7b' : cream, 0, h * .7, 0, w * .48, h * .3, d * .48);
+      if(kind==='burger')for(let i=0;i<6;i++){const a=i*Math.PI/3;box(cream,Math.cos(a)*w*.24,h*.96,Math.sin(a)*d*.24,2,1,1);}
+      else ball('#eb747e',0,h+2,0,3,3,3);
     } else if (kind === 'pizza') {
       cylinder('#dbb478', 0, 3, 0, w / 2, 6); cylinder('#f1d07b', 0, 6, 0, w * .45, 2);
       for (const x of [-1, 1]) for (const z of [-1, 1]) cylinder('#bd7156', x * w * .19, 8, z * d * .19, 4, 1);

@@ -3,7 +3,7 @@ import test from "node:test";
 import { SCENARIOS } from "../src/games/natura/naturaData.ts";
 import { NATURA_FACTS } from "../src/games/natura/naturaFacts.ts";
 import { SNAP_LEVELS, createHabitatMap, PLATFORMS, WILD_H, camouflageMatches, createCuttleGame, createSnapGame, createWildGame,
-  foodTarget, habitatAt, idleWildInput, inPredatorView, setCuttleSkin, updateWildGame } from "../src/games/natura/wildModes.ts";
+  habitatAt, idleWildInput, inPredatorView, setCuttleSkin, updateWildGame } from "../src/games/natura/wildModes.ts";
 
 const idle = () => [idleWildInput(), idleWildInput()];
 const playing = kind => { const game = createWildGame(kind); game.phase = "playing"; return game; };
@@ -71,14 +71,19 @@ test("movement cannot steer an ant in mid-air", () => {
   assert.equal(game.players[0].vx, velocity);
 });
 
-test("aim remains within limits, and left-facing launches travel left", () => {
-  const game = playing("trapjaw");
-  advance(game, 2, [{ ...idleWildInput(), y: -1 }, idleWildInput()]);
-  assert.equal(game.players[0].angle, 80);
-  advance(game, 2, [{ ...idleWildInput(), y: 1 }, idleWildInput()]);
-  assert.equal(game.players[0].angle, 35);
-  updateWildGame(game, [{ ...idleWildInput(), x: -1, action: true }, idleWildInput()], 1 / 60, false);
-  assert.ok(game.players[0].vx < 0);
+test("angle cycles without W/S, stays bounded, locks on snap, and left launches travel left", () => {
+  const a = playing("trapjaw"), b = playing("trapjaw");
+  for (let i = 0; i < 300; i++) {
+    updateWildGame(a, idle(), 1 / 60, false);
+    updateWildGame(b, [{ ...idleWildInput(), y: 1 }, idleWildInput()], 1 / 60, false);
+    assert.ok(a.players[0].angle >= 35 && a.players[0].angle <= 80);
+    assert.equal(a.players[0].angle, b.players[0].angle);
+  }
+  const angle = a.players[0].angle;
+  updateWildGame(a, [{ ...idleWildInput(), x: -1, action: true }, idleWildInput()], 1 / 60, false);
+  assert.ok(a.players[0].vx < 0);
+  advance(a, .2);
+  assert.equal(a.players[0].angle, angle);
 });
 
 test("falling costs one heart and respawns at the latest checkpoint", () => {
@@ -169,19 +174,19 @@ test("direct skin controls are inactive when paused", () => {
   assert.equal(game.players[0].pattern, 2); assert.equal(game.players[0].bumpy, true);
 });
 
-test("each cuttlefish collects only its current personal food target", () => {
+test("shared shrimp can be taken by either player and respawns only once", () => {
   const game = playing("cuttlefish");
-  Object.assign(game.players[0], foodTarget(0, 0));
-  advance(game, 0.2);
-  assert.equal(game.players[0].food, 1); assert.equal(game.players[1].food, 0);
-  advance(game, 0.2);
-  assert.equal(game.players[0].food, 1);
+  Object.assign(game.players[1], game.foodSites[0]);
+  advance(game, .1);
+  assert.equal(game.players[1].food, 1); assert.equal(game.players[0].food, 0);
+  assert.ok(game.foodSites[0].cooldown > 0);
+  advance(game, .2); assert.equal(game.players[1].food, 1);
 });
 
-test("simultaneous final shrimp collection produces a fair draw", () => {
+test("equal-distance final shared shrimp splits one point and produces a fair draw", () => {
   const game = playing("cuttlefish");
-  game.players.forEach((animal, player) => Object.assign(animal, { food: 5 }, foodTarget(player, 5)));
-  advance(game, 0.1);
+  game.players.forEach(animal => Object.assign(animal, game.foodSites[0], { food: 5.5 }));
+  advance(game, .1);
   assert.equal(game.phase, "finished"); assert.equal(game.winner, null);
   assert.deepEqual(game.players.map(p => p.food), [6, 6]);
 });
@@ -250,11 +255,11 @@ test("random habitats cover the board, include all disguises, and mirror player 
     assert.equal(habitatAt(x, y, map).pattern, habitatAt(x, 540 - y, map).pattern);
 });
 
-test("all ten Snap Launch courses are reachable using the same physics", () => {
-  assert.equal(SNAP_LEVELS.length, 10);
+test("all sixteen Snap Launch courses are reachable using the same physics", () => {
+  assert.equal(SNAP_LEVELS.length, 16);
   for (let level = 0; level < SNAP_LEVELS.length; level++) {
     const game = createSnapGame(level); game.phase = "playing";
-    advance(game, 60, idle(), true);
+    advance(game, 90, idle(), true);
     assert.equal(game.winner, 1, SNAP_LEVELS[level].name);
     assert.equal(game.players[1].checkpoint, SNAP_LEVELS[level].platforms.length - 1);
   }

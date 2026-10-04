@@ -18,6 +18,7 @@ export class EatAudio {
   play(event: GameEvent['type']) {
     const settings = getAudioSettings(); if (settings.muted || !settings.gameSounds) return;
     const volume = settings.masterVolume * settings.effectsVolume * 0.13;
+    if (event === 'shock' || event === 'shockHit') { this.tone(1100, 120, .22, volume, 0, 'sawtooth'); this.tone(1600, 260, .12, volume*.5, .08); }
     if (event === 'food') { this.tone(260, 490, 0.07, volume); this.tone(190, 95, 0.1, volume * 0.5, 0.07); }
     if (event === 'eat') { this.tone(180, 50, 0.22, volume, 0, 'triangle'); this.tone(300, 100, 0.15, volume * 0.7, 0.23); }
     if (event === 'power' || event === 'questPickup' || event === 'questComplete' || event === 'npcFeed') { this.tone(430, 720, 0.16, volume); this.tone(650, 1040, 0.2, volume, 0.12); }

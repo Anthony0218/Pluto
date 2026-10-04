@@ -1,15 +1,15 @@
+import { calibratedHotseatSeeds } from "../../../games/atlas/hotseatCalibration";
+import { AtlasTerritoryCampaign } from "../../../components/atlas/AtlasTerritoryCampaign";
 import { useCallback, useMemo, useRef, useState, type CSSProperties } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Check, ChevronRight, Crown, MapPin, RotateCcw, Trophy, Users, X } from "lucide-react";
+import { ArrowLeft, ChevronRight, Crown, MapPin, RotateCcw, Trophy, Users } from "lucide-react";
 import { AtlasSoloGame, SoloResults, SoloSettingsForm } from "../../../components/atlas/AtlasSoloGame";
 import { AtlasWorldMap } from "../../../components/atlas/AtlasWorldMap";
 import { HandoffCard, StatBattleHotseat } from "../../../components/atlas/trials/StatBattleDuel";
 import { TRIAL_GAMES, useTrialPools } from "../../../components/atlas/trials/trialRegistry";
 import { TrialSessionContext, type TrialSession } from "../../../components/atlas/trials/trialSession";
-import { useTrialTimers } from "../../../components/atlas/trials/useTrialTimers";
-import { freshSeed } from "../../../games/atlas/arenaStorage";
 import { ATLAS_SCORING } from "../../../games/atlas/config";
-import { validateAnswer } from "../../../games/atlas/engine";
+import { freshSeed } from "../../../games/atlas/arenaStorage";
 import { generateMatchQuestions } from "../../../games/atlas/matchQuestions";
 import { hotseatPlayerLimit, modeById, type ArenaModeDef } from "../../../games/atlas/modeCatalog";
 import { PLAYER_COLORS, settingsReady, type SoloSettings, type SoloSummary } from "../../../games/atlas/soloSettings";
@@ -66,7 +66,7 @@ export default function AtlasHotseatPage() {
   );
   const props: GameProps = { mode, data, players, settings, onExit: exit, onSetup: () => setPlayers(null) };
   if (mode.hotseat === "pins") return <PinsHotseat {...props} />;
-  if (mode.hotseat === "territory") return <TerritoryHotseat {...props} />;
+  if (mode.hotseat === "territory") return <StrategyHotseat {...props} />;
   if (mode.hotseat === "duel") return <DuelHotseat {...props} />;
   return <TurnsHotseat {...props} />;
 }
@@ -118,7 +118,8 @@ function TurnsHotseat({ mode, data, players, settings, onExit, onSetup }: GamePr
   const finishRun = useCallback((result: SoloSummary) => { setSummary(result); setPhase("between"); }, []);
   const record = useCallback((score: number) => { pending.current = score; }, []);
   // Every player gets a run of their own, so watching the previous turn gives nothing away.
-  const playerSeed = `${seed}:p${turn}`;
+  const calibrated=useMemo(()=>calibratedHotseatSeeds(data,mode.online,settings,seed,players.length),[data,mode.online,settings,seed,players.length]);
+  const playerSeed = calibrated[turn];
 
   if (phase === "standings") return <Standings title={mode.title} rows={players.map((item, index) => ({ player: item, score: scores[index] ?? 0 }))} unit={mode.id === "territory-battle" ? "countries" : "points"} onAgain={again} onSetup={onSetup} onExit={onExit} />;
   if (phase === "handoff") return (
@@ -174,9 +175,10 @@ function PinsHotseat({ mode, data, players, settings, onExit, onSetup }: GamePro
     // Everyone has pinned: measure, and the closest pin (the earlier one on a tie) wins the round.
     const measured = order.map((index) => ({ player: index, ...distanceToTerritory(placed[index]!, { geometryId: question.targetGeometryId, point: question.targetCoordinates, radiusKm: question.targetRadiusKm }, shapes) }));
     const ranked = [...measured].sort((left, right) => left.distanceKm - right.distanceKm);
+    const winners=ranked.filter(item=>item.distanceKm-ranked[0].distanceKm<.05).map(item=>item.player);
     setResults(ranked);
-    setScores((currentScores) => currentScores.map((score, index) => index === ranked[0].player ? score + ATLAS_SCORING.normalCorrect : score));
-    setWins((currentWins) => currentWins.map((value, index) => index === ranked[0].player ? value + 1 : value));
+    setScores((currentScores) => currentScores.map((score, index) => winners.includes(index) ? score + ATLAS_SCORING.normalCorrect : score));
+    setWins((currentWins) => currentWins.map((value, index) => winners.includes(index) ? value + 1 : value));
     setPhase("reveal");
   };
   const nextRound = () => {
@@ -213,8 +215,8 @@ function PinsHotseat({ mode, data, players, settings, onExit, onSetup }: GamePro
           {!revealed && <div className="atlas-pin-controls"><p>{draft ? "Click again to move your pin, then lock it in." : `Click anywhere to place a pin. ${question?.interaction === "closest_click" && question.targetRadiusKm ? "Within 20 km of the city center" : "Inside the country"} counts as 0 km.`}</p>
             <button type="button" className="atlas-submit" disabled={!draft} onClick={lock}><MapPin size={18} />Lock pin{step + 1 < players.length ? ` · pass to ${players[order[step + 1]].name}` : " · reveal"}</button></div>}
           {revealed && <>
-            <div className="atlas-guess-result is-correct"><strong>{players[results[0].player].name} wins the round — {nameOf(question?.entityId)}</strong>
-              <ul>{results.map((item, index) => <li key={item.player}><span>{index === 0 && <Crown size={14} />}{players[item.player].name}</span><span>{item.distanceKm < .5 ? "Inside" : `${Math.round(item.distanceKm).toLocaleString("en")} km`}</span><b>{index === 0 ? `+${ATLAS_SCORING.normalCorrect}` : "—"}</b></li>)}</ul></div>
+            <div className="atlas-guess-result is-correct"><strong>{results.filter(item=>item.distanceKm-results[0].distanceKm<.05).map(item=>players[item.player].name).join(" & ")} wins the round — {nameOf(question?.entityId)}</strong>
+              <ul>{results.map((item) => <li key={item.player}><span>{item.distanceKm-results[0].distanceKm<.05 && <Crown size={14} />}{players[item.player].name}</span><span>{item.distanceKm < .5 ? "Inside" : `${Math.round(item.distanceKm).toLocaleString("en")} km`}</span><b>{item.distanceKm-results[0].distanceKm<.05 ? `+${ATLAS_SCORING.normalCorrect}` : "—"}</b></li>)}</ul></div>
             <button type="button" className="atlas-submit" onClick={nextRound}>{round + 1 >= questions.length ? "See standings" : "Next round"} <ChevronRight size={18} /></button>
           </>}
           <HotseatScores players={players} scores={scores} unit="" />
@@ -227,56 +229,10 @@ function PinsHotseat({ mode, data, players, settings, onExit, onSetup }: GamePro
 }
 
 /** Territory Battle on one device: players alternate; a correct click captures (or steals) the country, a miss leaves it. */
-function TerritoryHotseat({ mode, data, players, settings, onExit, onSetup }: GameProps) {
-  const [seed, setSeed] = useState(freshSeed);
-  const questions = useMemo(() => generateMatchQuestions({ entities: data.countries, extras: data.extras, datasetVersion: data.version.atlasDataVersion, seed, difficulty: settings.difficulty, count: ATLAS_SCORING.territoryRounds, mode: "territory_battle", categories: settings.categories }), [data, seed, settings.categories, settings.difficulty]);
-  const [round, setRound] = useState(0);
-  const [ownership, setOwnership] = useState<Record<string, "player_a" | "player_b">>({});
-  const [feedback, setFeedback] = useState<{ selected: string; correct: boolean; previous?: "player_a" | "player_b" } | null>(null);
-  const [done, setDone] = useState(false);
-  const { schedule, clear } = useTrialTimers();
-  const question = questions[round], turn = round % 2, player = players[turn], side = turn === 0 ? "player_a" : "player_b";
-  const counts = [Object.values(ownership).filter((owner) => owner === "player_a").length, Object.values(ownership).filter((owner) => owner === "player_b").length];
-  const nameOf = (id?: string) => data.countries.find((entity) => entity.id === id)?.shortName ?? "";
-
-  const select = (entityId: string) => {
-    if (!question || feedback) return;
-    const correct = validateAnswer(question, entityId);
-    setFeedback({ selected: entityId, correct, previous: ownership[question.entityId] });
-    if (correct) setOwnership((current) => ({ ...current, [question.entityId]: side }));
-    schedule(() => {
-      setFeedback(null);
-      if (round + 1 >= questions.length) setDone(true); else setRound(round + 1);
-    }, 1500);
-  };
-  const again = () => { clear(); setSeed(freshSeed()); setRound(0); setOwnership({}); setFeedback(null); setDone(false); };
-
-  if (done) return <Standings title={mode.title} rows={players.map((item, index) => ({ player: item, score: counts[index] }))} unit="countries" onAgain={again} onSetup={onSetup} onExit={onExit} />;
-  const captured = feedback?.correct ? feedback.previous && feedback.previous !== side ? `${player.name} steals ${nameOf(question?.entityId)}` : feedback.previous ? `${player.name} holds ${nameOf(question?.entityId)}` : `${player.name} captures ${nameOf(question?.entityId)}` : null;
-  return (
-    <main className="atlas-game-page">
-      <header className="atlas-game-header">
-        <button type="button" className="atlas-icon-button" onClick={onExit} aria-label="Leave hotseat"><ArrowLeft /></button>
-        <div><span className="atlas-eyebrow">{mode.title} · Hotseat</span><strong>Round {round + 1} / {questions.length}</strong></div>
-        <div className="atlas-game-stats"><span className="atlas-turn-chip" style={{ "--player": player.color } as CSSProperties}><i />{player.name}'s turn</span><span><Trophy size={16} />{counts[0]} – {counts[1]}</span></div>
-      </header>
-      <section className="atlas-play-layout">
-        <aside className="atlas-question-panel">
-          <div className="atlas-progress"><i style={{ width: `${round / questions.length * 100}%` }} /></div>
-          <span className="atlas-eyebrow">{round >= questions.length / 2 ? "Second half · countries can be stolen" : "First half · capture countries"}</span>
-          <div className="atlas-turn-banner" style={{ "--player": player.color } as CSSProperties}><i />{player.name}, your turn</div>
-          <h1>{question?.prompt}</h1>
-          {question?.interaction === "map_click" && question.flagAsset && <img className="atlas-question-flag" src={question.flagAsset} alt="Country flag to identify" />}
-          {feedback && <div className={`atlas-feedback ${feedback.correct ? "is-correct" : "is-wrong"}`}>{feedback.correct ? <Check /> : <X />}<div><strong>{captured ?? `Missed — ${nameOf(question?.entityId)} stays ${feedback.previous ? `with ${players[feedback.previous === "player_a" ? 0 : 1].name}` : "neutral"}`}</strong><span>{feedback.correct ? "Captured countries count at the end." : "A miss captures nothing."}</span></div></div>}
-          <HotseatScores players={players} scores={counts} unit=" countries" />
-        </aside>
-        <AtlasWorldMap topology={data.topology} entities={data.countries} ownership={ownership} onSelect={select} selectedId={feedback?.selected} correctId={feedback ? question?.entityId : null} incorrectId={feedback && !feedback.correct ? feedback.selected : null}
-          disabled={Boolean(feedback)} showHoverLabels={false} ariaLabel={question?.prompt} />
-      </section>
-    </main>
-  );
+function StrategyHotseat({data,players,settings,onExit,onSetup,mode}:GameProps) {
+  const [seed,setSeed]=useState(freshSeed),[summary,setSummary]=useState<SoloSummary|null>(null);
+  if(summary)return <Standings title={mode.title} rows={[{player:players[0],score:summary.territory?.mine??0},{player:players[1],score:summary.territory?.rival??0}]} unit="influence" onAgain={()=>{setSummary(null);setSeed(freshSeed());}} onSetup={onSetup} onExit={onExit}/>;
+  return <AtlasTerritoryCampaign key={seed} data={data} difficulty={settings.difficulty} seed={seed} names={[players[0].name,players[1].name]} hotseat onFinish={setSummary} onExit={onExit}/>;
 }
 
-function HotseatScores({ players, scores, unit }: { players: Player[]; scores: number[]; unit: string }) {
-  return <div className="atlas-scoreboard">{players.map((player, index) => <div key={index}><span><i style={{ background: player.color }} />{player.name}</span><strong>{scores[index].toLocaleString("en")}{scores[index] === 1 ? unit.replace(/ies$/, "y") : unit}</strong></div>)}</div>;
-}
+function HotseatScores({players,scores,unit}:{players:Player[];scores:number[];unit:string}) {return <div className="atlas-scoreboard">{players.map((player,index)=><div key={index}><span><i style={{background:player.color}}/>{player.name}</span><strong>{scores[index]}{unit}</strong></div>)}</div>;}

@@ -1,10 +1,11 @@
+import { SURFACES, CANDY_MACHINES, FISH_POOLS } from './world.ts';
 import { CITY, cityRoads } from './cityLayout.ts';
 import { EAT, type PowerKind } from './config.ts';
 import { obstaclesFor } from './maps.ts';
 import type { MapId } from './types.ts';
 const TAU = Math.PI * 2;
-export const POWER_COLOR: Record<PowerKind, string> = { speed: '#bceb56', shield: '#70cfff', magnet: '#e6a0ff', divider: '#ff665e', multiplier: '#ffcc63', jump: '#65edce', strike: '#ff9754' };
-export const POWER_SYMBOL: Record<PowerKind, string> = { speed: '↯', shield: '◇', magnet: '∩', divider: '/2', multiplier: '2x', jump: '⇧', strike: '✹' };
+export const POWER_COLOR: Record<PowerKind, string> = { speed: '#bceb56', shield: '#70cfff', magnet: '#e6a0ff', divider: '#ff665e', multiplier: '#ffcc63', jump: '#65edce', strike: '#ff9754', shock: '#6ebfff' };
+export const POWER_SYMBOL: Record<PowerKind, string> = { speed: '↯', shield: '◇', magnet: '∩', divider: '/2', multiplier: '2x', jump: '⇧', strike: '✹', shock: 'ϟ' };
 function circle(c: CanvasRenderingContext2D, x: number, y: number, r: number, fill: string) {
   c.fillStyle = fill; c.beginPath(); c.arc(x, y, Math.max(0, r), 0, TAU); c.fill();
 }
@@ -40,6 +41,17 @@ export function background(map: MapId): HTMLCanvasElement {
       c.strokeStyle = '#8ca75f'; c.lineWidth = 2; c.beginPath(); c.moveTo(x - 4, y - 4); c.lineTo(x, y); c.lineTo(x + 4, y - 5); c.stroke();
       if (i % 3 === 0) { circle(c, x + 8, y - 5, 3, i % 2 ? '#f6ebcb' : '#d5a3bd'); circle(c, x + 8, y - 5, 1, '#e6be67'); }
     }
+  } else if (map === 'candy' || map === 'frozen') {
+    const candy=map==='candy';
+    c.fillStyle=candy?'#f3dded':'#d9e9ee';c.fillRect(0,0,2200,1600);
+    for(let i=0;i<55;i++){
+      const x=(i*397+190)%2200,y=(i*271+160)%1600;
+      ellipse(c,x,y,70+i%35,45,candy?(i%2?'#ebc2db':'#f3cec6'):(i%2?'#edf5f4':'#cbdfe7'));
+      if(candy){c.fillStyle='#fff4df';c.save();c.translate(x,y);c.rotate(i);c.fillRect(-12,-3,24,6);c.restore();}
+    }
+    c.strokeStyle=candy?'#fff1cd':'#f8faf4';c.lineWidth=120;c.lineCap='round';
+    c.beginPath();c.moveTo(0,800);c.bezierCurveTo(800,480,1400,1120,2200,800);c.stroke();
+    c.lineWidth=85;c.beginPath();c.moveTo(1100,0);c.lineTo(1100,1600);c.stroke();
   } else {
     // Undo the legacy drawing scale: placement and street texture share world coordinates.
     c.save(); c.scale(2200/canvas.width,1600/canvas.height);
@@ -66,5 +78,19 @@ export function background(map: MapId): HTMLCanvasElement {
     rect(c, o.x, o.y, o.w, o.h, '#7cb8b8');
     for (let y = o.y + 20; y < o.y + o.h; y += 45) rect(c, o.x + 20 + y % 25, y, 50, 3, '#a3d4cf', 2);
   }
+  for(const patch of SURFACES[map] ?? []) {
+    const {x,y,w,h,kind}=patch;
+    rect(c,x,y,w,h,kind==='belt'?'#9464a2':kind==='ice'?'#86c7e1':'#f7f6e9',14);
+    c.strokeStyle=kind==='belt'?'#ffe6ac':kind==='ice'?'#e0fbff':'#c2d1d5';c.lineWidth=kind==='belt'?5:3;
+    c.strokeRect(x+5,y+5,w-10,h-10);
+    if(kind==='belt')for(let t=60;t<Math.max(w,h)-20;t+=100){
+      const px=x+(w>h?t:w/2),py=y+(h>w?t:h/2),a=Math.atan2(patch.dy??0,patch.dx??0);
+      c.save();c.translate(px,py);c.rotate(a);c.beginPath();c.moveTo(-15,-15);c.lineTo(5,0);c.lineTo(-15,15);c.stroke();c.restore();
+    }
+    if(kind==='ice')for(let t=30;t<w;t+=100){c.beginPath();c.moveTo(x+t,y+20);c.lineTo(x+t+40,y+h-20);c.stroke();}
+    if(kind==='snow')for(let t=30;t<w;t+=65){ellipse(c,x+t,y+h/2,8,4,'#c9d9dd');}
+  }
+  if(map==='candy')for(const at of CANDY_MACHINES){circle(c,at.x,at.y,90,'#ffd892');circle(c,at.x,at.y,70,'#b970af');}
+  if(map==='nature')for(const at of FISH_POOLS){c.strokeStyle='#d9f1cf';c.lineWidth=4;c.beginPath();c.ellipse(at.x,at.y,65,45,0,0,TAU);c.stroke();}
   return canvas;
 }

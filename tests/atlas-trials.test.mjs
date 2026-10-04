@@ -177,7 +177,7 @@ test("Extreme Geography handles highest and lowest categories from configuration
   }
   let run = createExtremeRun(pool, "extreme", "beginner");
   const answered = answerExtreme(run, run.round.answerId, 0);
-  assert.equal(answered.score, 500);
+  assert.equal(answered.score, 315);
   assert.equal(answerExtreme(answered, answered.round.answerId, 0), answered, "only the first answer counts");
   run = answerExtreme(run, null, EXTREME_GEOGRAPHY.timeLimitMs);
   assert.equal(run.correct, false);

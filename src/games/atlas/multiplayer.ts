@@ -18,7 +18,7 @@ export const isRoundMode = (mode: string): mode is AtlasRoundMode => ATLAS_ROUND
 export const maxPlayersFor = (mode: AtlasMultiplayerMode) => mode === "territory_battle" || mode === "stat_battle" ? 2 : 4;
 export const clampPlayers = (mode: AtlasMultiplayerMode, requested: unknown) => Math.min(maxPlayersFor(mode), Math.max(2, Math.trunc(Number(requested)) || 2));
 export type AtlasMatchStatus = "waiting" | "draft" | "ready" | "intermission" | "countdown" | "round_active" | "round_resolving" | "next_round" | "finished" | "cancelled";
-export type ServerSubmission = { userId: string; round: number; answer: string | Coordinates; submittedAt: number; correct: boolean; distanceKm?: number; nearest?: Coordinates; tip?: number };
+export type ServerSubmission = { userId: string; round: number; answer: string | Coordinates; submittedAt: number; correct: boolean; distanceKm?: number; nearest?: Coordinates; tip?: number; concept?:string; elapsedMs?:number };
 
 export function parseClientAnswer(value: unknown, mode: AtlasMultiplayerMode): string | Coordinates {
   if (mode === "closest_wins") {
@@ -50,8 +50,9 @@ export function resolveRoundScores(options: { submissions: ServerSubmission[]; p
   const winnerId = ranked[0]?.userId || null;
   // Closest Wins rewards distance; placing a faraway pin faster earns no advantage.
   if (winnerId && ranked[0].distanceKm !== undefined) {
-    scores[winnerId] = (scores[winnerId] || 0) + normalScore(true, 0, options.roundDurationMs);
-    return { scores, winnerId };
+    const tied=ranked.filter(item=>(item.distanceKm??Infinity)-(ranked[0].distanceKm??0)<.05);
+    for(const item of tied)scores[item.userId]=(scores[item.userId]||0)+normalScore(true,0,options.roundDurationMs);
+    return {scores,winnerId:tied.length===1?winnerId:null};
   }
   for (const submission of options.submissions) {
     const remaining = Math.max(0, options.roundStartedAt + options.roundDurationMs - submission.submittedAt);
@@ -89,16 +90,5 @@ export function resolveGuessTip(options: { submissions: ServerSubmission[]; tip:
 
 /** One racer's live standing. `done` is final: a finished run can no longer change its score. */
 export type RaceEntry = { score: number; done: boolean; updatedAt: number; finishedAt?: number };
-/** A race may run this long before the room closes it with the scores it has. */
-export const RACE_LIMIT_MS = 30 * 60_000;
-export const MAX_RACE_SCORE = 10_000_000;
-
-export function applyRaceProgress(race: Record<string, RaceEntry>, userId: string, score: unknown, done: unknown, now: number, allowNegative = false): Record<string, RaceEntry> {
-  if (typeof score !== "number" || !Number.isFinite(score) || score < (allowNegative ? -MAX_RACE_SCORE : 0) || score > MAX_RACE_SCORE) throw new Error("A valid score is required.");
-  if (race[userId]?.done) throw new Error("Your run is already finished.");
-  const finished = done === true;
-  return { ...race, [userId]: { score: Math.round(score), done: finished, updatedAt: now, ...(finished ? { finishedAt: now } : {}) } };
-}
-
 export const raceComplete = (race: Record<string, RaceEntry>, playerIds: string[]) => playerIds.length > 0 && playerIds.every((id) => race[id]?.done);
 export const raceScores = (race: Record<string, RaceEntry>, playerIds: string[]) => Object.fromEntries(playerIds.map((id) => [id, race[id]?.score ?? 0]));

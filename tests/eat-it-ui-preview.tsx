@@ -16,7 +16,12 @@ export default function App() {
    s.powerups=['speed','shield','magnet','multiplier','divider'].map((kind,i)=>({id:s.nextId++,kind,x:p.x+(i-2)*90,y:p.y-180}));
    if(kind==='growth'){for(const name of ['speed','shield','magnet']){const power={id:s.nextId++,kind:name,x:p.x,y:p.y};s.powerups.push(power);collectPower(s,p,power);}}
    if(kind.includes('feeding')||kind.startsWith('hostile')) {const n=s.encounter.npc;Object.assign(n,{kind:kind.includes('cat')?'cat':'pigeon',phase:kind.startsWith('hostile')?'hostile':'friendly',targetId:'a',until:kind.startsWith('hostile')?20:60,since:0,nextAction:kind.startsWith('hostile')?5:1,x:p.x+100,y:p.y});s.encounter.completedBy='a';}
-   if(kind==='review'){s.status='finished';s.result='winner';s.winnerId='a';p.placement=1;p.stats.collected={apple:12,car:2,tree:3,plutoTiny:1,magnet:2,multiplier:1,divider:1};p.stats.growthActivations=1;p.stats.totalGrowth=164;setResult(s);return;}
+   if(kind==='review'){s.status='finished';s.result='winner';s.winnerId='a';p.placement=1;p.mass=38865;p.score=423959;p.playersEaten=3;p.foodEaten=843;p.powerupsCollected=5;s.time=108;p.stats.collected={apple:12,car:2,tree:3,giantCandy:1,iceberg:1,ancientStump:1,magnet:2,multiplier:1,divider:1};p.stats.growthActivations=1;p.stats.totalGrowth=164;setResult(s);return;}
+  }
+  if(kind==='shock') {
+   s.players.forEach(p=>p.bot=false);delete s.encounter;s.nextFactory=s.nextHumans=s.nextBig=1e9;delete s.feast;
+   s.players[0].shockAmmo=3;s.players[0].facing=0;
+   s.powerups=[{id:s.nextId++,kind:'shock',x:1050,y:1100}];
   }
   if(kind==='abilities') {
    startHell(s);s.time=s.hell.readyAt;s.phase='hell';s.nextPower=s.hell.nextEruption=1e9;blackHoles(s).forEach(b=>b.warnUntil=1e9);
@@ -37,6 +42,6 @@ export default function App() {
  }
  if(game)return <EatItArena initial={game} localId="a" onExit={()=>setGame(null)} onFinished={s=>{setGame(null);setResult(s)}}/>;
  if(result)return <EatItResults result={result} localId="a" online={false} isHost={false} busy={false} error="" onReplay={()=>start('respawn')} onLobby={()=>setResult(null)}/>;
- return <main style={{padding:24,fontFamily:'system-ui'}}><h1>Eat It HUD and review checks</h1>{['abilities','growth','feeding','cat feeding','hostile pigeon','hostile cat','eruption','curve','extreme','review','respawn','hell','friend','winner','tie'].map(kind=><button key={kind} onClick={()=>start(kind)} style={{padding:16,margin:8}}>{kind}</button>)}</main>;
+ return <main style={{padding:24,fontFamily:'system-ui'}}><h1>Eat It HUD and review checks</h1>{['shock','abilities','growth','feeding','cat feeding','hostile pigeon','hostile cat','eruption','curve','extreme','review','respawn','hell','friend','winner','tie'].map(kind=><button key={kind} onClick={()=>start(kind)} style={{padding:16,margin:8}}>{kind}</button>)}</main>;
 }
 createRoot(document.getElementById('root')).render(<BrowserRouter><App/></BrowserRouter>);
