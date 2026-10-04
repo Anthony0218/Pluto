@@ -21,17 +21,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const userId = user?.id;
   const currentUserId = useRef<string | null>(null);
+  const profileRequest = useRef(0);
 
   const loadProfile = useCallback(async (userId: string) => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", userId)
-      .single();
-    if (currentUserId.current !== userId) return;
-    if (error) console.error("Error loading profile:", error);
-    setProfile(error ? null : data);
-    setLoading(false);
+    const request = ++profileRequest.current;
+    const isCurrent = () => currentUserId.current === userId && profileRequest.current === request;
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .single();
+      if (!isCurrent()) return;
+      if (error) console.error("Error loading profile:", error);
+      // A failed background refresh must not erase the last loaded profile.
+      else setProfile(data);
+    } catch (error) {
+      if (isCurrent()) console.error("Error loading profile:", error);
+    }
+    if (isCurrent()) setLoading(false);
   }, []);
 
   const refreshProfile = useCallback(async () => {
@@ -45,6 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const applyUser = (next: User | null) => {
       if (disposed) return;
       if (currentUserId.current !== (next?.id ?? null)) {
+        profileRequest.current++;
         setProfile(null);
         setLoading(!!next);
       }
@@ -76,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!userId) return;
-    void loadProfile(userId);
+    const initialLoad = window.setTimeout(() => void loadProfile(userId), 0);
     const refresh = () => void loadProfile(userId);
     window.addEventListener("focus", refresh);
     const channel = supabase
@@ -93,6 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       )
       .subscribe();
     return () => {
+      window.clearTimeout(initialLoad);
       window.removeEventListener("focus", refresh);
       void supabase.removeChannel(channel);
     };
