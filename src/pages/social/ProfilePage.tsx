@@ -120,9 +120,10 @@ function StatCard({
 export default function ProfilePage() {
   const { language } = useUiLanguage();
   const { user, profile, refreshProfile, loading: authLoading } = useAuth();
+  const userId = user?.id;
 
-  const [username, setUsername] = useState("");
-  const [avatarId, setAvatarId] = useState("m1");
+  const [username, setUsername] = useState(() => profile?.username?.trim() || user?.email?.split("@")[0] || ui("Player"));
+  const [avatarId, setAvatarId] = useState(() => profile?.avatar_id ?? "m1");
 
   const [stats, setStats] = useState<ProfileStats>(emptyStats);
   const [recentResults, setRecentResults] = useState<RecentResult[]>([]);
@@ -156,11 +157,11 @@ export default function ProfilePage() {
         : "";
 
     const timer = window.setTimeout(() => {
-      setUsername(currentName || "");
+      if (!editing) setUsername(currentName || user?.email?.split("@")[0] || ui("Player"));
       setAvatarId(typedProfile?.avatar_id ?? "m1");
     }, 0);
     return () => window.clearTimeout(timer);
-  }, [profile, user?.email]);
+  }, [profile, user?.email, editing]);
 
   /* =========================================================
      MEMBER SINCE
@@ -179,10 +180,10 @@ export default function ProfilePage() {
      ========================================================= */
 
   useEffect(() => {
-    if (!user) {
+    if (!userId) {
       return;
     }
-    const userId = user.id;
+    let active = true;
 
     async function loadStats() {
       setLoadingStats(true);
@@ -197,6 +198,7 @@ export default function ProfilePage() {
           .eq("user_id", userId),
         supabase.from("user_game_results").select("game,outcome,multiplayer,completed_at,score_difference").eq("user_id", userId).order("completed_at", { ascending: false }).limit(4),
       ]);
+      if (!active) return;
       if (!recent.error) setRecentResults((recent.data ?? []) as RecentResult[]);
       if (!result.error) {
         setStatsError(null);
@@ -222,7 +224,8 @@ export default function ProfilePage() {
     }
 
     void loadStats();
-  }, [user]);
+    return () => { active = false; };
+  }, [userId]);
 
   const totalGames = stats.general.games_played;
   const mostPlayed = Object.entries(stats.games)

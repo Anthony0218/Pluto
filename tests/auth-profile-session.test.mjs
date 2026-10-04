@@ -27,7 +27,7 @@ const bob = { ...alice, id: "bob" };
 const session = user => ({ user });
 
 // Drive the provider's real subscription with controlled async SDK responses.
-function mountAuth() {
+function mountAuth(profileResults = []) {
   const states = [];
   const effects = [];
   let resolveSession;
@@ -48,7 +48,14 @@ function mountAuth() {
   const { AuthProvider } = loadComponent("../src/context/AuthContext.tsx", {
     react,
     "./authState": { AuthContext: React.createContext(null) },
-    "../lib/supabase": { supabase: { auth: {
+    "../lib/supabase": { supabase: { from() {
+      const query = {
+        select() { return query; },
+        eq() { return query; },
+        single() { return Promise.resolve(profileResults.shift()); },
+      };
+      return query;
+    }, auth: {
       getSession: () => initialSession,
       onAuthStateChange(callback) {
         notify = callback;
@@ -56,7 +63,7 @@ function mountAuth() {
       },
     } } },
   });
-  AuthProvider({ children: null });
+  const tree = AuthProvider({ children: null });
   const cleanup = effects[0]();
   return {
     states,
@@ -66,6 +73,7 @@ function mountAuth() {
       await initialSession;
     },
     cleanup,
+    refreshProfile: tree.props.value.refreshProfile,
     get unsubscribed() { return unsubscribed; },
   };
 }
@@ -78,6 +86,40 @@ test("delayed initial-session snapshots cannot log out a newly signed-in user", 
   await auth.resolve(null);
   assert.equal(auth.states[0], alice);
   assert.equal(auth.states[2], true);
+  auth.cleanup();
+});
+
+test("a failed desktop focus refresh retains the loaded profile and login", async context => {
+  context.mock.method(console, "error", () => {});
+  const profile = { id: alice.id, username: "Alice", avatar_id: "m2" };
+  const auth = mountAuth([
+    { data: profile, error: null },
+    { data: null, error: { message: "Temporary network failure" } },
+    Promise.reject(new Error("Network unavailable")),
+  ]);
+  auth.notify("SIGNED_IN", session(alice));
+  await auth.refreshProfile();
+  assert.equal(auth.states[1], profile);
+  await auth.refreshProfile();
+  assert.equal(auth.states[1], profile);
+  await auth.refreshProfile();
+  assert.equal(auth.states[0], alice);
+  assert.equal(auth.states[1], profile);
+  assert.equal(auth.states[2], false);
+  auth.cleanup();
+});
+
+test("out-of-order profile refreshes cannot replace newer profile data", async () => {
+  let resolveOlder;
+  const older = new Promise(resolve => { resolveOlder = resolve; });
+  const latestProfile = { id: alice.id, username: "Latest name" };
+  const auth = mountAuth([older, { data: latestProfile, error: null }]);
+  auth.notify("SIGNED_IN", session(alice));
+  const pending = auth.refreshProfile();
+  await auth.refreshProfile();
+  resolveOlder({ data: { id: alice.id, username: "Old name" }, error: null });
+  await pending;
+  assert.equal(auth.states[1], latestProfile);
   auth.cleanup();
 });
 
@@ -151,4 +193,34 @@ test("signed-in users retain the profile while profile data is loading", () => {
   const html = profileMarkup({ user: alice, profile: null, loading: true });
   assert.match(html, /Pluto player profile/);
   assert.doesNotMatch(html, /Not signed in/);
+});
+
+test("profile renders the loaded player name immediately without a blank first frame", () => {
+  const html = profileMarkup({ user: alice, profile: { id: alice.id, username: "Alice" }, loading: false });
+  assert.match(html, /<h1[^>]*>Alice<\/h1>/);
+});
+
+test("token and focus events for the same account do not restart the stats load", () => {
+  let auth = { user: alice, profile: null, loading: false };
+  let dependencies;
+  const source = readFileSync(new URL("../src/pages/social/ProfilePage.tsx", import.meta.url), "utf8");
+  const modules = Object.fromEntries([...source.matchAll(/from\s+"([^"]+)"/g)]
+    .map(([, name]) => [name, { __esModule: true, default: () => null }]));
+  Object.assign(modules, {
+    react: { ...React, useState: value => [typeof value === "function" ? value() : value, () => {}],
+      useEffect(_effect, deps) { dependencies = deps; } },
+    "@/context/AuthContext": { useAuth: () => auth },
+    "@/i18n/ui": { ui: text => text, useUiLanguage: () => ({ language: "en" }) },
+    "@/components/social/useCustomAvatars": { useCustomAvatars: () => ({ customAvatars: [] }) },
+    "@/data/dashboard": { featuredGames: [] },
+  });
+  const ProfilePage = loadComponent("../src/pages/social/ProfilePage.tsx", modules).default;
+  ProfilePage();
+  const initial = dependencies;
+  auth = { ...auth, user: { ...alice } };
+  ProfilePage();
+  assert.ok(dependencies.every((value, index) => Object.is(value, initial[index])));
+  auth = { ...auth, user: bob };
+  ProfilePage();
+  assert.notDeepEqual(dependencies, initial);
 });
