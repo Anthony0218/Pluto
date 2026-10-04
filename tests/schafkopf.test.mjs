@@ -59,7 +59,7 @@ test("Legen timeout passes undecided players and gives them the second packet", 
   assert.equal(timedOut.multiplier, 2);
 });
 
-test("a player who knocked must declare after four passes, with individual games for protected plain suits", () => {
+test("a player who knocked must declare after four passes and may always choose an individual game", () => {
   let game = legenGame(undefined, 3, shuffledDeck(rng(29)));
   game = applyAction(game, 0, { type: "legen", knock: true });
   game = applyAction(game, 1, { type: "legen", knock: false });
@@ -71,9 +71,10 @@ test("a player who knocked must declare after four passes, with individual games
   assert.equal(game.declarer, 0);
   assert.equal(game.forcedCallerReason, "legen");
   const view = viewFor(game, 0);
-  assert.equal(view.contracts.some(contract => contract.kind === "rufspiel"), false);
+  assert.equal(view.contracts.some(contract => contract.kind === "rufspiel"), true);
   assert.equal(view.contracts.some(contract => contract.kind === "solo"), true);
-  assert.throws(() => applyAction(game, 0, { type: "declare", contract: { kind: "rufspiel", suit: "Eichel" } }), /nicht ansagen/);
+  const rufspiel = view.contracts.find(contract => contract.kind === "rufspiel");
+  assert.equal(applyAction(game, 0, { type: "declare", contract: rufspiel }).phase, "play");
 });
 
 test("after four passes, the last player who knocked must declare", () => {
@@ -309,6 +310,7 @@ test("Kontra and Re enforce teams, timing, and the normal winning threshold", ()
   assert.equal(canDouble(game, 1), true);
   let doubled = applyAction(game, 1, { type: "play", cardId: legalCards(game, 1)[0].id, spritz: true });
   assert.equal(doubled.multiplier, 2);
+  assert.deepEqual(doubled.spritzSeats, [1]);
   assert.equal(doubled.turn, 2);
   assert.equal(canDouble(doubled, 1), false);
   doubled = applyAction(doubled, 2, { type: "play", cardId: legalCards(doubled, 2)[0].id });
@@ -479,6 +481,19 @@ test("Ramsch completes with zero-sum payments and a ledger entry", () => {
   assert.equal(game.result.deltas.reduce((sum, amount) => sum + amount, 0), 0);
   assert.equal(game.history.length, 1);
   assert.equal(game.history[0].contract, "Ramsch");
+});
+
+test("Ramsch pays a double share to each player without a trick", () => {
+  const game = classicGame();
+  Object.assign(game, {
+    contract: { kind: "ramsch" },
+    points: [70, 30, 20, 0],
+    tricks: [0, 0, 0, 0, 1, 1, 1, 1].map(winner => ({ plays: [], winner, points: 0 })),
+  });
+  const result = scoreRound(game);
+  assert.deepEqual(result.ramschDoubleWinners, [2, 3]);
+  assert.deepEqual(result.deltas, [-50, 10, 20, 20]);
+  assert.equal(result.deltas.reduce((sum, amount) => sum + amount, 0), 0);
 });
 
 test("forced lower-card Sauspiel plays through and reveals its partner", () => {

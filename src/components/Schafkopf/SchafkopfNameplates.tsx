@@ -10,11 +10,11 @@ const scenes: Record<Scene, { src: string; plates: Record<Position, [number, num
   mountain: { src: "/images/schafkopf-mountain-balcony.png", plates: { north: [832, 302], west: [305, 608], east: [1360, 608], south: [832, 805] } },
 };
 
-export default function SchafkopfNameplates({ scene, labels, knocked, cardCounts, pageRef }: { scene: Scene; labels: Record<Position, Nameplate>; knocked: Record<Position, boolean>; cardCounts: Record<Position, number>; pageRef: RefObject<HTMLElement | null> }) {
+export default function SchafkopfNameplates({ scene, labels, knocked, spritzed, cardCounts, pageRef }: { scene: Scene; labels: Record<Position, Nameplate>; knocked: Record<Position, boolean>; spritzed: Record<Position, boolean>; cardCounts: Record<Position, number>; pageRef: RefObject<HTMLElement | null> }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const overlayKey = JSON.stringify({ labels, knocked, cardCounts });
+  const overlayKey = JSON.stringify({ labels, knocked, spritzed, cardCounts });
   useEffect(() => {
-    const { labels, knocked } = JSON.parse(overlayKey) as { labels: Record<Position, Nameplate>; knocked: Record<Position, boolean> };
+    const { labels, knocked, spritzed } = JSON.parse(overlayKey) as { labels: Record<Position, Nameplate>; knocked: Record<Position, boolean>; spritzed: Record<Position, boolean> };
     const page = pageRef.current;
     const canvas = canvasRef.current;
     if (!page || !canvas) return;
@@ -35,12 +35,16 @@ export default function SchafkopfNameplates({ scene, labels, knocked, cardCounts
       const offsetX = (width - image.naturalWidth * scale) / 2;
       const offsetY = (height - image.naturalHeight * scale) / 2;
       const pageRect = page.getBoundingClientRect();
-      const narrow = width < 700;
+      const narrow = width < 700 || height < 500 && window.matchMedia("(pointer: coarse)").matches;
+      const shortViewport = narrow && height < 500;
+      const stage = page.querySelector<HTMLElement>(".sk-game-stage");
+      const stageRect = stage?.getBoundingClientRect();
       for (const position of ["north", "west", "east", "south"] as const) {
+        if (shortViewport && position === "south") continue;
         const [sourceX, sourceY] = scenes[scene].plates[position];
         const naturalX = sourceX * scale + offsetX;
-        const plateWidth = narrow ? Math.min(128, width * .29) : Math.min(202, 222 * scale);
-        const plateHeight = narrow ? 35 : 46;
+        const plateWidth = shortViewport ? Math.min(82, width * .2) : narrow ? Math.min(104, width * .25) : Math.min(202, 222 * scale);
+        const plateHeight = shortViewport ? 24 : narrow ? 35 : 46;
         const avatar = page.querySelector<HTMLElement>(`.sk-avatar-${position}`);
         const avatarRect = avatar?.getBoundingClientRect();
         const x = avatarRect ? avatarRect.left - pageRect.left + avatarRect.width / 2 : narrow && position === "west" ? width * .16 : narrow && position === "east" ? width * .84 : Math.max(42, Math.min(width - 42, naturalX));
@@ -49,7 +53,10 @@ export default function SchafkopfNameplates({ scene, labels, knocked, cardCounts
         const portraitBottom = avatarRect ? avatarRect.top + avatarRect.height * .53 : 0;
         const cardsBottom = avatar ? [...avatar.querySelectorAll<HTMLElement>(".sk-card-back")].reduce((bottom, card) => Math.max(bottom, card.getBoundingClientRect().bottom), 0) : 0;
         const attachmentBottom = Math.max(portraitBottom, cardsBottom);
-        const y = avatarRect ? attachmentBottom - pageRect.top + plateHeight / 2 + 2 : sourceY * scale + offsetY + (position === "south" ? 0 : height * .055);
+        const westLabelDrop = position === "west" ? narrow ? 31 : Math.min(59, Math.max(42, width * .045)) : 0;
+        const backgroundY = sourceY * scale + offsetY + (position === "south" ? 0 : height * .055);
+        const mobileSouthY = stageRect ? stageRect.bottom - pageRect.top - plateHeight / 2 - 3 : backgroundY;
+        const y = (avatarRect ? attachmentBottom - pageRect.top + plateHeight / 2 + 2 : narrow && position === "south" ? mobileSouthY : backgroundY) + westLabelDrop;
         ctx.save();
         ctx.translate(x, y);
         ctx.transform(1, 0, -0.08, .78, 0, 0);
@@ -96,7 +103,7 @@ export default function SchafkopfNameplates({ scene, labels, knocked, cardCounts
           ctx.strokeRect(-plateWidth / 2, -plateHeight / 2, plateWidth, plateHeight - 4);
           ctx.restore();
         }
-        let fontSize = narrow ? 14 : 19;
+        let fontSize = shortViewport ? 11 : narrow ? 14 : 19;
         do { ctx.font = `bold ${fontSize}px Georgia, serif`; fontSize -= 1; } while (ctx.measureText(label).width > plateWidth - 16 && fontSize > 10);
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
@@ -111,12 +118,12 @@ export default function SchafkopfNameplates({ scene, labels, knocked, cardCounts
         ctx.shadowColor = "transparent";
         ctx.shadowBlur = 0;
         if (role) {
-          ctx.font = `bold ${narrow ? 9 : 11}px Georgia, serif`;
+          ctx.font = `bold ${shortViewport ? 7 : narrow ? 9 : 11}px Georgia, serif`;
           ctx.fillStyle = role === "Spieler" ? "#f9df9b" : "#d8e9ef";
           ctx.fillText(role, 0, narrow ? 9 : 11);
         }
         if (knocked[position]) {
-          const coinRadius = narrow ? 12 : 15;
+          const coinRadius = shortViewport ? 8 : narrow ? 12 : 15;
           ctx.save();
           ctx.translate(plateWidth / 2 + coinRadius * .9, 0);
           ctx.fillStyle = "#f5c85b";
@@ -126,9 +133,26 @@ export default function SchafkopfNameplates({ scene, labels, knocked, cardCounts
           ctx.lineWidth = 2;
           ctx.strokeStyle = "#8a5a11";
           ctx.stroke();
-          ctx.font = `bold ${narrow ? 8 : 10}px Georgia, serif`;
+          ctx.font = `bold ${shortViewport ? 6 : narrow ? 8 : 10}px Georgia, serif`;
           ctx.fillStyle = "#4a2a05";
           ctx.fillText("1 €", 0, 1);
+          ctx.restore();
+        }
+        if (spritzed[position]) {
+          const coinRadius = shortViewport ? 8 : narrow ? 12 : 15;
+          const coinOffset = knocked[position] ? coinRadius * 2 + 5 : 0;
+          ctx.save();
+          ctx.translate(plateWidth / 2 + coinRadius * .9 + coinOffset, 0);
+          ctx.fillStyle = "#9ed2ff";
+          ctx.beginPath();
+          ctx.arc(0, 0, coinRadius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = "#185b91";
+          ctx.stroke();
+          ctx.font = `bold ${shortViewport ? 6 : narrow ? 8 : 10}px Georgia, serif`;
+          ctx.fillStyle = "#103d63";
+          ctx.fillText("×2", 0, 1);
           ctx.restore();
         }
         ctx.restore();

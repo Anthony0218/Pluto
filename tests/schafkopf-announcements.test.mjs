@@ -3,13 +3,13 @@ import test from "node:test";
 import { CALL_NAME_OPTIONS, DEFAULT_ANNOUNCEMENT_SETTINGS, formatDeclarationAnnouncement, normalizeAnnouncementSettings } from "../src/games/schafkopf/announcements.ts";
 import { BID_NAMES, applyAction, contractName, contractsFor, createGame, viewFor } from "../src/games/schafkopf/schafkopf.ts";
 
-test("every Rufname has the right form after auf and mit", () => {
+test("every Rufname has the right Bavarian form after auf and mit", () => {
   for (const suit of ["Eichel", "Gras", "Schellen"]) {
     for (const choice of CALL_NAME_OPTIONS[suit]) {
       const settings = normalizeAnnouncementSettings({ callPrefix: "auf", callNames: { [suit]: choice.id } });
-      assert.equal(formatDeclarationAnnouncement({ kind: "rufspiel", suit }, settings), `Ich spiele auf ${choice.auf}.`);
+      assert.equal(formatDeclarationAnnouncement({ kind: "rufspiel", suit }, settings), `I spui auf ${choice.auf}.`);
       settings.callPrefix = "mit";
-      assert.equal(formatDeclarationAnnouncement({ kind: "rufspiel", suit }, settings), `Ich spiele mit ${choice.mit}.`);
+      assert.equal(formatDeclarationAnnouncement({ kind: "rufspiel", suit }, settings), `I spui mit ${choice.mit}.`);
       settings.callPrefix = "none";
       assert.equal(formatDeclarationAnnouncement({ kind: "rufspiel", suit }, settings), `${choice.bare}.`);
     }
@@ -17,13 +17,18 @@ test("every Rufname has the right form after auf and mit", () => {
 });
 
 test("random names and prefixes, custom text, Solo and Sticht", () => {
-  assert.equal(formatDeclarationAnnouncement({ kind: "rufspiel", suit: "Eichel" }, DEFAULT_ANNOUNCEMENT_SETTINGS, () => 0), "Ich spiele auf das Eichel-Ass.");
+  assert.equal(formatDeclarationAnnouncement({ kind: "rufspiel", suit: "Eichel" }, DEFAULT_ANNOUNCEMENT_SETTINGS, () => 0), "I spui auf die Eichel-Ass.");
   assert.equal(formatDeclarationAnnouncement({ kind: "rufspiel", suit: "Eichel" }, DEFAULT_ANNOUNCEMENT_SETTINGS, () => .99), "Oide.");
   const settings = normalizeAnnouncementSettings({ soloWord: "Sticht", custom: { Eichel: "Meine Oide!" } });
   assert.equal(formatDeclarationAnnouncement({ kind: "rufspiel", suit: "Eichel" }, settings), "Meine Oide!");
   assert.equal(formatDeclarationAnnouncement({ kind: "solo", suit: "Gras" }, settings), "Gras-Sticht.");
   assert.equal(formatDeclarationAnnouncement({ kind: "solo", suit: "Herz", tout: true }, settings), "Herz-Sticht DU.");
   assert.equal(formatDeclarationAnnouncement({ kind: "wenz" }, settings), "Wenz.");
+});
+
+test("Kugel-Bauer-Theres is available as a Schellen-Ass name", () => {
+  const settings = normalizeAnnouncementSettings({ callPrefix: "mit", callNames: { Schellen: "kugel-bauer-theres" } });
+  assert.equal(formatDeclarationAnnouncement({ kind: "rufspiel", suit: "Schellen" }, settings), "I spui mit der Kugel-Bauer-Theres.");
 });
 
 test("custom game announcement keeps the canonical name in each player view", () => {
