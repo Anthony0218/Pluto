@@ -2,7 +2,7 @@
 
 Go review, hints and the singleplayer opponent run in a Web Worker, like the
 chess Stockfish integration. No analysis API, Render service, native KataGo
-installation, Supabase function, migration, or cross-origin isolation is needed.
+installation, Supabase function, or cross-origin isolation is needed for analysis.
 Deploy the normal frontend build.
 
 The browser engine is the MIT-licensed Web KaTrain TypeScript/TensorFlow.js
@@ -28,9 +28,28 @@ worker is released after two minutes.
 
 The adapter supplies full repetition history, previous boards, and recent moves.
 The vendored Chinese rules entry is adapted to this app: positional superko,
-area scoring, no suicide, no handicap bonus, 6.5 komi, and capture dead stones
-before passing. Engine candidates and variations are checked against the app's
-rules. Finished games after two passes use the exact local area score.
+area scoring, no suicide, no handicap bonus, and 6.5 komi. Engine candidates
+and variations are checked against the app's rules. In local games, players can
+mark entire dead groups after two passes, then confirm the final area score.
+Ranked and room results still use their server or room scoring flow.
+
+Review uses five Go-specific labels: AI Move for the engine's top move, then
+Good (<2 points lost), Inaccuracy (2–<5), Mistake (5–<10), and Blunder (10+).
+These point bands are app coaching thresholds, not universal Go standards.
+
+## Saved games and SGF
+
+Saved games can be exported as SGF FF[4]. Import reads the first main line and
+supports 9×9, 13×13, and 19×19 games with Chinese rules and 6.5 komi. It
+supports moves, passes, results, and names; setup stones and handicap games are
+not supported. A private `XDS` property preserves marked dead stones on app
+round trips. Comments and alternate variations are ignored on import.
+
+Anonymous saves remain in this browser. Signed-in saves sync through
+`public.go_saved_games`; the library also has an explicit action to move local
+anonymous saves into the signed-in account. Apply
+`supabase/migrations/20261021010000_go_saved_games.sql` to enable account sync.
+The table uses owner-only row-level security.
 
 See src/vendor/browser-katago/README.md for source provenance and modifications.
 

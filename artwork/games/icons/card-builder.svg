@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Card Builder icon">
+ <rect width="256" height="256" rx="48" fill="#302a4c"/>
+ <rect x="44" y="62" width="105" height="145" rx="12" transform="rotate(-14 44 62)" fill="#7e6ec0"/>
+ <rect x="105" y="46" width="105" height="145" rx="12" transform="rotate(11 105 46)" fill="#f1e9da"/>
+ <path d="M156 84v54m-27-27h54" stroke="#6656a6" stroke-width="13" stroke-linecap="round"/>
+ <path d="M62 163l20-28 20 28z" fill="#e8c475"/><circle cx="171" cy="179" r="18" fill="#7ad0cb"/>
+</svg>

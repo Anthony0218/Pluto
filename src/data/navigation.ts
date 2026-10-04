@@ -7,6 +7,16 @@ export const learningResources = [
     route: "/games/chess/analysis",
   },
   {
+    title: "Go Analysis",
+    description: "Replay saved Go games and review key moves.",
+    route: "/games/go/analysis",
+  },
+  {
+    title: "Go Rules",
+    description: "Learn liberties, captures, ko and area scoring.",
+    route: "/games/go/rules",
+  },
+  {
     title: "Chess Puzzles",
     description: "Sharpen your tactics and pattern recognition.",
     route: "/games/chess/puzzles",

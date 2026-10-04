@@ -10,6 +10,8 @@ export type GoState = {
   captures: Record<GoColor, number>; consecutivePasses: number; komi: number;
   status: "playing" | "finished"; winner: GoColor | "draw" | null; result: string | null;
   lastMove: GoPoint | null; positionHashes: string[]; moveHistory: GoHistoryEntry[];
+  /** Stones agreed dead after two passes; removed only for area scoring. */
+  deadStones?: number[];
 };
 export const otherGoColor = (color: GoColor): GoColor => color === "black" ? "white" : "black";
 export function hashGoBoard(board: GoState["board"]): string {
@@ -68,23 +70,36 @@ export function getLegalGoMoves(state: GoState): GoMove[] {
 }
 export function scoreGo(state: GoState) {
   let black = 0, white = state.komi;
+  const dead = new Set(state.deadStones ?? []);
+  const board = state.board.map((stone, index) => dead.has(index) ? null : stone);
   const visited = new Set<number>();
-  state.board.forEach((cell, index) => {
+  board.forEach((cell, index) => {
     if (cell === "black") black += 1;
     else if (cell === "white") white += 1;
     else if (!visited.has(index)) {
       const region = new Set<number>(), borders = new Set<GoColor>(), queue = [index];
       while (queue.length) {
         const point = queue.pop()!;
-        if (visited.has(point) || state.board[point]) continue;
+        if (visited.has(point) || board[point]) continue;
         visited.add(point); region.add(point);
-        for (const next of neighbors(state.boardSize, point)) { const occupant = state.board[next]; if (occupant) borders.add(occupant); else if (!visited.has(next)) queue.push(next); }
+        for (const next of neighbors(state.boardSize, point)) { const occupant = board[next]; if (occupant) borders.add(occupant); else if (!visited.has(next)) queue.push(next); }
       }
       if (borders.size === 1) { if (borders.has("black")) black += region.size; else white += region.size; }
     }
   });
   const winner: GoColor | "draw" = black === white ? "draw" : black > white ? "black" : "white";
   return { black, white, winner };
+}
+/** Toggle a connected group in the post-pass scoring review. */
+export function toggleDeadGoGroup(state: GoState, index: number): GoState {
+  if (state.status !== "finished" || state.consecutivePasses < 2 || !state.board[index]) return state;
+  const group = getGoGroup(state.board, state.boardSize, index);
+  const dead = new Set(state.deadStones ?? []);
+  const remove = dead.has(index);
+  group.stones.forEach(point => { if (remove) dead.delete(point); else dead.add(point); });
+  const next = { ...state, deadStones: [...dead].sort((a, b) => a - b) };
+  const score = scoreGo(next), margin = Math.abs(score.black - score.white);
+  return { ...next, winner: score.winner, result: score.winner === "draw" ? "Draw" : score.winner + " wins by " + margin };
 }
 export function applyGoMove(state: GoState, move: GoMove): GoState {
   if (!isLegalGoMove(state, move)) throw new Error("Illegal Go move");

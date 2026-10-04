@@ -18,9 +18,9 @@ import {
   mustFollowTrumpfOderKritisch,
   normalRankValue,
   WATTEN_CARD_CLIP,
-  wouldCardWin,
   type WattenCard,
 } from "../../utils/watten";
+import { getWattenHelpComparison } from "@/games/watten/help";
 import CardThemeSelector from "./WattenCardGameSelector";
 import { useCardTheme } from "@/context/CardThemeContext";
 import { getWattenCardImage } from "@/utils/WattenCardImages";
@@ -3304,21 +3304,11 @@ export default function WattenMultiplayerGame() {
                   {!waitingForDeal &&
                     hand.map((card, index) => {
                       const legal = cardIsLegal(card);
-                      const comparison =
-                        helpMode &&
-                        game.phase === "playing" &&
-                        game.played_cards.length > 0 &&
-                        legal &&
-                        game.farbe &&
-                        game.schlag
-                          ? wouldCardWin(
-                              card,
-                              me?.user_id ?? "",
-                              game.played_cards,
-                              game.farbe,
-                              game.schlag,
-                            )
-                          : null;
+                      const comparison = getWattenHelpComparison({
+                        card, hand, trick: game.played_cards, tricksWon: game.tricks_won,
+                        trump: game.farbe, schlag: game.schlag,
+                        playerId: me?.user_id ?? "", active: helpMode && game.phase === "playing" && isMyTurn,
+                      });
 
                       const canPlay =
                         game.phase === "playing" &&

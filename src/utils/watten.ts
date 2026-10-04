@@ -534,6 +534,10 @@ export function getWattenCardRole(
     return "Trumpf";
   }
 
+  if (!leadSuit) {
+    return "Normale Karte";
+  }
+
   if (card.suit === leadSuit) {
     return "angespielte Farbe";
   }
@@ -572,4 +576,3 @@ export function wouldCardWin(
 
 export const WATTEN_CARD_CLIP =
   "inset(1px_2px_1px_2px_round_6px)";
- 

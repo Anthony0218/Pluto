@@ -29,7 +29,10 @@ export default function GamesPage() {
             <Link
               key={game.route}
               to={game.route}
-              className="
+              aria-disabled={game.comingSoon ? true : undefined}
+              tabIndex={game.comingSoon ? -1 : undefined}
+              onClick={game.comingSoon ? (event) => event.preventDefault() : undefined}
+              className={`
                 group
                 overflow-hidden
                 rounded-[28px]
@@ -45,7 +48,8 @@ export default function GamesPage() {
                 hover:bg-zinc-900
                 hover:shadow-2xl
                 hover:shadow-black/40
-              "
+                ${game.comingSoon ? "pointer-events-none" : ""}
+              `}
             >
               {/* IMAGE */}
               <div className="relative aspect-[16/9] overflow-hidden bg-black/30">
@@ -87,12 +91,14 @@ export default function GamesPage() {
 
                   <span
                     className={`rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-wider backdrop-blur-md ${
-                      game.finished
-                        ? "border-emerald-400/25 bg-emerald-400/15 text-emerald-200"
-                        : "border-amber-400/25 bg-amber-400/15 text-amber-200"
+                      game.comingSoon
+                        ? "border-sky-400/25 bg-sky-400/15 text-sky-200"
+                        : game.finished
+                          ? "border-emerald-400/25 bg-emerald-400/15 text-emerald-200"
+                          : "border-amber-400/25 bg-amber-400/15 text-amber-200"
                     }`}
                   >
-                    {ui(game.finished ? "Ready to play" : "In progress")}
+                    {ui(game.comingSoon ? "Coming soon" : game.finished ? "Ready to play" : "In progress")}
                   </span>
                 </div>
               </div>

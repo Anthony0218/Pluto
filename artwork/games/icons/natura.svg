@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Natura icon">
+ <rect width="256" height="256" rx="48" fill="#1d4139"/>
+ <path d="M74 189c-6-70 23-118 109-128 0 78-35 132-109 128z" fill="#82bd82"/>
+ <path d="M73 198c31-49 60-76 106-109" fill="none" stroke="#e0e5a6" stroke-width="9" stroke-linecap="round"/>
+ <path d="M83 167c-24-8-41-31-45-57 34-1 56 13 68 36" fill="#5a9c70"/>
+ <path d="M120 143c21-8 39-10 57-8M103 163c8-24 10-46 9-65" fill="none" stroke="#d9e5a6" stroke-width="6" stroke-linecap="round"/>
+</svg>

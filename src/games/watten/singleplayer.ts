@@ -74,7 +74,8 @@ export function raiseSingleWatten(state: SingleWattenState, seat: number): Singl
 }
 export function respondSingleWattenBid(state: SingleWattenState, seat: number, hold: boolean): SingleWattenState {
   const bid = state.pendingBid;
-  if (!bid || teamOf(String(seat), state.count, state.caller) === bid.side) throw new Error("No bid for your side.");
+  if (state.phase !== "playing" || !bid || !Number.isInteger(seat) || seat < 0 || seat >= state.count ||
+      teamOf(String(seat), state.count, state.caller) === bid.side) throw new Error("No bid for your side.");
   if (hold) return { ...state, roundValue: bid.value, lastBidSide: bid.side, pendingBid: null };
   return awardRound(state, bid.side, state.roundValue);
 }

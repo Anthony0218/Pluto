@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Eat It icon">
+ <rect width="256" height="256" rx="48" fill="#243e48"/>
+ <circle cx="124" cy="132" r="72" fill="#f4846d"/>
+ <path d="M100 116a54 54 0 1 0 54 0l-28 20z" fill="#272738"/>
+ <circle cx="98" cy="89" r="8" fill="#fff6e9"/><circle cx="151" cy="89" r="8" fill="#fff6e9"/><circle cx="100" cy="90" r="3" fill="#23313d"/><circle cx="153" cy="90" r="3" fill="#23313d"/>
+ <circle cx="212" cy="136" r="16" fill="#f6ce70"/><path d="M210 119q1-9 11-12" fill="none" stroke="#83aa78" stroke-width="5" stroke-linecap="round"/>
+</svg>

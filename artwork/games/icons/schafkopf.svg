@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Schafkopf icon">
+ <rect width="256" height="256" rx="48" fill="#183b34"/>
+ <rect x="55" y="53" width="91" height="140" rx="11" transform="rotate(-15 55 53)" fill="#f3e9d6"/>
+ <rect x="93" y="56" width="91" height="140" rx="11" transform="rotate(7 93 56)" fill="#fff4de"/>
+ <rect x="131" y="68" width="78" height="134" rx="11" transform="rotate(17 131 68)" fill="#e8d8bc"/>
+ <path d="M137 110c-16-21-42-7-28 15l28 32 28-32c14-22-12-36-28-15z" fill="#c9554e"/>
+ <path d="M75 88q-17 6-8 26 5 10 17 6 3 15 13 14 12-2 14-16 5-25-20-29l-8-14-5 15z" fill="#5a814e"/>
+</svg>

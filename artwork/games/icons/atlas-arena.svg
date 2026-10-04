@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Atlas Arena icon">
+ <rect width="256" height="256" rx="48" fill="#152b46"/>
+ <circle cx="128" cy="128" r="78" fill="none" stroke="#77d0c5" stroke-width="11"/>
+ <path d="M50 128h156M128 50c-25 28-38 54-38 78s13 50 38 78M128 50c25 28 38 54 38 78s-13 50-38 78" fill="none" stroke="#77d0c5" stroke-width="8" stroke-linecap="round"/>
+ <path d="M78 89h100M78 167h100" stroke="#77d0c5" stroke-width="7"/>
+ <path d="M128 78c-18 0-31 13-31 31 0 23 31 54 31 54s31-31 31-54c0-18-13-31-31-31z" fill="#f4c671" stroke="#152b46" stroke-width="7"/><circle cx="128" cy="109" r="9" fill="#152b46"/>
+</svg>

@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useCardTheme } from "@/context/CardThemeContext";
 import { getWattenCardImage } from "@/utils/WattenCardImages";
-import { RANKS, SUITS, SUIT_SYMBOLS, WATTEN_CARD_CLIP, canPlayWattenCard, type Rank, type Suit, type WattenCard } from "@/utils/watten";
+import { RANKS, SUITS, SUIT_SYMBOLS, WATTEN_CARD_CLIP, canPlayWattenCard, getWattenCardRole, isHauptschlag, isFirstTrick, type Rank, type Suit, type WattenCard } from "@/utils/watten";
 import { botShouldHold, botShouldRaise, chooseBotCard } from "@/games/watten/bot";
+import { getWattenHelpComparison } from "@/games/watten/help";
 import { advanceSingleWatten, canRaiseSingleWatten, createSingleWattenRound, cutSingleWatten, declareSingleWatten, playSingleWattenCard, raiseSingleWatten, respondSingleWattenBid, teamOf, type SingleWattenState } from "@/games/watten/singleplayer";
 import { useTableTheme } from "@/context/TableThemeContext";
 import { useAuth } from "@/context/AuthContext";
@@ -33,6 +34,7 @@ export default function WattenSingleplayer() {
   const [schlag, setSchlag] = useState<Rank>("Ober");
   const [cutIndex, setCutIndex] = useState(16);
   const [notice, setNotice] = useState<string | null>(null);
+  const [helpMode, setHelpMode] = useState(false);
   useEffect(() => {
     if (!game || game.phase !== "playing" || !game.trump || !game.schlag) return;
     const humanSide = teamOf("0", game.count, game.caller);
@@ -68,6 +70,9 @@ export default function WattenSingleplayer() {
     if (!game || game.turn !== 0) return;
     try { setGame(playSingleWattenCard(game, card.id)); setNotice(null); }
     catch (error) { setNotice(error instanceof Error ? error.message : ui("Illegal card.")); }
+  }
+  function confirmLeaveGame() {
+    return !game || game.phase === "matchOver" || window.confirm(ui("Leave this game? Current progress will be lost."));
   }
   if (!game) return (
     <main className="watten-menu px-4 py-8 text-white sm:py-12">
@@ -113,13 +118,14 @@ export default function WattenSingleplayer() {
         <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div><p className="text-xs font-semibold uppercase tracking-widest text-amber-400">{ui("Bavarian Watten")}</p><h1 className="mt-1 text-2xl font-black">{game.count} {ui("Players")} · {ui("Singleplayer")}</h1></div>
           <div className="flex flex-wrap items-center gap-2">
+            <button type="button" aria-pressed={helpMode} onClick={() => setHelpMode(current => !current)} className={`rounded-lg px-3 py-2 text-sm font-bold transition ${helpMode ? "bg-amber-400 text-amber-950" : "bg-white/10 text-white hover:bg-white/20"}`}>💡 {ui(helpMode ? "Help On" : "Help")}</button>
             <HeaderTools><CardThemeSelector /><TableThemeSelector /></HeaderTools>
-            <button type="button" onClick={() => { setGame(null); setNotice(null); document.querySelector(".app-viewport")?.scrollTo(0, 0); }} className="rounded-lg bg-white/10 px-3 py-2 text-sm font-bold hover:bg-white/20">{ui("New Game")}</button>
-            <Link to="/games/watten" className="rounded-lg bg-white/10 px-3 py-2 text-sm font-bold hover:bg-white/20">{ui("Back")}</Link>
+            <button type="button" onClick={() => { if (!confirmLeaveGame()) return; setGame(null); setNotice(null); document.querySelector(".app-viewport")?.scrollTo(0, 0); }} className="rounded-lg bg-white/10 px-3 py-2 text-sm font-bold hover:bg-white/20">{ui("New Game")}</button>
+            <Link to="/games/watten" onClick={event => { if (!confirmLeaveGame()) event.preventDefault(); }} className="rounded-lg bg-white/10 px-3 py-2 text-sm font-bold hover:bg-white/20">{ui("Back")}</Link>
           </div>
         </header>
         <WattenTurnNotice player={profile?.username || ui("You")} active={trumpRuleActive} mustFollow={mustFollow} />
-        <div className="watten-game-grid grid grid-cols-[16rem_minmax(0,1fr)_16rem] gap-4">
+        <div className="watten-game-grid watten-single-grid grid grid-cols-[16rem_minmax(0,1fr)_16rem] gap-4">
           <aside className="space-y-3">
             <section className="rounded-2xl border border-white/10 bg-zinc-950/80 p-4">
               <h2 className="text-xs font-black uppercase tracking-widest text-amber-300">{ui("Scoreboard")}</h2>
@@ -159,7 +165,10 @@ export default function WattenSingleplayer() {
             </div>}
             <div className="watten-single-hand">
               <div className="mb-3 flex items-center justify-center gap-2"><ProfileAvatar avatarId={avatarId} className="h-9 w-9 rounded-xl" /><div><strong className="block text-sm">{profile?.username || ui("You")}</strong><p role="status" className="text-xs text-amber-200">{status}</p></div></div>
-              <div className="flex justify-center gap-2">{game.hands[0].map(card => <button type="button" key={card.id} disabled={!legal.has(card.id)} onClick={() => play(card)} aria-label={`${card.suit} ${card.rank}`} className={`watten-single-hand-card rounded-md transition hover:-translate-y-2 focus-visible:outline-2 focus-visible:outline-amber-200 disabled:cursor-default motion-reduce:transform-none ${humanTurn && mustFollow ? legal.has(card.id) ? "ring-2 ring-emerald-300" : "opacity-40 grayscale" : ""}`}><CardImage card={card} /></button>)}</div>
+              <div className="flex justify-center gap-2">{game.hands[0].map(card => {
+                const comparison = getWattenHelpComparison({ card, hand: game.hands[0], trick: game.trick, tricksWon: game.tricksWon, trump: game.trump, schlag: game.schlag, playerId: "0", active: helpMode && humanTurn });
+                return <button type="button" key={card.id} disabled={!legal.has(card.id)} onClick={() => play(card)} aria-label={`${card.suit} ${card.rank}${helpMode && humanTurn ? !legal.has(card.id) ? ` — ${ui("Illegal card")}` : comparison === null ? "" : comparison ? ` — ${ui("Beats the current winner")}` : ` — ${ui("Does not beat the current winner")}` : ""}`} className={`watten-single-hand-card relative rounded-md transition hover:-translate-y-2 focus-visible:outline-2 focus-visible:outline-amber-200 disabled:cursor-default motion-reduce:transform-none ${humanTurn && mustFollow ? legal.has(card.id) ? "ring-2 ring-emerald-300" : "opacity-40 grayscale" : ""} ${comparison === true ? "ring-2 ring-green-500" : comparison === false ? "ring-2 ring-red-500" : ""}`}><CardImage card={card} />{comparison !== null && <span aria-hidden="true" className={`absolute right-0 top-0 rounded-bl-md px-1 text-[10px] font-black ${comparison ? "bg-green-600 text-white" : "bg-red-700 text-white"}`}>{comparison ? ui("Wins") : ui("Loses")}</span>}</button>;
+              })}</div>
               {notice && <p role="alert" className="mt-3 text-center text-sm text-red-200">{notice}</p>}
             </div>
           </section>
@@ -169,7 +178,12 @@ export default function WattenSingleplayer() {
 
         {game.phase === "playing" && <section className="rounded-2xl border border-amber-200/20 bg-black/25 p-5"><h2 className="font-bold">{ui("Round value")}: {game.roundValue}</h2>{game.pendingBid ? <><p className="mt-2 text-sm text-zinc-300">{game.pendingBid.side === team ? ui("Your side raised the round.") : ui("Opponents raised the round.")}</p>{game.pendingBid.side !== team && <div className="mt-3 flex gap-2"><button type="button" onClick={() => setGame(respondSingleWattenBid(game, 0, true))} className="flex-1 rounded-lg bg-amber-300 p-2 font-bold text-black">{ui("Hold")}</button><button type="button" onClick={() => setGame(respondSingleWattenBid(game, 0, false))} className="flex-1 rounded-lg border border-white/20 p-2">{ui("Decline")}</button></div>}</> : canRaiseSingleWatten(game, 0) && <button type="button" onClick={() => setGame(raiseSingleWatten(game, 0))} className="mt-3 w-full rounded-lg border border-amber-300/50 p-2 font-bold text-amber-100 hover:bg-amber-300/10">{ui("Raise")}</button>}</section>}
         {game.phase === "trickPause" && <button type="button" onClick={() => setGame(advanceSingleWatten(game))} className="w-full rounded-xl bg-amber-300 p-3 font-bold text-black">{ui("Next trick")}</button>}
-        {(game.phase === "roundOver" || game.phase === "matchOver") && <section className="rounded-2xl border border-amber-200/30 bg-black/25 p-5"><h2 className="font-serif text-xl">{roundWinner === team ? ui("Your side won the round") : ui("Opponents won the round")}</h2><p className="mt-2 text-sm text-zinc-300">{game.scores.map((score, index) => `${index === 0 ? ui("You") : `${ui("Bot")} ${index}`}: ${score}`).join(" · ")}</p>{game.phase === "roundOver" && <button type="button" onClick={() => setGame(advanceSingleWatten(game))} className="mt-4 rounded-lg bg-amber-300 px-4 py-2 font-bold text-black">{ui("Next round")}</button>}</section>}
+        {(game.phase === "roundOver" || game.phase === "matchOver") && <section className="rounded-2xl border border-amber-200/30 bg-black/25 p-5" role="status"><h2 className="font-serif text-xl">{game.phase === "matchOver" ? roundWinner === team ? ui("Your side won the match") : ui("Opponents won the match") : roundWinner === team ? ui("Your side won the round") : ui("Opponents won the round")}</h2><p className="mt-2 text-sm text-zinc-300">{game.scores.map((score, index) => `${index === 0 ? ui("You") : `${ui("Bot")} ${index}`}: ${score}`).join(" · ")}</p>{game.phase === "roundOver" ? <button type="button" onClick={() => setGame(advanceSingleWatten(game))} className="mt-4 rounded-lg bg-amber-300 px-4 py-2 font-bold text-black">{ui("Next round")}</button> : <button type="button" onClick={() => { setGame(null); setNotice(null); }} className="mt-4 rounded-lg bg-amber-300 px-4 py-2 font-bold text-black">{ui("New Game")}</button>}</section>}
+        {helpMode && game.trump && game.schlag && game.hands[0].length > 0 && <section className="rounded-2xl border border-amber-200/20 bg-black/25 p-4" aria-label={ui("Help")}><h2 className="font-bold text-amber-200">💡 {ui("Help")}</h2><p className="mt-1 text-xs text-zinc-300">{ui("Only your cards and the cards on the table are used.")}</p><ul className="mt-3 space-y-2 text-xs">{game.hands[0].map(card => {
+          const comparison = getWattenHelpComparison({ card, hand: game.hands[0], trick: game.trick, tricksWon: game.tricksWon, trump: game.trump, schlag: game.schlag, playerId: "0", active: humanTurn });
+          const activatesRule = humanTurn && game.trick.length === 0 && isFirstTrick(game.tricksWon) && isHauptschlag(card, game.trump, game.schlag);
+          return <li key={card.id} className="rounded-lg border border-white/10 bg-white/5 p-2"><strong>{SUIT_SYMBOLS[card.suit]} {card.rank}</strong><span className="ml-1 text-zinc-300">· {getWattenCardRole(card, game.trick[0]?.card.suit ?? "", game.trump, game.schlag)}</span>{humanTurn && !legal.has(card.id) ? <span className="block text-rose-300">{ui("Trump or Critical: play a trump or critical card.")}</span> : comparison !== null ? <span className={`block ${comparison ? "text-green-300" : "text-red-300"}`}>{ui(comparison ? "Beats the current winner" : "Does not beat the current winner")}</span> : null}{activatesRule && <span className="block text-amber-200">{ui("Playing this Main Schlag activates Trump or Critical.")}</span>}</li>;
+        })}</ul></section>}
       </aside>
         </div>
       </div>

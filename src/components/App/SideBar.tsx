@@ -25,8 +25,8 @@ const links = [
   { label: "Clans", href: "/clans", icon: Users },
   { label: "Leaderboards", href: "/leaderboards", icon: Trophy },
 ];
-const sidebarGames = ["chess", "watten", "schafkopf", "go", "eat-it", "atlas-arena", "natura", "pluto-party", "medieval-kingdoms", "card-builder"].flatMap(slug => games.filter(game => game.route === `/games/${slug}`));
-const sidebarLessons = ["Chess Puzzles", "Chess Analysis", "Chess rules", "Schafkopfen Rules"].flatMap((title) =>
+const sidebarGames = ["chess", "watten", "schafkopf", "go", "eat-it", "atlas-arena", "natura"].flatMap(slug => games.filter(game => game.route === `/games/${slug}`));
+const sidebarLessons = ["Chess Puzzles", "Chess Analysis", "Chess rules", "Go Rules", "Go Analysis", "Schafkopfen Rules"].flatMap((title) =>
   learningResources.filter((resource) => resource.title === title),
 );
 

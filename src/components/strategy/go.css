@@ -10,6 +10,8 @@
 .go-page h2 { font-size: 25px; line-height: 1.3; margin: 24px 0 14px; font-family: Georgia, serif; color: #f4ead5; }
 .go-page p { line-height: 1.65; }
 .go-lessons { max-width: 1160px; margin: auto; padding: 32px 24px; display: grid; grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); align-items: center; gap: 40px; }
+.go-rules-intro { max-width: 1160px; margin: 20px auto 0; padding: 14px 20px; border-left: 2px solid #5eead4; color: #cbd5e1; font-size: 13px; line-height: 1.65; }
+.go-rules-intro strong { color: #f4ead5; }
 .go-tabs { display: flex; gap: 4px; flex-wrap: wrap; border-bottom: 1px solid #ffffff16; }
 .go-tabs button { padding: 12px 10px; font-size: 13px; color: #a1a1aa; border-bottom: 2px solid transparent; }
 .go-tabs button[aria-current], .go-tabs button[aria-selected=true] { color: #fde68a; border-color: #fde68a; }
@@ -35,6 +37,7 @@
 .go-stone { position: relative; z-index: 1; width: 84%; height: 84%; border-radius: 50%; box-shadow: inset -3px -4px 7px #0005, 0 2px 4px #0007; animation: go-place .22s ease-out; pointer-events: none; }
 .go-stone--black { background: radial-gradient(circle at 32% 25%,#52525b,#09090b 68%); color: #fff; }
 .go-stone--white { background: radial-gradient(circle at 32% 25%,#fff,#e4e4e7 68%); color: #18181b; }
+.go-stone--dead { opacity: .45; outline: 2px dashed #fda4af; outline-offset: 1px; }
 .go-last { position: absolute; inset: 39%; border: 2px solid currentColor; border-radius: 50%; }
 .go-atari { outline: 2px solid #f87171; outline-offset: 1px; }
 .go-capture-preview { outline: 3px solid #ef4444; opacity: .55; }
@@ -42,11 +45,10 @@
 .go-liberty { position: absolute; z-index: 2; width: 30%; height: 30%; border: 2px solid #0f766e; background: #99f6e4; border-radius: 50%; pointer-events: none; }
 .go-hint, .go-target { position: absolute; z-index: 3; inset: 18%; border: 3px solid #fef08a; border-radius: 50%; box-shadow: 0 0 0 1px #713f12; pointer-events: none; }
 .go-target { border-color: #ef4444; }
-.go-suggestion { position: absolute; z-index: 4; display: grid; place-items: center; width: 58%; height: 58%; border-radius: 50%; border: 2px solid #78350f; background: #fef08a; color: #422006; font-size: clamp(10px, 1.3vw, 18px); font-weight: 800; box-shadow: 0 2px 6px #0007; pointer-events: none; }
-.go-suggestion--selected { width: 76%; height: 76%; border: 3px solid #0f766e; background: #fff8cc; box-shadow: 0 0 0 3px #5eead4b3, 0 2px 8px #0009; }
-.go-board[data-board-size="13"] .go-suggestion { width: 72%; height: 72%; font-size: clamp(9px, 1.2vw, 14px); }
-.go-board[data-board-size="19"] .go-suggestion { width: 90%; height: 90%; border-width: 1px; font-size: clamp(8px, 1vw, 11px); }
-.go-board[data-board-size="19"] .go-suggestion--selected { border-width: 2px; box-shadow: 0 0 0 2px #5eead4b3, 0 2px 8px #0009; }
+.go-suggestion { position: absolute; z-index: 4; width: 62%; height: 62%; border-radius: 50%; border: 3px solid #fef08a; box-shadow: 0 0 0 1px #713f12, 0 0 10px #fef08a77; pointer-events: none; }
+.go-touch-candidate { position: absolute; z-index: 5; width: 88%; height: 88%; border-radius: 50%; border: 2px dashed #0f766e; background: #5eead43b; pointer-events: none; }
+.go-board[data-board-size="13"] .go-suggestion { width: 72%; height: 72%; }
+.go-board[data-board-size="19"] .go-suggestion { width: 90%; height: 90%; border-width: 2px; }
 .go-hover { position: absolute; opacity: 0; animation: none; }
 .go-point:hover .go-hover, .go-point:focus-visible .go-hover { opacity: .35; }
 .go-board-note { min-height: 44px; margin: 10px 0 0; font-size: 12px; color: #a1a1aa; text-align: center; }
@@ -63,7 +65,7 @@
 .go-move-row { width: 100%; display: grid; grid-template-columns: 28px 1fr auto; gap: 8px; align-items: center; text-align: left; padding: 10px 6px; border-bottom: 1px solid #ffffff0c; font-size: 12px; }
 .go-move-row[aria-current=true] { background: #fde68a14; box-shadow: inset 2px 0 #fde68a; }
 .go-move-row small { color: #94a3b8; }
-.go-quality { font-size: 11px; color: #6ee7b7; }
+.go-quality { font-size: 11px; color: #6ee7b7; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
 .go-quality[data-quality=Inaccuracy] { color: #facc15; }
 .go-quality[data-quality=Mistake] { color: #fb923c; }
 .go-quality[data-quality=Blunder] { color: #f87171; }
@@ -95,9 +97,30 @@
 .go-help-toggle input { accent-color: #5eead4; width: 17px; height: 17px; }
 .go-game-history { max-height: 220px; overflow: auto; font-size: 13px; margin-top: 12px; }
 .go-game-history li { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid #ffffff0b; }
+.go-header-links { display: flex; flex-wrap: wrap; gap: 16px; }
+.go-game-controls { justify-content: flex-start; }
+.go-game-controls button:last-child { margin-left: auto; border-color: #fde68a50; color: #fde68a; }
+.go-result { margin: 16px 0; padding: 16px; border: 1px solid #fde68a50; border-radius: 10px; background: #fde68a0a; }
+.go-result strong { color: #f4ead5; }
+.go-result p { margin: 6px 0; font-size: 12px; color: #a1a1aa; }
+.go-result-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.go-library { max-width: 1600px; margin: 12px auto 0; padding: 20px 20px 32px; border-top: 1px solid #ffffff16; }
+.go-library h2 { margin: 0; font-size: 20px; }
+.go-library-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.go-library-tools { display: flex; gap: 8px; flex-wrap: wrap; }
+.go-library-heading p { margin: 0; }
+.go-library-list { display: flex; gap: 10px; overflow-x: auto; padding: 12px 0; }
+.go-library-item { flex: 0 0 min(340px, 85vw); border: 1px solid #ffffff20; border-radius: 10px; background: #ffffff08; padding: 12px; }
+.go-library-item > a { display: grid; gap: 4px; }
+.go-library-item > a[aria-current=page] { color: #fde68a; }
+.go-library-item span, .go-library-item small { font-size: 11px; color: #a1a1aa; }
+.go-library-item > div { display: flex; align-items: center; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+.go-library-item .go-action { padding: 7px 9px; font-size: 11px; }
+.go-delete { margin-left: auto; color: #fda4af; padding: 7px; }
+.go-empty-review { max-width: 1260px; margin: auto; padding: 24px; }
 @media (max-width: 700px) { .go-play-layout { grid-template-columns: minmax(0,1fr); gap: 12px; padding: 12px 16px 28px; } .go-game-toolbar { padding: 8px 16px; gap: 8px; } .go-play-layout aside h2 { margin-top: 4px; } }
 @keyframes go-place { from { transform: scale(.7); opacity: .3; } to { transform: scale(1); opacity: 1; } }
 @keyframes go-capture { 0% { outline: 3px solid #f87171; opacity: 1; } 35% { transform: scale(1.15); opacity: .85; } 100% { transform: scale(.2); opacity: 0; } }
 @media (max-width: 1100px) { .go-review-grid { grid-template-columns: minmax(0,1.4fr) minmax(230px,1fr); } .go-review-overview { grid-column: 1 / -1; display: flex; gap: 24px; flex-wrap: wrap; } .go-review-overview h2 { width: 100%; margin-bottom: 0; } }
-@media (max-width: 700px) { .go-page-header { padding: 12px 16px; } .go-page-header > span { display: none; } .go-lessons { grid-template-columns: minmax(0,1fr); padding: 20px 16px; gap: 24px; } .go-lessons .go-board-wrap { max-width: 460px; } .go-board-wrap, .go-review .go-board-wrap { max-width: 100%; } .go-review { padding: 16px; } .go-review-grid { grid-template-columns: minmax(0,1fr); } .go-review .go-move-list { max-height: 300px; } .go-caption { min-height: 0; } .go-tabs button { padding: 10px 8px; } }
+@media (max-width: 700px) { .go-page-header { padding: 12px 16px; } .go-page-header > span { display: none; } .go-lessons { grid-template-columns: minmax(0,1fr); padding: 20px 16px; gap: 24px; } .go-lessons .go-board-wrap { max-width: 460px; } .go-board-wrap, .go-review .go-board-wrap { max-width: 100%; } .go-review { padding: 16px; } .go-review-grid { grid-template-columns: minmax(0,1fr); } .go-review-grid > section { order: -1; } .go-review .go-move-list { max-height: 300px; } .go-caption { min-height: 0; } .go-tabs button { padding: 10px 8px; } }
 @media (prefers-reduced-motion: reduce) { .go-stone, .go-captured { animation-duration: .01ms; } }

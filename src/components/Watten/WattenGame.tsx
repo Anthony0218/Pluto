@@ -19,9 +19,9 @@ import {
   normalRankValue,
   shuffleDeck,
   WATTEN_CARD_CLIP,
-  wouldCardWin,
   type WattenCard,
 } from "../../utils/watten";
+import { getWattenHelpComparison } from "@/games/watten/help";
 import WattenCardComponent from "./WattenCard";
 import CardThemeSelector from "./WattenCardGameSelector";
 import { useCardTheme } from "@/context/CardThemeContext";
@@ -2546,19 +2546,11 @@ export default function WattenGame() {
                             !fourCurrentMustFollow ||
                             isTrumpfOderKritischCard(card, Farbe);
 
-                          const comparison =
-                            helpMode &&
-                            playedCards.length > 0 &&
-                            !cardPlayedThisTurn &&
-                            legal
-                              ? wouldCardWin(
-                                  card,
-                                  fourCurrentPlayer.id,
-                                  playedCards,
-                                  Farbe,
-                                  schlag,
-                                )
-                              : null;
+                          const comparison = getWattenHelpComparison({
+                            card, hand: fourCurrentPlayer.cards, trick: playedCards,
+                            tricksWon, trump: Farbe, schlag, playerId: fourCurrentPlayer.id,
+                            active: helpMode && !cardPlayedThisTurn && !winner,
+                          });
 
                           return (
                             <div
@@ -4172,18 +4164,11 @@ export default function WattenGame() {
                           const legalUnderForcedRule =
                             canCurrentPlayerPlayCard(card);
 
-                          const comparison =
-                            helpMode &&
-                            playedCards.length > 0 &&
-                            !cardPlayedThisTurn
-                              ? wouldCardWin(
-                                  card,
-                                  currentPlayerData.id,
-                                  playedCards,
-                                  Farbe,
-                                  schlag,
-                                )
-                              : null;
+                          const comparison = getWattenHelpComparison({
+                            card, hand: currentPlayerData.cards, trick: playedCards,
+                            tricksWon, trump: Farbe, schlag, playerId: currentPlayerData.id,
+                            active: helpMode && !cardPlayedThisTurn && !winner,
+                          });
 
                           return (
                             <div
