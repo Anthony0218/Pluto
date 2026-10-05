@@ -2541,6 +2541,13 @@
     "scope": "transitive"
   },
   {
+    "name": "framer-motion",
+    "version": "14.0.0",
+    "license": "MIT",
+    "homepage": "https://github.com/motiondivision/motion/",
+    "scope": "transitive"
+  },
+  {
     "name": "fresh",
     "version": "0.5.2",
     "license": "MIT",
@@ -3812,6 +3819,27 @@
     "version": "1.9.1",
     "license": "MIT",
     "homepage": "https://www.npmjs.com/package/morgan",
+    "scope": "transitive"
+  },
+  {
+    "name": "motion",
+    "version": "14.0.0",
+    "license": "MIT",
+    "homepage": "https://github.com/motiondivision/motion",
+    "scope": "runtime"
+  },
+  {
+    "name": "motion-dom",
+    "version": "14.0.0",
+    "license": "MIT",
+    "homepage": "https://github.com/motiondivision/motion",
+    "scope": "transitive"
+  },
+  {
+    "name": "motion-utils",
+    "version": "14.0.0",
+    "license": "MIT",
+    "homepage": "https://github.com/motiondivision/motion",
     "scope": "transitive"
   },
   {

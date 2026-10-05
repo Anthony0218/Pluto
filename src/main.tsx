@@ -1,5 +1,10 @@
 import GoRankedGamePage from "./pages/games/Go/GoRankedGamePage";
 import LearnPage from "./pages/general/LearnPage";
+import LearningSubjectPage from "./pages/learn/LearningSubjectPage";
+import LearningPathPage from "./pages/learn/LearningPathPage";
+import LearningLessonPage from "./pages/learn/LearningLessonPage";
+import ToolsPage from "./pages/tools/ToolsPage";
+import ToolAppPage from "./pages/tools/ToolAppPage";
 import React from "react";
 import ReactDOM from "react-dom/client";
 
@@ -217,6 +222,12 @@ const router = createBrowserRouter([
             path: "/learn",
             element: <LearnPage />,
           },
+          { path: "/learn/start", element: <LearningLessonPage introduction /> },
+          { path: "/learn/:subjectId", element: <LearningSubjectPage /> },
+          { path: "/learn/:subjectId/:pathId", element: <LearningPathPage /> },
+          { path: "/learn/:subjectId/:pathId/:lessonId", element: <LearningLessonPage /> },
+          { path: "/tools", element: <ToolsPage /> },
+          { path: "/tools/:toolId", element: <ToolAppPage /> },
           {
             path: "/dashboard",
             element: <App />,

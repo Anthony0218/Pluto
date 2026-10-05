@@ -1,0 +1,2180 @@
+[
+  [
+    "Percent means out of one hundred: 25% = 25/100 = 1/4. Identify the whole before multiplying by the rate.",
+    "Prozent bedeutet von hundert: 25% = 25/100 = 1/4. Bestimme das Ganze, bevor du mit dem Prozentsatz multiplizierst.",
+    "Prozent hoaßt vo hundert: 25% = 25/100 = 1/4. Bestimm's Ganze, bevor'd mit'm Prozentsatz multiplizierst.",
+    "백분율은 100분의 얼마를 뜻합니다: 25% = 25/100 = 1/4. 비율을 곱하기 전에 기준이 되는 전체를 정하세요.",
+    "Процент означает из ста: 25% = 25/100 = 1/4. Определите целое перед умножением на ставку.",
+    "Por ciento significa de cada cien: 25% = 25/100 = 1/4. Identifica el total antes de multiplicar por la tasa.",
+    "Por cento significa de cada cem: 25% = 25/100 = 1/4. Identifique o total antes de multiplicar pela taxa."
+  ],
+  [
+    "A discount removes part of the original price. Compare the final prices of competing offers, including any fixed charges, rather than comparing percentages alone.",
+    "Ein Rabatt entfernt einen Teil des ursprünglichen Preises. Vergleiche die Endpreise verschiedener Angebote einschließlich fester Gebühren statt nur der Prozentsätze.",
+    "A Rabatt nimmt an Teil vom ursprünglichen Preis weg. Vergleich de Endpreise vo de Angebote samt festn Gebührn statt bloß de Prozentsätze.",
+    "할인은 원래 가격의 일부를 줄입니다. 비율만 비교하지 말고 고정 비용을 포함한 최종 가격을 비교하세요.",
+    "Скидка убирает часть исходной цены. Сравнивайте конечные цены предложений с фиксированными сборами, а не только проценты.",
+    "Un descuento quita parte del precio original. Compara los precios finales con cargos fijos incluidos, no solo los porcentajes.",
+    "Um desconto retira parte do preço original. Compare preços finais incluindo taxas fixas, não apenas porcentagens."
+  ],
+  [
+    "Identify the whole, change one input, and predict the result before reading the calculation.",
+    "Bestimme das Ganze, ändere einen Wert und sage das Ergebnis voraus, bevor du die Rechnung liest.",
+    "Bestimm's Ganze, änder an Wert und sag's Ergebnis voraus, bevor'd de Rechnung liest.",
+    "전체를 정하고 입력 하나를 바꾼 뒤 계산을 읽기 전에 결과를 예상하세요.",
+    "Определите целое, измените одно значение и предскажите результат до просмотра расчёта.",
+    "Identifica el total, cambia un dato y predice el resultado antes de leer el cálculo.",
+    "Identifique o total, mude um dado e preveja o resultado antes de ler o cálculo."
+  ],
+  [
+    "Enter a number or an exact fraction. The question states the unit; leave it out of your answer.",
+    "Gib eine Zahl oder einen exakten Bruch ein. Die Einheit steht in der Aufgabe; lasse sie in der Antwort weg.",
+    "Gib a Zahl oder an genauen Bruch ei. De Einheit steht in da Aufgab; lass sie bei da Antwort weg.",
+    "수나 정확한 분수를 입력하세요. 단위는 문제에 있으므로 답에는 쓰지 마세요.",
+    "Введите число или точную дробь. Единица указана в вопросе; не пишите её в ответе.",
+    "Introduce un número o una fracción exacta. La unidad está en la pregunta; omítela en la respuesta.",
+    "Digite um número ou uma fração exata. A unidade está na questão; omita-a na resposta."
+  ],
+  [
+    "Add the saving to the final price to recover the original price. A 25% discount leaves 75%; these two parts must add to 100%.",
+    "Addiere die Ersparnis zum Endpreis, um den ursprünglichen Preis zu erhalten. 25% Rabatt lassen 75% übrig; beide Teile ergeben 100%.",
+    "Zähl de Ersparnis zum Endpreis dazu, dann kriagst den ursprünglichen Preis. 25% Rabatt lassn 75% übrig; zamm san's 100%.",
+    "할인액과 최종 가격을 더하면 원래 가격이 됩니다. 25% 할인하면 75%가 남고 두 부분의 합은 100%입니다.",
+    "Прибавьте экономию к конечной цене, чтобы получить исходную. Скидка 25% оставляет 75%; вместе это 100%.",
+    "Suma el ahorro al precio final para recuperar el original. Un descuento del 25% deja el 75%; ambos suman el 100%.",
+    "Some a economia ao preço final para recuperar o original. Desconto de 25% deixa 75%; juntos somam 100%."
+  ],
+  [
+    "Apply each discount to the price left after the previous discount. Multiply the remaining fractions; do not add the rates.",
+    "Wende jeden Rabatt auf den nach dem vorigen Rabatt verbliebenen Preis an. Multipliziere die verbleibenden Anteile; addiere die Prozentsätze nicht.",
+    "Wend jeden Rabatt auf den Preis nach'm vorigen Rabatt o. Multiplizier de verbleibenden Anteile; zähl de Prozentsätze ned zamm.",
+    "각 할인은 직전 할인 후 남은 가격에 적용합니다. 남은 비율을 곱하고 할인율은 더하지 마세요.",
+    "Применяйте каждую скидку к цене после предыдущей. Умножайте оставшиеся доли, не складывайте ставки.",
+    "Aplica cada descuento al precio restante después del anterior. Multiplica las fracciones restantes; no sumes las tasas.",
+    "Aplique cada desconto ao preço após o anterior. Multiplique as frações restantes; não some as taxas."
+  ],
+  [
+    "20% off followed by 10% off leaves 0.8 × 0.9 = 0.72 of the original price. The combined discount is 28%, not 30%.",
+    "20% Rabatt und danach 10% Rabatt lassen 0,8 × 0,9 = 0,72 des ursprünglichen Preises übrig. Der Gesamtrabatt beträgt 28%, nicht 30%.",
+    "20% Rabatt und danach 10% lassn 0,8 × 0,9 = 0,72 vom ursprünglichen Preis übrig. Zamm san's 28% Rabatt, ned 30%.",
+    "20% 할인 후 10% 할인하면 원래 가격의 0.8 × 0.9 = 0.72가 남습니다. 전체 할인율은 30%가 아니라 28%입니다.",
+    "Скидка 20%, затем 10% оставляет 0,8 × 0,9 = 0,72 исходной цены. Общая скидка — 28%, а не 30%.",
+    "20% de descuento seguido de 10% deja 0,8 × 0,9 = 0,72 del precio original. El descuento combinado es 28%, no 30%.",
+    "20% de desconto seguido de 10% deixa 0,8 × 0,9 = 0,72 do preço original. O desconto combinado é 28%, não 30%."
+  ],
+  [
+    "Calculate each saving separately and add them to the final price. The second saving uses the reduced price as its whole.",
+    "Berechne jede Ersparnis getrennt und addiere sie zum Endpreis. Bei der zweiten Ersparnis ist der reduzierte Preis das Ganze.",
+    "Rechne jede Ersparnis extra aus und zähl sie zum Endpreis dazu. Bei da zweitn Ersparnis is da reduzierte Preis des Ganze.",
+    "각 할인액을 따로 계산해 최종 가격에 더하세요. 두 번째 할인의 기준은 이미 할인된 가격입니다.",
+    "Рассчитайте каждую экономию отдельно и прибавьте к конечной цене. Вторую скидку считают от сниженной цены.",
+    "Calcula cada ahorro por separado y súmalo al precio final. El segundo ahorro toma como total el precio reducido.",
+    "Calcule cada economia separadamente e some ao preço final. A segunda economia usa o preço reduzido como total."
+  ],
+  [
+    "Net is the price before VAT; gross includes VAT. With an example rate of 20%, gross = net × 1.20. The rate applies to the net price.",
+    "Netto ist der Preis vor Mehrwertsteuer, Brutto enthält sie. Bei einem Beispielsatz von 20% gilt: Brutto = Netto × 1,20. Der Satz bezieht sich auf den Nettopreis.",
+    "Netto is da Preis vor Mehrwertsteuer, Brutto enthält sie. Bei 20% als Beispiel gilt: Brutto = Netto × 1,20. Da Satz gilt für'n Nettopreis.",
+    "세전 가격에는 부가세가 없고 세후 가격에는 포함됩니다. 예시 세율 20%에서는 세후 = 세전 × 1.20입니다. 세율은 세전 가격에 적용합니다.",
+    "Нетто — цена без НДС, брутто включает НДС. При условной ставке 20% брутто = нетто × 1,20. Ставка применяется к нетто.",
+    "Neto es el precio sin IVA; bruto lo incluye. Con una tasa de ejemplo del 20%, bruto = neto × 1,20. La tasa se aplica al neto.",
+    "Líquido é o preço sem IVA; bruto inclui IVA. Com uma taxa de exemplo de 20%, bruto = líquido × 1,20. A taxa aplica-se ao líquido."
+  ],
+  [
+    "To remove VAT, divide the gross price by 1 + rate/100. Subtracting 20% of the gross price would use the wrong whole. The rates here are hypothetical, not tax rules.",
+    "Um die Mehrwertsteuer herauszurechnen, teile Brutto durch 1 + Satz/100. 20% von Brutto abzuziehen würde die falsche Bezugsgröße verwenden. Die Sätze hier sind hypothetisch, keine Steuerregeln.",
+    "Zum Herausrechnen teil Brutto durch 1 + Satz/100. 20% vo Brutto abziang nimmt de falsche Bezugsgröße. De Sätze do san hypothetisch, koane Steuerregeln.",
+    "부가세를 제거하려면 세후 가격을 1 + 세율/100으로 나누세요. 세후 가격의 20%를 빼면 기준이 잘못됩니다. 여기의 세율은 가정이며 세법이 아닙니다.",
+    "Чтобы убрать НДС, разделите брутто на 1 + ставка/100. Вычитание 20% от брутто использует неверную базу. Ставки здесь условные, это не налоговые правила.",
+    "Para quitar el IVA, divide el bruto entre 1 + tasa/100. Restar el 20% del bruto usaría una base incorrecta. Estas tasas son hipotéticas, no normas fiscales.",
+    "Para remover o IVA, divida o bruto por 1 + taxa/100. Subtrair 20% do bruto usa a base errada. Estas taxas são hipotéticas, não regras fiscais."
+  ],
+  [
+    "Multiply the recovered net price by the VAT factor to restore the gross price. Net plus VAT must also equal gross.",
+    "Multipliziere den ermittelten Nettopreis mit dem Steuerfaktor, um Brutto zu erhalten. Auch Netto plus Mehrwertsteuer muss Brutto ergeben.",
+    "Multiplizier den ermittelten Nettopreis mit'm Steuerfaktor, dann kriagst Brutto. Aa Netto plus Mehrwertsteuer muas Brutto gebn.",
+    "구한 세전 가격에 세율 계수를 곱하면 세후 가격으로 돌아갑니다. 세전 가격과 부가세를 더해도 세후 가격이어야 합니다.",
+    "Умножьте найденное нетто на множитель НДС, чтобы восстановить брутто. Нетто плюс НДС также должно равняться брутто.",
+    "Multiplica el neto recuperado por el factor del IVA para obtener el bruto. Neto más IVA también debe igualar bruto.",
+    "Multiplique o líquido recuperado pelo fator do IVA para obter o bruto. Líquido mais IVA também deve igualar bruto."
+  ],
+  [
+    "Percentage change = (new − old) ÷ old × 100. The old amount is the whole. A negative result means a decrease.",
+    "Prozentuale Änderung = (neu − alt) ÷ alt × 100. Der alte Betrag ist das Ganze. Ein negatives Ergebnis bedeutet eine Abnahme.",
+    "Prozentuale Änderung = (neu − alt) ÷ alt × 100. Da alte Betrag is des Ganze. A negatives Ergebnis hoaßt a Abnahme.",
+    "변화율 = (새 값 − 이전 값) ÷ 이전 값 × 100입니다. 기준은 이전 값이며 결과가 음수이면 감소입니다.",
+    "Изменение в процентах = (новое − старое) ÷ старое × 100. База — старое значение. Отрицательный результат означает снижение.",
+    "Cambio porcentual = (nuevo − anterior) ÷ anterior × 100. La base es el valor anterior. Un resultado negativo indica disminución.",
+    "Variação percentual = (novo − antigo) ÷ antigo × 100. A base é o valor antigo. Resultado negativo indica redução."
+  ],
+  [
+    "Reverse an increase by dividing by 1 + rate/100; reverse a decrease by dividing by 1 − rate/100. Equal increases and decreases do not cancel because their wholes differ.",
+    "Kehre eine Erhöhung durch Teilen durch 1 + Satz/100 um, eine Senkung durch 1 − Satz/100. Gleiche Erhöhungen und Senkungen heben sich nicht auf, weil ihre Bezugsgrößen verschieden sind.",
+    "Drah a Erhöhung durchs Teiln durch 1 + Satz/100 um, a Senkung durch 1 − Satz/100. Gleiche Erhöhungen und Senkungen hebn si ned auf, weil de Bezugsgrößn verschieden san.",
+    "증가 전 값은 1 + 비율/100으로, 감소 전 값은 1 − 비율/100으로 나누어 구합니다. 같은 비율로 올리고 내려도 기준이 달라 서로 상쇄되지 않습니다.",
+    "Отмените рост делением на 1 + ставка/100, снижение — на 1 − ставка/100. Одинаковые рост и снижение не отменяются, поскольку базы различаются.",
+    "Invierte un aumento dividiendo entre 1 + tasa/100 y una disminución entre 1 − tasa/100. No se cancelan tasas iguales porque sus bases difieren.",
+    "Inverta um aumento dividindo por 1 + taxa/100 e uma redução por 1 − taxa/100. Taxas iguais não se anulam porque as bases diferem."
+  ],
+  [
+    "Apply the original percentage change to your recovered starting amount. A 100% decrease leaves zero, so its original amount cannot be recovered from zero alone.",
+    "Wende die ursprüngliche prozentuale Änderung auf den ermittelten Ausgangsbetrag an. Eine Senkung um 100% ergibt null; der Ausgangsbetrag lässt sich daraus allein nicht ermitteln.",
+    "Wend de ursprüngliche Änderung auf den ermittelten Ausgangsbetrag o. 100% Senkung gibt null; da Ausgangsbetrag lässt si daraus alloa ned bestimmen.",
+    "구한 시작 값에 원래 변화율을 적용하세요. 100% 감소하면 0이므로 0만으로는 시작 값을 되찾을 수 없습니다.",
+    "Примените исходное изменение к найденной начальной сумме. Снижение на 100% даёт ноль; по одному нулю начальную сумму не восстановить.",
+    "Aplica el cambio original al valor inicial recuperado. Una bajada del 100% deja cero; solo con cero no se recupera el original.",
+    "Aplique a variação original ao valor inicial recuperado. Redução de 100% deixa zero; apenas com zero não se recupera o original."
+  ],
+  [
+    "Use the previous salary or rent as the whole when calculating its percentage change. The same rate can represent very different amounts of money.",
+    "Verwende das bisherige Gehalt oder die bisherige Miete als Ganzes für die prozentuale Änderung. Derselbe Satz kann sehr unterschiedliche Geldbeträge bedeuten.",
+    "Nimm des bisherige Gehalt oder de bisherige Mietn als Ganzes. Derselbe Satz ko ganz verschiedene Geldbeträge bedeitn.",
+    "급여나 임대료 변화율의 기준은 이전 금액입니다. 같은 비율도 서로 다른 금액을 뜻할 수 있습니다.",
+    "Считайте изменение от прежней зарплаты или аренды. Одинаковая ставка может означать очень разные денежные суммы.",
+    "Usa el sueldo o alquiler anterior como base del cambio. La misma tasa puede representar importes muy distintos.",
+    "Use o salário ou aluguel anterior como base da variação. A mesma taxa pode representar valores muito diferentes."
+  ],
+  [
+    "A salary increase and a rent increase cannot be compared by subtracting their rates. Calculate each money difference first, keeping the time period and gross or net basis consistent.",
+    "Gehaltserhöhung und Mieterhöhung lassen sich nicht durch Subtraktion ihrer Prozentsätze vergleichen. Berechne zuerst die Geldunterschiede mit gleichem Zeitraum und gleicher Brutto- oder Nettobasis.",
+    "Gehaltserhöhung und Mieterhöhung kannst ned durch Abziang vo ihre Prozentsätze vergleichen. Rechne eerst de Geldunterschiede mit gleichem Zeitraum und gleicher Brutto- oder Nettobasis.",
+    "급여와 임대료의 증가율을 빼서 비교할 수는 없습니다. 먼저 같은 기간과 같은 세전·세후 기준으로 금액 차이를 계산하세요.",
+    "Рост зарплаты и аренды нельзя сравнивать вычитанием ставок. Сначала рассчитайте денежные изменения за одинаковый период на одной базе нетто или брутто.",
+    "No compares subidas de sueldo y alquiler restando sus tasas. Calcula primero los cambios monetarios para el mismo período y la misma base bruta o neta.",
+    "Não compare aumentos de salário e aluguel subtraindo taxas. Calcule primeiro as diferenças monetárias para o mesmo período e a mesma base bruta ou líquida."
+  ],
+  [
+    "Calculate the money difference by subtraction, then divide it by the previous amount. Compare this with the rate applied to the original amount.",
+    "Berechne den Geldunterschied durch Subtraktion und teile ihn durch den bisherigen Betrag. Vergleiche das mit dem Prozentsatz angewandt auf den Ausgangsbetrag.",
+    "Rechne den Geldunterschied durchs Abziang aus und teil ihn durch den bisherigen Betrag. Vergleich des mit'm Prozentsatz auf'n Ausgangsbetrag.",
+    "뺄셈으로 금액 차이를 구한 뒤 이전 금액으로 나누세요. 시작 금액에 비율을 적용한 것과 비교하세요.",
+    "Найдите денежную разницу вычитанием, затем разделите на прежнюю сумму. Сравните со ставкой, применённой к исходной сумме.",
+    "Calcula la diferencia monetaria restando y divídela entre el importe anterior. Compárala con la tasa aplicada al original.",
+    "Calcule a diferença monetária subtraindo e divida pelo valor anterior. Compare com a taxa aplicada ao original."
+  ],
+  [
+    "Choose the bill amount to which the tip applies, multiply by tip/100, and add it to the bill. Then divide the total according to the agreed shares.",
+    "Wähle den Rechnungsbetrag, auf den sich das Trinkgeld bezieht, multipliziere mit Trinkgeld/100 und addiere es zur Rechnung. Teile die Summe nach den vereinbarten Anteilen.",
+    "Wähl den Rechnungsbetrag fürs Trinkgeld, multiplizier mit Trinkgeld/100 und zähl's dazu. Teil de Summe nach de vereinbartn Anteile.",
+    "팁을 적용할 금액에 팁 비율/100을 곱해 계산서에 더하세요. 그런 다음 합의한 비율로 총액을 나누세요.",
+    "Выберите базу чаевых, умножьте на ставку/100 и прибавьте к счёту. Затем разделите итог по согласованным долям.",
+    "Elige la base de la propina, multiplícala por propina/100 y súmala a la cuenta. Después divide el total según las partes acordadas.",
+    "Escolha a base da gorjeta, multiplique por gorjeta/100 e some à conta. Depois divida o total pelas partes acordadas."
+  ],
+  [
+    "Round the total to cents before splitting it. When equal shares have repeating decimals, distribute remaining cents so the rounded shares still add to the total.",
+    "Runde vor dem Aufteilen die Summe auf Cent. Bei periodischen Dezimalanteilen verteile die übrigen Cent, damit die gerundeten Anteile weiterhin die Summe ergeben.",
+    "Rund vorm Aufteiln de Summe auf Cent. Bei periodischen Dezimalanteiln verteil de übrign Cent, damit de grundetn Anteile zamm stimmen.",
+    "총액을 센트로 반올림한 뒤 나누세요. 몫이 순환소수이면 남은 센트를 배분해 반올림한 몫들의 합이 총액과 같게 하세요.",
+    "Округлите итог до центов перед делением. При периодических дробях распределите оставшиеся центы, чтобы округлённые доли дали итог.",
+    "Redondea el total a céntimos antes de dividir. Si las partes tienen decimales periódicos, reparte los céntimos restantes para conservar el total.",
+    "Arredonde o total para centavos antes de dividir. Se as partes têm dízimas, distribua os centavos restantes para preservar o total."
+  ],
+  [
+    "Add all shares and compare with the total bill including the tip. An equal-share estimate can be correct before rounding but differ by a cent afterward.",
+    "Addiere alle Anteile und vergleiche mit der Rechnung einschließlich Trinkgeld. Vor dem Runden korrekte gleiche Anteile können danach um einen Cent abweichen.",
+    "Zähl olle Anteile zamm und vergleich mit da Rechnung samt Trinkgeld. Vorm Runden richtige gleiche Anteile kennan danach um an Cent abweichn.",
+    "각 몫을 더해 팁을 포함한 총액과 비교하세요. 반올림 전에는 맞던 균등한 몫도 이후에는 1센트 차이가 날 수 있습니다.",
+    "Сложите все доли и сравните со счётом с чаевыми. Равные доли, верные до округления, после него могут отличаться на цент.",
+    "Suma las partes y compara con el total con propina. Partes iguales correctas antes de redondear pueden diferir después en un céntimo.",
+    "Some as partes e compare com o total com gorjeta. Partes iguais corretas antes de arredondar podem depois diferir em um centavo."
+  ],
+  [
+    "The scaling factor is target servings ÷ original servings. Multiply every ingredient quantity by this factor while keeping its unit.",
+    "Der Skalierungsfaktor ist Zielportionen ÷ ursprüngliche Portionen. Multipliziere jede Zutatenmenge mit diesem Faktor und behalte ihre Einheit bei.",
+    "Da Skalierungsfaktor is Zielportionen ÷ ursprüngliche Portionen. Multiplizier jede Zutatenmenge damit und behalt de Einheit bei.",
+    "배율은 목표 인분 ÷ 원래 인분입니다. 각 재료량에 배율을 곱하고 단위를 유지하세요.",
+    "Коэффициент = нужные порции ÷ исходные порции. Умножьте количество каждого ингредиента на него, сохраняя единицы.",
+    "El factor es porciones deseadas ÷ originales. Multiplica cada ingrediente por ese factor manteniendo su unidad.",
+    "O fator é porções desejadas ÷ originais. Multiplique cada ingrediente pelo fator mantendo a unidade."
+  ],
+  [
+    "150% of a recipe means 1.5 times the ingredients, a 50% increase. Oven temperature and cooking time do not automatically scale with ingredient quantities.",
+    "150% eines Rezepts bedeutet die 1,5-fache Zutatenmenge, eine Erhöhung um 50%. Ofentemperatur und Garzeit wachsen nicht automatisch mit.",
+    "150% vom Rezept hoaßt de 1,5-fache Zutatenmenge, a Erhöhung um 50%. Ofentemperatur und Garzeit wachsn ned automatisch mit.",
+    "레시피의 150%는 재료를 1.5배, 즉 50% 늘린다는 뜻입니다. 오븐 온도와 조리 시간은 자동으로 비례하지 않습니다.",
+    "150% рецепта означает ингредиенты в 1,5 раза больше, рост на 50%. Температура духовки и время приготовления автоматически не масштабируются.",
+    "150% de una receta significa 1,5 veces los ingredientes, un aumento del 50%. Temperatura y tiempo de cocción no escalan automáticamente.",
+    "150% de uma receita significa 1,5 vez os ingredientes, aumento de 50%. Temperatura e tempo de preparo não escalam automaticamente."
+  ],
+  [
+    "Divide a scaled ingredient by the scaling factor to recover its original quantity. Repeat the check for each ingredient and keep units unchanged.",
+    "Teile eine skalierte Zutat durch den Faktor, um ihre ursprüngliche Menge zu erhalten. Prüfe jede Zutat und behalte die Einheiten bei.",
+    "Teil a skalierte Zutat durch den Faktor, dann kriagst de ursprüngliche Menge. Prüaf jede Zutat und behalt de Einheiten bei.",
+    "늘린 재료량을 배율로 나누면 원래 양이 나옵니다. 각 재료를 확인하고 단위를 유지하세요.",
+    "Разделите новое количество на коэффициент, чтобы восстановить исходное. Проверьте каждый ингредиент, сохраняя единицы.",
+    "Divide un ingrediente escalado entre el factor para recuperar su cantidad original. Comprueba cada ingrediente sin cambiar unidades.",
+    "Divida um ingrediente ajustado pelo fator para recuperar a quantidade original. Confira cada ingrediente mantendo as unidades."
+  ],
+  [
+    "A survey percentage is the selected count divided by the relevant total, multiplied by 100. Check who is included in the denominator and whether multiple answers are allowed.",
+    "Ein Umfrageanteil ist die gewählte Anzahl geteilt durch die relevante Gesamtzahl, mal 100. Prüfe, wer zum Nenner gehört und ob Mehrfachantworten erlaubt sind.",
+    "A Umfrageanteil is de gwählte Anzahl geteilt durch de relevante Gesamtzahl, moi 100. Prüaf, wer zum Nenner ghört und ob Mehrfachantwortn erlaubt san.",
+    "설문 백분율은 선택한 사람 수 ÷ 해당 전체 수 × 100입니다. 분모에 누가 포함되는지와 복수 응답이 가능한지 확인하세요.",
+    "Процент опроса — выбранное число, делённое на соответствующее общее число, умноженное на 100. Проверьте знаменатель и возможность нескольких ответов.",
+    "Un porcentaje de encuesta es el recuento elegido dividido entre el total relevante, por 100. Comprueba quién entra en el denominador y si se permiten respuestas múltiples.",
+    "A porcentagem de uma pesquisa é a contagem escolhida dividida pelo total relevante, vezes 100. Confira o denominador e se respostas múltiplas são permitidas."
+  ],
+  [
+    "A move from 40% to 50% is a rise of 10 percentage points but a 25% relative increase. Percentages alone do not establish that a sample represents the population.",
+    "Von 40% auf 50% bedeutet 10 Prozentpunkte mehr, aber 25% relative Zunahme. Prozentsätze allein zeigen nicht, ob eine Stichprobe die Bevölkerung repräsentiert.",
+    "Vo 40% auf 50% san 10 Prozentpunkte mehr, aber 25% relative Zunahme. Prozentsätze alloa zoagn ned, ob a Stichprob de Bevölkerung repräsentiert.",
+    "40%에서 50%로 오르면 10%포인트 증가이지만 상대 증가율은 25%입니다. 백분율만으로 표본이 모집단을 대표한다고 할 수는 없습니다.",
+    "Рост с 40% до 50% — это 10 процентных пунктов, но 25% относительного роста. Одни проценты не доказывают репрезентативность выборки.",
+    "Pasar del 40% al 50% son 10 puntos porcentuales, pero un aumento relativo del 25%. Los porcentajes no prueban que una muestra represente a la población.",
+    "Passar de 40% a 50% são 10 pontos percentuais, mas aumento relativo de 25%. Porcentagens não provam que a amostra representa a população."
+  ],
+  [
+    "Multiply the percentage by the sample size to recover the count. For a rate change, add the percentage-point difference to the old rate and compare with the new rate.",
+    "Multipliziere den Anteil mit der Stichprobengröße, um die Anzahl zu erhalten. Addiere bei einer Satzänderung die Prozentpunktdifferenz zum alten Satz und vergleiche mit dem neuen.",
+    "Multiplizier den Anteil mit da Stichprobengröße für de Anzahl. Zähl bei ana Satzänderung de Prozentpunktdifferenz zum alten Satz und vergleich mit'm neien.",
+    "비율에 표본 수를 곱해 인원수를 확인하세요. 비율 변화는 이전 비율에 %포인트 차이를 더해 새 비율과 비교하세요.",
+    "Умножьте долю на размер выборки для проверки числа. При изменении ставки прибавьте разницу в процентных пунктах к старой ставке и сравните с новой.",
+    "Multiplica el porcentaje por el tamaño de muestra para recuperar el recuento. Suma la diferencia en puntos porcentuales a la tasa anterior y compara con la nueva.",
+    "Multiplique a porcentagem pelo tamanho da amostra para recuperar a contagem. Some a diferença em pontos percentuais à taxa antiga e compare com a nova."
+  ],
+  [
+    "With a fixed rate each period, multiply the starting amount by (1 + rate/100) once per period. Later growth applies to the increased amount, including earlier growth.",
+    "Bei einem festen Satz je Zeitraum multiplizierst du den Anfangsbetrag einmal je Zeitraum mit (1 + Satz/100). Späteres Wachstum gilt für den erhöhten Betrag einschließlich früherer Zuwächse.",
+    "Bei am festen Satz je Zeitraum multiplizierst den Anfangsbetrag jedes Moi mit (1 + Satz/100). Späteres Wachstum gilt für'n erhöhten Betrag samt früheren Zuwächsn.",
+    "기간마다 고정 비율이면 시작 금액에 (1 + 비율/100)을 매 기간 곱합니다. 이후 성장은 이전 성장분을 포함한 늘어난 금액에 적용됩니다.",
+    "При фиксированной ставке умножайте начальную сумму на (1 + ставка/100) каждый период. Последующий рост применяется к увеличенной сумме, включая предыдущий рост.",
+    "Con una tasa fija por período, multiplica el importe inicial por (1 + tasa/100) cada período. El crecimiento posterior incluye los aumentos anteriores.",
+    "Com taxa fixa por período, multiplique o valor inicial por (1 + taxa/100) a cada período. O crescimento posterior inclui os aumentos anteriores."
+  ],
+  [
+    "This model assumes a constant rate and no deposits, withdrawals, fees, taxes, or inflation. A calculation under those assumptions is not a prediction of future returns.",
+    "Dieses Modell setzt einen konstanten Satz ohne Einzahlungen, Abhebungen, Gebühren, Steuern oder Inflation voraus. Die Rechnung unter diesen Annahmen ist keine Vorhersage künftiger Renditen.",
+    "Des Modell nimmt an konstanten Satz ohne Eizahlungen, Abhebungen, Gebührn, Steuern oder Inflation o. De Rechnung is koa Vorhersag vo künftign Renditen.",
+    "이 모델은 일정한 비율과 입출금·수수료·세금·물가 상승이 없음을 가정합니다. 이 가정에 따른 계산은 미래 수익 예측이 아닙니다.",
+    "Модель предполагает постоянную ставку без пополнений, снятий, комиссий, налогов и инфляции. Расчёт при этих условиях не предсказывает доходность.",
+    "El modelo supone una tasa constante sin depósitos, retiros, comisiones, impuestos ni inflación. El cálculo no predice rendimientos futuros.",
+    "O modelo supõe taxa constante sem depósitos, retiradas, taxas, impostos ou inflação. O cálculo não prevê rendimentos futuros."
+  ],
+  [
+    "Calculate period by period and compare with the power formula. Divide the final amount by the full growth factor to recover the starting amount when that factor is nonzero.",
+    "Rechne Zeitraum für Zeitraum und vergleiche mit der Potenzformel. Teile den Endbetrag durch den gesamten Wachstumsfaktor, um den Anfangsbetrag zu erhalten, sofern der Faktor nicht null ist.",
+    "Rechne Zeitraum für Zeitraum und vergleich mit da Potenzformel. Teil den Endbetrag durch den ganzen Wachstumsfaktor, wenn der ned null is.",
+    "기간별로 계산하고 거듭제곱 공식과 비교하세요. 전체 성장 계수가 0이 아니면 최종 금액을 그 계수로 나누어 시작 금액을 확인하세요.",
+    "Считайте по периодам и сравните с формулой степени. Разделите итог на полный множитель роста для восстановления начальной суммы, если множитель ненулевой.",
+    "Calcula período a período y compara con la potencia. Divide el final entre el factor completo para recuperar el inicio, si el factor no es cero.",
+    "Calcule período a período e compare com a potência. Divida o final pelo fator completo para recuperar o início, se o fator não for zero."
+  ],
+  [
+    "Percentage of an amount",
+    "Prozent eines Betrags",
+    "Prozent vo am Betrag",
+    "금액의 백분율",
+    "Процент от суммы",
+    "Porcentaje de una cantidad",
+    "Porcentagem de um valor"
+  ],
+  [
+    "Part as a percentage",
+    "Anteil als Prozentsatz",
+    "Anteil als Prozentsatz",
+    "일부의 백분율",
+    "Доля в процентах",
+    "Parte como porcentaje",
+    "Parte como porcentagem"
+  ],
+  [
+    "Discount",
+    "Rabatt",
+    "Rabatt",
+    "할인",
+    "Скидка",
+    "Descuento",
+    "Desconto"
+  ],
+  [
+    "Add VAT",
+    "Mehrwertsteuer hinzufügen",
+    "Mehrwertsteuer dazuzähln",
+    "부가세 더하기",
+    "Добавить НДС",
+    "Añadir IVA",
+    "Adicionar IVA"
+  ],
+  [
+    "Remove VAT",
+    "Mehrwertsteuer herausrechnen",
+    "Mehrwertsteuer herausrechnen",
+    "부가세 제거",
+    "Убрать НДС",
+    "Quitar IVA",
+    "Remover IVA"
+  ],
+  [
+    "Percentage change",
+    "Prozentuale Änderung",
+    "Prozentuale Änderung",
+    "변화율",
+    "Изменение в процентах",
+    "Cambio porcentual",
+    "Variação percentual"
+  ],
+  [
+    "Before an increase",
+    "Vor einer Erhöhung",
+    "Vor ana Erhöhung",
+    "증가 전 값",
+    "До повышения",
+    "Antes de un aumento",
+    "Antes de um aumento"
+  ],
+  [
+    "Before a decrease",
+    "Vor einer Senkung",
+    "Vor ana Senkung",
+    "감소 전 값",
+    "До снижения",
+    "Antes de una disminución",
+    "Antes de uma redução"
+  ],
+  [
+    "Percentage points",
+    "Prozentpunkte",
+    "Prozentpunkte",
+    "퍼센트포인트",
+    "Процентные пункты",
+    "Puntos porcentuales",
+    "Pontos percentuais"
+  ],
+  [
+    "Hypothetical compound growth",
+    "Hypothetisches Zinseszinswachstum",
+    "Hypothetisches Zinseszinswachstum",
+    "가상의 복리 성장",
+    "Условный сложный рост",
+    "Crecimiento compuesto hipotético",
+    "Crescimento composto hipotético"
+  ],
+  [
+    "Tip and equal shares",
+    "Trinkgeld und gleiche Anteile",
+    "Trinkgeld und gleiche Anteile",
+    "팁과 균등 분할",
+    "Чаевые и равные доли",
+    "Propina y partes iguales",
+    "Gorjeta e partes iguais"
+  ],
+  [
+    "Serving-size change",
+    "Änderung der Portionszahl",
+    "Änderung vo da Portionszahl",
+    "인분 변경",
+    "Изменение порций",
+    "Cambio de porciones",
+    "Mudança de porções"
+  ],
+  [
+    "Whole amount",
+    "Gesamtbetrag",
+    "Gesamtbetrag",
+    "전체 금액",
+    "Общая сумма",
+    "Cantidad total",
+    "Valor total"
+  ],
+  [
+    "Rate (%)",
+    "Satz (%)",
+    "Satz (%)",
+    "비율 (%)",
+    "Ставка (%)",
+    "Tasa (%)",
+    "Taxa (%)"
+  ],
+  [
+    "Part",
+    "Teil",
+    "Teil",
+    "일부",
+    "Часть",
+    "Parte",
+    "Parte"
+  ],
+  [
+    "Original amount",
+    "Ursprünglicher Betrag",
+    "Ursprünglicher Betrag",
+    "원래 금액",
+    "Исходная сумма",
+    "Cantidad original",
+    "Valor original"
+  ],
+  [
+    "Discount (%)",
+    "Rabatt (%)",
+    "Rabatt (%)",
+    "할인율 (%)",
+    "Скидка (%)",
+    "Descuento (%)",
+    "Desconto (%)"
+  ],
+  [
+    "First discount (%)",
+    "Erster Rabatt (%)",
+    "Erster Rabatt (%)",
+    "첫 할인율 (%)",
+    "Первая скидка (%)",
+    "Primer descuento (%)",
+    "Primeiro desconto (%)"
+  ],
+  [
+    "Second discount (%)",
+    "Zweiter Rabatt (%)",
+    "Zweiter Rabatt (%)",
+    "둘째 할인율 (%)",
+    "Вторая скидка (%)",
+    "Segundo descuento (%)",
+    "Segundo desconto (%)"
+  ],
+  [
+    "Net amount",
+    "Nettobetrag",
+    "Nettobetrag",
+    "세전 금액",
+    "Сумма нетто",
+    "Importe neto",
+    "Valor líquido"
+  ],
+  [
+    "VAT rate (%)",
+    "Mehrwertsteuersatz (%)",
+    "Mehrwertsteuersatz (%)",
+    "부가세율 (%)",
+    "Ставка НДС (%)",
+    "Tasa de IVA (%)",
+    "Taxa de IVA (%)"
+  ],
+  [
+    "Gross amount",
+    "Bruttobetrag",
+    "Bruttobetrag",
+    "세후 금액",
+    "Сумма брутто",
+    "Importe bruto",
+    "Valor bruto"
+  ],
+  [
+    "Old amount",
+    "Alter Betrag",
+    "Alter Betrag",
+    "이전 금액",
+    "Старая сумма",
+    "Cantidad anterior",
+    "Valor antigo"
+  ],
+  [
+    "New amount",
+    "Neuer Betrag",
+    "Neier Betrag",
+    "새 금액",
+    "Новая сумма",
+    "Cantidad nueva",
+    "Valor novo"
+  ],
+  [
+    "Final amount",
+    "Endbetrag",
+    "Endbetrag",
+    "최종 금액",
+    "Итоговая сумма",
+    "Cantidad final",
+    "Valor final"
+  ],
+  [
+    "Increase (%)",
+    "Erhöhung (%)",
+    "Erhöhung (%)",
+    "증가율 (%)",
+    "Повышение (%)",
+    "Aumento (%)",
+    "Aumento (%)"
+  ],
+  [
+    "Decrease (%)",
+    "Senkung (%)",
+    "Senkung (%)",
+    "감소율 (%)",
+    "Снижение (%)",
+    "Disminución (%)",
+    "Redução (%)"
+  ],
+  [
+    "Old rate (%)",
+    "Alter Satz (%)",
+    "Alter Satz (%)",
+    "이전 비율 (%)",
+    "Старая ставка (%)",
+    "Tasa anterior (%)",
+    "Taxa antiga (%)"
+  ],
+  [
+    "New rate (%)",
+    "Neuer Satz (%)",
+    "Neier Satz (%)",
+    "새 비율 (%)",
+    "Новая ставка (%)",
+    "Tasa nueva (%)",
+    "Taxa nova (%)"
+  ],
+  [
+    "Starting amount",
+    "Anfangsbetrag",
+    "Anfangsbetrag",
+    "시작 금액",
+    "Начальная сумма",
+    "Cantidad inicial",
+    "Valor inicial"
+  ],
+  [
+    "Growth per period (%)",
+    "Wachstum je Zeitraum (%)",
+    "Wachstum je Zeitraum (%)",
+    "기간당 성장률 (%)",
+    "Рост за период (%)",
+    "Crecimiento por período (%)",
+    "Crescimento por período (%)"
+  ],
+  [
+    "Periods",
+    "Zeiträume",
+    "Zeiträume",
+    "기간 수",
+    "Периоды",
+    "Períodos",
+    "Períodos"
+  ],
+  [
+    "Bill before tip",
+    "Rechnung ohne Trinkgeld",
+    "Rechnung ohne Trinkgeld",
+    "팁 전 계산서",
+    "Счёт до чаевых",
+    "Cuenta sin propina",
+    "Conta sem gorjeta"
+  ],
+  [
+    "Tip (%)",
+    "Trinkgeld (%)",
+    "Trinkgeld (%)",
+    "팁 (%)",
+    "Чаевые (%)",
+    "Propina (%)",
+    "Gorjeta (%)"
+  ],
+  [
+    "People",
+    "Personen",
+    "Leit",
+    "인원",
+    "Люди",
+    "Personas",
+    "Pessoas"
+  ],
+  [
+    "Original servings",
+    "Ursprüngliche Portionen",
+    "Ursprüngliche Portionen",
+    "원래 인분",
+    "Исходные порции",
+    "Porciones originales",
+    "Porções originais"
+  ],
+  [
+    "Target servings",
+    "Zielportionen",
+    "Zielportionen",
+    "목표 인분",
+    "Нужные порции",
+    "Porciones deseadas",
+    "Porções desejadas"
+  ],
+  [
+    "Length",
+    "Länge",
+    "Längn",
+    "길이",
+    "Длина",
+    "Longitud",
+    "Comprimento"
+  ],
+  [
+    "Temperature",
+    "Temperatur",
+    "Temperatur",
+    "온도",
+    "Температура",
+    "Temperatura",
+    "Temperatura"
+  ],
+  [
+    "Speed",
+    "Geschwindigkeit",
+    "Gschwindigkeit",
+    "속도",
+    "Скорость",
+    "Velocidad",
+    "Velocidade"
+  ],
+  [
+    "Area",
+    "Fläche",
+    "Fläche",
+    "면적",
+    "Площадь",
+    "Área",
+    "Área"
+  ],
+  [
+    "Volume",
+    "Volumen",
+    "Volumen",
+    "부피",
+    "Объём",
+    "Volumen",
+    "Volume"
+  ],
+  [
+    "Data size",
+    "Datenmenge",
+    "Datenmenge",
+    "데이터 크기",
+    "Размер данных",
+    "Tamaño de datos",
+    "Tamanho de dados"
+  ],
+  [
+    "An €80 item has either 20% off or €10 off. Which offer leaves the lower price?",
+    "Ein Artikel für 80 € hat entweder 20% oder 10 € Rabatt. Welches Angebot ergibt den niedrigeren Preis?",
+    "A Artikel für 80 € hod entweder 20% oder 10 € Rabatt. Welches Angebot is billiger?",
+    "€80 상품에 20% 할인 또는 €10 할인이 있습니다. 어느 쪽의 최종 가격이 더 낮나요?",
+    "Товар за 80 € предлагают со скидкой 20% или 10 €. Где конечная цена ниже?",
+    "Un artículo de 80 € tiene 20% de descuento o 10 € de descuento. ¿Qué oferta deja el precio menor?",
+    "Um item de 80 € tem 20% ou 10 € de desconto. Qual oferta deixa o menor preço?"
+  ],
+  [
+    "A €120 item is reduced by 25%. What is its final price in euros?",
+    "Ein Artikel für 120 € wird um 25% reduziert. Wie hoch ist der Endpreis in Euro?",
+    "A Artikel für 120 € werd um 25% reduziert. Wia vui Euro kost er dann?",
+    "€120 상품을 25% 할인합니다. 최종 가격은 몇 유로인가요?",
+    "Товар за 120 € уценён на 25%. Какова конечная цена в евро?",
+    "Un artículo de 120 € se rebaja un 25%. ¿Cuál es el precio final en euros?",
+    "Um item de 120 € tem desconto de 25%. Qual é o preço final em euros?"
+  ],
+  [
+    "For a €50 item, compare 10% off with €8 off. What is the lower final price in euros?",
+    "Vergleiche bei einem Artikel für 50 € einen Rabatt von 10% mit 8 €. Wie hoch ist der niedrigere Endpreis in Euro?",
+    "Vergleich bei am Artikel für 50 € 10% Rabatt mit 8 €. Wia vui Euro is da niedrigere Endpreis?",
+    "€50 상품의 10% 할인과 €8 할인을 비교하세요. 더 낮은 최종 가격은 몇 유로인가요?",
+    "Для товара за 50 € сравните скидки 10% и 8 €. Какова меньшая конечная цена в евро?",
+    "Para un artículo de 50 €, compara 10% de descuento con 8 €. ¿Cuál es el menor precio final en euros?",
+    "Para um item de 50 €, compare 10% de desconto com 8 €. Qual é o menor preço final em euros?"
+  ],
+  [
+    "What percentage of 80 is 20?",
+    "Wie viel Prozent von 80 sind 20?",
+    "Wia vui Prozent vo 80 san 20?",
+    "20은 80의 몇 퍼센트인가요?",
+    "Сколько процентов от 80 составляет 20?",
+    "¿Qué porcentaje de 80 es 20?",
+    "Que porcentagem de 80 é 20?"
+  ],
+  [
+    "A €200 item gets 20% off, then another 10% off. Find the final price.",
+    "Ein Artikel für 200 € erhält 20% Rabatt und danach weitere 10%. Berechne den Endpreis.",
+    "A Artikel für 200 € kriagt 20% Rabatt und danach no 10%. Rechne den Endpreis aus.",
+    "€200 상품을 20% 할인한 뒤 다시 10% 할인합니다. 최종 가격을 구하세요.",
+    "Товар за 200 € получает скидку 20%, затем ещё 10%. Найдите конечную цену.",
+    "Un artículo de 200 € recibe 20% de descuento y después otro 10%. Halla el precio final.",
+    "Um item de 200 € recebe 20% de desconto e depois mais 10%. Ache o preço final."
+  ],
+  [
+    "A €100 item gets 20% off and then 10% off. What is the final price in euros?",
+    "Ein Artikel für 100 € erhält zuerst 20% und dann 10% Rabatt. Wie hoch ist der Endpreis in Euro?",
+    "A Artikel für 100 € kriagt eerst 20% und dann 10% Rabatt. Wia vui Euro kost er dann?",
+    "€100 상품을 20% 할인한 뒤 10% 할인합니다. 최종 가격은 몇 유로인가요?",
+    "Товар за 100 € получает скидки 20%, затем 10%. Какова конечная цена в евро?",
+    "Un artículo de 100 € recibe 20% de descuento y después 10%. ¿Cuál es el precio final en euros?",
+    "Um item de 100 € recebe descontos de 20% e depois 10%. Qual é o preço final em euros?"
+  ],
+  [
+    "Two successive 50% discounts leave what percentage of the original price?",
+    "Welcher Prozentsatz des ursprünglichen Preises bleibt nach zwei aufeinanderfolgenden Rabatten von 50% übrig?",
+    "Wia vui Prozent vom ursprünglichen Preis bleibn nach zwoa Rabatten vo je 50% übrig?",
+    "50% 할인을 두 번 연속 적용하면 원래 가격의 몇 퍼센트가 남나요?",
+    "Какой процент исходной цены остаётся после двух последовательных скидок по 50%?",
+    "¿Qué porcentaje del precio original queda tras dos descuentos sucesivos del 50%?",
+    "Que porcentagem do preço original resta após dois descontos sucessivos de 50%?"
+  ],
+  [
+    "20% off followed by 10% off gives what combined discount percentage?",
+    "Wie viel Prozent Gesamtrabatt ergeben 20% Rabatt und danach 10% Rabatt?",
+    "Wia vui Prozent Gesamtrabatt san 20% Rabatt und danach 10%?",
+    "20% 할인 후 10% 할인하면 전체 할인율은 몇 퍼센트인가요?",
+    "Какова общая скидка в процентах после 20% и затем 10%?",
+    "¿Qué descuento porcentual combinado dan 20% de descuento y después 10%?",
+    "Que desconto percentual combinado resultam de 20% de desconto e depois 10%?"
+  ],
+  [
+    "At an example VAT rate of 20%, a gross price is €120. Find the net price.",
+    "Bei einem beispielhaften Mehrwertsteuersatz von 20% ist der Bruttopreis 120 €. Berechne Netto.",
+    "Bei am Beispiel-Mehrwertsteuersatz vo 20% is Brutto 120 €. Rechne Netto aus.",
+    "예시 부가세율 20%에서 세후 가격이 €120입니다. 세전 가격을 구하세요.",
+    "При условной ставке НДС 20% цена брутто — 120 €. Найдите нетто.",
+    "Con una tasa de IVA de ejemplo del 20%, el bruto es 120 €. Halla el neto.",
+    "Com uma taxa de IVA de exemplo de 20%, o bruto é 120 €. Ache o líquido."
+  ],
+  [
+    "A net price is €200 and the example VAT rate is 10%. What is the gross price in euros?",
+    "Netto beträgt 200 €, der beispielhafte Mehrwertsteuersatz 10%. Wie hoch ist Brutto in Euro?",
+    "Netto san 200 €, da Beispiel-Mehrwertsteuersatz 10%. Wia vui Euro is Brutto?",
+    "세전 가격이 €200이고 예시 부가세율은 10%입니다. 세후 가격은 몇 유로인가요?",
+    "Нетто — 200 €, условная ставка НДС — 10%. Каково брутто в евро?",
+    "El neto es 200 € y el IVA de ejemplo es 10%. ¿Cuál es el bruto en euros?",
+    "O líquido é 200 € e o IVA de exemplo é 10%. Qual é o bruto em euros?"
+  ],
+  [
+    "A gross price is €240 at an example VAT rate of 20%. What is the net price in euros?",
+    "Brutto beträgt 240 € bei einem beispielhaften Mehrwertsteuersatz von 20%. Wie hoch ist Netto in Euro?",
+    "Brutto san 240 € bei 20% Beispiel-Mehrwertsteuer. Wia vui Euro is Netto?",
+    "예시 부가세율 20%에서 세후 가격은 €240입니다. 세전 가격은 몇 유로인가요?",
+    "Брутто — 240 € при условном НДС 20%. Каково нетто в евро?",
+    "El bruto es 240 € con IVA de ejemplo del 20%. ¿Cuál es el neto en euros?",
+    "O bruto é 240 € com IVA de exemplo de 20%. Qual é o líquido em euros?"
+  ],
+  [
+    "A net price of €80 becomes €96 gross. How much VAT was added in euros?",
+    "Ein Nettopreis von 80 € wird zu 96 € brutto. Wie viel Mehrwertsteuer wurde in Euro hinzugefügt?",
+    "80 € Netto wern 96 € Brutto. Wia vui Euro Mehrwertsteuer san dazu kemma?",
+    "세전 €80이 세후 €96이 되었습니다. 부가세는 몇 유로인가요?",
+    "Нетто 80 € стало брутто 96 €. Сколько евро НДС добавлено?",
+    "80 € netos se convierten en 96 € brutos. ¿Cuántos euros de IVA se añadieron?",
+    "80 € líquidos se tornam 96 € brutos. Quantos euros de IVA foram adicionados?"
+  ],
+  [
+    "A price rises 25% to €100. Find its original price.",
+    "Ein Preis steigt um 25% auf 100 €. Berechne den ursprünglichen Preis.",
+    "A Preis steigt um 25% auf 100 €. Rechne den ursprünglichen Preis aus.",
+    "가격이 25% 올라 €100이 되었습니다. 원래 가격을 구하세요.",
+    "Цена выросла на 25% до 100 €. Найдите исходную цену.",
+    "Un precio sube un 25% hasta 100 €. Halla el precio original.",
+    "Um preço sobe 25% até 100 €. Ache o preço original."
+  ],
+  [
+    "A price rises from €80 to €100. What is the percentage increase?",
+    "Ein Preis steigt von 80 € auf 100 €. Wie viel Prozent beträgt die Erhöhung?",
+    "A Preis steigt vo 80 € auf 100 €. Wia vui Prozent san des?",
+    "가격이 €80에서 €100으로 올랐습니다. 증가율은 몇 퍼센트인가요?",
+    "Цена выросла с 80 € до 100 €. Каков рост в процентах?",
+    "Un precio sube de 80 € a 100 €. ¿Cuál es el aumento porcentual?",
+    "Um preço sobe de 80 € para 100 €. Qual é o aumento percentual?"
+  ],
+  [
+    "After a 20% discount, a price is €64. What was the original price in euros?",
+    "Nach 20% Rabatt kostet ein Artikel 64 €. Wie hoch war der ursprüngliche Preis in Euro?",
+    "Nach 20% Rabatt kost a Artikel 64 €. Wia vui Euro hod er davor kost?",
+    "20% 할인 후 가격이 €64입니다. 원래 가격은 몇 유로인가요?",
+    "После скидки 20% цена — 64 €. Какова исходная цена в евро?",
+    "Tras un 20% de descuento, el precio es 64 €. ¿Cuál era el original en euros?",
+    "Após desconto de 20%, o preço é 64 €. Qual era o original em euros?"
+  ],
+  [
+    "A price drops from €100 to €80. What is the signed percentage change?",
+    "Ein Preis sinkt von 100 € auf 80 €. Wie lautet die prozentuale Änderung mit Vorzeichen?",
+    "A Preis sinkt vo 100 € auf 80 €. Wia lautet de prozentuale Änderung mit Vorzeichn?",
+    "가격이 €100에서 €80으로 내렸습니다. 부호를 포함한 변화율은 얼마인가요?",
+    "Цена упала со 100 € до 80 €. Каково изменение в процентах со знаком?",
+    "Un precio baja de 100 € a 80 €. ¿Cuál es el cambio porcentual con signo?",
+    "Um preço cai de 100 € para 80 €. Qual é a variação percentual com sinal?"
+  ],
+  [
+    "A monthly salary rises from €2,000 to €2,100; rent rises from €800 to €880. Compare the money changes.",
+    "Das Monatsgehalt steigt von 2.000 € auf 2.100 €, die Miete von 800 € auf 880 €. Vergleiche die Geldänderungen.",
+    "Des Monatsgehalt steigt vo 2.000 € auf 2.100 €, de Mietn vo 800 € auf 880 €. Vergleich de Geldänderungen.",
+    "월급이 €2,000에서 €2,100으로, 임대료가 €800에서 €880으로 오릅니다. 금액 변화를 비교하세요.",
+    "Зарплата за месяц выросла с 2 000 € до 2 100 €, аренда — с 800 € до 880 €. Сравните денежные изменения.",
+    "El sueldo mensual sube de 2.000 € a 2.100 € y el alquiler de 800 € a 880 €. Compara los cambios monetarios.",
+    "O salário mensal sobe de 2.000 € para 2.100 € e o aluguel de 800 € para 880 €. Compare as diferenças monetárias."
+  ],
+  [
+    "A salary of €2,000 rises by 5%. What is the new salary in euros?",
+    "Ein Gehalt von 2.000 € steigt um 5%. Wie hoch ist das neue Gehalt in Euro?",
+    "A Gehalt vo 2.000 € steigt um 5%. Wia vui Euro is des neie Gehalt?",
+    "€2,000 급여가 5% 오릅니다. 새 급여는 몇 유로인가요?",
+    "Зарплата 2 000 € выросла на 5%. Какова новая зарплата в евро?",
+    "Un sueldo de 2.000 € sube un 5%. ¿Cuál es el nuevo sueldo en euros?",
+    "Um salário de 2.000 € sobe 5%. Qual é o novo salário em euros?"
+  ],
+  [
+    "Rent rises from €800 to €880. What is the percentage increase?",
+    "Die Miete steigt von 800 € auf 880 €. Wie viel Prozent beträgt die Erhöhung?",
+    "De Mietn steigt vo 800 € auf 880 €. Wia vui Prozent san des?",
+    "임대료가 €800에서 €880으로 오릅니다. 증가율은 몇 퍼센트인가요?",
+    "Аренда выросла с 800 € до 880 €. Каков рост в процентах?",
+    "El alquiler sube de 800 € a 880 €. ¿Cuál es el aumento porcentual?",
+    "O aluguel sobe de 800 € para 880 €. Qual é o aumento percentual?"
+  ],
+  [
+    "Salary increases by €100 per month and rent by €80 per month. How much extra remains in euros before other changes?",
+    "Das Gehalt steigt monatlich um 100 €, die Miete um 80 €. Wie viel Euro bleiben vor anderen Änderungen zusätzlich übrig?",
+    "Des Gehalt steigt im Monat um 100 €, de Mietn um 80 €. Wia vui Euro bleibn vor andern Änderungen zusätzlich übrig?",
+    "월급이 €100, 임대료가 €80 오릅니다. 다른 변화 전 추가로 남는 돈은 몇 유로인가요?",
+    "Зарплата выросла на 100 € в месяц, аренда — на 80 €. Сколько евро дополнительно остаётся до других изменений?",
+    "El sueldo aumenta 100 € al mes y el alquiler 80 €. ¿Cuántos euros extra quedan antes de otros cambios?",
+    "O salário aumenta 100 € por mês e o aluguel 80 €. Quantos euros extras restam antes de outras mudanças?"
+  ],
+  [
+    "A €60 bill has a 10% tip and is shared by three people. Find each share.",
+    "Eine Rechnung über 60 € mit 10% Trinkgeld wird unter drei Personen geteilt. Berechne jeden Anteil.",
+    "A Rechnung über 60 € mit 10% Trinkgeld werd auf drei Leit aufteilt. Rechne jeden Anteil aus.",
+    "€60 계산서에 팁 10%를 더해 세 명이 나눕니다. 한 명의 몫을 구하세요.",
+    "Счёт 60 € с чаевыми 10% делят на троих. Найдите долю каждого.",
+    "Una cuenta de 60 € con propina del 10% se divide entre tres personas. Halla cada parte.",
+    "Uma conta de 60 € com gorjeta de 10% é dividida entre três pessoas. Ache cada parte."
+  ],
+  [
+    "A €40 bill has a 15% tip. What is the total in euros?",
+    "Eine Rechnung über 40 € hat 15% Trinkgeld. Wie hoch ist die Gesamtsumme in Euro?",
+    "A Rechnung über 40 € hod 15% Trinkgeld. Wia vui Euro san's zamm?",
+    "€40 계산서에 팁 15%를 더합니다. 총액은 몇 유로인가요?",
+    "К счёту 40 € добавляют 15% чаевых. Каков итог в евро?",
+    "Una cuenta de 40 € lleva propina del 15%. ¿Cuál es el total en euros?",
+    "Uma conta de 40 € tem gorjeta de 15%. Qual é o total em euros?"
+  ],
+  [
+    "A €60 bill plus a 10% tip is shared equally by three people. What is each share in euros?",
+    "60 € plus 10% Trinkgeld werden gleichmäßig auf drei Personen verteilt. Wie groß ist jeder Anteil in Euro?",
+    "60 € plus 10% Trinkgeld wern gleich auf drei Leit verteilt. Wia vui Euro zoit jeder?",
+    "€60에 팁 10%를 더해 세 명이 균등하게 나눕니다. 한 명의 몫은 몇 유로인가요?",
+    "60 € плюс чаевые 10% делят поровну на троих. Какова доля каждого в евро?",
+    "60 € más 10% de propina se dividen por igual entre tres personas. ¿Cuánto paga cada una en euros?",
+    "60 € mais 10% de gorjeta são divididos igualmente entre três pessoas. Quanto cada uma paga em euros?"
+  ],
+  [
+    "Three rounded shares of €3.33 total €9.99. How many cents must be added to reach €10?",
+    "Drei gerundete Anteile von 3,33 € ergeben 9,99 €. Wie viele Cent fehlen zu 10 €?",
+    "Drei grundete Anteile vo 3,33 € gebn 9,99 €. Wia vui Cent fehln zu 10 €?",
+    "반올림한 €3.33 세 몫의 합은 €9.99입니다. €10이 되려면 몇 센트를 더해야 하나요?",
+    "Три округлённые доли по 3,33 € дают 9,99 €. Сколько центов добавить до 10 €?",
+    "Tres partes redondeadas de 3,33 € suman 9,99 €. ¿Cuántos céntimos faltan para 10 €?",
+    "Três partes arredondadas de 3,33 € somam 9,99 €. Quantos centavos faltam para 10 €?"
+  ],
+  [
+    "A recipe for four uses 200 g of flour. How much is needed for six servings?",
+    "Ein Rezept für vier Portionen verwendet 200 g Mehl. Wie viel brauchst du für sechs Portionen?",
+    "A Rezept für vier Portionen braucht 200 g Mehl. Wia vui brauchst für sechs Portionen?",
+    "4인분 레시피에 밀가루 200 g을 씁니다. 6인분에는 얼마나 필요한가요?",
+    "Рецепт на четыре порции требует 200 г муки. Сколько нужно на шесть?",
+    "Una receta para cuatro usa 200 g de harina. ¿Cuánto hace falta para seis porciones?",
+    "Uma receita para quatro usa 200 g de farinha. Quanto é necessário para seis porções?"
+  ],
+  [
+    "A four-serving recipe uses 200 g of flour. How many grams are needed for six servings?",
+    "Ein Rezept für vier Portionen verwendet 200 g Mehl. Wie viele Gramm brauchst du für sechs Portionen?",
+    "A Rezept für vier Portionen braucht 200 g Mehl. Wia vui Gramm brauchst für sechs?",
+    "4인분에 밀가루 200 g을 씁니다. 6인분에는 몇 g이 필요한가요?",
+    "Для четырёх порций нужно 200 г муки. Сколько граммов нужно для шести?",
+    "Una receta de cuatro porciones usa 200 g de harina. ¿Cuántos gramos hacen falta para seis?",
+    "Uma receita de quatro porções usa 200 g de farinha. Quantos gramas são necessários para seis?"
+  ],
+  [
+    "Six servings are what percentage of four servings?",
+    "Wie viel Prozent von vier Portionen sind sechs Portionen?",
+    "Wia vui Prozent vo vier Portionen san sechs?",
+    "6인분은 4인분의 몇 퍼센트인가요?",
+    "Какой процент от четырёх порций составляют шесть?",
+    "¿Qué porcentaje de cuatro porciones son seis?",
+    "Que porcentagem de quatro porções são seis?"
+  ],
+  [
+    "An ingredient increases from 100 g to 150 g. What is the percentage increase?",
+    "Eine Zutat steigt von 100 g auf 150 g. Wie viel Prozent beträgt die Erhöhung?",
+    "A Zutat steigt vo 100 g auf 150 g. Wia vui Prozent san des?",
+    "재료량이 100 g에서 150 g으로 늘었습니다. 증가율은 몇 퍼센트인가요?",
+    "Ингредиент увеличивается со 100 г до 150 г. Каков рост в процентах?",
+    "Un ingrediente pasa de 100 g a 150 g. ¿Cuál es el aumento porcentual?",
+    "Um ingrediente passa de 100 g para 150 g. Qual é o aumento percentual?"
+  ],
+  [
+    "30 of 120 respondents choose an option. What percentage is that?",
+    "30 von 120 Befragten wählen eine Antwort. Wie viel Prozent sind das?",
+    "30 vo 120 Befragtn wähln a Antwort. Wia vui Prozent san des?",
+    "응답자 120명 중 30명이 한 항목을 선택했습니다. 몇 퍼센트인가요?",
+    "30 из 120 опрошенных выбрали вариант. Сколько это процентов?",
+    "30 de 120 encuestados eligen una opción. ¿Qué porcentaje es?",
+    "30 de 120 entrevistados escolhem uma opção. Que porcentagem é?"
+  ],
+  [
+    "30 of 120 respondents choose an option. What percentage chose it?",
+    "30 von 120 Befragten wählen eine Antwort. Welcher Prozentsatz hat sie gewählt?",
+    "30 vo 120 Befragtn wähln a Antwort. Wia vui Prozent hobn sie gwählt?",
+    "120명 중 30명이 한 항목을 선택했습니다. 선택한 비율은 몇 퍼센트인가요?",
+    "30 из 120 опрошенных выбрали вариант. Какой процент его выбрал?",
+    "30 de 120 encuestados eligen una opción. ¿Qué porcentaje la eligió?",
+    "30 de 120 entrevistados escolhem uma opção. Que porcentagem a escolheu?"
+  ],
+  [
+    "A rate rises from 40% to 50%. How many percentage points is the increase?",
+    "Ein Satz steigt von 40% auf 50%. Wie viele Prozentpunkte beträgt die Erhöhung?",
+    "A Satz steigt vo 40% auf 50%. Wia vui Prozentpunkte san des?",
+    "비율이 40%에서 50%로 올랐습니다. 몇 %포인트 증가했나요?",
+    "Ставка выросла с 40% до 50%. На сколько процентных пунктов?",
+    "Una tasa sube del 40% al 50%. ¿Cuántos puntos porcentuales aumenta?",
+    "Uma taxa sobe de 40% para 50%. Quantos pontos percentuais aumenta?"
+  ],
+  [
+    "A rate rises from 40% to 50%. What is its relative percentage increase?",
+    "Ein Satz steigt von 40% auf 50%. Wie hoch ist seine relative prozentuale Erhöhung?",
+    "A Satz steigt vo 40% auf 50%. Wia hoch is de relative prozentuale Erhöhung?",
+    "비율이 40%에서 50%로 올랐습니다. 상대 증가율은 몇 퍼센트인가요?",
+    "Ставка выросла с 40% до 50%. Каков относительный рост в процентах?",
+    "Una tasa sube del 40% al 50%. ¿Cuál es su aumento porcentual relativo?",
+    "Uma taxa sobe de 40% para 50%. Qual é seu aumento percentual relativo?"
+  ],
+  [
+    "In a hypothetical model, €1,000 grows 5% per period for two periods. Find the final amount.",
+    "In einem hypothetischen Modell wachsen 1.000 € je Zeitraum um 5%, über zwei Zeiträume. Berechne den Endbetrag.",
+    "In am hypothetischen Modell wachsn 1.000 € je Zeitraum um 5%, über zwoa Zeiträume. Rechne den Endbetrag aus.",
+    "가상 모델에서 €1,000이 두 기간 동안 매 기간 5% 성장합니다. 최종 금액을 구하세요.",
+    "В условной модели 1 000 € растут на 5% за период в течение двух периодов. Найдите итог.",
+    "En un modelo hipotético, 1.000 € crecen un 5% por período durante dos períodos. Halla el importe final.",
+    "Em um modelo hipotético, 1.000 € crescem 5% por período durante dois períodos. Ache o valor final."
+  ],
+  [
+    "In a fixed-rate model, €1,000 grows 5% per period for two periods. What is the final amount in euros?",
+    "Bei festem Satz wachsen 1.000 € je Zeitraum um 5%, über zwei Zeiträume. Wie hoch ist der Endbetrag in Euro?",
+    "Bei festem Satz wachsn 1.000 € je Zeitraum um 5%, über zwoa Zeiträume. Wia vui Euro san's am End?",
+    "고정 비율 모델에서 €1,000이 두 기간 동안 매 기간 5% 성장합니다. 최종 금액은 몇 유로인가요?",
+    "При фиксированной ставке 1 000 € растут на 5% за период в течение двух периодов. Каков итог в евро?",
+    "En un modelo de tasa fija, 1.000 € crecen 5% por período durante dos períodos. ¿Cuál es el final en euros?",
+    "Em um modelo de taxa fixa, 1.000 € crescem 5% por período durante dois períodos. Qual é o final em euros?"
+  ],
+  [
+    "An amount of €200 grows 10% per period for two periods. How much growth is added in total, in euros?",
+    "200 € wachsen je Zeitraum um 10%, über zwei Zeiträume. Wie viele Euro Wachstum kommen insgesamt hinzu?",
+    "200 € wachsn je Zeitraum um 10%, über zwoa Zeiträume. Wia vui Euro Wachstum kemman zamm dazu?",
+    "€200이 두 기간 동안 매 기간 10% 성장합니다. 총 증가액은 몇 유로인가요?",
+    "200 € растут на 10% за период в течение двух периодов. Сколько евро добавлено всего?",
+    "200 € crecen 10% por período durante dos períodos. ¿Cuántos euros de crecimiento se añaden en total?",
+    "200 € crescem 10% por período durante dois períodos. Quantos euros de crescimento são adicionados ao todo?"
+  ],
+  [
+    "An amount of €500 grows 0% for three periods. What is the final amount in euros?",
+    "500 € wachsen drei Zeiträume lang um 0%. Wie hoch ist der Endbetrag in Euro?",
+    "500 € wachsn drei Zeiträume lang um 0%. Wia vui Euro san's am End?",
+    "€500이 세 기간 동안 0% 성장합니다. 최종 금액은 몇 유로인가요?",
+    "500 € растут на 0% три периода. Каков итог в евро?",
+    "500 € crecen 0% durante tres períodos. ¿Cuál es el final en euros?",
+    "500 € crescem 0% durante três períodos. Qual é o final em euros?"
+  ],
+  [
+    "Math foundations, Everyday percentages, the introduction, game guides, and Game Analysis are available now. More courses are planned; their pages show what you will be able to learn.",
+    "Mathematische Grundlagen, Alltagsprozente, Einführung, Spielanleitungen und Spielanalyse sind verfügbar. Weitere Kurse sind geplant; ihre Seiten zeigen die künftigen Inhalte.",
+    "Mathe-Grundlagen, Alltagsprozente, Einführung, Spielanleitungen und Spielanalyse san verfügbar. Weitere Kurse san plant; ihre Seitn zoagn de künftign Inhalte.",
+    "수학 기초, 일상 백분율, 소개, 게임 안내와 분석을 이용할 수 있습니다. 다른 강좌는 예정되어 있으며 해당 페이지에서 내용을 미리 볼 수 있습니다.",
+    "Основы математики, повседневные проценты, введение, руководства и анализ игр доступны. Другие курсы запланированы; страницы показывают будущие темы.",
+    "Ya están disponibles fundamentos matemáticos, porcentajes cotidianos, introducción, guías y análisis de juegos. Hay más cursos previstos; sus páginas muestran los contenidos futuros.",
+    "Fundamentos matemáticos, porcentagens cotidianas, introdução, guias e análise de jogos estão disponíveis. Mais cursos estão previstos; suas páginas mostram os conteúdos futuros."
+  ],
+  [
+    "Favorited",
+    "Favorit",
+    "Favorit",
+    "즐겨찾기됨",
+    "В избранном",
+    "En favoritos",
+    "Nos favoritos"
+  ],
+  [
+    "Add to favorites",
+    "Zu Favoriten hinzufügen",
+    "Zu Favoritn dazua",
+    "즐겨찾기 추가",
+    "В избранное",
+    "Añadir a favoritos",
+    "Adicionar aos favoritos"
+  ],
+  [
+    "Your app has a place here",
+    "Deine App hat hier einen Platz",
+    "Dei App hod do an Platz",
+    "이곳에서 앱을 만나보세요",
+    "Здесь место для вашего приложения",
+    "Tu app tiene un lugar aquí",
+    "Seu app tem um lugar aqui"
+  ],
+  [
+    "This is a preview of the planned app. Its features are not available yet. You can favorite it and explore what is coming.",
+    "Dies ist eine Vorschau der geplanten App. Ihre Funktionen sind noch nicht verfügbar. Du kannst sie vormerken und die kommenden Inhalte ansehen.",
+    "Des is a Vorschau vo da plantn App. De Funktionen san no ned verfügbar. Du kannst sie merkn und de künftign Inhalte oschaun.",
+    "예정된 앱의 미리보기입니다. 기능은 아직 제공되지 않습니다. 즐겨찾기에 추가하고 예정된 내용을 살펴보세요.",
+    "Это предварительный обзор приложения. Функции ещё недоступны. Добавьте в избранное и ознакомьтесь с планами.",
+    "Es una vista previa de la app prevista. Sus funciones aún no están disponibles. Guárdala en favoritos y explora lo que viene.",
+    "Esta é uma prévia do app previsto. As funções ainda não estão disponíveis. Favorite e explore o que vem a seguir."
+  ],
+  [
+    "Planned features",
+    "Geplante Funktionen",
+    "Plante Funktionen",
+    "예정된 기능",
+    "Планируемые функции",
+    "Funciones previstas",
+    "Funções previstas"
+  ],
+  [
+    "Learn the idea behind the app",
+    "Lerne die Idee hinter der App",
+    "Lern de Idee hinter da App",
+    "앱의 원리 배우기",
+    "Изучите идею приложения",
+    "Aprende la idea detrás de la app",
+    "Aprenda a ideia por trás do app"
+  ],
+  [
+    "Back to apps",
+    "Zurück zu Apps",
+    "Zruck zu Apps",
+    "앱으로 돌아가기",
+    "Назад к приложениям",
+    "Volver a apps",
+    "Voltar aos apps"
+  ],
+  [
+    "All apps",
+    "Alle Apps",
+    "Olle Apps",
+    "모든 앱",
+    "Все приложения",
+    "Todas las apps",
+    "Todos os apps"
+  ],
+  [
+    "Favorites",
+    "Favoriten",
+    "Favoritn",
+    "즐겨찾기",
+    "Избранное",
+    "Favoritos",
+    "Favoritos"
+  ],
+  [
+    "Recently viewed",
+    "Zuletzt angesehen",
+    "Zuletzt ogschaut",
+    "최근 본 앱",
+    "Недавно просмотренные",
+    "Vistas recientemente",
+    "Vistos recentemente"
+  ],
+  [
+    "Your everyday app library",
+    "Deine App-Sammlung für den Alltag",
+    "Dei App-Sammlung für'n Alltag",
+    "일상에 유용한 앱 모음",
+    "Ваши повседневные приложения",
+    "Tu biblioteca de apps cotidianas",
+    "Sua biblioteca de apps cotidianos"
+  ],
+  [
+    "A useful app for the task at hand.",
+    "Eine nützliche App für jede Aufgabe.",
+    "A nützliche App für jede Aufgab.",
+    "필요한 일에 맞는 유용한 앱.",
+    "Полезное приложение для каждой задачи.",
+    "Una app útil para cada tarea.",
+    "Um app útil para cada tarefa."
+  ],
+  [
+    "Open an app, keep your favorites close, and find tools for calculations, planning, fitness, and everyday life.",
+    "Öffne eine App, behalte Favoriten griffbereit und finde Werkzeuge für Rechnen, Planung, Fitness und Alltag.",
+    "Mach a App auf, behalt Favoritn griffbereit und find Werkzeuge für Rechnen, Planung, Fitness und Alltag.",
+    "앱을 열고 즐겨찾기를 가까이 두세요. 계산, 계획, 운동과 일상을 위한 도구를 찾으세요.",
+    "Открывайте приложения, сохраняйте избранное и находите инструменты для расчётов, планирования, спорта и повседневных дел.",
+    "Abre una app, guarda tus favoritas y encuentra herramientas para cálculos, planificación, ejercicio y vida diaria.",
+    "Abra um app, mantenha favoritos à mão e encontre ferramentas para cálculos, planejamento, exercício e cotidiano."
+  ],
+  [
+    "Search apps",
+    "Apps suchen",
+    "Apps suachn",
+    "앱 검색",
+    "Поиск приложений",
+    "Buscar apps",
+    "Buscar apps"
+  ],
+  [
+    "Search apps...",
+    "Apps suchen...",
+    "Apps suachn...",
+    "앱 검색...",
+    "Поиск приложений...",
+    "Buscar apps...",
+    "Buscar apps..."
+  ],
+  [
+    "App category",
+    "App-Kategorie",
+    "App-Kategorie",
+    "앱 카테고리",
+    "Категория приложения",
+    "Categoría de app",
+    "Categoria de app"
+  ],
+  [
+    "App collection",
+    "App-Sammlung",
+    "App-Sammlung",
+    "앱 모음",
+    "Коллекция приложений",
+    "Colección de apps",
+    "Coleção de apps"
+  ],
+  [
+    "app",
+    "App",
+    "App",
+    "앱",
+    "приложение",
+    "app",
+    "app"
+  ],
+  [
+    "apps",
+    "Apps",
+    "Apps",
+    "앱",
+    "приложений",
+    "apps",
+    "apps"
+  ],
+  [
+    "Remove favorite",
+    "Favorit entfernen",
+    "Favorit wegnehma",
+    "즐겨찾기 제거",
+    "Удалить из избранного",
+    "Quitar favorito",
+    "Remover favorito"
+  ],
+  [
+    "Add favorite",
+    "Favorit hinzufügen",
+    "Favorit dazua",
+    "즐겨찾기 추가",
+    "Добавить в избранное",
+    "Añadir favorito",
+    "Adicionar favorito"
+  ],
+  [
+    "Your favorites belong here",
+    "Hier findest du deine Favoriten",
+    "Do findest dei Favoritn",
+    "즐겨찾기가 여기에 표시됩니다",
+    "Здесь будет избранное",
+    "Aquí van tus favoritas",
+    "Seus favoritos ficam aqui"
+  ],
+  [
+    "Your recently viewed apps belong here",
+    "Hier findest du zuletzt angesehene Apps",
+    "Do findest zuletzt ogschaute Apps",
+    "최근 본 앱이 여기에 표시됩니다",
+    "Здесь будут недавние приложения",
+    "Aquí van tus apps recientes",
+    "Seus apps recentes ficam aqui"
+  ],
+  [
+    "No apps match your search",
+    "Keine Apps passen zur Suche",
+    "Koane Apps passn zur Suach",
+    "검색 결과가 없습니다",
+    "Нет приложений по запросу",
+    "Ninguna app coincide",
+    "Nenhum app corresponde"
+  ],
+  [
+    "Use the star on any app to add it to your favorites.",
+    "Nutze den Stern einer App, um sie als Favorit zu speichern.",
+    "Nimm den Stern vo ana App zum Merkn als Favorit.",
+    "앱의 별을 눌러 즐겨찾기에 추가하세요.",
+    "Нажмите звезду приложения, чтобы добавить его в избранное.",
+    "Usa la estrella de una app para añadirla a favoritos.",
+    "Use a estrela de um app para adicioná-lo aos favoritos."
+  ],
+  [
+    "Open an app page to find it here next time.",
+    "Öffne eine App-Seite, damit du sie beim nächsten Mal hier findest.",
+    "Mach a App-Seitn auf, dann findest sie nächsts Moi do.",
+    "앱 페이지를 열면 다음에 여기에서 찾을 수 있습니다.",
+    "Откройте страницу приложения, чтобы найти её здесь в следующий раз.",
+    "Abre una app para encontrarla aquí la próxima vez.",
+    "Abra um app para encontrá-lo aqui da próxima vez."
+  ],
+  [
+    "Try a different search or category.",
+    "Probiere eine andere Suche oder Kategorie.",
+    "Probier a andere Suach oder Kategorie.",
+    "다른 검색어나 카테고리를 선택하세요.",
+    "Попробуйте другой запрос или категорию.",
+    "Prueba otra búsqueda o categoría.",
+    "Tente outra busca ou categoria."
+  ],
+  [
+    "Show all apps",
+    "Alle Apps anzeigen",
+    "Olle Apps zoagn",
+    "모든 앱 보기",
+    "Показать все приложения",
+    "Mostrar todas las apps",
+    "Mostrar todos os apps"
+  ],
+  [
+    "Four apps are available now: Percentage Calculator, Number-System Converter, Unit Converter, and Recipe Scaler. Other apps are marked Coming soon.",
+    "Vier Apps sind verfügbar: Prozentrechner, Zahlensystem-Umrechner, Einheiten-Umrechner und Rezept-Skalierer. Andere Apps sind mit Demnächst markiert.",
+    "Vier Apps san verfügbar: Prozentrechner, Zahlensystem-Umrechner, Einheiten-Umrechner und Rezept-Umrechner. Andere Apps san mit Kimmt boid markiert.",
+    "백분율 계산기, 진법 변환기, 단위 변환기와 레시피 분량 조절기를 이용할 수 있습니다. 다른 앱은 곧 제공으로 표시됩니다.",
+    "Доступны четыре приложения: калькулятор процентов, конвертер систем счисления, конвертер единиц и масштабирование рецептов. Остальные отмечены Скоро.",
+    "Hay cuatro apps disponibles: calculadora de porcentajes, conversor numérico, conversor de unidades y ajustador de recetas. Las demás indican Próximamente.",
+    "Quatro apps estão disponíveis: calculadora de porcentagens, conversor numérico, conversor de unidades e ajustador de receitas. Os demais indicam Em breve."
+  ],
+  [
+    "Favorites and recently viewed apps are saved on this browser, separately for each account.",
+    "Favoriten und zuletzt angesehene Apps werden in diesem Browser je Konto separat gespeichert.",
+    "Favoritn und zuletzt ogschaute Apps wern in dem Browser je Konto extra gspeichert.",
+    "즐겨찾기와 최근 본 앱은 이 브라우저에 계정별로 따로 저장됩니다.",
+    "Избранное и недавние приложения сохраняются в этом браузере отдельно для каждого аккаунта.",
+    "Favoritos y apps recientes se guardan en este navegador por separado para cada cuenta.",
+    "Favoritos e apps recentes são salvos neste navegador separadamente por conta."
+  ],
+  [
+    "Binary",
+    "Binär",
+    "Binär",
+    "2진수",
+    "Двоичная",
+    "Binario",
+    "Binário"
+  ],
+  [
+    "Octal",
+    "Oktal",
+    "Oktal",
+    "8진수",
+    "Восьмеричная",
+    "Octal",
+    "Octal"
+  ],
+  [
+    "Decimal",
+    "Dezimal",
+    "Dezimal",
+    "10진수",
+    "Десятичная",
+    "Decimal",
+    "Decimal"
+  ],
+  [
+    "Hexadecimal",
+    "Hexadezimal",
+    "Hexadezimal",
+    "16진수",
+    "Шестнадцатеричная",
+    "Hexadecimal",
+    "Hexadecimal"
+  ],
+  [
+    "Input base",
+    "Eingabe-Zahlensystem",
+    "Eingabe-Zahlensystem",
+    "입력 진법",
+    "Система ввода",
+    "Base de entrada",
+    "Base de entrada"
+  ],
+  [
+    "Integer",
+    "Ganze Zahl",
+    "Ganze Zahl",
+    "정수",
+    "Целое число",
+    "Entero",
+    "Inteiro"
+  ],
+  [
+    "Signed integers only, up to 256 digits. Optional 0b, 0o, or 0x prefixes must match the selected base. Negative values use a minus sign, not two’s complement.",
+    "Nur ganze Zahlen mit Vorzeichen, bis zu 256 Ziffern. Optionale Präfixe 0b, 0o oder 0x müssen zum gewählten System passen. Negative Werte verwenden ein Minuszeichen, kein Zweierkomplement.",
+    "Bloß ganze Zahlen mit Vorzeichn, bis zu 256 Ziffern. Optionale Präfixe 0b, 0o oder 0x miassn zum gwählten System passn. Negative Werte hobn a Minuszeichn, koa Zweierkomplement.",
+    "부호 있는 정수만 최대 256자리까지 입력할 수 있습니다. 0b, 0o, 0x 접두사는 선택한 진법과 같아야 합니다. 음수는 2의 보수가 아닌 마이너스 부호로 표시합니다.",
+    "Только целые со знаком, до 256 цифр. Префиксы 0b, 0o или 0x должны совпадать с выбранной системой. Отрицательные числа записаны с минусом, не в дополнительном коде.",
+    "Solo enteros con signo, hasta 256 cifras. Los prefijos 0b, 0o o 0x deben coincidir con la base. Los negativos usan signo menos, no complemento a dos.",
+    "Apenas inteiros com sinal, até 256 dígitos. Prefixos 0b, 0o ou 0x devem corresponder à base. Negativos usam sinal de menos, não complemento de dois."
+  ],
+  [
+    "Place-value explanations",
+    "Stellenwert-Erklärungen",
+    "Stellenwert-Erklärungen",
+    "자릿값 설명",
+    "Объяснение разрядов",
+    "Explicaciones del valor posicional",
+    "Explicações do valor posicional"
+  ],
+  [
+    "The place-value expansion is shown for numbers of up to 16 digits.",
+    "Die Stellenwertzerlegung wird für Zahlen mit höchstens 16 Ziffern angezeigt.",
+    "De Stellenwertzerlegung wird für Zahlen mit höchstens 16 Ziffern zoagt.",
+    "자릿값 전개는 최대 16자리 수에 표시됩니다.",
+    "Разложение по разрядам показано для чисел до 16 цифр.",
+    "La expansión posicional se muestra para números de hasta 16 cifras.",
+    "A expansão posicional aparece para números de até 16 dígitos."
+  ],
+  [
+    "Clickable bits",
+    "Anklickbare Bits",
+    "Anklickbare Bits",
+    "클릭 가능한 비트",
+    "Переключаемые биты",
+    "Bits interactivos",
+    "Bits interativos"
+  ],
+  [
+    "Toggle a bit to add or remove its power of two. This view uses 16 unsigned bits.",
+    "Schalte ein Bit um, um seine Zweierpotenz hinzuzufügen oder zu entfernen. Diese Ansicht verwendet 16 vorzeichenlose Bits.",
+    "Schalt a Bit um, um sei Zweierpotenz dazuzähln oder wegzunehm. De Ansicht nimmt 16 Bits ohne Vorzeichn.",
+    "비트를 눌러 해당 2의 거듭제곱을 더하거나 빼세요. 이 화면은 부호 없는 16비트를 사용합니다.",
+    "Переключите бит, чтобы добавить или убрать его степень двойки. Здесь используются 16 беззнаковых битов.",
+    "Activa un bit para añadir o quitar su potencia de dos. Esta vista usa 16 bits sin signo.",
+    "Alterne um bit para adicionar ou remover sua potência de dois. Esta visão usa 16 bits sem sinal."
+  ],
+  [
+    "Bit",
+    "Bit",
+    "Bit",
+    "비트",
+    "Бит",
+    "Bit",
+    "Bit"
+  ],
+  [
+    "The bit editor is available for values from 0 to 65,535. Conversion still works for larger or negative integers.",
+    "Der Bit-Editor gilt für Werte von 0 bis 65.535. Die Umrechnung funktioniert auch für größere oder negative ganze Zahlen.",
+    "Da Bit-Editor gilt vo 0 bis 65.535. Umrechnen geht aa für größere oder negative ganze Zahlen.",
+    "비트 편집기는 0~65,535에서 사용할 수 있습니다. 더 크거나 음수인 정수도 변환할 수 있습니다.",
+    "Редактор битов доступен для значений от 0 до 65 535. Преобразование работает и для больших или отрицательных целых.",
+    "El editor de bits está disponible de 0 a 65.535. La conversión funciona también para enteros mayores o negativos.",
+    "O editor de bits está disponível de 0 a 65.535. A conversão funciona também para inteiros maiores ou negativos."
+  ],
+  [
+    "Enter an integer containing only valid digits for the selected base.",
+    "Gib eine ganze Zahl nur mit gültigen Ziffern des gewählten Zahlensystems ein.",
+    "Gib a ganze Zahl bloß mit gültign Ziffern vom gwählten System ei.",
+    "선택한 진법에서 유효한 숫자만 포함한 정수를 입력하세요.",
+    "Введите целое число только с допустимыми цифрами выбранной системы.",
+    "Introduce un entero con cifras válidas para la base elegida.",
+    "Digite um inteiro com dígitos válidos para a base escolhida."
+  ],
+  [
+    "Enter valid numbers using a decimal point or comma, without units or thousands separators.",
+    "Gib gültige Zahlen mit Dezimalpunkt oder Komma ein, ohne Einheiten oder Tausendertrennzeichen.",
+    "Gib gültige Zahlen mit Punkt oder Komma ei, ohne Einheiten oder Tausendertrennzeichn.",
+    "단위나 천 단위 구분자 없이 소수점 또는 쉼표를 사용해 수를 입력하세요.",
+    "Введите числа с десятичной точкой или запятой, без единиц и разделителей тысяч.",
+    "Introduce números con punto o coma decimal, sin unidades ni separadores de miles.",
+    "Digite números com ponto ou vírgula decimal, sem unidades nem separadores de milhares."
+  ],
+  [
+    "Use nonnegative amounts, a positive whole, and a positive whole number of people or servings.",
+    "Verwende nichtnegative Beträge, ein positives Ganzes und eine positive ganze Personen- oder Portionszahl.",
+    "Nimm nednegative Beträge, a positives Ganzes und a positive ganze Personen- oder Portionszahl.",
+    "금액은 음수가 아니어야 하고 전체는 양수여야 하며 인원이나 인분 수는 양의 정수여야 합니다.",
+    "Используйте неотрицательные суммы, положительное целое и положительное целое число людей или порций.",
+    "Usa cantidades no negativas, un total positivo y un número entero positivo de personas o porciones.",
+    "Use valores não negativos, um total positivo e um inteiro positivo de pessoas ou porções."
+  ],
+  [
+    "Check the rate range. Discounts cannot exceed 100%; reversing a 100% decrease is impossible. Growth must be between −100% and 1,000%.",
+    "Prüfe den zulässigen Satz. Rabatte dürfen 100% nicht überschreiten; eine Senkung um 100% lässt sich nicht umkehren. Wachstum muss zwischen −100% und 1.000% liegen.",
+    "Prüaf den Satz. Rabatte derfan 100% ned überschreitn; a Senkung um 100% lässt si ned umdrehn. Wachstum muas zwischen −100% und 1.000% liegn.",
+    "비율 범위를 확인하세요. 할인율은 100%를 넘을 수 없고 100% 감소는 역산할 수 없습니다. 성장률은 −100%~1,000%여야 합니다.",
+    "Проверьте диапазон ставки. Скидки не выше 100%; снижение на 100% нельзя обратить. Рост должен быть от −100% до 1 000%.",
+    "Comprueba la tasa. Los descuentos no pueden superar 100%; no se invierte una bajada del 100%. El crecimiento debe estar entre −100% y 1.000%.",
+    "Confira a taxa. Descontos não podem superar 100%; redução de 100% não pode ser invertida. O crescimento deve estar entre −100% e 1.000%."
+  ],
+  [
+    "Use a whole number of periods from 0 to 100.",
+    "Verwende eine ganze Anzahl von 0 bis 100 Zeiträumen.",
+    "Nimm a ganze Anzahl vo 0 bis 100 Zeiträumen.",
+    "기간 수는 0~100의 정수여야 합니다.",
+    "Используйте целое число периодов от 0 до 100.",
+    "Usa un número entero de períodos de 0 a 100.",
+    "Use um número inteiro de períodos de 0 a 100."
+  ],
+  [
+    "The result is too large. Try smaller values.",
+    "Das Ergebnis ist zu groß. Verwende kleinere Werte.",
+    "Des Ergebnis is z'groß. Nimm kloanere Werte.",
+    "결과가 너무 큽니다. 더 작은 값을 사용하세요.",
+    "Результат слишком большой. Уменьшите значения.",
+    "El resultado es demasiado grande. Prueba valores menores.",
+    "O resultado é grande demais. Tente valores menores."
+  ],
+  [
+    "percentage points",
+    "Prozentpunkte",
+    "Prozentpunkte",
+    "%포인트",
+    "процентных пунктов",
+    "puntos porcentuales",
+    "pontos percentuais"
+  ],
+  [
+    "Calculation",
+    "Berechnung",
+    "Berechnung",
+    "계산",
+    "Расчёт",
+    "Cálculo",
+    "Cálculo"
+  ],
+  [
+    "Per person",
+    "Je Person",
+    "Je Person",
+    "1인당",
+    "На человека",
+    "Por persona",
+    "Por pessoa"
+  ],
+  [
+    "Step-by-step explanations",
+    "Schrittweise Erklärungen",
+    "Schrittweise Erklärungen",
+    "단계별 설명",
+    "Пошаговое объяснение",
+    "Explicaciones paso a paso",
+    "Explicações passo a passo"
+  ],
+  [
+    "Results are displayed to six decimal places; calculations use unrounded values. Keep amounts in the same unit.",
+    "Ergebnisse werden mit bis zu sechs Nachkommastellen angezeigt; die Rechnung nutzt ungerundete Werte. Verwende gleiche Einheiten für die Beträge.",
+    "Ergebnisse wern mit bis zu sechs Nachkommastelln zoagt; grechnet werd ungrundet. Nimm gleiche Einheiten für de Beträge.",
+    "결과는 소수점 여섯 자리까지 표시하며 계산에는 반올림 전 값을 사용합니다. 금액의 단위를 같게 맞추세요.",
+    "Результаты показаны до шести десятичных знаков; расчёт использует неокруглённые значения. Сохраняйте одинаковые единицы.",
+    "Los resultados muestran hasta seis decimales; el cálculo usa valores sin redondear. Mantén la misma unidad.",
+    "Resultados mostram até seis casas decimais; o cálculo usa valores sem arredondar. Mantenha a mesma unidade."
+  ],
+  [
+    "A fixed-rate illustration with no deposits, fees, taxes, or inflation. It is not a forecast.",
+    "Ein Beispiel mit festem Satz ohne Einzahlungen, Gebühren, Steuern oder Inflation. Keine Prognose.",
+    "A Beispiel mit festem Satz ohne Eizahlungen, Gebührn, Steuern oder Inflation. Koa Prognose.",
+    "입금, 수수료, 세금과 물가 상승이 없는 고정 비율 예시이며 예측이 아닙니다.",
+    "Иллюстрация с фиксированной ставкой без пополнений, комиссий, налогов и инфляции. Это не прогноз.",
+    "Ejemplo con tasa fija sin depósitos, comisiones, impuestos ni inflación. No es un pronóstico.",
+    "Exemplo com taxa fixa sem depósitos, taxas, impostos ou inflação. Não é uma previsão."
+  ],
+  [
+    "Round the total to cents first. Rounded per-person amounts may need a one-cent adjustment to add up.",
+    "Runde zuerst die Summe auf Cent. Gerundete Anteile brauchen eventuell eine Anpassung um einen Cent, damit die Summe stimmt.",
+    "Rund eerst de Summe auf Cent. Grundete Anteile brauchen vielleicht an Cent Anpassung, damit de Summe stimmt.",
+    "먼저 총액을 센트로 반올림하세요. 반올림한 1인당 몫의 합을 맞추려면 1센트 조정이 필요할 수 있습니다.",
+    "Сначала округлите итог до центов. Округлённым долям может потребоваться поправка на цент для верной суммы.",
+    "Redondea primero el total a céntimos. Las partes redondeadas pueden necesitar ajustar un céntimo para sumar el total.",
+    "Arredonde primeiro o total para centavos. As partes arredondadas podem precisar de ajuste de um centavo para somar o total."
+  ],
+  [
+    "Enter the rate that applies to your example. This calculator does not determine tax rules.",
+    "Gib den zu deinem Beispiel passenden Satz ein. Dieser Rechner bestimmt keine Steuerregeln.",
+    "Gib den Satz für dei Beispiel ei. Der Rechner bestimmt koane Steuerregeln.",
+    "예시에 맞는 세율을 입력하세요. 이 계산기는 세법을 결정하지 않습니다.",
+    "Введите ставку для вашего примера. Калькулятор не определяет налоговые правила.",
+    "Introduce la tasa de tu ejemplo. Esta calculadora no determina normas fiscales.",
+    "Digite a taxa do seu exemplo. Esta calculadora não determina regras fiscais."
+  ],
+  [
+    "Recipe name",
+    "Rezeptname",
+    "Rezeptname",
+    "레시피 이름",
+    "Название рецепта",
+    "Nombre de receta",
+    "Nome da receita"
+  ],
+  [
+    "Give your recipe a name",
+    "Gib deinem Rezept einen Namen",
+    "Gib deim Rezept an Namen",
+    "레시피 이름을 정하세요",
+    "Назовите рецепт",
+    "Ponle nombre a tu receta",
+    "Dê um nome à receita"
+  ],
+  [
+    "Quantities accept decimals or fractions such as 1/2. Use positive servings up to 1,000 and ingredient quantities from 0 to 1,000,000.",
+    "Mengen akzeptieren Dezimalzahlen oder Brüche wie 1/2. Verwende positive Portionen bis 1.000 und Zutatenmengen von 0 bis 1.000.000.",
+    "Mengen nehma Dezimalzahlen oder Brüche wia 1/2. Nimm positive Portionen bis 1.000 und Zutatenmengen vo 0 bis 1.000.000.",
+    "양은 소수나 1/2 같은 분수로 입력할 수 있습니다. 인분은 1,000 이하 양수, 재료량은 0~1,000,000을 사용하세요.",
+    "Количество допускает десятичные числа и дроби вроде 1/2. Порции — положительные до 1 000, количества ингредиентов — от 0 до 1 000 000.",
+    "Las cantidades aceptan decimales o fracciones como 1/2. Usa porciones positivas hasta 1.000 y cantidades de 0 a 1.000.000.",
+    "Quantidades aceitam decimais ou frações como 1/2. Use porções positivas até 1.000 e quantidades de 0 a 1.000.000."
+  ],
+  [
+    "Ingredient",
+    "Zutat",
+    "Zutat",
+    "재료",
+    "Ингредиент",
+    "Ingrediente",
+    "Ingrediente"
+  ],
+  [
+    "Ingredient name",
+    "Zutatenname",
+    "Zutatenname",
+    "재료 이름",
+    "Название ингредиента",
+    "Nombre del ingrediente",
+    "Nome do ingrediente"
+  ],
+  [
+    "Unit",
+    "Einheit",
+    "Einheit",
+    "단위",
+    "Единица",
+    "Unidad",
+    "Unidade"
+  ],
+  [
+    "Remove ingredient",
+    "Zutat entfernen",
+    "Zutat wegnehma",
+    "재료 제거",
+    "Убрать ингредиент",
+    "Quitar ingrediente",
+    "Remover ingrediente"
+  ],
+  [
+    "Add ingredient",
+    "Zutat hinzufügen",
+    "Zutat dazua",
+    "재료 추가",
+    "Добавить ингредиент",
+    "Añadir ingrediente",
+    "Adicionar ingrediente"
+  ],
+  [
+    "Scale factor",
+    "Skalierungsfaktor",
+    "Skalierungsfaktor",
+    "배율",
+    "Коэффициент масштаба",
+    "Factor de escala",
+    "Fator de escala"
+  ],
+  [
+    "Add named ingredients with valid quantities and positive serving counts to see the scaled recipe.",
+    "Füge benannte Zutaten mit gültigen Mengen und positiven Portionszahlen hinzu, um das angepasste Rezept zu sehen.",
+    "Trag benannte Zutaten mit gültign Mengen und positiven Portionszahln ei, dann siehst des angepasste Rezept.",
+    "이름과 유효한 양을 가진 재료와 양수 인분 수를 입력하면 조절된 레시피가 표시됩니다.",
+    "Добавьте названные ингредиенты с допустимыми количествами и положительные порции для просмотра результата.",
+    "Añade ingredientes con nombre, cantidades válidas y porciones positivas para ver la receta ajustada.",
+    "Adicione ingredientes com nome, quantidades válidas e porções positivas para ver a receita ajustada."
+  ],
+  [
+    "Ingredient quantities scale proportionally. Oven temperature, pan size, and cooking time may need separate adjustments.",
+    "Zutatenmengen werden proportional angepasst. Ofentemperatur, Formgröße und Garzeit müssen möglicherweise gesondert angepasst werden.",
+    "Zutatenmengen wern proportional angepasst. Ofentemperatur, Formgröße und Garzeit miassn vielleicht extra angepasst wern.",
+    "재료량은 비례해 조절됩니다. 오븐 온도, 팬 크기와 조리 시간은 따로 조절해야 할 수 있습니다.",
+    "Количество ингредиентов масштабируется пропорционально. Температуру духовки, размер формы и время готовки может потребоваться менять отдельно.",
+    "Las cantidades escalan proporcionalmente. Temperatura, tamaño del molde y tiempo de cocción pueden necesitar ajustes aparte.",
+    "Quantidades escalam proporcionalmente. Temperatura, tamanho da forma e tempo de preparo podem exigir ajustes separados."
+  ],
+  [
+    "Save recipe",
+    "Rezept speichern",
+    "Rezept speichern",
+    "레시피 저장",
+    "Сохранить рецепт",
+    "Guardar receta",
+    "Salvar receita"
+  ],
+  [
+    "New recipe",
+    "Neues Rezept",
+    "Neies Rezept",
+    "새 레시피",
+    "Новый рецепт",
+    "Nueva receta",
+    "Nova receita"
+  ],
+  [
+    "Storage is unavailable. Recipes stay available only for this session.",
+    "Speicher ist nicht verfügbar. Rezepte bleiben nur für diese Sitzung erhalten.",
+    "Speicher is ned verfügbar. Rezepte bleibn bloß für de Sitzung erhalten.",
+    "저장 공간을 사용할 수 없어 이번 세션에서만 레시피를 유지합니다.",
+    "Хранилище недоступно. Рецепты останутся только на эту сессию.",
+    "El almacenamiento no está disponible. Las recetas solo permanecen en esta sesión.",
+    "O armazenamento está indisponível. As receitas permanecem apenas nesta sessão."
+  ],
+  [
+    "Recipes are saved on this browser, separately for each account. Device sync comes later.",
+    "Rezepte werden in diesem Browser je Konto separat gespeichert. Gerätesynchronisierung kommt später.",
+    "Rezepte wern in dem Browser je Konto extra gspeichert. Gerätesynchronisierung kimmt später.",
+    "레시피는 이 브라우저에 계정별로 따로 저장됩니다. 기기 간 동기화는 나중에 제공됩니다.",
+    "Рецепты сохраняются в этом браузере отдельно для каждого аккаунта. Синхронизация появится позже.",
+    "Las recetas se guardan en este navegador por cuenta. La sincronización entre dispositivos llegará después.",
+    "Receitas ficam neste navegador separadamente por conta. A sincronização entre dispositivos virá depois."
+  ],
+  [
+    "Saved recipes",
+    "Gespeicherte Rezepte",
+    "Gspeicherte Rezepte",
+    "저장한 레시피",
+    "Сохранённые рецепты",
+    "Recetas guardadas",
+    "Receitas salvas"
+  ],
+  [
+    "Your saved recipes will appear here.",
+    "Deine gespeicherten Rezepte erscheinen hier.",
+    "Dei gspeichertn Rezepte erscheinen do.",
+    "저장한 레시피가 여기에 표시됩니다.",
+    "Здесь появятся сохранённые рецепты.",
+    "Tus recetas guardadas aparecerán aquí.",
+    "Suas receitas salvas aparecerão aqui."
+  ],
+  [
+    "Delete recipe",
+    "Rezept löschen",
+    "Rezept löschen",
+    "레시피 삭제",
+    "Удалить рецепт",
+    "Eliminar receta",
+    "Excluir receita"
+  ],
+  [
+    "Delete this saved recipe?",
+    "Dieses gespeicherte Rezept löschen?",
+    "Des gspeicherte Rezept löschen?",
+    "이 저장된 레시피를 삭제할까요?",
+    "Удалить этот сохранённый рецепт?",
+    "¿Eliminar esta receta guardada?",
+    "Excluir esta receita salva?"
+  ],
+  [
+    "Measurement",
+    "Messgröße",
+    "Messgröße",
+    "측정 종류",
+    "Величина",
+    "Magnitud",
+    "Grandeza"
+  ],
+  [
+    "Value",
+    "Wert",
+    "Wert",
+    "값",
+    "Значение",
+    "Valor",
+    "Valor"
+  ],
+  [
+    "From unit",
+    "Ausgangseinheit",
+    "Ausgangseinheit",
+    "원래 단위",
+    "Исходная единица",
+    "Unidad de origen",
+    "Unidade de origem"
+  ],
+  [
+    "To unit",
+    "Zieleinheit",
+    "Zieleinheit",
+    "목표 단위",
+    "Целевая единица",
+    "Unidad de destino",
+    "Unidade de destino"
+  ],
+  [
+    "Decimal places",
+    "Nachkommastellen",
+    "Nachkommastelln",
+    "소수 자릿수",
+    "Десятичные знаки",
+    "Decimales",
+    "Casas decimais"
+  ],
+  [
+    "Swap units",
+    "Einheiten tauschen",
+    "Einheiten tauschn",
+    "단위 바꾸기",
+    "Поменять единицы",
+    "Intercambiar unidades",
+    "Trocar unidades"
+  ],
+  [
+    "Enter a valid nonnegative measurement. Temperatures may be negative, but cannot be below absolute zero.",
+    "Gib eine gültige nichtnegative Messgröße ein. Temperaturen dürfen negativ sein, aber nicht unter dem absoluten Nullpunkt liegen.",
+    "Gib a gültige nednegative Messgröße ei. Temperaturen derfan negativ sei, aber ned unterm absoluten Nullpunkt liegn.",
+    "유효한 음수가 아닌 측정값을 입력하세요. 온도는 음수일 수 있지만 절대 영도 아래일 수 없습니다.",
+    "Введите допустимую неотрицательную величину. Температура может быть отрицательной, но не ниже абсолютного нуля.",
+    "Introduce una medida válida no negativa. Las temperaturas pueden ser negativas, pero no inferiores al cero absoluto.",
+    "Digite uma medida válida não negativa. Temperaturas podem ser negativas, mas não abaixo do zero absoluto."
+  ],
+  [
+    "Conversion method",
+    "Umrechnungsmethode",
+    "Umrechnungsmethode",
+    "변환 방법",
+    "Метод преобразования",
+    "Método de conversión",
+    "Método de conversão"
+  ],
+  [
+    "Displayed values are rounded. Calculations and the reverse check use full precision.",
+    "Angezeigte Werte sind gerundet. Rechnung und Gegenprobe nutzen volle Genauigkeit.",
+    "Ozeigte Werte san grundet. Rechnung und Gegenprob nehman volle Genauigkeit.",
+    "표시된 값은 반올림됩니다. 계산과 역변환 확인에는 전체 정밀도를 사용합니다.",
+    "Показанные значения округлены. Расчёт и обратная проверка используют полную точность.",
+    "Los valores mostrados están redondeados. El cálculo y la comprobación inversa usan toda la precisión.",
+    "Valores exibidos são arredondados. O cálculo e a verificação inversa usam precisão completa."
+  ],
+  [
+    "Decimal prefixes: 1 kB = 1,000 B. Binary prefixes: 1 KiB = 1,024 B. One byte contains eight bits.",
+    "Dezimalpräfixe: 1 kB = 1.000 B. Binärpräfixe: 1 KiB = 1.024 B. Ein Byte enthält acht Bits.",
+    "Dezimalpräfixe: 1 kB = 1.000 B. Binärpräfixe: 1 KiB = 1.024 B. A Byte enthält acht Bits.",
+    "10진 접두사: 1 kB = 1,000 B. 2진 접두사: 1 KiB = 1,024 B. 1바이트는 8비트입니다.",
+    "Десятичные приставки: 1 kB = 1 000 B. Двоичные: 1 KiB = 1 024 B. Байт содержит восемь битов.",
+    "Prefijos decimales: 1 kB = 1.000 B. Binarios: 1 KiB = 1.024 B. Un byte contiene ocho bits.",
+    "Prefixos decimais: 1 kB = 1.000 B. Binários: 1 KiB = 1.024 B. Um byte contém oito bits."
+  ],
+  [
+    "US gal and US fl oz are US liquid measures. Volume-to-mass conversion needs an ingredient density and is not included.",
+    "US gal und US fl oz sind US-Flüssigkeitsmaße. Die Umrechnung von Volumen in Masse erfordert die Zutatendichte und ist nicht enthalten.",
+    "US gal und US fl oz san US-Flüssigkeitsmaße. Vo Volumen auf Masse braucht ma de Zutatendichte; des is ned dabei.",
+    "US gal과 US fl oz는 미국 액량 단위입니다. 부피를 질량으로 변환하려면 재료의 밀도가 필요하며 여기에는 포함되지 않습니다.",
+    "US gal и US fl oz — американские жидкостные меры. Перевод объёма в массу требует плотности ингредиента и здесь не предусмотрен.",
+    "US gal y US fl oz son medidas líquidas estadounidenses. Convertir volumen a masa requiere la densidad del ingrediente y no se incluye.",
+    "US gal e US fl oz são medidas líquidas dos EUA. Converter volume em massa exige a densidade do ingrediente e não está incluído."
+  ],
+  [
+    "These are absolute temperatures. Temperature differences require a different calculation.",
+    "Dies sind absolute Temperaturen. Temperaturdifferenzen benötigen eine andere Rechnung.",
+    "Des san absolute Temperaturen. Temperaturunterschiede brauchen a andere Rechnung.",
+    "절대 온도의 변환입니다. 온도 차이는 다른 계산이 필요합니다.",
+    "Это абсолютные температуры. Разности температур требуют другого расчёта.",
+    "Estas son temperaturas absolutas. Las diferencias requieren otro cálculo.",
+    "Estas são temperaturas absolutas. Diferenças exigem outro cálculo."
+  ],
+  [
+    "Unit definitions: NIST",
+    "Einheitendefinitionen: NIST",
+    "Einheitendefinitionen: NIST",
+    "단위 정의: NIST",
+    "Определения единиц: NIST",
+    "Definiciones de unidades: NIST",
+    "Definições de unidades: NIST"
+  ],
+  [
+    "Binary prefixes: NIST",
+    "Binärpräfixe: NIST",
+    "Binärpräfixe: NIST",
+    "2진 접두사: NIST",
+    "Двоичные приставки: NIST",
+    "Prefijos binarios: NIST",
+    "Prefixos binários: NIST"
+  ],
+  [
+    "25% means 25 out of 100",
+    "25% bedeutet 25 von 100",
+    "25% hoaßt 25 vo 100",
+    "25%는 100개 중 25개입니다",
+    "25% означает 25 из 100",
+    "25% significa 25 de cada 100",
+    "25% significa 25 de cada 100"
+  ],
+  [
+    "25 of the 100 squares are filled.",
+    "25 der 100 Quadrate sind gefüllt.",
+    "25 vo de 100 Quadrate san gfüllt.",
+    "100개 정사각형 중 25개가 색칠되어 있습니다.",
+    "25 из 100 квадратов закрашены.",
+    "25 de los 100 cuadrados están rellenos.",
+    "25 dos 100 quadrados estão preenchidos."
+  ],
+  [
+    "Calculators & conversions",
+    "Rechner und Umrechnungen",
+    "Rechner und Umrechnungen",
+    "계산과 변환",
+    "Расчёты и преобразования",
+    "Cálculos y conversiones",
+    "Cálculos e conversões"
+  ],
+  [
+    "Food & fitness",
+    "Essen und Fitness",
+    "Essn und Fitness",
+    "음식과 운동",
+    "Питание и спорт",
+    "Comida y ejercicio",
+    "Comida e exercício"
+  ],
+  [
+    "Money & shared expenses",
+    "Geld und gemeinsame Ausgaben",
+    "Geld und gemeinsame Ausgabn",
+    "돈과 공동 지출",
+    "Деньги и общие расходы",
+    "Dinero y gastos compartidos",
+    "Dinheiro e despesas compartilhadas"
+  ],
+  [
+    "Planning & time",
+    "Planung und Zeit",
+    "Planung und Zeit",
+    "계획과 시간",
+    "Планирование и время",
+    "Planificación y tiempo",
+    "Planejamento e tempo"
+  ],
+  [
+    "All categories",
+    "Alle Kategorien",
+    "Olle Kategorien",
+    "모든 카테고리",
+    "Все категории",
+    "Todas las categorías",
+    "Todas as categorias"
+  ],
+  [
+    "Work and rest intervals",
+    "Belastungs- und Ruheintervalle",
+    "Trainings- und Ruheintervalle",
+    "운동과 휴식 구간",
+    "Интервалы нагрузки и отдыха",
+    "Intervalos de ejercicio y descanso",
+    "Intervalos de exercício e descanso"
+  ],
+  [
+    "Rounds and sound cues",
+    "Runden und Tonsignale",
+    "Rundn und Tonsignale",
+    "라운드와 소리 알림",
+    "Раунды и звуковые сигналы",
+    "Rondas y señales sonoras",
+    "Rodadas e sinais sonoros"
+  ],
+  [
+    "Saved workout routines",
+    "Gespeicherte Trainingspläne",
+    "Gspeicherte Trainingspläne",
+    "저장한 운동 루틴",
+    "Сохранённые тренировки",
+    "Rutinas guardadas",
+    "Rotinas salvas"
+  ],
+  [
+    "Equal and custom shares",
+    "Gleiche und individuelle Anteile",
+    "Gleiche und eigene Anteile",
+    "균등 및 맞춤 분할",
+    "Равные и произвольные доли",
+    "Partes iguales y personalizadas",
+    "Partes iguais e personalizadas"
+  ],
+  [
+    "Tips and rounding",
+    "Trinkgeld und Rundung",
+    "Trinkgeld und Rundung",
+    "팁과 반올림",
+    "Чаевые и округление",
+    "Propinas y redondeo",
+    "Gorjetas e arredondamento"
+  ],
+  [
+    "Groups, balances, and recorded repayments",
+    "Gruppen, Salden und erfasste Rückzahlungen",
+    "Gruppn, Salden und erfasste Rückzahlungen",
+    "그룹, 잔액과 상환 기록",
+    "Группы, балансы и записи возвратов",
+    "Grupos, saldos y pagos registrados",
+    "Grupos, saldos e pagamentos registrados"
+  ],
+  [
+    "Compare locations",
+    "Orte vergleichen",
+    "Orte vergleichen",
+    "장소 비교",
+    "Сравнение мест",
+    "Comparar lugares",
+    "Comparar locais"
+  ],
+  [
+    "Overlapping availability",
+    "Gemeinsame Verfügbarkeit",
+    "Gemeinsame Verfügbarkeit",
+    "겹치는 가능 시간",
+    "Общее доступное время",
+    "Disponibilidad coincidente",
+    "Disponibilidade em comum"
+  ],
+  [
+    "Dates and daylight-saving changes",
+    "Datums- und Sommerzeitwechsel",
+    "Datums- und Sommerzeitwechsel",
+    "날짜와 서머타임 변경",
+    "Даты и переходы на летнее время",
+    "Fechas y cambios de horario de verano",
+    "Datas e mudanças de horário de verão"
+  ],
+  [
+    "Plot and compare functions",
+    "Funktionen zeichnen und vergleichen",
+    "Funktionen zeichnen und vergleichen",
+    "함수 그리기와 비교",
+    "Построение и сравнение функций",
+    "Graficar y comparar funciones",
+    "Traçar e comparar funções"
+  ],
+  [
+    "Zoom and inspect graphs",
+    "Diagramme zoomen und untersuchen",
+    "Diagramme zoomen und oschaun",
+    "그래프 확대와 탐색",
+    "Масштабирование и изучение графиков",
+    "Ampliar y examinar gráficas",
+    "Ampliar e examinar gráficos"
+  ],
+  [
+    "Slope and area visualizations",
+    "Steigungs- und Flächenbilder",
+    "Steigungs- und Flächenbilder",
+    "기울기와 넓이 시각화",
+    "Визуализация наклонов и площадей",
+    "Visualizaciones de pendiente y área",
+    "Visualizações de inclinação e área"
+  ],
+  [
+    "Manual income and expenses",
+    "Manuelle Einnahmen und Ausgaben",
+    "Manuelle Einnahmen und Ausgabn",
+    "수입과 지출 직접 입력",
+    "Ручной ввод доходов и расходов",
+    "Ingresos y gastos manuales",
+    "Receitas e despesas manuais"
+  ],
+  [
+    "Categories and monthly totals",
+    "Kategorien und Monatssummen",
+    "Kategorien und Monatssummen",
+    "카테고리와 월 합계",
+    "Категории и месячные итоги",
+    "Categorías y totales mensuales",
+    "Categorias e totais mensais"
+  ],
+  [
+    "Recurring costs and export",
+    "Wiederkehrende Kosten und Export",
+    "Wiederkehrende Kostn und Export",
+    "반복 비용과 내보내기",
+    "Регулярные расходы и экспорт",
+    "Costes recurrentes y exportación",
+    "Custos recorrentes e exportação"
+  ],
+  [
+    "Recurring subscriptions",
+    "Laufende Abos",
+    "Laufende Abos",
+    "반복 구독",
+    "Регулярные подписки",
+    "Suscripciones recurrentes",
+    "Assinaturas recorrentes"
+  ],
+  [
+    "Renewal dates",
+    "Verlängerungstermine",
+    "Verlängerungstermine",
+    "갱신 날짜",
+    "Даты продления",
+    "Fechas de renovación",
+    "Datas de renovação"
+  ],
+  [
+    "Monthly and yearly cost overview",
+    "Monatliche und jährliche Kostenübersicht",
+    "Monatliche und jährliche Kostnübersicht",
+    "월·연 비용 개요",
+    "Обзор месячных и годовых расходов",
+    "Resumen mensual y anual de costes",
+    "Resumo mensal e anual de custos"
+  ],
+  [
+    "Manual food and portion entries",
+    "Manuelle Lebensmittel- und Portionseinträge",
+    "Manuelle Lebensmittel- und Portionseinträge",
+    "음식과 분량 직접 입력",
+    "Ручной ввод продуктов и порций",
+    "Entradas manuales de alimentos y porciones",
+    "Entradas manuais de alimentos e porções"
+  ],
+  [
+    "Reusable meals",
+    "Wiederverwendbare Mahlzeiten",
+    "Wiederverwendbare Mahlzeitn",
+    "재사용할 식단",
+    "Сохранённые блюда",
+    "Comidas reutilizables",
+    "Refeições reutilizáveis"
+  ],
+  [
+    "Daily history and export",
+    "Tagesverlauf und Export",
+    "Tagesverlauf und Export",
+    "일별 기록과 내보내기",
+    "История по дням и экспорт",
+    "Historial diario y exportación",
+    "Histórico diário e exportação"
+  ],
+  [
+    "Click a map location",
+    "Ort auf der Karte anklicken",
+    "Ort auf da Kartn oklickn",
+    "지도에서 장소 클릭",
+    "Выбор места на карте",
+    "Elegir un lugar en el mapa",
+    "Escolher um local no mapa"
+  ],
+  [
+    "Hourly forecasts",
+    "Stündliche Vorhersagen",
+    "Stündliche Vorhersagn",
+    "시간별 예보",
+    "Почасовой прогноз",
+    "Pronóstico por horas",
+    "Previsão por hora"
+  ],
+  [
+    "Favorite places and comparisons",
+    "Lieblingsorte und Vergleiche",
+    "Lieblingsorte und Vergleiche",
+    "즐겨찾는 장소와 비교",
+    "Избранные места и сравнение",
+    "Lugares favoritos y comparaciones",
+    "Locais favoritos e comparações"
+  ],
+  [
+    "Tasks, start times, and durations",
+    "Aufgaben, Startzeiten und Dauer",
+    "Aufgabn, Startzeitn und Dauer",
+    "할 일, 시작 시간과 소요 시간",
+    "Задачи, время начала и длительность",
+    "Tareas, horas de inicio y duración",
+    "Tarefas, horários de início e duração"
+  ],
+  [
+    "Daily timeline and scheduling conflicts",
+    "Tagesablauf und Terminkonflikte",
+    "Tagesablauf und Terminkonflikte",
+    "하루 일정과 시간 충돌",
+    "Дневная шкала и конфликты расписания",
+    "Cronología diaria y conflictos",
+    "Linha do tempo diária e conflitos"
+  ],
+  [
+    "Optional reminders",
+    "Optionale Erinnerungen",
+    "Optionale Erinnerungen",
+    "선택형 알림",
+    "Необязательные напоминания",
+    "Recordatorios opcionales",
+    "Lembretes opcionais"
+  ],
+  [
+    "Recipe saved.",
+    "Rezept gespeichert.",
+    "Rezept gspeichert.",
+    "레시피를 저장했습니다.",
+    "Рецепт сохранён.",
+    "Receta guardada.",
+    "Receita salva."
+  ],
+  [
+    "Could not save. Check the recipe or the limit of 50 saved recipes.",
+    "Speichern nicht möglich. Prüfe das Rezept oder die Grenze von 50 gespeicherten Rezepten.",
+    "Speichern geht ned. Prüaf's Rezept oder de Grenz vo 50 gspeichertn Rezepten.",
+    "저장하지 못했습니다. 레시피와 저장 한도 50개를 확인하세요.",
+    "Не удалось сохранить. Проверьте рецепт и лимит в 50 сохранённых рецептов.",
+    "No se pudo guardar. Revisa la receta o el límite de 50 recetas guardadas.",
+    "Não foi possível salvar. Confira a receita ou o limite de 50 receitas salvas."
+  ],
+  [
+    "Amount saved",
+    "Ersparnis",
+    "Ersparnis",
+    "할인액",
+    "Экономия",
+    "Ahorro",
+    "Economia"
+  ],
+  [
+    "Combined discount (%)",
+    "Gesamtrabatt (%)",
+    "Gesamtrabatt (%)",
+    "전체 할인율 (%)",
+    "Общая скидка (%)",
+    "Descuento combinado (%)",
+    "Desconto combinado (%)"
+  ],
+  [
+    "VAT amount",
+    "Mehrwertsteuerbetrag",
+    "Mehrwertsteuerbetrag",
+    "부가세액",
+    "Сумма НДС",
+    "Importe del IVA",
+    "Valor do IVA"
+  ],
+  [
+    "Relative change (%)",
+    "Relative Änderung (%)",
+    "Relative Änderung (%)",
+    "상대 변화율 (%)",
+    "Относительное изменение (%)",
+    "Cambio relativo (%)",
+    "Variação relativa (%)"
+  ],
+  [
+    "Total change",
+    "Gesamtänderung",
+    "Gesamtänderung",
+    "총 변화량",
+    "Общее изменение",
+    "Cambio total",
+    "Variação total"
+  ],
+  [
+    "Total with tip",
+    "Summe mit Trinkgeld",
+    "Summe mit Trinkgeld",
+    "팁 포함 총액",
+    "Итог с чаевыми",
+    "Total con propina",
+    "Total com gorjeta"
+  ],
+  [
+    "Serving change (%)",
+    "Portionsänderung (%)",
+    "Portionsänderung (%)",
+    "인분 변화율 (%)",
+    "Изменение порций (%)",
+    "Cambio de porciones (%)",
+    "Variação de porções (%)"
+  ]
+]

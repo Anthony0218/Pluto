@@ -10,7 +10,7 @@ import CommunityShowcase from "../../components/App/CommunityShowcase";
 export default function LandingPage() {
   useUiLanguage();
   return (
-    <main>
+    <MotionConfig reducedMotion="user"><LazyMotion features={domAnimation} strict><main>
       <LandingHero />
 
       <FeatureSection
@@ -69,6 +69,7 @@ export default function LandingPage() {
       >
         <CommunityShowcase />
       </FeatureSection>
-    </main>
+    </main></LazyMotion></MotionConfig>
   );
 }
+import { domAnimation, LazyMotion, MotionConfig } from "motion/react";

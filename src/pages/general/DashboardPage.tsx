@@ -11,6 +11,7 @@ import DidYouKnowCarousel from "@/components/App/dashboard/DidYouKnowCarousel";
 import DashboardActionRow, { DashboardContentGrid } from "@/components/App/dashboard/DashboardActionRow";
 import DailyQuestsCard from "@/components/App/dashboard/DailyQuestsCard";
 import LearnSomethingNew from "@/components/App/dashboard/LearnSomethingNew";
+import ToolShortcuts from "@/components/App/dashboard/ToolShortcuts";
 import DashboardFriendDialog from "@/components/App/dashboard/DashboardFriendDialog";
 import "@/components/App/dashboard/dashboard.css";
 
@@ -62,6 +63,7 @@ function Dashboard() {
           { id: "quests", label: "Daily quests", content: <DailyQuestsCard quests={activity?.quests} loading={loading} unavailable={activityError} signedIn={!!user} /> },
           { id: "discover", label: "Did you know?", content: <DidYouKnowCarousel /> },
           { id: "learning", label: "Continue learning", content: <LearnSomethingNew /> },
+          { id: "tools", label: "Your apps", content: <ToolShortcuts /> },
         ]} />
       </div>
     </div>

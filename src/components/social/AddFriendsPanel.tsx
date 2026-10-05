@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { supabase } from "@/lib/supabase";
+import { sendFriendRequest } from "@/data/friendRequests";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import type { PublicProfile } from "@/types/social";
 import FriendAvatar from "./FriendAvatar";
@@ -33,7 +34,7 @@ export default function AddFriendsPanel() {
   async function add(id: string) {
     if (!user || busyId) return;
     setBusyId(id);
-    const { error } = await supabase.from("friend_requests").insert({ sender_id: user.id, receiver_id: id, status: "pending" });
+    const { error } = await sendFriendRequest(supabase, user.id, id);
     if (!error || error.code === "23505") { setSent(current => [...current, id]); setStatus(error ? "A request has already been sent." : "Friend request sent."); }
     else setStatus(error.message);
     setBusyId(null);

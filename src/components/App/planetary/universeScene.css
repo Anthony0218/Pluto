@@ -1,0 +1,115 @@
+.landing-universe {
+  position: relative; isolation: isolate; width: 100%; max-width: 740px;
+  justify-self: center; min-width: 0; overflow: hidden; border: 1px solid #728ac730;
+  border-radius: 24px; background: #080e20;
+  box-shadow: 0 24px 70px #02051255, inset 0 1px #cbd7ff0a;
+}
+.universe-background { position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0; transition: opacity .3s ease-out; }
+.universe-background--games { background: radial-gradient(ellipse at 55% 55%, #6553b523, transparent 65%), radial-gradient(ellipse at 90% 10%, #315ca91c, transparent 50%); }
+.universe-background--tools { background: radial-gradient(ellipse at 55% 55%, #2093ac23, transparent 65%), radial-gradient(ellipse at 90% 10%, #4879e51c, transparent 50%); }
+.universe-background--learn { background: radial-gradient(ellipse at 55% 55%, #a67b4720, transparent 65%), radial-gradient(ellipse at 90% 10%, #7062b81c, transparent 50%); }
+.landing-universe[data-category="games"] .universe-background--games,
+.landing-universe[data-category="tools"] .universe-background--tools,
+.landing-universe[data-category="learn"] .universe-background--learn { opacity: 1; }
+.universe-header { position: relative; z-index: 3; padding: 22px 18px 0; text-align: center; }
+.universe-tabs { position: relative; isolation: isolate; display: flex; width: fit-content; max-width: 100%; gap: 3px; margin: auto; padding: 5px; border: 1px solid #a7b6e426; border-radius: 15px; background: #162039e6; }
+@supports (backdrop-filter: blur(12px)) { .universe-tabs { background: #18213ad9; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); } }
+.universe-tab { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 9px 18px; border-radius: 10px; color: #aab6d2; font-size: 13px; font-weight: 600; cursor: pointer; transition: color .15s ease-out; }
+.universe-tab svg { flex-shrink: 0; }
+.universe-tab:hover { color: #f1f4ff; }
+.universe-tab[data-active] { color: #f1f4ff; }
+.universe-tab-indicator { position: absolute; z-index: 0; left: var(--active-tab-left); top: var(--active-tab-top); width: var(--active-tab-width); height: var(--active-tab-height); border: 1px solid #b7b9ff2e; border-radius: 10px; background: #374366; box-shadow: inset 0 1px #d8deff0a, 0 2px 6px #0002; transition: left .2s cubic-bezier(.22, 1, .36, 1), width .2s cubic-bezier(.22, 1, .36, 1); }
+.landing-universe :is(a, button):focus-visible { outline: 2px solid #b8b3ff; outline-offset: 4px; }
+.universe-caption { min-height: 42px; margin-top: 12px; color: #a8b5d2; font-size: 13px; line-height: 1.6; }
+.universe-stage { position: relative; height: 438px; margin: 0 14px; }
+.universe-stage .solar-stars { opacity: .3; mask-image: radial-gradient(ellipse, #000 10%, transparent 80%); }
+.universe-stage .solar-orbits { opacity: .42; pointer-events: none; }
+.universe-stage .solar-orbits::before { left: 0; top: 10%; width: 100%; height: 74%; border-color: #727bca38; box-shadow: none; }
+.universe-stage .solar-orbits::after { left: 8%; top: 13%; width: 86%; height: 76%; border-color: #727bca2b; box-shadow: none; transform: rotate(30deg); }
+.universe-panel { position: absolute; inset: 0; transition: opacity .16s ease-out, transform .2s ease-out; }
+.universe-panel[data-ending-style] { opacity: 0; transform: translateY(-5px); pointer-events: none; }
+.universe-panel[data-starting-style] { opacity: .3; }
+.universe-panel[hidden] { display: none; }
+.universe-panel:focus-visible { outline: 2px solid #b8b3ff; outline-offset: -2px; border-radius: 12px; }
+.universe-grid { display: grid; height: 100%; position: relative; min-width: 0; }
+.universe-grid--games { grid-template-columns: repeat(12, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); padding: 8px 6px 20px; }
+.universe-grid--tools, .universe-grid--learn { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 12px 24px; padding: 4px 28px 22px; }
+.universe-object { min-width: 0; display: flex; justify-content: center; align-items: center; }
+.universe-object.solar-planet { --planet-size: 68px; padding: 0; }
+.universe-object.solar-planet--primary { --planet-size: 104px; }
+.universe-item { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 44px; min-width: 0; max-width: 100%; padding: 7px 4px; border-radius: 12px; text-align: center; color: #e9edfc; text-decoration: none; }
+.universe-art-wrap { display: block; flex: none; margin-bottom: 12px; }
+.universe-label { display: block; max-width: 170px; font-size: 13px; line-height: 1.4; font-weight: 600; overflow-wrap: anywhere; }
+.solar-planet--primary .universe-label { font-size: 14px; }
+.universe-status { display: inline-block; margin-top: 4px; color: #95a3c7; font-size: 10px; line-height: 1.4; }
+.universe-object .solar-atmosphere { opacity: .2; }
+.universe-object .solar-sphere { box-shadow: inset -15px -15px 24px #03091baa, inset 3px 3px 12px #fff5, 0 0 0 1px #ffffff40, 0 0 18px #6573b820, 0 10px 22px #0005; }
+.universe-object .solar-ring { border-width: 2px; opacity: .75; box-shadow: 0 0 8px #8390e02a; }
+.universe-object .solar-symbol { text-shadow: 0 3px 4px #030815, 0 0 9px #8573cb55; }
+.universe-app { position: relative; isolation: isolate; display: grid; place-items: center; width: 92px; height: 92px; overflow: hidden; border-radius: 25px; border: 1px solid color-mix(in srgb, var(--app-accent), transparent 55%); background: linear-gradient(145deg, color-mix(in srgb, var(--app-accent) 24%, #18213c), #101b31); color: var(--app-accent); box-shadow: inset 0 2px 1px #fff2, inset 0 -3px 8px #0003, 0 14px 24px #0004; }
+.universe-app-shine { position: absolute; inset: 0; z-index: -1; background: radial-gradient(circle at 18% 6%, #fff2, transparent 62%); }
+.universe-app--number-system-converter { background: repeating-linear-gradient(0deg, #a3d7ff05 0 1px, transparent 1px 9px), linear-gradient(145deg, #193b58, #122035); }
+.universe-app--unit-converter { border-radius: 24px 24px 34px 24px; }
+.universe-app--recipe-scaler { background: radial-gradient(circle at 20% 10%, #f4bb7028, transparent 70%), #2c2024; }
+.universe-book { position: relative; display: block; width: 112px; height: 138px; transform-style: preserve-3d; transform: perspective(700px) rotateY(-15deg) rotateZ(-7deg); }
+.universe-book-pages { position: absolute; inset: 3px -5px -2px 8px; border-radius: 2px 5px 5px 2px; background: repeating-linear-gradient(0deg, #ede4cd 0 1px, #bfb6a5 1px 2px, #f5eedf 2px 4px); border-bottom: 3px solid #484a60; box-shadow: 7px 13px 24px #0006; }
+.universe-book-cover { position: absolute; inset: 0; overflow: hidden; border-radius: 2px 5px 5px 2px; border: 1px solid #d6deff28; padding: 12px 11px 10px 17px; background: #182b46; color: #daecff; box-shadow: inset 1px 0 #fff3, inset -1px 0 #0004; }
+.universe-book-spine { position: absolute; inset: 0 auto 0 0; width: 8px; border-radius: 2px 0 0 2px; background: linear-gradient(90deg, #0003, #ffffff0d 65%, #0002); border-right: 1px solid #0002; }
+.universe-book-imprint { position: relative; z-index: 1; display: block; font-size: 7px; line-height: 1; letter-spacing: .2em; opacity: .75; }
+.universe-book-illustration { position: relative; display: grid; place-items: center; height: 48px; margin-block: 4px; }
+.universe-book-title { position: relative; z-index: 1; display: block; font-size: 12px; line-height: 1.2; font-weight: 650; hyphens: auto; overflow-wrap: anywhere; }
+.universe-book-rule { display: block; width: 18px; height: 2px; margin-top: 9px; background: currentColor; opacity: .6; }
+.universe-book--math .universe-book-cover { background: repeating-linear-gradient(0deg, transparent 0 12px, #9cecff0c 12px 13px), repeating-linear-gradient(90deg, transparent 0 12px, #9cecff0c 12px 13px), #153144; color: #a9e7eb; }
+.universe-book--math .universe-book-illustration { justify-items: start; }
+.universe-book--math .universe-book-illustration::after { content: ""; position: absolute; right: 0; top: 8px; width: 22px; height: 22px; border: 1px solid #9fe6ed88; border-radius: 50%; }
+.universe-book--percentages { transform: perspective(700px) rotateY(-12deg) rotateZ(6deg); }
+.universe-book--percentages .universe-book-cover { background: linear-gradient(160deg, #ee925d 0 36%, #eee1c6 36%); color: #442d24; }
+.universe-book--percentages .universe-book-illustration > svg { display: none; }
+.universe-book-percent { font-size: 44px; font-weight: 850; line-height: 1; letter-spacing: -.06em; }
+.universe-book--percentages .universe-book-title { font-weight: 800; letter-spacing: -.025em; }
+.universe-book--guides { transform: perspective(700px) rotateY(-18deg) rotateZ(-3deg); }
+.universe-book--guides .universe-book-cover { background: repeating-linear-gradient(45deg, #ffffff03 0 1px, transparent 1px 3px), #173c32; color: #e5ce9a; border: 1px solid #d3b67966; padding: 14px 14px 9px 18px; }
+.universe-book--guides .universe-book-cover::after { content: ""; position: absolute; inset: 6px 5px 6px 11px; border: 1px solid #d3b67955; pointer-events: none; }
+.universe-book--guides .universe-book-title { font-family: Georgia, serif; font-size: 15px; font-weight: 500; text-align: center; }
+.universe-book--guides .universe-book-imprint { text-align: center; }
+.universe-book--guides .universe-book-rule { margin-inline: auto; }
+.universe-book--analysis { transform: perspective(700px) rotateY(-10deg) rotateZ(5deg); }
+.universe-book--analysis .universe-book-cover { background: linear-gradient(145deg, #493764, #211b3e); color: #e4d9fd; }
+.universe-book--analysis .universe-book-illustration { border-bottom: 1px solid #e4d9fd55; justify-items: end; }
+.universe-book--analysis .universe-book-illustration::before { content: ""; position: absolute; left: -10px; bottom: 2px; width: 14px; height: 25px; background: #9b8ce63b; box-shadow: 18px -7px #9b8ce627, 36px -15px #9b8ce616; transform: skewY(-15deg); }
+.universe-book--analysis .universe-book-title { font-family: ui-monospace, monospace; font-size: 11px; font-weight: 500; line-height: 1.35; }
+.universe-book--analysis .universe-book-rule { width: 100%; height: 1px; }
+.universe-footer { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 17px 24px; border-top: 1px solid #92a5d31a; background: #080e2066; }
+.universe-brand { position: relative; color: #b4c1e3; font-size: 13px; font-weight: 750; letter-spacing: .18em; }
+.universe-brand-orbit { position: absolute; right: -9px; top: -5px; width: 21px; height: 21px; border: 1px solid #b4c1e366; border-radius: 50%; transform: rotate(-30deg) scaleY(.45); }
+.universe-footer a { display: inline-flex; align-items: center; gap: 8px; min-height: 32px; color: #adbdf0; font-size: 12px; font-weight: 500; border-radius: 4px; transition: color .15s; }
+.universe-footer a:hover { color: #e9edff; }
+@media (max-width: 1200px) and (min-width: 1024px) {
+  .universe-stage { margin-inline: 8px; }
+  .universe-object.solar-planet--primary { --planet-size: 88px; }
+  .universe-label { font-size: 12px; }
+  .universe-grid--tools, .universe-grid--learn { column-gap: 12px; padding-inline: 16px; }
+}
+@media (max-width: 620px) {
+  .landing-universe { border-radius: 20px; }
+  .universe-header { padding: 18px 12px 0; }
+  .universe-tab { padding-inline: 13px; gap: 6px; }
+  .universe-stage { height: 470px; margin-inline: 10px; }
+  .universe-grid--games { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(0, 1fr)); gap: 3px 8px; padding: 5px 10px 12px; }
+  .universe-grid--games .universe-object { grid-area: auto; }
+  .universe-object.solar-planet { --planet-size: 57px; }
+  .universe-object.solar-planet--primary { --planet-size: 65px; }
+  .solar-planet--primary .universe-label, .universe-label { font-size: 12px; }
+  .universe-art-wrap { margin-bottom: 9px; }
+  .universe-grid--tools, .universe-grid--learn { gap: 18px 12px; padding: 14px 8px 35px; }
+  .universe-grid--tools .universe-label { max-width: 140px; }
+  .universe-footer { padding: 12px 18px; }
+}
+@media (max-width: 430px) {
+  .universe-tab { padding-inline: 12px; font-size: 12px; }
+  .universe-tab svg { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-universe *, .landing-universe *::before, .landing-universe *::after { transition: none !important; animation: none !important; }
+  .universe-panel[data-ending-style] { transform: none; }
+}

@@ -11,11 +11,12 @@ import {
   Trophy,
   Heart,
   FileText,
+  Grid2X2,
 } from "lucide-react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { games } from "../../data/games";
-import { learningResources } from "../../data/navigation";
+import { learningSubjects, subjectRoute } from "@/data/learningCatalog";
 import ThemeToggle from "./ThemeToggle";
 
 const links = [
@@ -26,14 +27,12 @@ const links = [
   { label: "Leaderboards", href: "/leaderboards", icon: Trophy },
 ];
 const sidebarGames = ["chess", "watten", "schafkopf", "go", "eat-it", "atlas-arena", "natura"].flatMap(slug => games.filter(game => game.route === `/games/${slug}`));
-const sidebarLessons = ["Chess Puzzles", "Chess Analysis", "Chess rules", "Go Rules", "Go Analysis", "Schafkopfen Rules"].flatMap((title) =>
-  learningResources.filter((resource) => resource.title === title),
-);
 
 export default function SideBar({ onNavigate }: { onNavigate: () => void }) {
   useUiLanguage();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   return (
     <div className="flex h-full flex-col bg-[#080d1c] text-white">
       <nav
@@ -57,10 +56,11 @@ export default function SideBar({ onNavigate }: { onNavigate: () => void }) {
           <summary className="flex cursor-pointer list-none items-center gap-3 px-3 py-3 text-sm font-medium text-zinc-300 marker:content-none hover:text-white"><Gamepad2 size={18} />{ui("Games")}<ChevronRight size={16} className="ml-auto transition-transform group-open:rotate-90" /></summary>
           <div className="border-t border-white/[0.06] p-1.5">{sidebarGames.map((game) => <Link key={game.route} to={game.route} onClick={onNavigate} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-zinc-400 hover:bg-white/5 hover:text-white"><CornerDownRight size={13} aria-hidden />{ui(game.title)}</Link>)}</div>
         </details>
-        <details className="group rounded-xl border border-white/[0.06] bg-white/[0.025]">
+        <details open={pathname.startsWith("/learn")} className="group rounded-xl border border-white/[0.06] bg-white/[0.025]">
           <summary className="flex cursor-pointer list-none items-center gap-3 px-3 py-3 text-sm font-medium text-zinc-300 marker:content-none hover:text-white"><BookOpen size={18} />{ui("Learn")}<ChevronRight size={16} className="ml-auto transition-transform group-open:rotate-90" /></summary>
-          <div className="border-t border-white/[0.06] p-1.5">{sidebarLessons.map((resource) => <Link key={resource.route} to={resource.route} onClick={onNavigate} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-zinc-400 hover:bg-white/5 hover:text-white"><CornerDownRight size={13} aria-hidden />{ui(resource.title)}</Link>)}</div>
+          <div className="border-t border-white/[0.06] p-1.5"><Link to="/learn" onClick={onNavigate} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-indigo-200 hover:bg-white/5">{ui("All subjects")}</Link>{learningSubjects.map(subject => <NavLink key={subject.id} to={subjectRoute(subject.id)} onClick={onNavigate} className={({ isActive }) => `flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-white/5 ${isActive ? "text-indigo-200" : "text-zinc-400 hover:text-white"}`}><CornerDownRight size={13} aria-hidden />{ui(subject.title)}</NavLink>)}</div>
         </details>
+        <NavLink to="/tools" onClick={onNavigate} className={({ isActive }) => `flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium ${isActive ? "bg-indigo-500/15 text-indigo-200" : "text-zinc-300 hover:bg-white/5"}`}><Grid2X2 size={18} />{ui("Tools")}</NavLink>
         {links.slice(1).map(({ label, href, icon: Icon }) => (
           <NavLink
             key={href}

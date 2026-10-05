@@ -1,0 +1,39 @@
+.pt-workbench { padding: 28px; border: 1px solid #8e83c73d; border-radius: 18px; background: #10162bef; margin-bottom: 26px; color: #cbd5e8; }
+.pt-inputs { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; margin-bottom: 22px; }
+.pt-workbench label { display: grid; gap: 9px; font-size: 13px; color: #cbd5e8; min-width: 0; }
+.pt-workbench input, .pt-workbench select { width: 100%; min-width: 0; padding: 12px; border: 1px solid #8290bc4b; border-radius: 9px; background: #1a2238; color: #edf0ff; font-size: 15px; }
+.pt-workbench select option { background: #1a2238; }
+.pt-workbench input:focus-visible, .pt-workbench select:focus-visible, .pt-bits button:focus-visible { outline: 2px solid #c4b5fd; outline-offset: 3px; }
+.pt-workbench input[aria-invalid=true] { border-color: #fda4af; }
+.pt-result { background: #ada0ff0b; padding: 22px; border: 1px solid #b8aaff38; border-radius: 13px; margin: 22px 0; min-width: 0; }
+.pt-result p { margin: 10px 0; line-height: 1.8; font-size: 13px; }
+.pt-output { display: block; font-size: clamp(25px,4vw,38px); color: #ede9fe; font-weight: 650; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.pt-error { color: #fda4af; }
+.pt-working { margin-top: 25px; line-height: 1.9; font-size: 13px; }
+.pt-working h3 { color: #eae5ff; font-size: 17px; font-weight: 600; margin-bottom: 12px; }
+.pt-working ol { list-style: decimal; padding-left: 22px; }
+.pt-working code, .pt-mono { font-family: monospace; overflow-wrap: anywhere; }
+.pt-percent-bar { height: 15px; border-radius: 8px; border: 1px solid #a0a9c63b; overflow: hidden; background: #202943; margin-top: 18px; }
+.pt-percent-bar span { height: 100%; display: block; background: #a99bea; transition: width .15s; }
+.pt-base-results { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
+.pt-base-results .pt-result { margin: 0; }
+.pt-base-results h3 { color: #aaaec8; font-size: 12px; margin-bottom: 10px; }
+.pt-base-results output { font-family: monospace; overflow-wrap: anywhere; color: #e5e7ff; font-size: 20px; }
+.pt-bits { display: grid; grid-template-columns: repeat(8,minmax(0,1fr)); gap: 8px; margin-top: 15px; }
+.pt-bits button { min-width: 0; border: 1px solid #8794bc4b; border-radius: 8px; padding: 7px 3px; background: #202943; color: #a6b1cb; display: grid; gap: 4px; }
+.pt-bits button[aria-pressed=true] { color: #ede9fe; background: #7864ba55; border-color: #c4b5fd; }
+.pt-bits small { font-size: 10px; }
+.pt-bits strong { font-size: 20px; }
+.pt-ingredients fieldset { padding: 17px; border: 1px solid #8794bc3b; border-radius: 10px; margin-bottom: 16px; display: grid; grid-template-columns: minmax(0,2fr) repeat(2,minmax(0,1fr)); gap: 13px; min-width: 0; }
+.pt-ingredients legend { color: #c4b5fd; font-size: 12px; padding: 0 6px; }
+.pt-ingredients fieldset > button { justify-self: start; grid-column: 1/-1; }
+.pt-scaled-list li { display: flex; justify-content: space-between; gap: 18px; padding: 12px 0; border-bottom: 1px solid #7888ac28; overflow-wrap: anywhere; }
+.pt-actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 22px 0; }
+.pt-saved-recipes li { padding: 13px 0; border-bottom: 1px solid #7888ac28; display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; }
+.pt-saved-recipes li > div { width: 100%; }
+.pct-hundred { display: grid; grid-template-columns: repeat(10,minmax(0,1fr)); gap: 5px; max-width: 340px; margin: 20px 0; }
+.pct-hundred i { display: block; aspect-ratio: 1; border-radius: 4px; background: #2b3450; }
+.pct-hundred i.filled { background: #b4a4f4; }
+@media(max-width:720px) { .pt-workbench { padding:20px; } .pt-ingredients fieldset { grid-template-columns: repeat(2,minmax(0,1fr)); } .pt-ingredients label:first-of-type { grid-column:1/-1; } }
+@media(max-width:440px) { .pt-workbench { padding:16px; } .pt-inputs, .pt-base-results { grid-template-columns: minmax(0,1fr); } .pt-bits { grid-template-columns:repeat(4,minmax(0,1fr)); } .pt-result { padding:16px; } .pt-ingredients fieldset { padding:12px; } .pt-scaled-list li { flex-wrap:wrap; gap:8px; } }
+@media(prefers-reduced-motion:reduce) { .pt-percent-bar span { transition:none; } }

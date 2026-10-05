@@ -1,4 +1,6 @@
 import { ui, useUiLanguage } from "@/i18n/ui";
+import * as m from "motion/react-m";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 import type { ReactNode } from "react";
 
 import { ArrowRight } from "lucide-react";
@@ -32,6 +34,7 @@ export default function FeatureSection({
   reverse = Number(index) % 2 === 1,
 }: FeatureSectionProps) {
   useUiLanguage();
+  const reducedMotion = useReducedMotion();
   return (
     <section
       className="
@@ -48,7 +51,11 @@ export default function FeatureSection({
         xl:py-40
       "
     >
-      <div
+      <m.div
+        initial={reducedMotion ? false : { opacity: .75, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: .15 }}
+        transition={{ duration: reducedMotion ? 0 : .4, ease: [.22, 1, .36, 1] }}
         className="
           mx-auto
 
@@ -198,7 +205,7 @@ export default function FeatureSection({
 
         {/* SHOWCASE */}
         <div className={reverse ? "lg:col-start-1 lg:row-start-1" : "lg:col-start-2 lg:row-start-1"}>{children}</div>
-      </div>
+      </m.div>
     </section>
   );
 }
