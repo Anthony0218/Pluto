@@ -1,0 +1,27 @@
+.dm-results { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 20px 0; }
+.dm-results > div { padding: 14px; border: 1px solid #7585b12d; background: #172037; border-radius: 10px; min-width: 0; }
+.dm-results dt { font-size: 12px; line-height: 1.6; color: #a7b3ca; }
+.dm-results dd { margin-top: 7px; color: #e9e3ff; font-size: 20px; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.dm-diagram { display: block; width: 100%; max-width: 320px; margin: auto; }
+.dm-sequence { width: 100%; height: auto; margin-top: 20px; }
+.mf-activity figure figcaption { color: #b9c5dc; font-size: 12px; line-height: 1.8; text-align: center; }
+.dm-original { color: #c4b5fd; }
+.dm-result { color: #6ee7b7; }
+.dm-table-wrap { overflow-x: auto; }
+.dm-table { width: 100%; margin-top: 20px; border-collapse: collapse; font-size: 13px; color: #c8d2e8; }
+.dm-table caption { text-align: left; margin-bottom: 12px; color: #a7b3ca; }
+.dm-table th, .dm-table td { padding: 12px; border: 1px solid #7585b140; text-align: left; }
+.dm-data-label { display: block; margin-top: 20px; font-size: 13px; line-height: 1.8; color: #c8d2e8; }
+.dm-data-input { display: block; width: 100%; padding: 12px; margin-top: 10px; border: 1px solid #7585b155; border-radius: 10px; background: #172037; color: #edf0ff; font-size: 16px; resize: vertical; }
+.dm-data-input[aria-invalid=true] { border-color: #fca5a5; }
+.learning-tools-page textarea:focus-visible { outline: 2px solid #c4b5fd; outline-offset: 4px; }
+.dm-bars { display: grid; gap: 8px; margin: 20px 0; }
+.dm-bars > div { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 7px 12px; background: #172037; font-size: 12px; border-radius: 5px; min-height: 30px; overflow: hidden; }
+.dm-bars i { position: absolute; height: 100%; left: 0; top: 0; background: #a5b4fc40; }
+.dm-bars span, .dm-bars strong { position: relative; }
+.dm-chart-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
+.dm-chart-pair svg { width: 100%; height: auto; }
+.lt-everyday-case { border-color: #fcd34d40; background: #fcd34d06; }
+.lt-everyday-case h3 { color: #f8dda0; }
+.lt-everyday-case .mf-notation { font-variant-numeric: tabular-nums; overflow-wrap: anywhere; color: #f5e8ca; }
+@media (max-width: 440px) { .dm-results { grid-template-columns: minmax(0, 1fr); } .dm-results dd { font-size: 18px; } .dm-table th, .dm-table td { padding: 8px; } }

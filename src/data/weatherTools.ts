@@ -1,0 +1,25 @@
+import { validZone } from './lifeTools.ts';
+export type WeatherPlace = { id: string; name: string; latitude: number; longitude: number };
+export type WeatherHour = { at: number; temperature: number | null; rainChance: number | null; precipitation: number | null; wind: number | null; code: number | null };
+export type WeatherForecast = { zone: string; fetchedAt: number; hours: WeatherHour[] };
+const record = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
+export const validCoordinates = (latitude: unknown, longitude: unknown): boolean => typeof latitude === 'number' && Number.isFinite(latitude) && Math.abs(latitude) <= 90 && typeof longitude === 'number' && Number.isFinite(longitude) && Math.abs(longitude) <= 180;
+export const validWeatherPlace = (v: unknown): v is WeatherPlace => record(v) && typeof v.id === 'string' && /^[a-zA-Z0-9-]{1,80}$/.test(v.id) && typeof v.name === 'string' && !!v.name.trim() && v.name.length <= 100 && validCoordinates(v.latitude, v.longitude);
+export function mapCoordinates(x: number, y: number) { return { latitude: Math.round((90 - Math.max(0, Math.min(1, y)) * 180) * 1000) / 1000, longitude: Math.round((Math.max(0, Math.min(1, x)) * 360 - 180) * 1000) / 1000 }; }
+export function forecastUrl(place: WeatherPlace) { if (!validWeatherPlace(place)) throw Error('Invalid coordinates'); const url = new URL('https://api.open-meteo.com/v1/forecast'); url.search = new URLSearchParams({ latitude: String(place.latitude), longitude: String(place.longitude), hourly: 'temperature_2m,precipitation_probability,precipitation,wind_speed_10m,weather_code', timezone: 'auto', timeformat: 'unixtime', forecast_days: '3', temperature_unit: 'celsius', wind_speed_unit: 'kmh', precipitation_unit: 'mm' }).toString(); return url.toString(); }
+export function parseForecast(data: unknown, fetchedAt = Date.now()): WeatherForecast {
+  if (!record(data) || !validZone(data.timezone) || !record(data.hourly) || !record(data.hourly_units)) throw Error('Invalid forecast');
+  const h = data.hourly, units = data.hourly_units;
+  if (units.time !== 'unixtime' || units.temperature_2m !== '°C' || units.wind_speed_10m !== 'km/h' || units.precipitation !== 'mm' || units.precipitation_probability !== '%') throw Error('Unexpected units');
+  const fields = ['time', 'temperature_2m', 'precipitation_probability', 'precipitation', 'wind_speed_10m', 'weather_code'];
+  const times = h.time; if (!Array.isArray(times) || times.length < 1 || times.length > 96 || fields.some(key => !Array.isArray(h[key]) || h[key].length !== times.length)) throw Error('Invalid hourly data');
+  const value = (key: string, i: number, min: number, max: number) => { const n = (h[key] as unknown[])[i]; if (n === null) return null; if (typeof n !== 'number' || !Number.isFinite(n) || n < min || n > max) throw Error('Invalid weather value'); return n; };
+  const hours = times.map((t, i) => { if (typeof t !== 'number' || !Number.isSafeInteger(t) || t < 0 || t > 4102444800 || i > 0 && t <= times[i - 1]) throw Error('Invalid time'); return { at: t * 1000, temperature: value('temperature_2m', i, -100, 70), rainChance: value('precipitation_probability', i, 0, 100), precipitation: value('precipitation', i, 0, 1000), wind: value('wind_speed_10m', i, 0, 500), code: value('weather_code', i, 0, 99) }; });
+  return { zone: data.timezone, fetchedAt, hours };
+}
+export function parsePlaces(data: unknown): WeatherPlace[] { if (!record(data) || data.results === undefined) return []; if (!Array.isArray(data.results)) throw Error('Invalid search'); return data.results.slice(0, 10).flatMap((p: unknown) => { if (!record(p)) return []; const place = { id: `city-${p.id}`, name: [p.name, p.admin1, p.country].filter((v, i, list) => typeof v === 'string' && v && list.indexOf(v) === i).join(', ').slice(0, 100), latitude: p.latitude, longitude: p.longitude }; return validWeatherPlace(place) ? [place] : []; }); }
+export async function fetchWeatherJson(url: string, signal: AbortSignal, fetcher: typeof fetch = fetch): Promise<unknown> {
+  const response = await fetcher(url, { signal: AbortSignal.any([signal, AbortSignal.timeout(12000)]) }); if (!response.ok) throw Error('Weather request failed'); const text = await response.text(); if (text.length > 300000) throw Error('Response too large'); return JSON.parse(text);
+}
+export const weatherLabels = ['Clear sky', 'Partly cloudy', 'Overcast', 'Fog', 'Drizzle', 'Rain', 'Snow', 'Showers', 'Thunderstorm', 'Unavailable'] as const;
+export function weatherLabel(code: number | null): typeof weatherLabels[number] { if (code === null) return 'Unavailable'; if (code === 0) return 'Clear sky'; if (code <= 2) return 'Partly cloudy'; if (code === 3) return 'Overcast'; if ([45, 48].includes(code)) return 'Fog'; if ([51, 53, 55, 56, 57].includes(code)) return 'Drizzle'; if ([61, 63, 65, 66, 67].includes(code)) return 'Rain'; if ([71, 73, 75, 77, 85, 86].includes(code)) return 'Snow'; if ([80, 81, 82].includes(code)) return 'Showers'; if ([95, 96, 99].includes(code)) return 'Thunderstorm'; return 'Unavailable'; }

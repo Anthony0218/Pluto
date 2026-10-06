@@ -18,6 +18,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [passwordRecovery, setPasswordRecovery] = useState(false);
 
   const userId = user?.id;
   const currentUserId = useRef<string | null>(null);
@@ -75,6 +76,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (event === "INITIAL_SESSION" && liveAuthEventReceived) return;
       if (event !== "INITIAL_SESSION") liveAuthEventReceived = true;
       authEventReceived = true;
+      if (event === "PASSWORD_RECOVERY" && session?.user) setPasswordRecovery(true);
+      if (event === "SIGNED_OUT") setPasswordRecovery(false);
       applyUser(session?.user ?? null);
     });
     return () => {
@@ -177,6 +180,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         profile,
         loading,
+        passwordRecovery,
+        finishPasswordRecovery: () => setPasswordRecovery(false),
         refreshProfile,
         signUp,
         signIn,

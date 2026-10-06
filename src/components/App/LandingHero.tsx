@@ -1,15 +1,16 @@
 import { ArrowRight } from "lucide-react";
 import * as m from "motion/react-m";
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import PlanetScene from "./planetary/PlanetScene";
-import { universeCategories, type UniverseCategory } from "./planetary/universeCatalog";
+import { universeCategories } from "./planetary/universeCatalog";
+import { useLanding } from "./landing/landingContext";
+import ReturningStrip from "./landing/ReturningStrip";
 import { landingCopy } from "./planetary/landingCopy";
 
 export default function LandingHero() {
   const { language } = useUiLanguage();
-  const [category, setCategory] = useState<UniverseCategory>("games");
+  const { category, setCategory } = useLanding();
   const selected = universeCategories.find(item => item.id === category)!;
   return <section className="relative overflow-hidden border-b border-white/10 bg-[#080d1c] text-white">
     <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_72%_35%,rgba(75,85,190,.17),transparent_52%)]" />
@@ -22,8 +23,11 @@ export default function LandingHero() {
           <m.div className="max-w-full" whileTap={{ scale: .98 }} transition={{ duration: .15 }}>
             <Link to={selected.route} className="inline-flex min-h-12 min-w-[240px] max-w-full items-center justify-between gap-4 rounded-xl bg-indigo-500 px-6 py-3 font-bold text-white transition-colors hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-indigo-300">{category === "tools" ? landingCopy(language, "exploreTools") : ui(selected.action)}<ArrowRight size={18} className="shrink-0" aria-hidden="true" /></Link>
           </m.div>
-          <Link to="/dashboard" className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-zinc-300 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-indigo-300">{ui("Home")}<ArrowRight size={15} aria-hidden="true" /></Link>
+          <m.div className="max-w-full" whileTap={{ scale: .98 }} transition={{ duration: .15 }}>
+            <Link to="/dashboard" className="inline-flex min-h-12 min-w-[240px] max-w-full items-center justify-between gap-4 rounded-xl bg-violet-500 px-6 py-3 font-bold text-white transition-colors hover:bg-violet-400 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-300">{ui("Home")}<ArrowRight size={18} className="shrink-0" aria-hidden="true" /></Link>
+          </m.div>
         </div>
+        <ReturningStrip />
       </div>
       <PlanetScene category={category} onCategoryChange={setCategory} />
     </div>

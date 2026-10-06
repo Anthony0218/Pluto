@@ -214,6 +214,7 @@ export default function Auth() {
                   {busy ? ui("Please wait...") : isRegistering ? ui("Create Account") : ui("Login")}
                 </button>
               </form>
+              {!isRegistering && <Link to="/login?mode=forgot" className="mt-4 inline-block text-sm font-bold text-emerald-300 hover:underline">{ui("Forgot password?")}</Link>}
 
               <button
                 type="button"

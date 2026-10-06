@@ -2,7 +2,7 @@ import type { LearningLesson } from "./learningCatalog.ts";
 import type { PaperProblem } from "./paperArithmetic.ts";
 
 export type FoundationId = "addition-subtraction" | "multiplication-division" | "negative-numbers" | "fractions-decimals" | "order-of-operations" | "estimation-checks";
-export type MathExercise = { id: string; prompt: string; answer: string; hint: string; solution: string; verification: string; paper?: PaperProblem };
+export type MathExercise = { id: string; prompt: string; answer: string; hint: string; solution: string; verification: string; notation?: string; paper?: PaperProblem };
 export type FoundationActivity = { id: FoundationId; example: { problem: string; steps: string[]; verification: string }; practice: MathExercise[]; checks: MathExercise[] };
 const exercise = (id: string, prompt: string, answer: string, hint: string, solution: string, verification: string): MathExercise => ({ id, prompt, answer, hint, solution, verification });
 

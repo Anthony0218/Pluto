@@ -1,0 +1,1739 @@
+[
+  [
+    "In everyday life",
+    "Im Alltag",
+    "Im Alltag",
+    "일상에서",
+    "В повседневной жизни",
+    "En la vida cotidiana",
+    "No dia a dia"
+  ],
+  [
+    "Find the requested value.",
+    "Bestimme den gesuchten Wert.",
+    "Find den gsuachten Wert.",
+    "요구한 값을 구하세요.",
+    "Найдите указанное значение.",
+    "Calcula el valor solicitado.",
+    "Calcule o valor solicitado."
+  ],
+  [
+    "Predict, change, and compare",
+    "Vorhersagen, verändern und vergleichen",
+    "Vorhersagn, ändern und vergleichen",
+    "예측하고 바꾸고 비교하기",
+    "Предскажите, измените и сравните",
+    "Predice, cambia y compara",
+    "Preveja, altere e compare"
+  ],
+  [
+    "Change one input at a time. Compare the result with the formula and check the assumptions.",
+    "Verändere jeweils eine Eingabe. Vergleiche das Ergebnis mit der Formel und prüfe die Annahmen.",
+    "Änder oane Eingab nach da andern. Vergleich s Ergebnis mit da Formel und prüf de Annahmen.",
+    "입력을 하나씩 바꾸세요. 결과를 공식과 비교하고 가정을 확인하세요.",
+    "Меняйте по одному входному значению. Сравнивайте результат с формулой и проверяйте предположения.",
+    "Cambia una entrada cada vez. Compara el resultado con la fórmula y comprueba los supuestos.",
+    "Altere uma entrada por vez. Compare o resultado com a fórmula e confira as hipóteses."
+  ],
+  [
+    "A vector records a size and a direction. In two dimensions, its coordinates describe horizontal and vertical displacement.",
+    "Ein Vektor beschreibt Größe und Richtung. In zwei Dimensionen geben seine Koordinaten horizontale und vertikale Verschiebung an.",
+    "A Vektor beschreibt Größ und Richtung. In zwoa Dimensionen gebn seine Koordinaten de waagrechte und senkrechte Verschiebung an.",
+    "벡터는 크기와 방향을 나타냅니다. 이차원 좌표는 수평 및 수직 변위를 나타냅니다.",
+    "Вектор задаёт величину и направление. В двух измерениях его координаты описывают горизонтальное и вертикальное перемещение.",
+    "Un vector indica magnitud y dirección. En dos dimensiones, sus coordenadas describen el desplazamiento horizontal y vertical.",
+    "Um vetor indica magnitude e direção. Em duas dimensões, suas coordenadas descrevem o deslocamento horizontal e vertical."
+  ],
+  [
+    "Add vectors coordinate by coordinate. Multiplying by a scalar scales both coordinates; a negative scalar reverses direction. Length is √(x² + y²).",
+    "Addiere Vektoren koordinatenweise. Ein Skalar skaliert beide Koordinaten; ein negativer kehrt die Richtung um. Die Länge ist √(x² + y²).",
+    "Addier Vektoren Koordinate für Koordinate. A Skalar skaliert beide; a negativer dreht de Richtung um. De Läng is √(x² + y²).",
+    "벡터는 좌표별로 더합니다. 스칼라를 곱하면 두 좌표가 배율만큼 변하고, 음수이면 방향이 뒤집힙니다. 길이는 √(x² + y²)입니다.",
+    "Складывайте векторы покоординатно. Скаляр масштабирует обе координаты; отрицательный меняет направление. Длина равна √(x² + y²).",
+    "Suma los vectores coordenada a coordenada. Un escalar multiplica ambas; uno negativo invierte la dirección. La longitud es √(x² + y²).",
+    "Some vetores coordenada a coordenada. Um escalar multiplica ambas; um negativo inverte a direção. O comprimento é √(x² + y²)."
+  ],
+  [
+    "Walking distance can exceed displacement. Returning to your starting point gives zero displacement, even after a long walk.",
+    "Die Gehstrecke kann länger als die Verschiebung sein. Zurück am Start ist die Verschiebung null, auch nach einem langen Spaziergang.",
+    "De Gehstreck kann länger als de Verschiebung sein. Zruck am Start is de Verschiebung null, aa nach am langen Spaziergang.",
+    "걸은 거리는 변위보다 클 수 있습니다. 오래 걸어도 출발점으로 돌아오면 변위는 0입니다.",
+    "Пройденный путь может превышать перемещение. При возвращении к началу перемещение равно нулю даже после долгой прогулки.",
+    "La distancia recorrida puede superar el desplazamiento. Al volver al inicio, el desplazamiento es cero, incluso tras una larga caminata.",
+    "A distância percorrida pode superar o deslocamento. Ao voltar ao início, o deslocamento é zero, mesmo após uma longa caminhada."
+  ],
+  [
+    "A matrix organizes numbers in rows and columns. Multiplying a matrix by a vector forms a weighted sum for each output coordinate.",
+    "Eine Matrix ordnet Zahlen in Zeilen und Spalten. Die Multiplikation mit einem Vektor bildet für jede Ausgabekoordinate eine gewichtete Summe.",
+    "A Matrix ordnet Zahlen in Zeilen und Spalten. Beim Multipliziern mit am Vektor entsteht für jede Ausgabekoordinate a gewichtete Summe.",
+    "행렬은 수를 행과 열로 정리합니다. 행렬과 벡터의 곱은 각 출력 좌표에 대한 가중합을 만듭니다.",
+    "Матрица располагает числа по строкам и столбцам. Умножение на вектор даёт взвешенную сумму для каждой выходной координаты.",
+    "Una matriz organiza números en filas y columnas. Multiplicarla por un vector forma una suma ponderada para cada coordenada de salida.",
+    "Uma matriz organiza números em linhas e colunas. Multiplicá-la por um vetor forma uma soma ponderada para cada coordenada de saída."
+  ],
+  [
+    "For a two by two matrix, the determinant is ad − bc. A nonzero determinant gives an inverse; matrix multiplication usually depends on order.",
+    "Bei einer 2×2-Matrix ist die Determinante ad − bc. Ist sie ungleich null, existiert eine Inverse; die Reihenfolge der Matrixmultiplikation ist meist entscheidend.",
+    "Bei a 2×2-Matrix is de Determinante ad − bc. Is sie ned null, gibt’s a Inverse; de Reihenfolg beim Multipliziern is meist entscheidend.",
+    "2×2 행렬의 행렬식은 ad − bc입니다. 0이 아니면 역행렬이 존재하며, 행렬 곱은 일반적으로 순서에 따라 달라집니다.",
+    "Для матрицы 2×2 определитель равен ad − bc. Ненулевой определитель означает наличие обратной матрицы; порядок умножения обычно важен.",
+    "En una matriz 2×2, el determinante es ad − bc. Si no es cero, existe inversa; el orden de la multiplicación suele importar.",
+    "Em uma matriz 2×2, o determinante é ad − bc. Se não for zero, existe inversa; a ordem da multiplicação geralmente importa."
+  ],
+  [
+    "Check dimensions before multiplying. A matrix that collapses a plane to a line loses information and has no inverse.",
+    "Prüfe vor der Multiplikation die Dimensionen. Eine Matrix, die eine Ebene auf eine Linie reduziert, verliert Information und hat keine Inverse.",
+    "Prüf vorm Multipliziern de Dimensionen. A Matrix, de a Ebene auf a Linie zammstaucht, verliert Information und hat koa Inverse.",
+    "곱하기 전에 차원을 확인하세요. 평면을 직선으로 축소하는 행렬은 정보를 잃으므로 역행렬이 없습니다.",
+    "Перед умножением проверьте размерности. Матрица, сжимающая плоскость в линию, теряет информацию и не имеет обратной.",
+    "Comprueba las dimensiones antes de multiplicar. Una matriz que reduce un plano a una línea pierde información y no tiene inversa.",
+    "Confira as dimensões antes de multiplicar. Uma matriz que reduz um plano a uma linha perde informação e não tem inversa."
+  ],
+  [
+    "A linear system asks for values satisfying several equations at once. Elimination combines equations to remove an unknown.",
+    "Ein lineares Gleichungssystem sucht Werte, die mehrere Gleichungen gleichzeitig erfüllen. Elimination kombiniert Gleichungen, um eine Unbekannte zu entfernen.",
+    "A lineares Gleichungssystem sucht Werte, de mehrere Gleichungen auf oamoi erfülln. Elimination kombiniert Gleichungen und entfernt a Unbekannte.",
+    "연립일차방정식은 여러 식을 동시에 만족하는 값을 찾습니다. 소거법은 식들을 결합해 미지수 하나를 없앱니다.",
+    "Линейная система ищет значения, удовлетворяющие нескольким уравнениям одновременно. Исключение объединяет уравнения, убирая неизвестную.",
+    "Un sistema lineal busca valores que satisfagan varias ecuaciones a la vez. La eliminación combina ecuaciones para quitar una incógnita.",
+    "Um sistema linear busca valores que satisfaçam várias equações ao mesmo tempo. A eliminação combina equações para remover uma incógnita."
+  ],
+  [
+    "In two dimensions, intersecting lines give one solution. Parallel distinct lines give none; coincident lines give infinitely many.",
+    "In zwei Dimensionen liefern sich schneidende Geraden eine Lösung. Verschiedene parallele Geraden liefern keine, identische Geraden unendlich viele.",
+    "In zwoa Dimensionen gebn sich schneidende Geraden oa Lösung. Verschiedene parallele Geraden gebn koane, gleiche Geraden unendlich vui.",
+    "이차원에서 교차하는 두 직선은 해가 하나입니다. 서로 다른 평행선은 해가 없고, 일치하는 직선은 무한히 많습니다.",
+    "На плоскости пересекающиеся прямые дают одно решение. Различные параллельные — ни одного; совпадающие — бесконечно много.",
+    "En dos dimensiones, las rectas que se cruzan dan una solución. Las paralelas distintas no dan ninguna; las coincidentes dan infinitas.",
+    "Em duas dimensões, retas que se cruzam dão uma solução. Paralelas distintas não dão nenhuma; coincidentes dão infinitas."
+  ],
+  [
+    "A zero determinant does not distinguish no solutions from infinitely many. Check whether the equations and right-hand sides agree.",
+    "Eine Determinante von null unterscheidet nicht zwischen keiner und unendlich vielen Lösungen. Prüfe Gleichungen und rechte Seiten auf Übereinstimmung.",
+    "A Determinante von null unterscheidet ned zwischen koana und unendlich vui Lösungen. Prüf, ob de Gleichungen und rechten Seiten zamm passen.",
+    "행렬식이 0이라는 사실만으로 해가 없는지 무한히 많은지 알 수 없습니다. 방정식과 우변의 일관성을 확인하세요.",
+    "Нулевой определитель не различает отсутствие решений и их бесконечность. Проверьте согласованность уравнений и правых частей.",
+    "Un determinante cero no distingue entre ninguna solución e infinitas. Comprueba la coherencia de las ecuaciones y sus términos independientes.",
+    "Um determinante zero não distingue entre nenhuma solução e infinitas. Confira a coerência das equações e dos termos independentes."
+  ],
+  [
+    "Matrices can rotate, reflect, scale, or shear coordinates. A linear transformation always sends the origin to the origin.",
+    "Matrizen können Koordinaten drehen, spiegeln, skalieren oder scheren. Eine lineare Transformation bildet den Ursprung immer auf den Ursprung ab.",
+    "Matrizen können Koordinaten drehn, spiegeln, skaliern oder schern. A lineare Transformation bildet den Ursprung immer auf den Ursprung ab.",
+    "행렬은 좌표를 회전, 반사, 확대하거나 전단 변환할 수 있습니다. 선형변환은 항상 원점을 원점으로 보냅니다.",
+    "Матрицы могут поворачивать, отражать, масштабировать или сдвигать координаты сдвигом-срезом. Линейное преобразование всегда переводит начало координат в себя.",
+    "Las matrices pueden rotar, reflejar, escalar o cizallar coordenadas. Una transformación lineal siempre lleva el origen al origen.",
+    "Matrizes podem girar, refletir, escalar ou cisalhar coordenadas. Uma transformação linear sempre leva a origem à origem."
+  ],
+  [
+    "Apply the rightmost matrix first when composing transformations. A translation needs an added vector and is not linear unless it is zero.",
+    "Bei zusammengesetzten Transformationen wirkt die rechte Matrix zuerst. Eine Verschiebung benötigt einen addierten Vektor und ist nur bei Nullverschiebung linear.",
+    "Bei zammgsetzten Transformationen wirkt de rechte Matrix zuerst. A Verschiebung braucht an addierten Vektor und is nur bei null linear.",
+    "변환을 합성할 때 가장 오른쪽 행렬을 먼저 적용하세요. 평행이동은 벡터를 더해야 하며, 이동량이 0일 때만 선형입니다.",
+    "При композиции первой применяется крайняя правая матрица. Перенос требует добавления вектора и линеен только при нулевом сдвиге.",
+    "Al componer transformaciones, aplica primero la matriz de la derecha. Una traslación requiere sumar un vector y solo es lineal si es nula.",
+    "Ao compor transformações, aplique primeiro a matriz da direita. Uma translação exige somar um vetor e só é linear se for nula."
+  ],
+  [
+    "Rotations preserve length; stretches generally do not. Test the origin and basis vectors to check a linear transformation.",
+    "Drehungen erhalten die Länge; Streckungen im Allgemeinen nicht. Prüfe eine lineare Transformation am Ursprung und an den Basisvektoren.",
+    "Drehungen erhaltn de Läng; Streckungen meistens ned. Prüf a lineare Transformation am Ursprung und an de Basisvektoren.",
+    "회전은 길이를 보존하지만 확대는 일반적으로 보존하지 않습니다. 원점과 기저벡터로 선형변환을 확인하세요.",
+    "Повороты сохраняют длину, растяжения обычно нет. Проверьте линейное преобразование на начале координат и базисных векторах.",
+    "Las rotaciones conservan la longitud; los estiramientos generalmente no. Comprueba una transformación lineal con el origen y los vectores de base.",
+    "Rotações preservam o comprimento; alongamentos geralmente não. Confira uma transformação linear com a origem e os vetores da base."
+  ],
+  [
+    "An eigenvector is a nonzero vector satisfying Av = λv. Its direction stays on the same line; the eigenvalue gives its scale factor.",
+    "Ein Eigenvektor ist ein Vektor ungleich null mit Av = λv. Seine Richtung bleibt auf derselben Geraden; der Eigenwert gibt den Skalierungsfaktor an.",
+    "A Eigenvektor is a Vektor ungleich null mit Av = λv. Sei Richtung bleibt auf derselben Geraden; da Eigenwert gibt den Skalierungsfaktor an.",
+    "고유벡터는 Av = λv를 만족하는 0이 아닌 벡터입니다. 방향은 같은 직선 위에 남으며 고유값은 배율을 나타냅니다.",
+    "Собственный вектор — ненулевой вектор, удовлетворяющий Av = λv. Он остаётся на той же прямой; собственное значение задаёт масштаб.",
+    "Un vector propio es un vector no nulo que cumple Av = λv. Permanece en la misma recta; el valor propio da su factor de escala.",
+    "Um autovetor é um vetor não nulo que satisfaz Av = λv. Permanece na mesma reta; o autovalor dá seu fator de escala."
+  ],
+  [
+    "Repeated transformations multiply that vector by λ each time. A zero eigenvalue collapses it; a negative eigenvalue reverses it. Real eigenvectors need not exist.",
+    "Wiederholte Transformationen multiplizieren den Vektor jedes Mal mit λ. Bei λ = 0 wird er null; negatives λ kehrt ihn um. Reelle Eigenvektoren müssen nicht existieren.",
+    "Wiederholte Transformationen multipliziern den Vektor jedes Moi mit λ. Bei null wird er null, bei negativem λ dreht er sich um. Reelle Eigenvektoren müssen ned existiern.",
+    "반복 변환은 매번 이 벡터에 λ를 곱합니다. 고유값이 0이면 영벡터가 되고 음수이면 방향이 뒤집힙니다. 실수 고유벡터가 없을 수도 있습니다.",
+    "Повторные преобразования каждый раз умножают вектор на λ. Нулевое значение обнуляет его; отрицательное меняет направление. Вещественных собственных векторов может не быть.",
+    "Las transformaciones repetidas multiplican el vector por λ cada vez. Un valor cero lo anula; uno negativo lo invierte. Puede no haber vectores propios reales.",
+    "Transformações repetidas multiplicam o vetor por λ a cada vez. Um valor zero o anula; um negativo o inverte. Pode não haver autovetores reais."
+  ],
+  [
+    "The zero vector is never an eigenvector. A quarter-turn in the plane has no real eigenvector, despite preserving every length.",
+    "Der Nullvektor ist nie ein Eigenvektor. Eine Vierteldrehung in der Ebene hat keine reellen Eigenvektoren, obwohl sie alle Längen erhält.",
+    "Da Nullvektor is nie a Eigenvektor. A Vierteldrehung in da Ebene hat koane reellen Eigenvektoren, obwohl sie alle Längen erhält.",
+    "영벡터는 고유벡터가 아닙니다. 평면에서 90도 회전은 모든 길이를 보존하지만 실수 고유벡터가 없습니다.",
+    "Нулевой вектор не является собственным. Поворот плоскости на четверть оборота сохраняет длины, но не имеет вещественных собственных векторов.",
+    "El vector cero nunca es propio. Un cuarto de vuelta en el plano no tiene vectores propios reales, aunque conserve todas las longitudes.",
+    "O vetor zero nunca é um autovetor. Um quarto de volta no plano não tem autovetores reais, embora preserve todos os comprimentos."
+  ],
+  [
+    "The residual r = Ax − b measures how far a proposed solution misses each equation. An exact solution has zero residual.",
+    "Das Residuum r = Ax − b misst die Abweichung eines Lösungsvorschlags in jeder Gleichung. Eine exakte Lösung hat Residuum null.",
+    "Des Residuum r = Ax − b misst, wie weit a Lösungsvorschlag bei jeder Gleichung danebenliegt. Bei a exakten Lösung is es null.",
+    "잔차 r = Ax − b는 제안한 해가 각 방정식에서 얼마나 벗어나는지 측정합니다. 정확한 해의 잔차는 0입니다.",
+    "Невязка r = Ax − b измеряет отклонение предложенного решения в каждом уравнении. У точного решения невязка нулевая.",
+    "El residuo r = Ax − b mide cuánto se desvía una solución propuesta en cada ecuación. Una solución exacta tiene residuo cero.",
+    "O resíduo r = Ax − b mede quanto uma solução proposta se desvia em cada equação. Uma solução exata tem resíduo zero."
+  ],
+  [
+    "A small numerical residual need not mean a small solution error. Nearly dependent equations can amplify tiny changes in the data.",
+    "Ein kleines numerisches Residuum bedeutet nicht unbedingt einen kleinen Lösungsfehler. Fast abhängige Gleichungen können kleine Datenänderungen verstärken.",
+    "A kloans numerisches Residuum heißt ned unbedingt a kloana Lösungsfehler. Fast abhängige Gleichungen können winzige Datenänderungen verstärken.",
+    "작은 수치 잔차가 해의 오차도 작다는 뜻은 아닙니다. 거의 종속인 식들은 데이터의 작은 변화를 크게 증폭할 수 있습니다.",
+    "Малая численная невязка не обязательно означает малую ошибку решения. Почти зависимые уравнения могут усиливать небольшие изменения данных.",
+    "Un residuo numérico pequeño no garantiza un error pequeño en la solución. Ecuaciones casi dependientes pueden amplificar pequeños cambios en los datos.",
+    "Um resíduo numérico pequeno não garante um erro pequeno na solução. Equações quase dependentes podem amplificar pequenas mudanças nos dados."
+  ],
+  [
+    "Substitute into every original equation. Rounding a displayed solution can introduce a residual even when the calculation was correct.",
+    "Setze in jede ursprüngliche Gleichung ein. Rundung der angezeigten Lösung kann auch bei korrekter Rechnung ein Residuum erzeugen.",
+    "Setz in jede ursprüngliche Gleichung ein. Rundung von da angezeigten Lösung kann aa bei richtiger Rechnung a Residuum erzeugen.",
+    "모든 원래 방정식에 대입하세요. 계산이 정확해도 표시된 해를 반올림하면 잔차가 생길 수 있습니다.",
+    "Подставьте в каждое исходное уравнение. Округление отображённого решения может дать невязку даже при правильном расчёте.",
+    "Sustituye en cada ecuación original. Redondear la solución mostrada puede introducir un residuo incluso si el cálculo es correcto.",
+    "Substitua em cada equação original. Arredondar a solução exibida pode introduzir um resíduo mesmo com o cálculo correto."
+  ],
+  [
+    "A limit describes what outputs approach as inputs approach a point. The value at that point can differ from the limit or be undefined.",
+    "Ein Grenzwert beschreibt, welchem Wert die Ausgaben nahe einem Punkt zustreben. Der Wert am Punkt kann abweichen oder undefiniert sein.",
+    "A Grenzwert beschreibt, welchem Wert de Ausgaben nahe am Punkt zustreben. Da Wert am Punkt kann anders oder undefiniert sein.",
+    "극한은 입력이 한 점에 다가갈 때 출력이 접근하는 값을 뜻합니다. 그 점에서의 함수값은 극한과 다르거나 정의되지 않을 수 있습니다.",
+    "Предел описывает, к чему стремятся выходные значения при приближении к точке. Значение в самой точке может отличаться или быть не определено.",
+    "Un límite describe a qué se acercan las salidas al aproximarse a un punto. El valor en ese punto puede ser distinto o no estar definido.",
+    "Um limite descreve a que as saídas se aproximam quando a entrada se aproxima de um ponto. O valor nesse ponto pode ser diferente ou indefinido."
+  ],
+  [
+    "Continuity at a point requires a defined value, an existing limit, and equality between them. Left and right limits must agree.",
+    "Stetigkeit an einem Punkt verlangt einen definierten Wert, einen existierenden Grenzwert und deren Gleichheit. Links- und rechtsseitige Grenzwerte müssen übereinstimmen.",
+    "Stetigkeit am Punkt braucht an definierten Wert, an existierenden Grenzwert und Gleichheit zwischen de zwoa. Links und rechts müssen de Grenzwerte gleich sein.",
+    "한 점에서 연속이려면 함수값과 극한이 존재하고 서로 같아야 합니다. 좌극한과 우극한도 같아야 합니다.",
+    "Непрерывность в точке требует определённого значения, существующего предела и их равенства. Левый и правый пределы должны совпадать.",
+    "La continuidad en un punto exige un valor definido, un límite existente y que ambos sean iguales. Los límites laterales deben coincidir.",
+    "A continuidade em um ponto exige um valor definido, um limite existente e a igualdade entre eles. Os limites laterais devem coincidir."
+  ],
+  [
+    "A graph can suggest a limit but cannot prove it. A removable hole can have a limit without a function value.",
+    "Ein Graph kann einen Grenzwert nahelegen, aber nicht beweisen. An einer hebbaren Lücke kann ein Grenzwert ohne Funktionswert existieren.",
+    "A Graph kann an Grenzwert nahelegn, aber ned beweisen. An a hebbaren Lücke kann’s an Grenzwert ohne Funktionswert gebn.",
+    "그래프는 극한을 짐작하게 하지만 증명하지는 못합니다. 제거 가능한 구멍에서는 함수값이 없어도 극한이 존재할 수 있습니다.",
+    "График может подсказать предел, но не доказать его. В устранимой дырке предел может существовать без значения функции.",
+    "Una gráfica puede sugerir un límite, pero no demostrarlo. Un hueco removible puede tener límite sin valor de la función.",
+    "Um gráfico pode sugerir um limite, mas não prová-lo. Um furo removível pode ter limite sem valor da função."
+  ],
+  [
+    "A sequence is an ordered list indexed by positive integers. Convergence means every sufficiently late term lies within any chosen positive distance of a limit.",
+    "Eine Folge ist eine durch positive ganze Zahlen indizierte Liste. Konvergenz heißt, dass alle ausreichend späten Glieder innerhalb jedes gewählten positiven Abstands zum Grenzwert liegen.",
+    "A Folge is a Liste mit positiven ganzen Zahlen als Index. Konvergenz heißt, dass alle genügend späten Glieder in jedem gwählten positiven Abstand zum Grenzwert liegn.",
+    "수열은 양의 정수로 순서를 매긴 목록입니다. 수렴한다는 것은 충분히 뒤의 모든 항이 극한과 임의의 양의 거리 이내에 있다는 뜻입니다.",
+    "Последовательность — упорядоченный список с положительными целыми индексами. Сходимость означает, что все достаточно поздние члены лежат на любом заданном положительном расстоянии от предела.",
+    "Una sucesión es una lista ordenada con índices enteros positivos. Converge si todos los términos suficientemente avanzados quedan a cualquier distancia positiva elegida del límite.",
+    "Uma sequência é uma lista ordenada com índices inteiros positivos. Converge se todos os termos suficientemente avançados ficam a qualquer distância positiva escolhida do limite."
+  ],
+  [
+    "Being bounded alone does not imply convergence. A monotone bounded real sequence converges, although finding its limit still needs reasoning.",
+    "Beschränktheit allein bedeutet keine Konvergenz. Eine monotone beschränkte reelle Folge konvergiert; ihren Grenzwert zu bestimmen verlangt weitere Überlegungen.",
+    "Beschränktheit alloa heißt koa Konvergenz. A monotone beschränkte reelle Folge konvergiert; ihren Grenzwert zu finden braucht no Überlegungen.",
+    "유계라는 것만으로 수렴하지는 않습니다. 단조이고 유계인 실수 수열은 수렴하지만, 극한을 구하려면 추가 논리가 필요합니다.",
+    "Ограниченность сама по себе не означает сходимость. Монотонная ограниченная вещественная последовательность сходится, но нахождение предела требует рассуждений.",
+    "Estar acotada no implica convergencia. Una sucesión real monótona y acotada converge, aunque hallar su límite requiere razonamiento.",
+    "Ser limitada não implica convergência. Uma sequência real monótona e limitada converge, mas encontrar seu limite exige raciocínio."
+  ],
+  [
+    "The bounded sequence (−1)ⁿ alternates forever. A long list of close terms alone does not establish convergence.",
+    "Die beschränkte Folge (−1)ⁿ wechselt unbegrenzt hin und her. Eine lange Liste nah beieinanderliegender Glieder beweist keine Konvergenz.",
+    "De beschränkte Folge (−1)ⁿ wechselt ewig hin und her. A lange Liste nah beieinander liegender Glieder beweist koa Konvergenz.",
+    "유계 수열 (−1)ⁿ은 계속 번갈아 변합니다. 가까운 항이 많이 나왔다고 수렴이 증명되지는 않습니다.",
+    "Ограниченная последовательность (−1)ⁿ чередуется бесконечно. Длинный список близких членов сам по себе не доказывает сходимость.",
+    "La sucesión acotada (−1)ⁿ alterna indefinidamente. Una larga lista de términos cercanos no demuestra convergencia.",
+    "A sequência limitada (−1)ⁿ alterna indefinidamente. Uma longa lista de termos próximos não demonstra convergência."
+  ],
+  [
+    "A series adds the terms of a sequence. It converges when its partial sums approach a finite limit; terms approaching zero are necessary but not sufficient.",
+    "Eine Reihe addiert die Glieder einer Folge. Sie konvergiert, wenn ihre Partialsummen einen endlichen Grenzwert haben; Glieder gegen null sind notwendig, aber nicht hinreichend.",
+    "A Reihe addiert de Glieder von a Folge. Sie konvergiert, wenn de Teilsummen an endlichen Grenzwert habn; Glieder gegen null san nötig, aber reichen ned.",
+    "급수는 수열의 항을 더합니다. 부분합이 유한한 극한으로 가면 수렴합니다. 항이 0으로 가는 것은 필요하지만 충분하지는 않습니다.",
+    "Ряд складывает члены последовательности. Он сходится, если частичные суммы стремятся к конечному пределу; стремление членов к нулю необходимо, но недостаточно.",
+    "Una serie suma los términos de una sucesión. Converge si las sumas parciales se acercan a un límite finito; que los términos tiendan a cero es necesario, pero no suficiente.",
+    "Uma série soma os termos de uma sequência. Converge se as somas parciais se aproximam de um limite finito; os termos tenderem a zero é necessário, mas não suficiente."
+  ],
+  [
+    "A geometric series with first term a and |r| < 1 sums to a/(1 − r). The harmonic series diverges despite its terms approaching zero.",
+    "Eine geometrische Reihe mit Anfangsglied a und |r| < 1 hat Summe a/(1 − r). Die harmonische Reihe divergiert, obwohl ihre Glieder gegen null gehen.",
+    "A geometrische Reihe mit Anfangsglied a und |r| < 1 hat de Summe a/(1 − r). De harmonische Reihe divergiert, obwohl ihre Glieder gegen null gehn.",
+    "첫 항이 a이고 |r| < 1인 등비급수의 합은 a/(1 − r)입니다. 조화급수는 항이 0으로 가도 발산합니다.",
+    "Геометрический ряд с первым членом a и |r| < 1 имеет сумму a/(1 − r). Гармонический ряд расходится, хотя его члены стремятся к нулю.",
+    "Una serie geométrica con primer término a y |r| < 1 suma a/(1 − r). La serie armónica diverge aunque sus términos tiendan a cero.",
+    "Uma série geométrica com primeiro termo a e |r| < 1 soma a/(1 − r). A série harmônica diverge embora seus termos tendam a zero."
+  ],
+  [
+    "Check the ratio condition before using an infinite geometric sum. The remainder after N terms is arᴺ/(1 − r).",
+    "Prüfe die Bedingung für das Verhältnis vor der unendlichen geometrischen Summe. Der Rest nach N Gliedern ist arᴺ/(1 − r).",
+    "Prüf de Bedingung fürs Verhältnis vor da unendlichen geometrischen Summe. Da Rest nach N Gliedern is arᴺ/(1 − r).",
+    "무한 등비급수 공식을 쓰기 전에 공비 조건을 확인하세요. N개 항 이후의 나머지는 arᴺ/(1 − r)입니다.",
+    "Проверьте условие на знаменатель перед использованием бесконечной геометрической суммы. Остаток после N членов равен arᴺ/(1 − r).",
+    "Comprueba la condición de la razón antes de usar una suma geométrica infinita. El resto tras N términos es arᴺ/(1 − r).",
+    "Confira a condição da razão antes de usar uma soma geométrica infinita. O resto após N termos é arᴺ/(1 − r)."
+  ],
+  [
+    "A proof explains why a statement follows from definitions and assumptions. Examples can reveal a pattern but cannot prove a claim about all inputs.",
+    "Ein Beweis erklärt, warum eine Aussage aus Definitionen und Annahmen folgt. Beispiele zeigen Muster, beweisen aber keine Behauptung über alle Eingaben.",
+    "A Beweis erklärt, warum a Aussage aus Definitionen und Annahmen folgt. Beispiele zeign Muster, beweisen aber koa Behauptung über alle Eingaben.",
+    "증명은 명제가 정의와 가정에서 왜 따라오는지 설명합니다. 예시는 패턴을 보여줄 수 있지만 모든 입력에 대한 주장을 증명하지는 못합니다.",
+    "Доказательство объясняет, почему утверждение следует из определений и предположений. Примеры показывают закономерность, но не доказывают утверждение для всех входов.",
+    "Una demostración explica por qué una afirmación se deduce de definiciones y supuestos. Los ejemplos revelan patrones, pero no prueban una afirmación para todas las entradas.",
+    "Uma prova explica por que uma afirmação decorre de definições e hipóteses. Exemplos revelam padrões, mas não provam uma afirmação para todas as entradas."
+  ],
+  [
+    "For a limit L at a, every ε > 0 needs a δ > 0 so that 0 < |x − a| < δ implies |f(x) − L| < ε.",
+    "Für einen Grenzwert L bei a braucht jedes ε > 0 ein δ > 0, sodass aus 0 < |x − a| < δ folgt: |f(x) − L| < ε.",
+    "Für an Grenzwert L bei a braucht jedes ε > 0 a δ > 0, sodass aus 0 < |x − a| < δ folgt: |f(x) − L| < ε.",
+    "a에서 극한 L이 존재하려면 모든 ε > 0에 대해 0 < |x − a| < δ이면 |f(x) − L| < ε인 δ > 0이 있어야 합니다.",
+    "Для предела L в a каждому ε > 0 должно соответствовать δ > 0, при котором из 0 < |x − a| < δ следует |f(x) − L| < ε.",
+    "Para un límite L en a, cada ε > 0 necesita un δ > 0 tal que 0 < |x − a| < δ implique |f(x) − L| < ε.",
+    "Para um limite L em a, cada ε > 0 precisa de um δ > 0 tal que 0 < |x − a| < δ implique |f(x) − L| < ε."
+  ],
+  [
+    "For f(x) = 2x at a = 3, choosing δ = ε/2 proves the limit is 6 for every positive ε.",
+    "Für f(x) = 2x bei a = 3 beweist die Wahl δ = ε/2 den Grenzwert 6 für jedes positive ε.",
+    "Für f(x) = 2x bei a = 3 beweist de Wahl δ = ε/2 den Grenzwert 6 für jedes positive ε.",
+    "f(x) = 2x에서 a = 3일 때 δ = ε/2를 택하면 모든 양의 ε에 대해 극한이 6임을 증명합니다.",
+    "Для f(x) = 2x при a = 3 выбор δ = ε/2 доказывает предел 6 для любого положительного ε.",
+    "Para f(x) = 2x en a = 3, elegir δ = ε/2 demuestra que el límite es 6 para todo ε positivo.",
+    "Para f(x) = 2x em a = 3, escolher δ = ε/2 prova que o limite é 6 para todo ε positivo."
+  ],
+  [
+    "A counterexample disproves a universal statement. Check endpoints, excluded inputs, and cases where a theorem’s assumptions fail.",
+    "Ein Gegenbeispiel widerlegt eine allgemeine Aussage. Prüfe Endpunkte, ausgeschlossene Eingaben und Fälle, in denen die Voraussetzungen eines Satzes fehlen.",
+    "A Gegenbeispiel widerlegt a allgemeine Aussage. Prüf Endpunkte, ausgeschlossene Eingaben und Fälle, wo de Voraussetzungen von am Satz fehlen.",
+    "반례는 보편 명제를 반박합니다. 끝점, 제외된 입력, 정리의 가정이 성립하지 않는 경우를 확인하세요.",
+    "Контрпример опровергает универсальное утверждение. Проверьте концы интервала, исключённые значения и случаи нарушения условий теоремы.",
+    "Un contraejemplo refuta una afirmación universal. Comprueba extremos, entradas excluidas y casos donde fallan los supuestos del teorema.",
+    "Um contraexemplo refuta uma afirmação universal. Confira extremos, entradas excluídas e casos em que as hipóteses do teorema falham."
+  ],
+  [
+    "Continuity does not guarantee differentiability: |x| has a corner at zero. A stationary point does not guarantee an extremum: x³ keeps increasing through zero.",
+    "Stetigkeit garantiert keine Differenzierbarkeit: |x| hat bei null einen Knick. Ein stationärer Punkt garantiert kein Extremum: x³ steigt durch null weiter.",
+    "Stetigkeit garantiert koa Differenzierbarkeit: |x| hat bei null an Knick. A stationärer Punkt garantiert koa Extremum: x³ steigt durch null weiter.",
+    "연속이어도 미분 가능하지 않을 수 있습니다. |x|는 0에서 꺾입니다. 정지점이 극값을 보장하지도 않습니다. x³은 0을 지나며 계속 증가합니다.",
+    "Непрерывность не гарантирует дифференцируемость: у |x| угол в нуле. Стационарная точка не гарантирует экстремум: x³ продолжает расти через ноль.",
+    "La continuidad no garantiza derivabilidad: |x| tiene una esquina en cero. Un punto estacionario no garantiza un extremo: x³ sigue creciendo al pasar por cero.",
+    "Continuidade não garante diferenciabilidade: |x| tem um canto em zero. Um ponto estacionário não garante extremo: x³ continua crescendo ao passar por zero."
+  ],
+  [
+    "For |x| at zero, the left slope is −1 and the right slope is 1. Matching function limits do not make those slopes equal.",
+    "Für |x| bei null ist die linke Steigung −1 und die rechte 1. Gleiche Funktionsgrenzwerte machen diese Steigungen nicht gleich.",
+    "Für |x| bei null is de linke Steigung −1 und de rechte 1. Gleiche Funktionsgrenzwerte machn de Steigungen ned gleich.",
+    "|x|의 0에서 왼쪽 기울기는 −1, 오른쪽 기울기는 1입니다. 함수의 좌우 극한이 같아도 기울기가 같아지지는 않습니다.",
+    "Для |x| в нуле левый наклон равен −1, правый — 1. Совпадение пределов функции не делает наклоны равными.",
+    "Para |x| en cero, la pendiente izquierda es −1 y la derecha 1. Que los límites de la función coincidan no iguala esas pendientes.",
+    "Para |x| em zero, a inclinação à esquerda é −1 e à direita é 1. Limites iguais da função não tornam essas inclinações iguais."
+  ],
+  [
+    "Probability lies between zero and one. Conditional probability restricts the population: P(A|B) = P(A ∩ B)/P(B), provided P(B) > 0.",
+    "Wahrscheinlichkeit liegt zwischen null und eins. Bedingte Wahrscheinlichkeit beschränkt die Grundgesamtheit: P(A|B) = P(A ∩ B)/P(B), falls P(B) > 0.",
+    "Wahrscheinlichkeit liegt zwischen null und oans. Bedingte Wahrscheinlichkeit beschränkt de Grundgesamtheit: P(A|B) = P(A ∩ B)/P(B), wenn P(B) > 0.",
+    "확률은 0과 1 사이입니다. 조건부확률은 대상을 제한합니다. P(B) > 0일 때 P(A|B) = P(A ∩ B)/P(B)입니다.",
+    "Вероятность лежит между нулём и единицей. Условная вероятность ограничивает совокупность: P(A|B) = P(A ∩ B)/P(B), если P(B) > 0.",
+    "La probabilidad está entre cero y uno. La probabilidad condicional restringe la población: P(A|B) = P(A ∩ B)/P(B), si P(B) > 0.",
+    "A probabilidade está entre zero e um. A probabilidade condicional restringe a população: P(A|B) = P(A ∩ B)/P(B), se P(B) > 0."
+  ],
+  [
+    "P(A|B) generally differs from P(B|A). Independent events satisfy P(A ∩ B) = P(A)P(B); mutually exclusive events cannot happen together.",
+    "P(A|B) unterscheidet sich meist von P(B|A). Unabhängige Ereignisse erfüllen P(A ∩ B) = P(A)P(B); sich ausschließende Ereignisse treten nicht gemeinsam auf.",
+    "P(A|B) is meistens anders als P(B|A). Unabhängige Ereignisse erfülln P(A ∩ B) = P(A)P(B); sich ausschließende Ereignisse passiern ned zamm.",
+    "P(A|B)는 일반적으로 P(B|A)와 다릅니다. 독립 사건은 P(A ∩ B) = P(A)P(B)를 만족하며, 배반 사건은 함께 일어날 수 없습니다.",
+    "P(A|B) обычно отличается от P(B|A). Независимые события удовлетворяют P(A ∩ B) = P(A)P(B); несовместные не происходят вместе.",
+    "P(A|B) suele diferir de P(B|A). Los sucesos independientes cumplen P(A ∩ B) = P(A)P(B); los excluyentes no pueden ocurrir juntos.",
+    "P(A|B) geralmente difere de P(B|A). Eventos independentes satisfazem P(A ∩ B) = P(A)P(B); eventos mutuamente exclusivos não ocorrem juntos."
+  ],
+  [
+    "Always identify the denominator. Umbrella days are a different reference group from rainy days.",
+    "Bestimme immer den Nenner. Schirmtage und Regentage sind verschiedene Bezugsgruppen.",
+    "Bestimm immer den Nenner. Schirmtage und Regentage san verschiedene Bezugsgruppen.",
+    "항상 분모를 확인하세요. 우산을 쓴 날과 비 오는 날은 서로 다른 기준 집단입니다.",
+    "Всегда определяйте знаменатель. Дни с зонтом и дождливые дни — разные группы отсчёта.",
+    "Identifica siempre el denominador. Los días con paraguas y los días lluviosos son grupos de referencia distintos.",
+    "Identifique sempre o denominador. Dias com guarda-chuva e dias chuvosos são grupos de referência diferentes."
+  ],
+  [
+    "A discrete distribution assigns probabilities to possible values, summing to one. Expected value is the probability-weighted average, not a guaranteed outcome.",
+    "Eine diskrete Verteilung ordnet möglichen Werten Wahrscheinlichkeiten zu, deren Summe eins ist. Der Erwartungswert ist ein gewichteter Mittelwert, kein garantiertes Ergebnis.",
+    "A diskrete Verteilung ordnet möglichen Werten Wahrscheinlichkeiten zu, de zamm oans ergebn. Da Erwartungswert is a gewichteter Mittelwert, koa garantiertes Ergebnis.",
+    "이산분포는 가능한 값에 확률을 부여하며 합은 1입니다. 기댓값은 확률로 가중한 평균이며 확정된 결과가 아닙니다.",
+    "Дискретное распределение задаёт вероятности возможных значений, в сумме равные единице. Ожидание — взвешенное среднее, а не гарантированный исход.",
+    "Una distribución discreta asigna probabilidades a valores posibles que suman uno. La esperanza es el promedio ponderado por probabilidad, no un resultado garantizado.",
+    "Uma distribuição discreta atribui probabilidades aos valores possíveis, somando um. A esperança é a média ponderada pela probabilidade, não um resultado garantido."
+  ],
+  [
+    "A binomial distribution counts successes in a fixed number of independent trials with the same success probability. Real-life trials may violate those assumptions.",
+    "Eine Binomialverteilung zählt Erfolge in einer festen Zahl unabhängiger Versuche mit gleicher Erfolgswahrscheinlichkeit. Reale Versuche können diese Annahmen verletzen.",
+    "A Binomialverteilung zählt Erfolge bei a festen Zahl unabhängiger Versuche mit gleicher Erfolgswahrscheinlichkeit. Reale Versuche können de Annahmen verletzn.",
+    "이항분포는 성공확률이 같은 독립 시행을 정해진 횟수만큼 했을 때 성공 횟수를 셉니다. 실제 시행은 이 가정을 어길 수 있습니다.",
+    "Биномиальное распределение считает успехи в фиксированном числе независимых испытаний с одинаковой вероятностью успеха. Реальные испытания могут нарушать эти условия.",
+    "Una distribución binomial cuenta éxitos en un número fijo de ensayos independientes con la misma probabilidad de éxito. Los ensayos reales pueden incumplir esos supuestos.",
+    "Uma distribuição binomial conta sucessos em um número fixo de tentativas independentes com a mesma probabilidade de sucesso. Tentativas reais podem violar essas hipóteses."
+  ],
+  [
+    "Expected values can be impossible individual outcomes: a fair die has mean 3.5 even though no face shows 3.5.",
+    "Erwartungswerte können als Einzelergebnis unmöglich sein: Ein fairer Würfel hat Mittelwert 3,5, obwohl keine Seite 3,5 zeigt.",
+    "Erwartungswerte können als einzelnes Ergebnis unmöglich sein: A fairer Würfel hat Mittelwert 3,5, obwohl koa Seit 3,5 zeigt.",
+    "기댓값은 개별 결과로는 불가능한 값일 수 있습니다. 공정한 주사위의 평균은 3.5지만 그런 눈은 없습니다.",
+    "Ожидание может быть невозможным отдельным исходом: среднее честного кубика равно 3,5, хотя такой грани нет.",
+    "La esperanza puede ser imposible como resultado individual: un dado justo tiene media 3,5 aunque ninguna cara muestre 3,5.",
+    "A esperança pode ser impossível como resultado individual: um dado justo tem média 3,5 embora nenhuma face mostre 3,5."
+  ],
+  [
+    "The mean divides the total by the count. The median is the middle sorted value, or the mean of the two middle values for an even count.",
+    "Der Mittelwert teilt die Summe durch die Anzahl. Der Median ist der mittlere sortierte Wert oder bei gerader Anzahl der Mittelwert der beiden mittleren Werte.",
+    "Da Mittelwert teilt de Summe durch de Anzahl. Da Median is da mittlere sortierte Wert oder bei gerader Anzahl da Mittelwert von de zwoa mittleren Werte.",
+    "평균은 합을 개수로 나눕니다. 중앙값은 정렬된 값 중 가운데 값이며, 개수가 짝수이면 가운데 두 값의 평균입니다.",
+    "Среднее делит сумму на количество. Медиана — среднее по порядку значение, а при чётном количестве — среднее двух центральных.",
+    "La media divide el total por la cantidad. La mediana es el valor central ordenado, o la media de los dos centrales si la cantidad es par.",
+    "A média divide o total pela quantidade. A mediana é o valor central ordenado, ou a média dos dois centrais se a quantidade for par."
+  ],
+  [
+    "Population variance averages squared distances from the mean. Sample variance divides by n − 1 when estimating population variance from a sample; spread and units matter.",
+    "Die Populationsvarianz mittelt die quadrierten Abstände zum Mittelwert. Die Stichprobenvarianz teilt zur Schätzung durch n − 1; Streuung und Einheiten sind wichtig.",
+    "De Populationsvarianz mittelt de quadrierten Abstände zum Mittelwert. De Stichprobenvarianz teilt zur Schätzung durch n − 1; Streuung und Einheiten san wichtig.",
+    "모집단 분산은 평균과의 거리 제곱을 평균합니다. 표본에서 모집단 분산을 추정할 때 표본분산은 n − 1로 나눕니다. 퍼짐과 단위가 중요합니다.",
+    "Дисперсия совокупности усредняет квадраты отклонений от среднего. Выборочная дисперсия делит на n − 1 для оценки дисперсии совокупности; разброс и единицы важны.",
+    "La varianza poblacional promedia las distancias al cuadrado de la media. La varianza muestral divide por n − 1 para estimarla; importan la dispersión y las unidades.",
+    "A variância populacional calcula a média das distâncias ao quadrado da média. A variância amostral divide por n − 1 para estimá-la; dispersão e unidades importam."
+  ],
+  [
+    "An outlier can move the mean much more than the median. Variance has squared units; standard deviation restores the original units.",
+    "Ein Ausreißer kann den Mittelwert viel stärker verändern als den Median. Varianz hat quadrierte Einheiten; die Standardabweichung wieder die ursprünglichen.",
+    "A Ausreißer kann den Mittelwert vui stärker verändern als den Median. Varianz hat quadrierte Einheiten; de Standardabweichung wieder de ursprünglichen.",
+    "이상치는 중앙값보다 평균을 훨씬 크게 움직일 수 있습니다. 분산의 단위는 제곱이며, 표준편차는 원래 단위입니다.",
+    "Выброс может сдвинуть среднее гораздо сильнее медианы. Единицы дисперсии возведены в квадрат; стандартное отклонение возвращает исходные единицы.",
+    "Un valor atípico puede mover la media mucho más que la mediana. La varianza tiene unidades al cuadrado; la desviación estándar recupera las originales.",
+    "Um valor atípico pode mover a média muito mais que a mediana. A variância tem unidades ao quadrado; o desvio padrão recupera as originais."
+  ],
+  [
+    "A sample describes part of a population. Random sampling reduces selection bias; increasing a biased sample does not repair how it was selected.",
+    "Eine Stichprobe beschreibt einen Teil der Grundgesamtheit. Zufällige Auswahl reduziert Auswahlverzerrung; eine größere verzerrte Stichprobe korrigiert ihre Auswahl nicht.",
+    "A Stichprobe beschreibt an Teil von da Grundgesamtheit. Zufällige Auswahl reduziert Auswahlverzerrung; a größere verzerrte Stichprobe repariert de Auswahl ned.",
+    "표본은 모집단의 일부를 설명합니다. 무작위 추출은 선택 편향을 줄이지만, 편향된 표본을 크게 만든다고 추출 방식이 고쳐지지는 않습니다.",
+    "Выборка описывает часть совокупности. Случайный отбор снижает смещение; увеличение смещённой выборки не исправляет способ её отбора.",
+    "Una muestra describe parte de una población. El muestreo aleatorio reduce el sesgo de selección; ampliar una muestra sesgada no arregla su selección.",
+    "Uma amostra descreve parte de uma população. A amostragem aleatória reduz o viés de seleção; ampliar uma amostra enviesada não corrige sua seleção."
+  ],
+  [
+    "For independent Bernoulli observations, an approximate standard error is √(p̂(1 − p̂)/n). Normal intervals need adequate success and failure counts and do not include selection bias.",
+    "Bei unabhängigen Bernoulli-Beobachtungen ist der angenäherte Standardfehler √(p̂(1 − p̂)/n). Normalintervalle benötigen genügend Erfolge und Misserfolge und erfassen keine Auswahlverzerrung.",
+    "Bei unabhängigen Bernoulli-Beobachtungen is da angenäherte Standardfehler √(p̂(1 − p̂)/n). Normalintervalle brauchen genügend Erfolge und Misserfolge und erfassen koa Auswahlverzerrung.",
+    "독립 베르누이 관측의 근사 표준오차는 √(p̂(1 − p̂)/n)입니다. 정규 근사 구간은 충분한 성공과 실패 수가 필요하며 선택 편향을 포함하지 않습니다.",
+    "Для независимых наблюдений Бернулли приближённая стандартная ошибка равна √(p̂(1 − p̂)/n). Нормальные интервалы требуют достаточных чисел успехов и неудач и не учитывают смещение отбора.",
+    "Para observaciones Bernoulli independientes, el error estándar aproximado es √(p̂(1 − p̂)/n). Los intervalos normales requieren suficientes éxitos y fracasos y no incluyen sesgo de selección.",
+    "Para observações Bernoulli independentes, o erro padrão aproximado é √(p̂(1 − p̂)/n). Intervalos normais exigem sucessos e falhas suficientes e não incluem viés de seleção."
+  ],
+  [
+    "A 95% confidence procedure covers the fixed population parameter in about 95% of repeated samples under its assumptions.",
+    "Ein 95%-Konfidenzverfahren erfasst unter seinen Annahmen den festen Populationsparameter in etwa 95% wiederholter Stichproben.",
+    "A 95%-Konfidenzverfahren erfasst unter seine Annahmen den festen Populationsparameter in ungefähr 95% von wiederholten Stichproben.",
+    "95% 신뢰구간 절차는 가정이 성립할 때 반복 표본의 약 95%에서 고정된 모집단 모수를 포함합니다.",
+    "95%-ная доверительная процедура при выполнении условий охватывает фиксированный параметр совокупности примерно в 95% повторных выборок.",
+    "Un procedimiento de confianza del 95% cubre el parámetro poblacional fijo en aproximadamente el 95% de las muestras repetidas bajo sus supuestos.",
+    "Um procedimento de confiança de 95% cobre o parâmetro populacional fixo em cerca de 95% das amostras repetidas sob suas hipóteses."
+  ],
+  [
+    "Check axes, units, denominators, and time windows before interpreting a chart. A truncated bar axis can exaggerate differences in lengths.",
+    "Prüfe Achsen, Einheiten, Nenner und Zeitfenster vor der Diagrammdeutung. Eine abgeschnittene Balkenachse kann Längenunterschiede übertreiben.",
+    "Prüf Achsen, Einheiten, Nenner und Zeitfenster vorm Deuten vom Diagramm. A abgeschnittene Balkenachse kann Längenunterschiede übertreibn.",
+    "차트를 해석하기 전에 축, 단위, 분모와 기간을 확인하세요. 잘린 막대 축은 길이 차이를 과장할 수 있습니다.",
+    "Перед интерпретацией графика проверьте оси, единицы, знаменатели и периоды. Обрезанная ось столбцов может преувеличивать разницу длин.",
+    "Comprueba ejes, unidades, denominadores y periodos antes de interpretar un gráfico. Un eje de barras truncado puede exagerar las diferencias de longitud.",
+    "Confira eixos, unidades, denominadores e períodos antes de interpretar um gráfico. Um eixo de barras truncado pode exagerar diferenças de comprimento."
+  ],
+  [
+    "Absolute change, relative change, and percentage-point change answer different questions. Association alone does not establish causation.",
+    "Absolute, relative und Prozentpunktänderung beantworten verschiedene Fragen. Ein Zusammenhang allein belegt keine Ursache.",
+    "Absolute, relative und Prozentpunktänderung beantworten verschiedene Fragen. A Zusammenhang alloa belegt koa Ursache.",
+    "절대 변화, 상대 변화, 퍼센트포인트 변화는 서로 다른 질문에 답합니다. 관련성이 있다는 것만으로 인과관계가 성립하지는 않습니다.",
+    "Абсолютное, относительное изменение и изменение в процентных пунктах отвечают на разные вопросы. Связь сама по себе не доказывает причинность.",
+    "El cambio absoluto, relativo y en puntos porcentuales responden a preguntas distintas. La asociación por sí sola no demuestra causalidad.",
+    "Mudanças absolutas, relativas e em pontos percentuais respondem a perguntas diferentes. Associação por si só não estabelece causalidade."
+  ],
+  [
+    "A rate can rise while its count falls if the denominator shrinks. Compare both the count and the population behind it.",
+    "Eine Quote kann bei sinkender Anzahl steigen, wenn der Nenner schrumpft. Vergleiche Anzahl und zugrunde liegende Grundgesamtheit.",
+    "A Quote kann bei sinkender Anzahl steign, wenn da Nenner schrumpft. Vergleich de Anzahl und de Grundgesamtheit dahinter.",
+    "분모가 줄면 횟수가 감소해도 비율은 오를 수 있습니다. 횟수와 기준 집단을 함께 비교하세요.",
+    "Доля может расти при снижении количества, если уменьшается знаменатель. Сравнивайте и количество, и стоящую за ним совокупность.",
+    "Una tasa puede subir mientras su cantidad baja si el denominador disminuye. Compara tanto la cantidad como la población de referencia.",
+    "Uma taxa pode subir enquanto sua contagem cai se o denominador diminuir. Compare tanto a contagem como a população de referência."
+  ],
+  [
+    "The complement of an event has probability 1 − P(A). For independent trials, at least one success has probability 1 − (1 − p)ⁿ.",
+    "Das Gegenereignis hat Wahrscheinlichkeit 1 − P(A). Bei unabhängigen Versuchen hat mindestens ein Erfolg Wahrscheinlichkeit 1 − (1 − p)ⁿ.",
+    "Des Gegenereignis hat Wahrscheinlichkeit 1 − P(A). Bei unabhängigen Versuchen hat mindestens oa Erfolg Wahrscheinlichkeit 1 − (1 − p)ⁿ.",
+    "여사건의 확률은 1 − P(A)입니다. 독립 시행에서 한 번 이상 성공할 확률은 1 − (1 − p)ⁿ입니다.",
+    "Дополнение события имеет вероятность 1 − P(A). В независимых испытаниях вероятность хотя бы одного успеха равна 1 − (1 − p)ⁿ.",
+    "El complemento de un suceso tiene probabilidad 1 − P(A). En ensayos independientes, al menos un éxito tiene probabilidad 1 − (1 − p)ⁿ.",
+    "O complemento de um evento tem probabilidade 1 − P(A). Em tentativas independentes, ao menos um sucesso tem probabilidade 1 − (1 − p)ⁿ."
+  ],
+  [
+    "Simulation estimates probabilities through repeated trials. Estimates fluctuate and depend on the model; agreement with a formula is a check, not a proof.",
+    "Simulation schätzt Wahrscheinlichkeiten durch wiederholte Versuche. Schätzungen schwanken und hängen vom Modell ab; Formelübereinstimmung ist eine Kontrolle, kein Beweis.",
+    "Simulation schätzt Wahrscheinlichkeiten durch wiederholte Versuche. Schätzungen schwanken und hängen vom Modell ab; Übereinstimmung mit da Formel is a Kontrolle, koa Beweis.",
+    "시뮬레이션은 반복 시행으로 확률을 추정합니다. 추정은 변동하고 모델에 의존합니다. 공식과의 일치는 점검이지 증명은 아닙니다.",
+    "Симуляция оценивает вероятности повторными испытаниями. Оценки колеблются и зависят от модели; совпадение с формулой — проверка, не доказательство.",
+    "La simulación estima probabilidades mediante ensayos repetidos. Las estimaciones fluctúan y dependen del modelo; coincidir con una fórmula es una comprobación, no una prueba.",
+    "A simulação estima probabilidades por tentativas repetidas. Estimativas variam e dependem do modelo; concordar com uma fórmula é uma verificação, não uma prova."
+  ],
+  [
+    "Independent trials do not remember previous failures. A losing streak does not make the next success more likely.",
+    "Unabhängige Versuche erinnern sich nicht an frühere Misserfolge. Eine Verlustserie macht den nächsten Erfolg nicht wahrscheinlicher.",
+    "Unabhängige Versuche erinnern sich ned an frühere Misserfolge. A Verlustserie macht den nächsten Erfolg ned wahrscheinlicher.",
+    "독립 시행은 이전 실패를 기억하지 않습니다. 연속으로 졌다고 다음 성공 가능성이 커지지는 않습니다.",
+    "Независимые испытания не помнят прошлые неудачи. Серия проигрышей не повышает шанс следующего успеха.",
+    "Los ensayos independientes no recuerdan los fallos anteriores. Una racha de pérdidas no hace más probable el próximo éxito.",
+    "Tentativas independentes não lembram falhas anteriores. Uma sequência de perdas não torna o próximo sucesso mais provável."
+  ],
+  [
+    "You have €50 for groceries and spend €18 and €7. Subtraction tells you that €25 remains.",
+    "Du hast 50 € für Lebensmittel und gibst 18 € und 7 € aus. Subtraktion zeigt, dass 25 € bleiben.",
+    "Du hast 50 € für Lebensmittel und gibst 18 € und 7 € aus. Beim Abziehn bleiben 25 €.",
+    "장볼 돈이 50유로이고 18유로와 7유로를 썼습니다. 빼면 25유로가 남습니다.",
+    "У вас 50 € на продукты, и вы тратите 18 € и 7 €. Вычитание показывает остаток 25 €.",
+    "Tienes 50 € para comida y gastas 18 € y 7 €. La resta indica que quedan 25 €.",
+    "Você tem €50 para alimentos e gasta €18 e €7. A subtração mostra que restam €25."
+  ],
+  [
+    "Six friends share a €48 meal equally. Division gives €8 each; multiplying checks the total.",
+    "Sechs Freunde teilen ein Essen für 48 € gleichmäßig. Division ergibt je 8 €; Multiplikation prüft die Gesamtsumme.",
+    "Sechs Freind teiln a Essen für 48 € gleichmäßig. Beim Teiln zahlt jeder 8 €; Multipliziern prüft de Gesamtsumme.",
+    "친구 여섯 명이 48유로 식사비를 똑같이 나눕니다. 나누면 각자 8유로이며 곱셈으로 총액을 확인합니다.",
+    "Шесть друзей поровну делят счёт за еду на 48 €. Деление даёт по 8 €; умножение проверяет сумму.",
+    "Seis amigos reparten por igual una comida de 48 €. La división da 8 € por persona; la multiplicación comprueba el total.",
+    "Seis amigos dividem igualmente uma refeição de €48. A divisão dá €8 por pessoa; a multiplicação confere o total."
+  ],
+  [
+    "The temperature rises from −4°C by 7 degrees. Adding across zero gives 3°C.",
+    "Die Temperatur steigt von −4 °C um 7 Grad. Die Addition über null ergibt 3 °C.",
+    "De Temperatur steigt von −4 °C um 7 Grad. Über null drüber addiert ergibt des 3 °C.",
+    "기온이 −4°C에서 7도 오릅니다. 0을 지나 더하면 3°C입니다.",
+    "Температура повышается с −4 °C на 7 градусов. Сложение через ноль даёт 3 °C.",
+    "La temperatura sube 7 grados desde −4 °C. Sumar atravesando el cero da 3 °C.",
+    "A temperatura sobe 7 graus a partir de −4 °C. Somar passando por zero dá 3 °C."
+  ],
+  [
+    "A recipe needs three quarters of a litre of water. The decimal label on your measuring jug reads 0.75 litres.",
+    "Ein Rezept benötigt einen Dreiviertelliter Wasser. Die Dezimalskala deines Messbechers zeigt 0,75 Liter.",
+    "A Rezept braucht an Dreiviertelliter Wasser. De Dezimalskala am Messbecher zeigt 0,75 Liter.",
+    "레시피에 물 4분의 3리터가 필요합니다. 계량컵의 소수 눈금으로는 0.75리터입니다.",
+    "Для рецепта нужно три четверти литра воды. На десятичной шкале мерного кувшина это 0,75 литра.",
+    "Una receta necesita tres cuartos de litro de agua. La escala decimal de tu jarra indica 0,75 litros.",
+    "Uma receita precisa de três quartos de litro de água. A escala decimal da jarra indica 0,75 litro."
+  ],
+  [
+    "You buy three €4 tickets and pay one €2 booking fee. Grouping the fee with each ticket would overcharge you.",
+    "Du kaufst drei Tickets zu je 4 € und zahlst einmal 2 € Buchungsgebühr. Die Gebühr zu jedem Ticket zu addieren wäre zu teuer.",
+    "Du kaufst drei Tickets für je 4 € und zahlst oamoi 2 € Buchungsgebühr. De Gebühr zu jedem Ticket dazuzurechnen wär zu teuer.",
+    "4유로짜리 표 세 장에 예약 수수료 2유로를 한 번 냅니다. 각 표에 수수료를 더하면 과다 계산됩니다.",
+    "Вы покупаете три билета по 4 € и платите один сбор 2 €. Добавление сбора к каждому билету завысит сумму.",
+    "Compras tres entradas de 4 € y pagas una única comisión de 2 €. Incluirla en cada entrada cobraría de más.",
+    "Você compra três ingressos de €4 e paga uma única taxa de €2. Incluir a taxa em cada ingresso cobraria a mais."
+  ],
+  [
+    "Five items cost €1.98 each. Estimate €10 to check your receipt, then calculate the exact €9.90.",
+    "Fünf Artikel kosten je 1,98 €. Überschlage 10 €, um den Kassenbon zu prüfen, und berechne dann genau 9,90 €.",
+    "Fünf Artikel kosten je 1,98 €. Überschlag 10 € zum Prüfen vom Kassenzettel und rechne dann genau 9,90 €.",
+    "물건 다섯 개가 각각 1.98유로입니다. 약 10유로로 영수증을 점검한 뒤 정확히 9.90유로를 계산하세요.",
+    "Пять товаров стоят по 1,98 €. Прикиньте 10 € для проверки чека, затем вычислите точные 9,90 €.",
+    "Cinco artículos cuestan 1,98 € cada uno. Estima 10 € para comprobar el recibo y luego calcula los 9,90 € exactos.",
+    "Cinco itens custam €1,98 cada. Estime €10 para conferir o recibo e depois calcule os €9,90 exatos."
+  ],
+  [
+    "A €60 jacket is reduced by 25%. Compare its €45 final price with another shop’s €48 offer.",
+    "Eine Jacke für 60 € ist um 25% reduziert. Vergleiche den Endpreis von 45 € mit einem Angebot für 48 € in einem anderen Geschäft.",
+    "A Jackn für 60 € is um 25% reduziert. Vergleich den Endpreis von 45 € mit am Angebot für 48 € im andern Gschäft.",
+    "60유로 재킷이 25% 할인됩니다. 최종 가격 45유로와 다른 가게의 48유로 제안을 비교하세요.",
+    "Куртка за 60 € продаётся со скидкой 25%. Сравните итоговые 45 € с предложением другого магазина за 48 €.",
+    "Una chaqueta de 60 € tiene un 25% de descuento. Compara su precio final de 45 € con otra oferta de 48 €.",
+    "Uma jaqueta de €60 tem 25% de desconto. Compare o preço final de €45 com outra oferta de €48."
+  ],
+  [
+    "A €100 item has 20% off, then a further 10% off the reduced price. You pay €72, not €70.",
+    "Ein Artikel für 100 € ist erst um 20% und dann um weitere 10% auf den reduzierten Preis billiger. Du zahlst 72 €, nicht 70 €.",
+    "A Artikel für 100 € is erst um 20% und dann um weitere 10% vom reduzierten Preis billiger. Du zahlst 72 €, ned 70 €.",
+    "100유로 물건에 20% 할인 후 할인된 가격에서 10%를 더 할인합니다. 70유로가 아니라 72유로를 냅니다.",
+    "Товар за 100 € сначала дешевеет на 20%, затем ещё на 10% от сниженной цены. Вы платите 72 €, а не 70 €.",
+    "Un artículo de 100 € tiene un 20% de descuento y luego otro 10% sobre el precio reducido. Pagas 72 €, no 70 €.",
+    "Um item de €100 tem 20% de desconto e depois mais 10% sobre o preço reduzido. Você paga €72, não €70."
+  ],
+  [
+    "A hypothetical quote lists €100 before a 20% tax. Budget €120; removing that tax means dividing by 1.2.",
+    "Ein hypothetisches Angebot nennt 100 € vor einer Steuer von 20%. Plane 120 € ein; um die Steuer herauszurechnen, teile durch 1,2.",
+    "A hypothetisches Angebot nennt 100 € vor 20% Steuer. Plan 120 € ein; zum Steuer rausrechnen teilst durch 1,2.",
+    "가상 견적이 20% 세금 전 100유로입니다. 120유로를 준비하고 세금을 빼려면 1.2로 나눕니다.",
+    "Условная смета указывает 100 € до налога 20%. Заложите 120 €; для удаления налога разделите на 1,2.",
+    "Un presupuesto hipotético indica 100 € antes de un impuesto del 20%. Prevé 120 €; para quitar el impuesto divide entre 1,2.",
+    "Um orçamento hipotético indica €100 antes de um imposto de 20%. Reserve €120; para retirar o imposto divida por 1,2."
+  ],
+  [
+    "Your €40 subscription rises by 25% to €50. Returning to €40 requires a 20% decrease from the new price.",
+    "Dein Abonnement für 40 € steigt um 25% auf 50 €. Zurück auf 40 € kommt es mit einer Senkung um 20% des neuen Preises.",
+    "Dei Abo für 40 € steigt um 25% auf 50 €. Zruck auf 40 € geht’s mit 20% Senkung vom neuen Preis.",
+    "40유로 구독료가 25% 올라 50유로가 됩니다. 다시 40유로가 되려면 새 가격에서 20% 내려야 합니다.",
+    "Подписка за 40 € дорожает на 25% до 50 €. Возврат к 40 € требует снижения на 20% от новой цены.",
+    "Tu suscripción de 40 € sube un 25% hasta 50 €. Volver a 40 € exige una reducción del 20% desde el nuevo precio.",
+    "Sua assinatura de €40 sobe 25% para €50. Voltar a €40 exige uma redução de 20% sobre o novo preço."
+  ],
+  [
+    "Your hypothetical monthly income rises 5%, while rent rises 10%. Compare euro amounts before judging the effect on your budget.",
+    "Dein hypothetisches Monatseinkommen steigt um 5%, die Miete um 10%. Vergleiche Eurobeträge, bevor du die Budgetwirkung bewertest.",
+    "Dei hypothetisches Monatseinkommen steigt um 5%, de Miete um 10%. Vergleich Eurobeträge, bevor du de Wirkung aufs Budget beurteilst.",
+    "가상 월소득은 5%, 월세는 10% 오릅니다. 예산에 미치는 영향을 판단하기 전에 실제 금액을 비교하세요.",
+    "Условный месячный доход растёт на 5%, аренда — на 10%. Сравните суммы в евро, прежде чем оценивать влияние на бюджет.",
+    "Tu ingreso mensual hipotético sube un 5% y el alquiler un 10%. Compara las cantidades en euros antes de valorar el efecto en tu presupuesto.",
+    "Sua renda mensal hipotética sobe 5% e o aluguel 10%. Compare os valores em euros antes de avaliar o efeito no orçamento."
+  ],
+  [
+    "Four friends split an €80 meal and add a 10% tip. Each person pays €22.",
+    "Vier Freunde teilen ein Essen für 80 € und geben 10% Trinkgeld. Jede Person zahlt 22 €.",
+    "Vier Freind teiln a Essen für 80 € und gebn 10% Trinkgeld. Jeder zahlt 22 €.",
+    "친구 네 명이 80유로 식사비에 10% 팁을 더해 나눕니다. 각자 22유로를 냅니다.",
+    "Четверо друзей делят счёт 80 € и добавляют чаевые 10%. Каждый платит 22 €.",
+    "Cuatro amigos reparten una comida de 80 € y añaden un 10% de propina. Cada persona paga 22 €.",
+    "Quatro amigos dividem uma refeição de €80 e acrescentam 10% de gorjeta. Cada pessoa paga €22."
+  ],
+  [
+    "A recipe for four people uses 300 g of flour. Cooking for six needs 450 g if the ingredients scale proportionally.",
+    "Ein Rezept für vier Personen braucht 300 g Mehl. Für sechs brauchst du 450 g, wenn die Zutaten proportional skalieren.",
+    "A Rezept für vier Leit braucht 300 g Mehl. Für sechs brauchst 450 g, wenn de Zutaten proportional skaliern.",
+    "4인분 레시피에 밀가루 300g이 필요합니다. 재료가 비례해서 늘어난다면 6인분에는 450g이 필요합니다.",
+    "Рецепт на четверых требует 300 г муки. На шестерых нужно 450 г при пропорциональном масштабировании ингредиентов.",
+    "Una receta para cuatro usa 300 g de harina. Para seis necesitas 450 g si los ingredientes se escalan proporcionalmente.",
+    "Uma receita para quatro usa 300 g de farinha. Para seis são necessários 450 g se os ingredientes forem proporcionais."
+  ],
+  [
+    "Support in a club poll rises from 40% to 50%. That is 10 percentage points, or a 25% relative increase.",
+    "Zustimmung in einer Vereinsumfrage steigt von 40% auf 50%. Das sind 10 Prozentpunkte oder 25% relativer Anstieg.",
+    "Zustimmung bei a Vereinsumfrage steigt von 40% auf 50%. Des san 10 Prozentpunkte oder 25% relativer Anstieg.",
+    "동호회 설문 지지가 40%에서 50%로 오릅니다. 10퍼센트포인트, 또는 상대적으로 25% 증가입니다.",
+    "Поддержка в опросе клуба растёт с 40% до 50%. Это 10 процентных пунктов или относительный рост на 25%.",
+    "El apoyo en una encuesta del club sube del 40% al 50%. Son 10 puntos porcentuales o un aumento relativo del 25%.",
+    "O apoio em uma pesquisa do clube sobe de 40% para 50%. São 10 pontos percentuais ou um aumento relativo de 25%."
+  ],
+  [
+    "Compare a hypothetical €100 balance growing 10% each year for two years. Compounding gives €121; actual returns need not follow this model.",
+    "Vergleiche ein hypothetisches Guthaben von 100 €, das zwei Jahre lang jährlich um 10% wächst. Zinseszins ergibt 121 €; tatsächliche Erträge müssen diesem Modell nicht folgen.",
+    "Vergleich a hypothetisches Guthaben von 100 €, des zwoa Jahre jährlich um 10% wächst. Zinseszins ergibt 121 €; echte Erträge müssen dem Modell ned folgen.",
+    "가상 잔액 100유로가 2년 동안 매년 10%씩 늘어나는 경우를 비교하세요. 복리로 121유로가 되지만 실제 수익은 이 모델과 다를 수 있습니다.",
+    "Сравните условные 100 €, растущие на 10% ежегодно два года. Сложный рост даёт 121 €; реальные доходы могут не следовать модели.",
+    "Compara un saldo hipotético de 100 € que crece un 10% anual durante dos años. La capitalización da 121 €; los rendimientos reales pueden no seguir este modelo.",
+    "Compare um saldo hipotético de €100 crescendo 10% ao ano por dois anos. A composição dá €121; retornos reais podem não seguir esse modelo."
+  ],
+  [
+    "You have €35 for a taxi charging €5 plus €2 per kilometre. An inequality gives a maximum of 15 km in this model.",
+    "Du hast 35 € für ein Taxi mit 5 € Grundpreis und 2 € pro Kilometer. Eine Ungleichung ergibt in diesem Modell höchstens 15 km.",
+    "Du hast 35 € fürs Taxi mit 5 € Grundpreis und 2 € pro Kilometer. A Ungleichung ergibt in dem Modell höchstens 15 km.",
+    "기본료 5유로와 킬로미터당 2유로인 택시에 35유로를 쓸 수 있습니다. 이 모델의 부등식으로 최대 15km를 구합니다.",
+    "У вас 35 € на такси с платой 5 € плюс 2 € за километр. Неравенство даёт максимум 15 км в этой модели.",
+    "Tienes 35 € para un taxi que cobra 5 € más 2 € por kilómetro. Una desigualdad da un máximo de 15 km en este modelo.",
+    "Você tem €35 para um táxi que cobra €5 mais €2 por quilômetro. Uma desigualdade dá no máximo 15 km nesse modelo."
+  ],
+  [
+    "For identical portions, 200 g of rice serves two people. Direct proportion gives 500 g for five people.",
+    "Für gleiche Portionen reichen 200 g Reis für zwei Personen. Direkte Proportion ergibt 500 g für fünf Personen.",
+    "Für gleiche Portionen reichn 200 g Reis für zwoa Leit. Direkte Proportion ergibt 500 g für fünf Leit.",
+    "같은 크기의 2인분에 쌀 200g이 필요합니다. 정비례로 5인분은 500g입니다.",
+    "При одинаковых порциях 200 г риса хватает на двоих. Прямая пропорция даёт 500 г на пятерых.",
+    "Con porciones iguales, 200 g de arroz sirven para dos personas. La proporción directa da 500 g para cinco.",
+    "Com porções iguais, 200 g de arroz servem duas pessoas. A proporção direta dá 500 g para cinco."
+  ],
+  [
+    "You share a photo with two people, who each share it with two more. Three ideal doubling rounds produce eight recipients in that round.",
+    "Du teilst ein Foto mit zwei Personen, die es jeweils mit zwei weiteren teilen. Drei ideale Verdopplungsrunden erreichen acht Empfänger in dieser Runde.",
+    "Du teilst a Foto mit zwoa Leit, de’s jeweils mit zwoa weiteren teiln. Drei ideale Verdopplungsrunden erreichn acht Empfänger in der Runde.",
+    "사진을 두 사람에게 보내고 각자가 다시 두 명에게 보냅니다. 이상적인 배증을 세 번 하면 그 단계의 수신자는 여덟 명입니다.",
+    "Вы делитесь фото с двумя людьми, каждый — ещё с двумя. Три идеальных раунда удвоения дают восемь получателей в этом раунде.",
+    "Compartes una foto con dos personas y cada una con otras dos. Tres rondas ideales de duplicación producen ocho destinatarios en esa ronda.",
+    "Você compartilha uma foto com duas pessoas, cada uma com outras duas. Três rodadas ideais de duplicação produzem oito destinatários nessa rodada."
+  ],
+  [
+    "Compare two hypothetical phone plans costing €5 plus €2 per unit and €9 plus €1 per unit. They cost the same at four units.",
+    "Vergleiche zwei hypothetische Telefontarife: 5 € plus 2 € pro Einheit und 9 € plus 1 € pro Einheit. Bei vier Einheiten kosten beide gleich viel.",
+    "Vergleich zwoa hypothetische Telefontarife: 5 € plus 2 € pro Einheit und 9 € plus 1 € pro Einheit. Bei vier Einheiten kosten beide gleich vui.",
+    "기본료 5유로에 단위당 2유로인 요금과 기본료 9유로에 단위당 1유로인 가상 요금을 비교하세요. 네 단위에서 비용이 같습니다.",
+    "Сравните два условных тарифа: 5 € плюс 2 € за единицу и 9 € плюс 1 €. При четырёх единицах цены равны.",
+    "Compara dos planes hipotéticos: 5 € más 2 € por unidad y 9 € más 1 € por unidad. Cuestan igual a las cuatro unidades.",
+    "Compare dois planos hipotéticos: €5 mais €2 por unidade e €9 mais €1 por unidade. Custam o mesmo em quatro unidades."
+  ],
+  [
+    "Splitting a €60 bill equally requires at least one person. The formula 60/n has no meaning at zero people.",
+    "Eine Rechnung von 60 € gleichmäßig zu teilen erfordert mindestens eine Person. Die Formel 60/n hat bei null Personen keine Bedeutung.",
+    "A Rechnung von 60 € gleichmäßig teiln braucht mindestens oa Person. De Formel 60/n hat bei null Leit koa Bedeutung.",
+    "60유로 청구서를 똑같이 나누려면 한 명 이상이어야 합니다. 0명일 때 60/n은 의미가 없습니다.",
+    "Для равного деления счёта 60 € нужен хотя бы один человек. Формула 60/n не имеет смысла при нуле человек.",
+    "Repartir por igual una cuenta de 60 € requiere al menos una persona. La fórmula 60/n no tiene sentido con cero personas.",
+    "Dividir igualmente uma conta de €60 exige ao menos uma pessoa. A fórmula 60/n não faz sentido com zero pessoas."
+  ],
+  [
+    "A journey covers 60 km between hour one and hour two. The average speed is 60 km/h, even if the speed changed along the way.",
+    "Eine Fahrt legt zwischen Stunde eins und zwei 60 km zurück. Die Durchschnittsgeschwindigkeit ist 60 km/h, auch wenn sich das Tempo unterwegs änderte.",
+    "A Fahrt legt zwischen Stund oans und zwoa 60 km zruck. De Durchschnittsgeschwindigkeit is 60 km/h, aa wenn sich s Tempo unterwegs geändert hat.",
+    "여행에서 1시간째와 2시간째 사이에 60km를 이동했습니다. 속도가 변했어도 평균 속력은 60km/h입니다.",
+    "За время между первым и вторым часом поездки пройдено 60 км. Средняя скорость — 60 км/ч, даже если скорость менялась.",
+    "Un viaje recorre 60 km entre la primera y la segunda hora. La velocidad media es 60 km/h, aunque cambie durante el trayecto.",
+    "Uma viagem percorre 60 km entre a primeira e a segunda hora. A velocidade média é 60 km/h, mesmo que varie no trajeto."
+  ],
+  [
+    "A hypothetical journey has distance s(t) = t² kilometres. At two hours the instantaneous speed is 4 km/h; the average over the first two hours is 2 km/h.",
+    "Eine hypothetische Strecke ist s(t) = t² Kilometer. Nach zwei Stunden beträgt die momentane Geschwindigkeit 4 km/h; der Durchschnitt der ersten zwei Stunden ist 2 km/h.",
+    "A hypothetische Strecke is s(t) = t² Kilometer. Nach zwoa Stunden is de momentane Geschwindigkeit 4 km/h; da Durchschnitt von de ersten zwoa Stunden is 2 km/h.",
+    "가상 이동거리는 s(t) = t²km입니다. 2시간째 순간 속력은 4km/h이고 처음 2시간의 평균 속력은 2km/h입니다.",
+    "Условная поездка имеет путь s(t) = t² километров. В два часа мгновенная скорость 4 км/ч, а средняя за первые два часа — 2 км/ч.",
+    "Un viaje hipotético tiene distancia s(t) = t² kilómetros. A las dos horas la velocidad instantánea es 4 km/h; la media de las primeras dos es 2 km/h.",
+    "Uma viagem hipotética tem distância s(t) = t² quilômetros. Em duas horas a velocidade instantânea é 4 km/h; a média das primeiras duas é 2 km/h."
+  ],
+  [
+    "A tap fills a bucket at 3 litres per minute for four minutes. Accumulating the flow gives 12 litres.",
+    "Ein Wasserhahn füllt vier Minuten lang mit 3 Litern pro Minute einen Eimer. Aufsummieren der Durchflussmenge ergibt 12 Liter.",
+    "A Wasserhahn füllt vier Minuten lang mit 3 Liter pro Minute an Eimer. Aufsummiern vom Durchfluss ergibt 12 Liter.",
+    "수도꼭지가 4분 동안 분당 3리터로 양동이를 채웁니다. 유량을 누적하면 12리터입니다.",
+    "Кран наполняет ведро по 3 литра в минуту четыре минуты. Накопление потока даёт 12 литров.",
+    "Un grifo llena un cubo a 3 litros por minuto durante cuatro minutos. Acumular el caudal da 12 litros.",
+    "Uma torneira enche um balde a 3 litros por minuto durante quatro minutos. Acumular a vazão dá 12 litros."
+  ],
+  [
+    "Your walking app records a constant 3 km/h, starting 2 km from home along a straight route. The initial distance fixes the constant.",
+    "Deine Lauf-App erfasst konstante 3 km/h, beginnend 2 km von zu Hause auf einer geraden Route. Die Anfangsentfernung bestimmt die Konstante.",
+    "Dei Geh-App erfasst konstante 3 km/h, beginnend 2 km von dahoam auf a geraden Route. De Anfangsentfernung bestimmt de Konstante.",
+    "걷기 앱이 직선 경로에서 집으로부터 2km 떨어진 지점에서 출발해 일정한 3km/h를 기록합니다. 초기 거리가 상수를 결정합니다.",
+    "Приложение фиксирует постоянные 3 км/ч по прямой, начиная в 2 км от дома. Начальное расстояние определяет константу.",
+    "Tu app registra 3 km/h constantes, empezando a 2 km de casa por una ruta recta. La distancia inicial fija la constante.",
+    "Seu app registra 3 km/h constantes, começando a 2 km de casa em uma rota reta. A distância inicial fixa a constante."
+  ],
+  [
+    "A tap’s flow rises linearly from 0 to 4 litres per minute over two minutes. Integrating the flow gives 4 litres collected.",
+    "Der Durchfluss eines Wasserhahns steigt in zwei Minuten linear von 0 auf 4 Liter pro Minute. Integration ergibt 4 Liter gesammeltes Wasser.",
+    "Da Durchfluss von am Wasserhahn steigt in zwoa Minuten linear von 0 auf 4 Liter pro Minute. Integration ergibt 4 Liter gsammeltes Wasser.",
+    "수도꼭지 유량이 2분 동안 분당 0에서 4리터로 선형 증가합니다. 유량을 적분하면 모은 물은 4리터입니다.",
+    "Поток крана линейно растёт с 0 до 4 литров в минуту за две минуты. Интегрирование даёт 4 литра воды.",
+    "El caudal de un grifo sube linealmente de 0 a 4 litros por minuto en dos minutos. Integrarlo da 4 litros recogidos.",
+    "A vazão de uma torneira sobe linearmente de 0 a 4 litros por minuto em dois minutos. Integrá-la dá 4 litros coletados."
+  ],
+  [
+    "You have 12 metres of edging for a rectangular garden. Comparing feasible side lengths gives the largest area at 3 m by 3 m.",
+    "Du hast 12 Meter Einfassung für einen rechteckigen Garten. Der Vergleich möglicher Seitenlängen ergibt die größte Fläche bei 3 m mal 3 m.",
+    "Du hast 12 Meter Einfassung für an rechteckigen Garten. Beim Vergleich von mögliche Seitenlängen is de größte Fläche bei 3 m mal 3 m.",
+    "직사각형 정원에 12m 테두리를 쓸 수 있습니다. 가능한 변 길이를 비교하면 3m×3m일 때 면적이 최대입니다.",
+    "У вас 12 метров бордюра для прямоугольного сада. Сравнение допустимых сторон даёт максимальную площадь при 3 м на 3 м.",
+    "Tienes 12 metros de borde para un jardín rectangular. Comparar lados posibles da el área máxima con 3 m por 3 m.",
+    "Você tem 12 metros de borda para um jardim retangular. Comparar lados possíveis dá a maior área em 3 m por 3 m."
+  ],
+  [
+    "Your walking app samples speeds rather than recording every instant. Averaging adjacent readings estimates distance; missed speed changes can affect the result.",
+    "Deine Lauf-App erfasst Geschwindigkeiten stichprobenartig statt ständig. Der Mittelwert benachbarter Messungen schätzt die Strecke; übersehene Tempoänderungen beeinflussen das Ergebnis.",
+    "Dei Geh-App erfasst Geschwindigkeiten stichprobenartig statt ständig. Da Mittelwert benachbarter Messungen schätzt de Strecke; übersehene Tempoänderungen ändern s Ergebnis.",
+    "걷기 앱은 모든 순간 대신 속도를 간헐적으로 기록합니다. 인접 측정값의 평균으로 거리를 추정하며 놓친 속도 변화가 결과에 영향을 줍니다.",
+    "Приложение измеряет скорость отдельными отсчётами. Усреднение соседних измерений оценивает путь; пропущенные изменения скорости влияют на результат.",
+    "Tu app toma muestras de velocidad en vez de registrar cada instante. Promediar lecturas vecinas estima la distancia; los cambios no detectados afectan el resultado.",
+    "Seu app amostra velocidades em vez de registrar cada instante. A média de leituras vizinhas estima a distância; mudanças não detectadas afetam o resultado."
+  ],
+  [
+    "In an open park, your destination is 300 m east and 400 m north. The direct displacement is 500 m; paths may require a longer walk.",
+    "In einem offenen Park liegt dein Ziel 300 m östlich und 400 m nördlich. Die direkte Verschiebung ist 500 m; Wege können länger sein.",
+    "Im offenen Park liegt dei Ziel 300 m östlich und 400 m nördlich. De direkte Verschiebung is 500 m; de Wege können länger sein.",
+    "탁 트인 공원에서 목적지가 동쪽 300m, 북쪽 400m에 있습니다. 직선 변위는 500m이지만 길을 따라 걸으면 더 길 수 있습니다.",
+    "В открытом парке цель находится на 300 м восточнее и 400 м севернее. Прямое перемещение — 500 м; по дорожкам путь может быть длиннее.",
+    "En un parque abierto, tu destino está 300 m al este y 400 m al norte. El desplazamiento directo es 500 m; los senderos pueden alargar el recorrido.",
+    "Em um parque aberto, seu destino fica 300 m a leste e 400 m ao norte. O deslocamento direto é 500 m; caminhos podem exigir uma caminhada maior."
+  ],
+  [
+    "Compare grocery totals at two shops: two loaves and three milk cartons cost €7.50 at one and €8.40 at the other. Rows organize each shop’s prices.",
+    "Vergleiche Einkaufssummen zweier Läden: Zwei Brote und drei Milchkartons kosten hier 7,50 € und dort 8,40 €. Zeilen ordnen die Preise jedes Ladens.",
+    "Vergleich Einkaufssummen von zwoa Läden: Zwoa Brote und drei Milchkartons kosten hier 7,50 € und dort 8,40 €. Zeilen ordnen de Preise von jedem Laden.",
+    "두 가게의 장보기 총액을 비교하세요. 빵 두 개와 우유 세 팩은 한 곳에서 7.50유로, 다른 곳에서 8.40유로입니다. 각 행에 가게별 가격을 정리합니다.",
+    "Сравните покупки в двух магазинах: два хлеба и три пакета молока стоят 7,50 € в одном и 8,40 € в другом. Строки упорядочивают цены каждого магазина.",
+    "Compara totales en dos tiendas: dos panes y tres cartones de leche cuestan 7,50 € en una y 8,40 € en otra. Las filas organizan los precios de cada tienda.",
+    "Compare compras em duas lojas: dois pães e três caixas de leite custam €7,50 em uma e €8,40 na outra. As linhas organizam os preços de cada loja."
+  ],
+  [
+    "Two adults and one child pay €25 for tickets; one adult and two children pay €20. Solving both totals gives €10 per adult and €5 per child.",
+    "Zwei Erwachsene und ein Kind zahlen 25 € für Tickets; ein Erwachsener und zwei Kinder 20 €. Beide Summen ergeben 10 € pro Erwachsenem und 5 € pro Kind.",
+    "Zwoa Erwachsene und a Kind zahln 25 € für Tickets; a Erwachsener und zwoa Kinder 20 €. Beide Summen ergebn 10 € pro Erwachsenem und 5 € pro Kind.",
+    "성인 두 명과 어린이 한 명은 표값 25유로, 성인 한 명과 어린이 두 명은 20유로를 냅니다. 두 식을 풀면 성인은 10유로, 어린이는 5유로입니다.",
+    "Два взрослых и ребёнок платят 25 € за билеты; взрослый и двое детей — 20 €. Решение двух сумм даёт 10 € за взрослого и 5 € за ребёнка.",
+    "Dos adultos y un niño pagan 25 €; un adulto y dos niños, 20 €. Resolver ambos totales da 10 € por adulto y 5 € por niño.",
+    "Dois adultos e uma criança pagam €25; um adulto e duas crianças, €20. Resolver os dois totais dá €10 por adulto e €5 por criança."
+  ],
+  [
+    "Rotate a photo a quarter-turn counterclockwise. A point three units right and two up moves to two left and three up, preserving its distance from the centre.",
+    "Drehe ein Foto um eine Vierteldrehung gegen den Uhrzeigersinn. Ein Punkt drei Einheiten rechts und zwei oben wandert zwei nach links und drei nach oben, bei gleichem Abstand vom Zentrum.",
+    "Dreh a Foto um a Vierteldrehung gegen den Uhrzeigersinn. A Punkt drei Einheiten rechts und zwoa oben geht zwoa nach links und drei nach oben, bei gleichem Abstand vom Zentrum.",
+    "사진을 반시계 방향으로 90도 돌리세요. 오른쪽 3, 위쪽 2인 점은 왼쪽 2, 위쪽 3으로 이동하고 중심까지 거리는 유지됩니다.",
+    "Поверните фото на четверть оборота против часовой стрелки. Точка на три единицы вправо и две вверх перейдёт на две влево и три вверх, сохранив расстояние до центра.",
+    "Gira una foto un cuarto de vuelta en sentido antihorario. Un punto tres unidades a la derecha y dos arriba pasa a dos a la izquierda y tres arriba, manteniendo su distancia al centro.",
+    "Gire uma foto um quarto de volta no sentido anti-horário. Um ponto três unidades à direita e duas acima passa a duas à esquerda e três acima, preservando sua distância ao centro."
+  ],
+  [
+    "Resize a photo to twice its width and three times its height. A horizontal arrow keeps its direction and doubles in length: it is an eigenvector direction.",
+    "Skaliere ein Foto auf doppelte Breite und dreifache Höhe. Ein horizontaler Pfeil behält seine Richtung und verdoppelt seine Länge: eine Eigenvektorrichtung.",
+    "Skalier a Foto auf doppelte Breit und dreifache Höh. A waagrechter Pfeil behält sei Richtung und verdoppelt sei Läng: a Eigenvektorrichtung.",
+    "사진의 너비는 두 배, 높이는 세 배로 바꾸세요. 수평 화살표는 방향을 유지하고 길이만 두 배가 됩니다. 이것이 고유벡터 방향입니다.",
+    "Увеличьте фото вдвое по ширине и втрое по высоте. Горизонтальная стрелка сохранит направление и удвоит длину: это направление собственного вектора.",
+    "Redimensiona una foto al doble de ancho y triple de alto. Una flecha horizontal conserva su dirección y duplica su longitud: es una dirección propia.",
+    "Redimensione uma foto para o dobro da largura e o triplo da altura. Uma seta horizontal mantém a direção e dobra de comprimento: é uma direção de autovetor."
+  ],
+  [
+    "Before repaying shared shopping costs, check that your proposed item prices reproduce every receipt. A nonzero residual flags a mismatch to investigate.",
+    "Bevor du gemeinsame Einkäufe abrechnest, prüfe, ob vorgeschlagene Einzelpreise alle Belege reproduzieren. Ein Residuum ungleich null zeigt eine zu klärende Abweichung.",
+    "Bevor du gemeinsame Einkäufe abrechnest, prüf, ob de vorgeschlagenen Einzelpreise alle Kassenzettel reproduziern. A Residuum ungleich null zeigt a Abweichung zum Nachschaun.",
+    "공동 장보기 비용을 정산하기 전에 제안한 품목 가격이 모든 영수증 총액을 재현하는지 확인하세요. 0이 아닌 잔차는 확인할 불일치를 나타냅니다.",
+    "Перед расчётом общих покупок проверьте, воспроизводят ли предложенные цены все чеки. Ненулевая невязка указывает на расхождение для проверки.",
+    "Antes de liquidar compras compartidas, comprueba si los precios propuestos reproducen cada recibo. Un residuo no nulo señala una discrepancia que investigar.",
+    "Antes de acertar compras compartilhadas, confira se os preços propostos reproduzem todos os recibos. Um resíduo não nulo indica uma diferença a investigar."
+  ],
+  [
+    "A delivery fee may jump when a basket reaches €50. Approaching the threshold from below and above can give different totals; check the rule at exactly €50.",
+    "Eine Liefergebühr kann bei einem Warenkorb von 50 € springen. Annäherung von unten und oben kann verschiedene Summen ergeben; prüfe die Regel bei genau 50 €.",
+    "A Liefergebühr kann bei am Warenkorb von 50 € springen. Von unten und oben können verschiedene Summen rauskommen; prüf de Regel bei genau 50 €.",
+    "장바구니가 50유로가 되면 배송비가 바뀔 수 있습니다. 아래와 위에서 다가갈 때 총액이 다를 수 있으므로 정확히 50유로일 때 규칙을 확인하세요.",
+    "Стоимость доставки может скачком измениться при корзине 50 €. Приближение снизу и сверху может давать разные суммы; проверьте правило при ровно 50 €.",
+    "La tarifa de entrega puede saltar al llegar la cesta a 50 €. Acercarse desde abajo y arriba puede dar totales distintos; comprueba la regla en exactamente 50 €.",
+    "A taxa de entrega pode mudar de repente quando o carrinho chega a €50. Aproximar por baixo e por cima pode dar totais diferentes; confira a regra em exatamente €50."
+  ],
+  [
+    "You clear half a backlog each week. The remaining fraction approaches zero, but the ideal halving model never reaches exactly zero in a finite week.",
+    "Du erledigst jede Woche die Hälfte eines Rückstands. Der Restanteil nähert sich null, erreicht im idealen Halbierungsmodell aber in keiner endlichen Woche genau null.",
+    "Du erledigst jede Woche de Hälfte von am Rückstand. Da Restanteil nähert sich null, erreicht im idealen Halbierungsmodell aber in koana endlichen Woche genau null.",
+    "매주 밀린 일의 절반을 처리합니다. 남은 비율은 0에 다가가지만 이상적인 반감 모델에서 유한한 주 안에 정확히 0이 되지는 않습니다.",
+    "Каждую неделю вы выполняете половину оставшихся дел. Доля остатка стремится к нулю, но в идеальной модели не достигает его за конечное число недель.",
+    "Cada semana resuelves la mitad del trabajo pendiente. La fracción restante se acerca a cero, pero el modelo ideal nunca llega exactamente a cero en una semana finita.",
+    "Você resolve metade do trabalho pendente por semana. A fração restante se aproxima de zero, mas o modelo ideal nunca chega exatamente a zero em uma semana finita."
+  ],
+  [
+    "You watch half a video, then half the remaining part, and repeat. The watched fractions add toward one whole video.",
+    "Du schaust die Hälfte eines Videos, dann die Hälfte des Restes und wiederholst das. Die gesehenen Anteile summieren sich gegen ein ganzes Video.",
+    "Du schaust de Hälfte von am Video, dann de Hälfte vom Rest und wiederholst des. De gsehenen Anteile summiern sich gegen a ganzes Video.",
+    "영상의 절반을 보고 남은 부분의 절반을 보는 일을 반복합니다. 본 부분의 합은 영상 한 편에 다가갑니다.",
+    "Вы смотрите половину видео, затем половину остатка и повторяете. Просмотренные доли складываются к одному целому видео.",
+    "Ves la mitad de un vídeo, después la mitad de lo restante y repites. Las fracciones vistas suman hacia un vídeo completo.",
+    "Você assiste à metade de um vídeo, depois à metade do restante e repete. As frações assistidas somam em direção a um vídeo inteiro."
+  ],
+  [
+    "Two identical tickets cost twice the price of one. Keeping each ticket’s price error below €0.05 guarantees a total error below €0.10.",
+    "Zwei identische Tickets kosten das Doppelte eines Tickets. Ein Preisfehler unter 0,05 € pro Ticket garantiert einen Gesamtfehler unter 0,10 €.",
+    "Zwoa gleiche Tickets kosten s Doppelte von oam Ticket. A Preisfehler unter 0,05 € pro Ticket garantiert an Gesamtfehler unter 0,10 €.",
+    "같은 표 두 장은 한 장 가격의 두 배입니다. 한 장의 가격 오차를 0.05유로 미만으로 유지하면 총 오차가 0.10유로 미만임을 보장합니다.",
+    "Два одинаковых билета стоят вдвое больше одного. Ошибка цены каждого менее 0,05 € гарантирует общую ошибку менее 0,10 €.",
+    "Dos entradas iguales cuestan el doble de una. Mantener el error de cada precio por debajo de 0,05 € garantiza un error total inferior a 0,10 €.",
+    "Dois ingressos iguais custam o dobro de um. Manter o erro de cada preço abaixo de €0,05 garante um erro total abaixo de €0,10."
+  ],
+  [
+    "An advertised per-person price divides a bill by group size. Testing zero people reveals an excluded input before you rely on the formula.",
+    "Ein beworbener Preis pro Person teilt eine Rechnung durch die Gruppengröße. Der Test mit null Personen zeigt eine ausgeschlossene Eingabe, bevor du die Formel nutzt.",
+    "A beworbener Preis pro Person teilt de Rechnung durch de Gruppengröß. Da Test mit null Leit zeigt a ausgeschlossene Eingab, bevor du de Formel nutzt.",
+    "광고된 1인당 가격은 청구액을 인원수로 나눕니다. 0명을 대입하면 공식을 쓰기 전에 제외된 입력을 알 수 있습니다.",
+    "Рекламируемая цена на человека делит счёт на размер группы. Проверка нуля человек выявляет исключённый вход до использования формулы.",
+    "Un precio anunciado por persona divide la cuenta por el tamaño del grupo. Probar cero personas revela una entrada excluida antes de usar la fórmula.",
+    "Um preço anunciado por pessoa divide a conta pelo tamanho do grupo. Testar zero pessoas revela uma entrada excluída antes de usar a fórmula."
+  ],
+  [
+    "When deciding whether an umbrella signals rain, distinguish rainy days with umbrellas from umbrella days with rain. The two questions use different denominators.",
+    "Um zu beurteilen, ob ein Regenschirm Regen signalisiert, unterscheide Regentage mit Schirm von Schirmtagen mit Regen. Beide Fragen verwenden verschiedene Nenner.",
+    "Zum Beurteilen, ob a Regenschirm Regen signalisiert, unterscheid Regentage mit Schirm von Schirmtagen mit Regen. Beide Fragen habn verschiedene Nenner.",
+    "우산이 비를 나타내는지 판단할 때, 비 오는 날 중 우산을 쓴 날과 우산을 쓴 날 중 비 온 날을 구분하세요. 두 질문의 분모는 다릅니다.",
+    "Оценивая, означает ли зонт дождь, различайте дождливые дни с зонтом и дни с зонтом, когда шёл дождь. Знаменатели разные.",
+    "Para decidir si un paraguas indica lluvia, distingue días lluviosos con paraguas de días con paraguas y lluvia. Las dos preguntas usan denominadores distintos.",
+    "Para decidir se um guarda-chuva indica chuva, distinga dias chuvosos com guarda-chuva de dias com guarda-chuva e chuva. As perguntas usam denominadores diferentes."
+  ],
+  [
+    "Plan for how many friends might attend a picnic. With four independent guests each attending with probability one half, the expected count is two, but any count from zero to four is possible.",
+    "Plane die mögliche Gästezahl beim Picknick. Bei vier unabhängigen Gästen mit je 50% Teilnahmechance ist die erwartete Anzahl zwei; jede Zahl von null bis vier ist möglich.",
+    "Plan de mögliche Gästezahl beim Picknick. Bei vier unabhängigen Gästen mit je 50% Teilnahmechance is de erwartete Anzahl zwoa; jede Zahl von null bis vier is möglich.",
+    "소풍에 올 친구 수를 생각해 보세요. 네 명이 독립적으로 각각 절반의 확률로 참석하면 예상 인원은 두 명이지만 0명부터 4명까지 모두 가능합니다.",
+    "Планируйте число друзей на пикнике. Для четырёх независимых гостей с шансом прихода 1/2 ожидаемое число — два, но возможно любое от нуля до четырёх.",
+    "Planifica cuántos amigos podrían ir a un pícnic. Con cuatro invitados independientes y probabilidad de asistencia de un medio, la esperanza es dos, pero pueden ir de cero a cuatro.",
+    "Planeje quantos amigos podem ir ao piquenique. Com quatro convidados independentes e probabilidade de presença de metade, a esperança é dois, mas podem ir de zero a quatro."
+  ],
+  [
+    "Your last three delivery waits were 2, 4, and 60 minutes. The mean is 22 minutes and the median is 4; the unusual delay changes what “typical” means.",
+    "Deine letzten drei Lieferwartezeiten waren 2, 4 und 60 Minuten. Der Mittelwert ist 22 Minuten, der Median 4; die ungewöhnliche Verzögerung verändert, was „typisch“ heißt.",
+    "Deine letzten drei Lieferwartezeiten warn 2, 4 und 60 Minuten. Da Mittelwert is 22 Minuten, da Median 4; de ungewöhnliche Verzögerung verändert, was „typisch“ heißt.",
+    "최근 세 번의 배달 대기시간은 2분, 4분, 60분이었습니다. 평균은 22분이고 중앙값은 4분입니다. 이례적인 지연이 ‘보통’의 의미를 바꿉니다.",
+    "Последние три ожидания доставки: 2, 4 и 60 минут. Среднее — 22 минуты, медиана — 4; необычная задержка меняет смысл «типичного».",
+    "Tus últimas tres esperas de entrega fueron 2, 4 y 60 minutos. La media es 22 y la mediana 4; el retraso inusual cambia lo que significa «típico».",
+    "Suas últimas três esperas de entrega foram 2, 4 e 60 minutos. A média é 22 e a mediana 4; o atraso incomum muda o significado de “típico”."
+  ],
+  [
+    "A poll of your friends may not represent your whole neighbourhood. A larger poll reduces random fluctuation only when its sampling assumptions are reasonable.",
+    "Eine Umfrage unter Freunden repräsentiert vielleicht nicht deine ganze Nachbarschaft. Eine größere Umfrage reduziert Zufallsschwankung nur bei vernünftigen Stichprobenannahmen.",
+    "A Umfrage unter Freind repräsentiert vielleicht ned dei ganze Nachbarschaft. A größere Umfrage reduziert Zufallsschwankung nur bei vernünftigen Stichprobenannahmen.",
+    "친구들만 조사한 설문은 동네 전체를 대표하지 않을 수 있습니다. 표본 가정이 타당할 때에만 큰 조사가 무작위 변동을 줄입니다.",
+    "Опрос друзей может не представлять весь район. Больший опрос уменьшает случайные колебания только при разумных предположениях о выборке.",
+    "Una encuesta entre amigos quizá no represente todo tu barrio. Una encuesta mayor reduce la fluctuación aleatoria solo si los supuestos de muestreo son razonables.",
+    "Uma pesquisa entre amigos talvez não represente todo o bairro. Uma pesquisa maior reduz a flutuação aleatória apenas se as hipóteses de amostragem forem razoáveis."
+  ],
+  [
+    "A chart makes a household bill rising from €40 to €50 look doubled by starting its bars at €30. The actual increase is 25%.",
+    "Ein Diagramm lässt eine Haushaltsrechnung von 40 € auf 50 € wie eine Verdopplung aussehen, weil die Balken bei 30 € beginnen. Tatsächlich steigt sie um 25%.",
+    "A Diagramm lässt a Haushaltsrechnung von 40 € auf 50 € wie a Verdopplung ausschaun, weil de Balken bei 30 € anfangen. Tatsächlich steigt sie um 25%.",
+    "가계 청구액이 40유로에서 50유로로 오른 차트에서 막대를 30유로부터 시작하면 두 배처럼 보입니다. 실제 증가는 25%입니다.",
+    "График делает рост бытового счёта с 40 € до 50 € похожим на удвоение, начиная столбцы с 30 €. Настоящий рост — 25%.",
+    "Un gráfico hace parecer que una factura de 40 € a 50 € se duplica al empezar las barras en 30 €. El aumento real es del 25%.",
+    "Um gráfico faz uma conta de €40 para €50 parecer dobrar ao começar as barras em €30. O aumento real é 25%."
+  ],
+  [
+    "For three independent attempts at a game with a one-half chance each, the chance of at least one win is seven eighths. Earlier losses do not improve the next attempt.",
+    "Bei drei unabhängigen Spielversuchen mit je 50% Gewinnchance ist die Chance auf mindestens einen Gewinn sieben Achtel. Frühere Niederlagen verbessern den nächsten Versuch nicht.",
+    "Bei drei unabhängigen Spielversuchen mit je 50% Gewinnchance is de Chance auf mindestens oan Gewinn sieben Achtel. Frühere Niederlagen verbessern den nächsten Versuch ned.",
+    "각각 성공확률이 절반인 독립 게임을 세 번 하면 한 번 이상 이길 확률은 8분의 7입니다. 이전 패배는 다음 확률을 높이지 않습니다.",
+    "При трёх независимых попытках игры с шансом 1/2 вероятность хотя бы одной победы — семь восьмых. Прошлые проигрыши не улучшают следующую попытку.",
+    "En tres intentos independientes de un juego con probabilidad de un medio, la probabilidad de al menos una victoria es siete octavos. Las derrotas anteriores no mejoran el siguiente intento.",
+    "Em três tentativas independentes de um jogo com chance de metade, a probabilidade de ao menos uma vitória é sete oitavos. Perdas anteriores não melhoram a próxima tentativa."
+  ],
+  [
+    "Change coordinates and predict the result",
+    "Koordinaten ändern und Ergebnis vorhersagen",
+    "Koordinaten ändern und Ergebnis vorhersagn",
+    "좌표를 바꾸고 결과 예측하기",
+    "Меняйте координаты и предсказывайте результат",
+    "Cambia coordenadas y predice el resultado",
+    "Altere coordenadas e preveja o resultado"
+  ],
+  [
+    "Quarter-turn",
+    "Vierteldrehung",
+    "Vierteldrehung",
+    "90도 회전",
+    "Четверть оборота",
+    "Cuarto de vuelta",
+    "Quarto de volta"
+  ],
+  [
+    "Reflection",
+    "Spiegelung",
+    "Spiegelung",
+    "반사",
+    "Отражение",
+    "Reflexión",
+    "Reflexão"
+  ],
+  [
+    "Shear",
+    "Scherung",
+    "Scherung",
+    "전단",
+    "Сдвиг-срез",
+    "Cizallamiento",
+    "Cisalhamento"
+  ],
+  [
+    "Stretch",
+    "Streckung",
+    "Streckung",
+    "확대",
+    "Растяжение",
+    "Estiramiento",
+    "Alongamento"
+  ],
+  [
+    "Original vector",
+    "Ursprünglicher Vektor",
+    "Ursprünglicher Vektor",
+    "원래 벡터",
+    "Исходный вектор",
+    "Vector original",
+    "Vetor original"
+  ],
+  [
+    "Result vector",
+    "Ergebnisvektor",
+    "Ergebnisvektor",
+    "결과 벡터",
+    "Результирующий вектор",
+    "Vector resultante",
+    "Vetor resultante"
+  ],
+  [
+    "Candidate residual",
+    "Residuum des Vorschlags",
+    "Residuum vom Vorschlag",
+    "후보 해의 잔차",
+    "Невязка кандидата",
+    "Residuo del candidato",
+    "Resíduo do candidato"
+  ],
+  [
+    "Computed residual",
+    "Berechnetes Residuum",
+    "Berechnetes Residuum",
+    "계산된 잔차",
+    "Вычисленная невязка",
+    "Residuo calculado",
+    "Resíduo calculado"
+  ],
+  [
+    "System solution",
+    "Lösung des Systems",
+    "Lösung vom System",
+    "연립방정식의 해",
+    "Решение системы",
+    "Solución del sistema",
+    "Solução do sistema"
+  ],
+  [
+    "No solution",
+    "Keine Lösung",
+    "Koa Lösung",
+    "해 없음",
+    "Нет решения",
+    "Sin solución",
+    "Sem solução"
+  ],
+  [
+    "Infinitely many solutions",
+    "Unendlich viele Lösungen",
+    "Unendlich vui Lösungen",
+    "무한히 많은 해",
+    "Бесконечно много решений",
+    "Infinitas soluciones",
+    "Infinitas soluções"
+  ],
+  [
+    "This nonzero direction is not an eigenvector, or the input is the zero vector.",
+    "Diese Richtung ist kein Eigenvektor, oder die Eingabe ist der Nullvektor.",
+    "De Richtung is koa Eigenvektor, oder de Eingab is da Nullvektor.",
+    "이 방향은 고유벡터가 아니거나 입력이 영벡터입니다.",
+    "Это направление не является собственным вектором, либо введён нулевой вектор.",
+    "Esta dirección no es un vector propio, o la entrada es el vector cero.",
+    "Esta direção não é um autovetor, ou a entrada é o vetor zero."
+  ],
+  [
+    "This is an eigenvector direction.",
+    "Dies ist eine Eigenvektorrichtung.",
+    "Des is a Eigenvektorrichtung.",
+    "고유벡터 방향입니다.",
+    "Это направление собственного вектора.",
+    "Esta es una dirección propia.",
+    "Esta é uma direção de autovetor."
+  ],
+  [
+    "The sliders test a candidate. The computed solution uses both original equations; displayed decimals are rounded.",
+    "Die Regler testen einen Vorschlag. Die berechnete Lösung nutzt beide ursprünglichen Gleichungen; angezeigte Dezimalzahlen sind gerundet.",
+    "De Regler testen an Vorschlag. De berechnete Lösung nutzt beide ursprünglichen Gleichungen; angezeigte Dezimalzahlen san grundet.",
+    "슬라이더는 후보 해를 시험합니다. 계산된 해는 두 원래 방정식을 모두 사용하며 표시된 소수는 반올림됩니다.",
+    "Ползунки проверяют кандидата. Вычисленное решение использует оба исходных уравнения; десятичные числа округлены.",
+    "Los controles prueban un candidato. La solución calculada usa ambas ecuaciones originales; los decimales mostrados están redondeados.",
+    "Os controles testam um candidato. A solução calculada usa ambas as equações originais; os decimais exibidos são arredondados."
+  ],
+  [
+    "Coordinates are abstract units. Compare direction, length, and determinant before and after each change.",
+    "Koordinaten haben abstrakte Einheiten. Vergleiche Richtung, Länge und Determinante vor und nach jeder Änderung.",
+    "Koordinaten habn abstrakte Einheiten. Vergleich Richtung, Läng und Determinante vor und nach jeder Änderung.",
+    "좌표는 추상적인 단위입니다. 바꾸기 전후의 방향, 길이와 행렬식을 비교하세요.",
+    "Координаты заданы в абстрактных единицах. Сравнивайте направление, длину и определитель до и после изменения.",
+    "Las coordenadas usan unidades abstractas. Compara dirección, longitud y determinante antes y después de cada cambio.",
+    "As coordenadas usam unidades abstratas. Compare direção, comprimento e determinante antes e depois de cada mudança."
+  ],
+  [
+    "Partial sums and their limits",
+    "Partialsummen und ihre Grenzwerte",
+    "Teilsummen und ihre Grenzwerte",
+    "부분합과 극한",
+    "Частичные суммы и их пределы",
+    "Sumas parciales y sus límites",
+    "Somas parciais e seus limites"
+  ],
+  [
+    "Terms, limits, and tolerance",
+    "Glieder, Grenzwerte und Toleranz",
+    "Glieder, Grenzwerte und Toleranz",
+    "항, 극한과 허용 오차",
+    "Члены, пределы и допуск",
+    "Términos, límites y tolerancia",
+    "Termos, limites e tolerância"
+  ],
+  [
+    "Series model",
+    "Reihenmodell",
+    "Reihenmodell",
+    "급수 모델",
+    "Модель ряда",
+    "Modelo de serie",
+    "Modelo de série"
+  ],
+  [
+    "Sequence model",
+    "Folgenmodell",
+    "Folgenmodell",
+    "수열 모델",
+    "Модель последовательности",
+    "Modelo de sucesión",
+    "Modelo de sequência"
+  ],
+  [
+    "Geometric series",
+    "Geometrische Reihe",
+    "Geometrische Reihe",
+    "등비급수",
+    "Геометрический ряд",
+    "Serie geométrica",
+    "Série geométrica"
+  ],
+  [
+    "Harmonic series",
+    "Harmonische Reihe",
+    "Harmonische Reihe",
+    "조화급수",
+    "Гармонический ряд",
+    "Serie armónica",
+    "Série harmônica"
+  ],
+  [
+    "Number of terms",
+    "Anzahl der Glieder",
+    "Anzahl von de Glieder",
+    "항의 개수",
+    "Число членов",
+    "Número de términos",
+    "Número de termos"
+  ],
+  [
+    "Ratio r",
+    "Verhältnis r",
+    "Verhältnis r",
+    "공비 r",
+    "Знаменатель r",
+    "Razón r",
+    "Razão r"
+  ],
+  [
+    "Tolerance ε",
+    "Toleranz ε",
+    "Toleranz ε",
+    "허용 오차 ε",
+    "Допуск ε",
+    "Tolerancia ε",
+    "Tolerância ε"
+  ],
+  [
+    "Partial sums by term number",
+    "Partialsummen nach Gliederzahl",
+    "Teilsummen nach Gliederzahl",
+    "항 개수별 부분합",
+    "Частичные суммы по номеру члена",
+    "Sumas parciales por número de término",
+    "Somas parciais por número do termo"
+  ],
+  [
+    "Sequence values by term number",
+    "Folgenwerte nach Gliednummer",
+    "Folgenwerte nach Gliednummer",
+    "항 번호별 수열 값",
+    "Значения по номеру члена",
+    "Valores de la sucesión por término",
+    "Valores da sequência por termo"
+  ],
+  [
+    "Grouping harmonic terms into blocks shows that partial sums keep growing, even as individual terms shrink.",
+    "Die Gruppierung harmonischer Glieder in Blöcke zeigt, dass Partialsummen weiter wachsen, obwohl einzelne Glieder schrumpfen.",
+    "Harmonische Glieder in Blöcke gruppiern zeigt, dass Teilsummen weiter wachsen, obwohl einzelne Glieder schrumpfen.",
+    "조화급수의 항을 묶으면 개별 항이 줄어도 부분합은 계속 증가함을 알 수 있습니다.",
+    "Группировка гармонических членов в блоки показывает рост частичных сумм, хотя отдельные члены уменьшаются.",
+    "Agrupar términos armónicos en bloques muestra que las sumas parciales siguen creciendo aunque cada término disminuya.",
+    "Agrupar termos harmônicos em blocos mostra que as somas parciais continuam crescendo mesmo com termos menores."
+  ],
+  [
+    "For |r| < 1, the exact remainder is rᴺ/(1 − r). Negative ratios alternate around the limit.",
+    "Bei |r| < 1 ist der exakte Rest rᴺ/(1 − r). Negative Verhältnisse wechseln um den Grenzwert.",
+    "Bei |r| < 1 is da exakte Rest rᴺ/(1 − r). Negative Verhältnisse wechseln um den Grenzwert.",
+    "|r| < 1이면 정확한 나머지는 rᴺ/(1 − r)입니다. 음의 공비는 극한의 양쪽을 번갈아 오갑니다.",
+    "При |r| < 1 точный остаток равен rᴺ/(1 − r). Отрицательные знаменатели дают чередование вокруг предела.",
+    "Para |r| < 1, el resto exacto es rᴺ/(1 − r). Las razones negativas alternan alrededor del límite.",
+    "Para |r| < 1, o resto exato é rᴺ/(1 − r). Razões negativas alternam ao redor do limite."
+  ],
+  [
+    "Alternating between −1 and 1 stays bounded but does not converge.",
+    "Der Wechsel zwischen −1 und 1 bleibt beschränkt, konvergiert aber nicht.",
+    "Da Wechsel zwischen −1 und 1 bleibt beschränkt, konvergiert aber ned.",
+    "−1과 1 사이를 번갈아 오가면 유계이지만 수렴하지 않습니다.",
+    "Чередование −1 и 1 ограничено, но не сходится.",
+    "Alternar entre −1 y 1 permanece acotado, pero no converge.",
+    "Alternar entre −1 e 1 permanece limitado, mas não converge."
+  ],
+  [
+    "The shaded band is ±ε around zero. For 1/n, every term with n > 1/ε is inside it.",
+    "Das schattierte Band ist ±ε um null. Bei 1/n liegt jedes Glied mit n > 1/ε darin.",
+    "Des schattierte Band is ±ε um null. Bei 1/n liegt jedes Glied mit n > 1/ε drin.",
+    "음영 띠는 0 주변의 ±ε입니다. 1/n에서 n > 1/ε인 모든 항은 띠 안에 있습니다.",
+    "Заштрихованная полоса — ±ε вокруг нуля. Для 1/n каждый член с n > 1/ε находится внутри.",
+    "La banda sombreada es ±ε alrededor de cero. Para 1/n, todo término con n > 1/ε queda dentro.",
+    "A faixa sombreada é ±ε ao redor de zero. Para 1/n, todo termo com n > 1/ε fica dentro."
+  ],
+  [
+    "The drawing shows finitely many values. Convergence requires a statement about all sufficiently late terms.",
+    "Die Zeichnung zeigt endlich viele Werte. Konvergenz erfordert eine Aussage über alle ausreichend späten Glieder.",
+    "De Zeichnung zeigt endlich vui Werte. Konvergenz braucht a Aussage über alle genügend späten Glieder.",
+    "그림은 유한한 값만 보여줍니다. 수렴에는 충분히 뒤의 모든 항에 관한 명제가 필요합니다.",
+    "Рисунок показывает конечное число значений. Сходимость требует утверждения обо всех достаточно поздних членах.",
+    "El dibujo muestra una cantidad finita de valores. La convergencia requiere una afirmación sobre todos los términos suficientemente avanzados.",
+    "O desenho mostra uma quantidade finita de valores. A convergência exige uma afirmação sobre todos os termos suficientemente avançados."
+  ],
+  [
+    "From tolerance to a guarantee",
+    "Von Toleranz zur Garantie",
+    "Von Toleranz zur Garantie",
+    "허용 오차에서 보장으로",
+    "От допуска к гарантии",
+    "De tolerancia a garantía",
+    "Da tolerância à garantia"
+  ],
+  [
+    "Approach from both sides",
+    "Von beiden Seiten annähern",
+    "Von beide Seiten annähern",
+    "양쪽에서 접근하기",
+    "Приближение с обеих сторон",
+    "Acércate desde ambos lados",
+    "Aproxime pelos dois lados"
+  ],
+  [
+    "Refinement level",
+    "Verfeinerungsstufe",
+    "Verfeinerungsstuf",
+    "세분화 단계",
+    "Уровень уточнения",
+    "Nivel de refinamiento",
+    "Nível de refinamento"
+  ],
+  [
+    "With δ = ε/2, every permitted input satisfies the output tolerance. The inequality proves it for all positive ε.",
+    "Mit δ = ε/2 erfüllt jede erlaubte Eingabe die Ausgabetoleranz. Die Ungleichung beweist es für alle positiven ε.",
+    "Mit δ = ε/2 erfüllt jede erlaubte Eingab de Ausgabetoleranz. De Ungleichung beweist’s für alle positiven ε.",
+    "δ = ε/2이면 허용된 모든 입력이 출력 오차 조건을 만족합니다. 부등식이 모든 양의 ε에 대해 이를 증명합니다.",
+    "При δ = ε/2 каждый допустимый вход удовлетворяет выходному допуску. Неравенство доказывает это для всех положительных ε.",
+    "Con δ = ε/2, toda entrada permitida cumple la tolerancia de salida. La desigualdad lo demuestra para todo ε positivo.",
+    "Com δ = ε/2, toda entrada permitida satisfaz a tolerância de saída. A desigualdade prova isso para todo ε positivo."
+  ],
+  [
+    "With δ = ε, take x = 3 + 3ε/4. The input is inside δ, but the output error is 3ε/2, which exceeds ε.",
+    "Mit δ = ε wähle x = 3 + 3ε/4. Die Eingabe liegt innerhalb δ, aber der Ausgabefehler 3ε/2 überschreitet ε.",
+    "Mit δ = ε nimm x = 3 + 3ε/4. De Eingab liegt innerhalb δ, aber da Ausgabefehler 3ε/2 is größer als ε.",
+    "δ = ε이면 x = 3 + 3ε/4를 택하세요. 입력은 δ 안이지만 출력 오차 3ε/2는 ε보다 큽니다.",
+    "При δ = ε возьмите x = 3 + 3ε/4. Вход внутри δ, но ошибка выхода 3ε/2 превышает ε.",
+    "Con δ = ε, toma x = 3 + 3ε/4. La entrada está dentro de δ, pero el error 3ε/2 supera ε.",
+    "Com δ = ε, tome x = 3 + 3ε/4. A entrada está dentro de δ, mas o erro 3ε/2 supera ε."
+  ],
+  [
+    "The values of |x| approach zero from both sides, but the two slopes disagree. Continuity does not imply differentiability.",
+    "Die Werte von |x| nähern sich von beiden Seiten null, aber die Steigungen unterscheiden sich. Stetigkeit impliziert keine Differenzierbarkeit.",
+    "De Werte von |x| nähern sich von beide Seiten null, aber de Steigungen san verschieden. Stetigkeit heißt ned Differenzierbarkeit.",
+    "|x|의 값은 양쪽에서 0에 접근하지만 두 기울기는 다릅니다. 연속이라고 미분 가능한 것은 아닙니다.",
+    "Значения |x| приближаются к нулю с обеих сторон, но наклоны различаются. Непрерывность не влечёт дифференцируемость.",
+    "Los valores de |x| se acercan a cero por ambos lados, pero las pendientes difieren. Continuidad no implica derivabilidad.",
+    "Os valores de |x| se aproximam de zero pelos dois lados, mas as inclinações diferem. Continuidade não implica diferenciabilidade."
+  ],
+  [
+    "For x ≠ 1 the formula equals x + 1. Both sides approach 2, while the original function is undefined at 1.",
+    "Für x ≠ 1 ist die Formel gleich x + 1. Beide Seiten nähern sich 2, während die ursprüngliche Funktion bei 1 undefiniert ist.",
+    "Für x ≠ 1 is de Formel gleich x + 1. Beide Seiten nähern sich 2, während de ursprüngliche Funktion bei 1 undefiniert is.",
+    "x ≠ 1이면 식은 x + 1과 같습니다. 양쪽에서 2에 접근하지만 원래 함수는 1에서 정의되지 않습니다.",
+    "При x ≠ 1 формула равна x + 1. Обе стороны стремятся к 2, но исходная функция не определена в 1.",
+    "Para x ≠ 1 la fórmula es x + 1. Ambos lados se acercan a 2, pero la función original no está definida en 1.",
+    "Para x ≠ 1 a fórmula é x + 1. Os dois lados se aproximam de 2, mas a função original é indefinida em 1."
+  ],
+  [
+    "Compare data with the model",
+    "Daten mit dem Modell vergleichen",
+    "Daten mitm Modell vergleichen",
+    "데이터와 모델 비교하기",
+    "Сравните данные с моделью",
+    "Compara los datos con el modelo",
+    "Compare os dados com o modelo"
+  ],
+  [
+    "Imagine 100 days. B means rain and A means carrying an umbrella. Change the counts and compare the conditional probabilities.",
+    "Stelle dir 100 Tage vor. B steht für Regen, A für einen mitgeführten Schirm. Ändere die Anzahlen und vergleiche die bedingten Wahrscheinlichkeiten.",
+    "Stell dir 100 Tage vor. B steht für Regen, A für an mitgenommenen Schirm. Änder de Anzahlen und vergleich de bedingten Wahrscheinlichkeiten.",
+    "100일을 상상하세요. B는 비, A는 우산을 들고 다닌다는 뜻입니다. 횟수를 바꾸고 조건부확률을 비교하세요.",
+    "Представьте 100 дней. B означает дождь, A — наличие зонта. Меняйте количества и сравнивайте условные вероятности.",
+    "Imagina 100 días. B significa lluvia y A llevar paraguas. Cambia las cantidades y compara probabilidades condicionales.",
+    "Imagine 100 dias. B significa chuva e A levar guarda-chuva. Altere as contagens e compare probabilidades condicionais."
+  ],
+  [
+    "Rainy days",
+    "Regentage",
+    "Regentage",
+    "비 온 날",
+    "Дождливые дни",
+    "Días lluviosos",
+    "Dias chuvosos"
+  ],
+  [
+    "Umbrella use on rainy days (%)",
+    "Schirmnutzung an Regentagen (%)",
+    "Schirmnutzung an Regentagen (%)",
+    "비 오는 날 우산 사용률 (%)",
+    "Зонт в дождливые дни (%)",
+    "Uso de paraguas en días lluviosos (%)",
+    "Uso de guarda-chuva em dias chuvosos (%)"
+  ],
+  [
+    "Umbrella use on dry days (%)",
+    "Schirmnutzung an trockenen Tagen (%)",
+    "Schirmnutzung an trockenen Tagen (%)",
+    "맑은 날 우산 사용률 (%)",
+    "Зонт в сухие дни (%)",
+    "Uso de paraguas en días secos (%)",
+    "Uso de guarda-chuva em dias secos (%)"
+  ],
+  [
+    "Counts out of 100 days",
+    "Anzahlen bei 100 Tagen",
+    "Anzahlen bei 100 Tagen",
+    "100일 중 횟수",
+    "Количество из 100 дней",
+    "Cantidades de 100 días",
+    "Contagens em 100 dias"
+  ],
+  [
+    "Days",
+    "Tage",
+    "Tage",
+    "날",
+    "Дни",
+    "Días",
+    "Dias"
+  ],
+  [
+    "Umbrella",
+    "Regenschirm",
+    "Regenschirm",
+    "우산",
+    "Зонт",
+    "Paraguas",
+    "Guarda-chuva"
+  ],
+  [
+    "No umbrella",
+    "Kein Regenschirm",
+    "Koa Regenschirm",
+    "우산 없음",
+    "Без зонта",
+    "Sin paraguas",
+    "Sem guarda-chuva"
+  ],
+  [
+    "Rain",
+    "Regen",
+    "Regen",
+    "비",
+    "Дождь",
+    "Lluvia",
+    "Chuva"
+  ],
+  [
+    "No rain",
+    "Kein Regen",
+    "Koa Regen",
+    "비 없음",
+    "Без дождя",
+    "Sin lluvia",
+    "Sem chuva"
+  ],
+  [
+    "Undefined: empty group",
+    "Undefiniert: leere Gruppe",
+    "Undefiniert: leere Gruppn",
+    "정의되지 않음: 빈 집단",
+    "Не определено: пустая группа",
+    "Indefinida: grupo vacío",
+    "Indefinida: grupo vazio"
+  ],
+  [
+    "Counts are rounded to whole days. Both conditional probabilities use those counts and their own denominator.",
+    "Anzahlen sind auf ganze Tage gerundet. Beide bedingten Wahrscheinlichkeiten nutzen diese Anzahlen und ihren jeweiligen Nenner.",
+    "Anzahlen san auf ganze Tage grundet. Beide bedingten Wahrscheinlichkeiten nutzen de Anzahlen und ihren eigenen Nenner.",
+    "횟수는 온전한 날짜 수로 반올림됩니다. 두 조건부확률은 이 횟수와 각각의 분모를 사용합니다.",
+    "Количество округлено до целых дней. Обе условные вероятности используют эти числа и свой знаменатель.",
+    "Las cantidades se redondean a días enteros. Ambas probabilidades condicionales usan esas cantidades y su propio denominador.",
+    "As contagens são arredondadas para dias inteiros. As duas probabilidades condicionais usam essas contagens e seu próprio denominador."
+  ],
+  [
+    "Trials per experiment",
+    "Versuche pro Experiment",
+    "Versuche pro Experiment",
+    "실험당 시행 횟수",
+    "Испытаний в эксперименте",
+    "Ensayos por experimento",
+    "Tentativas por experimento"
+  ],
+  [
+    "Success probability p",
+    "Erfolgswahrscheinlichkeit p",
+    "Erfolgswahrscheinlichkeit p",
+    "성공확률 p",
+    "Вероятность успеха p",
+    "Probabilidad de éxito p",
+    "Probabilidade de sucesso p"
+  ],
+  [
+    "This model assumes independent trials with the same success probability.",
+    "Dieses Modell nimmt unabhängige Versuche mit gleicher Erfolgswahrscheinlichkeit an.",
+    "Des Modell nimmt unabhängige Versuche mit gleicher Erfolgswahrscheinlichkeit an.",
+    "이 모델은 성공확률이 같은 독립 시행을 가정합니다.",
+    "Модель предполагает независимые испытания с одинаковой вероятностью успеха.",
+    "Este modelo supone ensayos independientes con la misma probabilidad de éxito.",
+    "Este modelo supõe tentativas independentes com a mesma probabilidade de sucesso."
+  ],
+  [
+    "Binomial probabilities by success count",
+    "Binomialwahrscheinlichkeiten nach Erfolgsanzahl",
+    "Binomialwahrscheinlichkeiten nach Erfolgsanzahl",
+    "성공 횟수별 이항확률",
+    "Биномиальные вероятности по числу успехов",
+    "Probabilidades binomiales por cantidad de éxitos",
+    "Probabilidades binomiais por contagem de sucessos"
+  ],
+  [
+    "Number of experiments",
+    "Anzahl der Experimente",
+    "Anzahl von de Experimente",
+    "실험 횟수",
+    "Число экспериментов",
+    "Número de experimentos",
+    "Número de experimentos"
+  ],
+  [
+    "Run with another seed",
+    "Mit anderem Startwert ausführen",
+    "Mit am andern Startwert ausführen",
+    "다른 시드로 실행",
+    "Запустить с другим начальным числом",
+    "Ejecutar con otra semilla",
+    "Executar com outra semente"
+  ],
+  [
+    "Simulation estimate",
+    "Simulationsschätzung",
+    "Simulationsschätzung",
+    "시뮬레이션 추정",
+    "Оценка симуляции",
+    "Estimación simulada",
+    "Estimativa da simulação"
+  ],
+  [
+    "Absolute difference",
+    "Absoluter Unterschied",
+    "Absoluter Unterschied",
+    "절대 차이",
+    "Абсолютная разница",
+    "Diferencia absoluta",
+    "Diferença absoluta"
+  ],
+  [
+    "Model standard error",
+    "Standardfehler des Modells",
+    "Standardfehler vom Modell",
+    "모델 표준오차",
+    "Стандартная ошибка модели",
+    "Error estándar del modelo",
+    "Erro padrão do modelo"
+  ],
+  [
+    "Seed",
+    "Startwert",
+    "Startwert",
+    "시드",
+    "Начальное число",
+    "Semilla",
+    "Semente"
+  ],
+  [
+    "The seed makes a run reproducible. More experiments usually reduce fluctuation; they do not guarantee a closer answer on every run.",
+    "Der Startwert macht den Lauf reproduzierbar. Mehr Experimente reduzieren meist die Schwankung, garantieren aber nicht bei jedem Lauf ein genaueres Ergebnis.",
+    "Da Startwert macht den Lauf reproduzierbar. Mehr Experimente reduzieren meistens de Schwankung, garantiern aber ned bei jedem Lauf a genaueres Ergebnis.",
+    "시드는 실행 결과를 재현하게 합니다. 실험을 늘리면 보통 변동이 줄지만 매번 더 가까운 답을 보장하지는 않습니다.",
+    "Начальное число позволяет воспроизвести запуск. Больше экспериментов обычно уменьшает колебания, но не гарантирует более близкий ответ в каждом запуске.",
+    "La semilla permite reproducir una ejecución. Más experimentos suelen reducir la fluctuación, pero no garantizan un resultado más cercano en cada ejecución.",
+    "A semente permite reproduzir uma execução. Mais experimentos geralmente reduzem a flutuação, mas não garantem um resultado mais próximo em toda execução."
+  ],
+  [
+    "Your data: separate values with spaces or semicolons",
+    "Deine Daten: Werte mit Leerzeichen oder Semikolon trennen",
+    "Deine Daten: Werte mit Leerzeichen oder Strichpunkt trennen",
+    "데이터: 공백이나 세미콜론으로 값 구분",
+    "Ваши данные: разделяйте пробелами или точками с запятой",
+    "Tus datos: separa valores con espacios o punto y coma",
+    "Seus dados: separe valores por espaços ou ponto e vírgula"
+  ],
+  [
+    "Use up to 100 numbers between −1000000 and 1000000. Decimal points or commas are accepted; thousands separators and expressions are not.",
+    "Nutze bis zu 100 Zahlen zwischen −1000000 und 1000000. Dezimalpunkt oder -komma sind erlaubt; Tausendertrennzeichen und Ausdrücke nicht.",
+    "Nutz bis zu 100 Zahlen zwischen −1000000 und 1000000. Dezimalpunkt oder -komma san erlaubt; Tausendertrennzeichen und Ausdrücke ned.",
+    "−1000000부터 1000000까지 최대 100개 수를 사용하세요. 소수점이나 소수 쉼표는 허용하지만 천 단위 구분자와 수식은 허용하지 않습니다.",
+    "Введите до 100 чисел от −1000000 до 1000000. Допускается десятичная точка или запятая; разделители тысяч и выражения не допускаются.",
+    "Usa hasta 100 números entre −1000000 y 1000000. Se admite punto o coma decimal, pero no separadores de miles ni expresiones.",
+    "Use até 100 números entre −1000000 e 1000000. Ponto ou vírgula decimal são aceitos; separadores de milhares e expressões não."
+  ],
+  [
+    "Mean",
+    "Mittelwert",
+    "Mittelwert",
+    "평균",
+    "Среднее",
+    "Media",
+    "Média"
+  ],
+  [
+    "Median",
+    "Median",
+    "Median",
+    "중앙값",
+    "Медиана",
+    "Mediana",
+    "Mediana"
+  ],
+  [
+    "Range",
+    "Spannweite",
+    "Spannweite",
+    "범위",
+    "Размах",
+    "Rango",
+    "Amplitude"
+  ],
+  [
+    "Population variance",
+    "Populationsvarianz",
+    "Populationsvarianz",
+    "모집단 분산",
+    "Дисперсия совокупности",
+    "Varianza poblacional",
+    "Variância populacional"
+  ],
+  [
+    "Sample variance",
+    "Stichprobenvarianz",
+    "Stichprobenvarianz",
+    "표본분산",
+    "Выборочная дисперсия",
+    "Varianza muestral",
+    "Variância amostral"
+  ],
+  [
+    "Population standard deviation",
+    "Populationsstandardabweichung",
+    "Populationsstandardabweichung",
+    "모집단 표준편차",
+    "Стандартное отклонение совокупности",
+    "Desviación estándar poblacional",
+    "Desvio padrão populacional"
+  ],
+  [
+    "Needs at least two values",
+    "Mindestens zwei Werte nötig",
+    "Mindestens zwoa Werte nötig",
+    "최소 두 값 필요",
+    "Нужно хотя бы два значения",
+    "Requiere al menos dos valores",
+    "Exige ao menos dois valores"
+  ],
+  [
+    "Enter a valid dataset to see the statistics.",
+    "Gib gültige Daten ein, um die Statistik zu sehen.",
+    "Gib gültige Daten ein, zum Statistik sehn.",
+    "통계를 보려면 유효한 데이터를 입력하세요.",
+    "Введите допустимые данные для просмотра статистики.",
+    "Introduce datos válidos para ver las estadísticas.",
+    "Insira dados válidos para ver as estatísticas."
+  ],
+  [
+    "Compare an outlier",
+    "Ausreißer vergleichen",
+    "Ausreißer vergleichen",
+    "이상치 비교",
+    "Сравнить выброс",
+    "Comparar un valor atípico",
+    "Comparar um valor atípico"
+  ],
+  [
+    "Sample size",
+    "Stichprobengröße",
+    "Stichprobengröß",
+    "표본 크기",
+    "Размер выборки",
+    "Tamaño de muestra",
+    "Tamanho da amostra"
+  ],
+  [
+    "Observed success rate (%)",
+    "Beobachtete Erfolgsquote (%)",
+    "Beobachtete Erfolgsquote (%)",
+    "관측 성공률 (%)",
+    "Наблюдаемая доля успехов (%)",
+    "Tasa de éxito observada (%)",
+    "Taxa de sucesso observada (%)"
+  ],
+  [
+    "Sampling method",
+    "Stichprobenverfahren",
+    "Stichprobenverfahren",
+    "표본추출 방식",
+    "Метод отбора",
+    "Método de muestreo",
+    "Método de amostragem"
+  ],
+  [
+    "Independent random sample",
+    "Unabhängige Zufallsstichprobe",
+    "Unabhängige Zufallsstichprobe",
+    "독립 무작위 표본",
+    "Независимая случайная выборка",
+    "Muestra aleatoria independiente",
+    "Amostra aleatória independente"
+  ],
+  [
+    "Convenience sample",
+    "Gelegenheitsstichprobe",
+    "Gelegenheitsstichprobe",
+    "편의 표본",
+    "Удобная выборка",
+    "Muestra por conveniencia",
+    "Amostra por conveniência"
+  ],
+  [
+    "Approximate standard error",
+    "Angenäherter Standardfehler",
+    "Angenäherter Standardfehler",
+    "근사 표준오차",
+    "Приближённая стандартная ошибка",
+    "Error estándar aproximado",
+    "Erro padrão aproximado"
+  ],
+  [
+    "Approximate 95% interval",
+    "Angenähertes 95%-Intervall",
+    "Angenähertes 95%-Intervall",
+    "근사 95% 구간",
+    "Приближённый 95%-ный интервал",
+    "Intervalo aproximado del 95%",
+    "Intervalo aproximado de 95%"
+  ],
+  [
+    "Not justified for this sample",
+    "Für diese Stichprobe nicht begründet",
+    "Für de Stichprobe ned begründet",
+    "이 표본에 정당화되지 않음",
+    "Не обосновано для этой выборки",
+    "No justificado para esta muestra",
+    "Não justificado para esta amostra"
+  ],
+  [
+    "The normal approximation requires at least ten successes and ten failures. Selection bias and dependent observations are outside this calculation.",
+    "Die Normalapproximation erfordert mindestens zehn Erfolge und zehn Misserfolge. Auswahlverzerrung und abhängige Beobachtungen werden nicht erfasst.",
+    "De Normalapproximation braucht mindestens zehn Erfolge und zehn Misserfolge. Auswahlverzerrung und abhängige Beobachtungen werden ned erfasst.",
+    "정규 근사는 성공과 실패가 각각 열 번 이상이어야 합니다. 선택 편향과 종속 관측은 이 계산에 포함되지 않습니다.",
+    "Нормальная аппроксимация требует хотя бы десять успехов и десять неудач. Смещение отбора и зависимые наблюдения не учитываются.",
+    "La aproximación normal requiere al menos diez éxitos y diez fracasos. El sesgo de selección y las observaciones dependientes quedan fuera del cálculo.",
+    "A aproximação normal exige ao menos dez sucessos e dez falhas. Viés de seleção e observações dependentes ficam fora do cálculo."
+  ],
+  [
+    "Across repeated valid samples, about 95% of intervals from this procedure cover the fixed population proportion.",
+    "Bei wiederholten gültigen Stichproben erfassen etwa 95% der Intervalle dieses Verfahrens den festen Populationsanteil.",
+    "Bei wiederholten gültigen Stichproben erfassen ungefähr 95% von de Intervalle mit dem Verfahren den festen Populationsanteil.",
+    "타당한 표본을 반복 추출하면 이 절차로 만든 구간의 약 95%가 고정된 모집단 비율을 포함합니다.",
+    "При повторных допустимых выборках около 95% интервалов этой процедуры охватывают фиксированную долю совокупности.",
+    "En muestras válidas repetidas, aproximadamente el 95% de los intervalos de este procedimiento cubren la proporción poblacional fija.",
+    "Em amostras válidas repetidas, cerca de 95% dos intervalos desse procedimento cobrem a proporção populacional fixa."
+  ],
+  [
+    "A larger convenience sample can still be biased. Its formula-based standard error does not measure that bias.",
+    "Eine größere Gelegenheitsstichprobe kann weiterhin verzerrt sein. Ihr formelbasierter Standardfehler misst diese Verzerrung nicht.",
+    "A größere Gelegenheitsstichprobe kann weiterhin verzerrt sein. Ihr formelbasierter Standardfehler misst de Verzerrung ned.",
+    "편의 표본은 커도 편향될 수 있습니다. 공식으로 구한 표준오차는 그 편향을 측정하지 않습니다.",
+    "Большая удобная выборка всё ещё может быть смещённой. Стандартная ошибка по формуле не измеряет это смещение.",
+    "Una muestra por conveniencia mayor puede seguir sesgada. Su error estándar calculado no mide ese sesgo.",
+    "Uma amostra por conveniência maior ainda pode ser enviesada. Seu erro padrão calculado não mede esse viés."
+  ],
+  [
+    "Both charts describe the same change from 40 to 50. Change the baseline and compare bar lengths with actual values.",
+    "Beide Diagramme zeigen dieselbe Änderung von 40 auf 50. Ändere die Basis und vergleiche Balkenlängen mit tatsächlichen Werten.",
+    "Beide Diagramme zeign dieselbe Änderung von 40 auf 50. Änder de Basis und vergleich Balkenlängen mit echte Werte.",
+    "두 차트는 같은 40에서 50으로의 변화를 보여줍니다. 기준선을 바꾸고 막대 길이와 실제 값을 비교하세요.",
+    "Оба графика показывают одно изменение с 40 до 50. Меняйте основание и сравнивайте длины столбцов с реальными значениями.",
+    "Ambos gráficos muestran el mismo cambio de 40 a 50. Cambia la base y compara longitudes de barras con valores reales.",
+    "Os dois gráficos mostram a mesma mudança de 40 para 50. Altere a base e compare comprimentos das barras com valores reais."
+  ],
+  [
+    "Bar-axis baseline",
+    "Basis der Balkenachse",
+    "Basis von da Balkenachse",
+    "막대 축 기준선",
+    "Основание оси столбцов",
+    "Base del eje de barras",
+    "Base do eixo de barras"
+  ],
+  [
+    "Baseline",
+    "Basis",
+    "Basis",
+    "기준선",
+    "Основание",
+    "Base",
+    "Base"
+  ],
+  [
+    "Absolute change",
+    "Absolute Änderung",
+    "Absolute Änderung",
+    "절대 변화",
+    "Абсолютное изменение",
+    "Cambio absoluto",
+    "Mudança absoluta"
+  ],
+  [
+    "Relative change",
+    "Relative Änderung",
+    "Relative Änderung",
+    "상대 변화",
+    "Относительное изменение",
+    "Cambio relativo",
+    "Mudança relativa"
+  ],
+  [
+    "Displayed bar-length ratio",
+    "Angezeigtes Balkenlängenverhältnis",
+    "Angezeigtes Balkenlängenverhältnis",
+    "표시된 막대 길이 비율",
+    "Отношение показанных длин столбцов",
+    "Relación visual de longitudes",
+    "Razão visual de comprimentos"
+  ],
+  [
+    "Actual value ratio",
+    "Tatsächliches Werteverhältnis",
+    "Tatsächliches Werteverhältnis",
+    "실제 값 비율",
+    "Отношение реальных значений",
+    "Relación de valores reales",
+    "Razão de valores reais"
+  ],
+  [
+    "A truncated bar axis magnifies the visual ratio. Read the labeled values and baseline before drawing a conclusion.",
+    "Eine abgeschnittene Balkenachse vergrößert das sichtbare Verhältnis. Lies Werte und Basis, bevor du Schlussfolgerungen ziehst.",
+    "A abgeschnittene Balkenachse vergrößert s sichtbare Verhältnis. Lies Werte und Basis, bevor du Schlussfolgerungen ziehst.",
+    "잘린 막대 축은 시각적 비율을 크게 만듭니다. 결론을 내리기 전에 표시된 값과 기준선을 읽으세요.",
+    "Обрезанная ось увеличивает визуальное отношение. Прочитайте значения и основание, прежде чем делать вывод.",
+    "Un eje de barras truncado amplifica la relación visual. Lee los valores y la base antes de concluir.",
+    "Um eixo de barras truncado amplia a razão visual. Leia os valores e a base antes de concluir."
+  ],
+  [
+    "The shaded band is ±ε around zero. The formula gives a threshold after which every term stays inside it.",
+    "Das schattierte Band ist ±ε um null. Die Formel gibt eine Grenze an, nach der alle Glieder darin bleiben.",
+    "Des schattierte Band is ±ε um null. De Formel gibt a Grenz an, nach der alle Glieder drin bleiben.",
+    "음영 띠는 0 주변의 ±ε입니다. 공식은 그 이후 모든 항이 띠 안에 머무는 기준을 줍니다.",
+    "Заштрихованная полоса — ±ε вокруг нуля. Формула задаёт порог, после которого все члены остаются внутри.",
+    "La banda sombreada es ±ε alrededor de cero. La fórmula da un umbral tras el cual todos los términos quedan dentro.",
+    "A faixa sombreada é ±ε ao redor de zero. A fórmula dá um limiar após o qual todos os termos ficam dentro."
+  ]
+]

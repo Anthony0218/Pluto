@@ -33,8 +33,28 @@
 .universe-panel:focus-visible { outline: 2px solid #b8b3ff; outline-offset: -2px; border-radius: 12px; }
 .universe-grid { display: grid; height: 100%; position: relative; min-width: 0; }
 .universe-grid--games { grid-template-columns: repeat(12, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); padding: 8px 6px 20px; }
-.universe-grid--tools, .universe-grid--learn { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 12px 24px; padding: 4px 28px 22px; }
-.universe-object { min-width: 0; display: flex; justify-content: center; align-items: center; }
+.universe-grid--tools, .universe-grid--learn { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: minmax(145px, auto); gap: 12px 16px; padding: 16px 18px 28px; }
+.universe-grid--learn { grid-auto-rows: minmax(160px, auto); }
+.universe-grid--games .solar-position--atlas { grid-area: 1 / 3 / 2 / 6; }
+.universe-grid--games .solar-position--eat-it { grid-area: 1 / 8 / 2 / 11; }
+.universe-grid--games .solar-position--schafkopf { grid-area: 2 / 1 / 3 / 5; }
+.universe-grid--games .solar-position--chess { grid-area: 2 / 5 / 3 / 9; }
+.universe-grid--games .solar-position--watten { grid-area: 2 / 9 / 3 / 13; }
+.universe-grid--games .solar-position--natura { grid-area: 3 / 3 / 4 / 6; }
+.universe-grid--games .solar-position--go { grid-area: 3 / 8 / 4 / 11; }
+.landing-universe:is([data-category="tools"], [data-category="learn"]) .universe-stage { height: auto; min-height: 438px; }
+.landing-universe:is([data-category="tools"], [data-category="learn"]) .universe-panel { position: relative; }
+.universe-grid--learn .universe-art-wrap { zoom: .85; }
+.universe-grid--tools .universe-art-wrap { zoom: .85; }
+.universe-object { position: relative; min-width: 0; display: flex; justify-content: center; align-items: center; opacity: var(--hero-fade, 1); pointer-events: var(--hero-events, auto); }
+.universe-card {
+  position: absolute; z-index: 6; left: 50%; bottom: calc(100% - 4px); translate: -50% 0; width: max-content; max-width: 190px; padding: 8px 11px;
+  border: 1px solid #a7b6e440; border-radius: 10px; background: #0f1731f2; box-shadow: 0 10px 28px #0008; color: #cfd8f5; font-size: 11.5px; line-height: 1.45; text-align: center;
+  opacity: 0; transform: translateY(4px); pointer-events: none; transition: opacity .15s ease-out, transform .15s ease-out;
+}
+.universe-card--start { left: 0; translate: 0 0; text-align: left; }
+.universe-card--end { left: auto; right: 0; translate: 0 0; text-align: right; }
+.universe-object:is(:hover, :focus-within) .universe-card { opacity: 1; transform: none; }
 .universe-object.solar-planet { --planet-size: 68px; padding: 0; }
 .universe-object.solar-planet--primary { --planet-size: 104px; }
 .universe-item { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 44px; min-width: 0; max-width: 100%; padding: 7px 4px; border-radius: 12px; text-align: center; color: #e9edfc; text-decoration: none; }
@@ -42,10 +62,10 @@
 .universe-label { display: block; max-width: 170px; font-size: 13px; line-height: 1.4; font-weight: 600; overflow-wrap: anywhere; }
 .solar-planet--primary .universe-label { font-size: 14px; }
 .universe-status { display: inline-block; margin-top: 4px; color: #95a3c7; font-size: 10px; line-height: 1.4; }
-.universe-object .solar-atmosphere { opacity: .2; }
-.universe-object .solar-sphere { box-shadow: inset -15px -15px 24px #03091baa, inset 3px 3px 12px #fff5, 0 0 0 1px #ffffff40, 0 0 18px #6573b820, 0 10px 22px #0005; }
-.universe-object .solar-ring { border-width: 2px; opacity: .75; box-shadow: 0 0 8px #8390e02a; }
-.universe-object .solar-symbol { text-shadow: 0 3px 4px #030815, 0 0 9px #8573cb55; }
+.universe-object .solar-atmosphere, .flyby-item .solar-atmosphere { opacity: .2; }
+.universe-object .solar-sphere, .flyby-item .solar-sphere { box-shadow: inset var(--sx, -15px) var(--sy, -15px) 24px #03091baa, inset 3px 3px 12px #fff5, 0 0 0 1px #ffffff40, 0 0 18px #6573b820, 0 10px 22px #0005; }
+.universe-object .solar-ring, .flyby-item .solar-ring { border-width: 2px; opacity: .75; box-shadow: 0 0 8px #8390e02a; }
+.universe-object .solar-symbol, .flyby-item .solar-symbol { text-shadow: 0 3px 4px #030815, 0 0 9px #8573cb55; }
 .universe-app { position: relative; isolation: isolate; display: grid; place-items: center; width: 92px; height: 92px; overflow: hidden; border-radius: 25px; border: 1px solid color-mix(in srgb, var(--app-accent), transparent 55%); background: linear-gradient(145deg, color-mix(in srgb, var(--app-accent) 24%, #18213c), #101b31); color: var(--app-accent); box-shadow: inset 0 2px 1px #fff2, inset 0 -3px 8px #0003, 0 14px 24px #0004; }
 .universe-app-shine { position: absolute; inset: 0; z-index: -1; background: radial-gradient(circle at 18% 6%, #fff2, transparent 62%); }
 .universe-app--number-system-converter { background: repeating-linear-gradient(0deg, #a3d7ff05 0 1px, transparent 1px 9px), linear-gradient(145deg, #193b58, #122035); }
@@ -79,6 +99,29 @@
 .universe-book--analysis .universe-book-illustration::before { content: ""; position: absolute; left: -10px; bottom: 2px; width: 14px; height: 25px; background: #9b8ce63b; box-shadow: 18px -7px #9b8ce627, 36px -15px #9b8ce616; transform: skewY(-15deg); }
 .universe-book--analysis .universe-book-title { font-family: ui-monospace, monospace; font-size: 11px; font-weight: 500; line-height: 1.35; }
 .universe-book--analysis .universe-book-rule { width: 100%; height: 1px; }
+/* The learning paths added after the first four share the same layout and differ in cover colour, tilt and one mark. */
+.universe-book--algebra { transform: perspective(700px) rotateY(-14deg) rotateZ(-5deg); }
+.universe-book--algebra .universe-book-cover { background: linear-gradient(150deg, #2b5aa0, #18305a); color: #cfe1ff; }
+.universe-book--algebra .universe-book-illustration::after { content: "x²"; position: absolute; right: 0; top: 4px; font: italic 700 15px Georgia, serif; opacity: .8; }
+.universe-book--calculus { transform: perspective(700px) rotateY(-11deg) rotateZ(4deg); }
+.universe-book--calculus .universe-book-cover { background: linear-gradient(150deg, #0f766e, #134e4a); color: #b8f5ec; }
+.universe-book--calculus .universe-book-illustration::after { content: "∫"; position: absolute; right: 0; top: 2px; font: italic 500 26px Georgia, serif; opacity: .55; }
+.universe-book--linear { transform: perspective(700px) rotateY(-16deg) rotateZ(-3deg); }
+.universe-book--linear .universe-book-cover { background: repeating-linear-gradient(0deg, transparent 0 12px, #c7d2fe0e 12px 13px), repeating-linear-gradient(90deg, transparent 0 12px, #c7d2fe0e 12px 13px), #27235e; color: #c7d2fe; }
+.universe-book--depth { transform: perspective(700px) rotateY(-12deg) rotateZ(6deg); }
+.universe-book--depth .universe-book-cover { background: linear-gradient(145deg, #efe6d0, #d9ccae); color: #3a2f1f; border-color: #3a2f1f40; }
+.universe-book--depth .universe-book-title { font-family: Georgia, serif; font-weight: 600; }
+.universe-book--chance { transform: perspective(700px) rotateY(-13deg) rotateZ(-6deg); }
+.universe-book--chance .universe-book-cover { background: linear-gradient(160deg, #9a3412, #5a1d0a); color: #fed7aa; }
+.universe-book--pitch { transform: perspective(700px) rotateY(-15deg) rotateZ(4deg); }
+.universe-book--pitch .universe-book-cover { background: repeating-linear-gradient(0deg, transparent 0 7px, #f5d0fe18 7px 8px), #3b1646; color: #f5d0fe; }
+.universe-book--rhythm { transform: perspective(700px) rotateY(-10deg) rotateZ(-4deg); }
+.universe-book--rhythm .universe-book-cover { background: linear-gradient(150deg, #8a2650, #4a1230); color: #fbcfe8; }
+.universe-book--rules { transform: perspective(700px) rotateY(-17deg) rotateZ(3deg); }
+.universe-book--rules .universe-book-cover { background: repeating-linear-gradient(90deg, #ffffff06 0 14px, transparent 14px 28px), #14532d; color: #bbf7d0; }
+.universe-book--tactics { transform: perspective(700px) rotateY(-12deg) rotateZ(5deg); }
+.universe-book--tactics .universe-book-cover { background: linear-gradient(145deg, #1e293b, #0f172a); color: #e2e8f0; }
+.universe-book--tactics .universe-book-title { font-family: "Bradley Hand", "Segoe Print", cursive; font-size: 14px; }
 .universe-footer { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 17px 24px; border-top: 1px solid #92a5d31a; background: #080e2066; }
 .universe-brand { position: relative; color: #b4c1e3; font-size: 13px; font-weight: 750; letter-spacing: .18em; }
 .universe-brand-orbit { position: absolute; right: -9px; top: -5px; width: 21px; height: 21px; border: 1px solid #b4c1e366; border-radius: 50%; transform: rotate(-30deg) scaleY(.45); }
@@ -88,20 +131,19 @@
   .universe-stage { margin-inline: 8px; }
   .universe-object.solar-planet--primary { --planet-size: 88px; }
   .universe-label { font-size: 12px; }
-  .universe-grid--tools, .universe-grid--learn { column-gap: 12px; padding-inline: 16px; }
+  .universe-grid--tools, .universe-grid--learn { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 12px; padding-inline: 16px; }
 }
 @media (max-width: 620px) {
   .landing-universe { border-radius: 20px; }
   .universe-header { padding: 18px 12px 0; }
   .universe-tab { padding-inline: 13px; gap: 6px; }
   .universe-stage { height: 470px; margin-inline: 10px; }
-  .universe-grid--games { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(0, 1fr)); gap: 3px 8px; padding: 5px 10px 12px; }
-  .universe-grid--games .universe-object { grid-area: auto; }
+  .universe-grid--games { grid-template-columns: repeat(12, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 3px 0; padding: 5px 0 12px; }
   .universe-object.solar-planet { --planet-size: 57px; }
   .universe-object.solar-planet--primary { --planet-size: 65px; }
   .solar-planet--primary .universe-label, .universe-label { font-size: 12px; }
   .universe-art-wrap { margin-bottom: 9px; }
-  .universe-grid--tools, .universe-grid--learn { gap: 18px 12px; padding: 14px 8px 35px; }
+  .universe-grid--tools, .universe-grid--learn { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 12px; padding: 14px 8px 35px; }
   .universe-grid--tools .universe-label { max-width: 140px; }
   .universe-footer { padding: 12px 18px; }
 }

@@ -448,3 +448,9 @@ enabled = true
 # Every request authenticates with auth.getUser before service-role operations.
 verify_jwt = false
 entrypoint = "./functions/ranked-go/index.ts"
+
+[functions.tool-push]
+enabled = true
+# Browser actions use auth.getUser; dispatch uses a private scheduler secret; acknowledgements use opaque delivery tokens.
+verify_jwt = false
+entrypoint = "./functions/tool-push/index.ts"

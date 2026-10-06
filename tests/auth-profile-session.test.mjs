@@ -78,6 +78,17 @@ function mountAuth(profileResults = []) {
   };
 }
 
+test("password recovery remains available after session restoration and clears on sign-out", async () => {
+  const auth = mountAuth();
+  auth.notify("PASSWORD_RECOVERY", session(alice));
+  assert.equal(auth.states[3], true);
+  auth.notify("INITIAL_SESSION", session(alice));
+  assert.equal(auth.states[3], true);
+  auth.notify("SIGNED_OUT", null);
+  assert.equal(auth.states[3], false);
+  auth.cleanup();
+});
+
 test("delayed initial-session snapshots cannot log out a newly signed-in user", async () => {
   const auth = mountAuth();
   auth.notify("SIGNED_IN", session(alice));
@@ -159,17 +170,18 @@ test("unmounted providers ignore pending session work", async () => {
   assert.equal(auth.unsubscribed, true);
 });
 
-function profileMarkup(auth) {
+function profileMarkup(auth, tab = "general") {
   const source = readFileSync(new URL("../src/pages/social/ProfilePage.tsx", import.meta.url), "utf8");
   // Child widgets are irrelevant to the page's authentication branches.
   const modules = Object.fromEntries([...source.matchAll(/from\s+"([^"]+)"/g)]
     .map(([, name]) => [name, { __esModule: true, default: () => null }]));
   Object.assign(modules, {
-    react: { ...React, useEffect() {} },
+    react: { ...React, useEffect() {}, useState(initial) { return React.useState(initial === "general" ? tab : initial); } },
     "@/context/AuthContext": { useAuth: () => auth },
     "@/i18n/ui": { ui: text => text, useUiLanguage: () => ({ language: "en" }) },
     "@/components/social/useCustomAvatars": { useCustomAvatars: () => ({ customAvatars: [] }) },
     "@/data/dashboard": { featuredGames: [] },
+    "@/components/social/ProfileGameRanks": { ProfileChessRanks: () => React.createElement("span", null, "Chess ranks marker"), ProfileGoRanks: () => React.createElement("span", null, "Go ranks marker"), ProfileAtlasRank: () => React.createElement("span", null, "Atlas ranks marker") },
     "../../components/social/ProfileAvatarPicker": { __esModule: true, default: () => null, ProfileAvatar: () => null },
     "../../components/App/notifications/DoNotDisturbSwitch": { __esModule: true, default: () => null, ClanPopupsSwitch: () => null },
     "lucide-react": require("lucide-react"),
@@ -223,4 +235,19 @@ test("token and focus events for the same account do not restart the stats load"
   auth = { ...auth, user: bob };
   ProfilePage();
   assert.notDeepEqual(dependencies, initial);
+});
+
+
+test("profile header shows only the selected game's ranks and removes standalone Go boxes", () => {
+  const auth = { user: alice, profile: { id: alice.id, username: "Alice" }, loading: false };
+  for (const tab of ["general", "chess", "go", "atlas", "watten"]) {
+    const html = profileMarkup(auth, tab);
+    for (const [id, label] of [["chess", "Chess"], ["go", "Go"], ["atlas", "Atlas"]]) {
+      assert.equal(html.includes(`${label} ranks marker`), tab === id, `${tab}: ${label}`);
+    }
+    assert.doesNotMatch(html, /Go · Game history|Go · Ranked/);
+    if (["chess", "go", "atlas"].includes(tab)) {
+      assert.ok(html.indexOf("ranks marker") < html.indexOf("Player name"), "rank appears inside the profile header");
+    }
+  }
 });

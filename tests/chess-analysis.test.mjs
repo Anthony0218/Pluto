@@ -97,3 +97,15 @@ test("evaluation scores rank mates above every capped evaluation", async () => {
   assert.ok(order[2] > order[3]);
   assert.equal(evaluationScore("+25.00"), evaluationScore("+10.00"));
 });
+
+test("live coach, backfilled coach and full review all detect opening book moves", async () => {
+  const { gradeMove, gradeEarlierMoves, reviewGameMoves } = await import("../src/utils/chessAnalysis.ts");
+  const before = new Chess().fen(), afterFen = after(before, "e2e4");
+  const analyze = async fen => [line({ cp: 30 }, [new Chess(fen).turn() === "w" ? "e2e4" : "e7e5"])];
+  assert.equal((await gradeMove(before, afterFen, "e2e4", "e4", analyze)).quality, "Book");
+  assert.equal((await reviewGameMoves(["e4"], analyze))[0].quality, "Book");
+  const backfilled = [];
+  await gradeEarlierMoves(["e4"], [1], analyze, { stillWanted: () => true, onGrade: grade => backfilled.push(grade) });
+  assert.equal(backfilled[0].quality, "Book");
+  assert.equal(backfilled[0].openingName, "King's Pawn Game");
+});

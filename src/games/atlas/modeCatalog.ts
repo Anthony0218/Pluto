@@ -35,13 +35,13 @@ const speed = `${ATLAS_SCORING.normalCorrect.toLocaleString("en")} points for a 
 export const ARENA_MODES: ArenaModeDef[] = [
   {
     id: "map-battle", title: "Map Battle", tagline: "Know the world", accent: "cyan", meta: "10 questions · knowledge first",
-    description: "Find countries on the map from names, capitals, flags and facts. Correct answers earn the points; speed adds at most 5%.",
-    solo: { kind: "arena", mode: "map_click" }, online: "map_battle", hotseat: "turns", options: ["categories"], bestId: "map-battle",
+    description: "Find the named country on the world map. Correct answers earn the points; speed adds at most 5%.",
+    solo: { kind: "arena", mode: "map_click" }, online: "map_battle", hotseat: "turns", options: [], bestId: "map-battle",
     rules: {
-      goal: "Click the country the question describes — by its name, capital, flag or a fact about it.",
+      goal: "Click the named country on the world map.",
       play: ["Read the prompt and click the matching country on the world map.", "Zoom with the buttons or the mouse wheel; very small states are drawn as dots.", "You get one click per question: the right country lights up green, a wrong one red."],
       scoring: `${speed}. Wrong clicks score nothing.`,
-      solo: "10 questions from the categories you choose. Difficulty sets the speed-bonus window and how obscure the countries get.",
+      solo: "10 countries to locate. Difficulty sets the speed-bonus window and how obscure the countries get.",
       multiplayer: "2–4 players answer the same question at once with 20 seconds on the clock. Every correct click scores; speed adds at most 5%.",
       hotseat: turns("their own 10 questions"),
     },

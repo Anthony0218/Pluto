@@ -1,11 +1,14 @@
+import { useRandomSeries } from "./useRandomSeries";
+import { AtlasRandomSeriesResults } from "../../../components/atlas/AtlasRandomSeriesResults";
+import { TrialSessionContext } from "../../../components/atlas/trials/trialSession";
 import { AtlasTerritoryCampaign } from "../../../components/atlas/AtlasTerritoryCampaign";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, ChevronRight, Globe2, RotateCcw, SlidersHorizontal } from "lucide-react";
 import { AtlasSoloGame, SoloResults, SoloSettingsForm } from "../../../components/atlas/AtlasSoloGame";
 import { TRIAL_GAMES, useTrialPools } from "../../../components/atlas/trials/trialRegistry";
 import { bestKey, freshSeed } from "../../../games/atlas/arenaStorage";
-import { modeById, type ArenaModeDef } from "../../../games/atlas/modeCatalog";
+import { type ArenaModeDef } from "../../../games/atlas/modeCatalog";
 import { settingsReady, type SoloSummary } from "../../../games/atlas/soloSettings";
 import type { AtlasDataset } from "../../../games/atlas/types";
 import { useAtlasData } from "../../../games/atlas/useAtlasData";
@@ -19,29 +22,33 @@ export function AtlasUnavailable({ error }: { error?: string | null }) { return 
 /** Singleplayer for every mode: the stat modes start straight away, the map modes ask for their settings first. */
 export default function AtlasSoloPage() {
   const { modeId } = useParams();
-  const mode = modeById(modeId);
+  const series = useRandomSeries(modeId, true);
+  const mode = series.mode;
   const { data, loading, error } = useAtlasData();
   if (!mode) return <Navigate to="/games/atlas-arena" replace />;
   if (loading) return <AtlasLoading />;
   if (error || !data) return <AtlasUnavailable error={error} />;
-  return mode.solo.kind === "trial" ? <TrialSolo key={mode.id} mode={mode} data={data} /> : <ArenaSolo key={mode.id} mode={mode} data={data} />;
+  if (series.enabled && series.reviewing) return <AtlasRandomSeriesResults {...series} solo players={[{ id: "you", name: "You" }]} onNext={series.next} onAgain={series.reset} />;
+  const onComplete = series.enabled ? (score: number) => series.finish({ you: score }) : undefined;
+  return mode.solo.kind === "trial" ? <TrialSolo key={`${mode.id}:${series.results.length}`} mode={mode} data={data} onComplete={onComplete} /> : <ArenaSolo key={`${mode.id}:${series.results.length}`} mode={mode} data={data} onComplete={onComplete} />;
 }
 
-function TrialSolo({ mode, data }: { mode: ArenaModeDef; data: AtlasDataset }) {
+function TrialSolo({ mode, data, onComplete }: { mode: ArenaModeDef; data: AtlasDataset; onComplete?: (score: number) => void }) {
   const navigate = useNavigate();
   const { stored, recordBest } = useArenaStore();
   const [seed, setSeed] = useState(freshSeed);
   const { difficulty } = stored;
   const pools = useTrialPools(data, difficulty);
-  const record = useCallback((score: number) => recordBest(mode.bestId, difficulty, score), [difficulty, mode.bestId, recordBest]);
+  const pending = useRef(0);
+  const record = useCallback((score: number) => { pending.current = score; recordBest(mode.bestId, difficulty, score); }, [difficulty, mode.bestId, recordBest]);
   const exit = useCallback(() => navigate("/games/atlas-arena"), [navigate]);
   const restart = useCallback(() => setSeed(freshSeed()), []);
   if (mode.solo.kind !== "trial" || !pools) return null;
   const { component: Game, fullPool } = TRIAL_GAMES[mode.solo.trial];
-  return <Game key={`${difficulty}:${seed}`} pool={fullPool ? pools.full : pools.difficulty} byId={pools.byId} topology={data.topology} seed={seed} difficulty={difficulty} best={stored.best[bestKey(mode.bestId, difficulty)] ?? 0} onRecord={record} onRestart={restart} onExit={exit} />;
+  return <TrialSessionContext.Provider value={onComplete ? { finish: { label: "See series score", onClick: () => onComplete(pending.current) } } : null}><Game key={`${difficulty}:${seed}`} pool={fullPool ? pools.full : pools.difficulty} byId={pools.byId} topology={data.topology} seed={seed} difficulty={difficulty} best={stored.best[bestKey(mode.bestId, difficulty)] ?? 0} onRecord={record} onRestart={restart} onExit={exit} /></TrialSessionContext.Provider>;
 }
 
-function ArenaSolo({ mode, data }: { mode: ArenaModeDef; data: AtlasDataset }) {
+function ArenaSolo({ mode, data, onComplete }: { mode: ArenaModeDef; data: AtlasDataset; onComplete?: (score: number) => void }) {
   const navigate = useNavigate();
   const { stored, update, recordBest } = useArenaStore();
   const [phase, setPhase] = useState<"setup" | "playing" | "result">(mode.options.length ? "setup" : "playing");
@@ -69,7 +76,7 @@ function ArenaSolo({ mode, data }: { mode: ArenaModeDef; data: AtlasDataset }) {
     </main>
   );
   if (phase === "result" && summary) return <SoloResults mode={mode.solo.mode} summary={summary} entities={data.countries} actions={<>
-    <button type="button" onClick={start}><RotateCcw /> Play again</button>
+    {onComplete ? <button type="button" onClick={() => onComplete(summary.score)}>See series score <ChevronRight /></button> : <button type="button" onClick={start}><RotateCcw /> Play again</button>}
     {mode.options.length > 0 && <button type="button" className="atlas-secondary" onClick={() => setPhase("setup")}><SlidersHorizontal /> Settings</button>}
     <button type="button" className="atlas-secondary" onClick={toHub}>All modes</button>
   </>} />;

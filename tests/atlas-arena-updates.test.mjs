@@ -31,7 +31,7 @@ test("each Higher or Lower category can sustain a full solo streak on every diff
 });
 
 test("map multiplayer modes respect chosen question categories", () => {
-  for (const mode of ["map_battle", "closest_wins", "territory_battle"]) {
+  for (const mode of ["closest_wins", "territory_battle"]) {
     const questions = generateMatchQuestions({ ...base, mode, categories: ["languages", "population"] });
     assert.equal(questions.length, base.count);
     assert.deepEqual(new Set(questions.map((question) => question.category)), new Set(["languages", "population"]));
@@ -95,4 +95,11 @@ test("Closest Wins counts any pin inside the target country as 0 km and measures
   for (const entity of entities.filter((item) => item.playable && item.status === "un195" && item.geometryId && item.capitalCoordinates)) {
     assert.ok(distanceToTerritory(entity.capitalCoordinates, target(entity.iso3), shapes).distanceKm < 160, entity.shortName);
   }
+});
+
+ test("Map Battle shows country names only, regardless of saved category settings", () => {
+  const questions = generateMatchQuestions({ ...base, mode: "map_battle", categories: ["population", "area", "languages"] });
+  assert.equal(questions.length, base.count);
+  assert.ok(questions.every(q => q.category === "locations" && q.interaction === "map_click" && !q.flagAsset));
+  for (const q of questions) assert.equal(q.prompt, `Where is ${entities.find(c => c.id === q.entityId).shortName}?`);
 });

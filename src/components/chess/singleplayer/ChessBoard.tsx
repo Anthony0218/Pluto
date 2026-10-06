@@ -3056,7 +3056,7 @@ function countChecks(moves: string[]) {
 function QualityBadge({ quality }: { quality: MoveReview["quality"] }) {
   useUiLanguage();
   const styles: Record<MoveReview["quality"], string> = {
-    Book: "border-purple-500/20 bg-purple-500/15 text-purple-300",
+    Book: "border-zinc-500/20 bg-zinc-500/15 text-zinc-300",
     Best: "border-emerald-500/20 bg-emerald-500/15 text-emerald-300",
 
     Excellent: "border-cyan-500/20 bg-cyan-500/15 text-cyan-300",

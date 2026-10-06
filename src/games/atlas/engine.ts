@@ -70,14 +70,17 @@ export function makeChoiceQuestion(entity: GeographicEntity, category: AtlasCate
   const random = seededRandom(`${seed}:${index}:${category}`);
   if (category === "population" || category === "area") {
     const key: AtlasStatKey = category === "population" ? "population" : "areaKm2";
-    const available = pool.filter((candidate) => candidate[key]);
-    const comparison = plausibleEntities(entity, available, difficulty, 3, (candidate) => candidate[key]?.value || 0)[Math.floor(random() * Math.min(3, Math.max(1, available.length - 1)))] || available.find((candidate) => candidate.id !== entity.id)!;
+    const available = pool.filter((candidate) => candidate[key] && candidate.id !== entity.id && candidate[key]?.value !== entity[key]?.value);
+    const candidates = plausibleEntities(entity, available, difficulty, 3, (candidate) => candidate[key]?.value || 0);
+    const comparison = candidates[Math.floor(random() * candidates.length)];
     const firstValue = entity[key]?.value || 0, secondValue = comparison[key]?.value || 0;
     return {
       id: `${seed}:higher-lower:${index}`, seed, entityId: comparison.id, entityType: comparison.entityType,
       category, interaction: "higher_lower", difficulty, scope,
       prompt: `Is ${comparison.shortName}'s ${STAT_DEFINITIONS[key].label.toLowerCase()} higher or lower than ${entity.shortName}'s?`,
       answer: secondValue > firstValue ? "higher" : "lower", comparisonEntityId: entity.id,
+      first: { label: entity.shortName, kind: "country" },
+      second: { label: comparison.shortName, kind: "country" },
       stat: { key, label: STAT_DEFINITIONS[key].label, firstValue, secondValue, year: comparison[key]?.year, unit: STAT_DEFINITIONS[key].unit },
       sourceMetadata: sourceMetadata(comparison, category),
     };

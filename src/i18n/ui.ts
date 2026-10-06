@@ -1,3 +1,7 @@
+import finalTools from './finalToolsTranslations.json';
+import lifeTools from './lifeToolsTranslations.json';
+import footballReference from './footballReferenceTranslations.json';
+import musicFootball from './musicFootballTranslations.json';
 import existing from "./existingTranslations.json";
 import extra from "./uiTranslations.json";
 import dashboard from "./dashboardTranslations.json";
@@ -9,6 +13,8 @@ import social from "./socialTranslations.json";
 import information from "./informationTranslations.json";
 import learningTools from "./learningToolsTranslations.json";
 import learnContent from "./learnContentTranslations.json";
+import advancedMath from "./advancedMathTranslations.json";
+import deeperMath from "./deeperMathTranslations.json";
 import milestoneTools from "./milestoneToolsTranslations.json";
 import { getAppLanguage, useAppLanguage, type AppLanguage } from "./languageStore";
 
@@ -30,6 +36,12 @@ for (const [index, language] of learningLanguages.entries()) {
   Object.assign(lookup[language], (information as Table)[language]);
   Object.assign(lookup[language], (learningTools as Table)[language]);
   Object.assign(lookup[language], Object.fromEntries(learnContent.map(row => [normalized(row[0]), row[index + 1]])));
+  Object.assign(lookup[language], Object.fromEntries(advancedMath.map(row => [normalized(row[0]), row[index + 1]])));
+  Object.assign(lookup[language], Object.fromEntries(deeperMath.map(row => [normalized(row[0]), row[index + 1]])));
+  Object.assign(lookup[language], Object.fromEntries(footballReference.map(row => [normalized(row[0]), row[index + 1]])));
+  Object.assign(lookup[language], Object.fromEntries(musicFootball.map(row => [normalized(row[0]), row[index + 1]])));
+  Object.assign(lookup[language], Object.fromEntries(lifeTools.map(row => [normalized(row[0]), row[index + 1]])));
+  Object.assign(lookup[language], Object.fromEntries(finalTools.map(row => [normalized(row[0]), row[index + 1]])));
   Object.assign(lookup[language], Object.fromEntries(milestoneTools.map(row => [normalized(row[0]), row[index + 1]])));
 }
 

@@ -2,6 +2,7 @@ import { canPlayWattenCard, createDeck, determineTrickWinner, getNextPlayer, get
 
 export type SingleWattenState = {
   count: 3 | 4; dealer: number; caller: number; hands: WattenCard[][];
+  targetScore: number;
   phase: "cut" | "declare" | "playing" | "trickPause" | "roundOver" | "matchOver";
   deck: WattenCard[]; cutCards: WattenCard[];
   trump: Suit | null; schlag: Rank | null; turn: number; trick: PlayedCard[];
@@ -47,16 +48,16 @@ function dealAfterCut(state: SingleWattenState, cutIndex: number): SingleWattenS
   return { ...state, deck: [], cutCards, hands, phase: declaration ? "playing" : "declare",
     trump: declaration?.trump ?? null, schlag: declaration?.schlag ?? null, turn: state.caller };
 }
-export function createSingleWattenRound(count: 3 | 4, dealer = count - 1, scores = Array(count).fill(0) as number[], round = 1): SingleWattenState {
+export function createSingleWattenRound(count: 3 | 4, dealer = count - 1, scores = Array(count).fill(0) as number[], round = 1, targetScore = 15): SingleWattenState {
   const caller = getNextPlayer(dealer, count);
-  const state: SingleWattenState = { count, dealer, caller, hands: Array.from({ length: count }, () => []), deck: shuffleDeck(createDeck()), cutCards: [], phase: "cut",
+  const state: SingleWattenState = { count, dealer, caller, hands: Array.from({ length: count }, () => []), deck: shuffleDeck(createDeck()), cutCards: [], phase: "cut", targetScore: Math.max(4, Math.min(50, Math.trunc(targetScore))),
     trump: null, schlag: null, turn: caller, trick: [], lastTrick: [], lastTrickWinner: null, playedCardIds: [],
     tricksWon: Object.fromEntries(Array.from({ length: count }, (_, i) => [String(i), 0])), scores, round,
     roundValue: 2, pendingBid: null, lastBidSide: null, winnerSide: null };
-  return getPreviousPlayer(dealer, count) === 0 ? state : dealAfterCut(state, 10 + Math.floor(Math.random() * 12));
+  return state;
 }
-export function cutSingleWatten(state: SingleWattenState, cutIndex: number): SingleWattenState {
-  if (getPreviousPlayer(state.dealer, state.count) !== 0) throw new Error("It is not your cut.");
+export function cutSingleWatten(state: SingleWattenState, cutIndex: number, seat = 0): SingleWattenState {
+  if (getPreviousPlayer(state.dealer, state.count) !== seat) throw new Error("It is not your cut.");
   return dealAfterCut(state, cutIndex);
 }
 export function declareSingleWatten(state: SingleWattenState, trump: Suit, schlag: Rank): SingleWattenState {
@@ -66,7 +67,7 @@ export function declareSingleWatten(state: SingleWattenState, trump: Suit, schla
 export function canRaiseSingleWatten(state: SingleWattenState, seat: number): boolean {
   const side = teamOf(String(seat), state.count, state.caller);
   return state.phase === "playing" && state.turn === seat && !state.pendingBid && state.roundValue < 4
-    && state.lastBidSide !== side && !state.scores.some((score, player) => teamOf(String(player), state.count, state.caller) === side && score >= 13);
+    && state.lastBidSide !== side && !state.scores.some((score, player) => teamOf(String(player), state.count, state.caller) === side && score >= state.targetScore - 2);
 }
 export function raiseSingleWatten(state: SingleWattenState, seat: number): SingleWattenState {
   if (!canRaiseSingleWatten(state, seat)) throw new Error("Cannot raise now.");
@@ -81,7 +82,7 @@ export function respondSingleWattenBid(state: SingleWattenState, seat: number, h
 }
 function awardRound(state: SingleWattenState, side: string, points: number): SingleWattenState {
   const scores = state.scores.map((score, seat) => score + (teamOf(String(seat), state.count, state.caller) === side ? points : 0));
-  return { ...state, scores, winnerSide: side, pendingBid: null, trick: [], phase: scores.some(score => score >= 15) ? "matchOver" : "roundOver" };
+  return { ...state, scores, winnerSide: side, pendingBid: null, trick: [], phase: scores.some(score => score >= state.targetScore) ? "matchOver" : "roundOver" };
 }
 export function playSingleWattenCard(state: SingleWattenState, cardId: string): SingleWattenState {
   if (state.phase !== "playing" || !state.trump || !state.schlag || state.pendingBid) throw new Error("The round is not ready.");
@@ -102,6 +103,6 @@ export function playSingleWattenCard(state: SingleWattenState, cardId: string): 
 }
 export function advanceSingleWatten(state: SingleWattenState): SingleWattenState {
   if (state.phase === "trickPause") return { ...state, phase: "playing" };
-  if (state.phase === "roundOver") return createSingleWattenRound(state.count, getNextPlayer(state.dealer, state.count), state.scores, state.round + 1);
+  if (state.phase === "roundOver") return createSingleWattenRound(state.count, getNextPlayer(state.dealer, state.count), state.scores, state.round + 1, state.targetScore);
   throw new Error("No round to advance.");
 }

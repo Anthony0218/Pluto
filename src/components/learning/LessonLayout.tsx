@@ -5,6 +5,7 @@ import { useLearningToolsProgress } from "@/hooks/useLearningToolsProgress";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import HubLayout from "./HubLayout";
 import { useEffect, useRef, type ReactNode } from "react";
+import { everydayMathCases } from "@/data/everydayMathCases";
 
 /** Shared reading shell; subject lessons supply their own interactive content. */
 export default function LessonLayout({ lesson, activities, leadActivities, extraMeta }: { lesson: LearningLesson; activities?: Partial<Record<typeof lessonStages[number], ReactNode>>; leadActivities?: Partial<Record<typeof lessonStages[number], ReactNode>>; extraMeta?: ReactNode }) {
@@ -15,6 +16,7 @@ export default function LessonLayout({ lesson, activities, leadActivities, extra
   const stage = saved?.stage && stages.includes(saved.stage) ? saved.stage : saved?.stage === "check" && lesson.subjectId === "math" ? "practice" : "learn";
   const index = stages.indexOf(stage);
   const section = lesson.sections[stage];
+  const everydayCase = everydayMathCases[lesson.id];
   const bookmarked = progress.bookmarks.includes(lesson.id);
   const subject = learningSubjects.find(item => item.id === lesson.subjectId);
   const path = learningPaths.find(item => item.id === lesson.pathId && item.subjectId === lesson.subjectId);
@@ -34,6 +36,7 @@ export default function LessonLayout({ lesson, activities, leadActivities, extra
       {leadActivities?.[stage]}
       {section.paragraphs.map(paragraph => <p key={paragraph}>{ui(paragraph)}</p>)}
       {section.points && <ul>{section.points.map(point => <li key={point}><Check size={16} aria-hidden /><span>{ui(point)}</span></li>)}</ul>}
+      {stage === "learn" && everydayCase && <aside className="mf-activity lt-everyday-case" aria-label={ui("In everyday life")}><h3>{ui("In everyday life")}</h3><p>{ui(everydayCase.situation)}</p><p className="mf-notation">{everydayCase.calculation}</p></aside>}
       {lesson.subjectId === "math" && <aside className="mf-did-you-know" aria-label={ui("Did you know?")}><h3><Lightbulb size={18} aria-hidden />{ui("Did you know?")}</h3>{lesson.sections.check.paragraphs.map(paragraph => <p key={paragraph}>{ui(paragraph)}</p>)}</aside>}
       {activities?.[stage]}
     </article>

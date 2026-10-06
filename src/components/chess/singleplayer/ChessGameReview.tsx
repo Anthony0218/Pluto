@@ -99,7 +99,6 @@ type EnrichedReviewRow = {
 };
 
 function displayQuality(row: EnrichedReviewRow): ReviewVisualQuality {
-  if (row.review.quality === "Book") return "Book";
   if (isMissedWin(row.review, row.moverEvalBefore, row.moverEvalAfter)) return "Missed Win";
   return row.review.quality;
 }
@@ -285,8 +284,8 @@ type CachedReview = {
   ply: number;
 };
 
-// v2: mate scores are graded ply-accurately, so older cached grades are stale.
-const REVIEW_STORAGE_KEY = "chess-game-review-cache-v2";
+// v3: refresh opening-book grades and missed-mate categories.
+const REVIEW_STORAGE_KEY = "chess-game-review-cache-v3";
 const MAX_STORED_REVIEWS = 6;
 
 const reviewCache = new Map<string, CachedReview>(readStoredReviews());

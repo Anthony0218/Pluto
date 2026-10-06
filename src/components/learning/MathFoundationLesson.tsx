@@ -97,7 +97,7 @@ function ExerciseCard({ exercise, number, solved, disabled, onSolved }: { exerci
   const [digits, setDigits] = useState<string[]>(() => Array(paper?.width ?? 0).fill(""));
   return <section className="mf-exercise" aria-labelledby={`${inputId}-question`}>
     <div className="mf-exercise-top"><span>{ui("Question")} {number}</span>{solved && <span className="mf-solved"><CheckCircle2 size={14} aria-hidden />{ui("Solved")}</span>}</div>
-    <h3 id={`${inputId}-question`}>{ui(exercise.prompt)}</h3>
+    <h3 id={`${inputId}-question`}>{ui(exercise.prompt)}{exercise.notation && <span className="mf-notation" style={{ display: "block" }}>{exercise.notation}</span>}</h3>
     <form onSubmit={event => {
       event.preventDefault();
       const result = exercise.paper ? gradePaperWork(exercise.paper, marks, digits) : gradeMathAnswer(answer, exercise.answer);

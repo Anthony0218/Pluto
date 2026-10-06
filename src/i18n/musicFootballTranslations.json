@@ -1,0 +1,3611 @@
+[
+  [
+    "Staff and clefs",
+    "Notensystem und Schlüssel",
+    "Notensystem und Schlissl",
+    "오선과 음자리표",
+    "Нотный стан и ключи",
+    "Pentagrama y claves",
+    "Pauta e claves"
+  ],
+  [
+    "Read five lines and the spaces between them.",
+    "Lies fünf Linien und die Zwischenräume.",
+    "Lies fünf Linien und de Zwischenräum.",
+    "다섯 선과 사이 공간을 읽어 보세요.",
+    "Читайте пять линий и промежутки между ними.",
+    "Lee las cinco líneas y sus espacios.",
+    "Lê as cinco linhas e os espaços."
+  ],
+  [
+    "Read from bottom to top. Treble lines are E4, G4, B4, D5, F5; bass lines are G2, B2, D3, F3, A3. A clef fixes the pitch reference; changing clef changes the meaning of the same position.",
+    "Lies von unten nach oben. Im Violinschlüssel: E4, G4, B4, D5, F5; im Bassschlüssel: G2, B2, D3, F3, A3. Der Schlüssel bestimmt die Tonhöhen; dieselbe Position bedeutet je nach Schlüssel etwas anderes.",
+    "Lies vo unten nach oben. Im Violinschlissl: E4, G4, B4, D5, F5; im Bassschlissl: G2, B2, D3, F3, A3. Da Schlissl legt d Tonhöh fest; dieselbe Stell kann an andern Ton moana.",
+    "아래에서 위로 읽습니다. 높은음자리표의 선은 E4, G4, B4, D5, F5이며 낮은음자리표는 G2, B2, D3, F3, A3입니다. 음자리표가 음높이 기준을 정하므로 같은 위치도 다른 음이 됩니다.",
+    "Читайте снизу вверх: линии скрипичного ключа — E4, G4, B4, D5, F5; басового — G2, B2, D3, F3, A3. Ключ задаёт высоту: одна позиция в разных ключах означает разные ноты.",
+    "Lee de abajo arriba: en clave de sol, E4, G4, B4, D5, F5; en clave de fa, G2, B2, D3, F3, A3. La clave fija la referencia; una misma posición cambia de altura según la clave.",
+    "Lê de baixo para cima: na clave de sol, E4, G4, B4, D5, F5; na clave de fá, G2, B2, D3, F3, A3. A clave fixa a referência; a mesma posição muda de altura consoante a clave."
+  ],
+  [
+    "Middle C (C4) is one ledger line below treble and one ledger line above bass. Piano joins both staves into a grand staff; the notes between the staves connect the hands.",
+    "Das mittlere C (C4) liegt auf einer Hilfslinie unter dem Violinsystem und über dem Basssystem. Beim Klavier bilden beide ein Doppelsystem; die Töne dazwischen verbinden die Hände.",
+    "Des mittlere C (C4) liegt auf a Hilfslinie unterm Violinsystem und überm Basssystem. Beim Klavier ghörn beide zamm; de Tön dazwischen verbinden d Händ.",
+    "가운데 C(C4)는 높은음자리 오선 아래 보조선, 낮은음자리 오선 위 보조선에 놓입니다. 피아노는 두 오선을 큰보표로 묶으며 그 사이 음들이 양손을 연결합니다.",
+    "Среднее C (C4) находится на добавочной линии под скрипичным станом и над басовым. Фортепиано объединяет их в большую систему; ноты между ними связывают партии рук.",
+    "El do central (C4) está en una línea adicional bajo el pentagrama de sol y sobre el de fa. El piano los une en un sistema doble; las notas intermedias conectan las manos.",
+    "O dó central (C4) fica numa linha suplementar abaixo da pauta de sol e acima da de fá. O piano une as duas num sistema duplo; as notas intermédias ligam as mãos."
+  ],
+  [
+    "Change it and observe",
+    "Ändere etwas und beobachte",
+    "Änder was und schau zua",
+    "바꾸고 관찰하기",
+    "Изменяйте и наблюдайте",
+    "Cambia y observa",
+    "Altera e observa"
+  ],
+  [
+    "Choose an instrument or pattern, then compare what is written with what you hear. Start playback when you are ready.",
+    "Wähle ein Instrument oder Muster und vergleiche Notation und Klang. Starte die Wiedergabe, wenn du bereit bist.",
+    "Such a Instrument oder Muster aus und vergleich d Noten mitm Klang. Start, wennst bereit bist.",
+    "악기나 패턴을 선택하고 악보와 소리를 비교하세요. 준비되면 재생하세요.",
+    "Выберите инструмент или рисунок и сравните запись со звучанием. Запустите воспроизведение, когда будете готовы.",
+    "Elige un instrumento o patrón y compara lo escrito con lo que oyes. Reproduce cuando estés listo.",
+    "Escolhe um instrumento ou padrão e compara a escrita com o som. Inicia a reprodução quando estiveres pronto."
+  ],
+  [
+    "Choose an answer before checking. A revealed solution does not count as a solved exercise.",
+    "Wähle vor dem Prüfen eine Antwort. Eine aufgedeckte Lösung zählt nicht als gelöste Übung.",
+    "Wähl vorm Prüfen a Antwort. A aufdeckte Lösung zählt ned als glöste Übung.",
+    "확인 전에 답을 고르세요. 공개한 해답은 해결한 문제로 기록되지 않습니다.",
+    "Выберите ответ до проверки. Просмотр решения не засчитывается как решённое упражнение.",
+    "Elige antes de comprobar. Ver la solución no cuenta como ejercicio resuelto.",
+    "Escolhe antes de verificar. Ver a solução não conta como exercício resolvido."
+  ],
+  [
+    "Check your understanding",
+    "Prüfe dein Verständnis",
+    "Prüf, ob du's verstanden hast",
+    "이해 확인",
+    "Проверьте понимание",
+    "Comprueba lo aprendido",
+    "Verifica o que aprendeste"
+  ],
+  [
+    "Name the clef before naming a note. Count alternating lines and spaces from a known reference.",
+    "Bestimme zuerst den Schlüssel. Zähle ab einer bekannten Note abwechselnd Linien und Zwischenräume.",
+    "Schau erst aufn Schlissl. Zähl vo am bekannten Ton aus Linien und Zwischenräum abwechselnd.",
+    "먼저 음자리표를 확인하고 기준음에서 선과 공간을 번갈아 세세요.",
+    "Сначала определите ключ. От известной ноты считайте линии и промежутки поочерёдно.",
+    "Identifica primero la clave. Cuenta líneas y espacios alternados desde una nota conocida.",
+    "Identifica primeiro a clave. Conta linhas e espaços alternados a partir de uma nota conhecida."
+  ],
+  [
+    "Follow the musical alphabet beyond the staff.",
+    "Folge dem musikalischen Alphabet über das System hinaus.",
+    "Folg dem Notenalphabet über d Linien hinaus.",
+    "오선 밖에서도 음이름 순서를 따릅니다.",
+    "Продолжайте музыкальный алфавит за пределами стана.",
+    "Sigue el alfabeto musical fuera del pentagrama.",
+    "Segue o alfabeto musical para além da pauta."
+  ],
+  [
+    "The letters repeat A, B, C, D, E, F, G. Moving up one line or space advances one letter; ledger lines continue the same pattern outside the staff. Higher on the page means higher written pitch.",
+    "Die Buchstaben A, B, C, D, E, F, G wiederholen sich. Jede Linie oder jeder Zwischenraum nach oben führt zum nächsten Buchstaben; Hilfslinien setzen das Muster fort. Höher auf der Seite heißt höher notierter Ton.",
+    "A, B, C, D, E, F, G wiederholn si. Jede Linie oder jeder Zwischenraum nach oben bringt den nächsten Buchstabn; Hilfslinien geh'n genauso weiter. Weiter oben heißt höher notiert.",
+    "A, B, C, D, E, F, G가 반복됩니다. 선이나 공간 하나 올라가면 다음 글자가 되고 보조선에도 같은 규칙이 적용됩니다. 위에 쓸수록 기보된 음이 높습니다.",
+    "Буквы A, B, C, D, E, F, G повторяются. Шаг на линию или промежуток выше даёт следующую букву; добавочные линии продолжают правило. Выше на странице — выше записанный звук.",
+    "Se repiten A, B, C, D, E, F, G. Subir una línea o espacio avanza una letra; las líneas adicionales mantienen el patrón. Más arriba significa mayor altura escrita.",
+    "A, B, C, D, E, F, G repetem-se. Subir uma linha ou espaço avança uma letra; as linhas suplementares continuam o padrão. Mais acima significa maior altura escrita."
+  ],
+  [
+    "Starting at treble E4, the next space is F4, then the line G4. Below E4 come D4 in the space and C4 on a ledger line.",
+    "Über E4 im Violinsystem folgen F4 im Zwischenraum und G4 auf der Linie. Darunter liegen D4 im Zwischenraum und C4 auf einer Hilfslinie.",
+    "Über E4 im Violinsystem kemman F4 im Zwischenraum und G4 auf da Linie. Drunter san D4 im Zwischenraum und C4 auf a Hilfslinie.",
+    "높은음자리 E4 위 공간은 F4, 다음 선은 G4입니다. 아래 공간은 D4, 보조선은 C4입니다.",
+    "Над E4 в скрипичном ключе находятся F4 в промежутке и G4 на линии. Ниже — D4 в промежутке и C4 на добавочной линии.",
+    "Sobre E4 en clave de sol vienen F4 en el espacio y G4 en la línea. Debajo están D4 en el espacio y C4 en una línea adicional.",
+    "Acima de E4 na clave de sol vêm F4 no espaço e G4 na linha. Abaixo estão D4 no espaço e C4 numa linha suplementar."
+  ],
+  [
+    "Ledger lines are small extensions of the staff, not a separate naming system. This course uses international A–G names; German H is international B, and German B is B-flat.",
+    "Hilfslinien erweitern das System. Hier gelten internationale A–G-Namen: deutsches H entspricht B, deutsches B entspricht B-flat (B♭).",
+    "Hilfslinien verlängern s System. Hier gelten internationale A–G-Namen: unser H is B, unser B is B-flat (B♭).",
+    "보조선은 오선의 연장입니다. 여기서는 국제 A–G 이름을 사용합니다. 독일식 H는 국제식 B, 독일식 B는 B♭입니다.",
+    "Добавочные линии продолжают стан. Здесь используются международные A–G: немецкое H соответствует B, немецкое B — B♭.",
+    "Las líneas adicionales prolongan el pentagrama. Usamos nombres internacionales A–G: el H alemán equivale a B y el B alemán a B♭.",
+    "As linhas suplementares prolongam a pauta. Usamos nomes internacionais A–G: o H alemão equivale a B e o B alemão a B♭."
+  ],
+  [
+    "Octaves and keyboard geography",
+    "Oktaven und Klaviertasten",
+    "Oktaven und Klaviertastn",
+    "옥타브와 건반 위치",
+    "Октавы и клавиатура",
+    "Octavas y teclado",
+    "Oitavas e teclado"
+  ],
+  [
+    "Connect staff positions to a piano keyboard.",
+    "Verbinde Notenpositionen mit Klaviertasten.",
+    "Bring Notenpositionen mit Klaviertastn zamm.",
+    "악보 위치와 건반을 연결합니다.",
+    "Свяжите позиции нот с клавишами.",
+    "Relaciona notas y teclas.",
+    "Relaciona notas e teclas."
+  ],
+  [
+    "An octave goes from one letter to the next occurrence of that letter and spans 12 semitones. C is the white key immediately left of a group of two black keys. Scientific pitch notation calls middle C C4.",
+    "Eine Oktave reicht zum nächsten Ton desselben Buchstabens und umfasst 12 Halbtöne. C liegt direkt links von zwei schwarzen Tasten. In wissenschaftlicher Tonnotation ist das mittlere C C4.",
+    "A Oktav geht zum nächsten Ton vom selben Buchstabn und hat 12 Halbtön. C liegt links vo zwoa schwarzen Tastn. Wissenschaftlich hoaßt s mittlere C C4.",
+    "옥타브는 같은 글자의 다음 음까지이며 12반음입니다. C는 두 검은 건반 묶음 바로 왼쪽 흰 건반입니다. 과학적 음높이 표기에서 가운데 C는 C4입니다.",
+    "Октава достигает следующей ноты той же буквы и содержит 12 полутонов. C — белая клавиша слева от пары чёрных. В научной нотации среднее C обозначается C4.",
+    "Una octava llega a la siguiente nota de igual letra y abarca 12 semitonos. C es la tecla blanca a la izquierda de dos negras. En notación científica, el do central es C4.",
+    "Uma oitava chega à nota seguinte com a mesma letra e abrange 12 semitons. C é a tecla branca à esquerda de duas pretas. Na notação científica, o dó central é C4."
+  ],
+  [
+    "A4 is the A above middle C; in equal temperament with A4 = 440 Hz, A5 = 880 Hz and A3 = 220 Hz.",
+    "A4 liegt über dem mittleren C. Bei gleichstufiger Stimmung mit A4 = 440 Hz gilt A5 = 880 Hz und A3 = 220 Hz.",
+    "A4 liegt überm mittleren C. Bei gleichstufiger Stimmung mit A4 = 440 Hz san A5 = 880 Hz und A3 = 220 Hz.",
+    "A4는 가운데 C 위의 A입니다. 평균율에서 A4 = 440 Hz라면 A5 = 880 Hz, A3 = 220 Hz입니다.",
+    "A4 находится выше среднего C. При равномерной темперации и A4 = 440 Hz: A5 = 880 Hz, A3 = 220 Hz.",
+    "A4 está sobre el do central. En temperamento igual con A4 = 440 Hz, A5 = 880 Hz y A3 = 220 Hz.",
+    "A4 fica acima do dó central. No temperamento igual com A4 = 440 Hz, A5 = 880 Hz e A3 = 220 Hz."
+  ],
+  [
+    "An octave doubles frequency, while one adjacent staff step is usually a second, not an octave. Octave numbering is a convention; some software labels middle C differently.",
+    "Eine Oktave verdoppelt die Frequenz. Ein benachbarter Notenschritt ist meist eine Sekunde. Die Oktavnummerierung ist eine Konvention; manche Programme benennen das mittlere C anders.",
+    "A Oktav verdoppelt d Frequenz. A Nachbarschritt is meist a Sekund. D Oktavnummern san a Vereinbarung; manche Programme nennan s mittlere C anders.",
+    "옥타브가 올라가면 주파수가 두 배입니다. 오선의 한 단계는 보통 2도이지 옥타브가 아닙니다. 옥타브 번호는 관례이며 일부 프로그램은 가운데 C를 다르게 표시합니다.",
+    "Октава удваивает частоту; соседний шаг на стане обычно даёт секунду. Нумерация октав условна: некоторые программы иначе обозначают среднее C.",
+    "Una octava duplica la frecuencia; un paso contiguo suele ser una segunda. La numeración de octavas es una convención y algunos programas llaman de otra forma al do central.",
+    "Uma oitava duplica a frequência; um passo contíguo costuma ser uma segunda. A numeração é uma convenção e alguns programas dão outro nome ao dó central."
+  ],
+  [
+    "Read alterations without losing the note letter.",
+    "Lies Vorzeichen, ohne den Notenbuchstaben zu verlieren.",
+    "Lies Vorzeichn und behalt den Notenbuchstabn.",
+    "음이름을 유지하며 임시표를 읽습니다.",
+    "Читайте альтерацию, сохраняя букву ноты.",
+    "Lee alteraciones sin perder la letra.",
+    "Lê alterações sem perder a letra."
+  ],
+  [
+    "A sharp raises a note by one semitone; a flat lowers it by one; a natural cancels an alteration. An accidental applies to that note letter at that octave for the rest of the measure, unless changed; a tie carries the altered sound into the next measure.",
+    "Ein Kreuz erhöht um einen Halbton, ein Be senkt um einen, ein Auflösungszeichen hebt die Änderung auf. Ein Versetzungszeichen gilt für diesen Buchstaben in dieser Oktave bis zum Taktende, sofern es nicht geändert wird. Ein Haltebogen trägt den veränderten Klang in den nächsten Takt.",
+    "A Kreuz erhöht um an Halbton, a Be senkt um oan, a Auflösungszeichn hebt's auf. S Vorzeichn gilt für den Buchstabn in der Oktav bis zum Taktend, außer es ändert si. A Haltebogn nimmt den Klang in den nächsten Takt mit.",
+    "♯는 반음 올리고 ♭는 반음 내리며 ♮는 변화를 취소합니다. 임시표는 변경되지 않으면 같은 음이름과 옥타브에 마디 끝까지 적용됩니다. 붙임줄은 다음 마디에도 변화된 소리를 이어 줍니다.",
+    "Диез повышает на полутон, бемоль понижает, бекар отменяет изменение. Случайный знак действует на эту букву в данной октаве до конца такта, если не изменён; лига продлевает изменённый звук в следующий такт.",
+    "El sostenido sube un semitono, el bemol baja uno y el becuadro cancela la alteración. La alteración accidental rige para esa letra y octava hasta el final del compás, salvo cambio; una ligadura prolonga el sonido alterado al siguiente compás.",
+    "O sustenido sobe um semitom, o bemol desce um e o bequadro cancela a alteração. A alteração acidental aplica-se à mesma letra e oitava até ao fim do compasso, salvo mudança; uma ligadura prolonga o som alterado para o compasso seguinte."
+  ],
+  [
+    "On an equal-tempered keyboard, F-sharp and G-flat share a key but have different written names. B-sharp sounds like C, and C-flat sounds like B.",
+    "Bei gleichstufiger Stimmung teilen Fis und Ges eine Taste, heißen aber unterschiedlich. His klingt wie C und Ces wie B (deutsches H).",
+    "Gleichstufig san Fis und Ges auf derselben Tast, hoaßn aber anders. His klingt wia C und Ces wia B (unser H).",
+    "평균율 건반에서 F♯와 G♭는 같은 건반이지만 기보 이름은 다릅니다. B♯는 C, C♭는 B처럼 들립니다.",
+    "При равномерной темперации F♯ и G♭ — одна клавиша, но разные названия. B♯ звучит как C, а C♭ — как B.",
+    "En temperamento igual, F♯ y G♭ comparten tecla pero no nombre. B♯ suena como C y C♭ como B.",
+    "No temperamento igual, F♯ e G♭ partilham a tecla mas não o nome. B♯ soa como C e C♭ como B."
+  ],
+  [
+    "Read the key signature first, then any local accidental. An accidental changes pitch, not the staff position of the letter.",
+    "Lies zuerst die Tonartvorzeichen, dann lokale Vorzeichen. Ein Vorzeichen ändert die Tonhöhe, nicht die Position des Buchstabens.",
+    "Lies erst d Tonartvorzeichn, dann d lokalen. S Vorzeichn ändert d Tonhöh, ned d Position vom Buchstabn.",
+    "조표를 먼저 읽고 임시표를 읽습니다. 임시표는 음높이를 바꾸며 음이름의 오선 위치는 바꾸지 않습니다.",
+    "Сначала прочтите знаки при ключе, затем случайные. Знак меняет высоту, а не позицию буквы на стане.",
+    "Lee primero la armadura y después las alteraciones accidentales. Cambian la altura, no la posición de la letra.",
+    "Lê primeiro a armação e depois as alterações acidentais. Alteram a altura, não a posição da letra."
+  ],
+  [
+    "Key signatures and sound",
+    "Tonartvorzeichen und Klang",
+    "Tonartvorzeichn und Klang",
+    "조표와 소리",
+    "Знаки при ключе и звучание",
+    "Armaduras y sonido",
+    "Armações e som"
+  ],
+  [
+    "Use the signature before reading individual notes.",
+    "Beachte die Tonartvorzeichen vor jeder Note.",
+    "Beacht d Tonartvorzeichn vor jeder Notn.",
+    "각 음을 읽기 전에 조표를 확인합니다.",
+    "Учитывайте знаки при ключе перед чтением нот.",
+    "Considera la armadura antes de cada nota.",
+    "Considera a armação antes de cada nota."
+  ],
+  [
+    "A key signature applies to its note letters in every octave. One sharp means all F notes are sharp unless locally altered; one flat means all B notes are flat. G major and E minor share one sharp, so a signature alone does not identify the key.",
+    "Tonartvorzeichen gelten für ihre Buchstaben in allen Oktaven. Ein Kreuz macht jedes F zum Fis, sofern es nicht lokal geändert wird; ein Be macht jedes B zum B♭. G-Dur und e-Moll haben beide ein Kreuz: Die Vorzeichen allein bestimmen die Tonart nicht eindeutig.",
+    "Tonartvorzeichn gelten in alle Oktaven. A Kreuz macht jedes F zum Fis, außer a lokales Zeichn ändert's; a Be macht jedes B zum B♭. G-Dur und e-Moll ham beide a Kreuz: Allein daraus weißt d Tonart ned sicher.",
+    "조표는 해당 음이름의 모든 옥타브에 적용됩니다. ♯ 하나면 임시표가 없는 F는 모두 F♯이고 ♭ 하나면 B는 모두 B♭입니다. G장조와 E단조 모두 ♯ 하나이므로 조표만으로 조를 확정할 수는 없습니다.",
+    "Знаки при ключе действуют во всех октавах. Один диез делает все F нотами F♯, если нет случайного знака; один бемоль делает все B нотами B♭. G-мажор и E-минор имеют один диез, поэтому знаки не определяют тональность однозначно.",
+    "La armadura se aplica a sus letras en todas las octavas. Un sostenido altera todos los F, salvo cambio local; un bemol altera todos los B. Sol mayor y mi menor comparten un sostenido: la armadura sola no identifica la tonalidad.",
+    "A armação aplica-se às letras em todas as oitavas. Um sustenido altera todos os F, salvo alteração local; um bemol altera todos os B. Sol maior e mi menor partilham um sustenido: a armação, por si só, não identifica a tonalidade."
+  ],
+  [
+    "Read G, A, B, C, D, E, F-sharp, G for a G-major scale. C major has no sharps or flats in its signature.",
+    "Die G-Dur-Tonleiter lautet G, A, B, C, D, E, Fis, G. C-Dur hat keine Tonartvorzeichen.",
+    "G-Dur geht G, A, B, C, D, E, Fis, G. C-Dur hat koane Tonartvorzeichn.",
+    "G장조 음계는 G, A, B, C, D, E, F♯, G입니다. C장조 조표에는 ♯나 ♭가 없습니다.",
+    "Гамма G-мажор: G, A, B, C, D, E, F♯, G. В C-мажоре нет знаков при ключе.",
+    "La escala de sol mayor es G, A, B, C, D, E, F♯, G. Do mayor no tiene alteraciones en su armadura.",
+    "A escala de sol maior é G, A, B, C, D, E, F♯, G. Dó maior não tem alterações na armação."
+  ],
+  [
+    "Use the note, octave, key signature, local accidental, and instrument transposition to determine sounding pitch. The playback here uses a synthesized tone, not an instrument recording.",
+    "Bestimme den Klang aus Note, Oktave, Tonartvorzeichen, lokalem Vorzeichen und Instrumenttransposition. Die Wiedergabe nutzt synthetische Töne, keine Instrumentaufnahme.",
+    "Bestimm den Klang aus Notn, Oktav, Tonartvorzeichn, lokalem Vorzeichn und Transposition. D Wiedergab nutzt synthetische Tön, koa Instrumentaufnahme.",
+    "음, 옥타브, 조표, 임시표, 악기 이조를 함께 고려해 실제 음높이를 정합니다. 재생은 악기 녹음이 아닌 합성음입니다.",
+    "Определяйте звучание по ноте, октаве, знакам при ключе, случайному знаку и транспозиции инструмента. Воспроизводится синтезированный тон, а не запись инструмента.",
+    "Determina el sonido con nota, octava, armadura, alteración y transposición del instrumento. La reproducción usa tonos sintetizados, no grabaciones instrumentales.",
+    "Determina o som com a nota, oitava, armação, alteração e transposição do instrumento. A reprodução usa tons sintetizados, não gravações de instrumentos."
+  ],
+  [
+    "Reading for different instruments",
+    "Notenlesen für verschiedene Instrumente",
+    "Notnlesen für verschiedene Instrumente",
+    "여러 악기의 악보 읽기",
+    "Чтение для разных инструментов",
+    "Lectura para distintos instrumentos",
+    "Leitura para diferentes instrumentos"
+  ],
+  [
+    "Compare piano, strings, winds, guitar, bass, and drums.",
+    "Vergleiche Klavier, Streicher, Bläser, Gitarre, Bass und Schlagzeug.",
+    "Vergleich Klavier, Streicher, Bläser, Gitarr, Bass und Schlagzeug.",
+    "피아노, 현악기, 관악기, 기타, 베이스, 드럼을 비교합니다.",
+    "Сравните фортепиано, струнные, духовые, гитару, бас и ударные.",
+    "Compara piano, cuerdas, vientos, guitarra, bajo y batería.",
+    "Compara piano, cordas, sopros, guitarra, baixo e bateria."
+  ],
+  [
+    "Piano uses treble and bass together. Violin and flute usually read treble; viola commonly reads alto, where the middle line is C4; cello commonly reads bass and also uses tenor for higher passages. Always follow the clef printed in the part.",
+    "Klavier nutzt Violin- und Bassschlüssel zusammen. Violine und Flöte lesen meist Violinschlüssel; Bratsche oft Altschlüssel mit C4 auf der mittleren Linie. Cello liest meist Bass, in höheren Lagen auch Tenor. Maßgeblich ist immer der gedruckte Schlüssel.",
+    "Klavier nutzt Violin- und Bassschlissl zamm. Geign und Flötn lesen meist Violinschlissl, Bratschn oft Altschlissl mit C4 auf da Mittellinie. Cello liest meist Bass, weiter oben aa Tenor. Schau immer aufn gedruckten Schlissl.",
+    "피아노는 높은음자리표와 낮은음자리표를 함께 사용합니다. 바이올린과 플루트는 보통 높은음자리표, 비올라는 가운데 선이 C4인 가온음자리표를 씁니다. 첼로는 보통 낮은음자리표이며 높은 부분은 테너음자리표도 씁니다. 악보에 표시된 음자리표를 따르세요.",
+    "Фортепиано использует скрипичный и басовый ключи вместе. Скрипка и флейта обычно читают скрипичный, альт — альтовый с C4 на средней линии. Виолончель обычно читает басовый, а выше — теноровый. Следуйте ключу в партии.",
+    "El piano combina claves de sol y fa. Violín y flauta suelen leer sol; viola suele usar do en tercera, con C4 en la línea central. El violonchelo usa fa y también do en cuarta en pasajes altos. Sigue siempre la clave impresa.",
+    "O piano combina claves de sol e fá. Violino e flauta usam geralmente sol; a viola usa dó na terceira linha, com C4 na linha central. O violoncelo usa fá e também dó na quarta linha em passagens agudas. Segue sempre a clave impressa."
+  ],
+  [
+    "Guitar reads treble and normally sounds one octave lower; electric bass reads bass and sounds one octave lower. A B-flat clarinet sounds a major second below its written note; an E-flat alto saxophone sounds a major sixth below. Written C4 becomes B-flat3 on clarinet and E-flat3 on alto saxophone.",
+    "Gitarre liest Violin und klingt meist eine Oktave tiefer; E-Bass liest Bass und klingt ebenfalls eine Oktave tiefer. B♭-Klarinette klingt eine große Sekunde unter der Notation, E♭-Altsaxofon eine große Sexte. Notiertes C4 klingt dort als B♭3 beziehungsweise E♭3.",
+    "Gitarr liest Violin und klingt meist a Oktav tiefer; E-Bass liest Bass und klingt aa a Oktav tiefer. B♭-Klarinettn klingt a große Sekund tiefer, E♭-Altsaxofon a große Sext. Notiertes C4 klingt als B♭3 beziehungsweise E♭3.",
+    "기타는 높은음자리표를 읽고 보통 한 옥타브 낮게 소리 납니다. 일렉트릭 베이스도 낮은음자리표보다 한 옥타브 낮게 납니다. B♭ 클라리넷은 기보보다 장2도, E♭ 알토 색소폰은 장6도 낮습니다. 기보 C4는 각각 B♭3와 E♭3로 들립니다.",
+    "Гитара читает скрипичный ключ и звучит обычно на октаву ниже; электробас читает басовый и также звучит на октаву ниже. Кларнет B♭ звучит на большую секунду ниже записи, альт-саксофон E♭ — на большую сексту. Записанное C4 звучит как B♭3 и E♭3 соответственно.",
+    "La guitarra lee sol y suele sonar una octava abajo; el bajo eléctrico lee fa y también suena una octava abajo. El clarinete en B♭ suena una segunda mayor abajo y el saxo alto en E♭ una sexta mayor abajo. C4 escrito suena B♭3 y E♭3, respectivamente.",
+    "A guitarra lê sol e soa geralmente uma oitava abaixo; o baixo elétrico lê fá e também soa uma oitava abaixo. O clarinete em B♭ soa uma segunda maior abaixo e o saxofone alto em E♭ uma sexta maior abaixo. C4 escrito soa B♭3 e E♭3, respetivamente."
+  ],
+  [
+    "Percussion uses instrument assignments rather than a universal pitch map. Read the part legend: this demo places kick low, snare in the middle, and hi-hat high with an x head. Tablature shows string and fret, and needs rhythm information as well.",
+    "Schlagzeugnotation ordnet Positionen Instrumenten statt universellen Tonhöhen zu. Lies die Legende: hier Bassdrum unten, Snare mittig, Hi-Hat oben mit x-Kopf. Tabulatur zeigt Saite und Bund und braucht zusätzlich Rhythmusangaben.",
+    "Beim Schlagzeug stehen Positionen für Instrumente statt feste Tonhöhen. Lies d Legende: hier Bassdrum unten, Snare mittig, Hi-Hat oben mit x-Kopf. Tabulatur zeigt Saitn und Bund und braucht aa Rhythmusangaben.",
+    "타악기 위치는 공통 음높이가 아니라 악기 배정을 나타냅니다. 범례를 확인하세요. 여기서는 킥 아래, 스네어 가운데, 하이햇 위에 x 머리입니다. 타브는 줄과 프렛을 나타내며 리듬 정보도 필요합니다.",
+    "В ударных позиции обозначают инструменты, а не общие высоты звука. Читайте легенду: здесь бочка внизу, малый барабан в центре, хай-хэт вверху с головкой x. Табулатура показывает струну и лад и требует информации о ритме.",
+    "La percusión asigna posiciones a instrumentos, no a alturas universales. Lee la leyenda: bombo abajo, caja en medio, charles arriba con cabeza x. La tablatura muestra cuerda y traste y también necesita información rítmica.",
+    "A percussão atribui posições a instrumentos, não a alturas universais. Lê a legenda: bombo em baixo, tarola ao meio, prato de choque em cima com cabeça x. A tablatura mostra corda e trasto e também precisa de informação rítmica."
+  ],
+  [
+    "Count sounds and silences on the same beat grid.",
+    "Zähle Töne und Pausen im selben Taktraster.",
+    "Zähl Tön und Pausen im selben Taktraster.",
+    "소리와 쉼을 같은 박자 격자에서 셉니다.",
+    "Считайте звуки и паузы на одной сетке долей.",
+    "Cuenta sonidos y silencios en la misma cuadrícula.",
+    "Conta sons e silêncios na mesma grelha."
+  ],
+  [
+    "A whole note lasts as long as two half notes, four quarters, or eight eighths. Rests occupy the same durations without sound. In 4/4, the quarter note is one beat; that is a meter choice, not a universal rule.",
+    "Eine ganze Note dauert wie zwei halbe, vier Viertel oder acht Achtel. Pausen haben dieselben Dauern ohne Klang. In 4/4 entspricht ein Viertel einem Schlag; das folgt aus der Taktart und gilt nicht immer.",
+    "A ganze Notn dauert wia zwoa halbe, vier Viertel oder acht Achtel. Pausen dauern genauso, bloß ohne Klang. In 4/4 is a Viertel a Schlag; des liegt an da Taktart und gilt ned immer.",
+    "온음표는 2분음표 두 개, 4분음표 네 개, 8분음표 여덟 개와 길이가 같습니다. 쉼표도 소리 없이 같은 길이를 차지합니다. 4/4에서 4분음표는 한 박이며 모든 박자에 적용되는 규칙은 아닙니다.",
+    "Целая равна двум половинным, четырём четвертям или восьми восьмым. Паузы имеют те же длительности без звука. В 4/4 четверть равна доле; это зависит от метра, а не универсальное правило.",
+    "Una redonda dura dos blancas, cuatro negras u ocho corcheas. Los silencios tienen iguales duraciones sin sonido. En 4/4, la negra es un pulso; depende del compás y no es una regla universal.",
+    "Uma semibreve dura duas mínimas, quatro semínimas ou oito colcheias. As pausas ocupam as mesmas durações sem som. Em 4/4, a semínima vale um tempo; depende do compasso e não é uma regra universal."
+  ],
+  [
+    "In 4/4, a half note lasts two beats. Two quarter notes plus a half-note rest fill one four-beat measure.",
+    "In 4/4 dauert eine halbe Note zwei Schläge. Zwei Viertel und eine halbe Pause füllen einen Vierertakt.",
+    "In 4/4 dauert a halbe Notn zwoa Schläg. Zwoa Viertel und a halbe Pause fülln an Vierertakt.",
+    "4/4에서 2분음표는 두 박입니다. 4분음표 두 개와 2분쉼표 하나가 네 박 마디를 채웁니다.",
+    "В 4/4 половинная длится две доли. Две четверти и половинная пауза заполняют четыре доли.",
+    "En 4/4, una blanca dura dos pulsos. Dos negras y un silencio de blanca llenan cuatro pulsos.",
+    "Em 4/4, uma mínima dura dois tempos. Duas semínimas e uma pausa de mínima preenchem quatro tempos."
+  ],
+  [
+    "Keep counting during rests. Tempo changes how long a beat takes in seconds, without changing the ratios between note values.",
+    "Zähle während Pausen weiter. Tempo verändert die Sekunden pro Schlag, nicht die Verhältnisse der Notenwerte.",
+    "Zähl in Pausen weiter. S Tempo ändert d Sekunden pro Schlag, ned d Verhältnisse vo de Notenwerte.",
+    "쉼표에도 계속 셉니다. 빠르기는 한 박의 초 단위를 바꾸며 음가 비율은 유지됩니다.",
+    "Продолжайте считать в паузах. Темп меняет секунды на долю, но не соотношения длительностей.",
+    "Sigue contando en los silencios. El tempo cambia los segundos por pulso, no las proporciones de las notas.",
+    "Continua a contar nas pausas. O andamento altera os segundos por tempo, não as proporções das notas."
+  ],
+  [
+    "Extend a note in two different ways.",
+    "Verlängere eine Note auf zwei Arten.",
+    "Verlänger a Notn auf zwoa Arten.",
+    "두 방식으로 음을 늘립니다.",
+    "Продлевайте ноту двумя способами.",
+    "Alarga una nota de dos maneras.",
+    "Prolonga uma nota de duas formas."
+  ],
+  [
+    "A dot adds half of the original duration: a dotted quarter lasts one and a half quarter-note beats. A tie connects notes of the same pitch into one continuous sound. A slur connects a phrase and does not add note lengths.",
+    "Ein Punkt ergänzt die Hälfte des ursprünglichen Werts: ein punktiertes Viertel dauert 1,5 Viertelschläge. Ein Haltebogen verbindet gleiche Töne zu einem Klang. Ein Bindebogen verbindet eine Phrase und addiert keine Notenlängen.",
+    "A Punkt gibt d Hälfte vom ursprünglichen Wert dazu: a punktiertes Viertel dauert 1,5 Viertelschläg. A Haltebogn verbindet gleiche Tön zu oan Klang. A Bindebogn verbindet a Phrase und zählt koane Dauern zamm.",
+    "점은 원래 음가의 절반을 더합니다. 점4분음표는 4분음표 기준 1.5박입니다. 붙임줄은 같은 음을 하나로 이어 주고, 이음줄은 프레이즈를 연결할 뿐 길이를 더하지 않습니다.",
+    "Точка добавляет половину исходной длительности: четверть с точкой равна 1,5 четвертным долям. Лига связывает одинаковые ноты в непрерывный звук; фразировочная лига длительности не складывает.",
+    "El puntillo suma la mitad del valor original: una negra con puntillo dura 1,5 pulsos de negra. La ligadura de prolongación une notas iguales; la de expresión conecta una frase sin sumar duraciones.",
+    "O ponto acrescenta metade do valor original: uma semínima pontuada dura 1,5 tempos de semínima. A ligadura de prolongação une notas iguais; a de expressão liga uma frase sem somar durações."
+  ],
+  [
+    "A quarter tied to an eighth lasts 1 + 0.5 = 1.5 beats, the same duration as a dotted quarter. Do not attack the second tied note.",
+    "Ein Viertel mit angebundenem Achtel dauert 1 + 0,5 = 1,5 Schläge, wie ein punktiertes Viertel. Schlage die zweite Note nicht erneut an.",
+    "A Viertel mit angehängtem Achtel dauert 1 + 0,5 = 1,5 Schläg, wia a punktiertes Viertel. Spiel d zweite Notn ned neu an.",
+    "4분음표와 8분음표를 붙이면 1 + 0.5 = 1.5박으로 점4분음표와 같습니다. 두 번째 음을 다시 시작하지 않습니다.",
+    "Четверть, связанная с восьмой, длится 1 + 0,5 = 1,5 доли, как четверть с точкой. Вторую ноту не атакуйте заново.",
+    "Una negra ligada a una corchea dura 1 + 0,5 = 1,5 pulsos, como una negra con puntillo. No ataques de nuevo la segunda nota.",
+    "Uma semínima ligada a uma colcheia dura 1 + 0,5 = 1,5 tempos, como uma semínima pontuada. Não ataques novamente a segunda nota."
+  ],
+  [
+    "Check both pitch and duration at a tie. Two different pitches cannot form a tie, even if the curved mark looks similar.",
+    "Prüfe beim Haltebogen Tonhöhe und Dauer. Zwei verschiedene Töne können keinen Haltebogen bilden, auch wenn das Zeichen ähnlich aussieht.",
+    "Prüf beim Haltebogn Tonhöh und Dauer. Zwoa verschiedene Tön können koa Haltebogn sein, aa wenn s Zeichn ähnlich ausschaut.",
+    "붙임줄의 음높이와 길이를 확인합니다. 다른 두 음은 곡선이 비슷해도 붙임줄이 아닙니다.",
+    "Проверяйте высоту и длительность при лиге. Разные ноты нельзя связать лигой продления, даже если дуга похожа.",
+    "Comprueba altura y duración: dos notas distintas no forman una ligadura de prolongación aunque la curva se parezca.",
+    "Verifica a altura e a duração: duas notas diferentes não formam uma ligadura de prolongação, mesmo que a curva seja parecida."
+  ],
+  [
+    "Separate the beat unit from the way beats group.",
+    "Unterscheide Schlageinheit und Gruppierung.",
+    "Unterscheid Schlageinheit und Gruppierung.",
+    "박의 단위와 묶음을 구분합니다.",
+    "Различайте единицу доли и группировку.",
+    "Distingue unidad de pulso y agrupación.",
+    "Distingue unidade de tempo e agrupamento."
+  ],
+  [
+    "In 4/4 there are four quarter-note units per measure. In 3/4 there are three. In 6/8 there are six eighth-note units, usually grouped into two dotted-quarter beats: ONE-two-three FOUR-five-six.",
+    "4/4 hat vier Viertel pro Takt, 3/4 drei. 6/8 hat sechs Achtel, meist als zwei punktierte Viertelschläge gruppiert: EINS-zwei-drei VIER-fünf-sechs.",
+    "4/4 hat vier Viertel pro Takt, 3/4 drei. 6/8 hat sechs Achtel, meist in zwoa punktierte Viertelschläg: OANS-zwoa-drei VIER-fünf-sechs.",
+    "4/4는 마디당 4분음표 네 개, 3/4는 세 개입니다. 6/8은 8분음표 여섯 개를 보통 점4분음표 두 박으로 묶어 하나-둘-셋 넷-다섯-여섯으로 셉니다.",
+    "В 4/4 четыре четверти на такт, в 3/4 — три. В 6/8 шесть восьмых обычно группируются в две доли четверти с точкой: РАЗ-два-три ЧЕТЫРЕ-пять-шесть.",
+    "4/4 tiene cuatro negras por compás y 3/4 tres. 6/8 tiene seis corcheas, normalmente agrupadas en dos pulsos de negra con puntillo: UNO-dos-tres CUATRO-cinco-seis.",
+    "4/4 tem quatro semínimas por compasso e 3/4 três. 6/8 tem seis colcheias, normalmente agrupadas em dois tempos de semínima pontuada: UM-dois-três QUATRO-cinco-seis."
+  ],
+  [
+    "A 6/8 measure can contain two dotted quarters. At dotted-quarter = 60 BPM, each three-eighth group takes one second.",
+    "Ein 6/8-Takt kann zwei punktierte Viertel enthalten. Bei punktiertem Viertel = 60 BPM dauert jede Dreiergruppe von Achteln eine Sekunde.",
+    "A 6/8-Takt kann zwoa punktierte Viertel ham. Bei punktiertem Viertel = 60 BPM dauert jede Dreiergrupp vo Achteln a Sekund.",
+    "6/8 마디는 점4분음표 두 개로 채울 수 있습니다. 점4분음표 = 60 BPM이면 8분음표 세 개 묶음이 1초입니다.",
+    "Такт 6/8 может содержать две четверти с точкой. При четверти с точкой = 60 BPM каждая тройка восьмых длится секунду.",
+    "Un compás de 6/8 puede contener dos negras con puntillo. A negra con puntillo = 60 BPM, cada grupo de tres corcheas dura un segundo.",
+    "Um compasso de 6/8 pode conter duas semínimas pontuadas. A semínima pontuada = 60 BPM, cada grupo de três colcheias dura um segundo."
+  ],
+  [
+    "The lower number names a note value, not the tempo. A pickup measure can be incomplete, and grouping distinguishes 6/8 from 3/4.",
+    "Die untere Zahl nennt den Notenwert, nicht das Tempo. Ein Auftakt kann unvollständig sein; die Gruppierung unterscheidet 6/8 von 3/4.",
+    "D untere Zahl nennt den Notenwert, ned s Tempo. A Auftakt kann unvollständig sein; d Gruppierung unterscheidet 6/8 vo 3/4.",
+    "아래 숫자는 빠르기가 아니라 음가입니다. 못갖춘마디는 불완전할 수 있으며 묶음 방식이 6/8과 3/4를 구분합니다.",
+    "Нижняя цифра обозначает длительность, не темп. Затакт бывает неполным; группировка отличает 6/8 от 3/4.",
+    "La cifra inferior indica un valor, no el tempo. La anacrusa puede ser incompleta; la agrupación distingue 6/8 de 3/4.",
+    "O número inferior indica um valor, não o andamento. A anacruse pode ser incompleta; o agrupamento distingue 6/8 de 3/4."
+  ],
+  [
+    "Subdivide steadily and place attacks on the grid.",
+    "Unterteile gleichmäßig und setze Einsätze ins Raster.",
+    "Unterteil gleichmäßig und setz d Einsätz ins Raster.",
+    "일정하게 나누고 격자에 맞춰 시작합니다.",
+    "Делите равномерно и размещайте атаки на сетке.",
+    "Subdivide con regularidad y sitúa los ataques.",
+    "Subdivide regularmente e posiciona os ataques."
+  ],
+  [
+    "For eighth notes in 4/4, count 1-and-2-and-3-and-4-and. Keep the beat steady while sounds fall on a beat or between beats. Start slowly; speed up only after the pattern is stable.",
+    "Zähle Achtel in 4/4 als 1-und-2-und-3-und-4-und. Halte den Grundschlag gleichmäßig, auch bei Einsätzen dazwischen. Beginne langsam und werde erst schneller, wenn das Muster sicher ist.",
+    "Zähl Achtel in 4/4 als 1-und-2-und-3-und-4-und. Halt den Grundschlag gleichmäßig, aa wenn d Tön dazwischen kemman. Fang langsam an und werd erst schneller, wenn's sitzt.",
+    "4/4의 8분음표를 1-앤-2-앤-3-앤-4-앤으로 셉니다. 박 사이에 음이 있어도 기본 박은 일정하게 유지합니다. 천천히 시작하고 안정된 뒤에 속도를 올리세요.",
+    "Считайте восьмые в 4/4: 1-и-2-и-3-и-4-и. Держите долю ровной и при звуках между долями. Начинайте медленно, ускоряйтесь после освоения рисунка.",
+    "Cuenta corcheas en 4/4 como 1-y-2-y-3-y-4-y. Mantén el pulso aunque los ataques caigan entre pulsos. Empieza despacio y acelera cuando el patrón sea estable.",
+    "Conta colcheias em 4/4 como 1-e-2-e-3-e-4-e. Mantém o pulso mesmo quando os ataques caem entre tempos. Começa devagar e acelera quando o padrão estiver estável."
+  ],
+  [
+    "A quarter, two eighths, a quarter rest, and a quarter fill 4/4: attacks at 1, 2, the and after 2, and 4. The third beat is silent.",
+    "Viertel, zwei Achtel, Viertelpause und Viertel füllen 4/4: Einsätze auf 1, 2, dem und nach 2 und 4. Schlag 3 bleibt still.",
+    "Viertel, zwoa Achtel, Viertelpause und Viertel fülln 4/4: Einsätz auf 1, 2, dem und nach 2 und 4. Schlag 3 bleibt stad.",
+    "4분음표, 8분음표 두 개, 4분쉼표, 4분음표는 4/4를 채웁니다. 1, 2, 2 뒤 앤, 4에 시작하며 3박은 쉽니다.",
+    "Четверть, две восьмые, четвертная пауза и четверть заполняют 4/4: атаки на 1, 2, «и» после 2 и 4. Третья доля — тишина.",
+    "Negra, dos corcheas, silencio de negra y negra llenan 4/4: ataques en 1, 2, la y tras 2 y 4. El tercer pulso es silencio.",
+    "Semínima, duas colcheias, pausa de semínima e semínima preenchem 4/4: ataques em 1, 2, no e após 2 e em 4. O terceiro tempo é silêncio."
+  ],
+  [
+    "The playhead marks elapsed beats; rests remain visible. Tap practice is a timing guide and does not award a precision score because device latency varies.",
+    "Der Abspielmarker zeigt verstrichene Schläge; Pausen bleiben sichtbar. Mitklopfen dient als Orientierung, nicht als Genauigkeitswertung, weil Gerätelatenzen variieren.",
+    "Da Abspielmarker zeigt verstrichene Schläg; Pausen bleibn sichtbar. Mitklopfen is a Orientierung, koa Genauigkeitswertung, weil Geräte verschieden verzögern.",
+    "재생 표시가 지난 박을 보여 주며 쉼표도 표시됩니다. 기기 지연이 달라 탭 연습은 타이밍 안내이며 정밀 점수를 주지 않습니다.",
+    "Указатель показывает прошедшие доли; паузы видны. Простукивание — ориентир, не оценка точности, поскольку задержки устройств различаются.",
+    "El cursor muestra pulsos transcurridos y los silencios siguen visibles. Tocar el pulso orienta el ritmo, sin puntuación de precisión por las distintas latencias de los dispositivos.",
+    "O cursor mostra os tempos decorridos e as pausas continuam visíveis. Marcar o pulso orienta o ritmo, sem pontuação de precisão devido às diferentes latências dos dispositivos."
+  ],
+  [
+    "Read a short musical passage",
+    "Eine kurze Musikphrase lesen",
+    "A kurze Musikphrase lesen",
+    "짧은 악절 읽기",
+    "Чтение короткой фразы",
+    "Lee un pasaje corto",
+    "Lê uma passagem curta"
+  ],
+  [
+    "Bring pitch, rhythm, and instrument reading together.",
+    "Verbinde Tonhöhe, Rhythmus und Instrumentnotation.",
+    "Bring Tonhöh, Rhythmus und Instrumentnotation zamm.",
+    "음높이, 리듬, 악기 기보를 합칩니다.",
+    "Объедините высоту, ритм и запись инструмента.",
+    "Combina altura, ritmo y lectura instrumental.",
+    "Combina altura, ritmo e leitura instrumental."
+  ],
+  [
+    "Before playing, check the clef, key signature, time signature, and tempo. Name pitches, count durations, then combine them. Read ahead to the next event while keeping the current beat.",
+    "Prüfe vor dem Spielen Schlüssel, Tonartvorzeichen, Taktart und Tempo. Benenne Töne, zähle Dauern und verbinde beides. Lies voraus, während du den Schlag hältst.",
+    "Prüf vorm Spielen Schlissl, Tonartvorzeichn, Taktart und Tempo. Benenn d Tön, zähl d Dauern und bring beides zamm. Lies voraus und halt den Schlag.",
+    "연주 전에 음자리표, 조표, 박자표, 빠르기를 확인합니다. 음이름과 길이를 따로 읽은 뒤 합치세요. 현재 박을 유지하며 다음 음을 미리 읽습니다.",
+    "Перед игрой проверьте ключ, знаки, размер и темп. Назовите ноты, сосчитайте длительности и объедините их. Читайте вперёд, сохраняя текущую долю.",
+    "Antes de tocar, revisa clave, armadura, compás y tempo. Nombra alturas, cuenta duraciones y combina ambas. Lee el siguiente evento sin perder el pulso.",
+    "Antes de tocar, verifica a clave, armação, compasso e andamento. Nomeia alturas, conta durações e combina ambas. Lê o evento seguinte sem perder o pulso."
+  ],
+  [
+    "The original 4/4 phrase C4 quarter, D4 eighth, E4 eighth, quarter rest, G4 quarter fills four beats. On guitar it sounds one octave below the written notes.",
+    "Die eigene 4/4-Phrase C4-Viertel, D4-Achtel, E4-Achtel, Viertelpause, G4-Viertel füllt vier Schläge. Auf Gitarre klingt sie eine Oktave tiefer.",
+    "De eigene 4/4-Phrase C4-Viertel, D4-Achtel, E4-Achtel, Viertelpause, G4-Viertel füllt vier Schläg. Auf da Gitarr klingt's a Oktav tiefer.",
+    "직접 만든 4/4 악절 C4 4분, D4 8분, E4 8분, 4분쉼표, G4 4분은 네 박입니다. 기타에서는 기보보다 한 옥타브 낮게 들립니다.",
+    "Оригинальная фраза 4/4: C4 четверть, D4 восьмая, E4 восьмая, четвертная пауза, G4 четверть — четыре доли. На гитаре звучит на октаву ниже.",
+    "La frase original de 4/4 C4 negra, D4 corchea, E4 corchea, silencio de negra y G4 negra llena cuatro pulsos. En guitarra suena una octava abajo.",
+    "A frase original de 4/4 C4 semínima, D4 colcheia, E4 colcheia, pausa de semínima e G4 semínima preenche quatro tempos. Na guitarra soa uma oitava abaixo."
+  ],
+  [
+    "Add the lengths to check the measure, then verify each sounding note against the selected instrument. Reading a passage accurately is separate from marking this lesson as read.",
+    "Addiere die Dauern zur Taktprüfung und prüfe jeden Klang mit dem gewählten Instrument. Eine Phrase richtig zu lesen ist unabhängig von der Lesemarkierung dieser Lektion.",
+    "Zähl d Dauern fürn Takt zamm und prüf jeden Klang mitm gewählten Instrument. A Phrase richtig lesen is was anderes als d Lektion als glesen markieren.",
+    "길이를 합쳐 마디를 확인하고 선택한 악기로 실제 음높이를 검증하세요. 악절을 정확히 읽는 것과 수업을 읽음으로 표시하는 것은 별개입니다.",
+    "Сложите длительности для проверки такта, затем проверьте звучание с выбранным инструментом. Точное чтение фразы отдельно от отметки урока как прочитанного.",
+    "Suma duraciones para comprobar el compás y verifica los sonidos con el instrumento elegido. Leer bien una frase es independiente de marcar la lección como leída.",
+    "Soma durações para verificar o compasso e confirma os sons com o instrumento escolhido. Ler bem uma frase é independente de marcar a lição como lida."
+  ],
+  [
+    "Pitch, players, and officials",
+    "Spielfeld, Spieler und Offizielle",
+    "Spielfeld, Spieler und Offizielle",
+    "경기장, 선수, 심판",
+    "Поле, игроки и судьи",
+    "Campo, jugadores y árbitros",
+    "Campo, jogadores e árbitros"
+  ],
+  [
+    "Find the areas that matter for basic decisions.",
+    "Finde die Bereiche für grundlegende Entscheidungen.",
+    "Find d Bereiche für grundlegende Entscheidungen.",
+    "기본 판정에 필요한 구역을 찾습니다.",
+    "Найдите зоны для основных решений.",
+    "Identifica las zonas de decisiones básicas.",
+    "Identifica as zonas de decisões básicas."
+  ],
+  [
+    "Standard football has up to eleven players per team, including one goalkeeper. The referee enforces the laws with help from other officials. Shin guards and safe equipment are required; jewellery must be removed. The penalty area limits where a goalkeeper may legally handle the ball, with exceptions such as a deliberate kick from a team-mate.",
+    "Standardfußball hat bis zu elf Spieler pro Team einschließlich Torwart. Der Schiedsrichter setzt die Regeln mit Unterstützung weiterer Offizieller durch. Schienbeinschoner und sichere Ausrüstung sind Pflicht; Schmuck muss abgelegt werden. Der eigene Strafraum begrenzt das Handspiel des Torwarts, mit Ausnahmen etwa bei absichtlichem Zuspiel eines Mitspielers mit dem Fuß.",
+    "Normaler Fußball hat bis zu elf Spieler pro Mannschaft samt Torwart. Da Schiedsrichter setzt d Regeln mit weiteren Offiziellen durch. Schienbeinschoner und sichere Ausrüstung san Pflicht; Schmuck muss runter. Da eigene Strafraum begrenzt s Handspiel vom Torwart, mit Ausnahmen etwa beim absichtlichen Fußzuspiel vom Mitspieler.",
+    "일반 축구는 골키퍼 포함 팀당 최대 11명입니다. 주심은 다른 심판들의 도움으로 규칙을 집행합니다. 정강이 보호대와 안전한 장비가 필요하고 장신구는 제거해야 합니다. 골키퍼는 자기 페널티 구역에서 공을 손으로 다룰 수 있지만 동료가 의도적으로 발로 찬 공 등에는 예외가 있습니다.",
+    "В стандартном футболе до 11 игроков в команде, включая вратаря. Судья применяет правила с помощью других официальных лиц. Нужны щитки и безопасная экипировка, украшения снимают. Вратарь может играть руками в своей штрафной, с исключениями, например после намеренного паса ногой партнёра.",
+    "El fútbol estándar admite hasta once jugadores por equipo, incluido un portero. El árbitro aplica las reglas con ayuda de otros oficiales. Se requieren espinilleras y equipo seguro; se retiran las joyas. El portero puede usar las manos en su área penal, con excepciones como un pase deliberado con el pie de un compañero.",
+    "O futebol padrão admite até onze jogadores por equipa, incluindo um guarda-redes. O árbitro aplica as regras com apoio de outros oficiais. São necessárias caneleiras e equipamento seguro; retiram-se joias. O guarda-redes pode usar as mãos na sua área de penálti, com exceções como um passe deliberado com o pé de um colega."
+  ],
+  [
+    "The goal area is the smaller box; the penalty area is the larger box. A foul on a penalty-area boundary line is inside the area because lines belong to the areas they bound.",
+    "Der Torraum ist der kleinere, der Strafraum der größere Kasten. Ein Foul auf der Strafraumlinie liegt im Strafraum: Linien gehören zu den begrenzten Bereichen.",
+    "Da Torraum is da kleinere, da Strafraum da größere Kastn. A Foul auf da Strafraumlinie liegt drin: Linien ghörn zu de begrenzten Bereiche.",
+    "골 에어리어는 작은 상자, 페널티 구역은 큰 상자입니다. 경계선은 구역에 포함되므로 페널티 구역 선 위의 반칙은 구역 안입니다.",
+    "Площадь ворот — маленький прямоугольник, штрафная — большой. Нарушение на линии штрафной считается внутри: линии входят в ограничиваемые зоны.",
+    "El área de meta es el rectángulo pequeño y la penal el grande. Una falta sobre la línea del área penal está dentro: las líneas pertenecen a las zonas que delimitan.",
+    "A área de baliza é o retângulo pequeno e a de penálti o grande. Uma falta na linha da área de penálti está dentro: as linhas pertencem às zonas que delimitam."
+  ],
+  [
+    "Change one condition at a time. Use the diagram and its explanation to connect the situation to the rule or role.",
+    "Ändere eine Bedingung nach der anderen. Verbinde die Situation mithilfe von Diagramm und Erklärung mit Regel oder Rolle.",
+    "Änder a Bedingung nach da andern. Bring d Situation mit Bild und Erklärung zur Regel oder Rolle zamm.",
+    "조건을 하나씩 바꾸세요. 그림과 설명으로 상황을 규칙이나 역할에 연결합니다.",
+    "Меняйте по одному условию. По схеме и пояснению связывайте ситуацию с правилом или ролью.",
+    "Cambia una condición cada vez. Relaciona la situación con la regla o función usando el diagrama y la explicación.",
+    "Altera uma condição de cada vez. Liga a situação à regra ou função através do diagrama e da explicação."
+  ],
+  [
+    "Most matches need at least seven players per team; the 2026/27 edition specifies limited temporary exceptions under approved protocols. Substitution and youth rules depend on the competition.",
+    "Meist sind mindestens sieben Spieler pro Team nötig; 2026/27 gibt es begrenzte zeitweilige Ausnahmen nach genehmigten Protokollen. Wechsel- und Jugendregeln hängen vom Wettbewerb ab.",
+    "Meist braucht's mindestens sieben Spieler pro Team; 2026/27 gibt's begrenzte zeitweilige Ausnahmen nach genehmigten Protokollen. Wechsel- und Jugendregeln hängen vom Wettbewerb ab.",
+    "대부분 팀당 최소 7명이 필요하며 2026/27 규칙에는 승인된 프로토콜에 따른 제한적 일시 예외가 있습니다. 교체와 유소년 규정은 대회마다 다릅니다.",
+    "Обычно нужно минимум семь игроков в команде; редакция 2026/27 допускает ограниченные временные исключения по утверждённым протоколам. Замены и юношеские правила зависят от турнира.",
+    "Normalmente hacen falta al menos siete jugadores; 2026/27 contempla excepciones temporales limitadas bajo protocolos aprobados. Sustituciones y normas juveniles dependen de la competición.",
+    "Normalmente são precisos pelo menos sete jogadores; 2026/27 prevê exceções temporárias limitadas sob protocolos aprovados. Substituições e regras juvenis dependem da competição."
+  ],
+  [
+    "Understand the clock and when a goal counts.",
+    "Verstehe Spielzeit und Torentscheidung.",
+    "Versteh d Spielzeit und wann a Tor zählt.",
+    "경기 시간과 득점을 이해합니다.",
+    "Разберитесь во времени и голах.",
+    "Entiende el reloj y cuándo cuenta un gol.",
+    "Entende o relógio e quando conta um golo."
+  ],
+  [
+    "A standard match has two 45-minute halves plus time allowed for stoppages. The whole ball must cross the whole goal line between the posts and below the crossbar, with no attacking offence, for a goal. A ball touching the line is still in play.",
+    "Ein Standardspiel hat zwei Halbzeiten zu 45 Minuten plus Nachspielzeit. Für ein Tor muss der gesamte Ball vollständig zwischen den Pfosten und unter der Latte über die Torlinie, ohne angreifendes Vergehen. Berührt er die Linie, bleibt er im Spiel.",
+    "A normales Spiel hat zwoa Halbzeiten zu 45 Minuten plus Nachspielzeit. Für a Tor muss da ganze Ball zwischen de Pfosten und unter da Latte ganz über d Torlinie, ohne Angreifervergehen. Berührt er d Linie, bleibt er im Spiel.",
+    "일반 경기는 45분씩 두 전후반과 추가시간입니다. 공격 반칙 없이 공 전체가 골대 사이와 크로스바 아래에서 골라인을 완전히 넘어야 골입니다. 선에 걸쳐 있으면 계속 인플레이입니다.",
+    "Матч состоит из двух таймов по 45 минут плюс добавленное время. Для гола весь мяч должен полностью пересечь линию между стойками и под перекладиной без нарушения атакующих. Мяч на линии остаётся в игре.",
+    "Un partido estándar tiene dos mitades de 45 minutos más tiempo añadido. Para un gol, todo el balón debe cruzar toda la línea entre postes y bajo el larguero, sin infracción atacante. Si toca la línea, sigue en juego.",
+    "Um jogo padrão tem duas partes de 45 minutos mais tempo adicional. Para haver golo, toda a bola tem de cruzar toda a linha entre os postes e sob a barra, sem infração atacante. Se toca na linha, continua em jogo."
+  ],
+  [
+    "At 90 minutes, a board showing five minutes means at least five added minutes. The referee may add more for further delays; the board is not an exact final whistle time.",
+    "Fünf angezeigte Zusatzminuten bei Minute 90 sind mindestens fünf. Weitere Verzögerungen können mehr Zeit bringen; die Tafel nennt nicht den exakten Abpfiff.",
+    "Fünf angezeigte Zusatzminuten bei Minute 90 san mindestens fünf. Weitere Verzögerungen können mehr Zeit bringen; d Tafel sagt ned den genauen Abpfiff.",
+    "90분에 5분 표시가 나오면 최소 5분 추가입니다. 추가 지연에 더 늘어날 수 있으므로 정확한 종료 시각은 아닙니다.",
+    "Табло с пятью минутами на 90-й означает минимум пять. Новые задержки могут добавить время; табло не задаёт точный финальный свисток.",
+    "Cinco minutos indicados al minuto 90 son un mínimo. Nuevas demoras pueden añadir más; el cartel no fija el instante exacto del final.",
+    "Cinco minutos indicados aos 90 são um mínimo. Novas demoras podem acrescentar mais; o painel não fixa o instante exato do fim."
+  ],
+  [
+    "Extra time and a penalty shoot-out apply only when the competition requires a winner. Shoot-out kicks are separate from goals in the match score.",
+    "Verlängerung und Elfmeterschießen gibt es nur, wenn der Wettbewerb einen Sieger verlangt. Schüsse im Elfmeterschießen zählen getrennt vom Spielergebnis.",
+    "Verlängerung und Elfmeterschießen gibt's bloß, wenn da Wettbewerb an Sieger braucht. D Schüss beim Elfmeterschießen zählen extra vom Spielergebnis.",
+    "연장전과 승부차기는 대회가 승자를 요구할 때만 적용됩니다. 승부차기는 경기 득점과 별도로 기록됩니다.",
+    "Дополнительное время и серия пенальти применяются, если турниру нужен победитель. Удары серии учитываются отдельно от счёта матча.",
+    "Prórroga y tanda de penaltis solo se aplican si la competición exige un ganador. La tanda se cuenta aparte del marcador del partido.",
+    "Prolongamento e desempate por penáltis só se aplicam se a competição exigir um vencedor. O desempate é contado separadamente do resultado do jogo."
+  ],
+  [
+    "Offside, step by step",
+    "Abseits Schritt für Schritt",
+    "Abseits Schritt für Schritt",
+    "오프사이드 단계별 이해",
+    "Офсайд по шагам",
+    "Fuera de juego paso a paso",
+    "Fora de jogo passo a passo"
+  ],
+  [
+    "Freeze the pass before judging involvement.",
+    "Frieren wir den Pass vor der Beteiligungsprüfung ein.",
+    "Halt den Pass an, bevorst d Beteiligung beurteilst.",
+    "관여를 판단하기 전에 패스 순간을 고정합니다.",
+    "Замрите на моменте паса до оценки участия.",
+    "Congela el pase antes de juzgar la intervención.",
+    "Congela o passe antes de avaliar a intervenção."
+  ],
+  [
+    "Judge position when a team-mate first plays or touches the ball; for a goalkeeper throw, use release. In the opponents’ half, an attacker is in an offside position only when their head, body, or feet are beyond both the ball and the second-last opponent. Hands and arms do not count, and level is onside.",
+    "Beurteile die Position beim ersten Spielen oder Berühren durch den Mitspieler; beim Torwartwurf bei der Freigabe. In der gegnerischen Hälfte liegt Abseitsposition nur vor, wenn Kopf, Körper oder Füße sowohl vor dem Ball als auch vor dem vorletzten Gegner sind. Hände und Arme zählen nicht; gleiche Höhe ist kein Abseits.",
+    "Beurteil d Position beim ersten Spielen oder Berühren vom Mitspieler; beim Torwartwurf beim Loslassen. In da gegnerischen Hälfte is Abseitsposition bloß, wenn Kopf, Körper oder Füß vor Ball und vorletztem Gegner san. Händ und Arm zählen ned; gleiche Höh is koa Abseits.",
+    "동료가 공을 처음 플레이하거나 터치할 때 위치를 판단하며 골키퍼가 던질 때는 놓는 순간을 봅니다. 상대 진영에서 머리, 몸, 발이 공과 뒤에서 두 번째 상대보다 모두 골라인에 가까워야 오프사이드 위치입니다. 손과 팔은 제외하며 같은 선은 허용됩니다.",
+    "Позицию оценивают при первом касании партнёра, при броске вратаря — при выпуске мяча. На чужой половине голова, тело или ноги должны быть ближе к воротам, чем и мяч, и предпоследний соперник. Руки не учитываются; на одной линии — не офсайд.",
+    "La posición se juzga en el primer contacto del compañero; en un lanzamiento del portero, al soltar el balón. En campo rival, cabeza, cuerpo o pies deben superar tanto al balón como al penúltimo adversario. Manos y brazos no cuentan; estar a la misma altura es legal.",
+    "Avalia-se a posição no primeiro contacto do colega; num lançamento do guarda-redes, ao largar a bola. No meio-campo adversário, cabeça, corpo ou pés têm de superar tanto a bola como o penúltimo adversário. Mãos e braços não contam; estar na mesma linha é legal."
+  ],
+  [
+    "Position alone is not an offence. Playing the ball, affecting an opponent, or gaining advantage from a rebound or save can create an offence. The goalkeeper is not always the last opponent. Receiving directly from a throw-in, goal kick, or corner has no offside offence.",
+    "Die Position allein ist kein Vergehen. Ballspielen, Gegnerbeeinflussung oder Vorteil aus Abpraller oder Abwehr können es auslösen. Der Torwart ist nicht immer letzter Gegner. Direkter Empfang von Einwurf, Abstoß oder Ecke ist ohne Abseitsvergehen.",
+    "D Position allein is koa Vergehen. Ballspielen, Gegner beeinflussen oder Vorteil aus Abpraller oder Abwehr können's auslösen. Da Torwart is ned immer da letzte Gegner. Direkt aus Einwurf, Abstoß oder Ecke gibt's koa Abseitsvergehen.",
+    "위치만으로는 반칙이 아닙니다. 공을 플레이하거나 상대를 방해하거나 리바운드 또는 세이브로 이득을 얻으면 반칙이 될 수 있습니다. 골키퍼가 항상 마지막 상대인 것은 아닙니다. 스로인, 골킥, 코너킥을 직접 받는 경우는 제외됩니다.",
+    "Позиция сама по себе не нарушение. Игра мячом, влияние на соперника или преимущество после отскока либо спасения могут создать нарушение. Вратарь не всегда последний соперник. Прямое получение после вбрасывания, удара от ворот или углового не даёт офсайда.",
+    "La posición sola no es infracción. Jugar el balón, afectar a un rival o aprovechar un rebote o una parada puede serlo. El portero no siempre es el último adversario. Recibir directamente de saque de banda, de meta o de esquina no genera fuera de juego.",
+    "A posição por si só não é infração. Jogar a bola, afetar um adversário ou aproveitar um ressalto ou defesa pode sê-lo. O guarda-redes nem sempre é o último adversário. Receber diretamente de lançamento lateral, pontapé de baliza ou canto não gera fora de jogo."
+  ],
+  [
+    "A deliberate controlled play by an opponent can reset offside; a deflection or deliberate save does not. The animation uses dots for the foremost eligible body points and simplifies referee judgements. Offside restarts with an indirect free kick where involvement occurred.",
+    "Bewusstes kontrolliertes Spielen eines Gegners kann die Abseitsphase zurücksetzen; Ablenkung oder bewusste Torabwehr nicht. Die Punkte zeigen die vordersten relevanten Körperstellen und vereinfachen die Beurteilung. Ein Abseitsvergehen führt zum indirekten Freistoß am Beteiligungsort.",
+    "Bewusstes kontrolliertes Spielen vom Gegner kann d Abseitsphase neu anfangen lassen; Ablenkung oder bewusste Torabwehr ned. D Punkte zeigen d vordersten relevanten Körperstellen vereinfacht. Bei Abseits gibt's an indirekten Freistoß am Beteiligungsort.",
+    "상대의 통제된 의도적 플레이는 오프사이드 단계를 초기화할 수 있지만 굴절이나 의도적 세이브는 그렇지 않습니다. 점은 판정에 유효한 최전방 신체 지점을 단순화한 것입니다. 반칙이면 관여한 지점에서 간접프리킥입니다.",
+    "Осознанная контролируемая игра соперника может сбросить фазу офсайда; рикошет или намеренное спасение — нет. Точки упрощённо обозначают ближайшие к воротам учитываемые части тела. Нарушение ведёт к свободному удару в месте участия.",
+    "El juego deliberado y controlado de un rival puede reiniciar la fase; un desvío o parada deliberada no. Los puntos simplifican las partes válidas más adelantadas del cuerpo. La infracción se reinicia con libre indirecto donde intervino el jugador.",
+    "O jogo deliberado e controlado de um adversário pode reiniciar a fase; um desvio ou defesa deliberada não. Os pontos simplificam as partes válidas mais adiantadas do corpo. A infração dá livre indireto no local da intervenção."
+  ],
+  [
+    "Separate the restart from the disciplinary decision.",
+    "Unterscheide Spielfortsetzung und Disziplinarmaßnahme.",
+    "Unterscheid Spielfortsetzung und Disziplinarmaßnahme.",
+    "재개 방식과 징계를 구분합니다.",
+    "Разделяйте возобновление игры и наказание.",
+    "Distingue reanudación y sanción disciplinaria.",
+    "Distingue recomeço e sanção disciplinar."
+  ],
+  [
+    "For a tackle or challenge, careless means a foul without a card solely for that level of force; reckless means a caution; excessive force or endangering safety means sending off. Yellow is a caution; a second yellow in the same match leads to red.",
+    "Bei einem Zweikampf bedeutet fahrlässig: Foul ohne Karte allein für diese Härte; rücksichtslos: Verwarnung; übermäßige Härte oder Gefährdung: Feldverweis. Gelb ist eine Verwarnung, eine zweite Gelbe im selben Spiel führt zu Rot.",
+    "Beim Zweikampf heißt fahrlässig: Foul ohne Kartn bloß für de Härte; rücksichtslos: Verwarnung; übermäßige Härte oder Gefährdung: Platzverweis. Gelb is a Verwarnung; d zweite Gelbe im selben Spiel führt zu Rot.",
+    "태클에서 부주의는 그 힘 수준만으로 카드를 주지 않는 반칙, 무모함은 경고, 과도한 힘이나 안전 위협은 퇴장입니다. 노란 카드는 경고이며 같은 경기의 두 번째 경고는 퇴장입니다.",
+    "При борьбе неосторожность — фол без карточки лишь за силу; безрассудство — предупреждение; чрезмерная сила или угроза безопасности — удаление. Жёлтая — предупреждение; вторая жёлтая в матче ведёт к красной.",
+    "En una entrada, imprudencia implica falta sin tarjeta solo por esa fuerza; temeridad, amonestación; fuerza excesiva o peligro, expulsión. Amarilla es amonestación; una segunda en el mismo partido lleva a roja.",
+    "Numa entrada, negligência implica falta sem cartão só por essa força; imprudência, advertência; força excessiva ou perigo, expulsão. Amarelo é advertência; um segundo no mesmo jogo leva a vermelho."
+  ],
+  [
+    "Deliberate handball and an arm position making the body unnaturally bigger can be offences. Not every ball touching an arm is handball. An attacker scoring directly with an arm, even accidentally, cannot score a valid goal.",
+    "Absichtliches Handspiel oder ein Arm, der den Körper unnatürlich vergrößert, können Vergehen sein. Nicht jede Armberührung ist Handspiel. Ein direkt mit Hand oder Arm erzieltes Angreifertor zählt auch bei versehentlicher Berührung nicht.",
+    "Absichtliches Handspiel oder a Arm, dern Körper unnatürlich größer macht, können Vergehen sein. Ned jede Armberührung is Handspiel. A direkt mit Hand oder Arm erzieltes Angreifertor zählt aa versehentlich ned.",
+    "의도적 핸드볼이나 팔로 몸을 부자연스럽게 크게 만든 경우는 반칙일 수 있습니다. 모든 팔 접촉이 핸드볼은 아닙니다. 공격수가 손이나 팔로 직접 넣은 골은 우연이어도 인정되지 않습니다.",
+    "Умышленная игра рукой или рука, неестественно увеличивающая тело, могут быть нарушением. Не каждое касание руки — фол. Гол атакующего непосредственно рукой не засчитывается даже при случайном касании.",
+    "La mano deliberada o un brazo que agrande el cuerpo de forma antinatural pueden ser infracción. No todo contacto con el brazo lo es. Un gol marcado directamente con mano o brazo, incluso accidentalmente, no es válido.",
+    "Mão deliberada ou um braço que aumente o corpo de forma antinatural podem ser infração. Nem todo o contacto com o braço o é. Um golo marcado diretamente com mão ou braço, mesmo acidentalmente, não é válido."
+  ],
+  [
+    "The referee can apply advantage when the non-offending team benefits. Context matters for denying an obvious goal-scoring opportunity and stopping a promising attack; the basic force categories are not a complete card calculator.",
+    "Der Schiedsrichter kann Vorteil geben, wenn das benachteiligte Team profitiert. Vereiteln einer klaren Torchance und Stoppen eines aussichtsreichen Angriffs brauchen Kontext; die Härtekategorien sind kein vollständiger Kartenrechner.",
+    "Da Schiedsrichter kann Vorteil geben, wenn s benachteiligte Team profitiert. Beim Vereiteln vo a klaren Torchance oder am aussichtsreichen Angriff braucht's den Kontext; de Härtekategorien allein rechnen koane Kartn aus.",
+    "피해 팀에 이익이 되면 어드밴티지를 줄 수 있습니다. 명백한 득점 기회 저지와 유망한 공격 차단은 상황을 고려해야 하며 힘 수준만으로 모든 카드 판정을 계산할 수는 없습니다.",
+    "Судья может дать преимущество пострадавшей команде. Лишение явной возможности забить и срыв перспективной атаки требуют контекста; категории силы не являются полным калькулятором карточек.",
+    "El árbitro puede dar ventaja si beneficia al equipo afectado. Impedir una ocasión manifiesta o detener un ataque prometedor exige contexto; las categorías de fuerza no calculan todas las tarjetas.",
+    "O árbitro pode dar vantagem se beneficiar a equipa afetada. Impedir uma oportunidade clara ou travar um ataque prometedor exige contexto; as categorias de força não calculam todos os cartões."
+  ],
+  [
+    "Free kicks and penalty kicks",
+    "Freistöße und Strafstöße",
+    "Freistöß und Strafstöß",
+    "프리킥과 페널티킥",
+    "Штрафные, свободные и пенальти",
+    "Tiros libres y penaltis",
+    "Livres e penáltis"
+  ],
+  [
+    "Distinguish direct scoring from a required second touch.",
+    "Unterscheide direktes Tor und nötige zweite Berührung.",
+    "Unterscheid direktes Tor und nötige zweite Berührung.",
+    "직접 득점과 필요한 두 번째 터치를 구분합니다.",
+    "Отличайте прямой гол от нужного второго касания.",
+    "Distingue gol directo y segundo toque obligatorio.",
+    "Distingue golo direto e segundo toque obrigatório."
+  ],
+  [
+    "A direct free kick can score directly against the opponents; an indirect free kick needs another player to touch the ball first. A direct-free-kick offence by a defender inside their own penalty area normally gives a penalty kick. The referee signals an indirect kick with a raised arm.",
+    "Ein direkter Freistoß kann direkt ins gegnerische Tor treffen; ein indirekter braucht eine weitere Spielerberührung. Ein direktes Freistoßvergehen eines Verteidigers im eigenen Strafraum gibt normalerweise Strafstoß. Den indirekten Freistoß zeigt der Schiedsrichter mit erhobenem Arm.",
+    "A direkter Freistoß kann direkt ins gegnerische Tor geh'n; a indirekter braucht a weitere Spielerberührung. A direktes Freistoßvergehen vom Verteidiger im eigenen Strafraum gibt normalerweise Strafstoß. Den indirekten zeigt da Schiedsrichter mit erhobenem Arm.",
+    "직접프리킥은 상대 골로 직접 득점할 수 있고 간접프리킥은 다른 선수의 터치가 필요합니다. 수비수가 자기 페널티 구역에서 직접프리킥에 해당하는 반칙을 하면 보통 페널티킥입니다. 주심은 팔을 들어 간접프리킥을 표시합니다.",
+    "Со штрафного можно забить прямо в ворота соперника; со свободного нужно касание другого игрока. Нарушение защитника для штрафного в своей штрафной обычно даёт пенальти. Свободный судья обозначает поднятой рукой.",
+    "El libre directo puede marcar directamente en la portería rival; el indirecto necesita otro toque. Una infracción de libre directo de un defensor en su área penal normalmente da penalti. El árbitro indica el indirecto con el brazo levantado.",
+    "Um livre direto pode marcar diretamente na baliza adversária; um indireto precisa de outro toque. Uma infração de livre direto de um defensor na sua área de penálti normalmente dá penálti. O árbitro indica o indireto com o braço levantado."
+  ],
+  [
+    "A penalty kick is taken from the penalty mark, 11 metres from goal. At the kick, the goalkeeper must have part of at least one foot touching, in line with, or behind the goal line. Other players stay outside the area, behind the mark, and at least 9.15 metres away until the ball is in play.",
+    "Der Strafstoß kommt vom Punkt 11 Meter vor dem Tor. Beim Schuss muss mindestens ein Teil eines Torwartfußes die Torlinie berühren, auf gleicher Höhe oder dahinter sein. Andere Spieler bleiben außerhalb des Strafraums, hinter dem Punkt und mindestens 9,15 Meter entfernt, bis der Ball im Spiel ist.",
+    "Da Strafstoß kommt vom Punkt 11 Meter vorm Tor. Beim Schuss muss mindestens a Teil vo am Torwartfuß d Torlinie berühren, auf gleicher Höh oder dahinter sein. Andere bleibn außerhalb vom Strafraum, hinterm Punkt und mindestens 9,15 Meter weg, bis da Ball im Spiel is.",
+    "페널티킥은 골에서 11m인 지점에서 찹니다. 찰 때 골키퍼의 최소 한 발 일부가 골라인에 닿거나 같은 선상 또는 뒤에 있어야 합니다. 다른 선수는 공이 인플레이가 될 때까지 구역 밖, 지점 뒤, 최소 9.15m 떨어져 있어야 합니다.",
+    "Пенальти бьют с отметки в 11 метрах. При ударе часть хотя бы одной стопы вратаря должна касаться линии, быть на её уровне либо за ней. Остальные находятся вне штрафной, позади отметки и не ближе 9,15 м до ввода мяча.",
+    "El penalti se lanza desde 11 metros. Al golpear, parte de al menos un pie del portero debe tocar la línea, estar a su altura o detrás. Los demás permanecen fuera del área, detrás del punto y a 9,15 metros como mínimo hasta que el balón esté en juego.",
+    "O penálti é marcado a 11 metros. Ao pontapear, parte de pelo menos um pé do guarda-redes tem de tocar na linha, estar alinhada com ela ou atrás. Os restantes ficam fora da área, atrás da marca e a pelo menos 9,15 metros até a bola estar em jogo."
+  ],
+  [
+    "A goalkeeper controlling the ball with hands or arms for more than eight seconds concedes a corner; the referee visibly counts the final five seconds. This is different from handling a deliberate team-mate kick, which normally gives an indirect free kick.",
+    "Kontrolliert der Torwart den Ball länger als acht Sekunden mit Händen oder Armen, gibt es eine Ecke. Der Schiedsrichter zählt die letzten fünf Sekunden sichtbar. Ein absichtliches Fußzuspiel eines Mitspielers mit den Händen aufzunehmen führt hingegen normalerweise zum indirekten Freistoß.",
+    "Hält da Torwart den Ball länger als acht Sekunden mit Händ oder Arm, gibt's a Ecke. Da Schiedsrichter zählt d letzten fünf Sekunden sichtbar. A absichtliches Fußzuspiel vom Mitspieler mit de Händ aufzunehmen gibt normalerweise an indirekten Freistoß.",
+    "골키퍼가 손이나 팔로 8초 넘게 공을 통제하면 코너킥입니다. 주심은 마지막 5초를 눈에 보이게 셉니다. 동료가 의도적으로 발로 찬 공을 손으로 다루는 경우는 보통 간접프리킥입니다.",
+    "Если вратарь держит мяч руками более восьми секунд, назначается угловой; судья показывает отсчёт последних пяти. Взятие руками намеренного паса ногой партнёра обычно ведёт к свободному удару.",
+    "Controlar el balón con manos o brazos más de ocho segundos concede un córner; el árbitro cuenta visiblemente los cinco finales. Tomar con las manos un pase deliberado con el pie de un compañero normalmente concede libre indirecto.",
+    "Controlar a bola com mãos ou braços por mais de oito segundos concede um canto; o árbitro conta visivelmente os cinco finais. Apanhar com as mãos um passe deliberado com o pé de um colega normalmente concede livre indireto."
+  ],
+  [
+    "Throw-ins, goal kicks, and corners",
+    "Einwürfe, Abstöße und Ecken",
+    "Einwürf, Abstöß und Eckn",
+    "스로인, 골킥, 코너킥",
+    "Вбрасывания, удары от ворот и угловые",
+    "Saques de banda, meta y esquina",
+    "Lançamentos laterais, pontapés de baliza e cantos"
+  ],
+  [
+    "Follow the boundary and the final touch.",
+    "Beachte Grenze und letzte Berührung.",
+    "Beacht d Grenze und letzte Berührung.",
+    "경계와 마지막 터치를 따릅니다.",
+    "Следите за границей и последним касанием.",
+    "Observa el límite y el último toque.",
+    "Observa o limite e o último toque."
+  ],
+  [
+    "When the whole ball crosses a touchline, the opponents of the last player to touch it receive a throw-in. At delivery, the thrower faces the field, has part of each foot on the touchline or on the ground outside it, and throws with both hands from behind and over the head.",
+    "Geht der ganze Ball über die Seitenlinie, erhält der Gegner des letzten Berührers Einwurf. Beim Abwurf blickt der Werfer aufs Feld, steht mit einem Teil jedes Fußes auf der Linie oder auf dem Boden dahinter und wirft beidhändig von hinter und über dem Kopf.",
+    "Geht da ganze Ball über d Seitenlinie, kriegt da Gegner vom letzten Berührer Einwurf. Beim Werfen schaut er aufs Feld, hat an Teil vo jedem Fuß auf da Linie oder am Boden dahinter und wirft beidhändig vo hinter und überm Kopf.",
+    "공 전체가 터치라인을 넘으면 마지막 터치 선수의 상대 팀이 스로인합니다. 던질 때 경기장을 향하고 두 발 일부가 선 위나 선 밖 지면에 닿아 있어야 하며 양손으로 머리 뒤에서 위로 던집니다.",
+    "Когда весь мяч пересекает боковую, вбрасывают соперники последнего коснувшегося. Бросающий лицом к полю держит часть каждой стопы на линии либо на земле снаружи и бросает двумя руками из-за головы через неё.",
+    "Si todo el balón cruza la banda, sacan los rivales del último en tocarlo. Al lanzar, se mira al campo, parte de cada pie está en la línea o el suelo exterior y se lanza con ambas manos desde detrás y por encima de la cabeza.",
+    "Se toda a bola cruza a linha lateral, lançam os adversários do último a tocar. Ao lançar, olha-se para o campo, parte de cada pé está na linha ou no chão exterior e lança-se com ambas as mãos por trás e por cima da cabeça."
+  ],
+  [
+    "When the whole ball crosses the goal line without a goal: last touched by an attacker means goal kick; last touched by a defender means corner. A goal kick is in play once kicked and clearly moving; it need not leave the penalty area.",
+    "Geht der ganze Ball ohne Tor über die Torlinie: letzte Berührung eines Angreifers ergibt Abstoß, eines Verteidigers Ecke. Beim Abstoß ist der Ball nach Tritt und deutlicher Bewegung im Spiel; er muss den Strafraum nicht verlassen.",
+    "Geht da ganze Ball ohne Tor über d Torlinie: Angreifer zuletzt dran heißt Abstoß, Verteidiger heißt Ecke. Beim Abstoß is da Ball nachm Tritt und deutlicher Bewegung im Spiel; er muss ned ausm Strafraum.",
+    "골이 아닌 상황에서 공 전체가 골라인을 넘으면 마지막 터치가 공격수면 골킥, 수비수면 코너킥입니다. 골킥은 차서 명확히 움직이면 인플레이이며 페널티 구역을 나갈 필요는 없습니다.",
+    "При полном пересечении линии ворот без гола последнее касание атакующего даёт удар от ворот, защитника — угловой. При ударе от ворот мяч в игре после удара и явного движения; выходить из штрафной не нужно.",
+    "Si cruza completamente la línea de meta sin gol, último toque atacante da saque de meta y defensor da córner. El saque de meta entra en juego al patearlo y moverse claramente; no necesita salir del área penal.",
+    "Se cruza completamente a linha de baliza sem golo, último toque atacante dá pontapé de baliza e defensor dá canto. O pontapé de baliza entra em jogo ao ser pontapeado e mover-se claramente; não precisa de sair da área."
+  ],
+  [
+    "A dropped ball follows Law 8 when play stops without another restart. A kick-off starts each half and restarts after a goal. No offside occurs on direct receipt of a throw-in, goal kick, or corner, but a subsequent team-mate pass can be judged.",
+    "Ein Schiedsrichterball nach Regel 8 gilt bei Unterbrechung ohne andere Spielfortsetzung. Anstoß beginnt jede Halbzeit und setzt nach einem Tor fort. Direkter Empfang von Einwurf, Abstoß oder Ecke ist ohne Abseits; ein anschließender Mitspielerpass kann wieder beurteilt werden.",
+    "A Schiedsrichterball nach Regel 8 gilt bei Unterbrechung ohne andere Spielfortsetzung. Anstoß startet jede Halbzeit und geht nachm Tor weiter. Direkt aus Einwurf, Abstoß oder Ecke gibt's koa Abseits; beim nächsten Mitspielerpass kann's wieder gelten.",
+    "다른 재개 방식 없이 중단되면 규칙 8의 드롭볼을 적용합니다. 킥오프는 전후반 시작과 득점 후에 합니다. 스로인, 골킥, 코너킥 직접 수신은 오프사이드가 없지만 이후 동료 패스는 판정 대상입니다.",
+    "При остановке без другого возобновления применяется спорный мяч по Правилу 8. Начальный удар начинает таймы и возобновляет игру после гола. Прямое получение после вбрасывания, удара от ворот или углового не даёт офсайда; следующий пас партнёра оценивается заново.",
+    "El balón a tierra sigue la Regla 8 cuando no corresponde otra reanudación. El saque inicial abre cada mitad y reinicia tras un gol. No hay fuera de juego al recibir directamente de banda, meta o esquina; un pase posterior del compañero sí puede juzgarse.",
+    "A bola ao solo segue a Lei 8 quando não corresponde outro recomeço. O pontapé de saída inicia cada parte e recomeça após um golo. Não há fora de jogo na receção direta de lateral, baliza ou canto; um passe posterior do colega pode ser avaliado."
+  ],
+  [
+    "Competitions, trophies, and rule editions",
+    "Wettbewerbe, Titel und Regelausgaben",
+    "Wettbewerbe, Titel und Regelausgaben",
+    "대회, 트로피, 규칙 판본",
+    "Турниры, трофеи и редакции правил",
+    "Competiciones, trofeos y ediciones",
+    "Competições, troféus e edições"
+  ],
+  [
+    "Separate match laws from tournament rules and historical records.",
+    "Unterscheide Spielregeln, Turnierregeln und historische Statistiken.",
+    "Unterscheid Spielregeln, Turnierregeln und historische Statistiken.",
+    "경기 규칙, 대회 규정, 역사 기록을 구분합니다.",
+    "Разделяйте правила игры, регламент и историю.",
+    "Distingue reglas de juego, reglamentos e historia.",
+    "Distingue regras de jogo, regulamentos e história."
+  ],
+  [
+    "This course follows IFAB Laws of the Game 2026/27. League points, tie-breakers, extra time, shoot-outs, squad registration, and VAR availability come from competition regulations. European club tournaments are distinct from domestic leagues and cups; national teams play World Cups.",
+    "Der Kurs folgt IFAB 2026/27. Punkte, Gleichstandsauflösung, Verlängerung, Elfmeterschießen, Kaderregistrierung und VAR-Verfügbarkeit stammen aus den Wettbewerbsregeln. Europäische Klubturniere sind von heimischen Ligen und Pokalen getrennt; Nationalteams spielen Weltmeisterschaften.",
+    "Da Kurs folgt IFAB 2026/27. Punkte, Gleichstandsregeln, Verlängerung, Elfmeterschießen, Kaderregistrierung und VAR kommen aus de Wettbewerbsregeln. Europäische Klubturniere san von heimischen Ligen und Pokalen getrennt; Nationalteams spielen Weltmeisterschaften.",
+    "이 과정은 IFAB 2026/27을 따릅니다. 승점, 동률 기준, 연장전, 승부차기, 선수 등록, VAR 여부는 대회 규정입니다. 유럽 클럽 대회는 국내 리그·컵과 구별되며 국가대표가 월드컵에 참가합니다.",
+    "Курс следует IFAB 2026/27. Очки, тай-брейки, дополнительное время, серии пенальти, заявки и VAR задаются регламентом турнира. Европейские клубные турниры отделены от внутренних лиг и кубков; на чемпионатах мира играют сборные.",
+    "El curso sigue IFAB 2026/27. Puntos, desempates, prórroga, tandas, inscripción y disponibilidad de VAR dependen del reglamento. Los torneos europeos de clubes son distintos de ligas y copas nacionales; las selecciones disputan Mundiales.",
+    "O curso segue IFAB 2026/27. Pontos, desempates, prolongamento, penáltis, inscrições e disponibilidade de VAR dependem do regulamento. Os torneios europeus de clubes são distintos das ligas e taças nacionais; as seleções disputam Mundiais."
+  ],
+  [
+    "Liverpool’s 20 English top-flight titles through 2024/25 include 18 First Division titles and two Premier League titles. Bayern’s 33 Bundesliga titles at that cutoff exclude its 1932 German championship. Compare the definition as well as the number.",
+    "Liverpools 20 englische Erstligatitel bis 2024/25 umfassen 18 First-Division- und zwei Premier-League-Titel. Bayerns 33 Bundesliga-Titel schließen die deutsche Meisterschaft 1932 aus. Vergleiche neben der Zahl auch die Definition.",
+    "Liverpools 20 englische Erstligatitel bis 2024/25 san 18 First-Division- und zwoa Premier-League-Titel. Bayerns 33 Bundesliga-Titel lassen d deutsche Meisterschaft 1932 weg. Vergleich aa d Definition, ned bloß d Zahl.",
+    "2024/25까지 리버풀의 잉글랜드 최상위 리그 20회는 퍼스트 디비전 18회와 프리미어리그 2회입니다. 바이에른의 분데스리가 33회는 1932년 독일 우승을 제외합니다. 숫자와 집계 기준을 함께 비교하세요.",
+    "20 титулов высшей лиги Англии у Ливерпуля до 2024/25 включают 18 First Division и два Premier League. 33 титула Бундеслиги Баварии исключают чемпионство Германии 1932 года. Сравнивайте определение вместе с числом.",
+    "Los 20 títulos ingleses de Liverpool hasta 2024/25 incluyen 18 de First Division y dos de Premier League. Los 33 de Bundesliga del Bayern excluyen el campeonato alemán de 1932. Compara definiciones y cifras.",
+    "Os 20 títulos ingleses do Liverpool até 2024/25 incluem 18 da First Division e dois da Premier League. Os 33 da Bundesliga do Bayern excluem o campeonato alemão de 1932. Compara definições e números."
+  ],
+  [
+    "The explorer is a dated, selected historical dataset, not live standings or a complete ranking. European Cup and Champions League are combined; UEFA Cup and Europa League are combined. Only selected trophy categories are counted.",
+    "Der Explorer ist eine datierte historische Auswahl, keine Live-Tabelle oder vollständige Rangliste. Europapokal und Champions League sowie UEFA-Pokal und Europa League werden jeweils zusammengezählt. Nur ausgewählte Titelkategorien sind enthalten.",
+    "Da Explorer is a datierte historische Auswahl, koa Live-Tabelle oder vollständige Rangliste. Europapokal und Champions League sowie UEFA-Pokal und Europa League zählen jeweils zamm. Bloß ausgewählte Titelkategorien san drin.",
+    "탐색기는 날짜가 정해진 역사 자료 일부이며 실시간 순위나 완전한 순위표가 아닙니다. 유러피언컵과 챔피언스리그, UEFA컵과 유로파리그는 각각 합산하며 선택된 우승 종류만 포함합니다.",
+    "Обозреватель — датированная историческая выборка, не живая таблица и не полный рейтинг. Кубок чемпионов объединён с Лигой чемпионов, Кубок UEFA — с Лигой Европы. Включены только выбранные категории.",
+    "El explorador es una selección histórica fechada, no una clasificación en directo ni completa. Copa de Europa y Champions se combinan, al igual que Copa UEFA y Europa League. Solo se cuentan categorías seleccionadas.",
+    "O explorador é uma seleção histórica datada, não uma classificação em direto nem completa. Taça dos Campeões e Champions são combinadas, tal como Taça UEFA e Liga Europa. Só são contadas categorias selecionadas."
+  ],
+  [
+    "Understand jobs before shirt numbers.",
+    "Verstehe Aufgaben vor Rückennummern.",
+    "Versteh d Aufgaben vor de Rückennummern.",
+    "등번호보다 역할을 먼저 이해합니다.",
+    "Поймите задачи раньше номеров.",
+    "Entiende las funciones antes que los dorsales.",
+    "Entende as funções antes dos números."
+  ],
+  [
+    "Goalkeepers protect the goal and start attacks; defenders protect dangerous space; midfielders connect lines; forwards create and finish chances. These are responsibilities, not permanent coordinates. A shirt number does not legally fix a position.",
+    "Torwarte schützen das Tor und eröffnen Angriffe; Verteidiger schützen gefährliche Räume; Mittelfeldspieler verbinden Linien; Stürmer schaffen und verwerten Chancen. Das sind Aufgaben, keine festen Koordinaten. Eine Rückennummer legt regeltechnisch keine Position fest.",
+    "Torwarte schützen s Tor und starten Angriffe; Verteidiger schützen gefährliche Räume; Mittelfeldspieler verbinden Linien; Stürmer schaffen und verwerten Chancen. Des san Aufgaben, koane festen Koordinaten. A Rückennummer legt regeltechnisch koa Position fest.",
+    "골키퍼는 골을 지키고 공격을 시작하며 수비수는 위험한 공간을 지킵니다. 미드필더는 라인을 연결하고 공격수는 기회를 만들고 마무리합니다. 이는 고정 좌표가 아닌 역할이며 등번호는 규칙상 포지션을 정하지 않습니다.",
+    "Вратари защищают ворота и начинают атаки; защитники прикрывают опасные зоны; полузащитники связывают линии; нападающие создают и завершают моменты. Это задачи, не постоянные координаты. Номер не закрепляет позицию по правилам.",
+    "Los porteros protegen la portería e inician ataques; los defensas protegen espacios peligrosos; los medios conectan líneas; los delanteros crean y finalizan ocasiones. Son funciones, no coordenadas fijas. Un dorsal no fija legalmente una posición.",
+    "Os guarda-redes protegem a baliza e iniciam ataques; os defesas protegem espaços perigosos; os médios ligam linhas; os avançados criam e finalizam oportunidades. São funções, não coordenadas fixas. Um número não fixa legalmente uma posição."
+  ],
+  [
+    "In 4-3-3, four defenders, three midfielders, and three forwards join one goalkeeper. A fullback is a wide defender; a centre-back defends central space.",
+    "4-3-3 hat vier Verteidiger, drei Mittelfeldspieler und drei Stürmer plus Torwart. Außenverteidiger spielen breit, Innenverteidiger schützen das Zentrum.",
+    "4-3-3 hat vier Verteidiger, drei Mittelfeldspieler und drei Stürmer plus Torwart. Außenverteidiger spielen breit, Innenverteidiger schützen d Mittn.",
+    "4-3-3은 수비 4명, 미드필더 3명, 공격수 3명과 골키퍼 1명입니다. 풀백은 측면 수비수, 센터백은 중앙 공간을 지킵니다.",
+    "В 4-3-3 четыре защитника, три полузащитника, три нападающих и вратарь. Крайний защитник играет широко, центральный защищает центр.",
+    "4-3-3 tiene cuatro defensas, tres medios, tres delanteros y un portero. El lateral es un defensa abierto; el central protege el centro.",
+    "4-3-3 tem quatro defesas, três médios, três avançados e um guarda-redes. O lateral é um defesa aberto; o central protege o centro."
+  ],
+  [
+    "A player may perform several roles during a match. The board uses generic player numbers, not real teams or fixed shirt-number conventions.",
+    "Ein Spieler kann im Spiel mehrere Rollen erfüllen. Die Tafel nutzt allgemeine Nummern, keine echten Teams oder festen Nummernkonventionen.",
+    "A Spieler kann im Spiel mehrere Rollen erfüllen. D Tafel nutzt allgemeine Nummern, koane echten Teams oder festen Nummernkonventionen.",
+    "한 선수는 경기 중 여러 역할을 할 수 있습니다. 보드는 실제 팀이나 고정 등번호 관례가 아닌 일반 번호를 사용합니다.",
+    "Игрок может выполнять несколько ролей. На доске условные номера, не реальные команды или фиксированные традиции нумерации.",
+    "Un jugador puede desempeñar varias funciones. El tablero usa números genéricos, no equipos reales ni convenciones fijas de dorsales.",
+    "Um jogador pode desempenhar várias funções. O quadro usa números genéricos, não equipas reais nem convenções fixas de números."
+  ],
+  [
+    "Responsibilities with and without the ball",
+    "Aufgaben mit und ohne Ball",
+    "Aufgaben mit und ohne Ball",
+    "공 소유 여부에 따른 역할",
+    "Задачи с мячом и без него",
+    "Funciones con y sin balón",
+    "Funções com e sem bola"
+  ],
+  [
+    "See how the same player changes tasks.",
+    "Sieh, wie derselbe Spieler Aufgaben wechselt.",
+    "Schau, wia derselbe Spieler d Aufgaben wechselt.",
+    "같은 선수가 역할을 바꾸는 모습을 봅니다.",
+    "Посмотрите, как игрок меняет задачи.",
+    "Observa cómo cambia de tarea un mismo jugador.",
+    "Observa como o mesmo jogador muda de tarefa."
+  ],
+  [
+    "With possession, offer passing angles, width, depth, and support behind the ball. Without it, protect the goal, close useful spaces, and cover a team-mate who presses. A balanced team keeps protection against a counterattack while attacking.",
+    "Mit Ball: Passwinkel, Breite, Tiefe und Unterstützung hinter dem Ball anbieten. Ohne Ball: Tor schützen, wichtige Räume schließen und den pressenden Mitspieler absichern. Ein ausgeglichenes Team schützt sich auch im Angriff gegen Konter.",
+    "Mit Ball: Passwinkel, Breite, Tiefe und Unterstützung hinterm Ball anbieten. Ohne Ball: Tor schützen, wichtige Räume zumachen und den pressenden Mitspieler absichern. A ausgeglichenes Team schützt si aa im Angriff gegen Konter.",
+    "공이 있으면 패스 각도, 폭, 깊이, 공 뒤 지원을 제공합니다. 없으면 골을 지키고 유용한 공간을 막으며 압박하는 동료를 커버합니다. 균형 잡힌 팀은 공격 중에도 역습에 대비합니다.",
+    "С мячом создавайте углы паса, ширину, глубину и поддержку позади. Без мяча защищайте ворота, закрывайте зоны и страхуйте прессингующего партнёра. Сбалансированная команда защищена от контратаки и в атаке.",
+    "Con balón, ofrece ángulos de pase, amplitud, profundidad y apoyo detrás. Sin él, protege la portería, cierra espacios y cubre al compañero que presiona. Un equipo equilibrado mantiene protección contra la contra mientras ataca.",
+    "Com bola, oferece ângulos de passe, largura, profundidade e apoio atrás. Sem ela, protege a baliza, fecha espaços e cobre o colega que pressiona. Uma equipa equilibrada mantém proteção contra o contra-ataque enquanto ataca."
+  ],
+  [
+    "A wide player can stretch the attack near the touchline, then tuck inward when defending to protect central passing lanes.",
+    "Ein Außenspieler kann den Angriff an der Seitenlinie verbreitern und beim Verteidigen nach innen rücken, um zentrale Passwege zu schützen.",
+    "A Außenspieler kann den Angriff an da Seitenlinie breiter machen und beim Verteidigen nach innen rücken, zum zentrale Passwege schützen.",
+    "측면 선수는 터치라인 쪽으로 공격을 넓힌 뒤 수비할 때 안으로 들어와 중앙 패스 길을 막을 수 있습니다.",
+    "Крайний игрок растягивает атаку у боковой, а в обороне смещается внутрь, закрывая центральные передачи.",
+    "Un jugador de banda abre el ataque junto a la línea y se cierra al defender para proteger los pases centrales.",
+    "Um jogador de ala abre o ataque junto à linha e fecha por dentro ao defender para proteger passes centrais."
+  ],
+  [
+    "Switch possession on the board and compare the shape. These are examples, not mandatory movements or a guarantee that a tactic works.",
+    "Wechsle den Ballbesitz auf der Tafel und vergleiche die Form. Das sind Beispiele, keine Pflichtbewegungen oder Erfolgsgarantien.",
+    "Wechsel den Ballbesitz auf da Tafel und vergleich d Form. Des san Beispiele, koane Pflichtbewegungen oder Erfolgsgarantien.",
+    "보드에서 소유 상태를 바꾸고 형태를 비교하세요. 예시일 뿐 필수 움직임이나 성공 보장은 아닙니다.",
+    "Переключайте владение и сравнивайте форму. Это примеры, не обязательные движения и не гарантия успеха.",
+    "Cambia la posesión y compara la forma. Son ejemplos, no movimientos obligatorios ni garantías de éxito.",
+    "Altera a posse e compara a forma. São exemplos, não movimentos obrigatórios nem garantias de sucesso."
+  ],
+  [
+    "Formations and changing shape",
+    "Formationen und Formwechsel",
+    "Formationen und Formwechsel",
+    "포메이션과 형태 변화",
+    "Расстановки и изменение формы",
+    "Formaciones y cambios de estructura",
+    "Formações e mudanças de estrutura"
+  ],
+  [
+    "Read a starting shape without mistaking it for a rule.",
+    "Lies die Ausgangsformation, ohne sie für eine Regel zu halten.",
+    "Lies d Ausgangsformation, ohne sie für a Regel zu halten.",
+    "시작 형태를 규칙과 혼동하지 않습니다.",
+    "Читайте исходную схему, не принимая её за правило.",
+    "Lee la forma inicial sin tomarla por una regla.",
+    "Lê a forma inicial sem a tomar por uma regra."
+  ],
+  [
+    "4-4-2, 4-3-3, and 3-5-2 describe outfield lines from defence to attack. A formation is a snapshot: players move and teams can use a different shape in possession. Width, distances, opponent movement, and player abilities matter more than the label alone.",
+    "4-4-2, 4-3-3 und 3-5-2 beschreiben Feldspielerlinien von hinten nach vorn. Eine Formation ist eine Momentaufnahme; bei Ballbesitz kann sie anders aussehen. Breite, Abstände, Gegnerbewegungen und Fähigkeiten sind wichtiger als der Name.",
+    "4-4-2, 4-3-3 und 3-5-2 beschreiben Feldspielerlinien vo hinten nach vorn. A Formation is a Momentaufnahme; bei Ballbesitz kann's anders ausschaun. Breite, Abstände, Gegnerbewegungen und Können san wichtiger als da Name.",
+    "4-4-2, 4-3-3, 3-5-2는 수비에서 공격 순으로 필드 라인을 나타냅니다. 포메이션은 순간 모습이며 소유 시 달라질 수 있습니다. 이름보다 폭, 간격, 상대 움직임, 선수 능력이 중요합니다.",
+    "4-4-2, 4-3-3 и 3-5-2 описывают линии полевых игроков от обороны к атаке. Схема — снимок момента; с мячом она меняется. Ширина, дистанции, соперники и способности важнее названия.",
+    "4-4-2, 4-3-3 y 3-5-2 describen líneas de jugadores de campo desde defensa a ataque. Una formación es una instantánea y puede cambiar con posesión. Amplitud, distancias, rival y capacidades importan más que la etiqueta.",
+    "4-4-2, 4-3-3 e 3-5-2 descrevem linhas de jogadores de campo da defesa ao ataque. Uma formação é um retrato momentâneo e pode mudar com posse. Largura, distâncias, adversário e capacidades importam mais do que o nome."
+  ],
+  [
+    "A 3-5-2 has three defenders, five midfielders including two wide players, and two forwards. Wide players may retreat to create a back five when defending.",
+    "3-5-2 hat drei Verteidiger, fünf Mittelfeldspieler einschließlich zwei Außenspielern und zwei Stürmer. Außen können beim Verteidigen zurückfallen und eine Fünferkette bilden.",
+    "3-5-2 hat drei Verteidiger, fünf Mittelfeldspieler samt zwoa Außenspielern und zwoa Stürmer. Außen können beim Verteidigen zurückfallen und a Fünferkette bilden.",
+    "3-5-2는 수비 3명, 측면 2명 포함 미드필더 5명, 공격수 2명입니다. 측면 선수는 수비 시 내려와 5백을 만들 수 있습니다.",
+    "В 3-5-2 три защитника, пять полузащитников, включая двух крайних, и два нападающих. Крайние могут опуститься и создать линию из пяти защитников.",
+    "3-5-2 tiene tres defensas, cinco medios incluidos dos de banda y dos delanteros. Los jugadores de banda pueden retrasarse y formar una defensa de cinco.",
+    "3-5-2 tem três defesas, cinco médios incluindo dois de ala e dois avançados. Os alas podem recuar e formar uma defesa de cinco."
+  ],
+  [
+    "Count ten outfield players plus one goalkeeper. More attackers on paper do not automatically mean a better attack.",
+    "Zähle zehn Feldspieler plus Torwart. Mehr Stürmer auf dem Papier bedeuten nicht automatisch besseren Angriff.",
+    "Zähl zehn Feldspieler plus Torwart. Mehr Stürmer aufm Papier moant ned automatisch an besseren Angriff.",
+    "필드 선수 10명과 골키퍼 1명을 셉니다. 명목상 공격수가 많다고 공격이 더 좋은 것은 아닙니다.",
+    "Считайте десять полевых и вратаря. Больше нападающих на бумаге не гарантирует лучшую атаку.",
+    "Cuenta diez jugadores de campo y un portero. Más delanteros sobre el papel no garantizan mejor ataque.",
+    "Conta dez jogadores de campo e um guarda-redes. Mais avançados no papel não garantem melhor ataque."
+  ],
+  [
+    "Coordinate pressure and react to a change of possession.",
+    "Koordiniere Druck und reagiere auf Ballbesitzwechsel.",
+    "Stimm den Druck ab und reagier auf Ballbesitzwechsel.",
+    "압박을 맞추고 소유권 변화에 반응합니다.",
+    "Координируйте давление и смену владения.",
+    "Coordina la presión y reacciona al cambio de posesión.",
+    "Coordena a pressão e reage à mudança de posse."
+  ],
+  [
+    "Pressing is coordinated pressure on the ball and nearby passing options. A heavy touch or a backward pass can be a trigger. After losing possession, a team can counterpress quickly or recover into shape; after winning it, it can counterattack or keep the ball.",
+    "Pressing ist abgestimmter Druck auf Ball und nahe Passoptionen. Schlechte Ballannahme oder Rückpass können Auslöser sein. Nach Ballverlust folgt schnelles Gegenpressing oder Rückzug in die Ordnung; nach Ballgewinn Konter oder Ballsicherung.",
+    "Pressing is abgestimmter Druck auf Ball und nahe Passoptionen. Schlechte Ballannahme oder Rückpass können Auslöser sein. Nach Ballverlust folgt Gegenpressing oder Rückzug in d Ordnung; nach Ballgewinn Konter oder Ballsicherung.",
+    "압박은 공과 가까운 패스 선택지를 함께 압박하는 것입니다. 긴 터치나 백패스가 신호가 될 수 있습니다. 잃으면 즉시 재압박하거나 형태로 복귀하고 얻으면 역습하거나 소유를 유지합니다.",
+    "Прессинг — согласованное давление на мяч и ближние варианты паса. Неудачный приём или пас назад могут быть сигналом. После потери — контрпрессинг либо восстановление схемы; после отбора — контратака либо сохранение мяча.",
+    "Presionar es coordinar presión al balón y opciones próximas. Un mal control o pase atrás puede activar la presión. Tras perderlo, contrapresión o recuperación de forma; tras ganarlo, contraataque o conservación.",
+    "Pressionar é coordenar pressão à bola e opções próximas. Um mau domínio ou passe atrás pode ativar a pressão. Após perder, contrapressão ou recuperação da forma; após ganhar, contra-ataque ou conservação."
+  ],
+  [
+    "One player pressures the ball while others cover nearby passes and the space behind. If only one player runs forward, the opponent may pass around them.",
+    "Ein Spieler bedrängt den Ball, andere sichern nahe Pässe und den Raum dahinter. Läuft nur einer vor, kann der Gegner um ihn herum passen.",
+    "Oa Spieler bedrängt den Ball, andere sichern nahe Pässe und den Raum dahinter. Rennt bloß oana vor, kann da Gegner um ihn rum passen.",
+    "한 명이 공을 압박하고 다른 선수는 가까운 패스와 뒷공간을 커버합니다. 한 명만 나가면 상대는 그 주변으로 패스할 수 있습니다.",
+    "Один давит на мяч, другие прикрывают передачи и пространство позади. Если вперёд бежит только один, соперник может обойти его пасом.",
+    "Uno presiona el balón y otros cubren pases cercanos y espacio detrás. Si solo corre uno, el rival puede rodearlo con pases.",
+    "Um pressiona a bola e outros cobrem passes próximos e espaço atrás. Se só um correr, o adversário pode contorná-lo com passes."
+  ],
+  [
+    "Pressure needs cover and suitable distances. A high press leaves space behind; a low block trades pressure higher up for protection nearer goal.",
+    "Pressing braucht Absicherung und passende Abstände. Hohes Pressing lässt Raum dahinter; ein tiefer Block tauscht Druck weiter vorn gegen Schutz nahe dem Tor.",
+    "Pressing braucht Absicherung und passende Abstände. Hohes Pressing lässt Raum dahinter; a tiefer Block tauscht Druck vorn gegen Schutz beim Tor.",
+    "압박에는 커버와 적절한 간격이 필요합니다. 높은 압박은 뒤에 공간을 남기며 낮은 블록은 전방 압박 대신 골 주변을 보호합니다.",
+    "Прессинг требует страховки и дистанций. Высокий прессинг оставляет место позади; низкий блок снижает давление впереди ради защиты у ворот.",
+    "La presión necesita cobertura y distancias adecuadas. La alta deja espacio detrás; el bloque bajo reduce presión adelantada a cambio de proteger la portería.",
+    "A pressão precisa de cobertura e distâncias adequadas. A alta deixa espaço atrás; o bloco baixo reduz pressão avançada para proteger a baliza."
+  ],
+  [
+    "Create width with a run beyond a wide team-mate.",
+    "Schaffe Breite durch einen Lauf hinter dem Außenspieler vorbei.",
+    "Schaff Breite mit am Lauf außen am Mitspieler vorbei.",
+    "측면 동료를 넘어 달려 폭을 만듭니다.",
+    "Создайте ширину забеганием за крайним партнёром.",
+    "Crea amplitud con una carrera más allá del compañero.",
+    "Cria largura com uma corrida além do colega."
+  ],
+  [
+    "An overlap is a run outside and beyond the ball carrier; an underlap goes inside. A fullback’s run can offer a pass or draw a marker, while the winger can move inward. Someone must cover the space left behind.",
+    "Hinterlaufen geht außen am Ballführer vorbei, ein Underlap innen. Der Außenverteidiger bietet einen Pass oder zieht einen Gegenspieler weg; der Flügel kann nach innen gehen. Der verlassene Raum muss abgesichert werden.",
+    "Hinterlaufen geht außen am Ballführer vorbei, a Underlap innen. Da Außenverteidiger bietet an Pass oder zieht an Gegner weg; da Flügel kann nach innen geh'n. Da verlassene Raum braucht Absicherung.",
+    "오버랩은 공 소유자 바깥으로 앞질러 달리고 언더랩은 안쪽으로 갑니다. 풀백은 패스를 받거나 마크를 끌고 윙어는 안으로 이동할 수 있습니다. 비운 공간은 커버해야 합니다.",
+    "Забегание проходит снаружи игрока с мячом, underlap — внутри. Крайний защитник предлагает пас или уводит опекуна, вингер смещается внутрь. Освободившееся место нужно страховать.",
+    "El desdoblamiento pasa por fuera y más allá del portador; el underlap va por dentro. El lateral ofrece pase o atrae al marcador y el extremo entra. Hay que cubrir el espacio dejado.",
+    "A sobreposição passa por fora e além do portador; o underlap vai por dentro. O lateral oferece passe ou atrai o marcador e o extremo entra. É preciso cobrir o espaço deixado."
+  ],
+  [
+    "On the board, the wide defender runs outside the winger. A supporting midfielder stays deeper to help defend if possession is lost.",
+    "Auf der Tafel läuft der Außenverteidiger außen am Flügelspieler vorbei. Ein unterstützender Mittelfeldspieler bleibt tiefer als Absicherung bei Ballverlust.",
+    "Auf da Tafel rennt da Außenverteidiger außen am Flügel vorbei. A unterstützender Mittelfeldspieler bleibt tiefer als Absicherung bei Ballverlust.",
+    "보드에서 풀백이 윙어 바깥으로 달립니다. 지원 미드필더는 소유를 잃었을 때를 대비해 뒤에 남습니다.",
+    "На доске крайний защитник забегает снаружи вингера. Поддерживающий полузащитник остаётся глубже для защиты после потери.",
+    "En el tablero, el lateral corre por fuera del extremo. Un medio de apoyo queda atrás para defender si se pierde la posesión.",
+    "No quadro, o lateral corre por fora do extremo. Um médio de apoio fica atrás para defender se se perder a posse."
+  ],
+  [
+    "Time the run and inspect the offside position at the pass. Overlaps are tactical choices, not exemptions from the laws.",
+    "Stimme den Lauf zeitlich ab und prüfe Abseits beim Pass. Hinterlaufen ist Taktik, keine Regelausnahme.",
+    "Stimm den Lauf zeitlich ab und prüf Abseits beim Pass. Hinterlaufen is Taktik, koa Regelausnahme.",
+    "달리는 타이밍을 맞추고 패스 순간 오프사이드를 확인하세요. 오버랩은 전술이지 규칙 예외가 아닙니다.",
+    "Выберите момент забегания и проверьте офсайд при пасе. Забегание — тактика, не исключение из правил.",
+    "Coordina la carrera y revisa fuera de juego al pasar. Desdoblar es una táctica, no una excepción legal.",
+    "Coordena a corrida e verifica fora de jogo no passe. Sobrepor é uma tática, não uma exceção às leis."
+  ],
+  [
+    "Create space by moving a forward away from the front line.",
+    "Schaffe Raum, indem ein Stürmer die vorderste Linie verlässt.",
+    "Schaff Raum, indem a Stürmer d vorderste Linie verlässt.",
+    "공격수가 전방 라인을 떠나 공간을 만듭니다.",
+    "Создайте пространство отходом нападающего.",
+    "Crea espacio alejando al delantero de la primera línea.",
+    "Cria espaço afastando o avançado da primeira linha."
+  ],
+  [
+    "A false nine is a central forward who drops toward midfield to receive and connect play. If a centre-back follows, space may open for a winger or midfielder to run behind; if not, the forward may receive between the lines.",
+    "Eine falsche Neun ist ein Mittelstürmer, der ins Mittelfeld zurückfällt, um den Ball anzunehmen und das Spiel zu verbinden. Folgt ein Innenverteidiger, kann Raum für Flügel- oder Mittelfeldläufe dahinter entstehen; andernfalls kann die Neun zwischen den Linien anspielen.",
+    "A falsche Neun is a Mittelstürmer, der ins Mittelfeld zurückfällt, zum Ball annehmen und Spiel verbinden. Folgt a Innenverteidiger, kann Raum für Flügel- oder Mittelfeldläuf dahinter entstehen; sonst kann d Neun zwischen de Linien anspielen.",
+    "가짜 9번은 공을 받고 연결하려고 미드필드로 내려오는 중앙 공격수입니다. 센터백이 따라오면 윙어나 미드필더가 뒤로 달릴 공간이 생기고, 안 따라오면 라인 사이에서 받을 수 있습니다.",
+    "Ложная девятка — центральный форвард, отходящий в полузащиту для приёма и связи игры. Защитник следует — открывается место для вингера или полузащитника; не следует — форвард принимает между линиями.",
+    "Un falso nueve es un delantero central que baja al medio para recibir y conectar. Si el central lo sigue, abre espacio para carreras de extremos o medios; si no, puede recibir entre líneas.",
+    "Um falso nove é um avançado central que baixa ao meio-campo para receber e ligar. Se o central seguir, abre espaço para corridas de extremos ou médios; se não, pode receber entre linhas."
+  ],
+  [
+    "The board moves the central forward deeper and shows a wide forward making a supporting run into the vacated space.",
+    "Die Tafel bewegt den Mittelstürmer zurück und zeigt den Lauf eines Außenstürmers in den frei gewordenen Raum.",
+    "D Tafel bewegt den Mittelstürmer zurück und zeigt an Außenstürmerlauf in den freien Raum.",
+    "보드는 중앙 공격수를 뒤로 움직이고 측면 공격수가 빈 공간으로 달리는 모습을 보여 줍니다.",
+    "Доска отводит центрального форварда назад и показывает забегание крайнего в свободное место.",
+    "El tablero retrasa al delantero central y muestra una carrera de un extremo al espacio liberado.",
+    "O quadro recua o avançado central e mostra uma corrida de um extremo para o espaço libertado."
+  ],
+  [
+    "The movement depends on the opponent’s response and team-mates’ timing. A forward dropping deep is not automatically a successful false-nine tactic.",
+    "Die Bewegung hängt von Gegnerreaktion und Mitspielertiming ab. Ein zurückfallender Stürmer ist nicht automatisch eine erfolgreiche falsche Neun.",
+    "D Bewegung hängt vo da Gegnerreaktion und vom Mitspielertiming ab. A zurückfallender Stürmer is ned automatisch a erfolgreiche falsche Neun.",
+    "상대 반응과 동료의 타이밍에 달렸습니다. 공격수가 내려오는 것만으로 성공적인 가짜 9번 전술은 아닙니다.",
+    "Движение зависит от реакции соперника и времени партнёров. Отход форварда не делает тактику ложной девятки успешной автоматически.",
+    "El movimiento depende del rival y la coordinación. Que un delantero baje no hace automáticamente eficaz al falso nueve.",
+    "O movimento depende do adversário e da coordenação. Um avançado recuar não torna automaticamente eficaz o falso nove."
+  ],
+  [
+    "Which note is on the bottom line of a treble staff?",
+    "Welche Note liegt auf der untersten Linie im Violinsystem?",
+    "Welche Notn liegt auf da untersten Linie im Violinsystem?",
+    "높은음자리 오선의 맨 아래 선은 어떤 음인가요?",
+    "Какая нота на нижней линии скрипичного стана?",
+    "¿Qué nota está en la línea inferior de la clave de sol?",
+    "Que nota está na linha inferior da clave de sol?"
+  ],
+  [
+    "Which note follows G when moving upward?",
+    "Welche Note folgt aufwärts auf G?",
+    "Welche Notn kommt nach G nach oben?",
+    "G에서 위로 가면 다음 음은 무엇인가요?",
+    "Какая нота следует после G вверх?",
+    "¿Qué nota sigue a G al subir?",
+    "Que nota segue G ao subir?"
+  ],
+  [
+    "With A4 = 440 Hz, what is A5?",
+    "Bei A4 = 440 Hz: Wie viel hat A5?",
+    "Bei A4 = 440 Hz: Wieviel hat A5?",
+    "A4 = 440 Hz라면 A5는 얼마인가요?",
+    "При A4 = 440 Hz чему равно A5?",
+    "Con A4 = 440 Hz, ¿cuánto vale A5?",
+    "Com A4 = 440 Hz, quanto vale A5?"
+  ],
+  [
+    "880 Hz",
+    "880 Hz",
+    "880 Hz",
+    "880 Hz",
+    "880 Hz",
+    "880 Hz",
+    "880 Hz"
+  ],
+  [
+    "440 Hz",
+    "440 Hz",
+    "440 Hz",
+    "440 Hz",
+    "440 Hz",
+    "440 Hz",
+    "440 Hz"
+  ],
+  [
+    "220 Hz",
+    "220 Hz",
+    "220 Hz",
+    "220 Hz",
+    "220 Hz",
+    "220 Hz",
+    "220 Hz"
+  ],
+  [
+    "What does a natural sign do to an F-sharp in the measure?",
+    "Was macht ein Auflösungszeichen aus einem Fis im Takt?",
+    "Was macht a Auflösungszeichn aus am Fis im Takt?",
+    "마디 안의 F♯에 제자리표를 붙이면 어떻게 되나요?",
+    "Что делает бекар с F♯ в такте?",
+    "¿Qué hace un becuadro a F♯ en el compás?",
+    "O que faz um bequadro a F♯ no compasso?"
+  ],
+  [
+    "Makes it F natural",
+    "Macht es zum F ohne Vorzeichen",
+    "Macht's zum F ohne Vorzeichn",
+    "F 내추럴로 바꿉니다",
+    "Превращает в F без альтерации",
+    "Lo convierte en F natural",
+    "Transforma-o em F natural"
+  ],
+  [
+    "Makes it G",
+    "Macht es zum G",
+    "Macht's zum G",
+    "G로 바꿉니다",
+    "Превращает в G",
+    "Lo convierte en G",
+    "Transforma-o em G"
+  ],
+  [
+    "Doubles its length",
+    "Verdoppelt die Dauer",
+    "Verdoppelt d Dauer",
+    "길이를 두 배로 합니다",
+    "Удваивает длительность",
+    "Duplica su duración",
+    "Duplica a duração"
+  ],
+  [
+    "In a one-sharp signature, how is an unaltered F played?",
+    "Wie spielst du F ohne lokales Vorzeichen bei einem Kreuz in der Tonart?",
+    "Wia spielst F ohne lokales Vorzeichn bei am Kreuz in da Tonart?",
+    "조표에 ♯가 하나일 때 임시표 없는 F는 어떻게 연주하나요?",
+    "Как играть F без случайного знака при одном диезе у ключа?",
+    "¿Cómo se toca F sin alteración local con un sostenido en la armadura?",
+    "Como se toca F sem alteração local com um sustenido na armação?"
+  ],
+  [
+    "F-sharp",
+    "Fis",
+    "Fis",
+    "F♯",
+    "F♯",
+    "F sostenido",
+    "F sustenido"
+  ],
+  [
+    "F natural",
+    "F ohne Vorzeichen",
+    "F ohne Vorzeichn",
+    "F 내추럴",
+    "F без альтерации",
+    "F natural",
+    "F natural"
+  ],
+  [
+    "F-flat",
+    "Fes",
+    "Fes",
+    "F♭",
+    "F♭",
+    "F bemol",
+    "F bemol"
+  ],
+  [
+    "Which clef places C4 on the middle line?",
+    "Welcher Schlüssel setzt C4 auf die mittlere Linie?",
+    "Welcher Schlissl setzt C4 auf d mittlere Linie?",
+    "C4를 가운데 선에 두는 음자리표는 무엇인가요?",
+    "Какой ключ ставит C4 на среднюю линию?",
+    "¿Qué clave sitúa C4 en la línea central?",
+    "Que clave coloca C4 na linha central?"
+  ],
+  [
+    "Alto clef",
+    "Altschlüssel",
+    "Altschlissl",
+    "가온음자리표",
+    "Альтовый ключ",
+    "Clave de do en tercera",
+    "Clave de dó na terceira linha"
+  ],
+  [
+    "Treble clef",
+    "Violinschlüssel",
+    "Violinschlissl",
+    "높은음자리표",
+    "Скрипичный ключ",
+    "Clave de sol",
+    "Clave de sol"
+  ],
+  [
+    "Bass clef",
+    "Bassschlüssel",
+    "Bassschlissl",
+    "낮은음자리표",
+    "Басовый ключ",
+    "Clave de fa",
+    "Clave de fá"
+  ],
+  [
+    "In 4/4, how many beats does a half note occupy?",
+    "Wie viele Schläge belegt eine halbe Note in 4/4?",
+    "Wieviel Schläg braucht a halbe Notn in 4/4?",
+    "4/4에서 2분음표는 몇 박인가요?",
+    "Сколько долей занимает половинная в 4/4?",
+    "¿Cuántos pulsos ocupa una blanca en 4/4?",
+    "Quantos tempos ocupa uma mínima em 4/4?"
+  ],
+  [
+    "How long is a dotted quarter in quarter-note beats?",
+    "Wie lange dauert ein punktiertes Viertel in Viertelschlägen?",
+    "Wia lang dauert a punktiertes Viertel in Viertelschlägen?",
+    "점4분음표는 4분음표 기준 몇 박인가요?",
+    "Сколько четвертных долей в четверти с точкой?",
+    "¿Cuántos pulsos de negra dura una negra con puntillo?",
+    "Quantos tempos de semínima dura uma semínima pontuada?"
+  ],
+  [
+    "How are six eighth notes usually grouped in 6/8?",
+    "Wie werden sechs Achtel in 6/8 üblicherweise gruppiert?",
+    "Wia gruppiert ma sechs Achtel in 6/8 normalerweise?",
+    "6/8의 8분음표 여섯 개는 보통 어떻게 묶나요?",
+    "Как обычно группируют шесть восьмых в 6/8?",
+    "¿Cómo se agrupan normalmente seis corcheas en 6/8?",
+    "Como se agrupam normalmente seis colcheias em 6/8?"
+  ],
+  [
+    "Two groups of three",
+    "Zwei Dreiergruppen",
+    "Zwoa Dreiergruppen",
+    "세 개씩 두 묶음",
+    "Две группы по три",
+    "Dos grupos de tres",
+    "Dois grupos de três"
+  ],
+  [
+    "Three groups of two",
+    "Drei Zweiergruppen",
+    "Drei Zweiergruppen",
+    "두 개씩 세 묶음",
+    "Три группы по две",
+    "Tres grupos de dos",
+    "Três grupos de dois"
+  ],
+  [
+    "Six groups of four",
+    "Sechs Vierergruppen",
+    "Sechs Vierergruppen",
+    "네 개씩 여섯 묶음",
+    "Шесть групп по четыре",
+    "Seis grupos de cuatro",
+    "Seis grupos de quatro"
+  ],
+  [
+    "Where does the second eighth note on beat 2 start?",
+    "Wann beginnt das zweite Achtel auf Schlag 2?",
+    "Wann fangt s zweite Achtel auf Schlag 2 an?",
+    "2박의 두 번째 8분음표는 언제 시작하나요?",
+    "Когда начинается вторая восьмая на доле 2?",
+    "¿Cuándo empieza la segunda corchea del pulso 2?",
+    "Quando começa a segunda colcheia do tempo 2?"
+  ],
+  [
+    "On the and after 2",
+    "Auf dem und nach 2",
+    "Aufm und nach 2",
+    "2 뒤의 앤에서",
+    "На «и» после 2",
+    "En la y después de 2",
+    "No e depois de 2"
+  ],
+  [
+    "On beat 3",
+    "Auf Schlag 3",
+    "Auf Schlag 3",
+    "3박에서",
+    "На доле 3",
+    "En el pulso 3",
+    "No tempo 3"
+  ],
+  [
+    "On beat 4",
+    "Auf Schlag 4",
+    "Auf Schlag 4",
+    "4박에서",
+    "На доле 4",
+    "En el pulso 4",
+    "No tempo 4"
+  ],
+  [
+    "How many quarter-note beats does the example phrase fill?",
+    "Wie viele Viertelschläge füllt die Beispielphrase?",
+    "Wieviel Viertelschläg füllt d Beispielphrase?",
+    "예시 악절은 4분음표 기준 몇 박인가요?",
+    "Сколько четвертных долей занимает пример фразы?",
+    "¿Cuántos pulsos de negra llena la frase de ejemplo?",
+    "Quantos tempos de semínima preenche a frase de exemplo?"
+  ],
+  [
+    "Where may a goalkeeper normally handle the ball?",
+    "Wo darf der Torwart normalerweise die Hände benutzen?",
+    "Wo darf da Torwart normalerweise d Händ benutzen?",
+    "골키퍼는 보통 어디서 손으로 공을 다룰 수 있나요?",
+    "Где вратарь обычно может играть руками?",
+    "¿Dónde puede el portero usar normalmente las manos?",
+    "Onde pode o guarda-redes usar normalmente as mãos?"
+  ],
+  [
+    "Inside their own penalty area",
+    "Im eigenen Strafraum",
+    "Im eigenen Strafraum",
+    "자기 페널티 구역 안",
+    "В своей штрафной",
+    "En su propia área penal",
+    "Na sua área de penálti"
+  ],
+  [
+    "Anywhere in their own half",
+    "Überall in der eigenen Hälfte",
+    "Überall in da eigenen Hälfte",
+    "자기 진영 어디서나",
+    "Везде на своей половине",
+    "En cualquier lugar de su mitad",
+    "Em qualquer lugar do seu meio-campo"
+  ],
+  [
+    "Only inside the goal area",
+    "Nur im Torraum",
+    "Bloß im Torraum",
+    "골 에어리어 안에서만",
+    "Только в площади ворот",
+    "Solo en el área de meta",
+    "Só na área de baliza"
+  ],
+  [
+    "A small part of the ball remains above the goal line. Is it a goal?",
+    "Ein kleiner Teil des Balls ist noch über der Torlinie. Ist es ein Tor?",
+    "A kleiner Teil vom Ball is no über da Torlinie. Is des a Tor?",
+    "공 일부가 아직 골라인 위에 있습니다. 골인가요?",
+    "Часть мяча ещё над линией ворот. Это гол?",
+    "Parte del balón sigue sobre la línea. ¿Es gol?",
+    "Parte da bola continua sobre a linha. É golo?"
+  ],
+  [
+    "Only after 90 minutes",
+    "Nur nach 90 Minuten",
+    "Bloß nach 90 Minuten",
+    "90분 이후에만",
+    "Только после 90 минут",
+    "Solo después de 90 minutos",
+    "Só depois dos 90 minutos"
+  ],
+  [
+    "An attacker is level with the second-last opponent at the pass and then runs beyond them to receive. What is the decision?",
+    "Der Angreifer ist beim Pass auf gleicher Höhe mit dem vorletzten Gegner und läuft danach dahinter. Was gilt?",
+    "Da Angreifer is beim Pass auf gleicher Höh mitm vorletzten Gegner und rennt danach dahinter. Was gilt?",
+    "패스 때 공격수가 뒤에서 두 번째 상대와 같은 선이며 이후 앞질러 받습니다. 판정은 무엇인가요?",
+    "Нападающий на одной линии с предпоследним соперником при пасе, затем бежит за него. Какое решение?",
+    "El atacante está a la altura del penúltimo rival al pase y luego corre detrás. ¿Decisión?",
+    "O atacante está alinhado com o penúltimo rival no passe e depois corre nas costas. Qual a decisão?"
+  ],
+  [
+    "Play on",
+    "Weiterspielen",
+    "Weiterspielen",
+    "계속 진행",
+    "Продолжать игру",
+    "Sigue el juego",
+    "Segue o jogo"
+  ],
+  [
+    "Penalty kick",
+    "Strafstoß",
+    "Strafstoß",
+    "페널티킥",
+    "Пенальти",
+    "Penalti",
+    "Penálti"
+  ],
+  [
+    "A reckless challenge occurs outside the penalty area. What is the usual sanction?",
+    "Ein rücksichtsloser Zweikampf außerhalb des Strafraums: Welche Sanktion gilt üblicherweise?",
+    "A rücksichtsloser Zweikampf außerhalb vom Strafraum: Welche Sanktion gilt normalerweise?",
+    "페널티 구역 밖의 무모한 태클은 보통 어떤 처벌인가요?",
+    "Безрассудная борьба вне штрафной: какое обычное наказание?",
+    "Entrada temeraria fuera del área: ¿sanción habitual?",
+    "Entrada imprudente fora da área: qual a sanção habitual?"
+  ],
+  [
+    "Direct free kick and yellow card",
+    "Direkter Freistoß und Gelbe Karte",
+    "Direkter Freistoß und Gelbe Kartn",
+    "직접프리킥과 경고",
+    "Штрафной и жёлтая карточка",
+    "Libre directo y amarilla",
+    "Livre direto e amarelo"
+  ],
+  [
+    "Throw-in only",
+    "Nur Einwurf",
+    "Bloß Einwurf",
+    "스로인만",
+    "Только вбрасывание",
+    "Solo saque de banda",
+    "Só lançamento lateral"
+  ],
+  [
+    "Always no card",
+    "Immer ohne Karte",
+    "Immer ohne Kartn",
+    "항상 카드 없음",
+    "Всегда без карточки",
+    "Siempre sin tarjeta",
+    "Sempre sem cartão"
+  ],
+  [
+    "An indirect free kick goes straight into the opponents’ goal without another touch. What follows?",
+    "Ein indirekter Freistoß geht ohne weitere Berührung direkt ins gegnerische Tor. Was folgt?",
+    "A indirekter Freistoß geht ohne weitere Berührung direkt ins gegnerische Tor. Was folgt?",
+    "간접프리킥이 다른 터치 없이 상대 골로 들어갑니다. 어떻게 재개하나요?",
+    "Свободный удар попал прямо в чужие ворота без второго касания. Что дальше?",
+    "Un libre indirecto entra directamente sin otro toque. ¿Qué sigue?",
+    "Um livre indireto entra diretamente sem outro toque. O que segue?"
+  ],
+  [
+    "Goal kick",
+    "Abstoß",
+    "Abstoß",
+    "골킥",
+    "Удар от ворот",
+    "Saque de meta",
+    "Pontapé de baliza"
+  ],
+  [
+    "A defender last touches the ball before it crosses their goal line outside the goal. What follows?",
+    "Ein Verteidiger berührt zuletzt, bevor der Ball außerhalb des Tors die eigene Torlinie überquert. Was folgt?",
+    "A Verteidiger berührt zuletzt, bevor da Ball außerhalb vom Tor über d eigene Torlinie geht. Was folgt?",
+    "수비수의 마지막 터치 후 공이 골 바깥에서 자기 골라인을 넘습니다. 어떻게 재개하나요?",
+    "Защитник коснулся последним перед выходом за свою линию ворот вне ворот. Что дальше?",
+    "Último toque de un defensa y balón fuera por su línea de meta, sin gol. ¿Qué sigue?",
+    "Último toque de um defesa e bola fora pela sua linha de baliza, sem golo. O que segue?"
+  ],
+  [
+    "Corner kick",
+    "Eckstoß",
+    "Eckstoß",
+    "코너킥",
+    "Угловой",
+    "Saque de esquina",
+    "Pontapé de canto"
+  ],
+  [
+    "Throw-in",
+    "Einwurf",
+    "Einwurf",
+    "스로인",
+    "Вбрасывание",
+    "Saque de banda",
+    "Lançamento lateral"
+  ],
+  [
+    "Is a club’s Champions League trophy a national-team World Cup title?",
+    "Ist ein Champions-League-Titel eines Klubs ein Nationalteam-WM-Titel?",
+    "Is a Champions-League-Titel vom Klub a Nationalteam-WM-Titel?",
+    "클럽의 챔피언스리그 우승은 국가대표 월드컵 우승인가요?",
+    "Трофей Лиги чемпионов клуба — это титул сборной на ЧМ?",
+    "¿Una Champions de un club es un Mundial de selecciones?",
+    "Uma Champions de um clube é um Mundial de seleções?"
+  ],
+  [
+    "No, they are different competitions",
+    "Nein, es sind verschiedene Wettbewerbe",
+    "Na, des san verschiedene Wettbewerbe",
+    "아니요, 다른 대회입니다",
+    "Нет, это разные соревнования",
+    "No, son competiciones diferentes",
+    "Não, são competições diferentes"
+  ],
+  [
+    "Only for European clubs",
+    "Nur für europäische Klubs",
+    "Bloß für europäische Klubs",
+    "유럽 클럽만",
+    "Только для европейских клубов",
+    "Solo para clubes europeos",
+    "Só para clubes europeus"
+  ],
+  [
+    "Does the goalkeeper count in the numbers of a 4-3-3 formation?",
+    "Zählt der Torwart in den Zahlen einer 4-3-3-Formation mit?",
+    "Zählt da Torwart bei de Zahlen vo am 4-3-3 mit?",
+    "4-3-3 숫자에 골키퍼가 포함되나요?",
+    "Входит ли вратарь в числа схемы 4-3-3?",
+    "¿Se cuenta al portero en los números de 4-3-3?",
+    "Conta-se o guarda-redes nos números de 4-3-3?"
+  ],
+  [
+    "No; add one goalkeeper",
+    "Nein, ein Torwart kommt dazu",
+    "Na, a Torwart kommt dazu",
+    "아니요, 골키퍼 한 명을 더합니다",
+    "Нет, добавьте одного вратаря",
+    "No, se añade un portero",
+    "Não, acrescenta-se um guarda-redes"
+  ],
+  [
+    "Yes; there are only ten players",
+    "Ja, es gibt nur zehn Spieler",
+    "Ja, es gibt bloß zehn Spieler",
+    "네, 선수는 10명뿐입니다",
+    "Да, всего десять игроков",
+    "Sí, solo hay diez jugadores",
+    "Sim, só há dez jogadores"
+  ],
+  [
+    "Only in extra time",
+    "Nur in der Verlängerung",
+    "Bloß in da Verlängerung",
+    "연장전에서만",
+    "Только в дополнительное время",
+    "Solo en la prórroga",
+    "Só no prolongamento"
+  ],
+  [
+    "Why keep some players behind the ball during an attack?",
+    "Warum bleiben im Angriff Spieler hinter dem Ball?",
+    "Warum bleibn im Angriff Spieler hinterm Ball?",
+    "공격 중 일부가 공 뒤에 남는 이유는 무엇인가요?",
+    "Зачем оставлять игроков позади мяча в атаке?",
+    "¿Por qué dejar jugadores detrás del balón al atacar?",
+    "Porquê deixar jogadores atrás da bola ao atacar?"
+  ],
+  [
+    "To protect against a counterattack",
+    "Zum Schutz gegen Konter",
+    "Zum Schutz gegen Konter",
+    "역습 대비",
+    "Для защиты от контратаки",
+    "Para protegerse de una contra",
+    "Para proteger de um contra-ataque"
+  ],
+  [
+    "Because the laws demand four defenders",
+    "Die Regeln verlangen vier Verteidiger",
+    "D Regeln verlangen vier Verteidiger",
+    "규칙이 수비수 4명을 요구해서",
+    "Правила требуют четырёх защитников",
+    "Las reglas exigen cuatro defensas",
+    "As regras exigem quatro defesas"
+  ],
+  [
+    "To avoid all offside decisions",
+    "Um alle Abseitsentscheidungen zu vermeiden",
+    "Zum alle Abseitsentscheidungen vermeiden",
+    "모든 오프사이드 판정을 피하려고",
+    "Чтобы избежать всех офсайдов",
+    "Para evitar todos los fueras de juego",
+    "Para evitar todos os foras de jogo"
+  ],
+  [
+    "How many outfield players are represented by 3-5-2?",
+    "Wie viele Feldspieler zeigt 3-5-2?",
+    "Wieviel Feldspieler zeigt 3-5-2?",
+    "3-5-2는 필드 선수 몇 명인가요?",
+    "Сколько полевых игроков в 3-5-2?",
+    "¿Cuántos jugadores de campo representa 3-5-2?",
+    "Quantos jogadores de campo representa 3-5-2?"
+  ],
+  [
+    "What makes a press harder to bypass?",
+    "Was macht Pressing schwerer zu überspielen?",
+    "Was macht Pressing schwerer zum Überspielen?",
+    "어떤 압박이 더 뚫기 어렵나요?",
+    "Что делает прессинг труднее для обхода?",
+    "¿Qué dificulta superar la presión?",
+    "O que dificulta ultrapassar a pressão?"
+  ],
+  [
+    "Pressure supported by cover",
+    "Druck mit Absicherung",
+    "Druck mit Absicherung",
+    "커버가 뒷받침하는 압박",
+    "Давление со страховкой",
+    "Presión con cobertura",
+    "Pressão com cobertura"
+  ],
+  [
+    "Every player chasing the ball",
+    "Alle jagen den Ball",
+    "Alle rennen dem Ball nach",
+    "모두 공만 쫓기",
+    "Все бегут за мячом",
+    "Todos persiguiendo el balón",
+    "Todos a perseguir a bola"
+  ],
+  [
+    "The formation label alone",
+    "Nur der Formationsname",
+    "Bloß da Formationsname",
+    "포메이션 이름만",
+    "Одно название схемы",
+    "La etiqueta de formación sola",
+    "Só o nome da formação"
+  ],
+  [
+    "Which run is an overlap?",
+    "Welcher Lauf ist ein Hinterlaufen?",
+    "Welcher Lauf is a Hinterlaufen?",
+    "어떤 달리기가 오버랩인가요?",
+    "Какое движение является забеганием снаружи?",
+    "¿Qué carrera es un desdoblamiento?",
+    "Que corrida é uma sobreposição?"
+  ],
+  [
+    "Outside and beyond the ball carrier",
+    "Außen am Ballführer vorbei nach vorn",
+    "Außen am Ballführer vorbei nach vorn",
+    "공 소유자 바깥으로 앞질러 달리기",
+    "Снаружи и вперёд мимо игрока с мячом",
+    "Por fuera y más allá del portador",
+    "Por fora e além do portador"
+  ],
+  [
+    "Always through the centre",
+    "Immer durchs Zentrum",
+    "Immer durch d Mittn",
+    "항상 중앙으로",
+    "Всегда через центр",
+    "Siempre por el centro",
+    "Sempre pelo centro"
+  ],
+  [
+    "A goalkeeper taking a goal kick",
+    "Torwart beim Abstoß",
+    "Torwart beim Abstoß",
+    "골키퍼의 골킥",
+    "Вратарь выполняет удар от ворот",
+    "Portero sacando de meta",
+    "Guarda-redes num pontapé de baliza"
+  ],
+  [
+    "Why might a winger run behind when the central forward drops?",
+    "Warum läuft ein Flügelspieler hinter die Abwehr, wenn der Mittelstürmer zurückfällt?",
+    "Warum rennt a Flügel hinter d Abwehr, wenn da Mittelstürmer zurückfällt?",
+    "중앙 공격수가 내려올 때 윙어가 뒤로 달리는 이유는 무엇인가요?",
+    "Зачем вингеру бежать за защиту, когда форвард отходит?",
+    "¿Por qué corre un extremo detrás si el delantero central baja?",
+    "Porquê correr um extremo nas costas quando o avançado central recua?"
+  ],
+  [
+    "To use space a defender leaves",
+    "Um vom Verteidiger freigegebenen Raum zu nutzen",
+    "Zum den vom Verteidiger freien Raum nutzen",
+    "수비수가 떠난 공간 활용",
+    "Чтобы использовать оставленное защитником пространство",
+    "Para usar el espacio que deja un defensa",
+    "Para usar o espaço deixado por um defesa"
+  ],
+  [
+    "Because the winger must become goalkeeper",
+    "Der Flügel muss Torwart werden",
+    "Da Flügel muss Torwart werden",
+    "윙어가 골키퍼가 되어야 해서",
+    "Потому что вингер должен стать вратарём",
+    "Porque debe convertirse en portero",
+    "Porque deve tornar-se guarda-redes"
+  ],
+  [
+    "To make every pass onside",
+    "Damit jeder Pass ohne Abseits ist",
+    "Damit jeder Pass ohne Abseits is",
+    "모든 패스를 온사이드로 만들려고",
+    "Чтобы каждый пас был без офсайда",
+    "Para que todo pase sea legal",
+    "Para que todos os passes sejam legais"
+  ],
+  [
+    "Beyond the line",
+    "Vor der Linie",
+    "Vor da Linie",
+    "선 앞쪽",
+    "За линией",
+    "Más allá de la línea",
+    "Além da linha"
+  ],
+  [
+    "Level, then running behind",
+    "Gleiche Höhe, dann Lauf dahinter",
+    "Gleiche Höh, dann Lauf dahinter",
+    "같은 선에서 시작해 앞질러 달리기",
+    "На линии, затем забегание",
+    "A la altura, luego carrera detrás",
+    "Alinhado, depois corrida nas costas"
+  ],
+  [
+    "Behind the ball",
+    "Hinter dem Ball",
+    "Hinterm Ball",
+    "공 뒤쪽",
+    "Позади мяча",
+    "Detrás del balón",
+    "Atrás da bola"
+  ],
+  [
+    "Goalkeeper advanced",
+    "Torwart vorgerückt",
+    "Torwart vorgrückt",
+    "전진한 골키퍼",
+    "Вратарь вышел вперёд",
+    "Portero adelantado",
+    "Guarda-redes adiantado"
+  ],
+  [
+    "No involvement",
+    "Keine Beteiligung",
+    "Koa Beteiligung",
+    "관여 없음",
+    "Без участия",
+    "Sin intervención",
+    "Sem intervenção"
+  ],
+  [
+    "Direct throw-in",
+    "Direkter Einwurf",
+    "Direkter Einwurf",
+    "직접 스로인",
+    "Прямое вбрасывание",
+    "Recepción directa de banda",
+    "Receção direta de lateral"
+  ],
+  [
+    "In own half",
+    "In eigener Hälfte",
+    "In da eigenen Hälfte",
+    "자기 진영",
+    "На своей половине",
+    "En campo propio",
+    "No próprio meio-campo"
+  ],
+  [
+    "Deflection or save",
+    "Ablenkung oder Torabwehr",
+    "Ablenkung oder Torabwehr",
+    "굴절 또는 세이브",
+    "Рикошет или спасение",
+    "Desvío o parada",
+    "Desvio ou defesa"
+  ],
+  [
+    "Controlled deliberate play",
+    "Kontrolliertes bewusstes Spielen",
+    "Kontrolliertes bewusstes Spielen",
+    "통제된 의도적 플레이",
+    "Контролируемая осознанная игра",
+    "Juego deliberado controlado",
+    "Jogo deliberado controlado"
+  ],
+  [
+    "The attacker was beyond both references at the pass and becomes involved. Indirect free kick.",
+    "Der Angreifer war beim Pass vor beiden Referenzen und beteiligt sich. Indirekter Freistoß.",
+    "Da Angreifer war beim Pass vor beiden Referenzen und beteiligt si. Indirekter Freistoß.",
+    "패스 때 두 기준보다 앞에 있던 공격수가 관여합니다. 간접프리킥입니다.",
+    "Нападающий был дальше обеих границ при пасе и участвует. Свободный удар.",
+    "El atacante superaba ambas referencias al pase e interviene. Libre indirecto.",
+    "O atacante superava ambas as referências no passe e intervém. Livre indireto."
+  ],
+  [
+    "At the pass, the attacker is level, behind the ball or opponent, or in their own half.",
+    "Beim Pass ist der Angreifer auf gleicher Höhe, hinter Ball oder Gegner oder in der eigenen Hälfte.",
+    "Beim Pass is da Angreifer auf gleicher Höh, hinter Ball oder Gegner oder in da eigenen Hälfte.",
+    "패스 때 같은 선, 공이나 상대 뒤, 또는 자기 진영입니다.",
+    "При пасе нападающий на линии, позади мяча или соперника либо на своей половине.",
+    "Al pase está a la altura, detrás del balón o rival, o en su campo.",
+    "No passe está alinhado, atrás da bola ou rival, ou no seu meio-campo."
+  ],
+  [
+    "Offside position alone is not an offence; this player does not affect play or an opponent.",
+    "Abseitsposition allein ist kein Vergehen; dieser Spieler beeinflusst weder Spiel noch Gegner.",
+    "Abseitsposition allein is koa Vergehen; der Spieler beeinflusst weder Spiel no Gegner.",
+    "위치만으로는 반칙이 아닙니다. 이 선수는 플레이나 상대에 영향을 주지 않습니다.",
+    "Позиция офсайда не нарушение: игрок не влияет на игру или соперника.",
+    "La posición sola no es infracción; el jugador no afecta al juego ni al rival.",
+    "A posição por si só não é infração; o jogador não afeta o jogo nem o rival."
+  ],
+  [
+    "Direct receipt from this restart has no offside offence.",
+    "Direkter Empfang aus dieser Spielfortsetzung ist ohne Abseitsvergehen.",
+    "Direkt aus der Spielfortsetzung gibt's koa Abseitsvergehen.",
+    "이 재개에서 직접 받으면 오프사이드 반칙이 없습니다.",
+    "Прямое получение с этого возобновления не даёт офсайда.",
+    "Recibir directamente de esta reanudación no es fuera de juego.",
+    "Receber diretamente deste recomeço não é fora de jogo."
+  ],
+  [
+    "Controlled deliberate play by an opponent resets this offside phase; a save does not.",
+    "Kontrolliertes bewusstes Gegnerspiel setzt diese Phase zurück; eine Torabwehr nicht.",
+    "Kontrolliertes bewusstes Gegnerspiel setzt de Phase zurück; a Torabwehr ned.",
+    "상대의 통제된 의도적 플레이는 초기화하며 세이브는 아닙니다.",
+    "Осознанная контролируемая игра соперника сбрасывает фазу; спасение — нет.",
+    "El juego deliberado controlado del rival reinicia la fase; una parada no.",
+    "O jogo deliberado controlado do rival reinicia a fase; uma defesa não."
+  ],
+  [
+    "Normal team-mate pass",
+    "Normaler Mitspielerpass",
+    "Normaler Mitspielerpass",
+    "일반 동료 패스",
+    "Обычный пас партнёра",
+    "Pase normal de compañero",
+    "Passe normal de colega"
+  ],
+  [
+    "Free kick",
+    "Freistoß",
+    "Freistoß",
+    "프리킥",
+    "Свободный или штрафной удар",
+    "Tiro libre",
+    "Livre"
+  ],
+  [
+    "No opponent touch",
+    "Keine Gegnerberührung",
+    "Koa Gegnerberührung",
+    "상대 터치 없음",
+    "Без касания соперника",
+    "Sin toque rival",
+    "Sem toque adversário"
+  ],
+  [
+    "Deflection",
+    "Ablenkung",
+    "Ablenkung",
+    "굴절",
+    "Рикошет",
+    "Desvío",
+    "Desvio"
+  ],
+  [
+    "Deliberate save",
+    "Bewusste Torabwehr",
+    "Bewusste Torabwehr",
+    "의도적 세이브",
+    "Намеренное спасение",
+    "Parada deliberada",
+    "Defesa deliberada"
+  ],
+  [
+    "Throw-in to the other team",
+    "Einwurf für das andere Team",
+    "Einwurf fürs andere Team",
+    "상대 팀 스로인",
+    "Вбрасывание другой команде",
+    "Banda para el otro equipo",
+    "Lateral para a outra equipa"
+  ],
+  [
+    "Goalkeeper",
+    "Torwart",
+    "Torwart",
+    "골키퍼",
+    "Вратарь",
+    "Portero",
+    "Guarda-redes"
+  ],
+  [
+    "Defender",
+    "Verteidiger",
+    "Verteidiger",
+    "수비수",
+    "Защитник",
+    "Defensa",
+    "Defesa"
+  ],
+  [
+    "Midfielder",
+    "Mittelfeldspieler",
+    "Mittelfeldspieler",
+    "미드필더",
+    "Полузащитник",
+    "Centrocampista",
+    "Médio"
+  ],
+  [
+    "Forward",
+    "Stürmer",
+    "Stürmer",
+    "공격수",
+    "Нападающий",
+    "Delantero",
+    "Avançado"
+  ],
+  [
+    "Bundesliga titles since 1963",
+    "Bundesliga-Titel seit 1963",
+    "Bundesliga-Titel seit 1963",
+    "1963년 이후 분데스리가 우승",
+    "Титулы Бундеслиги с 1963",
+    "Títulos de Bundesliga desde 1963",
+    "Títulos da Bundesliga desde 1963"
+  ],
+  [
+    "Excludes the 1932 German championship; Bundesliga began in 1963.",
+    "Ohne deutsche Meisterschaft 1932; die Bundesliga begann 1963.",
+    "Ohne deutsche Meisterschaft 1932; d Bundesliga fing 1963 an.",
+    "1932년 독일 우승 제외. 분데스리가는 1963년 시작.",
+    "Без чемпионства Германии 1932; Бундеслига началась в 1963.",
+    "Excluye el campeonato alemán de 1932; Bundesliga empezó en 1963.",
+    "Exclui o campeonato alemão de 1932; a Bundesliga começou em 1963."
+  ],
+  [
+    "English top-flight titles",
+    "Englische Erstligatitel",
+    "Englische Erstligatitel",
+    "잉글랜드 최상위 리그 우승",
+    "Титулы высшей лиги Англии",
+    "Títulos ingleses de primera división",
+    "Títulos ingleses da primeira divisão"
+  ],
+  [
+    "Includes 18 First Division titles and two Premier League titles through 2024/25.",
+    "Enthält 18 First-Division- und zwei Premier-League-Titel bis 2024/25.",
+    "Enthält 18 First-Division- und zwoa Premier-League-Titel bis 2024/25.",
+    "2024/25까지 퍼스트 디비전 18회, 프리미어리그 2회 포함.",
+    "Включает 18 First Division и два Premier League до 2024/25.",
+    "Incluye 18 de First Division y dos de Premier League hasta 2024/25.",
+    "Inclui 18 da First Division e dois da Premier League até 2024/25."
+  ],
+  [
+    "Spanish top-flight titles",
+    "Spanische Erstligatitel",
+    "Spanische Erstligatitel",
+    "스페인 최상위 리그 우승",
+    "Титулы высшей лиги Испании",
+    "Títulos españoles de primera división",
+    "Títulos espanhóis da primeira divisão"
+  ],
+  [
+    "Italian championship titles",
+    "Italienische Meisterschaften",
+    "Italienische Meisterschaften",
+    "이탈리아 리그 우승",
+    "Чемпионства Италии",
+    "Campeonatos italianos",
+    "Campeonatos italianos"
+  ],
+  [
+    "Uses the league organiser’s 36 recognised titles; excludes revoked or unassigned championships.",
+    "Zählt die 36 vom Ligaveranstalter anerkannten Titel; entzogene oder nicht vergebene Meisterschaften sind ausgeschlossen.",
+    "Zählt de 36 vom Ligaveranstalter anerkannten Titel; entzogene oder ned vergebene Meisterschaften san draußen.",
+    "리그 주최자가 인정한 36회만 집계하며 박탈·미배정 우승은 제외합니다.",
+    "Учтены 36 признанных лигой титулов; отозванные или неприсвоенные исключены.",
+    "Usa 36 títulos reconocidos por la liga; excluye los revocados o no asignados.",
+    "Usa 36 títulos reconhecidos pela liga; exclui os revogados ou não atribuídos."
+  ],
+  [
+    "French top-flight titles",
+    "Französische Erstligatitel",
+    "Französische Erstligatitel",
+    "프랑스 최상위 리그 우승",
+    "Титулы высшей лиги Франции",
+    "Títulos franceses de primera división",
+    "Títulos franceses da primeira divisão"
+  ],
+  [
+    "Portuguese league titles",
+    "Portugiesische Ligatitel",
+    "Portugiesische Ligatitel",
+    "포르투갈 리그 우승",
+    "Титулы лиги Португалии",
+    "Títulos de liga portuguesa",
+    "Títulos da liga portuguesa"
+  ],
+  [
+    "Taça de Portugal is distinct from the former Campeonato de Portugal competition.",
+    "Taça de Portugal ist ein anderer Wettbewerb als der frühere Campeonato de Portugal.",
+    "Taça de Portugal is was anderes als da frühere Campeonato de Portugal.",
+    "타사 드 포르투갈은 과거 캄페오나투 드 포르투갈과 별개입니다.",
+    "Taça de Portugal отличается от прежнего Campeonato de Portugal.",
+    "Taça de Portugal es distinta del antiguo Campeonato de Portugal.",
+    "A Taça de Portugal é distinta do antigo Campeonato de Portugal."
+  ],
+  [
+    "Brazil",
+    "Brasilien",
+    "Brasilien",
+    "브라질",
+    "Бразилия",
+    "Brasil",
+    "Brasil"
+  ],
+  [
+    "Germany",
+    "Deutschland",
+    "Deutschland",
+    "독일",
+    "Германия",
+    "Alemania",
+    "Alemanha"
+  ],
+  [
+    "Italy",
+    "Italien",
+    "Italien",
+    "이탈리아",
+    "Италия",
+    "Italia",
+    "Itália"
+  ],
+  [
+    "Argentina",
+    "Argentinien",
+    "Argentinien",
+    "아르헨티나",
+    "Аргентина",
+    "Argentina",
+    "Argentina"
+  ],
+  [
+    "France",
+    "Frankreich",
+    "Frankreich",
+    "프랑스",
+    "Франция",
+    "Francia",
+    "França"
+  ],
+  [
+    "Uruguay",
+    "Uruguay",
+    "Uruguay",
+    "우루과이",
+    "Уругвай",
+    "Uruguay",
+    "Uruguai"
+  ],
+  [
+    "Spain",
+    "Spanien",
+    "Spanien",
+    "스페인",
+    "Испания",
+    "España",
+    "Espanha"
+  ],
+  [
+    "England",
+    "England",
+    "England",
+    "잉글랜드",
+    "Англия",
+    "Inglaterra",
+    "Inglaterra"
+  ],
+  [
+    "United States",
+    "Vereinigte Staaten",
+    "Vereinigte Staaten",
+    "미국",
+    "США",
+    "Estados Unidos",
+    "Estados Unidos"
+  ],
+  [
+    "Norway",
+    "Norwegen",
+    "Norwegen",
+    "노르웨이",
+    "Норвегия",
+    "Noruega",
+    "Noruega"
+  ],
+  [
+    "Japan",
+    "Japan",
+    "Japan",
+    "일본",
+    "Япония",
+    "Japón",
+    "Japão"
+  ],
+  [
+    "Tenor clef",
+    "Tenorschlüssel",
+    "Tenorschlissl",
+    "테너음자리표",
+    "Теноровый ключ",
+    "Clave de do en cuarta",
+    "Clave de dó na quarta linha"
+  ],
+  [
+    "Piano",
+    "Klavier",
+    "Klavier",
+    "피아노",
+    "Фортепиано",
+    "Piano",
+    "Piano"
+  ],
+  [
+    "Grand staff: treble above bass; both sound as written.",
+    "Doppelsystem: Violin über Bass; beide klingen wie notiert.",
+    "Doppelsystem: Violin über Bass; beide klingen wia notiert.",
+    "큰보표: 높은음자리 위, 낮은음자리 아래. 모두 기보대로 소리 납니다.",
+    "Большой стан: скрипичный над басовым; звучат как записано.",
+    "Sistema doble: sol sobre fa; ambos suenan como se escriben.",
+    "Sistema duplo: sol sobre fá; ambos soam como escritos."
+  ],
+  [
+    "Violin",
+    "Violine",
+    "Geign",
+    "바이올린",
+    "Скрипка",
+    "Violín",
+    "Violino"
+  ],
+  [
+    "Treble clef; sounds as written.",
+    "Violinschlüssel; klingt wie notiert.",
+    "Violinschlissl; klingt wia notiert.",
+    "높은음자리표. 기보대로 소리 납니다.",
+    "Скрипичный ключ; звучит как записано.",
+    "Clave de sol; suena como se escribe.",
+    "Clave de sol; soa como escrito."
+  ],
+  [
+    "Flute",
+    "Flöte",
+    "Flötn",
+    "플루트",
+    "Флейта",
+    "Flauta",
+    "Flauta"
+  ],
+  [
+    "Viola",
+    "Bratsche",
+    "Bratschn",
+    "비올라",
+    "Альт",
+    "Viola",
+    "Viola"
+  ],
+  [
+    "Alto clef: middle line C4; sounds as written.",
+    "Altschlüssel: C4 auf der mittleren Linie; klingt wie notiert.",
+    "Altschlissl: C4 auf da Mittellinie; klingt wia notiert.",
+    "가온음자리표: 가운데 선 C4. 기보대로 소리 납니다.",
+    "Альтовый ключ: C4 на средней линии; звучит как записано.",
+    "Do en tercera: C4 en línea central; suena como escrito.",
+    "Dó na terceira: C4 na linha central; soa como escrito."
+  ],
+  [
+    "Cello",
+    "Cello",
+    "Cello",
+    "첼로",
+    "Виолончель",
+    "Violonchelo",
+    "Violoncelo"
+  ],
+  [
+    "Usually bass clef; higher parts can use tenor or treble.",
+    "Meist Bassschlüssel; höhere Stellen können Tenor oder Violin nutzen.",
+    "Meist Bassschlissl; weiter oben aa Tenor oder Violin.",
+    "주로 낮은음자리표. 높은 부분은 테너·높은음자리표도 사용합니다.",
+    "Обычно басовый ключ; выше возможны теноровый или скрипичный.",
+    "Normalmente fa; pasajes altos pueden usar do en cuarta o sol.",
+    "Normalmente fá; passagens agudas podem usar dó na quarta ou sol."
+  ],
+  [
+    "Guitar",
+    "Gitarre",
+    "Gitarr",
+    "기타",
+    "Гитара",
+    "Guitarra",
+    "Guitarra"
+  ],
+  [
+    "Treble clef; sounds one octave below the written pitch. TAB lines represent strings.",
+    "Violinschlüssel; klingt eine Oktave tiefer. TAB-Linien zeigen Saiten.",
+    "Violinschlissl; klingt a Oktav tiefer. TAB-Linien zeigen Saitn.",
+    "높은음자리표보다 한 옥타브 낮게 소리 납니다. TAB 선은 줄입니다.",
+    "Скрипичный ключ; звучит на октаву ниже. Линии TAB — струны.",
+    "Clave de sol; suena una octava abajo. Las líneas TAB son cuerdas.",
+    "Clave de sol; soa uma oitava abaixo. As linhas TAB são cordas."
+  ],
+  [
+    "Electric bass",
+    "E-Bass",
+    "E-Bass",
+    "일렉트릭 베이스",
+    "Электробас",
+    "Bajo eléctrico",
+    "Baixo elétrico"
+  ],
+  [
+    "Bass clef; sounds one octave below the written pitch.",
+    "Bassschlüssel; klingt eine Oktave tiefer als notiert.",
+    "Bassschlissl; klingt a Oktav tiefer als notiert.",
+    "낮은음자리표보다 한 옥타브 낮게 소리 납니다.",
+    "Басовый ключ; звучит на октаву ниже записи.",
+    "Clave de fa; suena una octava abajo de lo escrito.",
+    "Clave de fá; soa uma oitava abaixo do escrito."
+  ],
+  [
+    "B-flat clarinet",
+    "B♭-Klarinette",
+    "B♭-Klarinettn",
+    "B♭ 클라리넷",
+    "Кларнет B♭",
+    "Clarinete en B♭",
+    "Clarinete em B♭"
+  ],
+  [
+    "Treble clef; sounds two semitones below the written pitch.",
+    "Violinschlüssel; klingt zwei Halbtöne tiefer als notiert.",
+    "Violinschlissl; klingt zwoa Halbtön tiefer als notiert.",
+    "높은음자리표보다 2반음 낮게 소리 납니다.",
+    "Скрипичный ключ; звучит на два полутона ниже записи.",
+    "Clave de sol; suena dos semitonos abajo de lo escrito.",
+    "Clave de sol; soa dois semitons abaixo do escrito."
+  ],
+  [
+    "E-flat alto saxophone",
+    "E♭-Altsaxofon",
+    "E♭-Altsaxofon",
+    "E♭ 알토 색소폰",
+    "Альт-саксофон E♭",
+    "Saxo alto en E♭",
+    "Saxofone alto em E♭"
+  ],
+  [
+    "Treble clef; sounds nine semitones below the written pitch.",
+    "Violinschlüssel; klingt neun Halbtöne tiefer als notiert.",
+    "Violinschlissl; klingt neun Halbtön tiefer als notiert.",
+    "높은음자리표보다 9반음 낮게 소리 납니다.",
+    "Скрипичный ключ; звучит на девять полутонов ниже записи.",
+    "Clave de sol; suena nueve semitonos abajo de lo escrito.",
+    "Clave de sol; soa nove semitons abaixo do escrito."
+  ],
+  [
+    "Drum kit",
+    "Schlagzeug",
+    "Schlagzeug",
+    "드럼 세트",
+    "Ударная установка",
+    "Batería",
+    "Bateria"
+  ],
+  [
+    "Unpitched notation: follow the score legend. This demo uses kick, snare, and hi-hat.",
+    "Unbestimmte Tonhöhen: Lies die Legende. Hier Bassdrum, Snare und Hi-Hat.",
+    "Unbestimmte Tonhöhen: Lies d Legende. Hier Bassdrum, Snare und Hi-Hat.",
+    "무율 타악보: 범례를 따르세요. 여기서는 킥, 스네어, 하이햇입니다.",
+    "Без определённой высоты: читайте легенду. Здесь бочка, малый барабан и хай-хэт.",
+    "Notación sin altura: sigue la leyenda. Aquí bombo, caja y charles.",
+    "Notação sem altura: segue a legenda. Aqui bombo, tarola e prato de choque."
+  ],
+  [
+    "Four steady quarters",
+    "Vier gleichmäßige Viertel",
+    "Vier gleichmäßige Viertel",
+    "일정한 4분음표 네 개",
+    "Четыре ровные четверти",
+    "Cuatro negras regulares",
+    "Quatro semínimas regulares"
+  ],
+  [
+    "Quarter-note beats",
+    "Viertelschläge",
+    "Viertelschläg",
+    "4분음표 기준 박",
+    "Четвертные доли",
+    "Pulsos de negra",
+    "Tempos de semínima"
+  ],
+  [
+    "Eighth notes and a rest",
+    "Achtel und eine Pause",
+    "Achtel und a Pause",
+    "8분음표와 쉼표",
+    "Восьмые и пауза",
+    "Corcheas y un silencio",
+    "Colcheias e uma pausa"
+  ],
+  [
+    "Dotted quarter and eighth",
+    "Punktiertes Viertel und Achtel",
+    "Punktiertes Viertel und Achtel",
+    "점4분음표와 8분음표",
+    "Четверть с точкой и восьмая",
+    "Negra con puntillo y corchea",
+    "Semínima pontuada e colcheia"
+  ],
+  [
+    "Quarter tied to an eighth",
+    "Viertel mit Haltebogen zum Achtel",
+    "Viertel mit Haltebogn zum Achtel",
+    "4분음표와 8분음표 붙임줄",
+    "Четверть, связанная с восьмой",
+    "Negra ligada a corchea",
+    "Semínima ligada a colcheia"
+  ],
+  [
+    "Three quarter beats",
+    "Drei Viertelschläge",
+    "Drei Viertelschläg",
+    "4분음표 세 박",
+    "Три четвертные доли",
+    "Tres pulsos de negra",
+    "Três tempos de semínima"
+  ],
+  [
+    "Two dotted-quarter groups",
+    "Zwei punktierte Viertelgruppen",
+    "Zwoa punktierte Viertelgruppen",
+    "점4분음표 두 묶음",
+    "Две группы четверти с точкой",
+    "Dos grupos de negra con puntillo",
+    "Dois grupos de semínima pontuada"
+  ],
+  [
+    "Dotted-quarter beats",
+    "Punktierte Viertelschläge",
+    "Punktierte Viertelschläg",
+    "점4분음표 기준 박",
+    "Доли четверти с точкой",
+    "Pulsos de negra con puntillo",
+    "Tempos de semínima pontuada"
+  ],
+  [
+    "Read the explanation, change a visual situation, then practice and explain the result. Reading and solved exercises are tracked separately.",
+    "Lies die Erklärung, ändere eine visuelle Situation und übe mit eigener Begründung. Lesen und gelöste Übungen werden getrennt gespeichert.",
+    "Lies d Erklärung, änder a Bildsituation und üb mit eigener Begründung. Lesen und glöste Übungen werden getrennt gspeichert.",
+    "설명을 읽고 시각적 상황을 바꾼 뒤 연습하며 이유를 설명하세요. 읽음과 문제 해결은 따로 기록됩니다.",
+    "Прочтите объяснение, измените схему, попрактикуйтесь и объясните результат. Чтение и упражнения учитываются отдельно.",
+    "Lee la explicación, cambia una situación visual, practica y explica el resultado. Lectura y ejercicios se registran por separado.",
+    "Lê a explicação, altera uma situação visual, pratica e explica o resultado. Leitura e exercícios são registados separadamente."
+  ],
+  [
+    "Offside replay",
+    "Abseits-Wiedergabe",
+    "Abseits-Wiedergab",
+    "오프사이드 재생",
+    "Повтор офсайда",
+    "Repetición de fuera de juego",
+    "Repetição de fora de jogo"
+  ],
+  [
+    "Freeze the pass. Then follow the play.",
+    "Halte beim Pass an. Verfolge dann das Spiel.",
+    "Halt beim Pass an. Schau dann, wia's weitergeht.",
+    "패스 순간을 고정한 뒤 플레이를 따라가세요.",
+    "Замрите при пасе. Затем следите за игрой.",
+    "Congela el pase. Luego sigue la jugada.",
+    "Congela o passe. Depois segue a jogada."
+  ],
+  [
+    "Situation",
+    "Situation",
+    "Situation",
+    "상황",
+    "Ситуация",
+    "Situación",
+    "Situação"
+  ],
+  [
+    "Attacker at the pass",
+    "Angreifer beim Pass",
+    "Angreifer beim Pass",
+    "패스 순간 공격수",
+    "Нападающий при пасе",
+    "Atacante al pase",
+    "Atacante no passe"
+  ],
+  [
+    "Ball at the pass",
+    "Ball beim Pass",
+    "Ball beim Pass",
+    "패스 순간 공",
+    "Мяч при пасе",
+    "Balón al pase",
+    "Bola no passe"
+  ],
+  [
+    "Second-last opponent",
+    "Vorletzter Gegner",
+    "Vorletzter Gegner",
+    "뒤에서 두 번째 상대",
+    "Предпоследний соперник",
+    "Penúltimo adversario",
+    "Penúltimo adversário"
+  ],
+  [
+    "Origin",
+    "Ursprung",
+    "Ursprung",
+    "출처",
+    "Источник",
+    "Origen",
+    "Origem"
+  ],
+  [
+    "Opponent contact after the pass",
+    "Gegnerkontakt nach dem Pass",
+    "Gegnerkontakt nachm Pass",
+    "패스 이후 상대 터치",
+    "Касание соперника после паса",
+    "Contacto rival tras el pase",
+    "Contacto adversário após o passe"
+  ],
+  [
+    "Attacker becomes involved",
+    "Angreifer beteiligt sich",
+    "Angreifer beteiligt si",
+    "공격수가 관여함",
+    "Нападающий участвует",
+    "El atacante interviene",
+    "O atacante intervém"
+  ],
+  [
+    "Offside situation, attacking to the right",
+    "Abseitssituation mit Angriff nach rechts",
+    "Abseitssituation mit Angriff nach rechts",
+    "오른쪽으로 공격하는 오프사이드 상황",
+    "Офсайд при атаке вправо",
+    "Fuera de juego atacando a la derecha",
+    "Fora de jogo atacando à direita"
+  ],
+  [
+    "Attack direction",
+    "Angriffsrichtung",
+    "Angriffsrichtung",
+    "공격 방향",
+    "Направление атаки",
+    "Dirección de ataque",
+    "Direção do ataque"
+  ],
+  [
+    "A = attacker · P = passer · D = opponent · GK = goalkeeper. R = receiving team-mate. Faded A marks the position at the pass; the dashed line is frozen at that moment.",
+    "A = Angreifer · P = Passgeber · D = Gegner · GK = Torwart. R = empfangender Mitspieler. Das blasse A zeigt die Passposition; die gestrichelte Linie bleibt dort eingefroren.",
+    "A = Angreifer · P = Passgeber · D = Gegner · GK = Torwart. R = empfangender Mitspieler. S blasse A zeigt d Passposition; d gestrichelte Linie bleibt dort stehen.",
+    "A = 공격수 · P = 패스 선수 · D = 상대 · GK = 골키퍼. R = 공을 받는 동료. 흐린 A는 패스 순간 위치이며 점선도 그 순간에 고정됩니다.",
+    "A = нападающий · P = пасующий · D = соперник · GK = вратарь. R = принимающий партнёр. Бледная A — позиция при пасе; пунктир зафиксирован в этот момент.",
+    "A = atacante · P = pasador · D = rival · GK = portero. R = compañero receptor. La A tenue marca la posición al pase; la línea queda congelada en ese instante.",
+    "A = atacante · P = passador · D = rival · GK = guarda-redes. R = colega recetor. O A esbatido marca a posição no passe; a linha fica congelada nesse instante."
+  ],
+  [
+    "Play situation",
+    "Situation abspielen",
+    "Situation abspielen",
+    "상황 재생",
+    "Воспроизвести ситуацию",
+    "Reproducir jugada",
+    "Reproduzir jogada"
+  ],
+  [
+    "Freeze at pass",
+    "Beim Pass anhalten",
+    "Beim Pass anhalten",
+    "패스 순간 고정",
+    "Замереть при пасе",
+    "Congelar al pase",
+    "Congelar no passe"
+  ],
+  [
+    "Replay position",
+    "Wiedergabeposition",
+    "Wiedergabeposition",
+    "재생 위치",
+    "Позиция повтора",
+    "Posición de repetición",
+    "Posição da repetição"
+  ],
+  [
+    "Reduced motion is enabled. Use the replay slider to move through the situation.",
+    "Reduzierte Bewegung ist aktiv. Gehe mit dem Schieberegler durch die Situation.",
+    "Weniger Bewegung is aktiv. Geh mitm Regler durch d Situation.",
+    "동작 줄이기가 켜져 있습니다. 슬라이더로 상황을 단계별로 보세요.",
+    "Уменьшенное движение включено. Используйте ползунок повтора.",
+    "Movimiento reducido activo. Usa el deslizador para recorrer la jugada.",
+    "Movimento reduzido ativo. Usa o cursor para percorrer a jogada."
+  ],
+  [
+    "Offside offence on involvement",
+    "Abseitsvergehen bei Beteiligung",
+    "Abseitsvergehen bei Beteiligung",
+    "관여 시 오프사이드 반칙",
+    "Нарушение офсайда при участии",
+    "Infracción al intervenir",
+    "Infração ao intervir"
+  ],
+  [
+    "No offside offence in this situation",
+    "Kein Abseitsvergehen in dieser Situation",
+    "Koa Abseitsvergehen in der Situation",
+    "이 상황은 오프사이드 반칙 없음",
+    "Нет нарушения офсайда",
+    "Sin infracción en esta jugada",
+    "Sem infração nesta jogada"
+  ],
+  [
+    "The dots represent eligible body points. This is a simplified teaching model; contact and interference still need referee judgement.",
+    "Die Punkte zeigen relevante Körperstellen. Dieses vereinfachte Lernmodell ersetzt keine Schiedsrichterbeurteilung von Kontakt und Beeinflussung.",
+    "D Punkte zeigen relevante Körperstellen. Des vereinfachte Lernmodell ersetzt koa Schiedsrichterbeurteilung vo Kontakt und Beeinflussung.",
+    "점은 유효한 신체 지점입니다. 단순화된 학습 모델이며 접촉과 방해는 심판의 판단이 필요합니다.",
+    "Точки обозначают учитываемые части тела. Это упрощённая учебная модель; контакт и влияние оценивает судья.",
+    "Los puntos representan partes válidas del cuerpo. Es un modelo simplificado; contacto e interferencia requieren juicio arbitral.",
+    "Os pontos representam partes válidas do corpo. É um modelo simplificado; contacto e interferência exigem avaliação arbitral."
+  ],
+  [
+    "Boundary replay",
+    "Grenzlinien-Wiedergabe",
+    "Grenzlinien-Wiedergab",
+    "경계선 재생",
+    "Повтор пересечения границы",
+    "Repetición de límite",
+    "Repetição de limite"
+  ],
+  [
+    "The whole ball must cross the line",
+    "Der ganze Ball muss über die Linie",
+    "Da ganze Ball muss über d Linie",
+    "공 전체가 선을 넘어야 합니다",
+    "Весь мяч должен пересечь линию",
+    "Todo el balón debe cruzar la línea",
+    "Toda a bola tem de cruzar a linha"
+  ],
+  [
+    "Boundary",
+    "Grenze",
+    "Grenze",
+    "경계",
+    "Граница",
+    "Límite",
+    "Limite"
+  ],
+  [
+    "Touchline",
+    "Seitenlinie",
+    "Seitenlinie",
+    "터치라인",
+    "Боковая линия",
+    "Línea de banda",
+    "Linha lateral"
+  ],
+  [
+    "Goal line outside the goal",
+    "Torlinie außerhalb des Tors",
+    "Torlinie außerhalb vom Tor",
+    "골 바깥의 골라인",
+    "Линия ворот вне ворот",
+    "Línea de meta fuera de la portería",
+    "Linha de baliza fora da baliza"
+  ],
+  [
+    "Last touch",
+    "Letzte Berührung",
+    "Letzte Berührung",
+    "마지막 터치",
+    "Последнее касание",
+    "Último toque",
+    "Último toque"
+  ],
+  [
+    "Attacker",
+    "Angreifer",
+    "Angreifer",
+    "공격수",
+    "Атакующий",
+    "Atacante",
+    "Atacante"
+  ],
+  [
+    "Ball crossing a boundary",
+    "Ball überquert eine Grenze",
+    "Ball geht über a Grenze",
+    "경계를 넘는 공",
+    "Мяч пересекает границу",
+    "Balón cruzando un límite",
+    "Bola a cruzar um limite"
+  ],
+  [
+    "Field",
+    "Spielfeld",
+    "Spielfeld",
+    "경기장",
+    "Поле",
+    "Campo",
+    "Campo"
+  ],
+  [
+    "Out of play",
+    "Aus dem Spiel",
+    "Ausm Spiel",
+    "아웃 오브 플레이",
+    "Вне игры",
+    "Fuera de juego del balón",
+    "Bola fora de jogo"
+  ],
+  [
+    "Move the ball",
+    "Ball bewegen",
+    "Ball bewegen",
+    "공 이동",
+    "Двигать мяч",
+    "Mueve el balón",
+    "Move a bola"
+  ],
+  [
+    "A ball overlapping the line is still in play. This diagram shows a goal-line crossing outside the goal mouth, so it cannot be a goal.",
+    "Überlappt der Ball die Linie, bleibt er im Spiel. Dieses Bild zeigt den Übergang außerhalb der Toröffnung; hier kann kein Tor entstehen.",
+    "Is da Ball no über da Linie, bleibt er im Spiel. Des Bild zeigt d Grenze außerhalb vom Tor; hier kann koa Tor entstehen.",
+    "선에 걸쳐 있으면 인플레이입니다. 그림은 골문 바깥의 골라인 통과이므로 득점이 될 수 없습니다.",
+    "Мяч, перекрывающий линию, в игре. Схема показывает пересечение вне проёма ворот, поэтому гола быть не может.",
+    "Si se solapa con la línea, sigue en juego. El dibujo muestra un cruce fuera de la boca de gol, por lo que no puede ser gol.",
+    "Se sobrepõe à linha, continua em jogo. O desenho mostra a passagem fora da boca da baliza, pelo que não pode ser golo."
+  ],
+  [
+    "A valid goal requires the whole ball between the posts and below the bar. Added time is a minimum; competition rules decide extra time and shoot-outs.",
+    "Ein gültiges Tor braucht den ganzen Ball zwischen Pfosten und unter Latte. Nachspielzeit ist ein Minimum; Verlängerung und Elfmeterschießen bestimmt der Wettbewerb.",
+    "A gültiges Tor braucht den ganzen Ball zwischen Pfosten und unter da Latte. Nachspielzeit is mindestens; Verlängerung und Elfmeterschießen legt da Wettbewerb fest.",
+    "유효한 골은 공 전체가 골대 사이와 바 아래를 넘어야 합니다. 추가시간은 최소치이며 연장전·승부차기는 대회 규정입니다.",
+    "Для гола весь мяч между стойками и под перекладиной. Добавленное время — минимум; дополнительное время и серию пенальти задаёт регламент.",
+    "Un gol válido requiere todo el balón entre postes y bajo el larguero. El añadido es mínimo; la competición decide prórroga y tandas.",
+    "Um golo válido exige toda a bola entre postes e sob a barra. O tempo adicional é mínimo; a competição decide prolongamento e desempate."
+  ],
+  [
+    "Tactics board",
+    "Taktiktafel",
+    "Taktiktafel",
+    "전술 보드",
+    "Тактическая доска",
+    "Tablero táctico",
+    "Quadro tático"
+  ],
+  [
+    "Shape, movement, and responsibilities",
+    "Form, Bewegung und Aufgaben",
+    "Form, Bewegung und Aufgaben",
+    "형태, 움직임, 역할",
+    "Форма, движение и задачи",
+    "Estructura, movimiento y funciones",
+    "Estrutura, movimento e funções"
+  ],
+  [
+    "Formation",
+    "Formation",
+    "Formation",
+    "포메이션",
+    "Расстановка",
+    "Formación",
+    "Formação"
+  ],
+  [
+    "Team phase",
+    "Teamphase",
+    "Teamphase",
+    "팀 단계",
+    "Фаза команды",
+    "Fase del equipo",
+    "Fase da equipa"
+  ],
+  [
+    "Without possession",
+    "Ohne Ballbesitz",
+    "Ohne Ballbesitz",
+    "공 미소유",
+    "Без владения",
+    "Sin posesión",
+    "Sem posse"
+  ],
+  [
+    "With possession",
+    "Mit Ballbesitz",
+    "Mit Ballbesitz",
+    "공 소유",
+    "С владением",
+    "Con posesión",
+    "Com posse"
+  ],
+  [
+    "Player to inspect",
+    "Spieler untersuchen",
+    "Spieler anschauen",
+    "살펴볼 선수",
+    "Игрок для изучения",
+    "Jugador a inspeccionar",
+    "Jogador a observar"
+  ],
+  [
+    "Formation and player movements",
+    "Formation und Spielerbewegungen",
+    "Formation und Spielerbewegungen",
+    "포메이션과 선수 움직임",
+    "Расстановка и перемещения",
+    "Formación y movimientos",
+    "Formação e movimentos"
+  ],
+  [
+    "Movement phase",
+    "Bewegungsphase",
+    "Bewegungsphase",
+    "움직임 단계",
+    "Фаза движения",
+    "Fase de movimiento",
+    "Fase do movimento"
+  ],
+  [
+    "Offer a passing option and keep support behind the ball.",
+    "Biete eine Passoption und halte Unterstützung hinter dem Ball.",
+    "Biet a Passoption und halt Unterstützung hinterm Ball.",
+    "패스 선택지와 공 뒤 지원을 제공합니다.",
+    "Предлагайте пас и поддержку позади мяча.",
+    "Ofrece pase y apoyo detrás del balón.",
+    "Oferece passe e apoio atrás da bola."
+  ],
+  [
+    "Protect space, support pressure, and cover team-mates.",
+    "Schütze Räume, unterstütze Druck und sichere Mitspieler ab.",
+    "Schütz Räume, unterstütz Druck und sicher Mitspieler ab.",
+    "공간을 지키고 압박을 지원하며 동료를 커버합니다.",
+    "Защищайте зоны, поддерживайте давление и страхуйте.",
+    "Protege espacios, apoya presión y cubre compañeros.",
+    "Protege espaços, apoia a pressão e cobre colegas."
+  ],
+  [
+    "Eleven generic players including the goalkeeper. Shapes and runs are teaching examples; they change with the opponent and the match.",
+    "Elf allgemeine Spieler samt Torwart. Formen und Läufe sind Lernbeispiele und ändern sich mit Gegner und Spielsituation.",
+    "Elf allgemeine Spieler samt Torwart. Formen und Läuf san Lernbeispiele und ändern si mit Gegner und Spielsituation.",
+    "골키퍼 포함 일반 선수 11명입니다. 형태와 달리기는 학습 예시이며 상대와 경기에 따라 달라집니다.",
+    "Одиннадцать условных игроков с вратарём. Схемы и движения — учебные примеры, меняются с соперником и матчем.",
+    "Once jugadores genéricos con portero. Formas y carreras son ejemplos que cambian con rival y partido.",
+    "Onze jogadores genéricos com guarda-redes. Formas e corridas são exemplos que mudam com o adversário e jogo."
+  ],
+  [
+    "Trophy explorer",
+    "Titel-Explorer",
+    "Titel-Explorer",
+    "트로피 탐색기",
+    "Обозреватель трофеев",
+    "Explorador de trofeos",
+    "Explorador de troféus"
+  ],
+  [
+    "Clubs, domestic competitions, and World Cups",
+    "Klubs, heimische Wettbewerbe und Weltmeisterschaften",
+    "Klubs, heimische Wettbewerbe und Weltmeisterschaften",
+    "클럽, 국내 대회, 월드컵",
+    "Клубы, внутренние турниры и ЧМ",
+    "Clubes, competiciones nacionales y Mundiales",
+    "Clubes, competições nacionais e Mundiais"
+  ],
+  [
+    "Records",
+    "Statistiken",
+    "Statistiken",
+    "기록",
+    "Записи",
+    "Registros",
+    "Registos"
+  ],
+  [
+    "Men’s club honours through 2024/25",
+    "Männer-Klubtitel bis 2024/25",
+    "Männer-Klubtitel bis 2024/25",
+    "남자 클럽 우승: 2024/25까지",
+    "Мужские клубные титулы до 2024/25",
+    "Títulos de clubes masculinos hasta 2024/25",
+    "Títulos de clubes masculinos até 2024/25"
+  ],
+  [
+    "Men’s World Cups through 2026",
+    "Männer-Weltmeisterschaften bis 2026",
+    "Männer-Weltmeisterschaften bis 2026",
+    "남자 월드컵: 2026년까지",
+    "Мужские ЧМ до 2026",
+    "Mundiales masculinos hasta 2026",
+    "Mundiais masculinos até 2026"
+  ],
+  [
+    "Women’s World Cups through 2023",
+    "Frauen-Weltmeisterschaften bis 2023",
+    "Frauen-Weltmeisterschaften bis 2023",
+    "여자 월드컵: 2023년까지",
+    "Женские ЧМ до 2023",
+    "Mundiales femeninos hasta 2023",
+    "Mundiais femininos até 2023"
+  ],
+  [
+    "Domestic league",
+    "Heimische Liga",
+    "Heimische Liga",
+    "국내 리그",
+    "Внутренняя лига",
+    "Liga nacional",
+    "Liga nacional"
+  ],
+  [
+    "All leagues",
+    "Alle Ligen",
+    "Alle Ligen",
+    "모든 리그",
+    "Все лиги",
+    "Todas las ligas",
+    "Todas as ligas"
+  ],
+  [
+    "Find a club",
+    "Klub suchen",
+    "Klub suchen",
+    "클럽 찾기",
+    "Найти клуб",
+    "Buscar club",
+    "Procurar clube"
+  ],
+  [
+    "Club",
+    "Klub",
+    "Klub",
+    "클럽",
+    "Клуб",
+    "Club",
+    "Clube"
+  ],
+  [
+    "Selected clubs and categories only. No overall trophy total: super cups, league cups, former Cup Winners’ Cup, and club world titles are not included.",
+    "Nur ausgewählte Klubs und Kategorien. Keine Gesamttitelzahl: Supercups, Ligapokale, ehemaliger Pokalsiegerwettbewerb und Klubwelttitel sind nicht enthalten.",
+    "Bloß ausgewählte Klubs und Kategorien. Koa Gesamttitelzahl: Supercups, Ligapokale, früherer Pokalsiegerwettbewerb und Klubwelttitel san ned drin.",
+    "일부 클럽·종류만 포함합니다. 슈퍼컵, 리그컵, 과거 컵위너스컵, 클럽 세계 대회는 제외하므로 전체 트로피 합계는 아닙니다.",
+    "Только выбранные клубы и категории. Общего итога нет: суперкубки, кубки лиг, прежний Кубок кубков и мировые клубные титулы исключены.",
+    "Solo clubes y categorías seleccionados. Sin total general: se excluyen supercopas, copas de liga, antigua Recopa y títulos mundiales de clubes.",
+    "Só clubes e categorias selecionados. Sem total geral: excluem-se supertaças, taças de liga, antiga Taça das Taças e títulos mundiais de clubes."
+  ],
+  [
+    "Source",
+    "Quelle",
+    "Quelle",
+    "출처",
+    "Источник",
+    "Fuente",
+    "Fonte"
+  ],
+  [
+    "No matching clubs. Try another league or search.",
+    "Keine passenden Klubs. Ändere Liga oder Suche.",
+    "Koane passenden Klubs. Änder Liga oder Suche.",
+    "일치하는 클럽이 없습니다. 리그나 검색을 바꿔 보세요.",
+    "Нет подходящих клубов. Измените лигу или поиск.",
+    "Sin clubes coincidentes. Cambia liga o búsqueda.",
+    "Sem clubes correspondentes. Altera a liga ou pesquisa."
+  ],
+  [
+    "National team",
+    "Nationalteam",
+    "Nationalteam",
+    "국가대표",
+    "Сборная",
+    "Selección",
+    "Seleção"
+  ],
+  [
+    "Titles",
+    "Titel",
+    "Titel",
+    "우승",
+    "Титулы",
+    "Títulos",
+    "Títulos"
+  ],
+  [
+    "Winning years",
+    "Siegerjahre",
+    "Siegerjahr",
+    "우승 연도",
+    "Годы побед",
+    "Años ganadores",
+    "Anos vencedores"
+  ],
+  [
+    "Germany includes West Germany. National-team World Cups are separate from club competitions.",
+    "Deutschland enthält Westdeutschland. Nationalteam-Weltmeisterschaften sind von Klubwettbewerben getrennt.",
+    "Deutschland zählt Westdeutschland mit. Nationalteam-Weltmeisterschaften san von Klubwettbewerben getrennt.",
+    "독일은 서독을 포함합니다. 국가대표 월드컵은 클럽 대회와 별개입니다.",
+    "Германия включает ФРГ. Чемпионаты мира сборных отделены от клубных турниров.",
+    "Alemania incluye Alemania Occidental. Los Mundiales de selecciones son distintos de los torneos de clubes.",
+    "A Alemanha inclui a Alemanha Ocidental. Os Mundiais de seleções são distintos dos torneios de clubes."
+  ],
+  [
+    "Historical snapshots with explicit cutoffs. Source pages may now show newer seasons; this explorer does not update automatically.",
+    "Historische Stände mit klaren Enddaten. Quellen können inzwischen neuere Spielzeiten zeigen; der Explorer aktualisiert sich nicht automatisch.",
+    "Historische Stände mit klaren Enddaten. Quellen können inzwischen neuere Spielzeiten zeigen; da Explorer aktualisiert si ned automatisch.",
+    "종료 시점을 명시한 역사 기록입니다. 출처는 이후 시즌을 표시할 수 있으며 탐색기는 자동 갱신되지 않습니다.",
+    "Исторические срезы с явными датами. Источники могут показывать новые сезоны; автоматического обновления нет.",
+    "Datos históricos con cortes explícitos. Las fuentes pueden mostrar temporadas nuevas; el explorador no se actualiza automáticamente.",
+    "Dados históricos com cortes explícitos. As fontes podem mostrar épocas novas; o explorador não se atualiza automaticamente."
+  ],
+  [
+    "Independent educational reference. Names identify teams and competitions; no official logos, trophy images, or affiliation are used.",
+    "Unabhängige Bildungsreferenz. Namen identifizieren Teams und Wettbewerbe; keine offiziellen Logos, Trophäenbilder oder Zugehörigkeit.",
+    "Unabhängige Bildungsreferenz. Namen zeigen Teams und Wettbewerbe; koane offiziellen Logos, Trophäenbilder oder Zugehörigkeit.",
+    "독립 교육 자료입니다. 이름은 팀과 대회를 식별하며 공식 로고·트로피 이미지·제휴를 사용하지 않습니다.",
+    "Независимый учебный справочник. Названия обозначают команды и турниры; официальных логотипов, изображений кубков или связи нет.",
+    "Referencia educativa independiente. Los nombres identifican equipos y torneos; sin logos oficiales, imágenes de trofeos ni afiliación.",
+    "Referência educativa independente. Os nomes identificam equipas e torneios; sem logótipos oficiais, imagens de troféus ou afiliação."
+  ],
+  [
+    "Compare situations",
+    "Situationen vergleichen",
+    "Situationen vergleichen",
+    "상황 비교",
+    "Сравнение ситуаций",
+    "Compara situaciones",
+    "Compara situações"
+  ],
+  [
+    "Free kick and challenge situation",
+    "Freistoß- und Zweikampfsituation",
+    "Freistoß- und Zweikampfsituation",
+    "프리킥과 태클 상황",
+    "Удар и борьба",
+    "Situación de libre y entrada",
+    "Situação de livre e entrada"
+  ],
+  [
+    "The diagram illustrates the stated scenario; it cannot infer foul severity from movement alone.",
+    "Das Bild illustriert das angegebene Szenario; aus Bewegung allein lässt sich die Schwere eines Fouls nicht bestimmen.",
+    "S Bild zeigt s angegebene Szenario; bloß aus Bewegung kann ma d Schwere vom Foul ned bestimmen.",
+    "그림은 명시된 상황을 보여 줄 뿐 움직임만으로 반칙의 심각성을 판단하지 않습니다.",
+    "Схема иллюстрирует заданный сценарий; по движению нельзя определить тяжесть фола.",
+    "El dibujo ilustra el escenario indicado; el movimiento solo no determina la gravedad de una falta.",
+    "O desenho ilustra o cenário indicado; só o movimento não determina a gravidade de uma falta."
+  ],
+  [
+    "Pitch guide",
+    "Spielfeldübersicht",
+    "Spielfeldübersicht",
+    "경기장 안내",
+    "Схема поля",
+    "Guía del campo",
+    "Guia do campo"
+  ],
+  [
+    "Penalty area",
+    "Strafraum",
+    "Strafraum",
+    "페널티 구역",
+    "Штрафная площадь",
+    "Área penal",
+    "Área de penálti"
+  ],
+  [
+    "Goal area",
+    "Torraum",
+    "Torraum",
+    "골 에어리어",
+    "Площадь ворот",
+    "Área de meta",
+    "Área de baliza"
+  ],
+  [
+    "Halfway line",
+    "Mittellinie",
+    "Mittellinie",
+    "하프웨이 라인",
+    "Средняя линия",
+    "Línea central",
+    "Linha de meio-campo"
+  ],
+  [
+    "Football pitch markings",
+    "Spielfeldmarkierungen",
+    "Spielfeldmarkierungen",
+    "축구 경기장 표시",
+    "Разметка футбольного поля",
+    "Marcas del campo",
+    "Marcas do campo"
+  ],
+  [
+    "The larger box is the penalty area. Its boundary lines are part of the area.",
+    "Der größere Kasten ist der Strafraum. Seine Linien gehören dazu.",
+    "Da größere Kastn is da Strafraum. Seine Linien ghörn dazu.",
+    "큰 상자는 페널티 구역이며 경계선도 포함됩니다.",
+    "Большой прямоугольник — штрафная. Его линии входят в неё.",
+    "El rectángulo mayor es el área penal. Sus líneas pertenecen al área.",
+    "O retângulo maior é a área de penálti. As linhas pertencem à área."
+  ],
+  [
+    "The smaller box is the goal area. It is not the limit of goalkeeper handling.",
+    "Der kleinere Kasten ist der Torraum. Er ist nicht die Grenze für Torwarthandspiel.",
+    "Da kleinere Kastn is da Torraum. Er is ned d Grenze fürs Torwarthandspiel.",
+    "작은 상자는 골 에어리어이며 골키퍼 손 사용 범위가 아닙니다.",
+    "Маленький прямоугольник — площадь ворот, не граница игры вратаря руками.",
+    "El rectángulo pequeño es el área de meta, no el límite de las manos del portero.",
+    "O retângulo pequeno é a área de baliza, não o limite das mãos do guarda-redes."
+  ],
+  [
+    "The halfway line is excluded from the opponents’ half for offside position.",
+    "Die Mittellinie gehört bei Abseitsposition nicht zur gegnerischen Hälfte.",
+    "D Mittellinie zählt bei Abseitsposition ned zur gegnerischen Hälfte.",
+    "오프사이드 위치에서 중앙선은 상대 진영에 포함되지 않습니다.",
+    "Средняя линия не входит в чужую половину при определении офсайда.",
+    "La línea central no forma parte del campo rival para posición de fuera de juego.",
+    "A linha central não faz parte do meio-campo adversário para posição de fora de jogo."
+  ],
+  [
+    "Official laws and editions",
+    "Offizielle Regeln und Ausgaben",
+    "Offizielle Regeln und Ausgaben",
+    "공식 규칙과 판본",
+    "Официальные правила и редакции",
+    "Reglas y ediciones oficiales",
+    "Leis e edições oficiais"
+  ],
+  [
+    "Drum notation",
+    "Schlagzeugnotation",
+    "Schlagzeugnotation",
+    "드럼 기보",
+    "Запись ударных",
+    "Notación de batería",
+    "Notação de bateria"
+  ],
+  [
+    "Musical staff",
+    "Notensystem",
+    "Notensystem",
+    "오선",
+    "Нотный стан",
+    "Pentagrama",
+    "Pauta musical"
+  ],
+  [
+    "Rhythm studio",
+    "Rhythmusstudio",
+    "Rhythmusstudio",
+    "리듬 스튜디오",
+    "Студия ритма",
+    "Estudio de ritmo",
+    "Estúdio de ritmo"
+  ],
+  [
+    "Notation studio",
+    "Notationsstudio",
+    "Notationsstudio",
+    "기보 스튜디오",
+    "Студия нотации",
+    "Estudio de notación",
+    "Estúdio de notação"
+  ],
+  [
+    "Read, count, and listen",
+    "Lesen, zählen und hören",
+    "Lesen, zählen und hören",
+    "읽고 세고 듣기",
+    "Читайте, считайте и слушайте",
+    "Lee, cuenta y escucha",
+    "Lê, conta e ouve"
+  ],
+  [
+    "Written pitch and sounding pitch",
+    "Notierte und klingende Tonhöhe",
+    "Notierte und klingende Tonhöh",
+    "기보 음높이와 실제 음높이",
+    "Записанная и звучащая высота",
+    "Altura escrita y sonora",
+    "Altura escrita e sonora"
+  ],
+  [
+    "Instrument",
+    "Instrument",
+    "Instrument",
+    "악기",
+    "Инструмент",
+    "Instrumento",
+    "Instrumento"
+  ],
+  [
+    "Written note",
+    "Notierte Note",
+    "Notierte Notn",
+    "기보된 음",
+    "Записанная нота",
+    "Nota escrita",
+    "Nota escrita"
+  ],
+  [
+    "Local accidental",
+    "Lokales Vorzeichen",
+    "Lokales Vorzeichn",
+    "임시표",
+    "Случайный знак",
+    "Alteración local",
+    "Alteração local"
+  ],
+  [
+    "Use key signature",
+    "Tonartvorzeichen verwenden",
+    "Tonartvorzeichn verwenden",
+    "조표 적용",
+    "Использовать знаки при ключе",
+    "Usar armadura",
+    "Usar armação"
+  ],
+  [
+    "Sharp",
+    "Kreuz",
+    "Kreuz",
+    "올림표",
+    "Диез",
+    "Sostenido",
+    "Sustenido"
+  ],
+  [
+    "Flat",
+    "Be",
+    "Be",
+    "내림표",
+    "Бемоль",
+    "Bemol",
+    "Bemol"
+  ],
+  [
+    "Key signature",
+    "Tonartvorzeichen",
+    "Tonartvorzeichn",
+    "조표",
+    "Знаки при ключе",
+    "Armadura",
+    "Armação"
+  ],
+  [
+    "Clef",
+    "Schlüssel",
+    "Schlissl",
+    "음자리표",
+    "Ключ",
+    "Clave",
+    "Clave"
+  ],
+  [
+    "Pattern",
+    "Muster",
+    "Muster",
+    "패턴",
+    "Рисунок",
+    "Patrón",
+    "Padrão"
+  ],
+  [
+    "Tempo",
+    "Tempo",
+    "Tempo",
+    "빠르기",
+    "Темп",
+    "Tempo",
+    "Andamento"
+  ],
+  [
+    "Rest",
+    "Pause",
+    "Pause",
+    "쉼표",
+    "Пауза",
+    "Silencio",
+    "Pausa"
+  ],
+  [
+    "Playback position",
+    "Abspielposition",
+    "Abspielposition",
+    "재생 위치",
+    "Позиция воспроизведения",
+    "Posición de reproducción",
+    "Posição da reprodução"
+  ],
+  [
+    "Kick / snare / hi-hat",
+    "Bassdrum / Snare / Hi-Hat",
+    "Bassdrum / Snare / Hi-Hat",
+    "킥 / 스네어 / 하이햇",
+    "Бочка / малый барабан / хай-хэт",
+    "Bombo / caja / charles",
+    "Bombo / tarola / prato de choque"
+  ],
+  [
+    "Sounding pitch",
+    "Klingende Tonhöhe",
+    "Klingende Tonhöh",
+    "실제 음높이",
+    "Звучащая высота",
+    "Altura sonora",
+    "Altura sonora"
+  ],
+  [
+    "First sounding note",
+    "Erster klingender Ton",
+    "Erster klingender Ton",
+    "첫 실제 음",
+    "Первый звучащий звук",
+    "Primera nota sonora",
+    "Primeira nota sonora"
+  ],
+  [
+    "Durations under the notes use the selected beat unit.",
+    "Dauern unter den Noten gelten in der gewählten Schlageinheit.",
+    "Dauern unter de Noten gelten in da gewählten Schlageinheit.",
+    "음 아래 길이는 선택된 박 단위입니다.",
+    "Длительности под нотами выражены в выбранных долях.",
+    "Las duraciones bajo las notas usan el pulso elegido.",
+    "As durações sob as notas usam o tempo escolhido."
+  ],
+  [
+    "Example: the top line is the highest string; 0 means open string. This is a separate example, not a fingering for the selected note.",
+    "Beispiel: Die oberste Linie ist die höchste Saite; 0 heißt leer. Dies ist ein separates Beispiel, kein Griff für die gewählte Note.",
+    "Beispiel: D oberste Linie is d höchste Saitn; 0 heißt leer. Des is a eigenes Beispiel, koa Griff für d gewählte Notn.",
+    "예시: 맨 위 선은 가장 높은 줄, 0은 개방현입니다. 선택된 음의 운지가 아닌 별도 예시입니다.",
+    "Пример: верхняя линия — самая высокая струна, 0 — открытая. Это отдельный пример, не аппликатура выбранной ноты.",
+    "Ejemplo: la línea superior es la cuerda más aguda; 0 significa al aire. Es un ejemplo aparte, no una digitación para la nota elegida.",
+    "Exemplo: a linha superior é a corda mais aguda; 0 significa solta. É um exemplo à parte, não uma digitação para a nota escolhida."
+  ],
+  [
+    "Kick low · snare middle · hi-hat high with x head. Playback uses synthetic pitch cues, not realistic drum sounds.",
+    "Bassdrum unten, Snare mittig, Hi-Hat oben mit x-Kopf. Die Wiedergabe nutzt synthetische Tonhinweise, keine realistischen Schlagzeugklänge.",
+    "Bassdrum unten, Snare mittig, Hi-Hat oben mit x-Kopf. D Wiedergab nutzt synthetische Tonhinweise, koane echten Schlagzeugklänge.",
+    "킥 아래, 스네어 가운데, 하이햇 위 x 머리입니다. 재생은 실제 드럼 대신 합성 음높이 안내입니다.",
+    "Бочка внизу, малый барабан в центре, хай-хэт вверху с x. Звучат синтетические подсказки, не реалистичные ударные.",
+    "Bombo abajo, caja en medio, charles arriba con x. La reproducción usa pistas tonales sintéticas, no sonidos reales de batería.",
+    "Bombo em baixo, tarola ao meio, prato de choque em cima com x. A reprodução usa pistas tonais sintéticas, não sons reais de bateria."
+  ],
+  [
+    "Stop",
+    "Stopp",
+    "Stopp",
+    "정지",
+    "Стоп",
+    "Detener",
+    "Parar"
+  ],
+  [
+    "Play sound",
+    "Klang abspielen",
+    "Klang abspielen",
+    "소리 재생",
+    "Воспроизвести звук",
+    "Reproducir sonido",
+    "Reproduzir som"
+  ],
+  [
+    "Tap along",
+    "Mitklopfen",
+    "Mitklopfen",
+    "박자 맞춰 탭",
+    "Простукивать",
+    "Toca el pulso",
+    "Marca o pulso"
+  ],
+  [
+    "Audio starts only when you press play.",
+    "Audio startet erst mit der Abspieltaste.",
+    "Audio startet erst mit da Abspieltastn.",
+    "재생을 눌러야 소리가 시작됩니다.",
+    "Звук начинается только по нажатию.",
+    "El audio empieza solo al pulsar reproducir.",
+    "O áudio começa só ao premir reproduzir."
+  ],
+  [
+    "Your taps in beat units",
+    "Deine Schläge in Schlageinheiten",
+    "Deine Schläg in Schlageinheiten",
+    "박 단위의 탭 기록",
+    "Ваши нажатия в долях",
+    "Tus toques en unidades de pulso",
+    "Os teus toques em unidades de tempo"
+  ],
+  [
+    "Audio is unavailable. You can still read and explore the notation.",
+    "Audio nicht verfügbar. Du kannst die Notation weiterhin lesen und erkunden.",
+    "Audio ned verfügbar. Du kannst d Notation trotzdem lesen und erkunden.",
+    "오디오를 사용할 수 없습니다. 악보는 계속 읽고 탐색할 수 있습니다.",
+    "Звук недоступен. Нотацию можно читать и изучать.",
+    "Audio no disponible. Puedes seguir leyendo y explorando la notación.",
+    "Áudio indisponível. Podes continuar a ler e explorar a notação."
+  ],
+  [
+    "International A–G note names; middle C = C4. Equal temperament, A4 = 440 Hz. Synthesized audio is illustrative.",
+    "Internationale A–G-Namen; mittleres C = C4. Gleichstufige Stimmung, A4 = 440 Hz. Synthetischer Klang zur Veranschaulichung.",
+    "Internationale A–G-Namen; mittleres C = C4. Gleichstufige Stimmung, A4 = 440 Hz. Synthetischer Klang zum Veranschaulichen.",
+    "국제 A–G 음이름, 가운데 C = C4. 평균율, A4 = 440 Hz. 합성음은 설명용입니다.",
+    "Международные A–G; среднее C = C4. Равномерная темперация, A4 = 440 Hz. Синтезированный звук для иллюстрации.",
+    "Nombres internacionales A–G; do central = C4. Temperamento igual, A4 = 440 Hz. Sonido sintetizado ilustrativo.",
+    "Nomes internacionais A–G; dó central = C4. Temperamento igual, A4 = 440 Hz. Som sintetizado ilustrativo."
+  ],
+  [
+    "Solution revealed. Use Practice again for a fresh attempt.",
+    "Lösung aufgedeckt. Starte mit Erneut üben einen neuen Versuch.",
+    "Lösung aufdeckt. Start mit Nochmal üben an neuen Versuch.",
+    "해답을 공개했습니다. 다시 연습으로 새로 시도하세요.",
+    "Решение открыто. Начните новую попытку через повторную практику.",
+    "Solución revelada. Usa Practicar de nuevo para otro intento.",
+    "Solução revelada. Usa Praticar novamente para outra tentativa."
+  ],
+  [
+    "Reset solved exercises for this lesson?",
+    "Gelöste Übungen dieser Lektion zurücksetzen?",
+    "Glöste Übungen vo der Lektion zurücksetzen?",
+    "이 수업의 해결한 문제를 초기화할까요?",
+    "Сбросить решённые упражнения урока?",
+    "¿Restablecer ejercicios resueltos de esta lección?",
+    "Repor exercícios resolvidos desta lição?"
+  ],
+  [
+    "Confirm reset",
+    "Zurücksetzen bestätigen",
+    "Zurücksetzen bestätigen",
+    "초기화 확인",
+    "Подтвердить сброс",
+    "Confirmar reinicio",
+    "Confirmar reposição"
+  ],
+  [
+    "Instrument reference",
+    "Instrumentreferenz",
+    "Instrumentreferenz",
+    "악기 참고 자료",
+    "Справочник инструментов",
+    "Referencia instrumental",
+    "Referência instrumental"
+  ],
+  [
+    "Careless challenge",
+    "Fahrlässiger Zweikampf",
+    "Fahrlässiger Zweikampf",
+    "부주의한 태클",
+    "Неосторожная борьба",
+    "Entrada imprudente",
+    "Entrada negligente"
+  ],
+  [
+    "Direct free kick; no card solely for a careless challenge.",
+    "Direkter Freistoß; keine Karte allein für einen fahrlässigen Zweikampf.",
+    "Direkter Freistoß; koa Kartn bloß für an fahrlässigen Zweikampf.",
+    "직접프리킥. 부주의 수준만으로는 카드 없음.",
+    "Штрафной; без карточки лишь за неосторожную борьбу.",
+    "Libre directo; sin tarjeta solo por una entrada imprudente.",
+    "Livre direto; sem cartão só por uma entrada negligente."
+  ],
+  [
+    "Reckless challenge",
+    "Rücksichtsloser Zweikampf",
+    "Rücksichtsloser Zweikampf",
+    "무모한 태클",
+    "Безрассудная борьба",
+    "Entrada temeraria",
+    "Entrada imprudente"
+  ],
+  [
+    "Direct free kick and yellow card.",
+    "Direkter Freistoß und Gelbe Karte.",
+    "Direkter Freistoß und Gelbe Kartn.",
+    "직접프리킥과 경고.",
+    "Штрафной и жёлтая карточка.",
+    "Libre directo y amarilla.",
+    "Livre direto e amarelo."
+  ],
+  [
+    "Excessive force",
+    "Übermäßige Härte",
+    "Übermäßige Härte",
+    "과도한 힘",
+    "Чрезмерная сила",
+    "Fuerza excesiva",
+    "Força excessiva"
+  ],
+  [
+    "Direct free kick and red card.",
+    "Direkter Freistoß und Rote Karte.",
+    "Direkter Freistoß und Rote Kartn.",
+    "직접프리킥과 퇴장.",
+    "Штрафной и красная карточка.",
+    "Libre directo y roja.",
+    "Livre direto e vermelho."
+  ],
+  [
+    "Direct free kick",
+    "Direkter Freistoß",
+    "Direkter Freistoß",
+    "직접프리킥",
+    "Штрафной удар",
+    "Libre directo",
+    "Livre direto"
+  ],
+  [
+    "A goal can be scored directly against the opponents.",
+    "Direktes Tor gegen den Gegner ist möglich.",
+    "Direktes Tor gegen den Gegner is möglich.",
+    "상대 골로 직접 득점할 수 있습니다.",
+    "Можно забить прямо в ворота соперника.",
+    "Puede marcarse directamente al rival.",
+    "Pode marcar-se diretamente ao adversário."
+  ],
+  [
+    "Indirect free kick",
+    "Indirekter Freistoß",
+    "Indirekter Freistoß",
+    "간접프리킥",
+    "Свободный удар",
+    "Libre indirecto",
+    "Livre indireto"
+  ],
+  [
+    "Another player must touch the ball before a goal can be scored.",
+    "Vor dem Tor muss ein weiterer Spieler den Ball berühren.",
+    "Vorm Tor muss a weiterer Spieler den Ball berühren.",
+    "득점 전에 다른 선수의 터치가 필요합니다.",
+    "Для гола нужно касание другого игрока.",
+    "Otro jugador debe tocar antes de marcar.",
+    "Outro jogador tem de tocar antes de marcar."
+  ],
+  [
+    "A defender committed a direct-free-kick offence inside their own penalty area.",
+    "Ein Verteidiger begeht ein direktes Freistoßvergehen im eigenen Strafraum.",
+    "A Verteidiger begeht a direktes Freistoßvergehen im eigenen Strafraum.",
+    "수비수가 자기 페널티 구역에서 직접프리킥 반칙을 했습니다.",
+    "Защитник нарушил для штрафного в своей штрафной.",
+    "Un defensa cometió infracción de libre directo en su área penal.",
+    "Um defesa cometeu infração de livre direto na sua área de penálti."
+  ],
+  [
+    "Natural",
+    "Auflösungszeichen",
+    "Auflösungszeichn",
+    "제자리표",
+    "Бекар",
+    "Becuadro",
+    "Bequadro"
+  ],
+  [
+    "Bass-staff reference: C3. This lower staff is a reference, not an additional playback part.",
+    "Bassreferenz: C3. Dieses untere System dient als Referenz, nicht als zusätzliche Wiedergabestimme.",
+    "Bassreferenz: C3. S untere System is a Referenz, koa zusätzliche Wiedergabestimm.",
+    "낮은음자리 기준 C3입니다. 아래 오선은 참고용이며 추가 재생 파트가 아닙니다.",
+    "Басовый ориентир: C3. Нижний стан — справочный, не дополнительная звучащая партия.",
+    "Referencia de fa: C3. El pentagrama inferior es referencia, no una parte adicional de reproducción.",
+    "Referência de fá: C3. A pauta inferior é uma referência, não uma parte adicional de reprodução."
+  ],
+  [
+    "Correct. Explain why before moving on.",
+    "Richtig. Begründe es, bevor du weitergehst.",
+    "Richtig. Erklär warum, bevorst weitergehst.",
+    "정답입니다. 다음으로 넘어가기 전에 이유를 설명하세요.",
+    "Верно. Объясните почему, прежде чем продолжить.",
+    "Correcto. Explica por qué antes de continuar.",
+    "Correto. Explica porquê antes de continuar."
+  ],
+  [
+    "Try again. Revisit the example and check the conditions.",
+    "Versuche es erneut. Lies das Beispiel und prüfe die Bedingungen.",
+    "Probier's nochmal. Lies s Beispiel und prüf d Bedingungen.",
+    "다시 시도하세요. 예시와 조건을 확인하세요.",
+    "Попробуйте ещё раз. Вернитесь к примеру и условиям.",
+    "Inténtalo de nuevo. Revisa el ejemplo y las condiciones.",
+    "Tenta novamente. Revê o exemplo e as condições."
+  ],
+  [
+    "European Cup / Champions League",
+    "Europapokal / Champions League",
+    "Europapokal / Champions League",
+    "유러피언컵 / 챔피언스리그",
+    "Кубок чемпионов / Лига чемпионов",
+    "Copa de Europa / Champions League",
+    "Taça dos Campeões / Champions League"
+  ],
+  [
+    "UEFA Cup / Europa League",
+    "UEFA-Pokal / Europa League",
+    "UEFA-Pokal / Europa League",
+    "UEFA컵 / 유로파리그",
+    "Кубок UEFA / Лига Европы",
+    "Copa UEFA / Europa League",
+    "Taça UEFA / Liga Europa"
+  ],
+  [
+    "Conference League",
+    "Conference League",
+    "Conference League",
+    "컨퍼런스리그",
+    "Лига конференций",
+    "Conference League",
+    "Liga Conferência"
+  ],
+  [
+    "Goal",
+    "Tor",
+    "Tor",
+    "골",
+    "Гол",
+    "Gol",
+    "Golo"
+  ],
+  [
+    "Pause",
+    "Pause",
+    "Pause",
+    "일시정지",
+    "Пауза",
+    "Pausa",
+    "Pausa"
+  ],
+  [
+    "Notation for piano, strings, winds, guitar, bass, and drums",
+    "Notation für Klavier, Streicher, Bläser, Gitarre, Bass und Schlagzeug",
+    "Notation für Klavier, Streicher, Bläser, Gitarr, Bass und Schlagzeug",
+    "피아노, 현악기, 관악기, 기타, 베이스, 드럼 기보",
+    "Запись для фортепиано, струнных, духовых, гитары, баса и ударных",
+    "Notación para piano, cuerdas, vientos, guitarra, bajo y batería",
+    "Notação para piano, cordas, sopros, guitarra, baixo e bateria"
+  ],
+  [
+    "Club trophies, domestic leagues and cups, and World Cups",
+    "Klubtitel, heimische Ligen und Pokale und Weltmeisterschaften",
+    "Klubtitel, heimische Ligen und Pokale und Weltmeisterschaften",
+    "클럽 트로피, 국내 리그·컵, 월드컵",
+    "Клубные трофеи, внутренние лиги и кубки, чемпионаты мира",
+    "Trofeos de clubes, ligas y copas nacionales y Mundiales",
+    "Troféus de clubes, ligas e taças nacionais e Mundiais"
+  ],
+  [
+    "Offer a safe return pass and start the build-up while staying ready to protect the goal.",
+    "Biete einen sicheren Rückpass und eröffne den Aufbau, während du das Tor absichern kannst.",
+    "Biet an sicheren Rückpass und start den Aufbau, währendst s Tor absichern kannst.",
+    "안전한 백패스 선택지를 주고 골을 지킬 준비를 유지하며 빌드업을 시작합니다.",
+    "Предлагайте безопасный пас назад и начинайте розыгрыш, оставаясь готовым защитить ворота.",
+    "Ofrece un pase atrás seguro e inicia la salida manteniéndote listo para proteger la portería.",
+    "Oferece um passe atrás seguro e inicia a construção mantendo-te pronto para proteger a baliza."
+  ],
+  [
+    "Protect the goal, organise defenders, and judge when to claim or clear the ball.",
+    "Schütze das Tor, organisiere die Abwehr und entscheide, wann du den Ball aufnimmst oder klärst.",
+    "Schütz s Tor, organisier d Abwehr und entscheid, wannst den Ball aufnimmst oder klärst.",
+    "골을 지키고 수비를 조직하며 공을 잡거나 걷어낼 때를 판단합니다.",
+    "Защищайте ворота, организуйте оборону и решайте, когда забрать или выбить мяч.",
+    "Protege la portería, organiza la defensa y decide cuándo atrapar o despejar.",
+    "Protege a baliza, organiza a defesa e decide quando agarrar ou afastar."
+  ],
+  [
+    "Provide a passing outlet or width, and keep cover against a counterattack.",
+    "Biete eine Passoption oder Breite und sichere gegen Konter ab.",
+    "Biet a Passoption oder Breite und sicher gegen Konter ab.",
+    "패스 선택지나 폭을 제공하고 역습 대비를 유지합니다.",
+    "Предлагайте выход для паса или ширину и страхуйте от контратаки.",
+    "Ofrece salida de pase o amplitud y mantén cobertura contra la contra.",
+    "Oferece saída de passe ou largura e mantém cobertura contra o contra-ataque."
+  ],
+  [
+    "Protect dangerous space, track attackers, and cover a team-mate who steps forward.",
+    "Schütze gefährliche Räume, verfolge Angreifer und sichere vorrückende Mitspieler ab.",
+    "Schütz gefährliche Räume, verfolg Angreifer und sicher vorrückende Mitspieler ab.",
+    "위험한 공간을 지키고 공격수를 추적하며 전진한 동료를 커버합니다.",
+    "Защищайте опасные зоны, следите за атакующими и страхуйте вышедшего вперёд партнёра.",
+    "Protege espacios peligrosos, sigue atacantes y cubre al compañero que sale.",
+    "Protege espaços perigosos, acompanha atacantes e cobre o colega que avança."
+  ],
+  [
+    "Connect defence and attack, find passing angles, and support the ball carrier.",
+    "Verbinde Abwehr und Angriff, finde Passwinkel und unterstütze den Ballführer.",
+    "Verbind Abwehr und Angriff, find Passwinkel und unterstütz den Ballführer.",
+    "수비와 공격을 연결하고 패스 각도를 찾아 공 소유자를 지원합니다.",
+    "Связывайте оборону и атаку, ищите углы паса и поддерживайте игрока с мячом.",
+    "Conecta defensa y ataque, encuentra ángulos de pase y apoya al portador.",
+    "Liga defesa e ataque, encontra ângulos de passe e apoia o portador."
+  ],
+  [
+    "Screen central passes, track runners, and support coordinated pressure.",
+    "Schirme zentrale Pässe ab, verfolge Läufe und unterstütze abgestimmtes Pressing.",
+    "Schirm zentrale Pässe ab, verfolg Läuf und unterstütz abgestimmtes Pressing.",
+    "중앙 패스를 차단하고 러너를 추적하며 조직된 압박을 지원합니다.",
+    "Перекрывайте центральные пасы, отслеживайте рывки и поддерживайте согласованный прессинг.",
+    "Bloquea pases centrales, sigue carreras y apoya la presión coordinada.",
+    "Bloqueia passes centrais, acompanha corridas e apoia a pressão coordenada."
+  ],
+  [
+    "Create depth, move into scoring space, link play, and finish chances.",
+    "Schaffe Tiefe, bewege dich in Abschlussräume, verbinde das Spiel und verwandle Chancen.",
+    "Schaff Tiefe, beweg di in Abschlussräume, verbind s Spiel und verwandel Chancen.",
+    "깊이를 만들고 득점 공간으로 이동하며 플레이를 연결하고 기회를 마무리합니다.",
+    "Создавайте глубину, выходите в зоны завершения, связывайте игру и реализуйте моменты.",
+    "Crea profundidad, entra en espacios de remate, conecta y finaliza ocasiones.",
+    "Cria profundidade, entra em espaços de remate, liga o jogo e finaliza oportunidades."
+  ],
+  [
+    "Guide the press and close useful passing lanes without losing team shape.",
+    "Lenke das Pressing und schließe wichtige Passwege, ohne die Teamform zu verlieren.",
+    "Lenk s Pressing und mach wichtige Passwege zu, ohne d Teamform zum Verlieren.",
+    "팀 형태를 유지하며 압박을 유도하고 유용한 패스 길을 닫습니다.",
+    "Направляйте прессинг и закрывайте важные линии паса, сохраняя форму команды.",
+    "Orienta la presión y cierra pases útiles sin perder la estructura.",
+    "Orienta a pressão e fecha passes úteis sem perder a estrutura."
+  ],
+  [
+    "Kick",
+    "Bassdrum",
+    "Bassdrum",
+    "킥 드럼",
+    "Бас-барабан",
+    "Bombo",
+    "Bombo"
+  ],
+  [
+    "Snare",
+    "Snare",
+    "Snare",
+    "스네어 드럼",
+    "Малый барабан",
+    "Caja",
+    "Tarola"
+  ],
+  [
+    "Hi-hat",
+    "Hi-Hat",
+    "Hi-Hat",
+    "하이햇",
+    "Хай-хэт",
+    "Hi-hat",
+    "Hi-hat"
+  ]
+]

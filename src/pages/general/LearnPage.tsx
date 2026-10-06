@@ -1,3 +1,4 @@
+import { footballCategories } from '@/data/footballReference';
 import { Link } from "react-router-dom";
 import { ArrowRight, Bookmark, CheckCircle2, Compass } from "lucide-react";
 import type { CSSProperties } from "react";
@@ -22,8 +23,8 @@ export default function LearnPage() {
     </div>
     <section className="lt-section" aria-labelledby="learning-subjects-title"><div className="lt-section-heading"><h2 id="learning-subjects-title">{ui("Subjects")}</h2><span>{ui("Follow a path or explore freely")}</span></div>
       <div className="lt-subject-grid">{learningSubjects.map(subject => <Link key={subject.id} to={subjectRoute(subject.id)} className="lt-subject-card" style={{ "--lt-accent": subject.accent } as CSSProperties}>
-        <div className="lt-card-top"><span className="lt-icon"><CatalogIcon id={subject.id} size={27} /></span><span className="lt-badge">{ui(subject.resourceLabel || learningLessons.some(lesson => lesson.subjectId === subject.id) ? "Available now" : subject.later ? "Later" : "Coming soon")}</span></div>
-        <h3>{ui(subject.title)}</h3><p>{ui(subject.description)}</p><div className="lt-card-footer"><span>{subject.resourceLabel ? ui(subject.resourceLabel) : subject.later ? ui("Sound, waves & radar") : `${getSubjectPaths(subject.id).length} ${ui("learning paths")}`}</span><ArrowRight size={18} aria-hidden /></div>
+        <div className="lt-card-top"><span className="lt-icon"><CatalogIcon id={subject.id} size={27} /></span><span className="lt-badge">{ui(subject.id === 'football' || subject.resourceLabel || learningLessons.some(lesson => lesson.subjectId === subject.id) ? "Available now" : subject.later ? "Later" : "Coming soon")}</span></div>
+        <h3>{ui(subject.title)}</h3><p>{ui(subject.description)}</p><div className="lt-card-footer"><span>{subject.id === 'football' ? `${footballCategories.length} ${ui('categories')}` : subject.resourceLabel ? ui(subject.resourceLabel) : subject.later ? ui("Sound, waves & radar") : `${getSubjectPaths(subject.id).length} ${ui("learning paths")}`}</span><ArrowRight size={18} aria-hidden /></div>
       </Link>)}</div>
     </section>
     <p className="lt-notice">{ui("Math foundations, Everyday percentages, the introduction, game guides, and Game Analysis are available now. More courses are planned; their pages show what you will be able to learn.")}</p>

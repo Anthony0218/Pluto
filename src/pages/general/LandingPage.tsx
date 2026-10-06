@@ -1,75 +1,30 @@
-import { ui, useUiLanguage } from "@/i18n/ui";
+import { useRef } from "react";
+import { domAnimation, LazyMotion, MotionConfig } from "motion/react";
+import { useUiLanguage } from "@/i18n/ui";
 import LandingHero from "../../components/App/LandingHero";
-import FeatureSection from "../../components/App/FeatureSection";
+import ClosingCta from "../../components/App/landing/ClosingCta";
+import LandingJourney from "../../components/App/landing/LandingJourney";
+import LandingSections from "../../components/App/landing/LandingSections";
+import LandingStage from "../../components/App/landing/LandingStage";
+import { usePlanetLight } from "../../components/App/landing/usePlanetLight";
 
-import PlayShowcase from "../../components/App/PlayShowcase";
-import LearnShowcase from "../../components/App/LearnShowcase";
-import CoachShowcase from "../../components/App/CoachShowcase";
-import CommunityShowcase from "../../components/App/CommunityShowcase";
-
+/**
+ * The landing page: a hero with Games / Tools / Learn tabs, a scroll-driven flyby that follows the selected tab,
+ * then one section per game (each with a playable demo), tools, learning and community, and a closing invitation.
+ */
 export default function LandingPage() {
   useUiLanguage();
-  return (
-    <MotionConfig reducedMotion="user"><LazyMotion features={domAnimation} strict><main>
-      <LandingHero />
-
-      <FeatureSection
-        index="01"
-        eyebrow={ui("PLAY")}
-        title={
-          <>{ui("Play")} {" "}<span className="text-indigo-400">{ui("great games.")}</span>
-          </>
-        }
-        description={ui("Chess, Watten, strategy games, variants and multiplayer — all in one place.")}
-        href="/games"
-        action={ui("Explore games")}
-      >
-        <PlayShowcase />
-      </FeatureSection>
-
-      <FeatureSection
-        index="02"
-        eyebrow={ui("LEARN")}
-        title={
-          <>{ui("Learn and")} {" "}<span className="text-indigo-400">{ui("grow stronger.")}</span>
-          </>
-        }
-        description={ui("Rules and strategies that help you understand the games you play.")}
-        href="/learn"
-        action={ui("Start learning")}
-      >
-        <LearnShowcase bare />
-      </FeatureSection>
-
-      <FeatureSection
-        index="03"
-        eyebrow={ui("CHESS COACH")}
-        title={
-          <>{ui("Analyze.")}<br />{ui("Understand.")}<br />
-            <span className="text-indigo-400">{ui("Improve.")}</span>
-          </>
-        }
-        description={ui("Analyze games with Stockfish and turn engine evaluations into explanations you can actually learn from.")}
-        href="/games/chess/classic/ai"
-        action={ui("Practice with Stockfish")}
-      >
-        <CoachShowcase />
-      </FeatureSection>
-
-      <FeatureSection
-        index="04"
-        eyebrow={ui("COMMUNITY")}
-        title={
-          <>{ui("Play together.")}<br />{ui("Learn")} {" "}<span className="text-indigo-400">{ui("together.")}</span>
-          </>
-        }
-        description={ui("Challenge friends, complete daily goals and share the experience with other players.")}
-        href="/friends"
-        action={ui("Explore community")}
-      >
-        <CommunityShowcase />
-      </FeatureSection>
-    </main></LazyMotion></MotionConfig>
-  );
+  const page = useRef<HTMLElement>(null);
+  usePlanetLight(page);
+  return <MotionConfig reducedMotion="user"><LazyMotion features={domAnimation} strict>
+    <main ref={page}>
+      <LandingStage>
+        <LandingHero />
+        <LandingJourney>
+          <LandingSections />
+          <ClosingCta />
+        </LandingJourney>
+      </LandingStage>
+    </main>
+  </LazyMotion></MotionConfig>;
 }
-import { domAnimation, LazyMotion, MotionConfig } from "motion/react";

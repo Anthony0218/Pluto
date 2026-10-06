@@ -106,3 +106,63 @@
 @media (max-width: 720px) { .lt-workspace { padding: 20px 20px 40px; } .lt-intro-grid, .lt-detail-grid { grid-template-columns: minmax(0, 1fr); } .lt-app-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .lt-hero { align-items: flex-start; flex-direction: column; } .lt-stages { grid-template-columns: repeat(2, minmax(0, 1fr)); } .lt-launcher-controls { flex-direction: column; } .lt-lesson-body { padding: 24px; } }
 @media (max-width: 440px) { .lt-workspace { padding-inline: 16px; } .lt-subject-grid, .lt-path-grid, .lt-feature-list { grid-template-columns: minmax(0, 1fr); } .lt-app-grid { gap: 10px; } .lt-app-link { padding: 16px; } .lt-app-link h2 { font-size: 14px; } .lt-app-link .lt-icon { width: 46px; height: 46px; } .lt-favorite { top: 7px; right: 7px; width: 32px; height: 32px; } .lt-panel { padding: 20px; } .lt-app-preview { align-items: flex-start; flex-direction: column; } .lt-top-nav a { padding-inline: 12px; } .lt-view-switch button { padding-inline: 10px; } .lt-introduction { gap: 12px; } .lt-link-list > a { flex-wrap: wrap; } }
 @media (prefers-reduced-motion: reduce) { .lt-subject-card, .lt-path-card, .lt-app-card { transition: none; } }
+/* Exploration belongs to the public header; core tools use the freed space. */
+.public-explore-nav { display:flex; gap:4px; margin-left:auto; }
+.public-explore-nav a { padding:8px 10px; color:#a7b3ca; font-size:13px; border-radius:8px; }
+.public-explore-nav a.active { color:#ede9fe; background:#8c8af81b; box-shadow:inset 0 -2px #c4b5fd; }
+.public-explore-nav a:focus-visible { outline:2px solid #c4b5fd; outline-offset:2px; }
+.learning-tools-page .lt-workspace { max-width:1420px; padding:16px 24px 28px; }
+.learning-tools-page .lt-breadcrumbs { margin-bottom:12px; }
+.learning-tools-page .lt-hero { margin-bottom:20px; gap:16px; }
+.learning-tools-page .lt-hero h1 { font-size:clamp(26px,3vw,36px); margin:6px 0 8px; }
+.learning-tools-page .lt-description { font-size:14px; line-height:1.6; }
+.lt-tool-learning { margin-bottom:14px; color:#a7b3ca; font-size:13px; }
+.lt-tool-learning summary { cursor:pointer; }
+@media(max-width:900px) { .public-explore-nav a { padding:8px; } .compact-app-header .chess-header-description { display:none; } }
+@media(max-width:639px) { .public-explore-nav { order:3; width:100%; justify-content:center; } .learning-tools-page .lt-workspace { padding:14px 12px 24px; } }
+@media(min-width:640px) and (max-width:1000px) { .compact-app-header:has(.public-explore-nav) .chess-header-text,.compact-app-header:has(.public-explore-nav) .chess-header-colon { display:none; } }
+@media(min-width:640px) and (max-width:1000px) {
+  .app-shell:not(.integrated-navigation):has(.public-explore-nav) { --public-header-height:6.5rem; }
+  .compact-app-header:has(.public-explore-nav) > div { flex-wrap:wrap; padding-block:8px; }
+  .public-explore-nav { order:3; flex-basis:100%; justify-content:center; }
+}
+@media(max-width:639px) { .app-shell:not(.integrated-navigation):has(.public-explore-nav) { --public-header-height:8.5rem; } }
+
+/* Math curriculum and its real lesson preview share the main learning area. */
+.lt-math-overview { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); }
+.lt-topic-preview { position: sticky; top: 20px; }
+.lt-topic-preview-column { position: sticky; top: 20px; min-width: 0; }
+.lt-topic-preview-column .lt-topic-preview { position: static; }
+.lt-curriculum { display: grid; gap: 12px; list-style: none; margin: 20px 0 0; padding: 0; }
+.lt-curriculum > li { border: 1px solid #7585b12d; border-radius: 12px; padding: 12px; background: #10182a70; }
+.lt-topic-select { display: flex; align-items: flex-start; gap: 12px; width: 100%; padding: 10px; border: 1px solid transparent; border-radius: 9px; text-align: left; cursor: pointer; min-height: 44px; }
+.lt-topic-select > .lt-path-number { flex-shrink: 0; }
+.lt-topic-select > span:last-child { min-width: 0; }
+.lt-topic-select strong, .lt-topic-select span > span, .lt-topic-select small { display: block; }
+.lt-topic-select strong { font-size: 15px; line-height: 1.4; }
+.lt-topic-select span > span { margin-top: 6px; color: #abb7ce; font-size: 13px; line-height: 1.65; }
+.lt-topic-select small { margin-top: 8px; color: #a5b4fc; font-size: 11px; }
+.lt-topic-select:hover { background: #a5b4fc0a; }
+.lt-topic-select[aria-pressed="true"] { background: #a5b4fc14; border-color: #a5b4fc66; box-shadow: inset 3px 0 #a5b4fc; }
+.lt-topic-select:focus-visible { outline: 2px solid #a5b4fc; outline-offset: 3px; }
+.lt-curriculum > li > .lt-text-link { margin: 4px 10px 0; min-height: 44px; }
+.lt-curriculum-concepts, .lt-path-concepts { margin: 8px 10px 0; font-size: 12px; line-height: 1.7; color: #abb7ce; }
+.lt-curriculum-concepts summary, .lt-preview-example summary { cursor: pointer; padding: 8px 0; min-height: 44px; }
+.lt-path-concepts, .lt-curriculum-concepts ul { padding-left: 20px; }
+.lt-preview-example { margin: 18px 0; padding: 16px; border: 1px solid #a5b4fc30; border-radius: 12px; background: #a5b4fc08; }
+.lt-preview-example h3 { color: #c7d2fe; font-size: 13px; font-weight: 650; }
+.lt-preview-example ol { margin: 12px 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #d7e1f5; }
+.lt-preview-example li + li { margin-top: 6px; }
+.lt-panel p.lt-preview-notation { font-family: ui-monospace, monospace; color: #e0e7ff; overflow-wrap: anywhere; }
+.lt-topic-preview > .lt-text-link { min-height: 44px; }
+.lt-math-progress { width: min(100%, 440px); margin-top: 20px; padding: 18px; }
+.lt-math-progress > div { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13px; }
+.lt-math-progress > progress { display: block; width: 100%; margin-top: 12px; accent-color: #818cf8; }
+.lt-math-progress > .lt-button { width: fit-content; margin: 0 0 12px; min-height: 44px; }
+.lt-math-support { display: flex; align-items: flex-start; gap: 12px; margin-top: 18px; padding: 16px 18px; }
+.lt-math-support > svg { flex-shrink: 0; margin: 0; }
+.lt-math-support > div { flex: 1; min-width: 0; }
+.lt-math-support h2 { font-size: 15px; }
+.lt-math-support p:not(.lt-eyebrow) { margin-top: 4px; font-size: 12px; }
+.lt-math-support .lt-text-link { margin: 0; min-height: 44px; flex-shrink: 0; }
+@media(max-width:720px) { .lt-math-overview { grid-template-columns: minmax(0,1fr); } .lt-topic-preview, .lt-topic-preview-column { position: static; } .lt-math-support { flex-wrap: wrap; } .lt-math-support .lt-text-link { margin-left: 32px; } }

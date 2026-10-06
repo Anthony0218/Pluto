@@ -334,3 +334,8 @@
   .battle-hand-card:hover:not(:disabled), .battle-hand-card:focus-visible { transform: translateY(-10px); }
   .battle-hand-card.is-lifted { transform: translateY(-18px) scale(1.04); }
 }
+
+.language-layout { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr); gap: 1.25rem; align-items: start; }
+.language-layout .language-guesser { width: 100%; max-width: none; }
+.language-layout .language-reveal { grid-template-columns: 1fr; margin-top: 0; }
+@media (max-width: 850px) { .language-layout { grid-template-columns: 1fr; } }

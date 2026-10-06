@@ -523,3 +523,24 @@ button.atlas-random-symbol:focus-visible { outline:2px solid #82ece5;outline-off
 /* Make the playable campaign distinct from surrounding geographic context. */
 .atlas-strategy-map .atlas-country--unmapped { fill: #344c58; stroke: #243b47; opacity: .75; }
 .atlas-strategy-map .atlas-country--unmapped:hover { fill: #344c58; stroke: #243b47; }
+
+/* Random match formats and per-game result cards. */
+.atlas-random-format { display:flex; flex-wrap:wrap; gap:.3rem; margin:.2rem 0; width:100%; }
+.atlas-random-format button { flex:1; min-width:65px; border:1px solid rgba(130,236,229,.25); border-radius:9px; padding:.4rem .35rem; color:#b9cdde; background:rgba(0,0,0,.15); font-size:.7rem; font-weight:700; white-space:nowrap; }
+.atlas-random-format button.active { color:#092321; background:#82ece5; border-color:#82ece5; }
+.atlas-random-format button:focus-visible { outline:2px solid #ffd890; outline-offset:2px; }
+.atlas-random-format button:disabled { opacity:.5; }
+.atlas-random-results { height:auto; min-height:var(--app-height); overflow:visible; }
+.atlas-series-order { grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); }
+.atlas-series-order li { align-items:flex-start; flex-wrap:wrap; }
+.atlas-series-order li span { flex:1; min-width:100px; }
+.atlas-series-order li small { white-space:normal; line-height:1.45; }
+@media(max-width:720px),(max-height:650px) {
+  .is-fixed-tab .is-random .atlas-random-format { grid-column:1; grid-row:3; display:flex; align-self:center; }
+  .is-fixed-tab .is-random .atlas-random-format button { min-width:0; padding:.3rem .2rem; font-size:.6rem; }
+  .is-fixed-tab .is-random { grid-template-rows:auto auto minmax(0,1fr) auto auto; }
+  .is-fixed-tab .is-random .atlas-choice-description { grid-column:1/-1; grid-row:4; }
+  .is-fixed-tab .is-random .atlas-choice-actions { grid-row:5; }
+  .is-fixed-tab .is-random .atlas-choice-icons.atlas-roulette-icons > span { min-height:0; height:auto; aspect-ratio:auto; border-radius:6px; }
+  .atlas-series-order { grid-template-columns:1fr; }
+}

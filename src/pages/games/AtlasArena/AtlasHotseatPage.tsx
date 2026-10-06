@@ -1,3 +1,6 @@
+import { useRandomSeries } from "./useRandomSeries";
+import { AtlasRandomSeriesResults } from "../../../components/atlas/AtlasRandomSeriesResults";
+import { seriesLabel } from "../../../games/atlas/randomSeries";
 import { calibratedHotseatSeeds } from "../../../games/atlas/hotseatCalibration";
 import { AtlasTerritoryCampaign } from "../../../components/atlas/AtlasTerritoryCampaign";
 import { useCallback, useMemo, useRef, useState, type CSSProperties } from "react";
@@ -11,8 +14,8 @@ import { TrialSessionContext, type TrialSession } from "../../../components/atla
 import { ATLAS_SCORING } from "../../../games/atlas/config";
 import { freshSeed } from "../../../games/atlas/arenaStorage";
 import { generateMatchQuestions } from "../../../games/atlas/matchQuestions";
-import { hotseatPlayerLimit, modeById, type ArenaModeDef } from "../../../games/atlas/modeCatalog";
-import { PLAYER_COLORS, settingsReady, type SoloSettings, type SoloSummary } from "../../../games/atlas/soloSettings";
+import { hotseatPlayerLimit, type ArenaModeDef } from "../../../games/atlas/modeCatalog";
+import { DEFAULT_SOLO_SETTINGS, PLAYER_COLORS, settingsReady, type SoloSettings, type SoloSummary } from "../../../games/atlas/soloSettings";
 import { countryShapesFromTopology, distanceToTerritory } from "../../../games/atlas/territoryDistance";
 import type { AtlasDataset, Coordinates } from "../../../games/atlas/types";
 import { useAtlasData } from "../../../games/atlas/useAtlasData";
@@ -22,12 +25,13 @@ import "./atlas-arena.css";
 import "../../../components/atlas/trials/atlas-trials.css";
 
 type Player = { name: string; color: string };
-type GameProps = { mode: ArenaModeDef; data: AtlasDataset; players: Player[]; settings: SoloSettings; onExit: () => void; onSetup: () => void };
+type GameProps = { mode: ArenaModeDef; data: AtlasDataset; players: Player[]; settings: SoloSettings; onExit: () => void; onSetup: () => void; onComplete?: (scores: number[]) => void };
 
 /** Hotseat: two to four people share one device. */
 export default function AtlasHotseatPage() {
   const { modeId } = useParams();
-  const mode = modeById(modeId);
+  const series = useRandomSeries(modeId);
+  const mode = series.mode;
   const navigate = useNavigate();
   const { data, loading, error } = useAtlasData();
   const { stored, update } = useArenaStore();
@@ -37,8 +41,8 @@ export default function AtlasHotseatPage() {
   if (!mode) return <Navigate to="/games/atlas-arena" replace />;
   if (loading) return <AtlasLoading />;
   if (error || !data) return <AtlasUnavailable error={error} />;
-  const limit = hotseatPlayerLimit(mode), seats = Math.min(count, limit);
-  const settings = stored.settings;
+  const limit = series.enabled ? 2 : hotseatPlayerLimit(mode), seats = Math.min(count, limit);
+  const settings = series.enabled ? { ...stored.settings, categories: stored.settings.categories.length ? stored.settings.categories : DEFAULT_SOLO_SETTINGS.categories, stats: stored.settings.stats.length ? stored.settings.stats : DEFAULT_SOLO_SETTINGS.stats } : stored.settings;
   const exit = () => navigate("/games/atlas-arena");
 
   if (!players) return (
@@ -46,8 +50,8 @@ export default function AtlasHotseatPage() {
       <Link className="atlas-back" to="/games/atlas-arena"><ArrowLeft /> Atlas Arena</Link>
       <div className="atlas-setup-card">
         <span className="atlas-eyebrow">Hotseat · one device</span>
-        <h1>{mode.title}</h1>
-        <p>{mode.rules.hotseat}</p>
+        <h1>{series.enabled ? `Random modes · ${seriesLabel(series.length)}` : mode.title}</h1>
+        <p>{series.enabled ? `Two players, up to ${series.length} different modes. First to ${Math.floor(series.length / 2) + 1} game wins; draws use a game without awarding a win. Start with ${mode.title}.` : mode.rules.hotseat}</p>
         <label className="atlas-label">Players</label>
         {limit > 2 && <div className="atlas-player-count" role="radiogroup" aria-label="Number of players">{[2, 3, 4].map((option) => <button type="button" role="radio" aria-checked={seats === option} key={option} className={seats === option ? "active" : ""} onClick={() => setCount(option)}>{option}</button>)}</div>}
         <div className="atlas-hotseat-names">
@@ -64,15 +68,17 @@ export default function AtlasHotseatPage() {
       </div>
     </main>
   );
-  const props: GameProps = { mode, data, players, settings, onExit: exit, onSetup: () => setPlayers(null) };
-  if (mode.hotseat === "pins") return <PinsHotseat {...props} />;
-  if (mode.hotseat === "territory") return <StrategyHotseat {...props} />;
-  if (mode.hotseat === "duel") return <DuelHotseat {...props} />;
-  return <TurnsHotseat {...props} />;
+  if (series.enabled && series.reviewing) return <AtlasRandomSeriesResults {...series} players={players.map((player, index) => ({ ...player, id: String(index) }))} onNext={series.next} onAgain={series.reset} />;
+  const gameKey = `${mode.id}:${series.results.length}`;
+  const props: GameProps = { mode, data, players, settings, onExit: exit, onSetup: () => { setPlayers(null); if (series.enabled) series.reset(); }, onComplete: series.enabled ? scores => series.finish(Object.fromEntries(scores.map((score, index) => [String(index), score]))) : undefined };
+  if (mode.hotseat === "pins") return <PinsHotseat key={gameKey} {...props} />;
+  if (mode.hotseat === "territory") return <StrategyHotseat key={gameKey} {...props} />;
+  if (mode.hotseat === "duel") return <DuelHotseat key={gameKey} {...props} />;
+  return <TurnsHotseat key={gameKey} {...props} />;
 }
 
 /** Final ranking for every hotseat mode. */
-function Standings({ title, rows, unit, onAgain, onSetup, onExit }: { title: string; rows: { player: Player; score: number; detail?: string }[]; unit: string; onAgain: () => void; onSetup: () => void; onExit: () => void }) {
+function Standings({ title, rows, unit, onAgain, onSetup, onExit, onComplete }: { title: string; rows: { player: Player; score: number; detail?: string }[]; unit: string; onAgain: () => void; onSetup: () => void; onExit: () => void; onComplete?: (scores: number[]) => void }) {
   const ranked = [...rows].sort((left, right) => right.score - left.score);
   const top = ranked[0]?.score ?? 0, winners = ranked.filter((row) => row.score === top);
   return (
@@ -89,7 +95,7 @@ function Standings({ title, rows, unit, onAgain, onSetup, onExit }: { title: str
         })}
       </ol>
       <div className="atlas-result-actions">
-        <button type="button" onClick={onAgain}><RotateCcw /> Play again</button>
+        {onComplete ? <button type="button" onClick={() => onComplete(rows.map(row => row.score))}>See series score <ChevronRight /></button> : <button type="button" onClick={onAgain}><RotateCcw /> Play again</button>}
         <button type="button" className="atlas-secondary" onClick={onSetup}><Users /> Players & settings</button>
         <button type="button" className="atlas-secondary" onClick={onExit}>All modes</button>
       </div>
@@ -98,7 +104,7 @@ function Standings({ title, rows, unit, onAgain, onSetup, onExit }: { title: str
 }
 
 /** Each player plays a full run of their own, one after another; the device is handed over in between. */
-function TurnsHotseat({ mode, data, players, settings, onExit, onSetup }: GameProps) {
+function TurnsHotseat({ mode, data, players, settings, onExit, onSetup, onComplete }: GameProps) {
   const [seed, setSeed] = useState(freshSeed);
   const [turn, setTurn] = useState(0);
   const [phase, setPhase] = useState<"handoff" | "playing" | "between" | "standings">("handoff");
@@ -121,7 +127,7 @@ function TurnsHotseat({ mode, data, players, settings, onExit, onSetup }: GamePr
   const calibrated=useMemo(()=>calibratedHotseatSeeds(data,mode.online,settings,seed,players.length),[data,mode.online,settings,seed,players.length]);
   const playerSeed = calibrated[turn];
 
-  if (phase === "standings") return <Standings title={mode.title} rows={players.map((item, index) => ({ player: item, score: scores[index] ?? 0 }))} unit={mode.id === "territory-battle" ? "countries" : "points"} onAgain={again} onSetup={onSetup} onExit={onExit} />;
+  if (phase === "standings") return <Standings title={mode.title} rows={players.map((item, index) => ({ player: item, score: scores[index] ?? 0 }))} unit={mode.id === "territory-battle" ? "countries" : "points"} onAgain={again} onSetup={onSetup} onExit={onExit} onComplete={onComplete} />;
   if (phase === "handoff") return (
     <main className="atlas-page atlas-center">
       <HandoffCard name={player.name} color={player.color} action={`Start ${player.name}'s run`} onReady={() => setPhase("playing")}
@@ -141,15 +147,15 @@ function TurnsHotseat({ mode, data, players, settings, onExit, onSetup }: GamePr
   );
 }
 
-function DuelHotseat({ data, players, settings, onExit }: GameProps) {
+function DuelHotseat({ data, players, settings, onExit, onComplete }: GameProps) {
   const [seed, setSeed] = useState(freshSeed);
   const pools = useTrialPools(data, settings.difficulty);
   if (!pools) return null;
-  return <StatBattleHotseat key={seed} pool={pools.difficulty} byId={pools.byId} seed={seed} names={[players[0].name, players[1].name]} onExit={onExit} onRestart={() => setSeed(freshSeed())} />;
+  return <StatBattleHotseat key={seed} pool={pools.difficulty} byId={pools.byId} seed={seed} names={[players[0].name, players[1].name]} onExit={onExit} onRestart={() => setSeed(freshSeed())} onComplete={onComplete} />;
 }
 
 /** Closest Wins on one device: every player pins each country in turn behind a cover screen, then all pins are revealed. */
-function PinsHotseat({ mode, data, players, settings, onExit, onSetup }: GameProps) {
+function PinsHotseat({ mode, data, players, settings, onExit, onSetup, onComplete }: GameProps) {
   const [seed, setSeed] = useState(freshSeed);
   const questions = useMemo(() => generateMatchQuestions({ entities: data.countries, extras: data.extras, datasetVersion: data.version.atlasDataVersion, seed, difficulty: settings.difficulty, count: 10, mode: "closest_wins", categories: settings.categories }), [data, seed, settings.categories, settings.difficulty]);
   const shapes = useMemo(() => countryShapesFromTopology(data.topology), [data.topology]);
@@ -187,7 +193,7 @@ function PinsHotseat({ mode, data, players, settings, onExit, onSetup }: GamePro
   };
   const again = () => { setSeed(freshSeed()); setRound(0); setStep(0); setPins(players.map(() => null)); setScores(players.map(() => 0)); setWins(players.map(() => 0)); setResults([]); setPhase("handoff"); };
 
-  if (phase === "standings") return <Standings title={mode.title} rows={players.map((item, index) => ({ player: item, score: scores[index], detail: `${wins[index]} round${wins[index] === 1 ? "" : "s"} won` }))} unit="points" onAgain={again} onSetup={onSetup} onExit={onExit} />;
+  if (phase === "standings") return <Standings title={mode.title} rows={players.map((item, index) => ({ player: item, score: scores[index], detail: `${wins[index]} round${wins[index] === 1 ? "" : "s"} won` }))} unit="points" onAgain={again} onSetup={onSetup} onExit={onExit} onComplete={onComplete} />;
   if (phase === "handoff") return (
     <main className="atlas-page atlas-center">
       <HandoffCard name={player.name} color={player.color} action={`Show ${player.name} the map`} onReady={() => setPhase("placing")}
@@ -229,9 +235,9 @@ function PinsHotseat({ mode, data, players, settings, onExit, onSetup }: GamePro
 }
 
 /** Territory Battle on one device: players alternate; a correct click captures (or steals) the country, a miss leaves it. */
-function StrategyHotseat({data,players,settings,onExit,onSetup,mode}:GameProps) {
+function StrategyHotseat({data,players,settings,onExit,onSetup,mode,onComplete}:GameProps) {
   const [seed,setSeed]=useState(freshSeed),[summary,setSummary]=useState<SoloSummary|null>(null);
-  if(summary)return <Standings title={mode.title} rows={[{player:players[0],score:summary.territory?.mine??0},{player:players[1],score:summary.territory?.rival??0}]} unit="influence" onAgain={()=>{setSummary(null);setSeed(freshSeed());}} onSetup={onSetup} onExit={onExit}/>;
+  if(summary)return <Standings title={mode.title} rows={[{player:players[0],score:summary.territory?.mine??0},{player:players[1],score:summary.territory?.rival??0}]} unit="influence" onAgain={()=>{setSummary(null);setSeed(freshSeed());}} onSetup={onSetup} onExit={onExit} onComplete={onComplete}/>;
   return <AtlasTerritoryCampaign key={seed} data={data} difficulty={settings.difficulty} seed={seed} names={[players[0].name,players[1].name]} hotseat onFinish={setSummary} onExit={onExit}/>;
 }
 

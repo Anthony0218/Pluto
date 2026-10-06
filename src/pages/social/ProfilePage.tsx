@@ -1,15 +1,12 @@
-import GoRankedHistory from "@/components/ranked/GoRankedHistory";
-import GoRankedProfile from "@/components/ranked/GoRankedProfile";
+import { ProfileChessRanks, ProfileGoRanks, ProfileAtlasRank, type ProfileChessRating } from "@/components/social/ProfileGameRanks";
 import { useEffect, useState } from "react";
 
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
 import { ui, useUiLanguage } from "@/i18n/ui";
-import { getChessRank } from "@/games/chess/ranked/tiers";
-import RankEmblem from "@/components/chess/RankEmblem";
 import { featuredGames } from "@/data/dashboard";
 import { Award, Crown, Flame, Gamepad2, Puzzle, Sparkles } from "lucide-react";
-import { isTimeControl, timeControlLabel, type TimeControl } from "@/games/chess/ranked/timeControls";
+import { isTimeControl, type TimeControl } from "@/games/chess/ranked/timeControls";
 
 import ProfileAvatarPicker, {
   ProfileAvatar,
@@ -126,6 +123,8 @@ export default function ProfilePage() {
   const [avatarId, setAvatarId] = useState(() => profile?.avatar_id ?? "m1");
 
   const [stats, setStats] = useState<ProfileStats>(emptyStats);
+  const [chessRatingsError, setChessRatingsError] = useState<string | null>(null);
+  const [chessRatings, setChessRatings] = useState<ProfileChessRating[]>([]);
   const [recentResults, setRecentResults] = useState<RecentResult[]>([]);
   const [statTab, setStatTab] = useState<string>("general");
 
@@ -199,6 +198,8 @@ export default function ProfilePage() {
         supabase.from("user_game_results").select("game,outcome,multiplayer,completed_at,score_difference").eq("user_id", userId).order("completed_at", { ascending: false }).limit(4),
       ]);
       if (!active) return;
+      setChessRatings(rating.error ? [] : rating.data ?? []);
+      setChessRatingsError(rating.error?.message ?? null);
       if (!recent.error) setRecentResults((recent.data ?? []) as RecentResult[]);
       if (!result.error) {
         setStatsError(null);
@@ -382,7 +383,9 @@ export default function ProfilePage() {
             <button type="button" onClick={() => setAvatarPickerOpen(true)} className="group relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-2xl border-2 border-indigo-300/70 bg-[#121d3d] p-1 shadow-[0_0_24px_rgba(129,140,248,.3)] sm:h-24 sm:w-24" aria-label={ui("Change avatar")}><ProfileAvatar avatarId={avatarId} className="h-full w-full rounded-xl" /></button>
             <div className="min-w-0 flex-1"><p className="text-[9px] font-black uppercase tracking-[.22em] text-indigo-200 sm:text-[10px] sm:tracking-[.28em]">{ui("Pluto player profile")}</p><h1 className="mt-1 break-words text-2xl font-black leading-tight text-white sm:text-4xl">{username}</h1><p className="mt-1 text-xs text-indigo-100/80 sm:text-sm">{ui("Play. Learn. Grow together.")}</p></div>
             <div className="col-span-2 min-w-0 sm:ml-0 sm:max-w-sm sm:flex-1"><div className="mb-1 flex flex-wrap justify-between gap-x-3 text-[11px] font-semibold text-indigo-100 sm:text-xs"><span>{ui("Activity level")} {Math.floor((stats.general.games_played * 100 + (stats.puzzles ?? 0) * 50) / 1000) + 1}</span><span>{(stats.general.games_played * 100 + (stats.puzzles ?? 0) * 50) % 1000} / 1,000 XP</span></div><div className="h-2 overflow-hidden rounded-full bg-indigo-200/15"><div className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-violet-300" style={{ width: `${((stats.general.games_played * 100 + (stats.puzzles ?? 0) * 50) % 1000) / 10}%` }} /></div><p className="mt-1 text-[9px] leading-4 text-indigo-100/60 sm:text-[10px]">{ui("100 XP per completed game · 50 XP per completed puzzle")}</p></div>
-            {stats.chessElo !== null && <div className="col-span-2 flex items-center gap-3 rounded-2xl border border-amber-300/30 bg-[#06101e]/75 p-3 backdrop-blur sm:col-span-1"><RankEmblem family={getChessRank(stats.chessElo).family} size="sm" /><div><strong className="block text-sm text-amber-100">{ui(getChessRank(stats.chessElo).name)}</strong><small className="text-amber-200/70">{stats.chessElo} Elo · {timeControlLabel(stats.chessEloMode, ui)}</small></div></div>}
+            {statTab === "chess" && <ProfileChessRanks rows={chessRatings} loading={loadingStats} error={chessRatingsError} />}
+            {statTab === "go" && <ProfileGoRanks userId={user.id} />}
+            {statTab === "atlas" && <ProfileAtlasRank userId={user.id} />}
           </div>
         </section>
 
@@ -850,7 +853,7 @@ export default function ProfilePage() {
                       label="Ranked ELO"
                       value={loadingStats ? "…" : (stats.chessElo ?? "—")}
                     />
-                    {stats.chessElo !== null && <div className="flex items-center gap-3 rounded-2xl border border-amber-300/25 bg-amber-300/[.06] p-3"><RankEmblem family={getChessRank(stats.chessElo).family} size="sm" /><div><strong className="block text-sm text-amber-100">{ui(getChessRank(stats.chessElo).name)}</strong><span className="text-xs text-zinc-400">{stats.chessElo} Elo · {timeControlLabel(stats.chessEloMode, ui)}</span></div></div>}
+
                   </>
                 ) : trackedGames.has(statTab) ? (
                   <>
@@ -906,7 +909,6 @@ export default function ProfilePage() {
 
               <section className="rounded-[26px] border border-indigo-400/15 bg-[#0b1529]/90 p-5 shadow-xl shadow-black/20"><div className="mb-3 flex items-center gap-2"><Award size={19} className="text-violet-300" /><h2 className="text-lg font-black">{ui("Achievements")}</h2></div><div className="grid grid-cols-2 gap-2">{achievements.map(item => <div key={item.label} className={`rounded-xl border p-3 ${item.earned ? "border-violet-300/30 bg-violet-400/10" : "border-white/5 bg-white/[.025] opacity-55"}`}><item.Icon size={24} className={item.tone} aria-hidden="true" /><strong className="mt-2 block text-xs text-white">{ui(item.label)}</strong><small className="text-[10px] text-slate-400">{ui(item.detail)}</small></div>)}</div></section>
 
-              {user && <><GoRankedProfile userId={user.id} /><GoRankedHistory userId={user.id} /></>}
               <section className="rounded-[26px] border border-indigo-400/15 bg-[#0b1529]/90 p-5 shadow-xl shadow-black/20"><h2 className="text-lg font-black">{ui("Recent matches")}</h2>{recentResults.length ? <ol className="mt-3 grid gap-2">{recentResults.map((result, index) => <li key={`${result.game}-${result.completed_at}-${index}`} className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[.035] px-3 py-2"><div className="min-w-0"><strong className="block truncate text-sm text-white">{ui(gameName(result.game))}</strong><small className="text-xs text-slate-400">{new Date(result.completed_at).toLocaleDateString()} · {ui(result.multiplayer ? "Multiplayer" : "Singleplayer")}</small></div><span className={`rounded-lg border px-2 py-1 text-xs font-bold ${result.outcome === "win" ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300" : result.outcome === "loss" ? "border-rose-400/30 bg-rose-400/10 text-rose-300" : "border-slate-400/30 bg-slate-400/10 text-slate-300"}`}>{ui(result.outcome)}</span></li>)}</ol> : <p className="mt-3 text-sm text-slate-400">{ui("No completed matches yet.")}</p>}</section>
 
               <section className="rounded-[26px] border border-indigo-400/15 bg-[#0b1529]/90 p-5 shadow-xl shadow-black/20">

@@ -10,7 +10,16 @@ export type Game = {
   comingSoon?: boolean;
 };
 
-export const games: Game[] = [
+/** Keep the remaining games in their existing order after the three lead games. */
+export function orderGamesForBrowse<T extends { route: string }>(items: readonly T[]): T[] {
+  const first = ["/games/chess", "/games/schafkopf", "/games/watten"];
+  return [
+    ...first.flatMap(route => items.filter(item => item.route === route)),
+    ...items.filter(item => !first.includes(item.route)),
+  ];
+}
+
+export const games: Game[] = orderGamesForBrowse([
   {
     title: "Pluto Party",
     subtitle: "Good friends. Questionable decisions.",
@@ -123,7 +132,7 @@ export const games: Game[] = [
     features: ["Animals", "Discovery"],
     finished: false,
   },
-];
+]);
 export const gameList = games.map((game) => ({
   name: game.title,
   description: game.description,

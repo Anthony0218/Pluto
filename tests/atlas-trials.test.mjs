@@ -227,3 +227,14 @@ test("Stat Battle compares values, handles ties, refills hands and never duplica
   const easyPicks = new Set(Array.from({ length: 100 }, (_, index) => chooseOpponentCard(hand, battleCategoryById("population:highest"), "easy", byId, seededRandom(`ai-${index}`))));
   assert.ok(easyPicks.size >= 4, "easy spreads its choices");
 });
+
+test("Extreme Geography replaces density and border counts with capital geography", () => {
+  assert.ok(!EXTREME_CATEGORIES.some(c => ["density", "neighborCount"].includes(c.statId)));
+  for (const statId of ["capitalLatitude", "capitalEquatorDistance"]) {
+    assert.ok(EXTREME_CATEGORIES.some(c => c.statId === statId));
+  }
+  const countries = ["AUS", "NOR", "ECU", "KEN"].map(iso => byIso.get(iso));
+  assert.equal(extremeWinner(countries, { statId: "capitalLatitude", direction: "highest" }).iso3, "NOR");
+  assert.equal(extremeWinner(countries, { statId: "capitalLatitude", direction: "lowest" }).iso3, "AUS");
+  assert.equal(extremeWinner(countries, { statId: "capitalEquatorDistance", direction: "lowest" }).iso3, "ECU");
+});

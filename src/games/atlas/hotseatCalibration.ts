@@ -18,7 +18,7 @@ export function calibratedHotseatSeeds(data:AtlasDataset,mode:AtlasMultiplayerMo
     if(mode==="higher_lower")return generateComparisonQuestions({...common,stats:settings.stats,chain:true});
     if(mode==="guess_country")return generateGuessCountryQuestions(common);
     if(isRaceMode(mode))return raceQuestions(data,mode,candidate,settings.difficulty,settings.scope,settings.categories);
-    return generateQuestions({...common,categories:settings.categories,interaction:"map_click"});
+    return generateQuestions({...common,categories:mode==="map_battle"?["locations"]:settings.categories,interaction:"map_click"});
   };
   const profile=(candidate:string)=>{const values:Record<string,number>={};const add=(key:string)=>values[key]=(values[key]??0)+1;const questions=deck(candidate);for(const question of questions){add(`interaction:${question.interaction}`);if("category"in question)add(`category:${question.category}`);if("entityId"in question){const q=question as AtlasQuestion,c=byId.get(q.entityId);if(c){add(`region:${c.subregion}`);add(`size:${Math.floor(Math.log10(Math.max(1,c.population?.value??1)))}`);}if(q.interaction==="higher_lower"){add(`kind:${q.first?.kind}`);add(`gap:${Math.min(4,Math.floor(Math.abs(q.stat.firstValue-q.stat.secondValue)/Math.max(1,Math.abs(q.stat.firstValue),Math.abs(q.stat.secondValue))*5))}`);add(`stat:${q.stat.key}`);}}}for(const key of Object.keys(values))values[key]/=Math.max(1,questions.length);return values;};
   const seeds=[`${seed}:p0:0`],blueprint=profile(seeds[0]);

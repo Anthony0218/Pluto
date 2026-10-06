@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useCardTheme } from "@/context/CardThemeContext";
 import { getWattenCardImage } from "@/utils/WattenCardImages";
-import { RANKS, SUITS, SUIT_SYMBOLS, WATTEN_CARD_CLIP, canPlayWattenCard, getWattenCardRole, isHauptschlag, isFirstTrick, type Rank, type Suit, type WattenCard } from "@/utils/watten";
+import { RANKS, SUITS, SUIT_SYMBOLS, WATTEN_CARD_CLIP, canPlayWattenCard, getPreviousPlayer, getWattenCardRole, isHauptschlag, isFirstTrick, type Rank, type Suit, type WattenCard } from "@/utils/watten";
 import { botShouldHold, botShouldRaise, chooseBotCard } from "@/games/watten/bot";
 import { getWattenHelpComparison } from "@/games/watten/help";
 import { advanceSingleWatten, canRaiseSingleWatten, createSingleWattenRound, cutSingleWatten, declareSingleWatten, playSingleWattenCard, raiseSingleWatten, respondSingleWattenBid, teamOf, type SingleWattenState } from "@/games/watten/singleplayer";
@@ -32,6 +32,7 @@ export default function WattenSingleplayer() {
   const [game, setGame] = useState<SingleWattenState | null>(null);
   const [trump, setTrump] = useState<Suit>("Herz");
   const [schlag, setSchlag] = useState<Rank>("Ober");
+  const [targetScore, setTargetScore] = useState(15);
   const [cutIndex, setCutIndex] = useState(16);
   const [notice, setNotice] = useState<string | null>(null);
   const [helpMode, setHelpMode] = useState(false);
@@ -66,6 +67,14 @@ export default function WattenSingleplayer() {
     }, 620);
     return () => window.clearTimeout(timer);
   }, [game]);
+  useEffect(() => {
+    if (!game || game.phase !== "cut") return;
+    const cutter = getPreviousPlayer(game.dealer, game.count);
+    if (cutter === 0) return;
+    const timer = window.setTimeout(() => setGame(current => current?.phase === "cut"
+      ? cutSingleWatten(current, 10 + Math.floor(Math.random() * 12), cutter) : current), 1400);
+    return () => window.clearTimeout(timer);
+  }, [game]);
   function play(card: WattenCard) {
     if (!game || game.turn !== 0) return;
     try { setGame(playSingleWattenCard(game, card.id)); setNotice(null); }
@@ -90,12 +99,19 @@ export default function WattenSingleplayer() {
               </button>
             ))}
           </div>
+          <section className="mt-5 rounded-2xl border border-white/10 bg-zinc-950/95 p-5 text-center">
+            <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-400">{ui("Points to win")}</h2>
+            <p className="mt-2 text-sm text-zinc-400">{ui("First choose how many points are needed to win the match.")}</p>
+            <div className="mt-3 flex justify-center gap-2">{[11, 15, 18].map(score => <button key={score} type="button" aria-pressed={targetScore === score} onClick={() => setTargetScore(score)} className={`h-10 w-14 rounded-lg text-sm font-black transition ${targetScore === score ? "bg-amber-400 text-amber-950 ring-2 ring-amber-200" : "bg-white/10 text-white hover:bg-white/20"}`}>{score}</button>)}</div>
+            <label className="mt-3 block text-xs text-zinc-500">{ui("Or custom value:")}<input type="number" min={4} max={50} value={targetScore} onChange={event => { const value = Number(event.target.value); if (Number.isFinite(value)) setTargetScore(Math.max(4, Math.min(50, Math.trunc(value)))); }} className="mx-auto mt-1.5 block w-20 rounded-lg border border-white/10 bg-zinc-900 px-2 py-1.5 text-center text-sm font-bold text-white outline-none focus:border-amber-400" /></label>
+            <p className="mt-3 text-xs text-zinc-400">{ui("Normal round win")} · {ui("2 points")}</p>
+          </section>
           <div className="mt-6 flex items-center gap-3 rounded-2xl border border-white/10 bg-black/20 p-4">
             <ProfileAvatar avatarId={avatarId} className="h-12 w-12 shrink-0 rounded-xl" />
             <div><p className="font-bold">{profile?.username || ui("You")}</p><p className="text-xs text-zinc-400">{count - 1} {ui("Bots")}</p></div>
           </div>
           <div className="mt-6 flex flex-wrap gap-3">
-            <button type="button" onClick={() => { setGame(createSingleWattenRound(count)); document.querySelector(".app-viewport")?.scrollTo(0, 0); }} className="flex-1 rounded-xl bg-amber-400 px-6 py-3 font-black text-amber-950 hover:bg-amber-300">{ui("Start Game")}</button>
+            <button type="button" onClick={() => { setGame(createSingleWattenRound(count, count - 1, undefined, 1, targetScore)); document.querySelector(".app-viewport")?.scrollTo(0, 0); }} className="flex-1 rounded-xl bg-amber-400 px-6 py-3 font-black text-amber-950 hover:bg-amber-300">{ui("Start Game")}</button>
             <Link to="/games/watten" className="rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-bold hover:bg-white/10">{ui("Back")}</Link>
           </div>
         </section>
@@ -131,8 +147,8 @@ export default function WattenSingleplayer() {
               <h2 className="text-xs font-black uppercase tracking-widest text-amber-300">{ui("Scoreboard")}</h2>
               <div className="mt-4 space-y-3">{game.scores.map((score, seat) => (
                 <div key={seat} className={`rounded-xl border p-3 ${seat === game.turn ? "border-amber-300/40 bg-amber-300/10" : "border-white/10 bg-white/5"}`}>
-                  <div className="flex items-center justify-between gap-2"><strong className="text-sm">{seat === 0 ? ui("You") : `${ui("Bot")} ${seat}`}</strong><b className="text-xl text-amber-200">{score}<span className="text-xs text-zinc-500"> / 15</span></b></div>
-                  <p className="mt-1 text-xs text-zinc-400">{ui(teamOf(String(seat), game.count, game.caller) === team ? "Your side" : "Opponent")} · {game.tricksWon[String(seat)] ?? 0} {ui("Tricks")}</p>
+                  <div className="flex items-center justify-between gap-2"><strong className="text-sm">{seat === 0 ? ui("You") : `${ui("Bot")} ${seat}`}</strong><b className="text-xl text-amber-200">{score}<span className="text-xs text-zinc-500"> / {game.targetScore}</span></b></div>
+                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-amber-400" style={{ width: `${Math.min(100, score / game.targetScore * 100)}%` }} /></div><p className="mt-1 text-xs text-zinc-400">{ui(teamOf(String(seat), game.count, game.caller) === team ? "Your side" : "Opponent")} · {game.tricksWon[String(seat)] ?? 0} {ui("Tricks")}</p>
                 </div>
               ))}</div>
             </section>
@@ -160,7 +176,15 @@ export default function WattenSingleplayer() {
               ) : <p className="text-center text-sm text-white/45">{ui("Waiting for the first card")}</p>}
             </div>
             {(game.phase === "cut" || game.phase === "declare") && <div className="watten-single-setup">
-        {game.phase === "cut" && <section className="rounded-2xl border border-amber-200/30 bg-black/25 p-5"><h2 className="font-bold">{ui("Cut the deck")}</h2><p className="mt-2 text-sm text-zinc-300">{ui("Choose where to cut. Revealed critical cards go alternately to the cutter and dealer.")}</p><input aria-label={ui("Cut position")} type="range" min="1" max={game.deck.length - 1} value={cutIndex} onChange={event => setCutIndex(Number(event.target.value))} className="mt-4 w-full accent-amber-300" /><p className="mt-1 text-sm">{ui("Cut position")}: {cutIndex}</p><button type="button" onClick={() => setGame(cutSingleWatten(game, cutIndex))} className="mt-4 w-full rounded-lg bg-amber-300 p-2 font-bold text-black">{ui("Cut the deck")}</button></section>}
+              {game.phase === "cut" && <section className="rounded-2xl border border-amber-200/30 bg-black/70 p-5">
+                <h2 className="font-bold">{ui("Abheben")} · {getPreviousPlayer(game.dealer, game.count) === 0 ? ui("You") : `${ui("Bot")} ${getPreviousPlayer(game.dealer, game.count)}`}</h2>
+                {getPreviousPlayer(game.dealer, game.count) === 0 ? <>
+                  <p className="mt-2 text-sm text-zinc-300">{ui("Choose where to cut. Revealed critical cards go alternately to the cutter and dealer.")}</p>
+                  <div className="mt-4 grid grid-cols-8 gap-1.5" aria-label={ui("Choose a card to cut")}>{game.deck.slice(0, -1).map((card, index) => <button key={card.id} type="button" aria-label={`${ui("Cut position")} ${index + 1}`} aria-pressed={cutIndex === index + 1} onClick={() => setCutIndex(index + 1)} className={`aspect-[2/3] rounded border text-xs font-bold ${cutIndex === index + 1 ? "border-amber-200 bg-amber-400 text-black" : "border-white/20 bg-[#173b2a] text-white hover:border-amber-300"}`}>{index + 1}</button>)}</div>
+                  <button type="button" onClick={() => setGame(cutSingleWatten(game, cutIndex))} className="mt-4 w-full rounded-lg bg-amber-300 p-2 font-bold text-black">{ui("Cut the deck")}</button>
+                </> : <p role="status" className="mt-2 text-sm text-zinc-300">{ui("The bot is cutting the deck…")}</p>}
+              </section>}
+
         {game.phase === "declare" && <section className="rounded-2xl border border-amber-200/30 bg-black/25 p-5"><h2 className="font-bold">{ui("Choose trump and Schlag")}</h2><label className="mt-3 block text-sm">{ui("Trumpf")}<select value={trump} onChange={event => setTrump(event.target.value as Suit)} className="mt-1 block w-full rounded-lg border border-white/20 bg-[#173b2a] p-2">{SUITS.map(suit => <option key={suit}>{suit}</option>)}</select></label><label className="mt-3 block text-sm">{ui("Schlag")}<select value={schlag} onChange={event => setSchlag(event.target.value as Rank)} className="mt-1 block w-full rounded-lg border border-white/20 bg-[#173b2a] p-2">{RANKS.map(rank => <option key={rank}>{rank}</option>)}</select></label><button type="button" onClick={() => setGame(declareSingleWatten(game, trump, schlag))} className="mt-4 w-full rounded-lg bg-amber-300 p-2 font-bold text-black">{ui("Continue")}</button></section>}
             </div>}
             <div className="watten-single-hand">
@@ -172,10 +196,10 @@ export default function WattenSingleplayer() {
               {notice && <p role="alert" className="mt-3 text-center text-sm text-red-200">{notice}</p>}
             </div>
           </section>
-          <aside className="watten-single-controls space-y-3"><section className="rounded-2xl border border-amber-200/20 bg-black/25 p-5"><h2 className="font-serif text-xl">{ui("Round")} {game.round}</h2><p className="mt-3 text-sm">{ui("Trumpf")}: <strong>{game.trump ? `${SUIT_SYMBOLS[game.trump]} ${game.trump}` : "—"}</strong></p><p className="mt-1 text-sm">{ui("Schlag")}: <strong>{game.schlag ?? "—"}</strong></p><p className="mt-3 text-xs text-zinc-400">{ui("First to 15 points wins. Three tricks win a round.")}</p></section>
+          <aside className="watten-single-controls space-y-3"><section className="rounded-2xl border border-amber-200/20 bg-black/25 p-5"><h2 className="font-serif text-xl">{ui("Round")} {game.round}</h2><p className="mt-3 text-sm">{ui("Trumpf")}: <strong>{game.trump ? `${SUIT_SYMBOLS[game.trump]} ${game.trump}` : "—"}</strong></p><p className="mt-1 text-sm">{ui("Schlag")}: <strong>{game.schlag ?? "—"}</strong></p><p className="mt-3 text-xs text-zinc-400">{ui("Points to win")}: {game.targetScore}. {ui("Three tricks win a round.")}</p></section>
 
-        {game.cutCards.length > 0 && game.phase !== "cut" && <p className="rounded-xl border border-amber-200/20 bg-black/25 p-3 text-xs text-amber-100">{ui("Critical cards from the cut")}: {game.cutCards.map(card => `${SUIT_SYMBOLS[card.suit]} ${card.rank}`).join(" · ")}</p>}
 
+        {game.cutCards.length > 0 && <section className="rounded-2xl border border-amber-200/20 bg-black/25 p-4"><h2 className="text-xs font-bold text-amber-200">{ui("Critical cards from the cut")}</h2><div className="mt-3 flex gap-2">{game.cutCards.map(card => <CardImage key={card.id} card={card} className="!h-20 !w-14" />)}</div></section>}
         {game.phase === "playing" && <section className="rounded-2xl border border-amber-200/20 bg-black/25 p-5"><h2 className="font-bold">{ui("Round value")}: {game.roundValue}</h2>{game.pendingBid ? <><p className="mt-2 text-sm text-zinc-300">{game.pendingBid.side === team ? ui("Your side raised the round.") : ui("Opponents raised the round.")}</p>{game.pendingBid.side !== team && <div className="mt-3 flex gap-2"><button type="button" onClick={() => setGame(respondSingleWattenBid(game, 0, true))} className="flex-1 rounded-lg bg-amber-300 p-2 font-bold text-black">{ui("Hold")}</button><button type="button" onClick={() => setGame(respondSingleWattenBid(game, 0, false))} className="flex-1 rounded-lg border border-white/20 p-2">{ui("Decline")}</button></div>}</> : canRaiseSingleWatten(game, 0) && <button type="button" onClick={() => setGame(raiseSingleWatten(game, 0))} className="mt-3 w-full rounded-lg border border-amber-300/50 p-2 font-bold text-amber-100 hover:bg-amber-300/10">{ui("Raise")}</button>}</section>}
         {game.phase === "trickPause" && <button type="button" onClick={() => setGame(advanceSingleWatten(game))} className="w-full rounded-xl bg-amber-300 p-3 font-bold text-black">{ui("Next trick")}</button>}
         {(game.phase === "roundOver" || game.phase === "matchOver") && <section className="rounded-2xl border border-amber-200/30 bg-black/25 p-5" role="status"><h2 className="font-serif text-xl">{game.phase === "matchOver" ? roundWinner === team ? ui("Your side won the match") : ui("Opponents won the match") : roundWinner === team ? ui("Your side won the round") : ui("Opponents won the round")}</h2><p className="mt-2 text-sm text-zinc-300">{game.scores.map((score, index) => `${index === 0 ? ui("You") : `${ui("Bot")} ${index}`}: ${score}`).join(" · ")}</p>{game.phase === "roundOver" ? <button type="button" onClick={() => setGame(advanceSingleWatten(game))} className="mt-4 rounded-lg bg-amber-300 px-4 py-2 font-bold text-black">{ui("Next round")}</button> : <button type="button" onClick={() => { setGame(null); setNotice(null); }} className="mt-4 rounded-lg bg-amber-300 px-4 py-2 font-bold text-black">{ui("New Game")}</button>}</section>}

@@ -1,0 +1,7 @@
+.qr-workspace { display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, .8fr); gap: 28px; align-items: start; }
+.qr-preview { display: grid; place-items: center; min-width: 0; border: 1px solid rgba(255,255,255,.12); border-radius: 20px; padding: 20px; background: rgba(255,255,255,.025); }
+.qr-preview img { display: block; width: 100%; max-width: 384px; height: auto; background: #fff; image-rendering: pixelated; }
+.qr-placeholder { display: grid; place-items: center; gap: 20px; min-height: 260px; text-align: center; color: #9ca3af; }
+.qr-workspace textarea { resize: vertical; min-height: 140px; width: 100%; padding: 12px; border: 1px solid #8290bc4b; border-radius: 9px; background: #1a2238; color: #edf0ff; font: inherit; line-height: 1.6; }
+.qr-workspace textarea:focus-visible { outline: 2px solid #c4b5fd; outline-offset: 3px; }
+@media (max-width: 700px) { .qr-workspace { grid-template-columns: minmax(0, 1fr); } }

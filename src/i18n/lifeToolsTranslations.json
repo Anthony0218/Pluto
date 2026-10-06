@@ -1,0 +1,2621 @@
+[
+  [
+    "Eleven apps are available now. Calorie Tracker and Weather Explorer are coming soon.",
+    "Elf Apps sind verfügbar. Kalorien-Tracker und Wetter-Explorer folgen bald.",
+    "Elf Apps san do. Kalorien-Tracker und Wetter-Explorer kemman boid.",
+    "현재 앱 11개를 사용할 수 있습니다. 칼로리 기록과 날씨 탐색은 곧 제공됩니다.",
+    "Доступны 11 приложений. Учёт калорий и прогноз погоды появятся позже.",
+    "Ya hay once aplicaciones disponibles. El registro de calorías y el explorador del tiempo llegarán pronto.",
+    "Onze aplicativos já estão disponíveis. O registro de calorias e o explorador do clima chegam em breve."
+  ],
+  [
+    "Enter a positive amount and valid shares.",
+    "Gib einen positiven Betrag und gültige Anteile ein.",
+    "Gib an positiven Betrag und gültige Anteile ei.",
+    "양수 금액과 유효한 분담 비율을 입력하세요.",
+    "Введите положительную сумму и корректные доли.",
+    "Introduce un importe positivo y participaciones válidas.",
+    "Insira um valor positivo e partes válidas."
+  ],
+  [
+    "Saved.",
+    "Gespeichert.",
+    "Gspeichert.",
+    "저장되었습니다.",
+    "Сохранено.",
+    "Guardado.",
+    "Salvo."
+  ],
+  [
+    "Could not save. Check the inputs or storage limits.",
+    "Speichern fehlgeschlagen. Prüfe Eingaben und Speichergrenzen.",
+    "Speichern geht ned. Prüf d'Eingaben und Speichergrenzen.",
+    "저장할 수 없습니다. 입력값이나 저장 한도를 확인하세요.",
+    "Не удалось сохранить. Проверьте данные и ограничения хранения.",
+    "No se pudo guardar. Revisa los datos o los límites de almacenamiento.",
+    "Não foi possível salvar. Confira os dados ou os limites de armazenamento."
+  ],
+  [
+    "Expense name",
+    "Name der Ausgabe",
+    "Nam von da Ausgab",
+    "지출 이름",
+    "Название расхода",
+    "Nombre del gasto",
+    "Nome da despesa"
+  ],
+  [
+    "Date",
+    "Datum",
+    "Datum",
+    "날짜",
+    "Дата",
+    "Fecha",
+    "Data"
+  ],
+  [
+    "Bill amount",
+    "Rechnungsbetrag",
+    "Rechnungsbetrag",
+    "청구 금액",
+    "Сумма счёта",
+    "Importe de la cuenta",
+    "Valor da conta"
+  ],
+  [
+    "Tip amount",
+    "Trinkgeldbetrag",
+    "Trinkgeldbetrag",
+    "팁 금액",
+    "Сумма чаевых",
+    "Importe de la propina",
+    "Valor da gorjeta"
+  ],
+  [
+    "Paid by",
+    "Bezahlt von",
+    "Zahlt von",
+    "지불한 사람",
+    "Оплатил",
+    "Pagado por",
+    "Pago por"
+  ],
+  [
+    "Custom share weights",
+    "Eigene Anteilsgewichte",
+    "Eigene Anteilsgewichte",
+    "사용자 지정 분담 가중치",
+    "Свои веса долей",
+    "Pesos personalizados",
+    "Pesos personalizados"
+  ],
+  [
+    "Use whole-number weights from 0 to 2,000,000,000. Zero excludes a participant; at least one weight must be positive.",
+    "Verwende ganze Gewichte von 0 bis 2.000.000.000. Null schließt eine Person aus; mindestens ein Gewicht muss positiv sein.",
+    "Nimm ganze Gewichte vo 0 bis 2.000.000.000. Null lasst a Person aus; mindestens oans muaß positiv sei.",
+    "0~2,000,000,000의 정수 가중치를 사용하세요. 0은 참여자를 제외하며, 하나 이상은 양수여야 합니다.",
+    "Используйте целые веса от 0 до 2 000 000 000. Ноль исключает участника; хотя бы один вес должен быть положительным.",
+    "Usa pesos enteros de 0 a 2.000.000.000. Cero excluye a una persona; al menos uno debe ser positivo.",
+    "Use pesos inteiros de 0 a 2.000.000.000. Zero exclui uma pessoa; pelo menos um deve ser positivo."
+  ],
+  [
+    "Total including tip",
+    "Gesamtbetrag mit Trinkgeld",
+    "Gesamtbetrag mit Trinkgeld",
+    "팁 포함 합계",
+    "Итого с чаевыми",
+    "Total con propina",
+    "Total com gorjeta"
+  ],
+  [
+    "Remainder cents go to the largest fractional shares, with ties in participant order. Shares always add up to the total.",
+    "Restcent gehen an die größten Bruchteile, bei Gleichstand nach Personenreihenfolge. Die Anteile ergeben immer den Gesamtbetrag.",
+    "Restcent gehng an d'größten Bruchteile, bei Gleichstand nach da Reihenfolg. D'Anteile ergeben oiwei den Gesamtbetrag.",
+    "남은 센트는 소수 부분이 큰 몫부터 배분하며 동률이면 참여자 순서를 따릅니다. 분담액의 합계는 항상 총액과 같습니다.",
+    "Оставшиеся центы получают доли с наибольшим остатком, при равенстве — по порядку участников. Сумма долей всегда равна итогу.",
+    "Los céntimos restantes se asignan a las mayores fracciones; los empates siguen el orden de participantes. Las partes siempre suman el total.",
+    "Os centavos restantes vão para as maiores frações; os empates seguem a ordem dos participantes. As partes sempre somam o total."
+  ],
+  [
+    "Enter an amount to preview the split.",
+    "Gib einen Betrag für die Aufteilung ein.",
+    "Gib an Betrag für d'Aufteilung ei.",
+    "금액을 입력하면 분담 내역을 미리 볼 수 있습니다.",
+    "Введите сумму для расчёта долей.",
+    "Introduce un importe para ver el reparto.",
+    "Insira um valor para visualizar a divisão."
+  ],
+  [
+    "Save changes",
+    "Änderungen speichern",
+    "Änderungen speichern",
+    "변경 저장",
+    "Сохранить изменения",
+    "Guardar cambios",
+    "Salvar alterações"
+  ],
+  [
+    "Save expense",
+    "Ausgabe speichern",
+    "Ausgab speichern",
+    "지출 저장",
+    "Сохранить расход",
+    "Guardar gasto",
+    "Salvar despesa"
+  ],
+  [
+    "Group balances",
+    "Gruppensalden",
+    "Gruppensalden",
+    "그룹 잔액",
+    "Баланс группы",
+    "Saldos del grupo",
+    "Saldos do grupo"
+  ],
+  [
+    "Positive balances are owed to a participant; negative balances are what they owe.",
+    "Positive Salden sind Forderungen; negative Salden sind Schulden der Person.",
+    "Positive Salden san Forderungen; negative san d'Schulden vo da Person.",
+    "양수 잔액은 받을 금액이고 음수 잔액은 갚을 금액입니다.",
+    "Положительный баланс — участнику должны; отрицательный — должен он.",
+    "Un saldo positivo indica lo que deben a la persona; uno negativo, lo que debe.",
+    "Saldo positivo indica o que a pessoa tem a receber; negativo, o que deve."
+  ],
+  [
+    "Suggested repayments",
+    "Vorgeschlagene Rückzahlungen",
+    "Vorgschlagene Rückzahlungen",
+    "추천 상환",
+    "Предлагаемые выплаты",
+    "Reembolsos sugeridos",
+    "Pagamentos sugeridos"
+  ],
+  [
+    "Everyone is settled up.",
+    "Alle Salden sind ausgeglichen.",
+    "Olle Salden san ausglichen.",
+    "모두 정산되었습니다.",
+    "Все расчёты завершены.",
+    "Todas las cuentas están saldadas.",
+    "Todas as contas estão acertadas."
+  ],
+  [
+    "Use suggestion",
+    "Vorschlag übernehmen",
+    "Vorschlag übernehma",
+    "추천 사용",
+    "Использовать предложение",
+    "Usar sugerencia",
+    "Usar sugestão"
+  ],
+  [
+    "Repayment recorded.",
+    "Rückzahlung erfasst.",
+    "Rückzahlung erfasst.",
+    "상환이 기록되었습니다.",
+    "Выплата записана.",
+    "Reembolso registrado.",
+    "Pagamento registrado."
+  ],
+  [
+    "Check the repayment amount and participants.",
+    "Prüfe Rückzahlungsbetrag und Beteiligte.",
+    "Prüf Rückzahlungsbetrag und Beteiligte.",
+    "상환 금액과 참여자를 확인하세요.",
+    "Проверьте сумму выплаты и участников.",
+    "Revisa el importe y los participantes del reembolso.",
+    "Confira o valor e os participantes do pagamento."
+  ],
+  [
+    "From participant",
+    "Von Person",
+    "Vo da Person",
+    "보내는 참여자",
+    "От участника",
+    "De participante",
+    "De participante"
+  ],
+  [
+    "To participant",
+    "An Person",
+    "An d'Person",
+    "받는 참여자",
+    "Участнику",
+    "A participante",
+    "Para participante"
+  ],
+  [
+    "Repayment amount",
+    "Rückzahlungsbetrag",
+    "Rückzahlungsbetrag",
+    "상환 금액",
+    "Сумма выплаты",
+    "Importe del reembolso",
+    "Valor do pagamento"
+  ],
+  [
+    "Record repayment",
+    "Rückzahlung erfassen",
+    "Rückzahlung erfassen",
+    "상환 기록",
+    "Записать выплату",
+    "Registrar reembolso",
+    "Registrar pagamento"
+  ],
+  [
+    "Expenses and repayments",
+    "Ausgaben und Rückzahlungen",
+    "Ausgaben und Rückzahlungen",
+    "지출 및 상환",
+    "Расходы и выплаты",
+    "Gastos y reembolsos",
+    "Despesas e pagamentos"
+  ],
+  [
+    "Repayment",
+    "Rückzahlung",
+    "Rückzahlung",
+    "상환",
+    "Выплата",
+    "Reembolso",
+    "Pagamento"
+  ],
+  [
+    "Type",
+    "Typ",
+    "Typ",
+    "유형",
+    "Тип",
+    "Tipo",
+    "Tipo"
+  ],
+  [
+    "Amount",
+    "Betrag",
+    "Betrag",
+    "금액",
+    "Сумма",
+    "Importe",
+    "Valor"
+  ],
+  [
+    "Currency",
+    "Währung",
+    "Währung",
+    "통화",
+    "Валюта",
+    "Moneda",
+    "Moeda"
+  ],
+  [
+    "Expense",
+    "Ausgabe",
+    "Ausgab",
+    "지출",
+    "Расход",
+    "Gasto",
+    "Despesa"
+  ],
+  [
+    "Export CSV",
+    "CSV exportieren",
+    "CSV exportiern",
+    "CSV 내보내기",
+    "Экспорт CSV",
+    "Exportar CSV",
+    "Exportar CSV"
+  ],
+  [
+    "Groups are a shared-expense ledger saved in your browser. Participants do not receive invitations or synced access. Recording a repayment does not transfer money.",
+    "Gruppen sind ein Ausgabenbuch in deinem Browser. Beteiligte erhalten keine Einladung oder synchronisierten Zugriff. Erfasste Rückzahlungen überweisen kein Geld.",
+    "Gruppen san a Ausgabenbuch in deim Browser. Beteiligte kriagn koa Einladung oder synchronisierten Zugriff. Erfasste Rückzahlungen überweisen koa Geld.",
+    "그룹은 브라우저에 저장되는 공동 지출 장부입니다. 참여자에게 초대나 동기화 접근이 제공되지 않습니다. 상환 기록은 실제 송금이 아닙니다.",
+    "Группы — журнал общих расходов в вашем браузере. Участники не получают приглашений или синхронизированного доступа. Запись выплаты не переводит деньги.",
+    "Los grupos son un registro de gastos compartidos en tu navegador. No envían invitaciones ni acceso sincronizado. Registrar un reembolso no transfiere dinero.",
+    "Grupos são um registro de despesas compartilhadas no seu navegador. Não enviam convites nem acesso sincronizado. Registrar um pagamento não transfere dinheiro."
+  ],
+  [
+    "Add 2–30 different participant names, separated by commas.",
+    "Gib 2–30 verschiedene Namen ein, getrennt durch Kommas.",
+    "Gib 2–30 verschiedene Namen ei, mit Kommas trennt.",
+    "서로 다른 참여자 이름 2~30개를 쉼표로 구분해 입력하세요.",
+    "Введите 2–30 разных имён участников через запятую.",
+    "Añade de 2 a 30 nombres distintos, separados por comas.",
+    "Adicione de 2 a 30 nomes diferentes, separados por vírgulas."
+  ],
+  [
+    "Group name",
+    "Gruppenname",
+    "Gruppennam",
+    "그룹 이름",
+    "Название группы",
+    "Nombre del grupo",
+    "Nome do grupo"
+  ],
+  [
+    "Participants separated by commas",
+    "Beteiligte, durch Kommas getrennt",
+    "Beteiligte, mit Kommas trennt",
+    "참여자 이름 (쉼표로 구분)",
+    "Участники через запятую",
+    "Participantes separados por comas",
+    "Participantes separados por vírgulas"
+  ],
+  [
+    "Create group",
+    "Gruppe erstellen",
+    "Gruppe erstellen",
+    "그룹 만들기",
+    "Создать группу",
+    "Crear grupo",
+    "Criar grupo"
+  ],
+  [
+    "Saved groups",
+    "Gespeicherte Gruppen",
+    "Gspeicherte Gruppen",
+    "저장된 그룹",
+    "Сохранённые группы",
+    "Grupos guardados",
+    "Grupos salvos"
+  ],
+  [
+    "Month",
+    "Monat",
+    "Monat",
+    "월",
+    "Месяц",
+    "Mes",
+    "Mês"
+  ],
+  [
+    "Income",
+    "Einnahmen",
+    "Einnahmen",
+    "수입",
+    "Доход",
+    "Ingresos",
+    "Receitas"
+  ],
+  [
+    "Expenses",
+    "Ausgaben",
+    "Ausgaben",
+    "지출",
+    "Расходы",
+    "Gastos",
+    "Despesas"
+  ],
+  [
+    "Income minus expenses",
+    "Einnahmen minus Ausgaben",
+    "Einnahmen minus Ausgaben",
+    "수입에서 지출을 뺀 금액",
+    "Доход минус расходы",
+    "Ingresos menos gastos",
+    "Receitas menos despesas"
+  ],
+  [
+    "Monthly spending limit",
+    "Monatliches Ausgabenlimit",
+    "Monatliches Ausgabenlimit",
+    "월 지출 한도",
+    "Месячный лимит расходов",
+    "Límite mensual de gastos",
+    "Limite mensal de gastos"
+  ],
+  [
+    "Save spending limit",
+    "Ausgabenlimit speichern",
+    "Ausgabenlimit speichern",
+    "지출 한도 저장",
+    "Сохранить лимит",
+    "Guardar límite de gastos",
+    "Salvar limite de gastos"
+  ],
+  [
+    "Over budget",
+    "Budget überschritten",
+    "Budget überschritten",
+    "예산 초과",
+    "Бюджет превышен",
+    "Presupuesto superado",
+    "Orçamento excedido"
+  ],
+  [
+    "Budget remaining",
+    "Verbleibendes Budget",
+    "Übrigs Budget",
+    "남은 예산",
+    "Остаток бюджета",
+    "Presupuesto restante",
+    "Orçamento restante"
+  ],
+  [
+    "Spending by category",
+    "Ausgaben nach Kategorie",
+    "Ausgaben nach Kategorie",
+    "항목별 지출",
+    "Расходы по категориям",
+    "Gastos por categoría",
+    "Despesas por categoria"
+  ],
+  [
+    "Entry name",
+    "Name des Eintrags",
+    "Nam vom Eintrag",
+    "내역 이름",
+    "Название записи",
+    "Nombre del registro",
+    "Nome do registro"
+  ],
+  [
+    "Category",
+    "Kategorie",
+    "Kategorie",
+    "항목",
+    "Категория",
+    "Categoría",
+    "Categoria"
+  ],
+  [
+    "Repeat monthly from this date",
+    "Ab diesem Datum monatlich wiederholen",
+    "Ab dem Datum monatlich wiederhoin",
+    "이 날짜부터 매월 반복",
+    "Повторять ежемесячно с этой даты",
+    "Repetir mensualmente desde esta fecha",
+    "Repetir mensalmente a partir desta data"
+  ],
+  [
+    "Add entry",
+    "Eintrag hinzufügen",
+    "Eintrag dazua",
+    "내역 추가",
+    "Добавить запись",
+    "Añadir registro",
+    "Adicionar registro"
+  ],
+  [
+    "Monthly repeats are planned amounts in each month from the start date, using the last day for shorter months. Totals include these plans and manual entries. Subscription costs stay separate to avoid counting them twice.",
+    "Monatliche Wiederholungen sind geplante Beträge ab dem Startdatum, in kürzeren Monaten am letzten Tag. Summen enthalten diese Pläne und manuelle Einträge. Abokosten bleiben separat, damit sie nicht doppelt zählen.",
+    "Monatliche Wiederholungen san geplante Beträge abm Startdatum, in kürzeren Monaten am letzten Tag. Summen enthalten de Pläne und manuelle Einträge. Abokosten bleim separat, damit's ned doppelt zähln.",
+    "월 반복은 시작일부터 매월 계획된 금액이며 짧은 달에는 말일을 사용합니다. 합계에는 계획과 수동 내역이 포함됩니다. 중복 계산을 막기 위해 구독 비용은 별도로 유지됩니다.",
+    "Ежемесячные повторы — плановые суммы с начальной даты, в коротких месяцах — в последний день. Итоги включают планы и ручные записи. Подписки учитываются отдельно во избежание двойного счёта.",
+    "Las repeticiones son importes previstos desde la fecha inicial; en meses cortos usan el último día. Los totales incluyen planes y registros manuales. Las suscripciones se mantienen aparte para evitar duplicados.",
+    "As repetições são valores previstos desde a data inicial; meses curtos usam o último dia. Os totais incluem planos e registros manuais. Assinaturas ficam separadas para evitar duplicidade."
+  ],
+  [
+    "Entries for this month",
+    "Einträge dieses Monats",
+    "Einträge vom Monat",
+    "이번 달 내역",
+    "Записи за этот месяц",
+    "Registros de este mes",
+    "Registros deste mês"
+  ],
+  [
+    "No entries for this month and currency.",
+    "Keine Einträge für diesen Monat und diese Währung.",
+    "Koa Einträge für den Monat und de Währung.",
+    "이 달과 통화에 해당하는 내역이 없습니다.",
+    "Нет записей за этот месяц в этой валюте.",
+    "No hay registros para este mes y moneda.",
+    "Não há registros para este mês e moeda."
+  ],
+  [
+    "Monthly plan",
+    "Monatlicher Plan",
+    "Monatlicher Plan",
+    "월별 계획",
+    "Месячный план",
+    "Plan mensual",
+    "Plano mensal"
+  ],
+  [
+    "Manage saved entries",
+    "Gespeicherte Einträge verwalten",
+    "Gspeicherte Einträge verwalten",
+    "저장된 내역 관리",
+    "Управление записями",
+    "Gestionar registros guardados",
+    "Gerenciar registros salvos"
+  ],
+  [
+    "Editing or deleting a monthly plan changes every month generated from it.",
+    "Ändern oder Löschen eines monatlichen Plans wirkt auf alle daraus erzeugten Monate.",
+    "Ändern oder Löschen von am monatlichen Plan wirkt auf olle daraus erzeugten Monate.",
+    "월별 계획을 수정하거나 삭제하면 그 계획에서 생성된 모든 달이 변경됩니다.",
+    "Изменение или удаление месячного плана влияет на все созданные из него месяцы.",
+    "Editar o borrar un plan mensual cambia todos los meses generados a partir de él.",
+    "Editar ou excluir um plano mensal altera todos os meses gerados a partir dele."
+  ],
+  [
+    "Time zone",
+    "Zeitzone",
+    "Zeitzone",
+    "시간대",
+    "Часовой пояс",
+    "Zona horaria",
+    "Fuso horário"
+  ],
+  [
+    "Task",
+    "Aufgabe",
+    "Aufgab",
+    "할 일",
+    "Задача",
+    "Tarea",
+    "Tarefa"
+  ],
+  [
+    "Start time",
+    "Startzeit",
+    "Startzeit",
+    "시작 시간",
+    "Время начала",
+    "Hora de inicio",
+    "Hora de início"
+  ],
+  [
+    "Duration in minutes",
+    "Dauer in Minuten",
+    "Dauer in Minuten",
+    "소요 시간 (분)",
+    "Длительность в минутах",
+    "Duración en minutos",
+    "Duração em minutos"
+  ],
+  [
+    "Repeated local time",
+    "Doppelte Ortszeit",
+    "Doppelte Ortszeit",
+    "반복되는 현지 시간",
+    "Повторяющееся местное время",
+    "Hora local repetida",
+    "Hora local repetida"
+  ],
+  [
+    "First occurrence",
+    "Erstes Auftreten",
+    "Erstes Auftreten",
+    "첫 번째 시간",
+    "Первое вхождение",
+    "Primera ocurrencia",
+    "Primeira ocorrência"
+  ],
+  [
+    "Second occurrence",
+    "Zweites Auftreten",
+    "Zweites Auftreten",
+    "두 번째 시간",
+    "Второе вхождение",
+    "Segunda ocurrencia",
+    "Segunda ocorrência"
+  ],
+  [
+    "This local time does not exist, or the date or time zone is invalid.",
+    "Diese Ortszeit existiert nicht, oder Datum bzw. Zeitzone sind ungültig.",
+    "De Ortszeit gibt's ned, oder Datum bzw. Zeitzone san ungültig.",
+    "이 현지 시간이 존재하지 않거나 날짜 또는 시간대가 유효하지 않습니다.",
+    "Это местное время не существует либо дата или часовой пояс неверны.",
+    "Esta hora local no existe, o la fecha o zona horaria no es válida.",
+    "Esta hora local não existe, ou a data ou o fuso horário é inválido."
+  ],
+  [
+    "Remind me at the start",
+    "Zum Start erinnern",
+    "Zum Start erinnern",
+    "시작할 때 알림",
+    "Напомнить в начале",
+    "Recordarme al inicio",
+    "Lembrar no início"
+  ],
+  [
+    "Add task",
+    "Aufgabe hinzufügen",
+    "Aufgab dazua",
+    "할 일 추가",
+    "Добавить задачу",
+    "Añadir tarea",
+    "Adicionar tarefa"
+  ],
+  [
+    "Daily timeline",
+    "Tagesablauf",
+    "Tagesablauf",
+    "하루 일정",
+    "Расписание дня",
+    "Cronograma diario",
+    "Cronograma diário"
+  ],
+  [
+    "Conflicts include unfinished tasks on all dates. Durations use elapsed minutes, including across clock changes.",
+    "Konflikte berücksichtigen unerledigte Aufgaben aller Tage. Die Dauer zählt verstrichene Minuten, auch bei Zeitumstellungen.",
+    "Konflikte berücksichtigen unerledigte Aufgaben vo ollen Tagen. D'Dauer zählt verstrichene Minuten, aa bei Zeitumstellungen.",
+    "충돌은 모든 날짜의 미완료 할 일을 포함합니다. 소요 시간은 시간 변경을 포함한 실제 경과 분으로 계산됩니다.",
+    "Конфликты учитывают незавершённые задачи всех дат. Длительность — прошедшие минуты, включая перевод часов.",
+    "Los conflictos incluyen tareas pendientes de todas las fechas. La duración usa minutos transcurridos, incluidos cambios de hora.",
+    "Os conflitos incluem tarefas pendentes de todas as datas. A duração usa minutos decorridos, incluindo mudanças de horário."
+  ],
+  [
+    "No tasks on this day in this time zone.",
+    "Keine Aufgaben an diesem Tag in dieser Zeitzone.",
+    "Koa Aufgaben an dem Tag in der Zeitzone.",
+    "이 날짜와 시간대에 할 일이 없습니다.",
+    "Нет задач на этот день в этом часовом поясе.",
+    "No hay tareas este día en esta zona horaria.",
+    "Não há tarefas neste dia e fuso horário."
+  ],
+  [
+    "minutes",
+    "Minuten",
+    "Minuten",
+    "분",
+    "минут",
+    "minutos",
+    "minutos"
+  ],
+  [
+    "Scheduling conflict",
+    "Terminkonflikt",
+    "Terminkonflikt",
+    "일정 충돌",
+    "Конфликт расписания",
+    "Conflicto de horario",
+    "Conflito de horário"
+  ],
+  [
+    "Reminder dismissed",
+    "Erinnerung geschlossen",
+    "Erinnerung zugmacht",
+    "알림 닫힘",
+    "Напоминание закрыто",
+    "Recordatorio descartado",
+    "Lembrete dispensado"
+  ],
+  [
+    "Reminder enabled",
+    "Erinnerung aktiviert",
+    "Erinnerung aktiviert",
+    "알림 켜짐",
+    "Напоминание включено",
+    "Recordatorio activado",
+    "Lembrete ativado"
+  ],
+  [
+    "Reminders appear while Pluto is open. Missed reminders appear when you return. Background and device delivery come later.",
+    "Erinnerungen erscheinen, solange Pluto geöffnet ist. Verpasste Erinnerungen erscheinen bei deiner Rückkehr. Hintergrund- und geräteübergreifende Zustellung folgen später.",
+    "Erinnerungen kemman, solang Pluto offen is. Verpasste Erinnerungen kemman beim Zruckkemma. Hintergrund- und geräteübergreifende Zustellung folgt später.",
+    "Pluto가 열려 있을 때 알림이 표시됩니다. 놓친 알림은 돌아오면 표시됩니다. 백그라운드 및 기기 간 전달은 추후 제공됩니다.",
+    "Напоминания появляются, пока Pluto открыт. Пропущенные появятся при возвращении. Фоновая доставка и доставка на другие устройства появятся позже.",
+    "Los recordatorios aparecen mientras Pluto está abierto. Los pendientes aparecen al volver. La entrega en segundo plano y entre dispositivos llegará después.",
+    "Lembretes aparecem enquanto Pluto está aberto. Os perdidos aparecem ao voltar. A entrega em segundo plano e entre dispositivos chega depois."
+  ],
+  [
+    "Storage is unavailable. Your tools stay available only for this session.",
+    "Speicher nicht verfügbar. Deine Tools bleiben nur in dieser Sitzung verfügbar.",
+    "Speicher geht ned. Deine Tools bleim nur in der Sitzung verfügbar.",
+    "저장소를 사용할 수 없습니다. 도구 데이터는 이번 세션에만 유지됩니다.",
+    "Хранилище недоступно. Данные сохранятся только в этом сеансе.",
+    "El almacenamiento no está disponible. Los datos solo duran esta sesión.",
+    "O armazenamento não está disponível. Os dados duram apenas esta sessão."
+  ],
+  [
+    "Saved in this browser, separately for each account. Device sync comes later.",
+    "In diesem Browser gespeichert, getrennt für jedes Konto. Gerätesynchronisierung folgt später.",
+    "In dem Browser gspeichert, getrennt für jedes Konto. Gerätesynchronisierung kimmt später.",
+    "계정별로 이 브라우저에 저장됩니다. 기기 동기화는 추후 제공됩니다.",
+    "Сохраняется в этом браузере отдельно для каждой учётной записи. Синхронизация устройств появится позже.",
+    "Guardado en este navegador por cuenta. La sincronización entre dispositivos llegará después.",
+    "Salvo neste navegador por conta. A sincronização entre dispositivos chega depois."
+  ],
+  [
+    "Delete this saved item?",
+    "Diesen gespeicherten Eintrag löschen?",
+    "Den gspeicherten Eintrag löschen?",
+    "이 저장 항목을 삭제할까요?",
+    "Удалить эту сохранённую запись?",
+    "¿Borrar este elemento guardado?",
+    "Excluir este item salvo?"
+  ],
+  [
+    "Monthly equivalent",
+    "Monatlicher Gegenwert",
+    "Monatlicher Gegenwert",
+    "월 환산액",
+    "Месячный эквивалент",
+    "Equivalente mensual",
+    "Equivalente mensal"
+  ],
+  [
+    "Annualized cost",
+    "Jährlicher Gegenwert",
+    "Jährlicher Gegenwert",
+    "연 환산 비용",
+    "Годовая стоимость",
+    "Coste anualizado",
+    "Custo anualizado"
+  ],
+  [
+    "Active subscriptions",
+    "Aktive Abonnements",
+    "Aktive Abos",
+    "활성 구독",
+    "Активные подписки",
+    "Suscripciones activas",
+    "Assinaturas ativas"
+  ],
+  [
+    "Annualized costs include all active subscriptions in the selected currency, even future starts. Yearly fees are divided by 12 for the monthly equivalent; this is not the amount billed each month.",
+    "Jahreswerte enthalten alle aktiven Abos der gewählten Währung, auch zukünftige Starts. Jahresgebühren werden für den Monatswert durch 12 geteilt; das ist nicht der monatliche Rechnungsbetrag.",
+    "Jahreswerte enthalten olle aktiven Abos in da gwählten Währung, aa zukünftige Starts. Jahresgebühren werdn fürn Monatswert durch 12 teilt; des is ned da monatliche Rechnungsbetrag.",
+    "연 환산액에는 미래 시작을 포함해 선택 통화의 모든 활성 구독이 포함됩니다. 연 요금은 월 환산을 위해 12로 나누며 실제 월별 청구액이 아닙니다.",
+    "Годовая стоимость включает все активные подписки в выбранной валюте, включая будущие. Годовой платёж делится на 12 для месячного эквивалента; это не фактический ежемесячный счёт.",
+    "El coste anualizado incluye todas las suscripciones activas en la moneda elegida, incluso futuras. Las cuotas anuales se dividen entre 12; no es la factura mensual real.",
+    "O custo anualizado inclui todas as assinaturas ativas na moeda escolhida, mesmo futuras. Taxas anuais são divididas por 12; não é o valor efetivamente cobrado todo mês."
+  ],
+  [
+    "Subscription name",
+    "Name des Abonnements",
+    "Nam vom Abo",
+    "구독 이름",
+    "Название подписки",
+    "Nombre de la suscripción",
+    "Nome da assinatura"
+  ],
+  [
+    "Price per billing cycle",
+    "Preis pro Abrechnungszeitraum",
+    "Preis pro Abrechnungszeitraum",
+    "청구 주기당 요금",
+    "Цена за период оплаты",
+    "Precio por ciclo de facturación",
+    "Preço por ciclo de cobrança"
+  ],
+  [
+    "First renewal date",
+    "Erstes Verlängerungsdatum",
+    "Erstes Verlängerungsdatum",
+    "첫 갱신일",
+    "Дата первого продления",
+    "Primera fecha de renovación",
+    "Primeira data de renovação"
+  ],
+  [
+    "Billing cycle",
+    "Abrechnungszeitraum",
+    "Abrechnungszeitraum",
+    "청구 주기",
+    "Период оплаты",
+    "Ciclo de facturación",
+    "Ciclo de cobrança"
+  ],
+  [
+    "Monthly",
+    "Monatlich",
+    "Monatlich",
+    "매월",
+    "Ежемесячно",
+    "Mensual",
+    "Mensal"
+  ],
+  [
+    "Yearly",
+    "Jährlich",
+    "Jährlich",
+    "매년",
+    "Ежегодно",
+    "Anual",
+    "Anual"
+  ],
+  [
+    "Add subscription",
+    "Abonnement hinzufügen",
+    "Abo dazua",
+    "구독 추가",
+    "Добавить подписку",
+    "Añadir suscripción",
+    "Adicionar assinatura"
+  ],
+  [
+    "Renewals and subscriptions",
+    "Verlängerungen und Abonnements",
+    "Verlängerungen und Abos",
+    "갱신 및 구독",
+    "Продления и подписки",
+    "Renovaciones y suscripciones",
+    "Renovações e assinaturas"
+  ],
+  [
+    "No subscriptions in this currency.",
+    "Keine Abonnements in dieser Währung.",
+    "Koa Abos in der Währung.",
+    "이 통화의 구독이 없습니다.",
+    "Нет подписок в этой валюте.",
+    "No hay suscripciones en esta moneda.",
+    "Não há assinaturas nesta moeda."
+  ],
+  [
+    "Next renewal",
+    "Nächste Verlängerung",
+    "Nächste Verlängerung",
+    "다음 갱신",
+    "Следующее продление",
+    "Próxima renovación",
+    "Próxima renovação"
+  ],
+  [
+    "Inactive",
+    "Inaktiv",
+    "Inaktiv",
+    "비활성",
+    "Неактивна",
+    "Inactiva",
+    "Inativa"
+  ],
+  [
+    "Deactivate",
+    "Deaktivieren",
+    "Deaktiviern",
+    "비활성화",
+    "Отключить",
+    "Desactivar",
+    "Desativar"
+  ],
+  [
+    "Activate",
+    "Aktivieren",
+    "Aktiviern",
+    "활성화",
+    "Включить",
+    "Activar",
+    "Ativar"
+  ],
+  [
+    "Renewals keep the original day, clamping to the last day of shorter months. Deactivating here does not cancel a subscription with its provider. Renewal reminders can be added in Day Planner.",
+    "Verlängerungen behalten den ursprünglichen Tag, in kürzeren Monaten den letzten Tag. Deaktivieren hier kündigt kein Abo beim Anbieter. Verlängerungserinnerungen kannst du im Tagesplaner hinzufügen.",
+    "Verlängerungen behalten den ursprünglichen Tag, in kürzeren Monaten den letzten Tag. Deaktiviern hier kündigt koa Abo beim Anbieter. Verlängerungserinnerungen kannst im Tagesplaner dazua doa.",
+    "갱신은 원래 날짜를 유지하며 짧은 달에는 말일로 조정됩니다. 여기서 비활성화해도 제공업체 구독은 취소되지 않습니다. 갱신 알림은 하루 계획에 추가할 수 있습니다.",
+    "Продления сохраняют исходный день, в коротких месяцах — последний день. Отключение здесь не отменяет подписку у поставщика. Напоминания можно добавить в планировщике дня.",
+    "Las renovaciones conservan el día original, ajustándolo al último día en meses cortos. Desactivar aquí no cancela con el proveedor. Puedes añadir recordatorios en el planificador diario.",
+    "Renovações mantêm o dia original, ajustando ao último dia em meses curtos. Desativar aqui não cancela com o fornecedor. Lembretes podem ser adicionados no planejador diário."
+  ],
+  [
+    "Source time zone",
+    "Ausgangszeitzone",
+    "Ausgangszeitzone",
+    "기준 시간대",
+    "Исходный часовой пояс",
+    "Zona horaria de origen",
+    "Fuso horário de origem"
+  ],
+  [
+    "Meeting duration in minutes",
+    "Besprechungsdauer in Minuten",
+    "Besprechungsdauer in Minuten",
+    "회의 시간 (분)",
+    "Длительность встречи в минутах",
+    "Duración de la reunión en minutos",
+    "Duração da reunião em minutos"
+  ],
+  [
+    "Selected instant",
+    "Gewählter Zeitpunkt",
+    "Gwählter Zeitpunkt",
+    "선택한 시각",
+    "Выбранный момент",
+    "Instante seleccionado",
+    "Instante selecionado"
+  ],
+  [
+    "Local times at the selected instant",
+    "Ortszeiten zum gewählten Zeitpunkt",
+    "Ortszeiten zum gwählten Zeitpunkt",
+    "선택한 시각의 현지 시간",
+    "Местное время в выбранный момент",
+    "Horas locales en el instante seleccionado",
+    "Horários locais no instante selecionado"
+  ],
+  [
+    "Local time",
+    "Ortszeit",
+    "Ortszeit",
+    "현지 시간",
+    "Местное время",
+    "Hora local",
+    "Hora local"
+  ],
+  [
+    "Daily availability",
+    "Tägliche Verfügbarkeit",
+    "Tägliche Verfügbarkeit",
+    "일일 가능 시간",
+    "Ежедневная доступность",
+    "Disponibilidad diaria",
+    "Disponibilidade diária"
+  ],
+  [
+    "Possible starts in the next 24 hours, every 30 minutes from your selected time. The entire meeting must fit every daily window.",
+    "Mögliche Starts in den nächsten 24 Stunden, alle 30 Minuten ab deiner gewählten Zeit. Die gesamte Besprechung muss in jedes Tagesfenster passen.",
+    "Mögliche Starts in de nächsten 24 Stunden, olle 30 Minuten ab deiner gwählten Zeit. D'ganze Besprechung muaß in jedes Tagesfenster passen.",
+    "선택한 시간부터 30분 간격으로 향후 24시간의 가능한 시작 시간을 표시합니다. 회의 전체가 모든 일일 가능 시간에 들어가야 합니다.",
+    "Возможные начала в следующие 24 часа с шагом 30 минут от выбранного времени. Вся встреча должна помещаться в каждое окно доступности.",
+    "Posibles inicios en las próximas 24 horas, cada 30 minutos desde la hora elegida. Toda la reunión debe caber en cada ventana diaria.",
+    "Inícios possíveis nas próximas 24 horas, a cada 30 minutos desde o horário escolhido. A reunião inteira deve caber em cada janela diária."
+  ],
+  [
+    "No overlapping availability for this duration.",
+    "Keine gemeinsame Verfügbarkeit für diese Dauer.",
+    "Koa gemeinsame Verfügbarkeit für de Dauer.",
+    "이 시간 길이에 맞는 공통 가능 시간이 없습니다.",
+    "Нет общего окна для этой длительности.",
+    "No hay disponibilidad común para esta duración.",
+    "Não há disponibilidade comum para esta duração."
+  ],
+  [
+    "Use IANA time zones such as Europe/Berlin or Asia/Seoul. Dates include daylight-saving changes. Availability repeats daily; an end before the start means an overnight window.",
+    "Verwende IANA-Zeitzonen wie Europe/Berlin oder Asia/Seoul. Datumsangaben berücksichtigen Sommerzeit. Verfügbarkeit wiederholt sich täglich; ein Ende vor dem Start bedeutet ein Fenster über Nacht.",
+    "Nimm IANA-Zeitzonen wia Europe/Berlin oder Asia/Seoul. Datumsangaben berücksichtigen Sommerzeit. Verfügbarkeit wiederholt si täglich; a Ende vorm Start bedeutet a Fenster über Nacht.",
+    "Europe/Berlin 또는 Asia/Seoul 같은 IANA 시간대를 사용하세요. 날짜에는 서머타임 변경이 반영됩니다. 가능 시간은 매일 반복되며 종료가 시작보다 이르면 자정을 넘는 시간대입니다.",
+    "Используйте зоны IANA, например Europe/Berlin или Asia/Seoul. Даты учитывают летнее время. Доступность повторяется ежедневно; конец раньше начала означает ночное окно.",
+    "Usa zonas IANA como Europe/Berlin o Asia/Seoul. Las fechas incluyen cambios de horario. La disponibilidad se repite a diario; un fin anterior al inicio indica una ventana nocturna.",
+    "Use fusos IANA como Europe/Berlin ou Asia/Seoul. As datas incluem mudanças de horário. A disponibilidade se repete diariamente; término antes do início indica uma janela noturna."
+  ],
+  [
+    "Available from",
+    "Verfügbar ab",
+    "Verfügbar ab",
+    "가능 시작 시간",
+    "Доступен с",
+    "Disponible desde",
+    "Disponível a partir de"
+  ],
+  [
+    "Available until",
+    "Verfügbar bis",
+    "Verfügbar bis",
+    "가능 종료 시간",
+    "Доступен до",
+    "Disponible hasta",
+    "Disponível até"
+  ],
+  [
+    "Add location",
+    "Ort hinzufügen",
+    "Ort dazua",
+    "지역 추가",
+    "Добавить место",
+    "Añadir ubicación",
+    "Adicionar local"
+  ],
+  [
+    "Remove location",
+    "Ort entfernen",
+    "Ort wegnehma",
+    "지역 제거",
+    "Удалить место",
+    "Quitar ubicación",
+    "Remover local"
+  ],
+  [
+    "Saved locations",
+    "Gespeicherte Orte",
+    "Gspeicherte Orte",
+    "저장된 지역",
+    "Сохранённые места",
+    "Ubicaciones guardadas",
+    "Locais salvos"
+  ],
+  [
+    "In-app reminders",
+    "Erinnerungen in der App",
+    "Erinnerungen in da App",
+    "앱 내 알림",
+    "Напоминания в приложении",
+    "Recordatorios en la aplicación",
+    "Lembretes no aplicativo"
+  ],
+  [
+    "Task reminder",
+    "Aufgabenerinnerung",
+    "Aufgabenerinnerung",
+    "할 일 알림",
+    "Напоминание о задаче",
+    "Recordatorio de tarea",
+    "Lembrete de tarefa"
+  ],
+  [
+    "Dismiss",
+    "Schließen",
+    "Zuamacha",
+    "닫기",
+    "Закрыть",
+    "Descartar",
+    "Dispensar"
+  ],
+  [
+    "More due tasks are listed in Day Planner.",
+    "Weitere fällige Aufgaben findest du im Tagesplaner.",
+    "Weitere fällige Aufgaben findst im Tagesplaner.",
+    "다른 예정된 할 일은 하루 계획에 표시됩니다.",
+    "Остальные задачи перечислены в планировщике дня.",
+    "Hay más tareas pendientes en el planificador diario.",
+    "Mais tarefas pendentes estão no planejador diário."
+  ],
+  [
+    "Time for a break",
+    "Zeit für eine Pause",
+    "Zeit für a Pause",
+    "휴식 시간",
+    "Пора отдохнуть",
+    "Hora de un descanso",
+    "Hora de uma pausa"
+  ],
+  [
+    "Stand up, move, or rest your eyes when it suits you.",
+    "Steh auf, bewege dich oder entspanne deine Augen, wenn es passt.",
+    "Steh auf, beweg di oder entspann deine Augen, wenn's passt.",
+    "편한 때에 일어나 움직이거나 눈을 쉬게 하세요.",
+    "Встаньте, подвигайтесь или дайте глазам отдых, когда вам удобно.",
+    "Levántate, muévete o descansa la vista cuando te venga bien.",
+    "Levante-se, movimente-se ou descanse os olhos quando for conveniente."
+  ],
+  [
+    "Turn off",
+    "Ausschalten",
+    "Ausschalten",
+    "끄기",
+    "Выключить",
+    "Desactivar",
+    "Desligar"
+  ],
+  [
+    "Sound is unavailable. The visual timer still works.",
+    "Ton nicht verfügbar. Der sichtbare Timer funktioniert weiterhin.",
+    "Ton geht ned. Da sichtbare Timer geht weida.",
+    "소리를 사용할 수 없습니다. 화면 타이머는 계속 작동합니다.",
+    "Звук недоступен. Визуальный таймер продолжает работать.",
+    "El sonido no está disponible. El temporizador visual sigue funcionando.",
+    "O som não está disponível. O temporizador visual continua funcionando."
+  ],
+  [
+    "Routine name",
+    "Name der Routine",
+    "Nam von da Routine",
+    "루틴 이름",
+    "Название тренировки",
+    "Nombre de la rutina",
+    "Nome da rotina"
+  ],
+  [
+    "Work seconds",
+    "Belastung in Sekunden",
+    "Belastung in Sekunden",
+    "운동 시간 (초)",
+    "Работа в секундах",
+    "Segundos de ejercicio",
+    "Segundos de exercício"
+  ],
+  [
+    "Rest seconds",
+    "Pause in Sekunden",
+    "Pause in Sekunden",
+    "휴식 시간 (초)",
+    "Отдых в секундах",
+    "Segundos de descanso",
+    "Segundos de descanso"
+  ],
+  [
+    "Rounds",
+    "Runden",
+    "Runden",
+    "라운드",
+    "Раунды",
+    "Rondas",
+    "Rodadas"
+  ],
+  [
+    "Sound cues",
+    "Tonsignale",
+    "Tonsignale",
+    "소리 신호",
+    "Звуковые сигналы",
+    "Señales sonoras",
+    "Sinais sonoros"
+  ],
+  [
+    "Use whole seconds: work 1–3,600, rest 0–3,600, and 1–100 rounds.",
+    "Ganze Sekunden: Belastung 1–3.600, Pause 0–3.600 und 1–100 Runden.",
+    "Ganze Sekunden: Belastung 1–3.600, Pause 0–3.600 und 1–100 Runden.",
+    "정수 초를 사용하세요: 운동 1~3,600초, 휴식 0~3,600초, 1~100라운드.",
+    "Используйте целые секунды: работа 1–3600, отдых 0–3600, 1–100 раундов.",
+    "Usa segundos enteros: ejercicio 1–3600, descanso 0–3600 y 1–100 rondas.",
+    "Use segundos inteiros: exercício 1–3600, descanso 0–3600 e 1–100 rodadas."
+  ],
+  [
+    "Remaining time",
+    "Verbleibende Zeit",
+    "Übrige Zeit",
+    "남은 시간",
+    "Оставшееся время",
+    "Tiempo restante",
+    "Tempo restante"
+  ],
+  [
+    "Total duration",
+    "Gesamtdauer",
+    "Gesamtdauer",
+    "전체 시간",
+    "Общая длительность",
+    "Duración total",
+    "Duração total"
+  ],
+  [
+    "Reset",
+    "Zurücksetzen",
+    "Zrucksetzen",
+    "초기화",
+    "Сбросить",
+    "Restablecer",
+    "Redefinir"
+  ],
+  [
+    "Save routine",
+    "Routine speichern",
+    "Routine speichern",
+    "루틴 저장",
+    "Сохранить тренировку",
+    "Guardar rutina",
+    "Salvar rotina"
+  ],
+  [
+    "The timer follows elapsed time when a tab is suspended. Sound may be delayed or unavailable in the background. Leaving this page resets the timer; saved routines remain.",
+    "Der Timer zählt verstrichene Zeit auch bei pausiertem Tab. Ton kann im Hintergrund verzögert oder nicht verfügbar sein. Verlassen der Seite setzt den Timer zurück; gespeicherte Routinen bleiben.",
+    "Da Timer zählt verstrichene Zeit aa bei pausiertem Tab. Ton kann im Hintergrund verzögert oder ned verfügbar sei. Beim Verlassen setzt si da Timer zruck; gspeicherte Routinen bleim.",
+    "탭이 일시 중지되어도 경과 시간을 따릅니다. 백그라운드에서는 소리가 지연되거나 없을 수 있습니다. 페이지를 나가면 타이머는 초기화되며 저장된 루틴은 유지됩니다.",
+    "Таймер учитывает прошедшее время при приостановке вкладки. В фоне звук может задержаться или отсутствовать. Уход со страницы сбрасывает таймер; сохранённые тренировки остаются.",
+    "El temporizador sigue el tiempo transcurrido si se suspende la pestaña. El sonido puede retrasarse o faltar en segundo plano. Al salir se reinicia; las rutinas guardadas permanecen.",
+    "O temporizador acompanha o tempo decorrido quando a aba é suspensa. O som pode atrasar ou faltar em segundo plano. Sair reinicia o temporizador; rotinas salvas permanecem."
+  ],
+  [
+    "Saved routines",
+    "Gespeicherte Routinen",
+    "Gspeicherte Routinen",
+    "저장된 루틴",
+    "Сохранённые тренировки",
+    "Rutinas guardadas",
+    "Rotinas salvas"
+  ],
+  [
+    "Break reminders",
+    "Pausenerinnerungen",
+    "Pausenerinnerungen",
+    "휴식 알림",
+    "Напоминания об отдыхе",
+    "Recordatorios de descanso",
+    "Lembretes de pausa"
+  ],
+  [
+    "Break reminders enabled.",
+    "Pausenerinnerungen aktiviert.",
+    "Pausenerinnerungen aktiviert.",
+    "휴식 알림이 켜졌습니다.",
+    "Напоминания об отдыхе включены.",
+    "Recordatorios de descanso activados.",
+    "Lembretes de pausa ativados."
+  ],
+  [
+    "Use a whole number of minutes from 1 to 240.",
+    "Verwende eine ganze Minutenzahl von 1 bis 240.",
+    "Nimm a ganze Minutenzahl vo 1 bis 240.",
+    "1~240의 정수 분을 사용하세요.",
+    "Введите целое число минут от 1 до 240.",
+    "Usa un número entero de minutos de 1 a 240.",
+    "Use um número inteiro de minutos de 1 a 240."
+  ],
+  [
+    "Break interval in minutes",
+    "Pausenintervall in Minuten",
+    "Pausenintervall in Minuten",
+    "휴식 간격 (분)",
+    "Интервал отдыха в минутах",
+    "Intervalo de descanso en minutos",
+    "Intervalo de pausa em minutos"
+  ],
+  [
+    "Enable break reminders",
+    "Pausenerinnerungen aktivieren",
+    "Pausenerinnerungen aktiviern",
+    "휴식 알림 켜기",
+    "Включить напоминания об отдыхе",
+    "Activar recordatorios de descanso",
+    "Ativar lembretes de pausa"
+  ],
+  [
+    "Break reminders are on.",
+    "Pausenerinnerungen sind eingeschaltet.",
+    "Pausenerinnerungen san eigschaltet.",
+    "휴식 알림이 켜져 있습니다.",
+    "Напоминания об отдыхе включены.",
+    "Los recordatorios de descanso están activados.",
+    "Os lembretes de pausa estão ativados."
+  ],
+  [
+    "Break reminders are off.",
+    "Pausenerinnerungen sind ausgeschaltet.",
+    "Pausenerinnerungen san ausgschaltet.",
+    "휴식 알림이 꺼져 있습니다.",
+    "Напоминания об отдыхе выключены.",
+    "Los recordatorios de descanso están desactivados.",
+    "Os lembretes de pausa estão desativados."
+  ],
+  [
+    "Work",
+    "Belastung",
+    "Belastung",
+    "운동",
+    "Работа",
+    "Ejercicio",
+    "Exercício"
+  ],
+  [
+    "Finished",
+    "Abgeschlossen",
+    "Fertig",
+    "완료",
+    "Завершено",
+    "Terminado",
+    "Concluído"
+  ],
+  [
+    "Name",
+    "Name",
+    "Nam",
+    "이름",
+    "Имя",
+    "Nombre",
+    "Nome"
+  ],
+  [
+    "Delete",
+    "Löschen",
+    "Löschen",
+    "삭제",
+    "Удалить",
+    "Eliminar",
+    "Excluir"
+  ],
+  [
+    "Resume",
+    "Fortsetzen",
+    "Weidamacha",
+    "다시 시작",
+    "Продолжить",
+    "Reanudar",
+    "Retomar"
+  ],
+  [
+    "Active",
+    "Aktiv",
+    "Aktiv",
+    "활성",
+    "Активна",
+    "Activa",
+    "Ativa"
+  ],
+  [
+    "New routine",
+    "Neue Routine",
+    "Neue Routine",
+    "새 루틴",
+    "Новая тренировка",
+    "Nueva rutina",
+    "Nova rotina"
+  ],
+  [
+    "Saved shares",
+    "Gespeicherte Anteile",
+    "Gspeicherte Anteile",
+    "저장된 분담액",
+    "Сохранённые доли",
+    "Partes guardadas",
+    "Partes salvas"
+  ],
+  [
+    "All apps are available now.",
+    "Alle Apps sind jetzt verfügbar.",
+    "Alle Apps san jetzt verfügbar.",
+    "모든 앱을 사용할 수 있습니다.",
+    "Все приложения доступны.",
+    "Todas las aplicaciones están disponibles.",
+    "Todas as aplicações estão disponíveis."
+  ],
+  [
+    "Your group display name",
+    "Dein Anzeigename in der Gruppe",
+    "Dei Name in da Gruppn",
+    "그룹 표시 이름",
+    "Ваше имя в группе",
+    "Tu nombre en el grupo",
+    "O teu nome no grupo"
+  ],
+  [
+    "Accept invitation",
+    "Einladung annehmen",
+    "Einladung annehma",
+    "초대 수락",
+    "Принять приглашение",
+    "Aceptar invitación",
+    "Aceitar convite"
+  ],
+  [
+    "Group sections",
+    "Gruppenbereiche",
+    "Gruppnbereiche",
+    "그룹 섹션",
+    "Разделы группы",
+    "Secciones del grupo",
+    "Secções do grupo"
+  ],
+  [
+    "Owes",
+    "Schuldet",
+    "Schuidet",
+    "갚을 금액",
+    "Должен",
+    "Debe",
+    "Deve"
+  ],
+  [
+    "Receives",
+    "Erhält",
+    "Kriagt",
+    "받을 금액",
+    "Получает",
+    "Recibe",
+    "Recebe"
+  ],
+  [
+    "Settled",
+    "Ausgeglichen",
+    "Ausglicha",
+    "정산 완료",
+    "Расчёты завершены",
+    "Saldado",
+    "Liquidado"
+  ],
+  [
+    "Net balance",
+    "Nettosaldo",
+    "Nettosaldo",
+    "순 잔액",
+    "Чистый баланс",
+    "Saldo neto",
+    "Saldo líquido"
+  ],
+  [
+    "Recording a repayment does not transfer money.",
+    "Eine erfasste Rückzahlung überweist kein Geld.",
+    "A erfasste Rückzahlung überweist koa Geld.",
+    "상환 기록은 실제 송금을 하지 않습니다.",
+    "Запись возврата не переводит деньги.",
+    "Registrar un reembolso no transfiere dinero.",
+    "Registar um reembolso não transfere dinheiro."
+  ],
+  [
+    "Assign the entire bill subtotal and select valid participants.",
+    "Verteile den gesamten Rechnungsbetrag und wähle gültige Teilnehmer.",
+    "Verteil den ganzn Rechnungsbetrag und wähl gültige Teilnehmer.",
+    "청구 소계를 모두 배분하고 참여자를 선택하세요.",
+    "Распределите всю сумму счёта и выберите участников.",
+    "Asigna todo el subtotal y selecciona participantes válidos.",
+    "Distribui todo o subtotal e seleciona participantes válidos."
+  ],
+  [
+    "Bill subtotal",
+    "Rechnungsbetrag ohne Trinkgeld",
+    "Rechnungsbetrag ohne Trinkgeld",
+    "청구 소계",
+    "Сумма счёта без чаевых",
+    "Subtotal de la cuenta",
+    "Subtotal da conta"
+  ],
+  [
+    "Participants",
+    "Teilnehmer",
+    "Teilnehmer",
+    "참여자",
+    "Участники",
+    "Participantes",
+    "Participantes"
+  ],
+  [
+    "Bill split",
+    "Rechnung aufteilen",
+    "Rechnung aufteiln",
+    "청구 분할",
+    "Разделение счёта",
+    "División de la cuenta",
+    "Divisão da conta"
+  ],
+  [
+    "Split Equally",
+    "Gleichmäßig aufteilen",
+    "Gleichmäßig aufteiln",
+    "균등 분할",
+    "Разделить поровну",
+    "Dividir por igual",
+    "Dividir igualmente"
+  ],
+  [
+    "Custom Amounts",
+    "Individuelle Beträge",
+    "Eigene Beträge",
+    "개별 금액",
+    "Индивидуальные суммы",
+    "Importes personalizados",
+    "Valores personalizados"
+  ],
+  [
+    "Remaining unassigned amount",
+    "Noch nicht zugeteilter Betrag",
+    "No ned verteilter Betrag",
+    "미배분 잔액",
+    "Нераспределённый остаток",
+    "Importe pendiente de asignar",
+    "Valor por distribuir"
+  ],
+  [
+    "Enter valid amounts",
+    "Gültige Beträge eingeben",
+    "Gültige Beträge eingebn",
+    "유효한 금액을 입력하세요",
+    "Введите корректные суммы",
+    "Introduce importes válidos",
+    "Introduz valores válidos"
+  ],
+  [
+    "Tip",
+    "Trinkgeld",
+    "Trinkgeld",
+    "팁",
+    "Чаевые",
+    "Propina",
+    "Gorjeta"
+  ],
+  [
+    "Tip split",
+    "Trinkgeld aufteilen",
+    "Trinkgeld aufteiln",
+    "팁 분할",
+    "Разделение чаевых",
+    "División de la propina",
+    "Divisão da gorjeta"
+  ],
+  [
+    "Split Tip Equally",
+    "Trinkgeld gleichmäßig aufteilen",
+    "Trinkgeld gleichmäßig aufteiln",
+    "팁 균등 분할",
+    "Разделить чаевые поровну",
+    "Dividir la propina por igual",
+    "Dividir a gorjeta igualmente"
+  ],
+  [
+    "One Person Pays Tip",
+    "Eine Person zahlt das Trinkgeld",
+    "Oane Person zahlt des Trinkgeld",
+    "한 사람이 팁 전액 부담",
+    "Один человек оплачивает чаевые",
+    "Una persona paga la propina",
+    "Uma pessoa paga a gorjeta"
+  ],
+  [
+    "Tip paid by",
+    "Trinkgeld bezahlt von",
+    "Trinkgeld zahlt",
+    "팁 부담자",
+    "Кто оплачивает чаевые",
+    "Propina a cargo de",
+    "Gorjeta paga por"
+  ],
+  [
+    "No expenses or repayments yet.",
+    "Noch keine Ausgaben oder Rückzahlungen.",
+    "No koane Ausgabn oder Rückzahlungen.",
+    "아직 지출이나 상환이 없습니다.",
+    "Пока нет расходов или возвратов.",
+    "Todavía no hay gastos ni reembolsos.",
+    "Ainda não há despesas nem reembolsos."
+  ],
+  [
+    "Split details",
+    "Aufteilung im Detail",
+    "Aufteilung im Detail",
+    "분할 내역",
+    "Детали разделения",
+    "Detalles de la división",
+    "Detalhes da divisão"
+  ],
+  [
+    "Bill",
+    "Rechnung",
+    "Rechnung",
+    "청구 금액",
+    "Счёт",
+    "Cuenta",
+    "Conta"
+  ],
+  [
+    "Member repayment",
+    "Rückzahlung eines Mitglieds",
+    "Rückzahlung von am Mitglied",
+    "회원 간 상환",
+    "Возврат участника",
+    "Reembolso de un miembro",
+    "Reembolso de um membro"
+  ],
+  [
+    "Bill Splitter sections",
+    "Bereiche des Rechnungsteilers",
+    "Bereiche vom Rechnungsteiler",
+    "더치페이 섹션",
+    "Разделы разделения счетов",
+    "Secciones del divisor de cuentas",
+    "Secções da divisão de contas"
+  ],
+  [
+    "Sign in to create shared groups and receive invitations.",
+    "Melde dich an, um gemeinsame Gruppen zu erstellen und Einladungen zu erhalten.",
+    "Meld di an, um gemeinsame Gruppn zum Erstelln und Einladungen zum Kriagn.",
+    "로그인하여 공유 그룹을 만들고 초대를 받으세요.",
+    "Войдите, чтобы создавать общие группы и получать приглашения.",
+    "Inicia sesión para crear grupos compartidos y recibir invitaciones.",
+    "Inicia sessão para criar grupos partilhados e receber convites."
+  ],
+  [
+    "Back to groups",
+    "Zurück zu den Gruppen",
+    "Zruck zu de Gruppn",
+    "그룹으로 돌아가기",
+    "Назад к группам",
+    "Volver a los grupos",
+    "Voltar aos grupos"
+  ],
+  [
+    "Group members and invitations",
+    "Gruppenmitglieder und Einladungen",
+    "Gruppnmitglieder und Einladungen",
+    "그룹 회원 및 초대",
+    "Участники и приглашения",
+    "Miembros e invitaciones",
+    "Membros e convites"
+  ],
+  [
+    "Save display name",
+    "Anzeigenamen speichern",
+    "Anzeigenamen speichern",
+    "표시 이름 저장",
+    "Сохранить имя",
+    "Guardar nombre",
+    "Guardar nome"
+  ],
+  [
+    "Invitation sent.",
+    "Einladung gesendet.",
+    "Einladung gschickt.",
+    "초대를 보냈습니다.",
+    "Приглашение отправлено.",
+    "Invitación enviada.",
+    "Convite enviado."
+  ],
+  [
+    "Invite by Pluto username",
+    "Mit Pluto-Benutzernamen einladen",
+    "Mit Pluto-Benutzernamen einladn",
+    "Pluto 사용자 이름으로 초대",
+    "Пригласить по имени пользователя Pluto",
+    "Invitar por nombre de usuario de Pluto",
+    "Convidar pelo nome de utilizador Pluto"
+  ],
+  [
+    "Invite user",
+    "Benutzer einladen",
+    "Benutzer einladn",
+    "사용자 초대",
+    "Пригласить пользователя",
+    "Invitar usuario",
+    "Convidar utilizador"
+  ],
+  [
+    "Existing browser ledger. This data is preserved locally; create a shared group to collaborate with Pluto users.",
+    "Bestehendes Browser-Kassenbuch. Die Daten bleiben lokal erhalten; erstelle eine gemeinsame Gruppe für Pluto-Nutzer.",
+    "Bestehends Browser-Kassenbuch. De Daten bleibn lokal; erstell a gemeinsame Gruppn für Pluto-Nutzer.",
+    "기존 브라우저 장부입니다. 데이터는 로컬에 보존됩니다. Pluto 사용자와 협업하려면 공유 그룹을 만드세요.",
+    "Существующий журнал браузера сохранён локально. Создайте общую группу для работы с пользователями Pluto.",
+    "El registro del navegador se conserva localmente. Crea un grupo compartido para colaborar con usuarios de Pluto.",
+    "O registo do navegador é preservado localmente. Cria um grupo partilhado para colaborar com utilizadores Pluto."
+  ],
+  [
+    "My Groups",
+    "Meine Gruppen",
+    "Meine Gruppn",
+    "내 그룹",
+    "Мои группы",
+    "Mis grupos",
+    "Os meus grupos"
+  ],
+  [
+    "Create a group or accept an invitation to get started.",
+    "Erstelle eine Gruppe oder nimm eine Einladung an, um zu beginnen.",
+    "Erstell a Gruppn oder nimm a Einladung an zum Loslegn.",
+    "그룹을 만들거나 초대를 수락하여 시작하세요.",
+    "Создайте группу или примите приглашение.",
+    "Crea un grupo o acepta una invitación para empezar.",
+    "Cria um grupo ou aceita um convite para começar."
+  ],
+  [
+    "Invitations",
+    "Einladungen",
+    "Einladungen",
+    "초대",
+    "Приглашения",
+    "Invitaciones",
+    "Convites"
+  ],
+  [
+    "Shared groups are saved to your Pluto account and refresh automatically. Every member can edit the ledger.",
+    "Gemeinsame Gruppen werden in deinem Pluto-Konto gespeichert und automatisch aktualisiert. Alle Mitglieder können das Kassenbuch bearbeiten.",
+    "Gemeinsame Gruppn wern in deim Pluto-Konto gspeichert und automatisch aktualisiert. Alle Mitglieder können des Kassenbuch bearbeiten.",
+    "공유 그룹은 Pluto 계정에 저장되며 자동으로 갱신됩니다. 모든 회원이 장부를 수정할 수 있습니다.",
+    "Общие группы сохраняются в аккаунте Pluto и обновляются автоматически. Каждый участник может редактировать журнал.",
+    "Los grupos se guardan en tu cuenta de Pluto y se actualizan automáticamente. Todos los miembros pueden editar el registro.",
+    "Os grupos são guardados na tua conta Pluto e atualizados automaticamente. Todos os membros podem editar o registo."
+  ],
+  [
+    "Subscription tracking is now part of the Budget Tracker. Your existing subscriptions are integrated here.",
+    "Die Abo-Verwaltung ist jetzt Teil des Budgetplaners. Deine bestehenden Abos sind hier integriert.",
+    "De Abo-Verwaltung is jetzt Teil vom Budgetplaner. Deine bisherigen Abos san hier integriert.",
+    "구독 관리는 이제 예산 관리에 포함됩니다. 기존 구독이 여기에 통합되었습니다.",
+    "Отслеживание подписок теперь входит в бюджет. Ваши подписки доступны здесь.",
+    "Las suscripciones ahora forman parte del gestor de presupuesto. Tus suscripciones existentes están integradas aquí.",
+    "As subscrições fazem agora parte do gestor de orçamento. As tuas subscrições existentes estão integradas aqui."
+  ],
+  [
+    "Budget sections",
+    "Budgetbereiche",
+    "Budgetbereiche",
+    "예산 섹션",
+    "Разделы бюджета",
+    "Secciones del presupuesto",
+    "Secções do orçamento"
+  ],
+  [
+    "Edit entry",
+    "Eintrag bearbeiten",
+    "Eintrag bearbeiten",
+    "항목 수정",
+    "Редактировать запись",
+    "Editar entrada",
+    "Editar entrada"
+  ],
+  [
+    "Monthly plans and active subscription bills are included. Subscriptions remain in their original records and are counted once per billing cycle.",
+    "Monatspläne und aktive Abo-Rechnungen sind enthalten. Abos bleiben in ihren ursprünglichen Datensätzen und werden einmal pro Abrechnungszeitraum gezählt.",
+    "Monatspläne und aktive Abo-Rechnungen san dabei. Abos bleibn in ihren ursprünglichen Datensätzen und wern oamoi pro Abrechnungszeitraum zählt.",
+    "월간 계획과 활성 구독 청구가 포함됩니다. 구독은 원래 기록에 유지되며 결제 주기당 한 번만 계산됩니다.",
+    "Включены ежемесячные планы и активные подписки. Подписки сохраняются в исходных записях и учитываются один раз за платёжный период.",
+    "Incluye planes mensuales y suscripciones activas. Las suscripciones mantienen sus registros originales y se cuentan una vez por ciclo.",
+    "Inclui planos mensais e subscrições ativas. As subscrições mantêm os registos originais e são contadas uma vez por ciclo."
+  ],
+  [
+    "This date is in the past. You can still add or edit items for this day.",
+    "Dieses Datum liegt in der Vergangenheit. Du kannst weiterhin Einträge für diesen Tag hinzufügen oder bearbeiten.",
+    "Des Datum liegt in da Vergangenheit. Du kannst weiterhin Einträge für den Tag hinzufügen oder bearbeiten.",
+    "지난 날짜입니다. 이 날짜의 항목을 추가하거나 수정할 수 있습니다.",
+    "Эта дата уже прошла. Вы можете добавлять и редактировать события этого дня.",
+    "Esta fecha está en el pasado. Puedes añadir o editar elementos para ese día.",
+    "Esta data já passou. Podes adicionar ou editar itens deste dia."
+  ],
+  [
+    "Previous month",
+    "Vorheriger Monat",
+    "Voriger Monat",
+    "이전 달",
+    "Предыдущий месяц",
+    "Mes anterior",
+    "Mês anterior"
+  ],
+  [
+    "Next month",
+    "Nächster Monat",
+    "Nächster Monat",
+    "다음 달",
+    "Следующий месяц",
+    "Mes siguiente",
+    "Mês seguinte"
+  ],
+  [
+    "Choose a date",
+    "Datum auswählen",
+    "Datum aussuacha",
+    "날짜 선택",
+    "Выберите дату",
+    "Elegir fecha",
+    "Escolher data"
+  ],
+  [
+    "events",
+    "Termine",
+    "Termine",
+    "일정",
+    "события",
+    "eventos",
+    "eventos"
+  ],
+  [
+    "Selected date",
+    "Ausgewähltes Datum",
+    "Ausgwähltes Datum",
+    "선택한 날짜",
+    "Выбранная дата",
+    "Fecha seleccionada",
+    "Data selecionada"
+  ],
+  [
+    "Plan Day",
+    "Tag planen",
+    "Tag planen",
+    "하루 계획",
+    "Спланировать день",
+    "Planificar día",
+    "Planear dia"
+  ],
+  [
+    "Back to calendar",
+    "Zurück zum Kalender",
+    "Zruck zum Kalender",
+    "달력으로 돌아가기",
+    "Назад к календарю",
+    "Volver al calendario",
+    "Voltar ao calendário"
+  ],
+  [
+    "Add event at",
+    "Termin hinzufügen um",
+    "Termin dazua um",
+    "일정 추가 시간",
+    "Добавить событие в",
+    "Añadir evento a las",
+    "Adicionar evento às"
+  ],
+  [
+    "All events for this day",
+    "Alle Termine dieses Tages",
+    "Alle Termine von dem Tag",
+    "이 날짜의 모든 일정",
+    "Все события этого дня",
+    "Todos los eventos de este día",
+    "Todos os eventos deste dia"
+  ],
+  [
+    "Edit event",
+    "Termin bearbeiten",
+    "Termin bearbeiten",
+    "일정 수정",
+    "Редактировать событие",
+    "Editar evento",
+    "Editar evento"
+  ],
+  [
+    "Add event",
+    "Termin hinzufügen",
+    "Termin hinzufügen",
+    "일정 추가",
+    "Добавить событие",
+    "Añadir evento",
+    "Adicionar evento"
+  ],
+  [
+    "End time",
+    "Endzeit",
+    "Endzeit",
+    "종료 시간",
+    "Время окончания",
+    "Hora de fin",
+    "Hora de fim"
+  ],
+  [
+    "Ends next day",
+    "Endet am nächsten Tag",
+    "Endet am nächsten Tag",
+    "다음 날 종료",
+    "Заканчивается на следующий день",
+    "Termina al día siguiente",
+    "Termina no dia seguinte"
+  ],
+  [
+    "Reminder settings",
+    "Erinnerungseinstellungen",
+    "Erinnerungseinstellungen",
+    "알림 설정",
+    "Настройки напоминаний",
+    "Ajustes de recordatorios",
+    "Definições de lembretes"
+  ],
+  [
+    "Click a location on the map to see its local time.",
+    "Klicke auf einen Ort auf der Karte, um seine Ortszeit zu sehen.",
+    "Klick auf an Ort auf da Kartn, um sei Ortszeit zum Sehn.",
+    "지도에서 위치를 클릭하면 현지 시간을 볼 수 있습니다.",
+    "Нажмите на место на карте, чтобы увидеть местное время.",
+    "Haz clic en un lugar del mapa para ver su hora local.",
+    "Clica num local do mapa para ver a hora local."
+  ],
+  [
+    "Time zone locations on the world map",
+    "Zeitzonenorte auf der Weltkarte",
+    "Zeitzonenorte auf da Weltkartn",
+    "세계 지도의 시간대 위치",
+    "Часовые пояса на карте мира",
+    "Ubicaciones de zonas horarias en el mapa",
+    "Localizações de fusos horários no mapa"
+  ],
+  [
+    "Loading map…",
+    "Karte wird geladen…",
+    "Kartn wird gladen…",
+    "지도 로딩 중…",
+    "Загрузка карты…",
+    "Cargando mapa…",
+    "A carregar mapa…"
+  ],
+  [
+    "Select a time zone with the keyboard",
+    "Zeitzone mit der Tastatur auswählen",
+    "Zeitzone mit da Tastatur aussuacha",
+    "키보드로 시간대 선택",
+    "Выбрать часовой пояс с клавиатуры",
+    "Seleccionar zona horaria con el teclado",
+    "Selecionar fuso horário com o teclado"
+  ],
+  [
+    "Map pins represent IANA locations, not time zone boundaries. Times include daylight-saving changes.",
+    "Kartenpunkte zeigen IANA-Orte, keine Zeitzonengrenzen. Die Zeiten berücksichtigen Sommerzeitänderungen.",
+    "Kartnpunkte zeign IANA-Orte, koane Zeitzonengrenzen. De Zeiten berücksichtign Sommerzeitänderungen.",
+    "지도 표시는 IANA 위치이며 시간대 경계가 아닙니다. 시간에는 서머타임이 반영됩니다.",
+    "Метки показывают места IANA, а не границы поясов. Время учитывает летнее время.",
+    "Los puntos representan ubicaciones IANA, no límites de zonas horarias. Las horas incluyen cambios de horario de verano.",
+    "Os pontos representam locais IANA, não limites de fusos. As horas incluem mudanças de horário de verão."
+  ],
+  [
+    "Selected time zone",
+    "Ausgewählte Zeitzone",
+    "Ausgwählte Zeitzone",
+    "선택한 시간대",
+    "Выбранный часовой пояс",
+    "Zona horaria seleccionada",
+    "Fuso horário selecionado"
+  ],
+  [
+    "Save time zone",
+    "Zeitzone speichern",
+    "Zeitzone speichern",
+    "시간대 저장",
+    "Сохранить часовой пояс",
+    "Guardar zona horaria",
+    "Guardar fuso horário"
+  ],
+  [
+    "Saved time zones",
+    "Gespeicherte Zeitzonen",
+    "Gspeicherte Zeitzonen",
+    "저장된 시간대",
+    "Сохранённые часовые пояса",
+    "Zonas horarias guardadas",
+    "Fusos horários guardados"
+  ],
+  [
+    "Select a location to save your first time zone.",
+    "Wähle einen Ort, um deine erste Zeitzone zu speichern.",
+    "Wähl an Ort, um dei erste Zeitzone zum Speichern.",
+    "위치를 선택하여 첫 시간대를 저장하세요.",
+    "Выберите место, чтобы сохранить первый часовой пояс.",
+    "Selecciona un lugar para guardar tu primera zona horaria.",
+    "Seleciona um local para guardar o primeiro fuso horário."
+  ],
+  [
+    "Workout name",
+    "Name des Trainings",
+    "Name vom Training",
+    "운동 이름",
+    "Название тренировки",
+    "Nombre del entrenamiento",
+    "Nome do treino"
+  ],
+  [
+    "Exercise",
+    "Übung",
+    "Übung",
+    "운동",
+    "Упражнение",
+    "Ejercicio",
+    "Exercício"
+  ],
+  [
+    "Exercise name",
+    "Übungsname",
+    "Übungsname",
+    "운동 이름",
+    "Название упражнения",
+    "Nombre del ejercicio",
+    "Nome do exercício"
+  ],
+  [
+    "Move up",
+    "Nach oben",
+    "Nach obn",
+    "위로 이동",
+    "Вверх",
+    "Subir",
+    "Subir"
+  ],
+  [
+    "Move down",
+    "Nach unten",
+    "Nach untn",
+    "아래로 이동",
+    "Вниз",
+    "Bajar",
+    "Descer"
+  ],
+  [
+    "Remove exercise",
+    "Übung entfernen",
+    "Übung wegnehma",
+    "운동 삭제",
+    "Удалить упражнение",
+    "Quitar ejercicio",
+    "Remover exercício"
+  ],
+  [
+    "Add exercise",
+    "Übung hinzufügen",
+    "Übung dazua",
+    "운동 추가",
+    "Добавить упражнение",
+    "Añadir ejercicio",
+    "Adicionar exercício"
+  ],
+  [
+    "Set",
+    "Satz",
+    "Satz",
+    "세트",
+    "Подход",
+    "Serie",
+    "Série"
+  ],
+  [
+    "reps",
+    "Wiederholungen",
+    "Wiederholungen",
+    "회",
+    "повторения",
+    "repeticiones",
+    "repetições"
+  ],
+  [
+    "Replay workout",
+    "Training wiederholen",
+    "Training wiederholn",
+    "운동 다시 시작",
+    "Повторить тренировку",
+    "Repetir entrenamiento",
+    "Repetir treino"
+  ],
+  [
+    "Workout complete. Your routine is saved and ready to replay.",
+    "Training abgeschlossen. Deine Routine ist gespeichert und kann wiederholt werden.",
+    "Training fertig. Dei Routine is gspeichert und kann wiederholt wern.",
+    "운동을 완료했습니다. 루틴이 저장되어 다시 실행할 수 있습니다.",
+    "Тренировка завершена. Программа сохранена и готова к повторению.",
+    "Entrenamiento completado. Tu rutina está guardada y lista para repetir.",
+    "Treino concluído. A tua rotina está guardada e pronta para repetir."
+  ],
+  [
+    "Workout routines",
+    "Trainingsroutinen",
+    "Trainingsroutinen",
+    "운동 루틴",
+    "Программы тренировок",
+    "Rutinas de entrenamiento",
+    "Rotinas de treino"
+  ],
+  [
+    "Create workout",
+    "Training erstellen",
+    "Training erstelln",
+    "운동 만들기",
+    "Создать тренировку",
+    "Crear entrenamiento",
+    "Criar treino"
+  ],
+  [
+    "Edit Routine",
+    "Routine bearbeiten",
+    "Routine bearbeiten",
+    "루틴 수정",
+    "Редактировать программу",
+    "Editar rutina",
+    "Editar rotina"
+  ],
+  [
+    "Back to workouts",
+    "Zurück zu den Trainings",
+    "Zruck zu de Trainings",
+    "운동 목록으로 돌아가기",
+    "Назад к тренировкам",
+    "Volver a entrenamientos",
+    "Voltar aos treinos"
+  ],
+  [
+    "Start Workout",
+    "Training starten",
+    "Training starten",
+    "운동 시작",
+    "Начать тренировку",
+    "Iniciar entrenamiento",
+    "Iniciar treino"
+  ],
+  [
+    "sets",
+    "Sätze",
+    "Sätze",
+    "세트",
+    "подходы",
+    "series",
+    "séries"
+  ],
+  [
+    "Saved workouts",
+    "Gespeicherte Trainings",
+    "Gspeicherte Trainings",
+    "저장된 운동",
+    "Сохранённые тренировки",
+    "Entrenamientos guardados",
+    "Treinos guardados"
+  ],
+  [
+    "Create a reusable routine for your next workout.",
+    "Erstelle eine wiederverwendbare Routine für dein nächstes Training.",
+    "Erstell a wiederverwendbare Routine für dei nächstes Training.",
+    "다음 운동을 위한 재사용 가능한 루틴을 만드세요.",
+    "Создайте программу для повторного использования.",
+    "Crea una rutina reutilizable para tu próximo entrenamiento.",
+    "Cria uma rotina reutilizável para o próximo treino."
+  ],
+  [
+    "exercises",
+    "Übungen",
+    "Übungen",
+    "운동",
+    "упражнения",
+    "ejercicios",
+    "exercícios"
+  ],
+  [
+    "Club honours and national team records",
+    "Vereinstitel und Nationalmannschaftsrekorde",
+    "Vereinstitel und Nationalmannschaftsrekorde",
+    "클럽 우승 및 국가대표 기록",
+    "Трофеи клубов и рекорды сборных",
+    "Títulos de clubes y registros de selecciones",
+    "Títulos de clubes e registos de seleções"
+  ],
+  [
+    "Final match details are unavailable for this year in the current dataset.",
+    "Für dieses Jahr enthält der aktuelle Datensatz keine Finaldetails.",
+    "Für des Jahr hat da aktuelle Datensatz koane Finaldetails.",
+    "현재 데이터에는 이 연도의 결승 상세 정보가 없습니다.",
+    "В текущем наборе данных нет деталей финала за этот год.",
+    "El conjunto de datos actual no incluye detalles de la final de este año.",
+    "O conjunto de dados atual não inclui detalhes da final deste ano."
+  ],
+  [
+    "After extra time",
+    "Nach Verlängerung",
+    "Nach Verlängerung",
+    "연장전 후",
+    "После дополнительного времени",
+    "Tras la prórroga",
+    "Após prolongamento"
+  ],
+  [
+    "Penalty shootout",
+    "Elfmeterschießen",
+    "Elfmeterschiaßn",
+    "승부차기",
+    "Серия пенальти",
+    "Tanda de penaltis",
+    "Desempate por penáltis"
+  ],
+  [
+    "won on penalties",
+    "gewann im Elfmeterschießen",
+    "hat im Elfmeterschiaßn gwunna",
+    "승부차기 승리",
+    "победил по пенальти",
+    "ganó en los penaltis",
+    "venceu nos penáltis"
+  ],
+  [
+    "Date unavailable",
+    "Datum nicht verfügbar",
+    "Datum ned verfügbar",
+    "날짜 정보 없음",
+    "Дата недоступна",
+    "Fecha no disponible",
+    "Data indisponível"
+  ],
+  [
+    "Goals",
+    "Tore",
+    "Tore",
+    "득점",
+    "Голы",
+    "Goles",
+    "Golos"
+  ],
+  [
+    "Own goal",
+    "Eigentor",
+    "Eigentor",
+    "자책골",
+    "Автогол",
+    "Autogol",
+    "Autogolo"
+  ],
+  [
+    "Penalty",
+    "Elfmeter",
+    "Elfmeter",
+    "페널티킥",
+    "Пенальти",
+    "Penalti",
+    "Penálti"
+  ],
+  [
+    "Minute unavailable",
+    "Minute nicht verfügbar",
+    "Minute ned verfügbar",
+    "득점 시간 없음",
+    "Минута недоступна",
+    "Minuto no disponible",
+    "Minuto indisponível"
+  ],
+  [
+    "No goals in regulation or extra time.",
+    "Keine Tore in der regulären Spielzeit oder Verlängerung.",
+    "Koane Tore in da regulären Spielzeit oder Verlängerung.",
+    "정규 시간과 연장전에 득점이 없습니다.",
+    "Нет голов в основное или дополнительное время.",
+    "Sin goles en el tiempo reglamentario ni en la prórroga.",
+    "Sem golos no tempo regulamentar ou prolongamento."
+  ],
+  [
+    "Goalscorer and minute data are unavailable.",
+    "Torschützen und Torzeiten sind nicht verfügbar.",
+    "Torschützen und Torzeiten san ned verfügbar.",
+    "득점자 및 득점 시간 정보가 없습니다.",
+    "Данные об авторах голов и минутах недоступны.",
+    "Los datos de goleadores y minutos no están disponibles.",
+    "Os dados dos marcadores e minutos não estão disponíveis."
+  ],
+  [
+    "Match source",
+    "Spielquelle",
+    "Spielquelle",
+    "경기 출처",
+    "Источник матча",
+    "Fuente del partido",
+    "Fonte do jogo"
+  ],
+  [
+    "Football tournaments",
+    "Fußballturniere",
+    "Fuaßballturniere",
+    "축구 대회",
+    "Футбольные турниры",
+    "Torneos de fútbol",
+    "Torneios de futebol"
+  ],
+  [
+    "Tournament",
+    "Turnier",
+    "Turnier",
+    "대회",
+    "Турнир",
+    "Torneo",
+    "Torneio"
+  ],
+  [
+    "Year",
+    "Jahr",
+    "Jahr",
+    "연도",
+    "Год",
+    "Año",
+    "Ano"
+  ],
+  [
+    "Tournament sections",
+    "Turnierbereiche",
+    "Turnierbereiche",
+    "대회 섹션",
+    "Разделы турнира",
+    "Secciones del torneo",
+    "Secções do torneio"
+  ],
+  [
+    "Previous champions",
+    "Bisherige Sieger",
+    "Bisherige Sieger",
+    "역대 우승팀",
+    "Предыдущие победители",
+    "Campeones anteriores",
+    "Campeões anteriores"
+  ],
+  [
+    "Stats",
+    "Statistiken",
+    "Statistiken",
+    "통계",
+    "Статистика",
+    "Estadísticas",
+    "Estatísticas"
+  ],
+  [
+    "Recorded editions",
+    "Erfasste Austragungen",
+    "Erfasste Austragungen",
+    "기록된 대회 수",
+    "Учтённые розыгрыши",
+    "Ediciones registradas",
+    "Edições registadas"
+  ],
+  [
+    "Different winners",
+    "Verschiedene Sieger",
+    "Verschiedene Sieger",
+    "서로 다른 우승팀",
+    "Разные победители",
+    "Ganadores distintos",
+    "Vencedores distintos"
+  ],
+  [
+    "Detailed finals",
+    "Finalspiele mit Details",
+    "Finalspiele mit Details",
+    "상세 정보가 있는 결승",
+    "Финалы с деталями",
+    "Finales detalladas",
+    "Finais detalhadas"
+  ],
+  [
+    "Competition source",
+    "Wettbewerbsquelle",
+    "Wettbewerbsquelle",
+    "대회 출처",
+    "Источник соревнования",
+    "Fuente de la competición",
+    "Fonte da competição"
+  ],
+  [
+    "Historical snapshots; live results and missing editions are not fetched automatically.",
+    "Historische Datenstände; Live-Ergebnisse und fehlende Austragungen werden nicht automatisch geladen.",
+    "Historische Datenstände; Live-Ergebnisse und fehlende Austragungen wern ned automatisch gladen.",
+    "역사 기록입니다. 실시간 결과와 누락된 대회는 자동으로 가져오지 않습니다.",
+    "Исторические данные; результаты в реальном времени и отсутствующие розыгрыши не загружаются автоматически.",
+    "Datos históricos; los resultados en directo y las ediciones que faltan no se obtienen automáticamente.",
+    "Dados históricos; os resultados em direto e as edições em falta não são obtidos automaticamente."
+  ],
+  [
+    "Add Group",
+    "Gruppe hinzufügen",
+    "Gruppn hinzufügen",
+    "그룹 추가",
+    "Добавить группу",
+    "Añadir grupo",
+    "Adicionar grupo"
+  ],
+  [
+    "Balance",
+    "Saldo",
+    "Saldo",
+    "잔액",
+    "Баланс",
+    "Saldo",
+    "Saldo"
+  ],
+  [
+    "Add Expense",
+    "Ausgabe hinzufügen",
+    "Ausgab hinzufügen",
+    "지출 추가",
+    "Добавить расход",
+    "Añadir gasto",
+    "Adicionar despesa"
+  ],
+  [
+    "Budget",
+    "Budget",
+    "Budget",
+    "예산",
+    "Бюджет",
+    "Presupuesto",
+    "Orçamento"
+  ],
+  [
+    "Subscriptions",
+    "Abos",
+    "Abos",
+    "구독",
+    "Подписки",
+    "Suscripciones",
+    "Subscrições"
+  ],
+  [
+    "Overview",
+    "Übersicht",
+    "Übersicht",
+    "개요",
+    "Обзор",
+    "Resumen",
+    "Visão geral"
+  ],
+  [
+    "Finals",
+    "Finalspiele",
+    "Finalspiele",
+    "결승",
+    "Финалы",
+    "Finales",
+    "Finais"
+  ],
+  [
+    "Sets",
+    "Sätze",
+    "Sätze",
+    "세트",
+    "Подходы",
+    "Series",
+    "Séries"
+  ],
+  [
+    "Reps",
+    "Wiederholungen",
+    "Wiederholungen",
+    "반복 횟수",
+    "Повторения",
+    "Repeticiones",
+    "Repetições"
+  ],
+  [
+    "Duration in seconds",
+    "Dauer in Sekunden",
+    "Dauer in Sekunden",
+    "시간(초)",
+    "Длительность в секундах",
+    "Duración en segundos",
+    "Duração em segundos"
+  ],
+  [
+    "Mon",
+    "Mo",
+    "Mo",
+    "월",
+    "Пн",
+    "Lun",
+    "Seg"
+  ],
+  [
+    "Tue",
+    "Di",
+    "Di",
+    "화",
+    "Вт",
+    "Mar",
+    "Ter"
+  ],
+  [
+    "Wed",
+    "Mi",
+    "Mi",
+    "수",
+    "Ср",
+    "Mié",
+    "Qua"
+  ],
+  [
+    "Thu",
+    "Do",
+    "Do",
+    "목",
+    "Чт",
+    "Jue",
+    "Qui"
+  ],
+  [
+    "Fri",
+    "Fr",
+    "Fr",
+    "금",
+    "Пт",
+    "Vie",
+    "Sex"
+  ],
+  [
+    "Sat",
+    "Sa",
+    "Sa",
+    "토",
+    "Сб",
+    "Sáb",
+    "Sáb"
+  ],
+  [
+    "Sun",
+    "So",
+    "So",
+    "일",
+    "Вс",
+    "Dom",
+    "Dom"
+  ],
+  [
+    "FIFA World Cup — Men",
+    "FIFA-Weltmeisterschaft — Männer",
+    "FIFA-Weltmeisterschaft — Männer",
+    "FIFA 월드컵 — 남자",
+    "Чемпионат мира FIFA — мужчины",
+    "Copa Mundial de la FIFA — Hombres",
+    "Mundial da FIFA — Masculino"
+  ],
+  [
+    "FIFA World Cup — Women",
+    "FIFA-Weltmeisterschaft — Frauen",
+    "FIFA-Weltmeisterschaft — Frauen",
+    "FIFA 월드컵 — 여자",
+    "Чемпионат мира FIFA — женщины",
+    "Copa Mundial de la FIFA — Mujeres",
+    "Mundial da FIFA — Feminino"
+  ],
+  [
+    "UEFA Champions League — Men",
+    "UEFA Champions League — Männer",
+    "UEFA Champions League — Männer",
+    "UEFA 챔피언스리그 — 남자",
+    "Лига чемпионов UEFA — мужчины",
+    "UEFA Champions League — Hombres",
+    "UEFA Champions League — Masculino"
+  ],
+  [
+    "UEFA Champions League — Women",
+    "UEFA Champions League — Frauen",
+    "UEFA Champions League — Frauen",
+    "UEFA 챔피언스리그 — 여자",
+    "Лига чемпионов UEFA — женщины",
+    "UEFA Champions League — Mujeres",
+    "UEFA Champions League — Feminino"
+  ],
+  [
+    "UEFA Europa League — Men",
+    "UEFA Europa League — Männer",
+    "UEFA Europa League — Männer",
+    "UEFA 유로파리그 — 남자",
+    "Лига Европы UEFA — мужчины",
+    "UEFA Europa League — Hombres",
+    "UEFA Europa League — Masculino"
+  ],
+  [
+    "UEFA Conference League — Men",
+    "UEFA Conference League — Männer",
+    "UEFA Conference League — Männer",
+    "UEFA 컨퍼런스리그 — 남자",
+    "Лига конференций UEFA — мужчины",
+    "UEFA Conference League — Hombres",
+    "UEFA Conference League — Masculino"
+  ],
+  [
+    "Selected finals: 2024–2025",
+    "Ausgewählte Finalspiele: 2024–2025",
+    "Ausgwählte Finalspiele: 2024–2025",
+    "선택된 결승: 2024–2025",
+    "Выбранные финалы: 2024–2025",
+    "Finales seleccionadas: 2024–2025",
+    "Finais selecionadas: 2024–2025"
+  ],
+  [
+    "Winners through 2026 · Detailed finals: 2018, 2022",
+    "Sieger bis 2026 · Finaldetails: 2018, 2022",
+    "Sieger bis 2026 · Finaldetails: 2018, 2022",
+    "2026년까지 우승팀 · 결승 상세: 2018, 2022",
+    "Победители до 2026 · Детали финалов: 2018, 2022",
+    "Ganadores hasta 2026 · Finales detalladas: 2018, 2022",
+    "Vencedores até 2026 · Finais detalhadas: 2018, 2022"
+  ],
+  [
+    "Winners through 2023 · Detailed finals: 2019, 2023",
+    "Sieger bis 2023 · Finaldetails: 2019, 2023",
+    "Sieger bis 2023 · Finaldetails: 2019, 2023",
+    "2023년까지 우승팀 · 결승 상세: 2019, 2023",
+    "Победители до 2023 · Детали финалов: 2019, 2023",
+    "Ganadores hasta 2023 · Finales detalladas: 2019, 2023",
+    "Vencedores até 2023 · Finais detalhadas: 2019, 2023"
+  ],
+  [
+    "Description",
+    "Beschreibung",
+    "Beschreibung",
+    "설명",
+    "Описание",
+    "Descripción",
+    "Descrição"
+  ],
+  [
+    "members",
+    "Mitglieder",
+    "Mitglieder",
+    "회원",
+    "участники",
+    "miembros",
+    "membros"
+  ],
+  [
+    "Saved in this browser",
+    "In diesem Browser gespeichert",
+    "In dem Browser gspeichert",
+    "이 브라우저에 저장됨",
+    "Сохранено в этом браузере",
+    "Guardado en este navegador",
+    "Guardado neste navegador"
+  ],
+  [
+    "Events",
+    "Termine",
+    "Termine",
+    "일정",
+    "События",
+    "Eventos",
+    "Eventos"
+  ],
+  [
+    "Event name",
+    "Terminname",
+    "Terminname",
+    "일정 이름",
+    "Название события",
+    "Nombre del evento",
+    "Nome do evento"
+  ],
+  [
+    "Saved",
+    "Gespeichert",
+    "Gspeichert",
+    "저장됨",
+    "Сохранено",
+    "Guardado",
+    "Guardado"
+  ],
+  [
+    "Repeated end time",
+    "Wiederholte Endzeit",
+    "Wiederholte Endzeit",
+    "반복되는 종료 시간",
+    "Повторяющееся время окончания",
+    "Hora de fin repetida",
+    "Hora de fim repetida"
+  ]
+]

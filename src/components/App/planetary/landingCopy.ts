@@ -19,13 +19,13 @@ export function landingCopy(language: AppLanguage, key: keyof Copy) {
 // Short printed cover titles keep the artwork legible in every language.
 // The full course/subject title is always shown below the book and on its link.
 const bookTitles: Record<AppLanguage, Record<BookDesign, string>> = {
-  en: { math: "Math", percentages: "Percentages", guides: "Game guides", analysis: "Analysis" },
-  de: { math: "Mathematik", percentages: "Prozente", guides: "Spielregeln", analysis: "Analyse" },
-  bar: { math: "Mathematik", percentages: "Prozente", guides: "Spuiregeln", analysis: "Analyse" },
-  ko: { math: "수학", percentages: "백분율", guides: "게임 가이드", analysis: "분석" },
-  ru: { math: "Математика", percentages: "Проценты", guides: "Правила игр", analysis: "Анализ" },
-  es: { math: "Matemáticas", percentages: "Porcentajes", guides: "Guías de juego", analysis: "Análisis" },
-  pt: { math: "Matemática", percentages: "Percentagens", guides: "Guias de jogo", analysis: "Análise" },
+  en: { math: "Math", percentages: "Percentages", guides: "Game guides", analysis: "Analysis", algebra: "Algebra", calculus: "Calculus", linear: "Linear algebra", depth: "Analysis", chance: "Statistics", pitch: "Pitches", rhythm: "Rhythm", rules: "Rules", tactics: "Tactics" },
+  de: { math: "Mathematik", percentages: "Prozente", guides: "Spielregeln", analysis: "Analyse", algebra: "Algebra", calculus: "Differenzial", linear: "Lineare Algebra", depth: "Analysis", chance: "Statistik", pitch: "Tonhöhen", rhythm: "Rhythmus", rules: "Regeln", tactics: "Taktik" },
+  bar: { math: "Mathematik", percentages: "Prozente", guides: "Spuiregeln", analysis: "Analyse", algebra: "Algebra", calculus: "Differenzial", linear: "Lineare Algebra", depth: "Analysis", chance: "Statistik", pitch: "Tonhöhn", rhythm: "Rhythmus", rules: "Regln", tactics: "Taktik" },
+  ko: { math: "수학", percentages: "백분율", guides: "게임 가이드", analysis: "분석", algebra: "대수", calculus: "미적분", linear: "선형대수", depth: "해석학", chance: "통계", pitch: "음높이", rhythm: "리듬", rules: "규칙", tactics: "전술" },
+  ru: { math: "Математика", percentages: "Проценты", guides: "Правила игр", analysis: "Анализ", algebra: "Алгебра", calculus: "Анализ", linear: "Линейная алгебра", depth: "Основы анализа", chance: "Статистика", pitch: "Высота звука", rhythm: "Ритм", rules: "Правила", tactics: "Тактика" },
+  es: { math: "Matemáticas", percentages: "Porcentajes", guides: "Guías de juego", analysis: "Análisis", algebra: "Álgebra", calculus: "Cálculo", linear: "Álgebra lineal", depth: "Análisis", chance: "Estadística", pitch: "Notas", rhythm: "Ritmo", rules: "Reglas", tactics: "Tácticas" },
+  pt: { math: "Matemática", percentages: "Percentagens", guides: "Guias de jogo", analysis: "Análise", algebra: "Álgebra", calculus: "Cálculo", linear: "Álgebra linear", depth: "Análise", chance: "Estatística", pitch: "Notas", rhythm: "Ritmo", rules: "Regras", tactics: "Táticas" },
 };
 
 export function landingBookTitle(language: AppLanguage, design: BookDesign) {

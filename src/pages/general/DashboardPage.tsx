@@ -1,4 +1,3 @@
-import ProgressCard from "@/components/App/dashboard/ProgressCard";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useUiLanguage } from "@/i18n/ui";
@@ -59,7 +58,6 @@ function Dashboard() {
         <MyGames />
         <DashboardActionRow userId={user?.id} />
         <DashboardContentGrid userId={user?.id} sections={[
-          { id: "progress", label: "Progress", content: <ProgressCard profile={profile} streak={activity?.streak} loading={authLoading} signedIn={!!user} /> },
           { id: "quests", label: "Daily quests", content: <DailyQuestsCard quests={activity?.quests} loading={loading} unavailable={activityError} signedIn={!!user} /> },
           { id: "discover", label: "Did you know?", content: <DidYouKnowCarousel /> },
           { id: "learning", label: "Continue learning", content: <LearnSomethingNew /> },

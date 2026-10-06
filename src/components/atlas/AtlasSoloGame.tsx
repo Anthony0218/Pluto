@@ -46,7 +46,7 @@ function buildRun(data: AtlasDataset, mode: AtlasMode, settings: SoloSettings, s
   if (mode === "higher_lower") return { questions: generateComparisonQuestions({ ...common, chain: true, stats: settings.stats }), fillTargets: [] };
   if (mode === "guess_country") return { questions: generateGuessCountryQuestions(common), fillTargets: [] };
   if (mode === "closest_wins" || mode === "territory_battle") return { questions: generateMatchQuestions({ ...common, mode, categories: settings.categories }), fillTargets: [] };
-  return { questions: generateQuestions({ ...common, categories: settings.categories, interaction: mode === "map_click" ? "map_click" : mode === "speed_run" ? "choice" : "mixed" }), fillTargets: [] };
+  return { questions: generateQuestions({ ...common, categories: mode === "map_click" ? ["locations"] : settings.categories, interaction: mode === "map_click" ? "map_click" : mode === "speed_run" ? "choice" : "mixed" }), fillTargets: [] };
 }
 
 /** One player's run of a map/quiz mode: the questions, the map and the scoring. Results are handed to `onFinish`. */
@@ -190,7 +190,7 @@ export function AtlasSoloGame({ data, mode, settings, seed, title, player, onFin
           <h1>{mode === "map_fill" ? `Find ${expectedFill?.shortName || "the next country"}` : currentQuestion?.prompt}</h1>
           {(currentQuestion?.interaction === "map_click" || currentQuestion?.interaction === "closest_click") && currentQuestion.flagAsset && <img className="atlas-question-flag" src={currentQuestion.flagAsset} alt="Country flag to identify" />}
           {mode === "flags" && currentQuestion?.interaction === "single_choice" && <><FlagPrompt question={currentQuestion} topology={data.topology} /><FlagChoices question={currentQuestion} disabled={Boolean(feedback)} selected={feedback?.selected} correctId={feedback ? currentQuestion.answer : null} onAnswer={answer} /></>}
-          {mode === "higher_lower" && currentQuestion?.interaction === "higher_lower" && <HigherLowerCards key={currentQuestion.id} question={currentQuestion} revealed={Boolean(feedback)} disabled={Boolean(feedback)} chosen={feedback?.selected} correct={feedback?.correct} onAnswer={answer} />}
+          {currentQuestion?.interaction === "higher_lower" && <HigherLowerCards key={currentQuestion.id} question={currentQuestion} revealed={Boolean(feedback)} disabled={Boolean(feedback)} chosen={feedback?.selected} correct={feedback?.correct} onAnswer={answer} />}
           {guessing && <>{!guess.result && <CountryGuessInput entities={data.countries} selectedId={guess.selectedId} disabled={false} excluded={guess.wrong} onSelect={(id) => setGuess((current) => ({ ...current, selectedId: id }))} onSubmit={submitGuess} />}
             {guess.wrong.length > 0 && <p className="atlas-guess-misses">Not {guess.wrong.map(nameOf).join(", not ")}.</p>}
             <GuessClueList entityId={guessing.entityId} clues={guessing.clues.slice(0, guess.result ? guessing.clues.length : guess.tip + 1)} total={guessing.clues.length} />

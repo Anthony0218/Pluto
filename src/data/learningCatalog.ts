@@ -1,4 +1,7 @@
+import { musicFootballLessons } from './musicFootball.ts';
 import { foundationLessons } from "./mathFoundations.ts";
+import { advancedMathLessons } from "./advancedMath.ts";
+import { deeperMathLessons } from "./deeperMath.ts";
 import { percentageLessons } from "./everydayPercentages.ts";
 
 export type LearningSubject = {
@@ -36,9 +39,9 @@ export const learningPaths: LearningPath[] = [
   { id: "linear-algebra", subjectId: "math", title: "Linear algebra", description: "Make vectors, matrices, and transformations visible.", topics: ["Vectors", "Matrices", "Systems of linear equations", "Geometric transformations", "Eigenvalues and eigenvectors", "Substitution and residual checks"] },
   { id: "analysis", subjectId: "math", title: "Analysis in depth", description: "Understand the definitions and assumptions behind calculus.", topics: ["Limits and continuity", "Sequences", "Series and convergence", "Definitions and proofs", "Boundary cases and counterexamples"], relatedTools: ["function-plotter"] },
   { id: "probability-statistics", subjectId: "math", title: "Probability and statistics", description: "Reason about chance, data, and uncertainty.", topics: ["Probability and conditional probability", "Distributions", "Averages and variability", "Sampling and uncertainty", "Misleading charts", "Complementary events and simulation checks"] },
-  { id: "reading-pitches", subjectId: "music", title: "Reading pitches", description: "Find your way around the staff and recognize written notes.", topics: ["Staff, treble clef, and bass clef", "Note names and ledger lines", "Octaves", "Sharps, flats, and naturals", "Key signatures", "Matching notation to sound"] },
+  { id: "reading-pitches", subjectId: "music", title: "Reading pitches", description: "Find your way around the staff and recognize written notes.", topics: ["Staff, treble clef, and bass clef", "Note names and ledger lines", "Octaves", "Sharps, flats, and naturals", "Key signatures", "Matching notation to sound", "Notation for piano, strings, winds, guitar, bass, and drums"] },
   { id: "reading-rhythm", subjectId: "music", title: "Reading rhythm", description: "Read note lengths, count beats, and follow short passages.", topics: ["Note values and rests", "Dotted notes and ties", "Time signatures and measures", "Counting and tapping rhythms", "Reading pitches and rhythm together"] },
-  { id: "rules", subjectId: "football", title: "Football rules", description: "A reference for the laws of the game, supported by visual situations.", topics: ["Pitch, equipment, players, and officials", "Match duration and scoring", "Offside", "Fouls, misconduct, and cards", "Free kicks and penalties", "Throw-ins, goal kicks, corners, and other restarts", "Competition-specific regulations and rule editions"] },
+  { id: "rules", subjectId: "football", title: "Football rules", description: "A reference for the laws of the game, supported by visual situations.", topics: ["Pitch, equipment, players, and officials", "Match duration and scoring", "Offside", "Fouls, misconduct, and cards", "Free kicks and penalties", "Throw-ins, goal kicks, corners, and other restarts", "Competition-specific regulations and rule editions", "Club trophies, domestic leagues and cups, and World Cups"] },
   { id: "positions-tactics", subjectId: "football", title: "Positions and tactics", description: "Discover player responsibilities and how a team's shape changes.", topics: ["Goalkeepers, defenders, midfielders, and forwards", "Responsibilities with and without possession", "Formations", "Pressing and transitions", "Overlapping fullbacks", "False nine and supporting runs"] },
 ];
 
@@ -74,7 +77,7 @@ export const learningLessons: LearningLesson[] = [{
     practice: { title: "Explain your own steps", paragraphs: ["Try a problem before opening the solution. If you get stuck, use a hint and then try again.", "Getting an answer right once is a start. Explaining why each step works helps you use the idea in a different situation."], points: ["Write down what you know and what you need to find.", "Keep units and assumptions visible.", "Return to mistakes as opportunities to practice."] },
     check: { title: "Know what your check tells you", paragraphs: ["A second method can catch a mistake that repeating the first method would miss. Ask whether your result is plausible and whether it satisfies the original problem.", "Checks have different strengths. An approximation can support an answer; a proof establishes a claim under its stated assumptions. Substitution can confirm a solution without showing that you found every solution."], points: ["Exact check: substitute a solution into the original equation.", "Independent method: calculate the same quantity another way.", "Reasonableness check: compare with an estimate or a boundary case.", "Proof: justify the claim using definitions and valid reasoning."] },
   },
-}, ...foundationLessons, ...percentageLessons];
+}, ...foundationLessons, ...percentageLessons, ...advancedMathLessons, ...deeperMathLessons, ...musicFootballLessons.filter(lesson => lesson.subjectId === 'music')];
 
 export const subjectRoute = (subjectId: string) => `/learn/${subjectId}`;
 export const pathRoute = (path: Pick<LearningPath, "subjectId" | "id">) => `${subjectRoute(path.subjectId)}/${path.id}`;

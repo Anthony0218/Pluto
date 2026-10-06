@@ -1,7 +1,7 @@
 import { beginFall } from './falling.ts';
 import { EAT, FOOD, playerRadius, type FoodKind } from './config.ts';
 import { objectContact } from './physics.ts';
-import { clearPath, distance, validPosition } from './maps.ts';
+import { clearPath, distance, obstaclesFor, validPosition } from './maps.ts';
 import { random, spawnPosition } from './spawn.ts';
 import type { FoodObject, GameState, MapId, Vec } from './types.ts';
 
@@ -28,6 +28,7 @@ export const SURFACES: Partial<Record<MapId, SurfacePatch[]>> = {
 export const CANDY_MACHINES: Vec[] = [{ x: 520, y: 775 }, { x: 3480, y: 2265 }];
 export const FISH_POOLS: Vec[] = [{ x: 2655, y: 560 }, { x: 2655, y: 2400 }];
 export function surfaceAt(map: MapId, p: Vec) {
+  if (obstaclesFor(map).some(o => o.kind === "water" && p.x >= o.x && p.x <= o.x + o.w && p.y >= o.y && p.y <= o.y + o.h)) return { drag: 2.2, speed: .45, x: 0, y: 0 };
   const patch = SURFACES[map]?.find(s => p.x >= s.x && p.x <= s.x + s.w && p.y >= s.y && p.y <= s.y + s.h);
   return { drag: patch?.kind === 'ice' ? .16 : patch?.kind === 'snow' ? 1.8 : 1,
     speed: patch?.kind === 'ice' ? 1.32 : patch?.kind === 'snow' ? .94 : 1, x: patch?.dx ?? 0, y: patch?.dy ?? 0 };

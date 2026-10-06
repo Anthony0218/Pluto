@@ -14,7 +14,7 @@ export function generateMatchQuestions(options: {
   if (options.mode === "higher_lower") return generateComparisonQuestions(options);
   if (options.mode === "flag_battle") return generateFlagQuestions(options);
   if (options.mode === "guess_country") return generateGuessCountryQuestions(options);
-  const categories = options.categories ?? (options.mode === "territory_battle" ? ["countries", "capitals", "flags"] : ["locations", "countries", "capitals"]);
+  const categories = options.mode === "map_battle" ? ["locations" as const] : options.categories ?? (options.mode === "territory_battle" ? ["countries", "capitals", "flags"] : ["locations", "countries", "capitals"]);
   const territory = options.mode === "territory_battle";
   const questions = generateQuestions({ ...options,
     entities: options.mode === "closest_wins" ? options.entities.filter((entity) => entity.centroid) : options.entities,

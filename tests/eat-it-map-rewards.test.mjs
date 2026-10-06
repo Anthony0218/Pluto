@@ -85,3 +85,17 @@ test('expanded ice covers almost twice the former area and adds a bounded speed 
   for(let i=0;i<20;i++){movePlayer(s,p,{x:1,y:0},1/30);movePlayer(plain,plain.players[0],{x:1,y:0},1/30);}
   assert.ok(p.vx>plain.players[0].vx&&p.vx<plain.players[0].vx*1.8);
 });
+
+test('Nature river is traversable at reduced speed while shore food stays on land', () => {
+  const s = scene('nature'), p = s.players[0];
+  Object.assign(p, { x: 2500, y: 560, vx: 0, vy: 0 });
+  for (let i = 0; i < 240; i++) movePlayer(s, p, { x: 1, y: 0 }, 1 / 30);
+  assert.ok(p.x > 2780, `crossed the river: ${p.x}`);
+  const land = scene('nature').players[0], water = structuredClone(land);
+  Object.assign(land, { x: 2000, y: 560, vx: 0, vy: 0 });
+  Object.assign(water, { x: 2655, y: 560, vx: 0, vy: 0 });
+  movePlayer(s, land, { x: 0, y: 1 }, 1);
+  movePlayer(s, water, { x: 0, y: 1 }, 1);
+  assert.ok(water.vy < land.vy * .5);
+  assert.equal(surfaceAt('nature', water).speed, .45);
+});
