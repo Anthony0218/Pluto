@@ -12,8 +12,9 @@ export function validateMap(map: BoardMap): string[] {
   const fail = (message: string) => errors.push(`${map.id}: ${message}`);
   const byId = new Map(map.nodes.map((n) => [n.id, n]));
 
-  if (map.nodes.length !== MAP_NODE_COUNT)
-    fail(`expected ${MAP_NODE_COUNT} playable nodes, found ${map.nodes.length}`);
+  const expectedSpaces = map.spaceCount ?? MAP_NODE_COUNT;
+  if (map.nodes.length !== expectedSpaces)
+    fail(`expected ${expectedSpaces} playable nodes, found ${map.nodes.length}`);
   if (byId.size !== map.nodes.length) fail("node ids are not unique");
   if (!byId.has(map.start)) fail(`start node ${map.start} does not exist`);
   if (!(map.goldenPlutoCount >= 1)) fail("goldenPlutoCount must be at least 1");
@@ -35,9 +36,11 @@ export function validateMap(map: BoardMap): string[] {
 
   const counts = new Map<TileType, number>();
   for (const node of map.nodes) counts.set(node.type, (counts.get(node.type) ?? 0) + 1);
-  for (const [type, expected] of FIELD_DISTRIBUTION)
+  for (const [type, baseline] of FIELD_DISTRIBUTION) {
+    const expected = map.fieldDistribution?.[type] ?? baseline;
     if ((counts.get(type) ?? 0) !== expected)
       fail(`expected ${expected} ${type} fields, found ${counts.get(type) ?? 0}`);
+  }
 
   if (byId.has(map.start)) {
     const reachable = graphDistances(map, map.start);

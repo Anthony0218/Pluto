@@ -7,6 +7,13 @@ import type {
 import PaddlePanicScreen from "./PaddlePanicScreen.tsx";
 import StreetCrossScreen from "./StreetCrossScreen.tsx";
 import TargetPanicScreen from "./TargetPanicScreen.tsx";
+import ArrowMemoryScreen from "./ArrowMemoryScreen.tsx";
+import PickupArenaScreen from "./PickupArenaScreen.tsx";
+import PatternWallScreen from "./PatternWallScreen.tsx";
+import TrailRunScreen from "./TrailRunScreen.tsx";
+import RhythmScreen from "./RhythmScreen.tsx";
+import CircleShotScreen from "./CircleShotScreen.tsx";
+import LavaKnockbackScreen from "./LavaKnockbackScreen.tsx";
 
 export interface MinigameViewProps {
   match: Match;
@@ -23,4 +30,11 @@ export const minigameViews: Record<string, ComponentType<MinigameViewProps>> =
     "target-panic": TargetPanicScreen,
     "paddle-panic": PaddlePanicScreen,
     "street-cross": StreetCrossScreen,
+    "arrow-memory": ArrowMemoryScreen,
+    "pickup-arena": PickupArenaScreen,
+    "pattern-wall": PatternWallScreen,
+    "trail-run": TrailRunScreen,
+    "rhythm-rush": RhythmScreen,
+    "circle-shot": CircleShotScreen,
+    "lava-knockback": LavaKnockbackScreen,
   };

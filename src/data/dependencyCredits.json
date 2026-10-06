@@ -434,10 +434,24 @@
     "scope": "transitive"
   },
   {
+    "name": "@jridgewell/gen-mapping",
+    "version": "0.3.3",
+    "license": "MIT",
+    "homepage": "https://github.com/jridgewell/gen-mapping",
+    "scope": "transitive"
+  },
+  {
     "name": "@jridgewell/remapping",
     "version": "2.3.5",
     "license": "MIT",
     "homepage": "https://github.com/jridgewell/sourcemaps/tree/main/packages/remapping",
+    "scope": "transitive"
+  },
+  {
+    "name": "@jridgewell/resolve-uri",
+    "version": "3.1.0",
+    "license": "MIT",
+    "homepage": "https://github.com/jridgewell/resolve-uri",
     "scope": "transitive"
   },
   {
@@ -448,10 +462,45 @@
     "scope": "transitive"
   },
   {
+    "name": "@jridgewell/set-array",
+    "version": "1.1.2",
+    "license": "MIT",
+    "homepage": "https://github.com/jridgewell/set-array",
+    "scope": "transitive"
+  },
+  {
+    "name": "@jridgewell/source-map",
+    "version": "0.3.3",
+    "license": "MIT",
+    "homepage": "https://github.com/jridgewell/source-map",
+    "scope": "transitive"
+  },
+  {
+    "name": "@jridgewell/sourcemap-codec",
+    "version": "1.4.14",
+    "license": "MIT",
+    "homepage": "https://github.com/jridgewell/sourcemap-codec",
+    "scope": "transitive"
+  },
+  {
+    "name": "@jridgewell/sourcemap-codec",
+    "version": "1.4.15",
+    "license": "MIT",
+    "homepage": "https://github.com/jridgewell/sourcemap-codec",
+    "scope": "transitive"
+  },
+  {
     "name": "@jridgewell/sourcemap-codec",
     "version": "1.6.0",
     "license": "MIT",
     "homepage": "https://github.com/jridgewell/sourcemaps/tree/main/packages/sourcemap-codec",
+    "scope": "transitive"
+  },
+  {
+    "name": "@jridgewell/trace-mapping",
+    "version": "0.3.18",
+    "license": "MIT",
+    "homepage": "https://github.com/jridgewell/trace-mapping",
     "scope": "transitive"
   },
   {
@@ -539,7 +588,7 @@
     "scope": "transitive"
   },
   {
-    "name": "@pnpm/exe.darwin-arm64",
+    "name": "@pnpm/exe.win32-x64",
     "version": "12.4.2",
     "license": "MIT",
     "homepage": "https://github.com/pnpm/pnpm",
@@ -567,7 +616,7 @@
     "scope": "transitive"
   },
   {
-    "name": "@rolldown/binding-darwin-arm64",
+    "name": "@rolldown/binding-win32-x64-msvc",
     "version": "1.2.6",
     "license": "MIT",
     "homepage": "https://rolldown.rs/",
@@ -609,7 +658,7 @@
     "scope": "transitive"
   },
   {
-    "name": "@supabase/cli-darwin-arm64",
+    "name": "@supabase/cli-windows-x64",
     "version": "2.118.0",
     "license": "MIT",
     "homepage": "https://github.com/supabase/cli#readme",
@@ -679,7 +728,7 @@
     "scope": "transitive"
   },
   {
-    "name": "@tailwindcss/oxide-darwin-arm64",
+    "name": "@tailwindcss/oxide-win32-x64-msvc",
     "version": "4.3.3",
     "license": "MIT",
     "homepage": "https://github.com/tailwindlabs/tailwindcss",
@@ -1113,6 +1162,13 @@
     "scope": "transitive"
   },
   {
+    "name": "acorn",
+    "version": "8.8.2",
+    "license": "MIT",
+    "homepage": "https://github.com/acornjs/acorn",
+    "scope": "transitive"
+  },
+  {
     "name": "acorn-jsx",
     "version": "5.3.2",
     "license": "MIT",
@@ -1418,6 +1474,13 @@
     "version": "1.0.1",
     "license": "BSD-3-Clause",
     "homepage": "https://www.npmjs.com/package/buffer-equal-constant-time",
+    "scope": "transitive"
+  },
+  {
+    "name": "buffer-from",
+    "version": "1.1.2",
+    "license": "MIT",
+    "homepage": "https://www.npmjs.com/package/buffer-from",
     "scope": "transitive"
   },
   {
@@ -2562,13 +2625,6 @@
     "scope": "transitive"
   },
   {
-    "name": "fsevents",
-    "version": "2.3.3",
-    "license": "MIT",
-    "homepage": "https://github.com/fsevents/fsevents",
-    "scope": "transitive"
-  },
-  {
     "name": "function-bind",
     "version": "1.1.2",
     "license": "MIT",
@@ -3500,14 +3556,14 @@
     "scope": "transitive"
   },
   {
-    "name": "lightningcss-darwin-arm64",
+    "name": "lightningcss-win32-x64-msvc",
     "version": "1.32.0",
     "license": "MPL-2.0",
     "homepage": "https://github.com/parcel-bundler/lightningcss",
     "scope": "transitive"
   },
   {
-    "name": "lightningcss-darwin-arm64",
+    "name": "lightningcss-win32-x64-msvc",
     "version": "1.33.0",
     "license": "MPL-2.0",
     "homepage": "https://github.com/parcel-bundler/lightningcss",
@@ -4788,6 +4844,13 @@
     "scope": "transitive"
   },
   {
+    "name": "source-map-support",
+    "version": "0.5.21",
+    "license": "MIT",
+    "homepage": "https://github.com/evanw/node-source-map-support",
+    "scope": "transitive"
+  },
+  {
     "name": "split2",
     "version": "3.0.0",
     "license": "ISC",
@@ -5030,6 +5093,13 @@
     "version": "2.3.3",
     "license": "MIT",
     "homepage": "https://github.com/webpack/tapable",
+    "scope": "transitive"
+  },
+  {
+    "name": "terser",
+    "version": "5.16.9",
+    "license": "BSD-2-Clause",
+    "homepage": "https://terser.org",
     "scope": "transitive"
   },
   {

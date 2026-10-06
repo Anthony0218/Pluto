@@ -110,6 +110,8 @@ export interface BoardMap {
   // Logical canvas size the node coordinates live in.
   size: { width: number; height: number };
   nodes: BoardNode[];
+  spaceCount?: number;
+  fieldDistribution?: Partial<Record<TileType, number>>;
   regions: Region[];
   eventHooks: string[];
   // Random Event pool (event registry ids); each event is also filtered by its own `allowedMaps`.

@@ -36,9 +36,9 @@ function landing(type) {
   ).id;
   return s;
 }
-test("tropical graph has exactly 60 connected spaces, correct distribution and reciprocal links", () => {
-  assert.equal(tropical.nodes.length, 60);
-  assert.equal(new Set(tropical.nodes.map((n) => n.id)).size, 60);
+test("tropical graph has 96 connected spaces, correct distribution and reciprocal links", () => {
+  assert.equal(tropical.nodes.length, 96);
+  assert.equal(new Set(tropical.nodes.map((n) => n.id)).size, 96);
   const reached = new Set(),
     queue = [tropical.start];
   while (queue.length) {
@@ -53,7 +53,7 @@ test("tropical graph has exactly 60 connected spaces, correct distribution and r
       queue.push(other);
     }
   }
-  assert.equal(reached.size, 60);
+  assert.equal(reached.size, 96);
   assert.ok(tropical.nodes.filter((n) => n.connections.length > 2).length >= 8);
   assert.deepEqual(
     Object.fromEntries(
@@ -64,14 +64,14 @@ test("tropical graph has exactly 60 connected spaces, correct distribution and r
     ),
     {
       empty: 1,
-      coin: 18,
-      item: 12,
+      coin: 30,
+      item: 18,
       rare: 1,
-      event: 6,
-      deposit: 6,
+      event: 12,
+      deposit: 12,
       bank: 1,
       property: 6,
-      heal: 3,
+      heal: 9,
       duel: 2,
       warp: 2,
       hazard: 1,

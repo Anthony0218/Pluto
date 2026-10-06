@@ -9,6 +9,7 @@ export interface MinigameParticipant {
   id: string;
   isBot: boolean;
   difficulty: Difficulty;
+  avatarId?: number;
 }
 export interface MinigameCreateContext {
   participants: MinigameParticipant[];
@@ -32,6 +33,7 @@ export interface MinigameDefinition<S = unknown, I = unknown> {
   durationSeconds: number;
   gameType: MinigameType;
   supportsBots: boolean;
+  selectable?: boolean;
   create(context: MinigameCreateContext): S;
   // Strictly parses an untrusted input record; null means "reject".
   parseInput(input: MinigameInput): I | null;
@@ -48,7 +50,9 @@ export interface MinigameDefinition<S = unknown, I = unknown> {
   // Participants ordered best first. Must be a total order (use `random` as the final tiebreaker).
   rank(state: S, participants: readonly string[], random: Random): string[];
   // What clients may see at `now` (no hidden schedules or bot plans).
-  publicView(state: S, now: number): unknown;
+  publicView(state: S, now: number, viewerId?: string): unknown;
+  // Private challenges require a distinct snapshot for each authenticated seat.
+  personalizedView?: boolean;
   // Realtime minigames (physics, moving hazards) advance their own simulation to server time `now` in
   // fixed steps. Returns whether anything changed. Called before every input and on every server tick.
   tick?(state: S, now: number): boolean;

@@ -1,3 +1,4 @@
+import { expandBoard } from "./expandBoard.ts";
 import type {
   BoardMap,
   BoardNode,
@@ -196,7 +197,9 @@ export const mountain: BoardMap = {
     "Climb from the village to the summit through chokepoints, cliffs and caves. Avalanches close paths; cable cars and ice slides bend the map.",
   start: id("v0"),
   size: { width: 1120, height: 1040 },
-  nodes,
+  nodes: expandBoard(nodes, regions, "mountain", 4),
+  spaceCount: 92,
+  fieldDistribution: { coin: 34, item: 20, deposit: 14 },
   regions,
   eventHooks: ["avalanche", "mine-collapse", "cable-breakdown", "snowstorm", "mountain-goats"],
   eventPoolIds: ["avalanche", "mine-collapse", "cable-breakdown", "windfall"],

@@ -97,6 +97,7 @@ export default function PartyMatch({
     alpine = map.theme === "mountain";
   const [inspected, setInspected] = useState<string | null>(null);
   const [itemsOpen, setItemsOpen] = useState(false);
+  const [boardOnly, setBoardOnly] = useState(true);
   // Unconfirmed board targeting is client-only; it belongs to the connection it started on, so a
   // reconnect cancels it safely (nothing was sent or consumed).
   const [aiming, setAiming] = useState<{
@@ -214,6 +215,7 @@ export default function PartyMatch({
       return;
     }
     setInspected(id);
+    setBoardOnly(false);
     if (
       mine &&
       match.phase === "PATH_SELECTION" &&
@@ -222,7 +224,7 @@ export default function PartyMatch({
       send({ type: "ACTION", action: { type: "SELECT_PATH", nodeId: id } });
   };
   return (
-    <section className="pp-match">
+    <section className="pp-match pp-board-match" data-board-only={boardOnly}>
       <FeedbackToasts match={match} />
       <div className="pp-match-heading">
         <div>
@@ -368,7 +370,8 @@ export default function PartyMatch({
             <span className="pp-hint">Tap any space to inspect</span>
           </div>
         </div>
-        <aside className="pp-turn-panel pp-card" id="pp-turn-panel">
+        <aside className={"pp-turn-panel pp-card" + (["ITEM_PHASE", "MOVEMENT", "DICE_ROLL", "TURN_END", "ANIMAL_PHASE", "ROUND_END"].includes(match.phase) ? " is-optional" : "")} id="pp-turn-panel">
+          <button className="pp-panel-close" onClick={() => setBoardOnly(true)} aria-label="See the board">✕</button>
           {match.phase === "GAME_OVER" ? (
             <FinalResults connection={connection} lobby={lobby} match={match} alpine={alpine} />
           ) : match.phase === "ITEM_REPLACE" && match.pendingItem ? (
@@ -514,6 +517,7 @@ export default function PartyMatch({
                     : `${match.movesRemaining} moves remaining`}
               </p>
               <div className="pp-turn-buttons">
+                <button onClick={() => setBoardOnly(true)}>See board</button>
                 {me && (
                   <button
                     aria-expanded={itemsOpen}
@@ -810,6 +814,8 @@ export default function PartyMatch({
             )}
           </div>
           {mine && match.phase === "ITEM_PHASE" ? (
+            <>
+            <button disabled={!canUseItems || !me?.inventory.length} onClick={() => { setItemsOpen(true); setBoardOnly(false); }}>Use item</button>
             <button
               className="pp-primary"
               disabled={!online}
@@ -817,11 +823,11 @@ export default function PartyMatch({
             >
               Roll <ArrowRight size={16} />
             </button>
+            <button aria-pressed={boardOnly} onClick={() => setBoardOnly(true)}>See board</button>
+            </>
           ) : (
             <button
-              onClick={() =>
-                document.getElementById("pp-turn-panel")?.scrollIntoView({ block: "start" })
-              }
+              onClick={() => setBoardOnly((value) => !value)}
             >
               {mine && match.phase === "PATH_SELECTION" ? "Choose path ↓" : mine ? "Your move ↓" : "Details ↓"}
             </button>

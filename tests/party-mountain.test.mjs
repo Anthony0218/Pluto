@@ -92,9 +92,9 @@ test("Mountain is registered next to the Tropical map with a unique id and passe
   for (const map of mapRegistry.all()) assert.deepEqual(validateMap(map), [], map.id);
 });
 
-test("Mountain has exactly 60 uniquely identified nodes, a Start, valid types and reciprocal links", () => {
-  assert.equal(mountain.nodes.length, 60);
-  assert.equal(new Set(mountain.nodes.map((n) => n.id)).size, 60);
+test("Mountain has 92 uniquely identified nodes, a Start, valid types and reciprocal links", () => {
+  assert.equal(mountain.nodes.length, 92);
+  assert.equal(new Set(mountain.nodes.map((n) => n.id)).size, 92);
   assert.ok(mountain.nodes.some((n) => n.id === mountain.start));
   const byId = new Map(mountain.nodes.map((n) => [n.id, n]));
   const valid = new Set(FIELD_DISTRIBUTION.map(([t]) => t));
@@ -108,7 +108,7 @@ test("Mountain has exactly 60 uniquely identified nodes, a Start, valid types an
 });
 
 test("every Mountain node is reachable from Start and the board has loops, branches and intersections", () => {
-  assert.equal(graphDistances(mountain, mountain.start).size, 60);
+  assert.equal(graphDistances(mountain, mountain.start).size, 92);
   const edges = edgesOf(mountain);
   const intersections = mountain.nodes.filter((n) => n.connections.length > 2);
   assert.ok(intersections.length >= 10, `intersections: ${intersections.length}`);
@@ -117,13 +117,13 @@ test("every Mountain node is reachable from Start and the board has loops, branc
   assert.ok(edges.length > tropical.nodes.length, "denser than a plain ring");
 });
 
-test("Mountain follows the standard 60-field distribution with exactly 6 camps, 1 rare, 1 bank and 1 Nothing", () => {
-  for (const [type, count] of FIELD_DISTRIBUTION) assert.equal(countType(mountain, type), count, type);
+test("Mountain expands its supplies while retaining 6 camps, 1 rare, 1 bank and 1 Nothing", () => {
+  for (const [type, count] of FIELD_DISTRIBUTION) assert.equal(countType(mountain, type), mountain.fieldDistribution[type] ?? count, type);
   assert.equal(countType(mountain, "property"), 6);
   assert.equal(countType(mountain, "rare"), 1);
   assert.equal(countType(mountain, "bank"), 1);
   assert.equal(countType(mountain, "empty"), 1);
-  assert.equal(mountain.nodes.reduce((n, node) => n + (FIELD_DISTRIBUTION.some(([t]) => t === node.type) ? 1 : 0), 0), 60);
+  assert.equal(mountain.nodes.reduce((n, node) => n + (FIELD_DISTRIBUTION.some(([t]) => t === node.type) ? 1 : 0), 0), 92);
 });
 
 test("map validation fails for a wrong node count, a one-way link, an unreachable node, a bad slide and a bad edge", () => {
@@ -132,7 +132,7 @@ test("map validation fails for a wrong node count, a one-way link, an unreachabl
     edit(map);
     return validateMap(map);
   };
-  assert.ok(broken((m) => m.nodes.pop()).some((e) => /expected 60 playable nodes/.test(e)));
+  assert.ok(broken((m) => m.nodes.pop()).some((e) => /expected 92 playable nodes/.test(e)));
   assert.ok(
     broken((m) => {
       m.nodes[0].connections = m.nodes[0].connections.slice(1);
@@ -736,7 +736,7 @@ test("the slide destination is a fixed forced path, so it can never trap a playe
     while (s.phase === "RESOLVE_TILE" && guard++ < 5) s = advance(s, settings, () => 0.5);
     assert.ok(guard < 5);
     assert.equal(activePlayer(s).currentNodeId, slide.path[1]);
-    assert.ok(graphDistances(mountain, activePlayer(s).currentNodeId).size === 60);
+    assert.ok(graphDistances(mountain, activePlayer(s).currentNodeId).size === 92);
   }
 });
 

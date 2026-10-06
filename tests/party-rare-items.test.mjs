@@ -337,7 +337,7 @@ test("Fallout Core rejects missing or invalid nodes without consuming the item",
   const s = falloutSetup();
   const item = give(s, "p0", "fallout-core");
   assert.throws(() => use(s, "p0", { itemInstanceId: item }), /Choose a space/);
-  assert.throws(() => use(s, "p0", { itemInstanceId: item, targetNodeId: "space-60" }), /Choose a space/);
+  assert.throws(() => use(s, "p0", { itemInstanceId: item, targetNodeId: "space-999" }), /Choose a space/);
   assert.ok(has(s, "p0", item));
   assert.equal(s.radiationZones.length, 0);
   // Consumed exactly once.

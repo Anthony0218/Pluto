@@ -52,16 +52,16 @@ const random = () => randomInt(0, 0x1000000) / 0x1000000;
 // most one broadcast per MIN interval, and the (trimmed) target window is refreshed every MAX interval.
 const MINIGAME_BROADCAST_MIN_MS = 200,
   MINIGAME_BROADCAST_MAX_MS = 1000;
-// Snapshot sent to clients: identical for everyone, with minigame state reduced to its public view.
+// Snapshots reduce minigame state to its public view; private challenges are scoped to the session.
 // Timed client views (minigames, aiming) also get the server clock so they can sync.
-export function publicLobby(room: Lobby, now = Date.now()): Lobby {
+export function publicLobby(room: Lobby, now = Date.now(), viewerId?: string): Lobby {
   const match = room.match;
   if (!match?.minigame && !match?.turn.aim) return room;
   return {
     ...room,
     match: {
       ...match,
-      minigame: match.minigame && publicMinigameView(match.minigame, now),
+      minigame: match.minigame && publicMinigameView(match.minigame, now, undefined, viewerId),
       turn: match.turn.aim
         ? { ...match.turn, aim: { ...match.turn.aim, serverNow: now } }
         : match.turn,
@@ -171,12 +171,13 @@ export class PartyRooms {
     }
   }
   broadcast(room: Lobby, now = Date.now()) {
-    const lobby = publicLobby(room, now);
+    const personalized = room.match?.minigame && minigameRegistry.get(room.match.minigame.minigameId).personalizedView;
+    const sharedLobby = personalized ? null : publicLobby(room, now);
     this.lastBroadcast.set(room.code, now);
     this.dirty.delete(room.code);
     for (const session of this.sessions.values())
       if (session.room === room.code)
-        session.send?.({ type: "STATE", lobby, serverNow: now });
+        session.send?.({ type: "STATE", lobby: sharedLobby ?? publicLobby(room, now, session.id), serverNow: now });
   }
   private deleteRoom(code: string, reason: string) {
     if (!this.rooms.delete(code)) return;

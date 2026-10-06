@@ -45,7 +45,7 @@ export function isMinigamePlayPhase(phase: Match["phase"]): boolean {
 function participantsOf(state: Match, ids: readonly string[]) {
   return ids.map((id): MinigameParticipant => {
     const p = state.players.find((player) => player.id === id)!;
-    return { id, isBot: p.isBot, difficulty: p.difficulty };
+    return { id, isBot: p.isBot, difficulty: p.difficulty, avatarId: p.avatarId };
   });
 }
 
@@ -310,10 +310,11 @@ export function publicMinigameView(
   runtime: MinigameRuntime,
   now: number,
   registry: MinigameRegistry = minigameRegistry,
+  viewerId?: string,
 ): MinigameRuntime {
   return {
     ...runtime,
-    state: registry.get(runtime.minigameId).publicView(runtime.state, now),
+    state: registry.get(runtime.minigameId).publicView(runtime.state, now, viewerId),
     serverNow: now,
   };
 }
