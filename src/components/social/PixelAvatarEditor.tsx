@@ -5,6 +5,7 @@ import { PixelAvatarImage } from "./ProfileAvatarPicker";
 import {
   blankPixelGrid,
   decodePixelAvatar,
+  editablePixelGrid,
   encodePixelAvatar,
   floodFill,
   PIXEL_PALETTE,
@@ -40,7 +41,7 @@ const toolButton = (active: boolean) =>
     active ? "border-amber-300 bg-amber-300/15 text-amber-100" : "border-white/10 bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-white"
   }`;
 
-/** Draw a 16×16 avatar pixel by pixel. No uploads: the drawing is the avatar. */
+/** Draw a 32×32 avatar pixel by pixel. No uploads: the drawing is the avatar. */
 export default function PixelAvatarEditor({ initialAvatarId, saving, onSave, onCancel }: {
   initialAvatarId?: string | null;
   saving?: boolean;
@@ -48,7 +49,10 @@ export default function PixelAvatarEditor({ initialAvatarId, saving, onSave, onC
   onCancel: () => void;
 }) {
   useUiLanguage();
-  const [grid, setGrid] = useState<PixelGrid>(() => decodePixelAvatar(initialAvatarId ?? "") ?? starterPixelGrid());
+  const [grid, setGrid] = useState<PixelGrid>(() => {
+    const saved = decodePixelAvatar(initialAvatarId ?? "");
+    return saved ? editablePixelGrid(saved) : starterPixelGrid();
+  });
   const [history, setHistory] = useState<PixelGrid[]>([]);
   const [color, setColor] = useState(12);
   const [tool, setTool] = useState<Tool>("pencil");
@@ -122,7 +126,7 @@ export default function PixelAvatarEditor({ initialAvatarId, saving, onSave, onC
         <div
           role="img"
           aria-label={ui("Pixel avatar canvas")}
-          className="relative mx-auto aspect-square w-full max-w-[420px] touch-none select-none overflow-hidden rounded-2xl border-2 border-white/15 bg-[#0f172a]"
+          className="relative mx-auto aspect-square w-full max-w-[480px] touch-none select-none overflow-hidden rounded-2xl border-2 border-white/15 bg-[#0f172a]"
           style={{ cursor: tool === "fill" ? "cell" : "crosshair" }}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
@@ -134,12 +138,13 @@ export default function PixelAvatarEditor({ initialAvatarId, saving, onSave, onC
           {/* Grid lines */}
           <svg viewBox={`0 0 ${PIXEL_SIZE} ${PIXEL_SIZE}`} className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden="true">
             {Array.from({ length: PIXEL_SIZE - 1 }, (_, index) => index + 1).map((line) => (
-              <g key={line} stroke="rgba(255,255,255,.08)" strokeWidth="0.04">
+              // Every eighth line is stronger, to keep your place on the finer canvas.
+              <g key={line} stroke={line % 8 === 0 ? "rgba(255,255,255,.2)" : "rgba(255,255,255,.07)"} strokeWidth="0.05">
                 <line x1={line} y1={0} x2={line} y2={PIXEL_SIZE} />
                 <line x1={0} y1={line} x2={PIXEL_SIZE} y2={line} />
               </g>
             ))}
-            {mirror && <line x1={PIXEL_SIZE / 2} y1={0} x2={PIXEL_SIZE / 2} y2={PIXEL_SIZE} stroke="rgba(252,211,77,.55)" strokeWidth="0.08" strokeDasharray="0.3 0.25" />}
+            {mirror && <line x1={PIXEL_SIZE / 2} y1={0} x2={PIXEL_SIZE / 2} y2={PIXEL_SIZE} stroke="rgba(252,211,77,.55)" strokeWidth="0.14" strokeDasharray="0.6 0.5" />}
           </svg>
         </div>
       </div>

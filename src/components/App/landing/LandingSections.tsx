@@ -103,13 +103,13 @@ export default function LandingSections() {
     "watten": index => (
       <FeatureSection id="watten" index={index} tone="watten" eyebrow="WATTEN" lines={[{ text: text("wattenL1") }, { text: text("wattenL2"), accent: true }]}
         description={text("wattenDesc")} href="/games/watten" action={explore("Watten")}>
-        {slot(<WattenDemo />, 520)}
+        {slot(<WattenDemo />, 740)}
       </FeatureSection>
     ),
     "schafkopf": index => (
       <FeatureSection id="schafkopf" index={index} tone="schafkopf" eyebrow="SCHAFKOPF" lines={[{ text: text("schafkopfL1") }, { text: text("schafkopfL2"), accent: true }]}
         description={text("schafkopfDesc")} href="/games/schafkopf" action={explore("Schafkopf")}>
-        {slot(<SchafkopfDemo />, 520)}
+        {slot(<SchafkopfDemo />, 730)}
       </FeatureSection>
     ),
     "atlas-arena": index => (

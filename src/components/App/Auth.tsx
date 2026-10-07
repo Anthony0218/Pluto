@@ -10,7 +10,8 @@ export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const [isRegistering, setIsRegistering] = useState(false);
+  // /login?register opens on the Register tab, for links that say "create an account".
+  const [isRegistering, setIsRegistering] = useState(() => new URLSearchParams(window.location.search).has("register"));
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);

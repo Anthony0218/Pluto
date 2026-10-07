@@ -69,27 +69,82 @@
 .go-candidates b { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: #ffffff18; font-size: 11px; }
 .go-candidates span { margin-left: auto; color: #94a3c8; font-variant-numeric: tabular-nums; }
 
-/* ── Card tables (Watten, Schafkopf) ── */
-.card-table { position: relative; display: grid; grid-template-rows: auto 1fr auto; min-height: 400px; padding: 14px; border: 1px solid #ffffff14; border-radius: 18px; background-size: cover; background-position: center; overflow: hidden; }
-.card-seat { position: absolute; z-index: 1; display: grid; justify-items: center; gap: 6px; color: #e8eefc; font-size: 11px; font-weight: 700; }
-.card-seat--top { left: 50%; top: 10px; translate: -50% 0; }
-.card-seat--left { left: 14px; top: 42%; translate: 0 -50%; }
-.card-seat--right { right: 14px; top: 42%; translate: 0 -50%; }
-.card-fan { display: flex; }
-.card-fan .card-back { width: 22px; height: 34px; margin-left: -14px; border: 1px solid #ffffff55; border-radius: 4px; background: repeating-linear-gradient(45deg, #7f1d1d 0 3px, #991b1b 3px 6px); box-shadow: 0 2px 6px #0007; }
-.card-fan .card-back:first-child { margin-left: 0; }
-.card-center { position: relative; grid-row: 2; align-self: center; justify-self: center; width: min(250px, 62%); height: 190px; }
-.card-played { position: absolute; width: 58px; height: auto; border-radius: 6px; box-shadow: 0 6px 16px #000a; }
-.card-played--bottom { left: 50%; bottom: 0; margin-left: -29px; }
-.card-played--top { left: 50%; top: 0; margin-left: -29px; }
-.card-played--left { left: 6%; top: 50%; margin-top: -45px; }
-.card-played--right { right: 6%; top: 50%; margin-top: -45px; }
-.card-played--winner { outline: 3px solid #fcd34d; outline-offset: 2px; }
-.card-hand { grid-row: 3; display: flex; justify-content: center; gap: 6px; }
-.card-hand-card { width: 62px; padding: 0; border: 0; border-radius: 6px; background: none; transition: transform .18s cubic-bezier(.22, 1, .36, 1), filter .18s; }
-.card-hand-card img { display: block; width: 100%; height: auto; border-radius: 6px; box-shadow: 0 6px 14px #0009; }
+/* ── Card tables (Watten, Schafkopf) ── each is laid out like the table of the real game. */
+.card-played { margin: 0; }
+.card-played img { display: block; border-radius: 6px; box-shadow: 0 6px 16px #000a; }
+.card-played--winner img { outline: 3px solid #fcd34d; outline-offset: 2px; }
+.card-hand { display: flex; justify-content: center; }
+.card-hand-card { padding: 0; border: 0; border-radius: 6px; background: none; transition: transform .18s cubic-bezier(.22, 1, .36, 1), filter .18s; }
+.card-hand-card img { display: block; width: 100%; height: 100%; border-radius: 6px; box-shadow: 0 6px 14px #0009; }
 .card-hand-card:not(:disabled):hover, .card-hand-card:not(:disabled):focus-visible { transform: translateY(-12px); }
-.card-hand-card:disabled { filter: brightness(.55) saturate(.7); cursor: default; }
+.card-hand-card:disabled { filter: brightness(.6) saturate(.75); cursor: default; }
+
+/* Watten: felt table with a wooden rim, the round's Trumpf and Schlag in the status pill, opponents in panels. */
+.wt-table { position: relative; isolation: isolate; min-height: 500px; border: 7px solid #382b23; border-radius: 28px; overflow: hidden; color: #fff; background-color: #10383f; background-image: radial-gradient(ellipse at 50% 38%, #ffffff0c, transparent 65%), repeating-linear-gradient(0deg, #ffffff02 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, #00000008 0 1px, transparent 1px 3px), radial-gradient(ellipse at center, #245b63, #10383f); box-shadow: inset 0 0 0 2px #d3b477, inset 0 0 45px #0006, 0 16px 40px #0005; }
+.wt-table::before { content: ""; position: absolute; inset: 10px; z-index: -1; border: 1px solid #d3b477; border-radius: 16px; opacity: .3; pointer-events: none; }
+.wt-status { position: absolute; top: 16px; left: 50%; translate: -50% 0; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 3px 14px; width: max-content; max-width: calc(100% - 28px); padding: 8px 14px; border: 1px solid #ffffff20; border-radius: 14px; background: #071a20b3; font-size: 12px; }
+.wt-status strong { display: inline-flex; align-items: baseline; gap: 6px; color: #fde3a7; font-size: 13px; }
+.wt-status small { color: #9fc0b8; font-size: 9.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.wt-seat { position: absolute; top: 70px; display: grid; justify-items: center; gap: 4px; width: 124px; padding: 8px; border: 1px solid #ffffff20; border-radius: 14px; background: #071a2099; text-align: center; }
+.wt-seat--left { left: 16px; }
+.wt-seat--right { right: 16px; }
+.wt-seat.is-active, .wt-hand p.is-active { border-color: #fcd34d99; box-shadow: 0 0 20px #fcd34d15; }
+.wt-seat strong { font-size: 12.5px; }
+.wt-seat span { color: #bdcfca; font-size: 10.5px; }
+.wt-backs { display: flex; justify-content: center; min-height: 35px; padding: 2px 0; }
+.wt-backs i { width: 22px; height: 33px; border: 1px solid #91afa2; border-radius: 4px; background: repeating-linear-gradient(45deg, #294e47 0 3px, #1a3934 3px 6px); box-shadow: 0 2px 5px #0005; }
+.wt-backs i + i { margin-left: -11px; }
+.wt-trick { position: absolute; top: 176px; left: 50%; translate: -50% 0; display: flex; align-items: center; justify-content: center; gap: 10px; width: min(340px, calc(100% - 28px)); min-height: 128px; padding: 10px; border: 1px solid #ffffff15; border-radius: 18px; background: #00140c30; }
+.wt-trick p { color: #ffffff80; font-size: 12.5px; text-align: center; }
+.wt-trick .card-played { display: grid; justify-items: center; gap: 5px; }
+.wt-trick .card-played img { width: 58px; height: 87px; object-fit: fill; }
+.wt-trick figcaption { color: #d5e5df; font-size: 10.5px; }
+.wt-hand { position: absolute; inset: auto 12px 12px; display: grid; justify-items: center; gap: 8px; padding: 8px 8px 10px; border: 1px solid #ffffff20; border-radius: 16px; background: #071a2080; }
+.wt-hand p { display: grid; justify-items: center; padding: 3px 14px; border: 1px solid transparent; border-radius: 10px; line-height: 1.25; }
+.wt-hand p strong { font-size: 13px; }
+.wt-hand p span { color: #bdcfca; font-size: 10.5px; }
+.wt-hand p.is-active span { color: #fcd34d; }
+.wt-hand .card-hand { gap: 6px; }
+.wt-hand .card-hand-card { width: 62px; height: 93px; }
+.wt-hand .card-hand-card img { object-fit: fill; }
+
+/* Schafkopf: the garden table, the regulars holding their cards behind wooden nameplates, your hand fanned out below. */
+.skd-table { position: relative; isolation: isolate; min-height: 500px; border: 1px solid #f2ddad40; border-radius: 18px; overflow: hidden; color: #fff; background: linear-gradient(180deg, #0c1a1055, transparent 24%, transparent 62%, #1a0f0780), url("/images/landing/schafkopf-garden.jpg") 50% 100% / cover no-repeat #3a2a18; }
+.skd-bar { position: absolute; inset: 10px 10px auto; z-index: 3; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; padding: 7px 12px; border: 1px solid #f2ddad66; border-radius: 13px; background: #142719db; font-size: 11.5px; }
+.skd-bar strong { font-size: 14px; font-weight: 800; }
+.skd-bar > span { color: #e6dcc3; }
+.skd-trump { display: inline-flex; align-items: baseline; gap: 5px; margin-left: auto; color: #fde3a7 !important; font-weight: 700; }
+.skd-trump small { color: #b9c8a8; font-size: 9.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.skd-trump b { color: #f87171; }
+.skd-stich { position: absolute; top: 60px; left: 12px; z-index: 3; padding: 4px 10px; border: 1px solid #dbe7f5aa; border-radius: 999px; background: #10243aee; font-size: 10.5px; font-weight: 800; }
+.skd-seat { position: absolute; z-index: 1; display: grid; justify-items: center; width: 112px; }
+.skd-seat--top { top: 62px; left: 50%; translate: -50% 0; }
+.skd-seat--left { top: 168px; left: 4px; }
+.skd-seat--right { top: 168px; right: 4px; }
+.skd-portrait { position: relative; display: block; width: 78px; height: 104px; overflow: hidden; }
+.skd-portrait > img { position: absolute; left: 50%; top: 0; width: 100%; height: auto; translate: -50% 0; filter: drop-shadow(0 4px 6px #0007); }
+.skd-seat.is-active .skd-portrait > img { filter: drop-shadow(0 0 7px #fde68a) drop-shadow(0 4px 6px #0007); }
+.skd-held { position: absolute; left: 50%; bottom: 3px; width: 0; height: 30px; }
+.skd-held i { position: absolute; left: 0; bottom: 0; width: 18px; height: 28px; border: 1.5px solid #f6e8c7; border-radius: 3px; background: repeating-linear-gradient(45deg, #245b84 0 3px, #f7f1df 3px 6px); box-shadow: inset 0 0 0 1.5px #416c8b, 0 2px 4px #0009; transform-origin: 50% 90%; transform: translateX(calc(-50% + var(--fan) * 9px)) rotate(calc(var(--fan) * 7deg)); }
+.skd-plate { position: relative; z-index: 2; display: grid; justify-items: center; min-width: 96px; margin-top: -2px; padding: 2px 8px 3px; border: 2px solid #5b3418; border-radius: 4px; background: linear-gradient(180deg, #d2a36c, #b07a48 55%, #8f5f34); box-shadow: 0 3px 0 #4d2818, 0 7px 12px #0007; color: #3a1e0d; font-family: Georgia, "Times New Roman", serif; line-height: 1.15; }
+.skd-plate b { font-size: 12.5px; letter-spacing: .02em; }
+.skd-plate small { font-size: 9px; font-style: italic; font-weight: 700; }
+.skd-plate--playing { outline: 2px solid #4ade80; }
+.skd-plate--opposing { outline: 2px solid #f87171; }
+.skd-speech { position: absolute; bottom: calc(100% - 14px); z-index: 4; width: max-content; max-width: 130px; padding: 4px 8px; border: 1px solid #e9d9a8; border-radius: 12px; background: #fff9e9; color: #352316; box-shadow: 0 5px 15px #0006; font-size: 10px; font-weight: 700; line-height: 1.25; }
+.skd-seat--top .skd-speech { bottom: auto; top: 6px; left: calc(50% + 34px); }
+.skd-trick { position: absolute; top: 212px; left: 50%; z-index: 2; width: 172px; height: 150px; translate: -50% 0; }
+.skd-trick .card-played { position: absolute; }
+.skd-trick .card-played img { width: 50px; height: 71px; }
+.skd-trick .card-played--bottom { left: 50%; bottom: 0; margin-left: -25px; z-index: 2; }
+.skd-trick .card-played--top { left: 50%; top: 0; margin-left: -25px; }
+.skd-trick .card-played--left { left: 6px; top: 50%; margin-top: -36px; rotate: -8deg; }
+.skd-trick .card-played--right { right: 6px; top: 50%; margin-top: -36px; rotate: 8deg; }
+.skd-hand { position: absolute; inset: auto 0 0; z-index: 3; display: grid; justify-items: center; }
+.skd-hand .card-hand { padding-bottom: 4px; }
+.skd-hand .card-hand-card { width: 60px; height: 85px; margin-inline: -5px; rotate: calc(var(--fan) * 6deg); translate: 0 calc(var(--fan) * var(--fan) * 3px); transform-origin: 50% 100%; }
+.skd-turn { width: min(300px, 78%); padding: 7px 12px 8px; border: 2px solid #46618c; border-bottom: 0; border-radius: 16px 16px 0 0; background: linear-gradient(180deg, #1d4a35, #123222); color: #c8d6cb; font-size: 12.5px; font-weight: 800; text-align: center; }
+.skd-turn.is-active { border-color: #6ea0ee; color: #eaf2ff; text-shadow: 0 0 10px #7fb0ff; }
 .card-status { display: grid; gap: 8px; margin-top: 14px; }
 .card-status p { color: #fff; font-size: 14px; font-weight: 600; }
 .card-status .card-score { color: var(--demo-accent); font-size: 12px; font-weight: 700; }
@@ -193,9 +248,29 @@
 @media (max-width: 720px) {
   .chess-demo, .go-demo { grid-template-columns: minmax(0, 1fr); }
   .variant-grid { grid-template-columns: minmax(0, 1fr); }
-  .card-hand-card { width: 52px; }
-  .card-played { width: 48px; }
-  .card-played--bottom, .card-played--top { margin-left: -24px; }
+  .wt-table { min-height: 516px; }
+  .wt-status { top: 12px; }
+  .wt-seat { top: 80px; width: 104px; padding: 6px; }
+  .wt-trick { top: 200px; }
+  .wt-seat--left { left: 10px; }
+  .wt-seat--right { right: 10px; }
+  .wt-trick .card-played img { width: 48px; height: 72px; }
+  .wt-hand { inset-inline: 8px; }
+  .wt-hand .card-hand { gap: 4px; }
+  .wt-hand .card-hand-card { width: 52px; height: 78px; }
+  .skd-table { min-height: 524px; }
+  .skd-bar strong { display: none; }
+  .skd-trump { margin-left: 0; }
+  .skd-stich { top: 72px; }
+  .skd-seat { width: 96px; }
+  .skd-seat--top { top: 84px; }
+  .skd-seat--left, .skd-seat--right { top: 192px; }
+  .skd-trick { top: 236px; }
+  .skd-plate { min-width: 84px; }
+  .skd-trick { width: 136px; }
+  .skd-trick .card-played img { width: 44px; height: 63px; }
+  .skd-trick .card-played--bottom, .skd-trick .card-played--top { margin-left: -22px; }
+  .skd-hand .card-hand-card { width: 52px; height: 74px; }
   .atlas-options { grid-template-columns: minmax(0, 1fr); }
   .demo-body { padding: 14px; }
 }

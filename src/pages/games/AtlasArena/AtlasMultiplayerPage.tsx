@@ -104,12 +104,19 @@ export default function AtlasMultiplayerPage() {
   useEffect(() => {
     if (!roomCode || !user || !datasetVersion) return;
     const initialRefresh = window.setTimeout(() => void refresh(), 0);
-    const channel = supabase.channel(`atlas-${roomCode}`, { config: { presence: { key: user.id } } })
+    const poll = window.setInterval(() => void refresh(), 1000);
+    return () => { window.clearTimeout(initialRefresh); window.clearInterval(poll); };
+  }, [datasetVersion, refresh, roomCode, user]);
+  // Who is connected. The channel is private: the database only lets players seated in this arena join it,
+  // so it is opened once the room confirms the seat.
+  const seated = !!user && !!room && room.code === roomCode && room.players.some((player) => player.id === user.id);
+  useEffect(() => {
+    if (!roomCode || !user || !seated) return;
+    const channel = supabase.channel(`atlas-${roomCode}`, { config: { private: true, presence: { key: user.id } } })
       .on("presence", { event: "sync" }, () => setOnlineIds(Object.keys(channel.presenceState())))
       .subscribe((status) => { if (status === "SUBSCRIBED") void channel.track({ userId: user.id, connectedAt: new Date().toISOString() }); });
-    const poll = window.setInterval(() => void refresh(), 1000);
-    return () => { window.clearTimeout(initialRefresh); window.clearInterval(poll); void supabase.removeChannel(channel); };
-  }, [datasetVersion, refresh, roomCode, user]);
+    return () => { void supabase.removeChannel(channel); };
+  }, [roomCode, seated, user]);
   useEffect(() => { const timer = window.setInterval(() => setNow(Date.now()), 100); return () => window.clearInterval(timer); }, []);
 
   const act = async (body: Record<string, unknown>) => {

@@ -16,6 +16,7 @@ import MyGroupsCard from "../../components/social/MyGroupsCard";
 import PixelAvatarEditor from "../../components/social/PixelAvatarEditor";
 import { useCustomAvatars } from "@/components/social/useCustomAvatars";
 import { isPixelAvatarId } from "../../components/social/pixelAvatar";
+import { activityLevel, activityXp, AVATAR_FRAMES, avatarFrameFor, avatarFrameStyle, nextAvatarFrame, XP_PER_LEVEL } from "../../components/social/avatarFrame";
 import DoNotDisturbSwitch, { ClanPopupsSwitch } from "../../components/App/notifications/DoNotDisturbSwitch";
 
 type GameStat = {
@@ -371,6 +372,11 @@ export default function ProfilePage() {
      PAGE
      ========================================================= */
 
+  const xp = activityXp(stats.general.games_played, stats.puzzles);
+  const level = activityLevel(xp);
+  const frame = avatarFrameFor(level);
+  const nextFrame = nextAvatarFrame(level);
+
   return (
     <main className="min-h-[var(--app-height)] overflow-x-hidden bg-[radial-gradient(ellipse_at_top,_rgba(79,70,229,.15),_transparent_52%)] px-3 py-4 text-white sm:px-6 sm:py-5 lg:h-[var(--app-height)] lg:min-h-0 lg:overflow-hidden lg:py-3">
       <div className="mx-auto max-w-6xl lg:flex lg:h-full lg:min-h-0 lg:flex-col">
@@ -380,9 +386,15 @@ export default function ProfilePage() {
           <img src={featuredGames[0]?.image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-45" />
           <div className="absolute inset-0 bg-gradient-to-r from-[#071024] via-[#071024]/90 to-[#071024]/35 max-sm:bg-gradient-to-b max-sm:from-[#071024]/75 max-sm:to-[#071024]" />
           <div className="relative grid grid-cols-[72px_minmax(0,1fr)] items-center gap-4 px-4 py-5 sm:flex sm:flex-wrap sm:gap-5 sm:px-8 sm:py-7">
-            <button type="button" onClick={() => setAvatarPickerOpen(true)} className="group relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-2xl border-2 border-indigo-300/70 bg-[#121d3d] p-1 shadow-[0_0_24px_rgba(129,140,248,.3)] sm:h-24 sm:w-24" aria-label={ui("Change avatar")}><ProfileAvatar avatarId={avatarId} className="h-full w-full rounded-xl" /></button>
+            <button type="button" onClick={() => setAvatarPickerOpen(true)} className={`group relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-2xl bg-[#121d3d] p-1 sm:h-24 sm:w-24 ${frame ? "" : "border-2 border-indigo-300/70 shadow-[0_0_24px_rgba(129,140,248,.3)]"}`} style={avatarFrameStyle(frame, "#121d3d")} aria-label={frame ? `${ui("Change avatar")} · ${ui(`${frame.name} border`)}` : ui("Change avatar")}><ProfileAvatar avatarId={avatarId} className="h-full w-full rounded-xl" /></button>
             <div className="min-w-0 flex-1 sm:min-w-[200px]"><p className="text-[9px] font-black uppercase tracking-[.22em] text-indigo-200 sm:text-[10px] sm:tracking-[.28em]">{ui("Pluto player profile")}</p><h1 className="mt-1 break-words text-2xl font-black leading-tight text-white sm:text-4xl">{username}</h1><p className="mt-1 text-xs text-indigo-100/80 sm:text-sm">{ui("Play. Learn. Grow together.")}</p></div>
-            <div className="col-span-2 min-w-0 sm:ml-0 sm:max-w-sm sm:flex-1"><div className="mb-1 flex flex-wrap justify-between gap-x-3 text-[11px] font-semibold text-indigo-100 sm:text-xs"><span>{ui("Activity level")} {Math.floor((stats.general.games_played * 100 + (stats.puzzles ?? 0) * 50) / 1000) + 1}</span><span>{(stats.general.games_played * 100 + (stats.puzzles ?? 0) * 50) % 1000} / 1,000 XP</span></div><div className="h-2 overflow-hidden rounded-full bg-indigo-200/15"><div className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-violet-300" style={{ width: `${((stats.general.games_played * 100 + (stats.puzzles ?? 0) * 50) % 1000) / 10}%` }} /></div><p className="mt-1 text-[9px] leading-4 text-indigo-100/60 sm:text-[10px]">{ui("100 XP per completed game · 50 XP per completed puzzle")}</p></div>
+            <div className="col-span-2 min-w-0 sm:ml-0 sm:max-w-sm sm:flex-1"><div className="mb-1 flex flex-wrap justify-between gap-x-3 text-[11px] font-semibold text-indigo-100 sm:text-xs"><span>{ui("Activity level")} {level}</span><span>{xp % XP_PER_LEVEL} / 1,000 XP</span></div><div className="h-2 overflow-hidden rounded-full bg-indigo-200/15"><div className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-violet-300" style={{ width: `${(xp % XP_PER_LEVEL) / 10}%` }} /></div><p className="mt-1 text-[9px] leading-4 text-indigo-100/60 sm:text-[10px]">{ui("100 XP per completed game · 50 XP per completed puzzle")}</p>
+              <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] font-semibold sm:text-[11px]" aria-label={ui("Avatar border")}>
+                <span className="text-indigo-100/70">{ui("Avatar border")}</span>
+                {AVATAR_FRAMES.map((tier) => <span key={tier.id} className={`inline-flex items-center gap-1 ${level >= tier.level ? "text-white" : "text-indigo-100/45"}`}><span className="h-2.5 w-2.5 rounded-[3px]" style={{ background: tier.metal, opacity: level >= tier.level ? 1 : 0.4 }} aria-hidden />{ui(tier.name)} · {ui("Lv.")} {tier.level}{level >= tier.level && <span className="sr-only"> ({ui("unlocked")})</span>}</span>)}
+              </div>
+              <p className="mt-0.5 text-[10px] leading-4 text-indigo-100/70 sm:text-[11px]">{nextFrame ? `${ui(`Next: ${nextFrame.name} border`)} · ${nextFrame.level - level} ${ui(nextFrame.level - level === 1 ? "level to go" : "levels to go")}` : ui("Gold border unlocked. Every border is yours.")}</p>
+            </div>
             <div className="col-span-2 grid w-full min-w-0 gap-3 border-t border-indigo-200/10 pt-4 sm:basis-full sm:grid-cols-[repeat(auto-fit,minmax(260px,1fr))] sm:items-start">
               {(statTab === "general" || statTab === "chess") && <ProfileChessRanks rows={chessRatings} loading={loadingStats} error={chessRatingsError} />}
               {(statTab === "general" || statTab === "go") && <ProfileGoRanks userId={user.id} />}

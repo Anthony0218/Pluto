@@ -1138,7 +1138,8 @@ export default function WattenMultiplayerGame() {
   useEffect(() => {
     if (!room?.id) return;
 
-    const channel = supabase.channel(`watten4-deal-${room.id}`);
+    // Private channel: the database only lets players at this table join it.
+    const channel = supabase.channel(`watten4-deal-${room.id}`, { config: { private: true } });
     channel.on("broadcast", { event: "distribute_cards" }, ({ payload }) => {
       const key =
         payload && typeof payload === "object" && "abhebenKey" in payload

@@ -8,7 +8,7 @@ The dedicated Node authority was replaced at the user's request on 4 October 202
 npm run dev
 ```
 
-Keep the existing `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`. No Natura environment variables, new Edge Function, SQL migration, service-role key, TURN service or extra server deployment is needed. Realtime public Broadcast must be enabled on the project. The local preview was verified against the configured Supabase project with the former Natura server stopped.
+Keep the existing `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`. No Natura environment variables, new Edge Function, service-role key, TURN service or extra server deployment is needed. Since 7 October 2026 the room topic is a **private** Realtime channel: both players must be signed in, and the `20261103000000_security_hardening_profiles_realtime.sql` migration must be applied (it adds the `realtime.messages` policies that admit signed-in players to `natura-v2:<code>` topics). Single-player, hotseat and local two-player play still need no account. The local preview was verified against the configured Supabase project with the former Natura server stopped.
 
 Build/publish the frontend through the existing site workflow. The frontend change has not been published to the public site in this task. `npm run dev:all` still runs Pluto Party's server alongside Vite; Natura no longer participates in that command. The old `natura:server`, `/natura-socket` proxy and authority environment variables have been removed.
 
@@ -28,7 +28,7 @@ Host closure, reload or sustained loss of contact ends the room. The guest retur
 
 The shared Broadcast topic carries only ephemeral public-key handshakes and encrypted envelopes. P-256 ECDH derives a pair key; AES-GCM protects inputs, reconnect tokens and projected snapshots. Room, peers, connection nonce and sequence number are bound to each encrypted message; replayed and invalid ciphertext have no effect. A passive listener to the room topic cannot read another seat's snapshots merely by ignoring the frontend's recipient filter.
 
-**The browser host holds the full world.** They can inspect it or change their own code. Invitations/public-key discovery are not authenticated competitive matchmaking and do not defend against an active room impostor. This is friendly invite play, not independent anti-cheat. Public channels are not being presented as Supabase RLS-protected private channels. HTTPS (or localhost) is required for Web Crypto. No account sign-in or unrelated Supabase security settings are changed.
+**The browser host holds the full world.** They can inspect it or change their own code. Invitations/public-key discovery are not authenticated competitive matchmaking and do not defend against an active room impostor. This is friendly invite play, not independent anti-cheat. The private channel keeps visitors without an account off the topic, but any signed-in player who has the room code can still join it: the code is the invitation. HTTPS (or localhost) is required for Web Crypto.
 
 Supabase still supplies the relay infrastructure. This removes a separately hosted, sleeping Natura process; it does not make Supabase free or unlimited, nor guarantee availability of a paused Supabase project. Broadcast traffic consumes the project's shared Realtime/egress quotas. Revisit rates/transport or hosting when measured usage warrants it. See [Broadcast](https://supabase.com/docs/guides/realtime/broadcast) and [Realtime limits](https://supabase.com/docs/guides/realtime/limits).
 

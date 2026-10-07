@@ -1,4 +1,4 @@
-import { decodePixelAvatar, PIXEL_PALETTE, PIXEL_SIZE } from "./pixelAvatar";
+import { decodePixelAvatar, PIXEL_PALETTE, pixelGridSize, pixelRuns } from "./pixelAvatar";
 
 type Mood = "happy" | "smile" | "calm" | "serious" | "wink" | "excited";
 
@@ -751,11 +751,12 @@ export function ProfileAvatar({
 }
 
 export function PixelAvatarImage({ pixels, className = "" }: { pixels: number[]; className?: string }) {
+  const size = pixelGridSize(pixels);
   return (
-    <svg viewBox={`0 0 ${PIXEL_SIZE} ${PIXEL_SIZE}`} className={className} role="img" aria-label="Pixel avatar" shapeRendering="crispEdges">
-      <rect width={PIXEL_SIZE} height={PIXEL_SIZE} fill={PIXEL_PALETTE[0]} />
-      {pixels.map((index, cell) => index === 0 ? null : (
-        <rect key={cell} x={cell % PIXEL_SIZE} y={Math.floor(cell / PIXEL_SIZE)} width="1.02" height="1.02" fill={PIXEL_PALETTE[index]} />
+    <svg viewBox={`0 0 ${size} ${size}`} className={className} role="img" aria-label="Pixel avatar" shapeRendering="crispEdges">
+      <rect width={size} height={size} fill={PIXEL_PALETTE[0]} />
+      {pixelRuns(pixels).map((run) => (
+        <rect key={`${run.x}-${run.y}`} x={run.x} y={run.y} width={run.width + 0.02} height="1.02" fill={PIXEL_PALETTE[run.color]} />
       ))}
     </svg>
   );

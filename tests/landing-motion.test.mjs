@@ -112,11 +112,46 @@ test("Schafkopf trump order: Ober beats Unter beats Herz beats plain cards", () 
   assert.equal(legalCards([card("eichel", "10")], [{ seat: 0, card: card("gras", "king") }], schafkopfRules).length, 1, "free to play anything without the suit");
 });
 
-test("Watten critical cards beat the trump suit", () => {
+test("Watten ranking: critical cards, Hauptschlag, other Schläge, Trumpf, then the suit led", () => {
   const { card, wattenRules, trickWinner } = cardEngine;
-  const rules = wattenRules("gras");
-  assert.equal(trickWinner([{ seat: 0, card: card("gras", "ace") }, { seat: 1, card: card("eichel", "7") }, { seat: 2, card: card("schellen", "7") }], rules), 2);
-  assert.equal(trickWinner([{ seat: 0, card: card("herz", "king") }, { seat: 1, card: card("schellen", "7") }], rules), 0);
+  const rules = wattenRules("gras", "ober");
+  const winner = (...cards) => trickWinner(cards.map((played, seat) => ({ seat, card: played })), rules);
+  assert.equal(winner(card("gras", "ace"), card("eichel", "7"), card("schellen", "7")), 2, "Belli beats Spitz beats trump");
+  assert.equal(winner(card("herz", "king"), card("schellen", "7")), 0, "Max is the highest card");
+  assert.equal(winner(card("gras", "ober"), card("eichel", "7")), 1, "a critical card beats the Hauptschlag");
+  assert.equal(winner(card("gras", "ace"), card("gras", "ober"), card("eichel", "ober")), 1, "the Hauptschlag beats trump and the other Schläge");
+  assert.equal(winner(card("gras", "ace"), card("schellen", "ober")), 1, "any Schlag beats the trump suit");
+  assert.equal(winner(card("eichel", "ober"), card("schellen", "ober"), card("herz", "ober")), 0, "among equal Schläge the first one played wins");
+  assert.equal(winner(card("schellen", "ober"), card("eichel", "ober")), 0);
+  assert.equal(winner(card("herz", "ace"), card("gras", "7")), 1, "the lowest trump beats a plain Ace");
+  assert.equal(winner(card("herz", "9"), card("eichel", "ace"), card("herz", "10")), 2, "without trump the suit led decides");
+});
+
+test("Watten lets you play any card, except trump-or-critical after a Hauptschlag opens the round", () => {
+  const { card, wattenRules, legalCards } = cardEngine;
+  const rules = wattenRules("gras", "ober");
+  const hand = [card("herz", "king"), card("gras", "7"), card("schellen", "10"), card("eichel", "ober")];
+  const names = (cards) => cards.map(c => `${c.suit}-${c.rank}`);
+  assert.equal(legalCards(hand, [], rules, 0).length, 4);
+  assert.equal(legalCards(hand, [{ seat: 1, card: card("schellen", "ace") }], rules, 0).length, 4, "no need to follow suit");
+  const hauptschlagLed = [{ seat: 1, card: card("gras", "ober") }];
+  assert.deepEqual(names(legalCards(hand, hauptschlagLed, rules, 0)), ["herz-king", "gras-7"]);
+  assert.equal(legalCards(hand, hauptschlagLed, rules, 1).length, 4, "only in the first trick");
+  assert.equal(legalCards(hand, [...hauptschlagLed, { seat: 2, card: card("eichel", "7") }], rules, 0).length, 4, "a critical card already played lifts the rule");
+  assert.equal(legalCards([card("schellen", "10"), card("herz", "8")], hauptschlagLed, rules, 0).length, 2, "nothing to answer with");
+});
+
+test("the Watten demo deal shows every kind of card and the Schafkopf deal matches its announcement", () => {
+  const { wattenGame, schafkopfGame, cardId } = cardEngine;
+  assert.deepEqual([wattenGame.trump, wattenGame.schlag, wattenGame.tricksToWin], ["gras", "ober", 3]);
+  const strengths = wattenGame.hands.flat().map(c => wattenGame.rules.trump(c));
+  for (const kind of [1000, 800, 700, 600]) assert.ok(strengths.includes(kind), `strength ${kind}`);
+  assert.ok(strengths.some(value => value !== null && value < 600) && strengths.includes(null));
+  // Sauspiel on the Eichel-Sau: the caller holds a plain Eichel card but not the ace; the partner across has it.
+  assert.deepEqual([schafkopfGame.trump, schafkopfGame.called], ["herz", "eichel"]);
+  const holds = (seat, id) => schafkopfGame.hands[seat].some(c => cardId(c) === id);
+  assert.ok(holds(2, "eichel-ace") && !holds(0, "eichel-ace"));
+  assert.ok(schafkopfGame.hands[0].some(c => c.suit === "eichel" && schafkopfGame.rules.trump(c) === null));
 });
 
 test("the demo deals contain no duplicate cards and the AI always plays a legal card", () => {
@@ -127,6 +162,23 @@ test("the demo deals contain no duplicate cards and the AI always plays a legal 
     const plays = [{ seat: 0, card: game.hands[0][0] }];
     const chosen = chooseAiCard(game.hands[1], plays, game.rules);
     assert.ok(legalCards(game.hands[1], plays, game.rules).some(c => cardId(c) === cardId(chosen)));
+  }
+  // Every seat playing the computer's choice finishes both deals without an illegal card.
+  for (const game of [schafkopfGame, wattenGame]) {
+    const hands = game.hands.map(hand => [...hand]);
+    let leader = 0;
+    for (let trick = 0; trick < game.hands[0].length; trick++) {
+      const plays = [];
+      for (let turn = 0; turn < game.seats; turn++) {
+        const seat = (leader + turn) % game.seats;
+        const chosen = chooseAiCard(hands[seat], plays, game.rules, trick);
+        assert.ok(legalCards(hands[seat], plays, game.rules, trick).some(c => cardId(c) === cardId(chosen)), `${game.id} trick ${trick}`);
+        hands[seat] = hands[seat].filter(c => cardId(c) !== cardId(chosen));
+        plays.push({ seat, card: chosen });
+      }
+      leader = cardEngine.trickWinner(plays, game.rules);
+    }
+    assert.ok(hands.every(hand => hand.length === 0));
   }
 });
 
