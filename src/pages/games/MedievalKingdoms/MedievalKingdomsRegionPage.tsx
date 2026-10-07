@@ -30,7 +30,7 @@ export default function MedievalKingdomsRegionPage() {
 
           <button
             type="button"
-            onClick={() => navigate("/games/medieval-kingdoms")}
+            onClick={() => navigate("/games/medieval-kingdoms/legacy")}
             className="mt-4 rounded-xl border border-[#a57c43] bg-[#5a4024] px-4 py-2 font-bold"
           >
             Return to continent
@@ -65,7 +65,7 @@ export default function MedievalKingdomsRegionPage() {
 
             <button
               type="button"
-              onClick={() => navigate("/games/medieval-kingdoms")}
+              onClick={() => navigate("/games/medieval-kingdoms/legacy")}
               className="mt-4 rounded-xl border border-[#a57c43] bg-[#5a4024] px-4 py-2 font-bold transition hover:bg-[#6a4b29]"
             >
               Return to continent

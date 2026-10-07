@@ -3,6 +3,7 @@
 import { readFile, readdir, realpath, mkdir, writeFile, copyFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
 
 const root = fileURLToPath(new URL('../..', import.meta.url));
 const project = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
@@ -42,7 +43,9 @@ async function visit(name, from, optional = false, scope = 'transitive') {
       licenseFiles.push({ name: entry.name, text: await readFile(join(directory, entry.name), 'utf8') });
     }
   }
-  const license = typeof pkg.license === 'string' ? pkg.license : pkg.license?.type || pkg.licenses?.map(item => item.type).join(' OR ') || 'See upstream license';
+  // webgl-constants 1.1.1 omits SPDX metadata, but its bundled LICENSE is MIT.
+  const declaredLicense = typeof pkg.license === 'string' ? pkg.license : pkg.license?.type || pkg.licenses?.map(item => item.type).join(' OR ');
+  const license = declaredLicense || (key === 'webgl-constants@1.1.1' && licenseFiles.some(file => file.text.includes('MIT License')) ? 'MIT' : 'See upstream license');
   if (!previous) packages.set(key, { name: pkg.name, version: pkg.version, license, homepage: projectUrl(pkg), scope, licenseFiles });
   const optionalNames = pkg.optionalDependencies ?? {};
   const peerNames = pkg.peerDependencies ?? {};
@@ -68,4 +71,27 @@ for (const item of inventory) {
 notices.push('='.repeat(72), 'Web KaTrain — vendored browser Go engine', 'Source commit: 8dd813aeb565cbdad5215dc75204fc40fd519c50', 'https://github.com/Sir-Teo/web-katrain', await readFile(join(root, 'src/vendor/browser-katago/LICENSE'), 'utf8'));
 await writeFile(join(root, 'public/licenses/third-party-notices.txt'), notices.join('\n'));
 await copyFile(resolve(root, 'node_modules/stockfish/Copying.txt'), join(root, 'public/licenses/Stockfish-GPL-3.0.txt'));
+const stockfish = JSON.parse(await readFile(join(root, 'node_modules/stockfish/package.json'), 'utf8'));
+if (stockfish.version !== '18.0.8') throw new Error('Update the Stockfish corresponding-source record before distributing a new engine version.');
+const stockfishFiles = ['stockfish-18-lite-single.js', 'stockfish-18-lite-single.wasm'];
+const stockfishHashes = [];
+for (const file of stockfishFiles) {
+  const bytes = await readFile(join(root, 'public/stockfish', file));
+  const upstream = await readFile(join(root, 'node_modules/stockfish/bin', file));
+  if (!bytes.equals(upstream)) throw new Error(`Stockfish ${file} differs from the recorded unmodified npm release. Update its source record.`);
+  stockfishHashes.push(`${createHash('sha256').update(bytes).digest('hex')}  ${file}`);
+}
+await writeFile(join(root, 'public/stockfish/SOURCE.txt'), [
+  'Stockfish.js 18 — corresponding source and distribution record',
+  'Distributed files are unmodified from npm stockfish 18.0.8.',
+  'GPL-3.0 license: /licenses/Stockfish-GPL-3.0.txt',
+  'Release source commit: 93c994592dcf3b4b21052ab925e9b534df9c0918 (18.0.8)',
+  'Source and build scripts: https://github.com/nmrugg/stockfish.js/tree/93c994592dcf3b4b21052ab925e9b534df9c0918',
+  'Source archive: https://github.com/nmrugg/stockfish.js/archive/93c994592dcf3b4b21052ab925e9b534df9c0918.zip',
+  'See upstream README.md, build.js and emscripten directory for build prerequisites and instructions.',
+  'Single-thread lite build: node build.js --single-threaded --lite -f',
+  'Neural network source: https://tests.stockfishchess.org/nns?network_name=nn-9067e33176e',
+  'No Pluto modifications to the distributed engine binaries.',
+  'SHA-256:', ...stockfishHashes, '',
+].join('\n'));
 console.log(`Generated credits and notices for ${inventory.length} installed packages.`);

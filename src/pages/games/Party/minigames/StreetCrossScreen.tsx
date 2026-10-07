@@ -10,6 +10,7 @@ import {
 } from "../../../../games/party/minigames/streetCross/logic.ts";
 import { useServerOffset } from "./useServerClock.ts";
 import { useThrottledInput } from "./useThrottledInput.ts";
+import { smoothStreetRunner, streetRunnerTarget, type StreetRunnerDisplay } from "../../../../games/party/minigames/streetCross/presentation.ts";
 import type { MinigameViewProps } from "./views.ts";
 
 const W = CONFIG.width,
@@ -111,9 +112,12 @@ export default function StreetCrossScreen({
   });
 
   useEffect(() => {
-    let frame = 0;
-    const draw = () => {
+    let frame = 0, previousFrame = 0;
+    const displayed: Record<string, StreetRunnerDisplay> = {};
+    const draw = (frameTime: number) => {
       frame = requestAnimationFrame(draw);
+      const frameSeconds = previousFrame ? (frameTime - previousFrame) / 1000 : 1 / 60;
+      previousFrame = frameTime;
       const el = canvas.current,
         ctx = el?.getContext("2d");
       if (!el || !ctx) return;
@@ -125,8 +129,7 @@ export default function StreetCrossScreen({
       const s = (cssW / W) * dpr,
         v = latest.current,
         serverNow = Math.min(Date.now() + (offset.current ?? 0), v.endsAt),
-        elapsed = serverNow - v.startedAt,
-        dt = Math.max(0, Math.min(serverNow - v.simTime, 300)) / 1000;
+        elapsed = serverNow - v.startedAt;
       // Course y grows upward; canvas y grows downward.
       const cy = (y: number) => ROWS - y;
       ctx.setTransform(s, 0, 0, s, 0, 0);
@@ -167,12 +170,16 @@ export default function StreetCrossScreen({
           ctx.fillRect(front, top + 0.46, 0.1, 0.14);
         }
       for (const [id, runner] of Object.entries(v.runners)) {
-        const moving = runner.finishedAt === null && serverNow >= runner.stunnedUntil;
         const dir = id === playerId ? intent.current : { dx: runner.dx, dy: runner.dy };
-        const x = moving ? Math.min(W - R, Math.max(R, runner.x + dir.dx * CONFIG.player.speed * dt)) : runner.x;
-        const y = moving ? Math.max(R, Math.min(FINISH_ROW + 0.5, runner.y + dir.dy * CONFIG.player.speed * dt)) : runner.y;
-        const blink = serverNow < runner.invulnerableUntil && Math.floor(serverNow / 120) % 2 === 0;
-        ctx.globalAlpha = blink ? 0.35 : 1;
+        const target = streetRunnerTarget(runner, v.simTime, serverNow, dir);
+        const { x, y } = (displayed[id] = smoothStreetRunner(displayed[id], runner, target, frameSeconds));
+        // A steady shield ring communicates immunity without flashing the character on and off.
+        if (serverNow < runner.invulnerableUntil) {
+          ctx.strokeStyle = "rgba(255,255,255,0.6)";
+          ctx.lineWidth = 0.05;
+          ctx.beginPath(); ctx.arc(x, cy(y), R + 0.13, 0, Math.PI * 2); ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
         ctx.fillStyle = colorsRef.current[id] ?? "#fff";
         ctx.beginPath();
         ctx.arc(x, cy(y), R, 0, Math.PI * 2);

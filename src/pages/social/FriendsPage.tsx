@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Bell, Check, Gamepad2, Mail, Search, UserPlus, Users, X } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "../../lib/supabase";
+import { sendFriendRequest as submitFriendRequest } from "@/data/friendRequests";
 import { useAuth } from "../../context/AuthContext";
 import type { Friend, FriendRequest, PublicProfile } from "../../types/social";
 import FriendAvatar from "../../components/social/FriendAvatar";
@@ -216,11 +217,7 @@ function FriendsPageContent() {
     if (!user) return;
     setStatus(null);
 
-    const { error } = await supabase.from("friend_requests").insert({
-      sender_id: user.id,
-      receiver_id: profile.id,
-      status: "pending",
-    });
+    const { error } = await submitFriendRequest(supabase, user.id, profile.id);
 
     if (error) {
       setStatus(

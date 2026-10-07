@@ -45,7 +45,7 @@ export default function BrickstoneFortressPage() {
     if (event.key === "Escape") { if (fortressOpen) { setFortressOpen(false); fortressButton.current?.focus(); } else setSelectedId(null); }
   }}>
     <header className="brickstone-topbar">
-      <Link to="/games/medieval-kingdoms" className="brickstone-back"><ChevronLeft size={17} /><span>Continent map</span></Link>
+      <Link to="/games/medieval-kingdoms/legacy" className="brickstone-back"><ChevronLeft size={17} /><span>Continent map</span></Link>
       <div className="brickstone-title"><Castle size={23} /><div><p>Medieval Kingdoms</p><h1>{BRICKSTONE_SCENE.name}</h1></div></div>
       <div className="brickstone-faction"><Bird size={18} /><span>Falconstone</span></div>
     </header>

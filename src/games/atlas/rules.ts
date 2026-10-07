@@ -37,13 +37,6 @@ export function applyMapFillSelection(state: MapFillState, selectedId: string, e
   return { ...state, found, streak, bestStreak: Math.max(state.bestStreak, streak), complete, score: state.score + ATLAS_SCORING.mapFillCountry + streak * ATLAS_SCORING.mapFillStreak + (complete ? ATLAS_SCORING.mapFillCompletion : 0) };
 }
 
-export type TerritoryState = { ownership: Record<string, "player_a" | "player_b">; scores: { player_a: number; player_b: number } };
-export function captureTerritory(state: TerritoryState, entityId: string, winner: "player_a" | "player_b", allowSteal = true, quizPoints = 0): TerritoryState {
-  const current = state.ownership[entityId];
-  if (current && current !== winner && !allowSteal) return state;
-  return { ownership: { ...state.ownership, [entityId]: winner }, scores: { ...state.scores, [winner]: state.scores[winner] + quizPoints } };
-}
-
 export function assertDatasetVersion(expected: string, received: string): void {
   if (expected !== received) throw new Error(`Atlas dataset mismatch: match uses ${expected}, client has ${received}.`);
 }

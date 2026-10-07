@@ -12,9 +12,9 @@ export function notificationDestination(item: DashboardNotification) {
     case "clan_message":
       return clanRoute(item.clanId);
     case "clan_invite":
-      // Chess lobbies join on arrival; other clan lobbies are joined from the clan page.
-      return item.game === "chess" && item.gameCode
-        ? getInviteDestination({ game: "chess", gameCode: item.gameCode, gameRoute: "/games/chess/classic/multiplayer" }, { autoJoin: true })
+      // Every lobby but Go joins on arrival (the game itself refuses a full lobby); Go is joined from the clan page.
+      return item.game !== "go" && item.gameCode
+        ? getInviteDestination({ game: item.game, gameCode: item.gameCode, gameRoute: item.gameRoute }, { autoJoin: true })
         : clanRoute(item.clanId);
     case "spectate_request":
       return `/friends${item.senderId ? `?friend=${encodeURIComponent(item.senderId)}` : ""}`;

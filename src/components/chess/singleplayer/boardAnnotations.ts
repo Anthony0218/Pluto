@@ -1,6 +1,6 @@
 import { Chess, type Square } from "chess.js";
 
-import { qualityColor, type ReviewVisualQuality } from "./reviewQualityVisuals";
+import { qualityColor, type ReviewVisualQuality } from "./reviewQualityVisuals.ts";
 
 export type BoardArrow = { from: Square; to: Square; color: string; opacity: number };
 
@@ -53,7 +53,7 @@ function checkmateAnnotations(fenAfter: string): Pick<BoardAnnotations, "arrows"
     const king = game.findPiece({ type: "k", color: game.turn() })[0];
     for (const checker of king ? game.attackers(king, attacker) : []) {
       if (!adjacent(checker, king)) arrows.push({ from: checker, to: king, color: CHECK_COLOR, opacity: 0.8 });
-      const supporters = game.attackers(checker, attacker);
+      const supporters = adjacent(checker, king) ? game.attackers(checker, attacker) : [];
       for (const supporter of supporters) arrows.push({ from: supporter, to: checker, color: SUPPORT_COLOR, opacity: 0.8 });
       if (supporters.length > 0) badges.push({ square: checker, kind: "shield", color: SUPPORT_COLOR });
     }
@@ -139,7 +139,7 @@ export function reviewMoveAnnotations(move: {
         // The protecting piece gets the blue border, the protected checker the shield.
         const protectors = new Set<Square>();
         for (const checker of checkers) {
-          const supporters = game.attackers(checker, attacker);
+          const supporters = adjacent(checker, king) ? game.attackers(checker, attacker) : [];
           for (const supporter of supporters) {
             link(supporter, checker, SUPPORT_COLOR, 0.8);
             protectors.add(supporter);

@@ -560,7 +560,7 @@ export default function WattenMultiplayerGame() {
     setCutting(true);
     setError(null);
 
-    const { data, error } = await supabase.rpc("perform_watten_abheben", {
+    const { error } = await supabase.rpc("perform_watten_abheben", {
       p_room_id: room.id,
 
       p_cut_index: cutIndex,
@@ -578,8 +578,6 @@ export default function WattenMultiplayerGame() {
 
       return;
     }
-
-    console.log("Abheben:", data);
   }
 
   async function chooseSchlag(rank: WattenRank) {
@@ -594,7 +592,7 @@ export default function WattenMultiplayerGame() {
     setChoosing(true);
     setError(null);
 
-    const { data, error } = await supabase.rpc("choose_watten_schlag", {
+    const { error } = await supabase.rpc("choose_watten_schlag", {
       p_room_id: room.id,
       p_schlag: rank,
     });
@@ -612,8 +610,6 @@ export default function WattenMultiplayerGame() {
       );
       return;
     }
-
-    console.log("Schlag selected:", data);
   }
 
   async function chooseFarbe(farbe: WattenSuit) {
@@ -628,7 +624,7 @@ export default function WattenMultiplayerGame() {
     setChoosing(true);
     setError(null);
 
-    const { data, error } = await supabase.rpc("choose_watten_farbe", {
+    const { error } = await supabase.rpc("choose_watten_farbe", {
       p_room_id: room.id,
       p_farbe: farbe,
     });
@@ -646,8 +642,6 @@ export default function WattenMultiplayerGame() {
       );
       return;
     }
-
-    console.log("Farbe selected:", data);
   }
   function cardIsLegal(card: WattenCard) {
     if (!mustPlayTrumpfOderKritisch) {
@@ -683,7 +677,7 @@ export default function WattenMultiplayerGame() {
     setPlayingCard(true);
     setError(null);
 
-    const { data, error } = await supabase.rpc("play_watten_card", {
+    const { error } = await supabase.rpc("play_watten_card", {
       p_room_id: room.id,
 
       p_card_id: card.id,
@@ -705,7 +699,6 @@ export default function WattenMultiplayerGame() {
       return;
     }
     playCardSound();
-    console.log("Card played:", data);
   }
   async function continueTrick() {
     if (!room || continuingTrick) {
@@ -1145,7 +1138,8 @@ export default function WattenMultiplayerGame() {
   useEffect(() => {
     if (!room?.id) return;
 
-    const channel = supabase.channel(`watten4-deal-${room.id}`);
+    // Private channel: the database only lets players at this table join it.
+    const channel = supabase.channel(`watten4-deal-${room.id}`, { config: { private: true } });
     channel.on("broadcast", { event: "distribute_cards" }, ({ payload }) => {
       const key =
         payload && typeof payload === "object" && "abhebenKey" in payload

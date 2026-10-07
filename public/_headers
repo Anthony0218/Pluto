@@ -1,0 +1,12 @@
+# Response headers for the Cloudflare static-assets deploy (see wrangler.jsonc).
+# connect-src lists every backend the browser talks to: Supabase (REST, auth, functions, realtime),
+# and the Pluto Party authority (VITE_PARTY_SERVER_URL). Add a host
+# here when the client starts calling a new one. 'wasm-unsafe-eval' is for Stockfish and KataGo.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; worker-src 'self' blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co wss://pluto-party-server-ghd8.onrender.com; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Cross-Origin-Opener-Policy: same-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()

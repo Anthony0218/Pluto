@@ -708,6 +708,9 @@ export async function gradeEarlierMoves(
     const playedUci = `${move.from}${move.to}${move.promotion ?? ""}`;
     const { quality, centipawnLoss, missedMate, bestMoveUci } = gradePlayedMove(fenBefore, fenAfter, playedUci, beforeLines[0], afterLines[0]);
 
+    const opening = await openingBookMove(fenAfter, ply);
+    if (!stillWanted()) return;
+
     onGrade({
       ply,
 
@@ -727,7 +730,8 @@ export async function gradeEarlierMoves(
 
       fenAfter,
 
-      quality,
+      quality: opening ? "Book" : quality,
+      openingName: opening?.name ?? null,
 
       centipawnLoss,
 

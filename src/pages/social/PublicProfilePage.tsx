@@ -10,6 +10,7 @@ import RankEmblem from "@/components/chess/RankEmblem";
 import { getChessRank } from "@/games/chess/ranked/tiers";
 import { isTimeControl, timeControlLabel, type TimeControl } from "@/games/chess/ranked/timeControls";
 import { ProfileAvatar } from "@/components/social/ProfileAvatarPicker";
+import { avatarFrameFor, avatarFrameStyle } from "@/components/social/avatarFrame";
 import ProfilePage from "./ProfilePage";
 
 type PublicProfile = {
@@ -19,6 +20,8 @@ type PublicProfile = {
   avatar_id: string | null;
   most_played: string[] | null;
   chess_rating: { rating: number; time_control: string } | null;
+  /** Activity level; absent until the database function that reports it is deployed. */
+  level?: number | null;
 };
 
 const gameNames: Record<string, string> = {
@@ -117,6 +120,7 @@ export default function PublicProfilePage() {
   const tier = rating ? getChessRank(rating.rating) : null;
   const mode: TimeControl | null = rating && isTimeControl(rating.time_control) ? rating.time_control : null;
   const mostPlayed = profile.most_played ?? [];
+  const frame = avatarFrameFor(profile.level ?? 1);
 
   return (
     <main className="min-h-[var(--app-height)] bg-[radial-gradient(ellipse_at_top,_rgba(79,70,229,.15),_transparent_52%)] px-3 py-5 text-white sm:px-6">
@@ -127,13 +131,14 @@ export default function PublicProfilePage() {
           <img src={featuredGames[0]?.image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
           <div className="absolute inset-0 bg-gradient-to-r from-[#071024] via-[#071024]/90 to-[#071024]/40 max-sm:bg-gradient-to-b" />
           <div className="relative flex flex-wrap items-center gap-5 px-5 py-7 sm:px-8">
-            <span className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl border-2 border-indigo-300/70 bg-[#121d3d] p-1 shadow-[0_0_24px_rgba(129,140,248,.3)]">
+            <span className={`h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-[#121d3d] p-1 ${frame ? "" : "border-2 border-indigo-300/70 shadow-[0_0_24px_rgba(129,140,248,.3)]"}`} style={avatarFrameStyle(frame, "#121d3d")} title={frame ? ui(`${frame.name} border`) : undefined}>
               <ProfileAvatar avatarId={profile.avatar_id ?? "m1"} className="h-full w-full rounded-xl" />
             </span>
             <div className="min-w-0 flex-1">
               <p className="text-[10px] font-black uppercase tracking-[.28em] text-indigo-200">{ui("Pluto player profile")}</p>
               <h1 className="mt-1 break-words text-3xl font-black leading-tight sm:text-4xl">{name}</h1>
               {profile.display_name && profile.username && profile.display_name !== profile.username && <p className="mt-1 text-sm text-indigo-100/70">{profile.display_name}</p>}
+              {profile.level != null && <p className="mt-1 text-xs font-semibold text-indigo-100/80">{ui("Activity level")} {profile.level}{frame && <> · <span style={{ color: frame.color }}>{ui(`${frame.name} border`)}</span></>}</p>}
             </div>
           </div>
         </section>

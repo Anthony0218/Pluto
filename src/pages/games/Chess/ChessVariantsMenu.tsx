@@ -1,5 +1,5 @@
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
-import { menuVariants as variants, type VariantCard } from "@/data/chessVariants";
+import { menuVariants, type VariantCard } from "@/data/chessVariants";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
 import { useEffect, useState } from "react";
@@ -8,6 +8,8 @@ import { Search } from "lucide-react";
 import { VariantArtwork, VariantDesignCard } from "@/components/chess/VariantDesignCard";
 
 type Language = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
+
+const variants = menuVariants.filter(variant => !["3d-chess", "pluto-chaos-chess"].includes(variant.id));
 
 const translations: Record<"de" | "bar" | "ko" | "ru", Record<string, string>> & Partial<Record<"es" | "pt", Record<string, string>>> = {
   de: {

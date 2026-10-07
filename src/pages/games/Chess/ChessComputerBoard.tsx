@@ -178,7 +178,6 @@ const deTranslations: Record<string, string> = {
   Expert: "Experte",
   Skill: "Stärke",
   "Think time": "Denkzeit",
-  "Weak-move chance": "Chance für schwachen Zug",
   "Undo Move": "Zug zurücknehmen",
   "New Game": "Neue Partie",
   Resign: "Aufgeben",
@@ -401,7 +400,6 @@ const koreanTranslations: Record<string, string> = {
   Expert: "전문가",
   Skill: "레벨",
   "Think time": "생각 시간",
-  "Weak-move chance": "약한 수 확률",
   "Undo Move": "수 되돌리기",
   "New Game": "새 게임",
   Resign: "기권",
@@ -554,7 +552,6 @@ const russianTranslations: Record<string, string> = {
   Expert: "Эксперт",
   Skill: "Уровень",
   "Think time": "Время на ход",
-  "Weak-move chance": "Вероятность слабого хода",
   "Undo Move": "Отменить ход",
   "New Game": "Новая партия",
   Resign: "Сдаться",
@@ -2761,21 +2758,6 @@ export default function ChessComputerBoard({
 
                 <div
                   className="
-                    rounded-xl
-                    bg-black/20
-                    px-3
-                    py-3
-                  "
-                >
-                  <div className="flex items-center justify-between text-[10px] text-zinc-600">
-                    <span>{t("Weak-move chance")}</span>
-
-                    <span>{Math.round(randomMoveChance * 100)}%</span>
-                  </div>
-                </div>
-
-                <div
-                  className="
                     flex
                     items-center
                     justify-between
@@ -3123,7 +3105,7 @@ function getHistoryPieceSymbol(color: "w" | "b", piece: PieceType) {
 function MoveQualityBadge({ quality }: { quality: MoveQuality }) {
   useUiLanguage();
   const styles: Record<MoveQuality, string> = {
-    Book: "border-purple-500/20 bg-purple-500/15 text-purple-300",
+    Book: "border-zinc-500/20 bg-zinc-500/15 text-zinc-300",
     Best: "border-emerald-500/20 bg-emerald-500/15 text-emerald-300",
 
     Excellent: "border-cyan-500/20 bg-cyan-500/15 text-cyan-300",

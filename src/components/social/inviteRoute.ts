@@ -43,3 +43,7 @@ export function currentRoomInvite(pathname: string, search = "") {
   if (pathname === "/chess-custom/play/multiplayer" && room && /^[A-Z0-9]{6}$/i.test(room)) return { lobbyRoute: pathname, code: room.toUpperCase() };
   return null;
 }
+
+/** The lobby route of a clan invite. Chess and Go invites made before every game could be shared carry no route. */
+export const clanInviteRoute = (game: string, gameRoute?: string | null) =>
+  gameRoute ?? (game === "chess" ? "/games/chess/classic/multiplayer" : `/games/${game}/multiplayer`);

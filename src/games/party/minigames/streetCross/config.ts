@@ -58,7 +58,7 @@ export const STREET_CROSS_CONFIG = {
   hitStunMs: 1200,
   invulnerableMs: 2000,
   inputIntervalMs: 80,
-  snapshotIntervalMs: 150,
+  snapshotIntervalMs: 100,
   bots: {
     easy: { decisionMs: 750, misjudgeSec: 0.45, marginUnits: 0.05, mistakeChance: 0.05 },
     medium: { decisionMs: 330, misjudgeSec: 0.18, marginUnits: 0.2, mistakeChance: 0.015 },

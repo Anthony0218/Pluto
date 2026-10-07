@@ -10,6 +10,7 @@ import { generateGuesserRound, guesserPoints } from "./trials/countryGuesser.ts"
 import { generateRegionRound, regionById } from "./trials/regionBuilder.ts";
 import { categoryById, generateExtremeRound } from "./trials/extremeGeography.ts";
 import { languageRound } from "./trials/languageGuesser.ts";
+import { historyDeck, historyExplanation } from "./trials/historyBattle.ts";
 import type { AtlasCategory, AtlasDataset, AtlasDifficulty, AtlasQuestion, ChoiceQuestion } from "./types.ts";
 import type { AtlasRaceMode } from "./multiplayer.ts";
 
@@ -33,6 +34,8 @@ export function raceQuestions(data:AtlasDataset, mode:AtlasRaceMode, seed:string
     if(tier!=="standard") return Array.from({length:count},(_,i)=>i%2 ? generateDensityQuestion(data.countries,seed,i,tier) : generateAdvancedQuestions(data.countries,`${seed}:${Math.floor(i/12)}`,6,tier)[Math.floor(i/2)%6]);
     return generateQuestions({entities:data.countries,datasetVersion:data.version.atlasDataVersion,seed,difficulty,categories,interaction:"choice",count});
   }
+  // Master and Grandmaster rooms get the expert history deck: every country, dates only a few years apart.
+  if(mode==="history_battle") return historyDeck(data.history,tier==="standard"?pool:full,seed,tier==="standard"?difficulty:"expert",count).map((r,i)=>({...base(i,r.prompt,r.answerId,r.options.map(({id,label})=>({id,label}))),entityId:r.countryId,property:r.kind,explanation:historyExplanation(r,id=>byId.get(id)?.name??id),sourceMetadata:[{source:data.history.source.name}]}));
   const used:string[]=[];
   return Array.from({length:count},(_,i):RaceQuestion=>{
     if(mode==="language_guesser") { const r=languageRound(seed,i,difficulty);return base(i,`Which language is this? “${r.sentence}”`,r.language,r.options.map(label=>({id:label,label}))); }
@@ -73,5 +76,5 @@ export function applyRaceAction(run:RaceRun, questions:RaceQuestion[], generatio
   const points=q.interaction==="ordering" ? scoreRanking(answer as string[],q.answer).total : correct ? q.interaction==="clues" ? guesserPoints(run.revealed) : mode==="speed_run" ? 150 : 1000 : mode==="speed_run" ? -150 : mode==="map_fill" ? -25 : 0;
   const answerText=Array.isArray(q.answer) ? q.answer.map(id=>"choices"in q?q.choices.find(c=>c.id===id)?.label??id:id).join(" → ") : "choices"in q ? q.choices.find(c=>c.id===q.answer)?.label??String(q.answer) : String(q.answer);
   const retry=(mode==="map_fill"&&!correct)||(q.interaction==="clues"&&!correct&&run.wrong.length<2);
-  return {...run,score:run.score+points,updatedAt:now,wrong:correct?run.wrong:[...run.wrong,String(answer)],feedback:retry?undefined:{correct,points,answer:answerText,explanation:q.interaction==="ordering"?"Partial credit for nearby positions; a perfect order earns a bonus.":correct?"Correct":"Review this answer before continuing."},ledger:[...run.ledger,{index:run.index,correct,points,elapsedMs:Math.max(0,now-run.startedAt),concept:`${mode}:${"category"in q?q.category:q.interaction}:${"property"in q?q.property??"":""}`} ]};
+  return {...run,score:run.score+points,updatedAt:now,wrong:correct?run.wrong:[...run.wrong,String(answer)],feedback:retry?undefined:{correct,points,answer:answerText,explanation:q.interaction==="ordering"?"Partial credit for nearby positions; a perfect order earns a bonus.":"explanation"in q&&q.explanation?q.explanation:correct?"Correct":"Review this answer before continuing."},ledger:[...run.ledger,{index:run.index,correct,points,elapsedMs:Math.max(0,now-run.startedAt),concept:`${mode}:${"category"in q?q.category:q.interaction}:${"property"in q?q.property??"":""}`} ]};
 }

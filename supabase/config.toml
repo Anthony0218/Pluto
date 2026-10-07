@@ -414,17 +414,6 @@ enabled = true
 # and column/key alignment. Set to "null" to emit raw, unformatted SQL.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":180,\"commaStyle\":\"trailing\"}"
 
-[functions.make-move]
-enabled = true
-verify_jwt = false
-import_map = "./functions/make-move/deno.json"
-# Uncomment to specify a custom file path to the entrypoint.
-# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
-entrypoint = "./functions/make-move/index.ts"
-# Specifies static files to be bundled with the function. Supports glob patterns.
-# For example, if you want to serve static HTML pages in your function:
-# static_files = [ "./functions/make-move/*.html" ]
-
 [functions.schafkopf-multiplayer]
 enabled = true
 # The function authenticates every request with auth.getUser before using service_role.
@@ -448,3 +437,15 @@ enabled = true
 # Every request authenticates with auth.getUser before service-role operations.
 verify_jwt = false
 entrypoint = "./functions/ranked-go/index.ts"
+
+[functions.tool-push]
+enabled = true
+# Browser actions use auth.getUser; dispatch uses a private scheduler secret; acknowledgements use opaque delivery tokens.
+verify_jwt = false
+entrypoint = "./functions/tool-push/index.ts"
+
+[functions.edravane-match]
+enabled = true
+# Every request verifies its bearer token with auth.getUser before service-role operations.
+verify_jwt = false
+entrypoint = "./functions/edravane-match/index.ts"

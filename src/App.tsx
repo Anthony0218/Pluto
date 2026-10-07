@@ -7,7 +7,7 @@ function App() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-950 text-white">
-        Wird geladen....
+        Wird geladen...
       </div>
     );
   }

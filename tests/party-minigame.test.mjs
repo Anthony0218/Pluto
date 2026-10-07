@@ -65,7 +65,10 @@ function lastTurnEnded() {
 const T0 = 1_000_000;
 function inIntro(rng = seeded(1)) {
   const animal = advance(lastTurnEnded(), settings, rng, T0);
-  return advance(animal, settings, rng, T0);
+  const intro = advance(animal, settings, rng, T0);
+  // Target Panic remains a legacy definition; these tests exercise its scoring/phase contract.
+  startMinigame(intro, "target-panic", rng, T0);
+  return intro;
 }
 function inMinigame(rng = seeded(1)) {
   const intro = inIntro(rng);
@@ -100,13 +103,13 @@ test("final board turn goes through the animal phase into a server-selected mini
   assert.equal(animal.minigame, null);
   const intro = advance(animal, settings, seeded(1), T0);
   assert.equal(intro.phase, "MINIGAME_INTRO");
-  assert.equal(intro.minigame.minigameId, "target-panic");
+  assert.equal(intro.minigame.minigameId, "pickup-arena");
   assert.equal(intro.minigame.status, "INTRO");
   assert.deepEqual(intro.minigame.participants, intro.order);
   assert.equal(intro.minigame.startedAt, T0 + MINIGAME_FLOW.introMs);
   assert.equal(
     intro.minigame.endsAt,
-    intro.minigame.startedAt + TARGET_PANIC_CONFIG.durationSeconds * 1000,
+    intro.minigame.startedAt + minigameRegistry.get("pickup-arena").durationSeconds * 1000,
   );
 });
 test("intro waits for the countdown, then the minigame starts and ends on the server clock", () => {
@@ -166,14 +169,17 @@ const stub = (id, gameType = "main") => ({
   id,
   name: id,
   gameType,
+  selectable: true,
 });
 test("registered minigames are selectable, invalid ids are rejected", () => {
-  assert.equal(selectMinigame(minigameRegistry.pool("main"), null, () => 0.5), "target-panic");
-  // Only one main game exists: the previous one is allowed again rather than failing.
+  assert.deepEqual(minigameRegistry.pool("main").map((game) => game.id), ["arrow-memory", "pickup-arena", "pattern-wall", "trail-run", "rhythm-rush", "circle-shot", "lava-knockback"]);
+  assert.equal(selectMinigame(minigameRegistry.pool("main"), null, () => 0.5), "trail-run");
+  // Additional main games avoid immediate repeats; a single-game pool still allows one.
   assert.equal(
     selectMinigame(minigameRegistry.pool("main"), "target-panic", () => 0.99),
-    "target-panic",
+    "lava-knockback",
   );
+  assert.equal(selectMinigame([minigameRegistry.get("target-panic")], "target-panic", () => 0.99), "target-panic");
   assert.throws(() => minigameRegistry.get("not-a-game"), /Unknown content/);
   assert.throws(() => startMinigame(started(), "not-a-game", () => 0, T0));
   assert.throws(() => selectMinigame([], null, () => 0));

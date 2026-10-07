@@ -34,3 +34,7 @@ data/lichess/lichess_db_puzzle.csv.zst
 # Atlas handler test modules and isolated preview cache
 .atlas-test/
 .vite-arena/
+/scripts/landing/output/
+
+# Local authoritative Edravane snapshots (includes private reconnect tokens)
+.edravane-data/

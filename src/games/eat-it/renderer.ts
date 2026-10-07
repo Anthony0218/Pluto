@@ -157,19 +157,33 @@ export class ArenaRenderer {
     ring.rotation.x = -Math.PI / 2; ring.position.y = .035; group.add(ring); this.resources.push(ring.geometry);
     const wall = new T.Mesh(this.pitGeometry, this.pitMaterial); wall.scale.set(MOUTH.radius, 1, MOUTH.radius); wall.position.y = -325; group.add(wall);
     const bottom = new T.Mesh(this.bottomGeometry, this.bottomMaterial); bottom.rotation.x = -Math.PI / 2; bottom.position.y = -649; bottom.scale.setScalar(MOUTH.radius); group.add(bottom);
-    // Two sparse jaw arcs: four upper fangs behind the eyes, three lower fangs.
-    // Gaps between the teeth and bare side arcs keep the opening readable.
-    const teeth=new T.Group();teeth.name='teeth';
+    // Rounded enamel bases taper into curved, inward-pointing fangs.
+    const teeth = new T.Group(); teeth.name = 'teeth';
     const jaws = [
       { name: 'upper', angle: Math.PI, offsets: [-.56, -.21, .21, .56] },
       { name: 'lower', angle: 0, offsets: [-.48, 0, .48] },
     ];
-    for(const jaw of jaws)for(const offset of jaw.offsets){
-      const a=jaw.angle+offset, length=Math.abs(offset)<.3 ? .25 : .22;
-      const tooth=this.library.part(teeth,'cone','#fff2d5',Math.cos(a)*.8,.065,Math.sin(a)*.8,.055,length,.085);
-      tooth.name=`${jaw.name}-fang`;
-      // Cone tips point inward; the broad bases overlap the colored rim.
-      tooth.rotation.z=Math.PI/2;tooth.rotation.y=-a;
+    for (const jaw of jaws) for (const offset of jaw.offsets) {
+      const a = jaw.angle + offset, length = Math.abs(offset) < .3 ? .25 : .22;
+      const root = new T.Vector3(Math.cos(a) * .87, .055, Math.sin(a) * .87);
+      const inward = new T.Vector3(-Math.cos(a), 0, -Math.sin(a));
+      const curve = new T.QuadraticBezierCurve3(root,
+        root.clone().addScaledVector(inward, length * .45).add(new T.Vector3(0, .075, 0)),
+        root.clone().addScaledVector(inward, length));
+      const rings = 10, sides = 8, vertices: number[] = [], indices: number[] = [];
+      const tangentSide = new T.Vector3(-Math.sin(a), 0, Math.cos(a));
+      for (let ringIndex = 0; ringIndex <= rings; ringIndex++) {
+        const t = ringIndex / rings, center = curve.getPoint(t), width = .062 * Math.pow(1 - t, .65) + .002;
+        for (let side = 0; side < sides; side++) {
+          const angle = side / sides * Math.PI * 2;
+          const v = center.clone().addScaledVector(tangentSide, Math.cos(angle) * width);
+          v.y += Math.sin(angle) * width * .6;
+          vertices.push(v.x, v.y, v.z);
+          if (ringIndex < rings) { const n = ringIndex * sides + side, next = ringIndex * sides + (side + 1) % sides; indices.push(n, next, n + sides, next, next + sides, n + sides); }
+        }
+      }
+      const geometry = new T.BufferGeometry(); geometry.setAttribute('position', new T.Float32BufferAttribute(vertices, 3)); geometry.setIndex(indices); geometry.computeVertexNormals(); this.resources.push(geometry);
+      const tooth = new T.Mesh(geometry, this.library.material('#fff2d5')); tooth.name = `${jaw.name}-fang`; teeth.add(tooth);
     }
     group.add(teeth);
     const outline=new T.Mesh(new T.TorusGeometry(.985,.018,8,64),this.library.material('#344757'));

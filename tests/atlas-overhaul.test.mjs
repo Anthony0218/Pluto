@@ -7,13 +7,12 @@ import {generateMatchQuestions} from '../src/games/atlas/matchQuestions.ts';
 import {generateAdvancedQuestions,generateDensityQuestion} from '../src/games/atlas/advancedQuestions.ts';
 import {raceQuestions,createRaceRun,raceView,applyRaceAction} from '../src/games/atlas/serverRace.ts';
 import {ATLAS_RACE_MODES,resolveRoundScores} from '../src/games/atlas/multiplayer.ts';
-import {answerTerritory,createTerritoryCampaign,legalTerritoryTargets,planTerritory,resolveTerritory,territoryKnowledge,territoryView,territoryBotPlan} from '../src/games/atlas/territoryStrategy.ts';
 import {calculateMatchResult,INITIAL_RATING} from '../src/games/atlas/rankedRating.ts';
 import {certifiedRating,getRankFromProfile} from '../src/games/atlas/ranked.ts';
 import {masteryQuestions,recordMastery} from '../src/games/atlas/mastery.ts';
 import {FILL_SCOPES,entitiesInFillScope} from '../src/games/atlas/scopes.ts';
 const read=async p=>JSON.parse(await readFile(new URL(p,import.meta.url),'utf8'));
-const data={countries:await read('../data/geography/countries.json'),extras:await read('../data/geography/extras.json'),version:await read('../data/geography/version.json'),topology:await read('../public/data/geography/world-110m.json')};
+const data={countries:await read('../data/geography/countries.json'),extras:await read('../data/geography/extras.json'),history:await read('../data/geography/history.json'),version:await read('../data/geography/version.json'),topology:await read('../public/data/geography/world-110m.json')};
 const common={entities:data.countries,extras:data.extras,datasetVersion:data.version.atlasDataVersion,seed:'private-seed',difficulty:'expert',count:20};
 test('unresolved snapshots have no hidden targets, seeds, answer fields or future clues',()=>{
  for(const mode of ['map_battle','closest_wins','higher_lower','flag_battle','guess_country'])for(const q of generateMatchQuestions({...common,mode})){
@@ -51,22 +50,6 @@ test('race ordering rejects duplicate and missing cards; clue advancement reject
  const clues=raceQuestions(data,'country_guesser','clues','expert'),first=raceView(run,clues,'gen').question.id,next=applyRaceAction(run,clues,'gen','country_guesser','clue',first,null,1);
  assert.throws(()=>applyRaceAction(next,clues,'gen','country_guesser','answer',first,clues[0].answer,2),/changed/);
 });
-test('territory boards stay connected with fair homes; actions need adjacency and both orders resolve simultaneously',()=>{
- const boards=new Set();for(let i=0;i<80;i++){
-  let state=createTerritoryCampaign(data.countries,`board:${i}`);boards.add(state.ids[0]);assert.ok(Math.abs(state.edges[state.homes.player_a].length-state.edges[state.homes.player_b].length)<=1);
-  const visited=[state.ids[0]];for(const id of visited)for(const next of state.edges[id])if(!visited.includes(next))visited.push(next);assert.equal(visited.length,state.ids.length);
-  assert.throws(()=>planTerritory(state,'player_a',state.homes.player_b),/supplied/);
-  for(let cycle=0;cycle<6;cycle++){
-   for(const seat of ['player_a','player_b']){const target=territoryBotPlan(state,seat);assert.ok(legalTerritoryTargets(state,seat).includes(target));state=planTerritory(state,seat,target);const q=territoryKnowledge(state,seat,data.countries,'expert');assert.equal(validateAnswer(q,q.answer),true);state=answerTerritory(state,seat,q,q.answer);}
-   assert.equal(territoryView(state,'player_a',data.countries,'expert','g').opponentPlanned,true);state=resolveTerritory(state);
-  }assert.ok(state.done);assert.equal(state.history.length,6);assert.equal(state.ownership[state.homes.player_a],'player_a');assert.equal(state.ownership[state.homes.player_b],'player_b');
- }assert.equal(boards.size,2);
-});
-test('a correct defense holds a country even when an attack is also correct',()=>{
- let s=createTerritoryCampaign(data.countries,'defense');const a=s.homes.player_a,target=s.edges[a].find(id=>id!==s.homes.player_b);s.ownership[target]='player_b';s=planTerritory(s,'player_a',target);s=planTerritory(s,'player_b',target);
- for(const seat of ['player_a','player_b']){const q=territoryKnowledge(s,seat,data.countries,'expert');s=answerTerritory(s,seat,q,q.answer);}s=resolveTerritory(s);assert.equal(s.ownership[target],'player_b');
- const review=territoryView(s,'player_a',data.countries,'expert','g',true);assert.equal(review.feedback.correct,true);assert.equal(review.cycle,0);assert.ok(review.history.every(h=>!Object.hasOwn(h,'feedback')));
-});
 test('advanced constraints each have exactly one world solution and density uses the displayed operands',()=>{
  for(const tier of ['master','grandmaster'])for(let i=0;i<20;i++){
   const qs=generateAdvancedQuestions(data.countries,'advanced:'+i,10,tier,true);assert.equal(new Set(qs.map(q=>q.entityId)).size,10);
@@ -98,11 +81,11 @@ test('server flag media covers every quiz flag and strips answer-bearing SVG met
 test('hotseat decks use distinct deterministic seeds and preserve the shared content format',async()=>{
  const {calibratedHotseatSeeds}=await import('../src/games/atlas/hotseatCalibration.ts');
  const {DEFAULT_SOLO_SETTINGS}=await import('../src/games/atlas/soloSettings.ts');
- for(const mode of ['map_battle','flag_battle','higher_lower','guess_country','language_guesser']){
+ for(const mode of ['map_battle','flag_battle','higher_lower','guess_country','language_guesser','history_battle']){
   const seeds=calibratedHotseatSeeds(data,mode,DEFAULT_SOLO_SETTINGS,'calibration',4);
   assert.equal(new Set(seeds).size,4);
   assert.deepEqual(seeds,calibratedHotseatSeeds(data,mode,DEFAULT_SOLO_SETTINGS,'calibration',4));
-  const decks=seeds.map(seed=> mode==='language_guesser'?raceQuestions(data,mode,seed,'intermediate','Europe',DEFAULT_SOLO_SETTINGS.categories):generateMatchQuestions({...common,seed,mode,difficulty:'intermediate',count:10,categories:DEFAULT_SOLO_SETTINGS.categories,stats:DEFAULT_SOLO_SETTINGS.stats}));
+  const decks=seeds.map(seed=> mode==='language_guesser'||mode==='history_battle'?raceQuestions(data,mode,seed,'intermediate','Europe',DEFAULT_SOLO_SETTINGS.categories):generateMatchQuestions({...common,seed,mode,difficulty:'intermediate',count:10,categories:DEFAULT_SOLO_SETTINGS.categories,stats:DEFAULT_SOLO_SETTINGS.stats}));
   assert.ok(decks.every(deck=>deck.length===decks[0].length));
   assert.ok(decks.every(deck=>deck.every(q=>q.interaction===decks[0][0].interaction)));
   assert.ok(new Set(decks.map(deck=>deck.map(q=>q.entityId).join(','))).size>1);
@@ -150,10 +133,10 @@ test('dataset loads are shared; one unmount cannot cancel another and late effec
  try {
   const first=mount(),second=mount(),late=mount();
   const cleanup=first.effects[0]();second.effects[0]();cleanup();
-  assert.equal(requests.length,4);assert.ok(requests.every(r=>!r.options?.signal));
-  const fixtures=[data.countries,data.topology,data.version,data.extras];requests.forEach((r,i)=>r.resolve({ok:true,json:async()=>fixtures[i]}));
+  assert.equal(requests.length,5);assert.ok(requests.every(r=>!r.options?.signal));
+  const fixtures=[data.countries,data.topology,data.version,data.extras,data.history];requests.forEach((r,i)=>r.resolve({ok:true,json:async()=>fixtures[i]}));
   await new Promise(resolve=>setImmediate(resolve));
-  assert.equal(first.state.data,null);assert.deepEqual(second.state.data.countries,data.countries);assert.equal(second.state.loading,false);
+  assert.equal(first.state.data,null);assert.deepEqual(second.state.data.countries,data.countries);assert.deepEqual(second.state.data.history,data.history);assert.equal(second.state.loading,false);
   late.effects[0]();assert.equal(late.state.loading,false);assert.deepEqual(late.state.data.version,data.version);
  }finally{globalThis.fetch=savedFetch;}
 });

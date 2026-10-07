@@ -1,13 +1,23 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ArrowLeft, Check, Copy, Globe, Link as LinkIcon, Users } from 'lucide-react';
 import { NaturaConnection } from '../../games/natura/network';
+import { useAuth } from '../../context/AuthContext';
 import { SCENARIOS, type ScenarioId } from '../../games/natura/naturaData';
 import { SNAP_LEVELS } from '../../games/natura/wildModes';
 import { SPIDER_COURSES } from '../../games/natura/expeditions';
 import type { NaturaConfig, PrivateState } from '../../games/natura/protocol';
 import NaturaGame from './NaturaGame';
 const inviteCode=()=>new URLSearchParams(location.search).get('naturaRoom')?.toUpperCase().slice(0,6)??'';
-export default function NaturaOnline({scenario,onExit}:{scenario:ScenarioId;onExit:()=>void}) {
+/** Online rooms use a private relay channel that only signed-in players may join. */
+export default function NaturaOnline(props:{scenario:ScenarioId;onExit:()=>void}) {
+  const {user,loading}=useAuth();
+  if(user)return <NaturaOnlineRoom {...props}/>;
+  return <main className="nm-page"><section className="nf-session nf-session-online"><button className="nf-button" onClick={props.onExit}><ArrowLeft size={17}/> Habitats</button><p className="nm-eyebrow">NATURA / ONLINE MULTIPLAYER</p><Globe size={36}/>
+    {loading?<p className="nf-connection-status" role="status">Checking your account…</p>:<><h1>You’re not logged in.</h1><p role="status">You need an account to play Natura online. Create one for free, or log in if you already have one. Single-player, hotseat and local two-player studies work without an account.</p><div className="nm-result-actions"><Link className="nf-primary" to="/login?register">Create account</Link><Link className="nf-button" to="/login">Log in</Link></div></>}
+  </section></main>;
+}
+function NaturaOnlineRoom({scenario,onExit}:{scenario:ScenarioId;onExit:()=>void}) {
   const [connection,setConnection]=useState<NaturaConnection|null>(null),[state,setState]=useState<PrivateState|null>(null),[status,setStatus]=useState('Ready to connect'),[error,setError]=useState('');
   const [name,setName]=useState('Player'),[code,setCode]=useState(inviteCode),[copied,setCopied]=useState('');
   const [config,setConfig]=useState<NaturaConfig>({scenario,level:0,seed:crypto.getRandomValues(new Uint32Array(1))[0],variant:'race',difficulty:'normal'});

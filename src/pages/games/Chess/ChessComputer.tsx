@@ -30,7 +30,7 @@ const difficultyLevels: Record<Difficulty, DifficultySettings> = {
   easy: {
     skillLevel: 0,
     thinkTime: 80,
-    randomMoveChance: 0.4,
+    randomMoveChance: 0.3,
     label: "Easy",
     description: "Relaxed play with enough mistakes to punish.",
     emoji: "🙂",
@@ -38,7 +38,7 @@ const difficultyLevels: Record<Difficulty, DifficultySettings> = {
   medium: {
     skillLevel: 1,
     thinkTime: 300,
-    randomMoveChance: 0.15,
+    randomMoveChance: 0.1,
     label: "Normal",
     description: "Balanced play with occasional inaccuracies.",
     emoji: "⚔️",
@@ -78,8 +78,6 @@ function ChessPageShell({ children }: { children: React.ReactNode }) {
 
       <div className="relative flex min-h-[var(--app-height)] w-full flex-col">
         <ChessPageHeader className="chess-menu-header">
-
-
           <Link
             to="/games/chess/rules"
             className="inline-flex items-center gap-2 text-sm text-zinc-500 transition hover:text-white"
@@ -147,24 +145,42 @@ export default function ChessComputer() {
               to="/games/chess/classic"
               className="mb-8 inline-flex items-center gap-2 text-sm text-zinc-600 transition hover:text-white"
             >
-              <span>←</span>{ui("Classic Chess")}</Link>
+              <span>←</span>
+              {ui("Classic Chess")}
+            </Link>
 
-            <p className="text-[11px] font-black uppercase tracking-[0.34em] text-amber-400">{ui("Singleplayer")}</p>
+            <p className="text-[11px] font-black uppercase tracking-[0.34em] text-amber-400">
+              {ui("Singleplayer")}
+            </p>
 
-            <h1 className="mt-5 font-serif text-[52px] leading-[.94] tracking-[-0.035em] text-white sm:text-[66px] xl:text-[82px]">{ui("Play vs")}<br />{ui("Stockfish")}</h1>
+            <h1 className="mt-5 font-serif text-[52px] leading-[.94] tracking-[-0.035em] text-white sm:text-[66px] xl:text-[82px]">
+              {ui("Play vs")}
+              <br />
+              {ui("Stockfish")}
+            </h1>
 
-            <p className="mt-6 max-w-[500px] font-serif text-[18px] leading-8 text-zinc-400 sm:text-[20px]">{ui("Pick your side, choose the challenge, then step onto the board.")}</p>
+            <p className="mt-6 max-w-[500px] font-serif text-[18px] leading-8 text-zinc-400 sm:text-[20px]">
+              {ui(
+                "Pick your side, choose the challenge, then step onto the board.",
+              )}
+            </p>
           </div>
 
           <div className="mt-12 flex items-center gap-4 text-[9px] font-black uppercase tracking-[0.28em] text-zinc-700">
-            <span className="h-px w-14 bg-amber-400/45" />{ui("Color · Difficulty · Play")}</div>
+            <span className="h-px w-14 bg-amber-400/45" />
+            {ui("Color · Difficulty · Play")}
+          </div>
         </header>
 
         <div className="relative flex min-h-[620px] items-center border-t border-white/[0.06] px-5 py-8 sm:px-8 lg:min-h-0 lg:border-t-0 lg:px-10 lg:py-12 xl:px-14 2xl:px-20">
           <div className="mx-auto flex w-full max-w-[980px] flex-col gap-4 xl:gap-5">
             <section className="rounded-[22px] border border-white/[0.09] bg-black/20 p-5 shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md sm:p-6 xl:p-5">
-              <p className="text-[9px] font-black uppercase tracking-[0.26em] text-amber-300/70">{ui("Choose your side")}</p>
-              <h2 className="mt-1.5 font-serif text-[27px] leading-tight text-white sm:text-[31px]">{ui("Color")}</h2>
+              <p className="text-[9px] font-black uppercase tracking-[0.26em] text-amber-300/70">
+                {ui("Choose your side")}
+              </p>
+              <h2 className="mt-1.5 font-serif text-[27px] leading-tight text-white sm:text-[31px]">
+                {ui("Color")}
+              </h2>
 
               <div className="mt-5 grid grid-cols-3 gap-3">
                 {(
@@ -215,8 +231,12 @@ export default function ChessComputer() {
             </section>
 
             <section className="rounded-[22px] border border-white/[0.09] bg-black/20 p-5 shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md sm:p-6 xl:p-5">
-              <p className="text-[9px] font-black uppercase tracking-[0.26em] text-amber-300/70">{ui("Choose the challenge")}</p>
-              <h2 className="mt-1.5 font-serif text-[27px] leading-tight text-white sm:text-[31px]">{ui("Difficulty")}</h2>
+              <p className="text-[9px] font-black uppercase tracking-[0.26em] text-amber-300/70">
+                {ui("Choose the challenge")}
+              </p>
+              <h2 className="mt-1.5 font-serif text-[27px] leading-tight text-white sm:text-[31px]">
+                {ui("Difficulty")}
+              </h2>
 
               <div className="mt-5 grid gap-2.5 lg:grid-cols-2 xl:grid-cols-5">
                 {(
@@ -283,10 +303,16 @@ export default function ChessComputer() {
               className="group flex w-full items-center justify-between rounded-[22px] border border-amber-300/45 bg-amber-300/[0.045] p-5 text-left shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:bg-amber-300/[0.07] sm:p-6 xl:p-4"
             >
               <span>
-                <span className="text-[9px] font-black uppercase tracking-[0.26em] text-amber-300/70">{ui("Ready")}</span>
-                <span className="mt-1.5 block font-serif text-[27px] leading-tight text-white sm:text-[31px]">{ui("Start Game")}</span>
+                <span className="text-[9px] font-black uppercase tracking-[0.26em] text-amber-300/70">
+                  {ui("Ready")}
+                </span>
+                <span className="mt-1.5 block font-serif text-[27px] leading-tight text-white sm:text-[31px]">
+                  {ui("Start Game")}
+                </span>
                 <span className="mt-2 block text-sm text-zinc-500">
-                  {selectedColor === "random" ? ui("Random side") : `Play as ${selectedColor === "white" ? "White" : "Black"}`}{" "}
+                  {selectedColor === "random"
+                    ? ui("Random side")
+                    : `Play as ${selectedColor === "white" ? "White" : "Black"}`}{" "}
                   · {ui(selectedDifficulty.label)}
                 </span>
               </span>

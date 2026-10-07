@@ -11,7 +11,7 @@ export class MinigameRegistry extends Registry<MinigameDefinition> {
     super.register(definition);
   }
   pool(gameType: MinigameType): MinigameDefinition[] {
-    return this.all().filter((d) => d.gameType === gameType);
+    return this.all().filter((d) => d.gameType === gameType && d.selectable !== false);
   }
 }
 

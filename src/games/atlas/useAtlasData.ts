@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { AtlasDataset, AtlasExtras, GeographicEntity } from "./types";
+import type { AtlasDataset, AtlasExtras, AtlasHistory, GeographicEntity } from "./types";
 
 type LoadState = { data: AtlasDataset | null; error: string | null; loading: boolean };
 let cached: AtlasDataset | null = null;
@@ -15,8 +15,9 @@ export function useAtlasData(): LoadState {
       fetch("/data/geography/world-110m.json").then((response) => response.ok ? response.json() : Promise.reject(new Error("Map geometry could not be loaded."))),
       fetch("/data/geography/version.json").then((response) => response.ok ? response.json() : Promise.reject(new Error("Dataset version could not be loaded."))),
       fetch("/data/geography/extras.json").then((response) => response.ok ? response.json() : Promise.reject(new Error("City and summit data could not be loaded."))),
-    ]).then(([countries, topology, version, extras]) => {
-      cached = { countries: countries as GeographicEntity[], extras: extras as AtlasExtras, topology, version };
+      fetch("/data/geography/history.json").then((response) => response.ok ? response.json() : Promise.reject(new Error("History data could not be loaded."))),
+    ]).then(([countries, topology, version, extras, history]) => {
+      cached = { countries: countries as GeographicEntity[], extras: extras as AtlasExtras, history: history as AtlasHistory, topology, version };
       return cached;
     }).finally(()=>{pending=null;});
     pending.then(data=>{if(live)setState({data,error:null,loading:false});}).catch((cause: unknown) => {

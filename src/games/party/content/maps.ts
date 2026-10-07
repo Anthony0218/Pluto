@@ -2,6 +2,7 @@ import type { BoardMap, BoardNode, Region, TileType } from "../types.ts";
 import { FIELD_DISTRIBUTION } from "../config.ts";
 import { mountain } from "./mountain.ts";
 import { Registry } from "./registry.ts";
+import { expandBoard } from "./expandBoard.ts";
 const regions: Region[] = [
   { name: "SUNSPILL BAY", x: 210, y: 215, color: 0x6dbd85, motif: "palm" },
   { name: "COCONUT CLUB", x: 540, y: 185, color: 0x8bca87, motif: "palm" },
@@ -55,7 +56,9 @@ export const tropical: BoardMap = {
     "Six sunny islands joined by bridges. Wide open, lots of alternate routes, two Golden Plutos to race for.",
   start: "space-0",
   size: { width: 1120, height: 800 },
-  nodes,
+  nodes: expandBoard(nodes, regions, "space", 6),
+  spaceCount: 96,
+  fieldDistribution: { coin: 30, item: 18, deposit: 12, heal: 9, event: 12 },
   regions,
   goldenPlutoCount: 2,
   propertyName: "Outpost",

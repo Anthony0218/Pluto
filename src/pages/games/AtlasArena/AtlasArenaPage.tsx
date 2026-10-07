@@ -2,6 +2,7 @@ import { AtlasMastery } from "../../../components/atlas/AtlasMastery";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, BookOpen, Check, Globe2, Info, CircleHelp, Shuffle, Trophy, User, Users, Wifi, X } from "lucide-react";
+import { chooseRandomModes, seriesLabel, type SeriesLength } from "../../../games/atlas/randomSeries";
 import { bestKey } from "../../../games/atlas/arenaStorage";
 import { ARENA_MODES, hotseatPlayerLimit, onlinePlayerLimit, type ArenaModeDef } from "../../../games/atlas/modeCatalog";
 import { DIFFICULTY_LABELS } from "../../../games/atlas/soloSettings";
@@ -29,7 +30,12 @@ export default function AtlasArenaPage() {
   const [about, setAbout] = useState(false);
   const [tab, setTab] = useState<"casual" | "ranked" | "modes" | "mastery">(() => searchParams.get("tab") === "mastery" ? "mastery" : searchParams.get("tab") === "ranked" ? "ranked" : searchParams.get("tab") === "modes" ? "modes" : "casual");
   const { difficulty } = stored;
-  const launch = (mode: ArenaModeDef, how: Launch) => navigate(how === "online" ? `/games/atlas-arena/multiplayer?mode=${mode.online}` : `/games/atlas-arena/${how}/${mode.id}`);
+  const launch = (mode: ArenaModeDef, how: Launch, bestOf?: SeriesLength) => {
+    const path = how === "online" ? `/games/atlas-arena/multiplayer?mode=${mode.online}` : `/games/atlas-arena/${how}/${mode.id}`;
+    if (!bestOf) { navigate(path); return; }
+    const order = chooseRandomModes(ARENA_MODES.map(item => item.id), bestOf, mode.id);
+    navigate(`${path}${how === "online" ? "&" : "?"}random=1&bestOf=${bestOf}&modes=${order.join(",")}`);
+  };
 
   if (about) return <AboutPanel version={data?.version.atlasDataVersion ?? "…"} onBack={() => setAbout(false)} />;
   return (
@@ -89,15 +95,16 @@ export default function AtlasArenaPage() {
       <div className="atlas-home-footer">
         <button type="button" onClick={() => setAbout(true)}><Info size={15} /> Dataset & method</button>
         <Link to="/games"><ArrowLeft size={15} /> Back to Pluto</Link>
-        <span>Natural Earth · UN · GeoNames · World Bank · CCKP · Wikidata</span>
+        <span>Natural Earth · UN · GeoNames · World Bank · CCKP · Wikidata · World Factbook</span>
       </div>
       {rulesFor && <RulesDialog mode={rulesFor} onClose={() => setRulesFor(null)} onLaunch={(how) => { const mode = rulesFor; setRulesFor(null); launch(mode, how); }} />}
     </main>
   );
 }
 
-function RandomModeChoice({ onLaunch }: { onLaunch: (mode: ArenaModeDef, how: Launch) => void }) {
+function RandomModeChoice({ onLaunch }: { onLaunch: (mode: ArenaModeDef, how: Launch, bestOf: SeriesLength) => void }) {
   const [selectedMode, setSelectedMode] = useState<ArenaModeDef | null>(null);
+  const [bestOf, setBestOf] = useState<SeriesLength>(3);
   const [highlight, setHighlight] = useState<number | null>(null);
   const [spinning, setSpinning] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -136,7 +143,8 @@ function RandomModeChoice({ onLaunch }: { onLaunch: (mode: ArenaModeDef, how: La
   return <article className="atlas-play-choice is-random">
     <div className="atlas-choice-copy"><span className="atlas-choice-tag"><Shuffle size={14} aria-hidden /> Surprise me</span>
       <h3>Play Random Mode</h3><p className="atlas-choice-description" role="status" data-selected={Boolean(selectedMode)}>{spinning ? "Choosing your mode…" : selectedMode ? `Selected: ${selectedMode.title}` : `Play now for a random mode, or click ? to spin through all ${ARENA_MODES.length} modes.`}</p>
-      <PlayChoiceActions disabled={spinning} onLaunch={how => onLaunch(selectedMode ?? ARENA_MODES[Math.floor(Math.random() * ARENA_MODES.length)], how)} />
+      <div className="atlas-random-format" role="radiogroup" aria-label="Random match length">{([1, 3, 5] as const).map(length => <button key={length} type="button" role="radio" aria-checked={bestOf === length} className={bestOf === length ? "active" : ""} disabled={spinning} onClick={() => setBestOf(length)}>{seriesLabel(length)}</button>)}</div>
+      <PlayChoiceActions disabled={spinning} onLaunch={how => onLaunch(selectedMode ?? ARENA_MODES[Math.floor(Math.random() * ARENA_MODES.length)], how, bestOf)} />
     </div>
     {highlight === null
       ? <button type="button" className="atlas-random-symbol" aria-label="Spin for a random mode" onClick={spin}><CircleHelp aria-hidden /></button>
@@ -195,7 +203,7 @@ function RulesDialog({ mode, onClose, onLaunch }: { mode: ArenaModeDef; onClose:
 }
 
 function AboutPanel({ version, onBack }: { version: string; onBack: () => void }) {
-  return <main className="atlas-page atlas-about"><button type="button" className="atlas-back" onClick={onBack}><ArrowLeft /> Atlas Arena</button><span className="atlas-eyebrow">Data & boundaries</span><h1>Built on traceable geography</h1><p>Atlas Arena uses a bundled snapshot—never a live API during a match. Every multiplayer room pins its dataset version so all players generate the same rounds.</p><div className="atlas-source-list"><article><strong>Natural Earth 1:110m</strong><span>Admin-0 boundary geometry · public domain</span></article><article><strong>United Nations M49</strong><span>Identifiers and statistical regions</span></article><article><strong>GeoNames</strong><span>Names, capitals, coordinates, languages and neighbors · CC BY 4.0</span></article><article><strong>World Bank</strong><span>Population (SP.POP.TOTL) and surface area (AG.SRF.TOTL.K2), including observation year</span></article><article><strong>Wikidata</strong><span>Highest summits used by the stat modes</span></article><article><strong>flag-icons</strong><span>Bundled SVG flags · MIT</span></article></div><div className="atlas-boundary-note"><Globe2 /><p>Natural Earth renders de facto boundaries. Rendering is separate from quiz eligibility: the default game uses an explicit UN 195 scope, while territories remain available in the data. Dataset: <strong>{version}</strong>.</p></div></main>;
+  return <main className="atlas-page atlas-about"><button type="button" className="atlas-back" onClick={onBack}><ArrowLeft /> Atlas Arena</button><span className="atlas-eyebrow">Data & boundaries</span><h1>Built on traceable geography</h1><p>Atlas Arena uses a bundled snapshot—never a live API during a match. Every multiplayer room pins its dataset version so all players generate the same rounds.</p><div className="atlas-source-list"><article><strong>Natural Earth 1:110m</strong><span>Admin-0 boundary geometry · public domain</span></article><article><strong>United Nations M49</strong><span>Identifiers and statistical regions</span></article><article><strong>GeoNames</strong><span>Names, capitals, coordinates, languages and neighbors · CC BY 4.0</span></article><article><strong>World Bank</strong><span>Population (SP.POP.TOTL) and surface area (AG.SRF.TOTL.K2), including observation year</span></article><article><strong>Wikidata</strong><span>Highest summits used by the stat modes</span></article><article><strong>The World Factbook</strong><span>Independence dates, founding events and former names for History Battle · public domain</span></article><article><strong>flag-icons</strong><span>Bundled SVG flags · MIT</span></article></div><div className="atlas-boundary-note"><Globe2 /><p>Natural Earth renders de facto boundaries. Rendering is separate from quiz eligibility: the default game uses an explicit UN 195 scope, while territories remain available in the data. Dataset: <strong>{version}</strong>.</p></div></main>;
 }
 
 function PlayChoiceActions({ onLaunch, disabled = false }: { onLaunch: (how: Launch) => void; disabled?: boolean }) {

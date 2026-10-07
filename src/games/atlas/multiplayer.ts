@@ -1,21 +1,21 @@
-import { assertDatasetVersion, captureTerritory, normalScore, type TerritoryState } from "./rules.ts";
+import { assertDatasetVersion, normalScore } from "./rules.ts";
 import { distanceToTerritory, type CountryShapes } from "./territoryDistance.ts";
 import { validateAnswer } from "./engine.ts";
 import { scoreGuessTip, type GuessAward } from "./guessCountry.ts";
 import type { AtlasQuestion, Coordinates } from "./types.ts";
 
 /** Server-run rounds: every player answers the same question, and the server scores it. */
-export type AtlasRoundMode = "map_battle" | "closest_wins" | "higher_lower" | "territory_battle" | "flag_battle" | "guess_country";
+export type AtlasRoundMode = "map_battle" | "closest_wins" | "higher_lower" | "flag_battle" | "guess_country";
 /** Races: everyone plays the same seeded run on their own device at once; the room collects live scores. */
-export type AtlasRaceMode = "speed_run" | "map_fill" | "stat_ranking" | "region_builder" | "stat_detective" | "country_guesser" | "extreme_geography" | "language_guesser";
+export type AtlasRaceMode = "speed_run" | "map_fill" | "stat_ranking" | "region_builder" | "stat_detective" | "country_guesser" | "extreme_geography" | "language_guesser" | "history_battle";
 export type AtlasMultiplayerMode = AtlasRoundMode | AtlasRaceMode | "stat_battle";
-export const ATLAS_ROUND_MODES: AtlasRoundMode[] = ["map_battle", "closest_wins", "higher_lower", "territory_battle", "flag_battle", "guess_country"];
-export const ATLAS_RACE_MODES: AtlasRaceMode[] = ["speed_run", "map_fill", "stat_ranking", "region_builder", "stat_detective", "country_guesser", "extreme_geography", "language_guesser"];
+export const ATLAS_ROUND_MODES: AtlasRoundMode[] = ["map_battle", "closest_wins", "higher_lower", "flag_battle", "guess_country"];
+export const ATLAS_RACE_MODES: AtlasRaceMode[] = ["speed_run", "map_fill", "stat_ranking", "region_builder", "stat_detective", "country_guesser", "extreme_geography", "language_guesser", "history_battle"];
 export const ATLAS_MULTIPLAYER_MODES: AtlasMultiplayerMode[] = [...ATLAS_ROUND_MODES, ...ATLAS_RACE_MODES, "stat_battle"];
 export const isRaceMode = (mode: string): mode is AtlasRaceMode => ATLAS_RACE_MODES.includes(mode as AtlasRaceMode);
 export const isRoundMode = (mode: string): mode is AtlasRoundMode => ATLAS_ROUND_MODES.includes(mode as AtlasRoundMode);
-/** Territory ownership is two-coloured and Stat Battle is a duel; every other mode seats two to four players. */
-export const maxPlayersFor = (mode: AtlasMultiplayerMode) => mode === "territory_battle" || mode === "stat_battle" ? 2 : 4;
+/** Stat Battle is a duel; every other mode seats two to four players. */
+export const maxPlayersFor = (mode: AtlasMultiplayerMode) => mode === "stat_battle" ? 2 : 4;
 export const clampPlayers = (mode: AtlasMultiplayerMode, requested: unknown) => Math.min(maxPlayersFor(mode), Math.max(2, Math.trunc(Number(requested)) || 2));
 export type AtlasMatchStatus = "waiting" | "draft" | "ready" | "intermission" | "countdown" | "round_active" | "round_resolving" | "next_round" | "finished" | "cancelled";
 export type ServerSubmission = { userId: string; round: number; answer: string | Coordinates; submittedAt: number; correct: boolean; distanceKm?: number; nearest?: Coordinates; tip?: number; concept?:string; elapsedMs?:number };
@@ -59,18 +59,6 @@ export function resolveRoundScores(options: { submissions: ServerSubmission[]; p
     scores[submission.userId] = (scores[submission.userId] || 0) + normalScore(submission.correct, remaining, options.roundDurationMs);
   }
   return { scores, winnerId };
-}
-
-export function applyTerritoryRound(state: TerritoryState, entityId: string, winnerId: string | null, playerIds: [string, string], allowSteal: boolean): TerritoryState {
-  if (!winnerId) return state;
-  return captureTerritory(state, entityId, winnerId === playerIds[0] ? "player_a" : "player_b", allowSteal);
-}
-
-export function territoryPlayerScores(ownership: TerritoryState["ownership"], playerIds: [string, string]): Record<string, number> {
-  return {
-    [playerIds[0]]: Object.values(ownership).filter((owner) => owner === "player_a").length,
-    [playerIds[1]]: Object.values(ownership).filter((owner) => owner === "player_b").length,
-  };
 }
 
 export function verifyMatchDataset(serverVersion: string, clientVersion: string): void {

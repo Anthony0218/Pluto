@@ -5,9 +5,9 @@ import { isMissedWin, REVIEW_SPEEDS, playbackDelay } from '../src/components/che
 test('review playback scales the move interval at every supported speed', () => {
   assert.deepEqual(REVIEW_SPEEDS.map(playbackDelay), [4400, 2200, 1100, 1100 / 1.5, 550, 275]);
 });
-test('missing mate or some advantage while still winning is not a missed win', () => {
-  assert.equal(isMissedWin({ missedMate: true, centipawnLoss: 100 }, 10, 10), false);
-  assert.equal(isMissedWin({ missedMate: true, centipawnLoss: 400 }, 10, 6), false);
+test('missing a forced mate is a missed win even while still winning', () => {
+  assert.equal(isMissedWin({ missedMate: true, centipawnLoss: 100 }, 10, 10), true);
+  assert.equal(isMissedWin({ missedMate: true, centipawnLoss: 400 }, 10, 6), true);
   assert.equal(isMissedWin({ missedMate: false, centipawnLoss: 240 }, 5, 2.6), false);
 });
 test('missed win requires losing the estimated winning advantage', () => {

@@ -15,6 +15,10 @@ has **no database tables**..
 
 ## Technology
 
+The **Learn** subject hub and **Tools** app launcher are documented in
+[`docs/LEARNING_TOOLS.md`](docs/LEARNING_TOOLS.md), including the milestone roadmap,
+routes, lesson framework, and browser-local progress storage.
+
 | Area               | Stack                                                                                                |
 | ------------------ | ---------------------------------------------------------------------------------------------------- |
 | Client             | React 19, Vite 8, TypeScript (strict for Pluto Party), Tailwind (site), PixiJS 8 (Pluto Party board) |

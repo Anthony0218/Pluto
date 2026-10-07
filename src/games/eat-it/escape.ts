@@ -109,7 +109,7 @@ export function stepEscape(s: GameState, p: Player, dt: number) {
           const at=spawnPosition(s,playerRadius(p,s.time)+20);
           if(at&&safePosition(s,at,playerRadius(p,s.time),p.id)){Object.assign(p,at);landed=true;}
         }
-        if(!landed)resolveWalls(s.map,p,playerRadius(p,s.time));
+        if(!landed)resolveWalls(s.map,p,playerRadius(p,s.time),true);
       }
     }
     delete p.escape; p.vx = 0; p.vy = 0;

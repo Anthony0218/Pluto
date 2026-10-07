@@ -14,7 +14,7 @@ const classifications: Array<{ quality: ReviewVisualQuality; range: string; desc
   { quality: "Inaccuracy", range: "≤ 1.20", description: "A weaker move: playable, but a better option was available." },
   { quality: "Mistake", range: "≤ 2.50", description: "A clear error that hands over a noticeable part of your advantage." },
   { quality: "Blunder", range: "> 2.50", description: "A serious error that often loses material or the game." },
-  { quality: "Missed Win", range: "Game Review", description: "Stockfish estimated a winning advantage (at least +5 or a forced mate), then +0.75 or less after your move. This estimate does not prove a forced win; missing mate while still winning does not qualify." },
+  { quality: "Missed Win", range: "Game Review", description: "A forced mate was missed, even if an advantage remains; or an estimated winning advantage of at least +5 fell to +0.75 or less." },
 ];
 
 /** Small info button that opens a window explaining the Chess Coach move classifications. */

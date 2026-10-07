@@ -1,0 +1,13 @@
+Stockfish.js 18 — corresponding source and distribution record
+Distributed files are unmodified from npm stockfish 18.0.8.
+GPL-3.0 license: /licenses/Stockfish-GPL-3.0.txt
+Release source commit: 93c994592dcf3b4b21052ab925e9b534df9c0918 (18.0.8)
+Source and build scripts: https://github.com/nmrugg/stockfish.js/tree/93c994592dcf3b4b21052ab925e9b534df9c0918
+Source archive: https://github.com/nmrugg/stockfish.js/archive/93c994592dcf3b4b21052ab925e9b534df9c0918.zip
+See upstream README.md, build.js and emscripten directory for build prerequisites and instructions.
+Single-thread lite build: node build.js --single-threaded --lite -f
+Neural network source: https://tests.stockfishchess.org/nns?network_name=nn-9067e33176e
+No Pluto modifications to the distributed engine binaries.
+SHA-256:
+5243fd9b276cab7dfe3ad1d43ab9ead73568fac76468c614242977a210c4a391  stockfish-18-lite-single.js
+a8fbc05ec6920b56d7485826dcb02c5ffd2826bcbf751cf973046f237a9096f1  stockfish-18-lite-single.wasm

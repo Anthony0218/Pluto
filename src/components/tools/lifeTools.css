@@ -1,0 +1,86 @@
+.life-form { margin: 24px 0; }
+.life-form fieldset { border:1px solid #8290bc4b; padding:16px; border-radius:12px; margin:16px 0; min-width:0; }
+.life-form legend { padding:0 8px; color:#c4b5fd; }
+.life-check { display:flex !important; flex-direction:row; align-items:center; gap:10px; margin:14px 0; }
+.life-check input { width:18px; height:18px; }
+.life-list { display:grid; gap:12px; padding:0; list-style:none; }
+.life-row { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; padding:16px; border:1px solid #8290bc3b; border-radius:12px; min-width:0; }
+.life-row > div { min-width:0; overflow-wrap:anywhere; }
+.life-row p, .life-row small { font-size:13px; line-height:1.7; }
+.life-row.conflict { border-color:#fbbf24; }
+.life-row.completed strong { text-decoration:line-through; opacity:.6; }
+.life-delete { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+.life-summary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:24px 0; }
+.life-summary > div { padding:18px; background:#ada0ff0b; border:1px solid #b8aaff38; border-radius:12px; }
+.life-summary small { display:block; color:#b4bdd5; margin-bottom:8px; }
+.life-summary strong { font-size:clamp(18px,2vw,26px); overflow-wrap:anywhere; }
+.life-timer { text-align:center; padding:32px 0; }
+.life-timer output { font-size:clamp(52px,12vw,90px); font-variant-numeric:tabular-nums; display:block; color:#ede9fe; }
+.life-table-wrap { overflow-x:auto; margin:20px 0; }
+.life-table { width:100%; border-collapse:collapse; font-size:14px; }
+.life-table th, .life-table td { text-align:left; padding:14px; border-bottom:1px solid #8290bc3b; white-space:nowrap; }
+.life-table caption { text-align:left; padding:12px; }
+.life-reminders { position:fixed; z-index:100; bottom:max(20px,env(safe-area-inset-bottom)); left:20px; width:min(380px,calc(100vw - 40px)); max-height:45vh; overflow:auto; display:grid; gap:10px; }
+.life-reminder { padding:18px; background:#1a2238; border:1px solid #c4b5fd; box-shadow:0 12px 35px #0006; border-radius:12px; overflow-wrap:anywhere; }
+.life-reminder p { margin:8px 0; }
+.life-reminder a { color:#c4b5fd; text-decoration:underline; }
+.life-slots { display:flex; flex-wrap:wrap; gap:10px; max-height:250px; overflow:auto; }
+@media(max-width:600px) { .life-summary { grid-template-columns:1fr; } .life-row { padding:12px; } }
+/* Compact workspaces share Pluto cards, controls and breakpoints. */
+.pt-workbench { padding:20px; margin-bottom:16px; }
+.pt-workbench .pt-inputs { gap:12px; margin-bottom:14px; }
+.pt-workbench input, .pt-workbench select { padding:9px 10px; min-height:40px; }
+.pt-workbench .life-check input { width:18px; min-height:18px; }
+.life-form { margin:14px 0; }
+.life-form fieldset { padding:12px; margin:12px 0; }
+.life-row { padding:12px; gap:10px; }
+.life-list { gap:8px; margin:12px 0; }
+.pt-workbench .pt-actions { gap:8px; margin:14px 0; }
+.pt-workbench .pt-result { padding:16px; margin:14px 0; }
+.life-summary { margin:16px 0; gap:10px; }
+.life-summary > div { padding:12px; }
+.life-workspace { display:grid; grid-template-columns:minmax(0,1.8fr) minmax(260px,1fr); gap:20px; align-items:start; }
+.life-workspace > * { min-width:0; }
+.life-workspace aside { padding:14px; border:1px solid #8290bc3b; border-radius:12px; background:#ada0ff08; }
+.life-tabs { display:flex; flex-wrap:wrap; gap:6px; margin:0 0 18px; border-bottom:1px solid #8290bc3b; padding-bottom:10px; }
+.life-tabs button { padding:10px 14px; border-radius:9px; color:#a7b3ca; }
+.life-tabs button[aria-selected=true] { background:#8c8af81b; color:#ede9fe; box-shadow:inset 0 -2px #c4b5fd; }
+.life-tabs button:focus-visible, .life-group-card:focus-visible, .life-event:focus-visible, .life-hour:focus-visible, .life-calendar button:focus-visible, .life-zone-map g:focus-visible { outline:2px solid #c4b5fd; outline-offset:2px; }
+.pt-workbench details { margin:12px 0; }
+.pt-workbench summary { cursor:pointer; color:#c4b5fd; font-size:13px; padding:6px 0; }
+.life-clock { display:block; font-variant-numeric:tabular-nums; }
+.life-zone-map { width:100%; min-height:250px; margin:12px 0; background:#0d1528; border-radius:12px; }
+.life-zone-map g { cursor:pointer; }
+.life-zone-map g:hover circle, .life-zone-map g:focus-visible circle { stroke:#fff; stroke-width:3px; }
+.life-repayment { border-color:#6ee7b760; background:#6ee7b708; }
+.life-participants { display:flex; flex-wrap:wrap; gap:8px 18px; }
+.life-group-card { width:100%; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; padding:18px; border:1px solid #8290bc3b; border-radius:12px; text-align:left; }
+.life-group-card:hover { background:#8c8af81b; }
+.life-group-card span { font-size:13px; color:#a7b3ca; }
+.life-exercise-editor { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.life-timer { padding:16px 0; }
+.life-calendar-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
+.life-calendar { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:5px; }
+.life-weekday { text-align:center; font-size:12px; color:#a7b3ca; padding:6px; }
+.life-calendar button { display:flex; flex-direction:column; justify-content:center; align-items:center; min-height:64px; border:1px solid #8290bc3b; border-radius:8px; background:#1a2238; }
+.life-calendar button.outside { opacity:.5; }
+.life-calendar button[aria-current=date] { border-color:#c4b5fd; }
+.life-calendar button[aria-pressed=true] { background:#7864ba55; outline:2px solid #c4b5fd; outline-offset:-2px; }
+.life-calendar small { font-size:10px; color:#c4b5fd; }
+.life-plan-day { width:100%; min-height:50px; margin-top:18px; }
+.life-day-scroll { height:min(480px,calc(100dvh - 270px)); min-height:280px; overflow:auto; border:1px solid #8290bc3b; border-radius:12px; }
+.life-day-timeline { position:relative; height:1440px; min-width:0; }
+.life-hour { position:absolute; left:0; width:100%; height:60px; text-align:left; border-top:1px solid #8290bc3b; font-size:11px; color:#a7b3ca; }
+.life-hour span { position:absolute; left:7px; top:4px; }
+.life-event { position:absolute; z-index:1; overflow:hidden; padding:4px 6px; border:1px solid #c4b5fd; border-radius:6px; background:#2c2a50; text-align:left; font-size:12px; }
+.life-event strong,.life-event small { display:block; overflow-wrap:anywhere; }
+.life-event.conflict { border-color:#fbbf24; }
+.life-event.completed { opacity:.6; text-decoration:line-through; }
+@media(min-width:1000px) { .pt-workbench .pt-inputs { grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); } }
+@media(max-width:800px) { .life-workspace { grid-template-columns:minmax(0,1fr); } .life-exercise-editor { grid-template-columns:1fr; } }
+@media(max-width:480px) { .life-calendar button { min-height:48px; } .life-calendar small { font-size:9px; } }
+.life-ledger-scroll { max-height:280px; overflow:auto; }
+.pt-workbench > .lt-notice { margin:0 0 14px; padding:10px 14px; }
+.pt-workbench label { gap:6px; }
+.life-day-scroll { height:clamp(280px,calc(100dvh - 390px),450px); }
+@media(min-width:801px) { .life-zone-map { max-height:clamp(260px,calc(100dvh - 390px),400px); } .life-zone-list { max-height:clamp(160px,calc(100dvh - 540px),300px); overflow:auto; } }

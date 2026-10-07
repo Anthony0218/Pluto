@@ -94,8 +94,8 @@ type Stage = { kind: "handoff"; seat: BattleSeat } | { kind: "pick"; seat: Battl
  * Stat Battle for two people on one device. Before each pick the device is handed over behind a cover screen, so
  * each hand is only ever shown to its owner; both cards are then revealed together.
  */
-export function StatBattleHotseat({ pool, byId, seed, names, onExit, onRestart }: {
-  pool: TrialCountry[]; byId: Map<string, TrialCountry>; seed: string; names: [string, string]; onExit: () => void; onRestart: () => void;
+export function StatBattleHotseat({ pool, byId, seed, names, onExit, onRestart, onComplete }: {
+  pool: TrialCountry[]; byId: Map<string, TrialCountry>; seed: string; names: [string, string]; onExit: () => void; onRestart: () => void; onComplete?: (scores: number[]) => void;
 }) {
   const [match, setMatch] = useState(() => createBattleMatch(pool, seed));
   const [stage, setStage] = useState<Stage>({ kind: "handoff", seat: 0 });
@@ -130,7 +130,7 @@ export function StatBattleHotseat({ pool, byId, seed, names, onExit, onRestart }
           <p className="trial-final-score">{battle.playerScore} – {battle.opponentScore}</p>
           <DuelHistory history={battleView(match, 0).history} byId={byId} names={names} />
           <div className="trial-final-actions">
-            <button type="button" className="atlas-start" onClick={onRestart}><RotateCcw size={18} /> Rematch</button>
+            {onComplete ? <button type="button" className="atlas-start" onClick={() => onComplete([battle.playerScore, battle.opponentScore])}>See series score</button> : <button type="button" className="atlas-start" onClick={onRestart}><RotateCcw size={18} /> Rematch</button>}
             <button type="button" className="atlas-start atlas-secondary" onClick={onExit}>All modes</button>
           </div>
         </section>

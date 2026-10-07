@@ -169,7 +169,7 @@ export default function MoonvilleMinigames() {
 
         <button
           type="button"
-          onClick={() => navigate("/games/medieval-kingdoms")}
+          onClick={() => navigate("/games/medieval-kingdoms/legacy")}
           className="rounded-xl border border-[#80603a] bg-[#4a3521] px-4 py-3 font-black text-[#f5dfb4] hover:bg-[#604526]"
         >
           ← Continent
@@ -261,7 +261,7 @@ export default function MoonvilleMinigames() {
 
           <button
             type="button"
-            onClick={() => navigate("/games/medieval-kingdoms")}
+            onClick={() => navigate("/games/medieval-kingdoms/legacy")}
             className="mt-4 rounded-xl border border-emerald-400 bg-emerald-800 px-5 py-2 font-black text-white hover:bg-emerald-700"
           >
             Continue to Continent

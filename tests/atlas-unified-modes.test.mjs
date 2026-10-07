@@ -23,7 +23,7 @@ const byId = new Map(buildTrialCountries(countries, extras, "expert").map((count
 test("the menu lists all fifteen modes in the agreed order, each playable three ways", () => {
   assert.deepEqual(ARENA_MODES.map((mode) => mode.title), [
     "Map Battle", "Closest Wins", "Higher or Lower", "Guess the Country", "Flag Battle", "Stat Ranking", "Stat Battle",
-    "Region Builder", "Stat Detective", "Guess the Country Mini Edition", "Extreme Geography", "Territory Battle", "Speed Run", "Language Guesser", "Map Fill",
+    "Region Builder", "Stat Detective", "Guess the Country Mini Edition", "Extreme Geography", "History Battle", "Speed Run", "Language Guesser", "Map Fill",
   ]);
   assert.equal(new Set(ARENA_MODES.map((mode) => mode.id)).size, ARENA_MODES.length);
   // Every online mode exists on the server and belongs to exactly one menu entry.
@@ -37,7 +37,12 @@ test("the menu lists all fifteen modes in the agreed order, each playable three 
   assert.equal(modeForTrial("country-guesser")?.id, "guess-country-mini");
   assert.equal(modeForTrial("country-guesser")?.bestId, "country-guesser");
   assert.equal(maxPlayersFor("stat_battle"), 2);
-  assert.equal(maxPlayersFor("territory_battle"), 2);
+  // Territory Battle is gone from every list; History Battle is a four-seat race with its own solo engine.
+  assert.ok(!ARENA_MODES.some((mode) => /territory/i.test(`${mode.id} ${mode.title} ${mode.online}`)) && !ATLAS_MULTIPLAYER_MODES.includes("territory_battle"));
+  assert.deepEqual(modeForOnline("history_battle")?.solo, { kind: "trial", trial: "history-battle" });
+  assert.equal(modeForOnline("history_battle")?.hotseat, "turns");
+  assert.ok(isRaceMode("history_battle"));
+  assert.equal(maxPlayersFor("history_battle"), 4);
   assert.equal(maxPlayersFor("stat_ranking"), 4);
 });
 
@@ -76,10 +81,6 @@ test("solo Closest Wins rewards distance smoothly, and solo/hotseat rounds come 
   const closest = generateMatchQuestions({ ...base, count: 10, mode: "closest_wins" });
   assert.equal(closest.length, 10);
   assert.ok(closest.every((question) => question.interaction === "closest_click" && question.targetCoordinates));
-  const territory = generateMatchQuestions({ ...base, count: 20, mode: "territory_battle" });
-  assert.equal(territory.length, 20);
-  // The second half revisits the first half's countries, so they can be stolen.
-  assert.deepEqual(new Set(territory.slice(10).map((question) => question.entityId)), new Set(territory.slice(0, 10).map((question) => question.entityId)));
 });
 
 test("capital pin rounds have a city target and zero distance within its radius", () => {

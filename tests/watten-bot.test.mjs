@@ -2,8 +2,12 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { chooseBotCard, getLegalBotMoves } from "../src/games/watten/bot.ts";
 import { advanceSingleWatten, createSingleWattenRound, cutSingleWatten, declareSingleWatten, playSingleWattenCard, raiseSingleWatten, respondSingleWattenBid, teamOf } from "../src/games/watten/singleplayer.ts";
-import { canPlayWattenCard, createDeck, getWattenCardRole } from "../src/utils/watten.ts";
+import { canPlayWattenCard, createDeck, getPreviousPlayer, getWattenCardRole } from "../src/utils/watten.ts";
 import { getWattenHelpComparison } from "../src/games/watten/help.ts";
+function dealtRound(count, dealer = count - 1, scores, round = 1, targetScore = 15) {
+  const state = createSingleWattenRound(count, dealer, scores, round, targetScore);
+  return cutSingleWatten(state, 16, getPreviousPlayer(dealer, count));
+}
 const card = (suit, rank) => ({ id: `${suit}-${rank}`, suit, rank });
 function knowledge(trick, count = 3) { return { seat: 1, playerCount: count, trick, playedCardIds: new Set(trick.map(item => item.card.id)), tricksWon: { "0": 0, "1": 0, "2": 0, "3": 0 }, trump: "Herz", schlag: "Ober", teamOf: id => teamOf(id, count, 0) }; }
 
@@ -27,7 +31,7 @@ test("bot filters cards under the existing Trumpf oder Kritisch rule", () => {
 
 test("three and four player rounds finish with legal moves", () => {
   for (const count of [3, 4]) {
-    let game = createSingleWattenRound(count);
+    let game = dealtRound(count);
     game = declareSingleWatten(game, "Herz", "Ober");
     let moves = 0;
     while (game.phase !== "roundOver" && game.phase !== "matchOver") {
@@ -42,26 +46,49 @@ test("three and four player rounds finish with legal moves", () => {
   }
 });
 
-test("singleplayer cut awards consecutive critical cards and deals five unique cards", () => {
+test("singleplayer shows every cutting turn and deals five unique cards after cutting", () => {
   for (const count of [3, 4]) {
-    const start = createSingleWattenRound(count, 1);
-    assert.equal(start.phase, "cut");
-    const deck = createDeck();
-    const critical = ["Herz-König", "Schellen-7"];
-    const ordered = [...deck.filter(item => !critical.includes(item.id)).slice(0, 3),
-      ...critical.map(id => deck.find(item => item.id === id)),
-      ...deck.filter(item => !critical.includes(item.id)).slice(3)];
-    const game = cutSingleWatten({ ...start, deck: ordered }, 5);
-    assert.deepEqual(game.cutCards.map(item => item.id), critical.toReversed());
-    assert.ok(game.hands.every(hand => hand.length === 5));
-    assert.equal(new Set(game.hands.flat().map(item => item.id)).size, count * 5);
-    assert.equal(game.hands[0].some(item => item.id === "Schellen-7"), true);
-    assert.equal(game.hands[1].some(item => item.id === "Herz-König"), true);
+    for (let dealer = 0; dealer < count; dealer++) {
+      const state = createSingleWattenRound(count, dealer);
+      assert.equal(state.phase, "cut");
+      assert.ok(state.hands.every(hand => hand.length === 0));
+      const cutter = getPreviousPlayer(dealer, count);
+      assert.throws(() => cutSingleWatten(state, 16, (cutter + 1) % count));
+      const game = cutSingleWatten(state, 16, cutter);
+      assert.ok(game.hands.every(hand => hand.length === 5));
+      assert.equal(new Set(game.hands.flat().map(item => item.id)).size, count * 5);
+    }
   }
 });
 
+test("singleplayer cutting awards consecutive critical cards to cutter and dealer", () => {
+  for (const count of [3, 4]) {
+    const state = createSingleWattenRound(count, 1), deck = createDeck();
+    const critical = ["Herz-König", "Schellen-7"];
+    const rest = deck.filter(card => !critical.includes(card.id));
+    const ordered = [...rest.slice(0, 3), ...critical.map(id => deck.find(card => card.id === id)), ...rest.slice(3)];
+    const game = cutSingleWatten({ ...state, deck: ordered }, 5);
+    assert.deepEqual(game.cutCards.map(card => card.id), critical.toReversed());
+    assert.ok(game.hands[0].some(card => card.id === "Schellen-7"));
+    assert.ok(game.hands[1].some(card => card.id === "Herz-König"));
+  }
+});
+
+test("custom target persists across rounds and determines bids and match completion", () => {
+  const game = declareSingleWatten(dealtRound(3, 2, [8, 0, 0], 1, 11), "Herz", "Ober");
+  const raised = raiseSingleWatten(game, 0);
+  const roundOver = respondSingleWattenBid(raised, 1, false);
+  assert.equal(roundOver.phase, "roundOver");
+  const next = advanceSingleWatten(roundOver);
+  assert.equal(next.targetScore, 11);
+  assert.deepEqual(next.scores, [10, 0, 0]);
+  assert.throws(() => raiseSingleWatten({ ...game, scores: [9, 0, 0] }, 0));
+  const winning = respondSingleWattenBid({ ...raised, scores: [10, 0, 0] }, 1, false);
+  assert.equal(winning.phase, "matchOver");
+});
+
 test("declining a raise awards the previously accepted value only once", () => {
-  let game = declareSingleWatten(createSingleWattenRound(3), "Herz", "Ober");
+  let game = declareSingleWatten(dealtRound(3), "Herz", "Ober");
   game = raiseSingleWatten(game, 0);
   assert.equal(game.pendingBid.value, 3);
   game = respondSingleWattenBid(game, 1, false);
@@ -84,7 +111,7 @@ test("help compares only legal cards on the current public trick", () => {
 });
 
 test("a bid cannot be answered outside play or by an absent seat", () => {
-  let game = declareSingleWatten(createSingleWattenRound(3), "Herz", "Ober");
+  let game = declareSingleWatten(dealtRound(3), "Herz", "Ober");
   game = raiseSingleWatten(game, 0);
   assert.throws(() => respondSingleWattenBid(game, 3, true));
   assert.throws(() => respondSingleWattenBid({ ...game, phase: "roundOver" }, 1, true));
@@ -92,7 +119,7 @@ test("a bid cannot be answered outside play or by an absent seat", () => {
 });
 
 test("singleplayer rejects an illegal forced response without changing the trick", () => {
-  const game = { ...declareSingleWatten(createSingleWattenRound(3), "Herz", "Ober"), turn: 0,
+  const game = { ...declareSingleWatten(dealtRound(3), "Herz", "Ober"), turn: 0,
     hands: [[card("Gras", "Ass"), card("Herz", "9")], [], []],
     trick: [{ playerId: "1", card: card("Herz", "Ober") }] };
   assert.throws(() => playSingleWattenCard(game, "Gras-Ass"), /Illegal card/);
@@ -104,7 +131,7 @@ test("singleplayer finishes at the target score and a fresh game resets scoring"
   const deck = createDeck();
   const winningIds = ["Herz-König", "Schellen-7", "Eichel-7", "Gras-8", "Gras-9"];
   const rest = deck.filter(item => !winningIds.includes(item.id));
-  let game = { ...declareSingleWatten(createSingleWattenRound(3), "Herz", "Ober"),
+  let game = { ...declareSingleWatten(dealtRound(3), "Herz", "Ober"),
     hands: [winningIds.map(id => deck.find(item => item.id === id)), rest.slice(0, 5), rest.slice(5, 10)],
     scores: [14, 0, 0], turn: 0 };
   while (game.phase !== "matchOver") {

@@ -2,8 +2,10 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useAppLanguage } from "@/i18n/languageStore";
+import { supabase } from "@/lib/supabase";
+import { hasRecoveryError, passwordResetUrl, passwordResetValidation } from "@/lib/passwordRecovery";
 
-type LoginMode = "login" | "register";
+type LoginMode = "login" | "register" | "forgot" | "reset";
 type Language = "de" | "en";
 
 const translations = {
@@ -50,6 +52,22 @@ const translations = {
     confirmation: "Prüfe deine E-Mails und bestätige dein Konto über den Bestätigungslink.",
     spam: "Keine E-Mail erhalten? Schau bitte auch in deinem Spam- oder Junk-Ordner nach.",
     created: "Dein Konto wurde erstellt. Du kannst jetzt spielen.",
+    forgot: "Passwort vergessen?",
+    forgotTitle: "Passwort zurücksetzen",
+    forgotIntro: "Gib deine E-Mail-Adresse ein, um einen Link zum Zurücksetzen anzufordern.",
+    sendReset: "Link zum Zurücksetzen senden",
+    resetSent: "Wenn für diese E-Mail-Adresse ein Konto besteht, erhältst du einen Link zum Zurücksetzen deines Passworts.",
+    enterEmail: "Bitte gib deine E-Mail-Adresse ein.",
+    resetTitle: "Neues Passwort wählen",
+    resetIntro: "Wähle ein neues Passwort mit mindestens 8 Zeichen und bestätige es.",
+    newPassword: "Neues Passwort",
+    savePassword: "Passwort speichern",
+    passwordShort: "Das Passwort muss mindestens 8 Zeichen lang sein.",
+    resetInvalid: "Dieser Link ist ungültig oder abgelaufen. Fordere einen neuen Link zum Zurücksetzen an.",
+    resetChecking: "Link wird geprüft…",
+    passwordUpdated: "Dein Passwort wurde aktualisiert. Du kannst dich jetzt mit dem neuen Passwort anmelden.",
+    backLogin: "Zurück zur Anmeldung",
+    requestAgain: "Neuen Link anfordern",
   },
   en: {
     backHome: "← Back to home",
@@ -93,14 +111,30 @@ const translations = {
     confirmation: "Check your email and confirm your account using the confirmation link.",
     spam: "No email yet? Please also check your spam or junk folder.",
     created: "Your account has been created. You can now play.",
+    forgot: "Forgot password?",
+    forgotTitle: "Reset your password",
+    forgotIntro: "Enter your email address to request a password reset link.",
+    sendReset: "Send reset link",
+    resetSent: "If an account exists for this email address, you will receive a link to reset your password.",
+    enterEmail: "Please enter your email address.",
+    resetTitle: "Choose a new password",
+    resetIntro: "Choose a new password with at least 8 characters and confirm it.",
+    newPassword: "New password",
+    savePassword: "Save password",
+    passwordShort: "Your password must have at least 8 characters.",
+    resetInvalid: "This reset link is invalid or has expired. Request a new password reset link.",
+    resetChecking: "Checking your reset link…",
+    passwordUpdated: "Your password has been updated. You can now sign in with your new password.",
+    backLogin: "Back to login",
+    requestAgain: "Request a new link",
   },
 } as const;
 
-export default function LoginPage() {
+export default function LoginPage({ resetPassword = false }: { resetPassword?: boolean }) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { signIn, signUp } = useAuth();
-  const [mode, setMode] = useState<LoginMode>(() => searchParams.get("mode") === "register" ? "register" : "login");
+  const { signIn, signUp, user, loading, finishPasswordRecovery } = useAuth();
+  const [mode, setMode] = useState<LoginMode>(() => resetPassword ? "reset" : searchParams.get("mode") === "register" ? "register" : searchParams.get("mode") === "forgot" ? "forgot" : "login");
   const { language: appLanguage, setLanguage } = useAppLanguage();
   const language: Language = appLanguage === "de" || appLanguage === "bar" ? "de" : "en";
   const [email, setEmail] = useState("");
@@ -109,8 +143,20 @@ export default function LoginPage() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [registrationStatus, setRegistrationStatus] = useState<"confirmation" | "created" | null>(null);
+  const [recoveryStatus, setRecoveryStatus] = useState<"sent" | "updated" | null>(null);
+  const [recoveryLinkError] = useState(() => typeof window !== "undefined" && hasRecoveryError(window.location.search, window.location.hash));
 
   const t = translations[language];
+  const resetUnavailable = mode === "reset" && (recoveryLinkError || (!loading && !user));
+
+  function changeMode(next: LoginMode) {
+    setMode(next);
+    setPassword("");
+    setConfirmPassword("");
+    setMessage(null);
+    setRegistrationStatus(null);
+    setRecoveryStatus(null);
+  }
 
   function changeLanguage(nextLanguage: Language) {
     setLanguage(nextLanguage);
@@ -122,6 +168,40 @@ export default function LoginPage() {
     event.preventDefault();
     setMessage(null);
     setRegistrationStatus(null);
+
+    if (mode === "forgot") {
+      if (!email.trim()) { setMessage(t.enterEmail); return; }
+      setBusy(true);
+      setRecoveryStatus(null);
+      try {
+        const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+          redirectTo: passwordResetUrl(window.location.origin),
+        });
+        if (error) throw error;
+        setRecoveryStatus("sent");
+      } catch (error) {
+        setMessage(error instanceof Error ? error.message : t.genericError);
+      } finally { setBusy(false); }
+      return;
+    }
+
+    if (mode === "reset") {
+      if (loading || resetUnavailable || recoveryStatus === "updated") return;
+      const validation = passwordResetValidation(password, confirmPassword);
+      if (validation) { setMessage(validation === "short" ? t.passwordShort : t.mismatch); return; }
+      setBusy(true);
+      try {
+        const { error } = await supabase.auth.updateUser({ password });
+        if (error) throw error;
+        finishPasswordRecovery();
+        setPassword("");
+        setConfirmPassword("");
+        setRecoveryStatus("updated");
+      } catch (error) {
+        setMessage(error instanceof Error ? error.message : t.genericError);
+      } finally { setBusy(false); }
+      return;
+    }
 
     if (!email.trim() || !password) {
       setMessage(t.pleaseEnter);
@@ -269,21 +349,18 @@ export default function LoginPage() {
               </p>
 
               <h2 className="mt-2 text-3xl font-black text-white">
-                {mode === "login" ? t.welcome : t.createAccount}
+                {mode === "login" ? t.welcome : mode === "register" ? t.createAccount : mode === "forgot" ? t.forgotTitle : t.resetTitle}
               </h2>
 
               <p className="mt-2 text-sm leading-6 text-zinc-500">
-                {mode === "login" ? t.loginIntro : t.registerIntro}
+                {mode === "login" ? t.loginIntro : mode === "register" ? t.registerIntro : mode === "forgot" ? t.forgotIntro : t.resetIntro}
               </p>
 
-              <div className="mt-7 grid grid-cols-2 rounded-xl border border-white/10 bg-black/20 p-1">
+              {(mode === "login" || mode === "register") && <div className="mt-7 grid grid-cols-2 rounded-xl border border-white/10 bg-black/20 p-1">
                 <button
                   type="button"
-                  onClick={() => {
-                    setMode("login");
-                    setMessage(null);
-                    setRegistrationStatus(null);
-                  }}
+                  disabled={busy}
+                  onClick={() => changeMode("login")}
                   className={`rounded-lg px-4 py-2.5 text-xs font-black transition ${
                     mode === "login"
                       ? "bg-emerald-300 text-zinc-950"
@@ -295,11 +372,8 @@ export default function LoginPage() {
 
                 <button
                   type="button"
-                  onClick={() => {
-                    setMode("register");
-                    setMessage(null);
-                    setRegistrationStatus(null);
-                  }}
+                  disabled={busy}
+                  onClick={() => changeMode("register")}
                   className={`rounded-lg px-4 py-2.5 text-xs font-black transition ${
                     mode === "register"
                       ? "bg-emerald-300 text-zinc-950"
@@ -308,29 +382,36 @@ export default function LoginPage() {
                 >
                   {t.register}
                 </button>
-              </div>
+              </div>}
 
-              <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-                <label className="block">
+              {mode === "reset" && loading && <p role="status" className="mt-6 text-sm text-zinc-400">{t.resetChecking}</p>}
+              {resetUnavailable && <div role="alert" className="mt-6 rounded-xl border border-amber-400/20 bg-amber-400/[0.06] px-4 py-3 text-sm text-amber-200">{t.resetInvalid}</div>}
+              {mode === "reset" && recoveryStatus === "updated" && <p role="status" className="mt-6 rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06] px-4 py-3 text-sm text-emerald-200">{t.passwordUpdated}</p>}
+
+              {!resetUnavailable && recoveryStatus !== "updated" && <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+                {mode !== "reset" && <label className="block">
                   <span className="text-xs font-bold text-zinc-400">
                     {t.email}
                   </span>
                   <input
                     type="email"
+                    required
                     autoComplete="email"
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
                     className="mt-2 w-full rounded-xl border border-white/10 bg-zinc-950/80 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-700 focus:border-emerald-300/50 focus:ring-2 focus:ring-emerald-300/10"
                     placeholder="you@example.com"
                   />
-                </label>
+                </label>}
 
-                <label className="block">
+                {mode !== "forgot" && <label className="block">
                   <span className="text-xs font-bold text-zinc-400">
-                    {t.password}
+                    {mode === "reset" ? t.newPassword : t.password}
                   </span>
                   <input
                     type="password"
+                    required
+                    minLength={mode === "reset" ? 8 : undefined}
                     autoComplete={
                       mode === "login" ? "current-password" : "new-password"
                     }
@@ -339,15 +420,16 @@ export default function LoginPage() {
                     className="mt-2 w-full rounded-xl border border-white/10 bg-zinc-950/80 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-700 focus:border-emerald-300/50 focus:ring-2 focus:ring-emerald-300/10"
                     placeholder="••••••••"
                   />
-                </label>
+                </label>}
 
-                {mode === "register" && (
+                {(mode === "register" || mode === "reset") && (
                   <label className="block">
                     <span className="text-xs font-bold text-zinc-400">
                       {t.confirmPassword}
                     </span>
                     <input
                       type="password"
+                      required
                       autoComplete="new-password"
                       value={confirmPassword}
                       onChange={(event) =>
@@ -370,15 +452,20 @@ export default function LoginPage() {
                     {registrationStatus === "confirmation" && <p className="mt-2 font-semibold">{t.spam}</p>}
                   </div>
                 )}
+                {recoveryStatus === "sent" && <div role="status" className="rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06] px-4 py-3 text-xs leading-5 text-emerald-200"><p>{t.resetSent}</p><p className="mt-2 font-semibold">{t.spam}</p></div>}
 
                 <button
                   type="submit"
-                  disabled={busy}
+                  disabled={busy || (mode === "reset" && loading)}
                   className="w-full rounded-xl bg-emerald-300 px-5 py-3.5 text-sm font-black text-zinc-950 transition hover:bg-emerald-200 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {busy ? t.wait : mode === "login" ? t.signIn : t.create}
+                  {busy ? t.wait : mode === "login" ? t.signIn : mode === "register" ? t.create : mode === "forgot" ? t.sendReset : t.savePassword}
                 </button>
-              </form>
+              </form>}
+
+              {mode === "login" && <button type="button" disabled={busy} onClick={() => changeMode("forgot")} className="mt-4 text-sm font-bold text-emerald-300 underline-offset-4 hover:underline">{t.forgot}</button>}
+              {mode === "forgot" && <button type="button" disabled={busy} onClick={() => changeMode("login")} className="mt-4 text-sm font-bold text-emerald-300 underline-offset-4 hover:underline">{t.backLogin}</button>}
+              {mode === "reset" && <Link to={recoveryStatus === "updated" ? "/login" : "/login?mode=forgot"} onClick={finishPasswordRecovery} className="mt-4 inline-block text-sm font-bold text-emerald-300 underline-offset-4 hover:underline">{recoveryStatus === "updated" ? t.backLogin : t.requestAgain}</Link>}
 
               <p className="mt-6 text-center text-[11px] leading-5 text-zinc-600">
                 {t.terms}

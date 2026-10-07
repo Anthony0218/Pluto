@@ -99,7 +99,7 @@ function ToastStack({ userId }: { userId: string }) {
           <div className="incoming-toast-copy">
             <p className="incoming-toast-eyebrow"><Shield size={12} aria-hidden="true" />{ui("Clan game invite")}{item.clanName ? ` · ${item.clanName}` : ""}</p>
             <p className="incoming-toast-title"><strong>{item.senderName || ui("A clan member")}</strong> {ui("shared a lobby")}</p>
-            <p className="incoming-toast-detail">{ui(item.game === "go" ? "Go" : "Classic Chess")} · <span className="font-mono tracking-widest">{item.gameCode}</span></p>
+            <p className="incoming-toast-detail">{ui(getInviteGameLabel({ game: item.game, gameRoute: item.gameRoute }))} · <span className="font-mono tracking-widest">{item.gameCode}</span></p>
             <div className="incoming-toast-actions">
               <button type="button" className="is-accept" onClick={() => open(item)}><Check size={15} aria-hidden="true" />{ui("Join")}</button>
               <button type="button" onClick={() => decline(item)}><X size={15} aria-hidden="true" />{ui("Decline")}</button>

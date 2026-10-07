@@ -3,12 +3,11 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {atlasEndpoint} from './helpers/atlas-endpoint.mjs';
 import {raceQuestions} from '../src/games/atlas/serverRace.ts';
-import {territoryKnowledge} from '../src/games/atlas/territoryStrategy.ts';
 import {generateMatchQuestions} from '../src/games/atlas/matchQuestions.ts';
 const read=async p=>JSON.parse(await readFile(new URL(p,import.meta.url),'utf8'));
-const data={countries:await read('../data/geography/countries.json'),extras:await read('../data/geography/extras.json'),topology:await read('../public/data/geography/world-110m.json'),version:await read('../data/geography/version.json')};
+const data={countries:await read('../data/geography/countries.json'),extras:await read('../data/geography/extras.json'),history:await read('../data/geography/history.json'),topology:await read('../public/data/geography/world-110m.json'),version:await read('../data/geography/version.json')};
 const version=data.version.atlasDataVersion;
-test('real handler validates participants, answer generations, retries, race resume, strategy and BO3 lifecycle',async()=>{
+test('real handler validates participants, answer generations, retries, race resume, history and BO3 lifecycle',async()=>{
  const e=await atlasEndpoint();
  try {
   const invoke=async(user,body,expected=200)=>{const r=await e.call(user,{...body,datasetVersion:version});assert.equal(r.status,expected,JSON.stringify(r.body));return r.body;};
@@ -24,8 +23,15 @@ test('real handler validates participants, answer generations, retries, race res
   room=await invoke('a',{op:'race',action:'next',code,questionId:id});await invoke('a',{op:'race',action:'answer',code,questionId:id,answer:q.answer},400);assert.equal(room.run.index,1);
   e.advance(90001);room=await invoke('a',{op:'get',code});assert.equal(room.status,'finished');assert.equal(room.race.a.done,true);
   room=await start('guess_country');code=room.code;const first=room.question.id;assert.equal(room.question.clues.length,1);e.advance(25001);room=await invoke('a',{op:'get',code});assert.equal(room.tipIndex,1);assert.equal(Date.parse(room.roundStartedAt),e.now());await invoke('a',{op:'submit',code,questionId:first,answer:'country:FRA'},400);
-  room=await start('territory_battle');code=room.code;row=e.matches.at(-1);for(const user of ['a','b']){const seat=user==='a'?'player_a':'player_b';const v=await invoke(user,{op:'get',code});const target=v.strategy.legal.find(id=>id!==v.strategy.homes[seat])??v.strategy.homes[seat];const planned=await invoke(user,{op:'strategy',action:'plan',code,target,cycle:0});const q=territoryKnowledge(row.state.strategy,seat,data.countries,'expert');assert.ok(planned.strategy.question);await invoke(user,{op:'strategy',action:'answer',code,cycle:0,questionId:planned.strategy.question.id,answer:q.answer});}
-  assert.equal(row.status,'round_resolving');assert.equal(row.state.strategy.cycle,1);assert.equal(row.state.attempts.length,2);
+  // History Battle is a server-graded race: no answer, record or seed on the wire until the answer is in.
+  room=await start('history_battle');code=room.code;row=e.matches.at(-1);const history=raceQuestions(data,'history_battle',row.seed,'expert');
+  assert.equal(room.run.count,12);assert.equal(room.run.question.prompt,history[0].prompt);assert.equal(room.run.question.choices.length,4);
+  assert.ok(!/explanation|answer|\d{1,2} [A-Z][a-z]+ \d{4}/.test(JSON.stringify(room.run.question)));
+  await invoke('a',{op:'race',action:'answer',code,questionId:room.run.question.id,answer:'country:XXX'},400);
+  const wrong=history[0].choices.find(choice=>choice.id!==history[0].answer).id;
+  room=await invoke('b',{op:'race',action:'answer',code,questionId:room.run.question.id,answer:wrong});assert.equal(room.run.feedback.correct,false);assert.equal(room.run.score,0);
+  room=await invoke('a',{op:'race',action:'answer',code,questionId:room.run.question.id,answer:history[0].answer});
+  assert.equal(room.run.feedback.correct,true);assert.equal(room.run.score,1000);assert.match(room.run.feedback.explanation,/The World Factbook$/);assert.equal(room.scores.a,1000);assert.equal(room.scores.b,0);
   room=await start('stat_battle');row=e.matches.at(-1);row.match_kind='ranked';row.state.ranked={bans:{a:[],b:[]},order:['stat_battle','map_battle','language_guesser'],gameIndex:0,wins:{a:0,b:0},results:[]};
   // Restarting a ranked duel from countdown retains the ranked-series object.
   row.status='countdown';row.round_started_at=new Date(e.now()).toISOString();room=await invoke('a',{op:'get',code:row.room_code});assert.ok(row.state.ranked);assert.ok(room.battle);assert.equal(room.seed,undefined);

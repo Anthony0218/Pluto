@@ -10,7 +10,8 @@ export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const [isRegistering, setIsRegistering] = useState(false);
+  // /login?register opens on the Register tab, for links that say "create an account".
+  const [isRegistering, setIsRegistering] = useState(() => new URLSearchParams(window.location.search).has("register"));
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -214,6 +215,7 @@ export default function Auth() {
                   {busy ? ui("Please wait...") : isRegistering ? ui("Create Account") : ui("Login")}
                 </button>
               </form>
+              {!isRegistering && <Link to="/login?mode=forgot" className="mt-4 inline-block text-sm font-bold text-emerald-300 hover:underline">{ui("Forgot password?")}</Link>}
 
               <button
                 type="button"

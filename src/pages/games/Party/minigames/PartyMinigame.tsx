@@ -14,7 +14,7 @@ import { useServerClock } from "./useServerClock.ts";
 import { minigameViews } from "./views.ts";
 
 // Wide realtime courts that play better with the phone turned sideways (tip only, never enforced).
-const LANDSCAPE_GAMES = new Set(["paddle-panic"]);
+const LANDSCAPE_GAMES = new Set(["paddle-panic", "pickup-arena"]);
 // Replaces the board screen during MINIGAME_INTRO → MINIGAME → MINIGAME_RESULTS and during a Duel Saber
 // duel (DUEL_INTRO → DUEL_MINIGAME → DUEL_RESULTS). The board HUD, inventory, property and roll controls
 // are not mounted here at all.

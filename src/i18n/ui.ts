@@ -1,3 +1,7 @@
+import finalTools from './finalToolsTranslations.json';
+import lifeTools from './lifeToolsTranslations.json';
+import footballReference from './footballReferenceTranslations.json';
+import musicFootball from './musicFootballTranslations.json';
 import existing from "./existingTranslations.json";
 import extra from "./uiTranslations.json";
 import dashboard from "./dashboardTranslations.json";
@@ -7,6 +11,12 @@ import chessCustom from "./chessCustomTranslations.json";
 import janmann from "./janmannTranslations.json";
 import social from "./socialTranslations.json";
 import information from "./informationTranslations.json";
+import learningTools from "./learningToolsTranslations.json";
+import learnContent from "./learnContentTranslations.json";
+import advancedMath from "./advancedMathTranslations.json";
+import deeperMath from "./deeperMathTranslations.json";
+import milestoneTools from "./milestoneToolsTranslations.json";
+import notesTool from "./notesToolTranslations.json";
 import { getAppLanguage, useAppLanguage, type AppLanguage } from "./languageStore";
 
 export const useUiLanguage = useAppLanguage;
@@ -14,8 +24,11 @@ type Table = Record<string, Record<string, string>>;
 const aliases: Record<string, string> = { Schach: "Chess", "Schach 3D": "3D Chess", "All Variants": "All variants", "Room Code": "Room code", "ROOM CODE": "Room code", "Create room": "Create Room", "Join room": "Join Room", "Back to Lobby": "Back to lobby", "Back to live board": "Back to Live Board", "Your Progress": "Your progress", "Chat →": "Chat", "Log in →": "Log in" };
 const normalized = (key: string) => key.replace(/\s+/g, " ").trim();
 const lookup: Table = {};
-for (const language of ["de", "bar", "ko", "ru", "es", "pt"]) {
+const learningLanguages = ["de", "bar", "ko", "ru", "es", "pt"];
+for (const [index, language] of learningLanguages.entries()) {
   lookup[language] = Object.fromEntries(Object.entries((existing as Table)[language] ?? {}).map(([key, value]) => [normalized(key), value]));
+  // The Notes tool's words go in first: any wording the app already had for the same text wins.
+  Object.assign(lookup[language], Object.fromEntries(notesTool.map(row => [normalized(row[0]), row[index + 1]])), lookup[language]);
   Object.assign(lookup[language], (extra as Table)[language]);
   Object.assign(lookup[language], (dashboard as Table)[language]);
   Object.assign(lookup[language], (esPt as Table)[language]);
@@ -24,6 +37,15 @@ for (const language of ["de", "bar", "ko", "ru", "es", "pt"]) {
   Object.assign(lookup[language], (janmann as Table)[language]);
   Object.assign(lookup[language], (social as Table)[language]);
   Object.assign(lookup[language], (information as Table)[language]);
+  Object.assign(lookup[language], (learningTools as Table)[language]);
+  Object.assign(lookup[language], Object.fromEntries(learnContent.map(row => [normalized(row[0]), row[index + 1]])));
+  Object.assign(lookup[language], Object.fromEntries(advancedMath.map(row => [normalized(row[0]), row[index + 1]])));
+  Object.assign(lookup[language], Object.fromEntries(deeperMath.map(row => [normalized(row[0]), row[index + 1]])));
+  Object.assign(lookup[language], Object.fromEntries(footballReference.map(row => [normalized(row[0]), row[index + 1]])));
+  Object.assign(lookup[language], Object.fromEntries(musicFootball.map(row => [normalized(row[0]), row[index + 1]])));
+  Object.assign(lookup[language], Object.fromEntries(lifeTools.map(row => [normalized(row[0]), row[index + 1]])));
+  Object.assign(lookup[language], Object.fromEntries(finalTools.map(row => [normalized(row[0]), row[index + 1]])));
+  Object.assign(lookup[language], Object.fromEntries(milestoneTools.map(row => [normalized(row[0]), row[index + 1]])));
 }
 
 export function translateUi(language: AppLanguage, input: string): string {

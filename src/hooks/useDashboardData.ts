@@ -4,6 +4,7 @@ import { supabase } from "../lib/supabase";
 import type { Friend } from "../types/social";
 import type { DailyChallenge } from "../data/dashboard";
 import { ONLINE_WINDOW_MS, type FriendPresence } from "../components/social/activity";
+import { clanInviteRoute, getInviteGameLabel } from "../components/social/inviteRoute";
 
 export type DashboardActivity = {
   streak: number;
@@ -37,7 +38,7 @@ export type Clan = { id: string; name: string; avatar_id: string };
 type ClanRows = {
   clans: Clan[];
   messages: { id: string; group_id: string; sender_id: string; body: string; created_at: string }[];
-  invites: { id: string; group_id: string; sender_id: string; game: string; room_code: string; created_at: string }[];
+  invites: { id: string; group_id: string; sender_id: string; game: string; game_route?: string | null; room_code: string; created_at: string }[];
 };
 type SpectateRow = { id: string; requester_id: string; target_id: string; game: string; mode: string | null; status: string; created_at: string; responded_at: string | null };
 type PresenceRow = { user_id: string; last_seen_at: string; activity_game?: string | null; activity_mode?: string | null; spectatable?: boolean | null };
@@ -53,7 +54,8 @@ async function loadClanRows(userId: string): Promise<ClanRows> {
   const [clans, messages, invites] = await Promise.all([
     supabase.from("community_groups").select("id,name,avatar_id").in("id", ids).order("name"),
     supabase.from("community_group_messages").select("id,group_id,sender_id,body,created_at").in("group_id", ids).neq("sender_id", userId).gt("created_at", since).order("created_at", { ascending: false }).limit(50),
-    supabase.from("community_game_invites").select("id,group_id,sender_id,game,room_code,created_at").in("group_id", ids).neq("sender_id", userId).gt("created_at", since).order("created_at", { ascending: false }).limit(20),
+    // All columns: `game_route` only exists once the "share any game" migration is applied, and naming it earlier would fail the request.
+    supabase.from("community_game_invites").select("*").in("group_id", ids).neq("sender_id", userId).gt("created_at", since).order("created_at", { ascending: false }).limit(20),
   ]);
   return {
     clans: (clans.data ?? []) as Clan[],
@@ -177,9 +179,9 @@ export function useDashboardDataSource() {
           })),
           ...clanRows.invites.map((row) => ({
             id: `clan-invite-${row.id}`, kind: "clan_invite" as const, title: "Clan game invite",
-            detail: `${nameOf(row.sender_id) ?? "A clan member"} shared a ${row.game === "go" ? "Go" : "Chess"} lobby`,
+            detail: `${nameOf(row.sender_id) ?? "A clan member"} shared a ${getInviteGameLabel({ game: row.game, gameRoute: clanInviteRoute(row.game, row.game_route) })} lobby`,
             createdAt: row.created_at, gameCode: row.room_code, game: row.game,
-            gameRoute: row.game === "chess" ? "/games/chess/classic/multiplayer" : `/games/${row.game}/multiplayer`,
+            gameRoute: clanInviteRoute(row.game, row.game_route),
             senderId: row.sender_id, senderName: nameOf(row.sender_id),
             clanId: row.group_id, clanName: clanById.get(row.group_id)?.name,
           })),

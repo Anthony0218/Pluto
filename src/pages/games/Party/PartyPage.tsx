@@ -70,7 +70,7 @@ function PartyApp() {
   const reduced = prefersReducedMotion();
   return (
     <main
-      className="pp-page"
+      className={"pp-page" + (lobby?.match ? " pp-immersive" : "")}
       data-motion={reduced ? "reduce" : "full"}
       data-hints={prefs.controlHints ? "on" : "off"}
     >

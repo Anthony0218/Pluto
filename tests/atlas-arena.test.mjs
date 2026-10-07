@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { entitiesForDifficulty, entitiesForScope, generateHigherLowerQuestions, generateQuestions, statValue, validateAnswer } from "../src/games/atlas/engine.ts";
-import { applyTerritoryRound, createAuthoritativeSubmission, verifyMatchDataset } from "../src/games/atlas/multiplayer.ts";
+import { createAuthoritativeSubmission, verifyMatchDataset } from "../src/games/atlas/multiplayer.ts";
 import { applyMapFillSelection, createMapFillState, haversineKm } from "../src/games/atlas/rules.ts";
 
 const countries = JSON.parse(await readFile(new URL("../data/geography/countries.json", import.meta.url), "utf8"));
@@ -89,16 +89,6 @@ test("multiplayer submission ignores client score and same seed yields same roun
   const first = generateQuestions({ ...base, interaction: "map_click" });
   const second = generateQuestions({ ...base, interaction: "map_click" });
   assert.deepEqual(first.map((item) => item.id), second.map((item) => item.id));
-});
-
-test("Territory Battle ownership can capture, steal, or preserve", () => {
-  let state = { ownership: {}, scores: { player_a: 0, player_b: 0 } };
-  state = applyTerritoryRound(state, "country:FRA", "a", ["a", "b"], true);
-  assert.equal(state.ownership["country:FRA"], "player_a");
-  state = applyTerritoryRound(state, "country:FRA", "b", ["a", "b"], false);
-  assert.equal(state.ownership["country:FRA"], "player_a");
-  state = applyTerritoryRound(state, "country:FRA", "b", ["a", "b"], true);
-  assert.equal(state.ownership["country:FRA"], "player_b");
 });
 
 test("dataset version mismatch is rejected", () => {

@@ -1,12 +1,14 @@
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
+import InviteSidePanel from "./InviteSidePanel";
 import SideBar from "./SideBar";
 
 export default function NavigationDrawer({ onClose }: { onClose: () => void }) {
   useUiLanguage();
   const dialog = useRef<HTMLDialogElement>(null);
   const [closing, setClosing] = useState(false);
+  const [invitePanel, setInvitePanel] = useState<"friend" | "clan" | null>(null);
   function close() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) onClose();
     else setClosing(true);
@@ -31,13 +33,14 @@ export default function NavigationDrawer({ onClose }: { onClose: () => void }) {
       ref={dialog}
       id="app-navigation"
       aria-label={ui("Pluto navigation")}
-      onCancel={event => { event.preventDefault(); close(); }}
+      onCancel={event => { event.preventDefault(); if (invitePanel) setInvitePanel(null); else close(); }}
+      data-invite={invitePanel ?? undefined}
       data-closing={closing || undefined}
       onAnimationEnd={event => { if (event.target === event.currentTarget && closing) onClose(); }}
       onClick={(event) => {
         if (event.target === event.currentTarget) close();
       }}
-      className="fixed inset-y-0 left-0 right-auto m-0 h-dvh max-h-none w-80 max-w-[90vw] border-r border-white/10 bg-transparent p-0 text-white shadow-2xl backdrop:bg-black/55 backdrop:backdrop-blur-md"
+      className="fixed inset-y-0 left-0 right-auto m-0 h-dvh max-h-none w-80 max-w-[90vw] overflow-visible border-r border-white/10 bg-transparent p-0 text-white shadow-2xl backdrop:bg-black/55 backdrop:backdrop-blur-md"
     >
       <div className="relative h-full">
         <button
@@ -49,7 +52,8 @@ export default function NavigationDrawer({ onClose }: { onClose: () => void }) {
         >
           <X size={20} />
         </button>
-        <SideBar onNavigate={close} />
+        <SideBar onNavigate={close} onInvite={kind => setInvitePanel(open => open === kind ? null : kind)} invitePanel={invitePanel} />
+        {invitePanel && <InviteSidePanel key={invitePanel} kind={invitePanel} onBack={() => setInvitePanel(null)} onNavigate={close} />}
       </div>
     </dialog>
   );

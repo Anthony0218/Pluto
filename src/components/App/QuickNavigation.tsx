@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BookOpen, Gamepad2, Pencil, Puzzle } from "lucide-react";
+import { BookOpen, Gamepad2, Grid2X2, Pencil, Puzzle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ui, useUiLanguage } from "@/i18n/ui";
 
@@ -7,6 +7,8 @@ const shortcuts = {
   games: { label: "Games", route: "/games", Icon: Gamepad2 },
   puzzle: { label: "Chess Puzzle", route: "/games/chess/rules?tab=puzzles", Icon: Puzzle },
   rules: { label: "Rules", route: "/games/chess/rules", Icon: BookOpen },
+  learn: { label: "Learn", route: "/learn", Icon: BookOpen },
+  tools: { label: "Tools", route: "/tools", Icon: Grid2X2 },
 } as const;
 type Shortcut = keyof typeof shortcuts;
 const defaults: [Shortcut, Shortcut] = ["games", "puzzle"];

@@ -18,7 +18,11 @@ test("every Atlas mode can be stored, with race and duel state", { skip: !PGlite
   await db.exec(await migration("20261013000000_atlas_party_modes.sql"));
   await db.exec(await migration("20261017000000_atlas_unified_modes.sql"));
   await db.exec(await migration("20261018000000_atlas_language_guesser.sql"));
-  const modes = ["map_battle", "closest_wins", "higher_lower", "territory_battle", "flag_battle", "guess_country", "speed_run", "map_fill", "stat_ranking", "region_builder", "stat_detective", "country_guesser", "extreme_geography", "stat_battle", "language_guesser"];
+  // A Territory Battle room finished before History Battle replaced it must survive the new constraint.
+  await db.exec(`insert into public.atlas_matches(room_code, mode, host_id, players, dataset_version, seed) values ('OLDTB1', 'territory_battle', '${host}', '[{"id":"${host}"}]', 'v1', 'seed')`);
+  await db.exec(await migration("20261030000000_atlas_history_battle.sql"));
+  await db.exec("delete from public.atlas_matches where room_code = 'OLDTB1'");
+  const modes = ["map_battle", "closest_wins", "higher_lower", "flag_battle", "guess_country", "speed_run", "map_fill", "stat_ranking", "region_builder", "stat_detective", "country_guesser", "extreme_geography", "stat_battle", "language_guesser", "history_battle"];
   for (const [index, mode] of modes.entries()) {
     await db.exec(`insert into public.atlas_matches(room_code, mode, host_id, players, dataset_version, seed) values ('ROOM${String(index).padStart(2, "0")}', '${mode}', '${host}', '[{"id":"${host}"}]', 'v1', 'seed')`);
   }

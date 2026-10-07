@@ -1,0 +1,49 @@
+.sl-lab { margin: 24px 0; padding: clamp(16px,3vw,28px); border: 1px solid #f0abfc35; border-radius: 18px; background: linear-gradient(135deg,#171d35,#0b1725); min-width: 0; }
+.sl-lab h3 { font-size: 23px; line-height: 1.3; margin: 7px 0 20px; letter-spacing: -.025em; }
+.sl-lab p { line-height: 1.75; color: #bac7db; font-size: 14px; margin: 14px 0; }
+.sl-controls { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 14px; margin: 20px 0; }
+.sl-lab label, .sl-slider { display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: #dce5f3; }
+.sl-lab select, .sl-lab input[type=search] { display: block; width: 100%; min-height: 42px; min-width: 0; max-width: 100%; border: 1px solid #94a3b844; border-radius: 9px; padding: 9px; color: #f3f5ff; background: #142236; font: inherit; }
+.sl-lab input[type=range] { width: 100%; min-height: 28px; accent-color: #f0abfc; cursor: pointer; }
+.sl-lab .sl-checkbox { flex-direction: row; align-items: center; align-self: center; }
+.sl-checkbox input { width: 18px; height: 18px; accent-color: #f0abfc; }
+.sl-staff, .sl-pitch, .sl-boundary { display: block; width: 100%; height: auto; margin: 20px 0; border-radius: 12px; }
+.sl-readout { display: flex; flex-wrap: wrap; gap: 16px; margin: 18px 0; padding: 16px; background: #ffffff07; border-radius: 12px; font-size: 14px; color: #dbe5f5; }
+.sl-readout strong { color: #fef3c7; }
+.sl-readout span { line-height: 1.6; }
+.sl-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 18px 0; }
+.sl-actions > span { display: inline-flex; align-items: center; gap: 6px; color: #bac7db; font-size: 12px; }
+.sl-beat-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.sl-beat-grid span { padding: 12px; border: 1px solid #94a3b838; border-radius: 8px; color: #cbd5e1; font-size: 13px; }
+.sl-beat-grid .active { background: #fde68a; color: #142236; border-color: #fde68a; }
+.sl-lab progress { width: 100%; margin: 18px 0; accent-color: #fde68a; }
+.sl-tab { margin: 20px 0; padding: 16px; background: #ffffff08; border-radius: 12px; }
+.sl-tab pre { font-size: 14px; line-height: 1.4; margin-top: 12px; }
+.sl-verdict { padding: 18px; background: #6ee7b710; border: 1px solid #6ee7b750; border-radius: 12px; margin-top: 20px; color: #a7f3d0; }
+.sl-verdict p { margin-bottom: 0; }
+.sl-source, .sl-lab p.sl-source { font-size: 12px; color: #9eafc7; line-height: 1.75; overflow-wrap: anywhere; }
+.sl-source a, a.sl-source { color: #c4b5fd; text-decoration: underline; text-underline-offset: 3px; display: inline-block; margin-right: 14px; }
+.sl-honours-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(150px,1fr)); gap: 12px; margin: 20px 0; }
+.sl-honours-grid > div { padding: 18px; border-radius: 12px; background: #ffffff08; border: 1px solid #94a3b82d; }
+.sl-honours-grid span { display: block; min-height: 40px; font-size: 12px; color: #bac7db; line-height: 1.5; }
+.sl-honours-grid strong { display: block; font-size: 34px; font-weight: 650; color: #fde68a; }
+.sl-table-wrap { overflow-x: auto; }
+.sl-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.sl-table caption { text-align: left; margin: 20px 0 12px; color: #fde68a; }
+.sl-table th, .sl-table td { padding: 14px 12px; border-bottom: 1px solid #94a3b82d; text-align: left; line-height: 1.6; }
+.sl-question { padding: 24px; border: 1px solid #94a3b83d; border-radius: 14px; margin: 24px 0; min-width: 0; }
+.sl-question legend { padding: 0 8px; font-size: 16px; font-weight: 600; line-height: 1.6; }
+.sl-options { display: grid; gap: 10px; }
+.sl-options label { display: flex; align-items: flex-start; gap: 10px; padding: 12px; border-radius: 9px; background: #ffffff06; cursor: pointer; font-size: 14px; line-height: 1.5; }
+.sl-options input { margin-top: 4px; accent-color: #f0abfc; }
+.sl-question p { font-size: 13px; line-height: 1.75; }
+.sl-solution { margin-top: 16px; padding: 16px; background: #a5b4fc10; border-radius: 10px; }
+.sl-next { margin-top: 22px; }
+.sl-lab :is(input,select,button):focus-visible, .sl-question :is(input,button):focus-visible { outline: 3px solid #f0abfc; outline-offset: 3px; }
+@media(max-width:560px) { .sl-controls { grid-template-columns: 1fr; } .sl-question { padding: 14px; } .sl-lab h3 { font-size: 20px; } .sl-readout { flex-direction: column; gap: 8px; } .sl-honours-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } .sl-table th, .sl-table td { padding: 10px 6px; } }
+@media(prefers-reduced-motion:reduce) { .sl-lab *, .sl-question * { scroll-behavior: auto; transition: none; animation: none; } }
+
+.sl-score-scroll { overflow-x: auto; border-radius: 12px; margin: 20px 0; }
+.sl-score-scroll:focus-visible { outline: 3px solid #f0abfc; outline-offset: 3px; }
+.sl-score-scroll .sl-staff { margin: 0; max-height: 280px; }
+@media(max-width:560px) { .sl-staff-passage { min-width: 520px; } }
