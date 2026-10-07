@@ -9,7 +9,7 @@ export type SoloSettings = { difficulty: AtlasDifficulty; categories: AtlasCateg
 export const DEFAULT_SOLO_SETTINGS: SoloSettings = { difficulty: "intermediate", categories: QUESTION_CATEGORIES.map(({ id }) => id), stats: DEFAULT_COMPARISON_STATS, scope: "Europe" };
 export type SoloSummary = {
   score: number; correct: number; wrong: number; bestStreak: number; elapsedMs: number; missed: string[];
-  fill?: MapFillState; territory?: { mine: number; rival: number }; averageKm?: number;
+  fill?: MapFillState; averageKm?: number;
 };
 export const DIFFICULTY_LABELS: Record<AtlasDifficulty, string> = { beginner: "Beginner", intermediate: "Explorer", expert: "Expert" };
 export const settingsReady = (mode: ArenaModeDef, settings: SoloSettings) =>

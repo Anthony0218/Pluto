@@ -10,7 +10,7 @@ export const QUESTION_CATEGORIES: { id: AtlasCategory; label: string }[] = [
 ];
 export const COMPARISON_CATEGORIES = Object.entries(STAT_DEFINITIONS).map(([id, definition]) => ({ id: id as AtlasStatKey, label: definition.label }));
 export const DEFAULT_COMPARISON_STATS = COMPARISON_CATEGORIES.map(({ id }) => id);
-export const usesMapCategories = (mode: string) => ["map_click", "speed_run", "map_battle", "closest_wins", "territory_battle"].includes(mode);
+export const usesMapCategories = (mode: string) => ["speed_run", "closest_wins"].includes(mode);
 
 /** Validate room settings once, so every participant gets the same supported categories. */
 export function parseSelection<T extends string>(value: unknown, options: { id: T }[], defaults: T[]): T[] {

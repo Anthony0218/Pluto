@@ -1,0 +1,30 @@
+Pluto — media provenance notes (7 October 2026)
+
+Documented:
+- All files under public/images, including card decks and game/scene images:
+  the project owner confirmed on 7 October 2026 that they were AI-generated
+  with Codex. This is the owner's provenance statement, not a declaration
+  that all generated output is free of third-party copyright/trademark rights.
+- Country flags: flag-icons 7.5.0, Lipis and contributors, MIT. Original
+  license is included in /licenses/third-party-notices.txt.
+- Community avatars: generated with OpenAI image generation. Generation
+  details are recorded in public/group-avatars/README.md in the project.
+- 3D chess pieces: Tinymen's Free Stuff 1 - Chess Set, CGTrader Royalty Free
+  License (no AI), as recorded in the existing credits. This license has
+  extraction/redistribution restrictions; attribution alone is not clearance.
+  https://www.cgtrader.com/free-3d-models/sports/game/free-stuff-1-chess-set
+  https://help.cgtrader.com/hc/en-us/articles/360015124437-Royalty-Free-License
+
+Incomplete records:
+The repository does not contain per-file author/source/permission records
+for chess MP3 effects, MedievalKingdoms maps and ring textures, app icons
+outside public/images, or public/swag/fraction_grayguard.jpg.
+Their inclusion here is not a declaration
+that they are original, public domain, or licensed for redistribution.
+Traditional suits and game rules do not establish rights to a particular
+card illustration or recording. AI-like appearance does not prove provenance.
+
+The release review and a file/hash inventory are recorded in
+docs/COPYRIGHT_REVIEW.md and docs/MEDIA_INVENTORY.csv in the project.
+Record ownership or the exact asset license/permission before release;
+replace any media whose required rights cannot be established.

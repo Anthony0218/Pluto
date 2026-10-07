@@ -107,11 +107,11 @@
 .friend-actions strong { display: block; font-size: 12px; line-height: 1.25; }
 .friend-actions small { display: block; color: #b5bfee; font-weight: 400; font-size: 10px; margin-top: 2px; }
 .discovery-carousel { position: relative; isolation: isolate; border: 1px solid #7661b584; border-radius: 13px; overflow: hidden; background: #0d1630; display: grid; }
-.discovery-slide { grid-area: 1 / 1; opacity: 0; transition: opacity .8s ease; pointer-events: none; position: relative; padding-bottom: 46px; }
+.discovery-slide { display: flex; align-items: center; grid-area: 1 / 1; opacity: 0; transition: opacity .8s ease; pointer-events: none; position: relative; padding-bottom: 46px; }
 .discovery-slide.active { opacity: 1; pointer-events: auto; z-index: 1; }
-.discovery-slide > img { position: absolute; width: 55%; height: 100%; right: 0; top: 0; object-fit: cover; opacity: .7; }
-.discovery-slide::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, #0c1229 5%, #10132beb 45%, #0b10242b); }
-.discovery-copy { position: relative; z-index: 1; padding: 18px 24px 0; max-width: 72%; }
+.discovery-slide > img { position: absolute; width: 50%; height: 100%; right: 0; top: 0; object-fit: cover; opacity: .7; }
+.discovery-slide::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, #0c1229 0, #0c1229 46%, #0c122999 53%, #0b10242b 100%); }
+.discovery-copy { position: relative; z-index: 1; box-sizing: border-box; width: 50%; padding: 18px 20px 0 24px; }
 .discovery-copy h2 { margin-top: 5px; font-size: clamp(18px, 1.6vw, 23px); font-weight: 650; line-height: 1.25; letter-spacing: -.015em; }
 .discovery-copy > p:not(.dash-eyebrow) { color: #b3bddf; font-size: 12px; line-height: 1.5; margin: 7px 0 9px; }
 .discovery-copy .dash-button { padding: 5px 12px; }
@@ -242,7 +242,7 @@
   .friend-actions .dash-button { padding: 8px; gap: 6px; }
   .friend-actions .dash-button > svg:first-child { display: none; }
   .friend-actions strong { font-size: 11px; }
-  .discovery-copy { max-width: 100%; padding: 18px 17px 0; }
+  .discovery-copy { width: 100%; max-width: 100%; padding: 18px 17px 0; }
   .discovery-slide::after { background: linear-gradient(90deg, #0c1229f5, #0c1229bf); }
   .discovery-controls { inset-inline: 16px; justify-content: space-between; gap: 8px; }
   .learning-row { grid-template-columns: 1fr; }
@@ -266,7 +266,7 @@
 /* The dashboard follows the same visual rhythm in either sidebar state. */
 .dashboard-page { background: radial-gradient(ellipse at 62% -5%, #27357965, transparent 52%), radial-gradient(ellipse at 2% 85%, #261b5940, transparent 42%), #050b1a; }
 .dashboard-page .dash-panel, .dashboard-page .dashboard-hero, .dashboard-page .discovery-carousel { border-radius: 18px; background-color: #0a1730; box-shadow: inset 0 1px #ffffff0b, 0 12px 32px #02071355; }
-.dashboard-page .dashboard-hero { overflow: hidden; }
+.dashboard-page .dashboard-hero { overflow: hidden; flex-shrink: 0; }
 .dashboard-page .hero-content { display: flex; min-height: 135px; padding: 28px 30px; }
 .dashboard-page .hero-content h1 { font-size: clamp(28px, 2.8vw, 42px); }
 .dashboard-page .dashboard-games .favorite-row { grid-template-columns: repeat(auto-fit, minmax(min(155px, 100%), 1fr)); grid-auto-rows: 182px; }
@@ -291,7 +291,7 @@
 .dashboard-move-controls button:disabled { opacity: .35; }
 .dashboard-content-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: stretch; }
 .dashboard-content-item { min-width: 0; display: flex; flex-direction: column; }
-.dashboard-content-item > :last-child { flex: 1; }
+.dashboard-content-item > :last-child, .dashboard-content-item > div > :is(.dash-panel, .discovery-carousel) { flex: 1; }
 .dashboard-content-move { display: flex; align-items: center; justify-content: space-between; color: #c4bbfb; font-size: 12px; }
 .dashboard-content-move .dashboard-move-controls { padding: 0 0 6px; }
 .dashboard-sortable-grid [data-dragging] { opacity: .55; }
@@ -391,3 +391,80 @@ body:has(.chess-game-grid) .room-friends-trigger { bottom: 62px; }
 .dashboard-drawer .game-invite-panel h2 { font-size:16px; }
 @media(max-height:740px) { .dashboard-drawer .game-invite-panel .invite-game-preview { display:none; } .dashboard-drawer .game-invite-panel select,.dashboard-drawer .game-invite-panel input { padding-top:7px;padding-bottom:7px; } .dashboard-drawer .game-invite-panel label { margin-top:8px; } .dashboard-drawer .game-invite-panel button { padding-top:8px;padding-bottom:8px; } .dashboard-drawer > div > div:first-child { margin-bottom:8px; } }
 @media(max-height:590px) { .dashboard-drawer .play-friends .friends-body { display:none; } .dashboard-drawer .play-friends { padding:8px; } .dashboard-drawer .dash-section-heading { margin:0; } .dashboard-drawer .game-invite-panel > div { margin-top:8px; } }
+
+/* Your apps: a strip of tiles under "Play together". */
+.dashboard-apps .dash-section-heading { margin-bottom: 12px; }
+.dashboard-apps .dash-section-heading h2 { font-size: 20px; font-weight: 700; }
+.dashboard-apps-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(112px, 1fr)); gap: 12px; }
+.dashboard-app-tile { --tile-accent: #a5b4fc; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; min-width: 0; padding: 16px 8px 14px; border: 1px solid color-mix(in srgb, var(--tile-accent), transparent 78%); border-radius: 16px; background: linear-gradient(160deg, color-mix(in srgb, var(--tile-accent), transparent 90%), #0a1730); text-align: center; transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
+.dashboard-app-tile:hover, .dashboard-app-tile:focus-visible { transform: translateY(-3px); border-color: color-mix(in srgb, var(--tile-accent), transparent 35%); box-shadow: 0 10px 26px color-mix(in srgb, var(--tile-accent), transparent 78%); }
+.dashboard-app-icon { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 15px; border: 1px solid color-mix(in srgb, var(--tile-accent), transparent 60%); background: color-mix(in srgb, var(--tile-accent), transparent 86%); color: var(--tile-accent); transition: transform .25s cubic-bezier(.34, 1.56, .64, 1); }
+.dashboard-app-tile:hover .dashboard-app-icon, .dashboard-app-tile:focus-visible .dashboard-app-icon { transform: scale(1.1) rotate(-5deg); }
+.dashboard-app-tile strong { font-size: 12px; font-weight: 650; line-height: 1.25; color: #e4ebfa; overflow-wrap: anywhere; }
+.dashboard-app-more { border-style: dashed; }
+.dashboard-app-tile.editing { animation: none; border-color: #8b79ff; box-shadow: 0 0 0 1px #6675e966, 0 0 12px #644aff33; cursor: default; }
+.dashboard-app-tile.editing:hover { transform: none; }
+.dashboard-app-tools { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
+.dashboard-app-tools .dash-icon-button { min-width: 26px; min-height: 26px; width: 26px; height: 26px; }
+.dashboard-app-tools .dash-icon-button[data-disabled] { opacity: .35; }
+.dashboard-app-tools button[slot=drag] { cursor: grab; }
+.dashboard-app-preview { color: #f1f5ff; pointer-events: none; background: #111b3d; }
+.dashboard-app-icon-small { width: 34px; height: 34px; border-radius: 10px; flex: none; }
+.game-choice .dashboard-app-icon-small { margin-right: 0; }
+.dashboard-apps-empty { grid-column: 1 / -1; padding: 22px; text-align: center; color: #9badde; font-size: 13px; border: 1px dashed #7894d53b; border-radius: 14px; }
+
+/* The page builds itself in: sections rise in one after another, the panels a little later. */
+@keyframes dash-rise { from { opacity: 0; transform: translateY(12px); } }
+.dashboard-main > * { animation: dash-rise .5s cubic-bezier(.22, 1, .36, 1) backwards; }
+.dashboard-main > :nth-child(2) { animation-delay: .06s; }
+.dashboard-main > :nth-child(3) { animation-delay: .12s; }
+.dashboard-main > :nth-child(4) { animation-delay: .18s; }
+.dashboard-main > :nth-child(5) { animation-delay: .24s; }
+.dashboard-app-tile { animation: dash-rise .45s cubic-bezier(.22, 1, .36, 1) backwards; }
+.dashboard-apps-row > :nth-child(1) { animation-delay: .22s; } .dashboard-apps-row > :nth-child(2) { animation-delay: .27s; } .dashboard-apps-row > :nth-child(3) { animation-delay: .32s; } .dashboard-apps-row > :nth-child(4) { animation-delay: .37s; }
+.dashboard-apps-row > :nth-child(5) { animation-delay: .42s; } .dashboard-apps-row > :nth-child(6) { animation-delay: .47s; } .dashboard-apps-row > :nth-child(7) { animation-delay: .52s; } .dashboard-apps-row > :nth-child(8) { animation-delay: .57s; }
+.dashboard-content-item { animation: dash-rise .5s cubic-bezier(.22, 1, .36, 1) backwards; }
+.dashboard-content-item:nth-child(1) { animation-delay: .3s; } .dashboard-content-item:nth-child(2) { animation-delay: .38s; } .dashboard-content-item:nth-child(3) { animation-delay: .46s; }
+.dashboard-content-item:not(.editing):hover > div > :is(.dash-panel, .discovery-carousel) { transform: translateY(-2px); }
+.dashboard-content-item > div > :is(.dash-panel, .discovery-carousel) { transition: transform .22s ease, border-color .24s ease, box-shadow .24s ease; }
+@media (prefers-reduced-motion: reduce) { .dashboard-main *, .dashboard-app-tile, .dashboard-app-icon { animation: none !important; transition: none !important; } }
+
+/* Drifting particles: tiny glowing dots rising slowly behind the page. */
+.dashboard-page { position: relative; }
+.dashboard-particles { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; animation: dash-hue 60s linear infinite alternate; }
+.dashboard-particles span { position: absolute; top: 100%; border-radius: 50%; background: #a5b4fc; box-shadow: 0 0 8px 1px #818cf8aa; opacity: 0; animation: dash-float linear infinite; will-change: transform, opacity; }
+.dashboard-particles span[data-tone="1"] { background: #67e8f9; box-shadow: 0 0 8px 1px #22d3eeaa; }
+.dashboard-particles span[data-tone="2"] { background: #c4b5fd; box-shadow: 0 0 8px 1px #a78bfaaa; }
+.dashboard-workspace { position: relative; z-index: 1; }
+@keyframes dash-float { 0% { transform: translate3d(0, 0, 0); opacity: 0; } 12% { opacity: var(--peak, .3); } 85% { opacity: var(--peak, .3); } 100% { transform: translate3d(var(--drift, 30px), -115vh, 0); opacity: 0; } }
+@keyframes dash-hue { to { filter: hue-rotate(40deg); } }
+
+/* A soft light follows the pointer over cards. */
+.dashboard-page :is(.dash-panel, .discovery-carousel, .dashboard-action-card, .dashboard-app-tile) { position: relative; }
+.dashboard-page :is(.dash-panel, .discovery-carousel, .dashboard-action-card, .dashboard-app-tile)::before { content: ""; position: absolute; inset: 0; z-index: 2; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .3s ease; background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), #b8b0ff26, transparent 65%); }
+.dashboard-page :is(.dash-panel, .discovery-carousel, .dashboard-action-card, .dashboard-app-tile):hover::before { opacity: 1; }
+
+/* Live touches. */
+.presence.online { animation: dash-presence 2.4s ease-out infinite; }
+@keyframes dash-presence { 0% { box-shadow: 0 0 0 0 #00e6a088; } 70%, 100% { box-shadow: 0 0 0 7px #00e6a000; } }
+.dash-bar { flex: 1; min-width: 0; height: 6px; border-radius: 999px; background: #ffffff14; overflow: hidden; }
+.dash-bar > span { display: block; width: 100%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #818cf8, #c4b5fd); transform-origin: left; transform: scaleX(0); }
+.in-view .dash-bar > span { transform: scaleX(var(--fill, 0)); transition: transform 1s cubic-bezier(.22, 1, .36, 1) .2s; }
+
+/* Greeting banner: a slow aurora behind the text, and the greeting fades in line by line. */
+.dashboard-page .dashboard-hero::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: linear-gradient(110deg, #4f46e533, #06b6d41f, #a855f72b, #4f46e533); background-size: 300% 100%; animation: dash-aurora 16s ease-in-out infinite alternate; }
+@keyframes dash-aurora { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
+.hero-greeting > * { animation: dash-rise .6s cubic-bezier(.22, 1, .36, 1) backwards; }
+.hero-greeting > :nth-child(1) { animation-delay: .1s; } .hero-greeting > :nth-child(2) { animation-delay: .2s; } .hero-greeting > :nth-child(3) { animation-delay: .32s; } .hero-greeting > :nth-child(4) { animation-delay: .4s; }
+
+/* A calmer empty state for panels with nothing to show. */
+.dash-empty-state { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 28px 12px; text-align: center; color: #a3b2d4; font-size: 13px; line-height: 1.5; }
+.dash-empty-icon { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; border: 1px solid #7894d544; background: radial-gradient(circle, #655de833, transparent 70%); color: #c3b9ff; animation: dash-breathe 3.2s ease-in-out infinite; }
+@keyframes dash-breathe { 50% { transform: scale(1.08); box-shadow: 0 0 22px #7668ff55; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-particles { display: none; }
+  .dashboard-page *, .dashboard-page *::before, .dashboard-page *::after { animation: none !important; transition: none !important; }
+  .dash-bar > span { transform: scaleX(var(--fill, 0)); }
+  .dashboard-page :is(.dash-panel, .discovery-carousel, .dashboard-action-card, .dashboard-app-tile)::before { display: none; }
+}

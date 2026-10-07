@@ -1,0 +1,147 @@
+/* Motion measures scroll offsets against a positioned container. LandingStage sets data-journey on the scroller,
+   so other pages keep their layout (no :has() needed, which older browsers lack). */
+.app-viewport[data-journey] { position: relative; }
+
+/* ── Journey wrapper: one sticky layer holds the travelling planet behind the page content ── */
+.journey { position: relative; overflow: clip; }
+/* overflow: clip keeps position: sticky working; browsers without it clip the overflow another way. */
+@supports not (overflow: clip) { .journey { clip-path: inset(0); } }
+/* Orbits and sweeps stop while the journey is scrolled far out of view. */
+.journey[data-paused] *, .journey[data-paused] *::before, .journey[data-paused] *::after { animation-play-state: paused !important; }
+.journey-layer {
+  position: sticky; top: 0; z-index: 0;
+  height: var(--app-height); margin-bottom: calc(var(--app-height) * -1);
+  pointer-events: none; overflow: hidden;
+}
+.journey-nebula {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 15%, #2a3a8a26, transparent 55%),
+    radial-gradient(ellipse at 85% 80%, #5a2a8a1f, transparent 55%),
+    #060816;
+}
+.journey-planet { position: absolute; left: 50%; top: 50%; width: 0; height: 0; will-change: transform, opacity; }
+.journey-planet-body { position: absolute; left: 0; top: 0; display: block; }
+.journey .journey-art { --planet-size: min(480px, calc(var(--app-height) * .62)); position: absolute; left: calc(var(--planet-size) / -2); top: calc(var(--planet-size) / -2); }
+.journey .journey-art .solar-ring { border-width: 4px; transform: rotate(var(--ring-tilt, -19deg)); }
+.journey .journey-art .solar-atmosphere { opacity: .5; }
+.journey-scan {
+  position: absolute; inset: -10%; z-index: 2; border-radius: 50%; mix-blend-mode: screen;
+  background: conic-gradient(from 0deg, transparent 0 74%, #8fe8ff00 74%, #8fe8ff66 94%, #e6fbffe6 99.6%, transparent 100%);
+  animation: journey-spin 5s linear infinite;
+}
+@keyframes journey-spin { to { transform: rotate(360deg); } }
+
+/* Tools and Learn: the app tile or book that travels instead of the planet. */
+.journey-items { position: absolute; left: 50%; top: 50%; width: 0; height: 0; }
+.journey-title { position: absolute; left: 50%; top: 5%; width: 0; pointer-events: none; }
+.journey-title > span { display: block; width: max-content; max-width: 40vw; transform: translateX(-50%); font-size: clamp(1.25rem, 2.2vw, 2rem); font-weight: 800; letter-spacing: -.04em; color: #c7d2fe; text-align: center; }
+.journey-item { position: absolute; left: 0; top: 0; width: 0; height: 0; filter: drop-shadow(0 0 70px color-mix(in srgb, var(--app-accent, #e79924) 55%, transparent)); }
+.journey-item > .universe-app { position: absolute; left: -46px; top: -46px; }
+.journey-item > .universe-book { position: absolute; left: -56px; top: -69px; transform: none; }
+
+/* Books (Learn) and friends (Community) circling the planet: two ping-pong animations a quarter-turn apart draw an ellipse. */
+.journey-orbiters { position: absolute; left: 0; top: 0; width: 0; height: 0; transform: rotate(-14deg); }
+.journey-orbiter {
+  --rx: calc(var(--planet-size) * .74); --ry: calc(var(--planet-size) * .2);
+  position: absolute; left: 0; top: 0; width: 0; height: 0;
+  animation: journey-orbit-x var(--t) cubic-bezier(.37, 0, .63, 1) infinite alternate;
+  animation-delay: var(--d);
+}
+.journey-orbiter > i { display: block; position: absolute; animation: journey-orbit-y var(--t) cubic-bezier(.37, 0, .63, 1) infinite alternate; animation-delay: calc(var(--d) - var(--t) / 2); }
+.journey-orbiter--moon { --rx: calc(var(--planet-size) * .66); --ry: calc(var(--planet-size) * .26); }
+@keyframes journey-orbit-x { from { transform: translateX(calc(var(--rx) * -1)); } to { transform: translateX(var(--rx)); } }
+@keyframes journey-orbit-y { from { transform: translateY(calc(var(--ry) * -1)); } to { transform: translateY(var(--ry)); } }
+.journey-book { width: 26px; height: 34px; margin: -17px 0 0 -13px; border-radius: 2px 5px 5px 2px; box-shadow: inset 5px 0 #0003, 0 6px 14px #0007; }
+.journey-moon { width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; border: 2px solid #ffffffb0; }
+
+/* ── Flyby: a pinned stage the camera travels through ── */
+.journey-flyby { position: relative; height: calc(var(--app-height) * 3.4); }
+.journey-flyby-stage { position: sticky; top: 0; height: var(--app-height); }
+.journey-sky { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.journey-stars { position: absolute; inset: 0; will-change: transform, opacity; }
+.journey-stars--far {
+  opacity: .8;
+  background-image: radial-gradient(1px 1px at 18px 32px, #c2d8ff 99%, transparent), radial-gradient(1px 1px at 130px 90px, #8ca8ff 99%, transparent), radial-gradient(1px 1px at 205px 182px, #fff 99%, transparent);
+  background-size: 251px 211px, 173px 163px, 289px 233px;
+}
+.journey-stars--mid {
+  background-image: radial-gradient(1.5px 1.5px at 60px 70px, #f4d6ff 99%, transparent), radial-gradient(1.5px 1.5px at 220px 140px, #c2d8ff 99%, transparent);
+  background-size: 347px 281px, 389px 313px;
+}
+.journey-stars--near {
+  background-image: radial-gradient(2.2px 2.2px at 110px 40px, #fff 99%, transparent), radial-gradient(2px 2px at 300px 260px, #b9ccff 99%, transparent);
+  background-size: 521px 433px, 613px 487px;
+}
+.flyby-title {
+  position: absolute; left: 0; right: 0; top: 8%; z-index: 2; margin: 0; text-align: center;
+  font-size: clamp(2.2rem, 4.6vw, 4.2rem); font-weight: 900; letter-spacing: -.05em; line-height: 1; color: #fff;
+}
+.journey-flyby .flyby-item { --planet-size: 78px; position: absolute; left: 0; top: 0; z-index: 3; display: block; width: 0; height: 0; padding: 0; }
+.flyby-item--planet { --art-w: var(--planet-size); --art-h: var(--planet-size); }
+.flyby-item--tile { --art-w: 92px; --art-h: 92px; }
+.flyby-item--book { --art-w: 112px; --art-h: 138px; }
+.flyby-link {
+  position: absolute; left: calc(var(--art-w) / -2 - 20px); top: calc(var(--art-h) / -2 - 8px);
+  display: flex; flex-direction: column; align-items: center; width: calc(var(--art-w) + 40px); padding: 8px 20px 10px; border-radius: 18px; color: #fff; text-decoration: none;
+}
+.flyby-link .solar-art, .flyby-link .universe-app, .flyby-link .universe-book { flex: none; }
+.flyby-link:focus-visible { outline: 2px solid #b8b3ff; outline-offset: 2px; }
+.journey-skip {
+  position: absolute; left: 16px; top: 12px; z-index: 6; padding: 10px 16px; border: 1px solid #a5b4fc66; border-radius: 10px; background: #0b1030; color: #e0e7ff; font-size: 13px; font-weight: 600;
+  clip-path: inset(50%); width: 1px; height: 1px; overflow: hidden; white-space: nowrap;
+}
+.journey-skip:focus { clip-path: none; width: auto; height: auto; overflow: visible; outline: 2px solid #c7d2fe; outline-offset: 2px; }
+.flyby-label { display: block; margin-top: 12px; font-size: 13px; font-weight: 700; line-height: 1.2; text-align: center; text-shadow: 0 2px 8px #000; }
+.flyby-chess-label { position: absolute; left: 0; right: 0; top: calc(46% + 31vh * .3); text-align: center; color: #e8e4ff; pointer-events: none; }
+.flyby-chess {
+  position: absolute; left: 0; right: 0; bottom: 6%; z-index: 4; width: min(560px, 90%); margin: 0 auto; text-align: center; will-change: opacity;
+}
+.flyby-chess h3 { margin: 0; font-size: clamp(2rem, 3.4vw, 3rem); font-weight: 900; letter-spacing: -.04em; line-height: 1; color: #fff; text-shadow: 0 4px 24px #000a; }
+.flyby-chess p { margin: 10px auto 18px; max-width: 420px; color: #c9cfe8; font-size: 15px; line-height: 1.55; text-shadow: 0 2px 12px #000a; }
+.flyby-cta { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 12px 24px; border-radius: 12px; background: #6366f1; color: #fff; font-weight: 700; text-decoration: none; transition: background-color .15s, transform .15s; }
+.flyby-cta:hover { background: #818cf8; }
+.flyby-cta:active { transform: scale(.98); }
+.flyby-cta:focus-visible { outline: 2px solid #c7d2fe; outline-offset: 4px; }
+.flyby-hint { position: absolute; left: 0; right: 0; bottom: 4%; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 4px; color: #8b97c0; font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; animation: flyby-nudge 1.8s ease-in-out infinite; }
+@keyframes flyby-nudge { 50% { transform: translateY(5px); } }
+
+/* ── Friends as moons ── */
+.moons { position: relative; margin-block: 4px 8px; }
+.moons-stage { position: relative; height: 270px; }
+.moons-orbit { position: absolute; left: 50%; top: 50%; border: 1px dashed #a5b4fc33; border-radius: 50%; pointer-events: none; transform: translate(-50%, -50%) rotate(-10deg); }
+.moons .moons-planet { --planet-size: 92px; padding: 0; position: absolute; left: 50%; top: 50%; z-index: 2; width: 0; height: 0; pointer-events: none; }
+.moons .moons-planet .solar-art { position: absolute; left: calc(var(--planet-size) / -2); top: calc(var(--planet-size) / -2); }
+.moon { position: absolute; left: 50%; top: 50%; display: flex; width: 76px; margin: -34px 0 0 -38px; flex-direction: column; align-items: center; gap: 2px; padding: 4px; border-radius: 14px; text-align: center; will-change: transform; }
+.moon:hover { background: #ffffff0d; }
+.moon[aria-pressed="true"] { background: #818cf81f; }
+.moon-avatar { position: relative; display: block; width: 48px; height: 48px; border-radius: 50%; }
+.moon-avatar--online { box-shadow: 0 0 0 2px #34d39999, 0 0 18px #34d39966; }
+.moon-avatar--offline { filter: saturate(.55); box-shadow: 0 0 0 1px #64748b66; }
+.moons-invite { display: inline-flex; align-items: center; gap: 6px; margin-top: 2px; font-size: 12px; font-weight: 600; color: #a5b4fc; }
+.moons-invite:hover { color: #fff; }
+
+/* ── Learning constellation ── */
+.constellation { position: relative; margin-bottom: 20px; padding: 18px 14px 10px; border: 1px solid #a5b4fc1f; border-radius: 22px; background: radial-gradient(ellipse at 50% 0%, #4f46e51a, transparent 70%), #0a1024; }
+.constellation-title { margin: 0 0 4px 6px; color: #a5b4fc; font-size: 11px; font-weight: 800; letter-spacing: .22em; text-transform: uppercase; }
+.constellation-sky { position: relative; aspect-ratio: 520 / 190; width: 100%; }
+.constellation-sky svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.constellation-stop { position: absolute; translate: -50% -50%; width: 100px; height: 56px; border-radius: 12px; text-align: center; color: #94a3c8; text-decoration: none; }
+.constellation-stop:focus-visible { outline: 2px solid #c7d2fe; outline-offset: 2px; }
+.constellation-star { position: absolute; left: 50%; top: 50%; display: block; width: 20px; height: 20px; margin: -10px 0 0 -10px; }
+.constellation-star::before { content: ""; position: absolute; inset: -12px; border-radius: 50%; background: radial-gradient(circle, #fde68a99, transparent 65%); }
+.constellation-star::after { content: ""; position: absolute; inset: 0; background: #fff7d6; clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); }
+.constellation-name { position: absolute; left: 0; right: 0; top: calc(50% + 17px); font-size: 11px; font-weight: 700; line-height: 1.25; }
+.constellation-stop--above .constellation-name { top: auto; bottom: calc(50% + 17px); }
+
+@media (max-width: 520px) {
+  .moons-stage { height: 240px; }
+  .constellation-stop { width: 76px; }
+  .constellation-name { font-size: 10px; }
+}
+
+/* ── WebGL planet (see JourneyCanvas): once it has drawn, the CSS sphere, ring and glow step aside ── */
+.journey-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.journey-layer[data-gl] .journey-art :is(.solar-atmosphere, .solar-ring) { display: none; }
+.journey-layer[data-gl] .journey-art .solar-sphere { background: none; box-shadow: none; }
+.journey-layer[data-gl] .journey-art .solar-sphere::after { display: none; }

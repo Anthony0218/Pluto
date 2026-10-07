@@ -1,5 +1,10 @@
 import GoRankedGamePage from "./pages/games/Go/GoRankedGamePage";
 import LearnPage from "./pages/general/LearnPage";
+import LearningSubjectPage from "./pages/learn/LearningSubjectPage";
+import LearningPathPage from "./pages/learn/LearningPathPage";
+import LearningLessonPage from "./pages/learn/LearningLessonPage";
+import ToolsPage from "./pages/tools/ToolsPage";
+import ToolAppPage from "./pages/tools/ToolAppPage";
 import React from "react";
 import ReactDOM from "react-dom/client";
 
@@ -152,6 +157,7 @@ import {
 import GamesPage from "./pages/general/GamesPage.tsx";
 import ProfilePage from "./pages/social/ProfilePage.tsx";
 import { WattenThreePlayerMultiplayerGame } from "./components/Watten/WattenThreePlayerMultiplayer.tsx";
+import EdravanePage from "./pages/games/MedievalKingdoms/EdravanePage.tsx";
 import MedievalKingdomsWorldPage from "./pages/games/MedievalKingdoms/MedievalKingdomsWorldPage.tsx";
 import MedievalKingdomsBattlePage from "./pages/games/MedievalKingdoms/MedievalKingdomsBattlePage.tsx";
 import { Chess3DAiRoute, Chess3DHotseatRoute, Chess3DMenuRoute, ChessCustomLegacyRedirect, ChessCustomRoute, JanmannGameRoute, JanmannRulesRoute } from "./pages/games/lazyChessRoutes.tsx";
@@ -202,6 +208,7 @@ const router = createBrowserRouter([
         path: "/login",
         element: <LoginPage />,
       },
+      { path: "/reset-password", element: <LoginPage key="password-reset" resetPassword /> },
 
       {
         path: "/credits",
@@ -217,6 +224,12 @@ const router = createBrowserRouter([
             path: "/learn",
             element: <LearnPage />,
           },
+          { path: "/learn/start", element: <LearningLessonPage introduction /> },
+          { path: "/learn/:subjectId", element: <LearningSubjectPage /> },
+          { path: "/learn/:subjectId/:pathId", element: <LearningPathPage /> },
+          { path: "/learn/:subjectId/:pathId/:lessonId", element: <LearningLessonPage /> },
+          { path: "/tools", element: <ToolsPage /> },
+          { path: "/tools/:toolId", element: <ToolAppPage /> },
           {
             path: "/dashboard",
             element: <App />,
@@ -674,14 +687,14 @@ const router = createBrowserRouter([
           },
           {
             path: "/games/medieval-kingdoms",
-            element: <MedievalKingdomsWorldPage />,
+            element: <EdravanePage />,
           },
           {
             path: "/games/medieval-kingdoms/battle/:battleId",
             element: <MedievalKingdomsBattlePage />,
           },
           {
-            path: "/games/medieval-kingdoms",
+            path: "/games/medieval-kingdoms/legacy",
             element: <MedievalKingdomsWorldPage />,
           },
           {

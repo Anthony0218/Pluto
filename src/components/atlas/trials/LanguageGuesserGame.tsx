@@ -31,20 +31,19 @@ export function LanguageGuesserGame({ seed, difficulty, best, byId, topology, on
   };
   useOptionHotkeys(round?.options.length ?? 0, (option) => { if (round) answer(round.options[option]); }, !over && picked === null);
   return <TrialShell title="Language Guesser" accent="violet" roundLabel={`Sentence ${Math.min(index + 1, LANGUAGE_GUESSER.rounds)} / ${LANGUAGE_GUESSER.rounds}`} score={score} progress={index / LANGUAGE_GUESSER.rounds * 100} onExit={onExit}>
-    {round && <div className="trial-panel language-guesser">
-      <span className="atlas-eyebrow">Identify the language</span>
+    {round && <div className="language-layout">
+      <div className="trial-panel language-guesser"><span className="atlas-eyebrow">Identify the language</span>
       <h1 className="trial-title">Which language is this?</h1>
       <blockquote lang="und">{round.sentence}</blockquote>
       <div className="language-options">{round.options.map((language, option) =>
         <button key={language} type="button" disabled={picked !== null} className={picked !== null ? language === round.language ? "is-correct" : language === picked ? "is-wrong" : "" : ""} onClick={() => answer(language)}><kbd>{option + 1}</kbd>{language}</button>)}</div>
       {picked !== null && <>
-        <section className="language-reveal" aria-label="Answer details">
-          <div className="language-translation"><span className="atlas-eyebrow">English translation</span><p>{round.translation}</p></div>
-          {country && <div className="language-country"><div><span className="atlas-eyebrow">A country where it is spoken</span><strong>{country.name}</strong><img src={country.flag} alt={`Flag of ${country.name}`} /></div><AtlasCountryShape topology={topology} geometryId={country.geometryId!} label={country.name} showLabel={false} /></div>}
-        </section>
         <TrialFeedback tone={picked === round.language ? "good" : "bad"} title={picked === round.language ? `Correct · +${LANGUAGE_GUESSER.correct}` : `That was ${round.language}`} detail={country ? `${round.language} is spoken in ${country.name}.` : "The sentence is an everyday greeting."} action={<button type="button" className="trial-next" onClick={() => { setPicked(null); setIndex(index + 1); }}>Next <ChevronRight size={16} /></button>} />
       </>}
-    </div>}
+    </div>{picked !== null && <section className="language-reveal" aria-label="Answer details">
+          <div className="language-translation"><span className="atlas-eyebrow">English translation</span><p>{round.translation}</p></div>
+          {country && <div className="language-country"><div><span className="atlas-eyebrow">A country where it is spoken</span><strong>{country.name}</strong><img src={country.flag} alt={`Flag of ${country.name}`} /></div><AtlasCountryShape topology={topology} geometryId={country.geometryId!} label={country.name} showLabel={false} /></div>}
+        </section>}</div>}
     {over && <GameOverPanel title="Languages complete" score={score} best={best} stats={[{ label: "Correct", value: `${correctCount} / ${LANGUAGE_GUESSER.rounds}` }, { label: "Accuracy", value: `${Math.round(correctCount / LANGUAGE_GUESSER.rounds * 100)}%` }]} onRestart={onRestart} onExit={onExit} />}
   </TrialShell>;
 }

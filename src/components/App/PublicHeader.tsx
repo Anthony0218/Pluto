@@ -7,7 +7,7 @@ import { LanguageSelector } from "@/games/chess/i18n/chessLanguage";
 import { useState, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { House, Menu } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import FriendAvatar from "../social/FriendAvatar";
 import { useTheme } from "../../context/ThemeContext";
@@ -73,10 +73,12 @@ export default function PublicHeader({ compact = false }: { compact?: boolean })
   const { plutoMode } = useTheme();
   const { pathname } = useLocation();
   const dashboard = pathname === "/dashboard";
+  const explore = /^\/(tools|learn)(\/|$)/.test(pathname) || /^\/games\/?$/.test(pathname);
   const brand = compact && !dashboard ? pageBrand(pathname) : undefined;
   return <header style={{ ...(brand?.surface ? { backgroundColor: brand.surface } : {}), "--chess-header-accent": brand?.accent } as CSSProperties} className={compact ? "compact-app-header absolute inset-x-0 top-0 z-[200] h-[var(--public-header-height)] text-white" : `fixed inset-x-0 top-0 z-[200] h-[var(--public-header-height)] border-b border-white/[0.08] text-white backdrop-blur-xl ${plutoMode ? "bg-[#060816]/95" : "bg-zinc-950/95"}`}>
     <div className="mx-auto flex h-full max-w-[1800px] flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2 sm:flex-nowrap sm:px-6 sm:py-0">
       {dashboard || !compact ? <><NavigationToggle /><PlutoHomeLink /></> : <HeaderBrand name={brand?.name} mode={brand?.mode} />}
+      {explore && <nav className="public-explore-nav" aria-label={ui("Explore Pluto")}>{[["/games", "Games"], ["/tools", "Tools"], ["/learn", "Learn"]].map(([to, label]) => <NavLink key={to} to={to}>{ui(label)}</NavLink>)}</nav>}
       {dashboard && <div id="dashboard-search-slot" className="order-3 min-w-0 basis-full sm:order-none sm:mx-auto sm:flex-1 sm:basis-auto" />}
       {!dashboard && !brand && <div className="flex-1" />}
       <div className="ml-auto min-w-0 max-w-full"><NavigationControls /></div>

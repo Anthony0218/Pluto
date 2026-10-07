@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import ts from 'typescript';
+import * as randomSeries from '../src/games/atlas/randomSeries.ts';
 import { ARENA_MODES } from '../src/games/atlas/modeCatalog.ts';
 import { areaReferenceCountry, areaValuesFromText } from '../src/games/atlas/areaReferences.ts';
 import { buildTrialCountries } from '../src/games/atlas/trials/countryStats.ts';
@@ -45,6 +46,7 @@ function harness(query = '', reducedMotion = false) {
     react,
     '../../../components/atlas/AtlasMastery': {AtlasMastery:()=>null},
     'react-router-dom': {Link: 'a', useNavigate: () => url => navigations.push(url), useSearchParams: () => [new URLSearchParams(query)]},
+    '../../../games/atlas/randomSeries': randomSeries,
     '../../../games/atlas/arenaStorage': {bestKey: id => id},
     '../../../games/atlas/modeCatalog': {ARENA_MODES},
     '../../../games/atlas/soloSettings': {DIFFICULTY_LABELS: {}},
@@ -120,7 +122,14 @@ test('only ? reveals roulette, its highlight slows down, and every launch uses t
     const expected = ARENA_MODES[Math.floor(.37 * ARENA_MODES.length)];
     for (const [index, url] of [`/games/atlas-arena/solo/${expected.id}`, `/games/atlas-arena/multiplayer?mode=${expected.online}`, `/games/atlas-arena/hotseat/${expected.id}`].entries()) {
       actionButtons(tree)[index].props.onClick();
-      assert.equal(parent.navigations.at(-1), url);
+      const launched = new URL(parent.navigations.at(-1), 'http://atlas.test');
+      const expectedUrl = new URL(url, 'http://atlas.test');
+      assert.equal(launched.pathname, expectedUrl.pathname);
+      assert.equal(launched.searchParams.get('mode'), expectedUrl.searchParams.get('mode'));
+      assert.equal(launched.searchParams.get('random'), '1');
+      assert.equal(launched.searchParams.get('bestOf'), '3');
+      assert.equal(new Set(launched.searchParams.get('modes').split(',')).size, 3);
+      assert.equal(launched.searchParams.get('modes').split(',')[0], expected.id);
     }
     assert.equal(find(render(), node => node.props?.['aria-label'] === 'Random mode roulette'), undefined);
     buttons(tree).find(node => node.props['aria-label'] === 'Spin for a random mode').props.onClick();
@@ -141,7 +150,8 @@ test('only ? reveals roulette, its highlight slows down, and every launch uses t
     assert.ok(actionButtons(tree).every(node => !node.props.disabled));
     Math.random = () => .99;
     for (let index = 0; index < 3; index++) actionButtons(tree)[index].props.onClick();
-    assert.deepEqual(parent.navigations.slice(-3), [`/games/atlas-arena/solo/${expected.id}`, `/games/atlas-arena/multiplayer?mode=${expected.online}`, `/games/atlas-arena/hotseat/${expected.id}`]);
+    assert.deepEqual(parent.navigations.slice(-3).map(url => new URL(url, 'http://atlas.test').pathname), [`/games/atlas-arena/solo/${expected.id}`, '/games/atlas-arena/multiplayer', `/games/atlas-arena/hotseat/${expected.id}`]);
+    assert.ok(parent.navigations.slice(-3).every(url => new URL(url, 'http://atlas.test').searchParams.get('modes').split(',')[0] === expected.id));
   } finally { Math.random = oldRandom; }
 });
 
@@ -178,4 +188,22 @@ test('random picker X cancels an active spin, restores ?, and permits another sp
   spin();
   assert.equal(h.timers.size, 1);
   h.unmount();
+});
+
+
+test('random match formats default to BO3 and launch one, three or five distinct modes', () => {
+  const parent = harness(), element = randomElement(parent.render()), h = harness();
+  const render = () => h.render(h.RandomModeChoice, element.props);
+  const formats = () => buttons(render()).filter(node => node.props.role === 'radio');
+  assert.deepEqual(formats().map(node => node.props.children), ['One game', 'Best of 3', 'Best of 5']);
+  assert.deepEqual(formats().map(node => node.props['aria-checked']), [false, true, false]);
+  for (const [index, length] of [1, 3, 5].entries()) {
+    formats()[index].props.onClick();
+    actionButtons(render())[2].props.onClick();
+    const params = new URL(parent.navigations.at(-1), 'http://atlas.test').searchParams;
+    assert.equal(params.get('bestOf'), String(length));
+    const modes = params.get('modes').split(',');
+    assert.equal(modes.length, length);
+    assert.equal(new Set(modes).size, length);
+  }
 });

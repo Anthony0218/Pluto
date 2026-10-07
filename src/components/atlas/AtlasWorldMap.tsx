@@ -20,10 +20,6 @@ type Props = {
   correctId?: string | null;
   incorrectId?: string | null;
   filledIds?: string[];
-  ownership?: Record<string, "player_a" | "player_b">;
-  legalIds?: string[];
-  objectiveIds?: string[];
-  routes?: [string, string][];
   disabled?: boolean;
   ariaLabel?: string;
   showHoverLabels?: boolean;
@@ -51,7 +47,7 @@ function fitView(projection: GeoProjection, focus?: [Coordinates, Coordinates] |
   return clampView({ scale, x: WIDTH / 2 - (minX + maxX) / 2 * scale, y: HEIGHT / 2 - (minY + maxY) / 2 * scale });
 }
 
-function AtlasWorldMapComponent({ topology, entities, onSelect, onPoint, pins = [], selectedId, correctId, incorrectId, filledIds = [], ownership = {}, legalIds = [], objectiveIds = [], routes = [], disabled, ariaLabel = "Interactive world map", showHoverLabels = true, focus }: Props) {
+function AtlasWorldMapComponent({ topology, entities, onSelect, onPoint, pins = [], selectedId, correctId, incorrectId, filledIds = [], disabled, ariaLabel = "Interactive world map", showHoverLabels = true, focus }: Props) {
   useUiLanguage();
   const svgRef = useRef<SVGSVGElement>(null);
   const dragRef = useRef<{ x: number; y: number; originX: number; originY: number } | null>(null);
@@ -109,14 +105,12 @@ function AtlasWorldMapComponent({ topology, entities, onSelect, onPoint, pins = 
   }, [touchPanning]);
 
   const statusClass = (entityId?: string) => {
-    const accents = `${entityId === selectedId ? " atlas-country--chosen" : ""}${entityId && legalIds.includes(entityId) ? " atlas-country--legal" : ""}`;
     if (!entityId) return "atlas-country atlas-country--unmapped";
     if (entityId === correctId) return "atlas-country atlas-country--correct";
     if (entityId === incorrectId) return "atlas-country atlas-country--incorrect";
-    if (ownership[entityId]) return `atlas-country atlas-country--${ownership[entityId]}${accents}`;
     if (filledIds.includes(entityId)) return "atlas-country atlas-country--filled";
     if (entityId === selectedId) return "atlas-country atlas-country--selected";
-    return `atlas-country${accents}`;
+    return "atlas-country";
   };
 
   const choose = (entity?: GeographicEntity) => {
@@ -180,8 +174,6 @@ function AtlasWorldMapComponent({ topology, entities, onSelect, onPoint, pins = 
               <circle r={Math.max(2.4, 4 / view.scale)} className="atlas-microstate" />
             </g>
           ))}
-          {routes.map(([a,b]) => { const ca=entities.find(c=>c.id===a)?.centroid, cb=entities.find(c=>c.id===b)?.centroid; return ca&&cb&&<path key={`${a}:${b}`} className="atlas-strategy-route" vectorEffect="non-scaling-stroke" d={geoPath(prepared.projection)({type:"LineString",coordinates:[ca,cb]})||""}/>; })}
-          {objectiveIds.map(id=>{const coordinate=entities.find(c=>c.id===id)?.centroid,point=coordinate&&prepared.projection(coordinate);return point&&<text key={`hub:${id}`} className="atlas-strategy-objective" x={point[0]} y={point[1]} transform={`translate(${point[0]} ${point[1]}) scale(${1/view.scale}) translate(${-point[0]} ${-point[1]})`}>★</text>;})}
           {pins.map(({ coordinates, color, target }, index) => target && <path key={`line-${index}`} className="atlas-map-pin-line" vectorEffect="non-scaling-stroke" style={{ color }} d={geoPath(prepared.projection)({ type: "LineString", coordinates: [coordinates, target] }) || ""} />)}
           {pins.map(({ coordinates, label, color }, index) => {
             const point = prepared.projection(coordinates);

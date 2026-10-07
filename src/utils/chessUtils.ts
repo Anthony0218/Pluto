@@ -29,15 +29,6 @@ export function getMoveRating(
 
   const evaluationLoss = beforeForPlayer - afterForPlayer;
 
-  console.log({
-    beforeEvaluation,
-    afterEvaluation,
-    playerColor,
-    beforeForPlayer,
-    afterForPlayer,
-    evaluationLoss,
-  });
-
   if (evaluationLoss <= 0.1) {
     return "Excellent";
   }

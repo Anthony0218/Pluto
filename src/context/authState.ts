@@ -18,6 +18,8 @@ export type AuthContextType = {
   user: User | null;
   profile: Profile | null;
   loading: boolean;
+  passwordRecovery: boolean;
+  finishPasswordRecovery: () => void;
   refreshProfile: () => Promise<void>;
 
   signUp: (

@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
+import { shareRoomWithClan } from "./clanShare";
 import { currentRoomInvite } from "./inviteRoute";
 const KEY = "pluto-pending-created-invite";
-type Pending = { userId: string; friendId: string; route: string; startedAt: number; code?: string; inviteId: string };
+type Pending = { userId: string; friendId?: string; clanId?: string; route: string; startedAt: number; code?: string; inviteId: string };
 export function prepareCreatedGameInvite(pending: Omit<Pending, "startedAt" | "inviteId">) {
   sessionStorage.setItem(KEY, JSON.stringify({ ...pending, inviteId: crypto.randomUUID(), startedAt: Date.now() }));
 }
@@ -34,11 +35,17 @@ export function useCreatedGameInvite(room: { lobbyRoute: string; code: string } 
     sending.current = true;
     void (async () => {
       try {
-        const { error } = await supabase.from("friend_messages").insert({ id: pending.inviteId, sender_id: user.id, receiver_id: pending.friendId, message_type: "game_code", game: route.startsWith("/games/watten/") ? "watten" : "chess", game_code: code, game_route: route });
-        if (error && error.code !== "23505") throw error;
-        sessionStorage.removeItem(KEY); setFailed(false); setStatus("Room created and friend invited.");
+        if (pending.clanId) {
+          const { error } = await shareRoomWithClan(pending.clanId, code, route);
+          if (error) throw error;
+          sessionStorage.removeItem(KEY); setFailed(false); setStatus("Room created and clan invited.");
+        } else {
+          const { error } = await supabase.from("friend_messages").insert({ id: pending.inviteId, sender_id: user.id, receiver_id: pending.friendId, message_type: "game_code", game: route.startsWith("/games/watten/") ? "watten" : "chess", game_code: code, game_route: route });
+          if (error && error.code !== "23505") throw error;
+          sessionStorage.removeItem(KEY); setFailed(false); setStatus("Room created and friend invited.");
+        }
       } catch {
-        setFailed(true); setStatus("Room created. The invite could not be sent. Retry or share the room code.");
+        setFailed(true); setStatus(pending.clanId ? "Room created. The clan invite could not be sent. Retry or share the room code." : "Room created. The invite could not be sent. Retry or share the room code.");
       } finally { sending.current = false; }
     })();
   }, [user, route, code, attempt]);

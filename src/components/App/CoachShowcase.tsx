@@ -32,11 +32,11 @@ const SUPPORT_COLOR = "#4f9dff";
 type Point = { tone: "support" | "shield" | "king" | "hint"; text: string };
 const notes: Array<{ quality: MoveQuality | "Start"; title: string; detail: string; points?: Point[] }> = [
   { quality: "Start", title: "The opening position", detail: "Step through the game to see how the review explains each move." },
-  { quality: "Best", title: "White claims the centre", detail: "The e-pawn opens lines for the queen and the light-squared bishop." },
-  { quality: "Excellent", title: "Black answers in kind", detail: "Both sides now contest the central squares." },
-  { quality: "Good", title: "The bishop eyes f7", detail: "A natural developing move, though Nf3 first keeps more options." },
-  { quality: "Excellent", title: "The knight guards e5", detail: "Black develops while protecting the centre." },
-  { quality: "Good", title: "Queen and bishop aim at f7", detail: "White threatens Qxf7#. Only the king defends f7." },
+  { quality: "Book", title: "White claims the centre", detail: "The e-pawn opens lines for the queen and the light-squared bishop." },
+  { quality: "Book", title: "Black answers in kind", detail: "Both sides now contest the central squares." },
+  { quality: "Book", title: "The bishop eyes f7", detail: "A natural developing move, though Nf3 first keeps more options." },
+  { quality: "Book", title: "The knight guards e5", detail: "Black develops while protecting the centre." },
+  { quality: "Book", title: "Queen and bishop aim at f7", detail: "White threatens Qxf7#. Only the king defends f7." },
   {
     quality: "Blunder", title: "Nf6 ignores the threat", detail: "The knight attacks the queen, but f7 is still defended by the king alone.",
     points: [{ tone: "hint", text: "g6 or Qe7 would have covered f7." }],
@@ -74,7 +74,7 @@ export default function CoachShowcase() {
       const game = new Chess(before);
       try {
         const move = game.move(san);
-        return [{ san, evaluation, index, quality: alternativeQuality(suggestions, index), fen: game.fen(), lastMove: [move.from, move.to] as [Square, Square] }];
+        return [{ san, evaluation, index, quality: san === moves[ply - 1] && notes[ply].quality !== "Start" ? notes[ply].quality as MoveQuality : alternativeQuality(suggestions, index), fen: game.fen(), lastMove: [move.from, move.to] as [Square, Square] }];
       } catch { return []; }
     });
   }, [ply, positions]);
@@ -83,10 +83,13 @@ export default function CoachShowcase() {
   const selected = candidatePositions.find(candidate => candidate.index === selectedAlternative);
   const board = selected ?? positions[ply];
   const played = positions[ply].lastMove;
-  // The played move gets the full Game Review markup; alternatives only their last-move ring.
-  const annotations = !selected && played && note.quality !== "Start"
-    ? reviewMoveAnnotations({ from: played[0], to: played[1], quality: note.quality, fenAfter: positions[ply].fen })
-    : null;
+  // The played alternative preserves the current move's exact board annotations.
+  const selectedPlayed = selected && selected.san === moves[ply - 1];
+  const annotations = selected && !selectedPlayed
+    ? reviewMoveAnnotations({ from: selected.lastMove[0], to: selected.lastMove[1], quality: selected.quality, fenAfter: selected.fen })
+    : played && note.quality !== "Start"
+      ? reviewMoveAnnotations({ from: played[0], to: played[1], quality: note.quality, fenAfter: positions[ply].fen })
+      : null;
 
   function selectPly(next: number) {
     setPly(next);
@@ -99,7 +102,7 @@ export default function CoachShowcase() {
       <span className="rounded-full border border-amber-300/25 px-2 py-1 text-[10px] font-bold text-amber-200">{ui("Sample game")}</span>
     </div>
     <div className="grid gap-5 p-5 sm:grid-cols-[minmax(0,1fr)_minmax(170px,.85fr)]">
-      <div><ChessPreviewBoard fen={board.fen} lastMove={board.lastMove} annotations={annotations} label={ui("Sample game review board")} /><div className="mt-3 flex items-center justify-between gap-2"><button type="button" onClick={() => selectPly(0)} aria-label={ui("Start of game")} className="rounded-lg border border-white/10 p-2 text-amber-100 hover:bg-white/10"><RotateCcw size={15} /></button><div className="flex items-center gap-2"><button type="button" disabled={ply === 0} onClick={() => selectPly(ply - 1)} aria-label={ui("Previous move")} className="rounded-lg border border-white/10 p-2 text-amber-100 hover:bg-white/10 disabled:opacity-40"><ChevronLeft size={16} /></button><span className="min-w-12 text-center text-xs text-stone-400">{ply}/{moves.length}</span><button type="button" disabled={ply === moves.length} onClick={() => selectPly(ply + 1)} aria-label={ui("Next move")} className="rounded-lg border border-white/10 p-2 text-amber-100 hover:bg-white/10 disabled:opacity-40"><ChevronRight size={16} /></button></div></div><div className="mt-5 border-t border-[#a38960]/20 pt-4"><p className="mb-2 text-[11px] leading-4 text-stone-400">{ui("Sample move categories")}</p><div className="flex flex-wrap items-center gap-1.5">{qualityList.map(quality => <QualityBadge key={quality} quality={quality} />)}</div><button type="button" onClick={() => setReviewOpen(true)} className="mt-4 inline-flex items-center gap-2 rounded-xl bg-amber-200 px-4 py-2.5 text-sm font-bold text-stone-950 transition hover:bg-amber-100">{ui("Open sample review")}<ArrowRight size={16} /></button></div></div>
+      <div><ChessPreviewBoard fen={board.fen} lastMove={board.lastMove} annotations={annotations} label={ui("Sample game review board")} /><div className="mt-3 flex items-center justify-between gap-2"><button type="button" onClick={() => selectPly(0)} aria-label={ui("Start of game")} className="rounded-lg border border-white/10 p-2 text-amber-100 hover:bg-white/10"><RotateCcw size={15} /></button><div className="flex items-center gap-2"><button type="button" disabled={ply === 0} onClick={() => selectPly(ply - 1)} aria-label={ui("Previous move")} className="rounded-lg border border-white/10 p-2 text-amber-100 hover:bg-white/10 disabled:opacity-40"><ChevronLeft size={16} /></button><span className="min-w-12 text-center text-xs text-stone-400">{ply}/{moves.length}</span><button type="button" disabled={ply === moves.length} onClick={() => selectPly(ply + 1)} aria-label={ui("Next move")} className="rounded-lg border border-white/10 p-2 text-amber-100 hover:bg-white/10 disabled:opacity-40"><ChevronRight size={16} /></button></div></div><div className="mt-5 border-t border-[#a38960]/20 pt-4"><p className="mb-2 text-[11px] leading-4 text-stone-400">{ui("Sample move categories")}</p><div className="flex flex-wrap items-center gap-1.5">{([...qualityList, "Missed Win"] as const).map(quality => <QualityBadge key={quality} quality={quality} />)}</div><button type="button" onClick={() => setReviewOpen(true)} className="mt-4 inline-flex items-center gap-2 rounded-xl bg-amber-200 px-4 py-2.5 text-sm font-bold text-stone-950 transition hover:bg-amber-100">{ui("Open sample review")}<ArrowRight size={16} /></button></div></div>
       <div className="flex min-w-0 flex-col">
         <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-300">{ui("Review insight")}</p>
         <p className="mt-2 font-serif text-xl text-[#f3e7cf]">{ui(note.title)}</p>
@@ -109,7 +112,7 @@ export default function CoachShowcase() {
           <span className="flex items-center justify-between gap-2 text-[9px] font-black uppercase tracking-[0.18em] text-amber-200/60"><span>{ui("Current Move")}</span><small className="font-mono text-[11px] normal-case tracking-normal text-emerald-300">{ui("Evaluation")} {ply ? reviewLines[ply - 1].current : "—"}</small></span>
           <span className="flex items-center justify-between gap-2"><span className="font-mono text-2xl font-black text-[#f1e4ca]">{ply ? `${Math.ceil(ply / 2)}${ply % 2 ? "." : "..."} ${moves[ply - 1]}` : "—"}</span>{note.quality === "Start" ? <strong className="text-sm text-stone-300">{ui("Start")}</strong> : <QualityBadge quality={note.quality} />}</span>
         </button>
-        {candidatePositions.length > 0 && <div className="mt-5"><p className="text-[10px] font-black uppercase tracking-widest text-amber-400">{ui("Best 3 Choices")}</p><div className="mt-3 space-y-2">{candidatePositions.map((candidate, index) => <AlternativeMoveButton key={candidate.san} index={index} san={candidate.san} evaluation={candidate.evaluation} quality={candidate.quality} active={selectedAlternative === candidate.index} onClick={() => setSelectedAlternative(candidate.index)} />)}</div></div>}
+        {candidatePositions.length > 0 && <div className="mt-5"><p className="text-[10px] font-black uppercase tracking-widest text-amber-400">{ui("Best 3 Choices")}</p><div className="mt-3 space-y-2">{candidatePositions.map((candidate, index) => <AlternativeMoveButton key={candidate.san} index={index} san={candidate.san} evaluation={candidate.evaluation} quality={candidate.quality} played={candidate.san === moves[ply - 1]} active={selectedAlternative === candidate.index} onClick={() => setSelectedAlternative(candidate.index)} />)}</div></div>}
         <Link to="/games/chess/classic/ai" className="mt-auto flex items-center justify-between pt-6 text-sm font-semibold text-amber-200 hover:text-amber-100">{ui("Try a full game review")}<ArrowRight size={16} /></Link>
       </div>
     </div>

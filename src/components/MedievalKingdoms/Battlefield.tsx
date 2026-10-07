@@ -98,7 +98,7 @@ export default function Battlefield({
   gameMode = "capture",
   gameModeConfig,
   playerFaction = "falconstone",
-  backPath = "/games/medieval-kingdoms",
+  backPath = "/games/medieval-kingdoms/legacy",
   onVictory,
 }: Props) {
   const navigate = useNavigate();

@@ -1,6 +1,7 @@
 import { ATLAS_SCORING, GUESS_SCORING } from "./config.ts";
 import { maxPlayersFor, type AtlasMultiplayerMode } from "./multiplayer.ts";
 import { COUNTRY_GUESSER, EXTREME_GEOGRAPHY, REGION_BUILDER, STAT_BATTLE, STAT_DETECTIVE, STAT_RANKING } from "./trials/config.ts";
+import { HISTORY_BATTLE, HISTORY_SOURCE } from "./trials/historyBattle.ts";
 import { LANGUAGE_GUESSER } from "./trials/languageGuesser.ts";
 import type { AtlasMode } from "./types.ts";
 
@@ -10,11 +11,11 @@ import type { AtlasMode } from "./types.ts";
  */
 export type ArenaModeId =
   | "map-battle" | "closest-wins" | "higher-lower" | "guess-country" | "flag-battle" | "stat-ranking" | "stat-battle"
-  | "region-builder" | "stat-detective" | "guess-country-mini" | "extreme-geography" | "territory-battle" | "speed-run" | "map-fill" | "language-guesser";
-export type TrialKind = "country-guesser" | "stat-detective" | "region-builder" | "stat-ranking" | "extreme-geography" | "stat-battle" | "language-guesser";
+  | "region-builder" | "stat-detective" | "guess-country-mini" | "extreme-geography" | "history-battle" | "speed-run" | "map-fill" | "language-guesser";
+export type TrialKind = "country-guesser" | "stat-detective" | "region-builder" | "stat-ranking" | "extreme-geography" | "stat-battle" | "language-guesser" | "history-battle";
 export type ModeAccent = "cyan" | "amber" | "violet" | "emerald" | "rose" | "sky";
-/** turns: each player plays their own run in turn · pins / territory / duel: head-to-head on one screen. */
-export type HotseatKind = "turns" | "pins" | "territory" | "duel";
+/** turns: each player plays their own run in turn · pins / duel: head-to-head on one screen. */
+export type HotseatKind = "turns" | "pins" | "duel";
 export type ModeOption = "categories" | "stats" | "scope";
 export type ModeRules = { goal: string; play: string[]; scoring: string; solo: string; multiplayer: string; hotseat: string };
 export type ArenaModeDef = {
@@ -35,13 +36,13 @@ const speed = `${ATLAS_SCORING.normalCorrect.toLocaleString("en")} points for a 
 export const ARENA_MODES: ArenaModeDef[] = [
   {
     id: "map-battle", title: "Map Battle", tagline: "Know the world", accent: "cyan", meta: "10 questions · knowledge first",
-    description: "Find countries on the map from names, capitals, flags and facts. Correct answers earn the points; speed adds at most 5%.",
-    solo: { kind: "arena", mode: "map_click" }, online: "map_battle", hotseat: "turns", options: ["categories"], bestId: "map-battle",
+    description: "Find the named country on the world map. Correct answers earn the points; speed adds at most 5%.",
+    solo: { kind: "arena", mode: "map_click" }, online: "map_battle", hotseat: "turns", options: [], bestId: "map-battle",
     rules: {
-      goal: "Click the country the question describes — by its name, capital, flag or a fact about it.",
+      goal: "Click the named country on the world map.",
       play: ["Read the prompt and click the matching country on the world map.", "Zoom with the buttons or the mouse wheel; very small states are drawn as dots.", "You get one click per question: the right country lights up green, a wrong one red."],
       scoring: `${speed}. Wrong clicks score nothing.`,
-      solo: "10 questions from the categories you choose. Difficulty sets the speed-bonus window and how obscure the countries get.",
+      solo: "10 countries to locate. Difficulty sets the speed-bonus window and how obscure the countries get.",
       multiplayer: "2–4 players answer the same question at once with 20 seconds on the clock. Every correct click scores; speed adds at most 5%.",
       hotseat: turns("their own 10 questions"),
     },
@@ -172,16 +173,15 @@ export const ARENA_MODES: ArenaModeDef[] = [
     },
   },
   {
-    id: "territory-battle", title: "Territory Battle", tagline: "Command a frontier", accent: "rose", meta: "6 cycles · supplied borders · strategic hubs",
-    description: "Plan attacks and defenses across a connected regional map. Geographic knowledge makes your orders succeed.",
-    solo: { kind: "arena", mode: "territory_battle" }, online: "territory_battle", hotseat: "territory", options: [], bestId: "territory-battle",
+    id: "history-battle", title: "History Battle", tagline: "Dates & empires", accent: "rose", meta: `${HISTORY_BATTLE.rounds} questions · ${HISTORY_BATTLE.options} options`,
+    description: "Independence days, fallen empires and the names countries left behind. How well do you know how the map was made?",
+    solo: { kind: "trial", trial: "history-battle" }, online: "history_battle", hotseat: "turns", options: [], bestId: "history-battle",
     rules: {
-      goal: "Earn the most influence at the end of six cycles.",
-      play: ["Choose a neighboring country to attack from your supplied frontier, or an owned country to defend.", "Solve a capital, border or currency challenge to execute your order. Homes cannot be captured.", "A correct defense blocks an attack. If both solve the same neutral target, ownership does not change."],
-      scoring: "One influence per country; strategic hubs count as three. Navigation speed gives no advantage.",
-      solo: "Six cycles against a rival commander. The rival chooses before seeing your order and has knowledge calibrated to your difficulty.",
-      multiplayer: "Two players issue hidden simultaneous orders. Each cycle allows 40 seconds to plan and answer; both orders then resolve together.",
-      hotseat: "Two players issue hidden orders behind handoff screens. Both finish their knowledge challenge before the cycle resolves.",
+      goal: "Answer questions about how and when countries came to be.",
+      play: ["Each question is about a country's past: the year it became independent, the power it broke away from, a founding event, or a name it used to carry.", `Pick one of ${HISTORY_BATTLE.options} options. Some questions name the country; in others the countries are the options.`, `After each answer you see the record behind it. Every fact comes from ${HISTORY_SOURCE}, a public-domain reference.`],
+      scoring: `${HISTORY_BATTLE.correct} points per correct answer plus ${HISTORY_BATTLE.streakBonus} for each correct answer in a row before it (up to +${HISTORY_BATTLE.maxStreakBonus}). Wrong answers score zero.`,
+      solo: `${HISTORY_BATTLE.rounds} questions. Beginner sticks to well-known countries and widely spaced years; Expert adds founding dates and years only a few apart.`,
+      multiplayer: race, hotseat: turns(`their own ${HISTORY_BATTLE.rounds} questions`),
     },
   },
   {
@@ -226,6 +226,6 @@ export const ARENA_MODES: ArenaModeDef[] = [
 export const modeById = (id: string | undefined) => ARENA_MODES.find((mode) => mode.id === id);
 export const modeForOnline = (online: string | null | undefined) => ARENA_MODES.find((mode) => mode.online === online);
 export const onlinePlayerLimit = (mode: ArenaModeDef) => maxPlayersFor(mode.online);
-export const hotseatPlayerLimit = (mode: ArenaModeDef) => mode.hotseat === "territory" || mode.hotseat === "duel" ? 2 : 4;
+export const hotseatPlayerLimit = (mode: ArenaModeDef) => mode.hotseat === "duel" ? 2 : 4;
 /** Old Atlas Trials links (/trials/country-guesser …) lead to the same mode here. */
 export const modeForTrial = (trial: string | undefined) => ARENA_MODES.find((mode) => mode.solo.kind === "trial" && mode.solo.trial === trial);

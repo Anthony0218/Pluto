@@ -982,3 +982,182 @@ Database migrations:
 Pluto Party: N/A — no persistent schema (Database changes: none)
 Repository (Supabase): not rebuildable from an empty database — found by inspecting the SQL (base tables are referenced but never created); not executed, because no PostgreSQL/Docker is available in this environment (pre-existing; see Database / Migration Status)
 ```
+
+
+# Learn and Tools — Milestones 5 and 6 (5 October 2026)
+
+These milestones belong to the separate Learn/Tools roadmap in
+`docs/LEARNING_TOOLS.md`; the Pluto Party milestone status above is unchanged.
+
+- Milestone 5: five published Algebra and Functions lessons and the available
+  Function Plotter, with comparison graphs, zoom, keyboard point inspection,
+  bounded expression parsing, and domain-aware curve gaps.
+- Milestone 6: seven published Derivatives and Integrals lessons, numerical slope
+  and signed-integral explorations, refinement comparisons, and clear limitations.
+- Twelve lessons add 36 exact-answer exercises, worked examples, independent
+  checks, and seven-language prose. Reading, bookmarks, and solved exercises use
+  the existing account-isolated local progress store.
+- Verification: 40 Learn/Tools tests pass; focused ESLint and production build
+  pass; desktop/mobile browser review includes calculation errors, domain gaps,
+  grading, reveal-without-credit, and reload persistence.
+- Database/Edge Functions/dependencies: no changes. Next Learn/Tools milestone:
+  7, Linear algebra. See `docs/LEARNING_TOOLS.md` for scope and numerical limits.
+
+
+# Learn and Tools — Milestones 7, 8, and 9 (5 October 2026)
+
+These milestones continue the separate Learn/Tools roadmap in
+`docs/LEARNING_TOOLS.md`; the Pluto Party status above is unchanged.
+
+- Milestone 7: six Linear algebra lessons, with interactive vectors, matrices,
+  systems, geometric transformations, eigenvector directions, and residual checks.
+- Milestone 8: five Analysis in depth lessons, with two-sided limits, ε/δ proof
+  and counterexample activities, sequences, and convergent/divergent series.
+- Milestone 9: six Probability and statistics lessons, with conditional counts,
+  binomial distributions, dataset summaries, sampling assumptions, chart baselines,
+  and reproducible complement simulation.
+- Seventeen new lessons add 51 exact-answer exercises. All 44 published math
+  topics now include a practical everyday situation and concrete calculation,
+  including earlier foundations, percentage, algebra, and calculus lessons.
+- Seven-language prose and controls, keyboard access, browser-local account
+  isolation, reading/bookmarks, and reveal-without-credit practice are preserved.
+- Verification: 52 Learn/Tools tests, focused type checking/ESLint, and production
+  build pass. Browser review covers every new lesson/exploration, persistence,
+  grading, numerical edge cases, and English/German desktop and 360px layouts.
+- Dependencies/Database/Edge Functions: no changes. Next Learn/Tools milestone:
+  10, Music pitches and notation. Numerical scope and limitations are documented
+  in `docs/LEARNING_TOOLS.md`.
+
+
+# Learn and Tools — Milestones 10, 11, 12, and 13 (6 October 2026)
+
+These milestones continue the separate Learn/Tools roadmap in
+`docs/LEARNING_TOOLS.md`; the Pluto Party status above is unchanged.
+
+- Milestone 10: six notation lessons and an interactive score/audio studio for
+  ten instruments, clefs, ledger lines, accidentals and written/sounding pitch.
+- Milestone 11: five rhythm lessons, original passages, notes/rests/dots/ties,
+  simple/compound beat units, tempo, playback and tap timing.
+- Milestone 12: seven football rules lessons based on IFAB 2026/27, including
+  offside replay with frozen pass-time geometry, restart exceptions,
+  whole-ball boundaries, discipline and penalty/free-kick examples.
+- Milestone 13: six tactics lessons with formations, possession changes,
+  player roles, pressing, overlap, false nine and a defending back five.
+- Twenty-four new lessons include 24 graded exercises, seven-language content,
+  keyboard controls and the existing isolated reading/bookmark/exercise store.
+- Trophy explorer: nine selected men's clubs across six domestic leagues,
+  domestic cups, UCL/Europa/Conference and men's/women's World Cup histories.
+  Club snapshots end in 2024/25; men's World Cups in 2026, women's in 2023.
+  These are explicitly dated historical records, not live or exhaustive club data.
+- Official logos are excluded; app usage rights were not established. Original
+  diagrams and identifying names ship. Primary-source research, counting rules
+  and media permissions are recorded in `docs/FOOTBALL_DATA_AND_MEDIA.md`.
+- Verification: all 61 Learn/Tools tests, focused type checking/ESLint and production
+  build pass. Browser review covers all 24 explorations, offside presets, league
+  filters, notation/audio, progress, and English/German desktop/360px layouts.
+- Dependencies/Database/Edge Functions: no changes. Next Learn/Tools milestone:
+  14, Day Planner, Time-Zone Planner and basic in-app task reminders.
+
+
+# Football reference update (6 October 2026)
+
+- Football uses selectable category lists instead of learning progress: all
+  17 IFAB laws, ten position/role explanations, and ten tactics/format topics.
+- A prominent stats box opens the separate club honours and World Cup explorer.
+- Existing interactive situations and old football URLs remain usable;
+  football exercises/reading are excluded from Learn progress registries.
+- Seven-language prose and topic search are available. 63 Learn/Tools tests,
+  focused type checking, ESLint, and production build pass. Desktop/360px
+  browser checks verify category/search/stats navigation and legacy redirects.
+  No database or dependency changes.
+- Official symbols still require applicable usage permission; they are not
+  categorically impossible to license. The rights review records FIFA's request
+  route and UEFA's restrictions. Generic iconography is used in the UI.
+
+# Learn and Tools — Milestones 14, 15, 16, and 17 (6 October 2026)
+
+These milestones continue the separate roadmap in `docs/LEARNING_TOOLS.md`.
+
+- Milestone 14: Day Planner with saved/editable dated tasks, elapsed durations,
+  cross-date conflict checks, completion and optional in-app start reminders;
+  Time-Zone Planner with saved IANA locations, daily/overnight availability,
+  date-aware comparisons and common meeting windows. Missing DST times are
+  rejected, repeated hours offer both UTC occurrences.
+- Milestone 15: Workout Timer with work/rest rounds, optional audio cues,
+  pause/resume/reset, saved editable routines and optional persistent break
+  reminders. Timing catches up after tab suspension; active workouts reset
+  when leaving the route. No final rest interval.
+- Milestone 16: Bill Splitter with local groups of named participants, equal or
+  weighted exact-cent splits, tips, editable expenses, balances, suggested
+  repayments, manually recorded repayments, confirmed deletion and CSV export.
+  Groups are browser-local shared-expense ledgers; there is no remote group
+  membership, invitation delivery or collaborative synchronization. Repayment
+  records do not send money.
+- Milestone 17: Budget Tracker with manual income/expenses, categories, monthly
+  plans/limits, separated currency totals and export; Subscription Tracker
+  with monthly/yearly renewals, anchor-day/leap-year handling, active status,
+  annualized/monthly costs, editing/deletion and export. Subscription totals
+  remain separate from the budget to avoid automatic double counting.
+- Eleven of thirteen catalog tools are now available. Calorie Tracker and
+  Weather Explorer remain planned. All new text has explicit translations
+  in English, German, Bavarian, Korean, Russian, Spanish and Portuguese.
+- Versioned state uses `pluto-life-tools-v1:<account-id>`, isolated from guest
+  state and previous learning/recipe data. Snapshots validate records and
+  limits, notify subscribers across tabs, and keep a session copy if storage
+  fails. Editors/timers reset at account boundaries; writes wait for auth.
+- Reminders run in the root layout across pages, with persisted dismissal and
+  catch-up after reopening. Multiple tabs can display a reminder until one
+  dismisses it. Background and cross-device delivery remain milestone 20.
+- Validation: all 80 Learn/Tools tests pass (17 new calendar, interval, money,
+  ledger, CSV and storage tests); focused TypeScript and ESLint pass; production
+  build passes with the existing Vite configuration and large-chunk warnings.
+  Browser verification covers all six routes, task conflict/DST/reload, time
+  comparison, workout completion/pause, groups/repayments/reload, budget
+  totals/currency filtering, subscriptions, global reminder dismissal/reload,
+  and English/German at 1440px/360px without page horizontal overflow or runtime
+  exceptions. Screenshots were reviewed for desktop and narrow layouts.
+  Re-run with `npm run check:life-tools` against a local dev server.
+- Dependencies/Database/Edge Functions: no additions or deployments required.
+  Next Learn/Tools milestone: 18, Calorie Tracker.
+
+
+## Learn and Tools — milestones 18–20 (6 October 2026)
+
+Milestones 18–19 are implemented. Milestone 20 code and automated checks are
+implemented; hosted rollout and real-device delivery verification are pending.
+
+- **18 — Calorie Tracker:** manual gram/serving portions and label energy,
+  breakfast/lunch/dinner/snack grouping, daily totals, edit/delete, reusable
+  snapshot meal templates with multipliers, date history and escaped CSV export.
+  Account-local validated storage adds 5,000 food entries and 100 meal templates.
+- **19 — Weather Explorer:** original keyboard/click world picker using existing
+  Natural Earth data, bounded coordinates, Open-Meteo place search, 20 saved
+  favorites, hourly temperature chart/table and same-instant place comparisons.
+  Forecasts show local date/time/zone, fixed metric units, missing-value dashes,
+  translated conditions, timeout/abort/error handling, refresh and visible attribution.
+  The live provider returned 72 hourly records and passed the production parser.
+- **20 — Background planner reminders:** per-device opt-in, signed-in account
+  delivery, persisted/coalesced outbox and deletion cancellation, revision guards,
+  backend enrollment/leased queue/retries, private grants/RLS, test rate limiting,
+  stable notification tags, service-worker display/click acknowledgements, account
+  switch cleanup, standalone manifest and device/delivery inspection UI. Other
+  tool records remain browser-local; break reminders stay in-app.
+- All thirteen Tools apps are available, with explicit seven-language UI coverage.
+  Existing version-1 records and account isolation are preserved. Snapshot size
+  is checked before writing to prevent an oversized snapshot becoming unreadable.
+- New infrastructure: `20261024000000_tool_push_reminders.sql`, `tool-push` Edge
+  Function (pinned `npm:web-push@3.6.7`), and optional Vault/pg_cron/pg_net scheduler
+  setup. No new frontend dependencies. No hosted migrations, secrets, deployment,
+  scheduler setup or actual push delivery were performed in this session.
+- Validation: 95 Learn/Tools tests, focused client/Edge contract type checking,
+  ESLint and production build pass. Real PGlite tests cover account/device
+  isolation, caps, grants, leases/retries, cancellation, stale revisions and
+  acknowledgement ordering. HTTP/provider/worker transport tests use mocks.
+  Isolated Chrome checks cover all eight life apps, new calorie and weather flows,
+  persisted data and guest push settings; English/German 1440px/360px layouts have
+  no horizontal overflow. Selected captures were visually inspected. Existing
+  Vite configuration/chunk warnings remain.
+
+Deployment instructions and required two-device/closed-page/iOS checks are in
+`docs/TOOL_NOTIFICATIONS.md`. Supabase setup and physical-device verification are
+required before claiming live background or cross-device delivery.

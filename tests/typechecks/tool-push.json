@@ -1,0 +1,4 @@
+{
+ "compilerOptions":{"target":"es2023","lib":["es2023","DOM"],"module":"esnext","moduleResolution":"bundler","allowImportingTsExtensions":true,"noEmit":true,"strict":true,"skipLibCheck":true},
+ "include":["../../supabase/functions/tool-push/*.ts","./tool-push.d.ts"]
+}

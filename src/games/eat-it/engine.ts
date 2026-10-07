@@ -133,7 +133,7 @@ export function movePlayer(state: Pick<GameState, 'map' | 'time' | 'encounter' |
   if ((p.stunnedUntil ?? 0) > state.time || isChoking(p, state.time)) { p.vx = 0; p.vy = 0; return; }
   if (burst) {
     p.vx = burst.x; p.vy = burst.y; p.x += p.vx*dt; p.y += p.vy*dt;
-    if (state.phase !== 'hell') { resolveWalls(state.map,p,playerRadius(p,state.time)); resolveShrine(state,p,playerRadius(p,state.time)); }
+    if (state.phase !== 'hell') { resolveWalls(state.map,p,playerRadius(p,state.time),true); resolveShrine(state,p,playerRadius(p,state.time)); }
     return;
   }
   const direction = sanitizeInput(input), moving = Math.hypot(direction.x, direction.y) > 0.05;
@@ -151,7 +151,7 @@ export function movePlayer(state: Pick<GameState, 'map' | 'time' | 'encounter' |
   } else { const drag = Math.exp(-friction * dt); p.vx *= drag; p.vy *= drag; }
   const speed = Math.hypot(p.vx, p.vy);
   if (speed > max) { p.vx *= max / speed; p.vy *= max / speed; }
-  p.x += (p.vx + surface.x) * dt; p.y += (p.vy + surface.y) * dt; if (state.phase === 'hell') return; resolveWalls(state.map, p, playerRadius(p, state.time)); resolveShrine(state, p, playerRadius(p, state.time));
+  p.x += (p.vx + surface.x) * dt; p.y += (p.vy + surface.y) * dt; if (state.phase === 'hell') return; resolveWalls(state.map, p, playerRadius(p, state.time), true); resolveShrine(state, p, playerRadius(p, state.time));
 }
 
 let epilogue = false;
@@ -200,7 +200,7 @@ export function stepGame(state: GameState, dt = 1 / EAT.network.tickRate): void 
     const dx = d > 0 ? (b.x - a.x) / d : 1, dy = d > 0 ? (b.y - a.y) / d : 0;
     const push = overlap * EAT.player.bodyPush;
     a.x -= dx * push; a.y -= dy * push; b.x += dx * push; b.y += dy * push;
-    resolveWalls(state.map, a, playerRadius(a, state.time)); resolveWalls(state.map, b, playerRadius(b, state.time));
+    resolveWalls(state.map, a, playerRadius(a, state.time), true); resolveWalls(state.map, b, playerRadius(b, state.time), true);
     resolveShrine(state, a, playerRadius(a, state.time)); resolveShrine(state, b, playerRadius(b, state.time));
     if (!state.events.some(e => e.type === 'collision' && e.playerId === a.id && state.time - e.at < 0.4)) emit(state, { type: 'collision', playerId: a.id, victimId: b.id, x: a.x, y: a.y });
   }

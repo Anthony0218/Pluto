@@ -6,7 +6,7 @@ import type { AtlasDifficulty, AtlasExtras, Coordinates, GeographicEntity } from
  * (World Bank, GeoNames, Wikidata); nothing is estimated. Stats a country lacks are simply absent, and every mode
  * filters on availability, so adding a new stat only needs a field below plus a STATS entry.
  */
-export type TrialStatId = "population" | "areaKm2" | "density" | "neighborCount" | "highestPointM" | "meanTempC";
+export type TrialStatId = "population" | "areaKm2" | "density" | "neighborCount" | "highestPointM" | "meanTempC" | "capitalLatitude" | "capitalEquatorDistance";
 export type TrialCountry = {
   id: string; iso3: string; name: string; flag: string;
   geometryId: string | null; officialLanguages: string[];
@@ -43,17 +43,29 @@ export const STATS: Record<TrialStatId, StatDefinition> = {
   density: {
     id: "density", label: "Population density", unit: "people/km²", source: "World Bank (population ÷ area)",
     extremes: { highest: "the highest population density", lowest: "the lowest population density" },
-    format: (value) => `${value < 10 ? value.toFixed(1) : grouped(value)}/km²`, usableIn: { detective: true, ranking: true, extreme: true, battle: true },
+    format: (value) => `${value < 10 ? value.toFixed(1) : grouped(value)}/km²`, usableIn: { detective: true, ranking: true, extreme: false, battle: true },
   },
   neighborCount: {
     id: "neighborCount", label: "Land borders", unit: "countries", source: "GeoNames",
     extremes: { highest: "the most land borders", lowest: "the fewest land borders" },
-    format: (value) => `${value} ${value === 1 ? "country" : "countries"}`, usableIn: { detective: true, ranking: false, extreme: true, battle: true },
+    format: (value) => `${value} ${value === 1 ? "country" : "countries"}`, usableIn: { detective: true, ranking: false, extreme: false, battle: true },
   },
   highestPointM: {
     id: "highestPointM", label: "Highest point", unit: "m", source: "Wikidata",
     extremes: { highest: "the highest mountain peak", lowest: "the lowest highest point" },
     format: (value) => `${grouped(value)} m`, usableIn: { detective: true, ranking: true, extreme: true, battle: true },
+  },
+  capitalLatitude: {
+    id: "capitalLatitude", label: "Capital latitude", unit: "°", source: "GeoNames capital coordinates",
+    extremes: { highest: "the northernmost capital", lowest: "the southernmost capital" },
+    format: value => `${Math.abs(value).toFixed(2)}° ${value >= 0 ? "N" : "S"}`,
+    usableIn: { detective: false, ranking: false, extreme: true, battle: false },
+  },
+  capitalEquatorDistance: {
+    id: "capitalEquatorDistance", label: "Capital distance from the equator", unit: "° latitude", source: "GeoNames capital coordinates",
+    extremes: { highest: "the capital farthest from the equator", lowest: "the capital closest to the equator" },
+    format: value => `${value.toFixed(2)}° from the equator`,
+    usableIn: { detective: false, ranking: false, extreme: true, battle: false },
   },
   meanTempC: {
     id: "meanTempC", label: "Historical annual mean temperature", unit: "°C", source: "World Bank Climate Change Knowledge Portal, 1995–2014",
@@ -85,6 +97,10 @@ export const hasStats = (country: TrialCountry, stats: TrialStatId[]) => stats.e
 export function toTrialCountry(entity: GeographicEntity, extras: AtlasExtras): TrialCountry {
   const population = entity.population?.value, area = entity.areaKm2?.value, summit = extras.highestPoints[entity.id];
   const stats: TrialCountry["stats"] = { neighborCount: entity.neighbors.length };
+  if (entity.capitalCoordinates) {
+    stats.capitalLatitude = entity.capitalCoordinates[1];
+    stats.capitalEquatorDistance = Math.abs(entity.capitalCoordinates[1]);
+  }
   if (population) stats.population = population;
   if (area) stats.areaKm2 = area;
   if (population && area) stats.density = population / area;

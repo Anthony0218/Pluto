@@ -14,8 +14,9 @@ export function circleHitsRect(p: Vec, radius: number, rect: Obstacle): boolean 
 export function validPosition(map: MapId, p: Vec, radius: number): boolean {
   return p.x >= radius && p.y >= radius && p.x <= EAT.match.width - radius && p.y <= EAT.match.height - radius && !obstaclesFor(map).some(o => circleHitsRect(p, radius + 4, o));
 }
-export function resolveWalls(map: MapId, p: Vec, radius: number): void {
+export function resolveWalls(map: MapId, p: Vec, radius: number, passWater = false): void {
   for (const o of obstaclesFor(map)) {
+    if (passWater && o.kind === "water") continue;
     const x = clamp(p.x, o.x, o.x + o.w), y = clamp(p.y, o.y, o.y + o.h);
     const dx = p.x - x, dy = p.y - y, d = Math.hypot(dx, dy);
     if (d >= radius) continue;

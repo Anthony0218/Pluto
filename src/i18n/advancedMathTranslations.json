@@ -1,0 +1,947 @@
+[
+  [
+    "An equation states that two expressions are equal. Apply the same reversible operation to both sides to preserve its solutions.",
+    "Eine Gleichung sagt aus, dass zwei Ausdrücke gleich sind. Wende auf beide Seiten dieselbe umkehrbare Operation an, um die Lösungen zu erhalten.",
+    "A Gleichung sagt, dass zwoa Ausdrück gleich san. Mach auf beiden Seitn dieselbe umkehrbare Rechnung, damit d Lösungsmenge gleich bleibt.",
+    "방정식은 두 식이 같다는 뜻입니다. 해를 유지하려면 양변에 같은 가역 연산을 적용하세요.",
+    "Уравнение утверждает равенство двух выражений. Применяйте одну и ту же обратимую операцию к обеим частям, чтобы сохранить решения.",
+    "Una ecuación afirma que dos expresiones son iguales. Aplica la misma operación reversible a ambos lados para conservar sus soluciones.",
+    "Uma equação afirma que duas expressões são iguais. Aplique a mesma operação reversível aos dois lados para preservar as soluções."
+  ],
+  [
+    "For inequalities, multiplying or dividing by a negative number reverses the sign. Substitution checks a candidate; it does not prove that you found every solution.",
+    "Bei Ungleichungen kehrt das Multiplizieren oder Dividieren durch eine negative Zahl das Zeichen um. Einsetzen prüft einen Kandidaten, beweist aber nicht, dass alle Lösungen gefunden wurden.",
+    "Bei Ungleichungen draht si s Zeichen um, wennst mit a negativer Zahl multiplizierst oder durch sie teilst. Einsetzn prüft an Kandidaten, beweist aber ned, dass alle Lösungen gfundn san.",
+    "부등식에서 음수를 곱하거나 나누면 부등호가 뒤집힙니다. 대입은 후보를 확인하지만 모든 해를 찾았다는 증명은 아닙니다.",
+    "В неравенствах умножение или деление на отрицательное число меняет знак на противоположный. Подстановка проверяет кандидата, но не доказывает, что найдены все решения.",
+    "En una desigualdad, multiplicar o dividir por un número negativo invierte el signo. Sustituir comprueba un candidato, pero no demuestra que hayas encontrado todas las soluciones.",
+    "Em desigualdades, multiplicar ou dividir por um número negativo inverte o sinal. A substituição verifica um candidato, mas não prova que todas as soluções foram encontradas."
+  ],
+  [
+    "Change the graph. Test your prediction.",
+    "Verändere den Graphen. Prüfe deine Vorhersage.",
+    "Änder den Graphen. Prüf dei Vorhersag.",
+    "그래프를 바꾸고 예측을 확인하세요.",
+    "Измените график. Проверьте свой прогноз.",
+    "Cambia la gráfica. Comprueba tu predicción.",
+    "Altere o gráfico. Teste sua previsão."
+  ],
+  [
+    "Change an input, compare functions, and inspect coordinates. Switch to slope or signed area to connect the graph with the calculation.",
+    "Verändere eine Eingabe, vergleiche Funktionen und untersuche Koordinaten. Wechsle zu Steigung oder vorzeichenbehafteter Fläche, um Graph und Rechnung zu verbinden.",
+    "Änder an Eingabewert, vergleich Funktionen und schau d Koordinaten an. Mit Steigung oder Fläche mit Vorzeichen verbindest den Graphen mit da Rechnung.",
+    "입력을 바꾸고 함수를 비교하며 좌표를 살펴보세요. 기울기나 부호 있는 넓이로 전환해 그래프와 계산을 연결하세요.",
+    "Меняйте входные значения, сравнивайте функции и изучайте координаты. Переключитесь на наклон или площадь со знаком, чтобы связать график с вычислением.",
+    "Cambia un dato, compara funciones e inspecciona coordenadas. Usa la pendiente o el área con signo para relacionar la gráfica con el cálculo.",
+    "Altere um valor, compare funções e examine coordenadas. Use a inclinação ou a área com sinal para relacionar o gráfico ao cálculo."
+  ],
+  [
+    "Give an exact numeric answer to the quantity requested. Keep domain restrictions and units in your written work.",
+    "Gib eine exakte numerische Antwort für die gesuchte Größe an. Halte Definitionsbereiche und Einheiten in deiner Rechnung fest.",
+    "Gib für d gsuchte Größ a genaue Zahl an. Schreib d Einschränkungen vom Definitionsbereich und d Einheiten bei deiner Rechnung dazu.",
+    "요구한 양의 정확한 수치로 답하세요. 풀이에 정의역 제한과 단위를 기록하세요.",
+    "Дайте точный числовой ответ для искомой величины. Указывайте ограничения области определения и единицы в своих записях.",
+    "Da una respuesta numérica exacta a la cantidad solicitada. Anota las restricciones del dominio y las unidades en tu cálculo.",
+    "Dê uma resposta numérica exata para a quantidade pedida. Anote as restrições de domínio e as unidades na resolução."
+  ],
+  [
+    "Substitute into the original equation, including any restrictions. For an inequality, test values on both sides of the boundary; the boundary itself may be excluded.",
+    "Setze in die ursprüngliche Gleichung ein und beachte Einschränkungen. Prüfe bei Ungleichungen Werte auf beiden Seiten der Grenze; die Grenze selbst kann ausgeschlossen sein.",
+    "Setz in d ursprüngliche Gleichung ein und beachte Einschränkungen. Prüf bei Ungleichungen Werte auf beiden Seitn von da Grenz; d Grenz selber kann ausgeschlossen sei.",
+    "제한을 지키며 원래 방정식에 대입하세요. 부등식은 경계 양쪽의 값을 확인하세요. 경계 자체는 제외될 수 있습니다.",
+    "Подставьте значение в исходное уравнение с учётом ограничений. Для неравенства проверьте значения по обе стороны границы; сама граница может быть исключена.",
+    "Sustituye en la ecuación original y respeta las restricciones. Para una desigualdad, prueba valores a ambos lados del límite; el propio límite puede estar excluido.",
+    "Substitua na equação original, respeitando as restrições. Para uma desigualdade, teste valores dos dois lados do limite; o próprio limite pode estar excluído."
+  ],
+  [
+    "A direct proportion has the form y = kx: doubling x doubles y. The ratio y/x is constant for nonzero x.",
+    "Direkte Proportionalität hat die Form y = kx: Verdoppeln von x verdoppelt y. Für x ≠ 0 ist das Verhältnis y/x konstant.",
+    "Direkte Proportionalität hat d Form y = kx: Wennst x verdoppelst, verdoppelt si y. Für x ≠ 0 bleibt y/x gleich.",
+    "정비례는 y = kx 꼴입니다. x가 두 배면 y도 두 배입니다. x가 0이 아니면 y/x는 일정합니다.",
+    "Прямая пропорциональность имеет вид y = kx: удвоение x удваивает y. Отношение y/x постоянно при x ≠ 0.",
+    "Una proporción directa tiene la forma y = kx: duplicar x duplica y. La razón y/x es constante para x distinto de cero.",
+    "Uma proporção direta tem a forma y = kx: dobrar x dobra y. A razão y/x é constante para x diferente de zero."
+  ],
+  [
+    "An inverse proportion has the form y = k/x for nonzero x: doubling x halves y. These models require their assumptions to stay the same.",
+    "Umgekehrte Proportionalität hat die Form y = k/x für x ≠ 0: Verdoppeln von x halbiert y. Die Annahmen dieser Modelle müssen gleich bleiben.",
+    "Umgekehrte Proportionalität hat d Form y = k/x für x ≠ 0: Wennst x verdoppelst, halbiert si y. D Annahmen von den Modellen müssn gleich bleibn.",
+    "반비례는 x ≠ 0에서 y = k/x 꼴입니다. x가 두 배면 y는 절반입니다. 이 모델의 가정은 그대로 유지되어야 합니다.",
+    "Обратная пропорциональность имеет вид y = k/x при x ≠ 0: удвоение x уменьшает y вдвое. Предположения этих моделей должны оставаться неизменными.",
+    "Una proporción inversa tiene la forma y = k/x para x distinto de cero: duplicar x reduce y a la mitad. Los supuestos del modelo deben mantenerse.",
+    "Uma proporção inversa tem a forma y = k/x para x diferente de zero: dobrar x reduz y à metade. As hipóteses do modelo devem permanecer iguais."
+  ],
+  [
+    "Check the constant ratio for direct proportion and the constant product for inverse proportion. Keep the units consistent; a graph through the origin alone does not establish a proportional model.",
+    "Prüfe das konstante Verhältnis bei direkter und das konstante Produkt bei umgekehrter Proportionalität. Verwende passende Einheiten; ein Graph durch den Ursprung allein belegt keine Proportionalität.",
+    "Prüf bei direkter Proportionalität s konstante Verhältnis und bei umgekehrter s konstante Produkt. Halt d Einheiten passend; a Graph durch den Ursprung allein beweist koa Proportionalität.",
+    "정비례는 일정한 비율, 반비례는 일정한 곱을 확인하세요. 단위를 맞추세요. 원점을 지나는 그래프만으로 비례 관계가 성립하지는 않습니다.",
+    "Проверьте постоянство отношения при прямой и произведения при обратной пропорциональности. Согласуйте единицы; прохождение графика через начало координат само по себе не устанавливает пропорциональность.",
+    "Comprueba la razón constante en la proporción directa y el producto constante en la inversa. Mantén unidades coherentes; pasar por el origen no basta para establecer proporcionalidad.",
+    "Verifique a razão constante na proporção direta e o produto constante na inversa. Mantenha unidades coerentes; passar pela origem não basta para estabelecer proporcionalidade."
+  ],
+  [
+    "Positive integer powers repeat multiplication. A negative power is a reciprocal of a nonzero base. The square-root symbol means the nonnegative root, while x² = a can have two real solutions.",
+    "Positive ganzzahlige Potenzen wiederholen die Multiplikation. Eine negative Potenz ist der Kehrwert einer Potenz mit nichtnulliger Basis. Das Quadratwurzelzeichen bezeichnet die nichtnegative Wurzel; x² = a kann zwei reelle Lösungen haben.",
+    "Positive ganzzahlige Potenzen wiederholn d Multiplikation. A negative Potenz is da Kehrwert bei einer Basis ungleich null. S Wurzelzeichen meint d nichtnegative Quadratwurzel; x² = a kann zwoa reelle Lösungen habn.",
+    "양의 정수 거듭제곱은 곱셈의 반복입니다. 음의 거듭제곱은 0이 아닌 밑의 거듭제곱의 역수입니다. 제곱근 기호는 음이 아닌 근을 뜻하지만 x² = a는 두 실수 해를 가질 수 있습니다.",
+    "Положительная целая степень означает повторное умножение. Отрицательная степень — обратная величина степени ненулевого основания. Символ квадратного корня означает неотрицательный корень, а уравнение x² = a может иметь два действительных решения.",
+    "Las potencias enteras positivas repiten la multiplicación. Una potencia negativa es el recíproco de una potencia de base no nula. La raíz cuadrada indica la raíz no negativa, mientras que x² = a puede tener dos soluciones reales.",
+    "Potências inteiras positivas repetem a multiplicação. Uma potência negativa é o inverso de uma potência de base não nula. A raiz quadrada indica a raiz não negativa, enquanto x² = a pode ter duas soluções reais."
+  ],
+  [
+    "A logarithm reverses exponentiation: log_b(a) is the exponent that gives a. For real logarithms, a > 0, b > 0, and b ≠ 1.",
+    "Ein Logarithmus kehrt das Potenzieren um: log_b(a) ist der Exponent, der a ergibt. Für reelle Logarithmen gilt a > 0, b > 0 und b ≠ 1.",
+    "A Logarithmus macht s Potenziern rückgängig: log_b(a) is da Exponent, der a ergibt. Für reelle Logarithmen gilt a > 0, b > 0 und b ≠ 1.",
+    "로그는 거듭제곱의 역입니다. log_b(a)는 a를 만드는 지수입니다. 실수 로그에서는 a > 0, b > 0, b ≠ 1이어야 합니다.",
+    "Логарифм обращает возведение в степень: log_b(a) — показатель, дающий a. Для действительных логарифмов a > 0, b > 0 и b ≠ 1.",
+    "Un logaritmo invierte la potenciación: log_b(a) es el exponente que produce a. Para logaritmos reales, a > 0, b > 0 y b ≠ 1.",
+    "Um logaritmo inverte a potenciação: log_b(a) é o expoente que produz a. Para logaritmos reais, a > 0, b > 0 e b ≠ 1."
+  ],
+  [
+    "Raise the base to your logarithm answer. Square a root and check its sign. Operations that square both sides can introduce extra candidates, so return to the original problem.",
+    "Potenzieren mit deiner Logarithmusantwort muss das Argument ergeben. Quadriere eine Wurzel und prüfe ihr Vorzeichen. Quadrieren beider Seiten kann zusätzliche Kandidaten erzeugen; prüfe daher die ursprüngliche Aufgabe.",
+    "Potenzier d Basis mit deiner Logarithmusantwort. Quadrier a Wurzel und prüf ihr Vorzeichen. Wennst beide Seitn quadrierst, können zusätzliche Kandidaten entstehen; prüf drum d ursprüngliche Aufgab.",
+    "로그의 답을 지수로 사용해 원래 값을 확인하세요. 근을 제곱하고 부호도 확인하세요. 양변을 제곱하면 추가 후보가 생길 수 있으므로 원래 문제로 돌아가세요.",
+    "Возведите основание в степень, равную ответу для логарифма. Возведите корень в квадрат и проверьте его знак. Возведение обеих частей в квадрат может добавить лишних кандидатов, поэтому проверьте исходную задачу.",
+    "Eleva la base al resultado del logaritmo. Eleva una raíz al cuadrado y comprueba su signo. Elevar ambos lados al cuadrado puede introducir candidatos extra; comprueba el problema original.",
+    "Eleve a base ao resultado do logaritmo. Eleve uma raiz ao quadrado e verifique seu sinal. Elevar os dois lados ao quadrado pode introduzir candidatos extras; verifique o problema original."
+  ],
+  [
+    "A function assigns exactly one output to each input in its domain. A graph shows pairs (x, f(x)); it is not a picture of every possible input.",
+    "Eine Funktion ordnet jeder Eingabe ihres Definitionsbereichs genau eine Ausgabe zu. Ein Graph zeigt Paare (x, f(x)); er bildet nicht jede mögliche Eingabe ab.",
+    "A Funktion ordnet jeder Eingab im Definitionsbereich genau oan Ausgabewert zu. A Graph zeigt Paare (x, f(x)); er zeigt ned jede mögliche Eingab.",
+    "함수는 정의역의 각 입력에 정확히 하나의 출력을 대응시킵니다. 그래프는 (x, f(x)) 쌍을 보여주며 모든 입력을 그린 것은 아닙니다.",
+    "Функция сопоставляет каждому входному значению своей области определения ровно одно выходное. График показывает пары (x, f(x)), а не все возможные входные значения.",
+    "Una función asigna exactamente una salida a cada entrada de su dominio. Una gráfica muestra pares (x, f(x)), no todas las entradas posibles.",
+    "Uma função atribui exatamente uma saída a cada entrada do domínio. Um gráfico mostra pares (x, f(x)), não todas as entradas possíveis."
+  ],
+  [
+    "For f(x) = mx + b, m is the change in output per unit of input and b is the output at zero. Intersections satisfy f(x) = g(x).",
+    "Bei f(x) = mx + b ist m die Änderung der Ausgabe pro Eingabeeinheit und b die Ausgabe bei null. An Schnittpunkten gilt f(x) = g(x).",
+    "Bei f(x) = mx + b is m d Änderung pro Eingabeeinheit und b da Wert bei null. An Schnittpunkten gilt f(x) = g(x).",
+    "f(x) = mx + b에서 m은 입력 한 단위당 출력의 변화이고 b는 입력이 0일 때의 출력입니다. 교점에서는 f(x) = g(x)입니다.",
+    "В f(x) = mx + b величина m — изменение выхода на единицу входа, а b — выход при нуле. В точках пересечения f(x) = g(x).",
+    "En f(x) = mx + b, m es el cambio de salida por unidad de entrada y b es la salida en cero. Las intersecciones satisfacen f(x) = g(x).",
+    "Em f(x) = mx + b, m é a variação da saída por unidade de entrada e b é a saída em zero. As interseções satisfazem f(x) = g(x)."
+  ],
+  [
+    "Read a point from the graph and substitute its input into the formula. A sampled graph can suggest intersections but may miss narrow features; solve and verify algebraically when possible.",
+    "Lies einen Punkt ab und setze seine Eingabe in die Formel ein. Ein abgetasteter Graph kann Schnittpunkte nahelegen, aber schmale Merkmale übersehen; löse und prüfe nach Möglichkeit algebraisch.",
+    "Lies an Punkt ab und setz sei Eingab in d Formel ein. A abgetasteter Graph kann Schnittpunkte andeutn, aber schmale Merkmale übersehn; lös und prüf möglichst algebraisch.",
+    "그래프의 점을 읽고 입력을 식에 대입하세요. 표본 그래프는 교점을 암시하지만 좁은 특징을 놓칠 수 있으므로 가능하면 대수적으로 풀고 확인하세요.",
+    "Считайте точку с графика и подставьте её вход в формулу. График по выборке может подсказать пересечения, но пропустить узкие особенности; по возможности решайте и проверяйте алгебраически.",
+    "Lee un punto y sustituye su entrada en la fórmula. Una gráfica muestreada puede sugerir intersecciones, pero omitir detalles estrechos; resuelve y verifica algebraicamente cuando sea posible.",
+    "Leia um ponto e substitua sua entrada na fórmula. Um gráfico amostrado pode sugerir interseções, mas omitir detalhes estreitos; resolva e verifique algebricamente quando possível."
+  ],
+  [
+    "A denominator cannot be zero; a real square root requires a nonnegative radicand; a real logarithm requires a positive argument. Intersect restrictions when combining expressions.",
+    "Ein Nenner darf nicht null sein; eine reelle Quadratwurzel braucht einen nichtnegativen Radikanden; ein reeller Logarithmus ein positives Argument. Kombiniere alle Einschränkungen bei zusammengesetzten Ausdrücken.",
+    "A Nenner derf ned null sei; a reelle Quadratwurzel braucht an nichtnegativen Radikanden; a reeller Logarithmus a positives Argument. Bei zusammengesetzten Ausdrücken müssn alle Einschränkungen gelten.",
+    "분모는 0일 수 없습니다. 실수 제곱근의 피제곱수는 음이 아니어야 하고 실수 로그의 인수는 양수여야 합니다. 식을 결합할 때 모든 제한을 동시에 적용하세요.",
+    "Знаменатель не может быть нулём; действительный квадратный корень требует неотрицательного подкоренного выражения, а логарифм — положительного аргумента. При объединении выражений учитывайте все ограничения.",
+    "Un denominador no puede ser cero; una raíz cuadrada real requiere un radicando no negativo y un logaritmo real un argumento positivo. Combina todas las restricciones al unir expresiones.",
+    "Um denominador não pode ser zero; uma raiz quadrada real exige radicando não negativo e um logaritmo real exige argumento positivo. Combine todas as restrições ao unir expressões."
+  ],
+  [
+    "Simplifying an expression does not restore excluded inputs. The formula (x² − 1)/(x − 1) equals x + 1 only where x ≠ 1.",
+    "Vereinfachen stellt ausgeschlossene Eingaben nicht wieder her. (x² − 1)/(x − 1) ist nur für x ≠ 1 gleich x + 1.",
+    "Vereinfachen macht ausgeschlossene Eingaben ned wieder erlaubt. (x² − 1)/(x − 1) is nur für x ≠ 1 gleich x + 1.",
+    "식을 간단히 해도 제외된 입력이 다시 허용되지는 않습니다. (x² − 1)/(x − 1)은 x ≠ 1에서만 x + 1과 같습니다.",
+    "Упрощение не возвращает исключённые входные значения. Формула (x² − 1)/(x − 1) равна x + 1 только при x ≠ 1.",
+    "Simplificar no recupera entradas excluidas. (x² − 1)/(x − 1) equivale a x + 1 solo cuando x ≠ 1.",
+    "Simplificar não recupera entradas excluídas. (x² − 1)/(x − 1) equivale a x + 1 apenas quando x ≠ 1."
+  ],
+  [
+    "Keep a list of excluded inputs before simplifying. Check both the original domain and the original equation. Numerical agreement at some points does not establish an identity everywhere.",
+    "Notiere ausgeschlossene Eingaben vor dem Vereinfachen. Prüfe ursprünglichen Definitionsbereich und ursprüngliche Gleichung. Übereinstimmung an einigen Punkten beweist keine überall gültige Identität.",
+    "Schreib ausgeschlossene Eingaben vorm Vereinfachen auf. Prüf den ursprünglichen Definitionsbereich und d ursprüngliche Gleichung. Wenn Zahlen an a paar Punkten passen, beweist des koa Identität überall.",
+    "간단히 하기 전에 제외된 입력을 기록하세요. 원래 정의역과 방정식을 모두 확인하세요. 일부 점에서의 수치 일치는 모든 곳에서 성립하는 항등식의 증명이 아닙니다.",
+    "Запишите исключённые значения до упрощения. Проверьте исходную область определения и уравнение. Численное совпадение в отдельных точках не устанавливает тождество всюду.",
+    "Anota las entradas excluidas antes de simplificar. Comprueba el dominio y la ecuación originales. Coincidir numéricamente en algunos puntos no establece una identidad en todas partes.",
+    "Anote as entradas excluídas antes de simplificar. Verifique o domínio e a equação originais. Coincidência numérica em alguns pontos não estabelece uma identidade em todos os pontos."
+  ],
+  [
+    "Average rate of change is (f(b) − f(a))/(b − a) for distinct inputs. It is the slope of the secant through two points, with output units per input unit.",
+    "Die mittlere Änderungsrate ist (f(b) − f(a))/(b − a) für verschiedene Eingaben. Sie ist die Sekantensteigung durch zwei Punkte, mit Ausgabeeinheiten pro Eingabeeinheit.",
+    "D mittlere Änderungsrate is (f(b) − f(a))/(b − a) für verschiedene Eingaben. Des is d Sekantensteigung durch zwoa Punkte, mit Ausgabeeinheiten pro Eingabeeinheit.",
+    "평균 변화율은 서로 다른 입력에 대해 (f(b) − f(a))/(b − a)입니다. 두 점을 잇는 할선의 기울기이며 단위는 출력 단위/입력 단위입니다.",
+    "Средняя скорость изменения равна (f(b) − f(a))/(b − a) для разных входных значений. Это наклон секущей через две точки, в единицах выхода на единицу входа.",
+    "La tasa media de cambio es (f(b) − f(a))/(b − a) para entradas distintas. Es la pendiente de la secante entre dos puntos, en unidades de salida por unidad de entrada.",
+    "A taxa média de variação é (f(b) − f(a))/(b − a) para entradas distintas. É a inclinação da secante entre dois pontos, em unidades de saída por unidade de entrada."
+  ],
+  [
+    "An instantaneous rate is the limit of secant slopes as the input difference approaches zero, when that limit exists. At a corner, left and right slopes can disagree.",
+    "Die momentane Änderungsrate ist der Grenzwert der Sekantensteigungen, wenn der Eingabeabstand gegen null geht und dieser Grenzwert existiert. An einer Ecke können sich linke und rechte Steigung unterscheiden.",
+    "D momentane Änderungsrate is da Grenzwert von de Sekantensteigungen, wenn da Eingabeabstand gegen null geht und der Grenzwert existiert. An einer Eck können linke und rechte Steigung verschieden sei.",
+    "순간 변화율은 입력 차이가 0에 가까워질 때 할선 기울기의 극한이며, 이 극한이 존재해야 합니다. 모서리에서는 왼쪽과 오른쪽 기울기가 다를 수 있습니다.",
+    "Мгновенная скорость — предел наклонов секущих при стремлении разности входов к нулю, если предел существует. В угловой точке левый и правый наклоны могут различаться.",
+    "La tasa instantánea es el límite de las pendientes secantes cuando la diferencia de entrada tiende a cero, si existe. En una esquina, las pendientes izquierda y derecha pueden diferir.",
+    "A taxa instantânea é o limite das inclinações secantes quando a diferença de entrada tende a zero, se existir. Em um canto, as inclinações à esquerda e à direita podem diferir."
+  ],
+  [
+    "Compare smaller positive and negative input changes. Agreement supports a slope estimate but is not proof that a derivative exists. For |x| at zero, the one-sided slopes are −1 and 1.",
+    "Vergleiche kleinere positive und negative Eingabeänderungen. Übereinstimmung stützt eine Steigungsschätzung, beweist aber keine Ableitung. Bei |x| in null sind die einseitigen Steigungen −1 und 1.",
+    "Vergleich kleinere positive und negative Eingabeänderungen. Übereinstimmung stützt a Steigungsschätzung, beweist aber koa Ableitung. Bei |x| an null san d einseitigen Steigungen −1 und 1.",
+    "더 작은 양수와 음수 입력 변화를 비교하세요. 일치는 기울기 추정을 뒷받침하지만 미분 가능성의 증명은 아닙니다. |x|의 0에서 한쪽 기울기는 −1과 1입니다.",
+    "Сравните меньшие положительные и отрицательные изменения входа. Совпадение поддерживает оценку наклона, но не доказывает существование производной. Для |x| в нуле односторонние наклоны равны −1 и 1.",
+    "Compara cambios positivos y negativos más pequeños. La coincidencia apoya una estimación, pero no prueba que exista derivada. Para |x| en cero, las pendientes laterales son −1 y 1.",
+    "Compare variações positivas e negativas menores. A concordância apoia uma estimativa, mas não prova a existência da derivada. Para |x| em zero, as inclinações laterais são −1 e 1."
+  ],
+  [
+    "Derivatives and their rules",
+    "Ableitungen und ihre Regeln",
+    "Ableitungen und ihre Regeln",
+    "도함수와 미분법",
+    "Производные и их правила",
+    "Derivadas y sus reglas",
+    "Derivadas e suas regras"
+  ],
+  [
+    "For a positive integer n, the derivative of xⁿ is nxⁿ⁻¹. Constants differentiate to zero, and sums differentiate term by term.",
+    "Für eine positive ganze Zahl n ist die Ableitung von xⁿ gleich nxⁿ⁻¹. Konstanten haben die Ableitung null; Summen werden gliedweise abgeleitet.",
+    "Für a positive ganze Zahl n is d Ableitung von xⁿ gleich nxⁿ⁻¹. Konstanten habn d Ableitung null; Summen leitest gliedweise ab.",
+    "양의 정수 n에서 xⁿ의 도함수는 nxⁿ⁻¹입니다. 상수의 도함수는 0이며 합은 각 항을 미분합니다.",
+    "Для положительного целого n производная xⁿ равна nxⁿ⁻¹. Производная константы равна нулю, суммы дифференцируются по членам.",
+    "Para un entero positivo n, la derivada de xⁿ es nxⁿ⁻¹. Las constantes tienen derivada cero y las sumas se derivan término a término.",
+    "Para um inteiro positivo n, a derivada de xⁿ é nxⁿ⁻¹. Constantes têm derivada zero e somas são derivadas termo a termo."
+  ],
+  [
+    "The product rule is (uv)′ = u′v + uv′. The quotient rule is (u/v)′ = (u′v − uv′)/v² where v ≠ 0. The chain rule differentiates the outside and multiplies by the derivative of the inside.",
+    "Die Produktregel lautet (uv)′ = u′v + uv′. Die Quotientenregel lautet (u/v)′ = (u′v − uv′)/v² für v ≠ 0. Die Kettenregel leitet die äußere Funktion ab und multipliziert mit der Ableitung der inneren.",
+    "D Produktregel lautet (uv)′ = u′v + uv′. D Quotientenregel lautet (u/v)′ = (u′v − uv′)/v² für v ≠ 0. Bei da Kettenregel leitest d äußere Funktion ab und multiplizierst mit da Ableitung von da inneren.",
+    "곱의 미분법은 (uv)′ = u′v + uv′입니다. 몫의 미분법은 v ≠ 0에서 (u/v)′ = (u′v − uv′)/v²입니다. 연쇄법칙은 바깥 함수를 미분한 뒤 안쪽 함수의 도함수를 곱합니다.",
+    "Правило произведения: (uv)′ = u′v + uv′. Правило частного: (u/v)′ = (u′v − uv′)/v² при v ≠ 0. Правило цепочки дифференцирует внешнюю функцию и умножает на производную внутренней.",
+    "La regla del producto es (uv)′ = u′v + uv′. La del cociente es (u/v)′ = (u′v − uv′)/v² para v ≠ 0. La regla de la cadena deriva la función externa y multiplica por la derivada interna.",
+    "A regra do produto é (uv)′ = u′v + uv′. A do quociente é (u/v)′ = (u′v − uv′)/v² para v ≠ 0. A regra da cadeia deriva a função externa e multiplica pela derivada interna."
+  ],
+  [
+    "Simplify by a different method where possible, then compare derivatives. A finite-difference estimate can catch many errors, but cannot prove a symbolic rule.",
+    "Vereinfache nach Möglichkeit anders und vergleiche die Ableitungen. Eine Differenzenquotienten-Schätzung kann viele Fehler aufdecken, aber keine symbolische Regel beweisen.",
+    "Vereinfach möglichst auf an andern Weg und vergleich d Ableitungen. A Schätzung mit Differenzenquotienten kann viele Fehler aufdeckn, aber koa symbolische Regel beweisn.",
+    "가능하면 다른 방법으로 식을 정리한 뒤 도함수를 비교하세요. 유한차분 추정은 많은 오류를 찾지만 기호적 규칙을 증명하지는 못합니다.",
+    "По возможности упростите другим способом и сравните производные. Конечно-разностная оценка выявляет многие ошибки, но не доказывает символьное правило.",
+    "Simplifica por otro método cuando sea posible y compara derivadas. Una estimación por diferencias finitas puede detectar muchos errores, pero no demostrar una regla simbólica.",
+    "Simplifique por outro método quando possível e compare derivadas. Uma estimativa por diferenças finitas pode detectar muitos erros, mas não provar uma regra simbólica."
+  ],
+  [
+    "Multiplying a constant rate by an input interval gives accumulated change. For a varying rate, divide the interval into small pieces and sum approximate contributions.",
+    "Eine konstante Rate mal Eingabeintervall ergibt die angesammelte Änderung. Bei einer veränderlichen Rate zerlegst du das Intervall und addierst angenäherte Beiträge.",
+    "A konstante Rate mal Eingabeintervall ergibt d aufsummierte Änderung. Bei a veränderlichen Rate zerlegst s Intervall und addierst angenäherte Beiträge.",
+    "일정한 변화율에 입력 구간의 길이를 곱하면 누적 변화가 됩니다. 변화율이 달라지면 구간을 작게 나누고 근사 기여량을 더하세요.",
+    "Умножение постоянной скорости на интервал входа даёт накопленное изменение. Для переменной скорости разделите интервал на части и сложите приближённые вклады.",
+    "Multiplicar una tasa constante por el intervalo de entrada da el cambio acumulado. Si varía, divide el intervalo en partes pequeñas y suma contribuciones aproximadas.",
+    "Multiplicar uma taxa constante pelo intervalo de entrada dá a variação acumulada. Se a taxa variar, divida o intervalo em partes pequenas e some contribuições aproximadas."
+  ],
+  [
+    "A definite integral is signed accumulation: contributions below zero subtract. Geometric area is nonnegative and requires splitting at sign changes or integrating the absolute value.",
+    "Ein bestimmtes Integral ist eine vorzeichenbehaftete Summe: Beiträge unter null werden abgezogen. Geometrische Fläche ist nichtnegativ; teile an Vorzeichenwechseln oder integriere den Betrag.",
+    "A bestimmtes Integral is a Summe mit Vorzeichen: Beiträge unter null werdn abzogn. Geometrische Fläche is nichtnegativ; teil an Vorzeichenwechseln auf oder integrier den Betrag.",
+    "정적분은 부호 있는 누적량입니다. 0 아래의 기여는 뺍니다. 기하학적 넓이는 음이 아니므로 부호가 바뀌는 곳에서 나누거나 절댓값을 적분해야 합니다.",
+    "Определённый интеграл — накопление со знаком: вклады ниже нуля вычитаются. Геометрическая площадь неотрицательна; разбивайте интервал при смене знака или интегрируйте модуль.",
+    "Una integral definida es acumulación con signo: las contribuciones bajo cero se restan. El área geométrica no es negativa; divide en los cambios de signo o integra el valor absoluto.",
+    "Uma integral definida é acumulação com sinal: contribuições abaixo de zero são subtraídas. A área geométrica não é negativa; divida nas mudanças de sinal ou integre o valor absoluto."
+  ],
+  [
+    "Start with rectangles or triangles whose exact areas are known. Increase the number of pieces and compare estimates; their difference is not a guaranteed error bound.",
+    "Beginne mit Rechtecken oder Dreiecken bekannter Fläche. Erhöhe die Anzahl der Teile und vergleiche Schätzungen; ihre Differenz ist keine garantierte Fehlerschranke.",
+    "Fang mit Rechtecken oder Dreiecken an, deren Fläche bekannt is. Erhöh d Anzahl der Teile und vergleich Schätzungen; ihr Unterschied is koa garantierte Fehlerschranke.",
+    "정확한 넓이를 아는 직사각형이나 삼각형부터 시작하세요. 조각 수를 늘리고 추정값을 비교하세요. 그 차이는 보장된 오차 한계가 아닙니다.",
+    "Начните с прямоугольников или треугольников с известной точной площадью. Увеличьте число частей и сравните оценки; их разность не является гарантированной границей ошибки.",
+    "Empieza con rectángulos o triángulos de área exacta conocida. Aumenta las partes y compara estimaciones; la diferencia no es una cota de error garantizada.",
+    "Comece com retângulos ou triângulos de área exata conhecida. Aumente o número de partes e compare estimativas; a diferença não é um limite de erro garantido."
+  ],
+  [
+    "Antiderivatives and the constant",
+    "Stammfunktionen und die Konstante",
+    "Stammfunktionen und d Konstante",
+    "원시함수와 적분상수",
+    "Первообразные и константа",
+    "Antiderivadas y la constante",
+    "Primitivas e a constante"
+  ],
+  [
+    "An antiderivative F of f satisfies F′ = f. If F works, F + C also works for any constant C. An indefinite integral denotes this family, rather than a single number.",
+    "Eine Stammfunktion F von f erfüllt F′ = f. Ist F eine Stammfunktion, gilt das auch für F + C mit jeder Konstante C. Ein unbestimmtes Integral bezeichnet diese Familie, keine einzelne Zahl.",
+    "A Stammfunktion F von f erfüllt F′ = f. Wenn F passt, passt aa F + C für jede Konstante C. A unbestimmtes Integral meint de ganze Familie, koa einzelne Zahl.",
+    "f의 원시함수 F는 F′ = f를 만족합니다. F가 원시함수이면 임의의 상수 C에 대해 F + C도 원시함수입니다. 부정적분은 하나의 수가 아니라 이 함수족을 나타냅니다.",
+    "Первообразная F функции f удовлетворяет F′ = f. Если F подходит, то F + C подходит для любой константы C. Неопределённый интеграл обозначает это семейство, а не одно число.",
+    "Una antiderivada F de f satisface F′ = f. Si F sirve, F + C también, para cualquier constante C. Una integral indefinida representa esa familia, no un solo número.",
+    "Uma primitiva F de f satisfaz F′ = f. Se F serve, F + C também serve para qualquer constante C. Uma integral indefinida representa essa família, não um único número."
+  ],
+  [
+    "For a nonnegative integer n, an antiderivative of xⁿ is xⁿ⁺¹/(n+1). The rule does not apply to n = −1: an antiderivative of 1/x is ln|x| on each interval avoiding zero.",
+    "Für eine nichtnegative ganze Zahl n ist xⁿ⁺¹/(n+1) eine Stammfunktion von xⁿ. Die Regel gilt nicht für n = −1: Eine Stammfunktion von 1/x ist ln|x| auf jedem Intervall ohne null.",
+    "Für a nichtnegative ganze Zahl n is xⁿ⁺¹/(n+1) a Stammfunktion von xⁿ. Für n = −1 gilt des ned: A Stammfunktion von 1/x is ln|x| auf jedem Intervall ohne null.",
+    "음이 아닌 정수 n에서 xⁿ의 원시함수는 xⁿ⁺¹/(n+1)입니다. n = −1에는 적용되지 않습니다. 0을 포함하지 않는 각 구간에서 1/x의 원시함수는 ln|x|입니다.",
+    "Для неотрицательного целого n первообразная xⁿ равна xⁿ⁺¹/(n+1). Правило не применяется при n = −1: первообразная 1/x — ln|x| на каждом интервале без нуля.",
+    "Para un entero no negativo n, una antiderivada de xⁿ es xⁿ⁺¹/(n+1). No se aplica a n = −1: una antiderivada de 1/x es ln|x| en cada intervalo que no incluya cero.",
+    "Para um inteiro não negativo n, uma primitiva de xⁿ é xⁿ⁺¹/(n+1). A regra não vale para n = −1: uma primitiva de 1/x é ln|x| em cada intervalo sem zero."
+  ],
+  [
+    "Differentiate your proposed antiderivative on its domain. An initial value fixes the constant on the interval in question. Do not use an antiderivative across a singularity.",
+    "Leite deine vorgeschlagene Stammfunktion in ihrem Definitionsbereich ab. Ein Anfangswert legt die Konstante im betrachteten Intervall fest. Verwende eine Stammfunktion nicht über eine Singularität hinweg.",
+    "Leit dei vorgeschlagene Stammfunktion in ihrem Definitionsbereich ab. A Anfangswert legt d Konstante im betrachteten Intervall fest. Verwend koa Stammfunktion über a Singularität hinweg.",
+    "제안한 원시함수를 정의역에서 미분하세요. 초기값은 해당 구간의 상수를 결정합니다. 특이점을 가로질러 원시함수를 사용하지 마세요.",
+    "Дифференцируйте предложенную первообразную в её области определения. Начальное значение определяет константу на рассматриваемом интервале. Не применяйте первообразную через особую точку.",
+    "Deriva la antiderivada propuesta en su dominio. Un valor inicial fija la constante en el intervalo. No uses una antiderivada atravesando una singularidad.",
+    "Derive a primitiva proposta no seu domínio. Um valor inicial fixa a constante no intervalo. Não use uma primitiva atravessando uma singularidade."
+  ],
+  [
+    "Definite integrals and the fundamental theorem",
+    "Bestimmte Integrale und der Hauptsatz",
+    "Bestimmte Integrale und da Hauptsatz",
+    "정적분과 미적분학의 기본정리",
+    "Определённые интегралы и основная теорема",
+    "Integrales definidas y el teorema fundamental",
+    "Integrais definidas e o teorema fundamental"
+  ],
+  [
+    "For continuous f on [a,b] and an antiderivative F, the fundamental theorem gives ∫ₐᵇ f(x) dx = F(b) − F(a). The constants cancel.",
+    "Für stetiges f auf [a,b] und eine Stammfunktion F liefert der Hauptsatz ∫ₐᵇ f(x) dx = F(b) − F(a). Die Konstanten heben sich auf.",
+    "Für stetiges f auf [a,b] und a Stammfunktion F gilt laut Hauptsatz ∫ₐᵇ f(x) dx = F(b) − F(a). D Konstanten hebn si auf.",
+    "[a,b]에서 연속인 f와 원시함수 F에 대해 기본정리는 ∫ₐᵇ f(x) dx = F(b) − F(a)를 줍니다. 상수는 상쇄됩니다.",
+    "Для непрерывной f на [a,b] и первообразной F основная теорема даёт ∫ₐᵇ f(x) dx = F(b) − F(a). Константы сокращаются.",
+    "Para f continua en [a,b] y una antiderivada F, el teorema fundamental da ∫ₐᵇ f(x) dx = F(b) − F(a). Las constantes se cancelan.",
+    "Para f contínua em [a,b] e uma primitiva F, o teorema fundamental dá ∫ₐᵇ f(x) dx = F(b) − F(a). As constantes se cancelam."
+  ],
+  [
+    "If A(x) = ∫ₐˣ f(t) dt and f is continuous, then A′(x) = f(x). This connects accumulation with rate of change. Reversing integral bounds reverses its sign.",
+    "Wenn A(x) = ∫ₐˣ f(t) dt und f stetig ist, gilt A′(x) = f(x). Das verbindet Anhäufung und Änderungsrate. Vertauschen der Integralgrenzen kehrt das Vorzeichen um.",
+    "Wenn A(x) = ∫ₐˣ f(t) dt und f stetig is, gilt A′(x) = f(x). Des verbindet Aufsummierung und Änderungsrate. Vertauschte Integralgrenzen drahn s Vorzeichen um.",
+    "A(x) = ∫ₐˣ f(t) dt이고 f가 연속이면 A′(x) = f(x)입니다. 누적량과 변화율을 연결하는 관계입니다. 적분 경계를 뒤집으면 부호도 뒤집힙니다.",
+    "Если A(x) = ∫ₐˣ f(t) dt и f непрерывна, то A′(x) = f(x). Это связывает накопление со скоростью изменения. Перестановка пределов интегрирования меняет знак.",
+    "Si A(x) = ∫ₐˣ f(t) dt y f es continua, A′(x) = f(x). Esto conecta acumulación y tasa de cambio. Invertir los límites invierte el signo de la integral.",
+    "Se A(x) = ∫ₐˣ f(t) dt e f é contínua, A′(x) = f(x). Isso conecta acumulação e taxa de variação. Inverter os limites inverte o sinal da integral."
+  ],
+  [
+    "Differentiate F before applying the endpoint formula. Verify the domain over the whole interval. For 1/x on an interval crossing zero, the usual endpoint calculation is not a valid proper integral.",
+    "Leite F ab, bevor du die Endpunktformel anwendest. Prüfe den Definitionsbereich über das ganze Intervall. Für 1/x über ein Intervall mit null ist die übliche Endpunktrechnung kein gültiges eigentliches Integral.",
+    "Leit F ab, bevorst d Endpunktformel anwendest. Prüf den Definitionsbereich im ganzen Intervall. Bei 1/x über a Intervall mit null is d normale Endpunktrechnung koa gültiges eigentliches Integral.",
+    "끝점 공식을 쓰기 전에 F를 미분하세요. 전체 구간의 정의역을 확인하세요. 0을 지나는 구간에서 1/x에 일반적인 끝점 계산을 적용하면 정상적인 정적분이 아닙니다.",
+    "Дифференцируйте F перед применением формулы по концам. Проверьте область определения на всём интервале. Для 1/x на интервале через нуль обычный расчёт по концам не даёт допустимого собственного интеграла.",
+    "Deriva F antes de aplicar la fórmula de extremos. Comprueba el dominio en todo el intervalo. Para 1/x en un intervalo que cruza cero, el cálculo habitual de extremos no es una integral propia válida.",
+    "Derive F antes de aplicar a fórmula dos extremos. Verifique o domínio em todo o intervalo. Para 1/x em um intervalo que cruza zero, o cálculo usual pelos extremos não é uma integral própria válida."
+  ],
+  [
+    "Optimization and boundary checks",
+    "Optimierung und Randprüfungen",
+    "Optimierung und Randprüfung",
+    "최적화와 경계 확인",
+    "Оптимизация и проверка границ",
+    "Optimización y comprobación de límites",
+    "Otimização e verificação dos extremos"
+  ],
+  [
+    "To optimize a differentiable function on a closed bounded interval, check stationary points inside the interval and both endpoints. Also check any points where the derivative does not exist.",
+    "Um eine differenzierbare Funktion auf einem abgeschlossenen beschränkten Intervall zu optimieren, prüfe stationäre Punkte im Inneren und beide Endpunkte. Prüfe auch Punkte ohne Ableitung.",
+    "Zum Optimiern auf am abgeschlossenen beschränkten Intervall prüfst stationäre Punkte im Inneren und beide Endpunkte. Prüf aa Punkte, wo d Ableitung ned existiert.",
+    "닫힌 유계 구간에서 미분 가능한 함수를 최적화하려면 내부 정지점과 양 끝점을 확인하세요. 도함수가 존재하지 않는 점도 확인하세요.",
+    "Для оптимизации дифференцируемой функции на замкнутом ограниченном интервале проверьте внутренние стационарные точки и оба конца. Также проверьте точки без производной.",
+    "Para optimizar una función diferenciable en un intervalo cerrado y acotado, comprueba puntos estacionarios interiores y ambos extremos. Comprueba también puntos sin derivada.",
+    "Para otimizar uma função diferenciável em um intervalo fechado e limitado, verifique os pontos estacionários internos e ambos os extremos. Verifique também pontos sem derivada."
+  ],
+  [
+    "A zero derivative alone does not establish a maximum or minimum. Compare nearby values, use a justified second-derivative test, or compare all candidates. State the feasible domain.",
+    "Eine Ableitung von null allein belegt kein Maximum oder Minimum. Vergleiche benachbarte Werte, nutze einen begründeten Test der zweiten Ableitung oder vergleiche alle Kandidaten. Nenne den zulässigen Bereich.",
+    "A Ableitung gleich null allein beweist koa Maximum oder Minimum. Vergleich benachbarte Werte, verwend an begründeten Test mit da zweiten Ableitung oder vergleich alle Kandidaten. Gib den erlaubten Bereich an.",
+    "도함수가 0이라는 것만으로 최대나 최소가 되지는 않습니다. 주변 값을 비교하거나 정당한 이계도함수 판정법을 쓰거나 모든 후보를 비교하세요. 허용되는 정의역을 명시하세요.",
+    "Нулевая производная сама по себе не устанавливает максимум или минимум. Сравните соседние значения, примените обоснованный тест второй производной или сравните всех кандидатов. Укажите допустимую область.",
+    "Una derivada cero no establece por sí sola un máximo o mínimo. Compara valores cercanos, usa una prueba justificada de la segunda derivada o compara todos los candidatos. Indica el dominio factible.",
+    "Uma derivada zero não estabelece sozinha um máximo ou mínimo. Compare valores próximos, use um teste justificado da segunda derivada ou compare todos os candidatos. Indique o domínio viável."
+  ],
+  [
+    "Compare function values at every candidate and endpoint. For x³ at zero, the derivative vanishes but there is no local maximum or minimum.",
+    "Vergleiche Funktionswerte an allen Kandidaten und Endpunkten. Bei x³ in null verschwindet die Ableitung, aber es gibt kein lokales Maximum oder Minimum.",
+    "Vergleich Funktionswerte an allen Kandidaten und Endpunkten. Bei x³ an null is d Ableitung null, aber es gibt koa lokales Maximum oder Minimum.",
+    "모든 후보와 끝점의 함숫값을 비교하세요. x³은 0에서 도함수가 0이지만 극대도 극소도 아닙니다.",
+    "Сравните значения функции во всех кандидатах и концах. У x³ в нуле производная равна нулю, но локального максимума или минимума нет.",
+    "Compara los valores en todos los candidatos y extremos. Para x³ en cero, la derivada se anula, pero no hay máximo ni mínimo local.",
+    "Compare os valores em todos os candidatos e extremos. Para x³ em zero, a derivada se anula, mas não há máximo nem mínimo local."
+  ],
+  [
+    "Numerical calculus and independent checks",
+    "Numerische Analysis und unabhängige Prüfungen",
+    "Numerische Analysis und unabhängige Prüfungen",
+    "수치 미적분과 독립 검산",
+    "Численные методы и независимые проверки",
+    "Cálculo numérico y comprobaciones independientes",
+    "Cálculo numérico e verificações independentes"
+  ],
+  [
+    "A central difference uses values on both sides of an input to estimate a derivative. A trapezoidal sum estimates a definite integral by joining sampled endpoints with straight segments.",
+    "Ein zentraler Differenzenquotient nutzt Werte auf beiden Seiten einer Eingabe zur Ableitungsschätzung. Eine Trapezsumme schätzt ein bestimmtes Integral durch Geraden zwischen abgetasteten Endpunkten.",
+    "A zentraler Differenzenquotient nutzt Werte auf beiden Seitn einer Eingab zum Schätzen der Ableitung. A Trapezsumme schätzt a bestimmtes Integral mit Geraden zwischen abgetasteten Endpunkten.",
+    "중앙차분은 입력 양쪽의 값을 이용해 도함수를 추정합니다. 사다리꼴 합은 표본 끝점들을 직선으로 이어 정적분을 추정합니다.",
+    "Центральная разность использует значения по обе стороны входа для оценки производной. Сумма трапеций оценивает определённый интеграл, соединяя выбранные концы прямыми отрезками.",
+    "Una diferencia central usa valores a ambos lados de una entrada para estimar una derivada. Una suma trapezoidal estima una integral definida uniendo extremos muestreados con segmentos rectos.",
+    "Uma diferença central usa valores dos dois lados de uma entrada para estimar uma derivada. Uma soma de trapézios estima uma integral definida unindo extremos amostrados com segmentos retos."
+  ],
+  [
+    "Compare a coarse calculation with a finer one and with an exact example when available. Tiny steps amplify rounding; agreement can miss narrow peaks or rapid oscillations.",
+    "Vergleiche eine grobe Rechnung mit einer feineren und, falls möglich, mit einem exakten Beispiel. Sehr kleine Schritte verstärken Rundungsfehler; Übereinstimmung kann schmale Spitzen oder schnelle Schwingungen übersehen.",
+    "Vergleich a grobe Rechnung mit einer feineren und möglichst mit am exakten Beispiel. Winzige Schritte verstärkn Rundungsfehler; Übereinstimmung kann schmale Spitzen oder schnelle Schwingungen übersehn.",
+    "거친 계산을 더 세밀한 계산과 비교하고 가능하면 정확한 예와도 비교하세요. 아주 작은 간격은 반올림 오차를 키웁니다. 일치하더라도 좁은 봉우리나 빠른 진동을 놓칠 수 있습니다.",
+    "Сравните грубое вычисление с более точным и, если возможно, с точным примером. Очень малые шаги усиливают округление; совпадение может не выявить узкие пики или быстрые колебания.",
+    "Compara un cálculo grueso con otro más fino y con un ejemplo exacto si existe. Pasos diminutos amplifican el redondeo; la coincidencia puede omitir picos estrechos u oscilaciones rápidas.",
+    "Compare um cálculo grosseiro com outro mais fino e com um exemplo exato, se houver. Passos minúsculos amplificam o arredondamento; a concordância pode omitir picos estreitos ou oscilações rápidas."
+  ],
+  [
+    "Numerical results are estimates, not proofs. A singularity must not be bridged by a trapezoid. Agreement after refinement is not a guaranteed error bound or a test of continuity.",
+    "Numerische Ergebnisse sind Schätzungen, keine Beweise. Ein Trapez darf keine Singularität überbrücken. Übereinstimmung nach Verfeinerung ist weder garantierte Fehlerschranke noch Stetigkeitstest.",
+    "Numerische Ergebnisse san Schätzungen, koa Beweise. A Trapez derf koa Singularität überbrückn. Übereinstimmung nach Verfeinerung is weder a garantierte Fehlerschranke noch a Stetigkeitstest.",
+    "수치 결과는 추정값이며 증명이 아닙니다. 사다리꼴이 특이점을 가로질러서는 안 됩니다. 세분화 후 일치는 보장된 오차 한계도 연속성 검사도 아닙니다.",
+    "Численные результаты — оценки, не доказательства. Трапеция не должна перекрывать особую точку. Совпадение после уточнения не является гарантированной границей ошибки или тестом непрерывности.",
+    "Los resultados numéricos son estimaciones, no pruebas. Un trapecio no debe cruzar una singularidad. Coincidir tras refinar no es una cota de error garantizada ni una prueba de continuidad.",
+    "Resultados numéricos são estimativas, não provas. Um trapézio não deve atravessar uma singularidade. Concordância após refinar não é um limite de erro garantido nem um teste de continuidade."
+  ],
+  [
+    "Solve for x.",
+    "Löse nach x auf.",
+    "Lös nach x auf.",
+    "x를 구하세요.",
+    "Решите относительно x.",
+    "Despeja x.",
+    "Resolva para x."
+  ],
+  [
+    "Find the excluded boundary value.",
+    "Finde den ausgeschlossenen Grenzwert.",
+    "Find den ausgeschlossenen Grenzwert.",
+    "제외된 경계값을 구하세요.",
+    "Найдите исключённое граничное значение.",
+    "Encuentra el valor límite excluido.",
+    "Encontre o valor limite excluído."
+  ],
+  [
+    "Find the proportional result.",
+    "Finde das proportionale Ergebnis.",
+    "Find s proportionale Ergebnis.",
+    "비례 관계의 결과를 구하세요.",
+    "Найдите результат пропорции.",
+    "Encuentra el resultado proporcional.",
+    "Encontre o resultado proporcional."
+  ],
+  [
+    "Find the constant of proportionality.",
+    "Finde die Proportionalitätskonstante.",
+    "Find d Proportionalitätskonstante.",
+    "비례상수를 구하세요.",
+    "Найдите коэффициент пропорциональности.",
+    "Encuentra la constante de proporcionalidad.",
+    "Encontre a constante de proporcionalidade."
+  ],
+  [
+    "Evaluate.",
+    "Berechne den Wert.",
+    "Rechn den Wert aus.",
+    "값을 계산하세요.",
+    "Вычислите значение.",
+    "Calcula el valor.",
+    "Calcule o valor."
+  ],
+  [
+    "log₂(8) = 3",
+    "log₂(8) = 3",
+    "log₂(8) = 3",
+    "log₂(8) = 3",
+    "log₂(8) = 3",
+    "log₂(8) = 3",
+    "log₂(8) = 3"
+  ],
+  [
+    "log₃(27) = 3",
+    "log₃(27) = 3",
+    "log₃(27) = 3",
+    "log₃(27) = 3",
+    "log₃(27) = 3",
+    "log₃(27) = 3",
+    "log₃(27) = 3"
+  ],
+  [
+    "Find the intersection input.",
+    "Finde die Eingabe am Schnittpunkt.",
+    "Find d Eingab am Schnittpunkt.",
+    "교점의 입력값을 구하세요.",
+    "Найдите входное значение в точке пересечения.",
+    "Encuentra la entrada de la intersección.",
+    "Encontre a entrada da interseção."
+  ],
+  [
+    "Find the slope.",
+    "Finde die Steigung.",
+    "Find d Steigung.",
+    "기울기를 구하세요.",
+    "Найдите наклон.",
+    "Encuentra la pendiente.",
+    "Encontre a inclinação."
+  ],
+  [
+    "Find the excluded input.",
+    "Finde die ausgeschlossene Eingabe.",
+    "Find d ausgeschlossene Eingab.",
+    "제외된 입력을 구하세요.",
+    "Найдите исключённое входное значение.",
+    "Encuentra la entrada excluida.",
+    "Encontre a entrada excluída."
+  ],
+  [
+    "Find the smallest permitted input.",
+    "Finde die kleinste erlaubte Eingabe.",
+    "Find d kleinste erlaubte Eingab.",
+    "허용되는 최소 입력을 구하세요.",
+    "Найдите наименьшее допустимое входное значение.",
+    "Encuentra la menor entrada permitida.",
+    "Encontre a menor entrada permitida."
+  ],
+  [
+    "Find the average rate of change.",
+    "Finde die mittlere Änderungsrate.",
+    "Find d mittlere Änderungsrate.",
+    "평균 변화율을 구하세요.",
+    "Найдите среднюю скорость изменения.",
+    "Encuentra la tasa media de cambio.",
+    "Encontre a taxa média de variação."
+  ],
+  [
+    "Find the signed integral.",
+    "Finde das vorzeichenbehaftete Integral.",
+    "Find s Integral mit Vorzeichen.",
+    "부호 있는 적분값을 구하세요.",
+    "Найдите интеграл со знаком.",
+    "Encuentra la integral con signo.",
+    "Encontre a integral com sinal."
+  ],
+  [
+    "Find the accumulated change.",
+    "Finde die angesammelte Änderung.",
+    "Find d aufsummierte Änderung.",
+    "누적 변화를 구하세요.",
+    "Найдите накопленное изменение.",
+    "Encuentra el cambio acumulado.",
+    "Encontre a variação acumulada."
+  ],
+  [
+    "Find the geometric area.",
+    "Finde die geometrische Fläche.",
+    "Find d geometrische Fläche.",
+    "기하학적 넓이를 구하세요.",
+    "Найдите геометрическую площадь.",
+    "Encuentra el área geométrica.",
+    "Encontre a área geométrica."
+  ],
+  [
+    "∫₋₂² |x| dx = 4",
+    "∫₋₂² |x| dx = 4",
+    "∫₋₂² |x| dx = 4",
+    "∫₋₂² |x| dx = 4",
+    "∫₋₂² |x| dx = 4",
+    "∫₋₂² |x| dx = 4",
+    "∫₋₂² |x| dx = 4"
+  ],
+  [
+    "Find the integration constant.",
+    "Finde die Integrationskonstante.",
+    "Find d Integrationskonstante.",
+    "적분상수를 구하세요.",
+    "Найдите константу интегрирования.",
+    "Encuentra la constante de integración.",
+    "Encontre a constante de integração."
+  ],
+  [
+    "Evaluate the specified antiderivative.",
+    "Berechne den Wert der angegebenen Stammfunktion.",
+    "Rechn den Wert von da angegebenen Stammfunktion aus.",
+    "주어진 원시함수의 값을 구하세요.",
+    "Вычислите значение указанной первообразной.",
+    "Evalúa la antiderivada indicada.",
+    "Calcule o valor da primitiva indicada."
+  ],
+  [
+    "∫₀² 3 dx = 6",
+    "∫₀² 3 dx = 6",
+    "∫₀² 3 dx = 6",
+    "∫₀² 3 dx = 6",
+    "∫₀² 3 dx = 6",
+    "∫₀² 3 dx = 6",
+    "∫₀² 3 dx = 6"
+  ],
+  [
+    "Find the maximizing input.",
+    "Finde die Eingabe für das Maximum.",
+    "Find d Eingab fürs Maximum.",
+    "최댓값을 만드는 입력을 구하세요.",
+    "Найдите входное значение максимума.",
+    "Encuentra la entrada que maximiza.",
+    "Encontre a entrada que maximiza."
+  ],
+  [
+    "Find the minimizing input.",
+    "Finde die Eingabe für das Minimum.",
+    "Find d Eingab fürs Minimum.",
+    "최솟값을 만드는 입력을 구하세요.",
+    "Найдите входное значение минимума.",
+    "Encuentra la entrada que minimiza.",
+    "Encontre a entrada que minimiza."
+  ],
+  [
+    "Find the trapezoidal estimate.",
+    "Finde die Trapezschätzung.",
+    "Find d Trapezschätzung.",
+    "사다리꼴 추정값을 구하세요.",
+    "Найдите оценку методом трапеций.",
+    "Encuentra la estimación trapezoidal.",
+    "Encontre a estimativa por trapézios."
+  ],
+  [
+    "∫₀¹ x² dx = 1/3; 3/8 − 1/3 = 1/24",
+    "∫₀¹ x² dx = 1/3; 3/8 − 1/3 = 1/24",
+    "∫₀¹ x² dx = 1/3; 3/8 − 1/3 = 1/24",
+    "∫₀¹ x² dx = 1/3; 3/8 − 1/3 = 1/24",
+    "∫₀¹ x² dx = 1/3; 3/8 − 1/3 = 1/24",
+    "∫₀¹ x² dx = 1/3; 3/8 − 1/3 = 1/24",
+    "∫₀¹ x² dx = 1/3; 3/8 − 1/3 = 1/24"
+  ],
+  [
+    "Find the central-difference estimate.",
+    "Finde die zentrale Differenzenschätzung.",
+    "Find d zentrale Differenzenschätzung.",
+    "중앙차분 추정값을 구하세요.",
+    "Найдите оценку центральной разностью.",
+    "Encuentra la estimación por diferencia central.",
+    "Encontre a estimativa por diferença central."
+  ],
+  [
+    "∫₀² x dx = 2",
+    "∫₀² x dx = 2",
+    "∫₀² x dx = 2",
+    "∫₀² x dx = 2",
+    "∫₀² x dx = 2",
+    "∫₀² x dx = 2",
+    "∫₀² x dx = 2"
+  ],
+  [
+    "Use numbers, x, explicit operators, and the listed functions. Check parentheses.",
+    "Verwende Zahlen, x, explizite Operatoren und die aufgeführten Funktionen. Prüfe die Klammern.",
+    "Verwend Zahlen, x, ausdrückliche Rechenzeichen und d aufgführten Funktionen. Prüf d Klammern.",
+    "숫자, x, 명시적 연산자와 안내된 함수를 사용하세요. 괄호를 확인하세요.",
+    "Используйте числа, x, явные операторы и перечисленные функции. Проверьте скобки.",
+    "Usa números, x, operadores explícitos y las funciones indicadas. Revisa los paréntesis.",
+    "Use números, x, operadores explícitos e as funções listadas. Verifique os parênteses."
+  ],
+  [
+    "Use increasing axis bounds between −10000 and 10000, with a span of at least 0.01.",
+    "Verwende aufsteigende Achsengrenzen zwischen −10000 und 10000 mit einer Spanne von mindestens 0.01.",
+    "Verwend aufsteigende Achsengrenzen zwischen −10000 und 10000 mit mindestens 0.01 Abstand.",
+    "−10000에서 10000 사이의 오름차순 축 경계를 사용하고 폭은 최소 0.01로 설정하세요.",
+    "Задайте возрастающие границы осей от −10000 до 10000 с размахом не менее 0.01.",
+    "Usa límites de ejes crecientes entre −10000 y 10000, con un intervalo de al menos 0.01.",
+    "Use limites de eixos crescentes entre −10000 e 10000, com amplitude de pelo menos 0.01."
+  ],
+  [
+    "Explore a relationship",
+    "Erkunde einen Zusammenhang",
+    "Erkund an Zusammenhang",
+    "관계 탐구",
+    "Изучите зависимость",
+    "Explora una relación",
+    "Explore uma relação"
+  ],
+  [
+    "Compare with g(x), optional",
+    "Mit g(x) vergleichen, optional",
+    "Mit g(x) vergleichen, wennst magst",
+    "g(x)와 비교, 선택 사항",
+    "Сравнить с g(x), необязательно",
+    "Comparar con g(x), opcional",
+    "Comparar com g(x), opcional"
+  ],
+  [
+    "Syntax and examples",
+    "Syntax und Beispiele",
+    "Schreibweis und Beispiele",
+    "문법과 예시",
+    "Синтаксис и примеры",
+    "Sintaxis y ejemplos",
+    "Sintaxe e exemplos"
+  ],
+  [
+    "Use * for multiplication and ^ for powers. Trigonometric inputs use radians. ln is the natural logarithm; log is base 10. Only real values are shown.",
+    "Verwende * zum Multiplizieren und ^ für Potenzen. Trigonometrische Eingaben sind im Bogenmaß. ln ist der natürliche Logarithmus, log zur Basis 10. Nur reelle Werte werden gezeigt.",
+    "Verwend * zum Multipliziern und ^ für Potenzen. Trigonometrische Eingaben san im Bogenmaß. ln is da natürliche Logarithmus, log zur Basis 10. Es werdn nur reelle Werte zeigt.",
+    "곱셈은 *, 거듭제곱은 ^를 사용하세요. 삼각함수 입력은 라디안입니다. ln은 자연로그, log는 상용로그입니다. 실수 값만 표시됩니다.",
+    "Используйте * для умножения и ^ для степеней. Тригонометрические аргументы задаются в радианах. ln — натуральный логарифм, log — десятичный. Показаны только действительные значения.",
+    "Usa * para multiplicar y ^ para potencias. Los argumentos trigonométricos usan radianes. ln es el logaritmo natural y log el de base 10. Solo se muestran valores reales.",
+    "Use * para multiplicar e ^ para potências. Argumentos trigonométricos usam radianos. ln é o logaritmo natural e log o de base 10. Só valores reais são mostrados."
+  ],
+  [
+    "Graph view",
+    "Graphansicht",
+    "Graphansicht",
+    "그래프 보기",
+    "Вид графика",
+    "Vista de gráfica",
+    "Vista do gráfico"
+  ],
+  [
+    "Graph",
+    "Graph",
+    "Graph",
+    "그래프",
+    "График",
+    "Gráfica",
+    "Gráfico"
+  ],
+  [
+    "Slope",
+    "Steigung",
+    "Steigung",
+    "기울기",
+    "Наклон",
+    "Pendiente",
+    "Inclinação"
+  ],
+  [
+    "Signed area",
+    "Vorzeichenbehaftete Fläche",
+    "Fläche mit Vorzeichen",
+    "부호 있는 넓이",
+    "Площадь со знаком",
+    "Área con signo",
+    "Área com sinal"
+  ],
+  [
+    "Graph window",
+    "Graphfenster",
+    "Graphfenster",
+    "그래프 범위",
+    "Окно графика",
+    "Ventana de gráfica",
+    "Janela do gráfico"
+  ],
+  [
+    "Reset view",
+    "Ansicht zurücksetzen",
+    "Ansicht zrucksetzn",
+    "보기 초기화",
+    "Сбросить вид",
+    "Restablecer vista",
+    "Redefinir vista"
+  ],
+  [
+    "The comparison expression is invalid.",
+    "Der Vergleichsausdruck ist ungültig.",
+    "Da Vergleichsausdruck is ungültig.",
+    "비교 식이 올바르지 않습니다.",
+    "Выражение для сравнения недопустимо.",
+    "La expresión de comparación no es válida.",
+    "A expressão de comparação é inválida."
+  ],
+  [
+    "Function graph",
+    "Funktionsgraph",
+    "Funktionsgraph",
+    "함수 그래프",
+    "График функции",
+    "Gráfica de función",
+    "Gráfico da função"
+  ],
+  [
+    "Read coordinates with the inspection controls below. Gaps indicate undefined or unresolved intervals; a sampled graph cannot prove continuity.",
+    "Lies Koordinaten mit den Prüfreglern unten ab. Lücken zeigen undefinierte oder ungeklärte Intervalle; ein abgetasteter Graph beweist keine Stetigkeit.",
+    "Lies Koordinaten mit de Prüfregler unten ab. Lücken zeigen undefinierte oder ungeklärte Intervalle; a abgetasteter Graph beweist koa Stetigkeit.",
+    "아래 검사 컨트롤로 좌표를 읽으세요. 빈틈은 정의되지 않거나 확인되지 않은 구간을 뜻합니다. 표본 그래프는 연속성을 증명하지 못합니다.",
+    "Считайте координаты с помощью элементов проверки ниже. Пробелы обозначают неопределённые или непроверенные интервалы; график по выборке не доказывает непрерывность.",
+    "Lee coordenadas con los controles inferiores. Los huecos indican intervalos indefinidos o no resueltos; una gráfica muestreada no prueba continuidad.",
+    "Leia coordenadas com os controles abaixo. Lacunas indicam intervalos indefinidos ou não resolvidos; um gráfico amostrado não prova continuidade."
+  ],
+  [
+    "Estimated tangent",
+    "Geschätzte Tangente",
+    "Gschätzte Tangente",
+    "추정 접선",
+    "Приближённая касательная",
+    "Tangente estimada",
+    "Tangente estimada"
+  ],
+  [
+    "Green above zero; rose below zero.",
+    "Grün über null; rosa unter null.",
+    "Grün über null; rosa unter null.",
+    "0 위는 초록, 0 아래는 분홍입니다.",
+    "Зелёный выше нуля; розовый ниже нуля.",
+    "Verde sobre cero; rosa bajo cero.",
+    "Verde acima de zero; rosa abaixo de zero."
+  ],
+  [
+    "No connected real values in this window. Try another expression or range.",
+    "Keine verbundenen reellen Werte in diesem Fenster. Versuche einen anderen Ausdruck oder Bereich.",
+    "Koa verbundene reellen Werte in dem Fenster. Probier an andern Ausdruck oder Bereich.",
+    "이 범위에 연결된 실수 값이 없습니다. 다른 식이나 범위를 시도하세요.",
+    "В этом окне нет связного участка действительных значений. Попробуйте другое выражение или диапазон.",
+    "No hay valores reales conectados en esta ventana. Prueba otra expresión o intervalo.",
+    "Não há valores reais conectados nesta janela. Tente outra expressão ou intervalo."
+  ],
+  [
+    "Curves are sampled. Very narrow features may be missed. Undefined intervals are left open.",
+    "Kurven werden abgetastet. Sehr schmale Merkmale können fehlen. Undefinierte Intervalle bleiben offen.",
+    "Kurven werdn abgetastet. Ganz schmale Merkmale können fehln. Undefinierte Intervalle bleibn offen.",
+    "곡선은 표본으로 그립니다. 매우 좁은 특징은 놓칠 수 있습니다. 정의되지 않은 구간은 비워 둡니다.",
+    "Кривые строятся по выборке. Очень узкие особенности могут быть пропущены. Неопределённые интервалы оставлены открытыми.",
+    "Las curvas se muestrean. Pueden omitirse detalles muy estrechos. Los intervalos indefinidos se dejan abiertos.",
+    "As curvas são amostradas. Detalhes muito estreitos podem ser omitidos. Intervalos indefinidos ficam abertos."
+  ],
+  [
+    "Inspect at x",
+    "Bei x untersuchen",
+    "Bei x anschaun",
+    "x에서 검사",
+    "Проверить при x",
+    "Inspeccionar en x",
+    "Examinar em x"
+  ],
+  [
+    "Move inspection point",
+    "Prüfpunkt verschieben",
+    "Prüfpunkt verschiebn",
+    "검사점 이동",
+    "Переместить точку проверки",
+    "Mover punto de inspección",
+    "Mover ponto de inspeção"
+  ],
+  [
+    "Secant step h",
+    "Sekantenschritt h",
+    "Sekantenschritt h",
+    "할선 간격 h",
+    "Шаг секущей h",
+    "Paso secante h",
+    "Passo da secante h"
+  ],
+  [
+    "The function is undefined or outside the numeric limits at this point.",
+    "Die Funktion ist hier undefiniert oder außerhalb der numerischen Grenzen.",
+    "D Funktion is da undefiniert oder außerhalb der numerischen Grenzen.",
+    "이 점에서 함수는 정의되지 않거나 수치 한계를 벗어납니다.",
+    "В этой точке функция не определена или выходит за численные пределы.",
+    "La función no está definida o excede los límites numéricos en este punto.",
+    "A função é indefinida ou excede os limites numéricos neste ponto."
+  ],
+  [
+    "Estimated slope",
+    "Geschätzte Steigung",
+    "Gschätzte Steigung",
+    "추정 기울기",
+    "Приближённый наклон",
+    "Pendiente estimada",
+    "Inclinação estimada"
+  ],
+  [
+    "Central difference at h",
+    "Zentraler Differenzenquotient bei h",
+    "Zentraler Differenzenquotient bei h",
+    "h에서의 중앙차분",
+    "Центральная разность при h",
+    "Diferencia central con h",
+    "Diferença central com h"
+  ],
+  [
+    "Difference after halving h",
+    "Differenz nach Halbieren von h",
+    "Unterschied nach Halbiern von h",
+    "h를 반으로 줄인 뒤 차이",
+    "Разность после уменьшения h вдвое",
+    "Diferencia al reducir h a la mitad",
+    "Diferença ao reduzir h à metade"
+  ],
+  [
+    "No reliable two-sided slope here. Check the domain, corners, or try a smaller h.",
+    "Keine verlässliche zweiseitige Steigung hier. Prüfe Definitionsbereich, Ecken oder ein kleineres h.",
+    "Koa verlässliche zweiseitige Steigung da. Prüf den Definitionsbereich, Ecken oder a kleineres h.",
+    "신뢰할 수 있는 양쪽 기울기가 없습니다. 정의역이나 모서리를 확인하거나 h를 줄여 보세요.",
+    "Здесь нет надёжного двустороннего наклона. Проверьте область определения, угловые точки или уменьшите h.",
+    "No hay una pendiente bilateral fiable aquí. Revisa el dominio, las esquinas o prueba un h menor.",
+    "Não há inclinação bilateral confiável aqui. Verifique o domínio, os cantos ou tente um h menor."
+  ],
+  [
+    "Integral from",
+    "Integral von",
+    "Integral von",
+    "적분 시작",
+    "Интеграл от",
+    "Integral desde",
+    "Integral de"
+  ],
+  [
+    "Integral to",
+    "Integral bis",
+    "Integral bis",
+    "적분 끝",
+    "Интеграл до",
+    "Integral hasta",
+    "Integral até"
+  ],
+  [
+    "Trapezoids",
+    "Trapeze",
+    "Trapeze",
+    "사다리꼴",
+    "Трапеции",
+    "Trapecios",
+    "Trapézios"
+  ],
+  [
+    "Estimated signed integral",
+    "Geschätztes vorzeichenbehaftetes Integral",
+    "Gschätztes Integral mit Vorzeichen",
+    "추정 부호 있는 적분값",
+    "Приближённый интеграл со знаком",
+    "Integral con signo estimada",
+    "Integral com sinal estimada"
+  ],
+  [
+    "Coarse estimate",
+    "Grobe Schätzung",
+    "Grobe Schätzung",
+    "거친 추정값",
+    "Грубая оценка",
+    "Estimación inicial",
+    "Estimativa grosseira"
+  ],
+  [
+    "Difference after doubling trapezoids",
+    "Differenz nach Verdoppeln der Trapeze",
+    "Unterschied nach Verdoppeln der Trapeze",
+    "사다리꼴을 두 배로 늘린 뒤 차이",
+    "Разность после удвоения числа трапеций",
+    "Diferencia al duplicar trapecios",
+    "Diferença ao dobrar os trapézios"
+  ],
+  [
+    "No estimate: the interval is invalid, undefined, or its continuity could not be established.",
+    "Keine Schätzung: Das Intervall ist ungültig, undefiniert oder seine Stetigkeit konnte nicht festgestellt werden.",
+    "Koa Schätzung: S Intervall is ungültig, undefiniert oder sei Stetigkeit hat ned festgestellt werdn können.",
+    "추정할 수 없습니다. 구간이 올바르지 않거나 정의되지 않거나 연속성을 확인할 수 없습니다.",
+    "Нет оценки: интервал недопустим, не определён или его непрерывность не удалось установить.",
+    "Sin estimación: el intervalo es inválido, indefinido o no pudo establecerse su continuidad.",
+    "Sem estimativa: o intervalo é inválido, indefinido ou sua continuidade não pôde ser estabelecida."
+  ],
+  [
+    "Numerical agreement is not a proof or an error bound. Signed integrals subtract contributions below zero; reversing the bounds reverses the sign.",
+    "Numerische Übereinstimmung ist kein Beweis und keine Fehlerschranke. Vorzeichenbehaftete Integrale ziehen Beiträge unter null ab; vertauschte Grenzen kehren das Vorzeichen um.",
+    "Numerische Übereinstimmung is koa Beweis und koa Fehlerschranke. Integrale mit Vorzeichen ziehn Beiträge unter null ab; vertauschte Grenzen drahn s Vorzeichen um.",
+    "수치 일치는 증명도 오차 한계도 아닙니다. 부호 있는 적분은 0 아래의 기여를 빼며 경계를 뒤집으면 부호도 바뀝니다.",
+    "Численное совпадение — не доказательство и не граница ошибки. Интегралы со знаком вычитают вклады ниже нуля; перестановка пределов меняет знак.",
+    "La coincidencia numérica no es una prueba ni una cota de error. Las integrales con signo restan contribuciones bajo cero; invertir los límites invierte el signo.",
+    "A concordância numérica não é prova nem limite de erro. Integrais com sinal subtraem contribuições abaixo de zero; inverter os limites inverte o sinal."
+  ],
+  [
+    "Five apps are available now: Percentage Calculator, Number-System Converter, Unit Converter, Recipe Scaler, and Function Plotter. Other apps are marked Coming soon.",
+    "Fünf Apps sind verfügbar: Prozentrechner, Zahlensystem-Umrechner, Einheiten-Umrechner, Rezept-Skalierer und Funktionsplotter. Andere Apps sind als Demnächst markiert.",
+    "Fünf Apps san verfügbar: Prozentrechner, Zahlensystem-Umrechner, Einheiten-Umrechner, Rezept-Skalierer und Funktionsplotter. Andere Apps san als Demnächst markiert.",
+    "이제 백분율 계산기, 진법 변환기, 단위 변환기, 레시피 조절기, 함수 그래프 도구 등 다섯 앱을 사용할 수 있습니다. 나머지 앱은 출시 예정으로 표시됩니다.",
+    "Доступны пять приложений: калькулятор процентов, конвертер систем счисления, конвертер единиц, масштабирование рецептов и построитель графиков. Остальные помечены как Скоро.",
+    "Hay cinco aplicaciones disponibles: calculadora de porcentajes, conversor de sistemas numéricos, conversor de unidades, escalador de recetas y trazador de funciones. Las demás están marcadas como Próximamente.",
+    "Cinco aplicativos estão disponíveis: calculadora de porcentagens, conversor de sistemas numéricos, conversor de unidades, ajuste de receitas e traçador de funções. Os demais estão marcados como Em breve."
+  ]
+]

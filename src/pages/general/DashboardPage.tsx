@@ -1,5 +1,4 @@
-import ProgressCard from "@/components/App/dashboard/ProgressCard";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useUiLanguage } from "@/i18n/ui";
 import { useAuth } from "@/context/AuthContext";
@@ -11,6 +10,8 @@ import DidYouKnowCarousel from "@/components/App/dashboard/DidYouKnowCarousel";
 import DashboardActionRow, { DashboardContentGrid } from "@/components/App/dashboard/DashboardActionRow";
 import DailyQuestsCard from "@/components/App/dashboard/DailyQuestsCard";
 import LearnSomethingNew from "@/components/App/dashboard/LearnSomethingNew";
+import ToolShortcuts from "@/components/App/dashboard/ToolShortcuts";
+import DashboardParticles from "@/components/App/dashboard/DashboardParticles";
 import DashboardFriendDialog from "@/components/App/dashboard/DashboardFriendDialog";
 import "@/components/App/dashboard/dashboard.css";
 
@@ -47,18 +48,38 @@ function Dashboard() {
       return next;
     });
   };
+  const page = useRef<HTMLElement>(null);
+  // A soft light follows the pointer across whichever card it is over (see `--mx` / `--my` in dashboard.css).
+  useEffect(() => {
+    const root = page.current;
+    if (!root || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let frame = 0;
+    const move = (event: PointerEvent) => {
+      const card = (event.target as Element | null)?.closest<HTMLElement>(".dash-panel, .discovery-carousel, .dashboard-action-card, .dashboard-app-tile");
+      if (!card) return;
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const box = card.getBoundingClientRect();
+        card.style.setProperty("--mx", `${event.clientX - box.left}px`);
+        card.style.setProperty("--my", `${event.clientY - box.top}px`);
+      });
+    };
+    root.addEventListener("pointermove", move);
+    return () => { root.removeEventListener("pointermove", move); cancelAnimationFrame(frame); };
+  }, []);
   const searchTarget = typeof document === "undefined" ? null : document.getElementById("dashboard-search-slot");
 
 
-  return <main className="dashboard-page">
+  return <main ref={page} className="dashboard-page">
+    <DashboardParticles />
     {searchTarget && createPortal(<DashboardSearch friends={friends} onChat={id => { markFriendMessagesRead(id); setFriendDialog({ id, view: "chat" }); }} />, searchTarget)}
     <div className="dashboard-workspace">
       <div className="dashboard-main">
         <DashboardHero profile={profile} signedIn={!!user} loading={authLoading} now={now} challenge={null} />
         <MyGames />
         <DashboardActionRow userId={user?.id} />
+        <ToolShortcuts />
         <DashboardContentGrid userId={user?.id} sections={[
-          { id: "progress", label: "Progress", content: <ProgressCard profile={profile} streak={activity?.streak} loading={authLoading} signedIn={!!user} /> },
           { id: "quests", label: "Daily quests", content: <DailyQuestsCard quests={activity?.quests} loading={loading} unavailable={activityError} signedIn={!!user} /> },
           { id: "discover", label: "Did you know?", content: <DidYouKnowCarousel /> },
           { id: "learning", label: "Continue learning", content: <LearnSomethingNew /> },

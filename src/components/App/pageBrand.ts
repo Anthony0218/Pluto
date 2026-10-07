@@ -1,3 +1,6 @@
+import { learningPaths, learningSubjects } from "@/data/learningCatalog";
+import { toolApps } from "@/data/toolCatalog";
+
 /** What the shared header shows after the Pluto mark: "Pluto : Name  Mode · detail". */
 export type PageBrand = { name: string; accent: string; surface?: string; mode?: string };
 
@@ -14,7 +17,7 @@ const games: Array<[prefix: string, brand: Omit<PageBrand, "mode">]> = [
 
 const pages: Array<[path: string, name: string]> = [
   ["/games", "Games"], ["/profile", "Profile"], ["/friends", "Friends"], ["/clans", "Clans"],
-  ["/leaderboards", "Leaderboards"], ["/learn", "Learn"], ["/credits", "Credits"], ["/imprint", "Imprint"],
+  ["/leaderboards", "Leaderboards"], ["/learn", "Learn"], ["/tools", "Tools"], ["/credits", "Credits"], ["/imprint", "Imprint"],
 ];
 
 const onPath = (pathname: string, prefix: string) => pathname === prefix || pathname.startsWith(`${prefix}/`);
@@ -32,6 +35,16 @@ function gameMode(pathname: string) {
 }
 
 export function pageBrand(pathname: string): PageBrand | undefined {
+  const [, area, subjectId, pathId] = pathname.split("/");
+  if (area === "tools") {
+    const tool = toolApps.find(item => item.id === subjectId);
+    if (tool) return { name: tool.title, accent: tool.accent };
+  }
+  if (area === "learn") {
+    const subject = learningSubjects.find(item => item.id === subjectId);
+    const path = learningPaths.find(item => item.subjectId === subjectId && item.id === pathId);
+    if (subject) return { name: subject.title, accent: subject.accent, mode: path?.title };
+  }
   const game = games.find(([prefix]) => onPath(pathname, prefix));
   if (game) return { ...game[1], mode: gameMode(pathname) };
   const page = pages.find(([path]) => onPath(pathname, path));

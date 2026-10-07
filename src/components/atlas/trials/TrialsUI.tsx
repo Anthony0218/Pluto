@@ -1,13 +1,13 @@
 import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import { ArrowLeft, Check, ChevronRight, Heart, RotateCcw, Trophy, X } from "lucide-react";
 import type { TrialCountry } from "../../../games/atlas/trials/countryStats";
-import type { AtlasDifficulty } from "../../../games/atlas/types";
+import type { AtlasDifficulty, AtlasHistory } from "../../../games/atlas/types";
 import { useTrialSession } from "./trialSession";
 
 /** What every mode receives from the Trials page. `best` is the stored personal best before this run. */
 export type TrialModeProps = {
   pool: TrialCountry[]; byId: Map<string, TrialCountry>; seed: string; difficulty: AtlasDifficulty; best: number;
-  topology: unknown;
+  topology: unknown; history: AtlasHistory;
   onRecord: (score: number) => void; onRestart: () => void; onExit: () => void;
 };
 export type TrialAccent = "cyan" | "amber" | "violet" | "emerald" | "rose" | "sky";

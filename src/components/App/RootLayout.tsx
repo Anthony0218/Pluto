@@ -7,7 +7,9 @@ import GlobalFriendsSidebar from "./GlobalFriendsSidebar";
 import IncomingNotificationToasts from "./notifications/IncomingNotificationToasts";
 import "./dashboard/dashboard.css";
 import { useEffect, useRef } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import ToolReminders from "../tools/ToolReminders";
 import AccountActivity from "./AccountActivity";
 import PublicHeader from "./PublicHeader";
 import { useTheme } from "../../context/ThemeContext";
@@ -18,6 +20,7 @@ export default function RootLayout() {
 
 function RootContent() {
   const location = useLocation();
+  const { passwordRecovery } = useAuth();
   const fullHeader = location.pathname === "/" || location.pathname === "/dashboard";
   const integratedNavigation = location.pathname === "/games/chess" || location.pathname.startsWith("/games/chess/") || location.pathname === "/chess-custom" || location.pathname.startsWith("/chess-custom/");
   const viewport = useRef<HTMLDivElement>(null);
@@ -28,13 +31,16 @@ function RootContent() {
       else viewport.current?.scrollTo(0, 0);
     });
     return () => cancelAnimationFrame(frame);
-  }, [location.key, location.hash]);
+  // Query parameters select in-page tabs, dates and historical editions (including
+  // tools embedded on the landing page). Only page/anchor navigation resets scroll.
+  }, [location.pathname, location.hash]);
 
   return <div className={"app-shell w-full text-zinc-100 " + (integratedNavigation ? "integrated-navigation " : "") + (plutoMode ? "bg-[#060816]" : "bg-zinc-950")} data-app-theme={plutoMode ? "pluto" : "black"}>
     <AccountActivity />
+    <ToolReminders />
     {!integratedNavigation && <PublicHeader compact={!fullHeader} />}
     <div ref={viewport} className="app-viewport">
-      <Outlet />
+      {passwordRecovery && location.pathname !== "/reset-password" ? <Navigate to="/reset-password" replace /> : <Outlet />}
     </div>
     <RoomFriends />
     <GlobalFriendsSidebar key={location.pathname} />

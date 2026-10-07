@@ -37,11 +37,6 @@ function FinishedGoGameReview({ game }: { game: GoState }) {
     }
     return result;
   }, [variation, frames, index, game.boardSize]);
-  useEffect(() => {
-    if (!variation || variationStep >= variationFrames.length - 1) return;
-    const timer = window.setTimeout(() => setVariationStep(value => value + 1), speed);
-    return () => window.clearTimeout(timer);
-  }, [variation, variationStep, variationFrames.length, speed]);
   function select(value: number) { setIndex(value); setPlaying(false); setVariation(null); }
   async function analyze() {
     controller.current?.abort();
@@ -110,11 +105,13 @@ function FinishedGoGameReview({ game }: { game: GoState }) {
       <aside>
         <h2>{index ? `${selected.move.player === "black" ? "Black" : "White"} · ${goCoordinate(selected.move, game.boardSize)}` : "Starting position"}</h2>
         {selected && <p><span className="go-quality" data-quality={selected.quality}>{selected.quality && <ReviewQualityIcon quality={selected.quality === "AI Move" ? "Best" : selected.quality} />} {selected.quality ?? "Not analysed"}</span>{selected.loss !== null && <span className="go-muted"> · {selected.loss.toFixed(1)} estimated points lost</span>}</p>}
-        {selected && recommended && <p className="go-muted">Played: {goCoordinate(selected.move, game.boardSize)} · Recommended: {recommended}</p>}
+        {selected && <button type="button" className="go-move-row" aria-pressed={!variation} onClick={() => { setPlaying(false); setVariation(null); }}><span>Current move · {goCoordinate(selected.move, game.boardSize)}</span><small>{variation ? "Click to show" : "On the board"}</small></button>}
+        {selected && recommended && <p className="go-muted">Recommended: {recommended}</p>}
         <p className="go-muted">{selected?.move.type === "resign" ? "Game ended by resignation." : selected?.move.type === "pass" ? "The player passed." : selected?.move.captured ? `${selected.move.captured} stone(s) captured on this move.` : index ? "No captures on this move." : "Black plays first."}</p>
         {evaluation && <><h3>Estimated lead: {evaluation.rootInfo.scoreLead >= 0 ? "Black" : "White"} +{Math.abs(evaluation.rootInfo.scoreLead).toFixed(1)}</h3><div className="go-winbar"><span style={{ width: (evaluation.rootInfo.winrate * 100) + "%" }} /></div><p className="go-muted">Black {Math.round(evaluation.rootInfo.winrate * 100)}% · White {Math.round((1 - evaluation.rootInfo.winrate) * 100)}%</p></>}
         <h3>{index ? "Alternatives before this move" : "Opening candidates"}</h3>
-        {alternatives.length ? alternatives.map(line => <button key={line.move} className="go-move-row" onClick={() => { setPlaying(false); setVariation(line.pv.length ? line.pv : [line.move]); setVariationStep(0); }}><Play size={14} /><span>{line.move}</span><small>{line.visits} visits</small></button>) : <p className="go-muted">Run analysis to see candidate moves.</p>}
+        {alternatives.length ? alternatives.map((line, rank) => <button key={line.move} type="button" className="go-move-row" aria-pressed={variation?.[0] === line.move} onClick={() => { setPlaying(false); setVariation(line.pv[0] === line.move ? line.pv : [line.move, ...line.pv]); setVariationStep(1); }}><span>{rank + 1}. {line.move}</span><small>{variation?.[0] === line.move ? "On the board" : "Click to show"} · {line.visits} visits</small></button>) : <p className="go-muted">Run analysis to see candidate moves.</p>}
+        {variation && <div className="go-controls"><button type="button" aria-label="Previous variation move" disabled={variationStep <= 1} onClick={() => setVariationStep(step => step - 1)}><ChevronLeft size={16} /></button><span>Alternative {variationStep}/{variationFrames.length - 1}</span><button type="button" aria-label="Next variation move" disabled={variationStep >= variationFrames.length - 1} onClick={() => setVariationStep(step => step + 1)}><ChevronRight size={16} /></button></div>}
         <h3>Moves</h3>
         <select aria-label="Filter moves" value={filter} onChange={event => setFilter(event.target.value)}><option value="all">All moves</option><option value="black">Black</option><option value="white">White</option><option value="mistakes">Mistakes</option><option value="captures">Captures</option></select>
         <div className="go-move-list">{filtered.map(row => <button key={row.turn} className="go-move-row" aria-current={index === row.turn} onClick={() => select(row.turn)}><small>{row.turn}</small><span>{row.move.player === "black" ? "B" : "W"} {goCoordinate(row.move, game.boardSize)}</span><span className="go-quality" data-quality={row.quality}>{row.quality && <ReviewQualityIcon quality={row.quality === "AI Move" ? "Best" : row.quality} />}{row.quality ?? (row.move.captured ? `+${row.move.captured}` : "--")}</span></button>)}</div>

@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.app.json",
+  "include": [
+    "../../src/components/learning/**/*.tsx",
+    "../../src/components/tools/**/*.tsx",
+    "../../src/pages/learn/**/*.tsx",
+    "../../src/pages/tools/**/*.tsx",
+    "../../src/data/advancedMath.ts",
+    "../../src/data/functionMath.ts"
+  ]
+}

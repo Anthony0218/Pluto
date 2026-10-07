@@ -1,0 +1,1685 @@
+[
+  [
+    "All thirteen apps are available now.",
+    "Alle dreizehn Apps sind jetzt verfügbar.",
+    "Alle dreizehn Apps san jetzt do.",
+    "13개 앱을 모두 사용할 수 있습니다.",
+    "Все тринадцать приложений доступны.",
+    "Las trece aplicaciones ya están disponibles.",
+    "Os treze aplicativos já estão disponíveis."
+  ],
+  [
+    "Enter energy from a food label or your own source. Totals are estimates based on your entries; no calorie target is prescribed.",
+    "Trage Energie vom Lebensmitteletikett oder einer eigenen Quelle ein. Summen sind Schätzungen anhand deiner Angaben; ein Kalorienziel wird nicht vorgegeben.",
+    "Trag d’Energie vom Etikett oder deiner eigenen Quell ein. D’Summen san Schätzungen aus deinen Angaben; a Kalorienziel gibt’s ned.",
+    "식품 라벨이나 직접 선택한 출처의 열량을 입력하세요. 합계는 입력값에 따른 추정치이며 칼로리 목표를 제시하지 않습니다.",
+    "Введите энергию с этикетки или из своего источника. Итоги — оценки по вашим данным; цель по калориям не задаётся.",
+    "Introduce la energía de la etiqueta o de tu fuente. Los totales son estimaciones según tus datos; no se prescribe un objetivo calórico.",
+    "Informe a energia do rótulo ou da sua fonte. Os totais são estimativas com base nas entradas; não há meta calórica prescrita."
+  ],
+  [
+    "Daily energy",
+    "Tägliche Energie",
+    "Energie am Tag",
+    "일일 열량",
+    "Энергия за день",
+    "Energía diaria",
+    "Energia diária"
+  ],
+  [
+    "Food entries",
+    "Lebensmitteleinträge",
+    "Essenseinträge",
+    "음식 기록",
+    "Записи продуктов",
+    "Registros de alimentos",
+    "Registros de alimentos"
+  ],
+  [
+    "Days logged",
+    "Erfasste Tage",
+    "Erfasste Tag",
+    "기록한 일수",
+    "Дней с записями",
+    "Días registrados",
+    "Dias registrados"
+  ],
+  [
+    "Food name",
+    "Lebensmittelname",
+    "Name vom Essen",
+    "음식 이름",
+    "Название продукта",
+    "Nombre del alimento",
+    "Nome do alimento"
+  ],
+  [
+    "Meal",
+    "Mahlzeit",
+    "Mahlzeit",
+    "식사",
+    "Приём пищи",
+    "Comida",
+    "Refeição"
+  ],
+  [
+    "Portion unit",
+    "Portionseinheit",
+    "Portionseinheit",
+    "분량 단위",
+    "Единица порции",
+    "Unidad de porción",
+    "Unidade da porção"
+  ],
+  [
+    "Grams",
+    "Gramm",
+    "Gramm",
+    "그램",
+    "Граммы",
+    "Gramos",
+    "Gramas"
+  ],
+  [
+    "Servings",
+    "Portionen",
+    "Portionen",
+    "인분",
+    "Порции",
+    "Porciones",
+    "Porções"
+  ],
+  [
+    "Portion quantity",
+    "Portionsmenge",
+    "Portionsmeng",
+    "분량",
+    "Количество порций",
+    "Cantidad de porción",
+    "Quantidade da porção"
+  ],
+  [
+    "Add food",
+    "Lebensmittel hinzufügen",
+    "Essen dazua",
+    "음식 추가",
+    "Добавить продукт",
+    "Añadir alimento",
+    "Adicionar alimento"
+  ],
+  [
+    "kcal per 100 g",
+    "kcal pro 100 g",
+    "kcal je 100 g",
+    "100g당 kcal",
+    "ккал на 100 г",
+    "kcal por 100 g",
+    "kcal por 100 g"
+  ],
+  [
+    "kcal per serving",
+    "kcal pro Portion",
+    "kcal je Portion",
+    "인분당 kcal",
+    "ккал на порцию",
+    "kcal por porción",
+    "kcal por porção"
+  ],
+  [
+    "Breakfast",
+    "Frühstück",
+    "Frühstück",
+    "아침",
+    "Завтрак",
+    "Desayuno",
+    "Café da manhã"
+  ],
+  [
+    "Lunch",
+    "Mittagessen",
+    "Mittagessen",
+    "점심",
+    "Обед",
+    "Almuerzo",
+    "Almoço"
+  ],
+  [
+    "Dinner",
+    "Abendessen",
+    "Abendessen",
+    "저녁",
+    "Ужин",
+    "Cena",
+    "Jantar"
+  ],
+  [
+    "Snack",
+    "Zwischenmahlzeit",
+    "Brotzeit",
+    "간식",
+    "Перекус",
+    "Tentempié",
+    "Lanche"
+  ],
+  [
+    "No foods logged for this date.",
+    "Für dieses Datum sind keine Lebensmittel erfasst.",
+    "Für den Tag is koa Essen erfasst.",
+    "이 날짜에 기록된 음식이 없습니다.",
+    "За эту дату продукты не записаны.",
+    "No hay alimentos registrados para esta fecha.",
+    "Não há alimentos registrados nesta data."
+  ],
+  [
+    "Save the foods in the selected meal as a template. Logging a template copies its portions, so later edits do not change history.",
+    "Speichere die Lebensmittel der ausgewählten Mahlzeit als Vorlage. Beim Erfassen werden die Portionen kopiert; spätere Änderungen ändern den Verlauf nicht.",
+    "Speicher s’Essen aus der gwählten Mahlzeit als Vorlage. Beim Eintragen werden d’Portionen kopiert; spätere Änderungen ändern den Verlauf ned.",
+    "선택한 식사의 음식을 템플릿으로 저장하세요. 기록할 때 분량을 복사하므로 나중에 수정해도 과거 기록은 바뀌지 않습니다.",
+    "Сохраните продукты выбранного приёма пищи как шаблон. При записи порции копируются, поэтому поздние правки не меняют историю.",
+    "Guarda los alimentos de la comida seleccionada como plantilla. Al registrarla se copian las porciones, por lo que las ediciones posteriores no cambian el historial.",
+    "Salve os alimentos da refeição selecionada como modelo. Ao registrar, as porções são copiadas, então edições posteriores não alteram o histórico."
+  ],
+  [
+    "Meal template name",
+    "Name der Mahlzeitenvorlage",
+    "Name von der Mahlzeitvorlage",
+    "식사 템플릿 이름",
+    "Название шаблона",
+    "Nombre de la plantilla",
+    "Nome do modelo de refeição"
+  ],
+  [
+    "Save selected meal",
+    "Ausgewählte Mahlzeit speichern",
+    "Gwählte Mahlzeit speichern",
+    "선택한 식사 저장",
+    "Сохранить выбранный приём пищи",
+    "Guardar comida seleccionada",
+    "Salvar refeição selecionada"
+  ],
+  [
+    "Portion multiplier",
+    "Portionsfaktor",
+    "Portionsfaktor",
+    "분량 배수",
+    "Множитель порции",
+    "Multiplicador de porción",
+    "Multiplicador da porção"
+  ],
+  [
+    "Log meal",
+    "Mahlzeit erfassen",
+    "Mahlzeit eintragen",
+    "식사 기록",
+    "Записать приём пищи",
+    "Registrar comida",
+    "Registrar refeição"
+  ],
+  [
+    "Daily history",
+    "Täglicher Verlauf",
+    "Täglicher Verlauf",
+    "일별 기록",
+    "История по дням",
+    "Historial diario",
+    "Histórico diário"
+  ],
+  [
+    "Label energy",
+    "Energie laut Etikett",
+    "Energie laut Etikett",
+    "라벨 열량",
+    "Энергия на этикетке",
+    "Energía de la etiqueta",
+    "Energia do rótulo"
+  ],
+  [
+    "Saved in this browser, separately for each account. Planner reminders can be shared through background reminder settings.",
+    "In diesem Browser pro Konto gespeichert. Planer-Erinnerungen können über die Einstellungen für Hintergrund-Erinnerungen geteilt werden.",
+    "In dem Browser je Konto gspeichert. Planer-Erinnerungen kannst über d’Hintergrund-Einstellungen teilen.",
+    "이 브라우저에 계정별로 저장됩니다. 플래너 알림은 백그라운드 알림 설정에서 공유할 수 있습니다.",
+    "Сохранено в этом браузере отдельно для каждого аккаунта. Напоминания планировщика можно передавать через настройки фоновых уведомлений.",
+    "Guardado en este navegador por cuenta. Los recordatorios se pueden compartir desde los ajustes de recordatorios en segundo plano.",
+    "Salvo neste navegador por conta. Os lembretes podem ser compartilhados nos ajustes de lembretes em segundo plano."
+  ],
+  [
+    "In-app reminders appear while Pluto is open. Enable background reminders below to send opted-in tasks to your enrolled devices.",
+    "In-App-Erinnerungen erscheinen, solange Pluto geöffnet ist. Aktiviere unten Hintergrund-Erinnerungen, um ausgewählte Aufgaben an registrierte Geräte zu senden.",
+    "Erinnerungen in der App kommen, solang Pluto offen is. Schalt unten Hintergrund-Erinnerungen ein, damit gwählte Aufgaben an deine Geräte gehen.",
+    "앱 내 알림은 Pluto가 열려 있을 때 표시됩니다. 아래에서 백그라운드 알림을 켜면 선택한 작업이 등록된 기기로 전송됩니다.",
+    "Уведомления в приложении появляются, пока Pluto открыт. Включите фоновые напоминания ниже, чтобы отправлять выбранные задачи на зарегистрированные устройства.",
+    "Los recordatorios internos aparecen mientras Pluto está abierto. Activa los de segundo plano para enviar las tareas elegidas a tus dispositivos registrados.",
+    "Os lembretes no aplicativo aparecem enquanto Pluto está aberto. Ative os de segundo plano para enviar as tarefas escolhidas aos dispositivos cadastrados."
+  ],
+  [
+    "Could not connect. Check notification permission, sign-in, and delivery setup.",
+    "Verbindung fehlgeschlagen. Prüfe Benachrichtigungsberechtigung, Anmeldung und Zustellungseinrichtung.",
+    "Verbindung hat ned klappt. Prüf Benachrichtigungen, Anmeldung und Zustellung.",
+    "연결하지 못했습니다. 알림 권한, 로그인, 전송 설정을 확인하세요.",
+    "Не удалось подключиться. Проверьте разрешение уведомлений, вход и настройку доставки.",
+    "No se pudo conectar. Revisa el permiso de notificaciones, la sesión y la configuración de entrega.",
+    "Não foi possível conectar. Verifique a permissão de notificações, o login e a configuração de entrega."
+  ],
+  [
+    "Background reminders",
+    "Hintergrund-Erinnerungen",
+    "Hintergrund-Erinnerungen",
+    "백그라운드 알림",
+    "Фоновые напоминания",
+    "Recordatorios en segundo plano",
+    "Lembretes em segundo plano"
+  ],
+  [
+    "Opt in on each device to receive your account’s planner reminders when this page is closed. Task names are sent to the delivery service and may appear on the lock screen.",
+    "Aktiviere jedes Gerät einzeln, um Planer-Erinnerungen deines Kontos bei geschlossener Seite zu erhalten. Aufgabennamen werden an den Zustelldienst gesendet und können auf dem Sperrbildschirm erscheinen.",
+    "Schalt jedes Gerät einzeln ein, damit Planer-Erinnerungen auch bei gschlossener Seit kommen. Aufgabennamen gehen an den Zustelldienst und können am Sperrbildschirm stehen.",
+    "페이지가 닫혀 있어도 계정의 플래너 알림을 받으려면 각 기기에서 켜세요. 작업 이름이 전송 서비스에 보내지며 잠금 화면에 표시될 수 있습니다.",
+    "Включите на каждом устройстве, чтобы получать напоминания аккаунта при закрытой странице. Названия задач передаются службе доставки и могут появляться на экране блокировки.",
+    "Activa cada dispositivo para recibir recordatorios de tu cuenta con la página cerrada. Los nombres de tareas se envían al servicio y pueden aparecer en la pantalla de bloqueo.",
+    "Ative em cada dispositivo para receber lembretes da sua conta com a página fechada. Os nomes das tarefas são enviados ao serviço e podem aparecer na tela de bloqueio."
+  ],
+  [
+    "Only planner reminders are shared. Food logs, budgets, and other tool records stay in this browser. Break reminders stay in-app.",
+    "Nur Planer-Erinnerungen werden geteilt. Essensprotokolle, Budgets und andere App-Daten bleiben in diesem Browser. Pausenerinnerungen bleiben in der App.",
+    "Bloß Planer-Erinnerungen werden teilt. Essen, Budgets und andere App-Daten bleiben in dem Browser. Pausenerinnerungen bleiben in der App.",
+    "플래너 알림만 공유됩니다. 음식 기록, 예산 및 다른 도구 기록은 이 브라우저에 남습니다. 휴식 알림은 앱 내에서만 표시됩니다.",
+    "Передаются только напоминания планировщика. Питание, бюджеты и другие записи остаются в браузере. Напоминания о перерывах остаются в приложении.",
+    "Solo se comparten recordatorios del planificador. Alimentos, presupuestos y otros registros quedan en este navegador. Los descansos siguen siendo avisos internos.",
+    "Apenas lembretes do planejador são compartilhados. Alimentação, orçamentos e outros registros ficam neste navegador. As pausas continuam como avisos internos."
+  ],
+  [
+    "Push notifications need a supported browser and a secure connection. On iPhone or iPad, open the installed home-screen app.",
+    "Push-Benachrichtigungen benötigen einen unterstützten Browser und eine sichere Verbindung. Öffne auf iPhone oder iPad die installierte Home-Bildschirm-App.",
+    "Push braucht an unterstützten Browser und a sichere Verbindung. Am iPhone oder iPad mach d’installierte App am Home-Bildschirm auf.",
+    "푸시 알림에는 지원되는 브라우저와 보안 연결이 필요합니다. iPhone이나 iPad에서는 홈 화면에 설치한 앱을 여세요.",
+    "Push-уведомления требуют поддерживаемый браузер и защищённое соединение. На iPhone или iPad откройте приложение, установленное на домашнем экране.",
+    "Las notificaciones push necesitan un navegador compatible y conexión segura. En iPhone o iPad, abre la aplicación instalada en la pantalla de inicio.",
+    "Notificações push precisam de navegador compatível e conexão segura. No iPhone ou iPad, abra o aplicativo instalado na tela inicial."
+  ],
+  [
+    "Sign in to enable background reminders.",
+    "Melde dich an, um Hintergrund-Erinnerungen zu aktivieren.",
+    "Meld di an für Hintergrund-Erinnerungen.",
+    "백그라운드 알림을 켜려면 로그인하세요.",
+    "Войдите для включения фоновых напоминаний.",
+    "Inicia sesión para activar recordatorios en segundo plano.",
+    "Entre para ativar lembretes em segundo plano."
+  ],
+  [
+    "Background reminders enabled on this device.",
+    "Hintergrund-Erinnerungen auf diesem Gerät aktiviert.",
+    "Hintergrund-Erinnerungen auf dem Gerät san an.",
+    "이 기기에서 백그라운드 알림이 켜졌습니다.",
+    "Фоновые напоминания включены на этом устройстве.",
+    "Recordatorios activados en este dispositivo.",
+    "Lembretes ativados neste dispositivo."
+  ],
+  [
+    "Reconnect this device",
+    "Dieses Gerät erneut verbinden",
+    "Des Gerät neu verbinden",
+    "이 기기 다시 연결",
+    "Подключить устройство заново",
+    "Reconectar este dispositivo",
+    "Reconectar este dispositivo"
+  ],
+  [
+    "Enable on this device",
+    "Auf diesem Gerät aktivieren",
+    "Auf dem Gerät einschalten",
+    "이 기기에서 켜기",
+    "Включить на этом устройстве",
+    "Activar en este dispositivo",
+    "Ativar neste dispositivo"
+  ],
+  [
+    "This device is unsubscribed. Other devices keep their reminders.",
+    "Dieses Gerät ist abgemeldet. Andere Geräte behalten ihre Erinnerungen.",
+    "Des Gerät is abgmeldet. Andere Geräte behalten ihre Erinnerungen.",
+    "이 기기의 구독을 해제했습니다. 다른 기기의 알림은 유지됩니다.",
+    "Подписка этого устройства отключена. Другие устройства сохраняют напоминания.",
+    "Este dispositivo está dado de baja. Los demás mantienen sus recordatorios.",
+    "Este dispositivo foi desinscrito. Os demais mantêm seus lembretes."
+  ],
+  [
+    "Disable on this device",
+    "Auf diesem Gerät deaktivieren",
+    "Auf dem Gerät ausschalten",
+    "이 기기에서 끄기",
+    "Отключить на этом устройстве",
+    "Desactivar en este dispositivo",
+    "Desativar neste dispositivo"
+  ],
+  [
+    "Check devices and delivery",
+    "Geräte und Zustellung prüfen",
+    "Geräte und Zustellung prüfen",
+    "기기 및 전송 확인",
+    "Проверить устройства и доставку",
+    "Comprobar dispositivos y entrega",
+    "Verificar dispositivos e entrega"
+  ],
+  [
+    "Test requested. Refresh delivery status after the notification appears.",
+    "Test angefordert. Aktualisiere den Zustellstatus, sobald die Benachrichtigung erscheint.",
+    "Test angfordert. Aktualisier den Status, wenn d’Benachrichtigung da is.",
+    "테스트를 요청했습니다. 알림이 표시되면 전송 상태를 새로고침하세요.",
+    "Тест запрошен. Обновите статус доставки после появления уведомления.",
+    "Prueba solicitada. Actualiza el estado tras aparecer la notificación.",
+    "Teste solicitado. Atualize o status após a notificação aparecer."
+  ],
+  [
+    "Send test to all devices",
+    "Test an alle Geräte senden",
+    "Test an alle Geräte schicken",
+    "모든 기기에 테스트 보내기",
+    "Отправить тест на все устройства",
+    "Enviar prueba a todos los dispositivos",
+    "Enviar teste a todos os dispositivos"
+  ],
+  [
+    "Reminder sync failed. Pending changes retry when online.",
+    "Erinnerungssynchronisierung fehlgeschlagen. Ausstehende Änderungen werden online erneut versucht.",
+    "Erinnerungen abgleichen hat ned klappt. Offene Änderungen werden online neu versucht.",
+    "알림 동기화에 실패했습니다. 대기 중인 변경은 온라인일 때 다시 시도합니다.",
+    "Синхронизация напоминаний не удалась. Изменения будут повторены при подключении.",
+    "Falló la sincronización. Los cambios pendientes se reintentan al volver a estar en línea.",
+    "Falha na sincronização. As alterações pendentes serão reenviadas ao ficar online."
+  ],
+  [
+    "Uploading reminder changes…",
+    "Erinnerungsänderungen werden hochgeladen…",
+    "Erinnerungsänderungen werden hochgladen…",
+    "알림 변경 업로드 중…",
+    "Загрузка изменений напоминаний…",
+    "Subiendo cambios de recordatorios…",
+    "Enviando alterações de lembretes…"
+  ],
+  [
+    "A test is allowed once per minute. Provider acceptance does not prove device delivery. “Shown” confirms the service worker displayed the notification; it does not prove you read it.",
+    "Ein Test ist einmal pro Minute erlaubt. Annahme durch den Anbieter beweist keine Gerätezustellung. „Angezeigt“ bestätigt die Anzeige durch den Service Worker; es beweist nicht, dass du sie gelesen hast.",
+    "A Test geht einmal je Minute. Annahme beim Anbieter beweist koa Zustellung. „Anzeigt“ bestätigt d’Anzeige vom Service Worker; es beweist ned, dass du’s glesen hast.",
+    "테스트는 분당 한 번 가능합니다. 제공업체의 수락이 기기 전달을 의미하지는 않습니다. ‘표시됨’은 서비스 워커가 알림을 표시했다는 뜻이며 읽었음을 증명하지 않습니다.",
+    "Тест разрешён раз в минуту. Принятие провайдером не доказывает доставку устройству. «Показано» подтверждает показ сервис-воркером, но не прочтение.",
+    "Se permite una prueba por minuto. La aceptación del proveedor no prueba la entrega. «Mostrada» confirma que el service worker mostró la notificación, no que la leíste.",
+    "É permitido um teste por minuto. A aceitação do provedor não comprova a entrega. “Exibida” confirma que o service worker exibiu a notificação, não que você a leu."
+  ],
+  [
+    "Enrolled devices",
+    "Registrierte Geräte",
+    "Registrierte Geräte",
+    "등록된 기기",
+    "Зарегистрированные устройства",
+    "Dispositivos registrados",
+    "Dispositivos cadastrados"
+  ],
+  [
+    "This device",
+    "Dieses Gerät",
+    "Des Gerät",
+    "이 기기",
+    "Это устройство",
+    "Este dispositivo",
+    "Este dispositivo"
+  ],
+  [
+    "Remove device",
+    "Gerät entfernen",
+    "Gerät wegnehmen",
+    "기기 삭제",
+    "Удалить устройство",
+    "Eliminar dispositivo",
+    "Remover dispositivo"
+  ],
+  [
+    "Cloud reminders",
+    "Cloud-Erinnerungen",
+    "Cloud-Erinnerungen",
+    "클라우드 알림",
+    "Облачные напоминания",
+    "Recordatorios en la nube",
+    "Lembretes na nuvem"
+  ],
+  [
+    "Cancel reminder",
+    "Erinnerung abbrechen",
+    "Erinnerung abbrechen",
+    "알림 취소",
+    "Отменить напоминание",
+    "Cancelar recordatorio",
+    "Cancelar lembrete"
+  ],
+  [
+    "Recent delivery checks",
+    "Letzte Zustellprüfungen",
+    "Letzte Zustellprüfungen",
+    "최근 전송 확인",
+    "Последние проверки доставки",
+    "Últimas comprobaciones de entrega",
+    "Últimas verificações de entrega"
+  ],
+  [
+    "Attempts",
+    "Versuche",
+    "Versuche",
+    "시도 횟수",
+    "Попытки",
+    "Intentos",
+    "Tentativas"
+  ],
+  [
+    "Queued",
+    "In Warteschlange",
+    "In der Warteschlang",
+    "대기 중",
+    "В очереди",
+    "En cola",
+    "Na fila"
+  ],
+  [
+    "Sending",
+    "Wird gesendet",
+    "Wird gschickt",
+    "전송 중",
+    "Отправляется",
+    "Enviando",
+    "Enviando"
+  ],
+  [
+    "Accepted by push provider",
+    "Vom Push-Anbieter angenommen",
+    "Vom Push-Anbieter angenommen",
+    "푸시 제공업체가 수락함",
+    "Принято push-провайдером",
+    "Aceptada por el proveedor push",
+    "Aceita pelo provedor push"
+  ],
+  [
+    "Shown by device",
+    "Vom Gerät angezeigt",
+    "Vom Gerät anzeigt",
+    "기기에 표시됨",
+    "Показано устройством",
+    "Mostrada por el dispositivo",
+    "Exibida pelo dispositivo"
+  ],
+  [
+    "Opened on device",
+    "Auf dem Gerät geöffnet",
+    "Am Gerät aufgmacht",
+    "기기에서 열림",
+    "Открыто на устройстве",
+    "Abierta en el dispositivo",
+    "Aberta no dispositivo"
+  ],
+  [
+    "Delivery failed",
+    "Zustellung fehlgeschlagen",
+    "Zustellung hat ned klappt",
+    "전송 실패",
+    "Доставка не удалась",
+    "Falló la entrega",
+    "Falha na entrega"
+  ],
+  [
+    "Delivery test",
+    "Zustelltest",
+    "Zustelltest",
+    "전송 테스트",
+    "Тест доставки",
+    "Prueba de entrega",
+    "Teste de entrega"
+  ],
+  [
+    "This device received the test.",
+    "Dieses Gerät hat den Test erhalten.",
+    "Des Gerät hat den Test kriegt.",
+    "이 기기가 테스트를 받았습니다.",
+    "Это устройство получило тест.",
+    "Este dispositivo recibió la prueba.",
+    "Este dispositivo recebeu o teste."
+  ],
+  [
+    "Loading forecast…",
+    "Vorhersage wird geladen…",
+    "Vorhersag wird gladen…",
+    "예보 불러오는 중…",
+    "Загрузка прогноза…",
+    "Cargando pronóstico…",
+    "Carregando previsão…"
+  ],
+  [
+    "Forecast unavailable. Check your connection and try Refresh.",
+    "Vorhersage nicht verfügbar. Prüfe die Verbindung und versuche „Aktualisieren“.",
+    "Vorhersag ned verfügbar. Prüf d’Verbindung und probier „Aktualisieren“.",
+    "예보를 사용할 수 없습니다. 연결을 확인하고 새로고침하세요.",
+    "Прогноз недоступен. Проверьте соединение и нажмите «Обновить».",
+    "Pronóstico no disponible. Revisa la conexión y pulsa Actualizar.",
+    "Previsão indisponível. Verifique a conexão e tente Atualizar."
+  ],
+  [
+    "Forecast time zone",
+    "Zeitzone der Vorhersage",
+    "Zeitzone von der Vorhersag",
+    "예보 시간대",
+    "Часовой пояс прогноза",
+    "Zona horaria del pronóstico",
+    "Fuso horário da previsão"
+  ],
+  [
+    "Retrieved",
+    "Abgerufen",
+    "Abgrufen",
+    "조회 시각",
+    "Получено",
+    "Consultado",
+    "Consultado"
+  ],
+  [
+    "Rain probability",
+    "Regenwahrscheinlichkeit",
+    "Regenwahrscheinlichkeit",
+    "강수 확률",
+    "Вероятность дождя",
+    "Probabilidad de lluvia",
+    "Probabilidade de chuva"
+  ],
+  [
+    "Wind",
+    "Wind",
+    "Wind",
+    "바람",
+    "Ветер",
+    "Viento",
+    "Vento"
+  ],
+  [
+    "Hourly temperature chart",
+    "Stündliches Temperaturdiagramm",
+    "Stündliches Temperaturdiagramm",
+    "시간별 기온 차트",
+    "Почасовой график температуры",
+    "Gráfico de temperatura por hora",
+    "Gráfico de temperatura por hora"
+  ],
+  [
+    "Hourly forecast",
+    "Stündliche Vorhersage",
+    "Stündliche Vorhersag",
+    "시간별 예보",
+    "Почасовой прогноз",
+    "Pronóstico por hora",
+    "Previsão por hora"
+  ],
+  [
+    "Missing data appears as a dash.",
+    "Fehlende Daten erscheinen als Strich.",
+    "Fehlende Daten stehen als Strich da.",
+    "없는 데이터는 대시로 표시됩니다.",
+    "Отсутствующие данные обозначены тире.",
+    "Los datos ausentes se muestran con un guion.",
+    "Dados ausentes aparecem como um traço."
+  ],
+  [
+    "No forecast hours available.",
+    "Keine Vorhersagestunden verfügbar.",
+    "Koa Vorhersagestunden verfügbar.",
+    "사용 가능한 시간별 예보가 없습니다.",
+    "Нет доступных часов прогноза.",
+    "No hay horas de pronóstico disponibles.",
+    "Não há horas de previsão disponíveis."
+  ],
+  [
+    "Search location",
+    "Ort suchen",
+    "Ort suchen",
+    "위치 검색",
+    "Поиск места",
+    "Buscar lugar",
+    "Buscar local"
+  ],
+  [
+    "Search",
+    "Suchen",
+    "Suchen",
+    "검색",
+    "Поиск",
+    "Buscar",
+    "Buscar"
+  ],
+  [
+    "Searching…",
+    "Suche läuft…",
+    "Suche lauft…",
+    "검색 중…",
+    "Поиск…",
+    "Buscando…",
+    "Buscando…"
+  ],
+  [
+    "Location search failed. Try again.",
+    "Ortssuche fehlgeschlagen. Versuche es erneut.",
+    "Ortssuche hat ned klappt. Probier’s nomoi.",
+    "위치 검색에 실패했습니다. 다시 시도하세요.",
+    "Поиск места не удался. Повторите попытку.",
+    "Falló la búsqueda. Inténtalo de nuevo.",
+    "Falha na busca. Tente novamente."
+  ],
+  [
+    "No matching locations.",
+    "Keine passenden Orte.",
+    "Koa passende Orte.",
+    "일치하는 위치가 없습니다.",
+    "Совпадающих мест нет.",
+    "No hay lugares coincidentes.",
+    "Não há locais correspondentes."
+  ],
+  [
+    "Choose a point on the world map, use arrow keys to move the marker, or enter coordinates below.",
+    "Wähle einen Punkt auf der Weltkarte, bewege die Markierung mit Pfeiltasten oder trage unten Koordinaten ein.",
+    "Wähl an Punkt auf der Weltkart, beweg d’Markierung mit Pfeiltasten oder trag unten Koordinaten ein.",
+    "세계 지도에서 점을 선택하거나 방향키로 마커를 움직이거나 아래에 좌표를 입력하세요.",
+    "Выберите точку на карте, переместите маркер стрелками или введите координаты ниже.",
+    "Elige un punto en el mapa, mueve el marcador con las flechas o introduce coordenadas abajo.",
+    "Escolha um ponto no mapa, mova o marcador com as setas ou informe coordenadas abaixo."
+  ],
+  [
+    "World location picker",
+    "Weltweite Ortsauswahl",
+    "Ortsauswahl auf der Welt",
+    "세계 위치 선택",
+    "Выбор места на карте мира",
+    "Selector de lugar mundial",
+    "Seletor de local no mundo"
+  ],
+  [
+    "Enter latitude from −90 to 90 and longitude from −180 to 180.",
+    "Trage einen Breitengrad von −90 bis 90 und einen Längengrad von −180 bis 180 ein.",
+    "Trag an Breitengrad von −90 bis 90 und an Längengrad von −180 bis 180 ein.",
+    "위도는 −90~90, 경도는 −180~180으로 입력하세요.",
+    "Введите широту от −90 до 90 и долготу от −180 до 180.",
+    "Introduce latitud de −90 a 90 y longitud de −180 a 180.",
+    "Informe latitude de −90 a 90 e longitude de −180 a 180."
+  ],
+  [
+    "Latitude",
+    "Breitengrad",
+    "Breitengrad",
+    "위도",
+    "Широта",
+    "Latitud",
+    "Latitude"
+  ],
+  [
+    "Longitude",
+    "Längengrad",
+    "Längengrad",
+    "경도",
+    "Долгота",
+    "Longitud",
+    "Longitude"
+  ],
+  [
+    "Explore coordinates",
+    "Koordinaten erkunden",
+    "Koordinaten anschauen",
+    "좌표 탐색",
+    "Изучить координаты",
+    "Explorar coordenadas",
+    "Explorar coordenadas"
+  ],
+  [
+    "Save place",
+    "Ort speichern",
+    "Ort speichern",
+    "위치 저장",
+    "Сохранить место",
+    "Guardar lugar",
+    "Salvar local"
+  ],
+  [
+    "Favorite places",
+    "Bevorzugte Orte",
+    "Lieblingsorte",
+    "즐겨찾는 위치",
+    "Избранные места",
+    "Lugares favoritos",
+    "Locais favoritos"
+  ],
+  [
+    "Compare with",
+    "Vergleichen mit",
+    "Vergleichen mit",
+    "비교 대상",
+    "Сравнить с",
+    "Comparar con",
+    "Comparar com"
+  ],
+  [
+    "No comparison",
+    "Kein Vergleich",
+    "Koa Vergleich",
+    "비교 없음",
+    "Без сравнения",
+    "Sin comparación",
+    "Sem comparação"
+  ],
+  [
+    "Forecast window",
+    "Vorhersagezeitraum",
+    "Vorhersagezeitraum",
+    "예보 기간",
+    "Период прогноза",
+    "Periodo del pronóstico",
+    "Período da previsão"
+  ],
+  [
+    "Next 24 hours",
+    "Nächste 24 Stunden",
+    "Nächste 24 Stunden",
+    "다음 24시간",
+    "Следующие 24 часа",
+    "Próximas 24 horas",
+    "Próximas 24 horas"
+  ],
+  [
+    "Hours 24–48",
+    "Stunden 24–48",
+    "Stunden 24–48",
+    "24~48시간",
+    "Часы 24–48",
+    "Horas 24–48",
+    "Horas 24–48"
+  ],
+  [
+    "Forecasts are model estimates. Comparisons use the same UTC hours and show each location’s local time. Data is requested when you open or refresh a location; forecasts are not saved offline.",
+    "Vorhersagen sind Modellschätzungen. Vergleiche nutzen dieselben UTC-Stunden und zeigen die Ortszeiten. Daten werden beim Öffnen oder Aktualisieren abgerufen; Vorhersagen werden nicht offline gespeichert.",
+    "Vorhersagen san Modellschätzungen. Vergleiche nehmen die gleichen UTC-Stunden und zeigen d’Ortszeit. Daten kommen beim Öffnen oder Aktualisieren; Vorhersagen werden ned offline gspeichert.",
+    "예보는 모델 추정치입니다. 비교는 동일한 UTC 시간에 각 위치의 현지 시간을 표시합니다. 위치를 열거나 새로고침할 때 데이터를 요청하며 예보는 오프라인 저장하지 않습니다.",
+    "Прогнозы — оценки модели. Сравнения используют одинаковые часы UTC и показывают местное время. Данные запрашиваются при открытии или обновлении места; офлайн прогнозы не сохраняются.",
+    "Los pronósticos son estimaciones. Las comparaciones usan las mismas horas UTC y muestran la hora local. Los datos se consultan al abrir o actualizar un lugar; no se guardan sin conexión.",
+    "As previsões são estimativas. As comparações usam as mesmas horas UTC e mostram a hora local. Os dados são consultados ao abrir ou atualizar um local; não são salvos offline."
+  ],
+  [
+    "Clear sky",
+    "Klarer Himmel",
+    "Klarer Himme",
+    "맑음",
+    "Ясно",
+    "Cielo despejado",
+    "Céu limpo"
+  ],
+  [
+    "Partly cloudy",
+    "Teilweise bewölkt",
+    "Teilweis bewölkt",
+    "구름 조금",
+    "Переменная облачность",
+    "Parcialmente nublado",
+    "Parcialmente nublado"
+  ],
+  [
+    "Overcast",
+    "Bedeckt",
+    "Bedeckt",
+    "흐림",
+    "Пасмурно",
+    "Cubierto",
+    "Encoberto"
+  ],
+  [
+    "Fog",
+    "Nebel",
+    "Nebe",
+    "안개",
+    "Туман",
+    "Niebla",
+    "Nevoeiro"
+  ],
+  [
+    "Drizzle",
+    "Nieselregen",
+    "Nieselregen",
+    "이슬비",
+    "Морось",
+    "Llovizna",
+    "Garoa"
+  ],
+  [
+    "Snow",
+    "Schnee",
+    "Schnee",
+    "눈",
+    "Снег",
+    "Nieve",
+    "Neve"
+  ],
+  [
+    "Showers",
+    "Schauer",
+    "Schauer",
+    "소나기",
+    "Ливни",
+    "Chubascos",
+    "Pancadas de chuva"
+  ],
+  [
+    "Thunderstorm",
+    "Gewitter",
+    "Gewitter",
+    "뇌우",
+    "Гроза",
+    "Tormenta",
+    "Trovoada"
+  ],
+  [
+    "Unavailable",
+    "Nicht verfügbar",
+    "Ned verfügbar",
+    "사용 불가",
+    "Недоступно",
+    "No disponible",
+    "Indisponível"
+  ],
+  [
+    "Conditions",
+    "Wetterlage",
+    "Wetterlag",
+    "날씨",
+    "Погодные условия",
+    "Condiciones",
+    "Condições"
+  ],
+  [
+    "Precipitation",
+    "Niederschlag",
+    "Niederschlag",
+    "강수량",
+    "Осадки",
+    "Precipitación",
+    "Precipitação"
+  ],
+  [
+    "Device",
+    "Gerät",
+    "Gerät",
+    "기기",
+    "Устройство",
+    "Dispositivo",
+    "Dispositivo"
+  ],
+  [
+    "Refresh",
+    "Aktualisieren",
+    "Aktualisieren",
+    "새로고침",
+    "Обновить",
+    "Actualizar",
+    "Atualizar"
+  ],
+  [
+    "Break reminders appear while Pluto is open and do not send push notifications.",
+    "Pausenerinnerungen erscheinen, solange Pluto geöffnet ist, und senden keine Push-Benachrichtigungen.",
+    "Pausenerinnerungen kommen, solang Pluto offen is, und schicken koa Push-Benachrichtigungen.",
+    "휴식 알림은 Pluto가 열려 있을 때 표시되며 푸시 알림을 보내지 않습니다.",
+    "Напоминания о перерывах появляются, пока Pluto открыт, и не отправляют push-уведомления.",
+    "Los recordatorios de descanso aparecen mientras Pluto está abierto y no envían notificaciones push.",
+    "Os lembretes de pausa aparecem enquanto Pluto está aberto e não enviam notificações push."
+  ],
+  [
+    "QR Code Creator",
+    "QR-Code-Ersteller",
+    "QR-Code-Ersteller",
+    "QR 코드 생성기",
+    "Генератор QR-кодов",
+    "Creador de códigos QR",
+    "Criador de códigos QR"
+  ],
+  [
+    "Turn a link or text into a QR code you can download.",
+    "Erstelle aus einem Link oder Text einen QR-Code zum Herunterladen.",
+    "Erstelle aus einem Link oder Text einen QR-Code zum Herunterladen.",
+    "링크나 텍스트를 다운로드할 수 있는 QR 코드로 만드세요.",
+    "Создайте скачиваемый QR-код из ссылки или текста.",
+    "Convierte un enlace o texto en un código QR descargable.",
+    "Transforme um link ou texto em um código QR para baixar."
+  ],
+  [
+    "Birthday Reminders",
+    "Geburtstagserinnerungen",
+    "Geburtstagserinnerungen",
+    "생일 알림",
+    "Напоминания о днях рождения",
+    "Recordatorios de cumpleaños",
+    "Lembretes de aniversário"
+  ],
+  [
+    "Save people and birthdays, and get a reminder each year.",
+    "Speichere Personen und Geburtstage und erhalte jedes Jahr eine Erinnerung.",
+    "Speichere Personen und Geburtstage und erhalte jedes Jahr eine Erinnerung.",
+    "사람과 생일을 저장하고 매년 알림을 받으세요.",
+    "Сохраняйте людей и дни рождения и получайте напоминания каждый год.",
+    "Guarda personas y cumpleaños y recibe un recordatorio cada año.",
+    "Salve pessoas e aniversários e receba um lembrete a cada ano."
+  ],
+  [
+    "Reminders repeat every year at 09:00 in the selected time zone. February 29 birthdays are celebrated on February 28 in other years.",
+    "Erinnerungen wiederholen sich jedes Jahr um 09:00 Uhr in der gewählten Zeitzone. Geburtstage am 29. Februar werden in anderen Jahren am 28. Februar berücksichtigt.",
+    "Erinnerungen wiederholen sich jedes Jahr um 09:00 Uhr in der gewählten Zeitzone. Geburtstage am 29. Februar werden in anderen Jahren am 28. Februar berücksichtigt.",
+    "알림은 선택한 시간대의 오전 9시에 매년 반복됩니다. 윤년이 아닌 해에는 2월 29일 생일을 2월 28일로 기념합니다.",
+    "Напоминания повторяются ежегодно в 09:00 в выбранном часовом поясе. В невисокосные годы дни рождения 29 февраля отмечаются 28 февраля.",
+    "Los recordatorios se repiten cada año a las 09:00 en la zona horaria elegida. Los cumpleaños del 29 de febrero se celebran el 28 en otros años.",
+    "Os lembretes se repetem anualmente às 09:00 no fuso escolhido. Aniversários de 29 de fevereiro são comemorados no dia 28 em outros anos."
+  ],
+  [
+    "Background reminders are enabled. Saving a person with reminders on shares their name, birthday month and day, and time zone with your reminder service. Birth years stay in this browser.",
+    "Hintergrunderinnerungen sind aktiviert. Beim Speichern einer Person mit aktivierter Erinnerung werden Name, Geburtsmonat und -tag sowie Zeitzone an den Erinnerungsdienst übermittelt. Geburtsjahre bleiben in diesem Browser.",
+    "Hintergrunderinnerungen sind aktiviert. Beim Speichern einer Person mit aktivierter Erinnerung werden Name, Geburtsmonat und -tag sowie Zeitzone an den Erinnerungsdienst übermittelt. Geburtsjahre bleiben in diesem Browser.",
+    "백그라운드 알림이 켜져 있습니다. 알림을 켠 사람을 저장하면 이름, 생일의 월과 일, 시간대가 알림 서비스에 공유됩니다. 출생 연도는 이 브라우저에만 남습니다.",
+    "Фоновые напоминания включены. При сохранении человека с напоминаниями службе передаются имя, месяц и день рождения и часовой пояс. Годы рождения остаются в браузере.",
+    "Los recordatorios en segundo plano están activados. Al guardar una persona con recordatorios se comparte su nombre, mes y día de cumpleaños y zona horaria con el servicio. El año de nacimiento queda en este navegador.",
+    "Os lembretes em segundo plano estão ativados. Salvar uma pessoa com lembretes compartilha nome, mês e dia de aniversário e fuso horário com o serviço. O ano de nascimento fica neste navegador."
+  ],
+  [
+    "Upcoming birthdays",
+    "Anstehende Geburtstage",
+    "Anstehende Geburtstage",
+    "다가오는 생일",
+    "Ближайшие дни рождения",
+    "Próximos cumpleaños",
+    "Próximos aniversários"
+  ],
+  [
+    "Add a person to remember their next birthday.",
+    "Füge eine Person hinzu, um an ihren nächsten Geburtstag erinnert zu werden.",
+    "Füge eine Person hinzu, um an ihren nächsten Geburtstag erinnert zu werden.",
+    "사람을 추가하여 다음 생일을 기억하세요.",
+    "Добавьте человека, чтобы помнить о его следующем дне рождения.",
+    "Añade una persona para recordar su próximo cumpleaños.",
+    "Adicione uma pessoa para lembrar do próximo aniversário."
+  ],
+  [
+    "Birthday today!",
+    "Heute ist Geburtstag!",
+    "Heute ist Geburtstag!",
+    "오늘이 생일이에요!",
+    "Сегодня день рождения!",
+    "¡Hoy es su cumpleaños!",
+    "Hoje é aniversário!"
+  ],
+  [
+    "days away",
+    "Tage bis dahin",
+    "Tage bis dahin",
+    "일 남음",
+    "дней осталось",
+    "días restantes",
+    "dias restantes"
+  ],
+  [
+    "No upcoming date available",
+    "Kein nächster Termin verfügbar",
+    "Kein nächster Termin verfügbar",
+    "다음 날짜가 없습니다",
+    "Ближайшая дата недоступна",
+    "No hay próxima fecha disponible",
+    "Nenhuma próxima data disponível"
+  ],
+  [
+    "Turning",
+    "Wird",
+    "Wird",
+    "새 나이",
+    "Исполнится",
+    "Cumple",
+    "Completa"
+  ],
+  [
+    "Reminders on",
+    "Erinnerungen an",
+    "Erinnerungen an",
+    "알림 켜짐",
+    "Напоминания включены",
+    "Recordatorios activados",
+    "Lembretes ativados"
+  ],
+  [
+    "Reminders off",
+    "Erinnerungen aus",
+    "Erinnerungen aus",
+    "알림 꺼짐",
+    "Напоминания отключены",
+    "Recordatorios desactivados",
+    "Lembretes desativados"
+  ],
+  [
+    "Edit person",
+    "Person bearbeiten",
+    "Person bearbeiten",
+    "사람 수정",
+    "Изменить человека",
+    "Editar persona",
+    "Editar pessoa"
+  ],
+  [
+    "Add person",
+    "Person hinzufügen",
+    "Person hinzufügen",
+    "사람 추가",
+    "Добавить человека",
+    "Añadir persona",
+    "Adicionar pessoa"
+  ],
+  [
+    "Person name",
+    "Name der Person",
+    "Name der Person",
+    "이름",
+    "Имя человека",
+    "Nombre de la persona",
+    "Nome da pessoa"
+  ],
+  [
+    "Birth month",
+    "Geburtsmonat",
+    "Geburtsmonat",
+    "태어난 월",
+    "Месяц рождения",
+    "Mes de nacimiento",
+    "Mês de nascimento"
+  ],
+  [
+    "Birth day",
+    "Geburtstag",
+    "Geburtstag",
+    "태어난 일",
+    "День рождения",
+    "Día de nacimiento",
+    "Dia de nascimento"
+  ],
+  [
+    "Birth year (optional)",
+    "Geburtsjahr (optional)",
+    "Geburtsjahr (optional)",
+    "출생 연도 (선택)",
+    "Год рождения (необязательно)",
+    "Año de nacimiento (opcional)",
+    "Ano de nascimento (opcional)"
+  ],
+  [
+    "Remind me each year",
+    "Jedes Jahr erinnern",
+    "Jedes Jahr erinnern",
+    "매년 알림 받기",
+    "Напоминать каждый год",
+    "Recordarme cada año",
+    "Lembrar a cada ano"
+  ],
+  [
+    "Birthday reminders appear while Pluto is open. Enable background reminders to receive them when the page is closed.",
+    "Geburtstagserinnerungen erscheinen, während Pluto geöffnet ist. Aktiviere Hintergrunderinnerungen, um sie auch bei geschlossener Seite zu erhalten.",
+    "Geburtstagserinnerungen erscheinen, während Pluto geöffnet ist. Aktiviere Hintergrunderinnerungen, um sie auch bei geschlossener Seite zu erhalten.",
+    "Pluto가 열려 있을 때 생일 알림이 표시됩니다. 페이지를 닫아도 받으려면 백그라운드 알림을 켜세요.",
+    "Напоминания о днях рождения появляются, пока Pluto открыт. Включите фоновые напоминания, чтобы получать их при закрытой странице.",
+    "Los recordatorios aparecen mientras Pluto está abierto. Activa los recordatorios en segundo plano para recibirlos con la página cerrada.",
+    "Os lembretes aparecem enquanto Pluto está aberto. Ative os lembretes em segundo plano para recebê-los com a página fechada."
+  ],
+  [
+    "Saved in this browser, separately for each account. Enabled planner and birthday reminders can be shared through background reminder settings.",
+    "In diesem Browser gespeichert, getrennt nach Konto. Aktivierte Planer- und Geburtstagserinnerungen können über die Hintergrundeinstellungen geteilt werden.",
+    "In diesem Browser gespeichert, getrennt nach Konto. Aktivierte Planer- und Geburtstagserinnerungen können über die Hintergrundeinstellungen geteilt werden.",
+    "계정별로 이 브라우저에 저장됩니다. 켜진 일정 및 생일 알림은 백그라운드 알림 설정을 통해 공유할 수 있습니다.",
+    "Сохранено в браузере отдельно для каждого аккаунта. Включённые напоминания планировщика и дней рождения можно отправлять через настройки фоновых напоминаний.",
+    "Guardado en este navegador por separado para cada cuenta. Los recordatorios activados del planificador y cumpleaños se pueden compartir mediante los ajustes en segundo plano.",
+    "Salvo neste navegador, separadamente por conta. Os lembretes ativados do planejador e aniversários podem ser compartilhados pelas configurações em segundo plano."
+  ],
+  [
+    "Your content stays in this browser. QR codes are generated locally and do not expire.",
+    "Deine Inhalte bleiben in diesem Browser. QR-Codes werden lokal erstellt und laufen nicht ab.",
+    "Deine Inhalte bleiben in diesem Browser. QR-Codes werden lokal erstellt und laufen nicht ab.",
+    "내용은 이 브라우저에만 남습니다. QR 코드는 로컬에서 생성되며 만료되지 않습니다.",
+    "Ваши данные остаются в браузере. QR-коды создаются локально и не имеют срока действия.",
+    "Tu contenido queda en este navegador. Los códigos QR se generan localmente y no caducan.",
+    "Seu conteúdo fica neste navegador. Os códigos QR são gerados localmente e não expiram."
+  ],
+  [
+    "Content type",
+    "Inhaltstyp",
+    "Inhaltstyp",
+    "내용 유형",
+    "Тип содержимого",
+    "Tipo de contenido",
+    "Tipo de conteúdo"
+  ],
+  [
+    "Website link",
+    "Website-Link",
+    "Website-Link",
+    "웹사이트 링크",
+    "Ссылка на сайт",
+    "Enlace web",
+    "Link de site"
+  ],
+  [
+    "Plain text",
+    "Klartext",
+    "Klartext",
+    "일반 텍스트",
+    "Обычный текст",
+    "Texto simple",
+    "Texto simples"
+  ],
+  [
+    "QR content",
+    "QR-Inhalt",
+    "QR-Inhalt",
+    "QR 내용",
+    "Содержимое QR-кода",
+    "Contenido QR",
+    "Conteúdo do QR"
+  ],
+  [
+    "Type your text here",
+    "Gib hier deinen Text ein",
+    "Gib hier deinen Text ein",
+    "여기에 텍스트를 입력하세요",
+    "Введите текст здесь",
+    "Escribe tu texto aquí",
+    "Digite seu texto aqui"
+  ],
+  [
+    "UTF-8 bytes",
+    "UTF-8-Bytes",
+    "UTF-8-Bytes",
+    "UTF-8 바이트",
+    "байт UTF-8",
+    "bytes UTF-8",
+    "bytes UTF-8"
+  ],
+  [
+    "Ready to scan",
+    "Bereit zum Scannen",
+    "Bereit zum Scannen",
+    "스캔 준비 완료",
+    "Готов к сканированию",
+    "Listo para escanear",
+    "Pronto para escanear"
+  ],
+  [
+    "Creating QR code…",
+    "QR-Code wird erstellt…",
+    "QR-Code wird erstellt…",
+    "QR 코드 생성 중…",
+    "Создание QR-кода…",
+    "Creando código QR…",
+    "Criando código QR…"
+  ],
+  [
+    "Download PNG",
+    "PNG herunterladen",
+    "PNG herunterladen",
+    "PNG 다운로드",
+    "Скачать PNG",
+    "Descargar PNG",
+    "Baixar PNG"
+  ],
+  [
+    "Download SVG",
+    "SVG herunterladen",
+    "SVG herunterladen",
+    "SVG 다운로드",
+    "Скачать SVG",
+    "Descargar SVG",
+    "Baixar SVG"
+  ],
+  [
+    "Scan the preview with a phone camera. A QR code keeps the exact content you enter; changing a website does not update the code.",
+    "Scanne die Vorschau mit einer Handykamera. Ein QR-Code enthält genau deine Eingabe; eine Änderung der Website aktualisiert den Code nicht.",
+    "Scanne die Vorschau mit einer Handykamera. Ein QR-Code enthält genau deine Eingabe; eine Änderung der Website aktualisiert den Code nicht.",
+    "휴대폰 카메라로 미리보기를 스캔하세요. QR 코드는 입력한 내용을 그대로 담으며 웹사이트가 바뀌어도 코드는 업데이트되지 않습니다.",
+    "Отсканируйте предпросмотр камерой телефона. QR-код сохраняет введённые данные без изменений; изменение сайта не обновляет код.",
+    "Escanea la vista previa con la cámara del móvil. El código conserva el contenido exacto introducido; cambiar una web no actualiza el código.",
+    "Escaneie a prévia com a câmera do celular. O código mantém o conteúdo exato digitado; alterar um site não atualiza o código."
+  ],
+  [
+    "QR code preview",
+    "QR-Code-Vorschau",
+    "QR-Code-Vorschau",
+    "QR 코드 미리보기",
+    "Предпросмотр QR-кода",
+    "Vista previa del código QR",
+    "Prévia do código QR"
+  ],
+  [
+    "Your QR code will appear here",
+    "Dein QR-Code erscheint hier",
+    "Dein QR-Code erscheint hier",
+    "여기에 QR 코드가 표시됩니다",
+    "Ваш QR-код появится здесь",
+    "Tu código QR aparecerá aquí",
+    "Seu código QR aparecerá aqui"
+  ],
+  [
+    "Opt in on each device to receive planner and birthday reminders when this page is closed. Reminder names and birthday month, day, and time zone are sent to the delivery service. Names may appear on the lock screen.",
+    "Aktiviere die Funktion auf jedem Gerät, um Planer- und Geburtstagserinnerungen bei geschlossener Seite zu erhalten. Namen sowie Geburtsmonat, -tag und Zeitzone werden an den Zustelldienst übermittelt. Namen können auf dem Sperrbildschirm erscheinen.",
+    "Aktiviere die Funktion auf jedem Gerät, um Planer- und Geburtstagserinnerungen bei geschlossener Seite zu erhalten. Namen sowie Geburtsmonat, -tag und Zeitzone werden an den Zustelldienst übermittelt. Namen können auf dem Sperrbildschirm erscheinen.",
+    "페이지가 닫혀 있어도 일정 및 생일 알림을 받으려면 기기마다 켜세요. 알림 이름과 생일의 월, 일, 시간대가 전송 서비스로 전달됩니다. 이름은 잠금 화면에 표시될 수 있습니다.",
+    "Включите на каждом устройстве напоминания планировщика и дней рождения при закрытой странице. Имена, месяц и день рождения и часовой пояс передаются службе доставки. Имена могут появиться на экране блокировки.",
+    "Activa en cada dispositivo los recordatorios del planificador y cumpleaños con la página cerrada. Se envían nombres, mes y día de cumpleaños y zona horaria al servicio. Los nombres pueden aparecer en la pantalla de bloqueo.",
+    "Ative em cada dispositivo os lembretes do planejador e aniversários com a página fechada. Nomes, mês e dia de aniversário e fuso horário são enviados ao serviço. Os nomes podem aparecer na tela de bloqueio."
+  ],
+  [
+    "Only enabled planner and birthday reminders are shared. Birth years, food logs, budgets, and other tool records stay in this browser. Break reminders stay in-app.",
+    "Nur aktivierte Planer- und Geburtstagserinnerungen werden geteilt. Geburtsjahre, Ernährungsprotokolle, Budgets und andere Tool-Daten bleiben in diesem Browser. Pausenerinnerungen bleiben in der App.",
+    "Nur aktivierte Planer- und Geburtstagserinnerungen werden geteilt. Geburtsjahre, Ernährungsprotokolle, Budgets und andere Tool-Daten bleiben in diesem Browser. Pausenerinnerungen bleiben in der App.",
+    "켜진 일정 및 생일 알림만 공유됩니다. 출생 연도, 음식 기록, 예산 및 기타 도구 기록은 이 브라우저에 남습니다. 휴식 알림은 앱 내에서만 표시됩니다.",
+    "Передаются только включённые напоминания планировщика и дней рождения. Годы рождения, дневники питания, бюджеты и остальные записи остаются в браузере. Напоминания о перерывах остаются в приложении.",
+    "Solo se comparten los recordatorios activados del planificador y cumpleaños. Los años de nacimiento, registros de comida, presupuestos y otros datos quedan en este navegador. Los descansos se recuerdan dentro de la app.",
+    "Somente os lembretes ativados do planejador e aniversários são compartilhados. Anos de nascimento, registros de comida, orçamentos e outros dados ficam neste navegador. Lembretes de pausa ficam no app."
+  ],
+  [
+    "Birthday reminder",
+    "Geburtstagserinnerung",
+    "Geburtstagserinnerung",
+    "생일 알림",
+    "Напоминание о дне рождения",
+    "Recordatorio de cumpleaños",
+    "Lembrete de aniversário"
+  ],
+  [
+    "See all birthdays",
+    "Alle Geburtstage ansehen",
+    "Alle Geburtstage ansehen",
+    "모든 생일 보기",
+    "Все дни рождения",
+    "Ver todos los cumpleaños",
+    "Ver todos os aniversários"
+  ],
+  [
+    "Enter a link or text to create a QR code.",
+    "Gib einen Link oder Text ein, um einen QR-Code zu erstellen.",
+    "Gib einen Link oder Text ein, um einen QR-Code zu erstellen.",
+    "QR 코드를 만들려면 링크나 텍스트를 입력하세요.",
+    "Введите ссылку или текст для создания QR-кода.",
+    "Introduce un enlace o texto para crear un código QR.",
+    "Digite um link ou texto para criar um código QR."
+  ],
+  [
+    "This content is too long. Use up to 2,000 UTF-8 bytes.",
+    "Dieser Inhalt ist zu lang. Verwende höchstens 2.000 UTF-8-Bytes.",
+    "Dieser Inhalt ist zu lang. Verwende höchstens 2.000 UTF-8-Bytes.",
+    "내용이 너무 깁니다. 최대 2,000 UTF-8 바이트를 사용하세요.",
+    "Содержимое слишком длинное. Допустимо до 2 000 байт UTF-8.",
+    "El contenido es demasiado largo. Usa hasta 2.000 bytes UTF-8.",
+    "O conteúdo é muito longo. Use até 2.000 bytes UTF-8."
+  ],
+  [
+    "Enter a complete web address starting with https:// or http://.",
+    "Gib eine vollständige Webadresse ein, die mit https:// oder http:// beginnt.",
+    "Gib eine vollständige Webadresse ein, die mit https:// oder http:// beginnt.",
+    "https:// 또는 http://로 시작하는 전체 웹 주소를 입력하세요.",
+    "Введите полный веб-адрес, начинающийся с https:// или http://.",
+    "Introduce una dirección completa que empiece por https:// o http://.",
+    "Digite um endereço completo que comece com https:// ou http://."
+  ],
+  [
+    "Could not create this QR code. Try shorter content.",
+    "Dieser QR-Code konnte nicht erstellt werden. Versuche einen kürzeren Inhalt.",
+    "Dieser QR-Code konnte nicht erstellt werden. Versuche einen kürzeren Inhalt.",
+    "QR 코드를 만들 수 없습니다. 내용을 줄여 보세요.",
+    "Не удалось создать QR-код. Попробуйте сократить содержимое.",
+    "No se pudo crear el código QR. Prueba un contenido más corto.",
+    "Não foi possível criar o código QR. Tente um conteúdo menor."
+  ],
+  [
+    "Links and text",
+    "Links und Text",
+    "Links und Text",
+    "링크 및 텍스트",
+    "Ссылки и текст",
+    "Enlaces y texto",
+    "Links e texto"
+  ],
+  [
+    "PNG and SVG downloads",
+    "PNG- und SVG-Downloads",
+    "PNG- und SVG-Downloads",
+    "PNG 및 SVG 다운로드",
+    "Скачивание PNG и SVG",
+    "Descargas PNG y SVG",
+    "Downloads PNG e SVG"
+  ],
+  [
+    "Created locally in your browser",
+    "Lokal in deinem Browser erstellt",
+    "Lokal in deinem Browser erstellt",
+    "브라우저에서 로컬로 생성",
+    "Создаётся локально в браузере",
+    "Creado localmente en tu navegador",
+    "Criado localmente no seu navegador"
+  ],
+  [
+    "People and birthdays",
+    "Personen und Geburtstage",
+    "Personen und Geburtstage",
+    "사람 및 생일",
+    "Люди и дни рождения",
+    "Personas y cumpleaños",
+    "Pessoas e aniversários"
+  ],
+  [
+    "Upcoming birthdays and optional ages",
+    "Anstehende Geburtstage und optionales Alter",
+    "Anstehende Geburtstage und optionales Alter",
+    "다가오는 생일과 선택적 나이",
+    "Ближайшие дни рождения и необязательный возраст",
+    "Próximos cumpleaños y edades opcionales",
+    "Próximos aniversários e idades opcionais"
+  ],
+  [
+    "Yearly reminders",
+    "Jährliche Erinnerungen",
+    "Jährliche Erinnerungen",
+    "연간 알림",
+    "Ежегодные напоминания",
+    "Recordatorios anuales",
+    "Lembretes anuais"
+  ],
+  [
+    "January",
+    "Januar",
+    "Januar",
+    "1월",
+    "Январь",
+    "Enero",
+    "Janeiro"
+  ],
+  [
+    "February",
+    "Februar",
+    "Februar",
+    "2월",
+    "Февраль",
+    "Febrero",
+    "Fevereiro"
+  ],
+  [
+    "March",
+    "März",
+    "März",
+    "3월",
+    "Март",
+    "Marzo",
+    "Março"
+  ],
+  [
+    "April",
+    "April",
+    "April",
+    "4월",
+    "Апрель",
+    "Abril",
+    "Abril"
+  ],
+  [
+    "May",
+    "Mai",
+    "Mai",
+    "5월",
+    "Май",
+    "Mayo",
+    "Maio"
+  ],
+  [
+    "June",
+    "Juni",
+    "Juni",
+    "6월",
+    "Июнь",
+    "Junio",
+    "Junho"
+  ],
+  [
+    "July",
+    "Juli",
+    "Juli",
+    "7월",
+    "Июль",
+    "Julio",
+    "Julho"
+  ],
+  [
+    "August",
+    "August",
+    "August",
+    "8월",
+    "Август",
+    "Agosto",
+    "Agosto"
+  ],
+  [
+    "September",
+    "September",
+    "September",
+    "9월",
+    "Сентябрь",
+    "Septiembre",
+    "Setembro"
+  ],
+  [
+    "October",
+    "Oktober",
+    "Oktober",
+    "10월",
+    "Октябрь",
+    "Octubre",
+    "Outubro"
+  ],
+  [
+    "November",
+    "November",
+    "November",
+    "11월",
+    "Ноябрь",
+    "Noviembre",
+    "Novembro"
+  ],
+  [
+    "December",
+    "Dezember",
+    "Dezember",
+    "12월",
+    "Декабрь",
+    "Diciembre",
+    "Dezembro"
+  ],
+  [
+    "Calculator",
+    "Taschenrechner",
+    "Taschenrechner",
+    "계산기",
+    "Калькулятор",
+    "Calculadora",
+    "Calculadora"
+  ],
+  [
+    "Add, subtract, multiply, and divide on a classic keypad.",
+    "Addiere, subtrahiere, multipliziere und dividiere auf einem klassischen Tastenfeld.",
+    "Addier, subtrahier, multiplizier und dividier auf am klassischn Tastnfeld.",
+    "클래식 키패드로 더하기, 빼기, 곱하기, 나누기를 하세요.",
+    "Складывайте, вычитайте, умножайте и делите на классической клавиатуре.",
+    "Suma, resta, multiplica y divide con un teclado clásico.",
+    "Some, subtraia, multiplique e divida em um teclado clássico."
+  ],
+  [
+    "Cannot divide by zero",
+    "Division durch null nicht möglich",
+    "Durch null teiln geht ned",
+    "0으로 나눌 수 없습니다",
+    "На ноль делить нельзя",
+    "No se puede dividir entre cero",
+    "Não é possível dividir por zero"
+  ],
+  [
+    "The result is too large",
+    "Das Ergebnis ist zu groß",
+    "Des Ergebnis is z'groß",
+    "결과가 너무 큽니다",
+    "Результат слишком большой",
+    "El resultado es demasiado grande",
+    "O resultado é grande demais"
+  ],
+  [
+    "Calculator keypad",
+    "Tastenfeld des Rechners",
+    "Tastnfeld vom Rechner",
+    "계산기 키패드",
+    "Клавиатура калькулятора",
+    "Teclado de la calculadora",
+    "Teclado da calculadora"
+  ],
+  [
+    "History",
+    "Verlauf",
+    "Verlauf",
+    "기록",
+    "История",
+    "Historial",
+    "Histórico"
+  ],
+  [
+    "Use this result",
+    "Dieses Ergebnis verwenden",
+    "Des Ergebnis hernehma",
+    "이 결과 사용",
+    "Использовать этот результат",
+    "Usar este resultado",
+    "Usar este resultado"
+  ],
+  [
+    "Clear history",
+    "Verlauf leeren",
+    "Verlauf leern",
+    "기록 지우기",
+    "Очистить историю",
+    "Borrar historial",
+    "Limpar histórico"
+  ],
+  [
+    "Your last calculations appear here. Select one to keep working with its result.",
+    "Deine letzten Rechnungen erscheinen hier. Wähle eine aus, um mit ihrem Ergebnis weiterzurechnen.",
+    "Deine letztn Rechnungan stengan do. Such da oane aus und rechn mit dem Ergebnis weida.",
+    "최근 계산이 여기에 표시됩니다. 하나를 선택하면 그 결과로 계속 계산할 수 있습니다.",
+    "Здесь появятся последние вычисления. Выберите одно, чтобы продолжить с его результатом.",
+    "Tus últimos cálculos aparecen aquí. Elige uno para seguir trabajando con su resultado.",
+    "Seus últimos cálculos aparecem aqui. Selecione um para continuar com o resultado."
+  ],
+  [
+    "× and ÷ are calculated before + and −. You can also type on your keyboard: Enter for =, Backspace to delete, Esc to clear.",
+    "× und ÷ werden vor + und − berechnet. Du kannst auch die Tastatur benutzen: Enter für =, Rücktaste zum Löschen, Esc zum Leeren.",
+    "× und ÷ wern vor + und − ausgrechnt. Du konnst aa d'Tastatur hernehma: Enter für =, Rücktaste zum Löschn, Esc zum Leern.",
+    "×와 ÷는 +와 −보다 먼저 계산됩니다. 키보드로도 입력할 수 있습니다: Enter는 =, Backspace는 삭제, Esc는 지우기.",
+    "× и ÷ вычисляются раньше + и −. Можно вводить и с клавиатуры: Enter — «=», Backspace — удалить, Esc — очистить.",
+    "× y ÷ se calculan antes que + y −. También puedes usar el teclado: Intro para =, Retroceso para borrar, Esc para limpiar.",
+    "× e ÷ são calculados antes de + e −. Você também pode usar o teclado: Enter para =, Backspace para apagar, Esc para limpar."
+  ],
+  [
+    "Enter a value in every row to see the result and the steps.",
+    "Gib in jeder Zeile einen Wert ein, um Ergebnis und Rechenschritte zu sehen.",
+    "Gib in jeda Zeiln an Wert ei, dann siehgst Ergebnis und Rechenschritte.",
+    "모든 행에 값을 입력하면 결과와 풀이 단계가 표시됩니다.",
+    "Введите значение в каждой строке, чтобы увидеть результат и шаги.",
+    "Introduce un valor en cada fila para ver el resultado y los pasos.",
+    "Digite um valor em cada linha para ver o resultado e os passos."
+  ],
+  [
+    "Clear all values",
+    "Alle Werte leeren",
+    "Olle Werte leern",
+    "모든 값 지우기",
+    "Очистить все значения",
+    "Borrar todos los valores",
+    "Limpar todos os valores"
+  ],
+  [
+    "Next value",
+    "Nächster Wert",
+    "Nächsta Wert",
+    "다음 값",
+    "Следующее значение",
+    "Siguiente valor",
+    "Próximo valor"
+  ],
+  [
+    "Delete last digit",
+    "Letzte Ziffer löschen",
+    "Letzte Ziffa löschn",
+    "마지막 숫자 삭제",
+    "Удалить последнюю цифру",
+    "Borrar el último dígito",
+    "Apagar o último dígito"
+  ],
+  [
+    "Change sign",
+    "Vorzeichen wechseln",
+    "Vorzeichn wechsln",
+    "부호 바꾸기",
+    "Сменить знак",
+    "Cambiar el signo",
+    "Trocar o sinal"
+  ],
+  [
+    "Decimal point",
+    "Dezimalkomma",
+    "Dezimalkomma",
+    "소수점",
+    "Десятичная запятая",
+    "Coma decimal",
+    "Vírgula decimal"
+  ],
+  [
+    "Percent",
+    "Prozent",
+    "Prozent",
+    "퍼센트",
+    "Процент",
+    "Porcentaje",
+    "Porcentagem"
+  ],
+  [
+    "Equals",
+    "Ist gleich",
+    "Is gleich",
+    "등호",
+    "Равно",
+    "Igual",
+    "Igual"
+  ],
+  [
+    "Basic arithmetic with operator precedence",
+    "Grundrechenarten mit Punkt-vor-Strich-Regel",
+    "Grundrechenartn mit Punkt vor Strich",
+    "연산 우선순위를 지키는 사칙연산",
+    "Арифметика с учётом порядка действий",
+    "Aritmética básica con prioridad de operaciones",
+    "Aritmética básica com precedência de operadores"
+  ],
+  [
+    "Percent, sign change, and backspace keys",
+    "Tasten für Prozent, Vorzeichenwechsel und Löschen",
+    "Tastn für Prozent, Vorzeichnwechsl und Löschn",
+    "퍼센트, 부호 변경, 지우기 키",
+    "Клавиши процента, смены знака и удаления",
+    "Teclas de porcentaje, cambio de signo y retroceso",
+    "Teclas de porcentagem, troca de sinal e apagar"
+  ],
+  [
+    "Works with the keyboard",
+    "Funktioniert mit der Tastatur",
+    "Geht aa mit da Tastatur",
+    "키보드로도 사용 가능",
+    "Работает с клавиатурой",
+    "Funciona con el teclado",
+    "Funciona com o teclado"
+  ]
+]

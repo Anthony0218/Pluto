@@ -66,7 +66,7 @@ a.solar-planet { cursor: pointer; }
 .solar-planet--primary { --planet-size: 124px; }
 a.solar-planet:is(:hover,:focus-visible) { z-index: 3; }
 a.solar-planet:focus-visible { outline: 2px solid #d5e3ff; outline-offset: -2px; }
-.solar-art { position: relative; display: block; flex: none; width: var(--planet-size); height: var(--planet-size); transition: transform .2s ease, filter .2s ease; }
+.solar-art { position: relative; display: block; flex: none; width: var(--planet-size); height: var(--planet-size); translate: var(--px, 0) var(--py, 0); transition: transform .2s ease, filter .2s ease; }
 a.solar-planet:is(:hover,:focus-visible) .solar-art { transform: translateY(-4px) scale(1.055); filter: brightness(1.15); }
 .solar-atmosphere { position: absolute; inset: -22%; border-radius: 50%; background: radial-gradient(circle, var(--glow), transparent 67%); opacity: .37; filter: blur(10px); }
 .solar-sphere {
@@ -74,9 +74,9 @@ a.solar-planet:is(:hover,:focus-visible) .solar-art { transform: translateY(-4px
   overflow: hidden;
   border-radius: 50%;
   background:
-    radial-gradient(circle at 28% 19%, #fff9, transparent 13%),
-    radial-gradient(circle at 38% 30%, var(--light), var(--base) 43%, var(--dark) 78%, #080c22 100%);
-  box-shadow: inset -15px -15px 24px #03091baa, inset 3px 3px 12px #fff7, 0 0 0 1px #ffffff62, 0 0 25px var(--glow), 0 12px 25px #0008;
+    radial-gradient(circle at var(--lx, 28%) var(--ly, 19%), #fff9, transparent 13%),
+    radial-gradient(circle at var(--gx, 38%) var(--gy, 30%), var(--light), var(--base) 43%, var(--dark) 78%, #080c22 100%);
+  box-shadow: inset var(--sx, -15px) var(--sy, -15px) 24px #03091baa, inset 3px 3px 12px #fff7, 0 0 0 1px #ffffff62, 0 0 25px var(--glow), 0 12px 25px #0008;
 }
 .solar-sphere::after {
   content: ""; position: absolute; inset: 0; border-radius: inherit;

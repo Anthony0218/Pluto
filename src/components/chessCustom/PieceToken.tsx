@@ -1,5 +1,6 @@
 import { luminance } from "@/games/chess/custom/engine/teams";
 import type { PieceDefinition, TeamDefinition } from "@/games/chess/custom/engine/types";
+import { ChaosPieceArtwork } from "./ChaosPieceArtwork";
 
 const CHESS_GLYPH = /^[♔-♟]$/u;
 
@@ -16,7 +17,7 @@ export default function PieceToken({ def, team, title }: { def?: PieceDefinition
   const gradientId = `token-${color.replace("#", "")}`;
   return (
     <svg viewBox="0 0 100 100" role={title ? "img" : undefined} aria-label={title} aria-hidden={!title} className="pointer-events-none block h-full w-full select-none overflow-visible">
-      {glyph ? (
+      {["🧙", "🐉", "💣", "💥"].includes(icon) ? <ChaosPieceArtwork icon={icon} color={color} outline={outline} /> : glyph ? (
         <text
           x="50"
           y="54"
