@@ -4,6 +4,7 @@ import {
 
 import MedievalKingdomsBattlePage from "./MedievalKingdomsBattlePage";
 import MedievalKingdomsRegionPage from "./MedievalKingdomsRegionPage";
+import EdravanePage from "./EdravanePage";
 import MedievalKingdomsWorldPage from "./MedievalKingdomsWorldPage";
 
 /**
@@ -18,9 +19,11 @@ export default function MedievalKingdomsRoutes() {
       <Route
         path="/games/medieval-kingdoms"
         element={
-          <MedievalKingdomsWorldPage />
+          <EdravanePage />
         }
       />
+
+      <Route path="/games/medieval-kingdoms/legacy" element={<MedievalKingdomsWorldPage />} />
 
       <Route
         path="/games/medieval-kingdoms/campaign/:campaignId"

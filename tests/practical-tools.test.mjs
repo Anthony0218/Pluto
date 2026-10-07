@@ -2,7 +2,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { decimalInput, calculatePercentage, percentageModes, numberBases, parseBaseInteger, baseRepresentations, toggleBit, placeValueTerms } from '../src/data/practicalMath.ts';
 import { convertUnit, units } from '../src/data/unitConversions.ts';
-import { recipeQuantity, scaleRecipe, createRecipeStore, parseSavedRecipes } from '../src/data/recipes.ts';
 import { percentageActivities, percentageLessons } from '../src/data/everydayPercentages.ts';
 import { gradeMathAnswer } from '../src/data/mathFoundations.ts';
 import { createLearningToolsStore } from '../src/data/learningToolsProgress.ts';
@@ -63,35 +62,6 @@ test('unit conversions distinguish powers, offsets and binary prefixes', () => {
   }
   for (const [value, from, to] of [[1, 'm', 'kg'], [-1, 'kg', 'g'], [-273.151, 'C', 'K'], [-1, 'K', 'C'], [Infinity, 'm', 'ft'], [1, 'fake', 'm']]) assert.equal(convertUnit(value, from, to), null);
 });
-const recipe = { id: 'recipe-a', name: 'Example', servings: '4', ingredients: [{ id: 'flour', name: 'Flour', quantity: '200', unit: 'g' }, { id: 'milk', name: 'Milk', quantity: '1/2', unit: 'L' }] };
-
-test('recipe scaling accepts fractions and preserves original quantities and units', () => {
-  assert.equal(recipeQuantity('1/2'), .5); assert.equal(recipeQuantity('0,5'), .5); assert.equal(recipeQuantity('1/0'), null); assert.equal(recipeQuantity('-1'), null);
-  assert.deepEqual(scaleRecipe(recipe, '6'), { factor: 1.5, quantities: [300, .75] });
-  assert.deepEqual(scaleRecipe(recipe, '2'), { factor: .5, quantities: [100, .25] });
-  assert.equal(recipe.ingredients[0].quantity, '200'); assert.equal(recipe.ingredients[1].unit, 'L');
-  for (const target of ['0', '-1', '1001', '1/0', 'abc']) assert.equal(scaleRecipe(recipe, target), null);
-  assert.equal(scaleRecipe({ ...recipe, servings: '0' }, '6'), null);
-  assert.equal(scaleRecipe({ ...recipe, ingredients: [{ ...recipe.ingredients[0], name: '' }] }, '6'), null);
-});
-
-test('saved recipes survive reload, update in place, and remain separate per account', () => {
-  const port = storage(), a = createRecipeStore(port), b = createRecipeStore(port);
-  assert.equal(a.save('alice', recipe), true); assert.equal(createRecipeStore(port).read('alice')[0].ingredients[1].quantity, '1/2');
-  assert.deepEqual(a.read('bob'), []); assert.deepEqual(a.read('guest'), []);
-  a.save('alice', { ...recipe, name: 'Renamed' }); assert.equal(a.read('alice').length, 1);
-  let changes = 0; b.read('alice'); b.subscribe('alice', () => changes++); b.sync('pluto-recipes-v1:alice'); assert.equal(b.read('alice')[0].name, 'Renamed'); assert.equal(changes, 1);
-  a.remove('alice', 'recipe-a'); b.sync('pluto-recipes-v1:alice'); assert.deepEqual(b.read('alice'), []);
-  assert.deepEqual(parseSavedRecipes('broken'), []); assert.deepEqual(parseSavedRecipes(JSON.stringify([null, { ...recipe, servings: '-1' }, recipe, recipe])), [recipe]);
-});
-
-test('unavailable storage and recipe limits give predictable behavior', () => {
-  const store = createRecipeStore(null); store.save('guest', recipe); assert.equal(store.isVolatile('guest'), true); assert.equal(store.read('guest'), store.read('guest')); assert.deepEqual(store.read('guest'), [recipe]);
-  const persistent = createRecipeStore(storage()); for (let i = 0; i < 50; i++) assert.equal(persistent.save('alice', { ...recipe, id: `recipe-${i}` }), true);
-  assert.equal(persistent.save('alice', { ...recipe, id: 'recipe-51' }), false); assert.equal(persistent.save('alice', { ...recipe, id: 'recipe-0' }), true);
-  assert.equal(persistent.save('alice', { ...recipe, name: '' }), false);
-});
-
 test('all nine percentage scenarios have audited practice answers and saved progress', () => {
   const expected = [[90, 42, 25], [72, 25, 28], [220, 200, 16], [25, 80, -20], [2100, 10, 20], [46, 22, 1], [300, 150, 50], [25, 10, 25], [1102.5, 42, 500]];
   assert.equal(percentageLessons.length, 9);
@@ -103,5 +73,5 @@ test('all nine percentage scenarios have audited practice answers and saved prog
   const port = storage(), store = createLearningToolsStore(port);
   store.recordSolvedExercise('alice', percentageActivities[0].id, 'p1'); store.recordSolvedExercise('alice', percentageActivities[0].id, 'fake');
   assert.deepEqual(createLearningToolsStore(port).read('alice').solvedExercises[percentageActivities[0].id], ['p1']); assert.deepEqual(store.read('bob').solvedExercises, {});
-  assert.deepEqual(toolApps.filter(item => item.status === 'available').map(item => item.id), ['percentage-calculator', 'number-system-converter', 'unit-converter', 'recipe-scaler', 'workout-timer', 'bill-splitter', 'time-zone-planner', 'function-plotter', 'budget-tracker', 'subscription-tracker', 'calorie-tracker', 'weather-explorer', 'day-planner']);
+  assert.deepEqual(toolApps.filter(item => item.status === 'available').map(item => item.id), ['calculator', 'percentage-calculator', 'birthday-reminders', 'qr-code-creator', 'number-system-converter', 'unit-converter', 'workout-timer', 'bill-splitter', 'time-zone-planner', 'budget-tracker', 'calorie-tracker', 'day-planner', 'notes']);
 });

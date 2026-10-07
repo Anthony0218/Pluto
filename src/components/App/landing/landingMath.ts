@@ -86,9 +86,9 @@ export function buildPoseTable(stops: readonly StopMeta[], wide: boolean): PoseT
 
 /**
  * Journey stops (1-based, in page order) of the `k`-th tool or book on the Tools and Learn tabs. The first one arrives
- * through the flyby; every later one gets an arrival stop right before its section.
+ * through the flyby, so its artwork is there from the end of the flyby (stop 0); every later one gets an arrival stop right before its section.
  */
-export const itemStops = (k: number) => k === 0 ? { arrival: 1, section: 1 } : { arrival: 2 * k, section: 2 * k + 1 };
+export const itemStops = (k: number) => k === 0 ? { arrival: 0, section: 1 } : { arrival: 2 * k, section: 2 * k + 1 };
 
 /**
  * How strongly the artwork of the item whose section is stop `section` (and whose arrival, if it has one, is stop
@@ -129,6 +129,8 @@ export function heroHandoffProgress(scroll: number, anchors: JourneyAnchors) {
 
 // The planet rests around each stop and only travels while the gap between two sections crosses the viewport.
 const plateau = (fraction: number) => smoothstep((fraction - 0.25) / 0.5);
+/** Share of the gap between the flyby and the first section during which the arrived object stays put. */
+const FIRST_HOLD = 0.3;
 
 /**
  * Where the persistent planet is on its journey: -1 → 0 while the flyby is pinned, then 0 at the end of the
@@ -144,8 +146,8 @@ export function journeyIndex(scroll: number, anchors: JourneyAnchors) {
     if (scroll <= points[i + 1]) {
       const span = points[i + 1] - points[i];
       const fraction = span > 0 ? (scroll - points[i]) / span : 1;
-      // Leaving the flyby the planet departs at once, so it never sits still while the stage scrolls away.
-      return i + (i === 0 ? smoothstep(fraction / 0.75) : plateau(fraction));
+      // The first object stays where the flyby delivered it for a while before it travels behind the first section.
+      return i + (i === 0 ? smoothstep((fraction - FIRST_HOLD) / (0.85 - FIRST_HOLD)) : plateau(fraction));
     }
   }
   return points.length - 1;

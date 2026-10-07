@@ -98,6 +98,10 @@ export function createLearningToolsStore(storage: StoragePort | null) {
     },
     toggleBookmark: (account: string, id: string) => toggle(account, "bookmarks", id),
     toggleFavoriteTool: (account: string, id: string) => toggle(account, "favoriteTools", id),
+    /** Replaces the whole favourites list, in the given order (the dashboard's "Your apps" row). */
+    setFavoriteTools(account: string, ids: string[]) {
+      update(account, state => ({ ...state, favoriteTools: [...new Set(ids.filter(id => toolIds.has(id)))] }));
+    },
     visitTool(account: string, id: string) {
       if (!toolIds.has(id)) return;
       update(account, state => state.recentTools[0] === id ? state : { ...state, recentTools: [id, ...state.recentTools.filter(item => item !== id)].slice(0, 6) });

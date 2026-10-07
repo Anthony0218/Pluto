@@ -1,6 +1,6 @@
 import { learningPaths, learningSubjects } from "@/data/learningCatalog";
 import { planets, type PlanetConfig } from "../planetary/planetConfig";
-import { universeBooks, universeTools, type UniverseCategory } from "../planetary/universeCatalog";
+import { landingTools, universeBooks, type UniverseBook, type UniverseCategory } from "../planetary/universeCatalog";
 import type { CopyKey } from "./copy";
 
 export type FlybyKind = "planet" | "tile" | "book";
@@ -15,7 +15,7 @@ export type FlybyItem = {
   y: number;
   depth: number;
   planet?: PlanetConfig;
-  tool?: (typeof universeTools)[number];
+  tool?: (typeof landingTools)[number];
   book?: (typeof universeBooks)[number];
 };
 export type FlybyScene = {
@@ -37,19 +37,32 @@ const planetSpots: Record<string, [x: number, y: number, depth: number]> = {
   "/games/eat-it": [66, 83, 1.05],
 };
 const sideSpots: [number, number, number][] = [[20, 30, 1.1], [80, 28, 0.8], [72, 80, 1.2]];
+/** Every tool flies past, so the tiles are spread around the stage clear of the title above and the arrival in the middle. */
+const toolSpots: [number, number, number][] = [
+  [10, 26, 1.2], [28, 18, 0.9], [72, 18, 0.9], [90, 26, 1.2],
+  [14, 46, 1.4], [86, 46, 1.4],
+  [34, 64, 0.75], [66, 62, 0.75],
+  [10, 70, 1.2], [28, 84, 0.9], [72, 84, 0.9], [90, 70, 1.2],
+];
 
 const planetItem = (config: PlanetConfig, spot: [number, number, number] = [50, 46, 0]): FlybyItem => ({ id: config.id, kind: "planet", title: config.label, route: config.route, x: spot[0], y: spot[1], depth: spot[2], planet: config });
-const toolItem = (tool: (typeof universeTools)[number], spot: [number, number, number] = [50, 46, 0]): FlybyItem => ({ id: tool.id, kind: "tile", title: tool.title, route: tool.route, x: spot[0], y: spot[1], depth: spot[2], tool });
+const toolItem = (tool: (typeof landingTools)[number], spot: [number, number, number] = [50, 46, 0]): FlybyItem => ({ id: tool.id, kind: "tile", title: tool.title, route: tool.route, x: spot[0], y: spot[1], depth: spot[2], tool });
 const bookItem = (book: (typeof universeBooks)[number], spot: [number, number, number] = [50, 46, 0]): FlybyItem => ({ id: book.id, kind: "book", title: book.title, route: book.route, x: spot[0], y: spot[1], depth: spot[2], book });
 
 export function bookDescription(id: string) {
   return learningPaths.find(path => path.id === id)?.description ?? learningSubjects.find(subject => subject.id === id)?.description ?? "";
 }
 
+/** What is inside a book: a shelf lists its books, a course its topics, and a plain subject its one resource. */
+export function bookTopics(book: Pick<UniverseBook, "id" | "books">) {
+  if (book.books) return book.books.map(item => item.title);
+  return learningPaths.find(path => path.id === book.id)?.topics ?? [learningSubjects.find(subject => subject.id === book.id)?.resourceLabel ?? ""];
+}
+
 export function flybyScene(category: UniverseCategory): FlybyScene {
   if (category === "tools") {
-    const [center, ...rest] = universeTools;
-    return { items: rest.map((tool, index) => toolItem(tool, sideSpots[index])), center: toolItem(center), pick: "pickTool", line: { text: center.description }, cta: "openTool" };
+    const [center, ...rest] = landingTools;
+    return { items: rest.map((tool, index) => toolItem(tool, toolSpots[index % toolSpots.length])), center: toolItem(center), pick: "pickTool", line: { text: center.description }, cta: "openTool" };
   }
   if (category === "learn") {
     const [center, ...rest] = universeBooks;

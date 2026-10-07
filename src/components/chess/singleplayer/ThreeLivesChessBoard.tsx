@@ -1674,8 +1674,6 @@ export default function ThreeLivesChessBoard({
        */
       checkGameOver(true);
     } catch {
-      console.log("Illegal move");
-
       setIllegal(true);
 
       playSound("illegal");

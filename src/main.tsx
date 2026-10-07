@@ -157,6 +157,7 @@ import {
 import GamesPage from "./pages/general/GamesPage.tsx";
 import ProfilePage from "./pages/social/ProfilePage.tsx";
 import { WattenThreePlayerMultiplayerGame } from "./components/Watten/WattenThreePlayerMultiplayer.tsx";
+import EdravanePage from "./pages/games/MedievalKingdoms/EdravanePage.tsx";
 import MedievalKingdomsWorldPage from "./pages/games/MedievalKingdoms/MedievalKingdomsWorldPage.tsx";
 import MedievalKingdomsBattlePage from "./pages/games/MedievalKingdoms/MedievalKingdomsBattlePage.tsx";
 import { Chess3DAiRoute, Chess3DHotseatRoute, Chess3DMenuRoute, ChessCustomLegacyRedirect, ChessCustomRoute, JanmannGameRoute, JanmannRulesRoute } from "./pages/games/lazyChessRoutes.tsx";
@@ -686,14 +687,14 @@ const router = createBrowserRouter([
           },
           {
             path: "/games/medieval-kingdoms",
-            element: <MedievalKingdomsWorldPage />,
+            element: <EdravanePage />,
           },
           {
             path: "/games/medieval-kingdoms/battle/:battleId",
             element: <MedievalKingdomsBattlePage />,
           },
           {
-            path: "/games/medieval-kingdoms",
+            path: "/games/medieval-kingdoms/legacy",
             element: <MedievalKingdomsWorldPage />,
           },
           {

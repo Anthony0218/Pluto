@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import jsQR from 'jsqr';
 import { PNG } from 'pngjs';
-import { qrPayload, generateQr } from '../src/data/qrTools.ts';
+import { qrPayload, generateQr, downloadQr } from '../src/data/qrTools.ts';
 import { birthdayDate, nextBirthday, dueBirthdays, validBirthdayPerson, birthdayReminderChanges } from '../src/data/birthdayTools.ts';
 import { createLifeToolsStore, parseLifeTools } from '../src/data/lifeToolsStorage.ts';
 import { validReminder } from '../supabase/functions/tool-push/model.ts';
@@ -19,6 +19,47 @@ test('QR images decode to the exact URL or Unicode text, with a quiet zone and d
   }
   for (const input of ['', 'javascript:alert(1)', 'example.com', 'file:///etc/passwd']) assert.throws(()=>qrPayload(input,'link'));
   assert.throws(()=>qrPayload('🎉'.repeat(501),'text')); assert.equal(qrPayload('  hello  ','text'),'  hello  ');
+});
+test('QR downloads save the preview as PNG or SVG files and release temporary URLs', async context => {
+  const qr = await generateQr('Download this QR 🎉');
+  const files = [], clicked = [], timers = [], revoked = [];
+  let attached = null;
+  context.mock.method(URL, 'createObjectURL', file => { files.push(file); return `blob:qr-${files.length}`; });
+  context.mock.method(URL, 'revokeObjectURL', url => revoked.push(url));
+  const originalDocument = Object.getOwnPropertyDescriptor(globalThis, 'document');
+  const originalWindow = Object.getOwnPropertyDescriptor(globalThis, 'window');
+  context.after(() => {
+    if (originalDocument) Object.defineProperty(globalThis, 'document', originalDocument);
+    else delete globalThis.document;
+    if (originalWindow) Object.defineProperty(globalThis, 'window', originalWindow);
+    else delete globalThis.window;
+  });
+  globalThis.document = {
+    createElement(tag) {
+      assert.equal(tag, 'a');
+      return {
+        click() { assert.equal(attached, this); clicked.push({ href: this.href, name: this.download }); },
+        remove() { assert.equal(attached, this); attached = null; },
+      };
+    },
+    body: { appendChild(link) { attached = link; } },
+  };
+  globalThis.window = { setTimeout(callback) { timers.push(callback); } };
+  downloadQr(qr, 'png');
+  downloadQr(qr, 'svg');
+  assert.deepEqual(clicked, [
+    { href: 'blob:qr-1', name: 'pluto-qr-code.png' },
+    { href: 'blob:qr-2', name: 'pluto-qr-code.svg' },
+  ]);
+  assert.equal(attached, null);
+  assert.equal(files[0].type, 'image/png');
+  const image = PNG.sync.read(Buffer.from(await files[0].arrayBuffer()));
+  assert.equal(jsQR(new Uint8ClampedArray(image.data), image.width, image.height)?.data, qr.payload);
+  assert.equal(files[1].type, 'image/svg+xml;charset=utf-8');
+  assert.equal(await files[1].text(), qr.svg);
+  assert.deepEqual(revoked, []);
+  timers.forEach(callback => callback());
+  assert.deepEqual(revoked, ['blob:qr-1', 'blob:qr-2']);
 });
 test('annual dates handle leap days, today, year rollover, daylight saving and optional ages',()=>{
   assert.equal(birthdayDate(person,2027),'2027-02-28');assert.equal(birthdayDate(person,2028),'2028-02-29');

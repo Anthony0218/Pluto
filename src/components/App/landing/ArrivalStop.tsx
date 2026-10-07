@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import * as m from "motion/react-m";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useLanding } from "./landingContext";
+import RevealButton from "./RevealButton";
 import { toneOf, type ToneName } from "./tones";
 import TravelingCaption from "./TravelingCaption";
 
@@ -43,10 +44,12 @@ export default function ArrivalStop({ id, tone, feature, ownArt, title, line, hr
       transition={{ duration: reducedMotion ? 0 : 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
       <TravelingCaption id={id} title={title} line={line} />
-      <Link to={href} className={button ? "item-open arrival-open" : "flyby-cta"}>
-        {action}
-        <ArrowRight size={17} aria-hidden="true" />
-      </Link>
+      <RevealButton className="flex justify-center">
+        <Link to={href} className={button ? "item-open arrival-open" : "flyby-cta"}>
+          {action}
+          <ArrowRight size={17} aria-hidden="true" />
+        </Link>
+      </RevealButton>
     </m.div>
   </section>;
 }

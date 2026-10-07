@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import * as m from "motion/react-m";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import RevealButton from "./RevealButton";
 import RevealTitle from "./RevealTitle";
 import { toneOf, type ToneName } from "./tones";
 import { useLanding } from "./landingContext";
@@ -47,10 +48,12 @@ export default function ItemSection({ id, tone, title, line, description, href, 
           <p data-caption-line className="caption-section-line">{line}</p>
         </m.div>
         <p className="mt-6 max-w-lg text-base leading-7 text-zinc-300 sm:text-lg sm:leading-8">{description}</p>
-        <Link to={href} className="item-open group">
-          {action}
-          <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true" />
-        </Link>
+        <RevealButton className="flex" flight={id}>
+          <Link to={href} className="item-open group">
+            {action}
+            <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true" />
+          </Link>
+        </RevealButton>
       </div>
     </m.div>
   </section>;

@@ -26,8 +26,6 @@ export function useStockfish(enabled = true) {
     const handleMessage = (event: MessageEvent) => {
       const line = String(event.data);
 
-      console.log("[Stockfish]", line);
-
       if (line === "uciok") {
         worker.postMessage("isready");
       }

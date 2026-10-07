@@ -4,7 +4,7 @@ export type AtlasDifficulty = "beginner" | "intermediate" | "expert";
 export type AtlasScope = "un195" | "territories" | "all_map_entities";
 export type AtlasCategory = "countries" | "locations" | "capitals" | "flags" | "population" | "area" | "continents" | "languages" | "borders" | "currency" | "statistics" | "clues";
 export type AtlasInteraction = "single_choice" | "multi_select" | "map_click" | "closest_click" | "higher_lower" | "map_fill" | "guess_country";
-export type AtlasMode = "map_click" | "closest_wins" | "speed_run" | "map_fill" | "flags" | "higher_lower" | "guess_country" | "territory_battle";
+export type AtlasMode = "map_click" | "closest_wins" | "speed_run" | "map_fill" | "flags" | "higher_lower" | "guess_country";
 
 export type SourcedNumber = { value: number; year: number; source: string; sourceUpdatedAt: string };
 export type Coordinates = [longitude: number, latitude: number];
@@ -57,6 +57,8 @@ export type ChoiceQuestion = QuestionBase & {
   /** Flag quiz: the flag to identify, or the lone country silhouette (geometry) and name whose flag is wanted. */
   promptFlagAsset?: string | null;
   promptShape?: { geometryId: string; label: string } | null;
+  /** Shown with the answer once it is graded (the record behind a History Battle question). */
+  explanation?: string;
 };
 
 export type MultiSelectQuestion = QuestionBase & {
@@ -108,4 +110,10 @@ export type ComparableKind = "country" | "city" | "continent" | "subregion";
 export type AtlasCity = { id: string; name: string; countryId: string; population: number; elevationM: number | null; coordinates: Coordinates; capital: boolean };
 export type AtlasExtras = { atlasDataVersion: string; synchronizedAt: string; cities: AtlasCity[]; highestPoints: Record<string, { name: string; elevationM: number }> };
 
-export type AtlasDataset = { countries: GeographicEntity[]; extras: AtlasExtras; version: { atlasDataVersion: string; synchronizedAt: string }; topology: unknown };
+/** One dated entry of a country's Independence record. `from` is set when the entry is about independence from a ruler. */
+export type HistoryEvent = { year: number; date: string; label: string; from?: string; power?: string; declared?: boolean };
+/** `mentions`: every power named in the country's Independence or Background entry, i.e. its recorded ties. */
+export type CountryHistory = { record: string; events: HistoryEvent[]; mentions: string[]; formerNames: string[]; background: string };
+export type AtlasHistory = { atlasDataVersion: string; synchronizedAt: string; source: { name: string; publisher: string; license: string }; countries: Record<string, CountryHistory> };
+
+export type AtlasDataset = { countries: GeographicEntity[]; extras: AtlasExtras; history: AtlasHistory; version: { atlasDataVersion: string; synchronizedAt: string }; topology: unknown };

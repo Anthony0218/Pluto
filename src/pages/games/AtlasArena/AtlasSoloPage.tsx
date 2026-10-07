@@ -1,7 +1,6 @@
 import { useRandomSeries } from "./useRandomSeries";
 import { AtlasRandomSeriesResults } from "../../../components/atlas/AtlasRandomSeriesResults";
 import { TrialSessionContext } from "../../../components/atlas/trials/trialSession";
-import { AtlasTerritoryCampaign } from "../../../components/atlas/AtlasTerritoryCampaign";
 import { useCallback, useRef, useState } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, ChevronRight, Globe2, RotateCcw, SlidersHorizontal } from "lucide-react";
@@ -45,7 +44,7 @@ function TrialSolo({ mode, data, onComplete }: { mode: ArenaModeDef; data: Atlas
   const restart = useCallback(() => setSeed(freshSeed()), []);
   if (mode.solo.kind !== "trial" || !pools) return null;
   const { component: Game, fullPool } = TRIAL_GAMES[mode.solo.trial];
-  return <TrialSessionContext.Provider value={onComplete ? { finish: { label: "See series score", onClick: () => onComplete(pending.current) } } : null}><Game key={`${difficulty}:${seed}`} pool={fullPool ? pools.full : pools.difficulty} byId={pools.byId} topology={data.topology} seed={seed} difficulty={difficulty} best={stored.best[bestKey(mode.bestId, difficulty)] ?? 0} onRecord={record} onRestart={restart} onExit={exit} /></TrialSessionContext.Provider>;
+  return <TrialSessionContext.Provider value={onComplete ? { finish: { label: "See series score", onClick: () => onComplete(pending.current) } } : null}><Game key={`${difficulty}:${seed}`} pool={fullPool ? pools.full : pools.difficulty} byId={pools.byId} topology={data.topology} history={data.history} seed={seed} difficulty={difficulty} best={stored.best[bestKey(mode.bestId, difficulty)] ?? 0} onRecord={record} onRestart={restart} onExit={exit} /></TrialSessionContext.Provider>;
 }
 
 function ArenaSolo({ mode, data, onComplete }: { mode: ArenaModeDef; data: AtlasDataset; onComplete?: (score: number) => void }) {
@@ -80,6 +79,5 @@ function ArenaSolo({ mode, data, onComplete }: { mode: ArenaModeDef; data: Atlas
     {mode.options.length > 0 && <button type="button" className="atlas-secondary" onClick={() => setPhase("setup")}><SlidersHorizontal /> Settings</button>}
     <button type="button" className="atlas-secondary" onClick={toHub}>All modes</button>
   </>} />;
-  if (mode.solo.mode === "territory_battle") return <AtlasTerritoryCampaign key={seed} data={data} difficulty={settings.difficulty} seed={seed} onFinish={finish} onExit={toHub}/>;
   return <AtlasSoloGame key={seed} data={data} mode={mode.solo.mode} settings={settings} seed={seed} title={mode.title} onFinish={finish} onExit={() => mode.options.length ? setPhase("setup") : toHub()} />;
 }

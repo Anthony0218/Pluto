@@ -339,3 +339,16 @@
 .language-layout .language-guesser { width: 100%; max-width: none; }
 .language-layout .language-reveal { grid-template-columns: 1fr; margin-top: 0; }
 @media (max-width: 850px) { .language-layout { grid-template-columns: 1fr; } }
+
+/* History Battle shares the two-column question / reveal layout with Language Guesser. */
+.history-battle .trial-title { font-size: clamp(1.35rem, 2.6vw, 2rem); line-height: 1.2; }
+.history-subject { display: flex; align-items: center; gap: .6rem; margin: .9rem 0 0; color: #ffe9ee; font-weight: 700; }
+.history-subject img { width: 34px; max-height: 24px; border-radius: 3px; box-shadow: 0 3px 10px rgba(0,0,0,.3); }
+.history-options kbd { color: #f5a9b8; }
+.history-options button img { flex: 0 0 auto; width: 30px; max-height: 21px; border-radius: 3px; }
+.history-options button span { display: grid; gap: .15rem; min-width: 0; }
+.history-options button small { color: #d9c7cd; font-size: .78rem; }
+.history-reveal { border-color: rgba(251,113,133,.32); background: rgba(251,113,133,.07); }
+.history-fact { margin: 0; padding: .8rem 1rem; border-left: 3px solid #fb7185; border-radius: 10px; color: #fff3f5; background: rgba(251,113,133,.1); line-height: 1.5; }
+.history-fact::first-letter { text-transform: uppercase; }
+.history-source { color: #c9b7bd; font-size: .74rem; letter-spacing: .02em; }

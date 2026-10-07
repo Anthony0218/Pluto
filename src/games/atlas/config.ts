@@ -8,7 +8,6 @@ export const ATLAS_SCORING = {
   mapFillCountry: 100,
   mapFillCompletion: 2500,
   mapFillStreak: 10,
-  territoryRounds: 20,
 } as const;
 
 export const DIFFICULTY_RULES: Record<AtlasDifficulty, { roundSeconds: number; minimumPopulation: number; minimumArea: number; choiceCount: number; sameContinentDistractors: boolean }> = {

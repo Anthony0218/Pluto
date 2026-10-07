@@ -37,21 +37,6 @@ try {
   const text = async () => evaluate('document.body.innerText');
   await send('Runtime.enable'); await send('Page.enable');
   // Deterministic transport fixtures keep API outages out of the UI regression check.
-  // Production still calls Open-Meteo; no fixture is bundled with the app.
-  await send('Page.addScriptToEvaluateOnNewDocument', {source: `
-    const realFetch = window.fetch.bind(window);
-    window.fetch = async (input,options) => {
-      const url = String(input);
-      if(url.startsWith('https://api.open-meteo.com/')) {
-        if(localStorage.getItem('weather-test-fail')==='true') return new Response('{}',{status:503});
-        const lat = Number(new URL(url).searchParams.get('latitude'));
-        const start = Math.floor(Date.now()/3600000)*3600;
-        return new Response(JSON.stringify({timezone:lat<0?'Australia/Sydney':'Europe/Berlin',hourly_units:{time:'unixtime',temperature_2m:'°C',precipitation_probability:'%',precipitation:'mm',wind_speed_10m:'km/h'},hourly:{time:Array.from({length:72},(_,i)=>start+i*3600),temperature_2m:Array.from({length:72},(_,i)=>Math.round((15+lat/10+Math.sin(i/4)*3)*10)/10),precipitation_probability:Array(72).fill(20),precipitation:Array(72).fill(0.2),wind_speed_10m:Array(72).fill(10),weather_code:Array(72).fill(2)}}));
-      }
-      if(url.startsWith('https://geocoding-api.open-meteo.com/')) return new Response(JSON.stringify({results:[{id:2950159,name:'Berlin',country:'Germany',latitude:52.52,longitude:13.41}]}));
-      return realFetch(input,options);
-    };
-  `});
   await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false });
   await init('day-planner'); await fill('Task', 'Browser appointment'); await fill('Start time', '09:00'); await click('Add task');
   await fill('Task', 'Conflicting task'); await fill('Start time', '09:15'); await click('Add task'); assert.match(await text(), /Scheduling conflict/);
@@ -71,22 +56,14 @@ try {
   // Use a past reminder in this isolated profile, then visit a different route.
   await evaluate(`(() => { const key='pluto-life-tools-v1:guest'; const data=JSON.parse(localStorage.getItem(key)); const at=Date.now()-60000; const p=new Intl.DateTimeFormat('en-CA',{timeZone:'UTC',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(at); const parts=Object.fromEntries(p.map(v=>[v.type,v.value])); const date=parts.year+'-'+parts.month+'-'+parts.day,time=parts.hour+':'+parts.minute; data.tasks.push({id:'overdue',title:'Missed reminder',date,time,zone:'UTC',at:Date.parse(date+'T'+time+':00Z'),duration:10,done:false,reminder:true,reminded:false}); data.breaks={enabled:true,interval:1,nextAt:at}; localStorage.setItem(key,JSON.stringify(data)); })()`);
   await init('percentage-calculator'); await waitFor('document.querySelector(".life-reminders")'); assert.match(await text(), /Missed reminder/); await click('Dismiss'); await click('Turn off');
-  await reload(); await waitFor('document.querySelector(".pt-workbench")'); assert.equal(await evaluate('!!document.querySelector(".life-reminders")'), false);
+  await reload(); await waitFor('document.querySelector(".calc-body")'); assert.equal(await evaluate('!!document.querySelector(".life-reminders")'), false);
   await init('calorie-tracker'); await fill('Date','2026-10-06'); await fill('Food name','Label example'); await fill('Portion quantity','150'); await fill('kcal per 100 g','80'); await click('Add food');
   assert.match(await text(),/120 kcal/); await fill('Meal template name','Test bowl'); await click('Save selected meal'); await fill('Portion multiplier','2'); await click('Log meal'); assert.match(await text(),/360 kcal/);
   await click('Edit'); await fill('Portion quantity','50'); await click('Save changes'); assert.match(await text(),/280 kcal/);
   await reload(); await waitFor('document.body.innerText.includes("Test bowl")'); await evaluate(helpers); await fill('Date','2026-10-06'); assert.match(await text(),/280 kcal/);
   assert.equal(await evaluate('JSON.parse(localStorage.getItem("pluto-life-tools-v1:guest")).savedMeals[0].foods[0].quantity'),150,'template keeps its original portion');
-  await init('weather-explorer'); await waitFor('document.querySelector(".weather-card tbody tr")'); assert.equal(await evaluate('document.querySelectorAll(".weather-card tbody tr").length'),24);
-  await fill('Latitude','-33.87'); await fill('Longitude','151.21'); await click('Explore coordinates'); await waitFor('document.body.innerText.includes("Australia/Sydney")'); await click('Save place');
-  await fill('Search location','Berlin'); await click('Search'); await waitFor('[...document.querySelectorAll("button")].some(b=>b.textContent==="Berlin, Germany")'); await click('Berlin, Germany'); await waitFor('document.body.innerText.includes("Europe/Berlin")'); await click('Save place');
-  const sid=await evaluate('JSON.parse(localStorage.getItem("pluto-life-tools-v1:guest")).weatherPlaces.find(p=>p.latitude<0).id'); await fill('Compare with',sid); await waitFor('document.querySelectorAll(".weather-card tbody tr").length===48');
-  assert.equal(await evaluate('document.querySelectorAll(".weather-card tbody tr")[0].cells[0].textContent===document.querySelectorAll(".weather-card tbody tr")[24].cells[0].textContent'),false,'comparison displays distinct local times');
-  await evaluate('localStorage.setItem("weather-test-fail","true")'); await click('Refresh'); await waitFor('document.body.innerText.includes("Forecast unavailable")'); await evaluate('localStorage.removeItem("weather-test-fail")'); await click('Refresh'); await waitFor('document.querySelectorAll(".weather-card tbody tr").length===48');
-  await evaluate('document.querySelector(".weather-map").dispatchEvent(new KeyboardEvent("keydown",{key:"ArrowRight",bubbles:true}))'); assert.equal(await evaluate('Number(field("Longitude").value)'),14.41);
-  await reload(); await waitFor('document.body.innerText.includes("151.210")');
   await init('day-planner'); assert.match(await text(),/Background reminders/); assert.match(await text(),/Sign in to enable background reminders/);
-  const apps = ['day-planner', 'time-zone-planner', 'workout-timer', 'bill-splitter', 'budget-tracker', 'subscription-tracker', 'calorie-tracker', 'weather-explorer'];
+  const apps = ['calculator', 'percentage-calculator', 'day-planner', 'time-zone-planner', 'workout-timer', 'bill-splitter', 'budget-tracker', 'calorie-tracker'];
   for (const language of ['en', 'de']) {
     await evaluate(`localStorage.setItem('pluto-language',${JSON.stringify(language)})`);
     for (const width of [1440, 360]) {
@@ -100,7 +77,7 @@ try {
     }
   }
   assert.deepEqual(errors, [], 'No browser runtime exceptions');
-  console.log(`PASS: all eight life apps; calorie portions/templates/edit/reload; weather fixtures/search/coordinates/compare/errors/keyboard/favorites/reload; background-reminder sign-in state; planner conflict/DST/reload; timezone comparison; workout completion/pause; bill balances/repayment/reload; budget totals/currency; subscriptions; global reminder dismissal/reload; English/German at 1440px and 360px. Screenshots: ${output}`);
+  console.log(`PASS: life apps; calorie portions/templates/edit/reload; background-reminder sign-in state; planner conflict/DST/reload; timezone comparison; workout completion/pause; bill balances/repayment/reload; budget totals/currency; subscriptions; global reminder dismissal/reload; English/German at 1440px and 360px. Screenshots: ${output}`);
 } finally {
   socket?.close(); chrome.kill(); await sleep(1000); try { rmSync(profile, { recursive: true, force: true }); } catch { /* Temporary Chrome files may still be closing. */ }
 }

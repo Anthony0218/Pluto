@@ -1312,7 +1312,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
     };
 
     if (currentGameId && !asNew) {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("games")
         .update(gameData)
         .eq("id", currentGameId)
@@ -1325,7 +1325,6 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
         return;
       }
 
-      console.log("Game updated:", data);
     } else {
       const { data, error } = await supabase
         .from("games")
@@ -1338,8 +1337,6 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
         return;
       }
-
-      console.log("Game created:", data);
 
       setCurrentGameId(data.id);
     }
@@ -1937,8 +1934,6 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
        */
       checkGameOver(true);
     } catch {
-      console.log("Illegal move");
-
       setIllegal(true);
 
       playSound("illegal");

@@ -1,7 +1,6 @@
 import CalorieTracker from '@/components/tools/CalorieTracker';
 import QrCodeCreator from '@/components/tools/QrCodeCreator';
 import BirthdayReminder from '@/components/tools/BirthdayReminder';
-import WeatherExplorer from '@/components/tools/WeatherExplorer';
 import { useEffect, type CSSProperties } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowRight, Check, Star } from "lucide-react";
@@ -10,18 +9,21 @@ import { learningPaths, pathRoute } from "@/data/learningCatalog";
 import { useLearningToolsProgress } from "@/hooks/useLearningToolsProgress";
 import HubLayout from "@/components/learning/HubLayout";
 import CatalogIcon from "@/components/learning/CatalogIcon";
+import Calculator from "@/components/tools/Calculator";
 import PercentageWorkbench from "@/components/tools/PercentageWorkbench";
 import NumberSystemConverter from "@/components/tools/NumberSystemConverter";
 import UnitConverter from "@/components/tools/UnitConverter";
-import FunctionPlotter from "@/components/tools/FunctionPlotter";
 import DayPlanner from '@/components/tools/DayPlanner';
 import TimeZonePlanner from '@/components/tools/TimeZonePlanner';
 import WorkoutTimer from '@/components/tools/WorkoutTimer';
 import BillSplitter from '@/components/tools/BillSplitter';
 import BudgetTracker from '@/components/tools/BudgetTracker';
-import RecipeScaler from "@/components/tools/RecipeScaler";
+import NotesApp from "@/components/tools/NotesApp";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import NotFoundPage from "@/pages/general/NotFoundPage";
+
+/** Apps that left the catalog: old links and bookmarks land somewhere useful instead of a 404. */
+const retiredTools: Record<string, string> = { "subscription-tracker": "/tools/budget-tracker?section=subscriptions", "weather-explorer": "/tools", "function-plotter": "/learn/math/algebra-functions" };
 
 export default function ToolAppPage() {
   useUiLanguage();
@@ -29,11 +31,10 @@ export default function ToolAppPage() {
   const tool = toolApps.find(item => item.id === toolId);
   const { progress, loading, visitTool, toggleFavoriteTool } = useLearningToolsProgress();
   useEffect(() => { if (tool) visitTool(tool.id); }, [tool, visitTool]);
-  if (!tool) return <NotFoundPage />;
-  if (tool.id === "subscription-tracker") return <Navigate to="/tools/budget-tracker?section=subscriptions" replace />;
-  const app = tool.id === "qr-code-creator" ? <QrCodeCreator /> : tool.id === "birthday-reminders" ? <BirthdayReminder /> : tool.id === "calorie-tracker" ? <CalorieTracker /> : tool.id === "weather-explorer" ? <WeatherExplorer /> : tool.id === "percentage-calculator" ? <PercentageWorkbench /> : tool.id === "number-system-converter" ? <NumberSystemConverter /> : tool.id === "unit-converter" ? <UnitConverter /> : tool.id === "recipe-scaler" ? <RecipeScaler /> : tool.id === "function-plotter" ? <FunctionPlotter /> : tool.id === "day-planner" ? <DayPlanner /> : tool.id === "time-zone-planner" ? <TimeZonePlanner /> : tool.id === "workout-timer" ? <WorkoutTimer /> : tool.id === "bill-splitter" ? <BillSplitter /> : tool.id === "budget-tracker" ? <BudgetTracker /> : tool.id === "subscription-tracker" ? <BudgetTracker /> : null;
+  if (!tool) return toolId && retiredTools[toolId] ? <Navigate to={retiredTools[toolId]} replace /> : <NotFoundPage />;
+  const app = tool.id === "qr-code-creator" ? <QrCodeCreator /> : tool.id === "birthday-reminders" ? <BirthdayReminder /> : tool.id === "calorie-tracker" ? <CalorieTracker /> : tool.id === "calculator" ? <Calculator /> : tool.id === "percentage-calculator" ? <PercentageWorkbench /> : tool.id === "number-system-converter" ? <NumberSystemConverter /> : tool.id === "unit-converter" ? <UnitConverter /> : tool.id === "notes" ? <NotesApp /> : tool.id === "day-planner" ? <DayPlanner /> : tool.id === "time-zone-planner" ? <TimeZonePlanner /> : tool.id === "workout-timer" ? <WorkoutTimer /> : tool.id === "bill-splitter" ? <BillSplitter /> : tool.id === "budget-tracker" ? <BudgetTracker /> : null;
   const favorite = progress.favoriteTools.includes(tool.id);
-  const related = learningPaths.filter(path => path.subjectId === tool.relatedPath?.subjectId && (path.id === tool.relatedPath?.id || tool.id === "function-plotter" && path.id === "calculus"));
+  const related = learningPaths.filter(path => path.subjectId === tool.relatedPath?.subjectId && path.id === tool.relatedPath?.id);
   return <HubLayout eyebrow={tool.category} title={tool.title} description={tool.description} breadcrumbs={[{ title: "Tools", route: "/tools" }, { title: tool.title }]}
     actions={<button type="button" className="lt-button" disabled={loading} aria-pressed={favorite} onClick={() => toggleFavoriteTool(tool.id)}><Star size={16} aria-hidden fill={favorite ? "currentColor" : "none"} />{ui(favorite ? "Favorited" : "Add to favorites")}</button>}>
     {app ?? <><section className="lt-panel lt-app-preview" style={{ "--lt-accent": tool.accent } as CSSProperties}><span className="lt-icon"><CatalogIcon id={tool.id} size={36} /></span><div><p className="lt-eyebrow">{ui("Coming soon")}</p><h2>{ui("Your app has a place here")}</h2><p>{ui("This is a preview of the planned app. Its features are not available yet. You can favorite it and explore what is coming.")}</p></div></section>

@@ -9,6 +9,15 @@ Analysis in depth, and Probability and statistics. Milestones 10 through 13
 publish music notation and rhythm, football rules, and positions and tactics.
 Milestones 14 through 17 publish six planning, fitness, and money apps with saved records and in-app reminders. Milestones 18–19 publish Calorie Tracker and Weather Explorer. Milestone 20 adds opt-in planner push delivery; hosted rollout and real-device verification remain pending.
 Football now uses the category reference described below instead of course progress.
+
+**App catalog update (October 2026).** The launcher now opens with Calculator, Percentage Calculator, Birthday
+Reminders and QR Code Creator. Calculator (`/tools/calculator`) is a keypad calculator that applies × and ÷ before
++ and − (`src/data/calculator.ts`); the Percentage Calculator keeps every calculation described below but is laid out
+as a calculator, with one display row per value and an on-screen keypad. Three apps left the catalog: Weather
+Explorer was removed with its Open-Meteo calls, Subscription Tracker lives on only as the Subscriptions section of
+Budget Tracker, and the Function Plotter is still used inside the algebra, calculus and analysis lessons but is no
+longer a separate app. Their old `/tools/…` links redirect. The sections on those three apps further down describe
+how they were built and are kept as history.
 Other subject courses and tool functionality follow in later milestones;
 preview pages are explicitly marked as coming soon.
 
@@ -133,20 +142,13 @@ Four tool routes are available:
   volume, and data size, including decimal/binary prefixes and US liquid units.
   Uses NIST definitions, affine temperature conversions, reverse checks, and
   selectable display precision. No density or temperature-difference conversions.
-- `/tools/recipe-scaler`: named ingredients, decimal/fraction quantities,
-  proportional scaling, reusable recipes, and confirmed deletion. Recipe content
-  stays user-authored when the UI language changes. Supports up to 100 ingredients
-  per recipe and 50 saved recipes per account.
 
-Recipe snapshots use `pluto-recipes-v1:<account-id>` with the same guest/account
-separation. They survive reload, update across tabs, and retain a session copy
-when storage fails. They have no Supabase sync; no migrations or functions need
-deployment for these milestones. Calculator inputs are transient; favorites and
-recent tools continue using the existing learning/tools store.
+Calculator inputs are transient; favorites and recent tools continue using the existing
+learning/tools store. No migrations or functions need deployment for these milestones.
 
 `node --test tests/practical-tools.test.mjs` checks all calculator modes and
 boundaries, exact large-integer conversions, bits, unit definitions and reverse
-conversions, recipe parsing/scaling/persistence/limits, and all 27 percentage
+conversions, and all 27 percentage
 answers. Run it with the existing learning/math/translation suites.
 
 

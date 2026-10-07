@@ -1,5 +1,4 @@
 import { mealNames } from '../../src/data/calorieTools.ts';
-import { weatherLabels } from '../../src/data/weatherTools.ts';
 import { footballReferenceKeys } from '../../src/data/footballReference.ts';
 import { subjectContentKeys } from '../../src/data/musicFootball.ts';
 import { musicInstruments, rhythmPatterns, clefNames, drumNames } from '../../src/data/musicReading.ts';
@@ -56,7 +55,7 @@ export function collectLearningKeys() {
   }
   ['Work', 'Rest', 'Finished'].forEach(add);
   toolCategories.forEach(add);
-  mealNames.forEach(add); weatherLabels.forEach(add);
+  mealNames.forEach(add);
   ['Delivery test','This device received the test.'].forEach(add);
   add("All categories");
   for (const tool of toolApps) [tool.title, tool.description, ...(tool.status === "planned" ? tool.features : [])].forEach(add);

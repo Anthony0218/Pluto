@@ -48,8 +48,10 @@ test("the planet rests near each section and moves in the gap between them", () 
   }
 });
 
-test("the planet leaves for the first section as soon as the flyby is over", () => {
-  assert.ok(journeyIndex(3000 + 160, withFlyby) > 0.1);
+test("the first object stays where the flyby delivered it for a while, then travels to the first section", () => {
+  assert.equal(journeyIndex(3000, withFlyby), 0);
+  assert.equal(journeyIndex(3000 + 0.25 * 800, withFlyby), 0);
+  assert.ok(journeyIndex(3000 + 0.5 * 800, withFlyby) > 0.1);
   assert.equal(journeyIndex(3800 - 100, withFlyby), 1);
 });
 
@@ -153,7 +155,7 @@ test("an arrival stop puts its planet in the middle at full size, then the secti
 });
 
 test("tools and books get an arrival before every section but the first", () => {
-  assert.deepEqual(itemStops(0), { arrival: 1, section: 1 });
+  assert.deepEqual(itemStops(0), { arrival: 0, section: 1 });
   assert.deepEqual(itemStops(1), { arrival: 2, section: 3 });
   assert.deepEqual(itemStops(4), { arrival: 8, section: 9 });
 });

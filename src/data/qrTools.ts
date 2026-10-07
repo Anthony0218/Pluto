@@ -16,3 +16,20 @@ export async function generateQr(payload: string) {
   const [svg, png] = await Promise.all([QRCode.toString(payload, { ...options, type: 'svg' }), QRCode.toDataURL(payload, options)]);
   return { payload, svg, png };
 }
+
+export function downloadQr(qr: Awaited<ReturnType<typeof generateQr>>, format: 'png' | 'svg') {
+  const file = format === 'svg'
+    ? new Blob([qr.svg], { type: 'image/svg+xml;charset=utf-8' })
+    : new Blob([Uint8Array.from(atob(qr.png.split(',')[1]), byte => byte.charCodeAt(0))], { type: 'image/png' });
+  const url = URL.createObjectURL(file);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `pluto-qr-code.${format}`;
+  document.body.appendChild(link);
+  try {
+    link.click();
+  } finally {
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+}

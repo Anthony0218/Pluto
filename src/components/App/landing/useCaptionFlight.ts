@@ -18,6 +18,9 @@ export function useCaptionFlight(id: string) {
   const targetOpacity = useTransform(() => { layout.get(); const t = progress.get(); return withFlyby && stage.current.captions[id] ? clamp01((t - 0.96) / 0.04) : 1; });
   const opacity = useTransform(() => { layout.get(); const target = targetOpacity.get(); return withFlyby && stage.current.captions[id] ? 1 - target : 0; });
   const lineOpacity = useTransform(() => { layout.get(); const t = progress.get(); return stage.current.captions[id]?.hasLine ? 1 : 1 - t; });
-  return { x, y, width, fontSize, opacity, lineOpacity, targetOpacity };
+  // The section's button follows the title in: it rises and fades in as the caption lands, and leaves again when scrolling back.
+  const reveal = useTransform(() => { layout.get(); const t = progress.get(); return withFlyby && stage.current.captions[id] ? clamp01((t - 0.7) / 0.3) : 1; });
+  const lift = useTransform(reveal, value => (1 - value) * 30);
+  return { x, y, width, fontSize, opacity, lineOpacity, targetOpacity, reveal, lift };
 }
 

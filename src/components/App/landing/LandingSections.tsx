@@ -1,5 +1,4 @@
 import { Fragment, lazy, type CSSProperties, type ReactNode } from "react";
-import { learningPaths, learningSubjects } from "@/data/learningCatalog";
 import { orderGamesForBrowse } from "@/data/games";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import FeatureSection from "../FeatureSection";
@@ -11,7 +10,7 @@ import { landingBooks, landingTools, type BookDesign } from "../planetary/univer
 import ArrivalStop from "./ArrivalStop";
 import DemoTabs from "./DemoTabs";
 import ItemSection from "./ItemSection";
-import { bookDescription } from "./flybyCatalog";
+import { bookDescription, bookTopics } from "./flybyCatalog";
 import { useLanding } from "./landingContext";
 import { useCopy, type CopyKey } from "./copy";
 import type { ToneName } from "./tones";
@@ -38,6 +37,8 @@ const slot = (node: ReactNode, height?: number) => <DemoSlot height={height}>{no
 /** The colours of each book's cover, for its button. */
 const bookButton: Record<BookDesign, { background: string; color: string }> = {
   math: { background: "#1d4a66", color: "#a9e7eb" },
+  foundations: { background: "#1d4a66", color: "#a9e7eb" },
+  music: { background: "#7e2a96", color: "#f8e1ff" },
   percentages: { background: "#ee925d", color: "#442d24" },
   guides: { background: "#1f5144", color: "#e5ce9a" },
   analysis: { background: "#5a4580", color: "#e4d9fd" },
@@ -153,9 +154,9 @@ export default function LandingSections() {
       {slot(<ToolsDemo toolId={tool.id} />, 520)}
     </ItemSection>]) : category === "learn" ? landingBooks.flatMap((book, k) => [
     ...(k ? [<ArrivalStop key={`arrive-${book.id}`} id={`book-${book.id}`} tone="learn" ownArt title={ui(book.title)} href={book.route} action={text("openBook")}
-      line={peek(learningPaths.find(path => path.id === book.id)?.topics ?? [learningSubjects.find(subject => subject.id === book.id)?.resourceLabel ?? ""])}
+      line={peek(bookTopics(book))}
       button={bookButton[book.design]} art={<BookArt title={landingBookTitle(language, book.design)} design={book.design} />} />] : []),
-    <ItemSection key={book.id} id={`book-${book.id}`} tone="learn" reverse={k % 2 === 1} title={ui(book.title)} line={peek(learningPaths.find(path => path.id === book.id)?.topics ?? [learningSubjects.find(subject => subject.id === book.id)?.resourceLabel ?? ""])} description={ui(bookDescription(book.id))} href={book.route} action={text("openBook")}
+    <ItemSection key={book.id} id={`book-${book.id}`} tone="learn" reverse={k % 2 === 1} title={ui(book.title)} line={peek(bookTopics(book))} description={ui(bookDescription(book.id))} href={book.route} action={text("openBook")}
       button={bookButton[book.design]}>
       {slot(<LearnDemo bookId={book.id} />, 360)}
     </ItemSection>]) : [];

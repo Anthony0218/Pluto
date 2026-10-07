@@ -10,11 +10,26 @@ function Team({ name, national }: { name?: string; national: boolean }) {
   return <span className="fr-team">{name && national && footballFlags[name] && <img src={`/flags/4x3/${footballFlags[name]}.svg`} width="24" height="18" alt="" />}{ui(name ?? 'Unavailable')}</span>;
 }
 
-function Final({ final, tournament, year }: { final?: TournamentFinal; tournament: FootballTournament; year: number }) {
+const finalFormatLabels: Record<NonNullable<TournamentFinal['format']>, string> = {
+  aggregate: 'Aggregate score (two legs)',
+  replay: 'Replay',
+  'final-round': 'Decisive final-round match',
+};
+
+function Final({ edition, tournament, year }: { edition?: ChampionshipEdition; tournament: FootballTournament; year: number }) {
+  const final = edition?.final;
   return <article className="fr-final">
     <h2>{ui(tournament.name)} · {year}</h2>
-    {!final ? <p role="status">{ui('Final match details are unavailable for this year in the current dataset.')}</p> : <>
+    {!final ? <>
+      <div className="fr-champion-summary">
+        <div className="pt-result"><p>{ui('Winner')}</p><strong><Team name={edition?.winner} national={tournament.national} /></strong></div>
+        <div className="pt-result"><p>{ui('Runner-up')}</p><strong><Team name={edition?.runnerUp} national={tournament.national} /></strong></div>
+      </div>
+      <p role="status">{ui('Final match details are unavailable for this year in the current dataset.')}</p>
+      {edition?.source && <a className="lt-text-link" href={edition.source} target="_blank" rel="noreferrer">{ui('Edition source')}</a>}
+    </> : <>
       <div className="fr-final-score"><Team name={final.teams[0]} national={tournament.national} /><strong>{final.score.join('–')}</strong><Team name={final.teams[1]} national={tournament.national} /></div>
+      {final.format && <p>{ui(finalFormatLabels[final.format])}</p>}
       {final.extraTime && <p>{ui('After extra time')}</p>}
       {final.penalties && <p className="fr-penalties"><strong>{ui('Penalty shootout')}: {final.penalties.join('–')}</strong> · {ui(final.teams[final.penalties[0] > final.penalties[1] ? 0 : 1])} {ui('won on penalties')}</p>}
       <p>{final.date ?? ui('Date unavailable')}{final.venue && ` · ${final.venue}`}</p>
@@ -45,7 +60,7 @@ function ChampionshipHistory({ editions, tournament, finalLink }: { editions: Ch
       const penalties = edition.final?.penalties && (winnerFirst ? edition.final.penalties : [...edition.final.penalties].reverse());
       return <tr key={edition.year}>
       <th scope="row">{edition.year}</th><td><Team name={edition.winner} national={tournament.national} /></td><td><Team name={edition.runnerUp} national={tournament.national} /></td>
-      <td>{edition.final ? <>{score?.join('–')}{edition.final.extraTime && <small>{ui('After extra time')}</small>}{penalties && <small>{ui('Penalty shootout')}: {penalties.join('–')}</small>}</> : ui('Unavailable')}</td>
+      <td>{edition.final ? <>{score?.join('–')}{edition.final.format && <small>{ui(finalFormatLabels[edition.final.format])}</small>}{edition.final.extraTime && <small>{ui('After extra time')}</small>}{penalties && <small>{ui('Penalty shootout')}: {penalties.join('–')}</small>}</> : ui('Unavailable')}</td>
       <td><Link className="lt-text-link fr-view-final" to={finalLink(edition.year)} aria-label={`${ui('View Final')} · ${ui(tournament.name)} · ${edition.year}`}>{ui('View Final')}</Link></td>
     </tr>;
     })}</tbody>
@@ -56,6 +71,7 @@ export default function FootballTournaments() {
   const [params, setParams] = useSearchParams();
   const tournament = footballTournaments.find(t => t.id === params.get('competition')) ?? footballTournaments[0];
   const editions = championshipEditions(tournament);
+  const winners = [...tournament.winners].sort((a, b) => b.years.length - a.years.length || a.team.localeCompare(b.team, 'en'));
   const years = editions.map(edition => edition.year);
   const tab = params.get('tab') === 'finals' ? 'Finals' : 'Overview';
   const year = params.get('year') === 'all' ? 'all' : years.includes(Number(params.get('year'))) ? Number(params.get('year')) : years[0];
@@ -89,17 +105,17 @@ export default function FootballTournaments() {
         <Field label="Year"><select value={tab === 'Finals' && finalYear !== undefined ? finalYear : year} onChange={e => change(e.target.value === 'all' ? { year: 'all', finalYear: null } : tab === 'Finals' ? { finalYear: e.target.value } : { year: e.target.value, finalYear: null })}><option value="all">{ui('All')}</option>{years.map(editionYear => <option key={editionYear} value={editionYear}>{editionYear}</option>)}</select></Field></div>
       <ToolTabs tabs={['Overview', 'Finals'] as const} value={tab} onChange={value => change({ tab: value.toLowerCase() })} label="Tournament sections" panelId="football-tournament-panel" />
       <div ref={panel} id="football-tournament-panel" role="tabpanel" aria-label={ui(tab)} tabIndex={0}>
-        {tab === 'Finals' && finalYear !== undefined ? <Final final={editions.find(edition => edition.year === finalYear)?.final} tournament={tournament} year={finalYear} /> : <>
+        {tab === 'Finals' && finalYear !== undefined ? <Final edition={editions.find(edition => edition.year === finalYear)} tournament={tournament} year={finalYear} /> : <>
           <h2>{ui(tournament.name)} · {year === 'all' ? ui('All') : year}</h2>
           {selected && <><div className="fr-champion-summary">
             <div className="pt-result"><p>{ui('Winner')}</p><strong><Team name={selected.winner} national={tournament.national} /></strong></div>
             <div className="pt-result"><p>{ui('Runner-up')}</p><strong><Team name={selected.runnerUp} national={tournament.national} /></strong></div>
             <div className="pt-result"><p>{ui('Previous Champion')}</p><strong><Team name={previous?.winner} national={tournament.national} /></strong>{previous && <p>{previous.year}</p>}{!previous && <p>{ui('No earlier edition in the current dataset.')}</p>}</div>
-          </div><Link className="lt-text-link fr-view-final" to={finalLink(selected.year)} aria-label={`${ui('View Final')} · ${ui(tournament.name)} · ${selected.year}`}>{ui('View Final')} · {selected.year}</Link></>}
+          </div><Link className="lt-text-link fr-view-final" to={finalLink(selected.year)} aria-label={`${ui('View Final')} · ${ui(tournament.name)} · ${selected.year}`}>{ui('View Final')} · {selected.year}</Link>{selected.source && <p><a className="lt-text-link" href={selected.source} target="_blank" rel="noreferrer">{ui('Edition source')}</a></p>}</>}
           {year === 'all' && history}
           <p className="lt-storage-note">{ui(tournament.coverage)}</p>
         </>}
       </div>
-    </div><aside className="fr-tournament-stats"><h2>{ui('Stats')}</h2><p>{ui(tournament.name)}</p><dl><div><dt>{ui('Recorded editions')}</dt><dd>{years.length}</dd></div><div><dt>{ui('Different winners')}</dt><dd>{tournament.winners.length}</dd></div><div><dt>{ui('Detailed finals')}</dt><dd>{tournament.finals.length}</dd></div></dl><p className="lt-storage-note">{ui(tournament.coverage)}</p><a className="lt-text-link" href={tournament.source} target="_blank" rel="noreferrer">{ui('Competition source')}</a><p className="lt-storage-note">{ui('Historical snapshots; live results and missing editions are not fetched automatically.')}</p></aside></div>
+    </div><aside className="fr-tournament-stats"><h2>{ui('Titles won')}</h2><p>{ui(tournament.name)}</p><dl>{winners.map(winner => <div key={winner.team}><dt><Team name={winner.team} national={tournament.national} /></dt><dd>{winner.years.length}</dd></div>)}</dl></aside></div>
   </section>;
 }

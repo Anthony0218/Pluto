@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 import { COMPARISON_CATEGORIES, DEFAULT_COMPARISON_STATS, QUESTION_CATEGORIES, parseSelection } from "../src/games/atlas/categories.ts";
 import { generateComparisonQuestions } from "../src/games/atlas/comparisons.ts";
 import { generateMatchQuestions } from "../src/games/atlas/matchQuestions.ts";
-import { applyTerritoryRound, createAuthoritativeSubmission, resolveRoundScores, territoryPlayerScores } from "../src/games/atlas/multiplayer.ts";
+import { createAuthoritativeSubmission, resolveRoundScores } from "../src/games/atlas/multiplayer.ts";
 import { haversineKm } from "../src/games/atlas/rules.ts";
 import { countryShapesFromTopology, distanceToTerritory } from "../src/games/atlas/territoryDistance.ts";
 
@@ -30,13 +30,11 @@ test("each Higher or Lower category can sustain a full solo streak on every diff
   assert.deepEqual(new Set(questions.map((question) => question.stat.key)), new Set(options.stats));
 });
 
-test("map multiplayer modes respect chosen question categories", () => {
-  for (const mode of ["closest_wins", "territory_battle"]) {
-    const questions = generateMatchQuestions({ ...base, mode, categories: ["languages", "population"] });
-    assert.equal(questions.length, base.count);
-    assert.deepEqual(new Set(questions.map((question) => question.category)), new Set(["languages", "population"]));
-    assert.ok(questions.every((question) => question.interaction === (mode === "closest_wins" ? "closest_click" : "map_click")));
-  }
+test("Closest Wins respects chosen question categories", () => {
+  const questions = generateMatchQuestions({ ...base, mode: "closest_wins", categories: ["languages", "population"] });
+  assert.equal(questions.length, base.count);
+  assert.deepEqual(new Set(questions.map((question) => question.category)), new Set(["languages", "population"]));
+  assert.ok(questions.every((question) => question.interaction === "closest_click"));
 });
 
 test("Closest Wins measures arbitrary pins and awards the nearest, even when submitted later", () => {
@@ -54,19 +52,6 @@ test("Closest Wins measures arbitrary pins and awards the nearest, even when sub
     assert.throws(() => submit("bad", answer, 1000), /coordinate/i);
   }
   assert.ok(Number.isFinite(haversineKm([0, 0], [180, 0])));
-});
-
-test("Territory Battle offers recaptures and scores current ownership after steals", () => {
-  const questions = generateMatchQuestions({ ...base, mode: "territory_battle", categories: ["countries"] });
-  assert.equal(new Set(questions.map((question) => question.id)).size, 20);
-  assert.deepEqual(new Set(questions.slice(0, 10).map((question) => question.entityId)), new Set(questions.slice(10).map((question) => question.entityId)));
-  let state = { ownership: {}, scores: { player_a: 0, player_b: 0 } };
-  for (const question of questions.slice(0, 10)) state = applyTerritoryRound(state, question.entityId, "a", ["a", "b"], true);
-  assert.deepEqual(territoryPlayerScores(state.ownership, ["a", "b"]), { a: 10, b: 0 });
-  for (const question of questions.slice(10)) state = applyTerritoryRound(state, question.entityId, "b", ["a", "b"], true);
-  assert.deepEqual(territoryPlayerScores(state.ownership, ["a", "b"]), { a: 0, b: 10 });
-  assert.deepEqual(applyTerritoryRound(state, questions[0].entityId, null, ["a", "b"], true), state);
-  assert.deepEqual(applyTerritoryRound(state, questions[0].entityId, "a", ["a", "b"], false), state);
 });
 
 test("room category validation rejects empty or unsupported settings and retains defaults", () => {

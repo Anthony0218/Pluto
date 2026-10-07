@@ -1492,5 +1492,194 @@
     "Декабрь",
     "Diciembre",
     "Dezembro"
+  ],
+  [
+    "Calculator",
+    "Taschenrechner",
+    "Taschenrechner",
+    "계산기",
+    "Калькулятор",
+    "Calculadora",
+    "Calculadora"
+  ],
+  [
+    "Add, subtract, multiply, and divide on a classic keypad.",
+    "Addiere, subtrahiere, multipliziere und dividiere auf einem klassischen Tastenfeld.",
+    "Addier, subtrahier, multiplizier und dividier auf am klassischn Tastnfeld.",
+    "클래식 키패드로 더하기, 빼기, 곱하기, 나누기를 하세요.",
+    "Складывайте, вычитайте, умножайте и делите на классической клавиатуре.",
+    "Suma, resta, multiplica y divide con un teclado clásico.",
+    "Some, subtraia, multiplique e divida em um teclado clássico."
+  ],
+  [
+    "Cannot divide by zero",
+    "Division durch null nicht möglich",
+    "Durch null teiln geht ned",
+    "0으로 나눌 수 없습니다",
+    "На ноль делить нельзя",
+    "No se puede dividir entre cero",
+    "Não é possível dividir por zero"
+  ],
+  [
+    "The result is too large",
+    "Das Ergebnis ist zu groß",
+    "Des Ergebnis is z'groß",
+    "결과가 너무 큽니다",
+    "Результат слишком большой",
+    "El resultado es demasiado grande",
+    "O resultado é grande demais"
+  ],
+  [
+    "Calculator keypad",
+    "Tastenfeld des Rechners",
+    "Tastnfeld vom Rechner",
+    "계산기 키패드",
+    "Клавиатура калькулятора",
+    "Teclado de la calculadora",
+    "Teclado da calculadora"
+  ],
+  [
+    "History",
+    "Verlauf",
+    "Verlauf",
+    "기록",
+    "История",
+    "Historial",
+    "Histórico"
+  ],
+  [
+    "Use this result",
+    "Dieses Ergebnis verwenden",
+    "Des Ergebnis hernehma",
+    "이 결과 사용",
+    "Использовать этот результат",
+    "Usar este resultado",
+    "Usar este resultado"
+  ],
+  [
+    "Clear history",
+    "Verlauf leeren",
+    "Verlauf leern",
+    "기록 지우기",
+    "Очистить историю",
+    "Borrar historial",
+    "Limpar histórico"
+  ],
+  [
+    "Your last calculations appear here. Select one to keep working with its result.",
+    "Deine letzten Rechnungen erscheinen hier. Wähle eine aus, um mit ihrem Ergebnis weiterzurechnen.",
+    "Deine letztn Rechnungan stengan do. Such da oane aus und rechn mit dem Ergebnis weida.",
+    "최근 계산이 여기에 표시됩니다. 하나를 선택하면 그 결과로 계속 계산할 수 있습니다.",
+    "Здесь появятся последние вычисления. Выберите одно, чтобы продолжить с его результатом.",
+    "Tus últimos cálculos aparecen aquí. Elige uno para seguir trabajando con su resultado.",
+    "Seus últimos cálculos aparecem aqui. Selecione um para continuar com o resultado."
+  ],
+  [
+    "× and ÷ are calculated before + and −. You can also type on your keyboard: Enter for =, Backspace to delete, Esc to clear.",
+    "× und ÷ werden vor + und − berechnet. Du kannst auch die Tastatur benutzen: Enter für =, Rücktaste zum Löschen, Esc zum Leeren.",
+    "× und ÷ wern vor + und − ausgrechnt. Du konnst aa d'Tastatur hernehma: Enter für =, Rücktaste zum Löschn, Esc zum Leern.",
+    "×와 ÷는 +와 −보다 먼저 계산됩니다. 키보드로도 입력할 수 있습니다: Enter는 =, Backspace는 삭제, Esc는 지우기.",
+    "× и ÷ вычисляются раньше + и −. Можно вводить и с клавиатуры: Enter — «=», Backspace — удалить, Esc — очистить.",
+    "× y ÷ se calculan antes que + y −. También puedes usar el teclado: Intro para =, Retroceso para borrar, Esc para limpiar.",
+    "× e ÷ são calculados antes de + e −. Você também pode usar o teclado: Enter para =, Backspace para apagar, Esc para limpar."
+  ],
+  [
+    "Enter a value in every row to see the result and the steps.",
+    "Gib in jeder Zeile einen Wert ein, um Ergebnis und Rechenschritte zu sehen.",
+    "Gib in jeda Zeiln an Wert ei, dann siehgst Ergebnis und Rechenschritte.",
+    "모든 행에 값을 입력하면 결과와 풀이 단계가 표시됩니다.",
+    "Введите значение в каждой строке, чтобы увидеть результат и шаги.",
+    "Introduce un valor en cada fila para ver el resultado y los pasos.",
+    "Digite um valor em cada linha para ver o resultado e os passos."
+  ],
+  [
+    "Clear all values",
+    "Alle Werte leeren",
+    "Olle Werte leern",
+    "모든 값 지우기",
+    "Очистить все значения",
+    "Borrar todos los valores",
+    "Limpar todos os valores"
+  ],
+  [
+    "Next value",
+    "Nächster Wert",
+    "Nächsta Wert",
+    "다음 값",
+    "Следующее значение",
+    "Siguiente valor",
+    "Próximo valor"
+  ],
+  [
+    "Delete last digit",
+    "Letzte Ziffer löschen",
+    "Letzte Ziffa löschn",
+    "마지막 숫자 삭제",
+    "Удалить последнюю цифру",
+    "Borrar el último dígito",
+    "Apagar o último dígito"
+  ],
+  [
+    "Change sign",
+    "Vorzeichen wechseln",
+    "Vorzeichn wechsln",
+    "부호 바꾸기",
+    "Сменить знак",
+    "Cambiar el signo",
+    "Trocar o sinal"
+  ],
+  [
+    "Decimal point",
+    "Dezimalkomma",
+    "Dezimalkomma",
+    "소수점",
+    "Десятичная запятая",
+    "Coma decimal",
+    "Vírgula decimal"
+  ],
+  [
+    "Percent",
+    "Prozent",
+    "Prozent",
+    "퍼센트",
+    "Процент",
+    "Porcentaje",
+    "Porcentagem"
+  ],
+  [
+    "Equals",
+    "Ist gleich",
+    "Is gleich",
+    "등호",
+    "Равно",
+    "Igual",
+    "Igual"
+  ],
+  [
+    "Basic arithmetic with operator precedence",
+    "Grundrechenarten mit Punkt-vor-Strich-Regel",
+    "Grundrechenartn mit Punkt vor Strich",
+    "연산 우선순위를 지키는 사칙연산",
+    "Арифметика с учётом порядка действий",
+    "Aritmética básica con prioridad de operaciones",
+    "Aritmética básica com precedência de operadores"
+  ],
+  [
+    "Percent, sign change, and backspace keys",
+    "Tasten für Prozent, Vorzeichenwechsel und Löschen",
+    "Tastn für Prozent, Vorzeichnwechsl und Löschn",
+    "퍼센트, 부호 변경, 지우기 키",
+    "Клавиши процента, смены знака и удаления",
+    "Teclas de porcentaje, cambio de signo y retroceso",
+    "Teclas de porcentagem, troca de sinal e apagar"
+  ],
+  [
+    "Works with the keyboard",
+    "Funktioniert mit der Tastatur",
+    "Geht aa mit da Tastatur",
+    "키보드로도 사용 가능",
+    "Работает с клавиатурой",
+    "Funciona con el teclado",
+    "Funciona com o teclado"
   ]
 ]

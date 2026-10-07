@@ -6,21 +6,19 @@ import DemoFrame from "./DemoFrame";
 
 // The real tools, loaded only when their section is near the viewport.
 const apps = {
+  calculator: lazy(() => import("@/components/tools/Calculator")),
   "percentage-calculator": lazy(() => import("@/components/tools/PercentageWorkbench")),
   "unit-converter": lazy(() => import("@/components/tools/UnitConverter")),
   "number-system-converter": lazy(() => import("@/components/tools/NumberSystemConverter")),
-  "recipe-scaler": lazy(() => import("@/components/tools/RecipeScaler")),
   "workout-timer": lazy(() => import("@/components/tools/WorkoutTimer")),
   "bill-splitter": lazy(() => import("@/components/tools/BillSplitter")),
   "time-zone-planner": lazy(() => import("@/components/tools/TimeZonePlanner")),
-  "function-plotter": lazy(() => import("@/components/tools/FunctionPlotter")),
   "budget-tracker": lazy(() => import("@/components/tools/BudgetTracker")),
-  "subscription-tracker": lazy(() => import("@/components/tools/SubscriptionTracker")),
   "calorie-tracker": lazy(() => import("@/components/tools/CalorieTracker")),
-  "weather-explorer": lazy(() => import("@/components/tools/WeatherExplorer")),
   "day-planner": lazy(() => import("@/components/tools/DayPlanner")),
   "qr-code-creator": lazy(() => import("@/components/tools/QrCodeCreator")),
   "birthday-reminders": lazy(() => import("@/components/tools/BirthdayReminder")),
+  notes: lazy(() => import("@/components/tools/NotesApp")),
 } as const;
 
 /** One featured tool, working for real, inside the landing page. */

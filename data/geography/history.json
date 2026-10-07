@@ -1,0 +1,3916 @@
+{
+  "atlasDataVersion": "2026-09-arena2",
+  "synchronizedAt": "2026-10-07T15:45:15.433Z",
+  "source": {
+    "name": "The World Factbook (final edition, 2026)",
+    "publisher": "Central Intelligence Agency",
+    "license": "Public domain (US Government work)",
+    "commit": "144d6977b2b01ac1cbd220de754c0a005616760b",
+    "worldFactbook": "https://www.cia.gov/the-world-factbook/",
+    "factbookJson": "https://github.com/factbook/factbook.json/tree/144d6977b2b01ac1cbd220de754c0a005616760b",
+    "archive": "https://codeload.github.com/factbook/factbook.json/zip/144d6977b2b01ac1cbd220de754c0a005616760b"
+  },
+  "countries": {
+    "country:AFG": {
+      "record": "19 August 1919 (from UK control over Afghan foreign affairs)",
+      "events": [
+        {
+          "year": 1919,
+          "date": "19 August 1919",
+          "label": "independence from UK control over Afghan foreign affairs",
+          "from": "UK control over Afghan foreign affairs"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Soviet Union",
+        "Russia",
+        "United States",
+        "Pakistan"
+      ],
+      "formerNames": [],
+      "background": "Ahmad Shah Durrani unified the Pashtun tribes and founded Afghanistan in 1747. The country served as a buffer between the British and Russian Empires until it won independence from notional British control in 1919."
+    },
+    "country:ALB": {
+      "record": "28 November 1912 (from the Ottoman Empire)",
+      "events": [
+        {
+          "year": 1912,
+          "date": "28 November 1912",
+          "label": "independence from the Ottoman Empire",
+          "from": "the Ottoman Empire",
+          "power": "Ottoman Empire"
+        }
+      ],
+      "mentions": [
+        "Soviet Union",
+        "Ottoman Empire",
+        "China"
+      ],
+      "formerNames": [],
+      "background": "After declaring independence from the Ottoman Empire in 1912, Albania experienced a period of political upheaval that led to a short-lived monarchy, which ended in 1939 when Italy conquered the country."
+    },
+    "country:DZA": {
+      "record": "5 July 1962 (from France)",
+      "events": [
+        {
+          "year": 1962,
+          "date": "5 July 1962",
+          "label": "independence from France",
+          "from": "France",
+          "power": "France"
+        }
+      ],
+      "mentions": [
+        "France",
+        "Spain",
+        "Ottoman Empire"
+      ],
+      "formerNames": [],
+      "background": "Algeria has known many empires and dynasties, including the ancient Numidians (3rd century B.C.), Phoenicians, Carthaginians, Romans, Vandals, Byzantines, over a dozen different Arab and Amazigh dynasties, Spaniards, and Ottoman Turks."
+    },
+    "country:AND": {
+      "record": "1278 (formed under the joint sovereignty of the French Count of Foix and the Spanish Bishop of Urgell)",
+      "events": [
+        {
+          "year": 1278,
+          "date": "1278",
+          "label": "formed under the joint sovereignty of the French Count of Foix and the Spanish Bishop of Urgell"
+        }
+      ],
+      "mentions": [
+        "France",
+        "Spain"
+      ],
+      "formerNames": [],
+      "background": "The landlocked Principality of Andorra — one of the smallest states in Europe and nestled high in the Pyrenees between the French and Spanish borders — is the last independent survivor of the Hispanic March states created by Frankish King Charlemagne in 795 after he halted the Moorish invasion of Spain."
+    },
+    "country:AGO": {
+      "record": "11 November 1975 (from Portugal)",
+      "events": [
+        {
+          "year": 1975,
+          "date": "11 November 1975",
+          "label": "independence from Portugal",
+          "from": "Portugal",
+          "power": "Portugal"
+        }
+      ],
+      "mentions": [
+        "Portugal",
+        "Soviet Union",
+        "United States",
+        "South Africa"
+      ],
+      "formerNames": [],
+      "background": "Bantu-speaking people settled in the area now called Angola in 6th century A.D.; by the 10th century various Bantu groups had established kingdoms, of which Kongo became the most powerful."
+    },
+    "country:ATG": {
+      "record": "1 November 1981 (from the UK)",
+      "events": [
+        {
+          "year": 1981,
+          "date": "1 November 1981",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "France",
+        "Spain"
+      ],
+      "formerNames": [],
+      "background": "The Siboney were the first people to inhabit the islands of Antigua and Barbuda in 2400 B.C., but the Arawaks populated the islands when Christopher Columbus landed on his second voyage in 1493."
+    },
+    "country:ARG": {
+      "record": "9 July 1816 (from Spain)",
+      "events": [
+        {
+          "year": 1816,
+          "date": "9 July 1816",
+          "label": "independence from Spain",
+          "from": "Spain",
+          "power": "Spain"
+        }
+      ],
+      "mentions": [
+        "Spain"
+      ],
+      "formerNames": [],
+      "background": "In 1816, the United Provinces of the Río de la Plata declared their independence from Spain. After Bolivia, Paraguay, and Uruguay went their separate ways, the area that remained became Argentina."
+    },
+    "country:ARM": {
+      "record": "21 September 1991 (from the Soviet Union); notable earlier dates: 321 B.C. (Kingdom of Armenia established under the Orontid Dynasty), A.D. 884 (Armenian Kingdom reestablished under the Bagratid Dynasty)",
+      "events": [
+        {
+          "year": 1991,
+          "date": "21 September 1991",
+          "label": "independence from the Soviet Union",
+          "from": "the Soviet Union",
+          "power": "Soviet Union"
+        },
+        {
+          "year": 884,
+          "date": "884",
+          "label": "Armenian Kingdom reestablished under the Bagratid Dynasty"
+        },
+        {
+          "year": 1198,
+          "date": "1198",
+          "label": "Cilician Kingdom established"
+        },
+        {
+          "year": 1918,
+          "date": "28 May 1918",
+          "label": "Democratic Republic of Armenia declared"
+        }
+      ],
+      "mentions": [
+        "Soviet Union",
+        "Russia",
+        "Ottoman Empire"
+      ],
+      "formerNames": [],
+      "background": "Armenia prides itself on being the first state to formally adopt Christianity (early 4th century). Armenia has existed as a political entity for centuries, but for much of its history it was under the sway of various empires, including the Roman, Byzantine, Arab, Persian, Ottoman, and Russian."
+    },
+    "country:AUS": {
+      "record": "1 January 1901 (from the federation of UK colonies)",
+      "events": [
+        {
+          "year": 1901,
+          "date": "1 January 1901",
+          "label": "federation of UK colonies"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Netherlands",
+        "Japan",
+        "Australia"
+      ],
+      "formerNames": [],
+      "background": "Aboriginal Australians arrived on the continent at least 60,000 years ago and developed complex hunter-gatherer societies and oral histories. Dutch navigators led by Abel Tasman were the first Europeans to land in Australia in 1606, and they mapped the western and northern coasts."
+    },
+    "country:AUT": {
+      "record": "no official date of independence: 976 (Margravate of Austria established); 17 September 1156 (Duchy of Austria founded); 6 January 1453 (Archduchy of Austria acknowledged); 11 August 1804 (Austrian Empire proclaimed)",
+      "events": [
+        {
+          "year": 976,
+          "date": "976",
+          "label": "Margravate of Austria established"
+        },
+        {
+          "year": 1156,
+          "date": "17 September 1156",
+          "label": "Duchy of Austria founded"
+        },
+        {
+          "year": 1453,
+          "date": "6 January 1453",
+          "label": "Archduchy of Austria acknowledged"
+        },
+        {
+          "year": 1804,
+          "date": "11 August 1804",
+          "label": "Austrian Empire proclaimed"
+        },
+        {
+          "year": 1867,
+          "date": "30 March 1867",
+          "label": "Austro-Hungarian dual monarchy established"
+        },
+        {
+          "year": 1918,
+          "date": "12 November 1918",
+          "label": "First Republic proclaimed"
+        },
+        {
+          "year": 1945,
+          "date": "27 April 1945",
+          "label": "Second Republic proclaimed"
+        }
+      ],
+      "mentions": [
+        "Soviet Union"
+      ],
+      "formerNames": [],
+      "background": "Once the center of power for the large Austro-Hungarian Empire, Austria was reduced to a small republic after its defeat in World War I. Nazi Germany annexed Austria in 1938, and the victorious Allies then occupied the country in 1945."
+    },
+    "country:AZE": {
+      "record": "30 August 1991 (declared from the Soviet Union); 18 October 1991 (adopted by the Supreme Council of Azerbaijan)",
+      "events": [
+        {
+          "year": 1991,
+          "date": "30 August 1991",
+          "label": "independence declared from the Soviet Union",
+          "from": "the Soviet Union",
+          "power": "Soviet Union",
+          "declared": true
+        }
+      ],
+      "mentions": [
+        "Soviet Union",
+        "Russia",
+        "Ottoman Empire"
+      ],
+      "formerNames": [],
+      "background": "Azerbaijan — a secular nation with a majority-Turkic and majority-Shia Muslim population — was briefly independent (from 1918 to 1920) following the collapse of the Russian Empire; it was subsequently incorporated into the Soviet Union for seven decades."
+    },
+    "country:BHS": {
+      "record": "10 July 1973 (from the UK)",
+      "events": [
+        {
+          "year": 1973,
+          "date": "10 July 1973",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Ottoman Empire",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "Lucayan Indians inhabited the Bahama islands when Christopher Columbus first set foot in the New World in 1492. British settlement of the islands began in 1647; the islands became a colony in 1783."
+    },
+    "country:BHR": {
+      "record": "15 August 1971 (from the UK)",
+      "events": [
+        {
+          "year": 1971,
+          "date": "15 August 1971",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "In 1783, the Sunni Al-Khalifa family took power in Bahrain. In order to secure these holdings, it entered into a series of treaties with the UK during the 19th century that made Bahrain a British protectorate."
+    },
+    "country:BGD": {
+      "record": "16 December 1971 (from Pakistan)",
+      "events": [
+        {
+          "year": 1971,
+          "date": "16 December 1971",
+          "label": "independence from Pakistan",
+          "from": "Pakistan",
+          "power": "Pakistan"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Pakistan"
+      ],
+      "formerNames": [
+        "East Bengal",
+        "East Pakistan"
+      ],
+      "background": "The huge delta region at the confluence of the Ganges and Brahmaputra River systems — now referred to as Bangladesh — was a loosely incorporated outpost of various empires for much of the first millennium A.D. Muslim conversions and settlement in the region began in the 10th century, primarily from Arab and Persian traders and preachers."
+    },
+    "country:BRB": {
+      "record": "30 November 1966 (from the UK)",
+      "events": [
+        {
+          "year": 1966,
+          "date": "30 November 1966",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom"
+      ],
+      "formerNames": [],
+      "background": "Barbados was uninhabited when first settled by the British in 1627. Enslaved Africans worked the sugar plantations established on the island, which initially dominated the Caribbean sugar industry."
+    },
+    "country:BLR": {
+      "record": "25 August 1991 (from the Soviet Union)",
+      "events": [
+        {
+          "year": 1991,
+          "date": "25 August 1991",
+          "label": "independence from the Soviet Union",
+          "from": "the Soviet Union",
+          "power": "Soviet Union"
+        }
+      ],
+      "mentions": [
+        "Soviet Union",
+        "Russia"
+      ],
+      "formerNames": [],
+      "background": "After seven decades as a constituent republic of the USSR, Belarus attained its independence in 1991. It has retained closer political and economic ties to Russia than any of the other former Soviet republics."
+    },
+    "country:BEL": {
+      "record": "4 October 1830 (a provisional government declared independence from the Netherlands); 21 July 1831 (King Leopold I ascended to the throne)",
+      "events": [
+        {
+          "year": 1830,
+          "date": "4 October 1830",
+          "label": "a provisional government declared independence from the Netherlands",
+          "from": "the Netherlands",
+          "power": "Netherlands",
+          "declared": true
+        },
+        {
+          "year": 1831,
+          "date": "21 July 1831",
+          "label": "King Leopold I ascended to the throne"
+        }
+      ],
+      "mentions": [
+        "France",
+        "Netherlands",
+        "Belgium"
+      ],
+      "formerNames": [],
+      "background": "Belgium became independent from the Netherlands in 1830; it was occupied by Germany during World Wars I and II. The country prospered as a modern, technologically advanced European state and member of NATO and the EU."
+    },
+    "country:BLZ": {
+      "record": "21 September 1981 (from the UK)",
+      "events": [
+        {
+          "year": 1981,
+          "date": "21 September 1981",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Spain"
+      ],
+      "formerNames": [
+        "British Honduras"
+      ],
+      "background": "Belize was the site of several Mayan city states until their decline at the end of the first millennium A.D. The British and Spanish disputed the region in the 17th and 18th centuries; it formally became the colony of British Honduras in 1862."
+    },
+    "country:BEN": {
+      "record": "1 August 1960 (from France)",
+      "events": [
+        {
+          "year": 1960,
+          "date": "1 August 1960",
+          "label": "independence from France",
+          "from": "France",
+          "power": "France"
+        }
+      ],
+      "mentions": [
+        "France"
+      ],
+      "formerNames": [
+        "Dahomey"
+      ],
+      "background": "Present-day Benin is comprised of about 42 ethnic groups, including the Yoruba in the southeast, who migrated from what is now Nigeria in the 12th century; the Dendi in the north-central area, who came from Mali in the 16th century; the Bariba and the Fula in the northeast; the Ottamari in the Atakora mountains; the Fon in the area around Abomey in the south-central area; and the Mina, Xueda, and…"
+    },
+    "country:BTN": {
+      "record": "17 December 1907 (became a unified kingdom under its first hereditary king); 8 August 1949 (Treaty of Friendship with India maintains Bhutanese independence)",
+      "events": [
+        {
+          "year": 1907,
+          "date": "17 December 1907",
+          "label": "became a unified kingdom under its first hereditary king"
+        },
+        {
+          "year": 1949,
+          "date": "8 August 1949",
+          "label": "Treaty of Friendship with India maintains Bhutanese independence"
+        }
+      ],
+      "mentions": [
+        "United Kingdom"
+      ],
+      "formerNames": [],
+      "background": "After Britain’s victory in the 1865 Duar War, Britain and Bhutan signed the Treaty of Sinchulu, under which Bhutan would receive an annual subsidy in exchange for ceding land to British India."
+    },
+    "country:BOL": {
+      "record": "6 August 1825 (from Spain)",
+      "events": [
+        {
+          "year": 1825,
+          "date": "6 August 1825",
+          "label": "independence from Spain",
+          "from": "Spain",
+          "power": "Spain"
+        }
+      ],
+      "mentions": [
+        "Spain"
+      ],
+      "formerNames": [
+        "Upper Peru"
+      ],
+      "background": "Bolivia, named after independence fighter Simón BolÍVar, broke away from Spanish rule in 1825. Much of its subsequent history has consisted of a series of coups and countercoups, with the last coup occurring in 1980."
+    },
+    "country:BIH": {
+      "record": "1 March 1992 (from Yugoslavia)",
+      "events": [
+        {
+          "year": 1992,
+          "date": "1 March 1992",
+          "label": "independence from Yugoslavia",
+          "from": "Yugoslavia",
+          "power": "Yugoslavia"
+        }
+      ],
+      "mentions": [
+        "Yugoslavia",
+        "Ottoman Empire",
+        "Serbia and Montenegro"
+      ],
+      "formerNames": [],
+      "background": "After four centuries of Ottoman rule over Bosnia and Herzegovina, Austria-Hungary took control in 1878 and held the region until 1918, when it was incorporated into the newly created Kingdom of Serbs, Croats, and Slovenes."
+    },
+    "country:BWA": {
+      "record": "30 September 1966 (from the UK)",
+      "events": [
+        {
+          "year": 1966,
+          "date": "30 September 1966",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "South Africa"
+      ],
+      "formerNames": [
+        "Bechuanaland"
+      ],
+      "background": "In the early 1800s, multiple political entities in what is now Botswana were destabilized or destroyed by a series of conflicts and population movements in southern Africa."
+    },
+    "country:BRA": {
+      "record": "7 September 1822 (from Portugal)",
+      "events": [
+        {
+          "year": 1822,
+          "date": "7 September 1822",
+          "label": "independence from Portugal",
+          "from": "Portugal",
+          "power": "Portugal"
+        }
+      ],
+      "mentions": [
+        "Portugal",
+        "Brazil"
+      ],
+      "formerNames": [],
+      "background": "After more than three centuries under Portuguese rule, Brazil gained its independence in 1822, maintaining a monarchical system of government until the abolition of slavery in 1888 and the subsequent proclamation of a republic by the military in 1889."
+    },
+    "country:BRN": {
+      "record": "1 January 1984 (from the UK)",
+      "events": [
+        {
+          "year": 1984,
+          "date": "1 January 1984",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom"
+      ],
+      "formerNames": [],
+      "background": "The Sultanate of Brunei's influence peaked between the 15th and 17th centuries, when its control extended over coastal areas of northwest Borneo and the southern Philippines."
+    },
+    "country:BGR": {
+      "record": "3 March 1878 (as an autonomous principality within the Ottoman Empire); 22 September 1908 (complete independence from the Ottoman Empire)",
+      "events": [
+        {
+          "year": 1908,
+          "date": "22 September 1908",
+          "label": "complete independence from the Ottoman Empire",
+          "from": "the Ottoman Empire",
+          "power": "Ottoman Empire"
+        }
+      ],
+      "mentions": [
+        "Soviet Union",
+        "Ottoman Empire"
+      ],
+      "formerNames": [],
+      "background": "The Bulgars, a Central Asian Turkic tribe, merged with the local Slavic inhabitants in the late 7th century to form the first Bulgarian state. In succeeding centuries, Bulgaria struggled with the Byzantine Empire to assert its place in the Balkans, but by the end of the 14th century, the Ottoman Turks overran the country."
+    },
+    "country:BFA": {
+      "record": "5 August 1960 (from France)",
+      "events": [
+        {
+          "year": 1960,
+          "date": "5 August 1960",
+          "label": "independence from France",
+          "from": "France",
+          "power": "France"
+        }
+      ],
+      "mentions": [
+        "France"
+      ],
+      "formerNames": [
+        "Upper Volta"
+      ],
+      "background": "Many of Burkina Faso’s ethnic groups arrived in the region between the 12th and 15th centuries. The Gurma and Mossi peoples established several of the largest kingdoms in the area and used horse-mounted warriors in military campaigns."
+    },
+    "country:BDI": {
+      "record": "1 July 1962 (from UN trusteeship under Belgian administration)",
+      "events": [
+        {
+          "year": 1962,
+          "date": "1 July 1962",
+          "label": "independence from UN trusteeship under Belgian administration",
+          "from": "UN trusteeship under Belgian administration",
+          "power": "Belgium"
+        }
+      ],
+      "mentions": [
+        "Belgium"
+      ],
+      "formerNames": [],
+      "background": "Established in the 1600s, the Burundi Kingdom has had borders similar to those of modern Burundi since the 1800s. Burundi’s two major ethnic groups, the majority Hutu and minority Tutsi, share a common language and culture and largely lived in peaceful cohabitation under Tutsi monarchs in pre-colonial Burundi."
+    },
+    "country:CPV": {
+      "record": "5 July 1975 (from Portugal)",
+      "events": [
+        {
+          "year": 1975,
+          "date": "5 July 1975",
+          "label": "independence from Portugal",
+          "from": "Portugal",
+          "power": "Portugal"
+        }
+      ],
+      "mentions": [
+        "Spain",
+        "Portugal"
+      ],
+      "formerNames": [],
+      "background": "The Portuguese discovered and colonized the uninhabited islands of Cabo Verde in the 15th century; Cabo Verde subsequently became a trading center for African slaves and later an important coaling and resupply stop for whaling and transatlantic shipping."
+    },
+    "country:KHM": {
+      "record": "9 November 1953 (from France)",
+      "events": [
+        {
+          "year": 1953,
+          "date": "9 November 1953",
+          "label": "independence from France",
+          "from": "France",
+          "power": "France"
+        }
+      ],
+      "mentions": [
+        "France",
+        "Japan",
+        "China"
+      ],
+      "formerNames": [
+        "Khmer Republic",
+        "Democratic Kampuchea"
+      ],
+      "background": "Most Cambodians consider themselves to be Khmers, descendants of the Angkor Empire that extended over much of Southeast Asia and reached its zenith between the 10th and 13th centuries."
+    },
+    "country:CMR": {
+      "record": "1 January 1960 (from French-administered UN trusteeship)",
+      "events": [
+        {
+          "year": 1960,
+          "date": "1 January 1960",
+          "label": "independence from French-administered UN trusteeship",
+          "from": "French-administered UN trusteeship",
+          "power": "France"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "France"
+      ],
+      "formerNames": [],
+      "background": "Powerful chiefdoms ruled much of the area of present-day Cameroon before it became a German colony known as Kamerun in 1884. After World War I, the territory was divided between France and the UK as League of Nations mandates."
+    },
+    "country:CAN": {
+      "record": "1 July 1867 (union of British North American colonies); 11 December 1931 (recognized by UK per Statute of Westminster)",
+      "events": [
+        {
+          "year": 1867,
+          "date": "1 July 1867",
+          "label": "union of British North American colonies"
+        },
+        {
+          "year": 1931,
+          "date": "11 December 1931",
+          "label": "recognized by UK per Statute of Westminster"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "A land of vast distances and rich natural resources, Canada became a self-governing dominion in 1867, while retaining ties to the British crown. Canada gained legislative independence from Britain in 1931 and formalized its constitutional independence from the UK when it passed the Canada Act in 1982."
+    },
+    "country:CAF": {
+      "record": "13 August 1960 (from France)",
+      "events": [
+        {
+          "year": 1960,
+          "date": "13 August 1960",
+          "label": "independence from France",
+          "from": "France",
+          "power": "France"
+        }
+      ],
+      "mentions": [
+        "France",
+        "Belgium"
+      ],
+      "formerNames": [
+        "Ubangi-Shari"
+      ],
+      "background": "The Central African Republic (Car) is a perennially weak state that sits at the crossroads of ethnic and linguistic groups in the center of the African continent."
+    },
+    "country:TCD": {
+      "record": "11 August 1960 (from France)",
+      "events": [
+        {
+          "year": 1960,
+          "date": "11 August 1960",
+          "label": "independence from France",
+          "from": "France",
+          "power": "France"
+        }
+      ],
+      "mentions": [
+        "France",
+        "Sudan"
+      ],
+      "formerNames": [],
+      "background": "Chad emerged from a collection of powerful states that controlled the Sahelian belt starting around the 9th century. These states focused on controlling trans-Saharan trade routes and profited mostly from the slave trade."
+    },
+    "country:CHL": {
+      "record": "18 September 1810 (from Spain)",
+      "events": [
+        {
+          "year": 1810,
+          "date": "18 September 1810",
+          "label": "independence from Spain",
+          "from": "Spain",
+          "power": "Spain"
+        }
+      ],
+      "mentions": [
+        "Spain"
+      ],
+      "formerNames": [],
+      "background": "Indigenous groups inhabited central and southern Chile for several thousand years, living in mixed pastoralist and settled communities. The Inca then ruled the north of the country for nearly a century prior to the arrival of the Spanish in the 16th century."
+    },
+    "country:CHN": {
+      "record": "1 October 1949 (People's Republic of China established); notable earlier dates: 221 B.C. (unification under the Qin Dynasty); 1 January 1912 (Qing Dynasty replaced by the Republic of China)",
+      "events": [
+        {
+          "year": 1949,
+          "date": "1 October 1949",
+          "label": "People's Republic of China established"
+        },
+        {
+          "year": 1912,
+          "date": "1 January 1912",
+          "label": "Qing Dynasty replaced by the Republic of China"
+        }
+      ],
+      "mentions": [
+        "Japan",
+        "China"
+      ],
+      "formerNames": [],
+      "background": "China's historical civilization dates to at least the 13th century B.C., first under the Shang (to 1046 B.C.) and then the Zhou (1046-221 B.C.) dynasties. The imperial era of China began in 221 B.C. under the Qin Dynasty and lasted until the fall of the Qing Dynasty in 1912."
+    },
+    "country:COL": {
+      "record": "20 July 1810 (from Spain)",
+      "events": [
+        {
+          "year": 1810,
+          "date": "20 July 1810",
+          "label": "independence from Spain",
+          "from": "Spain",
+          "power": "Spain"
+        }
+      ],
+      "mentions": [
+        "Spain",
+        "Colombia"
+      ],
+      "formerNames": [],
+      "background": "Colombia was one of three countries that emerged after the dissolution of Gran Colombia in 1830 — the others are Ecuador and Venezuela."
+    },
+    "country:COM": {
+      "record": "6 July 1975 (from France)",
+      "events": [
+        {
+          "year": 1975,
+          "date": "6 July 1975",
+          "label": "independence from France",
+          "from": "France",
+          "power": "France"
+        }
+      ],
+      "mentions": [
+        "France"
+      ],
+      "formerNames": [],
+      "background": "For centuries prior to colonization in the 19th century, the Comoros archipelago in the Indian Ocean served as a key node in maritime trade networks that connected the Middle East, India, and eastern African regions."
+    },
+    "country:CRI": {
+      "record": "15 September 1821 (from Spain)",
+      "events": [
+        {
+          "year": 1821,
+          "date": "15 September 1821",
+          "label": "independence from Spain",
+          "from": "Spain",
+          "power": "Spain"
+        }
+      ],
+      "mentions": [
+        "Spain",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "Although explored by the Spanish early in the 16th century, initial attempts at colonizing Costa Rica proved unsuccessful due to a combination of factors, including disease from mosquito-infested swamps, brutal heat, resistance from Indigenous populations, and pirate raids."
+    },
+    "country:HRV": {
+      "record": "25 June 1991 (from Yugoslavia); notable earlier dates: ca. 925 (Kingdom of Croatia established), 1 December 1918 (Kingdom of Serbs, Croats, and Slovenes established, later became Yugoslavia)",
+      "events": [
+        {
+          "year": 1991,
+          "date": "25 June 1991",
+          "label": "independence from Yugoslavia",
+          "from": "Yugoslavia",
+          "power": "Yugoslavia"
+        },
+        {
+          "year": 1918,
+          "date": "1 December 1918",
+          "label": "Kingdom of Serbs, Croats, and Slovenes established, later became Yugoslavia"
+        }
+      ],
+      "mentions": [
+        "Yugoslavia"
+      ],
+      "formerNames": [],
+      "background": "The lands that today comprise Croatia were part of the Austro-Hungarian Empire until the end of World War I. In 1918, the Croats, Serbs, and Slovenes formed a kingdom known after 1929 as Yugoslavia."
+    },
+    "country:CUB": {
+      "record": "20 May 1902 (from US administration); 10 December 1898 (from Spain); not acknowledged by the Cuban Government as days of independence",
+      "events": [
+        {
+          "year": 1902,
+          "date": "20 May 1902",
+          "label": "independence from US administration",
+          "from": "US administration",
+          "power": "United States"
+        },
+        {
+          "year": 1898,
+          "date": "10 December 1898",
+          "label": "independence from Spain",
+          "from": "Spain",
+          "power": "Spain"
+        }
+      ],
+      "mentions": [
+        "Spain",
+        "Soviet Union",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "The native Amerindian population of Cuba began to decline after the arrival of Christopher Columbus in 1492, as the country was developed as a Spanish colony during the next several centuries."
+    },
+    "country:CYP": {
+      "record": "16 August 1960 (from the UK)",
+      "events": [
+        {
+          "year": 1960,
+          "date": "16 August 1960",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Ottoman Empire"
+      ],
+      "formerNames": [],
+      "background": "A former British colony, Cyprus became independent in 1960 after years of resistance to British rule. Tensions between the Greek Cypriot majority and Turkish Cypriot minority came to a head in December 1963, when violence broke out in the capital of Nicosia."
+    },
+    "country:CZE": {
+      "record": "1 January 1993 (Czechoslovakia split into the Czech Republic and Slovakia)",
+      "events": [
+        {
+          "year": 1993,
+          "date": "1 January 1993",
+          "label": "Czechoslovakia split into the Czech Republic and Slovakia"
+        }
+      ],
+      "mentions": [
+        "Soviet Union"
+      ],
+      "formerNames": [],
+      "background": "At the close of World War I, the Czechs and Slovaks of the former Austro-Hungarian Empire merged to form Czechoslovakia, a parliamentarian democracy."
+    },
+    "country:COD": {
+      "record": "30 June 1960 (from Belgium)",
+      "events": [
+        {
+          "year": 1960,
+          "date": "30 June 1960",
+          "label": "independence from Belgium",
+          "from": "Belgium",
+          "power": "Belgium"
+        }
+      ],
+      "mentions": [
+        "Belgium",
+        "Sudan"
+      ],
+      "formerNames": [
+        "Zaire"
+      ],
+      "background": "Bantu, Sudanic, and other migrants from West and Northeastern Africa arrived in the Congo River Basin between 2000 B.C. and A.D. 500. The territory that is now the Democratic Republic of the Congo has more than 200 ethnic groups that trace their histories to many communal organizations and kingdoms."
+    },
+    "country:DNK": {
+      "record": "ca. 965 (unified and Christianized under Harald I Gormsson); 5 June 1849 (became a parliamentary constitutional monarchy)",
+      "events": [
+        {
+          "year": 1849,
+          "date": "5 June 1849",
+          "label": "became a parliamentary constitutional monarchy"
+        }
+      ],
+      "mentions": [
+        "Denmark"
+      ],
+      "formerNames": [],
+      "background": "Once the seat of Viking raiders and later a major north European power, Denmark has evolved into a modern, prosperous nation that is part of the general political and economic integration of Europe."
+    },
+    "country:DJI": {
+      "record": "27 June 1977 (from France)",
+      "events": [
+        {
+          "year": 1977,
+          "date": "27 June 1977",
+          "label": "independence from France",
+          "from": "France",
+          "power": "France"
+        }
+      ],
+      "mentions": [
+        "France",
+        "Spain",
+        "Japan",
+        "United States",
+        "Ethiopia",
+        "China"
+      ],
+      "formerNames": [
+        "French Somaliland"
+      ],
+      "background": "Present-day Djibouti was the site of the medieval Ifat and Adal Sultanates. In the late 19th century, the Afar sultans signed treaties with the French that allowed the latter to establish the colony of French Somaliland in 1862."
+    },
+    "country:DMA": {
+      "record": "3 November 1978 (from the UK)",
+      "events": [
+        {
+          "year": 1978,
+          "date": "3 November 1978",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "France"
+      ],
+      "formerNames": [],
+      "background": "Dominica was the last of the Caribbean islands to be colonized by Europeans, due chiefly to the fierce resistance of the native Caribs. France ceded possession to Britain in 1763, and Dominica became a British colony in 1805."
+    },
+    "country:DOM": {
+      "record": "27 February 1844 (from Haiti)",
+      "events": [
+        {
+          "year": 1844,
+          "date": "27 February 1844",
+          "label": "independence from Haiti",
+          "from": "Haiti",
+          "power": "Haiti"
+        }
+      ],
+      "mentions": [
+        "France",
+        "Spain",
+        "United States",
+        "Haiti"
+      ],
+      "formerNames": [],
+      "background": "The Taino — indigenous inhabitants of Hispaniola prior to the arrival of Europeans — divided the island now known as the Dominican Republic and Haiti into five chiefdoms and territories."
+    },
+    "country:ECU": {
+      "record": "24 May 1822 (from Spain)",
+      "events": [
+        {
+          "year": 1822,
+          "date": "24 May 1822",
+          "label": "independence from Spain",
+          "from": "Spain",
+          "power": "Spain"
+        }
+      ],
+      "mentions": [
+        "Spain",
+        "Colombia"
+      ],
+      "formerNames": [],
+      "background": "What is now Ecuador formed part of the northern Inca Empire until the Spanish conquest in 1533. Quito — the traditional name for the area — became a seat of Spanish colonial government in 1563 and part of the Viceroyalty of New Granada in 1717."
+    },
+    "country:EGY": {
+      "record": "28 February 1922 (from UK protectorate status; the military-led revolution that began on 23 July 1952 led to a republic being declared on 18 June 1953 and all British troops withdrawn on 18 June 1956)",
+      "events": [
+        {
+          "year": 1922,
+          "date": "28 February 1922",
+          "label": "independence from UK protectorate status",
+          "from": "UK protectorate status",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Ottoman Empire"
+      ],
+      "formerNames": [],
+      "background": "The regularity and richness of the annual Nile River flood, coupled with semi-isolation provided by deserts to the east and west, allowed for the development of one of the world's great civilizations in Egypt."
+    },
+    "country:SLV": {
+      "record": "15 September 1821 (from Spain)",
+      "events": [
+        {
+          "year": 1821,
+          "date": "15 September 1821",
+          "label": "independence from Spain",
+          "from": "Spain",
+          "power": "Spain"
+        }
+      ],
+      "mentions": [
+        "Spain"
+      ],
+      "formerNames": [],
+      "background": "El Salvador achieved independence from Spain in 1821 and from the Central American Federation in 1839. A 12-year civil war, which cost about 75,000 lives, was brought to a close in 1992 when the government and leftist rebels signed a treaty that provided for military and political reforms."
+    },
+    "country:GNQ": {
+      "record": "12 October 1968 (from Spain)",
+      "events": [
+        {
+          "year": 1968,
+          "date": "12 October 1968",
+          "label": "independence from Spain",
+          "from": "Spain",
+          "power": "Spain"
+        }
+      ],
+      "mentions": [
+        "Spain",
+        "Portugal"
+      ],
+      "formerNames": [],
+      "background": "Equatorial Guinea consists of a continental territory and five inhabited islands; it is one of the smallest countries by area and population in Africa. The mainland region was most likely predominantly inhabited by Pygmy ethnic groups prior to the migration of various Bantu-speaking ethnic groups around the second millennium BC."
+    },
+    "country:ERI": {
+      "record": "24 May 1993 (from Ethiopia)",
+      "events": [
+        {
+          "year": 1993,
+          "date": "24 May 1993",
+          "label": "independence from Ethiopia",
+          "from": "Ethiopia",
+          "power": "Ethiopia"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "United States",
+        "Ethiopia"
+      ],
+      "formerNames": [],
+      "background": "Eritrea won independence from Italian colonial control in 1941, but the UN only established it as an autonomous region within the Ethiopian federation in 1952, after a decade of British administrative control."
+    },
+    "country:EST": {
+      "record": "24 February 1918 (from Soviet Russia); 20 August 1991 (declared from the Soviet Union); 6 September 1991 (recognized by the Soviet Union)",
+      "events": [
+        {
+          "year": 1918,
+          "date": "24 February 1918",
+          "label": "independence from Soviet Russia",
+          "from": "Soviet Russia",
+          "power": "Russia"
+        },
+        {
+          "year": 1991,
+          "date": "20 August 1991",
+          "label": "independence declared from the Soviet Union",
+          "from": "the Soviet Union",
+          "power": "Soviet Union",
+          "declared": true
+        },
+        {
+          "year": 1991,
+          "date": "6 September 1991",
+          "label": "recognized by the Soviet Union"
+        }
+      ],
+      "mentions": [
+        "Soviet Union",
+        "Russia",
+        "United States",
+        "Denmark"
+      ],
+      "formerNames": [],
+      "background": "After centuries of Danish, Swedish, German, and Russian rule, Estonia attained independence in 1918. Forcibly incorporated into the USSR in 1940 — an action never recognized by the US and many other countries — it regained its freedom in 1991 with the collapse of the Soviet Union."
+    },
+    "country:SWZ": {
+      "record": "6 September 1968 (from the UK)",
+      "events": [
+        {
+          "year": 1968,
+          "date": "6 September 1968",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom"
+      ],
+      "formerNames": [
+        "Swaziland"
+      ],
+      "background": "A Swazi kingdom was founded in the mid-18th century and ruled by a series of kings, including Mswati II, a 19th century ruler whose name was adopted for the country and its predominant ethnic group."
+    },
+    "country:ETH": {
+      "record": "oldest independent country in Africa and one of the oldest in the world, at least 2,000 years; may be traced to the Aksumite Kingdom, which appeared in the first century B.C.",
+      "events": [],
+      "mentions": [
+        "Ethiopia"
+      ],
+      "formerNames": [
+        "Abyssinia"
+      ],
+      "background": "The area that is modern-day Ethiopia is rich in cultural and religious diversity with more than 80 ethnic groups."
+    },
+    "country:FJI": {
+      "record": "10 October 1970 (from the UK)",
+      "events": [
+        {
+          "year": 1970,
+          "date": "10 October 1970",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom"
+      ],
+      "formerNames": [],
+      "background": "Austronesians settled Fiji around 1000 B.C., followed by successive waves of Melanesians starting around the first century A.D. Fijians traded with Polynesian groups in Samoa and Tonga, and by about 900, much of Fiji was in the Tu’i Tongan Empire’s sphere of influence."
+    },
+    "country:FIN": {
+      "record": "6 December 1917 (from Russia)",
+      "events": [
+        {
+          "year": 1917,
+          "date": "6 December 1917",
+          "label": "independence from Russia",
+          "from": "Russia",
+          "power": "Russia"
+        }
+      ],
+      "mentions": [
+        "Soviet Union",
+        "Russia"
+      ],
+      "formerNames": [],
+      "background": "Finland was a province and then a grand duchy under Sweden from the 12th to the 19th centuries and an autonomous grand duchy of Russia after 1809. It gained complete independence in 1917."
+    },
+    "country:FRA": {
+      "record": "no official date of independence: 486 (Frankish tribes unified under Merovingian kingship); 10 August 843 (Western Francia established from the division of the Carolingian Empire); 14 July 1789 (French monarchy overthrown)",
+      "events": [
+        {
+          "year": 486,
+          "date": "486",
+          "label": "Frankish tribes unified under Merovingian kingship"
+        },
+        {
+          "year": 843,
+          "date": "10 August 843",
+          "label": "Western Francia established from the division of the Carolingian Empire"
+        },
+        {
+          "year": 1789,
+          "date": "14 July 1789",
+          "label": "French monarchy overthrown"
+        },
+        {
+          "year": 1792,
+          "date": "22 September 1792",
+          "label": "First French Republic established"
+        },
+        {
+          "year": 1958,
+          "date": "4 October 1958",
+          "label": "Fifth French Republic established"
+        }
+      ],
+      "mentions": [
+        "France"
+      ],
+      "formerNames": [],
+      "background": "France today is one of the most modern countries in the world and is a leader among European nations. It plays an influential global role as a permanent member of the United Nations Security Council, NATO, the G-7, the G-20, the EU, and other multilateral organizations."
+    },
+    "country:GAB": {
+      "record": "17 August 1960 (from France)",
+      "events": [
+        {
+          "year": 1960,
+          "date": "17 August 1960",
+          "label": "independence from France",
+          "from": "France",
+          "power": "France"
+        }
+      ],
+      "mentions": [
+        "France",
+        "Portugal"
+      ],
+      "formerNames": [],
+      "background": "Gabon, a sparsely populated country known for its dense rainforests and vast petroleum reserves, is one of the most prosperous and stable countries in central Africa."
+    },
+    "country:GMB": {
+      "record": "18 February 1965 (from the UK)",
+      "events": [
+        {
+          "year": 1965,
+          "date": "18 February 1965",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "In the 10th century, Muslim merchants established some of The Gambia’s earliest large settlements as trans-Saharan trade hubs. These settlements eventually grew into major export centers sending slaves, gold, and ivory across the Sahara."
+    },
+    "country:GEO": {
+      "record": "9 April 1991 (from the Soviet Union); notable earlier date: A.D. 1008 (Georgia unified under King Bagrat III)",
+      "events": [
+        {
+          "year": 1991,
+          "date": "9 April 1991",
+          "label": "independence from the Soviet Union",
+          "from": "the Soviet Union",
+          "power": "Soviet Union"
+        },
+        {
+          "year": 1008,
+          "date": "1008",
+          "label": "Georgia unified under King Bagrat III"
+        }
+      ],
+      "mentions": [
+        "Soviet Union",
+        "Russia",
+        "Ottoman Empire"
+      ],
+      "formerNames": [],
+      "background": "The region of present-day Georgia once contained the ancient kingdoms of Colchis (known as Egrisi locally) and Kartli-Iberia. The area came under Roman influence in the first centuries A.D., and Christianity became the state religion in the 330s."
+    },
+    "country:DEU": {
+      "record": "18 January 1871 (establishment of the German Empire); divided into four zones of occupation (UK, US, USSR, and France) in 1945 after World War II; Federal Republic of Germany (FRG or West Germany) proclaimed on 23 May 1949 and included the former UK,…",
+      "events": [
+        {
+          "year": 1871,
+          "date": "18 January 1871",
+          "label": "establishment of the German Empire"
+        },
+        {
+          "year": 843,
+          "date": "10 August 843",
+          "label": "Eastern Francia established from the division of the Carolingian Empire"
+        },
+        {
+          "year": 962,
+          "date": "2 February 962",
+          "label": "crowning of Otto I, recognized as the first Holy Roman Emperor"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "France",
+        "Soviet Union",
+        "Russia",
+        "United States",
+        "Holy Roman Empire"
+      ],
+      "formerNames": [],
+      "background": "As Europe's largest economy and second most-populous nation (after Russia), Germany is a key member of the continent's economic, political, and defense organizations."
+    },
+    "country:GHA": {
+      "record": "6 March 1957 (from the UK)",
+      "events": [
+        {
+          "year": 1957,
+          "date": "6 March 1957",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Portugal"
+      ],
+      "formerNames": [
+        "Gold Coast"
+      ],
+      "background": "Ghana is a multiethnic country rich in natural resources and is one of the most stable and democratic countries in West Africa. Ghana has been inhabited for at least several thousand years, but little is known about its early inhabitants."
+    },
+    "country:GRC": {
+      "record": "3 February 1830 (from the Ottoman Empire)",
+      "events": [
+        {
+          "year": 1830,
+          "date": "3 February 1830",
+          "label": "independence from the Ottoman Empire",
+          "from": "the Ottoman Empire",
+          "power": "Ottoman Empire"
+        }
+      ],
+      "mentions": [
+        "Ottoman Empire"
+      ],
+      "formerNames": [],
+      "background": "Greece won independence from the Ottoman Empire in 1830 and became a kingdom. During the second half of the 19th century and the first half of the 20th century, it gradually added neighboring islands and territories, most with Greek-speaking populations."
+    },
+    "country:GRD": {
+      "record": "7 February 1974 (from the UK)",
+      "events": [
+        {
+          "year": 1974,
+          "date": "7 February 1974",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "France",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "The indigenous Carib people inhabited Grenada when Christopher Columbus landed on the island in 1498, but it remained uncolonized for more than a century. The French settled Grenada in the 17th century, established sugar estates, and imported large numbers of African slaves."
+    },
+    "country:GTM": {
+      "record": "15 September 1821 (from Spain)",
+      "events": [
+        {
+          "year": 1821,
+          "date": "15 September 1821",
+          "label": "independence from Spain",
+          "from": "Spain",
+          "power": "Spain"
+        }
+      ],
+      "mentions": [
+        "Spain"
+      ],
+      "formerNames": [],
+      "background": "The Maya civilization flourished in Guatemala and surrounding regions during the first millennium A.D. After almost three centuries as a Spanish colony, Guatemala won its independence in 1821."
+    },
+    "country:GIN": {
+      "record": "2 October 1958 (from France)",
+      "events": [
+        {
+          "year": 1958,
+          "date": "2 October 1958",
+          "label": "independence from France",
+          "from": "France",
+          "power": "France"
+        }
+      ],
+      "mentions": [
+        "France"
+      ],
+      "formerNames": [],
+      "background": "Guinea's deep Muslim heritage arrived via the neighboring Almoravid Empire in the 11th century. Following Almoravid decline, Guinea existed on the fringe of several African kingdoms, all competing for regional dominance."
+    },
+    "country:GNB": {
+      "record": "24 September 1973 (declared); 10 September 1974 (from Portugal)",
+      "events": [
+        {
+          "year": 1974,
+          "date": "10 September 1974",
+          "label": "independence from Portugal",
+          "from": "Portugal",
+          "power": "Portugal"
+        }
+      ],
+      "mentions": [
+        "Portugal"
+      ],
+      "formerNames": [],
+      "background": "For much of its history, Guinea-Bissau was under the control of the Mali Empire and the Kaabu Kingdom. In the 16th century, Portugal began establishing trading posts along Guinea-Bissau’s shoreline."
+    },
+    "country:GUY": {
+      "record": "26 May 1966 (from the UK)",
+      "events": [
+        {
+          "year": 1966,
+          "date": "26 May 1966",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Netherlands"
+      ],
+      "formerNames": [
+        "British Guiana"
+      ],
+      "background": "Originally a Dutch colony in the 17th century, by 1815 Guyana had become a British possession. The abolition of slavery led to former slaves settling urban areas and indentured servants being imported from India to work the sugar plantations."
+    },
+    "country:HTI": {
+      "record": "1 January 1804 (from France)",
+      "events": [
+        {
+          "year": 1804,
+          "date": "1 January 1804",
+          "label": "independence from France",
+          "from": "France",
+          "power": "France"
+        }
+      ],
+      "mentions": [
+        "France",
+        "Spain",
+        "United States",
+        "Haiti"
+      ],
+      "formerNames": [],
+      "background": "The native Taino — who inhabited the island of Hispaniola when Christopher Columbus first landed in 1492 — were virtually wiped out by Spanish settlers within 25 years. In the early 17th century, the French established a presence on Hispaniola."
+    },
+    "country:HND": {
+      "record": "15 September 1821 (from Spain)",
+      "events": [
+        {
+          "year": 1821,
+          "date": "15 September 1821",
+          "label": "independence from Spain",
+          "from": "Spain",
+          "power": "Spain"
+        }
+      ],
+      "mentions": [
+        "Spain"
+      ],
+      "formerNames": [],
+      "background": "Once part of Spain's vast empire in the New World, Honduras became an independent nation in 1821. After two and a half decades of mostly military rule, a freely elected civilian government came to power in 1982."
+    },
+    "country:HUN": {
+      "record": "16 November 1918 (republic proclaimed); notable earlier dates: 25 December 1000 (crowning of King Stephen I, traditional founding date); 30 March 1867 (Austro-Hungarian dual monarchy established)",
+      "events": [
+        {
+          "year": 1918,
+          "date": "16 November 1918",
+          "label": "republic proclaimed"
+        },
+        {
+          "year": 1000,
+          "date": "25 December 1000",
+          "label": "crowning of King Stephen I, traditional founding date"
+        },
+        {
+          "year": 1867,
+          "date": "30 March 1867",
+          "label": "Austro-Hungarian dual monarchy established"
+        }
+      ],
+      "mentions": [
+        "Ottoman Empire"
+      ],
+      "formerNames": [],
+      "background": "Hungary became a Christian kingdom in A.D. 1000 and for many centuries served as a bulwark against Ottoman Turkish expansion in Europe. The kingdom eventually became part of the Austro-Hungarian Empire, which collapsed during World War I."
+    },
+    "country:ISL": {
+      "record": "1 December 1918 (became a sovereign state under the Danish Crown); 17 June 1944 (from Denmark; birthday of Jon Sigurdsson, leader of Iceland's 19th-century independence movement)",
+      "events": [
+        {
+          "year": 1918,
+          "date": "1 December 1918",
+          "label": "became a sovereign state under the Danish Crown"
+        },
+        {
+          "year": 1944,
+          "date": "17 June 1944",
+          "label": "independence from Denmark",
+          "from": "Denmark",
+          "power": "Denmark"
+        }
+      ],
+      "mentions": [
+        "United States",
+        "Denmark"
+      ],
+      "formerNames": [],
+      "background": "Settled by Norwegian and Celtic (Scottish and Irish) immigrants during the late 9th and 10th centuries A.D., Iceland boasts the world's oldest functioning legislative assembly, the Althingi, which was established in 930."
+    },
+    "country:IND": {
+      "record": "15 August 1947 (from the UK)",
+      "events": [
+        {
+          "year": 1947,
+          "date": "15 August 1947",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Ottoman Empire",
+        "Pakistan"
+      ],
+      "formerNames": [],
+      "background": "The Indus Valley civilization, one of the world's oldest, flourished during the 3rd and 2nd millennia B.C. and extended into northwestern India. Aryan tribes from the northwest infiltrated the Indian subcontinent about 1500 B.C.; their merger with the earlier Dravidian inhabitants created the classical Indian culture."
+    },
+    "country:IDN": {
+      "record": "17 August 1945 (declared independence from the Netherlands)",
+      "events": [
+        {
+          "year": 1945,
+          "date": "17 August 1945",
+          "label": "independence declared from the Netherlands",
+          "from": "the Netherlands",
+          "power": "Netherlands",
+          "declared": true
+        }
+      ],
+      "mentions": [
+        "Portugal",
+        "Netherlands",
+        "Japan",
+        "Indonesia",
+        "Malaysia"
+      ],
+      "formerNames": [
+        "Dutch East Indies"
+      ],
+      "background": "The archipelago was once largely under the control of Buddhist and Hindu rulers. By around the 7th century, a Buddhist kingdom arose on Sumatra and expanded into Java and the Malay Peninsula until it was conquered in the late 13th century by the Hindu Majapahit Empire from Java."
+    },
+    "country:IRN": {
+      "record": "1 April 1979 (Islamic Republic of Iran proclaimed); notable earlier dates: ca. 550 B.C. (Achaemenid or Persian Empire established); A.D. 1501 (Iran reunified under the Safavid dynasty); 1794 (beginning of Qajar dynasty)",
+      "events": [
+        {
+          "year": 1979,
+          "date": "1 April 1979",
+          "label": "Islamic Republic of Iran proclaimed"
+        },
+        {
+          "year": 1501,
+          "date": "1501",
+          "label": "Iran reunified under the Safavid dynasty"
+        },
+        {
+          "year": 1794,
+          "date": "1794",
+          "label": "beginning of Qajar dynasty"
+        },
+        {
+          "year": 1925,
+          "date": "12 December 1925",
+          "label": "modern Iran established under the Pahlavi dynasty"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Russia",
+        "United States",
+        "China"
+      ],
+      "formerNames": [
+        "Persia"
+      ],
+      "background": "Known as Persia until 1935, Iran became an Islamic republic in 1979 after the ruling monarchy was overthrown and Shah Mohammad Reza Pahlavi was forced into exile."
+    },
+    "country:IRQ": {
+      "record": "3 October 1932 (from League of Nations mandate under British administration)",
+      "events": [
+        {
+          "year": 1932,
+          "date": "3 October 1932",
+          "label": "independence from League of Nations mandate under British administration",
+          "from": "League of Nations mandate under British administration",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Ottoman Empire",
+        "United States",
+        "Sudan"
+      ],
+      "formerNames": [],
+      "background": "Formerly part of the Ottoman Empire, Iraq was occupied by the United Kingdom during World War I and was declared a League of Nations mandate under UK administration in 1920."
+    },
+    "country:IRL": {
+      "record": "6 December 1921 (from the UK); 6 December 1922 (Irish Free State established); 18 April 1949 (Republic of Ireland Act enabled)",
+      "events": [
+        {
+          "year": 1921,
+          "date": "6 December 1921",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        },
+        {
+          "year": 1922,
+          "date": "6 December 1922",
+          "label": "Irish Free State established"
+        },
+        {
+          "year": 1949,
+          "date": "18 April 1949",
+          "label": "Republic of Ireland Act enabled"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "United States",
+        "Denmark"
+      ],
+      "formerNames": [],
+      "background": "Celtic tribes arrived in Ireland between 600 and 150 B.C. Norse invasions that began in the late 8th century finally ended when King Brian Boru defeated the Danes in 1014."
+    },
+    "country:CIV": {
+      "record": "7 August 1960 (from France)",
+      "events": [
+        {
+          "year": 1960,
+          "date": "7 August 1960",
+          "label": "independence from France",
+          "from": "France",
+          "power": "France"
+        }
+      ],
+      "mentions": [
+        "France"
+      ],
+      "formerNames": [],
+      "background": "Various small kingdoms ruled the area of Cote d'Ivoire between the 15th and 19th centuries, when European explorers arrived and then began to expand their presence. In 1844, France established a protectorate."
+    },
+    "country:JAM": {
+      "record": "6 August 1962 (from the UK)",
+      "events": [
+        {
+          "year": 1962,
+          "date": "6 August 1962",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Spain"
+      ],
+      "formerNames": [],
+      "background": "Europeans first saw Jamaica when Christopher Columbus arrived in 1494, and the Spanish settled the island early in the 16th century. The Native Taino, who had inhabited Jamaica for centuries, were gradually exterminated and replaced with African slaves."
+    },
+    "country:JPN": {
+      "record": "3 May 1947 (current constitution adopted as amendment to Meiji Constitution); notable earlier dates: 11 February 660 B.C. (mythological date of Emperor Jimmu founding the nation)",
+      "events": [
+        {
+          "year": 1947,
+          "date": "3 May 1947",
+          "label": "current constitution adopted as amendment to Meiji Constitution"
+        },
+        {
+          "year": 1890,
+          "date": "29 November 1890",
+          "label": "Meiji Constitution provides for constitutional monarchy"
+        }
+      ],
+      "mentions": [
+        "Russia",
+        "Japan",
+        "United States",
+        "China"
+      ],
+      "formerNames": [],
+      "background": "In 1603, after decades of civil warfare, the Tokugawa shogunate (a military-led, dynastic government) ushered in a long period of relative political stability and isolation from foreign influence."
+    },
+    "country:JOR": {
+      "record": "25 May 1946 (from League of Nations mandate under British administration)",
+      "events": [
+        {
+          "year": 1946,
+          "date": "25 May 1946",
+          "label": "independence from League of Nations mandate under British administration",
+          "from": "League of Nations mandate under British administration",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Soviet Union",
+        "Ottoman Empire",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "After World War I and the dissolution of the Ottoman Empire, the League of Nations awarded Britain the mandate to govern much of the Middle East. In 1921, Britain demarcated from Palestine a semi-autonomous region of Transjordan and recognized Abdallah I from the Hashemite family as the country's first leader."
+    },
+    "country:KAZ": {
+      "record": "16 December 1991 (from the Soviet Union)",
+      "events": [
+        {
+          "year": 1991,
+          "date": "16 December 1991",
+          "label": "independence from the Soviet Union",
+          "from": "the Soviet Union",
+          "power": "Soviet Union"
+        }
+      ],
+      "mentions": [
+        "Soviet Union",
+        "Russia",
+        "Ottoman Empire",
+        "China"
+      ],
+      "formerNames": [],
+      "background": "Ethnic Kazakhs derive from a mix of Turkic nomadic tribes that migrated to the region in the 15th century. The Russian Empire conquered the Kazakh steppe in the 18th and 19th centuries, and Kazakhstan became a Soviet Republic in 1925."
+    },
+    "country:KEN": {
+      "record": "12 December 1963 (from the UK)",
+      "events": [
+        {
+          "year": 1963,
+          "date": "12 December 1963",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Portugal",
+        "China",
+        "Indonesia"
+      ],
+      "formerNames": [],
+      "background": "Trade centers such as Mombasa have existed along the Kenyan and Tanzanian coastlines, known as the Land of Zanj, since at least the 2nd century. These centers traded with the outside world, including China, India, Indonesia, the Middle East, North Africa, and Persia."
+    },
+    "country:KIR": {
+      "record": "12 July 1979 (from the UK)",
+      "events": [
+        {
+          "year": 1979,
+          "date": "12 July 1979",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Japan",
+        "United States"
+      ],
+      "formerNames": [
+        "Gilbert Islands"
+      ],
+      "background": "Kiribati is made up of three distinct island groups — the Gilbert Islands, the Line Islands, and the Phoenix Islands. The first Austronesian voyagers arrived in the Gilbert Islands as early as 3000 B.C., but these islands were not widely settled until about A.D. 200 by Micronesians."
+    },
+    "country:KWT": {
+      "record": "19 June 1961 (from the UK)",
+      "events": [
+        {
+          "year": 1961,
+          "date": "19 June 1961",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Ottoman Empire",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "Kuwait has been ruled by the Al-Sabah dynasty since the 18th century. The threat of Ottoman invasion in 1899 prompted Amir Mubarak Al-Sabah to seek protection from Britain, ceding foreign and defense responsibility to Britain until 1961, when the country attained its independence."
+    },
+    "country:KGZ": {
+      "record": "31 August 1991 (from the Soviet Union)",
+      "events": [
+        {
+          "year": 1991,
+          "date": "31 August 1991",
+          "label": "independence from the Soviet Union",
+          "from": "the Soviet Union",
+          "power": "Soviet Union"
+        }
+      ],
+      "mentions": [
+        "Soviet Union",
+        "Russia"
+      ],
+      "formerNames": [],
+      "background": "Kyrgyzstan is a Central Asian country of incredible natural beauty and proud nomadic traditions. The Russian Empire annexed most of the territory of present-day Kyrgyzstan in 1876."
+    },
+    "country:LAO": {
+      "record": "19 July 1949 (from France); 22 October 1953 (Franco-Lao Treaty recognizes full independence)",
+      "events": [
+        {
+          "year": 1949,
+          "date": "19 July 1949",
+          "label": "independence from France",
+          "from": "France",
+          "power": "France"
+        },
+        {
+          "year": 1953,
+          "date": "22 October 1953",
+          "label": "Franco-Lao Treaty recognizes full independence"
+        }
+      ],
+      "mentions": [
+        "France",
+        "Japan",
+        "China",
+        "Malaysia"
+      ],
+      "formerNames": [],
+      "background": "Modern-day Laos has its roots in the ancient Lao kingdom of Lan Xang, established in the 14th century under King Fa Ngum. For 300 years, Lan Xang had influence reaching into present-day Cambodia and Thailand, as well as over all of what is now Laos."
+    },
+    "country:LVA": {
+      "record": "18 November 1918 (from Soviet Russia); 4 May 1990 (declared from the Soviet Union); 6 September 1991 (recognized by the Soviet Union)",
+      "events": [
+        {
+          "year": 1918,
+          "date": "18 November 1918",
+          "label": "independence from Soviet Russia",
+          "from": "Soviet Russia",
+          "power": "Russia"
+        },
+        {
+          "year": 1990,
+          "date": "4 May 1990",
+          "label": "independence declared from the Soviet Union",
+          "from": "the Soviet Union",
+          "power": "Soviet Union",
+          "declared": true
+        },
+        {
+          "year": 1991,
+          "date": "6 September 1991",
+          "label": "recognized by the Soviet Union"
+        }
+      ],
+      "mentions": [
+        "Soviet Union",
+        "Russia",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "Several eastern Baltic tribes merged in medieval times to form the ethnic core of the Latvian people (ca. 8th-12th centuries A.D.). The region subsequently came under the control of Germans, Poles, Swedes, and finally Russians."
+    },
+    "country:LBN": {
+      "record": "22 November 1943 (from League of Nations mandate under French administration)",
+      "events": [
+        {
+          "year": 1943,
+          "date": "22 November 1943",
+          "label": "independence from League of Nations mandate under French administration",
+          "from": "League of Nations mandate under French administration",
+          "power": "France"
+        }
+      ],
+      "mentions": [
+        "France",
+        "Ottoman Empire",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "As a result of its location at the crossroads of three continents, the area that is modern-day Lebanon is rich in cultural and religious diversity. This region was subject to various foreign conquerors for much of its history, including the Romans, Arabs, and Ottomans."
+    },
+    "country:LSO": {
+      "record": "4 October 1966 (from the UK)",
+      "events": [
+        {
+          "year": 1966,
+          "date": "4 October 1966",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Netherlands",
+        "South Africa"
+      ],
+      "formerNames": [
+        "Basutoland"
+      ],
+      "background": "Paramount chief Moshoeshoe I consolidated what would become Basutoland in the early 19th century and made himself king in 1822."
+    },
+    "country:LBY": {
+      "record": "24 December 1951 (from UN trusteeship)",
+      "events": [
+        {
+          "year": 1951,
+          "date": "24 December 1951",
+          "label": "independence from UN trusteeship",
+          "from": "UN trusteeship"
+        }
+      ],
+      "mentions": [
+        "Ottoman Empire"
+      ],
+      "formerNames": [],
+      "background": "Berbers have inhabited central north Africa since ancient times, but Phoenicians, Greeks, Carthaginians, Persians, Egyptians, Romans, and Vandals have all settled and ruled the region."
+    },
+    "country:LIE": {
+      "record": "23 January 1719 (Principality of Liechtenstein established); 12 July 1806 (independence from the Holy Roman Empire); 24 August 1866 (independence from the German Confederation)",
+      "events": [
+        {
+          "year": 1719,
+          "date": "23 January 1719",
+          "label": "Principality of Liechtenstein established"
+        },
+        {
+          "year": 1806,
+          "date": "12 July 1806",
+          "label": "independence from the Holy Roman Empire",
+          "from": "the Holy Roman Empire",
+          "power": "Holy Roman Empire"
+        },
+        {
+          "year": 1866,
+          "date": "24 August 1866",
+          "label": "independence from the German Confederation",
+          "from": "the German Confederation"
+        }
+      ],
+      "mentions": [
+        "France",
+        "Russia",
+        "United States",
+        "Holy Roman Empire"
+      ],
+      "formerNames": [],
+      "background": "The Principality of Liechtenstein was established within the Holy Roman Empire in 1719. Occupied by both French and Russian troops during the Napoleonic Wars, it became a sovereign state in 1806 and joined the German Confederation in 1815."
+    },
+    "country:LTU": {
+      "record": "16 February 1918 (from Soviet Russia and Germany); 11 March 1990 (declared from the Soviet Union); 6 September 1991 (recognized by the Soviet Union)",
+      "events": [
+        {
+          "year": 1918,
+          "date": "16 February 1918",
+          "label": "independence from Soviet Russia and Germany",
+          "from": "Soviet Russia and Germany"
+        },
+        {
+          "year": 1990,
+          "date": "11 March 1990",
+          "label": "independence declared from the Soviet Union",
+          "from": "the Soviet Union",
+          "power": "Soviet Union",
+          "declared": true
+        },
+        {
+          "year": 1991,
+          "date": "6 September 1991",
+          "label": "recognized by the Soviet Union"
+        },
+        {
+          "year": 1253,
+          "date": "6 July 1253",
+          "label": "coronation of Mindaugas, traditional founding date"
+        },
+        {
+          "year": 1569,
+          "date": "1 July 1569",
+          "label": "Polish-Lithuanian Commonwealth created"
+        }
+      ],
+      "mentions": [
+        "Soviet Union",
+        "Russia",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "Lithuanian lands were united under Mindaugas in 1236; over the next century, Lithuania extended its territory through alliances and conquest to include most of present-day Belarus and Ukraine."
+    },
+    "country:LUX": {
+      "record": "1839 (from the Netherlands)",
+      "events": [
+        {
+          "year": 1839,
+          "date": "1839",
+          "label": "independence from the Netherlands",
+          "from": "the Netherlands",
+          "power": "Netherlands"
+        }
+      ],
+      "mentions": [
+        "Netherlands",
+        "Belgium"
+      ],
+      "formerNames": [],
+      "background": "Founded in 963, Luxembourg became a grand duchy in 1815 and a constituent part of the Kingdom of the Netherlands after the Congress of Vienna."
+    },
+    "country:MDG": {
+      "record": "26 June 1960 (from France)",
+      "events": [
+        {
+          "year": 1960,
+          "date": "26 June 1960",
+          "label": "independence from France",
+          "from": "France",
+          "power": "France"
+        }
+      ],
+      "mentions": [
+        "France",
+        "Indonesia"
+      ],
+      "formerNames": [
+        "Malagasy Republic"
+      ],
+      "background": "Madagascar was one of the last major habitable landmasses on earth to be settled by humans. While there is some evidence of human presence on the island in the millennia B.C., large-scale settlement began between A.D. 350 and 550 with settlers from present-day Indonesia."
+    },
+    "country:MWI": {
+      "record": "6 July 1964 (from the UK)",
+      "events": [
+        {
+          "year": 1964,
+          "date": "6 July 1964",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom"
+      ],
+      "formerNames": [
+        "Nyasaland"
+      ],
+      "background": "Malawi shares its name with the Chewa word for flames and is linked to the Maravi people from whom the Chewa language originated. The Maravi settled in what is now Malawi around 1400, during one of the later waves of Bantu migration across central and southern Africa."
+    },
+    "country:MYS": {
+      "record": "31 August 1957 (from the UK)",
+      "events": [
+        {
+          "year": 1957,
+          "date": "31 August 1957",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Portugal",
+        "Netherlands",
+        "Japan",
+        "China",
+        "Indonesia",
+        "Malaysia"
+      ],
+      "formerNames": [],
+      "background": "Malaysia’s location has long made it an important cultural, economic, historical, social, and trade link between the islands of Southeast Asia and the mainland."
+    },
+    "country:MDV": {
+      "record": "26 July 1965 (from the UK)",
+      "events": [
+        {
+          "year": 1965,
+          "date": "26 July 1965",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom"
+      ],
+      "formerNames": [],
+      "background": "A sultanate since the 12th century, the Maldives became a British protectorate in 1887 and a republic in 1968, three years after independence. President Maumoon Abdul Gayoom dominated Maldives' political scene for 30 years, elected to six successive terms by single-party referendums."
+    },
+    "country:MLI": {
+      "record": "22 September 1960 (from France)",
+      "events": [
+        {
+          "year": 1960,
+          "date": "22 September 1960",
+          "label": "independence from France",
+          "from": "France",
+          "power": "France"
+        }
+      ],
+      "mentions": [
+        "France",
+        "Sudan"
+      ],
+      "formerNames": [
+        "French Sudan"
+      ],
+      "background": "Present-day Mali is named after the Mali Empire that ruled the region between the 13th and 16th centuries. At its peak in the 14th century, it was the largest and wealthiest empire in West Africa and controlled an area about twice the size of modern-day France."
+    },
+    "country:MLT": {
+      "record": "21 September 1964 (from the UK)",
+      "events": [
+        {
+          "year": 1964,
+          "date": "21 September 1964",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "France",
+        "Spain"
+      ],
+      "formerNames": [],
+      "background": "With a civilization that dates back thousands of years, Malta boasts some of the oldest megalithic sites in the world."
+    },
+    "country:MHL": {
+      "record": "21 October 1986 (from the US-administered UN trusteeship)",
+      "events": [
+        {
+          "year": 1986,
+          "date": "21 October 1986",
+          "label": "independence from the US-administered UN trusteeship",
+          "from": "the US-administered UN trusteeship",
+          "power": "United States"
+        }
+      ],
+      "mentions": [
+        "Spain",
+        "Japan",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "Humans arrived in the Marshall Islands in the first millennium B.C. and gradually created permanent settlements on the various atolls. The early inhabitants were skilled navigators who frequently traveled between atolls using stick charts to map the islands."
+    },
+    "country:MRT": {
+      "record": "28 November 1960 (from France)",
+      "events": [
+        {
+          "year": 1960,
+          "date": "28 November 1960",
+          "label": "independence from France",
+          "from": "France",
+          "power": "France"
+        }
+      ],
+      "mentions": [
+        "France"
+      ],
+      "formerNames": [],
+      "background": "The Amazigh and Bafour people were among the earliest settlers in what is now Mauritania and among the first in recorded history to convert from a nomadic to agricultural lifestyle."
+    },
+    "country:MUS": {
+      "record": "12 March 1968 (from the UK)",
+      "events": [
+        {
+          "year": 1968,
+          "date": "12 March 1968",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "France",
+        "Netherlands"
+      ],
+      "formerNames": [],
+      "background": "Although known to Arab and European sailors since at least the early 1500s, the island of Mauritius was uninhabited until 1638 when the Dutch established a settlement named in honor of Prince Maurits van Nassau."
+    },
+    "country:MEX": {
+      "record": "16 September 1810 (declared independence from Spain); 27 September 1821 (recognized by Spain)",
+      "events": [
+        {
+          "year": 1810,
+          "date": "16 September 1810",
+          "label": "independence declared from Spain",
+          "from": "Spain",
+          "power": "Spain",
+          "declared": true
+        },
+        {
+          "year": 1821,
+          "date": "27 September 1821",
+          "label": "recognized by Spain"
+        }
+      ],
+      "mentions": [
+        "Spain",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "Mexico was the site of several advanced Amerindian civilizations — including the Olmec, Toltec, Teotihuacan, Zapotec, Maya, and Aztec — until Spain conquered and colonized the area in the early 16th century."
+    },
+    "country:FSM": {
+      "record": "3 November 1986 (from the US-administered UN trusteeship)",
+      "events": [
+        {
+          "year": 1986,
+          "date": "3 November 1986",
+          "label": "independence from the US-administered UN trusteeship",
+          "from": "the US-administered UN trusteeship",
+          "power": "United States"
+        }
+      ],
+      "mentions": [
+        "Spain",
+        "Portugal",
+        "Japan",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "Each of the four states that compose the Federated States of Micronesia (Fsm) — Chuuk, Kosrae, Pohnpei, and Yap — has its own unique history and cultural traditions."
+    },
+    "country:MDA": {
+      "record": "27 August 1991 (from the Soviet Union)",
+      "events": [
+        {
+          "year": 1991,
+          "date": "27 August 1991",
+          "label": "independence from the Soviet Union",
+          "from": "the Soviet Union",
+          "power": "Soviet Union"
+        }
+      ],
+      "mentions": [
+        "Soviet Union",
+        "Russia"
+      ],
+      "formerNames": [],
+      "background": "A large portion of present-day Moldovan territory became a province of the Russian Empire in 1812 and then unified with Romania in 1918 in the aftermath of World War I. This territory was then incorporated into the Soviet Union at the close of World War II."
+    },
+    "country:MCO": {
+      "record": "1419 (beginning of permanent rule by the House of Grimaldi)",
+      "events": [
+        {
+          "year": 1419,
+          "date": "1419",
+          "label": "beginning of permanent rule by the House of Grimaldi"
+        }
+      ],
+      "mentions": [
+        "France"
+      ],
+      "formerNames": [],
+      "background": "The Genoese built a fortress on the site of present-day Monaco in 1215. The current ruling Grimaldi family first seized control in 1297 but was not able to permanently secure its holding until 1419."
+    },
+    "country:MNG": {
+      "record": "29 December 1911 (independence declared from China; in actuality, autonomy attained); 11 July 1921 (from China)",
+      "events": [
+        {
+          "year": 1911,
+          "date": "29 December 1911",
+          "label": "independence declared from China",
+          "from": "China",
+          "power": "China",
+          "declared": true
+        },
+        {
+          "year": 1921,
+          "date": "11 July 1921",
+          "label": "independence from China",
+          "from": "China",
+          "power": "China"
+        }
+      ],
+      "mentions": [
+        "Soviet Union",
+        "Russia",
+        "Japan",
+        "United States",
+        "China"
+      ],
+      "formerNames": [],
+      "background": "The peoples of Mongolia have a long history under a number of nomadic empires dating back to the Xiongnu in the 4th century B.C., and the name Mongol goes back to at least the 11th century A.D. The most famous Mongol, TemÜÜJin (aka Genghis Khan), emerged as the ruler of all Mongols in the early 1200s."
+    },
+    "country:MNE": {
+      "record": "3 June 2006 (from the State Union of Serbia and Montenegro); notable earlier dates: 13 March 1852 (Principality of Montenegro established); 13 July 1878 (Congress of Berlin recognizes Montenegrin independence)",
+      "events": [
+        {
+          "year": 2006,
+          "date": "3 June 2006",
+          "label": "independence from the State Union of Serbia and Montenegro",
+          "from": "the State Union of Serbia and Montenegro",
+          "power": "Serbia and Montenegro"
+        },
+        {
+          "year": 1852,
+          "date": "13 March 1852",
+          "label": "Principality of Montenegro established"
+        },
+        {
+          "year": 1878,
+          "date": "13 July 1878",
+          "label": "Congress of Berlin recognizes Montenegrin independence"
+        },
+        {
+          "year": 1910,
+          "date": "28 August 1910",
+          "label": "Kingdom of Montenegro established"
+        }
+      ],
+      "mentions": [
+        "Yugoslavia",
+        "Ottoman Empire",
+        "Serbia and Montenegro"
+      ],
+      "formerNames": [],
+      "background": "The use of the name Crna Gora or Black Mountain (Montenegro) began in the 13th century in reference to a highland region in the Serbian province of Zeta. Under Ottoman control beginning in 1496, Montenegro was a semi-autonomous theocracy ruled by a series of bishop princes until 1852, when it became a secular principality."
+    },
+    "country:MAR": {
+      "record": "2 March 1956 (from France)",
+      "events": [
+        {
+          "year": 1956,
+          "date": "2 March 1956",
+          "label": "independence from France",
+          "from": "France",
+          "power": "France"
+        }
+      ],
+      "mentions": [
+        "France",
+        "Spain",
+        "United States",
+        "Sudan"
+      ],
+      "formerNames": [],
+      "background": "In 788, about a century after the Arab conquest of North Africa, a series of Muslim dynasties began to rule in Morocco. In the 16th century, the Sa'adi monarchy, particularly under Ahmad al-Mansur (1578-1603), repelled foreign invaders and inaugurated a golden age."
+    },
+    "country:MOZ": {
+      "record": "25 June 1975 (from Portugal)",
+      "events": [
+        {
+          "year": 1975,
+          "date": "25 June 1975",
+          "label": "independence from Portugal",
+          "from": "Portugal",
+          "power": "Portugal"
+        }
+      ],
+      "mentions": [
+        "Portugal",
+        "Ethiopia",
+        "South Africa"
+      ],
+      "formerNames": [
+        "Portuguese East Africa"
+      ],
+      "background": "In the first half of the second millennium A.D., northern Mozambican port towns were frequented by traders from Somalia, Ethiopia, Egypt, Arabia, Persia, and India. The Portuguese were able to wrest much of the coastal trade from Arab Muslims in the centuries after 1500, and they set up their own colonies."
+    },
+    "country:MMR": {
+      "record": "4 January 1948 (from the UK)",
+      "events": [
+        {
+          "year": 1948,
+          "date": "4 January 1948",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "Burma is home to ethnic Burmans and scores of other ethnic and religious minority groups that have resisted external efforts to consolidate control of the country throughout its history."
+    },
+    "country:NAM": {
+      "record": "21 March 1990 (from South African mandate)",
+      "events": [
+        {
+          "year": 1990,
+          "date": "21 March 1990",
+          "label": "independence from South African mandate",
+          "from": "South African mandate",
+          "power": "South Africa"
+        }
+      ],
+      "mentions": [
+        "South Africa"
+      ],
+      "formerNames": [
+        "South-West Africa"
+      ],
+      "background": "Various ethnic groups occupied southwestern Africa prior to Germany establishing a colony over most of the territory in 1884. South Africa occupied the colony, then known as German South West Africa, in 1915 during World War I and administered it as a mandate until after World War II, when it annexed the territory."
+    },
+    "country:NRU": {
+      "record": "31 January 1968 (from the Australia-, NZ-, and UK-administered UN trusteeship)",
+      "events": [
+        {
+          "year": 1968,
+          "date": "31 January 1968",
+          "label": "independence from the Australia-, NZ-, and UK-administered UN trusteeship",
+          "from": "the Australia-, NZ-, and UK-administered UN trusteeship"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Russia",
+        "Japan",
+        "Australia",
+        "New Zealand"
+      ],
+      "formerNames": [
+        "Pleasant Island"
+      ],
+      "background": "By 1000 B.C., Micronesian and Polynesian settlers inhabited Nauru, and the island was divided among 12 clans. Nauru developed in relative isolation because ocean currents made landfall on the island difficult."
+    },
+    "country:NPL": {
+      "record": "1768 (unified by Prithvi Narayan Shah)",
+      "events": [
+        {
+          "year": 1768,
+          "date": "1768",
+          "label": "unified by Prithvi Narayan Shah"
+        }
+      ],
+      "mentions": [
+        "United Kingdom"
+      ],
+      "formerNames": [],
+      "background": "During the late 18th and early 19th centuries, the principality of Gorkha united many of the other principalities and states of the sub-Himalayan region into a Nepali Kingdom."
+    },
+    "country:NZL": {
+      "record": "26 September 1907 (from the UK)",
+      "events": [
+        {
+          "year": 1907,
+          "date": "26 September 1907",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "France",
+        "Netherlands",
+        "United States",
+        "China",
+        "Australia",
+        "New Zealand"
+      ],
+      "formerNames": [],
+      "background": "Polynesians settled New Zealand between the late 1200s and the mid-1300s. They called the land Aotearoa, which legend holds is the name of the canoe that Kupe, the first Polynesian in New Zealand, used to sail to the country; the name Aotearoa is now in widespread use as the local Maori name for the country."
+    },
+    "country:NIC": {
+      "record": "15 September 1821 (from Spain)",
+      "events": [
+        {
+          "year": 1821,
+          "date": "15 September 1821",
+          "label": "independence from Spain",
+          "from": "Spain",
+          "power": "Spain"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Spain",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "The Pacific coast of Nicaragua was settled as a Spanish colony in the early 16th century. Independence from Spain was declared in 1821, and the country became an independent republic in 1838."
+    },
+    "country:NER": {
+      "record": "3 August 1960 (from France)",
+      "events": [
+        {
+          "year": 1960,
+          "date": "3 August 1960",
+          "label": "independence from France",
+          "from": "France",
+          "power": "France"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "France"
+      ],
+      "formerNames": [],
+      "background": "Nomadic peoples from the Saharan north and agriculturalists from the south settled present-day Niger. The Taureg kingdom of Takedda was one of the largest kingdoms in the north and played a prominent role in regional trade in the 14th century."
+    },
+    "country:NGA": {
+      "record": "1 October 1960 (from the UK)",
+      "events": [
+        {
+          "year": 1960,
+          "date": "1 October 1960",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom"
+      ],
+      "formerNames": [],
+      "background": "In ancient and pre-colonial times, the area of present-day Nigeria was occupied by a variety of ethnic groups with different languages and traditions."
+    },
+    "country:PRK": {
+      "record": "15 August 1945 (from Japan)",
+      "events": [
+        {
+          "year": 1945,
+          "date": "15 August 1945",
+          "label": "independence from Japan",
+          "from": "Japan",
+          "power": "Japan"
+        }
+      ],
+      "mentions": [
+        "Soviet Union",
+        "Russia",
+        "Japan",
+        "United States",
+        "China"
+      ],
+      "formerNames": [],
+      "background": "The first recorded kingdom (Choson) on the Korean Peninsula dates from approximately 2300 B.C. Over the subsequent centuries, three main kingdoms — Kogoryo, Paekche, and Silla — were established on the Peninsula."
+    },
+    "country:MKD": {
+      "record": "8 September 1991 (referendum endorsed independence from Yugoslavia)",
+      "events": [
+        {
+          "year": 1991,
+          "date": "8 September 1991",
+          "label": "referendum endorsed independence from Yugoslavia",
+          "from": "Yugoslavia",
+          "power": "Yugoslavia"
+        }
+      ],
+      "mentions": [
+        "Yugoslavia",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "North Macedonia gained its independence peacefully from Yugoslavia in 1991 under the name of \"Macedonia.\" Greece objected to the new country’s name, insisting it implied territorial pretensions to the northern Greek province of Macedonia, and democratic backsliding for several years stalled North Macedonia's movement toward Euro-Atlantic integration."
+    },
+    "country:NOR": {
+      "record": "7 June 1905 (union with Sweden declared dissolved); 26 October 1905 (Sweden agreed to the repeal of the union); notable earlier dates: ca. 872 (traditional unification of Norwegian kingdoms by Harald Fairhair)",
+      "events": [
+        {
+          "year": 1905,
+          "date": "7 June 1905",
+          "label": "union with Sweden declared dissolved"
+        },
+        {
+          "year": 1905,
+          "date": "26 October 1905",
+          "label": "Sweden agreed to the repeal of the union"
+        },
+        {
+          "year": 1397,
+          "date": "1397",
+          "label": "Kalmar Union of Denmark, Norway, and Sweden"
+        },
+        {
+          "year": 1814,
+          "date": "17 May 1814",
+          "label": "Norwegian constitution adopted"
+        },
+        {
+          "year": 1814,
+          "date": "4 November 1814",
+          "label": "Sweden-Norway union confirmed"
+        }
+      ],
+      "mentions": [
+        "Denmark"
+      ],
+      "formerNames": [],
+      "background": "Two centuries of Viking raids into Europe tapered off after King Olav Tryggvason adopted Christianity in 994; conversion of the Norwegian kingdom occurred over the next several decades."
+    },
+    "country:OMN": {
+      "record": "1650 (expulsion of the Portuguese)",
+      "events": [
+        {
+          "year": 1650,
+          "date": "1650",
+          "label": "expulsion of the Portuguese"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Portugal",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "The inhabitants of the area of present-day Oman have long prospered from Indian Ocean trade. In the late 18th century, the nascent sultanate in Muscat signed the first in a series of friendship treaties with Britain."
+    },
+    "country:PAK": {
+      "record": "14 August 1947 (from British India)",
+      "events": [
+        {
+          "year": 1947,
+          "date": "14 August 1947",
+          "label": "independence from British India",
+          "from": "British India",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Ottoman Empire",
+        "Pakistan"
+      ],
+      "formerNames": [],
+      "background": "The Indus Valley civilization, one of the oldest in the world and dating back at least 5,000 years, spread over much of modern-day Pakistan. During the second millennium B.C., remnants of this culture fused with the migrating Indo-Aryan peoples."
+    },
+    "country:PLW": {
+      "record": "1 October 1994 (from the US-administered UN trusteeship)",
+      "events": [
+        {
+          "year": 1994,
+          "date": "1 October 1994",
+          "label": "independence from the US-administered UN trusteeship",
+          "from": "the US-administered UN trusteeship",
+          "power": "United States"
+        }
+      ],
+      "mentions": [
+        "Spain",
+        "Japan",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "Humans arrived in the Palauan archipelago from Southeast Asia around 1000 B.C. and developed a complex, highly organized matrilineal society where high-ranking women picked the chiefs."
+    },
+    "country:PAN": {
+      "record": "3 November 1903 (from Colombia); 28 November 1821 (from Spain)",
+      "events": [
+        {
+          "year": 1903,
+          "date": "3 November 1903",
+          "label": "independence from Colombia",
+          "from": "Colombia",
+          "power": "Colombia"
+        },
+        {
+          "year": 1821,
+          "date": "28 November 1821",
+          "label": "independence from Spain",
+          "from": "Spain",
+          "power": "Spain"
+        }
+      ],
+      "mentions": [
+        "Spain",
+        "United States",
+        "Colombia"
+      ],
+      "formerNames": [],
+      "background": "Explored and settled by the Spanish in the 16th century, Panama broke with Spain in 1821 and joined a union of Colombia, Ecuador, and Venezuela that was named the Republic of Gran Colombia."
+    },
+    "country:PNG": {
+      "record": "16 September 1975 (from the Australia-administered UN trusteeship)",
+      "events": [
+        {
+          "year": 1975,
+          "date": "16 September 1975",
+          "label": "independence from the Australia-administered UN trusteeship",
+          "from": "the Australia-administered UN trusteeship",
+          "power": "Australia"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Spain",
+        "Portugal",
+        "Japan",
+        "Indonesia",
+        "Australia"
+      ],
+      "formerNames": [],
+      "background": "Papua New Guinea (Png) occupies the eastern half of the island of New Guinea; the western half is part of Indonesia. Png was first settled between 50,000 and 60,000 years ago."
+    },
+    "country:PRY": {
+      "record": "14-15 May 1811 (from Spain)",
+      "events": [
+        {
+          "year": 1811,
+          "date": "14-15 May 1811",
+          "label": "independence from Spain",
+          "from": "Spain",
+          "power": "Spain"
+        }
+      ],
+      "mentions": [
+        "Spain",
+        "Brazil"
+      ],
+      "formerNames": [],
+      "background": "Several Indigenous groups, principally belonging to the Guarani language family, inhabited the area of modern Paraguay before the arrival of the Spanish in the early 16th century, when the territory was incorporated into the Viceroyalty of Peru."
+    },
+    "country:PER": {
+      "record": "28 July 1821 (from Spain)",
+      "events": [
+        {
+          "year": 1821,
+          "date": "28 July 1821",
+          "label": "independence from Spain",
+          "from": "Spain",
+          "power": "Spain"
+        }
+      ],
+      "mentions": [
+        "Spain"
+      ],
+      "formerNames": [],
+      "background": "Ancient Peru was the seat of several prominent Andean civilizations, most notably that of the Incas whose empire was captured by Spanish conquistadors in 1533. Peru declared its independence in 1821, and remaining Spanish forces were defeated in 1824."
+    },
+    "country:PHL": {
+      "record": "4 July 1946 (from the US)",
+      "events": [
+        {
+          "year": 1946,
+          "date": "4 July 1946",
+          "label": "independence from the US",
+          "from": "the US",
+          "power": "United States"
+        }
+      ],
+      "mentions": [
+        "Spain",
+        "Japan",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "The Philippine Islands became a Spanish colony during the 16th century; they were ceded to the US in 1898 following the Spanish-American War. Led by Emilio Aguinaldo, the Filipinos conducted an insurgency against US rule from 1899-1902, although some fighting continued in outlying islands as late as 1913."
+    },
+    "country:POL": {
+      "record": "11 November 1918 (republic proclaimed); notable earlier dates: 14 April 966 (adoption of Christianity, traditional founding date), 1 July 1569 (Polish-Lithuanian Commonwealth created)",
+      "events": [
+        {
+          "year": 1918,
+          "date": "11 November 1918",
+          "label": "republic proclaimed"
+        },
+        {
+          "year": 966,
+          "date": "14 April 966",
+          "label": "adoption of Christianity, traditional founding date"
+        },
+        {
+          "year": 1569,
+          "date": "1 July 1569",
+          "label": "Polish-Lithuanian Commonwealth created"
+        }
+      ],
+      "mentions": [
+        "Soviet Union",
+        "Russia"
+      ],
+      "formerNames": [],
+      "background": "Poland's history as a state began near the middle of the 10th century. By the mid-16th century, the Polish-Lithuanian Commonwealth ruled a vast tract of land in Central and Eastern Europe."
+    },
+    "country:PRT": {
+      "record": "1143 (Kingdom of Portugal recognized); 1 December 1640 (independence reestablished after 60 years of Spanish rule); 5 October 1910 (republic proclaimed)",
+      "events": [
+        {
+          "year": 1143,
+          "date": "1143",
+          "label": "Kingdom of Portugal recognized"
+        },
+        {
+          "year": 1640,
+          "date": "1 December 1640",
+          "label": "independence reestablished after 60 years of Spanish rule"
+        },
+        {
+          "year": 1910,
+          "date": "5 October 1910",
+          "label": "republic proclaimed"
+        }
+      ],
+      "mentions": [
+        "Spain",
+        "Portugal",
+        "Brazil"
+      ],
+      "formerNames": [],
+      "background": "A global maritime power during the 15th and 16th centuries, Portugal lost much of its wealth and status with the destruction of Lisbon in a 1755 earthquake, occupation during the Napoleonic Wars, and the independence of Brazil, its wealthiest colony, in 1822."
+    },
+    "country:QAT": {
+      "record": "3 September 1971 (from the UK)",
+      "events": [
+        {
+          "year": 1971,
+          "date": "3 September 1971",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "Ruled by the Al Thani family since the mid-1800s, Qatar within the last 60 years transformed itself from a poor British protectorate noted mainly for pearling into an independent state with significant hydrocarbon revenues."
+    },
+    "country:COG": {
+      "record": "15 August 1960 (from France)",
+      "events": [
+        {
+          "year": 1960,
+          "date": "15 August 1960",
+          "label": "independence from France",
+          "from": "France",
+          "power": "France"
+        }
+      ],
+      "mentions": [
+        "France"
+      ],
+      "formerNames": [],
+      "background": "Upon independence in 1960, the former French region of Middle Congo became the Republic of the Congo. From 1968 to 1992, the country was named the People’s Republic of the Congo."
+    },
+    "country:ROU": {
+      "record": "9 May 1877 (independence proclaimed from the Ottoman Empire; 13 July 1878 (independence recognized by the Treaty of Berlin); 26 March 1881 (kingdom proclaimed); 30 December 1947 (republic proclaimed)",
+      "events": [
+        {
+          "year": 1878,
+          "date": "13 July 1878",
+          "label": "independence recognized by the Treaty of Berlin"
+        },
+        {
+          "year": 1881,
+          "date": "26 March 1881",
+          "label": "kingdom proclaimed"
+        },
+        {
+          "year": 1947,
+          "date": "30 December 1947",
+          "label": "republic proclaimed"
+        }
+      ],
+      "mentions": [
+        "Soviet Union",
+        "Ottoman Empire"
+      ],
+      "formerNames": [],
+      "background": "The principalities of Wallachia and Moldavia — for centuries under the control of the Turkish Ottoman Empire — secured their autonomy through the Treaty of Paris in 1856. They were de facto linked in 1859 and formally united in 1862 under the new name of Romania."
+    },
+    "country:RUS": {
+      "record": "25 December 1991 (from the Soviet Union; Russian SFSR renamed Russian Federation); notable earlier dates: 1157 (Principality of Vladimir-Suzdal created); 16 January 1547 (Tsardom of Muscovy established)",
+      "events": [
+        {
+          "year": 1991,
+          "date": "25 December 1991",
+          "label": "independence from the Soviet Union",
+          "from": "the Soviet Union",
+          "power": "Soviet Union"
+        },
+        {
+          "year": 1157,
+          "date": "1157",
+          "label": "Principality of Vladimir-Suzdal created"
+        },
+        {
+          "year": 1547,
+          "date": "16 January 1547",
+          "label": "Tsardom of Muscovy established"
+        },
+        {
+          "year": 1721,
+          "date": "22 October 1721",
+          "label": "Russian Empire proclaimed"
+        },
+        {
+          "year": 1922,
+          "date": "30 December 1922",
+          "label": "Soviet Union established"
+        }
+      ],
+      "mentions": [
+        "Soviet Union",
+        "Russia",
+        "Japan",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "Founded in the 12th century, the Principality of Muscovy emerged from over 200 years of Mongol domination (13th-15th centuries) and gradually conquered and absorbed surrounding principalities."
+    },
+    "country:RWA": {
+      "record": "1 July 1962 (from Belgium-administered UN trusteeship)",
+      "events": [
+        {
+          "year": 1962,
+          "date": "1 July 1962",
+          "label": "independence from Belgium-administered UN trusteeship",
+          "from": "Belgium-administered UN trusteeship",
+          "power": "Belgium"
+        }
+      ],
+      "mentions": [
+        "Belgium"
+      ],
+      "formerNames": [],
+      "background": "Rwanda — a small and centralized country dominated by rugged hills and fertile volcanic soil — has exerted disproportionate influence over the African Great Lakes region for centuries."
+    },
+    "country:KNA": {
+      "record": "19 September 1983 (from the UK)",
+      "events": [
+        {
+          "year": 1983,
+          "date": "19 September 1983",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "France"
+      ],
+      "formerNames": [],
+      "background": "Carib Indians occupied the islands of the West Indies for hundreds of years before the British and French began settlement in 1623. During the 17th century, Saint Kitts became the premier base for British and French expansion into the Caribbean."
+    },
+    "country:LCA": {
+      "record": "22 February 1979 (from the UK)",
+      "events": [
+        {
+          "year": 1979,
+          "date": "22 February 1979",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "France"
+      ],
+      "formerNames": [],
+      "background": "England and France contested Saint Lucia — with its fine natural harbor at Castries and burgeoning sugar industry — throughout the 17th and early 18th centuries, with possession changing 14 times; it was finally ceded to the UK in 1814 and became part of the British Windward Islands colony."
+    },
+    "country:VCT": {
+      "record": "27 October 1979 (from the UK)",
+      "events": [
+        {
+          "year": 1979,
+          "date": "27 October 1979",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "France",
+        "Portugal"
+      ],
+      "formerNames": [],
+      "background": "Resistance from native Caribs prevented colonization on Saint Vincent until 1719. France and England disputed the island for most of the 18th century, but it was ceded to England in 1783."
+    },
+    "country:WSM": {
+      "record": "1 January 1962 (from New Zealand-administered UN trusteeship)",
+      "events": [
+        {
+          "year": 1962,
+          "date": "1 January 1962",
+          "label": "independence from New Zealand-administered UN trusteeship",
+          "from": "New Zealand-administered UN trusteeship",
+          "power": "New Zealand"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Netherlands",
+        "United States",
+        "New Zealand"
+      ],
+      "formerNames": [],
+      "background": "The first Austronesian settlers arrived in Samoa around 1000 B.C., and early Samoans traded and intermarried with Fijian and Tongan nobility. The fa’amatai system of titles and nobility developed, which dominates Samoan politics to this day; all but two seats in the legislature are reserved for matai, or heads of families."
+    },
+    "country:SMR": {
+      "record": "3 September 301 (traditional founding date)",
+      "events": [
+        {
+          "year": 301,
+          "date": "3 September 301",
+          "label": "traditional founding date"
+        }
+      ],
+      "mentions": [],
+      "formerNames": [],
+      "background": "Geographically the third-smallest state in Europe (after the Holy See and Monaco), San Marino also claims to be the world's oldest republic. According to tradition, it was founded by a Christian stonemason named Marinus in A.D. 301."
+    },
+    "country:STP": {
+      "record": "12 July 1975 (from Portugal)",
+      "events": [
+        {
+          "year": 1975,
+          "date": "12 July 1975",
+          "label": "independence from Portugal",
+          "from": "Portugal",
+          "power": "Portugal"
+        }
+      ],
+      "mentions": [
+        "Portugal"
+      ],
+      "formerNames": [],
+      "background": "Portugal discovered and colonized the uninhabited Sao Tome and Principe islands in the late 15th century, setting up a sugar-based economy that gave way to coffee and cocoa in the 19th century — all grown with African slave labor, a form of which lingered into the 20th century."
+    },
+    "country:SAU": {
+      "record": "23 September 1932 (unification of the kingdom)",
+      "events": [
+        {
+          "year": 1932,
+          "date": "23 September 1932",
+          "label": "unification of the kingdom"
+        }
+      ],
+      "mentions": [
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "Saudi Arabia is the birthplace of Islam and home to Islam's two holiest shrines in Mecca and Medina. The king's official title is the Custodian of the Two Holy Mosques. Abd Al-Aziz bin Abd al-Rahman Al Saud (Ibn Saud) founded the modern Saudi state in 1932 after a 30-year campaign to unify most of the Arabian Peninsula."
+    },
+    "country:SEN": {
+      "record": "4 April 1960 (from France); 20 August 1960 (full independence after federation with Mali is dissolved)",
+      "events": [
+        {
+          "year": 1960,
+          "date": "4 April 1960",
+          "label": "independence from France",
+          "from": "France",
+          "power": "France"
+        },
+        {
+          "year": 1960,
+          "date": "20 August 1960",
+          "label": "full independence after federation with Mali is dissolved"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "France",
+        "Portugal",
+        "Netherlands",
+        "Sudan"
+      ],
+      "formerNames": [],
+      "background": "Senegal is one of the few countries in the world with evidence of continuous human life from the Paleolithic period to present. Between the 14th and 16th centuries, the Jolof Empire ruled most of Senegal."
+    },
+    "country:SRB": {
+      "record": "5 June 2006 (from the State Union of Serbia and Montenegro); notable earlier dates: 1217 (Serbian Kingdom established); 16 April 1346 (Serbian Empire established); 13 July 1878 (Congress of Berlin recognizes Serbian independence)",
+      "events": [
+        {
+          "year": 2006,
+          "date": "5 June 2006",
+          "label": "independence from the State Union of Serbia and Montenegro",
+          "from": "the State Union of Serbia and Montenegro",
+          "power": "Serbia and Montenegro"
+        },
+        {
+          "year": 1217,
+          "date": "1217",
+          "label": "Serbian Kingdom established"
+        },
+        {
+          "year": 1346,
+          "date": "16 April 1346",
+          "label": "Serbian Empire established"
+        },
+        {
+          "year": 1878,
+          "date": "13 July 1878",
+          "label": "Congress of Berlin recognizes Serbian independence"
+        },
+        {
+          "year": 1918,
+          "date": "1 December 1918",
+          "label": "Kingdom of Serbs, Croats, and Slovenes established, later known as Yugoslavia"
+        }
+      ],
+      "mentions": [
+        "Yugoslavia",
+        "Serbia and Montenegro"
+      ],
+      "formerNames": [],
+      "background": "In 1918, the Croats, Serbs, and Slovenes formed a kingdom known after 1929 as Yugoslavia. The monarchy remained in power until 1945, when the communist Partisans headed by Josip Broz (aka Tito) took control of the newly created Socialist Federal Republic of Yugoslavia (Sfry)."
+    },
+    "country:SYC": {
+      "record": "29 June 1976 (from the UK)",
+      "events": [
+        {
+          "year": 1976,
+          "date": "29 June 1976",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "France"
+      ],
+      "formerNames": [],
+      "background": "Seychelles was uninhabited before Europeans discovered the islands early in the 16th century. After a lengthy struggle, France eventually ceded control of the islands to Great Britain in 1814."
+    },
+    "country:SLE": {
+      "record": "27 April 1961 (from the UK)",
+      "events": [
+        {
+          "year": 1961,
+          "date": "27 April 1961",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "Continuously populated for at least 2,500 years, the area now known as Sierra Leone is covered with dense jungle that allowed the region to remain relatively protected from invading West African empires."
+    },
+    "country:SGP": {
+      "record": "9 August 1965 (from Malaysian Federation)",
+      "events": [
+        {
+          "year": 1965,
+          "date": "9 August 1965",
+          "label": "independence from Malaysian Federation",
+          "from": "Malaysian Federation",
+          "power": "Malaysia"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Malaysia"
+      ],
+      "formerNames": [],
+      "background": "A Malay trading port known as Temasek existed on the island of Singapore by the 14th century. The settlement changed hands several times in the ensuing centuries and was eventually burned in the 17th century, falling into obscurity."
+    },
+    "country:SVK": {
+      "record": "1 January 1993 (Czechoslovakia split into the Czech Republic and Slovakia)",
+      "events": [
+        {
+          "year": 1993,
+          "date": "1 January 1993",
+          "label": "Czechoslovakia split into the Czech Republic and Slovakia"
+        }
+      ],
+      "mentions": [
+        "Soviet Union"
+      ],
+      "formerNames": [],
+      "background": "Slovakia traces its roots to the 9th century state of Great Moravia. The Slovaks then became part of the Hungarian Kingdom, where they remained for the next 1,000 years."
+    },
+    "country:SVN": {
+      "record": "25 June 1991 (from Yugoslavia)",
+      "events": [
+        {
+          "year": 1991,
+          "date": "25 June 1991",
+          "label": "independence from Yugoslavia",
+          "from": "Yugoslavia",
+          "power": "Yugoslavia"
+        }
+      ],
+      "mentions": [
+        "Yugoslavia",
+        "Serbia and Montenegro"
+      ],
+      "formerNames": [],
+      "background": "The Slovene lands were part of the Austro-Hungarian Empire until the latter's dissolution at the end of World War I. In 1918, Slovenia became part of the Kingdom of Serbs, Croats, and Slovenes, which was renamed Yugoslavia in 1929."
+    },
+    "country:SLB": {
+      "record": "7 July 1978 (from the UK)",
+      "events": [
+        {
+          "year": 1978,
+          "date": "7 July 1978",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Spain",
+        "Japan",
+        "United States",
+        "China",
+        "Australia"
+      ],
+      "formerNames": [],
+      "background": "Settlers from Papua arrived on the Solomon Islands around 30,000 years ago. About 6,000 years ago, Austronesian settlers came to the islands, and the two groups mixed extensively."
+    },
+    "country:ZAF": {
+      "record": "31 May 1910 (Union of South Africa formed from four British colonies: Cape Colony, Natal, Transvaal, and Orange Free State); 22 August 1934 (Status of the Union Act); 31 May 1961 (republic declared); 27 April 1994 (majority rule)",
+      "events": [
+        {
+          "year": 1910,
+          "date": "31 May 1910",
+          "label": "Union of South Africa formed from four British colonies: Cape Colony, Natal, Transvaal, and Orange Free State"
+        },
+        {
+          "year": 1934,
+          "date": "22 August 1934",
+          "label": "Status of the Union Act"
+        },
+        {
+          "year": 1961,
+          "date": "31 May 1961",
+          "label": "republic declared"
+        },
+        {
+          "year": 1994,
+          "date": "27 April 1994",
+          "label": "majority rule"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Netherlands",
+        "South Africa"
+      ],
+      "formerNames": [],
+      "background": "Some of the earliest human remains in the fossil record were found in South Africa. By about A.D. 500, Bantu-speaking groups began settling into what is now northeastern South Africa, displacing Khoisan-speaking groups to the southwest."
+    },
+    "country:KOR": {
+      "record": "15 August 1945 (from Japan)",
+      "events": [
+        {
+          "year": 1945,
+          "date": "15 August 1945",
+          "label": "independence from Japan",
+          "from": "Japan",
+          "power": "Japan"
+        }
+      ],
+      "mentions": [
+        "Soviet Union",
+        "Russia",
+        "Japan",
+        "United States",
+        "China"
+      ],
+      "formerNames": [],
+      "background": "The first recorded kingdom (Choson) on the Korean Peninsula dates from approximately 2300 B.C. Over the subsequent centuries, three main kingdoms — Kogoryo, Baekche, and Silla — were established on the Peninsula."
+    },
+    "country:SSD": {
+      "record": "9 July 2011 (from Sudan)",
+      "events": [
+        {
+          "year": 2011,
+          "date": "9 July 2011",
+          "label": "independence from Sudan",
+          "from": "Sudan",
+          "power": "Sudan"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "United States",
+        "Sudan"
+      ],
+      "formerNames": [],
+      "background": "South Sudan, which gained independence from Sudan in 2011, is the world’s newest country. Home to a diverse array of mainly Nilotic ethnolinguistic groups that settled in the territory in the 15th through 19th centuries, South Sudanese society is heavily dependent on seasonal migration and seasonal fluctuations in precipitation."
+    },
+    "country:LKA": {
+      "record": "4 February 1948 (from the UK)",
+      "events": [
+        {
+          "year": 1948,
+          "date": "4 February 1948",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Portugal",
+        "Netherlands",
+        "China"
+      ],
+      "formerNames": [
+        "Ceylon"
+      ],
+      "background": "The first Sinhalese arrived in Sri Lanka late in the 6th century B.C., probably from northern India. Buddhism was introduced circa 250 B.C., and the first kingdoms developed at the cities of Anuradhapura (from about 200 B.C. to about A.D. 1000) and Polonnaruwa (from about A.D. 1070 to 1200)."
+    },
+    "country:SDN": {
+      "record": "1 January 1956 (from Egypt and the UK)",
+      "events": [
+        {
+          "year": 1956,
+          "date": "1 January 1956",
+          "label": "independence from Egypt and the UK",
+          "from": "Egypt and the UK"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Sudan"
+      ],
+      "formerNames": [],
+      "background": "Long referred to as Nubia, modern-day Sudan was the site of the Kingdom of Kerma (ca. 2500-1500 B.C.) until it was absorbed into the New Kingdom of Egypt."
+    },
+    "country:SUR": {
+      "record": "25 November 1975 (from the Netherlands)",
+      "events": [
+        {
+          "year": 1975,
+          "date": "25 November 1975",
+          "label": "independence from the Netherlands",
+          "from": "the Netherlands",
+          "power": "Netherlands"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Spain",
+        "Netherlands"
+      ],
+      "formerNames": [
+        "Netherlands Guiana",
+        "Dutch Guiana"
+      ],
+      "background": "The Spaniards first explored Suriname in the 16th century, and the English then settled it in the mid-17th century. Suriname became a Dutch colony in 1667. With the abolition of African slavery in 1863, workers were brought in from India and Java."
+    },
+    "country:SWE": {
+      "record": "6 June 1523 (Gustav Vasa elected king of Sweden, marking the abolishment of the Kalmar Union of Denmark, Norway, and Sweden)",
+      "events": [
+        {
+          "year": 1523,
+          "date": "6 June 1523",
+          "label": "Gustav Vasa elected king of Sweden, marking the abolishment of the Kalmar Union of Denmark, Norway, and Sweden"
+        }
+      ],
+      "mentions": [
+        "Denmark"
+      ],
+      "formerNames": [],
+      "background": "A military power during the 17th century, Sweden maintained a policy of military non-alignment until it applied to join NATO in 2022. Sweden has not participated in any war for two centuries."
+    },
+    "country:CHE": {
+      "record": "1 August 1291 (founding of the Swiss Confederation)",
+      "events": [
+        {
+          "year": 1291,
+          "date": "1 August 1291",
+          "label": "founding of the Swiss Confederation"
+        }
+      ],
+      "mentions": [
+        "Holy Roman Empire"
+      ],
+      "formerNames": [],
+      "background": "The Swiss Confederation was founded in 1291 as a defensive alliance among three cantons. In succeeding years, other localities joined the original three. The Swiss Confederation secured its independence from the Holy Roman Empire in 1499."
+    },
+    "country:SYR": {
+      "record": "17 April 1946 (from League of Nations mandate under French administration)",
+      "events": [
+        {
+          "year": 1946,
+          "date": "17 April 1946",
+          "label": "independence from League of Nations mandate under French administration",
+          "from": "League of Nations mandate under French administration",
+          "power": "France"
+        }
+      ],
+      "mentions": [
+        "France",
+        "Russia",
+        "Ottoman Empire",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "After World War I, France acquired a mandate over the northern portion of the former Ottoman Empire province of Syria. The French administered the area until granting it independence in 1946."
+    },
+    "country:TJK": {
+      "record": "9 September 1991 (from the Soviet Union)",
+      "events": [
+        {
+          "year": 1991,
+          "date": "9 September 1991",
+          "label": "independence from the Soviet Union",
+          "from": "the Soviet Union",
+          "power": "Soviet Union"
+        }
+      ],
+      "mentions": [
+        "Soviet Union",
+        "Russia"
+      ],
+      "formerNames": [],
+      "background": "The Tajik people came under Russian imperial rule in the 1860s and 1870s, but Russia's hold on Central Asia weakened following the Revolution of 1917. At that time, bands of indigenous guerrillas (known as \"basmachi\") fiercely contested Bolshevik control of the area, which was not fully reestablished until 1925."
+    },
+    "country:TZA": {
+      "record": "26 April 1964 (Tanganyika united with Zanzibar to form the United Republic of Tanganyika and Zanzibar); 29 October 1964 (renamed United Republic of Tanzania)",
+      "events": [
+        {
+          "year": 1964,
+          "date": "26 April 1964",
+          "label": "Tanganyika united with Zanzibar to form the United Republic of Tanganyika and Zanzibar"
+        },
+        {
+          "year": 1964,
+          "date": "29 October 1964",
+          "label": "renamed United Republic of Tanzania"
+        },
+        {
+          "year": 1961,
+          "date": "9 December 1961",
+          "label": "Tanganyika became independent from UK-administered UN trusteeship"
+        },
+        {
+          "year": 1963,
+          "date": "10 December 1963",
+          "label": "Zanzibar became independent from UK"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Portugal"
+      ],
+      "formerNames": [],
+      "background": "Tanzania contains some of Africa’s most iconic national parks and famous paleoanthropological sites, and its diverse cultural heritage reflects the multiple ethnolinguistic groups that live in the country."
+    },
+    "country:THA": {
+      "record": "1238 (traditional founding date; never colonized)",
+      "events": [
+        {
+          "year": 1238,
+          "date": "1238",
+          "label": "traditional founding date"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "France",
+        "United States"
+      ],
+      "formerNames": [
+        "Siam"
+      ],
+      "background": "Two unified Thai kingdoms emerged in the mid-13th century. The Sukhothai Kingdom, located in the south-central plains, gained its independence from the Khmer Empire to the east."
+    },
+    "country:TLS": {
+      "record": "28 November 1975 (from Portugal); 20 May 2002 (from Indonesia)",
+      "events": [
+        {
+          "year": 1975,
+          "date": "28 November 1975",
+          "label": "independence from Portugal",
+          "from": "Portugal",
+          "power": "Portugal"
+        },
+        {
+          "year": 2002,
+          "date": "20 May 2002",
+          "label": "independence from Indonesia",
+          "from": "Indonesia",
+          "power": "Indonesia"
+        }
+      ],
+      "mentions": [
+        "Portugal",
+        "Netherlands",
+        "Japan",
+        "Indonesia",
+        "Australia"
+      ],
+      "formerNames": [],
+      "background": "The island of Timor was actively involved in Southeast Asian trading networks for centuries, and by the 14th century, it exported sandalwood, slaves, honey, and wax."
+    },
+    "country:TGO": {
+      "record": "27 April 1960 (from French-administered UN trusteeship)",
+      "events": [
+        {
+          "year": 1960,
+          "date": "27 April 1960",
+          "label": "independence from French-administered UN trusteeship",
+          "from": "French-administered UN trusteeship",
+          "power": "France"
+        }
+      ],
+      "mentions": [
+        "France"
+      ],
+      "formerNames": [],
+      "background": "From the 11th to the 16th centuries, various ethnic groups settled the Togo region."
+    },
+    "country:TON": {
+      "record": "4 June 1970 (from UK protectorate status)",
+      "events": [
+        {
+          "year": 1970,
+          "date": "4 June 1970",
+          "label": "independence from UK protectorate status",
+          "from": "UK protectorate status",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Netherlands",
+        "United States"
+      ],
+      "formerNames": [
+        "Friendly Islands"
+      ],
+      "background": "The first humans arrived in Tonga around 1000 B.C. The islands’ politics were highly centralized under the Tu’i Tonga, or Tongan king, by A.D. 950, and by 1200, the Tu’i Tonga had expanded his influence throughout Polynesia and into Melanesia and Micronesia."
+    },
+    "country:TTO": {
+      "record": "31 August 1962 (from the UK)",
+      "events": [
+        {
+          "year": 1962,
+          "date": "31 August 1962",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Spain"
+      ],
+      "formerNames": [],
+      "background": "First colonized by the Spanish, Trinidad and Tobago came under British control in the early 19th century. The emancipation of enslaved people in 1834 disrupted the twin islands' sugar industry."
+    },
+    "country:TUN": {
+      "record": "20 March 1956 (from France)",
+      "events": [
+        {
+          "year": 1956,
+          "date": "20 March 1956",
+          "label": "independence from France",
+          "from": "France",
+          "power": "France"
+        }
+      ],
+      "mentions": [
+        "France",
+        "Ottoman Empire"
+      ],
+      "formerNames": [],
+      "background": "Many empires have controlled Tunisia, including the Phoenicians (as early as the 12 century B.C.), Carthaginians, Romans, Vandals, Byzantines, various Arab and Berber kingdoms, and Ottomans (16th to late-19th centuries)."
+    },
+    "country:TUR": {
+      "record": "29 October 1923 (republic proclaimed, succeeding the Ottoman Empire)",
+      "events": [
+        {
+          "year": 1923,
+          "date": "29 October 1923",
+          "label": "republic proclaimed, succeeding the Ottoman Empire"
+        }
+      ],
+      "mentions": [
+        "Ottoman Empire",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "Modern Turkey was founded in 1923 from the remnants of the Ottoman Empire by reformer and national hero Mustafa Kemal, known as Ataturk or \"Father of the Turks.\" One-party rule ended in 1950, and periods of instability and military coups have since fractured the multiparty democracy, in 1960, 1971, 1980, 1997, and 2016."
+    },
+    "country:TKM": {
+      "record": "27 October 1991 (from the Soviet Union)",
+      "events": [
+        {
+          "year": 1991,
+          "date": "27 October 1991",
+          "label": "independence from the Soviet Union",
+          "from": "the Soviet Union",
+          "power": "Soviet Union"
+        }
+      ],
+      "mentions": [
+        "Soviet Union",
+        "Russia",
+        "Ottoman Empire"
+      ],
+      "formerNames": [],
+      "background": "Present-day Turkmenistan has been at the crossroads of civilizations for centuries. Various Persian empires ruled the area in antiquity, and Alexander the Great, Muslim armies, the Mongols, Turkic warriors, and eventually the Russians conquered it."
+    },
+    "country:TUV": {
+      "record": "1 October 1978 (from the UK)",
+      "events": [
+        {
+          "year": 1978,
+          "date": "1 October 1978",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Netherlands",
+        "Russia",
+        "Japan",
+        "United States"
+      ],
+      "formerNames": [
+        "Ellice Islands"
+      ],
+      "background": "Voyagers from either Samoa or Tonga first populated Tuvalu in the first millennium A.D., and the islands provided a stepping-stone for various Polynesian communities that subsequently settled in Melanesia and Micronesia."
+    },
+    "country:UGA": {
+      "record": "9 October 1962 (from the UK)",
+      "events": [
+        {
+          "year": 1962,
+          "date": "9 October 1962",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom"
+      ],
+      "formerNames": [],
+      "background": "An ancient crossroads for various migrations, Uganda has as many as 65 ethnic groups that speak languages from three of Africa’s four major linguistic families."
+    },
+    "country:UKR": {
+      "record": "24 August 1991 (from the Soviet Union); notable earlier dates: ca. 982 (Volodymyr I consolidates Kyivan Rus); 1199 (Principality (later Kingdom) of Ruthenia formed); 1648 (establishment of the Cossack Hetmanate)",
+      "events": [
+        {
+          "year": 1991,
+          "date": "24 August 1991",
+          "label": "independence from the Soviet Union",
+          "from": "the Soviet Union",
+          "power": "Soviet Union"
+        },
+        {
+          "year": 1199,
+          "date": "1199",
+          "label": "Principality (later Kingdom) of Ruthenia formed"
+        },
+        {
+          "year": 1648,
+          "date": "1648",
+          "label": "establishment of the Cossack Hetmanate"
+        },
+        {
+          "year": 1918,
+          "date": "22 January 1918",
+          "label": "independence from Soviet Russia",
+          "from": "Soviet Russia",
+          "power": "Russia"
+        }
+      ],
+      "mentions": [
+        "Soviet Union",
+        "Russia"
+      ],
+      "formerNames": [],
+      "background": "Ukraine was the center of the first eastern Slavic state, Kyivan Rus, which was the largest and most powerful state in Europe during the 10th and 11th centuries."
+    },
+    "country:ARE": {
+      "record": "2 December 1971 (from the UK)",
+      "events": [
+        {
+          "year": 1971,
+          "date": "2 December 1971",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "United States"
+      ],
+      "formerNames": [
+        "Trucial States"
+      ],
+      "background": "The Trucial States of the Persian Gulf coast granted the UK control of their defense and foreign affairs in 19th-century treaties. In 1971, six of these states — Abu Dhabi, 'Ajman, Al Fujayrah, Ash Shariqah, Dubayy, and Umm al Qaywayn — merged to form the United Arab Emirates (UAE)."
+    },
+    "country:GBR": {
+      "record": "no official date of independence: 927 (minor English kingdoms unite); 3 March 1284 (enactment of the Statute of Rhuddlan uniting England and Wales); 1536 (Act of Union incorporates England and Wales)",
+      "events": [
+        {
+          "year": 927,
+          "date": "927",
+          "label": "minor English kingdoms unite"
+        },
+        {
+          "year": 1284,
+          "date": "3 March 1284",
+          "label": "enactment of the Statute of Rhuddlan uniting England and Wales"
+        },
+        {
+          "year": 1536,
+          "date": "1536",
+          "label": "Act of Union incorporates England and Wales"
+        },
+        {
+          "year": 1707,
+          "date": "1 May 1707",
+          "label": "Acts of Union unite England, Scotland, and Wales as Great Britain"
+        },
+        {
+          "year": 1801,
+          "date": "1 January 1801",
+          "label": "Acts of Union unite Great Britain and Ireland as the United Kingdom of Great Britain and Ireland"
+        },
+        {
+          "year": 1921,
+          "date": "6 December 1921",
+          "label": "Anglo-Irish Treaty formalizes partition of Ireland"
+        }
+      ],
+      "mentions": [
+        "United Kingdom"
+      ],
+      "formerNames": [],
+      "background": "The United Kingdom of Great Britain and Northern Ireland was created when the Kingdoms of England and Scotland — which previously had been distinct states under a single monarchy — were joined under the 1707 Acts of Union."
+    },
+    "country:USA": {
+      "record": "4 July 1776 (declared independence from Great Britain); 3 September 1783 (recognized by Great Britain)",
+      "events": [
+        {
+          "year": 1776,
+          "date": "4 July 1776",
+          "label": "independence declared from Great Britain",
+          "from": "Great Britain",
+          "power": "United Kingdom",
+          "declared": true
+        },
+        {
+          "year": 1783,
+          "date": "3 September 1783",
+          "label": "recognized by Great Britain"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "United States"
+      ],
+      "formerNames": [],
+      "background": "Thirteen of Britain's American colonies broke with the mother country in 1776 and were recognized as the new nation of the United States of America following the Treaty of Paris in 1783."
+    },
+    "country:URY": {
+      "record": "25 August 1825 (from Brazil)",
+      "events": [
+        {
+          "year": 1825,
+          "date": "25 August 1825",
+          "label": "independence from Brazil",
+          "from": "Brazil",
+          "power": "Brazil"
+        }
+      ],
+      "mentions": [
+        "Spain",
+        "Brazil"
+      ],
+      "formerNames": [
+        "Cisplatine Province"
+      ],
+      "background": "The Spanish founded the city of Montevideo in modern-day Uruguay in 1726 as a military stronghold, and it soon became an important commercial center due to its natural harbor."
+    },
+    "country:UZB": {
+      "record": "1 September 1991 (from the Soviet Union)",
+      "events": [
+        {
+          "year": 1991,
+          "date": "1 September 1991",
+          "label": "independence from the Soviet Union",
+          "from": "the Soviet Union",
+          "power": "Soviet Union"
+        }
+      ],
+      "mentions": [
+        "Soviet Union",
+        "Russia"
+      ],
+      "formerNames": [],
+      "background": "Uzbekistan is the geographic and population center of Central Asia, with a diverse economy and a relatively young population. Russia conquered and united the disparate territories of present-day Uzbekistan in the late 19th century."
+    },
+    "country:VUT": {
+      "record": "30 July 1980 (from France and the UK)",
+      "events": [
+        {
+          "year": 1980,
+          "date": "30 July 1980",
+          "label": "independence from France and the UK",
+          "from": "France and the UK"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "France",
+        "Portugal",
+        "United States",
+        "Australia"
+      ],
+      "formerNames": [
+        "New Hebrides"
+      ],
+      "background": "Austronesian speakers from the Solomon Islands first settled Vanuatu around 2000 B.C. By around 1000, localized chieftain systems began to develop on the islands. Around 1600, Melanesian Chief Roi Mata united some of the islands of modern-day Vanuatu under his rule."
+    },
+    "country:VEN": {
+      "record": "5 July 1811 (from Spain)",
+      "events": [
+        {
+          "year": 1811,
+          "date": "5 July 1811",
+          "label": "independence from Spain",
+          "from": "Spain",
+          "power": "Spain"
+        }
+      ],
+      "mentions": [
+        "Spain",
+        "United States",
+        "Colombia"
+      ],
+      "formerNames": [],
+      "background": "Venezuela was one of three countries that emerged from the collapse of Gran Colombia in 1830, the others being Ecuador and New Granada (Colombia). For most of the first half of the 20th century, military strongmen ruled Venezuela and promoted the oil industry while allowing some social reforms."
+    },
+    "country:VNM": {
+      "record": "2 September 1945 (from France)",
+      "events": [
+        {
+          "year": 1945,
+          "date": "2 September 1945",
+          "label": "independence from France",
+          "from": "France",
+          "power": "France"
+        }
+      ],
+      "mentions": [
+        "France",
+        "United States",
+        "China"
+      ],
+      "formerNames": [],
+      "background": "Vietnam's early history included periods of occupation by outside forces and eventual power consolidation under Vietnamese dynastic families. A succession of Han Chinese emperors ruled the area, which was centered on the Red River Valley, until approximately the 10th century."
+    },
+    "country:YEM": {
+      "record": "22 May 1990 (Republic of Yemen established with the merger of the Yemen Arab Republic [Yemen (Sanaa) or North Yemen] and the People's Democratic Republic of Yemen [Yemen (Aden) or South Yemen])",
+      "events": [
+        {
+          "year": 1918,
+          "date": "1 November 1918",
+          "label": "North Yemen independent from the Ottoman Empire"
+        },
+        {
+          "year": 1962,
+          "date": "27 September 1962",
+          "label": "North Yemen becomes republic"
+        },
+        {
+          "year": 1967,
+          "date": "30 November 1967",
+          "label": "South Yemen independent from the UK"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Ottoman Empire"
+      ],
+      "formerNames": [],
+      "background": "The Kingdom of Yemen (colloquially known as North Yemen) became independent from the Ottoman Empire in 1918 and in 1962 became the Yemen Arab Republic."
+    },
+    "country:ZMB": {
+      "record": "24 October 1964 (from the UK)",
+      "events": [
+        {
+          "year": 1964,
+          "date": "24 October 1964",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Portugal",
+        "South Africa"
+      ],
+      "formerNames": [
+        "Northern Rhodesia"
+      ],
+      "background": "Bantu-speaking groups mainly from the Luba and Lunda Kingdoms in the Congo River Basin and from the Great Lakes region in East Africa settled in what is now Zambia beginning around A.D. 300, displacing and mixing with previous population groups in the region."
+    },
+    "country:ZWE": {
+      "record": "18 April 1980 (from the UK)",
+      "events": [
+        {
+          "year": 1980,
+          "date": "18 April 1980",
+          "label": "independence from the UK",
+          "from": "the UK",
+          "power": "United Kingdom"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Portugal",
+        "South Africa"
+      ],
+      "formerNames": [
+        "Rhodesia"
+      ],
+      "background": "The hunter-gatherer San people first inhabited the area that eventually became Zimbabwe. Farming communities migrated to the area around A.D. 500 during the Bantu expansion, and Shona-speaking societies began to develop in the Limpopo valley and Zimbabwean highlands around the 9th century."
+    }
+  }
+}

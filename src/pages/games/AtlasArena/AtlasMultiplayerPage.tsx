@@ -1,6 +1,4 @@
 import { ArenaQuestionInput } from "../../../components/atlas/ArenaQuestionInput";
-import { TerritoryBoard } from "../../../components/atlas/AtlasTerritoryCampaign";
-import type { TerritoryView } from "../../../games/atlas/territoryStrategy";
 import type { RaceView } from "../../../games/atlas/serverRace";
 import type { PublicQuestion } from "../../../games/atlas/publicQuestion";
 import { focusForScope } from "../../../games/atlas/scopes";
@@ -40,13 +38,13 @@ import "../../../components/atlas/trials/atlas-trials.css";
 type Snapshot = {
   id: string; code: string; mode: AtlasMultiplayerMode; ranked: boolean; hostId: string; players: { id: string; name: string; ready: boolean }[]; seat: number; maxPlayers?: number;
   series?: { bans: Record<string, string[]>; order: AtlasMultiplayerMode[]; gameIndex: number; wins: Record<string, number>; results: { mode: AtlasMultiplayerMode; winnerId: string | null; scores: Record<string, number> }[] };
-  status: AtlasMatchStatus; datasetVersion: string; settings: { rounds: number; allowSteal?: boolean; difficulty: AtlasDifficulty; categories?: AtlasCategory[]; stats?: AtlasStatKey[]; scope?: FillScope };
+  status: AtlasMatchStatus; datasetVersion: string; settings: { rounds: number; difficulty: AtlasDifficulty; categories?: AtlasCategory[]; stats?: AtlasStatKey[]; scope?: FillScope };
   roundIndex: number; rounds: number; tipIndex?: number; tipCount?: number; roundStartedAt: string | null; roundEndsAt: string | null; scores: Record<string, number>;
-  ownership: Record<string, "player_a" | "player_b">; question: PublicQuestion | null; submitted: boolean; opponentSubmitted: boolean; submittedIds?: string[]; submittedAnswer?: string | Coordinates | null;
+  question: PublicQuestion | null; submitted: boolean; opponentSubmitted: boolean; submittedIds?: string[]; submittedAnswer?: string | Coordinates | null;
   guesses?: { userId: string; tip: number; answer: string; correct: boolean }[];
-  roundResult: { winnerId?: string | null; entityId?: string; answer?: string | Coordinates; tip?: number; awards?: GuessAward[]; previousOwner?: string | null; submissions?: { userId: string; answer?: string | Coordinates; correct: boolean; distanceKm?: number; nearest?: Coordinates; responseMs: number }[] } | null; version: number;
+  roundResult: { winnerId?: string | null; entityId?: string; answer?: string | Coordinates; tip?: number; awards?: GuessAward[]; submissions?: { userId: string; answer?: string | Coordinates; correct: boolean; distanceKm?: number; nearest?: Coordinates; responseMs: number }[] } | null; version: number;
   /** Races only: the shared seed every racer plays, and the live standings. */
-  run?: RaceView; race?: Record<string, RaceEntry>; strategy?: TerritoryView; tiebreak?:{attempt:number;mode:AtlasMultiplayerMode};
+  run?: RaceView; race?: Record<string, RaceEntry>; tiebreak?:{attempt:number;mode:AtlasMultiplayerMode};
   /** Stat Battle only: this seat's view of the card table. */
   battle?: BattleView;
 };
@@ -162,7 +160,6 @@ export default function AtlasMultiplayerPage() {
         <div className={`atlas-seats seats-${seats}`}>{Array.from({ length: seats }, (_, index) => { const player = room.players[index]; const mine = player?.id === user.id; return <RoomPlayer key={player?.id ?? `open-${index}`} player={player} rank={ranks.find(row => row.user_id === player?.id)} label={mine ? "You" : player?.id === room.hostId ? "Host" : `Player ${index + 1}`} online={mine || Boolean(player && onlineIds.includes(player.id))} waiting={!player} readyAction={mine && !player?.ready && room.players.length >= 2} busy={busy} onReady={() => void act({ op: "ready", code: room.code })} />; })}</div>
         {room.mode === "closest_wins" && <div className="atlas-science-note"><FlaskConical size={18} /><p><strong>Distance rule</strong> Place a pin anywhere and submit it. Country rounds count a pin inside the borders as 0 km; capital rounds count a pin within 20 km of the city center as 0 km. Outside the target, great-circle distance is measured. The closest pin wins; on an exact tie equally close pins share the point.</p></div>}
         {room.mode === "guess_country" && <div className="atlas-science-note"><Lightbulb size={18} /><p><strong>Scoring</strong> One guess per tip. Each correct guess on the same tip: 3 points. Solving on tip 1 adds +2, on tip 2 +1. A solved tip ends the country.</p></div>}
-        {room.mode === "territory_battle" && <div className="atlas-science-note"><Flag size={18} /><p><strong>Territory rules</strong> Choose an attack or defense on a supplied frontier, then solve a fact challenge to execute it. Six simultaneous cycles; hubs earn three points and countries one. Speed never decides a capture.</p></div>}
         {isRaceMode(room.mode) && <div className="atlas-science-note"><Timer size={18} /><p><strong>Race</strong> Everyone plays the same bounded deck, with answers scored and progress saved by the server. Review each answer before continuing. Highest final score wins.{room.settings.scope ? ` Region: ${room.settings.scope}.` : ""}</p></div>}
         {room.mode === "stat_battle" && <div className="atlas-science-note"><Swords size={18} /><p><strong>Duel</strong> Both players lay one card face down each round; the better value for the category wins. First to {STAT_BATTLE.winTarget}. You have 30 seconds per card and three full-hand rerolls for the game.</p></div>}
         {(room.settings.categories || room.settings.stats) && <p className="atlas-setup-note">Categories: {(room.settings.stats ?? room.settings.categories ?? []).map((id) => [...COMPARISON_CATEGORIES, ...QUESTION_CATEGORIES].find((option) => option.id === id)?.label ?? id).join(", ")}</p>}
@@ -178,7 +175,6 @@ export default function AtlasMultiplayerPage() {
     {room.mode === "stat_battle" && room.battle && <DuelHistoryBlock room={room} data={atlas.data} />}
     <div className="atlas-result-actions">{!room.ranked && <button type="button" onClick={() => void act({ op: "rematch", code: room.code })}>Rematch</button>}<Link to={room.ranked ? "/games/atlas-arena?tab=ranked" : "/games/atlas-arena"}>{room.ranked ? "Back to Ranked" : "Change mode"}</Link></div></main>;
   if (isRaceMode(room.mode)) return <RaceRoom remaining={remaining} room={room} userId={user.id} data={atlas.data} busy={busy} error={error} onAction={(action,answer)=>void act({op:"race",code:room.code,action,questionId:room.run?.question?.id,answer})} onEnd={()=>void act({op:"finish",code:room.code})}/>;
-  if(room.mode==="territory_battle"&&room.strategy)return <main className="atlas-game-page"><header className="atlas-game-header"><Link className="atlas-icon-button" to="/games/atlas-arena" aria-label="Exit campaign">×</Link><strong>Territory Battle · {Math.ceil(remaining)}s</strong></header><TerritoryBoard data={atlas.data} view={room.strategy} seat={room.seat===0?"player_a":"player_b"} names={[room.players[0].name,room.players[1].name]} disabled={busy||room.status!=="round_active"} onPlan={target=>void act({op:"strategy",action:"plan",target,cycle:room.strategy!.cycle,code:room.code})} onAnswer={answer=>void act({op:"strategy",action:"answer",answer,cycle:room.strategy!.cycle,questionId:room.strategy!.question?.id,code:room.code})}/>{error&&<p role="alert">{error}</p>}</main>;
   if (room.mode === "stat_battle") return <DuelRoom room={room} data={atlas.data} busy={busy} remaining={remaining} error={error} onPlay={(card) => void act({ op: "play", code: room.code, roundIndex:room.roundIndex, card })} onReroll={() => void act({ op: "reroll", code: room.code, roundIndex:room.roundIndex })} />;
 
   const question = room.question, resolved = Boolean(room.roundResult);
@@ -194,9 +190,8 @@ export default function AtlasMultiplayerPage() {
     ? (room.roundResult?.submissions ?? []).filter((item) => Array.isArray(item.answer)).map((item) => ({ coordinates: item.answer as Coordinates, label: `${playerName(item.userId)} · ${Math.round(item.distanceKm ?? 0).toLocaleString()} km`, color: pinColor(item.userId), target: item.distanceKm ? item.nearest : undefined }))
     : myPin ? [{ coordinates: myPin, label: "Your pin", color: "#ffd372" }] : [] : [];
   const guessId = guessSelection.key === roundKey ? guessSelection.id : null;
-  // Map Battle / Territory: keep the clicked country visible, and mark it red once a wrong click is revealed.
-  const clickModes: AtlasMultiplayerMode[] = ["map_battle", "territory_battle"];
-  const clickedId = clickModes.includes(room.mode) ? myPick : null;
+  // Map Battle: keep the clicked country visible, and mark it red once a wrong click is revealed.
+  const clickedId = room.mode === "map_battle" ? myPick : null;
   const wrongClickId = resolved && clickedId && myResult && !myResult.correct ? clickedId : null;
   const waitingOn = room.players.filter((player) => !(room.submittedIds ?? []).includes(player.id)).length;
   return <main className="atlas-game-page"><header className="atlas-game-header"><Link className="atlas-icon-button" to="/games/atlas-arena" aria-label="Exit room">×</Link><div><span className="atlas-eyebrow">{titleOf(room.mode)}</span><strong>{room.mode === "guess_country" ? `Country ${room.roundIndex + 1} / ${room.rounds} · Tip ${(room.tipIndex ?? 0) + 1}` : `Round ${room.roundIndex + 1} / ${room.rounds}`}</strong></div><div className="atlas-game-stats"><span><Trophy size={16} />{room.scores[user.id] || 0}</span><span><Clock3 size={16} />{remaining.toFixed(1)}</span><span className="atlas-live"><i className={onlineOthers.length === others.length ? "" : "is-offline"} /> {others.length === 1 ? (onlineOthers.length ? others[0].name : `${others[0].name} reconnecting`) : `${onlineOthers.length + 1}/${room.players.length} online`}</span></div></header>
@@ -211,7 +206,7 @@ export default function AtlasMultiplayerPage() {
       {room.submitted && room.status === "round_active" && <div className="atlas-feedback is-correct"><Check /><div><strong>Answer received</strong><span>{waitingOn ? `Waiting for ${waitingOn} more player${waitingOn === 1 ? "" : "s"}…` : "Resolving…"}</span></div></div>}
       {question && <AtlasAreaReference values={areaValuesFromText(question.prompt)} />}
       {room.roundResult && (room.mode === "guess_country" ? <GuessResult room={room} userId={user.id} countryName={nameOf(room.roundResult.entityId)} playerName={playerName} /> : <RoundResult room={room} userId={user.id} countryName={nameOf(room.roundResult.entityId)} playerName={playerName} />)}<ScoreBoard room={room} ranks={ranks} /></aside>
-      {!panelOnly && <AtlasWorldMap topology={atlas.data.topology} entities={atlas.data.countries} disabled={!active} selectedId={room.mode === "guess_country" ? guessId : clickedId} correctId={correctId} incorrectId={wrongClickId} ownership={room.ownership} pins={pins} showHoverLabels={room.mode === "guess_country"} onSelect={(entityId) => { if (room.mode === "guess_country") setGuessSelection({ key: roundKey, id: entityId }); else if (question?.interaction !== "closest_click") submit(entityId); }} onPoint={question?.interaction === "closest_click" ? (coordinates) => setPinSelection({ key: roundKey, coordinates }) : undefined} ariaLabel={question?.prompt} />}
+      {!panelOnly && <AtlasWorldMap topology={atlas.data.topology} entities={atlas.data.countries} disabled={!active} selectedId={room.mode === "guess_country" ? guessId : clickedId} correctId={correctId} incorrectId={wrongClickId} pins={pins} showHoverLabels={room.mode === "guess_country"} onSelect={(entityId) => { if (room.mode === "guess_country") setGuessSelection({ key: roundKey, id: entityId }); else if (question?.interaction !== "closest_click") submit(entityId); }} onPoint={question?.interaction === "closest_click" ? (coordinates) => setPinSelection({ key: roundKey, coordinates }) : undefined} ariaLabel={question?.prompt} />}
     </section>{error && <p role="alert" className="atlas-multiplayer-error">{error}</p>}</main>;
 }
 
@@ -246,8 +241,8 @@ function RankedSeries({ room }: { room: Snapshot }) {
     <p>{seriesLabel(series.order.length)}: first to {Math.floor(series.order.length / 2) + 1} game wins, or most wins when all games are played. {room.ranked ? "Ties use up to two sets of three knowledge challenges. If still level, the game is drawn." : "Tied games are drawn."}</p>
   </section>;
 }
-const unitFor = (mode: AtlasMultiplayerMode) => mode === "territory_battle" ? "influence" : mode === "stat_battle" ? "rounds" : "points";
-function ScoreBoard({ room, ranks }: { room: Snapshot; ranks: AtlasRankRow[] }) { return <div className="atlas-scoreboard">{[...room.players].sort((left, right) => (room.scores[right.id] || 0) - (room.scores[left.id] || 0)).map((player) => <div key={player.id}><span><i className={`player-${room.players.indexOf(player)}`} />{player.name}<AtlasRankBadge rating={ranks.find(rank => rank.user_id === player.id)?.rating ?? 1500} position={ranks.find(rank => rank.user_id === player.id)?.leaderboard_rank} deviation={ranks.find(rank=>rank.user_id===player.id)?.deviation??350} matchesPlayed={ranks.find(rank=>rank.user_id===player.id)?.matches_played??0} />{room.race?.[player.id]?.done && <Check size={13} aria-label="finished" />}</span><strong>{(room.scores[player.id] || 0).toLocaleString("en")}{room.status === "finished" && room.series ? " game wins" : room.mode === "territory_battle" ? " influence" : room.mode === "stat_battle" ? " rounds" : ""}</strong></div>)}</div>; }
+const unitFor = (mode: AtlasMultiplayerMode) => mode === "stat_battle" ? "rounds" : "points";
+function ScoreBoard({ room, ranks }: { room: Snapshot; ranks: AtlasRankRow[] }) { return <div className="atlas-scoreboard">{[...room.players].sort((left, right) => (room.scores[right.id] || 0) - (room.scores[left.id] || 0)).map((player) => <div key={player.id}><span><i className={`player-${room.players.indexOf(player)}`} />{player.name}<AtlasRankBadge rating={ranks.find(rank => rank.user_id === player.id)?.rating ?? 1500} position={ranks.find(rank => rank.user_id === player.id)?.leaderboard_rank} deviation={ranks.find(rank=>rank.user_id===player.id)?.deviation??350} matchesPlayed={ranks.find(rank=>rank.user_id===player.id)?.matches_played??0} />{room.race?.[player.id]?.done && <Check size={13} aria-label="finished" />}</span><strong>{(room.scores[player.id] || 0).toLocaleString("en")}{room.status === "finished" && room.series ? " game wins" : room.mode === "stat_battle" ? " rounds" : ""}</strong></div>)}</div>; }
 function RankedResult({ matchId, userId }: { matchId: string; userId: string }) {
   const {rows}=useAtlasRanks([userId]);
   const [result, setResult] = useState<{ player_a: string; before_a: number; after_a: number; before_b: number; after_b: number } | null>(null);
@@ -268,11 +263,7 @@ function RankedResult({ matchId, userId }: { matchId: string; userId: string }) 
 function RoundResult({ room, userId, countryName, playerName }: { room: Snapshot; userId: string; countryName: string; playerName: (id: string) => string }) {
   const result = room.roundResult, mine = result?.submissions?.find((item) => item.userId === userId);
   const won = result?.winnerId === userId, correct = Boolean(mine?.correct), winner = result?.winnerId ? playerName(result.winnerId) : null;
-  // Territory rounds read as captures: a winner either takes a free country, steals it, or defends their own.
-  const territory = room.mode === "territory_battle" && winner
-    ? result?.previousOwner && result.previousOwner !== result.winnerId ? `${winner === "You" ? "You stole" : `${winner} stole`} ${countryName}` : result?.previousOwner ? `${winner === "You" ? "You held" : `${winner} held`} ${countryName}` : `${winner === "You" ? "You captured" : `${winner} captured`} ${countryName}`
-    : null;
-  const headline = territory ?? (won ? "Round won" : correct ? room.mode === "closest_wins" ? "Another pin was closer" : "Correct · knowledge points earned" : winner ? `${winner} wins round` : room.mode === "territory_battle" ? `${countryName} stays ${result?.previousOwner ? "with its owner" : "neutral"}` : "No winner");
+  const headline = won ? "Round won" : correct ? room.mode === "closest_wins" ? "Another pin was closer" : "Correct · knowledge points earned" : winner ? `${winner} wins round` : "No winner";
   const detail = mine?.distanceKm !== undefined ? mine.distanceKm < 0.5 ? `Inside the target for ${countryName} — 0 km` : `${Math.round(mine.distanceKm).toLocaleString()} km from ${countryName}` : correct ? `${mine?.responseMs} ms` : mine ? `Incorrect — it was ${countryName}` : `No answer — it was ${countryName}`;
   return <div className={`atlas-feedback ${won || (correct && room.mode !== "closest_wins") ? "is-correct" : "is-wrong"}`}>{won ? <Crown /> : <MapPin />}<div><strong>{headline}</strong><span>{detail}</span></div></div>;
 }

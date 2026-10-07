@@ -1,5 +1,11 @@
 {
   "de": {
+    "All games": "Alle Spiele",
+    "All subjects": "Alle Fächer",
+    "All tools": "Alle Tools",
+    "Collapse": "Einklappen",
+    "Expand": "Ausklappen",
+    "All books": "Alle Bücher",
     "Chess": "Schach",
     "3D Chess": "3D-Schach",
     "Log in": "Anmelden",
@@ -463,6 +469,12 @@
     "Currently played · click to show": "Aktuell gespielt · zum Anzeigen klicken"
   },
   "bar": {
+    "All games": "Olle Spui",
+    "All subjects": "Olle Fächer",
+    "All tools": "Olle Tools",
+    "Collapse": "Einklappn",
+    "Expand": "Ausklappn",
+    "All books": "Olle Bücher",
     "Chess": "Schach",
     "3D Chess": "3D-Schach",
     "Log in": "Eiloggn",
@@ -836,6 +848,12 @@
     "Currently played · click to show": "Grad gspuit · zum Ozoang klicka"
   },
   "ko": {
+    "All games": "모든 게임",
+    "All subjects": "모든 과목",
+    "All tools": "모든 도구",
+    "Collapse": "접기",
+    "Expand": "펼치기",
+    "All books": "모든 책",
     "Chess": "체스",
     "3D Chess": "3D 체스",
     "Log in": "로그인",
@@ -1277,6 +1295,12 @@
     "Currently played · click to show": "실제로 둔 수 · 클릭하여 표시"
   },
   "ru": {
+    "All games": "Все игры",
+    "All subjects": "Все предметы",
+    "All tools": "Все инструменты",
+    "Collapse": "Свернуть",
+    "Expand": "Развернуть",
+    "All books": "Все книги",
     "Chess": "Шахматы",
     "3D Chess": "3D-шахматы",
     "Log in": "Войти",
@@ -1718,6 +1742,12 @@
     "Currently played · click to show": "Сыгранный ход · нажмите, чтобы показать"
   },
   "es": {
+    "All games": "Todos los juegos",
+    "All subjects": "Todas las materias",
+    "All tools": "Todas las herramientas",
+    "Collapse": "Contraer",
+    "Expand": "Expandir",
+    "All books": "Todos los libros",
     "Played move": "Jugada realizada",
     "Show correct move": "Mostrar jugada correcta",
     "Show played move": "Mostrar jugada realizada",
@@ -1755,6 +1785,12 @@
     "Currently played · click to show": "Jugada actual · haz clic para mostrar"
   },
   "pt": {
+    "All games": "Todos os jogos",
+    "All subjects": "Todas as disciplinas",
+    "All tools": "Todas as ferramentas",
+    "Collapse": "Recolher",
+    "Expand": "Expandir",
+    "All books": "Todos os livros",
     "Played move": "Lance jogado",
     "Show correct move": "Mostrar lance correto",
     "Show played move": "Mostrar lance jogado",

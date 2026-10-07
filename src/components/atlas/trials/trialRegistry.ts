@@ -4,6 +4,7 @@ import { buildTrialCountries } from "../../../games/atlas/trials/countryStats";
 import type { AtlasDataset, AtlasDifficulty } from "../../../games/atlas/types";
 import { CountryGuesserGame } from "./CountryGuesserGame";
 import { ExtremeGeographyGame } from "./ExtremeGeographyGame";
+import { HistoryBattleGame } from "./HistoryBattleGame";
 import { LanguageGuesserGame } from "./LanguageGuesserGame";
 import { RegionBuilderGame } from "./RegionBuilderGame";
 import { StatBattleGame } from "./StatBattleGame";
@@ -19,6 +20,7 @@ export const TRIAL_GAMES: Record<TrialKind, { component: ComponentType<TrialMode
   "stat-ranking": { component: StatRankingGame },
   "extreme-geography": { component: ExtremeGeographyGame },
   "language-guesser": { component: LanguageGuesserGame },
+  "history-battle": { component: HistoryBattleGame },
   "stat-battle": { component: StatBattleGame },
 };
 

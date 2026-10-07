@@ -111,7 +111,7 @@ test('CSV quotes delimiters and neutralizes spreadsheet formula text', () => {
   const content = csv([['Name', 'Amount'], ['=HYPERLINK("x")', 100], [' line\n"two",three', 1], [' @SUM(1)', 2]]);
   assert.ok(content.includes('"\'=HYPERLINK(""x"")"')); assert.ok(content.includes('" line\n""two"",three"')); assert.ok(content.includes('"\' @SUM(1)"'));
 });
-test('milestones 14–19 publish all eight life apps', () => {
-  for (const id of ['day-planner', 'time-zone-planner', 'workout-timer', 'bill-splitter', 'budget-tracker', 'subscription-tracker']) assert.equal(toolApps.find(t => t.id === id).status, 'available');
-  for (const id of ['calorie-tracker', 'weather-explorer']) assert.equal(toolApps.find(t => t.id === id).status, 'available');
+test('the life apps are published; Subscription Tracker and Weather Explorer left the catalog', () => {
+  for (const id of ['day-planner', 'time-zone-planner', 'workout-timer', 'bill-splitter', 'budget-tracker', 'calorie-tracker']) assert.equal(toolApps.find(t => t.id === id).status, 'available');
+  for (const id of ['subscription-tracker', 'weather-explorer']) assert.equal(toolApps.find(t => t.id === id), undefined);
 });

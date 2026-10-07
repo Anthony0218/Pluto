@@ -14,7 +14,6 @@ not a guarantee that every asset is cleared or a jurisdiction-specific opinion.
 | Extractable CGTrader chess models | Twelve GLB files in `public/models/chess` are credited to Tinymen's **Free Stuff 1 – Chess Set**. Vite publishes them as downloadable static files. | Obtain a written grant covering extractable browser delivery, or replace/remove the assets. Encryption or obfuscation in a browser is not automatically sufficient. Credits alone do not resolve this. |
 | Missing provenance outside public/images | Nine chess MP3 files, MedievalKingdoms map/ring textures, root app icons and public/swag/fraction_grayguard.jpg lack source/author/license records. The owner confirmed all public/images files were AI-generated with Codex; that folder is no longer classified as missing provenance. | Record owned/generated origin or exact third-party licenses and permissions for remaining files; replace anything that cannot be cleared. Inspect unused public files too: Vite still publishes them. |
 | UN M49 redistribution terms | `scripts/geography/sync-atlas.mjs` imports M49 names/identifiers/regions into the bundled Atlas snapshot. Existing credits reference the UN terms rather than an open-data grant. General UN terms limit copying to personal non-commercial use and exclude redistribution. | Establish dataset-specific permission or replace that imported mapping with an independently sourced, redistribution-permitted one. This flags a contractual/rights uncertainty; it does not assert that isolated country identifiers are copyrightable. Attribution by itself is insufficient. |
-| Open-Meteo commercial use | Weather Explorer calls the free forecast and geocoding APIs. | If the release is commercial, advertising-supported or subscription-based, use an appropriate paid/permitted service integration. Do not expose a private paid API key in browser code. Free service terms and CC-BY data attribution are separate obligations. |
 
 CGTrader sources:
 - [Model listing](https://www.cgtrader.com/free-3d-models/sports/game/free-stuff-1-chess-set)
@@ -23,7 +22,6 @@ CGTrader sources:
 Data/service sources:
 - [UN terms](https://www.un.org/en/about-us/terms-of-use)
 - [UN M49](https://unstats.un.org/unsd/methodology/m49/)
-- [Open-Meteo terms](https://open-meteo.com/en/terms)
 
 ## Software fixes made during this review
 
@@ -74,6 +72,10 @@ Sources: [Stockfish distribution guidance](https://stockfishchess.org/about/),
 
 ## Other reviewed sources
 
+- The World Factbook text and facts bundled for Atlas History Battle
+  (`data/geography/history.json`) are a US Government work in the public domain.
+  The credits name the source as a courtesy and state that the CIA does not
+  endorse the game; the CIA seal and name must not be used to suggest otherwise.
 - GeoNames and World Bank data require attribution, license links and change
   indications. The credits identify selection/normalization and observation
   years. Preserve these and the source metadata on new exports; individual

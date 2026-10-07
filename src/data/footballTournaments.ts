@@ -1,19 +1,22 @@
-import { mensWorldCups, womensWorldCups, worldCupSources } from './footballHonours.ts';
+import { worldCupSources } from './footballHonours.ts';
+import { footballTournamentHistory } from './footballTournamentHistory.ts';
 // team is the beneficiary, including for own goals; shootout kicks are separate.
 export type FinalGoal = { player?: string; team: string; minute?: string; kind?: 'penalty' | 'own-goal' };
-export type TournamentFinal = { year: number; teams: [string, string]; score: [number, number]; date?: string; venue?: string; extraTime?: boolean; penalties?: [number, number]; goals?: FinalGoal[]; source: string };
-export type FootballTournament = { id: string; name: string; national: boolean; winners: { team: string; years: number[] }[]; finals: TournamentFinal[]; coverage: string; source: string };
-export type ChampionshipEdition = { year: number; winner?: string; runnerUp?: string; final?: TournamentFinal };
+export type TournamentFinal = { year: number; teams: [string, string]; score: [number, number]; date?: string; venue?: string; extraTime?: boolean; penalties?: [number, number]; goals?: FinalGoal[]; format?: 'aggregate' | 'replay' | 'final-round'; source: string };
+export type TournamentEditionResult = { year: number; winner: string; runnerUp: string; source: string };
+export type FootballTournament = { id: string; name: string; national: boolean; winners: { team: string; years: number[] }[]; editions?: TournamentEditionResult[]; finals: TournamentFinal[]; coverage: string; source: string };
+export type ChampionshipEdition = { year: number; winner?: string; runnerUp?: string; source?: string; final?: TournamentFinal };
 
 /** Preserve repeated wins and missing details, scoped to one competition. */
 export function championshipEditions(tournament: FootballTournament): ChampionshipEdition[] {
- const years = [...new Set([...tournament.winners.flatMap(w => w.years), ...tournament.finals.map(f => f.year)])].sort((a, b) => b - a);
+ const years = [...new Set([...(tournament.editions ?? []).map(e => e.year), ...tournament.winners.flatMap(w => w.years), ...tournament.finals.map(f => f.year)])].sort((a, b) => b - a);
  return years.map(year => {
+  const edition = tournament.editions?.find(e => e.year === year);
   const final = tournament.finals.find(f => f.year === year);
   const result = final && (final.penalties ?? final.score);
   const finalWinner = final && result && result[0] !== result[1] ? final.teams[result[0] > result[1] ? 0 : 1] : undefined;
-  const winner = tournament.winners.find(w => w.years.includes(year))?.team ?? finalWinner;
-  return { year, winner, runnerUp: finalWinner ? final?.teams.find(team => team !== finalWinner) : undefined, final };
+  const winner = edition?.winner ?? tournament.winners.find(w => w.years.includes(year))?.team ?? finalWinner;
+  return { year, winner, runnerUp: edition?.runnerUp ?? (winner ? final?.teams.find(team => team !== winner) : undefined), source: edition?.source ?? final?.source, final };
  });
 }
 
@@ -43,6 +46,7 @@ const europaFinals: TournamentFinal[] = [
  { year: 2024, teams: ['Atalanta', 'Bayer Leverkusen'], score: [3, 0], date: '2024-05-22', venue: 'Dublin', goals: ['12','26','75'].map(minute => goal('Ademola Lookman','Atalanta',minute)), source: 'https://www.uefa.com/uefaeuropaleague/news/028d-1af3bf5e7e68-7d9202792002-1000/' },
 ];
 const conferenceFinals: TournamentFinal[] = [
+ { year: 2022, teams: ['Roma', 'Feyenoord'], score: [1, 0], date: '2022-05-25', venue: 'National Arena, Tirana', goals: [goal('Nicolò Zaniolo','Roma','32')], source: 'https://www.uefa.com/uefaconferenceleague/news/0275-153b4c3b58ce-9dd2bc95bfd0-1000--roma-win-the-europa/' },
  { year: 2025, teams: ['Real Betis', 'Chelsea'], score: [1, 4], date: '2025-05-28', venue: 'Wrocław', goals: [goal('Abdessamad Ezzalzouli','Real Betis','9'),goal('Enzo Fernández','Chelsea','65'),goal('Nicolas Jackson','Chelsea','71'),goal('Jadon Sancho','Chelsea','83'),goal('Moisés Caicedo','Chelsea','90+1')], source: 'https://www.uefa.com/uefaconferenceleague/news/0299-1dde1ba33803-6370dd142717-1000/' },
  { year: 2024, teams: ['Olympiacos', 'Fiorentina'], score: [1, 0], extraTime: true, date: '2024-05-29', venue: 'Athens', goals: [goal('Ayoub El Kaabi','Olympiacos','116')], source: 'https://www.uefa.com/uefaconferenceleague/news/028d-1b01e5ec31a5-144c1f00e4f3-1000/' },
 ];
@@ -54,17 +58,22 @@ const womenFinals: TournamentFinal[] = [
  { year: 2023, teams: ['Spain', 'England'], score: [1, 0], date: '2023-08-20', venue: 'Stadium Australia, Sydney', goals: [goal('Olga Carmona','Spain','29')], source: 'https://www.fifa.com/de/tournaments/womens/womensworldcup/australia-new-zealand2023/articles/frauen-wm-2023-finale-spanien-weltmeister-england' },
  { year: 2019, teams: ['United States', 'Netherlands'], score: [2, 0], date: '2019-07-07', venue: 'Lyon', goals: [goal('Megan Rapinoe','United States','61','penalty'),goal('Rose Lavelle','United States','69')], source: 'https://inside.fifa.com/tournaments/womens/womensworldcup/france2019/news/youth-and-experience-blend-in-usa-s-successful-title-defence' },
 ];
-function clubTournament(id: string, name: string, finals: TournamentFinal[], source: string): FootballTournament {
+function historicalTournament(id: string, name: string, national: boolean, detailedFinals: TournamentFinal[], source: string): FootballTournament {
+ const editions = footballTournamentHistory[id];
+ const finals = editions.flatMap(edition => {
+  const final = detailedFinals.find(match => match.year === edition.year) ?? edition.final;
+  return final ? [final] : [];
+ });
  const winners = new Map<string, number[]>();
- finals.forEach(final => { const score = final.penalties ?? final.score, winner = final.teams[score[0] > score[1] ? 0 : 1]; winners.set(winner, [...(winners.get(winner) ?? []), final.year]); });
- return { id, name, national: false, finals, source, coverage: 'Selected finals: 2024–2025', winners: [...winners].map(([team, years]) => ({ team, years })) };
+ editions.forEach(({ year, winner }) => winners.set(winner, [...(winners.get(winner) ?? []), year]));
+ return { id, name, national, editions, finals, source, coverage: `Complete winners and runners-up: ${editions[0].year}–${editions.at(-1)!.year}`, winners: [...winners].map(([team, years]) => ({ team, years })) };
 }
 export const footballTournaments: FootballTournament[] = [
- { id: 'world-men', name: 'FIFA World Cup — Men', national: true, winners: mensWorldCups, finals: worldFinals, coverage: 'Winners through 2026 · Detailed finals: 2018, 2022', source: worldCupSources.men },
- { id: 'world-women', name: 'FIFA World Cup — Women', national: true, winners: womensWorldCups, finals: womenFinals, coverage: 'Winners through 2023 · Detailed finals: 2019, 2023', source: worldCupSources.women },
- clubTournament('ucl-men','UEFA Champions League — Men',uclFinals,'https://www.uefa.com/uefachampionsleague/history/'),
- clubTournament('ucl-women','UEFA Champions League — Women',uwclFinals,'https://www.uefa.com/womenschampionsleague/history/'),
- clubTournament('europa-men','UEFA Europa League — Men',europaFinals,'https://www.uefa.com/uefaeuropaleague/history/'),
- clubTournament('conference-men','UEFA Conference League — Men',conferenceFinals,'https://www.uefa.com/uefaconferenceleague/history/'),
+ historicalTournament('world-men','FIFA World Cup — Men',true,worldFinals,worldCupSources.men),
+ historicalTournament('world-women','FIFA World Cup — Women',true,womenFinals,worldCupSources.women),
+ historicalTournament('ucl-men','UEFA Champions League — Men',false,uclFinals,'https://www.uefa.com/uefachampionsleague/history/'),
+ historicalTournament('ucl-women','UEFA Champions League — Women',false,uwclFinals,'https://www.uefa.com/womenschampionsleague/history/'),
+ historicalTournament('europa-men','UEFA Europa League — Men',false,europaFinals,'https://www.uefa.com/uefaeuropaleague/history/'),
+ historicalTournament('conference-men','UEFA Conference League — Men',false,conferenceFinals,'https://www.uefa.com/uefaconferenceleague/history/'),
 ];
-export const footballFlags: Record<string, string> = { Argentina:'ar', France:'fr', Germany:'de', Brazil:'br', Italy:'it', Spain:'es', England:'gb-eng', Uruguay:'uy', 'United States':'us', Norway:'no', Japan:'jp', Croatia:'hr', Netherlands:'nl' };
+export const footballFlags: Record<string, string> = { Argentina:'ar', France:'fr', Germany:'de', Brazil:'br', Italy:'it', Spain:'es', England:'gb-eng', Uruguay:'uy', 'United States':'us', Norway:'no', Japan:'jp', Croatia:'hr', Netherlands:'nl', Hungary:'hu', Sweden:'se', Czechoslovakia:'cz', China:'cn' };

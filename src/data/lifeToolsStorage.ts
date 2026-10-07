@@ -1,11 +1,14 @@
 import { birthdayReminderChanges, validBirthdayDay, validBirthdayPerson, type BirthdayPerson } from './birthdayTools.ts';
 import { reminderChanges, type ReminderChange } from './toolNotifications.ts';
 import { validFoodEntry, validSavedMeal, type FoodEntry, type SavedMeal } from './calorieTools.ts';
-import { validWeatherPlace, type WeatherPlace } from './weatherTools.ts';
 import { expenseSplit, currencies, validDate, validTime, validZone, zonedParts, type PlannerTask, type Routine, type ExpenseGroup, type BudgetEntry, type BudgetLimit, type Subscription, type ZoneAvailability } from './lifeTools.ts';
 export type LifeToolsState = { version: 1; birthdays: BirthdayPerson[]; background: { enabled: boolean; pending: ReminderChange[] }; foodEntries: FoodEntry[]; savedMeals: SavedMeal[]; weatherPlaces: WeatherPlace[]; tasks: PlannerTask[]; routines: Routine[]; groups: ExpenseGroup[]; entries: BudgetEntry[]; limits: BudgetLimit[]; subscriptions: Subscription[]; zones: ZoneAvailability[]; breaks: { enabled: boolean; interval: number; nextAt: number } };
 export const emptyLifeTools = (): LifeToolsState => ({ version: 1, birthdays: [], background: { enabled: false, pending: [] }, foodEntries: [], savedMeals: [], weatherPlaces: [], tasks: [], routines: [], groups: [], entries: [], limits: [], subscriptions: [], zones: [], breaks: { enabled: false, interval: 60, nextAt: 0 } });
 const record = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
+/** Weather Explorer was retired; its saved places stay in the stored state so existing data still loads and syncs. */
+export type WeatherPlace = { id: string; name: string; latitude: number; longitude: number };
+const validWeatherPlace = (v: unknown): v is WeatherPlace => record(v) && typeof v.id === 'string' && /^[a-zA-Z0-9-]{1,80}$/.test(v.id) && typeof v.name === 'string' && !!v.name.trim() && v.name.length <= 100
+  && typeof v.latitude === 'number' && Number.isFinite(v.latitude) && Math.abs(v.latitude) <= 90 && typeof v.longitude === 'number' && Number.isFinite(v.longitude) && Math.abs(v.longitude) <= 180;
 const id = (value: unknown): value is string => typeof value === 'string' && /^[a-zA-Z0-9-]{1,80}$/.test(value);
 const text = (value: unknown, length = 100): value is string => typeof value === 'string' && !!value.trim() && value.length <= length;
 const integer = (value: unknown, min: number, max: number): value is number => typeof value === 'number' && Number.isSafeInteger(value) && value >= min && value <= max;

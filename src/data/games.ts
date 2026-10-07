@@ -29,7 +29,6 @@ export const games: Game[] = orderGamesForBrowse([
     tag: "Party",
     features: ["4 players", "Friends & bots", "60 spaces"],
     finished: false,
-    comingSoon: true,
   },
   {
     title: "Eat It",
@@ -107,7 +106,6 @@ export const games: Game[] = orderGamesForBrowse([
     tag: "Strategie",
     features: ["Rundenbasiert", "Taktik", "Mittelalter"],
     finished: false,
-    comingSoon: true,
   },
   {
     title: "Card Builder",
@@ -133,7 +131,13 @@ export const games: Game[] = orderGamesForBrowse([
     finished: false,
   },
 ]);
-export const gameList = games.map((game) => ({
+/** The order of the Games page: the sidebar's games, then Pluto Party and Medieval Kingdoms (in progress), then Card Builder (coming soon). */
+export const gameMenuRoutes = [
+  "/games/chess", "/games/watten", "/games/schafkopf", "/games/go", "/games/eat-it", "/games/atlas-arena", "/games/natura",
+  "/games/pluto-party", "/games/medieval-kingdoms", "/games/card-builder",
+];
+
+export const gameList = gameMenuRoutes.flatMap(route => games.filter(game => game.route === route)).map((game) => ({
   name: game.title,
   description: game.description,
   route: game.route,

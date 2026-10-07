@@ -93,7 +93,7 @@ test('casual online series persist per-game results, stop early, rematch, and ne
 function localSeriesHarness(first, length = 3, solo = false, requested) {
   const states = [];
   let slot = 0;
-  const modes = requested ?? ['map-battle', 'closest-wins', 'stat-battle', 'territory-battle', 'region-builder'].slice(0, length);
+  const modes = requested ?? ['map-battle', 'closest-wins', 'stat-battle', 'history-battle', 'region-builder'].slice(0, length);
   const params = new URLSearchParams({ random: '1', bestOf: String(length), modes: modes.join(',') });
   const exports = loadTs('../src/pages/games/AtlasArena/useRandomSeries.ts', {
     react: { useState(initial) { const index = slot++; if (!(index in states)) states[index] = typeof initial === 'function' ? initial() : initial; return [states[index], next => { states[index] = typeof next === 'function' ? next(states[index]) : next; }]; } },

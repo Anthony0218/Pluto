@@ -16,6 +16,7 @@ import learnContent from "./learnContentTranslations.json";
 import advancedMath from "./advancedMathTranslations.json";
 import deeperMath from "./deeperMathTranslations.json";
 import milestoneTools from "./milestoneToolsTranslations.json";
+import notesTool from "./notesToolTranslations.json";
 import { getAppLanguage, useAppLanguage, type AppLanguage } from "./languageStore";
 
 export const useUiLanguage = useAppLanguage;
@@ -26,6 +27,8 @@ const lookup: Table = {};
 const learningLanguages = ["de", "bar", "ko", "ru", "es", "pt"];
 for (const [index, language] of learningLanguages.entries()) {
   lookup[language] = Object.fromEntries(Object.entries((existing as Table)[language] ?? {}).map(([key, value]) => [normalized(key), value]));
+  // The Notes tool's words go in first: any wording the app already had for the same text wins.
+  Object.assign(lookup[language], Object.fromEntries(notesTool.map(row => [normalized(row[0]), row[index + 1]])), lookup[language]);
   Object.assign(lookup[language], (extra as Table)[language]);
   Object.assign(lookup[language], (dashboard as Table)[language]);
   Object.assign(lookup[language], (esPt as Table)[language]);

@@ -43,12 +43,7 @@ export default function GamesPage() {
                 shadow-black/20
                 transition
                 duration-300
-                hover:-translate-y-1
-                hover:border-amber-400/30
-                hover:bg-zinc-900
-                hover:shadow-2xl
-                hover:shadow-black/40
-                ${game.comingSoon ? "pointer-events-none" : ""}
+                ${game.comingSoon ? "cursor-not-allowed" : "hover:-translate-y-1 hover:border-amber-400/30 hover:bg-zinc-900 hover:shadow-2xl hover:shadow-black/40"}
               `}
             >
               {/* IMAGE */}
@@ -56,14 +51,14 @@ export default function GamesPage() {
                 <img
                   src={game.image}
                   alt={game.name}
-                  className="
+                  className={`
                     h-full
                     w-full
                     object-cover
                     transition
                     duration-500
-                    group-hover:scale-105
-                  "
+                    ${game.comingSoon ? "" : "group-hover:scale-105"}
+                  `}
                 />
 
                 <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent" />
@@ -107,7 +102,7 @@ export default function GamesPage() {
               <div className="p-5">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h2 className="text-xl font-black transition group-hover:text-amber-300">
+                    <h2 className={`text-xl font-black transition ${game.comingSoon ? "" : "group-hover:text-amber-300"}`}>
                       {game.name}
                     </h2>
 
@@ -117,7 +112,7 @@ export default function GamesPage() {
                   </div>
 
                   <span
-                    className="
+                    className={`
                       mt-1
                       flex
                       h-9
@@ -132,10 +127,8 @@ export default function GamesPage() {
                       text-lg
                       text-zinc-500
                       transition
-                      group-hover:border-amber-400/30
-                      group-hover:bg-amber-400/10
-                      group-hover:text-amber-300
-                    "
+                      ${game.comingSoon ? "" : "group-hover:border-amber-400/30 group-hover:bg-amber-400/10 group-hover:text-amber-300"}
+                    `}
                   >
                     →
                   </span>

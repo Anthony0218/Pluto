@@ -35,6 +35,6 @@ test('subscription integration uses billing month amounts without copying, compo
 });
 test('all six tournament configurations isolate competition data, source finals and separate shootouts',()=>{
  assert.equal(footballTournaments.length,6);assert.equal(new Set(footballTournaments.map(t=>t.id)).size,6);
- for(const t of footballTournaments){assert.ok(t.finals.length>=2);for(const final of t.finals){assert.match(final.source,/^https:\/\//);assert.equal(final.goals.length,final.score[0]+final.score[1]);for(const goal of final.goals)assert.ok(final.teams.includes(goal.team));}if(t.national)for(const w of t.winners)assert.ok(footballFlags[w.team]);}
+ for(const t of footballTournaments){assert.ok(t.finals.length>=2);for(const final of t.finals){assert.match(final.source,/^https:\/\//);if(final.goals){assert.equal(final.goals.length,final.score[0]+final.score[1]);for(const goal of final.goals)assert.ok(final.teams.includes(goal.team));}}if(t.national)for(const w of t.winners)assert.ok(footballFlags[w.team]);}
  const final=footballTournaments[0].finals.find(f=>f.year===2022);assert.deepEqual(final.score,[3,3]);assert.deepEqual(final.penalties,[4,2]);assert.equal(final.goals.at(-1).minute,'118');
 });

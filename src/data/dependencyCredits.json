@@ -28,21 +28,7 @@
     "scope": "transitive"
   },
   {
-    "name": "@babel/helper-annotate-as-pure",
-    "version": "7.29.7",
-    "license": "MIT",
-    "homepage": "https://babel.dev/docs/en/next/babel-helper-annotate-as-pure",
-    "scope": "transitive"
-  },
-  {
     "name": "@babel/helper-compilation-targets",
-    "version": "7.29.7",
-    "license": "MIT",
-    "homepage": "https://github.com/babel/babel",
-    "scope": "transitive"
-  },
-  {
-    "name": "@babel/helper-create-class-features-plugin",
     "version": "7.29.7",
     "license": "MIT",
     "homepage": "https://github.com/babel/babel",
@@ -53,13 +39,6 @@
     "version": "7.29.7",
     "license": "MIT",
     "homepage": "https://github.com/babel/babel",
-    "scope": "transitive"
-  },
-  {
-    "name": "@babel/helper-member-expression-to-functions",
-    "version": "7.29.7",
-    "license": "MIT",
-    "homepage": "https://babel.dev/docs/en/next/babel-helper-member-expression-to-functions",
     "scope": "transitive"
   },
   {
@@ -74,34 +53,6 @@
     "version": "7.29.7",
     "license": "MIT",
     "homepage": "https://babel.dev/docs/en/next/babel-helper-module-transforms",
-    "scope": "transitive"
-  },
-  {
-    "name": "@babel/helper-optimise-call-expression",
-    "version": "7.29.7",
-    "license": "MIT",
-    "homepage": "https://babel.dev/docs/en/next/babel-helper-optimise-call-expression",
-    "scope": "transitive"
-  },
-  {
-    "name": "@babel/helper-plugin-utils",
-    "version": "7.29.7",
-    "license": "MIT",
-    "homepage": "https://babel.dev/docs/en/next/babel-helper-plugin-utils",
-    "scope": "transitive"
-  },
-  {
-    "name": "@babel/helper-replace-supers",
-    "version": "7.29.7",
-    "license": "MIT",
-    "homepage": "https://babel.dev/docs/en/next/babel-helper-replace-supers",
-    "scope": "transitive"
-  },
-  {
-    "name": "@babel/helper-skip-transparent-expression-wrappers",
-    "version": "7.29.7",
-    "license": "MIT",
-    "homepage": "https://github.com/babel/babel",
     "scope": "transitive"
   },
   {
@@ -137,41 +88,6 @@
     "version": "7.29.8",
     "license": "MIT",
     "homepage": "https://babel.dev/docs/en/next/babel-parser",
-    "scope": "transitive"
-  },
-  {
-    "name": "@babel/plugin-syntax-jsx",
-    "version": "7.29.7",
-    "license": "MIT",
-    "homepage": "https://babel.dev/docs/en/next/babel-plugin-syntax-jsx",
-    "scope": "transitive"
-  },
-  {
-    "name": "@babel/plugin-syntax-typescript",
-    "version": "7.29.7",
-    "license": "MIT",
-    "homepage": "https://babel.dev/docs/en/next/babel-plugin-syntax-typescript",
-    "scope": "transitive"
-  },
-  {
-    "name": "@babel/plugin-transform-modules-commonjs",
-    "version": "7.29.7",
-    "license": "MIT",
-    "homepage": "https://babel.dev/docs/en/next/babel-plugin-transform-modules-commonjs",
-    "scope": "transitive"
-  },
-  {
-    "name": "@babel/plugin-transform-typescript",
-    "version": "7.29.7",
-    "license": "MIT",
-    "homepage": "https://babel.dev/docs/en/next/babel-plugin-transform-typescript",
-    "scope": "transitive"
-  },
-  {
-    "name": "@babel/preset-typescript",
-    "version": "7.29.7",
-    "license": "MIT",
-    "homepage": "https://babel.dev/docs/en/next/babel-preset-typescript",
     "scope": "transitive"
   },
   {
@@ -221,20 +137,6 @@
     "version": "0.12.0",
     "license": "Apache-2.0",
     "homepage": "https://rapier.rs",
-    "scope": "transitive"
-  },
-  {
-    "name": "@dotenvx/dotenvx",
-    "version": "1.75.1",
-    "license": "BSD-3-Clause",
-    "homepage": "https://github.com/dotenvx/dotenvx",
-    "scope": "transitive"
-  },
-  {
-    "name": "@dotenvx/primitives",
-    "version": "0.8.0",
-    "license": "BSD-3-Clause",
-    "homepage": "https://github.com/dotenvx/dotenvx",
     "scope": "transitive"
   },
   {
@@ -343,13 +245,6 @@
     "scope": "runtime"
   },
   {
-    "name": "@hono/node-server",
-    "version": "2.1.1",
-    "license": "MIT",
-    "homepage": "https://github.com/honojs/node-server",
-    "scope": "transitive"
-  },
-  {
     "name": "@humanfs/core",
     "version": "0.19.2",
     "license": "Apache-2.0",
@@ -448,13 +343,6 @@
     "scope": "transitive"
   },
   {
-    "name": "@modelcontextprotocol/sdk",
-    "version": "1.30.0",
-    "license": "MIT",
-    "homepage": "https://modelcontextprotocol.io",
-    "scope": "transitive"
-  },
-  {
     "name": "@monogrid/gainmap-js",
     "version": "3.4.0",
     "license": "MIT",
@@ -483,27 +371,6 @@
     "scope": "transitive"
   },
   {
-    "name": "@nodelib/fs.scandir",
-    "version": "2.1.5",
-    "license": "MIT",
-    "homepage": "https://github.com/nodelib/nodelib/tree/master/packages/fs/fs.scandir",
-    "scope": "transitive"
-  },
-  {
-    "name": "@nodelib/fs.stat",
-    "version": "2.0.5",
-    "license": "MIT",
-    "homepage": "https://github.com/nodelib/nodelib/tree/master/packages/fs/fs.stat",
-    "scope": "transitive"
-  },
-  {
-    "name": "@nodelib/fs.walk",
-    "version": "1.2.8",
-    "license": "MIT",
-    "homepage": "https://github.com/nodelib/nodelib/tree/master/packages/fs/fs.walk",
-    "scope": "transitive"
-  },
-  {
     "name": "@oxc-project/types",
     "version": "0.147.0",
     "license": "MIT",
@@ -515,13 +382,6 @@
     "version": "2.9.6",
     "license": "MIT",
     "homepage": "https://www.npmjs.com/package/@pixi/colord",
-    "scope": "transitive"
-  },
-  {
-    "name": "@pnpm/exe.darwin-arm64",
-    "version": "12.4.2",
-    "license": "MIT",
-    "homepage": "https://github.com/pnpm/pnpm",
     "scope": "transitive"
   },
   {
@@ -564,20 +424,6 @@
     "version": "1.0.1",
     "license": "MIT",
     "homepage": "https://github.com/rolldown/plugins/tree/main/packages/pluginutils#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "@sec-ant/readable-stream",
-    "version": "0.4.1",
-    "license": "MIT",
-    "homepage": "https://github.com/Sec-ant/readable-stream",
-    "scope": "transitive"
-  },
-  {
-    "name": "@sindresorhus/merge-streams",
-    "version": "4.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/@sindresorhus/merge-streams",
     "scope": "transitive"
   },
   {
@@ -732,13 +578,6 @@
     "version": "4.22.0",
     "license": "Apache-2.0 AND MIT",
     "homepage": "https://github.com/tensorflow/tfjs",
-    "scope": "transitive"
-  },
-  {
-    "name": "@ts-morph/common",
-    "version": "0.27.0",
-    "license": "MIT",
-    "homepage": "https://github.com/dsherret/ts-morph",
     "scope": "transitive"
   },
   {
@@ -938,13 +777,6 @@
     "scope": "development"
   },
   {
-    "name": "@types/validate-npm-package-name",
-    "version": "4.0.2",
-    "license": "MIT",
-    "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/validate-npm-package-name",
-    "scope": "transitive"
-  },
-  {
     "name": "@types/webxr",
     "version": "0.5.24",
     "license": "MIT",
@@ -1078,13 +910,6 @@
     "scope": "transitive"
   },
   {
-    "name": "accepts",
-    "version": "2.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/accepts",
-    "scope": "transitive"
-  },
-  {
     "name": "acorn",
     "version": "8.18.0",
     "license": "MIT",
@@ -1106,43 +931,8 @@
     "scope": "transitive"
   },
   {
-    "name": "ajv",
-    "version": "8.20.0",
-    "license": "MIT",
-    "homepage": "https://ajv.js.org",
-    "scope": "transitive"
-  },
-  {
-    "name": "ajv-formats",
-    "version": "2.1.1",
-    "license": "MIT",
-    "homepage": "https://github.com/ajv-validator/ajv-formats#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "ajv-formats",
-    "version": "3.0.1",
-    "license": "MIT",
-    "homepage": "https://github.com/ajv-validator/ajv-formats#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "ansi-colors",
-    "version": "4.1.3",
-    "license": "MIT",
-    "homepage": "https://github.com/doowb/ansi-colors",
-    "scope": "transitive"
-  },
-  {
     "name": "ansi-regex",
     "version": "5.0.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/ansi-regex",
-    "scope": "transitive"
-  },
-  {
-    "name": "ansi-regex",
-    "version": "6.3.0",
     "license": "MIT",
     "homepage": "https://www.npmjs.com/package/ansi-regex",
     "scope": "transitive"
@@ -1162,13 +952,6 @@
     "scope": "transitive"
   },
   {
-    "name": "argparse",
-    "version": "2.0.1",
-    "license": "Python-2.0",
-    "homepage": "https://www.npmjs.com/package/argparse",
-    "scope": "transitive"
-  },
-  {
     "name": "aria-hidden",
     "version": "1.2.6",
     "license": "MIT",
@@ -1176,24 +959,10 @@
     "scope": "transitive"
   },
   {
-    "name": "ast-types",
-    "version": "0.16.3",
-    "license": "MIT",
-    "homepage": "https://github.com/benjamn/ast-types",
-    "scope": "transitive"
-  },
-  {
     "name": "asynckit",
     "version": "0.4.0",
     "license": "MIT",
     "homepage": "https://github.com/alexindigo/asynckit#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "atomically",
-    "version": "1.7.0",
-    "license": "MIT",
-    "homepage": "https://github.com/fabiospampinato/atomically",
     "scope": "transitive"
   },
   {
@@ -1232,24 +1001,10 @@
     "scope": "transitive"
   },
   {
-    "name": "body-parser",
-    "version": "2.3.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/body-parser",
-    "scope": "transitive"
-  },
-  {
     "name": "brace-expansion",
-    "version": "5.0.9",
+    "version": "5.0.12",
     "license": "MIT",
     "homepage": "https://github.com/juliangruber/brace-expansion",
-    "scope": "transitive"
-  },
-  {
-    "name": "braces",
-    "version": "3.0.3",
-    "license": "MIT",
-    "homepage": "https://github.com/micromatch/braces",
     "scope": "transitive"
   },
   {
@@ -1267,38 +1022,10 @@
     "scope": "transitive"
   },
   {
-    "name": "bundle-name",
-    "version": "4.1.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/bundle-name",
-    "scope": "transitive"
-  },
-  {
-    "name": "bytes",
-    "version": "3.1.2",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/bytes",
-    "scope": "transitive"
-  },
-  {
     "name": "call-bind-apply-helpers",
     "version": "1.0.2",
     "license": "MIT",
     "homepage": "https://github.com/ljharb/call-bind-apply-helpers#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "call-bound",
-    "version": "1.0.4",
-    "license": "MIT",
-    "homepage": "https://github.com/ljharb/call-bound#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "callsites",
-    "version": "3.1.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/callsites",
     "scope": "transitive"
   },
   {
@@ -1330,13 +1057,6 @@
     "scope": "transitive"
   },
   {
-    "name": "chalk",
-    "version": "5.6.2",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/chalk",
-    "scope": "transitive"
-  },
-  {
     "name": "chess.js",
     "version": "1.4.0",
     "license": "BSD-2-Clause",
@@ -1349,20 +1069,6 @@
     "license": "Apache-2.0",
     "homepage": "https://github.com/joe-bell/cva#readme",
     "scope": "runtime"
-  },
-  {
-    "name": "cli-cursor",
-    "version": "5.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/cli-cursor",
-    "scope": "transitive"
-  },
-  {
-    "name": "cli-spinners",
-    "version": "2.9.2",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/cli-spinners",
-    "scope": "transitive"
   },
   {
     "name": "client-only",
@@ -1393,20 +1099,6 @@
     "scope": "transitive"
   },
   {
-    "name": "cn",
-    "version": "0.2.6",
-    "license": "MIT",
-    "homepage": "https://github.com/shadcn-ui/cn",
-    "scope": "runtime"
-  },
-  {
-    "name": "code-block-writer",
-    "version": "13.0.3",
-    "license": "MIT",
-    "homepage": "https://github.com/dsherret/code-block-writer#readme",
-    "scope": "transitive"
-  },
-  {
     "name": "color-convert",
     "version": "2.0.1",
     "license": "MIT",
@@ -1429,51 +1121,9 @@
   },
   {
     "name": "commander",
-    "version": "11.1.0",
-    "license": "MIT",
-    "homepage": "https://github.com/tj/commander.js",
-    "scope": "transitive"
-  },
-  {
-    "name": "commander",
-    "version": "14.0.3",
-    "license": "MIT",
-    "homepage": "https://github.com/tj/commander.js",
-    "scope": "transitive"
-  },
-  {
-    "name": "commander",
     "version": "2.20.3",
     "license": "MIT",
     "homepage": "https://github.com/tj/commander.js",
-    "scope": "transitive"
-  },
-  {
-    "name": "conf",
-    "version": "10.2.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/conf",
-    "scope": "transitive"
-  },
-  {
-    "name": "content-disposition",
-    "version": "1.1.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/content-disposition",
-    "scope": "transitive"
-  },
-  {
-    "name": "content-type",
-    "version": "1.0.5",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/content-type",
-    "scope": "transitive"
-  },
-  {
-    "name": "content-type",
-    "version": "2.1.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/content-type",
     "scope": "transitive"
   },
   {
@@ -1481,13 +1131,6 @@
     "version": "2.0.0",
     "license": "MIT",
     "homepage": "https://github.com/thlorenz/convert-source-map",
-    "scope": "transitive"
-  },
-  {
-    "name": "cookie",
-    "version": "0.7.2",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/cookie",
     "scope": "transitive"
   },
   {
@@ -1505,31 +1148,10 @@
     "scope": "transitive"
   },
   {
-    "name": "cookie-signature",
-    "version": "1.2.2",
-    "license": "MIT",
-    "homepage": "https://github.com/visionmedia/node-cookie-signature",
-    "scope": "transitive"
-  },
-  {
     "name": "core-js",
     "version": "3.29.1",
     "license": "MIT",
     "homepage": "https://github.com/zloirock/core-js",
-    "scope": "transitive"
-  },
-  {
-    "name": "cors",
-    "version": "2.8.5",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/cors",
-    "scope": "transitive"
-  },
-  {
-    "name": "cosmiconfig",
-    "version": "9.0.2",
-    "license": "MIT",
-    "homepage": "https://github.com/cosmiconfig/cosmiconfig#readme",
     "scope": "transitive"
   },
   {
@@ -1544,13 +1166,6 @@
     "version": "7.0.6",
     "license": "MIT",
     "homepage": "https://github.com/moxystudio/node-cross-spawn",
-    "scope": "transitive"
-  },
-  {
-    "name": "cssesc",
-    "version": "3.0.0",
-    "license": "MIT",
-    "homepage": "https://mths.be/cssesc",
     "scope": "transitive"
   },
   {
@@ -1575,13 +1190,6 @@
     "scope": "runtime"
   },
   {
-    "name": "debounce-fn",
-    "version": "4.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/debounce-fn",
-    "scope": "transitive"
-  },
-  {
     "name": "debug",
     "version": "4.4.3",
     "license": "MIT",
@@ -1596,13 +1204,6 @@
     "scope": "transitive"
   },
   {
-    "name": "dedent",
-    "version": "1.7.2",
-    "license": "MIT",
-    "homepage": "https://github.com/dmnd/dedent",
-    "scope": "transitive"
-  },
-  {
     "name": "deep-is",
     "version": "0.1.4",
     "license": "MIT",
@@ -1610,52 +1211,10 @@
     "scope": "transitive"
   },
   {
-    "name": "deepmerge",
-    "version": "4.3.1",
-    "license": "MIT",
-    "homepage": "https://github.com/TehShrike/deepmerge",
-    "scope": "transitive"
-  },
-  {
-    "name": "default-browser",
-    "version": "5.5.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/default-browser",
-    "scope": "transitive"
-  },
-  {
-    "name": "default-browser-id",
-    "version": "5.0.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/default-browser-id",
-    "scope": "transitive"
-  },
-  {
-    "name": "define-lazy-prop",
-    "version": "2.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/define-lazy-prop",
-    "scope": "transitive"
-  },
-  {
-    "name": "define-lazy-prop",
-    "version": "3.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/define-lazy-prop",
-    "scope": "transitive"
-  },
-  {
     "name": "delayed-stream",
     "version": "1.0.0",
     "license": "MIT",
     "homepage": "https://github.com/felixge/node-delayed-stream",
-    "scope": "transitive"
-  },
-  {
-    "name": "depd",
-    "version": "2.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/depd",
     "scope": "transitive"
   },
   {
@@ -1673,31 +1232,10 @@
     "scope": "transitive"
   },
   {
-    "name": "diff",
-    "version": "8.0.4",
-    "license": "BSD-3-Clause",
-    "homepage": "https://github.com/kpdecker/jsdiff",
-    "scope": "transitive"
-  },
-  {
     "name": "dijkstrajs",
     "version": "1.0.3",
     "license": "MIT",
     "homepage": "https://github.com/tcort/dijkstrajs",
-    "scope": "transitive"
-  },
-  {
-    "name": "dot-prop",
-    "version": "6.0.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/dot-prop",
-    "scope": "transitive"
-  },
-  {
-    "name": "dotenv",
-    "version": "17.4.2",
-    "license": "BSD-2-Clause",
-    "homepage": "https://github.com/motdotla/dotenv#readme",
     "scope": "transitive"
   },
   {
@@ -1729,24 +1267,10 @@
     "scope": "transitive"
   },
   {
-    "name": "ee-first",
-    "version": "1.1.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/ee-first",
-    "scope": "transitive"
-  },
-  {
     "name": "electron-to-chromium",
     "version": "1.5.416",
     "license": "ISC",
     "homepage": "https://github.com/Kilian/electron-to-chromium",
-    "scope": "transitive"
-  },
-  {
-    "name": "emoji-regex",
-    "version": "10.6.0",
-    "license": "MIT",
-    "homepage": "https://mths.be/emoji-regex",
     "scope": "transitive"
   },
   {
@@ -1757,38 +1281,10 @@
     "scope": "transitive"
   },
   {
-    "name": "encodeurl",
-    "version": "2.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/encodeurl",
-    "scope": "transitive"
-  },
-  {
     "name": "enhanced-resolve",
     "version": "5.24.5",
     "license": "MIT",
     "homepage": "https://github.com/webpack/enhanced-resolve#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "enquirer",
-    "version": "2.4.1",
-    "license": "MIT",
-    "homepage": "https://github.com/enquirer/enquirer",
-    "scope": "transitive"
-  },
-  {
-    "name": "env-paths",
-    "version": "2.2.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/env-paths",
-    "scope": "transitive"
-  },
-  {
-    "name": "error-ex",
-    "version": "1.3.4",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/error-ex",
     "scope": "transitive"
   },
   {
@@ -1824,13 +1320,6 @@
     "version": "3.2.0",
     "license": "MIT",
     "homepage": "https://www.npmjs.com/package/escalade",
-    "scope": "transitive"
-  },
-  {
-    "name": "escape-html",
-    "version": "1.0.3",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/escape-html",
     "scope": "transitive"
   },
   {
@@ -1890,13 +1379,6 @@
     "scope": "transitive"
   },
   {
-    "name": "esprima",
-    "version": "4.0.1",
-    "license": "BSD-2-Clause",
-    "homepage": "http://esprima.org",
-    "scope": "transitive"
-  },
-  {
     "name": "esquery",
     "version": "1.7.0",
     "license": "BSD-3-Clause",
@@ -1925,13 +1407,6 @@
     "scope": "transitive"
   },
   {
-    "name": "etag",
-    "version": "1.8.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/etag",
-    "scope": "transitive"
-  },
-  {
     "name": "eventemitter3",
     "version": "5.0.4",
     "license": "MIT",
@@ -1939,59 +1414,10 @@
     "scope": "transitive"
   },
   {
-    "name": "eventsource",
-    "version": "3.0.7",
-    "license": "MIT",
-    "homepage": "https://github.com/EventSource/eventsource#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "eventsource-parser",
-    "version": "3.1.1",
-    "license": "MIT",
-    "homepage": "https://github.com/rexxars/eventsource-parser#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "execa",
-    "version": "5.1.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/execa",
-    "scope": "transitive"
-  },
-  {
-    "name": "execa",
-    "version": "9.6.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/execa",
-    "scope": "transitive"
-  },
-  {
-    "name": "express",
-    "version": "5.2.1",
-    "license": "MIT",
-    "homepage": "https://expressjs.com/",
-    "scope": "transitive"
-  },
-  {
-    "name": "express-rate-limit",
-    "version": "8.7.0",
-    "license": "MIT",
-    "homepage": "https://github.com/express-rate-limit/express-rate-limit",
-    "scope": "transitive"
-  },
-  {
     "name": "fast-deep-equal",
     "version": "3.1.3",
     "license": "MIT",
     "homepage": "https://github.com/epoberezkin/fast-deep-equal#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "fast-glob",
-    "version": "3.3.3",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/fast-glob",
     "scope": "transitive"
   },
   {
@@ -2006,20 +1432,6 @@
     "version": "2.0.6",
     "license": "MIT",
     "homepage": "https://github.com/hiddentao/fast-levenshtein",
-    "scope": "transitive"
-  },
-  {
-    "name": "fast-uri",
-    "version": "3.1.7",
-    "license": "BSD-3-Clause",
-    "homepage": "https://github.com/fastify/fast-uri",
-    "scope": "transitive"
-  },
-  {
-    "name": "fastq",
-    "version": "1.20.3",
-    "license": "ISC",
-    "homepage": "https://github.com/mcollina/fastq#readme",
     "scope": "transitive"
   },
   {
@@ -2044,38 +1456,10 @@
     "scope": "development"
   },
   {
-    "name": "figures",
-    "version": "6.1.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/figures",
-    "scope": "transitive"
-  },
-  {
     "name": "file-entry-cache",
     "version": "8.0.0",
     "license": "MIT",
     "homepage": "https://www.npmjs.com/package/file-entry-cache",
-    "scope": "transitive"
-  },
-  {
-    "name": "fill-range",
-    "version": "7.1.1",
-    "license": "MIT",
-    "homepage": "https://github.com/jonschlinkert/fill-range",
-    "scope": "transitive"
-  },
-  {
-    "name": "finalhandler",
-    "version": "2.1.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/finalhandler",
-    "scope": "transitive"
-  },
-  {
-    "name": "find-up",
-    "version": "3.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/find-up",
     "scope": "transitive"
   },
   {
@@ -2121,31 +1505,10 @@
     "scope": "transitive"
   },
   {
-    "name": "forwarded",
-    "version": "0.2.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/forwarded",
-    "scope": "transitive"
-  },
-  {
     "name": "framer-motion",
     "version": "14.0.0",
     "license": "MIT",
     "homepage": "https://github.com/motiondivision/motion/",
-    "scope": "transitive"
-  },
-  {
-    "name": "fresh",
-    "version": "2.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/fresh",
-    "scope": "transitive"
-  },
-  {
-    "name": "fs-extra",
-    "version": "11.4.0",
-    "license": "MIT",
-    "homepage": "https://github.com/jprichardson/node-fs-extra",
     "scope": "transitive"
   },
   {
@@ -2163,13 +1526,6 @@
     "scope": "transitive"
   },
   {
-    "name": "fuzzysort",
-    "version": "3.1.0",
-    "license": "MIT",
-    "homepage": "https://github.com/farzher/fuzzysort",
-    "scope": "transitive"
-  },
-  {
     "name": "gensync",
     "version": "1.0.0-beta.2",
     "license": "MIT",
@@ -2184,24 +1540,10 @@
     "scope": "transitive"
   },
   {
-    "name": "get-east-asian-width",
-    "version": "1.6.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/get-east-asian-width",
-    "scope": "transitive"
-  },
-  {
     "name": "get-intrinsic",
     "version": "1.3.0",
     "license": "MIT",
     "homepage": "https://github.com/ljharb/get-intrinsic#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "get-own-enumerable-keys",
-    "version": "1.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/get-own-enumerable-keys",
     "scope": "transitive"
   },
   {
@@ -2212,31 +1554,10 @@
     "scope": "transitive"
   },
   {
-    "name": "get-stream",
-    "version": "6.0.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/get-stream",
-    "scope": "transitive"
-  },
-  {
-    "name": "get-stream",
-    "version": "9.0.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/get-stream",
-    "scope": "transitive"
-  },
-  {
     "name": "gifuct-js",
     "version": "2.1.2",
     "license": "MIT",
     "homepage": "https://github.com/matt-way/gifuct-js",
-    "scope": "transitive"
-  },
-  {
-    "name": "glob-parent",
-    "version": "5.1.2",
-    "license": "ISC",
-    "homepage": "https://www.npmjs.com/package/glob-parent",
     "scope": "transitive"
   },
   {
@@ -2324,45 +1645,10 @@
     "scope": "transitive"
   },
   {
-    "name": "hono",
-    "version": "4.13.7",
-    "license": "MIT",
-    "homepage": "https://hono.dev",
-    "scope": "transitive"
-  },
-  {
-    "name": "http-errors",
-    "version": "2.0.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/http-errors",
-    "scope": "transitive"
-  },
-  {
-    "name": "human-signals",
-    "version": "2.1.0",
-    "license": "Apache-2.0",
-    "homepage": "https://git.io/JeluP",
-    "scope": "transitive"
-  },
-  {
-    "name": "human-signals",
-    "version": "8.0.1",
-    "license": "Apache-2.0",
-    "homepage": "https://www.github.com/ehmicky/human-signals",
-    "scope": "transitive"
-  },
-  {
     "name": "iceberg-js",
     "version": "0.8.1",
     "license": "MIT",
     "homepage": "https://github.com/supabase/iceberg-js#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "iconv-lite",
-    "version": "0.7.3",
-    "license": "MIT",
-    "homepage": "https://github.com/pillarjs/iconv-lite",
     "scope": "transitive"
   },
   {
@@ -2394,13 +1680,6 @@
     "scope": "transitive"
   },
   {
-    "name": "import-fresh",
-    "version": "3.3.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/import-fresh",
-    "scope": "transitive"
-  },
-  {
     "name": "imurmurhash",
     "version": "0.1.4",
     "license": "MIT",
@@ -2408,52 +1687,10 @@
     "scope": "transitive"
   },
   {
-    "name": "inherits",
-    "version": "2.0.4",
-    "license": "ISC",
-    "homepage": "https://github.com/isaacs/inherits",
-    "scope": "transitive"
-  },
-  {
     "name": "internmap",
     "version": "2.0.3",
     "license": "ISC",
     "homepage": "https://github.com/mbostock/internmap/",
-    "scope": "transitive"
-  },
-  {
-    "name": "ip-address",
-    "version": "10.7.0",
-    "license": "MIT",
-    "homepage": "https://github.com/beaugunderson/ip-address",
-    "scope": "transitive"
-  },
-  {
-    "name": "ipaddr.js",
-    "version": "1.9.1",
-    "license": "MIT",
-    "homepage": "https://github.com/whitequark/ipaddr.js",
-    "scope": "transitive"
-  },
-  {
-    "name": "is-arrayish",
-    "version": "0.2.1",
-    "license": "MIT",
-    "homepage": "https://github.com/qix-/node-is-arrayish",
-    "scope": "transitive"
-  },
-  {
-    "name": "is-docker",
-    "version": "2.2.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/is-docker",
-    "scope": "transitive"
-  },
-  {
-    "name": "is-docker",
-    "version": "3.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/is-docker",
     "scope": "transitive"
   },
   {
@@ -2478,55 +1715,6 @@
     "scope": "transitive"
   },
   {
-    "name": "is-in-ssh",
-    "version": "1.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/is-in-ssh",
-    "scope": "transitive"
-  },
-  {
-    "name": "is-inside-container",
-    "version": "1.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/is-inside-container",
-    "scope": "transitive"
-  },
-  {
-    "name": "is-interactive",
-    "version": "2.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/is-interactive",
-    "scope": "transitive"
-  },
-  {
-    "name": "is-number",
-    "version": "7.0.0",
-    "license": "MIT",
-    "homepage": "https://github.com/jonschlinkert/is-number",
-    "scope": "transitive"
-  },
-  {
-    "name": "is-obj",
-    "version": "2.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/is-obj",
-    "scope": "transitive"
-  },
-  {
-    "name": "is-obj",
-    "version": "3.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/is-obj",
-    "scope": "transitive"
-  },
-  {
-    "name": "is-plain-obj",
-    "version": "4.1.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/is-plain-obj",
-    "scope": "transitive"
-  },
-  {
     "name": "is-promise",
     "version": "2.2.2",
     "license": "MIT",
@@ -2534,73 +1722,10 @@
     "scope": "transitive"
   },
   {
-    "name": "is-promise",
-    "version": "4.0.0",
-    "license": "MIT",
-    "homepage": "https://github.com/then/is-promise",
-    "scope": "transitive"
-  },
-  {
-    "name": "is-regexp",
-    "version": "3.1.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/is-regexp",
-    "scope": "transitive"
-  },
-  {
-    "name": "is-stream",
-    "version": "2.0.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/is-stream",
-    "scope": "transitive"
-  },
-  {
-    "name": "is-stream",
-    "version": "4.0.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/is-stream",
-    "scope": "transitive"
-  },
-  {
-    "name": "is-unicode-supported",
-    "version": "1.3.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/is-unicode-supported",
-    "scope": "transitive"
-  },
-  {
-    "name": "is-unicode-supported",
-    "version": "2.1.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/is-unicode-supported",
-    "scope": "transitive"
-  },
-  {
-    "name": "is-wsl",
-    "version": "2.2.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/is-wsl",
-    "scope": "transitive"
-  },
-  {
-    "name": "is-wsl",
-    "version": "3.1.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/is-wsl",
-    "scope": "transitive"
-  },
-  {
     "name": "isexe",
     "version": "2.0.0",
     "license": "ISC",
     "homepage": "https://github.com/isaacs/isexe#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "isexe",
-    "version": "3.1.5",
-    "license": "BlueOak-1.0.0",
-    "homepage": "https://github.com/isaacs/isexe",
     "scope": "transitive"
   },
   {
@@ -2646,13 +1771,6 @@
     "scope": "transitive"
   },
   {
-    "name": "js-yaml",
-    "version": "4.3.2",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/js-yaml",
-    "scope": "transitive"
-  },
-  {
     "name": "jsesc",
     "version": "3.1.0",
     "license": "MIT",
@@ -2667,38 +1785,10 @@
     "scope": "transitive"
   },
   {
-    "name": "json-parse-even-better-errors",
-    "version": "2.3.1",
-    "license": "MIT",
-    "homepage": "https://github.com/npm/json-parse-even-better-errors",
-    "scope": "transitive"
-  },
-  {
     "name": "json-schema-traverse",
     "version": "0.4.1",
     "license": "MIT",
     "homepage": "https://github.com/epoberezkin/json-schema-traverse#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "json-schema-traverse",
-    "version": "1.0.0",
-    "license": "MIT",
-    "homepage": "https://github.com/epoberezkin/json-schema-traverse#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "json-schema-typed",
-    "version": "7.0.3",
-    "license": "BSD-2-Clause",
-    "homepage": "https://github.com/typeslick/json-schema-typed",
-    "scope": "transitive"
-  },
-  {
-    "name": "json-schema-typed",
-    "version": "8.0.2",
-    "license": "BSD-2-Clause",
-    "homepage": "https://github.com/RemyRylan/json-schema-typed/tree/main/dist/node",
     "scope": "transitive"
   },
   {
@@ -2716,13 +1806,6 @@
     "scope": "transitive"
   },
   {
-    "name": "jsonfile",
-    "version": "6.2.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/jsonfile",
-    "scope": "transitive"
-  },
-  {
     "name": "jsqr",
     "version": "1.4.0",
     "license": "Apache-2.0",
@@ -2734,20 +1817,6 @@
     "version": "4.5.4",
     "license": "MIT",
     "homepage": "https://github.com/jaredwray/keyv",
-    "scope": "transitive"
-  },
-  {
-    "name": "kleur",
-    "version": "3.0.3",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/kleur",
-    "scope": "transitive"
-  },
-  {
-    "name": "kleur",
-    "version": "4.1.5",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/kleur",
     "scope": "transitive"
   },
   {
@@ -2793,20 +1862,6 @@
     "scope": "transitive"
   },
   {
-    "name": "lines-and-columns",
-    "version": "1.2.4",
-    "license": "MIT",
-    "homepage": "https://github.com/eventualbuddha/lines-and-columns#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "locate-path",
-    "version": "3.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/locate-path",
-    "scope": "transitive"
-  },
-  {
     "name": "locate-path",
     "version": "5.0.0",
     "license": "MIT",
@@ -2818,13 +1873,6 @@
     "version": "6.0.0",
     "license": "MIT",
     "homepage": "https://www.npmjs.com/package/locate-path",
-    "scope": "transitive"
-  },
-  {
-    "name": "log-symbols",
-    "version": "6.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/log-symbols",
     "scope": "transitive"
   },
   {
@@ -2870,34 +1918,6 @@
     "scope": "transitive"
   },
   {
-    "name": "media-typer",
-    "version": "1.1.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/media-typer",
-    "scope": "transitive"
-  },
-  {
-    "name": "merge-descriptors",
-    "version": "2.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/merge-descriptors",
-    "scope": "transitive"
-  },
-  {
-    "name": "merge-stream",
-    "version": "2.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/merge-stream",
-    "scope": "transitive"
-  },
-  {
-    "name": "merge2",
-    "version": "1.4.1",
-    "license": "MIT",
-    "homepage": "https://github.com/teambition/merge2",
-    "scope": "transitive"
-  },
-  {
     "name": "meshline",
     "version": "3.3.1",
     "license": "MIT",
@@ -2912,22 +1932,8 @@
     "scope": "transitive"
   },
   {
-    "name": "micromatch",
-    "version": "4.0.8",
-    "license": "MIT",
-    "homepage": "https://github.com/micromatch/micromatch",
-    "scope": "transitive"
-  },
-  {
     "name": "mime-db",
     "version": "1.52.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/mime-db",
-    "scope": "transitive"
-  },
-  {
-    "name": "mime-db",
-    "version": "1.54.0",
     "license": "MIT",
     "homepage": "https://www.npmjs.com/package/mime-db",
     "scope": "transitive"
@@ -2940,45 +1946,10 @@
     "scope": "transitive"
   },
   {
-    "name": "mime-types",
-    "version": "3.0.2",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/mime-types",
-    "scope": "transitive"
-  },
-  {
-    "name": "mimic-fn",
-    "version": "2.1.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/mimic-fn",
-    "scope": "transitive"
-  },
-  {
-    "name": "mimic-fn",
-    "version": "3.1.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/mimic-fn",
-    "scope": "transitive"
-  },
-  {
-    "name": "mimic-function",
-    "version": "5.0.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/mimic-function",
-    "scope": "transitive"
-  },
-  {
     "name": "minimatch",
     "version": "10.2.6",
     "license": "BlueOak-1.0.0",
     "homepage": "https://www.npmjs.com/package/minimatch",
-    "scope": "transitive"
-  },
-  {
-    "name": "minimist",
-    "version": "1.2.8",
-    "license": "MIT",
-    "homepage": "https://github.com/minimistjs/minimist",
     "scope": "transitive"
   },
   {
@@ -3024,13 +1995,6 @@
     "scope": "transitive"
   },
   {
-    "name": "negotiator",
-    "version": "1.1.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/negotiator",
-    "scope": "transitive"
-  },
-  {
     "name": "node-fetch",
     "version": "2.6.13",
     "license": "MIT",
@@ -3045,94 +2009,10 @@
     "scope": "transitive"
   },
   {
-    "name": "npm-run-path",
-    "version": "4.0.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/npm-run-path",
-    "scope": "transitive"
-  },
-  {
-    "name": "npm-run-path",
-    "version": "6.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/npm-run-path",
-    "scope": "transitive"
-  },
-  {
-    "name": "object-assign",
-    "version": "4.1.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/object-assign",
-    "scope": "transitive"
-  },
-  {
-    "name": "object-inspect",
-    "version": "1.13.4",
-    "license": "MIT",
-    "homepage": "https://github.com/inspect-js/object-inspect",
-    "scope": "transitive"
-  },
-  {
-    "name": "object-treeify",
-    "version": "1.1.33",
-    "license": "MIT",
-    "homepage": "https://github.com/blackflux/object-treeify#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "on-finished",
-    "version": "2.4.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/on-finished",
-    "scope": "transitive"
-  },
-  {
-    "name": "once",
-    "version": "1.4.0",
-    "license": "ISC",
-    "homepage": "https://github.com/isaacs/once",
-    "scope": "transitive"
-  },
-  {
-    "name": "onetime",
-    "version": "5.1.2",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/onetime",
-    "scope": "transitive"
-  },
-  {
-    "name": "onetime",
-    "version": "7.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/onetime",
-    "scope": "transitive"
-  },
-  {
-    "name": "open",
-    "version": "11.0.2",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/open",
-    "scope": "transitive"
-  },
-  {
-    "name": "open",
-    "version": "8.4.2",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/open",
-    "scope": "transitive"
-  },
-  {
     "name": "optionator",
     "version": "0.9.4",
     "license": "MIT",
     "homepage": "https://github.com/gkz/optionator",
-    "scope": "transitive"
-  },
-  {
-    "name": "ora",
-    "version": "8.2.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/ora",
     "scope": "transitive"
   },
   {
@@ -3147,13 +2027,6 @@
     "version": "3.1.0",
     "license": "MIT",
     "homepage": "https://www.npmjs.com/package/p-limit",
-    "scope": "transitive"
-  },
-  {
-    "name": "p-locate",
-    "version": "3.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/p-locate",
     "scope": "transitive"
   },
   {
@@ -3185,52 +2058,10 @@
     "scope": "runtime"
   },
   {
-    "name": "parent-module",
-    "version": "1.0.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/parent-module",
-    "scope": "transitive"
-  },
-  {
-    "name": "parse-json",
-    "version": "5.2.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/parse-json",
-    "scope": "transitive"
-  },
-  {
-    "name": "parse-ms",
-    "version": "4.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/parse-ms",
-    "scope": "transitive"
-  },
-  {
     "name": "parse-svg-path",
     "version": "0.2.0",
     "license": "MIT",
     "homepage": "https://github.com/jkroso/parse-svg-path",
-    "scope": "transitive"
-  },
-  {
-    "name": "parseurl",
-    "version": "1.3.3",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/parseurl",
-    "scope": "transitive"
-  },
-  {
-    "name": "path-browserify",
-    "version": "1.0.1",
-    "license": "MIT",
-    "homepage": "https://github.com/browserify/path-browserify",
-    "scope": "transitive"
-  },
-  {
-    "name": "path-exists",
-    "version": "3.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/path-exists",
     "scope": "transitive"
   },
   {
@@ -3248,31 +2079,10 @@
     "scope": "transitive"
   },
   {
-    "name": "path-key",
-    "version": "4.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/path-key",
-    "scope": "transitive"
-  },
-  {
-    "name": "path-to-regexp",
-    "version": "8.4.2",
-    "license": "MIT",
-    "homepage": "https://github.com/pillarjs/path-to-regexp",
-    "scope": "transitive"
-  },
-  {
     "name": "picocolors",
     "version": "1.1.1",
     "license": "ISC",
     "homepage": "https://www.npmjs.com/package/picocolors",
-    "scope": "transitive"
-  },
-  {
-    "name": "picomatch",
-    "version": "2.3.2",
-    "license": "MIT",
-    "homepage": "https://github.com/micromatch/picomatch",
     "scope": "transitive"
   },
   {
@@ -3290,20 +2100,6 @@
     "scope": "runtime"
   },
   {
-    "name": "pkce-challenge",
-    "version": "5.0.1",
-    "license": "MIT",
-    "homepage": "https://github.com/crouchcd/pkce-challenge#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "pkg-up",
-    "version": "3.1.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/pkg-up",
-    "scope": "transitive"
-  },
-  {
     "name": "pngjs",
     "version": "5.0.0",
     "license": "MIT",
@@ -3311,24 +2107,10 @@
     "scope": "development"
   },
   {
-    "name": "pnpm",
-    "version": "12.4.2",
-    "license": "MIT",
-    "homepage": "https://github.com/pnpm/pnpm/tree/main/pnpm",
-    "scope": "runtime"
-  },
-  {
     "name": "postcss",
     "version": "8.5.26",
     "license": "MIT",
     "homepage": "https://postcss.org/",
-    "scope": "transitive"
-  },
-  {
-    "name": "postcss-selector-parser",
-    "version": "7.1.6",
-    "license": "MIT",
-    "homepage": "https://github.com/postcss/postcss-selector-parser",
     "scope": "transitive"
   },
   {
@@ -3339,20 +2121,6 @@
     "scope": "transitive"
   },
   {
-    "name": "powershell-utils",
-    "version": "0.1.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/powershell-utils",
-    "scope": "transitive"
-  },
-  {
-    "name": "powershell-utils",
-    "version": "0.2.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/powershell-utils",
-    "scope": "transitive"
-  },
-  {
     "name": "prelude-ls",
     "version": "1.2.1",
     "license": "MIT",
@@ -3360,31 +2128,10 @@
     "scope": "transitive"
   },
   {
-    "name": "pretty-ms",
-    "version": "9.3.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/pretty-ms",
-    "scope": "transitive"
-  },
-  {
     "name": "promise-worker-transferable",
     "version": "1.0.4",
     "license": "Apache-2.0",
     "homepage": "https://github.com/terikon/promise-worker-transferable#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "prompts",
-    "version": "2.4.2",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/prompts",
-    "scope": "transitive"
-  },
-  {
-    "name": "proxy-addr",
-    "version": "2.0.7",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/proxy-addr",
     "scope": "transitive"
   },
   {
@@ -3400,34 +2147,6 @@
     "license": "MIT",
     "homepage": "http://github.com/soldair/node-qrcode",
     "scope": "runtime"
-  },
-  {
-    "name": "qs",
-    "version": "6.16.0",
-    "license": "BSD-3-Clause",
-    "homepage": "https://github.com/ljharb/qs",
-    "scope": "transitive"
-  },
-  {
-    "name": "queue-microtask",
-    "version": "1.2.3",
-    "license": "MIT",
-    "homepage": "https://github.com/feross/queue-microtask",
-    "scope": "transitive"
-  },
-  {
-    "name": "range-parser",
-    "version": "1.2.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/range-parser",
-    "scope": "transitive"
-  },
-  {
-    "name": "raw-body",
-    "version": "3.0.2",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/raw-body",
-    "scope": "transitive"
   },
   {
     "name": "react",
@@ -3493,13 +2212,6 @@
     "scope": "transitive"
   },
   {
-    "name": "recast",
-    "version": "0.23.21",
-    "license": "MIT",
-    "homepage": "http://github.com/benjamn/recast",
-    "scope": "transitive"
-  },
-  {
     "name": "regenerator-runtime",
     "version": "0.13.11",
     "license": "MIT",
@@ -3535,27 +2247,6 @@
     "scope": "transitive"
   },
   {
-    "name": "resolve-from",
-    "version": "4.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/resolve-from",
-    "scope": "transitive"
-  },
-  {
-    "name": "restore-cursor",
-    "version": "5.1.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/restore-cursor",
-    "scope": "transitive"
-  },
-  {
-    "name": "reusify",
-    "version": "1.1.0",
-    "license": "MIT",
-    "homepage": "https://github.com/mcollina/reusify#readme",
-    "scope": "transitive"
-  },
-  {
     "name": "rolldown",
     "version": "1.2.6",
     "license": "MIT",
@@ -3563,38 +2254,10 @@
     "scope": "transitive"
   },
   {
-    "name": "router",
-    "version": "2.2.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/router",
-    "scope": "transitive"
-  },
-  {
-    "name": "run-applescript",
-    "version": "7.1.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/run-applescript",
-    "scope": "transitive"
-  },
-  {
-    "name": "run-parallel",
-    "version": "1.2.0",
-    "license": "MIT",
-    "homepage": "https://github.com/feross/run-parallel",
-    "scope": "transitive"
-  },
-  {
     "name": "safe-buffer",
     "version": "5.2.1",
     "license": "MIT",
     "homepage": "https://github.com/feross/safe-buffer",
-    "scope": "transitive"
-  },
-  {
-    "name": "safer-buffer",
-    "version": "2.1.2",
-    "license": "MIT",
-    "homepage": "https://github.com/ChALkeR/safer-buffer",
     "scope": "transitive"
   },
   {
@@ -3626,20 +2289,6 @@
     "scope": "transitive"
   },
   {
-    "name": "send",
-    "version": "1.2.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/send",
-    "scope": "transitive"
-  },
-  {
-    "name": "serve-static",
-    "version": "2.2.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/serve-static",
-    "scope": "transitive"
-  },
-  {
     "name": "set-blocking",
     "version": "2.0.0",
     "license": "ISC",
@@ -3652,20 +2301,6 @@
     "license": "MIT",
     "homepage": "https://github.com/nfriedly/set-cookie-parser",
     "scope": "transitive"
-  },
-  {
-    "name": "setprototypeof",
-    "version": "1.2.0",
-    "license": "ISC",
-    "homepage": "https://github.com/wesleytodd/setprototypeof",
-    "scope": "transitive"
-  },
-  {
-    "name": "shadcn",
-    "version": "4.21.0",
-    "license": "MIT",
-    "homepage": "https://ui.shadcn.com",
-    "scope": "runtime"
   },
   {
     "name": "shebang-command",
@@ -3682,78 +2317,8 @@
     "scope": "transitive"
   },
   {
-    "name": "side-channel",
-    "version": "1.1.1",
-    "license": "MIT",
-    "homepage": "https://github.com/ljharb/side-channel#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "side-channel-list",
-    "version": "1.0.1",
-    "license": "MIT",
-    "homepage": "https://github.com/ljharb/side-channel-list#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "side-channel-map",
-    "version": "1.0.1",
-    "license": "MIT",
-    "homepage": "https://github.com/ljharb/side-channel-map#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "side-channel-weakmap",
-    "version": "1.0.2",
-    "license": "MIT",
-    "homepage": "https://github.com/ljharb/side-channel-weakmap#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "signal-exit",
-    "version": "3.0.7",
-    "license": "ISC",
-    "homepage": "https://github.com/tapjs/signal-exit",
-    "scope": "transitive"
-  },
-  {
-    "name": "signal-exit",
-    "version": "4.1.0",
-    "license": "ISC",
-    "homepage": "https://github.com/tapjs/signal-exit",
-    "scope": "transitive"
-  },
-  {
-    "name": "sisteransi",
-    "version": "1.0.5",
-    "license": "MIT",
-    "homepage": "https://github.com/terkelg/sisteransi",
-    "scope": "transitive"
-  },
-  {
-    "name": "smart-buffer",
-    "version": "4.2.0",
-    "license": "MIT",
-    "homepage": "https://github.com/JoshGlazebrook/smart-buffer/",
-    "scope": "transitive"
-  },
-  {
-    "name": "socks",
-    "version": "2.8.10",
-    "license": "MIT",
-    "homepage": "https://github.com/JoshGlazebrook/socks/",
-    "scope": "transitive"
-  },
-  {
-    "name": "source-map",
-    "version": "0.6.1",
-    "license": "BSD-3-Clause",
-    "homepage": "https://github.com/mozilla/source-map",
-    "scope": "transitive"
-  },
-  {
     "name": "source-map-js",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "license": "BSD-3-Clause",
     "homepage": "https://github.com/7rulnik/source-map-js",
     "scope": "transitive"
@@ -3780,20 +2345,6 @@
     "scope": "transitive"
   },
   {
-    "name": "statuses",
-    "version": "2.0.2",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/statuses",
-    "scope": "transitive"
-  },
-  {
-    "name": "stdin-discarder",
-    "version": "0.2.2",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/stdin-discarder",
-    "scope": "transitive"
-  },
-  {
     "name": "stockfish",
     "version": "18.0.8",
     "license": "GPL-3.0",
@@ -3815,52 +2366,10 @@
     "scope": "transitive"
   },
   {
-    "name": "string-width",
-    "version": "7.2.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/string-width",
-    "scope": "transitive"
-  },
-  {
-    "name": "stringify-object",
-    "version": "5.0.0",
-    "license": "BSD-2-Clause",
-    "homepage": "https://www.npmjs.com/package/stringify-object",
-    "scope": "transitive"
-  },
-  {
     "name": "strip-ansi",
     "version": "6.0.1",
     "license": "MIT",
     "homepage": "https://www.npmjs.com/package/strip-ansi",
-    "scope": "transitive"
-  },
-  {
-    "name": "strip-ansi",
-    "version": "7.2.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/strip-ansi",
-    "scope": "transitive"
-  },
-  {
-    "name": "strip-bom",
-    "version": "3.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/strip-bom",
-    "scope": "transitive"
-  },
-  {
-    "name": "strip-final-newline",
-    "version": "2.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/strip-final-newline",
-    "scope": "transitive"
-  },
-  {
-    "name": "strip-final-newline",
-    "version": "4.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/strip-final-newline",
     "scope": "transitive"
   },
   {
@@ -3882,13 +2391,6 @@
     "version": "0.1.3",
     "license": "MIT",
     "homepage": "https://github.com/pmndrs/suspend-react#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "systeminformation",
-    "version": "5.33.9",
-    "license": "MIT",
-    "homepage": "https://systeminformation.io",
     "scope": "transitive"
   },
   {
@@ -3934,13 +2436,6 @@
     "scope": "transitive"
   },
   {
-    "name": "tiny-invariant",
-    "version": "1.3.3",
-    "license": "MIT",
-    "homepage": "https://github.com/alexreardon/tiny-invariant",
-    "scope": "transitive"
-  },
-  {
     "name": "tiny-lru",
     "version": "11.4.7",
     "license": "BSD-3-Clause",
@@ -3952,20 +2447,6 @@
     "version": "0.2.17",
     "license": "MIT",
     "homepage": "https://superchupu.dev/tinyglobby",
-    "scope": "transitive"
-  },
-  {
-    "name": "to-regex-range",
-    "version": "5.0.1",
-    "license": "MIT",
-    "homepage": "https://github.com/micromatch/to-regex-range",
-    "scope": "transitive"
-  },
-  {
-    "name": "toidentifier",
-    "version": "1.0.1",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/toidentifier",
     "scope": "transitive"
   },
   {
@@ -4011,20 +2492,6 @@
     "scope": "transitive"
   },
   {
-    "name": "ts-morph",
-    "version": "26.0.0",
-    "license": "MIT",
-    "homepage": "https://github.com/dsherret/ts-morph#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "tsconfig-paths",
-    "version": "4.2.0",
-    "license": "MIT",
-    "homepage": "https://github.com/dividab/tsconfig-paths",
-    "scope": "transitive"
-  },
-  {
     "name": "tslib",
     "version": "2.8.1",
     "license": "0BSD",
@@ -4053,13 +2520,6 @@
     "scope": "transitive"
   },
   {
-    "name": "type-is",
-    "version": "2.1.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/type-is",
-    "scope": "transitive"
-  },
-  {
     "name": "typescript",
     "version": "6.0.3",
     "license": "Apache-2.0",
@@ -4074,38 +2534,10 @@
     "scope": "development"
   },
   {
-    "name": "undici",
-    "version": "7.29.1",
-    "license": "MIT",
-    "homepage": "https://undici.nodejs.org",
-    "scope": "transitive"
-  },
-  {
     "name": "undici-types",
     "version": "7.18.2",
     "license": "MIT",
     "homepage": "https://undici.nodejs.org",
-    "scope": "transitive"
-  },
-  {
-    "name": "unicorn-magic",
-    "version": "0.3.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/unicorn-magic",
-    "scope": "transitive"
-  },
-  {
-    "name": "universalify",
-    "version": "2.0.1",
-    "license": "MIT",
-    "homepage": "https://github.com/RyanZim/universalify#readme",
-    "scope": "transitive"
-  },
-  {
-    "name": "unpipe",
-    "version": "1.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/unpipe",
     "scope": "transitive"
   },
   {
@@ -4130,31 +2562,10 @@
     "scope": "transitive"
   },
   {
-    "name": "util-deprecate",
-    "version": "1.0.2",
-    "license": "MIT",
-    "homepage": "https://github.com/TooTallNate/util-deprecate",
-    "scope": "transitive"
-  },
-  {
     "name": "utility-types",
     "version": "3.11.0",
     "license": "MIT",
     "homepage": "https://github.com/piotrwitek/utility-types",
-    "scope": "transitive"
-  },
-  {
-    "name": "validate-npm-package-name",
-    "version": "7.0.2",
-    "license": "ISC",
-    "homepage": "https://github.com/npm/validate-npm-package-name",
-    "scope": "transitive"
-  },
-  {
-    "name": "vary",
-    "version": "1.1.2",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/vary",
     "scope": "transitive"
   },
   {
@@ -4200,13 +2611,6 @@
     "scope": "transitive"
   },
   {
-    "name": "which",
-    "version": "4.0.0",
-    "license": "ISC",
-    "homepage": "https://github.com/npm/node-which",
-    "scope": "transitive"
-  },
-  {
     "name": "which-module",
     "version": "2.0.1",
     "license": "ISC",
@@ -4242,25 +2646,11 @@
     "scope": "transitive"
   },
   {
-    "name": "wrappy",
-    "version": "1.0.2",
-    "license": "ISC",
-    "homepage": "https://github.com/npm/wrappy",
-    "scope": "transitive"
-  },
-  {
     "name": "ws",
     "version": "8.22.0",
     "license": "MIT",
     "homepage": "https://github.com/websockets/ws",
     "scope": "runtime"
-  },
-  {
-    "name": "wsl-utils",
-    "version": "1.0.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/wsl-utils",
-    "scope": "transitive"
   },
   {
     "name": "y18n",
@@ -4319,38 +2709,10 @@
     "scope": "transitive"
   },
   {
-    "name": "yocto-spinner",
-    "version": "1.2.2",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/yocto-spinner",
-    "scope": "transitive"
-  },
-  {
-    "name": "yoctocolors",
-    "version": "2.2.0",
-    "license": "MIT",
-    "homepage": "https://www.npmjs.com/package/yoctocolors",
-    "scope": "transitive"
-  },
-  {
-    "name": "zod",
-    "version": "3.25.76",
-    "license": "MIT",
-    "homepage": "https://zod.dev",
-    "scope": "transitive"
-  },
-  {
     "name": "zod",
     "version": "4.5.1",
     "license": "MIT",
     "homepage": "https://zod.dev",
-    "scope": "transitive"
-  },
-  {
-    "name": "zod-to-json-schema",
-    "version": "3.25.2",
-    "license": "ISC",
-    "homepage": "https://github.com/StefanTerdell/zod-to-json-schema",
     "scope": "transitive"
   },
   {

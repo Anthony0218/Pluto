@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import * as m from "motion/react-m";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import RevealButton from "./landing/RevealButton";
 import RevealTitle, { type TitleLine } from "./landing/RevealTitle";
 import { toneOf, type ToneName } from "./landing/tones";
 import { useCaptionFlight } from "./landing/useCaptionFlight";
@@ -54,10 +55,12 @@ export default function FeatureSection({ id, index, eyebrow, lines, description,
             <m.div data-caption-target={id} style={{ opacity: targetOpacity }}><p data-caption-heading className="text-xs font-bold uppercase tracking-[0.3em]" style={{ color: colors.light }}>{eyebrow}</p></m.div>
             <RevealTitle lines={lines} className="mt-5 max-w-xl text-4xl font-black leading-[1.02] tracking-[-0.045em] text-white sm:text-5xl xl:text-6xl" />
             <p className="mt-6 max-w-lg text-base leading-7 text-zinc-300 sm:text-lg sm:leading-8">{description}</p>
-            <Link to={href} className="group mt-8 inline-flex items-center gap-2 rounded-xl bg-indigo-500 px-5 py-3 text-sm font-semibold text-white transition-all hover:bg-indigo-400 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-indigo-300">
-              {action}
-              <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true" />
-            </Link>
+            <RevealButton className="flex" flight={id}>
+              <Link to={href} className="group mt-8 inline-flex items-center gap-2 rounded-xl bg-indigo-500 px-5 py-3 text-sm font-semibold text-white transition-all hover:bg-indigo-400 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-indigo-300">
+                {action}
+                <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true" />
+              </Link>
+            </RevealButton>
           </div>
         </div>
       </div>

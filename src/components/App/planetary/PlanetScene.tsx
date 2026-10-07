@@ -1,9 +1,9 @@
 import { Tabs } from "@base-ui/react/tabs";
-import { ArrowRight, Binary, BookOpen, Calculator, CalendarClock, ChartLine, ChartNoAxesCombined, CloudSun, CookingPot, Dices, Drum, Dumbbell, Flame, Gift, Gamepad2, Globe, Goal, Grid2X2, Infinity as InfinityIcon, Music4, QrCode, Receipt, Repeat, Ruler, ShieldCheck, Sigma, Spline, Swords, Variable, Waypoints, Wallet } from "lucide-react";
+import { ArrowLeft, ArrowRight, Binary, BookOpen, Calculator, CalendarClock, ChartNoAxesCombined, Dices, Drum, Dumbbell, Flame, Gift, Gamepad2, Globe, Goal, Grid2X2, Hash, Infinity as InfinityIcon, Music, Music4, NotebookPen, Percent, QrCode, Receipt, Ruler, ShieldCheck, Sigma, Spline, Swords, Variable, Waypoints, Wallet } from "lucide-react";
 import * as m from "motion/react-m";
-import { useId, useRef, type CSSProperties, type ReactNode } from "react";
+import { useId, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { useMotionValueEvent, useTransform } from "motion/react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { games } from "@/data/games";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { ui, useUiLanguage } from "@/i18n/ui";
@@ -28,28 +28,32 @@ export function PlanetArt({ config }: { config: PlanetConfig }) {
   </span>;
 }
 
-type ItemProps = { id: string; route: string; title: string; className?: string; style?: CSSProperties; children: ReactNode; status?: string; landing?: boolean; blurb?: string; align?: "start" | "center" | "end" };
+type ItemProps = { id: string; route: string; title: string; className?: string; style?: CSSProperties; children: ReactNode; status?: string; landing?: boolean; blurb?: string; align?: "start" | "center" | "end"; /** Opens something on the page instead of navigating, e.g. a shelf of books. */ onSelect?: () => void };
 
-function UniverseItem({ id, route, title, className = "", style, children, status, landing, blurb, align = "center" }: ItemProps) {
+function UniverseItem({ id, route, title, className = "", style, children, status, landing, blurb, align = "center", onSelect }: ItemProps) {
   const reducedMotion = useReducedMotion();
   const land = usePlanetLanding();
   const cardId = useId();
+  const label = `${ui("Open")} ${ui(title)}${status ? ` · ${ui(status)}` : ""}`;
+  const content = <>
+    <m.span className="universe-art-wrap" variants={reducedMotion ? {} : { hover: { y: -4, scale: 1.035 }, press: { y: 0, scale: .98 } }} transition={{ type: "spring", stiffness: 420, damping: 30 }}>
+      {children}
+    </m.span>
+    <strong className="universe-label">{ui(title)}</strong>
+    {status && <span className="universe-status">{ui(status)}</span>}
+  </>;
   return <m.div className={`universe-object ${className}`} style={style} data-flyby-id={id} whileHover="hover" whileTap="press">
-    <Link to={route} className="universe-item" aria-describedby={blurb ? cardId : undefined} aria-label={`${ui("Open")} ${ui(title)}${status ? ` · ${ui(status)}` : ""}`} onClick={landing ? event => land(event, route) : undefined}>
-      <m.span className="universe-art-wrap" variants={reducedMotion ? {} : { hover: { y: -4, scale: 1.035 }, press: { y: 0, scale: .98 } }} transition={{ type: "spring", stiffness: 420, damping: 30 }}>
-        {children}
-      </m.span>
-      <strong className="universe-label">{ui(title)}</strong>
-      {status && <span className="universe-status">{ui(status)}</span>}
-    </Link>
+    {onSelect
+      ? <button type="button" className="universe-item" aria-describedby={blurb ? cardId : undefined} aria-label={label} onClick={onSelect}>{content}</button>
+      : <Link to={route} className="universe-item" aria-describedby={blurb ? cardId : undefined} aria-label={label} onClick={landing ? event => land(event, route) : undefined}>{content}</Link>}
     {blurb && <span id={cardId} role="tooltip" className={`universe-card universe-card--${align}`}>{blurb}</span>}
   </m.div>;
 }
 
 const toolIcons = {
-  "percentage-calculator": Calculator, "number-system-converter": Binary, "unit-converter": Ruler, "recipe-scaler": CookingPot,
-  "workout-timer": Dumbbell, "bill-splitter": Receipt, "time-zone-planner": Globe, "function-plotter": ChartLine, "budget-tracker": Wallet,
-  "subscription-tracker": Repeat, "calorie-tracker": Flame, "weather-explorer": CloudSun, "day-planner": CalendarClock, "qr-code-creator": QrCode, "birthday-reminders": Gift,
+  calculator: Calculator, "percentage-calculator": Percent, "number-system-converter": Binary, "unit-converter": Ruler,
+  "workout-timer": Dumbbell, "bill-splitter": Receipt, "time-zone-planner": Globe, "budget-tracker": Wallet,
+  "calorie-tracker": Flame, notes: NotebookPen, "day-planner": CalendarClock, "qr-code-creator": QrCode, "birthday-reminders": Gift,
 };
 
 export function AppTileArt({ toolId }: { toolId: string }) {
@@ -58,7 +62,7 @@ export function AppTileArt({ toolId }: { toolId: string }) {
 }
 const categoryIcons = { games: Gamepad2, tools: Grid2X2, learn: BookOpen };
 const bookIcons = {
-  math: Sigma, percentages: Calculator, guides: ShieldCheck, analysis: ChartNoAxesCombined,
+  math: Sigma, foundations: Hash, music: Music, percentages: Calculator, guides: ShieldCheck, analysis: ChartNoAxesCombined,
   algebra: Variable, calculus: Spline, linear: Waypoints, depth: InfinityIcon, chance: Dices,
   pitch: Music4, rhythm: Drum, rules: Goal, tactics: Swords,
 };
@@ -77,13 +81,37 @@ export function BookArt({ title, design }: { title: string; design: BookDesign }
   </span>;
 }
 
+/**
+ * The Learn tab's shelf. A subject book (Math, Music) opens in place to show the books inside it, with a way back;
+ * every other book goes straight to its page.
+ */
+function LearnShelf() {
+  const { language } = useUiLanguage();
+  const [openId, setOpenId] = useState<string | null>(null);
+  const group = landingBooks.find(book => book.id === openId);
+  const books = group?.books ?? landingBooks;
+  return <>
+    {group && <div className="universe-shelf-head">
+      <button type="button" autoFocus onClick={() => setOpenId(null)}><ArrowLeft size={15} aria-hidden="true" />{ui("All books")}</button>
+      <strong>{ui(group.title)}</strong>
+    </div>}
+    {books.map((book, index) => <UniverseItem key={book.id} id={book.id} title={book.title} route={book.route} blurb={ui(bookDescription(book.id))} align={index % 4 > 1 ? "end" : "start"} onSelect={book.books ? () => setOpenId(book.id) : undefined}>
+      <BookArt title={landingBookTitle(language, book.design)} design={book.design} />
+    </UniverseItem>)}
+  </>;
+}
+
 const planetBlurbs: Record<string, CopyKey> = {
   "/games/chess": "blurbChess", "/games/go": "blurbGo", "/games/watten": "blurbWatten", "/games/schafkopf": "blurbSchafkopf",
   "/games/atlas-arena": "blurbAtlas", "/games/natura": "blurbNatura", "/games/eat-it": "blurbEatIt",
 };
 const planetAlign: Record<string, "start" | "end"> = { schafkopf: "start", watten: "end", go: "end", atlas: "start" };
 
+/** The first click on a tab shows its objects; clicking the tab that is already open goes to the Games, Tools or Learn page. */
 export default function PlanetScene({ category, onCategoryChange }: { category: UniverseCategory; onCategoryChange: (category: UniverseCategory) => void }) {
+  const navigate = useNavigate();
+  // A tab is selected as soon as it is pressed, so remember whether it was already the open one when the press began.
+  const pressedOnCurrent = useRef<boolean | null>(null);
   const { language } = useUiLanguage();
   const text = useCopy();
   const reducedMotion = useReducedMotion();
@@ -106,7 +134,8 @@ export default function PlanetScene({ category, onCategoryChange }: { category: 
       <Tabs.List className="universe-tabs" aria-label={ui("Explore")} activateOnFocus>
         {universeCategories.map(item => {
           const Icon = categoryIcons[item.id];
-          return <Tabs.Tab key={item.id} value={item.id} className="universe-tab"><Icon size={16} aria-hidden="true" />{ui(item.label)}</Tabs.Tab>;
+          return <Tabs.Tab key={item.id} value={item.id} className="universe-tab" onPointerDown={() => { pressedOnCurrent.current = item.id === category; }} onKeyDown={() => { pressedOnCurrent.current = item.id === category; }}
+            onClick={() => { const wasCurrent = pressedOnCurrent.current ?? item.id === category; pressedOnCurrent.current = null; if (wasCurrent) navigate(item.route); }}><Icon size={16} aria-hidden="true" />{ui(item.label)}</Tabs.Tab>;
         })}
         <Tabs.Indicator className="universe-tab-indicator" />
       </Tabs.List>
@@ -126,9 +155,7 @@ export default function PlanetScene({ category, onCategoryChange }: { category: 
           {item.id === "tools" && landingTools.map((tool, index) => <UniverseItem key={tool.id} id={tool.id} title={tool.title} route={tool.route} blurb={ui(tool.description)} align={index % 2 ? "end" : "start"} style={{ "--app-accent": tool.accent } as CSSProperties}>
             <AppTileArt toolId={tool.id} />
           </UniverseItem>)}
-          {item.id === "learn" && landingBooks.map((book, index) => <UniverseItem key={book.id} id={book.id} title={book.title} route={book.route} blurb={ui(bookDescription(book.id))} align={index % 2 ? "end" : "start"}>
-            <BookArt title={landingBookTitle(language, book.design)} design={book.design} />
-          </UniverseItem>)}
+          {item.id === "learn" && <LearnShelf />}
         </m.div>
       </Tabs.Panel>)}
     </div>

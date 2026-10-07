@@ -301,7 +301,7 @@ export default function RegionMap({
 
         <button
           type="button"
-          onClick={() => navigate("/games/medieval-kingdoms")}
+          onClick={() => navigate("/games/medieval-kingdoms/legacy")}
           className="rounded-xl border border-[#856239] bg-[#4a3521] px-5 py-3 font-bold text-[#f1d9aa] hover:bg-[#604526]"
         >
           ← Continent

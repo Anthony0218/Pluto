@@ -1726,5 +1726,131 @@
     "Изучаемые понятия",
     "Conceptos tratados",
     "Conceitos abordados"
+  ],
+  [
+    "Aggregate score (two legs)",
+    "Gesamtergebnis (Hin- und Rückspiel)",
+    "Gesamtergebnis (Hin- und Rückspui)",
+    "합산 점수 (홈·원정 2경기)",
+    "Общий счёт двух матчей",
+    "Marcador global (ida y vuelta)",
+    "Resultado agregado (duas mãos)"
+  ],
+  [
+    "Replay",
+    "Wiederholungsspiel",
+    "Wiederholungsspui",
+    "재경기",
+    "Переигровка",
+    "Partido de desempate",
+    "Jogo de desempate"
+  ],
+  [
+    "Decisive final-round match",
+    "Entscheidendes Spiel der Finalrunde",
+    "Entscheidends Spui der Finalrundn",
+    "최종 라운드 우승 결정 경기",
+    "Решающий матч финального раунда",
+    "Partido decisivo de la ronda final",
+    "Jogo decisivo da fase final"
+  ],
+  [
+    "Edition source",
+    "Quelle zur Ausgabe",
+    "Quelle zur Ausgab",
+    "대회 기록 출처",
+    "Источник данных турнира",
+    "Fuente de la edición",
+    "Fonte da edição"
+  ],
+  [
+    "Final results",
+    "Finalergebnisse",
+    "Finalergebnisse",
+    "결승 결과",
+    "Результаты финалов",
+    "Resultados de las finales",
+    "Resultados das finais"
+  ],
+  [
+    "Open historical data",
+    "Offene historische Daten",
+    "Offene historische Daten",
+    "공개 역사 데이터",
+    "Открытые исторические данные",
+    "Datos históricos abiertos",
+    "Dados históricos abertos"
+  ],
+  [
+    "Czechoslovakia",
+    "Tschechoslowakei",
+    "Tschechoslowakei",
+    "체코슬로바키아",
+    "Чехословакия",
+    "Checoslovaquia",
+    "Checoslováquia"
+  ],
+  [
+    "Complete winners and runners-up: 1930–2026",
+    "Alle Sieger und Finalisten: 1930–2026",
+    "Alle Sieger und Finalisten: 1930–2026",
+    "전체 우승·준우승 기록: 1930–2026",
+    "Все чемпионы и финалисты: 1930–2026",
+    "Todos los campeones y subcampeones: 1930–2026",
+    "Todos os campeões e vice-campeões: 1930–2026"
+  ],
+  [
+    "Complete winners and runners-up: 1991–2023",
+    "Alle Sieger und Finalisten: 1991–2023",
+    "Alle Sieger und Finalisten: 1991–2023",
+    "전체 우승·준우승 기록: 1991–2023",
+    "Все чемпионы и финалисты: 1991–2023",
+    "Todos los campeones y subcampeones: 1991–2023",
+    "Todos os campeões e vice-campeões: 1991–2023"
+  ],
+  [
+    "Complete winners and runners-up: 1956–2026",
+    "Alle Sieger und Finalisten: 1956–2026",
+    "Alle Sieger und Finalisten: 1956–2026",
+    "전체 우승·준우승 기록: 1956–2026",
+    "Все чемпионы и финалисты: 1956–2026",
+    "Todos los campeones y subcampeones: 1956–2026",
+    "Todos os campeões e vice-campeões: 1956–2026"
+  ],
+  [
+    "Complete winners and runners-up: 2002–2026",
+    "Alle Sieger und Finalisten: 2002–2026",
+    "Alle Sieger und Finalisten: 2002–2026",
+    "전체 우승·준우승 기록: 2002–2026",
+    "Все чемпионы и финалисты: 2002–2026",
+    "Todos los campeones y subcampeones: 2002–2026",
+    "Todos os campeões e vice-campeões: 2002–2026"
+  ],
+  [
+    "Complete winners and runners-up: 1972–2026",
+    "Alle Sieger und Finalisten: 1972–2026",
+    "Alle Sieger und Finalisten: 1972–2026",
+    "전체 우승·준우승 기록: 1972–2026",
+    "Все чемпионы и финалисты: 1972–2026",
+    "Todos los campeones y subcampeones: 1972–2026",
+    "Todos os campeões e vice-campeões: 1972–2026"
+  ],
+  [
+    "Complete winners and runners-up: 2022–2026",
+    "Alle Sieger und Finalisten: 2022–2026",
+    "Alle Sieger und Finalisten: 2022–2026",
+    "전체 우승·준우승 기록: 2022–2026",
+    "Все чемпионы и финалисты: 2022–2026",
+    "Todos los campeones y subcampeones: 2022–2026",
+    "Todos os campeões e vice-campeões: 2022–2026"
+  ],
+  [
+    "Titles won",
+    "Titelgewinne",
+    "Gwonene Titel",
+    "우승 횟수",
+    "Количество титулов",
+    "Títulos ganados",
+    "Títulos conquistados"
   ]
 ]

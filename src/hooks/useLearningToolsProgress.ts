@@ -20,6 +20,7 @@ export function useLearningToolsProgress() {
     loading,
     toggleBookmark: (id: string) => { if (!loading) store.toggleBookmark(account, id); },
     toggleFavoriteTool: (id: string) => { if (!loading) store.toggleFavoriteTool(account, id); },
+    setFavoriteTools: (ids: string[]) => { if (!loading) store.setFavoriteTools(account, ids); },
     visitTool: useCallback((id: string) => { if (!loading) store.visitTool(account, id); }, [account, loading]),
     setLessonStage: useCallback((id: string, stage: LessonStage) => { if (!loading) store.setLessonStage(account, id, stage); }, [account, loading]),
     setLessonCompleted: (id: string, completed: boolean) => { if (!loading) store.setLessonCompleted(account, id, completed); },

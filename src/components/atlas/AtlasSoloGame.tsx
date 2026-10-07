@@ -7,7 +7,7 @@ import { AtlasCategoryPicker } from "./AtlasCategoryPicker";
 import { AtlasWorldMap } from "./AtlasWorldMap";
 import { COMPARISON_CATEGORIES, QUESTION_CATEGORIES } from "../../games/atlas/categories";
 import { generateComparisonQuestions } from "../../games/atlas/comparisons";
-import { ATLAS_SCORING, DIFFICULTY_RULES } from "../../games/atlas/config";
+import { DIFFICULTY_RULES } from "../../games/atlas/config";
 import { generateQuestions, validateAnswer } from "../../games/atlas/engine";
 import { generateFlagQuestions } from "../../games/atlas/flags";
 import { generateGuessCountryQuestions, scoreGuessTip, type GuessAward } from "../../games/atlas/guessCountry";
@@ -22,7 +22,7 @@ import type { AtlasDataset, AtlasDifficulty, AtlasMode, AtlasQuestion, Coordinat
 
 export type PlayerTag = { name: string; color: string };
 
-const QUESTION_COUNTS: Partial<Record<AtlasMode, number>> = { map_click: 10, closest_wins: 10, speed_run: 120, flags: 12, higher_lower: 100, guess_country: 8, territory_battle: ATLAS_SCORING.territoryRounds };
+const QUESTION_COUNTS: Partial<Record<AtlasMode, number>> = { map_click: 10, closest_wins: 10, speed_run: 120, flags: 12, higher_lower: 100, guess_country: 8 };
 /** Modes whose question panel takes the full width: the world map would give the answer away or has no role. */
 const PANEL_ONLY: AtlasMode[] = ["flags", "higher_lower", "speed_run"];
 
@@ -45,7 +45,7 @@ function buildRun(data: AtlasDataset, mode: AtlasMode, settings: SoloSettings, s
   if (mode === "flags") return { questions: generateFlagQuestions(common), fillTargets: [] };
   if (mode === "higher_lower") return { questions: generateComparisonQuestions({ ...common, chain: true, stats: settings.stats }), fillTargets: [] };
   if (mode === "guess_country") return { questions: generateGuessCountryQuestions(common), fillTargets: [] };
-  if (mode === "closest_wins" || mode === "territory_battle") return { questions: generateMatchQuestions({ ...common, mode, categories: settings.categories }), fillTargets: [] };
+  if (mode === "closest_wins") return { questions: generateMatchQuestions({ ...common, mode, categories: settings.categories }), fillTargets: [] };
   return { questions: generateQuestions({ ...common, categories: mode === "map_click" ? ["locations"] : settings.categories, interaction: mode === "map_click" ? "map_click" : mode === "speed_run" ? "choice" : "mixed" }), fillTargets: [] };
 }
 
@@ -64,7 +64,6 @@ export function AtlasSoloGame({ data, mode, settings, seed, title, player, onFin
   const [elapsedMs, setElapsedMs] = useState(0);
   const [fillState, setFillState] = useState(() => createMapFillState(run.fillTargets));
   const [guess, setGuess] = useState<GuessState>(freshGuess);
-  const [ownership, setOwnership] = useState<Record<string, "player_a" | "player_b">>({});
   const [pin, setPin] = useState<Coordinates | null>(null);
   const [closest, setClosest] = useState<{ distanceKm: number; nearest: Coordinates; points: number } | null>(null);
   const [over, setOver] = useState(false);
@@ -72,9 +71,7 @@ export function AtlasSoloGame({ data, mode, settings, seed, title, player, onFin
   const advanceTimer = useRef<number | null>(null);
   const shapes = useMemo(() => mode === "closest_wins" ? countryShapesFromTopology(data.topology) : undefined, [data.topology, mode]);
   const currentQuestion = questions[questionIndex];
-  const owned = Object.values(ownership).filter((owner) => owner === "player_a").length;
-  const rival = Object.values(ownership).filter((owner) => owner === "player_b").length;
-  const score = mode === "map_fill" ? fillState.score : mode === "territory_battle" ? owned : stats.score;
+  const score = mode === "map_fill" ? fillState.score : stats.score;
 
   const stopAdvanceTimer = () => { if (advanceTimer.current !== null) window.clearTimeout(advanceTimer.current); advanceTimer.current = null; };
   useEffect(() => { startedAt.current = Date.now(); questionStartedAt.current = Date.now(); return stopAdvanceTimer; }, []);
@@ -83,9 +80,9 @@ export function AtlasSoloGame({ data, mode, settings, seed, title, player, onFin
     if (!over || reported.current) return;
     reported.current = true;
     onFinish({ score, correct: mode === "map_fill" ? fillState.found.length : stats.correct, wrong: mode === "map_fill" ? fillState.mistakes : stats.wrong, bestStreak: mode === "map_fill" ? fillState.bestStreak : stats.bestStreak,
-      elapsedMs: Date.now() - startedAt.current, missed: stats.missed, fill: mode === "map_fill" ? fillState : undefined, territory: mode === "territory_battle" ? { mine: owned, rival } : undefined,
+      elapsedMs: Date.now() - startedAt.current, missed: stats.missed, fill: mode === "map_fill" ? fillState : undefined,
       averageKm: mode === "closest_wins" ? stats.distanceTotal / Math.max(1, stats.correct + stats.wrong) : undefined });
-  }, [fillState, mode, onFinish, over, owned, rival, score, stats]);
+  }, [fillState, mode, onFinish, over, score, stats]);
   useEffect(() => {
     if (over || mode !== "speed_run") return;
     const interval = window.setInterval(() => {
@@ -117,12 +114,10 @@ export function AtlasSoloGame({ data, mode, settings, seed, title, player, onFin
     setStats((current) => {
       return record(current, correct, mode === "speed_run" ? speedRunScore(correct) : normalScore(correct, Math.max(0, roundMs - responseTime), roundMs), currentQuestion.entityId);
     });
-    // Alone, Territory Battle is you against a rival empire: every miss hands the country to the rival.
-    if (mode === "territory_battle") setOwnership((current) => ({ ...current, [currentQuestion.entityId]: correct ? "player_a" : "player_b" }));
     stopAdvanceTimer();
     // Higher or Lower is a streak: the first miss reveals the value, then ends the run.
     advanceTimer.current = window.setTimeout(mode === "higher_lower" && !correct ? () => setOver(true) : () => advanceFrom(questionIndex),
-      mode === "speed_run" ? 320 : mode === "higher_lower" ? 1300 : mode === "territory_battle" ? 1400 : 1000);
+      mode === "speed_run" ? 320 : mode === "higher_lower" ? 1300 : 1000);
   }, [advanceFrom, currentQuestion, feedback, mode, over, questionIndex, settings.difficulty]);
 
   /** One guess per tip. A miss reveals the next tip; the last miss reveals the country. */
@@ -169,7 +164,7 @@ export function AtlasSoloGame({ data, mode, settings, seed, title, player, onFin
   const progress = mode === "map_fill" ? (fillState.targets.length ? fillState.found.length / fillState.targets.length * 100 : 0)
     : mode === "speed_run" ? remainingMs / 600 : mode === "higher_lower" ? Math.min(100, stats.streak * 5) : questionIndex / Math.max(1, questions.length) * 100;
   const pins = pinning && pin ? [{ coordinates: pin, label: closest ? `${Math.round(closest.distanceKm).toLocaleString("en")} km` : "Your pin", color: player?.color ?? "#ffd372", target: closest && closest.distanceKm >= .5 ? closest.nearest : undefined }] : [];
-  const counter = mode === "map_fill" ? settings.scope : mode === "higher_lower" ? `Streak ${stats.streak}` : `${mode === "guess_country" ? "Country" : mode === "territory_battle" || mode === "closest_wins" ? "Round" : "Question"} ${questionIndex + 1}${mode !== "speed_run" ? ` / ${questions.length}` : ""}`;
+  const counter = mode === "map_fill" ? settings.scope : mode === "higher_lower" ? `Streak ${stats.streak}` : `${mode === "guess_country" ? "Country" : mode === "closest_wins" ? "Round" : "Question"} ${questionIndex + 1}${mode !== "speed_run" ? ` / ${questions.length}` : ""}`;
 
   return (
     <main className="atlas-game-page">
@@ -178,15 +173,15 @@ export function AtlasSoloGame({ data, mode, settings, seed, title, player, onFin
         <div><span className="atlas-eyebrow">{title}</span><strong>{counter}</strong></div>
         <div className="atlas-game-stats">
           {player && <span className="atlas-turn-chip" style={{ "--player": player.color } as CSSProperties}><i />{player.name}</span>}
-          <span><Trophy size={16} />{mode === "territory_battle" ? `${owned} – ${rival}` : score}</span>
+          <span><Trophy size={16} />{score}</span>
           {mode === "speed_run" && <span><Clock3 size={16} />{(remainingMs / 1000).toFixed(1)}</span>}
-          {mode !== "territory_battle" && <span>{mode === "map_fill" ? `${fillState.found.length}/${fillState.targets.length}` : `${stats.correct} ✓`}</span>}
+          <span>{mode === "map_fill" ? `${fillState.found.length}/${fillState.targets.length}` : `${stats.correct} ✓`}</span>
         </div>
       </header>
       <section className={`atlas-play-layout ${PANEL_ONLY.includes(mode) ? "is-panel-only" : ""}`}>
         <div className="atlas-question-panel">
           <div className="atlas-progress"><i style={{ width: `${progress}%` }} /></div>
-          <span className="atlas-eyebrow">{mode === "map_fill" ? `${fillState.targets.length - fillState.found.length} remaining` : guessing ? `Tip ${guess.tip + 1} of ${guessing.clues.length}` : mode === "territory_battle" ? questionIndex >= questions.length / 2 ? "Second half · steal or lose countries" : "First half · capture countries" : currentQuestion?.category}</span>
+          <span className="atlas-eyebrow">{mode === "map_fill" ? `${fillState.targets.length - fillState.found.length} remaining` : guessing ? `Tip ${guess.tip + 1} of ${guessing.clues.length}` : currentQuestion?.category}</span>
           <h1>{mode === "map_fill" ? `Find ${expectedFill?.shortName || "the next country"}` : currentQuestion?.prompt}</h1>
           {(currentQuestion?.interaction === "map_click" || currentQuestion?.interaction === "closest_click") && currentQuestion.flagAsset && <img className="atlas-question-flag" src={currentQuestion.flagAsset} alt="Country flag to identify" />}
           {mode === "flags" && currentQuestion?.interaction === "single_choice" && <><FlagPrompt question={currentQuestion} topology={data.topology} /><FlagChoices question={currentQuestion} disabled={Boolean(feedback)} selected={feedback?.selected} correctId={feedback ? currentQuestion.answer : null} onAnswer={answer} /></>}
@@ -202,16 +197,14 @@ export function AtlasSoloGame({ data, mode, settings, seed, title, player, onFin
           {closest && <div className={`atlas-feedback ${closest.points >= 300 ? "is-correct" : "is-wrong"}`}><Crosshair /><div><strong>{closest.distanceKm < .5 ? `${pinning?.targetRadiusKm ? "Inside the city target" : `Inside ${nameOf(currentQuestion?.entityId)}`} — +1,000` : `${Math.round(closest.distanceKm).toLocaleString("en")} km from ${pinning?.targetRadiusKm ? "the city target" : nameOf(currentQuestion?.entityId)} — +${closest.points}`}</strong><span>{pinning?.targetRadiusKm ? "Measured from a 20 km radius around the city center" : "Measured to the nearest border"}</span></div></div>}
           {currentQuestion && !["map_click", "guess_country", "closest_click"].includes(currentQuestion.interaction) && (mode === "speed_run" || !PANEL_ONLY.includes(mode)) && <QuestionControls question={currentQuestion} feedback={feedback} answers={multiAnswers} setAnswers={setMultiAnswers} onAnswer={answer} />}
           {currentQuestion && <AtlasAreaReference values={areaValuesFromText(currentQuestion.prompt)} />}
-          {feedback && mode === "territory_battle" && <div className={`atlas-feedback ${feedback.correct ? "is-correct" : "is-wrong"}`}>{feedback.correct ? <Check /> : <X />}<div><strong>{feedback.correct ? `You hold ${nameOf(currentQuestion?.entityId)}` : `The rival takes ${nameOf(currentQuestion?.entityId)}`}</strong><span>{owned} yours · {rival} rival</span></div></div>}
-          {feedback && mode !== "territory_battle" && <div className={`atlas-feedback ${feedback.correct ? "is-correct" : "is-wrong"}`}>{feedback.correct ? <Check /> : <X />}<div><strong>{feedback.correct ? "Correct" : mode === "higher_lower" ? "Streak over" : "Not quite"}</strong><span>{currentQuestion?.interaction === "higher_lower" && currentQuestion.second ? currentQuestion.second.label : nameOf(currentQuestion?.entityId)}{currentQuestion?.sourceMetadata[0] ? ` · ${currentQuestion.sourceMetadata[0].source}${currentQuestion.sourceMetadata[0].year ? ` ${currentQuestion.sourceMetadata[0].year}` : ""}` : ""}</span></div></div>}
-          {mode === "territory_battle" && <div className="atlas-scoreboard"><div><span><i className="player-0" />You</span><strong>{owned} countries</strong></div><div><span><i className="player-1" />Rival empire</span><strong>{rival} countries</strong></div></div>}
+          {feedback && <div className={`atlas-feedback ${feedback.correct ? "is-correct" : "is-wrong"}`}>{feedback.correct ? <Check /> : <X />}<div><strong>{feedback.correct ? "Correct" : mode === "higher_lower" ? "Streak over" : "Not quite"}</strong><span>{currentQuestion?.interaction === "higher_lower" && currentQuestion.second ? currentQuestion.second.label : nameOf(currentQuestion?.entityId)}{currentQuestion?.sourceMetadata[0] ? ` · ${currentQuestion.sourceMetadata[0].source}${currentQuestion.sourceMetadata[0].year ? ` ${currentQuestion.sourceMetadata[0].year}` : ""}` : ""}</span></div></div>}
           {mode === "map_fill" && <div className="atlas-fill-meta"><span>{fillState.mistakes} mistakes</span><span>{fillState.streak} streak</span><span>{Math.round(fillState.found.length / Math.max(1, fillState.targets.length) * 100)}% complete</span><span>{Math.floor(elapsedMs / 1000)}s elapsed</span></div>}
         </div>
         {!PANEL_ONLY.includes(mode) && <AtlasWorldMap topology={data.topology} entities={data.countries} onSelect={selectMap} onPoint={pinning && !closest ? setPin : undefined} pins={pins}
           selectedId={guessing ? guess.selectedId : feedback?.selected || (currentQuestion?.interaction === "single_choice" && currentQuestion.category === "countries" ? currentQuestion.entityId : null)}
-          correctId={correctId} incorrectId={wrongId} filledIds={fillState.found} ownership={ownership} focus={mode === "map_fill" ? focusForScope(settings.scope) : null}
+          correctId={correctId} incorrectId={wrongId} filledIds={fillState.found} focus={mode === "map_fill" ? focusForScope(settings.scope) : null}
           disabled={(Boolean(feedback) && mode !== "map_fill") || Boolean(guess.result) || Boolean(closest) || over}
-          showHoverLabels={!["map_fill", "closest_wins", "territory_battle"].includes(mode) && currentQuestion?.interaction !== "map_click" && currentQuestion?.category !== "countries"}
+          showHoverLabels={!["map_fill", "closest_wins"].includes(mode) && currentQuestion?.interaction !== "map_click" && currentQuestion?.category !== "countries"}
           ariaLabel={mode === "map_fill" ? `World map. Find ${expectedFill?.shortName}.` : currentQuestion?.prompt} />}
       </section>
     </main>
@@ -227,16 +220,13 @@ function QuestionControls({ question, feedback, answers, setAnswers, onAnswer }:
 /** Headline, score and the four stat tiles after a run; `actions` decides what comes next (again, next player…). */
 export function SoloResults({ mode, summary, entities, eyebrow = "Expedition complete", actions }: { mode: AtlasMode; summary: SoloSummary; entities: GeographicEntity[]; eyebrow?: string; actions: ReactNode }) {
   const answered = summary.correct + summary.wrong;
-  const territory = summary.territory;
   const headline = mode === "map_fill" && summary.fill?.complete ? "Region mastered" : mode === "higher_lower" ? `Streak of ${summary.bestStreak}`
-    : territory ? territory.mine > territory.rival ? "Your empire prevails" : territory.mine === territory.rival ? "A stalemate" : "The rival empire wins" : "Great run";
-  const tiles = territory
-    ? [{ value: territory.mine, label: "Your influence" }, { value: territory.rival, label: "Rival influence" }, { value: answered ? `${Math.round(summary.correct / answered * 100)}%` : "—", label: "Knowledge accuracy" }, { value: `${Math.round(summary.elapsedMs / 1000)}s`, label: "Elapsed" }]
-    : mode === "closest_wins"
+    : "Great run";
+  const tiles = mode === "closest_wins"
       ? [{ value: summary.correct, label: "Bullseyes" }, { value: `${Math.round(summary.averageKm ?? 0).toLocaleString("en")} km`, label: "Average distance" }, { value: answered, label: "Pins" }, { value: `${Math.round(summary.elapsedMs / 1000)}s`, label: "Elapsed" }]
       : [{ value: summary.correct, label: "Correct" }, { value: mode === "map_fill" ? summary.wrong : `${answered ? Math.round(summary.correct / answered * 100) : 0}%`, label: mode === "map_fill" ? "Mistakes" : "Accuracy" }, { value: summary.bestStreak, label: "Best streak" }, { value: `${Math.round(summary.elapsedMs / 1000)}s`, label: "Elapsed" }];
   return <main className="atlas-page atlas-center"><div className="atlas-result-orbit"><Trophy /></div><span className="atlas-eyebrow">{eyebrow}</span><h1>{headline}</h1>
-    <p className="atlas-result-score">{new Intl.NumberFormat("en").format(summary.score)} <small>{territory ? "influence" : "points"}</small></p>
+    <p className="atlas-result-score">{new Intl.NumberFormat("en").format(summary.score)} <small>points</small></p>
     <div className="atlas-result-grid">{tiles.map((tile) => <div key={tile.label}><strong>{tile.value}</strong><span>{tile.label}</span></div>)}</div>
     {summary.missed.length > 0 && <p className="atlas-missed">Review: {[...new Set(summary.missed)].slice(0, 5).map((id) => entities.find((entity) => entity.id === id)?.shortName).filter(Boolean).join(", ")}</p>}
     <div className="atlas-result-actions">{actions}</div></main>;

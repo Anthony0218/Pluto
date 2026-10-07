@@ -238,15 +238,15 @@ test("token and focus events for the same account do not restart the stats load"
 });
 
 
-test("profile header shows only the selected game's ranks and removes standalone Go boxes", () => {
+test("profile header shows all ranks on General and only the selected game's ranks on game tabs", () => {
   const auth = { user: alice, profile: { id: alice.id, username: "Alice" }, loading: false };
-  for (const tab of ["general", "chess", "go", "atlas", "watten"]) {
+  for (const tab of ["general", "chess", "go", "atlas", "watten", "schafkopf", "natura", "medieval", "eat-it"]) {
     const html = profileMarkup(auth, tab);
     for (const [id, label] of [["chess", "Chess"], ["go", "Go"], ["atlas", "Atlas"]]) {
-      assert.equal(html.includes(`${label} ranks marker`), tab === id, `${tab}: ${label}`);
+      assert.equal(html.includes(`${label} ranks marker`), tab === "general" || tab === id, `${tab}: ${label}`);
     }
     assert.doesNotMatch(html, /Go · Game history|Go · Ranked/);
-    if (["chess", "go", "atlas"].includes(tab)) {
+    if (["general", "chess", "go", "atlas"].includes(tab)) {
       assert.ok(html.indexOf("ranks marker") < html.indexOf("Player name"), "rank appears inside the profile header");
     }
   }

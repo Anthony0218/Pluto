@@ -97,12 +97,13 @@ test("guess scoring: all solvers 3, early-tip bonuses +2/+1", () => {
   assert.deepEqual(solved.scores, { a: 1, b: 4, c: 4, d: 0 });
 });
 
-test("rooms seat two to four players; Territory Battle stays one-on-one", () => {
+test("rooms seat two to four players; Stat Battle stays one-on-one", () => {
   assert.equal(maxPlayersFor("guess_country"), 4);
-  assert.equal(maxPlayersFor("territory_battle"), 2);
+  assert.equal(maxPlayersFor("history_battle"), 4);
+  assert.equal(maxPlayersFor("stat_battle"), 2);
   assert.equal(clampPlayers("flag_battle", 3), 3);
   assert.equal(clampPlayers("flag_battle", 9), 4);
-  assert.equal(clampPlayers("territory_battle", 4), 2);
+  assert.equal(clampPlayers("stat_battle", 4), 2);
   assert.equal(clampPlayers("higher_lower", "nonsense"), 2);
 });
 

@@ -110,11 +110,71 @@ West Germany. Sources: [FIFA men's championship history](https://www.fifa.com/en
 [FIFA's simultaneous champions report](https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/spain-men-women-first-simultaneous-champions),
 and [UEFA women's winners and final results](https://www.uefa.com/womensworldcup/news/027a-166817b8be17-9e0082e122cd-1000--women-s-world-cup-groups-and-matches-netherlands-face-us-eng/).
 
-This is a small manually authored set of historical facts with provenance links,
+The club honours are a small manually authored set of historical facts with provenance links,
 not a copied provider database, scraped feed or redistributed site media. A future
 bulk/live data integration needs an explicit provider licence and refresh policy.
 When refreshing, change the cutoff labels and records together, verify winning
 years against the organiser, update this provenance record, and run the tests.
+
+## Tournament histories expanded on 7 October 2026
+
+`src/data/footballTournamentHistory.ts` contains **188 completed editions** with
+both winner and runner-up, independent of optional match and goal details:
+
+| Tournament (including predecessor) | Final / edition years | Editions |
+| --- | --- | --- |
+| Men's FIFA World Cup | 1930–2026 | 23 |
+| Women's FIFA World Cup | 1991–2023 | 9 |
+| European Cup / men's Champions League | 1956–2026 | 71 |
+| Women's UEFA Cup / Champions League | 2002–2026 | 25 |
+| UEFA Cup / Europa League | 1972–2026 | 55 |
+| Conference League | 2022–2026 | 5 |
+
+Years for club tournaments are the year of the final, so the inaugural European
+Cup season 1955/56 is listed as 1956. The cancelled 1942 and 1946 World Cups are
+excluded. Germany includes West Germany, matching the existing honours table.
+Historical clubs retain identifiable names (for example Steaua București,
+1. FFC Frankfurt, FCR 2001 Duisburg, Videoton and Austria Salzburg).
+
+The bulk expansion uses **Wikidata's structured entity statements**, published
+under [CC0](https://www.wikidata.org/wiki/Wikidata:Licensing). Only identifiers,
+years, team names, winner/participant statements, placement qualifiers, match
+scores, shootout scores and match dates were extracted using `wbgetentities`.
+Wikipedia sitelink titles identify the corresponding entities; Wikipedia article
+text and tables were not imported. Each edition and available final has its own
+source link. This licence applies to structured facts, not photos, logos, article
+prose or other linked website content. The UI and Credits include the licence link.
+
+Importing all statements without checking them would introduce errors. Small
+manual factual corrections, with separate primary source links in the records,
+resolve missing finalists, current club names, duplicated/non-team participants,
+and scores that included penalty shootouts. Those corrections reproduce only
+bare match facts; no organiser prose, page layout, images or bulk provider tables
+are redistributed. Examples include the [1984 Liverpool–Roma shootout](https://www.uefa.com/uefachampionsleague/history/seasons/1983/),
+the [1996 Juventus–Ajax final](https://www.uefa.com/uefachampionsleague/history/video/finals/0232-0e679758278d-aa4cd8aa4139-1000--1996-final-highlights-juventus-1-1-ajax-4-2-pens/),
+and the [2021 Villarreal–Manchester United shootout](https://www.uefa.com/uefaeuropaleague/news/0269-125f1aaaeb0d-c59e8a06ac14-1000--villarreal-1-1-manchester-united-aet-11-10-pens-spanish-side-wi/).
+
+The explorer includes **162 final results**. The 26 early UEFA Cup finals without
+verified scores in the imported structured data keep their winner and runner-up;
+match details remain explicitly unavailable instead of inventing scores. The
+13 curated goal timelines are available alongside basic final results. The 2022
+Conference League final includes Nicolò Zaniolo's 32nd-minute goal, verified
+against [UEFA's match report](https://www.uefa.com/uefaconferenceleague/news/0275-153b4c3b58ce-9dd2bc95bfd0-1000--roma-win-the-europa/).
+A missing goal timeline is not a zero-goal match. The tournament sidebar lists
+all winning teams and their title totals across the full recorded history,
+regardless of the selected year.
+
+Women's UEFA Cup finals from 2003–2009 use labelled two-leg aggregate scores.
+The [1974 European Cup replay](https://www.uefa.com/uefachampionsleague/news/0035-0e6a06cf32ec-449321a41353-1000--1973-74-muller-ends-bayern-wait/)
+is shown as 4–0, not the sum of the original draw and replay. The
+[1950 World Cup deciding match](https://www.fifa.com/en/articles/uruguay-brazil-1950-maracanazo)
+is labelled as a final-round match because the title was decided by a four-team
+round robin. Shootout scores are always separate from match scores.
+
+This is a bundled historical snapshot; it introduces no live requests or automatic
+refresh. Refresh records, source links, coverage and verification date together,
+then validate complete season coverage and consistency between edition winners,
+final teams and match/shootout results.
 
 ## Music references
 

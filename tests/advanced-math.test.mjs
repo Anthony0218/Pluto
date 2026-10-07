@@ -94,7 +94,8 @@ test('two complete courses have valid routes, examples, graphs and independently
     if (activity.graph.compare) expression(activity.graph.compare);
     activity.practice.forEach((question, j) => { assert.equal(gradeMathAnswer(question.answer, String(expected[index][j])), 'correct', activity.id+'/'+question.id); assert.ok(question.notation && question.hint && question.solution && question.verification); });
   }
-  assert.equal(toolApps.find(item => item.id === 'function-plotter').status, 'available');
+  // The plotter lives on inside these lessons; it is no longer a separate app.
+  assert.equal(toolApps.find(item => item.id === 'function-plotter'), undefined);
 });
 
 test('new solved exercises survive reload, reject unknown IDs and remain isolated per account', () => {

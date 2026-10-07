@@ -1,0 +1,61 @@
+/* The Calculator and the Percentage Calculator share one device: a display on top, a keypad below. */
+/* The side panel sits beside the device when there is room for it and drops below otherwise, whatever the page or frame around it. */
+.calc-layout { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 26px; margin-bottom: 26px; color: #cbd5e8; }
+.calc-body { flex: 0 1 380px; min-width: 0; padding: 18px; border: 1px solid #8e83c74d; border-radius: 28px; background: linear-gradient(165deg, #1c2542, #0e1528 70%); box-shadow: 0 26px 60px -34px #000, inset 0 1px 0 #ffffff17; }
+.calc-body:focus-visible { outline: 2px solid #c4b5fd; outline-offset: 4px; }
+.calc-display { display: grid; gap: 6px; min-height: 112px; padding: 16px 18px; border: 1px solid #7585b12d; border-radius: 18px; background: #060a15; box-shadow: inset 0 2px 14px #000b; text-align: right; font-variant-numeric: tabular-nums; }
+.calc-expression { min-height: 22px; margin: 0; color: #8fa0c4; font-size: 14px; line-height: 1.55; overflow-wrap: anywhere; }
+.calc-readout { display: block; align-self: end; color: #f3f1ff; font-size: clamp(30px, 9vw, 46px); font-weight: 600; line-height: 1.15; letter-spacing: -.01em; overflow-wrap: anywhere; }
+.calc-readout.is-long { font-size: 30px; }
+.calc-readout.is-longer { font-size: 22px; }
+.calc-readout.is-error { color: #fda4af; font-size: 20px; font-weight: 550; }
+
+.calc-keys { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 16px; }
+.calc-key { display: inline-flex; justify-content: center; align-items: center; gap: 6px; min-width: 0; min-height: 60px; border: 1px solid #ffffff14; border-bottom: 3px solid #090d1a; border-radius: 16px; background: #1f2845; color: #eef0ff; font-size: 22px; font-weight: 550; font-variant-numeric: tabular-nums; cursor: pointer; touch-action: manipulation; user-select: none; transition: transform .06s, background .12s; }
+.calc-key:hover { background: #273156; }
+.calc-key:active, .calc-key.is-pressed { transform: translateY(2px); border-bottom-width: 1px; margin-bottom: 2px; }
+.calc-key:focus-visible { outline: 2px solid #c4b5fd; outline-offset: 2px; }
+.calc-key--function { background: #2b3454; color: #c9d3ee; font-size: 17px; }
+.calc-key--function:hover { background: #343e63; }
+.calc-key--operator { background: #3b3478; color: #e9e3ff; font-size: 25px; }
+.calc-key--operator:hover { background: #473f8e; }
+.calc-key--operator[aria-pressed=true] { background: #c4b5fd; color: #1b1740; }
+.calc-key--equals { background: #6553d5; border-color: #9a8ae3; border-bottom-color: #2c2371; color: #fff; font-size: 25px; }
+.calc-key--equals:hover { background: #7362e0; }
+.calc-key--wide { grid-column: span 2; }
+.calc-key small { font-size: 13px; font-weight: 600; }
+
+.calc-side { flex: 1 1 300px; min-width: 0; padding: 22px 24px; border: 1px solid #8e83c73d; border-radius: 18px; background: #10162bef; }
+.calc-side h2 { color: #eae5ff; font-size: 17px; font-weight: 600; margin-bottom: 12px; }
+.calc-side > .lt-storage-note { margin-bottom: 0; }
+.calc-history { display: grid; gap: 8px; margin: 0 0 14px; }
+.calc-history button { display: grid; gap: 2px; width: 100%; padding: 10px 14px; border: 1px solid #7585b12d; border-radius: 12px; background: #151d33; color: #8fa0c4; font-size: 12px; text-align: right; font-variant-numeric: tabular-nums; cursor: pointer; overflow-wrap: anywhere; }
+.calc-history button:hover { border-color: #a99bea80; }
+.calc-history button:focus-visible { outline: 2px solid #c4b5fd; outline-offset: 2px; }
+.calc-history strong { color: #ede9fe; font-size: 17px; font-weight: 600; }
+.calc-empty { color: #8998b3; font-size: 13px; line-height: 1.7; }
+
+/* Percentage Calculator: the display holds one row per value, and the keypad types into the highlighted row. */
+.calc-mode { display: grid; gap: 7px; margin-bottom: 14px; color: #aab6d3; font-size: 12px; }
+.calc-mode select { width: 100%; min-width: 0; padding: 11px 12px; border: 1px solid #8290bc4b; border-radius: 12px; background: #1a2238; color: #edf0ff; font-size: 15px; }
+.calc-mode select option { background: #1a2238; }
+.calc-mode select:focus-visible { outline: 2px solid #c4b5fd; outline-offset: 3px; }
+.calc-display--fields { gap: 4px; padding: 10px; }
+.calc-field { display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr); align-items: center; gap: 12px; padding: 7px 10px; border: 1px solid transparent; border-radius: 12px; cursor: text; }
+.calc-field span { color: #8fa0c4; font-size: 12px; text-align: left; }
+.calc-field input { width: 100%; min-width: 0; padding: 0; border: 0; background: transparent; color: #dfe4f7; font: inherit; font-size: 24px; font-weight: 550; text-align: right; outline: none; caret-color: #c4b5fd; }
+.calc-field.is-active { border-color: #a99bea8c; background: #a99bea1c; }
+.calc-field.is-active span { color: #d6ccff; }
+.calc-field.is-active input { color: #fff; }
+.calc-field input[aria-invalid=true] { color: #fda4af; }
+.calc-result { display: grid; gap: 4px; margin-top: 6px; padding: 12px 10px 4px; border-top: 1px dashed #7585b155; }
+.calc-result .lt-eyebrow { color: #a5b4fc; }
+.calc-result p { margin: 0; color: #aab6d3; font-size: 13px; line-height: 1.6; }
+.calc-result p strong { color: #ede9fe; }
+.calc-result .pt-error { color: #fda4af; text-align: left; }
+.calc-side .pt-working { margin-top: 0; }
+.calc-side .pt-percent-bar { margin: 0 0 6px; }
+.calc-rate { margin: 0 0 18px; color: #aab6d3; font-size: 12px; }
+
+@media (max-width: 440px) { .calc-body { padding: 14px; border-radius: 24px; } .calc-keys { gap: 8px; } .calc-key { min-height: 54px; } .calc-side { padding: 16px; } }
+@media (prefers-reduced-motion: reduce) { .calc-key { transition: none; } }

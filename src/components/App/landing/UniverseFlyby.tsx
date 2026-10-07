@@ -4,11 +4,10 @@ import { ArrowRight, ChevronDown } from "lucide-react";
 import { useMotionValueEvent, useTransform, type MotionStyle, type MotionValue } from "motion/react";
 import * as m from "motion/react-m";
 import { ui, useUiLanguage } from "@/i18n/ui";
-import { learningPaths, learningSubjects } from "@/data/learningCatalog";
 import { AppTileArt, BookArt, PlanetArt } from "../planetary/PlanetScene";
 import { landingBookTitle } from "../planetary/landingCopy";
 import { useCopy } from "./copy";
-import { flybyScene, type FlybyItem } from "./flybyCatalog";
+import { bookTopics, flybyScene, type FlybyItem } from "./flybyCatalog";
 import { useLanding } from "./landingContext";
 import { clamp01, lerp, smoothstep } from "./landingMath";
 import { usePlanetLanding } from "./usePlanetLanding";
@@ -107,7 +106,7 @@ export default function UniverseFlyby() {
   const buttonOpacity = useTransform(() => arrivalIn.get() * (1 - clamp01(index.get() / 0.2)));
   useMotionValueEvent(buttonOpacity, "change", value => setArrived(value > 0.6));
   const planetLabel = useTransform(() => smoothstep((enter.get() - 0.9) / 0.1) * (1 - smoothstep(camera.get() / 0.18)));
-  const topics = scene.center.tool?.features ?? learningPaths.find(path => path.id === scene.center.book?.id)?.topics ?? [learningSubjects.find(subject => subject.id === scene.center.book?.id)?.resourceLabel ?? ""];
+  const topics = scene.center.tool?.features ?? (scene.center.book ? bookTopics(scene.center.book) : []);
   const line = category === "games" ? ("key" in scene.line ? text(scene.line.key) : ui(scene.line.text)) : topics.slice(0, 2).map(topic => ui(topic)).join(" · ");
   const captionId = category === "learn" ? `book-${scene.center.id}` : category === "games" ? "chess" : scene.center.id;
 

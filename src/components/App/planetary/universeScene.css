@@ -45,6 +45,11 @@
 .landing-universe:is([data-category="tools"], [data-category="learn"]) .universe-stage { height: auto; min-height: 438px; }
 .landing-universe:is([data-category="tools"], [data-category="learn"]) .universe-panel { position: relative; }
 .universe-grid--learn .universe-art-wrap { zoom: .85; }
+.universe-grid--learn:has(.universe-shelf-head) { grid-template-rows: 48px; }
+.universe-shelf-head { grid-column: 1 / -1; display: flex; align-items: center; gap: 14px; min-height: 44px; }
+.universe-shelf-head button { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 14px; border: 1px solid #a7b6e438; border-radius: 12px; background: #18213ad9; color: #cfd8f5; font-size: 13px; font-weight: 600; transition: background-color .15s, color .15s; }
+.universe-shelf-head button:hover { background: #26325a; color: #fff; }
+.universe-shelf-head strong { color: #fff; font-size: 18px; font-weight: 800; letter-spacing: -.02em; }
 .universe-grid--tools .universe-art-wrap { zoom: .85; }
 .universe-object { position: relative; min-width: 0; display: flex; justify-content: center; align-items: center; opacity: var(--hero-fade, 1); pointer-events: var(--hero-events, auto); }
 .universe-card {
@@ -70,7 +75,6 @@
 .universe-app-shine { position: absolute; inset: 0; z-index: -1; background: radial-gradient(circle at 18% 6%, #fff2, transparent 62%); }
 .universe-app--number-system-converter { background: repeating-linear-gradient(0deg, #a3d7ff05 0 1px, transparent 1px 9px), linear-gradient(145deg, #193b58, #122035); }
 .universe-app--unit-converter { border-radius: 24px 24px 34px 24px; }
-.universe-app--recipe-scaler { background: radial-gradient(circle at 20% 10%, #f4bb7028, transparent 70%), #2c2024; }
 .universe-book { position: relative; display: block; width: 112px; height: 138px; transform-style: preserve-3d; transform: perspective(700px) rotateY(-15deg) rotateZ(-7deg); }
 .universe-book-pages { position: absolute; inset: 3px -5px -2px 8px; border-radius: 2px 5px 5px 2px; background: repeating-linear-gradient(0deg, #ede4cd 0 1px, #bfb6a5 1px 2px, #f5eedf 2px 4px); border-bottom: 3px solid #484a60; box-shadow: 7px 13px 24px #0006; }
 .universe-book-cover { position: absolute; inset: 0; overflow: hidden; border-radius: 2px 5px 5px 2px; border: 1px solid #d6deff28; padding: 12px 11px 10px 17px; background: #182b46; color: #daecff; box-shadow: inset 1px 0 #fff3, inset -1px 0 #0004; }
@@ -82,6 +86,11 @@
 .universe-book--math .universe-book-cover { background: repeating-linear-gradient(0deg, transparent 0 12px, #9cecff0c 12px 13px), repeating-linear-gradient(90deg, transparent 0 12px, #9cecff0c 12px 13px), #153144; color: #a9e7eb; }
 .universe-book--math .universe-book-illustration { justify-items: start; }
 .universe-book--math .universe-book-illustration::after { content: ""; position: absolute; right: 0; top: 8px; width: 22px; height: 22px; border: 1px solid #9fe6ed88; border-radius: 50%; }
+.universe-book--foundations { transform: perspective(700px) rotateY(-13deg) rotateZ(-5deg); }
+.universe-book--foundations .universe-book-cover { background: linear-gradient(150deg, #1d4a66, #12293d); color: #a9e7eb; }
+.universe-book--foundations .universe-book-title { font-size: 11px; }
+.universe-book--music { transform: perspective(700px) rotateY(-14deg) rotateZ(5deg); }
+.universe-book--music .universe-book-cover { background: repeating-linear-gradient(0deg, transparent 0 7px, #f5d0fe14 7px 8px), linear-gradient(150deg, #5b1f6e, #2c0e3a); color: #f5d0fe; }
 .universe-book--percentages { transform: perspective(700px) rotateY(-12deg) rotateZ(6deg); }
 .universe-book--percentages .universe-book-cover { background: linear-gradient(160deg, #ee925d 0 36%, #eee1c6 36%); color: #442d24; }
 .universe-book--percentages .universe-book-illustration > svg { display: none; }

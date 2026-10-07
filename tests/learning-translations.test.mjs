@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { collectLearningKeys } from "../scripts/i18n/learning-keys.mjs";
 
 const read = name => JSON.parse(fs.readFileSync(new URL(`../src/i18n/${name}Translations.json`, import.meta.url), "utf8"));
-const rows = [...read("learnContent"), ...read("milestoneTools"), ...read("advancedMath"), ...read("deeperMath"), ...read("musicFootball"), ...read("footballReference"), ...read("lifeTools"), ...read("finalTools")];
+const rows = [...read("learnContent"), ...read("milestoneTools"), ...read("advancedMath"), ...read("deeperMath"), ...read("musicFootball"), ...read("footballReference"), ...read("lifeTools"), ...read("finalTools"), ...read("notesTool")];
 const tables = ["existing", "ui", "dashboard", "esPt", "eatIt", "chessCustom", "janmann", "social", "information", "learningTools"].map(read);
 const languages = ["de", "bar", "ko", "ru", "es", "pt"];
 const normalize = value => value.replace(/\s+/g, " ").trim();
