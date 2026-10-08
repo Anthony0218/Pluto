@@ -1,17 +1,19 @@
+import { startMinigame, DEFAULT_SETTINGS } from "./helpers/party-legacy-fixtures.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
-import { circleShot, shotOverlap, CIRCLE_SHOT_WINDOW, CIRCLE_SHOT_FLIGHT } from "../src/games/party/minigames/circleShot/index.ts";
+import { circleShot, shotOverlap, shotCircleY, CIRCLE_SHOT_RADIUS, CIRCLE_SHOT_TARGET_Y, CIRCLE_SHOT_WINDOW, CIRCLE_SHOT_FLIGHT } from "../src/games/party/minigames/circleShot/index.ts";
+import { TIMING_INPUT_GRACE_MS } from "../src/games/party/minigames/timing.ts";
 import { lavaKnockback, HELL_ISLANDS, onHellIsland, PUNCH_COOLDOWN } from "../src/games/party/minigames/lavaKnockback/index.ts";
 import { minigameRegistry } from "../src/games/party/minigames/index.ts";
-import { applyMinigameInput, startMinigame, publicMinigameView, finishMinigame } from "../src/games/party/minigames/flow.ts";
+import { applyMinigameInput, publicMinigameView, finishMinigame } from "../src/games/party/minigames/flow.ts";
 import { createMatch, createPlayer } from "../src/games/party/engine/engine.ts";
-import { DEFAULT_SETTINGS } from "../src/games/party/config.ts";
+
 import { parseMessage } from "../src/games/party/network/protocol.ts";
 
 const participants = ["a", "b", "c", "d"].map((id, avatarId) => ({ id, avatarId, isBot: false, difficulty: "medium" }));
 const rng = (seed = 4) => () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296; };
 const make = (def) => def.create({ participants, random: rng(), startedAt: 0, endsAt: def.durationSeconds * 1000 });
-const control = (fields = {}) => ({ type: "KNOCKBACK_CONTROL", x: 0, z: 0, yaw: 0, punch: false, jump: false, ...fields });
+const control = (fields = {}) => ({ type: "KNOCKBACK_CONTROL", x: 0, z: 0, yaw: 0, punch: false, jump: false, guard: false, ...fields });
 function fight(s) {
   Object.assign(s.players.a, { x: 0, z: 0, y: 0 });
   Object.assign(s.players.b, { x: 0, z: -1.5, y: 0, vx: 0, vz: 0 });
@@ -28,7 +30,7 @@ test("timing scoring uses actual equal-circle area: 0%, 80% × 3, and 100%", () 
   assert.equal(shotOverlap(70), shotOverlap(-70));
   let low = 0, high = CIRCLE_SHOT_WINDOW;
   for (let i = 0; i < 60; i++) { const mid = (low + high) / 2; if (shotOverlap(mid) > .8) low = mid; else high = mid; }
-  const s = make(circleShot), circle = s.circles[0]; circle.value = 3;
+  const s = make(circleShot), circle = s.circles[0]; Object.assign(circle, {value:3,shape:"circle",radius:CIRCLE_SHOT_RADIUS,windowMs:CIRCLE_SHOT_WINDOW});
   circleShot.applyInput(s, "a", { type: "CIRCLE_SHOOT", circleId: circle.id }, circle.at + (low + high) / 2);
   assert.ok(Math.abs(s.players.a.score - 2.4) < 1e-10);
   circleShot.applyInput(s, "b", { type: "CIRCLE_SHOOT", circleId: circle.id }, circle.at);
@@ -37,6 +39,7 @@ test("timing scoring uses actual equal-circle area: 0%, 80% × 3, and 100%", () 
 test("all four quadrants see the same current circle; at most one can be falling per seat", () => {
   const s = make(circleShot);
   for (let i = 1; i < s.circles.length; i++) assert.ok(s.circles[i].at - CIRCLE_SHOT_FLIGHT > s.circles[i - 1].at + CIRCLE_SHOT_WINDOW);
+  assert.ok(s.circles.at(-1).at + CIRCLE_SHOT_WINDOW + TIMING_INPUT_GRACE_MS < s.endsAt);
   const view = circleShot.publicView(s, s.circles[0].at);
   assert.equal(Object.keys(view.players).length, 4);
   for (const p of Object.values(view.players)) assert.deepEqual(p.circle, s.circles[0]);
@@ -50,11 +53,45 @@ test("a shot consumes one circle, misses expire, and duplicate or forged inputs 
   const copy = structuredClone(s);
   assert.throws(() => circleShot.applyInput(s, "a", { type: "CIRCLE_SHOOT", circleId: circle.id }, circle.at));
   assert.deepEqual(s, copy);
-  circleShot.tick(s, circle.at + CIRCLE_SHOT_WINDOW);
+  circleShot.tick(s, circle.at + circle.windowMs);
+  assert.equal(s.players.b.misses, 0, "allow a shot from the last displayed frames to arrive");
+  circleShot.tick(s, circle.at + circle.windowMs + TIMING_INPUT_GRACE_MS);
   assert.equal(s.players.b.misses, 1); assert.equal(s.players.b.next, 1);
   assert.equal(circleShot.parseInput({ type: "CIRCLE_SHOOT", circleId: NaN }), null);
   assert.deepEqual(circleShot.parseInput({ type: "CIRCLE_SHOOT", circleId: 1, score: 100000 }), { type: "CIRCLE_SHOOT", circleId: 1 });
-  assert.ok(Object.values(circleShot.publicView(s, circle.at + CIRCLE_SHOT_WINDOW).players).every((p) => p.circle === null));
+  assert.ok(Object.values(circleShot.publicView(s, circle.at + circle.windowMs).players).every((p) => p.circle === null));
+});
+test("circle scoring agrees with the displayed circle area despite delayed packet arrival", () => {
+  for (const error of [-300, -150, -100, 0, 100, 299]) {
+    const s = make(circleShot), circle = s.circles[0]; Object.assign(circle, {value:1,shape:"circle",radius:CIRCLE_SHOT_RADIUS,windowMs:CIRCLE_SHOT_WINDOW});
+    const displayedAt = circle.at + error, receivedAt = displayedAt + 150;
+    const distance = Math.abs(shotCircleY(circle.at, displayedAt) - CIRCLE_SHOT_TARGET_Y);
+    const normalized = Math.min(2, distance / CIRCLE_SHOT_RADIUS);
+    const visibleOverlap = (2 * Math.acos(normalized / 2) - normalized / 2 * Math.sqrt(4 - normalized ** 2)) / Math.PI;
+    circleShot.tick(s, receivedAt);
+    circleShot.applyInput(s, "a", { type: "CIRCLE_SHOOT", circleId: circle.id, elapsedMs: displayedAt - s.startedAt }, receivedAt);
+    assert.ok(Math.abs(s.players.a.score - visibleOverlap) < 1e-10);
+    if (error === 0) assert.equal(s.players.a.score, 1);
+    if (error === -100) assert.ok(s.players.a.score < .6, "a circle visibly above the target cannot earn nearly 100%");
+  }
+});
+test("circle timing survives normal authority ticks and rejects stale, future or replayed frame times", () => {
+  const m = createMatch(participants.map((p, i) => createPlayer(p.id, p.id, i)), DEFAULT_SETTINGS, rng());
+  m.order = participants.map((p) => p.id); startMinigame(m, circleShot.id, rng(), -7000);
+  m.minigame.status = "ACTIVE"; m.phase = "MINIGAME";
+  const s = m.minigame.state, circle = s.circles[0], receivedAt = circle.at + 150;
+  circleShot.tick(s, receivedAt);
+  const input = { type: "CIRCLE_SHOOT", circleId: circle.id, elapsedMs: circle.at - s.startedAt };
+  const parsed = parseMessage({ type: "ACTION", action: { type: "MINIGAME_INPUT", input } });
+  const next = applyMinigameInput(m, "a", parsed.action.input, receivedAt);
+  assert.equal(next.minigame.state.players.a.last.overlap, 1);
+  assert.throws(() => applyMinigameInput(next, "a", input, receivedAt + 1));
+  for (const elapsedMs of [receivedAt - s.startedAt - TIMING_INPUT_GRACE_MS - 1, receivedAt - s.startedAt + 100]) {
+    const copy = structuredClone(s);
+    assert.throws(() => circleShot.applyInput(s, "b", { ...input, elapsedMs }, receivedAt), /out of sync/);
+    assert.deepEqual(s, copy);
+  }
+  for (const elapsedMs of [-1, NaN, Infinity, "2000"]) assert.equal(circleShot.parseInput({ ...input, elapsedMs }), null);
 });
 test("timing bots hit with imperfect accuracy for every difficulty", () => {
   for (const difficulty of ["easy", "medium", "hard"]) {

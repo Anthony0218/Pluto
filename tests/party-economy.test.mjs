@@ -1,22 +1,17 @@
+import { DEFAULT_SETTINGS, advance, applyAction } from "./helpers/party-legacy-fixtures.mjs";
 import test from "node:test";
 import { irradiatedNodeIds } from "../src/games/party/hazards/radiation.ts";
 import assert from "node:assert/strict";
-import { DEFAULT_SETTINGS, RULES } from "../src/games/party/config.ts";
+import { RULES } from "../src/games/party/config.ts";
 import { tropical } from "../src/games/party/content/maps.ts";
-import {
-  activePlayer,
-  advance,
-  applyAction,
+import { activePlayer,
   createMatch,
-  createPlayer,
-} from "../src/games/party/engine/engine.ts";
-import {
-  distanceToPluto,
+  createPlayer } from "../src/games/party/engine/engine.ts";
+import { distanceToPluto,
   eligiblePlutoNodes,
   rankedPlayers,
   reachableLandings,
-  spawnPlutos,
-} from "../src/games/party/engine/economy.ts";
+  spawnPlutos } from "../src/games/party/engine/economy.ts";
 import { botAction } from "../src/games/party/engine/bots.ts";
 import { parseMessage } from "../src/games/party/network/protocol.ts";
 const players = () =>
@@ -195,7 +190,7 @@ test("passing through and zero rolls on a Pluto do not offer purchases", () => {
   s.phase = "ITEM_PHASE";
   s = applyAction(s, "p0", { type: "ROLL_DICE" }, DEFAULT_SETTINGS, () => 0);
   s = advance(s, DEFAULT_SETTINGS, () => 0);
-  assert.equal(s.phase, "TURN_END");
+  assert.equal(s.phase, "ZERO_BONUS");
   assert.equal(s.players[0].goldenPlutos, 0);
 });
 test("KO on a Pluto does not offer purchase at the respawn location", () => {

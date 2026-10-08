@@ -3,9 +3,9 @@ import { toolApps, toolRoute } from "@/data/toolCatalog";
 import { planets } from "./planetConfig";
 
 export type UniverseCategory = "games" | "tools" | "learn";
-export type BookDesign = "math" | "foundations" | "music" | "percentages" | "guides" | "analysis" | "algebra" | "calculus" | "linear" | "depth" | "chance" | "pitch" | "rhythm" | "rules" | "tactics";
+export type BookDesign = "math" | "foundations" | "music" | "percentages" | "guides" | "analysis" | "algebra" | "calculus" | "linear" | "depth" | "chance" | "pitch" | "rhythm" | "rules" | "tactics" | "football" | "signal";
 /** A book with `books` is a subject shelf: opening it shows the books inside rather than leaving the page. */
-export type UniverseBook = { id: string; title: string; route: string; design: BookDesign; books?: UniverseBook[] };
+export type UniverseBook = { id: string; title: string; route: string; design: BookDesign; books?: UniverseBook[]; /** Shown on the shelf but not openable yet. */ disabled?: boolean };
 
 // Editorial selections for the landing page only. Tool titles, routes and
 // availability come from the app catalog; lesson bodies aren't needed here.
@@ -19,17 +19,20 @@ const pathBooks = (subjectId: string, designs: Record<string, BookDesign>): Univ
   learningPaths.flatMap(path => path.subjectId === subjectId && designs[path.id] ? [{ id: path.id, title: path.title, route: pathRoute(path), design: designs[path.id] }] : []);
 const subjectBook = (id: string, design: BookDesign, books?: UniverseBook[]): UniverseBook => ({ id, title: learningSubjects.find(subject => subject.id === id)!.title, route: subjectRoute(id), design, books });
 
-/** Math and Music each gather their courses in one book; the other subjects keep a book apiece. */
+/** Math, Music and Football each gather their courses in one book; the other subjects keep a book apiece. */
 const mathBook = subjectBook("math", "math", pathBooks("math", {
   foundations: "foundations", percentages: "percentages", "algebra-functions": "algebra", calculus: "calculus", "linear-algebra": "linear", analysis: "depth", "probability-statistics": "chance",
 }));
 const musicBook = subjectBook("music", "music", pathBooks("music", { "reading-pitches": "pitch", "reading-rhythm": "rhythm" }));
+const footballBook = subjectBook("football", "football", pathBooks("football", { rules: "rules", "positions-tactics": "tactics" }));
 
 export const universeBooks: UniverseBook[] = [
   mathBook,
   musicBook,
+  footballBook,
   { id: "game-guides", title: "Game guides", route: "/learn/game-guides", design: "guides" },
   { id: "game-analysis", title: "Game Analysis", route: "/learn/game-analysis", design: "analysis" },
+  { ...subjectBook("signal-processing", "signal"), disabled: true },
 ];
 
 /**
@@ -38,8 +41,8 @@ export const universeBooks: UniverseBook[] = [
  */
 export const landingTools = [...universeTools, ...toolApps.flatMap(tool => tool.status === "available" && !universeTools.some(featured => featured.id === tool.id) ? [{ ...tool, route: toolRoute(tool.id) }] : [])];
 
-/** The books on the shelf, in the same way: the picks first, then the football books. */
-export const landingBooks: UniverseBook[] = [...universeBooks, ...pathBooks("football", { rules: "rules", "positions-tactics": "tactics" })];
+/** The books you can open: every book on the shelf above except the ones that are not ready yet. The sections and the journey follow this list. */
+export const landingBooks: UniverseBook[] = universeBooks.filter(book => !book.disabled);
 
 export const universeCategories = [
   { id: "games", label: "Games", action: "Explore games", browse: "All games", route: "/games", count: planets.length },

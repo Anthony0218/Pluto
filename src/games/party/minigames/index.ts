@@ -1,3 +1,7 @@
+import { tideTreasure } from "./festivalGames/tideTreasure.ts";
+import { cometCourier } from "./festivalGames/cometCourier.ts";
+import { ropeRescue } from "./festivalGames/ropeRescue.ts";
+import { paddleDoubles } from "./festivalGames/paddleDoubles.ts";
 import { MinigameRegistry } from "./registry.ts";
 import { paddlePanic } from "./paddlePanic/index.ts";
 import { streetCross } from "./streetCross/index.ts";
@@ -25,3 +29,5 @@ minigameRegistry.register(trailRun);
 minigameRegistry.register(rhythmRush);
 minigameRegistry.register(circleShot);
 minigameRegistry.register(lavaKnockback);
+
+for (const game of [tideTreasure, cometCourier, ropeRescue, paddleDoubles]) minigameRegistry.register(game);

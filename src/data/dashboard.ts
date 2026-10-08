@@ -1,8 +1,10 @@
 import { games } from "./games.ts";
 
-export const defaultFavoriteRoutes = ["/games/chess", "/games/watten", "/games/schafkopf"];
-export const featuredGames = defaultFavoriteRoutes.flatMap(route => games.filter(game => game.route === route));
+/** The lead games: the hero and profile artwork come from these. */
+export const featuredGames = ["/games/chess", "/games/watten", "/games/schafkopf"].flatMap(route => games.filter(game => game.route === route));
 export const favoriteLimit = 8;
+/** What an account shows until it picks its own games: as many as the limit allows, and as many as fit the Home page without scrolling. */
+export const defaultFavoriteRoutes = ["/games/chess", "/games/watten", "/games/schafkopf", "/games/go", "/games/natura", "/games/atlas-arena", "/games/pluto-party", "/games/eat-it"];
 export type ChallengeCategory = "puzzle" | "learning" | "play" | "win" | "explore" | "social" | "variant";
 export type DailyChallenge = {
   id?: string; category?: ChallengeCategory; title: string; description: string;

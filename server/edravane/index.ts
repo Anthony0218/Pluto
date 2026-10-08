@@ -15,6 +15,7 @@ import { initializeTurns } from "../../src/games/MedievalKingdoms/edravane/turns
 import { establishEstates } from "../../src/games/MedievalKingdoms/edravane/estates.ts";
 import { commandHouse } from "../../src/games/MedievalKingdoms/edravane/battle.ts";
 import { NATIONS } from "../../src/games/MedievalKingdoms/edravane/world.ts";
+import { strategyView } from "../../src/games/MedievalKingdoms/edravane/logistics.ts";
 import type {
   Campaign,
   Command,
@@ -110,7 +111,7 @@ export function startEdravaneServer(
       player: r.sessions.find((s) => s.token === slot.player)?.id ?? null,
     })),
     state: r.state
-      ? {
+      ? strategyView({
           ...r.state,
           battles: r.state.battles.map((b) =>
             b.rounds
@@ -131,7 +132,7 @@ export function startEdravaneServer(
                 }
               : b,
           ),
-        }
+        }, `${viewer.nation}-0`)
       : null,
     settings: r.settings,
   });

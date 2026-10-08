@@ -1,17 +1,14 @@
+import { DEFAULT_SETTINGS, advance, applyAction } from "./helpers/party-legacy-fixtures.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { tropical } from "../src/games/party/content/maps.ts";
-import { DEFAULT_SETTINGS } from "../src/games/party/config.ts";
-import {
-  activePlayer,
-  advance,
-  applyAction,
+
+import { activePlayer,
   createMatch,
   createPlayer,
   detectWinner,
   legalPaths,
-  rollDie,
-} from "../src/games/party/engine/engine.ts";
+  rollDie } from "../src/games/party/engine/engine.ts";
 import { parseMessage } from "../src/games/party/network/protocol.ts";
 import { botAction } from "../src/games/party/engine/bots.ts";
 const players = () =>
@@ -150,11 +147,13 @@ test("reject out-of-turn, duplicate rolls and impossible phase transitions witho
   );
   assert.deepEqual(s, before);
 });
-test("zero roll skips landing rewards and ends turn", () => {
+test("zero roll asks for a bonus without landing rewards, then ends turn", () => {
   const s = landing("coin");
   s.phase = "ITEM_PHASE";
   let result = applyAction(s, "p0", { type: "ROLL_DICE" }, settings, () => 0);
   result = advance(result, settings, () => 0);
+  assert.equal(result.phase, "ZERO_BONUS");
+  result = applyAction(result, "p0", { type: "ZERO_REWARD", reward: "heal" }, settings, () => 0);
   assert.equal(result.phase, "TURN_END");
   assert.equal(activePlayer(result).coins, 20);
 });
@@ -221,6 +220,7 @@ test("four turns keep order and hand over to the animal phase", () => {
     seen.push(id);
     s = applyAction(s, id, { type: "ROLL_DICE" }, settings, () => 0);
     s = advance(s, settings, () => 0);
+    s = applyAction(s, id, { type: "ZERO_REWARD", reward: "coins" }, settings, () => 0);
     s = advance(s, settings, () => 0);
   }
   assert.deepEqual(seen, ["p0", "p1", "p2", "p3"]);

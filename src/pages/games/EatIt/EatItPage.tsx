@@ -1,3 +1,4 @@
+import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import { MAPS } from '../../../games/eat-it/mapCatalog';
 import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
 import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
@@ -66,12 +67,12 @@ function EatItSession({ roomCode }: { roomCode?: string }) {
     finally { setBusy(false); }
   };
   const solo = () => { setResult(null); setGame(createGame(map, botsEnabled ? fillBots([{ id: 'local', name }], count) : [{ id: 'local', name }], crypto.getRandomValues(new Uint32Array(1))[0], crypto.randomUUID(), { ...settings, mode: 'solo' })); };
-  useInviteAutoCreate(() => createRoom());
   const createRoom = async () => {
     setBusy(true); setError('');
     try { const next = await roomAction({ op: 'create', map, count, ...settings }); setRoom(next); navigate(recordCreatedGameInvite(`/games/eat-it/multiplayer/${next.room_code}`)); }
     catch (cause) { setError(cause instanceof Error ? cause.message : ui('Room unavailable')); } finally { setBusy(false); }
   };
+  useInviteAutoCreate(() => createRoom());
   const leave = async () => {
     if (roomCode) {
       setBusy(true);
@@ -87,7 +88,7 @@ function EatItSession({ roomCode }: { roomCode?: string }) {
     {loading ? <p>{ui('Loading…')}</p> : !user ? <div className="eat-room-card"><Users size={32} /><h1>{ui('Sign in to play multiplayer')}</h1><Link className="eat-primary" to="/login">{ui('Sign in')}</Link></div> : !room ? <div className="eat-room-card"><h1>{ui('Joining room…')}</h1>{error && <p role="alert">{ui(error)}</p>}</div> : <section className="eat-room-card">
       <span className="eat-eyebrow">{ui('Eat It')} · {ui('Multiplayer')}</span><h1>{ui('Room')} <span className="eat-room-code">{room.room_code}</span></h1><p>{ui(room.settings.hellEnabled ? 'Hell Sudden Death' : 'Last player standing')}</p><p>{ui(MAPS[room.settings.map].name)} · {room.settings.count} {ui('Players')} · {ui('Last player standing')}</p>
       <div className="eat-settings-summary">{reviewSettings({ ...room.settings, mode: 'multiplayer' }).map(([label, value]) => <span key={label}>{ui(label)}: <b>{ui(value)}</b></span>)}</div><div className="eat-room-share"><button className="eat-secondary" onClick={() => { void navigator.clipboard.writeText(`${location.origin}/games/eat-it/multiplayer/${room.room_code}`).then(() => setCopied(true)).catch(() => setError(ui('Copy the room code above to invite friends.'))); }}>{copied ? <Check size={16} /> : <Copy size={16} />}{ui(copied ? 'Copied' : 'Copy invite link')}</button><button className="eat-secondary" onClick={() => window.dispatchEvent(new Event('open-room-friends'))}><Users size={16} />{ui('Invite friends')}</button></div>
-      <div className="eat-seats">{Array.from({ length: room.settings.count }, (_, i) => { const p = room.players[i]; return <div key={i}><div className={`eat-seat-avatar ${p ? '' : 'is-bot'}`}>{p ? p.name.slice(0, 1) : <Plus size={20} />}</div><strong>{p?.name ?? ui('Bot slot')}</strong><small>{p ? p.id === room.host_id ? ui('Host') : ui(p.ready ? 'Ready' : 'Not ready') : ui('Filled when the match starts')}</small></div>; })}</div>
+      <div className="eat-seats">{Array.from({ length: room.settings.count }, (_, i) => { const p = room.players[i]; return <div key={i}><div className={`eat-seat-avatar ${p ? '' : 'is-bot'}`}>{p ? p.name.slice(0, 1) : <Plus size={20} />}</div><strong>{p?.name ?? ui('Bot slot')}</strong><small>{p ? p.id === room.host_id ? ui('Host') : ui(p.ready ? 'Ready' : 'Not ready') : ui('Filled when the match starts')}</small>{!p && <InviteFriendButton />}</div>; })}</div>
       <p className="eat-lobby-note">{ui('Invite friends or start now. Empty seats become bots.')}</p>
       <div className="eat-result-actions"><button className="eat-secondary" disabled={busy} onClick={() => void act('ready')}><Check size={17} />{ui(room.players.find(p => p.id === user.id)?.ready ? 'Not ready' : 'Ready')}</button>{room.host_id === user.id && <button className="eat-primary" disabled={busy || !room.players.every(p => p.ready)} onClick={() => void act('start')}><Play size={17} />{ui('Start match')}</button>}</div>{error && <p className="eat-error" role="alert">{ui(error)}</p>}
     </section>}</main>;

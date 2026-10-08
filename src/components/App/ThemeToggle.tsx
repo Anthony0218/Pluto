@@ -9,22 +9,24 @@ export default function ThemeToggle() {
 
   return (
     <div
+      role="group"
+      aria-label={ui("Appearance")}
       className="
-        grid grid-cols-2 gap-1
-        rounded-xl
+        grid grid-cols-2 gap-0.5
+        rounded-lg
         border border-white/[0.07]
         bg-white/[0.025]
-        p-1
+        p-0.5
       "
     >
       <button
         type="button"
         onClick={() => setTheme("black")}
         className={`
-          flex h-9
+          flex h-7
           items-center justify-center
-          gap-2
-          rounded-lg
+          gap-1.5
+          rounded-md
           text-xs font-medium
           transition-all
           ${
@@ -34,16 +36,16 @@ export default function ThemeToggle() {
           }
         `}
       >
-        <Moon size={15} />{ui("Black")}</button>
+        <Moon size={13} />{ui("Black")}</button>
 
       <button
         type="button"
         onClick={() => setTheme("pluto")}
         className={`
-          flex h-9
+          flex h-7
           items-center justify-center
-          gap-2
-          rounded-lg
+          gap-1.5
+          rounded-md
           text-xs font-medium
           transition-all
           ${
@@ -60,7 +62,7 @@ export default function ThemeToggle() {
           }
         `}
       >
-        <Orbit size={15} />{ui("Pluto")}</button>
+        <Orbit size={13} />{ui("Pluto")}</button>
     </div>
   );
 }

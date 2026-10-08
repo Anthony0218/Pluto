@@ -21,6 +21,9 @@ import {
 } from "../../../games/MedievalKingdoms/edravane/battleRounds.ts";
 import { UnitGuide } from "./BattleRoundPanel.tsx";
 import { troopCount } from "../../../games/MedievalKingdoms/edravane/battle.ts";
+import { PeaceNegotiator, TreatyStatus } from "./RealmPanels.tsx";
+import { truce } from "../../../games/MedievalKingdoms/edravane/campaignStrategy.ts";
+import { EffectBadge } from "./RealmIcon.tsx";
 
 export function WarActions({
   state,
@@ -42,6 +45,7 @@ export function WarActions({
   const [requested, setReason] = useState<WarReason>();
   const target = NATIONS.find((n) => n.id === nation)!;
   const atWar = state.wars.includes([house.nation, nation].sort().join("|"));
+  const treaty = truce(state, house.nation, nation);
   const valid = justifiedWarReasons(state, house, nation, field?.id);
   const reason =
     requested && (requested === "unjustified" || valid.includes(requested))
@@ -60,6 +64,7 @@ export function WarActions({
       : null;
   return (
     <div className="ed-war-actions">
+      <TreatyStatus state={state} from={house.nation} to={nation} />
       {forecast && field && (
         <div className="ed-attack-preview" aria-label="Battle preview">
           <strong>
@@ -99,15 +104,7 @@ export function WarActions({
               <option value="unjustified">{WAR_REASONS.unjustified}</option>
             </select>
           </label>
-          <p
-            className={
-              reason === "unjustified" ? "ed-reason ed-danger" : "ed-reason"
-            }
-          >
-            {reason === "unjustified"
-              ? `+5 realm unrest, −6 army loyalty. ${(house.unjustifiedWars ?? 0) + 1 >= 2 ? "Vassals also lose 15 opinion." : "A second unjustified declaration will cost vassal loyalty."}`
-              : "Justified: no declaration unrest or loyalty penalty."}
-          </p>
+          {reason === "unjustified" ? <><div className="ed-effects" aria-label="War declaration effects"><EffectBadge metric="unrest" amount={5} label="realm unrest" /><EffectBadge metric="loyalty" amount={-6} label="army loyalty" />{(house.unjustifiedWars ?? 0) + 1 >= 2 && <EffectBadge metric="opinion" amount={-15} label="vassal opinion" />}</div>{!(house.unjustifiedWars ?? 0) && <p className="ed-reason">Another unjustified war will also cost vassal opinion.</p>}</> : <div className="ed-effects"><EffectBadge metric="unrest" amount={0} /><EffectBadge metric="loyalty" amount={0} label="loyalty penalty" /></div>}
           {reason === "territorial-conquest" && (
             <p className="ed-reason">
               {field
@@ -124,7 +121,7 @@ export function WarActions({
       )}
       <button
         disabled={
-          !active ||
+          !active || !atWar && !!treaty ||
           (field
             ? !army ||
               army.garrison ||
@@ -148,6 +145,9 @@ export function WarActions({
             ? "At war"
             : "Declare war"}
       </button>
+      {!active && <p className="ed-reason">Military orders require your own turn or an active defense response.</p>}
+      {field && (!army || army.garrison || !canControl(state, { house: house.id }, army)) && <p className="ed-reason">Raise and select a field host under your command to attack.</p>}
+      {!forecast && field && <p className="ed-reason">No current defender sighting. Scout this area before committing; unseen forces may defend it.</p>}
       {field && (
         <small>
           Choose a field army. Movement commits on End turn; the defender
@@ -155,12 +155,7 @@ export function WarActions({
         </small>
       )}
       {atWar && (
-        <button
-          disabled={!active}
-          onClick={() => onCommand({ type: "peace", nation })}
-        >
-          Propose peace
-        </button>
+        <PeaceNegotiator state={state} house={house} nation={nation} active={active} onCommand={onCommand} />
       )}
     </div>
   );

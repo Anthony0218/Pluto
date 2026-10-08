@@ -60,7 +60,7 @@ export default function MinigameResults({
                 } as React.CSSProperties
               }
             >
-              <b className="mg-place">{ORDINAL[r.position - 1]}</b>
+              <b className="mg-place">{definition.teamOf ? `Team ${definition.teamOf(minigame.state, p.id)}` : ORDINAL[r.position - 1]}</b>
               <Portrait player={p} />
               <span className="mg-name">
                 {p.name}
@@ -80,7 +80,7 @@ export default function MinigameResults({
         {champion
           ? `${champion.name} reached the coin goal!`
           : leader
-            ? `${leader.name} goes first next round.`
+            ? match.mode === "festival" ? `Festival round ${match.round} complete · next round starts shortly.` : `${leader.name} goes first next round.`
             : ""}
       </p>
     </div>

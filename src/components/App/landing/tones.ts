@@ -17,3 +17,19 @@ export const TONES = {
 export type ToneName = keyof typeof TONES;
 
 export const toneOf = (name: string | undefined): Tone => TONES[(name ?? "chess") as ToneName] ?? TONES.chess;
+
+/** Primary button colours per tone: the planet's own hue, darkened (or paired with dark text) so the label stays readable. */
+const BUTTONS: Record<ToneName, { background: string; color: string }> = {
+  chess: { background: "#6d4fe0", color: "#ffffff" },
+  go: { background: "#e4e7ff", color: "#1b1d3a" },
+  watten: { background: "#d9317a", color: "#ffffff" },
+  schafkopf: { background: "#34d9ab", color: "#04231c" },
+  atlas: { background: "#0e74bb", color: "#ffffff" },
+  natura: { background: "#8ad24f", color: "#10270a" },
+  eatit: { background: "#d93a24", color: "#ffffff" },
+  tools: { background: "#2a9db8", color: "#04202b" },
+  learn: { background: "#e79924", color: "#2a1604" },
+  party: { background: "#a336e5", color: "#ffffff" },
+};
+
+export const buttonOf = (name: string | undefined) => BUTTONS[(name ?? "chess") as ToneName] ?? BUTTONS.chess;

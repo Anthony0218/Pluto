@@ -7,6 +7,7 @@ import type {
   WarReason,
 } from "./types.ts";
 import { neighbors } from "./world.ts";
+import { campaignRound } from "./realm.ts";
 
 const soldiers = (a: Army) =>
   Object.values(a.troops).reduce((n, v) => n + v, 0);
@@ -17,6 +18,7 @@ export const WAR_REASONS: Record<WarReason, string> = {
   "defend-ally": "Defend a marriage ally",
   insult: "Answer a diplomatic insult",
   "territorial-conquest": "Territorial conquest of an unprotected border",
+  "dynastic-claim": "Press an inherited family claim",
   unjustified: "War without a justified reason",
 };
 function realmHouses(s: Campaign, h: House) {
@@ -72,7 +74,9 @@ export function routeBlockers(s: Campaign, route: TradeRoute) {
       (faction.nation === owner.nation && !a.rebel)
     )
       return false;
+    if ((s.treaties ?? []).some((t) => t.trade && t.until >= campaignRound(s) && [t.from, t.to].includes(faction.nation) && [t.from, t.to].includes(owner.nation))) return false;
     const onRoute =
+      (s.sieges ?? []).some((siege) => siege.army === a.id && route.path.includes(siege.hex)) ||
       route.path.includes(a.hex) ||
       (route.maritime &&
         !!s.districts.find((d) => d.id === a.hex)?.port &&
@@ -150,6 +154,7 @@ export function justifiedWarReasons(
   if (insultGrievances(s, h, nation).length) reasons.push("insult");
   if (conquestTargets(s, h, nation).some((d) => !hex || d.id === hex))
     reasons.push("territorial-conquest");
+  if (!hasMarriagePact(s, h, nation) && h.family.some((p) => p.alive && p.age >= 16 && !p.imprisonedBy && p.claims?.includes(nation))) reasons.push("dynastic-claim");
   return reasons;
 }
 export function recordWar(

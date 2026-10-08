@@ -2,9 +2,12 @@ import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { useMotionValue, useTransform, type MotionValue } from "motion/react";
 import * as m from "motion/react-m";
-import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useLandingReducedMotion as useReducedMotion } from "./motionPreference";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { universeBooks } from "../planetary/universeCatalog";
+
+/** The four stars are the original path; the shelf has since grown. */
+const pathBooks = ["math", "music", "game-guides", "game-analysis"].map(id => universeBooks.find(book => book.id === id)!);
 import { useCopy } from "./copy";
 import { useViewportScroll } from "./viewport";
 
@@ -15,7 +18,7 @@ const points = [{ x: 56, y: 128, above: false }, { x: 190, y: 62, above: true },
 const thresholds = [0.02, 0.34, 0.67, 0.98];
 const route = "M56 128 C 110 128, 140 62, 190 62 S 280 122, 330 122 S 410 56, 464 56";
 
-function Stop({ book, point, threshold, progress }: { book: (typeof universeBooks)[number]; point: (typeof points)[number]; threshold: number; progress: MotionValue<number> }) {
+function Stop({ book, point, threshold, progress }: { book: (typeof pathBooks)[number]; point: (typeof points)[number]; threshold: number; progress: MotionValue<number> }) {
   const lit = useTransform(progress, [threshold - 0.14, threshold], [0, 1]);
   const starScale = useTransform(lit, [0, 1], [0.5, 1]);
   const starOpacity = useTransform(lit, [0, 1], [0.3, 1]);
@@ -44,7 +47,7 @@ export default function LearningConstellation() {
         <path d={route} fill="none" stroke="#a5b4fc" strokeOpacity="0.22" strokeWidth="1.5" strokeDasharray="3 7" />
         <m.path d={route} fill="none" stroke="url(#constellation-line)" strokeWidth="2.5" strokeLinecap="round" style={{ pathLength: progress, filter: "drop-shadow(0 0 5px #818cf8aa)" }} />
       </svg>
-      {universeBooks.map((book, index) => <Stop key={book.id} book={book} point={points[index]} threshold={thresholds[index]} progress={progress} />)}
+      {pathBooks.map((book, index) => <Stop key={book.id} book={book} point={points[index]} threshold={thresholds[index]} progress={progress} />)}
     </div>
   </nav>;
 }

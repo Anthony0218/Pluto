@@ -1,4 +1,5 @@
 import AtlasAreaReference from "./AtlasAreaReference";
+import { AtlasResultHero } from "./AtlasResultHero";
 import { areaValuesFromText } from "@/games/atlas/areaReferences";
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { ArrowLeft, Check, Clock3, Crosshair, MapPin, Trophy, X } from "lucide-react";
@@ -225,7 +226,7 @@ export function SoloResults({ mode, summary, entities, eyebrow = "Expedition com
   const tiles = mode === "closest_wins"
       ? [{ value: summary.correct, label: "Bullseyes" }, { value: `${Math.round(summary.averageKm ?? 0).toLocaleString("en")} km`, label: "Average distance" }, { value: answered, label: "Pins" }, { value: `${Math.round(summary.elapsedMs / 1000)}s`, label: "Elapsed" }]
       : [{ value: summary.correct, label: "Correct" }, { value: mode === "map_fill" ? summary.wrong : `${answered ? Math.round(summary.correct / answered * 100) : 0}%`, label: mode === "map_fill" ? "Mistakes" : "Accuracy" }, { value: summary.bestStreak, label: "Best streak" }, { value: `${Math.round(summary.elapsedMs / 1000)}s`, label: "Elapsed" }];
-  return <main className="atlas-page atlas-center"><div className="atlas-result-orbit"><Trophy /></div><span className="atlas-eyebrow">{eyebrow}</span><h1>{headline}</h1>
+  return <main className="atlas-page atlas-center atlas-random-results"><AtlasResultHero eyebrow={eyebrow} title={headline} />
     <p className="atlas-result-score">{new Intl.NumberFormat("en").format(summary.score)} <small>points</small></p>
     <div className="atlas-result-grid">{tiles.map((tile) => <div key={tile.label}><strong>{tile.value}</strong><span>{tile.label}</span></div>)}</div>
     {summary.missed.length > 0 && <p className="atlas-missed">Review: {[...new Set(summary.missed)].slice(0, 5).map((id) => entities.find((entity) => entity.id === id)?.shortName).filter(Boolean).join(", ")}</p>}

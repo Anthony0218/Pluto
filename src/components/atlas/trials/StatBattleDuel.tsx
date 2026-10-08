@@ -1,5 +1,6 @@
 import { useState, type CSSProperties, type ReactNode } from "react";
-import { ArrowDown, ArrowUp, Crown, EyeOff, Layers, RotateCcw, Swords } from "lucide-react";
+import { ArrowDown, ArrowUp, EyeOff, Layers, RotateCcw, Swords } from "lucide-react";
+import { AtlasResultHero } from "../AtlasResultHero";
 import { STAT_BATTLE } from "../../../games/atlas/trials/config";
 import { formatCountryStat, STATS, type TrialCountry } from "../../../games/atlas/trials/countryStats";
 import { battleView, createBattleMatch, nextBattleRound, pickBattleCard, rerollBattleMatchHand, revealBattlePicks, type BattleSeat, type SeatOutcome } from "../../../games/atlas/trials/battleMatch";
@@ -114,6 +115,7 @@ export function StatBattleHotseat({ pool, byId, seed, names, onExit, onRestart, 
   const nextRound = () => {
     const next = nextBattleRound(match);
     setMatch(next);
+    if (next.battle.phase === "finished") onComplete?.([next.battle.playerScore, next.battle.opponentScore]);
     setStage({ kind: "handoff", seat: ((next.battle.round - 1) % 2) as BattleSeat });
   };
 
@@ -124,14 +126,12 @@ export function StatBattleHotseat({ pool, byId, seed, names, onExit, onRestart, 
       <div className="duel-scoreline" aria-label="Score"><span className="is-player">{names[0]} <b>{battle.playerScore}</b></span><span>–</span><span className="is-opponent"><b>{battle.opponentScore}</b> {names[1]}</span></div>
       {finished ? (
         <section className="trial-game-over">
-          <div className="atlas-result-orbit"><Crown /></div>
-          <span className="atlas-eyebrow">Duel complete</span>
-          <h2>{battle.playerScore === battle.opponentScore ? "Draw" : `${battle.playerScore > battle.opponentScore ? names[0] : names[1]} wins`}</h2>
+          <AtlasResultHero heading="h2" eyebrow="Duel complete" title={battle.playerScore === battle.opponentScore ? "Draw" : `${battle.playerScore > battle.opponentScore ? names[0] : names[1]} wins`} />
           <p className="trial-final-score">{battle.playerScore} – {battle.opponentScore}</p>
           <DuelHistory history={battleView(match, 0).history} byId={byId} names={names} />
           <div className="trial-final-actions">
-            {onComplete ? <button type="button" className="atlas-start" onClick={() => onComplete([battle.playerScore, battle.opponentScore])}>See series score</button> : <button type="button" className="atlas-start" onClick={onRestart}><RotateCcw size={18} /> Rematch</button>}
-            <button type="button" className="atlas-start atlas-secondary" onClick={onExit}>All modes</button>
+            {onComplete ? <button type="button" className="atlas-start" onClick={() => onComplete([battle.playerScore, battle.opponentScore])}>See series score</button> : <button type="button" className="atlas-start" onClick={onRestart}><RotateCcw size={18} /> Replay</button>}
+            <button type="button" className="atlas-start atlas-secondary" onClick={onExit}>Back to menu</button>
           </div>
         </section>
       ) : stage.kind === "handoff" ? (

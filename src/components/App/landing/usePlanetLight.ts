@@ -1,5 +1,5 @@
 import { useEffect, type RefObject } from "react";
-import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useLandingReducedMotion as useReducedMotion } from "./motionPreference";
 import { VIEWPORT_SELECTOR } from "./viewport";
 
 type Light = { x: number; y: number; pull: number; pullY: number };

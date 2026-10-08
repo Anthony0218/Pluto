@@ -31,10 +31,11 @@ export default function AtlasArenaPage() {
   const [tab, setTab] = useState<"casual" | "ranked" | "modes" | "mastery">(() => searchParams.get("tab") === "mastery" ? "mastery" : searchParams.get("tab") === "ranked" ? "ranked" : searchParams.get("tab") === "modes" ? "modes" : "casual");
   const { difficulty } = stored;
   const launch = (mode: ArenaModeDef, how: Launch, bestOf?: SeriesLength) => {
-    const path = how === "online" ? `/games/atlas-arena/multiplayer?mode=${mode.online}` : `/games/atlas-arena/${how}/${mode.id}`;
+    const order = bestOf ? chooseRandomModes(ARENA_MODES.map(item => item.id), bestOf, mode.id) : undefined;
+    const first = order ? ARENA_MODES.find(item => item.id === order[0])! : mode;
+    const path = how === "online" ? `/games/atlas-arena/multiplayer?mode=${mode.online}` : `/games/atlas-arena/${how}/${first.id}`;
     if (!bestOf) { navigate(path); return; }
-    const order = chooseRandomModes(ARENA_MODES.map(item => item.id), bestOf, mode.id);
-    navigate(`${path}${how === "online" ? "&" : "?"}random=1&bestOf=${bestOf}&modes=${order.join(",")}`);
+    navigate(`${path}${how === "online" ? "&" : "?"}random=1&bestOf=${bestOf}&modes=${order!.join(",")}&series=${crypto.randomUUID()}`);
   };
 
   if (about) return <AboutPanel version={data?.version.atlasDataVersion ?? "…"} onBack={() => setAbout(false)} />;
@@ -144,6 +145,7 @@ function RandomModeChoice({ onLaunch }: { onLaunch: (mode: ArenaModeDef, how: La
     <div className="atlas-choice-copy"><span className="atlas-choice-tag"><Shuffle size={14} aria-hidden /> Surprise me</span>
       <h3>Play Random Mode</h3><p className="atlas-choice-description" role="status" data-selected={Boolean(selectedMode)}>{spinning ? "Choosing your mode…" : selectedMode ? `Selected: ${selectedMode.title}` : `Play now for a random mode, or click ? to spin through all ${ARENA_MODES.length} modes.`}</p>
       <div className="atlas-random-format" role="radiogroup" aria-label="Random match length">{([1, 3, 5] as const).map(length => <button key={length} type="button" role="radio" aria-checked={bestOf === length} className={bestOf === length ? "active" : ""} disabled={spinning} onClick={() => setBestOf(length)}>{seriesLabel(length)}</button>)}</div>
+      <p className="atlas-setup-note">{bestOf === 1 ? "One randomly selected game." : `${bestOf} different modes in a shuffled order. The roulette selection can appear anywhere in the series.`}</p>
       <PlayChoiceActions disabled={spinning} onLaunch={how => onLaunch(selectedMode ?? ARENA_MODES[Math.floor(Math.random() * ARENA_MODES.length)], how, bestOf)} />
     </div>
     {highlight === null

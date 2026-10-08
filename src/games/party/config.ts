@@ -19,11 +19,14 @@ export const RULES = {
 export const MAX_INVENTORY_SIZE = RULES.inventory;
 export const FEEDBACK_HISTORY = 12;
 export const DEFAULT_SETTINGS: Settings = {
+  mode: "board",
+  roundLimit: 12,
+  minigameIds: [],
   mapId: "sunspill",
   victory: "plutos",
   plutoTarget: 5,
   coinTarget: 200,
-  difficulty: "medium",
+  difficulty: "hard",
   fillBots: true,
 };
 export const COLORS = ["#ff8c69", "#a5a2ff", "#74e2bd", "#ffdc72"];
@@ -61,7 +64,7 @@ export const AIM_CONFIG = {
   // After the aim window closes the server waits this long for a late release, then scores a miss.
   expiryGraceMs: 1500,
   // Bot reticle error (standard deviation per axis) by difficulty. Hard is good but never perfect.
-  botError: { easy: 0.17, medium: 0.1, hard: 0.05 },
+  botError: { beginner: .3, easy: .17, medium: .135, hard: .1, extreme: .012 },
 } as const;
 
 export interface ScatterBand {
@@ -106,7 +109,7 @@ export const DUEL_FLOW = {
   resultsMs: 7000,
 } as const;
 // Rough duel win chance a bot assumes for a duelist of each kind; humans count as medium.
-export const DUEL_BOT_SKILL = { easy: 0.35, medium: 0.5, hard: 0.62 } as const;
+export const DUEL_BOT_SKILL = { beginner: .2, easy: .35, medium: .42, hard: .5, extreme: .9 } as const;
 
 // ---- Milestone 8: rare items, radiation and summoned animals ------------------------------------
 // Rare Item field weights (item id → relative weight). The only place rare-pool balance lives.
@@ -141,15 +144,17 @@ export const ANIMAL_PHASE_FLOW = {
 } as const;
 // Route-scoring penalties bots apply to hazards. Easy bots ignore hazards `ignoreChance` of the time.
 export const BOT_HAZARD_WEIGHTS = {
-  radiation: { easy: 15, medium: 35, hard: 70 },
-  ignoreChance: { easy: 0.5, medium: 0, hard: 0 },
+  radiation: { beginner: 5, easy: 15, medium: 25, hard: 35, extreme: 100 },
+  ignoreChance: { beginner: .8, easy: .5, medium: .2, hard: 0, extreme: 0 },
   // Hostile animal within `near` nodes of a landing: strong penalty; within `far`: moderate.
   animalNear: 2,
   animalFar: 5,
   animal: {
+    beginner: { near: 5, far: 0 },
     easy: { near: 10, far: 0 },
-    medium: { near: 40, far: 15 },
-    hard: { near: 55, far: 20 },
+    medium: { near: 25, far: 8 },
+    hard: { near: 40, far: 15 },
+    extreme: { near: 80, far: 35 },
   },
 } as const;
 

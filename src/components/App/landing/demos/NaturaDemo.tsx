@@ -102,7 +102,7 @@ export default function NaturaDemo() {
           <strong>{ui("Archerfish")}</strong>
           <p>{ui("Aim at an insect. Catch it before your rival does.")}</p>
           {error ? <p role="status">{ui("This browser could not start WebGL. Enable hardware acceleration, then retry the habitat.")}</p>
-            : <button type="button" className="flyby-cta" onClick={start}>{ui(view.finished ? "Play again" : !view.started ? "Start game" : "Resume")}</button>}
+            : <button type="button" className="lp-btn lp-btn--primary" onClick={start}>{ui(view.finished ? "Play again" : !view.started ? "Start game" : "Resume")}</button>}
         </div>}
       </div>
       <div className="natura-preview-controls">

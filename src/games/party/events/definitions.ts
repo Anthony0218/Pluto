@@ -107,3 +107,53 @@ export const cableBreakdown = transportOutageEvent(
   "cable-car",
   "CABLE CAR BREAKDOWN! THE GONDOLAS ARE STOPPED",
 );
+
+// Regions produce readable, temporary opportunities rather than interchangeable coin payouts.
+const regionNodes = (map: BoardMap, motif: string) => map.nodes.filter((n) => map.regions[n.region].motif === motif && !map.cleansingNodeIds?.includes(n.id));
+export const pirateTreasure: EventDefinition = {
+  id: "pirate-treasure", name: "Pirate Treasure", icon: "💎", description: "Three pirate spaces hide 5 coins each until next round ends.", weight: 2, allowedMaps: ["sunspill"],
+  canRun: (state, map) => regionNodes(map, "boat").length >= 3 && !state.boardEffects?.some((e) => e.kind === "treasure"),
+  execute(state, { map, random }) { const pool = [...regionNodes(map, "boat")], ids: string[] = []; for (let i = 0; i < 3; i++) ids.push(pool.splice(Math.min(pool.length - 1, Math.floor(random() * pool.length)), 1)[0].id);
+    (state.boardEffects ??= []).push({ id: `treasure-${state.round}-${state.eventSeq}`, kind: "treasure", nodeIds: ids, expiresAfterRound: state.round + 1 });
+    emit(state, { kind: "EVENT", nodeId: ids[0], text: "PIRATE TREASURE! THREE MARKED SPACES HOLD +5 COINS UNTIL NEXT ROUND ENDS" });
+  },
+};
+export const eruptionForecast: EventDefinition = {
+  id: "eruption-forecast", name: "Ember Forecast", icon: "🌋", description: "Ember Peak erupts at the end of next round. Move away from marked spaces.", weight: 2, allowedMaps: ["sunspill"],
+  canRun: (state) => !state.boardEffects?.some((e) => e.kind === "eruption"),
+  execute(state, { map }) { const ids = regionNodes(map, "volcano").map((n) => n.id); (state.boardEffects ??= []).push({ id: `eruption-${state.round}`, kind: "eruption", nodeIds: ids, expiresAfterRound: state.round + 1 }); emit(state, { kind: "EVENT", nodeId: ids[0], text: "⚠ EMBER PEAK ERUPTS AT THE END OF NEXT ROUND · MARKED SPACES DEAL 10 HP DAMAGE" }); },
+};
+export const jungleBounty: EventDefinition = {
+  id: "jungle-bounty", name: "Jungle Bounty", icon: "🍃", description: "Jade Jungle spaces give 2 extra coins for the rest of this round and next.", weight: 2, allowedMaps: ["sunspill"],
+  canRun: (state) => !state.boardEffects?.some((e) => e.kind === "breeze"),
+  execute(state, { map }) { const ids = map.nodes.filter((n) => n.region === 5 && !map.cleansingNodeIds?.includes(n.id)).map((n) => n.id); (state.boardEffects ??= []).push({ id: `bounty-${state.round}`, kind: "breeze", nodeIds: ids, expiresAfterRound: state.round + 1 }); emit(state, { kind: "EVENT", nodeId: ids[0], text: "JADE JUNGLE BOUNTY! LAND ON A MARKED SPACE FOR +2 BONUS COINS" }); },
+};
+
+export const calmWaters: EventDefinition = {
+  id: "calm-waters", name: "Calm Waters", icon: "💚", description: "Sunspill Bay becomes a sanctuary: marked landings heal an extra 5 HP through next round.", weight: 2, allowedMaps: ["sunspill"],
+  canRun: (state) => !state.boardEffects?.some((e) => e.kind === "sanctuary"),
+  execute(state, { map }) {
+    const nodeIds = map.nodes.filter((n) => n.region === 0 && !map.cleansingNodeIds?.includes(n.id)).map((n) => n.id);
+    (state.boardEffects ??= []).push({ id: `sanctuary-${state.round}`, kind: "sanctuary", nodeIds, expiresAfterRound: state.round + 1 });
+    emit(state, { kind: "EVENT", nodeId: nodeIds[0], text: "CALM WATERS! SUNSPILL BAY LANDINGS HEAL +5 HP THROUGH NEXT ROUND" });
+  },
+};
+export const coconutMarket: EventDefinition = {
+  id: "coconut-market", name: "Coconut Market", icon: "🛍", description: "Players in Coconut Club save 2 coins on normal shop items through next round. Mystery boxes remain 10 coins.", weight: 2, allowedMaps: ["sunspill"],
+  canRun: (state) => !state.boardEffects?.some((e) => e.kind === "sale"),
+  execute(state, { map }) {
+    const nodeIds = map.nodes.filter((n) => n.region === 1).map((n) => n.id);
+    (state.boardEffects ??= []).push({ id: `sale-${state.round}`, kind: "sale", nodeIds, expiresAfterRound: state.round + 1 });
+    emit(state, { kind: "EVENT", nodeId: nodeIds[0], text: "COCONUT MARKET! NORMAL SHOP ITEMS COST 2 LESS WHILE YOU ARE IN COCONUT CLUB THROUGH NEXT ROUND" });
+  },
+};
+export const ruinsRelics: EventDefinition = {
+  id: "ruins-relics", name: "Ruins Relics", icon: "◆", description: "Three marked Whisper Ruins spaces become one-use item caches through next round.", weight: 2, allowedMaps: ["sunspill"],
+  canRun: (state, map) => map.nodes.filter((n) => n.region === 3 && ["coin", "heal", "deposit", "empty"].includes(n.type)).length >= 3 && !state.boardEffects?.some((e) => e.kind === "relic"),
+  execute(state, { map, random }) {
+    const pool = map.nodes.filter((n) => n.region === 3 && ["coin", "heal", "deposit", "empty"].includes(n.type) && !map.cleansingNodeIds?.includes(n.id));
+    const nodeIds = Array.from({ length: 3 }, () => pool.splice(Math.min(pool.length - 1, Math.floor(random() * pool.length)), 1)[0].id);
+    (state.boardEffects ??= []).push({ id: `relic-${state.round}-${state.eventSeq}`, kind: "relic", nodeIds, expiresAfterRound: state.round + 1 });
+    emit(state, { kind: "EVENT", nodeId: nodeIds[0], text: "RUINS RELICS! THREE MARKED SPACES GRANT AN ITEM INSTEAD OF THEIR NORMAL FIELD THROUGH NEXT ROUND" });
+  },
+};

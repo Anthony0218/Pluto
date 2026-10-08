@@ -1,3 +1,4 @@
+import { difficultyRank } from "../difficulty.ts";
 import { BOT_HAZARD_WEIGHTS, DUEL_BOT_SKILL, RULES } from "../config.ts";
 import { canSummonAnimal } from "../animals/runtime.ts";
 import { irradiatedNodeIds } from "../hazards/radiation.ts";
@@ -40,8 +41,8 @@ export function pocketDuelAction(
   const opponents = state.players.filter((p) => p.id !== me.id);
   if (!opponents.length) return null;
   let target: Player;
-  if (me.difficulty === "easy") target = pick(opponents, random);
-  else if (me.difficulty === "medium")
+  if (difficultyRank(me.difficulty) <= 1) target = pick(opponents, random);
+  else if (difficultyRank(me.difficulty) <= 3)
     target = [...opponents].sort(
       (a, b) => duelOdds(me, b) - duelOdds(me, a) || a.goldenPlutos - b.goldenPlutos,
     )[0];
@@ -94,12 +95,12 @@ export function falloutCoreAction(
     itemInstanceId: item.instanceId,
     targetNodeId: nodeId,
   });
-  if (me.difficulty === "easy") return random() < 0.6 ? detonate(pick(candidates, random).nodeId) : null;
+  if (difficultyRank(me.difficulty) <= 1) return random() < 0.6 ? detonate(pick(candidates, random).nodeId) : null;
   candidates.sort((a, b) => b.score - a.score);
   const best = candidates[0];
   // Medium settles for one opponent; hard waits for a juicier blast unless someone is near the goal.
   const nearGoal = leaderProgress >= goal(settings) * 0.6;
-  const threshold = me.difficulty === "hard" && !nearGoal && random() < 0.5 ? 180 : 100;
+  const threshold = me.difficulty === "extreme" && !nearGoal && random() < 0.5 ? 180 : 100;
   return best.score >= threshold ? detonate(best.nodeId) : null;
 }
 
@@ -112,8 +113,8 @@ export function wildTotemAction(
 ): GameAction | null {
   if (!canSummonAnimal(state, me.id)) return null;
   const summon: GameAction = { type: "USE_ITEM", itemInstanceId: item.instanceId };
-  if (me.difficulty === "easy") return random() < 0.5 ? summon : null;
-  if (me.difficulty === "medium") return summon;
+  if (difficultyRank(me.difficulty) <= 1) return random() < 0.5 ? summon : null;
+  if (difficultyRank(me.difficulty) <= 3) return summon;
   // Hard: summon when opponents are close enough to be hunted soon (or eventually, to avoid hoarding).
   const distances = graphDistances(map, me.currentNodeId, 8);
   const nearby = state.players.some((p) => p.id !== me.id && distances.has(p.currentNodeId));
@@ -137,8 +138,8 @@ export function hazardScorer(
     .filter((a) => a.ownerPlayerId !== me.id)
     .map((a) => {
       // Hard bots scale the danger radius with the animal's speed.
-      const near = difficulty === "hard" ? Math.max(BOT_HAZARD_WEIGHTS.animalNear, a.movementPerPhase) : BOT_HAZARD_WEIGHTS.animalNear;
-      const far = difficulty === "hard" ? near + 3 : BOT_HAZARD_WEIGHTS.animalFar;
+      const near = difficulty === "extreme" ? Math.max(BOT_HAZARD_WEIGHTS.animalNear, a.movementPerPhase) : BOT_HAZARD_WEIGHTS.animalNear;
+      const far = difficulty === "extreme" ? near + 3 : BOT_HAZARD_WEIGHTS.animalFar;
       return { near, far, distances: graphDistances(map, a.currentNodeId, far, restrictions) };
     });
   return (landing) => {

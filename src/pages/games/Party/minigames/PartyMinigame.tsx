@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { PartyConnection } from "../../../../games/party/network/usePartyConnection.ts";
+import ItemShop from "../ItemShop.tsx";
 import OrientationHint from "../OrientationHint.tsx";
 import { minigameRegistry } from "../../../../games/party/minigames/index.ts";
 import type {
@@ -9,7 +10,7 @@ import type {
 } from "../../../../games/party/types.ts";
 import MinigameIntro from "./MinigameIntro.tsx";
 import MinigameResults from "./MinigameResults.tsx";
-import { DuelIntro, DuelResults } from "./DuelScreens.tsx";
+import { DuelResults } from "./DuelScreens.tsx";
 import { useServerClock } from "./useServerClock.ts";
 import { minigameViews } from "./views.ts";
 
@@ -43,7 +44,7 @@ export default function PartyMinigame({
       <div className="mg-topbar">
         <span className="pp-eyebrow">
           ROUND {match.round} ·{duel ? " DUEL ·" : ""}{" "}
-          {lobby.settings.victory === "coins"
+          {match.mode === "festival" ? `MINIGAME FESTIVAL · ${match.round} / ${match.roundLimit}` : match.roundLimit ? `FINAL ROUND ${match.roundLimit} · MOST ${lobby.settings.victory === "coins" ? "COINS" : "PLUTOS"} WINS` : lobby.settings.victory === "coins"
             ? `FIRST TO ${lobby.settings.coinTarget} COINS`
             : `FIRST TO ${lobby.settings.plutoTarget} GOLDEN PLUTOS`}
         </span>
@@ -58,25 +59,11 @@ export default function PartyMinigame({
           <button onClick={() => setConfirmLeave(true)}>Leave</button>
         )}
       </div>
+      {match.mode !== "festival" && match.players.find((p) => p.id === playerId) && <ItemShop match={match} player={match.players.find((p) => p.id === playerId)!} connection={connection}/>}
       {playing && participant && LANDSCAPE_GAMES.has(minigame.minigameId) && <OrientationHint />}
       <div className="pp-card mg-stage">
-        {intro && duel ? (
-          <DuelIntro
-            definition={definition}
-            match={match}
-            duel={duel}
-            minigame={minigame}
-            playerId={playerId}
-            now={now}
-          />
-        ) : intro ? (
-          <MinigameIntro
-            definition={definition}
-            match={match}
-            minigame={minigame}
-            playerId={playerId}
-            now={now}
-          />
+        {intro ? (
+          <MinigameIntro definition={definition} match={match} minigame={minigame} playerId={playerId} now={now} online={status === "online"} onReady={() => send({ type: "ACTION", action: { type: "MINIGAME_READY" } })}/>
         ) : playing && View ? (
           <View
             match={match}

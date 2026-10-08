@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type MutableRefObject, type RefObject } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Line } from "@react-three/drei";
+import { Html, Line } from "@react-three/drei";
 import { Group, Mesh } from "three";
 import { COLORS } from "../../../../games/party/config.ts";
 import { ARENA_MAPS, WEAPONS } from "../../../../games/party/minigames/pickupArena/maps.ts";
@@ -60,6 +60,7 @@ function ArenaScene({ state, match, playerId, aim, held, now, offset }: Minigame
   const map = ARENA_MAPS[state.map];
   const me = state.players[playerId], hits = state.hits ?? [];
   return <>
+    {[...Array(map.floors)].map((_, floor) => <group key={floor} position={[0,floor * 4 + .025,3]}><mesh rotation={[-Math.PI/2,0,0]}><ringGeometry args={[2.1,2.5,40]}/><meshBasicMaterial color="#8df8dc" transparent opacity={.7 + .2 * Math.sin(now/200)}/></mesh><Html center position={[0,.3,0]} style={{ pointerEvents:"none" }}><span className="arena-world-pickup" style={{borderColor:"#8df8dc"}}>✦ BEACON · HOLD 3s = +1</span></Html></group>)}
     <ArenaWorld map={map}/><CameraRig state={state} playerId={playerId} avatarId={match.players.find((p) => p.id === playerId)?.avatarId ?? 0} aim={aim} held={held} offset={offset}/>
     {state.pickups.filter((p) => p.availableAt <= now).map((item) => {
       const p = map.pickups[item.id];
@@ -146,7 +147,7 @@ export default function PickupArenaScreen(props: MinigameViewProps) {
     const request = canvas.current?.requestPointerLock();
     if (request) request.catch(() => setTouchPlaying(true));
   };
-  const sorted = Object.entries(state.players).sort((a, b) => b[1].kills - a[1].kills);
+  const sorted = Object.entries(state.players).sort((a, b) => (b[1].kills * 3 + (b[1].beaconPoints ?? 0)) - (a[1].kills * 3 + (a[1].beaconPoints ?? 0)));
   const floor = Math.round((me?.y ?? 0) / 4);
   const nearest = me && state.pickups.find((p) => p.availableAt <= now && Math.hypot(map.pickups[p.id].x - me.x, map.pickups[p.id].y - me.y, map.pickups[p.id].z - me.z) < 1.5);
   const hit = (state.hits ?? []).findLast((h) => h.attacker === playerId && now - h.at < 350);
@@ -161,7 +162,7 @@ export default function PickupArenaScreen(props: MinigameViewProps) {
       {hit && <div key={hit.id} className={`arena-hit-marker ${hit.hpAfter === 0 ? "kill" : ""}`} aria-label={`${hit.damage} damage dealt`}>✕{hit.headshot && <small>HEADSHOT</small>}</div>}
       {hurt && <div key={hurt.id} className="arena-hurt-vignette" aria-hidden="true"/>}
       <ol className="arena-leaderboard">{sorted.map(([id, p]) => <li key={id} className={id === playerId ? "me" : ""}>
-        <span>{match.players.find((o) => o.id === id)?.name}</span><b>{p.kills}</b>
+        <span>{match.players.find((o) => o.id === id)?.name}</span><b>{p.kills * 3 + (p.beaconPoints ?? 0)}</b>
       </li>)}</ol>
       <div className="arena-feed" aria-live="polite">{state.feed.filter((f) => now - f.at < 5000).map((f) => <p key={`${f.at}:${f.victim}`}>
         {match.players.find((p) => p.id === f.killer)?.name} · {WEAPONS[f.weapon].name}{f.headshot ? " · HEADSHOT" : ""} · {match.players.find((p) => p.id === f.victim)?.name}
@@ -178,7 +179,7 @@ export default function PickupArenaScreen(props: MinigameViewProps) {
         <div className={`arena-hp-box ${me.hp < 35 ? "low" : ""}`}><span>HEALTH <b>{me.hp}<small> / 100</small></b></span>
           <div role="progressbar" aria-label="Your HP" aria-valuemin={0} aria-valuemax={100} aria-valuenow={me.hp}><i style={{ width: `${me.hp}%` }}/></div>
         </div>
-        <div className="arena-status"><span>{me.weapon ? WEAPONS[me.weapon].name : "Unarmed"}</span><b>{me.ammo < 0 ? "∞" : me.ammo} ammo</b><span>{me.kills} kills · floor {floor + 1}</span></div>
+        <div className="arena-status"><span>{me.weapon ? WEAPONS[me.weapon].name : "Unarmed"}</span><b>{me.ammo < 0 ? "∞" : me.ammo} ammo</b><span>{me.kills * 3 + (me.beaconPoints ?? 0)} pts · {me.kills} hits scored · floor {floor + 1}</span></div>
       </>}
       {nearest && active && <div className="arena-pickup-prompt">E / Swap · {WEAPONS[map.pickups[nearest.id].weapon].name}</div>}
       {me?.protectedUntil > now && active && <div className="arena-protection">Spawn shield · weapons ready in {Math.ceil((me.protectedUntil - now) / 1000)}s</div>}
@@ -199,6 +200,6 @@ export default function PickupArenaScreen(props: MinigameViewProps) {
       <button disabled={!nearest} onClick={() => sendInput({ type: "ARENA_PICKUP" })}>Swap</button>
       <button onClick={() => setTouchPlaying(false)}>Pause controls</button>
     </div>}
-    <p className="arena-help">{map.id === "arcade" ? "Three floors · four mint-marked stairs" : "Buildings, cars and crates provide cover"} · Knife, shotgun, Desert Eagle and other guns · Most kills wins</p>
+    <p className="arena-help">{map.id === "arcade" ? "Three floors · four mint-marked stairs" : "Buildings, cars and crates provide cover"} · Comet batons and blasters · kill +3 · beacon +1 every 3s · highest score wins</p>
   </div>;
 }

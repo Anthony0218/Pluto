@@ -94,7 +94,7 @@ const snapshot = (match: Match, userId: string) => {
   const thisTip = match.submissions.filter((item) => item.round === match.round_index && tipOf(item) === tip);
   // Earlier missed guesses of this country are public: they narrow the field for everyone.
   const missedGuesses = match.mode === "guess_country" ? match.submissions.filter((item) => item.round === match.round_index && (tipOf(item) < tip || resolved)).map((item) => ({ userId: item.userId, tip: tipOf(item), answer: String(item.answer), correct: resolved ? item.correct : false })) : [];
-  return { id: match.id, code: match.room_code, mode: match.mode, ranked: match.match_kind === "ranked", series: series ? { ...series, bans: match.status === "draft" ? { [userId]: series.bans[userId] ?? [] } : series.bans, submittedCount: Object.keys(series.bans).length } : undefined, hostId: match.host_id, players: match.players, seat, maxPlayers: maxPlayers(match), status: match.status, datasetVersion: match.dataset_version, settings: match.settings, roundIndex: match.round_index, rounds: roundsFor(match).length, tipIndex: tip, tipCount: question?.interaction === "guess_country" ? question.clues.length : 1, roundStartedAt: match.round_started_at, roundEndsAt: match.round_ends_at, scores: match.scores, ownership: match.ownership, question: publicQuestion(question, match, resolved), submitted: thisTip.some((item) => item.userId === userId), submittedAnswer: thisTip.find((item) => item.userId === userId)?.answer ?? null, opponentSubmitted: thisTip.some((item) => item.userId !== userId), submittedIds: thisTip.map((item) => item.userId), guesses: missedGuesses, roundResult: resolved ? match.round_result : null, version: match.version,
+  return { id: match.id, code: match.room_code, mode: match.mode, ranked: match.match_kind === "ranked", series: series ? { ...series, bans: match.status === "draft" ? { [userId]: series.bans[userId] ?? [] } : series.bans, submittedCount: Object.keys(series.bans).length } : undefined, hostId: match.host_id, players: match.players, seat, maxPlayers: maxPlayers(match), status: match.status, intermissionEndsAt: match.status === "intermission" && match.match_kind === "ranked" ? match.resolve_at : null, datasetVersion: match.dataset_version, settings: match.settings, roundIndex: match.round_index, rounds: roundsFor(match).length, tipIndex: tip, tipCount: question?.interaction === "guess_country" ? question.clues.length : 1, roundStartedAt: match.round_started_at, roundEndsAt: match.round_ends_at, scores: match.scores, ownership: match.ownership, question: publicQuestion(question, match, resolved), submitted: thisTip.some((item) => item.userId === userId), submittedAnswer: thisTip.find((item) => item.userId === userId)?.answer ?? null, opponentSubmitted: thisTip.some((item) => item.userId !== userId), submittedIds: thisTip.map((item) => item.userId), guesses: missedGuesses, roundResult: resolved ? match.round_result : null, version: match.version,
     // Only this participant’s current race question and card hand are exposed.
     ...(isRaceMode(match.mode) ? { race: Object.fromEntries(Object.entries(match.state?.race??{}).map(([id,run])=>[id,{score:run.score,done:run.done,updatedAt:run.updatedAt,finishedAt:run.finishedAt}])), run:match.state?.race?.[userId] ? safeRaceView(match.state.race[userId],match) : null } : {}),
     tiebreak:match.state?.tie ? {attempt:match.state.tie.attempt,mode:match.state.tie.mode} : undefined,
@@ -153,14 +153,14 @@ function advanceByClock(match: Match, now: number): boolean {
     match.status = "cancelled";
     return true;
   }
+  if (match.status === "intermission" && match.match_kind === "ranked" && match.resolve_at && now >= Date.parse(match.resolve_at)) {
+    match.status = "countdown"; match.round_started_at = new Date(now).toISOString(); match.resolve_at = null; changed = true;
+  }
   if ((match.status === "countdown" || match.status === "next_round") && match.round_started_at && now >= Date.parse(match.round_started_at)) {
     match.status = "round_active"; changed = true;
     if (isRaceMode(match.mode)) { match.state = { ...match.state, race: Object.fromEntries(match.players.map(p=>[p.id,createRaceRun(now)])) }; match.round_ends_at = new Date(now + raceDuration(match.mode)).toISOString(); }
     else if (match.mode === "stat_battle") { match.state = { ...match.state, duel: createBattleMatch(trialPool(match.settings.difficulty || "intermediate"), match.seed) }; syncDuelScores(match); match.round_ends_at = new Date(now + pickDuration(match)).toISOString(); }
     else match.round_ends_at = new Date(now + (match.mode === "guess_country" ? tipDuration(match) : ROUND_MS)).toISOString();
-  }
-  if(match.status==="intermission" && match.resolve_at && now>=Date.parse(match.resolve_at)) {
-    match.status="countdown";match.round_started_at=new Date(now+3000).toISOString();match.resolve_at=null;return true;
   }
   if (isRaceMode(match.mode)) {
     // Out of time: the race closes with whatever scores were reported.
@@ -229,7 +229,8 @@ function advanceCasualSeries(match: Match): void {
   match.seed = crypto.randomUUID(); match.status = "intermission";
   match.players = match.players.map(player => ({ ...player, ready: false }));
   match.round_index = 0; match.tip_index = 0; match.round_started_at = null; match.round_ends_at = null;
-  match.resolve_at = new Date(Date.now() + 45_000).toISOString();
+  // Casual series wait for both Continue signals, with no automatic advance.
+  match.resolve_at = null;
   match.submissions = []; match.scores = Object.fromEntries(match.players.map(player => [player.id, 0]));
   match.ownership = {}; match.round_result = null; match.state = { casualSeries: series };
 }
@@ -306,12 +307,13 @@ Deno.serve(async (request) => {
         const randomBestOf = body.randomBestOf === undefined ? undefined : seriesLength(body.randomBestOf);
         if (randomBestOf !== undefined && body.randomBestOf !== randomBestOf) throw new Error("Choose one game, best of 3 or best of 5.");
         const order = randomBestOf ? chooseRandomModes(ATLAS_MULTIPLAYER_MODES, randomBestOf, mode, () => crypto.getRandomValues(new Uint32Array(1))[0] / 2 ** 32) as AtlasMultiplayerMode[] : undefined;
-        const settings = { rounds: mode === "guess_country" ? 8 : 10, difficulty: body.difficulty === "expert" || body.difficulty === "beginner" ? body.difficulty : "intermediate", maxPlayers: randomBestOf ? 2 : clampPlayers(mode, body.maxPlayers), ...(randomBestOf ? { randomBestOf } : {}),
+        const initialMode = order?.[0] ?? mode;
+        const settings = { rounds: initialMode === "guess_country" ? 8 : 10, difficulty: body.difficulty === "expert" || body.difficulty === "beginner" ? body.difficulty : "intermediate", maxPlayers: randomBestOf ? 2 : clampPlayers(mode, body.maxPlayers), ...(randomBestOf ? { randomBestOf } : {}),
           ...(usesMapCategories(mode) || randomBestOf ? { categories: parseSelection(body.categories, QUESTION_CATEGORIES, QUESTION_CATEGORIES.map(({ id }) => id)) } : {}),
           ...(mode === "map_fill" || randomBestOf ? { scope: body.scope === undefined ? "Europe" : isFillScope(body.scope) ? body.scope : (() => { throw new Error("Unknown map region."); })() } : {}),
           ...(mode === "higher_lower" || randomBestOf ? { stats: parseSelection(body.stats, COMPARISON_CATEGORIES, DEFAULT_COMPARISON_STATS) } : {}),
         };
-        const { data, error } = await db.from("atlas_matches").insert({ room_code: code, mode, host_id: user.id, players: [player], dataset_version: ATLAS_VERSION, seed, settings, ...(order ? { state: { casualSeries: { bans: {}, order, gameIndex: 0, wins: {}, results: [] } } } : {}), scores: { [user.id]: 0 } }).select().single();
+        const { data, error } = await db.from("atlas_matches").insert({ room_code: code, mode: initialMode, host_id: user.id, players: [player], dataset_version: ATLAS_VERSION, seed, settings, ...(order ? { state: { casualSeries: { bans: {}, order, gameIndex: 0, wins: {}, results: [] } } } : {}), scores: { [user.id]: 0 } }).select().single();
         if (!error) return respond(snapshot(data as Match, user.id));
         if (error.code !== "23505") throw new Error("Could not create Atlas room.");
       }
@@ -367,7 +369,11 @@ Deno.serve(async (request) => {
       } else if (body.op === "ready") {
         if (!["waiting", "ready", "intermission"].includes(match.status)) throw new Error("This room is not waiting for players.");
         match.players[seat].ready = true; if (match.status !== "intermission") match.status = "ready"; changed = true;
-        if (match.players.length === maxPlayers(match) && match.players.every((player) => player.ready)) { match.status = "countdown"; match.round_started_at = new Date(now + 3000).toISOString(); }
+        if (match.players.length === maxPlayers(match) && match.players.every((player) => player.ready)) {
+          const rankedBreak = match.status === "intermission" && match.match_kind === "ranked";
+          match.status = "countdown"; match.round_started_at = new Date(now + (rankedBreak ? 0 : 3000)).toISOString(); match.resolve_at = null;
+          if (rankedBreak) advanceByClock(match, now);
+        }
       } else if (body.op === "start") {
         // The host may begin a 3–4 seat room early once everybody present is ready.
         if (match.host_id !== user.id) throw new Error("Only the host can start early.");

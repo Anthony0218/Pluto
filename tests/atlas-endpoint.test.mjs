@@ -35,7 +35,7 @@ test('real handler validates participants, answer generations, retries, race res
   room=await start('stat_battle');row=e.matches.at(-1);row.match_kind='ranked';row.state.ranked={bans:{a:[],b:[]},order:['stat_battle','map_battle','language_guesser'],gameIndex:0,wins:{a:0,b:0},results:[]};
   // Restarting a ranked duel from countdown retains the ranked-series object.
   row.status='countdown';row.round_started_at=new Date(e.now()).toISOString();room=await invoke('a',{op:'get',code:row.room_code});assert.ok(row.state.ranked);assert.ok(room.battle);assert.equal(room.seed,undefined);
-  row.status='finished';row.scores={a:5,b:2};room=await invoke('a',{op:'get',code:row.room_code});assert.equal(room.status,'intermission');assert.equal(room.series.wins.a,1);e.advance(45001);room=await invoke('a',{op:'get',code:row.room_code});assert.equal(room.status,'countdown');
+  row.status='finished';row.scores={a:5,b:2};room=await invoke('a',{op:'get',code:row.room_code});assert.equal(room.status,'intermission');assert.equal(room.series.wins.a,1);e.advance(45001);room=await invoke('a',{op:'get',code:row.room_code});assert.equal(room.status,'round_active');
   // A tied second game becomes a three-question challenge, never a seeded coin toss.
   row.status='finished';row.scores={a:1000,b:1000};room=await invoke('a',{op:'get',code:row.room_code});assert.equal(room.tiebreak.attempt,1);assert.equal(room.rounds,3);assert.equal(room.series.results.length,1);
   row.status='finished';row.scores={a:3000,b:1000};room=await invoke('a',{op:'get',code:row.room_code});assert.equal(room.status,'finished');assert.equal(room.series.wins.a,2);assert.equal(e.results.length,1);await invoke('a',{op:'get',code:row.room_code});assert.equal(e.results.length,1);

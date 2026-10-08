@@ -77,7 +77,39 @@ function createRuntime(
     results: null,
     rewards: null,
     rewardsApplied: false,
+    awaitingReady: participants.some((id) => !state.players.find((p) => p.id === id)!.isBot),
+    readyPlayerIds: participants.filter((id) => state.players.find((p) => p.id === id)!.isBot),
   };
+}
+
+// Readiness is separate from gameplay. Practice runs locally and cannot award anything.
+function startReadyCountdown(state: Match, random: Random, now: number) {
+  const runtime = state.minigame!;
+  if (!runtime.participants.every((id) => runtime.readyPlayerIds?.includes(id))) return;
+  const definition = minigameRegistry.get(runtime.minigameId);
+  runtime.awaitingReady = false;
+  runtime.startedAt = now + MINIGAME_FLOW.countdownMs;
+  runtime.endsAt = runtime.startedAt + definition.durationSeconds * 1000;
+  runtime.state = definition.create({ participants: participantsOf(state, runtime.participants), startedAt: runtime.startedAt, endsAt: runtime.endsAt, random });
+}
+export function readyMinigame(current: Match, playerId: string, random: Random, now: number): Match {
+  const runtime = current.minigame;
+  if (!(current.phase === "MINIGAME_INTRO" || current.phase === "DUEL_INTRO") || !runtime?.awaitingReady) throw new Error("The ready check is not open.");
+  if (!runtime.participants.includes(playerId)) throw new Error("You are not playing this minigame.");
+  if (runtime.readyPlayerIds?.includes(playerId)) return current;
+  const state = structuredClone(current);
+  state.minigame!.readyPlayerIds = [...(runtime.readyPlayerIds ?? []), playerId];
+  startReadyCountdown(state, random, now);
+  return state;
+}
+export function refreshBotReadiness(current: Match, random: Random, now: number): Match {
+  const runtime = current.minigame!;
+  const newBots = runtime.participants.filter((id) => current.players.find((p) => p.id === id)?.isBot && !runtime.readyPlayerIds?.includes(id));
+  if (!newBots.length) return current;
+  const state = structuredClone(current);
+  state.minigame!.readyPlayerIds = [...(runtime.readyPlayerIds ?? []), ...newBots];
+  startReadyCountdown(state, random, now);
+  return state;
 }
 
 export function startMinigame(
@@ -145,11 +177,12 @@ export function beginMinigamePhase(
   now: number,
   registry: MinigameRegistry = minigameRegistry,
 ) {
-  const id = selectMinigame(
-    registry.pool("main"),
-    state.lastMinigameId,
-    random,
-  );
+  const available = registry.pool("main").filter((game) => !state.selectedMinigameIds?.length || state.selectedMinigameIds.includes(game.id));
+  const pool = available.length ? available : registry.pool("main");
+  let fresh = pool.filter((game) => !state.playedMinigameIds?.includes(game.id));
+  if (!fresh.length) { state.playedMinigameIds = []; fresh = pool; }
+  const id = selectMinigame(fresh, state.lastMinigameId, random);
+  state.playedMinigameIds = [...(state.playedMinigameIds ?? []), id];
   startMinigame(state, id, random, now, registry);
 }
 
@@ -205,19 +238,27 @@ export function finishMinigame(
   if (state.minigame && registry.get(state.minigame.minigameId).gameType !== "main")
     throw new Error("Duels never pay main minigame rewards.");
   concludeMinigame(state, random, now, MINIGAME_FLOW.resultsMs, registry);
-  applyMinigameRewards(state);
+  applyMinigameRewards(state, registry);
   state.phase = "MINIGAME_RESULTS";
 }
 
-export function applyMinigameRewards(state: Match) {
+export function applyMinigameRewards(state: Match, registry: MinigameRegistry = minigameRegistry) {
   const runtime = state.minigame;
   if (!runtime?.results || runtime.rewardsApplied) return;
   runtime.rewards = {};
-  bumpStat(state, runtime.results[0].playerId, "minigameWins");
+  const definition = registry.get(runtime.minigameId);
+  const winningTeam = definition.teamOf?.(runtime.state, runtime.results[0].playerId);
+  const teamDraw = winningTeam !== undefined && runtime.results.every((r) => r.score === runtime.results![0].score);
   for (const result of runtime.results) {
-    const amount = rewardFor(result.position),
+    const teamWin = winningTeam !== undefined && definition.teamOf?.(runtime.state, result.playerId) === winningTeam;
+    const amount = winningTeam !== undefined ? teamDraw ? 5 : teamWin ? 8 : 3 : rewardFor(result.position),
       player = state.players.find((p) => p.id === result.playerId)!;
     player.coins += amount;
+    if (winningTeam !== undefined ? teamWin && !teamDraw : result.position === 1) bumpStat(state, player.id, "minigameWins");
+    if (state.mode === "festival") {
+      state.festivalScores ??= {};
+      state.festivalScores[player.id] = (state.festivalScores[player.id] ?? 0) + (winningTeam !== undefined ? teamDraw ? 2 : teamWin ? 3 : 1 : 4 - result.position);
+    }
     runtime.rewards[result.playerId] = amount;
     if (amount > 0)
       emit(state, {

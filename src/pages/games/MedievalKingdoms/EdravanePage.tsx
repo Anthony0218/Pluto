@@ -7,17 +7,27 @@ import type {
   CouncilView,
   CouncilRequest,
 } from "../../../games/MedievalKingdoms/edravane/multiplayer.ts";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   activeTurnHouse,
   defendingArmies,
 } from "../../../games/MedievalKingdoms/edravane/turns.ts";
-import { TerrainTile } from "./TerrainTile";
+import { HexFields } from "./HexFields.tsx";
+import { EstateLabels } from "./EstateLabel.tsx";
+import { clampMapZoom, MAX_MAP_ZOOM, MIN_MAP_ZOOM, mapViewport } from "./mapViewport.ts";
 import { HouseProfile } from "./HouseProfile";
 import { CharacterPortrait } from "./CharacterPortrait.tsx";
 import { WarActions } from "./WarActions";
 import { InsultAction } from "./InsultAction.tsx";
+import { RealmIcon } from "./RealmIcon.tsx";
+import { armyControl, CONTROL_LABELS, territoryControl } from "./mapPresentation.ts";
+import { mapBounds, territoryLayouts } from "./territoryLayout.ts";
+import { HouseSigil } from "./HouseSigil.tsx";
+import { ArmyLogistics, Chronicle, DistrictStrategy, KingdomIdentity, MarriagePlanner, Personality, SuccessionPlanner, VassalBargain } from "./RealmPanels.tsx";
+import { IDENTITIES, ruler, season, successionPreview } from "../../../games/MedievalKingdoms/edravane/realm.ts";
+import { peaceDescription } from "../../../games/MedievalKingdoms/edravane/campaignStrategy.ts";
+import { strategyView } from "../../../games/MedievalKingdoms/edravane/logistics.ts";
 import {
   BattleOutcome,
   BattleRoundPanel,
@@ -116,11 +126,13 @@ export default function EdravanePage() {
     [selectedHouse, setSelectedHouse] = useState<string | null>(null),
     [sidebarOpen, setSidebarOpen] = useState(true),
     [panelExpanded, setPanelExpanded] = useState(false),
+    [panelSide, setPanelSide] = useState<"east" | "west">("east"),
+    [mapFrame, setMapFrame] = useState({ width: 1440, height: 900 }),
     [inspectedReaction, setInspectedReaction] = useState(""),
     [region, setRegion] = useState(false),
-    [mapZoom, setMapZoom] = useState(1),
+    [mapZoom, setMapZoom] = useState(MIN_MAP_ZOOM),
     [mapPanning, setMapPanning] = useState(false),
-    [mapCenter, setMapCenter] = useState<[number, number]>([460, 310]),
+    [cameraCenter, setMapCenter] = useState<[number, number] | null>(null),
     [requestedTab, setTab] = useState("district"),
     [overlay, setOverlay] = useState("terrain"),
     [armySelection, setArmy] = useState(""),
@@ -156,6 +168,24 @@ export default function EdravanePage() {
       moved: boolean;
     } | null>(null),
     file = useRef<HTMLInputElement | null>(null);
+  const cameraFrame = useRef<number | null>(null);
+  const pendingCamera = useRef<[number, number] | null>(null);
+  const mapZoomRef = useRef(MIN_MAP_ZOOM);
+  useEffect(() => { mapZoomRef.current = mapZoom; }, [mapZoom]);
+  const zoomMap = useCallback((requested: number) => {
+    const zoom = clampMapZoom(requested);
+    mapZoomRef.current = zoom;
+    setMapZoom(zoom);
+    if (zoom === MIN_MAP_ZOOM) {
+      if (cameraFrame.current !== null) cancelAnimationFrame(cameraFrame.current);
+      cameraFrame.current = null;
+      pendingCamera.current = null;
+      mapDrag.current = null;
+      setMapPanning(false);
+      setMapCenter(null);
+      setRegion(false);
+    }
+  }, []);
   const campaignStarted = !!state;
   const lobbySlot = lobby?.slots.find((s) => s.player === player);
   const lobbyReady = !!lobbySlot?.ready;
@@ -168,13 +198,18 @@ export default function EdravanePage() {
         behavior: "smooth",
       });
   }, [networkMenu, lobby?.code, campaignStarted]);
-  const view = state ?? createCampaign(nation);
+  const view = useMemo(() => state ? online ? state : strategyView(state, `${nation}-0`) : createCampaign(nation), [state, online, nation]);
+  const worldBounds = useMemo(() => mapBounds(view.districts), [view.districts]);
+  const playableBounds = useMemo(() => mapBounds(view.districts, { includeLegacy: false }), [view.districts]);
+  const realmTerritories = useMemo(() => territoryLayouts(view, "realm"), [view]);
+  const houseTerritories = useMemo(() => territoryLayouts(view, "house"), [view]);
+  const mapCenter = cameraCenter ?? (campaignStarted ? playableBounds.center : worldBounds.center);
   const house = view.houses.find((h) => h.id === `${nation}-0`)!;
   const actor = { house: house.id };
   const requestedArmy = view.armies.find((a) => a.id === armySelection);
   const army = requestedArmy?.garrison
     ? (view.armies.find(
-        (a) => a.house === house.id && !a.garrison && !a.pledgedTo,
+        (a) => a.house === requestedArmy.house && !a.garrison && !a.pledgedTo && !a.rebel,
       )?.id ?? armySelection)
     : armySelection;
   const activeReaction = view.turns?.pending[0];
@@ -187,6 +222,11 @@ export default function EdravanePage() {
   const tab = newThreat ? "district" : requestedTab;
   const hex = view.districts.find((d) => d.id === selected),
     selectedArmy = view.armies.find((a) => a.id === army);
+  const selectedSiege = view.sieges?.find((siege) => siege.army === army);
+  const control = selectedArmy ? armyControl(view, house, selectedArmy) : undefined;
+  const armyOwner = view.houses.find((h) => h.id === selectedArmy?.house);
+  const panelVisible = sidebarOpen || !!(myResponse && inspectedReaction !== activeReaction?.id);
+  const crownHolder = view.houses.find((h) => h.id === view.titles.find((t) => t.nation === house.nation)?.holder);
   const profileHouse = view.houses.find((h) => h.id === selectedHouse) ?? house;
   const myTurn =
     activeTurnHouse(view) === house.id &&
@@ -239,26 +279,45 @@ export default function EdravanePage() {
   useEffect(() => {
     const svg = mapElement.current;
     if (!svg) return;
+    const observer = new ResizeObserver(([entry]) => setMapFrame({ width: entry.contentRect.width, height: entry.contentRect.height }));
+    observer.observe(svg.parentElement ?? svg);
+    let zoomFrame: number | null = null;
+    let zoomFactor = 1;
+    let zoomIdle: ReturnType<typeof setTimeout> | undefined;
     const wheel = (event: WheelEvent) => {
       event.preventDefault();
-      setMapZoom((z) =>
-        Math.max(0.75, Math.min(4, z * (event.deltaY > 0 ? 0.88 : 1.12))),
-      );
+      zoomFactor *= event.deltaY > 0 ? 0.88 : 1.12;
+      svg.classList.add("ed-camera-zooming");
+      if (zoomFrame === null) zoomFrame = requestAnimationFrame(() => {
+        const factor = zoomFactor;
+        zoomFrame = null;
+        zoomFactor = 1;
+        zoomMap(mapZoomRef.current * factor);
+      });
+      clearTimeout(zoomIdle);
+      zoomIdle = setTimeout(() => svg.classList.remove("ed-camera-zooming"), 160);
     };
     svg.addEventListener("wheel", wheel, { passive: false });
-    return () => svg.removeEventListener("wheel", wheel);
-  }, [campaignStarted]);
+    return () => {
+      svg.removeEventListener("wheel", wheel);
+      observer.disconnect();
+      if (zoomFrame !== null) cancelAnimationFrame(zoomFrame);
+      clearTimeout(zoomIdle);
+      svg.classList.remove("ed-camera-zooming");
+    };
+  }, [campaignStarted, zoomMap]);
   function resetCamera() {
-    setMapZoom(1);
-    setMapCenter([460, 310]);
-    setRegion(false);
+    zoomMap(MIN_MAP_ZOOM);
   }
   function panMap(dx: number, dy: number) {
     setMapPanning(false);
-    setMapCenter(([x, y]) => [
-      Math.max(0, Math.min(920, x + (dx * 90) / mapZoom)),
-      Math.max(0, Math.min(620, y + (dy * 90) / mapZoom)),
-    ]);
+    setMapCenter((current) => {
+      const [x, y] = current ?? playableBounds.center;
+      return [
+        Math.max(worldBounds.minX, Math.min(worldBounds.maxX, x + (dx * 90) / mapZoom)),
+        Math.max(worldBounds.minY, Math.min(worldBounds.maxY, y + (dy * 90) / mapZoom)),
+      ];
+    });
   }
   function mapKey(e: React.KeyboardEvent) {
     const direction: Record<string, [number, number]> = {
@@ -285,6 +344,7 @@ export default function EdravanePage() {
   }
   useEffect(
     () => () => {
+      if (cameraFrame.current !== null) cancelAnimationFrame(cameraFrame.current);
       connectionAttempt.current++;
       connection.current?.close();
     },
@@ -393,12 +453,17 @@ export default function EdravanePage() {
   }
   const netSend = (message: CouncilRequest) =>
     connection.current?.send(message);
-  function select(d: District) {
+  const select = useCallback((d: District) => {
     setSelected(d.id);
     setInspectedReaction(activeReaction?.id ?? "");
     setSidebarOpen(true);
     setTab("district");
-  }
+    if (campaignStarted) {
+      setMapCenter(center(d));
+      setMapZoom(1.8);
+      setRegion(true);
+    }
+  }, [activeReaction?.id, campaignStarted]);
   function visitHouse(h: House) {
     const seat =
       view.districts.find((d) => d.owner === h.id && d.seat === "capital") ??
@@ -416,8 +481,22 @@ export default function EdravanePage() {
     }
   }
   function map(mini = false) {
+    const bounds = mini || !campaignStarted ? worldBounds : playableBounds;
     const zoom = mini ? 1 : mapZoom;
-    const c = mini ? [460, 310] : mapCenter;
+    const regional = !mini && zoom >= 1.6;
+    const detailed = !mini && zoom >= 2.6;
+    const c = mini || !campaignStarted ? worldBounds.center : mapCenter;
+    const mobile = mapFrame.width <= 700;
+    const frame = mini || !campaignStarted ? { width: worldBounds.width, height: worldBounds.height } : mapFrame;
+    // Fit playable fields between the floating interface; the locked legacy entry doesn't shrink the world.
+    const left = mobile ? 12 : panelSide === "west" ? panelVisible ? 374 : 30 : 230;
+    const right = mobile ? 12 : panelSide === "east" ? panelVisible ? 374 : 30 : 230;
+    const top = mobile ? 375 : 185;
+    const hasOrders = !!selectedArmy && (!selectedArmy.garrison || control === "vassal");
+    const bottom = mobile ? (panelVisible ? mapFrame.height * .34 + 30 : 35) + (hasOrders ? 105 : 0) : hasOrders ? 245 : 70;
+    const scale = mini || !campaignStarted ? zoom : Math.max(.08, Math.min((frame.width - left - right) / bounds.width, (frame.height - top - bottom) / bounds.height)) * zoom;
+    const origin = mini || !campaignStarted ? [frame.width / 2, frame.height / 2] : [(left + frame.width - right) / 2, (top + frame.height - bottom) / 2];
+    const viewport = mini || !campaignStarted ? "" : mapViewport(c, origin, scale, frame);
     return (
       <svg
         ref={mini ? undefined : mapElement}
@@ -425,7 +504,7 @@ export default function EdravanePage() {
           mini
             ? undefined
             : (e) => {
-                if (e.button !== 0) return;
+                if (!campaignStarted || e.button !== 0) return;
                 setMapPanning(false);
                 mapDrag.current = {
                   point: mapPoint(e.currentTarget, e.clientX, e.clientY),
@@ -447,16 +526,25 @@ export default function EdravanePage() {
                 drag.moved = true;
                 setMapPanning(true);
                 e.currentTarget.setPointerCapture(e.pointerId);
-                setMapCenter([
-                  Math.max(0, Math.min(920, drag.center[0] - dx / mapZoom)),
-                  Math.max(0, Math.min(620, drag.center[1] - dy / mapZoom)),
-                ]);
+                pendingCamera.current = [
+                  Math.max(worldBounds.minX, Math.min(worldBounds.maxX, drag.center[0] - dx / scale)),
+                  Math.max(worldBounds.minY, Math.min(worldBounds.maxY, drag.center[1] - dy / scale)),
+                ];
+                if (cameraFrame.current === null) cameraFrame.current = requestAnimationFrame(() => {
+                  cameraFrame.current = null;
+                  if (pendingCamera.current) setMapCenter(pendingCamera.current);
+                  pendingCamera.current = null;
+                });
               }
         }
         onPointerUp={
           mini
             ? undefined
             : (e) => {
+                if (cameraFrame.current !== null) cancelAnimationFrame(cameraFrame.current);
+                cameraFrame.current = null;
+                if (pendingCamera.current) setMapCenter(pendingCamera.current);
+                pendingCamera.current = null;
                 setMapPanning(false);
                 if (e.currentTarget.hasPointerCapture(e.pointerId))
                   e.currentTarget.releasePointerCapture(e.pointerId);
@@ -466,6 +554,9 @@ export default function EdravanePage() {
           mini
             ? undefined
             : () => {
+                if (cameraFrame.current !== null) cancelAnimationFrame(cameraFrame.current);
+                cameraFrame.current = null;
+                pendingCamera.current = null;
                 mapDrag.current = null;
                 setMapPanning(false);
               }
@@ -486,8 +577,8 @@ export default function EdravanePage() {
                 mapDrag.current = null;
               }
         }
-        className={mini ? "ed-minimap" : "ed-world-svg"}
-        viewBox="0 0 920 620"
+        className={mini ? "ed-minimap" : `ed-world-svg${mapPanning ? " ed-camera-moving" : ""}`}
+        viewBox={`0 0 ${frame.width} ${frame.height}`}
         role={mini ? "img" : "group"}
         aria-label={mini ? "World minimap" : "Interactive hex map of Edravane"}
       >
@@ -535,17 +626,15 @@ export default function EdravanePage() {
             />
           </pattern>
         </defs>
-        <rect width="920" height="620" fill="#193942" />
+        <rect width={frame.width} height={frame.height} fill="#193942" />
         <rect
-          width="920"
-          height="620"
+          width={frame.width}
+          height={frame.height}
           fill={`url(#${mini ? "mini-water" : "water"})`}
         />
         <g
           style={{
-            transform: mini
-              ? ""
-              : `translate(${460 - c[0] * zoom}px, ${310 - c[1] * zoom}px) scale(${zoom})`,
+            transform: `translate(${origin[0] - c[0] * scale}px, ${origin[1] - c[1] * scale}px) scale(${scale})`,
             transition: mapPanning
               ? "none"
               : reduced
@@ -553,185 +642,10 @@ export default function EdravanePage() {
                 : "transform 180ms ease-out",
           }}
         >
-          {view.districts.map((d) => {
-            const owner = view.houses.find((h) => h.id === d.owner),
-              owned = owner?.id === house.id;
-            const [x, y] = center(d);
-            let fill = BIOMES[d.biome].color;
-            if (overlay === "loyalty" && owner)
-              fill =
-                owner.loyalty < 40
-                  ? "#94665e"
-                  : owner.loyalty < 65
-                    ? "#a99660"
-                    : "#6a987e";
-            if (overlay === "ownership" && owner) fill = BIOMES[d.biome].color;
-            return (
-              <g
-                key={d.id}
-                onClick={() => select(d)}
-                role={!mini ? "button" : undefined}
-                tabIndex={!mini ? 0 : undefined}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") select(d);
-                }}
-                aria-label={`${d.name}, ${owner?.name ?? d.biome}`}
-                className={!mini ? "ed-hex" : ""}
-              >
-                <title>
-                  {d.name} · {owner?.name ?? d.biome} ·{" "}
-                  {BIOMES[d.biome].description}
-                  {d.city ? ` · ${d.city} city` : ""}
-                  {d.castle ? ` · level ${d.castle.level} castle` : ""}
-                </title>
-                <polygon
-                  points={points(d)}
-                  fill={
-                    d.biome === "legacy"
-                      ? `url(#${mini ? "mini-legacy" : "legacy-image"})`
-                      : fill
-                  }
-                  stroke="#182e27"
-                  strokeWidth=".55"
-                  fillOpacity={1}
-                />
-                {overlay === "ownership" && owner && (
-                  <polygon
-                    points={points(d)}
-                    fill={owner.color}
-                    opacity=".18"
-                    pointerEvents="none"
-                  />
-                )}
-                {!mini && d.biome !== "legacy" && (
-                  <g transform={`translate(${x},${y})`}>
-                    <TerrainTile d={d} />
-                  </g>
-                )}
-                {d.owner && (
-                  <polygon
-                    points={points(d, 1.4)}
-                    fill="none"
-                    stroke={owned ? "#f6d97b" : owner!.color}
-                    strokeWidth={owned ? 2 : 1.2}
-                  />
-                )}
-                {d.occupation && (
-                  <polygon
-                    points={points(d, 2)}
-                    fill={`url(#${mini ? "mini-occupation" : "occupation"})`}
-                    opacity=".5"
-                  />
-                )}
-                {d.disputed && (
-                  <polygon
-                    points={points(d, 3)}
-                    fill="none"
-                    stroke="#ede0c3"
-                    strokeWidth="1"
-                    strokeDasharray="3 2"
-                  />
-                )}
-                {!mini && (overlay === "resources" || d.biome === "legacy") && (
-                  <text
-                    x={x}
-                    y={y + 5}
-                    textAnchor="middle"
-                    fontSize={d.biome === "legacy" ? 12 : 10}
-                    fill="#132b28"
-                    opacity=".8"
-                  >
-                    {d.biome === "legacy"
-                      ? "🔒"
-                      : overlay === "resources"
-                        ? {
-                            grain: "♧",
-                            timber: "♣",
-                            iron: "◆",
-                            livestock: "♘",
-                            horses: "♞",
-                            herbs: "✿",
-                            luxury: "✧",
-                          }[d.resource]
-                        : BIOMES[d.biome].icon}
-                  </text>
-                )}
-                {!mini && owned && (
-                  <text x={x - 10} y={y - 8} fontSize="8" fill="#fff0aa">
-                    ♛
-                  </text>
-                )}
-                {!mini && region && (
-                  <>
-                    <text
-                      x={x}
-                      y={y - 8}
-                      textAnchor="middle"
-                      fontSize="5"
-                      fill="#14271d"
-                    >
-                      {d.settlement === "Hamlet"
-                        ? `${owner?.crest ?? ""} ${owner?.name ?? ""}`
-                        : d.settlement}
-                    </text>
-                    {d.port && (
-                      <text x={x + 12} y={y + 14} fontSize="8">
-                        ⚓
-                      </text>
-                    )}
-                  </>
-                )}
-                {!mini && d.bonus && (
-                  <circle
-                    cx={x + 12}
-                    cy={y - 11}
-                    r="3.5"
-                    fill={d.bonus === "gold" ? "#ffdf6d" : "#e4edf0"}
-                    stroke="#49493c"
-                  />
-                )}
-              </g>
-            );
-          })}
-          {/* Borders follow actual shared hex edges, at estate and nation scales. */}
-          {view.districts
-            .filter((d) => d.owner)
-            .flatMap((d) => {
-              const [x, y] = center(d);
-              return Array.from({ length: 6 }, (_, i) => {
-                const a = ((60 * i - 30) * Math.PI) / 180,
-                  b = ((60 * (i + 1) - 30) * Math.PI) / 180;
-                const mx = x + (25 * (Math.cos(a) + Math.cos(b))) / 2,
-                  my = y + (25 * (Math.sin(a) + Math.sin(b))) / 2;
-                const adjacent = view.districts.find(
-                  (n) =>
-                    n.id !== d.id &&
-                    Math.hypot(
-                      center(n)[0] - (x + (mx - x) * 2),
-                      center(n)[1] - (y + (my - y) * 2),
-                    ) < 1,
-                );
-                const national =
-                    view.houses.find((h) => h.id === adjacent?.owner)
-                      ?.nation !==
-                    view.houses.find((h) => h.id === d.owner)?.nation,
-                  estate = adjacent?.owner !== d.owner;
-                if (!estate) return null;
-                return (
-                  <line
-                    key={`${d.id}-${i}`}
-                    x1={x + 25 * Math.cos(a)}
-                    y1={y + 25 * Math.sin(a)}
-                    x2={x + 25 * Math.cos(b)}
-                    y2={y + 25 * Math.sin(b)}
-                    stroke={national ? "#e8d7b0" : "#293932"}
-                    strokeWidth={national ? 2.6 : 1.4}
-                  />
-                );
-              });
-            })}
+          <HexFields view={view} house={house} overlay={mini ? "ownership" : overlay} regional={regional} detailed={detailed} mini={mini} viewport={viewport} supplyArmy={overlay === "supply" ? selectedArmy ?? view.armies.find((a) => a.house === house.id) : undefined} onSelect={select} />
+          {!mini && detailed && <EstateLabels view={view} viewport={viewport} resolution={Math.max(1, Math.min(4, Math.ceil(scale * window.devicePixelRatio)))} />}
           {!mini &&
-            view.routes.map((r) => {
+            view.routes.filter((r) => overlay === "trade" || detailed && r.house === house.id).map((r) => {
               const path = r.path.map((id) =>
                 center(view.districts.find((d) => d.id === id)!),
               );
@@ -754,48 +668,25 @@ export default function EdravanePage() {
                 </g>
               );
             })}
-          {!mini &&
-            NATIONS.map((n) => {
-              const [x, y] = center(
-                view.districts.find((d) => d.id === n.capital)!,
-              );
-              return (
-                <g key={n.id} pointerEvents="none">
-                  <rect
-                    x={x - 48}
-                    y={y - 38}
-                    width="96"
-                    height="17"
-                    rx="2"
-                    fill="#142c22"
-                    opacity=".9"
-                  />
-                  <text
-                    x={x}
-                    y={y - 27}
-                    textAnchor="middle"
-                    fontSize={region ? 8 : 14}
-                    fontFamily="Georgia"
-                    fontWeight="bold"
-                    fill="#fff1cb"
-                    stroke="#213e32"
-                    strokeWidth="2"
-                    paintOrder="stroke"
-                  >
-                    {n.name.toUpperCase()}
-                  </text>
-                  <text
-                    x={x}
-                    y={y - 15}
-                    textAnchor="middle"
-                    fontSize="7"
-                    fill="#fff1b8"
-                  >
-                    ♜
-                  </text>
-                </g>
-              );
-            })}
+          {!mini && !regional && realmTerritories.map((territory) => {
+            const pathId = `realm-name-${territory.id}`;
+            return <g key={pathId} className="ed-realm-map-label" transform={`translate(${territory.x} ${territory.y - 27}) rotate(${territory.angle})`} pointerEvents="none" aria-hidden="true" data-territory={territory.id} data-fields={territory.districts.length}>
+              <path id={pathId} d={`M${-territory.width / 2} 0 Q0 ${-territory.width * .09} ${territory.width / 2} 0`} fill="none" />
+              <text fontFamily="Georgia" fontSize={territory.fontSize} fontWeight="bold" letterSpacing="1.4" fill="#fff1cb" stroke="#172e28" strokeWidth="3" paintOrder="stroke"><textPath href={`#${pathId}`} startOffset="50%" textAnchor="middle">{territory.title.toUpperCase()}</textPath></text>
+            </g>;
+          })}
+          {!mini && houseTerritories.map((territory) => {
+            const size = territory.house.role === "crown" ? 28 : regional ? 24 : 18;
+            const pathId = `house-name-${territory.id}`;
+            return <g key={pathId} className="ed-house-map-label" pointerEvents="none" aria-hidden="true" data-house={territory.house.id} data-fields={territory.districts.length}>
+              <g transform={`translate(${territory.x - size / 2} ${territory.y - size * .6})`}><HouseSigil house={territory.house} size={size} /></g>
+              {regional && <g transform={`translate(${territory.x} ${territory.y - size * .6 - 9}) rotate(${territory.angle})`}>
+                <path id={pathId} d={`M${-territory.width / 2} 0 Q0 ${-territory.width * .07} ${territory.width / 2} 0`} fill="none" />
+                <text fontFamily="Georgia" fontSize={territory.fontSize} letterSpacing=".6" fill="#fff0ca" stroke="#18362b" strokeWidth="2" paintOrder="stroke"><textPath href={`#${pathId}`} startOffset="50%" textAnchor="middle">{territory.title.toUpperCase()}</textPath></text>
+              </g>}
+              {regional && territory.components.slice(1).filter((component) => component.length >= 2).map((component) => { const [x, y] = center(component[0]); return <g key={component[0].id} transform={`translate(${x - 7} ${y - 8})`} opacity=".75"><HouseSigil house={territory.house} size={14} /></g>; })}
+            </g>;
+          })}
           {!mini &&
             view.armies
               .filter(
@@ -815,6 +706,8 @@ export default function EdravanePage() {
                     ] ?? a.hex),
                 )!;
                 const [x, y] = center(d);
+                const command = armyControl(view, house, a);
+                const marker = command === "own" || command === "pledged" || command === "awaiting" ? "#f6d97b" : command === "vassal" ? "#d5be83" : command === "hostile" ? "#ef9990" : "#bdcacc";
                 return (
                   <g
                     key={a.id}
@@ -832,8 +725,11 @@ export default function EdravanePage() {
                         select(view.districts.find((d) => d.id === a.hex)!);
                       }
                     }}
-                    aria-label={a.name}
+                    aria-label={`${a.name}, ${CONTROL_LABELS[command]}`}
+                    data-control={command}
                   >
+                    {a.id === army && <rect x={x - 21 + (i % 2) * 8} y={y - 2} width="24" height="24" rx="4" fill="#b9e0e91a" stroke="#b9e0e9" strokeWidth=".8" />}
+                    {(command === "pledged" || command === "awaiting") && <circle cx={x - 9 + (i % 2) * 8} cy={y + 10} r="9.5" fill="none" stroke={marker} strokeWidth=".8" strokeDasharray={command === "awaiting" ? "3 2" : undefined} />}
                     <circle
                       cx={x - 9 + (i % 2) * 8}
                       cy={y + 10}
@@ -845,23 +741,24 @@ export default function EdravanePage() {
                             ? "#332b19"
                             : "#344b50"
                       }
-                      stroke={a.id === army ? "#fff1a4" : "#ddd2b7"}
+                      stroke={marker}
+                      strokeWidth="1.8"
+                      strokeDasharray={command === "vassal" ? "1 2.5" : undefined}
+                      strokeLinecap="round"
                     />
-                    <text
-                      x={x - 9 + (i % 2) * 8}
-                      y={y + 13}
-                      textAnchor="middle"
-                      fontSize="9"
-                      fill="#fff"
-                    >
-                      ⚔
-                    </text>
+                    <g transform={`translate(${x - 15 + (i % 2) * 8},${y + 4})`} style={{ color: marker }} pointerEvents="none"><RealmIcon metric="troops" size={12} /></g>
+                    {regional && <text x={x} y={y + 27} textAnchor="middle" fontSize="7" fill="#fff1cb" stroke="#142c22" strokeWidth="2" paintOrder="stroke">{troopCount(a).toLocaleString()}</text>}
                     <title>
-                      {a.name}: {troopCount(a)} troops
+                      {a.name}: {troopCount(a)} troops · {CONTROL_LABELS[command]}
                     </title>
                   </g>
                 );
               })}
+          {!mini && (view.intelligence?.[house.id] ?? []).filter((r) => !view.armies.some((a) => a.id === r.army)).map((report) => {
+            const d = view.districts.find((d) => d.id === report.hex)!;
+            const [x, y] = center(d);
+            return <g key={report.army} className="ed-intel-marker" role="button" tabIndex={0} aria-label={`${report.name}: last reported ${report.low}–${report.high} troops, round ${report.seen}`} onClick={() => select(d)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(d); } }}><circle cx={x} cy={y + 10} r="8" fill="#253c3c" stroke="#d6c6a4" strokeDasharray="2 2" /><text x={x} y={y + 13} fill="#e4d9bb" textAnchor="middle" fontSize="10">?</text><title>{report.name}: {report.low}–{report.high} troops · last seen round {report.seen}</title></g>;
+          })}
           {!mini && selected && hex && (
             <polygon
               className="ed-selected-hex"
@@ -879,7 +776,7 @@ export default function EdravanePage() {
           <>
             <text
               x="38"
-              y="575"
+              y={frame.height - 34}
               fontFamily="Georgia"
               fontSize="13"
               fill="#abc4c2"
@@ -887,7 +784,7 @@ export default function EdravanePage() {
             >
               THE AZURE SEA
             </text>
-            <g transform="translate(860 555)" fill="none" stroke="#cfc39b">
+            <g transform={`translate(${frame.width - 54} ${frame.height - 65})`} fill="none" stroke="#cfc39b">
               <path d="M0 -22 L5 0 L0 22 L-5 0Z M-22 0H22" />
               <text x="-4" y="-28" fill="#cfc39b" stroke="none" fontSize="10">
                 N
@@ -914,7 +811,7 @@ export default function EdravanePage() {
         </header>
         <div className="ed-intro">
           <div>
-            <span className="ed-eyebrow">EIGHT CROWNS. ONE CONTINENT.</span>
+            <span className="ed-eyebrow">EIGHT CROWNS. TWO CONTINENTS.</span>
             <h1>
               Edravane
               <span>
@@ -946,13 +843,14 @@ export default function EdravanePage() {
                 }}
                 style={{ "--nation": n.color } as React.CSSProperties}
               >
-                <span className="ed-crest">{n.crest}</span>
+                <span className="ed-crest ed-sigil-frame"><HouseSigil house={view.houses.find((h) => h.id === `${n.id}-0`)!} size={36} /></span>
                 <div>
                   <strong>{n.name}</strong>
                   <small>HOUSE {n.house.toUpperCase()}</small>
                   <span>
                     {n.people} · {n.succession}
                   </span>
+                  <small>{IDENTITIES[n.id].title}</small>
                 </div>
                 {nation === n.id && <Crown size={16} />}
               </button>
@@ -1154,7 +1052,7 @@ export default function EdravanePage() {
             </p>
           )}
           <p className="ed-footnote">
-            Provisional fictional names · 180 land districts · 40 great and
+            Two continents · {view.districts.length} hexes · {view.districts.filter((d) => d.nation).length} land districts · 40 great and
             minor houses · Legacy progress preserved
           </p>
         </section>
@@ -1196,7 +1094,7 @@ export default function EdravanePage() {
   );
   return createPortal(
     <main
-      className={`ed-app ed-playing ${sidebarOpen || (myResponse && inspectedReaction !== activeReaction?.id) ? "" : "ed-sidebar-hidden"}`}
+      className={`ed-app ed-playing ed-panel-${panelSide} ${panelVisible ? "" : "ed-sidebar-hidden"}`}
     >
       <header className="ed-masthead">
         <Link to="/games">
@@ -1249,6 +1147,7 @@ export default function EdravanePage() {
           <b>
             {view.turns?.round ?? 1} · {actingHouse?.name ?? "Council"}
           </b>
+          <small>{season(view)} · {mapZoom < 1.6 ? "World view" : mapZoom < 2.6 ? "Regional view" : "Estate view"}</small>
         </div>
         <div className="ed-tools">
           <button
@@ -1299,6 +1198,8 @@ export default function EdravanePage() {
             ? hiddenBattle === battle.id
               ? "Battle in progress · campaign waits"
               : "Battle in progress · campaign turns wait for the outcome"
+            : crownHolder?.id !== house.id
+              ? `Your crown has passed to House ${crownHolder?.name}. Review the chronicle or start a new campaign from Campaign menu.`
             : myTurn
               ? "Your turn · plan diplomacy, harvest, raise troops and order movement, then End turn."
               : `${actingHouse?.name ?? "The council"} is taking its turn. You can inspect the map while waiting.`}
@@ -1343,16 +1244,16 @@ export default function EdravanePage() {
             >
               <button
                 aria-label="Zoom out map"
-                disabled={mapZoom <= 0.75}
-                onClick={() => setMapZoom((z) => Math.max(0.75, z - 0.25))}
+                disabled={mapZoom <= MIN_MAP_ZOOM}
+                onClick={() => zoomMap(mapZoom - 0.25)}
               >
                 <Minus size={15} />
               </button>
               <span>{Math.round(mapZoom * 100)}%</span>
               <button
                 aria-label="Zoom in map"
-                disabled={mapZoom >= 4}
-                onClick={() => setMapZoom((z) => Math.min(4, z + 0.25))}
+                disabled={mapZoom >= MAX_MAP_ZOOM}
+                onClick={() => zoomMap(mapZoom + 0.25)}
               >
                 <Plus size={15} />
               </button>
@@ -1367,7 +1268,7 @@ export default function EdravanePage() {
               <button
                 aria-label="View map west"
                 title="View west · Left arrow"
-                disabled={mapCenter[0] <= 0}
+                disabled={mapCenter[0] <= worldBounds.minX}
                 onClick={() => panMap(-1, 0)}
               >
                 <ArrowLeft size={16} />
@@ -1375,7 +1276,7 @@ export default function EdravanePage() {
               <button
                 aria-label="View map north"
                 title="View north · Up arrow"
-                disabled={mapCenter[1] <= 0}
+                disabled={mapCenter[1] <= worldBounds.minY}
                 onClick={() => panMap(0, -1)}
               >
                 <ArrowUp size={16} />
@@ -1383,7 +1284,7 @@ export default function EdravanePage() {
               <button
                 aria-label="View map south"
                 title="View south · Down arrow"
-                disabled={mapCenter[1] >= 620}
+                disabled={mapCenter[1] >= worldBounds.maxY}
                 onClick={() => panMap(0, 1)}
               >
                 <ArrowDown size={16} />
@@ -1391,14 +1292,14 @@ export default function EdravanePage() {
               <button
                 aria-label="View map east"
                 title="View east · Right arrow"
-                disabled={mapCenter[0] >= 920}
+                disabled={mapCenter[0] >= worldBounds.maxX}
                 onClick={() => panMap(1, 0)}
               >
                 <ArrowRight size={16} />
               </button>
             </div>
             <div className="ed-overlay-controls">
-              {["terrain", "ownership", "loyalty", "resources", "trade"].map(
+              {["terrain", "ownership", "loyalty", "resources", "trade", "supply", "diplomacy", "claims"].map(
                 (o) => (
                   <button
                     className={overlay === o ? "active" : ""}
@@ -1419,6 +1320,8 @@ export default function EdravanePage() {
                 ),
               )}
             </div>
+            <div className="ed-map-mode-guide" role="status">{overlay === "supply" ? "Green: an open supply route · red: carried food needed" : overlay === "diplomacy" ? "Gold: your realm · blue: marriage allies · red: enemies" : overlay === "claims" ? "Gold: your realm · purple: inherited family claims" : overlay === "loyalty" ? "Green: ready for service · amber: reduced commitment · red: refusal risk" : overlay === "trade" ? "Dashed lines: trade routes · ports and blockades control access" : "House sigils mark controlled fields · zoom for house names and estates"}</div>
+            <div className="ed-control-legend" aria-label="Map control legend"><span><i className="ed-line-direct" />Your domain</span><span><i className="ed-line-vassal" />Vassal estates</span><small>Solid hosts: direct orders · dotted hosts: requests · double ring: pledged service</small></div>
             <button
               className="ed-sidebar-toggle"
               onClick={() => {
@@ -1460,11 +1363,11 @@ export default function EdravanePage() {
               </button>
             )}
           </div>
-          <div className="ed-army-bar">
+          <div className={`ed-army-bar ${selectedArmy && (!selectedArmy.garrison || control === "vassal") ? "" : "ed-army-bar-empty"}`}>
             <Swords size={16} />
             <select
               aria-label="Selected army"
-              value={selectedArmy?.garrison ? "" : army}
+              value={selectedArmy?.garrison && control !== "vassal" ? "" : army}
               onChange={(e) => setArmy(e.target.value)}
             >
               <option value="">
@@ -1477,21 +1380,17 @@ export default function EdravanePage() {
               {view.armies
                 .filter(
                   (a) =>
-                    !a.garrison &&
-                    (canControl(view, actor, a) ||
-                      view.houses.find((h) => h.id === a.house)?.liege ===
-                        house.id),
+                    (!a.garrison && (canControl(view, actor, a) || armyControl(view, house, a) === "awaiting")) || armyControl(view, house, a) === "vassal" && (!a.garrison || view.districts.some((d) => d.id === a.hex && d.seat)),
                 )
                 .map((a) => (
                   <option key={a.id} value={a.id}>
                     {a.name} ·{" "}
-                    {canControl(view, actor, a)
-                      ? "Your command"
-                      : "Independent"}{" "}
+                    {a.garrison ? "Vassal reserves · request service" : CONTROL_LABELS[armyControl(view, house, a)]}{" "}
                     · {troopCount(a)}
                   </option>
                 ))}
             </select>
+            {control && <strong className={`ed-command-label ed-command-${control}`}><RealmIcon metric="loyalty" />{CONTROL_LABELS[control]}{control === "vassal" && armyOwner ? ` · ${armyOwner.loyalty} loyalty` : ""}</strong>}
             {selectedArmy && !selectedArmy.garrison && (
               <span>
                 Loyalty {Math.round(armyLoyalty(view, selectedArmy))}% · Food{" "}
@@ -1506,12 +1405,14 @@ export default function EdravanePage() {
               </span>
             )}
             <button
+              hidden={control !== "own" && control !== "pledged"}
               disabled={
                 !canAct ||
                 !selectedArmy ||
                 selectedArmy.garrison ||
                 !hex ||
                 !canControl(view, actor, selectedArmy) ||
+                !!selectedSiege ||
                 !!battle
               }
               onClick={() => execute({ type: "move", army, hex: hex!.id })}
@@ -1519,12 +1420,14 @@ export default function EdravanePage() {
               March here <ArrowUpRight size={14} />
             </button>
             <button
+              hidden={control !== "own" && control !== "pledged"}
               disabled={
                 !canAct ||
                 !selectedArmy ||
                 selectedArmy.garrison ||
                 !hex?.port ||
                 !canControl(view, actor, selectedArmy) ||
+                !!selectedSiege ||
                 !!battle
               }
               onClick={() => execute({ type: "embark", army, hex: hex!.id })}
@@ -1542,37 +1445,41 @@ export default function EdravanePage() {
                     troopCount(selectedArmy) < 1
                   }
                   onClick={() =>
-                    execute({
+                    execute(selectedSiege ? { type: "siege", army, hex: selectedSiege.hex, stance: "lift" } : {
                       type: "blockade",
                       army,
                       enabled: !selectedArmy.blockading,
                     })
                   }
                 >
-                  {selectedArmy.blockading
+                  {selectedSiege ? "Lift siege" : selectedArmy.blockading
                     ? "Lift blockade"
                     : "Block trade here"}
                 </button>
               )}
             <button
+              hidden={control !== "vassal"}
               disabled={
-                !canAct ||
+                !myTurn ||
                 !selectedArmy ||
-                selectedArmy.garrison ||
                 !hex ||
                 canControl(view, actor, selectedArmy) ||
-                !!battle
+                !!battle || !!selectedArmy.voyage || !!selectedSiege
               }
               onClick={() => execute({ type: "objective", army, hex: hex!.id })}
             >
-              Request objective
+              <RealmIcon metric="relations" />Request {hex?.id === selectedArmy?.hex ? "hold position" : "march here"}
             </button>
+            {control === "vassal" && <small className="ed-vassal-request-note">Loyalty 55+ to obey.{armyOwner?.summons ? ` ${armyOwner.summons}.` : ""}</small>}
+            {control === "awaiting" && <small className="ed-vassal-request-note">Orders unlock after {selectedArmy?.delay} turn{selectedArmy?.delay === 1 ? "" : "s"} of travel.</small>}
           </div>
+          <ArmyLogistics state={view} house={house} army={selectedArmy} destination={hex} />
         </section>
         <aside
           className={`ed-panel ${panelExpanded || myResponse ? "ed-panel-expanded" : ""}`}
           aria-label="Kingdom information sidebar"
         >
+          <div className="ed-panel-dock"><span>REALM DESK</span><button className="ed-dock-side" aria-label={`Move sidebar ${panelSide === "east" ? "left" : "right"}`} onClick={() => setPanelSide((side) => side === "east" ? "west" : "east")}>{panelSide === "east" ? <ArrowLeft size={14} /> : <ArrowRight size={14} />}</button><button aria-label="Close sidebar" onClick={() => { setSidebarOpen(false); setInspectedReaction(activeReaction?.id ?? ""); }}>×</button></div>
           {activeReaction && myResponse && !battle && (
             <section
               className="ed-response-card"
@@ -1640,6 +1547,8 @@ export default function EdravanePage() {
                   ? `Invasion of ${view.districts.find((d) => d.id === activeReaction.hex)?.settlement}`
                   : activeReaction.kind === "war"
                     ? "A declaration of war"
+                    : activeReaction.kind === "surrender"
+                      ? "A castle surrender demand"
                     : activeReaction.kind === "peace"
                       ? "A peace offer"
                       : "A proposed marriage pact"}
@@ -1652,8 +1561,10 @@ export default function EdravanePage() {
                     ? "has declared war. You may raise or reinforce troops at your seats before completing your response."
                     : activeReaction.kind === "peace"
                       ? "asks to end the war. Peace requires your consent."
-                      : "proposes a marriage pact. The heirs marry only if you accept."}
+                      : activeReaction.kind === "surrender" ? "demands the castle's surrender. Acceptance disarms the garrison and cedes occupation; refusal continues the siege." : "proposes a marriage pact. The heirs marry only if you accept."}
               </p>
+              {activeReaction.kind === "peace" && <p className="ed-response-terms">{peaceDescription(activeReaction.terms)}</p>}
+              {activeReaction.kind === "marriage" && <p className="ed-response-terms">{activeReaction.people?.map((id) => view.houses.flatMap((h) => h.family).find((p) => p.id === id)?.name).join(" marries ")}. Their living marriage creates a pact and protects against border conquest.</p>}
               {activeReaction.kind === "attack" ? (
                 <>
                   {defendingArmies(view, activeReaction).map((a) => (
@@ -1709,7 +1620,7 @@ export default function EdravanePage() {
                     Accept{" "}
                     {activeReaction.kind === "peace"
                       ? "peace"
-                      : "marriage pact"}
+                      : activeReaction.kind === "surrender" ? "castle surrender" : "marriage pact"}
                   </button>
                   <button
                     onClick={() =>
@@ -1754,7 +1665,7 @@ export default function EdravanePage() {
           )}
 
           <nav className="ed-panel-tabs">
-            {["district", "houses", "council", "dynasty", "economy"].map(
+            {["district", "houses", "council", "dynasty", "economy", "chronicle"].map(
               (t) => (
                 <button
                   key={t}
@@ -1812,6 +1723,8 @@ export default function EdravanePage() {
                     </span>
                     <h2>{hex.settlement}</h2>
                     <p>{hex.name}</p>
+                    <p className={`ed-territory-label ed-territory-${territoryControl(view, house, hex)}`}><RealmIcon metric="legitimacy" />{territoryControl(view, house, hex) === "domain" ? "Your domain · direct rule" : territoryControl(view, house, hex) === "vassal" ? "Vassal estate · governed by its house" : "Outside your direct rule"}</p>
+                    {territoryControl(view, house, hex) === "vassal" && <button className="ed-request-host" onClick={() => { const host = view.armies.find((a) => a.house === (hex.occupation ?? hex.owner) && !a.garrison && !a.pledgedTo && !a.rebel) ?? view.armies.find((a) => a.house === (hex.occupation ?? hex.owner) && a.garrison && !a.rebel); if (host) { setArmy(host.id); if (window.matchMedia("(max-width: 700px)").matches) setSidebarOpen(false); } }}><RealmIcon metric="troops" />Request this vassal’s host</button>}
                     <p>
                       <button
                         className="ed-house-link"
@@ -2096,6 +2009,9 @@ export default function EdravanePage() {
                       {r}
                     </p>
                   ))}
+                  <DistrictStrategy state={view} house={house} district={hex} army={selectedArmy} active={myTurn && !battle} onCommand={execute} />
+                  <div className="ed-mobile-logistics"><ArmyLogistics state={view} house={house} army={selectedArmy} destination={hex} /></div>
+                  {(view.intelligence?.[house.id] ?? []).filter((r) => r.hex === hex.id && !view.armies.some((a) => a.id === r.army)).map((r) => <p className="ed-intel-report" key={r.army}>{r.name}: approximately {r.low}–{r.high} soldiers, last seen round {r.seen}. Their current position and strength are unknown.</p>)}
                   {hex.occupation && (
                     <button
                       disabled={!myTurn}
@@ -2217,7 +2133,7 @@ export default function EdravanePage() {
                       className={profileHouse.id === h.id ? "active" : ""}
                       onClick={() => visitHouse(h)}
                     >
-                      {h.crest} {h.name}
+                      <HouseSigil house={h} size={18} /> {h.name}
                     </button>
                   );
                 })}
@@ -2256,6 +2172,7 @@ export default function EdravanePage() {
           )}
           {tab === "council" && (
             <div className="ed-actions-fieldset">
+              <KingdomIdentity nation={house.nation} />
               <div className="ed-panel-title">
                 <span className="ed-eyebrow">THE FEUDAL COUNCIL</span>
                 <h2>Oaths & ambitions</h2>
@@ -2281,6 +2198,7 @@ export default function EdravanePage() {
                       </b>
                     </div>
                     <p>{v.ambition}</p>
+                    <VassalBargain state={view} house={house} vassal={v} active={myTurn && !battle} onCommand={execute} />
                     <small>
                       Opinion {v.opinion} · Legitimacy {v.legitimacy} ·{" "}
                       {v.obligation} troops
@@ -2389,6 +2307,9 @@ export default function EdravanePage() {
                 <h2>The line of succession</h2>
                 <p>{NATIONS.find((n) => n.id === nation)!.succession}</p>
               </div>
+              <Personality person={ruler(house)} />
+              <SuccessionPlanner state={view} house={house} active={myTurn && !battle} onCommand={execute} />
+              <MarriagePlanner state={view} house={house} active={myTurn && !battle} onCommand={execute} />
               {house.family.map((p) => (
                 <div className="ed-person" key={p.id}>
                   <CharacterPortrait person={p} house={house} />
@@ -2428,7 +2349,7 @@ export default function EdravanePage() {
                   </div>
                 </div>
               ))}
-              <button onClick={() => execute({ type: "succession" })}>
+              <button disabled={!myTurn || !successionPreview(view, house).next || !successionPreview(view, house).recognized} onClick={() => execute({ type: "succession" })}>
                 Pass the crown to the eligible heir
               </button>
               <h3>Titles held</h3>
@@ -2602,6 +2523,7 @@ export default function EdravanePage() {
               </>
             )}
           </div>
+          {tab === "chronicle" && <Chronicle state={view} onHouse={visitHouse} onHex={(d) => { select(d); setMapCenter(center(d)); setMapZoom(2.8); }} />}
           {message && (
             <p className="ed-notice" role="alert">
               {message}
@@ -2613,13 +2535,13 @@ export default function EdravanePage() {
         <span>
           CHRONICLE <span className="ed-dot">●</span>
         </span>
-        <p>{message || view.log[0]}</p>
-        <button onClick={() => setTab("council")}>
-          Open council <ChevronRight size={14} />
+        <p>{message || view.events?.[0]?.title || "Your reign begins. Plan your alliances and call your banners."}</p>
+        <button onClick={() => { setSidebarOpen(true); setTab("chronicle"); }}>
+          Read chronicle <ChevronRight size={14} />
         </button>
       </footer>
       <details className="ed-history">
-        <summary>Campaign chronicle · {view.log.length} entries</summary>
+        <summary>Routine reports · {view.log.length} entries</summary>
         {view.log.map((l, i) => (
           <p key={i}>{l}</p>
         ))}

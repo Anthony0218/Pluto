@@ -65,7 +65,7 @@ export default function VisitPlutoPreview() {
             {
               title: "Daily challenge",
               description: "See today's goal and your progress.",
-              to: "/dashboard",
+              to: "/home",
               icon: Target,
             },
             {
@@ -93,7 +93,7 @@ export default function VisitPlutoPreview() {
       <div className="flex items-center justify-between gap-4 border-t border-white/10 px-5 py-4">
         <p className="text-xs text-zinc-400">{ui("Your games, learning and progress.")}</p>
         <Link
-          to="/dashboard"
+          to="/home"
           className="shrink-0 rounded-xl bg-indigo-500 px-4 py-2.5 text-xs font-semibold text-white hover:bg-indigo-400"
         >{ui("Open Pluto")}</Link>
       </div>

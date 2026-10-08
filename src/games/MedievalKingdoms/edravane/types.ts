@@ -1,3 +1,18 @@
+export type Trait = "ambitious" | "loyal" | "greedy" | "proud" | "cautious" | "brave";
+export type CharacterSkills = { diplomacy: number; command: number; stewardship: number; intrigue: number };
+export type SuccessionLaw = "primogeniture" | "partition" | "elective" | "clan";
+export type CouncilOffice = "marshal" | "steward" | "chancellor" | "spymaster";
+export type DemandKind = "lower-taxes" | "council-seat" | "border-estate" | "protect-trade";
+export type FeudalContract = { taxRate: number; office?: CouncilOffice; protectedTrade?: boolean; grantedEstate?: string };
+export type VassalDemand = { kind: DemandKind; status: "open" | "fulfilled" | "broken"; since: number; deadline?: number };
+export type PeaceTerms = { kind: "white" | "recover" | "release" | "open-trade" | "cede" | "claimant" | "tribute"; hex?: string; claimant?: string; coins?: number; militaryAccess?: boolean };
+export type Conflict = { id: string; from: string; to: string; reason: WarReason; objective?: string; started: number };
+export type Treaty = { from: string; to: string; until: number; access: boolean; trade: boolean; tribute: number; tributeUntil: number; tributeRemaining?: number };
+export type Siege = { id: string; army: string; hex: string; defender: string; turns: number; food: number; engines: boolean; offered?: boolean };
+export type ScoutMission = { house: string; hex: string; until: number };
+export type ArmyReport = { army: string; house: string; name: string; hex: string; low: number; high: number; seen: number };
+export type ChronicleEvent = { id: string; tick: number; round: number; kind: "diplomacy" | "succession" | "battle" | "politics" | "siege" | "economy"; house: string; other?: string; hex?: string; person?: string; title: string; detail: string };
+
 export type Resource =
   | "grain"
   | "timber"
@@ -57,6 +72,8 @@ export type District = {
   occupiedAt?: number;
   disputed: boolean;
   unrest: number;
+  depot?: boolean;
+  watchtower?: boolean;
 };
 export type Person = {
   id: string;
@@ -67,7 +84,11 @@ export type Person = {
   parents: string[];
   spouse?: string;
   claim?: string;
+  claims?: string[];
   imprisonedBy?: string;
+  traits?: Trait[];
+  skills?: CharacterSkills;
+  lastChildYear?: number;
 };
 export type House = {
   id: string;
@@ -91,6 +112,13 @@ export type House = {
   rebellion: boolean;
   summons: string;
   unjustifiedWars?: number;
+  contract?: FeudalContract;
+  demand?: VassalDemand;
+  successionLaw?: SuccessionLaw;
+  designatedHeir?: string;
+  regent?: string;
+  prestige?: number;
+  bargains?: string[];
 };
 export type Title = {
   id: string;
@@ -127,6 +155,8 @@ export type Army = {
   commander: string;
   rebel: boolean;
   delay: number;
+  provisions?: number;
+  supplySource?: string;
 };
 export type TradeRoute = {
   id: string;
@@ -229,7 +259,7 @@ export type Challenge = {
 };
 export type Reaction = {
   id: string;
-  kind: "war" | "peace" | "marriage" | "attack";
+  kind: "war" | "peace" | "marriage" | "attack" | "surrender";
   from: string;
   to: string;
   created: number;
@@ -238,6 +268,9 @@ export type Reaction = {
   people?: [string, string];
   negotiated?: boolean;
   reason?: WarReason;
+  terms?: PeaceTerms;
+  siege?: string;
+  partnerHouse?: string;
 };
 export type WarReason =
   | "trade-blockade"
@@ -246,6 +279,7 @@ export type WarReason =
   | "defend-ally"
   | "insult"
   | "territorial-conquest"
+  | "dynastic-claim"
   | "unjustified";
 export type DiplomaticInsult = {
   from: string;
@@ -271,6 +305,13 @@ export type CampaignTurn = {
 export type Campaign = {
   version: 2;
   estateRules?: 1;
+  strategyRules?: 1;
+  conflicts?: Conflict[];
+  treaties?: Treaty[];
+  sieges?: Siege[];
+  scouts?: ScoutMission[];
+  intelligence?: Record<string, ArmyReport[]>;
+  events?: ChronicleEvent[];
   turns?: CampaignTurn;
   world: "Edravane";
   mode: "single" | "multi";
@@ -312,7 +353,13 @@ export type Actor = {
 export type Command =
   | { type: "endTurn" }
   | { type: "insult"; house: string }
-  | { type: "peace"; nation: string }
+  | { type: "peace"; nation: string; terms?: PeaceTerms }
+  | { type: "bargain"; house: string; offer: DemandKind; hex?: string; office?: CouncilOffice }
+  | { type: "successionLaw"; law: SuccessionLaw }
+  | { type: "nominate"; person: string }
+  | { type: "infrastructure"; hex: string; building: "road" | "depot" | "watchtower" }
+  | { type: "scout"; hex: string }
+  | { type: "siege"; army: string; hex: string; stance: "blockade" | "assault" | "negotiate" | "lift" }
   | {
       type: "respond";
       reaction: string;
@@ -359,6 +406,7 @@ export type Command =
   | {
       type: "marry";
       house: string;
+      people?: [string, string];
     }
   | {
       type: "succession";

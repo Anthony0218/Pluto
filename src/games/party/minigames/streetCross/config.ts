@@ -60,9 +60,11 @@ export const STREET_CROSS_CONFIG = {
   inputIntervalMs: 80,
   snapshotIntervalMs: 100,
   bots: {
-    easy: { decisionMs: 750, misjudgeSec: 0.45, marginUnits: 0.05, mistakeChance: 0.05 },
-    medium: { decisionMs: 330, misjudgeSec: 0.18, marginUnits: 0.2, mistakeChance: 0.015 },
-    hard: { decisionMs: 180, misjudgeSec: 0.06, marginUnits: 0.12, mistakeChance: 0.005 },
+    beginner: { decisionMs: 1000, misjudgeSec: .7, marginUnits: .02, mistakeChance: .12 },
+    easy: { decisionMs: 750, misjudgeSec: .45, marginUnits: .05, mistakeChance: .05 },
+    medium: { decisionMs: 540, misjudgeSec: .315, marginUnits: .12, mistakeChance: .03 },
+    hard: { decisionMs: 330, misjudgeSec: .18, marginUnits: .2, mistakeChance: .015 },
+    extreme: { decisionMs: 60, misjudgeSec: .005, marginUnits: .14, mistakeChance: .0002 },
   } satisfies Record<Difficulty, StreetBotProfile>,
 } as const;
 export const FINISH_ROW = STREET_CROSS_CONFIG.rows.indexOf("finish");

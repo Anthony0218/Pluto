@@ -1,24 +1,16 @@
+import { DEFAULT_SETTINGS, advance, applyAction } from "./helpers/party-legacy-fixtures.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
-import {
-  DEFAULT_SETTINGS,
-  PROPERTY_CONFIG,
-} from "../src/games/party/config.ts";
+import { PROPERTY_CONFIG } from "../src/games/party/config.ts";
 import { tropical } from "../src/games/party/content/maps.ts";
-import {
-  activePlayer,
-  advance,
-  applyAction,
+import { activePlayer,
   createMatch,
-  createPlayer,
-} from "../src/games/party/engine/engine.ts";
+  createPlayer } from "../src/games/party/engine/engine.ts";
 import { eligiblePlutoNodes } from "../src/games/party/engine/economy.ts";
 import { botAction } from "../src/games/party/engine/bots.ts";
 import { parseMessage } from "../src/games/party/network/protocol.ts";
-import {
-  isLevel4PlutoStealReady,
-  plutoStealRoundsLeft,
-} from "../src/games/party/properties/properties.ts";
+import { isLevel4PlutoStealReady,
+  plutoStealRoundsLeft } from "../src/games/party/properties/properties.ts";
 
 const settings = { ...DEFAULT_SETTINGS, victory: "coins", coinTarget: 300 };
 const plutoSettings = {
@@ -297,7 +289,7 @@ test("bots decide by difficulty", () => {
   );
   assert.equal(decide("medium", 10), "BUY_PROPERTY");
   assert.equal(decide("medium", 9), "LEAVE_PROPERTY");
-  assert.equal(decide("hard", 8), "BUY_PROPERTY");
+  assert.equal(decide("extreme", 8), "BUY_PROPERTY");
   assert.equal(
     decide("medium", 10, () => 0, 2),
     "UPGRADE_PROPERTY",

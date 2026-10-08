@@ -1,33 +1,52 @@
 import { useCallback, useEffect, useRef } from "react";
-import { RHYTHM_KEYS, RHYTHM_WINDOW, type RhythmView } from "../../../../games/party/minigames/rhythm/index.ts";
+import { partyAudio } from "../../../../games/party/client/audio.ts";
+import { RHYTHM_KEYS, nextRhythmNote, rhythmNoteTop, type RhythmView } from "../../../../games/party/minigames/rhythm/index.ts";
 import { COLORS } from "../../../../games/party/config.ts";
 import type { MinigameViewProps } from "./views.ts";
 import { useServerOffset } from "./useServerClock.ts";
 
-const KEY_LANE: Record<string, number> = { KeyW: 0, KeyA: 1, KeyS: 2, KeyD: 3, Space: 4, ShiftLeft: 5, ShiftRight: 5 };
+const KEY_INDEX: Record<string, number> = Object.fromEntries(RHYTHM_KEYS.map((key, index) => ["Key" + key, index]));
 export default function RhythmScreen({ minigame, match, playerId, now, online, sendInput }: MinigameViewProps) {
-  const s = minigame.state as RhythmView, me = s.players[playerId], board = useRef<HTMLDivElement>(null), nodes = useRef(new Map<number, HTMLDivElement>());
-  const offset = useServerOffset(minigame.serverNow), live = useRef(s), pads = useRef(new Map<number, HTMLButtonElement>());
+  const s = minigame.state as RhythmView, me = s.players[playerId];
+  const hitAt = me?.last?.at, hitPoints = me?.last?.points, combo = me?.combo ?? 0;
+  useEffect(() => {
+    if (hitAt !== undefined) partyAudio.play(hitPoints ? combo >= 5 && combo % 5 === 0 ? "combo" : "hit" : "miss");
+  }, [hitAt, hitPoints, combo]);
+  const board = useRef<HTMLDivElement>(null), nodes = useRef(new Map<number, HTMLDivElement>());
+  const offset = useServerOffset(minigame.serverNow), live = useRef(s);
+  const pad = useRef<HTMLButtonElement>(null), prompt = useRef<HTMLSpanElement>(null);
+  const displayed = useRef<{ at: number; lane: number | null } | null>(null);
   useEffect(() => { live.current = s; }, [s]);
   const tap = useCallback((lane: number) => {
-    if (!online || now < s.startedAt || now >= s.endsAt || !me) return;
-    pads.current.get(lane)?.animate([{ background: "#b4ffea", transform: "scale(.93)" }, { background: "#183349", transform: "scale(1)" }], { duration: 180 });
-    sendInput({ type: "RHYTHM_TAP", lane });
-  }, [online, now, s.startedAt, s.endsAt, me, sendInput]);
+    const frame = displayed.current, state = live.current;
+    const key = lane;
+    if (!online || !frame || key === null || key === undefined || frame.at < state.startedAt || frame.at >= state.endsAt || !state.players[playerId]) return;
+    pad.current?.animate([{ background: "#b4ffea", transform: "scale(.95)" }, { background: "#183349", transform: "scale(1)" }], { duration: 180 });
+    sendInput({ type: "RHYTHM_TAP", lane: key, elapsedMs: frame.at - state.startedAt });
+  }, [online, playerId, sendInput]);
   useEffect(() => {
-    const key = (e: KeyboardEvent) => { const lane = KEY_LANE[e.code]; if (lane === undefined || e.target instanceof HTMLInputElement) return; e.preventDefault(); if (!e.repeat) tap(lane); };
+    const key = (e: KeyboardEvent) => {
+      const index = KEY_INDEX[e.code];
+      if (index === undefined || e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || (e.target instanceof HTMLElement && e.target.isContentEditable)) return;
+      e.preventDefault(); if (!e.repeat) tap(index);
+    };
     window.addEventListener("keydown", key); return () => window.removeEventListener("keydown", key);
   }, [tap]);
   useEffect(() => {
     let frame: number;
     const update = () => {
-      const time = Date.now() + (offset.current ?? 0), height = board.current?.clientHeight ?? 400;
-      // One full circle diameter travels during the scoring window, matching the authority's overlap.
-      const diameter = Math.min(58, Math.max(32, (board.current?.clientWidth ?? 420) / 6 - 12));
-      board.current?.style.setProperty("--diameter", diameter + "px");
-      for (const note of live.current.notes) {
+      const at = Date.now() + (offset.current ?? 0), height = board.current?.clientHeight ?? 440;
+      const state = live.current, next = nextRhythmNote(state, at);
+      displayed.current = { at, lane: next?.lane ?? null };
+      const letter = next ? RHYTHM_KEYS[next.lane] : null;
+      if (prompt.current) prompt.current.textContent = letter ? "Tap " + letter : "Next beat incoming";
+
+      for (const note of state.notes) {
         const element = nodes.current.get(note.id);
-        if (element) { element.style.transform = "translate(-50%, " + (height - 82 - diameter / 2 - (note.at - time) / RHYTHM_WINDOW * diameter) + "px)"; element.style.opacity = live.current.judged.includes(note.id) ? "0" : "1"; }
+        if (element) {
+          element.style.transform = `translate(-50%, ${rhythmNoteTop(note.at, at, height - 110)}px)`;
+          element.style.opacity = state.judged.includes(note.id) ? "0" : "1";
+        }
       }
       frame = requestAnimationFrame(update);
     };
@@ -35,14 +54,15 @@ export default function RhythmScreen({ minigame, match, playerId, now, online, s
   }, [offset]);
   const last = me?.last && now - me.last.at < 1000 ? me.last : null;
   return <div className="rhythm-game new-minigame">
-    <header className="new-game-header"><div><span className="pp-eyebrow">SAME CHART · EVERY PLAYER</span><h2>Pluto Pulse</h2></div><strong>{Math.max(0, Math.ceil((s.endsAt - now) / 1000))}s</strong></header>
-    <div className="rhythm-feedback" aria-live="polite">{last ? <><b>{Math.round(last.overlap * 100)}% overlap</b><span>{last.value ? "+" + last.points.toFixed(2) + " points · ×" + last.value : "Miss · find the beat"}</span></> : <><b>Feel the pulse</b><span>Overlap × note value = your points</span></>}</div>
-    <div className="rhythm-track" ref={board}>
-      {RHYTHM_KEYS.map((key, lane) => <div className="rhythm-lane" key={key} style={{ left: (lane * 100 / 6) + "%", width: (100 / 6) + "%" }}><span className="rhythm-lane-name">{key}</span></div>)}
-      {s.notes.map((note) => <div key={note.id} className={"rhythm-note value-" + note.value} ref={(element) => { if (element) nodes.current.set(note.id, element); else nodes.current.delete(note.id); }} style={{ left: ((note.lane + .5) * 100 / 6) + "%" }}>{note.value}</div>)}
-      <div className="rhythm-targets">{RHYTHM_KEYS.map((key, lane) => <button key={key} aria-label={"Play " + key} disabled={!online || !me} ref={(el) => { if (el) pads.current.set(lane, el); else pads.current.delete(lane); }} onPointerDown={(e) => { e.preventDefault(); tap(lane); }}><span className="rhythm-target-circle"/><b>{key}</b></button>)}</div>
+    <header className="new-game-header"><div><span className="pp-eyebrow">100 BPM · FOLLOW THE LETTER</span><h2>Pluto Pulse</h2></div><strong>{Math.max(0, Math.ceil((s.endsAt - now) / 1000))}s</strong></header>
+    <div className={"rhythm-feedback" + (last ? " has-hit" : "")} aria-live="polite">{last ? <><b className="rhythm-comic" key={last.at}>{Math.round(last.overlap * 100)}%<small>{last.overlap >= .9 ? "PERFECT!" : last.overlap >= .65 ? "NICE!" : last.points > 0 ? "KEEP GOING!" : "MISSED!"}</small></b><span>{last.value ? "+" + last.points.toFixed(2) + " points · ×" + last.value : "Match the letter at the line"} <strong>{me?.combo ?? 0} COMBO</strong></span></> : <><b>One letter at a time</b><span>Press J, K or L when it reaches the line</span></>}</div>
+    <div className="rhythm-track" ref={board} role="group" aria-label="Single rhythm lane">
+      <div className="rhythm-lane" aria-hidden="true"/>
+      {s.notes.map((note) => <div key={note.id} className={"rhythm-note value-" + note.value} aria-label={RHYTHM_KEYS[note.lane] + ", " + note.value + " points"} ref={(element) => { if (element) nodes.current.set(note.id, element); else nodes.current.delete(note.id); }}><b>{RHYTHM_KEYS[note.lane]}</b><small>×{note.value}</small></div>)}
+      <div className="rhythm-hit-line" aria-hidden="true"><span>HIT HERE</span></div>
+      <div className="rhythm-key-pads" role="group" aria-label="Choose the matching rhythm key">{RHYTHM_KEYS.map((key, lane) => <button key={key} ref={lane === 0 ? pad : undefined} disabled={!online || !me || now >= s.endsAt} aria-label={"Play " + key} onPointerDown={(e) => { e.preventDefault(); tap(lane); }} onClick={(e) => { if (e.detail === 0) tap(lane); }}><kbd>{key}</kbd></button>)}</div><span className="rhythm-next-key" ref={prompt}>Next beat incoming</span>
     </div>
     <div className="new-game-scores">{match.players.filter((p) => s.players[p.id]).map((p) => <div key={p.id}><i style={{ background: COLORS[p.avatarId] }}/><span>{p.name}{p.id === playerId ? " · YOU" : ""}</span><b>{s.players[p.id].score.toFixed(2)}</b></div>)}</div>
-    <p className="new-game-tip">1 point · gold 3 · rare violet 5 · hit each circle at the target · touch the matching key below</p>
+    <p className="new-game-tip">Follow the letter down one lane · press it at the line · white ×1, gold ×3, violet ×5</p>
   </div>;
 }

@@ -1,43 +1,30 @@
+import { DEFAULT_SETTINGS, advance, applyAction, startMinigame } from "./helpers/party-legacy-fixtures.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
-import {
-  DEFAULT_SETTINGS,
-  MAIN_MINIGAME_REWARDS,
-  MINIGAME_FLOW,
-} from "../src/games/party/config.ts";
+import { MAIN_MINIGAME_REWARDS,
+  MINIGAME_FLOW } from "../src/games/party/config.ts";
 import { tropical } from "../src/games/party/content/maps.ts";
-import {
-  activePlayer,
-  advance,
-  applyAction,
+import { activePlayer,
   createMatch,
   createPlayer,
-  newTurnState,
-} from "../src/games/party/engine/engine.ts";
+  newTurnState } from "../src/games/party/engine/engine.ts";
 import { botAction } from "../src/games/party/engine/bots.ts";
 import { minigameRegistry } from "../src/games/party/minigames/index.ts";
-import {
-  MinigameRegistry,
-  selectMinigame,
-} from "../src/games/party/minigames/registry.ts";
-import {
-  applyMinigameInput,
+import { MinigameRegistry,
+  selectMinigame } from "../src/games/party/minigames/registry.ts";
+import { applyMinigameInput,
   applyMinigameRewards,
   beginMinigamePhase,
   finishMinigame,
   nextRoundOrder,
   publicMinigameView,
-  startMinigame,
   stepMinigameBots,
-  toResults,
-} from "../src/games/party/minigames/flow.ts";
+  toResults } from "../src/games/party/minigames/flow.ts";
 import { TARGET_PANIC_CONFIG } from "../src/games/party/minigames/targetPanic/config.ts";
-import {
-  applyTargetHit,
+import { applyTargetHit,
   createTargetPanic,
   rankTargetPanic,
-  targetPanicView,
-} from "../src/games/party/minigames/targetPanic/logic.ts";
+  targetPanicView } from "../src/games/party/minigames/targetPanic/logic.ts";
 import { targetPanicBotInputs } from "../src/games/party/minigames/targetPanic/bot.ts";
 import { parseMessage } from "../src/games/party/network/protocol.ts";
 import { PartyRooms } from "../server/party/rooms.ts";
@@ -103,13 +90,13 @@ test("final board turn goes through the animal phase into a server-selected mini
   assert.equal(animal.minigame, null);
   const intro = advance(animal, settings, seeded(1), T0);
   assert.equal(intro.phase, "MINIGAME_INTRO");
-  assert.equal(intro.minigame.minigameId, "pickup-arena");
+  assert.ok(minigameRegistry.pool("main").some((d) => d.id === intro.minigame.minigameId));
   assert.equal(intro.minigame.status, "INTRO");
   assert.deepEqual(intro.minigame.participants, intro.order);
   assert.equal(intro.minigame.startedAt, T0 + MINIGAME_FLOW.introMs);
   assert.equal(
     intro.minigame.endsAt,
-    intro.minigame.startedAt + minigameRegistry.get("pickup-arena").durationSeconds * 1000,
+    intro.minigame.startedAt + minigameRegistry.get(intro.minigame.minigameId).durationSeconds * 1000,
   );
 });
 test("intro waits for the countdown, then the minigame starts and ends on the server clock", () => {
@@ -172,12 +159,12 @@ const stub = (id, gameType = "main") => ({
   selectable: true,
 });
 test("registered minigames are selectable, invalid ids are rejected", () => {
-  assert.deepEqual(minigameRegistry.pool("main").map((game) => game.id), ["arrow-memory", "pickup-arena", "pattern-wall", "trail-run", "rhythm-rush", "circle-shot", "lava-knockback"]);
-  assert.equal(selectMinigame(minigameRegistry.pool("main"), null, () => 0.5), "trail-run");
+  assert.deepEqual(minigameRegistry.pool("main").map((game) => game.id), ["arrow-memory", "pickup-arena", "pattern-wall", "trail-run", "rhythm-rush", "circle-shot", "lava-knockback", "tide-treasure", "comet-courier", "rope-rescue", "paddle-doubles"]);
+  assert.equal(selectMinigame(minigameRegistry.pool("main"), null, () => 0.5), "circle-shot");
   // Additional main games avoid immediate repeats; a single-game pool still allows one.
   assert.equal(
     selectMinigame(minigameRegistry.pool("main"), "target-panic", () => 0.99),
-    "lava-knockback",
+    "paddle-doubles",
   );
   assert.equal(selectMinigame([minigameRegistry.get("target-panic")], "target-panic", () => 0.99), "target-panic");
   assert.throws(() => minigameRegistry.get("not-a-game"), /Unknown content/);
@@ -275,7 +262,7 @@ test("clients can only send intent: forged scores and oversized inputs are strip
     {},
     { type: "TARGET_HIT", targetId: { nested: true } },
     { type: "TARGET_HIT", targetId: "x".repeat(41) },
-    { a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7 },
+    { a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7, h: 8, i: 9 },
   ])
     assert.throws(() =>
       parseMessage({ type: "ACTION", action: { type: "MINIGAME_INPUT", input } }),
@@ -545,7 +532,7 @@ test("server accepts simultaneous minigame input, broadcasts a trimmed view, kee
 
   // After the disconnect grace period a bot continues from the current score.
   rooms.disconnect(host);
-  const t0 = now + 61_000;
+  const t0 = host.disconnectedAt + 61_000;
   rooms.tick(t0);
   assert.equal(room.players.find((p) => p.id === host.id).isBot, true);
 });

@@ -1,15 +1,17 @@
+import { routePreview } from "../../../games/party/engine/routePreview.ts";
 import { memo, useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Html, Line, OrbitControls, OrthographicCamera } from "@react-three/drei";
-import { CanvasTexture, Group, OrthographicCamera as Camera, SRGBColorSpace, Vector3 } from "three";
-import type { BoardMap, BoardNode, Match } from "../../../games/party/types.ts";
+import { Group, Mesh, OrthographicCamera as Camera, Vector3 } from "three";
+import type { BoardMap, Match } from "../../../games/party/types.ts";
 import type { BoardOverlay } from "../../../games/party/board/renderer.ts";
-import { tilePresentationFor } from "../../../games/party/content/maps.ts";
 import { activePlayer, legalPaths } from "../../../games/party/engine/engine.ts";
 import { COLORS } from "../../../games/party/config.ts";
 import { PartyCharacter } from "./minigames/PartyCharacter.tsx";
 import { LivingSurface, AtmosphereParticles, Flame } from "./minigames/WorldEffects.tsx";
 import { useSceneMotion } from "./minigames/useSceneMotion.ts";
+import { BoardField, BoardFieldResources, LandingEffects } from "./BoardFields.tsx";
+import type { BoardLanding } from "../../../games/party/board/fieldDesign.ts";
 
 function height(map: BoardMap, region: number) { return map.theme === "mountain" ? [0, .8, .8, 1.6, 2.1, 3, 3, 4][region] : .35; }
 function point(map: BoardMap, n: { x: number; y: number; region: number }): [number, number, number] {
@@ -84,7 +86,7 @@ const Scenery = memo(function Scenery({ map, preview }: { map: BoardMap; preview
   return <>
     <color attach="background" args={[mountain ? "#c4e0ec" : "#9cdad9"]}/>
     <hemisphereLight args={["#fff6df", mountain ? "#6e9dba" : "#4d9c9a", 2.1]}/><directionalLight position={[-12, 22, 9]} intensity={2.8} color="#fff2d6"/>
-    <group position={[0, mountain ? -1.4 : -.55, 0]} scale={[3.6, 1, 3.6]}><LivingSurface lava={false} motion={motion && !preview}/></group>
+    <group position={[0, mountain ? -1.4 : -.55, 0]} scale={[8, 1, 8]}><LivingSurface lava={false} motion={motion && !preview}/></group>
     {map.regions.map((r, i) => {
       const x = (r.x - map.size.width / 2) / 40, z = (r.y - map.size.height / 2) / 40, y = height(map, i);
       const nodes = map.nodes.filter((n) => n.region === i);
@@ -102,48 +104,48 @@ const Scenery = memo(function Scenery({ map, preview }: { map: BoardMap; preview
     {!preview && <AtmosphereParticles kind={mountain ? "snow" : "dust"} motion={motion} area={32}/>}
   </>;
 });
-function Tile({ node, map, selected, reachable, hot, amount, onSelect }: { node: BoardNode; map: BoardMap; selected: boolean; reachable: boolean; hot: boolean; amount: number; onSelect: (id: string) => void }) {
-  const p = tilePresentationFor(map)[node.type];
-  const texture = useMemo(() => {
-    const canvas = document.createElement("canvas"); canvas.width = 128; canvas.height = 128;
-    const ctx = canvas.getContext("2d")!; ctx.fillStyle = "#31565d"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.font = "bold 67px sans-serif"; ctx.fillText(p.icon, 64, 66);
-    const t = new CanvasTexture(canvas); t.colorSpace = SRGBColorSpace; return t;
-  }, [p.icon]);
-  useEffect(() => () => texture.dispose(), [texture]);
-  return <group position={point(map, node)} onClick={(e) => { e.stopPropagation(); onSelect(node.id); }}>
-    <mesh><cylinderGeometry args={[.39, .42, .18, 16]}/><meshStandardMaterial color={selected ? "#fff3ad" : hot ? "#8cd947" : p.color} emissive={reachable ? "#c4ffd5" : selected ? "#ffad51" : "#000"} emissiveIntensity={.6} roughness={.6}/></mesh>
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, .097, 0]}><planeGeometry args={[.53, .53]}/><meshBasicMaterial map={texture} transparent depthWrite={false}/></mesh>
-    {(reachable || selected || amount > 0) && <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, .102, 0]}><ringGeometry args={[.44, .51, 24]}/><meshBasicMaterial color={amount > 0 ? "#ff9273" : "#fff4a7"}/></mesh>}
-    {amount > 0 && <Html position={[0, .6, 0]} center style={{ pointerEvents: "none" }}><span className="pp-world-damage">−{amount}</span></Html>}
-  </group>;
-}
 function Pluto({ position, animate }: { position: [number, number, number]; animate: boolean }) {
   const root = useRef<Group>(null);
   useFrame(({ clock }) => { if (root.current && animate) { root.current.rotation.y = clock.elapsedTime; root.current.position.y = position[1] + .7 + Math.sin(clock.elapsedTime * 2) * .09; } });
   return <group ref={root} position={[position[0], position[1] + .7, position[2]]}>
-    <mesh rotation={[0, 0, Math.PI / 4]}><octahedronGeometry args={[.35, 0]}/><meshStandardMaterial color="#ffe08d" emissive="#eca947" emissiveIntensity={.55} metalness={.6} roughness={.2}/></mesh>
-    <mesh rotation={[Math.PI / 2.7, 0, .2]}><torusGeometry args={[.47, .035, 6, 24]}/><meshStandardMaterial color="#ffecad" emissive="#eab765" emissiveIntensity={.8}/></mesh>
+    <mesh rotation={[0, 0, Math.PI / 4]}><sphereGeometry args={[.32, 16, 12]}/><meshStandardMaterial color="#ffe08d" emissive="#eca947" emissiveIntensity={.55} metalness={.6} roughness={.2}/></mesh>
+    <mesh rotation={[Math.PI / 2.7, 0, .2]}><torusGeometry args={[.54, .035, 6, 32]}/><meshStandardMaterial color="#ffecad" emissive="#eab765" emissiveIntensity={.8}/></mesh>
+    <mesh position={[.53, .1, .08]}><sphereGeometry args={[.07, 8, 6]}/><meshStandardMaterial color="#fff5cd"/></mesh>
+    <mesh position={[.12, .1, .285]} scale={[1, .7, .25]}><sphereGeometry args={[.09, 8, 6]}/><meshStandardMaterial color="#edb94f"/></mesh>
   </group>;
 }
-function Pawn({ target, avatarId, color, active }: { target: [number, number, number]; avatarId: number; color: string; active: boolean }) {
-  const root = useRef<Group>(null), motion = useRef(0);
+function Pawn({ target, avatarId, color, active, landing, animate }: { target: [number, number, number]; avatarId: number; color: string; active: boolean; landing: BoardLanding | null; animate: boolean }) {
+  const root = useRef<Group>(null), pose = useRef<Group>(null), motion = useRef(0);
+  const materials = useRef<{ material: import("three").Material; opacity: number; transparent: boolean }[]>([]);
   const [initial] = useState(() => target);
   useFrame((_, dt) => {
     const g = root.current; if (!g) return; const dx = target[0] - g.position.x, dz = target[2] - g.position.z;
+    if (!materials.current.length) g.traverse((object) => { if (object instanceof Mesh) for (const material of Array.isArray(object.material) ? object.material : [object.material]) materials.current.push({ material, opacity: material.opacity, transparent: material.transparent }); });
     motion.current = Math.min(1, Math.hypot(dx, dz) * 2);
     if (motion.current > .05) g.rotation.y = Math.atan2(-dx, -dz);
-    g.position.lerp(new Vector3(...target), 1 - Math.exp(-9 * dt));
+    const age = landing ? (performance.now() - landing.startedAt) / 1000 : 9;
+    const warp = landing?.kind === "warp" && landing.targetNodeId;
+    const fading = warp && animate && age < 1;
+    if (warp) { if (!fading || age >= .45) g.position.set(...target); }
+    else g.position.lerp(new Vector3(...target), 1 - Math.exp(-9 * dt));
+    const opacity = fading ? age < .45 ? Math.max(0, 1 - age / .45) : Math.min(1, (age - .45) / .55) : 1;
+    for (const entry of materials.current) { entry.material.opacity = entry.opacity * opacity; entry.material.transparent = opacity < 1 || entry.transparent; }
+    if (pose.current) pose.current.rotation.z = animate && landing?.kind === "hazard" && age < .5 ? Math.sin(age * 30) * .18 * (1 - age / .5) : 0;
   });
   return <group ref={root} position={initial}>
-    <group scale={.49}><PartyCharacter avatarId={avatarId} color={color} motion={motion}/></group>
+    <group ref={pose} scale={.49}><PartyCharacter avatarId={avatarId} color={color} motion={motion}/></group>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, .025, 0]}><ringGeometry args={[.22, active ? .36 : .29, 20]}/><meshBasicMaterial color={active ? "#fff2a8" : color}/></mesh>
   </group>;
 }
-function BoardCamera({ map, focus, zoom }: { map: BoardMap; focus: string | null; zoom: number }) {
+function BoardCamera({ map, focus, zoom, cameraReset, overview }: { map: BoardMap; focus: string | null; zoom: number; cameraReset: string; overview: boolean }) {
   const camera = useRef<Camera>(null), controls = useRef<ComponentRef<typeof OrbitControls>>(null), size = useThree((s) => s.size);
   const goal = useRef<Vector3 | null>(null);
-  useEffect(() => { const n = map.nodes.find((n) => n.id === focus); goal.current = n ? new Vector3(...point(map, n)) : new Vector3(0, 1, 0); }, [focus, map]);
-  useEffect(() => { if (camera.current) { camera.current.zoom = Math.min(size.width / 35, size.height / (map.theme === "mountain" ? 33 : 27)) * zoom; camera.current.updateProjectionMatrix(); } }, [size, zoom, map.theme]);
+  const cameraZoom = Math.min(size.width / 35, size.height / (map.theme === "mountain" ? 33 : 27)) * zoom * (overview && size.height <= 600 ? .65 : 1);
+  // The overview sits below the board controls so even the mountain summit remains visible.
+  const overviewLift = overview && cameraZoom > 0 ? Math.min(70, size.height * .15) / (cameraZoom * Math.SQRT1_2) : 0;
+  useEffect(() => { const n = map.nodes.find((n) => n.id === focus); goal.current = n ? new Vector3(...point(map, n)) : new Vector3(0, 1 + overviewLift, 0); }, [focus, map, cameraReset, overviewLift]);
+  useEffect(() => { if (camera.current && controls.current) { camera.current.position.copy(controls.current.target).add(new Vector3(0, 23, 23)); controls.current.update(); } }, [cameraReset]);
+  useEffect(() => { if (camera.current) { camera.current.zoom = cameraZoom; camera.current.updateProjectionMatrix(); } }, [cameraZoom]);
   useFrame((_, dt) => {
     if (!goal.current || !controls.current || !camera.current) return;
     const delta = goal.current.clone().sub(controls.current.target).multiplyScalar(1 - Math.exp(-5 * dt));
@@ -152,24 +154,55 @@ function BoardCamera({ map, focus, zoom }: { map: BoardMap; focus: string | null
   });
   return <><OrthographicCamera ref={camera} makeDefault position={[0, 23, 23]} near={.1} far={150}/><OrbitControls ref={controls} makeDefault minPolarAngle={.2} maxPolarAngle={Math.PI / 2.2} enableDamping onStart={() => { goal.current = null; }} minZoom={6} maxZoom={95}/></>;
 }
-export function BoardWorld({ map, match, overlay, preview, onSelect, focus, zoom, explosion }: { map: BoardMap; match: Match | null; overlay: BoardOverlay | null; preview: boolean; onSelect: (id: string) => void; focus: string | null; zoom: number; explosion: { id: number; nodeId: string; kind: "melon" | "fallout" } | null }) {
+function PathArrow({ from, to, label, onSelect, onHover }: { from: [number, number, number]; to: [number, number, number]; label: string; onSelect: () => void; onHover: (hover: boolean) => void }) {
+  const button = useRef<HTMLButtonElement>(null), camera = useThree((s) => s.camera);
+  useFrame(() => { if (!button.current) return; const a = new Vector3(...from).project(camera), b = new Vector3(...to).project(camera); button.current.style.setProperty("--arrow-angle", `${Math.atan2(-(b.y - a.y), b.x - a.x) * 180 / Math.PI}deg`); });
+  return <Html position={[from[0] + (to[0] - from[0]) * .8, Math.max(from[1], to[1]) + .6, from[2] + (to[2] - from[2]) * .8]} center zIndexRange={[15, 13]}><button ref={button} className="pp-map-path-arrow" aria-label={label} title={label} onPointerEnter={() => onHover(true)} onPointerLeave={() => onHover(false)} onFocus={() => onHover(true)} onBlur={() => onHover(false)} onClick={(e) => { e.stopPropagation(); onSelect(); }}><span>➜</span><small>{label.split(";")[0].replace(/^Space \d+: /, "")}{label.includes(";") ? " · more landings" : ""}</small></button></Html>;
+}
+function MapEventMarker({ position, text, showLabel = true, labelOnly = false, color }: { position: [number, number, number]; text: string; showLabel?: boolean; labelOnly?: boolean; color?: string }) {
+  const root = useRef<Group>(null), motion = useSceneMotion();
+  useFrame(({ clock }) => { if (root.current && motion) root.current.position.y = position[1] + .3 + Math.sin(clock.elapsedTime * 3) * .12; });
+  return <group ref={root} position={position}>{!labelOnly && <mesh rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[.5, .7, 32]}/><meshBasicMaterial color={color ?? (text.includes("⚠") ? "#ff866d" : "#ffe191")} transparent opacity={.7}/></mesh>}{showLabel && <Html position={[0, labelOnly ? 2.2 : 1.05, 0]} center style={{ pointerEvents: "none" }}><span className="pp-map-event-marker">{text}</span></Html>}</group>;
+}
+export function BoardWorld({ map, match, overlay, preview, onSelect, focus, zoom, cameraReset, overview, landing, onProjectReward, explosion }: { map: BoardMap; match: Match | null; overlay: BoardOverlay | null; preview: boolean; onSelect: (id: string) => void; focus: string | null; zoom: number; cameraReset: string; overview: boolean; landing: BoardLanding | null; onProjectReward: (x: number, y: number) => void; explosion: { id: number; nodeId: string; kind: "melon" | "fallout" } | null }) {
   const paths = new Set(match?.phase === "PATH_SELECTION" ? legalPaths(match, map) : []), motion = useSceneMotion();
   const byId = useMemo(() => new Map(map.nodes.map((n) => [n.id, n])), [map]);
   const activeId = match ? activePlayer(match).id : null;
+  const [hoveredPath, setHoveredPath] = useState<string | null>(null);
+  const route = match?.phase === "PATH_SELECTION" && hoveredPath && paths.has(hoveredPath) ? routePreview(match, map, hoveredPath) : null;
+  const activeNode = match && byId.get(activePlayer(match).currentNodeId);
   return <>
-    <BoardCamera map={map} focus={focus} zoom={zoom}/><Scenery map={map} preview={preview}/>
+    <BoardCamera map={map} focus={focus} zoom={zoom} cameraReset={cameraReset} overview={overview}/><Scenery map={map} preview={preview}/>
     {map.nodes.flatMap((a) => a.connections.filter((id) => id > a.id).map((id) => {
       const b = byId.get(id)!;
       const blocked = match?.blockedConnections.some((c) => (c.fromNodeId === a.id && c.toNodeId === id) || (c.fromNodeId === id && c.toNodeId === a.id));
       return <Line key={a.id + ":" + id} points={[point(map, a), point(map, b)]} color={blocked ? "#ec6d72" : a.region === b.region ? "#f9e6bc" : "#d1b68b"} lineWidth={a.region === b.region ? 5 : 8} dashed={!!blocked} dashSize={.15} gapSize={.13}/>;
     }))}
-    {map.nodes.map((n) => <Tile key={n.id} node={n} map={map} selected={overlay?.selected === n.id} reachable={paths.has(n.id)} hot={!!match?.radiationZones.some((z) => z.nodeIds.includes(n.id))} amount={overlay?.damage.get(n.id) ?? 0} onSelect={onSelect}/>)}
+    <BoardFieldResources>{map.nodes.map((n) => <BoardField key={n.id} node={n} map={map} position={point(map, n)} selected={overlay?.selected === n.id} reachable={paths.has(n.id) || !!route?.landings.includes(n.id)} hot={!!match?.radiationZones.some((z) => z.nodeIds.includes(n.id))} amount={overlay?.damage.get(n.id) ?? 0} onSelect={onSelect} landing={landing?.nodeId === n.id ? landing : null} motion={motion && !preview} eventActive={!!match?.boardEffects?.some((e) => e.nodeIds.includes(n.id))}/>)}</BoardFieldResources>
+    {landing && byId.has(landing.nodeId) && <LandingEffects key={landing.id} landing={landing} position={point(map, byId.get(landing.nodeId)!)} motion={motion} onProject={onProjectReward}/>}
+    {landing?.targetNodeId && byId.has(landing.targetNodeId) && <LandingEffects key={landing.id + "arrival"} landing={{ ...landing, label: "Arrived!" }} position={point(map, byId.get(landing.targetNodeId)!)} motion={motion} onProject={() => {}}/>}
+    {match?.phase === "PATH_SELECTION" && activeNode && [...paths].map((id) => { const preview = routePreview(match, map, id); return <PathArrow key={id} from={point(map, activeNode)} to={point(map, byId.get(id)!)} label={preview.summaries.join("; ")} onSelect={() => onSelect(id)} onHover={(hover) => setHoveredPath(hover ? id : null)}/>; })}
+    {match?.boardEffects?.flatMap((effect) => {
+      const label = ({ treasure: "💎 +5", eruption: "⚠ −10 HP", breeze: "🍃 +2", sanctuary: "💚 +5 HP", sale: "🛍 −2 coins", relic: "◆ ITEM" })[effect.kind];
+      const color = ({ treasure: "#ffe191", eruption: "#ff866d", breeze: "#b7f38c", sanctuary: "#80f3db", sale: "#d9a6ff", relic: "#99caff" })[effect.kind];
+      const nodes = effect.nodeIds.filter((id) => byId.has(id));
+      const region = nodes.length ? byId.get(nodes[0])!.region : null;
+      return [
+        ...nodes.map((id) => <MapEventMarker key={effect.id + id} position={point(map, byId.get(id)!)} text={label} showLabel={false} color={color}/>),
+        ...(region === null ? [] : [<MapEventMarker key={effect.id + "label"} position={point(map, { ...map.regions[region], region })} text={label + (effect.kind === "eruption" ? ` · END R${effect.expiresAfterRound}` : ` · THROUGH R${effect.expiresAfterRound}`)} labelOnly/>]),
+      ];
+    })}
+    {match?.blockedConnections.map((closure) => byId.has(closure.fromNodeId) && <MapEventMarker key={closure.id} position={point(map, byId.get(closure.fromNodeId)!)} text={`⚠ PATH CLOSED · THROUGH R${closure.expiresAfterRound}`}/>)}
+    {match?.transportOutages.flatMap((outage) => {
+      const transport = map.transports?.find((t) => t.id === outage.transportId);
+      return transport?.endpoints.map((id) => <MapEventMarker key={outage.transportId + id} position={point(map, byId.get(id)!)} text={`⚠ ${transport.name} CLOSED · THROUGH R${outage.expiresAfterRound}`}/>) ?? [];
+    })}
     {(match?.plutoNodeIds ?? []).map((id) => <Pluto key={id} position={point(map, byId.get(id)!)} animate={motion && !preview}/>)}
     {match?.properties.map((property) => { const n = byId.get(property.nodeId); if (!n) return null; const p = point(map, n); const owner = match.players.find((p) => p.id === property.ownerPlayerId);
       return <group key={property.nodeId} position={[p[0] + .42, p[1], p[2] + .25]} scale={.35 + property.level * .025}><Hut color={COLORS[owner?.avatarId ?? 0]} tent={map.theme === "mountain"}/></group>; })}
     {match?.players.map((p, i) => { const node = byId.get(p.currentNodeId); if (!node) return null; const position = point(map, node); const crowd = match.players.filter((o) => o.currentNodeId === p.currentNodeId).length > 1;
       position[0] += crowd ? Math.cos(i * Math.PI / 2) * .28 : 0; position[2] += crowd ? Math.sin(i * Math.PI / 2) * .28 : 0; position[1] += .1;
-      return <Pawn key={p.id} target={position} avatarId={p.avatarId} color={COLORS[p.avatarId]} active={p.id === activeId}/>; })}
+      return <Pawn key={p.id} target={position} avatarId={p.avatarId} color={COLORS[p.avatarId]} active={p.id === activeId} landing={landing?.playerId === p.id ? landing : null} animate={motion}/>; })}
     {match?.animals.map((a) => { const n = byId.get(a.currentNodeId); if (!n) return null; const p = point(map, n); return <group key={a.id} position={[p[0] - .3, p[1], p[2] - .35]} scale={.27}><PartyCharacter avatarId={0} color="#ede7bd"/></group>; })}
     {explosion && byId.has(explosion.nodeId) && <Html key={explosion.id} position={point(map, byId.get(explosion.nodeId)!)} center style={{ pointerEvents: "none" }}><span className="pp-world-explosion">{explosion.kind === "fallout" ? "☢" : "✹"}</span></Html>}
   </>;

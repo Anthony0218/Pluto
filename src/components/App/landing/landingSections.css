@@ -234,16 +234,9 @@
 
 /* ── Closing call to action ── */
 .closing-cta { position: relative; padding: 140px 20px 160px; text-align: center; }
-.closing-cta h2 { color: #fff; font-size: clamp(2.8rem, 8vw, 6rem); font-weight: 900; letter-spacing: -.06em; line-height: .95; text-shadow: 0 6px 40px #0009; }
+.closing-cta h2 { color: #fff; font-size: clamp(2.8rem, 8vw, 6rem); font-weight: 900; letter-spacing: -.045em; line-height: .95; text-shadow: 0 6px 40px #0009; }
 .closing-cta p { max-width: 34rem; margin: 22px auto 0; color: #d5dcf5; font-size: 18px; line-height: 1.6; text-shadow: 0 2px 16px #000a; }
 .closing-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 34px; }
-.closing-primary, .closing-secondary { display: inline-flex; align-items: center; gap: 12px; min-height: 52px; padding: 14px 28px; border-radius: 14px; font-weight: 700; transition: background-color .15s, transform .12s, border-color .15s; }
-.closing-primary { background: #6366f1; color: #fff; box-shadow: 0 10px 40px #6366f166; }
-.closing-primary:hover { background: #818cf8; }
-.closing-secondary { border: 1px solid #c7d2fe55; background: #0b1030aa; color: #e0e7ff; backdrop-filter: blur(8px); }
-.closing-secondary:hover { border-color: #c7d2fe; }
-.closing-cta :is(a):active { transform: scale(.98); }
-.closing-cta a:focus-visible { outline: 2px solid #c7d2fe; outline-offset: 4px; }
 
 @media (max-width: 720px) {
   .chess-demo, .go-demo { grid-template-columns: minmax(0, 1fr); }
@@ -283,10 +276,6 @@
 /* ── Tool and book sections ── */
 .book-contents { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
 .book-contents li { padding: 9px 12px; border: 1px solid #ffffff14; border-radius: 10px; background: #ffffff08; color: #cfd8f5; font-size: 13px; }
-.item-open { display: inline-flex; align-items: center; gap: 8px; margin-top: 32px; padding: 12px 22px; border-radius: 12px; background: var(--item-bg); color: var(--item-fg); font-size: 14px; font-weight: 700; box-shadow: 0 8px 28px -10px var(--item-bg); transition: filter .15s, transform .12s; }
-.item-open:hover { filter: brightness(1.12); }
-.item-open:active { transform: scale(.98); }
-.item-open:focus-visible { outline: 2px solid #c7d2fe; outline-offset: 4px; }
 
 /* ── Arrivals: the item's planet, tile or book in the middle of the screen before its section ── */
 .arrival { position: relative; display: grid; align-content: end; justify-items: center; min-height: var(--app-height); padding: 0 20px 6vh; border-bottom: 1px solid #ffffff14; text-align: center; }
@@ -296,11 +285,10 @@
 .caption-traveller { position: absolute; top: 0; left: 0; pointer-events: none; }
 .landing-stage[data-caption-motion] .caption-placeholder { visibility: hidden; }
 .caption-origin p, .caption-section-line { margin: 10px 0 18px; max-width: 420px; color: #c9cfe8; font-size: 15px; line-height: 1.55; }
-.caption-origin h3 { line-height: 1; }
+/* A unit's name reads the same everywhere: the small tracked capitals that head its section ("01 —— CHESS"). */
+.caption-origin h3 { margin: 0; color: var(--section-accent, #d9d1ff); font-size: 12px; font-weight: 700; letter-spacing: .3em; line-height: 1; text-transform: uppercase; text-shadow: 0 2px 14px #000a; }
 .arrival-caption .caption-origin p, .flyby-chess .caption-origin p { margin-inline: 0; }
-.arrival-caption h3 { margin: 0; font-size: clamp(2rem, 3.4vw, 3rem); font-weight: 900; letter-spacing: -.04em; line-height: 1; color: #fff; text-shadow: 0 4px 24px #000a; }
 .arrival-caption p { margin: 10px auto 18px; max-width: 420px; color: #c9cfe8; font-size: 15px; line-height: 1.55; text-shadow: 0 2px 12px #000a; }
-.arrival-open { margin-top: 0; }
 /* Where nothing travels behind the stop, it is a compact block with its own artwork above the text. */
 .arrival[data-flat] { min-height: 0; align-content: start; padding: 64px 20px 8px; border-bottom: 0; }
 .arrival-art { display: grid; place-items: center; margin-bottom: 26px; --planet-size: 120px; }
@@ -313,3 +301,14 @@
 .book-shelf a:hover { border-color: #ffffff1f; background: #ffffff0a; }
 .book-shelf-art { display: grid; place-items: center; height: 118px; }
 .book-shelf-art .universe-book { zoom: .78; }
+
+/* A frosted panel behind an arrival's name and line: they stay readable over the bright planet, and the panel lets go as the words fly to their section. */
+.arrival-caption, .flyby-chess { position: relative; isolation: isolate; }
+.flyby-chess { position: absolute; }
+.caption-scrim {
+  position: absolute; inset: -20px -28px; z-index: -1; pointer-events: none; border-radius: 22px;
+  border: 1px solid color-mix(in srgb, var(--section-accent, #c7d2fe) 38%, transparent);
+  background: linear-gradient(160deg, #0a1026d9, #060a1ca8);
+  box-shadow: 0 18px 50px #02061899, inset 0 1px #ffffff14;
+  -webkit-backdrop-filter: blur(14px) saturate(1.2); backdrop-filter: blur(14px) saturate(1.2);
+}

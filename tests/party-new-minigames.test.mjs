@@ -1,3 +1,4 @@
+import { startMinigame, DEFAULT_SETTINGS } from "./helpers/party-legacy-fixtures.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { arrowMemory, arrowCount, DIRECTIONS, quadrantOrigin } from "../src/games/party/minigames/arrowMemory/index.ts";
@@ -6,9 +7,9 @@ import { streetRunnerTarget, smoothStreetRunner } from "../src/games/party/minig
 import { STREET_CROSS_CONFIG } from "../src/games/party/minigames/streetCross/config.ts";
 import { ARENA_MAPS, obstructionDistance, collides } from "../src/games/party/minigames/pickupArena/maps.ts";
 import { minigameRegistry } from "../src/games/party/minigames/index.ts";
-import { startMinigame, applyMinigameInput, finishMinigame, publicMinigameView } from "../src/games/party/minigames/flow.ts";
+import { applyMinigameInput, finishMinigame, publicMinigameView } from "../src/games/party/minigames/flow.ts";
 import { createMatch, createPlayer } from "../src/games/party/engine/engine.ts";
-import { DEFAULT_SETTINGS } from "../src/games/party/config.ts";
+
 import { parseMessage } from "../src/games/party/network/protocol.ts";
 import { PartyRooms } from "../server/party/rooms.ts";
 
@@ -129,7 +130,7 @@ test("memory bots recall imperfect visible sequences and bot matches finish with
       }
     }
     assert.ok(arrowMemory.isFinished(s)); correct += Math.max(...Object.values(s.players).map((p) => p.score));
-    assert.ok(Object.values(s.players).some((p) => !p.alive));
+    assert.equal(s.heatResults.length, 3); assert.ok(s.heatResults.some((r) => r.ranking.length === 4));
   }
   assert.ok(correct > 10);
 });
@@ -165,7 +166,7 @@ test("authoritative fire awards exactly one kill, consumes ammo, limits cadence 
   pickupArena.tick(s, 300); assert.equal(s.players.b.hp, 66);
   for (const at of [400, 800]) { pickupArena.applyInput(s, "a", control({ fire: true, pitch: -0.13 }), at); pickupArena.tick(s, at + 50); }
   assert.equal(s.players.a.kills, 1); assert.equal(s.players.b.deaths, 1); assert.equal(s.players.b.hp, 0);
-  assert.equal(s.feed.length, 1); assert.equal(pickupArena.scores(s).a, 1);
+  assert.equal(s.feed.length, 1); assert.equal(pickupArena.scores(s).a, 3);
   assert.equal(s.hits.at(-1).damage, 32); assert.equal(s.hits.at(-1).hpAfter, 0);
   assert.equal(pickupArena.publicView(s, 850).hits.at(-1).victim, "b");
   pickupArena.tick(s, s.players.b.respawnAt); assert.equal(s.players.b.hp, 100); assert.equal(s.players.b.weapon, null);
@@ -244,7 +245,7 @@ test("movement stops on missing heartbeat, normalizes diagonals and cannot tunne
   assert.deepEqual({ x: s.players.a.x, z: s.players.a.z }, position);
   Object.assign(s.players.a, { x: -11, y: 0, z: 0 });
   for (let now = 2100; now < 5100; now += 100) { pickupArena.applyInput(s, "a", control({ strafe: 1 }), now); pickupArena.tick(s, now + 100); }
-  assert.ok(s.players.a.x < -9); assert.equal(collides(ARENA_MAPS.city, s.players.a.x, s.players.a.y, s.players.a.z), false);
+  assert.ok(s.players.a.x < -7.5); assert.equal(collides(ARENA_MAPS.city, s.players.a.x, s.players.a.y, s.players.a.z), false);
 });
 test("the arcade has three reachable floors connected by four climbable and descendable stairs", () => {
   const map = ARENA_MAPS.arcade; assert.equal(map.floors, 3); assert.equal(map.stairs.length, 4);

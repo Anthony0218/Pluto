@@ -1,33 +1,26 @@
+import { DEFAULT_SETTINGS, advance, applyAction } from "./helpers/party-legacy-fixtures.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
-import { DEFAULT_SETTINGS, FIELD_DISTRIBUTION, PROPERTY_CONFIG, RULES } from "../src/games/party/config.ts";
+import { FIELD_DISTRIBUTION, PROPERTY_CONFIG, RULES } from "../src/games/party/config.ts";
 import { mapRegistry, mountain, tropical, tilePresentationFor } from "../src/games/party/content/maps.ts";
 import { validateMap } from "../src/games/party/content/validate.ts";
-import {
-  activePlayer,
-  advance,
-  applyAction,
+import { activePlayer,
   createMatch,
   createPlayer,
   legalPaths,
   mapOf,
-  resolveTile,
-} from "../src/games/party/engine/engine.ts";
+  resolveTile } from "../src/games/party/engine/engine.ts";
 import { botAction, transportDecision } from "../src/games/party/engine/bots.ts";
 import { eligiblePlutoNodes, spawnPlutos, distanceToPluto } from "../src/games/party/engine/economy.ts";
-import {
-  edgeKey,
+import { edgeKey,
   findShortestPath,
   graphDistances,
-  isMapConnected,
-} from "../src/games/party/engine/graph.ts";
-import {
-  activeRestrictions,
+  isMapConnected } from "../src/games/party/engine/graph.ts";
+import { activeRestrictions,
   blockConnection,
   blockedRoundsLeft,
   expireBlockedConnections,
-  safeBlockableEdges,
-} from "../src/games/party/engine/routes.ts";
+  safeBlockableEdges } from "../src/games/party/engine/routes.ts";
 import { availableTransport, disableTransport, slideDestination } from "../src/games/party/engine/transport.ts";
 import { eligibleEvents, eventRegistry, runRandomEvent } from "../src/games/party/events/registry.ts";
 import { createItemInstance } from "../src/games/party/items/inventory.ts";
@@ -300,7 +293,7 @@ test("event eligibility follows allowedMaps: Avalanche is Mountain-only, generic
   const names = (map) => eligibleEvents(s, map).map((e) => e.id);
   assert.ok(names(mountain).includes("avalanche"));
   assert.ok(!names(tropical).includes("avalanche"));
-  assert.deepEqual(names(tropical), ["island-breeze"]);
+  assert.deepEqual(names(tropical), ["island-breeze", "pirate-treasure", "eruption-forecast", "jungle-bounty", "calm-waters", "coconut-market", "ruins-relics"]);
   assert.ok(names(mountain).includes("windfall"));
   assert.ok(!names(mountain).includes("island-breeze"), "Tropical-only event excluded from Mountain");
   // Even if a pool lists a foreign event, allowedMaps still excludes it.
@@ -310,15 +303,13 @@ test("event eligibility follows allowedMaps: Avalanche is Mountain-only, generic
   assert.deepEqual(eventRegistry.get("avalanche").allowedMaps, ["mountain"]);
 });
 
-test("Tropical Random Event behaviour is unchanged: +2 coins for everyone and no random number drawn", () => {
+test("Tropical breeze remains a possible outcome and pays +2 coins for everyone", () => {
   const s = started(tropicalSettings);
   const before = s.players.map((p) => p.coins);
   const node = tropical.nodes.find((n) => n.type === "event").id;
   s.players[0].currentNodeId = node;
   s.phase = "RESOLVE_TILE";
-  const after = advance(s, tropicalSettings, () => {
-    throw new Error("no random draw expected");
-  });
+  const after = advance(s, tropicalSettings, () => 0);
   assert.deepEqual(after.players.map((p) => p.coins), before.map((c) => c + 2));
   assert.equal(after.blockedConnections.length, 0);
 });
@@ -1000,6 +991,7 @@ test("a Mountain room with bots plays through the server tick into round 2 and i
         room.players = room.match.players;
       }
     }
+    if (room.match.minigame?.awaitingReady) rooms.handle(host, { type: "ACTION", action: { type: "MINIGAME_READY" } });
     rooms.tick(now);
     rooms.fastTick(now);
     seen.add(room.match.phase);

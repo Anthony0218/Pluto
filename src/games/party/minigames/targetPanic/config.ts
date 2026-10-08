@@ -34,9 +34,11 @@ export const TARGET_PANIC_CONFIG = {
   // Minimum time between two taps of the same bot.
   botTapGapMs: 140,
   bots: {
-    easy: { reactionMs: [650, 1000], accuracy: 0.6, mistakeChance: 0.25 },
-    medium: { reactionMs: [350, 700], accuracy: 0.8, mistakeChance: 0.1 },
-    hard: { reactionMs: [180, 450], accuracy: 0.92, mistakeChance: 0.04 },
+    beginner: { reactionMs: [950, 1400], accuracy: .4, mistakeChance: .4 },
+    easy: { reactionMs: [650, 1000], accuracy: .6, mistakeChance: .25 },
+    medium: { reactionMs: [500, 850], accuracy: .7, mistakeChance: .175 },
+    hard: { reactionMs: [350, 700], accuracy: .8, mistakeChance: .1 },
+    extreme: { reactionMs: [60, 120], accuracy: .999, mistakeChance: .001 },
   } satisfies Record<Difficulty, TargetPanicBotProfile>,
 } as const;
 

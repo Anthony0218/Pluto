@@ -13,6 +13,7 @@ import ItemSection from "./ItemSection";
 import { bookDescription, bookTopics } from "./flybyCatalog";
 import { useLanding } from "./landingContext";
 import { useCopy, type CopyKey } from "./copy";
+import { useLandingReducedMotion } from "./motionPreference";
 import type { ToneName } from "./tones";
 import "./landingSections.css";
 
@@ -51,6 +52,8 @@ const bookButton: Record<BookDesign, { background: string; color: string }> = {
   rhythm: { background: "#be185d", color: "#fce7f3" },
   rules: { background: "#15803d", color: "#dcfce7" },
   tactics: { background: "#334155", color: "#e2e8f0" },
+  football: { background: "#15803d", color: "#f0fdf4" },
+  signal: { background: "#0e7490", color: "#cffafe" },
 };
 
 /** What each game's arrival says: the planet's route, its colour, the short line under its name and the play button. */
@@ -76,13 +79,14 @@ export default function LandingSections() {
   const { language } = useUiLanguage();
   const text = useCopy();
   const { category } = useLanding();
-  const explore = (name: string) => text("exploreGame").replace("{name}", ui(name));
+  // Without animation there is no journey to announce each item, so only the sections (text and illustration) are shown.
+  const plain = useLandingReducedMotion();
   const tabsLabel = text("demoTabsLabel");
 
   const sections: Record<string, (index: string) => ReactNode> = {
     "chess": index => (
       <FeatureSection id="chess" index={index} tone="chess" eyebrow={ui("Chess").toUpperCase()} lines={[{ text: text("chessL1") }, { text: text("chessL2"), accent: true }]}
-        description={text("chessDesc")} href="/games/chess" action={explore("Chess")}>
+        description={text("chessDesc")} href="/games/chess" action={text("playChess")} secondary={{ href: "/games/chess/variants", label: ui("All variants") }}>
         <DemoTabs tone="chess" label={tabsLabel} tabs={[
           { id: "chess", label: ui("Chess"), content: slot(<ChessPlayDemo />, 440) },
           { id: "variants", label: ui("Chess Variants"), content: slot(<ChessVariantsDemo />, 360) },
@@ -93,7 +97,7 @@ export default function LandingSections() {
     ),
     "go": index => (
       <FeatureSection id="go" index={index} tone="go" eyebrow="GO" lines={[{ text: text("goL1") }, { text: text("goL2"), accent: true }]}
-        description={text("goDesc")} href="/games/go" action={explore("Go")}>
+        description={text("goDesc")} href="/games/go" action={text("playGo")} secondary={{ href: "/games/go/analysis", label: text("analyzeGo") }}>
         <DemoTabs tone="go" label={tabsLabel} tabs={[
           { id: "go", label: ui("Go"), content: slot(<GoPlayDemo />, 480) },
           { id: "analysis", label: text("analysisTab"), content: slot(<GoAnalysisDemo />, 480) },
@@ -102,31 +106,31 @@ export default function LandingSections() {
     ),
     "watten": index => (
       <FeatureSection id="watten" index={index} tone="watten" eyebrow="WATTEN" lines={[{ text: text("wattenL1") }, { text: text("wattenL2"), accent: true }]}
-        description={text("wattenDesc")} href="/games/watten" action={explore("Watten")}>
+        description={text("wattenDesc")} href="/games/watten" action={text("playWatten")}>
         {slot(<WattenDemo />, 740)}
       </FeatureSection>
     ),
     "schafkopf": index => (
       <FeatureSection id="schafkopf" index={index} tone="schafkopf" eyebrow="SCHAFKOPF" lines={[{ text: text("schafkopfL1") }, { text: text("schafkopfL2"), accent: true }]}
-        description={text("schafkopfDesc")} href="/games/schafkopf" action={explore("Schafkopf")}>
+        description={text("schafkopfDesc")} href="/games/schafkopf" action={text("playSchafkopf")}>
         {slot(<SchafkopfDemo />, 730)}
       </FeatureSection>
     ),
     "atlas-arena": index => (
       <FeatureSection id="atlas-arena" index={index} tone="atlas" feature="scan" eyebrow="ATLAS ARENA" lines={[{ text: text("atlasL1") }, { text: text("atlasL2"), accent: true }]}
-        description={text("atlasDesc")} href="/games/atlas-arena" action={explore("Atlas Arena")}>
+        description={text("atlasDesc")} href="/games/atlas-arena" action={text("playAtlas")}>
         {slot(<AtlasFlagDemo />, 460)}
       </FeatureSection>
     ),
     "natura": index => (
       <FeatureSection id="natura" index={index} tone="natura" eyebrow="NATURA" lines={[{ text: text("naturaL1") }, { text: text("naturaL2"), accent: true }]}
-        description={text("naturaDesc")} href="/games/natura" action={explore("Natura")}>
+        description={text("naturaDesc")} href="/games/natura" action={text("playNatura")}>
         {slot(<NaturaDemo />, 660)}
       </FeatureSection>
     ),
     "eat-it": index => (
       <FeatureSection id="eat-it" index={index} tone="eatit" eyebrow="EAT IT" lines={[{ text: text("eatitL1") }, { text: text("eatitL2"), accent: true }]}
-        description={text("eatitDesc")} href="/games/eat-it" action={explore("Eat It")}>
+        description={text("eatitDesc")} href="/games/eat-it" action={text("playEatIt")}>
         {slot(<EatItDemo />, 480)}
       </FeatureSection>
     ),
@@ -139,6 +143,7 @@ export default function LandingSections() {
   };
 
   const arrival = (id: string) => {
+    if (plain) return null;
     const game = gameArrivals[id];
     const planet = planets.find(config => config.route === game.route)!;
     return <ArrivalStop key={`arrive-${id}`} id={id} tone={game.tone} feature={game.feature} title={ui(game.title)} line={text(game.line)} href={game.route} action={text(game.play)}
@@ -147,16 +152,16 @@ export default function LandingSections() {
   // Tools and learning get one section per tool or book: the item itself, its text, and a button in the item's colour.
   // Every one but the first (which the flyby delivers) is announced by an arrival, as the games are.
   const items: ReactNode[] = category === "tools" ? landingTools.flatMap((tool, k) => [
-    ...(k ? [<ArrivalStop key={`arrive-${tool.id}`} id={tool.id} tone="tools" ownArt title={ui(tool.title)} line={peek(tool.features)} href={tool.route} action={text("openTool")}
+    ...(k && !plain ? [<ArrivalStop key={`arrive-${tool.id}`} id={tool.id} tone="tools" ownArt title={ui(tool.title)} line={peek(tool.features)} href={tool.route} action={text("openTool")}
       button={{ background: tool.accent, color: "#0f172a" }} art={<span style={{ "--app-accent": tool.accent } as CSSProperties}><AppTileArt toolId={tool.id} /></span>} />] : []),
-    <ItemSection key={tool.id} id={tool.id} tone="tools" reverse={k % 2 === 1} title={ui(tool.title)} line={peek(tool.features)} description={ui(tool.description)} href={tool.route} action={text("openTool")}
+    <ItemSection key={tool.id} id={tool.id} index={numbered(k)} tone="tools" reverse={k % 2 === 1} title={ui(tool.title)} line={peek(tool.features)} description={ui(tool.description)} href={tool.route} action={text("openTool")}
       button={{ background: tool.accent, color: "#0f172a" }}>
       {slot(<ToolsDemo toolId={tool.id} />, 520)}
     </ItemSection>]) : category === "learn" ? landingBooks.flatMap((book, k) => [
-    ...(k ? [<ArrivalStop key={`arrive-${book.id}`} id={`book-${book.id}`} tone="learn" ownArt title={ui(book.title)} href={book.route} action={text("openBook")}
+    ...(k && !plain ? [<ArrivalStop key={`arrive-${book.id}`} id={`book-${book.id}`} tone="learn" ownArt title={ui(book.title)} href={book.route} action={text("openBook")}
       line={peek(bookTopics(book))}
       button={bookButton[book.design]} art={<BookArt title={landingBookTitle(language, book.design)} design={book.design} />} />] : []),
-    <ItemSection key={book.id} id={`book-${book.id}`} tone="learn" reverse={k % 2 === 1} title={ui(book.title)} line={peek(bookTopics(book))} description={ui(bookDescription(book.id))} href={book.route} action={text("openBook")}
+    <ItemSection key={book.id} id={`book-${book.id}`} index={numbered(k)} tone="learn" reverse={k % 2 === 1} title={ui(book.title)} line={peek(bookTopics(book))} description={ui(bookDescription(book.id))} href={book.route} action={text("openBook")}
       button={bookButton[book.design]}>
       {slot(<LearnDemo bookId={book.id} />, 360)}
     </ItemSection>]) : [];

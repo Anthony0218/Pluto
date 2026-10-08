@@ -1,3 +1,4 @@
+import FinalResults from "./FinalResults.tsx";
 import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { recordCreatedGameInviteCode, useCreatedGameInvite } from "@/components/social/GameInviteDelivery";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -15,6 +16,7 @@ import ConnectionOverlay from "./ConnectionOverlay.tsx";
 import { usePartyAudio } from "./usePartyAudio.ts";
 import { prefersReducedMotion } from "../../../games/party/client/preferences.ts";
 import { isMinigameScreenPhase } from "../../../games/party/minigames/flow.ts";
+import { mapRegistry } from "../../../games/party/content/maps.ts";
 import "./party.css";
 export default function PartyPage() {
   return (
@@ -46,7 +48,14 @@ function useViewportFitCover() {
 function PartyApp() {
   const connection = usePartyConnection();
   const [params] = useSearchParams();
+  const configuredRoom = useRef<string | null>(null);
   useInviteAutoCreate(() => connection.send({ type: "CREATE", name: "Friends party", playerName: "Explorer", public: false }), connection.status === "online" && !connection.lobby);
+  useEffect(() => {
+    const lobby = connection.lobby, mapId = params.get("map"), victory = params.get("victory");
+    if (!lobby || lobby.match || lobby.hostId !== connection.playerId || connection.status !== "online" || configuredRoom.current === lobby.code || !mapRegistry.all().some(map => map.id === mapId)) return;
+    configuredRoom.current = lobby.code;
+    connection.send({ type: "SETTINGS", settings: { ...lobby.settings, mapId: mapId!, ...(victory === "plutos" || victory === "coins" ? { victory } : {}) } });
+  }, [connection, params]);
   useEffect(() => {
     if (connection.lobby && connection.lobby.hostId === connection.playerId) recordCreatedGameInviteCode(connection.lobby.code, "/games/pluto-party");
   }, [connection.lobby, connection.playerId]);
@@ -145,6 +154,8 @@ function PartyApp() {
           match={lobby.match}
           minigame={lobby.match.minigame}
         />
+      ) : lobby.match.mode === "festival" ? (
+        <section className="pp-match pp-festival-results">{lobby.match.phase === "GAME_OVER" ? <FinalResults connection={connection} lobby={lobby} match={lobby.match} alpine={false}/> : <div className="mg-results"><h2>Next minigame…</h2></div>}</section>
       ) : (
         <PartyMatch connection={connection} lobby={lobby} match={lobby.match} />
       )}

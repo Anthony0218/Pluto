@@ -49,6 +49,7 @@ export default function ArrowMemoryScreen({ minigame, match, playerId, now, onli
     </div>
     <MemoryWorld state={state} players={match.players} playerId={playerId} serverNow={minigame.serverNow} focused={focused}/>
     {(state.phase === "intermission" || state.phase === "finished") && <div className="memory-round-results"><b>ROUND {state.heat} RESULTS</b>{state.heatResults.at(-1)?.ranking.map((id, i) => <p key={id}>{i + 1}. {match.players.find((p) => p.id === id)?.name} <strong>+{state.heatResults.at(-1)?.points[id]} points</strong></p>)}</div>}
+    {me && !me.alive && state.phase !== "finished" && state.phase !== "intermission" && <MemoryRehearsal/>}
     <div className="memory-controls" role="group" aria-label="Move one square">
       {DIRECTIONS.map((d) => <button key={d} disabled={!canMove} onClick={() => move(d)} aria-label={`Step ${d}`}>{ARROW_SYMBOLS[d]}</button>)}
     </div>
@@ -56,4 +57,17 @@ export default function ArrowMemoryScreen({ minigame, match, playerId, now, onli
       <i style={{ background: COLORS[p.avatarId] }}/><span><b>{p.name}{p.id === playerId && " · YOU"}</b><small>{CHARACTER_NAMES[p.avatarId % 4]} · quadrant {state.players[p.id].quadrant + 1}</small></span><strong>{state.players[p.id].score}{!state.players[p.id].alive && " · OUT"}</strong></span>)}</div>
     <p className="memory-tip">Three rounds · 1st: 3 points · 2nd: 2 · 3rd: 1 · private arrows · {state.map === "ice" ? "Icicles strike wrong squares." : "Wrong platforms fall into lava."}</p>
   </div>;
+}
+
+function MemoryRehearsal() {
+  const [path, setPath] = useState<Direction[]>(() => Array.from({ length: 4 }, () => DIRECTIONS[Math.floor(Math.random() * 4)]));
+  const [step, setStep] = useState(-1), [message, setMessage] = useState("Memorise these arrows, then hide them and repeat.");
+  const tap = useCallback((direction: Direction) => {
+    if (step < 0) return;
+    if (direction !== path[step]) { setMessage("Try again! Nothing is lost in practice."); setStep(-1); }
+    else if (step === path.length - 1) { setMessage("Perfect! Here’s a fresh practice path."); setStep(-1); setPath(Array.from({ length: 4 }, () => DIRECTIONS[Math.floor(Math.random() * 4)])); }
+    else { setStep(step + 1); setMessage(`${step + 1} / 4 remembered`); }
+  }, [path, step]);
+  useEffect(() => { const key = (e: KeyboardEvent) => { const direction = KEY_DIRECTION[e.key.length === 1 ? e.key.toLowerCase() : e.key]; if (direction && !e.repeat && !(e.target instanceof HTMLInputElement)) { e.preventDefault(); tap(direction); } }; window.addEventListener("keydown", key); return () => window.removeEventListener("keydown", key); }, [tap]);
+  return <div className="memory-rehearsal"><b>Practice while the heat finishes</b><p>{message}</p><div>{step < 0 ? <><span>{path.map((d) => ARROW_SYMBOLS[d]).join(" ")}</span><button onClick={() => setStep(0)}>Hide & repeat</button></> : DIRECTIONS.map((d) => <button key={d} aria-label={`Practice ${d}`} onClick={() => tap(d)}>{ARROW_SYMBOLS[d]}</button>)}</div></div>;
 }

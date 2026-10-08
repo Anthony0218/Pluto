@@ -124,12 +124,14 @@ test('only ? reveals roulette, its highlight slows down, and every launch uses t
       actionButtons(tree)[index].props.onClick();
       const launched = new URL(parent.navigations.at(-1), 'http://atlas.test');
       const expectedUrl = new URL(url, 'http://atlas.test');
-      assert.equal(launched.pathname, expectedUrl.pathname);
+      const order = launched.searchParams.get('modes').split(',');
+      assert.equal(launched.pathname, index === 1 ? expectedUrl.pathname : `/games/atlas-arena/${index === 0 ? 'solo' : 'hotseat'}/${order[0]}`);
       assert.equal(launched.searchParams.get('mode'), expectedUrl.searchParams.get('mode'));
       assert.equal(launched.searchParams.get('random'), '1');
       assert.equal(launched.searchParams.get('bestOf'), '3');
       assert.equal(new Set(launched.searchParams.get('modes').split(',')).size, 3);
-      assert.equal(launched.searchParams.get('modes').split(',')[0], expected.id);
+      assert.ok(launched.searchParams.get('modes').split(',').includes(expected.id));
+      assert.ok(launched.searchParams.get('series'));
     }
     assert.equal(find(render(), node => node.props?.['aria-label'] === 'Random mode roulette'), undefined);
     buttons(tree).find(node => node.props['aria-label'] === 'Spin for a random mode').props.onClick();

@@ -3,6 +3,8 @@ export type Game = {
   subtitle: string;
   description: string;
   image: string;
+  /** A flat illustration for small tiles, where the full artwork would be too busy. */
+  tileImage?: string;
   route: string;
   tag: string;
   features: string[];
@@ -79,6 +81,7 @@ export const games: Game[] = orderGamesForBrowse([
     description:
       "Spiele Schach, tritt gegen Stockfish an, analysiere Stellungen und werte deine Partien aus.",
     image: "/images/chess-home.png",
+    tileImage: "/images/games/chess.svg",
     route: "/games/chess",
     tag: "Strategie",
     features: ["Einzelspieler", "Stockfish", "Analyse"],

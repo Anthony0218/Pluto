@@ -1,102 +1,99 @@
-# Pluto Party — milestones 1–10
+# Pluto Party
 
-An isolated addition to the existing React/Vite app at `/games/pluto-party` (also linked from Games).
+The multiplayer party game at `/games/pluto-party`. The Node server owns the rules, randomness, scores and rewards; clients send validated inputs.
 
-## Run
+## Run locally
 
-Use Node 24+ with native TypeScript support and install dependencies with `npm install`.
-
-In separate terminals:
+Use Node 24+ with native TypeScript support and installed dependencies. In separate terminals:
 
 ```sh
 npm run party:server
-npm run dev
+VITE_PARTY_SERVER_URL= npm run dev
 ```
 
-Open `http://localhost:5173/games/pluto-party`. The Vite proxy forwards `/party-socket` to the authority on port 8787. Create a lobby, choose **Golden Plutos** or **Coins** as the victory condition, ready up and set sail. The default fills vacant seats with bots. Separate browser tabs have independent sessions and can join by code.
+Open `http://localhost:5173/games/pluto-party`. An empty `VITE_PARTY_SERVER_URL` uses the Vite `/party-socket` proxy to the local authority at port 8787. A nonempty value (including a value in `.env`) connects to that server instead. Each browser tab has its own session and can join a room by code.
 
-For phone testing on the same LAN, run Vite with `npm run dev -- --host 0.0.0.0` and open the computer’s LAN address on the phone. The backend remains bound to loopback behind the Vite proxy.
+For phone testing on the same LAN, add `-- --host 0.0.0.0` to the frontend command and open the computer’s LAN address on the phone. The backend stays behind the Vite proxy.
 
-Production requires a long-running Node service and a reverse proxy with WebSocket upgrades at `/party-socket`; static hosting alone is insufficient. `PARTY_PORT` and `PARTY_HOST` configure the server. Set `PARTY_ORIGINS` to a comma-separated list of allowed frontend origins for a public deployment. If hosting the service separately, set `VITE_PARTY_SERVER_URL` to its `wss://…/party-socket` URL at build time. Matches are in memory and are lost on restart. Do not run multiple independent authorities behind a load balancer without sticky routing and shared room discovery.
+Production needs a long-running Node service with WebSocket upgrades at `/party-socket`. Configure `PARTY_PORT`, `PARTY_HOST`, and `PARTY_ORIGINS` as needed. For a separately hosted authority, set `VITE_PARTY_SERVER_URL` to its complete `wss://…/party-socket` URL at frontend build time. Matches are in memory and are lost on restart; separate authorities need sticky routing and shared discovery.
 
-## Implemented
+## Lobby and match rules
 
-- Public/private rooms, exact-code private discovery, name/code search, four slots, host migration, bot add/remove/difficulty, kicking, ready checks and settings.
-- Server-generated session secrets, authoritative snapshots, reconnect after reload, a 60-second disconnect grace period followed by bot takeover. A returning player can reclaim their seat for 30 minutes. Empty or abandoned rooms expire; matches pause when no connected humans remain.
-- Cryptographic server randomness, message validation, payload/rate bounds, no client-submitted outcomes.
-- Full-screen React Three Fiber boards: Sunspill Islands has 96 spaces across six islands; Mountain has 92 spaces with climbing routes and intact avalanche choke points. Animated water, palm trees, a volcano, ruins, a pirate boat, village cabins, a mine, an ice lake and a summit decorate the maps. Reciprocal graph edges and existing board rules remain authoritative.
-- Animated pawns and dice, pan by scrolling/dragging the zoomed map, zoom/fit/find-pawn controls, large accessible HTML route choices, HUD, tile inspection and action feed.
-- Starting rolls with group-preserving tie rerolls; 0–10 dice; server-paced movement; no immediate backtracking; zero skips tile resolution; bots select legal routes; four turns advance the round.
-- Initial fields: coins, deposits, jackpot, heal, hazard/KO, ferry, and a simple island-breeze event.
-- Two server-randomized Golden Pluto overlays. Exact landing resolves the base tile first, then pauses for Buy / Leave. Each costs 20 coins (removed from the economy, not deposited in the bank). Passing through or rolling zero never opens an offer. Insufficient funds disable Buy but still allow Leave.
-- Purchases immediately respawn only the bought Pluto at a different eligible location, with a global announcement and a short camera visit before returning to the active pawn. Start, rare item, jackpot, active Pluto, irradiated, and map-excluded special nodes cannot receive a spawn. Ferry and boost spaces are excluded on this map.
-- Bots plan legal exact landings and buy affordable Plutos when pursuing Pluto victory; coin-victory bots save their coins. Both conditions end immediately when reached, with results ordered by the chosen goal, then secondary currency, then turn order. Simultaneous coin awards check the active player first, then the current round order.
+- Five bot levels: **Beginner, Easy, Normal, Hard, Extreme**. Hard retains the original default challenge. Extreme has exceptional recall, precise timing and aim, faster reactions and strategic route/item decisions. Hosts can choose a default for new bots and change each existing bot separately.
+- **Board Party** uses Tropical Islands (96 spaces, two active Plutos) or Mountain (92 spaces, one active Pluto). Choose 8, 12 or 16 rounds for a predictable finish, ranked by Golden Plutos or coins with the other currency breaking ties. The default is 12 rounds. The optional race mode still ends immediately at its selected target.
+- **Minigame Festival** skips starting dice, board turns, items and animals. Choose 3, 5, 8 or 12 minigames. Individual placements earn 3 / 2 / 1 / 0 festival points; winning partners earn 3 each and opponents earn 1 each, with 2 each for a team draw. Highest festival points wins; earned coins then turn order break ties.
+- Select any main-minigame lineup in either mode. An empty selection means all 11 games. A shuffled bag plays each selected game before repeating it.
+- Before every minigame and duel, each human participant must press **Space** or **I’m ready**. Bots are ready automatically. The shared three-second countdown starts only once everyone is ready. Disconnect takeover also releases a held ready check.
+- While unready, a separate local practice simulation runs against Easy bots. Practice has no effect on the match, wallets or rewards. During practice Space marks readiness; use the on-screen jump, dash and firing controls to practise those actions.
 
-## Milestone 4: HP, inventory and items
+## Board decisions and balancing
 
-`engine/combat.ts` owns damage, healing, KO and respawn. `items/` holds the item registry (Mega Medkit, Turbo Boots, Comet Melon) and inventory helpers (three slots, replace/discard when full). Items are used only in the item phase before rolling, validated by the server. Temporary turn data lives in `match.turn`; notifications in `match.events`. See `PROGRESS.md` and `ARCHITECTURE.md` section 30.
+Click a highlighted branch or its directional arrow on the map. Each arrow previews possible landing consequences after the remaining steps: rewards, healing, hazards, tolls, Plutos and event effects. Hovering highlights reachable landings. A compact expandable path list remains available for keyboard and fallback navigation.
 
-## Milestone 5: properties
+Dice animate through random faces, then use distinct small / medium / large particle bursts for rolls 1–3, 4–7 and 8–10. Rolling **zero** lets the active player choose **5 HP** (capped at maximum) or **2 coins**, without triggering the space again.
 
-Outposts (Mountain Camps on the Mountain map) can be claimed, upgraded to Level 4 and charge tolls; see `properties/` and `PROGRESS.md`.
+Each map contains **three connected groups of three cleansing spaces**. Exact landing neutralises all negative status effects and heals 10 HP instead of resolving the underlying field. Cyan crosses and rings make these spaces readable. Plutos cannot spawn there. Fallout Core still creates radiation zones, but cleansing offers a recovery route.
 
-## Milestone 6: minigames
+Each tropical region has its own event: Sunspill Bay becomes a +5 HP sanctuary; Coconut Club discounts normal shop items by 2 coins for players located there (mystery boxes stay 10); Whisper Ruins reveals three one-use item caches replacing their base field; Pirate Picnic marks three one-time +5 coin treasures; Jade Jungle bounty adds +2 coins on marked landings; Ember Forecast marks an upcoming eruption for 10 HP at the end of the next round. Cleansing spaces are excluded from landing-reward and damage markers. Mountain retains its cable car, mine cart, slides, tunnels and temporary avalanche / mine / cable closures. Animated map rings, floating event labels and closure markers show affected locations and timing.
 
-After every board round the server picks a main minigame from `minigames/` (`minigameRegistry`), runs it (intro → play → results), pays 10 / 5 / 3 / 0 coins and puts the winner first in the next round. The pool contains One Wrong Step, Pickup Shootout, Echo Wall, Triple Trail, Pluto Pulse, Circle Quickshot and Hell Knockout. Target Panic remains registered for legacy fixtures but is excluded from selection. Clients only send `MINIGAME_INPUT` intent; the server validates actions and computes rankings. See `ARCHITECTURE.md` section 32.
+The board camera follows the active pawn on desktop and phones, moving closer for a branch choice. **See board** hides turn controls while keeping the current local framing; **See whole board** fits the entire map. Both views have a **Back** button that restores the pawn camera and turn controls. Roll, items, viewing and zoom controls sit together in a centered panel inside the board. You can drag to explore and inspect spaces in either view. On phones, inactive opponent cards compact; the active player and local player remain readable.
 
-## Additional main minigames
+Fields use raised, consistent rims with large symbols and distinct 3D silhouettes: coin stacks, supply crates, heart crystals, cracked warning tiles, event signs, vaults, cleansing springs and recessed portals. Regional bases use wood, carved stone or faceted ice; functional colors and symbols stay consistent. Golden Plutos are floating planets with orbit rings. Ordinary fields stay still; rare fields and active events have restrained motion. On resolved landings, coins travel to/from the player's coin counter, crate lids and vault doors open, events reveal their result, healing expands a green ring, cleansing dissolves a removed status icon, hazards recoil the pawn, and warps fade the pawn out and back in at the destination. These are client-only effects derived from authoritative snapshots; movement, off-turn shopping and reconnects do not replay rewards. Both system and in-game reduced-motion settings are respected.
 
-**One Wrong Step** (`minigames/arrowMemory/`) randomly chooses an ice or hell 10×10 grid. Four private 5×5 quadrants receive different arrow sequences, with opponents' moves hidden until each hazard. There are exactly three survival rounds, with everyone returning between rounds. First, second and third earn 3 / 2 / 1 points each round; cumulative points determine the final ranking. Within each survival round, sequences grow from 3 arrows to 4 at levels 2–3, 5 at levels 4–6, 6 at levels 7–10 and one additional arrow at each later level. A round ends with one survivor or after two minutes; survival, correct steps and response time determine placements. Icicles shatter wrong ice tiles above water; wrong hell platforms fall into lava. Future paths and bot recollections never leave the server.
+## Items and shopping
 
-**Pickup Shootout** (`minigames/pickupArena/`) is a 120-second first-person free-for-all. The server randomly chooses Neon Play Arcade (three floors, four stairways, arcade machines and tables) or Pluto City Blocks (buildings, cars and crates). Everyone starts unarmed; available pickups provide a knife, pistol, shotgun, rifle or Desert Eagle (50 damage, seven-round magazine). Walk over a pickup while unarmed or out of ammo; E / Swap exchanges an equipped weapon. Pickups return after 10 seconds. Each kill awards exactly 1 point, with fewer deaths and server randomness breaking ties. Players respawn unarmed after 3 seconds with a 1.5-second shield that also delays firing. Movement, stairs, collisions, line of sight, ammo, fire cadence, damage and kills are all authoritative. Confirmed hits produce particles, a character reaction, a hit marker and floating actual damage numbers; misses and shields produce no damage feedback. A health box shows your HP, and visible opponents have health bars. Weapon pickups have rotating models and nearby labels; equipped weapons recoil or swing. Bots use validated inputs and navigate the same surfaces, with slower movement, reaction delays, imperfect aim and pauses between bursts at each difficulty. Desktop controls are WASD, mouse, click and E; touch controls include movement, drag-to-look, Fire and Swap.
+The **Shop** stays available while waiting, including during board-mode minigames. Each player can buy **one item per board round**, shared between the normal shop and mystery box. Purchases occupy one of three inventory slots and become usable from the **next round**. Item use still requires that player’s pre-roll item phase; radiation still prevents use.
 
-**Street Cross** draws normalized movement with bounded prediction and smooths corrections between 100 ms server snapshots. Checkpoint hits and finishes snap immediately to the authoritative position. Spawn immunity uses a steady ring instead of flashing the character.
+| Normal shop item | Coins |
+| --- | ---: |
+| Mega Medkit | 6 |
+| Turbo Boots | 8 |
+| Comet Melon | 8 |
+| Scatterblaster | 12 |
+| Lucky Six | 14 |
+| Duel Saber | 12 |
 
-**Shooter updates:** Every seat can spawn on all three arcade floors. Health packs restore up to 40 HP and ammo boxes refill a magazine, with a three-magazine ceiling; both respawn after 12 seconds. Gun headshots deal double damage, so the Desert Eagle's 50-damage shot becomes a 100-damage headshot. An elimination overlay identifies the killer and counts down to respawn. Local movement prediction shares collision and stair physics with the authority, and city windows use instanced meshes to reduce rendering work.
+A **10-coin Mystery Box** can contain any of the nine registered items with equal probability, including Pocket Duel, Fallout Core and Wild Totem. It consumes the same round purchase allowance as a normal purchase. Full inventories and unaffordable purchases are rejected before charging coins.
 
-**Echo Wall** (`minigames/patternWall/`) shows a shared sequence on a 3×3 wall, then accepts taps or keys 1–9 to repeat it. Lengths are 3 at level 1, 4 at levels 2–3, 5 at levels 4–7, then one more at every later level. Wrong or incomplete recall eliminates a player. Only the current light is broadcast; the answer and other players' taps remain private.
+## Minigames
 
-**Triple Trail** (`minigames/trailRun/`) runs three 45-second races across different ice, jungle and cloud courses. Four separate lanes, jumps, ice inertia, sky wind and checkpoints are server simulated. Each race awards 3 / 2 / 1 placement points; totals determine the final winner. Use A / D and Space or the on-screen run and jump buttons.
+| Game | Duration | Mechanics and controls |
+| --- | --- | --- |
+| One Wrong Step | Up to 72 s | Three short survival heats with private arrow sequences, faster reveals and everyone returning each heat. Eliminated players get a harmless recall rehearsal while waiting. Arrow keys / touch arrows. |
+| Pickup Shootout | 75 s | Compact city or three-floor arcade. Eliminations score 3; hold a floor beacon for 3 seconds to score 1. Headshots deal 1.5× damage. WASD, mouse, Fire, E/Swap; mobile movement, look, Fire and Swap. |
+| Echo Wall | Up to 60 s | Five independent recall rounds, so a mistake does not eliminate the rest of the game. Tiles have distinct symbols and tones. Keys 1–9 / click / touch. |
+| Triple Trail | Up to 66 s | Three 20-second races with short breaks, checkpoints, forgiving jump buffering / coyote time, ice cracks, swinging jungle platforms and sky wind. A/D or arrows, Space/W / touch run and jump. |
+| Pluto Pulse | 60 s | One falling-letter lane at 100 BPM; J/K/L or large touch keys. Server-scored accuracy %, comic judgements, current/best combo and combo sound feedback. |
+| Circle Quickshot | 60 s | Random circles, squares, diamonds and triangles at varied speeds. Smaller ×3 / ×5 targets are less frequent. Exact shape overlap scores; Space / click / large Fire button. |
+| Hell Knockout | Up to 75 s | Punch / jump / aim over lava. Islands collapse with five-second warnings. Guard reduces damage and knockback but slows movement and prevents punching. WASD/arrows, mouse, F/click, Space, G / touch controls. |
+| Tide Treasure | 60 s | Carry gems back to the boat, balance high-value outer gems against a rising 15-second tide, lose carried gems if caught. WASD/arrows / touch pad. |
+| Comet Courier | 60 s | Carry parcels to matching symbol pads; a two-second-cooldown dash can knock a rival’s parcel loose. Golden parcels score 3. WASD/arrows, Space / touch pad and Dash. |
+| Rope Rescue | 60 s | Random 2v2 teams: operator aligns the lever, runner crosses bridges and rescues explorers. Unsafe jumps reset to a checkpoint. Roles swap at 30 s. Operator W/S, runner A/D and Space / touch controls. |
+| Paddle Doubles | Up to 60 s | Random 2v2 teams cover upper/lower paddle lanes. First to 7 or highest score at time; every third serve is a two-point golden comet. W/S or up/down / touch buttons. |
 
-**Pluto Pulse** (`minigames/rhythm/`) gives everyone the same seeded six-lane W / A / S / D / Space / Shift chart. Tap a key or its screen button as a note reaches its target circle. Exact circle overlap is multiplied by its value: usually 1, occasionally 3 and rarely 5. Judgement and points are authoritative, and each note can score only once.
+Board individual minigames pay 10 / 5 / 3 / 0 coins. Team games pay each winning partner 8 and each opponent 3; a draw pays everyone 5. Partners receive equal results and both winners receive a minigame-win statistic. Duels retain wager escrow and their separate reward rules. Paddle Panic and Street Cross remain duel games; Target Panic remains a legacy practice fixture outside the main pool.
 
-**Circle Quickshot** (`minigames/circleShot/`) is a 60-second timing shooter with all four players visible in a 2×2 display. Each player has a weapon, a target ring and exactly one falling circle at a time. Click, Space or Fire takes one shot at that circle. The exact intersection area divided by circle area is multiplied by its value (1, 3 or 5), without rounding the accumulated score: 80% × 3 earns 2.4. The shared chart, shot validation, expiration and scoring run on the server; only current circles appear in snapshots.
+Unified fox, bunny, explorer and ghost portraits match the character roster across lobby, HUD, readiness and new arenas. Minigame descriptions use numbered rule cards and bordered keycaps. Large touch controls remain available in the new games and rhythm game.
 
-**Hell Knockout** (`minigames/lavaKnockback/`) places players on varied-size basalt islands and narrow paths over lava. Everyone starts with 200 HP. Fists deal 10 HP per hit, apply knockback and have a 450 ms cooldown. Lava contact or zero HP eliminates permanently. WASD/arrows move, the mouse aims, click/F punches and Space jumps; touch arrows aim and move, with Jump and Punch buttons. The last survivor wins; at 120 seconds, survivors rank by remaining HP then punches landed, and eliminated players rank by survival time. Bots use the same physics and inputs, travelling through the central island. Both new games use normal rewards and round ordering, and have buttons in the local minigame playground.
+## Sound files
 
-All boards and minigames fill the viewport. Player cards sit at the board edges; the turn dock provides Roll, Use item and See board. Both boards support drag, zoom, fit, find-pawn and an accessible space selector. The phone layout keeps action buttons visible and the platform-race camera follows the player's lane.
+Custom audio lives in **`public/sounds/party/`**. Put MP3/WAV/OGG/M4A files there and map event IDs to filenames in `manifest.json`. See that folder’s `README.md` for supported IDs and an example. Files load after a user interaction, follow game volume/mute settings and fall back to synthesized audio if unavailable. Echo Wall has nine cue pitches; Pluto Pulse music uses its authoritative 100 BPM chart grid.
 
-Both games join the existing main minigame pool and use the usual intro, results, coin rewards and next-round order. Their map choices are independent on every appearance. For direct local play against three bots, run the frontend and open `/tests/party-minigames-preview.html`. Rule, security, bot, staircase and flow checks live in `tests/party-new-minigames.test.mjs`.
+## Networking and architecture
 
-The minigames use original React Three Fiber worlds and characters. Frostfall Lagoon has moving water, snow, crystals, falling icicles and shattering ice; the Ember Vault has flowing lava, fire, embers and tumbling basalt platforms. Memory players can switch between the full map and a closer view of their quadrant. The shooter arcade has animated cabinet screens, air hockey tables, neon trims and stair lighting; the city has shop fronts, windows, detailed cars, crosswalks, rooftop fans and moving flags. Avatar seats map to a fox, bunny, explorer and ghost with team scarves, blinking, idle breathing, walk cycles and ghost hovering. Frame animations follow the server clock for gameplay events. Ambient motion respects reduced-motion preferences. All models and textures are generated locally without external asset downloads. The playground also includes a character gallery, weapon practice and an arcade tour.
+Public/private rooms, host migration, per-seat bot controls, reconnect sessions and private-code discovery remain supported. Disconnected humans keep a seat for 60 seconds before bot takeover and may reclaim it. Empty rooms expire; matches pause without connected humans. Server randomness, input validation, size/rate limits and private minigame answers remain authoritative.
 
-## Milestone 7: weapons and duels
+- `types.ts`, `config.ts`, `difficulty.ts`: contracts, tuning and the five difficulty levels.
+- `content/`: registered maps, topology, scenery and cleansing locations.
+- `engine/`: state transitions, movement, route previews, combat and economy.
+- `items/`, `events/`, `properties/`, `animals/`, `status/`, `duels/`: registered rules and rewards.
+- `minigames/`: React-free server rules and seeded simulations; `festivalGames/` contains the four new games.
+- `network/`: validation and the reconnecting client connection.
+- `client/audio.ts`: custom sound loading, synthesized fallback and music.
+- `src/pages/games/Party/`: React / React Three Fiber views, practice simulation, touch controls and shop.
+- `server/party/`: room/session lifecycle and WebSocket authority.
 
-Scatterblaster (graph-distance bands, spread aim) and Lucky Six (global precision shot) start a short server-seeded aiming challenge (`items/aim.ts`, phase `ITEM_AIM`); clients send only a bounded reticle position and release time, the server scores it and applies damage through `engine/combat.ts`. Duel Saber (`duels/`) challenges any opponent for 5/10/20/custom coins or 1 Golden Pluto and runs a random duel minigame from `minigameRegistry.pool("duel")` — Paddle Panic (`minigames/paddlePanic/`) or Street Cross (`minigames/streetCross/`) — inside the challenger's turn (`DUEL_INTRO → DUEL_MINIGAME → DUEL_RESULTS → ITEM_PHASE`). The winner takes the escrowed pot or the loser's Pluto; nothing is created. See `ARCHITECTURE.md` section 33.
-
-## Milestone 8: rare items, radiation and animals
-
-The Rare Item field awards a weighted random rare item (`RARE_ITEM_WEIGHTS`): **Pocket Duel** (a wager-free duel through the Milestone 7 duel flow; the winner gets one brand-new Golden Pluto), **Fallout Core** (KOs everyone else on a space and its directly connected spaces, irradiates them and leaves a radiation zone for the rest of the round plus 3 full rounds; `hazards/radiation.ts`) and **Wild Totem** (summons a Cheetah or Crocodile; `animals/`). Radiation is a generic status effect (`status/effects.ts`): −10 HP at each of the next 3 turn starts and no items. After the last board turn of each round the Animal Phase moves every summoned animal toward the nearest opponent along the shortest legal path (`engine/graph.ts` `findShortestPath`) and resolves bites before the minigame starts. See `ARCHITECTURE.md` section 34.
-
-## Milestone 9: Mountain map
-
-Hosts choose **Tropical Islands** (`sunspill`, 2 Golden Plutos) or **Mountain** (`mountain`, 1 Golden Pluto) in the lobby; the server stores the choice as `match.mapId` and every rule reads the map from the match (`mapOf`). Mountain is a second `BoardMap` in the same registry (`content/mountain.ts`): 60 spaces, eight regions, two rope-bridge chokepoints, Mountain Camps instead of Outposts and map-specific mechanics that are data on the map: a Cable Car and a Mine Cart (`transports`), two Frozen Slides (`slides`), tunnel warps (`warps`) and Avalanche-eligible connections (`blockableEdges`). Random Event fields now go through an event registry (`events/`, per-map `allowedMaps`): Avalanche, Mine Collapse and Cable Car Breakdown are Mountain-only. Temporarily closed routes are match state (`match.blockedConnections`, `engine/routes.ts`) fed into the shared graph helpers. `content/validate.ts` validates every registered map. See `ARCHITECTURE.md` section 35.
-
-## Deliberately deferred
-
-Other events (Snowstorm, Mountain Goats, Frozen Winds, Ice Melt), the `duel` board tile, and audio (10). Their spaces are explicitly labeled as upcoming and have no hidden effects.
-
-## Architecture
-
-- `types.ts`, `config.ts`: shared strict typed contracts and tuning.
-- `content/`: generic registry, map graph and presentation metadata. Add maps through `mapRegistry.register`.
-- `engine/`: pure state transitions with injected randomness; independent of React, Pixi and networking. Server calls `advance`; clients can only request validated actions.
-- `board/`: Pixi rendering of received state; no rules or random outcomes.
-- `network/`: runtime input validation and reconnecting React connection adapter.
-- `src/pages/games/Party/`: responsive React home/lobby/HUD and board host.
-- `server/party/`: rooms/session lifecycle and WebSocket adapter. `PartyRooms` can be tested without a socket and is the future persistence boundary.
-
-Future content should use registries of typed rule handlers rather than embedding rules in components. The engine currently exposes small explicit transitions; add item, event, animal and minigame handlers at the phase boundaries as each milestone is implemented. Minigame clients must submit inputs, never authoritative rankings.
+The local visual playground is `/tests/party-minigames-preview.html`. Historical architecture detail remains in `ARCHITECTURE.md` and `PROGRESS.md`; the rules above supersede old milestone durations and victory assumptions.
 
 ## Checks
 
@@ -107,8 +104,4 @@ npx eslint src/games/party src/pages/games/Party server/party
 npm run build
 ```
 
-`tsconfig.party.json` enforces strict mode for this feature and server without changing the existing application's TypeScript policy. Tests cover graph topology/distribution, resources, dice/ties, movement/phase security, fields, KO, round progression, victory, bot simulations, protocol validation, host controls, private discovery, reconnection and a real WebSocket roundtrip. Economy tests additionally cover spawn restrictions, atomic purchases, rejection/decline, landing versus passing, offer reconnection, two-client socket synchronization, victory, and complete seeded bot matches. Milestone 4 tests live in `tests/party-items.test.mjs`. Property tests live in `tests/party-properties.test.mjs`, minigame tests in `tests/party-minigame.test.mjs`, and Milestone 7 tests in `tests/party-weapons.test.mjs`, `tests/party-duel.test.mjs` and `tests/party-duel-minigames.test.mjs`, and Milestone 8 tests in `tests/party-rare-items.test.mjs` and `tests/party-animals.test.mjs`, and Milestone 9 tests in `tests/party-mountain.test.mjs`.
-
-## Milestone 10: hardening, reconnects, mobile polish
-
-Sessions are per browser tab; refreshing reconnects to the same seat, the newest connection replaces an older one, and a disconnected seat is held for 60 s (`NETWORK_CONFIG`) before a bot plays it (the player can take it back). The server isolates errors per room, falls back to a safe bot action instead of stalling, validates names/codes/tokens, rate-limits lobby creation and code lookups, exposes `GET /health`, logs one line per event and shuts down gracefully. The client adds a connection overlay, loading and error states, an error boundary, a settings sheet (volumes, mute, motion, hints, fullscreen), synthesized audio, a mobile turn dock, safe-area support, final results with Return to lobby. See `PROGRESS.md` (Milestone 10) and `ARCHITECTURE.md` section 36.
+`tests/party-festival-upgrade.test.mjs` covers five difficulty profiles, all-player ready checks, practice isolation boundaries, finite festival flow, zero rewards, off-turn shopping, next-round locks, all mystery outcomes, cleansing topology, regional events, team rewards, seeded new-game simulations, Extreme rhythm performance, random shape geometry and guard / island collapse. Existing Party suites cover board topology, resources, movement and phase security, KO, properties, items, duels, radiation, animals, server reconnection and real WebSocket roundtrips. Older race-specific fixtures explicitly opt into race mode and supply legacy auto-readiness; the new flow tests use the actual ready actions.

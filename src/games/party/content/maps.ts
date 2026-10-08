@@ -63,7 +63,7 @@ export const tropical: BoardMap = {
   goldenPlutoCount: 2,
   propertyName: "Outpost",
   eventHooks: ["tides", "hurricane", "bridge-collapse", "volcano"],
-  eventPoolIds: ["island-breeze"],
+  eventPoolIds: ["island-breeze", "pirate-treasure", "eruption-forecast", "jungle-bounty", "calm-waters", "coconut-market", "ruins-relics"],
   flavor: {
     welcome: "Welcome to Sunspill! Rolling for starting order…",
     roundStart: "The island adventure continues.",
@@ -72,6 +72,9 @@ export const tropical: BoardMap = {
     empty: "takes a breather.",
   },
 };
+tropical.cleansingNodeIds = [0, 2, 5].flatMap((region) => tropical.nodes.filter((node) => node.region === region && Number(node.id.split("-").at(-1)) >= 60).slice(0, 3).map((node) => node.id));
+mountain.cleansingNodeIds = [0, 3, 7].flatMap((region) => mountain.nodes.filter((node) => node.region === region && Number(node.id.split("-").at(-1)) >= 60).slice(0, 3).map((node) => node.id));
+
 export const mapRegistry = new Registry<BoardMap>();
 mapRegistry.register(tropical);
 mapRegistry.register(mountain);

@@ -1,3 +1,4 @@
+import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import { recordCreatedGameInviteCode } from "@/components/social/GameInviteDelivery";
 import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
@@ -11,6 +12,9 @@ import { useEditor } from "@/games/chess/custom/editor/editorContext";
 import { coordKey } from "@/games/chess/custom/editor/editorUtils";
 import { createOnlineMatch, getOnlineMatch, joinOnlineMatch, previewOnlineMatch, submitOnlineMove, type OnlinePreview, type OnlineSnapshot } from "@/games/chess/custom/multiplayer/client";
 import { validateOnlineVariant } from "@/games/chess/custom/multiplayer/protocol";
+import { createVariantFromPreset, PRESETS } from "@/games/chess/custom/engine/presets";
+import { createPlutoVariant, isPlutoCustomId } from "@/games/chess/custom/library/plutoVariants";
+import { parseVariantJson } from "@/games/chess/custom/engine/serialization";
 import { getBoardTheme } from "@/games/chess/custom/themes";
 import Board2D, { type CellHighlight } from "../Board2D";
 import { Button, Panel, SectionHeading } from "../ui";
@@ -73,7 +77,14 @@ export default function OnlineMatchView() {
     return () => { cancelled = true; window.clearTimeout(timer); };
   }, [code, match, userId]);
 
-  useInviteAutoCreate(() => perform(async () => { const created = await createOnlineMatch(draft); recordCreatedGameInviteCode(created.code, "/chess-custom/play/multiplayer"); return created; }), !!userId && validateOnlineVariant(draft).length === 0);
+  // A preset invite can arrive while the editor is already mounted with a different working copy.
+  const inviteVariant = useMemo(() => {
+    const id = params.get("preset");
+    if (isPlutoCustomId(id)) return parseVariantJson(JSON.stringify(createPlutoVariant(id))).variant ?? draft;
+    const preset = PRESETS.find(item => item.id === id);
+    return preset ? createVariantFromPreset(preset.id) : draft;
+  }, [params, draft]);
+  useInviteAutoCreate(() => perform(async () => { const created = await createOnlineMatch(inviteVariant); recordCreatedGameInviteCode(created.code, "/chess-custom/play/multiplayer"); return created; }), !!userId && validateOnlineVariant(inviteVariant).length === 0);
   async function perform(action: () => Promise<OnlineSnapshot>) {
     setBusy(true);
     setError(null);
@@ -150,7 +161,7 @@ export default function OnlineMatchView() {
     </div>
     {error && <p role="alert" className="rounded-xl border border-red-400/30 bg-red-400/10 p-3 text-sm text-red-200">{error}</p>}
     <div className="flex flex-wrap gap-2 text-xs text-zinc-300" aria-label="Room seats">
-      {variant.teams.map((team, index) => <span key={team.id} className={`rounded-full border px-3 py-1.5 ${index === match.seat ? "border-amber-300/40 bg-amber-300/10 text-amber-100" : "border-white/10 bg-white/[0.04]"}`}>{team.name}: {match.players[index] ? index === match.seat ? "You" : "Joined" : "Open"}</span>)}
+      {variant.teams.map((team, index) => <span key={team.id} className={`rounded-full border px-3 py-1.5 ${index === match.seat ? "border-amber-300/40 bg-amber-300/10 text-amber-100" : "border-white/10 bg-white/[0.04]"}`}>{team.name}: {match.players[index] ? index === match.seat ? "You" : "Joined" : "Open"}{match.status === "waiting" && !match.players[index] && <InviteFriendButton />}</span>)}
     </div>
     <p className="text-sm text-zinc-300" aria-live="polite">{match.status === "waiting" ? `Waiting for ${variant.teams.length - match.players.length} more player${variant.teams.length - match.players.length === 1 ? "" : "s"} to join…` : state!.result ? state!.result.reason : `${variant.teams.find((team) => team.id === state!.turn)?.name} to move${myTurn ? " · your turn" : ""}`}</p>
     <div className="flex flex-wrap gap-2">

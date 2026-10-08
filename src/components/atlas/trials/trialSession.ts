@@ -8,6 +8,7 @@ import { createContext, useContext } from "react";
 export type TrialSession = {
   player?: { name: string; color: string };
   onScore?: (score: number) => void;
+  onComplete?: (score: number) => void;
   finish?: { label: string; onClick: () => void };
 };
 export const TrialSessionContext = createContext<TrialSession | null>(null);

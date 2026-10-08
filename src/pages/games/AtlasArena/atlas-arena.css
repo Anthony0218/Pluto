@@ -530,3 +530,37 @@ button.atlas-random-symbol:focus-visible { outline:2px solid #82ece5;outline-off
   .is-fixed-tab .is-random .atlas-choice-icons.atlas-roulette-icons > span { min-height:0; height:auto; aspect-ratio:auto; border-radius:6px; }
   .atlas-series-order { grid-template-columns:1fr; }
 }
+
+/* A series keeps its own identity while each game uses its normal mode screen. */
+.atlas-random-progress { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: .35rem 1rem; min-height: 42px; padding: .5rem 1rem; border-bottom: 1px solid rgba(82,231,224,.2); color: #a3b5c9; background: #091a2b; font-size: .8rem; }
+.atlas-random-progress strong { color: #79e9e4; }
+.atlas-series-session > main { min-height: calc(var(--app-height) - 42px); }
+
+/* Result celebrations and the shared two-player break. */
+.atlas-winner-box { position:relative; isolation:isolate; width:min(700px,100%); margin:0 0 1.5rem; padding:clamp(1.5rem,4vw,2.8rem) 1.2rem; overflow:hidden; border:1px solid rgba(255,211,114,.38); border-radius:28px; background:radial-gradient(ellipse at 50% 0,rgba(255,211,114,.13),transparent 70%),linear-gradient(145deg,#14243b,#0a1426); box-shadow:0 20px 70px rgba(0,0,0,.28),0 0 50px rgba(255,211,114,.07); text-align:center; animation:atlas-winner-enter .65s cubic-bezier(.2,.8,.2,1) both; }
+.atlas-winner-box::after { content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; background:linear-gradient(115deg,transparent 30%,rgba(255,236,186,.08),transparent 65%); background-size:250% 100%; animation:atlas-winner-shine 6s ease-in-out infinite; }
+.atlas-winner-box .atlas-result-orbit { display:grid; place-items:center; width:80px; height:80px; margin:0 auto 1.3rem; border:1px solid rgba(255,211,114,.45); border-radius:50%; background:rgba(255,211,114,.08); animation:atlas-trophy-float 3s ease-in-out infinite; }
+.atlas-winner-box .atlas-result-orbit svg { width:34px; height:34px; }
+.atlas-winner-box h1,.atlas-winner-box h2 { margin:.6rem auto 0; max-width:100%; color:#fff4d8; font-size:clamp(1.8rem,5vw,3.5rem); overflow-wrap:anywhere; line-height:1.12; }
+.atlas-result-particles { position:absolute; inset:0; z-index:-1; pointer-events:none; overflow:hidden; }
+.atlas-result-particles i { position:absolute; left:var(--x); bottom:-10px; width:5px; height:9px; border-radius:2px; background:var(--particle); box-shadow:0 0 9px var(--particle); animation:atlas-result-particle var(--duration) var(--delay) ease-out infinite; }
+.atlas-intermission { width:min(620px,100%); margin:1.2rem 0; padding:1.4rem; border:1px solid rgba(121,233,228,.25); border-radius:22px; background:rgba(9,26,43,.9); }
+.atlas-intermission h2 { margin:.5rem 0 1rem; font-size:1.5rem; }
+.atlas-intermission p { color:#aabbd0; line-height:1.5; }
+.atlas-break-timer { display:flex; justify-content:center; align-items:center; gap:.5rem; flex-wrap:wrap; }
+.atlas-break-timer strong { color:#ffd372; font-size:1.7rem; font-variant-numeric:tabular-nums; }
+.atlas-ready-count { color:#79e9e4!important; font-weight:750; }
+.atlas-continue-players { display:flex; justify-content:center; gap:.6rem; flex-wrap:wrap; }
+.atlas-continue-players span { display:inline-flex; align-items:center; gap:.35rem; padding:.5rem .75rem; color:#8c9bb0; border-radius:12px; background:rgba(255,255,255,.04); }
+.atlas-continue-players .is-ready { color:#79e9e4; background:rgba(121,233,228,.1); }
+.atlas-result-actions button:disabled { opacity:.5; cursor:default; }
+.atlas-random-results > .atlas-result-actions { margin:1rem 0 1.5rem; }
+.atlas-intermission .atlas-start { margin-top:1.2rem; }
+@keyframes atlas-winner-enter { from { opacity:0; transform:translateY(18px) scale(.96); } to { opacity:1; transform:translateY(0) scale(1); } }
+@keyframes atlas-trophy-float { 50% { transform:translateY(-5px); box-shadow:0 0 45px rgba(255,211,114,.28); } }
+@keyframes atlas-winner-shine { 0%,100% { background-position:100% 0; } 50% { background-position:0 0; } }
+@keyframes atlas-result-particle { 0% { opacity:0; transform:translate(0,0) rotate(0); } 15% { opacity:.8; } 100% { opacity:0; transform:translate(var(--drift),-340px) rotate(240deg); } }
+@media(prefers-reduced-motion:reduce) {
+  .atlas-winner-box,.atlas-winner-box::after,.atlas-winner-box .atlas-result-orbit,.atlas-result-particles i { animation:none; }
+  .atlas-result-particles i { bottom:var(--x); opacity:.3; }
+}

@@ -1,6 +1,6 @@
 import { MAX_INVENTORY_SIZE } from "../../../games/party/config.ts";
 import { itemRegistry } from "../../../games/party/items/registry.ts";
-import { tropical } from "../../../games/party/content/maps.ts";
+import { mapRegistry } from "../../../games/party/content/maps.ts";
 import { itemLockReason } from "../../../games/party/status/effects.ts";
 import type {
   ItemInstance,
@@ -55,9 +55,10 @@ export default function ItemPanel({
               </li>
             );
           const definition = itemRegistry.get(item.itemId),
-            legal = definition.canUse(match, player.id, tropical),
-            reason = legal ? null : definition.blockedReason?.(match, player.id, tropical),
-            enabled = interactive && timingOpen && yourTurn && legal && !lock,
+            legal = definition.canUse(match, player.id, mapRegistry.get(match.mapId)),
+            reason = legal ? null : definition.blockedReason?.(match, player.id, mapRegistry.get(match.mapId)),
+            unlocks = (item.usableFromRound ?? 0) > match.round,
+            enabled = interactive && timingOpen && yourTurn && legal && !lock && !unlocks,
             rare = definition.rarity === "rare";
           return (
             <li
@@ -72,6 +73,7 @@ export default function ItemPanel({
                 <strong>{definition.name}</strong>
                 {!rare && <em>{definition.rarity}</em>}
                 <small>{definition.description}</small>
+                {unlocks && <small className="pp-item-reason">Ready in round {item.usableFromRound}</small>}
                 {reason && yourTurn && timingOpen && !lock && (
                   <small className="pp-item-reason">{reason}</small>
                 )}

@@ -14,6 +14,7 @@ export function clanStoredGame(route: string) {
   if (route === "/games/atlas-arena/multiplayer") return "atlas-arena";
   if (route === "/games/eat-it/multiplayer") return "eat-it";
   if (route === "/games/pluto-party") return "pluto-party";
+  if (route === "/games/card-builder/room") return "card-builder";
   return null;
 }
 

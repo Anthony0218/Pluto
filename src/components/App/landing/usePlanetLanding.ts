@@ -1,7 +1,7 @@
 import { useCallback, type MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { animate } from "motion/react";
-import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useLandingReducedMotion as useReducedMotion } from "./motionPreference";
 import { pageBrand } from "../pageBrand";
 import { VIEWPORT_SELECTOR } from "./viewport";
 
