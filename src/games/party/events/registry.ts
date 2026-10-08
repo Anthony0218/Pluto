@@ -9,11 +9,13 @@ import {
   islandBreeze,
   mineCollapse,
   windfall,
+  pirateTreasure, eruptionForecast, jungleBounty,
+  calmWaters, coconutMarket, ruinsRelics,
 } from "./definitions.ts";
 import type { EventDefinition } from "./types.ts";
 
 export const eventRegistry = new Registry<EventDefinition>();
-for (const event of [islandBreeze, windfall, avalanche, mineCollapse, cableBreakdown])
+for (const event of [islandBreeze, windfall, avalanche, mineCollapse, cableBreakdown, pirateTreasure, eruptionForecast, jungleBounty, calmWaters, coconutMarket, ruinsRelics])
   eventRegistry.register(event);
 
 // Events the map's pool allows right now: listed in `eventPoolIds`, allowed on this map id, and runnable.

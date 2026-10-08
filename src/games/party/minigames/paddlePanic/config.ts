@@ -30,8 +30,10 @@ export const PADDLE_PANIC_CONFIG = {
   inputIntervalMs: 70,
   snapshotIntervalMs: 100,
   bots: {
-    easy: { reactionMs: 280, errorUnits: 1.8, trackFrom: 0.55 },
-    medium: { reactionMs: 170, errorUnits: 1.3, trackFrom: 0.8 },
-    hard: { reactionMs: 110, errorUnits: 0.95, trackFrom: 1 },
+    beginner: { reactionMs: 480, errorUnits: 2.8, trackFrom: .4 },
+    easy: { reactionMs: 280, errorUnits: 1.8, trackFrom: .55 },
+    medium: { reactionMs: 225, errorUnits: 1.55, trackFrom: .68 },
+    hard: { reactionMs: 170, errorUnits: 1.3, trackFrom: .8 },
+    extreme: { reactionMs: 40, errorUnits: .1, trackFrom: 1 },
   } satisfies Record<Difficulty, PaddleBotProfile>,
 } as const;

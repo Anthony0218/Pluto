@@ -34,7 +34,7 @@
     "check:landing:update": "node scripts/landing/capture.mjs --update",
     "check:life-tools": "node scripts/tools/check-life-tools.mjs",
     "check:push": "tsc -p tests/typechecks/tool-push.json",
-    "test:edravane": "node --test tests/edravane*.test.mjs",
+    "test:edravane": "node --test --test-concurrency=1 tests/edravane*.test.mjs",
     "check:edravane": "tsc -p tsconfig.edravane.json"
   },
   "dependencies": {

@@ -1,5 +1,5 @@
 import { Component, lazy, Suspense, useRef, useState, type ReactNode } from "react";
-import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useLandingReducedMotion as useReducedMotion } from "./motionPreference";
 import { useLanding } from "./landingContext";
 import JourneyItems from "./JourneyItems";
 import JourneyTitle from "./JourneyTitle";

@@ -4,6 +4,8 @@ import type {
   House,
 } from "../../../games/MedievalKingdoms/edravane/types.ts";
 import { insultGrievances } from "../../../games/MedievalKingdoms/edravane/politics.ts";
+import { ruler } from "../../../games/MedievalKingdoms/edravane/realm.ts";
+import { EffectBadge } from "./RealmIcon.tsx";
 
 export function InsultAction({
   state,
@@ -35,14 +37,8 @@ export function InsultAction({
           ? `House ${target.name} insulted this round`
           : `Insult House ${target.name}`}
       </button>
-      <p className="ed-reason">
-        −20 relations.
-        {target.nation !== house.nation
-          ? " Their crown gains a justified war reason against your realm."
-          : target.liege === house.id
-            ? " Your vassal also loses 15 opinion."
-            : ""}
-      </p>
+      <div className="ed-effects"><EffectBadge metric="relations" amount={-20} />{target.liege === house.id && <EffectBadge metric="opinion" amount={ruler(target)?.traits?.includes("proud") ? -20 : -15} label="vassal opinion" />}</div>
+      {target.nation !== house.nation && <p className="ed-reason">Their crown gains a justified war reason against your realm.</p>}
       {!!received.length && target.nation !== house.nation && (
         <p className="ed-reason">
           {Array.from(

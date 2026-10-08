@@ -4,6 +4,9 @@ import type { FeedbackKind, Lobby } from "../../../games/party/types.ts";
 
 const EVENT_SOUNDS: Partial<Record<FeedbackKind, SoundId>> = {
   HEAL: "heal",
+  CLEANSED: "heal",
+  SHOP_PURCHASE: "item",
+  ZERO_REWARD: "result",
   DAMAGE: "damage",
   HIT: "damage",
   KO: "ko",
@@ -62,6 +65,8 @@ export function usePartyAudio(
   const mood = moodFor(lobby);
   useEffect(() => partyAudio.setMusic(mood), [mood]);
   const match = lobby?.match ?? null;
+  const pulseStart = lobby?.match?.phase === "MINIGAME" && lobby.match.minigame?.minigameId === "rhythm-rush" ? lobby.match.minigame.startedAt : null;
+  useEffect(() => { partyAudio.setRhythm(pulseStart === null ? null : pulseStart - (serverOffset.current ?? 0)); return () => partyAudio.setRhythm(null); }, [pulseStart, serverOffset]);
   const seen = useRef<number | null>(null),
     phase = useRef<string | null>(null),
     wallet = useRef<{ coins: number; plutos: number } | null>(null);
@@ -106,7 +111,7 @@ export function usePartyAudio(
   }, [coins, plutos]);
   // 3-2-1 before a minigame or duel starts, timed on the server clock.
   const startsAt =
-    (currentPhase === "MINIGAME_INTRO" || currentPhase === "DUEL_INTRO") && match?.minigame
+    (currentPhase === "MINIGAME_INTRO" || currentPhase === "DUEL_INTRO") && match?.minigame && !match.minigame.awaitingReady
       ? match.minigame.startedAt
       : null;
   useEffect(() => {

@@ -1,31 +1,21 @@
+import { DEFAULT_SETTINGS, advance, applyAction } from "./helpers/party-legacy-fixtures.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
-import {
-  DEFAULT_SETTINGS,
-  MAX_INVENTORY_SIZE,
-  RULES,
-} from "../src/games/party/config.ts";
+import { MAX_INVENTORY_SIZE,
+  RULES } from "../src/games/party/config.ts";
 import { tropical } from "../src/games/party/content/maps.ts";
-import {
-  activePlayer,
-  advance,
-  applyAction,
+import { activePlayer,
   createMatch,
   createPlayer,
-  rollDie,
-} from "../src/games/party/engine/engine.ts";
-import {
-  clampHp,
+  rollDie } from "../src/games/party/engine/engine.ts";
+import { clampHp,
   damagePlayer,
   healPlayer,
-  isKnockedOut,
-} from "../src/games/party/engine/combat.ts";
+  isKnockedOut } from "../src/games/party/engine/combat.ts";
 import { graphDistances } from "../src/games/party/engine/graph.ts";
 import { botAction } from "../src/games/party/engine/bots.ts";
-import {
-  createItemInstance,
-  grantItem,
-} from "../src/games/party/items/inventory.ts";
+import { createItemInstance,
+  grantItem } from "../src/games/party/items/inventory.ts";
 import { rollBonus } from "../src/games/party/items/dice.ts";
 import { itemRegistry } from "../src/games/party/items/registry.ts";
 import { parseMessage } from "../src/games/party/network/protocol.ts";
@@ -146,6 +136,7 @@ test("a player KO'd on someone else's turn still gets their own turn", () => {
       () => 0,
     );
     s = advance(s, settings, () => 0);
+    s = applyAction(s, activePlayer(s).id, { type: "ZERO_REWARD", reward: "coins" }, settings, () => 0);
     s = advance(s, settings, () => 0);
   }
   assert.deepEqual(seen, ["p0", "p1", "p2", "p3"]);

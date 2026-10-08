@@ -36,7 +36,7 @@ const planetSpots: Record<string, [x: number, y: number, depth: number]> = {
   "/games/natura": [33, 82, 0.8],
   "/games/eat-it": [66, 83, 1.05],
 };
-const sideSpots: [number, number, number][] = [[20, 30, 1.1], [80, 28, 0.8], [72, 80, 1.2]];
+const sideSpots: [number, number, number][] = [[18, 30, 1.1], [82, 28, 0.8], [72, 80, 1.2], [26, 80, 0.9], [90, 56, 1.4]];
 /** Every tool flies past, so the tiles are spread around the stage clear of the title above and the arrival in the middle. */
 const toolSpots: [number, number, number][] = [
   [10, 26, 1.2], [28, 18, 0.9], [72, 18, 0.9], [90, 26, 1.2],

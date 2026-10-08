@@ -22,6 +22,7 @@ import {
   BIOMES,
   NATIONS,
   RESOURCES,
+  WORLD_HEX_COUNT,
   findPath,
   hexDistance,
   makeWorld,
@@ -81,6 +82,10 @@ import {
   queueAttack,
   resolveReaction,
 } from "./turns.ts";
+import { advanceRealm, campaignRound, councilSkill, event, growDynasties, initializeStrategy, ruler, season, succeed, successionPreview } from "./realm.ts";
+import { feedArmy, realmNation, updateIntelligence } from "./logistics.ts";
+import { advanceStrategy, objectiveFor, strategyCommand, truce, validatePeace, warScore } from "./campaignStrategy.ts";
+import { validateStrategySave } from "./strategySave.ts";
 
 export function createCampaign(
   nationId = "auremarch",
@@ -255,6 +260,8 @@ export function createCampaign(
       .reasons.push("Human commander");
   establishEstates(s, true);
   initializeTurns(s, nationId);
+  initializeStrategy(s);
+  updateIntelligence(s);
   return s;
 }
 export function random(s: Campaign) {
@@ -272,6 +279,10 @@ export function canControl(s: Campaign, actor: Actor, a: Army) {
   );
 }
 export function heir(_s: Campaign, h: House) {
+  if (_s.strategyRules) {
+    const preview = successionPreview(_s, h);
+    return preview.recognized ? preview.next : undefined;
+  }
   const n = NATIONS.find((n) => n.id === h.nation)!;
   const candidates = h.family
     .filter(
@@ -310,7 +321,7 @@ export function loadSave(raw: string): Campaign {
   )
     throw Error("Not a supported Edravane v2 single-player save");
   if (
-    ![241, 301].includes(s.districts.length) ||
+    ![241, 301, WORLD_HEX_COUNT].includes(s.districts.length) ||
     !s.houses.every(
       (h) => h.family?.length && h.stock && Number.isFinite(h.treasury),
     ) ||
@@ -423,7 +434,7 @@ export function loadSave(raw: string): Campaign {
         (r) =>
           r &&
           typeof r.id === "string" &&
-          ["war", "peace", "marriage", "attack"].includes(r.kind) &&
+          ["war", "peace", "marriage", "attack", "surrender"].includes(r.kind) &&
           s.houses.some((h) => h.id === r.from) &&
           s.houses.some((h) => h.id === r.to) &&
           Number.isFinite(r.created) &&
@@ -491,6 +502,8 @@ export function loadSave(raw: string): Campaign {
         )),
     "Invalid insult history",
   );
+  validateStrategySave(s);
+  initializeStrategy(s);
   return s;
 }
 function need(condition: unknown, message: string): asserts condition {
@@ -527,8 +540,14 @@ function declareWar(
   );
   const key = [h.nation, nation].sort().join("|");
   need(!s.wars.includes(key), "Already at war");
+  const treaty = truce(s, h.nation, nation);
+  need(!treaty, `A truce protects this realm through round ${treaty?.until}`);
   const reason = recordWar(s, h, nation, requested, hex);
   s.wars.push(key);
+  if (s.strategyRules) {
+    (s.conflicts ??= []).push({ id: `war-${++s.serial}`, from: h.nation, to: nation, reason, objective: objectiveFor(s, h, nation, reason, hex), started: campaignRound(s) });
+    event(s, { kind: "diplomacy", house: h.id, other: s.titles.find((t) => t.nation === nation)!.holder, hex, title: "War declared", detail: `${h.name}: ${WAR_REASONS[reason]}. The war objective determines what to demand at peace.` });
+  }
   if (s.turns)
     addReaction(s, {
       kind: "war",
@@ -545,6 +564,7 @@ export function applyCommand(
 ): Campaign {
   const s = structuredClone(current);
   const h = ownHouse(s, actor);
+  initializeStrategy(s);
   need(cmd && typeof cmd.type === "string", "Invalid command");
   const battleTypes = [
     "stand",
@@ -559,6 +579,10 @@ export function applyCommand(
     "Campaign frozen by queued battle encounters",
   );
   authorizeTurn(s, actor, cmd);
+  if (strategyCommand(s, h, cmd)) {
+    while (s.battles[0] && !hasHumanParticipant(s, s.battles[0])) autoResolve(s, s.battles[0]);
+    completeTurn(s); updateIntelligence(s); return s;
+  }
   switch (cmd.type) {
     case "endTurn": {
       need(s.turns, "Turn-based campaign required");
@@ -579,7 +603,9 @@ export function applyCommand(
         s.wars.includes([h.nation, cmd.nation].sort().join("|")),
         "Already at peace",
       );
-      addReaction(s, { kind: "peace", from: h.id, to: target.holder });
+      const recipient = s.houses.find((v) => v.id === target.holder)!;
+      validatePeace(s, h, recipient, cmd.terms);
+      addReaction(s, { kind: "peace", from: h.id, to: target.holder, terms: cmd.terms });
       s.log.unshift(`${h.name} proposes peace with ${cmd.nation}.`);
       break;
     }
@@ -656,6 +682,7 @@ export function applyCommand(
         troops: splitTroops(reserve, cmd.count),
         wounded: {},
         path: [],
+        provisions: h.nation === "varnesk" ? 4 : 3,
       };
       s.armies.push(a);
       s.log.unshift(
@@ -696,14 +723,15 @@ export function applyCommand(
         (target.relations[h.id] ?? 0) - 20,
       );
       if (target.liege === h.id) {
-        target.opinion = Math.max(0, target.opinion - 15);
+        target.opinion = Math.max(0, target.opinion - (ruler(target)?.traits?.includes("proud") ? 20 : 15));
         target.loyalty = Math.round(
           target.opinion * 0.55 + target.legitimacy * 0.45,
         );
       }
       s.log.unshift(
-        `${h.name} publicly insults House ${target.name}: −20 relations. ${target.nation !== h.nation ? "Their crown may answer with a justified war." : target.liege === h.id ? "Insulting a sworn vassal costs 15 opinion." : "No foreign war reason within your realm."}`,
+        `${h.name} publicly insults House ${target.name}: −20 relations. ${target.nation !== h.nation ? "Their crown may answer with a justified war." : target.liege === h.id ? `Insulting this sworn vassal costs ${ruler(target)?.traits?.includes("proud") ? 20 : 15} opinion.` : "No foreign war reason within your realm."}`,
       );
+      event(s, { kind: "diplomacy", house: h.id, other: target.id, title: "A public insult", detail: `${h.name} insults ${target.name}. Relations fall; proud vassals resent the slight more deeply.` });
       break;
     }
     case "blockade": {
@@ -713,6 +741,7 @@ export function applyCommand(
         "At least one field troop must be stationed to block trade",
       );
       need(typeof cmd.enabled === "boolean", "Invalid blockade order");
+      need(!s.sieges?.some((siege) => siege.army === a.id), "Use Lift siege to release this castle's approaches");
       a.blockading = cmd.enabled;
       a.path = [];
       s.log.unshift(
@@ -723,6 +752,7 @@ export function applyCommand(
     case "attack": {
       const a = authority(s, actor, cmd.army),
         d = s.districts.find((d) => d.id === cmd.hex);
+      need(!s.sieges?.some((siege) => siege.army === a.id), "Lift this host's siege before attacking another field");
       need(
         !a.garrison && !a.voyage && troopCount(a) >= 1,
         "Raise and select a field army to attack",
@@ -773,6 +803,7 @@ export function applyCommand(
     }
     case "move": {
       const a = authority(s, actor, cmd.army);
+      need(!s.sieges?.some((siege) => siege.army === a.id), "Lift this host's siege before marching");
       need(!a.garrison, "Raise a mobile army from the seat first");
       need(!a.voyage, "Army is already at sea");
       const path = findPath(s.districts, a.hex, cmd.hex);
@@ -786,6 +817,7 @@ export function applyCommand(
     }
     case "embark": {
       const a = authority(s, actor, cmd.army);
+      need(!s.sieges?.some((siege) => siege.army === a.id), "Lift this host's siege before sailing");
       need(!a.garrison, "Raise a mobile army from the seat first");
       need(!a.voyage, "Army is already at sea");
       const from = s.districts.find((d) => d.id === a.hex),
@@ -820,31 +852,49 @@ export function applyCommand(
       break;
     }
     case "objective": {
-      const a = s.armies.find((a) => a.id === cmd.army);
+      let a = s.armies.find((a) => a.id === cmd.army);
       need(
-        a && a.house !== h.id && !a.rebel,
+        a && a.house !== h.id && !a.rebel && !a.pledgedTo && !canControl(s, actor, a),
         "Choose an independent friendly commander",
       );
-      const v = s.houses.find((v) => v.id === a.house)!;
+      const v = s.houses.find((v) => v.id === a!.house)!;
       need(
-        v.liege === h.id || (h.relations[v.id] ?? 0) >= 20,
+        !v.rebellion && (v.liege === h.id || (h.relations[v.id] ?? 0) >= 20),
         "No diplomatic command relationship",
       );
       need(
         s.districts.some((d) => d.id === cmd.hex && d.owner),
         "Invalid objective",
       );
+      if (v.loyalty < 55) {
+        v.summons = "Commander declined: low loyalty";
+        s.log.unshift(`${v.name} declined your requested objective: loyalty below 55.`);
+        break;
+      }
+      if (a.garrison) {
+        need(v.liege === h.id, "Only your vassals can raise a host on request");
+        const mobile = s.armies.find((army) => army.house === v.id && !army.garrison && !army.pledgedTo && !army.rebel && !army.voyage && !s.sieges?.some((siege) => siege.army === army.id));
+        if (mobile) a = mobile;
+        else {
+          need(!s.districts.find((d) => d.id === a!.hex)?.occupation, "Vassal seat is occupied");
+          need(s.armies.filter((army) => army.house === v.id && !army.garrison && !army.pledgedTo).length < 3, "Vassal already has three field hosts");
+          const count = Math.floor(Math.min(1000, v.obligation, troopCount(a) - 500));
+          need(count >= 100, "Vassal needs at least 100 available troops beyond 500 castle guards");
+          const coins = Math.ceil(count * .1), food = Math.ceil(count * .04);
+          need(v.treasury >= coins && v.stock.grain >= food, "Vassal lacks coins or food to raise a host");
+          v.treasury -= coins; v.stock.grain -= food;
+          a = { ...structuredClone(a), id: `host-${++s.serial}`, name: `${v.name} Vassal Host`, garrison: false, troops: splitTroops(a, count), wounded: {}, path: [], provisions: v.nation === "varnesk" ? 4 : 3 };
+          s.armies.push(a);
+          s.log.unshift(`${v.name} raised ${count} troops under its own commander for ${coins} coins and ${food} food.`);
+        }
+      }
+      need(!a.voyage && !s.sieges?.some((siege) => siege.army === a!.id), "Commander is at sea or committed to a siege");
       const path = findPath(s.districts, a.hex, cmd.hex);
-      need(path.length, "No land route");
-      need(
-        !a.garrison,
-        "Request a mobile commander, or summon a seat contingent",
-      );
+      need(a.hex === cmd.hex || path.length, "No land route");
       a.objective = cmd.hex;
-      if (v.loyalty >= 55) {
-        a.path = path;
-        v.summons = "Commander accepted requested objective";
-      } else v.summons = "Commander declined: low loyalty";
+      a.path = path;
+      v.summons = "Commander accepted requested objective";
+      s.log.unshift(`${v.name} accepted your request to ${a.hex === cmd.hex ? "hold" : "march to"} ${s.districts.find((d) => d.id === cmd.hex)!.name}; its host remains independent.`);
       break;
     }
     case "summon": {
@@ -858,11 +908,12 @@ export function applyCommand(
         ),
         "Already pledged",
       );
-      if (v.loyalty < 40) {
+      const summonLoyalty = v.loyalty + (ruler(v)?.traits?.includes("loyal") ? 5 : 0);
+      if (summonLoyalty < 40) {
         v.summons = "Refused: claimant sympathy and weak legitimacy";
         s.log.unshift(`${v.name} refused the royal summons.`);
       } else {
-        const delayed = v.loyalty < 60,
+        const delayed = summonLoyalty < 60,
           count = Math.min(
             Math.max(0, troopCount(a) - 500),
             Math.floor(v.obligation * (delayed ? 0.5 : 1)),
@@ -878,6 +929,7 @@ export function applyCommand(
         contingent.delay = delayed ? 3 : 0;
         contingent.path = [];
         contingent.garrison = false;
+        contingent.provisions = v.nation === "varnesk" ? 4 : 3;
         let remaining = count;
         const total = troopCount(a);
         const kinds = Object.keys(a.troops) as UnitKind[];
@@ -970,7 +1022,9 @@ export function applyCommand(
         b = v.family.find(
           (p) => p.alive && !p.spouse && p.age >= 18 && p.id !== v.ruler,
         );
-      need(a && b, "No unmarried adult heirs");
+      const first = cmd.people ? h.family.find((p) => p.id === cmd.people![0]) : a;
+      const second = cmd.people ? v.family.find((p) => p.id === cmd.people![1]) : b;
+      need(first && second && first.alive && second.alive && !first.spouse && !second.spouse && first.age >= 18 && second.age >= 18 && first.id !== h.ruler && second.id !== v.ruler && !first.imprisonedBy && !second.imprisonedBy && !first.parents.includes(second.id) && !second.parents.includes(first.id) && !first.parents.some((parent) => second.parents.includes(parent)), "No unrelated unmarried adult heirs");
       need(
         !s.turns || !s.wars.includes([h.nation, v.nation].sort().join("|")),
         "Make peace before proposing marriage",
@@ -980,23 +1034,26 @@ export function applyCommand(
         addReaction(s, {
           kind: "marriage",
           from: h.id,
-          to: v.id,
-          people: [a.id, b.id],
+          to: v.liege ?? v.id,
+          partnerHouse: v.id,
+          people: [first.id, second.id],
         });
         s.log.unshift(
           `${h.name} proposed a marriage pact to ${v.name}. Awaiting consent.`,
         );
         break;
       }
-      a.spouse = b.id;
-      b.spouse = a.id;
-      h.relations[v.id] = (h.relations[v.id] ?? 0) + 25;
-      v.relations[h.id] = (v.relations[h.id] ?? 0) + 25;
+      first.spouse = second.id;
+      second.spouse = first.id;
+      const marriageBonus = h.nation === "ilyr-coast" || v.nation === "ilyr-coast" ? 35 : 25;
+      h.relations[v.id] = (h.relations[v.id] ?? 0) + marriageBonus;
+      v.relations[h.id] = (v.relations[h.id] ?? 0) + marriageBonus;
       v.opinion = Math.min(100, v.opinion + 12);
-      s.log.unshift(`${a.name} married ${b.name}: +25 relationship.`);
+      s.log.unshift(`${first.name} married ${second.name}: +${marriageBonus} relationship.`);
       break;
     }
     case "succession": {
+      if (s.strategyRules) { succeed(s, h); break; }
       const next = heir(s, h);
       need(
         next,
@@ -1420,6 +1477,7 @@ export function applyCommand(
     autoResolve(s, s.battles[0]);
   completeTurn(s);
   s.log = s.log.slice(0, 70);
+  updateIntelligence(s);
   return s;
 }
 export function advanceCampaign(
@@ -1434,16 +1492,19 @@ export function advanceCampaign(
   )
     return s;
   s.tick++;
+  advanceRealm(s, actingNation);
   for (const h of s.houses) {
     const fields = s.districts.filter((d) => d.owner === h.id && !d.occupation);
     for (const d of fields)
       h.stock[d.resource] = Math.min(999, h.stock[d.resource] + production(d));
+    if (s.strategyRules && season(s) === "Winter") h.stock.grain = Math.max(0, h.stock.grain - fields.filter((d) => d.farm).length);
     const mouths = fields.length * 0.7;
     h.stock.grain = Math.max(0, h.stock.grain - mouths);
     h.stock.livestock = Math.max(0, h.stock.livestock - fields.length * 0.1);
     h.treasury +=
       fields.length * 1.1 +
       fields.reduce((n, d) => n + (d.city === "major" ? 4 : d.city ? 2 : 0), 0);
+    if (s.strategyRules && h.role === "crown") h.treasury += Math.max(0, councilSkill(s, h, "stewardship") - 8) * 0.1;
     if (
       !h.reasons.includes("Human commander") &&
       s.tick % HARVEST_COOLDOWN === 0
@@ -1460,7 +1521,7 @@ export function advanceCampaign(
     }
     h.loyalty = Math.round(h.opinion * 0.55 + h.legitimacy * 0.45);
     h.reasons = h.reasons.filter(
-      (r) => r === "Human commander" || r.startsWith("Royal concession"),
+      (r) => r === "Human commander" || r.startsWith("Royal concession") || r.startsWith("Agreed concession"),
     );
     h.reasons.push(
       `Personal opinion ${h.opinion}/100 (55%)`,
@@ -1513,6 +1574,7 @@ export function advanceCampaign(
       if (ruler.age >= 65 && random(s) < 0.3) {
         const next = heir(s, h);
         if (next) {
+          if (s.strategyRules) { succeed(s, h); continue; }
           ruler.alive = false;
           h.ruler = next.id;
           h.legitimacy -= 10;
@@ -1521,6 +1583,7 @@ export function advanceCampaign(
       }
     }
   }
+  growDynasties(s);
   for (const resource of RESOURCES) {
     const total = s.houses.reduce((n, h) => n + h.stock[resource], 0);
     s.prices[resource] =
@@ -1589,7 +1652,7 @@ export function advanceCampaign(
         route.resource === "luxury" &&
         seller.nation !== recipient.nation
           ? BALANCE.luxuryIncome
-          : 1);
+          : 1) * (s.strategyRules && route.maritime && seller.nation === "saltmere" && seller.id !== recipient.id ? 1.1 : 1);
     seller.stock[route.resource] -= cargo;
     recipient.stock[route.resource] = Math.min(
       999,
@@ -1603,6 +1666,7 @@ export function advanceCampaign(
   }
   for (const a of [...s.armies].sort((a, b) => a.id.localeCompare(b.id))) {
     if (s.battles.some((b) => b.armies.includes(a.id))) continue;
+    if (s.strategyRules && s.turns && realmNation(s, a) !== actingNation) continue;
     const h = s.houses.find((h) => h.id === a.house)!,
       d = s.districts.find((d) => d.id === a.hex)!;
     if (a.pledgedTo && a.serviceUntil <= s.tick) {
@@ -1624,9 +1688,8 @@ export function advanceCampaign(
     }
     const demand =
         (troopCount(a) + woundedCount(a)) * (a.garrison ? 0.0004 : 0.002),
-      available = Math.min(h.stock.grain, demand);
-    h.stock.grain -= available;
-    a.supply = demand ? available / demand : 1;
+      available = feedArmy(s, a, demand, actingNation);
+    a.supply = available;
     if (
       (!s.turns || h.nation === actingNation) &&
       a.supply >= 0.5 &&
@@ -1669,6 +1732,7 @@ export function advanceCampaign(
     if (d.biome === "tundra" || d.biome === "glacier")
       attr *= a.origin === "varnesk" ? BALANCE.winter : 1;
     if (a.supply < 0.5) attr += 0.02;
+    if (s.strategyRules && !a.garrison && season(s) === "Winter" && ["tundra", "mountains", "glacier"].includes(d.biome)) attr += a.origin === "varnesk" ? 0.005 : 0.015;
     for (const k of Object.keys(a.troops) as UnitKind[])
       a.troops[k] = Math.max(0, a.troops[k] - Math.floor(a.troops[k] * attr));
     const wages = troopCount(a) * (a.garrison ? 0.0002 : 0.001);
@@ -1712,7 +1776,7 @@ export function advanceCampaign(
           "Delayed contingent arrived; agreed campaign service active";
       continue;
     }
-    if (a.garrison) {
+    if (a.garrison || s.sieges?.some((siege) => siege.army === a.id)) {
       a.path = [];
       a.fatigue = Math.max(0, a.fatigue - 2);
       continue;
@@ -1832,6 +1896,8 @@ export function advanceCampaign(
   s.armies = s.armies.filter(
     (a) => a.garrison || troopCount(a) > 0 || woundedCount(a) > 0,
   );
+  advanceStrategy(s, actingNation);
+  updateIntelligence(s);
   // Deterministic bot commands use the same validated reducer as human commands.
   for (const h of s.houses.filter(
     (h) => !s.turns && !h.reasons.includes("Human commander") && !h.rebellion,
@@ -2038,9 +2104,12 @@ export function runAutomaticTurns(current: Campaign): Campaign {
   };
   if (
     !current.turns ||
-    !current.houses.some((h) => h.reasons.includes("Human commander"))
+    !current.houses.some((h) => h.reasons.includes("Human commander") && current.titles.some((t) => t.holder === h.id))
   )
     return current;
+  if (current.turns.pending.some((r) => r.kind === "attack" && !current.armies.some((a) => a.id === r.army && troopCount(a) > 0))) {
+    const pruned = structuredClone(current); completeTurn(pruned); return runAutomaticTurns(pruned);
+  }
   const awaiting = current.turns.pending[0]?.to ?? activeTurnHouse(current);
   if (
     !current.turns.ending &&
@@ -2083,6 +2152,14 @@ export function runAutomaticTurns(current: Campaign): Campaign {
           h.stock.grain > 30
             ? "decline"
             : "accept";
+        if (r.terms && r.terms.kind !== "white") {
+          const score = warScore(s, enemy.nation, h.nation);
+          choice = score >= (r.terms.kind === "claimant" ? 60 : r.terms.kind === "cede" || r.terms.kind === "tribute" ? 20 : 0) && (!r.terms.coins || h.treasury >= r.terms.coins) ? "accept" : "decline";
+        }
+      }
+      if (r.kind === "surrender") {
+        const siege = s.sieges?.find((v) => v.id === r.siege);
+        choice = siege && siege.food <= 1 ? "accept" : "decline";
       }
       if (r.kind === "attack") {
         const forces = defendingArmies(s, r),
@@ -2091,7 +2168,7 @@ export function runAutomaticTurns(current: Campaign): Campaign {
           forces.length &&
           troopCount(forces[0]) *
             (1 + castleBonus(s.districts.find((d) => d.id === r.hex)!)) >=
-            troopCount(attacker!) * 0.65
+            troopCount(attacker!) * (ruler(h)?.traits?.includes("cautious") ? 0.8 : ruler(h)?.traits?.includes("brave") ? 0.5 : 0.65)
             ? "defend"
             : "withdraw";
       }
@@ -2101,7 +2178,7 @@ export function runAutomaticTurns(current: Campaign): Campaign {
           { house: r.to },
           { type: "respond", reaction: r.id, choice },
         );
-      } catch {
+      } catch (error) {
         if (r.kind === "attack" && choice === "withdraw")
           s = applyCommand(
             s,
@@ -2114,7 +2191,9 @@ export function runAutomaticTurns(current: Campaign): Campaign {
             { house: r.to },
             { type: "respond", reaction: r.id, choice: "decline" },
           );
-        else throw Error("Automatic response could not resolve");
+        else if (r.kind === "peace" && choice === "accept")
+          s = applyCommand(s, { house: r.to }, { type: "respond", reaction: r.id, choice: "decline" });
+        else throw Error(`Automatic ${r.kind} response could not resolve: ${error instanceof Error ? error.message : String(error)}`);
       }
       continue;
     }
@@ -2125,6 +2204,13 @@ export function runAutomaticTurns(current: Campaign): Campaign {
     if (s.turns!.prepared !== stamp) {
       s.turns!.prepared = stamp;
       const commands: Command[] = [];
+      const demand = s.houses.find((v) => v.liege === h.id && v.loyalty < 60 && v.demand?.status === "open");
+      if (demand?.demand?.kind === "lower-taxes") commands.push({ type: "bargain", house: demand.id, offer: "lower-taxes" });
+      if (demand?.demand?.kind === "protect-trade" && h.treasury >= 80) commands.push({ type: "bargain", house: demand.id, offer: "protect-trade" });
+      if (demand?.demand?.kind === "council-seat") {
+        const office = (["marshal", "steward", "chancellor", "spymaster"] as const).find((o) => !s.houses.some((v) => v.liege === h.id && v.contract?.office === o));
+        if (office) commands.push({ type: "bargain", house: demand.id, offer: "council-seat", office });
+      }
       const provoker = NATIONS.find(
         (n) => n.id !== h.nation && insultGrievances(s, h, n.id).length,
       );
@@ -2145,7 +2231,7 @@ export function runAutomaticTurns(current: Campaign): Campaign {
           commands.push({ type: "muster", army: reserve.id, count: 1000 });
       } else if (provoker) {
         commands.push({ type: "war", nation: provoker.id, reason: "insult" });
-      } else if (s.turns!.round >= 4 && s.turns!.round % 4 === 0) {
+      } else if (s.turns!.round >= 4 && s.turns!.round % (ruler(h)?.traits?.includes("ambitious") ? 3 : 4) === 0 && (!ruler(h)?.traits?.includes("cautious") || h.stock.grain >= 80)) {
         const foreign = NATIONS.find((n) => conquestTargets(s, h, n.id).length);
         if (foreign)
           commands.push({
@@ -2158,6 +2244,8 @@ export function runAutomaticTurns(current: Campaign): Campaign {
         (a) => a.house === h.id && !a.garrison && !a.path.length && !a.voyage,
       );
       if (mobile) {
+        const siege = s.sieges?.find((v) => v.army === mobile.id);
+        if (siege && siege.engines && siege.food > 1) commands.push({ type: "siege", army: mobile.id, hex: siege.hex, stance: "assault" });
         const occupied = s.districts.find(
           (d) =>
             d.id === mobile.hex &&
@@ -2180,8 +2268,11 @@ export function runAutomaticTurns(current: Campaign): Campaign {
               hexDistance(s.districts.find((d) => d.id === mobile.hex)!, a) -
               hexDistance(s.districts.find((d) => d.id === mobile.hex)!, b),
           )[0];
-        if (enemy && enemy.id !== mobile.hex)
-          commands.push({ type: "move", army: mobile.id, hex: enemy.id });
+        if (enemy && enemy.id !== mobile.hex && !siege) {
+          if (enemy.castle && hexDistance(s.districts.find((d) => d.id === mobile.hex)!, enemy) === 1)
+            commands.push({ type: "siege", army: mobile.id, hex: enemy.id, stance: "blockade" });
+          else commands.push({ type: "move", army: mobile.id, hex: enemy.id });
+        }
       }
       if (!s.routes.some((r) => r.house === h.id)) {
         const from = s.districts.find((d) => d.owner === h.id),
@@ -2219,7 +2310,7 @@ export function runAutomaticTurns(current: Campaign): Campaign {
       if (s.turns!.pending.length) continue;
       // Newly mustered hosts receive an objective before committing the turn.
       for (const a of s.armies.filter(
-        (a) => a.house === h.id && !a.garrison && !a.path.length,
+        (a) => a.house === h.id && !a.garrison && !a.path.length && !s.sieges?.some((v) => v.army === a.id),
       )) {
         const target = s.districts.find(
           (d) =>

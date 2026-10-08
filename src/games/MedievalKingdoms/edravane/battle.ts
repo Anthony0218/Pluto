@@ -347,11 +347,18 @@ export function advanceBattle(s: Campaign, b: Battle, dt: number) {
   }
 }
 import { castleBonus } from "./estates.ts";
+import { event } from "./realm.ts";
 
 export function finishBattle(s: Campaign, b: Battle, winner?: string) {
   if (s.appliedResults.includes(b.id)) return;
   s.appliedResults.push(b.id);
   const winning = s.armies.find((a) => a.id === winner);
+  if (winning) {
+    const h = s.houses.find((h) => h.id === winning.house)!;
+    h.prestige = Math.min(1000, (h.prestige ?? 0) + 10);
+    if (h.nation === "graskor") h.legitimacy = Math.min(100, h.legitimacy + 5);
+    event(s, { kind: "battle", house: h.id, hex: b.hex, title: `${winning.name} wins the field`, detail: `${h.name} gains 10 prestige${h.nation === "graskor" ? " and 5 assembly legitimacy" : ""}. Survivors and wounded return to the campaign.` });
+  }
   if (b.rounds) {
     s.battleReports ??= [];
     s.battleReports.unshift({

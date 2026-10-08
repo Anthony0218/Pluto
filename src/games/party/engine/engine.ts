@@ -1,4 +1,6 @@
-import { spawnPlutos } from "./economy.ts";
+import { buyShopItem } from "../items/shop.ts";
+import { readyMinigame, refreshBotReadiness } from "../minigames/flow.ts";
+import { rankedPlayers, spawnPlutos } from "./economy.ts";
 import { AIM_CONFIG, DUEL_FLOW, RULES } from "../config.ts";
 import { mapRegistry } from "../content/maps.ts";
 import { damagePlayer, findPlayer, healPlayer } from "./combat.ts";
@@ -102,7 +104,7 @@ export function createPlayer(
     name,
     avatarId,
     isBot,
-    difficulty: "medium",
+    difficulty: "hard",
     ready: isBot,
     connected: true,
     coins: RULES.coins,
@@ -126,7 +128,13 @@ export function createMatch(
   )
     throw new Error("Four unique players are required.");
   const map = mapRegistry.get(settings.mapId);
-  return {
+  const match: Match = {
+    mode: settings.mode ?? "board",
+    roundLimit: settings.roundLimit ?? 0,
+    selectedMinigameIds: settings.minigameIds ?? [],
+    playedMinigameIds: [],
+    festivalScores: Object.fromEntries(players.map((p) => [p.id, 0])),
+    boardEffects: [],
     mapId: map.id,
     phase: "START_ROLL",
     players: players.map((p) => ({
@@ -169,6 +177,8 @@ export function createMatch(
     winner: null,
     stats: Object.fromEntries(players.map((p) => [p.id, emptyStats()])),
   };
+  if (match.mode === "festival") { match.order = players.map((p) => p.id); beginMinigamePhase(match, random, Date.now()); }
+  return match;
 }
 export function activePlayer(state: Match): Player {
   return (
@@ -190,6 +200,10 @@ export function applyAction(
   random: Random,
   now: number = Date.now(),
 ): Match {
+  if (action.type === "MINIGAME_READY") return readyMinigame(current, playerId, random, now);
+  if (action.type === "BUY_ITEM") {
+    const state = structuredClone(current); buyShopItem(state, playerId, action.mystery, action.itemId, random); return state;
+  }
   // Minigame input comes from every participant at once and is validated by the minigame module.
   if (action.type === "MINIGAME_INPUT")
     return applyMinigameInput(current, playerId, action.input, now);
@@ -227,6 +241,11 @@ export function applyAction(
         now,
       );
     }
+  } else if (action.type === "ZERO_REWARD") {
+    if (state.phase !== "ZERO_BONUS") throw new Error("There is no zero-roll reward to choose.");
+    if (action.reward === "heal") healPlayer(state, playerId, 5); else findPlayer(state, playerId).coins += 2;
+    emit(state, { kind: "ZERO_REWARD", playerId, text: `${findPlayer(state, playerId).name} chose ${action.reward === "heal" ? "+5 HP" : "+2 coins"}` });
+    state.winner = detectWinner(state, settings); state.phase = state.winner ? "GAME_OVER" : "TURN_END";
   } else if (action.type === "ROLL_DICE") {
     if (state.phase !== "ITEM_PHASE")
       throw new Error(
@@ -371,8 +390,9 @@ function applyItemUse(
 ) {
   if (state.phase !== "ITEM_PHASE" || state.turn.hasRolled)
     throw new Error("Items can only be used before you roll the dice.");
-  const instance = findItem(state, playerId, action.itemInstanceId),
-    definition = itemRegistry.get(instance.itemId);
+  const instance = findItem(state, playerId, action.itemInstanceId);
+  if ((instance.usableFromRound ?? 0) > state.round) throw new Error(`This purchased item unlocks in round ${instance.usableFromRound}.`);
+  const definition = itemRegistry.get(instance.itemId);
   const map = mapOf(state);
   // Status effects such as Radiation lock the whole inventory; the server enforces it here.
   const lock = itemLockReason(findPlayer(state, playerId));
@@ -509,6 +529,23 @@ export function resolveTile(
 ) {
   const player = activePlayer(state),
     node = map.nodes.find((n) => n.id === player.currentNodeId)!;
+  if (map.cleansingNodeIds?.includes(node.id)) {
+    player.statusEffects = [];
+    healPlayer(state, player.id, 10);
+    emit(state, { kind: "CLEANSED", playerId: player.id, nodeId: node.id, text: `${player.name} cleansed all negative effects · +10 HP` });
+    return;
+  }
+  if (state.boardEffects?.some((effect) => effect.kind === "breeze" && effect.nodeIds.includes(node.id))) { player.coins += 2; emit(state, { kind: "EVENT", playerId: player.id, nodeId: node.id, amount: 2, text: `${player.name} collected jungle bounty · +2 coins` }); }
+  const treasure = state.boardEffects?.find((effect) => effect.kind === "treasure" && effect.nodeIds.includes(node.id));
+  if (treasure) { player.coins += 5; treasure.nodeIds = treasure.nodeIds.filter((id) => id !== node.id); emit(state, { kind: "EVENT", playerId: player.id, nodeId: node.id, amount: 5, text: `${player.name} found pirate treasure · +5 coins` }); }
+  if (state.boardEffects?.some((effect) => effect.kind === "sanctuary" && effect.nodeIds.includes(node.id))) healPlayer(state, player.id, 5);
+  const relic = state.boardEffects?.find((effect) => effect.kind === "relic" && effect.nodeIds.includes(node.id));
+  if (relic) {
+    relic.nodeIds = relic.nodeIds.filter((id) => id !== node.id);
+    grantItem(state, player.id, randomStandardItemId(random));
+    emit(state, { kind: "EVENT", playerId: player.id, nodeId: node.id, text: `${player.name} found a ruins relic · item cache collected` });
+    return;
+  }
   switch (node.type) {
     case "coin":
     case "boost":
@@ -583,6 +620,7 @@ export function detectWinner(
   settings: Settings,
   priority: readonly string[] = roundPriority(state),
 ): string | null {
+  if ((settings.roundLimit ?? 0) > 0 || state.mode === "festival") return null;
   return (
     priority
       .map((id) => state.players.find((p) => p.id === id)!)
@@ -597,6 +635,7 @@ export function detectWinner(
 // early returns inside `advance` (each returns `current` unchanged in exactly these situations).
 function isWaiting(state: Match, now: number): boolean {
   switch (state.phase) {
+    case "ZERO_BONUS":
     case "ITEM_PHASE":
     case "ITEM_REPLACE":
     case "PATH_SELECTION":
@@ -633,6 +672,7 @@ export function advance(
   now: number = Date.now(),
 ): Match {
   // Called every tick for every room: return early (without cloning the whole match) while nothing is due.
+  if ((current.phase === "MINIGAME_INTRO" || current.phase === "DUEL_INTRO") && current.minigame?.awaitingReady) return refreshBotReadiness(current, random, now);
   if (isWaiting(current, now)) return current;
   const state = structuredClone(current),
     map = mapOf(state);
@@ -641,7 +681,7 @@ export function advance(
       startRoll(state, map, random);
       break;
     case "DICE_ROLL":
-      state.phase = state.movesRemaining === 0 ? "TURN_END" : "MOVEMENT";
+      state.phase = state.movesRemaining === 0 ? "ZERO_BONUS" : "MOVEMENT";
       break;
     case "MOVEMENT": {
       const paths = legalPaths(state, map);
@@ -792,6 +832,15 @@ export function advance(
       if (state.winner) clearMinigame(state);
       break;
     case "ROUND_END": {
+      for (const effect of state.boardEffects ?? []) if (effect.kind === "eruption" && effect.expiresAfterRound <= state.round) {
+        for (const player of state.players) if (effect.nodeIds.includes(player.currentNodeId)) damagePlayer(state, map, player.id, 10);
+        emit(state, { kind: "EXPLOSION", nodeId: effect.nodeIds[0], text: "EMBER PEAK ERUPTS! MARKED SPACES DEAL 10 HP DAMAGE" });
+      }
+      if ((state.roundLimit ?? 0) > 0 && state.round >= state.roundLimit!) {
+        state.winner = state.mode === "festival" ? [...state.players].sort((a, b) => (state.festivalScores?.[b.id] ?? 0) - (state.festivalScores?.[a.id] ?? 0) || b.coins - a.coins || state.order.indexOf(a.id) - state.order.indexOf(b.id))[0].id : rankedPlayers(state, settings)[0].id;
+        clearMinigame(state); state.phase = "GAME_OVER"; log(state, "Final round complete!"); break;
+      }
+      state.boardEffects = state.boardEffects?.filter((effect) => effect.expiresAfterRound > state.round);
       const winnerId = state.minigame?.results?.[0]?.playerId;
       if (winnerId) state.order = nextRoundOrder(state.order, winnerId);
       clearMinigame(state);
@@ -806,7 +855,7 @@ export function advance(
       state.lastRoll = null;
       log(state, `Round ${state.round}. ${map.flavor.roundStart}`);
       log(state, `${activePlayer(state).name}’s turn.`);
-      beginTurn(state, map);
+      if (state.mode === "festival") beginMinigamePhase(state, random, now); else beginTurn(state, map);
       break;
     }
     default:

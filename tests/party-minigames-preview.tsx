@@ -6,39 +6,68 @@ import { CHARACTER_NAMES } from "../src/pages/games/Party/minigames/characterRos
 import { createRoot } from "react-dom/client";
 import { arrowMemory } from "../src/games/party/minigames/arrowMemory/index.ts";
 import { pickupArena } from "../src/games/party/minigames/pickupArena/index.ts";
-import PartyBoard from "../src/pages/games/Party/PartyBoard.tsx";
+import PartyMatch from "../src/pages/games/Party/PartyMatch.tsx";
+import type { PartyConnection } from "../src/games/party/network/usePartyConnection.ts";
 import { mapRegistry } from "../src/games/party/content/maps.ts";
+import { pirateTreasure, eruptionForecast, jungleBounty, calmWaters, coconutMarket, ruinsRelics } from "../src/games/party/events/definitions.ts";
 import type { ArenaState } from "../src/games/party/minigames/pickupArena/index.ts";
+import { minigameRegistry } from "../src/games/party/minigames/index.ts";
 import { minigameViews } from "../src/pages/games/Party/minigames/views.ts";
-import { createMatch, createPlayer } from "../src/games/party/engine/engine.ts";
+import { activePlayer, advance, applyAction, createMatch, createPlayer } from "../src/games/party/engine/engine.ts";
 import { COLORS, DEFAULT_SETTINGS } from "../src/games/party/config.ts";
 import { startDuelMinigame, startMinigame, applyMinigameInput, publicMinigameView, stepMinigameBots, simulateMinigame } from "../src/games/party/minigames/flow.ts";
-import type { Match, MinigameInput } from "../src/games/party/types.ts";
+import type { ClientMessage, Match, MinigameInput } from "../src/games/party/types.ts";
 import "../src/pages/games/Party/party.css";
+import type { FieldKind } from "../src/games/party/board/fieldDesign.ts";
+
+function beginPreviewMinigame(match: Match, id: string, random: () => number, duel: boolean) {
+  const startedAt = Date.now() - 7000;
+  if (duel) startDuelMinigame(match, id, ["p0", "p1"], random, startedAt);
+  else startMinigame(match, id, random, startedAt);
+}
 
 export function Playground() {
   const live = useRef<Match | null>(null), [snapshot, setSnapshot] = useState<Match | null>(null);
   const [error, setError] = useState("");
+  const inputDelay = useRef(0);
+  const performanceLabel = useRef<HTMLOutputElement>(null);
+  useEffect(() => {
+    let frame = 0, previous = 0;
+    const gaps: number[] = [];
+    const sample = (time: number) => {
+      if (previous) gaps.push(time - previous);
+      previous = time;
+      if (gaps.length >= 120) {
+        const sorted = [...gaps].sort((a, b) => a - b);
+        if (performanceLabel.current) performanceLabel.current.textContent = `Frame cadence: ${Math.round(1000 / sorted[60])} fps · p95 ${sorted[114].toFixed(1)} ms`;
+        gaps.length = 0;
+      }
+      frame = requestAnimationFrame(sample);
+    };
+    frame = requestAnimationFrame(sample);
+    return () => cancelAnimationFrame(frame);
+  }, []);
   const [showCast, setShowCast] = useState(false);
   const [boardMap, setBoardMap] = useState<string | null>(null);
   const [boardMatch, setBoardMatch] = useState<Match | null>(null);
-  const rng = useRef(() => Math.random());
+  const [viewer, setViewer] = useState("p0"), boardOffset = useRef<number | null>(0);
+  const rng = useRef(Math.random);
   const publish = useCallback(() => {
     const m = live.current; if (!m?.minigame) return;
     setSnapshot({ ...m, minigame: publicMinigameView(m.minigame, Date.now(), undefined, "p0") });
   }, []);
   const start = (id: string, map: number, practice = false) => {
     setShowCast(false);
-    setBoardMap(null);
+    setBoardMap(null); setBoardMatch(null);
     let seed = 19;
     rng.current = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296; };
     const players = ["You", "Nova", "Orion", "Luna"].map((name, i) => ({ ...createPlayer(`p${i}`, name, i), isBot: !practice && i > 0 }));
     const m = createMatch(players, DEFAULT_SETTINGS, rng.current); m.order = players.map((p) => p.id);
     let first = true;
     const random = () => { if (first) { first = false; return map; } return rng.current(); };
-    if (id === "street-cross") startDuelMinigame(m, id, ["p0", "p1"], random, Date.now() - 7000);
-    else startMinigame(m, id, random, Date.now() - 7000);
-    m.minigame!.status = "ACTIVE"; m.phase = id === "street-cross" ? "DUEL_MINIGAME" : "MINIGAME";
+    const duel = minigameRegistry.get(id).gameType === "duel";
+    beginPreviewMinigame(m, id, random, duel);
+    m.minigame!.status = "ACTIVE"; m.phase = duel ? "DUEL_MINIGAME" : "MINIGAME";
     if (practice) {
       const s = m.minigame!.state as ArenaState;
       Object.assign(s.players.p0, { x: 0, y: 0, z: 0, yaw: 0, hp: 72, weapon: "desert-eagle", ammo: 7, protectedUntil: 0 });
@@ -61,22 +90,54 @@ export function Playground() {
     return () => clearInterval(timer);
   }, [publish]);
   const sendInput = useCallback((input: MinigameInput) => {
-    if (!live.current) return;
-    try { live.current = applyMinigameInput(live.current, "p0", input, Date.now()); setError(""); publish(); }
-    catch (e) { setError(e instanceof Error ? e.message : "Input rejected"); }
+    const game = live.current?.minigame;
+    const deliver = () => {
+      if (!live.current || live.current.minigame?.startedAt !== game?.startedAt) return;
+      try { live.current = applyMinigameInput(live.current, "p0", input, Date.now()); setError(""); publish(); }
+      catch (e) { setError(e instanceof Error ? e.message : "Input rejected"); }
+    };
+    if (inputDelay.current) setTimeout(deliver, inputDelay.current);
+    else deliver();
   }, [publish]);
   const View = snapshot?.minigame && minigameViews[snapshot.minigame.minigameId];
   const previewBoard = (mapId: string) => {
     live.current = null; setSnapshot(null); setShowCast(false); setBoardMap(mapId);
     const players = ["You", "Nova", "Orion", "Luna"].map((name, i) => createPlayer("p" + i, name, i));
     const m = createMatch(players, { ...DEFAULT_SETTINGS, mapId }, rng.current);
+    m.order = players.map((p) => p.id); m.phase = "ITEM_PHASE"; m.round = 1; m.turnIndex = 0; setViewer("p0");
     players.forEach((_, i) => { m.players[i].currentNodeId = mapRegistry.get(mapId).nodes[i * 13].id; }); setBoardMatch(m);
   };
+  const boardSend = (message: ClientMessage) => {
+    if (!boardMatch || message.type !== "ACTION") return;
+    try { setBoardMatch(applyAction(boardMatch, viewer, message.action, DEFAULT_SETTINGS, () => .55, Date.now())); setError(""); }
+    catch (e) { setError(e instanceof Error ? e.message : "Input rejected"); }
+  };
+  const landingPreview = (kind: FieldKind) => {
+    if (!boardMatch) return;
+    const m = structuredClone(boardMatch), map = mapRegistry.get(m.mapId);
+    const node = kind === "cleanse" ? map.nodes.find((n) => map.cleansingNodeIds?.includes(n.id)) : map.nodes.find((n) => n.type === kind && !map.cleansingNodeIds?.includes(n.id));
+    if (!node) return;
+    m.phase = "RESOLVE_TILE"; m.turnIndex = 0; m.movesRemaining = 0; m.lastRoll = 1; m.bank = 13; m.properties = []; m.boardEffects = []; m.pendingItem = null;
+    m.players[0].currentNodeId = node.id; m.players[0].hp = 18; m.players[0].coins = 20;
+    m.players[0].inventory = [];
+    m.players[0].statusEffects = kind === "cleanse" ? [{ id: "radiation", remainingTurns: 3 }] : [];
+    m.plutoNodeIds = m.plutoNodeIds.filter((id) => id !== node.id);
+    setViewer("p0"); setBoardMatch(m);
+    setTimeout(() => setBoardMatch(advance(m, DEFAULT_SETTINGS, () => .55, Date.now() + 1000)), 600);
+  };
+  useEffect(() => {
+    if (boardMatch?.phase !== "DICE_ROLL") return;
+    const timer = setTimeout(() => setBoardMatch((m) => m && advance(m, DEFAULT_SETTINGS, () => .55, Date.now())), 700);
+    return () => clearTimeout(timer);
+  }, [boardMatch]);
+  const boardLobby = { code: "TEST", name: "Board preview", public: false, hostId: "p0", settings: DEFAULT_SETTINGS, players: boardMatch?.players ?? [], match: boardMatch };
+  const boardConnection: PartyConnection = { status: "online", playerId: viewer, lobby: boardLobby, lobbies: [], lobbiesLoaded: true, error: "", errorCode: null, pending: null, sessionEpoch: 0, reconnectGraceMs: 60000, serverOffset: boardOffset, send: boardSend, retry: () => {}, clearError: () => setError("") };
   return <main className={"pp-page" + (boardMap || snapshot ? " pp-immersive" : "")} style={{ minHeight: "100vh", padding: boardMap || snapshot ? 0 : 24, background: "#071321" }}>
     <details style={{ position: "absolute", top: 8, left: 8, zIndex: 60, color: "#fff", background: "#071321de", borderRadius: 10, padding: 8 }}><summary>Preview games</summary>
     <nav style={{ display: "flex", gap: "8px", flexWrap: "wrap", maxWidth: 570, color: "#fff" }}>
       <button style={{ color: "#fff" }} onClick={() => previewBoard("sunspill")}>Sunspill board</button>
       <button style={{ color: "#fff" }} onClick={() => previewBoard("mountain")}>Mountain board</button>
+      {["tide-treasure", "comet-courier", "rope-rescue", "paddle-doubles"].map((id) => <button key={id} style={{ color: "#fff" }} onClick={() => start(id, 0)}>{minigameRegistry.get(id).name}</button>)}
       <button style={{ color: "#fff" }} onClick={() => start("pattern-wall", 0)}>Echo Wall</button>
       <button style={{ color: "#fff" }} onClick={() => start("trail-run", 0)}>Triple Trail</button>
       <button style={{ color: "#fff" }} onClick={() => start("rhythm-rush", 0)}>Pluto Pulse</button>
@@ -89,10 +150,19 @@ export function Playground() {
       <button style={{ color: "#fff" }} onClick={() => start(pickupArena.id, 0.99, true)}>Weapon practice</button>
       <button style={{ color: "#fff" }} onClick={() => start(pickupArena.id, 0, true)}>Arcade tour</button>
       <button style={{ color: "#fff" }} onClick={() => start("street-cross", 0)}>Street Cross duel</button>
+      <button style={{ color: "#fff" }} onClick={() => start("paddle-panic", 0)}>Paddle Panic duel</button>
+      <button style={{ color: "#fff" }} onClick={() => start("target-panic", 0)}>Target Panic practice</button>
       <button style={{ color: "#fff" }} onClick={() => { live.current = null; setSnapshot(null); setBoardMap(null); setShowCast(true); }}>Character cast</button>
-    </nav></details>
+      {boardMatch && <>
+        {(["coin", "item", "rare", "heal", "hazard", "event", "deposit", "bank", "cleanse", "warp"] as const).map((kind) => <button key={kind} onClick={() => landingPreview(kind)}>Land on {kind}</button>)}
+        <button onClick={() => { const m = structuredClone(boardMatch); const map = mapRegistry.get(m.mapId); m.turnIndex = 0; m.phase = "PATH_SELECTION"; m.movesRemaining = 2; m.lastRoll = 2; m.players[0].currentNodeId = map.nodes.find((n) => n.connections.length >= 3)!.id; m.players[0].previousNodeId = null; setViewer("p0"); setBoardMatch(m); }}>Branch choices</button>
+        {boardMatch.mapId === "sunspill" && <button onClick={() => { const m = structuredClone(boardMatch); m.boardEffects = []; const map = mapRegistry.get(m.mapId); for (const event of [pirateTreasure, eruptionForecast, jungleBounty, calmWaters, coconutMarket, ruinsRelics]) event.execute(m, { map, random: rng.current, playerId: "p0" }); setBoardMatch(m); }}>Regional events</button>}
+        <button onClick={() => setViewer(viewer === "p0" ? "p1" : "p0")}>Switch viewer</button>
+        <button onClick={() => { const m = structuredClone(boardMatch); m.turnIndex = 1; m.phase = "ITEM_PHASE"; m.lastRoll = null; m.turn.hasRolled = false; setViewer("p0"); setBoardMatch(applyAction(m, activePlayer(m).id, { type: "ROLL_DICE" }, DEFAULT_SETTINGS, () => .75, Date.now())); }}>Watch Nova roll</button>
+      </>}
+    </nav><label style={{ display: "block", marginTop: 8 }}>Input delay <select aria-label="Simulated input delay" defaultValue="0" onChange={(event) => { inputDelay.current = Number(event.target.value); }}><option value="0">None</option><option value="150">150 ms</option><option value="200">200 ms</option></select></label><output ref={performanceLabel} aria-label="Frame cadence" style={{ display: "block", fontSize: 11, marginTop: 8 }}>Measuring frame cadence…</output></details>
     {error && <p role="alert" style={{ color: "#ffaeb4" }}>{error}</p>}
-    {boardMap ? <section className="pp-match"><PartyBoard map={mapRegistry.get(boardMap)} match={boardMatch} onSelect={() => {}}/></section> : showCast ? <section style={{ color: "#e7f2ff", background: "#13263b", borderRadius: 20, padding: 20 }}>
+    {boardMap && boardMatch ? <PartyMatch connection={boardConnection} lobby={boardLobby} match={boardMatch}/> : showCast ? <section style={{ color: "#e7f2ff", background: "#13263b", borderRadius: 20, padding: 20 }}>
       <h2>The Pluto crew</h2><p>Fox · Bunny · Explorer · Ghost</p>
       <div style={{ height: 420 }}><Canvas shadows camera={{ position: [0, 3.4, 10], fov: 40 }} dpr={[1, 1.5]}>
         <color attach="background" args={["#13263b"]}/><hemisphereLight args={["#e5f5ff", "#547381", 2]}/><directionalLight position={[-3, 6, 6]} intensity={2.5}/>
@@ -100,7 +170,7 @@ export function Playground() {
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.05, 0]}><circleGeometry args={[8, 64]}/><meshStandardMaterial color="#234459" roughness={0.8}/></mesh>
         <OrbitControls target={[0, 0.85, 0]} enablePan={false} minDistance={5} maxDistance={15} maxPolarAngle={Math.PI / 2 - 0.05}/>
       </Canvas></div>
-    </section> : View && snapshot?.minigame ? <div className="pp-card mg-stage"><View key={snapshot.minigame.startedAt} match={snapshot} minigame={snapshot.minigame} playerId="p0" online now={snapshot.minigame.serverNow ?? 0} sendInput={sendInput}/></div> : <p style={{ color: "#fff" }}>Choose a map to play against three bots.</p>}
+    </section> : View && snapshot?.minigame ? <section className="pp-match mg-screen"><div className="pp-card mg-stage"><View key={snapshot.minigame.startedAt} match={snapshot} minigame={snapshot.minigame} playerId="p0" online now={snapshot.minigame.serverNow ?? 0} sendInput={sendInput}/></div></section> : <p style={{ color: "#fff" }}>Choose a map to play against three bots.</p>}
   </main>;
 }
 const root = createRoot(document.getElementById("root")!);

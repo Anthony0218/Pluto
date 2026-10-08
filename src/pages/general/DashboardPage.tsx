@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useLocation } from "react-router-dom";
 import { useUiLanguage } from "@/i18n/ui";
 import { useAuth } from "@/context/AuthContext";
 import { useDashboardData } from "@/hooks/useDashboardData";
@@ -7,12 +8,14 @@ import MyGames from "@/components/App/MyGames";
 import DashboardHero from "@/components/App/dashboard/DashboardHero";
 import DashboardSearch from "@/components/App/dashboard/DashboardSearch";
 import DidYouKnowCarousel from "@/components/App/dashboard/DidYouKnowCarousel";
-import DashboardActionRow, { DashboardContentGrid } from "@/components/App/dashboard/DashboardActionRow";
+import DashboardActionRow from "@/components/App/dashboard/DashboardActionRow";
 import DailyQuestsCard from "@/components/App/dashboard/DailyQuestsCard";
 import LearnSomethingNew from "@/components/App/dashboard/LearnSomethingNew";
+import UserActivityCard from "@/components/App/dashboard/activity/UserActivityCard";
 import ToolShortcuts from "@/components/App/dashboard/ToolShortcuts";
 import DashboardParticles from "@/components/App/dashboard/DashboardParticles";
 import DashboardFriendDialog from "@/components/App/dashboard/DashboardFriendDialog";
+import { DashboardTabs } from "@/components/App/PublicHeader";
 import "@/components/App/dashboard/dashboard.css";
 
 export default function DashboardPage() {
@@ -20,8 +23,10 @@ export default function DashboardPage() {
   return <Dashboard key={user?.id ?? "guest"} />;
 }
 
+
 function Dashboard() {
   useUiLanguage();
+  const tab = useLocation().pathname === "/dashboard" ? "dashboard" : "home";
   const { user, profile, loading: authLoading } = useAuth();
   const { activity, friends, onlineIds, loading, activityError, notifications } = useDashboardData();
   const [friendDialog, setFriendDialog] = useState<{ id: string; view: "actions" | "chat" | "profile" } | null>(null);
@@ -70,20 +75,30 @@ function Dashboard() {
   const searchTarget = typeof document === "undefined" ? null : document.getElementById("dashboard-search-slot");
 
 
-  return <main ref={page} className="dashboard-page">
+  return <main ref={page} className="dashboard-page" data-tab={tab}>
     <DashboardParticles />
     {searchTarget && createPortal(<DashboardSearch friends={friends} onChat={id => { markFriendMessagesRead(id); setFriendDialog({ id, view: "chat" }); }} />, searchTarget)}
     <div className="dashboard-workspace">
       <div className="dashboard-main">
-        <DashboardHero profile={profile} signedIn={!!user} loading={authLoading} now={now} challenge={null} />
-        <MyGames />
-        <DashboardActionRow userId={user?.id} />
-        <ToolShortcuts />
-        <DashboardContentGrid userId={user?.id} sections={[
-          { id: "quests", label: "Daily quests", content: <DailyQuestsCard quests={activity?.quests} loading={loading} unavailable={activityError} signedIn={!!user} /> },
-          { id: "discover", label: "Did you know?", content: <DidYouKnowCarousel /> },
-          { id: "learning", label: "Continue learning", content: <LearnSomethingNew /> },
-        ]} />
+        <DashboardTabs className="page-dashboard-tabs" />
+        {tab === "home" ? <div className="dashboard-tab-panel">
+          <div className="dashboard-top">
+            <DashboardHero profile={profile} signedIn={!!user} loading={authLoading} now={now} />
+            <DailyQuestsCard quests={activity?.quests} loading={loading} unavailable={activityError} signedIn={!!user} />
+          </div>
+          <div className="dashboard-trio">
+            <MyGames />
+            <LearnSomethingNew />
+            <ToolShortcuts />
+          </div>
+          <DashboardActionRow userId={user?.id} />
+        </div> : <div className="dashboard-tab-panel">
+          <div className="dashboard-overview">
+            <UserActivityCard signedIn={!!user} />
+            <DidYouKnowCarousel />
+          </div>
+          <DashboardActionRow userId={user?.id} />
+        </div>}
       </div>
     </div>
     {friend && friendDialog && <DashboardFriendDialog friend={friend} online={onlineIds.includes(friend.id)} view={friendDialog.view} onViewChange={view => { if (view === "chat") markFriendMessagesRead(friend.id); setFriendDialog({ id: friend.id, view }); }} onClose={() => setFriendDialog(null)} />}

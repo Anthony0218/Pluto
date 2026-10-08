@@ -1,7 +1,8 @@
+import { memo } from "react";
 import type { District } from "../../../games/MedievalKingdoms/edravane/types.ts";
 
 /** All scenery stays inside the playable hex: geography and hit targets share a footprint. */
-export function TerrainTile({ d }: { d: District }) {
+export const TerrainTile = memo(function TerrainTile({ d }: { d: District }) {
   const forest = d.biome === "forest",
     rock = ["mountains", "glacier", "volcanic", "hills"].includes(d.biome),
     snow = ["glacier", "tundra"].includes(d.biome);
@@ -177,4 +178,4 @@ export function TerrainTile({ d }: { d: District }) {
       )}
     </g>
   );
-}
+});

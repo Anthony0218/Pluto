@@ -37,7 +37,7 @@ const tools: { id: Tool; label: string; Icon: typeof Pencil }[] = [
 ];
 
 const toolButton = (active: boolean) =>
-  `inline-flex h-10 items-center gap-1.5 rounded-xl border px-3 text-xs font-black transition focus-visible:outline-2 focus-visible:outline-amber-300 ${
+  `inline-flex h-9 min-w-0 items-center justify-center [&>svg]:shrink-0 gap-1 rounded-xl border px-1.5 text-xs font-black transition md:h-10 md:gap-1.5 md:px-3 focus-visible:outline-2 focus-visible:outline-amber-300 ${
     active ? "border-amber-300 bg-amber-300/15 text-amber-100" : "border-white/10 bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-white"
   }`;
 
@@ -121,12 +121,12 @@ export default function PixelAvatarEditor({ initialAvatarId, saving, onSave, onC
   }
 
   return (
-    <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_200px]">
-      <div>
+    <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_200px] md:gap-5">
+      <div className="min-w-0">
         <div
           role="img"
           aria-label={ui("Pixel avatar canvas")}
-          className="relative mx-auto aspect-square w-full max-w-[480px] touch-none select-none overflow-hidden rounded-2xl border-2 border-white/15 bg-[#0f172a]"
+          className="relative mx-auto aspect-square w-full max-w-[min(100%,48dvh)] touch-none md:max-w-[480px] select-none overflow-hidden rounded-2xl border-2 border-white/15 bg-[#0f172a]"
           style={{ cursor: tool === "fill" ? "cell" : "crosshair" }}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
@@ -149,18 +149,18 @@ export default function PixelAvatarEditor({ initialAvatarId, saving, onSave, onC
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="min-w-0 space-y-3 md:space-y-4">
         <div>
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">{ui("Preview")}</p>
-          <div className="mt-2 flex items-end gap-3">
-            <PixelAvatarImage pixels={grid} className="h-16 w-16 rounded-2xl border border-white/10" />
-            <PixelAvatarImage pixels={grid} className="h-9 w-9 rounded-full border border-white/10" />
+          <div className="mt-1.5 flex items-end gap-3 md:mt-2">
+            <PixelAvatarImage pixels={grid} className="h-11 w-11 rounded-xl border md:h-16 md:w-16 md:rounded-2xl border-white/10" />
+            <PixelAvatarImage pixels={grid} className="h-7 w-7 rounded-full border md:h-9 md:w-9 border-white/10" />
           </div>
         </div>
 
         <fieldset>
           <legend className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">{ui("Colors")}</legend>
-          <div className="mt-2 grid grid-cols-8 gap-1.5">
+          <div className="mt-1.5 grid grid-cols-8 gap-1.5 md:mt-2">
             {PIXEL_PALETTE.map((swatch, index) => (
               <button
                 key={swatch}
@@ -168,14 +168,14 @@ export default function PixelAvatarEditor({ initialAvatarId, saving, onSave, onC
                 aria-label={`${ui("Color")} ${index + 1}`}
                 aria-pressed={color === index && tool !== "eraser"}
                 onClick={() => { setColor(index); if (tool === "eraser") setTool("pencil"); }}
-                className={`aspect-square rounded-md border-2 focus-visible:outline-2 focus-visible:outline-amber-300 ${color === index && tool !== "eraser" ? "border-amber-300 scale-110" : "border-white/15"}`}
+                className={`h-7 min-w-0 rounded-md border-2 md:aspect-square md:h-auto focus-visible:outline-2 focus-visible:outline-amber-300 ${color === index && tool !== "eraser" ? "border-amber-300 scale-110" : "border-white/15"}`}
                 style={{ background: swatch }}
               />
             ))}
           </div>
         </fieldset>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-4 gap-1.5 md:flex md:flex-wrap md:gap-2">
           {tools.map(({ id, label, Icon }) => (
             <button key={id} type="button" aria-pressed={tool === id} onClick={() => setTool(id)} className={toolButton(tool === id)}>
               <Icon size={15} aria-hidden="true" />{ui(label)}
@@ -186,7 +186,7 @@ export default function PixelAvatarEditor({ initialAvatarId, saving, onSave, onC
           </button>
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-3 gap-1.5 md:flex md:flex-wrap md:gap-2">
           <button type="button" onClick={undo} disabled={!history.length} className={`${toolButton(false)} disabled:opacity-40`}><Undo2 size={15} aria-hidden="true" />{ui("Undo")}</button>
           <button type="button" onClick={() => commit(starterPixelGrid())} className={toolButton(false)}><RotateCcw size={15} aria-hidden="true" />{ui("Template")}</button>
           <button type="button" onClick={() => commit(blankPixelGrid())} className={toolButton(false)}><Trash2 size={15} aria-hidden="true" />{ui("Clear")}</button>

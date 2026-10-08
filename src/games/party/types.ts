@@ -1,4 +1,4 @@
-export type Difficulty = "easy" | "medium" | "hard";
+export type Difficulty = "beginner" | "easy" | "medium" | "hard" | "extreme";
 export type TileType =
   | "coin"
   | "item"
@@ -18,6 +18,7 @@ export type Phase =
   | "ITEM_PHASE"
   | "ITEM_REPLACE"
   | "ITEM_AIM"
+  | "ZERO_BONUS"
   | "DICE_ROLL"
   | "MOVEMENT"
   | "PATH_SELECTION"
@@ -114,6 +115,7 @@ export interface BoardMap {
   fieldDistribution?: Partial<Record<TileType, number>>;
   regions: Region[];
   eventHooks: string[];
+  cleansingNodeIds?: string[];
   // Random Event pool (event registry ids); each event is also filtered by its own `allowedMaps`.
   eventPoolIds: string[];
   goldenPlutoCount: number;
@@ -128,6 +130,9 @@ export interface BoardMap {
   blockableEdges?: [string, string][];
 }
 export interface Settings {
+  mode?: "board" | "festival";
+  roundLimit?: number;
+  minigameIds?: string[];
   mapId: string;
   victory: "plutos" | "coins";
   plutoTarget: number;
@@ -193,6 +198,7 @@ export type ItemRarity = "common" | "uncommon" | "rare";
 export interface ItemInstance {
   instanceId: string;
   itemId: string;
+  usableFromRound?: number;
 }
 // Board-distance category of an aimed weapon. "global" = the weapon ignores distance (Lucky Six).
 export type RangeBand = "close" | "medium" | "long" | "global";
@@ -278,6 +284,9 @@ export type FeedbackKind =
   | "ANIMAL_MOVED"
   | "ANIMAL_HIT"
   | "ANIMAL_DESPAWNED"
+  | "CLEANSED"
+  | "SHOP_PURCHASE"
+  | "ZERO_REWARD"
   | "EVENT"
   | "AVALANCHE"
   | "ROUTE_REOPENED"
@@ -349,6 +358,8 @@ export interface MinigameRuntime {
   results: MinigameResult[] | null;
   rewards: Record<string, number> | null;
   rewardsApplied: boolean;
+  awaitingReady?: boolean;
+  readyPlayerIds?: string[];
   // Server clock at snapshot time, filled only in the network view so clients can sync timers.
   serverNow?: number;
 }
@@ -370,6 +381,7 @@ export interface Player {
   previousNodeId: string | null;
   inventory: ItemInstance[];
   statusEffects: StatusEffect[];
+  lastPurchaseRound?: number;
   // Set by the authority while a human is disconnected: the server time when their seat is handed to a
   // bot. Absent/null while connected.
   reconnectDeadline?: number | null;
@@ -411,6 +423,12 @@ export interface Match {
   eventSeq: number;
   minigame: MinigameRuntime | null;
   lastMinigameId: string | null;
+  playedMinigameIds?: string[];
+  mode?: "board" | "festival";
+  roundLimit?: number;
+  selectedMinigameIds?: string[];
+  festivalScores?: Record<string, number>;
+  boardEffects?: { id: string; kind: "treasure" | "eruption" | "breeze" | "sanctuary" | "sale" | "relic"; nodeIds: string[]; expiresAfterRound: number }[];
   duel: DuelState | null;
   lastDuelMinigameId: string | null;
   radiationZones: RadiationZone[];
@@ -446,6 +464,9 @@ export interface LobbySummary {
   public: boolean;
 }
 export type GameAction =
+  | { type: "MINIGAME_READY" }
+  | { type: "ZERO_REWARD"; reward: "heal" | "coins" }
+  | { type: "BUY_ITEM"; itemId?: string; mystery: boolean }
   | { type: "ROLL_DICE" }
   | { type: "SELECT_PATH"; nodeId: string }
   | { type: "BUY_PROPERTY"; nodeId: string }

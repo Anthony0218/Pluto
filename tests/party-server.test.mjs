@@ -187,6 +187,7 @@ test("WebSocket purchase broadcasts identical state, rejects duplicates and surv
   });
   const created = await host.wait((m) => m.type === "STATE" && m.lobby);
   const code = created.lobby.code;
+  server.rooms.rooms.get(code).settings.roundLimit = 0;
   const guest = await client();
   guest.send({ type: "JOIN", code, playerName: "Observer" });
   await guest.wait((m) => m.type === "STATE" && m.lobby?.players.length === 2);

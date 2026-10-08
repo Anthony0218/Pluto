@@ -7,15 +7,17 @@ type PickupInput = { type: "ARENA_PICKUP" };
 export interface ArenaPlayer extends ArenaPoint {
   avatarId?: number;
   yaw: number; pitch: number; hp: number; weapon: WeaponId | null; ammo: number;
-  kills: number; deaths: number; respawnAt: number | null; protectedUntil: number; lastShotAt: number;
+  beaconPoints?: number; nextBeaconAt?: number; kills: number; deaths: number; respawnAt: number | null; protectedUntil: number; lastShotAt: number;
 }
 export interface ArenaShot { id: number; from: ArenaPoint; to: ArenaPoint; at: number; weapon: WeaponId; playerId: string }
 export interface ArenaHit { id: number; attacker: string; victim: string; at: number; damage: number; headshot: boolean; hpAfter: number; position: ArenaPoint }
 interface ArenaBotPlan { nextAt: number; routeAt: number; route: ArenaPoint[]; goal: string; targetId: string | null; seenAt: number; nextFireAt: number }
 export const ARENA_BOT_PROFILES = {
-  easy: { reactionMs: 1300, shotPauseMs: 1500, aimSpread: 0.62, pitchSpread: 0.20, speed: 0.7 },
-  medium: { reactionMs: 950, shotPauseMs: 1100, aimSpread: 0.38, pitchSpread: 0.12, speed: 0.8 },
-  hard: { reactionMs: 650, shotPauseMs: 850, aimSpread: 0.22, pitchSpread: 0.075, speed: 0.9 },
+  beginner: { reactionMs: 1800, shotPauseMs: 2000, aimSpread: .95, pitchSpread: .3, speed: .5 },
+  easy: { reactionMs: 1300, shotPauseMs: 1500, aimSpread: .62, pitchSpread: .2, speed: .7 },
+  medium: { reactionMs: 1125, shotPauseMs: 1300, aimSpread: .5, pitchSpread: .16, speed: .75 },
+  hard: { reactionMs: 950, shotPauseMs: 1100, aimSpread: .38, pitchSpread: .12, speed: .8 },
+  extreme: { reactionMs: 100, shotPauseMs: 120, aimSpread: .025, pitchSpread: .01, speed: 1 },
 };
 export interface ArenaState {
   map: ArenaMapId; startedAt: number; endsAt: number; simTime: number;
@@ -39,7 +41,7 @@ function create(context: MinigameCreateContext): ArenaState {
     map, startedAt: context.startedAt, endsAt: context.endsAt, simTime: context.startedAt,
     players: Object.fromEntries(context.participants.map((p, i) => [p.id, {
       ...spawns[i % spawns.length], avatarId: p.avatarId ?? 2, yaw: 0, pitch: 0, hp: 100, weapon: null, ammo: 0,
-      kills: 0, deaths: 0, respawnAt: null, protectedUntil: context.startedAt + 1500, lastShotAt: context.startedAt - 10_000,
+      kills: 0, beaconPoints: 0, nextBeaconAt: context.startedAt + 3000, deaths: 0, respawnAt: null, protectedUntil: context.startedAt + 1500, lastShotAt: context.startedAt - 10_000,
     }])),
     pickups: ARENA_MAPS[map].pickups.map((_, id) => ({ id, availableAt: context.startedAt })),
     supplies: ARENA_MAPS[map].supplies.map((_, id) => ({ id, availableAt: context.startedAt })), seed: Math.floor(context.random() * 4294967296),
@@ -94,8 +96,8 @@ function fire(state: ArenaState, id: string, at: number) {
   let victim: string | null = null, headshot = false;
   for (const [otherId, other] of Object.entries(state.players)) if (otherId !== id && other.hp > 0) {
     const ghost = (other.avatarId ?? 2) % 4 === 3;
-    const head = rayBox(origin, direction, { x: other.x, y: other.y + (ghost ? 1.3 : 1.45), z: other.z, w: 0.58, h: 0.55, d: 0.58, color: "", kind: "cover" });
-    const body = rayBox(origin, direction, { x: other.x, y: other.y + 0.65, z: other.z, w: 0.75, h: 1.25, d: 0.7, color: "", kind: "cover" });
+    const head = rayBox(origin, direction, { x: other.x, y: other.y + (ghost ? 1.3 : 1.45), z: other.z, w: 0.72, h: 0.55, d: 0.72, color: "", kind: "cover" });
+    const body = rayBox(origin, direction, { x: other.x, y: other.y + 0.65, z: other.z, w: 0.92, h: 1.25, d: 0.92, color: "", kind: "cover" });
     const d = Math.min(head, body);
     if (d < hitDistance) { hitDistance = d; victim = otherId; headshot = weapon !== "knife" && head <= body; }
   }
@@ -103,7 +105,7 @@ function fire(state: ArenaState, id: string, at: number) {
     to: { x: origin.x + direction.x * hitDistance, y: origin.y + direction.y * hitDistance, z: origin.z + direction.z * hitDistance } });
   if (!victim) return;
   const other = state.players[victim]; if (at < other.protectedUntil) return;
-  const damage = Math.min(other.hp, spec.damage * (headshot ? 2 : 1));
+  const damage = Math.min(other.hp, spec.damage * (headshot ? 1.5 : 1));
   other.hp -= damage;
   state.hits.push({ id: state.shotId, attacker: id, victim, at, damage, headshot, hpAfter: other.hp,
     position: { x: origin.x + direction.x * hitDistance, y: origin.y + direction.y * hitDistance, z: origin.z + direction.z * hitDistance } });
@@ -144,6 +146,9 @@ export function tickArena(state: ArenaState, now: number): boolean {
       const control = state.controls[id];
       if (control && next - control.at <= 350) moveArenaPlayer(ARENA_MAPS[state.map], p, control.input, seconds);
       collectSupplies(state, id, next);
+      // A beacon on each floor gives a clear destination and a way to score without a kill.
+      if (Math.hypot(p.x, p.z - 3) <= 2.5 && next >= (p.nextBeaconAt ?? state.startedAt + 3000)) { p.beaconPoints = (p.beaconPoints ?? 0) + 1; p.nextBeaconAt = next + 3000; }
+      else if (Math.hypot(p.x, p.z - 3) > 2.5) p.nextBeaconAt = next + 3000;
       if (!p.weapon || p.ammo === 0) pickup(state, id, next);
     }
     for (const [id, control] of Object.entries(state.controls)) if (state.players[id].hp > 0 && next - control.at <= 350 && control.input.fire) fire(state, id, next);
@@ -179,19 +184,19 @@ function routeTo(state: ArenaState, start: ArenaPoint, target: ArenaPoint): Aren
   return route.slice(1);
 }
 export const pickupArena: MinigameDefinition<ArenaState, ArenaInput | PickupInput> = {
-  id: "pickup-arena", name: "Pickup Shootout", description: "Find a weapon and fight for the highest kill count.",
+  id: "pickup-arena", name: "Pickup Shootout", description: "Find a weapon and fight for the beacon and the highest score.",
   instructions: ["Everyone starts unarmed. Walk over a weapon to equip it; use E to swap.",
-    "One kill = one point. You respawn unarmed after three seconds.",
+    "One kill = three points. Hold a glowing beacon for three seconds to earn one point. You respawn unarmed after three seconds.",
     "Walk over health packs (+40 HP) and ammo boxes (one magazine). Supplies return after 12 seconds.",
-    "Headshots deal double damage. A Desert Eagle headshot eliminates a full-health opponent.",
+    "Headshots deal 1.5× damage. Larger hitboxes keep the action forgiving.",
     "Random arena: three-floor arcade with four stairs, or city buildings and street cover."],
   controls: "WASD + mouse · click to shoot / knife · E to swap · touch move, look and fire controls",
-  durationSeconds: 120, gameType: "main", supportsBots: true, snapshotIntervalMs: 100,
+  durationSeconds: 75, gameType: "main", supportsBots: true, snapshotIntervalMs: 100,
   create, parseInput: parseArenaInput, applyInput, tick: tickArena,
-  scores: (s) => Object.fromEntries(Object.entries(s.players).map(([id, p]) => [id, p.kills])),
+  scores: (s) => Object.fromEntries(Object.entries(s.players).map(([id, p]) => [id, p.kills * 3 + (p.beaconPoints ?? 0)])),
   rank(s, ids, random) {
     const ties = Object.fromEntries(ids.map((id) => [id, random()]));
-    return [...ids].sort((a, b) => s.players[b].kills - s.players[a].kills || s.players[a].deaths - s.players[b].deaths || ties[b] - ties[a]);
+    return [...ids].sort((a, b) => (s.players[b].kills * 3 + (s.players[b].beaconPoints ?? 0)) - (s.players[a].kills * 3 + (s.players[a].beaconPoints ?? 0)) || s.players[a].deaths - s.players[b].deaths || ties[b] - ties[a]);
   },
   publicView: (s): ArenaView => ({ map: s.map, startedAt: s.startedAt, endsAt: s.endsAt, simTime: s.simTime,
     players: structuredClone(s.players), pickups: s.pickups.map((p) => ({ ...p })), supplies: s.supplies.map((p) => ({ ...p })), shots: structuredClone(s.shots), hits: structuredClone(s.hits), feed: structuredClone(s.feed) }),
@@ -218,6 +223,7 @@ export const pickupArena: MinigameDefinition<ArenaState, ArenaInput | PickupInpu
       const item = state.pickups.filter((item) => item.availableAt <= now).sort((a, b) => distance(p, map.pickups[a.id]) - distance(p, map.pickups[b.id]))[0];
       if (item) { goal = map.pickups[item.id]; goalId = `pickup:${item.id}`; }
     }
+    if (p.weapon && p.ammo !== 0 && !visible && !supply && target && Math.abs(target[1].y - p.y) < 2) { goal = { x: 0, y: Math.round(p.y / 4) * 4, z: 3 }; goalId = "beacon:" + goal.y; }
     if (!goal) return [{ at: now, input: neutral() }];
     const stop = visible && p.weapon !== "knife" && distance(p, goal) < 10;
     if (!stop && now >= plan.routeAt && (plan.goal !== goalId || !plan.route.length)) {

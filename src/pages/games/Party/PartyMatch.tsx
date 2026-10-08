@@ -1,3 +1,5 @@
+import ItemShop from "./ItemShop.tsx";
+import { routePreview } from "../../../games/party/engine/routePreview.ts";
 import { useMemo, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import type { PartyConnection } from "../../../games/party/network/usePartyConnection.ts";
@@ -53,11 +55,14 @@ import PartyBoard from "./PartyBoard.tsx";
 import Portrait from "./PartyPortrait.tsx";
 import PlayerStatus from "./PlayerStatus.tsx";
 import FinalResults from "./FinalResults.tsx";
+import DiceRoll from "./DiceRoll.tsx";
 import type { Phase, Player } from "../../../games/party/types.ts";
 // What everyone else sees while the active player decides: never a frozen-looking screen.
 function waitingText(phase: Phase, active: Player, propertyName: string): string {
   const name = active.name;
   switch (phase) {
+    case "ZERO_BONUS":
+      return `Waiting for ${name} to choose +5 HP or +2 coins…`;
     case "ITEM_PHASE":
       return `Waiting for ${name} to use items or roll…`;
     case "ITEM_AIM":
@@ -98,6 +103,15 @@ export default function PartyMatch({
   const [inspected, setInspected] = useState<string | null>(null);
   const [itemsOpen, setItemsOpen] = useState(false);
   const [boardOnly, setBoardOnly] = useState(true);
+  const [boardView, setBoardView] = useState<"actions" | "board" | "whole">("actions");
+  const [cameraReset, setCameraReset] = useState(0);
+  const backToPawn = () => {
+    setBoardView("actions");
+    setCameraReset((value) => value + 1);
+    setBoardOnly(true);
+    setItemsOpen(false);
+    setInspected(null);
+  };
   // Unconfirmed board targeting is client-only; it belongs to the connection it started on, so a
   // reconnect cancels it safely (nothing was sent or consumed).
   const [aiming, setAiming] = useState<{
@@ -197,6 +211,14 @@ export default function PartyMatch({
         action: { type: "USE_ITEM", itemInstanceId: item.instanceId },
       });
   };
+  const viewBoard = (view: "board" | "whole") => {
+    setBoardView(view);
+    setBoardOnly(true);
+    setItemsOpen(false);
+    setInspected(null);
+    setAiming(null);
+    setPicking(null);
+  };
   const targetPlayerWith = (item: ItemInstance, targetPlayerId: string, wager?: DuelWager) => {
     send({
       type: "ACTION",
@@ -214,23 +236,20 @@ export default function PartyMatch({
       setAiming({ ...targetingItem, target: id });
       return;
     }
-    setInspected(id);
-    setBoardOnly(false);
-    if (
-      mine &&
-      match.phase === "PATH_SELECTION" &&
-      legalPaths(match, map).includes(id)
-    )
-      send({ type: "ACTION", action: { type: "SELECT_PATH", nodeId: id } });
+    if (mine && match.phase === "PATH_SELECTION" && legalPaths(match, map).includes(id)) {
+      send({ type: "ACTION", action: { type: "SELECT_PATH", nodeId: id } }); return;
+    }
+    setInspected(id); setBoardOnly(false);
   };
   return (
-    <section className="pp-match pp-board-match" data-board-only={boardOnly}>
+    <section className="pp-match pp-board-match" data-board-only={boardOnly} data-board-view={boardView}>
       <FeedbackToasts match={match} />
+      {me && <ItemShop match={match} player={me} connection={connection}/>}
       <div className="pp-match-heading">
         <div>
           <span className="pp-eyebrow">{map.name.toUpperCase()}</span>
           <h1>
-            Round {match.round}
+            Round {match.round}{match.roundLimit ? ` / ${match.roundLimit}` : ""}
             <span>
               {" "}
               /{" "}
@@ -251,7 +270,7 @@ export default function PartyMatch({
           <span>
             {lobby.settings.victory === "coins"
               ? `First to ${lobby.settings.coinTarget} coins`
-              : `First to ${lobby.settings.plutoTarget} Golden Plutos`}
+              : match.roundLimit ? `Most Golden Plutos after ${match.roundLimit} rounds` : `First to ${lobby.settings.plutoTarget} Golden Plutos`}
           </span>
           {match.phase !== "GAME_OVER" &&
             (confirmLeave ? (
@@ -300,7 +319,7 @@ export default function PartyMatch({
               <li aria-label={`HP ${p.hp} of ${p.maxHp}`}>
                 ❤️ <b>{p.hp}</b> / {p.maxHp}
               </li>
-              <li aria-label={`${p.coins} coins`}>
+              <li data-coin-counter={p.id} aria-label={`${p.coins} coins`}>
                 🪙 <b>{p.coins}</b>
               </li>
               <li aria-label={`${p.goldenPlutos} Golden Plutos`}>
@@ -315,6 +334,9 @@ export default function PartyMatch({
               </li>
             </ul>
             <StatusChips match={match} player={p} />
+            {p.id === active.id && match.lastRoll !== null && (
+              <DiceRoll key={`${match.round}-${match.turnIndex}`} rolling={match.phase === "DICE_ROLL"} value={match.lastRoll} name={p.name} />
+            )}
           </article>
         ))}
       </div>
@@ -326,7 +348,28 @@ export default function PartyMatch({
             onSelect={selectNode}
             overlay={overlay}
             explosion={explosion}
-          />
+            cameraMode={boardView === "whole" ? "whole" : "pawn"}
+            cameraReset={cameraReset}
+          >
+            {match.phase !== "GAME_OVER" && <div className="pp-board-commands" aria-label="Board and turn controls">
+              <span className="pp-board-command-title" role="status">
+                {boardView === "whole" ? "Whole board" : boardView === "board" ? "Explore the board" : mine ? "▶ YOUR TURN" : `${active.name.toUpperCase()}’S TURN`}
+              </span>
+              {boardView === "actions" ? <>
+                {mine && match.phase === "ITEM_PHASE" ? <div className="pp-board-actions">
+                  <button disabled={!canUseItems || !me?.inventory.length} aria-expanded={itemsOpen} onClick={() => { setItemsOpen(!itemsOpen); setBoardOnly(itemsOpen); }}>🎒 Use item</button>
+                  <button className="pp-primary" disabled={!canUseItems || !!targetingItem || !!pickingItem} onClick={() => { setItemsOpen(false); setBoardOnly(true); send({ type: "ACTION", action: { type: "ROLL_DICE" } }); }}>Roll dice <ArrowRight size={16}/></button>
+                </div> : <small className="pp-board-command-hint">{mine && match.phase === "PATH_SELECTION" ? "Choose an arrow on the map" : waitingText(match.phase, active, map.propertyName)}</small>}
+                <div className="pp-board-view-actions">
+                  <button onClick={() => viewBoard("board")}>See board</button>
+                  <button onClick={() => viewBoard("whole")}>See whole board</button>
+                </div>
+              </> : <div className="pp-board-view-actions">
+                <button className="pp-primary" onClick={backToPawn}>← Back</button>
+                <button onClick={() => viewBoard(boardView === "whole" ? "board" : "whole")}>{boardView === "whole" ? "See board" : "See whole board"}</button>
+              </div>}
+            </div>}
+          </PartyBoard>
           <div className="pp-legend">
             {(
               [
@@ -370,11 +413,14 @@ export default function PartyMatch({
             <span className="pp-hint">Tap any space to inspect</span>
           </div>
         </div>
-        <aside className={"pp-turn-panel pp-card" + (["ITEM_PHASE", "MOVEMENT", "DICE_ROLL", "TURN_END", "ANIMAL_PHASE", "ROUND_END"].includes(match.phase) ? " is-optional" : "")} id="pp-turn-panel">
-          <button className="pp-panel-close" onClick={() => setBoardOnly(true)} aria-label="See the board">✕</button>
-          {match.phase === "GAME_OVER" ? (
+        {((boardView === "actions" && mine) || (inspected && !boardOnly) || match.phase === "GAME_OVER") && <aside className={"pp-turn-panel pp-card" + (["ITEM_PHASE", "MOVEMENT", "DICE_ROLL", "TURN_END", "ANIMAL_PHASE", "ROUND_END"].includes(match.phase) ? " is-optional" : "")} id="pp-turn-panel">
+          {match.phase !== "GAME_OVER" && <button className="pp-panel-close" onClick={() => { if (boardView === "actions") viewBoard("board"); else { setInspected(null); setBoardOnly(true); } }} aria-label={boardView === "actions" ? "See the board" : "Close space details"}>✕</button>}
+          {(boardView === "actions" || match.phase === "GAME_OVER") && <>
+          {match.phase === "ZERO_BONUS" && mine ? (
+            <div className="pp-zero-choice"><span className="pp-eyebrow">A LUCKY LITTLE PAUSE</span><h2>Zero roll? Your choice.</h2><p>Recover or save for your next move.</p><button disabled={!online} onClick={() => send({ type: "ACTION", action: { type: "ZERO_REWARD", reward: "heal" } })}>✚ Heal 5 HP</button><button disabled={!online} onClick={() => send({ type: "ACTION", action: { type: "ZERO_REWARD", reward: "coins" } })}>🪙 Gain 2 coins</button></div>
+          ) : match.phase === "GAME_OVER" ? (
             <FinalResults connection={connection} lobby={lobby} match={match} alpine={alpine} />
-          ) : match.phase === "ITEM_REPLACE" && match.pendingItem ? (
+          ) : !mine ? null : match.phase === "ITEM_REPLACE" && match.pendingItem ? (
             <ItemOverflow
               player={active}
               match={match}
@@ -488,7 +534,7 @@ export default function PartyMatch({
                 {!mine
                   ? waitingText(match.phase, active, map.propertyName)
                   : match.phase === "PATH_SELECTION"
-                    ? "Pick your next move."
+                    ? "Tap an arrow on the map."
                     : match.phase === "ITEM_AIM"
                       ? "Taking aim…"
                       : match.phase === "ITEM_PHASE"
@@ -499,12 +545,6 @@ export default function PartyMatch({
                             ? "You’ve arrived."
                             : "On the move."}
               </h2>
-              <div
-                className={`pp-die ${match.phase === "DICE_ROLL" ? "rolling" : ""}`}
-                key={`${match.turnIndex}-${match.lastRoll}`}
-              >
-                {match.lastRoll ?? "?"}
-              </div>
               <p>
                 {aim && aimTarget
                   ? `🎯 ${active.name} is aiming the ${itemRegistry.get(aim.itemId).name} at ${aimTarget.name}${aim.band === "global" ? "" : ` (${aim.band}, ${aim.distance} space${aim.distance === 1 ? "" : "s"})`}…`
@@ -516,26 +556,6 @@ export default function PartyMatch({
                     ? `Rolled ${match.lastRoll} + ${match.turn.bonusMovement} Turbo bonus = ${(match.lastRoll ?? 0) + match.turn.bonusMovement} · ${match.movesRemaining} moves remaining`
                     : `${match.movesRemaining} moves remaining`}
               </p>
-              <div className="pp-turn-buttons">
-                <button onClick={() => setBoardOnly(true)}>See board</button>
-                {me && (
-                  <button
-                    aria-expanded={itemsOpen}
-                    onClick={() => setItemsOpen((open) => !open)}
-                  >
-                    🎒 Items ({me.inventory.length}/{MAX_INVENTORY_SIZE})
-                  </button>
-                )}
-                <button
-                  className="pp-primary"
-                  disabled={!mine || match.phase !== "ITEM_PHASE" || !online}
-                  onClick={() =>
-                    send({ type: "ACTION", action: { type: "ROLL_DICE" } })
-                  }
-                >
-                  Roll dice <ArrowRight size={18} />
-                </button>
-              </div>
               {me && itemsOpen && (
                 <ItemPanel
                   player={me}
@@ -545,7 +565,7 @@ export default function PartyMatch({
                 />
               )}
               {match.phase === "PATH_SELECTION" && (
-                <div className="pp-paths">
+                <details className="pp-path-alternatives"><summary>Other way to choose · {match.movesRemaining} steps left</summary><div className="pp-paths">
                   {legalPaths(match, map).map((id) => {
                     const node = map.nodes.find((n) => n.id === id)!;
                     // Hazard info is never hidden: radiation on the next space or on a possible landing.
@@ -572,6 +592,7 @@ export default function PartyMatch({
                         <span>
                           ↗ Space {spaceNumber(id)}
                           <small>{map.regions[node.region].name}</small>
+                          {routePreview(match, map, id).summaries.slice(0, 3).map((summary) => <small key={summary}>{summary}</small>)}
                           {hazard && <small className="pp-path-hazard">{hazard}</small>}
                           {slideDestination(map, id) && (
                             <small className="pp-path-feature">
@@ -593,10 +614,12 @@ export default function PartyMatch({
                       </button>
                     );
                   })}
-                </div>
+                </div></details>
               )}
             </>
           )}
+          <details className="pp-board-details">
+            <summary>Board details</summary>
           {match.startingRolls.length > 0 && (
             <details>
               <summary>Starting rolls & turn order</summary>
@@ -649,21 +672,32 @@ export default function PartyMatch({
               ))}
             </div>
           )}
+          <div className="pp-feed" aria-live="polite">
+            <span className="pp-eyebrow">{alpine ? "TRAIL DISPATCH" : "ISLAND DISPATCH"}</span>
+            {match.log.slice(0, 5).map((line, i) => (
+              <p key={`${line}-${i}`}>{line}</p>
+            ))}
+          </div>
+          </details>
+          </>}
           {inspected && (
             <div className="pp-inspector">
               <strong>Space {spaceNumber(inspected)}</strong>
+              <small>{map.regions[map.nodes.find((n) => n.id === inspected)!.region].name}</small>
+              {map.cleansingNodeIds?.includes(inspected) && <p>✚ Cleansing spring · removes all negative effects and heals 10 HP.</p>}
               {match.plutoNodeIds.includes(inspected) && (
                 <p>
                   ✦ Golden Pluto · {RULES.plutoPrice} coins · land here to buy
                 </p>
               )}
-              <p>
+              {!map.cleansingNodeIds?.includes(inspected) && !match.boardEffects?.some((e) => e.kind === "relic" && e.nodeIds.includes(inspected)) && <p>
                 {
                   presentation[
                     map.nodes.find((n) => n.id === inspected)!.type
                   ].label
                 }
-              </p>
+              </p>}
+              {match.boardEffects?.filter((e) => e.nodeIds.includes(inspected)).map((e) => <p key={e.id}>{({ treasure: "💎 Collect +5 treasure coins once", eruption: "⚠ Take 10 HP damage if still here", breeze: "🍃 Land here for +2 bonus coins", sanctuary: "💚 Land here for +5 extra HP", sale: "🛍 Save 2 coins on normal shop items while here", relic: "◆ Collect an item once, instead of the normal field" })[e.kind]} · {e.kind === "eruption" ? "at the end of" : "through"} round {e.expiresAfterRound}.</p>)}
               {map.slides?.some((sl) => sl.nodeId === inspected) && (
                 <p>
                   🧊 Frozen Slide · after this space resolves you slide{" "}
@@ -681,7 +715,7 @@ export default function PartyMatch({
                     {transportRoundsOut(match, t.id) > 0 && " Currently closed."}
                   </p>
                 ))}
-              {irradiated.has(inspected) && (
+              {irradiated.has(inspected) && !map.cleansingNodeIds?.includes(inspected) && (
                 <p className="pp-inspect-radiation">
                   ☢ Irradiated · {radiationRoundsLeft(match, inspected)} round
                   {radiationRoundsLeft(match, inspected) === 1 ? "" : "s"} left
@@ -708,13 +742,8 @@ export default function PartyMatch({
               )}
             </div>
           )}
-          <div className="pp-feed" aria-live="polite">
-            <span className="pp-eyebrow">{alpine ? "TRAIL DISPATCH" : "ISLAND DISPATCH"}</span>
-            {match.log.slice(0, 5).map((line, i) => (
-              <p key={`${line}-${i}`}>{line}</p>
-            ))}
-          </div>
-        </aside>
+
+        </aside>}
       </div>
       {pickingItem && me && (
         <TargetPicker
@@ -790,48 +819,6 @@ export default function PartyMatch({
             {fallout ? "☢ Detonate" : "Confirm"}
           </button>
           <button onClick={() => setAiming(null)}>Cancel</button>
-        </div>
-      )}
-      {match.phase !== "GAME_OVER" && (
-        <div className="pp-mobile-dock" aria-label="Turn summary">
-          <div className="pp-dock-turn">
-            <b className={mine ? "is-mine" : ""}>
-              {match.phase === "ANIMAL_PHASE"
-                ? "ANIMAL PHASE"
-                : match.phase === "ROUND_END"
-                  ? "NEXT ROUND"
-                  : match.phase === "START_ROLL"
-                    ? "STARTING ROLLS"
-                    : mine
-                      ? "▶ YOUR TURN"
-                      : `${active.name.toUpperCase()}’S TURN`}
-            </b>
-            {me && (
-              <small>
-                ❤️ {me.hp} · 🪙 {me.coins} · ✦ {me.goldenPlutos}
-                {me.statusEffects.some((e) => e.id === "radiation") ? " · ☢" : ""}
-              </small>
-            )}
-          </div>
-          {mine && match.phase === "ITEM_PHASE" ? (
-            <>
-            <button disabled={!canUseItems || !me?.inventory.length} onClick={() => { setItemsOpen(true); setBoardOnly(false); }}>Use item</button>
-            <button
-              className="pp-primary"
-              disabled={!online}
-              onClick={() => send({ type: "ACTION", action: { type: "ROLL_DICE" } })}
-            >
-              Roll <ArrowRight size={16} />
-            </button>
-            <button aria-pressed={boardOnly} onClick={() => setBoardOnly(true)}>See board</button>
-            </>
-          ) : (
-            <button
-              onClick={() => setBoardOnly((value) => !value)}
-            >
-              {mine && match.phase === "PATH_SELECTION" ? "Choose path ↓" : mine ? "Your move ↓" : "Details ↓"}
-            </button>
-          )}
         </div>
       )}
     </section>

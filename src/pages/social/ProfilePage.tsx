@@ -1,5 +1,5 @@
 import { ProfileChessRanks, ProfileGoRanks, ProfileAtlasRank, type ProfileChessRating } from "@/components/social/ProfileGameRanks";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
@@ -131,6 +131,12 @@ export default function ProfilePage() {
 
   const [editing, setEditing] = useState(false);
   const [avatarPickerOpen, setAvatarPickerOpen] = useState(false);
+  const avatarPickerRef = useRef<HTMLDivElement>(null);
+  // On phones the picker sits below the profile card, so bring it into view when it opens.
+  useEffect(() => {
+    if (!avatarPickerOpen || window.matchMedia("(min-width: 1024px)").matches) return;
+    avatarPickerRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+  }, [avatarPickerOpen]);
   const [avatarTab, setAvatarTab] = useState<"presets" | "custom">("presets");
   const [creatingAvatar, setCreatingAvatar] = useState(false);
   const { customAvatars, saveCustomAvatar } = useCustomAvatars(user?.id, profile?.id === user?.id ? profile?.avatar_id : null);
@@ -382,20 +388,25 @@ export default function ProfilePage() {
       <div className="mx-auto max-w-6xl lg:flex lg:h-full lg:min-h-0 lg:flex-col">
         {/* HEADER */}
 
-        <section className="relative mb-3 overflow-hidden rounded-[24px] border border-indigo-300/25 bg-[#0b1529] shadow-2xl shadow-black/30 sm:min-h-[190px] sm:rounded-[28px] lg:shrink-0">
+        <section className="relative mb-3 overflow-hidden rounded-[24px] border border-indigo-300/25 bg-[#0b1529] shadow-2xl shadow-black/30 [--profile-header-height:17.75rem] sm:rounded-[28px] lg:shrink-0">
           <img src={featuredGames[0]?.image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-45" />
           <div className="absolute inset-0 bg-gradient-to-r from-[#071024] via-[#071024]/90 to-[#071024]/35 max-sm:bg-gradient-to-b max-sm:from-[#071024]/75 max-sm:to-[#071024]" />
-          <div className="relative grid grid-cols-[72px_minmax(0,1fr)] items-center gap-4 px-4 py-5 sm:flex sm:flex-wrap sm:gap-5 sm:px-8 sm:py-7">
-            <button type="button" onClick={() => setAvatarPickerOpen(true)} className={`group relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-2xl bg-[#121d3d] p-1 sm:h-24 sm:w-24 ${frame ? "" : "border-2 border-indigo-300/70 shadow-[0_0_24px_rgba(129,140,248,.3)]"}`} style={avatarFrameStyle(frame, "#121d3d")} aria-label={frame ? `${ui("Change avatar")} · ${ui(`${frame.name} border`)}` : ui("Change avatar")}><ProfileAvatar avatarId={avatarId} className="h-full w-full rounded-xl" /></button>
-            <div className="min-w-0 flex-1 sm:min-w-[200px]"><p className="text-[9px] font-black uppercase tracking-[.22em] text-indigo-200 sm:text-[10px] sm:tracking-[.28em]">{ui("Pluto player profile")}</p><h1 className="mt-1 break-words text-2xl font-black leading-tight text-white sm:text-4xl">{username}</h1><p className="mt-1 text-xs text-indigo-100/80 sm:text-sm">{ui("Play. Learn. Grow together.")}</p></div>
-            <div className="col-span-2 min-w-0 sm:ml-0 sm:max-w-sm sm:flex-1"><div className="mb-1 flex flex-wrap justify-between gap-x-3 text-[11px] font-semibold text-indigo-100 sm:text-xs"><span>{ui("Activity level")} {level}</span><span>{xp % XP_PER_LEVEL} / 1,000 XP</span></div><div className="h-2 overflow-hidden rounded-full bg-indigo-200/15"><div className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-violet-300" style={{ width: `${(xp % XP_PER_LEVEL) / 10}%` }} /></div><p className="mt-1 text-[9px] leading-4 text-indigo-100/60 sm:text-[10px]">{ui("100 XP per completed game · 50 XP per completed puzzle")}</p>
+          <div className="relative grid gap-5 px-4 py-5 sm:px-8 sm:py-7 lg:min-h-[var(--profile-header-height)] lg:grid-cols-[minmax(0,23rem)_minmax(0,1fr)] lg:items-center lg:gap-8">
+            {/* Identity and level on the left; the ranked ratings sit to its right. The header keeps one height on every tab (a tab with no ranks just leaves that side empty). */}
+            <div className="grid min-w-0 gap-4">
+              <div className="grid grid-cols-[72px_minmax(0,1fr)] items-center gap-4 sm:flex sm:gap-5">
+                <button type="button" onClick={() => setAvatarPickerOpen(true)} className={`group relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-2xl bg-[#121d3d] p-1 sm:h-24 sm:w-24 ${frame ? "" : "border-2 border-indigo-300/70 shadow-[0_0_24px_rgba(129,140,248,.3)]"}`} style={avatarFrameStyle(frame, "#121d3d")} aria-label={frame ? `${ui("Change avatar")} · ${ui(`${frame.name} border`)}` : ui("Change avatar")}><ProfileAvatar avatarId={avatarId} className="h-full w-full rounded-xl" /></button>
+                <div className="min-w-0 flex-1"><p className="text-[9px] font-black uppercase tracking-[.22em] text-indigo-200 sm:text-[10px] sm:tracking-[.28em]">{ui("Pluto player profile")}</p><h1 className="mt-1 break-words text-2xl font-black leading-tight text-white sm:text-4xl">{username}</h1><p className="mt-1 text-xs text-indigo-100/80 sm:text-sm">{ui("Play. Learn. Grow together.")}</p></div>
+              </div>
+              <div className="min-w-0"><div className="mb-1 flex flex-wrap justify-between gap-x-3 text-[11px] font-semibold text-indigo-100 sm:text-xs"><span>{ui("Activity level")} {level}</span><span>{xp % XP_PER_LEVEL} / 1,000 XP</span></div><div className="h-2 overflow-hidden rounded-full bg-indigo-200/15"><div className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-violet-300" style={{ width: `${(xp % XP_PER_LEVEL) / 10}%` }} /></div><p className="mt-1 text-[9px] leading-4 text-indigo-100/60 sm:text-[10px]">{ui("100 XP per completed game · 50 XP per completed puzzle")}</p>
               <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] font-semibold sm:text-[11px]" aria-label={ui("Avatar border")}>
                 <span className="text-indigo-100/70">{ui("Avatar border")}</span>
                 {AVATAR_FRAMES.map((tier) => <span key={tier.id} className={`inline-flex items-center gap-1 ${level >= tier.level ? "text-white" : "text-indigo-100/45"}`}><span className="h-2.5 w-2.5 rounded-[3px]" style={{ background: tier.metal, opacity: level >= tier.level ? 1 : 0.4 }} aria-hidden />{ui(tier.name)} · {ui("Lv.")} {tier.level}{level >= tier.level && <span className="sr-only"> ({ui("unlocked")})</span>}</span>)}
               </div>
               <p className="mt-0.5 text-[10px] leading-4 text-indigo-100/70 sm:text-[11px]">{nextFrame ? `${ui(`Next: ${nextFrame.name} border`)} · ${nextFrame.level - level} ${ui(nextFrame.level - level === 1 ? "level to go" : "levels to go")}` : ui("Gold border unlocked. Every border is yours.")}</p>
             </div>
-            <div className="col-span-2 grid w-full min-w-0 gap-3 border-t border-indigo-200/10 pt-4 sm:basis-full sm:grid-cols-[repeat(auto-fit,minmax(260px,1fr))] sm:items-start">
+            </div>
+            <div className="grid min-w-0 grid-cols-2 content-center gap-2 sm:grid-cols-3 lg:border-l lg:border-indigo-200/10 lg:pl-8">
               {(statTab === "general" || statTab === "chess") && <ProfileChessRanks rows={chessRatings} loading={loadingStats} error={chessRatingsError} />}
               {(statTab === "general" || statTab === "go") && <ProfileGoRanks userId={user.id} />}
               {(statTab === "general" || statTab === "atlas") && <ProfileAtlasRank userId={user.id} />}
@@ -403,12 +414,12 @@ export default function ProfilePage() {
           </div>
         </section>
 
-        <div className="grid min-h-0 gap-4 lg:flex-1 lg:grid-cols-[250px_minmax(0,1fr)]">
+        <div className="grid min-h-0 grid-cols-1 gap-4 lg:flex-1 lg:grid-cols-[250px_minmax(0,1fr)]">
           {/* =================================================
               LEFT PROFILE CARD
               ================================================= */}
 
-          <aside className="min-h-0 lg:overflow-y-auto">
+          <aside className="min-h-0 min-w-0 lg:overflow-y-auto">
             <div className="rounded-[22px] border border-indigo-300/15 bg-[#0b1529]/90 p-4 shadow-2xl shadow-black/30 sm:rounded-[26px] sm:p-5">
               {/* AVATAR */}
 
@@ -652,11 +663,11 @@ export default function ProfilePage() {
               RIGHT CONTENT
               ================================================= */}
 
-          <section className="min-h-0 space-y-3 lg:overflow-y-auto">
+          <section className="min-h-0 min-w-0 space-y-3 lg:overflow-y-auto">
             {/* AVATAR PICKER */}
 
             {avatarPickerOpen && (
-              <div className="rounded-[30px] border border-amber-400/15 bg-zinc-900/80 p-4 sm:p-6 shadow-xl shadow-black/20">
+              <div ref={avatarPickerRef} className="scroll-mt-3 rounded-[30px] border border-amber-400/15 bg-zinc-900/80 p-4 sm:p-6 shadow-xl shadow-black/20">
                 <div className="mb-5 flex items-center justify-between gap-4">
                   <div>
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-400">
@@ -731,7 +742,7 @@ export default function ProfilePage() {
 
             {/* STATISTICS */}
 
-            <div className="rounded-[30px] border border-white/10 bg-zinc-900/80 p-6 shadow-xl shadow-black/20">
+            <div className="rounded-[30px] border border-white/10 bg-zinc-900/80 p-4 shadow-xl shadow-black/20 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-400">

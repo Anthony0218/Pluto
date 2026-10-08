@@ -122,3 +122,40 @@ test("sharing is limited to members, to a code that exists for that game, and to
     assert.equal((await invites(db)).find(item => item.room_code === "SCH001").status, "ended");
   } finally { await db.close(); }
 });
+
+test("casual clan invites accept Pluto codes and honor Card Builder and four-team custom chess capacity", async () => {
+  const db = await setup();
+  try {
+    await db.exec(`alter table chess_custom_matches add column player_ids uuid[] default '{}'::uuid[], add column variant jsonb;
+      create table card_game_sessions(id uuid primary key default gen_random_uuid(), code text, status text, state_json jsonb);
+      create table card_game_players(session_id uuid, user_id uuid, status text);`);
+    await db.exec(await fs.readFile(new URL("../supabase/migrations/20261107000000_complete_casual_clan_invites.sql", import.meta.url), "utf8"));
+    await share(db, "pluto-party", "/games/pluto-party", "pluto-123456");
+    await share(db, "pluto-party", "/games/pluto-party", "123456");
+    assert.equal((await invites(db)).filter(item => item.game === "pluto-party").length, 1);
+    assert.equal((await invites(db))[0].room_code, "PLUTO-123456");
+    await assert.rejects(share(db, "pluto-party", "/games/pluto-party", "ABC123"), /Pluto lobby code/);
+    await assert.rejects(share(db, "card-builder", "/games/card-builder/room", "PLUTO-123456"), /six-character/);
+    await assert.rejects(share(db, "pluto-party", "/games/pluto-party", "PLUTO-654321", bob), /Join this group/);
+
+    const session = (await db.query(`insert into card_game_sessions(code,status,state_json) values ('CAR001','waiting','{"room":{"capacity":3}}') returning id`)).rows[0].id;
+    await db.query("insert into card_game_players values ($1,$2,'active')", [session, alice]);
+    await lobby(db, "CAR001", "/games/card-builder/room");
+    await share(db, "card-builder", "/games/card-builder/room", "CAR001");
+    assert.equal((await invites(db)).find(item => item.game === "card-builder").status, "open");
+    await db.query("insert into card_game_players values ($1,$2,'left')", [session, bob]);
+    assert.equal((await invites(db)).find(item => item.game === "card-builder").status, "open");
+    await db.query("insert into card_game_players values ($1,$2,'active'),($1,$2,'active')", [session, bob]);
+    assert.equal((await invites(db)).find(item => item.game === "card-builder").status, "full");
+    await assert.rejects(share(db, "card-builder", "/games/card-builder/room", "CAR001"), /unavailable/);
+    await db.query("update card_game_sessions set status='finished'");
+    assert.equal((await invites(db)).find(item => item.game === "card-builder").status, "ended");
+
+    await db.query(`insert into chess_custom_matches(code,status,player_ids,variant) values ('CUS004','waiting',array[$1::uuid,$2::uuid],'{"teams":[{},{},{},{}]}')`, [alice, bob]);
+    await lobby(db, "CUS004", "/chess-custom/play/multiplayer");
+    await share(db, "chess-custom", "/chess-custom/play/multiplayer", "CUS004");
+    assert.equal((await invites(db)).find(item => item.room_code === "CUS004").status, "open");
+    await db.query("update chess_custom_matches set player_ids=array[$1::uuid,$2::uuid,$1::uuid,$2::uuid]", [alice,bob]);
+    assert.equal((await invites(db)).find(item => item.room_code === "CUS004").status, "full");
+  } finally { await db.close(); }
+});

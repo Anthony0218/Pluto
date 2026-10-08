@@ -1,3 +1,4 @@
+import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import { useAppLanguage } from "@/i18n/languageStore";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -1423,7 +1424,7 @@ export default function WattenMultiplayerGame() {
               style={wattenTableStyle(tableTheme)}
             >
               <div className="absolute inset-0 flex items-center justify-center bg-zinc-950/55 p-4 backdrop-blur-[2px]">
-                <div className="w-full max-w-lg">
+                <div className="max-h-[90dvh] w-full max-w-lg overflow-y-auto">
                   <button
                     type="button"
                     onClick={() => void copyRoomCode()}
@@ -1464,6 +1465,8 @@ export default function WattenMultiplayerGame() {
                         : t("Click this box to copy the code")}
                     </p>
                   </button>
+<div className="mt-3 grid gap-2 sm:grid-cols-2" aria-label="Room seats">{Array.from({ length: 4 }, (_, seat) => { const player = players.find(item => item.seat === seat); return <div key={seat} className="rounded-xl border border-white/10 bg-zinc-950/90 p-3"><p className="text-xs text-zinc-500">{l("Sitz", "Seat")} {seat + 1}</p><strong className="text-sm">{player?.display_name ?? l("Freier Platz", "Open seat")}</strong>{!player && <InviteFriendButton />}</div>; })}</div>
+
 
                   {isHost && (
                     <div className="mt-3 rounded-2xl border border-white/10 bg-zinc-950/85 p-3">

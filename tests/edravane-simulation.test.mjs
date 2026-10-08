@@ -38,7 +38,7 @@ function loadSave(raw) {
 }
 const actor = { house: "auremarch-0" };
 const command = (s, c, a = actor) => applyCommand(s, a, c);
-test("all eight selectable crowns, 180 connected land fields, forty populated estates, distinct titles and legacy lock", () => {
+test("all eight selectable crowns, 333 land fields across two continents, forty estates, distinct titles and legacy lock", () => {
   for (const n of NATIONS) {
     const s = createCampaign(n.id);
     assert.equal(
@@ -48,7 +48,7 @@ test("all eight selectable crowns, 180 connected land fields, forty populated es
     assert.equal(s.armies.find((a) => a.house === `${n.id}-0`).hex, n.capital);
   }
   const s = createCampaign();
-  assert.equal(s.districts.filter((d) => d.nation).length, 180);
+  assert.equal(s.districts.filter((d) => d.nation).length, 333);
   assert.equal(s.houses.length, 40);
   assert.equal(s.titles.length, 8);
   for (const h of s.houses) {
@@ -58,8 +58,7 @@ test("all eight selectable crowns, 180 connected land fields, forty populated es
   }
   for (const d of s.districts.filter((d) => d.nation && d.biome !== "island"))
     assert.ok(
-      d.id === NATIONS[0].capital ||
-        findPath(s.districts, NATIONS[0].capital, d.id).length > 0,
+      NATIONS.some((n) => n.capital === d.id || findPath(s.districts, n.capital, d.id).length > 0),
     );
   assert.throws(
     () => command(s, { type: "move", army: "army-auremarch-0", hex: "legacy" }),
@@ -151,13 +150,10 @@ test("land and maritime trade deliver cargo, apply transport costs, blockades, s
     (d) => d.owner === a.house && d.port && d.shipyard,
   );
   assert.ok(from);
-  const to = s.districts.find(
-    (d) =>
-      d.owner &&
-      d.owner !== a.house &&
-      d.port &&
-      findPath(s.districts, from.id, d.id, true).length,
-  );
+  const to = s.districts.filter((d) => d.owner && d.nation !== "saltmere" && d.port)
+    .map((d) => ({ d, path: findPath(s.districts, from.id, d.id, true) }))
+    .filter(({ path }) => path.length && path.some((id) => s.districts.find((d) => d.id === id).biome === "sea"))
+    .sort((a, b) => a.path.length - b.path.length)[0]?.d;
   assert.ok(to);
   s = command(
     s,
@@ -171,12 +167,9 @@ test("land and maritime trade deliver cargo, apply transport costs, blockades, s
     a,
   );
   assert.equal(s.houses.find((h) => h.id === a.house).treasury, 420 - 68);
-  const land = s.districts.find(
-    (d) =>
-      d.owner &&
-      d.owner !== a.house &&
-      findPath(s.districts, from.id, d.id).length,
-  );
+  const land = s.districts.filter((d) => d.owner && d.owner !== a.house)
+    .map((d) => ({ d, path: findPath(s.districts, from.id, d.id) }))
+    .filter(({ path }) => path.length).sort((a, b) => a.path.length - b.path.length)[0]?.d;
   s = command(
     s,
     {
@@ -189,7 +182,8 @@ test("land and maritime trade deliver cargo, apply transport costs, blockades, s
     a,
   );
   s.config.maritimeHazard = 0;
-  for (let i = 0; i < 25; i++) s = advanceCampaign(s);
+  const travelTurns = Math.max(...s.routes.map((route) => route.path.length)) + 8;
+  for (let i = 0; i < travelTurns; i++) s = advanceCampaign(s);
   assert.ok(s.routes[0].delivered > 0);
   assert.ok(s.routes[1].delivered > 0);
   assert.match(s.routes[0].status, /Delivered|transit/);
@@ -640,10 +634,7 @@ test("import contracts buy food from other houses and internal transfers never m
   const expected = advanceCampaign(baseline),
     result = advanceCampaign(internal);
   assert.ok(result.routes[0].delivered > 0);
-  assert.equal(
-    result.houses.find((v) => v.id === h.id).treasury,
-    expected.houses.find((v) => v.id === h.id).treasury - 1,
-  );
+  assert.ok(Math.abs(result.houses.find((v) => v.id === h.id).treasury - (expected.houses.find((v) => v.id === h.id).treasury - 1)) < 1e-8);
 });
 test("queued AI battles drain after a human encounter and expired pledges cannot freeze combat", () => {
   let s = createCampaign();

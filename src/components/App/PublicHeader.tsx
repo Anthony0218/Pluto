@@ -6,13 +6,14 @@ import { useAppLanguage } from "@/i18n/languageStore";
 import { LanguageSelector } from "@/games/chess/i18n/chessLanguage";
 import { useState, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { House, Menu } from "lucide-react";
+import { House, Menu, Sparkles } from "lucide-react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import FriendAvatar from "../social/FriendAvatar";
 import { useTheme } from "../../context/ThemeContext";
 import NavigationDrawer from "./NavigationDrawer";
 import { pageBrand } from "./pageBrand";
+import { useLandingAnimations } from "./landing/motionPreference";
 
 export function PlutoHomeLink({ className = "" }: { className?: string }) {
   useUiLanguage();
@@ -46,15 +47,29 @@ export function HeaderBrand({ name, mode, description }: { name?: string; mode?:
   </div>;
 }
 
+/** Landing page only: switches the page's animations off for older devices. */
+export function AnimationToggle() {
+  useUiLanguage();
+  const [on, setOn] = useLandingAnimations();
+  return <button type="button" role="switch" aria-checked={on} onClick={() => setOn(!on)} title={ui(on ? "Turn animations off" : "Turn animations on")}
+    className={`animation-toggle flex h-10 shrink-0 items-center gap-2 rounded-xl border px-2.5 text-xs font-semibold ${on ? "border-indigo-300/30 bg-indigo-400/15 text-indigo-100 hover:bg-indigo-400/25" : "border-white/10 bg-white/[0.05] text-zinc-400 hover:bg-white/10"}`}>
+    <Sparkles size={16} aria-hidden="true" />
+    <span className="hidden sm:inline">{ui("Animations")}</span>
+    <span className={`animation-toggle-track ${on ? "is-on" : ""}`} aria-hidden="true"><i /></span>
+  </button>;
+}
+
 export function NavigationControls() {
   useUiLanguage();
   const { user, profile } = useAuth();
   const { language, setLanguage } = useAppLanguage();
   const { notifications } = useDashboardData();
+  const { pathname } = useLocation();
   return <div className="navigation-controls flex min-w-0 items-center gap-1.5 sm:gap-2">
+      {pathname === "/" && <AnimationToggle />}
       <div id="header-tools-slot" className="flex min-w-0 items-center gap-1.5 sm:gap-2 empty:hidden" />
       <div className="public-header-language"><LanguageSelector language={language} onChange={setLanguage} /></div>
-      <Link to="/dashboard" aria-label={ui("Home")} title={ui("Home")} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] text-zinc-200 hover:bg-white/10"><House size={18} /></Link>
+      <Link to="/home" aria-label={ui("Home")} title={ui("Home")} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] text-zinc-200 hover:bg-white/10"><House size={18} /></Link>
       {user && <FriendNotifications key={user.id} items={notifications} userId={user.id} />}
       {user ? <Link to="/profile" aria-label={profile?.display_name?.trim() || profile?.username?.trim() || ui("Player")} className="flex h-10 max-w-28 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] px-2 text-xs font-semibold hover:bg-white/10 sm:max-w-44 sm:px-2.5"><FriendAvatar profile={profile ?? { display_name: user.email?.split("@")[0] ?? ui("Player"), username: null, avatar_url: null, avatar_id: null }} size="sm" /><span className="hidden min-w-0 truncate sm:inline">{profile?.display_name?.trim() || profile?.username?.trim() || user.email?.split("@")[0] || ui("Player")}</span></Link> : <Link to="/login" className="flex h-10 items-center rounded-xl bg-indigo-500 px-3 text-xs font-semibold hover:bg-indigo-400">{ui("Log in")}</Link>}
     </div>;
@@ -69,17 +84,27 @@ export function NavigationToggle() {
   </>;
 }
 
+/** The two Home pages, shown beside the logo while on them. */
+const dashboardTabs = [{ to: "/home", label: "Home" }, { to: "/dashboard", label: "Dashboard" }] as const;
+export function DashboardTabs({ className = "" }: { className?: string }) {
+  useUiLanguage();
+  const { pathname } = useLocation();
+  return <nav className={`dashboard-tabs ${className}`} aria-label={ui("Dashboard sections")}>
+    {dashboardTabs.map(item => <Link key={item.to} to={item.to} aria-current={pathname === item.to ? "page" : undefined} className={pathname === item.to ? "active" : undefined}>{ui(item.label)}</Link>)}
+  </nav>;
+}
+
 export default function PublicHeader({ compact = false }: { compact?: boolean }) {
   const { plutoMode } = useTheme();
   const { pathname } = useLocation();
-  const dashboard = pathname === "/dashboard";
+  const dashboard = pathname === "/home" || pathname === "/dashboard";
   const explore = /^\/(tools|learn)(\/|$)/.test(pathname) || /^\/games\/?$/.test(pathname);
   const brand = compact && !dashboard ? pageBrand(pathname) : undefined;
   return <header style={{ ...(brand?.surface ? { backgroundColor: brand.surface } : {}), "--chess-header-accent": brand?.accent } as CSSProperties} className={compact ? "compact-app-header absolute inset-x-0 top-0 z-[200] h-[var(--public-header-height)] text-white" : `fixed inset-x-0 top-0 z-[200] h-[var(--public-header-height)] border-b border-white/[0.08] text-white backdrop-blur-xl ${plutoMode ? "bg-[#060816]/95" : "bg-zinc-950/95"}`}>
     <div className="mx-auto flex h-full max-w-[1800px] flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2 sm:flex-nowrap sm:px-6 sm:py-0">
-      {dashboard || !compact ? <><NavigationToggle /><PlutoHomeLink /></> : <HeaderBrand name={brand?.name} mode={brand?.mode} />}
+      {dashboard || !compact ? <><NavigationToggle /><PlutoHomeLink />{dashboard && <DashboardTabs className="header-dashboard-tabs" />}</> : <HeaderBrand name={brand?.name} mode={brand?.mode} />}
       {explore && <nav className="public-explore-nav" aria-label={ui("Explore Pluto")}>{[["/games", "Games"], ["/tools", "Tools"], ["/learn", "Learn"]].map(([to, label]) => <NavLink key={to} to={to}>{ui(label)}</NavLink>)}</nav>}
-      {dashboard && <div id="dashboard-search-slot" className="order-3 min-w-0 basis-full sm:order-none sm:mx-auto sm:flex-1 sm:basis-auto" />}
+      {dashboard && <div id="dashboard-search-slot" className="order-3 min-w-0 basis-full sm:order-none sm:flex-1 sm:basis-auto" />}
       {!dashboard && !brand && <div className="flex-1" />}
       <div className="ml-auto min-w-0 max-w-full"><NavigationControls /></div>
     </div>

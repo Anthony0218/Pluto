@@ -1,3 +1,4 @@
+import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Bot, Check, Copy, Crown, DoorOpen, Play, UserPlus } from "lucide-react";
@@ -168,6 +169,7 @@ export default function OnlineRoom({ code }: { code: string }) {
                         <Bot size={14} /> Open — a bot plays if nobody joins
                       </span>
                     )}
+                    {!taken && <InviteFriendButton />}
                   </li>
                 );
               })}

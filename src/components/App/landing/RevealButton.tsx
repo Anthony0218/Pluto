@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import * as m from "motion/react-m";
-import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useLandingReducedMotion as useReducedMotion } from "./motionPreference";
 import { useLanding } from "./landingContext";
 import { useCaptionFlight } from "./useCaptionFlight";
 

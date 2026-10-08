@@ -1,3 +1,4 @@
+import FestivalGamesScreen from "./FestivalGamesScreen.tsx";
 import type { ComponentType } from "react";
 import type {
   Match,
@@ -27,6 +28,10 @@ export interface MinigameViewProps {
 // the server imports it). A later arena minigame can register a Pixi/Phaser-backed component here.
 export const minigameViews: Record<string, ComponentType<MinigameViewProps>> =
   {
+    "tide-treasure": FestivalGamesScreen,
+    "comet-courier": FestivalGamesScreen,
+    "rope-rescue": FestivalGamesScreen,
+    "paddle-doubles": FestivalGamesScreen,
     "target-panic": TargetPanicScreen,
     "paddle-panic": PaddlePanicScreen,
     "street-cross": StreetCrossScreen,

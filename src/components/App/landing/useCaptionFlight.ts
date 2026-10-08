@@ -21,6 +21,10 @@ export function useCaptionFlight(id: string) {
   // The section's button follows the title in: it rises and fades in as the caption lands, and leaves again when scrolling back.
   const reveal = useTransform(() => { layout.get(); const t = progress.get(); return withFlyby && stage.current.captions[id] ? clamp01((t - 0.7) / 0.3) : 1; });
   const lift = useTransform(reveal, value => (1 - value) * 30);
-  return { x, y, width, fontSize, opacity, lineOpacity, targetOpacity, reveal, lift };
+  // The arrival's own button leaves together with the frosted panel behind its text, so the same button is never on screen twice.
+  // The frosted panel behind the arrival's text fades as the text leaves for its section.
+  const scrim = useTransform(() => { layout.get(); const t = progress.get(); return withFlyby && stage.current.captions[id] ? 1 - clamp01(t / 0.28) : 0; });
+  const depart = useTransform(() => { layout.get(); const t = progress.get(); return withFlyby && stage.current.captions[id] ? 1 - clamp01(t / 0.28) : 1; });
+  return { x, y, width, fontSize, opacity, lineOpacity, targetOpacity, reveal, lift, depart, scrim };
 }
 

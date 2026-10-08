@@ -10,11 +10,11 @@ export interface ArenaMap {
   supplies: (ArenaPoint & { kind: "health" | "ammo" })[];
 }
 export const WEAPONS = {
-  knife: { name: "Knife", damage: 55, range: 2.5, cooldown: 480, ammo: -1, color: "#c7e4ee" },
-  pistol: { name: "Pistol", damage: 34, range: 36, cooldown: 360, ammo: 18, color: "#ffdb71" },
-  shotgun: { name: "Shotgun", damage: 70, range: 12, cooldown: 850, ammo: 8, color: "#ff9276" },
-  rifle: { name: "Rifle", damage: 25, range: 48, cooldown: 150, ammo: 40, color: "#92f0c2" },
-  "desert-eagle": { name: "Desert Eagle", damage: 50, range: 40, cooldown: 650, ammo: 7, color: "#b6c9ff" },
+  knife: { name: "Comet Baton", damage: 55, range: 2.5, cooldown: 480, ammo: -1, color: "#c7e4ee" },
+  pistol: { name: "Pocket Blaster", damage: 34, range: 36, cooldown: 360, ammo: 18, color: "#ffdb71" },
+  shotgun: { name: "Scatter Blaster", damage: 70, range: 12, cooldown: 850, ammo: 8, color: "#ff9276" },
+  rifle: { name: "Pulse Blaster", damage: 25, range: 48, cooldown: 150, ammo: 40, color: "#92f0c2" },
+  "desert-eagle": { name: "Nova Blaster", damage: 50, range: 40, cooldown: 650, ammo: 7, color: "#b6c9ff" },
 } satisfies Record<WeaponId, { name: string; damage: number; range: number; cooldown: number; ammo: number; color: string }>;
 const walls = (size: number, height: number): ArenaBox[] => [
   { x: -size, y: height / 2, z: 0, w: 0.5, h: height, d: size * 2, color: "#273349", kind: "wall" },
@@ -69,6 +69,10 @@ const city: ArenaMap = {
     { x: 0, y: 0, z: 3, weapon: "shotgun" }, { x: 0, y: 0, z: -3, weapon: "shotgun" },
   ],
 };
+// A smaller city brings encounters and objectives closer together.
+city.halfSize *= .82;
+for (const list of [city.boxes, city.spawns, city.pickups, city.supplies]) for (const point of list) { point.x *= .82; point.z *= .82; }
+for (const box of city.boxes) { box.w *= .82; box.d *= .82; }
 export const ARENA_MAPS: Record<ArenaMapId, ArenaMap> = { arcade, city };
 // Upper arcade decks leave holes above the four stairways.
 export function floorPieces(map: ArenaMap, floor: number): { x: number; z: number; w: number; d: number }[] {

@@ -1,3 +1,6 @@
+import { minigameRegistry } from "../../../games/party/minigames/index.ts";
+import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_DESCRIPTIONS } from "../../../games/party/difficulty.ts";
+import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import { useState } from "react";
 import { ArrowRight, Check, Copy, Plus, X } from "lucide-react";
 import type { PartyConnection } from "../../../games/party/network/usePartyConnection.ts";
@@ -44,7 +47,7 @@ export default function PartyLobby({
           <span className="pp-eyebrow">THE CREW IS COMING TOGETHER</span>
           <h1>{lobby.name}</h1>
           <p>
-            {lobby.public ? "Public lobby" : "Private lobby"} · {map.name} ·{" "}
+            {lobby.public ? "Public lobby" : "Private lobby"} · {lobby.settings.mode === "festival" ? "Minigame Festival" : map.name} ·{" "}
             {lobby.players.length}/4 explorers
           </p>
         </div>
@@ -110,8 +113,8 @@ export default function PartyLobby({
                             })
                           }
                         >
-                          {["easy", "medium", "hard"].map((d) => (
-                            <option key={d}>{d}</option>
+                          {DIFFICULTIES.map((d) => (
+                            <option key={d} value={d}>{DIFFICULTY_LABELS[d]}</option>
                           ))}
                         </select>
                       )}
@@ -134,6 +137,7 @@ export default function PartyLobby({
                         <strong>A seat for trouble</strong>
                         <small>Invite a friend with your lobby code</small>
                       </div>
+                      <InviteFriendButton room={{ lobbyRoute: "/games/pluto-party", code: lobby.code }} />
                       {host && (
                         <button onClick={() => send({ type: "ADD_BOT" })}>
                           <Plus size={15} /> Add bot
@@ -166,7 +170,7 @@ export default function PartyLobby({
                   </>
                 ) : (
                   <>
-                    Set sail <ArrowRight size={18} />
+                    {lobby.settings.mode === "festival" ? "Start festival" : "Set sail"} <ArrowRight size={18} />
                   </>
                 )}
               </button>
@@ -178,7 +182,7 @@ export default function PartyLobby({
           <p className="pp-help" role="status">
             {startBlocker ??
               (host
-                ? "Everyone is ready. Set sail when you like."
+                ? lobby.settings.mode === "festival" ? "Everyone is ready. Start the festival when you like." : "Everyone is ready. Set sail when you like."
                 : `Waiting for ${lobby.players.find((p) => p.id === lobby.hostId)?.name ?? "the host"} to start the match…`)}{" "}
             Changing match settings resets readiness.
           </p>
@@ -186,7 +190,21 @@ export default function PartyLobby({
         <aside className="pp-card pp-settings">
           <h2>Your island, your rules.</h2>
           <fieldset disabled={!host || !online}>
-            <div role="radiogroup" aria-label="Map" className="pp-map-picker">
+            <div className="pp-mode-picker" role="radiogroup" aria-label="Party mode">
+              {(["board", "festival"] as const).map((mode) => <button key={mode} type="button" role="radio" aria-checked={(lobby.settings.mode ?? "board") === mode} className={(lobby.settings.mode ?? "board") === mode ? "selected" : ""} onClick={() => {
+                const lengths = mode === "festival" ? [3, 5, 8, 12] : [0, 8, 12, 16];
+                updateSettings({ mode, roundLimit: lengths.includes(lobby.settings.roundLimit ?? 0) ? lobby.settings.roundLimit : mode === "festival" ? 5 : 12 });
+              }}><b>{mode === "board" ? "🏝 Board Party" : "🎪 Minigame Festival"}</b><small>{mode === "board" ? "Explore, shop and compete" : "Only minigames · choose your lineup"}</small></button>)}
+            </div>
+            <label>Match length<select value={lobby.settings.roundLimit ?? 0} onChange={(e) => updateSettings({ roundLimit: Number(e.target.value) })}>
+              {(lobby.settings.mode !== "festival" ? [0, 8, 12, 16] : [3, 5, 8, 12]).map((n) => <option key={n} value={n}>{n ? `${n} rounds · fixed ending` : "Race to the target"}</option>)}
+            </select></label>
+            <details className="pp-lineup" open={lobby.settings.mode === "festival"}>
+              <summary>Minigame lineup · {lobby.settings.minigameIds?.length || "all"} selected</summary>
+              <p>All games play once before repeating. An empty selection includes every game.</p>
+              {minigameRegistry.pool("main").map((game) => <label key={game.id} className="pp-checkbox"><input type="checkbox" checked={lobby.settings.minigameIds?.includes(game.id) ?? false} onChange={(e) => updateSettings({ minigameIds: e.target.checked ? [...(lobby.settings.minigameIds ?? []), game.id] : (lobby.settings.minigameIds ?? []).filter((id) => id !== game.id) })}/><span>{game.name}<small>{game.durationSeconds}s · {game.description}</small></span></label>)}
+            </details>
+            {lobby.settings.mode !== "festival" && <><div role="radiogroup" aria-label="Map" className="pp-map-picker">
               {mapRegistry.all().map((m) => (
                 <button
                   key={m.id}
@@ -208,7 +226,7 @@ export default function PartyLobby({
             </div>
             <p className="pp-help">{map.description}</p>
             <label>
-              Victory condition
+              {lobby.settings.roundLimit ? "Rank matches by" : "Victory condition"}
               <select
                 value={lobby.settings.victory}
                 onChange={(e) =>
@@ -221,7 +239,7 @@ export default function PartyLobby({
                 <option value="coins">Coins</option>
               </select>
             </label>
-            {lobby.settings.victory === "plutos" ? (
+            {!lobby.settings.roundLimit && (lobby.settings.victory === "plutos" ? (
               <label>
                 Golden Pluto target
                 <select
@@ -253,7 +271,8 @@ export default function PartyLobby({
                   ))}
                 </select>
               </label>
-            )}
+            ))}
+            </>}
             <label>
               New bot difficulty
               <select
@@ -262,11 +281,12 @@ export default function PartyLobby({
                   updateSettings({ difficulty: e.target.value as Difficulty })
                 }
               >
-                {["easy", "medium", "hard"].map((d) => (
-                  <option key={d}>{d}</option>
+                {DIFFICULTIES.map((d) => (
+                  <option key={d} value={d}>{DIFFICULTY_LABELS[d]}</option>
                 ))}
               </select>
             </label>
+            <p className="pp-help">{DIFFICULTY_DESCRIPTIONS[lobby.settings.difficulty]}</p>
             <label className="pp-checkbox">
               <input
                 type="checkbox"
@@ -277,14 +297,14 @@ export default function PartyLobby({
             </label>
           </fieldset>
           <p className="pp-help">
-            {map.goldenPlutoCount === 1
+            {lobby.settings.mode === "festival" ? "Jump straight into your chosen minigames. Individual games award 3 / 2 / 1 / 0 festival points; team games award 3 to each winner and 1 to each opponent (2 each for a draw). The player with the most festival points after the final round wins." : <>{map.goldenPlutoCount === 1
               ? "One Golden Pluto is hidden on the mountain."
               : `${map.goldenPlutoCount === 2 ? "Two" : map.goldenPlutoCount} Golden Plutos are hidden around the islands.`}{" "}
             Land on one and pay 20 coins to collect it. Choose Golden Plutos or coins to win. Item
             fields hand out heals, boosts, weapons and duels; the single Rare
             field hands out a Pocket Duel, Fallout Core or Wild Totem. {map.propertyName}s
             can be claimed for tolls. After every round, summoned animals hunt,
-            then a minigame pays 10 / 5 / 3 / 0 coins and its winner goes first.
+            then a minigame pays 10 / 5 / 3 / 0 coins and its winner goes first. Team minigames pay both partners equally. Buy one item per round, ready to use from the next round.</>}
           </p>
         </aside>
       </div>

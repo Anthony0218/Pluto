@@ -1,3 +1,4 @@
+import { minigameRegistry } from "../minigames/index.ts";
 import { mapRegistry } from "../content/maps.ts";
 import { NAME_LIMITS } from "../config.ts";
 import type {
@@ -44,7 +45,7 @@ const TOKEN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function minigameInput(v: unknown): MinigameInput | null {
   if (!record(v)) return null;
   const entries = Object.entries(v);
-  if (!entries.length || entries.length > 6) return null;
+  if (!entries.length || entries.length > 8) return null;
   for (const [key, field] of entries)
     if (
       key.length > 24 ||
@@ -69,10 +70,14 @@ function duelWager(v: unknown): DuelWager | null {
   return null;
 }
 export const difficulty = (v: unknown): v is Difficulty =>
-  v === "easy" || v === "medium" || v === "hard";
+  v === "beginner" || v === "easy" || v === "medium" || v === "hard" || v === "extreme";
 export function validSettings(v: unknown): v is Settings {
   return (
     record(v) &&
+    (v.mode === undefined || v.mode === "board" || v.mode === "festival") &&
+    (v.roundLimit === undefined || [0, 3, 5, 8, 12, 16].includes(Number(v.roundLimit)) && typeof v.roundLimit === "number") &&
+    (v.mode !== "festival" || Number(v.roundLimit) > 0) &&
+    (v.minigameIds === undefined || Array.isArray(v.minigameIds) && v.minigameIds.length <= 20 && new Set(v.minigameIds).size === v.minigameIds.length && v.minigameIds.every((id) => typeof id === "string" && minigameRegistry.pool("main").some((game) => game.id === id))) &&
     typeof v.mapId === "string" &&
     mapRegistry.all().some((map) => map.id === v.mapId) &&
     (v.victory === "plutos" || v.victory === "coins") &&
@@ -146,7 +151,10 @@ export function parseMessage(value: unknown): ClientMessage {
       break;
     case "ACTION":
       if (record(value.action)) {
+        if (value.action.type === "ZERO_REWARD" && (value.action.reward === "heal" || value.action.reward === "coins")) return { type: "ACTION", action: { type: "ZERO_REWARD", reward: value.action.reward } };
+        if (value.action.type === "BUY_ITEM" && typeof value.action.mystery === "boolean" && (value.action.itemId === undefined || str(value.action.itemId, 40))) return { type: "ACTION", action: { type: "BUY_ITEM", mystery: value.action.mystery, ...(value.action.itemId !== undefined && { itemId: value.action.itemId }) } };
         if (
+          value.action.type === "MINIGAME_READY" ||
           value.action.type === "ROLL_DICE" ||
           value.action.type === "BUY_PLUTO" ||
           value.action.type === "LEAVE_PLUTO" ||

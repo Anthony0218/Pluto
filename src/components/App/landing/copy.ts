@@ -113,6 +113,15 @@ export const copy = {
   ctaTitle: t("Your move.", "Du bist dran.", "Du bist dran.", "당신 차례입니다.", "Ваш ход.", "Tu turno.", "A tua vez."),
   ctaText: t("Pick a game, learn something new, or challenge a friend.", "Such dir ein Spiel aus, lerne etwas Neues oder fordere einen Freund heraus.", "Such da a Spui aus, lern was Neis oder fordre an Freind raus.", "게임을 고르고, 새로운 것을 배우고, 친구에게 도전해 보세요.", "Выберите игру, узнайте что-то новое или бросьте вызов другу.", "Elige un juego, aprende algo nuevo o reta a un amigo.", "Escolhe um jogo, aprende algo novo ou desafia um amigo."),
   startPlaying: t("Start playing", "Jetzt spielen", "Jetz spuin", "플레이 시작", "Начать играть", "Empezar a jugar", "Começar a jogar"),
+  heroSub: t("Real games, sharp tools and lessons that show you how to get better.", "Echte Spiele, starke Werkzeuge und Lektionen, die zeigen, wie du besser wirst.", "Echte Spiel, staake Werkzeig und Lektionen, de dir zeign, wia du bessa werst.", "진짜 게임, 똑똑한 도구, 그리고 더 나아지는 방법을 알려주는 학습까지.", "Настоящие игры, удобные инструменты и уроки, которые помогут стать лучше.", "Juegos de verdad, herramientas útiles y lecciones que te enseñan a mejorar.", "Jogos a sério, ferramentas úteis e lições que te mostram como melhorar."),
+  heroStats: t("{games} games · {tools} tools · {paths} learning paths", "{games} Spiele · {tools} Werkzeuge · {paths} Lernpfade", "{games} Spiel · {tools} Werkzeig · {paths} Lernpfade", "게임 {games}개 · 도구 {tools}개 · 학습 경로 {paths}개", "Игр: {games} · инструментов: {tools} · путей обучения: {paths}", "{games} juegos · {tools} herramientas · {paths} rutas de aprendizaje", "{games} jogos · {tools} ferramentas · {paths} percursos de aprendizagem"),
+
+  // Genre under each planet in the hero
+  genreStrategy: t("Strategy", "Strategie", "Strategie", "전략", "Стратегия", "Estrategia", "Estratégia"),
+  genreCards: t("Card game", "Kartenspiel", "Kartnspui", "카드 게임", "Карточная игра", "Juego de cartas", "Jogo de cartas"),
+  genreGeography: t("Geography", "Geografie", "Geografie", "지리", "География", "Geografía", "Geografia"),
+  genreNature: t("Nature", "Natur", "Natur", "자연", "Природа", "Naturaleza", "Natureza"),
+  genreArcade: t("Arcade", "Arcade", "Arcade", "아케이드", "Аркада", "Arcade", "Arcade"),
   openDashboard: t("Open dashboard", "Dashboard öffnen", "Dashboard aufmacha", "대시보드 열기", "Открыть панель", "Abrir panel", "Abrir painel"),
 } as const satisfies Record<string, Line>;
 

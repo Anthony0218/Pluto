@@ -15,7 +15,7 @@ function random(s: PatternState) { s.seed = (Math.imul(s.seed, 1664525) + 101390
 function prepare(s: PatternState, at: number) {
   s.pattern = Array.from({ length: patternLength(s.round) }, () => Math.floor(random(s) * 9));
   s.phase = "watch"; s.phaseStartedAt = at; s.phaseEndsAt = at + 1000 + s.pattern.length * PATTERN_BEAT;
-  for (const p of Object.values(s.players)) { p.step = 0; p.flashed = null; }
+  for (const p of Object.values(s.players)) { p.step = 0; p.flashed = null; p.alive = true; }
 }
 function create(c: MinigameCreateContext): PatternState {
   const s: PatternState = { startedAt: c.startedAt, endsAt: c.endsAt, round: 1, phase: "watch", phaseStartedAt: c.startedAt, phaseEndsAt: 0,
@@ -25,9 +25,9 @@ function create(c: MinigameCreateContext): PatternState {
 }
 export const patternWall: MinigameDefinition<PatternState, WallInput> = {
   id: "pattern-wall", name: "Echo Wall", description: "Watch a wall of nine lights, then tap the same sequence from memory.",
-  instructions: ["Watch the 3×3 wall. Repeated squares count as separate beats.", "When the lights stop, tap the squares in exactly the same order. One wrong square eliminates you.",
+  instructions: ["Watch the 3×3 wall. Repeated squares count as separate beats.", "When the lights stop, tap the squares in exactly the same order. A wrong square ends your attempt; everyone returns next round.",
     "Round 1: 3 lights. Rounds 2–3: 4. Rounds 4–7: 5. Each later round adds one light.", "Correct taps earn points. Completed rounds break ties; all players watch the same pattern."],
-  controls: "Tap / click squares · keyboard 1–9 (left to right, top to bottom)", durationSeconds: 180, gameType: "main", supportsBots: true, personalizedView: true, snapshotIntervalMs: 100,
+  controls: "Tap / click squares · keyboard 1–9 (left to right, top to bottom)", durationSeconds: 60, gameType: "main", supportsBots: true, personalizedView: true, snapshotIntervalMs: 100,
   create,
   parseInput(i: MinigameInput) {
     return i.type === "PATTERN_TAP" && Number.isInteger(i.tile) && Number(i.tile) >= 0 && Number(i.tile) < 9 && Number.isInteger(i.round) && Number(i.round) > 0 && Number.isInteger(i.step) && Number(i.step) >= 0
@@ -38,7 +38,7 @@ export const patternWall: MinigameDefinition<PatternState, WallInput> = {
     if (!p?.alive || s.phase !== "repeat" || at < s.phaseStartedAt || at >= s.phaseEndsAt || i.round !== s.round || i.step !== p.step || p.step >= s.pattern.length) throw new Error("Wait for your next square.");
     p.flashed = i.tile; p.lastTapAt = at;
     if (i.tile !== s.pattern[p.step]) p.alive = false;
-    else { p.step++; p.score++; if (p.step === s.pattern.length) p.completed++; }
+    else { p.step++; p.score++; if (p.step === s.pattern.length) { p.completed++; p.score += s.pattern.length; } }
   },
   tick(s, now) {
     let changed = false;
@@ -48,12 +48,12 @@ export const patternWall: MinigameDefinition<PatternState, WallInput> = {
     while (s.phase !== "finished" && now >= Math.min(s.phaseEndsAt, s.endsAt)) {
       changed = true; const at = Math.min(s.phaseEndsAt, s.endsAt);
       if (at >= s.endsAt) { s.phase = "finished"; break; }
-      if (s.phase === "watch") { s.phase = "repeat"; s.phaseStartedAt = at; s.phaseEndsAt = at + Math.max(12_000, s.pattern.length * 1200); }
+      if (s.phase === "watch") { s.phase = "repeat"; s.phaseStartedAt = at; s.phaseEndsAt = at + Math.max(5000, s.pattern.length * 700); }
       else if (s.phase === "repeat") {
         for (const p of Object.values(s.players)) if (p.alive && p.step < s.pattern.length) p.alive = false;
         s.phase = "break"; s.phaseStartedAt = at; s.phaseEndsAt = at + 1500;
       } else {
-        if (Object.values(s.players).filter((p) => p.alive).length <= 1) s.phase = "finished";
+        if (s.round >= 5) s.phase = "finished";
         else { s.round++; prepare(s, at); }
       }
     }
@@ -63,7 +63,7 @@ export const patternWall: MinigameDefinition<PatternState, WallInput> = {
     const p = s.players[bot.id]; if (!p?.alive || now < s.startedAt) return [];
     if (s.phase === "watch") {
       if (s.bots[bot.id]?.round !== s.round) {
-        const accuracy = { easy: .82, medium: .93, hard: .985 }[bot.difficulty];
+        const accuracy = { beginner: .6, easy: .82, medium: .875, hard: .93, extreme: .999 }[bot.difficulty];
         s.bots[bot.id] = { round: s.round, recall: s.pattern.map((tile) => rng() < accuracy ? tile : Math.floor(rng() * 9)), nextAt: s.phaseEndsAt + 650 };
       }
       return [];

@@ -4,7 +4,7 @@ import * as m from "motion/react-m";
 import { useAuth } from "@/context/AuthContext";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useCopy } from "./copy";
-import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useLandingReducedMotion as useReducedMotion } from "./motionPreference";
 
 /** The last stop of the journey: the planet settles in the middle behind one clear invitation. */
 export default function ClosingCta() {
@@ -17,8 +17,8 @@ export default function ClosingCta() {
       <h2>{text("ctaTitle")}</h2>
       <p>{text("ctaText")}</p>
       <div className="closing-actions">
-        <Link to="/games" className="closing-primary">{text("startPlaying")}<ArrowRight size={18} aria-hidden="true" /></Link>
-        <Link to={user ? "/dashboard" : "/login"} className="closing-secondary">{user ? text("openDashboard") : ui("Log in")}</Link>
+        <Link to="/games" className="lp-btn lp-btn--primary lp-btn--lg">{text("startPlaying")}<ArrowRight size={18} aria-hidden="true" /></Link>
+        <Link to={user ? "/home" : "/login"} className="lp-btn lp-btn--ghost lp-btn--lg">{user ? text("openDashboard") : ui("Log in")}</Link>
       </div>
     </m.div>
   </section>;

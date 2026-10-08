@@ -1,3 +1,4 @@
+import { difficultyRank } from "../difficulty.ts";
 import { activePlayer, legalPaths } from "./engine.ts";
 import type { Random } from "./engine.ts";
 import { BOT_TRANSPORT, DEFAULT_SETTINGS, PROPERTY_CONFIG, RULES } from "../config.ts";
@@ -34,7 +35,7 @@ function itemAction(
   if (itemLockReason(player)) return null;
   for (const item of player.inventory) {
     const definition = itemRegistry.get(item.itemId);
-    if (!definition.canUse(state, playerId, map)) continue;
+    if ((item.usableFromRound ?? 0) > state.round || !definition.canUse(state, playerId, map)) continue;
     if (item.itemId === "mega-medkit" && player.hp > player.maxHp / 2) continue;
     // Rare items have their own heuristics.
     const rare =
@@ -109,8 +110,8 @@ export function propertyDecision(
     coins = player.coins;
   let want = false;
   if (coins >= cost)
-    if (player.difficulty === "easy") want = random() < 0.5;
-    else if (player.difficulty === "medium") want = coins >= 10;
+    if (difficultyRank(player.difficulty) <= 1) want = random() < 0.5;
+    else if (difficultyRank(player.difficulty) <= 3) want = coins >= 10;
     else {
       const saving = savingForPluto(state, map, player.id, settings);
       want = buying
@@ -148,7 +149,7 @@ export function transportDecision(
     stay: GameAction = { type: "DECLINE_TRANSPORT" };
   if (!offer || player.coins < offer.cost) return stay;
   const ride: GameAction = { type: "RIDE_TRANSPORT", transportId: offer.id };
-  if (player.difficulty === "easy")
+  if (difficultyRank(player.difficulty) <= 1)
     return random() < BOT_TRANSPORT.easyAcceptChance ? ride : stay;
   const destination = transportDestination(offer, player.currentNodeId)!,
     restrictions = activeRestrictions(state),
@@ -156,7 +157,7 @@ export function transportDecision(
     gain =
       distanceToPluto(map, player.currentNodeId, objectives, restrictions) -
       distanceToPluto(map, destination, objectives, restrictions);
-  if (player.difficulty === "medium") return gain > 0 ? ride : stay;
+  if (difficultyRank(player.difficulty) <= 3) return gain > 0 ? ride : stay;
   const danger = hazardScorer(state, map, player, random)(destination);
   return gain - danger / 10 >= 2 ? ride : stay;
 }
@@ -168,6 +169,7 @@ export function botAction(
   now: number = Date.now(),
 ): GameAction | null {
   const player = activePlayer(state);
+  if (state.phase === "ZERO_BONUS") return { type: "ZERO_REWARD", reward: player.hp <= player.maxHp - 5 ? "heal" : "coins" };
   if (state.phase === "ITEM_AIM") return botFire(state, player, random, now);
   if (state.phase === "PLUTO_OFFER")
     return {
@@ -181,6 +183,11 @@ export function botAction(
   if (state.phase === "TRANSPORT_OFFER")
     return transportDecision(state, map, random, settings);
   if (state.phase === "ITEM_REPLACE") return { type: "DISCARD_NEW_ITEM" };
+  if (state.phase === "ITEM_PHASE" && player.difficulty === "extreme" && player.lastPurchaseRound !== state.round && player.inventory.length < 3 && state.mode !== "festival") {
+    const neededHeal = player.hp <= 15 && !player.inventory.some((i) => i.itemId === "mega-medkit");
+    if (neededHeal && player.coins >= 6) return { type: "BUY_ITEM", mystery: false, itemId: "mega-medkit" };
+    if (settings.victory === "plutos" && player.coins >= 34 && !savingForPluto(state, map, player.id, settings)) return { type: "BUY_ITEM", mystery: false, itemId: player.inventory.some((i) => i.itemId === "turbo-boots") ? "lucky-six" : "turbo-boots" };
+  }
   if (state.phase === "ITEM_PHASE")
     return itemAction(state, map, player.id, random, settings) ?? { type: "ROLL_DICE" };
   if (state.phase !== "PATH_SELECTION") return null;
@@ -193,6 +200,12 @@ export function botAction(
   const landingValue = (landing: string): number => {
       const node = map.nodes.find((n) => n.id === landing)!;
       return (
+        (map.cleansingNodeIds?.includes(landing) ? (player.maxHp - player.hp) * 3 + (player.statusEffects.length ? 65 : 0) : 0) +
+        (state.boardEffects?.some((e) => e.kind === "eruption" && e.nodeIds.includes(landing)) ? -45 : 0) +
+        (state.boardEffects?.some((e) => e.kind === "treasure" && e.nodeIds.includes(landing)) ? 25 : 0) +
+        (state.boardEffects?.some((e) => e.kind === "relic" && e.nodeIds.includes(landing)) ? player.inventory.length < 3 ? 25 : 5 : 0) +
+        (state.boardEffects?.some((e) => e.kind === "sanctuary" && e.nodeIds.includes(landing)) ? Math.min(5, player.maxHp - player.hp) * 3 : 0) +
+        (state.boardEffects?.some((e) => e.kind === "sale" && e.nodeIds.includes(landing)) && player.lastPurchaseRound !== state.round && player.coins >= 4 ? 10 : 0) +
         (node.type === "coin"
           ? 15
           : node.type === "bank"
@@ -228,11 +241,7 @@ export function botAction(
           ? distanceToPluto(map, id, state.plutoNodeIds, restrictions) * 3
           : 0) +
         random() *
-          (player.difficulty === "easy"
-            ? 180
-            : player.difficulty === "medium"
-              ? 60
-              : 20),
+          ({ beginner: 320, easy: 180, medium: 100, hard: 60, extreme: 0 }[player.difficulty]),
     };
   });
   scores.sort((a, b) => b.score - a.score);
@@ -243,6 +252,8 @@ export function botAction(
 // every optional offer, rolls, keeps items and takes the first open route.
 export function safeBotAction(state: Match, map: BoardMap): GameAction | null {
   switch (state.phase) {
+    case "ZERO_BONUS":
+      return { type: "ZERO_REWARD", reward: "coins" };
     case "ITEM_PHASE":
       return { type: "ROLL_DICE" };
     case "ITEM_AIM":

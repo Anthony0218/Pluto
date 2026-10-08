@@ -1,5 +1,5 @@
 import * as m from "motion/react-m";
-import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useLandingReducedMotion as useReducedMotion } from "./motionPreference";
 
 export type TitleLine = { text: string; accent?: boolean };
 

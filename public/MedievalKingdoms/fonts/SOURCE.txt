@@ -1,0 +1,5 @@
+IM Fell English Regular — by Igino Marini
+Unmodified font from the Google Fonts repository.
+Source: https://github.com/google/fonts/tree/main/ofl/imfellenglish
+Font file: IMFeENrm28P.ttf
+SIL Open Font License 1.1: see OFL.txt in this directory.

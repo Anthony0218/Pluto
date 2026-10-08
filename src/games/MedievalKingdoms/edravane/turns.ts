@@ -1,6 +1,8 @@
 import type { Actor, Army, Campaign, Command, Reaction } from "./types.ts";
 import { NATIONS, hexDistance, neighbors } from "./world.ts";
 import { atWar, makeBattle, startCombat, troopCount } from "./battle.ts";
+import { resolveSurrender, settlePeace } from "./campaignStrategy.ts";
+import { event } from "./realm.ts";
 
 function require(condition: unknown, message: string): asserts condition {
   if (!condition) throw Error(message);
@@ -75,6 +77,7 @@ export function authorizeTurn(s: Campaign, actor: Actor, cmd: Command) {
 }
 export function completeTurn(s: Campaign) {
   const t = s.turns;
+  if (t) t.pending = t.pending.filter((r) => r.kind !== "attack" || s.armies.some((a) => a.id === r.army && troopCount(a) > 0));
   if (!t?.ending || t.pending.length || s.battles.length) return;
   const ended = t.ending;
   t.index = (t.index + 1) % t.order.length;
@@ -147,6 +150,10 @@ export function resolveReaction(
   require(r?.id === cmd.reaction, "Response is stale or already resolved");
   const from = s.houses.find((h) => h.id === r.from)!,
     to = s.houses.find((h) => h.id === r.to)!;
+  if (r.kind === "surrender") {
+    resolveSurrender(s, r, cmd.choice);
+    t.pending.shift(); completeTurn(s); return;
+  }
   if (cmd.choice === "peace" && (r.kind === "war" || r.kind === "attack")) {
     require(!r.negotiated, "A peace counterproposal was already offered");
     require(s.wars.includes(
@@ -160,11 +167,12 @@ export function resolveReaction(
     return;
   }
   if (r.kind === "marriage") {
+    const partner = s.houses.find((h) => h.id === (r.partnerHouse ?? r.to))!;
     require(cmd.choice === "accept" ||
       cmd.choice === "decline", "Accept or decline the marriage pact");
     if (cmd.choice === "accept") {
       const a = from.family.find((p) => p.id === r.people?.[0]),
-        b = to.family.find((p) => p.id === r.people?.[1]);
+        b = partner.family.find((p) => p.id === r.people?.[1]);
       require(a &&
         b &&
         a.alive &&
@@ -178,9 +186,11 @@ export function resolveReaction(
       ), "Make peace before accepting a marriage pact");
       a.spouse = b.id;
       b.spouse = a.id;
-      from.relations[to.id] = (from.relations[to.id] ?? 0) + 25;
-      to.relations[from.id] = (to.relations[from.id] ?? 0) + 25;
-      to.opinion = Math.min(100, to.opinion + 12);
+      const bonus = from.nation === "ilyr-coast" || partner.nation === "ilyr-coast" ? 35 : 25;
+      from.relations[partner.id] = (from.relations[partner.id] ?? 0) + bonus;
+      partner.relations[from.id] = (partner.relations[from.id] ?? 0) + bonus;
+      partner.opinion = Math.min(100, partner.opinion + 12);
+      event(s, { kind: "diplomacy", house: from.id, other: to.id, person: a.id, title: "A marriage binds two houses", detail: `${a.name} and ${b.name} marry. Their living marriage creates an alliance; children retain the mother's house claim.` });
     }
     t.pending.shift();
     s.log.unshift(
@@ -191,6 +201,7 @@ export function resolveReaction(
       cmd.choice === "decline", "Accept or decline the peace offer");
     t.pending.shift();
     if (cmd.choice === "accept") {
+      if (s.strategyRules) settlePeace(s, from, to, r.terms);
       const key = warKey(s, r.from, r.to);
       s.wars = s.wars.filter((w) => w !== key);
       for (const i of s.insults ?? []) {
@@ -206,7 +217,7 @@ export function resolveReaction(
       t.pending = t.pending.filter(
         (p) =>
           !(
-            ["war", "attack"].includes(p.kind) &&
+            ["war", "attack", "surrender"].includes(p.kind) &&
             warKey(s, p.from, p.to) === key
           ),
       );

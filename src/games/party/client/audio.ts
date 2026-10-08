@@ -1,6 +1,6 @@
 import { getPreferences, subscribePreferences } from "./preferences.ts";
-// Centralized Pluto Party audio. Every sound is synthesized with the Web Audio API at runtime (original
-// tones and noise; no recorded or third-party assets). Buses: master → music / sfx / ui.
+// Centralized Pluto Party audio. Custom files in public/sounds/party override the original synthesized
+// tones and noise. Buses: master → music / sfx / ui.
 // Browsers only allow audio after a user gesture: nothing is created or played before `unlock()` runs
 // inside one, so there are no autoplay errors and no half-started music loops.
 export type SoundId =
@@ -23,6 +23,11 @@ export type SoundId =
   | "radiation"
   | "duel"
   | "victory"
+  | "hit"
+  | "combo"
+  | "delivery"
+  | "splash"
+  | "paddle"
   | "miss";
 export type MusicMood = "off" | "calm" | "board" | "minigame";
 type Bus = "music" | "sfx" | "ui";
@@ -56,6 +61,10 @@ class PartyAudio {
   private musicTimer: ReturnType<typeof setInterval> | null = null;
   private nextNoteTime = 0;
   private step = 0;
+  private rhythmStart: number | null = null;
+  private rhythmBeat = -1;
+  private custom = new Map<string, AudioBuffer>();
+  private loadingCustom = false;
   constructor() {
     if (typeof window !== "undefined") subscribePreferences(() => this.applyPreferences());
   }
@@ -87,6 +96,7 @@ class PartyAudio {
         for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
         this.noise = buffer;
         this.applyPreferences();
+        void this.loadCustomSounds();
       }
       if (this.ctx.state === "suspended") void this.ctx.resume().catch(() => {});
       if (this.mood !== "off") this.startMusic();
@@ -141,6 +151,27 @@ class PartyAudio {
     src.start(at);
     src.stop(at + duration + 0.02);
   }
+  private async loadCustomSounds() {
+    if (this.loadingCustom || !this.ctx) return;
+    this.loadingCustom = true;
+    try {
+      const manifest = await fetch("/sounds/party/manifest.json").then((r) => r.json()) as Record<string, unknown>;
+      await Promise.allSettled(Object.entries(manifest).filter(([, file]) => typeof file === "string" && /^[\w./-]+\.(mp3|wav|ogg|m4a)$/i.test(file) && !file.includes("..")).map(async ([id, file]) => {
+        const response = await fetch("/sounds/party/" + file); if (!response.ok) return;
+        const buffer = await this.ctx!.decodeAudioData(await response.arrayBuffer()); this.custom.set(id, buffer);
+      }));
+    } catch { /* Empty or missing custom audio keeps the synthesised fallback. */ }
+  }
+  cue(tile: number) {
+    if (!this.unlocked || getPreferences().muted) return;
+    this.tone([261.63,293.66,329.63,349.23,392,440,493.88,523.25,587.33][tile % 9], this.ctx!.currentTime + .01, .24, { gain: .13 });
+  }
+  setRhythm(localStartedAt: number | null) {
+    if (this.rhythmStart === localStartedAt) return;
+    this.rhythmStart = localStartedAt;
+    this.rhythmBeat = -1;
+    this.nextNoteTime = (this.ctx?.currentTime ?? 0) + .1;
+  }
   play(id: SoundId) {
     if (!this.unlocked || getPreferences().muted) return;
     const ctx = this.ctx!,
@@ -151,6 +182,8 @@ class PartyAudio {
     this.voices++;
     setTimeout(() => this.voices--, 600);
     const t = now + 0.01;
+    const custom = this.custom.get(id);
+    if (custom) { const source = ctx.createBufferSource(); source.buffer = custom; source.connect(this.buses![id === "click" ? "ui" : "sfx"]); source.start(t); return; }
     switch (id) {
       case "click":
         this.tone(900, t, 0.04, { type: "square", gain: 0.06, bus: "ui" });
@@ -226,6 +259,22 @@ class PartyAudio {
       case "miss":
         this.tone(330, t, 0.2, { slideTo: 220, gain: 0.1 });
         break;
+      case "hit":
+        this.tone(880, t, .09, { gain: .09 });
+        break;
+      case "combo":
+        [988, 1319, 1568].forEach((f, i) => this.tone(f, t + i * .04, .12, { gain: .08 }));
+        break;
+      case "delivery":
+        this.tone(659, t, .12, { gain: .1 });
+        this.tone(988, t + .1, .22, { gain: .1 });
+        break;
+      case "splash":
+        this.burst(t, .3, 1300, .13, 300);
+        break;
+      case "paddle":
+        this.tone(330, t, .07, { type: "square", gain: .06, slideTo: 440 });
+        break;
     }
   }
   setMusic(mood: MusicMood) {
@@ -247,6 +296,19 @@ class PartyAudio {
   private scheduleMusic() {
     const ctx = this.ctx;
     if (!ctx || this.mood === "off" || ctx.state !== "running") return;
+    if (this.rhythmStart !== null) {
+      // The same 600ms grid as the authoritative chart; the first note hits at start + 3000ms.
+      const first = this.rhythmStart + 3000, current = Date.now();
+      const nextBeat = Math.max(0, this.rhythmBeat + 1, Math.ceil((current - first) / 600));
+      for (let beat = nextBeat; first + beat * 600 < current + 300; beat++) {
+        const at = ctx.currentTime + Math.max(.005, (first + beat * 600 - current) / 1000);
+        const chord = PROGRESSION[Math.floor(beat / 4) % 4];
+        this.tone(chord[beat % 4], at, .22, { gain: .09, bus: "music" });
+        this.tone(beat % 4 === 0 ? 110 : 220, at, .08, { type: "sine", gain: .15, bus: "music" });
+        this.rhythmBeat = beat;
+      }
+      return;
+    }
     const mood = MOODS[this.mood],
       eighth = 60 / mood.bpm / 2;
     while (this.nextNoteTime < ctx.currentTime + 0.35) {

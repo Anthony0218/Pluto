@@ -4,7 +4,7 @@ import { Plus } from "lucide-react";
 import { useAnimationFrame, useMotionValue, useSpring, useTransform, type MotionValue } from "motion/react";
 import * as m from "motion/react-m";
 import { ProfileAvatar } from "@/components/social/ProfileAvatarPicker";
-import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useLandingReducedMotion as useReducedMotion } from "./motionPreference";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { PlanetArt } from "../planetary/PlanetScene";
 import type { PlanetConfig } from "../planetary/planetConfig";

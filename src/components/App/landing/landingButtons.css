@@ -1,0 +1,60 @@
+/* ── One button system for the landing page: hero, sections, arrivals, flyby and the closing call to action ──
+   --btn-bg / --btn-fg (inherited from the section) set the primary colours; without them the button is indigo. */
+.lp-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 12px 24px; border: 1px solid transparent; border-radius: 14px;
+  font-size: 15px; font-weight: 700; line-height: 1.2; text-decoration: none; cursor: pointer;
+  transition: filter .15s, transform .15s, border-color .15s, background-color .15s, box-shadow .2s;
+}
+.lp-btn > svg { flex: none; transition: transform .2s cubic-bezier(.22, 1, .36, 1); }
+.lp-btn:hover > svg { transform: translateX(3px); }
+.lp-btn:active { transform: scale(.98); }
+.lp-btn:focus-visible, .lp-link:focus-visible { outline: 2px solid #c7d2fe; outline-offset: 4px; }
+.lp-btn--lg { min-height: 52px; padding: 14px 28px; }
+.lp-btn--primary {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--btn-bg, #6366f1), #fff 12%), var(--btn-bg, #6366f1)); color: var(--btn-fg, #fff);
+  box-shadow: 0 10px 34px -10px var(--btn-bg, #6366f1), inset 0 1px 0 #ffffff40;
+}
+.lp-btn--primary:hover { filter: brightness(1.1); box-shadow: 0 14px 40px -10px var(--btn-bg, #6366f1), inset 0 1px 0 #ffffff55; transform: translateY(-1px); }
+.lp-btn--primary:active { transform: scale(.98); }
+.lp-btn--ghost { border-color: #c7d2fe55; background: #0b1030aa; color: #e0e7ff; backdrop-filter: blur(8px); }
+.lp-btn--ghost:hover { border-color: #c7d2fe; background: #141b45bb; }
+
+/* A quiet second action beside the primary one. */
+.lp-link { display: inline-flex; align-items: center; gap: 6px; padding: 8px 4px; color: var(--section-accent, #c7d2fe); font-size: 14px; font-weight: 700; text-decoration: none; }
+.lp-link > svg { transition: transform .2s cubic-bezier(.22, 1, .36, 1); }
+.lp-link:hover { color: #fff; }
+.lp-link:hover > svg { transform: translateX(3px); }
+.lp-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-btn, .lp-btn > svg, .lp-link > svg { transition: none; }
+  .lp-btn:hover > svg, .lp-link:hover > svg, .lp-btn--primary:hover { transform: none; }
+}
+
+/* ── Text ── */
+.landing :is(h1, h2, h3) { text-wrap: balance; }
+.landing p { text-wrap: pretty; }
+
+/* A dark veil behind a section's text, so it stays readable where the travelling planet passes underneath. */
+.section-copy { position: relative; isolation: isolate; }
+.section-copy::before {
+  content: ""; position: absolute; inset: -48px -64px; z-index: -1; pointer-events: none;
+  background: radial-gradient(ellipse 60% 55% at 45% 50%, #060816d9, #060816a6 45%, transparent 75%);
+}
+.section-copy :is(h2, h3, p) { text-shadow: 0 2px 22px #060816; }
+.section-eyebrow { display: flex; align-items: center; gap: 12px; }
+.section-number { display: inline-flex; align-items: center; gap: 12px; color: var(--section-accent, #a5b4fc); font-size: 12px; font-weight: 800; letter-spacing: .12em; font-variant-numeric: tabular-nums; }
+.section-number::after { content: ""; width: 28px; height: 1px; background: color-mix(in srgb, var(--section-accent, #a5b4fc) 60%, transparent); }
+@media (max-width: 1023px) { .section-copy::before { display: none; } }
+
+/* The hero's eyebrow: a quiet live-looking pill instead of a repeat of the tabs. */
+.lp-pill { display: inline-flex; align-self: flex-start; align-items: center; gap: 10px; padding: 7px 14px; border: 1px solid #a5b4fc2e; border-radius: 999px; background: #1a22445c; color: #c7d2fe; font-size: 12px; font-weight: 700; letter-spacing: .04em; }
+.lp-pill-dot { position: relative; width: 7px; height: 7px; border-radius: 50%; background: #818cf8; box-shadow: 0 0 10px #818cf8; }
+.lp-pill-dot::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 1px solid #818cf8; animation: lp-pulse 2.2s ease-out infinite; }
+@keyframes lp-pulse { from { transform: scale(.6); opacity: .9; } to { transform: scale(1.7); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .lp-pill-dot::after { animation: none; display: none; } }
+
+/* Animations switched off from the header: nothing on the page moves or fades, which also spares older devices. */
+.landing[data-animations="off"] *, .landing[data-animations="off"] *::before, .landing[data-animations="off"] *::after {
+  animation: none !important; transition: none !important; scroll-behavior: auto !important;
+}

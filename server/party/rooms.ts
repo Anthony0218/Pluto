@@ -13,6 +13,7 @@ import {
 } from "../../src/games/party/engine/engine.ts";
 import { botAction, safeBotAction } from "../../src/games/party/engine/bots.ts";
 import {
+  isMinigamePlayPhase,
   publicMinigameView,
   stepMinigameBots,
 } from "../../src/games/party/minigames/flow.ts";
@@ -578,12 +579,16 @@ export class PartyRooms {
           (next.minigame &&
             minigameRegistry.get(next.minigame.minigameId).snapshotIntervalMs) ||
           MINIGAME_BROADCAST_MIN_MS;
+        // Public views can change with time even when the simulation is unchanged (Echo Wall
+        // flashes, rhythm notes). Honor their cadence throughout active play.
+        const timedView = isMinigamePlayPhase(next.phase) && !!next.minigame &&
+          !!minigameRegistry.get(next.minigame.minigameId).snapshotIntervalMs;
         const since = now - (this.lastBroadcast.get(room.code) ?? 0);
         if (phaseChanged) this.afterMatchChange(room, match);
         if (
           phaseChanged ||
           since >= MINIGAME_BROADCAST_MAX_MS ||
-          (this.dirty.has(room.code) && since >= minInterval)
+          ((timedView || this.dirty.has(room.code)) && since >= minInterval)
         )
           this.broadcast(room, now);
       } catch (error) {

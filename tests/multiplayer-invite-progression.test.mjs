@@ -27,7 +27,12 @@ test('five established wins or losses cross a 100-point Bronze division', () => 
 test('game picker covers every game and preserves its selected online settings', () => {
   assert.deepEqual(INVITE_GAMES.map(g=>g.id),games.map(g=>g.route.split('/').at(-1)));
   const modes=id=>INVITE_GAMES.find(g=>g.id===id).modes;
-  assert.equal(modes('atlas-arena').length,15);
+  assert.equal(modes('atlas-arena').length,18);
+  assert.deepEqual(modes('atlas-arena').filter(m=>m.id.startsWith('random-')).map(m=>new URL(createInviteRoute(m),'https://local.test').searchParams.get('bestOf')),['1','3','5']);
+  assert.ok(modes('chess').some(m=>m.id==='custom-four-kingdoms'));
+  assert.equal(modes('pluto-party').length,4);
+  assert.match(createInviteRoute(modes('pluto-party')[3]),/map=mountain&victory=coins&create=1/);
+  for (const game of INVITE_GAMES) for(const mode of game.modes) assert.doesNotMatch(mode.route,/ranked/);
   assert.equal(modes('go').length,3);
   assert.match(createInviteRoute(modes('go')[2]),/boardSize=19&create=1/);
   assert.match(createInviteRoute(modes('watten')[1]),/variant=four-player&create=1/);
@@ -53,7 +58,7 @@ test('created invites only send the actual new room, and retry uses the same mes
   const oldStorage=globalThis.sessionStorage, oldWindow=globalThis.window;
   globalThis.window={setTimeout:()=>0,clearTimeout:()=>{}};
   globalThis.sessionStorage={getItem:key=>storage.get(key)??null,setItem:(key,value)=>storage.set(key,value),removeItem:key=>storage.delete(key)};
-  let effects=[],slot=0;const refs=[],state=[],sent=[],effectDeps=[];
+  let effects=[],slot=0;const refs=[],state=[],sent=[],clanShares=[],effectDeps=[];
   const signedUser={id:"me"};
   const routes=moduleFrom('../src/components/social/inviteRoute.ts',{'@/data/chessVariants':{variants:[]}});
   let error={message:'transport error'};
@@ -63,6 +68,7 @@ test('created invites only send the actual new room, and retry uses the same mes
     '@/context/AuthContext':{useAuth:()=>({user:signedUser})},
     '@/lib/supabase':{supabase:{from:()=>({insert:async message=>{sent.push(message);return {error};}})}},
     './inviteRoute':routes,
+    './clanShare':{shareRoomWithClan:async (...args)=>{clanShares.push(args);return {error:null};}},
   });
   const render=async room=>{slot=0;effects=[];const result=mod.useCreatedGameInvite(room);for(const effect of effects)effect();await new Promise(resolve=>setImmediate(resolve));return result;};
   try {
@@ -74,6 +80,11 @@ test('created invites only send the actual new room, and retry uses the same mes
     error={code:'23505'};result.retry();await render({lobbyRoute:'/games/go/multiplayer',code:'NEW123'});
     assert.equal(sent.length,2);assert.equal(sent[0].id,sent[1].id);assert.ok(sent[0].id);
     assert.equal(sent[0].receiver_id,'friend');assert.equal(sent[0].game_code,'NEW123');assert.equal(storage.size,0);
+    mod.prepareCreatedGameInvite({userId:'me',clanId:'clan',route:'/games/pluto-party'});
+    mod.recordCreatedGameInviteCode('PLUTO-123456','/games/pluto-party');
+    await render({lobbyRoute:'/games/pluto-party',code:'PLUTO-123456'});
+    assert.deepEqual(clanShares,[['clan','PLUTO-123456','/games/pluto-party']]);
+    assert.equal(storage.size,0);assert.equal(sent.length,2);
   } finally {globalThis.sessionStorage=oldStorage;globalThis.window=oldWindow;}
 });
 test('database assigns rank difficulty and rejects custom clan messages and nonmembers', async () => {

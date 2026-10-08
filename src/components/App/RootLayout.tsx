@@ -21,7 +21,7 @@ export default function RootLayout() {
 function RootContent() {
   const location = useLocation();
   const { passwordRecovery } = useAuth();
-  const fullHeader = location.pathname === "/" || location.pathname === "/dashboard";
+  const fullHeader = location.pathname === "/" || location.pathname === "/home" || location.pathname === "/dashboard";
   const integratedNavigation = location.pathname === "/games/chess" || location.pathname.startsWith("/games/chess/") || location.pathname === "/chess-custom" || location.pathname.startsWith("/chess-custom/");
   const viewport = useRef<HTMLDivElement>(null);
   const { plutoMode } = useTheme();

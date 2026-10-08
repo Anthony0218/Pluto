@@ -3,6 +3,7 @@ import { ArrowLeft, Check, ChevronRight, Heart, RotateCcw, Trophy, X } from "luc
 import type { TrialCountry } from "../../../games/atlas/trials/countryStats";
 import type { AtlasDifficulty, AtlasHistory } from "../../../games/atlas/types";
 import { useTrialSession } from "./trialSession";
+import { AtlasResultHero } from "../AtlasResultHero";
 
 /** What every mode receives from the Trials page. `best` is the stored personal best before this run. */
 export type TrialModeProps = {
@@ -83,6 +84,11 @@ export function GameOverPanel({ title, subtitle, score, best, stats, onRestart, 
 }) {
   const session = useTrialSession();
   const newBest = !session?.finish && score > 0 && score >= best;
+  const complete = session?.onComplete;
+  const reported = useRef(false);
+  useEffect(() => {
+    if (complete && !reported.current) { reported.current = true; complete(score); }
+  }, [complete, score]);
   const panel = useRef<HTMLElement>(null), again = useRef<HTMLButtonElement>(null);
   // Focus "Play again" without jumping; the panel glides into view after the revealed board has had a moment.
   useEffect(() => {
@@ -93,9 +99,7 @@ export function GameOverPanel({ title, subtitle, score, best, stats, onRestart, 
   }, []);
   return (
     <section className="trial-game-over" aria-labelledby="trial-game-over-title" ref={panel}>
-      <div className="atlas-result-orbit"><Trophy /></div>
-      <span className="atlas-eyebrow">{session?.player ? `${session.player.name} · final score` : newBest ? "New personal best" : `Best ${best.toLocaleString("en")}`}</span>
-      <h2 id="trial-game-over-title">{title}</h2>
+      <AtlasResultHero heading="h2" eyebrow={session?.player ? `${session.player.name} · final score` : newBest ? "New personal best" : `Best ${best.toLocaleString("en")}`} title={<span id="trial-game-over-title">{title}</span>} />
       {subtitle && <p>{subtitle}</p>}
       <p className="trial-final-score">{score.toLocaleString("en")} <small>points</small></p>
       <div className="trial-final-stats">{stats.map((stat) => <div key={stat.label}><strong>{stat.value}</strong><span>{stat.label}</span></div>)}</div>
@@ -103,8 +107,8 @@ export function GameOverPanel({ title, subtitle, score, best, stats, onRestart, 
       <div className="trial-final-actions">
         {session?.finish
           ? <button type="button" className="atlas-start" onClick={session.finish.onClick} ref={again}>{session.finish.label} <ChevronRight size={18} /></button>
-          : <><button type="button" className="atlas-start" onClick={onRestart} ref={again}><RotateCcw size={18} /> Play again</button>
-            <button type="button" className="atlas-start atlas-secondary" onClick={onExit}>All modes</button></>}
+          : <><button type="button" className="atlas-start" onClick={onRestart} ref={again}><RotateCcw size={18} /> Replay</button>
+            <button type="button" className="atlas-start atlas-secondary" onClick={onExit}>Back to menu</button></>}
       </div>
     </section>
   );

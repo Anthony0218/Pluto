@@ -10,7 +10,7 @@ test('random series draw without replacement and end at the correct win target',
   const modes = ['a', 'b', 'c', 'd', 'e', 'f'];
   for (const length of [1, 3, 5]) {
     const order = chooseRandomModes(modes, length, 'c', () => .9);
-    assert.equal(order[0], 'c');
+    assert.ok(order.includes('c'));
     assert.equal(new Set(order).size, length);
     const wins = Array.from({ length: Math.floor(length / 2) + 1 }, (_, i) => ({ mode: order[i], winnerId: 'alice', scores: { alice: 3, bob: 1 } }));
     assert.equal(seriesComplete(length, wins.slice(0, -1)), false);
@@ -37,7 +37,8 @@ test('casual online series persist per-game results, stop early, rematch, and ne
       let room = await invoke('alice', { op: 'create', mode: 'stat_battle', randomBestOf: length, maxPlayers: 4 });
       const row = endpoint.matches.at(-1), code = room.code, order = [...room.series.order];
       assert.equal(room.maxPlayers, 2);
-      assert.equal(order[0], 'stat_battle');
+      assert.ok(order.includes('stat_battle'));
+      assert.equal(room.mode, order[0]);
       assert.equal(new Set(order).size, length);
       assert.ok(room.settings.categories.length);
       assert.ok(room.settings.stats.length);
@@ -90,18 +91,29 @@ test('casual online series persist per-game results, stop early, rematch, and ne
 });
 
 // Exercise the actual local-series hook and result screen with controlled React state.
-function localSeriesHarness(first, length = 3, solo = false, requested) {
-  const states = [];
-  let slot = 0;
+function localSeriesHarness(first, length = 3, solo = false, requested, enabled = true) {
+  let states = [], refs = [], slot = 0, refSlot = 0;
   const modes = requested ?? ['map-battle', 'closest-wins', 'stat-battle', 'history-battle', 'region-builder'].slice(0, length);
-  const params = new URLSearchParams({ random: '1', bestOf: String(length), modes: modes.join(',') });
+  let params = new URLSearchParams({ ...(enabled ? { random: '1' } : {}), bestOf: String(length), modes: modes.join(',') });
+  let location = { pathname: `/games/atlas-arena/${solo ? 'solo' : 'hotseat'}/${first}`, search: `?${params}`, state: null };
+  const navigations = [];
   const exports = loadTs('../src/pages/games/AtlasArena/useRandomSeries.ts', {
-    react: { useState(initial) { const index = slot++; if (!(index in states)) states[index] = typeof initial === 'function' ? initial() : initial; return [states[index], next => { states[index] = typeof next === 'function' ? next(states[index]) : next; }]; } },
-    'react-router-dom': { useSearchParams: () => [params] },
+    react: {
+      useState(initial) { const index = slot++; if (!(index in states)) states[index] = typeof initial === 'function' ? initial() : initial; return [states[index], next => { states[index] = typeof next === 'function' ? next(states[index]) : next; }]; },
+      useRef(initial) { const index = refSlot++; return refs[index] ?? (refs[index] = {current: initial}); },
+    },
+    'react-router-dom': {
+      useSearchParams: () => [params], useLocation: () => location,
+      useNavigate: () => (to, options) => { navigations.push({ to, options }); location = { ...to, state: structuredClone(options.state) }; params = new URLSearchParams(location.search); },
+    },
     '../../../games/atlas/modeCatalog': { ARENA_MODES, modeById: id => ARENA_MODES.find(mode => mode.id === id) },
     '../../../games/atlas/randomSeries': { chooseRandomModes, gameWinner, seriesComplete, seriesLength },
   });
-  return () => { slot = 0; return exports.useRandomSeries(first, solo); };
+  const render = () => { slot = 0; refSlot = 0; return exports.useRandomSeries(location.pathname.split('/').at(-1), solo); };
+  render.navigations = navigations;
+  render.location = () => location;
+  render.reload = () => { states = []; refs = []; return render(); };
+  return render;
 }
 
 import { createRequire } from 'node:module';
@@ -145,13 +157,14 @@ test('hotseat retains the mode order and stops after two wins; solo visits all t
     assert.equal(new Set(series.order).size, 3);
   }
   const repaired = localSeriesHarness('map-battle', 3, false, ['unknown', 'map-battle', 'map-battle'])();
-  assert.equal(repaired.order[0], 'map-battle');
+  assert.ok(repaired.order.includes('map-battle'));
   assert.equal(new Set(repaired.order).size, 3);
 });
 
 test('final scorecard names each game winner and marks the unused third game', () => {
   const { AtlasRandomSeriesResults } = loadTs('../src/components/atlas/AtlasRandomSeriesResults.tsx', {
     'react-router-dom': { Link: props => React.createElement('a', { href: props.to }, props.children) },
+    './AtlasResultHero': loadTs('../src/components/atlas/AtlasResultHero.tsx', {}),
     '../../games/atlas/modeCatalog': { modeById: id => ARENA_MODES.find(mode => mode.id === id) },
     '../../games/atlas/randomSeries': { gameWinner, seriesWins, seriesLabel },
   });
@@ -163,4 +176,191 @@ test('final scorecard names each game winner and marks the unused third game', (
   assert.match(html, /Alice: 500 · Bob: 200/);
   assert.match(html, /Not needed/);
   assert.doesNotMatch(html, /Next game/);
+});
+
+test('every mode can open a random series and an included selection can occupy any position', () => {
+  const pool = ARENA_MODES.map(mode => mode.id), first = new Set(), positions = new Set();
+  for (let index = 0; index < 500; index++) {
+    first.add(chooseRandomModes(pool, 3, undefined, seededRandom(`all-random-${index}`))[0]);
+    const order = chooseRandomModes(pool, 5, 'map-fill', seededRandom(`included-${index}`));
+    positions.add(order.indexOf('map-fill'));
+    assert.equal(new Set(order).size, 5);
+  }
+  assert.deepEqual([...first].sort(), [...pool].sort());
+  assert.deepEqual([...positions].sort(), [0, 1, 2, 3, 4]);
+});
+
+import { seededRandom } from '../src/games/atlas/random.ts';
+
+test('next game navigates to the correct mode and retains scores across review and reload', () => {
+  for (const solo of [true, false]) for (const length of [1, 3, 5]) {
+    const order = ['guess-country-mini', 'map-fill', 'language-guesser', 'stat-battle', 'higher-lower'].slice(0, length);
+    const render = localSeriesHarness(order[0], length, solo, order);
+    let series = render();
+    for (let game = 0; game < length; game++) {
+      assert.equal(series.mode.id, order[game]);
+      const staleFinish = series.finish;
+      staleFinish(solo ? {you: (game + 1) * 100} : {'0': 100, '1': 100});
+      staleFinish(solo ? {you: 999} : {'0': 999, '1': 0});
+      series = render.reload();
+      assert.equal(series.results.length, game + 1, 'one result, even with a double click');
+      assert.equal(series.reviewing, true);
+      assert.deepEqual(series.order, order);
+      const calls = render.navigations.length;
+      series.next();
+      if (game === length - 1) {
+        assert.equal(render.navigations.length, calls, 'a completed series cannot start an extra game');
+        assert.equal(series.complete, true);
+      } else {
+        const destination = render.navigations.at(-1);
+        assert.equal(destination.to.pathname, `/games/atlas-arena/${solo ? 'solo' : 'hotseat'}/${order[game + 1]}`);
+        assert.equal(new URLSearchParams(destination.to.search).get('random'), '1');
+        assert.equal(destination.options.replace, true);
+        staleFinish({you: 999});
+        series = render.reload();
+        assert.equal(series.reviewing, false);
+        assert.equal(series.mode.id, order[game + 1]);
+        assert.equal(series.results.length, game + 1);
+        assert.deepEqual(series.results[0].scores, solo ? {you: 100} : {'0': 100, '1': 100});
+      }
+    }
+  }
+});
+
+test('a direct mode stays one game even if bestOf is present; a series rematch starts a fresh shuffled run', () => {
+  const direct = localSeriesHarness('map-fill', 5, true, undefined, false);
+  const single = direct();
+  assert.equal(single.enabled, false);
+  assert.equal(single.mode.id, 'map-fill');
+  single.finish({you: 999}); single.next(); single.reset();
+  assert.equal(direct().results.length, 0);
+  assert.equal(direct.navigations.length, 0);
+
+  const render = localSeriesHarness('map-fill', 3, true, ['map-fill', 'language-guesser', 'stat-battle']);
+  render().finish({you: 100});
+  let series = render();
+  series.reset(); series = render.reload();
+  assert.equal(series.results.length, 0);
+  assert.equal(series.reviewing, false);
+  assert.equal(series.order.length, 3);
+  assert.equal(render.location().pathname.split('/').at(-1), series.order[0]);
+
+  render.location().state.atlasRandomSeries.results = [{mode: series.order[0], scores: {you: 'bad'}, winnerId: null}];
+  assert.equal(render.reload().results.length, 0, 'invalid local history cannot contaminate the new game');
+});
+
+test('casual series never time out and require two distinct Continue signals after each game', async () => {
+  const version = JSON.parse(await readFile(new URL('../data/geography/version.json', import.meta.url), 'utf8')).atlasDataVersion;
+  const endpoint = await atlasEndpoint();
+  try {
+    const invoke = async (user, body) => { const response = await endpoint.call(user, { ...body, datasetVersion: version }); assert.equal(response.status, 200, JSON.stringify(response.body)); return response.body; };
+    for (const length of [3, 5]) {
+      let room = await invoke('alice', { op: 'create', mode: 'map_battle', randomBestOf: length });
+      const code = room.code, row = endpoint.matches.at(-1);
+      await invoke('bob', { op: 'join', code });
+      row.status = 'finished'; row.scores = { alice: 500, bob: 200 };
+      room = await invoke('alice', { op: 'get', code });
+      assert.equal(room.status, 'intermission'); assert.equal(room.intermissionEndsAt, null); assert.equal(row.resolve_at, null);
+      // Even a legacy deadline on a casual room cannot bypass Continue.
+      row.resolve_at = new Date(endpoint.now() + 45_000).toISOString();
+      endpoint.advance(300_000);
+      room = await invoke('bob', { op: 'get', code }); assert.equal(room.status, 'intermission');
+      room = await invoke('alice', { op: 'ready', code, requestId: 'continue-alice' });
+      assert.equal(room.status, 'intermission'); assert.equal(room.players.filter(p => p.ready).length, 1);
+      room = await invoke('alice', { op: 'ready', code, requestId: 'continue-alice' });
+      assert.equal(room.status, 'intermission'); assert.equal(room.players.filter(p => p.ready).length, 1);
+      endpoint.advance(60_000);
+      room = await invoke('bob', { op: 'get', code }); assert.equal(room.status, 'intermission'); assert.equal(room.players[0].ready, true);
+      room = await invoke('bob', { op: 'ready', code }); assert.equal(room.status, 'countdown'); assert.equal(row.resolve_at, null);
+      endpoint.advance(3000); room = await invoke('bob', { op: 'get', code }); assert.equal(room.status, 'round_active'); assert.equal(room.series.results.length, 1);
+    }
+  } finally { endpoint.close(); }
+});
+
+test('ranked break lasts exactly 45 seconds and both ready signals start the next mode immediately', async () => {
+  const version = JSON.parse(await readFile(new URL('../data/geography/version.json', import.meta.url), 'utf8')).atlasDataVersion;
+  const endpoint = await atlasEndpoint();
+  try {
+    const invoke = async (user, body) => { const response = await endpoint.call(user, { ...body, datasetVersion: version }); assert.equal(response.status, 200, JSON.stringify(response.body)); return response.body; };
+    for (const nextMode of ['map_battle', 'stat_battle', 'speed_run']) for (const early of [true, false]) {
+      let room = await invoke('alice', { op: 'create', mode: 'map_battle' }); const code = room.code, row = endpoint.matches.at(-1);
+      await invoke('bob', { op: 'join', code });
+      row.match_kind = 'ranked'; row.state = { ranked: { bans: { alice: [], bob: [] }, order: ['map_battle', nextMode, 'language_guesser'], gameIndex: 0, wins: {}, results: [] } };
+      row.status = 'finished'; row.scores = { alice: 5, bob: 2 };
+      room = await invoke('alice', { op: 'get', code }); assert.equal(room.status, 'intermission'); assert.equal(Date.parse(room.intermissionEndsAt) - endpoint.now(), 45_000);
+      const deadline = room.intermissionEndsAt;
+      room = await invoke('alice', { op: 'ready', code }); assert.equal(room.players.filter(p => p.ready).length, 1); assert.equal(room.intermissionEndsAt, deadline);
+      endpoint.advance(10_000);
+      if (early) room = await invoke('bob', { op: 'ready', code });
+      else {
+        endpoint.advance(34_999); room = await invoke('bob', { op: 'get', code }); assert.equal(room.status, 'intermission');
+        endpoint.advance(1); room = await invoke('bob', { op: 'get', code });
+      }
+      assert.equal(room.status, 'round_active'); assert.equal(room.mode, nextMode); assert.equal(room.intermissionEndsAt, null); assert.equal(room.series.results.length, 1);
+      assert.equal(Date.parse(room.roundStartedAt), endpoint.now()); assert.ok(room.roundEndsAt);
+      if (nextMode === 'speed_run') assert.ok(room.run);
+      if (nextMode === 'stat_battle') assert.ok(room.battle);
+      row.status = 'finished'; row.scores = { alice: 4, bob: 1 };
+      room = await invoke('alice', { op: 'get', code }); assert.equal(room.status, 'finished'); assert.equal(room.intermissionEndsAt, null); assert.equal(room.series.wins.alice, 2);
+    }
+  } finally { endpoint.close(); }
+});
+
+test('local series Continue waits for both players and ignores a repeated click', () => {
+  let continued = [], nextCalls = 0;
+  const ref = { current: [] };
+  const { AtlasRandomSeriesResults } = loadTs('../src/components/atlas/AtlasRandomSeriesResults.tsx', {
+    react: { useState: () => [continued, next => { continued = next; }], useRef: () => ref },
+    'react-router-dom': { Link: props => React.createElement('a', { href: props.to }, props.children) },
+    './AtlasResultHero': loadTs('../src/components/atlas/AtlasResultHero.tsx', {}),
+    '../../games/atlas/modeCatalog': { modeById: id => ARENA_MODES.find(mode => mode.id === id) },
+    '../../games/atlas/randomSeries': { gameWinner, seriesWins, seriesLabel },
+  });
+  const props = { order: ['map-battle', 'closest-wins', 'stat-battle'], players: [{ id: 'a', name: 'Alice' }, { id: 'b', name: 'Bob' }], results: [{ mode: 'map-battle', winnerId: 'a', scores: { a: 500, b: 200 } }], complete: false, onNext: () => nextCalls++, onAgain() {} };
+  const buttons = node => { if (!node || typeof node !== 'object') return []; if (Array.isArray(node)) return node.flatMap(buttons); return [...(node.type === 'button' ? [node] : []), ...buttons(node.props?.children)]; };
+  let tree = AtlasRandomSeriesResults(props);
+  const [alice, bob] = buttons(tree); alice.props.onClick(); alice.props.onClick(); assert.equal(nextCalls, 0); assert.deepEqual(continued, ['a']);
+  tree = AtlasRandomSeriesResults(props); assert.equal(buttons(tree)[0].props.disabled, true); assert.match(renderToStaticMarkup(tree), /1\/2 are ready/);
+  bob.props.onClick(); bob.props.onClick(); assert.equal(nextCalls, 1);
+  const final = AtlasRandomSeriesResults({ ...props, complete: true }); const html = renderToStaticMarkup(final);
+  assert.match(html, /Replay/); assert.match(html, /Back to menu/); assert.doesNotMatch(html, /Continue/); assert.match(html, /atlas-result-particles/);
+});
+
+test('ranked result break renders the shared countdown, early-start explanation and ready count', () => {
+  const { AtlasSeriesIntermission } = loadTs('../src/components/atlas/AtlasSeriesIntermission.tsx', {});
+  const props = { players: [{ id: 'a', name: 'Alice', ready: false }, { id: 'b', name: 'Bob', ready: true }], userId: 'a', ranked: true, endsAt: new Date(45_000).toISOString(), now: 10_000, gameNumber: 2, modeTitle: 'Stat Battle', busy: false, onReady() {} };
+  const html = renderToStaticMarkup(React.createElement(AtlasSeriesIntermission, props));
+  assert.match(html, /35s/); assert.match(html, /both players click Ready/); assert.match(html, /1\/2 are ready/);
+  const casual = renderToStaticMarkup(React.createElement(AtlasSeriesIntermission, { ...props, ranked: false }));
+  assert.doesNotMatch(casual, /35s/); assert.match(casual, /both players press Continue/); assert.match(casual, />Continue</);
+  const ready = renderToStaticMarkup(React.createElement(AtlasSeriesIntermission, { ...props, userId: 'b' }));
+  assert.match(ready, /disabled=""/); assert.match(ready, /Waiting for opponent/);
+});
+
+test('trial completion reports the actual final score once without an extra results click', () => {
+  const effects = [];
+  const received = [];
+  const { GameOverPanel } = loadTs('../src/components/atlas/trials/TrialsUI.tsx', {
+    react: { useEffect: fn => effects.push(fn), useRef: initial => ({ current: initial }) },
+    './trialSession': { useTrialSession: () => ({ onComplete: score => received.push(score) }) },
+    '../AtlasResultHero': loadTs('../src/components/atlas/AtlasResultHero.tsx', {}),
+  });
+  GameOverPanel({ title: 'Run complete', score: 1450, best: 1000, stats: [], onRestart() {}, onExit() {} });
+  effects[0](); effects[0]();
+  assert.deepEqual(received, [1450]);
+});
+
+test('chosen-mode rooms finish after one game and Replay keeps the chosen mode', async () => {
+  const version = JSON.parse(await readFile(new URL('../data/geography/version.json', import.meta.url), 'utf8')).atlasDataVersion;
+  const endpoint = await atlasEndpoint();
+  try {
+    const invoke = async (user, body) => { const response = await endpoint.call(user, { ...body, datasetVersion: version }); assert.equal(response.status, 200, JSON.stringify(response.body)); return response.body; };
+    for (const mode of ['map_battle', 'stat_battle', 'speed_run']) {
+      let room = await invoke('alice', { op: 'create', mode }); const code = room.code, row = endpoint.matches.at(-1);
+      await invoke('bob', { op: 'join', code }); row.status = 'finished'; row.scores = { alice: 7, bob: 3 };
+      room = await invoke('alice', { op: 'get', code }); assert.equal(room.status, 'finished'); assert.equal(room.series, undefined); assert.equal(room.intermissionEndsAt, null);
+      endpoint.advance(60_000); room = await invoke('bob', { op: 'get', code }); assert.equal(room.status, 'finished');
+      room = await invoke('alice', { op: 'rematch', code }); assert.equal(room.status, 'ready'); assert.equal(room.mode, mode); assert.equal(room.series, undefined); assert.deepEqual(room.scores, { alice: 0, bob: 0 });
+    }
+  } finally { endpoint.close(); }
 });

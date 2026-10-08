@@ -1,9 +1,10 @@
 import { useRandomSeries } from "./useRandomSeries";
-import { AtlasRandomSeriesResults } from "../../../components/atlas/AtlasRandomSeriesResults";
+import { AtlasResultHero } from "../../../components/atlas/AtlasResultHero";
+import { AtlasRandomSeriesProgress, AtlasRandomSeriesResults } from "../../../components/atlas/AtlasRandomSeriesResults";
 import { seriesLabel } from "../../../games/atlas/randomSeries";
 import { calibratedHotseatSeeds } from "../../../games/atlas/hotseatCalibration";
 import { useCallback, useMemo, useRef, useState, type CSSProperties } from "react";
-import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
+import { Link, Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ChevronRight, Crown, MapPin, RotateCcw, Trophy, Users } from "lucide-react";
 import { AtlasSoloGame, SoloResults, SoloSettingsForm } from "../../../components/atlas/AtlasSoloGame";
 import { AtlasWorldMap } from "../../../components/atlas/AtlasWorldMap";
@@ -29,6 +30,12 @@ type GameProps = { mode: ArenaModeDef; data: AtlasDataset; players: Player[]; se
 /** Hotseat: two to four people share one device. */
 export default function AtlasHotseatPage() {
   const { modeId } = useParams();
+  const [params] = useSearchParams();
+  const key = params.get("random") === "1" ? `series:${params.get("series") ?? params.get("bestOf")}` : `single:${modeId}`;
+  return <HotseatSession key={key} modeId={modeId} />;
+}
+
+function HotseatSession({ modeId }: { modeId?: string }) {
   const series = useRandomSeries(modeId);
   const mode = series.mode;
   const navigate = useNavigate();
@@ -67,12 +74,11 @@ export default function AtlasHotseatPage() {
       </div>
     </main>
   );
-  if (series.enabled && series.reviewing) return <AtlasRandomSeriesResults {...series} players={players.map((player, index) => ({ ...player, id: String(index) }))} onNext={series.next} onAgain={series.reset} />;
+  if (series.enabled && series.reviewing) return <AtlasRandomSeriesResults key={series.results.length} {...series} players={players.map((player, index) => ({ ...player, id: String(index) }))} onNext={series.next} onAgain={series.reset} />;
   const gameKey = `${mode.id}:${series.results.length}`;
   const props: GameProps = { mode, data, players, settings, onExit: exit, onSetup: () => { setPlayers(null); if (series.enabled) series.reset(); }, onComplete: series.enabled ? scores => series.finish(Object.fromEntries(scores.map((score, index) => [String(index), score]))) : undefined };
-  if (mode.hotseat === "pins") return <PinsHotseat key={gameKey} {...props} />;
-  if (mode.hotseat === "duel") return <DuelHotseat key={gameKey} {...props} />;
-  return <TurnsHotseat key={gameKey} {...props} />;
+  const game = mode.hotseat === "pins" ? <PinsHotseat key={gameKey} {...props} /> : mode.hotseat === "duel" ? <DuelHotseat key={gameKey} {...props} /> : <TurnsHotseat key={gameKey} {...props} />;
+  return series.enabled ? <div className="atlas-series-session"><AtlasRandomSeriesProgress length={series.length} index={series.results.length} />{game}</div> : game;
 }
 
 /** Final ranking for every hotseat mode. */
@@ -80,10 +86,8 @@ function Standings({ title, rows, unit, onAgain, onSetup, onExit, onComplete }: 
   const ranked = [...rows].sort((left, right) => right.score - left.score);
   const top = ranked[0]?.score ?? 0, winners = ranked.filter((row) => row.score === top);
   return (
-    <main className="atlas-page atlas-center">
-      <div className="atlas-result-orbit"><Crown /></div>
-      <span className="atlas-eyebrow">{title} · final standings</span>
-      <h1>{winners.length > 1 ? "It's a tie" : `${winners[0]?.player.name} wins`}</h1>
+    <main className="atlas-page atlas-center atlas-random-results">
+      <AtlasResultHero eyebrow={`${title} · final standings`} title={winners.length > 1 ? "It's a tie" : `${winners[0]?.player.name} wins`} />
       <ol className="atlas-standings">
         {ranked.map((row) => {
           const rank = ranked.findIndex((item) => item.score === row.score) + 1;
@@ -93,9 +97,9 @@ function Standings({ title, rows, unit, onAgain, onSetup, onExit, onComplete }: 
         })}
       </ol>
       <div className="atlas-result-actions">
-        {onComplete ? <button type="button" onClick={() => onComplete(rows.map(row => row.score))}>See series score <ChevronRight /></button> : <button type="button" onClick={onAgain}><RotateCcw /> Play again</button>}
+        {onComplete ? <button type="button" onClick={() => onComplete(rows.map(row => row.score))}>See series score <ChevronRight /></button> : <button type="button" onClick={onAgain}><RotateCcw /> Replay</button>}
         <button type="button" className="atlas-secondary" onClick={onSetup}><Users /> Players & settings</button>
-        <button type="button" className="atlas-secondary" onClick={onExit}>All modes</button>
+        <button type="button" className="atlas-secondary" onClick={onExit}>Back to menu</button>
       </div>
     </main>
   );
@@ -114,9 +118,9 @@ function TurnsHotseat({ mode, data, players, settings, onExit, onSetup, onComple
   const commit = useCallback((score: number) => {
     setScores((current) => { const copy = [...current]; copy[turn] = score; return copy; });
     setSummary(null);
-    if (last) setPhase("standings");
+    if (last) { if (onComplete) onComplete(players.map((_, index) => index === turn ? score : scores[index] ?? 0)); else setPhase("standings"); }
     else { setTurn(turn + 1); setPhase("handoff"); }
-  }, [last, turn]);
+  }, [last, onComplete, players, scores, turn]);
   const session = useMemo<TrialSession>(() => ({ player, finish: { label: last ? "See standings" : `Pass to ${next?.name}`, onClick: () => commit(pending.current) } }), [commit, last, next?.name, player]);
   const again = () => { setSeed(freshSeed()); setTurn(0); setScores([]); setPhase("handoff"); };
   const finishRun = useCallback((result: SoloSummary) => { setSummary(result); setPhase("between"); }, []);
@@ -186,7 +190,7 @@ function PinsHotseat({ mode, data, players, settings, onExit, onSetup, onComplet
     setPhase("reveal");
   };
   const nextRound = () => {
-    if (round + 1 >= questions.length) { setPhase("standings"); return; }
+    if (round + 1 >= questions.length) { if (onComplete) onComplete(scores); else setPhase("standings"); return; }
     setRound(round + 1); setStep(0); setPins(players.map(() => null)); setResults([]); setPhase("handoff");
   };
   const again = () => { setSeed(freshSeed()); setRound(0); setStep(0); setPins(players.map(() => null)); setScores(players.map(() => 0)); setWins(players.map(() => 0)); setResults([]); setPhase("handoff"); };

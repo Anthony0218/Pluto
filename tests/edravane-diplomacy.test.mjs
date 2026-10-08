@@ -283,7 +283,7 @@ test("insulting your own vassal costs opinion and loyalty without creating a for
   const s = createCampaign(),
     v = house(s, "auremarch-1");
   const next = act(s, { type: "insult", house: v.id });
-  assert.equal(house(next, v.id).opinion, v.opinion - 15);
+  assert.equal(house(next, v.id).opinion, v.opinion - (v.family.find((p) => p.id === v.ruler).traits.includes("proud") ? 20 : 15));
   assert.ok(house(next, v.id).loyalty < v.loyalty);
   assert.equal(next.wars.length, 0);
 });

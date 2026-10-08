@@ -8,6 +8,8 @@ export const RESOURCES: Resource[] = [
   "herbs",
   "luxury",
 ];
+export const WORLD_GRID = { minQ: -8, maxQ: 28, minR: -4, maxR: 17 };
+export const WORLD_HEX_COUNT = (WORLD_GRID.maxQ - WORLD_GRID.minQ + 1) * (WORLD_GRID.maxR - WORLD_GRID.minR + 1);
 export const NATIONS: Nation[] = [
   [
     "auremarch",
@@ -250,9 +252,28 @@ export const center = (d: Pick<District, "q" | "r">): [number, number] => [
   54 + d.q * (Math.sqrt(3) * 25) + (d.r % 2 ? Math.sqrt(3) * 12.5 : 0),
   66 + d.r * 37.5,
 ];
+const worldIndexes = new WeakMap<District[], { length: number; ids: Map<string, District>; cells: Map<string, District[]>; order: Map<District, number> }>();
+function worldIndex(world: District[]) {
+  let index = worldIndexes.get(world);
+  if (!index || index.length !== world.length) {
+    index = { length: world.length, ids: new Map(), cells: new Map(), order: new Map() };
+    world.forEach((d, i) => {
+      index!.ids.set(d.id, d); index!.order.set(d, i);
+      const key = `${d.q}:${d.r}`;
+      index!.cells.set(key, [...(index!.cells.get(key) ?? []), d]);
+    });
+    worldIndexes.set(world, index);
+  }
+  return index;
+}
+/** Odd-row offset coordinates; geometry is fixed for the lifetime of a campaign map. */
+export function adjacentCoordinates(q: number, r: number): [number, number][] {
+  const diagonal = r % 2 ? 1 : -1;
+  return [[q - 1, r], [q + 1, r], [q, r - 1], [q + diagonal, r - 1], [q, r + 1], [q + diagonal, r + 1]];
+}
 export function neighbors(world: District[], id: string): District[] {
-  const d = world.find((h) => h.id === id);
-  return d ? world.filter((h) => hexDistance(d, h) === 1) : [];
+  const index = worldIndex(world), d = index.ids.get(id);
+  return d ? adjacentCoordinates(d.q, d.r).flatMap(([q, r]) => index.cells.get(`${q}:${r}`) ?? []).sort((a, b) => index.order.get(a)! - index.order.get(b)!) : [];
 }
 export function findPath(
   world: District[],
@@ -260,8 +281,8 @@ export function findPath(
   to: string,
   sea = false,
 ): string[] {
-  const end = world.find((d) => d.id === to),
-    start = world.find((d) => d.id === from);
+  const index = worldIndex(world);
+  const end = index.ids.get(to), start = index.ids.get(from);
   if (
     !end ||
     !start ||
@@ -272,8 +293,8 @@ export function findPath(
     return [];
   const queue = [from],
     prev = new Map<string, string>([[from, ""]]);
-  while (queue.length) {
-    const id = queue.shift()!;
+  for (let i = 0; i < queue.length; i++) {
+    const id = queue[i];
     if (id === to) break;
     for (const n of neighbors(world, id)) {
       if (prev.has(n.id) || n.biome === "legacy") continue;
@@ -293,35 +314,22 @@ export function findPath(
 }
 export function makeWorld(): District[] {
   const world: District[] = [];
-  // A broad mainland, a south-eastern gulf, and Saltmere's island chain follow the reference.
-  // Select 174 mainland hexes by a geographic score, plus six explicit island hexes.
+  // Two deliberately shaped continents, separated by the navigable Crown Strait.
+  // Retain the original capitals and Saltmere's island chain; saved maps are never regenerated.
   const islands = new Set(["16:9", "16:10", "17:10", "16:11", "18:11", "18:8"]);
-  const candidates: {
-    id: string;
-    score: number;
-  }[] = [];
-  for (let r = 0; r <= 12; r++)
-    for (let q = 0; q <= 17; q++) {
-      const gulf = q >= 14 && r >= 8,
-        corner = q <= 1 && r <= 1;
-      if (gulf || corner || islands.has(`${q}:${r}`)) continue;
-      const score =
-        ((q - 8.4) / 9.3) ** 2 +
-        ((r - 6) / 7.1) ** 2 +
-        (q < 3 && r > 9 ? 0.3 : 0);
-      candidates.push({
-        id: `${q}:${r}`,
-        score: NATIONS.some((n) => n.capital === `${q}:${r}`) ? -1 : score,
-      });
-    }
-  const land = new Set(
-    candidates
-      .sort((a, b) => a.score - b.score || a.id.localeCompare(b.id))
-      .slice(0, 174)
-      .map((d) => d.id),
-  );
-  for (let r = -1; r <= 13; r++)
-    for (let q = -1; q <= 18; q++) {
+  const western: [number, number][] = [[1, 7], [-1, 8], [-2, 9], [-3, 10], [-4, 10], [-5, 9], [-5, 9], [-6, 9], [-6, 9], [-5, 9], [-4, 10], [-5, 9], [-4, 10], [-3, 9], [-2, 9], [-1, 8], [0, 7], [2, 6]];
+  const eastern: [number, number][] = [[17, 21], [15, 23], [13, 24], [13, 25], [13, 25], [14, 26], [13, 25], [13, 24], [14, 23]];
+  const land = new Set<string>();
+  const addRow = (range: [number, number], r: number) => { for (let q = range[0]; q <= range[1]; q++) land.add(`${q}:${r}`); };
+  western.forEach((range, i) => addRow(range, i - 2));
+  eastern.forEach((range, i) => addRow(range, i - 1));
+  // Bays and peninsulas break up the eastern shore without joining the archipelago.
+  addRow([13, 14], 8); addRow([21, 23], 8); addRow([21, 22], 9); addRow([22, 22], 10);
+  for (const bay of ["-6:6", "-5:6", "-5:10", "-4:10", "-3:10", "25:2", "25:3", "26:3", "13:5", "17:7", "18:7"]) land.delete(bay);
+  const isLand = (q: number, r: number) => land.has(`${q}:${r}`) || islands.has(`${q}:${r}`);
+  for (let r = WORLD_GRID.minR; r <= WORLD_GRID.maxR; r++)
+    for (let q = WORLD_GRID.minQ; q <= WORLD_GRID.maxQ; q++) {
+      if (q === 28 && r === 17) continue; // Reserved for the legacy campaign entry.
       let biome: Biome = islands.has(`${q}:${r}`)
         ? "island"
         : land.has(`${q}:${r}`)
@@ -330,7 +338,7 @@ export function makeWorld(): District[] {
       const nation =
         biome === "sea"
           ? null
-          : NATIONS.reduce((a, b) =>
+          : NATIONS.filter((n) => n.id !== "saltmere" || islands.has(`${q}:${r}`) || r >= 6 && adjacentCoordinates(q, r).some(([nq, nr]) => !isLand(nq, nr))).reduce((a, b) =>
               hexDistance({ q, r }, { q: a.anchor[0], r: a.anchor[1] }) <=
               hexDistance({ q, r }, { q: b.anchor[0], r: b.anchor[1] })
                 ? a
@@ -350,7 +358,7 @@ export function makeWorld(): District[] {
         biome = base[nation.id];
         if ((q + r) % 5 === 0) biome = "hills";
         if (q === 8 && r > 3) biome = "river";
-        if (q >= 9 && q <= 11 && r === 0) biome = "glacier";
+        if ((q >= 7 && q <= 10 && r <= 0) || q === 22 && r >= 2 && r <= 5) biome = r <= 0 ? "glacier" : "mountains";
         if (q >= 6 && q <= 12 && r === 12) biome = "volcanic";
         if (q === 16 && r === 7) biome = "desert";
         if (q === 15 && r === 7) biome = "marsh";
@@ -401,8 +409,8 @@ export function makeWorld(): District[] {
   }
   world.push({
     id: "legacy",
-    q: 18,
-    r: 13,
+    q: 28,
+    r: 17,
     name: "Legacy Region",
     nation: null,
     owner: null,

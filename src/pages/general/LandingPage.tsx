@@ -6,6 +6,8 @@ import ClosingCta from "../../components/App/landing/ClosingCta";
 import LandingJourney from "../../components/App/landing/LandingJourney";
 import LandingSections from "../../components/App/landing/LandingSections";
 import LandingStage from "../../components/App/landing/LandingStage";
+import "../../components/App/landing/landingButtons.css";
+import { useLandingAnimations } from "../../components/App/landing/motionPreference";
 import { usePlanetLight } from "../../components/App/landing/usePlanetLight";
 
 /**
@@ -16,8 +18,9 @@ export default function LandingPage() {
   useUiLanguage();
   const page = useRef<HTMLElement>(null);
   usePlanetLight(page);
-  return <MotionConfig reducedMotion="user"><LazyMotion features={domAnimation} strict>
-    <main ref={page}>
+  const [animations] = useLandingAnimations();
+  return <MotionConfig reducedMotion={animations ? "user" : "always"}><LazyMotion features={domAnimation} strict>
+    <main ref={page} className="landing" data-animations={animations ? undefined : "off"}>
       <LandingStage>
         <LandingHero />
         <LandingJourney>

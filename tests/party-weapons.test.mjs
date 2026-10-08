@@ -1,26 +1,18 @@
+import { DEFAULT_SETTINGS, advance, applyAction } from "./helpers/party-legacy-fixtures.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
-import {
-  AIM_CONFIG,
-  DEFAULT_SETTINGS,
+import { AIM_CONFIG,
   LUCKY_SIX_CONFIG,
-  SCATTERBLASTER_CONFIG,
-} from "../src/games/party/config.ts";
+  SCATTERBLASTER_CONFIG } from "../src/games/party/config.ts";
 import { tropical } from "../src/games/party/content/maps.ts";
-import {
-  advance,
-  applyAction,
-  createMatch,
-  createPlayer,
-} from "../src/games/party/engine/engine.ts";
+import { createMatch,
+  createPlayer } from "../src/games/party/engine/engine.ts";
 import { graphDistances } from "../src/games/party/engine/graph.ts";
 import { botAction } from "../src/games/party/engine/bots.ts";
 import { createItemInstance } from "../src/games/party/items/inventory.ts";
-import {
-  aimTargetPosition,
+import { aimTargetPosition,
   botAimRelease,
-  resolveAimRelease,
-} from "../src/games/party/items/aim.ts";
+  resolveAimRelease } from "../src/games/party/items/aim.ts";
 import { itemRegistry } from "../src/games/party/items/registry.ts";
 import { scatterBand, scatterblasterDamage } from "../src/games/party/items/weapons.ts";
 import { parseMessage } from "../src/games/party/network/protocol.ts";

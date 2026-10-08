@@ -158,7 +158,8 @@ test("two real connected clients, mixed eight-slot lobby, permissions, host sett
     (d) => d.owner,
   ).id;
   a.command({ type: "muster", army: "army-auremarch-0", count: 500 });
-  const raised = await b.wait(
+  // A distant opponent no longer receives this host or its planned movement.
+  const raised = await a.wait(
     (m) =>
       m.type === "snapshot" &&
       m.room.state?.armies.some(
@@ -169,7 +170,7 @@ test("two real connected clients, mixed eight-slot lobby, permissions, host sett
     (a) => a.house === "auremarch-0" && !a.garrison,
   );
   a.command({ type: "move", army: host.id, hex: destination });
-  await b.wait(
+  await a.wait(
     (m) =>
       m.type === "snapshot" &&
       m.room.state?.armies.find((a) => a.id === host.id)?.path.length > 0,
@@ -214,7 +215,7 @@ test("two real connected clients, mixed eight-slot lobby, permissions, host sett
       m.room.slots.find((s) => s.nation === "high-cairn").connected,
   );
   assert.equal(returned.room.state.version, 2);
-  assert.equal(returned.room.state.districts.length, 301);
+  assert.equal(returned.room.state.districts.length, 814);
   assert.equal(
     returned.room.slots.find((s) => s.nation === "high-cairn").bot,
     false,
@@ -573,7 +574,7 @@ test("a real player can blockade neutral trade and the affected crown declares a
     )
   ).room.state.armies.find((a) => a.house === "high-cairn-0" && !a.garrison);
   b.command({ type: "blockade", army: host.id, enabled: true });
-  await a.wait(
+  await b.wait(
     (m) =>
       m.type === "snapshot" &&
       m.room.state?.armies.find((a) => a.id === host.id)?.blockading,

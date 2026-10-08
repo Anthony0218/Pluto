@@ -1,15 +1,14 @@
-import { useRef, useState, type ReactNode } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button, GridList, GridListItem, I18nProvider, useDragAndDrop } from "react-aria-components";
-import { ArrowDown, ArrowRight, ArrowUp, Check, Gamepad2, GripVertical, Pencil, Swords, Trophy, Users } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUp, Check, GripVertical, Pencil, Swords, Trophy, Users } from "lucide-react";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { reorderFavorites } from "@/data/dashboard";
 
 const actions = [
-  { id: "match", label: "See all games", detail: "Choose a game", route: "/games", Icon: Gamepad2 },
-  { id: "friend", label: "Challenge a friend", detail: "Play someone you know", route: "/invite", Icon: Swords },
-  { id: "group", label: "Play with your clan", detail: "Create or join a clan", route: "/clans", Icon: Users },
-  { id: "ranked", label: "Play competitive (Chess)", detail: "Climb the ranked ladder", route: "/games/chess/ranked", Icon: Trophy },
+  { id: "friend", label: "Challenge a friend", detail: "Play someone you know", route: "/invite", Icon: Swords, tone: "pink" },
+  { id: "group", label: "Play with your clan", detail: "Create or join a clan", route: "/clans", Icon: Users, tone: "teal" },
+  { id: "ranked", label: "Play competitive", detail: "Climb the ranked ladders", route: "/competitive", Icon: Trophy, tone: "gold" },
 ] as const;
 
 /** Saved order plus an editable draft: changes only persist on Save and Cancel restores the saved order. */
@@ -86,49 +85,15 @@ function SortableActionRow({ userId }: { userId?: string }) {
     },
     isDisabled: !editing,
   });
-  return <section className="dashboard-actions" aria-labelledby="dashboard-actions-title">
+  return <section className="dashboard-actions dash-panel" aria-labelledby="dashboard-actions-title">
     <div className="dash-section-heading"><h2 id="dashboard-actions-title">{ui("Play together")}</h2><CustomizeControls editing={editing} onStart={start} onCancel={cancel} onSave={save} /></div>
     <GridList ref={gridRef} dependencies={[editing, order]} aria-label={ui("Reorder play together actions")} items={orderedActions} layout="grid" orientation="horizontal" selectionMode="none" dragAndDropHooks={dragAndDropHooks} className="dashboard-actions-grid dashboard-sortable-grid">
       {(action) => {
         const index = order.indexOf(action.id);
-        const content = <><action.Icon size={27} aria-hidden="true" /><span><strong>{ui(action.label)}</strong><small>{ui(action.detail)}</small></span><ArrowRight size={18} aria-hidden="true" /></>;
-        return <GridListItem id={action.id} data-action-id={action.id} textValue={ui(action.label)} className={`dashboard-action-card${action.id === "match" ? " dashboard-action-primary" : ""}${editing ? " editing" : ""}`}>
+        const content = <><span className="dashboard-action-icon"><action.Icon size={22} aria-hidden="true" /></span><span><strong>{ui(action.label)}</strong><small>{ui(action.detail)}</small></span><ArrowRight size={18} aria-hidden="true" /></>;
+        return <GridListItem id={action.id} data-action-id={action.id} textValue={ui(action.label)} className={`dashboard-action-card tone-${action.tone}${editing ? " editing" : ""}`}>
           {editing ? <div className="dashboard-action-link">{content}</div> : <Link to={action.route} className="dashboard-action-link">{content}</Link>}
           {editing && <div className="dashboard-edit-tools"><Button slot="drag" aria-label={`${ui("Move")}: ${ui(action.label)}`} className="dashboard-drag-handle"><GripVertical size={17} /></Button><MoveControls label={action.label} first={index === 0} last={index === order.length - 1} onMove={direction => move(action.id, direction)} /></div>}
-        </GridListItem>;
-      }}
-    </GridList>
-  </section>;
-}
-
-export function DashboardContentGrid({ userId, sections }: { userId?: string; sections: { id: string; label: string; content: ReactNode }[] }) {
-  const { language } = useUiLanguage();
-  return <I18nProvider locale={language === "bar" ? "de" : language}><SortableContentGrid userId={userId} sections={sections} /></I18nProvider>;
-}
-
-function SortableContentGrid({ userId, sections }: { userId?: string; sections: { id: string; label: string; content: ReactNode }[] }) {
-  const gridRef = useRef<HTMLDivElement>(null);
-  const { order, editing, start, cancel, save, move, reorder } = useStoredOrder(`pluto-dashboard-panels-${userId ?? "guest"}`, sections.map(section => section.id));
-  const orderedSections = order.map(id => sections.find(item => item.id === id)).filter((item): item is (typeof sections)[number] => Boolean(item));
-  const { dragAndDropHooks } = useDragAndDrop({
-    getItems: keys => [...keys].map(key => ({ "text/plain": String(key) })),
-    getAllowedDropOperations: () => ["move"],
-    onReorder: event => reorder(new Set([...event.keys].map(String)), String(event.target.key), event.target.dropPosition === "after" ? "after" : "before"),
-    renderDragPreview: items => {
-      const section = sections.find(item => item.id === items[0]?.["text/plain"]);
-      const bounds = gridRef.current?.querySelector<HTMLElement>(`[data-section-id="${section?.id}"]`)?.getBoundingClientRect();
-      return <div className="dashboard-content-preview" style={{ width: bounds?.width, height: Math.min(bounds?.height ?? 150, 220) }}>{section ? ui(section.label) : ui("Move")}</div>;
-    },
-    isDisabled: !editing,
-  });
-  return <section className="dashboard-content" aria-labelledby="dashboard-content-title">
-    <div className="dash-section-heading"><h2 id="dashboard-content-title">{ui("Your dashboard")}</h2><CustomizeControls editing={editing} onStart={start} onCancel={cancel} onSave={save} /></div>
-    <GridList ref={gridRef} dependencies={[editing, order, sections]} aria-label={ui("Reorder dashboard panels")} items={orderedSections} layout="grid" orientation="horizontal" selectionMode="none" dragAndDropHooks={dragAndDropHooks} className="dashboard-content-grid dashboard-sortable-grid">
-      {(section) => {
-        const index = order.indexOf(section.id);
-        return <GridListItem id={section.id} data-section-id={section.id} textValue={ui(section.label)} className={`dashboard-content-item${editing ? " editing" : ""}`}>
-          {editing && <div className="dashboard-content-move"><span>{ui(section.label)}</span><div className="dashboard-content-tools"><Button slot="drag" aria-label={`${ui("Move")}: ${ui(section.label)}`} className="dashboard-drag-handle"><GripVertical size={17} /></Button><MoveControls label={section.label} first={index === 0} last={index === order.length - 1} onMove={direction => move(section.id, direction)} /></div></div>}
-          {section.content}
         </GridListItem>;
       }}
     </GridList>

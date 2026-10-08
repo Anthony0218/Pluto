@@ -1,29 +1,22 @@
+import { DEFAULT_SETTINGS, advance, applyAction } from "./helpers/party-legacy-fixtures.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
-import { DEFAULT_SETTINGS, RADIATION_CONFIG, RARE_ITEM_WEIGHTS } from "../src/games/party/config.ts";
+import { RADIATION_CONFIG, RARE_ITEM_WEIGHTS } from "../src/games/party/config.ts";
 import { tropical } from "../src/games/party/content/maps.ts";
-import {
-  activePlayer,
-  advance,
-  applyAction,
+import { activePlayer,
   createMatch,
-  createPlayer,
-} from "../src/games/party/engine/engine.ts";
+  createPlayer } from "../src/games/party/engine/engine.ts";
 import { botAction } from "../src/games/party/engine/bots.ts";
 import { eligiblePlutoNodes } from "../src/games/party/engine/economy.ts";
 import { graphDistances } from "../src/games/party/engine/graph.ts";
 import { createItemInstance } from "../src/games/party/items/inventory.ts";
 import { falloutBlastNodes } from "../src/games/party/items/rare.ts";
-import {
-  itemRegistry,
+import { itemRegistry,
   randomRareItemId,
-  randomStandardItemId,
-} from "../src/games/party/items/registry.ts";
-import {
-  createRadiationZone,
+  randomStandardItemId } from "../src/games/party/items/registry.ts";
+import { createRadiationZone,
   irradiatedNodeIds,
-  radiationRoundsLeft,
-} from "../src/games/party/hazards/radiation.ts";
+  radiationRoundsLeft } from "../src/games/party/hazards/radiation.ts";
 import { minigameRegistry } from "../src/games/party/minigames/index.ts";
 import { parseMessage } from "../src/games/party/network/protocol.ts";
 import { PartyRooms } from "../server/party/rooms.ts";

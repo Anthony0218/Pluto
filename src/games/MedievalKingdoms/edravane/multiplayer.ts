@@ -7,6 +7,7 @@ import {
 import { commandHouse } from "./battle.ts";
 import { NATIONS } from "./world.ts";
 import type { Campaign, Command } from "./types.ts";
+import { strategyView } from "./logistics.ts";
 
 export const PRESENCE_MS = 90000;
 export type CouncilSlot = {
@@ -313,5 +314,6 @@ export function councilReply(room: CouncilRoom, user: string): CouncilReply {
           }),
         );
       }
+  if (view.state) view.state = strategyView(view.state, `${member.nation}-0`);
   return { room: view, player: user, nation: member.nation, seq: member.last };
 }

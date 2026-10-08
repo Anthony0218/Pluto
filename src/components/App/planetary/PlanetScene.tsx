@@ -1,14 +1,14 @@
 import { Tabs } from "@base-ui/react/tabs";
-import { ArrowLeft, ArrowRight, Binary, BookOpen, Calculator, CalendarClock, ChartNoAxesCombined, Dices, Drum, Dumbbell, Flame, Gift, Gamepad2, Globe, Goal, Grid2X2, Hash, Infinity as InfinityIcon, Music, Music4, NotebookPen, Percent, QrCode, Receipt, Ruler, ShieldCheck, Sigma, Spline, Swords, Variable, Waypoints, Wallet } from "lucide-react";
+import { ArrowLeft, ArrowRight, AudioWaveform, Binary, BookOpen, Calculator, CalendarClock, ChartNoAxesCombined, Dices, Drum, Dumbbell, Flame, Gift, Gamepad2, Globe, Goal, Grid2X2, Hash, Infinity as InfinityIcon, Music, Music4, NotebookPen, Percent, QrCode, Receipt, Ruler, ShieldCheck, Sigma, Spline, Swords, Trophy, Variable, Waypoints, Wallet } from "lucide-react";
 import * as m from "motion/react-m";
 import { useId, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { useMotionValueEvent, useTransform } from "motion/react";
 import { Link, useNavigate } from "react-router-dom";
 import { games } from "@/data/games";
-import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useLandingReducedMotion as useReducedMotion } from "../landing/motionPreference";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { heroPlanets, type PlanetConfig } from "./planetConfig";
-import { landingBooks, landingTools, universeCategories, type BookDesign, type UniverseCategory } from "./universeCatalog";
+import { landingTools, universeBooks, universeCategories, type BookDesign, type UniverseCategory } from "./universeCatalog";
 import { landingBookTitle, landingCopy } from "./landingCopy";
 import { bookDescription } from "../landing/flybyCatalog";
 import { useLanding } from "../landing/landingContext";
@@ -28,9 +28,9 @@ export function PlanetArt({ config }: { config: PlanetConfig }) {
   </span>;
 }
 
-type ItemProps = { id: string; route: string; title: string; className?: string; style?: CSSProperties; children: ReactNode; status?: string; landing?: boolean; blurb?: string; align?: "start" | "center" | "end"; /** Opens something on the page instead of navigating, e.g. a shelf of books. */ onSelect?: () => void };
+type ItemProps = { id: string; route: string; title: string; className?: string; style?: CSSProperties; children: ReactNode; status?: string; /** A short label under the name, e.g. the genre. Shown instead of the status, which stays in the accessible name. */ tag?: string; landing?: boolean; blurb?: string; align?: "start" | "center" | "end"; /** Opens something on the page instead of navigating, e.g. a shelf of books. */ onSelect?: () => void; /** Shown but not openable yet. */ disabled?: boolean };
 
-function UniverseItem({ id, route, title, className = "", style, children, status, landing, blurb, align = "center", onSelect }: ItemProps) {
+function UniverseItem({ id, route, title, className = "", style, children, status, tag, landing, blurb, align = "center", onSelect, disabled }: ItemProps) {
   const reducedMotion = useReducedMotion();
   const land = usePlanetLanding();
   const cardId = useId();
@@ -40,10 +40,12 @@ function UniverseItem({ id, route, title, className = "", style, children, statu
       {children}
     </m.span>
     <strong className="universe-label">{ui(title)}</strong>
-    {status && <span className="universe-status">{ui(status)}</span>}
+    {(tag ?? status) && <span className="universe-status">{tag ?? ui(status!)}</span>}
   </>;
-  return <m.div className={`universe-object ${className}`} style={style} data-flyby-id={id} whileHover="hover" whileTap="press">
-    {onSelect
+  return <m.div className={`universe-object ${className}${disabled ? " universe-object--disabled" : ""}`} style={style} data-flyby-id={id} whileHover="hover" whileTap="press">
+    {disabled
+      ? <span className="universe-item" aria-disabled="true" role="link" aria-describedby={blurb ? cardId : undefined} aria-label={label}>{content}</span>
+      : onSelect
       ? <button type="button" className="universe-item" aria-describedby={blurb ? cardId : undefined} aria-label={label} onClick={onSelect}>{content}</button>
       : <Link to={route} className="universe-item" aria-describedby={blurb ? cardId : undefined} aria-label={label} onClick={landing ? event => land(event, route) : undefined}>{content}</Link>}
     {blurb && <span id={cardId} role="tooltip" className={`universe-card universe-card--${align}`}>{blurb}</span>}
@@ -64,7 +66,7 @@ const categoryIcons = { games: Gamepad2, tools: Grid2X2, learn: BookOpen };
 const bookIcons = {
   math: Sigma, foundations: Hash, music: Music, percentages: Calculator, guides: ShieldCheck, analysis: ChartNoAxesCombined,
   algebra: Variable, calculus: Spline, linear: Waypoints, depth: InfinityIcon, chance: Dices,
-  pitch: Music4, rhythm: Drum, rules: Goal, tactics: Swords,
+  pitch: Music4, rhythm: Drum, rules: Goal, tactics: Swords, football: Trophy, signal: AudioWaveform,
 };
 
 export function BookArt({ title, design }: { title: string; design: BookDesign }) {
@@ -88,14 +90,14 @@ export function BookArt({ title, design }: { title: string; design: BookDesign }
 function LearnShelf() {
   const { language } = useUiLanguage();
   const [openId, setOpenId] = useState<string | null>(null);
-  const group = landingBooks.find(book => book.id === openId);
-  const books = group?.books ?? landingBooks;
+  const group = universeBooks.find(book => book.id === openId);
+  const books = group?.books ?? universeBooks;
   return <>
     {group && <div className="universe-shelf-head">
       <button type="button" autoFocus onClick={() => setOpenId(null)}><ArrowLeft size={15} aria-hidden="true" />{ui("All books")}</button>
       <strong>{ui(group.title)}</strong>
     </div>}
-    {books.map((book, index) => <UniverseItem key={book.id} id={book.id} title={book.title} route={book.route} blurb={ui(bookDescription(book.id))} align={index % 4 > 1 ? "end" : "start"} onSelect={book.books ? () => setOpenId(book.id) : undefined}>
+    {books.map((book, index) => <UniverseItem key={book.id} id={book.id} title={book.title} route={book.route} blurb={ui(bookDescription(book.id))} align={index % 4 > 1 ? "end" : "start"} onSelect={book.books ? () => setOpenId(book.id) : undefined} disabled={book.disabled} tag={book.disabled ? ui("Coming soon") : undefined}>
       <BookArt title={landingBookTitle(language, book.design)} design={book.design} />
     </UniverseItem>)}
   </>;
@@ -104,6 +106,10 @@ function LearnShelf() {
 const planetBlurbs: Record<string, CopyKey> = {
   "/games/chess": "blurbChess", "/games/go": "blurbGo", "/games/watten": "blurbWatten", "/games/schafkopf": "blurbSchafkopf",
   "/games/atlas-arena": "blurbAtlas", "/games/natura": "blurbNatura", "/games/eat-it": "blurbEatIt",
+};
+const planetGenres: Record<string, CopyKey> = {
+  "/games/chess": "genreStrategy", "/games/go": "genreStrategy", "/games/watten": "genreCards", "/games/schafkopf": "genreCards",
+  "/games/atlas-arena": "genreGeography", "/games/natura": "genreNature", "/games/eat-it": "genreArcade",
 };
 const planetAlign: Record<string, "start" | "end"> = { schafkopf: "start", watten: "end", go: "end", atlas: "start" };
 
@@ -148,7 +154,7 @@ export default function PlanetScene({ category, onCategoryChange }: { category: 
         <m.div className={`universe-grid universe-grid--${item.id}`} initial={reducedMotion ? false : { opacity: .25, y: 8, scale: .985 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: reducedMotion ? 0 : .22, ease: [.22, 1, .36, 1] }}>
           {item.id === "games" && heroPlanets.map(config => {
             const game = games.find(game => game.route === config.route);
-            return <UniverseItem key={config.id} id={config.id} title={config.label} route={config.route} blurb={planetBlurbs[config.route] ? text(planetBlurbs[config.route]) : undefined} align={planetAlign[config.position] ?? "center"} className={`solar-planet solar-planet--${config.tone} solar-position--${config.position}${config.primary ? " solar-planet--primary" : ""}`} status={game && !game.finished ? "In progress" : undefined} landing>
+            return <UniverseItem key={config.id} id={config.id} title={config.label} route={config.route} blurb={planetBlurbs[config.route] ? text(planetBlurbs[config.route]) : undefined} align={planetAlign[config.position] ?? "center"} className={`solar-planet solar-planet--${config.tone} solar-position--${config.position}${config.primary ? " solar-planet--primary" : ""}`} status={game && !game.finished ? "In progress" : undefined} tag={planetGenres[config.route] ? text(planetGenres[config.route]) : undefined} landing>
               <PlanetArt config={config} />
             </UniverseItem>;
           })}

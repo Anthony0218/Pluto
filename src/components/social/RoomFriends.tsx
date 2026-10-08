@@ -12,17 +12,23 @@ export default function RoomFriends() {
   useUiLanguage();
   const { pathname, search } = useLocation();
   const invite = currentRoomInvite(pathname, search);
-  if (!invite) return null;
-  return <RoomFriendsPanel key={pathname + search} lobbyRoute={invite.lobbyRoute} code={invite.code} />;
+  return <RoomFriendsPanel key={pathname + search} invite={invite} />;
 }
-function RoomFriendsPanel({ lobbyRoute, code }: { lobbyRoute: string; code: string }) {
+function RoomFriendsPanel({ invite }: { invite: { lobbyRoute: string; code: string } | null }) {
   useUiLanguage();
-  const [open, setOpen] = useState(false);
-  useEffect(() => { const show = () => setOpen(true); window.addEventListener("open-room-friends", show); return () => window.removeEventListener("open-room-friends", show); }, []);
+  const [room, setRoom] = useState<typeof invite>(null);
+  useEffect(() => {
+    const show = (event: Event) => {
+      const requested = (event as CustomEvent<typeof invite>).detail ?? invite;
+      if (requested) setRoom(requested);
+    };
+    window.addEventListener("open-room-friends", show);
+    return () => window.removeEventListener("open-room-friends", show);
+  }, [invite]);
   return <>
-    <button type="button" onClick={() => setOpen(true)} className="room-friends-trigger flex items-center gap-2 rounded-xl border border-amber-300/30 bg-[#091019] px-4 py-3 text-sm font-semibold text-amber-100 shadow-xl">
-      <Users size={17} />{ui("Invite friends")}</button>
-    {open && <RoomFriendsDialog lobbyRoute={lobbyRoute} code={code} onClose={() => setOpen(false)} />}
+    {invite && <button type="button" onClick={() => setRoom(invite)} className="room-friends-trigger flex items-center gap-2 rounded-xl border border-amber-300/30 bg-[#091019] px-4 py-3 text-sm font-semibold text-amber-100 shadow-xl">
+      <Users size={17} />{ui("Invite friends")}</button>}
+    {room && <RoomFriendsDialog key={room.lobbyRoute + room.code} lobbyRoute={room.lobbyRoute} code={room.code} onClose={() => setRoom(null)} />}
   </>;
 }
 function RoomFriendsDialog({ lobbyRoute, code, onClose }: { lobbyRoute: string; code: string; onClose: () => void }) {

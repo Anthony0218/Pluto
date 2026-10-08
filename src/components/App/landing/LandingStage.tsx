@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { useMotionValue, useTransform } from "motion/react";
-import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useLandingReducedMotion as useReducedMotion } from "./motionPreference";
 import type { UniverseCategory } from "../planetary/universeCatalog";
 import { LandingContext, type CaptionFlight, type CaptionSpot, type HeroSpot, type StageInfo } from "./landingContext";
 import { clamp01, flybyProgress, heroHandoffProgress, journeyIndex } from "./landingMath";

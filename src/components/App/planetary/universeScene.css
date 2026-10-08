@@ -63,10 +63,12 @@
 .universe-object.solar-planet { --planet-size: 68px; padding: 0; }
 .universe-object.solar-planet--primary { --planet-size: 104px; }
 .universe-item { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 44px; min-width: 0; max-width: 100%; padding: 7px 4px; border-radius: 12px; text-align: center; color: #e9edfc; text-decoration: none; }
+.universe-object--disabled { pointer-events: none; }
+.universe-object--disabled :is(.universe-art-wrap, .universe-label) { opacity: .5; filter: saturate(.55); }
 .universe-art-wrap { display: block; flex: none; margin-bottom: 12px; }
 .universe-label { display: block; max-width: 170px; font-size: 13px; line-height: 1.4; font-weight: 600; overflow-wrap: anywhere; }
 .solar-planet--primary .universe-label { font-size: 14px; }
-.universe-status { display: inline-block; margin-top: 4px; color: #95a3c7; font-size: 10px; line-height: 1.4; }
+.universe-status { display: inline-block; margin-top: 3px; color: #a3b0d4; font-size: 11px; letter-spacing: .02em; line-height: 1.4; }
 .universe-object .solar-atmosphere, .flyby-item .solar-atmosphere { opacity: .2; }
 .universe-object .solar-sphere, .flyby-item .solar-sphere { box-shadow: inset var(--sx, -15px) var(--sy, -15px) 24px #03091baa, inset 3px 3px 12px #fff5, 0 0 0 1px #ffffff40, 0 0 18px #6573b820, 0 10px 22px #0005; }
 .universe-object .solar-ring, .flyby-item .solar-ring { border-width: 2px; opacity: .75; box-shadow: 0 0 8px #8390e02a; }
@@ -128,6 +130,10 @@
 .universe-book--rhythm .universe-book-cover { background: linear-gradient(150deg, #8a2650, #4a1230); color: #fbcfe8; }
 .universe-book--rules { transform: perspective(700px) rotateY(-17deg) rotateZ(3deg); }
 .universe-book--rules .universe-book-cover { background: repeating-linear-gradient(90deg, #ffffff06 0 14px, transparent 14px 28px), #14532d; color: #bbf7d0; }
+.universe-book--football { transform: perspective(700px) rotateY(-15deg) rotateZ(-4deg); }
+.universe-book--football .universe-book-cover { background: repeating-linear-gradient(90deg, #15803d 0 18px, #166534 18px 36px); color: #f0fdf4; }
+.universe-book--signal { transform: perspective(700px) rotateY(-13deg) rotateZ(4deg); }
+.universe-book--signal .universe-book-cover { background: repeating-linear-gradient(0deg, transparent 0 9px, #a5f3fc12 9px 10px), linear-gradient(150deg, #0e7490, #082f49); color: #a5f3fc; }
 .universe-book--tactics { transform: perspective(700px) rotateY(-12deg) rotateZ(5deg); }
 .universe-book--tactics .universe-book-cover { background: linear-gradient(145deg, #1e293b, #0f172a); color: #e2e8f0; }
 .universe-book--tactics .universe-book-title { font-family: "Bradley Hand", "Segoe Print", cursive; font-size: 14px; }

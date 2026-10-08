@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { Gamepad2, Send } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -7,10 +7,9 @@ import { supabase } from "@/lib/supabase";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { modeForOnline } from "@/games/atlas/modeCatalog";
 import { normalizeLobbyCode } from "@/games/party/network/protocol";
-import { useCardGameRepository } from "@/games/cards/storage/useCardGameRepository";
-import { latestPublished } from "@/games/cards/versioning";
 import { currentRoomInvite, getInviteDestination, getInviteGameLabel } from "./inviteRoute";
-import { INVITE_GAMES, createInviteRoute, type InviteMode } from "./gameCreationCatalog";
+import { createInviteRoute } from "./gameCreationCatalog";
+import { useInviteGames } from "./useInviteGames";
 import { prepareCreatedGameInvite } from "./GameInviteDelivery";
 type RoomDestination = { game_route: string; mode: string };
 const field = "mt-1 w-full min-w-0 rounded-xl border border-white/15 bg-[#10172a] px-3 py-2.5 text-sm text-white";
@@ -18,7 +17,6 @@ export default function GameInvitePanel({ onNavigate, initialFriendId = "", comp
   useUiLanguage();
   const { user } = useAuth();
   const { friends, onlineIds, loading, friendsError } = useDashboardData();
-  const { repository } = useCardGameRepository();
   const navigate = useNavigate(), location = useLocation();
   const current = currentRoomInvite(location.pathname, location.search);
   const [view, setView] = useState<"create" | "code">("create");
@@ -27,25 +25,14 @@ export default function GameInvitePanel({ onNavigate, initialFriendId = "", comp
   const [friendId, setFriendId] = useState(initialFriendId);
   const [gameId, setGameId] = useState("chess");
   const [modeId, setModeId] = useState("classic");
-  const [cardModes, setCardModes] = useState<InviteMode[]>([]);
-  const [cardsError, setCardsError] = useState("");
+  const { games, cardsError, clearCardsError } = useInviteGames(gameId);
   const [rooms, setRooms] = useState<RoomDestination[]>([]), [route, setRoute] = useState("");
   const [busy, setBusy] = useState(false), [message, setMessage] = useState(""), [error, setError] = useState("");
-  const game = INVITE_GAMES.find(item => item.id === gameId)!;
-  const modes = gameId === "card-builder" ? cardModes : game.modes;
+  const game = games.find(item => item.id === gameId)!;
+  const modes = game.modes;
   const selectedMode = modes.find(mode => mode.id === modeId) ?? modes[0];
   const validCode = /^[A-Z0-9]{6}$/.test(code.trim().toUpperCase()) || Boolean(normalizeLobbyCode(code));
   const validFriend = friends.some(friend => friend.id === friendId);
-  useEffect(() => {
-    if (gameId !== "card-builder" || repository.kind !== "cloud") return;
-    let active = true;
-    void repository.list().then(records => {
-      if (!active) return;
-      setCardModes(records.flatMap(record => { const version = latestPublished(record); return version ? [{ id: version.id, label: `${record.name} · v${version.version}`, route: `/games/card-builder/play?game=${record.id}&version=${version.id}&mode=online`, inviteRoute: "/games/card-builder/room" }] : []; }));
-      setCardsError("");
-    }).catch(() => { if (active) setCardsError("Published games could not be loaded. Select Card Builder again to retry."); });
-    return () => { active = false; };
-  }, [gameId, repository]);
   function create() {
     if (!user || !selectedMode || !validFriend) return;
     try {
@@ -93,7 +80,7 @@ export default function GameInvitePanel({ onNavigate, initialFriendId = "", comp
       {compact && <div className="mt-3 flex gap-2" role="group" aria-label={ui("Invitation action")}>{(["create", "code"] as const).map(action => <button type="button" key={action} aria-pressed={view === action} onClick={() => setView(action)} className={`flex-1 rounded-lg px-2 py-2 text-sm font-bold ${view === action ? "bg-indigo-400/20 text-indigo-200" : "bg-white/5 text-slate-400"}`}>{ui(action === "create" ? "Create & invite" : "Use a code")}</button>)}</div>}
       {showCreate && <><div className="invite-game-preview mt-3 flex items-center gap-3"><img src={game.image} alt="" className="h-10 w-10 rounded-lg object-cover" /><span className="font-bold">{game.title}</span></div>
       <div className="mt-3 grid grid-cols-2 gap-3">
-        <label className="min-w-0 text-sm text-slate-300">{ui("Game")}<select aria-label={ui("Game")} className={field} value={gameId} disabled={busy} onChange={event => { setGameId(event.target.value); setModeId(""); setCardsError(""); }}>{INVITE_GAMES.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}</select></label>
+        <label className="min-w-0 text-sm text-slate-300">{ui("Game")}<select aria-label={ui("Game")} className={field} value={gameId} disabled={busy} onChange={event => { setGameId(event.target.value); setModeId(""); clearCardsError(); }}>{games.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}</select></label>
         <label className="min-w-0 text-sm text-slate-300">{ui("Mode")}<select aria-label={ui("Mode")} className={field} value={selectedMode?.id ?? ""} disabled={busy || !modes.length} onChange={event => setModeId(event.target.value)}>{!modes.length && <option value="">{ui("No online modes")}</option>}{modes.map(mode => <option key={mode.id} value={mode.id}>{ui(mode.label)}</option>)}</select></label>
       </div>
       {cardsError && <p role="alert" className="mt-2 text-sm text-red-300">{ui(cardsError)}</p>}

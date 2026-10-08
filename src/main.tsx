@@ -179,6 +179,7 @@ import GoAnalysisPage from "./pages/games/Go/GoAnalysisPage.tsx";
 import StrategyMultiplayer from "./components/strategy/StrategyMultiplayer.tsx";
 import GoRules from "./components/strategy/GoRules.tsx";
 const PartyPage = React.lazy(() => import("./pages/games/Party/PartyPage.tsx"));
+const CompetitivePage = React.lazy(() => import("./pages/general/CompetitivePage.tsx"));
 const AtlasArenaPage = React.lazy(() => import("./pages/games/AtlasArena/AtlasArenaPage.tsx"));
 const EatItPage = React.lazy(() => import("./pages/games/EatIt/EatItPage.tsx"));
 const eatItPage = <React.Suspense fallback={<main className="min-h-[var(--app-height)] bg-[#18201d]" />}><EatItPage /></React.Suspense>;
@@ -230,10 +231,9 @@ const router = createBrowserRouter([
           { path: "/learn/:subjectId/:pathId/:lessonId", element: <LearningLessonPage /> },
           { path: "/tools", element: <ToolsPage /> },
           { path: "/tools/:toolId", element: <ToolAppPage /> },
-          {
-            path: "/dashboard",
-            element: <App />,
-          },
+          { path: "/home", element: <App /> },
+          { path: "/dashboard", element: <App /> },
+          { path: "/competitive", element: <React.Suspense fallback={<main>Loading…</main>}><CompetitivePage /></React.Suspense> },
 
           {
             path: "/games",

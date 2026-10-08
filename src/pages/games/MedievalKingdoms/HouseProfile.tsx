@@ -16,6 +16,8 @@ import {
 } from "../../../games/MedievalKingdoms/edravane/politics.ts";
 import { heir } from "../../../games/MedievalKingdoms/edravane/simulation.ts";
 import { NATIONS } from "../../../games/MedievalKingdoms/edravane/world.ts";
+import { KingdomIdentity, Personality } from "./RealmPanels.tsx";
+import { HouseSigil } from "./HouseSigil.tsx";
 
 export function HouseProfile({
   state,
@@ -46,10 +48,12 @@ export function HouseProfile({
           {house.liege ? "VASSAL HOUSE" : "CROWN HOUSE"}
         </span>
         <h2 style={{ color: house.color }}>
-          {house.crest} House {house.name}
+          <HouseSigil house={house} size={32} /> House {house.name}
         </h2>
         <p>Ruled by {ruler?.name ?? "Vacant seat"}</p>
       </div>
+      <KingdomIdentity nation={house.nation} />
+      <Personality person={ruler} />
       <div className="ed-profile-stats">
         <span>
           <Swords size={15} />
@@ -133,8 +137,8 @@ export function HouseProfile({
             >
               {a.name}
             </button>
-            <small>
-              {troopCount(a).toLocaleString()} troops ·{" "}
+              <small>
+                {troopCount(a).toLocaleString()} observed troops ·{" "}
               {a.garrison ? "Garrison" : "Field army"} · Morale{" "}
               {Math.round(a.morale)} · Loyalty{" "}
               {Math.round(armyLoyalty(state, a))}% · {woundedCount(a)} wounded ·
@@ -171,6 +175,7 @@ export function HouseProfile({
         </button>
       ))}
       {!vassals.length && <p className="ed-reason">No sworn vassals.</p>}
+      {!armies.length && house.id !== state.houses.find((h) => h.reasons.includes("Human commander"))?.id && <p className="ed-reason">No current army sightings. Scouts and trade reports can reveal their forces.</p>}
       <h3>Controlled castles & cities</h3>
       {holdings
         .filter((d) => d.city || d.castle)

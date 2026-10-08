@@ -19,6 +19,7 @@ import {
 import { armyLoyalty } from "./politics.ts";
 import { castleBonus } from "./estates.ts";
 import { neighbors } from "./world.ts";
+import { commandBonus } from "./realm.ts";
 
 export const UNIT_KINDS: UnitKind[] = [
   "levies",
@@ -182,6 +183,7 @@ export function previewArmies(
             (0.35 + (0.65 * (f?.morale ?? initialMorale(s, army))) / 100) *
             (1 - (f?.fatigue ?? army.fatigue) / 200) *
             (0.55 + 0.45 * army.supply)
+            * commandBonus(s, army)
         );
       }, 0) *
       (side === 1
@@ -441,7 +443,7 @@ export function resolveBattleRound(s: Campaign, b: Battle) {
     const damage =
       (f.count *
         0.13 *
-        UNIT_STATS[f.kind].power *
+        UNIT_STATS[f.kind].power * commandBonus(s, a) *
         modifier *
         (0.35 + f.morale * 0.0065) *
         (1 - f.fatigue / 200) *

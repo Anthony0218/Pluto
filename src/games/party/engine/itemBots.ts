@@ -1,3 +1,4 @@
+import { difficultyRank } from "../difficulty.ts";
 import {
   AIM_CONFIG,
   DUEL_BOT_SKILL,
@@ -56,7 +57,7 @@ function scatterblasterAction(
     if (value > (best?.value ?? 0)) best = { id: target.id, value };
   }
   if (!best) return null;
-  if (me.difficulty === "easy" ? random() < 0.4 : best.value < 5) return null;
+  if (difficultyRank(me.difficulty) <= 1 ? random() < 0.4 : best.value < 5) return null;
   return { type: "USE_ITEM", itemInstanceId: item.instanceId, targetPlayerId: best.id };
 }
 
@@ -69,12 +70,12 @@ function luckySixAction(
 ): GameAction | null {
   const opponents = state.players.filter((p) => p.id !== me.id);
   let target: Player;
-  if (me.difficulty === "easy") target = pick(opponents, random);
+  if (difficultyRank(me.difficulty) <= 1) target = pick(opponents, random);
   else {
     const killable = opponents.filter((p) => p.hp <= LUCKY_SIX_CONFIG.damage);
     target = killable.length
       ? leader(killable, settings)
-      : me.difficulty === "hard"
+      : me.difficulty === "extreme"
         ? leader(opponents, settings)
         : [...opponents].sort((a, b) => a.hp - b.hp)[0];
   }
@@ -103,7 +104,7 @@ function duelSaberAction(
     targetPlayerId: target.id,
     wager,
   });
-  if (me.difficulty === "easy") {
+  if (difficultyRank(me.difficulty) <= 1) {
     // Mostly random legal choice.
     const target = pick(legal, random),
       max = maxCoinWager(me, target),
@@ -114,7 +115,7 @@ function duelSaberAction(
     if (canWagerPluto(me, target)) options.push({ type: "pluto", amount: 1 });
     return challengeWith(target, pick(options, random));
   }
-  if (me.difficulty === "medium") {
+  if (difficultyRank(me.difficulty) <= 3) {
     // Small, safe coin stakes against whoever can cover them; never most of its own coins.
     const budget = Math.floor(me.coins / 3);
     const target = [...legal].sort((a, b) => b.coins - a.coins)[0],

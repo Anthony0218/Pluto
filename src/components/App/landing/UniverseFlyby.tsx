@@ -10,8 +10,10 @@ import { useCopy } from "./copy";
 import { bookTopics, flybyScene, type FlybyItem } from "./flybyCatalog";
 import { useLanding } from "./landingContext";
 import { clamp01, lerp, smoothstep } from "./landingMath";
+import { toneOf } from "./tones";
 import { usePlanetLanding } from "./usePlanetLanding";
 import TravelingCaption from "./TravelingCaption";
+import { CaptionScrim } from "./ArrivalStop";
 
 const flybyStars = [
   { className: "journey-stars--far", zoom: 1.2 },
@@ -69,9 +71,10 @@ function FlybyObject({ item, center = false, camera, live }: { item: FlybyItem; 
   });
   const label = useTransform(() => { const c = camera.get(); return center ? 1 - smoothstep(c / 0.18) : 1; });
   const tone = item.planet ? ` solar-planet solar-planet--${item.planet.tone}` : "";
-  const style = { x, y, scale, opacity, pointerEvents: live ? "auto" : "none", "--app-accent": item.tool?.accent } as MotionStyle;
+  const disabled = item.book?.disabled;
+  const style = { x, y, scale, opacity, pointerEvents: live && !disabled ? "auto" : "none", "--app-accent": item.tool?.accent } as MotionStyle;
   return <m.div className={`flyby-item flyby-item--${item.kind}${tone}`} style={style}>
-    <Link to={item.route} tabIndex={live ? 0 : -1} aria-hidden={!live} aria-label={`${ui("Open")} ${ui(item.title)}`} className="flyby-link" onClick={item.planet ? event => land(event, item.route) : undefined}>
+    <Link to={item.route} tabIndex={live && !disabled ? 0 : -1} aria-hidden={!live} aria-disabled={disabled || undefined} aria-label={`${ui("Open")} ${ui(item.title)}`} className="flyby-link" onClick={item.planet ? event => land(event, item.route) : undefined}>
       {item.planet && <PlanetArt config={item.planet} />}
       {item.tool && <AppTileArt toolId={item.tool.id} />}
       {item.book && <BookArt title={landingBookTitle(language, item.book.design)} design={item.book.design} />}
@@ -103,7 +106,7 @@ export default function UniverseFlyby() {
   const hintOpacity = useTransform(() => smoothstep((enter.get() - 0.6) / 0.4) * (1 - smoothstep(progress.get() / 0.07)));
   const arrivalIn = useTransform(progress, [0.74, 0.88], [0, 1]);
   const captionOpacity = useTransform(() => arrivalIn.get());
-  const buttonOpacity = useTransform(() => arrivalIn.get() * (1 - clamp01(index.get() / 0.2)));
+  const buttonOpacity = useTransform(() => arrivalIn.get() * (1 - clamp01(index.get() / 0.28)));
   useMotionValueEvent(buttonOpacity, "change", value => setArrived(value > 0.6));
   const planetLabel = useTransform(() => smoothstep((enter.get() - 0.9) / 0.1) * (1 - smoothstep(camera.get() / 0.18)));
   const topics = scene.center.tool?.features ?? (scene.center.book ? bookTopics(scene.center.book) : []);
@@ -124,9 +127,10 @@ export default function UniverseFlyby() {
         {scene.items.map(item => <FlybyObject key={item.id} item={item} camera={camera} live={live} />)}
         {scene.center.kind !== "planet" && <FlybyObject item={scene.center} center camera={camera} live={live} />}
       </Fragment>
-      <m.div className="flyby-chess" style={{ opacity: captionOpacity, pointerEvents: arrived ? "auto" : "none" }}>
+      <m.div className="flyby-chess" style={{ opacity: captionOpacity, pointerEvents: arrived ? "auto" : "none", ...({ "--section-accent": toneOf(category === "games" ? "chess" : category).light } as object) }}>
+        <CaptionScrim key={`scrim-${captionId}`} id={captionId} />
         <TravelingCaption key={captionId} id={captionId} title={ui(scene.center.title)} line={line} />
-        <m.div style={{ opacity: buttonOpacity }}><Link to={scene.center.route} tabIndex={arrived ? 0 : -1} className="flyby-cta">{text(scene.cta)}<ArrowRight size={17} aria-hidden="true" /></Link></m.div>
+        <m.div style={{ opacity: buttonOpacity }}><Link to={scene.center.route} tabIndex={arrived ? 0 : -1} className="lp-btn lp-btn--primary lp-btn--lg">{text(scene.cta)}<ArrowRight size={17} aria-hidden="true" /></Link></m.div>
       </m.div>
       <m.div className="flyby-hint" aria-hidden="true" style={{ opacity: hintOpacity }}>{text("scrollToTravel")}<ChevronDown size={16} /></m.div>
     </div>

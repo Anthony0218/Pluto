@@ -1,23 +1,26 @@
+import { startMinigame, DEFAULT_SETTINGS } from "./helpers/party-legacy-fixtures.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { patternWall, patternLength, PATTERN_BEAT } from "../src/games/party/minigames/patternWall/index.ts";
-import { rhythmRush, circleOverlap, RHYTHM_WINDOW } from "../src/games/party/minigames/rhythm/index.ts";
-import { trailRun, TRAIL_MAPS, TRAIL_FINISH } from "../src/games/party/minigames/trailRun/index.ts";
+import { rhythmRush, circleOverlap, RHYTHM_WINDOW, RHYTHM_KEYS, RHYTHM_NOTE_HEIGHT, rhythmNoteTop, nextRhythmNote } from "../src/games/party/minigames/rhythm/index.ts";
+import { TIMING_INPUT_GRACE_MS } from "../src/games/party/minigames/timing.ts";
+import { trailRun, TRAIL_MAPS, TRAIL_FINISH, predictTrailRunner } from "../src/games/party/minigames/trailRun/index.ts";
+import { PartyRooms } from "../server/party/rooms.ts";
 import { pickupArena, collectSupplies, moveArenaPlayer } from "../src/games/party/minigames/pickupArena/index.ts";
 import { ARENA_MAPS, WEAPONS, collides } from "../src/games/party/minigames/pickupArena/maps.ts";
 import { minigameRegistry } from "../src/games/party/minigames/index.ts";
-import { applyMinigameInput, publicMinigameView, startMinigame } from "../src/games/party/minigames/flow.ts";
+import { applyMinigameInput, publicMinigameView } from "../src/games/party/minigames/flow.ts";
 import { createPlayer, createMatch } from "../src/games/party/engine/engine.ts";
-import { DEFAULT_SETTINGS } from "../src/games/party/config.ts";
+
 import { parseMessage } from "../src/games/party/network/protocol.ts";
 const participants = ["a", "b", "c", "d"].map((id) => ({ id, isBot: false, difficulty: "medium" }));
 const rng = (seed = 4) => () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296; };
 const make = (def, random = rng()) => def.create({ participants, random, startedAt: 0, endsAt: def.durationSeconds * 1000 });
 const control = (fields = {}) => ({ type: "ARENA_CONTROL", forward: 0, strafe: 0, yaw: 0, pitch: 0, fire: false, ...fields });
 
-test("main pool contains all seven games and never picks Target Panic", () => {
+test("main pool contains all eleven games and never picks Target Panic", () => {
   const ids = minigameRegistry.pool("main").map((d) => d.id);
-  assert.deepEqual(ids, ["arrow-memory", "pickup-arena", "pattern-wall", "trail-run", "rhythm-rush", "circle-shot", "lava-knockback"]);
+  assert.deepEqual(ids, ["arrow-memory", "pickup-arena", "pattern-wall", "trail-run", "rhythm-rush", "circle-shot", "lava-knockback", "tide-treasure", "comet-courier", "rope-rescue", "paddle-doubles"]);
   assert.equal(minigameRegistry.get("target-panic").selectable, false);
 });
 test("Echo Wall follows all difficulty boundaries", () => {
@@ -35,6 +38,31 @@ test("wall broadcasts only the currently lit square and keeps recall/order and o
   assert.equal(patternWall.publicView(s, at, "b").players.a.flashed, null);
   assert.equal(patternWall.publicView(s, at, "a").lit, null);
 });
+test("Echo Wall sends every light and dark beat through real room snapshots without bot or input changes", () => {
+  for (const pattern of [[0, 4, 8], [4, 4, 4]]) {
+    const rooms = new PartyRooms(), messages = [];
+    const host = rooms.connect(undefined, (message) => messages.push(structuredClone(message)));
+    rooms.handle(host, { type: "CREATE", name: "Echo regression", playerName: "You", public: true });
+    rooms.handle(host, { type: "READY", ready: true }); rooms.handle(host, { type: "START" });
+    const room = rooms.rooms.get(host.room), now = Date.now();
+    room.match.order = room.match.players.map((p) => p.id);
+    room.match.players.forEach((p) => { p.isBot = false; });
+    startMinigame(room.match, patternWall.id, rng(), now - 7000);
+    room.match.phase = "MINIGAME"; room.match.minigame.status = "ACTIVE";
+    room.match.minigame.state.pattern = pattern;
+    const start = room.match.minigame.startedAt;
+    rooms.broadcast(room, start);
+    for (let step = 0; step < pattern.length; step++) {
+      for (const [at, lit] of [[start + 700 + step * PATTERN_BEAT, pattern[step]], [start + 1200 + step * PATTERN_BEAT, null]]) {
+        const count = messages.length;
+        rooms.fastTick(at);
+        assert.ok(messages.length > count, `snapshot at beat ${step}, time ${at - start}`);
+        assert.equal(messages.at(-1).lobby.match.minigame.state.lit, lit);
+        assert.equal(messages.at(-1).lobby.match.minigame.state.pattern, undefined);
+      }
+    }
+  }
+});
 test("wall rejects duplicates, wrong rounds and impossible squares; errors cannot rewrite scores", () => {
   const s = make(patternWall); patternWall.tick(s, s.phaseEndsAt); const at = s.phaseStartedAt + 100;
   const input = { type: "PATTERN_TAP", tile: s.pattern[0], round: 1, step: 0 };
@@ -44,13 +72,13 @@ test("wall rejects duplicates, wrong rounds and impossible squares; errors canno
   patternWall.applyInput(s, "b", { ...input, tile: (s.pattern[0] + 1) % 9 }, at);
   assert.equal(s.players.b.alive, false); assert.equal(s.players.b.score, 0);
 });
-test("wall grows after all players finish, and stops when nobody survives", () => {
+test("wall grows after attempts, brings everyone back and ends after five rounds", () => {
   const s = make(patternWall); patternWall.tick(s, s.phaseEndsAt);
   for (const { id } of participants) for (let step = 0; step < s.pattern.length; step++) patternWall.applyInput(s, id, { type: "PATTERN_TAP", tile: s.pattern[step], round: s.round, step }, s.phaseStartedAt + 200 + step * 200);
   patternWall.tick(s, s.phaseStartedAt + 1000); assert.equal(s.phase, "break");
   patternWall.tick(s, s.phaseEndsAt); assert.equal(s.round, 2); assert.equal(s.pattern.length, 4);
   patternWall.tick(s, s.phaseEndsAt); patternWall.tick(s, s.phaseEndsAt); patternWall.tick(s, s.phaseEndsAt);
-  assert.ok(patternWall.isFinished(s)); assert.ok(Object.values(s.players).every((p) => p.score === 3));
+  while (!patternWall.isFinished(s)) patternWall.tick(s, s.phaseEndsAt); assert.ok(patternWall.isFinished(s)); assert.ok(Object.values(s.players).every((p) => p.score === 6));
 });
 test("rhythm scores the exact circle intersection and note value, including 80% × 3", () => {
   assert.equal(circleOverlap(0), 1); assert.equal(circleOverlap(RHYTHM_WINDOW), 0); assert.equal(circleOverlap(-70), circleOverlap(70));
@@ -70,7 +98,36 @@ test("rhythm players receive identical upcoming notes, score once, and cannot su
   assert.equal(rhythmRush.publicView(s, note.at, "b").judged.length, 0);
   assert.equal(rhythmRush.parseInput({ type: "RHYTHM_TAP", lane: NaN }), null);
   assert.deepEqual(rhythmRush.parseInput({ type: "RHYTHM_TAP", lane: 2, points: 999 }), { type: "RHYTHM_TAP", lane: 2 });
-  rhythmRush.tick(s, note.at + RHYTHM_WINDOW); assert.equal(s.players.b.misses, 1);
+  rhythmRush.tick(s, note.at + RHYTHM_WINDOW); assert.equal(s.players.b.misses, 0);
+  rhythmRush.tick(s, note.at + RHYTHM_WINDOW + TIMING_INPUT_GRACE_MS); assert.equal(s.players.b.misses, 1);
+});
+test("single-lane rhythm uses only J/K/L, keeps shared timing, and advances the prompt after hits or misses", () => {
+  assert.deepEqual(RHYTHM_KEYS, ["J", "K", "L"]);
+  const s = make(rhythmRush), [first, second] = s.notes;
+  assert.deepEqual([...new Set(s.notes.map((n) => n.lane))].sort(), [0, 1, 2]);
+  assert.equal(rhythmRush.parseInput({ type: "RHYTHM_TAP", lane: 3 }), null);
+  const view = rhythmRush.publicView(s, first.at - 1000, "a");
+  assert.equal(nextRhythmNote(view, first.at).id, first.id);
+  assert.equal(nextRhythmNote({ ...view, judged: [first.id] }, first.at).id, second.id);
+  assert.equal(nextRhythmNote(view, first.at + RHYTHM_WINDOW).id, second.id);
+  assert.equal(nextRhythmNote({ notes: [], judged: [] }, first.at), null);
+  rhythmRush.applyInput(s, "a", { type: "RHYTHM_TAP", lane: (first.lane + 1) % RHYTHM_KEYS.length }, first.at);
+  assert.equal(s.players.a.score, 0, "the wrong displayed letter earns no points");
+});
+test("rhythm judges the displayed key at the hit line, including late-arriving valid taps", () => {
+  for (const error of [-100, 0, RHYTHM_WINDOW - 1]) {
+    const s = make(rhythmRush), note = s.notes[0], displayedAt = note.at + error, receivedAt = displayedAt + 150;
+    const hitLineY = 300;
+    assert.equal(rhythmNoteTop(note.at, note.at, hitLineY) + RHYTHM_NOTE_HEIGHT / 2, hitLineY);
+    if (error < 0) assert.ok(rhythmNoteTop(note.at, displayedAt, hitLineY) + RHYTHM_NOTE_HEIGHT / 2 < hitLineY);
+    rhythmRush.tick(s, receivedAt);
+    rhythmRush.applyInput(s, "a", { type: "RHYTHM_TAP", lane: note.lane, elapsedMs: displayedAt - s.startedAt }, receivedAt);
+    assert.ok(Math.abs(s.players.a.last.overlap - circleOverlap(error)) < 1e-10);
+    assert.equal(s.players.a.hits, 1);
+    const copy = structuredClone(s);
+    assert.throws(() => rhythmRush.applyInput(s, "b", { type: "RHYTHM_TAP", lane: note.lane, elapsedMs: displayedAt - 300 }, receivedAt), /out of sync/);
+    assert.deepEqual(s, copy);
+  }
 });
 test("rhythm chart has common, occasional and rare notes, and bots play without perfect scores", () => {
   const s = make(rhythmRush), bot = { ...participants[0], isBot: true, difficulty: "medium" }, random = rng(29);
@@ -105,6 +162,29 @@ test("trail input cannot teleport, duplicate jumps in midair, or act in an old r
   assert.equal(s.players.a.x, TRAIL_MAPS.ice[3].x); assert.equal(s.players.a.falls, 1);
   assert.equal(trailRun.publicView(s, 220).controls, undefined);
 });
+test("Trail prediction matches authoritative jumps, acceleration and platform landings on every theme", () => {
+  for (const theme of ["ice", "jungle", "sky"]) {
+    for (const jump of [false, true]) {
+      const s = make(trailRun); s.theme = theme;
+      const original = structuredClone(s.players.a), input = { type: "RUN_CONTROL", forward: 1, jump, round: 1 };
+      const predicted = predictTrailRunner(original, theme, 0, 140, input);
+      trailRun.applyInput(s, "a", input, 0); trailRun.tick(s, 140);
+      assert.deepEqual(predicted, s.players.a);
+      assert.deepEqual(original, make(trailRun).players.a, "prediction cannot change a snapshot");
+      assert.ok(predicted.x > original.x, "local movement appears before the next snapshot");
+      assert.equal(predicted.grounded, !jump);
+    }
+  }
+});
+test("Trail prediction caps stale snapshots and respects respawns, finishes, and held jumps", () => {
+  const s = make(trailRun), p = s.players.a, input = { forward: 1, jump: true };
+  assert.deepEqual(predictTrailRunner(p, "ice", 0, 5000, input), predictTrailRunner(p, "ice", 0, 150, input));
+  assert.equal(predictTrailRunner(p, "ice", 0, 100, input, true).y, 0, "holding jump does not retrigger");
+  p.respawnUntil = 600;
+  assert.deepEqual(predictTrailRunner(p, "ice", 0, 100, input), p);
+  p.respawnUntil = 0; p.finishAt = 10;
+  assert.deepEqual(predictTrailRunner(p, "ice", 10, 100, input), p);
+});
 test("arcade spawns cover all floors and every seat can start on every floor over seeded matches", () => {
   assert.equal(ARENA_MAPS.arcade.spawns.length, 12);
   const seen = Object.fromEntries(participants.map((p) => [p.id, new Set()]));
@@ -114,15 +194,15 @@ test("arcade spawns cover all floors and every seat can start on every floor ove
   }
   for (const floors of Object.values(seen)) assert.deepEqual([...floors].sort(), [0, 4, 8]);
 });
-test("headshots double every gun's damage; Desert Eagle eliminates in one shot; body hits stay normal", () => {
+test("headshots multiply blaster damage by 1.5; body hits stay normal", () => {
   for (const [weapon, spec] of Object.entries(WEAPONS).filter(([id]) => id !== "knife")) for (const headshot of [true, false]) {
     const s = make(pickupArena, () => .99);
     Object.assign(s.players.a, { x: 0, y: 0, z: 0, weapon, ammo: spec.ammo, protectedUntil: 0 });
     Object.assign(s.players.b, { x: 0, y: 0, z: -5, protectedUntil: 0, avatarId: 2 });
     Object.assign(s.players.c, { x: 20, z: 20 }); Object.assign(s.players.d, { x: -20, z: 20 });
     pickupArena.applyInput(s, "a", control({ fire: true, pitch: headshot ? 0 : -.13 }), 0); pickupArena.tick(s, 50);
-    assert.equal(s.hits[0].headshot, headshot); assert.equal(s.hits[0].damage, Math.min(100, spec.damage * (headshot ? 2 : 1)));
-    if (weapon === "desert-eagle" && headshot) { assert.equal(s.players.b.hp, 0); assert.equal(s.players.a.kills, 1); assert.equal(s.feed[0].headshot, true); }
+    assert.equal(s.hits[0].headshot, headshot); assert.equal(s.hits[0].damage, Math.min(100, spec.damage * (headshot ? 1.5 : 1)));
+    if (weapon === "desert-eagle" && headshot) { assert.equal(s.players.b.hp, 25); assert.equal(s.players.a.kills, 0); }
   }
 });
 test("health and ammo packs obey proximity, ceilings, availability and respawn, on every floor", () => {

@@ -4,7 +4,7 @@ import type { MinigameInput } from "../../types.ts";
 export const DIRECTIONS = ["left", "up", "right", "down"] as const;
 export type Direction = (typeof DIRECTIONS)[number];
 export const ARROW_SYMBOLS: Record<Direction, string> = { left: "←", up: "↑", right: "→", down: "↓" };
-export const MEMORY_TIMING = { move: 2400, hazard: 1100, restore: 650 };
+export const MEMORY_TIMING = { move: 1100, hazard: 500, restore: 200 };
 const DELTA: Record<Direction, [number, number]> = { left: [-1, 0], up: [0, -1], right: [1, 0], down: [0, 1] };
 export function arrowCount(round: number): number {
   return round === 1 ? 3 : round <= 3 ? 4 : round <= 6 ? 5 : round <= 10 ? 6 : round - 4;
@@ -57,13 +57,13 @@ function prepareRound(state: ArrowMemoryState, at: number) {
     if (p.alive) { p.x = origin.x + 2; p.z = origin.z + 2; p.moved = false; }
   }
   state.step = 0; state.phase = "memorize";
-  state.phaseEndsAt = Math.min(state.heatEndsAt, at + 1800 + arrowCount(state.level) * 850);
+  state.phaseEndsAt = Math.min(state.heatEndsAt, at + 650 + arrowCount(state.level) * 400);
 }
 function create(context: MinigameCreateContext): ArrowMemoryState {
   const state: ArrowMemoryState = {
     map: context.random() < 0.5 ? "ice" : "hell", startedAt: context.startedAt, endsAt: context.endsAt,
     round: 1, step: 0, phase: "memorize", phaseEndsAt: 0, sequences: {}, paths: {}, safe: {},
-    heat: 1, level: 1, heatEndsAt: context.startedAt + 120_000, heatResults: [],
+    heat: 1, level: 1, heatEndsAt: context.startedAt + 22_000, heatResults: [],
     seed: Math.floor(context.random() * 4294967296), bots: {},
     players: Object.fromEntries(context.participants.map((p, quadrant) => [p.id, {
       quadrant, x: 0, z: 0, alive: true, moved: false, score: 0, eliminatedAt: null,
@@ -82,7 +82,7 @@ function finishHeat(state: ArrowMemoryState, at: number) {
   const points = Object.fromEntries(ranking.map((id, i) => [id, Math.max(0, 3 - i)]));
   for (const id of ranking) state.players[id].score += points[id];
   state.heatResults.push({ heat: state.heat, ranking, points });
-  state.phase = state.heat === 3 ? "finished" : "intermission"; state.phaseEndsAt = at + 3500;
+  state.phase = state.heat === 3 ? "finished" : "intermission"; state.phaseEndsAt = at + 1800;
 }
 export function tickMemory(state: ArrowMemoryState, now: number): boolean {
   let changed = false;
@@ -90,7 +90,7 @@ export function tickMemory(state: ArrowMemoryState, now: number): boolean {
     changed = true;
     const at = state.phaseEndsAt;
     if (state.phase === "intermission") {
-      state.heat++; state.level = 1; state.round++; state.heatEndsAt = at + 120_000; state.bots = {};
+      state.heat++; state.level = 1; state.round++; state.heatEndsAt = at + 22_000; state.bots = {};
       for (const p of Object.values(state.players)) Object.assign(p, { alive: true, moved: false, eliminatedAt: null, heatSteps: 0, lastCorrectAt: at });
       prepareRound(state, at); continue;
     }
@@ -152,7 +152,7 @@ export const arrowMemory: MinigameDefinition<ArrowMemoryState, MemoryInput> = {
     "Three survival rounds. Each awards 3 / 2 / 1 points to first / second / third; totals decide the winner.",
     "Everyone returns for the next round. Sequences grow harder within each round; tied survivors use correct steps and response time."],
   controls: "WASD / arrow keys or direction buttons · one press per step",
-  durationSeconds: 375, gameType: "main", supportsBots: true,
+  durationSeconds: 72, gameType: "main", supportsBots: true,
   personalizedView: true,
   create, parseInput: parseMemoryInput, applyInput, tick: tickMemory,
   isFinished: (s) => s.phase === "finished", snapshotIntervalMs: 100,
@@ -161,7 +161,7 @@ export const arrowMemory: MinigameDefinition<ArrowMemoryState, MemoryInput> = {
     // Memorize only what humans can see; keep this imperfect recollection after the arrows disappear.
     if (state.phase === "memorize") {
       if (state.bots[bot.id]?.round !== state.round) {
-        const accuracy = { easy: 0.80, medium: 0.92, hard: 0.98 }[bot.difficulty];
+        const accuracy = { beginner: .6, easy: .8, medium: .86, hard: .92, extreme: .999 }[bot.difficulty];
         state.bots[bot.id] = { round: state.round, step: -1, remembered: state.sequences[bot.id].map((d) =>
           random() < accuracy ? d : DIRECTIONS[Math.floor(random() * 4)]) };
       }
@@ -169,7 +169,7 @@ export const arrowMemory: MinigameDefinition<ArrowMemoryState, MemoryInput> = {
     }
     const plan = state.bots[bot.id];
     if (state.phase !== "move" || state.players[bot.id].moved || plan?.step === state.step ||
-      now < state.phaseEndsAt - MEMORY_TIMING.move + 450) return [];
+      now < state.phaseEndsAt - MEMORY_TIMING.move + 180) return [];
     if (plan) plan.step = state.step;
     return [{ at: now, input: { type: "MEMORY_STEP", direction: plan?.remembered[state.step] ?? DIRECTIONS[Math.floor(random() * 4)],
       round: state.round, step: state.step } }];

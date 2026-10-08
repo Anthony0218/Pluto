@@ -33,7 +33,7 @@ export default function FinalResults({
         {winner ? `${winner.id === playerId ? "You win" : `${winner.name} wins`}!` : "Match over"}
       </h2>
       <p>
-        {winner ? `${winner.name} reached ${target} first.` : "The match has ended."} Thanks for making a little
+        {winner ? match.mode === "festival" ? `${winner.name} won the festival with ${match.festivalScores?.[winner.id] ?? 0} points.` : match.roundLimit ? `${winner.name} leads after ${match.roundLimit} rounds.` : `${winner.name} reached ${target} first.` : "The match has ended."} Thanks for making a little
         trouble.
       </p>
       <ol className="pp-final-ranking">
@@ -57,7 +57,7 @@ export default function FinalResults({
                   {p.id === match.winner ? " · 👑 winner" : ""}
                 </strong>
                 <small>
-                  {plutoGame
+                  {match.mode === "festival" ? `★ ${match.festivalScores?.[p.id] ?? 0} festival points · ${stats?.minigameWins ?? 0} wins` : plutoGame
                     ? `✦ ${p.goldenPlutos} Golden Pluto${p.goldenPlutos === 1 ? "" : "s"} · 🪙 ${p.coins} coins`
                     : `🪙 ${p.coins} coins · ✦ ${p.goldenPlutos} Golden Pluto${p.goldenPlutos === 1 ? "" : "s"}`}
                 </small>

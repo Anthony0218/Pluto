@@ -75,7 +75,7 @@
 }
 .flyby-title {
   position: absolute; left: 0; right: 0; top: 8%; z-index: 2; margin: 0; text-align: center;
-  font-size: clamp(2.2rem, 4.6vw, 4.2rem); font-weight: 900; letter-spacing: -.05em; line-height: 1; color: #fff;
+  font-size: clamp(2.2rem, 4.6vw, 4.2rem); font-weight: 900; letter-spacing: -.04em; line-height: 1; color: #fff;
 }
 .journey-flyby .flyby-item { --planet-size: 78px; position: absolute; left: 0; top: 0; z-index: 3; display: block; width: 0; height: 0; padding: 0; }
 .flyby-item--planet { --art-w: var(--planet-size); --art-h: var(--planet-size); }
@@ -86,6 +86,7 @@
   display: flex; flex-direction: column; align-items: center; width: calc(var(--art-w) + 40px); padding: 8px 20px 10px; border-radius: 18px; color: #fff; text-decoration: none;
 }
 .flyby-link .solar-art, .flyby-link .universe-app, .flyby-link .universe-book { flex: none; }
+.flyby-link[aria-disabled="true"] { opacity: .55; filter: saturate(.55); }
 .flyby-link:focus-visible { outline: 2px solid #b8b3ff; outline-offset: 2px; }
 .journey-skip {
   position: absolute; left: 16px; top: 12px; z-index: 6; padding: 10px 16px; border: 1px solid #a5b4fc66; border-radius: 10px; background: #0b1030; color: #e0e7ff; font-size: 13px; font-weight: 600;
@@ -97,12 +98,7 @@
 .flyby-chess {
   position: absolute; left: 0; right: 0; bottom: 6%; z-index: 4; width: min(560px, 90%); margin: 0 auto; text-align: center; will-change: opacity;
 }
-.flyby-chess h3 { margin: 0; font-size: clamp(2rem, 3.4vw, 3rem); font-weight: 900; letter-spacing: -.04em; line-height: 1; color: #fff; text-shadow: 0 4px 24px #000a; }
 .flyby-chess p { margin: 10px auto 18px; max-width: 420px; color: #c9cfe8; font-size: 15px; line-height: 1.55; text-shadow: 0 2px 12px #000a; }
-.flyby-cta { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 12px 24px; border-radius: 12px; background: #6366f1; color: #fff; font-weight: 700; text-decoration: none; transition: background-color .15s, transform .15s; }
-.flyby-cta:hover { background: #818cf8; }
-.flyby-cta:active { transform: scale(.98); }
-.flyby-cta:focus-visible { outline: 2px solid #c7d2fe; outline-offset: 4px; }
 .flyby-hint { position: absolute; left: 0; right: 0; bottom: 4%; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 4px; color: #8b97c0; font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; animation: flyby-nudge 1.8s ease-in-out infinite; }
 @keyframes flyby-nudge { 50% { transform: translateY(5px); } }
 

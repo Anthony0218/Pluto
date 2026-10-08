@@ -8,7 +8,7 @@ export default function NavigationDrawer({ onClose }: { onClose: () => void }) {
   useUiLanguage();
   const dialog = useRef<HTMLDialogElement>(null);
   const [closing, setClosing] = useState(false);
-  const [invitePanel, setInvitePanel] = useState<"friend" | "clan" | null>(null);
+  const [invitePanel, setInvitePanel] = useState(false);
   function close() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) onClose();
     else setClosing(true);
@@ -33,8 +33,8 @@ export default function NavigationDrawer({ onClose }: { onClose: () => void }) {
       ref={dialog}
       id="app-navigation"
       aria-label={ui("Pluto navigation")}
-      onCancel={event => { event.preventDefault(); if (invitePanel) setInvitePanel(null); else close(); }}
-      data-invite={invitePanel ?? undefined}
+      onCancel={event => { event.preventDefault(); if (invitePanel) setInvitePanel(false); else close(); }}
+      data-invite={invitePanel || undefined}
       data-closing={closing || undefined}
       onAnimationEnd={event => { if (event.target === event.currentTarget && closing) onClose(); }}
       onClick={(event) => {
@@ -52,8 +52,8 @@ export default function NavigationDrawer({ onClose }: { onClose: () => void }) {
         >
           <X size={20} />
         </button>
-        <SideBar onNavigate={close} onInvite={kind => setInvitePanel(open => open === kind ? null : kind)} invitePanel={invitePanel} />
-        {invitePanel && <InviteSidePanel key={invitePanel} kind={invitePanel} onBack={() => setInvitePanel(null)} onNavigate={close} />}
+        <SideBar onNavigate={close} onInvite={() => setInvitePanel(open => !open)} invitePanel={invitePanel} />
+        {invitePanel && <InviteSidePanel onBack={() => setInvitePanel(false)} onNavigate={close} />}
       </div>
     </dialog>
   );
