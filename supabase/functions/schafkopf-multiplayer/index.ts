@@ -1,5 +1,6 @@
+import { botConfig, type BotConfig } from "../../../src/games/schafkopf/botConfig.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { applyAction, chooseAiAction, collectSecondsFor, createGame, MULTIPLAYER_LEGEN_DECISION_MILLISECONDS, MULTIPLAYER_TURN_MILLISECONDS, resolveLegenTimeout, shuffledDeck, viewFor, DEFAULT_GAME_RULES, type Action, type AiDifficulty, type GameRules, type GameState } from "../../../src/games/schafkopf/schafkopf.ts";
+import { applyAction, chooseAiAction, collectSecondsFor, createGame, migrateGameState, MULTIPLAYER_LEGEN_DECISION_MILLISECONDS, MULTIPLAYER_TURN_MILLISECONDS, resolveLegenTimeout, shuffledDeck, viewFor, DEFAULT_GAME_RULES, type Action, type AiDifficulty, type GameRules, type GameState } from "../../../src/games/schafkopf/schafkopf.ts";
 import { DEFAULT_ANNOUNCEMENT_SETTINGS, SIMPLE_ANNOUNCEMENT_SETTINGS, formatDeclarationAnnouncement } from "../../../src/games/schafkopf/announcements.ts";
 
 const cors = {
@@ -45,6 +46,16 @@ function validRules(value: unknown): GameRules {
   }
   if (input.spritzen !== "nie" && input.spritzen !== "vor-ausspiel" && input.spritzen !== "jederzeit") throw new Error("Ungültige Spritzregel.");
   rules.spritzen = input.spritzen;
+  for (const key of ["davonlaufen", "toutAbbrechen", "laufendeAktiv", "klopferMussSpiel"] as const) {
+    if (input[key] !== undefined) { if (typeof input[key] !== "boolean") throw new Error(`Ungültige Regel: ${key}.`); rules[key] = input[key]; }
+  }
+  for (const [key,min,max] of [["rufsauAbwerfenAbStich",1,8],["laufendeAbFarbspiel",1,14],["laufendeAbWenzGeier",1,4],["hotseatKlopfSekunden",5,180],["multiplayerKlopfSekunden",5,180]] as const) {
+    if (input[key] !== undefined) { if (!Number.isInteger(input[key]) || Number(input[key]) < min || Number(input[key]) > max) throw new Error(`Ungültige Regel: ${key}.`); rules[key] = Number(input[key]); }
+  }
+  if (input.bot !== undefined) {
+    if (!input.bot || typeof input.bot !== "object" || Array.isArray(input.bot)) throw new Error("Ungültige Bot-Einstellungen.");
+    rules.bot = botConfig(input.bot as Partial<BotConfig>);
+  }
   return rules;
 }
 function hasTimedTurn(game: GameState) {
@@ -57,7 +68,7 @@ function hasTimedTurn(game: GameState) {
  */
 function scheduleMultiplayerTimers(game: GameState, resetTurn = true, resetLegen = false) {
   if (game.phase === "legen") {
-    if (resetLegen || !Number.isFinite(game.legenDeadline)) game.legenDeadline = Date.now() + MULTIPLAYER_LEGEN_DECISION_MILLISECONDS;
+    if (resetLegen || !Number.isFinite(game.legenDeadline)) game.legenDeadline = Date.now() + (game.rules.multiplayerKlopfSekunden ?? MULTIPLAYER_LEGEN_DECISION_MILLISECONDS / 1000) * 1000;
     game.turnDeadline = null;
     return;
   }
@@ -115,6 +126,7 @@ Deno.serve(async req => {
       if (error) throw new Error("Tisch konnte nicht geladen werden.");
       if (!data) return response({ error: "Tisch nicht gefunden." }, 404);
       const room = data as Room;
+      if (room.game) room.game = migrateGameState(room.game);
       room.former_players ??= [];
       room.pending_seats ??= [];
       const seat = room.players.findIndex(player => player.id === user.id);
@@ -136,7 +148,7 @@ Deno.serve(async req => {
         if (seat < 0 && !(body.op === "delete" && formerPlayer)) return response({ error: formerPlayer ? "Du wurdest zwischen den Runden ersetzt. Dein Spielstand bleibt unter Spieltage gespeichert." : "Du sitzt nicht an diesem Tisch. Bitte über die Lobby beitreten." }, 403);
         if (body.op === "get") {
           if (room.game?.phase === "legen") {
-            if (!Number.isFinite(room.game.legenDeadline)) room.game.legenDeadline = Date.now() + MULTIPLAYER_LEGEN_DECISION_MILLISECONDS;
+            if (!Number.isFinite(room.game.legenDeadline)) room.game.legenDeadline = Date.now() + (room.game.rules.multiplayerKlopfSekunden ?? MULTIPLAYER_LEGEN_DECISION_MILLISECONDS / 1000) * 1000;
             if (room.game.legenDeadline && Date.now() >= room.game.legenDeadline) {
               room.game = resolveLegenTimeout(room.game);
               scheduleMultiplayerTimers(room.game);

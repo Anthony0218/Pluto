@@ -2,7 +2,10 @@
 
 Entry: `/games/schafkopf`. Local modes work without a backend or login.
 
-- `schafkopf.ts`: pure shared engine, immutable transitions, legal-card reasons, redacted player views and heuristic AI (own hand + public information only).
+- `schafkopf.ts`: pure shared engine, data-driven trump/rank definitions, immutable transitions, legal-card reasons and redacted player views.
+- `bot.ts`, `botConfig.ts`, `knowledge.ts`: shared document-based bot pipeline and public information sets.
+- `coach.ts`, `lessons.ts`: coaching/review and random learning cards.
+- `docs/`: unchanged copies of the three supplied original documents.
 - `../../components/Schafkopf/SchafkopfGame.tsx`: hotseat and AI.
 - `../../components/Schafkopf/SchafkopfMultiplayerGame.tsx`: authenticated online rooms with human and AI seats.
 - `../../pages/schafkopf/`: menu and lobby.
@@ -13,15 +16,19 @@ Entry: `/games/schafkopf`. Local modes work without a backend or login.
 
 Table convention: virtual cent values, Rufspiel 10 / Solo and Wenz 30 by default, with adjustable bonuses. Laufende minimum 3 (Wenz 2), maximum 14 for Rufspiel, 4 for Wenz, 8 otherwise. Tout doubles base + Laufende; Sie quadruples Solo + 8 Laufende. No Schneider/Schwarz surcharge on Tout/Sie. Each knock doubles the value; the 1 € coin is a table marker, not a payment. Kontra is allowed on an opponent's first card; Re, Sub and Hirsch follow on successive tricks and double the value each time. In Ramsch, the player with the most eyes pays the other three the selected base value. All tricks are played out, including a lost Tout.
 
-Hotseat passes the device with cards hidden; this is privacy between normal players, not protection against inspecting local JavaScript memory. Local games and their score ledger are saved in browser storage. The AI is a lightweight heuristic, not an expert solver.
+Hotseat passes the device with cards hidden; this is privacy between normal players, not protection against inspecting local JavaScript memory. Local games and their score ledger are saved in browser storage. The bots use the imported rulebook in `docs/`, shared `knowledge.ts`, hard candidate restrictions (R1–R6b) and tier-specific tips T1–T12. `bot.ts` receives only a redacted player view. All random decisions accept an injected PRNG; `botConfig.ts` contains configurable thresholds, reliability values and search budgets.
 
-AI levels are Anfänger, Amateur, Fortgeschritten, Profi and Legende. The last level samples possible unseen hands for the current trick; it never reads another player's private cards. Anfänger shows live tips and commentary on completed tricks. Stich-Review lists every completed trick during and after play. The collection delay defaults to 6/5/4/3/2 seconds by level and can be set to 1–10 seconds in Rulebook → Design. In online rooms the host sets this delay for the whole table.
+AI levels are Anfänger, Amateur, Fortgeschritten, Profi and Legende. Anfänger randomly chooses inside R-rule candidates and uses no tip scoring or round memory. Amateur uses only H knowledge; Fortgeschritten adds public card/void tracking. Profi weights tips, uses exact points and basic allocation probabilities. Legende uses root information-set MCTS: UCB over permitted actions, constrained sampled hands, and complete-round rollouts whose seats receive redacted views. Default: 200 iterations / 180 ms with minimum exploration; not a guaranteed simulation count. Announcement and spritz simulations play sampled allocations through round scoring using configured tariffs. They are estimates, not proven win probabilities.
+
+Rulebook → Bot/KI exposes the tip matrix, hand thresholds and simulation budget. The complete original Markdown documents are rendered and downloadable under Grundregeln, with a searchable learning index. The user clarifications in `docs/klarstellungen-2026-10-05.md` supersede conflicting original text. Remaining questions and the exact verification status are recorded in `IMPLEMENTATION.md`.
+
+Anfänger displays one random rule; Amateur one rule or tip; Fortgeschritten one tip. Profi/Legende have no automatic learning banner. Every completed trick can be reviewed during and after play. Review reconstructs the own hand, prior public tricks, point totals, called-ace revelation and doubling events before the reviewed move. Future cards and final hidden team membership cannot influence the recommendation. The collection delay defaults to 6/5/4/3/2 seconds by level and can be set to 1–10 seconds in Rulebook → Design. In online rooms the host sets this delay for the whole table.
 
 Under Rulebook → Design, a player can choose the Ruf-Sau name, a grammatically matching lead-in, Solo or Sticht, or enter custom announcement text. Empty choices use randomized standard phrases. These preferences are stored on that device; a chosen game announcement is sent with the move so all players see the same text. Hovering over it reveals the canonical contract or called ace. Automatic hand sorting runs again after a declared game except Sauspiel and Herz-Solo; manual card order then remains in place.
 
 ## Backend setup
 
-The multiplayer backend must be deployed to the same Supabase project used by `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`. From the repository root, with the CLI linked to your project:
+The multiplayer backend must be deployed to the same Supabase project used by `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`. From `Swag/`, with the CLI linked to your project:
 
 ```sh
 npx supabase db push
@@ -47,3 +54,12 @@ npm run build
 Online smoke test after deployment: create a room with one account and start with three AI seats; verify AI moves and saved scores. Create another with multiple accounts, check simultaneous joins and a rejected fifth seat, manually hand a seat to AI and return it, reconnect, play a full round, verify locked cards and hidden opponents' hands in network responses, then start the next round. Check the saved list from two accounts and both deletion behaviors. Also test expired authentication and retry after a network interruption.
 
 Automated endpoint tests run the real Edge handler with mocked authentication and an atomic in-memory database. They cover access control, private views, conflicting joins/moves, reconnection, host transfer, AI seats, game-day lists/deletion and server-side rejection of illegal cards. They do not replace a deployed Supabase integration test.
+
+## Reproducible simulations
+
+```sh
+node scripts/simulate-schafkopf.mjs --games 10000 --profile quick --output /tmp/schafkopf-quick.json
+node scripts/simulate-schafkopf.mjs --games 10000 --profile standard --output /tmp/schafkopf-standard.json
+```
+
+The quick profile checks full games at reduced search depth (one rollout per Legend decision). It cannot establish the relative strength of the standard Legend configuration. Reports contain win rates, eyes, announcement frequency, declarer wins, score deltas and legality/candidate checks. A standard-depth balancing run remains necessary before claiming a statistically separated skill hierarchy.

@@ -3,6 +3,7 @@ import test from "node:test";
 import { readFileSync } from "node:fs";
 import ts from "typescript";
 import * as engine from "../src/games/schafkopf/schafkopf.ts";
+import * as botSettings from "../src/games/schafkopf/botConfig.ts";
 import * as announcements from "../src/games/schafkopf/announcements.ts";
 
 // Execute the real Edge handler with its auth/database boundaries replaced.
@@ -68,7 +69,7 @@ function server() {
     },
   };
   new Function("require", "Deno", "exports", compiled)(
-    name => name.includes("supabase-js") ? { createClient: () => db } : name.includes("announcements") ? announcements : engine,
+    name => name.includes("supabase-js") ? { createClient: () => db } : name.includes("announcements") ? announcements : name.includes("botConfig") ? botSettings : engine,
     { env: { get: () => "test-only" }, serve: value => { handler = value; } }, {},
   );
   async function request(user, body) {
@@ -82,6 +83,19 @@ async function fullRoom(server) {
   for (let seat = 1; seat < 4; seat++) ({ body } = await server.request(`user-${seat}`, { op: "join", code: body.code, name: `Player ${seat}` }));
   return body;
 }
+
+test('online host controls knock duration and run/knocker switches; invalid times are rejected',async()=>{
+  const s=server(), room=await fullRoom(s);
+  const rules={...engine.DEFAULT_GAME_RULES,legen:true,multiplayerKlopfSekunden:47,hotseatKlopfSekunden:22,laufendeAktiv:false,klopferMussSpiel:false};
+  const before=Date.now();
+  const result=await s.request('user-0',{op:'start',code:room.code,version:room.version,rules});
+  assert.equal(result.status,200);
+  assert.ok(result.body.game.legenDeadline>=before+47000 && result.body.game.legenDeadline<=Date.now()+47000);
+  assert.equal(result.body.game.rules.laufendeAktiv,false);
+  assert.equal(result.body.game.rules.klopferMussSpiel,false);
+  const invalid=await s.request('user-0',{op:'rules',code:room.code,version:result.body.version,rules:{...rules,multiplayerKlopfSekunden:0}});
+  assert.equal(invalid.status,400);
+});
 
 test("endpoint rejects missing/invalid auth and outsider reads", async () => {
   const s = server();
@@ -136,7 +150,7 @@ test("online Legen accepts independent decisions and gives each player their sec
   const room = await fullRoom(s);
   let state = (await s.request("user-0", { op: "start", code: room.code, version: room.version, rules: { ...engine.DEFAULT_GAME_RULES, legen: true } })).body;
   assert.equal(state.game.phase, "legen");
-  assert.ok(state.game.legenDeadline - Date.now() <= 20_000);
+  assert.ok(state.game.legenDeadline - Date.now() <= 30_000);
   assert.ok(state.game.legenDeadline - Date.now() > 19_000);
   assert.equal(state.game.turnDeadline, null);
   assert.equal(state.game.hand.length, 4);
@@ -166,7 +180,7 @@ test("online announcements and card turns receive a shared 60-second clock", asy
   assert.ok(moved.game.turnDeadline - Date.now() > 59_000);
 });
 
-test("online Legen timeout passes undecided players after 20 seconds", async () => {
+test("online Legen timeout passes undecided players after 30 seconds", async () => {
   const s = server();
   const room = await fullRoom(s);
   const started = await s.request("user-0", { op: "start", code: room.code, version: room.version, rules: { ...engine.DEFAULT_GAME_RULES, legen: true } });
@@ -302,4 +316,18 @@ test("only the online host can set a valid trick collection delay", async () => 
   assert.equal(changed.status, 200);
   assert.equal(changed.body.collectSeconds, 7);
   assert.equal((await s.request("user-1", { op: "get", code: created.code })).body.collectSeconds, 7);
+});
+
+test("host bot configuration survives validated online rules, but guests cannot change it", async () => {
+  const s=server(); const room=await fullRoom(s);
+  const configured={...engine.DEFAULT_GAME_RULES,bot:{legendIterations:350,legendTimeMs:250,proError:.01}};
+  const started=await s.request("user-0",{op:"start",code:room.code,version:room.version,rules:configured});
+  assert.equal(started.status,200);
+  assert.equal(started.body.game.rules.bot.legendIterations,350);
+  assert.equal(started.body.game.rules.bot.proError,.01);
+  const denied=await s.request("user-1",{op:"rules",code:room.code,version:started.body.version,rules:configured});
+  assert.equal(denied.status,400);
+  assert.match(denied.body.error,/Gastgeber/);
+  const invalid=await s.request("user-0",{op:"rules",code:room.code,version:started.body.version,rules:{...configured,bot:[]}});
+  assert.equal(invalid.status,400);
 });
