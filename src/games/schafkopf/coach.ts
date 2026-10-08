@@ -5,7 +5,7 @@ import { SCHAFKOPF_LESSONS, type Lesson } from './lessons.ts';
 const plainName = (card: Card) => card.rank === 'Ass' ? `${card.suit}-Ass` : cardName(card);
 /** Contextual advice and review share the exact same rule/tip pipeline as the bots. */
 export function liveSchafkopfTip(view: GameView): string | null {
-  if (view.phase === 'legen') return 'Klopfen verdoppelt den Wert. Nach viermal Weiter verpflichtet der letzte Klopfer sich zum Spiel.';
+  if (view.phase === 'legen') return `Klopfen verdoppelt den Wert. ${view.rules.klopferMussSpiel !== false ? 'Nach viermal Weiter verpflichtet der letzte Klopfer sich zum Spiel.' : 'Nach viermal Weiter gelten die eingestellten Ramsch-/Eichel-Ober-Regeln mit allen Klopfverdopplungen.'}`;
   if (view.phase !== 'play' || view.turn !== view.seat || !view.contract || !view.legalCards.length) return null;
   const decision = chooseCard(view,'pro',seededRandom(42));
   const lesson = SCHAFKOPF_LESSONS.find(item => item.code === decision.reasonCode);

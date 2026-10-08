@@ -17,9 +17,9 @@ const rates = (values: number[]): Record<TipCode, number> => Object.fromEntries(
 export const DEFAULT_BOT_CONFIG: BotConfig = {
   reliability: {
     beginner: rates(Array(14).fill(0)),
-    amateur: rates([0,.6,0,0,0,0,0,.75,.75,0,0,0,0,.9]),
-    advanced: rates([.85,.85,.55,.55,.6,.85,.7,1,1,.55,.85,.8,.6,.95]),
-    pro: rates(Array(14).fill(.98).map((rate,index) => index === 8 ? 1 : rate)),
+    amateur: rates([0,.6,0,0,0,0,0,.75,.75,0,.25,0,0,.9]),
+    advanced: rates([.85,.85,.55,.55,.6,.85,.7,1,1,.55,.5,.8,.6,.95]),
+    pro: rates(Array(14).fill(.98).map((rate,index) => index === 8 ? 1 : index === 10 ? .75 : rate)),
     legend: rates(Array(14).fill(1)),
   },
   announcementError: { beginner: .2, amateur: .1, advanced: 0, pro: 0, legend: 0 },
@@ -44,5 +44,7 @@ export function botConfig(overrides?: Partial<BotConfig>): BotConfig {
   config.amateurSpritzChance = bounded(config.amateurSpritzChance, .08, 0, 1);
   for (const key of ['announcementError','deducedR6','r6b'] as const) config[key] = Object.fromEntries(Object.keys(DEFAULT_BOT_CONFIG[key]).map(level => [level, bounded(config[key]?.[level as BotLevel], DEFAULT_BOT_CONFIG[key][level as BotLevel], 0, 1)])) as Record<BotLevel, number>;
   config.reliability = Object.fromEntries(Object.keys(DEFAULT_BOT_CONFIG.reliability).map(level => [level, Object.fromEntries(Object.keys(DEFAULT_BOT_CONFIG.reliability.beginner).map(tip => [tip, bounded(config.reliability?.[level as BotLevel]?.[tip as TipCode], DEFAULT_BOT_CONFIG.reliability[level as BotLevel][tip as TipCode], 0, 1)]))])) as BotConfig['reliability'];
+  // Explicit search rates supersede older saved matrices; the menu shows these as fixed values.
+  for (const level of Object.keys(config.reliability) as BotLevel[]) config.reliability[level].T9 = DEFAULT_BOT_CONFIG.reliability[level].T9;
   return config;
 }

@@ -71,10 +71,11 @@ test("a player who knocked must declare after four passes and may always choose 
   assert.equal(game.declarer, 0);
   assert.equal(game.forcedCallerReason, "legen");
   const view = viewFor(game, 0);
-  assert.equal(view.contracts.some(contract => contract.kind === "rufspiel"), true);
+  assert.equal(view.contracts.some(contract => contract.kind === "rufspiel"), false,'all three plain aces require an individual game');
   assert.equal(view.contracts.some(contract => contract.kind === "solo"), true);
-  const rufspiel = view.contracts.find(contract => contract.kind === "rufspiel");
-  assert.equal(applyAction(game, 0, { type: "declare", contract: rufspiel }).phase, "play");
+  assert.ok(!view.contracts.some(contract => contract.calledRank && contract.calledRank !== "Ass"),'only Eichel-Ober forced calls may call lower cards');
+  const solo = view.contracts.find(contract => contract.kind === "solo");
+  assert.equal(applyAction(game, 0, { type: "declare", contract: solo }).phase, "play");
 });
 
 test("after four passes, the last player who knocked must declare", () => {
@@ -91,13 +92,13 @@ test("after four passes, the last player who knocked must declare", () => {
 
 test("AI knocks only with allowed high-trump combinations and weighs running trumps", () => {
   assert.equal(shouldAiKnock([c("Unter"), c("Unter", "Gras"), c("Unter", "Herz"), c("7")]), true);
-  assert.equal(shouldAiKnock([c("Ober"), c("Ober", "Gras"), c("7"), c("8")]), true);
+  assert.equal(shouldAiKnock([c("Ober"), c("Ober", "Gras"), c("7"), c("8")]), false);
   assert.equal(shouldAiKnock([c("Unter"), c("Unter", "Gras"), c("Ober", "Schellen"), c("7"), c("8")]), false, "only four cards may count");
   assert.equal(shouldAiKnock([c("Unter"), c("Unter", "Gras"), c("Ober", "Schellen"), c("7", "Herz")]), true);
   assert.equal(shouldAiKnock([c("Unter"), c("Ober"), c("7", "Herz"), c("8")]), true);
   assert.equal(shouldAiKnock([c("Unter", "Schellen"), c("Ober", "Schellen"), c("7", "Herz"), c("8")]), false);
   assert.equal(shouldAiKnock([c("Ober", "Herz"), c("Ober", "Schellen"), c("7"), c("8")]), false);
-  assert.equal(shouldAiKnock([c("Unter"), c("Unter", "Gras"), c("Ass"), c("10")]), false);
+  assert.equal(shouldAiKnock([c("Unter"), c("Unter", "Gras"), c("Ass"), c("10")]), true,'two Unter and a same-suit pair permit the first knock');
 });
 
 test("Amateur spritzes rarely with exceptional hands; advanced uses A5", () => {
@@ -176,7 +177,7 @@ test("trump structure and ranking for all standard games", () => {
 test("calling requires a real non-trump suit card and an absent ace", () => {
   const hand = [c("Ober"), c("Unter", "Gras"), c("Ass", "Schellen"), c("9", "Schellen"), c("Ass", "Herz")];
   assert.equal(contractsFor(hand).filter(c => c.kind === "rufspiel").length, 0);
-  assert.deepEqual(contractsFor([...hand, c("7", "Gras")]).filter(c => c.kind === "rufspiel"), [{ kind: "rufspiel", suit: "Gras" }]);
+  assert.deepEqual(contractsFor([...hand, c("7", "Gras")]).filter(c => c.kind === "rufspiel"), [{ kind: "rufspiel", suit: "Gras" }, {kind:"rufspiel",suit:"Gras",tout:true}]);
   assert.equal(contractsFor(SUITS.flatMap(s => [card(s, "Ober"), card(s, "Unter")])).some(c => c.kind === "sie"), true);
 });
 
@@ -223,11 +224,11 @@ test("Davonlaufen needs four current cards, reveals the partner and frees the ac
   assert.equal(escaped.partnerRevealed, true);
   escaped.turn = 0;
   escaped.trick = [{ seat: 3, card: c("8") }];
-  assert.deepEqual(legalCards(escaped), [c("Ass")]);
+  assert.deepEqual(legalCards(escaped), [c("Ass"),c("9"),c("7")]);
   escaped.trick = [{ seat: 3, card: c("Ass", "Gras") }];
   assert.ok(legalCards(escaped).some(c => c.rank === "Ass"));
   escaped.trick = [];
-  assert.match(cardLock(escaped, 0, c("9")), /vier Karten/);
+  assert.equal(cardLock(escaped, 0, c("9")), null,'the four-card requirement applies only to the initial escape');
   assert.equal(game.escaped, false, "transitions must not mutate their input");
   game.hands[0] = [c("9"), c("7", "Gras")];
   game.partnerRevealed = true;
@@ -244,10 +245,10 @@ test("AI declares individual games only with sufficiently strong trumps", () => 
   assert.equal(intent([...topFive, c("Ass", "Herz"), c("10", "Herz"), c("7")], solo), true);
   const farbwenz = { kind: "farbwenz", suit: "Herz" };
   const fourUnters = [c("Unter"), c("Unter", "Gras"), c("Unter", "Herz"), c("Unter", "Schellen")];
-  assert.equal(intent([...fourUnters, c("Ass", "Herz"), c("7"), c("8"), c("9")], farbwenz), false);
-  assert.equal(intent([...fourUnters, c("Ass", "Herz"), c("Ass"), c("8"), c("9")], farbwenz), false, "two missing nontrump aces plus position 1 exclude Farbwenz");
-  assert.equal(intent([...fourUnters, c("Ass", "Herz"), c("10", "Herz"), c("8"), c("9")], farbwenz), false);
-  assert.equal(intent([...fourUnters, c("7"), c("8"), c("9"), c("Ass")], { kind: "wenz" }), false, "two exclusion criteria also apply to Wenz");
+  assert.equal(intent([...fourUnters, c("Ass", "Herz"), c("7"), c("8"), c("9")], farbwenz), true);
+  assert.equal(intent([...fourUnters, c("Ass", "Herz"), c("Ass"), c("8"), c("9")], farbwenz), true, "void suits do not count as missing aces");
+  assert.equal(intent([...fourUnters, c("Ass", "Herz"), c("10", "Herz"), c("8"), c("9")], farbwenz), true);
+  assert.equal(intent([...fourUnters, c("7"), c("8"), c("9"), c("Ass")], { kind: "wenz" }), false, "three void suits exclude a pure Wenz");
 });
 
 test("AI Sauspiel uses the documented Bremser requirements", () => {
@@ -261,47 +262,35 @@ test("AI Sauspiel uses the documented Bremser requirements", () => {
   assert.equal(wantsToPlay(four.map(card => card.id === "Gras-Ass" ? c("9", "Gras") : card)), true, "the document does not exclude Sauspiel because of two missing aces");
 });
 
-test("auction: earlier seat may match, later seat must raise, final suit stays private", () => {
+test("auction starts with the first interested player; earlier seats may match and suits stay private", () => {
   let game = intents(classicGame(undefined, 3, shuffledDeck(rng(3))), [0, 1]);
-  assert.equal(game.turn, 1);
-  assert.ok(!bidLevels(game, 1).includes(1));
-  game = applyAction(game, 1, { type: "bid", level: 3 });
-  assert.ok(bidLevels(game, 0).includes(3));
-  game = applyAction(game, 0, { type: "bid", level: 3 });
-  assert.ok(!bidLevels(game, 1).includes(3));
+  assert.equal(game.turn, 0);
+  assert.throws(() => applyAction(game,0,{type:"bid",level:null}),/verbindlich/);
+  game = applyAction(game, 0, { type: "bid", level: 5 });
+  assert.ok(!bidLevels(game, 1).includes(5));
+  game = applyAction(game, 1, { type: "bid", level: 8 });
+  assert.ok(bidLevels(game, 0).includes(8));
+  game = applyAction(game, 0, { type: "bid", level: 8 });
   assert.equal(game.contract, null);
   game = applyAction(game, 1, { type: "bid", level: null });
   assert.equal(game.phase, "declare");
   assert.equal(game.declarer, 0);
   assert.throws(() => applyAction(game, 0, { type: "declare", contract: { kind: "farbwenz", suit: "Herz" } }));
-  game = applyAction(game, 0, { type: "declare", contract: { kind: "wenz" } });
+  game = applyAction(game, 0, { type: "declare", contract: { kind: "solo", suit:"Herz" } });
   assert.equal(game.phase, "play");
-  assert.equal(game.turn, 0, "forehand, not declarer, leads");
+  assert.equal(game.turn, 0);
 });
 
-test("intentions bind challengers; subsequent challengers cannot lower the winning bid", () => {
+test("subsequent interested players may pass but cannot lower the winning bid", () => {
   let game = intents(classicGame(), [0, 1, 2, 3]);
-  assert.throws(() => applyAction(game, 1, { type: "bid", level: null }), /verbindlich/);
-  game = applyAction(game, 1, { type: "bid", level: 3 });
-  game = applyAction(game, 0, { type: "bid", level: 3 });
-  game = applyAction(game, 1, { type: "bid", level: null });
-  assert.equal(game.turn, 2);
-  game = applyAction(game, 2, { type: "bid", level: null });
-  assert.equal(game.bidLevel, 3);
-  assert.equal(game.turn, 3);
-  assert.throws(() => applyAction(game, 3, { type: "bid", level: null }), /verbindlich/);
-  const raisedLevel = bidLevels(game, 3)[0];
-  assert.ok(raisedLevel > 3);
-  game = applyAction(game, 3, { type: "bid", level: raisedLevel });
-  if (bidLevels(game, 0).includes(raisedLevel)) {
-    game = applyAction(game, 0, { type: "bid", level: raisedLevel });
-    game = applyAction(game, 3, { type: "bid", level: null });
-    assert.equal(game.declarer, 0);
-  } else {
-    game = applyAction(game, 0, { type: "bid", level: null });
-    assert.equal(game.declarer, 3);
-  }
-  assert.equal(game.bidLevel, raisedLevel);
+  game = applyAction(game,0,{type:"bid",level:5});
+  game = applyAction(game,1,{type:"bid",level:null});
+  assert.equal(game.turn,2);
+  assert.ok(bidLevels(game,2).every(level=>level>5));
+  game = applyAction(game,2,{type:"bid",level:null});
+  game = applyAction(game,3,{type:"bid",level:null});
+  assert.equal(game.declarer,0);
+  assert.equal(game.bidLevel,5);
 });
 
 test("Kontra and Re enforce teams, timing, and the normal winning threshold", () => {

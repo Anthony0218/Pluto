@@ -84,6 +84,19 @@ async function fullRoom(server) {
   return body;
 }
 
+test('online host controls knock duration and run/knocker switches; invalid times are rejected',async()=>{
+  const s=server(), room=await fullRoom(s);
+  const rules={...engine.DEFAULT_GAME_RULES,legen:true,multiplayerKlopfSekunden:47,hotseatKlopfSekunden:22,laufendeAktiv:false,klopferMussSpiel:false};
+  const before=Date.now();
+  const result=await s.request('user-0',{op:'start',code:room.code,version:room.version,rules});
+  assert.equal(result.status,200);
+  assert.ok(result.body.game.legenDeadline>=before+47000 && result.body.game.legenDeadline<=Date.now()+47000);
+  assert.equal(result.body.game.rules.laufendeAktiv,false);
+  assert.equal(result.body.game.rules.klopferMussSpiel,false);
+  const invalid=await s.request('user-0',{op:'rules',code:room.code,version:result.body.version,rules:{...rules,multiplayerKlopfSekunden:0}});
+  assert.equal(invalid.status,400);
+});
+
 test("endpoint rejects missing/invalid auth and outsider reads", async () => {
   const s = server();
   assert.equal((await s.request(null, { op: "create" })).status, 401);
@@ -137,7 +150,7 @@ test("online Legen accepts independent decisions and gives each player their sec
   const room = await fullRoom(s);
   let state = (await s.request("user-0", { op: "start", code: room.code, version: room.version, rules: { ...engine.DEFAULT_GAME_RULES, legen: true } })).body;
   assert.equal(state.game.phase, "legen");
-  assert.ok(state.game.legenDeadline - Date.now() <= 20_000);
+  assert.ok(state.game.legenDeadline - Date.now() <= 30_000);
   assert.ok(state.game.legenDeadline - Date.now() > 19_000);
   assert.equal(state.game.turnDeadline, null);
   assert.equal(state.game.hand.length, 4);
@@ -167,7 +180,7 @@ test("online announcements and card turns receive a shared 60-second clock", asy
   assert.ok(moved.game.turnDeadline - Date.now() > 59_000);
 });
 
-test("online Legen timeout passes undecided players after 20 seconds", async () => {
+test("online Legen timeout passes undecided players after 30 seconds", async () => {
   const s = server();
   const room = await fullRoom(s);
   const started = await s.request("user-0", { op: "start", code: room.code, version: room.version, rules: { ...engine.DEFAULT_GAME_RULES, legen: true } });

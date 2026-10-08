@@ -36,6 +36,19 @@ function singletonDiscards(c: Context): Card[] {
   if (!remembers(c.level)) return [];
   return c.plain.filter(card => !full(card) && !c.knowledge.playedSuits.has(card.suit) && c.view.hand.filter(other => !isTrump(other,c.contract) && other.suit === card.suit).length === 1);
 }
+function decisiveWin(c: Context, card: Card): boolean {
+  if (!remembers(c.level) || !c.wins(card) || !c.safe(card)) return false;
+  const points = c.knowledge.teamPoints + c.eyes + POINTS[card.rank];
+  const win = c.knowledge.teamPoints < c.knowledge.targetThresholds.win && points >= c.knowledge.targetThresholds.win;
+  const schneiderFree = c.view.tricks.length >= 6 && c.knowledge.teamPoints < c.knowledge.targetThresholds.schneiderFree && points >= c.knowledge.targetThresholds.schneiderFree;
+  const avoidsBlack = c.knowledge.teamsKnown && !c.view.tricks.some(trick => sameParty(c.knowledge,trick.winner));
+  return win || schneiderFree || avoidsBlack;
+}
+function decisiveFeed(c: Context, card: Card): boolean {
+  if (!exact(c.level) || !c.safePartner) return false;
+  const points = c.knowledge.teamPoints+c.eyes+POINTS[card.rank];
+  return [c.knowledge.targetThresholds.win,121-c.knowledge.targetThresholds.opponentSchneiderFree].some(target => c.knowledge.teamPoints < target && points >= target);
+}
 function t11Options(c: Context): Card[] {
   if (!c.free || !remembers(c.level)) return [];
   const singles = singletonDiscards(c);
@@ -43,7 +56,7 @@ function t11Options(c: Context): Card[] {
   const winners = c.trumps.filter(c.wins);
   const safeWin = winners.some(c.safe);
   const winningEyes = Math.max(0,...winners.map(card => c.eyes+POINTS[card.rank]));
-  if (safeWin && (c.eyes >= 10 || c.knowledge.teamPoints+winningEyes >= c.knowledge.targetThresholds.win)) return [];
+  if (safeWin && (c.eyes >= 10 || c.knowledge.teamPoints+winningEyes >= c.knowledge.targetThresholds.win || winners.some(card => decisiveWin(c,card)))) return [];
   if (c.safePartner) return singles;
   const enemySafe = !c.allyWinning && !!c.winningCard && c.safe(c.winningCard) && !winners.length;
   if (enemySafe || c.view.hand.filter(full).length < 3) return [];
@@ -67,14 +80,16 @@ export function ruleCandidates(view: GameView, difficulty: AiDifficulty, random:
       let higher = order[index-1], lower = order[index+1];
       let neighbors = higher && lower && cards.some(card => card.id === higher.id) && cards.some(card => card.id === lower.id);
       if (!neighbors && remembers(level) && random() < config.deducedR6[level]) {
-        const remaining = c.knowledge.remainingTrumps;
+        // The partner's card is already public and therefore absent from
+        // remainingTrumps; retain it as the pivot for deduced adjacency.
+        const remaining = [...c.knowledge.remainingTrumps,c.winningCard!].sort((a,b) => cardStrength(b,c.contract)-cardStrength(a,c.contract));
         index = remaining.findIndex(card => card.id === c.winningCard!.id);
         higher = remaining[index-1]; lower = remaining[index+1];
         neighbors = higher && lower && cards.some(card => card.id === higher.id) && cards.some(card => card.id === lower.id);
       }
-      if (level !== 'beginner' && directlyBefore && neighbors) {
-        const third = cards.filter(card => isTrump(card,c.contract) && card.id !== higher.id && card.id !== lower.id && cardStrength(card,c.contract) < cardStrength(c.winningCard!,c.contract));
-        if (third.length) { restrict(third,'R6'); return {cards,rules}; }
+      // The two-card hand is valid under every proposed interpretation of "all cards".
+      // Do not extend R6 to hands with additional plain cards before clarification.
+      if (level !== 'beginner' && directlyBefore && neighbors && view.hand.every(card => card.id === higher.id || card.id === lower.id)) {
         restrict(cards.filter(card => card.id === higher.id),'R6'); return {cards,rules};
       }
       const ownTrumps = view.hand.filter(card => isTrump(card,c.contract));
@@ -97,14 +112,15 @@ export function ruleCandidates(view: GameView, difficulty: AiDifficulty, random:
     }
     if (c.safePartner) {
       // Preserve an unplayed plain ace unless its ten replaces it or it closes the game (R5 extension).
-      const gifts = cards.filter(card => !(remembers(level) && card.rank === 'Ass' && !isTrump(card,c.contract) && !c.knowledge.playedSuits.has(card.suit) && !view.hand.some(other => other.suit === card.suit && other.rank === '10') && c.knowledge.teamPoints+c.eyes+11 < c.knowledge.targetThresholds.win));
+      const gifts = cards.filter(card => !(remembers(level) && card.rank === 'Ass' && !isTrump(card,c.contract) && !c.knowledge.playedSuits.has(card.suit) && !view.hand.some(other => other.suit === card.suit && other.rank === '10') && c.knowledge.teamPoints+c.eyes+11 < c.knowledge.targetThresholds.win && !decisiveFeed(c,card)));
       const options = gifts.length ? gifts : cards;
       const smear = options.filter(full);
       const highPoints = Math.max(...options.map(card => POINTS[card.rank]));
       const t11 = t11Options(c).filter(card => cards.some(other => other.id === card.id));
       // R4a allows a control play before R2; otherwise feed available points.
       const permittedOvertakes = rules.includes('R4a') ? cards.filter(c.wins) : [];
-      restrict([... (smear.length ? smear : options.filter(card => POINTS[card.rank] === highPoints)),...t11,...permittedOvertakes],'R2');
+      const decisive = options.filter(card => decisiveFeed(c,card));
+      restrict(decisive.length ? decisive : [... (smear.length ? smear : options.filter(card => POINTS[card.rank] === highPoints)),...t11,...permittedOvertakes],'R2');
     } else if (c.free) {
       const winners = cards.filter(card => isTrump(card,c.contract) && c.wins(card));
       const onlyValuable = winners.length === 1 && (remembers(level) ? c.knowledge.remainingTrumps : c.trumpOrder).slice(0,4).some(card => card.id === winners[0].id);
@@ -112,9 +128,14 @@ export function ruleCandidates(view: GameView, difficulty: AiDifficulty, random:
       const t11 = t11Options(c).filter(card => cards.some(other => other.id === card.id));
       restrict([...winners,...zeroException,...t11],'R5');
     }
+    const decisive = cards.filter(card => decisiveWin(c,card));
+    if (decisive.length && !c.safePartner) restrict(decisive,'R5');
   } else {
-    const opponents = [0,1,2,3].filter(seat => c.knowledge.roles[seat] === 'SICHER_GEGENSPIELER');
-    const noSearch = remembers(level) && !c.playing && opponents.length === 2 && opponents.every(seat => seat === view.seat ? !view.hand.some(card => isTrump(card,c.contract)) : c.knowledge.voids[seat].has('Trumpf'));
+    // T9 is the explicitly authorized memory exception for Amateur.
+    const searchKnowledge = gameKnowledge(view);
+    const opponents = [0,1,2,3].filter(seat => searchKnowledge.roles[seat] === 'SICHER_GEGENSPIELER');
+    const bothVoid = !c.playing && opponents.length === 2 && opponents.every(seat => seat === view.seat ? !view.hand.some(card => isTrump(card,c.contract)) : searchKnowledge.voids[seat].has('Trumpf'));
+    const noSearch = bothVoid && level !== 'beginner' && random() < config.reliability[level].T9;
     const search = !c.playing && c.contract.kind === 'rufspiel' && !view.partnerRevealed && !view.escaped && !noSearch ? c.plain.filter(card => card.suit === c.contract.suit) : [];
     if (search.length) restrict(search,'R3');
     else {
@@ -125,7 +146,10 @@ export function ruleCandidates(view: GameView, difficulty: AiDifficulty, random:
         return possiblePartners.reduce((sum,seat) => sum + (sameParty(c.knowledge,seat) ? 1 : c.knowledge.probabilities[seat].get(`${c.contract.suit}-${c.contract.calledRank ?? 'Ass'}`) ?? 0),0) >= .6;
       }) : [];
       if (c.playing && c.trumps.length && !noEnemyTrump) restrict([...c.trumps,...probableFreePartner],'R1');
-      else if ((!c.playing || noEnemyTrump) && c.plain.length) restrict(c.plain,noSearch ? 'T9' : 'R1');
+      else if ((!c.playing || noEnemyTrump) && c.plain.length) {
+        const alternatives = noSearch ? c.plain.filter(card => card.suit !== c.contract.suit) : [];
+        restrict(alternatives.length ? alternatives : c.plain,noSearch ? 'T9' : 'R1');
+      }
     }
   }
   return {cards,rules};
@@ -352,7 +376,9 @@ function simulateCard(c: Context, cards: Card[], priors: TipMatch[], random: () 
     } catch { break; /* Inconsistent historical saves must not cause an illegal real move. */ }
   }
   const ranked = cards.map((card,index) => ({card,score:visits[index] ? scores[index]/visits[index] : -Infinity})).sort((a,b) => b.score-a.score);
-  const priorChoice = [...cards].sort((a,b) => priors.reduce((sum,match) => sum + match.weight*(Number(match.cards.some(card => card.id === b.id))-Number(match.cards.some(card => card.id === a.id))),0))[0];
+  const priorScores = cards.map(card => ({card,score:priors.reduce((sum,match) => sum+(match.cards.some(other => other.id === card.id) ? match.weight : 0),0)}));
+  const bestPrior = Math.max(...priorScores.map(entry => entry.score));
+  const priorChoice = pick(priorScores.filter(entry => entry.score === bestPrior),random).card;
   return {card:visits.some(count => count === 0) ? priorChoice : ranked[0].score > -Infinity ? ranked[0].card : pick(cards,random),iterations};
 }
 
@@ -382,20 +408,24 @@ export function evaluateHand(hand: Card[], contract: Contract, position = 1, con
   const trumpSchmier = trumps.filter(full).length;
   const plainSuits = SUITS.filter(suit => createDeck().some(card => card.suit === suit && !isTrump(card,contract)));
   const suitsWithoutAce = plainSuits.filter(suit => plain.some(card => card.suit === suit) && !plain.some(card => card.suit === suit && card.rank === 'Ass')).length;
-  const missingAces = plainSuits.filter(suit => !plain.some(card => card.suit === suit && card.rank === 'Ass')).length;
+  const missingAces = suitsWithoutAce;
   const aces = plain.filter(card => card.rank === 'Ass' && !(contract.kind === 'rufspiel' && card.suit === contract.suit)).length;
   const voids = plainSuits.filter(suit => !plain.some(card => card.suit === suit)).length;
   const lonelyTens = plain.filter(card => card.rank === '10' && !plain.some(other => other.suit === card.suit && other.rank === 'Ass')).length;
   let topTrumpRun = 0;
   const withTop = trumps.some(card => card.id === definition.trumps[0]?.id);
   for (const card of definition.trumps) { if (trumps.some(own => own.id === card.id) !== withTop) break; topTrumpRun += withTop ? 1 : -1; }
-  const twoUnter = hand.filter(card => card.rank === 'Unter').length === 2 && hand.some(card => card.rank === 'Unter' && card.suit !== 'Schellen');
-  const exclusions = Number(missingAces >= 2) + Number(contract.kind === 'farbwenz' && trumpSchmier === 0) + Number(twoUnter) + Number(position === 1 || position === 4);
+  const rankTrump = contract.kind === 'geier' || contract.kind === 'farbgeier' ? 'Ober' : 'Unter';
+  const twoRankTrumps = hand.filter(card => card.rank === rankTrump).length === 2 && hand.some(card => card.rank === rankTrump && card.suit !== 'Schellen');
+  const exclusions = Number(missingAces >= 2) + Number(contract.kind === 'farbwenz' && trumpSchmier === 0) + Number(twoRankTrumps) + Number(position === 1 || position === 4);
   let eligible = false;
   if (contract.kind === 'rufspiel') eligible = bremser ? trumpCount >= config.sauspielWithBremserMin && trumps.filter(court).length >= 2 : trumpCount >= config.sauspielWithoutBremserMin || trumpCount === 5 && trumps.some(card => card.id === 'Schellen-Ober' || card.id === 'Eichel-Unter');
   else if (contract.kind === 'solo') eligible = trumpCount === 8 || trumpCount >= config.soloMinTrumps && highTrumps >= config.soloMinOber && suitsWithoutAce <= 1;
   else if (contract.kind === 'farbwenz') eligible = trumpCount >= config.farbwenzMinTrumps && highTrumps >= config.farbwenzMinUnter && trumpSchmier >= 1 && (trumpCount >= 7 || definition.trumps.slice(0,trumpCount === 5 ? 2 : 3).some(card => trumps.some(own => own.id === card.id))) && exclusions < 2;
-  else if (contract.kind === 'wenz' || contract.kind === 'geier') eligible = exclusions < 2 && (trumpCount === 4 || definition.trumps.slice(0,3).every(card => trumps.some(own => own.id === card.id)) && aces >= 1);
+  else if (contract.kind === 'wenz' || contract.kind === 'geier') {
+    const twoWithAces = trumpCount >= 2 && (aces >= 3 || aces >= 2 && voids >= 2);
+    eligible = voids <= 2 && (twoWithAces || exclusions < 2 && (trumpCount === 4 || definition.trumps.slice(0,3).every(card => trumps.some(own => own.id === card.id)) && aces >= 1));
+  }
   else if (contract.kind === 'sie') eligible = hand.length === 8 && hand.every(court);
   else if (contract.kind === 'bettel') eligible = hand.filter(card => POINTS[card.rank] === 0).length >= 5;
   else if (contract.kind === 'farbgeier') {
@@ -407,15 +437,14 @@ export function evaluateHand(hand: Card[], contract: Contract, position = 1, con
   const power = trumpCount*1.3 + highTrumps*1.5 + Math.max(0,topTrumpRun)*.7 - Math.max(0,-topTrumpRun)*.35 + aces*1.5 + voids*.4 - lonelyTens*.5 - suitsWithoutAce*.6 + (position === 1 ? Math.max(0,topTrumpRun)*.15 : position === 4 ? aces*.2 : 0);
   const probability = Math.max(.05,Math.min(.99,1/(1+Math.exp(-(power-(contract.kind === 'rufspiel' ? 8 : 12))/2))));
   const minimum = contract.kind === 'wenz' || contract.kind === 'geier' ? tariffs?.laufendeAbWenzGeier ?? definition.laufendeMin : tariffs?.laufendeAbFarbspiel ?? definition.laufendeMin;
-  const limit = contract.kind === 'rufspiel' ? 14 : contract.kind === 'wenz' || contract.kind === 'geier' ? 4 : contract.kind === 'solo' ? tariffs?.laufendeSoloLimit ?? 8 : 8;
-  const countedRun = Math.min(Math.abs(topTrumpRun),limit);
-  const value = ((contract.kind === 'rufspiel' ? tariffs?.rufspielValue ?? 10 : contract.kind === 'wenz' ? tariffs?.wenzValue ?? 30 : tariffs?.soloValue ?? 30) + (countedRun >= minimum ? countedRun*(tariffs?.laufendeValue ?? 10) : 0))*(contract.kind === 'sie' ? tariffs?.sieMultiplier ?? 4 : contract.tout ? tariffs?.toutMultiplier ?? 2 : 1);
+  const countedRun = tariffs?.laufendeAktiv === false ? 0 : Math.abs(topTrumpRun);
+  const value = ((contract.kind === 'rufspiel' ? tariffs?.rufspielValue ?? 10 : contract.kind === 'wenz' ? tariffs?.wenzValue ?? 30 : tariffs?.soloValue ?? 30) + (countedRun >= minimum ? countedRun*(tariffs?.laufendeValue ?? 10) : 0))*(contract.kind === 'sie' ? 4 : contract.tout ? 2 : 1);
   return {trumpCount,highTrumps,bremser,trumpSchmier,suitsWithoutAce,topTrumpRun,aces,voids,lonelyTens,exclusions,eligible,expectedGain:probability*value};
 }
 function contractChoices(view: GameView, level: BotLevel, config: BotConfig): Contract[] {
   const position = (view.seat-(view.dealer+1)+4)%4+1;
   const call = preferredCall(view.hand,view.contracts);
-  return view.contracts.filter(contract => contract.kind !== 'rufspiel' || contract === call).filter(contract => {
+  return view.contracts.filter(contract => contract.kind !== 'rufspiel' || contract.suit === call?.suit && (contract.calledRank ?? 'Ass') === (call?.calledRank ?? 'Ass')).filter(contract => {
     const e = evaluateHand(view.hand,contract,position,config,view.rules);
     if (!e.eligible) return false;
     if (level === 'beginner' && contract.kind !== 'rufspiel' && contract.kind !== 'sie' && !(e.trumpCount === 8 || e.topTrumpRun >= 4 && e.aces >= 2)) return false;
@@ -432,6 +461,13 @@ export function shouldSpritz(view: GameView, level: BotLevel, random: () => numb
   const voids = SUITS.filter(suit => createDeck().some(card => card.suit === suit && !isTrump(card,contract)) && !view.hand.some(card => card.suit === suit && !isTrump(card,contract))).length;
   const aces = view.hand.filter(card => card.rank === 'Ass' && !isTrump(card,contract)).length;
   const re = (view.spritzCount ?? 0)%2 === 1;
+  if (contract.kind === 'wenz' || contract.kind === 'geier') {
+    const first = view.tricks[0];
+    const knowledge = gameKnowledge(view);
+    const top = gameDefinition(contract).trumps;
+    const strength = trumps.some(card => card.id === top[0].id) || trumps.length >= 2 && trumps.some(card => top.slice(0,2).some(high => high.id === card.id));
+    return !!first && first.points > 30 && sameParty(knowledge,first.winner) && strength && (level !== 'amateur' || random() < config.amateurSpritzChance);
+  }
   const eligible = re ? (trumps.length >= 5 && (ober >= 3 || ober >= 2 && (voids > 0 || aces > 0)) || trumps.length >= 6 && ober >= 1 && courts >= 2) : contract.kind === 'rufspiel' ? trumps.length >= 5 && ober >= 1 && courts >= 3 && voids >= 1 : trumps.length >= 5 && high && courts >= 3;
   if (!eligible) return false;
   if (level === 'amateur') return trumps.length >= 6 && ober >= 3 && random() < config.amateurSpritzChance;
@@ -461,6 +497,8 @@ export function simulateContract(view: GameView, contract: Contract, random: () 
 }
 function chooseBotAction(view: GameView, difficulty: AiDifficulty, random: () => number): Action {
   const level = botLevel(difficulty), config = botConfig(view.rules.bot);
+  // First-packet criteria are settled; activating the separate second-Legen
+  // criteria awaits clarification of whether "second" means player or deal stage.
   if (view.phase === 'legen') return {type:'legen',knock:shouldAiKnock(view.hand)};
   if (view.phase === 'trick') return {type:'collect'};
   if (view.phase === 'finished' || view.phase === 'redeal') return {type:'next'};

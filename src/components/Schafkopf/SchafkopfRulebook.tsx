@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react';
 import rules from '../../games/schafkopf/docs/teil1.md?raw';
 import tips from '../../games/schafkopf/docs/teil2.md?raw';
 import additions from '../../games/schafkopf/docs/teil2b.md?raw';
+import clarifications from '../../games/schafkopf/docs/klarstellungen-2026-10-05.md?raw';
 import { SCHAFKOPF_LESSONS } from '../../games/schafkopf/lessons';
 const documents = [{title:'Teil 1 · Regeln',text:rules},{title:'Teil 2 · Tipps',text:tips},{title:'Teil 2b · Bot-Einstellungen und Ergänzungen',text:additions}];
 function inline(text: string): ReactNode[] {
@@ -37,27 +38,8 @@ export default function SchafkopfRulebook() {
   const lessons = SCHAFKOPF_LESSONS.filter(lesson => `${lesson.code} ${lesson.title} ${lesson.text}`.toLocaleLowerCase('de').includes(query.toLocaleLowerCase('de')));
   return <div className="sk-document-rulebook">
     <h3>Dein Regelwerk · Regeln, Tipps und Bot-Verhalten</h3>
-    <p>Die drei Originaldokumente sind vollständig übernommen. Widersprüche zu bisherigen Tischregeln sind zur Klärung markiert; bis dahin gelten dort die bisherigen Einstellungen.</p>
-    <details className="sk-pending-rules"><summary>Abweichungen zur bisherigen App · Klärung ausstehend</summary><ul>
-      <li>Bieten: bisher getrennte Spielränge, Tout im Bieten und zweiter Spieler zuerst; Dokument: Wenz = Geier = Solo, erster Spieler zuerst, Tout erst nach dem Bieten.</li>
-      <li>Spritzen: bisher Kontra zur ersten eigenen Karte sowie Re/Sub/Hirsch im Folgestich mit festen 61/60-Grenzen; Dokument: Kontra vor der ersten Karte, Re vor dem nächsten eigenen Zug und 61/31 für die letzte Spritzerpartei.</li>
-      <li>Davonlaufen: bisher Sau beim Bedienen weiter verpflichtend; Dokument: nach Davonlaufen frei wählbar.</li>
-      <li>Laufende: bisher höchstens 8 im Farbsolo; Dokument beschreibt die ganze Trumpffolge.</li>
-      <li>Sie: bisher vierfaches Solo; Dokument: vierfaches Solo-Tout.</li>
-      <li>Schwarz: bisher zusätzlich zu Schneider; Dokument nennt einen Zuschlag statt Schneider. Bei den Standardtarifen ergibt beides insgesamt +20.</li>
-      <li>T9: feste R3-Ausnahme oder Trefferquote laut Tippmatrix? Aktuell gilt die feste Ausnahme bei bewiesener Trumpflosigkeit.</li>
-      <li>Tout: bisher immer zu Ende spielen. Sofortiger Abbruch ist jetzt optional unter „Regeln anpassen“ verfügbar.</li>
-      <li>R4a, R2/T11 und A4-Ausschlusskriterien enthalten Präzisierungen mit dokumentierten technischen Defaults. Die genaue Schwarz-Gefahr-Schwelle und die grobe Punktkenntnis von Fortgeschritten sind noch offen.</li>
-      <li>Hochzeit: bisher nur ein Einstellschalter, keine spielbare Engine-Variante. Das Dokument setzt eine vorhandene Implementierung voraus.</li>
-    </ul></details>
-    <details className="sk-pending-rules"><summary>Zusätzliche weiterhin geltende Tischregeln</summary><ul>
-      <li>Eichel-Ober-Pflichtspiel nach viermal Weiter, falls aktiviert. Bei einem erzwungenen Ruf gehen fehlende Sauen vor; sonst können Zehn, König, Neun, Acht oder Sieben gerufen werden.</li>
-      <li>Der letzte Klopfer muss nach viermal Weiter spielen. Die Entscheidung gibt die zweite Viererhand sofort frei; jede Klopfentscheidung verdoppelt den Tarif.</li>
-      <li>Ramsch: Eine Jungfrau ohne Stich bekommt eine doppelte Gewinnzahlung. Bei gleichen höchsten Augen verliert bisher der früheste Sitz.</li>
-      <li>Bettel hat keinen Trumpf, der Ansager gewinnt ohne eigenen Stich. Farbwenz und Farbgeier zählen Laufende bisher ab drei.</li>
-      <li>Online: 20 Sekunden Klopfzeit und 60 Sekunden Zugzeit. Einzelspieler: Legen immer aktiv und ohne Entscheidungsfrist.</li>
-      <li>Wenz/Geier-Bots behalten die zusätzliche bisherige Mindeststärke: alle vier Rangtrümpfe oder die höchsten drei und ein Fehlfarben-Ass.</li>
-    </ul></details>
+    <p>Die drei Originaldokumente sind vollständig übernommen. Deine Klarstellungen vom 5. Oktober 2026 haben bei Abweichungen Vorrang. Noch offene Details sind im aktuellen Regelstand gekennzeichnet.</p>
+    <details className="sk-rule-document" open><summary>Aktuelle Klarstellungen · 5. Oktober 2026</summary><a download="schafkopf-klarstellungen-2026-10-05.md" href={`data:text/markdown;charset=utf-8,${encodeURIComponent(clarifications)}`}>Aktuellen Regelstand herunterladen</a><Markdown text={clarifications}/></details>
     <label className="sk-rule-search">Regeln und Tipps suchen<input type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder="Zum Beispiel R6, Schmieren oder Bremser" /></label>
     <div className="sk-lesson-index">{lessons.map(lesson => <details key={lesson.id}><summary><b>{lesson.code}</b> · {lesson.title} <small>{lesson.kind === 'rule' ? 'Regel' : 'Tipp'}</small></summary><p>{lesson.text}</p></details>)}{!lessons.length && <p>Keine passenden Regeln oder Tipps.</p>}</div>
     {documents.map(document => <details className="sk-rule-document" key={document.title}><summary>{document.title} · vollständiges Original</summary><a download={`${document.title.split(' · ')[0].replaceAll(' ','-')}.md`} href={`data:text/markdown;charset=utf-8,${encodeURIComponent(document.text)}`}>Originaldatei herunterladen</a><Markdown text={document.text}/></details>)}

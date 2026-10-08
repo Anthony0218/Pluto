@@ -39,8 +39,8 @@ test('Legend announcements play sampled rounds through scoring; spritz sampling 
   assert.equal(later.winChance,1);
   assert.equal(later.expectedGain,220);
   const configured={...game,rules:{...game.rules,toutMultiplier:3,toutSchneiderSchwarz:true},points:[120,0,0,0],tricks:Array.from({length:8},()=>({winner:0,points:15,plays:[]}))};
-  assert.equal(scoreRound(configured).value,390);
-  assert.ok(Math.abs(evaluateHand(hand,contract,1,config,configured.rules).expectedGain/evaluateHand(hand,contract,1,config,game.rules).expectedGain-1.5)<1e-12);
+  assert.equal(scoreRound(configured).value,220,'obsolete saved multipliers and Tout bonuses cannot change the fixed rules');
+  assert.equal(evaluateHand(hand,contract,1,config,configured.rules).expectedGain,evaluateHand(hand,contract,1,config,game.rules).expectedGain);
 });
 
 test('data-driven game definitions contain the specified ordered trumps and plain ranks', () => {
@@ -96,11 +96,13 @@ test('R2 feeds a safe partner, R4 blocks overtaking, R5 forces an available winn
     assert.deepEqual(options(view(['Herz-Unter','Gras-7'],[[1,'Schellen-Ass']]),level),['Herz-Unter']);
   }
 });
-test('R6 direct neighbors are mandatory from Amateur; a third weak trump preserves the partner', () => {
+test('R6 direct neighbors are mandatory from Amateur only when every held card is adjacent', () => {
   const neighbors=view(['Herz-Ober','Eichel-Unter'],[[3,'Schellen-Ober']]);
   assert.deepEqual(options(neighbors,'beginner'),['Eichel-Unter']);
   for (const level of allLevels.slice(1)) assert.deepEqual(options(neighbors,level),['Herz-Ober']);
-  assert.deepEqual(options(view(['Herz-Ober','Eichel-Unter','Herz-10'],[[3,'Schellen-Ober']]),'amateur'),['Herz-10']);
+  const additional=view(['Herz-Ober','Eichel-Unter','Herz-10'],[[3,'Schellen-Ober']]);
+  assert.ok(!ruleCandidates(additional,'amateur',() => .4).rules.includes('R6'));
+  assert.ok(!options(additional,'amateur').includes('Herz-Ober'));
 });
 test('R4a has conservative configurable reserves and never spends the sole high trump', () => {
   const strong=view(['Eichel-Ober','Gras-Ober','Herz-Unter','Herz-7','Herz-8'],[[3,'Eichel-Unter']]);
@@ -149,7 +151,7 @@ test('T7 retains safe Gras-Ober, sacrifices unsafe Herz-Ober, and Profi uses the
   assert.equal(chooseCard(view(['Schellen-Ober','Eichel-Unter'],[[3,'Eichel-Ober']]),'pro',() => .4).card.id,'Schellen-Ober');
 });
 test('T8 spreads 5–12 eyes with sufficient valuable cards; T10 can claim a trump lead', () => {
-  const v=view(['Eichel-Ober','Gras-Ass','Gras-10','Schellen-Ass','Schellen-10','Gras-König'],[[3,'Eichel-7']]);
+  const v=view(['Eichel-Ober','Gras-Ass','Gras-10','Schellen-Ass','Schellen-10','Gras-König'],[[3,'Eichel-7']],{tricks:[{plays:[],winner:0,points:11}]});
   assert.ok(tip(v,'T8').includes('Gras-Ass'));
   assert.ok(!tip(v,'T8').includes('Gras-König'));
   assert.deepEqual(tip(view(['Gras-Ober','Herz-7'],[[1,'Herz-Ober']]),'T10'),['Gras-Ober']);
@@ -239,7 +241,7 @@ test('T3a leads another plain suit when unable to seek', () => {
   assert.deepEqual(options(v),['Gras-7','Schellen-7']);
 });
 
-test('optional Spritz house rule shares asymmetric 61/31 thresholds between scoring and bots', () => {
+test('fixed last-Spritz thresholds share asymmetric 61/31 between scoring and bots', () => {
   const game=createGame();
   Object.assign(game,{contract:{kind:'solo',suit:'Herz'},declarer:0,partner:null,spritzCount:1,spritzSeats:[1],points:[60,20,20,20],tricks:Array.from({length:8},(_,i)=>({plays:[],winner:i%2,points:0})),rules:{...DEFAULT_GAME_RULES,spritzSchwellen:'letzter-spritzer'}});
   assert.equal(scoreRound(game).declarerWon,true,'last Kontra party loses 60:60');
@@ -247,7 +249,7 @@ test('optional Spritz house rule shares asymmetric 61/31 thresholds between scor
   game.points=[30,30,30,30]; assert.equal(scoreRound(game).schneider,false,'playing team is free at 30 after Kontra');
   game.points=[29,31,30,30]; assert.equal(scoreRound(game).schneider,true);
   game.points=[60,20,20,20]; game.spritzCount=2; assert.equal(scoreRound(game).declarerWon,false,'last Re party loses 60:60');
-  game.spritzCount=1; game.rules.spritzSchwellen='klassisch'; assert.equal(scoreRound(game).declarerWon,false,'existing default remains unchanged');
+  game.spritzCount=1; game.rules.spritzSchwellen='klassisch'; assert.equal(scoreRound(game).declarerWon,true,'old saved house-rule choices cannot change the fixed rule');
   const v={...view(['Herz-7']),rules:{...DEFAULT_GAME_RULES,spritzSchwellen:'letzter-spritzer'},spritzCount:1,spritzSeats:[1]};
   assert.equal(gameKnowledge(v).targetThresholds.win,60);
   assert.equal(gameKnowledge({...v,seat:1,declarer:0,partner:3}).targetThresholds.win,61);
@@ -266,6 +268,6 @@ test('optional immediate Tout loss stops after collection and reports only point
   const game=createGame(); Object.assign(game,{phase:'trick',turn:1,contract:{kind:'solo',suit:'Herz',tout:true},declarer:0,partner:null,rules:{...DEFAULT_GAME_RULES,toutAbbrechen:true},tricks:[{plays:[{seat:0,card:card('Eichel-7')},{seat:1,card:card('Eichel-Ass')},{seat:2,card:card('Eichel-8')},{seat:3,card:card('Eichel-9')}],winner:1,points:11}],points:[0,11,0,0]});
   const ended=applyAction(game,1,{type:'collect'});
   assert.equal(ended.phase,'finished'); assert.equal(ended.result.declarerWon,false); assert.equal(ended.result.opponentPoints,11);
-  const continuing=applyAction({...game,rules:{...DEFAULT_GAME_RULES}},1,{type:'collect'});
+  const continuing=applyAction({...game,rules:{...DEFAULT_GAME_RULES,toutAbbrechen:false}},1,{type:'collect'});
   assert.equal(continuing.phase,'play');
 });

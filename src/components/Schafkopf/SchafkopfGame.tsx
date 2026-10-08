@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { applyAction, chooseAiAction, collectSecondsFor, createGame, resolveLegenTimeout, viewFor, type Action, type AiDifficulty, type GameRules, type GameState } from "../../games/schafkopf/schafkopf";
+import { applyAction, chooseAiAction, collectSecondsFor, createGame, migrateGameState, resolveLegenTimeout, viewFor, type Action, type AiDifficulty, type GameRules, type GameState } from "../../games/schafkopf/schafkopf";
 import { DEFAULT_ANNOUNCEMENT_SETTINGS, SIMPLE_ANNOUNCEMENT_SETTINGS, formatDeclarationAnnouncement } from "../../games/schafkopf/announcements";
 import SchafkopfTable from "./SchafkopfTable";
 import { savedSchafkopfRules } from "./schafkopfRulesPreference";
@@ -30,7 +30,7 @@ export default function SchafkopfGame({ mode = "hotseat" }: { mode?: "hotseat" |
           saved.legenDeadline = null;
           saved.rules = { ...saved.rules, legen: true };
         }
-        return saved;
+        return migrateGameState(saved);
       }
     } catch { /* Start a new table if the saved game is invalid. */ }
     const freshGame = createGame(mode === "ai" ? savedAiNames() : undefined, 3, undefined, undefined, 1, { ...savedSchafkopfRules(), ...(mode === "ai" ? { legen: true } : {}) });

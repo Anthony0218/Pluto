@@ -69,12 +69,12 @@ export function gameKnowledge(view: GameView): GameKnowledge {
   view.hand.forEach(card => probabilities[view.seat].set(card.id,1));
   const teamsKnown = roles.every(role => role !== 'UNBEKANNT');
   const ownRole = roles[view.seat];
-  const teamPoints = view.points.reduce((sum, points, seat) => sum + (roles[seat] === ownRole ? points : 0),0);
+  const teamPoints = teamsKnown ? view.points.reduce((sum, points, seat) => sum + (roles[seat] === ownRole ? points : 0),0) : view.points[view.seat];
   const opponentPoints = view.points.reduce((sum, points, seat) => sum + (roles[seat] !== ownRole && roles[seat] !== 'UNBEKANNT' ? points : 0),0);
   const playedCards = [...played.values()];
   const targets = partyThresholds(view.rules,view.spritzCount ?? 0);
   return { roles, ownRole, partner, playedCards, playedTrumps: playedCards.filter(card => isTrump(card,contract)), remainingTrumps: gameDefinition(contract).trumps.filter(card => !played.has(card.id)), voids, playedSuits, discards, presumablyVoidInCalledSuit, constraints, probabilities, remainingPoints: 120 - view.points.reduce((a,b) => a+b,0), teamPoints, opponentPoints, teamsKnown,
-    // This reads the active table convention, including optional last-Spritzer thresholds.
+    // The last Spritz party always needs 61/31.
     targetThresholds: { win: ownPlaying ? targets.playerWin : targets.opponentWin, schneiderFree: ownPlaying ? targets.playerFree : targets.opponentFree, opponentWin: ownPlaying ? targets.opponentWin : targets.playerWin, opponentSchneiderFree: ownPlaying ? targets.opponentFree : targets.playerFree } };
 }
 export function sameParty(knowledge: GameKnowledge, seat: number): boolean {
