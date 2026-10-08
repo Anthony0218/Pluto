@@ -145,6 +145,39 @@ test("only host starts; responses redact hands; concurrent moves commit only onc
   assert.equal((await s.request("user-3", { op: "join", code: room.code })).status, 200, "running seat reconnects");
 });
 
+test("Weiter accepts every announcement pass, including in saved legacy rooms", async () => {
+  for (const legacy of [false, true]) {
+    for (const wantsToPlay of [false, true]) {
+      const s = server();
+      const room = await fullRoom(s);
+      const started = await s.request("user-0", {
+        op: "start", code: room.code, version: room.version,
+        rules: { ...engine.DEFAULT_GAME_RULES, legen: false },
+      });
+      assert.equal(started.status, 200);
+      const row = [...s.rows.values()][0];
+      if (legacy) delete row.game.rulesVersion;
+      const hands = structuredClone(row.game.hands);
+      let version = started.body.version;
+      for (let seat = 0; seat < 4; seat++) {
+        const moved = await s.request(`user-${seat}`, {
+          op: "action", code: room.code, version,
+          action: { type: "intent", play: wantsToPlay && seat === 0 },
+        });
+        assert.equal(moved.status, 200, JSON.stringify(moved.body));
+        version++;
+        assert.equal(moved.body.version, version);
+        assert.equal(moved.body.game.declarations, seat + 1);
+        assert.equal(moved.body.game.phase, seat < 3 ? "intent" : wantsToPlay ? "declare" : "redeal");
+        assert.equal(moved.body.game.hands, undefined);
+        if (!(wantsToPlay && seat === 0)) assert.match(moved.body.game.announcements.at(-1), /Weiter|Weg/);
+      }
+      assert.deepEqual(row.game.hands, hands, "Passing preserves the dealt cards");
+      assert.equal(row.game.rulesVersion, 2);
+    }
+  }
+});
+
 test("online Legen accepts independent decisions and gives each player their second packet immediately", async () => {
   const s = server();
   const room = await fullRoom(s);
