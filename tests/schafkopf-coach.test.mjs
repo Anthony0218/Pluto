@@ -42,7 +42,7 @@ test("beginner advice recommends a small trump when void in the led suit", () =>
   const lead = { id: "Eichel-7", suit: "Eichel", rank: "7" };
   const trump = { id: "Herz-7", suit: "Herz", rank: "7" };
   const playing = { ...view, phase: "play", turn: 0, contract: { kind: "rufspiel", suit: "Gras" }, partner: null, hand: [trump], legalCards: [trump.id], trick: [{ seat: 1, card: lead }] };
-  assert.match(liveSchafkopfTip(playing), /Fehlfarbe frei.*Trumpf ein/);
+  assert.match(liveSchafkopfTip(playing), /Fehlfarbe frei.*Trumpf stechen/);
 });
 
 test("beginner and amateur declarations use the standard ace names", () => {

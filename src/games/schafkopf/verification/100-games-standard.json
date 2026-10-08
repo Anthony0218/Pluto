@@ -1,0 +1,78 @@
+{
+  "seed": 20261004,
+  "profile": "standard",
+  "games": 100,
+  "redeals": 4,
+  "moves": 3200,
+  "simulations": 28152,
+  "illegalMoves": 0,
+  "ruleCandidateViolations": 0,
+  "elapsedSeconds": 60.355,
+  "levels": {
+    "beginner": {
+      "games": 83,
+      "wins": 53,
+      "eyes": 2255,
+      "declarations": 12,
+      "declarerWins": 6,
+      "delta": 650,
+      "winRate": 0.6385542168674698,
+      "averageEyes": 27.16867469879518,
+      "announcementRate": 0.14457831325301204,
+      "declarerWinRate": 0.5,
+      "averageDelta": 7.831325301204819
+    },
+    "amateur": {
+      "games": 81,
+      "wins": 43,
+      "eyes": 2184,
+      "declarations": 19,
+      "declarerWins": 8,
+      "delta": -500,
+      "winRate": 0.5308641975308642,
+      "averageEyes": 26.962962962962962,
+      "announcementRate": 0.2345679012345679,
+      "declarerWinRate": 0.42105263157894735,
+      "averageDelta": -6.172839506172839
+    },
+    "advanced": {
+      "games": 81,
+      "wins": 45,
+      "eyes": 2394,
+      "declarations": 18,
+      "declarerWins": 8,
+      "delta": 240,
+      "winRate": 0.5555555555555556,
+      "averageEyes": 29.555555555555557,
+      "announcementRate": 0.2222222222222222,
+      "declarerWinRate": 0.4444444444444444,
+      "averageDelta": 2.962962962962963
+    },
+    "pro": {
+      "games": 82,
+      "wins": 52,
+      "eyes": 2952,
+      "declarations": 31,
+      "declarerWins": 16,
+      "delta": -40,
+      "winRate": 0.6341463414634146,
+      "averageEyes": 36,
+      "announcementRate": 0.3780487804878049,
+      "declarerWinRate": 0.5161290322580645,
+      "averageDelta": -0.4878048780487805
+    },
+    "legend": {
+      "games": 73,
+      "wins": 42,
+      "eyes": 2215,
+      "declarations": 20,
+      "declarerWins": 7,
+      "delta": -350,
+      "winRate": 0.5753424657534246,
+      "averageEyes": 30.34246575342466,
+      "announcementRate": 0.273972602739726,
+      "declarerWinRate": 0.35,
+      "averageDelta": -4.794520547945205
+    }
+  }
+}

@@ -2229,3 +2229,29 @@
     font-size: 8px;
   }
 }
+
+/* Shared document rulebook, coaching and review. */
+.sk-document-rulebook { max-width: 100%; line-height: 1.65; }
+.sk-rule-search { display: grid; gap: .4rem; margin-block: 1rem; }
+.sk-rule-search input { width: 100%; padding: .65rem; border: 1px solid #a18d69; border-radius: .5rem; background: #fff9ec; color: #302a22; }
+.sk-lesson-index details, .sk-rule-document, .sk-pending-rules { border-bottom: 1px solid #9c896a66; padding-block: .65rem; }
+.sk-document-rulebook summary { cursor: pointer; }
+.sk-lesson-index small { margin-left: .4rem; opacity: .7; }
+.sk-source-table { max-width: 100%; overflow-x: auto; margin-block: 1rem; }
+.sk-source-table table { border-collapse: collapse; min-width: 100%; font-size: .9rem; }
+.sk-source-table th, .sk-source-table td { padding: .55rem; text-align: left; vertical-align: top; border: 1px solid #9c896a66; }
+.sk-rule-source pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 1rem; background: #302a2210; }
+.sk-rule-source blockquote { margin: .5rem 0; padding-left: 1rem; border-left: 3px solid #a18d69; }
+.sk-source-bullet { margin-block: .3rem; padding-left: .65rem; }
+.sk-bot-settings fieldset { display: grid; gap: .7rem; margin-block: 1rem; }
+.sk-bot-settings label { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin-block: .5rem; }
+.sk-bot-settings input { width: 5rem; max-width: 100%; padding: .35rem; border: 1px solid #a18d69; border-radius: .4rem; }
+.sk-learning-banner { padding: .8rem 1rem; margin: .75rem 0; border: 1px solid #9c896a66; border-radius: .7rem; background: #fff5df; color: #302a22; line-height: 1.5; }
+.sk-learning-banner span { font-size: .75rem; opacity: .8; margin-right: .75rem; }
+.sk-learning-banner p { margin: .25rem 0 0; font-size: .9rem; }
+.sk-review-list details { margin-block: .6rem; line-height: 1.5; }
+.sk-review-list summary { cursor: pointer; }
+@media (max-width: 600px) { .sk-learning-banner { padding: .6rem; } .sk-source-table th, .sk-source-table td { padding: .35rem; } }
+.sk-document-options { display: grid; gap: .6rem; margin-block: 1rem; }
+.sk-document-options label { display: flex; justify-content: space-between; align-items: center; gap: .75rem; }
+.sk-document-options input[type="number"] { width: 5rem; padding: .35rem; border-radius: .4rem; border: 1px solid #a18d69; }
