@@ -374,11 +374,6 @@
 .dnd-switch[aria-checked="true"] .dnd-switch-track { background: #8b5cf6; }
 .dnd-switch[aria-checked="true"] .dnd-switch-track::after { transform: translateX(18px); }
 
-/* Room invite button sits bottom-left so the bottom-right corner stays free for toasts;
-   on game boards it stacks above the chess sidebar toggle. */
-.room-friends-trigger { position: fixed; z-index: 100; bottom: 16px; left: 16px; }
-body:has(.chess-game-grid) .room-friends-trigger { bottom: 62px; }
-
 /* A single fixed friends drawer for the dashboard and other routes. */
 .dashboard-workspace > .dashboard-main { width:100%; }
 .dashboard-drawer { overflow:hidden;width:min(460px,95vw);height:100dvh;max-height:100dvh;overscroll-behavior:none; }
@@ -393,6 +388,10 @@ body:has(.chess-game-grid) .room-friends-trigger { bottom: 62px; }
 .dashboard-drawer .game-invite-panel h2 { font-size:16px; }
 @media(max-height:740px) { .dashboard-drawer .game-invite-panel .invite-game-preview { display:none; } .dashboard-drawer .game-invite-panel select,.dashboard-drawer .game-invite-panel input { padding-top:7px;padding-bottom:7px; } .dashboard-drawer .game-invite-panel label { margin-top:8px; } .dashboard-drawer .game-invite-panel button { padding-top:8px;padding-bottom:8px; } .dashboard-drawer > div > div:first-child { margin-bottom:8px; } }
 @media(max-height:590px) { .dashboard-drawer .play-friends .friends-body { display:none; } .dashboard-drawer .play-friends { padding:8px; } .dashboard-drawer .dash-section-heading { margin:0; } .dashboard-drawer .game-invite-panel > div { margin-top:8px; } }
+/* In a room the drawer also lists the friends to invite, so it scrolls instead of fitting one screen. */
+.dashboard-drawer.is-scrollable { overflow-y:auto;overscroll-behavior:contain; }
+.dashboard-drawer.is-scrollable > div { height:auto;min-height:100%; }
+.dashboard-drawer.is-scrollable .play-friends .friends-body { display:block; }
 
 /* Your apps: a strip of tiles under "Play together". */
 .dashboard-apps .dash-section-heading { margin-bottom: 12px; }

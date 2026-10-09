@@ -352,3 +352,20 @@
 .history-fact { margin: 0; padding: .8rem 1rem; border-left: 3px solid #fb7185; border-radius: 10px; color: #fff3f5; background: rgba(251,113,133,.1); line-height: 1.5; }
 .history-fact::first-letter { text-transform: uppercase; }
 .history-source { color: #c9b7bd; font-size: .74rem; letter-spacing: .02em; }
+
+/* Solo, hotseat and online trials share the same viewport-fit frame. */
+.atlas-trials-page{box-sizing:border-box;height:var(--app-height);min-height:0;overflow:hidden;display:flex;flex-direction:column;padding:clamp(.55rem,1.8vw,1.1rem)}
+.trial-header{flex:none;width:100%;margin-bottom:.5rem}.trial-progress{flex:none;width:100%;margin-bottom:.6rem}
+.trial-stage,.trial-stage.is-wide{flex:1;width:100%;min-height:0;display:block;overflow:hidden}
+.trial-stage .atlas-fit-content{display:grid;gap:.65rem}
+.trial-panel{padding:clamp(.65rem,1.8vw,1.2rem)}.trial-title{margin:.3rem 0 .6rem;font-size:clamp(1.3rem,2.8vw,2rem)}
+@media(max-width:700px){
+ .trial-split,.language-layout{gap:.5rem}.trial-panel{border-radius:16px;padding:.65rem}
+ .trial-option-grid{gap:.4rem}.trial-option-grid.is-region{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .trial-country-card{min-height:44px;padding:.4rem .45rem;gap:.35rem;font-size:.8rem}
+ .trial-country-card .trial-flag{width:25px;height:18px}.trial-sort-row{height:48px}.trial-sortable{gap:.35rem}
+ .trial-stat-sheet>div{padding:.5rem .6rem}.trial-clues li{padding:.45rem .5rem}.trial-feedback{padding:.5rem .6rem}
+ .language-reveal .atlas-country-shape svg{max-height:110px}.language-guesser blockquote{margin:.5rem 0;font-size:1.35rem}.language-options{gap:.35rem}.language-options button{min-height:40px;padding:.45rem .65rem}
+ .duel-hand-card{min-height:90px}.history-fact,.language-translation p{font-size:.8rem;line-height:1.35}
+}
+.trial-stage .atlas-fit-content:has(>.trial-game-over)>:not(.trial-game-over){display:none}

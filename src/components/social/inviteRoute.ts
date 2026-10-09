@@ -5,6 +5,12 @@ type Invite = { game?: string | null; gameCode: string; gameRoute?: string | nul
 const directRoomRoutes = new Set(["/games/atlas-arena/multiplayer", "/games/eat-it/multiplayer", "/games/card-builder/room"]);
 const chessLobbyRoute = /^\/games\/chess\/(?:(?:classic|variants\/[a-z0-9-]+)\/multiplayer|ranked)$/;
 
+/**
+ * The `game` column of a stored invite. The database only knows Watten and "everything else filed under chess";
+ * the lobby route in `game_route` is what actually identifies the game.
+ */
+export const inviteGameKey = (route?: string | null) => route?.startsWith("/games/watten/") ? "watten" : "chess";
+
 /** Where a game invite leads. With `autoJoin`, lobbies join the room on arrival instead of only prefilling the code. */
 export function getInviteDestination({ game, gameCode, gameRoute }: Invite, { autoJoin = false } = {}) {
   const code = encodeURIComponent(gameCode);
@@ -12,6 +18,8 @@ export function getInviteDestination({ game, gameCode, gameRoute }: Invite, { au
   if (gameRoute && directRoomRoutes.has(gameRoute)) return `${gameRoute}/${code}${autoJoin ? "?join=1" : ""}`;
   if (gameRoute && chessLobbyRoute.test(gameRoute)) return `${gameRoute}?code=${code}${join}`;
   if (gameRoute === "/games/pluto-party") return `${gameRoute}?code=${code}${join}`;
+  if (gameRoute === "/games/natura") return `${gameRoute}?naturaRoom=${code}${join}`;
+  if (gameRoute === "/games/medieval-kingdoms") return `${gameRoute}?council=${code}${join}`;
   if (gameRoute === "/chess-custom/play/multiplayer") return `${gameRoute}?room=${code}${join}`;
   if (gameRoute && /^\/games\/(go|shogi|schafkopf)\/multiplayer$/.test(gameRoute)) return `${gameRoute}?code=${code}${join}`;
   if (gameRoute && /^\/games\/watten\/multiplayer\/[34]$/.test(gameRoute)) return `/games/watten/multiplayer?variant=${gameRoute.endsWith("/3") ? "three-player" : "four-player"}&code=${code}${join}`;
@@ -19,9 +27,17 @@ export function getInviteDestination({ game, gameCode, gameRoute }: Invite, { au
   return `/games/chess/classic/multiplayer?code=${code}${join}`;
 }
 
+/**
+ * Navigation state for accepting an invite. A lobby that is already open would otherwise keep the
+ * old room code in its state, so the page is remounted and joins the invited room from scratch.
+ */
+export const acceptInviteState = () => ({ inviteRemount: Date.now() });
+
 /** English label for the invited game; pass the parts through `ui()` when rendering. */
 export function getInviteGameLabel({ game, gameRoute }: Omit<Invite, "gameCode">) {
   if (gameRoute === "/games/pluto-party") return "Pluto Party";
+  if (gameRoute === "/games/natura") return "Natura";
+  if (gameRoute === "/games/medieval-kingdoms") return "Medieval Kingdoms";
   if (gameRoute === "/games/go/multiplayer") return "Go";
   if (gameRoute === "/games/shogi/multiplayer") return "Shogi";
   if (gameRoute === "/games/schafkopf/multiplayer") return "Schafkopf";

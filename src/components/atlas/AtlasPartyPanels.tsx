@@ -76,7 +76,7 @@ export function HigherLowerCards({ question, revealed, disabled, chosen, correct
   );
 }
 
-export function GuessClueList({ clues, total, entityId }: { clues: GuessClue[]; total: number; entityId?: string }) {
+export function GuessClueList({ clues, total, entityId, excludeIds = [] }: { clues: GuessClue[]; total: number; entityId?: string; excludeIds?: string[] }) {
   return (
     <>
     <ol className="atlas-clues">
@@ -89,7 +89,7 @@ export function GuessClueList({ clues, total, entityId }: { clues: GuessClue[]; 
       ))}
       {total > clues.length && <li className="is-locked"><p>{total - clues.length} more {total - clues.length === 1 ? "tip" : "tips"}, revealed one per round while nobody solves it</p></li>}
     </ol>
-    <AtlasAreaReference values={clues.flatMap(clue => areaValuesFromText(clue.text))} excludeIds={entityId ? [entityId] : []} />
+    <AtlasAreaReference values={clues.flatMap(clue => areaValuesFromText(clue.text))} excludeIds={[...excludeIds, ...(entityId ? [entityId] : [])]} />
     </>
   );
 }
@@ -104,7 +104,7 @@ export function CountryGuessInput({ entities, selectedId, disabled, excluded = [
   const submit = () => { if (selectedId && !disabled) { onSubmit(selectedId); setQuery(""); } };
   return (
     <div className="atlas-guess-input">
-      <label><Search size={16} /><input value={query} disabled={disabled} placeholder="Type a country or click the map…" aria-label="Search for a country"
+      <label><Search size={16} /><input value={query} disabled={disabled} placeholder="Search for a country…" aria-label="Search for a country"
         onChange={(event) => setQuery(event.target.value)}
         onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); if (matches[0] && matches[0].id !== selectedId) { onSelect(matches[0].id); setQuery(matches[0].shortName); } else submit(); } }} /></label>
       {matches.length > 0 && selected?.shortName !== query && <div className="atlas-guess-suggestions">{matches.map((entity) => <button type="button" key={entity.id} disabled={disabled || excluded.includes(entity.id)} onClick={() => { onSelect(entity.id); setQuery(entity.shortName); }}>{entity.shortName}</button>)}</div>}

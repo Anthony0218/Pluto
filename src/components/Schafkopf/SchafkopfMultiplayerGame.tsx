@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import { useAuth } from "../../context/AuthContext";
 import { schafkopfRequest, type RoomSnapshot } from "../../games/schafkopf/multiplayer";
 import { AI_DIFFICULTY_OPTIONS, type Action, type AiDifficulty, type GameRules } from "../../games/schafkopf/schafkopf";
@@ -90,7 +91,7 @@ export default function SchafkopfMultiplayerGame() {
   }
   return <main className="sk-page"><header className="sk-header"><div><span className="sk-eyebrow">Dein Schafkopf-Tisch</span><h1>{room.title}</h1><p>Teile den Code mit Freunden oder starte mit KI auf den freien Plätzen.</p></div><Link className="sk-button sk-secondary" to="/games/schafkopf/multiplayer">Spieltage</Link></header>
     <section className="sk-panel"><strong className="sk-room-code">{code}</strong><div className="sk-actions"><button className="sk-button sk-secondary" onClick={() => void copyCode()}>{copied ? "Kopiert" : "Code kopieren"}</button></div>
-      <ul className="sk-waiting-list">{Array.from({ length: 4 }, (_, seat) => <li key={seat}>{seat + 1}. {room.players[seat]?.name ?? "Freier Platz · wird beim Start KI"}{room.players[seat]?.id === room.hostId ? " · Gastgeber" : ""}{room.players[seat]?.id === user.id ? " · Du" : ""}</li>)}</ul>
+      <ul className="sk-waiting-list">{Array.from({ length: 4 }, (_, seat) => <li key={seat} className="sk-waiting-seat"><span>{seat + 1}. {room.players[seat]?.name ?? "Freier Platz · wird beim Start KI"}{room.players[seat]?.id === room.hostId ? " · Gastgeber" : ""}{room.players[seat]?.id === user.id ? " · Du" : ""}</span>{!room.players[seat] && <InviteFriendButton />}</li>)}</ul>
       {host && <div className="sk-waiting-settings"><label className="sk-lobby-field" htmlFor="sk-room-title">Spieltag<input ref={titleRef} id="sk-room-title" defaultValue={room.title} maxLength={60} /></label><label className="sk-lobby-field" htmlFor="sk-room-ai">KI-Spielstärke<select ref={difficultyRef} id="sk-room-ai" defaultValue={room.aiDifficulty === "normal" ? "amateur" : room.aiDifficulty}>{AI_DIFFICULTY_OPTIONS.map(option => <option key={option.id} value={option.id}>{option.label}</option>)}</select></label><button className="sk-button sk-secondary" disabled={busy || Boolean(connectionError)} onClick={() => void send("configure")}>Einstellungen speichern</button></div>}
       <div className="sk-actions">{host ? <button className="sk-button" disabled={busy || Boolean(connectionError)} onClick={() => void send("start")}>Spiel starten · {room.players.length} Mensch{room.players.length === 1 ? "" : "en"}, {4 - room.players.length} KI</button> : <p>Der Gastgeber startet, wenn alle gewünschten Menschen beigetreten sind.</p>}<button className="sk-button sk-secondary" disabled={busy} onClick={() => void send("leave")}>Tisch verlassen</button></div>
       <p>Nach Spielbeginn bleiben die Plätze reserviert. Unterbrochene Verbindungen können diesem Raum wieder beitreten.</p>

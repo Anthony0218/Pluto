@@ -1,13 +1,14 @@
 import type { Army, Campaign, District, House } from "./types.ts";
 import { findPath, hexDistance, neighbors } from "./world.ts";
 import { campaignRound, councilSkill, season } from "./realm.ts";
+import { compactAccess } from "./agreements.ts";
 
 const soldiers = (a: Army) => Object.values(a.troops).reduce((sum, n) => sum + n, 0);
 export function realmNation(s: Campaign, a: Army) {
   return s.houses.find((h) => h.id === (a.pledgedTo ?? a.house))?.nation ?? a.origin;
 }
 export function militaryAccess(s: Campaign, from: string, to: string) {
-  return from === to || (s.treaties ?? []).some((t) => t.access && t.until >= campaignRound(s) && [t.from, t.to].includes(from) && [t.from, t.to].includes(to));
+  return from === to || compactAccess(s, from, to) || (s.treaties ?? []).some((t) => t.access && t.until >= campaignRound(s) && [t.from, t.to].includes(from) && [t.from, t.to].includes(to));
 }
 export function hostileAt(s: Campaign, nation: string, d: District) {
   return (s.sieges ?? []).some((siege) => siege.hex === d.id && s.houses.find((h) => h.id === siege.defender)?.nation === nation) ||
@@ -23,7 +24,7 @@ export function supplyConnection(s: Campaign, a: Army, at = a.hex) {
     const owner = s.houses.find((h) => h.id === (d.occupation ?? d.owner));
     return owner && militaryAccess(s, nation, owner.nation) && !hostileAt(s, nation, d);
   };
-  const source = (d: District) => accessible(d) && (d.city || d.depot || d.farm && d.resource === "grain" && !d.occupation);
+  const source = (d: District) => accessible(d) && (d.city || d.depot && !(s.agreements?.projects ?? []).some((p) => p.kind === "granary" && p.hex === d.id && p.status === "complete" && (!p.open || !p.maintained)) || d.farm && d.resource === "grain" && !d.occupation);
   const seen = new Set<string>([at]);
   const queue: string[][] = [[at]];
   for (let index = 0; index < queue.length; index++) {
@@ -47,7 +48,8 @@ export function supplyConnection(s: Campaign, a: Army, at = a.hex) {
 }
 export function provisionLimit(s: Campaign, a: Army) {
   const h = s.houses.find((h) => h.id === a.house);
-  return (a.origin === "varnesk" ? 4 : 3) + (h && councilSkill(s, h, "stewardship") >= 16 ? 1 : 0);
+  const granary = s.agreements?.projects.some((p) => p.kind === "granary" && p.status === "complete" && p.open && p.maintained && p.contributions[a.house]);
+  return Math.min(5, (a.origin === "varnesk" ? 4 : 3) + (h && councilSkill(s, h, "stewardship") >= 16 ? 1 : 0) + (granary ? 1 : 0));
 }
 export function feedArmy(s: Campaign, a: Army, demand: number, actingNation?: string) {
   const h = s.houses.find((h) => h.id === a.house)!;
@@ -116,6 +118,11 @@ export function strategyView(s: Campaign, houseId: string): Campaign {
   const engagements = new Set(s.battles.flatMap((b) => b.armies));
   const threatened = s.turns?.pending.filter((r) => r.to === houseId && r.kind === "attack").map((r) => r.army) ?? [];
   return { ...s,
+    agreements: s.agreements ? { ...s.agreements,
+      compacts: s.agreements.compacts.filter((c) => [c.from, c.to].includes(houseId)),
+      memories: s.agreements.memories.filter((m) => m.house === houseId || m.other === houseId),
+      domestic: Object.fromEntries(Object.entries(s.agreements.domestic).filter(([id]) => s.houses.find((h) => h.id === id)?.nation === house.nation)),
+    } : undefined,
     armies: s.armies.filter((a) => realmNation(s, a) === house.nation || visible.has(a.hex) || engagements.has(a.id) || threatened.includes(a.id)).map((a) => realmNation(s, a) === house.nation ? a : { ...a, path: [], objective: undefined, voyage: a.voyage ? { ...a.voyage, destination: a.hex, path: a.voyage.path.slice(0, a.voyage.progress + 1) } : undefined }),
     scouts: (s.scouts ?? []).filter((m) => m.house === houseId),
     intelligence: { [houseId]: s.intelligence?.[houseId] ?? [] },

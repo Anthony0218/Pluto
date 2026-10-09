@@ -837,7 +837,8 @@ export function advance(
         emit(state, { kind: "EXPLOSION", nodeId: effect.nodeIds[0], text: "EMBER PEAK ERUPTS! MARKED SPACES DEAL 10 HP DAMAGE" });
       }
       if ((state.roundLimit ?? 0) > 0 && state.round >= state.roundLimit!) {
-        state.winner = state.mode === "festival" ? [...state.players].sort((a, b) => (state.festivalScores?.[b.id] ?? 0) - (state.festivalScores?.[a.id] ?? 0) || b.coins - a.coins || state.order.indexOf(a.id) - state.order.indexOf(b.id))[0].id : rankedPlayers(state, settings)[0].id;
+        // Festival ties share victory; winner remains a completion marker for the phase flow.
+        state.winner = rankedPlayers(state, settings)[0].id;
         clearMinigame(state); state.phase = "GAME_OVER"; log(state, "Final round complete!"); break;
       }
       state.boardEffects = state.boardEffects?.filter((effect) => effect.expiresAfterRound > state.round);

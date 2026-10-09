@@ -74,7 +74,7 @@ export function applyRaceAction(run:RaceRun, questions:RaceQuestion[], generatio
   if(run.wrong.includes(String(answer))) throw new Error("That guess is already recorded.");
   const correct=q.interaction==="ordering" ? (answer as string[]).join("|")===q.answer.join("|") : q.interaction==="clues" ? answer===q.answer : validateAnswer(q,answer as string|string[]);
   const points=q.interaction==="ordering" ? scoreRanking(answer as string[],q.answer).total : correct ? q.interaction==="clues" ? guesserPoints(run.revealed) : mode==="speed_run" ? 150 : 1000 : mode==="speed_run" ? -150 : mode==="map_fill" ? -25 : 0;
-  const answerText=Array.isArray(q.answer) ? q.answer.map(id=>"choices"in q?q.choices.find(c=>c.id===id)?.label??id:id).join(" → ") : "choices"in q ? q.choices.find(c=>c.id===q.answer)?.label??String(q.answer) : String(q.answer);
+  const answerText=Array.isArray(q.answer) ? q.answer.map(id=>"choices"in q?q.choices?.find(c=>c.id===id)?.label??id:id).join(" → ") : "choices"in q ? q.choices?.find(c=>c.id===q.answer)?.label??String(q.answer) : String(q.answer);
   const retry=(mode==="map_fill"&&!correct)||(q.interaction==="clues"&&!correct&&run.wrong.length<2);
   return {...run,score:run.score+points,updatedAt:now,wrong:correct?run.wrong:[...run.wrong,String(answer)],feedback:retry?undefined:{correct,points,answer:answerText,explanation:q.interaction==="ordering"?"Partial credit for nearby positions; a perfect order earns a bonus.":"explanation"in q&&q.explanation?q.explanation:correct?"Correct":"Review this answer before continuing."},ledger:[...run.ledger,{index:run.index,correct,points,elapsedMs:Math.max(0,now-run.startedAt),concept:`${mode}:${"category"in q?q.category:q.interaction}:${"property"in q?q.property??"":""}`} ]};
 }

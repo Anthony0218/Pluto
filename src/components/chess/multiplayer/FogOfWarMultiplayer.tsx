@@ -2,7 +2,7 @@ import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery"
 import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
-import InviteFriendButton from "@/components/chess/InviteFriendButton";
+import RoomSlots from "@/components/social/RoomSlots";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
@@ -966,7 +966,7 @@ export function FogOfWarMultiplayerGame() {
                         {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
                       </p>
                     </button>
-                    <InviteFriendButton overlay />
+                    <RoomSlots total={2} names={snapshot.players.map((player) => player.display_name)} overlay />
                   </div>
                 )}
 

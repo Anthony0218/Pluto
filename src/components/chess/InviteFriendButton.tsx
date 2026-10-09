@@ -1,11 +1,18 @@
+import { UserPlus } from "lucide-react";
 import { ui, useUiLanguage } from "@/i18n/ui";
+import "@/components/social/roomInvite.css";
+import type { RoomInvite } from "@/components/social/currentRoom";
 
-/** Opens the existing room friends dialog, which sends the current room code. */
-export default function InviteFriendButton({ overlay = false, room }: { overlay?: boolean; room?: { lobbyRoute: string; code: string } }) {
+/**
+ * The invite button every open room slot carries, in every game. It opens the
+ * friends list for the room the player is in; pass `room` only when the room
+ * code is not part of the page URL and not published by the page.
+ */
+export default function InviteFriendButton({ room, className = "" }: { room?: RoomInvite; className?: string }) {
   useUiLanguage();
   return <button
     type="button"
     onClick={() => window.dispatchEvent(new CustomEvent("open-room-friends", { detail: room }))}
-    className={`room-invite-button rounded-xl border border-amber-300/50 bg-[#282015] px-4 py-2 text-sm font-bold text-amber-100 shadow-lg transition hover:border-amber-200 hover:bg-[#3c2e1a] focus-visible:outline-2 focus-visible:outline-amber-200 ${overlay ? "absolute bottom-4 right-4 z-[60]" : "mt-4"}`}
-  >{ui("Invite Friend")}</button>;
+    className={`room-invite-button ${className}`}
+  ><UserPlus size={14} aria-hidden="true" /><span>{ui("Invite friend")}</span></button>;
 }

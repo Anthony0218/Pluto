@@ -295,13 +295,13 @@ test("board actions are paused during the duel; duelists can play and spectators
 
 test("duels pick only registered duel minigames; the round-end minigame never picks a duel", () => {
   const duelIds = minigameRegistry.pool("duel").map((d) => d.id).sort();
-  assert.deepEqual(duelIds, ["paddle-panic", "street-cross"]);
+  assert.deepEqual(duelIds, ["fuse-faceoff", "gravity-tug", "paddle-panic", "ricochet-rivals", "street-cross"]);
   const rng = seeded(8);
   const picked = new Set();
   for (let i = 0; i < 200; i++) picked.add(selectDuelMinigame(null, rng));
   assert.deepEqual([...picked].sort(), duelIds);
   // Consecutive duels avoid repeating the same game when possible.
-  assert.equal(selectDuelMinigame("paddle-panic", rng), "street-cross");
+  assert.notEqual(selectDuelMinigame("paddle-panic", rng), "paddle-panic");
   for (let i = 0; i < 50; i++) {
     const s = started();
     beginMinigamePhase(s, rng, T0);

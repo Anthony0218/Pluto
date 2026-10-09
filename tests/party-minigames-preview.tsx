@@ -143,12 +143,14 @@ export function Playground() {
       <button style={{ color: "#fff" }} onClick={() => start("rhythm-rush", 0)}>Pluto Pulse</button>
       <button style={{ color: "#fff" }} onClick={() => start("circle-shot", 0)}>Circle Quickshot</button>
       <button style={{ color: "#fff" }} onClick={() => start("lava-knockback", 0)}>Hell Knockout</button>
+      {["disco-freeze", "pluto-heist", "kitchen-chaos", "rocket-rumble", "orbital-rally", "island-impostor", "penalty-shootout"].map((id) => <button key={id} style={{ color: "#fff" }} onClick={() => start(id, 0)}>{minigameRegistry.get(id).name}</button>)}
       <button style={{ color: "#fff" }} onClick={() => start(arrowMemory.id, 0)}>Ice memory</button>
       <button style={{ color: "#fff" }} onClick={() => start(arrowMemory.id, 0.99)}>Hell memory</button>
       <button style={{ color: "#fff" }} onClick={() => start(pickupArena.id, 0)}>Arcade shooter</button>
       <button style={{ color: "#fff" }} onClick={() => start(pickupArena.id, 0.99)}>City shooter</button>
       <button style={{ color: "#fff" }} onClick={() => start(pickupArena.id, 0.99, true)}>Weapon practice</button>
       <button style={{ color: "#fff" }} onClick={() => start(pickupArena.id, 0, true)}>Arcade tour</button>
+      {["ricochet-rivals", "fuse-faceoff", "gravity-tug", "minotaur-maze", "color-clash", "constellation-cascade"].map((id) => <button key={id} style={{ color: "#fff" }} onClick={() => start(id, 0)}>{minigameRegistry.get(id).name}</button>)}
       <button style={{ color: "#fff" }} onClick={() => start("street-cross", 0)}>Street Cross duel</button>
       <button style={{ color: "#fff" }} onClick={() => start("paddle-panic", 0)}>Paddle Panic duel</button>
       <button style={{ color: "#fff" }} onClick={() => start("target-panic", 0)}>Target Panic practice</button>

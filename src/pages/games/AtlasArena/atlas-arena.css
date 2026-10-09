@@ -46,7 +46,6 @@
 .atlas-category-picker{min-width:0;margin:0;padding:0;border:0}.atlas-category-picker .atlas-label{float:none;width:100%;padding:0}.atlas-pin-controls p{color:#aab4c7;font-size:.85rem;line-height:1.6}.atlas-submit:disabled{opacity:.45;cursor:not-allowed}.atlas-map-pin{pointer-events:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6))}.atlas-map-pin path{fill:currentColor;stroke:#06131e;stroke-width:1.5}.atlas-map-pin circle{fill:#06131e;stroke:none}
 
 /* On narrow screens the map and question form one scrollable page. */
-.atlas-map-controls .atlas-map-pan-toggle { display: none; }
 @media (max-width: 950px) {
   .atlas-game-page { height: auto; min-height: var(--app-height); overflow: visible; }
   .atlas-game-header { height: auto; min-height: 68px; gap: .65rem; margin-bottom: 1rem; }
@@ -56,12 +55,6 @@
   .atlas-map-shell svg { height: 100%; min-height: 0; }
   .atlas-home-page, .atlas-room-page { height: auto; min-height: var(--app-height); overflow: visible; gap: 1.2rem; }
   .atlas-home-protocols { margin: 1rem auto; }
-}
-@media (max-width: 950px), (pointer: coarse) {
-  .atlas-map-shell { touch-action: pan-y pinch-zoom; }
-  .atlas-map-shell.is-panning { touch-action: none; }
-  .atlas-map-controls .atlas-map-pan-toggle { display: flex; align-items: center; justify-content: center; gap: .35rem; width: auto; padding-inline: .7rem; font-size: .7rem; font-weight: 800; white-space: nowrap; }
-  .atlas-map-pan-toggle[aria-pressed="true"] { color: #52e7e0; background: #52e7e020; }
 }
 .atlas-map-pin-line{fill:none;stroke-width:1.8;stroke:currentColor;stroke-dasharray:5 4;stroke-linecap:round;pointer-events:none;opacity:.9}
 
@@ -563,4 +556,187 @@ button.atlas-random-symbol:focus-visible { outline:2px solid #82ece5;outline-off
 @media(prefers-reduced-motion:reduce) {
   .atlas-winner-box,.atlas-winner-box::after,.atlas-winner-box .atlas-result-orbit,.atlas-result-particles i { animation:none; }
   .atlas-result-particles i { bottom:var(--x); opacity:.3; }
+}
+
+/* The playable area always fits the app viewport. Panels scale only when their full contents need it. */
+.atlas-game-page{box-sizing:border-box;height:var(--app-height);min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:.5rem}
+.atlas-game-header{box-sizing:border-box;flex:none;width:100%;height:auto;min-height:54px;margin:0 auto;padding:.2rem .25rem .45rem}
+.atlas-play-layout,.atlas-play-layout.is-panel-only{flex:1;width:100%;height:auto;min-height:0;grid-template-rows:minmax(0,1fr);margin:0 auto}
+.atlas-question-panel{box-sizing:border-box;height:100%;min-height:0;overflow:hidden;padding:clamp(.7rem,1.7vw,1.2rem)}
+.atlas-map-shell,.atlas-play-layout .atlas-map-shell{height:100%;min-height:0;order:initial;touch-action:none}
+.atlas-map-shell>svg{height:100%;min-height:0}
+.atlas-fit-viewport{height:100%;min-height:0;overflow:hidden;width:100%}
+.atlas-fit-content{display:flow-root;transform-origin:top center;width:100%}
+.atlas-question-panel .atlas-progress{margin-bottom:.75rem}
+.atlas-question-panel h1{min-height:0;font-size:clamp(1.25rem,2.5vw,2rem);margin:.45rem 0 .75rem}
+.atlas-question-panel .atlas-feedback{margin-top:.6rem}
+.atlas-map-confirm{position:absolute;bottom:3.8rem;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:.5rem;max-width:calc(100% - 1rem);padding:.5rem .65rem;border:1px solid #ffd372;border-radius:14px;background:#071321f2;color:#ffdf94;box-shadow:0 5px 24px #0005;font-size:.8rem;z-index:3}
+.atlas-map-confirm span{min-width:0}.atlas-map-confirm button{flex:none;min-height:40px;padding:.4rem .6rem;border:1px solid #ffd37280;border-radius:9px;color:#ffdf94;background:#ffd37218;cursor:pointer}
+.atlas-suspects{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.3rem;margin-bottom:.5rem}
+.atlas-suspects button{min-height:38px;border:1px solid #ffffff26;border-radius:9px;background:#ffffff08;color:#dce2ee;padding:.3rem;font-size:.75rem;cursor:pointer}.atlas-suspects button[aria-pressed=true]{border-color:#52e7e0;background:#52e7e025}.atlas-suspects button:disabled{opacity:.4}
+.atlas-series-session{height:var(--app-height);min-height:0;overflow:hidden;display:flex;flex-direction:column}.atlas-series-session>.atlas-game-page,.atlas-series-session>.atlas-trials-page{height:auto;flex:1;min-height:0}.atlas-random-progress{flex:none}
+@media(max-width:950px){
+ .atlas-play-layout{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) minmax(0,1.15fr);gap:.5rem}
+ .atlas-play-layout.is-panel-only{grid-template-rows:minmax(0,1fr)}
+ .atlas-game-header{margin-bottom:0}.atlas-question-panel h1{font-size:clamp(1.2rem,4.5vw,1.65rem)}
+ .atlas-map-confirm{bottom:3.3rem;font-size:.7rem;width:max-content}.atlas-map-confirm button{min-height:40px}
+ .atlas-game-page .atlas-scoreboard{margin-top:.5rem}.atlas-game-page .atlas-scoreboard>div{padding:.35rem .5rem}
+ .atlas-pin-controls p{margin:.4rem 0;line-height:1.35}.atlas-guess-input{margin-bottom:.4rem}.atlas-clues{gap:.3rem}.atlas-clues li{padding:.4rem .5rem}
+ .atlas-game-page .atlas-live{font-size:.68rem}.atlas-game-page .atlas-game-stats{gap:.3rem}.atlas-game-page .atlas-game-stats span{padding:.35rem .5rem}
+}
+@media(max-height:500px) and (orientation:landscape){.atlas-play-layout{grid-template-columns:minmax(230px,.8fr) minmax(0,1.2fr);grid-template-rows:minmax(0,1fr)}.atlas-game-header{grid-template-columns:auto 1fr auto}.atlas-game-stats{grid-column:auto}.atlas-play-layout.is-panel-only{grid-template-columns:minmax(0,980px)}}
+.atlas-page.atlas-center:has(>.atlas-fit-viewport){box-sizing:border-box;height:var(--app-height);min-height:0;overflow:hidden;display:block;padding:clamp(.8rem,2.5vw,2rem)}
+.atlas-center>.atlas-fit-viewport>.atlas-fit-content{display:grid;justify-items:center;gap:.6rem}.atlas-center .atlas-fit-content>p{color:#94a0b4;margin:.3rem 0}
+.atlas-center .atlas-result-actions{margin-top:.5rem}.atlas-center .atlas-series{margin-top:.5rem}.atlas-center .atlas-series-order{margin:.5rem 0}.atlas-center .atlas-series-order li{padding:.6rem}
+.atlas-series-session>.atlas-page.atlas-center{height:auto;flex:1;min-height:0}
+@media(max-width:950px){.atlas-play-layout.is-guess-country{grid-template-rows:minmax(0,1fr)}.atlas-play-layout.is-guess-country>.atlas-map-shell{display:none}}
+@media(max-width:950px){
+ .atlas-question-panel .atlas-area-reference{padding:.45rem;margin-top:.4rem}.atlas-question-panel .atlas-area-reference .atlas-country-shape svg{max-height:50px}
+ .atlas-question-panel .atlas-area-reference>p{margin-bottom:.25rem}.atlas-question-panel .atlas-area-reference article{gap:.15rem}
+ .atlas-question-panel .atlas-clues{margin-bottom:.4rem}.atlas-question-panel .atlas-clues li p{font-size:.85rem;line-height:1.35;margin-top:.15rem}
+ .atlas-question-panel .atlas-clues li img{width:65px;margin-top:.25rem}.atlas-question-panel .atlas-clues li.is-locked{padding:.25rem .5rem}
+}
+
+/* The same prompt, repeated under the question beside the map. */
+.atlas-map-confirm.atlas-map-confirm--panel{position:static;transform:none;width:auto;max-width:100%;margin-top:.75rem;justify-content:space-between;flex-wrap:wrap}
+
+/* Phones: Casual and Ranked scroll like every other tab instead of being squeezed into one screen.
+   This block is last on purpose; it replaces the fixed-viewport grid tricks above for narrow widths. */
+@media (max-width: 720px) {
+  .app-viewport:has(.atlas-hub.is-fixed-tab) { overflow: auto; }
+  .atlas-hub.atlas-trials-hub.is-fixed-tab { height: auto; min-height: var(--app-height); overflow: visible; grid-template-rows: none; align-content: start; justify-items: stretch; gap: .8rem; padding: .75rem .85rem 1.5rem; }
+  .atlas-hub.is-fixed-tab .trials-hub-intro { justify-self: center; }
+  .atlas-hub.is-fixed-tab .trials-hub-intro h1 { font-size: 2.6rem; }
+  .atlas-hub.is-fixed-tab .atlas-tabs { justify-self: center; }
+  .atlas-hub.is-fixed-tab .atlas-play-home { height: auto; grid-template-rows: none; gap: .8rem; width: 100%; }
+  .atlas-hub.is-fixed-tab .atlas-play-intro .atlas-eyebrow { display: block; }
+  .atlas-hub.is-fixed-tab .atlas-play-intro h2 { font-size: 1.7rem; }
+  .atlas-hub.is-fixed-tab .atlas-play-intro p { display: block; font-size: .85rem; line-height: 1.4; }
+  .atlas-hub.is-fixed-tab .atlas-play-choices { height: auto; grid-template-columns: minmax(0, 1fr); grid-template-rows: none; gap: .8rem; }
+
+  .atlas-hub.is-fixed-tab .atlas-play-choice { display: flex; flex-direction: column; align-items: stretch; height: auto; min-height: 0; gap: .7rem; padding: 1rem; border-radius: 22px; }
+  .atlas-hub.is-fixed-tab .atlas-choice-copy { display: contents; }
+  .atlas-hub.is-fixed-tab .atlas-choice-copy .atlas-choice-tag { order: 1; align-self: flex-start; padding: .3rem .6rem; font-size: .65rem; }
+  .atlas-hub.is-fixed-tab .atlas-choice-copy h3 { order: 2; margin: 0; font-size: 1.6rem; }
+  .atlas-hub.is-fixed-tab .atlas-choice-copy .atlas-choice-description { order: 3; display: block; max-width: none; margin: 0; font-size: .85rem; line-height: 1.4; }
+  .atlas-hub.is-fixed-tab .is-random .atlas-random-format { order: 4; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; }
+  .atlas-hub.is-fixed-tab .is-random .atlas-random-format button { min-width: 0; min-height: 40px; padding: .4rem .25rem; font-size: .75rem; }
+  .atlas-hub.is-fixed-tab .atlas-choice-copy .atlas-setup-note { order: 5; margin: 0; padding: .6rem .8rem; font-size: .8rem; line-height: 1.4; }
+  .atlas-hub.is-fixed-tab .atlas-choice-icons,
+  .atlas-hub.is-fixed-tab .atlas-random-symbol { order: 6; grid-column: auto; grid-row: auto; align-self: stretch; }
+  .atlas-hub.is-fixed-tab .atlas-choice-copy .atlas-choice-actions { order: 7; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .4rem; margin: .1rem 0 0; }
+  .atlas-hub.is-fixed-tab .atlas-choice-copy .atlas-choice-actions button { min-height: 48px; padding: .4rem .25rem; justify-content: center; align-items: center; flex-direction: column; gap: .2rem; font-size: .75rem; }
+  .atlas-hub.is-fixed-tab .atlas-choice-actions svg { width: 17px; height: 17px; }
+  .atlas-hub.is-fixed-tab .atlas-choose-button { order: 7; grid-column: auto; grid-row: auto; min-height: 52px; margin: .1rem 0 0; padding: .6rem 1rem; font-size: 1rem; }
+
+  .atlas-hub.is-fixed-tab .atlas-choice-icons,
+  .atlas-hub.is-fixed-tab .is-choose .atlas-choice-icons,
+  .atlas-hub.is-fixed-tab .atlas-roulette-icons { grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: none; gap: .35rem; margin: 0; padding: 0; }
+  .atlas-hub.is-fixed-tab .atlas-choice-icons > button,
+  .atlas-hub.is-fixed-tab .is-random .atlas-choice-icons.atlas-roulette-icons > span { aspect-ratio: 1; height: auto; min-height: 0; border-radius: 10px; }
+  .atlas-hub.is-fixed-tab .atlas-choice-icons svg { width: 19px; height: 19px; }
+  .atlas-hub.is-fixed-tab .is-random .atlas-random-symbol { min-height: 0; padding: .35rem; border: 1px dashed rgba(130, 236, 229, .35); border-radius: 16px; }
+  .atlas-hub.is-fixed-tab .atlas-random-symbol svg { width: 64px; height: 64px; }
+
+  .atlas-hub.is-fixed-tab .atlas-home-footer { display: flex; flex-wrap: wrap; justify-content: center; margin-top: .4rem; font-size: .72rem; }
+  .atlas-hub.is-fixed-tab .atlas-home-footer > span { display: block; flex-basis: 100%; text-align: center; }
+
+  .atlas-hub.is-fixed-tab .atlas-ranked-home,
+  .atlas-hub.is-fixed-tab .atlas-ranked-draft { height: auto; grid-template-rows: none; }
+}
+
+/* ===== Map navigation =====
+   Region buttons sit on the map, so a region is one tap away; the arrows and zoom buttons are docked under it,
+   which keeps them from covering countries. Placed last on purpose: it replaces the older floating controls above. */
+.atlas-map-shell { display: flex; flex-direction: column; }
+.atlas-map-shell > svg.atlas-map-canvas { flex: 1 1 0; width: 100%; height: auto; min-height: 0; touch-action: none; }
+.atlas-map-shell .atlas-map-regions { position: relative; order: -1; flex: none; z-index: 4; display: flex; gap: 6px; padding: 6px 8px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid #ffffff1f; background: #06131fe6; backdrop-filter: blur(10px); }
+.atlas-map-shell .atlas-map-regions::-webkit-scrollbar { display: none; }
+.atlas-map-shell .atlas-map-regions > :first-child { margin-left: auto; }
+.atlas-map-shell .atlas-map-regions > :last-child { margin-right: auto; }
+.atlas-map-shell .atlas-map-regions button { flex: none; min-height: 32px; padding: 0 13px; border: 1px solid #ffffff2e; border-radius: 999px; color: #e6f0fb; background: #ffffff0f; font-size: .78rem; font-weight: 700; white-space: nowrap; cursor: pointer; touch-action: manipulation; transition: background-color .12s, color .12s, border-color .12s; }
+.atlas-map-shell .atlas-map-regions button:hover { background: #ffffff26; border-color: #52e7e099; }
+.atlas-map-shell .atlas-map-regions button.is-active { color: #04201f; background: #52e7e0; border-color: #52e7e0; }
+.atlas-map-shell .atlas-map-regions button:focus-visible, .atlas-map-shell .atlas-map-controls button:focus-visible { outline: 2px solid #fde68a; outline-offset: 1px; }
+.atlas-map-region-short { display: none; }
+.atlas-map-shell .atlas-map-controls { position: relative; inset: auto; transform: none; flex: none; z-index: 4; display: flex; align-items: center; justify-content: center; gap: 12px; padding: 6px 8px; border: 0; border-top: 1px solid #ffffff1f; border-radius: 0; overflow: visible; background: #06131fe6; box-shadow: none; backdrop-filter: blur(10px); }
+.atlas-map-shell .atlas-map-zoom, .atlas-map-shell .atlas-map-arrows { display: flex; gap: 4px; }
+.atlas-map-shell .atlas-map-controls button { display: grid; place-items: center; width: 40px; height: 36px; padding: 0; border: 1px solid #ffffff1f; border-radius: 10px; color: #dbe7f5; background: #ffffff10; cursor: pointer; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; transition: background-color .12s, color .12s, transform .12s, opacity .12s; }
+.atlas-map-shell .atlas-map-controls button:hover { background: #ffffff26; }
+.atlas-map-shell .atlas-map-controls button:active { transform: scale(.94); color: #52e7e0; background: #52e7e02e; }
+.atlas-map-shell .atlas-map-controls button[aria-disabled="true"] { opacity: .35; cursor: default; }
+.atlas-map-shell .atlas-map-overview { bottom: 58px; }
+.atlas-map-shell .atlas-map-confirm { bottom: 58px; }
+.atlas-map-shell .atlas-map-cluster { max-height: calc(100% - 70px); }
+@media (max-width: 650px) {
+  /* Phones: every region stays visible, as a grid of wide tap targets. */
+  .atlas-map-shell .atlas-map-regions { flex-wrap: wrap; overflow: visible; gap: 4px; padding: 5px 6px; }
+  .atlas-map-shell .atlas-map-regions > :first-child, .atlas-map-shell .atlas-map-regions > :last-child { margin: 0; }
+  .atlas-map-shell .atlas-map-regions button { flex: 1 1 calc(25% - 4px); min-height: 28px; padding: 0 4px; font-size: .72rem; }
+  .atlas-map-region-full { display: none; }
+  .atlas-map-region-short { display: inline; }
+  .atlas-map-shell .atlas-map-controls { gap: 8px; padding: 4px 6px; }
+  .atlas-map-shell .atlas-map-controls button { width: 36px; height: 34px; }
+  .atlas-map-shell .atlas-map-overview { bottom: 50px; left: 8px; width: 68px !important; height: 40px !important; opacity: .75; }
+  .atlas-map-shell .atlas-map-confirm { bottom: 54px; }
+}
+
+/* ===== Confirm = green, in every map mode (selecting a country, and locking a pin) ===== */
+.atlas-map-confirm { border-color: #4ade8099; }
+.atlas-map-confirm button.atlas-map-confirm-go { min-height: 44px; padding: .45rem .95rem; border: 1px solid #86efac; border-radius: 11px; color: #052e16; background: linear-gradient(180deg, #4ade80, #16a34a); font-weight: 850; box-shadow: 0 3px 14px #16a34a66; transition: filter .12s, transform .12s; }
+.atlas-map-confirm button.atlas-map-confirm-go:hover { filter: brightness(1.1); }
+.atlas-map-confirm button.atlas-map-confirm-go:active { transform: scale(.97); }
+.atlas-pin-controls .atlas-submit:not(.atlas-secondary) { color: #052e16; background: linear-gradient(180deg, #4ade80, #16a34a); box-shadow: 0 3px 14px #16a34a4d; }
+.atlas-pin-controls .atlas-submit:not(.atlas-secondary):hover:not(:disabled) { filter: brightness(1.08); }
+.atlas-map-shell .atlas-map-confirm { width: max-content; white-space: nowrap; }
+.atlas-map-confirm.atlas-map-confirm--panel { white-space: normal; }
+.atlas-map-confirm.atlas-map-confirm--panel > span { flex: 1 0 100%; }
+.atlas-map-confirm.atlas-map-confirm--panel button.atlas-map-confirm-go { flex: 1 1 auto; }
+@media (max-width: 650px) { .atlas-map-shell .atlas-map-confirm { white-space: normal; width: calc(100% - 1rem); justify-content: space-between; } .atlas-map-shell .atlas-map-confirm > span { flex: 1 1 100%; } .atlas-map-shell .atlas-map-confirm button.atlas-map-confirm-go { flex: 1 1 auto; } }
+
+/* ===== Phones: the question panel is only as tall as its content, so the map starts higher ===== */
+.atlas-map-confirm-slot { display: none; }
+@media (max-width: 950px) {
+  .atlas-play-layout:not(.is-panel-only) { grid-template-rows: minmax(0, auto) minmax(250px, 1fr); }
+  .atlas-play-layout:not(.is-panel-only) > .atlas-question-panel { height: auto; align-self: start; max-height: 100%; }
+  .atlas-map-confirm-slot { display: block; height: 52px; margin-top: .5rem; }
+  .atlas-map-confirm.atlas-map-confirm--panel { flex-wrap: nowrap; height: 52px; margin-top: .5rem; padding: .3rem .45rem; gap: .4rem; font-size: .72rem; box-sizing: border-box; }
+  .atlas-map-confirm.atlas-map-confirm--panel > span { flex: 1 1 0; min-width: 0; }
+  .atlas-map-confirm.atlas-map-confirm--panel button.atlas-map-confirm-go { flex: none; min-height: 40px; padding: .3rem .8rem; }
+  .atlas-map-confirm.atlas-map-confirm--panel button[aria-label] { min-height: 40px; min-width: 36px; padding: 0; }
+}
+
+/* ===== Phones, map questions: the panel shows everything it holds (never clipped), the flag sits beside the question ===== */
+@media (max-width: 950px) {
+  .atlas-play-layout:not(.is-panel-only):not(.is-guess-country) { grid-template-rows: auto minmax(220px, 1fr); overflow-y: auto; overscroll-behavior: contain; }
+  .atlas-play-layout:not(.is-panel-only) > .atlas-question-panel { overflow: visible; max-height: none; }
+  .atlas-play-layout:not(.is-panel-only) .atlas-fit-viewport { height: auto; overflow: visible; }
+  .atlas-play-layout:not(.is-panel-only) .atlas-fit-content:has(> .atlas-question-flag) { display: grid; grid-template-columns: minmax(0, 1fr) 92px; column-gap: .75rem; align-items: start; }
+  .atlas-play-layout:not(.is-panel-only) .atlas-fit-content:has(> .atlas-question-flag) > * { grid-column: 1 / -1; }
+  .atlas-play-layout:not(.is-panel-only) .atlas-fit-content:has(> .atlas-question-flag) > .atlas-progress { grid-row: 1; }
+  .atlas-play-layout:not(.is-panel-only) .atlas-fit-content:has(> .atlas-question-flag) > .atlas-eyebrow { grid-column: 1; grid-row: 2; }
+  .atlas-play-layout:not(.is-panel-only) .atlas-fit-content:has(> .atlas-question-flag) > h1 { grid-column: 1; grid-row: 3; margin-bottom: .5rem; }
+  .atlas-play-layout:not(.is-panel-only) .atlas-fit-content:has(> .atlas-question-flag) > .atlas-question-flag { grid-column: 2; grid-row: 2 / 4; width: 92px; height: auto; margin: 0; align-self: center; border-radius: 8px; box-shadow: 0 6px 18px #0006, 0 0 0 1px #ffffff1f; }
+}
+@media (max-width: 950px) {
+  /* Stacked, never overlapping: the panel keeps its full height, the map takes what is left (at least 220px), the whole thing scrolls if even that is too much. */
+  .atlas-play-layout:not(.is-panel-only):not(.is-guess-country) { display: flex; flex-direction: column; gap: .5rem; }
+  .atlas-play-layout:not(.is-panel-only):not(.is-guess-country) > .atlas-question-panel { flex: none; height: auto; }
+  .atlas-play-layout:not(.is-panel-only):not(.is-guess-country) > .atlas-map-shell { flex: 1 0 220px; height: auto; min-height: 220px; }
+  .atlas-play-layout:not(.is-panel-only) .atlas-feedback { padding: .6rem .75rem; gap: .6rem; }
+  .atlas-play-layout:not(.is-panel-only) .atlas-feedback strong { font-size: .95rem; }
+}
+@media (max-width: 950px) {
+  /* Once the answer is in, the pin controls have nothing left to do; their room goes to the result. */
+  .atlas-play-layout .atlas-pin-controls:has(+ .atlas-feedback) { display: none; }
+}
+@media (max-width: 950px) { .atlas-play-layout:not(.is-panel-only):not(.is-guess-country) { align-items: stretch; } .atlas-play-layout:not(.is-panel-only):not(.is-guess-country) > * { width: 100%; box-sizing: border-box; } }
+
+/* ===== Phones: score, timer and correct count share the row with the back button and "Question x / 10" ===== */
+@media (max-width: 650px) {
+  .atlas-game-header { grid-template-columns: auto minmax(0, 1fr) auto; gap: .5rem; align-items: center; }
+  .atlas-game-header strong { white-space: nowrap; }
+  .atlas-game-header .atlas-game-stats { grid-column: auto; flex-wrap: wrap; justify-content: flex-end; gap: .25rem; }
+  .atlas-game-page .atlas-game-header .atlas-game-stats span { flex: none; gap: .25rem; padding: .3rem .45rem; border-radius: 10px; font-size: .74rem; }
+  .atlas-game-header .atlas-game-stats svg { width: 14px; height: 14px; }
 }

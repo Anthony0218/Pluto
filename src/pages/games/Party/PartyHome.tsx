@@ -11,6 +11,7 @@ import type { PartyConnection } from "../../../games/party/network/usePartyConne
 import PartyBoard from "./PartyBoard.tsx";
 import { mapRegistry, tropical } from "../../../games/party/content/maps.ts";
 import { NAME_LIMITS } from "../../../games/party/config.ts";
+import MinigameCatalog from "./MinigameCatalog.tsx";
 export default function PartyHome({
   connection,
 }: {
@@ -88,7 +89,7 @@ export default function PartyHome({
             <span className="pp-sticker">✦</span>
           </div>
           <h2>Get the party started.</h2>
-          <p>Bring your people. We’ll bring the islands.</p>
+          <p>Play the board or jump straight into a Minigame Festival. Choose in your lobby.</p>
           <div className="pp-tabs" role="tablist" aria-label="Lobby options">
             {(["create", "find", "join"] as const).map((t) => (
               <button
@@ -245,7 +246,7 @@ export default function PartyHome({
                         <strong>{room.name}</strong>
                         <small>
                           {room.count}/4 ·{" "}
-                          {mapRegistry.all().find((m) => m.id === room.mapId)?.name ?? "Unknown map"} ·{" "}
+                          {room.mode === "festival" ? "Minigames only" : mapRegistry.all().find((m) => m.id === room.mapId)?.name ?? "Unknown map"} ·{" "}
                           {room.public ? "Public" : "Private"}
                         </small>
                       </div>
@@ -274,6 +275,7 @@ export default function PartyHome({
           </div>
         </section>
       </section>
+      <MinigameCatalog />
       <footer className="pp-home-footer">
         <span>01 / THE ISLAND CHAPTER</span>
         <span>

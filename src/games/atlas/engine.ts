@@ -38,12 +38,7 @@ export function plausibleEntities(target: GeographicEntity, pool: GeographicEnti
 const mapPrompt = (entity: GeographicEntity, category: AtlasCategory) => {
   if (category === "capitals" && entity.capitalCities[0]) return `Find the country whose capital is ${entity.capitalCities[0]}.`;
   if (category === "flags") return "Find the country represented by this flag.";
-  if (category === "population" && entity.population) return `Find ${entity.shortName}, population ${new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(entity.population.value)} (${entity.population.year}).`;
-  if (category === "area" && entity.areaKm2) return `Find ${entity.shortName}, with an area of ${new Intl.NumberFormat("en").format(Math.round(entity.areaKm2.value))} km².`;
-  if (category === "continents") return `Find ${entity.shortName} in ${normalizedContinent(entity)}.`;
-  if (category === "languages" && entity.officialLanguages[0]) return `Find ${entity.shortName}, where ${entity.officialLanguages[0]} is spoken.`;
-  if (category === "borders" && entity.neighbors[0]) return `Find ${entity.shortName}; it shares a land border with a neighboring country.`;
-  if (category === "currency" && entity.currencies[0]) return `Find ${entity.shortName}, which uses the ${entity.currencies[0].name}.`;
+  // Locating a country is only about where it is: no population, area, language, border or currency facts in the prompt.
   return category === "locations" ? `Where is ${entity.shortName}?` : `Find ${entity.shortName} on the map.`;
 };
 

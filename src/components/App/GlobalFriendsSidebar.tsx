@@ -1,4 +1,6 @@
 import GameInvitePanel from "@/components/social/GameInvitePanel";
+import RoomInviteList from "@/components/social/RoomInviteList";
+import { useCurrentRoom } from "@/components/social/currentRoom";
 import { useState } from "react";
 import { Users } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -16,6 +18,7 @@ export default function GlobalFriendsSidebar() {
   useUiLanguage();
   const { user } = useAuth();
   const { friends, onlineIds, presence, loading, friendsError, notifications } = useDashboardData();
+  const currentRoom = useCurrentRoom();
   const [open, setOpen] = useState(false);
   const [friendDialog, setFriendDialog] = useState<{ id: string; view: FriendView } | null>(null);
   const [messageBaseline] = useState(() => getFriendMessageBaseline(user?.id));
@@ -54,7 +57,12 @@ export default function GlobalFriendsSidebar() {
       {onlineIds.length > 0 && <span className="sidebar-online-count" aria-hidden="true">{onlineIds.length}</span>}
       {unreadCount > 0 && <span className="sidebar-message-count" aria-hidden="true">{unreadCount}</span>}
     </button>
-    {open && <DashboardDialog title={ui("Friends")} drawer onClose={() => setOpen(false)}>
+    {open && <DashboardDialog title={ui("Friends")} drawer scrollable={!!currentRoom} onClose={() => setOpen(false)}>
+      {currentRoom && <section className="mb-4 rounded-2xl border border-amber-300/25 bg-amber-300/[.06] p-4" aria-label={ui("Invite to your room")}>
+        <h2 className="text-base font-bold text-white">{ui("Invite to your room")} <span className="ml-1 font-mono tracking-widest text-amber-200">{currentRoom.code}</span></h2>
+        <p className="mb-3 mt-0.5 text-xs text-slate-400">{ui("Friends you invite get a message and join with one tap.")}</p>
+        <RoomInviteList room={currentRoom} />
+      </section>}
       <PlayWithFriends
         friends={friends}
         onlineIds={onlineIds}
@@ -65,7 +73,8 @@ export default function GlobalFriendsSidebar() {
         signedIn={!!user}
         onFriendSelect={(id) => showFriend(id, "actions")}
       />
-      <div className="mt-4"><GameInvitePanel compact onNavigate={() => setOpen(false)} /></div>
+      {/* In a room you invite friends to it; creating or joining another room happens only by accepting an invite. */}
+      {!currentRoom && <div className="mt-4"><GameInvitePanel onNavigate={() => setOpen(false)} /></div>}
     </DashboardDialog>}
     {selectedFriend && friendDialog && <DashboardFriendDialog
       friend={selectedFriend}

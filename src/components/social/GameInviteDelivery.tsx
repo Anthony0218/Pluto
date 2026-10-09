@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { shareRoomWithClan } from "./clanShare";
-import { currentRoomInvite } from "./inviteRoute";
+import { currentRoomInvite, inviteGameKey } from "./inviteRoute";
+import { useCurrentRoom } from "./currentRoom";
 const KEY = "pluto-pending-created-invite";
 type Pending = { userId: string; friendId?: string; clanId?: string; route: string; startedAt: number; code?: string; inviteId: string };
 export function prepareCreatedGameInvite(pending: Omit<Pending, "startedAt" | "inviteId">) {
@@ -40,7 +41,7 @@ export function useCreatedGameInvite(room: { lobbyRoute: string; code: string } 
           if (error) throw error;
           sessionStorage.removeItem(KEY); setFailed(false); setStatus("Room created and clan invited.");
         } else {
-          const { error } = await supabase.from("friend_messages").insert({ id: pending.inviteId, sender_id: user.id, receiver_id: pending.friendId, message_type: "game_code", game: route.startsWith("/games/watten/") ? "watten" : "chess", game_code: code, game_route: route });
+          const { error } = await supabase.from("friend_messages").insert({ id: pending.inviteId, sender_id: user.id, receiver_id: pending.friendId, message_type: "game_code", game: inviteGameKey(route), game_code: code, game_route: route });
           if (error && error.code !== "23505") throw error;
           sessionStorage.removeItem(KEY); setFailed(false); setStatus("Room created and friend invited.");
         }
@@ -57,8 +58,7 @@ export function useCreatedGameInvite(room: { lobbyRoute: string; code: string } 
   return { status, failed, retry: () => { setFailed(false); setAttempt(value => value + 1); } };
 }
 export default function GameInviteDelivery() {
-  const location = useLocation();
-  const delivery = useCreatedGameInvite(currentRoomInvite(location.pathname, location.search));
+  const delivery = useCreatedGameInvite(useCurrentRoom());
   if (!delivery.status) return null;
   return <div role={delivery.failed ? "alert" : "status"} className="fixed bottom-5 left-1/2 z-[150] max-w-[90vw] -translate-x-1/2 rounded-xl border border-indigo-300/30 bg-[#101a30] px-4 py-3 text-sm text-white shadow-xl">{delivery.status}{delivery.failed && <button className="ml-3 font-bold text-amber-200" onClick={delivery.retry}>Retry invite</button>}<Link to="/invite" className="ml-3 text-indigo-200">Invites</Link></div>;
 }

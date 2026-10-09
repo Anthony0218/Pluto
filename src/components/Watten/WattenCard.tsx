@@ -5,6 +5,7 @@ import {
 } from "@/utils/watten";
 import { getWattenCardImage } from "@/utils/WattenCardImages";
 import { playHoverSound } from "./WattenGame";
+import { ui } from "@/i18n/ui";
 
 type WattenCardProps = {
   card: WattenCardType;
@@ -44,7 +45,7 @@ export default function WattenCard({
       onClick={onClick}
       title={
         invalid
-          ? "Trumpf oder Kritisch: Du musst Trumpf oder einen Kritischen spielen."
+          ? ui("Trump or Critical: play a trump or critical card.")
           : undefined
       }
       className={`
@@ -55,12 +56,7 @@ export default function WattenCard({
 
         ${
           invalid
-            ? `
-              cursor-not-allowed
-              opacity-35
-              grayscale
-              ring-2 ring-red-600
-            `
+            ? "wt-card-locked"
             : helpStatus === "winning"
               ? `
                 cursor-pointer
@@ -126,31 +122,8 @@ export default function WattenCard({
         />
       </div>
 
-      {/* Invalid card X */}
-      {invalid && (
-        <span
-          className="
-            pointer-events-none
-            absolute
-            right-1
-            top-1
-            z-30
-            flex
-            h-5
-            w-5
-            items-center
-            justify-center
-            rounded-full
-            bg-red-600
-            text-xs
-            font-black
-            text-white
-            shadow
-          "
-        >
-          ×
-        </span>
-      )}
+      {/* Locked: this card may not be played now (Trumpf oder Kritisch), as in Schafkopf */}
+      {invalid && <span className="wt-card-lock" aria-hidden="true">🔒 {ui("Locked")}</span>}
 
       {/* Beginner/help mode tooltip */}
       {hint && !invalid && (

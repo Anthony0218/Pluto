@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { ARENA_MODES, modeById } from "../../../games/atlas/modeCatalog";
+import { ONLINE_ARENA_MODES, modeById } from "../../../games/atlas/modeCatalog";
 import { chooseRandomModes, gameWinner, seriesComplete, seriesLength, type SeriesResult } from "../../../games/atlas/randomSeries";
 
 type LocalSeries = { order: string[]; results: SeriesResult[]; reviewing: boolean };
@@ -11,7 +11,7 @@ function restoreSeries(enabled: boolean, length: 1 | 3 | 5, requested: string[],
   if (candidate && validOrder(candidate.order, length) && (!validOrder(requested, length) || requested.join(",") === candidate.order.join(",")) &&
     typeof candidate.reviewing === "boolean" && Array.isArray(candidate.results) && candidate.results.length <= length &&
     candidate.results.every((result, index) => result && result.mode === candidate.order[index] && (result.winnerId === null || typeof result.winnerId === "string") && result.scores && typeof result.scores === "object" && !Array.isArray(result.scores) && Object.values(result.scores).every(Number.isFinite))) return candidate;
-  return { order: validOrder(requested, length) ? requested : chooseRandomModes(ARENA_MODES.map(mode => mode.id), length, firstMode), results: [], reviewing: false };
+  return { order: validOrder(requested, length) ? requested : chooseRandomModes(ONLINE_ARENA_MODES.map(mode => mode.id), length, firstMode), results: [], reviewing: false };
 }
 
 /** The random marker belongs to a series; a direct mode link always starts a single game. */
@@ -49,7 +49,7 @@ export function useRandomSeries(firstMode?: string, solo = false) {
     },
     reset: () => {
       if (!enabled) return;
-      const next = { order: chooseRandomModes(ARENA_MODES.map(mode => mode.id), length), results: [], reviewing: false };
+      const next = { order: chooseRandomModes(ONLINE_ARENA_MODES.map(mode => mode.id), length), results: [], reviewing: false };
       update(next); openGame(next);
     },
   };

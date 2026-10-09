@@ -82,9 +82,8 @@ test("Closest Wins counts any pin inside the target country as 0 km and measures
   }
 });
 
- test("Map Battle shows country names only, regardless of saved category settings", () => {
+ test("Map Battle combines selections and pins while respecting saved categories", () => {
   const questions = generateMatchQuestions({ ...base, mode: "map_battle", categories: ["population", "area", "languages"] });
   assert.equal(questions.length, base.count);
-  assert.ok(questions.every(q => q.category === "locations" && q.interaction === "map_click" && !q.flagAsset));
-  for (const q of questions) assert.equal(q.prompt, `Where is ${entities.find(c => c.id === q.entityId).shortName}?`);
+  assert.ok(questions.every((q, index) => ["population", "area", "languages"].includes(q.category) && q.interaction === (index % 2 ? "closest_click" : "map_click")));
 });

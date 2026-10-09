@@ -43,7 +43,7 @@ export function spawnPlutos(
 }
 
 export function rankedPlayers(state: Match, settings: Settings): Player[] {
-  if (state.mode === "festival") return [...state.players].sort((a, b) => (state.festivalScores?.[b.id] ?? 0) - (state.festivalScores?.[a.id] ?? 0) || b.coins - a.coins || state.order.indexOf(a.id) - state.order.indexOf(b.id));
+  if (state.mode === "festival") return [...state.players].sort((a, b) => (state.festivalScores?.[b.id] ?? 0) - (state.festivalScores?.[a.id] ?? 0));
   const primary = (p: Player) =>
     settings.victory === "plutos" ? p.goldenPlutos : p.coins;
   const secondary = (p: Player) =>

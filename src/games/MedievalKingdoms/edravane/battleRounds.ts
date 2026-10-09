@@ -139,7 +139,7 @@ export function terrainExplanation(s: Campaign, hex: string) {
   ];
   if (d.castle)
     notes.push(
-      `Level ${d.castle.level} castle: defender +${Math.round(castleBonus(d) * 100)}% protection; attacking cavalry −25%.`,
+      `Level ${d.castle.level} castle: defender +${Math.round(castleBonus(d, s) * 100)}% protection; attacking cavalry −25%.`,
     );
   if (d.city)
     notes.push(
@@ -187,7 +187,7 @@ export function previewArmies(
         );
       }, 0) *
       (side === 1
-        ? 1 + castleBonus(s.districts.find((d) => d.id === hex)!)
+        ? 1 + castleBonus(s.districts.find((d) => d.id === hex)!, s)
         : 1);
     const live = formations?.filter((f) => f.army === army.id);
     const healthy = live
@@ -439,7 +439,7 @@ export function resolveBattleRound(s: Campaign, b: Battle) {
       modifier *= 1.15;
     if (f.position === "rear" && f.kind !== "archers") modifier *= 0.55;
     let defense = enemyOrder === "hold" ? 1.15 : 1;
-    if (b.armies[1] === target.army) defense *= 1 + castleBonus(d);
+    if (b.armies[1] === target.army) defense *= 1 + castleBonus(d, s);
     const damage =
       (f.count *
         0.13 *

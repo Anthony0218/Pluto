@@ -1,8 +1,13 @@
 import { useLayoutEffect } from "react";
 
-/** Keep Watten setup panels inside the space below the fixed public header. */
-export function useFitWattenScreen() {
+/**
+ * Keep Watten setup panels inside the space below the fixed public header by
+ * scaling them down. Pass `active` as false while the page shows something
+ * else (e.g. the table) so the hook binds again when the menu comes back.
+ */
+export function useFitWattenScreen(active = true) {
   useLayoutEffect(() => {
+    if (!active) return;
     const screen = document.querySelector<HTMLElement>(".watten-menu--screen");
     const content = screen?.firstElementChild as HTMLElement | null;
     if (!screen || !content) return;
@@ -19,5 +24,5 @@ export function useFitWattenScreen() {
     observer.observe(content);
     fit();
     return () => observer.disconnect();
-  }, []);
+  }, [active]);
 }

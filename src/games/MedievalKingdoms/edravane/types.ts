@@ -1,3 +1,4 @@
+import type { AgreementCommand, Integration, RealmAgreements } from "./agreementsTypes.ts";
 export type Trait = "ambitious" | "loyal" | "greedy" | "proud" | "cautious" | "brave";
 export type CharacterSkills = { diplomacy: number; command: number; stewardship: number; intrigue: number };
 export type SuccessionLaw = "primogeniture" | "partition" | "elective" | "clan";
@@ -50,6 +51,8 @@ export type Nation = {
   anchor: [number, number];
 };
 export type District = {
+  integration?: Integration;
+  development?: number;
   id: string;
   q: number;
   r: number;
@@ -303,6 +306,7 @@ export type CampaignTurn = {
   prepared?: string;
 };
 export type Campaign = {
+  agreements?: RealmAgreements;
   version: 2;
   estateRules?: 1;
   strategyRules?: 1;
@@ -351,6 +355,7 @@ export type Actor = {
   host?: boolean;
 };
 export type Command =
+  | AgreementCommand
   | { type: "endTurn" }
   | { type: "insult"; house: string }
   | { type: "peace"; nation: string; terms?: PeaceTerms }

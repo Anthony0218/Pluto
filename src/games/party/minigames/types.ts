@@ -34,6 +34,7 @@ export interface MinigameDefinition<S = unknown, I = unknown> {
   gameType: MinigameType;
   supportsBots: boolean;
   teamOf?(state: S, playerId: string): string;
+  teamFormat?: "2v2" | "1v3";
   selectable?: boolean;
   create(context: MinigameCreateContext): S;
   // Strictly parses an untrusted input record; null means "reject".

@@ -1,4 +1,3 @@
-import { minigameRegistry } from "../../../games/party/minigames/index.ts";
 import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_DESCRIPTIONS } from "../../../games/party/difficulty.ts";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import { useState } from "react";
@@ -12,6 +11,8 @@ import type {
 import { mapRegistry } from "../../../games/party/content/maps.ts";
 import Portrait from "./PartyPortrait.tsx";
 import PlayerStatus from "./PlayerStatus.tsx";
+import MinigameCatalog from "./MinigameCatalog.tsx";
+import { FESTIVAL_PLACEMENT_POINTS } from "../../../games/party/minigames/festivalScoring.ts";
 export default function PartyLobby({
   connection,
   lobby,
@@ -69,6 +70,16 @@ export default function PartyLobby({
           {copied ? "Copied!" : lobby.code}
         </button>
       </div>
+      <fieldset className="pp-lobby-mode" disabled={!host || !online}>
+        <legend>Choose how to play</legend>
+        <div className="pp-mode-picker" role="radiogroup" aria-label="Party mode">
+          {(["board", "festival"] as const).map((mode) => <button key={mode} type="button" role="radio" aria-checked={(lobby.settings.mode ?? "board") === mode} className={(lobby.settings.mode ?? "board") === mode ? "selected" : ""} onClick={() => {
+            if ((lobby.settings.mode ?? "board") === mode) return;
+            const lengths = mode === "festival" ? [3, 5, 8, 12] : [0, 8, 12, 16];
+            updateSettings({ mode, roundLimit: lengths.includes(lobby.settings.roundLimit ?? 0) ? lobby.settings.roundLimit : mode === "festival" ? 5 : 12 });
+          }}><b>{mode === "board" ? "🏝 Board Party" : "🎪 Minigames only"}</b><small>{mode === "board" ? "Explore, shop and compete" : "Minigame Festival · no board"}</small></button>)}
+        </div>
+      </fieldset>
       <div className="pp-lobby-columns">
         <div>
           <div className="pp-slots">
@@ -186,24 +197,22 @@ export default function PartyLobby({
                 : `Waiting for ${lobby.players.find((p) => p.id === lobby.hostId)?.name ?? "the host"} to start the match…`)}{" "}
             Changing match settings resets readiness.
           </p>
+          {lobby.settings.mode === "festival" && <section className="pp-card pp-festival-scoring" aria-labelledby="pp-festival-scoring-title">
+            <span className="pp-eyebrow">EVERY GAME COUNTS EQUALLY</span>
+            <h2 id="pp-festival-scoring-title">Festival points</h2>
+            <div className="pp-scoring-places">{FESTIVAL_PLACEMENT_POINTS.map((points, i) => <div key={points}><small>{["1st", "2nd", "3rd", "4th"][i]}</small><strong>{points}</strong><span>points</span></div>)}</div>
+            <p><b>2v2:</b> 5 points per winning teammate, 1 per opponent. A draw gives everyone 3.</p>
+            <p><b>Minotaur 1v3:</b> the winning side shares 12 points: 12 for the hunter or 4 per runner.</p>
+            <p>Tied solo scores split the points for their places: two tied for first earn 5 each. Every round distributes 12 points.</p>
+            <p>Most points after {lobby.settings.roundLimit} minigames wins. Equal final totals share victory.</p>
+          </section>}
         </div>
         <aside className="pp-card pp-settings">
-          <h2>Your island, your rules.</h2>
+          <h2>Your party, your rules.</h2>
           <fieldset disabled={!host || !online}>
-            <div className="pp-mode-picker" role="radiogroup" aria-label="Party mode">
-              {(["board", "festival"] as const).map((mode) => <button key={mode} type="button" role="radio" aria-checked={(lobby.settings.mode ?? "board") === mode} className={(lobby.settings.mode ?? "board") === mode ? "selected" : ""} onClick={() => {
-                const lengths = mode === "festival" ? [3, 5, 8, 12] : [0, 8, 12, 16];
-                updateSettings({ mode, roundLimit: lengths.includes(lobby.settings.roundLimit ?? 0) ? lobby.settings.roundLimit : mode === "festival" ? 5 : 12 });
-              }}><b>{mode === "board" ? "🏝 Board Party" : "🎪 Minigame Festival"}</b><small>{mode === "board" ? "Explore, shop and compete" : "Only minigames · choose your lineup"}</small></button>)}
-            </div>
             <label>Match length<select value={lobby.settings.roundLimit ?? 0} onChange={(e) => updateSettings({ roundLimit: Number(e.target.value) })}>
               {(lobby.settings.mode !== "festival" ? [0, 8, 12, 16] : [3, 5, 8, 12]).map((n) => <option key={n} value={n}>{n ? `${n} rounds · fixed ending` : "Race to the target"}</option>)}
             </select></label>
-            <details className="pp-lineup" open={lobby.settings.mode === "festival"}>
-              <summary>Minigame lineup · {lobby.settings.minigameIds?.length || "all"} selected</summary>
-              <p>All games play once before repeating. An empty selection includes every game.</p>
-              {minigameRegistry.pool("main").map((game) => <label key={game.id} className="pp-checkbox"><input type="checkbox" checked={lobby.settings.minigameIds?.includes(game.id) ?? false} onChange={(e) => updateSettings({ minigameIds: e.target.checked ? [...(lobby.settings.minigameIds ?? []), game.id] : (lobby.settings.minigameIds ?? []).filter((id) => id !== game.id) })}/><span>{game.name}<small>{game.durationSeconds}s · {game.description}</small></span></label>)}
-            </details>
             {lobby.settings.mode !== "festival" && <><div role="radiogroup" aria-label="Map" className="pp-map-picker">
               {mapRegistry.all().map((m) => (
                 <button
@@ -297,7 +306,7 @@ export default function PartyLobby({
             </label>
           </fieldset>
           <p className="pp-help">
-            {lobby.settings.mode === "festival" ? "Jump straight into your chosen minigames. Individual games award 3 / 2 / 1 / 0 festival points; team games award 3 to each winner and 1 to each opponent (2 each for a draw). The player with the most festival points after the final round wins." : <>{map.goldenPlutoCount === 1
+            {lobby.settings.mode === "festival" ? "Jump straight into your chosen minigames. No board turns, dice or shopping. Choose your lineup in the Minigames box. Festival points decide the winner." : <>{map.goldenPlutoCount === 1
               ? "One Golden Pluto is hidden on the mountain."
               : `${map.goldenPlutoCount === 2 ? "Two" : map.goldenPlutoCount} Golden Plutos are hidden around the islands.`}{" "}
             Land on one and pay 20 coins to collect it. Choose Golden Plutos or coins to win. Item
@@ -308,6 +317,7 @@ export default function PartyLobby({
           </p>
         </aside>
       </div>
+      <MinigameCatalog selectedIds={lobby.settings.minigameIds} canSelect={host && online} onSelect={(minigameIds) => updateSettings({ minigameIds })} />
     </section>
   );
 }

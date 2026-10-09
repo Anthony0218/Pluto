@@ -223,8 +223,66 @@ test("online Legen timeout passes undecided players after 30 seconds", async () 
   const resolved = await s.request("user-2", { op: "get", code: room.code });
   assert.equal(resolved.status, 200);
   assert.equal(resolved.body.game.phase, "intent");
+  assert.equal(row.game.phase, "intent", "Polling must save the phase it returns to the client");
+  assert.equal(resolved.body.version, started.body.version + 1);
+  const passed = await s.request("user-0", {
+    op: "action", code: room.code, version: resolved.body.version,
+    action: { type: "intent", play: false },
+  });
+  assert.equal(passed.status, 200, JSON.stringify(passed.body));
+  assert.equal(passed.body.game.declarations, 1);
   assert.deepEqual(resolved.body.game.legenDecisions, [false, false, false, false]);
   assert.equal(resolved.body.game.hand.length, 8);
+});
+
+test("polling saves bot knocks before the remaining human decides", async () => {
+  const s = server();
+  const room = (await s.request("user-0", { op: "create", name: "Host" })).body;
+  const started = await s.request("user-0", {
+    op: "start", code: room.code, version: room.version,
+    rules: { ...engine.DEFAULT_GAME_RULES, legen: true },
+  });
+  assert.equal(started.status, 200);
+  const row = [...s.rows.values()][0];
+  row.updated_at = new Date(Date.now() - 1000).toISOString();
+  const polled = await s.request("user-0", { op: "get", code: room.code });
+  assert.equal(polled.status, 200);
+  assert.equal(polled.body.game.phase, "legen");
+  assert.equal(polled.body.game.legenDecisions[0], null);
+  assert.ok(polled.body.game.legenDecisions.slice(1).every(value => typeof value === "boolean"));
+  assert.deepEqual(row.game.legenDecisions, polled.body.game.legenDecisions);
+  assert.deepEqual(row.game.hands.map(hand => hand.length), [4, 8, 8, 8]);
+  const unchanged = await s.request("user-0", { op: "get", code: room.code });
+  assert.equal(unchanged.body.version, polled.body.version, "Unchanged polling must not write again");
+  const decided = await s.request("user-0", {
+    op: "action", code: room.code, version: polled.body.version,
+    action: { type: "legen", knock: false },
+  });
+  assert.equal(decided.status, 200);
+  assert.equal(decided.body.game.phase, "intent");
+});
+
+test("concurrent polling saves a legacy human turn clock once", async () => {
+  const s = server();
+  const room = await fullRoom(s);
+  const started = await s.request("user-0", {
+    op: "start", code: room.code, version: room.version,
+    rules: { ...engine.DEFAULT_GAME_RULES, legen: false },
+  });
+  const row = [...s.rows.values()][0];
+  delete row.game.rulesVersion;
+  row.game.turnDeadline = null;
+  const hands = structuredClone(row.game.hands);
+  const results = await Promise.all([0, 1].map(seat => s.request(`user-${seat}`, { op: "get", code: room.code })));
+  assert.ok(results.every(result => result.status === 200));
+  assert.ok(results.every(result => result.body.version === started.body.version + 1));
+  assert.equal(row.game.rulesVersion, 2);
+  assert.ok(row.game.turnDeadline > Date.now());
+  assert.ok(results.every(result => result.body.game.turnDeadline === row.game.turnDeadline));
+  assert.deepEqual(row.game.hands, hands);
+  const unchanged = await s.request("user-0", { op: "get", code: room.code });
+  assert.equal(unchanged.body.version, row.version);
+  assert.equal(unchanged.body.game.turnDeadline, row.game.turnDeadline);
 });
 
 test("waiting host can leave and ownership transfers; final player removes empty room", async () => {

@@ -41,6 +41,7 @@ export default function MinigameResults({
   const results = minigame.results ?? [];
   const leader = match.players.find((p) => p.id === results[0]?.playerId);
   const champion = match.players.find((p) => p.id === match.winner);
+  const festival = match.mode === "festival";
   return (
     <div className="mg-results">
       <span className="pp-eyebrow">RESULTS</span>
@@ -69,8 +70,8 @@ export default function MinigameResults({
               <span className={`mg-reward ${gained ? "" : "none"}`}>
                 +{gained}
               </span>
-              <span className="mg-total" aria-label={`${p.coins} coins`}>
-                🪙 <CoinCount to={p.coins} gained={gained} />
+              <span className="mg-total" aria-label={festival ? `${match.festivalScores?.[p.id] ?? 0} festival points` : `${p.coins} coins`}>
+                {festival ? <>★ {match.festivalScores?.[p.id] ?? 0}</> : <>🪙 <CoinCount to={p.coins} gained={gained} /></>}
               </span>
             </li>
           );
@@ -80,7 +81,7 @@ export default function MinigameResults({
         {champion
           ? `${champion.name} reached the coin goal!`
           : leader
-            ? match.mode === "festival" ? `Festival round ${match.round} complete · next round starts shortly.` : `${leader.name} goes first next round.`
+            ? festival ? `Festival round ${match.round} complete · ${match.round === match.roundLimit ? "final standings" : "next round"} shortly. Rewards shown are festival points.` : `${leader.name} goes first next round.`
             : ""}
       </p>
     </div>

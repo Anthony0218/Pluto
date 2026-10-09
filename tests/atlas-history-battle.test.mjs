@@ -137,8 +137,8 @@ test("online History Battle is server-graded and reveals the record only with th
 
 test("History Battle replaces Territory Battle in the menu and in Ranked", async () => {
   const mode = modeById("history-battle");
-  assert.equal(ARENA_MODES.length, 15);
-  assert.equal(ARENA_MODES.findIndex((item) => item.id === "history-battle"), 11, "it takes Territory Battle's slot");
+  assert.equal(ARENA_MODES.length, 12);
+  assert.equal(ARENA_MODES.findIndex((item) => item.id === "history-battle"), 9, "it remains after Extreme Geography");
   assert.equal(modeById("territory-battle"), undefined);
   assert.ok(mode.rules.play.some((step) => step.includes("The World Factbook")));
   const ranked = rankedModes().map((item) => item.online);

@@ -256,6 +256,7 @@ export class PartyRooms {
         name: r.name,
         count: r.players.length,
         mapId: r.settings.mapId,
+        mode: r.settings.mode ?? "board",
         public: r.public,
       }));
   }

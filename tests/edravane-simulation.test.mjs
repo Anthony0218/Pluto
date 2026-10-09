@@ -38,7 +38,7 @@ function loadSave(raw) {
 }
 const actor = { house: "auremarch-0" };
 const command = (s, c, a = actor) => applyCommand(s, a, c);
-test("all eight selectable crowns, 333 land fields across two continents, forty estates, distinct titles and legacy lock", () => {
+test("all eight selectable crowns, 341 land fields across two continents and offshore islands, forty estates, distinct titles and legacy lock", () => {
   for (const n of NATIONS) {
     const s = createCampaign(n.id);
     assert.equal(
@@ -48,7 +48,7 @@ test("all eight selectable crowns, 333 land fields across two continents, forty 
     assert.equal(s.armies.find((a) => a.house === `${n.id}-0`).hex, n.capital);
   }
   const s = createCampaign();
-  assert.equal(s.districts.filter((d) => d.nation).length, 333);
+  assert.equal(s.districts.filter((d) => d.nation).length, 341);
   assert.equal(s.houses.length, 40);
   assert.equal(s.titles.length, 8);
   for (const h of s.houses) {
@@ -536,7 +536,7 @@ test("reference geography places the southwest and southeast crowns correctly, w
   assert.ok(graskor.anchor[1] > dun.anchor[1]);
   const hazards = ["glacier", "volcanic", "desert", "marsh"];
   hazards.forEach((b) => assert.ok(s.districts.some((d) => d.biome === b)));
-  assert.equal(s.districts.filter((d) => d.biome === "island").length, 6);
+  assert.equal(s.districts.filter((d) => d.biome === "island").length, 14);
   assert.ok(
     s.districts.some(
       (d) =>

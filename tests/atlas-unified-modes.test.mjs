@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { ARENA_MODES, hotseatPlayerLimit, modeForOnline, modeForTrial, onlinePlayerLimit } from "../src/games/atlas/modeCatalog.ts";
+import { ARENA_MODES, ONLINE_ARENA_MODES, hotseatPlayerLimit, modeForOnline, modeForTrial, onlinePlayerLimit } from "../src/games/atlas/modeCatalog.ts";
 import { generateMatchQuestions } from "../src/games/atlas/matchQuestions.ts";
 import { ATLAS_MULTIPLAYER_MODES, ATLAS_RACE_MODES, isRaceMode, maxPlayersFor, raceComplete, raceScores } from "../src/games/atlas/multiplayer.ts";
 import { closestScore, speedRunScore } from "../src/games/atlas/rules.ts";
@@ -20,22 +20,22 @@ const version = (await read("../data/geography/version.json")).atlasDataVersion;
 const pool = buildTrialCountries(countries, extras, "intermediate");
 const byId = new Map(buildTrialCountries(countries, extras, "expert").map((country) => [country.id, country]));
 
-test("the menu lists all fifteen modes in the agreed order, each playable three ways", () => {
+test("the menu consolidates modes and only offers supported online choices", () => {
   assert.deepEqual(ARENA_MODES.map((mode) => mode.title), [
-    "Map Battle", "Closest Wins", "Higher or Lower", "Guess the Country", "Flag Battle", "Stat Ranking", "Stat Battle",
-    "Region Builder", "Stat Detective", "Guess the Country Mini Edition", "Extreme Geography", "History Battle", "Speed Run", "Language Guesser", "Map Fill",
+    "Map Battle", "Higher or Lower", "Guess the Country", "Flag Battle", "Stat Ranking", "Stat Battle",
+    "Region Builder", "Stat Detective", "Extreme Geography", "History Battle", "Language Guesser", "Map Fill",
   ]);
   assert.equal(new Set(ARENA_MODES.map((mode) => mode.id)).size, ARENA_MODES.length);
   // Every online mode exists on the server and belongs to exactly one menu entry.
-  assert.deepEqual([...ARENA_MODES.map((mode) => mode.online)].sort(), [...ATLAS_MULTIPLAYER_MODES].sort());
+  assert.deepEqual([...ONLINE_ARENA_MODES.map((mode) => mode.online)].sort(), [...ATLAS_MULTIPLAYER_MODES].sort());
   for (const mode of ARENA_MODES) {
     assert.equal(modeForOnline(mode.online), mode);
     assert.ok(mode.rules.goal && mode.rules.play.length && mode.rules.scoring && mode.rules.solo && mode.rules.multiplayer && mode.rules.hotseat, mode.id);
     assert.ok(onlinePlayerLimit(mode) >= 2 && hotseatPlayerLimit(mode) >= 2);
   }
   // The former Atlas Trials keep their personal-best keys and old links.
-  assert.equal(modeForTrial("country-guesser")?.id, "guess-country-mini");
-  assert.equal(modeForTrial("country-guesser")?.bestId, "country-guesser");
+  assert.equal(modeForTrial("country-guesser")?.id, "guess-country");
+  assert.equal(modeForTrial("country-guesser")?.bestId, "guess-country");
   assert.equal(maxPlayersFor("stat_battle"), 2);
   // Territory Battle is gone from every list; History Battle is a four-seat race with its own solo engine.
   assert.ok(!ARENA_MODES.some((mode) => /territory/i.test(`${mode.id} ${mode.title} ${mode.online}`)) && !ATLAS_MULTIPLAYER_MODES.includes("territory_battle"));

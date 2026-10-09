@@ -509,6 +509,7 @@ const rulebookTranslations: Partial<
       "Durch „Gehen“ kann eine Seite versuchen, den Rundenwert zu erhöhen.",
     "The opposing side can": "Die Gegenseite kann den höheren Wert",
     " hold": " halten",
+    " stay": " halten (bleiben)",
     ". The round then continues at the new value.":
       ". Dann wird um den neuen Wert weitergespielt.",
     "If the raise is declined, the raising side wins the round at the previously accepted round value.":
@@ -625,6 +626,7 @@ const rulebookTranslations: Partial<
       "‘Gehen’을 통해 한쪽이 라운드 점수를 올릴 수 있습니다.",
     "The opposing side can": "상대편은 더 높은 점수를",
     " hold": " 받아들일 수 있습니다",
+    " stay": " 유지할 수 있습니다",
     ". The round then continues at the new value.":
       ". 그러면 새 점수로 라운드를 계속합니다.",
     "If the raise is declined, the raising side wins the round at the previously accepted round value.":
@@ -717,6 +719,7 @@ const rulebookTranslations: Partial<
       "С помощью «Gehen» одна из сторон может попытаться повысить стоимость раунда.",
     "The opposing side can": "Противоположная сторона может",
     " hold": " принять повышение",
+    " stay": " остаться на новом значении",
     ". The round then continues at the new value.":
       ". После этого игра продолжается с новым значением.",
     "If the raise is declined, the raising side wins the round at the previously accepted round value.":
@@ -804,6 +807,18 @@ const extraTranslations: Partial<
   Partial<Record<WattenLanguage, Record<string, string>>>
 > = {
   de: {
+    "Stay at {value}": "{value} halten",
+    "Gehen (give up)": "Gehen (aufgeben)",
+    "{count}/{total} want to give up (gehen)": "{count}/{total} wollen gehen",
+    "{name} wants to give up (gehen)": "{name} will gehen",
+    "{name}, stay or give up (gehen)?": "{name}: halten oder gehen?",
+    "One vote to stay is enough. To give up (gehen), both players of the team must vote gehen.": "Ein Mal Halten genügt. Zum Gehen (Aufgeben) müssen beide Spieler des Teams gehen.",
+    "You want to give up (gehen). Your partner can still stay.": "Du willst gehen. Dein Partner kann noch halten.",
+    "Current round value": "Aktueller Rundenwert",
+    "New value if you stay": "Neuer Wert bei Halten",
+    "If the answering side gives up (gehen), {name} wins the round at the current value of {value} points.": "Wenn die Gegenseite geht (aufgibt), gewinnt {name} die Runde mit dem bisherigen Wert von {value} Punkten.",
+    "The decision is with": "Die Entscheidung liegt bei",
+    "The opposing side must decide whether to stay at the new round value.": "Die Gegenseite muss entscheiden, ob sie beim neuen Rundenwert bleibt (halten).",
     "How would you like to play?": "Wie möchtest du spielen?",
     Local: "Lokal",
     "Play together on one device. After each turn, simply pass the device to the next player.":
@@ -882,6 +897,18 @@ const extraTranslations: Partial<
     You: "Du",
   },
   bar: {
+    "Stay at {value}": "{value} haltn",
+    "Gehen (give up)": "Gehn (aufgebn)",
+    "{count}/{total} want to give up (gehen)": "{count}/{total} wolln gehn",
+    "{name} wants to give up (gehen)": "{name} wui gehn",
+    "{name}, stay or give up (gehen)?": "{name}: haltn oder gehn?",
+    "One vote to stay is enough. To give up (gehen), both players of the team must vote gehen.": "A moi Haltn langt. Zum Gehn (Aufgebn) miassn boide vom Team gehn.",
+    "You want to give up (gehen). Your partner can still stay.": "Du wuist gehn. Dei Partner ko no haltn.",
+    "Current round value": "Aktueller Rundenwert",
+    "New value if you stay": "Neier Wert beim Haltn",
+    "If the answering side gives up (gehen), {name} wins the round at the current value of {value} points.": "Wenn d'Gegenseitn gehd, gwinnt {name} d'Runde mit'm bisherigen Wert vo {value} Punkt.",
+    "The decision is with": "D'Entscheidung liegt bei",
+    "The opposing side must decide whether to stay at the new round value.": "D'Gegenseitn muaß entscheidn, ob's beim neia Rundnwert bleibt (haltn).",
     "How would you like to play?": "Wia mogst spuin?",
     Local: "Lokal",
     "Play together on one device. After each turn, simply pass the device to the next player.":
@@ -945,6 +972,18 @@ const extraTranslations: Partial<
     You: "Du",
   },
   ko: {
+    "Stay at {value}": "{value}점 유지",
+    "Gehen (give up)": "Gehen (포기)",
+    "{count}/{total} want to give up (gehen)": "{count}/{total}명이 Gehen(포기)을 원함",
+    "{name} wants to give up (gehen)": "{name}님이 Gehen(포기)을 원함",
+    "{name}, stay or give up (gehen)?": "{name}: 유지 또는 Gehen(포기)?",
+    "One vote to stay is enough. To give up (gehen), both players of the team must vote gehen.": "유지 1표면 충분합니다. 포기(Gehen)하려면 팀의 두 플레이어 모두 Gehen에 투표해야 합니다.",
+    "You want to give up (gehen). Your partner can still stay.": "당신은 Gehen(포기)을 선택했습니다. 파트너는 여전히 유지할 수 있습니다.",
+    "Current round value": "현재 라운드 점수",
+    "New value if you stay": "유지 시 새 점수",
+    "If the answering side gives up (gehen), {name} wins the round at the current value of {value} points.": "응답한 쪽이 Gehen(포기)하면 {name}이(가) 현재 점수 {value}점으로 라운드에서 승리합니다.",
+    "The decision is with": "결정하는 쪽",
+    "The opposing side must decide whether to stay at the new round value.": "상대편이 새 라운드 점수를 유지할지 결정해야 합니다.",
     "How would you like to play?": "어떻게 플레이하시겠어요?",
     Local: "로컬",
     "Play together on one device. After each turn, simply pass the device to the next player.":
@@ -1020,6 +1059,18 @@ const extraTranslations: Partial<
     You: "나",
   },
   ru: {
+    "Stay at {value}": "Остаться на {value}",
+    "Gehen (give up)": "Gehen (сдаться)",
+    "{count}/{total} want to give up (gehen)": "{count}/{total} хотят сдаться (Gehen)",
+    "{name} wants to give up (gehen)": "{name} хочет сдаться (Gehen)",
+    "{name}, stay or give up (gehen)?": "{name}: остаться или сдаться (Gehen)?",
+    "One vote to stay is enough. To give up (gehen), both players of the team must vote gehen.": "Достаточно одного голоса «остаться». Чтобы сдаться (Gehen), оба игрока команды должны проголосовать за Gehen.",
+    "You want to give up (gehen). Your partner can still stay.": "Вы хотите сдаться (Gehen). Партнёр всё ещё может остаться.",
+    "Current round value": "Текущая стоимость раунда",
+    "New value if you stay": "Новая стоимость, если остаться",
+    "If the answering side gives up (gehen), {name} wins the round at the current value of {value} points.": "Если отвечающая сторона сдаётся (Gehen), {name} выигрывает раунд по текущей стоимости {value}.",
+    "The decision is with": "Решает",
+    "The opposing side must decide whether to stay at the new round value.": "Противник должен решить, остаться ли на новой стоимости раунда.",
     "How would you like to play?": "Как вы хотите играть?",
     Local: "Локально",
     "Play together on one device. After each turn, simply pass the device to the next player.":

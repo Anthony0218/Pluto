@@ -45,6 +45,9 @@ import {
   HARVEST_COOLDOWN,
 } from "../../../games/MedievalKingdoms/edravane/estates.ts";
 import { Link } from "react-router-dom";
+import InviteFriendButton from "../../../components/chess/InviteFriendButton";
+import { usePublishRoom } from "../../../components/social/currentRoom";
+import { useAuth } from "../../../context/AuthContext";
 import {
   ArrowLeft,
   ArrowRight,
@@ -96,7 +99,17 @@ import type {
   Resource,
   UnitKind,
 } from "../../../games/MedievalKingdoms/edravane/types.ts";
+import { AgreementsPanel, CampaignLegacy, EstateDevelopment, IntegrationPanel, InterestsPanel, LandmarkLayer, MapScaleLegend, ProjectsPanel, RealmAgenda, RelationshipLayer, RelationsPanel, ResourceDependency } from "./RealmAgreements.tsx";
+import { calendarYear } from "../../../games/MedievalKingdoms/edravane/calendar.ts";
+import { legacyScore, realmDecisions } from "../../../games/MedievalKingdoms/edravane/agreements.ts";
 import "./edravane.css";
+import "./realmAgreements.css";
+import "./mobileRealm.css";
+
+const MOBILE_REALM_QUERY = "(max-width: 700px), (max-width: 1000px) and (max-height: 500px)";
+const MAP_VIEWS = ["terrain", "ownership", "loyalty", "resources", "trade", "supply", "diplomacy", "claims", "relationships", "objectives"];
+const REALM_SECTIONS = ["agenda", "district", "houses", "council", "dynasty", "economy", "agreements", "projects", "interests", "relationships", "legacy", "chronicle"];
+const sectionLabel = (section: string) => section === "agenda" ? "Decisions" : section.charAt(0).toUpperCase() + section.slice(1);
 const points = (d: District, inset = 0) => {
   const [x, y] = center(d);
   return Array.from({ length: 6 }, (_, i) => {
@@ -119,9 +132,16 @@ const labels: Record<UnitKind, string> = {
   heavy: "Heavy infantry",
   cavalry: "Cavalry",
 };
+/** The council an accepted invite points at (`?council=CODE&join=1`), read once when the page opens. */
+function invitedCouncil() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("join") === "1" ? (params.get("council") ?? "").trim().toUpperCase() : "";
+}
 export default function EdravanePage() {
+  const [inviteCouncil] = useState(invitedCouncil);
   const [state, setState] = useState<Campaign | null>(null),
     [nation, setNation] = useState("auremarch"),
+    [chronicle, setChronicle] = useState<"council" | "sandbox">("council"),
     [selection, setSelected] = useState<string | null>(null),
     [selectedHouse, setSelectedHouse] = useState<string | null>(null),
     [sidebarOpen, setSidebarOpen] = useState(true),
@@ -143,10 +163,10 @@ export default function EdravanePage() {
     [lobby, setLobby] = useState<CouncilView | null>(null),
     [online, setOnline] = useState(false),
     [netStatus, setNetStatus] = useState(""),
-    [code, setCode] = useState(""),
+    [code, setCode] = useState(inviteCouncil),
     [player, setPlayer] = useState(""),
     [name, setName] = useState("Ruler"),
-    [networkMenu, setNetworkMenu] = useState(false),
+    [networkMenu, setNetworkMenu] = useState(() => !!inviteCouncil),
     [resource, setResource] = useState<Resource>("grain"),
     [maritime, setMaritime] = useState(false),
     [importCargo, setImportCargo] = useState(false),
@@ -161,6 +181,7 @@ export default function EdravanePage() {
   const connection = useRef<CouncilConnection | null>(null),
     connectionAttempt = useRef(0),
     networkPanel = useRef<HTMLElement | null>(null),
+    realmDesk = useRef<HTMLElement | null>(null),
     mapElement = useRef<SVGSVGElement | null>(null),
     mapDrag = useRef<{
       point: [number, number];
@@ -186,6 +207,9 @@ export default function EdravanePage() {
       setRegion(false);
     }
   }, []);
+  useEffect(() => {
+    if (state?.agreements?.campaign.result) { setTab("legacy"); setSidebarOpen(true); setPanelExpanded(true); }
+  }, [state?.agreements?.campaign.result]);
   const campaignStarted = !!state;
   const lobbySlot = lobby?.slots.find((s) => s.player === player);
   const lobbyReady = !!lobbySlot?.ready;
@@ -198,6 +222,8 @@ export default function EdravanePage() {
         behavior: "smooth",
       });
   }, [networkMenu, lobby?.code, campaignStarted]);
+  const { user, profile } = useAuth();
+  usePublishRoom(lobby ? { lobbyRoute: "/games/medieval-kingdoms", code: lobby.code } : null);
   const view = useMemo(() => state ? online ? state : strategyView(state, `${nation}-0`) : createCampaign(nation), [state, online, nation]);
   const worldBounds = useMemo(() => mapBounds(view.districts), [view.districts]);
   const playableBounds = useMemo(() => mapBounds(view.districts, { includeLegacy: false }), [view.districts]);
@@ -220,6 +246,9 @@ export default function EdravanePage() {
     inspectedReaction !== activeReaction.id;
   const selected = newThreat ? activeReaction.hex : selection;
   const tab = newThreat ? "district" : requestedTab;
+  useEffect(() => {
+    realmDesk.current?.scrollTo({ top: 0 });
+  }, [tab, panelExpanded]);
   const hex = view.districts.find((d) => d.id === selected),
     selectedArmy = view.armies.find((a) => a.id === army);
   const selectedSiege = view.sieges?.find((siege) => siege.army === army);
@@ -231,7 +260,8 @@ export default function EdravanePage() {
   const myTurn =
     activeTurnHouse(view) === house.id &&
     !view.turns?.ending &&
-    !activeReaction;
+    !activeReaction &&
+    !view.agreements?.campaign.result;
   const canAct =
     myTurn ||
     (myResponse &&
@@ -357,7 +387,9 @@ export default function EdravanePage() {
     setLobby(null);
     setOnline(false);
     resetCamera();
-    setState(createCampaign(nation));
+    setState(createCampaign(nation, "single", chronicle));
+    setTab("agenda");
+    setPanelExpanded(!window.matchMedia(MOBILE_REALM_QUERY).matches);
     setSelected(NATIONS.find((n) => n.id === nation)!.capital);
     setArmy(`army-${nation}-0`);
     setMessage(
@@ -401,21 +433,22 @@ export default function EdravanePage() {
     a.click();
     URL.revokeObjectURL(url);
   }
-  async function connect(action: "create" | "join" | "resume") {
+  async function connect(action: "create" | "join" | "resume", joinCode?: string, playerName?: string) {
     const attempt = ++connectionAttempt.current;
     connection.current?.close(action !== "resume");
     connection.current = null;
     setNetStatus("Connecting…");
     setMessage("");
     try {
-      const roomCode = action === "resume" ? savedCouncil() : code.trim();
+      const roomCode = action === "resume" ? savedCouncil() : (joinCode ?? code).trim();
       if (action === "resume" && !roomCode)
         throw Error("No saved Supabase council in this browser tab.");
       const initial = await councilAction({
         type: action,
+        chronicle,
         code: roomCode ?? undefined,
         nation,
-        name,
+        name: playerName ?? name,
       });
       if (attempt !== connectionAttempt.current) return;
       resetCamera();
@@ -453,6 +486,18 @@ export default function EdravanePage() {
   }
   const netSend = (message: CouncilRequest) =>
     connection.current?.send(message);
+  const inviteHandled = useRef(false);
+  useEffect(() => {
+    if (!inviteCouncil || !user || inviteHandled.current) return;
+    inviteHandled.current = true;
+    const params = new URLSearchParams(window.location.search);
+    params.delete("join");
+    const query = params.toString();
+    window.history.replaceState(window.history.state, "", `${window.location.pathname}${query ? `?${query}` : ""}`);
+    void connect("join", inviteCouncil, profile?.username || undefined);
+    // `connect` is recreated every render; the invite is consumed exactly once.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inviteCouncil, user]);
   const select = useCallback((d: District) => {
     setSelected(d.id);
     setInspectedReaction(activeReaction?.id ?? "");
@@ -486,14 +531,15 @@ export default function EdravanePage() {
     const regional = !mini && zoom >= 1.6;
     const detailed = !mini && zoom >= 2.6;
     const c = mini || !campaignStarted ? worldBounds.center : mapCenter;
-    const mobile = mapFrame.width <= 700;
+    const landscapePhone = mapFrame.width >= 550 && mapFrame.width <= 1000 && mapFrame.height <= 500;
+    const mobile = mapFrame.width <= 700 || landscapePhone;
     const frame = mini || !campaignStarted ? { width: worldBounds.width, height: worldBounds.height } : mapFrame;
     // Fit playable fields between the floating interface; the locked legacy entry doesn't shrink the world.
     const left = mobile ? 12 : panelSide === "west" ? panelVisible ? 374 : 30 : 230;
-    const right = mobile ? 12 : panelSide === "east" ? panelVisible ? 374 : 30 : 230;
-    const top = mobile ? 375 : 185;
+    const right = landscapePhone ? panelVisible ? mapFrame.width * .42 + 20 : 12 : mobile ? 12 : panelSide === "east" ? panelVisible ? 374 : 30 : 230;
+    const top = landscapePhone ? 168 : mobile ? 304 : 185;
     const hasOrders = !!selectedArmy && (!selectedArmy.garrison || control === "vassal");
-    const bottom = mobile ? (panelVisible ? mapFrame.height * .34 + 30 : 35) + (hasOrders ? 105 : 0) : hasOrders ? 245 : 70;
+    const bottom = landscapePhone ? (hasOrders ? 100 : 20) : mobile ? (panelVisible ? Math.min(224, mapFrame.height * .28) + 20 : 24) + (hasOrders ? 104 : 0) : hasOrders ? 245 : 70;
     const scale = mini || !campaignStarted ? zoom : Math.max(.08, Math.min((frame.width - left - right) / bounds.width, (frame.height - top - bottom) / bounds.height)) * zoom;
     const origin = mini || !campaignStarted ? [frame.width / 2, frame.height / 2] : [(left + frame.width - right) / 2, (top + frame.height - bottom) / 2];
     const viewport = mini || !campaignStarted ? "" : mapViewport(c, origin, scale, frame);
@@ -651,7 +697,7 @@ export default function EdravanePage() {
               );
               const merchant = path[r.progress % path.length];
               return (
-                <g key={r.id}>
+                <g key={r.id} className={`ed-caravan-route ${r.status.startsWith("Blockaded") ? "ed-route-blocked" : ""}`}><title>{r.resource} route · {r.status}</title>
                   <polyline
                     points={path.map((p) => p.join(",")).join(" ")}
                     fill="none"
@@ -663,11 +709,13 @@ export default function EdravanePage() {
                     cx={merchant[0]}
                     cy={merchant[1]}
                     r="3"
-                    fill={r.maritime ? "#adf6ff" : "#ffdf82"}
+                    className="ed-caravan" fill={r.maritime ? "#adf6ff" : "#ffdf82"}
                   />
                 </g>
               );
             })}
+          {!mini && campaignStarted && <LandmarkLayer state={view} onHex={select} detailed={detailed} />}
+          {!mini && overlay === "relationships" && <RelationshipLayer state={view} focus={profileHouse} onHouse={(h) => { setSelectedHouse(h.id); setTab("relationships"); setSidebarOpen(true); }} />}
           {!mini && !regional && realmTerritories.map((territory) => {
             const pathId = `realm-name-${territory.id}`;
             return <g key={pathId} className="ed-realm-map-label" transform={`translate(${territory.x} ${territory.y - 27}) rotate(${territory.angle})`} pointerEvents="none" aria-hidden="true" data-territory={territory.id} data-fields={territory.districts.length}>
@@ -817,12 +865,11 @@ export default function EdravanePage() {
               <span>
                 A kingdom is inherited.
                 <br />
-                An empire is earned.
+                A legacy is built together.
               </span>
             </h1>
             <p>
-              Raise your dynasty, call your banners, and shape the fortunes of a
-              living world.
+              Build a realm your heirs can keep. Trade scarce resources, honour your promises, and unite a divided court.
             </p>
           </div>
           <div className="ed-intro-map">{map()}</div>
@@ -855,6 +902,10 @@ export default function EdravanePage() {
                 {nation === n.id && <Crown size={16} />}
               </button>
             ))}
+          </div>
+          <div className="ed-chronicle-choice" role="group" aria-label="Campaign format">
+            <button className={chronicle === "council" ? "active" : ""} aria-pressed={chronicle === "council"} onClick={() => setChronicle("council")}><Crown size={19} /><span><strong>Council chronicle</strong><small>48 rounds · succession midway · four paths to a lasting legacy</small></span></button>
+            <button className={chronicle === "sandbox" ? "active" : ""} aria-pressed={chronicle === "sandbox"} onClick={() => setChronicle("sandbox")}><Leaf size={19} /><span><strong>Generational sandbox</strong><small>Open campaign · twelve rounds per year · no fixed ending</small></span></button>
           </div>
           <div className="ed-start-actions">
             <button className="ed-primary" onClick={start}>
@@ -978,6 +1029,7 @@ export default function EdravanePage() {
                     </button>
                     {lobby.host === player && (
                       <>
+                        <label>Campaign format<select value={lobby.settings.chronicle ?? "sandbox"} onChange={(e) => netSend({ type: "settings", tickSeconds: lobby.settings.tickSeconds, maritimeHazard: lobby.settings.maritimeHazard, chronicle: e.target.value as "council" | "sandbox" })}><option value="council">Council · 48 rounds</option><option value="sandbox">Generational sandbox</option></select></label>
                         <label>
                           Sea hazard
                           <select
@@ -1039,6 +1091,7 @@ export default function EdravanePage() {
                           {s.ready ? "Ready" : "Not ready"}
                           {s.player && !s.connected ? " · disconnected" : ""}
                         </span>
+                        {s.bot && <InviteFriendButton room={{ lobbyRoute: "/games/medieval-kingdoms", code: lobby.code }} />}
                       </div>
                     ))}
                   </div>
@@ -1094,7 +1147,7 @@ export default function EdravanePage() {
   );
   return createPortal(
     <main
-      className={`ed-app ed-playing ed-panel-${panelSide} ${panelVisible ? "" : "ed-sidebar-hidden"}`}
+      className={`ed-app ed-playing ed-mode-${overlay} ed-panel-${panelSide} ${panelVisible ? "" : "ed-sidebar-hidden"}`}
     >
       <header className="ed-masthead">
         <Link to="/games">
@@ -1147,9 +1200,10 @@ export default function EdravanePage() {
           <b>
             {view.turns?.round ?? 1} · {actingHouse?.name ?? "Council"}
           </b>
-          <small>{season(view)} · {mapZoom < 1.6 ? "World view" : mapZoom < 2.6 ? "Regional view" : "Estate view"}</small>
+          <small>{season(view)} · Year {calendarYear(view) + 1}</small>
         </div>
         <div className="ed-tools">
+          <button className="ed-legacy-badge" onClick={() => { setSidebarOpen(true); setTab("legacy"); setPanelExpanded(true); }}><Crown size={15} />{legacyScore(view, house).total} legacy{view.agreements?.campaign.kind === "council" ? ` · ${Math.max(0, 48 - ((view.turns?.round ?? 1) - view.agreements.campaign.startRound))} rounds left` : " · sandbox"}</button>
           <button
             className="ed-end-turn"
             disabled={!myTurn || !!battle}
@@ -1158,6 +1212,8 @@ export default function EdravanePage() {
             End turn <ChevronRight size={16} />
           </button>
           <button
+            className="ed-campaign-menu"
+            aria-label="Campaign menu"
             onClick={() => {
               if (!online) save();
               connectionAttempt.current++;
@@ -1171,7 +1227,7 @@ export default function EdravanePage() {
               setSelected(null);
             }}
           >
-            Campaign menu
+            <span className="ed-desktop-menu-label">Campaign menu</span><span className="ed-mobile-menu-label">Menu</span>
           </button>
           {online ? (
             <>
@@ -1192,7 +1248,9 @@ export default function EdravanePage() {
         </div>
       </div>
       <div className="ed-turn-status" role="status">
-        {activeReaction && !battle
+        {view.agreements?.campaign.result
+          ? "The council has recorded the final legacy. Review the verdict or continue a solo realm as a sandbox."
+          : activeReaction && !battle
           ? `${myResponse ? "Your response required" : "Awaiting response"}: ${view.houses.find((h) => h.id === activeReaction.from)?.name} → ${view.houses.find((h) => h.id === activeReaction.to)?.name} · ${activeReaction.kind}`
           : battle
             ? hiddenBattle === battle.id
@@ -1215,6 +1273,7 @@ export default function EdravanePage() {
       <div className="ed-workspace">
         <section className="ed-map-card">
           <div className="ed-map-head">
+            <MapScaleLegend zoom={mapZoom} />
             <div className="ed-trail">
               <button
                 onClick={() => {
@@ -1299,12 +1358,12 @@ export default function EdravanePage() {
               </button>
             </div>
             <div className="ed-overlay-controls">
-              {["terrain", "ownership", "loyalty", "resources", "trade", "supply", "diplomacy", "claims"].map(
+              {MAP_VIEWS.map(
                 (o) => (
                   <button
                     className={overlay === o ? "active" : ""}
                     key={o}
-                    onClick={() => setOverlay(o)}
+                    onClick={() => { setOverlay(o); if (o === "relationships" || o === "objectives") { setTab(o === "objectives" ? "legacy" : "relationships"); setSidebarOpen(true); } }}
                   >
                     {o === "ownership" ? (
                       <Shield size={13} />
@@ -1320,7 +1379,14 @@ export default function EdravanePage() {
                 ),
               )}
             </div>
-            <div className="ed-map-mode-guide" role="status">{overlay === "supply" ? "Green: an open supply route · red: carried food needed" : overlay === "diplomacy" ? "Gold: your realm · blue: marriage allies · red: enemies" : overlay === "claims" ? "Gold: your realm · purple: inherited family claims" : overlay === "loyalty" ? "Green: ready for service · amber: reduced commitment · red: refusal risk" : overlay === "trade" ? "Dashed lines: trade routes · ports and blockades control access" : "House sigils mark controlled fields · zoom for house names and estates"}</div>
+            <div className="ed-mobile-map-tools" role="group" aria-label="Mobile map controls">
+              <label><span className="ed-visually-hidden">Map view</span><select value={overlay} onChange={(e) => { const next = e.target.value; setOverlay(next); if (next === "relationships" || next === "objectives") { setTab(next === "objectives" ? "legacy" : "relationships"); setSidebarOpen(true); } }}>{MAP_VIEWS.map((o) => <option key={o} value={o}>{o === "relationships" ? "House ties" : sectionLabel(o)}</option>)}</select></label>
+              <button aria-label="Zoom out map" disabled={mapZoom <= MIN_MAP_ZOOM} onClick={() => zoomMap(mapZoom - .25)}><Minus size={18} /></button>
+              <button aria-label="Zoom in map" disabled={mapZoom >= MAX_MAP_ZOOM} onClick={() => zoomMap(mapZoom + .25)}><Plus size={18} /></button>
+              <button aria-label="Fit map" title="Fit the world map" onClick={resetCamera}><ZoomOut size={18} /></button>
+              <button className={panelVisible ? "active" : ""} aria-label={panelVisible ? "Hide realm desk" : "Show realm desk"} aria-pressed={panelVisible} onClick={() => { setSidebarOpen((v) => !v); setInspectedReaction(activeReaction?.id ?? ""); }}><Crown size={18} /></button>
+            </div>
+            <div className="ed-map-mode-guide" role="status">{overlay === "relationships" ? "Select a connection: purple marriage · teal compact · gold obligation · red rivalry" : overlay === "objectives" ? "Connect strategic passes, harbours and river crossings to your capital" : overlay === "supply" ? "Green: an open supply route · red: carried food needed" : overlay === "diplomacy" ? "Gold: your realm · blue: marriage allies · red: enemies" : overlay === "claims" ? "Gold: your realm · purple: inherited family claims" : overlay === "loyalty" ? "Green: ready for service · amber: reduced commitment · red: refusal risk" : overlay === "trade" ? "Dashed lines: trade routes · ports and blockades control access" : "House sigils mark controlled fields · zoom for house names and estates"}</div>
             <div className="ed-control-legend" aria-label="Map control legend"><span><i className="ed-line-direct" />Your domain</span><span><i className="ed-line-vassal" />Vassal estates</span><small>Solid hosts: direct orders · dotted hosts: requests · double ring: pledged service</small></div>
             <button
               className="ed-sidebar-toggle"
@@ -1476,10 +1542,11 @@ export default function EdravanePage() {
           <ArmyLogistics state={view} house={house} army={selectedArmy} destination={hex} />
         </section>
         <aside
+          ref={realmDesk}
           className={`ed-panel ${panelExpanded || myResponse ? "ed-panel-expanded" : ""}`}
           aria-label="Kingdom information sidebar"
         >
-          <div className="ed-panel-dock"><span>REALM DESK</span><button className="ed-dock-side" aria-label={`Move sidebar ${panelSide === "east" ? "left" : "right"}`} onClick={() => setPanelSide((side) => side === "east" ? "west" : "east")}>{panelSide === "east" ? <ArrowLeft size={14} /> : <ArrowRight size={14} />}</button><button aria-label="Close sidebar" onClick={() => { setSidebarOpen(false); setInspectedReaction(activeReaction?.id ?? ""); }}>×</button></div>
+          <div className="ed-panel-dock"><span>REALM DESK</span><button className="ed-dock-expand" aria-label={panelExpanded ? "Compact realm desk" : "Expand realm desk"} aria-expanded={panelExpanded} disabled={myResponse} onClick={() => setPanelExpanded((v) => !v)}>{panelExpanded ? "Map" : "Expand"}{panelExpanded ? <ArrowDown size={14} /> : <ArrowUp size={14} />}</button><button className="ed-dock-side" aria-label={`Move sidebar ${panelSide === "east" ? "left" : "right"}`} onClick={() => setPanelSide((side) => side === "east" ? "west" : "east")}>{panelSide === "east" ? <ArrowLeft size={14} /> : <ArrowRight size={14} />}</button><button aria-label="Close sidebar" onClick={() => { setSidebarOpen(false); setInspectedReaction(activeReaction?.id ?? ""); }}>×</button></div>
           {activeReaction && myResponse && !battle && (
             <section
               className="ed-response-card"
@@ -1664,8 +1731,9 @@ export default function EdravanePage() {
             </section>
           )}
 
-          <nav className="ed-panel-tabs">
-            {["district", "houses", "council", "dynasty", "economy", "chronicle"].map(
+          <button className="ed-agenda-shortcut" onClick={() => setTab(view.agreements?.campaign.result ? "legacy" : "agenda")}><Crown size={15} /><span>{view.agreements?.campaign.result ? "The council’s verdict is ready" : realmDecisions(view, house)[0]?.title ?? "Decisions for this reign"}</span><ChevronRight size={15} /></button>
+          <nav className="ed-panel-tabs" aria-label="Realm desk sections">
+            {REALM_SECTIONS.map(
               (t) => (
                 <button
                   key={t}
@@ -1675,11 +1743,12 @@ export default function EdravanePage() {
                     setInspectedReaction(activeReaction?.id ?? "");
                   }}
                 >
-                  {t}
+                  {t === "agenda" ? "decisions" : t}
                 </button>
               ),
             )}
           </nav>
+          <label className="ed-mobile-desk-picker"><span className="ed-visually-hidden">Realm section</span><select value={tab} onChange={(e) => { setTab(e.target.value); setPanelExpanded(e.target.value !== "agenda"); setInspectedReaction(activeReaction?.id ?? ""); }}>{REALM_SECTIONS.map((t) => <option value={t} key={t}>{sectionLabel(t)}</option>)}</select></label>
           <button
             className="ed-panel-size"
             aria-expanded={panelExpanded}
@@ -1694,6 +1763,12 @@ export default function EdravanePage() {
           >
             {map(true)}
           </button>
+          {tab === "agenda" && <RealmAgenda state={view} house={house} onVisit={(nextTab, hexId) => { if (hexId) { setSelected(hexId); setMapCenter(center(view.districts.find((d) => d.id === hexId)!)); setMapZoom(1.8); } setTab(nextTab); }} />}
+          {tab === "agreements" && <AgreementsPanel state={view} house={house} active={myTurn && !battle} onCommand={execute} />}
+          {tab === "projects" && <ProjectsPanel state={view} house={house} selected={hex} active={myTurn && !battle} onCommand={execute} onHex={(d) => { setSelected(d.id); setMapCenter(center(d)); setMapZoom(1.8); }} />}
+          {tab === "interests" && <InterestsPanel state={view} house={house} active={myTurn && !battle} onCommand={execute} />}
+          {tab === "relationships" && <><label>Inspect connections<select value={profileHouse.id} onChange={(e) => setSelectedHouse(e.target.value)}>{view.houses.map((h) => <option key={h.id} value={h.id}>{h.name}</option>)}</select></label><RelationsPanel state={view} house={house} focus={profileHouse} onHouse={(h) => { setSelectedHouse(h.id); setOverlay("relationships"); }} onAgreements={() => setTab("agreements")} /></>}
+          {tab === "legacy" && <CampaignLegacy state={view} house={house} active={!!view.agreements?.campaign.result || myTurn} onCommand={execute} />}
           {tab === "district" && (
             <div className="ed-actions-fieldset">
               {hex?.biome === "legacy" ? (
@@ -1831,7 +1906,7 @@ export default function EdravanePage() {
                         <dt>Castle</dt>
                         <dd>
                           Level {hex.castle.level} · {castleGuard(view, hex)}{" "}
-                          guards · +{Math.round(castleBonus(hex) * 100)}%
+                          guards · +{Math.round(castleBonus(hex, view) * 100)}%
                           defense
                         </dd>
                       </>
@@ -2000,7 +2075,7 @@ export default function EdravanePage() {
                       <p className="ed-reason">
                         Seat troops include the 500 castle guards. Raising an
                         army transfers reserves and keeps the guards at home.
-                        Field troops also need food and wages each turn.
+                        Field troops also need food and wages each turn. Raising 500 soldiers costs 5 rural approval and temporarily reduces farm output by about 17%.
                       </p>
                     </fieldset>
                   )}
@@ -2009,17 +2084,12 @@ export default function EdravanePage() {
                       {r}
                     </p>
                   ))}
+                  <IntegrationPanel state={view} house={house} district={hex} active={myTurn && !battle} onCommand={execute} />
+                  <EstateDevelopment state={view} house={house} district={hex} active={myTurn && !battle} onCommand={execute} />
                   <DistrictStrategy state={view} house={house} district={hex} army={selectedArmy} active={myTurn && !battle} onCommand={execute} />
                   <div className="ed-mobile-logistics"><ArmyLogistics state={view} house={house} army={selectedArmy} destination={hex} /></div>
                   {(view.intelligence?.[house.id] ?? []).filter((r) => r.hex === hex.id && !view.armies.some((a) => a.id === r.army)).map((r) => <p className="ed-intel-report" key={r.army}>{r.name}: approximately {r.low}–{r.high} soldiers, last seen round {r.seen}. Their current position and strength are unknown.</p>)}
-                  {hex.occupation && (
-                    <button
-                      disabled={!myTurn}
-                      onClick={() => execute({ type: "annex", hex: hex.id })}
-                    >
-                      Annex estate · 50 coins / 3 turns of occupation
-                    </button>
-                  )}
+
                   {owner.liege === house.id && (
                     <button
                       disabled={!canAct || !!battle}
@@ -2157,6 +2227,7 @@ export default function EdravanePage() {
                   onCommand={execute}
                 />
               )}
+              <button onClick={() => { setOverlay("relationships"); setTab("relationships"); }}><Shield size={14} />View relationships and remembered promises</button>
               <HouseProfile
                 state={view}
                 house={profileHouse}
@@ -2391,6 +2462,7 @@ export default function EdravanePage() {
                   </div>
                 ))}
               </div>
+              <ResourceDependency state={view} house={house} />
               <h3>Establish a route</h3>
               <p className="ed-reason">
                 Select your origin estate on the map. Approved merchants move

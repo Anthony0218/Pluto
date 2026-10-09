@@ -1,14 +1,14 @@
 import type { FillScope } from "../../../games/atlas/scopes";
 import { useCallback, useState } from "react";
-import { ArrowUpDown, Compass, Crosshair, Flag, Landmark, Languages, LayoutGrid, Lightbulb, ListOrdered, Map as MapIcon, MapPin, Mountain, ScanSearch, Swords, Zap, type LucideIcon } from "lucide-react";
+import { ArrowUpDown, Flag, Landmark, Languages, LayoutGrid, Lightbulb, ListOrdered, Map as MapIcon, MapPin, Mountain, ScanSearch, Swords, type LucideIcon } from "lucide-react";
 import { bestKey, loadArenaStored, saveArenaStored, type ArenaStored } from "../../../games/atlas/arenaStorage";
 import type { ArenaModeId } from "../../../games/atlas/modeCatalog";
 import type { AtlasDifficulty } from "../../../games/atlas/types";
 
 export const MODE_ICONS: Record<ArenaModeId, LucideIcon> = {
-  "map-battle": MapPin, "closest-wins": Crosshair, "higher-lower": ArrowUpDown, "guess-country": Lightbulb, "flag-battle": Flag,
-  "stat-ranking": ListOrdered, "stat-battle": Swords, "region-builder": LayoutGrid, "stat-detective": ScanSearch, "guess-country-mini": Compass,
-  "extreme-geography": Mountain, "history-battle": Landmark, "speed-run": Zap, "map-fill": MapIcon,
+  "map-battle": MapPin, "higher-lower": ArrowUpDown, "guess-country": Lightbulb, "flag-battle": Flag,
+  "stat-ranking": ListOrdered, "stat-battle": Swords, "region-builder": LayoutGrid, "stat-detective": ScanSearch,
+  "extreme-geography": Mountain, "history-battle": Landmark, "map-fill": MapIcon,
   "language-guesser": Languages,
 };
 

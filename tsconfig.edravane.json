@@ -4,6 +4,7 @@
     "lib": ["ES2023", "DOM"],
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "paths": { "@/*": ["./src/*"] },
     "types": ["node", "vite/client"],
     "jsx": "react-jsx",
     "strict": true,

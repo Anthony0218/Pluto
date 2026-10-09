@@ -290,7 +290,7 @@ export function advanceBattle(s: Campaign, b: Battle, dt: number) {
         field.hill && b.armies.indexOf(enemy.army) === 1 ? 0.8 : 1;
       const castleDefense =
         b.armies.indexOf(enemy.army) === 1
-          ? 1 / (1 + castleBonus(s.districts.find((d) => d.id === b.hex)!))
+          ? 1 / (1 + castleBonus(s.districts.find((d) => d.id === b.hex)!, s))
           : 1;
       const settlementDefense =
         enemy.x >= 72 && enemy.x <= 86 && enemy.y >= 36 && enemy.y <= 56
@@ -545,7 +545,7 @@ export function autoResolve(s: Campaign, b: Battle) {
         100) *
       (1 - a.fatigue / 200) *
       (i === 1 && BIOMES[d.biome].cost > 1 ? 1.2 : 1) *
-      (i === 1 ? 1 + castleBonus(d) : 1)
+      (i === 1 ? 1 + castleBonus(d, s) : 1)
     );
   });
   const winner = scores[0] >= scores[1] ? 0 : 1;

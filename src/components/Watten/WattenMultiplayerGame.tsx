@@ -31,6 +31,12 @@ import { ProfileAvatar } from "../social/ProfileAvatarPicker";
 import "./wattenGameScreen.css";
 import { wattenPlayAnimation, wattenTableStyle } from "@/games/watten/presentation";
 import WattenTurnNotice from "./WattenTurnNotice";
+import WattenScreen from "./WattenScreen";
+import WattenFullscreenButton from "./WattenFullscreenButton";
+import { WattenLastTrickViewer, WattenTrickPile, type WattenTrickRecord } from "./WattenTricks";
+import { useLastTrick } from "./useLastTrick";
+import { GehenRule, GehenVotes } from "./WattenGehenVote";
+import { useGehenText } from "@/games/watten/useGehenText";
 
 import { useTableTheme } from "@/context/TableThemeContext";
 import {
@@ -96,6 +102,9 @@ type MultiplayerGame = {
   pending_bid_team: "team-a" | "team-b" | null;
 
   pending_bid_value: number | null;
+
+  /** Answering players who voted to give up (gehen), by seat. */
+  bid_votes?: Record<string, string> | null;
 
   last_bid_team: "team-a" | "team-b" | null;
 
@@ -362,6 +371,8 @@ export default function WattenMultiplayerGame() {
   const [startingNextRound, setStartingNextRound] = useState(false);
 
   const [actionError, setActionError] = useState<string | null>(null);
+  const lastTrick = useLastTrick();
+  const g = useGehenText();
 
   const shownAbhebenResultRef = useRef<string | null>(null);
   const dealChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(
@@ -844,6 +855,28 @@ export default function WattenMultiplayerGame() {
     }
   }
 
+  // The latest finished trick stays inspectable until the next round starts.
+  const finishedTrickSeat = game?.trick_winner_seat ?? null;
+  const finishedTrickCards = game?.played_cards;
+  const finishLastTrick = lastTrick.finish;
+  const resetLastTrick = lastTrick.reset;
+  useEffect(() => {
+    if (finishedTrickSeat === null || !finishedTrickCards || finishedTrickCards.length < 4) return;
+    finishLastTrick({
+      winnerSeat: finishedTrickSeat,
+      plays: finishedTrickCards.map((played) => ({
+        seat: played.seat,
+        name: players.find((player) => player.seat === played.seat)?.display_name ?? "",
+        card: played.card,
+      })),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [finishedTrickSeat, finishedTrickCards, finishLastTrick]);
+  const tricksTaken = Object.values(game?.tricks_won ?? {}).reduce((sum, count) => sum + count, 0);
+  useEffect(() => {
+    if (tricksTaken === 0) resetLastTrick();
+  }, [tricksTaken, resetLastTrick]);
+
   function cardCountForSeat(seat: number) {
     return resolvedGame.cards_remaining?.[String(seat)] ?? 0;
   }
@@ -1253,40 +1286,30 @@ export default function WattenMultiplayerGame() {
     const missingPlayers = Math.max(0, 4 - players.length);
 
     return (
-      <main className="min-h-screen bg-transparent px-4 py-8 text-white sm:px-6">
-        <div className="mx-auto max-w-6xl">
-          <header className="mb-6 flex flex-wrap items-start justify-between gap-4 rounded-[30px] border border-emerald-300/15 bg-zinc-950/65 p-6 shadow-2xl shadow-black/30">
+      <WattenScreen>
+        <div className="watten-game-content">
+          <header className="watten-game-header">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-300">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-amber-400">
                 {t("Bavarian Watten")} · Multiplayer
               </p>
-
-              <h1 className="mt-1 text-3xl font-black">
+              <h1 className="font-black">
                 {l("4 Spieler · 2 gegen 2", "4 Players · 2 vs 2")}
               </h1>
-
-              <p className="mt-2 max-w-xl text-sm leading-6 text-zinc-400">
-                {l(
-                  "Teile den Raumcode mit drei Mitspielern. Der Gastgeber kann die Partie starten, sobald alle vier Plätze belegt sind.",
-                  "Share the room code with three other players. The host can start once all four seats are filled.",
-                )}
-              </p>
             </div>
-
-            <div className="flex items-center gap-3 max-md:w-full max-md:gap-2 max-md:overflow-x-auto max-md:pb-1">
-
+            <div>
+              <WattenFullscreenButton />
               <Link
                 to="/games/watten/multiplayer"
-                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-black text-zinc-300 transition hover:bg-white/10 hover:text-white"
+                className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium transition hover:bg-white/20"
               >
                 {t("Leave")}
               </Link>
             </div>
           </header>
-
-          <div className="grid gap-3 lg:grid-cols-[300px_minmax(0,1fr)] lg:gap-5">
+          <div className="watten-game-grid watten-wait-grid">
             {/* PLAYERS */}
-            <aside className="rounded-[30px] border border-white/10 bg-zinc-950/75 p-5 shadow-xl shadow-black/20">
+            <aside className="watten-wait-seats rounded-[24px] border border-white/10 bg-zinc-950/75 p-4 shadow-xl shadow-black/20">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-300">
@@ -1307,7 +1330,7 @@ export default function WattenMultiplayerGame() {
                 />
               </div>
 
-              <div className="mt-5 space-y-3">
+              <div className="watten-wait-seatlist">
                 {[0, 1, 2, 3].map((seat) => {
                   const player = players.find(
                     (current) => current.seat === seat,
@@ -1318,7 +1341,7 @@ export default function WattenMultiplayerGame() {
                   return (
                     <div
                       key={seat}
-                      className={`rounded-2xl border p-4 ${
+                      className={`rounded-2xl border p-3 ${
                         player
                           ? teamA
                             ? "border-amber-400/25 bg-amber-400/[0.06]"
@@ -1370,13 +1393,14 @@ export default function WattenMultiplayerGame() {
                             </p>
                           )}
                         </div>
+                        {!player && <InviteFriendButton />}
                       </div>
                     </div>
                   );
                 })}
               </div>
 
-              <div className="mt-5 rounded-2xl border border-white/5 bg-black/20 p-4 text-center">
+              <div className="watten-wait-status rounded-2xl border border-white/5 bg-black/20 p-3 text-center">
                 {players.length < 4 ? (
                   <>
                     <p className="text-xs font-black text-zinc-300">
@@ -1420,11 +1444,11 @@ export default function WattenMultiplayerGame() {
 
             {/* TABLE / COPYABLE ROOM CODE */}
             <section
-              className="watten-table relative min-h-[620px] overflow-hidden rounded-[42px] border border-white/10 shadow-2xl max-md:min-h-[480px] max-md:rounded-[28px]"
+              className="watten-table watten-wait-table rounded-[36px] shadow-2xl"
               style={wattenTableStyle(tableTheme)}
             >
               <div className="absolute inset-0 flex items-center justify-center bg-zinc-950/55 p-4 backdrop-blur-[2px]">
-                <div className="max-h-[90dvh] w-full max-w-lg overflow-y-auto">
+                <div className="watten-wait-panel w-full max-w-lg">
                   <button
                     type="button"
                     onClick={() => void copyRoomCode()}
@@ -1465,7 +1489,7 @@ export default function WattenMultiplayerGame() {
                         : t("Click this box to copy the code")}
                     </p>
                   </button>
-<div className="mt-3 grid gap-2 sm:grid-cols-2" aria-label="Room seats">{Array.from({ length: 4 }, (_, seat) => { const player = players.find(item => item.seat === seat); return <div key={seat} className="rounded-xl border border-white/10 bg-zinc-950/90 p-3"><p className="text-xs text-zinc-500">{l("Sitz", "Seat")} {seat + 1}</p><strong className="text-sm">{player?.display_name ?? l("Freier Platz", "Open seat")}</strong>{!player && <InviteFriendButton />}</div>; })}</div>
+
 
 
                   {isHost && (
@@ -1559,10 +1583,9 @@ export default function WattenMultiplayerGame() {
             </section>
           </div>
         </div>
-      </main>
+      </WattenScreen>
     );
   }
-
   /*
    * A room can switch to "playing" a fraction before the game row is
    * received through Realtime. Keep a short loading state instead of
@@ -1630,6 +1653,15 @@ export default function WattenMultiplayerGame() {
     game.pending_bid_team !== null &&
     game.pending_bid_team !== myTeam;
 
+  // One vote to stay is enough; giving up (gehen) needs both players of the answering team.
+  const gehenSeats = Object.entries(game.bid_votes ?? {})
+    .filter(([, vote]) => vote === "gehen")
+    .map(([seat]) => Number(seat));
+  const gehenNames = gehenSeats.map(
+    (seat) => players.find((player) => player.seat === seat)?.display_name ?? "",
+  );
+  const iVotedGehen = gehenSeats.includes(mySeat);
+
   function teamName(team: WattenTeam) {
     const teamPlayers = team === "team-a" ? teamAPlayers : teamBPlayers;
 
@@ -1668,9 +1700,6 @@ export default function WattenMultiplayerGame() {
   const teamBTricks =
     (game.tricks_won?.["1"] ?? 0) + (game.tricks_won?.["3"] ?? 0);
 
-  function tricksForTeam(team: WattenTeam) {
-    return team === "team-a" ? teamATricks : teamBTricks;
-  }
   function playedCardPosition(seat: number) {
     const relativeSeat = (seat - resolvedMySeat + 4) % 4;
     switch (relativeSeat) {
@@ -1873,7 +1902,7 @@ export default function WattenMultiplayerGame() {
   }
 
   return (
-    <main className="watten-game-screen min-h-screen bg-transparent px-4 py-6 text-white md:px-8">
+    <WattenScreen>
       {actionError && (
         <div className="fixed left-1/2 top-5 z-[250] -translate-x-1/2 rounded-xl border border-red-400/30 bg-red-950/95 px-5 py-3 text-sm font-bold text-red-200 shadow-2xl">
           {actionError}
@@ -1996,10 +2025,10 @@ export default function WattenMultiplayerGame() {
               <p className="mt-1 text-sm text-zinc-500">{t("Points")}</p>
 
               <div className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-zinc-300">
-                {l("Aktueller Rundenwert", "Current round value")}:{" "}
+                {g("Current round value")}:{" "}
                 <strong className="text-amber-300">{game.round_value}</strong>
                 <br />
-                {l("Neuer Wert bei Halten", "New value if held")}:{" "}
+                {g("New value if you stay")}:{" "}
                 <strong className="text-emerald-300">
                   {game.pending_bid_value}
                 </strong>
@@ -2011,6 +2040,12 @@ export default function WattenMultiplayerGame() {
                     {l("Dein Team muss entscheiden.", "Your team must decide.")}
                   </p>
 
+                  {iVotedGehen && (
+                    <p className="mt-2 text-sm font-bold text-red-200">
+                      {g("You want to give up (gehen). Your partner can still stay.")}
+                    </p>
+                  )}
+
                   <button
                     type="button"
                     disabled={bidAction !== null}
@@ -2019,28 +2054,28 @@ export default function WattenMultiplayerGame() {
                     }}
                     className="mt-5 w-full rounded-xl bg-emerald-500 px-5 py-3 font-black text-emerald-950 transition hover:bg-emerald-400 disabled:opacity-40"
                   >
-                    {game.pending_bid_value} halten
+                    {g("Stay at {value}", { value: game.pending_bid_value })}
                   </button>
 
                   <button
                     type="button"
-                    disabled={bidAction !== null}
+                    disabled={bidAction !== null || iVotedGehen}
                     onClick={() => {
                       void respondToBid(false);
                     }}
-                    className="mt-3 w-full rounded-xl bg-red-500/20 px-5 py-3 font-bold text-red-200 transition hover:bg-red-500/30 disabled:opacity-40"
+                    className="mt-3 w-full rounded-xl bg-red-500/20 px-5 py-3 font-bold text-red-200 transition hover:bg-red-500/30 disabled:cursor-not-allowed disabled:opacity-40"
                   >
-                    {l("Nicht halten", "Decline")}
+                    {g("Gehen (give up)")}
                   </button>
 
-                  <p className="mt-4 text-xs leading-5 text-zinc-500">
-                    {l("Bei „Nicht halten“ erhält", "If declined,")}{" "}
-                    {teamName(game.pending_bid_team)}{" "}
-                    {l(
-                      "den bisherigen Rundenwert von",
-                      "receives the current round value of",
-                    )}{" "}
-                    {game.round_value} {t("Points")}.
+                  <GehenVotes names={gehenNames} needed={2} />
+                  <GehenRule />
+
+                  <p className="mt-3 text-xs leading-5 text-zinc-500">
+                    {g("If the answering side gives up (gehen), {name} wins the round at the current value of {value} points.", {
+                      name: teamName(game.pending_bid_team),
+                      value: game.round_value,
+                    })}
                   </p>
                 </>
               ) : (
@@ -2052,56 +2087,42 @@ export default function WattenMultiplayerGame() {
                     )}
                   </p>
 
+                  <GehenVotes names={gehenNames} needed={2} />
+
                   <div className="mx-auto mt-4 h-6 w-6 animate-spin rounded-full border-2 border-white/20 border-t-amber-400" />
                 </>
               )}
             </div>
           </div>
         )}
-      <div className="watten-game-content mx-auto w-full max-w-[1800px] max-md:px-2">
+      <div className="watten-game-content">
         {/* HEADER */}
-
-        <div className="relative z-30 mb-3 flex items-start justify-between gap-2 max-md:flex-col md:mb-4 md:items-center">
-          <div className="ml-5 pl-5 max-md:ml-0 max-md:pl-0">
-            <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
+        <div className="watten-game-header">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-amber-400">
               {t("Bavarian Watten")}
             </p>
-
-            <h1 className="mt-1 text-2xl font-black">
+            <h1 className="font-black">
               {l("4 Spieler · Multiplayer", "4 Players · Multiplayer")}
+              <span className="ml-3 text-xs font-medium text-zinc-400">{t("Room code")}: {room.code}</span>
             </h1>
-
-            <p className="mt-1 text-xs text-zinc-400">
-              {t("Room code")}: {room.code}
-            </p>
           </div>
-
-          <div className="flex items-center gap-3 max-md:w-full max-md:gap-2 max-md:overflow-x-auto max-md:pb-1">
-
+          <div>
             <button
               type="button"
               onClick={() => setHelpMode((current) => !current)}
-              className={`
-        rounded-lg
-        px-4
-        py-2
-        text-sm
-        font-semibold
-        transition
-        ${
-          helpMode
-            ? "bg-amber-400 text-amber-950 hover:bg-amber-300"
-            : "bg-white/10 text-white hover:bg-white/20"
-        }
-      `}
+              className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
+                helpMode
+                  ? "bg-amber-400 text-amber-950 hover:bg-amber-300"
+                  : "bg-white/10 text-white hover:bg-white/20"
+              }`}
             >
               {helpMode
                 ? l("💡 Hilfe an", "💡 Help On")
                 : l("💡 Hilfe", "💡 Help")}
             </button>
-
             <HeaderTools><CardThemeSelector /><TableThemeSelector /></HeaderTools>
-
+            <WattenFullscreenButton />
             <Link
               to="/games/watten/multiplayer"
               className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium transition hover:bg-white/20"
@@ -2114,24 +2135,14 @@ export default function WattenMultiplayerGame() {
         <WattenTurnNotice player={me?.display_name ?? l("Du", "You")} active={game.phase === "playing" && isMyTurn && mustPlayTrumpfOderKritisch} mustFollow={mustPlayTrumpfOderKritisch} />
         {/* TABLE + SIDEBARS */}
 
-        <div
-          className="watten-game-grid
-    grid
-    w-full
-    grid-cols-[16rem_minmax(0,1fr)_16rem]
-    items-start
-    gap-5
-    max-md:grid-cols-1
-    max-md:gap-3
-  "
-        >
+        <div className="watten-game-grid watten-cols">
           {/* LEFT SIDEBAR */}
 
-          <aside className="relative w-64 pt-15 max-md:order-2 max-md:w-full max-md:pt-0">
+          <aside className="watten-aside watten-aside--left">
             {/* CARD PRIORITY */}
 
             {game.farbe && game.schlag && (
-              <div className="absolute left-0 top-5 z-50 w-full">
+              <div className="watten-rank-help">
                 <button
                   type="button"
                   onClick={() => setShowRankingHelp((current) => !current)}
@@ -2162,30 +2173,7 @@ export default function WattenMultiplayerGame() {
                 </button>
 
                 {showRankingHelp && (
-                  <div
-                    className="
-                absolute
-                left-0
-                top-full
-                mt-2
-                h-[720px]
-                w-full
-                overflow-y-auto
-                max-md:fixed
-                max-md:inset-x-2
-                max-md:top-20
-                max-md:z-[200]
-                max-md:h-[70vh]
-                max-md:w-auto
-                rounded-3xl
-                border
-                border-white/10
-                bg-zinc-950/95
-                p-4
-                shadow-2xl
-                backdrop-blur
-              "
-                  >
+                  <div className="watten-rank-popup rounded-3xl border border-white/10 bg-zinc-950/95 p-4 shadow-2xl backdrop-blur">
                     <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
                       {l("Anfängerhilfe", "Beginner help")}
                     </p>
@@ -2243,7 +2231,7 @@ export default function WattenMultiplayerGame() {
 
             {/* SCORE */}
 
-            <div className="h-[720px] rounded-3xl border border-white/10 bg-zinc-950/95 p-5 shadow-2xl max-md:h-auto max-md:p-3">
+            <div className="watten-aside-card watten-score rounded-3xl border border-white/10 bg-zinc-950/95 p-5 shadow-2xl">
               <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
                 {l("Punktestand", "Score")}
               </p>
@@ -2316,9 +2304,9 @@ export default function WattenMultiplayerGame() {
             </div>
           </aside>
           {/* CENTER COLUMN */}
-          <div className="min-w-0">
+          <div className="watten-center-col">
             {game.phase === "playing" && (
-              <div className="mb-3 flex justify-center">
+              <div className="watten-info-bar flex justify-center">
                 <div
                   className="
         flex
@@ -2374,17 +2362,7 @@ export default function WattenMultiplayerGame() {
             {/* TABLE */}
 
             <div
-              className="watten-table
-    relative
-    min-h-[720px]
-    min-w-0
-    overflow-visible
-    rounded-[60px]
-    shadow-2xl
-    max-md:order-1
-    max-md:min-h-[540px]
-    max-md:rounded-[32px]
-  "
+              className="watten-table watten-table-grid rounded-[40px] shadow-2xl"
               style={wattenTableStyle(tableTheme)}
             >
               <div
@@ -2427,14 +2405,10 @@ export default function WattenMultiplayerGame() {
                 abheber={game.abheben_player}
                 current={game.current_player}
                 team={getTeamForSeat(topSeat)}
-                teamTricks={tricksForTeam(getTeamForSeat(topSeat))}
-                className="
-    absolute
-    left-1/2
-    top-7
-    -translate-x-1/2
-    max-md:top-2
-  "
+                tricks={resolvedGame.tricks_won?.[String(topSeat)] ?? 0}
+                last={lastTrick.last?.winnerSeat === topSeat ? lastTrick.last : null}
+                onViewLast={() => lastTrick.setOpen(true)}
+                className="watten-seat watten-seat--top z-20"
                 cardCount={waitingForDeal ? 0 : cardCountForSeat(topSeat)}
               />
 
@@ -2452,14 +2426,10 @@ export default function WattenMultiplayerGame() {
                 abheber={game.abheben_player}
                 current={game.current_player}
                 team={getTeamForSeat(leftSeat)}
-                teamTricks={tricksForTeam(getTeamForSeat(leftSeat))}
-                className="
-    absolute
-    left-7
-    top-1/2
-    -translate-y-1/2
-    max-md:left-1
-  "
+                tricks={resolvedGame.tricks_won?.[String(leftSeat)] ?? 0}
+                last={lastTrick.last?.winnerSeat === leftSeat ? lastTrick.last : null}
+                onViewLast={() => lastTrick.setOpen(true)}
+                className="watten-seat watten-seat--left z-20"
                 cardCount={waitingForDeal ? 0 : cardCountForSeat(leftSeat)}
               />
 
@@ -2478,14 +2448,10 @@ export default function WattenMultiplayerGame() {
                 abheber={game.abheben_player}
                 current={game.current_player}
                 team={getTeamForSeat(rightSeat)}
-                teamTricks={tricksForTeam(getTeamForSeat(rightSeat))}
-                className="
-    absolute
-    right-7
-    top-1/2
-    -translate-y-1/2
-    max-md:right-1
-  "
+                tricks={resolvedGame.tricks_won?.[String(rightSeat)] ?? 0}
+                last={lastTrick.last?.winnerSeat === rightSeat ? lastTrick.last : null}
+                onViewLast={() => lastTrick.setOpen(true)}
+                className="watten-seat watten-seat--right z-20"
                 cardCount={waitingForDeal ? 0 : cardCountForSeat(rightSeat)}
               />
 
@@ -2495,9 +2461,9 @@ export default function WattenMultiplayerGame() {
                 className={
                   game.phase === "playing" && !waitingForDeal
                     ? `
+          watten-table-center
+          watten-play-area
           pointer-events-none
-          absolute
-          inset-0
           z-20
         `
                     : `
@@ -2799,17 +2765,7 @@ export default function WattenMultiplayerGame() {
                   <>
                     {/* PLAYED CARDS */}
 
-                    <div
-                      className="
-        absolute
-        left-1/2
-        top-1/2
-        h-[300px]
-        w-[420px]
-        -translate-x-1/2
-        -translate-y-1/2
-      "
-                    >
+                    <div className="watten-cross">
                       {game.played_cards.length === 0 ? (
                         <div
                           className="
@@ -2867,7 +2823,6 @@ export default function WattenMultiplayerGame() {
                               <div
                                 className="
                     pointer-events-none
-                    scale-[0.78]
                     drop-shadow-2xl
                   "
                               >
@@ -2900,15 +2855,7 @@ export default function WattenMultiplayerGame() {
 
                     {/* CURRENT TURN */}
 
-                    <div
-                      className="
-        absolute
-        bottom-[155px]
-        left-1/2
-        z-30
-        -translate-x-1/2
-      "
-                    >
+                    <div className="watten-turn-pill">
                       {isMyTurn ? (
                         <div
                           className="
@@ -2954,6 +2901,12 @@ export default function WattenMultiplayerGame() {
                   <p>{game.phase}</p>
                 )}
               </div>
+              <WattenLastTrickViewer
+                trick={lastTrick.last}
+                open={lastTrick.open}
+                onClose={() => lastTrick.setOpen(false)}
+                nameOf={(seat) => players.find((player) => player.seat === seat)?.display_name ?? ""}
+              />
               {game.phase === "trickReview" &&
                 game.trick_winner_seat !== null && (
                   <div className="fixed inset-0 z-[160] flex items-center justify-center bg-black/70 px-6 backdrop-blur-sm">
@@ -3208,49 +3161,15 @@ export default function WattenMultiplayerGame() {
               )}
 
               {/* ME / BOTTOM */}
-
-              <div className="absolute bottom-5 left-1/2 -translate-x-1/2 text-center max-md:bottom-2 max-md:w-full max-md:px-1">
-                <div
-                  className={`
-                relative
-                inline-block
-                rounded-2xl
-                border
-                px-5
-                py-3
-                max-md:px-3
-                max-md:py-2
-                ${
-                  isMyTurn
-                    ? "border-emerald-400 bg-emerald-400/15"
-                    : "border-white/10 bg-black/40"
-                }
-              `}
-                >
+              <div className="watten-table-hand watten-me text-center">
+                <div className="watten-hand-head">
                   {isMyTurn && game.phase === "playing" && (
-                    <div
-                      className="
-        absolute
-        -top-4
-        left-1/2
-        z-50
-        -translate-x-1/2
-        whitespace-nowrap
-        rounded-full
-        bg-amber-400
-        px-4
-        py-1
-        text-xs
-        font-black
-        text-amber-950
-        shadow-xl
-      "
-                    >
+                    <div className="watten-turn-label">
                       ▼ {l("DU BIST AM ZUG", "YOUR TURN")}
                     </div>
                   )}
-                  <div className="flex items-center justify-center gap-3">
-                    <div className="h-12 w-12 shrink-0 overflow-hidden rounded-2xl border border-white/10">
+                  <div className="flex items-center gap-2">
+                    <div className="h-9 w-9 shrink-0 overflow-hidden rounded-xl border border-white/10">
                       <ProfileAvatar
                         avatarId={
                           me ? (playerAvatarIds[me.user_id] ?? "m1") : "m1"
@@ -3258,46 +3177,28 @@ export default function WattenMultiplayerGame() {
                         className="h-full w-full"
                       />
                     </div>
-
                     <p className="font-black">{me?.display_name}</p>
-                  </div>
-                  <div className="mt-2 flex items-center justify-center gap-3">
                     <span
-                      className={`
-      rounded-full
-      px-3
-      py-1
-      text-[9px]
-      font-black
-      uppercase
-      tracking-widest
-
-      ${
-        myTeam === "team-a"
-          ? "bg-amber-400/15 text-amber-300"
-          : "bg-emerald-400/15 text-emerald-300"
-      }
-    `}
+                      className={`rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-widest ${
+                        myTeam === "team-a"
+                          ? "bg-amber-400/15 text-amber-300"
+                          : "bg-emerald-400/15 text-emerald-300"
+                      }`}
                     >
                       {myTeam === "team-a" ? "Team A" : "Team B"}
                     </span>
-
-                    <span className="text-[10px] font-bold text-zinc-400">
-                      {tricksForTeam(myTeam)}{" "}
-                      {l(
-                        tricksForTeam(myTeam) === 1 ? "Stich" : "Stiche",
-                        tricksForTeam(myTeam) === 1 ? "trick" : "tricks",
-                      )}
-                    </span>
                   </div>
-
-                  <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-emerald-300">
-                    {l("Du", "You")}
-                  </p>
+                  <WattenTrickPile
+                    count={game.tricks_won?.[String(mySeat)] ?? 0}
+                    name={me?.display_name ?? l("Du", "You")}
+                    last={lastTrick.last?.winnerSeat === mySeat ? lastTrick.last : null}
+                    cardsPerTrick={4}
+                    onView={() => lastTrick.setOpen(true)}
+                  />
                 </div>
                 {/* PRIVATE HAND */}
 
-                <div className="watten-hand mt-4 flex justify-center">
+                <div className="watten-hand flex justify-center">
                   {!waitingForDeal &&
                     hand.map((card, index) => {
                       const legal = cardIsLegal(card);
@@ -3328,11 +3229,6 @@ export default function WattenMultiplayerGame() {
 
     ${index > 0 ? "-ml-3" : ""}
 
-    ${
-      game.phase === "playing" && isMyTurn && !legal
-        ? "opacity-40 ring-2 ring-red-500"
-        : ""
-    }
 
     ${helpMode && comparison === true ? "ring-2 ring-green-500" : ""}
 
@@ -3343,6 +3239,7 @@ export default function WattenMultiplayerGame() {
                         >
                           <WattenCardComponent
                             card={card}
+                            invalid={game.phase === "playing" && isMyTurn && !legal}
                             disabled={!canPlay}
                             hint={
                               helpMode ? getBeginnerCardHint(card) : undefined
@@ -3365,8 +3262,8 @@ export default function WattenMultiplayerGame() {
 
           {/* RIGHT SIDEBAR */}
 
-          <aside className="w-64 pt-10">
-            <div className="h-[720px] overflow-y-auto rounded-3xl border border-white/10 bg-zinc-950/95 p-5 shadow-2xl">
+          <aside className="watten-aside watten-aside--right">
+            <div className="watten-aside-card watten-trickscore rounded-3xl border border-white/10 bg-zinc-950/95 p-5 shadow-2xl">
               <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
                 {l("Aktueller Stichstand", "Current trick score")}
               </p>
@@ -3457,7 +3354,7 @@ export default function WattenMultiplayerGame() {
 
               {/* GEHEN */}
 
-              <div className="mt-5 rounded-xl border border-white/10 bg-white/5 p-3 text-center">
+              <div className="watten-raise mt-5 rounded-xl border border-white/10 bg-white/5 p-3 text-center">
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
                   {l("Gehen · Rundenwert", "Gehen · Round value")}
                 </p>
@@ -3520,15 +3417,16 @@ export default function WattenMultiplayerGame() {
                   </div>
                 )}
 
-                <p className="mt-3 border-t border-white/10 pt-3 text-[10px] leading-4 text-zinc-600">
+                <GehenRule className="watten-gehen-aside" />
+                <p className="watten-fineprint mt-3 border-t border-white/10 pt-3 text-[10px] leading-4 text-zinc-600">
                   {l(
-                    "Standard: 2 Punkte. Gehen erhöht auf 3, danach maximal 4. Die Gegenseite hält oder lehnt ab.",
-                    "Standard: 2 points. Gehen raises to 3, then at most 4. The opposing team holds or declines.",
+                    "Standard: 2 Punkte. Gehen erhöht auf 3, danach maximal 4. Die Gegenseite bleibt (halten) oder gibt auf (gehen).",
+                    "Standard: 2 points. Gehen raises to 3, then at most 4. The opposing team stays or gives up (gehen).",
                   )}
                 </p>
 
                 {targetScore < 5 && (
-                  <p className="mt-2 text-[10px] leading-4 text-sky-300/80">
+                  <p className="watten-fineprint mt-2 text-[10px] leading-4 text-sky-300/80">
                     {l(
                       "Bei kurzen Spielen bis 4 Punkte ist die Gespannt-Sperre deaktiviert, damit Gehen weiterhin möglich bleibt.",
                       "For short matches up to 4 points, the Gespannt restriction is disabled so Gehen remains usable.",
@@ -3540,10 +3438,9 @@ export default function WattenMultiplayerGame() {
           </aside>
         </div>
       </div>
-    </main>
+    </WattenScreen>
   );
 }
-
 function PlayerBox({
   l,
   player,
@@ -3555,28 +3452,23 @@ function PlayerBox({
   className,
   cardCount,
   team,
-  teamTricks,
+  tricks,
+  last,
+  onViewLast,
 }: {
   l: (de: string, en: string) => string;
-
   player: RoomPlayer | undefined;
-
   avatarId: string;
-
   seat: number;
-
   dealer: number;
-
   abheber: number;
-
   current: number;
-
   className?: string;
-
   cardCount: number;
-
   team: WattenTeam;
-  teamTricks: number;
+  tricks: number;
+  last: WattenTrickRecord | null;
+  onViewLast: () => void;
 }) {
   if (!player) {
     return null;
@@ -3585,32 +3477,19 @@ function PlayerBox({
   return (
     <div
       className={`
-      w-48
-      max-w-48
-      shrink-0
       rounded-2xl
       border
-      px-5
-      py-4
-      max-md:w-28
-      max-md:max-w-28
-      max-md:rounded-xl
-      max-md:px-2
-      max-md:py-2
       text-center
       shadow-xl
       backdrop-blur-md
       transition-all
       duration-300
-
       ${
         team === "team-a"
           ? "border-amber-400/30 bg-zinc-950/85"
           : "border-emerald-400/30 bg-zinc-950/85"
       }
-
-      ${seat === current ? "scale-105 ring-2 ring-white/70 shadow-2xl" : ""}
-
+      ${seat === current ? "ring-2 ring-white/70 shadow-2xl" : ""}
       ${className ?? ""}
     `}
     >
@@ -3625,7 +3504,7 @@ function PlayerBox({
           rounded-full
           bg-white
           px-3
-          py-1
+          py-0.5
           text-[9px]
           font-black
           uppercase
@@ -3638,69 +3517,49 @@ function PlayerBox({
         </div>
       )}
 
-      <div className="mx-auto h-14 w-14 overflow-hidden rounded-2xl border border-white/10 shadow-lg max-md:h-9 max-md:w-9 max-md:rounded-xl">
-        <ProfileAvatar avatarId={avatarId} className="h-full w-full" />
+      <div className="flex items-center justify-center gap-2">
+        <div className="h-8 w-8 shrink-0 overflow-hidden rounded-xl border border-white/10 shadow-lg">
+          <ProfileAvatar avatarId={avatarId} className="h-full w-full" />
+        </div>
+        <p className="min-w-0 truncate text-sm font-black text-white">
+          {player.display_name}
+        </p>
       </div>
 
-      <p className="mt-2 text-base font-black text-white max-md:mt-1 max-md:truncate max-md:text-xs">
-        {player.display_name}
-      </p>
-
-      <div className="mt-2 flex items-center justify-center gap-2 max-md:mt-1 max-md:flex-col max-md:gap-1">
+      <div className="watten-seat-tags mt-1 flex flex-wrap items-center justify-center gap-1 text-[9px] font-black uppercase tracking-wider">
         <span
-          className={`
-          rounded-full
-          px-2.5
-          py-1
-          text-[9px]
-          font-black
-          uppercase
-          tracking-wider
-
-          ${
+          className={`watten-team-tag rounded-full px-2 py-0.5 ${
             team === "team-a"
               ? "bg-amber-400/15 text-amber-300"
               : "bg-emerald-400/15 text-emerald-300"
-          }
-        `}
+          }`}
         >
           {team === "team-a" ? "Team A" : "Team B"}
         </span>
-
-        <span className="text-[10px] font-bold text-zinc-400">
-          {teamTricks}{" "}
-          {l(
-            teamTricks === 1 ? "Stich" : "Stiche",
-            teamTricks === 1 ? "trick" : "tricks",
-          )}
-        </span>
-      </div>
-
-      <div className="mt-2 flex justify-center gap-2 text-[9px] font-bold uppercase tracking-wider">
         {seat === dealer && (
-          <span className="rounded-full bg-amber-400 px-2 py-1 text-amber-950">
+          <span className="rounded-full bg-amber-400 px-2 py-0.5 text-amber-950">
             {l("Geber", "Dealer")}
           </span>
         )}
-
         {seat === abheber && (
-          <span className="rounded-full bg-emerald-400 px-2 py-1 text-emerald-950">
+          <span className="rounded-full bg-emerald-400 px-2 py-0.5 text-emerald-950">
             {l("Abheber", "Cutter")}
           </span>
         )}
       </div>
 
-      <div className="mt-4 flex justify-center">
-        {Array.from({
-          length: cardCount,
-        }).map((_, index) => (
-          <div
-            key={index}
-            onMouseEnter={playHoverSound}
-            className={`
+      <div className="watten-seat-extra">
+        <div className="flex justify-center">
+          {Array.from({
+            length: cardCount,
+          }).map((_, index) => (
+            <div
+              key={index}
+              onMouseEnter={playHoverSound}
+              className={`
     relative
-    h-12
-    w-8
+    h-10
+    w-7
     rounded-md
     border
     border-amber-100/20
@@ -3709,24 +3568,28 @@ function PlayerBox({
     transition-all
     duration-200
     ease-out
-
     hover:z-30
     hover:-translate-y-2
-    hover:scale-110
     hover:border-amber-300/50
-    hover:shadow-xl
-
     ${index > 0 ? "-ml-3" : ""}
   `}
-            style={{
-              zIndex: index,
-            }}
-          >
-            <div className="absolute inset-[2px] rounded-[4px] border border-emerald-300/25 bg-emerald-950">
-              <div className="absolute inset-1 rounded-[2px] border border-amber-300/15" />
+              style={{
+                zIndex: index,
+              }}
+            >
+              <div className="absolute inset-[2px] rounded-[4px] border border-emerald-300/25 bg-emerald-950">
+                <div className="absolute inset-1 rounded-[2px] border border-amber-300/15" />
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
+        <WattenTrickPile
+          count={tricks}
+          name={player.display_name}
+          last={last}
+          cardsPerTrick={4}
+          onView={onViewLast}
+        />
       </div>
     </div>
   );

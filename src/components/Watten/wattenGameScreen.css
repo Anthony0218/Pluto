@@ -1,38 +1,65 @@
+/*
+ * Watten game pages never scroll. WattenScreen sizes `.watten-game-content` to the
+ * free space under the header and zooms it out when the screen is smaller than the
+ * layout's minimum; `data-wt-mode` ("desktop" | "mobile") picks the table layout.
+ */
+.app-viewport:has(.watten-game-screen) { overflow: hidden; }
 body:has(.watten-game-screen) { overflow: hidden; }
 
 .watten-game-screen {
   box-sizing: border-box;
-  height: max(var(--app-height), 780px);
+  position: relative;
+  height: var(--app-height);
   min-height: 0 !important;
+  padding: 0 !important;
   overflow: hidden;
 }
 
 .watten-game-content {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  gap: 8px;
   min-height: 0;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 10px 20px 14px !important;
+  overflow: hidden;
 }
+.watten-game-content > * { flex-shrink: 0; margin-top: 0 !important; margin-bottom: 0 !important; }
+.watten-game-content > .watten-game-grid { flex: 1 1 0; min-height: 0; }
 
-.watten-game-grid {
-  flex: 1;
-  min-height: 0;
-  align-items: stretch;
+/* Full screen: hide the app header so the table gets its height as well. */
+html.watten-immersive .app-shell { --public-header-height: 0px !important; }
+html.watten-immersive .app-shell > header { display: none !important; }
+
+.watten-fullscreen-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  min-height: 36px;
+  padding: .4rem .75rem;
+  border-radius: .5rem;
+  background: #ffffff1a;
+  color: #fff;
+  font-size: .875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background-color .15s;
 }
+.watten-fullscreen-button:hover { background: #ffffff33; }
+.watten-fullscreen-button[aria-pressed="true"] { background: #fbbf24; color: #451a03; }
+.watten-fullscreen-button:focus-visible { outline: 2px solid #fde68a; outline-offset: 2px; }
 
-.watten-game-grid > aside {
-  min-height: 0;
-  max-height: 100%;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-  padding-top: 0;
-}
+/* Header rows keep one line; long titles shorten instead of pushing the table down. */
+.watten-game-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; }
+.watten-game-header h1 { margin: 0; font-size: 1.35rem; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.watten-game-header > div:first-child { min-width: 0; }
+.watten-game-header > div:last-child { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.watten-game-header button, .watten-game-header a { min-height: 36px; }
 
-.watten-game-grid > aside > div { max-height: 100%; }
-.watten-game-grid > :not(aside) { height: 100% !important; min-height: 0 !important; }
-
-/* Theme colors are independent of the table's aspect ratio. */
+/* ----- Table skin ----- */
 .watten-table {
   position: relative;
   isolation: isolate;
@@ -59,103 +86,443 @@ body:has(.watten-game-screen) { overflow: hidden; }
   pointer-events: none;
 }
 
+.watten-table-preview { border-width: 3px; border-radius: 7px; box-shadow: inset 0 0 0 1px var(--watten-rim), inset 0 0 12px #0004; }
+.watten-table-preview::before { inset: 3px; border-radius: 3px; }
+
+/* ----- Turn notice ----- */
 .watten-turn-notice {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  gap: .3rem .75rem;
-  margin-bottom: .75rem;
-  padding: .7rem 1rem;
+  gap: .15rem .6rem;
+  padding: .4rem .9rem;
   border: 1px solid #fbbf2455;
-  border-radius: 14px;
+  border-radius: 12px;
   background: #392c18;
   color: #fde8b3;
-  font-size: .8rem;
+  font-size: .75rem;
+  line-height: 1.25;
   text-align: center;
   overflow-wrap: anywhere;
 }
 .watten-turn-notice.is-required { border-color: #fb718566; background: #3c2027; color: #ffe4e6; }
 .watten-turn-notice strong { font-weight: 900; }
 
-.watten-single-table { min-height: 640px; overflow: hidden; }
-.watten-single-status { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); display: flex; flex-wrap: wrap; justify-content: center; gap: .25rem 1rem; width: max-content; max-width: calc(100% - 32px); padding: .6rem 1rem; border: 1px solid #ffffff20; border-radius: 14px; background: #071a20b3; text-align: center; font-size: .75rem; }
+/* ----- Tricks taken: one group of cards per trick, the latest face-up and highlighted ----- */
+.wt-pile { display: inline-flex; align-items: center; gap: 6px; padding: 3px 6px; border: 1px solid #ffffff1f; border-radius: 10px; background: #0000004d; color: #fff; font: inherit; }
+.wt-pile-group { display: inline-flex; align-items: center; flex-shrink: 0; padding: 2px 3px; border: 1px solid transparent; border-radius: 7px; background: none; color: inherit; font: inherit; }
+.wt-pile-group + .wt-pile-group { margin-left: 3px; }
+.wt-pile-group.is-old { cursor: not-allowed; }
+.wt-pile-group.is-last { border-color: #fcd34d; background: #fcd34d1f; box-shadow: 0 0 10px #fcd34d66; }
+.wt-pile-group.is-last { position: relative; }
+.wt-pile-tag { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); z-index: 1; padding: 1px 5px; border-radius: 999px; background: #fcd34d; color: #3b2a00; font-size: .5rem; font-weight: 900; letter-spacing: .05em; line-height: 1.15; text-transform: uppercase; white-space: nowrap; pointer-events: none; box-shadow: 0 1px 3px #0006; }
+.watten-game-screen[data-wt-mode="desktop"] .wt-pile-tag { font-size: .58rem; top: -11px; }
+.wt-pile-group.is-viewable { cursor: pointer; transition: background-color .15s, box-shadow .15s, transform .15s; }
+.wt-pile-group.is-viewable:hover { background: #fcd34d33; box-shadow: 0 0 14px #fcd34d99; transform: translateY(-1px); }
+.wt-pile-group.is-viewable:focus-visible { outline: 2px solid #fde68a; outline-offset: 2px; }
+.wt-pile-stack { display: flex; align-items: center; flex-shrink: 0; height: 44px; min-width: 24px; }
+.wt-pile-card { display: block; flex-shrink: 0; width: 22px; height: 33px; border: 1px solid #91afa2; border-radius: 4px; background: repeating-linear-gradient(45deg, #294e47 0 3px, #1a3934 3px 6px); box-shadow: 0 2px 4px #0006; object-fit: fill; }
+.wt-pile-group > .wt-pile-card + .wt-pile-card { margin-left: -18px; }
+.wt-pile-group.is-last > .wt-pile-card + .wt-pile-card { margin-left: -15px; }
+.wt-pile-card.is-face-up { width: 24px; height: 36px; border-color: #ffffff59; border-radius: 3px; background: #fff; }
+.wt-pile-card.is-face-up.is-winner { border-color: #fcd34d; transform: translateY(-2px); }
+.wt-pile-empty { display: block; width: 22px; height: 33px; border: 1px dashed #ffffff40; border-radius: 4px; }
+.wt-pile-count { display: grid; justify-items: start; line-height: 1; }
+.wt-pile-count b { font-size: 1rem; font-weight: 900; color: #fde68a; }
+.wt-pile-count small { margin-top: 2px; font-size: .55rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #bdcfca; }
+
+.wt-trick-viewer { position: absolute; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; padding: 12px; border-radius: inherit; background: #000000a6; backdrop-filter: blur(2px); }
+.wt-trick-viewer-panel { position: relative; max-width: 100%; padding: 14px 18px 12px; border: 1px solid #fcd34d55; border-radius: 18px; background: #0a191ef5; text-align: center; box-shadow: 0 12px 45px #0009; }
+.wt-trick-viewer-close { position: absolute; top: 8px; right: 8px; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: #ffffff1a; color: #fff; }
+.wt-trick-viewer-close:hover { background: #ffffff33; }
+.wt-trick-viewer-title { font-size: .65rem; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: #fcd34d; }
+.wt-trick-viewer-winner { margin-top: 2px; font-size: .8rem; color: #d5e5df; }
+.wt-trick-viewer-winner strong { color: #fff; }
+.wt-trick-viewer-cards { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
+.wt-trick-viewer-cards figure { display: grid; justify-items: center; gap: 4px; margin: 0; padding: 6px; border: 1px solid transparent; border-radius: 12px; }
+.wt-trick-viewer-cards figure.is-winner { border-color: #fcd34d99; background: #fcd34d14; }
+.wt-trick-viewer-cards img { width: 72px; height: 110px; object-fit: fill; filter: drop-shadow(0 4px 8px #0008); }
+.wt-trick-viewer-cards figcaption { max-width: 76px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .65rem; color: #d5e5df; }
+.wt-trick-viewer-note { margin-top: 8px; font-size: .6rem; color: #8ba59c; }
+
+/* ----- Singleplayer table: a grid, so seats, trick and hand never overlap ----- */
+.watten-single-table {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  grid-template-areas: "status status status" "top top top" "left trick right" "hand hand hand";
+  gap: 8px 10px;
+  height: 100%;
+  min-height: 0;
+  padding: 12px 14px 12px;
+  overflow: hidden;
+}
+.watten-single-status { grid-area: status; justify-self: center; display: flex; flex-wrap: wrap; justify-content: center; gap: .15rem 1rem; max-width: 100%; padding: .4rem 1rem; border: 1px solid #ffffff20; border-radius: 12px; background: #071a20b3; text-align: center; font-size: .75rem; }
 .watten-single-status strong { color: #fde3a7; }
-.watten-single-seat { position: absolute; top: 24%; display: grid; justify-items: center; gap: 5px; width: 140px; padding: 10px; border: 1px solid #ffffff20; border-radius: 16px; background: #071a2099; text-align: center; }
-.watten-single-seat.is-left { left: 20px; }
-.watten-single-seat.is-right { right: 20px; }
-.watten-single-seat.is-top { top: 90px; left: 50%; transform: translateX(-50%); }
+.watten-single-seat { display: grid; justify-items: center; align-content: start; gap: 4px; width: 192px; padding: 8px 10px; border: 1px solid #ffffff20; border-radius: 16px; background: #071a2099; text-align: center; }
+.watten-single-seat.is-left { grid-area: left; align-self: center; }
+.watten-single-seat.is-right { grid-area: right; align-self: center; }
+.watten-single-seat.is-top { grid-area: top; justify-self: center; width: auto; min-width: 190px; }
 .watten-single-seat.is-active { border-color: #fcd34d99; box-shadow: 0 0 20px #fcd34d15; }
 .watten-single-seat strong { font-size: .8rem; }
-.watten-single-seat span { color: #bdcfca; font-size: .65rem; }
+.watten-single-seat > span { color: #bdcfca; font-size: .65rem; }
+.watten-single-seat-cards { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 8px; }
 .watten-single-card-backs { display: flex; justify-content: center; padding: 3px 0; }
 .watten-single-card-backs i { width: 25px; height: 37px; border: 1px solid #91afa2; border-radius: 4px; background: repeating-linear-gradient(45deg, #294e47 0 3px, #1a3934 3px 6px); box-shadow: 0 2px 5px #0005; }
 .watten-single-card-backs i + i { margin-left: -12px; }
-.watten-single-trick { position: absolute; top: 52%; left: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; gap: 10px; width: min(440px, calc(100% - 24px)); min-height: 160px; padding: 16px; border: 1px solid #ffffff15; border-radius: 22px; background: #00140c30; }
+.watten-single-trick { grid-area: trick; align-self: stretch; display: flex; align-items: center; justify-content: center; gap: 10px; min-width: 0; padding: 10px; border: 1px solid #ffffff15; border-radius: 22px; background: #00140c30; }
 .watten-single-played { display: grid; justify-items: center; gap: 6px; min-width: 0; }
 .watten-single-played img { width: 72px; height: 110px; }
 .watten-single-played span { color: #d5e5df; font-size: .65rem; }
-.watten-single-hand { position: absolute; bottom: 16px; inset-inline: 16px; padding: 16px 8px 8px; border: 1px solid #ffffff20; border-radius: 20px; background: #071a2080; }
-.watten-single-controls > section { border-color: #ffffff1a; background: #09090bcc; }
-
-@media (max-width: 1279px) {
-  .watten-game-screen { height: auto; min-height: var(--app-height) !important; overflow: visible; }
-  .watten-game-content { height: auto; }
-  .watten-game-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    grid-template-rows: auto auto;
-    gap: 8px;
-  }
-
-  .watten-game-grid > :not(aside) {
-    grid-column: 1 / -1;
-    grid-row: 1;
-    height: max(640px, 85dvh) !important;
-  }
-
-  .watten-game-grid > aside {
-    grid-row: 2;
-    width: 100% !important;
-    max-height: none;
-    overflow: visible;
-  }
-
-  .watten-game-grid > aside:first-of-type { grid-column: 1; }
-  .watten-game-grid > aside:last-of-type { grid-column: 2; }
-  .watten-game-grid > aside > div { height: auto !important; max-height: none; }
-  .watten-table { border-width: 6px; }
-}
-
-@media (max-width: 600px) {
-  .watten-game-grid { grid-template-columns: minmax(0, 1fr) !important; }
-  .watten-game-grid > aside:first-of-type { grid-column: 1; grid-row: 2; }
-  .watten-game-grid > aside:last-of-type { grid-column: 1; grid-row: 3; }
-  .watten-single-grid > aside:first-of-type { grid-row: 3; }
-  .watten-single-grid > aside:last-of-type { grid-row: 2; }
-  .watten-turn-notice { flex-direction: column; padding: .65rem; }
-  .watten-single-seat { top: 25%; width: 110px; padding: 8px; }
-  .watten-single-seat.is-left { left: 12px; }
-  .watten-single-seat.is-right { right: 12px; }
-  .watten-single-seat.is-top { top: 86px; }
-  .watten-single-status { font-size: .65rem; }
-  .watten-single-trick { gap: 7px; padding-inline: 8px; }
-  .watten-single-played img { width: 57px; height: 87px; }
-  .watten-single-hand { inset-inline: 10px; }
-  .watten-single-hand-card img { width: 64px; height: 98px; }
-  .watten-single-hand-card + .watten-single-hand-card { margin-left: -12px; }
-}
-.watten-single-setup { position: absolute; inset: 80px 16px 180px; z-index: 40; display: flex; align-items: center; justify-content: center; }
+.watten-single-hand { grid-area: hand; display: grid; gap: 6px; justify-items: center; padding: 8px 8px 10px; border: 1px solid #ffffff20; border-radius: 20px; background: #071a2080; }
+.watten-single-hand-head { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.watten-single-hand-cards { display: flex; justify-content: center; gap: 8px; }
+.watten-single-hand-card img { width: 78px; height: 120px; }
+.watten-single-setup { position: absolute; inset: 0; z-index: 40; display: flex; align-items: center; justify-content: center; padding: 16px; background: #0006; border-radius: inherit; }
 .watten-single-setup > section { width: min(360px, 100%); margin: 0; background: #0a191ef5; box-shadow: 0 12px 45px #0007; }
+.watten-single-controls { min-height: 0; overflow-y: auto; scrollbar-width: thin; }
+.watten-single-controls > section { border-color: #ffffff1a; background: #09090bcc; }
+.watten-single-score-compact { display: none; }
+
+/* ----- Desktop: scoreboard | table | controls ----- */
+.watten-game-screen[data-wt-mode="desktop"] .watten-single-grid { display: grid; grid-template-columns: 15rem minmax(0, 1fr) 15rem; gap: 14px; align-items: stretch; }
+.watten-game-screen[data-wt-mode="desktop"] .watten-single-grid > aside { min-height: 0; overflow-y: auto; scrollbar-width: thin; }
+.watten-game-screen[data-wt-mode="desktop"] .watten-single-grid > .watten-table { height: 100%; }
+
+/* ----- Mobile: compact score strip, table, action row ----- */
+.watten-game-screen[data-wt-mode="mobile"] .watten-game-content { gap: 6px; padding: 6px 8px 8px !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-game-header h1 { font-size: 1.05rem; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-game-header { flex-wrap: wrap; gap: 4px 8px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-game-header > div:last-child { gap: 5px; flex-wrap: wrap; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-game-header :is(button, a) { min-height: 32px; padding: .25rem .55rem !important; font-size: .75rem !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-fullscreen-button span { display: none; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-fullscreen-button { padding: .25rem .5rem; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-turn-notice { padding: .3rem .5rem; font-size: .65rem; flex-direction: column; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-table { border-width: 5px; border-radius: 22px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-table::before { inset: 8px; border-radius: 14px; }
+
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-grid { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; gap: 6px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-grid > aside:first-of-type { grid-row: 1; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-grid > .watten-table { grid-row: 2; min-height: 0; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-grid > aside:last-of-type { grid-row: 3; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-scoreboard { padding: 6px !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-scoreboard > h2 { display: none; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-scoreboard > div { display: grid; grid-template-columns: repeat(var(--seats, 4), minmax(0, 1fr)); gap: 4px; margin-top: 0 !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-scoreboard > div > div { padding: 4px 6px !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-scoreboard strong { font-size: .65rem; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-scoreboard > div > div > .flex { flex-wrap: nowrap; gap: 2px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-scoreboard strong, .watten-game-screen[data-wt-mode="mobile"] .watten-single-scoreboard b { white-space: nowrap; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-scoreboard b > span { font-size: .55rem; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-trick .text-center > p { margin-bottom: 4px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-trick .text-center img { width: 42px !important; height: 64px !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-scoreboard b { font-size: .95rem; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-scoreboard p { display: none; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-scoreboard .h-1\.5 { margin-top: 3px !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-controls { overflow: visible; display: flex; flex-wrap: wrap; gap: 6px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-controls > section, .watten-game-screen[data-wt-mode="mobile"] .watten-single-controls > button { flex: 1 1 100%; padding: 8px 10px !important; margin: 0 !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-controls > section:first-child { display: none; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-controls > section[aria-label], .watten-game-screen[data-wt-mode="mobile"] .watten-single-cut { display: none; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-controls > section h2 { display: inline; font-size: .8rem; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-controls > section p { display: none; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-controls > section[role="status"] p { display: block; margin-top: 2px; font-size: .7rem; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-controls > section > div, .watten-game-screen[data-wt-mode="mobile"] .watten-single-controls > section > button { margin-top: 6px !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-controls > section .flex.gap-2 > button { padding: .35rem !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-controls > section img { width: 40px !important; height: 60px !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-controls > section > .mt-3.flex.gap-2 { margin-top: 4px !important; }
+
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-table { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "status status" "top top" "left right" "trick trick" "hand hand"; grid-template-rows: auto auto auto minmax(auto, 1fr) auto; gap: 5px; padding: 8px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-table.is-three { grid-template-areas: "status status" "left right" "trick trick" "hand hand"; grid-template-rows: auto auto minmax(auto, 1fr) auto; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-status { font-size: .65rem; padding: .25rem .6rem; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-seat { width: auto; min-width: 0; padding: 5px 6px; gap: 2px; border-radius: 12px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-seat.is-left, .watten-game-screen[data-wt-mode="mobile"] .watten-single-seat.is-right { align-self: stretch; justify-self: stretch; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-seat.is-top { min-width: 0; justify-self: center; width: 70%; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-seat strong { font-size: .7rem; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-seat > span { font-size: .58rem; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-seat-cards { gap: 5px; flex-wrap: nowrap; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-card-backs i { width: 17px; height: 25px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-card-backs i + i { margin-left: -9px; }
+.watten-game-screen[data-wt-mode="mobile"] .wt-pile { padding: 2px 4px; gap: 4px; }
+.watten-game-screen[data-wt-mode="mobile"] .wt-pile-card { width: 15px; height: 23px; }
+.watten-game-screen[data-wt-mode="mobile"] .wt-pile-group > .wt-pile-card + .wt-pile-card { margin-left: -12px; }
+.watten-game-screen[data-wt-mode="mobile"] .wt-pile-group.is-last > .wt-pile-card + .wt-pile-card { margin-left: -8px; }
+.watten-game-screen[data-wt-mode="mobile"] .wt-pile-card.is-face-up { width: 17px; height: 26px; }
+.watten-game-screen[data-wt-mode="mobile"] .wt-pile-empty { width: 15px; height: 23px; }
+.watten-game-screen[data-wt-mode="mobile"] .wt-pile-stack { height: 34px; min-width: 17px; }
+.watten-game-screen[data-wt-mode="mobile"] .wt-pile-count b { font-size: .8rem; }
+.watten-game-screen[data-wt-mode="mobile"] .wt-pile-count small { display: none; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-trick { gap: 6px; padding: 6px; border-radius: 16px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-played img { width: 50px; height: 76px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-hand { padding: 6px 4px 8px; border-radius: 14px; gap: 4px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-hand-cards { gap: 0; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-hand-card img { width: 64px; height: 98px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-single-hand-card + .watten-single-hand-card { margin-left: -10px; }
+.watten-game-screen[data-wt-mode="mobile"] .wt-trick-viewer-cards { gap: 4px; }
+.watten-game-screen[data-wt-mode="mobile"] .wt-trick-viewer-cards img { width: 56px; height: 86px; }
+
+/* ----- Four- and three-player tables (hotseat and multiplayer) ----- */
+.watten-game-screen[data-wt-mode="desktop"] .watten-cols { display: grid; grid-template-columns: 13.5rem minmax(0, 1fr) 13.5rem; gap: 14px; align-items: stretch; }
+.watten-cols > .watten-table { height: 100%; min-height: 0; }
+.watten-center-col { display: flex; flex-direction: column; gap: 8px; min-width: 0; min-height: 0; }
+.watten-center-col > .watten-table { flex: 1 1 0; min-height: 0; }
+.watten-center-col > :not(.watten-table) { flex-shrink: 0; margin: 0 !important; }
+
+.watten-aside { display: flex; flex-direction: column; gap: 8px; min-width: 0; min-height: 0; width: auto !important; padding-top: 0 !important; }
+.watten-aside-card { flex: 1 1 auto; min-height: 0; height: auto !important; max-height: none !important; overflow: hidden; padding: 12px 14px !important; }
+.watten-aside-card [class~="mt-6"], .watten-aside-card [class~="mt-5"] { margin-top: 10px !important; }
+.watten-aside-card [class~="my-5"], .watten-aside-card [class~="my-4"] { margin-block: 8px !important; }
+.watten-aside-card [class~="p-4"] { padding: 10px 12px !important; }
+.watten-aside-card [class~="text-3xl"] { font-size: 1.7rem; line-height: 1.1; }
+.watten-aside-card [class~="text-2xl"] { font-size: 1.4rem; line-height: 1.1; }
+.watten-aside-card [class~="mt-4"] { margin-top: 8px !important; }
+.watten-aside-card [class~="mt-3"] { margin-top: 6px !important; }
+
+.watten-rank-help { position: relative; z-index: 50; flex-shrink: 0; }
+.watten-rank-help > button { width: 100%; }
+.watten-rank-popup { position: fixed; z-index: 200; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(620px, 94vw); max-height: min(88dvh, 760px); overflow-y: auto; scrollbar-width: thin; }
+.watten-rank-popup .space-y-5 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.watten-rank-popup .space-y-5 > * { margin-top: 0 !important; padding: 10px !important; }
+
+.watten-table-grid {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  grid-template-areas: "status status status" "top top top" "left center right" "hand hand hand";
+  gap: 8px 10px;
+  height: 100%;
+  min-height: 0 !important;
+  padding: 12px 14px 10px;
+  overflow: hidden !important;
+}
+.watten-table-grid.is-three { grid-template-columns: 1fr minmax(0, 1fr) 1fr; grid-template-rows: auto auto minmax(0, 1fr) auto; grid-template-areas: "status status status" "left . right" "center center center" "hand hand hand"; }
+.watten-table-contents { display: contents; }
+.watten-table-status { grid-area: status; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 10px; }
+.watten-status-chip { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 6px 16px; border: 1px solid #ffffff1a; border-radius: 14px; background: #052e2bcc; box-shadow: 0 6px 18px #0004; }
+.watten-clockwise { padding: 4px 10px; border: 1px solid #ffffff1a; border-radius: 999px; background: #052e2bcc; color: #a7f3d0; font-size: .65rem; font-weight: 600; white-space: nowrap; }
+
+.watten-seat { position: relative !important; inset: auto !important; transform: none !important; margin: 0 !important; width: 188px !important; max-width: none !important; min-width: 0; padding: 8px 10px !important; text-align: center; }
+.watten-seat--top { grid-area: top; justify-self: center; }
+.watten-seat--left { grid-area: left; align-self: center; justify-self: start; }
+.watten-seat--right { grid-area: right; align-self: center; justify-self: end; }
+.is-three > .watten-seat--left, .is-three > .watten-table-contents > .watten-seat--left, .is-three > .watten-seat--right, .is-three > .watten-table-contents > .watten-seat--right { align-self: start; }
+.watten-seat > [class*="mt-4"], .watten-seat > [class*="mt-3"] { margin-top: 6px !important; }
+.watten-seat-extra { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 4px; }
+.watten-seat-extra--stack { flex-direction: column; gap: 6px; }
+.watten-seat .wt-pile-card { width: 14px; height: 21px; }
+.watten-single-seat .wt-pile-card { width: 14px; height: 21px; }
+.watten-seat .wt-pile-group > .wt-pile-card + .wt-pile-card { margin-left: -11px; }
+.watten-single-seat .wt-pile-group > .wt-pile-card + .wt-pile-card { margin-left: -11px; }
+.watten-seat .wt-pile-group.is-last > .wt-pile-card + .wt-pile-card { margin-left: -11px; }
+.watten-single-seat .wt-pile-group.is-last > .wt-pile-card + .wt-pile-card { margin-left: -11px; }
+.watten-seat .wt-pile-card.is-face-up { width: 20px; height: 30px; }
+.watten-single-seat .wt-pile-card.is-face-up { width: 20px; height: 30px; }
+.watten-seat .wt-pile-empty { width: 14px; height: 21px; }
+.watten-single-seat .wt-pile-empty { width: 14px; height: 21px; }
+.watten-seat .wt-pile-stack { height: 38px; min-width: 20px; }
+.watten-single-seat .wt-pile-stack { height: 38px; min-width: 20px; }
+
+.watten-table-center { grid-area: center; position: relative !important; inset: auto !important; transform: none !important; width: auto !important; height: auto !important; min-width: 0; min-height: 0; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 8px; }
+.watten-table-center .watten-played-card .group { width: 76px; height: 116px; }
+.watten-table-hand { grid-area: hand; position: relative !important; inset: auto !important; transform: none !important; width: 100% !important; max-width: none !important; padding: 0 !important; min-width: 0; }
+.watten-table-hand > div { min-height: 0 !important; padding: 2px 4px !important; margin-inline: auto; }
+.watten-hand .group { width: 80px; height: 122px; }
+.watten-turn-label { display: block; width: fit-content; margin: 0 auto 4px; white-space: nowrap; border-radius: 999px; background: #fbbf24; padding: 3px 14px; font-size: .75rem; font-weight: 900; color: #451a03; box-shadow: 0 4px 12px #0004; }
+.watten-hand-head { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px 10px; margin-bottom: 6px; }
+.watten-hand-head > .watten-turn-label { margin: 0; }
+/* Hotseat 3p: avatar and turn label on the left, the trick pile on the right, all above the cards. */
+.watten-hand-center { display: grid; min-width: 0; justify-items: stretch; }
+.watten-hand-head--spread { flex-wrap: nowrap; justify-content: flex-start; width: 100%; }
+.watten-hand-head--spread > :first-child { margin: 0; }
+.watten-hand-head--spread > .wt-pile { margin-left: auto; }
+.watten-hand-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
+.watten-hand-extras { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; min-width: 0; }
+.watten-hand-row > .watten-hand-extras:first-child { justify-content: flex-end; }
+.watten-hand-row > .watten-hand-extras:last-child { justify-content: flex-start; }
+
+/* Three-player multiplayer panels */
+.watten-seat-wrap { position: relative !important; inset: auto !important; transform: none !important; margin: 0 !important; min-width: 0; }
+.watten-seat-wrap > .watten-opponent { width: 188px; }
+.watten-table-status.watten-status-chip { justify-self: center; position: relative !important; inset: auto !important; transform: none !important; margin: 0 !important; }
+.watten-panel { display: flex; flex-direction: column; }
+.watten-panel > p { flex-shrink: 0; }
+.watten-panel-body { flex: 1 1 auto; min-height: 0; margin-top: 8px !important; }
+.watten-players3 .space-y-3 > * + * { margin-top: 6px; }
+.watten-players3 [class~="h-12"] { width: 34px; height: 34px; border-radius: 10px; }
+.watten-players3 .mt-3.grid { margin-top: 6px !important; }
+.watten-players3 .mt-3.grid > div { padding: 3px 6px; }
+.watten-players3 [class~="p-3"] { padding: 8px 10px !important; }
+.watten-score3 [class~="p-4"] { padding: 10px 12px !important; }
+.watten-score3 [class~="mt-4"] { margin-top: 8px !important; }
+.watten-score3 [class~="text-3xl"], .watten-trickscore3 [class~="text-3xl"] { font-size: 1.6rem; line-height: 1.1; }
+.watten-trickscore3 [class~="p-4"] { padding: 8px 12px !important; }
+.watten-trickscore3 [class~="h-14"][class~="w-14"], .watten-trickscore3 [class~="h-12"][class~="w-12"] { display: none; }
+.watten-trickscore3 [class~="mt-3"] { margin-top: 4px !important; }
+.watten-trickscore3 [class~="mt-5"] { margin-top: 10px !important; }
+.watten-trickscore3 [class~="my-4"] { margin-block: 8px !important; }
+.watten-rank-popup .space-y-4 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.watten-rank-popup .space-y-4 > * { margin-top: 0 !important; }
+
+/* Multiplayer: the trick lies in a cross of four cards between the seats. */
+.watten-play-area { flex-direction: column; justify-content: flex-start; padding: 0 !important; }
+.watten-cross { position: relative; flex: 1 1 0; width: 100%; max-width: 440px; min-height: 0; }
+.watten-turn-pill { order: -1; z-index: 30; flex-shrink: 0; margin-bottom: 6px; pointer-events: none; }
+.watten-play-area .watten-played-card .group { width: 64px; height: 98px; }
+.watten-fineprint { display: none; }
+.watten-me > .watten-hand-head { margin-bottom: 4px; }
+
+/* Waiting rooms: seats on the left, room code and start on the table. */
+.watten-wait-grid { display: grid; grid-template-columns: 20rem minmax(0, 1fr); gap: 14px; min-height: 0; }
+.watten-wait-grid > * { min-height: 0; min-width: 0; }
+.watten-wait-seats { display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
+.watten-wait-seatlist { display: grid; gap: 8px; }
+.watten-wait-seatlist > div { padding: 8px 10px !important; }
+.watten-wait-seatlist > div > div { flex-wrap: wrap; overflow: visible !important; }
+.watten-wait-seatlist > div > div > .min-w-0 { min-width: 8.5rem; }
+.watten-wait-seatlist .room-invite-button { margin-left: 52px; min-height: 30px; padding-block: .25rem; }
+.watten-wait-status { margin-top: auto; }
+.watten-wait-table { display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.watten-wait-panel { max-height: 100%; }
+.watten-wait-panel > button { padding: 14px 20px !important; }
+
+/* ----- Mobile: score strip, table, action bar ----- */
+.watten-game-screen[data-wt-mode="mobile"] .watten-cols { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; gap: 6px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-cols > .watten-aside--left { grid-row: 1; flex-direction: row; align-items: stretch; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-cols > :is(.watten-table, .watten-center-col) { grid-row: 2; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-cols > .watten-aside--right { grid-row: 3; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-rank-help { flex: 0 0 auto; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-rank-help > button { width: 44px; height: 100%; min-height: 40px; padding: 0 !important; font-size: 0 !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-rank-help > button::before { content: "📚"; font-size: 1.15rem; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-rank-popup .space-y-5 { grid-template-columns: minmax(0, 1fr); }
+.watten-game-screen[data-wt-mode="mobile"] .watten-aside-card { flex: 1 1 auto; padding: 6px !important; border-radius: 14px !important; }
+
+.watten-game-screen[data-wt-mode="mobile"] .watten-score { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; align-content: start; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-score > p { display: none; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-score > h3 { grid-column: 1 / -1; margin: 0; font-size: .65rem; line-height: 1; font-weight: 600; color: #a1a1aa; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-score > div { margin: 0 !important; padding: 4px 8px !important; border-radius: 10px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-score > div:not([class*="my-"]) > p:first-child { display: none; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-score > div[class*="my-"] { display: none; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-score > div > p { margin: 0 !important; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .65rem; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-score > div [class~="mt-4"] { margin-top: 2px !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-score > div [class~="mt-3"] { margin-top: 3px !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-score > div [class~="text-3xl"] { font-size: 1.1rem; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-score > .mt-5.space-y-4 { grid-column: 1 / -1; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 4px; margin-top: 0 !important; padding: 0 !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-score > .mt-5.space-y-4 > div { margin: 0 !important; padding: 4px 6px !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-score > .mt-5.space-y-4 [class~="mt-3"] { margin-top: 3px !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-score > .mt-5.space-y-4 span { font-size: .65rem; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-score > .mt-5.space-y-4 strong { font-size: .7rem; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-score > .mt-5.space-y-4 [class~="rounded-full"]:not([class~="h-2"]):not(.bg-white\/10) { display: none; }
+
+.watten-game-screen[data-wt-mode="mobile"] .watten-wait-grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 6px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-wait-seats { padding: 8px !important; gap: 6px; border-radius: 16px !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-wait-seats > div:first-child { display: none; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-wait-seatlist { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-wait-seatlist .room-invite-button { margin-left: 0; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-wait-status { display: none; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-wait-panel > button { padding: 8px 12px !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-play-area .watten-played-card .group { width: 48px; height: 74px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-cross { max-width: 300px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-me .watten-hand-head { flex-wrap: nowrap; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-seat-wrap > .watten-opponent { width: 100%; padding: 5px 6px !important; border-radius: 12px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-seat-wrap { justify-self: stretch; align-self: stretch; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-seat-wrap [class*="h-10"][class*="w-7"] { width: 20px; height: 30px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-seat-wrap [class*="h-10"][class*="w-7"]:not(:first-child) { margin-left: -12px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-seat-wrap [class~="h-8"] { width: 22px; height: 22px; border-radius: 8px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-players3 { display: none; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-score3 { flex: 1 1 auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; align-content: start; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-score3 > p { display: none; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-score3 > div { margin: 0 !important; padding: 4px 8px !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-score3 > div[class*="my-"] { display: none; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-score3 [class~="text-3xl"] { font-size: 1.1rem; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-score3 [class~="mt-3"] { margin-top: 3px !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-trickscore3 { padding: 6px !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-trickscore3 > p { display: none; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-trickscore3 .watten-panel-body { margin-top: 0 !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-trickscore3 .watten-panel-body > :not(.watten-raise) { display: none !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-trickscore3 .watten-raise { display: flex !important; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px; margin: 0 !important; padding: 6px 10px !important; text-align: left !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-trickscore3 .watten-raise > p { margin: 0 !important; font-size: .65rem; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-trickscore3 .watten-raise > p:nth-child(2) { font-size: 1rem; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-trickscore3 .watten-raise > button { width: auto !important; margin: 0 !important; padding: 6px 12px !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-trickscore3 .watten-raise > div { display: none; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-trickscore > :not(.watten-raise) { display: none !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-trickscore { padding: 6px !important; flex: 1 1 auto; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-raise { display: flex !important; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px; margin: 0 !important; padding: 6px 10px !important; text-align: left !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-raise > p { margin: 0 !important; font-size: .65rem; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-raise > p:nth-child(2) { font-size: 1rem; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-raise > button { width: auto !important; margin: 0 !important; padding: 6px 12px !important; }
+
+.watten-game-screen[data-wt-mode="mobile"] .watten-table-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-areas: "status status status" "left top right" "center center center" "hand hand hand"; grid-template-rows: auto auto minmax(auto, 1fr) auto; gap: 14px 5px; padding: 8px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-table-grid.is-three { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-areas: "status status" "left right" "center center" "hand hand"; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-hand-row { display: flex; flex-direction: column; gap: 4px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-hand-head { margin-bottom: 2px; gap: 4px 6px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-seat-extra > span { display: none; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-status-chip { padding: 4px 10px; gap: 10px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-clockwise { display: none; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-seat { width: auto !important; padding: 5px 6px !important; border-radius: 12px !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-seat--top { justify-self: stretch; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-seat--left, .watten-game-screen[data-wt-mode="mobile"] .watten-seat--right { justify-self: stretch; align-self: stretch; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-seat [class~="text-lg"], .watten-game-screen[data-wt-mode="mobile"] .watten-seat [class~="text-base"] { font-size: .75rem; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-table-center { padding: 4px; gap: 6px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-game-header > div:first-child > p { display: none; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-game-header h1 span { display: none; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-info-bar > div { padding: 3px 10px; gap: 8px; border-radius: 12px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-info-bar [class~="text-lg"] { font-size: .85rem; line-height: 1.2; padding: 1px 8px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-info-bar img { width: 20px; height: 20px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-info-bar [class~="h-8"] { height: 20px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-info-bar [class~="px-2.5"] { padding: 1px 8px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-team-tag { display: none; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-seat-tags:not(:has(.watten-team-tag ~ span)) { display: none; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-seat [class~="h-8"] { width: 22px; height: 22px; border-radius: 8px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-table-center { min-height: 82px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-table-center .watten-played-card { gap: 2px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-table-center .watten-played-card .group { width: 40px; height: 62px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-table-center .watten-played-card > :not(.group) { font-size: .55rem !important; line-height: 1.1; padding: 0 4px !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-seat > .absolute { top: -8px; white-space: nowrap; font-size: 8px !important; line-height: 1.2; padding: 1px 7px !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-hand .group { width: 62px; height: 95px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-hand { gap: 0; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-hand > div { scale: 1 !important; margin-inline: -4px !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-turn-label { font-size: .65rem; padding: 2px 10px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-table-hand > div { padding: 0 !important; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-seat .wt-pile, .watten-game-screen[data-wt-mode="mobile"] .watten-table-hand .wt-pile { padding: 2px 4px; gap: 4px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-seat [class*="h-14"][class*="w-9"], .watten-game-screen[data-wt-mode="mobile"] .watten-seat [class*="h-10"][class*="w-7"] { width: 20px; height: 30px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-seat [class*="h-10"][class*="w-7"]:not(:first-child) { margin-left: -12px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-seat-extra { gap: 3px; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-seat [class*="h-14"][class*="w-9"]:not(:first-child) { margin-left: -12px; }
+
+/* Cards and hands shared by the other Watten tables. */
 @media (max-width: 767px) {
   .watten-hand > button + button { margin-left: -18px; }
   .watten-hand { gap: 0; }
-}
-.watten-table-preview { border-width: 3px; border-radius: 7px; box-shadow: inset 0 0 0 1px var(--watten-rim), inset 0 0 12px #0004; }
-.watten-table-preview::before { inset: 3px; border-radius: 3px; }
-@media (max-width: 767px) {
   .watten-hand .group { width: 64px; height: 98px; }
   .watten-played-card .group { width: 60px; height: 92px; }
   .watten-played-card > div { scale: 1; }
   .watten-played-card > span { max-width: 70px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: .6rem; }
 }
+
+/* ----- Gehen: the answering team votes; one vote to stay is enough, giving up needs everyone ----- */
+.wt-gehen-votes { margin-top: 14px; padding: 10px 14px; border: 1px solid #f8717159; border-radius: 12px; background: #7f1d1d33; color: #fecaca; font-size: .8rem; line-height: 1.4; }
+.wt-gehen-votes p { margin: 2px 0 0; }
+.wt-gehen-votes strong { color: #fff; }
+.wt-gehen-dots { display: flex; justify-content: center; gap: 6px; margin-bottom: 6px; }
+.wt-gehen-dots i { width: 12px; height: 12px; border: 2px solid #f87171; border-radius: 50%; }
+.wt-gehen-dots i.is-on { background: #f87171; }
+.wt-gehen-rule { margin-top: 12px; font-size: .7rem; line-height: 1.45; color: #a1a1aa; }
+.watten-raise .wt-gehen-rule { margin-top: 8px; font-size: .62rem; color: #8b8b94; text-align: center; }
+.watten-game-screen[data-wt-mode="mobile"] .watten-raise .wt-gehen-rule { display: none; }
+
+/* ----- A card that may not be played (Trumpf oder Kritisch): greyed out with a lock, like Schafkopf ----- */
+.wt-card-locked { cursor: not-allowed !important; }
+.wt-card-locked img { filter: grayscale(.85); opacity: .4; }
+.wt-card-lock { position: absolute; left: 0; right: 0; bottom: 12px; z-index: 30; padding: 4px 0; background: #111d; color: #fff; font-size: 10px; font-weight: 800; line-height: 1.2; text-align: center; pointer-events: none; }
+.wt-card-locked:hover { transform: none !important; }
+.watten-game-screen[data-wt-mode="mobile"] .wt-card-lock { bottom: 6px; padding: 2px 0; font-size: 8px; }
+
+/* The "Last trick" tag sits in the pile's top padding; these come last so the compact mobile and seat pile rules above don't flatten that room. */
+.watten-game-screen[data-wt-mode] .wt-pile.has-last { padding-top: 13px; }
+.watten-game-screen[data-wt-mode="desktop"] .wt-pile.has-last { padding-top: 15px; }
+
+/* ----- Phone dialogs: always reachable and scrollable, with cards that fit the row ----- */
+.watten-game-screen[data-wt-mode="mobile"] .fixed.inset-0 { align-items: flex-start; overflow-y: auto; overscroll-behavior: contain; padding: calc(var(--wt-top, 0px) + 10px) 10px 10px !important; }
+.watten-game-screen[data-wt-mode="mobile"] .fixed.inset-0 > div { margin-block: auto; padding: 16px !important; border-radius: 20px; }
+.watten-game-screen[data-wt-mode="mobile"] .fixed.inset-0 .group.relative.shrink-0 { width: 54px; height: 83px; }
+.watten-game-screen[data-wt-mode="mobile"] .fixed.inset-0 h2 { font-size: 1.5rem; line-height: 1.15; }

@@ -43,7 +43,8 @@ test("friend and clan pickers render the same games and modes, including publish
     "@/i18n/ui": uiMocks,
     "@/games/atlas/modeCatalog": { modeForOnline: () => null },
     "@/games/party/network/protocol": { normalizeLobbyCode: () => null },
-    "./inviteRoute": { currentRoomInvite: () => null, getInviteDestination: () => "", getInviteGameLabel: () => "" },
+    "./inviteRoute": { acceptInviteState: () => ({}), getInviteDestination: () => "", getInviteGameLabel: () => "", inviteGameKey: () => "chess" },
+    "./currentRoom": { useCurrentRoom: () => null },
     "./gameCreationCatalog": { createInviteRoute: () => "" },
     "./GameInviteDelivery": { prepareCreatedGameInvite() {} },
     "./clanShare": clan,
@@ -62,7 +63,7 @@ test("each open Party seat opens its own room invite without relying on the URL"
   const events = [], priorWindow = globalThis.window;
   globalThis.window = { dispatchEvent: event => events.push(event) };
   try {
-    const Button = load("../src/components/chess/InviteFriendButton.tsx", { "@/i18n/ui": uiMocks }).default;
+    const Button = load("../src/components/chess/InviteFriendButton.tsx", { "@/i18n/ui": uiMocks, "@/components/social/roomInvite.css": {} }).default;
     const room = { lobbyRoute: "/games/pluto-party", code: "PLUTO-123456" };
     Button({ room }).props.onClick();
     assert.equal(events[0].type, "open-room-friends");
@@ -75,6 +76,6 @@ test("each open Party seat opens its own room invite without relying on the URL"
     }).default;
     const lobby = { code: room.code, name: "Party", hostId: "me", settings: { mapId: "sunspill", victory: "plutos", difficulty: "easy", plutoTarget: 3, fillBots: true }, players: [{ id: "me", name: "Me", connected: true }], match: null };
     const markup = renderToStaticMarkup(React.createElement(Lobby, { lobby, connection: { status: "online", playerId: "me", send() {}, serverOffset: 0 } }));
-    assert.equal((markup.match(/>Invite Friend<\/button>/g) ?? []).length, 3);
+    assert.equal((markup.match(/Invite friend<\/span><\/button>/g) ?? []).length, 3);
   } finally { globalThis.window = priorWindow; }
 });

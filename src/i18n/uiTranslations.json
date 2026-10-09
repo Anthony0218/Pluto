@@ -466,7 +466,12 @@
     "Click the marked square to play it": "Klicke das markierte Feld, um ihn zu spielen",
     "Grading earlier moves...": "Bewerte frühere Züge...",
     "Currently played · on the board": "Aktuell gespielt · auf dem Brett",
-    "Currently played · click to show": "Aktuell gespielt · zum Anzeigen klicken"
+    "Currently played · click to show": "Aktuell gespielt · zum Anzeigen klicken",
+    "Click a piece to play": "Figur anklicken und selbst spielen",
+    "Your move": "Du bist am Zug",
+    "Thinking…": "Überlegt …",
+    "Back to demo": "Zurück zur Demo",
+    "Captured pieces": "Geschlagene Figuren"
   },
   "bar": {
     "All games": "Olle Spui",
@@ -845,7 +850,12 @@
     "Click the marked square to play it": "Klick des markierte Feid, dann werd er gspuit",
     "Grading earlier moves...": "Bewert de friahran Zig...",
     "Currently played · on the board": "Grad gspuit · aufm Brett",
-    "Currently played · click to show": "Grad gspuit · zum Ozoang klicka"
+    "Currently played · click to show": "Grad gspuit · zum Ozoang klicka",
+    "Click a piece to play": "Figur okliggn und selm spuin",
+    "Your move": "Du bist dro",
+    "Thinking…": "Denkt nach …",
+    "Back to demo": "Zruck zur Demo",
+    "Captured pieces": "Gschlogne Figurn"
   },
   "ko": {
     "All games": "모든 게임",
@@ -1292,7 +1302,12 @@
     "Click the marked square to play it": "표시된 칸을 클릭하면 이 수를 둡니다",
     "Grading earlier moves...": "이전 수 평가 중...",
     "Currently played · on the board": "실제로 둔 수 · 보드에 표시됨",
-    "Currently played · click to show": "실제로 둔 수 · 클릭하여 표시"
+    "Currently played · click to show": "실제로 둔 수 · 클릭하여 표시",
+    "Click a piece to play": "기물을 눌러 직접 두세요",
+    "Your move": "당신의 차례",
+    "Thinking…": "생각 중…",
+    "Back to demo": "데모로 돌아가기",
+    "Captured pieces": "잡은 기물"
   },
   "ru": {
     "All games": "Все игры",
@@ -1739,7 +1754,12 @@
     "Click the marked square to play it": "Нажмите на отмеченную клетку, чтобы сыграть ход",
     "Grading earlier moves...": "Оцениваем предыдущие ходы...",
     "Currently played · on the board": "Сыгранный ход · на доске",
-    "Currently played · click to show": "Сыгранный ход · нажмите, чтобы показать"
+    "Currently played · click to show": "Сыгранный ход · нажмите, чтобы показать",
+    "Click a piece to play": "Нажмите на фигуру, чтобы сыграть",
+    "Your move": "Ваш ход",
+    "Thinking…": "Думает…",
+    "Back to demo": "Назад к демо",
+    "Captured pieces": "Взятые фигуры"
   },
   "es": {
     "All games": "Todos los juegos",
@@ -1782,7 +1802,12 @@
     "Click the marked square to play it": "Haz clic en la casilla marcada para jugarla",
     "Grading earlier moves...": "Evaluando jugadas anteriores...",
     "Currently played · on the board": "Jugada actual · en el tablero",
-    "Currently played · click to show": "Jugada actual · haz clic para mostrar"
+    "Currently played · click to show": "Jugada actual · haz clic para mostrar",
+    "Click a piece to play": "Toca una pieza para jugar",
+    "Your move": "Tu jugada",
+    "Thinking…": "Pensando…",
+    "Back to demo": "Volver a la demo",
+    "Captured pieces": "Piezas capturadas"
   },
   "pt": {
     "All games": "Todos os jogos",
@@ -1825,6 +1850,11 @@
     "Click the marked square to play it": "Clique na casa marcada para jogá-lo",
     "Grading earlier moves...": "Avaliando lances anteriores...",
     "Currently played · on the board": "Lance jogado · no tabuleiro",
-    "Currently played · click to show": "Lance jogado · clique para mostrar"
+    "Currently played · click to show": "Lance jogado · clique para mostrar",
+    "Click a piece to play": "Toque numa peça para jogar",
+    "Your move": "Sua jogada",
+    "Thinking…": "Pensando…",
+    "Back to demo": "Voltar à demo",
+    "Captured pieces": "Peças capturadas"
   }
 }

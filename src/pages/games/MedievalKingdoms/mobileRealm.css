@@ -1,0 +1,147 @@
+.ed-app .ed-mobile-map-tools,
+.ed-app .ed-mobile-desk-picker,
+.ed-app .ed-mobile-menu-label,
+.ed-app .ed-dock-expand { display: none; }
+.ed-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (max-width: 700px), (max-width: 1000px) and (max-height: 500px) {
+  .ed-app:not(.ed-playing) .ed-masthead { height: auto; min-height: 55px; flex-wrap: wrap; gap: 8px; padding: 8px 0; }
+  .ed-app:not(.ed-playing) .ed-masthead > span { order: 3; width: 100%; font-size: 8px; letter-spacing: 1px; }
+  .ed-app:not(.ed-playing) button { min-height: 44px; }
+  .ed-app:not(.ed-playing) :is(input:not([type="checkbox"]):not([type="range"]), select) { min-height: 44px; font-size: 16px; }
+  .ed-playing .ed-masthead {
+    top: calc(8px + env(safe-area-inset-top));
+    left: 10px;
+    right: 10px;
+    height: 28px;
+    font-size: 8px;
+  }
+  .ed-playing .ed-masthead a { font-size: 10px; }
+  .ed-playing .ed-topbar {
+    top: calc(44px + env(safe-area-inset-top));
+    left: 10px;
+    right: 10px;
+    min-height: 0;
+    padding: 8px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: 44px 32px;
+    gap: 6px 5px;
+  }
+  .ed-playing .ed-dynasty-mark { grid-column: 1 / 3; margin: 0; padding-left: 4px; min-width: 0; gap: 5px; }
+  .ed-playing .ed-dynasty-mark > svg { width: 19px; flex-shrink: 0; }
+  .ed-playing .ed-dynasty-mark h1 { font-size: 17px; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ed-playing .ed-dynasty-mark span { display: none; }
+  .ed-playing .ed-stat { grid-row: 2; min-width: 0; }
+  .ed-playing .ed-stat b { font-size: 13px; gap: 4px; }
+  .ed-playing .ed-stat small { font-size: 8px; margin-bottom: 3px; }
+  .ed-playing .ed-tools { grid-column: 3 / 5; grid-row: 1; margin: 0; flex-wrap: nowrap; gap: 4px; justify-content: flex-end; }
+  .ed-playing .ed-tools button { min-height: 44px; padding: 6px; font-size: 10px; }
+  .ed-playing .ed-end-turn { white-space: nowrap; }
+  .ed-playing .ed-desktop-menu-label { display: none; }
+  .ed-playing .ed-mobile-menu-label { display: inline; }
+  .ed-playing .ed-tools :is(.ed-save, .ed-export, .ed-reconnect, .ed-legacy-badge),
+  .ed-playing .ed-live { display: none; }
+  .ed-playing .ed-turn-status { top: calc(153px + env(safe-area-inset-top)); left: 10px; right: 10px; padding: 6px 8px; font-size: 11px; line-height: 15px; }
+  .ed-playing :is(.ed-overlay-controls, .ed-zoom-controls, .ed-pan-controls, .ed-sidebar-toggle, .ed-control-legend, .ed-map-head, .ed-return) { display: none; }
+  .ed-playing .ed-mobile-map-tools {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    position: absolute;
+    z-index: 4;
+    top: calc(201px + env(safe-area-inset-top));
+    left: 10px;
+    right: 10px;
+    padding: 4px;
+    background: #132c25f2;
+    border: 1px solid #ddbf7c45;
+    border-radius: 10px;
+  }
+  .ed-mobile-map-tools > label { flex: 1; min-width: 0; margin: 0; }
+  .ed-app .ed-mobile-map-tools select { min-height: 44px; width: 100%; margin: 0; padding: 7px; font-size: 16px; }
+  .ed-app .ed-mobile-map-tools > button { flex: 0 0 44px; width: 44px; min-height: 44px; padding: 0; }
+  .ed-mobile-map-tools > button.active { background: #ddbf7c20; border-color: #ddbf7c80; color: #f0d695; }
+  .ed-playing .ed-map-mode-guide { top: calc(261px + env(safe-area-inset-top)); left: 10px; right: 10px; max-width: none; padding: 4px 8px; font-size: 11px; line-height: 14px; background: #132c25ed; border-radius: 6px; pointer-events: none; }
+  .ed-playing .ed-panel,
+  .ed-playing .ed-panel:not(.ed-panel-expanded) {
+    top: auto;
+    left: 10px;
+    right: 10px;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    width: auto;
+    min-height: 0;
+    max-height: min(28dvh, 224px);
+    padding: 0 14px 14px;
+    border-radius: 16px;
+    overscroll-behavior: contain;
+    scroll-padding-top: 106px;
+  }
+  .ed-playing .ed-panel-expanded { max-height: calc(100dvh - 218px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
+  .ed-playing .ed-panel-dock { top: 0; margin: 0 -14px; padding: 4px 8px; min-height: 52px; background: #1b352afc; }
+  .ed-app .ed-panel-dock button { min-width: 44px; min-height: 44px; padding: 6px; }
+  .ed-app .ed-dock-expand { display: inline-flex; font-size: 12px; gap: 6px; }
+  .ed-playing :is(.ed-dock-side, .ed-panel-tabs, .ed-panel-size, .ed-agenda-shortcut) { display: none; }
+  .ed-playing .ed-mobile-desk-picker { display: block; position: sticky; z-index: 2; top: 52px; padding: 4px 0 8px; margin: 0; background: #142c24fc; }
+  .ed-app .ed-mobile-desk-picker select { width: 100%; min-height: 44px; margin: 0; font-size: 16px; }
+  .ed-playing:has(.ed-panel-expanded):not(.ed-sidebar-hidden) :is(.ed-mobile-map-tools, .ed-map-mode-guide) { display: none; }
+  .ed-playing .ed-panel:not(.ed-panel-expanded) :is(.ed-section-kicker, .ed-decision small) { display: none; }
+  .ed-playing .ed-agenda { margin: 8px 0; }
+  .ed-playing .ed-decision { margin: 6px 0; padding: 10px; }
+  .ed-playing .ed-decision strong { font-size: 17px; }
+  .ed-playing .ed-army-bar { bottom: calc(min(28dvh, 224px) + 20px + env(safe-area-inset-bottom)); left: 10px; right: 10px; max-height: 100px; }
+  .ed-playing.ed-sidebar-hidden .ed-army-bar { bottom: calc(10px + env(safe-area-inset-bottom)); }
+  .ed-playing .ed-army-bar select { font-size: 16px; min-height: 44px; }
+  .ed-playing .ed-army-bar button { min-height: 44px; font-size: 12px; }
+  .ed-playing .ed-panel :is(input:not([type="checkbox"]):not([type="range"]), select) { font-size: 16px; min-height: 44px; }
+  .ed-playing .ed-panel button { min-height: 44px; }
+  .ed-playing .ed-panel :is(p, small, li) { overflow-wrap: anywhere; }
+  .ed-playing .ed-consequence { font-size: 12px; }
+  .ed-playing .ed-panel :is(.ed-family, .ed-house-roster, .ed-compact, .ed-project-card, fieldset) { min-width: 0; }
+  .ed-playing .ed-cargo-editor > label { display: flex; flex-direction: row; gap: 12px; }
+  .ed-app.ed-playing .ed-cargo-editor > label input:not([type="checkbox"]):not([type="range"]) { width: 96px; min-width: 0; flex: 0 0 96px; }
+  .ed-playing .ed-cargo-goods { gap: 10px; }
+  .ed-playing .ed-cargo-goods input { min-width: 0; }
+  .ed-playing :is(.ed-journal, .ed-history, .ed-logistics) { display: none; }
+  .ed-playing .ed-mobile-logistics .ed-logistics { display: block; }
+  .ed-battle-backdrop { padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom)); }
+  .ed-battle-modal { max-width: 100%; max-height: calc(100dvh - 16px); padding: 12px; overscroll-behavior: contain; }
+  .ed-battle-modal :is(input, select) { min-height: 44px; font-size: 16px; }
+  .ed-battle-modal button { min-height: 44px; }
+  .ed-battle-modal header h2 { font-size: 20px; }
+}
+
+@media (max-width: 359px) {
+  .ed-playing .ed-masthead > span { display: none; }
+  .ed-playing .ed-dynasty-mark h1 { font-size: 15px; }
+  .ed-playing .ed-tools button { font-size: 9px; padding: 5px; }
+  .ed-app .ed-mobile-map-tools select { padding: 4px; }
+}
+
+@media (min-width: 550px) and (max-width: 1000px) and (max-height: 500px) {
+  .ed-playing .ed-masthead { display: none; }
+  .ed-playing .ed-topbar { top: 8px; grid-template-columns: minmax(0, 1fr) repeat(4, minmax(58px, .5fr)) auto; grid-template-rows: 44px; gap: 5px; padding: 6px; }
+  .ed-playing .ed-dynasty-mark { grid-column: 1; grid-row: 1; }
+  .ed-playing .ed-stat { grid-row: 1; }
+  .ed-playing .ed-tools { grid-column: 6; }
+  .ed-playing .ed-turn-status { top: 72px; font-size: 10px; line-height: 14px; }
+  .ed-playing .ed-mobile-map-tools,
+  .ed-playing:has(.ed-panel-expanded):not(.ed-sidebar-hidden) .ed-mobile-map-tools { display: flex; top: 108px; right: calc(42% + 20px); }
+  .ed-playing .ed-map-mode-guide { display: none; }
+  .ed-playing .ed-panel,
+  .ed-playing .ed-panel:not(.ed-panel-expanded),
+  .ed-playing .ed-panel-expanded { top: 108px; left: auto; right: 10px; bottom: 10px; width: calc(42% - 10px); max-height: calc(100dvh - 118px); }
+  .ed-playing.ed-sidebar-hidden .ed-mobile-map-tools { right: 10px; }
+  .ed-playing .ed-army-bar { left: 10px; right: calc(42% + 20px); bottom: 10px; }
+  .ed-playing.ed-sidebar-hidden .ed-army-bar { right: 10px; }
+  .ed-playing .ed-panel:not(.ed-panel-expanded) .ed-decision small { display: block; }
+}

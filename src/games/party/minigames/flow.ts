@@ -9,6 +9,7 @@ import type {
   MinigameRuntime,
 } from "../types.ts";
 import { minigameRegistry } from "./index.ts";
+import { festivalRoundPoints } from "./festivalScoring.ts";
 import { selectMinigame, type MinigameRegistry } from "./registry.ts";
 import type {
   MinigameDefinition,
@@ -221,11 +222,16 @@ export function concludeMinigame(
     definition.rank(runtime.state, runtime.participants, random),
     definition.scores(runtime.state),
   );
+  if (state.mode === "festival" && definition.gameType === "main" && !definition.teamOf) {
+    runtime.results.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+    for (const result of runtime.results) {
+      result.position = (1 + runtime.results.filter((other) => (other.score ?? 0) > (result.score ?? 0)).length) as MinigamePosition;
+    }
+  }
   runtime.resultsEndsAt = now + resultsMs;
-  log(
-    state,
-    `${definition.name} is over! ${state.players.find((p) => p.id === runtime.results![0].playerId)!.name} wins.`,
-  );
+  log(state, state.mode === "festival"
+    ? `${definition.name} is over! Festival points awarded.`
+    : `${definition.name} is over! ${state.players.find((p) => p.id === runtime.results![0].playerId)!.name} wins.`);
 }
 
 // Freezes the main minigame, ranks it and pays rewards. Idempotent: rewards are applied exactly once.
@@ -249,15 +255,18 @@ export function applyMinigameRewards(state: Match, registry: MinigameRegistry = 
   const definition = registry.get(runtime.minigameId);
   const winningTeam = definition.teamOf?.(runtime.state, runtime.results[0].playerId);
   const teamDraw = winningTeam !== undefined && runtime.results.every((r) => r.score === runtime.results![0].score);
+  const festival = state.mode === "festival";
+  const points = festival ? festivalRoundPoints(runtime.results, definition.teamOf ? (id) => definition.teamOf!(runtime.state, id) : undefined) : {};
   for (const result of runtime.results) {
     const teamWin = winningTeam !== undefined && definition.teamOf?.(runtime.state, result.playerId) === winningTeam;
-    const amount = winningTeam !== undefined ? teamDraw ? 5 : teamWin ? 8 : 3 : rewardFor(result.position),
+    const amount = festival ? points[result.playerId] : winningTeam !== undefined ? teamDraw ? 5 : teamWin ? 8 : 3 : rewardFor(result.position),
       player = state.players.find((p) => p.id === result.playerId)!;
-    player.coins += amount;
-    if (winningTeam !== undefined ? teamWin && !teamDraw : result.position === 1) bumpStat(state, player.id, "minigameWins");
-    if (state.mode === "festival") {
+    if (!festival) player.coins += amount;
+    const soloDraw = festival && runtime.results.every((r) => r.score === runtime.results![0].score);
+    if (winningTeam !== undefined ? teamWin && !teamDraw : result.position === 1 && !soloDraw) bumpStat(state, player.id, "minigameWins");
+    if (festival) {
       state.festivalScores ??= {};
-      state.festivalScores[player.id] = (state.festivalScores[player.id] ?? 0) + (winningTeam !== undefined ? teamDraw ? 2 : teamWin ? 3 : 1 : 4 - result.position);
+      state.festivalScores[player.id] = (state.festivalScores[player.id] ?? 0) + amount;
     }
     runtime.rewards[result.playerId] = amount;
     if (amount > 0)
@@ -265,7 +274,7 @@ export function applyMinigameRewards(state: Match, registry: MinigameRegistry = 
         kind: "MINIGAME_REWARD",
         playerId: player.id,
         amount,
-        text: `${player.name.toUpperCase()} +${amount} COINS`,
+        text: `${player.name.toUpperCase()} +${amount} ${festival ? "FESTIVAL POINTS" : "COINS"}`,
       });
   }
   runtime.rewardsApplied = true;

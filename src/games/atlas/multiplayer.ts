@@ -9,8 +9,8 @@ export type AtlasRoundMode = "map_battle" | "closest_wins" | "higher_lower" | "f
 /** Races: everyone plays the same seeded run on their own device at once; the room collects live scores. */
 export type AtlasRaceMode = "speed_run" | "map_fill" | "stat_ranking" | "region_builder" | "stat_detective" | "country_guesser" | "extreme_geography" | "language_guesser" | "history_battle";
 export type AtlasMultiplayerMode = AtlasRoundMode | AtlasRaceMode | "stat_battle";
-export const ATLAS_ROUND_MODES: AtlasRoundMode[] = ["map_battle", "closest_wins", "higher_lower", "flag_battle", "guess_country"];
-export const ATLAS_RACE_MODES: AtlasRaceMode[] = ["speed_run", "map_fill", "stat_ranking", "region_builder", "stat_detective", "country_guesser", "extreme_geography", "language_guesser", "history_battle"];
+export const ATLAS_ROUND_MODES: AtlasRoundMode[] = ["map_battle", "higher_lower", "flag_battle", "guess_country"];
+export const ATLAS_RACE_MODES: AtlasRaceMode[] = ["stat_ranking", "stat_detective", "extreme_geography", "language_guesser", "history_battle"];
 export const ATLAS_MULTIPLAYER_MODES: AtlasMultiplayerMode[] = [...ATLAS_ROUND_MODES, ...ATLAS_RACE_MODES, "stat_battle"];
 export const isRaceMode = (mode: string): mode is AtlasRaceMode => ATLAS_RACE_MODES.includes(mode as AtlasRaceMode);
 export const isRoundMode = (mode: string): mode is AtlasRoundMode => ATLAS_ROUND_MODES.includes(mode as AtlasRoundMode);
@@ -33,8 +33,9 @@ export function parseClientAnswer(value: unknown, mode: AtlasMultiplayerMode): s
 
 /** `shapes` lets Closest Wins measure to the target's borders (0 km inside); without them it measures to the reference point. */
 export function createAuthoritativeSubmission(options: { userId: string; round: number; answer: unknown; mode: AtlasMultiplayerMode; question: AtlasQuestion; submittedAt: number; shapes?: CountryShapes }): ServerSubmission {
-  const answer = parseClientAnswer(options.answer, options.mode);
-  if (options.mode === "closest_wins") {
+  const pinRound = options.question.interaction === "closest_click" || options.mode === "closest_wins";
+  const answer = parseClientAnswer(options.answer, pinRound ? "closest_wins" : options.mode);
+  if (pinRound) {
     const question = options.question;
     if ((question.interaction !== "closest_click" && question.interaction !== "map_click") || typeof answer === "string") throw new Error("This round has no point target.");
     const { distanceKm, nearest } = distanceToTerritory(answer, { geometryId: question.targetGeometryId, point: question.targetCoordinates, radiusKm: question.interaction === "closest_click" ? question.targetRadiusKm : undefined }, options.shapes);
@@ -44,7 +45,7 @@ export function createAuthoritativeSubmission(options: { userId: string; round: 
   return { userId: options.userId, round: options.round, answer, submittedAt: options.submittedAt, correct: validateAnswer(options.question, answer) };
 }
 
-export function resolveRoundScores(options: { submissions: ServerSubmission[]; playerIds: string[]; roundStartedAt: number; roundDurationMs: number; currentScores: Record<string, number> }): { scores: Record<string, number>; winnerId: string | null } {
+export function resolveRoundScores(options: { submissions: ServerSubmission[]; playerIds: string[]; roundStartedAt: number; roundDurationMs: number; currentScores: Record<string, number>; ranked?: boolean }): { scores: Record<string, number>; winnerId: string | null } {
   const scores = { ...options.currentScores };
   const ranked = [...options.submissions].filter((submission) => submission.correct).sort((left, right) => (left.distanceKm ?? 0) - (right.distanceKm ?? 0) || left.submittedAt - right.submittedAt);
   const winnerId = ranked[0]?.userId || null;
@@ -56,9 +57,9 @@ export function resolveRoundScores(options: { submissions: ServerSubmission[]; p
   }
   for (const submission of options.submissions) {
     const remaining = Math.max(0, options.roundStartedAt + options.roundDurationMs - submission.submittedAt);
-    scores[submission.userId] = (scores[submission.userId] || 0) + normalScore(submission.correct, remaining, options.roundDurationMs);
+    scores[submission.userId] = (scores[submission.userId] || 0) + normalScore(submission.correct, remaining, options.roundDurationMs, options.ranked);
   }
-  return { scores, winnerId };
+  return { scores, winnerId: ranked.length === 1 || options.ranked ? winnerId : null };
 }
 
 export function verifyMatchDataset(serverVersion: string, clientVersion: string): void {

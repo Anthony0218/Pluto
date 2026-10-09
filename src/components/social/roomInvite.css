@@ -1,0 +1,63 @@
+/* One invite button for every room slot in every game. */
+.room-invite-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: .4rem;
+  min-height: 34px;
+  padding: .35rem .85rem;
+  border: 1px solid #fcd34d80;
+  border-radius: 999px;
+  background: #2a2112;
+  color: #fde68a;
+  font: 700 .78rem/1 inherit;
+  font-family: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #0004;
+  transition: background-color .15s, border-color .15s, color .15s;
+}
+.room-invite-button:hover { border-color: #fde68a; background: #3b2d16; color: #fff7d6; }
+.room-invite-button:focus-visible { outline: 2px solid #fde68a; outline-offset: 2px; }
+.room-invite-button svg { flex-shrink: 0; }
+
+/* A row of seats; open seats carry the invite button. */
+.room-slots { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; width: 100%; }
+.room-slot {
+  display: flex;
+  flex: 1 1 11rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: .6rem;
+  min-width: 0;
+  padding: .5rem .7rem;
+  border: 1px solid #ffffff22;
+  border-radius: 14px;
+  background: #0a1018d9;
+  color: #fff;
+  text-align: left;
+}
+.room-slot.is-open { border-style: dashed; border-color: #fcd34d4d; }
+.room-slot > span { display: grid; min-width: 0; }
+.room-slot small { font-size: .62rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #a1a1aa; }
+.room-slot strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .85rem; }
+.room-slot.is-open strong { color: #d4d4d8; font-weight: 600; }
+.room-slots--overlay { max-width: 32rem; margin-top: .25rem; }
+
+/* Waiting overlays centre a room-code card; with seats below it the card and seats stack. */
+.absolute.inset-0:has(> .room-slots--overlay) { flex-direction: column; gap: .6rem; overflow: hidden; }
+.absolute.inset-0:has(> .room-slots--overlay) > button { width: 100%; max-width: 32rem; padding: 1rem 1.25rem !important; }
+.absolute.inset-0:has(> .room-slots--overlay) > button .text-4xl { font-size: 1.6rem; line-height: 1; }
+.absolute.inset-0:has(> .room-slots--overlay) > button [class*="text-5xl"], .absolute.inset-0:has(> .room-slots--overlay) > button [class*="text-4xl"] { font-size: 2rem; }
+.absolute.inset-0:has(> .room-slots--overlay) > button [class*="mt-6"] { margin-top: .75rem; }
+.absolute.inset-0:has(> .room-slots--overlay) > button [class*="mt-4"] { margin-top: .5rem; }
+.absolute.inset-0:has(> .room-slots--overlay) > button [class*="py-5"] { padding-block: .6rem; }
+
+/* The list of friends to invite to the open room. */
+.room-invite-list { display: grid; gap: .4rem; margin: 0; padding: 0; list-style: none; }
+.room-invite-list li { display: flex; align-items: center; justify-content: space-between; gap: .6rem; padding: .45rem .6rem; border: 1px solid #ffffff1a; border-radius: 12px; background: #ffffff0a; }
+.room-invite-list li > span { display: flex; align-items: center; gap: .55rem; min-width: 0; }
+.room-invite-list li strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .85rem; }
+.room-invite-list .is-online { color: #6ee7b7; font-size: .65rem; font-weight: 700; }
+.room-invite-list .is-sent { display: inline-flex; align-items: center; gap: .3rem; padding: .35rem .7rem; color: #6ee7b7; font-size: .75rem; font-weight: 700; }

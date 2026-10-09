@@ -34,6 +34,12 @@ import { ProfileAvatar } from "../social/ProfileAvatarPicker";
 import "./wattenGameScreen.css";
 import { wattenPlayAnimation, wattenTableStyle } from "@/games/watten/presentation";
 import WattenTurnNotice from "./WattenTurnNotice";
+import WattenScreen from "./WattenScreen";
+import WattenFullscreenButton from "./WattenFullscreenButton";
+import { WattenLastTrickViewer, WattenTrickPile } from "./WattenTricks";
+import { GehenRule, GehenVotes } from "./WattenGehenVote";
+import { useGehenText } from "@/games/watten/useGehenText";
+import { useLastTrick } from "./useLastTrick";
 
 import {
   translateWatten,
@@ -245,15 +251,21 @@ export default function WattenGame() {
   const [roundValue, setRoundValue] = useState(2);
 
   // A proposed raise that the other side still has to answer.
+  // `gehen` lists the answering players who voted to give up so far.
   const [pendingBid, setPendingBid] = useState<{
     side: WattenSide;
     value: number;
+    gehen: string[];
   } | null>(null);
+  const g = useGehenText();
 
   // Prevent one side from raising twice in succession.
   const [lastBidSide, setLastBidSide] = useState<WattenSide | null>(null);
 
   const [trickWinner, setTrickWinner] = useState<PlayedCard | null>(null);
+  const lastTrick = useLastTrick();
+  const lastTrickFor = (playerId: string) =>
+    lastTrick.last && players[lastTrick.last.winnerSeat]?.id === playerId ? lastTrick.last : null;
 
   const [tricksWon, setTricksWon] = useState<Record<string, number>>(() =>
     Object.fromEntries(playerInfo.map((player) => [player.id, 0])),
@@ -573,6 +585,14 @@ export default function WattenGame() {
     }
 
     const winnerId = trickWinner.playerId;
+    lastTrick.finish({
+      winnerSeat: players.findIndex((player) => player.id === winnerId),
+      plays: playedCards.map((played) => ({
+        seat: players.findIndex((player) => player.id === played.playerId),
+        name: players.find((player) => player.id === played.playerId)?.name ?? "",
+        card: played.card,
+      })),
+    });
 
     const newTricks = {
       ...tricksWon,
@@ -761,6 +781,7 @@ export default function WattenGame() {
     setPendingBid({
       side: currentSide,
       value: roundValue + 1,
+      gehen: [],
     });
   }
   function holdBid() {
@@ -771,6 +792,28 @@ export default function WattenGame() {
     setRoundValue(pendingBid.value);
     setLastBidSide(pendingBid.side);
     setPendingBid(null);
+  }
+  // One vote to stay is enough (holdBid); giving up needs every answering player.
+  function voteGehen() {
+    if (!pendingBid) {
+      return;
+    }
+
+    const responders = getSidePlayers(getOpposingSide(pendingBid.side));
+    const voter = responders.find((player) => !pendingBid.gehen.includes(player.id));
+
+    if (!voter) {
+      return;
+    }
+
+    const gehen = [...pendingBid.gehen, voter.id];
+
+    if (gehen.length < responders.length) {
+      setPendingBid({ ...pendingBid, gehen });
+      return;
+    }
+
+    declineBid();
   }
   function declineBid() {
     if (!pendingBid) {
@@ -787,6 +830,13 @@ export default function WattenGame() {
 
     setPendingBid(null);
   }
+
+  // Who answers a pending raise, who is asked next, and who has already voted to give up.
+  const bidResponders = pendingBid ? getSidePlayers(getOpposingSide(pendingBid.side)) : [];
+  const bidVoter = pendingBid ? bidResponders.find((player) => !pendingBid.gehen.includes(player.id)) : undefined;
+  const bidGehenNames = pendingBid
+    ? pendingBid.gehen.map((id) => players.find((player) => player.id === id)?.name ?? "")
+    : [];
 
   function finishViewingCards() {
     if (viewingPlayer === null) {
@@ -817,6 +867,7 @@ export default function WattenGame() {
   }
 
   function startNewRound(nextDealer: number) {
+    lastTrick.reset();
     const newDeck = shuffleDeck(createDeck());
     const nextTrumpCaller = getNextPlayer(nextDealer, players.length);
 
@@ -1292,21 +1343,20 @@ export default function WattenGame() {
     }
 
     return (
-      <main className="watten-game-screen min-h-screen bg-transparent px-2 py-3 text-white sm:px-4 sm:py-4 md:px-8 md:py-6">
-        <div className="watten-game-content mx-auto w-full max-w-[1800px]">
+      <WattenScreen>
+        <div className="watten-game-content">
           {/* HEADER */}
-          <div className="relative z-30 mb-3 flex items-start justify-between gap-2 max-md:flex-col md:mb-4 md:items-center">
-            <div className="max-md:ml-0 max-md:pl-0 ml-5 pl-5">
-              <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
+          <div className="watten-game-header">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-amber-400">
                 {l("Bayerisches Watten", "Bavarian Watten")}
               </p>
-
-              <h1 className="mt-1 text-2xl font-black">
+              <h1 className="font-black">
                 {l("4 Spieler · Hotseat", "4 Players · Hotseat")}
               </h1>
             </div>
 
-            <div className="flex items-center gap-3 max-md:w-full max-md:gap-2 max-md:overflow-x-auto max-md:pb-1">
+            <div>
               <button
                 type="button"
                 onClick={() => setHelpMode((current) => !current)}
@@ -1319,65 +1369,23 @@ export default function WattenGame() {
                 {helpMode ? "💡 Help On" : "💡 Help"}
               </button>
               <HeaderTools><CardThemeSelector /><TableThemeSelector /></HeaderTools>
-
+              <WattenFullscreenButton />
               <Link
-                to="/watten/hotseat"
+                to="/games/watten/hotseat"
                 className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium transition hover:bg-white/20"
               >
                 {l("Zurück", "Back")}
               </Link>
             </div>
           </div>
-          {/* GAME STATUS - BETWEEN OPPONENTS */}
-          <div className="absolute left-1/3 top-3 z-20 -translate-x-1/2 max-md:static max-md:mb-3 max-md:translate-x-0">
-            <div className="flex min-w-72 flex-col items-center rounded-2xl border border-white/10 bg-emerald-950/80 px-5 py-3 shadow-lg backdrop-blur max-md:min-w-0 max-md:w-full max-md:px-3 max-md:py-2">
-              {/* Farbe + Schlag */}
-              <div className="flex items-center justify-center gap-10">
-                <div className="text-center">
-                  <p className="text-[11px] font-semibold uppercase tracking-widest text-emerald-300">
-                    {l("Farbe", "Trump")}
-                  </p>
-
-                  {Farbe ? (
-                    <div className="mt-0.5 flex items-center gap-2">
-                      <img
-                        src={suitIcons[Farbe]}
-                        alt={Farbe}
-                        draggable={false}
-                        className="h-7 w-7 object-contain"
-                      />
-
-                      <span className="text-sm font-bold text-white">
-                        {Farbe}
-                      </span>
-                    </div>
-                  ) : (
-                    <span className="text-[10px] text-zinc-500">–</span>
-                  )}
-                </div>
-
-                <div className="h-7 w-px bg-white/10" />
-
-                <div className="text-center">
-                  <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-300">
-                    {t("Schlag")}
-                  </p>
-
-                  <p className="mt-0.5 text-base font-bold text-white">
-                    {schlag ?? "–"}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
           <WattenTurnNotice player={fourCurrentPlayer.name} active={phase === "playing" && !showPassScreen && fourTrumpfOderKritischActive} mustFollow={fourCurrentMustFollow} />
           {/* TABLE + SIDEBARS */}
-          <div className="watten-game-grid grid w-full grid-cols-[16rem_minmax(0,1fr)_16rem] items-start gap-5 max-md:grid-cols-1 max-md:gap-3">
+          <div className="watten-game-grid watten-cols">
             {/* LEFT SIDEBAR: HELP + TEAM SCORE */}
-            <aside className="relative w-64 pt-15 max-md:order-2 max-md:w-full max-md:pt-0">
+            <aside className="watten-aside watten-aside--left">
               {/* CARD PRIORITY HELP */}
               {Farbe && schlag && (
-                <div className="absolute left-0 top-5 z-50 w-full">
+                <div className="watten-rank-help">
                   <button
                     type="button"
                     onClick={() => setShowRankingHelp((current) => !current)}
@@ -1393,7 +1401,7 @@ export default function WattenGame() {
                   </button>
 
                   {showRankingHelp && (
-                    <div className="absolute left-0 top-full mt-2 h-[650px] w-full overflow-y-auto rounded-3xl border border-white/10 bg-zinc-950/95 p-4 shadow-2xl backdrop-blur max-md:fixed max-md:inset-x-2 max-md:top-20 max-md:z-[200] max-md:h-[70vh] max-md:w-auto max-md:p-3">
+                    <div className="watten-rank-popup rounded-3xl border border-white/10 bg-zinc-950/95 p-4 shadow-2xl backdrop-blur">
                       <div className="mb-5">
                         <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
                           {l("Anfängerhilfe", "Beginner")}
@@ -1468,7 +1476,7 @@ export default function WattenGame() {
               )}
 
               {/* TEAM SCORE */}
-              <div className="h-[650px] rounded-3xl border border-white/10 bg-zinc-950/95 p-5 shadow-2xl max-md:h-auto max-md:p-3">
+              <div className="watten-aside-card watten-score rounded-3xl border border-white/10 bg-zinc-950/95 p-5 shadow-2xl">
                 <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
                   {l("Punktestand", "Score")}
                 </p>
@@ -1561,21 +1569,44 @@ export default function WattenGame() {
             </aside>
             {/* CENTER: 4 PLAYER TABLE */}
             <div
-              className="watten-table
-    relative
-    min-h-[640px]
-    min-w-0
-    overflow-visible
-    rounded-[60px]
-    max-md:order-1
-    max-md:min-h-[500px]
-    max-md:rounded-[32px]
-    shadow-2xl
-    transition-all
-    duration-500
-  "
+              className="watten-table watten-table-grid rounded-[40px] shadow-2xl"
               style={wattenTableStyle(tableTheme)}
             >
+              {/* GAME STATUS */}
+              <div className="watten-table-status">
+                <div className="watten-status-chip">
+                  <div className="text-center">
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-emerald-300">
+                      {l("Farbe", "Trump")}
+                    </p>
+                    {Farbe ? (
+                      <div className="flex items-center gap-1.5">
+                        <img src={suitIcons[Farbe]} alt={Farbe} draggable={false} className="h-6 w-6 object-contain" />
+                        <span className="text-sm font-bold text-white">{Farbe}</span>
+                      </div>
+                    ) : (
+                      <span className="text-[10px] text-zinc-500">–</span>
+                    )}
+                  </div>
+                  <div className="h-7 w-px bg-white/10" />
+                  <div className="text-center">
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-amber-300">
+                      {t("Schlag")}
+                    </p>
+                    <p className="text-sm font-bold text-white">{schlag ?? "–"}</p>
+                  </div>
+                  <div className="h-7 w-px bg-white/10" />
+                  <div className="text-center">
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400">
+                      {l("Rundenwert", "Round value")}
+                    </p>
+                    <p className="text-sm font-bold text-white">{roundValue}</p>
+                  </div>
+                </div>
+                <span className="watten-clockwise">
+                  {l("↻ Spielrichtung im Uhrzeigersinn", "↻ Play proceeds clockwise")}
+                </span>
+              </div>
               {/* TABLE SURFACE */}
               {phase === "setup" && (
                 <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[110px] bg-black/30">
@@ -1674,23 +1705,29 @@ export default function WattenGame() {
                     </p>
 
                     <h2 className="mt-2 text-2xl font-black text-white">
-                      {getSideLabel(pendingBid.side)} geht auf{" "}
+                      {getSideLabel(pendingBid.side)} {l("geht auf", "raises to")}{" "}
                       {pendingBid.value}
                     </h2>
 
                     <p className="mt-5 text-sm text-zinc-400">
-                      {l("Die Entscheidung liegt bei", "The decision is with")}
+                      {g("The decision is with")}
                     </p>
 
                     <p className="mt-1 text-lg font-black text-emerald-300">
                       {getSideLabel(getOpposingSide(pendingBid.side))}
                     </p>
 
-                    <div className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-zinc-300">
-                      Aktueller Rundenwert:{" "}
+                    {bidResponders.length > 1 && bidVoter && (
+                      <p className="mt-4 rounded-xl border border-emerald-300/30 bg-emerald-400/10 px-3 py-2 text-sm font-black text-emerald-200">
+                        {g("{name}, stay or give up (gehen)?", { name: bidVoter.name })}
+                      </p>
+                    )}
+
+                    <div className="mt-5 rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-zinc-300">
+                      {g("Current round value")}:{" "}
                       <strong className="text-amber-300">{roundValue}</strong>
                       <br />
-                      Neuer Rundenwert bei Halten:{" "}
+                      {g("New value if you stay")}:{" "}
                       <strong className="text-amber-300">
                         {pendingBid.value}
                       </strong>
@@ -1699,23 +1736,24 @@ export default function WattenGame() {
                     <button
                       type="button"
                       onClick={holdBid}
-                      className="mt-6 w-full rounded-xl bg-emerald-500 px-5 py-3 font-black text-emerald-950 transition hover:bg-emerald-400"
+                      className="mt-5 w-full rounded-xl bg-emerald-500 px-5 py-3 font-black text-emerald-950 transition hover:bg-emerald-400"
                     >
-                      {pendingBid.value} halten
+                      {g("Stay at {value}", { value: pendingBid.value })}
                     </button>
 
                     <button
                       type="button"
-                      onClick={declineBid}
+                      onClick={voteGehen}
                       className="mt-3 w-full rounded-xl bg-red-500/20 px-5 py-3 font-bold text-red-200 transition hover:bg-red-500/30"
                     >
-                      {l("Nicht halten", "Decline")}
+                      {g("Gehen (give up)")}
                     </button>
 
-                    <p className="mt-4 text-xs leading-5 text-zinc-500">
-                      Bei „Nicht halten“ gewinnt {getSideLabel(pendingBid.side)}{" "}
-                      die Runde mit dem bisherigen Wert von {roundValue}{" "}
-                      Punkten.
+                    <GehenVotes names={bidGehenNames} needed={bidResponders.length} />
+                    {bidResponders.length > 1 && <GehenRule />}
+
+                    <p className="mt-3 text-xs leading-5 text-zinc-500">
+                      {g("If the answering side gives up (gehen), {name} wins the round at the current value of {value} points.", { name: getSideLabel(pendingBid.side), value: roundValue })}
                     </p>
                   </div>
                 </div>
@@ -2411,9 +2449,9 @@ export default function WattenGame() {
                 </div>
               )}
               {phase !== "setup" && (
-                <div>
+                <div className="watten-table-contents">
                   <div
-                    className={`absolute left-1/2 top-6 z-20 w-52 -translate-x-1/2 rounded-2xl border p-4 text-center shadow-xl backdrop-blur max-md:top-2 max-md:w-36 max-md:p-2 ${topTeam.box}`}
+                    className={`watten-seat watten-seat--top z-20 rounded-2xl border text-center shadow-xl backdrop-blur ${topTeam.box}`}
                   >
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-amber-400 px-3 py-1 text-[9px] font-black uppercase tracking-wider text-amber-950">
                       {t("Partner")}
@@ -2424,17 +2462,16 @@ export default function WattenGame() {
                       {topPlayer.name}
                     </div>
 
-                    <div
-                      className={`mx-auto mt-1 w-fit rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${topTeam.badge}`}
-                    >
-                      {topTeam.label}
+                    <div className="watten-seat-extra">
+                      <span className={`rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${topTeam.badge}`}>{topTeam.label}</span>
+                      <WattenTrickPile count={tricksWon[topPlayer.id] ?? 0} name={topPlayer.name} last={lastTrickFor(topPlayer.id)} cardsPerTrick={4} onView={() => lastTrick.setOpen(true)} />
                     </div>
 
                     <HiddenPreviewCards player={topPlayer} />
                   </div>
 
                   <div
-                    className={`absolute left-3 top-1/2 z-20 w-44 -translate-y-1/2 rounded-2xl border p-3 text-center shadow-xl backdrop-blur max-md:left-1 max-md:w-28 max-md:p-2 ${leftTeam.box}`}
+                    className={`watten-seat watten-seat--left z-20 rounded-2xl border text-center shadow-xl backdrop-blur ${leftTeam.box}`}
                   >
                     <div className="absolute -top-3 right-3 rounded-full bg-amber-400 px-3 py-1 text-[9px] font-black uppercase tracking-wider text-amber-950">
                       {l("Nächster Spieler", "Next player")}
@@ -2442,24 +2479,22 @@ export default function WattenGame() {
 
                     <div className="text-lg font-bold"><HostAvatar player={leftPlayer} avatarId={hostAvatarId} />{leftPlayer.name}</div>
 
-                    <div
-                      className={`mx-auto mt-1 w-fit rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${leftTeam.badge}`}
-                    >
-                      {leftTeam.label}
+                    <div className="watten-seat-extra">
+                      <span className={`rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${leftTeam.badge}`}>{leftTeam.label}</span>
+                      <WattenTrickPile count={tricksWon[leftPlayer.id] ?? 0} name={leftPlayer.name} last={lastTrickFor(leftPlayer.id)} cardsPerTrick={4} onView={() => lastTrick.setOpen(true)} />
                     </div>
 
                     <HiddenPreviewCards player={leftPlayer} />
                   </div>
 
                   <div
-                    className={`absolute right-3 top-1/2 z-20 w-44 -translate-y-1/2 rounded-2xl border p-3 text-center shadow-xl backdrop-blur max-md:right-1 max-md:w-28 max-md:p-2 ${rightTeam.box}`}
+                    className={`watten-seat watten-seat--right z-20 rounded-2xl border text-center shadow-xl backdrop-blur ${rightTeam.box}`}
                   >
                     <div className="text-lg font-bold"><HostAvatar player={rightPlayer} avatarId={hostAvatarId} />{rightPlayer.name}</div>
 
-                    <div
-                      className={`mx-auto mt-1 w-fit rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${rightTeam.badge}`}
-                    >
-                      {rightTeam.label}
+                    <div className="watten-seat-extra">
+                      <span className={`rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${rightTeam.badge}`}>{rightTeam.label}</span>
+                      <WattenTrickPile count={tricksWon[rightPlayer.id] ?? 0} name={rightPlayer.name} last={lastTrickFor(rightPlayer.id)} cardsPerTrick={4} onView={() => lastTrick.setOpen(true)} />
                     </div>
 
                     <HiddenPreviewCards player={rightPlayer} />
@@ -2467,7 +2502,7 @@ export default function WattenGame() {
                 </div>
               )}
               {/* PLAYED CARDS */}
-              <div className="absolute left-1/2 top-[45%] z-10 flex h-44 w-[440px] -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-3 rounded-3xl border border-white/10 bg-emerald-950/30 p-4 shadow-inner max-md:h-28 max-md:w-[calc(100%-1rem)] max-md:gap-1 max-md:rounded-2xl max-md:p-2">
+              <div className="watten-table-center z-10 rounded-3xl border border-white/10 bg-emerald-950/40 shadow-inner">
                 {playedCards.length === 0 ? (
                   <div className="text-center">
                     <p className="mt-2 text-sm text-emerald-300/50">
@@ -2497,29 +2532,24 @@ export default function WattenGame() {
               </div>
               {/* CURRENT PLAYER HAND */}
               {!showPassScreen && phase === "playing" && !winner && (
-                <div className="absolute bottom-4 left-1/2 z-30 w-full max-w-4xl -translate-x-1/2 px-8 max-md:bottom-2 max-md:px-1">
+                <div className="watten-table-hand z-30">
                   <div
-                    className={`relative rounded-2xl px-6 py-5 shadow-2xl max-md:px-1 max-md:py-3`}
+                    className="relative rounded-2xl shadow-2xl"
                   >
                     {/* ACTIVE PLAYER */}
-                    <div className="absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-amber-400 px-5 py-1.5 text-sm font-black text-amber-950 shadow-lg max-md:-top-4 max-md:px-3 max-md:py-1 max-md:text-[10px]">
-                      ▼ {fourCurrentPlayer.name} · AM ZUG
+                    <div className="watten-hand-head">
+                      <HostAvatar player={fourCurrentPlayer} avatarId={hostAvatarId} />
+                      <div className="watten-turn-label">▼ {fourCurrentPlayer.name} · AM ZUG</div>
+                      <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wider ${bottomTeam.badge}`}>{bottomTeam.label}</span>
+                      <WattenTrickPile count={tricksWon[fourCurrentPlayer.id] ?? 0} name={fourCurrentPlayer.name} last={lastTrickFor(fourCurrentPlayer.id)} cardsPerTrick={4} onView={() => lastTrick.setOpen(true)} />
                     </div>
-
-                    <div
-                      className={`mx-auto mt-3 w-fit rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wider ${bottomTeam.badge}`}
-                    >
-                      {bottomTeam.label}
-                    </div>
-                    <HostAvatar player={fourCurrentPlayer} avatarId={hostAvatarId} />
-
                     {/* LEFT: Help legend */}
-                    <div className="mt-5 grid grid-cols-[1fr_auto_1fr] items-center gap-4 max-md:mt-2 max-md:grid-cols-1 max-md:gap-2">
-                      <div className="flex justify-end">
+                    <div className="watten-hand-row mt-2">
+                      <div className="watten-hand-extras">
                         {helpMode &&
                           playedCards.length > 0 &&
                           !cardPlayedThisTurn && (
-                            <div className="flex flex-col gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-xs font-semibold">
+                            <div className="flex flex-row flex-wrap gap-x-4 gap-y-1 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-semibold">
                               <span className="flex items-center gap-2 text-green-300">
                                 <span className="h-3 w-3 rounded-full bg-green-500" />
                                 {l(
@@ -2589,7 +2619,7 @@ export default function WattenGame() {
                       </div>
 
                       {/* FINISH TURN */}
-                      <div className="flex justify-start">
+                      <div className="watten-hand-extras">
                         {playedCards.length < players.length &&
                           cardPlayedThisTurn && (
                             <button
@@ -2605,13 +2635,7 @@ export default function WattenGame() {
                   </div>
                 </div>
               )}
-              {/* CLOCKWISE INDICATOR */}
-              <div className="absolute left-7 top-7 z-30 rounded-full border border-white/10 bg-emerald-950/80 px-4 py-2 text-xs font-semibold text-emerald-200 shadow-lg backdrop-blur">
-                {l(
-                  "↻ Spielrichtung im Uhrzeigersinn",
-                  "↻ Play proceeds clockwise",
-                )}
-              </div>
+              <WattenLastTrickViewer trick={lastTrick.last} open={lastTrick.open} onClose={() => lastTrick.setOpen(false)} nameOf={(seat) => players[seat]?.name ?? ""} />
               {winner && (
                 <div className="absolute inset-0 z-[110] flex items-center justify-center rounded-[110px] bg-black/65 backdrop-blur-sm">
                   <div className="w-full max-w-lg rounded-3xl border border-amber-400/30 bg-zinc-950 p-10 text-center shadow-2xl">
@@ -2640,8 +2664,8 @@ export default function WattenGame() {
             </div>
 
             {/* RIGHT SIDEBAR: STICHSTAND */}
-            <aside className="w-64 pt-10 max-md:order-3 max-md:w-full max-md:pt-0">
-              <div className="h-[650px] overflow-y-auto rounded-3xl border border-white/10 bg-zinc-950/95 p-5 shadow-2xl max-md:h-auto max-md:max-h-[420px] max-md:p-3">
+            <aside className="watten-aside watten-aside--right">
+              <div className="watten-aside-card watten-trickscore rounded-3xl border border-white/10 bg-zinc-950/95 p-5 shadow-2xl">
                 <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
                   {l("Aktueller Stichstand", "Current trick score")}
                 </p>
@@ -2734,7 +2758,7 @@ export default function WattenGame() {
                   </div>
                 </div>
                 {/* RUNDENWERT / GEHEN */}
-                <div className="mt-5 rounded-xl border border-white/10 bg-white/5 p-3 text-center">
+                <div className="watten-raise mt-5 rounded-xl border border-white/10 bg-white/5 p-3 text-center">
                   <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
                     {l("Rundenwert", "Round value")}
                   </p>
@@ -2770,12 +2794,14 @@ export default function WattenGame() {
                       </p>
                     </div>
                   )}
-                </div>
+                
+                <GehenRule />
+              </div>
               </div>
             </aside>
           </div>
         </div>
-      </main>
+      </WattenScreen>
     );
   }
   const currentPlayerData = players[currentPlayer];
@@ -2823,51 +2849,51 @@ export default function WattenGame() {
   }
 
   return (
-    <main className="watten-game-screen min-h-screen bg-transparent px-2 py-3 text-white sm:px-4 sm:py-4 md:px-8 md:py-6">
-      <div className="watten-game-content mx-auto w-full max-w-[1800px]">
+    <WattenScreen>
+      <div className="watten-game-content">
         {/* Header */}
-        <div className="max-md:ml-0 max-md:pl-0 ml-5 pl-5">
-          <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
-            {l("Bayerisches Watten", "Bavarian Watten")}
-          </p>
-
-          <h1 className="mt-1 text-2xl font-black">
-            {l("3 Spieler · Hotseat", "3 Players · Hotseat")}
-          </h1>
+        <div className="watten-game-header">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-amber-400">
+              {l("Bayerisches Watten", "Bavarian Watten")}
+            </p>
+            <h1 className="font-black">
+              {l("3 Spieler · Hotseat", "3 Players · Hotseat")}
+            </h1>
+          </div>
+          <div>
+            <button
+              type="button"
+              onClick={() => setHelpMode((current) => !current)}
+              className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
+                helpMode
+                  ? "bg-amber-400 text-amber-950 hover:bg-amber-300"
+                  : "bg-white/10 text-white hover:bg-white/20"
+              }`}
+            >
+              {helpMode ? "💡 Help On" : "💡 Help"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowRules((current) => !current)}
+              className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
+                showRules
+                  ? "bg-amber-400 text-amber-950 hover:bg-amber-300"
+                  : "bg-white/10 text-white hover:bg-white/20"
+              }`}
+            >
+              {l("📖 Spielregeln", "📖 Rules")}
+            </button>
+            <HeaderTools><CardThemeSelector /><TableThemeSelector /></HeaderTools>
+            <WattenFullscreenButton />
+            <Link
+              to="/games/watten"
+              className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium transition hover:bg-white/20"
+            >
+              Exit
+            </Link>
+          </div>
         </div>
-
-        <div className="relative pb-5 z-30 flex items-center justify-end gap-3 pr-2 max-md:justify-start max-md:overflow-x-auto max-md:pb-2">
-          <button
-            type="button"
-            onClick={() => setHelpMode((current) => !current)}
-            className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
-              helpMode
-                ? "bg-amber-400 text-amber-950 hover:bg-amber-300"
-                : "bg-white/10 text-white hover:bg-white/20"
-            }`}
-          >
-            {helpMode ? "💡 Help On" : "💡 Help"}
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowRules((current) => !current)}
-            className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
-              showRules
-                ? "bg-amber-400 text-amber-950 hover:bg-amber-300"
-                : "bg-white/10 text-white hover:bg-white/20"
-            }`}
-          >
-            {l("📖 Spielregeln", "📖 Rules")}
-          </button>
-          <HeaderTools><CardThemeSelector /><TableThemeSelector /></HeaderTools>
-          <Link
-            to="/watten"
-            className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium transition hover:bg-white/20"
-          >
-            Exit
-          </Link>
-        </div>
-
         {notification && (
           <div className="absolute left-1/2 top-8 z-50 -translate-x-1/2 animate-in fade-in slide-in-from-top-3">
             <div className="flex items-center gap-3 rounded-2xl border border-red-400/30 bg-red-950/90 px-5 py-3 text-sm font-semibold text-red-200 shadow-2xl backdrop-blur">
@@ -2980,40 +3006,56 @@ export default function WattenGame() {
                 {t("Gehen")}
               </p>
 
-              <h2 className="mt-2 text-2xl font-bold text-white">
-                {getSideLabel(pendingBid.side)} geht auf {pendingBid.value}
+              <h2 className="mt-2 text-2xl font-black text-white">
+                {getSideLabel(pendingBid.side)} {l("geht auf", "raises to")}{" "}
+                {pendingBid.value}
               </h2>
 
               <p className="mt-4 text-sm leading-6 text-zinc-400">
-                {l(
-                  "Die Gegenseite muss entscheiden, ob sie den neuen Rundenwert hält.",
-                  "The opposing side must decide whether to hold the new round value.",
-                )}
+                {g("The opposing side must decide whether to stay at the new round value.")}
               </p>
+
+              {bidResponders.length > 1 && bidVoter && (
+                <p className="mt-4 rounded-xl border border-emerald-300/30 bg-emerald-400/10 px-3 py-2 text-sm font-black text-emerald-200">
+                  {g("{name}, stay or give up (gehen)?", { name: bidVoter.name })}
+                </p>
+              )}
+
+              <div className="mt-5 rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-zinc-300">
+                {g("Current round value")}:{" "}
+                <strong className="text-amber-300">{roundValue}</strong>
+                <br />
+                {g("New value if you stay")}:{" "}
+                <strong className="text-amber-300">
+                  {pendingBid.value}
+                </strong>
+              </div>
 
               <button
                 type="button"
                 onClick={holdBid}
-                className="mt-6 w-full rounded-xl bg-emerald-500 px-5 py-3 font-black text-emerald-950 transition hover:bg-emerald-400"
+                className="mt-5 w-full rounded-xl bg-emerald-500 px-5 py-3 font-black text-emerald-950 transition hover:bg-emerald-400"
               >
-                {pendingBid.value} halten
+                {g("Stay at {value}", { value: pendingBid.value })}
               </button>
 
               <button
                 type="button"
-                onClick={declineBid}
+                onClick={voteGehen}
                 className="mt-3 w-full rounded-xl bg-red-500/20 px-5 py-3 font-bold text-red-200 transition hover:bg-red-500/30"
               >
-                {l("Nicht halten", "Decline")}
+                {g("Gehen (give up)")}
               </button>
 
-              <p className="mt-4 text-xs text-zinc-500">
-                Bei „Nicht halten“ erhält {getSideLabel(pendingBid.side)}{" "}
-                {roundValue} Punkte.
+              <GehenVotes names={bidGehenNames} needed={bidResponders.length} />
+              {bidResponders.length > 1 && <GehenRule />}
+
+              <p className="mt-3 text-xs leading-5 text-zinc-500">
+                {g("If the answering side gives up (gehen), {name} wins the round at the current value of {value} points.", { name: getSideLabel(pendingBid.side), value: roundValue })}
               </p>
             </div>
           </div>
-        )}
+              )}
         {/* OVERALL GAME WINNER */}
         {gameWinner && (
           <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 px-6 backdrop-blur-md">
@@ -3545,12 +3587,12 @@ export default function WattenGame() {
 
         <WattenTurnNotice player={currentPlayerData.name} active={phase === "playing" && !showPassScreen && trumpfOderKritischActive} mustFollow={currentPlayerMustFollowTrumpfOderKritisch} />
         {/* Table + round score */}
-        <div className="watten-game-grid grid w-full grid-cols-[16rem_minmax(0,1fr)_16rem] items-start gap-5 max-md:grid-cols-1 max-md:gap-3">
+        <div className="watten-game-grid watten-cols">
           {/* LEFT SIDEBAR: PUNKTESTAND */}
-          <aside className="relative w-64 pt-15 max-md:order-2 max-md:w-full max-md:pt-0">
+          <aside className="watten-aside watten-aside--left">
             {/* CARD PRIORITY HELP */}
             {Farbe && schlag && (
-              <div className="absolute left-0 top-5 z-50 w-full">
+              <div className="watten-rank-help">
                 <button
                   type="button"
                   onClick={() => setShowRankingHelp((current) => !current)}
@@ -3566,7 +3608,7 @@ export default function WattenGame() {
                 </button>
 
                 {showRankingHelp && (
-                  <div className="absolute left-0 top-full mt-2 h-[650px] w-full overflow-y-auto rounded-3xl border border-white/10 bg-zinc-950/95 p-4 shadow-2xl backdrop-blur max-md:fixed max-md:inset-x-2 max-md:top-20 max-md:z-[200] max-md:h-[70vh] max-md:w-auto max-md:p-3">
+                  <div className="watten-rank-popup rounded-3xl border border-white/10 bg-zinc-950/95 p-4 shadow-2xl backdrop-blur">
                     <div className="mb-5">
                       <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
                         {l("Anfängerhilfe", "Beginner")}
@@ -3639,7 +3681,7 @@ export default function WattenGame() {
                 )}
               </div>
             )}
-            <div className="h-[650px] rounded-3xl border border-white/10 bg-zinc-950/95 p-5 shadow-2xl max-md:h-auto max-md:p-3">
+            <div className="watten-aside-card watten-score rounded-3xl border border-white/10 bg-zinc-950/95 p-5 shadow-2xl">
               <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
                 {l("Punktestand", "Score")}
               </p>
@@ -3695,25 +3737,13 @@ export default function WattenGame() {
 
           {/* CENTER: PLAYING TABLE */}
           <div
-            className="watten-table
-    relative
-    h-[520px]
-    overflow-hidden
-    rounded-[40px]
-    max-md:order-1
-    max-md:h-[460px]
-    max-md:rounded-[28px]
-    border border-white/10
-    shadow-2xl
-    transition-all
-    duration-500
-  "
+            className="watten-table watten-table-grid is-three rounded-[40px] shadow-2xl"
             style={wattenTableStyle(tableTheme)}
           >
             {/* DECK READY AFTER ABHEBEN */}
             {phase === "dealReady" && !winner && (
               <div className="absolute left-1/2 top-[43%] z-40 -translate-x-1/2 -translate-y-1/2">
-                <div className="flex items-center gap-10 rounded-3xl border border-white/10 bg-emerald-950/70 px-10 py-8 shadow-2xl backdrop-blur-sm">
+                <div className="flex items-center gap-6 rounded-3xl border border-white/10 bg-emerald-950/70 px-6 py-4 shadow-2xl backdrop-blur-sm">
                   {/* Animated deck */}
                   <div className="flex flex-col items-center">
                     <div className="relative h-32 w-24">
@@ -3757,7 +3787,7 @@ export default function WattenGame() {
             )}
             {/* ABHEBER HAND DURING DEAL READY */}
             {phase === "dealReady" && (
-              <div className="absolute bottom-4 left-1/2 z-30 w-full -translate-x-1/2 px-10 max-md:bottom-2 max-md:px-1">
+              <div className="watten-table-hand z-30">
                 <div className="relative mx-auto min-h-32 max-w-xl rounded-2xl border border-amber-400/20 px-6 py-4 shadow-2xl backdrop-blur-sm max-md:min-h-24 max-md:px-2 max-md:py-2">
                   {/* Player label */}
                   <div className="absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-amber-400 px-5 py-1.5 text-sm font-black text-amber-950 shadow-lg max-md:-top-4 max-md:px-3 max-md:py-1 max-md:text-[10px]">
@@ -3802,45 +3832,35 @@ export default function WattenGame() {
                 </div>
               </div>
             )}
-            {/* GAME STATUS - BETWEEN OPPONENTS */}
-            <div className="absolute left-1/2 top-8 z-20 -translate-x-1/2">
-              <div className="flex min-w-72 flex-col items-center rounded-2xl border border-white/10 bg-emerald-950/80 px-5 py-3 shadow-lg backdrop-blur max-md:min-w-0 max-md:w-full max-md:px-3 max-md:py-2">
-                {/* Farbe + Schlag */}
-                <div className="flex items-center justify-center gap-10">
-                  <div className="text-center">
-                    <p className="text-[11px] font-semibold uppercase tracking-widest text-emerald-300">
-                      {l("Farbe", "Trump")}
-                    </p>
-
-                    {Farbe ? (
-                      <div className="mt-0.5 flex items-center gap-2">
-                        <img
-                          src={suitIcons[Farbe]}
-                          alt={Farbe}
-                          draggable={false}
-                          className="h-7 w-7 object-contain"
-                        />
-
-                        <span className="text-sm font-bold text-white">
-                          {Farbe}
-                        </span>
-                      </div>
-                    ) : (
-                      <span className="text-[10px] text-zinc-500">–</span>
-                    )}
-                  </div>
-
-                  <div className="h-7 w-px bg-white/10" />
-
-                  <div className="text-center">
-                    <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-300">
-                      {t("Schlag")}
-                    </p>
-
-                    <p className="mt-0.5 text-base font-bold text-white">
-                      {schlag ?? "–"}
-                    </p>
-                  </div>
+            {/* GAME STATUS */}
+            <div className="watten-table-status">
+              <div className="watten-status-chip">
+                <div className="text-center">
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-emerald-300">
+                    {l("Farbe", "Trump")}
+                  </p>
+                  {Farbe ? (
+                    <div className="flex items-center gap-1.5">
+                      <img src={suitIcons[Farbe]} alt={Farbe} draggable={false} className="h-6 w-6 object-contain" />
+                      <span className="text-sm font-bold text-white">{Farbe}</span>
+                    </div>
+                  ) : (
+                    <span className="text-[10px] text-zinc-500">–</span>
+                  )}
+                </div>
+                <div className="h-7 w-px bg-white/10" />
+                <div className="text-center">
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-amber-300">
+                    {t("Schlag")}
+                  </p>
+                  <p className="text-sm font-bold text-white">{schlag ?? "–"}</p>
+                </div>
+                <div className="h-7 w-px bg-white/10" />
+                <div className="text-center">
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400">
+                    {l("Rundenwert", "Round value")}
+                  </p>
+                  <p className="text-sm font-bold text-white">{roundValue}</p>
                 </div>
               </div>
             </div>
@@ -3952,9 +3972,9 @@ export default function WattenGame() {
               </div>
             )}
             {phase !== "setup" && (
-              <div>
+              <div className="watten-table-contents">
                 {/* LEFT OPPONENT */}
-                <div className="absolute left-10 top-8 z-20 w-48 rounded-2xl border border-white/10 bg-emerald-950/55 p-3 text-center shadow-lg transition-all duration-300 max-md:left-2 max-md:top-3 max-md:w-32 max-md:p-2">
+                <div className="watten-seat watten-seat--left z-20 rounded-2xl border border-white/10 bg-emerald-950/55 text-center shadow-lg transition-all duration-300">
                   {/* NEXT PLAYER */}
                   {phase !== "dealReady" && (
                     <div className="absolute -top-2 right-2 rounded-full border border-amber-400/40 bg-amber-400 px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider text-amber-950 shadow">
@@ -3970,9 +3990,7 @@ export default function WattenGame() {
                   <p className="mt-0.5 text-[11px] text-emerald-300">
                     {phase === "dealReady"
                       ? l("Wartet auf Karten", "Waiting for cards")
-                      : `${leftOpponent.cards.length} Karten · ${
-                          tricksWon[leftOpponent.id] ?? 0
-                        } Stiche`}
+                      : `${leftOpponent.cards.length} Karten`}
                   </p>
 
                   {/* Hidden cards */}
@@ -3990,17 +4008,20 @@ export default function WattenGame() {
                     ))}
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => requestToSeeCards(leftOpponentIndex)}
-                    className="mt-2 rounded-md bg-white/10 px-2 py-1 text-[10px] font-semibold text-white transition hover:bg-white/20"
-                  >
-                    {l("👁 Karten ansehen", "👁 View cards")}
-                  </button>
+                  <div className="watten-seat-extra watten-seat-extra--stack">
+                    <button
+                      type="button"
+                      onClick={() => requestToSeeCards(leftOpponentIndex)}
+                      className="rounded-md bg-white/10 px-2 py-1 text-[10px] font-semibold text-white transition hover:bg-white/20"
+                    >
+                      {l("👁 Karten ansehen", "👁 View cards")}
+                    </button>
+                    <WattenTrickPile count={tricksWon[leftOpponent.id] ?? 0} name={leftOpponent.name} last={lastTrickFor(leftOpponent.id)} cardsPerTrick={3} onView={() => lastTrick.setOpen(true)} />
+                  </div>
                 </div>
 
                 {/* RIGHT OPPONENT */}
-                <div className="absolute right-10 top-8 z-20 w-48 rounded-2xl border border-white/10 bg-emerald-950/55 p-3 text-center shadow-lg transition-all duration-300 max-md:right-2 max-md:top-3 max-md:w-32 max-md:p-2">
+                <div className="watten-seat watten-seat--right z-20 rounded-2xl border border-white/10 bg-emerald-950/55 text-center shadow-lg transition-all duration-300">
                   {phase === "dealReady" && (
                     <div className="absolute -top-2 left-2 rounded-full border border-amber-400/40 bg-amber-400 px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider text-amber-950 shadow">
                       {l("Beginnt das Spiel", "Starts the game")}
@@ -4014,9 +4035,7 @@ export default function WattenGame() {
                   <p className="mt-0.5 text-[11px] text-emerald-300">
                     {phase === "dealReady"
                       ? l("Wartet auf Karten", "Waiting for cards")
-                      : `${rightOpponent.cards.length} Karten · ${
-                          tricksWon[rightOpponent.id] ?? 0
-                        } Stiche`}
+                      : `${rightOpponent.cards.length} Karten`}
                   </p>
 
                   {/* Hidden cards */}
@@ -4034,19 +4053,22 @@ export default function WattenGame() {
                     ))}
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => requestToSeeCards(rightOpponentIndex)}
-                    className="mt-2 rounded-md bg-white/10 px-2 py-1 text-[10px] font-semibold text-white transition hover:bg-white/20"
-                  >
-                    {l("👁 Karten ansehen", "👁 View cards")}
-                  </button>
+                  <div className="watten-seat-extra watten-seat-extra--stack">
+                    <button
+                      type="button"
+                      onClick={() => requestToSeeCards(rightOpponentIndex)}
+                      className="rounded-md bg-white/10 px-2 py-1 text-[10px] font-semibold text-white transition hover:bg-white/20"
+                    >
+                      {l("👁 Karten ansehen", "👁 View cards")}
+                    </button>
+                    <WattenTrickPile count={tricksWon[rightOpponent.id] ?? 0} name={rightOpponent.name} last={lastTrickFor(rightOpponent.id)} cardsPerTrick={3} onView={() => lastTrick.setOpen(true)} />
+                  </div>
                 </div>
               </div>
             )}
 
             {/* PLAYED CARDS */}
-            <div className="absolute left-1/2 top-[46%] z-10 flex h-44 w-[380px] max-md:h-36 max-md:w-[calc(100%-1rem)] max-md:gap-1 max-md:p-2 -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-3 rounded-3xl border border-white/10 bg-emerald-950/30 p-4 shadow-inner">
+            <div className="watten-table-center z-10 rounded-3xl border border-white/10 bg-emerald-950/40 shadow-inner">
               {playedCards.length === 0 ? (
                 <div className="text-center">
                   <p className="mt-2 text-sm text-emerald-300/50">
@@ -4104,38 +4126,17 @@ export default function WattenGame() {
             {!showPassScreen && phase === "playing" && (
               <>
                 {/* CURRENT PLAYER HAND */}
-                <div className="absolute bottom-3 left-1/2 z-30 w-full -translate-x-1/2 px-10 max-md:px-1">
-                  <div className="relative mx-auto min-h-40 max-w-3xl rounded-2xl p-2.5 shadow-2xl">
+                <div className="watten-table-hand z-30">
+                  <div className="relative mx-auto rounded-2xl shadow-2xl">
                     {/* Active player label */}
-                    <div className="absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-amber-400 px-5 py-1.5 text-sm font-black text-amber-950 shadow-lg max-md:-top-4 max-md:px-3 max-md:py-1 max-md:text-[10px]">
-                      ▼ {currentPlayerData.name} · AM ZUG ·{" "}
-                      {tricksWon[currentPlayerData.id] ?? 0}{" "}
-                      {(tricksWon[currentPlayerData.id] ?? 0) === 1
-                        ? "Stich"
-                        : "Stiche"}
-                    </div>
-                    {/* Current player */}
-                    <div className="mb-1 text-center">
-                      <HostAvatar player={currentPlayerData} avatarId={hostAvatarId} />
-                      <div className="mb-1 text-center">
-                        <span className="text-xs font-semibold uppercase tracking-widest text-emerald-300">
-                          {l("Handkarten von", "Hand of")}
-                        </span>
-
-                        <span className="ml-2 text-sm font-bold text-white">
-                          {currentPlayerData.name}
-                        </span>
-                      </div>
-                    </div>
-
                     {/* Help + Cards + Finish Turn */}
-                    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 max-md:grid-cols-1 max-md:gap-2">
+                    <div className="watten-hand-row">
                       {/* LEFT: Help legend */}
-                      <div className="flex justify-end">
+                      <div className="watten-hand-extras">
                         {helpMode &&
                           playedCards.length > 0 &&
                           !cardPlayedThisTurn && (
-                            <div className="flex flex-col gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-xs font-semibold">
+                            <div className="flex flex-row flex-wrap gap-x-4 gap-y-1 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-semibold">
                               <span className="flex items-center gap-2 text-green-300">
                                 <span className="h-3 w-3 rounded-full bg-green-500" />
                                 {l(
@@ -4155,6 +4156,12 @@ export default function WattenGame() {
                           )}
                       </div>
 
+                      <div className="watten-hand-center">
+                        <div className="watten-hand-head watten-hand-head--spread">
+                          <HostAvatar player={currentPlayerData} avatarId={hostAvatarId} />
+                          <div className="watten-turn-label">▼ {currentPlayerData.name} · AM ZUG</div>
+                          <WattenTrickPile count={tricksWon[currentPlayerData.id] ?? 0} name={currentPlayerData.name} last={lastTrickFor(currentPlayerData.id)} cardsPerTrick={3} onView={() => lastTrick.setOpen(true)} />
+                        </div>
                       {/* CENTER: Cards */}
                       <div className="watten-hand flex justify-center gap-2 max-md:gap-0">
                         {currentPlayerData.cards.map((card) => {
@@ -4205,13 +4212,14 @@ export default function WattenGame() {
                           );
                         })}
                       </div>
+                      </div>
 
                       {/* RIGHT: Finish Turn */}
-                      <div className="flex justify-start">
+                      <div className="watten-hand-extras">
                         {phase === "playing" &&
                           playedCards.length < players.length &&
                           cardPlayedThisTurn && (
-                            <div className="flex flex-col items-center gap-2 max-md:scale-[0.72]">
+                            <div className="flex flex-col items-center gap-1">
                               <p className="text-center text-xs font-medium text-emerald-200">
                                 {t("Card played.")}
                               </p>
@@ -4231,6 +4239,7 @@ export default function WattenGame() {
                 </div>
               </>
             )}
+            <WattenLastTrickViewer trick={lastTrick.last} open={lastTrick.open} onClose={() => lastTrick.setOpen(false)} nameOf={(seat) => players[seat]?.name ?? ""} />
             {/* WINNER */}
             {winner && (
               <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/60 backdrop-blur-sm">
@@ -4255,8 +4264,8 @@ export default function WattenGame() {
             )}
           </div>
           {/* RIGHT SIDEBAR: STICHSTAND */}
-          <aside className="w-64 pt-10 max-md:order-3 max-md:w-full max-md:pt-0">
-            <div className="h-[650px] overflow-y-auto rounded-3xl border border-white/10 bg-zinc-950/95 p-5 shadow-2xl max-md:h-auto max-md:max-h-[420px] max-md:p-3">
+          <aside className="watten-aside watten-aside--right">
+            <div className="watten-aside-card watten-trickscore rounded-3xl border border-white/10 bg-zinc-950/95 p-5 shadow-2xl">
               <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
                 {l("Aktueller Stichstand", "Current trick score")}
               </p>
@@ -4346,7 +4355,7 @@ export default function WattenGame() {
               </div>
 
               {/* RUNDENWERT / GEHEN */}
-              <div className="mt-5 rounded-xl border border-white/10 bg-white/5 p-3 text-center">
+              <div className="watten-raise mt-5 rounded-xl border border-white/10 bg-white/5 p-3 text-center">
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
                   {l("Rundenwert", "Round value")}
                 </p>
@@ -4370,6 +4379,8 @@ export default function WattenGame() {
                     {l("Maximum erreicht", "Maximum reached")}
                   </p>
                 )}
+              
+                <GehenRule />
               </div>
               {currentSideIsGespannt && (
                 <p className="text-xs font-bold text-red-300">
@@ -4383,6 +4394,6 @@ export default function WattenGame() {
           </aside>
         </div>
       </div>
-    </main>
+    </WattenScreen>
   );
 }

@@ -1,4 +1,4 @@
-import { ARENA_MODES, type ArenaModeDef } from "./modeCatalog.ts";
+import { ONLINE_ARENA_MODES, type ArenaModeDef } from "./modeCatalog.ts";
 
 export const RANKED_CONFIG = {
   provisionalMatches: 10,
@@ -7,7 +7,7 @@ export const RANKED_CONFIG = {
   prestartTimeoutMs: 30_000,
 } as const;
 
-export const rankedModes = (): ArenaModeDef[] => ARENA_MODES;
+export const rankedModes = (): ArenaModeDef[] => ONLINE_ARENA_MODES;
 export const maxModeBans = (modeCount = rankedModes().length) => Math.max(0, Math.min(RANKED_CONFIG.maxBans, modeCount - 3));
 
 export function sanitizeBans(ids: readonly string[], modes = rankedModes()): string[] {

@@ -77,7 +77,7 @@ export function validSettings(v: unknown): v is Settings {
     (v.mode === undefined || v.mode === "board" || v.mode === "festival") &&
     (v.roundLimit === undefined || [0, 3, 5, 8, 12, 16].includes(Number(v.roundLimit)) && typeof v.roundLimit === "number") &&
     (v.mode !== "festival" || Number(v.roundLimit) > 0) &&
-    (v.minigameIds === undefined || Array.isArray(v.minigameIds) && v.minigameIds.length <= 20 && new Set(v.minigameIds).size === v.minigameIds.length && v.minigameIds.every((id) => typeof id === "string" && minigameRegistry.pool("main").some((game) => game.id === id))) &&
+    (v.minigameIds === undefined || Array.isArray(v.minigameIds) && v.minigameIds.length <= minigameRegistry.pool("main").length && new Set(v.minigameIds).size === v.minigameIds.length && v.minigameIds.every((id) => typeof id === "string" && minigameRegistry.pool("main").some((game) => game.id === id))) &&
     typeof v.mapId === "string" &&
     mapRegistry.all().some((map) => map.id === v.mapId) &&
     (v.victory === "plutos" || v.victory === "coins") &&

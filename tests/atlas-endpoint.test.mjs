@@ -12,16 +12,16 @@ test('real handler validates participants, answer generations, retries, race res
  try {
   const invoke=async(user,body,expected=200)=>{const r=await e.call(user,{...body,datasetVersion:version});assert.equal(r.status,expected,JSON.stringify(r.body));return r.body;};
   const start=async mode=>{const room=await invoke('a',{op:'create',mode,difficulty:'expert'});const code=room.code;await invoke('b',{op:'join',code});await invoke('a',{op:'ready',code});await invoke('b',{op:'ready',code});e.advance(3001);return invoke('a',{op:'get',code});};
-  let room=await start('speed_run'),row=e.matches.at(-1),code=room.code;
+  let room=await start('extreme_geography'),row=e.matches.at(-1),code=room.code;
   assert.equal(room.seed,undefined);assert.equal(room.run.index,0);await invoke('outsider',{op:'get',code},403);
   await invoke('a',{op:'progress',code,score:1000000,done:true},400);
-  const q=raceQuestions(data,'speed_run',row.seed,'expert','Europe',row.settings.categories)[0],id=room.run.question.id;
+  const q=raceQuestions(data,'extreme_geography',row.seed,'expert','Europe',row.settings.categories)[0],id=room.run.question.id;
   room=await invoke('a',{op:'race',action:'answer',code,questionId:id,answer:q.answer,requestId:'answer-1'});const score=room.run.score;
   assert.ok(room.run.feedback.correct);room=await invoke('a',{op:'race',action:'answer',code,questionId:id,answer:q.answer,requestId:'answer-1'});assert.equal(room.run.score,score);
   const restored=await invoke('a',{op:'get',code});assert.deepEqual(restored.run,room.run);
   const opponent=await invoke('b',{op:'get',code});assert.equal(opponent.run.index,0);assert.equal(opponent.run.feedback,null);
   room=await invoke('a',{op:'race',action:'next',code,questionId:id});await invoke('a',{op:'race',action:'answer',code,questionId:id,answer:q.answer},400);assert.equal(room.run.index,1);
-  e.advance(90001);room=await invoke('a',{op:'get',code});assert.equal(room.status,'finished');assert.equal(room.race.a.done,true);
+  e.advance(180001);room=await invoke('a',{op:'get',code});assert.equal(room.status,'finished');assert.equal(room.race.a.done,true);
   room=await start('guess_country');code=room.code;const first=room.question.id;assert.equal(room.question.clues.length,1);e.advance(25001);room=await invoke('a',{op:'get',code});assert.equal(room.tipIndex,1);assert.equal(Date.parse(room.roundStartedAt),e.now());await invoke('a',{op:'submit',code,questionId:first,answer:'country:FRA'},400);
   // History Battle is a server-graded race: no answer, record or seed on the wire until the answer is in.
   room=await start('history_battle');code=room.code;row=e.matches.at(-1);const history=raceQuestions(data,'history_battle',row.seed,'expert');
@@ -35,7 +35,7 @@ test('real handler validates participants, answer generations, retries, race res
   room=await start('stat_battle');row=e.matches.at(-1);row.match_kind='ranked';row.state.ranked={bans:{a:[],b:[]},order:['stat_battle','map_battle','language_guesser'],gameIndex:0,wins:{a:0,b:0},results:[]};
   // Restarting a ranked duel from countdown retains the ranked-series object.
   row.status='countdown';row.round_started_at=new Date(e.now()).toISOString();room=await invoke('a',{op:'get',code:row.room_code});assert.ok(row.state.ranked);assert.ok(room.battle);assert.equal(room.seed,undefined);
-  row.status='finished';row.scores={a:5,b:2};room=await invoke('a',{op:'get',code:row.room_code});assert.equal(room.status,'intermission');assert.equal(room.series.wins.a,1);e.advance(45001);room=await invoke('a',{op:'get',code:row.room_code});assert.equal(room.status,'round_active');
+  row.status='finished';row.scores={a:5,b:2};room=await invoke('a',{op:'get',code:row.room_code});assert.equal(room.status,'intermission');assert.equal(room.series.wins.a,1);e.advance(45001);room=await invoke('a',{op:'get',code:row.room_code});assert.equal(room.status,'intermission');await invoke('a',{op:'ready',code:row.room_code});room=await invoke('b',{op:'ready',code:row.room_code});assert.equal(room.status,'round_active');
   // A tied second game becomes a three-question challenge, never a seeded coin toss.
   row.status='finished';row.scores={a:1000,b:1000};room=await invoke('a',{op:'get',code:row.room_code});assert.equal(room.tiebreak.attempt,1);assert.equal(room.rounds,3);assert.equal(room.series.results.length,1);
   row.status='finished';row.scores={a:3000,b:1000};room=await invoke('a',{op:'get',code:row.room_code});assert.equal(room.status,'finished');assert.equal(room.series.wins.a,2);assert.equal(e.results.length,1);await invoke('a',{op:'get',code:row.room_code});assert.equal(e.results.length,1);

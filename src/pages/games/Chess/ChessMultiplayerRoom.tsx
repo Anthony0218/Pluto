@@ -1,3 +1,4 @@
+import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useCallback, useEffect, useState } from "react";
@@ -588,7 +589,7 @@ function PlayerCard({
               <span>{player ? ui("Player joined") : ui("Waiting for player")}</span>
             </div>
           )}
-          {canInvite && <button type="button" onClick={() => window.dispatchEvent(new Event("open-room-friends"))} className="mt-3 rounded-lg border border-amber-300/40 bg-amber-300/10 px-3 py-2 text-xs font-bold text-amber-200 transition hover:bg-amber-300/20 focus-visible:outline-2 focus-visible:outline-amber-300">{ui("Invite Friend")}</button>}
+          {canInvite && <InviteFriendButton className="mt-3" />}
         </div>
       </div>
     </section>

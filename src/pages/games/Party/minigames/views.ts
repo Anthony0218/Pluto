@@ -1,4 +1,10 @@
+import NewArcadeScreen from "./NewArcadeScreen.tsx";
+import MinotaurMazeScreen from "./MinotaurMazeScreen.tsx";
+import ConstellationCascadeScreen from "./ConstellationCascadeScreen.tsx";
 import FestivalGamesScreen from "./FestivalGamesScreen.tsx";
+import ArcadeMovementScreen from "./ArcadeMovementScreen.tsx";
+import IslandImpostorScreen from "./IslandImpostorScreen.tsx";
+import PenaltyShootoutScreen from "./PenaltyShootoutScreen.tsx";
 import type { ComponentType } from "react";
 import type {
   Match,
@@ -28,6 +34,19 @@ export interface MinigameViewProps {
 // the server imports it). A later arena minigame can register a Pixi/Phaser-backed component here.
 export const minigameViews: Record<string, ComponentType<MinigameViewProps>> =
   {
+    "ricochet-rivals": NewArcadeScreen,
+    "fuse-faceoff": NewArcadeScreen,
+    "gravity-tug": NewArcadeScreen,
+    "color-clash": NewArcadeScreen,
+    "minotaur-maze": MinotaurMazeScreen,
+    "constellation-cascade": ConstellationCascadeScreen,
+    "disco-freeze": ArcadeMovementScreen,
+    "pluto-heist": ArcadeMovementScreen,
+    "kitchen-chaos": ArcadeMovementScreen,
+    "rocket-rumble": ArcadeMovementScreen,
+    "orbital-rally": ArcadeMovementScreen,
+    "island-impostor": IslandImpostorScreen,
+    "penalty-shootout": PenaltyShootoutScreen,
     "tide-treasure": FestivalGamesScreen,
     "comet-courier": FestivalGamesScreen,
     "rope-rescue": FestivalGamesScreen,

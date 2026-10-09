@@ -30,7 +30,7 @@ export type CouncilRoom = {
   host: string;
   slots: CouncilSlot[];
   state: Campaign | null;
-  settings: { tickSeconds: number; maritimeHazard: number };
+  settings: { tickSeconds: number; maritimeHazard: number; chronicle?: "council" | "sandbox" };
   sessions: CouncilMember[];
   version: number;
   createdAt: number;
@@ -59,6 +59,7 @@ export type CouncilRequest = {
   ready?: boolean;
   tickSeconds?: number;
   maritimeHazard?: number;
+  chronicle?: "council" | "sandbox";
   seq?: number;
   command?: Command;
 };
@@ -105,6 +106,7 @@ export function makeCouncil(
 ): CouncilRoom {
   const crown = nation(request.nation),
     displayName = name(request.name);
+  if (request.chronicle !== undefined && !["council", "sandbox"].includes(request.chronicle)) throw Error("Unknown campaign format");
   const room: CouncilRoom = {
     code,
     host: user,
@@ -117,7 +119,7 @@ export function makeCouncil(
       bot: true,
     })),
     state: null,
-    settings: { tickSeconds: 4, maritimeHazard: 0.025 },
+    settings: { tickSeconds: 4, maritimeHazard: 0.025, chronicle: request.chronicle ?? "sandbox" },
     sessions: [
       { id: user, nation: crown, name: displayName, connected: true, last: 0 },
     ],
@@ -254,12 +256,14 @@ export function applyCouncilRequest(
       request.tickSeconds! > 30 ||
       !Number.isFinite(request.maritimeHazard) ||
       request.maritimeHazard! < 0 ||
-      request.maritimeHazard! > 0.2
+      request.maritimeHazard! > 0.2 ||
+      request.chronicle !== undefined && !["council", "sandbox"].includes(request.chronicle)
     )
       throw Error("Invalid settings");
     room.settings = {
       tickSeconds: request.tickSeconds!,
       maritimeHazard: request.maritimeHazard!,
+      chronicle: request.chronicle ?? room.settings.chronicle ?? "sandbox",
     };
     room.slots.forEach((s) => {
       if (s.player) s.ready = false;
@@ -273,7 +277,7 @@ export function applyCouncilRequest(
       throw Error(
         "Every human, including the host, must be connected and ready",
       );
-    room.state = createCampaign(member.nation, "multi");
+    room.state = createCampaign(member.nation, "multi", room.settings.chronicle ?? "sandbox");
     Object.assign(room.state.config, room.settings);
     room.slots.forEach((s) => human(room, s.nation, !s.bot));
   } else if (request.type === "command") {

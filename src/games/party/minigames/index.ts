@@ -1,7 +1,18 @@
+import { ricochetRivals, fuseFaceoff, gravityTug } from "./arcadeAdditions/duels.ts";
+import { minotaurMaze } from "./arcadeAdditions/maze.ts";
+import { colorClash } from "./arcadeAdditions/colorClash.ts";
+import { constellationCascade } from "./arcadeAdditions/cascade.ts";
 import { tideTreasure } from "./festivalGames/tideTreasure.ts";
 import { cometCourier } from "./festivalGames/cometCourier.ts";
 import { ropeRescue } from "./festivalGames/ropeRescue.ts";
 import { paddleDoubles } from "./festivalGames/paddleDoubles.ts";
+import { discoFreeze } from "./expansionGames/discoFreeze.ts";
+import { plutoHeist } from "./expansionGames/plutoHeist.ts";
+import { kitchenChaos } from "./expansionGames/kitchenChaos.ts";
+import { rocketRumble } from "./expansionGames/rocketRumble.ts";
+import { orbitalRally } from "./expansionGames/orbitalRally.ts";
+import { islandImpostor } from "./expansionGames/islandImpostor.ts";
+import { penaltyShootout } from "./expansionGames/penaltyShootout.ts";
 import { MinigameRegistry } from "./registry.ts";
 import { paddlePanic } from "./paddlePanic/index.ts";
 import { streetCross } from "./streetCross/index.ts";
@@ -31,3 +42,6 @@ minigameRegistry.register(circleShot);
 minigameRegistry.register(lavaKnockback);
 
 for (const game of [tideTreasure, cometCourier, ropeRescue, paddleDoubles]) minigameRegistry.register(game);
+for (const game of [discoFreeze, plutoHeist, kitchenChaos, rocketRumble, orbitalRally, islandImpostor, penaltyShootout]) minigameRegistry.register(game);
+
+for (const game of [ricochetRivals, fuseFaceoff, gravityTug, minotaurMaze, colorClash, constellationCascade]) minigameRegistry.register(game);
