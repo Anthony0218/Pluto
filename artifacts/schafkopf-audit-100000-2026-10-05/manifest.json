@@ -1,0 +1,210 @@
+{
+  "schema": 1,
+  "startedAt": "2026-10-04T22:50:36.293Z",
+  "requestedDeals": 100000,
+  "seed": 20261005,
+  "workers": 8,
+  "shardSize": 250,
+  "levels": [
+    "beginner",
+    "amateur",
+    "pro",
+    "legend"
+  ],
+  "labels": [
+    "Anfänger",
+    "Amateur",
+    "Profi",
+    "Legende"
+  ],
+  "profile": "standard",
+  "rules": {
+    "sauspiel": true,
+    "farbwenz": true,
+    "geier": false,
+    "farbgeier": false,
+    "hochzeit": false,
+    "bettel": false,
+    "ramsch": false,
+    "eichelOberMuss": false,
+    "legen": false,
+    "spritzen": "jederzeit",
+    "rufspielValue": 10,
+    "soloValue": 30,
+    "wenzValue": 30,
+    "ramschValue": 10,
+    "schneiderValue": 10,
+    "schwarzValue": 10,
+    "laufendeValue": 10,
+    "showPoints": true,
+    "showTrickPoints": true,
+    "showPlayedTrumps": false,
+    "laufendeAktiv": true,
+    "klopferMussSpiel": true,
+    "hotseatKlopfSekunden": 20,
+    "multiplayerKlopfSekunden": 30,
+    "toutAbbrechen": true
+  },
+  "botConfig": {
+    "reliability": {
+      "beginner": {
+        "T1": 0,
+        "T2": 0,
+        "T3a": 0,
+        "T3b": 0,
+        "T3c": 0,
+        "T4": 0,
+        "T5": 0,
+        "T6": 0,
+        "T7": 0,
+        "T8": 0,
+        "T9": 0,
+        "T10": 0,
+        "T11": 0,
+        "T12": 0
+      },
+      "amateur": {
+        "T1": 0,
+        "T2": 0.6,
+        "T3a": 0,
+        "T3b": 0,
+        "T3c": 0,
+        "T4": 0,
+        "T5": 0,
+        "T6": 0.75,
+        "T7": 0.75,
+        "T8": 0,
+        "T9": 0.25,
+        "T10": 0,
+        "T11": 0,
+        "T12": 0.9
+      },
+      "advanced": {
+        "T1": 0.85,
+        "T2": 0.85,
+        "T3a": 0.55,
+        "T3b": 0.55,
+        "T3c": 0.6,
+        "T4": 0.85,
+        "T5": 0.7,
+        "T6": 1,
+        "T7": 1,
+        "T8": 0.55,
+        "T9": 0.5,
+        "T10": 0.8,
+        "T11": 0.6,
+        "T12": 0.95
+      },
+      "pro": {
+        "T1": 0.98,
+        "T2": 0.98,
+        "T3a": 0.98,
+        "T3b": 0.98,
+        "T3c": 0.98,
+        "T4": 0.98,
+        "T5": 0.98,
+        "T6": 0.98,
+        "T7": 1,
+        "T8": 0.98,
+        "T9": 0.75,
+        "T10": 0.98,
+        "T11": 0.98,
+        "T12": 0.98
+      },
+      "legend": {
+        "T1": 1,
+        "T2": 1,
+        "T3a": 1,
+        "T3b": 1,
+        "T3c": 1,
+        "T4": 1,
+        "T5": 1,
+        "T6": 1,
+        "T7": 1,
+        "T8": 1,
+        "T9": 1,
+        "T10": 1,
+        "T11": 1,
+        "T12": 1
+      }
+    },
+    "announcementError": {
+      "beginner": 0.2,
+      "amateur": 0.1,
+      "advanced": 0,
+      "pro": 0,
+      "legend": 0
+    },
+    "deducedR6": {
+      "beginner": 0,
+      "amateur": 0,
+      "advanced": 0.5,
+      "pro": 0.75,
+      "legend": 1
+    },
+    "r6b": {
+      "beginner": 0,
+      "amateur": 0,
+      "advanced": 0.75,
+      "pro": 0.9,
+      "legend": 1
+    },
+    "r4aMinTrumps": 3,
+    "r4aRemainingTrumps": 4,
+    "r4aRemainingHigh": 1,
+    "manyTrumps": 5,
+    "manyHigh": 2,
+    "manyCourt": 4,
+    "legendIterations": 200,
+    "legendTimeMs": 180,
+    "announcementSamples": 64,
+    "amateurSpritzChance": 0.08,
+    "proError": 0.02,
+    "sauspielWithBremserMin": 4,
+    "sauspielWithoutBremserMin": 6,
+    "soloMinTrumps": 6,
+    "soloMinOber": 2,
+    "farbwenzMinTrumps": 5,
+    "farbwenzMinUnter": 2
+  },
+  "node": "v24.21.0",
+  "cpu": "Apple M3 Pro",
+  "parallelism": 11,
+  "hashes": {
+    "schafkopf.ts": {
+      "original": "fe3aa7355a53039b14f8e40e73bdac3d4004a56c0a6d41d92cbd16345ba463b5",
+      "runtime": "fe3aa7355a53039b14f8e40e73bdac3d4004a56c0a6d41d92cbd16345ba463b5"
+    },
+    "bot.ts": {
+      "original": "b9420fddbbcaadb80785b97faede861b942eedc55e855b7483219d4247c9823d",
+      "runtime": "4caf8d6e0e14956bfbfd93bbe2f1a9d589336c526b2cc6eb17c0f1f6c7e6a4a0"
+    },
+    "botConfig.ts": {
+      "original": "6cb5c62864891b5b382ebec6eca26a2ab8675c6b09dac8dbdf4244f35547f570",
+      "runtime": "6cb5c62864891b5b382ebec6eca26a2ab8675c6b09dac8dbdf4244f35547f570"
+    },
+    "knowledge.ts": {
+      "original": "f52a751708bf83536c2529af8d21a241a9ff2d3a98cceb4e459cecb77b9eca6b",
+      "runtime": "f52a751708bf83536c2529af8d21a241a9ff2d3a98cceb4e459cecb77b9eca6b"
+    },
+    "coach.ts": {
+      "original": "91cb85cc6e247bfa17b1ba884024d8071eeb6a383133e6a04f908a8e9b0e1d79",
+      "runtime": "91cb85cc6e247bfa17b1ba884024d8071eeb6a383133e6a04f908a8e9b0e1d79"
+    },
+    "lessons.ts": {
+      "original": "28a75c9785bba1d473b95ca0f197e9d8738d85e6735167649b3c3242d9ddea78",
+      "runtime": "28a75c9785bba1d473b95ca0f197e9d8738d85e6735167649b3c3242d9ddea78"
+    },
+    "announcements.ts": {
+      "original": "1cdb6051efe7f343fc489ef5d6022aaf806b5f4693bd3adfe37d853699295851",
+      "runtime": "1cdb6051efe7f343fc489ef5d6022aaf806b5f4693bd3adfe37d853699295851"
+    }
+  },
+  "gitCommit": "50bafcbf2b69d246db1c9a1b3e4e331dae50cb43",
+  "workingTreeStatus": " M scripts/simulate-schafkopf.mjs\n M src/components/Schafkopf/SchafkopfBotSettings.tsx\n M src/components/Schafkopf/SchafkopfGame.tsx\n M src/components/Schafkopf/SchafkopfRulebook.tsx\n M src/components/Schafkopf/SchafkopfTable.tsx\n M src/games/schafkopf/IMPLEMENTATION.md\n M src/games/schafkopf/README.md\n M src/games/schafkopf/bot.ts\n M src/games/schafkopf/botConfig.ts\n M src/games/schafkopf/coach.ts\n M src/games/schafkopf/knowledge.ts\n M src/games/schafkopf/lessons.ts\n M src/games/schafkopf/schafkopf.ts\n M supabase/functions/schafkopf-multiplayer/index.ts\n M tests/schafkopf-document-rules.test.mjs\n M tests/schafkopf-multiplayer.test.mjs\n M tests/schafkopf.test.mjs\n?? artifacts/\n?? scripts/audit-schafkopf.mjs\n?? scripts/read-schafkopf-audit.mjs\n?? scripts/schafkopf-audit/\n?? src/games/schafkopf/docs/klarstellungen-2026-10-05.md\n?? src/games/schafkopf/verification/10000-games-refinements-2026-10-05.json\n?? src/games/schafkopf/verification/einstellungen-2026-10-05.jpg\n?? tests/schafkopf-audit.test.mjs\n?? tests/schafkopf-refinements.test.mjs\n",
+  "dealMeaning": "Exactly requestedDeals distinct four-seat allocations, including all-pass redeals. Redeals have zero score and are not silently replaced.",
+  "seatSchedule": "All 24 tier permutations; dealer changes after each 24 allocations; 96-deal balanced blocks.",
+  "timing": "Original wall-clock search budgets preserved. Scheduling/load affects iteration counts, so action traces, rather than seeds alone, reproduce exact games.",
+  "audit": "Read-only runtime telemetry; no live source changes. Separate PRNG for reviews. Exact full-information endgame assessment is retrospective and does not reach bots.",
+  "coverage": "Default rules only: no Legen/Ramsch/Geier/Farbgeier/Bettel/Hochzeit. Logs include every spritz opportunity and executed Kontra/Re/Sub/Hirsch."
+}

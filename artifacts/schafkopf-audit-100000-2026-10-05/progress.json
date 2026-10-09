@@ -1,0 +1,460 @@
+{
+  "status": "running",
+  "pid": 10540,
+  "output": "/Users/ticonil/Projekt/Pluto/artifacts/schafkopf-audit-100000-2026-10-05",
+  "requestedDeals": 100000,
+  "committedDeals": 8000,
+  "observedDeals": 9330,
+  "sessionElapsedSeconds": 915.165,
+  "estimatedRemainingSeconds": 8893.677443729903,
+  "stats": {
+    "deals": 9330,
+    "finished": 8760,
+    "redeals": 570,
+    "errors": 0,
+    "moves": 280320,
+    "simulations": 2253421,
+    "endgameNodes": 911955,
+    "endgameDecisions": 26882,
+    "earlyTouts": 0,
+    "spritzes": 359,
+    "singles": 1990,
+    "checks": 408116,
+    "searchCalls": 39204,
+    "searchMs": 6827206,
+    "contractSamples": 31948,
+    "findings": {
+      "tip-recommended-other-card": 80537,
+      "simulation-small-sample": 13244,
+      "pro-review-alternative": 75370,
+      "tip-applied-trick-lost": 20463,
+      "simulation-failure": 2684,
+      "declaration-below-hand-threshold": 691,
+      "single-game": 1990,
+      "declaration-lost": 2820,
+      "spritz": 359,
+      "hindsight-better-card": 946,
+      "hindsight-rule-excludes-best": 241,
+      "simulation-incomplete-candidates": 533,
+      "hindsight-tip-inferior": 478,
+      "spritz-party-lost": 89,
+      "announcement-or-spritz-small-sample": 53
+    },
+    "contracts": {
+      "Sauspiel auf Eichel-Ass": 2687,
+      "Sauspiel auf Gras-Ass": 2256,
+      "Sauspiel auf Schellen-Ass": 1827,
+      "Eichel-Solo": 429,
+      "Schellen-Wenz": 121,
+      "Wenz": 115,
+      "Schellen-Solo": 314,
+      "Herz-Solo": 306,
+      "Gras-Wenz": 126,
+      "Gras-Solo": 328,
+      "Eichel-Wenz": 149,
+      "Herz-Wenz": 102
+    },
+    "tips": {
+      "amateur:T6": {
+        "opportunities": 13361,
+        "followed": 7288,
+        "usedAsReason": 6451,
+        "trickWins": 2993,
+        "gameWins": 2916
+      },
+      "amateur:T7": {
+        "opportunities": 5660,
+        "followed": 4616,
+        "usedAsReason": 4288,
+        "trickWins": 2508,
+        "gameWins": 2221
+      },
+      "amateur:T3b": {
+        "opportunities": 1960,
+        "followed": 943,
+        "usedAsReason": 0,
+        "trickWins": 340,
+        "gameWins": 283
+      },
+      "amateur:T10": {
+        "opportunities": 5381,
+        "followed": 2847,
+        "usedAsReason": 0,
+        "trickWins": 2243,
+        "gameWins": 1296
+      },
+      "legend:T6": {
+        "opportunities": 22577,
+        "followed": 7713,
+        "usedAsReason": 0,
+        "trickWins": 3441,
+        "gameWins": 3773
+      },
+      "legend:T8": {
+        "opportunities": 1937,
+        "followed": 978,
+        "usedAsReason": 0,
+        "trickWins": 454,
+        "gameWins": 523
+      },
+      "beginner:T6": {
+        "opportunities": 15382,
+        "followed": 4743,
+        "usedAsReason": 0,
+        "trickWins": 1934,
+        "gameWins": 1881
+      },
+      "beginner:T7": {
+        "opportunities": 5626,
+        "followed": 2202,
+        "usedAsReason": 0,
+        "trickWins": 1144,
+        "gameWins": 1026
+      },
+      "pro:T5": {
+        "opportunities": 6565,
+        "followed": 5993,
+        "usedAsReason": 2447,
+        "trickWins": 1987,
+        "gameWins": 2008
+      },
+      "pro:T6": {
+        "opportunities": 21411,
+        "followed": 14770,
+        "usedAsReason": 13759,
+        "trickWins": 6571,
+        "gameWins": 6581
+      },
+      "amateur:T5": {
+        "opportunities": 6313,
+        "followed": 4156,
+        "usedAsReason": 0,
+        "trickWins": 1365,
+        "gameWins": 1370
+      },
+      "beginner:T12": {
+        "opportunities": 650,
+        "followed": 154,
+        "usedAsReason": 0,
+        "trickWins": 103,
+        "gameWins": 127
+      },
+      "pro:T7": {
+        "opportunities": 6032,
+        "followed": 5501,
+        "usedAsReason": 5300,
+        "trickWins": 3373,
+        "gameWins": 2915
+      },
+      "pro:T10": {
+        "opportunities": 5204,
+        "followed": 3262,
+        "usedAsReason": 1318,
+        "trickWins": 2583,
+        "gameWins": 1794
+      },
+      "legend:T3b": {
+        "opportunities": 1638,
+        "followed": 772,
+        "usedAsReason": 0,
+        "trickWins": 319,
+        "gameWins": 350
+      },
+      "legend:T10": {
+        "opportunities": 4983,
+        "followed": 2863,
+        "usedAsReason": 0,
+        "trickWins": 2281,
+        "gameWins": 1644
+      },
+      "legend:T1": {
+        "opportunities": 2156,
+        "followed": 1028,
+        "usedAsReason": 0,
+        "trickWins": 920,
+        "gameWins": 729
+      },
+      "legend:T5": {
+        "opportunities": 5951,
+        "followed": 4098,
+        "usedAsReason": 0,
+        "trickWins": 1297,
+        "gameWins": 1602
+      },
+      "legend:T7": {
+        "opportunities": 5914,
+        "followed": 3121,
+        "usedAsReason": 0,
+        "trickWins": 1842,
+        "gameWins": 1829
+      },
+      "beginner:T5": {
+        "opportunities": 6207,
+        "followed": 3710,
+        "usedAsReason": 0,
+        "trickWins": 1117,
+        "gameWins": 1263
+      },
+      "legend:T4": {
+        "opportunities": 1235,
+        "followed": 681,
+        "usedAsReason": 0,
+        "trickWins": 204,
+        "gameWins": 239
+      },
+      "amateur:T2": {
+        "opportunities": 1488,
+        "followed": 1019,
+        "usedAsReason": 913,
+        "trickWins": 680,
+        "gameWins": 833
+      },
+      "beginner:T10": {
+        "opportunities": 5534,
+        "followed": 2615,
+        "usedAsReason": 0,
+        "trickWins": 1978,
+        "gameWins": 1184
+      },
+      "pro:T12": {
+        "opportunities": 3864,
+        "followed": 3674,
+        "usedAsReason": 3613,
+        "trickWins": 1595,
+        "gameWins": 2614
+      },
+      "beginner:T3b": {
+        "opportunities": 1960,
+        "followed": 995,
+        "usedAsReason": 0,
+        "trickWins": 364,
+        "gameWins": 293
+      },
+      "beginner:T4": {
+        "opportunities": 1280,
+        "followed": 596,
+        "usedAsReason": 0,
+        "trickWins": 167,
+        "gameWins": 196
+      },
+      "pro:T1": {
+        "opportunities": 2146,
+        "followed": 1949,
+        "usedAsReason": 1957,
+        "trickWins": 1750,
+        "gameWins": 1164
+      },
+      "beginner:T1": {
+        "opportunities": 1084,
+        "followed": 445,
+        "usedAsReason": 0,
+        "trickWins": 337,
+        "gameWins": 249
+      },
+      "pro:T3b": {
+        "opportunities": 1747,
+        "followed": 1221,
+        "usedAsReason": 1203,
+        "trickWins": 430,
+        "gameWins": 400
+      },
+      "amateur:T1": {
+        "opportunities": 1362,
+        "followed": 502,
+        "usedAsReason": 0,
+        "trickWins": 400,
+        "gameWins": 262
+      },
+      "beginner:T2": {
+        "opportunities": 1463,
+        "followed": 600,
+        "usedAsReason": 0,
+        "trickWins": 405,
+        "gameWins": 512
+      },
+      "pro:T8": {
+        "opportunities": 1973,
+        "followed": 1236,
+        "usedAsReason": 218,
+        "trickWins": 499,
+        "gameWins": 564
+      },
+      "amateur:T8": {
+        "opportunities": 1865,
+        "followed": 920,
+        "usedAsReason": 0,
+        "trickWins": 369,
+        "gameWins": 356
+      },
+      "amateur:T12": {
+        "opportunities": 1072,
+        "followed": 963,
+        "usedAsReason": 925,
+        "trickWins": 427,
+        "gameWins": 686
+      },
+      "legend:T12": {
+        "opportunities": 4085,
+        "followed": 1381,
+        "usedAsReason": 0,
+        "trickWins": 749,
+        "gameWins": 1166
+      },
+      "beginner:T8": {
+        "opportunities": 1721,
+        "followed": 843,
+        "usedAsReason": 0,
+        "trickWins": 339,
+        "gameWins": 314
+      },
+      "legend:T2": {
+        "opportunities": 1524,
+        "followed": 631,
+        "usedAsReason": 0,
+        "trickWins": 386,
+        "gameWins": 482
+      },
+      "pro:T4": {
+        "opportunities": 1227,
+        "followed": 1026,
+        "usedAsReason": 841,
+        "trickWins": 313,
+        "gameWins": 334
+      },
+      "pro:T2": {
+        "opportunities": 1557,
+        "followed": 1268,
+        "usedAsReason": 1488,
+        "trickWins": 803,
+        "gameWins": 983
+      },
+      "amateur:T4": {
+        "opportunities": 1287,
+        "followed": 623,
+        "usedAsReason": 0,
+        "trickWins": 189,
+        "gameWins": 209
+      },
+      "pro:T11": {
+        "opportunities": 142,
+        "followed": 98,
+        "usedAsReason": 95,
+        "trickWins": 97,
+        "gameWins": 77
+      },
+      "legend:T11": {
+        "opportunities": 160,
+        "followed": 112,
+        "usedAsReason": 0,
+        "trickWins": 108,
+        "gameWins": 82
+      },
+      "legend:T3c": {
+        "opportunities": 21,
+        "followed": 14,
+        "usedAsReason": 0,
+        "trickWins": 3,
+        "gameWins": 7
+      },
+      "pro:T3c": {
+        "opportunities": 21,
+        "followed": 19,
+        "usedAsReason": 18,
+        "trickWins": 2,
+        "gameWins": 7
+      }
+    },
+    "levels": {
+      "beginner": {
+        "games": 8760,
+        "wins": 3927,
+        "eyes": 227422,
+        "delta": -37890,
+        "declarations": 1960,
+        "declarerWins": 1206,
+        "spritzes": 0,
+        "spritzWins": 0,
+        "seats": [
+          2205,
+          2182,
+          2172,
+          2201
+        ],
+        "dealerSeats": [
+          2242,
+          2187,
+          2166,
+          2165
+        ]
+      },
+      "amateur": {
+        "games": 8760,
+        "wins": 4033,
+        "eyes": 251478,
+        "delta": -21430,
+        "declarations": 2097,
+        "declarerWins": 1317,
+        "spritzes": 1,
+        "spritzWins": 1,
+        "seats": [
+          2193,
+          2178,
+          2203,
+          2186
+        ],
+        "dealerSeats": [
+          2242,
+          2187,
+          2166,
+          2165
+        ]
+      },
+      "pro": {
+        "games": 8760,
+        "wins": 4273,
+        "eyes": 275001,
+        "delta": 8030,
+        "declarations": 2358,
+        "declarerWins": 1591,
+        "spritzes": 200,
+        "spritzWins": 137,
+        "seats": [
+          2181,
+          2201,
+          2192,
+          2186
+        ],
+        "dealerSeats": [
+          2242,
+          2187,
+          2166,
+          2165
+        ]
+      },
+      "legend": {
+        "games": 8760,
+        "wins": 4763,
+        "eyes": 297299,
+        "delta": 51290,
+        "declarations": 2345,
+        "declarerWins": 1826,
+        "spritzes": 158,
+        "spritzWins": 132,
+        "seats": [
+          2181,
+          2199,
+          2193,
+          2187
+        ],
+        "dealerSeats": [
+          2242,
+          2187,
+          2166,
+          2165
+        ]
+      }
+    }
+  },
+  "error": null,
+  "updatedAt": "2026-10-04T23:05:51.490Z"
+}

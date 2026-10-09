@@ -1,0 +1,581 @@
+{
+  "gameId": 1673,
+  "finding": {
+    "id": 1673,
+    "step": 39,
+    "type": "hindsight-tip-inferior",
+    "severity": "hindsight",
+    "tip": "T10",
+    "recommended": [
+      "Schellen-Ober"
+    ],
+    "alternatives": [
+      {
+        "card": "Gras-Ass",
+        "delta": 10
+      },
+      {
+        "card": "Schellen-Ober",
+        "delta": -10
+      }
+    ]
+  },
+  "decision": {
+    "step": 39,
+    "level": "beginner",
+    "rngStateBefore": 307591406,
+    "rngStateAfterDecision": 137554805,
+    "view": {
+      "seat": 2,
+      "phase": "play",
+      "turn": 2,
+      "hand": [
+        "Gras-Ass",
+        "Schellen-Ober"
+      ],
+      "counts": [
+        2,
+        1,
+        2,
+        2
+      ],
+      "trick": [
+        {
+          "seat": 1,
+          "card": "Eichel-9"
+        }
+      ],
+      "trickIndex": 6,
+      "points": [
+        27,
+        35,
+        10,
+        4
+      ],
+      "contract": {
+        "kind": "rufspiel",
+        "suit": "Eichel"
+      },
+      "declarer": 2,
+      "partner": 1,
+      "partnerRevealed": true,
+      "escaped": false,
+      "legalCards": [
+        "Gras-Ass",
+        "Schellen-Ober"
+      ],
+      "locks": {},
+      "bidLevel": 2,
+      "bidLevels": [],
+      "canPassBid": false,
+      "canDouble": false,
+      "forcedCaller": false,
+      "spritzCount": 0,
+      "spritzSeats": [],
+      "lastSpritzTrick": -1,
+      "multiplier": 1
+    },
+    "action": {
+      "type": "play",
+      "cardId": "Schellen-Ober",
+      "reasonCode": "R5",
+      "botLevel": "beginner",
+      "debugInfo": {
+        "candidates": [
+          "Schellen-Ober",
+          "Gras-Ass"
+        ],
+        "rules": [
+          "R5"
+        ],
+        "tips": [
+          "T10"
+        ]
+      }
+    },
+    "events": [
+      {
+        "type": "cardDecision",
+        "matches": [
+          {
+            "code": "T10",
+            "cards": [
+              "Schellen-Ober"
+            ],
+            "weight": 65,
+            "deduced": false
+          }
+        ],
+        "selected": "Schellen-Ober",
+        "reasonCode": "R5",
+        "debugInfo": {
+          "candidates": [
+            "Schellen-Ober",
+            "Gras-Ass"
+          ],
+          "rules": [
+            "R5"
+          ],
+          "tips": [
+            "T10"
+          ]
+        },
+        "rngState": 137554805
+      }
+    ],
+    "tipStatus": [
+      {
+        "code": "T10",
+        "cards": [
+          "Schellen-Ober"
+        ],
+        "weight": 65,
+        "deduced": false,
+        "selectedRecommendedCard": true,
+        "expectedReliability": 0
+      }
+    ],
+    "proReview": {
+      "card": "Schellen-Ober",
+      "reason": "T10",
+      "candidates": [
+        "Schellen-Ober",
+        "Gras-Ass"
+      ],
+      "rules": [
+        "R5"
+      ],
+      "tips": [
+        "T10"
+      ]
+    },
+    "endgame": {
+      "method": "exact-full-information-team-minimax-last-two-tricks",
+      "objective": "final-seat-delta-cent",
+      "futureSpritz": false,
+      "alternatives": [
+        {
+          "card": "Gras-Ass",
+          "delta": 10
+        },
+        {
+          "card": "Schellen-Ober",
+          "delta": -10
+        }
+      ],
+      "nodes": 24
+    },
+    "rngStateAfterTransition": 137554805
+  },
+  "initialHands": [
+    [
+      "Gras-Ober",
+      "Schellen-9",
+      "Gras-7",
+      "Eichel-10",
+      "Herz-Unter",
+      "Herz-König",
+      "Gras-Unter",
+      "Herz-Ass"
+    ],
+    [
+      "Schellen-7",
+      "Eichel-9",
+      "Gras-10",
+      "Herz-7",
+      "Schellen-Ass",
+      "Eichel-Ass",
+      "Schellen-10",
+      "Herz-9"
+    ],
+    [
+      "Herz-8",
+      "Herz-10",
+      "Gras-Ass",
+      "Gras-9",
+      "Schellen-Ober",
+      "Herz-Ober",
+      "Eichel-8",
+      "Eichel-Ober"
+    ],
+    [
+      "Eichel-7",
+      "Gras-8",
+      "Schellen-König",
+      "Schellen-8",
+      "Gras-König",
+      "Schellen-Unter",
+      "Eichel-König",
+      "Eichel-Unter"
+    ]
+  ],
+  "seatLevels": [
+    "pro",
+    "legend",
+    "beginner",
+    "amateur"
+  ],
+  "final": {
+    "contract": {
+      "kind": "rufspiel",
+      "suit": "Eichel"
+    },
+    "declarer": 2,
+    "partner": 1,
+    "points": [
+      60,
+      35,
+      21,
+      4
+    ],
+    "result": {
+      "declarerPoints": 56,
+      "opponentPoints": 64,
+      "declarerWon": false,
+      "schneider": false,
+      "schwarz": false,
+      "laufende": 0,
+      "value": 10,
+      "deltas": [
+        10,
+        -10,
+        -10,
+        10
+      ],
+      "team": [
+        2,
+        1
+      ]
+    },
+    "totals": [
+      10,
+      -10,
+      -10,
+      10
+    ],
+    "tricks": [
+      {
+        "plays": [
+          {
+            "seat": 2,
+            "card": {
+              "id": "Herz-Ober",
+              "suit": "Herz",
+              "rank": "Ober"
+            }
+          },
+          {
+            "seat": 3,
+            "card": {
+              "id": "Schellen-Unter",
+              "suit": "Schellen",
+              "rank": "Unter"
+            }
+          },
+          {
+            "seat": 0,
+            "card": {
+              "id": "Herz-Unter",
+              "suit": "Herz",
+              "rank": "Unter"
+            }
+          },
+          {
+            "seat": 1,
+            "card": {
+              "id": "Herz-9",
+              "suit": "Herz",
+              "rank": "9"
+            }
+          }
+        ],
+        "winner": 2,
+        "points": 7
+      },
+      {
+        "plays": [
+          {
+            "seat": 2,
+            "card": {
+              "id": "Herz-8",
+              "suit": "Herz",
+              "rank": "8"
+            }
+          },
+          {
+            "seat": 3,
+            "card": {
+              "id": "Eichel-Unter",
+              "suit": "Eichel",
+              "rank": "Unter"
+            }
+          },
+          {
+            "seat": 0,
+            "card": {
+              "id": "Gras-Unter",
+              "suit": "Gras",
+              "rank": "Unter"
+            }
+          },
+          {
+            "seat": 1,
+            "card": {
+              "id": "Herz-7",
+              "suit": "Herz",
+              "rank": "7"
+            }
+          }
+        ],
+        "winner": 3,
+        "points": 4
+      },
+      {
+        "plays": [
+          {
+            "seat": 3,
+            "card": {
+              "id": "Eichel-7",
+              "suit": "Eichel",
+              "rank": "7"
+            }
+          },
+          {
+            "seat": 0,
+            "card": {
+              "id": "Eichel-10",
+              "suit": "Eichel",
+              "rank": "10"
+            }
+          },
+          {
+            "seat": 1,
+            "card": {
+              "id": "Eichel-Ass",
+              "suit": "Eichel",
+              "rank": "Ass"
+            }
+          },
+          {
+            "seat": 2,
+            "card": {
+              "id": "Eichel-8",
+              "suit": "Eichel",
+              "rank": "8"
+            }
+          }
+        ],
+        "winner": 1,
+        "points": 21
+      },
+      {
+        "plays": [
+          {
+            "seat": 1,
+            "card": {
+              "id": "Schellen-7",
+              "suit": "Schellen",
+              "rank": "7"
+            }
+          },
+          {
+            "seat": 2,
+            "card": {
+              "id": "Eichel-Ober",
+              "suit": "Eichel",
+              "rank": "Ober"
+            }
+          },
+          {
+            "seat": 3,
+            "card": {
+              "id": "Schellen-8",
+              "suit": "Schellen",
+              "rank": "8"
+            }
+          },
+          {
+            "seat": 0,
+            "card": {
+              "id": "Schellen-9",
+              "suit": "Schellen",
+              "rank": "9"
+            }
+          }
+        ],
+        "winner": 2,
+        "points": 3
+      },
+      {
+        "plays": [
+          {
+            "seat": 2,
+            "card": {
+              "id": "Herz-10",
+              "suit": "Herz",
+              "rank": "10"
+            }
+          },
+          {
+            "seat": 3,
+            "card": {
+              "id": "Schellen-König",
+              "suit": "Schellen",
+              "rank": "König"
+            }
+          },
+          {
+            "seat": 0,
+            "card": {
+              "id": "Gras-Ober",
+              "suit": "Gras",
+              "rank": "Ober"
+            }
+          },
+          {
+            "seat": 1,
+            "card": {
+              "id": "Schellen-10",
+              "suit": "Schellen",
+              "rank": "10"
+            }
+          }
+        ],
+        "winner": 0,
+        "points": 27
+      },
+      {
+        "plays": [
+          {
+            "seat": 0,
+            "card": {
+              "id": "Gras-7",
+              "suit": "Gras",
+              "rank": "7"
+            }
+          },
+          {
+            "seat": 1,
+            "card": {
+              "id": "Gras-10",
+              "suit": "Gras",
+              "rank": "10"
+            }
+          },
+          {
+            "seat": 2,
+            "card": {
+              "id": "Gras-9",
+              "suit": "Gras",
+              "rank": "9"
+            }
+          },
+          {
+            "seat": 3,
+            "card": {
+              "id": "Gras-König",
+              "suit": "Gras",
+              "rank": "König"
+            }
+          }
+        ],
+        "winner": 1,
+        "points": 14
+      },
+      {
+        "plays": [
+          {
+            "seat": 1,
+            "card": {
+              "id": "Eichel-9",
+              "suit": "Eichel",
+              "rank": "9"
+            }
+          },
+          {
+            "seat": 2,
+            "card": {
+              "id": "Schellen-Ober",
+              "suit": "Schellen",
+              "rank": "Ober"
+            }
+          },
+          {
+            "seat": 3,
+            "card": {
+              "id": "Eichel-König",
+              "suit": "Eichel",
+              "rank": "König"
+            }
+          },
+          {
+            "seat": 0,
+            "card": {
+              "id": "Herz-König",
+              "suit": "Herz",
+              "rank": "König"
+            }
+          }
+        ],
+        "winner": 2,
+        "points": 11
+      },
+      {
+        "plays": [
+          {
+            "seat": 2,
+            "card": {
+              "id": "Gras-Ass",
+              "suit": "Gras",
+              "rank": "Ass"
+            }
+          },
+          {
+            "seat": 3,
+            "card": {
+              "id": "Gras-8",
+              "suit": "Gras",
+              "rank": "8"
+            }
+          },
+          {
+            "seat": 0,
+            "card": {
+              "id": "Herz-Ass",
+              "suit": "Herz",
+              "rank": "Ass"
+            }
+          },
+          {
+            "seat": 1,
+            "card": {
+              "id": "Schellen-Ass",
+              "suit": "Schellen",
+              "rank": "Ass"
+            }
+          }
+        ],
+        "winner": 0,
+        "points": 33
+      }
+    ],
+    "remainingHands": [
+      [],
+      [],
+      [],
+      []
+    ],
+    "spritzEvents": [],
+    "announcements": [
+      "beginner: I dad scho!",
+      "amateur: Ich möchte spielen.",
+      "pro: I würd scho spuin!",
+      "legend: Weg.",
+      "beginner: Mindestens Sauspiel.",
+      "amateur: Weiter.",
+      "pro: Weg.",
+      "beginner: Sauspiel auf Eichel-Ass"
+    ],
+    "multiplier": 1
+  }
+}

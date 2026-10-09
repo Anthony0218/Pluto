@@ -1,0 +1,1029 @@
+{
+  "status": "running",
+  "analyzedShards": 32,
+  "analyzed": 1020,
+  "allocationHypotheses": 24962,
+  "modelErrors": 0,
+  "positiveMeanAlternative": 742,
+  "nonWorseningAlternative": 650,
+  "samples": [
+    {
+      "id": 4038,
+      "step": 37,
+      "gain": 360,
+      "allocations": 30,
+      "chosen": "Eichel-Ober",
+      "recommendation": {
+        "card": "Eichel-Unter",
+        "meanMinimaxDeltaCent": 180,
+        "fullInformationWins": 30,
+        "betterThanChosen": 30,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 180,
+        "maxDelta": 180,
+        "rAllowed": true,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 360
+      },
+      "level": "pro",
+      "rules": [
+        "R1"
+      ],
+      "tips": [
+        {
+          "code": "T12",
+          "cards": [
+            "Eichel-Ober"
+          ],
+          "weight": 35,
+          "deduced": false,
+          "selectedRecommendedCard": true,
+          "expectedReliability": 0.98
+        }
+      ]
+    },
+    {
+      "id": 2388,
+      "step": 39,
+      "gain": 280,
+      "allocations": 36,
+      "chosen": "Gras-9",
+      "recommendation": {
+        "card": "Gras-Ass",
+        "meanMinimaxDeltaCent": 180,
+        "fullInformationWins": 36,
+        "betterThanChosen": 28,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 8,
+        "minDelta": 180,
+        "maxDelta": 180,
+        "rAllowed": true,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 0.7777777777777778,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 280
+      },
+      "level": "pro",
+      "rules": [
+        "R1"
+      ],
+      "tips": []
+    },
+    {
+      "id": 3609,
+      "step": 39,
+      "gain": 240,
+      "allocations": 60,
+      "chosen": "Gras-König",
+      "recommendation": {
+        "card": "Gras-Ass",
+        "meanMinimaxDeltaCent": 150,
+        "fullInformationWins": 60,
+        "betterThanChosen": 48,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 12,
+        "minDelta": 150,
+        "maxDelta": 150,
+        "rAllowed": true,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 0.8,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 240
+      },
+      "level": "pro",
+      "rules": [
+        "R1"
+      ],
+      "tips": []
+    },
+    {
+      "id": 4255,
+      "step": 37,
+      "gain": 240,
+      "allocations": 90,
+      "chosen": "Herz-7",
+      "recommendation": {
+        "card": "Herz-Ass",
+        "meanMinimaxDeltaCent": 110,
+        "fullInformationWins": 78,
+        "betterThanChosen": 72,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 18,
+        "minDelta": -150,
+        "maxDelta": 150,
+        "rAllowed": true,
+        "fullInformationWinFraction": 0.8666666666666667,
+        "strictlyBetterFraction": 0.8,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 240
+      },
+      "level": "pro",
+      "rules": [
+        "R1"
+      ],
+      "tips": []
+    },
+    {
+      "id": 7819,
+      "step": 35,
+      "gain": 210,
+      "allocations": 90,
+      "chosen": "Herz-8",
+      "recommendation": {
+        "card": "Herz-Ass",
+        "meanMinimaxDeltaCent": 120,
+        "fullInformationWins": 90,
+        "betterThanChosen": 90,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 120,
+        "maxDelta": 120,
+        "rAllowed": true,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 210
+      },
+      "level": "amateur",
+      "rules": [],
+      "tips": []
+    },
+    {
+      "id": 337,
+      "step": 38,
+      "gain": 180,
+      "allocations": 19,
+      "chosen": "Gras-10",
+      "recommendation": {
+        "card": "Eichel-Ober",
+        "meanMinimaxDeltaCent": 90,
+        "fullInformationWins": 19,
+        "betterThanChosen": 19,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 90,
+        "maxDelta": 90,
+        "rAllowed": true,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 180
+      },
+      "level": "pro",
+      "rules": [
+        "R1"
+      ],
+      "tips": [
+        {
+          "code": "T12",
+          "cards": [
+            "Gras-10"
+          ],
+          "weight": 35,
+          "deduced": false,
+          "selectedRecommendedCard": true,
+          "expectedReliability": 0.98
+        }
+      ]
+    },
+    {
+      "id": 1096,
+      "step": 38,
+      "gain": 180,
+      "allocations": 90,
+      "chosen": "Eichel-Ass",
+      "recommendation": {
+        "card": "Schellen-Ober",
+        "meanMinimaxDeltaCent": 90,
+        "fullInformationWins": 90,
+        "betterThanChosen": 90,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 90,
+        "maxDelta": 90,
+        "rAllowed": true,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 180
+      },
+      "level": "pro",
+      "rules": [
+        "R1"
+      ],
+      "tips": [
+        {
+          "code": "T12",
+          "cards": [
+            "Eichel-Ass"
+          ],
+          "weight": 35,
+          "deduced": false,
+          "selectedRecommendedCard": true,
+          "expectedReliability": 0.98
+        }
+      ]
+    },
+    {
+      "id": 1107,
+      "step": 40,
+      "gain": 180,
+      "allocations": 2,
+      "chosen": "Eichel-Ober",
+      "recommendation": {
+        "card": "Eichel-8",
+        "meanMinimaxDeltaCent": 90,
+        "fullInformationWins": 2,
+        "betterThanChosen": 2,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 90,
+        "maxDelta": 90,
+        "rAllowed": true,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 180
+      },
+      "level": "amateur",
+      "rules": [
+        "R5"
+      ],
+      "tips": [
+        {
+          "code": "T7",
+          "cards": [
+            "Eichel-Ober"
+          ],
+          "weight": 140,
+          "deduced": false,
+          "selectedRecommendedCard": true,
+          "expectedReliability": 0.75
+        }
+      ]
+    },
+    {
+      "id": 1589,
+      "step": 38,
+      "gain": 180,
+      "allocations": 60,
+      "chosen": "Schellen-Unter",
+      "recommendation": {
+        "card": "Eichel-Ober",
+        "meanMinimaxDeltaCent": 90,
+        "fullInformationWins": 60,
+        "betterThanChosen": 60,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 90,
+        "maxDelta": 90,
+        "rAllowed": true,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 180
+      },
+      "level": "amateur",
+      "rules": [
+        "R1"
+      ],
+      "tips": []
+    },
+    {
+      "id": 2211,
+      "step": 41,
+      "gain": 180,
+      "allocations": 6,
+      "chosen": "Gras-Ober",
+      "recommendation": {
+        "card": "Schellen-9",
+        "meanMinimaxDeltaCent": 90,
+        "fullInformationWins": 6,
+        "betterThanChosen": 6,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 90,
+        "maxDelta": 90,
+        "rAllowed": false,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 180
+      },
+      "level": "legend",
+      "rules": [
+        "R5"
+      ],
+      "tips": []
+    },
+    {
+      "id": 2438,
+      "step": 39,
+      "gain": 180,
+      "allocations": 60,
+      "chosen": "Gras-10",
+      "recommendation": {
+        "card": "Schellen-Unter",
+        "meanMinimaxDeltaCent": 90,
+        "fullInformationWins": 60,
+        "betterThanChosen": 60,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 90,
+        "maxDelta": 90,
+        "rAllowed": true,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 180
+      },
+      "level": "pro",
+      "rules": [
+        "R1"
+      ],
+      "tips": [
+        {
+          "code": "T12",
+          "cards": [
+            "Gras-10"
+          ],
+          "weight": 35,
+          "deduced": false,
+          "selectedRecommendedCard": true,
+          "expectedReliability": 0.98
+        }
+      ]
+    },
+    {
+      "id": 2917,
+      "step": 37,
+      "gain": 180,
+      "allocations": 3,
+      "chosen": "Eichel-Ober",
+      "recommendation": {
+        "card": "Eichel-Ass",
+        "meanMinimaxDeltaCent": 90,
+        "fullInformationWins": 3,
+        "betterThanChosen": 3,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 90,
+        "maxDelta": 90,
+        "rAllowed": true,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 180
+      },
+      "level": "pro",
+      "rules": [
+        "R5",
+        "R5"
+      ],
+      "tips": [
+        {
+          "code": "T5",
+          "cards": [
+            "Eichel-Ober"
+          ],
+          "weight": 50,
+          "deduced": false,
+          "selectedRecommendedCard": true,
+          "expectedReliability": 0.98
+        }
+      ]
+    },
+    {
+      "id": 3007,
+      "step": 42,
+      "gain": 180,
+      "allocations": 1,
+      "chosen": "Herz-Unter",
+      "recommendation": {
+        "card": "Herz-10",
+        "meanMinimaxDeltaCent": 90,
+        "fullInformationWins": 1,
+        "betterThanChosen": 1,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 90,
+        "maxDelta": 90,
+        "rAllowed": false,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 180
+      },
+      "level": "amateur",
+      "rules": [
+        "R5"
+      ],
+      "tips": []
+    },
+    {
+      "id": 3578,
+      "step": 38,
+      "gain": 180,
+      "allocations": 30,
+      "chosen": "Eichel-Ass",
+      "recommendation": {
+        "card": "Eichel-Unter",
+        "meanMinimaxDeltaCent": 90,
+        "fullInformationWins": 30,
+        "betterThanChosen": 30,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 90,
+        "maxDelta": 90,
+        "rAllowed": true,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 180
+      },
+      "level": "pro",
+      "rules": [
+        "R1"
+      ],
+      "tips": [
+        {
+          "code": "T12",
+          "cards": [
+            "Eichel-Ass"
+          ],
+          "weight": 35,
+          "deduced": false,
+          "selectedRecommendedCard": true,
+          "expectedReliability": 0.98
+        }
+      ]
+    },
+    {
+      "id": 3988,
+      "step": 37,
+      "gain": 180,
+      "allocations": 60,
+      "chosen": "Gras-10",
+      "recommendation": {
+        "card": "Schellen-Ober",
+        "meanMinimaxDeltaCent": 90,
+        "fullInformationWins": 60,
+        "betterThanChosen": 60,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 90,
+        "maxDelta": 90,
+        "rAllowed": true,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 180
+      },
+      "level": "pro",
+      "rules": [
+        "R1"
+      ],
+      "tips": [
+        {
+          "code": "T12",
+          "cards": [
+            "Gras-10"
+          ],
+          "weight": 35,
+          "deduced": false,
+          "selectedRecommendedCard": true,
+          "expectedReliability": 0.98
+        }
+      ]
+    },
+    {
+      "id": 5407,
+      "step": 37,
+      "gain": 180,
+      "allocations": 6,
+      "chosen": "Schellen-Ober",
+      "recommendation": {
+        "card": "Eichel-Ober",
+        "meanMinimaxDeltaCent": 90,
+        "fullInformationWins": 6,
+        "betterThanChosen": 6,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 90,
+        "maxDelta": 90,
+        "rAllowed": true,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 180
+      },
+      "level": "pro",
+      "rules": [
+        "R1"
+      ],
+      "tips": [
+        {
+          "code": "T12",
+          "cards": [
+            "Schellen-Ober"
+          ],
+          "weight": 35,
+          "deduced": false,
+          "selectedRecommendedCard": true,
+          "expectedReliability": 0.98
+        }
+      ]
+    },
+    {
+      "id": 5494,
+      "step": 39,
+      "gain": 180,
+      "allocations": 30,
+      "chosen": "Schellen-9",
+      "recommendation": {
+        "card": "Schellen-Unter",
+        "meanMinimaxDeltaCent": 90,
+        "fullInformationWins": 30,
+        "betterThanChosen": 30,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 90,
+        "maxDelta": 90,
+        "rAllowed": true,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 180
+      },
+      "level": "pro",
+      "rules": [
+        "R1"
+      ],
+      "tips": [
+        {
+          "code": "T12",
+          "cards": [
+            "Schellen-9"
+          ],
+          "weight": 35,
+          "deduced": false,
+          "selectedRecommendedCard": true,
+          "expectedReliability": 0.98
+        }
+      ]
+    },
+    {
+      "id": 4022,
+      "step": 37,
+      "gain": 180,
+      "allocations": 3,
+      "chosen": "Herz-Ass",
+      "recommendation": {
+        "card": "Schellen-Unter",
+        "meanMinimaxDeltaCent": 90,
+        "fullInformationWins": 3,
+        "betterThanChosen": 3,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 90,
+        "maxDelta": 90,
+        "rAllowed": true,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 180
+      },
+      "level": "pro",
+      "rules": [
+        "R1"
+      ],
+      "tips": [
+        {
+          "code": "T12",
+          "cards": [
+            "Herz-Ass"
+          ],
+          "weight": 35,
+          "deduced": false,
+          "selectedRecommendedCard": true,
+          "expectedReliability": 0.98
+        }
+      ]
+    },
+    {
+      "id": 4193,
+      "step": 40,
+      "gain": 180,
+      "allocations": 2,
+      "chosen": "Eichel-Ass",
+      "recommendation": {
+        "card": "Herz-König",
+        "meanMinimaxDeltaCent": 90,
+        "fullInformationWins": 2,
+        "betterThanChosen": 2,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 90,
+        "maxDelta": 90,
+        "rAllowed": false,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 180
+      },
+      "level": "amateur",
+      "rules": [
+        "R5"
+      ],
+      "tips": []
+    },
+    {
+      "id": 4296,
+      "step": 38,
+      "gain": 180,
+      "allocations": 2,
+      "chosen": "Gras-Ober",
+      "recommendation": {
+        "card": "Herz-König",
+        "meanMinimaxDeltaCent": 90,
+        "fullInformationWins": 2,
+        "betterThanChosen": 2,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 90,
+        "maxDelta": 90,
+        "rAllowed": true,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 180
+      },
+      "level": "pro",
+      "rules": [
+        "R5"
+      ],
+      "tips": [
+        {
+          "code": "T10",
+          "cards": [
+            "Gras-Ober"
+          ],
+          "weight": 65,
+          "deduced": false,
+          "selectedRecommendedCard": true,
+          "expectedReliability": 0.98
+        }
+      ]
+    },
+    {
+      "id": 4474,
+      "step": 35,
+      "gain": 180,
+      "allocations": 3,
+      "chosen": "Eichel-10",
+      "recommendation": {
+        "card": "Schellen-Ober",
+        "meanMinimaxDeltaCent": 90,
+        "fullInformationWins": 3,
+        "betterThanChosen": 3,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 90,
+        "maxDelta": 90,
+        "rAllowed": true,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 180
+      },
+      "level": "amateur",
+      "rules": [
+        "R1"
+      ],
+      "tips": []
+    },
+    {
+      "id": 4684,
+      "step": 38,
+      "gain": 180,
+      "allocations": 30,
+      "chosen": "Eichel-10",
+      "recommendation": {
+        "card": "Gras-Unter",
+        "meanMinimaxDeltaCent": 90,
+        "fullInformationWins": 30,
+        "betterThanChosen": 30,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 90,
+        "maxDelta": 90,
+        "rAllowed": true,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 180
+      },
+      "level": "pro",
+      "rules": [
+        "R1"
+      ],
+      "tips": [
+        {
+          "code": "T12",
+          "cards": [
+            "Eichel-10"
+          ],
+          "weight": 35,
+          "deduced": false,
+          "selectedRecommendedCard": true,
+          "expectedReliability": 0.98
+        }
+      ]
+    },
+    {
+      "id": 5572,
+      "step": 37,
+      "gain": 180,
+      "allocations": 9,
+      "chosen": "Schellen-Unter",
+      "recommendation": {
+        "card": "Schellen-Ober",
+        "meanMinimaxDeltaCent": 90,
+        "fullInformationWins": 9,
+        "betterThanChosen": 9,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 90,
+        "maxDelta": 90,
+        "rAllowed": true,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 180
+      },
+      "level": "pro",
+      "rules": [
+        "R1"
+      ],
+      "tips": [
+        {
+          "code": "T12",
+          "cards": [
+            "Schellen-Unter"
+          ],
+          "weight": 35,
+          "deduced": false,
+          "selectedRecommendedCard": true,
+          "expectedReliability": 0.98
+        }
+      ]
+    },
+    {
+      "id": 4790,
+      "step": 41,
+      "gain": 180,
+      "allocations": 6,
+      "chosen": "Schellen-Ober",
+      "recommendation": {
+        "card": "Herz-9",
+        "meanMinimaxDeltaCent": 90,
+        "fullInformationWins": 6,
+        "betterThanChosen": 6,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 90,
+        "maxDelta": 90,
+        "rAllowed": false,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 180
+      },
+      "level": "pro",
+      "rules": [
+        "R5"
+      ],
+      "tips": []
+    },
+    {
+      "id": 7871,
+      "step": 39,
+      "gain": 180,
+      "allocations": 3,
+      "chosen": "Eichel-Ober",
+      "recommendation": {
+        "card": "Herz-Ass",
+        "meanMinimaxDeltaCent": 90,
+        "fullInformationWins": 3,
+        "betterThanChosen": 3,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 90,
+        "maxDelta": 90,
+        "rAllowed": true,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 180
+      },
+      "level": "pro",
+      "rules": [
+        "R5"
+      ],
+      "tips": [
+        {
+          "code": "T5",
+          "cards": [
+            "Eichel-Ober"
+          ],
+          "weight": 50,
+          "deduced": false,
+          "selectedRecommendedCard": true,
+          "expectedReliability": 0.98
+        }
+      ]
+    },
+    {
+      "id": 6206,
+      "step": 35,
+      "gain": 180,
+      "allocations": 42,
+      "chosen": "Schellen-Ass",
+      "recommendation": {
+        "card": "Gras-Ober",
+        "meanMinimaxDeltaCent": 90,
+        "fullInformationWins": 42,
+        "betterThanChosen": 42,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 90,
+        "maxDelta": 90,
+        "rAllowed": true,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 180
+      },
+      "level": "pro",
+      "rules": [
+        "R1"
+      ],
+      "tips": [
+        {
+          "code": "T12",
+          "cards": [
+            "Schellen-Ass"
+          ],
+          "weight": 35,
+          "deduced": false,
+          "selectedRecommendedCard": true,
+          "expectedReliability": 0.98
+        }
+      ]
+    },
+    {
+      "id": 6427,
+      "step": 36,
+      "gain": 180,
+      "allocations": 15,
+      "chosen": "Eichel-10",
+      "recommendation": {
+        "card": "Gras-Ober",
+        "meanMinimaxDeltaCent": 90,
+        "fullInformationWins": 15,
+        "betterThanChosen": 15,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 90,
+        "maxDelta": 90,
+        "rAllowed": true,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 180
+      },
+      "level": "pro",
+      "rules": [
+        "R5"
+      ],
+      "tips": [
+        {
+          "code": "T5",
+          "cards": [
+            "Gras-Ober"
+          ],
+          "weight": 50,
+          "deduced": false,
+          "selectedRecommendedCard": false,
+          "expectedReliability": 0.98
+        },
+        {
+          "code": "T10",
+          "cards": [
+            "Gras-Ober"
+          ],
+          "weight": 65,
+          "deduced": false,
+          "selectedRecommendedCard": false,
+          "expectedReliability": 0.98
+        }
+      ]
+    },
+    {
+      "id": 6443,
+      "step": 35,
+      "gain": 180,
+      "allocations": 27,
+      "chosen": "Eichel-Ass",
+      "recommendation": {
+        "card": "Herz-Ober",
+        "meanMinimaxDeltaCent": 90,
+        "fullInformationWins": 27,
+        "betterThanChosen": 27,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 90,
+        "maxDelta": 90,
+        "rAllowed": true,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 180
+      },
+      "level": "amateur",
+      "rules": [
+        "R1"
+      ],
+      "tips": []
+    },
+    {
+      "id": 6681,
+      "step": 38,
+      "gain": 180,
+      "allocations": 6,
+      "chosen": "Eichel-König",
+      "recommendation": {
+        "card": "Gras-Ober",
+        "meanMinimaxDeltaCent": 90,
+        "fullInformationWins": 6,
+        "betterThanChosen": 6,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 90,
+        "maxDelta": 90,
+        "rAllowed": true,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 180
+      },
+      "level": "pro",
+      "rules": [
+        "R1"
+      ],
+      "tips": [
+        {
+          "code": "T12",
+          "cards": [
+            "Eichel-König"
+          ],
+          "weight": 35,
+          "deduced": false,
+          "selectedRecommendedCard": true,
+          "expectedReliability": 0.98
+        }
+      ]
+    },
+    {
+      "id": 6684,
+      "step": 35,
+      "gain": 180,
+      "allocations": 60,
+      "chosen": "Schellen-König",
+      "recommendation": {
+        "card": "Herz-Ober",
+        "meanMinimaxDeltaCent": 90,
+        "fullInformationWins": 60,
+        "betterThanChosen": 60,
+        "worseThanChosen": 0,
+        "tiesWithChosen": 0,
+        "minDelta": 90,
+        "maxDelta": 90,
+        "rAllowed": true,
+        "fullInformationWinFraction": 1,
+        "strictlyBetterFraction": 1,
+        "strictlyWorseFraction": 0,
+        "meanPairedGainCent": 180
+      },
+      "level": "amateur",
+      "rules": [
+        "R1"
+      ],
+      "tips": []
+    }
+  ],
+  "updatedAt": "2026-10-04T23:04:03.259Z"
+}

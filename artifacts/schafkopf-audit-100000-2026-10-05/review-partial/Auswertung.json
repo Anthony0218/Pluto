@@ -1,0 +1,512 @@
+{
+  "deals": 2000,
+  "finished": 1862,
+  "singles": 427,
+  "spritzes": 83,
+  "simulationFailureReasons": {
+    "card:no-compatible-hands:": 543,
+    "contract:no-compatible-hands:": 6
+  },
+  "retrospective": {
+    "beginner": {
+      "assessed": 1406,
+      "improved": 54,
+      "totalGapCent": 1240,
+      "rulesExcludedBest": 8,
+      "tipsInferior": {
+        "T5": 14,
+        "T3b": 1,
+        "T10": 1
+      }
+    },
+    "amateur": {
+      "assessed": 1437,
+      "improved": 59,
+      "totalGapCent": 1920,
+      "rulesExcludedBest": 14,
+      "tipsInferior": {
+        "T5": 12,
+        "T4": 1,
+        "T1": 1,
+        "T7": 2,
+        "T3b": 3,
+        "T10": 3,
+        "T6": 1
+      }
+    },
+    "pro": {
+      "assessed": 1420,
+      "improved": 63,
+      "totalGapCent": 2530,
+      "rulesExcludedBest": 12,
+      "tipsInferior": {
+        "T12": 7,
+        "T8": 2,
+        "T3b": 4,
+        "T5": 15,
+        "T10": 6,
+        "T2": 2,
+        "T7": 3
+      }
+    },
+    "legend": {
+      "assessed": 1453,
+      "improved": 17,
+      "totalGapCent": 690,
+      "rulesExcludedBest": 12,
+      "tipsInferior": {
+        "T5": 11,
+        "T8": 3,
+        "T12": 4,
+        "T10": 4,
+        "T6": 2,
+        "T3b": 1,
+        "T1": 1,
+        "T2": 1
+      }
+    }
+  },
+  "tips": {
+    "amateur:T2": {
+      "matches": 322,
+      "selected": 223,
+      "exactAssessed": 1,
+      "exactInferior": 0,
+      "exactSuperior": 0,
+      "exactEqual": 1
+    },
+    "amateur:T12": {
+      "matches": 232,
+      "selected": 206,
+      "exactAssessed": 0,
+      "exactInferior": 0,
+      "exactSuperior": 0,
+      "exactEqual": 0
+    },
+    "pro:T10": {
+      "matches": 1129,
+      "selected": 707,
+      "exactAssessed": 70,
+      "exactInferior": 6,
+      "exactSuperior": 17,
+      "exactEqual": 47
+    },
+    "legend:T7": {
+      "matches": 1231,
+      "selected": 643,
+      "exactAssessed": 57,
+      "exactInferior": 0,
+      "exactSuperior": 5,
+      "exactEqual": 52
+    },
+    "legend:T8": {
+      "matches": 386,
+      "selected": 194,
+      "exactAssessed": 27,
+      "exactInferior": 3,
+      "exactSuperior": 2,
+      "exactEqual": 22
+    },
+    "beginner:T10": {
+      "matches": 1222,
+      "selected": 583,
+      "exactAssessed": 46,
+      "exactInferior": 1,
+      "exactSuperior": 10,
+      "exactEqual": 35
+    },
+    "amateur:T1": {
+      "matches": 317,
+      "selected": 107,
+      "exactAssessed": 21,
+      "exactInferior": 1,
+      "exactSuperior": 1,
+      "exactEqual": 19
+    },
+    "pro:T7": {
+      "matches": 1281,
+      "selected": 1175,
+      "exactAssessed": 55,
+      "exactInferior": 3,
+      "exactSuperior": 7,
+      "exactEqual": 45
+    },
+    "legend:T6": {
+      "matches": 4824,
+      "selected": 1696,
+      "exactAssessed": 307,
+      "exactInferior": 2,
+      "exactSuperior": 7,
+      "exactEqual": 298
+    },
+    "legend:T5": {
+      "matches": 1264,
+      "selected": 864,
+      "exactAssessed": 286,
+      "exactInferior": 11,
+      "exactSuperior": 29,
+      "exactEqual": 246
+    },
+    "beginner:T6": {
+      "matches": 3242,
+      "selected": 1004,
+      "exactAssessed": 187,
+      "exactInferior": 0,
+      "exactSuperior": 1,
+      "exactEqual": 186
+    },
+    "pro:T6": {
+      "matches": 4651,
+      "selected": 3176,
+      "exactAssessed": 285,
+      "exactInferior": 0,
+      "exactSuperior": 9,
+      "exactEqual": 276
+    },
+    "pro:T11": {
+      "matches": 37,
+      "selected": 28,
+      "exactAssessed": 3,
+      "exactInferior": 0,
+      "exactSuperior": 0,
+      "exactEqual": 3
+    },
+    "beginner:T7": {
+      "matches": 1219,
+      "selected": 495,
+      "exactAssessed": 26,
+      "exactInferior": 0,
+      "exactSuperior": 4,
+      "exactEqual": 22
+    },
+    "beginner:T8": {
+      "matches": 390,
+      "selected": 184,
+      "exactAssessed": 0,
+      "exactInferior": 0,
+      "exactSuperior": 0,
+      "exactEqual": 0
+    },
+    "pro:T4": {
+      "matches": 261,
+      "selected": 214,
+      "exactAssessed": 2,
+      "exactInferior": 0,
+      "exactSuperior": 0,
+      "exactEqual": 2
+    },
+    "amateur:T6": {
+      "matches": 2857,
+      "selected": 1538,
+      "exactAssessed": 100,
+      "exactInferior": 1,
+      "exactSuperior": 1,
+      "exactEqual": 98
+    },
+    "amateur:T10": {
+      "matches": 1069,
+      "selected": 554,
+      "exactAssessed": 52,
+      "exactInferior": 3,
+      "exactSuperior": 18,
+      "exactEqual": 31
+    },
+    "beginner:T5": {
+      "matches": 1288,
+      "selected": 762,
+      "exactAssessed": 264,
+      "exactInferior": 14,
+      "exactSuperior": 22,
+      "exactEqual": 228
+    },
+    "pro:T12": {
+      "matches": 832,
+      "selected": 788,
+      "exactAssessed": 94,
+      "exactInferior": 7,
+      "exactSuperior": 3,
+      "exactEqual": 84
+    },
+    "amateur:T3b": {
+      "matches": 391,
+      "selected": 186,
+      "exactAssessed": 6,
+      "exactInferior": 3,
+      "exactSuperior": 0,
+      "exactEqual": 3
+    },
+    "amateur:T8": {
+      "matches": 422,
+      "selected": 197,
+      "exactAssessed": 0,
+      "exactInferior": 0,
+      "exactSuperior": 0,
+      "exactEqual": 0
+    },
+    "beginner:T2": {
+      "matches": 306,
+      "selected": 115,
+      "exactAssessed": 2,
+      "exactInferior": 0,
+      "exactSuperior": 0,
+      "exactEqual": 2
+    },
+    "legend:T4": {
+      "matches": 283,
+      "selected": 170,
+      "exactAssessed": 0,
+      "exactInferior": 0,
+      "exactSuperior": 0,
+      "exactEqual": 0
+    },
+    "amateur:T5": {
+      "matches": 1352,
+      "selected": 903,
+      "exactAssessed": 297,
+      "exactInferior": 12,
+      "exactSuperior": 17,
+      "exactEqual": 268
+    },
+    "amateur:T7": {
+      "matches": 1207,
+      "selected": 980,
+      "exactAssessed": 33,
+      "exactInferior": 2,
+      "exactSuperior": 7,
+      "exactEqual": 24
+    },
+    "legend:T12": {
+      "matches": 871,
+      "selected": 305,
+      "exactAssessed": 100,
+      "exactInferior": 4,
+      "exactSuperior": 1,
+      "exactEqual": 95
+    },
+    "legend:T1": {
+      "matches": 447,
+      "selected": 221,
+      "exactAssessed": 28,
+      "exactInferior": 1,
+      "exactSuperior": 5,
+      "exactEqual": 22
+    },
+    "pro:T5": {
+      "matches": 1359,
+      "selected": 1240,
+      "exactAssessed": 328,
+      "exactInferior": 15,
+      "exactSuperior": 41,
+      "exactEqual": 272
+    },
+    "pro:T1": {
+      "matches": 480,
+      "selected": 427,
+      "exactAssessed": 20,
+      "exactInferior": 0,
+      "exactSuperior": 4,
+      "exactEqual": 16
+    },
+    "beginner:T3b": {
+      "matches": 425,
+      "selected": 207,
+      "exactAssessed": 6,
+      "exactInferior": 1,
+      "exactSuperior": 0,
+      "exactEqual": 5
+    },
+    "pro:T3b": {
+      "matches": 380,
+      "selected": 265,
+      "exactAssessed": 9,
+      "exactInferior": 4,
+      "exactSuperior": 0,
+      "exactEqual": 5
+    },
+    "legend:T2": {
+      "matches": 312,
+      "selected": 132,
+      "exactAssessed": 6,
+      "exactInferior": 1,
+      "exactSuperior": 0,
+      "exactEqual": 5
+    },
+    "amateur:T4": {
+      "matches": 267,
+      "selected": 127,
+      "exactAssessed": 1,
+      "exactInferior": 1,
+      "exactSuperior": 0,
+      "exactEqual": 0
+    },
+    "legend:T10": {
+      "matches": 1067,
+      "selected": 632,
+      "exactAssessed": 80,
+      "exactInferior": 4,
+      "exactSuperior": 24,
+      "exactEqual": 52
+    },
+    "pro:T2": {
+      "matches": 326,
+      "selected": 265,
+      "exactAssessed": 3,
+      "exactInferior": 2,
+      "exactSuperior": 0,
+      "exactEqual": 1
+    },
+    "beginner:T4": {
+      "matches": 286,
+      "selected": 119,
+      "exactAssessed": 1,
+      "exactInferior": 0,
+      "exactSuperior": 0,
+      "exactEqual": 1
+    },
+    "legend:T3b": {
+      "matches": 334,
+      "selected": 153,
+      "exactAssessed": 3,
+      "exactInferior": 1,
+      "exactSuperior": 0,
+      "exactEqual": 2
+    },
+    "beginner:T1": {
+      "matches": 202,
+      "selected": 83,
+      "exactAssessed": 14,
+      "exactInferior": 0,
+      "exactSuperior": 2,
+      "exactEqual": 12
+    },
+    "pro:T8": {
+      "matches": 381,
+      "selected": 238,
+      "exactAssessed": 26,
+      "exactInferior": 2,
+      "exactSuperior": 3,
+      "exactEqual": 21
+    },
+    "beginner:T12": {
+      "matches": 147,
+      "selected": 36,
+      "exactAssessed": 0,
+      "exactInferior": 0,
+      "exactSuperior": 0,
+      "exactEqual": 0
+    },
+    "legend:T11": {
+      "matches": 40,
+      "selected": 29,
+      "exactAssessed": 6,
+      "exactInferior": 0,
+      "exactSuperior": 0,
+      "exactEqual": 6
+    },
+    "legend:T3c": {
+      "matches": 6,
+      "selected": 4,
+      "exactAssessed": 0,
+      "exactInferior": 0,
+      "exactSuperior": 0,
+      "exactEqual": 0
+    },
+    "pro:T3c": {
+      "matches": 2,
+      "selected": 2,
+      "exactAssessed": 0,
+      "exactInferior": 0,
+      "exactSuperior": 0,
+      "exactEqual": 0
+    }
+  },
+  "spritzNames": {
+    "Kontra": {
+      "count": 82,
+      "partyWins": 63,
+      "byLevel": {
+        "legend": 28,
+        "pro": 54
+      }
+    },
+    "Re": {
+      "count": 1,
+      "partyWins": 1,
+      "byLevel": {
+        "amateur": 1
+      }
+    }
+  },
+  "contracts": {
+    "rufspiel:Eichel": {
+      "games": 561,
+      "wins": 389,
+      "spritzes": 28
+    },
+    "rufspiel:Gras": {
+      "games": 483,
+      "wins": 351,
+      "spritzes": 28
+    },
+    "solo:Schellen": {
+      "games": 70,
+      "wins": 43,
+      "spritzes": 1
+    },
+    "solo:Gras": {
+      "games": 60,
+      "wins": 37,
+      "spritzes": 2
+    },
+    "solo:Herz": {
+      "games": 77,
+      "wins": 50,
+      "spritzes": 4
+    },
+    "farbwenz:Eichel": {
+      "games": 42,
+      "wins": 28,
+      "spritzes": 0
+    },
+    "rufspiel:Schellen": {
+      "games": 391,
+      "wins": 264,
+      "spritzes": 16
+    },
+    "solo:Eichel": {
+      "games": 90,
+      "wins": 44,
+      "spritzes": 4
+    },
+    "wenz": {
+      "games": 25,
+      "wins": 19,
+      "spritzes": 0
+    },
+    "farbwenz:Herz": {
+      "games": 19,
+      "wins": 16,
+      "spritzes": 0
+    },
+    "farbwenz:Schellen": {
+      "games": 19,
+      "wins": 11,
+      "spritzes": 0
+    },
+    "farbwenz:Gras": {
+      "games": 25,
+      "wins": 19,
+      "spritzes": 0
+    }
+  },
+  "severity": {
+    "review": 26932,
+    "unexpected": 651,
+    "uncertain": 2786,
+    "expected": 6883,
+    "outcome-only": 4363,
+    "hindsight": 344,
+    "index": 510
+  },
+  "reviewProvenance": "All endgame gaps are full-information hindsight, not probability estimates."
+}
