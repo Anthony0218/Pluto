@@ -181,8 +181,8 @@ export default function VariantRoomSetup({ roomId, variantName, lobbyPath, onSta
                         </div>
                       )}
                     </div>
+                    {!player && <InviteFriendButton />}
                   </div>
-                  {!player && <InviteFriendButton />}
                 </div>
               );
             })}

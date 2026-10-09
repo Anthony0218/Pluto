@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
+import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
+import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
 import { useAuth } from "../../context/AuthContext";
 import { schafkopfRequest } from "../../games/schafkopf/multiplayer";
 import "../../components/Schafkopf/schafkopf.css";
@@ -7,7 +10,7 @@ import "../../components/Schafkopf/schafkopf.css";
 export default function SchafKopfLobbyPage() {
   const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState(() => (new URLSearchParams(window.location.search).get("code") ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const name = profile?.display_name || profile?.username || "Spieler";
@@ -18,10 +21,13 @@ export default function SchafKopfLobbyPage() {
       const room = await schafkopfRequest(create
         ? { op: "create", name, title: "Spieltag", aiDifficulty: "amateur" }
         : { op: "join", code, name });
-      if (room) navigate(`/games/schafkopf/multiplayer/${room.code}`);
+      if (room) navigate(recordCreatedGameInvite(`/games/schafkopf/multiplayer/${room.code}`));
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Raum konnte nicht geöffnet werden."); }
     finally { setBusy(false); }
   }
+  // Friend invites open this page with `?create=1` (host a table) or `?code=…&join=1` (take a seat).
+  useInviteAutoCreate(() => openRoom(true));
+  useInviteAutoJoin(() => openRoom(false));
   return <main className="sk-page"><header className="sk-header"><div><span className="sk-eyebrow">Privater Tisch · Vier Spieler</span><h1>Schafkopf online</h1><p>Raum erstellen, Code teilen und gemeinsam spielen.</p></div><Link className="sk-button sk-secondary" to="/games/schafkopf">Zurück</Link></header>
     {loading ? <p>Anmeldung wird geladen …</p> : !user ? <section className="sk-panel sk-login"><h2>Melde dich zum Mitspielen an</h2><p>Dein Konto hält deinen Platz frei, auch wenn du die Seite neu lädst.</p><Link className="sk-button" to="/login">Anmelden</Link></section> : <><p>Du spielst als <strong>{name}</strong>.</p><div className="sk-lobby-grid">
       <section className="sk-panel"><h2>Neuen Tisch erstellen</h2><p>Standardregeln mit 32 Karten, Kontra/Re und virtueller Punktewertung. Es werden vier angemeldete Spieler benötigt.</p><button className="sk-button" disabled={busy} onClick={() => void openRoom(true)}>{busy ? "Bitte warten …" : "Tisch erstellen"}</button></section>

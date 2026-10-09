@@ -9,7 +9,7 @@ import { generateMatchQuestions } from "../../../src/games/atlas/matchQuestions.
 import { chooseRandomModes, gameWinner, seriesComplete, seriesLength } from "../../../src/games/atlas/randomSeries.ts";
 import { rankedModes, maxModeBans, sanitizeBans, chooseRankedSeries, RANKED_CONFIG } from "../../../src/games/atlas/ranked.ts";
 import { calculateMatchResult, type Rating } from "../../../src/games/atlas/rankedRating.ts";
-import { GUESS_SCORING } from "../../../src/games/atlas/config.ts";
+import { GUESS_SCORING, MAP_BATTLE_ROUND_SECONDS } from "../../../src/games/atlas/config.ts";
 import { ATLAS_MULTIPLAYER_MODES, clampPlayers, createAuthoritativeSubmission, isRaceMode, isRoundMode, raceComplete, raceScores, resolveGuessTip, resolveRoundScores, verifyMatchDataset, type AtlasMatchStatus, type AtlasMultiplayerMode, type ServerSubmission } from "../../../src/games/atlas/multiplayer.ts";
 import { isFillScope, type FillScope } from "../../../src/games/atlas/scopes.ts";
 import { countryShapesFromTopology } from "../../../src/games/atlas/territoryDistance.ts";
@@ -29,7 +29,7 @@ const ATLAS_VERSION = versionJson.atlasDataVersion;
 // Closest Wins measures pins against real borders, so a pin anywhere inside the target country is 0 km.
 const shapes = countryShapesFromTopology(topologyJson);
 const modes = new Set<AtlasMultiplayerMode>(ATLAS_MULTIPLAYER_MODES);
-const ROUND_MS = 20_000, TIP_MS = GUESS_SCORING.tipSeconds * 1000;
+const ROUND_MS = 20_000, MAP_BATTLE_MS = MAP_BATTLE_ROUND_SECONDS * 1000, TIP_MS = GUESS_SCORING.tipSeconds * 1000;
 // Stat Battle: each player has this long to lay a card face down, then both stay on the table for the reveal.
 const PICK_MS = 30_000, REVEAL_MS = 4_200;
 const tipDuration=(match:Match)=>match.match_kind==="ranked"?12_000:TIP_MS;
@@ -62,16 +62,17 @@ const raceDeck = (match:Match) => {
 const roundsFor = (match: Match): AtlasQuestion[] => {
   if (!isRoundMode(match.mode)) return [];
   const count = match.state?.tie ? 3 : Math.min(30, Math.max(match.match_kind==="ranked"?3:5, match.settings.rounds || (match.mode === "guess_country" ? 4 : 8)));
-  const key=`${match.seed}:${match.mode}:${count}:${match.settings.challengeTier}`;
+  const key=`${match.seed}:${match.mode}:${count}:${match.settings.challengeTier}:${Boolean(match.state?.tie)}`;
   if(deckCache.has(key))return deckCache.get(key)!;
   const tier=match.settings.challengeTier||"standard";
   const advanced=tier!=="standard" && ["map_battle","closest_wins"].includes(match.mode);
   const deck = advanced ? generateAdvancedQuestions(countries,match.seed,count,tier,true) : generateMatchQuestions({ entities: countries, extras, datasetVersion: match.dataset_version, seed: match.seed,
     difficulty: match.settings.difficulty || "intermediate", count, mode: match.mode,
     categories: match.settings.categories, stats: match.settings.stats });
-  const converted=advanced&&match.mode==="closest_wins"?deck.map(q=>{if(q.interaction!=="map_click"||!q.targetCoordinates)throw new Error("Missing target");return {...q,interaction:"closest_click" as const,answer:q.targetCoordinates,targetCoordinates:q.targetCoordinates};}):deck;
+  const converted=advanced?deck.map((q,index)=>{if(match.mode==="map_battle"&&index%2===0)return q;if(q.interaction!=="map_click"||!q.targetCoordinates)throw new Error("Missing target");return {...q,interaction:"closest_click" as const,answer:q.targetCoordinates,targetCoordinates:q.targetCoordinates};}):deck;
   if(deckCache.size>=64)deckCache.delete(deckCache.keys().next().value!);
-  deckCache.set(key,converted);return converted;
+  const finalDeck = match.state?.tie ? converted.map(q => q.interaction === "closest_click" ? { ...q, interaction: "map_click" as const, answer: q.entityId, prompt: `Find ${countries.find(country => country.id === q.entityId)?.shortName} on the map.` } : q) : converted;
+  deckCache.set(key,finalDeck);return finalDeck;
 };
 // Inline media removes ISO filenames and SVG metadata from mystery flags. No answer seed or target IDs go on the wire.
 const media = (path:string|null|undefined) => path ? (flagsJson as Record<string,string>)[path] ?? null : null;
@@ -94,7 +95,7 @@ const snapshot = (match: Match, userId: string) => {
   const thisTip = match.submissions.filter((item) => item.round === match.round_index && tipOf(item) === tip);
   // Earlier missed guesses of this country are public: they narrow the field for everyone.
   const missedGuesses = match.mode === "guess_country" ? match.submissions.filter((item) => item.round === match.round_index && (tipOf(item) < tip || resolved)).map((item) => ({ userId: item.userId, tip: tipOf(item), answer: String(item.answer), correct: resolved ? item.correct : false })) : [];
-  return { id: match.id, code: match.room_code, mode: match.mode, ranked: match.match_kind === "ranked", series: series ? { ...series, bans: match.status === "draft" ? { [userId]: series.bans[userId] ?? [] } : series.bans, submittedCount: Object.keys(series.bans).length } : undefined, hostId: match.host_id, players: match.players, seat, maxPlayers: maxPlayers(match), status: match.status, intermissionEndsAt: match.status === "intermission" && match.match_kind === "ranked" ? match.resolve_at : null, datasetVersion: match.dataset_version, settings: match.settings, roundIndex: match.round_index, rounds: roundsFor(match).length, tipIndex: tip, tipCount: question?.interaction === "guess_country" ? question.clues.length : 1, roundStartedAt: match.round_started_at, roundEndsAt: match.round_ends_at, scores: match.scores, ownership: match.ownership, question: publicQuestion(question, match, resolved), submitted: thisTip.some((item) => item.userId === userId), submittedAnswer: thisTip.find((item) => item.userId === userId)?.answer ?? null, opponentSubmitted: thisTip.some((item) => item.userId !== userId), submittedIds: thisTip.map((item) => item.userId), guesses: missedGuesses, roundResult: resolved ? match.round_result : null, version: match.version,
+  return { id: match.id, code: match.room_code, mode: match.mode, ranked: match.match_kind === "ranked", series: series ? { ...series, bans: match.status === "draft" ? { [userId]: series.bans[userId] ?? [] } : series.bans, submittedCount: Object.keys(series.bans).length } : undefined, hostId: match.host_id, players: match.players, seat, maxPlayers: maxPlayers(match), status: match.status, intermissionEndsAt: null, datasetVersion: match.dataset_version, settings: match.settings, roundIndex: match.round_index, rounds: roundsFor(match).length, tipIndex: tip, tipCount: question?.interaction === "guess_country" ? question.clues.length : 1, roundStartedAt: match.round_started_at, roundEndsAt: match.round_ends_at, scores: match.scores, ownership: match.ownership, question: publicQuestion(question, match, resolved), submitted: thisTip.some((item) => item.userId === userId), submittedAnswer: thisTip.find((item) => item.userId === userId)?.answer ?? null, opponentSubmitted: thisTip.some((item) => item.userId !== userId), submittedIds: thisTip.map((item) => item.userId), guesses: missedGuesses, roundResult: resolved ? match.round_result : null, version: match.version,
     // Only this participant’s current race question and card hand are exposed.
     ...(isRaceMode(match.mode) ? { race: Object.fromEntries(Object.entries(match.state?.race??{}).map(([id,run])=>[id,{score:run.score,done:run.done,updatedAt:run.updatedAt,finishedAt:run.finishedAt}])), run:match.state?.race?.[userId] ? safeRaceView(match.state.race[userId],match) : null } : {}),
     tiebreak:match.state?.tie ? {attempt:match.state.tie.attempt,mode:match.state.tie.mode} : undefined,
@@ -116,7 +117,7 @@ function resolveCurrentRound(match: Match, now: number): void {
     match.resolve_at = new Date(now + 4500).toISOString();
     return;
   }
-  const result = resolveRoundScores({ submissions: current, playerIds: match.players.map((player) => player.id), roundStartedAt: Date.parse(match.round_started_at || new Date(now).toISOString()), roundDurationMs: ROUND_MS, currentScores: match.scores });
+  const result = resolveRoundScores({ submissions: current, playerIds: match.players.map((player) => player.id), roundStartedAt: Date.parse(match.round_started_at || new Date(now).toISOString()), roundDurationMs: match.mode === "map_battle" ? MAP_BATTLE_MS : ROUND_MS, currentScores: match.scores, ranked: match.match_kind === "ranked" });
   match.scores = match.state?.tie ? Object.fromEntries(match.players.map(p=>[p.id,(match.scores[p.id]??0)+(current.find(s=>s.userId===p.id)?.correct?1000:0)])) : result.scores;
   match.round_result = { winnerId: result.winnerId, answer: question.answer, entityId: question.entityId, submissions: current.map((item) => ({ userId: item.userId, answer: item.answer, correct: item.correct, distanceKm: item.distanceKm, nearest: item.nearest, responseMs: item.submittedAt - Date.parse(match.round_started_at || new Date(now).toISOString()) })) };
   match.status = "round_resolving";
@@ -153,14 +154,12 @@ function advanceByClock(match: Match, now: number): boolean {
     match.status = "cancelled";
     return true;
   }
-  if (match.status === "intermission" && match.match_kind === "ranked" && match.resolve_at && now >= Date.parse(match.resolve_at)) {
-    match.status = "countdown"; match.round_started_at = new Date(now).toISOString(); match.resolve_at = null; changed = true;
-  }
+
   if ((match.status === "countdown" || match.status === "next_round") && match.round_started_at && now >= Date.parse(match.round_started_at)) {
     match.status = "round_active"; changed = true;
     if (isRaceMode(match.mode)) { match.state = { ...match.state, race: Object.fromEntries(match.players.map(p=>[p.id,createRaceRun(now)])) }; match.round_ends_at = new Date(now + raceDuration(match.mode)).toISOString(); }
     else if (match.mode === "stat_battle") { match.state = { ...match.state, duel: createBattleMatch(trialPool(match.settings.difficulty || "intermediate"), match.seed) }; syncDuelScores(match); match.round_ends_at = new Date(now + pickDuration(match)).toISOString(); }
-    else match.round_ends_at = new Date(now + (match.mode === "guess_country" ? tipDuration(match) : ROUND_MS)).toISOString();
+    else match.round_ends_at = new Date(now + (match.mode === "guess_country" ? tipDuration(match) : match.mode === "map_battle" ? MAP_BATTLE_MS : ROUND_MS)).toISOString();
   }
   if (isRaceMode(match.mode)) {
     // Out of time: the race closes with whatever scores were reported.
@@ -208,7 +207,7 @@ function advanceRankedSeries(match: Match): void {
   match.settings={...match.settings,rounds:match.mode==="guess_country"?4:8,maxPlayers:2};
   match.seed=crypto.randomUUID();match.status="intermission";
   match.players=match.players.map(p=>({...p,ready:false}));match.round_index=0;match.tip_index=0;
-  match.round_started_at=null;match.round_ends_at=null;match.resolve_at=new Date(Date.now()+45_000).toISOString();
+  match.round_started_at=null;match.round_ends_at=null;match.resolve_at=null;
   match.submissions=[];match.scores={[a]:0,[b]:0};match.ownership={};match.round_result=null;match.state={ranked:series};
 }
 
@@ -326,6 +325,17 @@ Deno.serve(async (request) => {
       if (error) throw new Error("Could not load room.");
       if (!data) return respond({ error: "Room not found." }, 404);
       const match = data as Match;
+      if (body.op === "leave") {
+        // A seat is only given back before the match starts; afterwards it stays reserved for reconnecting.
+        if (match.match_kind === "ranked" || !["waiting", "ready"].includes(match.status) || !match.players.some((player) => player.id === user.id)) return respond({ left: false });
+        const players = match.players.filter((player) => player.id !== user.id);
+        const scores = Object.fromEntries(Object.entries(match.scores).filter(([id]) => id !== user.id));
+        // The next player hosts; a room nobody is left in is closed.
+        const { data: left, error: leaveError } = await db.from("atlas_matches").update({ players, scores, host_id: players.some((player) => player.id === match.host_id) ? match.host_id : players[0]?.id ?? match.host_id, status: players.length ? match.status : "cancelled", version: match.version + 1, updated_at: new Date().toISOString() }).eq("id", match.id).eq("version", match.version).select("id").maybeSingle();
+        if (leaveError) throw new Error("Could not leave room.");
+        if (left) return respond({ left: true });
+        continue;
+      }
       if(match.dataset_version!==ATLAS_VERSION) throw new Error("This room belongs to an older Arena version. Start a new room.");
       verifyMatchDataset(match.dataset_version, String(body.datasetVersion || ""));
       const seat = match.players.findIndex((player) => player.id === user.id);

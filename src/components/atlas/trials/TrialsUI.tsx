@@ -1,3 +1,4 @@
+import { AtlasFitContent } from "../AtlasFitContent";
 import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import { ArrowLeft, Check, ChevronRight, Heart, RotateCcw, Trophy, X } from "lucide-react";
 import type { TrialCountry } from "../../../games/atlas/trials/countryStats";
@@ -38,7 +39,7 @@ export function TrialShell({ title, accent, roundLabel, score, lives, maxLives, 
         </div>
       </header>
       <div className="trial-progress" aria-hidden><i style={{ width: `${Math.max(0, Math.min(100, progress))}%` }} /></div>
-      <div className={`trial-stage ${wide ? "is-wide" : ""}`}>{children}</div>
+      <div className={`trial-stage ${wide ? "is-wide" : ""}`}><AtlasFitContent>{children}</AtlasFitContent></div>
     </main>
   );
 }
@@ -89,16 +90,10 @@ export function GameOverPanel({ title, subtitle, score, best, stats, onRestart, 
   useEffect(() => {
     if (complete && !reported.current) { reported.current = true; complete(score); }
   }, [complete, score]);
-  const panel = useRef<HTMLElement>(null), again = useRef<HTMLButtonElement>(null);
-  // Focus "Play again" without jumping; the panel glides into view after the revealed board has had a moment.
-  useEffect(() => {
-    again.current?.focus({ preventScroll: true });
-    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    const timer = window.setTimeout(() => panel.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "nearest" }), 1100);
-    return () => window.clearTimeout(timer);
-  }, []);
+  const again = useRef<HTMLButtonElement>(null);
+  useEffect(() => { again.current?.focus({ preventScroll: true }); }, []);
   return (
-    <section className="trial-game-over" aria-labelledby="trial-game-over-title" ref={panel}>
+    <section className="trial-game-over" aria-labelledby="trial-game-over-title">
       <AtlasResultHero heading="h2" eyebrow={session?.player ? `${session.player.name} · final score` : newBest ? "New personal best" : `Best ${best.toLocaleString("en")}`} title={<span id="trial-game-over-title">{title}</span>} />
       {subtitle && <p>{subtitle}</p>}
       <p className="trial-final-score">{score.toLocaleString("en")} <small>points</small></p>

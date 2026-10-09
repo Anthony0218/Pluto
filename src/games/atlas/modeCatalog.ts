@@ -1,17 +1,17 @@
 import { ATLAS_SCORING, GUESS_SCORING } from "./config.ts";
 import { maxPlayersFor, type AtlasMultiplayerMode } from "./multiplayer.ts";
-import { COUNTRY_GUESSER, EXTREME_GEOGRAPHY, REGION_BUILDER, STAT_BATTLE, STAT_DETECTIVE, STAT_RANKING } from "./trials/config.ts";
+import { EXTREME_GEOGRAPHY, REGION_BUILDER, STAT_BATTLE, STAT_DETECTIVE, STAT_RANKING } from "./trials/config.ts";
 import { HISTORY_BATTLE, HISTORY_SOURCE } from "./trials/historyBattle.ts";
 import { LANGUAGE_GUESSER } from "./trials/languageGuesser.ts";
 import type { AtlasMode } from "./types.ts";
 
 /**
- * Every Atlas Arena mode in menu order. Each one can be played alone, online and on one shared device (hotseat);
+ * Every Atlas Arena mode in menu order. Local-only modes are excluded from online selection;
  * this table says which engine runs each of the three, and holds the rules shown on the menu.
  */
 export type ArenaModeId =
-  | "map-battle" | "closest-wins" | "higher-lower" | "guess-country" | "flag-battle" | "stat-ranking" | "stat-battle"
-  | "region-builder" | "stat-detective" | "guess-country-mini" | "extreme-geography" | "history-battle" | "speed-run" | "map-fill" | "language-guesser";
+  | "map-battle" | "higher-lower" | "guess-country" | "flag-battle" | "stat-ranking" | "stat-battle"
+  | "region-builder" | "stat-detective" | "extreme-geography" | "history-battle" | "map-fill" | "language-guesser";
 export type TrialKind = "country-guesser" | "stat-detective" | "region-builder" | "stat-ranking" | "extreme-geography" | "stat-battle" | "language-guesser" | "history-battle";
 export type ModeAccent = "cyan" | "amber" | "violet" | "emerald" | "rose" | "sky";
 /** turns: each player plays their own run in turn · pins / duel: head-to-head on one screen. */
@@ -29,35 +29,22 @@ export type ArenaModeDef = {
   rules: ModeRules;
 };
 
-const race = "Online uses a bounded, shared deck, a 3-minute limit (90 seconds for Speed Run), and server-graded answers. Runs resume after reconnecting. Ordinary correct answers earn 1,000, wrong answers zero; ranking uses partial placement credit, clues lower the award, and Map Fill mistakes cost 25. Speed Run is +150 / −150.";
+const race = "Online uses a bounded, shared deck, a 3-minute limit, and server-graded answers. Runs resume after reconnecting. Ordinary correct answers earn 1,000, wrong answers zero; ranking uses partial placement credit, clues lower the award.";
 const turns = (what: string) => `2–4 players share one device and take turns, each playing ${what}. Pass the device when your run ends — the highest score wins.`;
-const speed = `${ATLAS_SCORING.normalCorrect.toLocaleString("en")} points for a correct answer plus up to ${ATLAS_SCORING.maxSpeedBonus} for speed`;
+const knowledge = `${ATLAS_SCORING.normalCorrect.toLocaleString("en")} points for a correct answer before time runs out. Only Ranked can add a speed bonus`;
 
 export const ARENA_MODES: ArenaModeDef[] = [
   {
-    id: "map-battle", title: "Map Battle", tagline: "Know the world", accent: "cyan", meta: "10 questions · knowledge first",
-    description: "Find the named country on the world map. Correct answers earn the points; speed adds at most 5%.",
-    solo: { kind: "arena", mode: "map_click" }, online: "map_battle", hotseat: "turns", options: [], bestId: "map-battle",
+    id: "map-battle", title: "Map Battle", tagline: "Know the world", accent: "cyan", meta: "10 rounds · countries & pins",
+    description: "Find countries and drop pins near countries or capitals. Confirm your selection before locking it in.",
+    solo: { kind: "arena", mode: "map_click" }, online: "map_battle", hotseat: "turns", options: ["categories"], bestId: "map-battle",
     rules: {
-      goal: "Click the named country on the world map.",
-      play: ["Read the prompt and click the matching country on the world map.", "Zoom with the buttons or the mouse wheel; very small states are drawn as dots.", "You get one click per question: the right country lights up green, a wrong one red."],
-      scoring: `${speed}. Wrong clicks score nothing.`,
-      solo: "10 countries to locate. Difficulty sets the speed-bonus window and how obscure the countries get.",
-      multiplayer: "2–4 players answer the same question at once with 20 seconds on the clock. Every correct click scores; speed adds at most 5%.",
+      goal: "Locate countries and capitals in a mix of selection and closest-pin rounds.",
+      play: ["Selection rounds: tap a country to preview it, then tap it again or Confirm selection to answer.", "Zoom with the buttons or the mouse wheel; very small states are drawn as dots.", "Pin rounds: place and adjust a pin, then submit. Country borders and a 20 km capital radius count as zero distance."],
+      scoring: `${knowledge}. Wrong selections score nothing. Solo pins earn up to 1,000 by distance; online, the closest pins share 1,000 with no speed advantage.`,
+      solo: "10 mixed map rounds with 30 seconds per answer. Difficulty sets the country pool.",
+      multiplayer: "2–4 players answer the same question at once with 30 seconds on the clock. Every correct selection scores; the closest pins win pin rounds. Only Ranked awards speed bonuses on selections.",
       hotseat: turns("their own 10 questions"),
-    },
-  },
-  {
-    id: "closest-wins", title: "Closest Wins", tagline: "Drop a pin", accent: "sky", meta: "10 rounds · scored by distance",
-    description: "Drop a pin near a country or capital. Country rounds use real borders; capital rounds use a city target.",
-    solo: { kind: "arena", mode: "closest_wins" }, online: "closest_wins", hotseat: "pins", options: ["categories"], bestId: "closest-wins",
-    rules: {
-      goal: "Place your pin as close as possible to the country or capital in the question.",
-      play: ["Click anywhere on land or sea to place your pin; click again to move it.", "Submit to lock it in. Inside a country's borders or within 20 km of a capital's center counts as 0 km.", "After the round, a dashed line shows where each distance was measured."],
-      scoring: "Alone: 1,000 points for a zero-distance pin; outside, points fall with distance. Against others: only the closest pin scores 1,000 points.",
-      solo: "10 rounds scored by distance.",
-      multiplayer: "2–4 players pin the same country within 20 seconds. The closest pin wins the round; equally close pins share the points.",
-      hotseat: "2–4 players pin each country one after another. The map is covered between turns so nobody sees an earlier pin, then all pins are revealed and the closest wins the round.",
     },
   },
   {
@@ -67,7 +54,7 @@ export const ARENA_MODES: ArenaModeDef[] = [
     rules: {
       goal: "Decide whether the second subject has a higher or lower value than the first.",
       play: ["Two subjects share a statistic, such as population, area or highest point.", "The first value is shown. Choose Higher or Lower for the second.", "The revealed card becomes the next comparison."],
-      scoring: `${speed}.`,
+      scoring: `${knowledge}.`,
       solo: "Keep your streak going as long as you can. One wrong call ends the run.",
       multiplayer: "10 comparisons for 2–4 players. Everyone answers every round, so a miss only costs that round.",
       hotseat: turns("their own streak"),
@@ -75,11 +62,11 @@ export const ARENA_MODES: ArenaModeDef[] = [
   },
   {
     id: "guess-country", title: "Guess the Country", tagline: "Tip by tip", accent: "violet", meta: "8 countries · 5 tips each",
-    description: "A new tip every round — numbers, summits, a sentence overheard on the street. Solve it early for bonus points.",
+    description: "A new tip every round — numbers, summits, a sentence overheard on the street. Solve it with fewer clues for bonus points.",
     solo: { kind: "arena", mode: "guess_country" }, online: "guess_country", hotseat: "turns", options: [], bestId: "guess-country",
     rules: {
       goal: "Name the mystery country from four random tips and a final flag reveal.",
-      play: ["The first four tips are drawn in random order from population, geography, languages, currency and other facts. The fifth tip always shows the flag.", "Type a country, pick it from the list (or click it on the map) and submit. You have one guess per tip.", "A wrong guess reveals the next tip. After the last tip the answer is shown."],
+      play: ["The first four tips are drawn in random order from population, geography, languages, currency and other facts. The fifth tip always shows the flag.", "Choose from six suspects, search for a country or select it on the map, then submit. You have one guess per tip.", "A wrong guess reveals the next tip; alone you can also reveal it yourself for a smaller clue award. Online, pass to reveal once everyone answers. After the last tip the answer is shown."],
       scoring: `${GUESS_SCORING.first} points for solving, +${GUESS_SCORING.tipBonus[0]} on the first tip and +${GUESS_SCORING.tipBonus[1]} on the second. Online, the first solver gets ${GUESS_SCORING.first} and everyone else who solves the same tip ${GUESS_SCORING.other}.`,
       solo: "8 countries.",
       multiplayer: `2–4 players share each tip with ${GUESS_SCORING.tipSeconds} seconds per tip. Once someone is right, the others get a short last call.`,
@@ -93,9 +80,9 @@ export const ARENA_MODES: ArenaModeDef[] = [
     rules: {
       goal: "Match flags with their countries.",
       play: ["Rounds alternate: name the country behind a flag, then choose the flag that belongs to a country outline.", "Pick one of four options."],
-      scoring: `${speed}.`,
+      scoring: `${knowledge}.`,
       solo: "12 rounds.",
-      multiplayer: "10 rounds for 2–4 players with 20 seconds each; speed adds at most 5%.",
+      multiplayer: "10 rounds for 2–4 players with 20 seconds each; only Ranked awards speed bonuses.",
       hotseat: turns("their own 12 rounds"),
     },
   },
@@ -133,7 +120,7 @@ export const ARENA_MODES: ArenaModeDef[] = [
       play: ["A region such as the Nordic countries or the Maghreb appears with a spread of country cards.", "Tap its members one by one. When all are found, the next region starts.", "One wrong card ends the whole run."],
       scoring: `${REGION_BUILDER.perCountry} points per correct country, +${REGION_BUILDER.regionComplete} for completing a region, plus ${REGION_BUILDER.roundBonus} more for every region already completed.`,
       solo: "Endless: how many regions can you complete?",
-      multiplayer: race, hotseat: turns("their own run"),
+      multiplayer: "Singleplayer and Hotseat only.", hotseat: turns("their own run"),
     },
   },
   {
@@ -149,25 +136,13 @@ export const ARENA_MODES: ArenaModeDef[] = [
     },
   },
   {
-    id: "guess-country-mini", title: "Guess the Country Mini Edition", tagline: "Clue by clue", accent: "cyan", meta: `${COUNTRY_GUESSER.rounds} countries · ${COUNTRY_GUESSER.lives} lives`,
-    description: "One mystery country, six suspects. Reveal clues only when you need them — each extra clue lowers the prize.",
-    solo: { kind: "trial", trial: "country-guesser" }, online: "country_guesser", hotseat: "turns", options: [], bestId: "country-guesser",
-    rules: {
-      goal: `Find the mystery country among ${COUNTRY_GUESSER.options} suspects with as few clues as possible.`,
-      play: ["The first four clues are drawn in random order from a varied set of country facts. Reveal more only when you need them; the fifth keeps the decisive capital clue.", "Pick a suspect at any time. A wrong pick costs a life and rules that country out."],
-      scoring: `${COUNTRY_GUESSER.pointsByClues.map((points) => points.toLocaleString("en")).join(", ")} points when solved with 1, 2, 3, 4 or 5 clues.`,
-      solo: `${COUNTRY_GUESSER.rounds} countries and ${COUNTRY_GUESSER.lives} lives.`,
-      multiplayer: race, hotseat: turns(`their own ${COUNTRY_GUESSER.rounds} countries`),
-    },
-  },
-  {
     id: "extreme-geography", title: "Extreme Geography", tagline: "Fast trivia", accent: "amber", meta: `${EXTREME_GEOGRAPHY.rounds} questions · ${EXTREME_GEOGRAPHY.timeLimitMs / 1000}s each`,
     description: "Which is coldest, warmest, largest, smallest or highest? Ten seconds a question, with double-point extreme rounds.",
     solo: { kind: "trial", trial: "extreme-geography" }, online: "extreme_geography", hotseat: "turns", options: [], bestId: "extreme-geography",
     rules: {
       goal: "Pick the most extreme country: the coldest, warmest, largest, smallest, highest, most crowded…",
       play: [`Each question shows ${EXTREME_GEOGRAPHY.choices} countries and a category. Only the countries shown are compared.`, `You have ${EXTREME_GEOGRAPHY.timeLimitMs / 1000} seconds. Every ${EXTREME_GEOGRAPHY.extremeEvery}th question is an Extreme round with ${EXTREME_GEOGRAPHY.extremeChoices} countries.`],
-      scoring: `${EXTREME_GEOGRAPHY.correct} per correct answer plus up to ${EXTREME_GEOGRAPHY.maxSpeedBonus} for speed; Extreme rounds count ×${EXTREME_GEOGRAPHY.extremeMultiplier}.`,
+      scoring: `${EXTREME_GEOGRAPHY.correct} per correct answer with no speed bonus; Extreme rounds count ×${EXTREME_GEOGRAPHY.extremeMultiplier}.`,
       solo: `${EXTREME_GEOGRAPHY.rounds} questions.`,
       multiplayer: race, hotseat: turns(`their own ${EXTREME_GEOGRAPHY.rounds} questions`),
     },
@@ -182,18 +157,6 @@ export const ARENA_MODES: ArenaModeDef[] = [
       scoring: `${HISTORY_BATTLE.correct} points per correct answer plus ${HISTORY_BATTLE.streakBonus} for each correct answer in a row before it (up to +${HISTORY_BATTLE.maxStreakBonus}). Wrong answers score zero.`,
       solo: `${HISTORY_BATTLE.rounds} questions. Beginner sticks to well-known countries and widely spaced years; Expert adds founding dates and years only a few apart.`,
       multiplayer: race, hotseat: turns(`their own ${HISTORY_BATTLE.rounds} questions`),
-    },
-  },
-  {
-    id: "speed-run", title: "Speed Run", tagline: "60-second sprint", accent: "amber", meta: "60 seconds · +150 / −150",
-    description: "Answer as many choice questions as you can in 60 seconds, without a map.",
-    solo: { kind: "arena", mode: "speed_run" }, online: "speed_run", hotseat: "turns", options: ["categories"], bestId: "speed-run",
-    rules: {
-      goal: "Answer as many questions as you can in 60 seconds.",
-      play: ["Questions use choice buttons from your chosen categories. No map navigation is needed.", "Answer quickly and keep going until the clock runs out."],
-      scoring: `+${ATLAS_SCORING.speedRunCorrect} per correct answer; ${ATLAS_SCORING.speedRunWrong} per wrong answer.`,
-      solo: "One 60-second sprint.",
-      multiplayer: race, hotseat: turns("their own 60 seconds"),
     },
   },
   {
@@ -217,15 +180,17 @@ export const ARENA_MODES: ArenaModeDef[] = [
       play: ["Choose a region; the map zooms to it automatically.", "You are asked for one country at a time. Click it to fill it in.", "Wrong clicks count as mistakes and break your streak."],
       scoring: `${ATLAS_SCORING.mapFillCountry} per country plus ${ATLAS_SCORING.mapFillStreak} × your current streak, and ${ATLAS_SCORING.mapFillCompletion.toLocaleString("en")} for completing the region.`,
       solo: "Fill the whole region; your time is shown at the end.",
-      multiplayer: `${race} Everyone fills the same region in the same order.`,
+      multiplayer: "Singleplayer and Hotseat only.",
       hotseat: turns("the same region"),
     },
   },
 ];
 
-export const modeById = (id: string | undefined) => ARENA_MODES.find((mode) => mode.id === id);
-export const modeForOnline = (online: string | null | undefined) => ARENA_MODES.find((mode) => mode.online === online);
+export const isOnlineMode = (mode: ArenaModeDef) => mode.id !== "map-fill" && mode.id !== "region-builder";
+export const ONLINE_ARENA_MODES = ARENA_MODES.filter(isOnlineMode);
+export const modeById = (id: string | undefined) => ARENA_MODES.find((mode) => mode.id === (id === "closest-wins" ? "map-battle" : id === "guess-country-mini" ? "guess-country" : id));
+export const modeForOnline = (online: string | null | undefined) => ARENA_MODES.find((mode) => mode.online === (online === "closest_wins" ? "map_battle" : online === "country_guesser" ? "guess_country" : online));
 export const onlinePlayerLimit = (mode: ArenaModeDef) => maxPlayersFor(mode.online);
 export const hotseatPlayerLimit = (mode: ArenaModeDef) => mode.hotseat === "duel" ? 2 : 4;
 /** Old Atlas Trials links (/trials/country-guesser …) lead to the same mode here. */
-export const modeForTrial = (trial: string | undefined) => ARENA_MODES.find((mode) => mode.solo.kind === "trial" && mode.solo.trial === trial);
+export const modeForTrial = (trial: string | undefined) => trial === "country-guesser" ? modeById("guess-country") : ARENA_MODES.find((mode) => mode.solo.kind === "trial" && mode.solo.trial === trial);

@@ -68,6 +68,7 @@ test('created invites only send the actual new room, and retry uses the same mes
     '@/context/AuthContext':{useAuth:()=>({user:signedUser})},
     '@/lib/supabase':{supabase:{from:()=>({insert:async message=>{sent.push(message);return {error};}})}},
     './inviteRoute':routes,
+    './currentRoom':{useCurrentRoom:()=>null},
     './clanShare':{shareRoomWithClan:async (...args)=>{clanShares.push(args);return {error:null};}},
   });
   const render=async room=>{slot=0;effects=[];const result=mod.useCreatedGameInvite(room);for(const effect of effects)effect();await new Promise(resolve=>setImmediate(resolve));return result;};

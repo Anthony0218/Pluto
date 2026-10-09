@@ -1,5 +1,5 @@
 import { GUESS_SCORING } from "./config.ts";
-import { entitiesForDifficulty, entitiesForScope, normalizedContinent } from "./engine.ts";
+import { entitiesForDifficulty, entitiesForScope, normalizedContinent, plausibleEntities } from "./engine.ts";
 import { randomCountryHints } from "./countryHints.ts";
 import { seededRandom, shuffled } from "./random.ts";
 import type { AtlasDifficulty, AtlasExtras, GeographicEntity, GuessClue, GuessCountryQuestion } from "./types.ts";
@@ -25,12 +25,12 @@ export function generateGuessCountryQuestions(options: { entities: GeographicEnt
   const order = shuffled(pool, seededRandom(`${options.datasetVersion}:${options.seed}:${options.difficulty}:guess`));
   return Array.from({ length: options.count }, (_, index) => {
     const entity = order[index % order.length];
-    return { id: `${options.seed}:guess:${index}`, seed: options.seed, entityId: entity.id, entityType: entity.entityType, category: "clues", interaction: "guess_country", difficulty: options.difficulty, scope: "un195", prompt: "Which country is it?", answer: entity.id, clues: countryClues(entity, options.extras, seededRandom(`${options.datasetVersion}:${options.seed}:${options.difficulty}:guess:${index}:${entity.id}:clues`)), sourceMetadata: [] };
+    return { id: `${options.seed}:guess:${index}`, seed: options.seed, entityId: entity.id, entityType: entity.entityType, category: "clues", interaction: "guess_country", difficulty: options.difficulty, scope: "un195", prompt: "Which country is it?", answer: entity.id, choices: shuffled([entity, ...plausibleEntities(entity, pool, options.difficulty, 5)], seededRandom(`${options.seed}:suspects:${index}`)).map(country => ({ id: country.id, label: country.shortName })), clues: countryClues(entity, options.extras, seededRandom(`${options.datasetVersion}:${options.seed}:${options.difficulty}:guess:${index}:${entity.id}:clues`)), sourceMetadata: [] };
   });
 }
 
 export type GuessAward = { userId: string; base: number; bonus: number; total: number; first: boolean };
-/** Correct guesses of one tip, fastest first: 3 points for the first, 2 for everyone else, plus the early-tip bonus. */
+/** Correct guesses of one tip, fastest first: 3 points for every solver, plus the early-tip bonus. */
 export function scoreGuessTip(correct: { userId: string; submittedAt: number }[], tip: number): GuessAward[] {
   const bonus = GUESS_SCORING.tipBonus[tip] ?? 0;
   return [...correct].sort((left, right) => left.submittedAt - right.submittedAt).map((guess, index) => {

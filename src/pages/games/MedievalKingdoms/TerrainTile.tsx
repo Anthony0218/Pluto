@@ -119,6 +119,8 @@ export const TerrainTile = memo(function TerrainTile({ d }: { d: District }) {
               opacity=".7"
             />
           )}
+          {d.farm && ["plains", "river", "steppe", "coast"].includes(d.biome) && <g className="ed-cultivated-fields" opacity={d.harvestedAt === undefined ? ".5" : ".3"}><path d="M-16 10l8-3 6 7-8 3Z" fill={(d.development ?? 0) > 0 ? "#d6b467" : "#b59c5c"} stroke="#675c39" strokeWidth=".5" /><path d="M-14 11l6-2M-12 13l6-2M-10 15l6-2" stroke="#f2da94" strokeWidth=".7" /></g>}
+          {(d.development ?? 0) >= 2 && <path d="M10-10v6h5v-6l-2.5-3Z" fill="#eed7ae" stroke="#5b5943" strokeWidth=".5" />}
           {d.city && (
             <g
               transform={`translate(${d.castle ? -9 : 0},5)`}
@@ -174,8 +176,21 @@ export const TerrainTile = memo(function TerrainTile({ d }: { d: District }) {
               )}
             </g>
           )}
+          {d.port && <g className="ed-working-port" transform="translate(13,14)"><path d="M-5 0H5M-3-3V4M2-3V4" stroke="#e7c995" strokeWidth="1" /><path d="M-5 4Q0 9 5 4Z" fill="#e4d6b0" stroke="#334e45" strokeWidth=".6" />{d.shipyard && <path d="M0 4V-4L4 2H0" fill="#b87b61" stroke="#334e45" strokeWidth=".5" />}</g>}
+          {d.depot && <g transform="translate(-13,-12)"><rect x="-4" y="-2" width="8" height="6" rx="1" fill="#d2b274" stroke="#4a5139" strokeWidth=".7" /><path d="M-5-2L0-6 5-2" stroke="#5b4b33" strokeWidth="1.5" /><path d="M-2 0V3M2 0V3" stroke="#fff0b8" strokeWidth=".7" /></g>}
+          {d.watchtower && <path d="M-14-6V-15h4v9M-15-15l3-4 3 4" fill="#d8d9c3" stroke="#42564a" strokeWidth=".6" />}
+          {(d.development ?? 0) > 0 && <g className="ed-prosperity-pips" fill="#f1d484">{Array.from({ length: d.development ?? 0 }, (_, i) => <circle key={i} cx={-3 + i * 3} cy="-17" r="1" />)}</g>}
         </>
       )}
     </g>
   );
+});
+
+/** A sparse atlas relief keeps the world readable without flattening its geography. */
+export const TerrainRelief = memo(function TerrainRelief({ d }: { d: District }) {
+  if (["mountains", "hills", "glacier"].includes(d.biome)) return <path d="M-13 6L-5-8 2 6M-1 6L7-5 14 6M-5-8L-7-3-5-5-3-2" fill="none" stroke={d.biome === "glacier" ? "#f3f1d1" : "#465949"} opacity=".38" strokeWidth=".8" />;
+  if (d.biome === "forest") return <path d="M-12 4l4-9 4 9M-4 5l4-10 4 10M4 3l4-8 4 8" stroke="#274c37" fill="#315c4033" opacity=".38" strokeWidth=".7" />;
+  if (d.farm && ["plains", "steppe"].includes(d.biome)) return <path d="M-13 6L3-1M-11 9L5 2M-9 12L7 5" stroke="#f1d999" opacity=".23" strokeWidth=".7" />;
+  if (d.biome === "river") return <path d={`M${d.r % 2 ? -10.825 : 10.825}-18.75Q-6-8 0 0T${d.r % 2 ? -10.825 : 10.825} 18.75`} stroke="#89b9b1" fill="none" strokeWidth="2" opacity=".58" />;
+  return null;
 });

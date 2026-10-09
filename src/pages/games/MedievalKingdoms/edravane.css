@@ -335,6 +335,8 @@
 .ed-slots > .ed-slot-self {
   border-color: var(--ed-gold);
 }
+.ed-slots .room-invite-button { margin-top: 6px; }
+.ed-slots .room-invite-button span { display: inline; margin: 0; font-size: inherit; color: inherit; }
 .ed-lobby-actions {
   padding: 12px;
   border: 1px solid #cfb36f60;

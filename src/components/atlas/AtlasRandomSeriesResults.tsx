@@ -1,3 +1,4 @@
+import { AtlasFitContent } from "./AtlasFitContent";
 import { Link } from "react-router-dom";
 import { useRef, useState } from "react";
 import { AtlasResultHero } from "./AtlasResultHero";
@@ -24,11 +25,11 @@ export function AtlasRandomSeriesResults({ order, results, players, complete, so
     setContinued(next);
     if (next.length === players.length) onNext();
   };
-  return <main className="atlas-page atlas-center atlas-random-results">
+  return <main className="atlas-page atlas-center atlas-random-results"><AtlasFitContent>
     <AtlasResultHero eyebrow={`Random modes · ${seriesLabel(order.length)}`} title={complete ? solo ? "Expedition complete" : winner ? `${nameOf(winner)} wins${order.length === 1 ? "" : " the series"}` : order.length === 1 ? "Game drawn" : "Series drawn" : solo ? `Game ${results.length} complete` : last?.winnerId ? `${nameOf(last.winnerId)} wins game ${results.length}` : `Game ${results.length} drawn`} />
     {!solo && <p className="atlas-result-score" aria-label="Series score">{players.map(player => wins[player.id]).join(" – ")} <small>game wins</small></p>}
-    {!complete && <><p>Next game · {modeById(order[results.length])?.title}</p>{!solo && <p className="atlas-ready-count" role="status">{continued.length}/{players.length} are ready · Both players must press Continue.</p>}</>}
-    <div className="atlas-result-actions">{complete ? <button type="button" onClick={onAgain}>Replay</button> : solo ? <button type="button" onClick={onNext}>Continue</button> : players.map(player => <button key={player.id} type="button" disabled={continued.includes(player.id)} onClick={() => continuePlayer(player.id)}>{continued.includes(player.id) ? `${player.name} is ready` : `Continue · ${player.name}`}</button>)}<Link to="/games/atlas-arena">Back to menu</Link></div>
+    {!complete && <><p>Next game · {modeById(order[results.length])?.title}</p>{!solo && <p className="atlas-ready-count" role="status">{continued.length}/{players.length} are ready · Both players must press I'm ready.</p>}</>}
+    <div className="atlas-result-actions">{complete ? <button type="button" onClick={onAgain}>Replay</button> : solo ? <button type="button" onClick={onNext}>I'm ready</button> : players.map(player => <button key={player.id} type="button" disabled={continued.includes(player.id)} onClick={() => continuePlayer(player.id)}>{continued.includes(player.id) ? `${player.name} is ready` : `I'm ready · ${player.name}`}</button>)}<Link to="/games/atlas-arena">Back to menu</Link></div>
     <section className="atlas-series" aria-label="Random mode series results">
       <div className="atlas-series-players">{players.map(player => <div key={player.id}><strong>{player.name}</strong><span>{solo ? `${results.reduce((sum, result) => sum + (result.scores[player.id] ?? 0), 0).toLocaleString()} total points` : `${wins[player.id]} game wins`}</span></div>)}</div>
       <ol className="atlas-series-order">{order.map((id, index) => {
@@ -36,5 +37,5 @@ export function AtlasRandomSeriesResults({ order, results, players, complete, so
         return <li key={id} className={!complete && index === results.length ? "is-current" : ""}><span><small>Game {index + 1}</small><strong>{modeById(id)?.title}</strong>{result && <small>{players.map(player => `${player.name}: ${(result.scores[player.id] ?? 0).toLocaleString()}`).join(" · ")}</small>}</span><em>{result ? solo ? "Completed" : result.winnerId ? `${nameOf(result.winnerId)} won` : "Draw" : complete ? "Not needed" : "Up next"}</em></li>;
       })}</ol>
     </section>
-  </main>;
+  </AtlasFitContent></main>;
 }

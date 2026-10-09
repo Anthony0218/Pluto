@@ -275,7 +275,7 @@ function FriendsPageContent() {
 
   return (
     <main className="min-h-screen px-5 py-8 text-zinc-100 sm:px-8">
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto max-w-[1480px]">
         <div className="mb-7 ml-10">
           <p className="text-xs font-black uppercase tracking-[0.25em] text-sky-400">
             Pluto Social
@@ -286,10 +286,8 @@ function FriendsPageContent() {
           </p>
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-[360px_1fr]">
-          <aside className="space-y-4">
-            <FriendNotifications items={notifications} />
-            <MyGroupsCard userId={user.id} />
+        <div className="grid gap-5 lg:grid-cols-[340px_minmax(0,1fr)]">
+          <aside className="min-w-0 space-y-4">
             <section className="rounded-3xl border border-white/10 bg-zinc-900/80 p-4 shadow-xl shadow-black/10 backdrop-blur-md">
               <div className="flex items-center gap-2">
                 <UserPlus size={18} className="text-sky-400" />
@@ -413,11 +411,11 @@ function FriendsPageContent() {
                     No friends yet
                   </p>
                   <p className="mt-1 text-xs text-zinc-500">
-                    Search for a username above.
+                    Use Add friend above to find someone.
                   </p>
                 </div>
               ) : (
-                <div className="p-2">
+                <div className="max-h-[min(460px,52dvh)] overflow-y-auto p-2">
                   {[...friends].sort((a, b) => Number(onlineIds.includes(b.id)) - Number(onlineIds.includes(a.id))).map((friend) => {
                     const active = friend.id === selectedFriendId;
                     const online = onlineIds.includes(friend.id);
@@ -450,9 +448,11 @@ function FriendsPageContent() {
                 </div>
               )}
             </section>
+            <FriendNotifications items={notifications} />
+            <MyGroupsCard userId={user.id} />
           </aside>
 
-          <div className="space-y-4">
+          <div className="grid min-w-0 items-start gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
           {selectedFriend ? (
             <FriendChat key={selectedFriend.id} friend={selectedFriend} />
           ) : (
@@ -468,7 +468,7 @@ function FriendsPageContent() {
               </div>
             </section>
           )}
-          <GameInvitePanel />
+          <div className="xl:sticky xl:top-4"><GameInvitePanel /></div>
           </div>
         </div>
       </div>

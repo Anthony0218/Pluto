@@ -5,8 +5,8 @@ export const HARVEST_COOLDOWN = 6;
 export function harvestYield(d: District) {
   return d.biome === "plains" || d.biome === "river" ? 32 : 18;
 }
-export function castleBonus(d: District) {
-  return d.castle ? [0, 0.15, 0.3, 0.55][d.castle.level] + (d.nation === "high-cairn" && ["hills", "mountains"].includes(d.biome) ? 0.1 : 0) : 0;
+export function castleBonus(d: District, s?: Campaign) {
+  return d.castle ? [0, 0.15, 0.3, 0.55][d.castle.level] + (d.nation === "high-cairn" && ["hills", "mountains"].includes(d.biome) ? 0.1 : 0) + (s?.agreements?.landmarks.some((l) => l.hex === d.id && l.kind === "pass") ? .1 : 0) : 0;
 }
 export function castleGuard(s: Campaign, d: District) {
   return Math.min(

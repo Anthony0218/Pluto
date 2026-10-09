@@ -3,6 +3,7 @@ import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
+import RoomSlots from "@/components/social/RoomSlots";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import FourPlayerThemedPiece from "../FourPlayerThemedPiece";
 import { boardColors, useChessSettings } from "@/context/ChessSettingsContext";
@@ -789,7 +790,6 @@ export function FourPlayerMultiplayerGame() {
               <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">{room.code}</p>
               <p className="mt-4 text-xs font-bold text-zinc-400">{copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}</p>
             </button>
-                    <InviteFriendButton />
           </section>
 
           <section className="mt-5 rounded-3xl border border-white/10 bg-zinc-900/75 p-5 shadow-xl shadow-black/15 sm:p-6">
@@ -985,7 +985,7 @@ export function FourPlayerMultiplayerGame() {
                       {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
                     </p>
                   </button>
-                    <InviteFriendButton overlay />
+                    <RoomSlots total={4} names={orderedPlayers.map(({ player }) => player?.display_name)} labels={orderedPlayers.map(({ color }) => fourPlayerLabel(color))} overlay />
                 </div>
               )}
 

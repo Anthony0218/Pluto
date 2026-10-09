@@ -18,9 +18,9 @@ const rng = (seed = 4) => () => { seed = (Math.imul(seed, 1664525) + 1013904223)
 const make = (def, random = rng()) => def.create({ participants, random, startedAt: 0, endsAt: def.durationSeconds * 1000 });
 const control = (fields = {}) => ({ type: "ARENA_CONTROL", forward: 0, strafe: 0, yaw: 0, pitch: 0, fire: false, ...fields });
 
-test("main pool contains all eleven games and never picks Target Panic", () => {
+test("main pool contains all twenty-one games and never picks Target Panic", () => {
   const ids = minigameRegistry.pool("main").map((d) => d.id);
-  assert.deepEqual(ids, ["arrow-memory", "pickup-arena", "pattern-wall", "trail-run", "rhythm-rush", "circle-shot", "lava-knockback", "tide-treasure", "comet-courier", "rope-rescue", "paddle-doubles"]);
+  assert.deepEqual(ids, ["arrow-memory", "pickup-arena", "pattern-wall", "trail-run", "rhythm-rush", "circle-shot", "lava-knockback", "tide-treasure", "comet-courier", "rope-rescue", "paddle-doubles", "disco-freeze", "pluto-heist", "kitchen-chaos", "rocket-rumble", "orbital-rally", "island-impostor", "penalty-shootout", "minotaur-maze", "color-clash", "constellation-cascade"]);
   assert.equal(minigameRegistry.get("target-panic").selectable, false);
 });
 test("Echo Wall follows all difficulty boundaries", () => {

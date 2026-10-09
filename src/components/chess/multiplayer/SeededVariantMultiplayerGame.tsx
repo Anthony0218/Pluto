@@ -1,5 +1,5 @@
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
-import InviteFriendButton from "@/components/chess/InviteFriendButton";
+import RoomSlots from "@/components/social/RoomSlots";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
@@ -1348,7 +1348,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                       {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
                     </p>
                   </button>
-                    <InviteFriendButton overlay />
+                    <RoomSlots total={2} names={players.map((player) => player.display_name)} overlay />
                 </div>
               )}
 

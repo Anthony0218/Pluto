@@ -1,3 +1,4 @@
+import { AtlasFitContent } from "../../../components/atlas/AtlasFitContent";
 import { useRandomSeries } from "./useRandomSeries";
 import { AtlasResultHero } from "../../../components/atlas/AtlasResultHero";
 import { AtlasRandomSeriesProgress, AtlasRandomSeriesResults } from "../../../components/atlas/AtlasRandomSeriesResults";
@@ -86,7 +87,7 @@ function Standings({ title, rows, unit, onAgain, onSetup, onExit, onComplete }: 
   const ranked = [...rows].sort((left, right) => right.score - left.score);
   const top = ranked[0]?.score ?? 0, winners = ranked.filter((row) => row.score === top);
   return (
-    <main className="atlas-page atlas-center atlas-random-results">
+    <main className="atlas-page atlas-center atlas-random-results"><AtlasFitContent>
       <AtlasResultHero eyebrow={`${title} · final standings`} title={winners.length > 1 ? "It's a tie" : `${winners[0]?.player.name} wins`} />
       <ol className="atlas-standings">
         {ranked.map((row) => {
@@ -101,7 +102,7 @@ function Standings({ title, rows, unit, onAgain, onSetup, onExit, onComplete }: 
         <button type="button" className="atlas-secondary" onClick={onSetup}><Users /> Players & settings</button>
         <button type="button" className="atlas-secondary" onClick={onExit}>Back to menu</button>
       </div>
-    </main>
+    </AtlasFitContent></main>
   );
 }
 
@@ -131,11 +132,11 @@ function TurnsHotseat({ mode, data, players, settings, onExit, onSetup, onComple
 
   if (phase === "standings") return <Standings title={mode.title} rows={players.map((item, index) => ({ player: item, score: scores[index] ?? 0 }))} unit="points" onAgain={again} onSetup={onSetup} onExit={onExit} onComplete={onComplete} />;
   if (phase === "handoff") return (
-    <main className="atlas-page atlas-center">
+    <main className="atlas-page atlas-center"><AtlasFitContent>
       <HandoffCard name={player.name} color={player.color} action={`Start ${player.name}'s run`} onReady={() => setPhase("playing")}
         detail={<>{mode.title} · turn {turn + 1} of {players.length}{turn > 0 && <><br />Score to beat: {Math.max(...scores).toLocaleString("en")}</>}</>} />
       <button type="button" className="atlas-room-leave" onClick={onExit}>Leave hotseat</button>
-    </main>
+    </AtlasFitContent></main>
   );
   if (phase === "between" && summary && mode.solo.kind === "arena") return <SoloResults mode={mode.solo.mode} summary={summary} entities={data.countries} eyebrow={`${player.name}'s run`}
     actions={<button type="button" onClick={() => commit(summary.score)}>{last ? "See standings" : `Pass to ${next?.name}`} <ChevronRight /></button>} />;
@@ -197,11 +198,11 @@ function PinsHotseat({ mode, data, players, settings, onExit, onSetup, onComplet
 
   if (phase === "standings") return <Standings title={mode.title} rows={players.map((item, index) => ({ player: item, score: scores[index], detail: `${wins[index]} round${wins[index] === 1 ? "" : "s"} won` }))} unit="points" onAgain={again} onSetup={onSetup} onExit={onExit} onComplete={onComplete} />;
   if (phase === "handoff") return (
-    <main className="atlas-page atlas-center">
+    <main className="atlas-page atlas-center"><AtlasFitContent>
       <HandoffCard name={player.name} color={player.color} action={`Show ${player.name} the map`} onReady={() => setPhase("placing")}
         detail={<>Round {round + 1} of {questions.length}{step > 0 ? ` · ${step} pin${step === 1 ? "" : "s"} already placed and hidden` : ""}</>} />
       <button type="button" className="atlas-room-leave" onClick={onExit}>Leave hotseat</button>
-    </main>
+    </AtlasFitContent></main>
   );
   const revealed = phase === "reveal";
   const mapPins = revealed
@@ -215,7 +216,7 @@ function PinsHotseat({ mode, data, players, settings, onExit, onSetup, onComplet
         <div className="atlas-game-stats">{!revealed && <span className="atlas-turn-chip" style={{ "--player": player.color } as CSSProperties}><i />{player.name}</span>}<span><Trophy size={16} />{revealed ? "Reveal" : `${step + 1}/${players.length} pinning`}</span></div>
       </header>
       <section className="atlas-play-layout">
-        <aside className="atlas-question-panel">
+        <aside className="atlas-question-panel"><AtlasFitContent>
           <div className="atlas-progress"><i style={{ width: `${(round + Number(revealed)) / questions.length * 100}%` }} /></div>
           <span className="atlas-eyebrow">{revealed ? "All pins revealed" : `${player.name}'s pin`}</span>
           <h1>{question?.prompt}</h1>
@@ -228,7 +229,7 @@ function PinsHotseat({ mode, data, players, settings, onExit, onSetup, onComplet
             <button type="button" className="atlas-submit" onClick={nextRound}>{round + 1 >= questions.length ? "See standings" : "Next round"} <ChevronRight size={18} /></button>
           </>}
           <HotseatScores players={players} scores={scores} unit="" />
-        </aside>
+        </AtlasFitContent></aside>
         <AtlasWorldMap topology={data.topology} entities={data.countries} pins={mapPins} correctId={revealed ? question?.entityId : null} disabled={revealed} showHoverLabels={false}
           onPoint={revealed ? undefined : setDraft} ariaLabel={question?.prompt} />
       </section>

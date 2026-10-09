@@ -4,7 +4,9 @@ import { Link } from "react-router-dom";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import type { DashboardNotification } from "@/hooks/useDashboardData";
 import DashboardDialog from "./DashboardDialog";
-import { notificationActionLabel, notificationDestination, respondToSpectateRequest } from "@/components/social/notificationActions";
+import { acceptInviteState } from "@/components/social/inviteRoute";
+import { notificationActionLabel, notificationDestination, notificationRoomCode, respondToSpectateRequest } from "@/components/social/notificationActions";
+import { leaveCurrentRoom } from "@/components/social/currentRoom";
 import DoNotDisturbSwitch, { ClanPopupsSwitch } from "../notifications/DoNotDisturbSwitch";
 import { markNotificationsSeen, useDoNotDisturb, useSeenNotificationIds } from "../notifications/notificationState";
 
@@ -71,7 +73,7 @@ export default function FriendNotifications({ items, userId }: { items: Dashboar
           <div className="notification-copy"><div className="notification-title"><strong>{ui(item.title)}</strong><time dateTime={item.createdAt}>{new Date(item.createdAt).toLocaleDateString()}</time></div><p>{item.kind === "clan_message" ? <><strong className="text-white">{item.senderName || ui("Player")}</strong>{item.clanName ? ` · ${item.clanName}` : ""}: {item.body}</> : ui(item.detail) || item.senderName || ui("Player")}</p>{item.gameCode && <small>{ui("Room code")}: {item.gameCode}</small>}
             <div className="notification-actions">{item.kind === "spectate_request" && item.spectateRequestId
               ? <><button type="button" onClick={() => void respondToSpectateRequest(item.spectateRequestId!, true).then(error => { if (!error) { markNotificationsSeen(userId, [item.id]); dismiss(item.id); } else window.alert(ui(error)); })}>{ui("Allow")}</button><button type="button" onClick={() => void respondToSpectateRequest(item.spectateRequestId!, false).then(() => dismiss(item.id))}>{ui("Decline")}</button></>
-              : <><Link to={destination} onClick={() => { markNotificationsSeen(userId, [item.id]); setOpen(false); }}>{ui(action)}</Link><button type="button" onClick={() => dismiss(item.id)}>{ui("Dismiss")}</button></>}</div>
+              : <><Link to={destination} state={acceptInviteState()} onClick={() => { markNotificationsSeen(userId, [item.id]); const roomCode = notificationRoomCode(item); if (roomCode) leaveCurrentRoom(roomCode); setOpen(false); }}>{ui(action)}</Link><button type="button" onClick={() => dismiss(item.id)}>{ui("Dismiss")}</button></>}</div>
           </div>
           <button type="button" className="notification-dismiss" aria-label={`${ui("Dismiss")}: ${ui(item.title)}`} onClick={() => dismiss(item.id)}><X size={14} /></button>
         </article>;

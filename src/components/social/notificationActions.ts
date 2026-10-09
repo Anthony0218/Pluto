@@ -6,26 +6,36 @@ export const isClanNotification = (item: DashboardNotification) => item.kind ===
 
 export const clanRoute = (clanId?: string) => `/clans${clanId ? `?clan=${encodeURIComponent(clanId)}` : ""}`;
 
-/** Where opening a notification leads. */
-export function notificationDestination(item: DashboardNotification) {
+/** The room a notification's action joins on arrival, if it joins one. Go clan invites are joined from the clan page. */
+export function notificationRoomCode(item: DashboardNotification) {
   switch (item.kind) {
     case "clan_message":
-      return clanRoute(item.clanId);
-    case "clan_invite":
-      // Every lobby but Go joins on arrival (the game itself refuses a full lobby); Go is joined from the clan page.
-      return item.game !== "go" && item.gameCode
-        ? getInviteDestination({ game: item.game, gameCode: item.gameCode, gameRoute: item.gameRoute }, { autoJoin: true })
-        : clanRoute(item.clanId);
     case "spectate_request":
-      return `/friends${item.senderId ? `?friend=${encodeURIComponent(item.senderId)}` : ""}`;
+    case "spectate_accepted":
+    case "friend_request":
+      return undefined;
+    case "clan_invite":
+      return item.game !== "go" ? item.gameCode || undefined : undefined;
+    default:
+      return item.gameCode || undefined;
+  }
+}
+
+/** Where opening a notification leads. */
+export function notificationDestination(item: DashboardNotification) {
+  const roomCode = notificationRoomCode(item);
+  // Every lobby joins on arrival (the game itself refuses a full lobby).
+  if (roomCode) return getInviteDestination({ game: item.game, gameCode: roomCode, gameRoute: item.gameRoute }, { autoJoin: true });
+  switch (item.kind) {
+    case "clan_message":
+    case "clan_invite":
+      return clanRoute(item.clanId);
     case "spectate_accepted":
       return `/spectate/${item.spectateRequestId}`;
     case "friend_request":
       return "/friends";
     default:
-      return item.gameCode
-        ? getInviteDestination({ game: item.game, gameCode: item.gameCode, gameRoute: item.gameRoute }, { autoJoin: true })
-        : `/friends${item.senderId ? `?friend=${encodeURIComponent(item.senderId)}` : ""}`;
+      return `/friends${item.senderId ? `?friend=${encodeURIComponent(item.senderId)}` : ""}`;
   }
 }
 

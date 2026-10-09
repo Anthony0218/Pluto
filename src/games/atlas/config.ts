@@ -16,6 +16,11 @@ export const DIFFICULTY_RULES: Record<AtlasDifficulty, { roundSeconds: number; m
   expert: { roundSeconds: 9, minimumPopulation: 0, minimumArea: 0, choiceCount: 4, sameContinentDistractors: true },
 };
 
+/** Map Battle gives the same, longer deadline at every difficulty and in every match type (solo, casual, ranked). */
+export const MAP_BATTLE_ROUND_SECONDS = 30;
+/** Answer deadline for a question: Map Battle is fixed, other modes follow the chosen difficulty. */
+export const roundSecondsFor = (mode: string, difficulty: AtlasDifficulty) => mode === "map_click" || mode === "map_battle" ? MAP_BATTLE_ROUND_SECONDS : DIFFICULTY_RULES[difficulty].roundSeconds;
+
 export const STAT_DEFINITIONS: Record<AtlasStatKey, { label: string; unit: string; timeSensitive: boolean }> = {
   population: { label: "Population", unit: "people", timeSensitive: true },
   areaKm2: { label: "Area", unit: "km²", timeSensitive: false },

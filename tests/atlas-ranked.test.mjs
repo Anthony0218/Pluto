@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { ARENA_MODES } from "../src/games/atlas/modeCatalog.ts";
+import { ARENA_MODES, ONLINE_ARENA_MODES } from "../src/games/atlas/modeCatalog.ts";
 import { chooseRankedMode, chooseRankedSeries, getRankFromRating, maxModeBans, rankedModes, RANK_THRESHOLDS, sanitizeBans } from "../src/games/atlas/ranked.ts";
 import { calculateMatchResult, INITIAL_RATING } from "../src/games/atlas/rankedRating.ts";
 
@@ -35,9 +35,9 @@ test("rank boundaries and catalog compatibility are centralized", () => {
     const at = getRankFromRating(threshold.rating), below = getRankFromRating(threshold.rating - 1);
     assert.notEqual(at.displayName, below.displayName, `boundary at ${threshold.rating}`);
   }
-  assert.equal(rankedModes().length, 15);
-  assert.deepEqual(rankedModes().map((mode) => mode.online), ARENA_MODES.map((mode) => mode.online));
-  assert.equal(ARENA_MODES.length, 15);
+  assert.equal(rankedModes().length, 10);
+  assert.deepEqual(rankedModes().map((mode) => mode.online), ONLINE_ARENA_MODES.map((mode) => mode.online));
+  assert.equal(ARENA_MODES.length, 12);
 });
 
 test("bans are bounded and combined bans select only eligible modes", () => {

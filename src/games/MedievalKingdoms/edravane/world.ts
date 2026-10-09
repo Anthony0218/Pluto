@@ -10,6 +10,17 @@ export const RESOURCES: Resource[] = [
 ];
 export const WORLD_GRID = { minQ: -8, maxQ: 28, minR: -4, maxR: 17 };
 export const WORLD_HEX_COUNT = (WORLD_GRID.maxQ - WORLD_GRID.minQ + 1) * (WORLD_GRID.maxR - WORLD_GRID.minR + 1);
+// Small, detached island groups give the western continent a varied coastal silhouette.
+export const COASTAL_ISLANDS = new Map<string, { nation: string; name: string }>([
+  ["-1:-4", { nation: "high-cairn", name: "Greywatch North" }],
+  ["0:-4", { nation: "high-cairn", name: "Greywatch East" }],
+  ["-1:-3", { nation: "high-cairn", name: "Greywatch Haven" }],
+  ["-8:5", { nation: "ilyr-coast", name: "Gull Key" }],
+  ["-8:6", { nation: "ilyr-coast", name: "Mistral Key" }],
+  ["12:0", { nation: "varnesk", name: "Rimehaven" }],
+  ["10:14", { nation: "graskor", name: "Ember Key" }],
+  ["10:15", { nation: "graskor", name: "Cinder Key" }],
+]);
 export const NATIONS: Nation[] = [
   [
     "auremarch",
@@ -314,6 +325,7 @@ export function findPath(
 }
 export function makeWorld(): District[] {
   const world: District[] = [];
+  const offshore: District[] = [];
   // Two deliberately shaped continents, separated by the navigable Crown Strait.
   // Retain the original capitals and Saltmere's island chain; saved maps are never regenerated.
   const islands = new Set(["16:9", "16:10", "17:10", "16:11", "18:11", "18:8"]);
@@ -326,17 +338,19 @@ export function makeWorld(): District[] {
   // Bays and peninsulas break up the eastern shore without joining the archipelago.
   addRow([13, 14], 8); addRow([21, 23], 8); addRow([21, 22], 9); addRow([22, 22], 10);
   for (const bay of ["-6:6", "-5:6", "-5:10", "-4:10", "-3:10", "25:2", "25:3", "26:3", "13:5", "17:7", "18:7"]) land.delete(bay);
-  const isLand = (q: number, r: number) => land.has(`${q}:${r}`) || islands.has(`${q}:${r}`);
+  const isLand = (q: number, r: number) => land.has(`${q}:${r}`) || islands.has(`${q}:${r}`) || COASTAL_ISLANDS.has(`${q}:${r}`);
   for (let r = WORLD_GRID.minR; r <= WORLD_GRID.maxR; r++)
     for (let q = WORLD_GRID.minQ; q <= WORLD_GRID.maxQ; q++) {
       if (q === 28 && r === 17) continue; // Reserved for the legacy campaign entry.
-      let biome: Biome = islands.has(`${q}:${r}`)
+      const coastalIsland = COASTAL_ISLANDS.get(`${q}:${r}`);
+      let biome: Biome = islands.has(`${q}:${r}`) || coastalIsland
         ? "island"
         : land.has(`${q}:${r}`)
           ? "plains"
           : "sea";
       const nation =
-        biome === "sea"
+        coastalIsland ? NATIONS.find((n) => n.id === coastalIsland.nation)!
+        : biome === "sea"
           ? null
           : NATIONS.filter((n) => n.id !== "saltmere" || islands.has(`${q}:${r}`) || r >= 6 && adjacentCoordinates(q, r).some(([nq, nr]) => !isLand(nq, nr))).reduce((a, b) =>
               hexDistance({ q, r }, { q: a.anchor[0], r: a.anchor[1] }) <=
@@ -374,11 +388,11 @@ export function makeWorld(): District[] {
         coast: "luxury",
         island: "luxury",
       };
-      world.push({
+      (coastalIsland ? offshore : world).push({
         id: `${q}:${r}`,
         q,
         r,
-        name: nation ? `${nation.name} ${q + 2}·${r + 2}` : "The Azure Sea",
+        name: coastalIsland?.name ?? (nation ? `${nation.name} ${q + 2}·${r + 2}` : "The Azure Sea"),
         nation: nation?.id ?? null,
         owner: null,
         biome,
@@ -402,6 +416,8 @@ export function makeWorld(): District[] {
         unrest: 0,
       });
     }
+  // Established mainland seats and trade origins stay ahead of the newly added holdings.
+  world.push(...offshore);
   for (const d of world) {
     d.port =
       !!d.nation && neighbors(world, d.id).some((n) => n.biome === "sea");

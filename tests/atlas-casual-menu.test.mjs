@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import ts from 'typescript';
 import * as randomSeries from '../src/games/atlas/randomSeries.ts';
-import { ARENA_MODES } from '../src/games/atlas/modeCatalog.ts';
+import { ARENA_MODES, ONLINE_ARENA_MODES, isOnlineMode } from '../src/games/atlas/modeCatalog.ts';
 import { areaReferenceCountry, areaValuesFromText } from '../src/games/atlas/areaReferences.ts';
 import { buildTrialCountries } from '../src/games/atlas/trials/countryStats.ts';
 import { createGuesserRun, guesserClues } from '../src/games/atlas/trials/countryGuesser.ts';
@@ -48,7 +48,7 @@ function harness(query = '', reducedMotion = false) {
     'react-router-dom': {Link: 'a', useNavigate: () => url => navigations.push(url), useSearchParams: () => [new URLSearchParams(query)]},
     '../../../games/atlas/randomSeries': randomSeries,
     '../../../games/atlas/arenaStorage': {bestKey: id => id},
-    '../../../games/atlas/modeCatalog': {ARENA_MODES},
+    '../../../games/atlas/modeCatalog': {ARENA_MODES, ONLINE_ARENA_MODES, isOnlineMode},
     '../../../games/atlas/soloSettings': {DIFFICULTY_LABELS: {}},
     '../../../games/atlas/useAtlasData': {useAtlasData: () => ({data: null})},
     './useArenaStore': {MODE_ICONS: Object.fromEntries(ARENA_MODES.map(mode => [mode.id, 'svg'])), useArenaStore: () => ({stored: {difficulty: 'beginner', best: {},settings:{scope:'Europe'}}, update() {}})},
@@ -59,7 +59,7 @@ function harness(query = '', reducedMotion = false) {
     compilerOptions: {module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, target: ts.ScriptTarget.ES2023},
   }).outputText;
   const exports = {};
-  new Function('require', 'exports', 'setTimeout', 'clearTimeout', 'window', source + '\nexports.RandomModeChoice = RandomModeChoice;')(
+  new Function('require', 'exports', 'setTimeout', 'clearTimeout', 'window', source + '\nexports.RandomModeChoice = RandomModeChoice; exports.LaunchButtons = LaunchButtons;')(
     name => modules[name] ?? require(name), exports,
     (callback, delay) => { const id = ++timerId; timers.set(id, callback); delays.push(delay); return id; },
     id => timers.delete(id), {matchMedia: () => ({matches: reducedMotion})},
@@ -68,7 +68,7 @@ function harness(query = '', reducedMotion = false) {
     render(Component = exports.default, props = {}) { stateSlot = 0; refSlot = 0; return Component(props); },
     step() { const [id, callback] = timers.entries().next().value; timers.delete(id); callback(); },
     unmount() { cleanups.forEach(cleanup => cleanup?.()); },
-    timers, delays, navigations, RandomModeChoice: exports.RandomModeChoice,
+    timers, delays, navigations, LaunchButtons: exports.LaunchButtons, RandomModeChoice: exports.RandomModeChoice,
   };
 }
 function nodes(tree) {
@@ -119,7 +119,7 @@ test('only ? reveals roulette, its highlight slows down, and every launch uses t
     let tree = render();
     assert.equal(find(tree, node => node.props?.['aria-label'] === 'Random mode roulette'), undefined);
     assert.equal(tree.props.onClick, undefined, 'the card background does not spin');
-    const expected = ARENA_MODES[Math.floor(.37 * ARENA_MODES.length)];
+    const expected = ONLINE_ARENA_MODES[Math.floor(.37 * ONLINE_ARENA_MODES.length)];
     for (const [index, url] of [`/games/atlas-arena/solo/${expected.id}`, `/games/atlas-arena/multiplayer?mode=${expected.online}`, `/games/atlas-arena/hotseat/${expected.id}`].entries()) {
       actionButtons(tree)[index].props.onClick();
       const launched = new URL(parent.navigations.at(-1), 'http://atlas.test');
@@ -137,7 +137,7 @@ test('only ? reveals roulette, its highlight slows down, and every launch uses t
     buttons(tree).find(node => node.props['aria-label'] === 'Spin for a random mode').props.onClick();
     tree = render();
     const roulette = find(tree, node => node.props?.['aria-label'] === 'Random mode roulette');
-    assert.equal(nodes(roulette).filter(node => node.props?.["aria-disabled"] === "true").length, ARENA_MODES.length);
+    assert.equal(nodes(roulette).filter(node => node.props?.["aria-disabled"] === "true").length, ONLINE_ARENA_MODES.length);
     assert.ok(actionButtons(tree).every(node => node.props.disabled));
     while (h.timers.size) {
       tree = render();
@@ -145,7 +145,7 @@ test('only ? reveals roulette, its highlight slows down, and every launch uses t
       h.step();
     }
     tree = render();
-    assert.ok(h.delays.length >= ARENA_MODES.length * 2);
+    assert.ok(h.delays.length >= ONLINE_ARENA_MODES.length * 2);
     assert.ok(h.delays.at(-1) > h.delays[0] * 5);
     assert.ok(h.delays.every((delay, index) => index === 0 || delay > h.delays[index - 1]));
     assert.equal(find(tree, node => node.props?.className === 'is-highlighted').props['aria-label'], expected.title);
@@ -184,7 +184,7 @@ test('random picker X cancels an active spin, restores ?, and permits another sp
   assert.ok(actionButtons(render()).every(node => !node.props.disabled));
   spin();
   while (h.timers.size) h.step();
-  assert.equal(nodes(render()).filter(node => node.props?.['aria-disabled'] === 'true').length, ARENA_MODES.length);
+  assert.equal(nodes(render()).filter(node => node.props?.['aria-disabled'] === 'true').length, ONLINE_ARENA_MODES.length);
   reset();
   assert.equal(find(render(), node => node.props?.['aria-label'] === 'Random mode roulette'), undefined);
   spin();
@@ -207,5 +207,19 @@ test('random match formats default to BO3 and launch one, three or five distinct
     const modes = params.get('modes').split(',');
     assert.equal(modes.length, length);
     assert.equal(new Set(modes).size, length);
+  }
+});
+
+
+test('local-only modes offer solo and hotseat but cannot enter the multiplayer or roulette choices', () => {
+  for (const id of ['map-fill', 'region-builder']) {
+    const h = harness(), mode = ARENA_MODES.find(item => item.id === id);
+    const selected = buttons(chooseCard(h.render())).find(node => node.props['aria-label'] === mode.title);
+    selected.props.onClick();
+    const actions = actionButtons(chooseCard(h.render()));
+    assert.deepEqual(actions.map(button => button.props.children[1].props.children), ['Singleplayer','Hotseat']);
+    const launch = h.render(h.LaunchButtons, {mode,onLaunch() {}});
+    assert.deepEqual(actionButtons(launch).map(button => button.props.children[1].props.children), ['Singleplayer','Hotseat']);
+    assert.ok(!ONLINE_ARENA_MODES.some(item => item.id === id));
   }
 });

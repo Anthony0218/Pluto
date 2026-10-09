@@ -91,6 +91,7 @@ export type GuessCountryQuestion = QuestionBase & {
   answer: string;
   /** Four random hints and a fixed fifth reveal; one more is revealed after every unsolved round. */
   clues: GuessClue[];
+  choices?: { id: string; label: string }[];
 };
 
 export type ClosestClickQuestion = QuestionBase & {

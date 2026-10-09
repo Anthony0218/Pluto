@@ -3,6 +3,7 @@ import { NATIONS, hexDistance, neighbors } from "./world.ts";
 import { atWar, makeBattle, startCombat, troopCount } from "./battle.ts";
 import { resolveSurrender, settlePeace } from "./campaignStrategy.ts";
 import { event } from "./realm.ts";
+import { updateCampaignOutcome } from "./agreements.ts";
 
 function require(condition: unknown, message: string): asserts condition {
   if (!condition) throw Error(message);
@@ -34,6 +35,10 @@ export function addReaction(s: Campaign, r: Omit<Reaction, "id" | "created">) {
   return reaction;
 }
 export function authorizeTurn(s: Campaign, actor: Actor, cmd: Command) {
+  if (cmd.type === "continueSandbox") {
+    require(s.mode === "single" && s.agreements?.campaign.result && s.houses.find((h) => h.id === actor.house)?.reasons.includes("Human commander"), "Only the solo player can continue a completed chronicle");
+    return;
+  }
   if (
     !s.turns ||
     [
@@ -87,6 +92,7 @@ export function completeTurn(s: Campaign) {
   s.log.unshift(
     `${ended} ended its turn. ${t.order[t.index]}'s turn · round ${t.round}.`,
   );
+  updateCampaignOutcome(s);
 }
 export function queueAttack(s: Campaign, a: Army, hex: string) {
   if (!s.turns) return false;

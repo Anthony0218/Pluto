@@ -32,7 +32,11 @@ const EVENT_SOUNDS: Partial<Record<FeedbackKind, SoundId>> = {
 function moodFor(lobby: Lobby | null): MusicMood {
   const phase = lobby?.match?.phase;
   if (!phase) return "calm";
-  if (phase === "MINIGAME" || phase === "DUEL_MINIGAME") return "minigame";
+  if (phase === "MINIGAME" || phase === "DUEL_MINIGAME") {
+    const game = lobby?.match?.minigame;
+    if (game?.minigameId === "disco-freeze" && (game.state as { phase?: string }).phase === "freeze") return "off";
+    return "minigame";
+  }
   if (phase === "GAME_OVER") return "calm";
   return "board";
 }

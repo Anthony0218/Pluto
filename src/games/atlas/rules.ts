@@ -1,8 +1,9 @@
 import { ATLAS_SCORING } from "./config.ts";
 import type { Coordinates } from "./types.ts";
 
-export function normalScore(correct: boolean, remainingMs: number, roundMs: number): number {
+export function normalScore(correct: boolean, remainingMs: number, roundMs: number, ranked = false): number {
   if (!correct) return 0;
+  if (!ranked) return ATLAS_SCORING.normalCorrect;
   const ratio = Math.max(0, Math.min(1, remainingMs / Math.max(1, roundMs)));
   return ATLAS_SCORING.normalCorrect + Math.round(ATLAS_SCORING.maxSpeedBonus * ratio);
 }

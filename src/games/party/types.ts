@@ -356,6 +356,7 @@ export interface MinigameRuntime {
   resultsEndsAt: number | null;
   state: unknown;
   results: MinigameResult[] | null;
+  // Main-game rewards: coins on the board, points in a festival.
   rewards: Record<string, number> | null;
   rewardsApplied: boolean;
   awaitingReady?: boolean;
@@ -461,6 +462,7 @@ export interface LobbySummary {
   name: string;
   count: number;
   mapId: string;
+  mode?: Settings["mode"];
   public: boolean;
 }
 export type GameAction =

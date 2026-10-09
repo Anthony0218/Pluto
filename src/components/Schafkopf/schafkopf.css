@@ -2255,3 +2255,4 @@
 .sk-document-options { display: grid; gap: .6rem; margin-block: 1rem; }
 .sk-document-options label { display: flex; justify-content: space-between; align-items: center; gap: .75rem; }
 .sk-document-options input[type="number"] { width: 5rem; padding: .35rem; border-radius: .4rem; border: 1px solid #a18d69; }
+.sk-waiting-seat{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}

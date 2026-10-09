@@ -16,11 +16,17 @@ export function generateFlagQuestions(options: { entities: GeographicEntity[]; d
   const random = seededRandom(`${options.datasetVersion}:${options.seed}:${options.difficulty}:flags`);
   const order = shuffled(eligible, random);
   const questions: ChoiceQuestion[] = [];
+  const recent: string[] = [];
+  if (!order.length) return questions;
   for (let index = 0; index < options.count; index += 1) {
-    let entity = order[index % order.length];
+    const offset = index % order.length;
+    const candidates = [...order.slice(offset), ...order.slice(0, offset)];
     const showShape = index % 2 === 1;
-    // The silhouette drill needs a mapped outline; microstates without one get the other drill's slot.
-    if (showShape && !entity.geometryId) entity = [...order.slice(index + 1), ...order].find((candidate) => candidate.geometryId) || entity;
+    const available = candidates.filter(candidate => !recent.includes(candidate.id));
+    const entity = (showShape ? available.find(candidate => candidate.geometryId) : available[0]) || available[0];
+    if (!entity) throw new Error("Flag Battle needs at least eleven eligible countries for varied rounds.");
+    recent.push(entity.id);
+    if (recent.length > 10) recent.shift();
     const distractors = shuffled(plausibleEntities(entity, pool, options.difficulty, 8), random).slice(0, FLAG_CHOICES - 1);
     const entities = shuffled([entity, ...distractors], random);
     const base = { seed: options.seed, entityId: entity.id, entityType: entity.entityType, category: "flags" as const, interaction: "single_choice" as const, difficulty: options.difficulty, scope: "un195" as const, targetGeometryId: entity.geometryId, sourceMetadata: sourceMetadata(entity, "flags") };

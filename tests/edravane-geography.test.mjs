@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { createCampaign, loadSave } from "../src/games/MedievalKingdoms/edravane/simulation.ts";
-import { center, findPath, hexDistance, neighbors, NATIONS, WORLD_HEX_COUNT } from "../src/games/MedievalKingdoms/edravane/world.ts";
+import { center, COASTAL_ISLANDS, findPath, hexDistance, neighbors, NATIONS, WORLD_HEX_COUNT } from "../src/games/MedievalKingdoms/edravane/world.ts";
 import { mapBounds, territoryLayouts } from "../src/pages/games/MedievalKingdoms/territoryLayout.ts";
 
 test("two separate continents, isolated Saltmere islands, valid capitals and navigable intercontinental ports", () => {
@@ -22,13 +22,35 @@ test("two separate continents, isolated Saltmere islands, valid capitals and nav
   const westPort = components[0].find((d) => d.port), eastPort = components[1].find((d) => d.port);
   const crossing = findPath(s.districts, westPort.id, eastPort.id, true);
   assert.ok(crossing.length && crossing.some((id) => s.districts.find((d) => d.id === id).biome === "sea"));
-  const islands = s.districts.filter((d) => d.biome === "island");
+  const islands = s.districts.filter((d) => d.biome === "island" && d.nation === "saltmere");
   assert.equal(islands.length, 6);
   for (const d of islands) {
     assert.equal(d.nation, "saltmere"); assert.ok(d.port && d.shipyard);
     assert.deepEqual(findPath(s.districts, "14:6", d.id), []);
   }
   assert.ok(s.districts.filter((d) => d.nation === "saltmere").every((d) => d.port));
+});
+
+test("four small coastal island groups remain detached and accessible by sea without joining the continents", () => {
+  const s = createCampaign(), islands = s.districts.filter((d) => COASTAL_ISLANDS.has(d.id));
+  assert.equal(islands.length, 8);
+  const unseen = new Set(islands.map((d) => d.id)), sizes = [];
+  for (const first of islands) {
+    if (!unseen.delete(first.id)) continue;
+    const group = [first];
+    for (let i = 0; i < group.length; i++) for (const d of neighbors(s.districts, group[i].id)) if (unseen.delete(d.id)) group.push(d);
+    sizes.push(group.length);
+  }
+  assert.deepEqual(sizes.sort(), [1, 2, 2, 3]);
+  for (const d of islands) {
+    assert.equal(d.biome, "island"); assert.equal(d.owner, `${d.nation}-0`); assert.ok(d.port);
+    assert.equal(d.seat, undefined, "new islands must not move the existing mainland seats");
+    assert.ok(neighbors(s.districts, d.id).every((n) => n.biome === "sea" || COASTAL_ISLANDS.has(n.id)));
+    const capital = NATIONS.find((n) => n.id === d.nation).capital;
+    assert.deepEqual(findPath(s.districts, capital, d.id), []);
+    const port = s.districts.find((p) => p.nation === d.nation && p.port && p.biome !== "island" && findPath(s.districts, p.id, d.id, true).length);
+    assert.ok(port, `${d.name} needs a navigable home port`);
+  }
 });
 
 test("territory names grow with conquered control, and sigil anchors remain on their own fields", () => {

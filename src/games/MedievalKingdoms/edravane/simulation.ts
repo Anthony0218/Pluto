@@ -20,6 +20,7 @@ import {
 import {
   BALANCE,
   BIOMES,
+  COASTAL_ISLANDS,
   NATIONS,
   RESOURCES,
   WORLD_HEX_COUNT,
@@ -86,10 +87,14 @@ import { advanceRealm, campaignRound, councilSkill, event, growDynasties, initia
 import { feedArmy, realmNation, updateIntelligence } from "./logistics.ts";
 import { advanceStrategy, objectiveFor, strategyCommand, truce, validatePeace, warScore } from "./campaignStrategy.ts";
 import { validateStrategySave } from "./strategySave.ts";
+import { advanceAgreements, agreementBotCommands, agreementCommand, economicFactors, initializeAgreements, integrateTerritory, noteLevies, routeBenefits } from "./agreements.ts";
+import { validateAgreementsSave } from "./agreementsSave.ts";
+import { ageDue, calendarYear } from "./calendar.ts";
 
 export function createCampaign(
   nationId = "auremarch",
   mode: Campaign["mode"] = "single",
+  chronicle: "council" | "sandbox" = "sandbox",
 ): Campaign {
   if (!NATIONS.some((n) => n.id === nationId)) throw Error("Unknown nation");
   const districts = makeWorld();
@@ -165,12 +170,14 @@ export function createCampaign(
           hexDistance(a, { q: n.anchor[0], r: n.anchor[1] }) -
           hexDistance(b, { q: n.anchor[0], r: n.anchor[1] }),
       );
+    // New offshore holdings belong to the crown without moving existing mainland estates.
+    const home = land.filter((d) => !COASTAL_ISLANDS.has(d.id));
     const anchors = [
-      land[0],
-      land[Math.floor(land.length * 0.2)],
-      land[Math.floor(land.length * 0.4)],
-      land[Math.floor(land.length * 0.65)],
-      land[land.length - 1],
+      home[0],
+      home[Math.floor(home.length * 0.2)],
+      home[Math.floor(home.length * 0.4)],
+      home[Math.floor(home.length * 0.65)],
+      home[home.length - 1],
     ];
     for (const d of land) {
       let i = anchors.reduce(
@@ -178,7 +185,7 @@ export function createCampaign(
           hexDistance(d, a) < hexDistance(d, anchors[best]) ? j : best,
         0,
       );
-      if (d.id === n.capital) i = 0;
+      if (d.id === n.capital || COASTAL_ISLANDS.has(d.id)) i = 0;
       d.owner = `${n.id}-${i}`;
       d.disputed = i === 4;
     }
@@ -261,6 +268,7 @@ export function createCampaign(
   establishEstates(s, true);
   initializeTurns(s, nationId);
   initializeStrategy(s);
+  initializeAgreements(s, chronicle);
   updateIntelligence(s);
   return s;
 }
@@ -504,6 +512,8 @@ export function loadSave(raw: string): Campaign {
   );
   validateStrategySave(s);
   initializeStrategy(s);
+  validateAgreementsSave(s);
+  initializeAgreements(s);
   return s;
 }
 function need(condition: unknown, message: string): asserts condition {
@@ -565,7 +575,9 @@ export function applyCommand(
   const s = structuredClone(current);
   const h = ownHouse(s, actor);
   initializeStrategy(s);
+  initializeAgreements(s);
   need(cmd && typeof cmd.type === "string", "Invalid command");
+  need(!s.agreements?.campaign.result || cmd.type === "continueSandbox", "This chronicle has ended; review the council's results");
   const battleTypes = [
     "stand",
     "retreat",
@@ -579,9 +591,12 @@ export function applyCommand(
     "Campaign frozen by queued battle encounters",
   );
   authorizeTurn(s, actor, cmd);
+  if (agreementCommand(s, h, cmd)) {
+    initializeAgreements(s); completeTurn(s); updateIntelligence(s); return s;
+  }
   if (strategyCommand(s, h, cmd)) {
     while (s.battles[0] && !hasHumanParticipant(s, s.battles[0])) autoResolve(s, s.battles[0]);
-    completeTurn(s); updateIntelligence(s); return s;
+    initializeAgreements(s); completeTurn(s); updateIntelligence(s); return s;
   }
   switch (cmd.type) {
     case "endTurn": {
@@ -621,7 +636,7 @@ export function applyCommand(
         "Fields are regrowing; harvest every 6 days",
       );
       const yieldFood = harvestYield(d);
-      h.stock.grain = Math.min(999, h.stock.grain + yieldFood);
+      h.stock.grain = Math.min(999, h.stock.grain + Math.floor(yieldFood * economicFactors(s, h, d, false).output));
       d.harvestedAt = s.tick;
       s.log.unshift(`${h.name} harvested ${yieldFood} food at ${d.name}.`);
       break;
@@ -685,6 +700,7 @@ export function applyCommand(
         provisions: h.nation === "varnesk" ? 4 : 3,
       };
       s.armies.push(a);
+      noteLevies(s, h, cmd.count);
       s.log.unshift(
         `${h.name} raised ${cmd.count} troops for ${coins} coins and ${food} food.`,
       );
@@ -1095,35 +1111,14 @@ export function applyCommand(
       if (cmd.kind !== "levies") h.stock.iron -= supplies;
       if (cmd.kind === "cavalry") h.stock.horses -= supplies;
       a.troops[cmd.kind] += count;
+      if (cmd.kind === "levies") noteLevies(s, h, count);
       s.log.unshift(
         `${h.name} recruited ${count} ${cmd.kind} for ${count * UNIT_STATS[cmd.kind].cost} coins and ${supplies} food.`,
       );
       break;
     }
     case "annex": {
-      const d = s.districts.find((d) => d.id === cmd.hex);
-      need(
-        d?.owner && d.occupation && d.biome !== "legacy",
-        "No occupied estate",
-      );
-      const army = s.armies.find(
-        (a) =>
-          a.hex === d.id && a.house === d.occupation && canControl(s, actor, a),
-      );
-      need(army, "A controlled occupying army must hold the field");
-      need(
-        s.tick >= (d.occupiedAt ?? s.tick) + 3,
-        "Hold occupation for three campaign ticks",
-      );
-      spend(h, 50);
-      d.owner = h.id;
-      d.occupation = undefined;
-      d.occupiedAt = undefined;
-      d.disputed = true;
-      d.unrest = Math.min(100, d.unrest + 20);
-      s.log.unshift(
-        `${h.name} annexes ${d.name}. Land bonuses remain attached to the original district.`,
-      );
+      integrateTerritory(s, h, cmd.hex, "direct");
       break;
     }
     case "shipyard": {
@@ -1476,6 +1471,7 @@ export function applyCommand(
   while (s.battles[0] && !hasHumanParticipant(s, s.battles[0]))
     autoResolve(s, s.battles[0]);
   completeTurn(s);
+  initializeAgreements(s);
   s.log = s.log.slice(0, 70);
   updateIntelligence(s);
   return s;
@@ -1493,17 +1489,19 @@ export function advanceCampaign(
     return s;
   s.tick++;
   advanceRealm(s, actingNation);
+  advanceAgreements(s, actingNation);
+  const ageing = ageDue(s), year = calendarYear(s);
   for (const h of s.houses) {
     const fields = s.districts.filter((d) => d.owner === h.id && !d.occupation);
     for (const d of fields)
-      h.stock[d.resource] = Math.min(999, h.stock[d.resource] + production(d));
+      h.stock[d.resource] = Math.min(999, h.stock[d.resource] + production(d) * economicFactors(s, h, d).output);
+    // Every realm has a small subsistence harvest; specialisation never removes survival options.
+    if (s.agreements && h.nation === actingNation) h.stock.grain = Math.min(999, h.stock.grain + 6);
     if (s.strategyRules && season(s) === "Winter") h.stock.grain = Math.max(0, h.stock.grain - fields.filter((d) => d.farm).length);
     const mouths = fields.length * 0.7;
     h.stock.grain = Math.max(0, h.stock.grain - mouths);
     h.stock.livestock = Math.max(0, h.stock.livestock - fields.length * 0.1);
-    h.treasury +=
-      fields.length * 1.1 +
-      fields.reduce((n, d) => n + (d.city === "major" ? 4 : d.city ? 2 : 0), 0);
+    h.treasury += fields.reduce((n, d) => n + (1.1 + (d.city === "major" ? 4 : d.city ? 2 : 0)) * economicFactors(s, h, d).income, 0);
     if (s.strategyRules && h.role === "crown") h.treasury += Math.max(0, councilSkill(s, h, "stewardship") - 8) * 0.1;
     if (
       !h.reasons.includes("Human commander") &&
@@ -1568,8 +1566,8 @@ export function advanceCampaign(
         g.path = [];
       s.log.unshift(`${h.name} rebels: claimant warning became an uprising.`);
     }
-    if (s.tick % 120 === 0) {
-      for (const p of h.family) p.age++;
+    if (ageing) {
+      for (const p of h.family) if (p.alive) p.age += s.agreements ? year - s.agreements.calendar.agedYear : 1;
       const ruler = h.family.find((p) => p.id === h.ruler)!;
       if (ruler.age >= 65 && random(s) < 0.3) {
         const next = heir(s, h);
@@ -1583,6 +1581,7 @@ export function advanceCampaign(
       }
     }
   }
+  if (ageing && s.agreements) s.agreements.calendar.agedYear = year;
   growDynasties(s);
   for (const resource of RESOURCES) {
     const total = s.houses.reduce((n, h) => n + h.stock[resource], 0);
@@ -1620,7 +1619,9 @@ export function advanceCampaign(
     route.status = `In transit ${route.progress}/${route.path.length}`;
     if (route.progress < route.path.length) continue;
     route.progress = 0;
-    if (route.maritime && random(s) < s.config.maritimeHazard) {
+    const benefits = routeBenefits(s, route.house, route.from, route.to, route.maritime);
+    const transportCost = route.cost * benefits.cost;
+    if (route.maritime && random(s) < s.config.maritimeHazard * benefits.hazard) {
       route.status = "Storm loss: cargo lost";
       const supplier = route.import ? buyer : h;
       supplier.stock[route.resource] = Math.max(
@@ -1636,10 +1637,10 @@ export function advanceCampaign(
       Math.min(
         route.capacity,
         seller.stock[route.resource] - 15,
-        (recipient.treasury - route.cost) / s.prices[route.resource],
+        (recipient.treasury - transportCost) / s.prices[route.resource],
       ),
     );
-    if (cargo < 1 || h.treasury < route.cost) {
+    if (cargo < 1 || h.treasury < transportCost) {
       route.status = "Waiting: cargo or funds shortage";
       continue;
     }
@@ -1660,9 +1661,9 @@ export function advanceCampaign(
     );
     recipient.treasury -= cargo * price;
     seller.treasury += income;
-    h.treasury -= route.cost;
+    h.treasury -= transportCost;
     route.delivered += cargo;
-    route.status = `${route.import ? "Imported" : "Delivered"} ${Math.floor(cargo)} ${route.resource}, value ${income.toFixed(1)} − ${route.cost} transport`;
+    route.status = `${route.import ? "Imported" : "Delivered"} ${Math.floor(cargo)} ${route.resource}, value ${income.toFixed(1)} − ${transportCost.toFixed(1)} transport`;
   }
   for (const a of [...s.armies].sort((a, b) => a.id.localeCompare(b.id))) {
     if (s.battles.some((b) => b.armies.includes(a.id))) continue;
@@ -2058,6 +2059,7 @@ export function advanceCampaign(
   // AI-only encounters resolve through the same aftermath path without opening combat.
   while (s.battles[0] && !hasHumanParticipant(s, s.battles[0]))
     autoResolve(s, s.battles[0]);
+  initializeAgreements(s);
   s.log = s.log.slice(0, 70);
   return s;
 }
@@ -2097,6 +2099,7 @@ export function priceExplanation(s: Campaign, r: Resource) {
 
 /** Run automatic seats only until a human turn, response, or tactical battle. */
 export function runAutomaticTurns(current: Campaign): Campaign {
+  if (current.agreements?.campaign.result) return current;
   const rebelResponse = (s: Campaign) => {
     const r = s.turns?.pending[0];
     const defenders = r?.kind === "attack" ? defendingArmies(s, r) : [];
@@ -2122,6 +2125,7 @@ export function runAutomaticTurns(current: Campaign): Campaign {
   let s = structuredClone(current);
   for (let step = 0; step < 64; step++) {
     completeTurn(s);
+    if (s.agreements?.campaign.result) break;
     if (s.battles.length) break;
     const r = s.turns!.pending[0];
     if (r) {
@@ -2167,7 +2171,7 @@ export function runAutomaticTurns(current: Campaign): Campaign {
         choice =
           forces.length &&
           troopCount(forces[0]) *
-            (1 + castleBonus(s.districts.find((d) => d.id === r.hex)!)) >=
+            (1 + castleBonus(s.districts.find((d) => d.id === r.hex)!, s)) >=
             troopCount(attacker!) * (ruler(h)?.traits?.includes("cautious") ? 0.8 : ruler(h)?.traits?.includes("brave") ? 0.5 : 0.65)
             ? "defend"
             : "withdraw";
@@ -2204,6 +2208,7 @@ export function runAutomaticTurns(current: Campaign): Campaign {
     if (s.turns!.prepared !== stamp) {
       s.turns!.prepared = stamp;
       const commands: Command[] = [];
+      commands.push(...agreementBotCommands(s, h));
       const demand = s.houses.find((v) => v.liege === h.id && v.loyalty < 60 && v.demand?.status === "open");
       if (demand?.demand?.kind === "lower-taxes") commands.push({ type: "bargain", house: demand.id, offer: "lower-taxes" });
       if (demand?.demand?.kind === "protect-trade" && h.treasury >= 80) commands.push({ type: "bargain", house: demand.id, offer: "protect-trade" });

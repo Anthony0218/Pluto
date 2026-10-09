@@ -126,6 +126,7 @@ Deno.serve(async req => {
       if (error) throw new Error("Tisch konnte nicht geladen werden.");
       if (!data) return response({ error: "Tisch nicht gefunden." }, 404);
       const room = data as Room;
+      const storedGame = body.op === "get" ? JSON.stringify(room.game) : undefined;
       if (room.game) room.game = migrateGameState(room.game);
       room.former_players ??= [];
       room.pending_seats ??= [];
@@ -166,10 +167,14 @@ Deno.serve(async req => {
           const botSeat = room.game?.turn ?? -1;
           const isBotTurn = room.game?.phase !== "legen" && botSeat >= 0 && room.players[botSeat]?.bot && room.game?.phase !== "finished" && room.game?.phase !== "redeal";
           const delay = room.game?.phase === "trick" ? (room.collect_seconds || collectSecondsFor(room.ai_difficulty)) * 1000 : 700;
-          if (!isBotTurn || Date.now() - new Date(room.updated_at).getTime() < delay) return response(snapshot(room, user.id));
-          const aiAction = chooseAiAction(viewFor(room.game!, botSeat), room.ai_difficulty, random);
-          room.game = applyAction(room.game!, botSeat, aiAction.type === "declare" ? { ...aiAction, phrase: formatDeclarationAnnouncement(aiAction.contract, room.ai_difficulty === "beginner" || room.ai_difficulty === "amateur" ? SIMPLE_ANNOUNCEMENT_SETTINGS : DEFAULT_ANNOUNCEMENT_SETTINGS, random) } : aiAction, random);
-          scheduleMultiplayerTimers(room.game);
+          if (isBotTurn && Date.now() - new Date(room.updated_at).getTime() >= delay) {
+            const aiAction = chooseAiAction(viewFor(room.game!, botSeat), room.ai_difficulty, random);
+            room.game = applyAction(room.game!, botSeat, aiAction.type === "declare" ? { ...aiAction, phrase: formatDeclarationAnnouncement(aiAction.contract, room.ai_difficulty === "beginner" || room.ai_difficulty === "amateur" ? SIMPLE_ANNOUNCEMENT_SETTINGS : DEFAULT_ANNOUNCEMENT_SETTINGS, random) } : aiAction, random);
+            scheduleMultiplayerTimers(room.game);
+          }
+          // Timeouts, bot knocks, clocks and migrations must be committed even
+          // when the next turn belongs to a human. Return unchanged polls only.
+          if (JSON.stringify(room.game) === storedGame) return response(snapshot(room, user.id));
         } else {
           if (body.op !== "delete" && body.version !== room.version) return response({ error: "Der Tisch hat sich geändert. Bitte erneut versuchen." }, 409);
           if (body.op === "start") {

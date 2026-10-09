@@ -1,4 +1,4 @@
-import { DEFAULT_COMPARISON_STATS, QUESTION_CATEGORIES } from "./categories.ts";
+import { DEFAULT_COMPARISON_STATS, MAP_BATTLE_CATEGORIES } from "./categories.ts";
 import type { ArenaModeDef } from "./modeCatalog.ts";
 import type { MapFillState } from "./rules.ts";
 import type { FillScope } from "./scopes.ts";
@@ -6,7 +6,7 @@ import type { AtlasCategory, AtlasDifficulty, AtlasStatKey } from "./types.ts";
 
 /** What a player chooses before a map or quiz run. Difficulty is shared by every mode; the rest only where the mode asks. */
 export type SoloSettings = { difficulty: AtlasDifficulty; categories: AtlasCategory[]; stats: AtlasStatKey[]; scope: FillScope };
-export const DEFAULT_SOLO_SETTINGS: SoloSettings = { difficulty: "intermediate", categories: QUESTION_CATEGORIES.map(({ id }) => id), stats: DEFAULT_COMPARISON_STATS, scope: "Europe" };
+export const DEFAULT_SOLO_SETTINGS: SoloSettings = { difficulty: "intermediate", categories: MAP_BATTLE_CATEGORIES.map(({ id }) => id), stats: DEFAULT_COMPARISON_STATS, scope: "World" };
 export type SoloSummary = {
   score: number; correct: number; wrong: number; bestStreak: number; elapsedMs: number; missed: string[];
   fill?: MapFillState; averageKm?: number;

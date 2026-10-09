@@ -159,12 +159,12 @@ const stub = (id, gameType = "main") => ({
   selectable: true,
 });
 test("registered minigames are selectable, invalid ids are rejected", () => {
-  assert.deepEqual(minigameRegistry.pool("main").map((game) => game.id), ["arrow-memory", "pickup-arena", "pattern-wall", "trail-run", "rhythm-rush", "circle-shot", "lava-knockback", "tide-treasure", "comet-courier", "rope-rescue", "paddle-doubles"]);
-  assert.equal(selectMinigame(minigameRegistry.pool("main"), null, () => 0.5), "circle-shot");
+  assert.deepEqual(minigameRegistry.pool("main").map((game) => game.id), ["arrow-memory", "pickup-arena", "pattern-wall", "trail-run", "rhythm-rush", "circle-shot", "lava-knockback", "tide-treasure", "comet-courier", "rope-rescue", "paddle-doubles", "disco-freeze", "pluto-heist", "kitchen-chaos", "rocket-rumble", "orbital-rally", "island-impostor", "penalty-shootout", "minotaur-maze", "color-clash", "constellation-cascade"]);
+  assert.equal(selectMinigame(minigameRegistry.pool("main"), null, () => 0.5), "paddle-doubles");
   // Additional main games avoid immediate repeats; a single-game pool still allows one.
   assert.equal(
     selectMinigame(minigameRegistry.pool("main"), "target-panic", () => 0.99),
-    "paddle-doubles",
+    "constellation-cascade",
   );
   assert.equal(selectMinigame([minigameRegistry.get("target-panic")], "target-panic", () => 0.99), "target-panic");
   assert.throws(() => minigameRegistry.get("not-a-game"), /Unknown content/);
@@ -477,7 +477,11 @@ test("full seeded bot match loops board -> minigame -> rewards -> board for seve
       : stepMinigameBots(advance(s, cfg, rng, now), now, rng).match;
     if (s.phase === "MINIGAME_RESULTS" && lastPhase !== "MINIGAME_RESULTS") {
       minigames++;
-      assert.equal(Object.values(s.minigame.rewards).reduce((a, b) => a + b, 0), 18);
+      const game = minigameRegistry.get(s.minigame.minigameId);
+      const winningTeam = game.teamOf?.(s.minigame.state, s.minigame.results[0].playerId);
+      const draw = s.minigame.results.every((r) => r.score === s.minigame.results[0].score);
+      const winners = winningTeam === undefined ? 0 : s.minigame.results.filter((r) => game.teamOf(s.minigame.state, r.playerId) === winningTeam).length;
+      assert.equal(Object.values(s.minigame.rewards).reduce((a, b) => a + b, 0), winningTeam === undefined ? 18 : draw ? 20 : winners * 8 + (4 - winners) * 3);
       assert.ok(s.minigame.results[0].score > 0, "bots scored during the minigame");
     }
     lastPhase = s.phase;

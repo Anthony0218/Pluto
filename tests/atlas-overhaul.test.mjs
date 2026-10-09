@@ -87,7 +87,7 @@ test('hotseat decks use distinct deterministic seeds and preserve the shared con
   assert.deepEqual(seeds,calibratedHotseatSeeds(data,mode,DEFAULT_SOLO_SETTINGS,'calibration',4));
   const decks=seeds.map(seed=> mode==='language_guesser'||mode==='history_battle'?raceQuestions(data,mode,seed,'intermediate','Europe',DEFAULT_SOLO_SETTINGS.categories):generateMatchQuestions({...common,seed,mode,difficulty:'intermediate',count:10,categories:DEFAULT_SOLO_SETTINGS.categories,stats:DEFAULT_SOLO_SETTINGS.stats}));
   assert.ok(decks.every(deck=>deck.length===decks[0].length));
-  assert.ok(decks.every(deck=>deck.every(q=>q.interaction===decks[0][0].interaction)));
+  assert.ok(decks.every(deck=>deck.every((q,index)=>q.interaction===decks[0][index].interaction)));
   assert.ok(new Set(decks.map(deck=>deck.map(q=>q.entityId).join(','))).size>1);
  }
 });

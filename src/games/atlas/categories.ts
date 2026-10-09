@@ -8,9 +8,11 @@ export const QUESTION_CATEGORIES: { id: AtlasCategory; label: string }[] = [
   { id: "continents", label: "Continents" }, { id: "languages", label: "Languages" },
   { id: "borders", label: "Borders" }, { id: "currency", label: "Currency" },
 ];
+/** Map Battle is only about where a country is, so it offers no fact categories (population, area, language, ...); Guess the Country carries those as tips. */
+export const MAP_BATTLE_CATEGORIES = QUESTION_CATEGORIES.filter(({ id }) => ["countries", "locations", "capitals", "flags"].includes(id));
 export const COMPARISON_CATEGORIES = Object.entries(STAT_DEFINITIONS).map(([id, definition]) => ({ id: id as AtlasStatKey, label: definition.label }));
 export const DEFAULT_COMPARISON_STATS = COMPARISON_CATEGORIES.map(({ id }) => id);
-export const usesMapCategories = (mode: string) => ["speed_run", "closest_wins"].includes(mode);
+export const usesMapCategories = (mode: string) => ["map_battle", "closest_wins"].includes(mode);
 
 /** Validate room settings once, so every participant gets the same supported categories. */
 export function parseSelection<T extends string>(value: unknown, options: { id: T }[], defaults: T[]): T[] {

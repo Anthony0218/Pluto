@@ -13,24 +13,27 @@ import type {
 } from "../../types/social";
 import FriendAvatar from "./FriendAvatar";
 import GameInvitePanel from "./GameInvitePanel";
-import { getInviteDestination, getInviteGameLabel } from "./inviteRoute";
+import { acceptInviteState, getInviteDestination, getInviteGameLabel, inviteGameKey } from "./inviteRoute";
+import { leaveCurrentRoom, useCurrentRoom } from "./currentRoom";
 import UserLink from "./UserLink";
 
-type FriendChatProps = { friend: Friend; roomInvite?: { code: string; lobbyRoute: string } };
+type FriendChatProps = { friend: Friend };
 
 const PRESET_LABELS = CHAT_PRESETS;
 
-export default function FriendChat({ friend, roomInvite }: FriendChatProps) {
+export default function FriendChat({ friend }: FriendChatProps) {
   const { language } = useUiLanguage();
   const { user } = useAuth();
   const navigate = useNavigate();
+  // In a room, "Send game code" shares that room instead of offering to create another one.
+  const roomInvite = useCurrentRoom();
   const [messages, setMessages] = useState<FriendMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [inviteSent, setInviteSent] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
-  const inviteGame = roomInvite?.lobbyRoute.startsWith("/games/watten/") ? "watten" : "chess";
+  const inviteGame = inviteGameKey(roomInvite?.lobbyRoute);
   const gameCode = roomInvite?.code ?? "";
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
@@ -199,7 +202,8 @@ export default function FriendChat({ friend, roomInvite }: FriendChatProps) {
 
   function joinInvite(message: FriendMessage) {
     if (!message.game || !message.game_code) return;
-    navigate(getInviteDestination({ game: message.game, gameCode: message.game_code, gameRoute: message.game_route }, { autoJoin: true }));
+    leaveCurrentRoom(message.game_code);
+    navigate(getInviteDestination({ game: message.game, gameCode: message.game_code, gameRoute: message.game_route }, { autoJoin: true }), { state: acceptInviteState() });
   }
 
   function renderMessage(message: FriendMessage) {

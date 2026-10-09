@@ -87,6 +87,17 @@ Deno.serve(async (request) => {
     }
 
     const seat = onlineSeat(match.player_ids, user.id);
+    if (body.op === "leave") {
+      // Seats are only given back before the game starts; afterwards they stay reserved.
+      if (seat === -1 || match.status !== "waiting") return respond({ left: false });
+      const players = match.player_ids.filter((id) => id !== user.id);
+      const waiting = db.from("chess_custom_matches");
+      const { error } = players.length
+        ? await waiting.update({ player_ids: players, host_id: players[0], guest_id: players[1] ?? null, version: match.version + 1, updated_at: new Date().toISOString() }).eq("id", match.id).eq("version", match.version).eq("status", "waiting")
+        : await waiting.delete().eq("id", match.id).eq("version", match.version).eq("status", "waiting");
+      if (error) throw error;
+      return respond({ left: true });
+    }
     if (seat === -1) return respond({ error: "You are not a player in this room." }, 403);
     if (body.op === "get") return respond(snapshot(match, user.id));
     if (body.op !== "move") return respond({ error: "Unknown room action." }, 400);

@@ -48,6 +48,16 @@ Deno.serve(async (request) => {
       if (!data) return respond({ error: "Room not found." }, 404);
       const room = data as Room;
       const seat = room.players.findIndex((player) => player.id === user.id);
+      if (body.op === "leave") {
+        // Joining starts the game, so a room that has not started holds only its host and is removed with them.
+        // A running game keeps both seats for reconnecting.
+        const left = seat >= 0 && !room.game_state;
+        if (left) {
+          const { error: removeError } = await db.from("strategy_matches").delete().eq("id", room.id).eq("version", room.version);
+          if (removeError) throw new Error("Could not leave room.");
+        }
+        return respond({ left });
+      }
       if (body.op === "get") {
         if (seat < 0) return respond({ error: "Join this room first." }, 403);
         return respond(snapshot(room, user.id));

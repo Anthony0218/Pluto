@@ -41,10 +41,9 @@ export function generateExtremeRound(pool: readonly TrialCountry[], seed: string
   throw new Error("Could not build an extreme round.");
 }
 
-/** Base points plus a bonus that shrinks linearly over the time limit; doubled on extreme rounds. */
+/** Fixed knowledge points before the deadline; doubled on extreme rounds. */
 export function extremePoints(elapsedMs: number, extreme: boolean) {
-  const speed = Math.max(0, 1 - elapsedMs / EXTREME_GEOGRAPHY.timeLimitMs);
-  return Math.round((EXTREME_GEOGRAPHY.correct + EXTREME_GEOGRAPHY.maxSpeedBonus * speed) * (extreme ? EXTREME_GEOGRAPHY.extremeMultiplier : 1));
+  return elapsedMs >= EXTREME_GEOGRAPHY.timeLimitMs ? 0 : EXTREME_GEOGRAPHY.correct * (extreme ? EXTREME_GEOGRAPHY.extremeMultiplier : 1);
 }
 
 export function createExtremeRun(pool: readonly TrialCountry[], seed: string, difficulty: AtlasDifficulty): ExtremeRun {
@@ -53,7 +52,7 @@ export function createExtremeRun(pool: readonly TrialCountry[], seed: string, di
 /** `countryId === null` is a timeout. Only the first answer of a round counts. */
 export function answerExtreme(run: ExtremeRun, countryId: string | null, elapsedMs: number): ExtremeRun {
   if (run.phase !== "answering" || (countryId !== null && !run.round.countryIds.includes(countryId))) return run;
-  const correct = countryId === run.round.answerId, points = correct ? extremePoints(elapsedMs, run.round.extreme) : 0, streak = correct ? run.streak + 1 : 0;
+  const correct = elapsedMs < EXTREME_GEOGRAPHY.timeLimitMs && countryId === run.round.answerId, points = correct ? extremePoints(elapsedMs, run.round.extreme) : 0, streak = correct ? run.streak + 1 : 0;
   return { ...run, phase: "revealed", picked: countryId, correct, score: run.score + points, correctCount: run.correctCount + Number(correct), streak, bestStreak: Math.max(run.bestStreak, streak), lastPoints: points };
 }
 export function nextExtremeRound(run: ExtremeRun, pool: readonly TrialCountry[]): ExtremeRun {

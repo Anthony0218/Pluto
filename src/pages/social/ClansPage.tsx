@@ -9,7 +9,7 @@ import { groupAvatars } from "@/components/social/groupAvatarManifest";
 import ClanChat from "@/components/social/ClanChat";
 import UserLink from "@/components/social/UserLink";
 import { shareRoomWithClan } from "@/components/social/clanShare";
-import { getInviteDestination, getInviteGameLabel } from "@/components/social/inviteRoute";
+import { acceptInviteState, getInviteDestination, getInviteGameLabel } from "@/components/social/inviteRoute";
 import { ui, useUiLanguage } from "@/i18n/ui";
 
 type Group = { id: string; name: string; description: string; avatar_id: string; owner_id: string; invite_code: string; created_at: string };
@@ -152,7 +152,7 @@ export default function ClansPage() {
     if (invite.game_route) {
       // The game's own lobby checks the seats and refuses a full one.
       setBusy(false);
-      navigate(getInviteDestination({ game: invite.game, gameCode: invite.room_code, gameRoute: invite.game_route }, { autoJoin: true }));
+      navigate(getInviteDestination({ game: invite.game, gameCode: invite.room_code, gameRoute: invite.game_route }, { autoJoin: true }), { state: acceptInviteState() });
     } else if (invite.game === "chess") {
       const result = await supabase.rpc("join_chess_room", { p_code: invite.room_code, p_display_name: displayName });
       setBusy(false);

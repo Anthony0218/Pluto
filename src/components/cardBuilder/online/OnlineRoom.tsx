@@ -84,6 +84,20 @@ export default function OnlineRoom({ code }: { code: string }) {
     }
   };
 
+  // An accepted invite (`?join=1`) takes a free seat as soon as the lobby has loaded.
+  const joinOnArrival = useRef(new URLSearchParams(window.location.search).get("join") === "1");
+  useEffect(() => {
+    if (!joinOnArrival.current || busy || !room || room.member || room.status !== "waiting" || room.capacity - room.seats.length <= 0) return;
+    joinOnArrival.current = false;
+    const params = new URLSearchParams(window.location.search);
+    params.delete("join");
+    const query = params.toString();
+    window.history.replaceState(window.history.state, "", `${window.location.pathname}${query ? `?${query}` : ""}`);
+    void perform(() => joinRoom(code));
+    // `perform` only closes over stable state setters and `code`.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room, busy, code]);
+
   const leave = async () => {
     setBusy(true);
     try {

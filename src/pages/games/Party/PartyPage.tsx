@@ -1,6 +1,7 @@
 import FinalResults from "./FinalResults.tsx";
 import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
-import { recordCreatedGameInviteCode, useCreatedGameInvite } from "@/components/social/GameInviteDelivery";
+import { recordCreatedGameInviteCode } from "@/components/social/GameInviteDelivery";
+import { usePublishRoom } from "@/components/social/currentRoom";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Settings2, Sparkles, X } from "lucide-react";
@@ -17,6 +18,7 @@ import { usePartyAudio } from "./usePartyAudio.ts";
 import { prefersReducedMotion } from "../../../games/party/client/preferences.ts";
 import { isMinigameScreenPhase } from "../../../games/party/minigames/flow.ts";
 import { mapRegistry } from "../../../games/party/content/maps.ts";
+import { normalizeLobbyCode } from "../../../games/party/network/protocol.ts";
 import "./party.css";
 export default function PartyPage() {
   return (
@@ -47,7 +49,7 @@ function useViewportFitCover() {
 }
 function PartyApp() {
   const connection = usePartyConnection();
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
   const configuredRoom = useRef<string | null>(null);
   useInviteAutoCreate(() => connection.send({ type: "CREATE", name: "Friends party", playerName: "Explorer", public: false }), connection.status === "online" && !connection.lobby);
   useEffect(() => {
@@ -59,16 +61,30 @@ function PartyApp() {
   useEffect(() => {
     if (connection.lobby && connection.lobby.hostId === connection.playerId) recordCreatedGameInviteCode(connection.lobby.code, "/games/pluto-party");
   }, [connection.lobby, connection.playerId]);
-  const createdInvite = useCreatedGameInvite(connection.lobby ? { lobbyRoute: "/games/pluto-party", code: connection.lobby.code } : null);
+  // The open lobby is the room friends are invited to. Accepting an invite elsewhere gives the seat up
+  // right away; a seat in a running match stays, so the player can still come back to it.
+  usePublishRoom(connection.lobby ? { lobbyRoute: "/games/pluto-party", code: connection.lobby.code } : null, () => {
+    if (connection.lobby && !connection.lobby.match) connection.send({ type: "LEAVE" });
+  });
   const invitedCode = params.get("code");
   const inviteStarted = useRef(false);
+  const leftForInvite = useRef(false);
   useEffect(() => {
-    if (connection.status !== "online" || connection.lobby || inviteStarted.current || params.get("join") !== "1" || !invitedCode) return;
+    if (connection.status !== "online" || inviteStarted.current || params.get("join") !== "1" || !invitedCode) return;
+    const sameLobby = connection.lobby?.code === normalizeLobbyCode(invitedCode);
+    if (connection.lobby && !sameLobby) {
+      // A session sits in one lobby: the one it resumed is left for the invited lobby.
+      if (!leftForInvite.current) { leftForInvite.current = true; connection.send({ type: "LEAVE" }); }
+      return;
+    }
     inviteStarted.current = true;
+    // The invite is used up, so a refresh never leaves a later lobby for this one.
+    setParams((current) => { const next = new URLSearchParams(current); next.delete("join"); return next; }, { replace: true });
+    if (sameLobby) return;
     let playerName = "Explorer";
     try { playerName = localStorage.getItem("pluto-party-name") || playerName; } catch { /* The default name still joins. */ }
     connection.send({ type: "JOIN", code: invitedCode, playerName });
-  }, [connection, invitedCode, params]);
+  }, [connection, invitedCode, params, setParams]);
   const { status, lobby, error, errorCode, clearError, playerId, serverOffset, retry } = connection;
   const [settingsOpen, setSettingsOpen] = useState(false);
   const closeSettings = useCallback(() => setSettingsOpen(false), []);
@@ -83,7 +99,6 @@ function PartyApp() {
       data-motion={reduced ? "reduce" : "full"}
       data-hints={prefs.controlHints ? "on" : "off"}
     >
-      {createdInvite.status && <div className="pp-alert" role={createdInvite.failed ? "alert" : "status"}>{createdInvite.status}{createdInvite.failed && <button onClick={createdInvite.retry}>Retry invite</button>}</div>}
       <header className="pp-header">
         <Link to="/games" className="pp-back">
           <ArrowLeft size={17} /> Games

@@ -59,6 +59,9 @@ export default function PartyMinigame({
           <button onClick={() => setConfirmLeave(true)}>Leave</button>
         )}
       </div>
+      {match.mode === "festival" && <div className="pp-festival-standings" aria-label="Festival standings">
+        {[...match.players].sort((a, b) => (match.festivalScores?.[b.id] ?? 0) - (match.festivalScores?.[a.id] ?? 0)).map((p) => <span key={p.id} className={p.id === playerId ? "me" : ""}><strong>{p.name}</strong><b>★ {match.festivalScores?.[p.id] ?? 0}</b></span>)}
+      </div>}
       {match.mode !== "festival" && match.players.find((p) => p.id === playerId) && <ItemShop match={match} player={match.players.find((p) => p.id === playerId)!} connection={connection}/>}
       {playing && participant && LANDSCAPE_GAMES.has(minigame.minigameId) && <OrientationHint />}
       <div className="pp-card mg-stage">

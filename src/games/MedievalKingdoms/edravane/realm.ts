@@ -1,5 +1,6 @@
 import type { Campaign, CharacterSkills, ChronicleEvent, House, Person, SuccessionLaw, Trait } from "./types.ts";
 import { NATIONS } from "./world.ts";
+import { calendarYear } from "./calendar.ts";
 
 export const TRAITS: Record<Trait, string> = {
   ambitious: "Seeks power; rival claims and offices matter more.",
@@ -85,7 +86,8 @@ export function successionPreview(s: Campaign, h: House) {
   const candidates = successionCandidates(s, h);
   const next = candidates.find((p) => p.id === h.designatedHeir) ?? candidates[0];
   const vassals = s.houses.filter((v) => v.liege === h.id && !v.rebellion);
-  const supporters = vassals.filter((v) => v.loyalty >= 60 || !!v.contract?.office || ruler(v)?.traits?.includes("loyal"));
+  const sworn = (s.agreements?.compacts ?? []).filter((c) => c.status === "active" && c.covenant === "heir-support" && c.from === h.id).map((c) => s.houses.find((v) => v.id === c.to)!).filter(Boolean);
+  const supporters = [...vassals.filter((v) => v.loyalty >= 60 || !!v.contract?.office || ruler(v)?.traits?.includes("loyal")), ...sworn.filter((v) => !vassals.some((x) => x.id === v.id))];
   const opposition = vassals.filter((v) => !supporters.includes(v));
   const law = h.successionLaw ?? "primogeniture";
   const recognized = law === "elective" ? h.legitimacy >= 40 && (!vassals.length || supporters.length > vassals.length / 2) :
@@ -97,6 +99,10 @@ export function succeed(s: Campaign, h: House, forced = false) {
   const preview = successionPreview(s, h);
   if (!preview.next || (!preview.recognized && !forced)) throw Error("No recognized heir: raise legitimacy or secure a majority of council support");
   const former = ruler(h)!;
+  if (s.agreements?.domestic[h.id]) {
+    s.agreements.domestic[h.id].successions++;
+    s.agreements.domestic[h.id].successionSupport = preview.supporters.length;
+  }
   former.alive = false;
   h.ruler = preview.next.id;
   h.legitimacy = clamp(h.legitimacy - 10);
@@ -162,8 +168,9 @@ export function advanceRealm(s: Campaign, nation?: string) {
   }
 }
 export function growDynasties(s: Campaign) {
-  if (!s.strategyRules || s.tick % 120) return;
-  const year = Math.floor(s.tick / 120);
+  const year = calendarYear(s);
+  if (!s.strategyRules || (s.agreements ? year <= s.agreements.calendar.bornYear : s.tick % 120 !== 0)) return;
+  if (s.agreements) s.agreements.calendar.bornYear = year;
   for (const h of s.houses) {
     for (const mother of h.family.filter((p) => p.alive && p.gender === "female" && p.age >= 18 && p.age <= 40 && p.spouse && !p.imprisonedBy)) {
       const father = s.houses.flatMap((v) => v.family).find((p) => p.id === mother.spouse && p.alive && p.gender === "male" && !p.imprisonedBy && p.spouse === mother.id);

@@ -5,7 +5,7 @@ import { supplyConnection } from "../../../games/MedievalKingdoms/edravane/logis
 import { hasMarriagePact } from "../../../games/MedievalKingdoms/edravane/politics.ts";
 import { territoryControl } from "./mapPresentation.ts";
 import { visibleMapDistricts } from "./mapViewport.ts";
-import { TerrainTile } from "./TerrainTile.tsx";
+import { TerrainRelief, TerrainTile } from "./TerrainTile.tsx";
 
 const points = (d: District, inset = 0) => {
   const [x, y] = center(d);
@@ -46,6 +46,7 @@ export const HexFields = memo(function HexFields({ view, house, overlay, regiona
             }
             if (overlay === "diplomacy" && controlling) fill = controlling.nation === house.nation ? "#b8a365" : view.wars.includes([house.nation, controlling.nation].sort().join("|")) ? "#97605b" : hasMarriagePact(view, house, controlling.nation) ? "#628c9b" : "#798577";
             if (overlay === "claims" && controlling) fill = controlling.nation === house.nation ? "#b8a365" : house.family.some((p) => p.alive && (p.claim === controlling.nation || p.claims?.includes(controlling.nation))) ? "#967cac" : "#798577";
+            if (overlay === "objectives" && controlling) fill = view.agreements?.landmarks.some((l) => l.hex === d.id) ? "#b2a164" : controlling.nation === house.nation ? "#64876b" : "#69786c";
             return (
               <g
                 key={d.id}
@@ -84,11 +85,13 @@ export const HexFields = memo(function HexFields({ view, house, overlay, regiona
                   />
                 )}
                 {overlay === "terrain" && landControl === "domain" && <polygon points={points(d)} fill="#f1cc70" opacity=".12" pointerEvents="none" />}
+                {!mini && !regional && d.nation && <g transform={`translate(${x},${y})`} pointerEvents="none"><TerrainRelief d={d} /></g>}
                 {!mini && d.biome !== "legacy" && (regional || NATIONS.some((n) => n.capital === d.id)) && (
                   <g transform={`translate(${x},${y})`}>
                     <TerrainTile d={d} />
                   </g>
                 )}
+                {!mini && regional && overlay === "resources" && d.owner && <text x={x} y={y + 20} textAnchor="middle" fontSize="6" fill="#fff4d5" stroke="#19352a" strokeWidth="2" paintOrder="stroke" pointerEvents="none">{d.resource} · {d.development ?? 0}/3</text>}
                 {d.owner && regional && landControl === "foreign" && (
                   <polygon
                     points={points(d, 1.4)}

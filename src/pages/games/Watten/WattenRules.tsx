@@ -1,3 +1,4 @@
+import { GEHEN_RULE } from "@/games/watten/useGehenText";
 import { useAppLanguage } from "@/i18n/languageStore";
 import "./wattenMenus.css";
 import { useCallback, useMemo, useState, type ReactNode } from "react";
@@ -948,7 +949,7 @@ export default function WattenRule() {
                       "The opposing side can",
                     )}
                     <strong className="text-emerald-300">
-                      {l(" halten", " hold")}
+                      {l(" halten", " stay")}
                     </strong>
                     {l(
                       ". Dann wird um den neuen Wert weitergespielt.",
@@ -961,6 +962,10 @@ export default function WattenRule() {
                       "Wird nicht gehalten, gewinnt die Seite, die erhöht hat, die\n                    Runde zum bisher gültigen Rundenwert.",
                       "If the raise is declined, the raising side wins the round at the previously accepted round value.",
                     )}
+                  </p>
+
+                  <p className="font-semibold text-amber-200">
+                    {t(GEHEN_RULE)}
                   </p>
                 </RulePanel>
 

@@ -7,15 +7,16 @@ export function seriesLength(value: unknown): SeriesLength {
 
 export const seriesLabel = (length: number) => length === 1 ? "One game" : `Best of ${length}`;
 
-/** Draw without replacement, include the roulette selection, then shuffle every position. */
+/** Draw without replacement, keep the roulette selection first, then draw the remaining modes. */
 export function chooseRandomModes(modes: readonly string[], length: SeriesLength, included?: string, random = Math.random): string[] {
   const available = [...new Set(modes)];
   if (available.length < length) throw new Error("Not enough different modes for this series.");
   const order: string[] = [];
   if (included && available.includes(included)) order.push(...available.splice(available.indexOf(included), 1));
   while (order.length < length) order.push(...available.splice(Math.min(available.length - 1, Math.floor(random() * available.length)), 1));
-  for (let index = order.length - 1; index > 0; index--) {
-    const swap = Math.floor(random() * (index + 1));
+  for (let index = order.length - 1; index > (included && modes.includes(included) ? 1 : 0); index--) {
+    const first = included && modes.includes(included) ? 1 : 0;
+    const swap = first + Math.floor(random() * (index + 1 - first));
     [order[index], order[swap]] = [order[swap], order[index]];
   }
   return order;

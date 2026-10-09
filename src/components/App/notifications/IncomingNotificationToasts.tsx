@@ -5,8 +5,9 @@ import { useAuth } from "@/context/AuthContext";
 import { useDashboardData, type DashboardNotification } from "@/hooks/useDashboardData";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import FriendAvatar from "@/components/social/FriendAvatar";
-import { getInviteDestination, getInviteGameLabel } from "@/components/social/inviteRoute";
-import { isClanNotification, notificationDestination, respondToSpectateRequest } from "@/components/social/notificationActions";
+import { acceptInviteState, getInviteDestination, getInviteGameLabel } from "@/components/social/inviteRoute";
+import { isClanNotification, notificationDestination, notificationRoomCode, respondToSpectateRequest } from "@/components/social/notificationActions";
+import { leaveCurrentRoom } from "@/components/social/currentRoom";
 import DashboardFriendDialog from "../dashboard/DashboardFriendDialog";
 import { markNotificationsSeen, useClanPopupsMuted, useDoNotDisturb, useSeenNotificationIds } from "./notificationState";
 
@@ -58,12 +59,15 @@ function ToastStack({ userId }: { userId: string }) {
   function accept(item: DashboardNotification) {
     if (!item.gameCode) return;
     markNotificationsSeen(userId, [item.id]);
-    navigate(getInviteDestination({ game: item.game, gameCode: item.gameCode, gameRoute: item.gameRoute }, { autoJoin: true }));
+    leaveCurrentRoom(item.gameCode);
+    navigate(getInviteDestination({ game: item.game, gameCode: item.gameCode, gameRoute: item.gameRoute }, { autoJoin: true }), { state: acceptInviteState() });
   }
   function decline(item: DashboardNotification) { markNotificationsSeen(userId, [item.id]); }
   function open(item: DashboardNotification) {
     markNotificationsSeen(userId, [item.id]);
-    navigate(notificationDestination(item));
+    const roomCode = notificationRoomCode(item);
+    if (roomCode) leaveCurrentRoom(roomCode);
+    navigate(notificationDestination(item), { state: acceptInviteState() });
   }
   async function answerSpectate(item: DashboardNotification, accept: boolean) {
     if (!item.spectateRequestId) return;

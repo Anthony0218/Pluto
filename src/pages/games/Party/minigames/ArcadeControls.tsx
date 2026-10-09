@@ -1,0 +1,6 @@
+export function HoldButton({ label, name, active, controlKey, change }: { label: string; name: string; active: boolean; controlKey: string; change: (key: string, held: boolean) => void }) {
+  return <button type="button" disabled={!active} aria-label={name} onPointerDown={(e) => { e.preventDefault(); e.currentTarget.setPointerCapture(e.pointerId); change(controlKey, true); }} onPointerUp={() => change(controlKey, false)} onPointerCancel={() => change(controlKey, false)} onLostPointerCapture={() => change(controlKey, false)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); change(controlKey, true); } }} onKeyUp={(e) => { if (e.key === 'Enter') change(controlKey, false); }}>{label}</button>;
+}
+export function DirectionPad({ active, change }: { active: boolean; change: (key: string, held: boolean) => void }) {
+  return <div className="pp-new-direction" aria-label="Movement"><HoldButton active={active} controlKey="KeyW" label="↑" name="Move up" change={change}/><HoldButton active={active} controlKey="KeyA" label="←" name="Move left" change={change}/><HoldButton active={active} controlKey="KeyS" label="↓" name="Move down" change={change}/><HoldButton active={active} controlKey="KeyD" label="→" name="Move right" change={change}/></div>;
+}

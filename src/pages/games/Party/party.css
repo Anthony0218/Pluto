@@ -394,8 +394,6 @@
   display: grid;
   gap: 13px;
 }
-.pp-page .pp-slot .room-invite-button { margin-top:0; color:#203a3d; background:#e3edb8; border-color:#bdcc87; box-shadow:none; }
-.pp-page .pp-slot .room-invite-button:hover { background:#d5e698; }
 .pp-slot {
   display: flex;
   align-items: center;
@@ -3609,6 +3607,118 @@ body:has(.pp-immersive) button[aria-label="Open sidebar"] { display:none; }
 .pp-page .pp-mode-picker button { display:flex; flex-direction:column; align-items:flex-start; text-align:left; padding:14px 10px; min-height:95px; background:#eef1e8; }
 .pp-mode-picker button.selected { border:2px solid #358c7d; background:#dbefe6; }
 .pp-mode-picker small { font-size:11px; font-weight:400; }
+/* Cosmic arcade arenas use the same layout during practice and live play. */
+.pp-arcade-game { display:flex; flex-direction:column; gap:10px; height:calc(100dvh - 160px); min-height:530px; padding:18px; background:radial-gradient(ellipse at top,#263652,#111b2d); color:#ecf5fc; }
+.pp-arcade-header { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-shrink:0; }
+.pp-arcade-header h2 { margin:4px 0; font-size:26px; line-height:1.1; }
+.pp-arcade-header .pp-eyebrow { font-size:9px; color:#a8c9d7; }
+.pp-arcade-header > strong { padding:8px 12px; border:1px solid #aacdde55; border-radius:12px; font-size:21px; color:#fff0c7; }
+.pp-arcade-objective { flex-shrink:0; padding:10px 14px; border:1px solid #86cdd455; border-radius:12px; background:#28465c; font-size:13px; line-height:1.45; text-align:center; font-weight:750; }
+.pp-arcade-objective.freeze { color:#ffdeca; background:#69374b; border-color:#ffb1b2; }
+.pp-arcade-world { display:block; flex:1; min-height:0; width:100%; border-radius:16px; background:#10182e; }
+.pp-arcade-controls { display:flex; align-items:center; justify-content:center; gap:12px; flex-shrink:0; }
+.pp-arcade-controls > div { display:flex; gap:7px; }
+.pp-page .pp-arcade-controls button { min-width:48px; min-height:48px; padding:9px; touch-action:none; user-select:none; border-color:#aac9d478; background:#2b465e; color:#f1f7fc; font-size:20px; }
+.pp-page .pp-arcade-controls > button { background:#5b4679; font-size:14px; min-width:80px; }
+.pp-arcade-scores { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; flex-shrink:0; }
+.pp-arcade-scores > div { display:flex; align-items:center; gap:6px; min-width:0; padding:9px; background:#294256; border-radius:9px; font-size:12px; }
+.pp-arcade-scores .me { box-shadow:inset 0 0 0 1.5px #9be2d2; }
+.pp-arcade-scores i { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.pp-arcade-scores span { min-width:0; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pp-arcade-scores b { color:#ffedb8; flex-shrink:0; }
+.pp-arcade-scores small { display:block; color:#bed4db; font-size:9px; }
+.pp-arcade-hint { margin:0; text-align:center; color:#b8d3dc; font-size:11px; line-height:1.4; flex-shrink:0; }
+.pp-immersive .pp-arcade-game { height:100%; padding:14px max(12px,calc((100vw - 1100px)/2)); }
+.pp-immersive .mg-practice-box > .pp-arcade-game { padding:12px; }
+.pp-souvenir-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); grid-template-rows:repeat(2,minmax(0,1fr)); gap:12px; flex:1; min-height:0; }
+.pp-page .pp-souvenir-grid button { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; min-width:0; min-height:0; padding:10px; border:2px solid #8caeb84d; border-radius:16px; background:#203d52; color:#eaf5fe; }
+.pp-page .pp-souvenir-grid button:disabled { opacity:1; }
+.pp-souvenir-grid svg { flex:1; min-height:0; width:100%; max-height:220px; }
+.pp-souvenir-number { font-size:10px; font-weight:800; margin-top:4px; }
+.pp-page .pp-souvenir-grid button.chosen { border-color:#dcb9fc; }
+.pp-page .pp-souvenir-grid button.changed { border-color:#a7e5a9; background:#2d564f; }
+.pp-blackout-mark { font-size:54px; color:#bfb1e3; }
+.pp-souvenir-grid.blackout button { background:#151a2e; }
+.pp-penalty-buttons { display:flex; justify-content:center; gap:8px; flex-shrink:0; }
+.pp-page .pp-penalty-buttons button { min-height:44px; flex:1; padding:10px; font-size:12px; color:#e9f7fd; background:#294b5d; border:1px solid #94c6cb66; }
+.pp-page .pp-penalty-buttons button.selected { border-color:#fff0ae; background:#4f5961; }
+.pp-penalty-kick { display:flex; align-items:center; gap:15px; flex-shrink:0; }
+.pp-penalty-kick > div { flex:1; min-width:0; }
+.pp-penalty-kick span { display:block; font-size:11px; color:#c4dcdf; margin-bottom:8px; }
+.pp-page .pp-penalty-kick button { background:#ead195; color:#213c50; min-height:44px; font-weight:850; }
+.pp-power-track { position:relative; height:13px; border-radius:7px; background:#785963; overflow:hidden; }
+.pp-power-good { position:absolute; left:22%; width:68%; top:0; bottom:0; background:#67ab8c; }
+.pp-power-marker { position:absolute; top:0; bottom:0; width:4px; transform:translateX(-50%); background:#fff5d6; }
+@media(max-width:600px) {
+ .pp-immersive .pp-arcade-game { padding:10px; gap:8px; }
+ .pp-arcade-header h2 { font-size:22px; }
+ .pp-arcade-header .pp-eyebrow { font-size:8px; }
+ .pp-arcade-header > strong { font-size:16px; padding:6px 8px; }
+ .pp-arcade-objective { font-size:11px; padding:8px; }
+ .pp-arcade-scores { grid-template-columns:repeat(2,minmax(0,1fr)); gap:5px; }
+ .pp-arcade-scores > div { padding:6px 8px; font-size:11px; }
+ .pp-arcade-controls { gap:8px; }
+ .pp-page .pp-arcade-controls button { min-width:43px; min-height:46px; }
+ .pp-page .pp-arcade-controls > button { min-width:70px; font-size:12px; }
+ .pp-souvenir-grid { gap:7px; }
+ .pp-page .pp-souvenir-grid button { padding:7px 3px; border-radius:12px; }
+ .pp-souvenir-number { font-size:8px; }
+}
+@media(max-height:520px) and (min-width:601px) {
+ .pp-immersive .pp-arcade-game { padding:6px 12px; gap:4px; }
+ .pp-arcade-header h2 { font-size:19px; }
+ .pp-arcade-header .pp-eyebrow,.pp-arcade-hint { display:none; }
+ .pp-arcade-objective { padding:4px; font-size:10px; }
+ .pp-page .pp-arcade-controls button { min-height:35px; padding:5px; }
+ .pp-arcade-scores > div { padding:4px 8px; }
+}
+.pp-lobby-mode { border:0; padding:0; margin:0 0 24px; }
+.pp-lobby-mode legend { font-size:12px; font-weight:800; margin-bottom:10px; }
+.pp-lobby-columns > .pp-settings { align-self:start; }
+.pp-minigame-catalog { margin-top:24px; }
+.pp-minigame-catalog header { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.pp-minigame-catalog h2,.pp-festival-scoring h2 { font-size:24px; margin:7px 0 12px; }
+.pp-minigame-catalog h2 span { font-size:13px; padding:4px 9px; border-radius:20px; background:#e3eddf; vertical-align:middle; }
+.pp-minigame-catalog p,.pp-festival-scoring p { font-size:12px; line-height:1.6; color:var(--muted); }
+.pp-catalog-count { padding:7px 10px; border-radius:20px; background:#dbefe6; color:#24574a; font-size:12px; font-weight:800; }
+.pp-catalog-tools { display:grid; grid-template-columns:minmax(0,1fr) minmax(140px,.65fr); gap:12px; }
+.pp-catalog-tools input,.pp-catalog-tools select { min-width:0; }
+.pp-catalog-lineup { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:12px 0; }
+.pp-catalog-lineup small,.pp-minigame-catalog > small { color:var(--muted); font-size:11px; line-height:1.5; }
+.pp-page .pp-catalog-lineup button { flex-shrink:0; font-size:11px; padding:8px 10px; }
+.pp-catalog-list { max-height:430px; overflow:auto; overscroll-behavior:contain; scrollbar-gutter:stable; border:1px solid var(--line); border-radius:12px; margin:12px 0; }
+.pp-catalog-game { display:flex; align-items:flex-start; gap:12px; padding:14px; }
+.pp-catalog-game + .pp-catalog-game { border-top:1px solid var(--line); }
+.pp-catalog-game details { min-width:0; flex:1; }
+.pp-catalog-game summary { cursor:pointer; font-size:13px; line-height:1.5; }
+.pp-catalog-game summary span { display:block; margin-top:3px; font-size:10px; color:var(--muted); }
+.pp-catalog-game ol { font-size:12px; line-height:1.65; padding-left:20px; }
+.pp-page .pp-catalog-select { display:flex; align-items:center; gap:6px; flex-shrink:0; margin:1px 0 0; font-size:10px; }
+.pp-page .pp-catalog-select input { width:18px; height:18px; margin:0; accent-color:#358c7d; }
+.pp-festival-scoring { margin-top:24px; background:#f2f4df; }
+.pp-scoring-places { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
+.pp-scoring-places div { display:flex; flex-direction:column; align-items:center; padding:12px 6px; background:#fffef8; border:1px solid var(--line); border-radius:12px; }
+.pp-scoring-places div:first-child { background:#ffe6a1; }
+.pp-scoring-places strong { font-size:27px; margin:4px 0; }
+.pp-scoring-places small,.pp-scoring-places span { font-size:11px; }
+.pp-festival-standings { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-bottom:12px; }
+.pp-festival-standings > span { display:flex; justify-content:space-between; align-items:center; gap:5px; min-width:0; padding:8px; border-radius:8px; background:#e3eddf; font-size:12px; }
+.pp-festival-standings strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pp-festival-standings b { flex-shrink:0; }
+.pp-festival-standings .me { box-shadow:inset 0 0 0 2px #358c7d; }
+.pp-immersive .pp-festival-standings { position:absolute; top:39px; left:0; right:0; height:40px; z-index:30; margin:0; padding:3px 8px; background:#102334; gap:5px; }
+.pp-immersive .pp-festival-standings > span { background:#244454; color:#fff5d9; font-size:11px; padding:5px; }
+.pp-immersive .mg-screen:has(.pp-festival-standings) .mg-stage { top:80px; }
+@media(max-width:600px) {
+ .pp-catalog-tools { grid-template-columns:1fr; gap:0; }
+ .pp-catalog-select span { display:none; }
+ .pp-catalog-lineup { align-items:flex-start; }
+ .pp-festival-standings > span { font-size:10px; }
+ .pp-slot.empty { display:grid; grid-template-columns:44px minmax(0,1fr) minmax(0,1fr); }
+ .pp-slot.empty > div { grid-column:2/-1; }
+ .pp-slot.empty > .room-invite-button { grid-column:1/3; }
+ .pp-slot.empty > button { min-width:0; justify-content:center; }
+}
 .pp-lineup { margin:16px 0; padding:12px; border:1px solid var(--line); border-radius:12px; }
 .pp-lineup summary { font-size:12px; font-weight:800; cursor:pointer; }
 .pp-lineup p { font-size:11px; line-height:1.5; }
@@ -3676,3 +3786,47 @@ body:has(.pp-immersive) button[aria-label="Open sidebar"] { display:none; }
   .pp-board-tools .pp-camera span { display:none; }
   .pp-immersive .pp-board-access { bottom:16px; }
 }
+
+/* Arcade duels, labyrinth and the honeycomb moon puzzle. */
+.pp-new-game { width: min(100%, 650px); margin: 0 auto; color: #eef4ff; padding: clamp(12px, 2.5vw, 24px); }
+.pp-new-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.pp-new-header h2 { margin: 4px 0 0; font-size: clamp(21px, 4vw, 30px); line-height: 1.15; }
+.pp-new-timer { display: grid; justify-items: center; min-width: 74px; font-size: 28px; color: #ffda9b; font-variant-numeric: tabular-nums; }
+.pp-new-timer small { font-size: 9px; letter-spacing: .12em; color: #b0bfd8; }
+.pp-new-standings { display: flex; gap: 7px; margin-bottom: 12px; flex-wrap: wrap; }
+.pp-new-standings > span { flex: 1 1 100px; display: flex; justify-content: space-between; gap: 8px; padding: 8px 10px; border: 1px solid; border-radius: 10px; background: #142239; font-size: 12px; min-width: 0; }
+.pp-new-standings > span.me { background: #263952; box-shadow: inset 0 0 0 1px #d6e8ff33; }
+.pp-new-standings b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pp-new-arena { display: block; width: 100%; aspect-ratio: 1; border: 1px solid #64759666; border-radius: 18px; overflow: hidden; background: #101b31; touch-action: none; user-select: none; }
+.pp-new-status { min-height: 34px; margin: 10px 0; text-align: center; color: #ffe1b5; font-size: 13px; line-height: 1.5; }
+.pp-new-controls { display: flex; gap: 10px; align-items: center; justify-content: center; flex-wrap: wrap; }
+.pp-new-controls button { min-height: 44px; min-width: 44px; padding: 10px 13px; border: 1px solid #7e9ac2; border-radius: 12px; color: #f3f6ff; background: #263b58; touch-action: none; user-select: none; font-weight: 750; }
+.pp-new-controls button:active { background: #456784; }
+.pp-new-controls button:disabled { opacity: .45; }
+.pp-new-controls button:focus-visible { outline: 2px solid #ffdc95; outline-offset: 2px; }
+.pp-new-direction, .pp-new-aim { display: grid; grid-template-columns: repeat(3, 44px); grid-template-rows: repeat(2, 44px); gap: 3px; }
+.pp-new-direction > :first-child, .pp-new-aim > :first-child { grid-column: 2; }
+.pp-new-direction > :nth-child(2), .pp-new-aim > :nth-child(2) { grid-column: 1; grid-row: 2; }
+.pp-new-direction > :nth-child(3), .pp-new-aim > :nth-child(3) { grid-column: 2; grid-row: 2; }
+.pp-new-direction > :nth-child(4), .pp-new-aim > :nth-child(4) { grid-column: 3; grid-row: 2; }
+.pp-new-aim button { border-color: #bf9dca; background: #443655; }
+.pp-new-help { display: block; margin-top: 12px; color: #9cacc5; text-align: center; font-size: 11px; line-height: 1.6; }
+.pp-maze-stage { position: relative; }
+.pp-maze-map { position: absolute; width: 28%; right: 10px; top: 10px; padding: 6px; border: 1px solid #978ba1; border-radius: 10px; background: #171326f2; text-align: center; pointer-events: none; }
+.pp-maze-map.revealing { border-color: #9af3d9; box-shadow: 0 0 20px #71f2d333; }
+.pp-maze-map svg { display: block; width: 100%; margin: 5px 0; border-radius: 4px; }
+.pp-maze-map span, .pp-maze-map small { display: block; color: #e6d9e8; font-size: clamp(7px, 1.4vw, 10px); }
+.pp-cascade-game .pp-new-arena { border-radius: 24px; }
+@media (max-width: 480px) {
+  .pp-new-game { padding: 10px 5px; }
+  .pp-new-standings { gap: 5px; }
+  .pp-new-standings > span { flex-basis: 40%; font-size: 11px; padding: 6px 8px; }
+  .pp-new-header .pp-eyebrow { font-size: 9px; }
+  .pp-new-controls { gap: 6px; }
+  .pp-new-controls button { padding: 9px; }
+  .pp-maze-map { right: 6px; top: 6px; width: 30%; padding: 4px; }
+}
+/* Keep the arena and its controls in reach on short desktop and phone viewports. */
+.pp-new-arena { width: min(100%, max(220px, calc(100svh - 360px))); margin: 0 auto; }
+.pp-maze-stage { width: min(100%, max(220px, calc(100svh - 360px))); margin: 0 auto; }
+.pp-maze-stage .pp-new-arena { width: 100%; }
