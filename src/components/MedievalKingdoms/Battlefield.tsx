@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -101,6 +102,7 @@ export default function Battlefield({
   backPath = "/games/medieval-kingdoms/legacy",
   onVictory,
 }: Props) {
+  useGameLanguage();
   const navigate = useNavigate();
   const battle = BATTLES[battleId] ?? BATTLES["falcon-bridge"];
   const [game, setGame] = useState(() => createInitialBattleState(battle.id));
@@ -1028,21 +1030,18 @@ export default function Battlefield({
     <div className="mx-auto w-full max-w-[1500px] text-[#f4e4c1]">
       <div className="mb-4 flex items-center justify-between gap-4">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#d3a448]">
-            Medieval Kingdoms
-          </p>
-          <h1 className="text-3xl font-black text-[#ffe7ad]">{battle.name}</h1>
-          <p className="text-sm text-[#bba17a]">
-            Round {game.round} · {battle.subtitle}
+          <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#d3a448]">{gameUi(" Medieval Kingdoms ")}</p>
+          <h1 className="text-3xl font-black text-[#ffe7ad]">{gameUi(battle.name)}</h1>
+          <p className="text-sm text-[#bba17a]">{gameUi(" Round ")}{gameUi(game.round)} · {gameUi(battle.subtitle)}
           </p>
 
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <span className="rounded-full border border-[#c89b4f] bg-[#5d411f] px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-[#ffe2a0]">
-              {GAME_MODE_LABELS[gameMode]}
+              {gameUi(GAME_MODE_LABELS[gameMode])}
             </span>
 
             <span className="text-[11px] text-[#a9906c]">
-              {GAME_MODE_DESCRIPTIONS[gameMode]}
+              {gameUi(GAME_MODE_DESCRIPTIONS[gameMode])}
             </span>
           </div>
         </div>
@@ -1050,9 +1049,7 @@ export default function Battlefield({
           type="button"
           onClick={() => navigate(backPath)}
           className="rounded-xl border border-[#856239] bg-[#4a3521] px-5 py-3 font-bold text-[#f1d9aa] hover:bg-[#604526]"
-        >
-          ← Campaign Map
-        </button>
+        >{gameUi(" ← Campaign Map ")}</button>
       </div>
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_350px]">
@@ -1088,7 +1085,7 @@ export default function Battlefield({
           >
             <img
               src={battle.mapImage}
-              alt={battle.name}
+              alt={gameUi(battle.name)}
               draggable={false}
               className="block w-full select-none"
             />
@@ -1109,28 +1106,28 @@ export default function Battlefield({
               />
             ))}
 
-            {selectedUnit && selectedUnit.faction === game.activeFaction && (
+            {gameUi(selectedUnit && selectedUnit.faction === game.activeFaction && (
               <>
-                {!selectedUnit.hasMoved && (
+                {gameUi(!selectedUnit.hasMoved && (
                   <RangeZone
                     x={selectedUnit.position.x}
                     y={selectedUnit.position.y}
                     range={selectedUnit.moveRange}
                     type="move"
                   />
-                )}
-                {!selectedUnit.hasActed && (
+                ))}
+                {gameUi(!selectedUnit.hasActed && (
                   <RangeZone
                     x={selectedUnit.position.x}
                     y={selectedUnit.position.y}
                     range={selectedUnit.attackRange}
                     type="attack"
                   />
-                )}
+                ))}
               </>
-            )}
+            ))}
 
-            {ghostDirectional && (
+            {gameUi(ghostDirectional && (
               <div className="opacity-30">
                 <AttackAimOverlay
                   x={previewUnit.position.x}
@@ -1140,7 +1137,7 @@ export default function Battlefield({
                   mapAspectRatio={battle.mapAspectRatio}
                 />
               </div>
-            )}
+            ))}
             {previewAction?.kind === "attack" &&
               previewAction.id === "area" &&
               previewUnit &&
@@ -1174,7 +1171,7 @@ export default function Battlefield({
                 />
               )}
 
-            {selectedUnit &&
+            {gameUi(selectedUnit &&
               ((aimMode && aimStage === "direction") ||
                 projectile?.kind === "straight") && (
                 <AttackAimOverlay
@@ -1184,8 +1181,8 @@ export default function Battlefield({
                   angle={aimAngle}
                   mapAspectRatio={battle.mapAspectRatio}
                 />
-              )}
-            {selectedUnit &&
+              ))}
+            {gameUi(selectedUnit &&
               aimMode &&
               attackAction === "archer" &&
               aimStage === "elevation" &&
@@ -1196,8 +1193,8 @@ export default function Battlefield({
                   elevation={elevation}
                   mapAspectRatio={battle.mapAspectRatio}
                 />
-              )}
-            {selectedUnit &&
+              ))}
+            {gameUi(selectedUnit &&
               aimMode &&
               attackAction === "area" &&
               aimStage === "distance" &&
@@ -1208,15 +1205,15 @@ export default function Battlefield({
                   radius={5}
                   mapAspectRatio={battle.mapAspectRatio}
                 />
-              )}
-            {aimMode && aimStage === "meleeTiming" && meleeTarget && (
+              ))}
+            {gameUi(aimMode && aimStage === "meleeTiming" && meleeTarget && (
               <MeleeTimingOverlay
                 position={meleeTarget.position}
                 pulse={meleePulse}
                 interactive
                 onStrike={resolveMelee}
               />
-            )}
+            ))}
 
             {game.traps.map((trap) => (
               <TrapMarker
@@ -1226,7 +1223,7 @@ export default function Battlefield({
               />
             ))}
 
-            {dragPreview && selectedUnit && (
+            {gameUi(dragPreview && selectedUnit && (
               <div
                 className="pointer-events-none absolute z-[95] -translate-x-1/2 -translate-y-1/2"
                 style={{
@@ -1253,7 +1250,7 @@ export default function Battlefield({
                     height: `${(selectedUnit.tokenSize ?? 52) + 14}px`,
                   }}
                 >
-                  {selectedUnit.ringImage ? (
+                  {gameUi(selectedUnit.ringImage ? (
                     <img
                       src={selectedUnit.ringImage}
                       alt=""
@@ -1268,7 +1265,7 @@ export default function Battlefield({
                         }
                       `}
                     />
-                  ) : null}
+                  ) : null)}
 
                   <div
                     className={`
@@ -1293,11 +1290,11 @@ export default function Battlefield({
                       }
                     `}
                   >
-                    {dragPreview.legal ? "Legal move" : dragPreview.reason}
+                    {gameUi(dragPreview.legal ? "Legal move" : dragPreview.reason)}
                   </div>
                 </div>
               </div>
-            )}
+            ))}
 
             {game.units.map((unit) => (
               <div
@@ -1342,7 +1339,7 @@ export default function Battlefield({
               </div>
             ))}
 
-            {projectile && (
+            {gameUi(projectile && (
               <ProjectileOverlay
                 start={projectile.start}
                 end={projectile.end}
@@ -1351,26 +1348,26 @@ export default function Battlefield({
                 mapAspectRatio={battle.mapAspectRatio}
                 onDone={finishProjectile}
               />
-            )}
-            {pendingSpell && (
+            ))}
+            {gameUi(pendingSpell && (
               <SpellEffectOverlay
                 kind={pendingSpell.kind}
                 start={pendingSpell.start}
                 end={pendingSpell.end}
                 onDone={finishSpell}
               />
-            )}
+            ))}
             {damageEffects.map((effect, index) => (
               <DamagePopup
                 key={`${effect.targetId}-${index}`}
                 position={effect.position}
                 damage={effect.damage}
                 hit={effect.hit}
-                label={effect.label}
+                label={gameUi(effect.label)}
               />
             ))}
 
-            {selectedObject && (
+            {gameUi(selectedObject && (
               <BattlefieldObjectPanel
                 object={selectedObject}
                 selectedUnit={selectedUnit}
@@ -1378,24 +1375,21 @@ export default function Battlefield({
                 onInteract={interactWithSelectedObject}
                 onClose={() => setSelectedObjectId(null)}
               />
-            )}
+            ))}
 
-            {game.winner && (
+            {gameUi(game.winner && (
               <div className="absolute inset-0 z-[250] flex items-center justify-center bg-[#25190f]/70 backdrop-blur-sm">
                 <div className="rounded-3xl border-2 border-[#c39745] bg-[#3b2a1b] p-8 text-center">
-                  <div className="text-xs font-bold uppercase tracking-[0.3em] text-[#dcb65f]">
-                    Battle Over
-                  </div>
+                  <div className="text-xs font-bold uppercase tracking-[0.3em] text-[#dcb65f]">{gameUi(" Battle Over ")}</div>
                   <div className="mt-2 text-3xl font-black capitalize text-[#ffe4a3]">
-                    {game.winner} Victory
-                  </div>
+                    {gameUi(game.winner)}{gameUi(" Victory ")}</div>
                 </div>
               </div>
-            )}
+            ))}
           </div>
 
           <div className="mt-3 rounded-xl border border-[#755433] bg-[#3a291b] px-4 py-3 text-sm text-[#dbc49d]">
-            {message}
+            {gameUi(message)}
           </div>
           <ArmyStatusBar
             units={game.units}

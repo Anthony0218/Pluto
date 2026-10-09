@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useState } from "react";
 import type {
   Battle,
@@ -27,28 +28,26 @@ import {
 import { BIOMES } from "../../../games/MedievalKingdoms/edravane/world.ts";
 
 export function UnitGuide({ open = false }: { open?: boolean }) {
+  useGameLanguage();
   return (
     <details className="ed-unit-guide" open={open}>
-      <summary>Unit strengths & counters</summary>
-      <p>
-        Green means stronger against the target; amber means weaker. Position,
-        terrain, morale, and supplies also affect combat.
-      </p>
+      <summary>{gameUi("Unit strengths & counters")}</summary>
+      <p>{gameUi(" Green means stronger against the target; amber means weaker. Position, terrain, morale, and supplies also affect combat. ")}</p>
       <div className="ed-counter-scroll">
         <table>
-          <caption>Attacking unit → target unit · strength multiplier</caption>
+          <caption>{gameUi("Attacking unit → target unit · strength multiplier")}</caption>
           <thead>
             <tr>
-              <th>Unit</th>
+              <th>{gameUi("Unit")}</th>
               {UNIT_KINDS.map((k) => (
-                <th key={k}>{UNIT_NAMES[k]}</th>
+                <th key={k}>{gameUi(UNIT_NAMES[k])}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {UNIT_KINDS.map((k) => (
               <tr key={k}>
-                <th>{UNIT_NAMES[k]}</th>
+                <th>{gameUi(UNIT_NAMES[k])}</th>
                 {UNIT_KINDS.map((target) => {
                   const value = unitCounter(k, target);
                   return (
@@ -62,7 +61,7 @@ export function UnitGuide({ open = false }: { open?: boolean }) {
                             : ""
                       }
                     >
-                      {value.toFixed(2)}×
+                      {gameUi(value.toFixed(2))}×
                     </td>
                   );
                 })}
@@ -72,16 +71,14 @@ export function UnitGuide({ open = false }: { open?: boolean }) {
         </table>
       </div>
       <p>
-        <strong>Braced spearmen:</strong> Hold in the front makes spearmen 1.60×
-        against cavalry; cavalry falls to 0.50× against them.
-      </p>
+        <strong>{gameUi("Braced spearmen:")}</strong>{gameUi(" Hold in the front makes spearmen 1.60× against cavalry; cavalry falls to 0.50× against them. ")}</p>
       {UNIT_KINDS.map((k) => (
         <div className="ed-unit-note" key={k}>
           <strong>
-            {UNIT_NAMES[k]} · best in the {UNIT_HELP[k].position}
+            {gameUi(UNIT_NAMES[k])}{gameUi(" · best in the ")}{gameUi(UNIT_HELP[k].position)}
           </strong>
-          <span>Effective: {UNIT_HELP[k].strong}.</span>
-          <span>Vulnerable: {UNIT_HELP[k].weak}.</span>
+          <span>{gameUi("Effective: ")}{gameUi(UNIT_HELP[k].strong)}.</span>
+          <span>{gameUi("Vulnerable: ")}{gameUi(UNIT_HELP[k].weak)}.</span>
         </div>
       ))}
     </details>
@@ -102,6 +99,7 @@ export function BattleRoundPanel({
   onInspect: () => void;
   message: string;
 }) {
+  useGameLanguage();
   const [plans, setPlans] = useState<Record<string, BattlePlan>>(() =>
     Object.fromEntries(
       battle.armies.map((id) => [
@@ -138,78 +136,74 @@ export function BattleRoundPanel({
         className="ed-battle-modal ed-round-battle"
         role="dialog"
         aria-modal="true"
-        aria-label="Turn-based battle"
+        aria-label={gameUi("Turn-based battle")}
       >
         <header>
           <div>
             <span className="ed-eyebrow">
-              {battle.phase === "encounter"
+              {gameUi(battle.phase === "encounter"
                 ? "BATTLE PREVIEW"
-                : `BATTLE ROUND ${r.round}`}
+                : `BATTLE ROUND ${r.round}`)}
             </span>
-            <h2>{d.name}</h2>
+            <h2>{gameUi(d.name)}</h2>
           </div>
-          <button onClick={onInspect}>Inspect campaign</button>
+          <button onClick={onInspect}>{gameUi("Inspect campaign")}</button>
         </header>
         <p className="ed-round-status" role="status">
-          {battle.phase === "encounter"
+          {gameUi(battle.phase === "encounter"
             ? "Choose to fight or withdraw. The campaign waits for your decision."
             : r.committed.length
               ? "Orders committed. Waiting for the opposing commander; their orders remain hidden."
-              : "Choose positions and one army order. Both sides resolve together after committing."}
+              : "Choose positions and one army order. Both sides resolve together after committing.")}
         </p>
         <div className="ed-battle-summary">
           {forecast.sides.map((side, i) => (
             <article key={side.army}>
               <span className="ed-eyebrow">
-                {i === 0 ? "ATTACKER" : "DEFENDER"}
+                {gameUi(i === 0 ? "ATTACKER" : "DEFENDER")}
               </span>
-              <h3>{side.name}</h3>
+              <h3>{gameUi(side.name)}</h3>
               <dl>
                 <div>
-                  <dt>Healthy</dt>
-                  <dd>{side.healthy.toLocaleString()}</dd>
+                  <dt>{gameUi("Healthy")}</dt>
+                  <dd>{gameUi(side.healthy.toLocaleString())}</dd>
                 </div>
                 <div>
-                  <dt>Wounded</dt>
-                  <dd>{side.wounded.toLocaleString()}</dd>
+                  <dt>{gameUi("Wounded")}</dt>
+                  <dd>{gameUi(side.wounded.toLocaleString())}</dd>
                 </div>
                 <div>
-                  <dt>Readiness</dt>
-                  <dd>{side.health}%</dd>
+                  <dt>{gameUi("Readiness")}</dt>
+                  <dd>{gameUi(side.health)}%</dd>
                 </div>
                 <div>
-                  <dt>Morale</dt>
-                  <dd>{side.morale}/100</dd>
+                  <dt>{gameUi("Morale")}</dt>
+                  <dd>{gameUi(side.morale)}/100</dd>
                 </div>
                 <div>
-                  <dt>Loyalty</dt>
-                  <dd>{side.loyalty}%</dd>
+                  <dt>{gameUi("Loyalty")}</dt>
+                  <dd>{gameUi(side.loyalty)}%</dd>
                 </div>
                 <div>
-                  <dt>Supplies</dt>
-                  <dd>{side.supply}%</dd>
+                  <dt>{gameUi("Supplies")}</dt>
+                  <dd>{gameUi(side.supply)}%</dd>
                 </div>
               </dl>
               <progress
                 max={100}
                 value={side.morale}
-                aria-label={`${side.name} morale`}
+                aria-label={gameUi(`${side.name} morale`)}
               />
             </article>
           ))}
         </div>
-        <p className="ed-forecast">
-          Estimated attacker advantage: <strong>{forecast.chance}%</strong> ·
-          defender {100 - forecast.chance}%. A strength estimate, not a
-          guaranteed outcome; orders and reinforcements can change it.
-        </p>
+        <p className="ed-forecast">{gameUi(" Estimated attacker advantage: ")}<strong>{gameUi(forecast.chance)}%</strong>{gameUi(" · defender ")}{gameUi(100 - forecast.chance)}{gameUi("%. A strength estimate, not a guaranteed outcome; orders and reinforcements can change it. ")}</p>
         <div className="ed-round-layout">
           <div>
             <svg
               viewBox="0 0 600 340"
               role="img"
-              aria-label="Battle positions: protected rear, front line, and flanks"
+              aria-label={gameUi("Battle positions: protected rear, front line, and flanks")}
             >
               <rect width="600" height="340" fill={BIOMES[d.biome].color} />
               {[0, 1].map((side) => (
@@ -229,10 +223,10 @@ export function BattleRoundPanel({
                     fill="#f4e5bf"
                     fontSize="12"
                   >
-                    {side === 0 ? "ATTACKER" : "DEFENDER"}
-                    {side === 1 && d.castle
+                    {gameUi(side === 0 ? "ATTACKER" : "DEFENDER")}
+                    {gameUi(side === 1 && d.castle
                       ? ` · CASTLE LVL ${d.castle.level}`
-                      : ""}
+                      : "")}
                   </text>
                   {(["flank", "front", "rear"] as BattlePosition[]).map(
                     (position, i) => (
@@ -251,7 +245,7 @@ export function BattleRoundPanel({
                           fill="#d7c9a3"
                           fontSize="11"
                         >
-                          {position.toUpperCase()}
+                          {gameUi(position.toUpperCase())}
                         </text>
                         {battle.formations
                           .filter(
@@ -269,9 +263,9 @@ export function BattleRoundPanel({
                               fill={f.routed ? "#dba28f" : "#eee4ca"}
                               fontSize="11"
                             >
-                              {icons[f.kind]} {UNIT_NAMES[f.kind]}{" "}
-                              {Math.floor(f.count)}
-                              {f.routed ? " ↘" : ""}
+                              {gameUi(icons[f.kind])} {gameUi(UNIT_NAMES[f.kind])}{gameUi(" ")}
+                              {gameUi(Math.floor(f.count))}
+                              {gameUi(f.routed ? " ↘" : "")}
                             </text>
                           ))}
                       </g>
@@ -282,12 +276,9 @@ export function BattleRoundPanel({
             </svg>
             <div className="ed-battle-terrain">
               {terrainExplanation(state, battle.hex).map((line) => (
-                <p key={line}>{line}</p>
+                <p key={line}>{gameUi(line)}</p>
               ))}
-              <p>
-                Wounded soldiers cannot fight. At a supplied friendly city, 25%
-                recover per own turn; castles 20%, friendly camps 10%.
-              </p>
+              <p>{gameUi(" Wounded soldiers cannot fight. At a supplied friendly city, 25% recover per own turn; castles 20%, friendly camps 10%. ")}</p>
             </div>
             <UnitGuide />
           </div>
@@ -299,9 +290,9 @@ export function BattleRoundPanel({
               const committed = r.committed.includes(id);
               const reserves = reinforcementSources(state, battle, a);
               return (
-                <section key={id} aria-label={`Orders for ${a.name}`}>
-                  <h3>Your orders · {a.name}</h3>
-                  {battle.phase === "encounter" ? (
+                <section key={id} aria-label={gameUi(`Orders for ${a.name}`)}>
+                  <h3>{gameUi("Your orders · ")}{gameUi(a.name)}</h3>
+                  {gameUi(battle.phase === "encounter" ? (
                     <div className="ed-round-actions">
                       <button
                         className="ed-primary"
@@ -314,9 +305,9 @@ export function BattleRoundPanel({
                           })
                         }
                       >
-                        {battle.stood.includes(id)
+                        {gameUi(battle.stood.includes(id)
                           ? "Waiting for opponent"
-                          : "Stand and fight"}
+                          : "Stand and fight")}
                       </button>
                       <button
                         onClick={() =>
@@ -326,9 +317,7 @@ export function BattleRoundPanel({
                             army: id,
                           })
                         }
-                      >
-                        Withdraw before battle
-                      </button>
+                      >{gameUi(" Withdraw before battle ")}</button>
                     </div>
                   ) : (
                     <>
@@ -342,12 +331,12 @@ export function BattleRoundPanel({
                               className={plan.order === order ? "active" : ""}
                               onClick={() => update(id, { order })}
                             >
-                              {ORDER_NAMES[order]}
+                              {gameUi(ORDER_NAMES[order])}
                             </button>
                           ),
                         )}
                       </div>
-                      <p>{ORDER_HELP[plan.order]}</p>
+                      <p>{gameUi(ORDER_HELP[plan.order])}</p>
                       <button
                         className="ed-primary"
                         disabled={committed}
@@ -361,20 +350,19 @@ export function BattleRoundPanel({
                           })
                         }
                       >
-                        {committed
+                        {gameUi(committed
                           ? "Orders committed"
-                          : `Commit round ${r.round}`}
+                          : `Commit round ${r.round}`)}
                       </button>
                       <fieldset disabled={committed}>
-                        <legend>Deploy your troops</legend>
+                        <legend>{gameUi("Deploy your troops")}</legend>
                         {battle.formations
                           .filter((f) => f.army === id)
                           .map((f) => (
                             <label key={f.id}>
-                              {UNIT_NAMES[f.kind]} · {Math.floor(f.count)}{" "}
-                              healthy{f.routed ? " · Routed" : ""}
+                              {gameUi(UNIT_NAMES[f.kind])} · {gameUi(Math.floor(f.count))}{gameUi(" ")}{gameUi(" healthy")}{gameUi(f.routed ? " · Routed" : "")}
                               <select
-                                aria-label={`${UNIT_NAMES[f.kind]} position`}
+                                aria-label={gameUi(`${UNIT_NAMES[f.kind]} position`)}
                                 value={
                                   plan.positions[f.kind] ??
                                   defaultPosition(f.kind)
@@ -390,20 +378,19 @@ export function BattleRoundPanel({
                                   })
                                 }
                               >
-                                <option value="front">Front line</option>
-                                <option value="rear">Protected rear</option>
-                                <option value="flank">Flank</option>
+                                <option value="front">{gameUi("Front line")}</option>
+                                <option value="rear">{gameUi("Protected rear")}</option>
+                                <option value="flank">{gameUi("Flank")}</option>
                               </select>
-                              <small>
-                                Strong: {UNIT_HELP[f.kind].strong}. Weak:{" "}
-                                {UNIT_HELP[f.kind].weak}.
+                              <small>{gameUi(" Strong: ")}{gameUi(UNIT_HELP[f.kind].strong)}{gameUi(". Weak:")}{gameUi(" ")}
+                                {gameUi(UNIT_HELP[f.kind].weak)}.
                               </small>
                             </label>
                           ))}
                       </fieldset>
                     </>
-                  )}
-                  {!!reserves.length && (
+                  ))}
+                  {gameUi(!!reserves.length && (
                     <button
                       disabled={
                         committed ||
@@ -420,31 +407,29 @@ export function BattleRoundPanel({
                           reserve: reserves[0].id,
                         })
                       }
-                    >
-                      Call 100 city reserves · 10 coins · 10 food
-                    </button>
-                  )}
+                    >{gameUi(" Call 100 city reserves · 10 coins · 10 food ")}</button>
+                  ))}
                 </section>
               );
             })}
-            {message && (
+            {gameUi(message && (
               <p role="alert" className="ed-notice">
-                {message}
+                {gameUi(message)}
               </p>
-            )}
+            ))}
           </aside>
         </div>
-        {!!r.log.length && (
+        {gameUi(!!r.log.length && (
           <section
             className="ed-round-log"
-            aria-label="Battle round explanations"
+            aria-label={gameUi("Battle round explanations")}
           >
-            <h3>What happened</h3>
+            <h3>{gameUi("What happened")}</h3>
             {r.log.map((line, i) => (
-              <p key={`${r.round}-${i}`}>{line}</p>
+              <p key={`${r.round}-${i}`}>{gameUi(line)}</p>
             ))}
           </section>
-        )}
+        ))}
       </section>
     </div>
   );
@@ -456,52 +441,42 @@ export function BattleOutcome({
   report: BattleReport;
   onClose: () => void;
 }) {
+  useGameLanguage();
   return (
     <div className="ed-battle-backdrop">
       <section
         className="ed-battle-modal"
         role="dialog"
         aria-modal="true"
-        aria-label="Battle outcome"
+        aria-label={gameUi("Battle outcome")}
       >
-        <span className="ed-eyebrow">
-          BATTLE OUTCOME · {report.round} ROUNDS
-        </span>
+        <span className="ed-eyebrow">{gameUi(" BATTLE OUTCOME · ")}{gameUi(report.round)}{gameUi(" ROUNDS ")}</span>
         <h2>
-          {report.winner
+          {gameUi(report.winner
             ? `${report.winner} holds the field`
-            : "Both armies leave the field"}
+            : "Both armies leave the field")}
         </h2>
         <div className="ed-battle-summary">
           {report.sides.map((s) => (
             <article key={s.army}>
-              <h3>{s.name}</h3>
+              <h3>{gameUi(s.name)}</h3>
               <p>
-                {s.healthy.toLocaleString()} healthy survivors ·{" "}
-                {s.wounded.toLocaleString()} wounded · {s.dead.toLocaleString()}{" "}
-                dead.
-              </p>
-              {s.escaped && <p>Survivors retreat to a safe neighboring hex.</p>}
-              {!!s.captured && (
+                {gameUi(s.healthy.toLocaleString())}{gameUi(" healthy survivors ·")}{gameUi(" ")}
+                {gameUi(s.wounded.toLocaleString())}{gameUi(" wounded · ")}{gameUi(s.dead.toLocaleString())}{gameUi(" ")}{gameUi(" dead. ")}</p>
+              {s.escaped && <p>{gameUi("Survivors retreat to a safe neighboring hex.")}</p>}
+              {gameUi(!!s.captured && (
                 <p>
-                  {s.captured.toLocaleString()} soldiers captured; no safe
-                  withdrawal route remained.
-                </p>
-              )}
+                  {gameUi(s.captured.toLocaleString())}{gameUi(" soldiers captured; no safe withdrawal route remained. ")}</p>
+              ))}
             </article>
           ))}
         </div>
-        <p>
-          Wounded soldiers remain with the army. Rest on supplied friendly land
-          to recover them; cities and castles help them heal faster.
-        </p>
-        <button className="ed-primary" onClick={onClose}>
-          Return to campaign
-        </button>
+        <p>{gameUi(" Wounded soldiers remain with the army. Rest on supplied friendly land to recover them; cities and castles help them heal faster. ")}</p>
+        <button className="ed-primary" onClick={onClose}>{gameUi(" Return to campaign ")}</button>
         <details className="ed-round-log">
-          <summary>Battle explanations</summary>
+          <summary>{gameUi("Battle explanations")}</summary>
           {report.log.map((line, i) => (
-            <p key={i}>{line}</p>
+            <p key={i}>{gameUi(line)}</p>
           ))}
         </details>
       </section>

@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useState } from "react";
 import { Swords } from "lucide-react";
 import type {
@@ -42,6 +43,7 @@ export function WarActions({
   active: boolean;
   onCommand: (cmd: Command) => void;
 }) {
+  useGameLanguage();
   const [requested, setReason] = useState<WarReason>();
   const target = NATIONS.find((n) => n.id === nation)!;
   const atWar = state.wars.includes([house.nation, nation].sort().join("|"));
@@ -65,60 +67,52 @@ export function WarActions({
   return (
     <div className="ed-war-actions">
       <TreatyStatus state={state} from={house.nation} to={nation} />
-      {forecast && field && (
-        <div className="ed-attack-preview" aria-label="Battle preview">
-          <strong>
-            Battle preview · {forecast.chance}% estimated attacker advantage
-          </strong>
+      {gameUi(forecast && field && (
+        <div className="ed-attack-preview" aria-label={gameUi("Battle preview")}>
+          <strong>{gameUi(" Battle preview · ")}{gameUi(forecast.chance)}{gameUi("% estimated attacker advantage ")}</strong>
           {forecast.sides.map((side) => (
             <p key={side.army}>
-              {side.name}: {side.healthy.toLocaleString()} healthy ·{" "}
-              {side.wounded} wounded · Morale {side.morale} · Supplies{" "}
-              {side.supply}%.
+              {gameUi(side.name)}: {gameUi(side.healthy.toLocaleString())}{gameUi(" healthy ·")}{gameUi(" ")}
+              {gameUi(side.wounded)}{gameUi(" wounded · Morale ")}{gameUi(side.morale)}{gameUi(" · Supplies")}{gameUi(" ")}
+              {gameUi(side.supply)}%.
             </p>
           ))}
           {terrainExplanation(state, field.id).map((line) => (
-            <p key={line}>{line}</p>
+            <p key={line}>{gameUi(line)}</p>
           ))}
-          <small>
-            Estimate against the largest stationed force. The defender can
-            reinforce or withdraw; orders change the outcome.
-          </small>
+          <small>{gameUi(" Estimate against the largest stationed force. The defender can reinforce or withdraw; orders change the outcome. ")}</small>
           <UnitGuide />
         </div>
-      )}
-      {!atWar && (
+      ))}
+      {gameUi(!atWar && (
         <>
-          <label>
-            War reason for {target.name}
+          <label>{gameUi(" War reason for ")}{target.name}
             <select
-              aria-label={`War reason for ${target.name}`}
+              aria-label={gameUi(`War reason for ${target.name}`)}
               value={reason}
               onChange={(e) => setReason(e.target.value as WarReason)}
             >
               {valid.map((r) => (
                 <option value={r} key={r}>
-                  {WAR_REASONS[r]}
+                  {gameUi(WAR_REASONS[r])}
                 </option>
               ))}
-              <option value="unjustified">{WAR_REASONS.unjustified}</option>
+              <option value="unjustified">{gameUi(WAR_REASONS.unjustified)}</option>
             </select>
           </label>
-          {reason === "unjustified" ? <><div className="ed-effects" aria-label="War declaration effects"><EffectBadge metric="unrest" amount={5} label="realm unrest" /><EffectBadge metric="loyalty" amount={-6} label="army loyalty" />{(house.unjustifiedWars ?? 0) + 1 >= 2 && <EffectBadge metric="opinion" amount={-15} label="vassal opinion" />}</div>{!(house.unjustifiedWars ?? 0) && <p className="ed-reason">Another unjustified war will also cost vassal opinion.</p>}</> : <div className="ed-effects"><EffectBadge metric="unrest" amount={0} /><EffectBadge metric="loyalty" amount={0} label="loyalty penalty" /></div>}
-          {reason === "territorial-conquest" && (
+          {reason === "unjustified" ? <><div className="ed-effects" aria-label={gameUi("War declaration effects")}><EffectBadge metric="unrest" amount={5} label={gameUi("realm unrest")} /><EffectBadge metric="loyalty" amount={-6} label={gameUi("army loyalty")} />{(house.unjustifiedWars ?? 0) + 1 >= 2 && <EffectBadge metric="opinion" amount={-15} label={gameUi("vassal opinion")} />}</div>{!(house.unjustifiedWars ?? 0) && <p className="ed-reason">{gameUi("Another unjustified war will also cost vassal opinion.")}</p>}</> : <div className="ed-effects"><EffectBadge metric="unrest" amount={0} /><EffectBadge metric="loyalty" amount={0} label={gameUi("loyalty penalty")} /></div>}
+          {gameUi(reason === "territorial-conquest" && (
             <p className="ed-reason">
-              {field
+              {gameUi(field
                 ? "This hex borders land controlled by your realm."
-                : "Their realm shares an unprotected land border with yours."}
+                : "Their realm shares an unprotected land border with yours.")}
             </p>
-          )}
-          {hasMarriagePact(state, house, nation) && (
-            <p className="ed-reason">
-              Marriage pact active: territorial conquest is unavailable.
-            </p>
-          )}
+          ))}
+          {gameUi(hasMarriagePact(state, house, nation) && (
+            <p className="ed-reason">{gameUi(" Marriage pact active: territorial conquest is unavailable. ")}</p>
+          ))}
         </>
-      )}
+      ))}
       <button
         disabled={
           !active || !atWar && !!treaty ||
@@ -137,26 +131,23 @@ export function WarActions({
         }
       >
         <Swords size={14} />
-        {field
+        {gameUi(field
           ? atWar
             ? "Attack this hex"
             : "Declare war & attack"
           : atWar
             ? "At war"
-            : "Declare war"}
+            : "Declare war")}
       </button>
-      {!active && <p className="ed-reason">Military orders require your own turn or an active defense response.</p>}
-      {field && (!army || army.garrison || !canControl(state, { house: house.id }, army)) && <p className="ed-reason">Raise and select a field host under your command to attack.</p>}
-      {!forecast && field && <p className="ed-reason">No current defender sighting. Scout this area before committing; unseen forces may defend it.</p>}
-      {field && (
-        <small>
-          Choose a field army. Movement commits on End turn; the defender
-          responds before entry.
-        </small>
-      )}
-      {atWar && (
+      {!active && <p className="ed-reason">{gameUi("Military orders require your own turn or an active defense response.")}</p>}
+      {field && (!army || army.garrison || !canControl(state, { house: house.id }, army)) && <p className="ed-reason">{gameUi("Raise and select a field host under your command to attack.")}</p>}
+      {!forecast && field && <p className="ed-reason">{gameUi("No current defender sighting. Scout this area before committing; unseen forces may defend it.")}</p>}
+      {gameUi(field && (
+        <small>{gameUi(" Choose a field army. Movement commits on End turn; the defender responds before entry. ")}</small>
+      ))}
+      {gameUi(atWar && (
         <PeaceNegotiator state={state} house={house} nation={nation} active={active} onCommand={onCommand} />
-      )}
+      ))}
     </div>
   );
 }

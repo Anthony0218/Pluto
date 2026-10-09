@@ -1,14 +1,16 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { memo } from "react";
 import type { District } from "../../../games/MedievalKingdoms/edravane/types.ts";
 
 /** All scenery stays inside the playable hex: geography and hit targets share a footprint. */
 export const TerrainTile = memo(function TerrainTile({ d }: { d: District }) {
+  useGameLanguage();
   const forest = d.biome === "forest",
     rock = ["mountains", "glacier", "volcanic", "hills"].includes(d.biome),
     snow = ["glacier", "tundra"].includes(d.biome);
   return (
     <g pointerEvents="none">
-      {d.biome === "sea" ? (
+      {gameUi(d.biome === "sea" ? (
         <>
           <path
             d="M-15 -4q4-3 8 0t8 0 M-8 7q4-3 8 0t8 0"
@@ -27,7 +29,7 @@ export const TerrainTile = memo(function TerrainTile({ d }: { d: District }) {
             opacity=".22"
             strokeWidth=".7"
           />
-          {forest &&
+          {gameUi(forest &&
             [-11, 0, 11].map((x, i) => (
               <g key={x} transform={`translate(${x},${i % 2 ? -9 : -3})`}>
                 <path
@@ -38,8 +40,8 @@ export const TerrainTile = memo(function TerrainTile({ d }: { d: District }) {
                 />
                 <path d="M0 4v4" stroke="#4e3928" />
               </g>
-            ))}
-          {rock &&
+            )))}
+          {gameUi(rock &&
             [-9, 8].map((x, i) => (
               <g key={x} transform={`translate(${x},${i ? 3 : -4})`}>
                 <path
@@ -58,17 +60,17 @@ export const TerrainTile = memo(function TerrainTile({ d }: { d: District }) {
                   d="M0-10L-4-2L0-4L4-1Z"
                   fill={snow || d.biome === "mountains" ? "#edf0d7" : "#a7ad76"}
                 />
-                {d.biome === "volcanic" && (
+                {gameUi(d.biome === "volcanic" && (
                   <path
                     d="M0-9L3 0L1 6"
                     fill="none"
                     stroke="#ff753b"
                     strokeWidth="1.5"
                   />
-                )}
+                ))}
               </g>
-            ))}
-          {["plains", "steppe"].includes(d.biome) &&
+            )))}
+          {gameUi(["plains", "steppe"].includes(d.biome) &&
             [-10, 0, 10].map((x) => (
               <path
                 key={x}
@@ -77,8 +79,8 @@ export const TerrainTile = memo(function TerrainTile({ d }: { d: District }) {
                 strokeWidth="1"
                 opacity=".6"
               />
-            ))}
-          {d.biome === "river" && (
+            )))}
+          {gameUi(d.biome === "river" && (
             <>
               <path
                 d={`M${d.r % 2 ? -10.825 : 10.825} -18.75Q-6 -8 0 0T${d.r % 2 ? -10.825 : 10.825} 18.75`}
@@ -93,23 +95,23 @@ export const TerrainTile = memo(function TerrainTile({ d }: { d: District }) {
                 strokeWidth="4"
               />
             </>
-          )}
-          {d.biome === "desert" && (
+          ))}
+          {gameUi(d.biome === "desert" && (
             <path
               d="M-18 6Q-7-6 3 5Q12-5 18 4M-13 12Q0 2 14 11"
               fill="none"
               stroke="#e9c687"
               strokeWidth="2"
             />
-          )}
-          {snow && !rock && (
+          ))}
+          {gameUi(snow && !rock && (
             <path
               d="M-10-9l5 3m-1-6l-2 7m13 7l6 3m-1-6l-3 7"
               stroke="#eef4e8"
               strokeWidth="1"
             />
-          )}
-          {d.road && (
+          ))}
+          {gameUi(d.road && (
             <path
               d="M-20 8Q-6 12 3 4T20-8"
               fill="none"
@@ -118,11 +120,11 @@ export const TerrainTile = memo(function TerrainTile({ d }: { d: District }) {
               strokeDasharray="2 1"
               opacity=".7"
             />
-          )}
-          {d.city && (
+          ))}
+          {gameUi(d.city && (
             <g
               transform={`translate(${d.castle ? -9 : 0},5)`}
-              aria-label={d.city === "major" ? "Major city" : "City"}
+              aria-label={gameUi(d.city === "major" ? "Major city" : "City")}
             >
               <path
                 d="M-6 5V-2h4V-7h4v3h4V5Z"
@@ -137,19 +139,19 @@ export const TerrainTile = memo(function TerrainTile({ d }: { d: District }) {
                 strokeWidth=".6"
               />
               <path d="M-4 2v3M0-3v2M4 0v3" stroke="#496153" strokeWidth="1" />
-              {d.city === "major" && (
+              {gameUi(d.city === "major" && (
                 <path
                   d="M-8 6H9M-8 3v3M9 3v3"
                   stroke="#ecd79f"
                   strokeWidth="1.3"
                 />
-              )}
+              ))}
             </g>
-          )}
-          {d.castle && (
+          ))}
+          {gameUi(d.castle && (
             <g
               transform={`translate(${d.city ? 9 : 0},4)`}
-              aria-label={`Castle level ${d.castle.level}`}
+              aria-label={gameUi(`Castle level ${d.castle.level}`)}
             >
               <path
                 d="M-6 6V-5h2v2h2v-2h4v2h2v-2h2V6Z"
@@ -164,18 +166,18 @@ export const TerrainTile = memo(function TerrainTile({ d }: { d: District }) {
                 stroke="#3c554b"
                 strokeWidth=".5"
               />
-              {d.castle.level === 3 && (
+              {gameUi(d.castle.level === 3 && (
                 <path
                   d="M-8 7V0h2M8 7V0H6"
                   fill="none"
                   stroke="#e9cc7f"
                   strokeWidth="1.5"
                 />
-              )}
+              ))}
             </g>
-          )}
+          ))}
         </>
-      )}
+      ))}
     </g>
   );
 });

@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { memo, useMemo } from "react";
 import type { Army, Campaign, District, House } from "../../../games/MedievalKingdoms/edravane/types.ts";
 import { BIOMES, center, neighbors, NATIONS } from "../../../games/MedievalKingdoms/edravane/world.ts";
@@ -22,6 +23,7 @@ type Props = {
 
 /** Camera motion reuses this layer until the visible hex window or game state changes. */
 export const HexFields = memo(function HexFields({ view, house, overlay, regional, detailed, mini, viewport, supplyArmy, onSelect }: Props) {
+  useGameLanguage();
   const fields = useMemo(() => mini ? view.districts.filter((d) => d.nation || d.biome === "legacy") : visibleMapDistricts(view.districts, viewport), [view.districts, mini, viewport]);
   const visibleIds = useMemo(() => new Set(fields.map((d) => d.id)), [fields]);
   return <g className={mini ? "ed-minimap-fields" : "ed-map-fields"}>
@@ -55,14 +57,14 @@ export const HexFields = memo(function HexFields({ view, house, overlay, regiona
                 onKeyDown={mini ? undefined : (e) => {
                   if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); onSelect(d); }
                 }}
-                aria-label={`${d.name}, ${owner?.name ?? d.biome}${landControl === "domain" ? ", your direct domain" : landControl === "vassal" ? ", vassal estate" : ""}`}
+                aria-label={gameUi(`${d.name}, ${owner?.name ?? d.biome}${landControl === "domain" ? ", your direct domain" : landControl === "vassal" ? ", vassal estate" : ""}`)}
                 className={!mini ? "ed-hex" : ""}
               >
                 <title>
-                  {d.biome === "sea" ? `${d.name}\nShips only` : [
+                  {gameUi(d.biome === "sea" ? `${d.name}\nShips only` : [
                     d.settlement === "Hamlet" ? d.name : d.settlement,
                     owner ? `House ${owner.name}` : d.biome === "legacy" ? "Unavailable" : d.biome,
-                  ].map((line) => line.length > 36 ? `${line.slice(0, 35)}…` : line).join("\n")}
+                  ].map((line) => line.length > 36 ? `${line.slice(0, 35)}…` : line).join("\n"))}
                 </title>
                 <polygon
                   points={points(d)}
@@ -75,36 +77,36 @@ export const HexFields = memo(function HexFields({ view, house, overlay, regiona
                   strokeWidth={detailed ? ".55" : ".1"}
                   fillOpacity={1}
                 />
-                {overlay === "ownership" && owner && (
+                {gameUi(overlay === "ownership" && owner && (
                   <polygon
                     points={points(d)}
                     fill={owner.color}
                     opacity=".18"
                     pointerEvents="none"
                   />
-                )}
+                ))}
                 {overlay === "terrain" && landControl === "domain" && <polygon points={points(d)} fill="#f1cc70" opacity=".12" pointerEvents="none" />}
-                {!mini && d.biome !== "legacy" && (regional || NATIONS.some((n) => n.capital === d.id)) && (
+                {gameUi(!mini && d.biome !== "legacy" && (regional || NATIONS.some((n) => n.capital === d.id)) && (
                   <g transform={`translate(${x},${y})`}>
                     <TerrainTile d={d} />
                   </g>
-                )}
-                {d.owner && regional && landControl === "foreign" && (
+                ))}
+                {gameUi(d.owner && regional && landControl === "foreign" && (
                   <polygon
                     points={points(d, 1.4)}
                     fill="none"
                     stroke={controlling?.color ?? owner!.color}
                     strokeWidth={1.2}
                   />
-                )}
-                {d.occupation && (
+                ))}
+                {gameUi(d.occupation && (
                   <polygon
                     points={points(d, 2)}
                     fill={`url(#${mini ? "mini-occupation" : "occupation"})`}
                     opacity=".5"
                   />
-                )}
-                {d.disputed && (
+                ))}
+                {gameUi(d.disputed && (
                   <polygon
                     points={points(d, 3)}
                     fill="none"
@@ -112,8 +114,8 @@ export const HexFields = memo(function HexFields({ view, house, overlay, regiona
                     strokeWidth="1"
                     strokeDasharray="3 2"
                   />
-                )}
-                {!mini && (overlay === "resources" || d.biome === "legacy") && (
+                ))}
+                {gameUi(!mini && (overlay === "resources" || d.biome === "legacy") && (
                   <text
                     x={x}
                     y={y + 5}
@@ -122,7 +124,7 @@ export const HexFields = memo(function HexFields({ view, house, overlay, regiona
                     fill="#132b28"
                     opacity=".8"
                   >
-                    {d.biome === "legacy"
+                    {gameUi(d.biome === "legacy"
                       ? "🔒"
                       : overlay === "resources"
                         ? {
@@ -134,24 +136,24 @@ export const HexFields = memo(function HexFields({ view, house, overlay, regiona
                             herbs: "✿",
                             luxury: "✧",
                           }[d.resource]
-                        : BIOMES[d.biome].icon}
+                        : BIOMES[d.biome].icon)}
                   </text>
-                )}
-                {detailed && owned && (
+                ))}
+                {gameUi(detailed && owned && (
                   <text x={x - 10} y={y - 8} fontSize="8" fill="#fff0aa">
                     ♛
                   </text>
-                )}
-                {!mini && detailed && d.nation && (
+                ))}
+                {gameUi(!mini && detailed && d.nation && (
                   <>
-                    {d.port && (
+                    {gameUi(d.port && (
                       <text x={x + 12} y={y + 14} fontSize="8">
                         ⚓
                       </text>
-                    )}
+                    ))}
                   </>
-                )}
-                {detailed && d.bonus && (
+                ))}
+                {gameUi(detailed && d.bonus && (
                   <circle
                     cx={x - 12}
                     cy={y + 14}
@@ -159,7 +161,7 @@ export const HexFields = memo(function HexFields({ view, house, overlay, regiona
                     fill={d.bonus === "gold" ? "#ffdf6d" : "#e4edf0"}
                     stroke="#49493c"
                   />
-                )}
+                ))}
               </g>
             );
           })}

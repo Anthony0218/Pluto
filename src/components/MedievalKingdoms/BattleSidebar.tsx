@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { useState } from "react";
 import {
   ATTACK_ACTIONS,
@@ -54,17 +55,18 @@ type Props = {
 };
 
 export default function BattleSidebar(props: Props) {
+  useGameLanguage();
   const { battle, game, hoveredUnit, pinnedUnit, pinnedTerrain } = props;
 
   return (
     <aside className="space-y-4">
-      {pinnedUnit ? (
+      {gameUi(pinnedUnit ? (
         <UnitPanel {...props} unit={pinnedUnit} terrain={pinnedTerrain} />
       ) : hoveredUnit ? (
         <HoverPanel unit={hoveredUnit} onPin={props.onPinHovered} />
       ) : (
         <BattleIntel battle={battle} game={game} />
-      )}
+      ))}
 
       <TurnPanel game={game} onEndTurn={props.onEndTurn} />
 
@@ -100,6 +102,7 @@ function UnitPanel({
   onFire,
   onMeleeStrike,
 }: Props & { unit: Unit; terrain: TerrainType | null }) {
+  useGameLanguage();
   const [menu, setMenu] = useState<
     "main" | "attack" | "defend" | "skills" | "guard"
   >("main");
@@ -113,116 +116,107 @@ function UnitPanel({
     <MedievalCard>
       <div className="flex gap-4">
         <div className="h-28 w-28 shrink-0 overflow-hidden rounded-full border-2 border-[#b98a45] bg-[#25190f]">
-          {unit.ringImage ? (
+          {gameUi(unit.ringImage ? (
             <img
               src={unit.ringImage}
-              alt={unit.name}
+              alt={gameUi(unit.name)}
               className="h-full w-full object-contain"
             />
-          ) : null}
+          ) : null)}
         </div>
         <div className="min-w-0">
-          <div className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#bfa67c]">
-            unit scroll
-          </div>
+          <div className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#bfa67c]">{gameUi(" unit scroll ")}</div>
           <div className="mt-1 text-lg font-black text-[#ffe8ad]">
-            {unit.name}
+            {gameUi(unit.name)}
           </div>
           <div className="text-xs text-[#c7ae82]">
-            {unit.faction} · {unit.tier}
+            {gameUi(unit.faction)} · {gameUi(unit.tier)}
           </div>
           <div className="mt-2 text-xs font-black">
-            {unit.health}/{unit.maxHealth} HP
-          </div>
+            {gameUi(unit.health)}/{gameUi(unit.maxHealth)}{gameUi(" HP ")}</div>
           <div className="mt-2 flex flex-wrap gap-1">
-            {unit.defenseMode && (
-              <StatusBadge icon={unit.defenseMode} label={unit.defenseMode} />
-            )}
-            {unit.damageBoostTurns > 0 && (
-              <StatusBadge icon="damageBoost" label="blessed" />
-            )}
-            {unit.burnTurns > 0 && <StatusBadge icon="burn" label="burning" />}
+            {gameUi(unit.defenseMode && (
+              <StatusBadge icon={unit.defenseMode} label={gameUi(unit.defenseMode)} />
+            ))}
+            {gameUi(unit.damageBoostTurns > 0 && (
+              <StatusBadge icon="damageBoost" label={gameUi("blessed")} />
+            ))}
+            {unit.burnTurns > 0 && <StatusBadge icon="burn" label={gameUi("burning")} />}
           </div>
         </div>
       </div>
 
       <div className="mt-4 grid grid-cols-4 gap-2">
-        <Stat label="Impact" value={unit.impact} />
-        <Stat label="Agility" value={unit.agility} />
-        <Stat label="Tough" value={unit.toughness} />
-        <Stat label="Damage" value={unit.damage} />
-        <Stat label="Move" value={unit.moveRange} />
-        <Stat label="Range" value={unit.attackRange} />
-        <Stat label="Moved" value={unit.hasMoved ? "yes" : "no"} />
-        <Stat label="Acted" value={unit.hasActed ? "yes" : "no"} />
+        <Stat label={gameUi("Impact")} value={unit.impact} />
+        <Stat label={gameUi("Agility")} value={unit.agility} />
+        <Stat label={gameUi("Tough")} value={unit.toughness} />
+        <Stat label={gameUi("Damage")} value={unit.damage} />
+        <Stat label={gameUi("Move")} value={unit.moveRange} />
+        <Stat label={gameUi("Range")} value={unit.attackRange} />
+        <Stat label={gameUi("Moved")} value={unit.hasMoved ? "yes" : "no"} />
+        <Stat label={gameUi("Acted")} value={unit.hasActed ? "yes" : "no"} />
       </div>
 
-      {terrain && (
+      {gameUi(terrain && (
         <div className="mt-3 rounded-lg border border-[#765633]/60 bg-[#2e2015]/70 px-3 py-2 text-xs">
-          <span className="text-[#ae966f]">Terrain: </span>
+          <span className="text-[#ae966f]">{gameUi("Terrain: ")}</span>
           <span className="font-bold text-[#f5dfb4]">
-            {terrainLabel(terrain)}
+            {gameUi(terrainLabel(terrain))}
           </span>
         </div>
-      )}
+      ))}
 
-      {moveMode && selected && (
+      {gameUi(moveMode && selected && (
         <ModePanel>
           <div className="flex items-center gap-2 font-black text-[#ffe5a6]">
-            <ActionIcon id="move" className="h-5 w-5" />
-            Movement mode
-          </div>
-          <p className="mt-2 text-xs leading-5 text-[#cfb78e]">
-            Drag this figure to its destination. Clicking the map is kept as a
-            fallback.
-          </p>
-          <CancelButton onClick={onCancelAction} label="Cancel Move" />
+            <ActionIcon id="move" className="h-5 w-5" />{gameUi(" Movement mode ")}</div>
+          <p className="mt-2 text-xs leading-5 text-[#cfb78e]">{gameUi(" Drag this figure to its destination. Clicking the map is kept as a fallback. ")}</p>
+          <CancelButton onClick={onCancelAction} label={gameUi("Cancel Move")} />
         </ModePanel>
-      )}
+      ))}
 
-      {aimMode && selected && (
+      {gameUi(aimMode && selected && (
         <ModePanel>
           <div className="text-xs font-black text-[#ffe7b0]">
-            {ATTACK_ACTIONS.find((a) => a.id === currentAttackAction)?.name ??
+            {gameUi(ATTACK_ACTIONS.find((a) => a.id === currentAttackAction)?.name ??
               SKILL_ACTIONS.find((a) => a.id === currentSkillAction)?.name ??
-              "Action"}
+              "Action")}
           </div>
-          {aimStage === "direction" && (
-            <div className="mt-1 text-[11px] text-[#bda77f]">
-              Direction {Math.round(aimAngle)}°
+          {gameUi(aimStage === "direction" && (
+            <div className="mt-1 text-[11px] text-[#bda77f]">{gameUi(" Direction ")}{gameUi(Math.round(aimAngle))}°
             </div>
-          )}
-          {aimStage === "elevation" && (
+          ))}
+          {gameUi(aimStage === "elevation" && (
             <div className="mt-3">
               <ArcherElevationMeter elevation={elevation} />
             </div>
-          )}
-          {aimStage === "power" && (
+          ))}
+          {gameUi(aimStage === "power" && (
             <div className="mt-3">
               <ActionTimingMeter
-                title="Power timing"
+                title={gameUi("Power timing")}
                 value={timingValue}
                 lowLabel="safe"
                 highLabel="max"
               />
             </div>
-          )}
-          {aimStage === "distance" && (
+          ))}
+          {gameUi(aimStage === "distance" && (
             <div className="mt-3">
               <ActionTimingMeter
-                title="Distance timing"
+                title={gameUi("Distance timing")}
                 value={timingValue}
                 lowLabel="near"
                 highLabel="far"
               />
             </div>
-          )}
-          {aimStage === "meleeTarget" && (
+          ))}
+          {gameUi(aimStage === "meleeTarget" && (
             <div className="mt-3">
               <p className="text-xs leading-5 text-[#d0b88d]">
-                {hasMeleeTargets
+                {gameUi(hasMeleeTargets
                   ? "Click a highlighted nearby enemy to start the collapsing-ring timing challenge."
-                  : "No enemy is currently within melee range."}
+                  : "No enemy is currently within melee range.")}
               </p>
               <button
                 type="button"
@@ -231,28 +225,21 @@ function UnitPanel({
                   setMenu("attack");
                 }}
                 className="mt-3 w-full rounded-lg border border-[#9b7444] bg-[#4a3521] px-3 py-2 text-xs font-black text-[#f6dfb1] hover:bg-[#604526]"
-              >
-                ← Choose another attack
-              </button>
+              >{gameUi(" ← Choose another attack ")}</button>
             </div>
-          )}
-          {aimStage === "meleeTiming" && (
+          ))}
+          {gameUi(aimStage === "meleeTiming" && (
             <>
-              <p className="mt-3 text-xs leading-5 text-[#d0b88d]">
-                Strike when the moving ring reaches the golden center.
-              </p>
-              {meleeScore !== null && (
-                <div className="mt-2 text-sm font-black text-[#ffe39a]">
-                  Timing {Math.round(meleeScore * 100)}%
+              <p className="mt-3 text-xs leading-5 text-[#d0b88d]">{gameUi(" Strike when the moving ring reaches the golden center. ")}</p>
+              {gameUi(meleeScore !== null && (
+                <div className="mt-2 text-sm font-black text-[#ffe39a]">{gameUi(" Timing ")}{gameUi(Math.round(meleeScore * 100))}%
                 </div>
-              )}
+              ))}
               <button
                 type="button"
                 onClick={onMeleeStrike}
                 className="mt-3 w-full rounded-lg border-2 border-[#cf9f45] bg-[#7f351e] px-3 py-2 text-xs font-black text-[#fff0bf] hover:bg-[#9c4628]"
-              >
-                Strike Now
-              </button>
+              >{gameUi(" Strike Now ")}</button>
               <button
                 type="button"
                 onClick={() => {
@@ -260,21 +247,19 @@ function UnitPanel({
                   setMenu("attack");
                 }}
                 className="mt-2 w-full rounded-lg border border-[#765633] bg-[#2e2015] px-3 py-2 text-xs font-black text-[#d7bd91] hover:bg-[#4a3521]"
-              >
-                ← Choose another attack
-              </button>
+              >{gameUi(" ← Choose another attack ")}</button>
             </>
-          )}
-          {currentSkillAction && (
+          ))}
+          {gameUi(currentSkillAction && (
             <p className="mt-3 text-xs leading-5 text-[#d0b88d]">
-              {skillInstruction(currentSkillAction)}
+              {gameUi(skillInstruction(currentSkillAction))}
             </p>
-          )}
-          {!currentSkillAction &&
+          ))}
+          {gameUi(!currentSkillAction &&
             aimStage !== "meleeTarget" &&
             aimStage !== "meleeTiming" && (
               <div className="mt-3 grid grid-cols-2 gap-2">
-                {aimStage === "direction" &&
+                {gameUi(aimStage === "direction" &&
                 (currentAttackAction === "power" ||
                   currentAttackAction === "area" ||
                   currentAttackAction === "archer") ? (
@@ -282,58 +267,54 @@ function UnitPanel({
                     type="button"
                     onClick={onLockDirection}
                     className="rounded-lg border border-[#b88b46] bg-[#d8c18c] px-3 py-2 text-xs font-black text-[#392819] hover:bg-[#f0dca9]"
-                  >
-                    Lock Direction
-                  </button>
+                  >{gameUi(" Lock Direction ")}</button>
                 ) : (
                   <button
                     type="button"
                     onClick={onFire}
                     className="rounded-lg border border-[#9a4c2f] bg-[#7f351e] px-3 py-2 text-xs font-black text-[#fff0bf] hover:bg-[#9c4628]"
-                  >
-                    Fire / Execute
-                  </button>
-                )}
+                  >{gameUi(" Fire / Execute ")}</button>
+                ))}
                 <CancelButton onClick={onCancelAction} />
               </div>
-            )}
-          {currentSkillAction && (
-            <CancelButton onClick={onCancelAction} label="Cancel Skill" />
-          )}
+            ))}
+          {gameUi(currentSkillAction && (
+            <CancelButton onClick={onCancelAction} label={gameUi("Cancel Skill")} />
+          ))}
         </ModePanel>
-      )}
+      ))}
 
-      {friendly && !aimMode && !moveMode && (
+      {gameUi(friendly && !aimMode && !moveMode && (
         <>
-          {menu === "main" && (
+          {gameUi(menu === "main" && (
             <div className="mt-4 grid grid-cols-2 gap-2">
               <MainButton
                 icon="move"
-                label="Move"
+                label={gameUi("Move")}
                 disabled={unit.hasMoved}
                 onClick={onStartMove}
               />
               <MainButton
                 icon="quick"
-                label="Attack"
+                label={gameUi("Attack")}
                 disabled={unit.hasActed}
                 onClick={() => setMenu("attack")}
               />
               <MainButton
                 icon="shield"
-                label="Defend"
+                label={gameUi("Defend")}
                 disabled={unit.hasActed}
                 onClick={() => setMenu("defend")}
               />
               <MainButton
                 icon="heal"
-                label="Skills"
+                label={gameUi("Skills")}
                 disabled={unit.hasActed}
                 onClick={() => setMenu("skills")}
               />
               <MainButton
                 icon="finish"
-                label="Finish"
+                label={gameUi("Finish")}
                 onClick={onFinishPinned}
               />
               <button
@@ -341,13 +322,13 @@ function UnitPanel({
                 onClick={onSelectPinned}
                 className={`flex items-center justify-center rounded-xl border px-3 py-2 text-xs font-black ${selected ? "border-[#e5bd64] bg-[#77531f] text-[#fff0bd]" : "border-[#765633] bg-[#2f2116] hover:bg-[#4a3521]"}`}
               >
-                {selected ? "Selected" : "Select"}
+                {gameUi(selected ? "Selected" : "Select")}
               </button>
             </div>
-          )}
-          {menu === "attack" && (
+          ))}
+          {gameUi(menu === "attack" && (
             <ActionMenu
-              title="Attack Arts"
+              title={gameUi("Attack Arts")}
               actions={ATTACK_ACTIONS}
               kind="attack"
               onBack={() => setMenu("main")}
@@ -357,10 +338,10 @@ function UnitPanel({
                 setMenu("main");
               }}
             />
-          )}
-          {menu === "defend" && (
+          ))}
+          {gameUi(menu === "defend" && (
             <ActionMenu
-              title="Defensive Stances"
+              title={gameUi("Defensive Stances")}
               actions={DEFENSE_ACTIONS}
               kind="defense"
               onBack={() => setMenu("main")}
@@ -374,10 +355,10 @@ function UnitPanel({
                 setMenu("main");
               }}
             />
-          )}
-          {menu === "skills" && (
+          ))}
+          {gameUi(menu === "skills" && (
             <ActionMenu
-              title="Arts & Spells"
+              title={gameUi("Arts & Spells")}
               actions={SKILL_ACTIONS}
               kind="skill"
               onBack={() => setMenu("main")}
@@ -387,11 +368,11 @@ function UnitPanel({
                 setMenu("main");
               }}
             />
-          )}
-          {menu === "guard" && (
+          ))}
+          {gameUi(menu === "guard" && (
             <div className="mt-4">
               <MenuHeading
-                title="Guard Ally"
+                title={gameUi("Guard Ally")}
                 onBack={() => setMenu("defend")}
               />
               <div className="space-y-2">
@@ -406,29 +387,28 @@ function UnitPanel({
                     className="flex w-full items-center gap-3 rounded-xl border border-[#806039] bg-[#4a3521]/65 p-2 text-left hover:bg-[#604526]"
                   >
                     <div className="h-10 w-10 overflow-hidden rounded-full border border-[#9b7545] bg-[#25190f]">
-                      {ally.ringImage ? (
+                      {gameUi(ally.ringImage ? (
                         <img
                           src={ally.ringImage}
-                          alt={ally.name}
+                          alt={gameUi(ally.name)}
                           className="h-full w-full object-contain"
                         />
-                      ) : null}
+                      ) : null)}
                     </div>
                     <div>
                       <div className="text-xs font-black text-[#f8e5bc]">
-                        {ally.name}
+                        {gameUi(ally.name)}
                       </div>
                       <div className="text-[10px] text-[#b9a078]">
-                        {ally.health}/{ally.maxHealth} HP
-                      </div>
+                        {gameUi(ally.health)}/{gameUi(ally.maxHealth)}{gameUi(" HP ")}</div>
                     </div>
                   </button>
                 ))}
               </div>
             </div>
-          )}
+          ))}
         </>
-      )}
+      ))}
     </MedievalCard>
   );
 }
@@ -448,9 +428,10 @@ function ActionMenu({
   onPreview: (action: PreviewAction) => void;
   onChoose: (id: string) => void;
 }) {
+  useGameLanguage();
   return (
     <div className="mt-4">
-      <MenuHeading title={title} onBack={onBack} />
+      <MenuHeading title={gameUi(title)} onBack={onBack} />
       <div className="space-y-2">
         {actions.map((action) => (
           <button
@@ -471,10 +452,10 @@ function ActionMenu({
             </div>
             <div>
               <div className="text-xs font-black text-[#f6dfb1]">
-                {action.name}
+                {gameUi(action.name)}
               </div>
               <div className="mt-1 text-[10px] leading-4 text-[#bda47b]">
-                {action.description}
+                {gameUi(action.description)}
               </div>
             </div>
           </button>
@@ -495,6 +476,7 @@ function MainButton({
   disabled?: boolean;
   onClick: () => void;
 }) {
+  useGameLanguage();
   return (
     <button
       type="button"
@@ -503,15 +485,16 @@ function MainButton({
       className="flex items-center justify-center gap-2 rounded-xl border border-[#84613a] bg-[#4a3521]/80 px-3 py-2 text-xs font-black text-[#f6dfb1] hover:border-[#d1a553] hover:bg-[#604526] disabled:cursor-not-allowed disabled:opacity-35"
     >
       <ActionIcon id={icon} className="h-5 w-5" />
-      {label}
+      {gameUi(label)}
     </button>
   );
 }
 function StatusBadge({ icon, label }: { icon: ActionIconId; label: string }) {
+  useGameLanguage();
   return (
     <div className="flex items-center gap-1 rounded-full border border-[#8f6d40] bg-[#2e2015] px-2 py-1 text-[9px] font-black uppercase text-[#e9cf98]">
       <ActionIcon id={icon} className="h-3.5 w-3.5" />
-      {label}
+      {gameUi(label)}
     </div>
   );
 }
@@ -530,16 +513,18 @@ function skillInstruction(action: SkillActionId) {
   }
 }
 function MedievalCard({ children }: { children: React.ReactNode }) {
+  useGameLanguage();
   return (
     <div className="rounded-2xl border-2 border-[#8d693b]/70 bg-[#3b2a1b]/95 p-4 text-[#f5e4c1] shadow-[inset_0_0_25px_rgba(0,0,0,0.18)]">
-      {children}
+      {gameUi(children)}
     </div>
   );
 }
 function ModePanel({ children }: { children: React.ReactNode }) {
+  useGameLanguage();
   return (
     <div className="mt-3 rounded-xl border border-[#9d7440]/70 bg-[#2e2015]/80 p-3">
-      {children}
+      {gameUi(children)}
     </div>
   );
 }
@@ -550,49 +535,45 @@ function CancelButton({
   onClick: () => void;
   label?: string;
 }) {
+  useGameLanguage();
   return (
     <button
       type="button"
       onClick={onClick}
       className="mt-3 rounded-lg border border-[#765633] bg-[#2e2015] px-3 py-2 text-xs font-black hover:bg-[#4a3521]"
     >
-      {label}
+      {gameUi(label)}
     </button>
   );
 }
 function MenuHeading({ title, onBack }: { title: string; onBack: () => void }) {
+  useGameLanguage();
   return (
     <div className="mb-2 flex items-center justify-between">
       <div className="text-[10px] font-black uppercase tracking-[0.18em] text-[#e0bd71]">
-        {title}
+        {gameUi(title)}
       </div>
       <button
         type="button"
         onClick={onBack}
         className="text-[10px] font-bold text-[#a88f68] hover:text-[#ffe4a6]"
-      >
-        ← Back
-      </button>
+      >{gameUi(" ← Back ")}</button>
     </div>
   );
 }
 function HoverPanel({ unit, onPin }: { unit: Unit; onPin: () => void }) {
+  useGameLanguage();
   return (
     <MedievalCard>
-      <div className="text-[9px] font-black uppercase tracking-[0.2em] text-[#b99d73]">
-        Hover preview
-      </div>
-      <div className="mt-2 font-black text-[#ffe7ad]">{unit.name}</div>
+      <div className="text-[9px] font-black uppercase tracking-[0.2em] text-[#b99d73]">{gameUi(" Hover preview ")}</div>
+      <div className="mt-2 font-black text-[#ffe7ad]">{gameUi(unit.name)}</div>
       <div className="text-xs text-[#bca37a]">
-        {unit.faction} · {unit.health}/{unit.maxHealth} HP
-      </div>
+        {gameUi(unit.faction)} · {gameUi(unit.health)}/{gameUi(unit.maxHealth)}{gameUi(" HP ")}</div>
       <button
         type="button"
         onClick={onPin}
         className="mt-3 w-full rounded-lg border border-[#83623b] bg-[#4a3521] px-3 py-2 text-xs font-black hover:bg-[#604526]"
-      >
-        Pin details
-      </button>
+      >{gameUi(" Pin details ")}</button>
     </MedievalCard>
   );
 }
@@ -603,22 +584,21 @@ function BattleIntel({
   battle: BattleDefinition;
   game: BattleState;
 }) {
+  useGameLanguage();
   return (
     <MedievalCard>
-      <div className="text-[9px] font-black uppercase tracking-[0.2em] text-[#e1b95e]">
-        Battlefield Chronicle
-      </div>
+      <div className="text-[9px] font-black uppercase tracking-[0.2em] text-[#e1b95e]">{gameUi(" Battlefield Chronicle ")}</div>
       <div className="mt-1 text-lg font-black text-[#ffe7ad]">
-        {battle.name}
+        {gameUi(battle.name)}
       </div>
-      <p className="mt-3 text-xs leading-5 text-[#c5ac83]">{battle.lore}</p>
+      <p className="mt-3 text-xs leading-5 text-[#c5ac83]">{gameUi(battle.lore)}</p>
       <div className="mt-4 grid grid-cols-2 gap-2">
-        <Stat label="Round" value={`${game.round}/${game.maxRounds}`} />
-        <Stat label="Objective" value={game.objective.name} />
+        <Stat label={gameUi("Round")} value={`${game.round}/${game.maxRounds}`} />
+        <Stat label={gameUi("Objective")} value={game.objective.name} />
         {CLANS.map((clan) => (
           <Stat
             key={clan.id}
-            label={clan.name}
+            label={gameUi(clan.name)}
             value={game.units.filter((unit) => unit.faction === clan.id).length}
           />
         ))}
@@ -633,6 +613,7 @@ function TurnPanel({
   game: BattleState;
   onEndTurn: () => void;
 }) {
+  useGameLanguage();
   const active = game.units.filter(
     (unit) => unit.faction === game.activeFaction,
   );
@@ -641,37 +622,31 @@ function TurnPanel({
   ).length;
   return (
     <MedievalCard>
-      <div className="text-xs font-bold uppercase tracking-[0.2em] text-[#b99d73]">
-        Active clan
-      </div>
+      <div className="text-xs font-bold uppercase tracking-[0.2em] text-[#b99d73]">{gameUi(" Active clan ")}</div>
       <div className="mt-1 text-lg font-black capitalize text-[#ffe7ad]">
-        {game.activeFaction}
+        {gameUi(game.activeFaction)}
       </div>
       <div className="mt-2 text-xs text-[#c1a77c]">
-        {available}/{active.length} units available
-      </div>
+        {gameUi(available)}/{gameUi(active.length)}{gameUi(" units available ")}</div>
       <button
         type="button"
         disabled={Boolean(game.winner)}
         onClick={onEndTurn}
         className="mt-3 w-full rounded-xl border-2 border-[#b98a45] bg-[#c69a45] px-4 py-3 text-sm font-black text-[#3a2818] hover:bg-[#e1bd69] disabled:opacity-40"
-      >
-        End Turn
-      </button>
+      >{gameUi(" End Turn ")}</button>
     </MedievalCard>
   );
 }
 function ClanPanel() {
+  useGameLanguage();
   return (
     <MedievalCard>
-      <div className="text-xs font-black uppercase tracking-[0.2em] text-[#b99d73]">
-        Clans
-      </div>
+      <div className="text-xs font-black uppercase tracking-[0.2em] text-[#b99d73]">{gameUi(" Clans ")}</div>
       <div className="mt-3 space-y-3">
         {CLANS.map((clan) => (
           <div key={clan.id}>
-            <div className="text-xs font-black text-[#f0d59b]">{clan.name}</div>
-            <div className="text-[10px] text-[#aa916b]">{clan.motto}</div>
+            <div className="text-xs font-black text-[#f0d59b]">{gameUi(clan.name)}</div>
+            <div className="text-[10px] text-[#aa916b]">{gameUi(clan.motto)}</div>
           </div>
         ))}
       </div>
@@ -679,12 +654,13 @@ function ClanPanel() {
   );
 }
 function Stat({ label, value }: { label: string; value: string | number }) {
+  useGameLanguage();
   return (
     <div className="rounded-lg border border-[#6f5030]/60 bg-[#2d2015]/80 px-2 py-2">
       <div className="text-[9px] uppercase tracking-wide text-[#a98e68]">
-        {label}
+        {gameUi(label)}
       </div>
-      <div className="mt-0.5 text-xs font-black text-[#f0dab0]">{value}</div>
+      <div className="mt-0.5 text-xs font-black text-[#f0dab0]">{gameUi(value)}</div>
     </div>
   );
 }

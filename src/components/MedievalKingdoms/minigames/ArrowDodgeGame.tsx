@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import {
   useEffect,
   useRef,
@@ -16,6 +17,7 @@ export default function ArrowDodgeGame({
 }: {
   onComplete: () => void;
 }) {
+  useGameLanguage();
   const [
     playerX,
     setPlayerX,
@@ -350,22 +352,18 @@ export default function ArrowDodgeGame({
     <div className="rounded-3xl border-2 border-[#785838] bg-[#302219] p-5 shadow-2xl">
       <div className="mb-3 flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-black text-[#ffe7ae]">
-            Arrow Dodge
-          </h2>
+          <h2 className="text-xl font-black text-[#ffe7ae]">{gameUi(" Arrow Dodge ")}</h2>
 
-          <p className="text-xs text-[#bba27d]">
-            A/D or ←/→. Survive for 20 seconds.
-          </p>
+          <p className="text-xs text-[#bba27d]">{gameUi(" A/D or ←/→. Survive for 20 seconds. ")}</p>
         </div>
 
         <div className="flex gap-2 text-sm font-black">
           <span className="rounded-lg border border-red-500/50 bg-red-950/40 px-3 py-2 text-red-200">
-            ♥ {lives}
+            ♥ {gameUi(lives)}
           </span>
 
           <span className="rounded-lg border border-[#8a673f] bg-[#21170f] px-3 py-2 text-[#ffe1a0]">
-            {timeLeft}s
+            {gameUi(timeLeft)}s
           </span>
         </div>
       </div>
@@ -406,13 +404,11 @@ export default function ArrowDodgeGame({
           🛡️
         </div>
 
-        {lives <=
+        {gameUi(lives <=
           0 && (
           <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/65">
             <div className="rounded-2xl border border-red-500 bg-red-950/80 p-5 text-center">
-              <div className="text-xl font-black text-red-100">
-                Training failed
-              </div>
+              <div className="text-xl font-black text-red-100">{gameUi(" Training failed ")}</div>
 
               <button
                 type="button"
@@ -420,12 +416,10 @@ export default function ArrowDodgeGame({
                   window.location.reload()
                 }
                 className="mt-3 rounded-lg border border-red-300 px-4 py-2 font-black text-red-100"
-              >
-                Retry
-              </button>
+              >{gameUi(" Retry ")}</button>
             </div>
           </div>
-        )}
+        ))}
       </div>
     </div>
   );

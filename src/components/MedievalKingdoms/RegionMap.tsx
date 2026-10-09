@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -42,6 +43,7 @@ export default function RegionMap({
   campaign: CampaignDefinition;
   progress: CampaignProgress;
 }) {
+  useGameLanguage();
   const navigate = useNavigate();
 
   const [imageFailed, setImageFailed] = useState(false);
@@ -282,20 +284,18 @@ export default function RegionMap({
     <div className="mx-auto w-full max-w-[1250px] text-[#f5e4c1]">
       <div className="mb-4 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.28em] text-[#d3a448]">
-            Campaign Region
-          </p>
+          <p className="text-xs font-black uppercase tracking-[0.28em] text-[#d3a448]">{gameUi(" Campaign Region ")}</p>
 
           <h1 className="mt-1 text-3xl font-black text-[#ffe7ad]">
-            {campaign.name}
+            {gameUi(campaign.name)}
           </h1>
 
           <p className="mt-1 text-sm font-bold text-[#c3aa80]">
-            {campaign.subtitle}
+            {gameUi(campaign.subtitle)}
           </p>
 
           <p className="mt-2 max-w-3xl text-sm leading-6 text-[#aa9471]">
-            {campaign.description}
+            {gameUi(campaign.description)}
           </p>
         </div>
 
@@ -303,23 +303,19 @@ export default function RegionMap({
           type="button"
           onClick={() => navigate("/games/medieval-kingdoms/legacy")}
           className="rounded-xl border border-[#856239] bg-[#4a3521] px-5 py-3 font-bold text-[#f1d9aa] hover:bg-[#604526]"
-        >
-          ← Continent
-        </button>
+        >{gameUi(" ← Continent ")}</button>
       </div>
-      {debugMask && (
+      {gameUi(debugMask && (
         <div className="fixed left-4 top-4 z-[300] rounded-xl border border-yellow-400 bg-black/90 p-3 font-mono text-xs text-white shadow-2xl">
-          <div>
-            Pixel: {debugMask.x}, {debugMask.y}
+          <div>{gameUi(" Pixel: ")}{gameUi(debugMask.x)}, {gameUi(debugMask.y)}
           </div>
 
-          <div>
-            RGB: {debugMask.r}, {debugMask.g}, {debugMask.b}
+          <div>{gameUi(" RGB: ")}{gameUi(debugMask.r)}, {gameUi(debugMask.g)}, {gameUi(debugMask.b)}
           </div>
 
-          <div>Battle: {debugMask.battle ?? "none"}</div>
+          <div>{gameUi("Battle: ")}{gameUi(debugMask.battle ?? "none")}</div>
         </div>
-      )}
+      ))}
 
       <div
         onMouseMove={(event) => {
@@ -355,17 +351,17 @@ export default function RegionMap({
           }
         `}
       >
-        {!imageFailed && campaign.regionMap ? (
+        {gameUi(!imageFailed && campaign.regionMap ? (
           <img
             src={campaign.regionMap}
-            alt={`${campaign.name} regional campaign map`}
+            alt={gameUi(`${campaign.name} regional campaign map`)}
             draggable={false}
             onError={() => setImageFailed(true)}
             className="relative block h-auto w-full select-none"
           />
         ) : (
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#705736_0%,_#4b3825_45%,_#281c13_100%)]" />
-        )}
+        ))}
 
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#24170c]/20 via-transparent to-[#24170c]/45" />
 
@@ -402,7 +398,7 @@ export default function RegionMap({
                 left: `${node.position.x}%`,
                 top: `${node.position.y}%`,
               }}
-              title={node.name}
+              title={gameUi(node.name)}
               className={`
     group
     absolute
@@ -427,7 +423,7 @@ export default function RegionMap({
     }
   `}
             >
-              {completed ? (
+              {gameUi(completed ? (
                 "✓"
               ) : unlocked ? (
                 "⚔"
@@ -435,11 +431,11 @@ export default function RegionMap({
                 <span className="text-xl opacity-0 transition-opacity duration-150 group-hover:opacity-100">
                   🔒
                 </span>
-              )}
+              ))}
             </button>
           );
         })}
-        {hoveredBattle && (
+        {gameUi(hoveredBattle && (
           <div className="pointer-events-none absolute bottom-5 left-1/2 z-50 w-[min(90%,460px)] -translate-x-1/2 rounded-2xl border-2 border-[#b98a45]/80 bg-[#302116]/95 p-4 text-center shadow-2xl backdrop-blur-md">
             <div
               className={`
@@ -456,43 +452,39 @@ export default function RegionMap({
         }
       `}
             >
-              {isBattleCompleted(campaign.id, hoveredBattle.id, progress)
+              {gameUi(isBattleCompleted(campaign.id, hoveredBattle.id, progress)
                 ? "Battle Complete"
                 : isBattleUnlocked(campaign.id, hoveredBattle, progress)
                   ? "Battle Available"
-                  : "Battle Locked"}
+                  : "Battle Locked")}
             </div>
 
             <div className="mt-1 text-xl font-black text-[#ffe4a3]">
-              {hoveredBattle.name}
+              {gameUi(hoveredBattle.name)}
             </div>
 
             <p className="mt-2 text-xs leading-5 text-[#c6ad83]">
-              {hoveredBattle.description}
+              {gameUi(hoveredBattle.description)}
             </p>
 
             <div className="mt-3 flex items-center justify-center gap-2">
               <span className="rounded-full border border-[#b98a45]/40 px-2 py-1 text-[9px] font-black uppercase tracking-wide text-[#d8bd8b]">
-                {GAME_MODE_LABELS[hoveredBattle.gameMode]}
+                {gameUi(GAME_MODE_LABELS[hoveredBattle.gameMode])}
               </span>
 
-              {hoveredBattle.optional && (
-                <span className="rounded-full border border-[#b98a45]/40 px-2 py-1 text-[9px] font-black uppercase tracking-wide text-[#e1bd70]">
-                  Optional
-                </span>
-              )}
+              {gameUi(hoveredBattle.optional && (
+                <span className="rounded-full border border-[#b98a45]/40 px-2 py-1 text-[9px] font-black uppercase tracking-wide text-[#e1bd70]">{gameUi(" Optional ")}</span>
+              ))}
             </div>
 
             <div className="mt-3 text-[10px] uppercase tracking-wider text-[#9e8969]">
-              {isBattleUnlocked(campaign.id, hoveredBattle, progress)
+              {gameUi(isBattleUnlocked(campaign.id, hoveredBattle, progress)
                 ? "Click the highlighted region to enter battle"
-                : "Complete the previous battle to unlock"}
+                : "Complete the previous battle to unlock")}
             </div>
           </div>
-        )}
-        <div className="absolute bottom-4 left-4 z-30 rounded-xl border border-[#80613b] bg-[#2f2116]/92 px-4 py-3 text-[10px] leading-5 text-[#c7ad83] backdrop-blur-sm">
-          Complete all required battles to unlock the next campaign.
-        </div>
+        ))}
+        <div className="absolute bottom-4 left-4 z-30 rounded-xl border border-[#80613b] bg-[#2f2116]/92 px-4 py-3 text-[10px] leading-5 text-[#c7ad83] backdrop-blur-sm">{gameUi(" Complete all required battles to unlock the next campaign. ")}</div>
       </div>
     </div>
   );

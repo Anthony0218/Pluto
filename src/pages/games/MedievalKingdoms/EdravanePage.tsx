@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import {
   CouncilConnection,
   councilAction,
@@ -120,6 +121,7 @@ const labels: Record<UnitKind, string> = {
   cavalry: "Cavalry",
 };
 export default function EdravanePage() {
+  useGameLanguage();
   const [state, setState] = useState<Campaign | null>(null),
     [nation, setNation] = useState("auremarch"),
     [selection, setSelected] = useState<string | null>(null),
@@ -580,7 +582,7 @@ export default function EdravanePage() {
         className={mini ? "ed-minimap" : `ed-world-svg${mapPanning ? " ed-camera-moving" : ""}`}
         viewBox={`0 0 ${frame.width} ${frame.height}`}
         role={mini ? "img" : "group"}
-        aria-label={mini ? "World minimap" : "Interactive hex map of Edravane"}
+        aria-label={gameUi(mini ? "World minimap" : "Interactive hex map of Edravane")}
       >
         <defs>
           <pattern
@@ -644,7 +646,7 @@ export default function EdravanePage() {
         >
           <HexFields view={view} house={house} overlay={mini ? "ownership" : overlay} regional={regional} detailed={detailed} mini={mini} viewport={viewport} supplyArmy={overlay === "supply" ? selectedArmy ?? view.armies.find((a) => a.house === house.id) : undefined} onSelect={select} />
           {!mini && detailed && <EstateLabels view={view} viewport={viewport} resolution={Math.max(1, Math.min(4, Math.ceil(scale * window.devicePixelRatio)))} />}
-          {!mini &&
+          {gameUi(!mini &&
             view.routes.filter((r) => overlay === "trade" || detailed && r.house === house.id).map((r) => {
               const path = r.path.map((id) =>
                 center(view.districts.find((d) => d.id === id)!),
@@ -667,27 +669,27 @@ export default function EdravanePage() {
                   />
                 </g>
               );
-            })}
-          {!mini && !regional && realmTerritories.map((territory) => {
+            }))}
+          {gameUi(!mini && !regional && realmTerritories.map((territory) => {
             const pathId = `realm-name-${territory.id}`;
             return <g key={pathId} className="ed-realm-map-label" transform={`translate(${territory.x} ${territory.y - 27}) rotate(${territory.angle})`} pointerEvents="none" aria-hidden="true" data-territory={territory.id} data-fields={territory.districts.length}>
               <path id={pathId} d={`M${-territory.width / 2} 0 Q0 ${-territory.width * .09} ${territory.width / 2} 0`} fill="none" />
-              <text fontFamily="Georgia" fontSize={territory.fontSize} fontWeight="bold" letterSpacing="1.4" fill="#fff1cb" stroke="#172e28" strokeWidth="3" paintOrder="stroke"><textPath href={`#${pathId}`} startOffset="50%" textAnchor="middle">{territory.title.toUpperCase()}</textPath></text>
+              <text fontFamily="Georgia" fontSize={territory.fontSize} fontWeight="bold" letterSpacing="1.4" fill="#fff1cb" stroke="#172e28" strokeWidth="3" paintOrder="stroke"><textPath href={`#${pathId}`} startOffset="50%" textAnchor="middle">{gameUi(territory.title.toUpperCase())}</textPath></text>
             </g>;
-          })}
-          {!mini && houseTerritories.map((territory) => {
+          }))}
+          {gameUi(!mini && houseTerritories.map((territory) => {
             const size = territory.house.role === "crown" ? 28 : regional ? 24 : 18;
             const pathId = `house-name-${territory.id}`;
             return <g key={pathId} className="ed-house-map-label" pointerEvents="none" aria-hidden="true" data-house={territory.house.id} data-fields={territory.districts.length}>
               <g transform={`translate(${territory.x - size / 2} ${territory.y - size * .6})`}><HouseSigil house={territory.house} size={size} /></g>
               {regional && <g transform={`translate(${territory.x} ${territory.y - size * .6 - 9}) rotate(${territory.angle})`}>
                 <path id={pathId} d={`M${-territory.width / 2} 0 Q0 ${-territory.width * .07} ${territory.width / 2} 0`} fill="none" />
-                <text fontFamily="Georgia" fontSize={territory.fontSize} letterSpacing=".6" fill="#fff0ca" stroke="#18362b" strokeWidth="2" paintOrder="stroke"><textPath href={`#${pathId}`} startOffset="50%" textAnchor="middle">{territory.title.toUpperCase()}</textPath></text>
+                <text fontFamily="Georgia" fontSize={territory.fontSize} letterSpacing=".6" fill="#fff0ca" stroke="#18362b" strokeWidth="2" paintOrder="stroke"><textPath href={`#${pathId}`} startOffset="50%" textAnchor="middle">{gameUi(territory.title.toUpperCase())}</textPath></text>
               </g>}
-              {regional && territory.components.slice(1).filter((component) => component.length >= 2).map((component) => { const [x, y] = center(component[0]); return <g key={component[0].id} transform={`translate(${x - 7} ${y - 8})`} opacity=".75"><HouseSigil house={territory.house} size={14} /></g>; })}
+              {gameUi(regional && territory.components.slice(1).filter((component) => component.length >= 2).map((component) => { const [x, y] = center(component[0]); return <g key={component[0].id} transform={`translate(${x - 7} ${y - 8})`} opacity=".75"><HouseSigil house={territory.house} size={14} /></g>; }))}
             </g>;
-          })}
-          {!mini &&
+          }))}
+          {gameUi(!mini &&
             view.armies
               .filter(
                 (a) =>
@@ -725,7 +727,7 @@ export default function EdravanePage() {
                         select(view.districts.find((d) => d.id === a.hex)!);
                       }
                     }}
-                    aria-label={`${a.name}, ${CONTROL_LABELS[command]}`}
+                    aria-label={gameUi(`${a.name}, ${CONTROL_LABELS[command]}`)}
                     data-control={command}
                   >
                     {a.id === army && <rect x={x - 21 + (i % 2) * 8} y={y - 2} width="24" height="24" rx="4" fill="#b9e0e91a" stroke="#b9e0e9" strokeWidth=".8" />}
@@ -747,19 +749,19 @@ export default function EdravanePage() {
                       strokeLinecap="round"
                     />
                     <g transform={`translate(${x - 15 + (i % 2) * 8},${y + 4})`} style={{ color: marker }} pointerEvents="none"><RealmIcon metric="troops" size={12} /></g>
-                    {regional && <text x={x} y={y + 27} textAnchor="middle" fontSize="7" fill="#fff1cb" stroke="#142c22" strokeWidth="2" paintOrder="stroke">{troopCount(a).toLocaleString()}</text>}
+                    {regional && <text x={x} y={y + 27} textAnchor="middle" fontSize="7" fill="#fff1cb" stroke="#142c22" strokeWidth="2" paintOrder="stroke">{gameUi(troopCount(a).toLocaleString())}</text>}
                     <title>
-                      {a.name}: {troopCount(a)} troops · {CONTROL_LABELS[command]}
+                      {gameUi(a.name)}: {gameUi(troopCount(a))}{gameUi(" troops · ")}{gameUi(CONTROL_LABELS[command])}
                     </title>
                   </g>
                 );
-              })}
-          {!mini && (view.intelligence?.[house.id] ?? []).filter((r) => !view.armies.some((a) => a.id === r.army)).map((report) => {
+              }))}
+          {gameUi(!mini && (view.intelligence?.[house.id] ?? []).filter((r) => !view.armies.some((a) => a.id === r.army)).map((report) => {
             const d = view.districts.find((d) => d.id === report.hex)!;
             const [x, y] = center(d);
-            return <g key={report.army} className="ed-intel-marker" role="button" tabIndex={0} aria-label={`${report.name}: last reported ${report.low}–${report.high} troops, round ${report.seen}`} onClick={() => select(d)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(d); } }}><circle cx={x} cy={y + 10} r="8" fill="#253c3c" stroke="#d6c6a4" strokeDasharray="2 2" /><text x={x} y={y + 13} fill="#e4d9bb" textAnchor="middle" fontSize="10">?</text><title>{report.name}: {report.low}–{report.high} troops · last seen round {report.seen}</title></g>;
-          })}
-          {!mini && selected && hex && (
+            return <g key={report.army} className="ed-intel-marker" role="button" tabIndex={0} aria-label={gameUi(`${report.name}: last reported ${report.low}–${report.high} troops, round ${report.seen}`)} onClick={() => select(d)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(d); } }}><circle cx={x} cy={y + 10} r="8" fill="#253c3c" stroke="#d6c6a4" strokeDasharray="2 2" /><text x={x} y={y + 13} fill="#e4d9bb" textAnchor="middle" fontSize="10">?</text><title>{gameUi(report.name)}: {gameUi(report.low)}–{gameUi(report.high)}{gameUi(" troops · last seen round ")}{gameUi(report.seen)}</title></g>;
+          }))}
+          {gameUi(!mini && selected && hex && (
             <polygon
               className="ed-selected-hex"
               points={points(hex, 1)}
@@ -770,9 +772,9 @@ export default function EdravanePage() {
               vectorEffect="non-scaling-stroke"
               pointerEvents="none"
             />
-          )}
+          ))}
         </g>
-        {!mini && (
+        {gameUi(!mini && (
           <>
             <text
               x="38"
@@ -781,9 +783,7 @@ export default function EdravanePage() {
               fontSize="13"
               fill="#abc4c2"
               letterSpacing="4"
-            >
-              THE AZURE SEA
-            </text>
+            >{gameUi(" THE AZURE SEA ")}</text>
             <g transform={`translate(${frame.width - 54} ${frame.height - 65})`} fill="none" stroke="#cfc39b">
               <path d="M0 -22 L5 0 L0 22 L-5 0Z M-22 0H22" />
               <text x="-4" y="-28" fill="#cfc39b" stroke="none" fontSize="10">
@@ -791,7 +791,7 @@ export default function EdravanePage() {
               </text>
             </g>
           </>
-        )}
+        ))}
       </svg>
     );
   }
@@ -800,37 +800,24 @@ export default function EdravanePage() {
       <main className="ed-app ed-start">
         <header className="ed-masthead">
           <Link to="/games">
-            <ArrowLeft size={16} /> Games
-          </Link>
-          <span>
-            MEDIEVAL KINGDOMS <b> / </b> A NEW CHRONICLE
-          </span>
-          <Link to="/games/medieval-kingdoms/legacy">
-            Legacy mode <ArrowUpRight size={15} />
+            <ArrowLeft size={16} />{gameUi(" Games ")}</Link>
+          <span>{gameUi(" MEDIEVAL KINGDOMS ")}<b> / </b>{gameUi(" A NEW CHRONICLE ")}</span>
+          <Link to="/games/medieval-kingdoms/legacy">{gameUi(" Legacy mode ")}<ArrowUpRight size={15} />
           </Link>
         </header>
         <div className="ed-intro">
           <div>
-            <span className="ed-eyebrow">EIGHT CROWNS. TWO CONTINENTS.</span>
-            <h1>
-              Edravane
-              <span>
-                A kingdom is inherited.
-                <br />
-                An empire is earned.
-              </span>
+            <span className="ed-eyebrow">{gameUi("EIGHT CROWNS. TWO CONTINENTS.")}</span>
+            <h1>{gameUi(" Edravane ")}<span>{gameUi(" A kingdom is inherited. ")}<br />{gameUi(" An empire is earned. ")}</span>
             </h1>
-            <p>
-              Raise your dynasty, call your banners, and shape the fortunes of a
-              living world.
-            </p>
+            <p>{gameUi(" Raise your dynasty, call your banners, and shape the fortunes of a living world. ")}</p>
           </div>
-          <div className="ed-intro-map">{map()}</div>
+          <div className="ed-intro-map">{gameUi(map())}</div>
         </div>
         <section className="ed-selection">
           <div className="ed-section-title">
-            <h2>Choose your crown</h2>
-            <span>01 — Found a dynasty</span>
+            <h2>{gameUi("Choose your crown")}</h2>
+            <span>{gameUi("01 — Found a dynasty")}</span>
           </div>
           <div className="ed-nations">
             {NATIONS.map((n) => (
@@ -845,12 +832,12 @@ export default function EdravanePage() {
               >
                 <span className="ed-crest ed-sigil-frame"><HouseSigil house={view.houses.find((h) => h.id === `${n.id}-0`)!} size={36} /></span>
                 <div>
-                  <strong>{n.name}</strong>
-                  <small>HOUSE {n.house.toUpperCase()}</small>
+                  <strong>{gameUi(n.name)}</strong>
+                  <small>{gameUi("HOUSE ")}{gameUi(n.house.toUpperCase())}</small>
                   <span>
-                    {n.people} · {n.succession}
+                    {gameUi(n.people)} · {gameUi(n.succession)}
                   </span>
-                  <small>{IDENTITIES[n.id].title}</small>
+                  <small>{gameUi(IDENTITIES[n.id].title)}</small>
                 </div>
                 {nation === n.id && <Crown size={16} />}
               </button>
@@ -858,17 +845,16 @@ export default function EdravanePage() {
           </div>
           <div className="ed-start-actions">
             <button className="ed-primary" onClick={start}>
-              <Crown size={16} /> Begin single-player <ArrowUpRight size={16} />
+              <Crown size={16} />{gameUi(" Begin single-player ")}<ArrowUpRight size={16} />
             </button>
             <button
               aria-expanded={networkMenu}
               aria-controls="ed-network-lobby"
               onClick={() => setNetworkMenu((v) => !v)}
             >
-              <Flag size={16} /> Multiplayer council
-            </button>
-            <button onClick={resume}>Continue saved campaign</button>
-            <button onClick={() => file.current?.click()}>Import save</button>
+              <Flag size={16} />{gameUi(" Multiplayer council ")}</button>
+            <button onClick={resume}>{gameUi("Continue saved campaign")}</button>
+            <button onClick={() => file.current?.click()}>{gameUi("Import save")}</button>
           </div>
           <input
             ref={file}
@@ -898,68 +884,44 @@ export default function EdravanePage() {
               className="ed-network"
               id="ed-network-lobby"
               ref={networkPanel}
-              aria-label="Multiplayer lobby"
+              aria-label={gameUi("Multiplayer lobby")}
             >
-              <h3>Gather the eight banners</h3>
-              <p>
-                Multiplayer uses your existing Supabase account.{" "}
-                <Link to="/login">Log in</Link> to host or join; councils and
-                turns are saved automatically.
-              </p>
+              <h3>{gameUi("Gather the eight banners")}</h3>
+              <p>{gameUi(" Multiplayer uses your existing Supabase account.")}{gameUi(" ")}
+                <Link to="/login">{gameUi("Log in")}</Link>{gameUi(" to host or join; councils and turns are saved automatically. ")}</p>
               {!lobby && (
                 <>
-                  <p>
-                    Each crown takes a turn. Use End turn to commit movement and
-                    pass control. War, invasion, peace and marriage proposals
-                    allow the receiving player to respond. Unoccupied slots are
-                    bots. During battles, campaign turns wait for the outcome;
-                    both sides commit an order before each round resolves.
-                    Production, movement, trade, and challenge cooldowns stay
-                    frozen.
-                  </p>
+                  <p>{gameUi(" Each crown takes a turn. Use End turn to commit movement and pass control. War, invasion, peace and marriage proposals allow the receiving player to respond. Unoccupied slots are bots. During battles, campaign turns wait for the outcome; both sides commit an order before each round resolves. Production, movement, trade, and challenge cooldowns stay frozen. ")}</p>
                   <div className="ed-form-row">
-                    <label>
-                      Your name
-                      <input
+                    <label>{gameUi(" Your name ")}<input
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                       />
                     </label>
-                    <label>
-                      Room code
-                      <input
+                    <label>{gameUi(" Room code ")}<input
                         value={code}
                         onChange={(e) => setCode(e.target.value)}
                       />
                     </label>
                   </div>
                   <div className="ed-form-row">
-                    <button onClick={() => connect("create")}>
-                      Host council
-                    </button>
-                    <button onClick={() => connect("join")}>
-                      Join council
-                    </button>
+                    <button onClick={() => connect("create")}>{gameUi(" Host council ")}</button>
+                    <button onClick={() => connect("join")}>{gameUi(" Join council ")}</button>
                     <button
                       className="ed-reconnect"
                       onClick={() => connect("resume")}
-                    >
-                      Reconnect
-                    </button>
-                    <span>{netStatus}</span>
+                    >{gameUi(" Reconnect ")}</button>
+                    <span>{gameUi(netStatus)}</span>
                   </div>
                 </>
               )}
               {lobby && (
                 <>
-                  <p>
-                    Room <strong>{lobby.code}</strong> · share this code with
-                    the other players.
-                  </p>
+                  <p>{gameUi(" Room ")}<strong>{lobby.code}</strong>{gameUi(" · share this code with the other players. ")}</p>
                   <div
                     className="ed-form-row ed-lobby-actions"
                     role="group"
-                    aria-label="Your lobby controls"
+                    aria-label={gameUi("Your lobby controls")}
                   >
                     <button
                       className={lobbyReady ? "" : "ed-primary"}
@@ -974,13 +936,11 @@ export default function EdravanePage() {
                         })
                       }
                     >
-                      {lobbyReady ? "Cancel ready" : "Ready"}
+                      {gameUi(lobbyReady ? "Cancel ready" : "Ready")}
                     </button>
-                    {lobby.host === player && (
+                    {gameUi(lobby.host === player && (
                       <>
-                        <label>
-                          Sea hazard
-                          <select
+                        <label>{gameUi(" Sea hazard ")}<select
                             value={lobby.settings.maritimeHazard}
                             onChange={(e) =>
                               netSend({
@@ -990,9 +950,9 @@ export default function EdravanePage() {
                               })
                             }
                           >
-                            <option value="0">Calm</option>
-                            <option value="0.025">Normal · 2.5%</option>
-                            <option value="0.08">Harsh · 8%</option>
+                            <option value="0">{gameUi("Calm")}</option>
+                            <option value="0.025">{gameUi("Normal · 2.5%")}</option>
+                            <option value="0.08">{gameUi("Harsh · 8%")}</option>
                           </select>
                         </label>
                         <button
@@ -1001,43 +961,39 @@ export default function EdravanePage() {
                             !allPlayersReady || netStatus !== "Connected"
                           }
                           onClick={() => netSend({ type: "start" })}
-                        >
-                          Start campaign
-                        </button>
+                        >{gameUi(" Start campaign ")}</button>
                       </>
-                    )}
+                    ))}
                   </div>
                   <p className="ed-lobby-status" role="status">
-                    {lobbyReady
+                    {gameUi(lobbyReady
                       ? "You are ready."
-                      : "Click Ready when you have chosen your crown."}{" "}
-                    {allPlayersReady
+                      : "Click Ready when you have chosen your crown.")}{gameUi(" ")}
+                    {gameUi(allPlayersReady
                       ? lobby.host === player
                         ? "All players are ready. You can start the campaign."
                         : "All players are ready. Waiting for the host to start."
-                      : "Waiting for every player, including the host, to be ready."}
+                      : "Waiting for every player, including the host, to be ready.")}
                   </p>
-                  {netStatus !== "Connected" && (
+                  {gameUi(netStatus !== "Connected" && (
                     <div className="ed-form-row">
-                      <span role="status">{netStatus}</span>
-                      <button onClick={() => connect("resume")}>
-                        Reconnect
-                      </button>
+                      <span role="status">{gameUi(netStatus)}</span>
+                      <button onClick={() => connect("resume")}>{gameUi(" Reconnect ")}</button>
                     </div>
-                  )}
+                  ))}
                   <div className="ed-slots">
                     {lobby.slots.map((s) => (
                       <div
                         key={s.nation}
                         className={s.player === player ? "ed-slot-self" : ""}
                       >
-                        <b>{NATIONS.find((n) => n.id === s.nation)!.name}</b>
+                        <b>{gameUi(NATIONS.find((n) => n.id === s.nation)!.name)}</b>
                         <span>
-                          {s.bot ? "Bot" : s.name}
-                          {s.player === player ? " (you)" : ""}
-                          {s.player === lobby.host ? " · Host" : ""} ·{" "}
-                          {s.ready ? "Ready" : "Not ready"}
-                          {s.player && !s.connected ? " · disconnected" : ""}
+                          {gameUi(s.bot ? "Bot" : s.name)}
+                          {gameUi(s.player === player ? " (you)" : "")}
+                          {gameUi(s.player === lobby.host ? " · Host" : "")} ·{gameUi(" ")}
+                          {gameUi(s.ready ? "Ready" : "Not ready")}
+                          {gameUi(s.player && !s.connected ? " · disconnected" : "")}
                         </span>
                       </div>
                     ))}
@@ -1046,15 +1002,12 @@ export default function EdravanePage() {
               )}
             </section>
           )}
-          {message && (
+          {gameUi(message && (
             <p className="ed-notice" role="status">
-              {message}
+              {gameUi(message)}
             </p>
-          )}
-          <p className="ed-footnote">
-            Two continents · {view.districts.length} hexes · {view.districts.filter((d) => d.nation).length} land districts · 40 great and
-            minor houses · Legacy progress preserved
-          </p>
+          ))}
+          <p className="ed-footnote">{gameUi(" Two continents · ")}{gameUi(view.districts.length)}{gameUi(" hexes · ")}{gameUi(view.districts.filter((d) => d.nation).length)}{gameUi(" land districts · 40 great and minor houses · Legacy progress preserved ")}</p>
         </section>
       </main>
     );
@@ -1098,13 +1051,9 @@ export default function EdravanePage() {
     >
       <header className="ed-masthead">
         <Link to="/games">
-          <ArrowLeft size={16} /> Games
-        </Link>
-        <span>
-          MEDIEVAL KINGDOMS <b>/</b> EDRAVANE
-        </span>
-        <Link to="/games/medieval-kingdoms/legacy">
-          Legacy mode <ArrowUpRight size={15} />
+          <ArrowLeft size={16} />{gameUi(" Games ")}</Link>
+        <span>{gameUi(" MEDIEVAL KINGDOMS ")}<b>/</b>{gameUi(" EDRAVANE ")}</span>
+        <Link to="/games/medieval-kingdoms/legacy">{gameUi(" Legacy mode ")}<ArrowUpRight size={15} />
         </Link>
       </header>
       <div className="ed-topbar">
@@ -1114,48 +1063,46 @@ export default function EdravanePage() {
         >
           <Crown />
           <div>
-            <h1>{NATIONS.find((n) => n.id === nation)!.name}</h1>
-            <span>
-              HOUSE {house.name.toUpperCase()} ·{" "}
+            <h1>{gameUi(NATIONS.find((n) => n.id === nation)!.name)}</h1>
+            <span>{gameUi(" HOUSE ")}{gameUi(house.name.toUpperCase())} ·{gameUi(" ")}
               {house.family.find((p) => p.id === house.ruler)?.name}
             </span>
           </div>
         </div>
         <div className="ed-stat">
-          <small>COINS</small>
+          <small>{gameUi("COINS")}</small>
           <b>
-            <Coins size={15} /> {money(house.treasury)}
+            <Coins size={15} /> {gameUi(money(house.treasury))}
           </b>
         </div>
         <div className="ed-stat ed-food-stat">
-          <small>FOOD</small>
+          <small>{gameUi("FOOD")}</small>
           <b>
-            <Leaf size={15} /> {money(house.stock.grain)}
+            <Leaf size={15} /> {gameUi(money(house.stock.grain))}
           </b>
         </div>
         <div className="ed-stat">
-          <small>HOUSE TROOPS</small>
+          <small>{gameUi("HOUSE TROOPS")}</small>
           <b>
-            <Swords size={15} />{" "}
-            {myArmies
+            <Swords size={15} />{gameUi(" ")}
+            {gameUi(myArmies
               .filter((a) => canControl(view, actor, a))
-              .reduce((n, a) => n + troopCount(a), 0)}
+              .reduce((n, a) => n + troopCount(a), 0))}
           </b>
         </div>
         <div className="ed-stat">
-          <small>ROUND / TURN</small>
+          <small>{gameUi("ROUND / TURN")}</small>
           <b>
-            {view.turns?.round ?? 1} · {actingHouse?.name ?? "Council"}
+            {gameUi(view.turns?.round ?? 1)} · {gameUi(actingHouse?.name ?? "Council")}
           </b>
-          <small>{season(view)} · {mapZoom < 1.6 ? "World view" : mapZoom < 2.6 ? "Regional view" : "Estate view"}</small>
+          <small>{gameUi(season(view))} · {gameUi(mapZoom < 1.6 ? "World view" : mapZoom < 2.6 ? "Regional view" : "Estate view")}</small>
         </div>
         <div className="ed-tools">
           <button
             className="ed-end-turn"
             disabled={!myTurn || !!battle}
             onClick={() => execute({ type: "endTurn" })}
-          >
-            End turn <ChevronRight size={16} />
+          >{gameUi(" End turn ")}<ChevronRight size={16} />
           </button>
           <button
             onClick={() => {
@@ -1170,29 +1117,24 @@ export default function EdravanePage() {
               resetCamera();
               setSelected(null);
             }}
-          >
-            Campaign menu
-          </button>
+          >{gameUi(" Campaign menu ")}</button>
           {online ? (
             <>
-              <span className="ed-live">Room {code}</span>
-              <span className="ed-live">● {netStatus}</span>
-              <button onClick={() => connect("resume")}>Reconnect</button>
+              <span className="ed-live">{gameUi("Room ")}{code}</span>
+              <span className="ed-live">● {gameUi(netStatus)}</span>
+              <button onClick={() => connect("resume")}>{gameUi("Reconnect")}</button>
             </>
           ) : (
             <>
               <button className="ed-save" onClick={save}>
-                <Save size={16} /> Save
-              </button>
-              <button className="ed-export" onClick={exportSave}>
-                Export
-              </button>
+                <Save size={16} />{gameUi(" Save ")}</button>
+              <button className="ed-export" onClick={exportSave}>{gameUi(" Export ")}</button>
             </>
           )}
         </div>
       </div>
       <div className="ed-turn-status" role="status">
-        {activeReaction && !battle
+        {gameUi(activeReaction && !battle
           ? `${myResponse ? "Your response required" : "Awaiting response"}: ${view.houses.find((h) => h.id === activeReaction.from)?.name} → ${view.houses.find((h) => h.id === activeReaction.to)?.name} · ${activeReaction.kind}`
           : battle
             ? hiddenBattle === battle.id
@@ -1202,15 +1144,13 @@ export default function EdravanePage() {
               ? `Your crown has passed to House ${crownHolder?.name}. Review the chronicle or start a new campaign from Campaign menu.`
             : myTurn
               ? "Your turn · plan diplomacy, harvest, raise troops and order movement, then End turn."
-              : `${actingHouse?.name ?? "The council"} is taking its turn. You can inspect the map while waiting.`}
-        {battle && hiddenBattle === battle.id && (
+              : `${actingHouse?.name ?? "The council"} is taking its turn. You can inspect the map while waiting.`)}
+        {gameUi(battle && hiddenBattle === battle.id && (
           <button
             className="ed-battle-return"
             onClick={() => setHiddenBattle("")}
-          >
-            Return to battle
-          </button>
-        )}
+          >{gameUi(" Return to battle ")}</button>
+        ))}
       </div>
       <div className="ed-workspace">
         <section className="ed-map-card">
@@ -1222,76 +1162,75 @@ export default function EdravanePage() {
                   setSelected(null);
                 }}
               >
-                <ZoomOut size={14} /> World
-              </button>
-              {region && hex && (
+                <ZoomOut size={14} />{gameUi(" World ")}</button>
+              {gameUi(region && hex && (
                 <>
                   <ChevronRight size={14} />
-                  <span>{NATIONS.find((n) => n.id === hex.nation)?.name}</span>
+                  <span>{gameUi(NATIONS.find((n) => n.id === hex.nation)?.name)}</span>
                   <ChevronRight size={14} />
-                  <span>{hex.settlement}</span>
+                  <span>{gameUi(hex.settlement)}</span>
                 </>
-              )}
+              ))}
             </div>
-            <span>THE REALMS OF EDRAVANE</span>
+            <span>{gameUi("THE REALMS OF EDRAVANE")}</span>
           </div>
           <div className="ed-map">
-            {map()}
+            {gameUi(map())}
             <div
               className="ed-zoom-controls"
               role="group"
-              aria-label="Map zoom controls"
+              aria-label={gameUi("Map zoom controls")}
             >
               <button
-                aria-label="Zoom out map"
+                aria-label={gameUi("Zoom out map")}
                 disabled={mapZoom <= MIN_MAP_ZOOM}
                 onClick={() => zoomMap(mapZoom - 0.25)}
               >
                 <Minus size={15} />
               </button>
-              <span>{Math.round(mapZoom * 100)}%</span>
+              <span>{gameUi(Math.round(mapZoom * 100))}%</span>
               <button
-                aria-label="Zoom in map"
+                aria-label={gameUi("Zoom in map")}
                 disabled={mapZoom >= MAX_MAP_ZOOM}
                 onClick={() => zoomMap(mapZoom + 0.25)}
               >
                 <Plus size={15} />
               </button>
-              <button onClick={resetCamera}>Fit map</button>
+              <button onClick={resetCamera}>{gameUi("Fit map")}</button>
             </div>
             <div
               className="ed-pan-controls"
               role="group"
-              aria-label="Map direction controls"
+              aria-label={gameUi("Map direction controls")}
               onKeyDown={mapKey}
             >
               <button
-                aria-label="View map west"
-                title="View west · Left arrow"
+                aria-label={gameUi("View map west")}
+                title={gameUi("View west · Left arrow")}
                 disabled={mapCenter[0] <= worldBounds.minX}
                 onClick={() => panMap(-1, 0)}
               >
                 <ArrowLeft size={16} />
               </button>
               <button
-                aria-label="View map north"
-                title="View north · Up arrow"
+                aria-label={gameUi("View map north")}
+                title={gameUi("View north · Up arrow")}
                 disabled={mapCenter[1] <= worldBounds.minY}
                 onClick={() => panMap(0, -1)}
               >
                 <ArrowUp size={16} />
               </button>
               <button
-                aria-label="View map south"
-                title="View south · Down arrow"
+                aria-label={gameUi("View map south")}
+                title={gameUi("View south · Down arrow")}
                 disabled={mapCenter[1] >= worldBounds.maxY}
                 onClick={() => panMap(0, 1)}
               >
                 <ArrowDown size={16} />
               </button>
               <button
-                aria-label="View map east"
-                title="View east · Right arrow"
+                aria-label={gameUi("View map east")}
+                title={gameUi("View east · Right arrow")}
                 disabled={mapCenter[0] >= worldBounds.maxX}
                 onClick={() => panMap(1, 0)}
               >
@@ -1306,7 +1245,7 @@ export default function EdravanePage() {
                     key={o}
                     onClick={() => setOverlay(o)}
                   >
-                    {o === "ownership" ? (
+                    {gameUi(o === "ownership" ? (
                       <Shield size={13} />
                     ) : o === "trade" ? (
                       <Anchor size={13} />
@@ -1314,14 +1253,14 @@ export default function EdravanePage() {
                       <Leaf size={13} />
                     ) : (
                       <Flag size={13} />
-                    )}{" "}
-                    {o}
+                    ))}{gameUi(" ")}
+                    {gameUi(o)}
                   </button>
                 ),
               )}
             </div>
-            <div className="ed-map-mode-guide" role="status">{overlay === "supply" ? "Green: an open supply route · red: carried food needed" : overlay === "diplomacy" ? "Gold: your realm · blue: marriage allies · red: enemies" : overlay === "claims" ? "Gold: your realm · purple: inherited family claims" : overlay === "loyalty" ? "Green: ready for service · amber: reduced commitment · red: refusal risk" : overlay === "trade" ? "Dashed lines: trade routes · ports and blockades control access" : "House sigils mark controlled fields · zoom for house names and estates"}</div>
-            <div className="ed-control-legend" aria-label="Map control legend"><span><i className="ed-line-direct" />Your domain</span><span><i className="ed-line-vassal" />Vassal estates</span><small>Solid hosts: direct orders · dotted hosts: requests · double ring: pledged service</small></div>
+            <div className="ed-map-mode-guide" role="status">{gameUi(overlay === "supply" ? "Green: an open supply route · red: carried food needed" : overlay === "diplomacy" ? "Gold: your realm · blue: marriage allies · red: enemies" : overlay === "claims" ? "Gold: your realm · purple: inherited family claims" : overlay === "loyalty" ? "Green: ready for service · amber: reduced commitment · red: refusal risk" : overlay === "trade" ? "Dashed lines: trade routes · ports and blockades control access" : "House sigils mark controlled fields · zoom for house names and estates")}</div>
+            <div className="ed-control-legend" aria-label={gameUi("Map control legend")}><span><i className="ed-line-direct" />{gameUi("Your domain")}</span><span><i className="ed-line-vassal" />{gameUi("Vassal estates")}</span><small>{gameUi("Solid hosts: direct orders · dotted hosts: requests · double ring: pledged service")}</small></div>
             <button
               className="ed-sidebar-toggle"
               onClick={() => {
@@ -1329,53 +1268,48 @@ export default function EdravanePage() {
                 setInspectedReaction(activeReaction?.id ?? "");
               }}
             >
-              {sidebarOpen ||
+              {gameUi(sidebarOpen ||
               (myResponse && inspectedReaction !== activeReaction?.id)
                 ? "Hide sidebar"
-                : "Show sidebar"}
+                : "Show sidebar")}
             </button>
             <div className="ed-map-bottom">
               <div>
                 <span>
-                  <i className="gold" /> Your estate · ♛
-                </span>
+                  <i className="gold" />{gameUi(" Your estate · ♛ ")}</span>
                 <span>
-                  <i className="green" /> Vassal crest
-                </span>
-                <span>♜ Castle · 500 guards</span>
-                <span>⌂ City · trade</span>
-                <span>▨ Occupied</span>
-                <span>┄ Disputed</span>
-                <span>Wheel to zoom · drag or arrows to explore</span>
+                  <i className="green" />{gameUi(" Vassal crest ")}</span>
+                <span>{gameUi("♜ Castle · 500 guards")}</span>
+                <span>{gameUi("⌂ City · trade")}</span>
+                <span>{gameUi("▨ Occupied")}</span>
+                <span>{gameUi("┄ Disputed")}</span>
+                <span>{gameUi("Wheel to zoom · drag or arrows to explore")}</span>
               </div>
               <label>
                 <input
                   type="checkbox"
                   checked={reduced}
                   onChange={(e) => setReduced(e.target.checked)}
-                />{" "}
-                Reduce motion
-              </label>
+                />{gameUi(" ")}{gameUi(" Reduce motion ")}</label>
             </div>
-            {region && (
+            {gameUi(region && (
               <button className="ed-return" onClick={resetCamera}>
-                <ArrowLeft size={14} /> Return to world
-              </button>
-            )}
+                <ArrowLeft size={14} />{gameUi(" Return to world ")}</button>
+            ))}
           </div>
           <div className={`ed-army-bar ${selectedArmy && (!selectedArmy.garrison || control === "vassal") ? "" : "ed-army-bar-empty"}`}>
             <Swords size={16} />
             <select
-              aria-label="Selected army"
+              aria-label={gameUi("Selected army")}
               value={selectedArmy?.garrison && control !== "vassal" ? "" : army}
               onChange={(e) => setArmy(e.target.value)}
             >
               <option value="">
-                {view.armies.some(
+                {gameUi(view.armies.some(
                   (a) => !a.garrison && canControl(view, actor, a),
                 )
                   ? "Select a field army"
-                  : "Raise a field army at your seat"}
+                  : "Raise a field army at your seat")}
               </option>
               {view.armies
                 .filter(
@@ -1384,26 +1318,24 @@ export default function EdravanePage() {
                 )
                 .map((a) => (
                   <option key={a.id} value={a.id}>
-                    {a.name} ·{" "}
-                    {a.garrison ? "Vassal reserves · request service" : CONTROL_LABELS[armyControl(view, house, a)]}{" "}
-                    · {troopCount(a)}
+                    {gameUi(a.name)} ·{gameUi(" ")}
+                    {gameUi(a.garrison ? "Vassal reserves · request service" : CONTROL_LABELS[armyControl(view, house, a)])}{gameUi(" ")}
+                    · {gameUi(troopCount(a))}
                   </option>
                 ))}
             </select>
-            {control && <strong className={`ed-command-label ed-command-${control}`}><RealmIcon metric="loyalty" />{CONTROL_LABELS[control]}{control === "vassal" && armyOwner ? ` · ${armyOwner.loyalty} loyalty` : ""}</strong>}
-            {selectedArmy && !selectedArmy.garrison && (
-              <span>
-                Loyalty {Math.round(armyLoyalty(view, selectedArmy))}% · Food{" "}
-                {Math.round(selectedArmy.supply * 100)}% · Morale{" "}
-                {Math.round(selectedArmy.morale)} · {woundedCount(selectedArmy)}{" "}
-                wounded · Readiness {armyHealth(selectedArmy)}% ·{" "}
-                {selectedArmy.voyage
+            {control && <strong className={`ed-command-label ed-command-${control}`}><RealmIcon metric="loyalty" />{gameUi(CONTROL_LABELS[control])}{gameUi(control === "vassal" && armyOwner ? ` · ${armyOwner.loyalty} loyalty` : "")}</strong>}
+            {gameUi(selectedArmy && !selectedArmy.garrison && (
+              <span>{gameUi(" Loyalty ")}{gameUi(Math.round(armyLoyalty(view, selectedArmy)))}{gameUi("% · Food")}{gameUi(" ")}
+                {gameUi(Math.round(selectedArmy.supply * 100))}{gameUi("% · Morale")}{gameUi(" ")}
+                {gameUi(Math.round(selectedArmy.morale))} · {gameUi(woundedCount(selectedArmy))}{gameUi(" ")}{gameUi(" wounded · Readiness ")}{gameUi(armyHealth(selectedArmy))}% ·{gameUi(" ")}
+                {gameUi(selectedArmy.voyage
                   ? "At sea"
                   : selectedArmy.path.length
                     ? "Queued for End turn"
-                    : "Stationed"}
+                    : "Stationed")}
               </span>
-            )}
+            ))}
             <button
               hidden={control !== "own" && control !== "pledged"}
               disabled={
@@ -1416,8 +1348,7 @@ export default function EdravanePage() {
                 !!battle
               }
               onClick={() => execute({ type: "move", army, hex: hex!.id })}
-            >
-              March here <ArrowUpRight size={14} />
+            >{gameUi(" March here ")}<ArrowUpRight size={14} />
             </button>
             <button
               hidden={control !== "own" && control !== "pledged"}
@@ -1432,9 +1363,8 @@ export default function EdravanePage() {
               }
               onClick={() => execute({ type: "embark", army, hex: hex!.id })}
             >
-              <Anchor size={14} /> Sail here
-            </button>
-            {selectedArmy &&
+              <Anchor size={14} />{gameUi(" Sail here ")}</button>
+            {gameUi(selectedArmy &&
               !selectedArmy.garrison &&
               canControl(view, actor, selectedArmy) && (
                 <button
@@ -1452,11 +1382,11 @@ export default function EdravanePage() {
                     })
                   }
                 >
-                  {selectedSiege ? "Lift siege" : selectedArmy.blockading
+                  {gameUi(selectedSiege ? "Lift siege" : selectedArmy.blockading
                     ? "Lift blockade"
-                    : "Block trade here"}
+                    : "Block trade here")}
                 </button>
-              )}
+              ))}
             <button
               hidden={control !== "vassal"}
               disabled={
@@ -1468,41 +1398,39 @@ export default function EdravanePage() {
               }
               onClick={() => execute({ type: "objective", army, hex: hex!.id })}
             >
-              <RealmIcon metric="relations" />Request {hex?.id === selectedArmy?.hex ? "hold position" : "march here"}
+              <RealmIcon metric="relations" />{gameUi("Request ")}{gameUi(hex?.id === selectedArmy?.hex ? "hold position" : "march here")}
             </button>
-            {control === "vassal" && <small className="ed-vassal-request-note">Loyalty 55+ to obey.{armyOwner?.summons ? ` ${armyOwner.summons}.` : ""}</small>}
-            {control === "awaiting" && <small className="ed-vassal-request-note">Orders unlock after {selectedArmy?.delay} turn{selectedArmy?.delay === 1 ? "" : "s"} of travel.</small>}
+            {control === "vassal" && <small className="ed-vassal-request-note">{gameUi("Loyalty 55+ to obey.")}{gameUi(armyOwner?.summons ? ` ${armyOwner.summons}.` : "")}</small>}
+            {control === "awaiting" && <small className="ed-vassal-request-note">{gameUi("Orders unlock after ")}{gameUi(selectedArmy?.delay)}{gameUi(" turn")}{gameUi(selectedArmy?.delay === 1 ? "" : "s")}{gameUi(" of travel.")}</small>}
           </div>
           <ArmyLogistics state={view} house={house} army={selectedArmy} destination={hex} />
         </section>
         <aside
           className={`ed-panel ${panelExpanded || myResponse ? "ed-panel-expanded" : ""}`}
-          aria-label="Kingdom information sidebar"
+          aria-label={gameUi("Kingdom information sidebar")}
         >
-          <div className="ed-panel-dock"><span>REALM DESK</span><button className="ed-dock-side" aria-label={`Move sidebar ${panelSide === "east" ? "left" : "right"}`} onClick={() => setPanelSide((side) => side === "east" ? "west" : "east")}>{panelSide === "east" ? <ArrowLeft size={14} /> : <ArrowRight size={14} />}</button><button aria-label="Close sidebar" onClick={() => { setSidebarOpen(false); setInspectedReaction(activeReaction?.id ?? ""); }}>×</button></div>
+          <div className="ed-panel-dock"><span>{gameUi("REALM DESK")}</span><button className="ed-dock-side" aria-label={gameUi(`Move sidebar ${panelSide === "east" ? "left" : "right"}`)} onClick={() => setPanelSide((side) => side === "east" ? "west" : "east")}>{panelSide === "east" ? <ArrowLeft size={14} /> : <ArrowRight size={14} />}</button><button aria-label={gameUi("Close sidebar")} onClick={() => { setSidebarOpen(false); setInspectedReaction(activeReaction?.id ?? ""); }}>×</button></div>
           {activeReaction && myResponse && !battle && (
             <section
               className="ed-response-card"
-              aria-label="Diplomatic or military response"
+              aria-label={gameUi("Diplomatic or military response")}
             >
-              <span className="ed-eyebrow">RESPONSE REQUIRED</span>
-              {activeReaction.reason && (
-                <p className="ed-reason">
-                  War reason: {WAR_REASONS[activeReaction.reason]}
+              <span className="ed-eyebrow">{gameUi("RESPONSE REQUIRED")}</span>
+              {gameUi(activeReaction.reason && (
+                <p className="ed-reason">{gameUi(" War reason: ")}{gameUi(WAR_REASONS[activeReaction.reason])}
                 </p>
-              )}
-              {activeReaction.hex && (
+              ))}
+              {gameUi(activeReaction.hex && (
                 <div className="ed-threat-info">
                   <strong>
                     {
-                      view.districts.find((d) => d.id === activeReaction.hex)
-                        ?.name
+                      gameUi(view.districts.find((d) => d.id === activeReaction.hex)
+                        ?.name)
                     }
                   </strong>
-                  <p>
-                    Controlled by{" "}
+                  <p>{gameUi(" Controlled by")}{gameUi(" ")}
                     {
-                      view.houses.find(
+                      gameUi(view.houses.find(
                         (h) =>
                           h.id ===
                           (view.districts.find(
@@ -1511,15 +1439,13 @@ export default function EdravanePage() {
                             view.districts.find(
                               (d) => d.id === activeReaction.hex,
                             )?.owner),
-                      )?.name
-                    }{" "}
-                    ·{" "}
-                    {view.armies
+                      )?.name)
+                    }{gameUi(" ")}
+                    ·{gameUi(" ")}
+                    {gameUi(view.armies
                       .filter((a) => a.hex === activeReaction.hex)
                       .reduce((n, a) => n + troopCount(a), 0)
-                      .toLocaleString()}{" "}
-                    troops
-                  </p>
+                      .toLocaleString())}{gameUi(" ")}{gameUi(" troops ")}</p>
                   <button
                     onClick={() => {
                       select(
@@ -1536,14 +1462,12 @@ export default function EdravanePage() {
                       );
                       setMapZoom(1.8);
                     }}
-                  >
-                    Inspect threatened hex
-                  </button>
+                  >{gameUi(" Inspect threatened hex ")}</button>
                 </div>
-              )}
-              {message && <p role="alert">{message}</p>}
+              ))}
+              {message && <p role="alert">{gameUi(message)}</p>}
               <h2>
-                {activeReaction.kind === "attack"
+                {gameUi(activeReaction.kind === "attack"
                   ? `Invasion of ${view.districts.find((d) => d.id === activeReaction.hex)?.settlement}`
                   : activeReaction.kind === "war"
                     ? "A declaration of war"
@@ -1551,21 +1475,21 @@ export default function EdravanePage() {
                       ? "A castle surrender demand"
                     : activeReaction.kind === "peace"
                       ? "A peace offer"
-                      : "A proposed marriage pact"}
+                      : "A proposed marriage pact")}
               </h2>
               <p>
-                {view.houses.find((h) => h.id === activeReaction.from)?.name}{" "}
-                {activeReaction.kind === "attack"
+                {gameUi(view.houses.find((h) => h.id === activeReaction.from)?.name)}{gameUi(" ")}
+                {gameUi(activeReaction.kind === "attack"
                   ? "is attacking your territory. Choose a defending force, withdraw, or request peace."
                   : activeReaction.kind === "war"
                     ? "has declared war. You may raise or reinforce troops at your seats before completing your response."
                     : activeReaction.kind === "peace"
                       ? "asks to end the war. Peace requires your consent."
-                      : activeReaction.kind === "surrender" ? "demands the castle's surrender. Acceptance disarms the garrison and cedes occupation; refusal continues the siege." : "proposes a marriage pact. The heirs marry only if you accept."}
+                      : activeReaction.kind === "surrender" ? "demands the castle's surrender. Acceptance disarms the garrison and cedes occupation; refusal continues the siege." : "proposes a marriage pact. The heirs marry only if you accept.")}
               </p>
-              {activeReaction.kind === "peace" && <p className="ed-response-terms">{peaceDescription(activeReaction.terms)}</p>}
-              {activeReaction.kind === "marriage" && <p className="ed-response-terms">{activeReaction.people?.map((id) => view.houses.flatMap((h) => h.family).find((p) => p.id === id)?.name).join(" marries ")}. Their living marriage creates a pact and protects against border conquest.</p>}
-              {activeReaction.kind === "attack" ? (
+              {activeReaction.kind === "peace" && <p className="ed-response-terms">{gameUi(peaceDescription(activeReaction.terms))}</p>}
+              {activeReaction.kind === "marriage" && <p className="ed-response-terms">{gameUi(activeReaction.people?.map((id) => view.houses.flatMap((h) => h.family).find((p) => p.id === id)?.name).join(" marries "))}{gameUi(". Their living marriage creates a pact and protects against border conquest.")}</p>}
+              {gameUi(activeReaction.kind === "attack" ? (
                 <>
                   {defendingArmies(view, activeReaction).map((a) => (
                     <button
@@ -1578,8 +1502,7 @@ export default function EdravanePage() {
                           army: a.id,
                         })
                       }
-                    >
-                      Defend with {a.name} · {troopCount(a).toLocaleString()}
+                    >{gameUi(" Defend with ")}{gameUi(a.name)} · {gameUi(troopCount(a).toLocaleString())}
                     </button>
                   ))}
                   <button
@@ -1590,9 +1513,7 @@ export default function EdravanePage() {
                         choice: "withdraw",
                       })
                     }
-                  >
-                    Move troops out · about 2% losses
-                  </button>
+                  >{gameUi(" Move troops out · about 2% losses ")}</button>
                 </>
               ) : activeReaction.kind === "war" ? (
                 <button
@@ -1603,9 +1524,7 @@ export default function EdravanePage() {
                       choice: "defend",
                     })
                   }
-                >
-                  Defenses ready
-                </button>
+                >{gameUi(" Defenses ready ")}</button>
               ) : (
                 <>
                   <button
@@ -1616,11 +1535,10 @@ export default function EdravanePage() {
                         choice: "accept",
                       })
                     }
-                  >
-                    Accept{" "}
-                    {activeReaction.kind === "peace"
+                  >{gameUi(" Accept")}{gameUi(" ")}
+                    {gameUi(activeReaction.kind === "peace"
                       ? "peace"
-                      : activeReaction.kind === "surrender" ? "castle surrender" : "marriage pact"}
+                      : activeReaction.kind === "surrender" ? "castle surrender" : "marriage pact")}
                   </button>
                   <button
                     onClick={() =>
@@ -1630,12 +1548,10 @@ export default function EdravanePage() {
                         choice: "decline",
                       })
                     }
-                  >
-                    Decline proposal
-                  </button>
+                  >{gameUi(" Decline proposal ")}</button>
                 </>
-              )}
-              {(activeReaction.kind === "attack" ||
+              ))}
+              {gameUi((activeReaction.kind === "attack" ||
                 activeReaction.kind === "war") && (
                 <button
                   disabled={
@@ -1657,10 +1573,8 @@ export default function EdravanePage() {
                       choice: "peace",
                     })
                   }
-                >
-                  Request peace
-                </button>
-              )}
+                >{gameUi(" Request peace ")}</button>
+              ))}
             </section>
           )}
 
@@ -1675,7 +1589,7 @@ export default function EdravanePage() {
                     setInspectedReaction(activeReaction?.id ?? "");
                   }}
                 >
-                  {t}
+                  {gameUi(t)}
                 </button>
               ),
             )}
@@ -1685,46 +1599,38 @@ export default function EdravanePage() {
             aria-expanded={panelExpanded}
             onClick={() => setPanelExpanded((v) => !v)}
           >
-            {panelExpanded ? "Compact sidebar" : "Expand sidebar"}
+            {gameUi(panelExpanded ? "Compact sidebar" : "Expand sidebar")}
           </button>
           <button
             className="ed-panel-minimap"
-            aria-label="World minimap — return to world"
+            aria-label={gameUi("World minimap — return to world")}
             onClick={resetCamera}
           >
-            {map(true)}
+            {gameUi(map(true))}
           </button>
-          {tab === "district" && (
+          {gameUi(tab === "district" && (
             <div className="ed-actions-fieldset">
-              {hex?.biome === "legacy" ? (
+              {gameUi(hex?.biome === "legacy" ? (
                 <section className="ed-legacy-info">
-                  <span className="ed-eyebrow">THE OLD KINGDOMS</span>
-                  <h2>Legacy Region</h2>
-                  <p>
-                    The original Medieval Kingdoms campaign, with its own
-                    rulers, armies and saved progress.
-                  </p>
-                  <p className="ed-reason">
-                    Legacy Region — unavailable in this campaign. Edravane
-                    armies and trade cannot enter it.
-                  </p>
+                  <span className="ed-eyebrow">{gameUi("THE OLD KINGDOMS")}</span>
+                  <h2>{gameUi("Legacy Region")}</h2>
+                  <p>{gameUi(" The original Medieval Kingdoms campaign, with its own rulers, armies and saved progress. ")}</p>
+                  <p className="ed-reason">{gameUi(" Legacy Region — unavailable in this campaign. Edravane armies and trade cannot enter it. ")}</p>
                   <Link
                     className="ed-primary ed-visit"
                     to="/games/medieval-kingdoms/legacy"
-                  >
-                    Visit the old kingdoms <ArrowUpRight size={15} />
+                  >{gameUi(" Visit the old kingdoms ")}<ArrowUpRight size={15} />
                   </Link>
                 </section>
               ) : hex && owner ? (
                 <>
                   <div className="ed-panel-title">
-                    <span className="ed-eyebrow">
-                      SELECTED DISTRICT · {hex.id}
+                    <span className="ed-eyebrow">{gameUi(" SELECTED DISTRICT · ")}{gameUi(hex.id)}
                     </span>
-                    <h2>{hex.settlement}</h2>
-                    <p>{hex.name}</p>
-                    <p className={`ed-territory-label ed-territory-${territoryControl(view, house, hex)}`}><RealmIcon metric="legitimacy" />{territoryControl(view, house, hex) === "domain" ? "Your domain · direct rule" : territoryControl(view, house, hex) === "vassal" ? "Vassal estate · governed by its house" : "Outside your direct rule"}</p>
-                    {territoryControl(view, house, hex) === "vassal" && <button className="ed-request-host" onClick={() => { const host = view.armies.find((a) => a.house === (hex.occupation ?? hex.owner) && !a.garrison && !a.pledgedTo && !a.rebel) ?? view.armies.find((a) => a.house === (hex.occupation ?? hex.owner) && a.garrison && !a.rebel); if (host) { setArmy(host.id); if (window.matchMedia("(max-width: 700px)").matches) setSidebarOpen(false); } }}><RealmIcon metric="troops" />Request this vassal’s host</button>}
+                    <h2>{gameUi(hex.settlement)}</h2>
+                    <p>{gameUi(hex.name)}</p>
+                    <p className={`ed-territory-label ed-territory-${territoryControl(view, house, hex)}`}><RealmIcon metric="legitimacy" />{gameUi(territoryControl(view, house, hex) === "domain" ? "Your domain · direct rule" : territoryControl(view, house, hex) === "vassal" ? "Vassal estate · governed by its house" : "Outside your direct rule")}</p>
+                    {territoryControl(view, house, hex) === "vassal" && <button className="ed-request-host" onClick={() => { const host = view.armies.find((a) => a.house === (hex.occupation ?? hex.owner) && !a.garrison && !a.pledgedTo && !a.rebel) ?? view.armies.find((a) => a.house === (hex.occupation ?? hex.owner) && a.garrison && !a.rebel); if (host) { setArmy(host.id); if (window.matchMedia("(max-width: 700px)").matches) setSidebarOpen(false); } }}><RealmIcon metric="troops" />{gameUi("Request this vassal’s host")}</button>}
                     <p>
                       <button
                         className="ed-house-link"
@@ -1735,75 +1641,69 @@ export default function EdravanePage() {
                             )!,
                           )
                         }
-                      >
-                        House{" "}
+                      >{gameUi(" House")}{gameUi(" ")}
                         {
                           view.houses.find(
                             (h) => h.id === (hex.occupation ?? owner.id),
                           )!.name
                         }
-                      </button>{" "}
-                      ·{" "}
-                      {view.armies
+                      </button>{gameUi(" ")}
+                      ·{gameUi(" ")}
+                      {gameUi(view.armies
                         .filter((a) => a.hex === hex.id)
                         .reduce((n, a) => n + troopCount(a), 0)
-                        .toLocaleString()}{" "}
-                      troops
-                    </p>
+                        .toLocaleString())}{gameUi(" ")}{gameUi(" troops ")}</p>
                   </div>
                   <div
                     className="ed-terrain"
                     style={{ background: BIOMES[hex.biome].color }}
                   >
-                    <span>{BIOMES[hex.biome].icon}</span>
+                    <span>{gameUi(BIOMES[hex.biome].icon)}</span>
                     <div>
-                      <strong>{hex.biome}</strong>
-                      <small>{BIOMES[hex.biome].description}</small>
+                      <strong>{gameUi(hex.biome)}</strong>
+                      <small>{gameUi(BIOMES[hex.biome].description)}</small>
                     </div>
                   </div>
                   <dl className="ed-details">
-                    <dt>Troops on hex</dt>
+                    <dt>{gameUi("Troops on hex")}</dt>
                     <dd>
-                      {view.armies
+                      {gameUi(view.armies
                         .filter((a) => a.hex === hex.id)
                         .reduce((n, a) => n + troopCount(a), 0)
-                        .toLocaleString()}{" "}
-                      total
-                    </dd>
-                    <dt>Owner</dt>
+                        .toLocaleString())}{gameUi(" ")}{gameUi(" total ")}</dd>
+                    <dt>{gameUi("Owner")}</dt>
                     <dd style={{ color: owner.color }}>
                       <button
                         className="ed-house-link"
                         onClick={() => visitHouse(owner)}
                       >
-                        {owner.crest} House {owner.name}
-                        {owner.id === house.id ? " · ♛" : ""}
+                        {gameUi(owner.crest)}{gameUi(" House ")}{owner.name}
+                        {gameUi(owner.id === house.id ? " · ♛" : "")}
                       </button>
                     </dd>
-                    <dt>Liege</dt>
+                    <dt>{gameUi("Liege")}</dt>
                     <dd>
-                      {liege ? (
+                      {gameUi(liege ? (
                         <button
                           className="ed-house-link"
                           onClick={() => visitHouse(liege)}
-                        >
-                          House {liege.name}
+                        >{gameUi(" House ")}{gameUi(liege.name)}
                         </button>
                       ) : (
                         "Crown domain"
-                      )}
+                      ))}
                     </dd>
-                    <dt>Resource</dt>
+                    <dt>{gameUi("Resource")}</dt>
                     <dd>
-                      {hex.resource} · {hex.port ? "Port" : "Landlocked"}
-                      {hex.shipyard ? " / shipyard" : ""}
+                      {gameUi(hex.resource)} · {gameUi(hex.port ? "Port" : "Landlocked")}
+                      {gameUi(hex.shipyard ? " / shipyard" : "")}
                     </dd>
-                    {hex.seat && (
+                    {gameUi(hex.seat && (
                       <>
-                        <dt>House seat</dt>
+                        <dt>{gameUi("House seat")}</dt>
                         <dd>
-                          {hex.seat === "capital" ? "Capital" : "Secondary"} ·{" "}
-                          {view.armies
+                          {gameUi(hex.seat === "capital" ? "Capital" : "Secondary")} ·{gameUi(" ")}
+                          {gameUi(view.armies
                             .filter(
                               (a) =>
                                 a.garrison &&
@@ -1811,56 +1711,45 @@ export default function EdravanePage() {
                                 a.house === owner.id,
                             )
                             .reduce((n, a) => n + troopCount(a), 0)
-                            .toLocaleString()}{" "}
-                          troops
-                        </dd>
+                            .toLocaleString())}{gameUi(" ")}{gameUi(" troops ")}</dd>
                       </>
-                    )}
-                    {hex.city && (
+                    ))}
+                    {gameUi(hex.city && (
                       <>
-                        <dt>City</dt>
+                        <dt>{gameUi("City")}</dt>
                         <dd>
-                          {hex.city === "major" ? "Major city" : "Market city"}{" "}
-                          · +12 trade cargo · {hex.city === "major" ? 4 : 2}{" "}
-                          coins/turn
-                        </dd>
+                          {gameUi(hex.city === "major" ? "Major city" : "Market city")}{gameUi(" ")}{gameUi(" · +12 trade cargo · ")}{gameUi(hex.city === "major" ? 4 : 2)}{gameUi(" ")}{gameUi(" coins/turn ")}</dd>
                       </>
-                    )}
-                    {hex.castle && (
+                    ))}
+                    {gameUi(hex.castle && (
                       <>
-                        <dt>Castle</dt>
-                        <dd>
-                          Level {hex.castle.level} · {castleGuard(view, hex)}{" "}
-                          guards · +{Math.round(castleBonus(hex) * 100)}%
-                          defense
-                        </dd>
+                        <dt>{gameUi("Castle")}</dt>
+                        <dd>{gameUi(" Level ")}{gameUi(hex.castle.level)} · {gameUi(castleGuard(view, hex))}{gameUi(" ")}{gameUi(" guards · +")}{gameUi(Math.round(castleBonus(hex) * 100))}{gameUi("% defense ")}</dd>
                       </>
-                    )}
-                    <dt>Loyalty</dt>
-                    <dd>{owner.loyalty}/100</dd>
-                    <dt>Unrest</dt>
-                    <dd>{hex.unrest}/100</dd>
-                    <dt>Obligation</dt>
-                    <dd>{owner.obligation} contracted troops</dd>
-                    <dt>Pledged</dt>
+                    ))}
+                    <dt>{gameUi("Loyalty")}</dt>
+                    <dd>{gameUi(owner.loyalty)}/100</dd>
+                    <dt>{gameUi("Unrest")}</dt>
+                    <dd>{gameUi(hex.unrest)}/100</dd>
+                    <dt>{gameUi("Obligation")}</dt>
+                    <dd>{gameUi(owner.obligation)}{gameUi(" contracted troops")}</dd>
+                    <dt>{gameUi("Pledged")}</dt>
                     <dd>
-                      {view.armies
+                      {gameUi(view.armies
                         .filter((a) => a.house === owner.id && a.pledgedTo)
-                        .reduce((n, a) => n + troopCount(a), 0)}{" "}
-                      troops
-                    </dd>
-                    <dt>Status</dt>
+                        .reduce((n, a) => n + troopCount(a), 0))}{gameUi(" ")}{gameUi(" troops ")}</dd>
+                    <dt>{gameUi("Status")}</dt>
                     <dd>
-                      {hex.occupation
+                      {gameUi(hex.occupation
                         ? `▨ Occupied by ${view.houses.find((h) => h.id === hex.occupation)?.name}`
                         : hex.disputed
                           ? "┄ Disputed claim"
-                          : "Stable possession"}
+                          : "Stable possession")}
                     </dd>
                   </dl>
                   <section
                     className="ed-hex-forces"
-                    aria-label="Troops stationed on this hex"
+                    aria-label={gameUi("Troops stationed on this hex")}
                   >
                     {view.armies
                       .filter(
@@ -1870,28 +1759,25 @@ export default function EdravanePage() {
                       )
                       .map((a) => (
                         <div className="ed-profile-army" key={a.id}>
-                          <strong>{a.name}</strong>
+                          <strong>{gameUi(a.name)}</strong>
                           <small>
-                            {troopCount(a).toLocaleString()} troops ·{" "}
-                            {a.rebel
+                            {gameUi(troopCount(a).toLocaleString())}{gameUi(" troops ·")}{gameUi(" ")}
+                            {gameUi(a.rebel
                               ? "Rebel"
                               : a.garrison
                                 ? "Garrison"
-                                : "Field army"}{" "}
-                            · Morale {Math.round(a.morale)} · Loyalty{" "}
-                            {Math.round(armyLoyalty(view, a))}% ·{" "}
-                            {woundedCount(a)} wounded · Readiness{" "}
-                            {armyHealth(a)}%
+                                : "Field army")}{gameUi(" ")}{gameUi(" · Morale ")}{gameUi(Math.round(a.morale))}{gameUi(" · Loyalty")}{gameUi(" ")}
+                            {gameUi(Math.round(armyLoyalty(view, a)))}% ·{gameUi(" ")}
+                            {gameUi(woundedCount(a))}{gameUi(" wounded · Readiness")}{gameUi(" ")}
+                            {gameUi(armyHealth(a))}%
                           </small>
-                          {canControl(view, actor, a) && !a.garrison && (
-                            <button onClick={() => setArmy(a.id)}>
-                              Select this army
-                            </button>
-                          )}
+                          {gameUi(canControl(view, actor, a) && !a.garrison && (
+                            <button onClick={() => setArmy(a.id)}>{gameUi(" Select this army ")}</button>
+                          ))}
                         </div>
                       ))}
                   </section>
-                  {attackNation && attackNation !== nation && (
+                  {gameUi(attackNation && attackNation !== nation && (
                     <WarActions
                       state={view}
                       house={house}
@@ -1901,8 +1787,8 @@ export default function EdravanePage() {
                       active={myTurn && !battle}
                       onCommand={execute}
                     />
-                  )}
-                  {fieldEnemy?.rebel && attackNation === nation && (
+                  ))}
+                  {gameUi(fieldEnemy?.rebel && attackNation === nation && (
                     <button
                       disabled={
                         !myTurn ||
@@ -1914,16 +1800,14 @@ export default function EdravanePage() {
                       onClick={() =>
                         execute({ type: "attack", army, hex: hex.id })
                       }
-                    >
-                      Attack rebel forces
-                    </button>
-                  )}
-                  {owner.id === house.id && (
+                    >{gameUi(" Attack rebel forces ")}</button>
+                  ))}
+                  {gameUi(owner.id === house.id && (
                     <fieldset
                       className="ed-estate-actions ed-actions-fieldset"
                       disabled={!canAct || !!battle}
                     >
-                      {hex.farm && (
+                      {gameUi(hex.farm && (
                         <button
                           disabled={
                             !myTurn ||
@@ -1936,26 +1820,24 @@ export default function EdravanePage() {
                             execute({ type: "harvest", hex: hex.id })
                           }
                         >
-                          <Leaf size={14} /> Harvest {harvestYield(hex)} food{" "}
-                          {hex.harvestedAt !== undefined &&
+                          <Leaf size={14} />{gameUi(" Harvest ")}{gameUi(harvestYield(hex))}{gameUi(" food")}{gameUi(" ")}
+                          {gameUi(hex.harvestedAt !== undefined &&
                           view.tick - hex.harvestedAt < HARVEST_COOLDOWN
                             ? `· ready in ${HARVEST_COOLDOWN - (view.tick - hex.harvestedAt)} turns`
-                            : ""}
+                            : "")}
                         </button>
-                      )}
-                      {hex.castle && hex.castle.level < 3 && (
+                      ))}
+                      {gameUi(hex.castle && hex.castle.level < 3 && (
                         <button
                           disabled={!!battle || !!hex.occupation}
                           onClick={() =>
                             execute({ type: "upgradeCastle", hex: hex.id })
                           }
                         >
-                          <Shield size={14} /> Upgrade to level{" "}
-                          {hex.castle.level + 1} ·{" "}
-                          {hex.castle.level === 1 ? 150 : 300} coins · 30 timber
-                          · 20 iron
-                        </button>
-                      )}
+                          <Shield size={14} />{gameUi(" Upgrade to level")}{gameUi(" ")}
+                          {gameUi(hex.castle.level + 1)} ·{gameUi(" ")}
+                          {gameUi(hex.castle.level === 1 ? 150 : 300)}{gameUi(" coins · 30 timber · 20 iron ")}</button>
+                      ))}
                       {view.armies
                         .filter(
                           (a) =>
@@ -1979,9 +1861,7 @@ export default function EdravanePage() {
                                 })
                               }
                             >
-                              <Swords size={14} /> Raise 500 troops · 50 coins ·
-                              20 food
-                            </button>
+                              <Swords size={14} />{gameUi(" Raise 500 troops · 50 coins · 20 food ")}</button>
                             <button
                               disabled={!!battle || !!hex.occupation}
                               onClick={() =>
@@ -1992,65 +1872,52 @@ export default function EdravanePage() {
                                   count: 100,
                                 })
                               }
-                            >
-                              Recruit 100 reserve troops · 100 coins · 50 food
-                            </button>
+                            >{gameUi(" Recruit 100 reserve troops · 100 coins · 50 food ")}</button>
                           </div>
                         ))}
-                      <p className="ed-reason">
-                        Seat troops include the 500 castle guards. Raising an
-                        army transfers reserves and keeps the guards at home.
-                        Field troops also need food and wages each turn.
-                      </p>
+                      <p className="ed-reason">{gameUi(" Seat troops include the 500 castle guards. Raising an army transfers reserves and keeps the guards at home. Field troops also need food and wages each turn. ")}</p>
                     </fieldset>
-                  )}
+                  ))}
                   {owner.reasons.map((r, i) => (
                     <p className="ed-reason" key={i}>
-                      {r}
+                      {gameUi(r)}
                     </p>
                   ))}
                   <DistrictStrategy state={view} house={house} district={hex} army={selectedArmy} active={myTurn && !battle} onCommand={execute} />
                   <div className="ed-mobile-logistics"><ArmyLogistics state={view} house={house} army={selectedArmy} destination={hex} /></div>
-                  {(view.intelligence?.[house.id] ?? []).filter((r) => r.hex === hex.id && !view.armies.some((a) => a.id === r.army)).map((r) => <p className="ed-intel-report" key={r.army}>{r.name}: approximately {r.low}–{r.high} soldiers, last seen round {r.seen}. Their current position and strength are unknown.</p>)}
-                  {hex.occupation && (
+                  {(view.intelligence?.[house.id] ?? []).filter((r) => r.hex === hex.id && !view.armies.some((a) => a.id === r.army)).map((r) => <p className="ed-intel-report" key={r.army}>{gameUi(r.name)}{gameUi(": approximately ")}{gameUi(r.low)}–{gameUi(r.high)}{gameUi(" soldiers, last seen round ")}{gameUi(r.seen)}{gameUi(". Their current position and strength are unknown.")}</p>)}
+                  {gameUi(hex.occupation && (
                     <button
                       disabled={!myTurn}
                       onClick={() => execute({ type: "annex", hex: hex.id })}
-                    >
-                      Annex estate · 50 coins / 3 turns of occupation
-                    </button>
-                  )}
-                  {owner.liege === house.id && (
+                    >{gameUi(" Annex estate · 50 coins / 3 turns of occupation ")}</button>
+                  ))}
+                  {gameUi(owner.liege === house.id && (
                     <button
                       disabled={!canAct || !!battle}
                       onClick={() =>
                         execute({ type: "summon", house: owner.id })
                       }
                     >
-                      <Flag size={14} /> Summon this house
-                    </button>
-                  )}
-                  {hex.owner === house.id && hex.port && !hex.shipyard && (
+                      <Flag size={14} />{gameUi(" Summon this house ")}</button>
+                  ))}
+                  {gameUi(hex.owner === house.id && hex.port && !hex.shipyard && (
                     <button
                       disabled={!myTurn || !!battle}
                       onClick={() => execute({ type: "shipyard", hex: hex.id })}
-                    >
-                      Build shipyard · 100 coins / 30 timber
-                    </button>
-                  )}
-                  {hex.bonus && (
+                    >{gameUi(" Build shipyard · 100 coins / 30 timber ")}</button>
+                  ))}
+                  {gameUi(hex.bonus && (
                     <div className="ed-challenge-note">
                       <strong>
-                        {hex.bonus === "gold"
+                        {gameUi(hex.bonus === "gold"
                           ? "● Merchant’s table"
-                          : "⚑ Tournament field"}
+                          : "⚑ Tournament field")}
                       </strong>
                       <p>
-                        {hex.bonus === "gold"
+                        {gameUi(hex.bonus === "gold"
                           ? "A fair bargain earns 60 coins."
-                          : "Read the battlefield and earn 20 levies."}{" "}
-                        Three rewards per field; 30-turn cooldown.
-                      </p>
+                          : "Read the battlefield and earn 20 levies.")}{gameUi(" ")}{gameUi(" Three rewards per field; 30-turn cooldown. ")}</p>
                       <button
                         disabled={
                           !myTurn || hex.owner !== house.id || !!activeChallenge
@@ -2058,52 +1925,41 @@ export default function EdravanePage() {
                         onClick={() =>
                           execute({ type: "challenge", hex: hex.id })
                         }
-                      >
-                        Enter challenge
-                      </button>
+                      >{gameUi(" Enter challenge ")}</button>
                       <small>
-                        {view.rewards[`${house.id}|${hex.id}`] &&
-                          `Claimed ${view.rewards[`${house.id}|${hex.id}`].count}/3 · next turn ${view.rewards[`${house.id}|${hex.id}`].next + 1}`}
+                        {gameUi(view.rewards[`${house.id}|${hex.id}`] &&
+                          `Claimed ${view.rewards[`${house.id}|${hex.id}`].count}/3 · next turn ${view.rewards[`${house.id}|${hex.id}`].next + 1}`)}
                       </small>
                     </div>
-                  )}
+                  ))}
                 </>
               ) : hex ? (
                 <section>
                   <div className="ed-panel-title">
-                    <span className="ed-eyebrow">SELECTED HEX · {hex.id}</span>
-                    <h2>{hex.name}</h2>
-                    <p>{BIOMES[hex.biome].description}</p>
+                    <span className="ed-eyebrow">{gameUi("SELECTED HEX · ")}{gameUi(hex.id)}</span>
+                    <h2>{gameUi(hex.name)}</h2>
+                    <p>{gameUi(BIOMES[hex.biome].description)}</p>
                   </div>
                   <p>
-                    {view.armies
+                    {gameUi(view.armies
                       .filter((a) => a.hex === hex.id)
-                      .reduce((n, a) => n + troopCount(a), 0)}{" "}
-                    troops · No house owns this sea field.
-                  </p>
+                      .reduce((n, a) => n + troopCount(a), 0))}{gameUi(" ")}{gameUi(" troops · No house owns this sea field. ")}</p>
                   <p>
-                    {view.routes.filter((r) => r.path.includes(hex.id)).length}{" "}
-                    trade routes cross this field.
-                  </p>
+                    {gameUi(view.routes.filter((r) => r.path.includes(hex.id)).length)}{gameUi(" ")}{gameUi(" trade routes cross this field. ")}</p>
                 </section>
               ) : (
                 <div className="ed-panel-empty">
                   <Crown size={32} />
-                  <h2>The realm awaits</h2>
-                  <p>
-                    Select a hex to inspect its estate, resources, loyalty, and
-                    military obligations.
-                  </p>
+                  <h2>{gameUi("The realm awaits")}</h2>
+                  <p>{gameUi(" Select a hex to inspect its estate, resources, loyalty, and military obligations. ")}</p>
                 </div>
-              )}
+              ))}
             </div>
-          )}
+          ))}
           {tab === "houses" && (
             <>
-              <label>
-                Navigate to a house
-                <select
-                  aria-label="Navigate to a house"
+              <label>{gameUi(" Navigate to a house ")}<select
+                  aria-label={gameUi("Navigate to a house")}
                   value={profileHouse.id}
                   onChange={(e) =>
                     visitHouse(
@@ -2112,19 +1968,18 @@ export default function EdravanePage() {
                   }
                 >
                   {NATIONS.map((n) => (
-                    <optgroup key={n.id} label={n.name}>
+                    <optgroup key={n.id} label={gameUi(n.name)}>
                       {view.houses
                         .filter((h) => h.nation === n.id)
                         .map((h) => (
-                          <option key={h.id} value={h.id}>
-                            House {h.name}
+                          <option key={h.id} value={h.id}>{gameUi(" House ")}{gameUi(h.name)}
                           </option>
                         ))}
                     </optgroup>
                   ))}
                 </select>
               </label>
-              <div className="ed-house-directory" aria-label="Great houses">
+              <div className="ed-house-directory" aria-label={gameUi("Great houses")}>
                 {view.titles.map((t) => {
                   const h = view.houses.find((h) => h.id === t.holder)!;
                   return (
@@ -2133,7 +1988,7 @@ export default function EdravanePage() {
                       className={profileHouse.id === h.id ? "active" : ""}
                       onClick={() => visitHouse(h)}
                     >
-                      <HouseSigil house={h} size={18} /> {h.name}
+                      <HouseSigil house={h} size={18} /> {gameUi(h.name)}
                     </button>
                   );
                 })}
@@ -2147,7 +2002,7 @@ export default function EdravanePage() {
                   onCommand={execute}
                 />
               )}
-              {profileHouse.nation !== nation && (
+              {gameUi(profileHouse.nation !== nation && (
                 <WarActions
                   state={view}
                   house={house}
@@ -2156,7 +2011,7 @@ export default function EdravanePage() {
                   active={myTurn && !battle}
                   onCommand={execute}
                 />
-              )}
+              ))}
               <HouseProfile
                 state={view}
                 house={profileHouse}
@@ -2170,16 +2025,13 @@ export default function EdravanePage() {
               />
             </>
           )}
-          {tab === "council" && (
+          {gameUi(tab === "council" && (
             <div className="ed-actions-fieldset">
               <KingdomIdentity nation={house.nation} />
               <div className="ed-panel-title">
-                <span className="ed-eyebrow">THE FEUDAL COUNCIL</span>
-                <h2>Oaths & ambitions</h2>
-                <p>
-                  Loyalty combines personal opinion and legitimacy. Contracts
-                  set service obligations.
-                </p>
+                <span className="ed-eyebrow">{gameUi("THE FEUDAL COUNCIL")}</span>
+                <h2>{gameUi("Oaths & ambitions")}</h2>
+                <p>{gameUi(" Loyalty combines personal opinion and legitimacy. Contracts set service obligations. ")}</p>
               </div>
               {view.houses
                 .filter((h) => h.nation === nation && h.id !== house.id)
@@ -2191,57 +2043,49 @@ export default function EdravanePage() {
                         style={{ color: v.color }}
                         onClick={() => visitHouse(v)}
                       >
-                        {v.crest} {v.name}
+                        {gameUi(v.crest)} {gameUi(v.name)}
                       </button>
                       <b className={v.loyalty < 40 ? "ed-danger" : ""}>
-                        {v.loyalty}%
+                        {gameUi(v.loyalty)}%
                       </b>
                     </div>
-                    <p>{v.ambition}</p>
+                    <p>{gameUi(v.ambition)}</p>
                     <VassalBargain state={view} house={house} vassal={v} active={myTurn && !battle} onCommand={execute} />
-                    <small>
-                      Opinion {v.opinion} · Legitimacy {v.legitimacy} ·{" "}
-                      {v.obligation} troops
-                    </small>
+                    <small>{gameUi(" Opinion ")}{gameUi(v.opinion)}{gameUi(" · Legitimacy ")}{gameUi(v.legitimacy)} ·{gameUi(" ")}
+                      {gameUi(v.obligation)}{gameUi(" troops ")}</small>
                     <p className="ed-reason">
-                      {v.rebellion
+                      {gameUi(v.rebellion
                         ? "⚑ REBELLION"
                         : v.loyalty < 40
                           ? "⚠ Likely refusal / pretender support"
                           : v.loyalty < 60
                             ? "⚠ Delays and reduced commitment"
-                            : "Ready for campaign service"}{" "}
-                      · {v.summons}
+                            : "Ready for campaign service")}{gameUi(" ")}
+                      · {gameUi(v.summons)}
                     </p>
                     <div>
                       <button
                         disabled={!canAct || !!battle}
                         onClick={() => execute({ type: "summon", house: v.id })}
-                      >
-                        Summon
-                      </button>
+                      >{gameUi(" Summon ")}</button>
                       <button
                         disabled={!myTurn}
                         onClick={() =>
                           execute({ type: "concession", house: v.id })
                         }
-                      >
-                        Concession · 40
-                      </button>
-                      {v.role === "claimant" && (
+                      >{gameUi(" Concession · 40 ")}</button>
+                      {gameUi(v.role === "claimant" && (
                         <button
                           disabled={!myTurn}
                           onClick={() =>
                             execute({ type: "pretender", house: v.id })
                           }
-                        >
-                          Support claim · 80
-                        </button>
-                      )}
+                        >{gameUi(" Support claim · 80 ")}</button>
+                      ))}
                     </div>
                   </div>
                 ))}
-              <h3>Foreign crowns</h3>
+              <h3>{gameUi("Foreign crowns")}</h3>
               {NATIONS.filter((n) => n.id !== nation).map((n) => (
                 <div className="ed-foreign" key={n.id}>
                   <button
@@ -2256,7 +2100,7 @@ export default function EdravanePage() {
                       )
                     }
                   >
-                    {n.crest} {n.name}
+                    {gameUi(n.crest)} {gameUi(n.name)}
                   </button>
                   <WarActions
                     state={view}
@@ -2275,9 +2119,7 @@ export default function EdravanePage() {
                           .holder,
                       })
                     }
-                  >
-                    Propose marriage · 30 coins
-                  </button>
+                  >{gameUi(" Propose marriage · 30 coins ")}</button>
                   <InsultAction
                     state={view}
                     house={house}
@@ -2294,18 +2136,17 @@ export default function EdravanePage() {
                 </div>
               ))}
             </div>
-          )}
+          ))}
           {tab === "dynasty" && (
             <fieldset
               className="ed-actions-fieldset"
               disabled={!canAct || !!battle}
             >
               <div className="ed-panel-title">
-                <span className="ed-eyebrow">
-                  HOUSE {house.name.toUpperCase()}
+                <span className="ed-eyebrow">{gameUi(" HOUSE ")}{gameUi(house.name.toUpperCase())}
                 </span>
-                <h2>The line of succession</h2>
-                <p>{NATIONS.find((n) => n.id === nation)!.succession}</p>
+                <h2>{gameUi("The line of succession")}</h2>
+                <p>{gameUi(NATIONS.find((n) => n.id === nation)!.succession)}</p>
               </div>
               <Personality person={ruler(house)} />
               <SuccessionPlanner state={view} house={house} active={myTurn && !battle} onCommand={execute} />
@@ -2316,104 +2157,87 @@ export default function EdravanePage() {
                   <div>
                     <strong>{p.name}</strong>
                     <small>
-                      {p.gender} · {p.age} years ·{" "}
-                      {!p.alive
+                      {gameUi(p.gender)} · {gameUi(p.age)}{gameUi(" years ·")}{gameUi(" ")}
+                      {gameUi(!p.alive
                         ? "Deceased"
                         : p.id === house.ruler
                           ? "Ruling"
                           : heir(view, house)?.id === p.id
                             ? "Eligible heir"
-                            : "Family"}
+                            : "Family")}
                     </small>
                     <small>
-                      {p.parents.length
+                      {gameUi(p.parents.length
                         ? `Child of ${house.family.find((a) => a.id === p.parents[0])?.name}`
-                        : "Dynasty founder"}
+                        : "Dynasty founder")}
                     </small>
-                    {p.spouse && (
-                      <small>
-                        Married to{" "}
+                    {gameUi(p.spouse && (
+                      <small>{gameUi(" Married to")}{gameUi(" ")}
                         {
                           view.houses
                             .flatMap((h) => h.family)
                             .find((a) => a.id === p.spouse)?.name
                         }
                       </small>
-                    )}
-                    {p.imprisonedBy && (
-                      <small className="ed-danger">
-                        Prisoner of {p.imprisonedBy}
+                    ))}
+                    {gameUi(p.imprisonedBy && (
+                      <small className="ed-danger">{gameUi(" Prisoner of ")}{gameUi(p.imprisonedBy)}
                       </small>
-                    )}
-                    {p.claim && <small>Claim to the crown of {p.claim}</small>}
+                    ))}
+                    {p.claim && <small>{gameUi("Claim to the crown of ")}{gameUi(p.claim)}</small>}
                   </div>
                 </div>
               ))}
-              <button disabled={!myTurn || !successionPreview(view, house).next || !successionPreview(view, house).recognized} onClick={() => execute({ type: "succession" })}>
-                Pass the crown to the eligible heir
-              </button>
-              <h3>Titles held</h3>
+              <button disabled={!myTurn || !successionPreview(view, house).next || !successionPreview(view, house).recognized} onClick={() => execute({ type: "succession" })}>{gameUi(" Pass the crown to the eligible heir ")}</button>
+              <h3>{gameUi("Titles held")}</h3>
               {view.titles
                 .filter((t) => t.holder === house.id)
                 .map((t) => (
-                  <p key={t.id}>♛ Crown of {t.nation}</p>
+                  <p key={t.id}>{gameUi("♛ Crown of ")}{gameUi(t.nation)}</p>
                 ))}
-              <p className="ed-reason">
-                Titles belong to houses, and can change hands after a claimant
-                victory. Land ownership and troop origins remain distinct.
-              </p>
+              <p className="ed-reason">{gameUi(" Titles belong to houses, and can change hands after a claimant victory. Land ownership and troop origins remain distinct. ")}</p>
             </fieldset>
           )}
-          {tab === "economy" && (
+          {gameUi(tab === "economy" && (
             <fieldset
               className="ed-actions-fieldset"
               disabled={!canAct || !!battle}
             >
               <div className="ed-panel-title">
-                <span className="ed-eyebrow">TREASURY & SUPPLY</span>
-                <h2>The lifeblood of a realm</h2>
-                <p>
-                  Food sustains armies. Timber builds ships. Iron equips
-                  soldiers. Ports connect distant estates.
-                </p>
+                <span className="ed-eyebrow">{gameUi("TREASURY & SUPPLY")}</span>
+                <h2>{gameUi("The lifeblood of a realm")}</h2>
+                <p>{gameUi(" Food sustains armies. Timber builds ships. Iron equips soldiers. Ports connect distant estates. ")}</p>
               </div>
               <div className="ed-ledger">
                 {RESOURCES.map((r) => (
                   <div
                     key={r}
-                    title={`Price bounded 1–12 coins; base × 1800 / max(900, total world stock). Current ${view.prices[r]} coins.`}
+                    title={gameUi(`Price bounded 1–12 coins; base × 1800 / max(900, total world stock). Current ${view.prices[r]} coins.`)}
                   >
-                    <span>{r}</span>
+                    <span>{gameUi(r)}</span>
                     <b className={house.stock[r] < 15 ? "ed-danger" : ""}>
-                      {Math.floor(house.stock[r])}
+                      {gameUi(Math.floor(house.stock[r]))}
                     </b>
-                    <small>{view.prices[r]} coins</small>
+                    <small>{gameUi(view.prices[r])}{gameUi(" coins")}</small>
                   </div>
                 ))}
               </div>
-              <h3>Establish a route</h3>
-              <p className="ed-reason">
-                Select your origin estate on the map. Approved merchants move
-                automatically, carrying 12 land or 24 maritime cargo.
-              </p>
-              <label>
-                Cargo
-                <select
+              <h3>{gameUi("Establish a route")}</h3>
+              <p className="ed-reason">{gameUi(" Select your origin estate on the map. Approved merchants move automatically, carrying 12 land or 24 maritime cargo. ")}</p>
+              <label>{gameUi(" Cargo ")}<select
                   value={resource}
                   onChange={(e) => setResource(e.target.value as Resource)}
                 >
                   {RESOURCES.map((r) => (
-                    <option key={r}>{r}</option>
+                    <option key={r}>{gameUi(r)}</option>
                   ))}
                 </select>
               </label>
-              <label>
-                Destination
-                <select
+              <label>{gameUi(" Destination ")}<select
                   value={destination}
                   onChange={(e) => setDestination(e.target.value)}
                 >
-                  <option value="">Choose a market</option>
+                  <option value="">{gameUi("Choose a market")}</option>
                   {view.districts
                     .filter(
                       (d) =>
@@ -2421,9 +2245,9 @@ export default function EdravanePage() {
                     )
                     .map((d) => (
                       <option key={d.id} value={d.id}>
-                        {d.name} ·{" "}
-                        {view.houses.find((h) => h.id === d.owner)?.name}
-                        {d.port ? " ⚓" : ""}
+                        {gameUi(d.name)} ·{gameUi(" ")}
+                        {gameUi(view.houses.find((h) => h.id === d.owner)?.name)}
+                        {gameUi(d.port ? " ⚓" : "")}
                       </option>
                     ))}
                 </select>
@@ -2433,17 +2257,13 @@ export default function EdravanePage() {
                   type="checkbox"
                   checked={importCargo}
                   onChange={(e) => setImportCargo(e.target.checked)}
-                />{" "}
-                Import cargo into your estate
-              </label>
+                />{gameUi(" ")}{gameUi(" Import cargo into your estate ")}</label>
               <label className="ed-checkbox">
                 <input
                   type="checkbox"
                   checked={maritime}
                   onChange={(e) => setMaritime(e.target.checked)}
-                />{" "}
-                Maritime · shipyard required
-              </label>
+                />{gameUi(" ")}{gameUi(" Maritime · shipyard required ")}</label>
               <button
                 disabled={
                   !myTurn || !hex || !destination || hex.owner !== house.id
@@ -2459,43 +2279,30 @@ export default function EdravanePage() {
                   })
                 }
               >
-                <Anchor size={14} /> Approve {maritime ? "ship" : "caravan"}{" "}
-                route
-              </button>
-              <p className="ed-reason">
-                Land setup 25 coins; ship 80 coins / 20 timber (Saltmere
-                shipyard −15%). Transport costs 1 / 3 coins. Sea storm chance{" "}
-                {view.config.maritimeHazard * 100}% per delivery; one foreign
-                troop can stop trade. Blocking trade in peacetime gives the
-                affected crown a justified war reason.
-              </p>
+                <Anchor size={14} />{gameUi(" Approve ")}{gameUi(maritime ? "ship" : "caravan")}{gameUi(" ")}{gameUi(" route ")}</button>
+              <p className="ed-reason">{gameUi(" Land setup 25 coins; ship 80 coins / 20 timber (Saltmere shipyard −15%). Transport costs 1 / 3 coins. Sea storm chance")}{gameUi(" ")}
+                {gameUi(view.config.maritimeHazard * 100)}{gameUi("% per delivery; one foreign troop can stop trade. Blocking trade in peacetime gives the affected crown a justified war reason. ")}</p>
               {view.routes
                 .filter((r) => r.house === house.id)
                 .map((r) => (
                   <div className="ed-route" key={r.id}>
                     <b>
-                      {r.maritime ? "⚓" : "♘"} {r.resource} ·{" "}
-                      {Math.floor(r.delivered)} delivered
-                    </b>
+                      {gameUi(r.maritime ? "⚓" : "♘")} {gameUi(r.resource)} ·{gameUi(" ")}
+                      {gameUi(Math.floor(r.delivered))}{gameUi(" delivered ")}</b>
                     <small>
-                      {routeBlockers(view, r).length
+                      {gameUi(routeBlockers(view, r).length
                         ? `Blocked by ${routeBlockers(view, r)
                             .map((a) => a.name)
                             .join(", ")} · justification to declare war`
-                        : r.status}
+                        : r.status)}
                     </small>
                   </div>
                 ))}
-              <h3>Food and armies</h3>
-              <p className="ed-reason">
-                Harvest your farmland in the District tab, or import grain
-                through trade. City endpoints each add 12 cargo capacity. Raise
-                a field host from a seat for 50 coins and 20 food per 500
-                troops; recruit reserves to grow your force.
-              </p>
-              <h3>Reinforce selected troops</h3>
+              <h3>{gameUi("Food and armies")}</h3>
+              <p className="ed-reason">{gameUi(" Harvest your farmland in the District tab, or import grain through trade. City endpoints each add 12 cargo capacity. Raise a field host from a seat for 50 coins and 20 food per 500 troops; recruit reserves to grow your force. ")}</p>
+              <h3>{gameUi("Reinforce selected troops")}</h3>
               <UnitGuide />
-              {selectedArmy?.house === house.id ? (
+              {gameUi(selectedArmy?.house === house.id ? (
                 unitKinds.map((k) => (
                   <button
                     key={k}
@@ -2503,63 +2310,60 @@ export default function EdravanePage() {
                       execute({ type: "recruit", army, kind: k, count: 100 })
                     }
                   >
-                    +100 {labels[k]} · {UNIT_STATS[k].cost * 100} coins · 50
-                    food{k !== "levies" ? " · 50 iron" : ""}
-                    {k === "cavalry" ? " · 50 horses" : ""}
+                    +100 {gameUi(labels[k])} · {gameUi(UNIT_STATS[k].cost * 100)}{gameUi(" coins · 50 food")}{gameUi(k !== "levies" ? " · 50 iron" : "")}
+                    {gameUi(k === "cavalry" ? " · 50 horses" : "")}
                   </button>
                 ))
               ) : (
-                <p>Select your royal army to recruit at its estate.</p>
-              )}
+                <p>{gameUi("Select your royal army to recruit at its estate.")}</p>
+              ))}
             </fieldset>
-          )}
+          ))}
           <div className="ed-sidebar-tools">
-            {online ? (
-              <button onClick={() => connect("resume")}>Reconnect</button>
+            {gameUi(online ? (
+              <button onClick={() => connect("resume")}>{gameUi("Reconnect")}</button>
             ) : (
               <>
-                <button onClick={save}>Save campaign</button>
-                <button onClick={exportSave}>Export save</button>
+                <button onClick={save}>{gameUi("Save campaign")}</button>
+                <button onClick={exportSave}>{gameUi("Export save")}</button>
               </>
-            )}
+            ))}
           </div>
           {tab === "chronicle" && <Chronicle state={view} onHouse={visitHouse} onHex={(d) => { select(d); setMapCenter(center(d)); setMapZoom(2.8); }} />}
-          {message && (
+          {gameUi(message && (
             <p className="ed-notice" role="alert">
-              {message}
+              {gameUi(message)}
             </p>
-          )}
+          ))}
         </aside>
       </div>
       <footer className="ed-journal">
-        <span>
-          CHRONICLE <span className="ed-dot">●</span>
+        <span>{gameUi(" CHRONICLE ")}<span className="ed-dot">●</span>
         </span>
-        <p>{message || view.events?.[0]?.title || "Your reign begins. Plan your alliances and call your banners."}</p>
-        <button onClick={() => { setSidebarOpen(true); setTab("chronicle"); }}>
-          Read chronicle <ChevronRight size={14} />
+        <p>{gameUi(message || view.events?.[0]?.title || "Your reign begins. Plan your alliances and call your banners.")}</p>
+        <button onClick={() => { setSidebarOpen(true); setTab("chronicle"); }}>{gameUi(" Read chronicle ")}<ChevronRight size={14} />
         </button>
       </footer>
       <details className="ed-history">
-        <summary>Routine reports · {view.log.length} entries</summary>
+        <summary>{gameUi("Routine reports · ")}{gameUi(view.log.length)}{gameUi(" entries")}</summary>
         {view.log.map((l, i) => (
-          <p key={i}>{l}</p>
+          <p key={i}>{gameUi(l)}</p>
         ))}
       </details>
-      {activeChallenge && (
+      {gameUi(activeChallenge && (
         <div className="ed-modal-backdrop">
           <section className="ed-modal">
             <span className="ed-eyebrow">
-              {activeChallenge.kind === "gold"
+              {gameUi(activeChallenge.kind === "gold"
                 ? "THE MERCHANT’S TABLE"
-                : "THE SILVER TOURNAMENT"}
+                : "THE SILVER TOURNAMENT")}
             </span>
             <h2>
-              {activeChallenge.kind === "gold"
+              {gameUi(activeChallenge.kind === "gold"
                 ? "Strike a fair bargain"
-                : "Command the field"}
+                : "Command the field")}
             </h2>
-            <p>{activeChallenge.question}</p>
+            <p>{gameUi(activeChallenge.question)}</p>
             {activeChallenge.choices.map((c, i) => (
               <button
                 key={i}
@@ -2571,17 +2375,14 @@ export default function EdravanePage() {
                   })
                 }
               >
-                {i + 1}. {c}
+                {gameUi(i + 1)}. {gameUi(c)}
               </button>
             ))}
-            <small>
-              One attempt. Rewards and cooldowns are validated by the campaign
-              authority.
-            </small>
+            <small>{gameUi(" One attempt. Rewards and cooldowns are validated by the campaign authority. ")}</small>
           </section>
         </div>
-      )}
-      {battle?.rounds && hiddenBattle !== battle.id && (
+      ))}
+      {gameUi(battle?.rounds && hiddenBattle !== battle.id && (
         <BattleRoundPanel
           key={`${battle.id}:${battle.rounds.round}`}
           state={view}
@@ -2591,37 +2392,32 @@ export default function EdravanePage() {
           onInspect={() => setHiddenBattle(battle.id)}
           message={message}
         />
-      )}
-      {!battle &&
+      ))}
+      {gameUi(!battle &&
         latestBattleReport &&
         dismissedBattleReport !== latestBattleReport.id && (
           <BattleOutcome
             report={latestBattleReport}
             onClose={() => setDismissedBattleReport(latestBattleReport.id)}
           />
-        )}
-      {battle && !battle.rounds && hiddenBattle !== battle.id && (
+        ))}
+      {gameUi(battle && !battle.rounds && hiddenBattle !== battle.id && (
         <div className="ed-battle-backdrop">
           <section className="ed-battle-modal">
             <header>
               <div>
-                <span className="ed-eyebrow">
-                  ENCOUNTER {battle.id} · {view.battles.length} QUEUED
-                </span>
-                <h2>{view.districts.find((d) => d.id === battle.hex)!.name}</h2>
+                <span className="ed-eyebrow">{gameUi(" ENCOUNTER ")}{gameUi(battle.id)} · {gameUi(view.battles.length)}{gameUi(" QUEUED ")}</span>
+                <h2>{gameUi(view.districts.find((d) => d.id === battle.hex)!.name)}</h2>
               </div>
-              <span>
-                Campaign frozen · {Math.floor(battle.seconds)}s{" "}
-                <button onClick={() => setHiddenBattle(battle.id)}>
-                  Inspect frozen campaign
-                </button>
+              <span>{gameUi(" Campaign frozen · ")}{gameUi(Math.floor(battle.seconds))}s{gameUi(" ")}
+                <button onClick={() => setHiddenBattle(battle.id)}>{gameUi(" Inspect frozen campaign ")}</button>
               </span>
             </header>
             <div className="ed-battle-content">
               <div className="ed-tactical-wrap">
                 <svg
                   viewBox="0 0 100 100"
-                  aria-label="Tactical formation battlefield"
+                  aria-label={gameUi("Tactical formation battlefield")}
                   onClick={(e) => {
                     const box = e.currentTarget.getBoundingClientRect();
                     const t: [number, number] = [
@@ -2673,7 +2469,7 @@ export default function EdravanePage() {
                     />
                   </pattern>
                   <rect width="100" height="100" fill="url(#battle-grid)" />
-                  {field!.river && (
+                  {gameUi(field!.river && (
                     <rect
                       x="44"
                       width="12"
@@ -2681,10 +2477,10 @@ export default function EdravanePage() {
                       fill="#63a4bd"
                       opacity=".8"
                     />
-                  )}
-                  {field!.road && (
+                  ))}
+                  {gameUi(field!.road && (
                     <path d="M0 50H100" stroke="#d1bb89" strokeWidth="5" />
-                  )}
+                  ))}
                   {field!.obstacles.map((o, i) => (
                     <rect
                       key={i}
@@ -2705,7 +2501,7 @@ export default function EdravanePage() {
                     stroke="#615541"
                   />
                   <text x="72" y="36" fontSize="2.5">
-                    {field!.settlement}
+                    {gameUi(field!.settlement)}
                   </text>
                   {battle.formations
                     .filter((f) => f.count > 0 && !f.escaped)
@@ -2744,11 +2540,10 @@ export default function EdravanePage() {
                             fontSize="2"
                             transform={`rotate(${-f.facing})`}
                           >
-                            {Math.ceil(f.count)}
+                            {gameUi(Math.ceil(f.count))}
                           </text>
                           <title>
-                            {labels[f.kind]} · morale {Math.floor(f.morale)} ·
-                            fatigue {Math.floor(f.fatigue)} · {f.order}
+                            {gameUi(labels[f.kind])}{gameUi(" · morale ")}{gameUi(Math.floor(f.morale))}{gameUi(" · fatigue ")}{gameUi(Math.floor(f.fatigue))} · {gameUi(f.order)}
                           </title>
                         </g>
                       );
@@ -2763,29 +2558,26 @@ export default function EdravanePage() {
                   />
                 </svg>
                 <p>
-                  {field!.forest
+                  {gameUi(field!.forest
                     ? "Woodland reduces archery visibility and movement."
                     : field!.river
                       ? "River crossing slows formations; road provides a ford."
                       : field!.hill
                         ? "High ground favours the defender."
-                        : "Open ground favours cavalry."}{" "}
-                  Reserves engage after 12s. Routed troops flee.
-                </p>
+                        : "Open ground favours cavalry.")}{gameUi(" ")}{gameUi(" Reserves engage after 12s. Routed troops flee. ")}</p>
               </div>
               <aside className="ed-battle-controls">
                 {battle.armies.map((id) => {
                   const a = view.armies.find((a) => a.id === id)!;
                   return (
                     <div key={id}>
-                      <h3>{a.name}</h3>
+                      <h3>{gameUi(a.name)}</h3>
                       <p>
-                        {canControl(view, actor, a)
+                        {gameUi(canControl(view, actor, a)
                           ? "Authorized command"
-                          : "AI commander / opposing player"}{" "}
-                        · approach {battle.approaches[id]}
+                          : "AI commander / opposing player")}{gameUi(" ")}{gameUi(" · approach ")}{gameUi(battle.approaches[id])}
                       </p>
-                      {battle.phase === "encounter" &&
+                      {gameUi(battle.phase === "encounter" &&
                         canControl(view, actor, a) && (
                           <>
                             <button
@@ -2796,9 +2588,7 @@ export default function EdravanePage() {
                                   army: id,
                                 })
                               }
-                            >
-                              Stand and fight
-                            </button>
+                            >{gameUi(" Stand and fight ")}</button>
                             <button
                               onClick={() =>
                                 execute({
@@ -2807,23 +2597,19 @@ export default function EdravanePage() {
                                   army: id,
                                 })
                               }
-                            >
-                              Attempt withdrawal
-                            </button>
+                            >{gameUi(" Attempt withdrawal ")}</button>
                           </>
-                        )}
+                        ))}
                     </div>
                   );
                 })}
-                {battle.phase === "combat" && (
+                {gameUi(battle.phase === "combat" && (
                   <>
-                    <label>
-                      Formation
-                      <select
+                    <label>{gameUi(" Formation ")}<select
                         value={formation}
                         onChange={(e) => setFormation(e.target.value)}
                       >
-                        <option value="">Select formation</option>
+                        <option value="">{gameUi("Select formation")}</option>
                         {battle.formations
                           .filter((f) =>
                             canControl(
@@ -2834,8 +2620,8 @@ export default function EdravanePage() {
                           )
                           .map((f) => (
                             <option key={f.id} value={f.id}>
-                              {labels[f.kind]} · {Math.ceil(f.count)} ·{" "}
-                              {f.routed ? "Routed" : f.order}
+                              {gameUi(labels[f.kind])} · {gameUi(Math.ceil(f.count))} ·{gameUi(" ")}
+                              {gameUi(f.routed ? "Routed" : f.order)}
                             </option>
                           ))}
                       </select>
@@ -2856,12 +2642,11 @@ export default function EdravanePage() {
                           className={order === o ? "active" : ""}
                           onClick={() => setOrder(o)}
                         >
-                          {o}
+                          {gameUi(o)}
                         </button>
                       ))}
                     </div>
-                    <label>
-                      Facing · {facing}°
+                    <label>{gameUi(" Facing · ")}{gameUi(facing)}°
                       <input
                         type="range"
                         min="0"
@@ -2870,8 +2655,7 @@ export default function EdravanePage() {
                         onChange={(e) => setFacing(Number(e.target.value))}
                       />
                     </label>
-                    <label>
-                      Width · {width}
+                    <label>{gameUi(" Width · ")}{gameUi(width)}
                       <input
                         type="range"
                         min="4"
@@ -2894,14 +2678,8 @@ export default function EdravanePage() {
                           width,
                         })
                       }
-                    >
-                      Issue order at selected point
-                    </button>
-                    <p className="ed-reason">
-                      Select a formation and an order, then click the field.
-                      Hold restores fatigue; charges tire quickly. Face
-                      vulnerable flanks toward the enemy.
-                    </p>
+                    >{gameUi(" Issue order at selected point ")}</button>
+                    <p className="ed-reason">{gameUi(" Select a formation and an order, then click the field. Hold restores fatigue; charges tire quickly. Face vulnerable flanks toward the enemy. ")}</p>
                     <button
                       onClick={() =>
                         execute({
@@ -2911,24 +2689,24 @@ export default function EdravanePage() {
                         })
                       }
                     >
-                      {battle.pauseVotes.includes(house.id)
+                      {gameUi(battle.pauseVotes.includes(house.id)
                         ? "Resume vote"
-                        : "Request tactical pause"}
+                        : "Request tactical pause")}
                     </button>
                     <small>
-                      {battle.pauseVotes.length} pause votes ·{" "}
-                      {online
+                      {gameUi(battle.pauseVotes.length)}{gameUi(" pause votes ·")}{gameUi(" ")}
+                      {gameUi(online
                         ? "Unanimous participants required"
-                        : "Single-player tactical pause"}
+                        : "Single-player tactical pause")}
                     </small>
                   </>
-                )}
-                {message && <p className="ed-notice">{message}</p>}
+                ))}
+                {message && <p className="ed-notice">{gameUi(message)}</p>}
               </aside>
             </div>
           </section>
         </div>
-      )}
+      ))}
     </main>,
     document.body,
   );

@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import type { CSSProperties } from "react";
 
 export type RealmMetric = "loyalty" | "unrest" | "opinion" | "legitimacy" | "coins" | "food" | "troops" | "relations";
@@ -19,7 +20,8 @@ export function RealmIcon({ metric, size = 16, style }: { metric: RealmMetric; s
 }
 
 export function EffectBadge({ metric, amount, label, adverse, suffix = "", description }: { metric: RealmMetric; amount: number; label?: string; adverse?: boolean; suffix?: string; description?: string }) {
+  useGameLanguage();
   const bad = adverse ?? (metric === "unrest" ? amount > 0 : amount < 0);
   const text = `${amount > 0 ? "+" : amount < 0 ? "−" : ""}${Math.abs(amount)}${suffix} ${label ?? metric}`;
-  return <span className={`ed-effect ${amount === 0 ? "ed-effect-neutral" : bad ? "ed-effect-loss" : "ed-effect-gain"}`} title={description} aria-label={text}><RealmIcon metric={metric} /><b>{text}</b></span>;
+  return <span className={`ed-effect ${amount === 0 ? "ed-effect-neutral" : bad ? "ed-effect-loss" : "ed-effect-gain"}`} title={gameUi(description)} aria-label={gameUi(text)}><RealmIcon metric={metric} /><b>{gameUi(text)}</b></span>;
 }

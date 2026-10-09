@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { useEffect, useRef, useState } from "react";
 import type {
   Position,
@@ -15,6 +16,7 @@ export default function SpellEffectOverlay({
   end: Position;
   onDone: () => void;
 }) {
+  useGameLanguage();
   const [t, setT] = useState(0);
   const doneRef = useRef(false);
 
@@ -69,9 +71,9 @@ export default function SpellEffectOverlay({
         className={`pointer-events-none absolute z-[170] -translate-x-1/2 -translate-y-1/2 text-3xl ${glow}`}
         style={{ left: `${x}%`, top: `${y}%` }}
       >
-        {symbol}
+        {gameUi(symbol)}
       </div>
-      {kind === "burn" && (
+      {gameUi(kind === "burn" && (
         <>
           <div
             className="pointer-events-none absolute z-[165] h-5 w-5 -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-full bg-orange-500/60 blur-sm"
@@ -82,7 +84,7 @@ export default function SpellEffectOverlay({
             style={{ left: `${x}%`, top: `${y}%` }}
           />
         </>
-      )}
+      ))}
     </>
   );
 }

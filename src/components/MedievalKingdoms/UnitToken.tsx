@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { useState } from "react";
 import type { DefenseActionId, Unit } from "../../games/MedievalKingdoms/types";
 import UnitStatusOverlay from "./UnitStatusOverlay";
@@ -38,6 +39,7 @@ export default function UnitToken({
   onDragStart,
   onDragEnd,
 }: Props) {
+  useGameLanguage();
   const [imageFailed, setImageFailed] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const size = unit.tokenSize ?? 52;
@@ -75,22 +77,21 @@ export default function UnitToken({
       style={{ width: `${size}px`, height: `${size}px` }}
     >
       <UnitStatusOverlay unit={unit} previewDefense={previewDefense} />
-      {unit.ringImage && !imageFailed ? (
+      {gameUi(unit.ringImage && !imageFailed ? (
         <img
           src={unit.ringImage}
-          alt={unit.name}
+          alt={gameUi(unit.name)}
           draggable={false}
           onError={() => setImageFailed(true)}
           className="h-full w-full pointer-events-none select-none object-contain"
         />
       ) : (
         <div className="flex h-full w-full items-center justify-center rounded-full bg-[#4a3521] text-[10px] font-black text-[#f7e8c6]">
-          {initials}
+          {gameUi(initials)}
         </div>
-      )}
+      ))}
       <div className="pointer-events-none absolute left-1/2 top-full z-40 mt-0.5 -translate-x-1/2 whitespace-nowrap rounded border border-[#7c5b35]/80 bg-[#3a291b]/95 px-1.5 py-0.5 text-[8px] font-black text-[#f6e4bd]">
-        {unit.health} HP
-      </div>
+        {gameUi(unit.health)}{gameUi(" HP ")}</div>
     </button>
   );
 }
