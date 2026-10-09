@@ -70,6 +70,7 @@ export class NaturaScene {
     mesh.material = this.mat(color); mesh.position.set(pos[0], pos[1], pos[2]); mesh.scale.set(scale[0], scale[1], scale[2]); mesh.rotation.set(0, 0, rotation); mesh.castShadow = true; mesh.receiveShadow = true; return mesh;
   }
   private label(key: string, text: string, position: number[], color = '#ffffff', scale = 1) {
+    text = gameUi(text);
     const sprite = this.object('label:' + key, () => new THREE.Sprite(new THREE.SpriteMaterial({depthTest:false}))) as THREE.Sprite;
     if(sprite.userData.text!==text||sprite.userData.color!==color) {
       const canvas = document.createElement('canvas'); canvas.width = 512; canvas.height = 96;
@@ -374,3 +375,4 @@ export class NaturaScene {
     geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());this.renderer.dispose();this.objects.clear();
   }
 }
+import { gameUi } from "../../i18n/gameUi.ts";
