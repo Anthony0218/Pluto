@@ -4,7 +4,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, BookOpen, Check, Globe2, Info, CircleHelp, Shuffle, Trophy, User, Users, Wifi, X } from "lucide-react";
 import { chooseRandomModes, seriesLabel, type SeriesLength } from "../../../games/atlas/randomSeries";
 import { bestKey } from "../../../games/atlas/arenaStorage";
-import { ARENA_MODES, ONLINE_ARENA_MODES, isOnlineMode, hotseatPlayerLimit, onlinePlayerLimit, type ArenaModeDef } from "../../../games/atlas/modeCatalog";
+import { ARENA_MODES, ONLINE_ARENA_MODES, isOnlineMode, type ArenaModeDef } from "../../../games/atlas/modeCatalog";
 import { DIFFICULTY_LABELS } from "../../../games/atlas/soloSettings";
 import type { AtlasDifficulty } from "../../../games/atlas/types";
 import { useAtlasData } from "../../../games/atlas/useAtlasData";
@@ -179,7 +179,6 @@ function RulesDialog({ mode, onClose, onLaunch }: { mode: ArenaModeDef; onClose:
     window.addEventListener("keydown", onKey);
     return () => { window.removeEventListener("keydown", onKey); previous?.focus?.(); };
   }, [onClose]);
-  const online = onlinePlayerLimit(mode), local = hotseatPlayerLimit(mode);
   return (
     <div className="atlas-rules-backdrop" onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}>
       <section className={`atlas-rules trial-accent-${mode.accent}`} role="dialog" aria-modal="true" aria-labelledby="atlas-rules-title">
@@ -196,8 +195,8 @@ function RulesDialog({ mode, onClose, onLaunch }: { mode: ArenaModeDef; onClose:
           <p>{mode.rules.scoring}</p>
           <div className="atlas-rules-ways">
             <article><h4><User aria-hidden /> Singleplayer</h4><p>{mode.rules.solo}</p></article>
-            {isOnlineMode(mode) && <article><h4><Wifi aria-hidden /> Multiplayer · {online === 2 ? "2 players" : `2–${online} players`}</h4><p>{mode.rules.multiplayer}</p></article>}
-            <article><h4><Users aria-hidden /> Hotseat · {local === 2 ? "2 players" : `2–${local} players`}</h4><p>{mode.rules.hotseat}</p></article>
+            {isOnlineMode(mode) && <article><h4><Wifi aria-hidden /> Multiplayer · 2–4 players</h4><p>{mode.rules.multiplayer}</p></article>}
+            <article><h4><Users aria-hidden /> Hotseat · 2–4 players</h4><p>{mode.rules.hotseat}</p></article>
           </div>
         </div>
         <footer><LaunchButtons mode={mode} onLaunch={onLaunch} /></footer>

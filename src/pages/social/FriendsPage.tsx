@@ -481,7 +481,7 @@ function FriendNotifications({ items }: { items: DashboardNotification[] }) {
     <div className="flex items-center gap-2 border-b border-white/10 px-4 py-4"><Bell size={18} className="text-indigo-300" /><h2 className="font-bold text-white">{ui("Friend notifications")}</h2>{items.length > 0 && <span className="ml-auto rounded-full bg-indigo-400/15 px-2 py-1 text-[10px] font-black text-indigo-200">{items.length}</span>}</div>
     {items.length ? <div className="divide-y divide-white/[0.06]">{items.slice(0, 6).map((item) => {
       const Icon = item.kind === "friend_request" ? Users : item.gameCode ? Gamepad2 : Mail;
-      const destination = item.kind === "friend_request" ? "/friends" : `/friends${item.senderId ? `?friend=${encodeURIComponent(item.senderId)}` : ""}`;
+      const destination = item.kind === "friend_request" ? "/friends" : item.kind === "clan_join_invite" ? "/clans" : `/friends${item.senderId ? `?friend=${encodeURIComponent(item.senderId)}` : ""}`;
       return <Link key={item.id} to={destination} className="flex items-center gap-3 px-4 py-3 transition hover:bg-white/[0.04]"><Icon size={17} className="shrink-0 text-indigo-300" /><span className="min-w-0 flex-1"><strong className="block text-sm text-white">{ui(item.title)}</strong><small className="block truncate text-xs text-zinc-400">{item.senderName || ui("Player")}{item.gameCode ? ` · ${ui("Room code")}: ${item.gameCode}` : ""}</small></span></Link>;
     })}</div> : <p className="px-4 py-5 text-sm text-zinc-400">{ui("No friend notifications yet.")}</p>}
   </section>;

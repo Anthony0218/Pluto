@@ -132,14 +132,14 @@ type Base = {
 export type AntState = Vec & {
   vx: number; vy: number; angle: number; facing: number; grounded: boolean;
   checkpoint: number; lives: number; cooldown: number; flash: number; sweep: number;
-  dwell: number; broken: number;
+  dwell: number; broken: number; standing?: number;
 };
 export type CuttleState = Vec & {
   pattern: Pattern; bumpy: boolean; exposure: number; lives: number; food: number;
   moving: boolean; flash: number;
 };
-export type SnapGame = Base & { kind: "trapjaw"; level: number; players: [AntState, AntState] };
-export type CuttleGame = Base & { kind: "cuttlefish"; seed: number; foodSites: FoodSite[]; patches: HabitatPatch[]; players: [CuttleState, CuttleState] };
+export type SnapGame = Base & { kind: "trapjaw"; level: number; detours?: SnapPlatform[]; players: [AntState, AntState] };
+export type CuttleGame = Base & { kind: "cuttlefish"; seed: number; tidal?: boolean; tideStep?: number; foodSites: FoodSite[]; patches: HabitatPatch[]; players: [CuttleState, CuttleState] };
 export type WildGame = SnapGame | CuttleGame;
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 const base = (): Base => ({ phase: "ready", time: WILD_SECONDS, elapsed: 0, winner: null,
@@ -216,7 +216,8 @@ export function chooseSnapInput(game: SnapGame, player: Player): WildInput {
   const platforms = snapPlatforms(game);
   const next = platforms[ant.checkpoint + 1];
   if (!ant.grounded || !next || ant.lives === 0 || (player === 1 && game.elapsed < game.aiReadyAt)) return input;
-  const launchX = platforms[ant.checkpoint].x + platforms[ant.checkpoint].width / 2;
+  const standing=ant.standing??ant.checkpoint,shelf=standing<platforms.length?platforms[standing]:game.detours?.[standing-platforms.length]??platforms[ant.checkpoint];
+  const launchX = shelf.x + shelf.width / 2;
   if (Math.abs(ant.x - launchX) > 3) return { ...input, x: clamp((launchX - ant.x) / (135 * 0.2), -1, 1) };
   if(game.level>=10) {
     const landing=predictSnapLanding(game,ant,ant.angle);
@@ -303,13 +304,15 @@ export function updateWildGame(game: WildGame, inputs: [WildInput, WildInput], s
 
 function stepSnap(game: SnapGame, inputs: [WildInput, WildInput], dt: number) {
   const platforms = snapPlatforms(game);
+  const landingPlatforms = [...platforms,...(game.detours ?? [])];
   game.players.forEach((ant, index) => {
     if (ant.lives <= 0) return;
     const input = inputs[index];
     if(ant.grounded) {
-      const prev=snapPlatforms(game,game.elapsed-dt)[ant.checkpoint],current=platforms[ant.checkpoint];
+      const standing=ant.standing??ant.checkpoint;
+      const current=landingPlatforms[standing],prev=standing<platforms.length?snapPlatforms(game,game.elapsed-dt)[standing]:current;
       ant.x+=current.x-prev.x;ant.y+=current.y-prev.y;ant.dwell=Math.abs(input.x)>0.1?0:ant.dwell+dt;
-      if(current.crumble&&ant.dwell>current.crumble){ant.broken=ant.checkpoint;ant.grounded=false;ant.vy=30;game.notice='The bark crumbles. Snap before the timer empties!';}
+      if(current.crumble&&ant.dwell>current.crumble){ant.broken=ant.standing??ant.checkpoint;ant.grounded=false;ant.vy=30;game.notice='The bark crumbles. Snap before the timer empties!';}
     } else ant.dwell=0;
     ant.cooldown = Math.max(0, ant.cooldown - dt); ant.flash = Math.max(0, ant.flash - dt);
     if (ant.grounded && !input.action) {
@@ -331,15 +334,15 @@ function stepSnap(game: SnapGame, inputs: [WildInput, WildInput], dt: number) {
     const previousY = ant.y;
     if(!ant.grounded)ant.vx+=snapWind(game)*dt;
     ant.x = clamp(ant.x + ant.vx * dt, 12, WILD_W - 12);
-    if (ant.grounded && !platforms.some(p => Math.abs(p.y - ant.y) < 1 && ant.x >= p.x && ant.x <= p.x + p.width)) ant.grounded = false;
+    if (ant.grounded && !landingPlatforms.some(p => Math.abs(p.y - ant.y) < 1 && ant.x >= p.x && ant.x <= p.x + p.width)) ant.grounded = false;
     if (!ant.grounded) {
       ant.y += ant.vy * dt + SNAP_GRAVITY * dt * dt / 2;
       ant.vy += SNAP_GRAVITY * dt;
       if (ant.vy >= 0) {
-        const landed = platforms.findIndex((p,i) => i!==ant.broken&&previousY <= p.y && ant.y >= p.y && ant.x >= p.x + 4 && ant.x <= p.x + p.width - 4);
+        const landed = landingPlatforms.findIndex((p,i) => i!==ant.broken&&previousY <= p.y && ant.y >= p.y && ant.x >= p.x + 4 && ant.x <= p.x + p.width - 4);
         if (landed >= 0) {
-          ant.y = platforms[landed].y; ant.vy = 0; ant.vx = 0; ant.grounded = true;
-          if (landed > ant.checkpoint) {
+          ant.standing=landed;ant.y = landingPlatforms[landed].y; ant.vy = 0; ant.vx = 0; ant.grounded = true;
+          if (landed < platforms.length && landed > ant.checkpoint) {
             ant.checkpoint = landed;
             if (index === 1) game.aiReadyAt = game.elapsed + (platforms[landed].crumble?0.3:2);
             ant.dwell=0;ant.broken=-1;
@@ -353,7 +356,7 @@ function stepSnap(game: SnapGame, inputs: [WildInput, WildInput], dt: number) {
       ant.lives--; ant.flash = 1.4; ant.vx = 0; ant.vy = 0; ant.grounded = true;
       const checkpoint = platforms[ant.checkpoint];
       ant.x = checkpoint.x + checkpoint.width / 2; ant.y = checkpoint.y;
-      ant.cooldown = 0.4; ant.facing = 1;
+      ant.cooldown = 0.4; ant.facing = 1;ant.standing=ant.checkpoint;
       ant.dwell=0;ant.broken=-1;
       game.notice = "Missed the ledge. Lose one heart and return to your checkpoint.";
     }
@@ -361,6 +364,13 @@ function stepSnap(game: SnapGame, inputs: [WildInput, WildInput], dt: number) {
 }
 
 function stepCuttle(game: CuttleGame, inputs: [WildInput, WildInput], dt: number) {
+  if(game.tidal) {
+    const step = Math.floor(game.elapsed/12);
+    if(step !== (game.tideStep ?? 0)) {
+      game.patches.forEach((patch,i) => { if(i%4 === step%4) patch.pattern = ((patch.pattern+1)%6) as Pattern; });
+      game.tideStep=step; game.notice='The tide changes some patches. Check your disguise before crossing.';
+    }
+  }
   const predators = predatorsAt(game.elapsed);
   game.players.forEach((animal, index) => {
     if (animal.lives <= 0) return;

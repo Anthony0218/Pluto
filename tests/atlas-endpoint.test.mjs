@@ -47,3 +47,30 @@ test('real handler validates participants, answer generations, retries, race res
   room=await invoke('a',{op:'submit',code,questionId:room.question.id,answer:deck[0].answer,requestId:'collision'});assert.equal(row.submissions.length,2);assert.equal(room.status,'round_resolving');
  }finally{e.close();}
 });
+
+test('a finished Guess the Country round keeps every tip and the answer up long enough to read',async()=>{
+ const {generateGuessCountryQuestions}=await import('../src/games/atlas/guessCountry.ts');
+ const {GUESS_SCORING}=await import('../src/games/atlas/config.ts');
+ assert.ok(GUESS_SCORING.revealSeconds>=10&&GUESS_SCORING.rankedRevealSeconds>=7);
+ const e=await atlasEndpoint();
+ try {
+  const invoke=async(user,body,expected=200)=>{const r=await e.call(user,{...body,datasetVersion:version});assert.equal(r.status,expected,JSON.stringify(r.body));return r.body;};
+  for(const ranked of [false,true]) {
+   let room=await invoke('a',{op:'create',mode:'guess_country',difficulty:'expert',maxPlayers:ranked?2:4});const code=room.code,row=e.matches.at(-1);
+   const players=ranked?['a','b']:['a','b','c','d'];
+   for(const user of players.slice(1))await invoke(user,{op:'join',code});
+   if(ranked)row.match_kind='ranked';
+   for(const user of players)room=await invoke(user,{op:'ready',code});
+   assert.equal(room.status,'countdown');e.advance(3001);room=await invoke('a',{op:'get',code});
+   assert.equal(room.resolveAt,null);assert.equal(room.question.clues.length,1);
+   const answer=generateGuessCountryQuestions({entities:data.countries,extras:data.extras,datasetVersion:version,seed:row.seed,difficulty:'expert',count:room.rounds})[0].answer;
+   for(const user of players)room=await invoke(user,{op:'submit',code,questionId:room.question.id,answer:user==='b'?answer:''});
+   const reveal=(ranked?GUESS_SCORING.rankedRevealSeconds:GUESS_SCORING.revealSeconds)*1000;
+   assert.equal(room.status,'round_resolving');assert.equal(Date.parse(room.resolveAt)-e.now(),reveal);
+   assert.equal(room.question.clues.length,5,'all five tips are revealed with the answer');assert.equal(room.roundResult.entityId,answer);
+   e.advance(reveal-1);room=await invoke('c'in row.scores?'c':'a',{op:'get',code});
+   assert.equal(room.status,'round_resolving');assert.equal(room.question.clues.length,5);assert.equal(room.roundResult.awards[0].userId,'b');
+   e.advance(1);room=await invoke('a',{op:'get',code});assert.equal(room.status,'next_round');assert.equal(room.resolveAt,null);assert.equal(room.roundIndex,1);
+  }
+ }finally{e.close();}
+});

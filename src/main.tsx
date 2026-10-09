@@ -163,6 +163,8 @@ import MedievalKingdomsBattlePage from "./pages/games/MedievalKingdoms/MedievalK
 import { Chess3DAiRoute, Chess3DHotseatRoute, Chess3DMenuRoute, ChessCustomLegacyRedirect, ChessCustomRoute, JanmannGameRoute, JanmannRulesRoute } from "./pages/games/lazyChessRoutes.tsx";
 import { CardBuilderCreateRoute, CardBuilderHomeRoute, CardBuilderPlayRoute, CardBuilderRoomRoute, CardBuilderSimulationRoute, CardBuilderTemplateRoute } from "./pages/games/lazyCardBuilderRoutes.tsx";
 import CreditsPage from "./pages/general/CreditsPage.tsx";
+import RouteError from "./components/App/RouteError.tsx";
+import { reloadForNewVersion } from "./lib/chunkReload.ts";
 import ImprintPage from "./pages/general/ImprintPage.tsx";
 import MedievalKingdomsRegionPage from "./pages/games/MedievalKingdoms/MedievalKingdomsRegionPage.tsx";
 import LoginPage from "./pages/general/LoginPage.tsx";
@@ -195,9 +197,13 @@ function GroupsRedirect() {
   return <Navigate to={`/clans${search}`} replace />;
 }
 
+// After a deploy the page chunks of an open tab are gone; reload once instead of failing the navigation.
+window.addEventListener("vite:preloadError", (event) => { if (reloadForNewVersion()) event.preventDefault(); });
+
 const router = createBrowserRouter([
   {
     element: <RootLayout />,
+    errorElement: <RouteError />,
 
     children: [
       {

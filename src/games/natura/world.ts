@@ -7,10 +7,11 @@ import { createExpedition, updateExpedition, type Expedition, type ExpeditionInp
 import { createLaneOcean, updateLaneOcean, type LaneOcean } from './laneOcean.ts';
 import type { Game } from './naturaData.ts';
 import { intentKeys, type PlayerIntent } from './input.ts';
+import { configureWildChallenge } from './challenges.ts';
 import { createAbyssDuel, updateAbyssDuel, type AbyssDuel } from './abyssDuel.ts';
-export type RunOptions = { seed?: number; variant?: 'race'|'pursuit'; role?: 'falcon'|'mouse'|'whale'|'squid' };
+export type RunOptions = { seed?: number; variant?: 'race'|'pursuit'; challenge?: 'classic'|'wild'; role?: 'falcon'|'mouse'|'whale'|'squid' };
 export type NaturaWorld = { kind: 'meadow'; game: Game } | { kind: 'archerfish'; game: ArcherGame } | WildGame | ToolGame | Expedition | LaneOcean | AbyssDuel;
-export function makeWorld(scenario: ScenarioId, mode: PlayMode, round: number, level: number, botDifficulty: BotDifficulty, options:RunOptions={}): NaturaWorld {
+function baseWorld(scenario: ScenarioId, mode: PlayMode, round: number, level: number, botDifficulty: BotDifficulty, options:RunOptions={}): NaturaWorld {
   const seed=options.seed??round*7919;
   if (scenario === 'meadow') return {kind: scenario, game: initialGame(mode === 'ai' ? 'solo' : 'duo', options.role==='mouse'?'mouse':options.role==='falcon'?'falcon':round % 2 ? 'falcon' : 'mouse',seed)};
   if (scenario === 'archerfish') return {kind: scenario, game: createArcherGame()};
@@ -23,6 +24,11 @@ export function makeWorld(scenario: ScenarioId, mode: PlayMode, round: number, l
   }
   if (scenario === 'bolas' || scenario === 'coconut') return createToolGame(scenario);
   return createExpedition(scenario, level);
+}
+export function makeWorld(scenario: ScenarioId, mode: PlayMode, round: number, level: number, botDifficulty: BotDifficulty, options: RunOptions = {}): NaturaWorld {
+  const world = baseWorld(scenario,mode,round,level,botDifficulty,options);
+  if(options.challenge === 'wild') configureWildChallenge(world, mode === 'ai');
+  return world;
 }
 export const phase = (w: NaturaWorld) => 'game' in w ? w.game.phase : w.phase;
 export const ended = (w: NaturaWorld) => ['end','finished'].includes(phase(w));
@@ -39,7 +45,7 @@ export function stepWorld(w: NaturaWorld, inputs: [PlayerIntent, PlayerIntent], 
     const a=inputs.map((v):ArcherInput=>({move:v.x,aim:v.y,shoot:v.action,dash:v.secondary,target:v.target})) as [ArcherInput,ArcherInput];updateArcherGame(w.game,a,dt,ai,difficulty);
   } else if(w.kind==='trapjaw'||w.kind==='cuttlefish')updateWildGame(w,[inputs[0],inputs[1]],dt,ai,difficulty);
   else if(w.kind==='bolas'||w.kind==='coconut')updateToolGame(w,[inputs[0],inputs[1]],dt,ai,difficulty);
-  else if(w.kind==='flyingfish')updateLaneOcean(w,[inputs[0].x,inputs[1].x],dt,ai);
+  else if(w.kind==='flyingfish')updateLaneOcean(w,[inputs[0].x,inputs[1].x],dt,ai,inputs[0].action);
   else if(w.kind==='jumpingspider'||w.kind==='spermwhale') {
     const a=inputs.map((v):ExpeditionInput=>({x:v.x,z:v.y,vertical:v.vertical,action:v.action,special:v.secondary})) as [ExpeditionInput,ExpeditionInput];updateExpedition(w,a,dt,ai,difficulty);
   }
@@ -47,7 +53,7 @@ export function stepWorld(w: NaturaWorld, inputs: [PlayerIntent, PlayerIntent], 
 export function measureRun(w:NaturaWorld,seat:Player=0):RunPerformance {
   if(w.kind==='meadow') {
     const g=w.game,role=g.mode==='solo'?g.role:seat===0?'falcon':'mouse';
-    return {completed:g.winner===role,progress:role==='falcon'?g.catches*10+g.bossHits:g.t,health:role==='falcon'?3-g.bossHits:g.lives,elapsed:g.t,label:role==='falcon'?`${g.catches} catches`:`${g.t.toFixed(1)}s survived`};
+    return {completed:g.winner===role,progress:role==='falcon'?g.catches*10+g.bossHits:g.t,health:role==='falcon'?(g.winner==='falcon'?3:0):g.lives,elapsed:g.t,label:role==='falcon'?`${g.catches} catches`:`${g.t.toFixed(1)}s survived`};
   }
   if(w.kind==='archerfish') {const p=w.game.fish[seat];return {completed:w.game.winner===seat,progress:p.catches,health:0,elapsed:w.game.elapsed,label:`${p.catches} catches`};}
   if(w.kind==='abyssduel') {const p=w.players[seat];return {completed:w.winner===seat,progress:seat===0?w.bites:w.elapsed,health:p.lives,elapsed:w.elapsed,label:seat===0?`${w.bites} bites`:`${w.elapsed.toFixed(1)}s survived`};}

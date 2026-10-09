@@ -23,7 +23,7 @@ export default function ClanInvitePanel({ onNavigate }: { onNavigate?: () => voi
   const { clans, loading } = useDashboardData();
   const navigate = useNavigate();
   const [gameId, setGameId] = useState("chess");
-  const { games, cardsError, clearCardsError } = useInviteGames(gameId);
+  const { games } = useInviteGames();
   const [modeId, setModeId] = useState("classic");
   const [clanId, setClanId] = useState("");
   const [code, setCode] = useState("");
@@ -70,11 +70,9 @@ export default function ClanInvitePanel({ onNavigate }: { onNavigate?: () => voi
     {!user ? <Link className="mt-3 block text-sm text-indigo-200" to="/login" onClick={onNavigate}>{ui("Sign in")}</Link> : !loading && !clans.length ? <p className="mt-3 text-sm text-slate-300">{ui("You are not in a clan yet.")} <Link className="font-bold text-indigo-200 underline" to="/clans" onClick={onNavigate}>{ui("Find or create a clan")}</Link></p> : <>
       {game && <div className="invite-game-preview mt-3 flex items-center gap-3"><img src={game.image} alt="" className="h-10 w-10 rounded-lg object-cover" /><span className="font-bold">{game.title}</span></div>}
       <div className="mt-3 grid grid-cols-2 gap-3">
-        <label className="min-w-0 text-sm text-slate-300">{ui("Game")}<select aria-label={ui("Game")} className={field} value={game?.id ?? ""} disabled={busy} onChange={event => { setGameId(event.target.value); setModeId(""); clearCardsError(); }}>{games.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}</select></label>
+        <label className="min-w-0 text-sm text-slate-300">{ui("Game")}<select aria-label={ui("Game")} className={field} value={game?.id ?? ""} disabled={busy} onChange={event => { setGameId(event.target.value); setModeId(""); }}>{games.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}</select></label>
         <label className="min-w-0 text-sm text-slate-300">{ui("Mode")}<select aria-label={ui("Mode")} className={field} value={selectedMode?.id ?? ""} disabled={busy || !game?.modes.length} onChange={event => setModeId(event.target.value)}>{game?.modes.map(mode => <option key={mode.id} value={mode.id}>{ui(mode.label)}</option>)}</select></label>
       </div>
-      {cardsError && <p role="alert" className="mt-2 text-sm text-red-300">{ui(cardsError)}</p>}
-      {!game?.modes.length && !cardsError && <p className="mt-2 text-sm text-slate-400">{ui("Publish a card game in your account to invite friends.")}</p>}
       <label className="mt-3 block text-sm text-slate-300">{ui("Choose a clan")}<select aria-label={ui("Choose a clan")} value={clanId} onChange={event => setClanId(event.target.value)} disabled={busy || loading} className={field}><option value="">{ui(loading ? "Loading clans..." : "Choose a clan")}</option>{clans.map(clan => <option key={clan.id} value={clan.id}>{clan.name}</option>)}</select></label>
       <button type="button" disabled={busy || !selectedMode || !validClan} onClick={create} className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-500 px-3 py-3 text-sm font-bold disabled:opacity-40"><Send size={16} />{ui("Create & invite")}</button>
       <div className="mt-4 border-t border-white/10 pt-3">

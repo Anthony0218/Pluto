@@ -137,7 +137,8 @@ export function AtlasSoloGame({ data, mode, settings, seed, title, player, onFin
     setGuess((current) => ({ ...current, selectedId: entityId, wrong: correct || !entityId ? current.wrong : [...current.wrong, entityId], result: { correct, award } }));
     setStats((current) => record(current, correct, award?.total ?? 0, currentQuestion.entityId));
     stopAdvanceTimer();
-    advanceTimer.current = window.setTimeout(() => advanceFrom(questionIndex), 2600);
+    // Every tip and the answer stay up to be read; "Next country" skips the wait.
+    advanceTimer.current = window.setTimeout(() => advanceFrom(questionIndex), GUESS_SCORING.revealSeconds * 1000);
   }, [advanceFrom, currentQuestion, guess, over, questionIndex]);
 
   const submitPin = () => {
@@ -214,7 +215,8 @@ export function AtlasSoloGame({ data, mode, settings, seed, title, player, onFin
             {guess.wrong.length > 0 && <p className="atlas-guess-misses">Not {guess.wrong.map(nameOf).join(", not ")}.</p>}
             {!guess.result && guess.tip + 1 < guessing.clues.length && <button type="button" className="atlas-submit atlas-secondary" disabled={remainingMs <= 0} onClick={() => submitGuess("")}>Reveal next clue · lower award</button>}
             <GuessClueList excludeIds={guessing.choices?.map(choice => choice.id)} entityId={guessing.entityId} clues={guessing.clues.slice(0, guess.result ? guessing.clues.length : guess.tip + 1)} total={guessing.clues.length} />
-            {guess.result && <div className={`atlas-feedback ${guess.result.correct ? "is-correct" : "is-wrong"}`}>{guess.result.correct ? <Check /> : <X />}<div><strong>{guess.result.correct ? `${nameOf(guessing.entityId)} — +${guess.result.award!.total} points` : `It was ${nameOf(guessing.entityId)}`}</strong><span>{guess.result.award ? `${guess.result.award.base} for solving${guess.result.award.bonus ? ` + ${guess.result.award.bonus} tip-${guess.tip + 1} bonus` : ""}` : "No points this time"}</span></div></div>}</>}
+            {guess.result && <div className={`atlas-feedback ${guess.result.correct ? "is-correct" : "is-wrong"}`}>{guess.result.correct ? <Check /> : <X />}<div><strong>{guess.result.correct ? `${nameOf(guessing.entityId)} — +${guess.result.award!.total} points` : `It was ${nameOf(guessing.entityId)}`}</strong><span>{guess.result.award ? `${guess.result.award.base} for solving${guess.result.award.bonus ? ` + ${guess.result.award.bonus} tip-${guess.tip + 1} bonus` : ""}` : "No points this time"}</span></div></div>}
+            {guess.result && <button type="button" className="atlas-submit atlas-guess-continue" onClick={() => { stopAdvanceTimer(); advanceFrom(questionIndex); }}>{questionIndex + 1 >= questions.length ? "See results" : "Next country"} <small>or wait {GUESS_SCORING.revealSeconds}s</small></button>}</>}
           {pinning && <div className="atlas-pin-controls">
             <p>{pin ? `Your pin: ${Math.abs(pin[1]).toFixed(2)}° ${pin[1] >= 0 ? "N" : "S"}, ${Math.abs(pin[0]).toFixed(2)}° ${pin[0] >= 0 ? "E" : "W"}${closest ? "" : " — click again to move it."}` : `Click anywhere to place a pin. ${pinning.targetRadiusKm ? "Within 20 km of the city center" : "Inside the country"} counts as 0 km.`}</p>
             <button type="button" className="atlas-submit" disabled={!pin || Boolean(closest)} onClick={submitPin}><MapPin size={18} />{closest ? "Pin locked" : "Submit pin"}</button>

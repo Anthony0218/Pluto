@@ -10,6 +10,12 @@ camera, and the spider and whale modes allow movement through the world.
 `input.ts` turns keyboard/touch state into two player intents. `world.ts` owns the
 renderer-independent simulation adapters, including the remaining meadow key bridge.
 
+The Field Station also includes guided practice, a persistent local field journal,
+three-habitat expeditions and date-seeded daily trails. Optional single-player
+Wild challenges add route and survival decisions; shared animation, particles,
+HUD meters and synthesized audio improve feedback. See
+[field journeys](../../../docs/natura/journey.md) for rules and validation.
+
 ## Modes
 
 - **Wings & Whiskers:** seven grass shelters and a two-exit tunnel. Each dive

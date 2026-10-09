@@ -1,5 +1,5 @@
 import { ATLAS_SCORING, GUESS_SCORING } from "./config.ts";
-import { maxPlayersFor, type AtlasMultiplayerMode } from "./multiplayer.ts";
+import type { AtlasMultiplayerMode } from "./multiplayer.ts";
 import { EXTREME_GEOGRAPHY, REGION_BUILDER, STAT_BATTLE, STAT_DETECTIVE, STAT_RANKING } from "./trials/config.ts";
 import { HISTORY_BATTLE, HISTORY_SOURCE } from "./trials/historyBattle.ts";
 import { LANGUAGE_GUESSER } from "./trials/languageGuesser.ts";
@@ -14,7 +14,7 @@ export type ArenaModeId =
   | "region-builder" | "stat-detective" | "extreme-geography" | "history-battle" | "map-fill" | "language-guesser";
 export type TrialKind = "country-guesser" | "stat-detective" | "region-builder" | "stat-ranking" | "extreme-geography" | "stat-battle" | "language-guesser" | "history-battle";
 export type ModeAccent = "cyan" | "amber" | "violet" | "emerald" | "rose" | "sky";
-/** turns: each player plays their own run in turn · pins / duel: head-to-head on one screen. */
+/** turns: each player plays their own run in turn · pins / duel: everyone plays the same rounds on one screen. */
 export type HotseatKind = "turns" | "pins" | "duel";
 export type ModeOption = "categories" | "stats" | "scope";
 export type ModeRules = { goal: string; play: string[]; scoring: string; solo: string; multiplayer: string; hotseat: string };
@@ -99,16 +99,16 @@ export const ARENA_MODES: ArenaModeDef[] = [
     },
   },
   {
-    id: "stat-battle", title: "Stat Battle", tagline: "Card duel", accent: "amber", meta: `First to ${STAT_BATTLE.winTarget} · vs AI or a friend`,
+    id: "stat-battle", title: "Stat Battle", tagline: "Card duel", accent: "amber", meta: `First to ${STAT_BATTLE.winTarget} · vs AI or friends`,
     description: "Hold a hand of countries, read the category, and play the card you think wins. Spend giants wisely.",
     solo: { kind: "trial", trial: "stat-battle" }, online: "stat_battle", hotseat: "duel", options: [], bestId: "stat-battle",
     rules: {
       goal: `Be the first to win ${STAT_BATTLE.winTarget} rounds of a country card duel.`,
-      play: [`Each side holds ${STAT_BATTLE.handSize} country cards. Every round reveals a category — for example "Population · higher wins" or "Area · lower wins".`, "Each player can reroll their entire hand up to three times per game, before laying a card.", "Both sides lay one card face down, then both are revealed. The better value takes the round; equal values are a tie.", "Played cards are replaced from the deck. Giants are strong, but lower-wins rounds punish them."],
+      play: [`Each side holds ${STAT_BATTLE.handSize} country cards. Every round reveals a category — for example "Population · higher wins" or "Area · lower wins".`, "Each player can reroll their entire hand up to three times per game, before laying a card.", "Everyone lays one card face down, then all are revealed. The best value takes the round; if the best value is shared, nobody scores.", "Played cards are replaced from the deck. Giants are strong, but lower-wins rounds punish them."],
       scoring: `First to ${STAT_BATTLE.winTarget} round wins takes the match. Your solo record counts 200 per round won and +1,000 for winning the match.`,
       solo: "Duel the computer. Difficulty sets how cleverly it plays.",
-      multiplayer: "A live duel against one other player. You have 30 seconds to play each card, or your first card is played for you.",
-      hotseat: "Two players on one device. Pass it over before each pick — each hand is shown only to its owner — then both cards are revealed together.",
+      multiplayer: "2–4 players at one live table: a duel for two, a free-for-all for three or four. You have 30 seconds to play each card, or your first card is played for you.",
+      hotseat: "2–4 players on one device. Pass it over before each pick — each hand is shown only to its owner — then all cards are revealed together.",
     },
   },
   {
@@ -190,7 +190,5 @@ export const isOnlineMode = (mode: ArenaModeDef) => mode.id !== "map-fill" && mo
 export const ONLINE_ARENA_MODES = ARENA_MODES.filter(isOnlineMode);
 export const modeById = (id: string | undefined) => ARENA_MODES.find((mode) => mode.id === (id === "closest-wins" ? "map-battle" : id === "guess-country-mini" ? "guess-country" : id));
 export const modeForOnline = (online: string | null | undefined) => ARENA_MODES.find((mode) => mode.online === (online === "closest_wins" ? "map_battle" : online === "country_guesser" ? "guess_country" : online));
-export const onlinePlayerLimit = (mode: ArenaModeDef) => maxPlayersFor(mode.online);
-export const hotseatPlayerLimit = (mode: ArenaModeDef) => mode.hotseat === "duel" ? 2 : 4;
 /** Old Atlas Trials links (/trials/country-guesser …) lead to the same mode here. */
 export const modeForTrial = (trial: string | undefined) => trial === "country-guesser" ? modeById("guess-country") : ARENA_MODES.find((mode) => mode.solo.kind === "trial" && mode.solo.trial === trial);

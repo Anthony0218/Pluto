@@ -1,9 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { ARENA_MODES, ONLINE_ARENA_MODES, hotseatPlayerLimit, modeForOnline, modeForTrial, onlinePlayerLimit } from "../src/games/atlas/modeCatalog.ts";
+import { ARENA_MODES, ONLINE_ARENA_MODES, modeForOnline, modeForTrial } from "../src/games/atlas/modeCatalog.ts";
 import { generateMatchQuestions } from "../src/games/atlas/matchQuestions.ts";
-import { ATLAS_MULTIPLAYER_MODES, ATLAS_RACE_MODES, isRaceMode, maxPlayersFor, raceComplete, raceScores } from "../src/games/atlas/multiplayer.ts";
+import { ATLAS_MAX_PLAYERS, ATLAS_MULTIPLAYER_MODES, ATLAS_RACE_MODES, isRaceMode, raceComplete, raceScores } from "../src/games/atlas/multiplayer.ts";
 import { closestScore, speedRunScore } from "../src/games/atlas/rules.ts";
 import { generateQuestions } from "../src/games/atlas/engine.ts";
 import { distanceToTerritory } from "../src/games/atlas/territoryDistance.ts";
@@ -31,19 +31,16 @@ test("the menu consolidates modes and only offers supported online choices", () 
   for (const mode of ARENA_MODES) {
     assert.equal(modeForOnline(mode.online), mode);
     assert.ok(mode.rules.goal && mode.rules.play.length && mode.rules.scoring && mode.rules.solo && mode.rules.multiplayer && mode.rules.hotseat, mode.id);
-    assert.ok(onlinePlayerLimit(mode) >= 2 && hotseatPlayerLimit(mode) >= 2);
   }
   // The former Atlas Trials keep their personal-best keys and old links.
   assert.equal(modeForTrial("country-guesser")?.id, "guess-country");
   assert.equal(modeForTrial("country-guesser")?.bestId, "guess-country");
-  assert.equal(maxPlayersFor("stat_battle"), 2);
+  assert.equal(ATLAS_MAX_PLAYERS, 4);
   // Territory Battle is gone from every list; History Battle is a four-seat race with its own solo engine.
   assert.ok(!ARENA_MODES.some((mode) => /territory/i.test(`${mode.id} ${mode.title} ${mode.online}`)) && !ATLAS_MULTIPLAYER_MODES.includes("territory_battle"));
   assert.deepEqual(modeForOnline("history_battle")?.solo, { kind: "trial", trial: "history-battle" });
   assert.equal(modeForOnline("history_battle")?.hotseat, "turns");
   assert.ok(isRaceMode("history_battle"));
-  assert.equal(maxPlayersFor("history_battle"), 4);
-  assert.equal(maxPlayersFor("stat_ranking"), 4);
 });
 
 test("Map Fill regions follow the everyday continents and their zoom boxes frame the capitals", () => {

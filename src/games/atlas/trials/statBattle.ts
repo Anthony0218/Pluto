@@ -33,7 +33,7 @@ export const battleCategoryById = (id: string) => BATTLE_CATEGORIES.find((catego
 export const battleDeckPool = (pool: readonly TrialCountry[]) => pool.filter((country) => hasStats(country, BATTLE_STATS));
 
 /** Never the same stat twice in a row (so "Population ↓" isn't followed by "Population ↑"), nor a category from the last two rounds. */
-function drawCategory(seed: string, round: number, recent: string[]): string {
+export function drawCategory(seed: string, round: number, recent: string[]): string {
   const random = seededRandom(`${seed}:battle-category:${round}`);
   const lastStat = recent.length ? battleCategoryById(recent[recent.length - 1]).statId : null;
   return pickOne(BATTLE_CATEGORIES.filter((category) => !recent.includes(category.id) && category.statId !== lastStat), random).id;

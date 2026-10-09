@@ -13,7 +13,7 @@ export const SPIDER_STUDIES = [
   {name:'Storm Crown',theme:'storm',hint:'Narrow moving platforms, wind and stone gates combine every learned skill.',wind:1,moving:true,slippery:false,gates:true,crumble:true},
 ];
 export const SPIDER_COURSES = SPIDER_STUDIES.map(c=>c.name);
-export type Platform3 = Point3 & { radius: number; checkpoint: boolean; motion?:{amplitude:number;phase:number};crumble?:number };
+export type Platform3 = Point3 & { radius: number; checkpoint: boolean; routeProgress?: number; motion?:{amplitude:number;phase:number};crumble?:number };
 export function spiderPlatforms(level: number): Platform3[] {
   const course=SPIDER_STUDIES[level]??SPIDER_STUDIES[0];
   return Array.from({ length: 24 }, (_, i) => ({
@@ -56,7 +56,7 @@ export type Squid = Point3 & { health: number; warning: number; cooldown: number
 export type Expedition = {
   kind: 'jumpingspider' | 'spermwhale'; phase: 'ready' | 'playing' | 'paused' | 'finished';
   time: number; elapsed: number; level: number; players: [Explorer, Explorer];
-  platforms: Platform3[]; squids: Squid[]; winner: Player | null; notice: string;
+  currents?: boolean; platforms: Platform3[]; squids: Squid[]; winner: Player | null; notice: string;
 };
 const clamp = (x: number, min: number, max: number) => Math.max(min, Math.min(max, x));
 export const distance3 = (a: Point3, b: Point3) => Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
@@ -74,9 +74,9 @@ function rescue(g: Expedition, p: Explorer) {
   const c = platformAt(g.platforms[p.checkpoint],g.elapsed); Object.assign(p, { x: c.x, y: c.y, z: c.z, vy: 0, grounded: true,standing:p.checkpoint,broken:-1,groundedTime:0,flash:1,velocity:{x:0,y:0,z:0} });
 }
 export function spiderAI(g: Expedition, difficulty: "easy" | "normal" | "hard" = "normal"): ExpeditionInput {
-  const p = g.players[1], target = platformAt(g.platforms[Math.min(23, p.standing + 1)],g.elapsed+1.05);
+  const p = g.players[1], next=Math.min(23,(g.platforms[p.standing].routeProgress??p.standing)+1), target = platformAt(g.platforms[next],g.elapsed+1.05);
   const dx = target.x - p.x, dz = target.z - p.z, d = Math.hypot(dx, dz);
-  const gateBlocked=[0.2,0.35,0.5,0.65,0.8,0.95].some(t=>spiderGates(g,g.elapsed+t).some(gate=>gate.target===p.standing+1&&gate.active));
+  const gateBlocked=[0.2,0.35,0.5,0.65,0.8,0.95].some(t=>spiderGates(g,g.elapsed+t).some(gate=>gate.target===next&&gate.active));
   const preparing = p.grounded && (g.elapsed<=(difficulty==='easy'?2.5:difficulty==='hard'?0.5:1.5)||p.groundedTime < (difficulty === "easy" ? 0.6 : difficulty === "hard" ? 0 : 0.28)||gateBlocked);
   const wind=p.grounded?0:spiderWind(g)/6.6;
   return { x: !preparing && d > 0.15 ? dx / d-wind : 0, z: !preparing && d > 0.15 ? dz / d : 0, vertical: 0, action: p.grounded && !p.actionHeld && !preparing && g.elapsed > (difficulty === "easy" ? 2.5 : difficulty === "hard" ? 0.5 : 1.5), special: false };
@@ -116,7 +116,7 @@ export function updateExpedition(g: Expedition, inputs: [ExpeditionInput, Expedi
           if (p.vy <= 0) {
             const index = platforms.findIndex((t,index) => index!==p.broken&&oldY >= t.y && p.y <= t.y && Math.hypot(t.x - p.x, t.z - p.z) < t.radius);
             if (index >= 0) {
-              p.y = platforms[index].y; p.vy = 0; p.grounded = true; p.progress = Math.max(index, p.progress);p.standing=index;p.broken=-1;p.groundedTime=0;
+              p.y = platforms[index].y; p.vy = 0; p.grounded = true; p.progress = Math.max(platforms[index].routeProgress ?? index, p.progress);p.standing=index;p.broken=-1;p.groundedTime=0;
               if (g.platforms[index].checkpoint && index > p.checkpoint) { p.checkpoint = index; p.silk = 2; g.notice = `Checkpoint ${index + 1} reached. Silk refilled.`; }
             }
           }
@@ -131,6 +131,7 @@ export function updateExpedition(g: Expedition, inputs: [ExpeditionInput, Expedi
           p.velocity[axis] += (intent / length * 10 - p.velocity[axis]) * blend;
           p[axis] += p.velocity[axis] * dt;
         });
+        if(g.currents && p.y < -8) { p.x += Math.sin(g.elapsed*0.25+p.y*0.05)*1.5*dt; p.z += Math.cos(g.elapsed*0.2)*0.8*dt; }
         p.x = clamp(p.x, -32, 32); p.z = clamp(p.z, -36, 30); p.y = clamp(p.y, -65, -1);
         p.oxygen = p.y > -3 ? Math.min(90, p.oxygen + 25 * dt) : Math.max(0, p.oxygen - dt);
         p.sonar = Math.max(0, p.sonar - dt); p.sonarCooldown = Math.max(0, p.sonarCooldown - dt);

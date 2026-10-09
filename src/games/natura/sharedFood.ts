@@ -1,5 +1,5 @@
 import type { Vec } from './naturaData';
-export type FoodSite = Vec & { id: number; cooldown: number };
+export type FoodSite = Vec & { id: number; cooldown: number; value?: number };
 export const createFoodSites = (points: Vec[]): FoodSite[] => points.map((point, id) => ({ ...point, id, cooldown: 0 }));
 export function nearestFood(sites: FoodSite[], point: Vec): FoodSite | undefined {
   return sites.filter(site => site.cooldown <= 0).reduce<FoodSite | undefined>((best, site) => !best || Math.hypot(site.x - point.x, site.y - point.y) < Math.hypot(best.x - point.x, best.y - point.y) ? site : best, undefined);
@@ -13,7 +13,7 @@ export function collectSharedFood(sites: FoodSite[], players: [Vec & { food: num
     const nearest = Math.min(...distances);
     if (nearest > radius) return;
     const tied = Math.abs(distances[0] - distances[1]) < 0.5;
-    players.forEach((player, i) => { if (tied || distances[i] === nearest) player.food += tied ? 0.5 : 1; });
+    players.forEach((player, i) => { if (tied || distances[i] === nearest) player.food += (site.value ?? 1) * (tied ? 0.5 : 1); });
     site.cooldown = 5;
     collected = true;
   });

@@ -369,3 +369,34 @@
  .duel-hand-card{min-height:90px}.history-fact,.language-translation p{font-size:.8rem;line-height:1.35}
 }
 .trial-stage .atlas-fit-content:has(>.trial-game-over)>:not(.trial-game-over){display:none}
+
+/* Stat Battle table for three or four players: one slot per seat, each named and coloured by player. */
+.battle-rivals { display: flex; flex-wrap: wrap; justify-content: center; gap: .35rem 1.4rem; }
+.battle-seat-name { display: inline-flex; align-items: center; gap: .4rem; min-width: 0; }
+.battle-seat-name i { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--player, #8fe9e4); }
+.battle-arena.is-table { grid-template-columns: repeat(var(--seats), minmax(0, 1fr)); align-items: stretch; max-width: 980px; gap: clamp(.4rem, 1.4vw, 1rem); }
+.battle-arena.is-table .battle-slot { align-content: start; gap: .5rem; min-height: 214px; padding: .55rem .3rem .7rem; }
+.battle-arena.is-table .battle-slot > .battle-seat-name { color: #aebcd0; font-size: .7rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+.battle-arena.is-table .battle-slot-empty { align-self: center; margin: auto 0; text-align: center; }
+.battle-arena.is-table .battle-arena-card { width: 100%; }
+.duel-scoreline.is-table { flex-wrap: wrap; gap: .3rem 1.3rem; }
+.duel-scoreline.is-table > span { align-items: center; color: #c8d3e3; }
+.duel-scoreline.is-table i { width: 9px; height: 9px; border-radius: 50%; background: var(--player); }
+.battle-history.is-table li { grid-template-columns: 9rem minmax(0, 1fr) 4.5rem; align-items: start; }
+.battle-history.is-table .battle-history-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: .25rem .9rem; }
+.battle-history-cards > span { display: flex; align-items: center; gap: .4rem; min-width: 0; color: #8fa0b8; }
+.battle-history-cards > span.is-best { color: #fff; }
+@media (max-width: 700px) {
+  /* Two rows of slots are tall: the hand scrolls with the table instead of sticking over it, and empty slots stay short. */
+  .battle-table.is-table .battle-you { position: static; margin: 0; padding: 0; background: none; }
+  .battle-arena.is-table { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .battle-arena.is-table .battle-slot { min-height: 78px; padding: .4rem .25rem .5rem; gap: .3rem; }
+  .battle-arena.is-table .battle-arena-card { padding: .5rem .35rem; }
+  .battle-arena.is-table .battle-arena-card .trial-flag { width: 46px; height: 32px; }
+  .battle-arena.is-table .battle-face-down { min-height: 78px; }
+  .battle-table.is-table .battle-category strong { font-size: 1.35rem; }
+  .battle-history.is-table li { grid-template-columns: minmax(0, 1fr) auto; }
+  .battle-history.is-table .battle-history-cards { grid-column: 1 / -1; grid-row: 2; }
+}
+.battle-arena.is-table .battle-slot { display: flex; flex-direction: column; align-items: center; }
+.battle-arena.is-table .battle-crown { top: -13px; right: -9px; }

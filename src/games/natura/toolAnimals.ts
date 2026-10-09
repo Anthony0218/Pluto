@@ -13,7 +13,7 @@ export type ToolGame = {
   kind: ToolKind; phase: "ready" | "playing" | "paused" | "finished"; time: number; elapsed: number;
   players: [ToolPlayer, ToolPlayer]; winner: Player | null; notice: string;
   actionHeld: [boolean, boolean]; secondaryHeld: [boolean, boolean];
-  foodSites: FoodSite[]; moths: Moth[]; spawn: number; nextMoth: number; aiThink: number; aiInput: ToolInput;
+  reefShelters?: Vec[]; foodSites: FoodSite[]; moths: Moth[]; spawn: number; nextMoth: number; aiThink: number; aiInput: ToolInput;
   raid: { stage: "calm" | "warning" | "attack"; time: number; lanes: number[] };
 };
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
@@ -188,7 +188,7 @@ function stepCoconut(game: ToolGame, inputs: [ToolInput, ToolInput], dt: number)
     }
     if (player.carrying) player.shell = { x: player.x, y: player.y };
     const predatorIndex = raidPredators(game).findIndex(predator => Math.hypot(predator.x - player.x, predator.y - player.y) < 46);
-    if (player.flash === 0 && !shellProtects(player) && predatorIndex >= 0) {
+    if (player.flash === 0 && !shellProtects(player) && !game.reefShelters?.some(reef => Math.hypot(reef.x-player.x,reef.y-player.y)<48) && predatorIndex >= 0) {
       player.lives--; player.captured = 1; player.flash = 1;
       player.dragDirection = predatorIndex % 2 ? -1 : 1;
       player.hidden = false; player.carrying = false;
