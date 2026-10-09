@@ -14,9 +14,10 @@ export const ATLAS_RACE_MODES: AtlasRaceMode[] = ["stat_ranking", "stat_detectiv
 export const ATLAS_MULTIPLAYER_MODES: AtlasMultiplayerMode[] = [...ATLAS_ROUND_MODES, ...ATLAS_RACE_MODES, "stat_battle"];
 export const isRaceMode = (mode: string): mode is AtlasRaceMode => ATLAS_RACE_MODES.includes(mode as AtlasRaceMode);
 export const isRoundMode = (mode: string): mode is AtlasRoundMode => ATLAS_ROUND_MODES.includes(mode as AtlasRoundMode);
-/** Stat Battle is a duel; every other mode seats two to four players. */
-export const maxPlayersFor = (mode: AtlasMultiplayerMode) => mode === "stat_battle" ? 2 : 4;
-export const clampPlayers = (mode: AtlasMultiplayerMode, requested: unknown) => Math.min(maxPlayersFor(mode), Math.max(2, Math.trunc(Number(requested)) || 2));
+/** Every mode seats two to four players, online and on one device: Stat Battle is a duel for two and a card table for three or four. */
+export const ATLAS_MAX_PLAYERS = 4;
+export const clampPlayers = (requested: unknown) => Math.min(ATLAS_MAX_PLAYERS, Math.max(2, Math.trunc(Number(requested)) || 2));
+
 export type AtlasMatchStatus = "waiting" | "draft" | "ready" | "intermission" | "countdown" | "round_active" | "round_resolving" | "next_round" | "finished" | "cancelled";
 export type ServerSubmission = { userId: string; round: number; answer: string | Coordinates; submittedAt: number; correct: boolean; distanceKm?: number; nearest?: Coordinates; tip?: number; concept?:string; elapsedMs?:number };
 

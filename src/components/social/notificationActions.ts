@@ -10,6 +10,7 @@ export const clanRoute = (clanId?: string) => `/clans${clanId ? `?clan=${encodeU
 export function notificationRoomCode(item: DashboardNotification) {
   switch (item.kind) {
     case "clan_message":
+    case "clan_join_invite":
     case "spectate_request":
     case "spectate_accepted":
     case "friend_request":
@@ -30,6 +31,9 @@ export function notificationDestination(item: DashboardNotification) {
     case "clan_message":
     case "clan_invite":
       return clanRoute(item.clanId);
+    case "clan_join_invite":
+      // Not a member yet: the clans page lists the invitation to accept or decline.
+      return clanRoute();
     case "spectate_accepted":
       return `/spectate/${item.spectateRequestId}`;
     case "friend_request":
@@ -43,6 +47,7 @@ export function notificationActionLabel(item: DashboardNotification) {
   switch (item.kind) {
     case "clan_message": return "Open clan";
     case "clan_invite": return "Join";
+    case "clan_join_invite": return "Review";
     case "spectate_request": return "Review";
     case "spectate_accepted": return "Watch now";
     case "friend_request": return "Review";
@@ -52,6 +57,12 @@ export function notificationActionLabel(item: DashboardNotification) {
 
 export async function respondToSpectateRequest(requestId: string, accept: boolean) {
   const { error } = await supabase.rpc("respond_spectate_request", { p_request_id: requestId, p_accept: accept });
+  return error?.message ?? null;
+}
+
+/** Accepting joins the clan. Returns an error message, or null on success. */
+export async function respondToClanInvite(inviteId: string, accept: boolean) {
+  const { error } = await supabase.rpc("respond_clan_invite", { p_invite_id: inviteId, p_accept: accept });
   return error?.message ?? null;
 }
 

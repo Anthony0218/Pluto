@@ -32,7 +32,7 @@
 .atlas-clues{display:grid;gap:.5rem;margin:0 0 1rem;padding:0;list-style:none}.atlas-clues li{padding:.7rem .85rem;border:1px solid rgba(255,255,255,.09);border-radius:14px;background:rgba(255,255,255,.04)}.atlas-clues li>span{display:inline-flex;align-items:center;gap:.35rem;color:#c3a6ff;font-size:.66rem;font-weight:850;letter-spacing:.14em;text-transform:uppercase}.atlas-clues li p{margin:.3rem 0 0;color:#e3e9f4;line-height:1.45}.atlas-clues li img{display:block;width:110px;margin-top:.55rem;border-radius:5px;box-shadow:0 0 0 1px rgba(255,255,255,.14)}.atlas-clues li.is-new{border-color:rgba(167,139,250,.5);background:rgba(167,139,250,.09);animation:atlas-clue-in .35s ease-out}.atlas-clues li.is-locked{border-style:dashed;opacity:.45}.atlas-clues li.is-locked p{color:#8f9cb2;font-size:.8rem}@keyframes atlas-clue-in{from{opacity:0;transform:translateY(6px)}}
 .atlas-guess-input{display:grid;gap:.5rem}.atlas-guess-input label{display:flex;align-items:center;gap:.5rem;padding:0 .8rem;border:1px solid rgba(255,255,255,.14);border-radius:13px;color:#8f9cb2;background:#0b1528}.atlas-guess-input input{flex:1;min-width:0;min-height:44px;border:0;outline:0;color:#fff;background:transparent;font:inherit}.atlas-guess-suggestions{display:grid;gap:.3rem}.atlas-guess-suggestions button{display:flex;align-items:center;gap:.55rem;padding:.5rem .7rem;border:1px solid rgba(255,255,255,.08);border-radius:10px;color:#dce2ee;background:rgba(255,255,255,.04);text-align:left;cursor:pointer}.atlas-guess-suggestions button:hover:not(:disabled){border-color:rgba(82,231,224,.5)}.atlas-guess-suggestions button:disabled{opacity:.35;text-decoration:line-through}.atlas-guess-suggestions img{width:24px;height:18px;object-fit:cover;border-radius:2px}.atlas-guess-input .atlas-submit{margin-top:0}.atlas-guess-input .atlas-submit:disabled{opacity:.45;cursor:not-allowed}
 .atlas-guess-misses{margin:0 0 .8rem;color:#fda4af;font-size:.82rem;line-height:1.5}
-.atlas-guess-result{margin-top:1rem;padding:.9rem 1rem;border:1px solid rgba(52,211,153,.35);border-radius:14px;background:rgba(52,211,153,.07);animation:atlas-clue-in .35s ease-out}.atlas-guess-result.is-wrong{border-color:rgba(251,113,133,.35);background:rgba(251,113,133,.06)}.atlas-guess-result>strong{display:block;margin-bottom:.5rem;color:#eafff6}.atlas-guess-result ul{display:grid;gap:.3rem;margin:0;padding:0;list-style:none}.atlas-guess-result li{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:.8rem;padding:.45rem .6rem;border-radius:9px;background:rgba(0,0,0,.18);font-size:.85rem}.atlas-guess-result li span:first-child{display:inline-flex;align-items:center;gap:.35rem;color:#dfe7f3}.atlas-guess-result li span:first-child svg{color:#ffd372}.atlas-guess-result li span:nth-child(2){color:#8f9cb2}.atlas-guess-result li b{color:#6ee7b7;font-size:1rem}.atlas-guess-result small{display:block;margin-top:.5rem;color:#fda4af}
+.atlas-guess-result{margin-top:1rem;padding:.9rem 1rem;border:1px solid rgba(52,211,153,.35);border-radius:14px;background:rgba(52,211,153,.07);animation:atlas-clue-in .35s ease-out}.atlas-guess-result.is-wrong{border-color:rgba(251,113,133,.35);background:rgba(251,113,133,.06)}.atlas-guess-result>strong{display:block;margin-bottom:.5rem;color:#eafff6}.atlas-guess-result ul{display:grid;gap:.3rem;margin:0;padding:0;list-style:none}.atlas-guess-result li{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:.8rem;padding:.45rem .6rem;border-radius:9px;background:rgba(0,0,0,.18);font-size:.85rem}.atlas-guess-result li span:first-child{display:inline-flex;align-items:center;gap:.35rem;color:#dfe7f3}.atlas-guess-result li span:first-child svg{color:#ffd372}.atlas-guess-result li span:nth-child(2){color:#8f9cb2}.atlas-guess-result li b{color:#6ee7b7;font-size:1rem}.atlas-guess-result small{display:block;margin-top:.5rem;color:#fda4af}.atlas-guess-result small.atlas-guess-next{color:#8f9cb2}.atlas-guess-continue{margin-top:.6rem}.atlas-guess-continue small{margin-left:.4rem;font-weight:500;opacity:.7}
 .atlas-multiplayer-grid{grid-template-columns:repeat(3,1fr)}.atlas-player-count{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem}.atlas-player-count button{min-height:44px;border:1px solid rgba(255,255,255,.12);border-radius:12px;color:#c8d1df;background:#0b1528;font:inherit;font-weight:800;cursor:pointer}.atlas-player-count button.active{border-color:var(--atlas-cyan);color:#eaffff;background:rgba(82,231,224,.12)}.atlas-player-count button:disabled{opacity:.35;cursor:not-allowed}.atlas-lobby-actions label+label{margin-top:.9rem}
 .atlas-seats{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem;padding:0 1.2rem 1.2rem}.atlas-seats.seats-3{grid-template-columns:repeat(3,1fr)}.atlas-seats.seats-4{grid-template-columns:repeat(4,1fr)}.atlas-seats .atlas-room-player{min-height:130px}.atlas-room-page .atlas-secondary{margin-top:-.2rem}
 .atlas-scoreboard .player-2{background:#f5c66c}.atlas-scoreboard .player-3{background:#4ade80}
@@ -739,4 +739,41 @@ button.atlas-random-symbol:focus-visible { outline:2px solid #82ece5;outline-off
   .atlas-game-header .atlas-game-stats { grid-column: auto; flex-wrap: wrap; justify-content: flex-end; gap: .25rem; }
   .atlas-game-page .atlas-game-header .atlas-game-stats span { flex: none; gap: .25rem; padding: .3rem .45rem; border-radius: 10px; font-size: .74rem; }
   .atlas-game-header .atlas-game-stats svg { width: 14px; height: 14px; }
+}
+
+/* Multiplayer room. It scrolls instead of shrinking to fit, so text keeps one size on every screen. */
+.atlas-page.atlas-center.atlas-room-page:has(> .atlas-fit-viewport) { height: auto; min-height: var(--app-height); overflow: visible; padding: clamp(1rem, 3vw, 2.2rem) clamp(.8rem, 3vw, 2rem) 2rem; }
+.atlas-room-page > .atlas-fit-viewport { height: auto; overflow: visible; }
+.atlas-room-page .atlas-fit-content { gap: .8rem; }
+.atlas-room-page h1 { margin: .15rem 0 0; font-size: clamp(2rem, 6vw, 3.3rem); line-height: 1.05; }
+.atlas-room-page .atlas-room-intro { margin: 0; }
+/* A real border instead of a padded gradient: notes with margins no longer show the gradient through. */
+.atlas-room-card { padding: 0; border: 1px solid transparent; overflow: hidden; background: linear-gradient(145deg, rgba(11,26,48,.97), rgba(4,10,25,.98)) padding-box, linear-gradient(135deg, rgba(82,231,224,.72), rgba(167,139,250,.52), rgba(82,231,224,.16)) border-box; }
+.atlas-room-card > * { background: none; }
+.atlas-room-card > .atlas-setup-note { margin: 0 1.2rem 1.2rem; }
+.atlas-room-card-header { flex-wrap: wrap; gap: .6rem 1rem; }
+.atlas-room-card-header > button { margin-left: auto; }
+.atlas-seat-picker { display: flex; align-items: center; gap: .6rem; color: #8f9db7; font-size: .72rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.atlas-seat-picker .atlas-player-count { grid-template-columns: repeat(3, 2.7rem); gap: .3rem; }
+.atlas-seat-picker .atlas-player-count button { display: grid; place-items: center; min-height: 34px; padding: 0; border: 1px solid rgba(255,255,255,.12); border-radius: 9px; color: #c8d1df; background: #0b1528; font-size: .85rem; letter-spacing: 0; }
+.atlas-seat-picker .atlas-player-count button.active { border-color: var(--atlas-cyan); color: #eaffff; background: rgba(82,231,224,.12); }
+.atlas-seat-picker .atlas-player-count button:disabled { cursor: default; }
+.atlas-seat-picker .atlas-player-count button:disabled:not(.active) { opacity: .4; }
+.atlas-series-head { display: flex; align-items: stretch; gap: .8rem; }
+.atlas-series-head .atlas-series-players { flex: 1; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+.atlas-series-head .atlas-seat-picker { flex: none; flex-direction: column; justify-content: center; gap: .35rem; padding: .6rem .8rem; border-radius: 12px; background: rgba(255,255,255,.05); }
+.atlas-seats.seats-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.atlas-seats .atlas-room-player { min-width: 0; min-height: 132px; align-content: start; }
+.atlas-room-page .atlas-ready-count { margin: 0; }
+/* Every open seat keeps its invite button; phones only drop the duplicate "Mark ready" button. */
+.atlas-room-page .atlas-room-player .room-invite-button { display: inline-flex; }
+@media (max-width: 950px) { .atlas-seats.seats-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 640px) {
+  .atlas-seats, .atlas-seats.seats-3, .atlas-seats.seats-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .55rem; padding: 0 .7rem .8rem; }
+  .atlas-seats .atlas-room-player { min-height: 0; padding: .75rem; gap: .4rem; }
+  .atlas-room-player > strong { font-size: 1rem; }
+  .atlas-room-card-header { padding: .8rem .7rem; }
+  .atlas-science-note, .atlas-room-card > .atlas-setup-note { margin: 0 .7rem .8rem; }
+  .atlas-series-head { flex-direction: column; }
+  .atlas-series-head .atlas-seat-picker { flex-direction: row; justify-content: space-between; }
 }

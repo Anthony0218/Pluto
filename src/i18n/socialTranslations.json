@@ -166,7 +166,15 @@
     "Invited": "Eingeladen",
     "Loading friends...": "Freunde werden geladen …",
     "Game invite could not be sent. Please try again.": "Die Einladung konnte nicht gesendet werden. Bitte versuche es erneut.",
-    "Locked": "Gesperrt"
+    "Locked": "Gesperrt",
+    "Clan invitations": "Clan-Einladungen",
+    "Clan invitation": "Clan-Einladung",
+    "invited you to join": "hat dich eingeladen",
+    "Invited friends get a notification and join as soon as they accept.": "Eingeladene Freunde erhalten eine Benachrichtigung und treten bei, sobald sie annehmen.",
+    "All your friends are already in this clan.": "Alle deine Freunde sind bereits in diesem Clan.",
+    "You have no friends to invite yet.": "Du hast noch keine Freunde zum Einladen.",
+    "Review": "Ansehen",
+    "Add friends": "Freunde hinzufügen"
   },
   "bar": {
     "Clans": "Clans",
@@ -203,7 +211,15 @@
     "Game invite could not be sent. Please try again.": "D'Eiladung hod ned gschickt werdn kenna. Probier's no amoi.",
     "Player": "Spuier",
     "Sign in": "Anmeldn",
-    "Locked": "Gsperrt"
+    "Locked": "Gsperrt",
+    "Clan invitations": "Clan-Eiladunga",
+    "Clan invitation": "Clan-Eiladung",
+    "invited you to join": "hod di eiglodn",
+    "Invited friends get a notification and join as soon as they accept.": "Eiglodne Freind kriang a Benachrichtigung und san dabei, sobald s' onemma.",
+    "All your friends are already in this clan.": "Olle deine Freind san scho in dem Clan.",
+    "You have no friends to invite yet.": "Du host no koane Freind zum Eilodn.",
+    "Review": "Oschaun",
+    "Add friends": "Freind dazuadoa"
   },
   "ko": {
     "Only allow non-clan chats": "클랜 외 채팅만 허용",
@@ -373,7 +389,15 @@
     "Invited": "초대함",
     "Loading friends...": "친구 불러오는 중…",
     "Game invite could not be sent. Please try again.": "초대를 보내지 못했습니다. 다시 시도해 주세요.",
-    "Locked": "잠김"
+    "Locked": "잠김",
+    "Clan invitations": "클랜 초대",
+    "Clan invitation": "클랜 초대",
+    "invited you to join": "님이 초대했습니다",
+    "Invited friends get a notification and join as soon as they accept.": "초대받은 친구는 알림을 받고, 수락하면 바로 가입됩니다.",
+    "All your friends are already in this clan.": "모든 친구가 이미 이 클랜에 있습니다.",
+    "You have no friends to invite yet.": "아직 초대할 친구가 없습니다.",
+    "Review": "확인",
+    "Add friends": "친구 추가"
   },
   "ru": {
     "Only allow non-clan chats": "Только чаты вне клана",
@@ -543,7 +567,15 @@
     "Invited": "Приглашён",
     "Loading friends...": "Загрузка друзей…",
     "Game invite could not be sent. Please try again.": "Не удалось отправить приглашение. Повторите попытку.",
-    "Locked": "Заблокировано"
+    "Locked": "Заблокировано",
+    "Clan invitations": "Приглашения в кланы",
+    "Clan invitation": "Приглашение в клан",
+    "invited you to join": "приглашает вас вступить",
+    "Invited friends get a notification and join as soon as they accept.": "Приглашённые друзья получат уведомление и вступят, как только примут приглашение.",
+    "All your friends are already in this clan.": "Все ваши друзья уже в этом клане.",
+    "You have no friends to invite yet.": "У вас пока нет друзей для приглашения.",
+    "Review": "Посмотреть",
+    "Add friends": "Добавить друзей"
   },
   "es": {
     "Only allow non-clan chats": "Solo chats fuera del clan",
@@ -723,7 +755,15 @@
     "If the answering side gives up (gehen), {name} wins the round at the current value of {value} points.": "Si el lado que responde se rinde (gehen), {name} gana la ronda con el valor actual de {value} puntos.",
     "The decision is with": "La decisión corresponde a",
     "The opposing side must decide whether to stay at the new round value.": "El lado contrario debe decidir si mantiene el nuevo valor de la ronda.",
-    "Locked": "Bloqueada"
+    "Locked": "Bloqueada",
+    "Clan invitations": "Invitaciones a clanes",
+    "Clan invitation": "Invitación al clan",
+    "invited you to join": "te invitó a unirte",
+    "Invited friends get a notification and join as soon as they accept.": "Los amigos invitados reciben una notificación y se unen en cuanto aceptan.",
+    "All your friends are already in this clan.": "Todos tus amigos ya están en este clan.",
+    "You have no friends to invite yet.": "Aún no tienes amigos a los que invitar.",
+    "Review": "Revisar",
+    "Add friends": "Añadir amigos"
   },
   "pt": {
     "Only allow non-clan chats": "Apenas chats fora do clã",
@@ -903,6 +943,14 @@
     "If the answering side gives up (gehen), {name} wins the round at the current value of {value} points.": "Se o lado que responde desistir (gehen), {name} ganha a ronda com o valor atual de {value} pontos.",
     "The decision is with": "A decisão cabe a",
     "The opposing side must decide whether to stay at the new round value.": "O lado contrário tem de decidir se mantém o novo valor da ronda.",
-    "Locked": "Bloqueada"
+    "Locked": "Bloqueada",
+    "Clan invitations": "Convites de clã",
+    "Clan invitation": "Convite de clã",
+    "invited you to join": "convidou-te a entrar",
+    "Invited friends get a notification and join as soon as they accept.": "Os amigos convidados recebem uma notificação e entram assim que aceitarem.",
+    "All your friends are already in this clan.": "Todos os teus amigos já estão neste clã.",
+    "You have no friends to invite yet.": "Ainda não tens amigos para convidar.",
+    "Review": "Rever",
+    "Add friends": "Adicionar amigos"
   }
 }

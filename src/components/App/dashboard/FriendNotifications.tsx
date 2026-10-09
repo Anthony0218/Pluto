@@ -65,7 +65,7 @@ export default function FriendNotifications({ items, userId }: { items: Dashboar
         {(["all", "games", "social"] as const).map(value => <button key={value} type="button" role="tab" aria-selected={filter === value} onClick={() => setFilter(value)}>{value === "games" ? <Gamepad2 size={14} /> : value === "social" ? <Users size={14} /> : <Bell size={14} />}{ui(value === "all" ? "All" : value === "games" ? "Games" : "Social")}</button>)}
       </div>
       {filteredItems.length ? <div className="notification-list">{filteredItems.map(item => {
-        const Icon = item.kind === "friend_request" ? Users : item.kind === "clan_message" ? Shield : item.kind === "spectate_request" || item.kind === "spectate_accepted" ? Eye : item.gameCode ? Gamepad2 : Mail;
+        const Icon = item.kind === "friend_request" ? Users : item.kind === "clan_message" || item.kind === "clan_join_invite" ? Shield : item.kind === "spectate_request" || item.kind === "spectate_accepted" ? Eye : item.gameCode ? Gamepad2 : Mail;
         const destination = notificationDestination(item);
         const action = notificationActionLabel(item);
         return <article key={item.id} className={`notification-card${Date.parse(item.createdAt) > openedReadAt && !seen.has(item.id) ? " is-new" : ""}`}>

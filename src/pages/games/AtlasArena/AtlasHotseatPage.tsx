@@ -15,7 +15,9 @@ import { TrialSessionContext, type TrialSession } from "../../../components/atla
 import { ATLAS_SCORING } from "../../../games/atlas/config";
 import { freshSeed } from "../../../games/atlas/arenaStorage";
 import { generateMatchQuestions } from "../../../games/atlas/matchQuestions";
-import { hotseatPlayerLimit, type ArenaModeDef } from "../../../games/atlas/modeCatalog";
+import type { ArenaModeDef } from "../../../games/atlas/modeCatalog";
+import { ATLAS_MAX_PLAYERS } from "../../../games/atlas/multiplayer";
+import { StatBattleTableHotseat } from "../../../components/atlas/trials/StatBattleTable";
 import { DEFAULT_SOLO_SETTINGS, PLAYER_COLORS, settingsReady, type SoloSettings, type SoloSummary } from "../../../games/atlas/soloSettings";
 import { countryShapesFromTopology, distanceToTerritory } from "../../../games/atlas/territoryDistance";
 import type { AtlasDataset, Coordinates } from "../../../games/atlas/types";
@@ -48,7 +50,7 @@ function HotseatSession({ modeId }: { modeId?: string }) {
   if (!mode) return <Navigate to="/games/atlas-arena" replace />;
   if (loading) return <AtlasLoading />;
   if (error || !data) return <AtlasUnavailable error={error} />;
-  const limit = series.enabled ? 2 : hotseatPlayerLimit(mode), seats = Math.min(count, limit);
+  const seats = Math.min(count, ATLAS_MAX_PLAYERS);
   const settings = series.enabled ? { ...stored.settings, categories: stored.settings.categories.length ? stored.settings.categories : DEFAULT_SOLO_SETTINGS.categories, stats: stored.settings.stats.length ? stored.settings.stats : DEFAULT_SOLO_SETTINGS.stats } : stored.settings;
   const exit = () => navigate("/games/atlas-arena");
 
@@ -58,9 +60,9 @@ function HotseatSession({ modeId }: { modeId?: string }) {
       <div className="atlas-setup-card">
         <span className="atlas-eyebrow">Hotseat · one device</span>
         <h1>{series.enabled ? `Random modes · ${seriesLabel(series.length)}` : mode.title}</h1>
-        <p>{series.enabled ? `Two players, up to ${series.length} different modes. First to ${Math.floor(series.length / 2) + 1} game wins; draws use a game without awarding a win. Start with ${mode.title}.` : mode.rules.hotseat}</p>
+        <p>{series.enabled ? `2–4 players, ${series.length === 1 ? "one random mode" : `up to ${series.length} different modes`}. First to ${Math.floor(series.length / 2) + 1} game wins; draws use a game without awarding a win. Start with ${mode.title}.` : mode.rules.hotseat}</p>
         <label className="atlas-label">Players</label>
-        {limit > 2 && <div className="atlas-player-count" role="radiogroup" aria-label="Number of players">{[2, 3, 4].map((option) => <button type="button" role="radio" aria-checked={seats === option} key={option} className={seats === option ? "active" : ""} onClick={() => setCount(option)}>{option}</button>)}</div>}
+        <div className="atlas-player-count" role="radiogroup" aria-label="Number of players">{[2, 3, 4].map((option) => <button type="button" role="radio" aria-checked={seats === option} key={option} className={seats === option ? "active" : ""} onClick={() => setCount(option)}>{option}</button>)}</div>
         <div className="atlas-hotseat-names">
           {Array.from({ length: seats }, (_, index) => (
             <label key={index} style={{ "--player": PLAYER_COLORS[index] } as CSSProperties}><i aria-hidden /><span className="sr-only">Player {index + 1} name</span>
@@ -154,7 +156,9 @@ function DuelHotseat({ data, players, settings, onExit, onComplete }: GameProps)
   const [seed, setSeed] = useState(freshSeed);
   const pools = useTrialPools(data, settings.difficulty);
   if (!pools) return null;
-  return <StatBattleHotseat key={seed} pool={pools.difficulty} byId={pools.byId} seed={seed} names={[players[0].name, players[1].name]} onExit={onExit} onRestart={() => setSeed(freshSeed())} onComplete={onComplete} />;
+  const shared = { pool: pools.difficulty, byId: pools.byId, seed, onExit, onRestart: () => setSeed(freshSeed()), onComplete };
+  // Two players duel; three or four sit at one card table.
+  return players.length > 2 ? <StatBattleTableHotseat key={seed} {...shared} names={players.map((player) => player.name)} /> : <StatBattleHotseat key={seed} {...shared} names={[players[0].name, players[1].name]} />;
 }
 
 /** Closest Wins on one device: every player pins each country in turn behind a cover screen, then all pins are revealed. */

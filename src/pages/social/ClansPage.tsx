@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { Copy, MessageCircle, Plus, Users, X } from "lucide-react";
+import { Copy, MessageCircle, Plus, UserPlus, Users, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
 import { ProfileAvatar } from "@/components/social/ProfileAvatarPicker";
@@ -10,6 +10,8 @@ import ClanChat from "@/components/social/ClanChat";
 import UserLink from "@/components/social/UserLink";
 import { shareRoomWithClan } from "@/components/social/clanShare";
 import { acceptInviteState, getInviteDestination, getInviteGameLabel } from "@/components/social/inviteRoute";
+import { respondToClanInvite } from "@/components/social/notificationActions";
+import { loadClanJoinInvites, useDashboardData, type ClanJoinInvite } from "@/hooks/useDashboardData";
 import { ui, useUiLanguage } from "@/i18n/ui";
 
 type Group = { id: string; name: string; description: string; avatar_id: string; owner_id: string; invite_code: string; created_at: string };
@@ -44,6 +46,10 @@ export default function ClansPage() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [invites, setInvites] = useState<Invite[]>([]);
+  const { friends } = useDashboardData();
+  // Invitations to join a clan: those waiting for my answer, and the friends I have already asked into the open clan.
+  const [clanInvites, setClanInvites] = useState<ClanJoinInvite[]>([]);
+  const [invitedIds, setInvitedIds] = useState<string[]>([]);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [avatarId, setAvatarId] = useState("chess-king");
@@ -56,6 +62,7 @@ export default function ClansPage() {
 
   const load = useCallback(async () => {
     if (!user) return;
+    setClanInvites(await loadClanJoinInvites());
     const membership = await supabase.from("community_group_members").select("group_id,user_id,joined_at").eq("user_id", user.id);
     if (membership.error) { setError(membership.error.message); return; }
     const mine = (membership.data ?? []) as Member[];
@@ -95,9 +102,19 @@ export default function ClansPage() {
     return () => { alive = false; window.clearInterval(timer); };
   }, [selectedId]);
 
+  useEffect(() => {
+    if (!selectedId || !user) return;
+    let alive = true;
+    // Own rows only (others' invitations are private); reads as empty before the clan invitation migration.
+    void supabase.from("community_group_invites").select("receiver_id").eq("group_id", selectedId).eq("sender_id", user.id).eq("status", "pending")
+      .then(({ data }) => { if (alive) setInvitedIds((data ?? []).map(row => row.receiver_id as string)); });
+    return () => { alive = false; };
+  }, [selectedId, user]);
+
   const selected = groups.find(group => group.id === selectedId);
   const owned = groups.find(group => group.owner_id === user?.id);
   const selectedMembers = members.filter(member => member.group_id === selectedId);
+  const invitable = friends.filter(friend => !selectedMembers.some(member => member.user_id === friend.id));
   function beginEdit() { if (!selected) return; setName(selected.name); setDescription(selected.description); setAvatarId(selected.avatar_id); setEditing(true); }
   async function run(actionFn: () => PromiseLike<{ error: { message: string } | null }>) {
     setBusy(true); setError(null);
@@ -122,6 +139,22 @@ export default function ClansPage() {
     const result = await supabase.rpc("join_community_group", { p_invite_code: joinCode });
     if (result.error) { setError(result.error.message); setBusy(false); return; }
     setJoinCode(""); await load(); selectClan(result.data as string);
+    setBusy(false);
+  }
+  async function inviteFriend(friendId: string) {
+    if (!selected || busy) return;
+    setBusy(true); setError(null);
+    const result = await supabase.rpc("invite_friend_to_clan", { p_group_id: selected.id, p_friend_id: friendId });
+    if (result.error) setError(result.error.message); else setInvitedIds(current => [...current, friendId]);
+    setBusy(false);
+  }
+  async function answerClanInvite(invite: ClanJoinInvite, accept: boolean) {
+    if (busy) return;
+    setBusy(true); setError(null);
+    const failure = await respondToClanInvite(invite.id, accept);
+    if (failure) setError(failure);
+    await load();
+    if (!failure && accept) selectClan(invite.group_id);
     setBusy(false);
   }
   async function shareGame() {
@@ -177,9 +210,14 @@ export default function ClansPage() {
         <div className={panel}><h2 className="font-black">{ui("Join with a code")}</h2><form className="mt-3 flex gap-2" onSubmit={event => { event.preventDefault(); void joinGroup(); }}><input aria-label={ui("Clan invite code")} className={input} value={joinCode} onChange={event => setJoinCode(event.target.value.toUpperCase())} maxLength={8} placeholder={ui("8 character code")} /><button className={action} disabled={busy || !joinCode.trim()}>{ui("Join")}</button></form></div>
       </aside>
       <section className="space-y-6">
+        {clanInvites.length > 0 && <div className={panel}><h2 className="flex items-center gap-2 text-xl font-black"><UserPlus size={20} className="text-amber-300" />{ui("Clan invitations")}</h2><div className="mt-4 space-y-3">{clanInvites.map(invite => <article key={invite.id} className="flex flex-wrap items-center gap-3 rounded-2xl border border-amber-200/25 bg-amber-300/[.06] p-3"><GroupAvatar id={invite.group_avatar_id} className="h-12 w-12" /><div className="min-w-0 flex-1"><p className="truncate font-black">{invite.group_name}</p><p className="text-sm text-slate-400"><UserLink userId={invite.sender_id} className="font-semibold text-slate-200">{invite.sender_name}</UserLink> {ui("invited you to join")} · {invite.member_count} {ui("members")}</p></div><button type="button" disabled={busy} className={action} onClick={() => void answerClanInvite(invite, true)}>{ui("Accept")}</button><button type="button" disabled={busy} className="rounded-xl border border-white/20 px-4 py-2.5 text-sm font-bold hover:bg-white/10 disabled:opacity-50" onClick={() => void answerClanInvite(invite, false)}>{ui("Decline")}</button></article>)}</div></div>}
         {!owned && !editing && <div className={panel}><h2 className="flex items-center gap-2 text-xl font-black"><Plus /> {ui("Create your clan")}</h2><p className="mt-1 text-sm text-slate-400">{ui("You can own one clan and join as many others as you like.")}</p><GroupForm {...{name,setName,description,setDescription,avatarId,setAvatarId,busy}} onSave={() => void saveGroup()} /></div>}
         {selected && <>
           <div className={panel}><div className="flex flex-wrap items-start gap-4"><GroupAvatar id={selected.avatar_id} className="h-20 w-20" /><div className="min-w-0 flex-1"><h2 className="text-3xl font-black">{selected.name}</h2><p className="mt-1 whitespace-pre-wrap text-slate-300">{selected.description || ui("A place to play together.")}</p><p className="mt-3 flex items-center gap-1 text-sm text-slate-400"><Users size={15} /> {selectedMembers.length} {ui("members")}</p></div>{selected.owner_id === user.id && <button className="rounded-xl border border-white/20 px-3 py-2 text-sm font-bold hover:bg-white/10" onClick={beginEdit}>{ui("Edit")}</button>}</div><div className="mt-5 flex flex-wrap items-center gap-3 border-t border-white/10 pt-4"><span className="text-sm text-slate-400">{ui("Invite code")} <strong className="ml-1 tracking-widest text-amber-200">{selected.invite_code}</strong></span><button type="button" aria-label={ui("Copy clan invite code")} className="rounded-lg border border-white/20 p-2 hover:bg-white/10" onClick={() => void navigator.clipboard.writeText(selected.invite_code)}><Copy size={15} /></button></div></div>
+          <div className={panel}><h2 className="flex items-center gap-2 text-xl font-black"><UserPlus size={20} className="text-amber-300" />{ui("Invite friends")}</h2><p className="mt-1 text-sm text-slate-400">{ui("Invited friends get a notification and join as soon as they accept.")}</p>
+            {invitable.length ? <div className="mt-4 grid gap-2 sm:grid-cols-2">{invitable.map(friend => { const sent = invitedIds.includes(friend.id); return <div key={friend.id} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3"><ProfileAvatar avatarId={friend.avatar_id ?? "m1"} className="h-10 w-10 shrink-0 rounded-full" /><span className="min-w-0 flex-1 truncate font-semibold">{friend.display_name || friend.username || ui("Player")}</span><button type="button" disabled={busy || sent} className={sent ? "rounded-xl border border-white/15 px-3 py-2 text-sm font-bold text-slate-400" : action} onClick={() => void inviteFriend(friend.id)}>{ui(sent ? "Invited" : "Invite")}</button></div>; })}</div>
+              : <p className="mt-4 text-sm text-slate-400">{friends.length ? ui("All your friends are already in this clan.") : <>{ui("You have no friends to invite yet.")} <Link className="font-bold text-amber-300 underline" to="/friends">{ui("Add friends")}</Link></>}</p>}
+          </div>
           <div className={panel}><h2 className="mb-4 flex items-center gap-2 text-xl font-black"><MessageCircle size={20} className="text-teal-300" />{ui("Clan chat")}</h2><ClanChat clanId={selected.id} userId={user.id} players={players.filter(player => selectedMembers.some(member => member.user_id === player.id))} /></div>
           {editing && selected.owner_id === user.id && <div className={panel}><div className="flex items-center justify-between"><h2 className="text-xl font-black">{ui("Edit clan")}</h2><button aria-label={ui("Close editor")} onClick={() => setEditing(false)}><X /></button></div><GroupForm {...{name,setName,description,setDescription,avatarId,setAvatarId,busy}} onSave={() => void saveGroup()} /><button className="mt-5 text-sm text-red-300 underline" onClick={() => { if (window.confirm(`${ui("Disband")} ${selected.name}? ${ui("This removes its members, invites and chat.")}`)) void run(() => supabase.rpc("delete_community_group", { p_group_id: selected.id })); }}>{ui("Disband clan")}</button></div>}
           <div className={panel}><h2 className="text-xl font-black">{ui("Share a game")}</h2><p className="mt-1 text-sm text-slate-400">{ui("Create a casual lobby, then share its six character code here. Clan members get a pop-up.")}</p><div className="mt-4 flex flex-wrap gap-3"><select aria-label={ui("Game to share")} className={input} value={inviteGame} onChange={event => setInviteGame(event.target.value)}>{shareGames.map(item => <option key={item.id} value={item.id}>{ui(item.label)}</option>)}</select><Link className={action} to={(shareGames.find(item => item.id === inviteGame) ?? shareGames[0]).create}>{ui("Create a lobby")}</Link><form className="flex min-w-0 flex-1 gap-2" onSubmit={event => { event.preventDefault(); void shareGame(); }}><input aria-label={ui("Game lobby code")} className={input} value={roomCode} onChange={event => setRoomCode(event.target.value.toUpperCase())} maxLength={6} placeholder={ui("Lobby code")} /><button disabled={busy || roomCode.length !== 6} className={action}>{ui("Share")}</button></form></div></div>

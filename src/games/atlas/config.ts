@@ -32,5 +32,6 @@ export const STAT_DEFINITIONS: Record<AtlasStatKey, { label: string; unit: strin
 };
 
 /** Guess the Country: the first correct guesser earns `first`, every later correct guesser in the same tip `other`;
- *  solving on tip 1 or 2 adds `tipBonus[tip]`. */
-export const GUESS_SCORING = { first: 3, other: 3, tipBonus: [2, 1] as readonly number[], tipSeconds: 25, afterFirstCorrectSeconds: 8 } as const;
+ *  solving on tip 1 or 2 adds `tipBonus[tip]`. Once a country is over, every tip and the answer stay up for
+ *  `revealSeconds` (`rankedRevealSeconds` in Ranked) so they can be read. */
+export const GUESS_SCORING = { first: 3, other: 3, tipBonus: [2, 1] as readonly number[], tipSeconds: 25, afterFirstCorrectSeconds: 8, revealSeconds: 12, rankedRevealSeconds: 8 } as const;

@@ -34,7 +34,7 @@ test('casual online series persist per-game results, stop early, rematch, and ne
       return response.body;
     };
     for (const length of [1, 3, 5]) {
-      let room = await invoke('alice', { op: 'create', mode: 'stat_battle', randomBestOf: length, maxPlayers: 4 });
+      let room = await invoke('alice', { op: 'create', mode: 'stat_battle', randomBestOf: length });
       const row = endpoint.matches.at(-1), code = room.code, order = [...room.series.order];
       assert.equal(room.maxPlayers, 2);
       assert.ok(order.includes('stat_battle'));
@@ -87,6 +87,77 @@ test('casual online series persist per-game results, stop early, rematch, and ne
       assert.deepEqual(room.scores, scores[0].alice === scores[0].bob ? { alice: 0, bob: 0 } : { alice: 2, bob: 1 });
     }
     for (const invalid of [2, 4, 100, '3', null]) await invoke('alice', { op: 'create', mode: 'map_battle', randomBestOf: invalid }, 400);
+  } finally { endpoint.close(); }
+});
+
+test('a casual series seats up to four, keeps Stat Battle for every group size, and its breaks wait for everyone playing', async () => {
+  const version = JSON.parse(await readFile(new URL('../data/geography/version.json', import.meta.url), 'utf8')).atlasDataVersion;
+  const endpoint = await atlasEndpoint();
+  try {
+    const invoke = async (user, body, expected = 200) => {
+      const response = await endpoint.call(user, { ...body, datasetVersion: version });
+      assert.equal(response.status, expected, JSON.stringify(response.body));
+      return response.body;
+    };
+    assert.equal((await invoke('alice', { op: 'create', mode: 'map_battle', randomBestOf: 3, maxPlayers: 9 })).maxPlayers, 4);
+    assert.equal((await invoke('alice', { op: 'create', mode: 'map_battle', randomBestOf: 3 })).maxPlayers, 2);
+    let room = await invoke('alice', { op: 'create', mode: 'stat_battle', randomBestOf: 3, maxPlayers: 4 });
+    const row = endpoint.matches.at(-1), code = room.code, order = [...room.series.order];
+    assert.equal(room.mode, 'stat_battle');
+    await invoke('bob', { op: 'join', code }); room = await invoke('cara', { op: 'join', code });
+    assert.deepEqual(room.series.order, order, 'three players keep the drawn modes, Stat Battle included');
+    // Three of four seats: the host starts early, and every later break needs exactly those three.
+    for (const user of ['alice', 'bob', 'cara']) room = await invoke(user, { op: 'ready', code });
+    assert.equal(room.status, 'ready');
+    room = await invoke('alice', { op: 'start', code }); assert.equal(room.status, 'countdown');
+    await invoke('dan', { op: 'join', code }, 400);
+    endpoint.advance(3001); room = await invoke('cara', { op: 'get', code });
+    assert.equal(room.status, 'round_active'); assert.equal(room.battle, undefined); assert.equal(room.table.handSizes.length, 3);
+    row.status = 'finished'; row.scores = { alice: 3, bob: 5, cara: 1 };
+    room = await invoke('alice', { op: 'get', code });
+    assert.equal(room.status, 'intermission'); assert.equal(room.series.results[0].winnerId, 'bob');
+    await invoke('alice', { op: 'ready', code }); room = await invoke('bob', { op: 'ready', code });
+    assert.equal(room.status, 'intermission');
+    room = await invoke('cara', { op: 'ready', code }); assert.equal(room.status, 'countdown');
+    // A shared top score draws the game; two wins take a best of three.
+    row.status = 'finished'; row.scores = { alice: 500, bob: 500, cara: 100 };
+    room = await invoke('alice', { op: 'get', code });
+    assert.equal(room.status, 'intermission'); assert.equal(room.series.results[1].winnerId, null);
+    row.status = 'finished'; row.scores = { alice: 1, bob: 7, cara: 3 };
+    room = await invoke('cara', { op: 'get', code });
+    assert.equal(room.status, 'finished'); assert.deepEqual(room.scores, { alice: 0, bob: 2, cara: 0 });
+    room = await invoke('alice', { op: 'rematch', code });
+    assert.equal(room.series.order.length, 3); assert.deepEqual(room.scores, { alice: 0, bob: 0, cara: 0 });
+  } finally { endpoint.close(); }
+});
+
+test('the host sets the number of seats in the room; taken seats stay and a full, ready room starts', async () => {
+  const version = JSON.parse(await readFile(new URL('../data/geography/version.json', import.meta.url), 'utf8')).atlasDataVersion;
+  const endpoint = await atlasEndpoint();
+  try {
+    const invoke = async (user, body, expected = 200) => {
+      const response = await endpoint.call(user, { ...body, datasetVersion: version });
+      assert.equal(response.status, expected, JSON.stringify(response.body));
+      return response.body;
+    };
+    let room = await invoke('alice', { op: 'create', mode: 'guess_country' });
+    const code = room.code;
+    assert.equal(room.maxPlayers, 2);
+    await invoke('bob', { op: 'join', code });
+    await invoke('cara', { op: 'join', code }, 400);
+    await invoke('bob', { op: 'seats', code, seats: 4 }, 400);
+    for (const invalid of [1, 5, 2.5, '3', null]) await invoke('alice', { op: 'seats', code, seats: invalid }, 400);
+    room = await invoke('alice', { op: 'seats', code, seats: 4 }); assert.equal(room.maxPlayers, 4); assert.equal(room.status, 'waiting');
+    room = await invoke('cara', { op: 'join', code }); assert.equal(room.players.length, 3);
+    await invoke('alice', { op: 'seats', code, seats: 2 }, 400);
+    // Everyone ready with a seat still open: nothing starts until the host closes it (or starts early).
+    for (const user of ['alice', 'bob', 'cara']) room = await invoke(user, { op: 'ready', code });
+    assert.equal(room.status, 'ready');
+    room = await invoke('alice', { op: 'seats', code, seats: 3 }); assert.equal(room.maxPlayers, 3); assert.equal(room.status, 'countdown');
+    await invoke('alice', { op: 'seats', code, seats: 4 }, 400);
+    // Ranked rooms are always two seats.
+    await invoke('alice', { op: 'create', mode: 'map_battle' }); const ranked = endpoint.matches.at(-1); ranked.match_kind = 'ranked';
+    await invoke('alice', { op: 'seats', code: ranked.room_code, seats: 3 }, 400);
   } finally { endpoint.close(); }
 });
 
@@ -338,6 +409,9 @@ test('ranked and casual result breaks require both ready signals and show the re
   assert.doesNotMatch(casual, /35s/); assert.match(casual, /both players press I&#x27;m ready/); assert.match(casual, />I&#x27;m ready</);
   const ready = renderToStaticMarkup(React.createElement(AtlasSeriesIntermission, { ...props, userId: 'b' }));
   assert.match(ready, /disabled=""/); assert.match(ready, /Waiting for opponent/);
+  const four = { ...props, userId: 'b', players: [...props.players, { id: 'c', name: 'Cara', ready: false }, { id: 'd', name: 'Dan', ready: false }] };
+  const crowded = renderToStaticMarkup(React.createElement(AtlasSeriesIntermission, four));
+  assert.match(crowded, /all players press I&#x27;m ready/); assert.match(crowded, /1\/4 are ready/); assert.match(crowded, /Waiting for the others/);
 });
 
 test('trial completion reports the actual final score once without an extra results click', () => {

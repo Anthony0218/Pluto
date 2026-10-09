@@ -31,8 +31,10 @@ test("every casual creation mode has a matching clan invite route, including cus
   for (const variant of variants.filter(item => item.multiplayerRoute && item.id !== "king-of-the-hill")) assert.ok(chess.some(mode => mode.route === variant.multiplayerRoute));
 });
 
-test("friend and clan pickers render the same games and modes, including published card games", () => {
-  const games = INVITE_GAMES.filter(game => game.modes.length || game.id === "card-builder").map(game => game.id === "card-builder" ? { ...game, modes: [{ id: "v1", label: "Published Durak", route: "/games/card-builder/play?game=g1&version=v1&mode=online", inviteRoute: "/games/card-builder/room" }] } : game);
+test("friend and clan pickers render the same games and modes, without Card Builder", () => {
+  const { games } = load("../src/components/social/useInviteGames.ts", { "./gameCreationCatalog": { INVITE_GAMES } }).useInviteGames();
+  assert.ok(games.length > 3 && games.every(game => game.modes.length));
+  assert.ok(INVITE_GAMES.some(game => game.id === "card-builder") && !games.some(game => game.id === "card-builder"));
   let selectedGame = "chess";
   const sharedMocks = {
     react: { ...React, useState(initial) { const value = initial === "chess" ? selectedGame : initial; return [value, () => {}]; } },
@@ -48,14 +50,16 @@ test("friend and clan pickers render the same games and modes, including publish
     "./gameCreationCatalog": { createInviteRoute: () => "" },
     "./GameInviteDelivery": { prepareCreatedGameInvite() {} },
     "./clanShare": clan,
-    "./useInviteGames": { useInviteGames: () => ({ games, cardsError: "", clearCardsError() {} }) },
+    "./useInviteGames": { useInviteGames: () => ({ games }) },
   };
   const Friend = load("../src/components/social/GameInvitePanel.tsx", sharedMocks).default;
   const Clan = load("../src/components/social/ClanInvitePanel.tsx", sharedMocks).default;
   const selects = markup => [...markup.matchAll(/<select[^>]*aria-label="(Game|Mode)"[^>]*>(.*?)<\/select>/g)].map(match => match[2]);
   for (const game of games) {
     selectedGame = game.id;
-    assert.deepEqual(selects(renderToStaticMarkup(React.createElement(Friend))), selects(renderToStaticMarkup(React.createElement(Clan))), game.id);
+    const friend = selects(renderToStaticMarkup(React.createElement(Friend)));
+    assert.deepEqual(friend, selects(renderToStaticMarkup(React.createElement(Clan))), game.id);
+    assert.doesNotMatch(friend[0], /Card Builder/);
   }
 });
 

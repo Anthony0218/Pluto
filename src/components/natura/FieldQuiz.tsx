@@ -3,6 +3,7 @@ import { ArrowRight, Check, RotateCcw, X } from 'lucide-react';
 import { SCENARIOS, type ScenarioId } from '../../games/natura/naturaData';
 import { STUDIES } from '../../games/natura/studies';
 import FieldDialog from './FieldDialog';
+import { recordQuiz } from '../../games/natura/journal';
 import HabitatIcon from './HabitatIcon';
 
 export default function FieldQuiz({ id, close }: { id: ScenarioId; close: () => void }) {
@@ -18,6 +19,7 @@ export default function FieldQuiz({ id, close }: { id: ScenarioId; close: () => 
   const answered = answer !== undefined;
   useEffect(() => { if (answered) nextButton.current?.focus(); else heading.current?.focus(); }, [answered, index]);
   const score = responses.filter((value, i) => value === scenario.questions[i].correct).length;
+  useEffect(()=>{if(done)recordQuiz(id,score);},[done,id,score]);
   const missed = scenario.questions.filter((q, i) => responses[i] !== q.correct);
   return <FieldDialog title={`${scenario.title} field quiz`} close={close} className="nm-quiz">
     <div style={{ '--habitat-accent': study.accent } as CSSProperties}>

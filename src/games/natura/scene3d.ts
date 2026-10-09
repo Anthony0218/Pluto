@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { NaturaParticles } from './particles';
+import { observe, observeChanges, type Observation } from './observations';
 import { GRASS, PERCH, BURROW_EXITS, type Game, type Vec, type Player } from './naturaData';
 import { ARCHER_BRANCHES, WATERLINE, insectLanding, type ArcherGame } from './archerfish';
 import { snapPlatforms, snapGates, snapWind, snapTrajectory, SNAP_LEVELS, predatorsAt, HABITATS, PATTERN_NAMES, type WildGame } from './wildModes';
@@ -14,6 +16,16 @@ const palette = ['#d3c296', '#869a84', '#be7b74', '#539778', '#d6bcc0', '#58768c
 /** Real WebGL meshes, lights, depth and perspective. Simulations remain independent of rendering. */
 export class NaturaScene {
   private renderer: THREE.WebGLRenderer;
+  private particles = new NaturaParticles();
+  private particleGeometry = new THREE.BufferGeometry();
+  private particlePositions = new Float32Array(160*3);
+  private particleColors = new Float32Array(160*3);
+  private particleMaterial = new THREE.PointsMaterial({size:0.16,vertexColors:true,transparent:true,opacity:0.8,depthWrite:false});
+  private particleMesh = new THREE.Points(this.particleGeometry,this.particleMaterial);
+  private observations = new Map<number,Observation>();
+  private clock = 0;
+  private previousTime = 0;
+  private reduced = false;
   private scene = new THREE.Scene();
   private camera = new THREE.PerspectiveCamera(48, 16 / 9, 0.1, 450);
   private objects = new Map<string, THREE.Object3D>();
@@ -30,6 +42,9 @@ export class NaturaScene {
   private lost: (event: Event) => void;
   constructor(canvas: HTMLCanvasElement, _mode: NaturaWorld['kind'], onLost: () => void) {
     this.canvas = canvas;
+    this.particleGeometry.setAttribute('position',new THREE.BufferAttribute(this.particlePositions,3));
+    this.particleGeometry.setAttribute('color',new THREE.BufferAttribute(this.particleColors,3));
+    this.particleMesh.frustumCulled=false;this.scene.add(this.particleMesh);
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.6));
     this.renderer.shadowMap.enabled = true;
@@ -134,7 +149,21 @@ export class NaturaScene {
       return g;
     });
     obj.position.set(pos[0], pos[1], pos[2]); obj.scale.setScalar(scale); obj.rotation.set(0, facing < 0 ? Math.PI : 0, 0);
-    if (kind === 'bird') obj.children.forEach((part, i) => { if (i === 3 || i === 5) part.rotation.x = Math.sin(time * 7) * 0.16; });
+    const animationTime=this.reduced?0:this.clock;
+    const last=obj.userData.lastPosition as number[]|undefined;
+    const moving=last?Math.hypot(pos[0]-last[0],pos[1]-last[1],pos[2]-last[2])>0.002:false;
+    obj.userData.lastPosition=[...pos];
+    obj.children.forEach((part,i)=>{
+      if(!part.userData.rest)part.userData.rest={x:part.rotation.x,y:part.rotation.y,z:part.rotation.z};
+      const rest=part.userData.rest;
+      part.rotation.set(rest.x,rest.y,rest.z);
+      if(kind==='bird'&&(i===3||i===5))part.rotation.x=Math.sin((time||animationTime)*8)*(this.reduced?0:0.28)*(i===3?1:-1);
+      if((kind==='ant'||kind==='spider')&&i>=2&&i<(kind==='ant'?8:10)&&moving)part.rotation.z+=Math.sin(animationTime*18+i*Math.PI)*0.24;
+      if(kind==='moth'&&i>=obj.children.length-2)part.rotation.x=Math.sin(animationTime*22)*0.65*(i%2?1:-1);
+      if(['octopus','squid','cuttle'].includes(kind)&&part instanceof THREE.Mesh&&part.geometry instanceof THREE.TubeGeometry)part.rotation.y=Math.sin(animationTime*3+i)*0.16;
+      if(['fish','tuna','flyingfish'].includes(kind)&&i===1)part.rotation.y=Math.sin(animationTime*10)*0.3;
+      if(kind==='whale'&&i===3)part.rotation.x=Math.sin(animationTime*2)*0.16;
+    });
     return obj;
   }
   private side(v: Vec, z = 0): number[] { return [(v.x - 480) / 30, (270 - v.y) / 30, z]; }
@@ -173,6 +202,7 @@ export class NaturaScene {
   draw(world: NaturaWorld, ai: boolean,options:{viewer?:Player;hidden?:{vole:boolean;duelOpponent:boolean}}={}) {
     this.used.clear();
     const t = 'game' in world ? world.kind === 'meadow' ? world.game.t : world.game.elapsed : world.elapsed;
+    this.clock=t;
     this.backdrop(world.kind, t);
     const top = world.kind === 'cuttlefish' || world.kind === 'coconut';
     const distance = Math.max(top ? 36 : 30, 18 / this.camera.aspect / Math.tan(24 * Math.PI / 180));
@@ -187,7 +217,29 @@ export class NaturaScene {
     else if (world.kind === 'jumpingspider' || world.kind === 'spermwhale') this.expedition(world, ai,options.viewer);
     else if (world.kind === 'abyssduel')this.abyssDuel(world,ai?world.controlled:options.viewer,options.hidden?.duelOpponent);
     this.objects.forEach((obj,key) => { if (!this.used.has(key)) obj.visible = false; });
+    this.drawEffects(world,options.viewer,options.hidden);
     this.renderer.render(this.scene, this.camera);
+  }
+  setReducedMotion(value: boolean) { this.reduced=value;if(value)this.particles.clear(); }
+  private drawEffects(world:NaturaWorld,viewer?:Player,hidden?:{vole?:boolean;duelOpponent?:boolean}) {
+    if(this.clock<this.previousTime){this.particles.clear();this.observations.clear();}
+    const elapsed=Math.max(0,Math.min(0.05,this.clock-this.previousTime));this.previousTime=this.clock;
+    const underwater=['spermwhale','abyssduel','cuttlefish','coconut','archerfish'].includes(world.kind);
+    this.particles.step(elapsed,underwater);
+    for(const seat of [0,1]) {
+      if(viewer!==undefined && viewer!==seat)continue;
+      if(world.kind==='meadow'&&seat===1&&(hidden?.vole||voleConcealed(world.game)))continue;
+      if(world.kind==='abyssduel'&&hidden?.duelOpponent&&seat!==viewer)continue;
+      const current=observe(world,seat),previous=this.observations.get(seat);this.observations.set(seat,current);
+      if(previous&&!this.reduced) {
+        const pos=world.kind==='jumpingspider'||world.kind==='spermwhale'||world.kind==='abyssduel'?[current.x,current.y+0.5,current.z??0]:world.kind==='cuttlefish'||world.kind==='coconut'?this.floorPoint(current,0.7):world.kind==='flyingfish'?[current.x,1,0]:this.side(world.kind==='archerfish'?{x:current.x,y:WATERLINE}:current,1);
+        observeChanges(previous,current).forEach(cue=>this.particles.burst(pos,cue==='hurt'?'#ff956f':cue==='checkpoint'?'#e7f6a6':cue==='sonar'?'#91ede5':'#fff0bd',cue==='action'?6:18,underwater));
+        if(elapsed>0&&Math.hypot(current.x-previous.x,current.y-previous.y,(current.z??0)-(previous.z??0))>0.2&&Math.floor(this.clock*12)!==Math.floor((this.clock-elapsed)*12))this.particles.burst(pos,underwater?'#b0e5ef':'#c7d5a6',2,underwater);
+      }
+    }
+    const count=this.reduced?0:this.particles.sparks.length;
+    this.particles.sparks.forEach((p,i)=>{this.particlePositions.set([p.x,p.y,p.z],i*3);const c=new THREE.Color(p.color).multiplyScalar(Math.max(0,p.life/p.duration));this.particleColors.set([c.r,c.g,c.b],i*3);});
+    this.particleGeometry.setDrawRange(0,count);this.particleGeometry.attributes.position.needsUpdate=true;this.particleGeometry.attributes.color.needsUpdate=true;
   }
   private meadow(g: Game,ownVole=false,hidden=false) {
     this.shape('meadow-ground', 'box', '#67955b', [0,-4.4,0], [34,0.7,7]);
@@ -244,6 +296,7 @@ export class NaturaScene {
     if(course.theme==='storm'||course.theme==='crown')for(let j=0;j<18;j++)this.line('snap-rain'+j,[-17+j*2,7-j%4,-2],[-16.7+j*2,5-j%4,-2],'#9dbfcd',0.02);
     if(course.wind)this.label('snap-wind',`${snapWind(g)>0?'WIND →':'← WIND'}`,this.side({x:480,y:55},1),'#fff4cf',0.8);
     snapGates(g).forEach((gate,i)=>{this.shape('seedpod-gate'+i,'box',gate.active?'#b96146':gate.warning?'#e8ba63':'#697f57',this.side({x:gate.x,y:gate.y},0.5),[gate.width/30,gate.active?gate.height/30:0.25,1]);if(gate.warning)this.label('gate-warning'+i,'CLOSING',this.side({x:gate.x,y:gate.y-65},1),'#ffdc72',0.5);});
+    g.detours?.forEach((p,i)=>{this.shape('detour'+i,'box','#729474',this.side({x:p.x+p.width/2,y:p.y+8},0),[p.width/30,0.55,2]);this.label('detour-label'+i,'SAFE STEP',this.side({x:p.x+p.width/2,y:p.y+25},1),'#cde6bf',0.4);});
     platforms.forEach((p,i)=>{this.shape('ledge'+i,'box',i===platforms.length-1?'#bf9b50':'#816852',this.side({x:p.x+p.width/2,y:p.y+22},0),[p.width/30,1.5,2.8]);this.shape('moss'+i,'box','#accb77',this.side({x:p.x+p.width/2,y:p.y+2},0),[p.width/30,0.13,2.85]);this.label('ledge-label'+i,i===platforms.length-1?'NEST':String(i+1),this.side({x:p.x+p.width/2,y:p.y+50},1),'#ffffff',0.5);});
     g.players.forEach((p,i)=>{
       const color=i?GOLD:CORAL; this.animal('ant'+i,'ant',color,this.side({x:p.x,y:p.y-9},i?0.4:0.8),0.65,p.facing,g.elapsed);
@@ -253,17 +306,18 @@ export class NaturaScene {
   }
   private cuttle(g: Extract<WildGame,{kind:'cuttlefish'}>) {
     g.patches.forEach((p,i)=>{
-      const obj=this.object('patch'+g.seed+'-'+i,()=>{const shape=new THREE.Shape();p.polygon.forEach((v,j)=>{if(j===0)shape.moveTo((v.x-480)/30,(v.y-270)/30);else shape.lineTo((v.x-480)/30,(v.y-270)/30);});const mesh=new THREE.Mesh(new THREE.ShapeGeometry(shape),new THREE.MeshStandardMaterial({color:HABITATS[p.pattern].color,side:THREE.DoubleSide,roughness:0.85}));mesh.rotation.x=Math.PI/2;return mesh;}); obj.position.y=0;
+      const obj=this.object('patch'+g.seed+'-'+i,()=>{const shape=new THREE.Shape();p.polygon.forEach((v,j)=>{if(j===0)shape.moveTo((v.x-480)/30,(v.y-270)/30);else shape.lineTo((v.x-480)/30,(v.y-270)/30);});const mesh=new THREE.Mesh(new THREE.ShapeGeometry(shape),new THREE.MeshStandardMaterial({color:HABITATS[p.pattern].color,side:THREE.DoubleSide,roughness:0.85}));mesh.rotation.x=Math.PI/2;return mesh;}); obj.position.y=0; if(obj instanceof THREE.Mesh)(obj.material as THREE.MeshStandardMaterial).color.set(HABITATS[p.pattern].color);
       this.label('habitat'+i,`${PATTERN_NAMES[p.pattern]} · ${HABITATS[p.pattern].bumpy?'bumpy':'smooth'}`,this.floorPoint(p,0.1),'#ffffff',0.53);
     });
     g.players.forEach((p,i)=>{this.animal('cuttle'+i,'cuttle',palette[p.pattern],this.floorPoint(p),0.8);this.ring('player-ring'+i,this.floorPoint(p,0.1),i?GOLD:CORAL,0.75,true);if(p.bumpy)for(let j=0;j<6;j++)this.shape(`papilla${i}-${j}`,'cone',palette[p.pattern],this.floorPoint({x:p.x-15+j*5,y:p.y},0.95),[0.08,0.25,0.08]);});
-    g.foodSites.filter(s=>s.cooldown===0).forEach(s=>{this.animal('shrimp'+s.id,'fish','#edbc86',this.floorPoint(s,0.5),0.35);this.ring('food-ring'+s.id,this.floorPoint(s,0.08),'#f3e1a1',0.45,true);});
+    g.foodSites.filter(s=>s.cooldown===0).forEach(s=>{this.animal('shrimp'+s.id,'fish','#edbc86',this.floorPoint(s,0.5),0.35);this.ring('food-ring'+s.id,this.floorPoint(s,0.08),'#f3e1a1',s.value===2?0.8:0.45,true);if(s.value===2)this.label('rich-food'+s.id,'2 FOOD',this.floorPoint(s,1.5),'#fff0ae',0.4);});
     predatorsAt(g.elapsed).forEach((p,i)=>{this.animal('predator'+i,'fish','#345a66',this.floorPoint(p,1),1.4,p.facing);this.viewCone('vision'+i,this.floorPoint(p,0.2),p.facing);if(p.turning)this.label('predator-turn'+i,'TURNING',this.floorPoint(p,2.4),'#fff2a1',0.5);});
   }
   private viewCone(key:string,pos:number[],facing:number) {
     const cone=this.object(key,()=>{const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute([0,0,0,8,0,-4.1,8,0,4.1],3));return new THREE.Mesh(geometry,new THREE.MeshBasicMaterial({color:'#ffbc71',transparent:true,opacity:0.23,side:THREE.DoubleSide,depthWrite:false}));});cone.position.set(...pos as [number,number,number]);cone.rotation.y=facing<0?Math.PI:0;
   }
   private tool(g: ToolGame) {
+    g.reefShelters?.forEach((reef,i)=>{this.shape('reef'+i,'sphere','#537b72',this.floorPoint(reef,0.1),[1.6,0.4,1.6]);this.ring('reef-ring'+i,this.floorPoint(reef,0.2),'#b4dba2',1.6,true);this.label('reef-label'+i,'REEF SHELTER',this.floorPoint(reef,1.5),'#d9f2c8',0.5);});
     if(g.kind==='bolas') {
       this.shape('night-branch','box','#6e5c54',this.side({x:480,y:110},-1.5),[34,0.35,2]);
       g.players.forEach((p,i)=>{const color=i?GOLD:CORAL;this.animal('spider'+i,'spider',color,this.side(p,0.5),0.95);const tip=bolasTip(p);this.line('silk'+i,this.side(p,0.5),this.side(tip,0.5),'#c1ded4',0.025);this.shape('sticky'+i,'sphere',color,this.side(tip,0.5),[0.22,0.22,0.22]);if(p.lure>0)this.ring('lure'+i,this.side({x:p.x,y:p.y+120},-0.2),'#cae594',2.2+Math.sin(g.elapsed*3)*0.25);});
@@ -276,7 +330,7 @@ export class NaturaScene {
         if(p.captured>0) { this.animal('captor'+i,'fish','#365460',this.floorPoint({x:p.x+25*p.dragDirection,y:p.y},1.1),1.8,p.dragDirection); }
 
       });
-      g.foodSites.filter(s=>s.cooldown===0).forEach(s=>{this.animal('food'+s.id,'fish','#edbc86',this.floorPoint(s),0.35);this.ring('food-ring'+s.id,this.floorPoint(s,0.08),'#f3e1a1',0.45,true);});
+      g.foodSites.filter(s=>s.cooldown===0).forEach(s=>{this.animal('food'+s.id,'fish','#edbc86',this.floorPoint(s),0.35);this.ring('food-ring'+s.id,this.floorPoint(s,0.08),'#f3e1a1',s.value===2?0.8:0.45,true);if(s.value===2)this.label('rich-food'+s.id,'2 FOOD',this.floorPoint(s,1.5),'#fff0ae',0.4);});
       if(g.raid.stage!=='calm')g.raid.lanes.forEach((y,i)=>this.shape('warning'+i,'box','#f1a56f',[0,0.08,(y-270)/30],[32,0.04,2.7]));
       raidPredators(g).forEach((p,i)=>this.animal('hunter'+i,'fish','#365460',this.floorPoint(p,1),1.5,i%2?-1:1));
     }
@@ -297,9 +351,10 @@ export class NaturaScene {
     for(let i=0;i<30;i++){const z=-85+((i*6+g.elapsed*12)%110);this.shape('wave'+i,'box',sky?'#7ccbcc':'#24728a',[0,-1.65-immersion*4,z],[35,0.06,0.08]);}
     for(let i=0;i<3;i++){this.shape('lane'+i,'box',sky?'#7dd5d6':'#34788e',[(i-1)*5,-1.5-immersion*4,-32],[0.06,0.06,90]);this.label('lane-label'+i,['LEFT','MIDDLE','RIGHT'][i],[(i-1)*5,-0.5-immersion*3,4],'#ffffff',0.48);}
     g.waves.forEach((w,i)=>{
+      const otherZone=g.manual&&(w.kind==='gull')!==sky;
       if(w.switchLanes&&!w.switched&&w.z>-35)w.switchLanes.forEach(l=>{this.ring(`switch-warning${i}-${l}`,[(l-1)*5,-1.35-immersion*4,w.z],'#fff2a1',2,true);this.label(`switch-label${i}-${l}`,'CHANGING LANE',[(l-1)*5,3,w.z],'#fff2a1',0.5);});
       w.lanes.forEach(l=>{
-      const animal=this.animal(`obstacle${i}-${l}`,w.kind==='gull'?'bird':'tuna',w.kind==='gull'?'#f1f2df':'#83cddd',[(l-1)*5,1-immersion*3,w.z],w.kind==='gull'?1.15:1.5,1,g.elapsed);
+      const animal=this.animal(`obstacle${i}-${l}`,w.kind==='gull'?'bird':'tuna',w.kind==='gull'?'#f1f2df':'#83cddd',[(l-1)*5,1-immersion*3+(otherZone?(sky?-6:6):0),w.z],w.kind==='gull'?1.15:1.5,1,g.elapsed);
       animal.rotation.y=-Math.PI/2;this.ring(`danger${i}-${l}`,[(l-1)*5,-1.35-immersion*4,w.z],'#ffd6aa',1.6,true);
     });});
     g.players.forEach((p,i)=>{if(ai&&i===1||p.lives===0)return;const a=this.animal('flyer'+i,'flyingfish',i?GOLD:CORAL,[p.x,1.2-immersion*3.6+i*1.5+Math.sin(progress*Math.PI)*(sky?1.5:0.3),0],0.85);a.rotation.y=Math.PI/2;a.rotation.z=g.transition>0?(sky?1:-1)*Math.sin(g.transition*Math.PI)*0.6:0;a.children.slice(-2).forEach(fin=>{fin.scale.z=0.75*(1-immersion*0.7);});
@@ -327,7 +382,7 @@ export class NaturaScene {
       if(course.wind)this.label('ridge-wind',spiderWind(g)>0?'WIND →':'← WIND',[focus.x,focus.y+7,focus.z-7],'#ffdf9b',0.65);
       spiderGates(g).forEach((gate,i)=>{const y=gate.active?gate.y:gate.y+4;this.shape('stone-gate'+i,'sphere',gate.active?'#a36f60':gate.warning?'#d2aa69':'#737c75',[gate.x,y,gate.z],[gate.radius,gate.radius,gate.radius]);if(gate.warning)this.ring('stone-warning'+i,[gate.x,gate.y,gate.z],'#ffdf9b',1,true);});
       expeditionPlatforms(g).forEach((t,i)=>{
-        const color=t.checkpoint?'#b1cc68':g.level===1?'#aa8868':g.level===2?'#72ad9a':'#6ca260';
+        const color=t.routeProgress!==undefined?'#a2ba83':t.checkpoint?'#b1cc68':g.level===1?'#aa8868':g.level===2?'#72ad9a':'#6ca260';
         this.shape('leaf'+i,g.level===1?'box':'sphere',color,[t.x,t.y-0.28,t.z],[t.radius*(g.level===1?2:1),g.level===1?0.55:0.28,t.radius*(g.level===1?2:1)]);
         this.shape('stem'+i,'cylinder','#52775c',[t.x,t.y-4,t.z],[0.16,7.5,0.16]);
         this.ring('platform-ring'+i,[t.x,t.y+0.06,t.z],t.checkpoint?'#fff4a3':'#95cca1',t.radius*0.78,true);
@@ -371,6 +426,6 @@ export class NaturaScene {
     this.resize.disconnect();this.canvas.removeEventListener('webglcontextlost',this.lost);
     const geometries=new Set<THREE.BufferGeometry>(Object.values(this.geometries));const materials=new Set<THREE.Material>(this.materials.values());
     this.scene.traverse(obj=>{if(obj instanceof THREE.Mesh){geometries.add(obj.geometry);(Array.isArray(obj.material)?obj.material:[obj.material]).forEach(m=>materials.add(m));}else if(obj instanceof THREE.Sprite){obj.material.map?.dispose();materials.add(obj.material);}});
-    geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());this.renderer.dispose();this.objects.clear();
+    geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());this.renderer.dispose();this.objects.clear();this.particleGeometry.dispose();this.particleMaterial.dispose();this.particles.clear();
   }
 }

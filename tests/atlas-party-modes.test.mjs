@@ -7,7 +7,7 @@ import { GUESS_SCORING } from "../src/games/atlas/config.ts";
 import { validateAnswer } from "../src/games/atlas/engine.ts";
 import { generateFlagQuestions, FLAG_CHOICES } from "../src/games/atlas/flags.ts";
 import { countryClues, generateGuessCountryQuestions, scoreGuessTip } from "../src/games/atlas/guessCountry.ts";
-import { clampPlayers, createAuthoritativeSubmission, maxPlayersFor, resolveGuessTip } from "../src/games/atlas/multiplayer.ts";
+import { ATLAS_MAX_PLAYERS, clampPlayers, createAuthoritativeSubmission, resolveGuessTip } from "../src/games/atlas/multiplayer.ts";
 
 const read = async (path) => JSON.parse(await readFile(new URL(path, import.meta.url), "utf8"));
 const countries = await read("../data/geography/countries.json"), extras = await read("../data/geography/extras.json");
@@ -97,14 +97,12 @@ test("guess scoring: all solvers 3, early-tip bonuses +2/+1", () => {
   assert.deepEqual(solved.scores, { a: 1, b: 4, c: 4, d: 0 });
 });
 
-test("rooms seat two to four players; Stat Battle stays one-on-one", () => {
-  assert.equal(maxPlayersFor("guess_country"), 4);
-  assert.equal(maxPlayersFor("history_battle"), 4);
-  assert.equal(maxPlayersFor("stat_battle"), 2);
-  assert.equal(clampPlayers("flag_battle", 3), 3);
-  assert.equal(clampPlayers("flag_battle", 9), 4);
-  assert.equal(clampPlayers("stat_battle", 4), 2);
-  assert.equal(clampPlayers("higher_lower", "nonsense"), 2);
+test("rooms of every mode seat two to four players", () => {
+  assert.equal(ATLAS_MAX_PLAYERS, 4);
+  assert.equal(clampPlayers(3), 3);
+  assert.equal(clampPlayers(9), 4);
+  assert.equal(clampPlayers(1), 2);
+  assert.equal(clampPlayers("nonsense"), 2);
 });
 
 test("Atlas Edge Function keeps unrevealed tips and hidden values on the server", async () => {

@@ -6,13 +6,13 @@ import { useDashboardData, type DashboardNotification } from "@/hooks/useDashboa
 import { ui, useUiLanguage } from "@/i18n/ui";
 import FriendAvatar from "@/components/social/FriendAvatar";
 import { acceptInviteState, getInviteDestination, getInviteGameLabel } from "@/components/social/inviteRoute";
-import { isClanNotification, notificationDestination, notificationRoomCode, respondToSpectateRequest } from "@/components/social/notificationActions";
+import { clanRoute, isClanNotification, notificationDestination, notificationRoomCode, respondToClanInvite, respondToSpectateRequest } from "@/components/social/notificationActions";
 import { leaveCurrentRoom } from "@/components/social/currentRoom";
 import DashboardFriendDialog from "../dashboard/DashboardFriendDialog";
 import { markNotificationsSeen, useClanPopupsMuted, useDoNotDisturb, useSeenNotificationIds } from "./notificationState";
 
 const MAX_VISIBLE = 3;
-const TOAST_KINDS = new Set<DashboardNotification["kind"]>(["message", "clan_message", "clan_invite", "spectate_request", "spectate_accepted"]);
+const TOAST_KINDS = new Set<DashboardNotification["kind"]>(["message", "clan_message", "clan_invite", "clan_join_invite", "spectate_request", "spectate_accepted"]);
 const MESSAGE_TOAST_MS = 9_000;
 // Server and browser clocks can disagree; this only filters out history.
 const RECENT_WINDOW_MS = 5 * 60_000;
@@ -30,7 +30,7 @@ function ToastStack({ userId }: { userId: string }) {
   const { notifications, friends, onlineIds, loading } = useDashboardData();
   const seen = useSeenNotificationIds(userId);
   const [clanMuted] = useClanPopupsMuted(userId);
-  const [spectateError, setSpectateError] = useState<Record<string, string>>({});
+  const [actionError, setActionError] = useState<Record<string, string>>({});
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const [mountedAt] = useState(() => Date.now());
@@ -72,8 +72,16 @@ function ToastStack({ userId }: { userId: string }) {
   async function answerSpectate(item: DashboardNotification, accept: boolean) {
     if (!item.spectateRequestId) return;
     const error = await respondToSpectateRequest(item.spectateRequestId, accept);
-    if (error && accept) { setSpectateError(current => ({ ...current, [item.id]: error })); return; }
+    if (error && accept) { setActionError(current => ({ ...current, [item.id]: error })); return; }
     markNotificationsSeen(userId, [item.id]);
+  }
+  async function answerClanInvite(item: DashboardNotification, accept: boolean) {
+    if (!item.clanInviteId) return;
+    const error = await respondToClanInvite(item.clanInviteId, accept);
+    if (error && accept) { setActionError(current => ({ ...current, [item.id]: error })); return; }
+    markNotificationsSeen(userId, [item.id]);
+    close(item.id);
+    if (accept) navigate(clanRoute(item.clanId));
   }
   function openChat(item: DashboardNotification) {
     markNotificationsSeen(userId, [item.id]);
@@ -110,12 +118,24 @@ function ToastStack({ userId }: { userId: string }) {
             </div>
           </div>
         </article>;
+        if (item.kind === "clan_join_invite") return <article key={item.id} className="incoming-toast is-invite">
+          <ToastAvatar sender={sender} invite />
+          <div className="incoming-toast-copy">
+            <p className="incoming-toast-eyebrow"><Shield size={12} aria-hidden="true" />{ui("Clan invitation")}</p>
+            <p className="incoming-toast-title"><strong>{name}</strong> {ui("invited you to join")} <strong>{item.clanName}</strong></p>
+            {actionError[item.id] && <p className="incoming-toast-detail text-rose-300" role="alert">{ui(actionError[item.id])}</p>}
+            <div className="incoming-toast-actions">
+              <button type="button" className="is-accept" onClick={() => void answerClanInvite(item, true)}><Check size={15} aria-hidden="true" />{ui("Accept")}</button>
+              <button type="button" onClick={() => void answerClanInvite(item, false)}><X size={15} aria-hidden="true" />{ui("Decline")}</button>
+            </div>
+          </div>
+        </article>;
         if (item.kind === "spectate_request") return <article key={item.id} className="incoming-toast is-invite">
           <ToastAvatar sender={sender} invite />
           <div className="incoming-toast-copy">
             <p className="incoming-toast-eyebrow"><Eye size={12} aria-hidden="true" />{ui("Spectate request")}</p>
             <p className="incoming-toast-title"><strong>{name}</strong> {ui("wants to watch your game")}</p>
-            {spectateError[item.id] && <p className="incoming-toast-detail text-rose-300" role="alert">{ui(spectateError[item.id])}</p>}
+            {actionError[item.id] && <p className="incoming-toast-detail text-rose-300" role="alert">{ui(actionError[item.id])}</p>}
             <div className="incoming-toast-actions">
               <button type="button" className="is-accept" onClick={() => void answerSpectate(item, true)}><Check size={15} aria-hidden="true" />{ui("Allow")}</button>
               <button type="button" onClick={() => void answerSpectate(item, false)}><X size={15} aria-hidden="true" />{ui("Decline")}</button>

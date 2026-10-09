@@ -24,7 +24,7 @@ export default function GameInvitePanel({ onNavigate, initialFriendId = "" }: { 
   const [friendId, setFriendId] = useState(initialFriendId);
   const [gameId, setGameId] = useState("chess");
   const [modeId, setModeId] = useState("classic");
-  const { games, cardsError, clearCardsError } = useInviteGames(gameId);
+  const { games } = useInviteGames();
   const [rooms, setRooms] = useState<RoomDestination[]>([]), [route, setRoute] = useState("");
   const [busy, setBusy] = useState(false), [message, setMessage] = useState(""), [error, setError] = useState("");
   const game = games.find(item => item.id === gameId)!;
@@ -79,11 +79,9 @@ export default function GameInvitePanel({ onNavigate, initialFriendId = "" }: { 
     {!user ? <Link className="mt-3 block text-sm text-indigo-200" to="/login" onClick={onNavigate}>{ui("Sign in")}</Link> : <>
       <div className="invite-game-preview mt-3 flex items-center gap-3"><img src={game.image} alt="" className="h-10 w-10 rounded-lg object-cover" /><span className="font-bold">{game.title}</span></div>
       <div className="mt-3 grid grid-cols-2 gap-3">
-        <label className="min-w-0 text-sm text-slate-300">{ui("Game")}<select aria-label={ui("Game")} className={field} value={gameId} disabled={busy} onChange={event => { setGameId(event.target.value); setModeId(""); clearCardsError(); }}>{games.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}</select></label>
+        <label className="min-w-0 text-sm text-slate-300">{ui("Game")}<select aria-label={ui("Game")} className={field} value={gameId} disabled={busy} onChange={event => { setGameId(event.target.value); setModeId(""); }}>{games.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}</select></label>
         <label className="min-w-0 text-sm text-slate-300">{ui("Mode")}<select aria-label={ui("Mode")} className={field} value={selectedMode?.id ?? ""} disabled={busy || !modes.length} onChange={event => setModeId(event.target.value)}>{!modes.length && <option value="">{ui("No online modes")}</option>}{modes.map(mode => <option key={mode.id} value={mode.id}>{ui(mode.label)}</option>)}</select></label>
       </div>
-      {cardsError && <p role="alert" className="mt-2 text-sm text-red-300">{ui(cardsError)}</p>}
-      {!modes.length && !cardsError && <p className="mt-2 text-sm text-slate-400">{ui(gameId === "card-builder" ? "Publish a card game in your account to invite friends." : "This game does not have online multiplayer yet.")}</p>}
       <label className="mt-3 block text-sm text-slate-300">{ui("Choose a friend")}<select aria-label={ui("Choose a friend")} value={friendId} onChange={event => setFriendId(event.target.value)} disabled={busy || loading || friendsError} className={field}><option value="">{ui(loading ? "Loading friends..." : friendsError ? "Friends are unavailable" : "Choose a friend")}</option>{[...friends].sort((a,b) => Number(onlineIds.includes(b.id))-Number(onlineIds.includes(a.id))).map(friend => <option key={friend.id} value={friend.id}>{friend.display_name || friend.username || "Player"}{onlineIds.includes(friend.id) ? ` · ${ui("Online")}` : ""}</option>)}</select></label>
       <button type="button" disabled={busy || !selectedMode || !validFriend} onClick={create} className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-500 px-3 py-3 text-sm font-bold disabled:opacity-40"><Send size={16} />{ui("Create & invite")}</button>
       <div className="mt-4 border-t border-white/10 pt-3"><form onSubmit={event => void act("join", event)} className="flex items-end gap-2"><label className="min-w-0 flex-1 text-sm text-slate-300">{ui("Game invite code")}<input aria-label={ui("Game invite code")} disabled={busy} placeholder="ABC123" value={code} onChange={event => { setCode(event.target.value.toUpperCase().replace(/[^A-Z0-9 -]/g, "")); setRooms([]); setRoute(""); setMessage(""); setError(""); }} minLength={6} maxLength={20} required className={field + " font-mono tracking-widest"} /></label><button type="submit" disabled={busy || !validCode} className="min-h-10 rounded-xl bg-indigo-500 px-3 py-2 text-sm font-bold disabled:opacity-40">{ui(busy ? "Loading…" : "Join")}</button></form>

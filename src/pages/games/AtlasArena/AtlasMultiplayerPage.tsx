@@ -12,7 +12,7 @@ import AtlasAreaReference from "@/components/atlas/AtlasAreaReference";
 import { areaValuesFromText } from "@/games/atlas/areaReferences";
 import AtlasRankBadge from "@/components/atlas/AtlasRankBadge";
 import { useAtlasRanks, type AtlasRankRow } from "@/games/atlas/useAtlasRanks";
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Check, Clock3, Copy, Crown, FlaskConical, Flag, Lightbulb, MapPin, Play, Radio, Shield, Swords, Timer, Trophy, Users } from "lucide-react";
 import { CountryGuessInput, FlagChoices, FlagPrompt, GuessClueList, HigherLowerCards } from "../../../components/atlas/AtlasPartyPanels";
@@ -28,10 +28,12 @@ import type { GuessAward } from "../../../games/atlas/guessCountry";
 import { ARENA_MODES, ONLINE_ARENA_MODES, isOnlineMode, modeForOnline } from "../../../games/atlas/modeCatalog";
 import { seriesLabel, seriesLength } from "../../../games/atlas/randomSeries";
 import { getRankFromProfile } from "../../../games/atlas/ranked";
-import { isRaceMode, maxPlayersFor, type AtlasMatchStatus, type AtlasMultiplayerMode, type RaceEntry } from "../../../games/atlas/multiplayer";
+import { ATLAS_MAX_PLAYERS, isRaceMode, type AtlasMatchStatus, type AtlasMultiplayerMode, type RaceEntry } from "../../../games/atlas/multiplayer";
 import type { FillScope } from "../../../games/atlas/scopes";
 import { DEFAULT_SOLO_SETTINGS, PLAYER_COLORS, settingsReady, type SoloSettings } from "../../../games/atlas/soloSettings";
 import type { BattleView } from "../../../games/atlas/trials/battleMatch";
+import type { TableView } from "../../../games/atlas/trials/battleTable";
+import { TableBoard, TableHistory, TableScoreline } from "../../../components/atlas/trials/StatBattleTable";
 import { STAT_BATTLE } from "../../../games/atlas/trials/config";
 import type { AtlasCategory, AtlasDataset, AtlasDifficulty, AtlasStatKey, Coordinates } from "../../../games/atlas/types";
 import { useAtlasData } from "../../../games/atlas/useAtlasData";
@@ -44,14 +46,14 @@ type Snapshot = {
   id: string; code: string; mode: AtlasMultiplayerMode; ranked: boolean; hostId: string; players: { id: string; name: string; ready: boolean }[]; seat: number; maxPlayers?: number;
   series?: { bans: Record<string, string[]>; order: AtlasMultiplayerMode[]; gameIndex: number; wins: Record<string, number>; results: { mode: AtlasMultiplayerMode; winnerId: string | null; scores: Record<string, number> }[] };
   status: AtlasMatchStatus; intermissionEndsAt?: string | null; datasetVersion: string; settings: { rounds: number; difficulty: AtlasDifficulty; categories?: AtlasCategory[]; stats?: AtlasStatKey[]; scope?: FillScope };
-  roundIndex: number; rounds: number; tipIndex?: number; tipCount?: number; roundStartedAt: string | null; roundEndsAt: string | null; scores: Record<string, number>;
+  roundIndex: number; rounds: number; tipIndex?: number; tipCount?: number; roundStartedAt: string | null; roundEndsAt: string | null; resolveAt?: string | null; scores: Record<string, number>;
   question: PublicQuestion | null; submitted: boolean; opponentSubmitted: boolean; submittedIds?: string[]; submittedAnswer?: string | Coordinates | null;
   guesses?: { userId: string; tip: number; answer: string; correct: boolean }[];
   roundResult: { winnerId?: string | null; entityId?: string; answer?: string | Coordinates; tip?: number; awards?: GuessAward[]; submissions?: { userId: string; answer?: string | Coordinates; correct: boolean; distanceKm?: number; nearest?: Coordinates; responseMs: number }[] } | null; version: number;
   /** Races only: the shared seed every racer plays, and the live standings. */
   run?: RaceView; race?: Record<string, RaceEntry>; tiebreak?:{attempt:number;mode:AtlasMultiplayerMode};
-  /** Stat Battle only: this seat's view of the card table. */
-  battle?: BattleView;
+  /** Stat Battle only: this seat's view of the duel (two players) or of the card table (three or four). */
+  battle?: BattleView; table?: TableView;
 };
 const titleOf = (mode: AtlasMultiplayerMode) => modeForOnline(mode)?.title ?? mode;
 /** Panel-only rounds: the world map has no role (or would give the answer away). */
@@ -73,7 +75,6 @@ export default function AtlasMultiplayerPage() {
   const { stored, update } = useArenaStore();
   const settings = randomBestOf ? { ...stored.settings, categories: stored.settings.categories.length ? stored.settings.categories : DEFAULT_SOLO_SETTINGS.categories, stats: stored.settings.stats.length ? stored.settings.stats : DEFAULT_SOLO_SETTINGS.stats } : stored.settings;
   const [pinSelection, setPinSelection] = useState<{ key: string; coordinates: Coordinates } | null>(null);
-  const [playerCount, setPlayerCount] = useState(2);
   const [code, setCode] = useState("");
   const [room, setRoom] = useState<Snapshot | null>(null);
   const [pendingMap, setPendingMap] = useState<{ id: string; label: string } | null>(null);
@@ -135,7 +136,7 @@ export default function AtlasMultiplayerPage() {
   };
   const create = async () => {
     setBusy(true); setError("");
-    try { const created = await invoke({ op: "create", mode, ...(randomBestOf ? { randomBestOf } : {}), difficulty: settings.difficulty, name, maxPlayers: Math.min(playerCount, maxPlayersFor(mode)), ...(usesMapCategories(mode) || randomBestOf ? { categories: settings.categories } : {}), ...(mode === "higher_lower" || randomBestOf ? { stats: settings.stats } : {}), ...(mode === "map_fill" || randomBestOf ? { scope: settings.scope } : {}) }); navigate(recordCreatedGameInvite(`/games/atlas-arena/multiplayer/${created.code}`)); }
+    try { const created = await invoke({ op: "create", mode, ...(randomBestOf ? { randomBestOf } : {}), difficulty: settings.difficulty, name, ...(usesMapCategories(mode) || randomBestOf ? { categories: settings.categories } : {}), ...(mode === "higher_lower" || randomBestOf ? { stats: settings.stats } : {}), ...(mode === "map_fill" || randomBestOf ? { scope: settings.scope } : {}) }); navigate(recordCreatedGameInvite(`/games/atlas-arena/multiplayer/${created.code}`)); }
     catch (cause) { setError(errorMessage(cause)); } finally { setBusy(false); }
   };
   useInviteAutoCreate(() => create(), !!datasetVersion);
@@ -148,7 +149,7 @@ export default function AtlasMultiplayerPage() {
   if (authLoading || atlas.loading) return <main className="atlas-page atlas-center"><AtlasFitContent><Radio /><h1>Joining realtime…</h1></AtlasFitContent></main>;
   if (!user) return <main className="atlas-page atlas-center"><AtlasFitContent><Users /><h1>Sign in to play</h1><p>Atlas rooms use your Pluto account to reserve your seat and restore matches after reconnecting.</p><Link className="atlas-start" to="/login">Sign in</Link></AtlasFitContent></main>;
   if (!atlas.data || atlas.error) return <main className="atlas-page atlas-center"><AtlasFitContent><h1>Atlas unavailable</h1><p>{atlas.error}</p></AtlasFitContent></main>;
-  if (!roomCode) return <MultiplayerLobby randomBestOf={randomBestOf} mode={mode} setMode={setMode} fixed={Boolean(requested)} settings={settings} setSettings={(next) => update({ settings: next })} playerCount={playerCount} setPlayerCount={setPlayerCount} code={code} setCode={setCode} busy={busy} error={error} rank={ranks.find(row => row.user_id === user.id)} onCreate={create} onJoin={join} />;
+  if (!roomCode) return <MultiplayerLobby randomBestOf={randomBestOf} mode={mode} setMode={setMode} fixed={Boolean(requested)} settings={settings} setSettings={(next) => update({ settings: next })} code={code} setCode={setCode} busy={busy} error={error} rank={ranks.find(row => row.user_id === user.id)} onCreate={create} onJoin={join} />;
   if (!room || room.code!==roomCode) return <main className="atlas-page atlas-center"><AtlasFitContent><Radio /><h1>Restoring arena…</h1>{error && <p role="alert">{error}</p>}</AtlasFitContent></main>;
   if (room.status === "cancelled") return <main className="atlas-page atlas-center"><AtlasFitContent><Shield /><h1>Match cancelled</h1><p>The match ended before play began. No rating changed.</p><Link className="atlas-start" to="/games/atlas-arena?tab=ranked">Back to Ranked</Link></AtlasFitContent></main>;
 
@@ -157,6 +158,8 @@ export default function AtlasMultiplayerPage() {
   const onlineOthers = others.filter((player) => onlineIds.includes(player.id));
   const countdown = room.roundStartedAt ? Math.max(0, Math.ceil((Date.parse(room.roundStartedAt) - now) / 1000)) : 0;
   const remaining = room.roundEndsAt ? Math.max(0, (Date.parse(room.roundEndsAt) - now) / 1000) : 0;
+  // How long the solved country's tips and answer stay up before the next one.
+  const revealLeft = room.resolveAt ? Math.max(0, (Date.parse(room.resolveAt) - now) / 1000) : null;
   const active = room.status === "round_active" && remaining > 0 && !room.submitted && !busy;
   const leaders = room.players.filter((player) => (room.scores[player.id] || 0) === Math.max(...room.players.map((item) => room.scores[item.id] || 0)));
   const winningPlayer = leaders.length === 1 ? leaders[0] : null;
@@ -180,20 +183,27 @@ export default function AtlasMultiplayerPage() {
   if (room.status === "waiting" || room.status === "ready") {
     const everyoneReady = room.players.length >= 2 && room.players.every((player) => player.ready);
     const isHost = room.hostId === user.id, me = room.players[room.seat];
-    return <main className="atlas-page atlas-center atlas-room-page"><AtlasFitContent><span className="atlas-eyebrow">{room.series ? `${room.ranked ? "Ranked" : "Random modes"} · Game ${room.series.gameIndex + 1} of ${room.series.order.length}` : `Private arena · ${titleOf(room.mode)} · ${seats} players`}</span><h1>Room {room.code}</h1>
-      <p className="atlas-room-intro">{room.series ? `The mode order is set. Confirm ready to play ${titleOf(room.mode)}; ${seriesLabel(room.series.order.length).toLowerCase()}, first to ${Math.floor(room.series.order.length / 2) + 1} game wins.` : room.players.length < seats ? `Share this code — ${seats - room.players.length} seat${seats - room.players.length === 1 ? "" : "s"} open.${room.players.length >= 2 ? " The host can also start early once everyone present is ready." : ""}` : "Everyone is here. Confirm readiness to start the match."}</p>
-      {room.series && <RankedSeries room={room} />}
-      <section className="atlas-room-card" aria-label="Room seats"><div className="atlas-room-card-header"><span>Seats {room.players.length} / {seats}</span><button type="button" onClick={() => void navigator.clipboard.writeText(room.code)}><Copy size={15} /> Copy code</button></div>
-        <div className={`atlas-seats seats-${seats}`}>{Array.from({ length: seats }, (_, index) => { const player = room.players[index]; const mine = player?.id === user.id; return <RoomPlayer key={player?.id ?? `open-${index}`} player={player} rank={ranks.find(row => row.user_id === player?.id)} label={mine ? "You" : player?.id === room.hostId ? "Host" : `Player ${index + 1}`} online={mine || Boolean(player && onlineIds.includes(player.id))} waiting={!player} canInvite={!player && !room.ranked && room.status === "waiting"} readyAction={mine && !player?.ready && room.players.length >= 2} busy={busy} onReady={() => void act({ op: "ready", code: room.code })} />; })}</div>
+    // One seat per player who is going to play; the host sets how many with the 2 / 3 / 4 buttons.
+    const openSeats = seats - room.players.length, open = openSeats > 0;
+    const capacity = `${seats} players`;
+    const hostName = room.players.find((player) => player.id === room.hostId)?.name ?? "The host";
+    const invite = !open ? "Everyone is here. Confirm readiness to start the match."
+      : `${openSeats} seat${openSeats === 1 ? "" : "s"} open — invite friends or share the code.${room.players.length >= 2 ? ` ${isHost ? "You" : hostName} can also start with ${room.players.length} once everyone here is ready.` : isHost && !room.ranked ? " Use 2 / 3 / 4 to set how many play." : ""}`;
+    const seatPicker = room.ranked ? null : <SeatPicker seats={seats} taken={room.players.length} editable={isHost && !busy} onChange={(count) => void act({ op: "seats", code: room.code, seats: count })} />;
+    return <main className="atlas-page atlas-center atlas-room-page"><AtlasFitContent><span className="atlas-eyebrow">{room.series ? `${room.ranked ? "Ranked" : "Random modes"} · Game ${room.series.gameIndex + 1} of ${room.series.order.length}${room.ranked ? "" : ` · ${capacity}`}` : `Private arena · ${titleOf(room.mode)} · ${capacity}`}</span><h1>Room {room.code}</h1>
+      <p className="atlas-room-intro">{room.series ? `The mode order is set. Confirm ready to play ${titleOf(room.mode)}; ${seriesLabel(room.series.order.length).toLowerCase()}, first to ${Math.floor(room.series.order.length / 2) + 1} game wins.${room.ranked || !open ? "" : ` ${invite}`}` : invite}</p>
+      {room.series && <RankedSeries room={room} aside={seatPicker} />}
+      <section className="atlas-room-card" aria-label="Room seats"><div className="atlas-room-card-header"><span>Seats {room.players.length} / {seats}</span>{!room.series && seatPicker}<button type="button" onClick={() => void navigator.clipboard.writeText(room.code)}><Copy size={15} /> Copy code</button></div>
+        <div className={`atlas-seats seats-${seats}`}>{Array.from({ length: seats }, (_, index) => { const player = room.players[index]; const mine = player?.id === user.id; return <RoomPlayer key={player?.id ?? `open-${index}`} player={player} rank={ranks.find(row => row.user_id === player?.id)} label={mine ? "You" : player?.id === room.hostId ? "Host" : `Player ${index + 1}`} online={mine || Boolean(player && onlineIds.includes(player.id))} waiting={!player} canInvite={!player && !room.ranked} readyAction={mine && !player?.ready && room.players.length >= 2} busy={busy} onReady={() => void act({ op: "ready", code: room.code })} />; })}</div>
         {room.mode === "closest_wins" && <div className="atlas-science-note"><FlaskConical size={18} /><p><strong>Distance rule</strong> Place a pin anywhere and submit it. Country rounds count a pin inside the borders as 0 km; capital rounds count a pin within 20 km of the city center as 0 km. Outside the target, great-circle distance is measured. The closest pin wins; on an exact tie equally close pins share the point.</p></div>}
         {room.mode === "guess_country" && <div className="atlas-science-note"><Lightbulb size={18} /><p><strong>Scoring</strong> One guess per tip. Each correct guess on the same tip: 3 points. Solving on tip 1 adds +2, on tip 2 +1. A solved tip ends the country.</p></div>}
         {isRaceMode(room.mode) && <div className="atlas-science-note"><Timer size={18} /><p><strong>Race</strong> Everyone plays the same bounded deck, with answers scored and progress saved by the server. Review each answer before continuing. Highest final score wins.{room.settings.scope ? ` Region: ${room.settings.scope}.` : ""}</p></div>}
-        {room.mode === "stat_battle" && <div className="atlas-science-note"><Swords size={18} /><p><strong>Duel</strong> Both players lay one card face down each round; the better value for the category wins. First to {STAT_BATTLE.winTarget}. You have 30 seconds per card and three full-hand rerolls for the game.</p></div>}
+        {room.mode === "stat_battle" && <div className="atlas-science-note"><Swords size={18} /><p><strong>{seats > 2 ? "Card table" : "Duel"}</strong> Everyone lays one card face down each round; the best value for the category wins, and a shared best scores nobody. First to {STAT_BATTLE.winTarget}. You have 30 seconds per card and three full-hand rerolls for the game.</p></div>}
         {(room.settings.categories || room.settings.stats) && <p className="atlas-setup-note">Categories: {(room.settings.stats ?? room.settings.categories ?? []).map((id) => [...COMPARISON_CATEGORIES, ...QUESTION_CATEGORIES].find((option) => option.id === id)?.label ?? id).join(", ")}</p>}
       </section>
-      <p className="atlas-ready-count" role="status">{room.players.filter(player => player.ready).length}/{seats} are ready</p>
+      <p className="atlas-ready-count" role="status">{room.players.filter(player => player.ready).length}/{room.players.length} are ready</p>
       <button type="button" className="atlas-start atlas-ready-button" disabled={room.players.length < 2 || me.ready || busy} onClick={() => void act({ op: "ready", code: room.code })}><Check /> {me.ready ? "Ready signal sent" : "Confirm ready"}</button>
-      {isHost && room.players.length < seats && <button type="button" className="atlas-start atlas-ready-button atlas-secondary" disabled={!everyoneReady || busy} onClick={() => void act({ op: "start", code: room.code })}><Play /> Start with {room.players.length} players</button>}
+      {isHost && open && !room.ranked && <button type="button" className="atlas-start atlas-ready-button atlas-secondary" disabled={!everyoneReady || busy} onClick={() => void act({ op: "start", code: room.code })}><Play /> {room.players.length < 2 ? "Start once a second player joins" : `Start with ${room.players.length} players`}</button>}
       {error && <p role="alert">{error}</p>}{room.ranked ? !room.series?.results.length && <button type="button" className="atlas-room-leave" onClick={() => void act({ op: "cancel", code: room.code })}>Cancel before start</button> : <Link className="atlas-room-leave" to="/games/atlas-arena">Leave room</Link>}</AtlasFitContent></main>;
   }
 
@@ -210,8 +220,10 @@ export default function AtlasMultiplayerPage() {
     <ScoreBoard room={room} ranks={ranks} />
     {room.ranked && <RankedResult matchId={room.id} userId={user.id} />}
     {room.mode === "stat_battle" && room.battle && <DuelHistoryBlock room={room} data={atlas.data} />}
+    {room.mode === "stat_battle" && room.table && <TableHistoryBlock room={room} data={atlas.data} />}
   </AtlasFitContent></main>;
   if (isRaceMode(room.mode)) return <RaceRoom remaining={remaining} room={room} userId={user.id} data={atlas.data} busy={busy} error={error} onAction={(action,answer)=>void act({op:"race",code:room.code,action,questionId:room.run?.question?.id,answer})} onEnd={()=>void act({op:"finish",code:room.code})}/>;
+  if (room.mode === "stat_battle" && room.table) return <TableRoom room={room} data={atlas.data} busy={busy} remaining={remaining} error={error} onPlay={(card) => void act({ op: "play", code: room.code, roundIndex:room.roundIndex, card })} onReroll={() => void act({ op: "reroll", code: room.code, roundIndex:room.roundIndex })} />;
   if (room.mode === "stat_battle") return <DuelRoom room={room} data={atlas.data} busy={busy} remaining={remaining} error={error} onPlay={(card) => void act({ op: "play", code: room.code, roundIndex:room.roundIndex, card })} onReroll={() => void act({ op: "reroll", code: room.code, roundIndex:room.roundIndex })} />;
 
   const question = room.question, resolved = Boolean(room.roundResult);
@@ -231,7 +243,7 @@ export default function AtlasMultiplayerPage() {
   const clickedId = room.mode === "map_battle" ? myPick : null;
   const wrongClickId = resolved && clickedId && myResult && !myResult.correct ? clickedId : null;
   const waitingOn = room.players.filter((player) => !(room.submittedIds ?? []).includes(player.id)).length;
-  return <main className="atlas-game-page"><header className="atlas-game-header"><Link className="atlas-icon-button" to="/games/atlas-arena" aria-label="Exit room">×</Link><div><span className="atlas-eyebrow">{titleOf(room.mode)}</span><strong>{room.mode === "guess_country" ? `Country ${room.roundIndex + 1} / ${room.rounds} · Tip ${(room.tipIndex ?? 0) + 1}` : `Round ${room.roundIndex + 1} / ${room.rounds}`}</strong></div><div className="atlas-game-stats"><span><Trophy size={16} />{room.scores[user.id] || 0}</span><span><Clock3 size={16} />{remaining.toFixed(1)}</span><span className="atlas-live"><i className={onlineOthers.length === others.length ? "" : "is-offline"} /> {others.length === 1 ? (onlineOthers.length ? others[0].name : `${others[0].name} reconnecting`) : `${onlineOthers.length + 1}/${room.players.length} online`}</span></div></header>
+  return <main className="atlas-game-page"><header className="atlas-game-header"><Link className="atlas-icon-button" to="/games/atlas-arena" aria-label="Exit room">×</Link><div><span className="atlas-eyebrow">{titleOf(room.mode)}</span><strong>{room.mode === "guess_country" ? `Country ${room.roundIndex + 1} / ${room.rounds} · Tip ${(room.tipIndex ?? 0) + 1}` : `Round ${room.roundIndex + 1} / ${room.rounds}`}</strong></div><div className="atlas-game-stats"><span><Trophy size={16} />{room.scores[user.id] || 0}</span><span><Clock3 size={16} />{(room.mode === "guess_country" && revealLeft !== null ? revealLeft : remaining).toFixed(1)}</span><span className="atlas-live"><i className={onlineOthers.length === others.length ? "" : "is-offline"} /> {others.length === 1 ? (onlineOthers.length ? others[0].name : `${others[0].name} reconnecting`) : `${onlineOthers.length + 1}/${room.players.length} online`}</span></div></header>
     <section className={`atlas-play-layout ${panelOnly ? "is-panel-only" : room.mode === "guess_country" ? "is-guess-country" : ""}`}><aside className="atlas-question-panel"><AtlasFitContent><div className="atlas-progress"><i style={{ width: `${(room.roundIndex + 1) / room.rounds * 100}%` }} /></div><span className="atlas-eyebrow">{room.submitted ? "Answer locked" : room.mode === "guess_country" ? `Tip ${(room.tipIndex ?? 0) + 1} of ${room.tipCount ?? 6}` : question?.interaction.replace("_", " ")}</span><h1>{question?.prompt}</h1>{room.tiebreak&&<p className="atlas-setup-note">Tie challenge {room.tiebreak.attempt} / 2 · three questions · equal knowledge awards.</p>}
       {(question?.interaction === "map_click" || question?.interaction === "closest_click") && question.flagAsset && <img className="atlas-question-flag" src={question.flagAsset} alt="Country flag to identify" />}
       {question?.interaction === "closest_click" && <div className="atlas-pin-controls"><p>{myPin ? `Your pin: ${Math.abs(myPin[1]).toFixed(2)}° ${myPin[1] >= 0 ? "N" : "S"}, ${Math.abs(myPin[0]).toFixed(2)}° ${myPin[0] >= 0 ? "E" : "W"}${room.submitted ? "" : " — click again to move it."}` : `Click anywhere to place a pin. ${question.targetRadiusKm ? "Within 20 km of the city center" : "Inside the country"} counts as 0 km.`}</p><button type="button" className="atlas-submit" disabled={!active || !myPin} onClick={() => myPin && submit(myPin)}><MapPin size={18} />{room.submitted ? "Pin locked" : "Submit pin"}</button></div>}
@@ -244,23 +256,22 @@ export default function AtlasMultiplayerPage() {
       {room.submitted && room.status === "round_active" && <div className="atlas-feedback is-correct"><Check /><div><strong>Answer received</strong><span>{waitingOn ? `Waiting for ${waitingOn} more player${waitingOn === 1 ? "" : "s"}…` : "Resolving…"}</span></div></div>}
       {question && <AtlasAreaReference values={areaValuesFromText(question.prompt)} />}
       {!panelOnly && <AtlasMapConfirm reserve={question?.interaction !== "closest_click"} pending={pendingMap} onConfirm={() => mapSelection.current?.confirm()} onCancel={() => mapSelection.current?.cancel()} />}
-      {room.roundResult && (room.mode === "guess_country" ? <GuessResult room={room} userId={user.id} countryName={nameOf(room.roundResult.entityId)} playerName={playerName} /> : <RoundResult room={room} userId={user.id} countryName={nameOf(room.roundResult.entityId)} playerName={playerName} />)}<ScoreBoard room={room} ranks={ranks} /></AtlasFitContent></aside>
+      {room.roundResult && (room.mode === "guess_country" ? <GuessResult room={room} userId={user.id} countryName={nameOf(room.roundResult.entityId)} playerName={playerName} nextIn={revealLeft} /> : <RoundResult room={room} userId={user.id} countryName={nameOf(room.roundResult.entityId)} playerName={playerName} />)}<ScoreBoard room={room} ranks={ranks} /></AtlasFitContent></aside>
       {!panelOnly && <AtlasWorldMap ref={mapSelection} onPendingChange={setPendingMap} confirmationKey={roundKey} topology={atlas.data.topology} entities={atlas.data.countries} disabled={!active} selectedId={room.mode === "guess_country" ? guessId : clickedId} correctId={correctId} incorrectId={wrongClickId} pins={pins} showHoverLabels={room.mode === "guess_country"} onSelect={(entityId) => { if (room.mode === "guess_country") setGuessSelection({ key: roundKey, id: entityId }); else if (question?.interaction !== "closest_click") submit(entityId); }} onPoint={question?.interaction === "closest_click" ? (coordinates) => setPinSelection({ key: roundKey, coordinates }) : undefined} ariaLabel={question?.prompt} />}
     </section>{error && <p role="alert" className="atlas-multiplayer-error">{error}</p>}</main>;
 }
 
-function MultiplayerLobby({ randomBestOf, rank, mode, setMode, fixed, settings, setSettings, playerCount, setPlayerCount, code, setCode, busy, error, onCreate, onJoin }: { randomBestOf?: 1 | 3 | 5; rank?: AtlasRankRow; mode: AtlasMultiplayerMode; setMode: (mode: AtlasMultiplayerMode) => void; fixed: boolean; settings: SoloSettings; setSettings: (settings: SoloSettings) => void; playerCount: number; setPlayerCount: (count: number) => void; code: string; setCode: (code: string) => void; busy: boolean; error: string; onCreate: () => void; onJoin: (event: FormEvent) => void }) {
-  const limit = randomBestOf ? 2 : maxPlayersFor(mode), def = modeForOnline(mode) ?? ARENA_MODES[0], Icon = MODE_ICONS[def.id];
+function MultiplayerLobby({ randomBestOf, rank, mode, setMode, fixed, settings, setSettings, code, setCode, busy, error, onCreate, onJoin }: { randomBestOf?: 1 | 3 | 5; rank?: AtlasRankRow; mode: AtlasMultiplayerMode; setMode: (mode: AtlasMultiplayerMode) => void; fixed: boolean; settings: SoloSettings; setSettings: (settings: SoloSettings) => void; code: string; setCode: (code: string) => void; busy: boolean; error: string; onCreate: () => void; onJoin: (event: FormEvent) => void }) {
+  const def = modeForOnline(mode) ?? ARENA_MODES[0], Icon = MODE_ICONS[def.id];
   return <main className="atlas-page atlas-lobby"><Link className="atlas-back" to="/games/atlas-arena"><ArrowLeft size={18} /> Atlas Arena</Link><section className="atlas-mode-section">
     {fixed
-      ? <header className={`atlas-lobby-mode trial-accent-${def.accent}`}><span className="trials-mode-icon"><Icon aria-hidden /></span><div><span className="atlas-eyebrow">Multiplayer · {limit === 2 ? "2 players" : `2–${limit} players`}</span><h1 className="atlas-lobby-title">{randomBestOf ? `Random modes · ${seriesLabel(randomBestOf)}` : def.title}</h1><p>{randomBestOf ? `${randomBestOf} different modes in a random order${randomBestOf === 1 ? `: ${def.title}` : `, starting with ${def.title}`}. First to ${Math.floor(randomBestOf / 2) + 1} game wins; draws use a game without awarding a win.` : def.rules.multiplayer}</p></div></header>
+      ? <header className={`atlas-lobby-mode trial-accent-${def.accent}`}><span className="trials-mode-icon"><Icon aria-hidden /></span><div><span className="atlas-eyebrow">Multiplayer · 2–{ATLAS_MAX_PLAYERS} players</span><h1 className="atlas-lobby-title">{randomBestOf ? `Random modes · ${seriesLabel(randomBestOf)}` : def.title}</h1><p>{randomBestOf ? `${randomBestOf === 1 ? "One mode" : `${randomBestOf} different modes`} in a random order${randomBestOf === 1 ? `: ${def.title}` : `, starting with ${def.title}`}. First to ${Math.floor(randomBestOf / 2) + 1} game wins; draws use a game without awarding a win.` : def.rules.multiplayer}</p></div></header>
       : <><span className="atlas-eyebrow">Realtime · 2–4 players</span><h1 className="atlas-lobby-title">Choose an arena</h1>
         <div className="atlas-multiplayer-grid">{ONLINE_ARENA_MODES.map((item) => { const ItemIcon = MODE_ICONS[item.id]; return <button type="button" className={`atlas-duel-card ${mode === item.online ? "active" : ""}`} key={item.id} onClick={() => setMode(item.online)}><ItemIcon /><strong>{item.title}</strong><small>{item.tagline}</small></button>; })}</div></>}
     <AtlasRankBadge rating={rank?.rating ?? 1500} deviation={rank?.deviation??350} matchesPlayed={rank?.matches_played??0} position={rank?.leaderboard_rank} /><div className="atlas-lobby-actions"><section><h2>Create room</h2>
       <SoloSettingsForm mode={def} settings={settings} onChange={setSettings} />
       <label className="atlas-label">Players</label>
-      {limit > 2 ? <div className="atlas-player-count" role="radiogroup" aria-label="Number of players">{[2, 3, 4].map((count) => <button type="button" role="radio" aria-checked={Math.min(playerCount, limit) === count} key={count} className={Math.min(playerCount, limit) === count ? "active" : ""} onClick={() => setPlayerCount(count)}>{count}</button>)}</div>
-        : <p className="atlas-setup-note">A two-player {mode === "stat_battle" ? "duel" : "battle"}.</p>}
+      <p className="atlas-setup-note">2–{ATLAS_MAX_PLAYERS} players. Create the room, then choose 2, 3 or 4 players inside it and invite a friend to every open seat.</p>
       <button type="button" className="atlas-start" disabled={busy || !settingsReady(def, settings)} onClick={onCreate}>Create {randomBestOf ? "random series" : def.title} room</button></section>
       <form onSubmit={onJoin}><h2>Join by code</h2><label>Six-character invite code<input value={code} onChange={(event) => setCode(event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6))} minLength={6} required /></label><button className="atlas-start" disabled={busy}>Join room</button></form></div>
     {error && <p role="alert" className="atlas-multiplayer-error">{error}</p>}</section></main>;
@@ -270,12 +281,18 @@ function RoomPlayer({ rank, player, label, online = false, waiting = false, read
   const state = waiting ? "Waiting for player" : ready ? "Ready" : online ? "Not ready" : "Reconnecting";
   return <article className={`atlas-room-player ${ready ? "is-ready" : "is-not-ready"} ${waiting ? "is-waiting" : ""}`}><span className="atlas-room-player-label">{label}</span><strong>{player?.name || "Open seat"}</strong>{player && <AtlasRankBadge rating={rank?.rating ?? 1500} deviation={rank?.deviation??350} matchesPlayed={rank?.matches_played??0} position={rank?.leaderboard_rank} />}<span className={`atlas-ready-check ${ready ? "is-ready" : "is-not-ready"}`} role="checkbox" aria-checked={ready}><i>{ready ? <Check size={13} /> : null}</i>{state}</span>{canInvite && <InviteFriendButton />}{readyAction && <button type="button" disabled={busy} onClick={onReady}>Mark ready</button>}</article>;
 }
-function RankedSeries({ room }: { room: Snapshot }) {
+/** The host's 2 / 3 / 4 switch: how many seats the room has. Seats already taken cannot be removed. */
+function SeatPicker({ seats, taken, editable, onChange }: { seats: number; taken: number; editable: boolean; onChange: (count: number) => void }) {
+  return <div className="atlas-seat-picker"><span>Players</span><div className="atlas-player-count" role="radiogroup" aria-label="Number of players">
+    {[2, 3, 4].map((count) => <button type="button" role="radio" aria-checked={seats === count} key={count} className={seats === count ? "active" : ""} disabled={!editable || count < taken} title={!editable ? "The host sets the number of players" : count < taken ? `${taken} players are already here` : `${count} players`} onClick={() => { if (count !== seats) onChange(count); }}>{count}</button>)}
+  </div></div>;
+}
+function RankedSeries({ room, aside }: { room: Snapshot; aside?: ReactNode }) {
   const series = room.series;
   if (!series) return null;
   return <section className="atlas-series" aria-label={room.ranked ? "Ranked match series" : "Random mode series"}>
     <p className="atlas-series-score" aria-label="Series score">{room.players.map(player => series.wins[player.id] ?? 0).join(" – ")} · {seriesLabel(series.order.length)}</p>
-    <div className="atlas-series-players">{room.players.map((player) => <div key={player.id}><strong>{player.name}</strong><span>{series.wins[player.id] ?? 0} game wins</span>{room.ranked && <small>Banned: {(series.bans[player.id] ?? []).map((mode) => titleOf(mode as AtlasMultiplayerMode)).join(", ") || "None"}</small>}</div>)}</div>
+    <div className="atlas-series-head"><div className="atlas-series-players">{room.players.map((player) => <div key={player.id}><strong>{player.name}</strong><span>{series.wins[player.id] ?? 0} game wins</span>{room.ranked && <small>Banned: {(series.bans[player.id] ?? []).map((mode) => titleOf(mode as AtlasMultiplayerMode)).join(", ") || "None"}</small>}</div>)}</div>{aside}</div>
     <ol className="atlas-series-order">{series.order.map((mode, index) => { const def = modeForOnline(mode), Icon = def ? MODE_ICONS[def.id] : Shield, result = series.results[index]; return <li key={mode} className={index === series.gameIndex && !result && room.status !== "finished" ? "is-current" : ""}><Icon aria-hidden /><span><small>Game {index + 1}</small><strong>{titleOf(mode)}</strong>{result && <small>{room.players.map(player => `${player.name}: ${(result.scores[player.id] ?? 0).toLocaleString()}`).join(" · ")}</small>}</span><em>{result ? result.winnerId ? `${room.players.find((player) => player.id === result.winnerId)?.name ?? "Player"} won` : "Draw" : room.status === "finished" ? "Not needed" : index === series.gameIndex ? "Up next" : "Pending"}</em></li>; })}</ol>
     <p>{seriesLabel(series.order.length)}: first to {Math.floor(series.order.length / 2) + 1} game wins, or most wins when all games are played. {room.ranked ? "Ties use up to two sets of three knowledge challenges. If still level, the game is drawn." : "Tied games are drawn."}</p>
   </section>;
@@ -307,11 +324,12 @@ function RoundResult({ room, userId, countryName, playerName }: { room: Snapshot
   return <div className={`atlas-feedback ${won || (correct && mine?.distanceKm === undefined) ? "is-correct" : "is-wrong"}`}>{won ? <Crown /> : <MapPin />}<div><strong>{headline}</strong><span>{detail}</span></div></div>;
 }
 /** The point addition after a solved (or abandoned) country: who solved it on which tip, and what they earned. */
-function GuessResult({ room, userId, countryName, playerName }: { room: Snapshot; userId: string; countryName: string; playerName: (id: string) => string }) {
+function GuessResult({ room, userId, countryName, playerName, nextIn }: { room: Snapshot; userId: string; countryName: string; playerName: (id: string) => string; nextIn: number | null }) {
   const awards = room.roundResult?.awards ?? [], mine = awards.find((award) => award.userId === userId), tip = (room.roundResult?.tip ?? 0) + 1;
   return <div className={`atlas-guess-result ${mine ? "is-correct" : "is-wrong"}`}><strong>{awards.length ? `${countryName} — solved on tip ${tip}` : `Nobody got it: ${countryName}`}</strong>
     {awards.length > 0 && <ul>{awards.map((award) => <li key={award.userId}><span>{award.first && <Crown size={14} />}{playerName(award.userId)}</span><span>{award.base}{award.bonus ? ` + ${award.bonus} bonus` : ""}</span><b>+{award.total}</b></li>)}</ul>}
-    {!mine && awards.length > 0 && <small>You didn’t solve this tip — no points this time.</small>}</div>;
+    {!mine && awards.length > 0 && <small>You didn’t solve this tip — no points this time.</small>}
+    {nextIn !== null && <small className="atlas-guess-next" role="timer">{room.roundIndex + 1 >= room.rounds ? "Final standings" : "Next country"} in {Math.ceil(nextIn)}s — all tips are shown above.</small>}</div>;
 }
 
 /**
@@ -369,6 +387,27 @@ function DuelRoom({ room, data, busy, remaining, error, onPlay, onReroll }: { ro
       hint={view.picked ? `Card down — waiting for ${them?.name ?? "your opponent"}…` : `${Math.ceil(remaining)}s to play a card, or your first card is played for you`} />
     {error && <p role="alert" className="atlas-multiplayer-error">{error}</p>}
   </TrialShell>;
+}
+
+/** Stat Battle online for three or four: your hand at the bottom, everyone's card face down until all are played. */
+function TableRoom({ room, data, busy, remaining, error, onPlay, onReroll }: { room: Snapshot; data: AtlasDataset; busy: boolean; remaining: number; error: string; onPlay: (card: string) => void; onReroll: () => void }) {
+  const navigate = useNavigate();
+  const pools = useTrialPools(data, "expert");
+  const view = room.table;
+  if (!pools || !view) return <main className="atlas-page atlas-center"><AtlasFitContent><Radio /><h1>Dealing cards…</h1></AtlasFitContent></main>;
+  const names = room.players.map((player, seat) => seat === room.seat ? "You" : player.name);
+  const waiting = view.pickedSeats.filter((picked) => !picked).length;
+  return <TrialShell title="Stat Battle · Online" accent="amber" roundLabel={`Round ${view.round} · first to ${STAT_BATTLE.winTarget}`} progress={Math.max(...view.scores) / STAT_BATTLE.winTarget * 100} onExit={() => navigate("/games/atlas-arena")} wide>
+    <TableScoreline names={names} scores={view.scores} />
+    <TableBoard byId={pools.byId} view={view} names={names} canPlay={room.status === "round_active" && !view.picked && !busy} onPlay={onPlay} onReroll={onReroll}
+      hint={view.picked ? `Card down — waiting for ${waiting} more player${waiting === 1 ? "" : "s"}…` : `${Math.ceil(remaining)}s to play a card, or your first card is played for you`} />
+    {error && <p role="alert" className="atlas-multiplayer-error">{error}</p>}
+  </TrialShell>;
+}
+function TableHistoryBlock({ room, data }: { room: Snapshot; data: AtlasDataset }) {
+  const pools = useTrialPools(data, "expert");
+  if (!pools || !room.table?.history.length) return null;
+  return <TableHistory history={room.table.history} byId={pools.byId} names={room.players.map((player, seat) => seat === room.seat ? "You" : player.name)} />;
 }
 
 function DuelHistoryBlock({ room, data }: { room: Snapshot; data: AtlasDataset }) {

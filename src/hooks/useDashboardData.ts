@@ -14,7 +14,7 @@ export type DashboardActivity = {
 };
 export type DashboardNotification = {
   id: string;
-  kind: "message" | "friend_request" | "clan_message" | "clan_invite" | "spectate_request" | "spectate_accepted";
+  kind: "message" | "friend_request" | "clan_message" | "clan_invite" | "clan_join_invite" | "spectate_request" | "spectate_accepted";
   title: string;
   detail: string;
   createdAt: string;
@@ -28,6 +28,8 @@ export type DashboardNotification = {
   clanName?: string;
   /** Free-text clan chat body. */
   body?: string;
+  /** Open invitation to join `clanId`. */
+  clanInviteId?: string;
   spectateRequestId?: string;
   spectateGame?: string | null;
   spectateMode?: string | null;
@@ -62,6 +64,13 @@ async function loadClanRows(userId: string): Promise<ClanRows> {
     messages: (messages.error ? [] : messages.data ?? []) as ClanRows["messages"],
     invites: (invites.error ? [] : invites.data ?? []) as ClanRows["invites"],
   };
+}
+
+export type ClanJoinInvite = { id: string; group_id: string; group_name: string; group_avatar_id: string; member_count: number; sender_id: string; sender_name: string; sender_avatar_id: string | null; created_at: string };
+/** Open invitations to join a clan. Reads as empty before the clan invitation migration. */
+export async function loadClanJoinInvites(): Promise<ClanJoinInvite[]> {
+  const { data, error } = await supabase.rpc("get_clan_invites");
+  return error ? [] : (data ?? []) as ClanJoinInvite[];
 }
 
 async function loadSpectateRows(userId: string): Promise<SpectateRow[]> {
@@ -119,7 +128,7 @@ export function useDashboardDataSource() {
       if (running) return;
       running = true;
       try {
-        const [activityResult, questResult, friendships, messages, requests, clanRows, spectateRows] = await Promise.all([
+        const [activityResult, questResult, friendships, messages, requests, clanRows, spectateRows, clanJoinInvites] = await Promise.all([
           supabase.rpc("get_dashboard_activity"),
           supabase.rpc("get_daily_quests"),
           supabase
@@ -130,6 +139,7 @@ export function useDashboardDataSource() {
           supabase.from("friend_requests").select("id,sender_id,created_at").eq("receiver_id", userId).eq("status", "pending").order("created_at", { ascending: false }).limit(12),
           loadClanRows(userId!).catch((): ClanRows => ({ clans: [], messages: [], invites: [] })),
           loadSpectateRows(userId!).catch((): SpectateRow[] => []),
+          loadClanJoinInvites().catch((): ClanJoinInvite[] => []),
         ]);
         const activity = activityResult.error ? null : activityResult.data as DashboardActivity;
         if (activity && !questResult.error && Array.isArray(questResult.data)) activity.quests = questResult.data as DailyChallenge[];
@@ -184,6 +194,12 @@ export function useDashboardDataSource() {
             gameRoute: clanInviteRoute(row.game, row.game_route),
             senderId: row.sender_id, senderName: nameOf(row.sender_id),
             clanId: row.group_id, clanName: clanById.get(row.group_id)?.name,
+          })),
+          ...clanJoinInvites.map((row) => ({
+            id: `clan-join-${row.id}`, kind: "clan_join_invite" as const, title: "Clan invitation",
+            detail: `${row.sender_name} invited you to join ${row.group_name}`, createdAt: row.created_at,
+            senderId: row.sender_id, senderName: row.sender_name,
+            clanId: row.group_id, clanName: row.group_name, clanInviteId: row.id,
           })),
           ...spectateRows.map((row) => {
             const incoming = row.target_id === userId;
@@ -275,12 +291,18 @@ export function useDashboardDataSource() {
       .on("postgres_changes", { event: "*", schema: "public", table: "community_game_invites" }, onFocus)
       .on("postgres_changes", { event: "*", schema: "public", table: "spectate_requests" }, onFocus)
       .subscribe();
+    // Its own channel for the same reason: the table arrives with the clan invitation migration.
+    const clanInviteChannel = supabase
+      .channel(`dashboard-clan-invites-${userId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "community_group_invites" }, onFocus)
+      .subscribe();
     return () => {
       disposed = true;
       window.clearInterval(interval);
       window.removeEventListener("focus", onFocus);
       void supabase.removeChannel(channel);
       void supabase.removeChannel(socialChannel);
+      void supabase.removeChannel(clanInviteChannel);
     };
   }, [userId]);
 

@@ -163,7 +163,7 @@ export type Stage = "menu" | "briefing" | "game" | "quiz" | "results";
 export type PlayMode = "hotseat" | "ai";
 export type BotDifficulty = "easy" | "normal" | "hard";
 export type RunPerformance = { completed: boolean; progress: number; health: number; elapsed: number; label: string };
-export type GameResult = { winner: Player | null; detail: string; performance?: RunPerformance; opponent?:'ocean'|'rival' };
+export type GameResult = { winner: Player | null; detail: string; performance?: RunPerformance; opponent?:'ocean'|'rival'; review?: { facts: string[]; tip: string }; context?: { level:number; difficulty:BotDifficulty; challenge?:string; variant?:string; role?:string } };
 export type Scenario = {
   id: ScenarioId;
   icon: string;
