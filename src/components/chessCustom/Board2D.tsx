@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { memo, type DragEvent, type MouseEvent, type PointerEvent, type ReactNode } from "react";
 import { isLightSquare, squareName } from "@/games/chess/custom/engine/board";
 import type { BoardCell, BoardDefinition, Coord, GameVariant } from "@/games/chess/custom/engine/types";
@@ -74,6 +75,7 @@ function Board2D({
   onPieceDragStart,
   cellBadge,
 }: Props) {
+  useGameLanguage();
   const byCell = new Map(pieces.map((piece) => [coordKey(piece), piece]));
   const rows = Array.from({ length: board.height }, (_, index) => (flipped ? index : board.height - 1 - index));
   const columns = Array.from({ length: board.width }, (_, index) => (flipped ? board.width - 1 - index : index));
@@ -81,7 +83,7 @@ function Board2D({
   return (
     <div
       role="grid"
-      aria-label={label}
+      aria-label={gameUi(label)}
       className="grid w-full select-none overflow-hidden rounded-xl p-[1.5%] shadow-[0_24px_60px_rgba(0,0,0,.45)]"
       style={{ gridTemplateColumns: `repeat(${board.width}, minmax(0, 1fr))`, background: theme.frame, boxShadow: `inset 0 0 0 1px ${theme.trim}55, 0 24px 60px rgba(0,0,0,.45)` }}
     >
@@ -99,7 +101,7 @@ function Board2D({
           const showRank = showCoords && x === columns[0];
 
           if (!cell.enabled && !showDisabled) {
-            return <div key={key} role="gridcell" aria-label={`${name}: not part of the board`} className="aspect-square" />;
+            return <div key={key} role="gridcell" aria-label={gameUi(`${name}: not part of the board`)} className="aspect-square" />;
           }
 
           return (
@@ -107,7 +109,7 @@ function Board2D({
               key={key}
               type="button"
               role="gridcell"
-              aria-label={`${name}${cell.enabled ? "" : " (disabled)"}${cell.tile !== "normal" ? `, ${tile.label} tile` : ""}${def ? `, ${team?.name ?? ""} ${def.name}` : ""}`}
+              aria-label={gameUi(`${name}${cell.enabled ? "" : " (disabled)"}${cell.tile !== "normal" ? `, ${tile.label} tile` : ""}${def ? `, ${team?.name ?? ""} ${def.name}` : ""}`)}
               onClick={(event) => onCellClick?.(cell, event)}
               onContextMenu={(event) => {
                 if (!onCellContextMenu) return;
@@ -131,7 +133,7 @@ function Board2D({
               }`}
               style={{ background: isLightSquare(cell) ? theme.light : theme.dark }}
             >
-              {cell.enabled && cell.tile !== "normal" && (
+              {gameUi(cell.enabled && cell.tile !== "normal" && (
                 <span
                   className="pointer-events-none absolute inset-0 flex items-start justify-end p-[6%] text-[min(1.6vw,11px)] font-bold leading-none"
                   style={{
@@ -141,15 +143,15 @@ function Board2D({
                     textShadow: "0 1px 2px rgba(0,0,0,.7)",
                   }}
                 >
-                  {cell.tile === "oneWay" && cell.direction ? (
-                    <span style={{ transform: `rotate(${Math.atan2(-cell.direction.y, cell.direction.x)}rad)` }}>{tile.glyph}</span>
+                  {gameUi(cell.tile === "oneWay" && cell.direction ? (
+                    <span style={{ transform: `rotate(${Math.atan2(-cell.direction.y, cell.direction.x)}rad)` }}>{gameUi(tile.glyph)}</span>
                   ) : (
                     tile.glyph
-                  )}
+                  ))}
                 </span>
-              )}
-              {cellBadge?.(cell)}
-              {piece && (
+              ))}
+              {gameUi(cellBadge?.(cell))}
+              {gameUi(piece && (
                 <span
                   draggable={Boolean(onPieceDragStart)}
                   onDragStart={onPieceDragStart ? (event) => onPieceDragStart(piece, event) : undefined}
@@ -157,10 +159,10 @@ function Board2D({
                 >
                   <PieceToken def={def} team={team} />
                 </span>
-              )}
+              ))}
               {highlight && <Marker kind={highlight} />}
-              {showFile && <span className="pointer-events-none absolute bottom-[3%] right-[6%] text-[min(1.4vw,9px)] font-bold opacity-60" style={{ color: isLightSquare(cell) ? theme.dark : theme.light }}>{name[0]}</span>}
-              {showRank && <span className="pointer-events-none absolute left-[5%] top-[3%] text-[min(1.4vw,9px)] font-bold opacity-60" style={{ color: isLightSquare(cell) ? theme.dark : theme.light }}>{y + 1}</span>}
+              {showFile && <span className="pointer-events-none absolute bottom-[3%] right-[6%] text-[min(1.4vw,9px)] font-bold opacity-60" style={{ color: isLightSquare(cell) ? theme.dark : theme.light }}>{gameUi(name[0])}</span>}
+              {showRank && <span className="pointer-events-none absolute left-[5%] top-[3%] text-[min(1.4vw,9px)] font-bold opacity-60" style={{ color: isLightSquare(cell) ? theme.dark : theme.light }}>{gameUi(y + 1)}</span>}
             </button>
           );
         }),

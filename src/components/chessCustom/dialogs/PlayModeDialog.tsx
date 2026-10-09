@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { PLAY_MODES, type PlayMode } from "@/games/chess/custom/library/navigation";
 import { ui } from "@/i18n/ui";
 import { NextIcon } from "../icons/ChessCustomIcons";
@@ -6,8 +7,9 @@ import Dialog from "./Dialog";
 
 /** Play a variant: Singleplayer (vs AI), Multiplayer (online) or Hotseat (same device). */
 export default function PlayModeDialog({ open, variantName, onChoose, onClose, playerCount = 2, disabledModes = {} }: { playerCount?: number; disabledModes?: Partial<Record<PlayMode, string>>; open: boolean; variantName: string; onChoose: (mode: PlayMode) => void; onClose: () => void }) {
+  useGameLanguage();
   return (
-    <Dialog open={open} onClose={onClose} eyebrow={ui("Play variant")} title={variantName} description={ui("Choose how you want to play.")}>
+    <Dialog open={open} onClose={onClose} eyebrow={ui("Play variant")} title={gameUi(variantName)} description={ui("Choose how you want to play.")}>
       <ul className="grid gap-2.5" aria-label={ui("Game modes")}>
         {PLAY_MODES.map((mode) => {
           const Icon = PLAY_MODE_ICONS[mode.id];
@@ -18,7 +20,7 @@ export default function PlayModeDialog({ open, variantName, onChoose, onClose, p
               <button
                 type="button"
                 disabled={Boolean(disabledReason)}
-                title={disabledReason}
+                title={gameUi(disabledReason)}
                 data-play-mode={mode.id}
                 onClick={() => onChoose(mode.id)}
                 className="disabled:cursor-not-allowed disabled:opacity-40 group flex w-full items-center gap-4 rounded-2xl border border-white/[0.08] bg-gradient-to-r from-white/[0.04] to-transparent p-3.5 text-left transition hover:border-amber-300/40 hover:from-amber-300/[0.08] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300"
@@ -28,7 +30,7 @@ export default function PlayModeDialog({ open, variantName, onChoose, onClose, p
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block font-serif text-lg text-white">{ui(mode.label)}</span>
-                  <span className="block text-sm text-zinc-400">{disabledReason ?? detail}</span>
+                  <span className="block text-sm text-zinc-400">{gameUi(disabledReason ?? detail)}</span>
                 </span>
                 <NextIcon size={18} className="shrink-0 text-zinc-600 transition group-hover:translate-x-0.5 group-hover:text-amber-300" />
               </button>

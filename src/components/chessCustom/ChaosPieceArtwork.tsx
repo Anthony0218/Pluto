@@ -1,5 +1,7 @@
+import { useGameLanguage } from "../../i18n/gameUi.ts";
 /** Pluto's fairy pieces: an astral wizard, a crescent dragon and a comet bomb. */
 export function ChaosPieceArtwork({ icon, color, outline }: { icon: string; color: string; outline: string }) {
+  useGameLanguage();
   return <g fill={color} stroke={outline} strokeWidth="2.8" strokeLinejoin="round" strokeLinecap="round">
     {icon === "🧙" && <>
       <path d="M23 78h54l-5 9H28zM34 75l5-24h22l5 24z" />

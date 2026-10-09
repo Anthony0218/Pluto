@@ -1,3 +1,4 @@
+import { useGameLanguage } from "../../i18n/gameUi.ts";
 import { Link } from "react-router-dom";
 import { chessCustomPath, routeArea, type ChessCustomRoute, type TopLevelArea } from "@/games/chess/custom/library/navigation";
 import { ui } from "@/i18n/ui";
@@ -13,6 +14,7 @@ const AREAS: { id: TopLevelArea; label: string; to: ChessCustomRoute }[] = [
 
 /** The Chess Custom areas. Editor steps live inside Create, never up here. */
 export default function ChessCustomNav({ route, onShowGuide }: { route: ChessCustomRoute; onShowGuide: () => void }) {
+  useGameLanguage();
   const active = routeArea(route);
   return (
     <div className="relative z-30 -mx-4 border-b border-white/[0.06] bg-[#07090b]/90 px-4 backdrop-blur-xl sm:-mx-6 sm:px-6">

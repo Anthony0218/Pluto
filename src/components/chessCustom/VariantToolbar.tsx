@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { useEffect, useRef, useState } from "react";
 import { issueCounts } from "@/games/chess/custom/engine/validation";
 import { useEditor } from "@/games/chess/custom/editor/editorContext";
@@ -41,6 +42,7 @@ function SaveAsPopover({ onClose }: { onClose: () => void }) {
 
 /** Persistent Create bar: name, save state, undo/redo, Save, Save As and Play. */
 export default function VariantToolbar() {
+  useGameLanguage();
   const { variant, dispatch, canUndo, canRedo, dirty, inLibrary, save, issues, toast, playSaved } = useEditor();
   const [saveAsOpen, setSaveAsOpen] = useState(false);
   const [playOpen, setPlayOpen] = useState(false);
@@ -66,19 +68,19 @@ export default function VariantToolbar() {
               className="w-full min-w-0 max-w-[420px] truncate rounded-lg border border-transparent bg-transparent px-2 py-1 font-serif text-lg text-white outline-none transition hover:border-white/10 focus:border-amber-300/40 focus:bg-black/30"
             />
             <p className="flex items-center gap-1.5 px-2 text-[11px] text-zinc-500" aria-live="polite">
-              {toast ? (
-                <span className={toast.tone === "error" ? "text-red-300" : toast.tone === "info" ? "text-sky-300" : "text-emerald-300"}>{toast.text}</span>
+              {gameUi(toast ? (
+                <span className={toast.tone === "error" ? "text-red-300" : toast.tone === "info" ? "text-sky-300" : "text-emerald-300"}>{gameUi(toast.text)}</span>
               ) : (
                 <>
                   <span className={`inline-flex items-center gap-1 font-semibold ${dirty ? "text-amber-200" : inLibrary ? "text-emerald-300" : "text-zinc-400"}`}>
-                    {dirty ? <span className="h-1.5 w-1.5 rounded-full bg-amber-300" aria-hidden="true" /> : inLibrary ? <CheckIcon size={12} /> : null}
-                    {status}
+                    {gameUi(dirty ? <span className="h-1.5 w-1.5 rounded-full bg-amber-300" aria-hidden="true" /> : inLibrary ? <CheckIcon size={12} /> : null)}
+                    {gameUi(status)}
                   </span>
-                  {inLibrary && <span>· v{variant.version}</span>}
-                  {counts.error > 0 && <span className="text-red-300"> · {counts.error} {ui("errors")}</span>}
-                  {counts.error === 0 && counts.warning > 0 && <span className="text-amber-300"> · {counts.warning} {ui("warnings")}</span>}
+                  {inLibrary && <span>· v{gameUi(variant.version)}</span>}
+                  {counts.error > 0 && <span className="text-red-300"> · {gameUi(counts.error)} {ui("errors")}</span>}
+                  {counts.error === 0 && counts.warning > 0 && <span className="text-amber-300"> · {gameUi(counts.warning)} {ui("warnings")}</span>}
                 </>
-              )}
+              ))}
             </p>
           </div>
         </div>

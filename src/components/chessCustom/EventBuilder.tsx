@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { ChevronDown, ChevronRight, Copy, Plus, Trash2, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { squareName } from "@/games/chess/custom/engine/board";
@@ -72,13 +73,15 @@ const coordFromId = (id: string): Coord => {
 };
 
 function Row({ children }: { children: ReactNode }) {
-  return <div className="flex flex-wrap items-center gap-2">{children}</div>;
+  useGameLanguage();
+  return <div className="flex flex-wrap items-center gap-2">{gameUi(children)}</div>;
 }
 
 function SquareSelect({ value, onChange, options }: { value?: Coord; onChange: (coord: Coord) => void; options: { id: string; label: string }[] }) {
+  useGameLanguage();
   return (
     <Select
-      label="Square"
+      label={gameUi("Square")}
       className="w-24"
       value={value ? `${value.x},${value.y}` : ""}
       onChange={(id) => onChange(coordFromId(id))}
@@ -88,15 +91,17 @@ function SquareSelect({ value, onChange, options }: { value?: Coord; onChange: (
 }
 
 function Stage({ label, tone, children }: { label: string; tone: string; children: ReactNode }) {
+  useGameLanguage();
   return (
     <div className="grid gap-2 sm:grid-cols-[76px_minmax(0,1fr)]">
       <span className={`self-start rounded-md px-2 py-1 text-center text-[10px] font-black tracking-[0.18em] ${tone}`}>{ui(label)}</span>
-      <div className="min-w-0 space-y-2">{children}</div>
+      <div className="min-w-0 space-y-2">{gameUi(children)}</div>
     </div>
   );
 }
 
 function ActionEditor({ action, onChange, onRemove, variant }: { action: EventAction; onChange: (action: EventAction) => void; onRemove: () => void; variant: GameVariant }) {
+  useGameLanguage();
   const options = useOptions(variant);
   const set = (patch: Partial<EventAction>) => onChange({ ...action, ...patch });
   const target = action.target ?? "contextPiece";
@@ -104,75 +109,75 @@ function ActionEditor({ action, onChange, onRemove, variant }: { action: EventAc
   return (
     <div className="rounded-xl border border-white/[0.08] bg-black/25 p-2.5">
       <Row>
-        <Select label="Action" className="w-auto min-w-[190px] flex-1 sm:flex-none" value={action.type} onChange={(type) => onChange({ id: action.id, type })} options={EVENT_ACTIONS.map((id) => ({ id, label: ACTION_LABELS[id] }))} />
-        {action.type === "spawnPiece" && (
-          <Select label="Piece type" className="w-auto" value={action.pieceType ?? ""} onChange={(pieceType) => set({ pieceType: pieceType || undefined })} options={[{ id: "", label: "Same type as the captured piece" }, ...options.pieces]} />
-        )}
-        {PIECE_TARGET_ACTIONS.has(action.type) && (
+        <Select label={gameUi("Action")} className="w-auto min-w-[190px] flex-1 sm:flex-none" value={action.type} onChange={(type) => onChange({ id: action.id, type })} options={EVENT_ACTIONS.map((id) => ({ id, label: ACTION_LABELS[id] }))} />
+        {gameUi(action.type === "spawnPiece" && (
+          <Select label={gameUi("Piece type")} className="w-auto" value={action.pieceType ?? ""} onChange={(pieceType) => set({ pieceType: pieceType || undefined })} options={[{ id: "", label: "Same type as the captured piece" }, ...options.pieces]} />
+        ))}
+        {gameUi(PIECE_TARGET_ACTIONS.has(action.type) && (
           <>
-            <Select label="Which piece" className="w-auto" value={target} onChange={(value) => set({ target: value })} options={PIECE_SELECTORS} />
-            {target === "firstOfType" && <Select label="Piece type" className="w-auto" value={action.pieceType ?? ""} onChange={(pieceType) => set({ pieceType })} options={[{ id: "", label: "Type…" }, ...options.pieces]} />}
-            {(target === "firstOfType" || target === "highestValue") && action.type !== "changeTeam" && (
-              <Select label="Of team" className="w-auto" value={action.team ?? "actor"} onChange={(team) => set({ team })} options={options.contextTeams} />
-            )}
+            <Select label={gameUi("Which piece")} className="w-auto" value={target} onChange={(value) => set({ target: value })} options={PIECE_SELECTORS} />
+            {target === "firstOfType" && <Select label={gameUi("Piece type")} className="w-auto" value={action.pieceType ?? ""} onChange={(pieceType) => set({ pieceType })} options={[{ id: "", label: "Type…" }, ...options.pieces]} />}
+            {gameUi((target === "firstOfType" || target === "highestValue") && action.type !== "changeTeam" && (
+              <Select label={gameUi("Of team")} className="w-auto" value={action.team ?? "actor"} onChange={(team) => set({ team })} options={options.contextTeams} />
+            ))}
             {target === "atSquare" && <SquareSelect value={action.square} onChange={(square) => set({ square })} options={options.squares} />}
           </>
-        )}
-        {action.type === "transformPiece" && (
+        ))}
+        {gameUi(action.type === "transformPiece" && (
           <>
             <span className="text-xs text-zinc-500">{ui("into")}</span>
-            <Select label="Into" className="w-auto" value={action.toPieceType ?? ""} onChange={(toPieceType) => set({ toPieceType })} options={[{ id: "", label: "Type…" }, ...options.pieces]} />
+            <Select label={gameUi("Into")} className="w-auto" value={action.toPieceType ?? ""} onChange={(toPieceType) => set({ toPieceType })} options={[{ id: "", label: "Type…" }, ...options.pieces]} />
           </>
-        )}
-        {action.type === "changePieceRule" && (
+        ))}
+        {gameUi(action.type === "changePieceRule" && (
           <>
-            <Select label="Piece" className="w-auto" value={action.pieceType ?? ""} onChange={(pieceType) => set({ pieceType })} options={[{ id: "", label: "Piece…" }, ...options.pieces]} />
+            <Select label={gameUi("Piece")} className="w-auto" value={action.pieceType ?? ""} onChange={(pieceType) => set({ pieceType })} options={[{ id: "", label: "Piece…" }, ...options.pieces]} />
             <span className="text-xs text-zinc-500">{ui("now moves like")}</span>
-            <Select label="Moves like" className="w-auto" value={action.toPieceType ?? ""} onChange={(toPieceType) => set({ toPieceType })} options={[{ id: "", label: "Piece…" }, ...options.pieces]} />
+            <Select label={gameUi("Moves like")} className="w-auto" value={action.toPieceType ?? ""} onChange={(toPieceType) => set({ toPieceType })} options={[{ id: "", label: "Piece…" }, ...options.pieces]} />
           </>
-        )}
-        {TEAM_ACTIONS.has(action.type) && (
+        ))}
+        {gameUi(TEAM_ACTIONS.has(action.type) && (
           <Select
-            label="Team"
+            label={gameUi("Team")}
             className="w-auto"
             value={action.team ?? (action.type === "skipTurn" || action.type === "changeTeam" ? "opponentOfActor" : action.type === "spawnPiece" || action.type === "declareLoser" ? "target" : "actor")}
             onChange={(team) => set({ team })}
             options={options.contextTeams}
           />
-        )}
+        ))}
       </Row>
-      {(SQUARE_ACTIONS.has(action.type) || action.type === "changeTile" || action.type === "setRoyalMode" || action.type === "triggerAnimation" || MESSAGE_ACTIONS.has(action.type)) && (
+      {gameUi((SQUARE_ACTIONS.has(action.type) || action.type === "changeTile" || action.type === "setRoyalMode" || action.type === "triggerAnimation" || MESSAGE_ACTIONS.has(action.type)) && (
         <div className="mt-2">
           <Row>
-            {SQUARE_ACTIONS.has(action.type) && (
+            {gameUi(SQUARE_ACTIONS.has(action.type) && (
               <>
                 <span className="text-xs text-zinc-500">{ui("at")}</span>
-                <Select label="Location" className="w-auto" value={at} onChange={(value) => set({ at: value })} options={SQUARE_SELECTORS} />
+                <Select label={gameUi("Location")} className="w-auto" value={at} onChange={(value) => set({ at: value })} options={SQUARE_SELECTORS} />
                 {at === "square" && <SquareSelect value={action.square} onChange={(square) => set({ square })} options={options.squares} />}
               </>
-            )}
-            {action.type === "changeTile" && (
-              <Select label="Tile" className="w-auto" value={action.tile ?? "normal"} onChange={(tile) => set({ tile })} options={TILE_TYPES.map((tile) => ({ id: tile, label: TILE_STYLES[tile].label }))} />
-            )}
-            {action.type === "triggerAnimation" && (
-              <Select label="Animation" className="w-auto" value={action.animation ?? "pulse"} onChange={(animation) => set({ animation })} options={[{ id: "pulse", label: "Pulse" }, { id: "glow", label: "Glow" }, { id: "shake", label: "Shake" }]} />
-            )}
-            {action.type === "setRoyalMode" && (
-              <Select label="King rule" className="w-auto" value={action.royalMode ?? "none"} onChange={(royalMode) => set({ royalMode })} options={[{ id: "checkmate", label: "Standard checkmate" }, { id: "capture", label: "Capturable kings" }, { id: "none", label: "No king requirement" }]} />
-            )}
-            {MESSAGE_ACTIONS.has(action.type) && (
+            ))}
+            {gameUi(action.type === "changeTile" && (
+              <Select label={gameUi("Tile")} className="w-auto" value={action.tile ?? "normal"} onChange={(tile) => set({ tile })} options={TILE_TYPES.map((tile) => ({ id: tile, label: TILE_STYLES[tile].label }))} />
+            ))}
+            {gameUi(action.type === "triggerAnimation" && (
+              <Select label={gameUi("Animation")} className="w-auto" value={action.animation ?? "pulse"} onChange={(animation) => set({ animation })} options={[{ id: "pulse", label: "Pulse" }, { id: "glow", label: "Glow" }, { id: "shake", label: "Shake" }]} />
+            ))}
+            {gameUi(action.type === "setRoyalMode" && (
+              <Select label={gameUi("King rule")} className="w-auto" value={action.royalMode ?? "none"} onChange={(royalMode) => set({ royalMode })} options={[{ id: "checkmate", label: "Standard checkmate" }, { id: "capture", label: "Capturable kings" }, { id: "none", label: "No king requirement" }]} />
+            ))}
+            {gameUi(MESSAGE_ACTIONS.has(action.type) && (
               <input
                 aria-label={ui("Message")}
                 value={action.message ?? ""}
                 maxLength={140}
-                placeholder={action.type === "displayMessage" ? ui("Message to show") : ui("Optional message")}
+                placeholder={gameUi(action.type === "displayMessage" ? ui("Message to show") : ui("Optional message"))}
                 onChange={(event) => set({ message: event.target.value })}
                 className={`${inputClass} min-w-[180px] flex-1 py-1.5`}
               />
-            )}
+            ))}
           </Row>
         </div>
-      )}
+      ))}
       <div className="mt-2 flex justify-end">
         <button type="button" onClick={onRemove} className="inline-flex items-center gap-1 text-[11px] text-zinc-500 hover:text-red-300">
           <X size={12} />
@@ -184,6 +189,7 @@ function ActionEditor({ action, onChange, onRemove, variant }: { action: EventAc
 }
 
 function ConditionEditor({ condition, onChange, onRemove, variant }: { condition: EventCondition; onChange: (condition: EventCondition) => void; onRemove: () => void; variant: GameVariant }) {
+  useGameLanguage();
   const options = useOptions(variant);
   const set = (patch: Partial<EventCondition>) => onChange({ ...condition, ...patch });
   const needsTeam = ["teamHasPiece", "teamLacksPiece", "teamPieceCount", "teamRoyalCount"].includes(condition.type);
@@ -191,17 +197,17 @@ function ConditionEditor({ condition, onChange, onRemove, variant }: { condition
   const needsCompare = ["teamPieceCount", "teamRoyalCount", "turnNumber"].includes(condition.type);
   return (
     <div className="flex flex-wrap items-center gap-2 rounded-xl border border-white/[0.08] bg-black/25 p-2.5">
-      <Select label="Condition" className="w-auto" value={condition.type} onChange={(type) => onChange({ id: condition.id, type, team: "target", op: "eq", value: type === "randomChance" ? 50 : 0 })} options={(Object.keys(CONDITION_LABELS) as ConditionType[]).map((id) => ({ id, label: CONDITION_LABELS[id] }))} />
-      {needsTeam && <Select label="Team" className="w-auto" value={condition.team ?? "target"} onChange={(team) => set({ team })} options={options.contextTeams} />}
-      {needsPiece && <Select label="Piece type" className="w-auto" value={condition.pieceType ?? ""} onChange={(pieceType) => set({ pieceType })} options={[{ id: "", label: "Type…" }, ...options.pieces]} />}
-      {needsCompare && (
+      <Select label={gameUi("Condition")} className="w-auto" value={condition.type} onChange={(type) => onChange({ id: condition.id, type, team: "target", op: "eq", value: type === "randomChance" ? 50 : 0 })} options={(Object.keys(CONDITION_LABELS) as ConditionType[]).map((id) => ({ id, label: CONDITION_LABELS[id] }))} />
+      {needsTeam && <Select label={gameUi("Team")} className="w-auto" value={condition.team ?? "target"} onChange={(team) => set({ team })} options={options.contextTeams} />}
+      {needsPiece && <Select label={gameUi("Piece type")} className="w-auto" value={condition.pieceType ?? ""} onChange={(pieceType) => set({ pieceType })} options={[{ id: "", label: "Type…" }, ...options.pieces]} />}
+      {gameUi(needsCompare && (
         <>
-          <Select label="Comparison" className="w-20" value={condition.op ?? "eq"} onChange={(op) => set({ op })} options={[{ id: "eq", label: "=" }, { id: "gte", label: "≥" }, { id: "lte", label: "≤" }]} />
-          <NumberField label="Value" value={condition.value ?? 0} min={0} max={500} onChange={(value) => set({ value })} />
+          <Select label={gameUi("Comparison")} className="w-20" value={condition.op ?? "eq"} onChange={(op) => set({ op })} options={[{ id: "eq", label: "=" }, { id: "gte", label: "≥" }, { id: "lte", label: "≤" }]} />
+          <NumberField label={gameUi("Value")} value={condition.value ?? 0} min={0} max={500} onChange={(value) => set({ value })} />
         </>
-      )}
+      ))}
       {condition.type === "squareOccupied" && <SquareSelect value={condition.square} onChange={(square) => set({ square })} options={options.squares} />}
-      {condition.type === "randomChance" && <NumberField label="Chance" value={condition.value ?? 50} min={1} max={100} suffix="%" onChange={(value) => set({ value })} />}
+      {condition.type === "randomChance" && <NumberField label={gameUi("Chance")} value={condition.value ?? 50} min={1} max={100} suffix="%" onChange={(value) => set({ value })} />}
       <IconButton label={ui("Remove condition")} onClick={onRemove} className="ml-auto h-8 w-8">
         <X size={13} />
       </IconButton>
@@ -210,9 +216,10 @@ function ConditionEditor({ condition, onChange, onRemove, variant }: { condition
 }
 
 function ActionList({ actions, onChange, variant, emptyLabel }: { actions: EventAction[]; onChange: (actions: EventAction[]) => void; variant: GameVariant; emptyLabel: string }) {
+  useGameLanguage();
   return (
     <>
-      {actions.length === 0 && <p className="text-xs text-zinc-500">{emptyLabel}</p>}
+      {actions.length === 0 && <p className="text-xs text-zinc-500">{gameUi(emptyLabel)}</p>}
       {actions.map((action, index) => (
         <ActionEditor
           key={action.id}
@@ -249,6 +256,7 @@ export function EventCard({
   onDuplicate: () => void;
   highlighted?: boolean;
 }) {
+  useGameLanguage();
   const options = useOptions(variant);
   const trigger = event.trigger;
   const setTrigger = (patch: Partial<GameEvent["trigger"]>) => onChange((current) => ({ ...current, trigger: { ...current.trigger, ...patch } }));
@@ -257,7 +265,7 @@ export function EventCard({
   return (
     <article className={`rounded-2xl border transition ${highlighted ? "border-amber-300/60" : event.enabled ? "border-white/[0.09]" : "border-white/[0.05] opacity-70"} bg-[#0d1014]/90`}>
       <header className="flex flex-wrap items-center gap-2 px-4 py-3">
-        <button type="button" onClick={onToggleExpanded} aria-expanded={expanded} aria-label={expanded ? ui("Collapse") : ui("Expand")} className="text-zinc-500 hover:text-white">
+        <button type="button" onClick={onToggleExpanded} aria-expanded={expanded} aria-label={gameUi(expanded ? ui("Collapse") : ui("Expand"))} className="text-zinc-500 hover:text-white">
           {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
         </button>
         <input
@@ -286,36 +294,36 @@ export function EventCard({
           <span className={`absolute top-0.5 h-3.5 w-3.5 rounded-full bg-white transition-all ${event.enabled ? "left-[18px]" : "left-0.5"}`} />
         </button>
       </header>
-      {!expanded ? (
-        <p className="truncate px-4 pb-3 pl-11 text-xs text-zinc-500">{summary}</p>
+      {gameUi(!expanded ? (
+        <p className="truncate px-4 pb-3 pl-11 text-xs text-zinc-500">{gameUi(summary)}</p>
       ) : (
         <div className="space-y-4 border-t border-white/[0.06] px-4 py-4">
-          <Stage label="WHEN" tone="bg-sky-400/15 text-sky-200">
+          <Stage label={gameUi("WHEN")} tone="bg-sky-400/15 text-sky-200">
             <Row>
-              <Select label="Trigger" className="w-auto" value={trigger.type} onChange={(type) => setTrigger({ type })} options={EVENT_TRIGGERS.map((id) => ({ id, label: TRIGGER_LABELS[id] }))} />
-              {TRIGGER_TEAM.has(trigger.type) && (
+              <Select label={gameUi("Trigger")} className="w-auto" value={trigger.type} onChange={(type) => setTrigger({ type })} options={EVENT_TRIGGERS.map((id) => ({ id, label: TRIGGER_LABELS[id] }))} />
+              {gameUi(TRIGGER_TEAM.has(trigger.type) && (
                 <Select
-                  label="Team filter"
+                  label={gameUi("Team filter")}
                   className="w-auto"
                   value={trigger.team ?? (trigger.type === "teamPieceCountEquals" ? variant.teams[0].id : "any")}
                   onChange={(team) => setTrigger({ team })}
                   options={trigger.type === "teamPieceCountEquals" ? options.teams : [{ id: "any", label: "Any team" }, ...options.teams]}
                 />
-              )}
-              {TRIGGER_PIECE.has(trigger.type) && (
-                <Select label="Piece filter" className="w-auto" value={trigger.pieceType ?? ""} onChange={(pieceType) => setTrigger({ pieceType: pieceType || undefined })} options={[{ id: "", label: "Any piece" }, ...options.pieces]} />
-              )}
+              ))}
+              {gameUi(TRIGGER_PIECE.has(trigger.type) && (
+                <Select label={gameUi("Piece filter")} className="w-auto" value={trigger.pieceType ?? ""} onChange={(pieceType) => setTrigger({ pieceType: pieceType || undefined })} options={[{ id: "", label: "Any piece" }, ...options.pieces]} />
+              ))}
               {(trigger.type === "pieceEnterSquare" || trigger.type === "pieceLeaveSquare") && <SquareSelect value={trigger.square} onChange={(square) => setTrigger({ square })} options={options.squares} />}
-              {trigger.type === "tileEntered" && (
-                <Select label="Tile" className="w-auto" value={trigger.tile ?? "goal"} onChange={(tile) => setTrigger({ tile })} options={TILE_TYPES.filter((tile) => tile !== "normal").map((tile) => ({ id: tile, label: TILE_STYLES[tile].label }))} />
-              )}
-              {(trigger.type === "pieceCountEquals" || trigger.type === "teamPieceCountEquals") && <NumberField label="Count" value={trigger.count ?? 0} min={0} max={200} onChange={(count) => setTrigger({ count })} />}
-              {trigger.type === "afterTurnNumber" && <NumberField label="Turn" value={trigger.turn ?? 10} min={1} max={500} onChange={(turn) => setTrigger({ turn })} />}
+              {gameUi(trigger.type === "tileEntered" && (
+                <Select label={gameUi("Tile")} className="w-auto" value={trigger.tile ?? "goal"} onChange={(tile) => setTrigger({ tile })} options={TILE_TYPES.filter((tile) => tile !== "normal").map((tile) => ({ id: tile, label: TILE_STYLES[tile].label }))} />
+              ))}
+              {(trigger.type === "pieceCountEquals" || trigger.type === "teamPieceCountEquals") && <NumberField label={gameUi("Count")} value={trigger.count ?? 0} min={0} max={200} onChange={(count) => setTrigger({ count })} />}
+              {trigger.type === "afterTurnNumber" && <NumberField label={gameUi("Turn")} value={trigger.turn ?? 10} min={1} max={500} onChange={(turn) => setTrigger({ turn })} />}
             </Row>
             <div className="flex flex-wrap items-center gap-4">
               <span className="flex items-center gap-2 text-xs text-zinc-400">
                 {ui("then wait")}
-                <NumberField label="Moves to wait" value={event.delayTurns} min={0} max={200} onChange={(delayTurns) => onChange((current) => ({ ...current, delayTurns }), `${event.id}-delay`)} />
+                <NumberField label={gameUi("Moves to wait")} value={event.delayTurns} min={0} max={200} onChange={(delayTurns) => onChange((current) => ({ ...current, delayTurns }), `${event.id}-delay`)} />
                 {ui("moves")}
               </span>
               <div className="min-w-[200px]">
@@ -324,12 +332,12 @@ export function EventCard({
             </div>
           </Stage>
 
-          <Stage label="IF" tone="bg-violet-400/15 text-violet-200">
-            {event.conditions.length === 0 ? (
+          <Stage label={gameUi("IF")} tone="bg-violet-400/15 text-violet-200">
+            {gameUi(event.conditions.length === 0 ? (
               <p className="text-xs text-zinc-500">{ui("Always — no conditions.")}</p>
             ) : (
-              <Segmented size="sm" label="Condition mode" value={event.conditionMode} onChange={(conditionMode) => onChange((current) => ({ ...current, conditionMode }))} options={[{ id: "all", label: "All must be true" }, { id: "any", label: "Any may be true" }]} />
-            )}
+              <Segmented size="sm" label={gameUi("Condition mode")} value={event.conditionMode} onChange={(conditionMode) => onChange((current) => ({ ...current, conditionMode }))} options={[{ id: "all", label: "All must be true" }, { id: "any", label: "Any may be true" }]} />
+            ))}
             {event.conditions.map((condition, index) => (
               <ConditionEditor
                 key={condition.id}
@@ -345,17 +353,17 @@ export function EventCard({
             </Button>
           </Stage>
 
-          <Stage label="THEN" tone="bg-emerald-400/15 text-emerald-200">
+          <Stage label={gameUi("THEN")} tone="bg-emerald-400/15 text-emerald-200">
             <ActionList actions={event.actions} variant={variant} emptyLabel={ui("No actions yet.")} onChange={(actions) => onChange((current) => ({ ...current, actions }))} />
           </Stage>
 
-          {event.conditions.length > 0 && (
-            <Stage label="ELSE" tone="bg-amber-400/15 text-amber-200">
+          {gameUi(event.conditions.length > 0 && (
+            <Stage label={gameUi("ELSE")} tone="bg-amber-400/15 text-amber-200">
               <ActionList actions={event.elseActions} variant={variant} emptyLabel={ui("Nothing happens when the conditions fail.")} onChange={(elseActions) => onChange((current) => ({ ...current, elseActions }))} />
             </Stage>
-          )}
+          ))}
         </div>
-      )}
+      ))}
     </article>
   );
 }

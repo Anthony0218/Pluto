@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { GUIDE_STEPS, guideKeyAction, type GuideState } from "@/games/chess/custom/library/onboarding";
@@ -24,6 +25,7 @@ function findTarget(targets: string[]) {
  * short card. Next/Previous, Skip and Finish; arrows and Escape work too.
  */
 export default function OnboardingGuide({ open, onClose }: { open: boolean; onClose: (state: GuideState) => void }) {
+  useGameLanguage();
   const [index, setIndex] = useState(0);
   const [rect, setRect] = useState<Rect | null>(null);
   const [viewport, setViewport] = useState({ width: 0, height: 0 });
@@ -137,7 +139,7 @@ export default function OnboardingGuide({ open, onClose }: { open: boolean; onCl
     <div className="chess-custom-guide fixed inset-0 z-[300]">
       {/* Catch clicks so the page underneath is not changed mid-tour. */}
       <div className="absolute inset-0" aria-hidden="true" />
-      {rect ? (
+      {gameUi(rect ? (
         <div
           aria-hidden="true"
           className={`pointer-events-none absolute rounded-2xl ring-2 ring-amber-300/90 ${transition}`}
@@ -145,7 +147,7 @@ export default function OnboardingGuide({ open, onClose }: { open: boolean; onCl
         />
       ) : (
         <div aria-hidden="true" className="absolute inset-0 bg-[rgba(3,4,6,.72)]" />
-      )}
+      ))}
       <div
         ref={card}
         role="dialog"
@@ -158,7 +160,7 @@ export default function OnboardingGuide({ open, onClose }: { open: boolean; onCl
         <div className="flex items-start gap-3">
           <div className="min-w-0 flex-1">
             <p className="text-[10px] font-black uppercase tracking-[0.24em] text-amber-300/80">
-              {ui("Guide")} · {index + 1} / {GUIDE_STEPS.length}
+              {ui("Guide")} · {gameUi(index + 1)} / {gameUi(GUIDE_STEPS.length)}
             </p>
             <h2 id={titleId} className="mt-1 font-serif text-xl text-white">
               {ui(step.title)}
@@ -171,20 +173,20 @@ export default function OnboardingGuide({ open, onClose }: { open: boolean; onCl
         <p id={bodyId} className="mt-2 text-sm leading-6 text-zinc-300">
           {ui(step.body)}
         </p>
-        {step.showSteps && (
+        {gameUi(step.showSteps && (
           <ol className="mt-3 grid grid-cols-2 gap-1.5" aria-label={ui("Create steps")}>
             {CREATE_STEPS.slice(0, 4).map(({ id, label }) => {
               const Icon = STEP_ICONS[id];
               return (
                 <li key={id} className="flex items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.03] px-2.5 py-1.5 text-xs">
-                  <span className="font-mono text-[10px] text-amber-300">{stepNumber(id)}</span>
+                  <span className="font-mono text-[10px] text-amber-300">{gameUi(stepNumber(id))}</span>
                   <Icon size={14} className="text-zinc-400" />
                   {ui(label)}
                 </li>
               );
             })}
           </ol>
-        )}
+        ))}
         <div className="mt-4 flex items-center gap-1.5" aria-hidden="true">
           {GUIDE_STEPS.map((entry, position) => (
             <span key={entry.id} className={`h-1.5 rounded-full ${transition} ${position === index ? "w-5 bg-amber-300" : position < index ? "w-1.5 bg-amber-300/50" : "w-1.5 bg-white/15"}`} />
@@ -194,19 +196,19 @@ export default function OnboardingGuide({ open, onClose }: { open: boolean; onCl
           <button type="button" onClick={() => onClose("dismissed")} className="mr-auto text-xs font-semibold text-zinc-500 underline-offset-2 hover:text-zinc-200 hover:underline">
             {ui("Skip Guide")}
           </button>
-          {index > 0 && (
+          {gameUi(index > 0 && (
             <button type="button" onClick={() => setIndex((value) => value - 1)} className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 px-3 py-2 text-xs font-semibold text-zinc-200 hover:border-white/25">
               <PreviousIcon size={15} />
               {ui("Previous")}
             </button>
-          )}
+          ))}
           <button
             ref={primary}
             type="button"
             onClick={() => (last ? onClose("completed") : setIndex((value) => value + 1))}
             className="inline-flex items-center gap-1.5 rounded-xl border border-amber-300/60 bg-amber-300 px-3.5 py-2 text-xs font-bold text-zinc-950 hover:bg-amber-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200"
           >
-            {last ? ui("Finish") : ui("Next")}
+            {gameUi(last ? ui("Finish") : ui("Next"))}
             {!last && <NextIcon size={15} />}
           </button>
         </div>

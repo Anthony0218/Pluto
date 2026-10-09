@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useMemo, useRef, useState } from "react";
 import { isPlayable } from "@/games/chess/custom/engine/board";
 import { createVariantFromPreset, KING_BEHAVIORS, matchKingBehavior, PRESETS, type PresetId } from "@/games/chess/custom/engine/presets";
@@ -18,6 +19,7 @@ import ValidationPanel from "../ValidationPanel";
 const FEATURED: PresetId[] = ["standard", "3d-chess", "portal", "sandbox"];
 
 export default function OverviewSection() {
+  useGameLanguage();
   const { variant, dispatch, goToStep, issues, exportJson, importJson, applyBasePreset, inLibrary, dirty, library, published, userId, save } = useEditor();
   const [importMessage, setImportMessage] = useState<{ tone: "error" | "warning"; lines: string[] } | null>(null);
   const [confirmPreset, setConfirmPreset] = useState<PresetId | null>(null);
@@ -63,7 +65,7 @@ export default function OverviewSection() {
       <SectionHeading
         step="overview"
         eyebrow="Overview"
-        title="Start your chess variant"
+        title={gameUi("Start your chess variant")}
         description={ui("Name it, pick a base to start from, then work through the steps. Every variant — standard chess included — is one configuration of the same rule engine.")}
         actions={
           <>
@@ -90,16 +92,16 @@ export default function OverviewSection() {
         }
       />
 
-      {importMessage && (
+      {gameUi(importMessage && (
         <div role="alert" className={`mb-4 rounded-xl border px-4 py-3 text-sm ${importMessage.tone === "error" ? "border-red-400/30 bg-red-500/10 text-red-100" : "border-amber-300/30 bg-amber-300/10 text-amber-100"}`}>
-          <p className="font-semibold">{importMessage.tone === "error" ? ui("Import failed — nothing was changed.") : ui("Imported with adjustments:")}</p>
+          <p className="font-semibold">{gameUi(importMessage.tone === "error" ? ui("Import failed — nothing was changed.") : ui("Imported with adjustments:"))}</p>
           <ul className="mt-1 list-disc pl-5 text-xs leading-5">
             {importMessage.lines.map((line) => (
-              <li key={line}>{line}</li>
+              <li key={line}>{gameUi(line)}</li>
             ))}
           </ul>
         </div>
-      )}
+      ))}
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_380px]">
         <div className="min-w-0 space-y-5">
@@ -127,9 +129,9 @@ export default function OverviewSection() {
               </label>
               <div className="flex flex-wrap gap-2 text-xs text-zinc-500">
                 {variant.presetId && <Chip tone="amber">{ui("Based on")} {ui(PRESETS.find((preset) => preset.id === variant.presetId)?.name ?? variant.presetId)}</Chip>}
-                {variant.remixedFrom && <Chip tone="violet" title={variant.remixedFrom}>{ui("Remix")}</Chip>}
-                {inLibrary && <Chip>{ui("Revision")} {variant.version}</Chip>}
-                <Chip>{ui("Updated")} {new Date(variant.updatedAt).toLocaleDateString()}</Chip>
+                {variant.remixedFrom && <Chip tone="violet" title={gameUi(variant.remixedFrom)}>{ui("Remix")}</Chip>}
+                {inLibrary && <Chip>{ui("Revision")} {gameUi(variant.version)}</Chip>}
+                <Chip>{ui("Updated")} {gameUi(new Date(variant.updatedAt).toLocaleDateString())}</Chip>
               </div>
             </div>
           </Panel>
@@ -139,7 +141,7 @@ export default function OverviewSection() {
             eyebrow={ui("Start from a blueprint")}
             actions={
               <Button size="sm" onClick={() => setAllPresets((value) => !value)} aria-expanded={allPresets}>
-                {allPresets ? ui("Show fewer") : `${ui("All presets")} (${PRESETS.length})`}
+                {gameUi(allPresets ? ui("Show fewer") : `${ui("All presets")} (${PRESETS.length})`)}
               </Button>
             }
           >
@@ -160,7 +162,7 @@ export default function OverviewSection() {
                     >
                       <BoardThumbnail preview={presetPreviews[preset.id]} label={`${preset.name} ${ui("preview")}`} className="mx-auto aspect-square w-full max-w-[120px]" />
                       <span className="mt-2 block truncate text-sm font-semibold text-zinc-100">{ui(preset.name)}</span>
-                      <span className="line-clamp-2 text-[11px] leading-4 text-zinc-500">{confirming ? ui("Click again to replace the current board, pieces and rules.") : ui(preset.tagline)}</span>
+                      <span className="line-clamp-2 text-[11px] leading-4 text-zinc-500">{gameUi(confirming ? ui("Click again to replace the current board, pieces and rules.") : ui(preset.tagline))}</span>
                     </button>
                   </li>
                 );
@@ -175,15 +177,15 @@ export default function OverviewSection() {
                   <LayersIcon size={22} />
                 </span>
                 <div>
-                  <p className="font-semibold text-zinc-100">{layers > 1 ? `${ui("Multi-layer 3D")} · ${layers} ${ui("Layers")}` : ui("Single board")}</p>
+                  <p className="font-semibold text-zinc-100">{gameUi(layers > 1 ? `${ui("Multi-layer 3D")} · ${layers} ${ui("Layers")}` : ui("Single board"))}</p>
                   <p className="text-xs text-zinc-500">
-                    {variant.teams.length} {ui("players")} · {variant.teams.map((team) => team.name).join(" vs ")}
+                    {gameUi(variant.teams.length)} {ui("players")} · {gameUi(variant.teams.map((team) => team.name).join(" vs "))}
                   </p>
                 </div>
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
                 <Button size="sm" onClick={() => goToStep("board")}>
-                  {layers > 1 ? ui("Edit layers") : ui("Add layers")}
+                  {gameUi(layers > 1 ? ui("Edit layers") : ui("Add layers"))}
                 </Button>
                 <Button size="sm" onClick={() => goToStep("teams")}>
                   {ui("Edit teams")}
@@ -197,12 +199,12 @@ export default function OverviewSection() {
                   {isPublic ? <PublicIcon size={22} /> : <PrivateIcon size={22} />}
                 </span>
                 <div>
-                  <p className="font-semibold text-zinc-100">{isPublic ? ui("Public") : ui("Private")}</p>
-                  <p className="text-xs text-zinc-500">{isPublic ? ui("Listed in Community") : ui("Only you can see it")}</p>
+                  <p className="font-semibold text-zinc-100">{gameUi(isPublic ? ui("Public") : ui("Private"))}</p>
+                  <p className="text-xs text-zinc-500">{gameUi(isPublic ? ui("Listed in Community") : ui("Only you can see it"))}</p>
                 </div>
               </div>
               <div className="mt-3">
-                {!inLibrary ? (
+                {gameUi(!inLibrary ? (
                   <Button size="sm" tone="primary" onClick={() => void save()}>
                     {ui("Save to My Games first")}
                   </Button>
@@ -218,9 +220,9 @@ export default function OverviewSection() {
                     }}
                   >
                     <ShareIcon size={14} />
-                    {dirty ? ui("Save & Share") : isPublic ? ui("Manage Sharing") : userId ? ui("Share to Community") : ui("Share")}
+                    {gameUi(dirty ? ui("Save & Share") : isPublic ? ui("Manage Sharing") : userId ? ui("Share to Community") : ui("Share"))}
                   </Button>
-                )}
+                ))}
               </div>
             </Panel>
           </div>
@@ -238,9 +240,9 @@ export default function OverviewSection() {
                       <span className="min-w-0 flex-1">
                         <span className="flex items-baseline justify-between gap-2">
                           <span className={labelClass}>{ui(stat.label)}</span>
-                          <span className="truncate font-serif text-base text-white">{stat.value}</span>
+                          <span className="truncate font-serif text-base text-white">{gameUi(stat.value)}</span>
                         </span>
-                        <span className="block truncate text-xs text-zinc-500">{stat.detail}</span>
+                        <span className="block truncate text-xs text-zinc-500">{gameUi(stat.detail)}</span>
                       </span>
                       <NextIcon size={14} className="shrink-0 text-zinc-700 transition group-hover:text-amber-300" />
                     </button>

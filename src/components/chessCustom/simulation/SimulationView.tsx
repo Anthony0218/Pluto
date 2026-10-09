@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { lazy, Suspense, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useSearchParams } from "react-router-dom";
 import type { CameraCommand } from "@/components/chess3d/Board3DScene";
@@ -42,6 +43,7 @@ const playersFor = (teams: { id: string }[], mode: SimulationMode, level: AiKind
  * in AI vs AI to watch the variant; from Play it starts in the chosen mode.
  */
 export default function SimulationView({ context }: { context: "create" | "play" }) {
+  useGameLanguage();
   const { variant, testSetup, simulationSource, go, goToStep, route, save, dirty, inLibrary, isDirty } = useEditor();
   const [params, setParams] = useSearchParams();
   // 2D is the default; 3D is opt-in (?view=3d), e.g. from the 3D Chess entry points.
@@ -141,9 +143,9 @@ export default function SimulationView({ context }: { context: "create" | "play"
         {/* Left sidebar: Play, Board, Customize, Settings — nothing else. */}
         <aside className="z-20 flex flex-row items-center gap-2 overflow-x-auto border-b border-white/[0.06] bg-black/45 px-3 py-2 backdrop-blur-xl lg:flex-col lg:items-stretch lg:overflow-visible lg:border-b-0 lg:border-r lg:px-3 lg:py-4">
           <div className="hidden px-2 pb-4 lg:block">
-            <p className="text-[9px] font-black uppercase tracking-[0.24em] text-amber-300/70">{context === "create" ? `${ui("Create")} · ${stepNumber("simulation")} ${ui("Simulation")}` : `${ui("Play")} · ${ui(playLabel ?? "")}`}</p>
-            <p className="mt-1 truncate font-serif text-lg text-white">{variant.name}</p>
-            {context === "create" && <p className="text-[11px] text-zinc-500">{dirty ? ui("Unsaved changes") : inLibrary ? ui("Saved") : ui("Not saved yet")}</p>}
+            <p className="text-[9px] font-black uppercase tracking-[0.24em] text-amber-300/70">{gameUi(context === "create" ? `${ui("Create")} · ${stepNumber("simulation")} ${ui("Simulation")}` : `${ui("Play")} · ${ui(playLabel ?? "")}`)}</p>
+            <p className="mt-1 truncate font-serif text-lg text-white">{gameUi(variant.name)}</p>
+            {context === "create" && <p className="text-[11px] text-zinc-500">{gameUi(dirty ? ui("Unsaved changes") : inLibrary ? ui("Saved") : ui("Not saved yet"))}</p>}
           </div>
           <nav aria-label={ui("Simulation")} className="flex gap-1 lg:flex-col">
             {SIMULATION_SIDEBAR.map(({ id, label }) => {
@@ -168,12 +170,12 @@ export default function SimulationView({ context }: { context: "create" | "play"
             })}
           </nav>
           <div className="ml-auto flex gap-1.5 lg:ml-0 lg:mt-auto lg:flex-col">
-            {context === "create" ? (
+            {gameUi(context === "create" ? (
               <>
                 <button type="button" onClick={() => goToStep("position")} className="flex shrink-0 items-center gap-2 rounded-xl border border-white/10 px-3 py-2 text-xs font-semibold text-zinc-300 transition hover:border-white/25 hover:text-white">
                   <PreviousIcon size={16} />
                   <span className="hidden sm:inline">
-                    {ui("Previous")}: {stepNumber("position")} {ui("Position")}
+                    {ui("Previous")}: {gameUi(stepNumber("position"))} {ui("Position")}
                   </span>
                 </button>
                 <button
@@ -195,7 +197,7 @@ export default function SimulationView({ context }: { context: "create" | "play"
                 <MyGamesIcon size={16} />
                 <span className="hidden sm:inline">{ui("Back to My Games")}</span>
               </button>
-            )}
+            ))}
           </div>
         </aside>
 
@@ -212,7 +214,7 @@ export default function SimulationView({ context }: { context: "create" | "play"
                   onClick={() => setView(id)}
                   className={`rounded-lg px-3 py-1.5 text-xs font-black tracking-wider transition ${view === id ? "bg-amber-300 text-zinc-950 shadow-[0_0_18px_rgba(252,211,77,.3)]" : "text-zinc-400 hover:bg-white/[0.06] hover:text-white"}`}
                 >
-                  {id.toUpperCase()}
+                  {gameUi(id.toUpperCase())}
                 </button>
               ))}
             </div>
@@ -220,22 +222,22 @@ export default function SimulationView({ context }: { context: "create" | "play"
               type="button"
               onClick={() => setDrawer(drawer === "play" ? null : "play")}
               className="inline-flex items-center gap-2 rounded-xl border border-sky-400/40 bg-sky-400/10 px-3 py-1.5 text-xs font-semibold text-sky-100 transition hover:bg-sky-400/20"
-              aria-label={`${ui("Mode")}: ${ui(SIMULATION_MODES.find((mode) => mode.id === matchMode)?.label ?? "")}. ${ui("Change in Play")}`}
+              aria-label={gameUi(`${ui("Mode")}: ${ui(SIMULATION_MODES.find((mode) => mode.id === matchMode)?.label ?? "")}. ${ui("Change in Play")}`)}
             >
               <span className="h-1.5 w-1.5 rounded-full bg-sky-300" aria-hidden="true" />
               {ui(SIMULATION_MODES.find((mode) => mode.id === matchMode)?.label ?? "")}
               {matchMode !== "hvh" && <span className="text-sky-200/60">· {ui(AI_KINDS.find((kind) => kind.id === aiLevel)?.label ?? "")}</span>}
             </button>
-            {layers.length > 1 && (
+            {gameUi(layers.length > 1 && (
               <span className="text-[11px] text-zinc-400">
-                {ui("Layer")} {shownLayer.name}
+                {ui("Layer")} {gameUi(shownLayer.name)}
               </span>
-            )}
-            <span className="ml-auto hidden text-[11px] text-zinc-500 xl:inline">{simulationSource === "test" ? ui("From your test position") : ui("From the starting position")}</span>
+            ))}
+            <span className="ml-auto hidden text-[11px] text-zinc-500 xl:inline">{gameUi(simulationSource === "test" ? ui("From your test position") : ui("From the starting position"))}</span>
           </div>
 
           <div className="relative h-[56vh] min-h-[360px] lg:h-auto lg:flex-1">
-            {view === "3d" ? (
+            {gameUi(view === "3d" ? (
               <Suspense fallback={<p className="absolute inset-0 flex items-center justify-center text-sm text-zinc-500">{ui("Loading the 3D board…")}</p>}>
                 <Board3DCanvas
                   className="absolute! inset-0"
@@ -274,36 +276,36 @@ export default function SimulationView({ context }: { context: "create" | "play"
                   <Board2D board={shownLayer} variant={variant} theme={theme} pieces={boardPieces} highlights={layerMarks} flipped={flipped} showCoords={settings.showCoords} label={ui("2D simulation board")} onCellClick={(coord) => selection.clickSquare({ ...coord, z: activeLayer })} />
                 </div>
               </div>
-            )}
+            ))}
 
             <div className="pointer-events-none absolute inset-x-0 top-3 flex flex-col items-center gap-2 px-3" aria-live="polite">
               <div className={`rounded-full border px-4 py-1.5 text-sm shadow-lg backdrop-blur-xl ${state.result ? "border-amber-300/50 bg-amber-300/15 text-amber-50" : "border-white/10 bg-black/55 text-zinc-200"}`}>
-                {state.result ? (
+                {gameUi(state.result ? (
                   <span className="flex items-center gap-2 font-semibold">
                     <VictoryIcon size={16} className="text-amber-300" />
-                    {state.result.reason}
+                    {gameUi(state.result.reason)}
                   </span>
                 ) : (
                   <span className="flex items-center gap-2">
                     <span className="h-2.5 w-2.5 rounded-full ring-1 ring-white/40" style={{ background: turnTeam?.color }} />
-                    <span className="font-semibold">{turnTeam?.name}{turnTeam?.alliance ? ` · ${turnTeam.alliance}` : ""}</span>
+                    <span className="font-semibold">{gameUi(turnTeam?.name)}{gameUi(turnTeam?.alliance ? ` · ${turnTeam.alliance}` : "")}</span>
                     <span className="text-zinc-400">
-                      {ui("to move")} · {players[state.turn] === "human" ? ui("your move") : session.playing || !playback ? ui("AI thinking…") : ui("press Play")}
+                      {ui("to move")} · {gameUi(players[state.turn] === "human" ? ui("your move") : session.playing || !playback ? ui("AI thinking…") : ui("press Play"))}
                     </span>
                   </span>
-                )}
+                ))}
               </div>
               {recentMessages.map((message, index) => (
                 <div key={`${message.ply}-${index}`} className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs backdrop-blur-xl ${message.kind === "warning" ? "border-amber-400/30 bg-amber-500/15 text-amber-100" : "border-sky-400/25 bg-sky-500/10 text-sky-100"}`}>
                   <EventsIcon size={13} />
-                  {message.text}
+                  {gameUi(message.text)}
                 </div>
               ))}
             </div>
 
-            {drawer && (
+            {gameUi(drawer && (
               <div className="absolute bottom-3 left-3 top-3 z-30 flex lg:bottom-28">
-                {drawer === "play" && (
+                {gameUi(drawer === "play" && (
                   <PlayDrawer
                     variant={variant}
                     mode={matchMode}
@@ -322,8 +324,8 @@ export default function SimulationView({ context }: { context: "create" | "play"
                     }}
                     onClose={() => setDrawer(null)}
                   />
-                )}
-                {drawer === "board" && (
+                ))}
+                {gameUi(drawer === "board" && (
                   <BoardDrawer
                     variant={variant}
                     view={view}
@@ -338,16 +340,16 @@ export default function SimulationView({ context }: { context: "create" | "play"
                     onFlip={setFlipped}
                     onClose={() => setDrawer(null)}
                   />
-                )}
+                ))}
                 {drawer === "settings" && <SettingsDrawer settings={settings} onChange={setSettings} speed={speed} onSpeed={setSpeed} autoOrbit={autoOrbit} onAutoOrbit={setAutoOrbit} onClose={() => setDrawer(null)} />}
               </div>
-            )}
+            ))}
 
             {selection.pendingPromotion && <PromotionPicker pending={selection.pendingPromotion} variant={variant} team={state.turn} onChoose={selection.choosePromotion} />}
           </div>
 
           <div className="z-20 flex flex-wrap items-end gap-3 p-3 lg:absolute lg:inset-x-3 lg:bottom-3 lg:p-0">
-            {playback ? (
+            {gameUi(playback ? (
               <div className="min-w-[300px] flex-1" data-playback-bar>
                 <SimulationControls session={session} speed={speed} onSpeed={setSpeed} canAutoplay />
               </div>
@@ -371,13 +373,13 @@ export default function SimulationView({ context }: { context: "create" | "play"
                   <RefreshIcon size={15} />
                   {ui("New game")}
                 </button>
-                {!session.atEnd && (
+                {gameUi(!session.atEnd && (
                   <button type="button" onClick={session.toEnd} className="inline-flex items-center gap-2 rounded-2xl border border-sky-400/40 bg-sky-400/15 px-3 py-2.5 text-xs font-semibold text-sky-100 backdrop-blur-xl">
                     {ui("Back to live position")}
                   </button>
-                )}
+                ))}
               </div>
-            )}
+            ))}
             {view === "3d" && <CameraControls preset={cameraView.preset} onPreset={choosePreset} onCommand={(kind) => setCameraCommand((current) => ({ id: (current?.id ?? 0) + 1, kind }))} autoOrbit={autoOrbit} onAutoOrbit={setAutoOrbit} />}
           </div>
         </div>
@@ -388,15 +390,15 @@ export default function SimulationView({ context }: { context: "create" | "play"
             <button type="button" aria-expanded={historyOpen} onClick={() => setHistoryOpen((value) => !value)} className="flex w-full items-center justify-between gap-2 px-3 py-2.5">
               <span className="text-[11px] font-black uppercase tracking-[0.18em] text-amber-200/90">{ui("Move History")}</span>
               <span className="flex items-center gap-2 text-[11px] text-zinc-500">
-                {ui("Turn")} {state.turnNumber}
+                {ui("Turn")} {gameUi(state.turnNumber)}
                 {historyOpen ? <ChevronUpIcon size={14} /> : <ChevronDownIcon size={14} />}
               </span>
             </button>
-            {historyOpen && (
+            {gameUi(historyOpen && (
               <div className="px-3 pb-3">
                 <MoveHistoryList frames={session.frames} cursor={session.cursor} onJump={session.jumpTo} variant={variant} maxHeight="max-h-44" />
               </div>
-            )}
+            ))}
           </section>
           <div className="min-h-[320px] flex-1 lg:min-h-0">
             <PieceInspector variant={variant} state={state} piece={selection.selected} explanations={selection.explanations} skin={skin} reducedMotion={reducedMotion} show3D={view === "3d"} />

@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { Orbit, RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
 import type { Chess3DCameraPreset } from "@/games/chess/3d/chess3dAppearance";
 import { ui } from "@/i18n/ui";
@@ -28,6 +29,7 @@ export default function CameraControls({
   autoOrbit: boolean;
   onAutoOrbit: (value: boolean) => void;
 }) {
+  useGameLanguage();
   return (
     <div className="rounded-2xl border border-white/[0.09] bg-black/60 p-2 shadow-[0_20px_50px_rgba(0,0,0,.5)] backdrop-blur-xl" role="group" aria-label={ui("Camera controls")}>
       <p className="mb-1.5 px-1 text-[9px] font-black uppercase tracking-[0.22em] text-zinc-500">{ui("Camera")}</p>
@@ -42,7 +44,7 @@ export default function CameraControls({
             onClick={() => onPreset(entry.id)}
             className={`${button} ${preset === entry.id ? "border-sky-400/60 bg-sky-400/15 text-sky-100" : "border-white/10 text-zinc-400 hover:text-white"}`}
           >
-            {entry.short}
+            {gameUi(entry.short)}
           </button>
         ))}
       </div>

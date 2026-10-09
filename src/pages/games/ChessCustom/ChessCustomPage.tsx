@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import { useBlocker } from "react-router-dom";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
@@ -60,6 +61,7 @@ function SimulationFallback() {
 }
 
 function ChessCustomShell() {
+  useGameLanguage();
   const { route, step, dispatch, save, isDirty, variant, discardChanges, pendingReplace, resolveReplace, libraryStatus } = useEditor();
   const [guideOpen, setGuideOpen] = useState(false);
 
@@ -129,12 +131,12 @@ function ChessCustomShell() {
     return (
       <main className="relative left-1/2 flex min-h-[var(--app-height)] w-screen -translate-x-1/2 flex-col bg-[#050608] text-zinc-100">
         {/* The header's own mode chip names Singleplayer/Hotseat; the description names the variant. */}
-        <ChessPageHeader className="chess-menu-header" title="Chess Custom" description={context === "create" ? ui("Simulation") : variant.name} />
+        <ChessPageHeader className="chess-menu-header" title={gameUi("Chess Custom")} description={gameUi(context === "create" ? ui("Simulation") : variant.name)} />
         <Suspense fallback={<SimulationFallback />}>
           <SimulationView key={`${route.view}:${route.view === "play" ? route.mode : step}`} context={context} />
         </Suspense>
         <EditorToast />
-        {dialogs}
+        {gameUi(dialogs)}
       </main>
     );
   }
@@ -143,14 +145,14 @@ function ChessCustomShell() {
   return (
     <main className="chess-custom-page relative left-1/2 min-h-[var(--app-height)] w-screen -translate-x-1/2 bg-[#07090b] text-zinc-100">
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(245,158,11,.07),transparent_32%),radial-gradient(circle_at_88%_80%,rgba(56,189,248,.05),transparent_30%)]" />
-      <ChessPageHeader className="chess-menu-header" title="Chess Custom" description={ui("Variant creator & simulator")} />
+      <ChessPageHeader className="chess-menu-header" title={gameUi("Chess Custom")} description={ui("Variant creator & simulator")} />
       <div className="relative mx-auto w-full max-w-[1800px] px-4 pb-16 sm:px-6">
         <ChessCustomNav route={route} onShowGuide={() => setGuideOpen(true)} />
         {route.view === "library" && <MyGamesView />}
         {route.view === "community" && <CommunityView />}
         {route.view === "pluto" && <CommunityView scope="pluto" />}
         {route.view === "play" && route.mode === "multiplayer" && <OnlineMatchView />}
-        {Section && (
+        {gameUi(Section && (
           <>
             <VariantToolbar />
             <div className="grid gap-6 pt-4 lg:grid-cols-[250px_minmax(0,1fr)]">
@@ -161,10 +163,10 @@ function ChessCustomShell() {
               </div>
             </div>
           </>
-        )}
+        ))}
       </div>
       {!Section && <EditorToast />}
-      {dialogs}
+      {gameUi(dialogs)}
     </main>
   );
 }

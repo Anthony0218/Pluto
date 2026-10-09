@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { filterLibrary, LIBRARY_SORTS, sortLibrary, type LibraryEntry, type LibrarySort } from "@/games/chess/custom/library/metadata";
@@ -12,6 +13,7 @@ import VariantCard, { type VariantCardActions } from "./VariantCard";
 
 /** My Chess Games: the player's library and the Chess Custom home page. */
 export default function MyGamesView() {
+  useGameLanguage();
   const { library, libraryStatus, variant, dirty, inLibrary, createNew, editVariant, playSaved, duplicateSaved, exportSaved, importJson, notify, storage, moveLocalToCloud, discardChanges, goToStep } = useEditor();
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<LibrarySort>("updated");
@@ -63,13 +65,13 @@ export default function MyGamesView() {
         </button>
       </header>
 
-      {dirty && (
+      {gameUi(dirty && (
         <div className="mb-5 flex flex-wrap items-center gap-3 rounded-2xl border border-amber-300/30 bg-amber-300/[0.06] px-4 py-3 text-sm">
           <WarningIcon size={18} className="text-amber-300" />
           <p className="min-w-[min(100%,220px)] flex-1 text-amber-50">
-            <span className="font-semibold">“{variant.name}”</span> {inLibrary ? ui("has unsaved changes.") : ui("is not saved to My Games yet.")}
+            <span className="font-semibold">“{gameUi(variant.name)}”</span> {gameUi(inLibrary ? ui("has unsaved changes.") : ui("is not saved to My Games yet."))}
           </p>
-          {confirmDiscard ? (
+          {gameUi(confirmDiscard ? (
             <>
               <span className="text-xs text-amber-100">{ui("Discard these changes?")}</span>
               <Button size="sm" tone="danger" onClick={() => void discardChanges().then(() => setConfirmDiscard(false))}>
@@ -88,9 +90,9 @@ export default function MyGamesView() {
                 {ui("Discard")}
               </Button>
             </>
-          )}
+          ))}
         </div>
-      )}
+      ))}
 
       <div className="mb-5 flex flex-wrap items-center gap-3">
         <label className="relative min-w-[200px] flex-1 sm:max-w-sm">
@@ -125,7 +127,7 @@ export default function MyGamesView() {
         />
       </div>
 
-      {libraryStatus === "loading" ? (
+      {gameUi(libraryStatus === "loading" ? (
         <ul className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4" aria-busy="true" aria-label={ui("Loading your variants")}>
           {[0, 1, 2].map((index) => (
             <li key={index} className="h-[420px] rounded-3xl border border-white/[0.06] bg-white/[0.02] motion-safe:animate-pulse" />
@@ -155,29 +157,29 @@ export default function MyGamesView() {
             </li>
           ))}
         </ul>
-      )}
+      ))}
 
       <div className={`mt-8 flex flex-wrap items-center gap-3 rounded-2xl border px-4 py-3 text-sm ${storage.error ? "border-amber-300/30 bg-amber-300/[0.06]" : "border-white/[0.06] bg-white/[0.02]"}`}>
         {storage.mode === "cloud" ? <CloudIcon size={18} className="text-sky-300" /> : <DeviceIcon size={18} className="text-zinc-400" />}
         <p className="min-w-0 flex-1 text-xs text-zinc-400">
-          <span className="font-semibold text-zinc-200">{storage.mode === "cloud" ? (storage.error ? ui("Your account storage is unreachable") : ui("Saved to your account")) : ui("Saved in this browser")}</span>
-          {" — "}
-          {storage.mode === "cloud"
+          <span className="font-semibold text-zinc-200">{gameUi(storage.mode === "cloud" ? (storage.error ? ui("Your account storage is unreachable") : ui("Saved to your account")) : ui("Saved in this browser"))}</span>
+          {gameUi(" — ")}
+          {gameUi(storage.mode === "cloud"
             ? storage.error
               ? `${ui("Showing this browser's copies; saves fall back here until it is back.")} (${storage.error})`
               : ui("Your variants follow you to any device you sign in on.")
-            : ui("Sign in to keep variants in your account and share them with the community.")}
+            : ui("Sign in to keep variants in your account and share them with the community."))}
         </p>
-        {storage.mode === "local" && (
+        {gameUi(storage.mode === "local" && (
           <Link to="/login" className="rounded-xl border border-sky-400/40 bg-sky-400/15 px-3 py-1.5 text-xs font-semibold text-sky-100 hover:bg-sky-400/25">
             {ui("Sign in")}
           </Link>
-        )}
-        {storage.mode === "cloud" && !storage.error && storage.localCount > 0 && (
+        ))}
+        {gameUi(storage.mode === "cloud" && !storage.error && storage.localCount > 0 && (
           <Button size="sm" tone="blue" onClick={() => void moveLocalToCloud()}>
-            {ui("Move")} {storage.localCount} {ui("browser variant(s) to your account")}
+            {ui("Move")} {gameUi(storage.localCount)} {ui("browser variant(s) to your account")}
           </Button>
-        )}
+        ))}
       </div>
 
       <PlayModeDialog
