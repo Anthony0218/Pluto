@@ -1,3 +1,4 @@
+import { gameUi } from "../../i18n/gameUi.ts";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ui, useUiLanguage } from "@/i18n/ui";
@@ -46,7 +47,7 @@ export default function ShogiRules() {
 
           <section className="min-h-0">
             <div className="grid grid-cols-4 gap-2" aria-label={ui("Choose a Shogi piece")}>
-              {pieces.map((piece) => <button key={piece.type} type="button" onClick={() => { setPieceType(piece.type); setPanel("pieces"); }} aria-label={ui(piece.name)} className={"flex aspect-square items-center justify-center text-2xl font-black [clip-path:polygon(50%_0,100%_20%,92%_100%,8%_100%,0_20%)] sm:text-3xl " + (pieceType === piece.type ? "bg-amber-300 text-[#2c1a0b]" : "bg-[#d7a657] text-[#3b210d] opacity-75 hover:opacity-100")}>{piece.glyph}</button>)}
+              {pieces.map((piece) => <button key={piece.type} type="button" onClick={() => { setPieceType(piece.type); setPanel("pieces"); }} aria-label={ui(piece.name)} className={"flex aspect-square items-center justify-center text-2xl font-black [clip-path:polygon(50%_0,100%_20%,92%_100%,8%_100%,0_20%)] sm:text-3xl " + (pieceType === piece.type ? "bg-amber-300 text-[#2c1a0b]" : "bg-[#d7a657] text-[#3b210d] opacity-75 hover:opacity-100")}>{gameUi(piece.glyph)}</button>)}
             </div>
             <div className="mt-3 rounded-2xl border border-white/10 bg-black/25 p-4 text-xs leading-5 text-zinc-500">
               {ui("Win by checkmating the opposing King. A legal move may never leave your own King in check. Black (sente) moves first.")}

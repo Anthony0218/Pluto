@@ -15,7 +15,7 @@ function component(path, modules = {}) {
   const source = readFileSync(new URL(path,import.meta.url),'utf8');
   const compiled = ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,target:ts.ScriptTarget.ES2023,esModuleInterop:true}}).outputText;
   const exports = {};
-  new Function('require','exports',compiled)(name => modules[name] ?? require(name), exports);
+  new Function('require','exports',compiled)(name => name.endsWith('/i18n/gameUi.ts') ? { gameUi: value => value, useGameLanguage: () => ({ language: 'en' }) } : modules[name] ?? require(name), exports);
   return exports;
 }
 const i18n = { ui: text => text, useUiLanguage: () => {} };

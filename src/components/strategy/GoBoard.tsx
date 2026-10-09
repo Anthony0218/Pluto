@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getGoGroup, isLegalGoMove, type GoMove, type GoState } from "../../games/go/rules";
 import { capturedGoPoints, GO_COLUMNS, goAtariPoints, goCoordinate, previewGoMove } from "../../games/go/analysis";
@@ -5,6 +6,7 @@ import "./go.css";
 
 type Props = { state: GoState; onMove: (move: GoMove) => void; disabled?: boolean; scoring?: boolean; help?: boolean; marked?: number; hint?: GoMove | null; suggestions?: GoMove[]; selectedSuggestion?: number; onAttempt?: (move: GoMove) => void };
 export default function GoBoard({ state, onMove, disabled, scoring = false, help = false, marked, hint, suggestions = [], selectedSuggestion, onAttempt }: Props) {
+  useGameLanguage();
   const [hover, setHover] = useState<number | null>(null);
   const [touchSelection, setTouchCandidate] = useState<{ position: GoState; index: number } | null>(null);
   const touchCandidate = touchSelection?.position === state ? touchSelection.index : null;
@@ -27,9 +29,9 @@ export default function GoBoard({ state, onMove, disabled, scoring = false, help
   const liberties = group?.liberties ?? preview?.liberties ?? new Set<number>();
   const edge = state.boardSize === 9 ? 2 : 3, center = Math.floor(state.boardSize / 2);
   return <div className="go-board-wrap">
-    <div className="go-board" role="group" aria-label="Go board" data-board-size={state.boardSize}>
-      <div className="go-coordinates go-coordinates-columns" aria-hidden="true" style={{ gridTemplateColumns: `repeat(${state.boardSize}, 1fr)` }}>{Array.from({ length: state.boardSize }, (_, index) => <span key={index}>{GO_COLUMNS[index]}</span>)}</div>
-      <div className="go-coordinates go-coordinates-rows" aria-hidden="true" style={{ gridTemplateRows: `repeat(${state.boardSize}, 1fr)` }}>{Array.from({ length: state.boardSize }, (_, index) => <span key={index}>{state.boardSize - index}</span>)}</div>
+    <div className="go-board" role="group" aria-label={gameUi("Go board")} data-board-size={state.boardSize}>
+      <div className="go-coordinates go-coordinates-columns" aria-hidden="true" style={{ gridTemplateColumns: `repeat(${state.boardSize}, 1fr)` }}>{Array.from({ length: state.boardSize }, (_, index) => <span key={index}>{gameUi(GO_COLUMNS[index])}</span>)}</div>
+      <div className="go-coordinates go-coordinates-rows" aria-hidden="true" style={{ gridTemplateRows: `repeat(${state.boardSize}, 1fr)` }}>{Array.from({ length: state.boardSize }, (_, index) => <span key={index}>{gameUi(state.boardSize - index)}</span>)}</div>
       <div className="go-grid" style={{ gridTemplateColumns: `repeat(${state.boardSize}, 1fr)` }}>
         {state.board.map((stone, index) => {
           const row = Math.floor(index / state.boardSize), col = index % state.boardSize;
@@ -40,7 +42,7 @@ export default function GoBoard({ state, onMove, disabled, scoring = false, help
           const star = [edge, center, state.boardSize - edge - 1].includes(row) && [edge, center, state.boardSize - edge - 1].includes(col) && (state.boardSize !== 9 || row === col || row + col === state.boardSize - 1);
           const suggested = hint?.type === "place" && hint.row === row && hint.col === col;
           const suggestionRank = suggestions.findIndex(candidate => candidate.type === "place" && candidate.row === row && candidate.col === col);
-          return <button key={index} type="button" className="go-point" aria-label={`${goCoordinate(placement, state.boardSize)}: ${stone ?? "empty"}${state.deadStones?.includes(index) ? ", marked dead" : ""}${atari.has(index) ? ", in atari" : ""}${suggestionRank >= 0 ? `, best move ${suggestionRank + 1}${selectedSuggestion === suggestionRank ? ", selected" : ""}` : ""}`} aria-disabled={scoring ? !stone : disabled || !legal}
+          return <button key={index} type="button" className="go-point" aria-label={gameUi(`${goCoordinate(placement, state.boardSize)}: ${stone ?? "empty"}${state.deadStones?.includes(index) ? ", marked dead" : ""}${atari.has(index) ? ", in atari" : ""}${suggestionRank >= 0 ? `, best move ${suggestionRank + 1}${selectedSuggestion === suggestionRank ? ", selected" : ""}` : ""}`)} aria-disabled={scoring ? !stone : disabled || !legal}
             onMouseEnter={() => setHover(index)} onMouseLeave={() => setHover(null)} onFocus={() => setHover(index)} onBlur={() => setHover(null)}
             onKeyDown={() => { touchInput.current = false; }}
             onPointerDown={event => { touchInput.current = event.pointerType === "touch"; if (touchInput.current) setHover(index); }}
@@ -60,6 +62,6 @@ export default function GoBoard({ state, onMove, disabled, scoring = false, help
         })}
       </div>
     </div>
-    {(help || touchCandidate !== null) && <p className="go-board-note" role="status">{touchCandidate !== null ? `Tap ${goCoordinate({ type: "place", row: Math.floor(touchCandidate / state.boardSize), col: touchCandidate % state.boardSize }, state.boardSize)} again to place, or tap another point to change.` : group ? `${group.stones.size} stone${group.stones.size === 1 ? "" : "s"} · ${group.liberties.size} liberties${group.liberties.size === 1 ? " · Atari" : ""}` : preview ? `${preview.captured.length} captured · ${preview.liberties.size} liberties${preview.selfAtari ? " · Warning: self-atari" : ""}` : active !== null && move && !isLegalGoMove(state, move) && !state.board[active] ? "Illegal move: suicide or a repeated position." : "Teal: liberties · Red: atari · Gold: suggested move"}</p>}
+    {(help || touchCandidate !== null) && <p className="go-board-note" role="status">{gameUi(touchCandidate !== null ? `Tap ${goCoordinate({ type: "place", row: Math.floor(touchCandidate / state.boardSize), col: touchCandidate % state.boardSize }, state.boardSize)} again to place, or tap another point to change.` : group ? `${group.stones.size} stone${group.stones.size === 1 ? "" : "s"} · ${group.liberties.size} liberties${group.liberties.size === 1 ? " · Atari" : ""}` : preview ? `${preview.captured.length} captured · ${preview.liberties.size} liberties${preview.selfAtari ? " · Warning: self-atari" : ""}` : active !== null && move && !isLegalGoMove(state, move) && !state.board[active] ? "Illegal move: suicide or a repeated position." : "Teal: liberties · Red: atari · Gold: suggested move")}</p>}
   </div>;
 }
