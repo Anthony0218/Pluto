@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../../i18n/gameUi.ts";
 import { useState } from "react";
 import { COLORS } from "../../../../games/party/config.ts";
 import {
@@ -26,6 +27,7 @@ export default function TargetPanicScreen({
   online,
   sendInput,
 }: MinigameViewProps) {
+  useGameLanguage();
   const view = minigame.state as TargetPanicView;
   const [tapped, setTapped] = useState<Set<string>>(() => new Set());
   const [pops, setPops] = useState<Pop[]>([]);
@@ -68,16 +70,16 @@ export default function TargetPanicScreen({
         <div
           className={`tp-timer ${secondsLeft <= 10 ? "urgent" : ""}`}
           role="timer"
-          aria-label={`${secondsLeft} seconds left`}
+          aria-label={gameUi(`${secondsLeft} seconds left`)}
         >
-          {secondsLeft}
+          {gameUi(secondsLeft)}
           <small>s</small>
         </div>
         <div className="tp-myscore" aria-live="polite">
-          <small>{mine ? "YOUR SCORE" : "SPECTATING"}</small>
-          <b>{mine?.score ?? "–"}</b>
+          <small>{gameUi(mine ? "YOUR SCORE" : "SPECTATING")}</small>
+          <b>{gameUi(mine?.score ?? "–")}</b>
         </div>
-        <ol className="tp-standings" aria-label="Live standings">
+        <ol className="tp-standings" aria-label={gameUi("Live standings")}>
           {standings.map(({ player, score }) => (
             <li
               key={player.id}
@@ -90,12 +92,12 @@ export default function TargetPanicScreen({
             >
               <i />
               <span>{player.name}</span>
-              <b>{score}</b>
+              <b>{gameUi(score)}</b>
             </li>
           ))}
         </ol>
       </div>
-      <div className="tp-field" aria-label="Target Panic play field">
+      <div className="tp-field" aria-label={gameUi("Target Panic play field")}>
         {visible.map((t) => (
           <button
             key={t.id}
@@ -109,7 +111,7 @@ export default function TargetPanicScreen({
               } as React.CSSProperties
             }
             disabled={!online || !mine}
-            aria-label={`${t.kind} target, ${targetValue(t.kind) > 0 ? "+" : ""}${targetValue(t.kind)}`}
+            aria-label={gameUi(`${t.kind} target, ${targetValue(t.kind) > 0 ? "+" : ""}${targetValue(t.kind)}`)}
             onPointerDown={(e) => {
               e.preventDefault();
               tap(t);
@@ -131,17 +133,17 @@ export default function TargetPanicScreen({
               setPops((current) => current.filter((c) => c.key !== p.key))
             }
           >
-            {targetValue(p.kind) > 0 ? "+" : "−"}
-            {Math.abs(targetValue(p.kind))}
+            {gameUi(targetValue(p.kind) > 0 ? "+" : "−")}
+            {gameUi(Math.abs(targetValue(p.kind)))}
           </span>
         ))}
-        {now >= view.endsAt && <div className="tp-banner">TIME!</div>}
-        {now < view.startedAt && <div className="tp-banner">GO!</div>}
+        {now >= view.endsAt && <div className="tp-banner">{gameUi("TIME!")}</div>}
+        {now < view.startedAt && <div className="tp-banner">{gameUi("GO!")}</div>}
       </div>
       <p className="tp-legend">
-        <span className="tp-key tp-standard" /> +{TARGET_PANIC_CONFIG.normalScore}
-        <span className="tp-key tp-golden" /> +{TARGET_PANIC_CONFIG.goldenScore}
-        <span className="tp-key tp-danger" /> −{TARGET_PANIC_CONFIG.dangerPenalty}
+        <span className="tp-key tp-standard" /> +{gameUi(TARGET_PANIC_CONFIG.normalScore)}
+        <span className="tp-key tp-golden" /> +{gameUi(TARGET_PANIC_CONFIG.goldenScore)}
+        <span className="tp-key tp-danger" /> −{gameUi(TARGET_PANIC_CONFIG.dangerPenalty)}
       </p>
     </div>
   );

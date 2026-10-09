@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { rankedPlayers } from "../../../games/party/engine/economy.ts";
 import { COLORS } from "../../../games/party/config.ts";
 import type { PartyConnection } from "../../../games/party/network/usePartyConnection.ts";
@@ -18,6 +19,7 @@ export default function FinalResults({
   match: Match;
   alpine: boolean;
 }) {
+  useGameLanguage();
   const { playerId, send, status, pending } = connection;
   const settings = lobby.settings,
     plutoGame = settings.victory === "plutos",
@@ -28,14 +30,12 @@ export default function FinalResults({
   const target = plutoGame ? `${settings.plutoTarget} Golden Plutos` : `${settings.coinTarget} coins`;
   return (
     <div className="pp-final" aria-labelledby="pp-final-title">
-      <span className="pp-eyebrow">{alpine ? "SUMMIT REACHED" : "ISLAND ROYALTY"} · ROUND {match.round}</span>
+      <span className="pp-eyebrow">{gameUi(alpine ? "SUMMIT REACHED" : "ISLAND ROYALTY")}{gameUi(" · ROUND ")}{gameUi(match.round)}</span>
       <h2 id="pp-final-title">
-        {winner ? `${winner.id === playerId ? "You win" : `${winner.name} wins`}!` : "Match over"}
+        {gameUi(winner ? `${winner.id === playerId ? "You win" : `${winner.name} wins`}!` : "Match over")}
       </h2>
       <p>
-        {winner ? match.mode === "festival" ? `${winner.name} won the festival with ${match.festivalScores?.[winner.id] ?? 0} points.` : match.roundLimit ? `${winner.name} leads after ${match.roundLimit} rounds.` : `${winner.name} reached ${target} first.` : "The match has ended."} Thanks for making a little
-        trouble.
-      </p>
+        {gameUi(winner ? match.mode === "festival" ? `${winner.name} won the festival with ${match.festivalScores?.[winner.id] ?? 0} points.` : match.roundLimit ? `${winner.name} leads after ${match.roundLimit} rounds.` : `${winner.name} reached ${target} first.` : "The match has ended.")}{gameUi(" Thanks for making a little trouble. ")}</p>
       <ol className="pp-final-ranking">
         {rankedPlayers(match, settings).map((p, i) => {
           const stats = match.stats?.[p.id],
@@ -46,26 +46,26 @@ export default function FinalResults({
               className={p.id === match.winner ? "winner" : ""}
               style={{ "--pawn-color": COLORS[p.avatarId] } as React.CSSProperties}
             >
-              <b className="pp-final-place" aria-label={`Place ${i + 1}`}>
-                {i + 1}
+              <b className="pp-final-place" aria-label={gameUi(`Place ${i + 1}`)}>
+                {gameUi(i + 1)}
               </b>
               <Portrait player={p} />
               <div>
                 <strong>
                   {p.name}
-                  {p.id === playerId ? " · you" : ""}
-                  {p.id === match.winner ? " · 👑 winner" : ""}
+                  {gameUi(p.id === playerId ? " · you" : "")}
+                  {gameUi(p.id === match.winner ? " · 👑 winner" : "")}
                 </strong>
                 <small>
-                  {match.mode === "festival" ? `★ ${match.festivalScores?.[p.id] ?? 0} festival points · ${stats?.minigameWins ?? 0} wins` : plutoGame
+                  {gameUi(match.mode === "festival" ? `★ ${match.festivalScores?.[p.id] ?? 0} festival points · ${stats?.minigameWins ?? 0} wins` : plutoGame
                     ? `✦ ${p.goldenPlutos} Golden Pluto${p.goldenPlutos === 1 ? "" : "s"} · 🪙 ${p.coins} coins`
-                    : `🪙 ${p.coins} coins · ✦ ${p.goldenPlutos} Golden Pluto${p.goldenPlutos === 1 ? "" : "s"}`}
+                    : `🪙 ${p.coins} coins · ✦ ${p.goldenPlutos} Golden Pluto${p.goldenPlutos === 1 ? "" : "s"}`)}
                 </small>
                 <small className="pp-final-stats">
-                  {stats ? `${stats.minigameWins} minigame win${stats.minigameWins === 1 ? "" : "s"} · ` : ""}
-                  {stats ? `${stats.duelWins} duel win${stats.duelWins === 1 ? "" : "s"} · ` : ""}
-                  {stats ? `KO’d ${stats.knockouts}× · ` : ""}
-                  {properties} {properties === 1 ? "property" : "properties"}
+                  {gameUi(stats ? `${stats.minigameWins} minigame win${stats.minigameWins === 1 ? "" : "s"} · ` : "")}
+                  {gameUi(stats ? `${stats.duelWins} duel win${stats.duelWins === 1 ? "" : "s"} · ` : "")}
+                  {gameUi(stats ? `KO’d ${stats.knockouts}× · ` : "")}
+                  {gameUi(properties)} {gameUi(properties === 1 ? "property" : "properties")}
                 </small>
               </div>
             </li>
@@ -73,20 +73,18 @@ export default function FinalResults({
         })}
       </ol>
       <div className="pp-final-actions">
-        {host ? (
+        {gameUi(host ? (
           <button
             className="pp-primary"
             disabled={!online || pending === "return"}
             onClick={() => send({ type: "RETURN_TO_LOBBY" })}
           >
-            {pending === "return" ? "Returning…" : "Return to lobby"}
+            {gameUi(pending === "return" ? "Returning…" : "Return to lobby")}
           </button>
         ) : (
-          <p role="status">Waiting for {hostName} to return everyone to the lobby…</p>
-        )}
-        <button disabled={!online} onClick={() => send({ type: "LEAVE" })}>
-          Back to home
-        </button>
+          <p role="status">{gameUi("Waiting for ")}{gameUi(hostName)}{gameUi(" to return everyone to the lobby…")}</p>
+        ))}
+        <button disabled={!online} onClick={() => send({ type: "LEAVE" })}>{gameUi(" Back to home ")}</button>
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useState } from "react";
 import { COLORS, DUEL_CONFIG } from "../../../games/party/config.ts";
 import { tropical } from "../../../games/party/content/maps.ts";
@@ -44,6 +45,7 @@ function WagerPicker({
   onBack: () => void;
   onConfirm: (wager: DuelWager) => void;
 }) {
+  useGameLanguage();
   const max = maxCoinWager(me, target);
   const [wager, setWager] = useState<DuelWager | null>(null);
   // Custom mode is explicit, so stepping the custom amount onto 5/10/20 keeps the custom controls open.
@@ -63,13 +65,11 @@ function WagerPicker({
   };
   return (
     <>
-      <span className="pp-eyebrow">CHALLENGE {target.name.toUpperCase()}</span>
-      <h2>Choose wager</h2>
-      <p className="pp-sheet-note">
-        Both duelists stake the same amount; the winner takes the whole pot. {target.name} has 🪙{" "}
-        {target.coins} and ✦ {target.goldenPlutos}. They cannot refuse.
-      </p>
-      <div className="pp-wagers" role="radiogroup" aria-label="Wager">
+      <span className="pp-eyebrow">{gameUi("CHALLENGE ")}{target.name.toUpperCase()}</span>
+      <h2>{gameUi("Choose wager")}</h2>
+      <p className="pp-sheet-note">{gameUi(" Both duelists stake the same amount; the winner takes the whole pot. ")}{target.name}{gameUi(" has 🪙")}{gameUi(" ")}
+        {gameUi(target.coins)}{gameUi(" and ✦ ")}{gameUi(target.goldenPlutos)}{gameUi(". They cannot refuse. ")}</p>
+      <div className="pp-wagers" role="radiogroup" aria-label={gameUi("Wager")}>
         {DUEL_CONFIG.coinPresets.map((amount) => {
           const legal = canWagerCoins(me, target, amount);
           return (
@@ -81,8 +81,7 @@ function WagerPicker({
               disabled={!legal}
               onClick={() => choose({ type: "coins", amount })}
             >
-              <b>{amount}</b> coins
-              {!legal && <small>not covered</small>}
+              <b>{gameUi(amount)}</b>{gameUi(" coins ")}{!legal && <small>{gameUi("not covered")}</small>}
             </button>
           );
         })}
@@ -96,8 +95,8 @@ function WagerPicker({
             setCustomAmount(custom);
           }}
         >
-          <b>Custom</b>
-          <small>1–{max}</small>
+          <b>{gameUi("Custom")}</b>
+          <small>1–{gameUi(max)}</small>
         </button>
         <button
           role="radio"
@@ -106,17 +105,16 @@ function WagerPicker({
           disabled={!canWagerPluto(me, target)}
           onClick={() => choose({ type: "pluto", amount: 1 })}
         >
-          <b>✦ 1</b> Golden Pluto
-          {!canWagerPluto(me, target) && <small>both need one</small>}
+          <b>✦ 1</b>{gameUi(" Golden Pluto ")}{!canWagerPluto(me, target) && <small>{gameUi("both need one")}</small>}
         </button>
       </div>
-      {isCustom && (
+      {gameUi(isCustom && (
         <div className="pp-custom-wager">
-          <button aria-label="One coin less" onClick={() => setCustomAmount(custom - 1)} disabled={custom <= 1}>
+          <button aria-label={gameUi("One coin less")} onClick={() => setCustomAmount(custom - 1)} disabled={custom <= 1}>
             −
           </button>
           <label>
-            <span className="sr-only">Custom coin wager</span>
+            <span className="sr-only">{gameUi("Custom coin wager")}</span>
             <input
               type="number"
               inputMode="numeric"
@@ -126,7 +124,7 @@ function WagerPicker({
               onChange={(e) => setCustomAmount(Number(e.target.value))}
             />
           </label>
-          <button aria-label="One coin more" onClick={() => setCustomAmount(custom + 1)} disabled={custom >= max}>
+          <button aria-label={gameUi("One coin more")} onClick={() => setCustomAmount(custom + 1)} disabled={custom >= max}>
             +
           </button>
           <input
@@ -134,16 +132,14 @@ function WagerPicker({
             min={1}
             max={max}
             value={custom}
-            aria-label="Custom coin wager slider"
+            aria-label={gameUi("Custom coin wager slider")}
             onChange={(e) => setCustomAmount(Number(e.target.value))}
           />
         </div>
-      )}
+      ))}
       <div className="pp-sheet-actions">
-        <button onClick={onBack}>Back</button>
-        <button className="pp-primary" disabled={!wager} onClick={() => wager && onConfirm(wager)}>
-          ⚔️ Duel!
-        </button>
+        <button onClick={onBack}>{gameUi("Back")}</button>
+        <button className="pp-primary" disabled={!wager} onClick={() => wager && onConfirm(wager)}>{gameUi(" ⚔️ Duel! ")}</button>
       </div>
     </>
   );
@@ -163,12 +159,13 @@ export default function TargetPicker({
   onCancel: () => void;
   onConfirm: (targetPlayerId: string, wager?: DuelWager) => void;
 }) {
+  useGameLanguage();
   const [targetId, setTargetId] = useState<string | null>(null);
   const target = match.players.find((p) => p.id === targetId);
   const isDuel = definition.id === "duel-saber",
     isPocket = definition.id === "pocket-duel";
   return (
-    <div className="pp-sheet" role="dialog" aria-label={`${definition.name} target`}>
+    <div className="pp-sheet" role="dialog" aria-label={gameUi(`${definition.name} target`)}>
       {isDuel && target ? (
         <WagerPicker
           me={me}
@@ -179,11 +176,11 @@ export default function TargetPicker({
       ) : (
         <>
           <span className="pp-eyebrow">
-            {definition.icon} {definition.rarity === "rare" ? "★ RARE · " : ""}
-            {definition.name.toUpperCase()}
+            {gameUi(definition.icon)} {gameUi(definition.rarity === "rare" ? "★ RARE · " : "")}
+            {gameUi(definition.name.toUpperCase())}
           </span>
-          <h2>{isDuel || isPocket ? "Who do you challenge?" : "Choose a target"}</h2>
-          <p className="pp-sheet-note">{definition.description}</p>
+          <h2>{gameUi(isDuel || isPocket ? "Who do you challenge?" : "Choose a target")}</h2>
+          <p className="pp-sheet-note">{gameUi(definition.description)}</p>
           <ul className="pp-targets">
             {match.players
               .filter((p) => p.id !== me.id)
@@ -201,17 +198,17 @@ export default function TargetPicker({
                       <Portrait player={p} />
                       <span>
                         <strong>{p.name}</strong>
-                        <small>{status.note}</small>
+                        <small>{gameUi(status.note)}</small>
                       </span>
                       <span className="pp-target-stats">
-                        {isDuel || isPocket ? (
+                        {gameUi(isDuel || isPocket ? (
                           <>
-                            🪙 {p.coins} · ✦ {p.goldenPlutos}
+                            🪙 {gameUi(p.coins)} · ✦ {gameUi(p.goldenPlutos)}
                           </>
                         ) : (
-                          <>❤️ {p.hp}</>
-                        )}
-                        <small>Space {Number(p.currentNodeId.split("-")[1]) + 1}</small>
+                          <>❤️ {gameUi(p.hp)}</>
+                        ))}
+                        <small>{gameUi("Space ")}{gameUi(Number(p.currentNodeId.split("-")[1]) + 1)}</small>
                       </span>
                     </button>
                   </li>
@@ -219,16 +216,16 @@ export default function TargetPicker({
               })}
           </ul>
           <div className="pp-sheet-actions">
-            <button onClick={onCancel}>Cancel</button>
-            {!isDuel && (
+            <button onClick={onCancel}>{gameUi("Cancel")}</button>
+            {gameUi(!isDuel && (
               <button
                 className="pp-primary"
                 disabled={!targetId}
                 onClick={() => targetId && onConfirm(targetId)}
               >
-                {isPocket ? "🎮 Start duel" : "Take aim"}
+                {gameUi(isPocket ? "🎮 Start duel" : "Take aim")}
               </button>
-            )}
+            ))}
           </div>
         </>
       )}

@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../../i18n/gameUi.ts";
 import { useRef, type RefObject } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
@@ -7,6 +8,7 @@ import { WEAPONS, type ArenaPoint, type WeaponId } from "../../../../games/party
 import type { ArenaHit, ArenaPlayer } from "../../../../games/party/minigames/pickupArena/index.ts";
 
 export function WeaponModel({ weapon }: { weapon: WeaponId }) {
+  useGameLanguage();
   const handgun = weapon === "pistol" || weapon === "desert-eagle";
   const length = weapon === "desert-eagle" ? 0.36 : weapon === "pistol" ? 0.25 : 0.65;
   if (weapon === "knife") return <group>
@@ -24,6 +26,7 @@ export function WeaponModel({ weapon }: { weapon: WeaponId }) {
 }
 
 export function WeaponPickup({ point, weapon, label }: { point: ArenaPoint; weapon: WeaponId; label: boolean }) {
+  useGameLanguage();
   const display = useRef<Group>(null);
   useFrame(({ clock }) => {
     if (display.current) { display.current.rotation.y = clock.elapsedTime * 0.7; display.current.position.y = 0.58 + Math.sin(clock.elapsedTime * 2) * 0.08; }
@@ -32,12 +35,13 @@ export function WeaponPickup({ point, weapon, label }: { point: ArenaPoint; weap
     <group ref={display} scale={1.35}><WeaponModel weapon={weapon}/></group>
     <mesh position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[0.42, 0.65, 24]}/><meshBasicMaterial color={WEAPONS[weapon].color} transparent opacity={0.8}/></mesh>
     {label && <Html center position={[0, 0.35, 0]} distanceFactor={4} occlude zIndexRange={[4, 0]} style={{ pointerEvents: "none" }}>
-      <span className="arena-world-pickup" style={{ borderColor: WEAPONS[weapon].color }}>{WEAPONS[weapon].name}</span>
+      <span className="arena-world-pickup" style={{ borderColor: WEAPONS[weapon].color }}>{gameUi(WEAPONS[weapon].name)}</span>
     </Html>}
   </group>;
 }
 
 export function ArenaCharacter({ player, name, color, avatarId, hit, now, offset }: { player: ArenaPlayer; name: string; color: string; avatarId: number; hit?: ArenaHit; now: number; offset: RefObject<number | null> }) {
+  useGameLanguage();
   const body = useRef<Group>(null), walking = useRef(0), initialized = useRef(false);
   useFrame((_, dt) => {
     const group = body.current; if (!group) return;
@@ -57,12 +61,13 @@ export function ArenaCharacter({ player, name, color, avatarId, hit, now, offset
     {player.weapon && <group position={[0.35, 1.1, -0.2]}><WeaponModel weapon={player.weapon}/></group>}
     {player.protectedUntil > now && <mesh position={[0, 1, 0]}><sphereGeometry args={[1, 12, 8]}/><meshBasicMaterial color="#79d8ff" wireframe transparent opacity={0.18}/></mesh>}
     <Html center position={[0, 2.5, 0]} distanceFactor={8} occlude zIndexRange={[4, 0]} style={{ pointerEvents: "none" }}>
-      <div className="arena-enemy-hp"><span>{name} <b>{player.hp} HP</b></span><div><i style={{ width: `${player.hp}%`, background: player.hp < 35 ? "#ff7489" : "#82e5bc" }}/></div></div>
+      <div className="arena-enemy-hp"><span>{name} <b>{gameUi(player.hp)}{gameUi(" HP")}</b></span><div><i style={{ width: `${player.hp}%`, background: player.hp < 35 ? "#ff7489" : "#82e5bc" }}/></div></div>
     </Html>
   </group>;
 }
 
 export function HitBurst({ hit, offset }: { hit: ArenaHit; offset: RefObject<number | null> }) {
+  useGameLanguage();
   const sparks = useRef<Group>(null);
   useFrame(() => {
     const age = Math.max(0, (Date.now() + (offset.current ?? 0) - hit.at) / 1000), group = sparks.current;
@@ -81,17 +86,19 @@ export function HitBurst({ hit, offset }: { hit: ArenaHit; offset: RefObject<num
 }
 
 export function HitDamageNumber({ hit }: { hit: ArenaHit }) {
+  useGameLanguage();
   return <Html center position={[hit.position.x, hit.position.y + 0.7, hit.position.z]} distanceFactor={8} zIndexRange={[4, 0]} style={{ pointerEvents: "none" }}>
-    <span className={`arena-damage-number ${hit.hpAfter === 0 ? "kill" : ""}`}>{hit.headshot && <small>HEADSHOT</small>}−{hit.damage}</span>
+    <span className={`arena-damage-number ${hit.hpAfter === 0 ? "kill" : ""}`}>{hit.headshot && <small>{gameUi("HEADSHOT")}</small>}−{gameUi(hit.damage)}</span>
   </Html>;
 }
 export function SupplyPickup({ point }: { point: ArenaPoint & { kind: "health" | "ammo" } }) {
+  useGameLanguage();
   const root = useRef<Group>(null), health = point.kind === "health";
   useFrame(({ clock }) => { if (root.current) { root.current.rotation.y = clock.elapsedTime * .65; root.current.position.y = point.y + .5 + Math.sin(clock.elapsedTime * 2 + point.x) * .06; } });
   return <group ref={root} position={[point.x, point.y + .5, point.z]}>
     <mesh><boxGeometry args={[.6, .4, .4]}/><meshStandardMaterial color={health ? "#f6edf0" : "#707d61"} roughness={.6}/></mesh>
-    {health ? <group position={[0, 0, .205]}><mesh><boxGeometry args={[.1, .27, .02]}/><meshStandardMaterial color="#fa637f" emissive="#ee657d" emissiveIntensity={.3}/></mesh><mesh><boxGeometry args={[.27, .1, .02]}/><meshStandardMaterial color="#fa637f"/></mesh></group>
-      : [-.15, 0, .15].map((x) => <mesh key={x} position={[x, .07, .22]}><capsuleGeometry args={[.034, .18, 2, 6]}/><meshStandardMaterial color="#ffd285" metalness={.6}/></mesh>)}
+    {gameUi(health ? <group position={[0, 0, .205]}><mesh><boxGeometry args={[.1, .27, .02]}/><meshStandardMaterial color="#fa637f" emissive="#ee657d" emissiveIntensity={.3}/></mesh><mesh><boxGeometry args={[.27, .1, .02]}/><meshStandardMaterial color="#fa637f"/></mesh></group>
+      : [-.15, 0, .15].map((x) => <mesh key={x} position={[x, .07, .22]}><capsuleGeometry args={[.034, .18, 2, 6]}/><meshStandardMaterial color="#ffd285" metalness={.6}/></mesh>))}
     <mesh position={[0, -.38, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[.35, .39, 20]}/><meshBasicMaterial color={health ? "#ff91a8" : "#ffdb94"}/></mesh>
   </group>;
 }

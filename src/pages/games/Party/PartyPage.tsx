@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import FinalResults from "./FinalResults.tsx";
 import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { recordCreatedGameInviteCode, useCreatedGameInvite } from "@/components/social/GameInviteDelivery";
@@ -46,6 +47,7 @@ function useViewportFitCover() {
   }, []);
 }
 function PartyApp() {
+  useGameLanguage();
   const connection = usePartyConnection();
   const [params] = useSearchParams();
   const configuredRoom = useRef<string | null>(null);
@@ -83,67 +85,59 @@ function PartyApp() {
       data-motion={reduced ? "reduce" : "full"}
       data-hints={prefs.controlHints ? "on" : "off"}
     >
-      {createdInvite.status && <div className="pp-alert" role={createdInvite.failed ? "alert" : "status"}>{createdInvite.status}{createdInvite.failed && <button onClick={createdInvite.retry}>Retry invite</button>}</div>}
+      {createdInvite.status && <div className="pp-alert" role={createdInvite.failed ? "alert" : "status"}>{gameUi(createdInvite.status)}{createdInvite.failed && <button onClick={createdInvite.retry}>{gameUi("Retry invite")}</button>}</div>}
       <header className="pp-header">
         <Link to="/games" className="pp-back">
-          <ArrowLeft size={17} /> Games
-        </Link>
-        <a href="/games/pluto-party" className="pp-wordmark">
-          pluto<span>party</span>
+          <ArrowLeft size={17} />{gameUi(" Games ")}</Link>
+        <a href="/games/pluto-party" className="pp-wordmark">{gameUi(" pluto")}<span>{gameUi("party")}</span>
           <Sparkles size={18} aria-hidden="true" />
         </a>
         <div className="pp-header-tools">
           <span className={`pp-connection is-${status}`} role="status">
             <i aria-hidden="true" />
-            {STATUS_LABEL[status]}
+            {gameUi(STATUS_LABEL[status])}
           </span>
           <button
             className="pp-icon-button"
             onClick={() => setSettingsOpen(true)}
-            aria-label="Settings"
+            aria-label={gameUi("Settings")}
             aria-haspopup="dialog"
           >
             <Settings2 size={19} />
           </button>
         </div>
       </header>
-      {error && errorCode !== "SESSION_REPLACED" && (
+      {gameUi(error && errorCode !== "SESSION_REPLACED" && (
         <div className={`pp-alert ${errorCode === "RATE_LIMITED" ? "is-warning" : ""}`} role="alert">
-          {error}
-          <button onClick={clearError} aria-label="Dismiss message">
+          {gameUi(error)}
+          <button onClick={clearError} aria-label={gameUi("Dismiss message")}>
             <X size={18} />
           </button>
         </div>
-      )}
-      {!lobby && !online && (
+      ))}
+      {gameUi(!lobby && !online && (
         <div className="pp-notice" role="status">
-          {status === "connecting" ? (
+          {gameUi(status === "connecting" ? (
             <>
-              <span className="pp-spinner small" aria-hidden="true" /> Connecting to the party server…
-            </>
+              <span className="pp-spinner small" aria-hidden="true" />{gameUi(" Connecting to the party server… ")}</>
           ) : status === "replaced" ? (
-            <>
-              Pluto Party is open in another tab.{" "}
-              <button className="pp-link-button" onClick={retry}>
-                Use this tab
-              </button>
+            <>{gameUi(" Pluto Party is open in another tab.")}{gameUi(" ")}
+              <button className="pp-link-button" onClick={retry}>{gameUi(" Use this tab ")}</button>
             </>
           ) : (
             <>
-              {status === "offline"
+              {gameUi(status === "offline"
                 ? "Can’t reach the party server. Retrying automatically…"
-                : "Reconnecting to the party server…"}{" "}
-              {import.meta.env.DEV && status === "offline" && (
-                <span>(Local play: start it with npm run party:server.)</span>
-              )}{" "}
-              <button className="pp-link-button" onClick={retry}>
-                Retry now
-              </button>
+                : "Reconnecting to the party server…")}{gameUi(" ")}
+              {gameUi(import.meta.env.DEV && status === "offline" && (
+                <span>{gameUi("(Local play: start it with npm run party:server.)")}</span>
+              ))}{gameUi(" ")}
+              <button className="pp-link-button" onClick={retry}>{gameUi(" Retry now ")}</button>
             </>
-          )}
+          ))}
         </div>
-      )}
-      {!lobby ? (
+      ))}
+      {gameUi(!lobby ? (
         <PartyHome connection={connection} />
       ) : !lobby.match ? (
         <PartyLobby connection={connection} lobby={lobby} />
@@ -155,10 +149,10 @@ function PartyApp() {
           minigame={lobby.match.minigame}
         />
       ) : lobby.match.mode === "festival" ? (
-        <section className="pp-match pp-festival-results">{lobby.match.phase === "GAME_OVER" ? <FinalResults connection={connection} lobby={lobby} match={lobby.match} alpine={false}/> : <div className="mg-results"><h2>Next minigame…</h2></div>}</section>
+        <section className="pp-match pp-festival-results">{lobby.match.phase === "GAME_OVER" ? <FinalResults connection={connection} lobby={lobby} match={lobby.match} alpine={false}/> : <div className="mg-results"><h2>{gameUi("Next minigame…")}</h2></div>}</section>
       ) : (
         <PartyMatch connection={connection} lobby={lobby} match={lobby.match} />
-      )}
+      ))}
       {lobby && <ConnectionOverlay connection={connection} />}
       {settingsOpen && <PartySettings onClose={closeSettings} />}
     </main>

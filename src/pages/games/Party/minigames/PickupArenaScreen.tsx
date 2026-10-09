@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../../i18n/gameUi.ts";
 import { useCallback, useEffect, useRef, useState, type MutableRefObject, type RefObject } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Html, Line } from "@react-three/drei";
@@ -12,6 +13,7 @@ import { ArenaCharacter, HitBurst, HitDamageNumber, WeaponModel, WeaponPickup, S
 
 interface Aim { yaw: number; pitch: number }
 function CameraRig({ state, playerId, avatarId, aim, held, offset }: { state: ArenaView; playerId: string; avatarId: number; aim: MutableRefObject<Aim>; held: MutableRefObject<ArenaInput>; offset: RefObject<number | null> }) {
+  useGameLanguage();
   const hand = useRef<Group>(null), muzzle = useRef<Mesh>(null), initialized = useRef(false);
   const me = state.players[playerId] ?? Object.values(state.players)[0];
   const predicted = useRef({ x: 0, y: 0, z: 0 }), correction = useRef({ x: 0, y: 0, z: 0 }), dead = useRef(false);
@@ -57,14 +59,15 @@ function CameraRig({ state, playerId, avatarId, aim, held, offset }: { state: Ar
   </group>;
 }
 function ArenaScene({ state, match, playerId, aim, held, now, offset }: MinigameViewProps & { state: ArenaView; aim: MutableRefObject<Aim>; held: MutableRefObject<ArenaInput>; offset: RefObject<number | null> }) {
+  useGameLanguage();
   const map = ARENA_MAPS[state.map];
   const me = state.players[playerId], hits = state.hits ?? [];
   return <>
-    {[...Array(map.floors)].map((_, floor) => <group key={floor} position={[0,floor * 4 + .025,3]}><mesh rotation={[-Math.PI/2,0,0]}><ringGeometry args={[2.1,2.5,40]}/><meshBasicMaterial color="#8df8dc" transparent opacity={.7 + .2 * Math.sin(now/200)}/></mesh><Html center position={[0,.3,0]} style={{ pointerEvents:"none" }}><span className="arena-world-pickup" style={{borderColor:"#8df8dc"}}>✦ BEACON · HOLD 3s = +1</span></Html></group>)}
+    {[...Array(map.floors)].map((_, floor) => <group key={floor} position={[0,floor * 4 + .025,3]}><mesh rotation={[-Math.PI/2,0,0]}><ringGeometry args={[2.1,2.5,40]}/><meshBasicMaterial color="#8df8dc" transparent opacity={.7 + .2 * Math.sin(now/200)}/></mesh><Html center position={[0,.3,0]} style={{ pointerEvents:"none" }}><span className="arena-world-pickup" style={{borderColor:"#8df8dc"}}>{gameUi("✦ BEACON · HOLD 3s = +1")}</span></Html></group>)}
     <ArenaWorld map={map}/><CameraRig state={state} playerId={playerId} avatarId={match.players.find((p) => p.id === playerId)?.avatarId ?? 0} aim={aim} held={held} offset={offset}/>
     {state.pickups.filter((p) => p.availableAt <= now).map((item) => {
       const p = map.pickups[item.id];
-      return <WeaponPickup key={item.id} point={p} weapon={p.weapon} label={!!me && Math.abs(me.y - p.y) < 2.2 && Math.hypot(me.x - p.x, me.z - p.z) < 14}/>;
+      return <WeaponPickup key={item.id} point={p} weapon={p.weapon} label={gameUi(!!me && Math.abs(me.y - p.y) < 2.2 && Math.hypot(me.x - p.x, me.z - p.z) < 14)}/>;
     })}
     {(state.supplies ?? []).filter((s) => s.availableAt <= now).map((s) => <SupplyPickup key={s.id} point={map.supplies[s.id]}/>)}
     {Object.entries(state.players).filter(([id, p]) => id !== playerId && p.hp > 0).map(([id, p]) => {
@@ -78,6 +81,7 @@ function ArenaScene({ state, match, playerId, aim, held, now, offset }: Minigame
   </>;
 }
 export default function PickupArenaScreen(props: MinigameViewProps) {
+  useGameLanguage();
   const { minigame, match, playerId, now, online, sendInput } = props;
   const state = minigame.state as ArenaView, me = state.players[playerId], map = ARENA_MAPS[state.map];
   const offset = useServerOffset(minigame.serverNow);
@@ -153,21 +157,21 @@ export default function PickupArenaScreen(props: MinigameViewProps) {
   const hit = (state.hits ?? []).findLast((h) => h.attacker === playerId && now - h.at < 350);
   const hurt = (state.hits ?? []).findLast((h) => h.victim === playerId && now - h.at < 650);
   return <div className="arena-game">
-    <header className="arena-header"><div><span className="pp-eyebrow">{map.name.toUpperCase()}</span><h2>Pickup Shootout</h2></div><strong>{Math.max(0, Math.ceil((state.endsAt - now) / 1000))}s</strong></header>
+    <header className="arena-header"><div><span className="pp-eyebrow">{gameUi(map.name.toUpperCase())}</span><h2>{gameUi("Pickup Shootout")}</h2></div><strong>{gameUi(Math.max(0, Math.ceil((state.endsAt - now) / 1000)))}s</strong></header>
     <div className="arena-viewport" onPointerDown={(e) => { if (e.pointerType === "mouse" && locked && e.button === 0) setFire(true); }} onContextMenu={(e) => e.preventDefault()}>
       <Canvas camera={{ fov: 78, near: 0.08, far: 100 }} dpr={[1, 1.25]} gl={{ antialias: true, powerPreference: "high-performance" }} onCreated={({ gl }) => { canvas.current = gl.domElement; }} fallback={<p>This arena needs a browser with WebGL enabled.</p>}>
         <ArenaScene {...props} state={state} aim={aim} held={held} offset={offset}/>
       </Canvas>
       <div className="arena-crosshair" aria-hidden="true">+</div>
-      {hit && <div key={hit.id} className={`arena-hit-marker ${hit.hpAfter === 0 ? "kill" : ""}`} aria-label={`${hit.damage} damage dealt`}>✕{hit.headshot && <small>HEADSHOT</small>}</div>}
+      {hit && <div key={hit.id} className={`arena-hit-marker ${hit.hpAfter === 0 ? "kill" : ""}`} aria-label={gameUi(`${hit.damage} damage dealt`)}>✕{hit.headshot && <small>{gameUi("HEADSHOT")}</small>}</div>}
       {hurt && <div key={hurt.id} className="arena-hurt-vignette" aria-hidden="true"/>}
       <ol className="arena-leaderboard">{sorted.map(([id, p]) => <li key={id} className={id === playerId ? "me" : ""}>
-        <span>{match.players.find((o) => o.id === id)?.name}</span><b>{p.kills * 3 + (p.beaconPoints ?? 0)}</b>
+        <span>{match.players.find((o) => o.id === id)?.name}</span><b>{gameUi(p.kills * 3 + (p.beaconPoints ?? 0))}</b>
       </li>)}</ol>
       <div className="arena-feed" aria-live="polite">{state.feed.filter((f) => now - f.at < 5000).map((f) => <p key={`${f.at}:${f.victim}`}>
-        {match.players.find((p) => p.id === f.killer)?.name} · {WEAPONS[f.weapon].name}{f.headshot ? " · HEADSHOT" : ""} · {match.players.find((p) => p.id === f.victim)?.name}
+        {match.players.find((p) => p.id === f.killer)?.name} · {gameUi(WEAPONS[f.weapon].name)}{gameUi(f.headshot ? " · HEADSHOT" : "")} · {match.players.find((p) => p.id === f.victim)?.name}
       </p>)}</div>
-      <svg className="arena-minimap" viewBox={`${-map.halfSize} ${-map.halfSize} ${map.halfSize * 2} ${map.halfSize * 2}`} role="img" aria-label={`Arena map. Floor ${floor + 1}`}>
+      <svg className="arena-minimap" viewBox={`${-map.halfSize} ${-map.halfSize} ${map.halfSize * 2} ${map.halfSize * 2}`} role="img" aria-label={gameUi(`Arena map. Floor ${floor + 1}`)}>
         <rect x={-map.halfSize} y={-map.halfSize} width={map.halfSize * 2} height={map.halfSize * 2} fill="#131d2b"/>
         {map.boxes.filter((b) => b.kind !== "wall" && b.y - b.h / 2 <= floor * 4 + 1 && b.y + b.h / 2 > floor * 4).map((b, i) => <rect key={i} x={b.x - b.w / 2} y={b.z - b.d / 2} width={b.w} height={b.d} fill={b.color}/>)}
         {map.stairs.map((s, i) => <rect key={i} x={s.x - s.w / 2} y={s.z - s.length / 2} width={s.w} height={s.length} fill="#8ed5bd"/>)}
@@ -176,30 +180,30 @@ export default function PickupArenaScreen(props: MinigameViewProps) {
         {(state.supplies ?? []).filter((s) => s.availableAt <= now && map.supplies[s.id].y === floor * 4).map((s) => <rect key={"s" + s.id} x={map.supplies[s.id].x - .5} y={map.supplies[s.id].z - .5} width={1} height={1} fill={map.supplies[s.id].kind === "health" ? "#ff91a0" : "#ffe19c"}/>)}
       </svg>
       {me && <>
-        <div className={`arena-hp-box ${me.hp < 35 ? "low" : ""}`}><span>HEALTH <b>{me.hp}<small> / 100</small></b></span>
-          <div role="progressbar" aria-label="Your HP" aria-valuemin={0} aria-valuemax={100} aria-valuenow={me.hp}><i style={{ width: `${me.hp}%` }}/></div>
+        <div className={`arena-hp-box ${me.hp < 35 ? "low" : ""}`}><span>{gameUi("HEALTH ")}<b>{gameUi(me.hp)}<small> / 100</small></b></span>
+          <div role="progressbar" aria-label={gameUi("Your HP")} aria-valuemin={0} aria-valuemax={100} aria-valuenow={me.hp}><i style={{ width: `${me.hp}%` }}/></div>
         </div>
-        <div className="arena-status"><span>{me.weapon ? WEAPONS[me.weapon].name : "Unarmed"}</span><b>{me.ammo < 0 ? "∞" : me.ammo} ammo</b><span>{me.kills * 3 + (me.beaconPoints ?? 0)} pts · {me.kills} hits scored · floor {floor + 1}</span></div>
+        <div className="arena-status"><span>{gameUi(me.weapon ? WEAPONS[me.weapon].name : "Unarmed")}</span><b>{gameUi(me.ammo < 0 ? "∞" : me.ammo)}{gameUi(" ammo")}</b><span>{gameUi(me.kills * 3 + (me.beaconPoints ?? 0))}{gameUi(" pts · ")}{gameUi(me.kills)}{gameUi(" hits scored · floor ")}{gameUi(floor + 1)}</span></div>
       </>}
-      {nearest && active && <div className="arena-pickup-prompt">E / Swap · {WEAPONS[map.pickups[nearest.id].weapon].name}</div>}
-      {me?.protectedUntil > now && active && <div className="arena-protection">Spawn shield · weapons ready in {Math.ceil((me.protectedUntil - now) / 1000)}s</div>}
-      {!me?.hp ? <div className="arena-overlay arena-death" role="status"><span className="arena-death-icon">☠</span><h3>{me ? "ELIMINATED" : "SPECTATING"}</h3><p>{me && state.feed.find((f) => f.victim === playerId) ? "Taken out by " + match.players.find((p) => p.id === state.feed.find((f) => f.victim === playerId)?.killer)?.name : ""}</p><strong>{me?.respawnAt ? `Back in ${Math.max(0, Math.ceil((me.respawnAt - now) / 1000))} seconds` : "Watch the shootout."}</strong><p>Respawn with 100 HP and a short spawn shield.</p></div> :
-        !locked && !touchPlaying && <div className="arena-overlay"><span className="pp-eyebrow">FIND · EQUIP · SURVIVE</span><h3>Start with nothing.<br/>Make every pickup count.</h3><p>WASD to move · mouse to look · click to fire · E to swap<br/>1 kill = 1 point · Escape releases your mouse</p><button disabled={!online} onClick={begin}>Enter arena</button></div>}
+      {nearest && active && <div className="arena-pickup-prompt">{gameUi("E / Swap · ")}{gameUi(WEAPONS[map.pickups[nearest.id].weapon].name)}</div>}
+      {me?.protectedUntil > now && active && <div className="arena-protection">{gameUi("Spawn shield · weapons ready in ")}{gameUi(Math.ceil((me.protectedUntil - now) / 1000))}s</div>}
+      {!me?.hp ? <div className="arena-overlay arena-death" role="status"><span className="arena-death-icon">☠</span><h3>{gameUi(me ? "ELIMINATED" : "SPECTATING")}</h3><p>{gameUi(me && state.feed.find((f) => f.victim === playerId) ? "Taken out by " + match.players.find((p) => p.id === state.feed.find((f) => f.victim === playerId)?.killer)?.name : "")}</p><strong>{gameUi(me?.respawnAt ? `Back in ${Math.max(0, Math.ceil((me.respawnAt - now) / 1000))} seconds` : "Watch the shootout.")}</strong><p>{gameUi("Respawn with 100 HP and a short spawn shield.")}</p></div> :
+        !locked && !touchPlaying && <div className="arena-overlay"><span className="pp-eyebrow">{gameUi("FIND · EQUIP · SURVIVE")}</span><h3>{gameUi("Start with nothing.")}<br/>{gameUi("Make every pickup count.")}</h3><p>{gameUi("WASD to move · mouse to look · click to fire · E to swap")}<br/>{gameUi("1 kill = 1 point · Escape releases your mouse")}</p><button disabled={!online} onClick={begin}>{gameUi("Enter arena")}</button></div>}
     </div>
     {touchPlaying && <div className="arena-touch-controls">
-      <div className="arena-touch-move" role="group" aria-label="Movement">{[["a", "←"], ["w", "↑"], ["s", "↓"], ["d", "→"]].map(([key, label]) => <button key={key} aria-label={`Move ${label}`}
+      <div className="arena-touch-move" role="group" aria-label={gameUi("Movement")}>{[["a", "←"], ["w", "↑"], ["s", "↓"], ["d", "→"]].map(([key, label]) => <button key={key} aria-label={gameUi(`Move ${label}`)}
         onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); changeKey(key, true); }}
-        onPointerUp={() => changeKey(key, false)} onPointerCancel={() => changeKey(key, false)} onLostPointerCapture={() => changeKey(key, false)}>{label}</button>)}</div>
-      <div className="arena-touch-look" aria-label="Drag to look" onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); touchLook.current = [e.clientX, e.clientY]; }} onPointerMove={(e) => {
+        onPointerUp={() => changeKey(key, false)} onPointerCancel={() => changeKey(key, false)} onLostPointerCapture={() => changeKey(key, false)}>{gameUi(label)}</button>)}</div>
+      <div className="arena-touch-look" aria-label={gameUi("Drag to look")} onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); touchLook.current = [e.clientX, e.clientY]; }} onPointerMove={(e) => {
         if (!e.currentTarget.hasPointerCapture(e.pointerId) || !touchLook.current) return;
         const [x, y] = touchLook.current, yaw = aim.current.yaw + (e.clientX - x) * 0.006;
         aim.current.yaw = Math.atan2(Math.sin(yaw), Math.cos(yaw)); aim.current.pitch = Math.max(-1.45, Math.min(1.45, aim.current.pitch - (e.clientY - y) * 0.006));
         touchLook.current = [e.clientX, e.clientY];
-      }} onLostPointerCapture={() => { touchLook.current = null; }}>Drag to look</div>
-      <button className="arena-fire" onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); setFire(true); }} onPointerUp={() => setFire(false)} onPointerCancel={() => setFire(false)} onLostPointerCapture={() => { if (held.current.fire) setFire(false); }}>Fire</button>
-      <button disabled={!nearest} onClick={() => sendInput({ type: "ARENA_PICKUP" })}>Swap</button>
-      <button onClick={() => setTouchPlaying(false)}>Pause controls</button>
+      }} onLostPointerCapture={() => { touchLook.current = null; }}>{gameUi("Drag to look")}</div>
+      <button className="arena-fire" onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); setFire(true); }} onPointerUp={() => setFire(false)} onPointerCancel={() => setFire(false)} onLostPointerCapture={() => { if (held.current.fire) setFire(false); }}>{gameUi("Fire")}</button>
+      <button disabled={!nearest} onClick={() => sendInput({ type: "ARENA_PICKUP" })}>{gameUi("Swap")}</button>
+      <button onClick={() => setTouchPlaying(false)}>{gameUi("Pause controls")}</button>
     </div>}
-    <p className="arena-help">{map.id === "arcade" ? "Three floors · four mint-marked stairs" : "Buildings, cars and crates provide cover"} · Comet batons and blasters · kill +3 · beacon +1 every 3s · highest score wins</p>
+    <p className="arena-help">{gameUi(map.id === "arcade" ? "Three floors · four mint-marked stairs" : "Buildings, cars and crates provide cover")}{gameUi(" · Comet batons and blasters · kill +3 · beacon +1 every 3s · highest score wins")}</p>
   </div>;
 }

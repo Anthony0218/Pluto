@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { minigameRegistry } from "../../../games/party/minigames/index.ts";
 import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_DESCRIPTIONS } from "../../../games/party/difficulty.ts";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
@@ -19,6 +20,7 @@ export default function PartyLobby({
   connection: PartyConnection;
   lobby: Lobby;
 }) {
+  useGameLanguage();
   const { status, playerId, send, pending, serverOffset } = connection;
   const online = status === "online",
     host = lobby.hostId === playerId,
@@ -44,12 +46,11 @@ export default function PartyLobby({
     <section className="pp-lobby-screen">
       <div className="pp-title-row">
         <div>
-          <span className="pp-eyebrow">THE CREW IS COMING TOGETHER</span>
+          <span className="pp-eyebrow">{gameUi("THE CREW IS COMING TOGETHER")}</span>
           <h1>{lobby.name}</h1>
           <p>
-            {lobby.public ? "Public lobby" : "Private lobby"} · {lobby.settings.mode === "festival" ? "Minigame Festival" : map.name} ·{" "}
-            {lobby.players.length}/4 explorers
-          </p>
+            {gameUi(lobby.public ? "Public lobby" : "Private lobby")} · {gameUi(lobby.settings.mode === "festival" ? "Minigame Festival" : map.name)} ·{gameUi(" ")}
+            {gameUi(lobby.players.length)}{gameUi("/4 explorers ")}</p>
         </div>
         <button
           className="pp-code"
@@ -66,7 +67,7 @@ export default function PartyLobby({
           }}
         >
           <Copy size={16} aria-hidden="true" />
-          {copied ? "Copied!" : lobby.code}
+          {gameUi(copied ? "Copied!" : lobby.code)}
         </button>
       </div>
       <div className="pp-lobby-columns">
@@ -85,21 +86,20 @@ export default function PartyLobby({
                       <div>
                         <strong>
                           {p.name}
-                          {p.id === playerId ? " (you)" : ""}
+                          {gameUi(p.id === playerId ? " (you)" : "")}
                         </strong>
                         <small>
-                          {p.id === lobby.hostId ? "Host · " : ""}
+                          {gameUi(p.id === lobby.hostId ? "Host · " : "")}
                           <PlayerStatus player={p} serverOffset={serverOffset} />
                         </small>
                       </div>
                       <span className={`pp-ready ${p.ready ? "yes" : ""}`}>
-                        {p.ready ? (
+                        {gameUi(p.ready ? (
                           <>
-                            <Check size={14} /> Ready
-                          </>
+                            <Check size={14} />{gameUi(" Ready ")}</>
                         ) : (
                           "Not ready"
-                        )}
+                        ))}
                       </span>
                       {p.isBot && host && (
                         <select
@@ -114,7 +114,7 @@ export default function PartyLobby({
                           }
                         >
                           {DIFFICULTIES.map((d) => (
-                            <option key={d} value={d}>{DIFFICULTY_LABELS[d]}</option>
+                            <option key={d} value={d}>{gameUi(DIFFICULTY_LABELS[d])}</option>
                           ))}
                         </select>
                       )}
@@ -134,15 +134,14 @@ export default function PartyLobby({
                     <>
                       <span className="pp-empty-avatar">+</span>
                       <div>
-                        <strong>A seat for trouble</strong>
-                        <small>Invite a friend with your lobby code</small>
+                        <strong>{gameUi("A seat for trouble")}</strong>
+                        <small>{gameUi("Invite a friend with your lobby code")}</small>
                       </div>
                       <InviteFriendButton room={{ lobbyRoute: "/games/pluto-party", code: lobby.code }} />
-                      {host && (
+                      {gameUi(host && (
                         <button onClick={() => send({ type: "ADD_BOT" })}>
-                          <Plus size={15} /> Add bot
-                        </button>
-                      )}
+                          <Plus size={15} />{gameUi(" Add bot ")}</button>
+                      ))}
                     </>
                   )}
                 </article>
@@ -155,56 +154,51 @@ export default function PartyLobby({
               className="pp-primary"
               onClick={() => send({ type: "READY", ready: !me?.ready })}
             >
-              {me?.ready ? "Unready" : "I’m ready"} <Check size={18} />
+              {gameUi(me?.ready ? "Unready" : "I’m ready")} <Check size={18} />
             </button>
-            {host && (
+            {gameUi(host && (
               <button
                 className="pp-primary pp-dark"
                 disabled={!online || !!startBlocker || pending === "start"}
                 aria-busy={pending === "start"}
                 onClick={() => send({ type: "START" })}
               >
-                {pending === "start" ? (
+                {gameUi(pending === "start" ? (
                   <>
-                    <span className="pp-spinner small" aria-hidden="true" /> Starting…
-                  </>
+                    <span className="pp-spinner small" aria-hidden="true" />{gameUi(" Starting… ")}</>
                 ) : (
                   <>
-                    {lobby.settings.mode === "festival" ? "Start festival" : "Set sail"} <ArrowRight size={18} />
+                    {gameUi(lobby.settings.mode === "festival" ? "Start festival" : "Set sail")} <ArrowRight size={18} />
                   </>
-                )}
+                ))}
               </button>
-            )}
-            <button disabled={!online} onClick={() => send({ type: "LEAVE" })}>
-              Leave lobby
-            </button>
+            ))}
+            <button disabled={!online} onClick={() => send({ type: "LEAVE" })}>{gameUi(" Leave lobby ")}</button>
           </div>
           <p className="pp-help" role="status">
-            {startBlocker ??
+            {gameUi(startBlocker ??
               (host
                 ? lobby.settings.mode === "festival" ? "Everyone is ready. Start the festival when you like." : "Everyone is ready. Set sail when you like."
-                : `Waiting for ${lobby.players.find((p) => p.id === lobby.hostId)?.name ?? "the host"} to start the match…`)}{" "}
-            Changing match settings resets readiness.
-          </p>
+                : `Waiting for ${lobby.players.find((p) => p.id === lobby.hostId)?.name ?? "the host"} to start the match…`))}{gameUi(" ")}{gameUi(" Changing match settings resets readiness. ")}</p>
         </div>
         <aside className="pp-card pp-settings">
-          <h2>Your island, your rules.</h2>
+          <h2>{gameUi("Your island, your rules.")}</h2>
           <fieldset disabled={!host || !online}>
-            <div className="pp-mode-picker" role="radiogroup" aria-label="Party mode">
+            <div className="pp-mode-picker" role="radiogroup" aria-label={gameUi("Party mode")}>
               {(["board", "festival"] as const).map((mode) => <button key={mode} type="button" role="radio" aria-checked={(lobby.settings.mode ?? "board") === mode} className={(lobby.settings.mode ?? "board") === mode ? "selected" : ""} onClick={() => {
                 const lengths = mode === "festival" ? [3, 5, 8, 12] : [0, 8, 12, 16];
                 updateSettings({ mode, roundLimit: lengths.includes(lobby.settings.roundLimit ?? 0) ? lobby.settings.roundLimit : mode === "festival" ? 5 : 12 });
-              }}><b>{mode === "board" ? "🏝 Board Party" : "🎪 Minigame Festival"}</b><small>{mode === "board" ? "Explore, shop and compete" : "Only minigames · choose your lineup"}</small></button>)}
+              }}><b>{gameUi(mode === "board" ? "🏝 Board Party" : "🎪 Minigame Festival")}</b><small>{gameUi(mode === "board" ? "Explore, shop and compete" : "Only minigames · choose your lineup")}</small></button>)}
             </div>
-            <label>Match length<select value={lobby.settings.roundLimit ?? 0} onChange={(e) => updateSettings({ roundLimit: Number(e.target.value) })}>
-              {(lobby.settings.mode !== "festival" ? [0, 8, 12, 16] : [3, 5, 8, 12]).map((n) => <option key={n} value={n}>{n ? `${n} rounds · fixed ending` : "Race to the target"}</option>)}
+            <label>{gameUi("Match length")}<select value={lobby.settings.roundLimit ?? 0} onChange={(e) => updateSettings({ roundLimit: Number(e.target.value) })}>
+              {(lobby.settings.mode !== "festival" ? [0, 8, 12, 16] : [3, 5, 8, 12]).map((n) => <option key={n} value={n}>{gameUi(n ? `${n} rounds · fixed ending` : "Race to the target")}</option>)}
             </select></label>
             <details className="pp-lineup" open={lobby.settings.mode === "festival"}>
-              <summary>Minigame lineup · {lobby.settings.minigameIds?.length || "all"} selected</summary>
-              <p>All games play once before repeating. An empty selection includes every game.</p>
-              {minigameRegistry.pool("main").map((game) => <label key={game.id} className="pp-checkbox"><input type="checkbox" checked={lobby.settings.minigameIds?.includes(game.id) ?? false} onChange={(e) => updateSettings({ minigameIds: e.target.checked ? [...(lobby.settings.minigameIds ?? []), game.id] : (lobby.settings.minigameIds ?? []).filter((id) => id !== game.id) })}/><span>{game.name}<small>{game.durationSeconds}s · {game.description}</small></span></label>)}
+              <summary>{gameUi("Minigame lineup · ")}{gameUi(lobby.settings.minigameIds?.length || "all")}{gameUi(" selected")}</summary>
+              <p>{gameUi("All games play once before repeating. An empty selection includes every game.")}</p>
+              {minigameRegistry.pool("main").map((game) => <label key={game.id} className="pp-checkbox"><input type="checkbox" checked={lobby.settings.minigameIds?.includes(game.id) ?? false} onChange={(e) => updateSettings({ minigameIds: e.target.checked ? [...(lobby.settings.minigameIds ?? []), game.id] : (lobby.settings.minigameIds ?? []).filter((id) => id !== game.id) })}/><span>{gameUi(game.name)}<small>{gameUi(game.durationSeconds)}s · {gameUi(game.description)}</small></span></label>)}
             </details>
-            {lobby.settings.mode !== "festival" && <><div role="radiogroup" aria-label="Map" className="pp-map-picker">
+            {lobby.settings.mode !== "festival" && <><div role="radiogroup" aria-label={gameUi("Map")} className="pp-map-picker">
               {mapRegistry.all().map((m) => (
                 <button
                   key={m.id}
@@ -215,18 +209,16 @@ export default function PartyLobby({
                   onClick={() => lobby.settings.mapId !== m.id && updateSettings({ mapId: m.id })}
                 >
                   <span className="pp-map-thumb" aria-hidden="true" />
-                  <strong>{m.theme === "tropical" ? "TROPICAL ISLANDS" : m.name.toUpperCase()}</strong>
-                  <small>{m.tagline}</small>
+                  <strong>{gameUi(m.theme === "tropical" ? "TROPICAL ISLANDS" : m.name.toUpperCase())}</strong>
+                  <small>{gameUi(m.tagline)}</small>
                   <small>
-                    {m.goldenPlutoCount} active Golden Pluto
-                    {m.goldenPlutoCount === 1 ? "" : "s"} · {m.nodes.length} spaces
-                  </small>
+                    {gameUi(m.goldenPlutoCount)}{gameUi(" active Golden Pluto ")}{gameUi(m.goldenPlutoCount === 1 ? "" : "s")} · {gameUi(m.nodes.length)}{gameUi(" spaces ")}</small>
                 </button>
               ))}
             </div>
-            <p className="pp-help">{map.description}</p>
+            <p className="pp-help">{gameUi(map.description)}</p>
             <label>
-              {lobby.settings.roundLimit ? "Rank matches by" : "Victory condition"}
+              {gameUi(lobby.settings.roundLimit ? "Rank matches by" : "Victory condition")}
               <select
                 value={lobby.settings.victory}
                 onChange={(e) =>
@@ -235,14 +227,12 @@ export default function PartyLobby({
                   })
                 }
               >
-                <option value="plutos">Golden Plutos</option>
-                <option value="coins">Coins</option>
+                <option value="plutos">{gameUi("Golden Plutos")}</option>
+                <option value="coins">{gameUi("Coins")}</option>
               </select>
             </label>
-            {!lobby.settings.roundLimit && (lobby.settings.victory === "plutos" ? (
-              <label>
-                Golden Pluto target
-                <select
+            {gameUi(!lobby.settings.roundLimit && (lobby.settings.victory === "plutos" ? (
+              <label>{gameUi(" Golden Pluto target ")}<select
                   value={lobby.settings.plutoTarget}
                   onChange={(e) =>
                     updateSettings({ plutoTarget: Number(e.target.value) })
@@ -250,15 +240,12 @@ export default function PartyLobby({
                 >
                   {[3, 5, 7, 10].map((n) => (
                     <option key={n} value={n}>
-                      {n} Golden Plutos
-                    </option>
+                      {gameUi(n)}{gameUi(" Golden Plutos ")}</option>
                   ))}
                 </select>
               </label>
             ) : (
-              <label>
-                Coin target
-                <select
+              <label>{gameUi(" Coin target ")}<select
                   value={lobby.settings.coinTarget}
                   onChange={(e) =>
                     updateSettings({ coinTarget: Number(e.target.value) })
@@ -266,45 +253,35 @@ export default function PartyLobby({
                 >
                   {[100, 150, 200, 250, 300].map((n) => (
                     <option key={n} value={n}>
-                      {n} coins
-                    </option>
+                      {gameUi(n)}{gameUi(" coins ")}</option>
                   ))}
                 </select>
               </label>
-            ))}
+            )))}
             </>}
-            <label>
-              New bot difficulty
-              <select
+            <label>{gameUi(" New bot difficulty ")}<select
                 value={lobby.settings.difficulty}
                 onChange={(e) =>
                   updateSettings({ difficulty: e.target.value as Difficulty })
                 }
               >
                 {DIFFICULTIES.map((d) => (
-                  <option key={d} value={d}>{DIFFICULTY_LABELS[d]}</option>
+                  <option key={d} value={d}>{gameUi(DIFFICULTY_LABELS[d])}</option>
                 ))}
               </select>
             </label>
-            <p className="pp-help">{DIFFICULTY_DESCRIPTIONS[lobby.settings.difficulty]}</p>
+            <p className="pp-help">{gameUi(DIFFICULTY_DESCRIPTIONS[lobby.settings.difficulty])}</p>
             <label className="pp-checkbox">
               <input
                 type="checkbox"
                 checked={lobby.settings.fillBots}
                 onChange={(e) => updateSettings({ fillBots: e.target.checked })}
-              />{" "}
-              Fill empty seats with bots
-            </label>
+              />{gameUi(" ")}{gameUi(" Fill empty seats with bots ")}</label>
           </fieldset>
           <p className="pp-help">
-            {lobby.settings.mode === "festival" ? "Jump straight into your chosen minigames. Individual games award 3 / 2 / 1 / 0 festival points; team games award 3 to each winner and 1 to each opponent (2 each for a draw). The player with the most festival points after the final round wins." : <>{map.goldenPlutoCount === 1
+            {gameUi(lobby.settings.mode === "festival" ? "Jump straight into your chosen minigames. Individual games award 3 / 2 / 1 / 0 festival points; team games award 3 to each winner and 1 to each opponent (2 each for a draw). The player with the most festival points after the final round wins." : <>{gameUi(map.goldenPlutoCount === 1
               ? "One Golden Pluto is hidden on the mountain."
-              : `${map.goldenPlutoCount === 2 ? "Two" : map.goldenPlutoCount} Golden Plutos are hidden around the islands.`}{" "}
-            Land on one and pay 20 coins to collect it. Choose Golden Plutos or coins to win. Item
-            fields hand out heals, boosts, weapons and duels; the single Rare
-            field hands out a Pocket Duel, Fallout Core or Wild Totem. {map.propertyName}s
-            can be claimed for tolls. After every round, summoned animals hunt,
-            then a minigame pays 10 / 5 / 3 / 0 coins and its winner goes first. Team minigames pay both partners equally. Buy one item per round, ready to use from the next round.</>}
+              : `${map.goldenPlutoCount === 2 ? "Two" : map.goldenPlutoCount} Golden Plutos are hidden around the islands.`)}{gameUi(" ")}{gameUi(" Land on one and pay 20 coins to collect it. Choose Golden Plutos or coins to win. Item fields hand out heals, boosts, weapons and duels; the single Rare field hands out a Pocket Duel, Fallout Core or Wild Totem. ")}{gameUi(map.propertyName)}{gameUi("s can be claimed for tolls. After every round, summoned animals hunt, then a minigame pays 10 / 5 / 3 / 0 coins and its winner goes first. Team minigames pay both partners equally. Buy one item per round, ready to use from the next round.")}</>)}
           </p>
         </aside>
       </div>

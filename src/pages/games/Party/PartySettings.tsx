@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useEffect, useId, useRef, useState } from "react";
 import { usePreferences } from "./usePreferences.ts";
 import { X } from "lucide-react";
@@ -16,6 +17,7 @@ const VOLUMES: { key: "masterVolume" | "musicVolume" | "sfxVolume" | "uiVolume";
 ];
 // Settings sheet: audio, motion, hints and fullscreen. Preferences are stored on this device only.
 export default function PartySettings({ onClose }: { onClose: () => void }) {
+  useGameLanguage();
   const prefs = usePreferences();
   const titleId = useId();
   const first = useRef<HTMLButtonElement>(null);
@@ -51,25 +53,25 @@ export default function PartySettings({ onClose }: { onClose: () => void }) {
         onClick={(e) => e.stopPropagation()}
       >
         <header>
-          <h2 id={titleId}>Settings</h2>
-          <button ref={first} className="pp-icon-button" onClick={onClose} aria-label="Close settings">
+          <h2 id={titleId}>{gameUi("Settings")}</h2>
+          <button ref={first} className="pp-icon-button" onClick={onClose} aria-label={gameUi("Close settings")}>
             <X size={20} />
           </button>
         </header>
         <fieldset>
-          <legend>Audio</legend>
+          <legend>{gameUi("Audio")}</legend>
           <label className="pp-switch">
             <input
               type="checkbox"
               checked={prefs.muted}
               onChange={(e) => setPreferences({ muted: e.target.checked })}
             />
-            <span>Mute all sound</span>
+            <span>{gameUi("Mute all sound")}</span>
           </label>
           {VOLUMES.map(({ key, label }) => (
             <label key={key} className="pp-slider">
               <span>
-                {label} <b>{Math.round(prefs[key] * 100)}%</b>
+                {gameUi(label)} <b>{gameUi(Math.round(prefs[key] * 100))}%</b>
               </span>
               <input
                 type="range"
@@ -83,19 +85,19 @@ export default function PartySettings({ onClose }: { onClose: () => void }) {
               />
             </label>
           ))}
-          <small>Sound starts after your first tap or key press (browser rule).</small>
+          <small>{gameUi("Sound starts after your first tap or key press (browser rule).")}</small>
         </fieldset>
         <fieldset>
-          <legend>Display</legend>
+          <legend>{gameUi("Display")}</legend>
           <label className="pp-select">
-            <span>Motion</span>
+            <span>{gameUi("Motion")}</span>
             <select
               value={prefs.motion}
               onChange={(e) => setPreferences({ motion: e.target.value as MotionPreference })}
             >
-              <option value="system">Follow device setting</option>
-              <option value="reduce">Reduced motion</option>
-              <option value="full">Full motion</option>
+              <option value="system">{gameUi("Follow device setting")}</option>
+              <option value="reduce">{gameUi("Reduced motion")}</option>
+              <option value="full">{gameUi("Full motion")}</option>
             </select>
           </label>
           <label className="pp-switch">
@@ -104,21 +106,17 @@ export default function PartySettings({ onClose }: { onClose: () => void }) {
               checked={prefs.controlHints}
               onChange={(e) => setPreferences({ controlHints: e.target.checked })}
             />
-            <span>Show control hints</span>
+            <span>{gameUi("Show control hints")}</span>
           </label>
-          {canFullscreen && (
+          {gameUi(canFullscreen && (
             <button type="button" onClick={toggleFullscreen}>
-              {fullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+              {gameUi(fullscreen ? "Exit fullscreen" : "Enter fullscreen")}
             </button>
-          )}
+          ))}
         </fieldset>
         <footer>
-          <button type="button" onClick={() => setPreferences(DEFAULT_PREFERENCES)}>
-            Reset to defaults
-          </button>
-          <button type="button" className="pp-primary" onClick={onClose}>
-            Done
-          </button>
+          <button type="button" onClick={() => setPreferences(DEFAULT_PREFERENCES)}>{gameUi(" Reset to defaults ")}</button>
+          <button type="button" className="pp-primary" onClick={onClose}>{gameUi(" Done ")}</button>
         </footer>
       </section>
     </div>
