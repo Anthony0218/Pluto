@@ -15,9 +15,11 @@ export default function SchafKopfLobbyPage() {
     if (busy || !user) return;
     setBusy(true); setError(null);
     try {
+      let avatar = 2;
+      try { const saved = localStorage.getItem(`schafkopf-own-avatar-${user.id}`); const index = saved === null ? JSON.parse(localStorage.getItem("schafkopf-avatars") ?? "[2]")[0] : Number(saved); if (Number.isInteger(index) && index >= 0 && index <= 5) avatar = index; } catch { /* Default avatar. */ }
       const room = await schafkopfRequest(create
-        ? { op: "create", name, title: "Spieltag", aiDifficulty: "amateur" }
-        : { op: "join", code, name });
+        ? { op: "create", name, avatar, title: "Spieltag", aiDifficulty: "beginner" }
+        : { op: "join", code, name, avatar });
       if (room) navigate(`/games/schafkopf/multiplayer/${room.code}`);
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Raum konnte nicht geöffnet werden."); }
     finally { setBusy(false); }

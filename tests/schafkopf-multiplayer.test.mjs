@@ -364,3 +364,33 @@ test("host bot configuration survives validated online rules, but guests cannot 
   const invalid=await s.request("user-0",{op:"rules",code:room.code,version:started.body.version,rules:{...configured,bot:[]}});
   assert.equal(invalid.status,400);
 });
+
+test('saved avatars are authoritative for every participant and only the own seat can be changed', async () => {
+  const s = server();
+  const created = (await s.request('user-0', { op: 'create', name: 'Host', avatar: 1 })).body;
+  const joined = (await s.request('user-1', { op: 'join', code: created.code, name: 'Friend', avatar: 5 })).body;
+  assert.equal(joined.players[0].avatar, 1);
+  assert.equal(joined.players[1].avatar, 5);
+  const saved = await s.request('user-1', { op: 'avatar', code: joined.code, version: joined.version, avatar: 3, name: 'Resi', seat: 0 });
+  assert.equal(saved.status, 200);
+  assert.equal(saved.body.players[0].avatar, 1);
+  assert.equal(saved.body.players[0].name, 'Host');
+  assert.equal(saved.body.players[1].avatar, 3);
+  assert.equal(saved.body.players[1].name, 'Resi');
+  const hostView = (await s.request('user-0', { op: 'get', code: joined.code })).body;
+  assert.equal(hostView.players[1].avatar, 3);
+  assert.equal((await s.request('user-2', { op: 'avatar', code: joined.code, version: saved.body.version, avatar: 0 })).status, 403);
+  assert.equal((await s.request('user-1', { op: 'avatar', code: joined.code, version: saved.body.version, avatar: 99 })).status, 400);
+  assert.equal((await s.request('user-1', { op: 'avatar', code: joined.code, version: joined.version, avatar: 0 })).status, 409);
+});
+
+test('new rooms default to beginner and only hosts can change bot difficulty during play', async () => {
+  const s = server(), room = await fullRoom(s);
+  assert.equal(room.aiDifficulty, 'beginner');
+  const started = (await s.request('user-0', { op: 'start', code: room.code, version: room.version, rules: { ...engine.DEFAULT_GAME_RULES, legen: false } })).body;
+  const changed = await s.request('user-0', { op: 'difficulty', code: room.code, version: started.version, aiDifficulty: 'advanced' });
+  assert.equal(changed.status, 200);
+  assert.equal(changed.body.aiDifficulty, 'advanced');
+  assert.equal((await s.request('user-1', { op: 'difficulty', code: room.code, version: changed.body.version, aiDifficulty: 'legend' })).status, 400);
+  assert.equal((await s.request('user-0', { op: 'difficulty', code: room.code, version: changed.body.version, aiDifficulty: 'invalid' })).status, 400);
+});

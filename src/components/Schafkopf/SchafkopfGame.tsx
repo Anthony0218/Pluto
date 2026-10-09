@@ -4,10 +4,10 @@ import { DEFAULT_ANNOUNCEMENT_SETTINGS, SIMPLE_ANNOUNCEMENT_SETTINGS, formatDecl
 import SchafkopfTable from "./SchafkopfTable";
 import { savedSchafkopfRules } from "./schafkopfRulesPreference";
 
-function savedAiNames() {
-  const fallback = ["Du", "KI Sepp", "KI Resi", "KI Franz"];
+function savedAiNames(mode: "hotseat" | "ai") {
+  const fallback = mode === "ai" ? ["Du", "KI Sepp", "KI Resi", "KI Franz"] : ["Spieler 1", "Spieler 2", "Spieler 3", "Spieler 4"];
   try {
-    const names = JSON.parse(localStorage.getItem("schafkopf-ai-names") ?? "null");
+    const names = JSON.parse(localStorage.getItem(`schafkopf-${mode}-names`) ?? "null");
     return Array.isArray(names) && names.length === 4 && names.every(name => typeof name === "string" && name.trim()) ? names as string[] : fallback;
   } catch { return fallback; }
 }
@@ -15,8 +15,8 @@ function savedAiNames() {
 function savedAiDifficulty(): AiDifficulty {
   try {
     const value = localStorage.getItem("schafkopf-ai-difficulty");
-    return value === "beginner" || value === "amateur" || value === "advanced" || value === "pro" || value === "legend" ? value : "amateur";
-  } catch { return "amateur"; }
+    return value === "beginner" || value === "amateur" || value === "advanced" || value === "pro" || value === "legend" ? value : "beginner";
+  } catch { return "beginner"; }
 }
 
 export default function SchafkopfGame({ mode = "hotseat" }: { mode?: "hotseat" | "ai" }) {
@@ -33,7 +33,7 @@ export default function SchafkopfGame({ mode = "hotseat" }: { mode?: "hotseat" |
         return migrateGameState(saved);
       }
     } catch { /* Start a new table if the saved game is invalid. */ }
-    const freshGame = createGame(mode === "ai" ? savedAiNames() : undefined, 3, undefined, undefined, 1, { ...savedSchafkopfRules(), ...(mode === "ai" ? { legen: true } : {}) });
+    const freshGame = createGame(savedAiNames(mode), 3, undefined, undefined, 1, { ...savedSchafkopfRules(), ...(mode === "ai" ? { legen: true } : {}) });
     if (mode === "ai") freshGame.legenDeadline = null;
     return freshGame;
   });
@@ -56,14 +56,6 @@ export default function SchafkopfGame({ mode = "hotseat" }: { mode?: "hotseat" |
     if (mode === "ai" || game.phase !== "legen" || !game.legenDeadline) return;
     const timeout = window.setTimeout(() => setGame(current => current.phase === "legen" ? resolveLegenTimeout(current) : current), Math.max(0, game.legenDeadline - Date.now()));
     return () => window.clearTimeout(timeout);
-  }, [game.phase, game.legenDeadline, mode]);
-
-  // `next` creates a fresh engine state, which normally includes the local
-  // Legen deadline. Strip it again for every single-player deal, including
-  // games that were already open during an app update.
-  useEffect(() => {
-    if (mode !== "ai" || game.phase !== "legen" || !game.legenDeadline) return;
-    setGame(current => current.phase === "legen" && current.legenDeadline ? { ...current, legenDeadline: null } : current);
   }, [game.phase, game.legenDeadline, mode]);
 
   useEffect(() => {
@@ -104,9 +96,9 @@ export default function SchafkopfGame({ mode = "hotseat" }: { mode?: "hotseat" |
       const names = [...current.names];
       const previous = names[index];
       names[index] = clean;
-      try { localStorage.setItem("schafkopf-ai-names", JSON.stringify(names)); } catch { /* Keep this session's names. */ }
+      try { localStorage.setItem(`schafkopf-${mode}-names`, JSON.stringify(names)); } catch { /* Keep this session's names. */ }
       return { ...current, names, announcements: current.announcements.map(text => text.startsWith(`${previous}: `) ? `${clean}: ${text.slice(previous.length + 2)}` : text) };
     });
   };
-  return <SchafkopfTable view={viewFor(game, seat)} onAction={act} error={error} hidden={hidden} onReveal={() => setRevealed(game.revision)} onRulesChange={(rules: GameRules) => setGame(current => ({ ...current, rules: mode === "ai" ? { ...rules, legen: true } : rules }))} onRename={mode === "ai" ? renameAi : undefined} aiDifficulty={mode === "ai" ? aiDifficulty : undefined} onAiDifficultyChange={mode === "ai" ? changeAiDifficulty : undefined} collectSecondsValue={collectSeconds} onCollectSecondsChange={setCustomCollectSeconds} alwaysLegen={mode === "ai"} untimedLegen={mode === "ai"} subtitle={mode === "ai" ? "Du gegen drei KI-Spieler" : "Hotseat · Vier Spieler"} />;
+  return <SchafkopfTable view={viewFor(game, seat)} onAction={act} error={error} hidden={hidden} onReveal={() => setRevealed(game.revision)} onRulesChange={(rules: GameRules) => setGame(current => ({ ...current, rules: mode === "ai" ? { ...rules, legen: true } : rules }))} onRename={renameAi} aiDifficulty={mode === "ai" ? aiDifficulty : undefined} onAiDifficultyChange={mode === "ai" ? changeAiDifficulty : undefined} collectSecondsValue={collectSeconds} onCollectSecondsChange={setCustomCollectSeconds} alwaysLegen={mode === "ai"} untimedLegen={mode === "ai"} subtitle={mode === "ai" ? "Du gegen drei KI-Spieler" : "Hotseat · Vier Spieler"} />;
 }

@@ -1,3 +1,4 @@
+import { baseGameValue } from "./tariffs.ts";
 import { chooseDocumentAiAction } from "./bot.ts";
 import type { BotConfig } from "./botConfig.ts";
 
@@ -12,6 +13,7 @@ export type GameRules = {
   sauspiel: boolean; farbwenz: boolean; geier: boolean; farbgeier: boolean; hochzeit: boolean; bettel: boolean;
   ramsch: boolean; eichelOberMuss: boolean; legen: boolean; spritzen: "nie" | "vor-ausspiel" | "jederzeit";
   rufspielValue: number; soloValue: number; wenzValue: number; ramschValue: number;
+  farbwenzValue?: number; geierValue?: number; farbgeierValue?: number; bettelValue?: number;
   schneiderValue: number; schwarzValue: number; laufendeValue: number; showPoints: boolean;
   showTrickPoints: boolean; showPlayedTrumps: boolean; bot?: Partial<BotConfig>;
   davonlaufen?: boolean; rufsauAbwerfenAbStich?: number;
@@ -306,7 +308,7 @@ export function scoreRound(state: GameState): Result {
   if (laufende < (["wenz", "geier"].includes(contract.kind) ? rules.laufendeAbWenzGeier ?? 2 : rules.laufendeAbFarbspiel ?? 3)) laufende = 0;
   if (rules.laufendeAktiv === false) laufende = 0;
   // Virtual units only: Rufspiel 1, solos 5, each bonus 1.
-  const baseValue = contract.kind === "rufspiel" ? rules.rufspielValue : contract.kind === "wenz" ? rules.wenzValue : rules.soloValue;
+  const baseValue = baseGameValue(contract, rules);
   const bonusValue = laufende * (rules.laufendeValue ?? DEFAULT_GAME_RULES.laufendeValue)
     + (sie || contract.tout ? 0 : Number(schneider) * (rules.schneiderValue ?? DEFAULT_GAME_RULES.schneiderValue) + Number(schwarz) * (rules.schwarzValue ?? DEFAULT_GAME_RULES.schwarzValue));
   const value = (baseValue + bonusValue) * (sie ? 4 : contract.tout ? 2 : 1) * state.multiplier;
@@ -318,7 +320,7 @@ function priceBreakdown(state: GameState, result: Result): string {
   const contract = state.contract!;
   const rules = state.rules ?? DEFAULT_GAME_RULES;
   if (contract.kind === "ramsch") return `Ramsch ${rules.ramschValue} ¢${state.multiplier > 1 ? ` × ${state.multiplier} (Klopfen/Spritzen)` : ""}${result.ramschDoubleWinners?.length ? ` · Jungfrau ×2: ${result.ramschDoubleWinners.map(seat => state.names[seat]).join(", ")}` : ""} = ${result.value} ¢`;
-  const base = contract.kind === "rufspiel" ? rules.rufspielValue : contract.kind === "wenz" ? rules.wenzValue : rules.soloValue;
+  const base = baseGameValue(contract, rules);
   const baseName = contract.kind === "rufspiel" ? "Sauspiel" : contract.kind === "wenz" ? "Wenz" : "Einzelspiel";
   const parts = [`${baseName} ${base} ¢`];
   if (result.laufende) parts.push(`+ ${result.laufende} Laufende × ${rules.laufendeValue} ¢`);

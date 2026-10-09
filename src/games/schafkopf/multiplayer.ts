@@ -3,24 +3,26 @@ import type { Action, AiDifficulty, GameRules, GameView } from "./schafkopf";
 
 export type RoomSnapshot = {
   code: string; hostId: string; version: number; title: string; aiDifficulty: AiDifficulty; collectSeconds: number;
-  players: { id: string; name: string; bot?: boolean }[]; game: GameView | null;
+  players: { id: string; name: string; avatar?: number; bot?: boolean }[]; game: GameView | null;
   pendingSeats: number[];
 };
 export type SessionSummary = {
   code: string; title: string; hostId: string; version: number; updatedAt: string;
-  players: { id: string; name: string; bot?: boolean }[];
+  players: { id: string; name: string; avatar?: number; bot?: boolean }[];
   formerPlayers: { id: string; name: string; total: number; round: number }[];
   pendingSeats: number[];
   totals: number[] | null; round: number | null;
 };
 export type RoomRequest =
-  | { op: "create"; name: string; title: string; aiDifficulty: AiDifficulty }
+  | { op: "create"; name: string; avatar?: number; title: string; aiDifficulty: AiDifficulty }
   | { op: "list" }
-  | { op: "join"; code: string; name: string }
+  | { op: "join"; code: string; name: string; avatar?: number }
   | { op: "get"; code: string }
   | { op: "start"; code: string; version: number; rules: GameRules; title: string; aiDifficulty: AiDifficulty }
   | { op: "rules"; code: string; version: number; rules: GameRules }
   | { op: "configure"; code: string; version: number; title: string; aiDifficulty: AiDifficulty }
+  | { op: "avatar"; code: string; version: number; avatar: number; name: string }
+  | { op: "difficulty"; code: string; version: number; aiDifficulty: AiDifficulty }
   | { op: "timing"; code: string; version: number; collectSeconds: number }
   | { op: "replace"; code: string; version: number; seat: number; bot: boolean }
   | { op: "vacate"; code: string; version: number; seat: number }

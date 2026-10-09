@@ -8,7 +8,7 @@ const cors = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
-type Player = { id: string; name: string; bot?: boolean };
+type Player = { id: string; name: string; avatar?: number; bot?: boolean };
 type FormerPlayer = { id: string; name: string; total: number; round: number };
 type Room = { id: string; code: string; host_id: string; title: string; ai_difficulty: AiDifficulty; collect_seconds: number; players: Player[]; former_players: FormerPlayer[]; pending_seats: number[]; game: GameState | null; version: number; updated_at: string };
 function response(body: unknown, status = 200) { return new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json", "Cache-Control": "no-store" } }); }
@@ -25,9 +25,15 @@ const random = () => crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296;
 const nameFor = (name: unknown) => typeof name === "string" ? name.trim().slice(0, 32) || "Spieler" : "Spieler";
 const titleFor = (title: unknown) => typeof title === "string" ? title.trim().slice(0, 60) || "Spieltag" : "Spieltag";
 function difficultyFor(value: unknown): AiDifficulty {
-  if (value === undefined || value === null || value === "normal") return "amateur";
+  if (value === "normal") return "amateur";
+  if (value === undefined || value === null) return "beginner";
   if (value === "beginner" || value === "amateur" || value === "advanced" || value === "pro" || value === "legend") return value;
   throw new Error("Ungültige KI-Spielstärke.");
+}
+function avatarFor(value: unknown): number {
+  if (value === undefined) return 2;
+  if (!Number.isInteger(value) || (value as number) < 0 || (value as number) > 5) throw new Error("Ungültiger Avatar.");
+  return value as number;
 }
 function validRules(value: unknown): GameRules {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("Ungültige Tischregeln.");
@@ -42,6 +48,12 @@ function validRules(value: unknown): GameRules {
   for (const key of ["rufspielValue", "soloValue", "wenzValue", "ramschValue", "schneiderValue", "schwarzValue", "laufendeValue"] as const) {
     const amount = input[key] ?? rules[key];
     if (!Number.isInteger(amount) || (amount as number) < (["schneiderValue", "schwarzValue", "laufendeValue"].includes(key) ? 0 : 1) || (amount as number) > 999) throw new Error(`Ungültiger Preis: ${key}.`);
+    rules[key] = amount as number;
+  }
+  for (const key of ["farbwenzValue", "geierValue", "farbgeierValue", "bettelValue"] as const) {
+    if (input[key] === undefined) continue;
+    const amount = input[key];
+    if (!Number.isInteger(amount) || (amount as number) < 1 || (amount as number) > 999) throw new Error(`Ungültiger Preis: ${key}.`);
     rules[key] = amount as number;
   }
   if (input.spritzen !== "nie" && input.spritzen !== "vor-ausspiel" && input.spritzen !== "jederzeit") throw new Error("Ungültige Spritzregel.");
@@ -113,7 +125,7 @@ Deno.serve(async req => {
       for (let attempt = 0; attempt < 5; attempt++) {
         const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
         const code = Array.from({ length: 6 }, () => alphabet[Math.floor(random() * alphabet.length)]).join("");
-        const { data, error } = await db.from("schafkopf_rooms").insert({ code, host_id: user.id, title: titleFor(body.title), ai_difficulty: difficultyFor(body.aiDifficulty), players: [{ id: user.id, name: nameFor(body.name) }], former_players: [], pending_seats: [] }).select().single();
+        const { data, error } = await db.from("schafkopf_rooms").insert({ code, host_id: user.id, title: titleFor(body.title), ai_difficulty: difficultyFor(body.aiDifficulty), players: [{ id: user.id, name: nameFor(body.name), avatar: avatarFor(body.avatar) }], former_players: [], pending_seats: [] }).select().single();
         if (!error) return response(snapshot(data as Room, user.id));
         if (error.code !== "23505") throw new Error("Tisch konnte nicht gespeichert werden.");
       }
@@ -134,13 +146,13 @@ Deno.serve(async req => {
         if (seat >= 0) return response(snapshot(room, user.id));
         if (!room.game) {
           if (room.players.length >= 4) throw new Error("Dieser Tisch ist voll.");
-          room.players.push({ id: user.id, name: nameFor(body.name) });
+          room.players.push({ id: user.id, name: nameFor(body.name), avatar: avatarFor(body.avatar) });
         } else {
           if (room.game.phase !== "finished" && room.game.phase !== "redeal") throw new Error("Beitreten ist zwischen zwei Spielen möglich.");
           const openSeat = room.players.findIndex((player, index) => index > 0 && player.id.startsWith("bot:"));
           if (openSeat < 0) throw new Error("An diesem Tisch ist kein KI-Platz frei.");
           if (!room.pending_seats.includes(openSeat)) room.former_players.push({ id: room.players[openSeat].id, name: room.players[openSeat].name, total: room.game.totals[openSeat], round: room.game.round });
-          room.players[openSeat] = { id: user.id, name: nameFor(body.name) };
+          room.players[openSeat] = { id: user.id, name: nameFor(body.name), avatar: avatarFor(body.avatar) };
           if (!room.pending_seats.includes(openSeat)) room.pending_seats.push(openSeat);
         }
       } else {
@@ -182,6 +194,21 @@ Deno.serve(async req => {
           } else if (body.op === "configure") {
             if (room.host_id !== user.id || room.game) throw new Error("Nur der Gastgeber kann den Wartetisch einstellen.");
             room.title = titleFor(body.title);
+            room.ai_difficulty = difficultyFor(body.aiDifficulty);
+          } else if (body.op === "avatar") {
+            if (body.avatar === undefined) throw new Error("Avatar fehlt.");
+            room.players[seat].avatar = avatarFor(body.avatar);
+            if (body.name !== undefined) {
+              const previous = room.players[seat].name;
+              const name = nameFor(body.name);
+              room.players[seat].name = name;
+              if (room.game) {
+                room.game.names[seat] = name;
+                room.game.announcements = room.game.announcements.map(text => text.startsWith(`${previous}: `) ? `${name}: ${text.slice(previous.length + 2)}` : text);
+              }
+            }
+          } else if (body.op === "difficulty") {
+            if (room.host_id !== user.id) throw new Error("Nur der Gastgeber ändert die Bot-Stufe.");
             room.ai_difficulty = difficultyFor(body.aiDifficulty);
           } else if (body.op === "timing") {
             if (room.host_id !== user.id || !room.game) throw new Error("Nur der Gastgeber ändert die Einsammelzeit.");
