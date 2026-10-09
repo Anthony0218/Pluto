@@ -1,6 +1,6 @@
 {
-  "atlasDataVersion": "2026-09",
-  "synchronizedAt": "2026-09-26T21:19:59.079Z",
+  "atlasDataVersion": "2026-10-un195",
+  "synchronizedAt": "2026-10-09T21:42:07.000Z",
   "entityCount": 248,
   "playableUn195Count": 195,
   "sources": {
@@ -9,7 +9,13 @@
     "geonamesCities": "https://download.geonames.org/export/dump/cities15000.zip",
     "flags": "https://github.com/lipis/flag-icons/tree/v7.5.0",
     "population": "https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json&per_page=20000&mrnev=1",
-    "area": "https://api.worldbank.org/v2/country/all/indicator/AG.SRF.TOTL.K2?format=json&per_page=20000&mrnev=1"
+    "area": "https://api.worldbank.org/v2/country/all/indicator/AG.SRF.TOTL.K2?format=json&per_page=20000&mrnev=1",
+    "vaticanPopulation": "https://www.vaticanstate.va/en/state-and-government/general-informations/population.html",
+    "vaticanArea": "https://www.vaticanstate.va/en/state-and-government/general-informations/geography.html",
+    "israelCapital": "https://www.geonames.org/281184/jerusalem.html",
+    "palestineCapital": "https://www.geonames.org/7303419/east-jerusalem.html",
+    "gambiaHighestPoint": "https://github.com/factbook/factbook.json/blob/144d6977b2b01ac1cbd220de754c0a005616760b/africa/ga.json",
+    "palestineHistory": "https://www.un.org/unispal/document/auto-insert-187149/"
   },
   "geometry": {
     "source": "Natural Earth via world-atlas",

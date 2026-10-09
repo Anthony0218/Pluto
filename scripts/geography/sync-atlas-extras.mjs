@@ -5,6 +5,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { unzipSync } from "fflate";
+import { HIGHEST_POINT_SUPPLEMENTS, SUPPLEMENT_SOURCES } from "./country-supplements.mjs";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const outputDirectory = join(root, "data", "geography");
@@ -50,10 +51,12 @@ for (const row of (await wikidata.json()).results.bindings) {
 }
 
 // Fill-ins for countries whose Wikidata highest point has no normalized elevation statement.
-const FILL_INS = { "country:USA": { name: "Denali", elevationM: 6190 } };
+const FILL_INS = { "country:USA": { name: "Denali", elevationM: 6190 }, ...HIGHEST_POINT_SUPPLEMENTS };
 for (const [id, point] of Object.entries(FILL_INS)) highestPoints[id] ??= point;
+const missing = countries.filter((country) => country.status === "un195" && !highestPoints[country.id]);
+if (missing.length) throw new Error(`Atlas highest points missing for: ${missing.map((country) => country.iso3).join(", ")}`);
 
-const extras = { atlasDataVersion, synchronizedAt: new Date().toISOString(), sources, cities, highestPoints };
+const extras = { atlasDataVersion, synchronizedAt: new Date().toISOString(), sources: { ...sources, gambiaHighestPoint: SUPPLEMENT_SOURCES.gambiaHighestPoint }, cities, highestPoints };
 await Promise.all([
   writeFile(join(outputDirectory, "extras.json"), `${JSON.stringify(extras, null, 2)}\n`),
   writeFile(join(publicDirectory, "extras.json"), `${JSON.stringify(extras)}\n`),

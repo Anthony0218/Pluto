@@ -57,7 +57,7 @@
     "geometryId": "004",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -105,7 +105,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -168,7 +168,7 @@
     "geometryId": "008",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -234,7 +234,7 @@
     "geometryId": "012",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -294,7 +294,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -355,7 +355,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -418,7 +418,7 @@
     "geometryId": "024",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -466,7 +466,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -497,7 +497,7 @@
     "geometryId": "010",
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -553,7 +553,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -622,7 +622,7 @@
     "geometryId": "032",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -685,7 +685,7 @@
     "geometryId": "051",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -746,7 +746,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -804,7 +804,7 @@
     "geometryId": "036",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -874,7 +874,7 @@
     "geometryId": "040",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -940,7 +940,7 @@
     "geometryId": "031",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -998,7 +998,7 @@
     "geometryId": "044",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -1059,7 +1059,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -1121,7 +1121,7 @@
     "geometryId": "050",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -1179,7 +1179,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -1244,7 +1244,7 @@
     "geometryId": "112",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -1309,7 +1309,7 @@
     "geometryId": "056",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -1371,7 +1371,7 @@
     "geometryId": "084",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -1434,7 +1434,7 @@
     "geometryId": "204",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -1493,7 +1493,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -1554,7 +1554,7 @@
     "geometryId": "064",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -1620,7 +1620,7 @@
     "geometryId": "068",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -1670,7 +1670,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -1732,7 +1732,7 @@
     "geometryId": "070",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -1795,7 +1795,7 @@
     "geometryId": "072",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -1833,7 +1833,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -1903,7 +1903,7 @@
     "geometryId": "076",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -1945,7 +1945,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -2001,7 +2001,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -2062,7 +2062,7 @@
     "geometryId": "096",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -2128,7 +2128,7 @@
     "geometryId": "100",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -2194,7 +2194,7 @@
     "geometryId": "854",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -2257,7 +2257,7 @@
     "geometryId": "108",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -2315,7 +2315,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -2379,7 +2379,7 @@
     "geometryId": "116",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -2445,7 +2445,7 @@
     "geometryId": "120",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -2507,7 +2507,7 @@
     "geometryId": "124",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -2565,7 +2565,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -2633,7 +2633,7 @@
     "geometryId": "140",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -2700,7 +2700,7 @@
     "geometryId": "148",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -2762,7 +2762,7 @@
     "geometryId": "152",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -2840,7 +2840,7 @@
     "geometryId": "156",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -2890,7 +2890,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -2937,7 +2937,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -2999,7 +2999,7 @@
     "geometryId": "170",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -3058,7 +3058,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -3107,7 +3107,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -3167,7 +3167,7 @@
     "geometryId": "188",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -3232,7 +3232,7 @@
     "geometryId": "191",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -3293,7 +3293,7 @@
     "geometryId": "192",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -3352,7 +3352,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -3412,7 +3412,7 @@
     "geometryId": "196",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -3476,7 +3476,7 @@
     "geometryId": "203",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -3549,7 +3549,7 @@
     "geometryId": "180",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -3612,7 +3612,7 @@
     "geometryId": "208",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -3677,7 +3677,7 @@
     "geometryId": "262",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -3735,7 +3735,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -3795,7 +3795,7 @@
     "geometryId": "214",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -3856,7 +3856,7 @@
     "geometryId": "218",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -3921,7 +3921,7 @@
     "geometryId": "818",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -3982,7 +3982,7 @@
     "geometryId": "222",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -4045,7 +4045,7 @@
     "geometryId": "226",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -4111,7 +4111,7 @@
     "geometryId": "232",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -4173,7 +4173,7 @@
     "geometryId": "233",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -4235,7 +4235,7 @@
     "geometryId": "748",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -4305,7 +4305,7 @@
     "geometryId": "231",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -4353,7 +4353,7 @@
     "geometryId": "238",
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -4410,7 +4410,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -4469,7 +4469,7 @@
     "geometryId": "242",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -4533,7 +4533,7 @@
     "geometryId": "246",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -4606,7 +4606,7 @@
     "geometryId": "250",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -4657,7 +4657,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -4714,7 +4714,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -4762,7 +4762,7 @@
     "geometryId": "260",
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -4822,7 +4822,7 @@
     "geometryId": "266",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -4886,7 +4886,7 @@
     "geometryId": "270",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -4952,7 +4952,7 @@
     "geometryId": "268",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -5020,7 +5020,7 @@
     "geometryId": "276",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -5084,7 +5084,7 @@
     "geometryId": "288",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -5147,7 +5147,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -5212,7 +5212,7 @@
     "geometryId": "300",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -5272,7 +5272,7 @@
     "geometryId": "304",
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -5330,7 +5330,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -5378,7 +5378,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -5435,7 +5435,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -5498,7 +5498,7 @@
     "geometryId": "320",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -5547,7 +5547,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -5610,7 +5610,7 @@
     "geometryId": "324",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -5672,7 +5672,7 @@
     "geometryId": "624",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -5734,7 +5734,7 @@
     "geometryId": "328",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -5795,7 +5795,7 @@
     "geometryId": "332",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -5833,7 +5833,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -5895,7 +5895,7 @@
     "geometryId": "340",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -5955,7 +5955,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -6021,7 +6021,7 @@
     "geometryId": "348",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -6084,7 +6084,7 @@
     "geometryId": "352",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -6174,7 +6174,7 @@
     "geometryId": "356",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -6239,7 +6239,7 @@
     "geometryId": "360",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -6306,7 +6306,7 @@
     "geometryId": "364",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -6373,7 +6373,7 @@
     "geometryId": "368",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -6434,7 +6434,7 @@
     "geometryId": "372",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -6493,7 +6493,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -6549,12 +6549,18 @@
       "country:PSE"
     ],
     "flagAsset": "/flags/4x3/il.svg",
-    "centroid": null,
-    "capitalCoordinates": null,
+    "centroid": [
+      35.21633,
+      31.76904
+    ],
+    "capitalCoordinates": [
+      35.21633,
+      31.76904
+    ],
     "geometryId": "376",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -6625,7 +6631,7 @@
     "geometryId": "380",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -6689,7 +6695,7 @@
     "geometryId": "384",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -6747,7 +6753,7 @@
     "geometryId": "388",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -6805,7 +6811,7 @@
     "geometryId": "392",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -6855,7 +6861,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -6918,7 +6924,7 @@
     "geometryId": "400",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -6983,7 +6989,7 @@
     "geometryId": "398",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -7048,7 +7054,7 @@
     "geometryId": "404",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -7107,7 +7113,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -7169,7 +7175,7 @@
     "geometryId": "414",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -7234,7 +7240,7 @@
     "geometryId": "417",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -7300,7 +7306,7 @@
     "geometryId": "418",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -7365,7 +7371,7 @@
     "geometryId": "428",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -7429,7 +7435,7 @@
     "geometryId": "422",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -7492,7 +7498,7 @@
     "geometryId": "426",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -7554,7 +7560,7 @@
     "geometryId": "430",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -7621,7 +7627,7 @@
     "geometryId": "434",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -7682,7 +7688,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -7747,7 +7753,7 @@
     "geometryId": "440",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -7811,7 +7817,7 @@
     "geometryId": "442",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -7870,7 +7876,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -7929,7 +7935,7 @@
     "geometryId": "450",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -7994,7 +8000,7 @@
     "geometryId": "454",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -8063,7 +8069,7 @@
     "geometryId": "458",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -8122,7 +8128,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -8189,7 +8195,7 @@
     "geometryId": "466",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -8248,7 +8254,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -8307,7 +8313,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -8355,7 +8361,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -8421,7 +8427,7 @@
     "geometryId": "478",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -8481,7 +8487,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -8529,7 +8535,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -8589,7 +8595,7 @@
     "geometryId": "484",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -8655,7 +8661,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -8719,7 +8725,7 @@
     "geometryId": "498",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -8781,7 +8787,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -8843,7 +8849,7 @@
     "geometryId": "496",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -8912,7 +8918,7 @@
     "geometryId": "499",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -8960,7 +8966,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -9022,7 +9028,7 @@
     "geometryId": "504",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -9088,7 +9094,7 @@
     "geometryId": "508",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -9152,7 +9158,7 @@
     "geometryId": "104",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -9219,7 +9225,7 @@
     "geometryId": "516",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -9278,7 +9284,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -9340,7 +9346,7 @@
     "geometryId": "524",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -9398,7 +9404,7 @@
     "geometryId": "540",
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -9457,7 +9463,7 @@
     "geometryId": "554",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -9519,7 +9525,7 @@
     "geometryId": "558",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -9588,7 +9594,7 @@
     "geometryId": "562",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -9655,7 +9661,7 @@
     "geometryId": "566",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -9704,7 +9710,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -9750,7 +9756,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -9810,7 +9816,7 @@
     "geometryId": "408",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -9878,7 +9884,7 @@
     "geometryId": "807",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -9939,7 +9945,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -10005,7 +10011,7 @@
     "geometryId": "578",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -10070,7 +10076,7 @@
     "geometryId": "512",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -10138,7 +10144,7 @@
     "geometryId": "586",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -10202,7 +10208,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -10253,12 +10259,18 @@
       "country:EGY"
     ],
     "flagAsset": "/flags/4x3/ps.svg",
-    "centroid": null,
-    "capitalCoordinates": null,
+    "centroid": [
+      35.2338838577271,
+      31.7833596083705
+    ],
+    "capitalCoordinates": [
+      35.2338838577271,
+      31.7833596083705
+    ],
     "geometryId": "275",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -10320,7 +10332,7 @@
     "geometryId": "591",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -10383,7 +10395,7 @@
     "geometryId": "598",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -10446,7 +10458,7 @@
     "geometryId": "600",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -10512,7 +10524,7 @@
     "geometryId": "604",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -10590,7 +10602,7 @@
     "geometryId": "608",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -10638,7 +10650,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -10702,7 +10714,7 @@
     "geometryId": "616",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -10763,7 +10775,7 @@
     "geometryId": "620",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -10822,7 +10834,7 @@
     "geometryId": "630",
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -10883,7 +10895,7 @@
     "geometryId": "634",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -10949,7 +10961,7 @@
     "geometryId": "178",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -10997,7 +11009,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -11061,7 +11073,7 @@
     "geometryId": "642",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -11156,7 +11168,7 @@
     "geometryId": "643",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -11222,7 +11234,7 @@
     "geometryId": "646",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -11270,7 +11282,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -11316,7 +11328,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -11372,7 +11384,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -11430,7 +11442,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -11490,7 +11502,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -11538,7 +11550,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -11595,7 +11607,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -11654,7 +11666,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -11714,7 +11726,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -11772,7 +11784,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -11838,7 +11850,7 @@
     "geometryId": "682",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -11905,7 +11917,7 @@
     "geometryId": "686",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -11976,7 +11988,7 @@
     "geometryId": "688",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -12035,7 +12047,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -12098,7 +12110,7 @@
     "geometryId": "694",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -12159,7 +12171,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -12220,7 +12232,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -12285,7 +12297,7 @@
     "geometryId": "703",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -12349,7 +12361,7 @@
     "geometryId": "705",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -12408,7 +12420,7 @@
     "geometryId": "090",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -12473,7 +12485,7 @@
     "geometryId": "706",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -12548,7 +12560,7 @@
     "geometryId": "710",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -12596,7 +12608,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -12655,7 +12667,7 @@
     "geometryId": "410",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -12720,7 +12732,7 @@
     "geometryId": "728",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -12788,7 +12800,7 @@
     "geometryId": "724",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -12848,7 +12860,7 @@
     "geometryId": "144",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -12916,7 +12928,7 @@
     "geometryId": "729",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -12982,7 +12994,7 @@
     "geometryId": "740",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -13031,7 +13043,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -13093,7 +13105,7 @@
     "geometryId": "752",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -13160,7 +13172,7 @@
     "geometryId": "756",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -13229,7 +13241,7 @@
     "geometryId": "760",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -13293,7 +13305,7 @@
     "geometryId": "762",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -13362,7 +13374,7 @@
     "geometryId": "834",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -13426,7 +13438,7 @@
     "geometryId": "764",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -13488,7 +13500,7 @@
     "geometryId": "528",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -13551,7 +13563,7 @@
     "geometryId": "626",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -13618,7 +13630,7 @@
     "geometryId": "768",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -13659,7 +13671,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -13716,7 +13728,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -13778,7 +13790,7 @@
     "geometryId": "780",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -13840,7 +13852,7 @@
     "geometryId": "788",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -13911,7 +13923,7 @@
     "geometryId": "792",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -13976,7 +13988,7 @@
     "geometryId": "795",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -14034,7 +14046,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -14095,7 +14107,7 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -14153,7 +14165,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -14220,7 +14232,7 @@
     "geometryId": "800",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -14290,7 +14302,7 @@
     "geometryId": "804",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -14355,7 +14367,7 @@
     "geometryId": "784",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -14417,7 +14429,7 @@
     "geometryId": "826",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -14482,7 +14494,7 @@
     "geometryId": "840",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -14522,7 +14534,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -14581,7 +14593,7 @@
     "geometryId": "858",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -14647,7 +14659,7 @@
     "geometryId": "860",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -14707,7 +14719,7 @@
     "geometryId": "548",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -14742,8 +14754,18 @@
         "name": "Euro"
       }
     ],
-    "population": null,
-    "areaKm2": null,
+    "population": {
+      "value": 882,
+      "year": 2024,
+      "source": "Vatican City State",
+      "sourceUpdatedAt": "2026-10-09T21:42:07.000Z"
+    },
+    "areaKm2": {
+      "value": 0.44,
+      "year": 2026,
+      "source": "Vatican City State (geography, verified 2026)",
+      "sourceUpdatedAt": "2026-10-09T21:42:07.000Z"
+    },
     "neighbors": [
       "country:ITA"
     ],
@@ -14759,12 +14781,14 @@
     "geometryId": null,
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
       "GeoNames",
-      "flag-icons"
+      "flag-icons",
+      "Vatican City State",
+      "Vatican City State (geography, verified 2026)"
     ]
   },
   {
@@ -14819,7 +14843,7 @@
     "geometryId": "862",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -14885,7 +14909,7 @@
     "geometryId": "704",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -14935,7 +14959,7 @@
     "geometryId": null,
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -14980,7 +15004,7 @@
     "geometryId": "732",
     "playable": false,
     "status": "territory",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -15039,7 +15063,7 @@
     "geometryId": "887",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -15111,7 +15135,7 @@
     "geometryId": "894",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",
@@ -15177,7 +15201,7 @@
     "geometryId": "716",
     "playable": true,
     "status": "un195",
-    "dataVersion": "2026-09-arena2",
+    "dataVersion": "2026-10-un195",
     "sources": [
       "UN M49",
       "Natural Earth",

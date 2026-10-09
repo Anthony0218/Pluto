@@ -2,9 +2,8 @@ import { seededRandom, shuffled } from "../random.ts";
 import type { AtlasDifficulty, AtlasHistory, CountryHistory, HistoryEvent } from "../types.ts";
 
 /**
- * History Battle: questions about how and when countries came to be. Every fact is an entry of The World Factbook
- * (public domain) bundled in history.json — independence dates, the power a country became independent from,
- * founding events and former names. Nothing here is estimated or written by hand.
+ * History Battle: sourced independence dates, former rulers, founding events and former names.
+ * history.json bundles Factbook records plus an attributed UN record for Palestine.
  */
 export const HISTORY_BATTLE = { rounds: 12, options: 4, correct: 250, streakBonus: 50, maxStreakBonus: 250, latestYear: 2025 } as const;
 export const HISTORY_SOURCE = "The World Factbook";
@@ -20,8 +19,8 @@ export type HistoryRound = {
   /** The country the question names, or null when the countries are the options. */
   subjectId: string | null;
   options: HistoryOption[]; answerId: string;
-  /** The country whose record answers the question, and that record as the Factbook words it. */
-  countryId: string; fact: string;
+  /** The country whose sourced record answers the question, and the record shown after answering. */
+  countryId: string; fact: string; source?: string;
 };
 export type HistoryCountry = { id: string; name: string; continent: string; subregion: string };
 
@@ -195,7 +194,10 @@ export function historyDeck(history: AtlasHistory, pool: readonly HistoryCountry
   const mix = KIND_MIX[difficulty];
   return shuffled(Array.from({ length: count }, (_, index) => mix[index % mix.length]), random).map((kind) => {
     // A kind the pool cannot fill (say, no four dates far enough apart) falls back to a dated question.
-    for (const candidate of [kind, "year", "event", "former"] as const) { const round = BUILDERS[candidate](context); if (round) return round; }
+    for (const candidate of [kind, "year", "event", "former"] as const) {
+      const round = BUILDERS[candidate](context);
+      if (round) return { ...round, source: history.countries[round.countryId]?.source?.name };
+    }
     throw new Error("Could not build a history round.");
   });
 }
@@ -205,5 +207,5 @@ export const historyPoints = (streakBefore: number) => HISTORY_BATTLE.correct + 
 /** One line for places without room for the full reveal (the online race feedback). */
 export function historyExplanation(round: HistoryRound, nameOf: (id: string) => string): string {
   const details = round.options.filter((option) => option.detail).map((option) => `${option.label} ${option.detail}`).join(" · ");
-  return `${details || `${nameOf(round.countryId)}: ${round.fact}`} — ${HISTORY_SOURCE}`;
+  return `${details || `${nameOf(round.countryId)}: ${round.fact}`} — ${round.source ?? HISTORY_SOURCE}`;
 }

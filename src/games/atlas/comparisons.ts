@@ -22,7 +22,7 @@ export function buildComparables(entities: GeographicEntity[], extras: AtlasExtr
   const countries = entitiesForScope(entities, "un195");
   const summit = (entity: GeographicEntity): StatValue | undefined => {
     const point = extras.highestPoints[entity.id];
-    return point ? { value: point.elevationM, source: "Wikidata", note: point.name } : undefined;
+    return point ? { value: point.elevationM, source: point.source ?? "Wikidata", note: point.name } : undefined;
   };
   const country = (entity: GeographicEntity): Comparable => ({
     id: entity.id, label: entity.shortName, kind: "country", detail: normalizedContinent(entity),
@@ -42,9 +42,9 @@ export function buildComparables(entities: GeographicEntity[], extras: AtlasExtr
       return {
         id: `${kind}:${name}`, label: name, kind, detail: kind === "subregion" ? normalizedContinent(members[0]) : undefined,
         stats: {
-          population: { value: members.reduce((sum, member) => sum + (member.population?.value || 0), 0), source: "World Bank (sum of UN members)" },
-          areaKm2: { value: members.reduce((sum, member) => sum + (member.areaKm2?.value || 0), 0), source: "World Bank (sum of UN members)" },
-          highestPointM: peak ? { value: peak.point.elevationM, source: "Wikidata", note: `${peak.point.name}, ${peak.member.shortName}` } : undefined,
+          population: { value: members.reduce((sum, member) => sum + (member.population?.value || 0), 0), source: "Bundled population (sum of the 195-country scope)" },
+          areaKm2: { value: members.reduce((sum, member) => sum + (member.areaKm2?.value || 0), 0), source: "Bundled area (sum of the 195-country scope)" },
+          highestPointM: peak ? { value: peak.point.elevationM, source: peak.point.source ?? "Wikidata", note: `${peak.point.name}, ${peak.member.shortName}` } : undefined,
           countryCount: { value: members.length, source: "UN M49" },
         },
       };

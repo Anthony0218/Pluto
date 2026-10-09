@@ -1,14 +1,15 @@
 {
-  "atlasDataVersion": "2026-09-arena2",
-  "synchronizedAt": "2026-10-07T15:45:15.433Z",
+  "atlasDataVersion": "2026-10-un195",
+  "synchronizedAt": "2026-10-09T21:42:07.000Z",
   "source": {
     "name": "The World Factbook (final edition, 2026)",
     "publisher": "Central Intelligence Agency",
-    "license": "Public domain (US Government work)",
+    "license": "Public domain (US Government work); supplementary UN record attributed separately",
     "commit": "144d6977b2b01ac1cbd220de754c0a005616760b",
     "worldFactbook": "https://www.cia.gov/the-world-factbook/",
     "factbookJson": "https://github.com/factbook/factbook.json/tree/144d6977b2b01ac1cbd220de754c0a005616760b",
-    "archive": "https://codeload.github.com/factbook/factbook.json/zip/144d6977b2b01ac1cbd220de754c0a005616760b"
+    "archive": "https://codeload.github.com/factbook/factbook.json/zip/144d6977b2b01ac1cbd220de754c0a005616760b",
+    "palestineHistory": "https://www.un.org/unispal/document/auto-insert-187149/"
   },
   "countries": {
     "country:AFG": {
@@ -3911,6 +3912,133 @@
         "Rhodesia"
       ],
       "background": "The hunter-gatherer San people first inhabited the area that eventually became Zimbabwe. Farming communities migrated to the area around A.D. 500 during the Bantu expansion, and Shona-speaking societies began to develop in the Limpopo valley and Zimbabwean highlands around the 9th century."
+    },
+    "country:ISR": {
+      "record": "14 May 1948: declaration of independence following the League of Nations mandate under British administration.",
+      "events": [
+        {
+          "year": 1948,
+          "date": "14 May 1948",
+          "label": "declaration of independence following the British-administered mandate"
+        }
+      ],
+      "mentions": [
+        "United Kingdom"
+      ],
+      "formerNames": [],
+      "background": ""
+    },
+    "country:ITA": {
+      "record": "17 March 1861: proclamation of the Kingdom of Italy; full unification followed in 1871.",
+      "events": [
+        {
+          "year": 1861,
+          "date": "17 March 1861",
+          "label": "proclamation of the Kingdom of Italy"
+        }
+      ],
+      "mentions": [],
+      "formerNames": [],
+      "background": ""
+    },
+    "country:LBR": {
+      "record": "26 July 1847: declaration of independence.",
+      "events": [
+        {
+          "year": 1847,
+          "date": "26 July 1847",
+          "label": "declaration of independence"
+        }
+      ],
+      "mentions": [
+        "United States"
+      ],
+      "formerNames": [],
+      "background": ""
+    },
+    "country:SOM": {
+      "record": "1 July 1960: British Somaliland and Italian Somaliland merged to form the Somali Republic after independence.",
+      "events": [
+        {
+          "year": 1960,
+          "date": "1 July 1960",
+          "label": "formation of the Somali Republic by the merger of British and Italian Somaliland"
+        }
+      ],
+      "mentions": [
+        "United Kingdom",
+        "Italy"
+      ],
+      "formerNames": [],
+      "background": ""
+    },
+    "country:ESP": {
+      "record": "1492: seizure of Granada, traditionally considered the completion of the unification that forged present-day Spain.",
+      "events": [
+        {
+          "year": 1492,
+          "date": "1492",
+          "label": "seizure of Granada completing the traditional unification of Spain"
+        }
+      ],
+      "mentions": [],
+      "formerNames": [],
+      "background": ""
+    },
+    "country:NLD": {
+      "record": "26 July 1581: declaration of independence through the Act of Abjuration; Spain recognized independence on 30 January 1648.",
+      "events": [
+        {
+          "year": 1581,
+          "date": "26 July 1581",
+          "label": "independence declared from Spain",
+          "from": "Spain",
+          "power": "Spain",
+          "declared": true
+        },
+        {
+          "year": 1648,
+          "date": "30 January 1648",
+          "label": "recognition of independence by Spain"
+        }
+      ],
+      "mentions": [
+        "Spain"
+      ],
+      "formerNames": [],
+      "background": ""
+    },
+    "country:VAT": {
+      "record": "11 February 1929: the Lateran treaties with Italy acknowledged the sovereignty of the Holy See and established Vatican City State.",
+      "events": [
+        {
+          "year": 1929,
+          "date": "11 February 1929",
+          "label": "establishment of Vatican City State through the Lateran treaties"
+        }
+      ],
+      "mentions": [
+        "Italy"
+      ],
+      "formerNames": [],
+      "background": ""
+    },
+    "country:PSE": {
+      "record": "29 November 2012: the United Nations General Assembly accorded Palestine non-member observer State status in resolution 67/19.",
+      "events": [
+        {
+          "year": 2012,
+          "date": "29 November 2012",
+          "label": "granting of non-member observer State status at the United Nations"
+        }
+      ],
+      "mentions": [],
+      "formerNames": [],
+      "background": "",
+      "source": {
+        "name": "United Nations General Assembly, resolution 67/19",
+        "url": "https://www.un.org/unispal/document/auto-insert-187149/"
+      }
     }
   }
 }

@@ -180,7 +180,7 @@ function advanceByClock(match: Match, now: number): boolean {
     match.status = "round_active"; changed = true;
     if (isRaceMode(match.mode)) { match.state = { ...match.state, race: Object.fromEntries(match.players.map(p=>[p.id,createRaceRun(now)])) }; match.round_ends_at = new Date(now + raceDuration(match.mode)).toISOString(); }
     else if (match.mode === "stat_battle") {
-      const pool = trialPool(match.settings.difficulty || "intermediate");
+      const pool = trialPool("expert");
       // Two players duel; three or four sit at a card table.
       if (match.players.length > 2) { match.state = { ...match.state, duel: undefined, table: createBattleTable(pool, match.seed, match.players.length) }; syncTableScores(match); }
       else { match.state = { ...match.state, table: undefined, duel: createBattleMatch(pool, match.seed) }; syncDuelScores(match); }

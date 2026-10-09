@@ -31,4 +31,17 @@ export const REGIONS: RegionDefinition[] = [
   { id: "micronesia", name: "Micronesia (region)", definition: "UN members in UN M49 Micronesia.", tier: 3, members: ["FSM", "KIR", "MHL", "NRU", "PLW"] },
   { id: "landlocked_africa", name: "Landlocked Africa", definition: "African countries without a coastline.", tier: 3, members: ["BWA", "BFA", "BDI", "CAF", "TCD", "ETH", "LSO", "MWI", "MLI", "NER", "RWA", "SSD", "SWZ", "UGA", "ZMB", "ZWE"] },
   { id: "mediterranean", name: "The Mediterranean coast", definition: "Countries with a Mediterranean shoreline.", tier: 3, members: ["ALB", "DZA", "BIH", "HRV", "CYP", "EGY", "FRA", "GRC", "ISR", "ITA", "LBN", "LBY", "MLT", "MCO", "MNE", "MAR", "PSE", "SVN", "ESP", "SYR", "TUN", "TUR"] },
+  // Broad geographical groups let every one of the 195 countries appear as a correct member.
+  { id: "continent_africa", name: "Africa", definition: "UN M49 Africa.", tier: 3,
+    members: ["DZA", "AGO", "BEN", "BWA", "BFA", "BDI", "CPV", "CMR", "CAF", "TCD", "COM", "COD", "DJI", "EGY", "GNQ", "ERI", "SWZ", "ETH", "GAB", "GMB", "GHA", "GIN", "GNB", "CIV", "KEN", "LSO", "LBR", "LBY", "MDG", "MWI", "MLI", "MRT", "MUS", "MAR", "MOZ", "NAM", "NER", "NGA", "COG", "RWA", "STP", "SEN", "SYC", "SLE", "SOM", "ZAF", "SSD", "SDN", "TZA", "TGO", "TUN", "UGA", "ZMB", "ZWE"] },
+  { id: "continent_asia", name: "Asia", definition: "UN M49 Asia, including Palestine.", tier: 3,
+    members: ["AFG", "ARM", "AZE", "BHR", "BGD", "BTN", "BRN", "KHM", "CHN", "CYP", "GEO", "IND", "IDN", "IRN", "IRQ", "ISR", "JPN", "JOR", "KAZ", "KWT", "KGZ", "LAO", "LBN", "MYS", "MDV", "MNG", "MMR", "NPL", "PRK", "OMN", "PAK", "PSE", "PHL", "QAT", "SAU", "SGP", "KOR", "LKA", "SYR", "TJK", "THA", "TLS", "TUR", "TKM", "ARE", "UZB", "VNM", "YEM"] },
+  { id: "continent_europe", name: "Europe", definition: "UN M49 Europe, including the Holy See.", tier: 3,
+    members: ["ALB", "AND", "AUT", "BLR", "BEL", "BIH", "BGR", "HRV", "CZE", "DNK", "EST", "FIN", "FRA", "DEU", "GRC", "HUN", "ISL", "IRL", "ITA", "LVA", "LIE", "LTU", "LUX", "MLT", "MDA", "MCO", "MNE", "MKD", "NOR", "POL", "PRT", "ROU", "RUS", "SMR", "SRB", "SVK", "SVN", "ESP", "SWE", "CHE", "NLD", "UKR", "GBR", "VAT"] },
+  { id: "continent_north_america", name: "North America", definition: "UN M49 Northern America, Central America and Caribbean.", tier: 3,
+    members: ["ATG", "BHS", "BRB", "BLZ", "CAN", "CRI", "CUB", "DMA", "DOM", "SLV", "GRD", "GTM", "HTI", "HND", "JAM", "MEX", "NIC", "PAN", "KNA", "LCA", "VCT", "TTO", "USA"] },
+  { id: "continent_south_america", name: "South America", definition: "UN M49 South America.", tier: 3,
+    members: ["ARG", "BOL", "BRA", "CHL", "COL", "ECU", "GUY", "PRY", "PER", "SUR", "URY", "VEN"] },
+  { id: "continent_oceania", name: "Oceania", definition: "UN M49 Oceania.", tier: 3,
+    members: ["AUS", "FJI", "KIR", "MHL", "FSM", "NRU", "NZL", "PLW", "PNG", "WSM", "SLB", "TON", "TUV", "VUT"] },
 ];

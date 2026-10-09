@@ -156,7 +156,7 @@ function DuelHotseat({ data, players, settings, onExit, onComplete }: GameProps)
   const [seed, setSeed] = useState(freshSeed);
   const pools = useTrialPools(data, settings.difficulty);
   if (!pools) return null;
-  const shared = { pool: pools.difficulty, byId: pools.byId, seed, onExit, onRestart: () => setSeed(freshSeed()), onComplete };
+  const shared = { pool: pools.full, byId: pools.byId, seed, onExit, onRestart: () => setSeed(freshSeed()), onComplete };
   // Two players duel; three or four sit at one card table.
   return players.length > 2 ? <StatBattleTableHotseat key={seed} {...shared} names={players.map((player) => player.name)} /> : <StatBattleHotseat key={seed} {...shared} names={[players[0].name, players[1].name]} />;
 }

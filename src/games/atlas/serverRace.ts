@@ -35,7 +35,7 @@ export function raceQuestions(data:AtlasDataset, mode:AtlasRaceMode, seed:string
     return generateQuestions({entities:data.countries,datasetVersion:data.version.atlasDataVersion,seed,difficulty,categories,interaction:"choice",count});
   }
   // Master and Grandmaster rooms get the expert history deck: every country, dates only a few years apart.
-  if(mode==="history_battle") return historyDeck(data.history,tier==="standard"?pool:full,seed,tier==="standard"?difficulty:"expert",count).map((r,i)=>({...base(i,r.prompt,r.answerId,r.options.map(({id,label})=>({id,label}))),entityId:r.countryId,property:r.kind,explanation:historyExplanation(r,id=>byId.get(id)?.name??id),sourceMetadata:[{source:data.history.source.name}]}));
+  if(mode==="history_battle") return historyDeck(data.history,tier==="standard"?pool:full,seed,tier==="standard"?difficulty:"expert",count).map((r,i)=>({...base(i,r.prompt,r.answerId,r.options.map(({id,label})=>({id,label}))),entityId:r.countryId,property:r.kind,explanation:historyExplanation(r,id=>byId.get(id)?.name??id),sourceMetadata:[{source:r.source??data.history.source.name}]}));
   const used:string[]=[];
   return Array.from({length:count},(_,i):RaceQuestion=>{
     if(mode==="language_guesser") { const r=languageRound(seed,i,difficulty);return base(i,`Which language is this? “${r.sentence}”`,r.language,r.options.map(label=>({id:label,label}))); }

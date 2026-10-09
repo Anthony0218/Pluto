@@ -1,9 +1,10 @@
 {
-  "atlasDataVersion": "2026-09-arena2",
-  "synchronizedAt": "2026-10-02T14:12:13.285Z",
+  "atlasDataVersion": "2026-10-un195",
+  "synchronizedAt": "2026-10-09T21:42:07.000Z",
   "sources": {
     "geonamesCities": "https://download.geonames.org/export/dump/cities15000.zip",
-    "wikidataHighestPoints": "https://query.wikidata.org/sparql"
+    "wikidataHighestPoints": "https://query.wikidata.org/sparql",
+    "gambiaHighestPoint": "https://github.com/factbook/factbook.json/blob/144d6977b2b01ac1cbd220de754c0a005616760b/africa/ga.json"
   },
   "cities": [
     {
@@ -2703,6 +2704,12 @@
     "country:USA": {
       "name": "Denali",
       "elevationM": 6190
+    },
+    "country:GMB": {
+      "name": "Unnamed elevation southeast of Sabi",
+      "elevationM": 63,
+      "source": "The World Factbook",
+      "sourceUrl": "https://github.com/factbook/factbook.json/blob/144d6977b2b01ac1cbd220de754c0a005616760b/africa/ga.json"
     }
   }
 }

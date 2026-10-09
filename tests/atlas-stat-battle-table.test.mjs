@@ -100,13 +100,18 @@ test('online Stat Battle runs a duel for two and a table for three or four, with
       return response.body;
     };
     for (const users of [['a', 'b'], ['a', 'b', 'c'], ['a', 'b', 'c', 'd']]) {
-      let room = await invoke('a', { op: 'create', mode: 'stat_battle', maxPlayers: users.length });
+      const difficulty = { 2: 'beginner', 3: 'intermediate', 4: 'expert' }[users.length];
+      let room = await invoke('a', { op: 'create', mode: 'stat_battle', difficulty, maxPlayers: users.length });
       const code = room.code, row = endpoint.matches.at(-1);
       for (const user of users.slice(1)) await invoke(user, { op: 'join', code });
       for (const user of users) room = await invoke(user, { op: 'ready', code });
       assert.equal(room.status, 'countdown');
       endpoint.advance(3001); room = await invoke('a', { op: 'get', code });
       assert.equal(room.status, 'round_active');
+      const dealt = row.state.table ? [...row.state.table.deck, ...row.state.table.hands.flat()]
+        : [...row.state.duel.battle.deck, ...row.state.duel.battle.player, ...row.state.duel.battle.opponent];
+      assert.equal(dealt.length, 195, `${difficulty}: online Stat Battle keeps the full deck`);
+      assert.equal(new Set(dealt).size, 195);
       if (users.length === 2) { assert.ok(room.battle); assert.equal(room.table, undefined); continue; }
       assert.equal(room.battle, undefined);
       assert.equal(room.table.hand.length, STAT_BATTLE.handSize); assert.deepEqual(room.table.handSizes, users.map(() => STAT_BATTLE.handSize));
