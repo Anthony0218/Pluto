@@ -1,3 +1,4 @@
+import TodoList from '@/components/tools/TodoList';
 import CalorieTracker from '@/components/tools/CalorieTracker';
 import QrCodeCreator from '@/components/tools/QrCodeCreator';
 import BirthdayReminder from '@/components/tools/BirthdayReminder';
@@ -32,7 +33,7 @@ export default function ToolAppPage() {
   const { progress, loading, visitTool, toggleFavoriteTool } = useLearningToolsProgress();
   useEffect(() => { if (tool) visitTool(tool.id); }, [tool, visitTool]);
   if (!tool) return toolId && retiredTools[toolId] ? <Navigate to={retiredTools[toolId]} replace /> : <NotFoundPage />;
-  const app = tool.id === "qr-code-creator" ? <QrCodeCreator /> : tool.id === "birthday-reminders" ? <BirthdayReminder /> : tool.id === "calorie-tracker" ? <CalorieTracker /> : tool.id === "calculator" ? <Calculator /> : tool.id === "percentage-calculator" ? <PercentageWorkbench /> : tool.id === "number-system-converter" ? <NumberSystemConverter /> : tool.id === "unit-converter" ? <UnitConverter /> : tool.id === "notes" ? <NotesApp /> : tool.id === "day-planner" ? <DayPlanner /> : tool.id === "time-zone-planner" ? <TimeZonePlanner /> : tool.id === "workout-timer" ? <WorkoutTimer /> : tool.id === "bill-splitter" ? <BillSplitter /> : tool.id === "budget-tracker" ? <BudgetTracker /> : null;
+  const app = tool.id === "todo-list" ? <TodoList /> : tool.id === "qr-code-creator" ? <QrCodeCreator /> : tool.id === "birthday-reminders" ? <BirthdayReminder /> : tool.id === "calorie-tracker" ? <CalorieTracker /> : tool.id === "calculator" ? <Calculator /> : tool.id === "percentage-calculator" ? <PercentageWorkbench /> : tool.id === "number-system-converter" ? <NumberSystemConverter /> : tool.id === "unit-converter" ? <UnitConverter /> : tool.id === "notes" ? <NotesApp /> : tool.id === "day-planner" ? <DayPlanner /> : tool.id === "time-zone-planner" ? <TimeZonePlanner /> : tool.id === "workout-timer" ? <WorkoutTimer /> : tool.id === "bill-splitter" ? <BillSplitter /> : tool.id === "budget-tracker" ? <BudgetTracker /> : null;
   const favorite = progress.favoriteTools.includes(tool.id);
   const related = learningPaths.filter(path => path.subjectId === tool.relatedPath?.subjectId && path.id === tool.relatedPath?.id);
   return <HubLayout eyebrow={tool.category} title={tool.title} description={tool.description} breadcrumbs={[{ title: "Tools", route: "/tools" }, { title: tool.title }]}

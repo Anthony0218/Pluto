@@ -1,5 +1,5 @@
 import { Tabs } from "@base-ui/react/tabs";
-import { ArrowLeft, ArrowRight, AudioWaveform, Binary, BookOpen, Calculator, CalendarClock, ChartNoAxesCombined, Dices, Drum, Dumbbell, Flame, Gift, Gamepad2, Globe, Goal, Grid2X2, Hash, Infinity as InfinityIcon, Music, Music4, NotebookPen, Percent, QrCode, Receipt, Ruler, ShieldCheck, Sigma, Spline, Swords, Trophy, Variable, Waypoints, Wallet } from "lucide-react";
+import { ListTodo, ArrowLeft, ArrowRight, AudioWaveform, Binary, BookOpen, Calculator, CalendarClock, ChartNoAxesCombined, Dices, Drum, Dumbbell, Flame, Gift, Gamepad2, Globe, Goal, Grid2X2, Hash, Infinity as InfinityIcon, Music, Music4, NotebookPen, Percent, QrCode, Receipt, Ruler, ShieldCheck, Sigma, Spline, Swords, Trophy, Variable, Waypoints, Wallet } from "lucide-react";
 import * as m from "motion/react-m";
 import { useId, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { useMotionValueEvent, useTransform } from "motion/react";
@@ -53,7 +53,7 @@ function UniverseItem({ id, route, title, className = "", style, children, statu
 }
 
 const toolIcons = {
-  calculator: Calculator, "percentage-calculator": Percent, "number-system-converter": Binary, "unit-converter": Ruler,
+  "todo-list": ListTodo, calculator: Calculator, "percentage-calculator": Percent, "number-system-converter": Binary, "unit-converter": Ruler,
   "workout-timer": Dumbbell, "bill-splitter": Receipt, "time-zone-planner": Globe, "budget-tracker": Wallet,
   "calorie-tracker": Flame, notes: NotebookPen, "day-planner": CalendarClock, "qr-code-creator": QrCode, "birthday-reminders": Gift,
 };

@@ -12,6 +12,7 @@ export type ToolApp = {
 };
 
 export const toolApps: ToolApp[] = [
+  { id: "todo-list", title: "ToDo List", description: "Manage tasks, keep their history, and connect shopping lists with recipes and shared bills.", category: "Planning & time", accent: "#b8ec67", features: ["Tasks, completed items, and revision history", "Named shopping lists with recipe ingredients", "Connected Bill Splitter expenses and keyboard controls"], status: "available" },
   { id: "calculator", title: "Calculator", description: "Add, subtract, multiply, and divide on a classic keypad.", category: "Calculators & conversions", accent: "#93c5fd", features: ["Basic arithmetic with operator precedence", "Percent, sign change, and backspace keys", "Works with the keyboard"], status: "available" },
   { id: "percentage-calculator", title: "Percentage Calculator", description: "Work out discounts, changes, VAT, and reverse percentages.", category: "Calculators & conversions", accent: "#a5b4fc", features: ["Percentage amounts and changes", "Reverse percentages", "Discounts, VAT, and percentage points", "Step-by-step explanations"], relatedPath: { subjectId: "math", id: "percentages" }, status: "available" },
   { id: "birthday-reminders", title: "Birthday Reminders", description: "Save people and birthdays, and get a reminder each year.", category: "Planning & time", accent: "#f9a8d4", features: ["People and birthdays", "Upcoming birthdays and optional ages", "Yearly reminders"], status: "available" },

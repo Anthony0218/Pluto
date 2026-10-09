@@ -1,0 +1,83 @@
+.todo-workbench { min-width: 0; }
+.todo-workbench *, .todo-recipe-action * { box-sizing: border-box; }
+.todo-workbench .calorie-tabs button { display: inline-flex; gap: 7px; align-items: center; }
+.todo-header-icon { display: grid; place-items: center; color: #12313a; background: #b8ec67; width: 58px; height: 58px; border-radius: 18px; flex: none; }
+.todo-summary { display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 14px; margin-bottom: 18px; }
+.todo-summary article { padding: 20px; display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
+.todo-summary article:first-child svg { color: #709d33; }
+.todo-summary article:nth-child(2) svg { color: #8275ec; }
+.todo-summary strong { font-size: 34px; letter-spacing: -.05em; }
+.todo-summary span { grid-column: 1/-1; font-size: 13px; color: #647982; }
+.todo-summary .todo-summary-tip { display: block; color: #fff; background: linear-gradient(135deg,#173941,#28545c); border-radius: 18px; }
+.todo-summary-tip p { margin: 4px 0 8px; font-size: 19px; font-weight: 750; }
+.todo-summary-tip span { color: #dce9e6; }
+.todo-layout { display: grid; grid-template-columns: minmax(0,1.6fr) minmax(270px,1fr); gap: 16px; align-items: start; }
+.todo-panel { padding: 20px; min-width: 0; }
+.todo-panel h3 { font-size: 21px; letter-spacing: -.04em; margin: 0 0 15px; color: #12313a; }
+.todo-panel .calorie-label { display: flex; align-items: center; gap: 6px; }
+.todo-panel > label { display: grid; gap: 6px; margin: 12px 0; }
+.todo-search { width: 100%; margin: 5px 0 12px; }
+.todo-filters, .todo-list-pills { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 15px; }
+.todo-filters button, .todo-list-pills button { background: #edf2ed; color: #49636a; border: 1px solid transparent; border-radius: 9px; padding: 8px 11px; font-size: 12px; font-weight: 750; cursor: pointer; }
+.todo-filters button.active, .todo-list-pills button.active { background: #e5f5cf; color: #294b12; border-color: #bddf8c; }
+.todo-items { margin: 0; padding: 0; list-style: none; }
+.todo-row { border-top: 1px solid #e9eee9; padding: 12px 0; }
+.todo-row-main { display: flex; gap: 10px; align-items: start; padding: 6px; border-radius: 10px; }
+.todo-workbench :focus-visible, .todo-recipe-action :focus-visible { outline: 3px solid #8275ec; outline-offset: 3px; }
+.todo-workbench .todo-row-main > input[type=checkbox] { min-height: 20px; height: 20px; width: 20px; margin: 2px 0; flex: none; accent-color: #709d33; cursor: pointer; }
+.todo-content { min-width: 0; flex: 1; overflow-wrap: anywhere; }
+.todo-content strong { display: block; font-size: 15px; line-height: 1.5; }
+.todo-content p { white-space: pre-wrap; color: #647982; font-size: 13px; margin: 4px 0 8px; }
+.todo-content > span, .todo-content > small { display: block; font-size: 12px; color: #647982; margin-top: 3px; }
+.todo-row.is-done .todo-content > strong { text-decoration: line-through; color: #647982; }
+.todo-row-actions { display: flex; gap: 5px; flex-shrink: 0; }
+.todo-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 10px; color: #647982; }
+.todo-badge { background: #fff0e5; color: #874014; border-radius: 8px; padding: 3px 6px; }
+.todo-meta .todo-overdue { color: #a13737; font-weight: 750; }
+.todo-history { padding: 6px 6px 0 36px; font-size: 12px; color: #647982; }
+.todo-history summary, .todo-shortcuts summary, .todo-recipe-action summary { cursor: pointer; font-weight: 750; }
+.todo-history ol { margin: 10px 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.todo-history li { padding: 12px; border-left: 3px solid #b8ec67; background: #f8faf6; border-radius: 8px; overflow-wrap: anywhere; }
+.todo-history strong { display: block; margin-top: 6px; color: #12313a; }
+.todo-history p { white-space: pre-wrap; margin: 5px 0; }
+.todo-form { display: grid; gap: 12px; margin-top: 12px; }
+.todo-form label, .todo-item-form label, .todo-list-manager label, .todo-list-settings label { display: grid; gap: 5px; min-width: 0; }
+.todo-form input, .todo-form select, .todo-item-form input, .todo-item-form select, .todo-list-manager input, .todo-list-settings input { width: 100%; min-width: 0; }
+.todo-workbench textarea { width: 100%; border: 1px solid #dce5df; border-radius: 10px; color: #12313a; background: #fff; padding: 10px; resize: vertical; min-height: 80px; font: inherit; font-size: 13px; }
+.todo-shortcuts { margin-top: 18px; border-top: 1px solid #e9eee9; padding-top: 14px; color: #647982; font-size: 12px; }
+.todo-shortcuts p { line-height: 1.8; margin: 7px 0; }
+.todo-shortcuts kbd { background: #edf2ed; color: #12313a; border: 1px solid #dce5df; border-radius: 5px; padding: 2px 4px; font: inherit; font-size: 11px; }
+.todo-empty { padding: 32px 18px; display: grid; justify-items: center; text-align: center; color: #647982; }
+.todo-empty svg { color: #719f30; }
+.todo-empty h4, .todo-empty h3 { margin: 12px 0 4px; color: #12313a; }
+.todo-empty p { max-width: 350px; font-size: 13px; margin: 4px 0; }
+.todo-list-manager { padding: 18px; }
+.todo-list-manager .pt-actions, .todo-list-settings .pt-actions { align-items: end; }
+.todo-list-manager form > label { flex: 1; }
+.todo-list-pills { margin: 16px 0 0; }
+.todo-list-pills button { display: flex; align-items: center; gap: 6px; max-width: 100%; overflow-wrap: anywhere; text-align: left; }
+.todo-list-pills span { background: #fff; border-radius: 7px; padding: 1px 5px; }
+.todo-list-settings { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: center; margin: 15px 0; }
+.todo-list-settings form { flex: 1; }
+.todo-shopping-heading { display: flex; gap: 10px; justify-content: space-between; align-items: center; flex-wrap: wrap; margin: 18px 0; overflow-wrap: anywhere; }
+.todo-shopping-heading h3 { margin: 0; font-size: 23px; color: #12313a; }
+.todo-shopping-heading span { color: #647982; font-size: 12px; }
+.todo-item-form { display: grid; grid-template-columns: minmax(0,1fr) 70px 95px; gap: 8px; align-items: end; margin: 6px 0 15px; }
+.todo-item-form button { justify-self: start; }
+.todo-sidebar { display: grid; gap: 15px; min-width: 0; }
+.todo-recipe-action { flex-basis: 100%; width: 100%; margin: 10px 0; font-size: 12px; color: #49636a; }
+.todo-recipe-action summary { display: flex; align-items: center; gap: 6px; padding: 9px 10px; background: #e9f5db; border-radius: 9px; color: #375c1e; }
+.todo-recipe-action .todo-form { border: 1px solid #dce5df; padding: 12px; border-radius: 10px; }
+.todo-recipe-action label { display: grid; gap: 5px; }
+.todo-bill-links select { max-width: 100%; }
+.todo-linked-bills { list-style: none; margin: 16px 0 0; padding: 0; }
+.todo-linked-bills li { display: grid; gap: 6px; padding: 12px 0; border-top: 1px solid #e9eee9; font-size: 13px; overflow-wrap: anywhere; }
+.todo-linked-bills small { color: #647982; }
+.todo-linked-bills button { justify-self: start; }
+.todo-workbench a { color: #375c1e; overflow-wrap: anywhere; }
+.todo-workbench .lt-text-link, .todo-workbench .todo-shortcuts summary { color: #49636a; }
+.todo-total { display: flex; justify-content: space-between; gap: 8px; align-items: center; background: #e9f5db; border-radius: 10px; padding: 12px; font-size: 12px; }
+@media (max-width: 1000px) { .todo-layout { grid-template-columns: 1fr; } .todo-summary { grid-template-columns: 1fr 1fr; } .todo-summary-tip { grid-column: 1/-1; } .todo-sidebar { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 600px) { .todo-panel { padding: 14px; } .todo-summary article { padding: 14px; } .todo-sidebar { grid-template-columns: 1fr; } .todo-row-main { flex-wrap: wrap; } .todo-row-actions { margin-left: auto; } .todo-row-actions .calorie-secondary { font-size: 11px; } .todo-list-manager .pt-actions { display: grid; width: 100%; } .todo-item-form { grid-template-columns: minmax(0,1fr) minmax(80px,1fr); } .todo-item-form > label:first-child { grid-column: 1/-1; } .todo-item-form > button { grid-column: 1/-1; } .todo-list-settings form { min-width: 0; width: 100%; } .todo-list-settings label { width: 100%; } }
+
+.todo-selected-bill { outline: 2px solid #b8ec67; outline-offset: 5px; border-radius: 10px; }

@@ -2,8 +2,9 @@ import { birthdayReminderChanges, validBirthdayDay, validBirthdayPerson, type Bi
 import { reminderChanges, type ReminderChange } from './toolNotifications.ts';
 import { validFoodEntry, validSavedMeal, validNutritionFood, validNutritionRecipe, validNutritionSettings, type FoodEntry, type SavedMeal, type NutritionFood, type NutritionRecipe, type NutritionSettings } from './calorieTools.ts';
 import { expenseSplit, currencies, validDate, validTime, validZone, zonedParts, type PlannerTask, type Routine, type ExpenseGroup, type BudgetEntry, type BudgetLimit, type Subscription, type ZoneAvailability } from './lifeTools.ts';
-export type LifeToolsState = { version: 1; birthdays: BirthdayPerson[]; background: { enabled: boolean; pending: ReminderChange[] }; foodEntries: FoodEntry[]; savedMeals: SavedMeal[]; nutritionFoods: NutritionFood[]; nutritionRecipes: NutritionRecipe[]; nutritionSettings: NutritionSettings; weatherPlaces: WeatherPlace[]; tasks: PlannerTask[]; routines: Routine[]; groups: ExpenseGroup[]; entries: BudgetEntry[]; limits: BudgetLimit[]; subscriptions: Subscription[]; zones: ZoneAvailability[]; breaks: { enabled: boolean; interval: number; nextAt: number } };
-export const emptyLifeTools = (): LifeToolsState => ({ version: 1, birthdays: [], background: { enabled: false, pending: [] }, foodEntries: [], savedMeals: [], nutritionFoods: [], nutritionRecipes: [], nutritionSettings: { calorieGoal: null }, weatherPlaces: [], tasks: [], routines: [], groups: [], entries: [], limits: [], subscriptions: [], zones: [], breaks: { enabled: false, interval: 60, nextAt: 0 } });
+import { validTodo, validShoppingList, type Todo, type ShoppingList } from './todoTools.ts';
+export type LifeToolsState = { version: 1; todos: Todo[]; shoppingLists: ShoppingList[]; birthdays: BirthdayPerson[]; background: { enabled: boolean; pending: ReminderChange[] }; foodEntries: FoodEntry[]; savedMeals: SavedMeal[]; nutritionFoods: NutritionFood[]; nutritionRecipes: NutritionRecipe[]; nutritionSettings: NutritionSettings; weatherPlaces: WeatherPlace[]; tasks: PlannerTask[]; routines: Routine[]; groups: ExpenseGroup[]; entries: BudgetEntry[]; limits: BudgetLimit[]; subscriptions: Subscription[]; zones: ZoneAvailability[]; breaks: { enabled: boolean; interval: number; nextAt: number } };
+export const emptyLifeTools = (): LifeToolsState => ({ version: 1, todos: [], shoppingLists: [], birthdays: [], background: { enabled: false, pending: [] }, foodEntries: [], savedMeals: [], nutritionFoods: [], nutritionRecipes: [], nutritionSettings: { calorieGoal: null }, weatherPlaces: [], tasks: [], routines: [], groups: [], entries: [], limits: [], subscriptions: [], zones: [], breaks: { enabled: false, interval: 60, nextAt: 0 } });
 const record = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
 /** Weather Explorer was retired; its saved places stay in the stored state so existing data still loads and syncs. */
 export type WeatherPlace = { id: string; name: string; latitude: number; longitude: number };
@@ -29,6 +30,7 @@ function validExpenseMetadata(e: Record<string, unknown>) {
   return tipValues.reduce((a,b) => a+b,0) === e.tip && (e.splitMethod !== 'equal' || Math.max(...billValues) - Math.min(...billValues) <= 1) && (e.tipMethod === 'person' ? participants.every(id => tips[id] === (id === e.tipPayer ? e.tip : 0)) : Math.max(...tipValues) - Math.min(...tipValues) <= 1);
 }
 export const validators = {
+  todos: validTodo, shoppingLists: validShoppingList,
   birthdays: validBirthdayPerson,
   foodEntries: validFoodEntry, savedMeals: validSavedMeal, nutritionFoods: validNutritionFood, nutritionRecipes: validNutritionRecipe, weatherPlaces: validWeatherPlace,
   tasks: (v: unknown): v is PlannerTask => record(v) && id(v.id) && text(v.title) && validDate(v.date) && validTime(v.time) && validZone(v.zone) && timestamp(v.at) && (zonedParts(v.at as number, v.zone).date === v.date && zonedParts(v.at as number, v.zone).time === v.time) && integer(v.duration, 1, 1440) && typeof v.done === 'boolean' && typeof v.reminder === 'boolean' && typeof v.reminded === 'boolean',
@@ -44,7 +46,7 @@ export const validators = {
       && list(v.repayments, p => record(p) && id(p.id) && validDate(p.date) && members.has(p.from as string) && members.has(p.to as string) && p.from !== p.to && integer(p.amount, 1, 2e9), 500);
   },
 };
-export const collectionLimits = { birthdays: 300, foodEntries: 5000, savedMeals: 100, nutritionFoods: 1000, nutritionRecipes: 300, weatherPlaces: 20, tasks: 500, routines: 50, groups: 30, entries: 2000, limits: 1200, subscriptions: 200, zones: 10 };
+export const collectionLimits = { todos: 1000, shoppingLists: 50, birthdays: 300, foodEntries: 5000, savedMeals: 100, nutritionFoods: 1000, nutritionRecipes: 300, weatherPlaces: 20, tasks: 500, routines: 50, groups: 30, entries: 2000, limits: 1200, subscriptions: 200, zones: 10 };
 export type Collection = keyof typeof validators;
 const validBreaks = (value: unknown): value is LifeToolsState['breaks'] => record(value) && typeof value.enabled === 'boolean' && integer(value.interval, 1, 240) && timestamp(value.nextAt);
 let lastReminderChange = 0;
