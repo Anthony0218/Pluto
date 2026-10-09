@@ -1,0 +1,11520 @@
+{
+  "One meaningful missed position is created automatically when you analyze a finished Singleplayer or Multiplayer game in Game Review. Hotseat never creates personal puzzles.": [
+    "ko"
+  ],
+  "Your solved Lichess puzzles and solved positions from your own games are kept together here.": [
+    "ko",
+    "pt"
+  ],
+  "Suggested ·": [
+    "ko",
+    "pt"
+  ],
+  "My Games ·": [
+    "ko",
+    "pt"
+  ],
+  "Completed ·": [
+    "ko",
+    "pt"
+  ],
+  "Refresh first 5": [
+    "ko"
+  ],
+  "Sign in to use personal training": [
+    "pt"
+  ],
+  "Personal game puzzles and completion history are private to your account.": [
+    "ko",
+    "pt"
+  ],
+  "No completed puzzles yet.": [
+    "ko",
+    "pt"
+  ],
+  "No personal puzzles yet. Finish a Singleplayer or Multiplayer game, open Game Review, and run the analysis.": [
+    "ko",
+    "pt"
+  ],
+  "No puzzles match these filters.": [
+    "ko",
+    "pt"
+  ],
+  "You played": [
+    "pt"
+  ],
+  "Perfect ✓": [
+    "pt"
+  ],
+  "Loading 5 more...": [
+    "pt"
+  ],
+  "20 puzzle limit reached": [
+    "pt"
+  ],
+  "· Move": [
+    "pt"
+  ],
+  "Rename puzzle": [
+    "pt"
+  ],
+  "✎ Rename": [
+    "pt"
+  ],
+  "Replay the position and find what you missed during the game.": [
+    "pt"
+  ],
+  "The reply is being played automatically.": [
+    "pt"
+  ],
+  "↺ Reset": [
+    "pt"
+  ],
+  "Finding puzzle...": [
+    "pt"
+  ],
+  "Next puzzle →": [
+    "pt"
+  ],
+  "Loading your puzzle set": [
+    "pt"
+  ],
+  "Completed puzzles are filtered out automatically.": [
+    "pt"
+  ],
+  "Missed on": [
+    "pt"
+  ],
+  "Eval loss": [
+    "pt"
+  ],
+  "Move you played": [
+    "pt"
+  ],
+  "No puzzle selected.": [
+    "pt"
+  ],
+  "Opening book matches are marked Book. Other moves are graded by evaluation lost compared to the best move (in pawns).": [
+    "ko"
+  ],
+  "Pawn · Knight · Bishop · Rook · Queen": [
+    "ko"
+  ],
+  "Highlighted on board": [
+    "ko"
+  ],
+  "Click to highlight": [
+    "ko"
+  ],
+  "Shift before the normal move": [
+    "ko"
+  ],
+  "After four normal plies, the next side must resolve its Tectonic Shift first.": [
+    "ko"
+  ],
+  "Skip keeps your move": [
+    "ko"
+  ],
+  "Skipping does not consume the player's normal chess move.": [
+    "ko"
+  ],
+  "A shift opportunity appears after 4 normal plies": [
+    "ko"
+  ],
+  "Only ordinary chess moves count toward the four-ply timer. Tectonic Shift actions themselves do not count as normal plies.": [
+    "ko"
+  ],
+  "A rotation turns one quadrant 90° clockwise": [
+    "ko"
+  ],
+  "Generate": [
+    "pt"
+  ],
+  "Normal chess begins": [
+    "pt"
+  ],
+  "Adapt": [
+    "pt"
+  ],
+  "No opening book can save you": [
+    "pt"
+  ],
+  "What changes": [
+    "pt"
+  ],
+  "Opening theory disappears": [
+    "pt"
+  ],
+  "Connected, isolated and advanced Pawns are created before anyone makes a move.": [
+    "pt"
+  ],
+  "text-fuchsia-300": [
+    "pt"
+  ],
+  "Rule": [
+    "pt"
+  ],
+  "Fine-tune in Position": [
+    "ko"
+  ],
+  "Rules at a glance": [
+    "ko"
+  ],
+  "all of": [
+    "ko"
+  ],
+  "any of": [
+    "ko"
+  ],
+  "Edit rules in Create": [
+    "ko"
+  ],
+  "Players per side": [
+    "ko"
+  ],
+  "Mark where a selected piece can move and capture.": [
+    "ko"
+  ],
+  "Show blocked squares": [
+    "ko"
+  ],
+  "Travel Route": [
+    "de",
+    "bar"
+  ],
+  "Bridge Encounter": [
+    "de",
+    "bar"
+  ],
+  "Encounter Region": [
+    "de",
+    "bar"
+  ],
+  "Click to open regional campaign map": [
+    "de",
+    "bar"
+  ],
+  "Complete the previous campaign to unlock": [
+    "de",
+    "bar"
+  ],
+  "realms conquered": [
+    "de",
+    "bar"
+  ],
+  "· Locked": [
+    "de",
+    "bar"
+  ],
+  "Strike at the current melee timing": [
+    "de",
+    "bar"
+  ],
+  "Campaign Region": [
+    "de",
+    "bar"
+  ],
+  "← Continent": [
+    "de",
+    "bar"
+  ],
+  "Pixel:": [
+    "de",
+    "bar"
+  ],
+  "RGB:": [
+    "de",
+    "bar"
+  ],
+  "Battle:": [
+    "de",
+    "bar"
+  ],
+  "losses ·": [
+    "de",
+    "bar"
+  ],
+  "Peak": [
+    "de",
+    "bar"
+  ],
+  "Time the rotating direction pointer. Balanced accuracy and damage.": [
+    "de",
+    "bar"
+  ],
+  "Choose a nearby enemy. Strike when the collapsing ring reaches the golden center.": [
+    "de",
+    "bar"
+  ],
+  "Lock direction, then time a power meter. More power gives more damage but lowers accuracy slightly.": [
+    "de",
+    "bar"
+  ],
+  "Attack every enemy inside a forward cone at reduced damage.": [
+    "de",
+    "bar"
+  ],
+  "Rush in the chosen direction and strike an enemy near the destination.": [
+    "de",
+    "bar"
+  ],
+  "Lock direction, then time distance. Damages enemies around the landing point.": [
+    "de",
+    "bar"
+  ],
+  "A directional attack that pushes a hit target away.": [
+    "de",
+    "bar"
+  ],
+  "Lock direction, then estimate elevation/range and release at the right moment.": [
+    "de",
+    "bar"
+  ],
+  "Reduces incoming damage and knockback.": [
+    "de",
+    "bar"
+  ],
+  "Strongly lowers enemy hit chance.": [
+    "de",
+    "bar"
+  ],
+  "Nearby melee attackers can take automatic retaliation damage.": [
+    "de",
+    "bar"
+  ],
+  "Choose an ally; this unit absorbs part of incoming damage while close.": [
+    "de",
+    "bar"
+  ],
+  "Sure-footed": [
+    "de",
+    "bar"
+  ],
+  "Watchful": [
+    "de",
+    "bar"
+  ],
+  "Fight through mountain approaches and open the road to Arkstone.": [
+    "de",
+    "bar"
+  ],
+  "The mercantile city is divided between rival houses and hired armies.": [
+    "de",
+    "bar"
+  ],
+  "A distant frontier where armies disappear into stone and mist.": [
+    "de",
+    "bar"
+  ],
+  "Ancient roads converge around a tree older than the kingdoms.": [
+    "de",
+    "bar"
+  ],
+  "The last campaign climbs toward the beacon at the eastern frontier.": [
+    "de",
+    "bar"
+  ],
+  "Strong river current": [
+    "de",
+    "bar"
+  ],
+  "Barricade blocks the route": [
+    "de",
+    "bar"
+  ],
+  "Cliff edge": [
+    "de",
+    "bar"
+  ],
+  "A new tip every round — numbers, summits, a sentence overheard on the street. Solve it early for bonus points.": [
+    "de",
+    "bar"
+  ],
+  "Name the country behind a flag, then pick the right flag for a country outline.": [
+    "de",
+    "bar"
+  ],
+  "A warm breeze: every player receives 2 coins.": [
+    "ko"
+  ],
+  "ISLAND BREEZE! EVERYONE RECEIVES 2 COINS": [
+    "ko"
+  ],
+  "A lucky find: every player receives 2 coins.": [
+    "ko"
+  ],
+  "Snow and rock close one mountain path for 2 rounds.": [
+    "ko"
+  ],
+  "Sunspill Bay becomes a sanctuary: marked landings heal an extra 5 HP through next round.": [
+    "ko"
+  ],
+  "COCONUT MARKET! NORMAL SHOP ITEMS COST 2 LESS WHILE YOU ARE IN COCONUT CLUB THROUGH NEXT ROUND": [
+    "ko"
+  ],
+  "Three marked Whisper Ruins spaces become one-use item caches through next round.": [
+    "ko"
+  ],
+  "+ Add setting…": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "+ add effect…": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "+ condition": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "+ value": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  ", so the same run gives the same results.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "1 · Basics": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "10 · Rulebook": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "11 · Settings": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "12 · Validation": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "13 · Preview": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "14 · Save & publish": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "2 · Deck": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "3 · Players": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "4 · Zones": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "5 · Setup": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "6 · Turn phases": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "7 beats Ace": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "7 · Rules": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "8 · Events": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "9 · End conditions": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "; last:": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "A / D or arrows to run · Space / W to jump · touch movement and jump buttons": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "A central queen move preserves pressure, but it lets Black reorganize instead of forcing the mating net.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "A direct Knight check freezes one enemy piece": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "A forcing check, but it attacks from the side and does not line the king up with the queen.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "A full White army faces a reduced Black force led by a 5-HP Boss King with powers, armor and Rage.": [
+    "es",
+    "pt"
+  ],
+  "A future chess variant played across multiple vertical layers, where pieces can attack, defend and move through three-dimensional space.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "A harmless improving king move, but the tactical skewer is available immediately and should not be postponed.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "A king caught by a collapse loses one life and may escape only one square into the surviving board. If no adjacent legal escape exists, the game ends immediately.": [
+    "es",
+    "pt"
+  ],
+  "A legal king move, but the special en-passant window exists for only one move and should be used immediately.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "A legal rook move, but it gives Black a tempo to create an escape square or defend.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "A non-mating White check removes 1 Boss HP when armor is inactive.": [
+    "es",
+    "pt"
+  ],
+  "A normal developing move, but the position contains a concrete combination that is much stronger than quiet development.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "A player's score is called": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "A queen is normally strongest, but here it misses the immediate knight fork that wins Black's queen.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "A random non-king piece carries a ticking bomb. Move it, pass it by capture, or escape before the 3×3 blast.": [
+    "es",
+    "pt"
+  ],
+  "A random non-king piece starts as the carrier.": [
+    "es",
+    "pt"
+  ],
+  "A round moves through phases. Each phase lists what players may do; transitions decide when the game moves on. Actions are the buttons players press.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "A safe move, but it misses the simplest path. When ahead, ask whether a queen trade can turn a complicated game into an easy endgame.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "A seeded standard 16-piece bag decides the next piece": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "A selected outer edge cracks for 4 completed moves before disappearing.": [
+    "es",
+    "pt"
+  ],
+  "A sensible move that questions the bishop and preserves the queen, but it misses the tactical chance to end the game immediately.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "A shift may give check or checkmate to the opponent.": [
+    "es",
+    "pt"
+  ],
+  "A shift rotates one 4×4 quadrant 90° clockwise.": [
+    "es",
+    "pt"
+  ],
+  "A slow flank move ignores the tactical concentration around f7 and allows Black to stabilize the pin on the queen.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "A useful forcing check, but it does not attack the queen. You gain time, not material.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "A useful move in some positions, but delaying king safety while Black is already active is risky.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "ALL of (AND)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "ANY of (OR)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Add an effect": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Add end condition": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Add phase": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Add role": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Add setting": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Add zone": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "After an explosion, 5 moves pass before the next potato appears.": [
+    "es",
+    "pt"
+  ],
+  "After it has moved": [
+    "es",
+    "pt"
+  ],
+  "After losing HP, the Boss ignores HP damage for 2 completed plies.": [
+    "es",
+    "pt"
+  ],
+  "After taking damage, the Boss gains 2 completed plies of HP-damage immunity. Check rules still apply.": [
+    "es",
+    "pt"
+  ],
+  "All 32 standard pieces are scattered across the board into a playable random position. Understand the chaos before your opponent does.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "All cards, evenly": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "All {0} found · +{1} including the region bonus. Next region incoming…": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Allied armies fight across a cross-shaped board. Capture both enemy kings and win together.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Allowed actions": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Also caused by:": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Any normal piece still on the collapsing edge is destroyed.": [
+    "es",
+    "pt"
+  ],
+  "Attacked and legal squares reveal the fog": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Auto-pass": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Automatic": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Available when": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "BARK {0}s": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Back to the card builder": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Balance check · bots only": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Banded": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Basic": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Basic information": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Be the last remaining player": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best continuation found during your Game Review.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best move from the Lichess puzzle solution.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best practical decision: Black has queen, rook and bishop pressure directed toward the kingside. Long castling moves the king away from the attack and activates the rook.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best teaching choice: Black's queen and rook are already aimed at the kingside. Castling long places the king away from that concentration of force.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best {0}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best: Bb6+ moves the bishop off the d-file with check. Black must answer the check, and the rook then wins the queen on d7. The pawn on e5 also removes the old Bf6+ alternative.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best: White appears to abandon the queen, but the point is a forcing mating attack. After ...Bxd1, Bxf7+ drives the king to e7 and Nd5 is mate.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best: White is materially worse, so the correct objective changes. The queen checks and the knight on e6 removes key escape squares, creating a repeatable checking net.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best: both sides are ready for central exchanges. Castling finishes king safety first and connects the rook to the coming fight.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best: en passant removes the pawn on f5 while your pawn leaves e5. That clears the entire e-file, so the rook on e1 gives a discovered check.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best: h3 quietly gives the king an escape square on h2 and reduces the danger of future back-rank mating ideas.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best: the bishop sacrifice destroys the h7 shelter and forces the king away from its normal defensive structure. Ng5+ then gains another tempo and Qh5 brings the queen into the attack.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best: the first rook sacrifices itself with check and drags the black queen onto e8. That clears the e-file for the second rook.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best: the knight attacks h8. The black king is trapped by its own rook and pawn structure, so the knight check is mate.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best: the knight checks the king on e8 and attacks the queen on a8 at the same time. The king must respond, so the queen falls next.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best: the knight on e7 is absolutely pinned to the king by the rook on e1. It cannot move, so the pawn can simply take it.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best: the new knight checks the king on e7 and simultaneously attacks the queen on f6. Promotion is not always about choosing the strongest piece.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best: the pawn leaves e4 and opens the e-file for the rook. Because the black king is still on e8, opening the center comes with check and creates immediate pressure.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best: the pawn remains on the e-file and keeps Black's rook from entering. When your own king is vulnerable and the opponent has more active pieces, closing the center can buy the time you need.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best: the queen is deliberately offered on g8. The king cannot take it because the knight on h6 protects g8, so the rook is forced to capture.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best: the queen is deliberately sacrificed. After ...Kxh7, Rh1# works because the knight on e7 controls the king's escape squares g8 and g6.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best: the queen sacrifice drags the b7-pawn onto c6. That vacates b7, opening the bishop diagonal a6-b7-c8 and the rook's access to b8. Ba6 then creates the classic Boden mating net.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best: the queen sacrifice forces the knight away from d7. Once the knight captures on b8, the d-file is completely open and Rd8 is mate.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best: the rook belongs behind the passed pawn. From d1 it supports every advance while staying active as the pawn moves up the d-file.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best: the rook checks the king on e7. The queen sits directly behind the king on e8, so after the king moves the rook wins the queen.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best: the rook deliberately enters h8. If Black captures it, the g7-pawn recaptures on h8 and promotes immediately. The rook sacrifice clears the promotion square.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best: the rook reaches the eighth rank with check. The king has no escape because its own pawns seal the seventh rank.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best: the zwischenzug check forces the king away from d7. Only then does Rxd7 win the queen without allowing Kxd7.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best: when behind, look for forcing activity rather than automatic simplification. Qd5+ checks the king and attacks the rook on a8 along the diagonal.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best: when you are clearly ahead in material, trading queens usually reduces the opponent's tactical chances. After ...Rxd8, White still has two rooks against one rook and almost no mating danger.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Black starts with the Boss, six pawns, one knight and one bishop.": [
+    "es",
+    "pt"
+  ],
+  "Bomb lifecycle": [
+    "es",
+    "pt"
+  ],
+  "Boss HP 0 or Boss checkmate = White wins. White checkmate = Boss wins.": [
+    "es",
+    "pt"
+  ],
+  "Boss powers": [
+    "es",
+    "pt"
+  ],
+  "Bot speed": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Bot step": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Bot weight": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Both players start with three lives. Every check removes one life; checkmate still wins instantly.": [
+    "es",
+    "pt"
+  ],
+  "Bots play automatically": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Break the rules": [
+    "es",
+    "pt"
+  ],
+  "Build your own": [
+    "es",
+    "pt"
+  ],
+  "Build your own condition with the rule builder.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Button label": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "CHANGING LANE": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "CHECKPOINT {0}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "CLOSING": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "COVER": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "CREATE · SHARE · PLAY": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Capture one and the capturer dies after the opponent moves": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Capture the carrier and your capturing piece inherits it.": [
+    "es",
+    "pt"
+  ],
+  "Card combinations": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Card comes from": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Card down — waiting for {0}…": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Card game builder": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Card goes to": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Cards counted in": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Cards dealt to each player": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Cards in a row": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Cards of one suit": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Cards per player": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Castling is disabled because Kings and Rooks do not begin in reliable home positions.": [
+    "es",
+    "pt"
+  ],
+  "Castling is normally good, but not automatically. Here it places the king on the side where Black's queen, rook and bishop are already active.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Challenge the engine": [
+    "es",
+    "pt"
+  ],
+  "Check the Boss to remove HP. Checkmate also wins instantly.": [
+    "es",
+    "pt"
+  ],
+  "Checkmate always ends the game immediately, even with lives remaining.": [
+    "es",
+    "pt"
+  ],
+  "Checkmate the White king. Powers replace a normal Boss turn.": [
+    "es",
+    "pt"
+  ],
+  "Choice": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Choice label": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Choice value": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Choices (● = default)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Choose a highlighted card (": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Choose a phase…": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Choose a variable…": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Choose a zone…": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Choose starting player": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Claim territory and capture groups on 9×9, 13×13, or 19×19 boards — locally, against AI, or online.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Click · Space · touch Fire": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Close room": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Code": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Coins come only from missions and bounty targets.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Collapse selection favors lightly occupied edges, preventing an opening back-rank wipeout. The board stops shrinking at the central c3–f6 core.": [
+    "es",
+    "pt"
+  ],
+  "Collapsed squares are dead and can never be entered again.": [
+    "es",
+    "pt"
+  ],
+  "Collect all cards": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Combination": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Combination name": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Combine conditions": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Copies": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Copies of each card": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Could not create the room.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Could not leave the room.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Could not save to your account ({0}) — saved in this browser instead.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Counts as a draw": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Covered": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Create a custom legal formation and mirror it for the opponent so both sides begin symmetrically.": [
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Creating…": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Current:": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Custom end": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Damage loop": [
+    "es",
+    "pt"
+  ],
+  "Dark Step relocates the Boss up to two squares to a safe empty square.": [
+    "es",
+    "pt"
+  ],
+  "Debug": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Deck & deal": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Default choice": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Delete action {0}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Delete effect": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Delete end condition": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Delete phase {0}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Delete rule {0}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Delete setting {0}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Delete variable {0}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Delete zone {0}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Delete {0}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Design card games with zones, phases and WHEN/IF/THEN rules — start from Durak, Short-Deck Poker or High Card Battle and watch bots play them.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Developer JSON": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Does {0} have more or fewer {1} than {2}?": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Draft room unavailable.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Drag up and down anywhere on the court (mouse, touch or ↑ ↓ / W S)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Dragon adds one-square diagonal moves.": [
+    "de",
+    "bar",
+    "ko",
+    "ru"
+  ],
+  "Dragons, Cannons and explosive Bombers battle across portals and ice. In round six, every pawn awakens with Dragon powers.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Draw piles and hands also emit DRAW_PILE_EMPTY / HAND_EMPTY.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Drop a pin in {0}.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Duel complete": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Duplicate rule": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Each king starts with 3 collapse lives.": [
+    "es",
+    "pt"
+  ],
+  "Each new mission gets a random contract reward": [
+    "es",
+    "pt"
+  ],
+  "Each new potato gets a random fuse from 4 to 12 completed player moves.": [
+    "es",
+    "pt"
+  ],
+  "Earn coins through captures, checks, missions and bounties, then spend them on limited Royal Powers.": [
+    "es",
+    "pt"
+  ],
+  "Eat, grow, and be the last circle standing in colorful City and Nature arenas.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Editor mode": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Effect": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Empty rule": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "End conditions": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Enemy pieces outside your vision are invisible": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Errors": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Evaluation order": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Events & rules": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Every 4 normal plies, the side whose turn comes next gets a Tectonic Shift instead of a normal move.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Every four normal plies, a player can rotate one 4×4 quadrant and reshape the geometry of the entire position.": [
+    "es",
+    "pt"
+  ],
+  "Every game starts with the normal 32-piece material, but all pieces are scattered across the board.": [
+    "es",
+    "pt"
+  ],
+  "Every option, ids, events and developer JSON": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Every placement automatically appears on the opponent's mirrored square": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Every ten plies, a random non-king piece mutates into another piece.": [
+    "es",
+    "pt"
+  ],
+  "Everyone (face up)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Everything that happens in a game emits an event. This map shows which rules listen to each one and what can cause it. Add a note to explain how your game uses an event.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Example: 7 beats Ace": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Excluded roles": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Explain your game in your own words. The facts on the right are generated from your configuration and always stay accurate — they are shown separately.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Explore animals and their remarkable abilities through interactive games.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Explore six tropical islands in a four-player board adventure with branching paths, friends and bots.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Explosion patterns": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Export / import": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Extra notes": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "FRIENDS · RANKED · LIVE": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Face-down card": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Facts": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Fast": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Final result · {0}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "First error:": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Fix the validation errors first": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Four Player room unavailable.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Four players fight around a cross-shaped board. Checkmate eliminates a player; the last army standing wins.": [
+    "es",
+    "pt"
+  ],
+  "Friendly choices for the most common settings": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Friends join with the room code. Seats still empty when you start are taken by bots ({0} players).": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Führe dein mittelalterliches Königreich, plane deine Züge und kämpfe in rundenbasierten Schlachten um die Vorherrschaft.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Game info": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Game log": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Game settings": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Game variables": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Game {0} complete · {1}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Game → Version 1 → Version 2 …": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Game, players and mode": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Gameplay": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Generated from the configuration": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Generated from your settings": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Good morning! How are you? Thank you very much.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Hand rankings · weakest first": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Hearts collected": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Highest priority first": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Horse adds one-square orthogonal moves.": [
+    "de",
+    "bar",
+    "ko",
+    "ru"
+  ],
+  "Host an online room": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "How do players get ready?": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "How does the game end?": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "How does your game use this event? (optional)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "How games ended": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "How many people can sit at the table. Roles (like attacker and defender) are labels that rules and actions can refer to.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "How the game ends": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Ich möchte spielen": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Ich würde": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Ich würde Spielen": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Id": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Id (used by rules)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Identify the country. Extra clues reduce the award.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "If both kings are in the radius, the game is a draw.": [
+    "es",
+    "pt"
+  ],
+  "If exactly one king is in the blast radius, that player loses.": [
+    "es",
+    "pt"
+  ],
+  "Import (replaces the editor)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Imported — save to keep it.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Improving the king is useful in an endgame, but activating the rook behind the passed pawn is the more urgent structural improvement.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Includes the {0} perfect bonus.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Infected movers spread to one adjacent non-King piece": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Infection, cursed pieces, burning squares and knight-triggered freezing turn the board into a survival game.": [
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Initial value": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Is {0}'s {1} higher or lower than {2}'s?": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "It creates an escape square on f2, but it also weakens the diagonal around the king more than h3 does.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "J · K · L as shown / tap the matching J / K / L button": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Joystick (touch) or WASD / arrow keys": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Keeping queens is sensible, but retreating gives away the immediate tactical chance to recover material.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Key (used by rules)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Key ideas": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Kind": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "King of the Hill": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "LEVEL 0{0} · FIND YOUR NEXT HIGH SCORE": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "LEVEL {0} ↑": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "LOCAL · TURN BY TURN": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Label": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Landing on or crossing fire is lethal": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Limited vision combines with randomized legal starting positions to create hidden-information chess.": [
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Load draft into the table": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Load the draft to set up a test game.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Load the poker ladder": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Log": [
+    "ko",
+    "ru"
+  ],
+  "Lucky Square outcomes": [
+    "es",
+    "pt"
+  ],
+  "MINE CART — Ride to the other end of the mine?": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Make stronger": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Make weaker": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Master countries, capitals, flags and geographic facts on an interactive world map.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Maximum": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Maximum players": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Minimum": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Minimum players": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Mottled": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Move effect down": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Move effect up": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Move phase earlier": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Move phase later": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Move {0} stronger": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Move {0} weaker": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Moves and attacked squares reveal the fog": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Moves any number of squares diagonally, as long as no piece blocks the path.": [
+    "es",
+    "pt"
+  ],
+  "Moves any number of squares horizontally or vertically, as long as the path is clear.": [
+    "es",
+    "pt"
+  ],
+  "Moves any number of squares horizontally, vertically, or diagonally.": [
+    "es",
+    "pt"
+  ],
+  "Moves in an L-shape: two squares in one direction and then one square sideways.": [
+    "es",
+    "pt"
+  ],
+  "Moves one square forward. From its starting square it may move two squares. Pawns capture one square diagonally forward.": [
+    "es",
+    "pt"
+  ],
+  "Moves one square in any direction. The king may never move onto a square attacked by the opponent.": [
+    "es",
+    "pt"
+  ],
+  "Moving and normal captures give no automatic coins.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Moving the king toward safety is sensible, but Black still has the option to open the center immediately.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Moving the rook abandons the tactical alignment, and the en-passant opportunity will vanish after this move.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Must be fixed before publishing.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "NEON PLAY ARCADE": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "NEST": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Name your game and describe it in a sentence. Players see this on the game card.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "New": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "New choice": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "New combination": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "New number": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "New personal best": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "New phase": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "New role": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "New rule": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "New switch": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "New text": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "New zone": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Next phase": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "No combinations. Add some to compare hands with the “Find the best hand” effect (pairs, runs, suits…).": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "No conditions yet — always true.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "No event rules. Many games need none — phases, actions and their conditions do the work.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "No lobby settings.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "No options yet — never true.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "No player input — entry effects run and the game moves on.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "No settings yet.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Nobody (face down)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "None.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Not saved yet.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Note for {0}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Nothing to do right now — waiting for other players.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Now click a highlighted card on the table to": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Number": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Number of games": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "On / off": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "On by default": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "One screen · Two players": [
+    "es",
+    "pt"
+  ],
+  "Online Multiplayer": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Online rooms run a version published to your account. Templates and games saved only in this browser can be tested locally — save and publish this game while signed in to play it online.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Only the owner": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Only when": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Open — a bot plays if nobody joins": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Opening the center is playable, but doing it before securing the king makes every check and central file more dangerous.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Opening the room…": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Operator: W / S or ↑ / ↓ · Runner: A / D or ← / → · Space to jump · touch controls": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Option A": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Option B": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Options players choose in the lobby. Rules and effects can read them (value type “lobby setting”), so one game can cover many variants.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Order": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Order from highest to lowest: {0}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Ordered (a stack or row)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Outcome": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "PERCH · REFILL 5": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "PRESS START": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Partial credit for nearby positions; a perfect order earns a bonus.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Passed checks": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Paste a game definition": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Paste an exported game here…": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Phase order": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Phase:": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Pick a goal. Several players may finish before the game is over (as in Durak), and a game can also end in a loss for the last player or a draw.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Places where cards can be: a draw pile, each player's hand, the table, captured cards… Shared zones exist once; player zones exist once per player.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Plain": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Play this version": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Play your current draft right here with bots or hotseat players. The game uses the exact engine the server runs. Restart after editing to pick up changes.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Player variable": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Player variables (one per player)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Players who are eliminated drop out; the last one in wins.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Players whose only option is “pass” pass automatically.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Pluto Chaos Chess": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Pluto Team Chess": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Preview & test": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Preview / Test": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Priority": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Private game": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Promoted Knight moves as Gold.": [
+    "de",
+    "bar",
+    "ko",
+    "ru"
+  ],
+  "Promoted Lance moves as Gold.": [
+    "de",
+    "bar",
+    "ko",
+    "ru"
+  ],
+  "Promoted Silver moves as Gold.": [
+    "de",
+    "bar",
+    "ko",
+    "ru"
+  ],
+  "Publish version": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Published version {0}. It can no longer change — your next save starts version {1}.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Publishing is blocked by": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "QUEUE · COMPETE · CLIMB": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Rage rises over time and shortens power cooldowns.": [
+    "es",
+    "pt"
+  ],
+  "Random seed": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Rank order": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Rank order, weakest first": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Ranks in the deck": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Reach X points": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Reach the target score": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Read-only": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Ready to publish": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Remembered values": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Remove choice": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Remove role {0}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Remove starting player": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Remove transition": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Reroll your bounty target": [
+    "es",
+    "pt"
+  ],
+  "Reroll your current mission": [
+    "es",
+    "pt"
+  ],
+  "Restart with latest edits": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Results per seat": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Review this answer before continuing.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Reward is random — even a Pawn can be worth a fortune": [
+    "es",
+    "pt"
+  ],
+  "Roles": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Roles that go last": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Room is full": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Round {0}: {1}, {2} wins. You pick first.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Rufspiel, Wenz und Solo mit verbindlichem Zugeben – im Hotseat, gegen KI oder online zu viert.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Rule for this event": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Rule name": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Rules react to events. When several rules listen to the same event, higher priority runs first; a rule that “stops lower-priority rules” overrides the general ones below it — e.g. “7 beats Ace” (100) above “higher card wins” (10).": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Rules:": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Rules: WHEN · IF · THEN": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Run many games instantly": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Run once, in order": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "SQUID": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "STAR QUEST": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "STOCKFISH · LEVELS · ANALYSIS": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Same-rank groups": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Save & publish": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Save / Publish": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Save draft": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Saving keeps a draft. Publishing freezes that version forever: games in progress keep using it, and your next edit becomes a new draft version.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Schach": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Score label": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Seat": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Seat {0} name": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Seat {0}: {1} (click to switch)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Select every country shown that borders {0}.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Sell {0} cargo at {1} coins each, less a {2}-coin tariff. Choose the fair bid.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Set up a test game": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Setting": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Setup flow": [
+    "es",
+    "pt"
+  ],
+  "Setup steps": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Several humans play hotseat on this device — switch who you are looking at during the game.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Share as a file": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Shockwave pushes adjacent non-king White pieces one square away when the destination is free.": [
+    "es",
+    "pt"
+  ],
+  "Short description": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Show every card": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Show rule JSON": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Shuffle the deck first": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Sign in to host a room your friends can join with a code.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Sign in to keep your games in your account (they are validated again on the server).": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Slow": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Solved with {0} clue{1}.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Speckled": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Spectator": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Spectator view (no hidden cards are revealed)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Spend a point budget on your starting army. The king must remain on the back rank.": [
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Spiele Schach, tritt gegen Stockfish an, analysiere Stellungen und werte deine Partien aus.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Spiele Watten mit taktischen Hinweisen, Punktewertung und einer einsteigerfreundlichen Hilfe.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Spotted": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Start position": [
+    "es",
+    "pt"
+  ],
+  "Started from the template “": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Starting player": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Stop lower-priority rules": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Suits and copies": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Summon places a Black pawn on an empty square of rank 6 or 7.": [
+    "es",
+    "pt"
+  ],
+  "Switch to Advanced to edit": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "TAKE THE STAIRS": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "TUNNEL": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "TURNING": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Table rules": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Take Cable Car?": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Take a seat": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Tap / click squares · keyboard 1–9 (left to right, top to bottom)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Tap or click targets": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Target a card in": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Team Chess Long Edition": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Test bots pick this": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Test controls": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "That player finishes safely (game continues)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "That player wins (game ends)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The American kestrel is a small falcon.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The bishop clears the d-file and attacks the queen indirectly, but without check Black can simply move the queen.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The bishop leaves the critical h7 diagonal and gives up the defining tactical idea of the position.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The bishop neither checks the king nor attacks the queen. It throws away the special tactical point of the position.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The bishop remains useful, but this gives the king time to escape. When the enemy king is exposed, time matters.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The black Queen is outside White's vision, so White sees only fog on h6.": [
+    "es",
+    "pt"
+  ],
+  "The card is allowed if": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The carrier square and all 8 adjacent squares explode.": [
+    "es",
+    "pt"
+  ],
+  "The carrier square plus every adjacent square.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The carrier square plus up to two squares along each diagonal.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The carrier square plus up to two squares horizontally and vertically.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The deck starts in": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The definition could not be checked: {0}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The draft has": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The first player to reach the target score wins.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The first player with no cards in hand wins.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The game could not start": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The game may behave unexpectedly.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The giant boss is invented for the game.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The kestrel is a small falcon that hunts rodents.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The king avoids the kingside castle but gives up castling rights and leaves the rook undeveloped.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The king loses castling rights and remains awkwardly placed while Black keeps the initiative.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The knight attacks material, but the move abandons the immediate drawing mechanism.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The knight heads toward the king, but without first removing h7 the attack is less forcing and Black has more defensive resources.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The knight moves near the king, but the forcing queen sacrifice is the move that creates the mating geometry.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The knight remains active, but the move ignores a mating pattern that is available right now.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The knight retreats far from the king and loses both the mate and the rook-winning opportunity.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The knight retreats from the action and gives Black time to save the queen. The tactical opportunity disappears.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The knight stays active, but the move misses the immediate tactical fork.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The last one": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The move follows a good general rule in the wrong position. Castling directly into an already concentrated attack can be worse than leaving the king in the center for one more move.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The original game": [
+    "es",
+    "pt"
+  ],
+  "The passed pawn advances, but the e-file stays blocked and the immediate discovered-check opportunity disappears.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The passed pawn becomes dangerous, but you are leaving a free pinned knight on the board.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The quadrant used by the previous shift is locked for the next one.": [
+    "es",
+    "pt"
+  ],
+  "The queen abandons the kingside and removes the tactical pressure that makes the smothered-mate pattern possible.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The queen becomes passive and offers Black exactly what the materially stronger side wants: time to consolidate and simplify.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The queen centralizes safely, but the immediate mating geometry disappears.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The queen enters the seventh rank and keeps pressure, but the knight remains on d7 and continues to block the mating rook.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The queen improves, but slowly. The position rewards a forcing sacrifice before Black can reinforce the kingside.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The queen keeps attacking chances, but the forcing sacrifice is much stronger because it controls Black's reply.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The queen moves away from the king and gives Black time to convert the material advantage.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The queen moves far from the trade and keeps the position unnecessarily tactical. The player who is ahead usually benefits from reducing danger, not increasing it.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The queen remains active, but the move does nothing to remove the defender on d7.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The queen remains safe, but the tactical chance to improve the capture with tempo is missed.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The queen retreats all the way from the attack, surrendering the forcing opportunity around the exposed king.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The queen stays active but gives Black time to improve the king's shelter.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The queen stays active, but keeping queens on the board gives the losing side more chances for checks, forks and perpetual attacks.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The queen stays active, but without check Black gets time to protect the rook or force a queen trade.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The queen stays centralized, but without a forcing check Black can coordinate the extra rook and queen.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The queen stays near the king and creates pressure, but the b7-pawn continues to block the decisive bishop diagonal.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The queen steps away from the forcing line and gives Black time to consolidate the back rank.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The real enemy position remains server-side": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The rook abandons the attack on d7 and gives Black time to move the queen.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The rook becomes active and attacks along the seventh rank, but it does not force the black rook away from g8.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The rook becomes passive and gives Black time to separate the king and queen, removing the skewer completely.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The rook leaves the attacking file while the bishop still blocks the queen. The tactical opportunity disappears.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The rook leaves the first rank and can no longer swing to h1 for the mating finish.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The rook moves far away from the passed pawn and contributes almost nothing to its advance.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The rook promotion gains material value but does not create the tactical double attack.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The rook remains active, but moving it away releases the pin and lets the knight escape.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The rook remains active, but the forcing check is lost and Black gets time to defend.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The rook retreats from the critical eighth rank and gives Black time to blockade the pawn permanently.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The rook retreats from the mating rank and throws away a forced win immediately.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The rook reveals its file and rank until a piece blocks the line.": [
+    "es",
+    "pt"
+  ],
+  "The rook stays active and keeps pressure, but there is no reason to postpone an immediate checkmate.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The rook stays near the pawn, but the promotion problem remains unsolved because g8 is still occupied.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The rook supports the pawn from the side, but it can become awkward as the pawn advances and may be attacked more easily.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The same checks run on the server before a game is saved or published. Click an issue to jump to it.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The same seed and moves always produce the same game.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The sentence is an everyday greeting.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The standard 32-card deck is 7 to Ace in four suits; add the 6s for a 36-card deck. Drag the ranks to set which beats which in your game.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The table (shared)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The three-catch target is a game rule.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Then go to (first match wins, checked after every action)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "This also uncovers the rook, but it gives Black time to save the queen because the move is not forcing.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "This also vacates h2, but advancing two squares weakens more dark squares and places the pawn farther from the king.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "This blocks the second rook on e1 and destroys the geometry of your own mating attack.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "This game": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "This gives the king some breathing room and attacks the center indirectly, but it weakens dark squares and does not solve the e-file problem as cleanly.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "This questions the bishop and gives the king some luft, but it does not solve the larger problem of where the king belongs.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "This sample army uses 39 points exactly.": [
+    "es",
+    "pt"
+  ],
+  "This wins the queen for a rook, but Black can answer Kxd7. The intermediate check lets you win the queen much more cleanly.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Tip: switch to Advanced mode to change card conditions, targets and ids.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Tokin moves as Gold.": [
+    "de",
+    "bar",
+    "ko",
+    "ru"
+  ],
+  "Transition": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Trump suit": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Trump:": [
+    "de",
+    "bar",
+    "ko",
+    "ru"
+  ],
+  "Turbo": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Turn phases": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Turn phases & actions": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Two armies side by side on each edge of a 16×8 board. Coordinate with your ally to break the opposing team.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Unordered (a hand or heap)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Used when no setup step picks one.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Useful in some structures, but it spends a tempo while the king is still in the center.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Uses a lobby setting — change its default in Game settings.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Uses the current players and settings. Seeds": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Using these figures, which country has the greatest population density? Compare people per km².": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Value type": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Variable key": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Variable label": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Variables": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Variants, tips, edge cases (optional).": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Vegetation and underground tunnels offer cover.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Veined": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Versions": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Viewing as": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Visible Lucky Squares can destroy, teleport, swap or transform the piece that lands on them.": [
+    "es",
+    "pt"
+  ],
+  "Voles move through cover among grasses and other plants.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "W / S or ↑ / ↓ · touch Up and Down": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "WASD + mouse · click to shoot / knife · E to swap · touch move, look and fire controls": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "WASD / arrow keys or direction buttons · one press per step": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "WASD / arrows · Space to dash · touch direction pad and Dash": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "WASD / arrows · mouse to aim · click / F to punch · G to guard · Space to jump · touch controls": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "WASD / arrows · touch direction pad": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "WHALE": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "WILTING {0}s": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "WIND →": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Waiting for the host to start the game…": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Walking the king into the center voluntarily makes the coming central exchanges much harder to handle.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Warned outer edges collapse permanently while both Kings race toward the surviving central battlefield.": [
+    "es",
+    "pt"
+  ],
+  "Warnings": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Watch the bots' hidden cards.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Weakest → strongest": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "What happens before the first move: where the deck starts, whether it is shuffled, how cards are dealt and who starts.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "What happens on a turn?": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "What is the game about, in two sentences?": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "What players can do": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "When": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "When Random Start is enabled, both sides receive the exact same shuffled back-rank pattern. With it disabled, the normal chess starting position is used.": [
+    "es",
+    "pt"
+  ],
+  "When only one player still has cards, they win.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "When the phase ends": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "When the phase starts": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "When {0}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Which country does this flag belong to?": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Which country has {0}?": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Which country was formerly known as {0}{1}?": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Which flag belongs to {0}?": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Which of these countries became independent {0}?": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Which of these countries gained independence from {0}?": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Which power did {0} {1} independence from in {2}?": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "White and Black alternate choosing where the random piece goes": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "White and Black receive independently shuffled back ranks, creating a different non-mirrored opening every game.": [
+    "es",
+    "pt"
+  ],
+  "White starts with the normal full chess army.": [
+    "es",
+    "pt"
+  ],
+  "Who may use it": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Who may use it:": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Who sees the cards": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Whose": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Win / lose conditions": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Win rate": [
+    "es",
+    "pt"
+  ],
+  "Winner{0}: {1}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Winning": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Winning condition": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Winning the rook is good materially, but checkmate is stronger than winning material.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Worst: e5 closes the center and blocks your own rook. That is exactly what the exposed king wants — fewer open lines and more time.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Worst: the e-pawn leaves the file and exposes the rook on e1 to Black's rook on e8. With your king still unsafe, opening lines helps the better-developed attacker.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Worst: the king moves deeper into the corner without creating any escape square. The back-rank problem remains.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Worst: the rook completely abandons the e-file, immediately freeing the pinned knight and wasting the tactical opportunity.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Written by the author": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "You have unsaved edits.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "You remove the central pawn, but your own e4-pawn still blocks the rook. The center opens less effectively.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "You win a pawn, but Black keeps the back rank defended. Material is less important than the forced mating sequence.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Your account and this browser": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Your actions": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Your options": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Your own pieces are always visible": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Your rotation may never leave your own King in check.": [
+    "es",
+    "pt"
+  ],
+  "a player": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "actions": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "active players": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "advanced": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "ai": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "amateur": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "amber": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "anime": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "any": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "any active player": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "any cards (the fallback)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "auto-pass": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "automatic": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "back-rank": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "bavarian": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "blonde": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "border-amber-400/25 hover:border-amber-300/60": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "border-emerald-400/25 hover:border-emerald-300/60": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "border-sky-400/25 hover:border-sky-300/60": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "bottom card of…": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "bp": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "card stored in variable…": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "cards in total": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "cards in zone": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "choose": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "contract bonuses": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "countries": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "current phase": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "deal everything": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "deutsches-blatt": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "difference": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "dirndl": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "division (rounded down)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "draws": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "each player (in a loop)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "emerald": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "equals": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "except roles": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "false": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "finished #{0}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "first": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "game info": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "game variable": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "games": [
+    "ko",
+    "ru"
+  ],
+  "go": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "group": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "hand size": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "has warnings": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "hit the move limit": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "holder of highest card…": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "holder of lowest card…": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "horror": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "host": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "hotseat": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "in": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "in a row": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "in progress": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "is at least": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "is at most": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "is less than": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "is more than": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "is not": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "it.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "label": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "largest of": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "legend": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "lobby setting": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "loses (everyone else wins)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "make group": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "matching": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "matching cards in zone": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "minecraft-boy": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "modern": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "neighbors": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "new role": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "next player after…": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "no (false)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "number": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "number of players": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "one player…": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "one suit": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "or that player if still in": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "passed": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "people": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "people/km²": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "plaid": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "player before…": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "player stored in variable…": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "player variable": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "player with role…": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "player's score": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "players matching…": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "players with a role…": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "priority": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "pro": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "random moves": [
+    "es",
+    "pt"
+  ],
+  "rank of card": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "remove NOT": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "revision": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "roles": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "round number": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "row in one suit": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "same rank": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "seat number…": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "seat order": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "seats ·": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "seed": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "self": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "show on table": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "singleplayer": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "sky": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "smallest of": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "spannende Schachvariante, bei der man neben dem klassischen Schachmatt auch gewinnt, indem man seinen König in die Mitte des Brettes zieht.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "sporty": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "starting with": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "starts at": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "steampunk": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "stops": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "stops lower rules": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "strength of card": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "suit of card": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "sum of": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "text": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "the acting player": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "the capital closest to the equator": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "the capital farthest from the equator": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "the card (in a loop/filter)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "the coldest annual mean temperature (1995–2014)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "the current player": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "the event's player": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "the fewest land borders": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "the highest mountain peak": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "the highest population density": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "the largest area": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "the largest population": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "the lowest highest point": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "the lowest population density": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "the most land borders": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "the northernmost capital": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "the player (in context)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "the smallest area": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "the smallest population": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "the southernmost capital": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "the warmest annual mean temperature (1995–2014)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "to": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "top card of…": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "top rank may be low": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "traditional": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "true": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "trump suit": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "turn number": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "ungroup": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "use a fixed number": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "useCardEditor must be used inside the card game editor.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "validation error(s).": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "validation error(s). You can still try it, but it may not start or may stop early.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "wb": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "when": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "where": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "who": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "wins": [
+    "es",
+    "pt"
+  ],
+  "with roles": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "with {0} bot{1}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "wk": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "wn": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "wp": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "wq": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "wr": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "wuerttemberger-blatt": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "yes (true)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0} allows {1} players.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0} errors": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0} exact, {1} one off, {2} two off · {3}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0} face-down card{1}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0} has played a card face down. Your turn.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0} in a row": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0} in a row{1}{2}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0} is for exactly {1}.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0} is spoken in {1}.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0} joined": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0} layer{1}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0} of one suit": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0} players": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0} spent": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0} warnings": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0} {1} left — reveal another clue or guess again.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0} {1} left.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0} · final score": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0} · final standings": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0} · {1}. Only the countries shown are compared.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0} — {1}. In which year?": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0}'s run": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0}, choose a card. {1} must not look!": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0}s to play a card, or your first card is played for you": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0}–{1} allowed.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "{0}–{1} each contract": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "° latitude": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "× as often as other buttons (0 = only as a last resort; card plays always come first)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Σ |piece value change|": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "— add condition": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "← WIND": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "⚠ PATH CLOSED · THROUGH R{0}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "⚠ unknown “": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "⚠ {0} (missing)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "⚠ {0} (not declared)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "⚠ {0} CLOSED · THROUGH R{1}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Kabul": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Mariehamn": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Tirana": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Algiers": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Pago Pago": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Andorra la Vella": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Luanda": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "The Valley": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Saint John’s": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Buenos Aires": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Yerevan": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Oranjestad": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Papiamento": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Canberra": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Vienna": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Baku": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Nassau": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Manama": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Dhaka": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Bridgetown": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Minsk": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Brussels": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Belmopan": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Porto-Novo": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Hamilton": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Thimphu": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Sucre": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Kralendijk": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Sarajevo": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Gaborone": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Brasília": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Diego Garcia": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Road Town": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Bandar Seri Begawan": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Sofia": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Romany": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Ouagadougou": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Mossi": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Gitega": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Praia": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Phnom Penh": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Yaoundé": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Ottawa": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "George Town": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Bangui": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "N'Djamena": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Santiago": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Beijing": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Cantonese": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Wu Chinese": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Flying Fish Cove": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "West Island": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Bogotá": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Moroni": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Avarua": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "San José": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Zagreb": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Havana": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Willemstad": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Nicosia": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Prague": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Kinshasa": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Luba-Lulua": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Copenhagen": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Roseau": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Santo Domingo": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Quito": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Cairo": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "San Salvador": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Ciudad de la Paz": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Asmara": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Tigre": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Tallinn": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Mbabane": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Addis Ababa": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Sidamo": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Stanley": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Tórshavn": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Suva": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Helsinki": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Inari Sami": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Paris": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Arpitan": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Cayenne": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Papeete": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Port-aux-Français": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Libreville": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Banjul": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Tbilisi": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Berlin": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Accra": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Athens": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Nuuk": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Saint George's": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Basse-Terre": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Hagåtña": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Guatemala City": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Saint Peter Port": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Conakry": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Bissau": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Georgetown": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Port-au-Prince": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Tegucigalpa": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Budapest": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Reykjavík": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "New Delhi": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Santali": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Konkani": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Dogri": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Manipuri": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Mizo": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Jakarta": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Tehran": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Baghdad": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Dublin": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Douglas": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Jerusalem": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Rome": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Yamoussoukro": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Kingston": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Tokyo": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Saint Helier": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Amman": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Astana": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Nairobi": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Tarawa": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Gilbertese": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Kuwait City": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Bishkek": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Vientiane": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Riga": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Beirut": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Maseru": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Monrovia": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Tripoli": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Vaduz": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Vilnius": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Macau": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Antananarivo": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Lilongwe": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Tumbuka": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Kuala Lumpur": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Male": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Bamako": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Valletta": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Majuro": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Fort-de-France": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Nouakchott": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Soninke": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Port Louis": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Mamoudzou": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Mexico City": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Palikir": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Chuukese": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Pohnpeian": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Yapese": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Kosraean": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Chisinau": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Gagauz": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Ulan Bator": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Podgorica": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Plymouth": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Rabat": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Maputo": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Makhuwa": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Nay Pyi Taw": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Windhoek": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Nama": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Yaren": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Kathmandu": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Nouméa": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Wellington": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Managua": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Niamey": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Zarma": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Abuja": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Alofi": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Niuean": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Pyongyang": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Skopje": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Saipan": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Oslo": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Muscat": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Baluchi": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Islamabad": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Brahui": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Ngerulmud": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Palauan": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "East Jerusalem": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Panama City": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Port Moresby": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Tok Pisin": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Asunción": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Lima": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Manila": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Cebuano": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Iloko": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Hiligaynon": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Waray": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Pampanga": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Bikol": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Pangasinan": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Kinaray-a": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Adamstown": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Warsaw": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Lisbon": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Mirandese": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "San Juan": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Doha": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Brazzaville": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Saint-Denis": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Bucharest": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Moscow": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Kalmyk": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Adyghe": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Tuvinian": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Udmurt": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Buriat": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Erzya": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Moksha": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Mari": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Ingush": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Kabardian": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Karachay-Balkar": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Yakut": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Nogai": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Kigali": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Gustavia": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Jamestown": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Basseterre": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Castries": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Marigot": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Saint-Pierre": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Kingstown": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Apia": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "São Tomé": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Riyadh": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Dakar": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Belgrade": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Victoria": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Freetown": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Mende": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Timne": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Philipsburg": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Bratislava": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Ljubljana": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Honiara": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Mogadishu": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Pretoria": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Northern Sotho": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Grytviken": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Seoul": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Juba": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Madrid": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Colombo": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Khartoum": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Paramaribo": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Sranan Tongo": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Longyearbyen": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Stockholm": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Southern Sami": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Bern": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Damascus": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Aramaic": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Dushanbe": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Dodoma": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Bangkok": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Amsterdam": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Dili": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Tetum": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Lomé": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Tokelauan": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Nuku‘alofa": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Port of Spain": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Tunis": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Ankara": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Zaza": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Ashgabat": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Cockburn Town": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Funafuti": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Charlotte Amalie": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Kampala": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Kyiv": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Abu Dhabi": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "London": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Washington": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Hawaiian": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Montevideo": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Tashkent": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Port-Vila": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Vatican City": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Caracas": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Hanoi": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Mata-Utu": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "El-Aaiun": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Sanaa": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Lusaka": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Bemba": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Lozi": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Lunda": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Harare": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Shanghai": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Chongqing": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Chengdu": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Guangzhou": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Istanbul": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Lagos": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Ho Chi Minh City": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Lahore": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Mumbai": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "São Paulo": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Karachi": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Delhi": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Johannesburg": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "New York City": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Bengaluru": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Hyderabad": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Rio de Janeiro": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Ahmedabad": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Abidjan": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Sydney": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Melbourne": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Dar es Salaam": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Saint Petersburg": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Alexandria": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Kano": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Cape Town": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Peshawar": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Jeddah": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Yangon": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Giza": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Chattogram": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Los Angeles": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Faisalabad": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Dubai": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Yokohama": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Casablanca": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Ibadan": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Rawalpindi": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Durban": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Busan": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Bursa": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Quezon City": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Surabaya": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Incheon": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "İzmir": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Toronto": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Brisbane": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Osaka": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Brooklyn": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Guayaquil": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Belo Horizonte": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Salvador": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Gazipur": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Chicago": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Bekasi": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Haiphong": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Kumasi": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Bandung": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Medan": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Fortaleza": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Cali": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Perth": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Daegu": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Nagoya": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Queens": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Mashhad": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Gaziantep": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Lubumbashi": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Port Harcourt": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Córdoba": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Mbuji-Mayi": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Aleppo": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Al Mawşil al Jadīdah": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "La Paz": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Medellín": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Almaty": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Hamburg": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Sapporo": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Tijuana": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Camayenne": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Kakamega": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Omdurman": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Davao": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Iztapalapa": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Santa Cruz de la Sierra": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Sharjah": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Montréal": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Maracaibo": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Caloocan": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Soweto": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Puebla": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Barcelona": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Mosul": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Ecatepec de Morelos": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Valencia": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Novosibirsk": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Erbil": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Kisangani": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Makkah": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Aim left": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Aim right": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "All puzzles": [
+    "es",
+    "pt"
+  ],
+  "Any gender": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Any gender; clan assembly recognition": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Any non-King piece draws one mystery card.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Any non-King piece: choose one mystery card.": [
+    "es",
+    "pt"
+  ],
+  "Armies": [
+    "es",
+    "pt"
+  ],
+  "Auremarch": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Bar": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Battle": [
+    "es",
+    "pt"
+  ],
+  "Before every move, ask: Is my king safe?": [
+    "es",
+    "pt"
+  ],
+  "Berghütte": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Best": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Book": [
+    "ko",
+    "ru"
+  ],
+  "Chaos": [
+    "es",
+    "pt"
+  ],
+  "Check whether your opponent attacks one of your pieces.": [
+    "es",
+    "pt"
+  ],
+  "Classic Rows": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Compressed View": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Dash": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Dash while swimming": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Develop knights and bishops before moving the queen many times.": [
+    "es",
+    "pt"
+  ],
+  "Difficulty · easy → hard": [
+    "de",
+    "bar",
+    "ko",
+    "ru"
+  ],
+  "Difficulty · hard → easy": [
+    "de",
+    "bar",
+    "ko",
+    "ru"
+  ],
+  "Do not trade a valuable piece for a much cheaper one without a reason.": [
+    "es",
+    "pt"
+  ],
+  "Drazhkul": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Dunwald": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Eldest eligible child, any gender": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Eligible heir confirmed by council": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Elo · high → low": [
+    "de",
+    "bar",
+    "ko",
+    "ru"
+  ],
+  "Elo · low → high": [
+    "de",
+    "bar",
+    "ko",
+    "ru"
+  ],
+  "Elven": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Enter the queue and wait for an opponent near your Elo.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Excellent": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Exploded View": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Farbwenz · Trümpfe mindestens": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Farbwenz · Unter mindestens": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Focus Layer": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Full Stack": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Garten": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Graskor": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "High Cairn": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Hotseat · Klopfzeit (Sekunden)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "House {0}": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Ilyr Coast": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Isolate Layer": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Kings inherit": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Laufende im Farbspiel ab": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Laufende im Wenz/Geier ab": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Maren": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Market": [
+    "es",
+    "pt"
+  ],
+  "Moments": [
+    "es",
+    "pt"
+  ],
+  "Multiplayer · Klopfzeit (Sekunden)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Musik": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Oriveth": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Ork": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Patterns": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Pawn only: choose one mystery card.": [
+    "es",
+    "pt"
+  ],
+  "Plague": [
+    "es",
+    "pt"
+  ],
+  "Popularity · high → low": [
+    "de",
+    "bar",
+    "ko",
+    "ru"
+  ],
+  "Popularity · low → high": [
+    "de",
+    "bar",
+    "ko",
+    "ru"
+  ],
+  "Pressure": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Queens inherit": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "R4a · eigene Trümpfe mindestens": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "R4a · verbleibende Trümpfe mindestens": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "R4a · verbleibende der höchsten sechs": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Rufsau abwerfen ab Stich": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Saltmere": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Sauspiel · Trümpfe mit Bremser": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Sauspiel · Trümpfe ohne Bremser": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Simulationen je Zug": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Solo · Ober mindestens": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Solo · Trümpfe mindestens": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Sound effects volume": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Spit": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Spit water": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Stoneward": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Strand": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Survival": [
+    "es",
+    "pt"
+  ],
+  "Swim left": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Swim right": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Sylvarenne": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "T12 · Ober/Unter insgesamt": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "T12 · viele Ober": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "T12 · viele Trümpfe": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Thornholt": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Try to castle before starting an attack.": [
+    "es",
+    "pt"
+  ],
+  "Vaeltharyn": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Valcrest": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Varnesk": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Verteilungen für Ansagen": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Vision": [
+    "es",
+    "pt"
+  ],
+  "When unsure, look for checks, captures, and threats.": [
+    "es",
+    "pt"
+  ],
+  "Wintermere": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Your game opens automatically and your rating updates afterwards.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Your piece jumps to a seeded safe empty square.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Your piece may swap places with a random enemy piece.": [
+    "es",
+    "pt"
+  ],
+  "Your piece may swap with a seeded enemy piece.": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "Your piece may vanish.": [
+    "es",
+    "pt"
+  ],
+  "Zeitbudget je Zug (ms)": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "assault": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "attack": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "bettel": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "bettelValue": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "bishop": [
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "blockade": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "buffs": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "captured": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "casual": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "character": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "charge": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "chronicle": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "claims": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "council": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "create": [
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "dark_step": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "debuffs": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "deposit": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "depot": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "diplomacy": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "discard": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "district": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "drawPile": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "drops": [
+    "de",
+    "bar",
+    "ko",
+    "ru"
+  ],
+  "dynasty": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "economy": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "effects": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "event": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "face": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "farbgeier": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "farbgeierValue": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "farbwenz": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "farbwenzValue": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "festival": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "find": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "flank": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "friends": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "front": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "geier": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "geierValue": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "hand": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "hazard": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "heal": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "highest": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "hochzeit": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "hold": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "houses": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "info": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "item": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "join": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "knight": [
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "laufendeValue": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "log": [
+    "ko",
+    "ru"
+  ],
+  "lowest": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "loyalty": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "mastery": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "medium": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "modes": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "negotiate": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "or": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "other": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "ownership": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "queen": [
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "ramschValue": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "ranked": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "rare": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "rear": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "resources": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "road": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "rook": [
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "rufspielValue": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "schneiderValue": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "schwarzValue": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "shockwave": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "soloValue": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "stack": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "summon": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "supply": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "table": [
+    "ko",
+    "ru"
+  ],
+  "terrain": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "trade": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "warp": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "watchtower": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "wenzValue": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ],
+  "withdraw": [
+    "de",
+    "bar",
+    "ko",
+    "ru",
+    "es",
+    "pt"
+  ]
+}
