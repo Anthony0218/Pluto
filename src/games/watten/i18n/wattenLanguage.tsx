@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { translateUi } from "@/i18n/ui";
+import { translateGameUi } from "../../../i18n/gameUi.ts";
+import { isGameTerm } from "../../../i18n/gameTerms.ts";
 
 export type WattenLanguage = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 
@@ -1496,29 +1497,25 @@ export function setStoredWattenLanguage(language: WattenLanguage) {
 }
 
 export function translateWatten(language: WattenLanguage, key: string): string {
+  if (isGameTerm(key)) return key;
   const rulebook =
-    language === "bar"
-      ? (rulebookTranslations.bar?.[key] ?? rulebookTranslations.de?.[key])
-      : rulebookTranslations[language]?.[key];
+    rulebookTranslations[language]?.[key];
   if (rulebook) return rulebook;
 
   if (language === "en") return key;
 
   const feature =
-    language === "bar"
-      ? (menuAndSituationTranslations.bar?.[key] ??
-        menuAndSituationTranslations.de?.[key])
-      : menuAndSituationTranslations[language]?.[key];
+    menuAndSituationTranslations[language]?.[key];
   if (feature) return feature;
 
   const extra = extraTranslations[language]?.[key];
   if (extra) return extra;
 
-  if (language === "de") return de[key] ?? key;
-  if (language === "bar") return bar[key] ?? de[key] ?? key;
-  if (language === "ko") return ko[key] ?? key;
-  if (language === "ru") return ru[key] ?? key;
-  return translateUi(language, key);
+  if (language === "de") return de[key] ?? translateGameUi(language, key);
+  if (language === "bar") return bar[key] ?? translateGameUi(language, key);
+  if (language === "ko") return ko[key] ?? translateGameUi(language, key);
+  if (language === "ru") return ru[key] ?? translateGameUi(language, key);
+  return translateGameUi(language, key);
 }
 
 /**

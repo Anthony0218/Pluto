@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useAppLanguage } from "@/i18n/languageStore";
 import "./wattenMenus.css";
 import { useCallback, useMemo, useState, type ReactNode } from "react";
@@ -458,6 +459,7 @@ function RuleCard({
   card: DisplayCard;
   small?: boolean;
 }) {
+  useGameLanguage();
   const { cardTheme } = useCardTheme();
 
   return (
@@ -472,7 +474,7 @@ function RuleCard({
     >
       <img
         src={getWattenCardImage(card, cardTheme)}
-        alt={`${card.suit} ${card.rank}`}
+        alt={gameUi(`${card.suit} ${card.rank}`)}
         draggable={false}
         className="
           absolute
@@ -500,18 +502,19 @@ function RulePanel({
   title: string;
   children: ReactNode;
 }) {
+  useGameLanguage();
   return (
     <section className="rounded-3xl border border-white/10 bg-white/[0.045] p-6 shadow-xl">
       <div className="flex items-center gap-3">
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-400/10 text-emerald-300">
-          {icon}
+          {gameUi(icon)}
         </div>
 
-        <h2 className="text-xl font-black text-white">{title}</h2>
+        <h2 className="text-xl font-black text-white">{gameUi(title)}</h2>
       </div>
 
       <div className="mt-4 space-y-3 text-sm leading-7 text-zinc-300">
-        {children}
+        {gameUi(children)}
       </div>
     </section>
   );
@@ -538,9 +541,10 @@ function PriorityRelation({
   type: "higher" | "equal";
   language: WattenLanguage;
 }) {
+  useGameLanguage();
   return (
     <div className="flex min-w-9 flex-col items-center justify-center">
-      {type === "higher" ? (
+      {gameUi(type === "higher" ? (
         <>
           <ChevronRight size={27} className="text-amber-300" />
 
@@ -556,7 +560,7 @@ function PriorityRelation({
             {translateWatten(language, "equal")}
           </span>
         </>
-      )}
+      ))}
     </div>
   );
 }
@@ -570,6 +574,7 @@ function PriorityRow({
   relation?: "higher" | "equal";
   language: WattenLanguage;
 }) {
+  useGameLanguage();
   return (
     <div className="flex flex-wrap items-center gap-3">
       {cards.map((card, index) => (
@@ -578,14 +583,14 @@ function PriorityRow({
             <RuleCard card={card} small />
 
             <span className="max-w-[74px] text-center text-[9px] font-semibold leading-4 text-zinc-400">
-              {translateWatten(language, card.suit)}{" "}
+              {translateWatten(language, card.suit)}{gameUi(" ")}
               {translateWatten(language, card.rank)}
             </span>
           </div>
 
-          {index < cards.length - 1 && (
+          {gameUi(index < cards.length - 1 && (
             <PriorityRelation type={relation} language={language} />
-          )}
+          ))}
         </div>
       ))}
     </div>
@@ -807,7 +812,7 @@ export default function WattenRule() {
                 }
               `}
             >
-              {tab.label}
+              {gameUi(tab.label)}
             </button>
           ))}
         </div>
@@ -819,53 +824,53 @@ export default function WattenRule() {
             {/* =====================
                 ÜBERSICHT
             ====================== */}
-            {activeTab === "overview" && (
+            {gameUi(activeTab === "overview" && (
               <div className="grid gap-5 md:grid-cols-2">
                 <RulePanel
                   icon={<Target size={22} />}
                   title={t("Goal of the game")}
                 >
                   <p>
-                    {l(
+                    {gameUi(l(
                       "Ziel ist es, eine Runde durch Stiche zu gewinnen und dadurch\n                    Punkte für die Gesamtwertung zu erhalten.",
                       "The goal is to win a round through tricks and earn points for the overall score.",
-                    )}
+                    ))}
                   </p>
 
                   <p>
-                    {l(
+                    {gameUi(l(
                       "Eine Runde wird normalerweise über fünf mögliche Stiche\n                    entschieden. Wer zuerst die notwendige Mehrheit der Stiche\n                    erreicht, gewinnt die Runde.",
                       "A round normally has up to five tricks. The first side to reach the required majority wins the round.",
-                    )}
+                    ))}
                   </p>
 
                   <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4">
                     <strong className="text-emerald-300">
-                      {l("Grundidee:", "Basic idea:")}
+                      {gameUi(l("Grundidee:", "Basic idea:"))}
                     </strong>
 
                     <p className="mt-1">
-                      {l(
+                      {gameUi(l(
                         "Gute Karten helfen – aber Farbe, Schlag, Kritische und\n                      taktische Ansagen bestimmen oft, welche Karte tatsächlich\n                      gewinnt.",
                         "Strong cards help, but suit, Schlag, critical cards and tactical calls often determine which card actually wins.",
-                      )}
+                      ))}
                     </p>
                   </div>
                 </RulePanel>
 
                 <RulePanel icon={<Swords size={22} />} title={t("Tricks")}>
                   <p>
-                    {l(
+                    {gameUi(l(
                       "Jeder Spieler legt pro Stich eine Karte. Anschließend wird\n                    bestimmt, welche Karte den Stich gewinnt.",
                       "Each player plays one card per trick. The winning card is then determined.",
-                    )}
+                    ))}
                   </p>
 
                   <p>
-                    {l(
+                    {gameUi(l(
                       "Entscheidend ist dabei die Kartenpriorität:",
                       "Card priority is decisive:",
-                    )}
+                    ))}
                   </p>
 
                   <div className="rounded-2xl bg-black/20 p-4 font-semibold">
@@ -885,31 +890,31 @@ export default function WattenRule() {
                   </div>
 
                   <p>
-                    {l(
+                    {gameUi(l(
                       "Der Gewinner eines Stichs spielt den nächsten Stich aus.\n                    Keine feste Reihenfolge zwischen verschiedenen Farben. Es\n                    zählt die angespielte (zuerst gespielte) Farbe; innerhalb\n                    dieser Farbe: Ass → König → Ober → Unter → 10 → 9 → 8 → 7.",
                       "The winner of a trick leads the next trick. There is no fixed order between different suits; the led suit matters, and within that suit: Ace → King → Ober → Unter → 10 → 9 → 8 → 7.",
-                    )}
+                    ))}
                   </p>
                 </RulePanel>
               </div>
-            )}
+            ))}
 
             {/* =====================
                 REGELN
             ====================== */}
-            {activeTab === "rules" && (
+            {gameUi(activeTab === "rules" && (
               <div className="space-y-5">
                 <RulePanel icon={<ShieldAlert size={22} />} title={t("Gehen")}>
                   <p>
-                    {t("A round starts at a value of")}{" "}
+                    {t("A round starts at a value of")}{gameUi(" ")}
                     <strong className="text-amber-300">{t("2 points")}</strong>.
                   </p>
 
                   <p>
-                    {l(
+                    {gameUi(l(
                       "Durch „Gehen“ kann eine Seite versuchen, den Rundenwert zu\n                    erhöhen.",
                       "With “Gehen”, one side can try to raise the value of the round.",
-                    )}
+                    ))}
                   </p>
 
                   <div className="grid gap-3 sm:grid-cols-3">
@@ -943,40 +948,40 @@ export default function WattenRule() {
                   </div>
 
                   <p>
-                    {l(
+                    {gameUi(l(
                       "Die Gegenseite kann den höheren Wert",
                       "The opposing side can",
-                    )}
+                    ))}
                     <strong className="text-emerald-300">
-                      {l(" halten", " hold")}
+                      {gameUi(l(" halten", " hold"))}
                     </strong>
-                    {l(
+                    {gameUi(l(
                       ". Dann wird um den neuen Wert weitergespielt.",
                       ". The round then continues at the new value.",
-                    )}
+                    ))}
                   </p>
 
                   <p>
-                    {l(
+                    {gameUi(l(
                       "Wird nicht gehalten, gewinnt die Seite, die erhöht hat, die\n                    Runde zum bisher gültigen Rundenwert.",
                       "If the raise is declined, the raising side wins the round at the previously accepted round value.",
-                    )}
+                    ))}
                   </p>
                 </RulePanel>
 
                 <RulePanel icon={<Hand size={22} />} title={t("Abheben")}>
                   <p>
-                    {l(
+                    {gameUi(l(
                       "Vor dem eigentlichen Austeilen wird abgehoben.",
                       "The deck is cut before the cards are dealt.",
-                    )}
+                    ))}
                   </p>
 
                   <p>
-                    {l(
+                    {gameUi(l(
                       "Der Abheber befindet sich rechts vom Geber.",
                       "The cutter sits to the right of the dealer.",
-                    )}
+                    ))}
                   </p>
 
                   <div className="grid gap-3 md:grid-cols-2">
@@ -984,10 +989,10 @@ export default function WattenRule() {
                       <p className="font-bold text-white">{t("3 Players")}</p>
 
                       <p className="mt-2 text-sm text-zinc-400">
-                        {l(
+                        {gameUi(l(
                           "Eine Karte wird beim Abheben aufgedeckt. Ist sie\n                        kritisch, erhält der Abheber die Karte. Bei einer\n                        normalen Karte wird das Abheben beendet.",
                           "A card is revealed when cutting. If it is critical, the cutter receives it. A normal card ends the cutting sequence.",
-                        )}
+                        ))}
                       </p>
                     </div>
 
@@ -995,19 +1000,19 @@ export default function WattenRule() {
                       <p className="font-bold text-white">{t("4 Players")}</p>
 
                       <p className="mt-2 text-sm text-zinc-400">
-                        {l(
+                        {gameUi(l(
                           "Der Stapel wird an einer gewählten Stelle getrennt.\n                        Kritische Karten können beim Aufdecken bereits verteilt\n                        werden, bevor die restlichen Karten ausgegeben werden.",
                           "The deck is split at the chosen position. Critical cards can already be distributed while revealing before the remaining cards are dealt.",
-                        )}
+                        ))}
                       </p>
                     </div>
                   </div>
 
                   <p>
-                    {l(
+                    {gameUi(l(
                       "Danach wird so ausgeteilt, dass jeder Spieler insgesamt fünf\n                    Karten besitzt.",
                       "Cards are then dealt until every player has five cards in total.",
-                    )}
+                    ))}
                   </p>
                 </RulePanel>
 
@@ -1016,46 +1021,46 @@ export default function WattenRule() {
                   title={t("Trumpf oder Kritisch")}
                 >
                   <p>
-                    {l(
+                    {gameUi(l(
                       "Diese Sonderregel kann im ersten Stich durch den",
                       "This special rule can be activated in the first trick by the",
-                    )}
+                    ))}
                     <strong className="text-amber-300">
-                      {l("Hauptschlag", "Main Schlag")}
+                      {gameUi(l("Hauptschlag", "Main Schlag"))}
                     </strong>
-                    {l("aktiviert werden.", "being played.")}
+                    {gameUi(l("aktiviert werden.", "being played."))}
                   </p>
 
                   <div className="rounded-2xl border border-amber-400/20 bg-amber-400/10 p-5">
                     <p className="font-black text-amber-200">
-                      {l(
+                      {gameUi(l(
                         "Wird der Hauptschlag ausgespielt:",
                         "When the Main Schlag is played:",
-                      )}
+                      ))}
                     </p>
 
                     <p className="mt-2 text-amber-100/80">
-                      {l(
+                      {gameUi(l(
                         "Spieler, die einen Trumpf oder eine Kritische besitzen, müssen eine solche Karte spielen.",
                         "Players who hold a trump or critical card must play one of those cards.",
-                      )}
+                      ))}
                     </p>
                   </div>
 
                   <p>
-                    {l(
+                    {gameUi(l(
                       "Besitzt ein Spieler weder Trumpf noch Kritische, darf er frei eine andere Karte wählen.",
                       "If a player has neither trump nor a critical card, they may freely choose another card.",
-                    )}
+                    ))}
                   </p>
                 </RulePanel>
               </div>
-            )}
+            ))}
 
             {/* =====================
                 KARTEN
             ====================== */}
-            {activeTab === "cards" && (
+            {gameUi(activeTab === "cards" && (
               <div className="space-y-5">
                 {/* KRITISCHE */}
                 <RulePanel
@@ -1063,10 +1068,10 @@ export default function WattenRule() {
                   title={t("Critical cards")}
                 >
                   <p>
-                    {l(
+                    {gameUi(l(
                       "Die drei Kritischen stehen an der Spitze der Kartenrangfolge.",
                       "The three critical cards are at the top of the card ranking.",
-                    )}
+                    ))}
                   </p>
 
                   <div className="mt-5 flex flex-wrap items-center justify-center gap-4">
@@ -1098,7 +1103,7 @@ export default function WattenRule() {
                           <RuleCard card={item.card} />
 
                           <span className="mt-2 font-black text-amber-300">
-                            {item.name}
+                            {gameUi(item.name)}
                           </span>
 
                           <span className="text-[10px] text-zinc-500">
@@ -1106,16 +1111,16 @@ export default function WattenRule() {
                           </span>
                         </div>
 
-                        {index < array.length - 1 && (
+                        {gameUi(index < array.length - 1 && (
                           <PriorityRelation type="higher" language={language} />
-                        )}
+                        ))}
                       </div>
                     ))}
                   </div>
 
                   <p>
-                    {l("Damit gilt:", "Therefore:")}
-                    <strong className="text-white"> Max → Belli → Spitz</strong>
+                    {gameUi(l("Damit gilt:", "Therefore:"))}
+                    <strong className="text-white">{gameUi(" Max → Belli → Spitz")}</strong>
                     .
                   </p>
                 </RulePanel>
@@ -1123,20 +1128,20 @@ export default function WattenRule() {
                 {/* HAUPTSCHLAG */}
                 <RulePanel icon={<Crown size={22} />} title={t("Main Schlag")}>
                   <p>
-                    {l(
+                    {gameUi(l(
                       "Der Hauptschlag entsteht aus der Kombination von",
                       "The Main Schlag is created by combining",
-                    )}
+                    ))}
                     <strong className="text-emerald-300">
-                      {l("Trumpf", "Trump")}
+                      {gameUi(l("Trumpf", "Trump"))}
                     </strong>
-                    {l("und", "and")}
-                    <strong className="text-amber-300"> Schlag</strong>.
+                    {gameUi(l("und", "and"))}
+                    <strong className="text-amber-300">{gameUi(" Schlag")}</strong>.
                   </p>
 
                   <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
                     <p className="text-sm text-zinc-400">
-                      {l("Beispiel", "Example")}
+                      {gameUi(l("Beispiel", "Example"))}
                     </p>
 
                     <p className="mt-1 font-bold">
@@ -1146,55 +1151,55 @@ export default function WattenRule() {
                     </p>
 
                     <p className="mt-3">
-                      →{" "}
+                      →{gameUi(" ")}
                       <strong className="text-amber-300">
                         {t("Gras")} {t("Ober")}
-                      </strong>{" "}
+                      </strong>{gameUi(" ")}
                       {t("is the Main Schlag.")}
                     </p>
                   </div>
 
                   <p>
-                    {l(
+                    {gameUi(l(
                       "Der Hauptschlag steht unmittelbar unter den Kritischen und über allen gewöhnlichen Schlägen und Trumpfkarten.",
                       "The Main Schlag ranks directly below the critical cards and above all ordinary Schlag and trump cards.",
-                    )}
+                    ))}
                   </p>
 
                   <p>
-                    {l(
+                    {gameUi(l(
                       "Im ersten Stich kann der Hauptschlag außerdem die Regel „Trumpf oder Kritisch“ aktivieren.",
                       "In the first trick, the Main Schlag can also activate the “Trump or Critical” rule.",
-                    )}
+                    ))}
                   </p>
                 </RulePanel>
 
                 {/* SCHLAG */}
                 <RulePanel icon={<Layers3 size={22} />} title={t("Schlag")}>
                   <p>
-                    {l(
+                    {gameUi(l(
                       "Der Schlag ist ein bestimmter Kartenrang, zum Beispiel Ober, König oder 9.",
                       "Schlag is a selected card rank, for example Ober, King or 9.",
-                    )}
+                    ))}
                   </p>
 
                   <p>
-                    {l(
+                    {gameUi(l(
                       "Alle Karten dieses Rangs werden zu Schlägen.",
                       "All cards of this rank become Schlag cards.",
-                    )}
+                    ))}
                   </p>
 
                   <div className="rounded-2xl border border-sky-400/20 bg-sky-400/10 p-4">
                     <p className="font-bold text-sky-200">
-                      {l("Wichtig:", "Important:")}
+                      {gameUi(l("Wichtig:", "Important:"))}
                     </p>
 
                     <p className="mt-1">
-                      {l(
+                      {gameUi(l(
                         "Die normalen Schläge besitzen untereinander dieselbe Stärke. Werden zwei gleichwertige Schläge gespielt, gewinnt der zuerst gespielte.",
                         "The normal Schlag cards are equal in strength. If two equal Schlag cards are played, the one played first wins.",
-                      )}
+                      ))}
                     </p>
                   </div>
                 </RulePanel>
@@ -1205,10 +1210,10 @@ export default function WattenRule() {
                   title={t("Trump / suit")}
                 >
                   <p>
-                    {l(
+                    {gameUi(l(
                       "Die gewählte Farbe ist die Trumpffarbe der Runde.",
                       "The selected suit is the trump suit for the round.",
-                    )}
+                    ))}
                   </p>
 
                   <div className="grid grid-cols-4 gap-3">
@@ -1231,10 +1236,10 @@ export default function WattenRule() {
                   </div>
 
                   <p>
-                    {l(
+                    {gameUi(l(
                       "Trumpfkarten stehen unterhalb der Schläge, sind aber stärker als gewöhnliche Karten.",
                       "Trump cards rank below Schlag cards but above ordinary cards.",
-                    )}
+                    ))}
                   </p>
                 </RulePanel>
 
@@ -1244,32 +1249,32 @@ export default function WattenRule() {
                   title={t("Normal cards")}
                 >
                   <p>
-                    {l(
+                    {gameUi(l(
                       "Normale Karten sind weder Kritische noch Hauptschlag, Schlag oder Trumpf.",
                       "Normal cards are neither critical cards, Main Schlag, Schlag nor trump.",
-                    )}
+                    ))}
                   </p>
 
                   <div className="rounded-2xl bg-black/20 p-4 text-center font-black tracking-wide text-white">
-                    {l(
+                    {gameUi(l(
                       "Keine feste Reihenfolge zwischen verschiedenen Farben. Es\n                    zählt die angespielte (zuerst gespielte) Farbe; innerhalb\n                    dieser Farbe: Ass → König → Ober → Unter → 10 → 9 → 8 → 7.",
                       "There is no fixed order between different suits. The led suit matters; within that suit: Ace → King → Ober → Unter → 10 → 9 → 8 → 7.",
-                    )}
+                    ))}
                   </div>
 
                   <p>
-                    {l(
+                    {gameUi(l(
                       "Zwischen verschiedenen normalen Farben besteht keine allgemeine Trumpf-Priorität.",
                       "There is no general priority between different normal suits.",
-                    )}
+                    ))}
                   </p>
                 </RulePanel>
               </div>
-            )}
+            ))}
             {/* =====================
                 SITUATIONS
             ====================== */}
-            {activeTab === "situations" && (
+            {gameUi(activeTab === "situations" && (
               <div className="space-y-5">
                 <section className="rounded-3xl border border-white/10 bg-white/[0.045] p-5 shadow-xl sm:p-6">
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -1314,13 +1319,13 @@ export default function WattenRule() {
                   </div>
 
                   <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-xs leading-5 text-zinc-400">
-                    {situationMode === "three"
+                    {gameUi(situationMode === "three"
                       ? t(
                           "Three-player mode: one Solo player faces a two-player team. Card priority itself is the same as in four-player mode.",
                         )
                       : t(
                           "Four-player mode: Team A and Team B alternate seats. Card priority itself is the same as in three-player mode.",
-                        )}
+                        ))}
                   </div>
                 </section>
 
@@ -1351,7 +1356,7 @@ export default function WattenRule() {
                                     : "bg-white/5 text-zinc-500"
                                 }`}
                               >
-                                {index + 1}
+                                {gameUi(index + 1)}
                               </span>
                               <div className="min-w-0">
                                 <p className="text-xs font-black text-white">
@@ -1383,7 +1388,7 @@ export default function WattenRule() {
                         <span className="flex items-center gap-1.5 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5 text-emerald-300">
                           <img
                             src={suitIcons[activeSituation.farbe]}
-                            alt={activeSituation.farbe}
+                            alt={gameUi(activeSituation.farbe)}
                             className="h-4 w-4 object-contain"
                           />
                           {t("Trump")}: {t(activeSituation.farbe)}
@@ -1392,9 +1397,9 @@ export default function WattenRule() {
                           {t("Schlag")}: {t(activeSituation.schlag)}
                         </span>
                         <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-zinc-400">
-                          {activeSituation.firstTrick
+                          {gameUi(activeSituation.firstTrick
                             ? t("First trick")
-                            : t("Any / later trick")}
+                            : t("Any / later trick"))}
                         </span>
                       </div>
                     </div>
@@ -1426,18 +1431,18 @@ export default function WattenRule() {
                           >
                             <div className="mb-3 flex items-center justify-between gap-2">
                               <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/5 text-[10px] font-black text-zinc-400">
-                                {index + 1}
+                                {gameUi(index + 1)}
                               </span>
-                              {index === 0 && (
+                              {gameUi(index === 0 && (
                                 <span className="rounded-full bg-sky-400/10 px-2 py-1 text-[9px] font-black uppercase tracking-wider text-sky-300">
                                   {t("Led")}
                                 </span>
-                              )}
-                              {won && (
+                              ))}
+                              {gameUi(won && (
                                 <span className="rounded-full bg-amber-400 px-2 py-1 text-[9px] font-black uppercase tracking-wider text-amber-950">
                                   {t("Winner")}
                                 </span>
-                              )}
+                              ))}
                             </div>
 
                             <div className="flex justify-center">
@@ -1445,7 +1450,7 @@ export default function WattenRule() {
                             </div>
 
                             <p className="mt-3 text-xs font-black text-white">
-                              {situationPlayerLabel(index)}
+                              {gameUi(situationPlayerLabel(index))}
                             </p>
                             <p
                               className={`mt-1 text-[10px] font-bold ${
@@ -1476,16 +1481,16 @@ export default function WattenRule() {
                         <p className="mt-2 text-sm leading-6 text-zinc-300">
                           <strong className="text-white">
                             {t("Lead suit")}:
-                          </strong>{" "}
+                          </strong>{gameUi(" ")}
                           {t(activeLeadSuit)}
                           <br />
                           <strong className="text-white">
                             {t("Winning card")}:
-                          </strong>{" "}
+                          </strong>{gameUi(" ")}
                           {t(
                             activeSituationCards[activeSituationWinnerIndex]
                               .suit,
-                          )}{" "}
+                          )}{gameUi(" ")}
                           {t(
                             activeSituationCards[activeSituationWinnerIndex]
                               .rank,
@@ -1494,7 +1499,7 @@ export default function WattenRule() {
                       </div>
                     </div>
 
-                    {activeSituation.edgeKey && (
+                    {gameUi(activeSituation.edgeKey && (
                       <div className="mt-3 rounded-2xl border border-sky-400/20 bg-sky-400/10 p-4">
                         <p className="text-[10px] font-black uppercase tracking-[0.18em] text-sky-300">
                           {t("Edge case")}
@@ -1503,9 +1508,9 @@ export default function WattenRule() {
                           {t(activeSituation.edgeKey)}
                         </p>
                       </div>
-                    )}
+                    ))}
 
-                    {(() => {
+                    {gameUi((() => {
                       const examples =
                         situationMode === "three"
                           ? activeSituation.legalExamples3
@@ -1526,7 +1531,7 @@ export default function WattenRule() {
                                 className="rounded-xl border border-white/10 bg-black/20 p-3"
                               >
                                 <p className="text-xs font-black text-white">
-                                  {situationPlayerLabel(example.playerIndex)}
+                                  {gameUi(situationPlayerLabel(example.playerIndex))}
                                 </p>
                                 <div className="mt-3 flex flex-wrap gap-3">
                                   {example.hand.map((card, cardIndex) => {
@@ -1549,7 +1554,7 @@ export default function WattenRule() {
                                               : "text-red-300"
                                           }`}
                                         >
-                                          {legal ? t("Legal") : t("Not legal")}
+                                          {gameUi(legal ? t("Legal") : t("Not legal"))}
                                         </p>
                                       </div>
                                     );
@@ -1563,11 +1568,11 @@ export default function WattenRule() {
                           </div>
                         </div>
                       );
-                    })()}
+                    })())}
                   </section>
                 </div>
               </div>
-            )}
+            ))}
           </div>
 
           {/* ==========================
@@ -1578,16 +1583,16 @@ export default function WattenRule() {
               {/* CONFIGURATOR */}
               <div className="border-b border-white/10 p-5">
                 <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-400">
-                  {l("Beispiel konfigurieren", "Configure example")}
+                  {gameUi(l("Beispiel konfigurieren", "Configure example"))}
                 </p>
 
                 <h2 className="mt-1 text-xl font-black">{t("Card ranking")}</h2>
 
                 <p className="mt-2 text-xs leading-5 text-zinc-500">
-                  {l(
+                  {gameUi(l(
                     "Wähle Trumpf und Schlag. Die Rangfolge darunter wird\n                  automatisch angepasst.",
                     "Choose trump and Schlag. The ranking below updates automatically.",
-                  )}
+                  ))}
                 </p>
 
                 {/* FARBE */}
@@ -1674,7 +1679,7 @@ export default function WattenRule() {
                   <div className="flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5">
                     <img
                       src={suitIcons[exampleFarbe]}
-                      alt={exampleFarbe}
+                      alt={gameUi(exampleFarbe)}
                       className="h-5 w-5 object-contain"
                     />
 
@@ -1712,9 +1717,9 @@ export default function WattenRule() {
                   </div>
 
                   <div className="mt-3 flex justify-between text-[9px] font-semibold text-zinc-500">
-                    <span>Max</span>
-                    <span>Belli</span>
-                    <span>Spitz</span>
+                    <span>{gameUi("Max")}</span>
+                    <span>{gameUi("Belli")}</span>
+                    <span>{gameUi("Spitz")}</span>
                   </div>
                 </div>
 
@@ -1731,25 +1736,25 @@ export default function WattenRule() {
                       <h3 className="font-black">{t("Main Schlag")}</h3>
 
                       <p className="text-[10px] text-zinc-500">
-                        {l("Farbe + Schlag", "Suit + Schlag")}
+                        {gameUi(l("Farbe + Schlag", "Suit + Schlag"))}
                       </p>
                     </div>
                   </div>
 
                   <div className="mt-4">
-                    {priority.hauptschlag.length > 0 ? (
+                    {gameUi(priority.hauptschlag.length > 0 ? (
                       <PriorityRow
                         cards={priority.hauptschlag}
                         language={language}
                       />
                     ) : (
                       <p className="rounded-xl bg-black/20 p-3 text-xs leading-5 text-zinc-400">
-                        {l(
+                        {gameUi(l(
                           "Bei dieser Kombination fällt die entsprechende Karte\n                        bereits unter die Kritischen.",
                           "With this combination, the corresponding card is already a critical card.",
-                        )}
+                        ))}
                       </p>
-                    )}
+                    ))}
                   </div>
                 </div>
 
@@ -1780,10 +1785,10 @@ export default function WattenRule() {
                   </div>
 
                   <p className="mt-3 text-[10px] leading-4 text-zinc-500">
-                    {l(
+                    {gameUi(l(
                       "Bei gleicher Stärke gewinnt die zuerst gespielte Karte.",
                       "If cards have equal strength, the one played first wins.",
-                    )}
+                    ))}
                   </p>
                 </div>
 
@@ -1838,10 +1843,10 @@ export default function WattenRule() {
                   </div>
 
                   <p className="mt-2 text-[10px] leading-4 text-zinc-500">
-                    {l(
+                    {gameUi(l(
                       "Keine feste Reihenfolge zwischen verschiedenen Farben. Es\n                    zählt die angespielte (zuerst gespielte) Farbe; innerhalb\n                    dieser Farbe: Ass → König → Ober → Unter → 10 → 9 → 8 → 7.",
                       "There is no fixed order between different suits. The led suit matters; within that suit: Ace → King → Ober → Unter → 10 → 9 → 8 → 7.",
-                    )}
+                    ))}
                   </p>
                 </div>
               </div>

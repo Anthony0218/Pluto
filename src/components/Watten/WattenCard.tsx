@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { useCardTheme } from "@/context/CardThemeContext";
 import {
   WATTEN_CARD_CLIP,
@@ -32,6 +33,7 @@ export default function WattenCard({
   helpStatus,
   onClick,
 }: WattenCardProps) {
+  useGameLanguage();
   const { cardTheme } = useCardTheme();
 
   const imageSrc = getWattenCardImage(card, cardTheme);
@@ -43,9 +45,9 @@ export default function WattenCard({
       disabled={disabled || invalid}
       onClick={onClick}
       title={
-        invalid
+        gameUi(invalid
           ? "Trumpf oder Kritisch: Du musst Trumpf oder einen Kritischen spielen."
-          : undefined
+          : undefined)
       }
       className={`
         group relative
@@ -110,7 +112,7 @@ export default function WattenCard({
       <div className="relative h-full w-full">
         <img
           src={imageSrc}
-          alt={`${card.suit} ${card.rank}`}
+          alt={gameUi(`${card.suit} ${card.rank}`)}
           draggable={false}
           style={{
             clipPath: WATTEN_CARD_CLIP,
@@ -127,7 +129,7 @@ export default function WattenCard({
       </div>
 
       {/* Invalid card X */}
-      {invalid && (
+      {gameUi(invalid && (
         <span
           className="
             pointer-events-none
@@ -150,10 +152,10 @@ export default function WattenCard({
         >
           ×
         </span>
-      )}
+      ))}
 
       {/* Beginner/help mode tooltip */}
-      {hint && !invalid && (
+      {gameUi(hint && !invalid && (
         <div
           className="
             pointer-events-none
@@ -181,7 +183,7 @@ export default function WattenCard({
             group-hover:block
           "
         >
-          {hint}
+          {gameUi(hint)}
 
           {/* Tooltip arrow */}
           <div
@@ -196,7 +198,7 @@ export default function WattenCard({
             "
           />
         </div>
-      )}
+      ))}
     </button>
   );
 }

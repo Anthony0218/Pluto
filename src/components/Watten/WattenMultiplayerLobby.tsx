@@ -1,3 +1,4 @@
+import { gameUi } from "../../i18n/gameUi.ts";
 import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
 import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
@@ -361,19 +362,15 @@ export default function WattenMultiplayerLobby() {
                 </div>
 
                 <div className="mt-4 flex gap-2">
-                  <span className="rounded-full border border-amber-400/20 bg-amber-400/[0.07] px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-amber-300">
-                    Team A
-                  </span>
-                  <span className="rounded-full border border-emerald-400/20 bg-emerald-400/[0.07] px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-300">
-                    Team B
-                  </span>
+                  <span className="rounded-full border border-amber-400/20 bg-amber-400/[0.07] px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-amber-300">{gameUi(" Team A ")}</span>
+                  <span className="rounded-full border border-emerald-400/20 bg-emerald-400/[0.07] px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-300">{gameUi(" Team B ")}</span>
                 </div>
               </button>
             </div>
           </section>
 
           <section className="mt-6 rounded-2xl border border-white/10 bg-white/[0.035] p-4">
-            {user ? (
+            {gameUi(user ? (
               <div className="flex items-center gap-3">
                 <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-amber-400/20">
                   <ProfileAvatar
@@ -387,19 +384,19 @@ export default function WattenMultiplayerLobby() {
                     {t("Signed in as")}
                   </p>
                   <p className="truncate font-black text-emerald-300">
-                    {displayName}
+                    {gameUi(displayName)}
                   </p>
                 </div>
 
                 <div className="ml-auto rounded-full border border-white/10 bg-black/20 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-zinc-400">
-                  {playerCount} {t("Players")}
+                  {gameUi(playerCount)} {t("Players")}
                 </div>
               </div>
             ) : (
               <p className="text-sm font-semibold text-red-300">
                 {t("You must be signed in to play multiplayer.")}
               </p>
-            )}
+            ))}
           </section>
 
           <div className="mt-8 grid gap-5 lg:grid-cols-2">
@@ -409,9 +406,9 @@ export default function WattenMultiplayerLobby() {
               </div>
 
               <p className="mt-5 text-[10px] font-black uppercase tracking-[0.2em] text-amber-400">
-                {variant === "three-player"
+                {gameUi(variant === "three-player"
                   ? t("3-player Watten")
-                  : t("4-player Watten")}
+                  : t("4-player Watten"))}
               </p>
 
               <h2 className="mt-1 text-2xl font-black">
@@ -427,13 +424,13 @@ export default function WattenMultiplayerLobby() {
               <div className="mt-6 space-y-2 rounded-2xl border border-white/10 bg-white/[0.035] p-4 text-sm text-zinc-300">
                 <div className="flex items-center justify-between">
                   <span className="text-zinc-500">{t("Players")}</span>
-                  <strong>{playerCount}</strong>
+                  <strong>{gameUi(playerCount)}</strong>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <span className="text-zinc-500">{t("Mode")}</span>
                   <strong>
-                    {variant === "three-player" ? t("1 vs 2") : t("2 vs 2")}
+                    {gameUi(variant === "three-player" ? t("1 vs 2") : t("2 vs 2"))}
                   </strong>
                 </div>
 
@@ -449,11 +446,11 @@ export default function WattenMultiplayerLobby() {
                 onClick={() => void createRoom()}
                 className="mt-7 w-full rounded-xl bg-amber-400 px-6 py-4 font-black text-amber-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {loading === "create"
+                {gameUi(loading === "create"
                   ? t("Creating room...")
                   : variant === "three-player"
                     ? t("Create 3-player room")
-                    : t("Create 4-player room")}
+                    : t("Create 4-player room"))}
               </button>
             </section>
 
@@ -502,7 +499,7 @@ export default function WattenMultiplayerLobby() {
                     void joinRoom();
                   }
                 }}
-                placeholder="ABC123"
+                placeholder={gameUi("ABC123")}
                 maxLength={6}
                 autoComplete="off"
                 aria-label={t("Room code")}
@@ -511,7 +508,7 @@ export default function WattenMultiplayerLobby() {
 
               <div className="mt-3 flex items-center justify-between text-xs">
                 <span className="text-zinc-600">
-                  {t("Selected")}: {playerCount} {t("Players")}
+                  {t("Selected")}: {gameUi(playerCount)} {t("Players")}
                 </span>
 
                 <span
@@ -521,7 +518,7 @@ export default function WattenMultiplayerLobby() {
                       : "text-zinc-700"
                   }
                 >
-                  {roomCode.length}/6
+                  {gameUi(roomCode.length)}/6
                 </span>
               </div>
 
@@ -533,20 +530,20 @@ export default function WattenMultiplayerLobby() {
                 onClick={() => void joinRoom()}
                 className="mt-7 w-full rounded-xl bg-emerald-500 px-6 py-4 font-black text-emerald-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {loading === "join"
+                {gameUi(loading === "join"
                   ? t("Opening room...")
                   : variant === "three-player"
                     ? t("Join 3-player room")
-                    : t("Join 4-player room")}
+                    : t("Join 4-player room"))}
               </button>
             </section>
           </div>
 
-          {error && (
+          {gameUi(error && (
             <div className="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 px-5 py-4 text-sm font-semibold text-red-200">
-              {error}
+              {gameUi(error)}
             </div>
-          )}
+          ))}
         </div>
       </div>
     </main>
