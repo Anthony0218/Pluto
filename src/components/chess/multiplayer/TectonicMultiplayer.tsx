@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
 import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
@@ -362,7 +363,7 @@ function Panel({
         <h2 className="text-sm font-black text-zinc-100">{ui(title)}</h2>
         {subtitle && <p className="mt-1 text-xs text-zinc-500">{ui(subtitle)}</p>}
       </div>
-      {children}
+      {gameUi(children)}
     </section>
   );
 }
@@ -371,7 +372,7 @@ function ErrorBox({ children }: { children: ReactNode }) {
   useUiLanguage();
   return (
     <div className="mt-4 rounded-2xl border border-red-400/20 bg-red-400/[0.07] px-4 py-3 text-sm font-semibold text-red-200">
-      {children}
+      {gameUi(children)}
     </div>
   );
 }
@@ -398,33 +399,33 @@ function CapturedPieces({ rows }: { rows: TectonicHistoryEntry[] }) {
 
   const render = (pieces: PieceType[], color: TectonicSide) => (
     <div className="mt-2 flex min-h-8 flex-wrap gap-1">
-      {pieces.length === 0 ? (
+      {gameUi(pieces.length === 0 ? (
         <span className="text-xs text-zinc-700">—</span>
       ) : (
         pieces.map((piece, index) => (
           <span key={`${color}-${piece}-${index}`} className="text-2xl">
-            {color === "w" ? whiteSymbols[piece] : blackSymbols[piece]}
+            {gameUi(color === "w" ? whiteSymbols[piece] : blackSymbols[piece])}
           </span>
         ))
-      )}
+      ))}
     </div>
   );
 
   return (
     <>
       <div className="mb-3 rounded-xl border border-white/5 bg-black/20 px-3 py-2 text-xs font-bold text-zinc-400">
-        {diff > 0
+        {gameUi(diff > 0
           ? `White +${diff}`
           : diff < 0
             ? `Black +${Math.abs(diff)}`
-            : "Material equal"}
+            : "Material equal")}
       </div>
       <div className="rounded-2xl border border-white/5 bg-black/20 p-3">
         <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">{ui("Black pieces captured")}</p>
-        {render(capturedBlack, "b")}
+        {gameUi(render(capturedBlack, "b"))}
         <div className="mt-3 border-t border-white/5 pt-3">
           <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">{ui("White pieces captured")}</p>
-          {render(capturedWhite, "w")}
+          {gameUi(render(capturedWhite, "w"))}
         </div>
       </div>
     </>
@@ -435,7 +436,7 @@ function Stat({ label, value }: { label: string; value: number }) {
   useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-2 py-3 text-center">
-      <p className="text-xl font-black text-violet-200">{value}</p>
+      <p className="text-xl font-black text-violet-200">{gameUi(value)}</p>
       <p className="mt-1 text-[9px] font-bold leading-4 text-zinc-600">
         {ui(label)}
       </p>
@@ -450,7 +451,7 @@ function StatusMini({ label, value }: { label: string; value: string }) {
       <p className="text-[9px] font-black uppercase tracking-wider text-zinc-600">
         {ui(label)}
       </p>
-      <p className="mt-1 text-sm font-black text-zinc-300">{value}</p>
+      <p className="mt-1 text-sm font-black text-zinc-300">{gameUi(value)}</p>
     </div>
   );
 }
@@ -501,7 +502,7 @@ function QuadrantOverlay({
                 : "border-violet-300/10 bg-zinc-950/30 text-violet-300/45"
             }`}
           >
-            {quadrant}
+            {gameUi(quadrant)}
           </div>
         );
       })}
@@ -576,7 +577,7 @@ export function TectonicMultiplayerLobby() {
 
         </ChessPageHeader>
 
-        {!user ? (
+        {gameUi(!user ? (
           <Panel title={ui("Sign in required")}>
             <p className="text-sm text-zinc-400">{ui("Multiplayer rooms use your existing Supabase account.")}</p>
           </Panel>
@@ -592,7 +593,7 @@ export function TectonicMultiplayerLobby() {
                 onClick={() => void createRoom()}
                 className="mt-5 w-full rounded-xl bg-violet-300 px-5 py-3 font-black text-zinc-950 transition hover:bg-violet-200 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {loading === "create" ? ui("Creating...") : ui("Create Tectonic Room")}
+                {gameUi(loading === "create" ? ui("Creating...") : ui("Create Tectonic Room"))}
               </button>
             </Panel>
 
@@ -613,11 +614,11 @@ export function TectonicMultiplayerLobby() {
                 onClick={() => void joinRoom()}
                 className="mt-3 w-full rounded-xl border border-violet-400/20 bg-violet-400/[0.07] px-5 py-3 font-black text-violet-200 transition hover:bg-violet-400/10 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {loading === "join" ? ui("Joining...") : ui("Join Tectonic Room")}
+                {gameUi(loading === "join" ? ui("Joining...") : ui("Join Tectonic Room"))}
               </button>
             </Panel>
           </div>
-        )}
+        ))}
 
         {error && <ErrorBox>{ui(error)}</ErrorBox>}
       </div>
@@ -1373,7 +1374,7 @@ export function TectonicMultiplayerGame() {
 
 
           <div className="flex flex-wrap items-center gap-2">
-            {gameState.status === "playing" && (
+            {gameUi(gameState.status === "playing" && (
               <div
                 className={`rounded-full border px-3 py-1.5 text-xs font-black ${
                   tectonic.pendingShift
@@ -1381,14 +1382,14 @@ export function TectonicMultiplayerGame() {
                     : "border-white/10 bg-white/5 text-zinc-300"
                 }`}
               >
-                {tectonic.pendingShift ? `TECTONIC SHIFT · ${shifterName}` : moveAfterSkippedShift ? `${activeTurnColor === "white" ? "White" : "Black"} · normal move after skip` : `${activeTurnColor === "white" ? "White" : "Black"} to move`}
+                {gameUi(tectonic.pendingShift ? `TECTONIC SHIFT · ${shifterName}` : moveAfterSkippedShift ? `${activeTurnColor === "white" ? "White" : "Black"} · normal move after skip` : `${activeTurnColor === "white" ? "White" : "Black"} to move`)}
               </div>
-            )}
+            ))}
             <button
               type="button"
               onClick={() => void copyRoomCode()}
               className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 font-mono text-xs font-black text-zinc-300"
-            >{ui("Room")}{room.code} {copied ? "✓" : ""}
+            >{ui("Room")}{room.code} {gameUi(copied ? "✓" : "")}
             </button>
             <Link
               to="/games/chess/variants/tectonic/multiplayer"
@@ -1405,7 +1406,7 @@ export function TectonicMultiplayerGame() {
               <Panel
                 title={ui("Players")}
                 subtitle={
-                  players.length < 2 ? "Waiting for opponent..." : "Connected"
+                  gameUi(players.length < 2 ? "Waiting for opponent..." : "Connected")
                 }
               >
                 <div className="space-y-2">
@@ -1424,12 +1425,12 @@ export function TectonicMultiplayerGame() {
                           {player.display_name}
                         </span>
                         <span className="text-xl">
-                          {player.chosen_color === "black" ? "♚" : "♔"}
+                          {gameUi(player.chosen_color === "black" ? "♚" : "♔")}
                         </span>
                       </div>
                       <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-zinc-600">
-                        {player.user_id === user.id ? ui("You") : ui("Opponent")} ·{" "}
-                        {player.chosen_color ?? "waiting"}
+                        {gameUi(player.user_id === user.id ? ui("You") : ui("Opponent"))} ·{gameUi(" ")}
+                        {gameUi(player.chosen_color ?? "waiting")}
                       </p>
                     </div>
                   ))}
@@ -1457,16 +1458,16 @@ export function TectonicMultiplayerGame() {
                 </div>
               </Panel>
 
-              {gameState.undo_requested_by && (
+              {gameUi(gameState.undo_requested_by && (
                 <Panel
                   title={ui("Undo request")}
                   subtitle={
-                    myUndoRequest
+                    gameUi(myUndoRequest
                       ? "Waiting for opponent"
-                      : "Opponent wants to undo the latest action"
+                      : "Opponent wants to undo the latest action")
                   }
                 >
-                  {opponentUndoRequest ? (
+                  {gameUi(opponentUndoRequest ? (
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         type="button"
@@ -1481,9 +1482,9 @@ export function TectonicMultiplayerGame() {
                     </div>
                   ) : (
                     <p className="text-sm text-zinc-400">{ui("Request sent.")}</p>
-                  )}
+                  ))}
                 </Panel>
-              )}
+              ))}
 
               <Panel title={ui("Action History")} subtitle={ui("Moves and board shifts")}>
                 <ChessMoveHistoryList
@@ -1513,8 +1514,8 @@ export function TectonicMultiplayerGame() {
                     side: entry.color,
                     content: (
                       <>
-                        <span className="font-black text-zinc-500">{entry.kind === "shift" ? "↻" : "·"}</span>
-                        <span className="truncate font-mono text-xs font-black text-zinc-200">{entry.notation}</span>
+                        <span className="font-black text-zinc-500">{gameUi(entry.kind === "shift" ? "↻" : "·")}</span>
+                        <span className="truncate font-mono text-xs font-black text-zinc-200">{gameUi(entry.notation)}</span>
                       </>
                     ),
                   }))}
@@ -1534,7 +1535,7 @@ export function TectonicMultiplayerGame() {
 
           <section className="min-w-0">
             <div className="mx-auto max-w-[820px]">
-              {gameState.status === "finished" && (
+              {gameUi(gameState.status === "finished" && (
                 <VisibleGameResult
                   winner={gameState.winner}
                   playerColor={myColor}
@@ -1546,18 +1547,18 @@ export function TectonicMultiplayerGame() {
                       onClick={() => void requestRematch()}
                       className="rounded-xl bg-violet-300 px-4 py-2.5 text-sm font-black text-zinc-950 disabled:opacity-40"
                     >
-                      {myRematchReady ? ui("Rematch requested") : ui("Play Again")}
+                      {gameUi(myRematchReady ? ui("Rematch requested") : ui("Play Again"))}
                     </button>
                   }
                 />
-              )}
+              ))}
 
               {historyPreviewIndex !== null && (
                 <div className="mb-3 flex items-center justify-between rounded-xl border border-violet-400/20 bg-violet-400/[0.06] px-4 py-3">
                   <div>
                     <p className="text-[9px] font-black uppercase tracking-widest text-violet-300">{ui("History Preview")}</p>
                     <p className="mt-1 text-sm font-bold text-white">
-                      {historyPreviewIndex === -1 ? ui("Initial position") : `${historyPreview?.kind === "shift" ? "Tectonic shift" : "Normal move"} · ${historyPreview?.notation ?? ""}`}
+                      {gameUi(historyPreviewIndex === -1 ? ui("Initial position") : `${historyPreview?.kind === "shift" ? "Tectonic shift" : "Normal move"} · ${historyPreview?.notation ?? ""}`)}
                     </p>
                   </div>
                   <button
@@ -1568,29 +1569,29 @@ export function TectonicMultiplayerGame() {
                 </div>
               )}
 
-              {previewGame &&
+              {gameUi(previewGame &&
                 hoveredQuadrant &&
                 historyPreviewIndex === null && (
                   <div className="mb-3 flex items-center justify-between rounded-xl border border-violet-400/20 bg-violet-400/[0.07] px-4 py-3">
                     <div>
                       <p className="text-[9px] font-black uppercase tracking-widest text-violet-300">{ui("Shift preview")}</p>
                       <p className="mt-1 text-sm font-bold text-white">
-                        ↻ {quadrantLabel(hoveredQuadrant)}
+                        ↻ {gameUi(quadrantLabel(hoveredQuadrant))}
                       </p>
                     </div>
-                    {postShiftPreviewGame?.isCheck() && (
+                    {gameUi(postShiftPreviewGame?.isCheck() && (
                       <span className="rounded-full border border-red-400/20 bg-red-400/10 px-3 py-1.5 text-[10px] font-black text-red-300">{ui("This shift gives check!")}</span>
-                    )}
+                    ))}
                   </div>
-                )}
+                ))}
 
-              {pendingPromotion &&
+              {gameUi(pendingPromotion &&
                 historyPreviewIndex === null &&
                 !tectonic.pendingShift && (
                   <div className="mb-3">
                     <PromotionBar onPromote={promotePawn} />
                   </div>
-                )}
+                ))}
 
               <div className="relative">
                 <Board
@@ -1629,7 +1630,7 @@ export function TectonicMultiplayerGame() {
                       <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">{ui("Waiting for players")}</p>
 
                       <h2 className="mt-2 text-2xl font-black text-white">
-                        {players.length}{ui("/2 players connected")}</h2>
+                        {gameUi(players.length)}{ui("/2 players connected")}</h2>
 
                       <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">{ui("Share this room code. The game starts automatically when everyone has joined.")}</p>
 
@@ -1642,7 +1643,7 @@ export function TectonicMultiplayerGame() {
                       </div>
 
                       <p className="mt-4 text-xs font-bold text-zinc-400">
-                        {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
+                        {gameUi(copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code"))}
                       </p>
                     </button>
                     <InviteFriendButton overlay />
@@ -1670,15 +1671,15 @@ export function TectonicMultiplayerGame() {
                   <span className="text-2xl">↻</span>
                 </div>
 
-                {tectonic.pendingShift ? (
+                {gameUi(tectonic.pendingShift ? (
                   <div className="mt-4">
                     <div className="rounded-2xl border border-violet-300/20 bg-violet-400/[0.07] p-4 text-center">
                       <p className="text-[10px] font-black uppercase tracking-[0.2em] text-violet-300">{ui("TECTONIC SHIFT")}</p>
                       <p className="mt-2 text-lg font-black text-white">
-                        {shifterName}
+                        {gameUi(shifterName)}
                       </p>
                       <p className="mt-1 text-[10px] text-zinc-500">
-                        {canShift ? ui("Choose one quadrant or skip") : ui("Waiting for the other player")}
+                        {gameUi(canShift ? ui("Choose one quadrant or skip") : ui("Waiting for the other player"))}
                       </p>
                     </div>
 
@@ -1711,15 +1712,15 @@ export function TectonicMultiplayerGame() {
                           >
                             <div className="flex items-center justify-between">
                               <span className="text-2xl font-black text-white">
-                                {quadrant}
+                                {gameUi(quadrant)}
                               </span>
                               <span className="text-lg">↻</span>
                             </div>
                             <p className="mt-2 text-[10px] font-bold text-zinc-500">
-                              {quadrantLabel(quadrant).slice(4)}
+                              {gameUi(quadrantLabel(quadrant).slice(4))}
                             </p>
                             <p className="mt-1 text-[9px] font-black uppercase tracking-wider text-zinc-600">
-                              {locked ? ui("Locked") : legal ? ui("Rotate 90° clockwise") : ui("Illegal")}
+                              {gameUi(locked ? ui("Locked") : legal ? ui("Rotate 90° clockwise") : ui("Illegal"))}
                             </p>
                           </button>
                         );
@@ -1735,27 +1736,27 @@ export function TectonicMultiplayerGame() {
                       className="mt-3 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs font-black text-zinc-300 transition hover:bg-white/10 disabled:opacity-35"
                     >{ui("Skip Shift")}</button>
 
-                    {canSkipTectonicShift(liveGame, tectonic) && (
+                    {gameUi(canSkipTectonicShift(liveGame, tectonic) && (
                       <p className="mt-2 text-[10px] leading-4 text-violet-200/70">{ui("Skip keeps your turn. Make your normal move afterwards.")}</p>
-                    )}
+                    ))}
 
-                    {liveGame.isCheck() && (
+                    {gameUi(liveGame.isCheck() && (
                       <p className="mt-2 text-[10px] leading-4 text-red-300/80">{ui("Skip is illegal while your King is in check.")}</p>
-                    )}
+                    ))}
 
-                    {isTectonicLockedOut(liveGame, tectonic) && (
+                    {gameUi(isTectonicLockedOut(liveGame, tectonic) && (
                       <div className="mt-3 rounded-xl border border-red-400/15 bg-red-400/[0.06] p-3 text-xs font-black text-red-300">{ui("Shift locked out — no legal quadrant can rotate the King to safety.")}</div>
-                    )}
+                    ))}
                   </div>
                 ) : (
                   <div className="mt-4 rounded-2xl border border-white/5 bg-black/20 p-4">
                     <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">{ui("Normal plies until shift")}</p>
                     <div className="mt-2 flex items-end justify-between">
                       <span className="text-sm font-bold text-zinc-300">
-                        {shifterName}
+                        {gameUi(shifterName)}
                       </span>
                       <span className="text-4xl font-black leading-none text-violet-300">
-                        {pliesUntilShift}
+                        {gameUi(pliesUntilShift)}
                       </span>
                     </div>
                     <div className="mt-4 h-2 overflow-hidden rounded-full bg-zinc-800">
@@ -1767,7 +1768,7 @@ export function TectonicMultiplayerGame() {
                       />
                     </div>
                   </div>
-                )}
+                ))}
 
                 <div className="mt-3 grid grid-cols-2 gap-2">
                   <StatusMini

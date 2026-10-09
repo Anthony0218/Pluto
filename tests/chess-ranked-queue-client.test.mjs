@@ -24,7 +24,7 @@ function mount(game="chess", stored=null){
   '@/games/chess/ranked/timeControls':timeControls,
   '@/components/chess/RankEmblem':{default:()=>null},
  };
- const exports={};new Function('require','exports','window','localStorage',compiled)(name=>deps[name]??{default:()=>null},exports,win,{getItem:()=>stored,setItem:()=>{}});
+ const exports={};new Function('require','exports','window','localStorage',compiled)(name=>name.endsWith('/i18n/gameUi.ts')?{gameUi:value=>value,useGameLanguage:()=>({language:'en'})}:deps[name]??{default:()=>null},exports,win,{getItem:()=>stored,setItem:()=>{}});
  const tree=exports.default({game});effects.forEach(fn=>{const cleanup=fn();if(cleanup)cleanups.push(cleanup)});
  function all(node){if(!node||typeof node!=='object')return [];if(Array.isArray(node))return node.flatMap(all);return [node,...all(node.props?.children)]}
  const join=all(tree).find(n=>n.type==='button'&&n.props.children?.includes?.('Find match'));

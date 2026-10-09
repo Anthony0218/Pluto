@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { playChessSound } from "@/games/chess/audio/chessAudio";
 import { ui, useUiLanguage } from "@/i18n/ui";
@@ -87,7 +88,7 @@ function ChessPageShell({ children }: { children: React.ReactNode }) {
           </Link>
         </ChessPageHeader>
 
-        {children}
+        {gameUi(children)}
       </div>
     </main>
   );
@@ -210,7 +211,7 @@ export default function ChessComputer() {
                             : "border-white/10 bg-white/[0.035] text-zinc-400"
                         }`}
                       >
-                        {icon}
+                        {gameUi(icon)}
                       </div>
 
                       <p
@@ -218,7 +219,7 @@ export default function ChessComputer() {
                           active ? "text-amber-300/70" : "text-zinc-700"
                         }`}
                       >
-                        {active ? ui("Selected") : ui("Side")}
+                        {gameUi(active ? ui("Selected") : ui("Side"))}
                       </p>
 
                       <p className="mt-1 font-serif text-xl text-white sm:text-2xl">
@@ -263,7 +264,7 @@ export default function ChessComputer() {
                             : "border-white/10 bg-white/[0.035]"
                         }`}
                       >
-                        {settings.emoji}
+                        {gameUi(settings.emoji)}
                       </span>
 
                       <span className="min-w-0 flex-1 xl:mt-3 xl:block">
@@ -272,7 +273,7 @@ export default function ChessComputer() {
                             active ? "text-amber-300/70" : "text-zinc-700"
                           }`}
                         >
-                          {active ? ui("Selected") : ui("Stockfish")}
+                          {gameUi(active ? ui("Selected") : ui("Stockfish"))}
                         </span>
                         <span className="mt-1 block font-serif text-xl text-white">
                           {ui(settings.label)}
@@ -289,7 +290,7 @@ export default function ChessComputer() {
                             : "border-white/10 text-zinc-600 group-hover:border-amber-300/35 group-hover:text-amber-300"
                         }`}
                       >
-                        {active ? "✓" : "→"}
+                        {gameUi(active ? "✓" : "→")}
                       </span>
                     </button>
                   );
@@ -310,9 +311,9 @@ export default function ChessComputer() {
                   {ui("Start Game")}
                 </span>
                 <span className="mt-2 block text-sm text-zinc-500">
-                  {selectedColor === "random"
+                  {gameUi(selectedColor === "random"
                     ? ui("Random side")
-                    : `Play as ${selectedColor === "white" ? "White" : "Black"}`}{" "}
+                    : `Play as ${selectedColor === "white" ? "White" : "Black"}`)}{gameUi(" ")}
                   · {ui(selectedDifficulty.label)}
                 </span>
               </span>

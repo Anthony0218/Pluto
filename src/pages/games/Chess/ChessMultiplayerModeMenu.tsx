@@ -1,3 +1,4 @@
+import { useGameLanguage } from "../../../i18n/gameUi.ts";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
@@ -25,6 +26,7 @@ const modes = [
 ];
 
 function ModeTabs({ activeTab, onChange }: { activeTab: 0 | 1; onChange: (tab: 0 | 1) => void }) {
+  useGameLanguage();
   return <div role="tablist" aria-label={ui("Multiplayer modes")} className="mb-5 grid grid-cols-2 gap-1 rounded-2xl border border-white/10 bg-white/[.04] p-1.5">{modes.map((mode, index) => <button key={mode.path} type="button" role="tab" aria-selected={activeTab === index} onClick={() => onChange(index as 0 | 1)} className={`rounded-xl px-4 py-3 text-sm font-bold transition ${activeTab === index ? "bg-amber-300 text-black shadow-lg shadow-amber-500/20" : "text-zinc-400 hover:bg-white/[.06] hover:text-white"}`}>{ui(mode.title)}</button>)}</div>;
 }
 

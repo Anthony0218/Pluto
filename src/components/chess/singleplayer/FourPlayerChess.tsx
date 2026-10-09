@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
@@ -415,7 +416,7 @@ export default function FourPlayerChess({
             </div>
 
             <div className="flex flex-wrap items-center justify-end gap-2">
-              {!state.winner && (
+              {gameUi(!state.winner && (
                 <div
                   className={`rounded-full border px-3 py-1.5 text-xs font-black ${
                     playerStyles[state.turn].border
@@ -424,9 +425,9 @@ export default function FourPlayerChess({
                   }`}
                 >
                   {t(fourPlayerLabel(state.turn))} {t("to move")}
-                  {isFourPlayerKingInCheck(state.board, state.turn) ? ` · ${t("CHECK")}` : ""}
+                  {gameUi(isFourPlayerKingInCheck(state.board, state.turn) ? ` · ${t("CHECK")}` : "")}
                 </div>
-              )}
+              ))}
             </div>
           </div>
         </ChessPageHeader>
@@ -465,7 +466,7 @@ export default function FourPlayerChess({
 
               <Panel
                 title={t("Move History")}
-                subtitle={`${history.length} ${t("turns")}`}
+                subtitle={gameUi(`${history.length} ${t("turns")}`)}
               >
                 <ChessMoveHistoryList
                   sides={FOUR_PLAYER_HISTORY_SIDES}
@@ -476,7 +477,7 @@ export default function FourPlayerChess({
                     ply: entry.index,
                     side: entry.state.lastMove?.color ?? null,
                     title: entry.notation,
-                    content: <span className="truncate font-mono text-[10px] font-bold text-zinc-300">{entry.notation}</span>,
+                    content: <span className="truncate font-mono text-[10px] font-bold text-zinc-300">{gameUi(entry.notation)}</span>,
                   }))}
                 />
               </Panel>
@@ -484,13 +485,13 @@ export default function FourPlayerChess({
           </aside>
 
           <section className="mx-auto w-full min-w-0">
-            {state.event && (
+            {gameUi(state.event && (
               <div className="mb-3 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-center text-xs font-bold text-zinc-400">
-                {translateFourPlayerEvent(state.event, t)}
+                {gameUi(translateFourPlayerEvent(state.event, t))}
               </div>
-            )}
+            ))}
 
-            {state.winner && (
+            {gameUi(state.winner && (
               <VisibleGameResult
                 actions={
                   <button
@@ -502,7 +503,7 @@ export default function FourPlayerChess({
                   </button>
                 }
               />
-            )}
+            ))}
 
             <div className="relative">
               <FourPlayerBoard
@@ -594,12 +595,12 @@ function FourPlayerBoard({
             >
               <div className="flex items-start justify-between gap-1">
                 <span className={`text-[8px] font-black uppercase tracking-[0.14em] sm:text-[10px] ${playerStyles[slot.color].text}`}>
-                  {fourPlayerLabel(slot.color)}
+                  {gameUi(fourPlayerLabel(slot.color))}
                 </span>
                 {!state.winner && state.turn === slot.color && <span className="rounded bg-white/20 px-1 text-[7px] font-black text-white sm:text-[9px]">{ui("Turn")}</span>}
               </div>
               <span className="text-[9px] font-bold text-zinc-100 sm:text-xs">
-                {!state.activePlayers.includes(slot.color) ? ui("Eliminated") : aiMode ? (humanColor === slot.color ? ui("YOU") : ui("AI bot")) : ui("Player")}
+                {gameUi(!state.activePlayers.includes(slot.color) ? ui("Eliminated") : aiMode ? (humanColor === slot.color ? ui("YOU") : ui("AI bot")) : ui("Player"))}
               </span>
             </div>
           ))}
@@ -632,26 +633,26 @@ function FourPlayerBoard({
                 <button
                   key={`${row}-${column}`}
                   type="button"
-                  aria-label={fourPlayerSquareName(square)}
+                  aria-label={gameUi(fourPlayerSquareName(square))}
                   onClick={() => onSquareClick(square.row, square.column)}
                   className={`group relative flex aspect-square items-center justify-center overflow-hidden border-0 p-0 transition ${selected ? "z-10 ring-4 ring-inset ring-fuchsia-300" : ""}`}
                   style={{ backgroundColor: light ? colors.light : colors.dark }}
                 >
-                  {last && (
+                  {gameUi(last && (
                     <span className="pointer-events-none absolute inset-0 z-[2] bg-yellow-300/25" />
-                  )}
+                  ))}
 
-                  {checked && (
+                  {gameUi(checked && (
                     <span className="pointer-events-none absolute inset-0 z-[3] bg-[radial-gradient(circle,rgba(239,68,68,0.85)_0%,rgba(185,28,28,0.52)_45%,rgba(127,29,29,0.05)_80%)] shadow-[inset_0_0_20px_rgba(239,68,68,0.85)]" />
-                  )}
+                  ))}
 
-                  {legal && !piece && (
+                  {gameUi(legal && !piece && (
                     <span className="pointer-events-none absolute z-[6] h-[26%] w-[26%] rounded-full bg-black/35" />
-                  )}
+                  ))}
 
-                  {legal && piece && (
+                  {gameUi(legal && piece && (
                     <span className="pointer-events-none absolute inset-[7%] z-[6] rounded-full border-[3px] border-black/30" />
-                  )}
+                  ))}
 
                   {piece && <FourPlayerThemedPiece piece={piece} />}
                 </button>
@@ -678,7 +679,7 @@ function Panel({
     <section className="rounded-3xl border border-white/5 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
       <h2 className="font-black text-zinc-100">{ui(title)}</h2>
       <p className="mt-1 mb-4 text-xs text-zinc-600">{ui(subtitle)}</p>
-      {children}
+      {gameUi(children)}
     </section>
   );
 }

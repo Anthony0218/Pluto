@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { Shield, X } from "lucide-react";
@@ -539,7 +540,7 @@ export default function Board({
                           }
                         `}
       >
-        {pieceTheme === "classic" ? pieceSymbols[`${piece.color}${piece.type}`] : <ChessPiece type={piece.type} color={piece.color} theme={pieceTheme} />}
+        {gameUi(pieceTheme === "classic" ? pieceSymbols[`${piece.color}${piece.type}`] : <ChessPiece type={piece.type} color={piece.color} theme={pieceTheme} />)}
       </span>
     </span>
   );
@@ -768,7 +769,7 @@ export default function Board({
                   <button
                     key={square}
                     type="button"
-                    aria-label={square}
+                    aria-label={gameUi(square)}
                     style={{ background: isLight ? colors.light : colors.dark }}
                     onClick={() => {
                       if (orientationAnimating) {
@@ -835,7 +836,7 @@ export default function Board({
                         </span>
                       ),
                     )}
-                    {isDraftSetupSquare && (
+                    {gameUi(isDraftSetupSquare && (
                       <span
                         className="
                         pointer-events-none
@@ -846,9 +847,9 @@ export default function Board({
                         shadow-[inset_0_0_16px_rgba(52,211,153,0.16)]
                       "
                       />
-                    )}
+                    ))}
 
-                    {isDraftKingSquare && (
+                    {gameUi(isDraftKingSquare && (
                       <span
                         className="
                         pointer-events-none
@@ -873,9 +874,9 @@ export default function Board({
                       >
                         ♔
                       </span>
-                    )}
+                    ))}
 
-                    {isMirrorSetupSquare && (
+                    {gameUi(isMirrorSetupSquare && (
                       <span
                         className="
                         pointer-events-none
@@ -886,9 +887,9 @@ export default function Board({
                         shadow-[inset_0_0_18px_rgba(167,139,250,0.12)]
                       "
                       />
-                    )}
+                    ))}
 
-                    {isMirrorAvailableSquare && (
+                    {gameUi(isMirrorAvailableSquare && (
                       <span
                         className="
                         pointer-events-none
@@ -901,9 +902,9 @@ export default function Board({
                         shadow-[inset_0_0_12px_rgba(110,231,183,0.15)]
                       "
                       />
-                    )}
+                    ))}
 
-                    {isMirrorPreviewSquare && (
+                    {gameUi(isMirrorPreviewSquare && (
                       <span
                         className="
                         pointer-events-none
@@ -923,13 +924,13 @@ export default function Board({
                       >
                         ◈
                       </span>
-                    )}
+                    ))}
 
                     {/* =========================
                       CHESSROULETTE LUCKY SQUARE
                      ========================= */}
 
-                    {isLuckySquare && (
+                    {gameUi(isLuckySquare && (
                       <>
                         <span
                           className={`
@@ -986,16 +987,16 @@ export default function Board({
                         `}
                           aria-hidden="true"
                         >
-                          {isDestroyLuckySquare ? "💥" : isTeleportLuckySquare ? "🌀" : isSwapLuckySquare ? "🔄" : isPromoteLuckySquare ? "🎴" : "?"}
+                          {gameUi(isDestroyLuckySquare ? "💥" : isTeleportLuckySquare ? "🌀" : isSwapLuckySquare ? "🔄" : isPromoteLuckySquare ? "🎴" : "?")}
                         </span>
                       </>
-                    )}
+                    ))}
 
                     {/* =========================
                       CHESS HOT POTATO
                      ========================= */}
 
-                    {isHotPotatoExplosionSquare && (
+                    {gameUi(isHotPotatoExplosionSquare && (
                       <>
                         <span
                           className="
@@ -1027,9 +1028,9 @@ export default function Board({
                           💥
                         </span>
                       </>
-                    )}
+                    ))}
 
-                    {isHotPotatoSquare && (
+                    {gameUi(isHotPotatoSquare && (
                       <>
                         <span
                           className="
@@ -1081,21 +1082,21 @@ export default function Board({
                                         : "border-orange-100/70 text-orange-100"
                                   }
                                 `}
-                              aria-label={`Hot Potato explodes in ${potato.movesRemaining} moves`}
+                              aria-label={gameUi(`Hot Potato explodes in ${potato.movesRemaining} moves`)}
                             >
                               <span aria-hidden="true">💣</span>
-                              <span>{potato.movesRemaining}</span>
+                              <span>{gameUi(potato.movesRemaining)}</span>
                             </span>
                           ))}
                         </span>
                       </>
-                    )}
+                    ))}
 
                     {/* =========================
                       BOSS BATTLE CHESS
                      ========================= */}
 
-                    {isBossShockwaveSquare && (
+                    {gameUi(isBossShockwaveSquare && (
                       <>
                         <span
                           className="
@@ -1126,9 +1127,9 @@ export default function Board({
                           💥
                         </span>
                       </>
-                    )}
+                    ))}
 
-                    {isBossPowerTargetSquare && (
+                    {gameUi(isBossPowerTargetSquare && (
                       <>
                         <span
                           className={`
@@ -1169,12 +1170,12 @@ export default function Board({
                           `}
                           aria-hidden="true"
                         >
-                          {bossPowerTargetMode === "summon" ? "♟+" : "✦"}
+                          {gameUi(bossPowerTargetMode === "summon" ? "♟+" : "✦")}
                         </span>
                       </>
-                    )}
+                    ))}
 
-                    {isBossSquare && (
+                    {gameUi(isBossSquare && (
                       <>
                         <span
                           className={`
@@ -1211,7 +1212,7 @@ export default function Board({
                           "
                         >{ui("Boss")}</span>
 
-                        {bossArmorActive && (
+                        {gameUi(bossArmorActive && (
                           <span
                             className="
                               pointer-events-none
@@ -1226,9 +1227,9 @@ export default function Board({
                           >
                             🛡
                           </span>
-                        )}
+                        ))}
 
-                        {bossRage > 0 && (
+                        {gameUi(bossRage > 0 && (
                           <span
                             className="
                               pointer-events-none
@@ -1246,17 +1247,17 @@ export default function Board({
                             "
                             aria-hidden="true"
                           >
-                            🔥{bossRage}
+                            🔥{gameUi(bossRage)}
                           </span>
-                        )}
+                        ))}
                       </>
-                    )}
+                    ))}
 
                     {/* =========================
                       CHESS COLLAPSE
                      ========================= */}
 
-                    {isCollapseWarningSquare && !isCollapsedSquare && (
+                    {gameUi(isCollapseWarningSquare && !isCollapsedSquare && (
                       <>
                         <span
                           className="
@@ -1303,9 +1304,9 @@ export default function Board({
                           ⚠
                         </span>
                       </>
-                    )}
+                    ))}
 
-                    {isCollapseImpactSquare && (
+                    {gameUi(isCollapseImpactSquare && (
                       <>
                         <span
                           className="
@@ -1334,9 +1335,9 @@ export default function Board({
                           💥
                         </span>
                       </>
-                    )}
+                    ))}
 
-                    {isCollapsedSquare && (
+                    {gameUi(isCollapsedSquare && (
                       <>
                         <span
                           className="
@@ -1362,7 +1363,7 @@ export default function Board({
                         "
                         />
                       </>
-                    )}
+                    ))}
 
                     {/* =========================
                       THREE LIVES HEART SQUARE
@@ -1370,7 +1371,7 @@ export default function Board({
                       so it can never drift or offset.
                      ========================= */}
 
-                    {isHeartSquare && (
+                    {gameUi(isHeartSquare && (
                       <>
                         <span
                           className="
@@ -1404,13 +1405,13 @@ export default function Board({
                           <span className="animate-pulse leading-none">♥</span>
                         </span>
                       </>
-                    )}
+                    ))}
 
                     {/* =========================
                       MUTATION SQUARE
                      ========================= */}
 
-                    {isMutationSquare && (
+                    {gameUi(isMutationSquare && (
                       <>
                         <span
                           className="
@@ -1443,13 +1444,13 @@ export default function Board({
                           ✦
                         </span>
                       </>
-                    )}
+                    ))}
 
                     {/* =========================
                       CAPITALISM BOUNTY TARGET
                      ========================= */}
 
-                    {isBountySquare && (
+                    {gameUi(isBountySquare && (
                       <>
                         <span
                           className="
@@ -1489,13 +1490,13 @@ export default function Board({
                           $
                         </span>
                       </>
-                    )}
+                    ))}
 
                     {/* =========================
                       CAPITALISM SHOP SPAWN POINT
                      ========================= */}
 
-                    {isShopSpawnSquare && (
+                    {gameUi(isShopSpawnSquare && (
                       <>
                         <span
                           className={`
@@ -1541,13 +1542,13 @@ export default function Board({
                           +
                         </span>
                       </>
-                    )}
+                    ))}
 
                     {/* =========================
                       KING JOURNEY TARGET
                      ========================= */}
 
-                    {isAnyMissionTargetSquare && (
+                    {gameUi(isAnyMissionTargetSquare && (
                       <>
                         <span
                           className={`
@@ -1595,8 +1596,8 @@ export default function Board({
                           }
                         `}
                         >
-                          {isWhiteMissionTargetSquare &&
-                          isBlackMissionTargetSquare ? "♔♚" : isWhiteMissionTargetSquare ? "♔" : "♚"}
+                          {gameUi(isWhiteMissionTargetSquare &&
+                          isBlackMissionTargetSquare ? "♔♚" : isWhiteMissionTargetSquare ? "♔" : "♚")}
                         </span>
 
                         <span
@@ -1623,13 +1624,13 @@ export default function Board({
                           ★
                         </span>
                       </>
-                    )}
+                    ))}
 
                     {/* =========================
                       HORROR CHESS STATUS MARKERS
                      ========================= */}
 
-                    {isInfectedSquare && (
+                    {gameUi(isInfectedSquare && (
                       <>
                         <span
                           className="
@@ -1666,9 +1667,9 @@ export default function Board({
                           ☣
                         </span>
                       </>
-                    )}
+                    ))}
 
-                    {isCursedSquare && (
+                    {gameUi(isCursedSquare && (
                       <>
                         <span
                           className="
@@ -1705,9 +1706,9 @@ export default function Board({
                           ☠
                         </span>
                       </>
-                    )}
+                    ))}
 
-                    {isHotSquare && (
+                    {gameUi(isHotSquare && (
                       <>
                         <span
                           className="
@@ -1737,9 +1738,9 @@ export default function Board({
                           🔥
                         </span>
                       </>
-                    )}
+                    ))}
 
-                    {isFrozenSquare && (
+                    {gameUi(isFrozenSquare && (
                       <>
                         <span
                           className="
@@ -1769,9 +1770,9 @@ export default function Board({
                           ❄
                         </span>
                       </>
-                    )}
+                    ))}
 
-                    {isDoomedSquare && (
+                    {gameUi(isDoomedSquare && (
                       <>
                         <span
                           className="
@@ -1806,9 +1807,9 @@ export default function Board({
                           ×
                         </span>
                       </>
-                    )}
+                    ))}
 
-                    {isGraveSquare && (
+                    {gameUi(isGraveSquare && (
                       <>
                         <span
                           className="
@@ -1839,13 +1840,13 @@ export default function Board({
                           🪦
                         </span>
                       </>
-                    )}
+                    ))}
 
                     {/* =========================
                       LAST MOVE HIGHLIGHT
                      ========================= */}
 
-                    {isLastMove && (
+                    {gameUi(isLastMove && (
                       <span
                         className="
                         pointer-events-none
@@ -1855,13 +1856,13 @@ export default function Board({
                         bg-yellow-300/25
                       "
                       />
-                    )}
+                    ))}
 
                     {/* =========================
                       CHECK GLOW
                      ========================= */}
 
-                    {isCheckedKing && (
+                    {gameUi(isCheckedKing && (
                       <span
                         className="
                         pointer-events-none
@@ -1872,13 +1873,13 @@ export default function Board({
                         shadow-[inset_0_0_0_3px_#ef4444,inset_0_0_20px_rgba(239,68,68,0.85)]
                       "
                       />
-                    )}
+                    ))}
 
                     {/* =========================
                       EMPTY LEGAL MOVE
                      ========================= */}
 
-                    {isLegalMove && !piece && !isCollapsedSquare && (
+                    {gameUi(isLegalMove && !piece && !isCollapsedSquare && (
                       <span
                         className="
                         pointer-events-none
@@ -1891,13 +1892,13 @@ export default function Board({
                         shadow-sm
                       "
                       />
-                    )}
+                    ))}
 
                     {/* =========================
                       LEGAL CAPTURE
                      ========================= */}
 
-                    {isLegalMove && piece && !isCollapsedSquare && (
+                    {gameUi(isLegalMove && piece && !isCollapsedSquare && (
                       <span
                         className="
                         pointer-events-none
@@ -1909,19 +1910,19 @@ export default function Board({
                         border-black/25
                       "
                       />
-                    )}
+                    ))}
 
                     {/* =========================
                       PIECE
                      ========================= */}
 
-                    {piece &&
+                    {gameUi(piece &&
                       !isHotPotatoBlownUpKingSquare &&
                       !isCollapsedSquare &&
                       slide?.to !== square &&
-                      renderPiece(piece, true)}
+                      renderPiece(piece, true))}
 
-                    {isFogSquare && (
+                    {gameUi(isFogSquare && (
                       <>
                         <span
                           className="
@@ -1951,14 +1952,14 @@ export default function Board({
                           ◌
                         </span>
                       </>
-                    )}
+                    ))}
 
                     {/* =========================
                       FILE COORDINATE
                       a b c d e f g h
                      ========================= */}
 
-                    {displayRow === 7 && (
+                    {gameUi(displayRow === 7 && (
                       <span
                         style={{
                           fontSize: coordinateFontSize,
@@ -1978,16 +1979,16 @@ export default function Board({
                         ${isLight ? "text-[#66452f]/70" : "text-[#f1ddbe]/70"}
                       `}
                       >
-                        {file}
+                        {gameUi(file)}
                       </span>
-                    )}
+                    ))}
 
                     {/* =========================
                       RANK COORDINATE
                       1 2 3 4 5 6 7 8
                      ========================= */}
 
-                    {displayColumn === 0 && (
+                    {gameUi(displayColumn === 0 && (
                       <span
                         style={{
                           fontSize: coordinateFontSize,
@@ -2007,9 +2008,9 @@ export default function Board({
                         ${isLight ? "text-[#66452f]/70" : "text-[#f1ddbe]/70"}
                       `}
                       >
-                        {rank}
+                        {gameUi(rank)}
                       </span>
-                    )}
+                    ))}
                     {annotationBadges.filter((badge) => badge.square === square).map((badge, index) => (
                       // Top-left, opposite the quality icon in the top-right.
                       <span
@@ -2020,7 +2021,7 @@ export default function Board({
                         <Shield size={14} strokeWidth={2.5} />
                       </span>
                     ))}
-                    {annotationCross?.square === square && (
+                    {gameUi(annotationCross?.square === square && (
                       <span
                         title={ui("Played move")}
                         className={`pointer-events-none absolute right-0 top-0 z-[32] grid h-6 w-6 place-items-center rounded-full border border-white/35 bg-[#06131e] shadow-lg max-sm:h-4 max-sm:w-4 max-sm:[&_svg]:h-2.5 max-sm:[&_svg]:w-2.5 ${cornerBadgeOffset(displayRow, displayColumn)}`}
@@ -2028,8 +2029,8 @@ export default function Board({
                       >
                         <X size={15} strokeWidth={3} className="drop-shadow-[0_0_3px_currentColor]" />
                       </span>
-                    )}
-                    {annotationIcon?.square === square && (
+                    ))}
+                    {gameUi(annotationIcon?.square === square && (
                       <span
                         title={ui(annotationIcon.quality)}
                         className={`group/quality absolute right-0 top-0 z-[32] grid h-6 w-6 place-items-center rounded-full border border-white/35 bg-[#06131e] shadow-lg transition-[transform,box-shadow] duration-200 ease-out hover:scale-110 motion-reduce:transition-none max-sm:h-4 max-sm:w-4 max-sm:[&_svg]:h-2.5 max-sm:[&_svg]:w-2.5 ${insetMoveQualityIcon ? "" : cornerBadgeOffset(displayRow, displayColumn)}`}
@@ -2037,12 +2038,12 @@ export default function Board({
                       >
                         <ReviewQualityIcon quality={annotationIcon.quality} size={14} />
                       </span>
-                    )}
+                    ))}
                   </button>
                 );
               }),
             )}
-            {slide && slidePiece && (
+            {gameUi(slide && slidePiece && (
               <span
                 ref={slidingPieceRef}
                 className="pointer-events-none absolute z-[25] flex"
@@ -2053,10 +2054,10 @@ export default function Board({
                   height: "12.5%",
                 }}
               >
-                {renderPiece(slidePiece, false)}
+                {gameUi(renderPiece(slidePiece, false))}
               </span>
-            )}
-            {annotationArrows.length > 0 && (
+            ))}
+            {gameUi(annotationArrows.length > 0 && (
               <svg className="pointer-events-none absolute inset-0 z-[8] h-full w-full" viewBox="0 0 800 800" aria-hidden="true">
                 <defs>
                   {annotationArrows.map((arrow, index) => (
@@ -2069,7 +2070,7 @@ export default function Board({
                   <line key={index} x1={arrow.x1} y1={arrow.y1} x2={arrow.x2} y2={arrow.y2} stroke={arrow.color} strokeWidth="6" strokeLinecap="round" markerEnd={`url(#${arrowId}-${index})`} opacity={arrow.opacity} />
                 ))}
               </svg>
-            )}
+            ))}
           </div>
         </div>
       </div>

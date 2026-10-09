@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
@@ -570,13 +571,13 @@ function RuleCard({
     <section className="rounded-3xl border border-white/10 bg-zinc-900/70 p-5 shadow-lg shadow-black/10">
       <div className="flex items-start gap-4">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-sky-400/15 bg-sky-400/10 text-sm font-black text-sky-200">
-          {number}
+          {gameUi(number)}
         </span>
 
         <div className="min-w-0">
           <h2 className="font-black text-white">{ui(title)}</h2>
 
-          <div className="mt-2 text-sm leading-7 text-zinc-400">{children}</div>
+          <div className="mt-2 text-sm leading-7 text-zinc-400">{gameUi(children)}</div>
         </div>
       </div>
     </section>
@@ -603,7 +604,7 @@ function VisualRuleCard({
         <p className="mt-2 text-sm leading-7 text-zinc-400">{ui(text)}</p>
       </div>
 
-      <div className="flex justify-center">{children}</div>
+      <div className="flex justify-center">{gameUi(children)}</div>
     </section>
   );
 }
@@ -637,7 +638,7 @@ function MiniBoard({
       squares.push(
         <div
           key={square}
-          title={info?.label ?? square}
+          title={gameUi(info?.label ?? square)}
           className={`
             relative
             flex
@@ -649,7 +650,7 @@ function MiniBoard({
             ${info?.highlighted ? "ring-2 ring-inset ring-sky-300" : ""}
           `}
         >
-          {visible && (
+          {gameUi(visible && (
             <span
               className={`
                 relative
@@ -663,11 +664,11 @@ function MiniBoard({
                 }
               `}
             >
-              {info?.piece ?? ""}
+              {gameUi(info?.piece ?? "")}
             </span>
-          )}
+          ))}
 
-          {fog && (
+          {gameUi(fog && (
             <>
               <span className="absolute inset-0 z-20 bg-zinc-950/90" />
 
@@ -675,9 +676,9 @@ function MiniBoard({
                 🌫
               </span>
             </>
-          )}
+          ))}
 
-          {fileIndex === 0 && (
+          {gameUi(fileIndex === 0 && (
             <span
               className={`
                 pointer-events-none
@@ -696,11 +697,11 @@ function MiniBoard({
                 }
               `}
             >
-              {rank}
+              {gameUi(rank)}
             </span>
-          )}
+          ))}
 
-          {rank === 1 && (
+          {gameUi(rank === 1 && (
             <span
               className={`
                 pointer-events-none
@@ -719,9 +720,9 @@ function MiniBoard({
                 }
               `}
             >
-              {file}
+              {gameUi(file)}
             </span>
-          )}
+          ))}
         </div>,
       );
     }
@@ -730,7 +731,7 @@ function MiniBoard({
   return (
     <div className="w-full max-w-[340px]">
       <div className="grid grid-cols-8 overflow-hidden rounded-xl border border-white/10 shadow-2xl shadow-black/30">
-        {squares}
+        {gameUi(squares)}
       </div>
     </div>
   );
@@ -788,7 +789,7 @@ function LegendItem({
           ${className}
         `}
       >
-        {sample}
+        {gameUi(sample)}
       </span>
 
       <span className="text-[10px] font-bold text-zinc-400">{ui(label)}</span>

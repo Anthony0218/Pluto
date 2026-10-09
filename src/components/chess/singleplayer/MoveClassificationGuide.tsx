@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { Info, X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -41,7 +42,7 @@ export default function MoveClassificationGuide() {
         <Info size={14} strokeWidth={2.5} />
       </button>
 
-      {open &&
+      {gameUi(open &&
         createPortal(
           <div
             className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
@@ -102,7 +103,7 @@ export default function MoveClassificationGuide() {
             </div>
           </div>,
           document.body,
-        )}
+        ))}
     </>
   );
 }

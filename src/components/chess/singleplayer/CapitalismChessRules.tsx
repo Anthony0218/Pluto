@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
@@ -229,8 +230,8 @@ export default function CapitalismChessRules() {
                 <option value="en">{ui("English")}</option>
                 <option value="de">{ui("Deutsch")}</option>
                 <option value="bar">{ui("Boarisch")}</option>
-                <option value="ko">한국어</option>
-                <option value="ru">Русский</option>
+                <option value="ko">{gameUi("한국어")}</option>
+                <option value="ru">{gameUi("Русский")}</option>
               </select>
             </div>
           </div>
@@ -296,7 +297,7 @@ export default function CapitalismChessRules() {
                 key={mission}
                 className="rounded-xl border border-white/5 bg-black/20 px-3 py-3 text-xs font-bold text-zinc-300"
               >
-                ★ {mission}
+                ★ {gameUi(mission)}
               </div>
             ))}
           </div>
@@ -442,7 +443,7 @@ function RuleSection({
     >
       <h2 className="text-lg font-black text-white">{ui(title)}</h2>
 
-      <div className="mt-4">{children}</div>
+      <div className="mt-4">{gameUi(children)}</div>
     </section>
   );
 }
@@ -451,7 +452,7 @@ function RuleParagraph({ children }: { children: React.ReactNode }) {
   useUiLanguage();
   return (
     <p className="mt-3 text-sm leading-7 text-zinc-400 first:mt-0">
-      {children}
+      {gameUi(children)}
     </p>
   );
 }
@@ -466,9 +467,9 @@ function RuleCallout({
   useUiLanguage();
   return (
     <div className="mt-4 flex items-center gap-3 rounded-2xl border border-amber-400/10 bg-amber-400/[0.04] px-4 py-3">
-      <span className="text-xl font-black text-amber-300">{icon}</span>
+      <span className="text-xl font-black text-amber-300">{gameUi(icon)}</span>
 
-      <p className="text-xs font-bold leading-5 text-zinc-300">{children}</p>
+      <p className="text-xs font-bold leading-5 text-zinc-300">{gameUi(children)}</p>
     </div>
   );
 }
@@ -486,19 +487,19 @@ function TwoColumnTable({
       <table className="w-full border-collapse">
         <thead className="bg-black/30">
           <tr className="text-left text-[10px] font-black uppercase tracking-wider text-zinc-600">
-            <th className="px-4 py-3">{headers[0]}</th>
+            <th className="px-4 py-3">{gameUi(headers[0])}</th>
 
-            <th className="px-4 py-3">{headers[1]}</th>
+            <th className="px-4 py-3">{gameUi(headers[1])}</th>
           </tr>
         </thead>
 
         <tbody>
           {rows.map(([left, right]) => (
             <tr key={`${left}-${right}`} className="border-t border-white/5">
-              <td className="px-4 py-3 text-sm text-zinc-300">{left}</td>
+              <td className="px-4 py-3 text-sm text-zinc-300">{gameUi(left)}</td>
 
               <td className="px-4 py-3 text-sm font-black text-amber-300">
-                {right}
+                {gameUi(right)}
               </td>
             </tr>
           ))}
@@ -521,11 +522,11 @@ function SpawnCard({
   return (
     <div className="rounded-2xl border border-emerald-400/10 bg-emerald-400/[0.04] p-4">
       <p className="text-xs font-black text-zinc-300">
-        {side === "white" ? "♔" : "♚"} {ui(label)}
+        {gameUi(side === "white" ? "♔" : "♚")} {ui(label)}
       </p>
 
       <p className="mt-2 font-mono text-xl font-black text-emerald-300">
-        + {squares}
+        + {gameUi(squares)}
       </p>
     </div>
   );
@@ -577,7 +578,7 @@ function JourneyMarkerCard({
             }
           `}
         >
-          {symbol}
+          {gameUi(symbol)}
         </span>
 
         <span className="text-2xl text-zinc-500">★</span>
@@ -602,11 +603,11 @@ function PowerRule({
         <p className="text-sm font-black text-zinc-200">{ui(title)}</p>
 
         <span className="rounded-lg bg-amber-400/10 px-2 py-1 text-xs font-black text-amber-300">
-          {cost}
+          {gameUi(cost)}
         </span>
       </div>
 
-      <p className="mt-2 text-xs leading-5 text-zinc-500">{children}</p>
+      <p className="mt-2 text-xs leading-5 text-zinc-500">{gameUi(children)}</p>
     </div>
   );
 }

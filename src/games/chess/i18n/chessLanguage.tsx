@@ -1,4 +1,5 @@
 import { translateUi } from "@/i18n/ui";
+import { isGameTerm } from "../../../i18n/gameTerms.ts";
 
 export type ChessLanguage = "en" | "de" | "bar" | "ko" | "ru" | "es" | "pt";
 
@@ -269,18 +270,18 @@ export function translateChess(
   key: string,
   local?: Partial<TranslationTable>,
 ): string {
+  if (isGameTerm(key)) return key;
   if (language === "en") return key;
 
   const localLanguage = local?.[language];
   const commonLanguage = commonTranslations[language] ?? {};
 
   if (language === "bar") {
+    const shared = translateUi(language, key);
     return (
       localLanguage?.[key] ??
-      local?.de?.[key] ??
       commonLanguage[key] ??
-      commonTranslations.de[key] ??
-      translateUi(language, key)
+      (shared !== key ? shared : local?.de?.[key] ?? commonTranslations.de[key] ?? key)
     );
   }
 

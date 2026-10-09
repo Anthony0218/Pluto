@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
@@ -1099,25 +1100,25 @@ export default function MirrorChessBoard({
 
 
           <div className="flex flex-wrap items-center justify-end gap-2">
-            {phase === "setup" && (
+            {gameUi(phase === "setup" && (
               <div className="rounded-full border border-violet-400/15 bg-violet-400/[0.06] px-3 py-1.5 text-xs font-black text-violet-200">
-                {setupFlipPending ? t("Switching sides...") : `${t("Placement turn")}: ${
+                {gameUi(setupFlipPending ? t("Switching sides...") : `${t("Placement turn")}: ${
                       setupState.turn === "w" ? t("White") : t("Black")
-                    }`}
+                    }`)}
               </div>
-            )}
+            ))}
 
-            {phase === "playing" && !gameOver && (
+            {gameUi(phase === "playing" && !gameOver && (
               <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-300">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-violet-400" />
 
-                {game.turn() === "w" ? t("White to move") : t("Black to move")}
+                {gameUi(game.turn() === "w" ? t("White to move") : t("Black to move"))}
               </div>
-            )}
+            ))}
           </div>
         </ChessPageHeader>
 
-        {phase === "setup" && (
+        {gameUi(phase === "setup" && (
           <section className="mb-6 grid gap-3 rounded-3xl border border-violet-400/10 bg-violet-400/[0.03] px-5 py-4 md:grid-cols-3">
             <RuleStrip
               icon="🎲"
@@ -1137,14 +1138,14 @@ export default function MirrorChessBoard({
               detail="White and Black alternate choosing where the random piece goes"
             />
           </section>
-        )}
+        ))}
 
         <main className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           {/* LEFT */}
 
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              {phase === "setup" ? (
+              {gameUi(phase === "setup" ? (
                 <>
                   <Panel>
                     <PanelTitle
@@ -1157,7 +1158,7 @@ export default function MirrorChessBoard({
                         {t("Random piece")}
                       </p>
 
-                      {setupFlipPending ? (
+                      {gameUi(setupFlipPending ? (
                         <div className="py-4">
                           <div className="text-4xl leading-none text-violet-200">
                             ↔
@@ -1170,7 +1171,7 @@ export default function MirrorChessBoard({
                       ) : currentPiece ? (
                         <>
                           <div className="mt-3 text-6xl leading-none">
-                            {setupState.turn === "w" ? whiteSymbols[currentPiece] : blackSymbols[currentPiece]}
+                            {gameUi(setupState.turn === "w" ? whiteSymbols[currentPiece] : blackSymbols[currentPiece])}
                           </div>
 
                           <p className="mt-3 text-sm font-black text-white">
@@ -1185,7 +1186,7 @@ export default function MirrorChessBoard({
                         <p className="mt-3 text-sm font-black text-emerald-200">
                           {t("Formation complete")}
                         </p>
-                      )}
+                      ))}
                     </div>
 
                     <div className="mt-4 grid grid-cols-2 gap-2">
@@ -1200,11 +1201,11 @@ export default function MirrorChessBoard({
                       />
                     </div>
 
-                    {setupError && (
+                    {gameUi(setupError && (
                       <p className="mt-3 rounded-xl border border-red-400/15 bg-red-400/[0.06] px-3 py-2 text-xs font-bold text-red-200">
-                        {setupError}
+                        {gameUi(setupError)}
                       </p>
-                    )}
+                    ))}
 
                     <button
                       type="button"
@@ -1214,7 +1215,7 @@ export default function MirrorChessBoard({
                       ↻ {t("New Setup")}
                     </button>
 
-                    {setupState.complete && (
+                    {gameUi(setupState.complete && (
                       <button
                         type="button"
                         onClick={startGame}
@@ -1223,7 +1224,7 @@ export default function MirrorChessBoard({
                       >
                         ▶ {t("Start Game")}
                       </button>
-                    )}
+                    ))}
                   </Panel>
 
                   <Panel>
@@ -1277,13 +1278,13 @@ export default function MirrorChessBoard({
                       />
 
                       <span className="rounded-xl bg-white/5 px-2.5 py-1 text-xs font-bold text-zinc-400">
-                        {materialDifference > 0 &&
-                          `${t("White")} +${materialDifference}`}
+                        {gameUi(materialDifference > 0 &&
+                          `${t("White")} +${materialDifference}`)}
 
-                        {materialDifference < 0 &&
-                          `${t("Black")} +${Math.abs(materialDifference)}`}
+                        {gameUi(materialDifference < 0 &&
+                          `${t("Black")} +${Math.abs(materialDifference)}`)}
 
-                        {materialDifference === 0 && t("Equal")}
+                        {gameUi(materialDifference === 0 && t("Equal"))}
                       </span>
                     </div>
 
@@ -1303,7 +1304,7 @@ export default function MirrorChessBoard({
                       />
 
                       <span className="rounded-xl bg-white/5 px-2.5 py-1 text-xs font-semibold text-zinc-400">
-                        {records.length}
+                        {gameUi(records.length)}
                       </span>
                     </div>
 
@@ -1321,7 +1322,7 @@ export default function MirrorChessBoard({
                     />
                   </Panel>
                 </>
-              )}
+              ))}
             </div>
           </aside>
 
@@ -1329,18 +1330,18 @@ export default function MirrorChessBoard({
 
           <section className="min-w-0">
             <div className="mx-auto max-w-[820px]">
-              {phase === "playing" && gameOver && (
+              {gameUi(phase === "playing" && gameOver && (
                 <VisibleGameResult />
-              )}
+              ))}
 
-              {phase === "playing" &&
+              {gameUi(phase === "playing" &&
                 promotionSquare &&
                 promotionFrom &&
                 !historyPreview && (
                   <div className="mb-3 rounded-2xl border border-violet-400/20 bg-zinc-900/90 p-3 shadow-xl">
                     <PromotionBar onPromote={promotePawn} />
                   </div>
-                )}
+                ))}
 
               {phase === "playing" && historyPreview && (
                 <div className="mb-3 flex items-center justify-between gap-4 rounded-xl border border-blue-400/20 bg-blue-400/[0.07] px-4 py-3">
@@ -1350,9 +1351,9 @@ export default function MirrorChessBoard({
                     </p>
 
                     <p className="mt-1 text-sm font-bold text-white">
-                      {historyPreview.moveNumber}
-                      {historyPreview.color === "w" ? "." : "..."}{" "}
-                      {historyPreview.san}
+                      {gameUi(historyPreview.moveNumber)}
+                      {gameUi(historyPreview.color === "w" ? "." : "...")}{gameUi(" ")}
+                      {gameUi(historyPreview.san)}
                     </p>
                   </div>
 
@@ -1403,7 +1404,7 @@ export default function MirrorChessBoard({
 
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              {phase === "setup" ? (
+              {gameUi(phase === "setup" ? (
                 <>
                   <section className="rounded-3xl border border-violet-400/15 bg-zinc-900/80 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
                     <div className="flex items-start justify-between gap-3">
@@ -1412,7 +1413,7 @@ export default function MirrorChessBoard({
                           {t("Random bag")}
                         </h2>
 
-                        <p className="mt-1 text-xs text-zinc-500">{ui("Seed")}{setupState.seed}
+                        <p className="mt-1 text-xs text-zinc-500">{ui("Seed")}{gameUi(setupState.seed)}
                         </p>
                       </div>
 
@@ -1439,7 +1440,7 @@ export default function MirrorChessBoard({
                             `}
                         >
                           <div className="text-lg leading-none">
-                            {setupState.turn === "w" ? whiteSymbols[piece] : blackSymbols[piece]}
+                            {gameUi(setupState.turn === "w" ? whiteSymbols[piece] : blackSymbols[piece])}
                           </div>
                         </div>
                       ))}
@@ -1512,7 +1513,7 @@ export default function MirrorChessBoard({
                     ))}
                   </div>
 
-                  {statsTab === "setup" && (
+                  {gameUi(statsTab === "setup" && (
                     <div className="mt-4 grid grid-cols-2 gap-2">
                       <SetupStat
                         label={t("White placements")}
@@ -1524,9 +1525,9 @@ export default function MirrorChessBoard({
                         value={setupStats.blackPlaced}
                       />
                     </div>
-                  )}
+                  ))}
 
-                  {statsTab === "battle" && (
+                  {gameUi(statsTab === "battle" && (
                     <div className="mt-4 grid grid-cols-2 gap-2">
                       <SetupStat
                         label={t("Captures")}
@@ -1542,9 +1543,9 @@ export default function MirrorChessBoard({
 
                       <SetupStat label={ui("Moves")} value={gameStats.moves} />
                     </div>
-                  )}
+                  ))}
                 </section>
-              )}
+              ))}
             </div>
           </aside>
         </main>
@@ -1588,13 +1589,13 @@ function RuleStrip({
   return (
     <div className="flex items-center gap-3">
       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-400/10 text-lg font-black text-violet-200">
-        {icon}
+        {gameUi(icon)}
       </span>
 
       <div>
         <p className="text-xs font-black text-zinc-200">{ui(title)}</p>
 
-        <p className="mt-1 text-[10px] leading-4 text-zinc-600">{detail}</p>
+        <p className="mt-1 text-[10px] leading-4 text-zinc-600">{gameUi(detail)}</p>
       </div>
     </div>
   );
@@ -1624,9 +1625,9 @@ function MoveHistory({
         content: (
           <>
             <span className="text-base leading-none">
-              {record.color === "w" ? (whiteSymbols[record.piece] ?? "") : (blackSymbols[record.piece] ?? "")}
+              {gameUi(record.color === "w" ? (whiteSymbols[record.piece] ?? "") : (blackSymbols[record.piece] ?? ""))}
             </span>
-            <span className="truncate font-mono text-xs font-bold text-zinc-200">{record.san}</span>
+            <span className="truncate font-mono text-xs font-bold text-zinc-200">{gameUi(record.san)}</span>
           </>
         ),
       }))}
@@ -1639,7 +1640,7 @@ function Panel({ children }: { children: ReactNode }) {
   useUiLanguage();
   return (
     <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
-      {children}
+      {gameUi(children)}
     </section>
   );
 }
@@ -1673,7 +1674,7 @@ function SetupStat({
   useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3">
-      <p className="text-lg font-black text-zinc-100">{value}</p>
+      <p className="text-lg font-black text-zinc-100">{gameUi(value)}</p>
 
       <p className="mt-1 text-[9px] font-black uppercase tracking-wider text-zinc-600">
         {ui(label)}
@@ -1734,7 +1735,7 @@ function CapturedPiecesGrid({
   function renderPieces(pieces: PieceType[], color: "w" | "b") {
     return (
       <div className="mt-2 flex min-h-8 flex-wrap gap-1">
-        {pieces.length === 0 ? (
+        {gameUi(pieces.length === 0 ? (
           <span className="text-xs text-zinc-700">—</span>
         ) : (
           pieces.map((piece, index) => (
@@ -1742,10 +1743,10 @@ function CapturedPiecesGrid({
               key={`${color}-${piece}-${index}`}
               className="flex h-7 w-7 items-center justify-center text-2xl leading-none"
             >
-              {color === "w" ? whiteSymbols[piece] : blackSymbols[piece]}
+              {gameUi(color === "w" ? whiteSymbols[piece] : blackSymbols[piece])}
             </span>
           ))
-        )}
+        ))}
       </div>
     );
   }
@@ -1757,7 +1758,7 @@ function CapturedPiecesGrid({
           {t("Black")}
         </p>
 
-        {renderPieces(capturedBlack, "b")}
+        {gameUi(renderPieces(capturedBlack, "b"))}
       </div>
 
       <div className="mt-3 border-t border-white/5 pt-3">
@@ -1765,7 +1766,7 @@ function CapturedPiecesGrid({
           {t("White")}
         </p>
 
-        {renderPieces(capturedWhite, "w")}
+        {gameUi(renderPieces(capturedWhite, "w"))}
       </div>
     </div>
   );

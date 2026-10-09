@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { memo, Suspense, useEffect, useMemo, useRef, useState, type ComponentRef, type MutableRefObject } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Lightformer, Line, OrbitControls, PerformanceMonitor, Sparkles } from "@react-three/drei";
@@ -137,6 +138,7 @@ function BoardFurniture({ width, height, theme }: { width: number; height: numbe
 }
 
 function Atmosphere({ size, theme, sparkles }: { size: number; theme: Board3DTheme; sparkles: boolean }) {
+  useGameLanguage();
   return (
     <>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.18, 0]} receiveShadow>
@@ -196,6 +198,7 @@ const RING = new THREE.RingGeometry(0.4, 0.5, 48);
 const BEAM = new THREE.CylinderGeometry(0.34, 0.42, 2.2, 24, 1, true);
 
 function EffectBurst({ effect, width, height, onDone }: { effect: Board3DEffect; width: number; height: number; onDone: (id: number) => void }) {
+  useGameLanguage();
   const style = EFFECT_STYLE[effect.kind];
   const ringRef = useRef<THREE.Mesh>(null);
   const beamRef = useRef<THREE.Mesh>(null);
@@ -220,17 +223,18 @@ function EffectBurst({ effect, width, height, onDone }: { effect: Board3DEffect;
       <mesh ref={ringRef} geometry={RING} rotation={[-Math.PI / 2, 0, 0]}>
         <meshBasicMaterial ref={ringMaterialRef} {...glow} opacity={0.9} />
       </mesh>
-      {style.beam && (
+      {gameUi(style.beam && (
         <mesh ref={beamRef} geometry={BEAM} position={[0, 1.1, 0]}>
           <meshBasicMaterial ref={beamMaterialRef} {...glow} opacity={0} />
         </mesh>
-      )}
+      ))}
       {effect.kind === "royalCapture" && <pointLight color="#fbbf24" intensity={4} distance={4} position={[0, 0.8, 0]} />}
     </group>
   );
 }
 
 function EffectLayer({ effects, width, height }: { effects: Board3DEffect[]; width: number; height: number }) {
+  useGameLanguage();
   const [done, setDone] = useState<Set<number>>(() => new Set());
   const active = effects.filter((effect) => !done.has(effect.id));
   // Portal effects also flash at the exit square.
@@ -361,6 +365,7 @@ function MaterialAnimator({ reducedMotion }: { reducedMotion: boolean }) {
 /* -------------------------------------------------------------- Scene */
 
 function Scene(props: SceneProps & { controlsRef: MutableRefObject<OrbitControlsImpl | null> }) {
+  useGameLanguage();
   const { width, height, cells, layers = [], layerSpacing = 2.8, visibleLayers, focusLayer, pieces, marks, selectedPieceId, theme, skin, cameraView, cameraCommand, cameraShake, autoOrbit, enablePan, reducedMotion = false, quality = "high", effects = [], trail, trailJump, atmosphere = true, cameraScale = 1, onCellClick, controlsRef } = props;
   const interactingRef = useRef(false);
   const maxZ = Math.max(0, ...layers.map((layer) => layer.z));

@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
@@ -2086,7 +2087,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                   CHESS COACH — LEFT SIDEBAR TOP
                  =========================================== */}
 
-              {!onlineGameId && (
+              {gameUi(!onlineGameId && (
                 <button
                   type="button"
                   onClick={toggleCoachMode}
@@ -2143,7 +2144,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                       </p>
 
                       <p className="mt-0.5 text-xs text-zinc-500">
-                        {coachModeEnabled ? t("Live analysis enabled") : t("Enable Stockfish feedback")}
+                        {gameUi(coachModeEnabled ? t("Live analysis enabled") : t("Enable Stockfish feedback"))}
                       </p>
                     </div>
                   </div>
@@ -2183,7 +2184,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                     />
                   </div>
                 </button>
-              )}
+              ))}
 
               {/* ===========================================
                   CHESS COACH
@@ -2263,53 +2264,53 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                             text-zinc-500
                           "
                           >
-                            {t("Last move")} ·{" "}
-                            {moveFeedback.color === "w" ? t("White") : t("Black")}
+                            {t("Last move")} ·{gameUi(" ")}
+                            {gameUi(moveFeedback.color === "w" ? t("White") : t("Black"))}
                           </p>
 
                           <div className="mt-2 flex items-center justify-between gap-3">
                             <span className="font-mono text-lg font-black text-white">
-                              {moveFeedback.san}
+                              {gameUi(moveFeedback.san)}
                             </span>
 
                             <QualityBadge quality={moveFeedback.quality} />
                           </div>
 
-                          {moveFeedback.quality !== "Best" && moveFeedback.quality !== "Book" && (
+                          {gameUi(moveFeedback.quality !== "Best" && moveFeedback.quality !== "Book" && (
                             <p className="mt-2 text-xs text-zinc-500">
-                              {t("Evaluation loss")}:{" "}
+                              {t("Evaluation loss")}:{gameUi(" ")}
                               <span className="font-semibold text-zinc-300">
-                                {(moveFeedback.centipawnLoss / 100).toFixed(2)}{" "}
+                                {gameUi((moveFeedback.centipawnLoss / 100).toFixed(2))}{gameUi(" ")}
                                 {t("pawns")}
                               </span>
                             </p>
-                          )}
+                          ))}
 
-                          {moveFeedback.bestMoveSan &&
+                          {gameUi(moveFeedback.bestMoveSan &&
                             moveFeedback.quality !== "Best" && moveFeedback.quality !== "Book" && (
                               <p className="mt-1 text-xs text-zinc-500">
-                                {t("Engine preferred")}:{" "}
+                                {t("Engine preferred")}:{gameUi(" ")}
                                 <span className="font-mono font-bold text-amber-300">
-                                  {moveFeedback.bestMoveSan}
+                                  {gameUi(moveFeedback.bestMoveSan)}
                                 </span>
                               </p>
-                            )}
+                            ))}
                         </div>
                       )}
 
                       {/* ANALYZING */}
 
-                      {coachBackfill.progress ? (
+                      {gameUi(coachBackfill.progress ? (
                         <div className="mt-3 flex items-center gap-2 text-xs text-zinc-500">
                           <span className="h-2 w-2 animate-pulse rounded-full bg-amber-400" />
-                          {ui("Grading earlier moves...")} {coachBackfill.progress.done}/{coachBackfill.progress.total}
+                          {ui("Grading earlier moves...")} {gameUi(coachBackfill.progress.done)}/{gameUi(coachBackfill.progress.total)}
                         </div>
                       ) : analyzing && !helpVisible && (
                         <div className="mt-3 flex items-center gap-2 text-xs text-zinc-500">
                           <span className="h-2 w-2 animate-pulse rounded-full bg-amber-400" />
                           {t("Analyzing last move...")}
                         </div>
-                      )}
+                      ))}
 
                       {/* HELP BUTTON */}
 
@@ -2347,7 +2348,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                         disabled:opacity-40
                       `}
                       >
-                        {analyzing && helpVisible ? ui("Analyzing...") : helpVisible ? ui("Hide Help") : ui("Help · Next Best Moves")}
+                        {gameUi(analyzing && helpVisible ? ui("Analyzing...") : helpVisible ? ui("Hide Help") : ui("Help · Next Best Moves"))}
                       </button>
 
                       <AutoBestMoveToggle enabled={autoBestMove.enabled} onToggle={autoBestMove.toggle} />
@@ -2368,7 +2369,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                               text-zinc-500
                             "
                             >
-                              {analyzing ? t("Stockfish is analyzing...") : t("No analysis available.")}
+                              {gameUi(analyzing ? t("Stockfish is analyzing...") : t("No analysis available."))}
                             </div>
                           ) : (
                             suggestions.map((suggestion, index) => {
@@ -2429,22 +2430,22 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
               }
             `}
                                     >
-                                      {index + 1}
+                                      {gameUi(index + 1)}
                                     </span>
 
                                     <div>
                                       <p className="font-mono text-sm font-bold text-zinc-200">
-                                        {suggestion.san}
+                                        {gameUi(suggestion.san)}
                                       </p>
 
                                       <p className="text-[10px] text-zinc-600">
-                                        {selected ? ui("Click the marked square to play it") : t("Click to show")}
+                                        {gameUi(selected ? ui("Click the marked square to play it") : t("Click to show"))}
                                       </p>
                                     </div>
                                   </div>
 
                                   <span className="text-xs font-semibold text-zinc-400">
-                                    {suggestion.evaluation}
+                                    {gameUi(suggestion.evaluation)}
                                   </span>
                                 </button>
                               );
@@ -2475,18 +2476,18 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="rounded-lg border border-amber-300/10 bg-amber-300/[0.06] px-2 py-1 text-xs font-bold text-amber-200">
-                      {savedGames.length}
+                      {gameUi(savedGames.length)}
                     </span>
                     <span className="rounded-lg border border-amber-400/20 bg-amber-400/10 px-3 py-1.5 text-xs font-black text-amber-300">
-                      {savedGamesOpen ? ui("Hide") : ui("Show")}
+                      {gameUi(savedGamesOpen ? ui("Hide") : ui("Show"))}
                     </span>
                   </div>
                 </button>
 
-                {savedGamesOpen && (
+                {gameUi(savedGamesOpen && (
                   <div className="border-t border-white/5">
                     <div className="max-h-80 space-y-1 overflow-y-auto p-2 [scrollbar-width:thin]">
-                      {savedGames.length === 0 ? (
+                      {gameUi(savedGames.length === 0 ? (
                         <div className="py-6 text-center">
                           <div className="mb-2 text-2xl text-zinc-700">♟</div>
                           <p className="text-xs text-zinc-500">
@@ -2501,12 +2502,12 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                           >
                             <div className="min-w-0 flex-1">
                               <p className="truncate text-xs font-semibold text-zinc-200">
-                                {savedGame.name || t("Unnamed Game")}
+                                {gameUi(savedGame.name || t("Unnamed Game"))}
                               </p>
                               <p className="mt-1 truncate text-[10px] text-zinc-600">
-                                {savedGame.white_player || t("White")}{" "}
-                                <span className="px-1 text-zinc-700">{ui("vs")}</span>{" "}
-                                {savedGame.black_player || t("Black")}
+                                {gameUi(savedGame.white_player || t("White"))}{gameUi(" ")}
+                                <span className="px-1 text-zinc-700">{ui("vs")}</span>{gameUi(" ")}
+                                {gameUi(savedGame.black_player || t("Black"))}
                               </p>
                             </div>
                             <div className="flex shrink-0 gap-1">
@@ -2527,10 +2528,10 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                             </div>
                           </div>
                         ))
-                      )}
+                      ))}
                     </div>
                   </div>
-                )}
+                ))}
               </section>
 
               {/* CAPTURED PIECES */}
@@ -2564,13 +2565,13 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                       }
                     `}
                   >
-                    {materialDifference > 0 &&
-                      `${t("White")} +${materialDifference}`}
+                    {gameUi(materialDifference > 0 &&
+                      `${t("White")} +${materialDifference}`)}
 
-                    {materialDifference < 0 &&
-                      `${t("Black")} +${Math.abs(materialDifference)}`}
+                    {gameUi(materialDifference < 0 &&
+                      `${t("Black")} +${Math.abs(materialDifference)}`)}
 
-                    {materialDifference === 0 && t("Equal")}
+                    {gameUi(materialDifference === 0 && t("Equal"))}
                   </span>
                 </div>
 
@@ -2602,7 +2603,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                     </p>
                   </div>
                   <span className="rounded-lg border border-white/5 bg-white/5 px-2.5 py-1 text-xs font-bold text-zinc-400">
-                    {moveHistory.length}
+                    {gameUi(moveHistory.length)}
                   </span>
                 </div>
                 <ChessMoveHistoryList
@@ -2619,10 +2620,10 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                       content: (
                         <>
                           <span className="text-base leading-none">
-                            {getHistoryPieceSymbol(move.color, move.piece)}
+                            {gameUi(getHistoryPieceSymbol(move.color, move.piece))}
                           </span>
                           <span className="truncate font-mono text-xs font-bold text-zinc-200">
-                            {move.san}
+                            {gameUi(move.san)}
                           </span>
                         </>
                       ),
@@ -2650,7 +2651,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
             <div className="mx-auto w-full max-w-[820px] xl:flex xl:max-w-none xl:flex-col">
               {/* GAME OVER STATUS */}
 
-              {gameOver && (
+              {gameUi(gameOver && (
                 <div
                   className="
                     mb-3
@@ -2669,12 +2670,12 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                       </p>
 
                       <p className="mt-1 font-black text-white">
-                        {gameOverReason}
+                        {gameUi(gameOverReason)}
                       </p>
                     </div>
 
                     <span className="text-sm font-bold text-zinc-300">
-                      {winner === "draw" ? t("Draw") : winner === "white" ? t("White wins") : t("Black wins")}
+                      {gameUi(winner === "draw" ? t("Draw") : winner === "white" ? t("White wins") : t("Black wins"))}
                     </span>
                     <button
                       type="button"
@@ -2697,11 +2698,11 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                     </button>
                   </div>
                 </div>
-              )}
+              ))}
 
               {/* PROMOTION */}
 
-              {promotionSquare && promotionFrom && (
+              {gameUi(promotionSquare && promotionFrom && (
                 <div
                   className="
                       mb-3
@@ -2715,7 +2716,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                 >
                   <PromotionBar onPromote={promotePawn} />
                 </div>
-              )}
+              ))}
 
               {/* HISTORY PREVIEW STATUS */}
 
@@ -2740,9 +2741,9 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                       {t("History Preview")}
                     </p>
 
-                    <p className="mt-1 text-sm font-bold text-white">{ui("Move")}{historyPreview.moveNumber}
-                      {historyPreview.color === "w" ? "." : "..."}{" "}
-                      {historyPreview.san}
+                    <p className="mt-1 text-sm font-bold text-white">{ui("Move")}{gameUi(historyPreview.moveNumber)}
+                      {gameUi(historyPreview.color === "w" ? "." : "...")}{gameUi(" ")}
+                      {gameUi(historyPreview.san)}
                     </p>
                   </div>
 
@@ -2825,7 +2826,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
               {/* ANALYSIS BLOCKING MESSAGE */}
 
-              {analyzing && coachAllowed && !coachBackfill.running && (
+              {gameUi(analyzing && coachAllowed && !coachBackfill.running && (
                 <div
                   className="
                       mt-3
@@ -2854,7 +2855,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                   />
                   {t("Stockfish is analyzing...")}
                 </div>
-              )}
+              ))}
 
               {/* MOBILE MATERIAL */}
 
@@ -2876,13 +2877,13 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                 <span className="text-sm text-zinc-500">{t("Material")}</span>
 
                 <span className="text-sm font-bold text-zinc-200">
-                  {materialDifference > 0 &&
-                    `${t("White")} +${materialDifference}`}
+                  {gameUi(materialDifference > 0 &&
+                    `${t("White")} +${materialDifference}`)}
 
-                  {materialDifference < 0 &&
-                    `${t("Black")} +${Math.abs(materialDifference)}`}
+                  {gameUi(materialDifference < 0 &&
+                    `${t("Black")} +${Math.abs(materialDifference)}`)}
 
-                  {materialDifference === 0 && t("Equal")}
+                  {gameUi(materialDifference === 0 && t("Equal"))}
                 </span>
               </div>
             </div>
@@ -2897,7 +2898,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
               {/* WAITING PLAYER MINI BOARD */}
               <section className="relative aspect-square w-full shrink-0 overflow-hidden rounded-3xl border border-amber-400/20 bg-[#07101a] shadow-2xl shadow-black/40">
                 <div className="pointer-events-none absolute left-2 top-2 z-20 rounded-lg border border-amber-300/15 bg-black/65 px-2 py-1 backdrop-blur-md">
-                  <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-amber-100/90">{ui("Waiting player")} · {boardOrientation === "white" ? t("Black") : t("White")}</p>
+                  <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-amber-100/90">{ui("Waiting player")} · {gameUi(boardOrientation === "white" ? t("Black") : t("White"))}</p>
                 </div>
 
                 <div className="pointer-events-none h-full w-full">
@@ -2941,26 +2942,26 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
                           <div className="min-w-0 flex-1">
                             <p className="truncate font-serif text-lg font-semibold text-[#f7ead0]">
-                              {isWhite ? whitePlayer || t("White") : blackPlayer || t("Black")}
+                              {gameUi(isWhite ? whitePlayer || t("White") : blackPlayer || t("Black"))}
                             </p>
                             <p className="mt-0.5 text-xs text-zinc-500">
-                              {isWhite ? t("White") : t("Black")}
+                              {gameUi(isWhite ? t("White") : t("Black"))}
                             </p>
                           </div>
 
-                          {active && (
+                          {gameUi(active && (
                             <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-amber-400 shadow-[0_0_14px_rgba(251,191,36,.65)]" />
-                          )}
+                          ))}
                         </div>
                       </section>
 
-                      {index === 0 && (
+                      {gameUi(index === 0 && (
                         <div className="flex items-center gap-2 px-2">
                           <span className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-white/20" />
                           <span className="rounded-full border border-amber-400/15 bg-amber-400/[0.06] px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-amber-200/75">{ui("VS")}</span>
                           <span className="h-px flex-1 bg-gradient-to-l from-transparent via-white/10 to-white/20" />
                         </div>
-                      )}
+                      ))}
                     </div>
                   );
                 })}
@@ -3184,10 +3185,11 @@ function CapturedPiecesGrid({
     color: "white" | "black";
     pieces: PieceType[];
   }) {
+  useGameLanguage();
     return (
       <div className="grid grid-cols-[52px_minmax(0,1fr)] items-start gap-2">
         <div className="pt-2 text-[10px] font-black uppercase tracking-wider text-zinc-600">
-          {color === "white" ? t("White") : t("Black")}
+          {gameUi(color === "white" ? t("White") : t("Black"))}
         </div>
 
         <div
@@ -3204,7 +3206,7 @@ function CapturedPiecesGrid({
             p-1.5
           "
         >
-          {pieces.length === 0 ? (
+          {gameUi(pieces.length === 0 ? (
             <span className="px-1 py-1 text-xs text-zinc-700">—</span>
           ) : (
             pieces.map((piece, index) => (
@@ -3225,10 +3227,10 @@ function CapturedPiecesGrid({
                   leading-none
                 "
               >
-                {symbols[color][piece]}
+                {gameUi(symbols[color][piece])}
               </span>
             ))
-          )}
+          ))}
         </div>
       </div>
     );

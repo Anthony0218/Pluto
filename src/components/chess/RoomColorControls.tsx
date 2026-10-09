@@ -1,3 +1,4 @@
+import { gameUi } from "../../i18n/gameUi.ts";
 import { ui, useUiLanguage } from "@/i18n/ui";
 
 // Shared by the classic chess room and the two-player variant rooms.
@@ -54,11 +55,11 @@ export function ColorChoice({
             >
               ✓
             </span>
-            <span className={`text-2xl leading-none ${selected ? "text-amber-200" : "text-zinc-300"}`} aria-hidden="true">{option.symbol}</span>
+            <span className={`text-2xl leading-none ${selected ? "text-amber-200" : "text-zinc-300"}`} aria-hidden="true">{gameUi(option.symbol)}</span>
             <span className="min-w-0">
               <span className={`block text-sm font-black ${selected ? "text-amber-100" : "text-zinc-200"}`}>{ui(option.label)}</span>
               <span className="block truncate text-[11px] text-zinc-500">
-                {selected ? ui("Your color") : taken ? `${ui("Taken by")} ${opponentName ?? ui("Opponent")}` : ui("Free")}
+                {gameUi(selected ? ui("Your color") : taken ? `${ui("Taken by")} ${opponentName ?? ui("Opponent")}` : ui("Free"))}
               </span>
             </span>
           </label>
@@ -99,13 +100,13 @@ export function ReadyButton({
             aria-hidden="true"
             className={`h-2.5 w-2.5 rounded-full ${ready ? "bg-emerald-400 shadow-[0_0_10px_rgba(74,222,128,.55)]" : "bg-zinc-600"}`}
           />
-          {ready ? ui("Ready") : ui("I'm ready")}
+          {gameUi(ready ? ui("Ready") : ui("I'm ready"))}
         </span>
-        <span className="text-[11px] font-bold text-zinc-500">{ready ? ui("Click to cancel") : ""}</span>
+        <span className="text-[11px] font-bold text-zinc-500">{gameUi(ready ? ui("Click to cancel") : "")}</span>
       </button>
-      {!hasColor && !ready && (
+      {gameUi(!hasColor && !ready && (
         <p className="mt-2 text-xs text-zinc-500">{ui("Pick a color to get ready.")}</p>
-      )}
+      ))}
     </div>
   );
 }

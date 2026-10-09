@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
 import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
@@ -37,7 +38,7 @@ function ChessPageShell({ children }: { children: React.ReactNode }) {
           </Link>
         </ChessPageHeader>
 
-        {children}
+        {gameUi(children)}
       </div>
     </main>
   );
@@ -77,7 +78,7 @@ function ActionCard({
               : "border-white/10 bg-white/[0.035] text-zinc-400"
           }`}
         >
-          {icon}
+          {gameUi(icon)}
         </div>
 
         <p
@@ -96,7 +97,7 @@ function ActionCard({
           {ui(description)}
         </p>
 
-        {children}
+        {gameUi(children)}
       </div>
     </section>
   );
@@ -283,11 +284,11 @@ export function FriendRoomPanel({ embedded = false }: { embedded?: boolean }) {
         </div>
       </div>
 
-      {error && (
+      {gameUi(error && (
         <div className="rounded-xl border border-red-400/20 bg-red-400/[0.05] px-4 py-3 text-sm text-red-200">
           {ui(error)}
         </div>
-      )}
+      ))}
     </div>
   );
 }

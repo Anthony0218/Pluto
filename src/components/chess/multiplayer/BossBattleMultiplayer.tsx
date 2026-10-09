@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
 import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
@@ -285,7 +286,7 @@ function Panel({
   return (
     <section className="rounded-3xl border border-white/5 bg-zinc-900/80 p-4 shadow-xl shadow-black/20">
       <h2 className="font-black text-zinc-100">{ui(title)}</h2>
-      <div className="mt-4">{children}</div>
+      <div className="mt-4">{gameUi(children)}</div>
     </section>
   );
 }
@@ -303,8 +304,8 @@ function StatusCard({
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 p-3">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-lg">{icon}</span>
-        <span className="font-black text-violet-200">{value}</span>
+        <span className="text-lg">{gameUi(icon)}</span>
+        <span className="font-black text-violet-200">{gameUi(value)}</span>
       </div>
       <p className="mt-1 text-[10px] text-zinc-600">{ui(label)}</p>
     </div>
@@ -405,11 +406,11 @@ export function BossBattleMultiplayerLobby() {
             className="mt-2 w-full rounded-xl border border-white/10 bg-black/25 px-4 py-3 outline-none focus:border-violet-400/40"
           />
 
-          {error && (
+          {gameUi(error && (
             <div className="mt-4 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200">
               {ui(error)}
             </div>
-          )}
+          ))}
 
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <section className="rounded-2xl border border-white/5 bg-black/20 p-4">
@@ -423,7 +424,7 @@ export function BossBattleMultiplayerLobby() {
                 disabled={busy !== null}
                 className="mt-4 w-full rounded-xl bg-violet-400 px-4 py-3 font-black text-violet-950 disabled:opacity-50"
               >
-                {busy === "create" ? ui("Creating...") : ui("Create Boss Battle room")}
+                {gameUi(busy === "create" ? ui("Creating...") : ui("Create Boss Battle room"))}
               </button>
             </section>
 
@@ -446,7 +447,7 @@ export function BossBattleMultiplayerLobby() {
                 disabled={busy !== null || !joinCode.trim()}
                 className="mt-4 w-full rounded-xl border border-violet-300/20 bg-violet-400/10 px-4 py-3 font-black text-violet-200 disabled:opacity-50"
               >
-                {busy === "join" ? ui("Joining...") : ui("Join room")}
+                {gameUi(busy === "join" ? ui("Joining...") : ui("Join room"))}
               </button>
             </section>
           </div>
@@ -1326,15 +1327,15 @@ export function BossBattleMultiplayerGame() {
 
 
           <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-2 text-sm">
-            {gameState.status === "waiting" ? ui("Waiting for opponent…") : gameState.status === "finished" ? ui("Game finished") : canMove ? ui("Your turn") : ui("Opponent's turn")}
+            {gameUi(gameState.status === "waiting" ? ui("Waiting for opponent…") : gameState.status === "finished" ? ui("Game finished") : canMove ? ui("Your turn") : ui("Opponent's turn"))}
           </div>
         </ChessPageHeader>
 
-        {error && (
+        {gameUi(error && (
           <div className="mb-4 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200">
             {ui(error)}
           </div>
-        )}
+        ))}
 
         <div className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="space-y-4">
@@ -1342,19 +1343,19 @@ export function BossBattleMultiplayerGame() {
               <div className="space-y-2 text-sm">
                 <div className="rounded-xl bg-white/5 p-3">
                   <p className="font-black">
-                    {me.display_name} ·{" "}
-                    {myColor === "black" ? ui("Boss") : ui("White Army")}
+                    {me.display_name} ·{gameUi(" ")}
+                    {gameUi(myColor === "black" ? ui("Boss") : ui("White Army"))}
                   </p>
                   <p className="text-xs text-zinc-500">{ui("You")}</p>
                 </div>
 
                 <div className="rounded-xl bg-white/5 p-3">
                   <p className="font-black">
-                    {opponent ? `${opponent.display_name} · ${
+                    {gameUi(opponent ? `${opponent.display_name} · ${
                           opponent.chosen_color === "black"
                             ? "Boss"
                             : "White Army"
-                        }` : ui("Waiting…")}
+                        }` : ui("Waiting…"))}
                   </p>
                   <p className="text-xs text-zinc-500">{ui("Opponent")}</p>
                 </div>
@@ -1400,7 +1401,7 @@ export function BossBattleMultiplayerGame() {
                   ply: entry.ply,
                   side: entry.color,
                   moveNumber: entry.moveNumber,
-                  content: <span className="truncate font-mono text-xs font-bold text-zinc-200">{entry.san}</span>,
+                  content: <span className="truncate font-mono text-xs font-bold text-zinc-200">{gameUi(entry.san)}</span>,
                   trailing: entry.bossDamaged ? <span className="text-red-300">♥−1</span> : null,
                 }))}
                 onSelect={(ply) => {
@@ -1414,11 +1415,11 @@ export function BossBattleMultiplayerGame() {
           </aside>
 
           <section className="mx-auto w-full max-w-[820px] min-w-0">
-            {historyPreviewPly !== null && (
+            {gameUi(historyPreviewPly !== null && (
               <div className="mb-3 flex items-center justify-between rounded-xl border border-violet-400/20 bg-violet-400/[0.07] px-4 py-3">
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-wider text-violet-300">{ui("History Preview")}</p>
-                  <p className="text-sm text-zinc-400">{ui("Position after action")}{historyPreviewPly}
+                  <p className="text-sm text-zinc-400">{ui("Position after action")}{gameUi(historyPreviewPly)}
                   </p>
                 </div>
 
@@ -1428,14 +1429,14 @@ export function BossBattleMultiplayerGame() {
                   className="rounded-lg bg-white/10 px-3 py-2 text-xs font-black"
                 >{ui("Back to live board")}</button>
               </div>
-            )}
+            ))}
 
-            {bossTargetMode && historyPreviewPly === null && mySide === "b" && (
+            {gameUi(bossTargetMode && historyPreviewPly === null && mySide === "b" && (
               <div className="mb-3 flex items-center justify-between rounded-xl border border-violet-400/20 bg-violet-400/[0.07] px-4 py-3">
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-wider text-violet-300">{ui("Boss Power Targeting")}</p>
                   <p className="text-sm text-zinc-400">
-                    {bossTargetMode === "summon" ? ui("Choose an empty square on rank 6 or 7.") : ui("Choose a safe Dark Step destination.")}
+                    {gameUi(bossTargetMode === "summon" ? ui("Choose an empty square on rank 6 or 7.") : ui("Choose a safe Dark Step destination."))}
                   </p>
                 </div>
 
@@ -1445,9 +1446,9 @@ export function BossBattleMultiplayerGame() {
                   className="rounded-lg bg-white/10 px-3 py-2 text-xs font-black"
                 >{ui("Cancel")}</button>
               </div>
-            )}
+            ))}
 
-            {pendingPromotion && historyPreviewPly === null && (
+            {gameUi(pendingPromotion && historyPreviewPly === null && (
               <div className="relative mb-3">
                 <PromotionBar
                   onPromote={(piece) =>
@@ -1459,9 +1460,9 @@ export function BossBattleMultiplayerGame() {
                   }
                 />
               </div>
-            )}
+            ))}
 
-            {finishedGame && historyPreviewPly === null && (
+            {gameUi(finishedGame && historyPreviewPly === null && (
               <VisibleGameResult
                 winner={finishedGame.winner}
                 playerColor={myColor}
@@ -1473,11 +1474,11 @@ export function BossBattleMultiplayerGame() {
                     disabled={myRematchReady || Boolean(actionBusy)}
                     className="mt-5 w-full rounded-xl bg-violet-400 px-4 py-3 font-black text-violet-950 disabled:opacity-50"
                   >
-                    {myRematchReady ? ui("Waiting for opponent…") : ui("Play again")}
+                    {gameUi(myRematchReady ? ui("Waiting for opponent…") : ui("Play again"))}
                   </button>
                 }
               />
-            )}
+            ))}
 
             <div className="relative">
               <Board
@@ -1518,7 +1519,7 @@ export function BossBattleMultiplayerGame() {
                     <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">{ui("Waiting for players")}</p>
 
                     <h2 className="mt-2 text-2xl font-black text-white">
-                      {players.length}{ui("/2 players connected")}</h2>
+                      {gameUi(players.length)}{ui("/2 players connected")}</h2>
 
                     <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">{ui("Share this room code. The game starts automatically when everyone has joined.")}</p>
 
@@ -1531,7 +1532,7 @@ export function BossBattleMultiplayerGame() {
                     </div>
 
                     <p className="mt-4 text-xs font-bold text-zinc-400">
-                      {codeCopied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
+                      {gameUi(codeCopied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code"))}
                     </p>
                   </button>
                     <InviteFriendButton overlay />
@@ -1548,11 +1549,11 @@ export function BossBattleMultiplayerGame() {
                 <p className="text-[10px] font-black uppercase tracking-wider text-zinc-500">{ui("Boss HP")}</p>
 
                 <p className="mt-2 text-2xl font-black tracking-widest text-red-300">
-                  {bossHearts(displayedBossState.hp)}
+                  {gameUi(bossHearts(displayedBossState.hp))}
                 </p>
 
                 <p className="mt-1 text-xs text-zinc-500">
-                  {displayedBossState.hp}/{BOSS_MAX_HP}
+                  {gameUi(displayedBossState.hp)}/{gameUi(BOSS_MAX_HP)}
                 </p>
               </div>
 
@@ -1588,16 +1589,16 @@ export function BossBattleMultiplayerGame() {
             </Panel>
 
             <Panel title={ui("Boss Powers")}>
-              {!isBossPlayer && (
+              {gameUi(!isBossPlayer && (
                 <p className="mb-3 text-xs text-zinc-600">{ui("Only the Black Boss player can activate powers.")}</p>
-              )}
+              ))}
 
-              {isBossPlayer &&
+              {gameUi(isBossPlayer &&
                 liveGame.turn() === "b" &&
                 liveGame.isCheck() &&
                 gameState.status === "playing" && (
                   <div className="mb-3 rounded-xl border border-red-400/15 bg-red-400/[0.06] p-3 text-xs text-red-300">{ui("The Boss is in check. Powers are locked until the check is answered normally.")}</div>
-                )}
+                ))}
 
               <div className="space-y-2">
                 {(["shockwave", "summon", "dark_step"] as BossPowerId[]).map(
@@ -1621,19 +1622,19 @@ export function BossBattleMultiplayerGame() {
                       >
                         <div>
                           <p className="font-black">
-                            {bossPowerIcon(power)} {bossPowerLabel(power)}
+                            {gameUi(bossPowerIcon(power))} {gameUi(bossPowerLabel(power))}
                           </p>
                           <p className="mt-1 text-[10px] text-zinc-600">
-                            {power === "shockwave" ? ui("Push adjacent White pieces away") : power === "summon" ? ui("Create a Black pawn") : ui("Relocate the Boss safely")}
+                            {gameUi(power === "shockwave" ? ui("Push adjacent White pieces away") : power === "summon" ? ui("Create a Black pawn") : ui("Relocate the Boss safely"))}
                           </p>
                         </div>
 
                         <div className="text-right">
                           <p className="text-xs font-black text-violet-200">
-                            {cooldown > 0 ? `CD ${cooldown}` : ui("READY")}
+                            {gameUi(cooldown > 0 ? `CD ${cooldown}` : ui("READY"))}
                           </p>
-                          <p className="mt-1 text-[9px] text-zinc-700">{ui("next CD")}{" "}
-                            {getBossPowerCooldown(power, displayedBossState)}
+                          <p className="mt-1 text-[9px] text-zinc-700">{ui("next CD")}{gameUi(" ")}
+                            {gameUi(getBossPowerCooldown(power, displayedBossState))}
                           </p>
                         </div>
                       </button>

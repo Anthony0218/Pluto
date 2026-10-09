@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
@@ -1240,27 +1241,27 @@ export default function DraftChessBoard({
               {t("39-point budget")}
             </div>
 
-            {phase === "playing" && !gameOver && (
+            {gameUi(phase === "playing" && !gameOver && (
               <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-300">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
 
-                {game.turn() === "w" ? t("White to move") : t("Black to move")}
+                {gameUi(game.turn() === "w" ? t("White to move") : t("Black to move"))}
               </div>
-            )}
+            ))}
           </div>
         </ChessPageHeader>
 
-        {phase === "setup" && (
+        {gameUi(phase === "setup" && (
           <section className="mb-6 rounded-3xl border border-emerald-400/10 bg-emerald-400/[0.03] px-5 py-4">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div>
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-300">
-                  {t("Private setup")} ·{" "}
-                  {setupSide === "w" ? t("White") : t("Black")}
+                  {t("Private setup")} ·{gameUi(" ")}
+                  {gameUi(setupSide === "w" ? t("White") : t("Black"))}
                 </p>
 
                 <p className="mt-1 text-sm text-zinc-400">
-                  {setupSide === "w" ? t("White may use ranks 1–2. King must be on rank 1.") : t("Black may use ranks 7–8. King must be on rank 8.")}
+                  {gameUi(setupSide === "w" ? t("White may use ranks 1–2. King must be on rank 1.") : t("Black may use ranks 7–8. King must be on rank 8."))}
                 </p>
               </div>
 
@@ -1271,14 +1272,14 @@ export default function DraftChessBoard({
               </div>
             </div>
           </section>
-        )}
+        ))}
 
         <main className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           {/* LEFT */}
 
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              {phase === "setup" ? (
+              {gameUi(phase === "setup" ? (
                 <>
                   <Panel>
                     <PanelTitle
@@ -1325,24 +1326,24 @@ export default function DraftChessBoard({
                       </button>
                     </div>
 
-                    {setupError && (
+                    {gameUi(setupError && (
                       <p className="mt-3 rounded-xl border border-red-400/15 bg-red-400/[0.06] px-3 py-2 text-xs font-bold text-red-200">
-                        {setupError}
+                        {gameUi(setupError)}
                       </p>
-                    )}
+                    ))}
                   </Panel>
 
                   <Panel>
                     <PanelTitle
                       title={t("Setup Zone")}
                       subtitle={
-                        setupSide === "w"
+                        gameUi(setupSide === "w"
                           ? t(
                               "White may use ranks 1–2. King must be on rank 1.",
                             )
                           : t(
                               "Black may use ranks 7–8. King must be on rank 8.",
-                            )
+                            ))
                       }
                       compact
                     />
@@ -1366,7 +1367,7 @@ export default function DraftChessBoard({
                 </>
               ) : (
                 <>
-                  {autoRandomFallbackUsed && (
+                  {gameUi(autoRandomFallbackUsed && (
                     <Panel>
                       <div className="rounded-2xl border border-amber-400/20 bg-amber-400/[0.07] px-3 py-3">
                         <p className="text-[10px] font-black uppercase tracking-wider text-amber-300">{ui("⚠ Start position corrected")}</p>
@@ -1377,7 +1378,7 @@ export default function DraftChessBoard({
                         </p>
                       </div>
                     </Panel>
-                  )}
+                  ))}
 
                   <Panel>
                     <PanelTitle
@@ -1402,13 +1403,13 @@ export default function DraftChessBoard({
                       />
 
                       <span className="rounded-xl bg-white/5 px-2.5 py-1 text-xs font-bold text-zinc-400">
-                        {materialDifference > 0 &&
-                          `${t("White")} +${materialDifference}`}
+                        {gameUi(materialDifference > 0 &&
+                          `${t("White")} +${materialDifference}`)}
 
-                        {materialDifference < 0 &&
-                          `${t("Black")} +${Math.abs(materialDifference)}`}
+                        {gameUi(materialDifference < 0 &&
+                          `${t("Black")} +${Math.abs(materialDifference)}`)}
 
-                        {materialDifference === 0 && t("Equal")}
+                        {gameUi(materialDifference === 0 && t("Equal"))}
                       </span>
                     </div>
 
@@ -1428,7 +1429,7 @@ export default function DraftChessBoard({
                       />
 
                       <span className="rounded-xl bg-white/5 px-2.5 py-1 text-xs font-semibold text-zinc-400">
-                        {records.length}
+                        {gameUi(records.length)}
                       </span>
                     </div>
 
@@ -1446,7 +1447,7 @@ export default function DraftChessBoard({
                     />
                   </Panel>
                 </>
-              )}
+              ))}
             </div>
           </aside>
 
@@ -1454,18 +1455,18 @@ export default function DraftChessBoard({
 
           <section className="min-w-0">
             <div className="mx-auto max-w-[820px]">
-              {phase === "playing" && gameOver && (
+              {gameUi(phase === "playing" && gameOver && (
                 <VisibleGameResult />
-              )}
+              ))}
 
-              {phase === "playing" &&
+              {gameUi(phase === "playing" &&
                 promotionSquare &&
                 promotionFrom &&
                 !historyPreview && (
                   <div className="mb-3 rounded-2xl border border-emerald-400/20 bg-zinc-900/90 p-3 shadow-xl">
                     <PromotionBar onPromote={promotePawn} />
                   </div>
-                )}
+                ))}
 
               {phase === "playing" && historyPreview && (
                 <div className="mb-3 flex items-center justify-between gap-4 rounded-xl border border-blue-400/20 bg-blue-400/[0.07] px-4 py-3">
@@ -1475,9 +1476,9 @@ export default function DraftChessBoard({
                     </p>
 
                     <p className="mt-1 text-sm font-bold text-white">
-                      {historyPreview.moveNumber}
-                      {historyPreview.color === "w" ? "." : "..."}{" "}
-                      {historyPreview.san}
+                      {gameUi(historyPreview.moveNumber)}
+                      {gameUi(historyPreview.color === "w" ? "." : "...")}{gameUi(" ")}
+                      {gameUi(historyPreview.san)}
                     </p>
                   </div>
 
@@ -1518,7 +1519,7 @@ export default function DraftChessBoard({
                   orientation={boardOrientation}
                 />
 
-                {phase === "setup" && privacyStep !== "none" && (
+                {gameUi(phase === "setup" && privacyStep !== "none" && (
                   <PrivacyOverlay
                     step={privacyStep}
                     t={t}
@@ -1528,7 +1529,7 @@ export default function DraftChessBoard({
                         : startDraftGame
                     }
                   />
-                )}
+                ))}
               </div>
             </div>
           </section>
@@ -1537,12 +1538,12 @@ export default function DraftChessBoard({
 
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              {phase === "setup" ? (
+              {gameUi(phase === "setup" ? (
                 <section className="rounded-3xl border border-emerald-400/15 bg-zinc-900/80 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <h2 className="text-base font-black text-zinc-100">
-                        {setupSide === "w" ? t("White army") : t("Black army")}
+                        {gameUi(setupSide === "w" ? t("White army") : t("Black army"))}
                       </h2>
 
                       <p className="mt-1 text-xs text-zinc-500">
@@ -1630,7 +1631,7 @@ export default function DraftChessBoard({
                     ))}
                   </div>
 
-                  {statsTab === "armies" && (
+                  {gameUi(statsTab === "armies" && (
                     <div className="mt-4 space-y-3">
                       <ArmySummary
                         title={t("White army")}
@@ -1644,9 +1645,9 @@ export default function DraftChessBoard({
                         symbol="♚"
                       />
                     </div>
-                  )}
+                  ))}
 
-                  {statsTab === "battle" && (
+                  {gameUi(statsTab === "battle" && (
                     <div className="mt-4 grid grid-cols-2 gap-2">
                       <SetupStat
                         label={t("Captures")}
@@ -1662,9 +1663,9 @@ export default function DraftChessBoard({
 
                       <SetupStat label={ui("Moves")} value={gameStats.moves} />
                     </div>
-                  )}
+                  ))}
                 </section>
-              )}
+              ))}
             </div>
           </aside>
         </main>
@@ -1746,7 +1747,7 @@ function PiecePalette({
               `}
           >
             <span className="flex items-center gap-2">
-              <span className="text-2xl leading-none">{symbol}</span>
+              <span className="text-2xl leading-none">{gameUi(symbol)}</span>
 
               <span className="text-[10px] font-black">
                 {t(pieceNames[piece])}
@@ -1754,7 +1755,7 @@ function PiecePalette({
             </span>
 
             <span className="rounded-lg bg-black/20 px-1.5 py-1 text-[9px] font-black">
-              {cost}
+              {gameUi(cost)}
             </span>
           </button>
         );
@@ -1809,11 +1810,11 @@ function PrivacyOverlay({
         </p>
 
         <h2 className="mt-2 text-2xl font-black text-white">
-          {toBlack ? t("White army locked") : t("Both armies are ready")}
+          {gameUi(toBlack ? t("White army locked") : t("Both armies are ready"))}
         </h2>
 
         <p className="mt-3 text-sm text-zinc-500">
-          {toBlack ? t("Do not look at the setup") : t("Black army locked")}
+          {gameUi(toBlack ? t("Do not look at the setup") : t("Black army locked"))}
         </p>
 
         <button
@@ -1821,7 +1822,7 @@ function PrivacyOverlay({
           onClick={onContinue}
           className="mt-6 w-full rounded-xl bg-emerald-300 px-4 py-3 text-sm font-black text-zinc-950 transition hover:bg-emerald-200"
         >
-          {toBlack ? t("Build Black Army") : t("Reveal Armies & Start")}
+          {gameUi(toBlack ? t("Build Black Army") : t("Reveal Armies & Start"))}
         </button>
       </div>
     </div>
@@ -1852,9 +1853,9 @@ function MoveHistory({
         content: (
           <>
             <span className="text-base leading-none">
-              {record.color === "w" ? (whiteSymbols[record.piece] ?? "") : (blackSymbols[record.piece] ?? "")}
+              {gameUi(record.color === "w" ? (whiteSymbols[record.piece] ?? "") : (blackSymbols[record.piece] ?? ""))}
             </span>
-            <span className="truncate font-mono text-xs font-bold text-zinc-200">{record.san}</span>
+            <span className="truncate font-mono text-xs font-bold text-zinc-200">{gameUi(record.san)}</span>
           </>
         ),
       }))}
@@ -1867,7 +1868,7 @@ function Panel({ children }: { children: ReactNode }) {
   useUiLanguage();
   return (
     <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
-      {children}
+      {gameUi(children)}
     </section>
   );
 }
@@ -1899,7 +1900,7 @@ function BudgetPill({ label, value }: { label: string; value: number }) {
         {ui(label)}
       </p>
 
-      <p className="mt-1 text-lg font-black text-emerald-200">{value}</p>
+      <p className="mt-1 text-lg font-black text-emerald-200">{gameUi(value)}</p>
     </div>
   );
 }
@@ -1914,7 +1915,7 @@ function SetupStat({
   useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3">
-      <p className="text-lg font-black text-zinc-100">{value}</p>
+      <p className="text-lg font-black text-zinc-100">{gameUi(value)}</p>
 
       <p className="mt-1 text-[9px] font-black uppercase tracking-wider text-zinc-600">
         {ui(label)}
@@ -1927,9 +1928,9 @@ function TinyPieceStat({ symbol, value }: { symbol: string; value: number }) {
   useUiLanguage();
   return (
     <div className="rounded-lg border border-white/5 bg-black/20 px-1 py-2 text-center">
-      <div className="text-xl leading-none">{symbol}</div>
+      <div className="text-xl leading-none">{gameUi(symbol)}</div>
 
-      <div className="mt-1 text-[10px] font-black text-zinc-500">{value}</div>
+      <div className="mt-1 text-[10px] font-black text-zinc-500">{gameUi(value)}</div>
     </div>
   );
 }
@@ -1949,24 +1950,24 @@ function ArmySummary({
       <div className="flex items-center justify-between">
         <span className="text-xs font-black text-zinc-300">{ui(title)}</span>
 
-        <span className="text-xl">{symbol}</span>
+        <span className="text-xl">{gameUi(symbol)}</span>
       </div>
 
       <div className="mt-3 grid grid-cols-3 gap-2 text-center">
         <div>
-          <p className="text-lg font-black text-white">{stats.pieces}</p>
+          <p className="text-lg font-black text-white">{gameUi(stats.pieces)}</p>
 
           <p className="text-[8px] uppercase text-zinc-600">{ui("pieces")}</p>
         </div>
 
         <div>
-          <p className="text-lg font-black text-emerald-200">{stats.spent}</p>
+          <p className="text-lg font-black text-emerald-200">{gameUi(stats.spent)}</p>
 
           <p className="text-[8px] uppercase text-zinc-600">{ui("spent")}</p>
         </div>
 
         <div>
-          <p className="text-lg font-black text-zinc-400">{stats.remaining}</p>
+          <p className="text-lg font-black text-zinc-400">{gameUi(stats.remaining)}</p>
 
           <p className="text-[8px] uppercase text-zinc-600">{ui("left")}</p>
         </div>
@@ -2027,7 +2028,7 @@ function CapturedPiecesGrid({
   function renderPieces(pieces: PieceType[], color: "w" | "b") {
     return (
       <div className="mt-2 flex min-h-8 flex-wrap gap-1">
-        {pieces.length === 0 ? (
+        {gameUi(pieces.length === 0 ? (
           <span className="text-xs text-zinc-700">—</span>
         ) : (
           pieces.map((piece, index) => (
@@ -2035,10 +2036,10 @@ function CapturedPiecesGrid({
               key={`${color}-${piece}-${index}`}
               className="flex h-7 w-7 items-center justify-center text-2xl leading-none"
             >
-              {color === "w" ? whiteSymbols[piece] : blackSymbols[piece]}
+              {gameUi(color === "w" ? whiteSymbols[piece] : blackSymbols[piece])}
             </span>
           ))
-        )}
+        ))}
       </div>
     );
   }
@@ -2050,7 +2051,7 @@ function CapturedPiecesGrid({
           {t("Black")}
         </p>
 
-        {renderPieces(capturedBlack, "b")}
+        {gameUi(renderPieces(capturedBlack, "b"))}
       </div>
 
       <div className="mt-3 border-t border-white/5 pt-3">
@@ -2058,7 +2059,7 @@ function CapturedPiecesGrid({
           {t("White")}
         </p>
 
-        {renderPieces(capturedWhite, "w")}
+        {gameUi(renderPieces(capturedWhite, "w"))}
       </div>
     </div>
   );

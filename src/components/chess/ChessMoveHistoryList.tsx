@@ -1,3 +1,4 @@
+import { gameUi } from "../../i18n/gameUi.ts";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useState, type ReactNode } from "react";
 
@@ -126,21 +127,21 @@ export default function ChessMoveHistoryList({
         type="button"
         disabled={!onSelect || entry.disabled}
         aria-pressed={selected}
-        title={entry.title}
+        title={gameUi(entry.title)}
         onClick={() => onSelect?.(entry.ply === newestPly ? null : entry.ply)}
         className={`flex w-full min-w-0 items-center gap-1.5 rounded-lg ${compact && !withNumber ? "px-1" : "px-2"} py-1 text-left transition enabled:hover:bg-white/[0.05] disabled:cursor-default ${entry.disabled ? "opacity-55" : ""} ${
           selected ? "bg-blue-400/15 ring-1 ring-inset ring-blue-300/25" : ""
         }`}
       >
-        {withNumber && (
+        {gameUi(withNumber && (
           <span className="w-7 shrink-0 text-[10px] font-black text-zinc-600">
-            {number !== undefined && `${number}${suffix}`}
+            {gameUi(number !== undefined && `${number}${suffix}`)}
           </span>
-        )}
-        <span className="flex min-w-0 flex-1 items-center gap-1.5 truncate">{entry.content}</span>
-        {entry.trailing && (
-          <span className="flex min-w-0 max-w-[50%] shrink-0 items-center justify-end truncate text-[9px]">{entry.trailing}</span>
-        )}
+        ))}
+        <span className="flex min-w-0 flex-1 items-center gap-1.5 truncate">{gameUi(entry.content)}</span>
+        {gameUi(entry.trailing && (
+          <span className="flex min-w-0 max-w-[50%] shrink-0 items-center justify-end truncate text-[9px]">{gameUi(entry.trailing)}</span>
+        ))}
         {entry.quality && <QualityMark quality={entry.quality} />}
       </button>
     );
@@ -179,11 +180,11 @@ export default function ChessMoveHistoryList({
       </div>
 
       <div className={`min-h-0 flex-1 overflow-y-auto [scrollbar-width:thin] ${listClassName}`}>
-        {leading}
+        {gameUi(leading)}
 
-        {entries.length === 0 ? (
+        {gameUi(entries.length === 0 ? (
           <div className="px-4 py-8 text-center text-xs text-zinc-600">
-            {typeof emptyLabel === "string" ? ui(emptyLabel) : emptyLabel}
+            {gameUi(typeof emptyLabel === "string" ? ui(emptyLabel) : emptyLabel)}
           </div>
         ) : activeFilter === "all" ? (
           <>
@@ -203,7 +204,7 @@ export default function ChessMoveHistoryList({
             {orderedRounds.map((round, index) =>
               round.event ? (
                 <div key={`event-${round.event.ply}`} className="border-b border-white/5 px-1 py-0.5 last:border-0">
-                  {renderCell(round.event, false)}
+                  {gameUi(renderCell(round.event, false))}
                 </div>
               ) : (
                 <div
@@ -211,14 +212,14 @@ export default function ChessMoveHistoryList({
                   className="grid items-center gap-1 border-b border-white/5 px-1 py-0.5 last:border-0"
                   style={{ gridTemplateColumns: columns }}
                 >
-                  <span className="px-1 text-[10px] font-black text-zinc-600">{round.number}.</span>
+                  <span className="px-1 text-[10px] font-black text-zinc-600">{gameUi(round.number)}.</span>
                   {round.cells.map((entry, cell) =>
                     entry ? (
                       renderCell(entry, false)
                     ) : (
                       // A skipped turn before a later move (e.g. an eliminated player) shows a dash.
                       <span key={`empty-${cell}`} className="px-2 text-[10px] text-zinc-700">
-                        {round.cells.slice(cell + 1).some(Boolean) ? "—" : ""}
+                        {gameUi(round.cells.slice(cell + 1).some(Boolean) ? "—" : "")}
                       </span>
                     ),
                   )}
@@ -230,9 +231,9 @@ export default function ChessMoveHistoryList({
           <div className="px-4 py-8 text-center text-xs text-zinc-600">{ui("No moves yet")}</div>
         ) : (
           <div className="divide-y divide-white/5 px-1">
-            {orderedEntries.map((entry) => renderCell(entry, true))}
+            {gameUi(orderedEntries.map((entry) => renderCell(entry, true)))}
           </div>
-        )}
+        ))}
       </div>
     </div>
   );

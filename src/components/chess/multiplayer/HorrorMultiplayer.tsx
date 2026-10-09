@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
 import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
@@ -270,7 +271,7 @@ function Panel({
   return (
     <section className="rounded-3xl border border-white/5 bg-zinc-900/80 p-4 shadow-xl shadow-black/20">
       <h2 className="font-black text-zinc-100">{ui(title)}</h2>
-      <div className="mt-4">{children}</div>
+      <div className="mt-4">{gameUi(children)}</div>
     </section>
   );
 }
@@ -288,8 +289,8 @@ function HazardStat({
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 p-3">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-lg">{icon}</span>
-        <span className="font-black text-rose-200">{value}</span>
+        <span className="text-lg">{gameUi(icon)}</span>
+        <span className="font-black text-rose-200">{gameUi(value)}</span>
       </div>
       <p className="mt-1 text-[10px] text-zinc-600">{ui(label)}</p>
     </div>
@@ -393,11 +394,11 @@ export function HorrorMultiplayerLobby() {
             className="mt-2 w-full rounded-xl border border-white/10 bg-black/25 px-4 py-3 outline-none focus:border-rose-400/40"
           />
 
-          {error && (
+          {gameUi(error && (
             <div className="mt-4 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200">
               {ui(error)}
             </div>
-          )}
+          ))}
 
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <section className="rounded-2xl border border-white/5 bg-black/20 p-4">
@@ -411,7 +412,7 @@ export function HorrorMultiplayerLobby() {
                 disabled={busy !== null}
                 className="mt-4 w-full rounded-xl bg-rose-400 px-4 py-3 font-black text-rose-950 disabled:opacity-50"
               >
-                {busy === "create" ? ui("Creating...") : ui("Create Horror room")}
+                {gameUi(busy === "create" ? ui("Creating...") : ui("Create Horror room"))}
               </button>
             </section>
 
@@ -434,7 +435,7 @@ export function HorrorMultiplayerLobby() {
                 disabled={busy !== null || !joinCode.trim()}
                 className="mt-4 w-full rounded-xl border border-rose-300/20 bg-rose-400/10 px-4 py-3 font-black text-rose-200 disabled:opacity-50"
               >
-                {busy === "join" ? ui("Joining...") : ui("Join room")}
+                {gameUi(busy === "join" ? ui("Joining...") : ui("Join room"))}
               </button>
             </section>
           </div>
@@ -1179,15 +1180,15 @@ export function HorrorMultiplayerGame() {
 
 
           <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-2 text-sm">
-            {gameState.status === "waiting" ? ui("Waiting for opponent…") : gameState.status === "finished" ? ui("Game finished") : canMove ? ui("Your turn") : ui("Opponent's turn")}
+            {gameUi(gameState.status === "waiting" ? ui("Waiting for opponent…") : gameState.status === "finished" ? ui("Game finished") : canMove ? ui("Your turn") : ui("Opponent's turn"))}
           </div>
         </ChessPageHeader>
 
-        {error && (
+        {gameUi(error && (
           <div className="mb-4 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200">
             {ui(error)}
           </div>
-        )}
+        ))}
 
         <div className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="space-y-4">
@@ -1195,14 +1196,14 @@ export function HorrorMultiplayerGame() {
               <div className="space-y-2 text-sm">
                 <div className="rounded-xl bg-white/5 p-3">
                   <p className="font-black">
-                    {me.display_name} · {myColor}
+                    {me.display_name} · {gameUi(myColor)}
                   </p>
                   <p className="text-xs text-zinc-500">{ui("You")}</p>
                 </div>
 
                 <div className="rounded-xl bg-white/5 p-3">
                   <p className="font-black">
-                    {opponent ? `${opponent.display_name} · ${opponent.chosen_color}` : ui("Waiting…")}
+                    {gameUi(opponent ? `${opponent.display_name} · ${opponent.chosen_color}` : ui("Waiting…"))}
                   </p>
                   <p className="text-xs text-zinc-500">{ui("Opponent")}</p>
                 </div>
@@ -1248,8 +1249,8 @@ export function HorrorMultiplayerGame() {
                   ply: record.ply,
                   side: record.color,
                   moveNumber: record.moveNumber,
-                  content: <span className="truncate font-mono text-xs font-bold text-zinc-200">{record.san}</span>,
-                  trailing: <span>{eventIcons(record)}</span>,
+                  content: <span className="truncate font-mono text-xs font-bold text-zinc-200">{gameUi(record.san)}</span>,
+                  trailing: <span>{gameUi(eventIcons(record))}</span>,
                 }))}
                 onSelect={(ply) => {
                   setHistoryPreviewPly(ply);
@@ -1261,11 +1262,11 @@ export function HorrorMultiplayerGame() {
           </aside>
 
           <section className="mx-auto w-full max-w-[820px] min-w-0">
-            {historyPreviewPly !== null && (
+            {gameUi(historyPreviewPly !== null && (
               <div className="mb-3 flex items-center justify-between rounded-xl border border-rose-400/20 bg-rose-400/[0.07] px-4 py-3">
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-wider text-rose-300">{ui("History Preview")}</p>
-                  <p className="text-sm text-zinc-400">{ui("Position after move")}{historyPreviewPly}
+                  <p className="text-sm text-zinc-400">{ui("Position after move")}{gameUi(historyPreviewPly)}
                   </p>
                 </div>
 
@@ -1275,9 +1276,9 @@ export function HorrorMultiplayerGame() {
                   className="rounded-lg bg-white/10 px-3 py-2 text-xs font-black"
                 >{ui("Back to live board")}</button>
               </div>
-            )}
+            ))}
 
-            {displayedRecord &&
+            {gameUi(displayedRecord &&
               (displayedRecord.event.infectionsAdded.length > 0 ||
                 displayedRecord.event.becameCursed ||
                 displayedRecord.event.curseTriggered ||
@@ -1286,33 +1287,33 @@ export function HorrorMultiplayerGame() {
                 displayedRecord.event.frozenSquare ||
                 displayedRecord.event.deaths.length > 0) && (
                 <div className="mb-3 flex flex-wrap gap-2 text-xs">
-                  {displayedRecord.event.infectionsAdded.length > 0 && (
+                  {gameUi(displayedRecord.event.infectionsAdded.length > 0 && (
                     <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5 text-emerald-200">{ui("☣ Infection spread")}</span>
-                  )}
+                  ))}
 
-                  {(displayedRecord.event.becameCursed ||
+                  {gameUi((displayedRecord.event.becameCursed ||
                     displayedRecord.event.curseTriggered) && (
                     <span className="rounded-full border border-violet-400/20 bg-violet-400/10 px-3 py-1.5 text-violet-200">{ui("☠ Curse triggered")}</span>
-                  )}
+                  ))}
 
-                  {(displayedRecord.event.fireTriggered ||
+                  {gameUi((displayedRecord.event.fireTriggered ||
                     displayedRecord.event.hotSpawned.length > 0) && (
                     <span className="rounded-full border border-orange-400/20 bg-orange-400/10 px-3 py-1.5 text-orange-200">{ui("🔥 Fire")}</span>
-                  )}
+                  ))}
 
-                  {displayedRecord.event.frozenSquare && (
-                    <span className="rounded-full border border-sky-400/20 bg-sky-400/10 px-3 py-1.5 text-sky-200">{ui("❄ Frozen")}{displayedRecord.event.frozenSquare}
+                  {gameUi(displayedRecord.event.frozenSquare && (
+                    <span className="rounded-full border border-sky-400/20 bg-sky-400/10 px-3 py-1.5 text-sky-200">{ui("❄ Frozen")}{gameUi(displayedRecord.event.frozenSquare)}
                     </span>
-                  )}
+                  ))}
 
-                  {displayedRecord.event.deaths.length > 0 && (
+                  {gameUi(displayedRecord.event.deaths.length > 0 && (
                     <span className="rounded-full border border-rose-400/20 bg-rose-400/10 px-3 py-1.5 text-rose-200">
-                      † {displayedRecord.event.deaths.length}{ui("vanished")}</span>
-                  )}
+                      † {gameUi(displayedRecord.event.deaths.length)}{ui("vanished")}</span>
+                  ))}
                 </div>
-              )}
+              ))}
 
-            {promotion && historyPreviewPly === null && (
+            {gameUi(promotion && historyPreviewPly === null && (
               <div className="relative mb-3">
                 <PromotionBar
                   onPromote={(piece) =>
@@ -1320,9 +1321,9 @@ export function HorrorMultiplayerGame() {
                   }
                 />
               </div>
-            )}
+            ))}
 
-            {gameState.status === "finished" &&
+            {gameUi(gameState.status === "finished" &&
               historyPreviewPly === null && (
                 <VisibleGameResult
                   winner={gameState.winner}
@@ -1335,11 +1336,11 @@ export function HorrorMultiplayerGame() {
                       disabled={myRematchReady || Boolean(actionBusy)}
                       className="mt-5 w-full rounded-xl bg-rose-400 px-4 py-3 font-black text-rose-950 disabled:opacity-50"
                     >
-                      {myRematchReady ? ui("Waiting for opponent…") : ui("Play again")}
+                      {gameUi(myRematchReady ? ui("Waiting for opponent…") : ui("Play again"))}
                     </button>
                   }
                 />
-              )}
+              ))}
 
             <div className="relative">
               <Board
@@ -1376,7 +1377,7 @@ export function HorrorMultiplayerGame() {
                     <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">{ui("Waiting for players")}</p>
 
                     <h2 className="mt-2 text-2xl font-black text-white">
-                      {players.length}{ui("/2 players connected")}</h2>
+                      {gameUi(players.length)}{ui("/2 players connected")}</h2>
 
                     <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">{ui("Share this room code. The game starts automatically when everyone has joined.")}</p>
 
@@ -1389,7 +1390,7 @@ export function HorrorMultiplayerGame() {
                     </div>
 
                     <p className="mt-4 text-xs font-bold text-zinc-400">
-                      {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
+                      {gameUi(copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code"))}
                     </p>
                   </button>
                     <InviteFriendButton overlay />
@@ -1429,14 +1430,14 @@ export function HorrorMultiplayerGame() {
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-zinc-500">{ui("Frozen piece")}</span>
                   <span className="font-mono font-black text-sky-200">
-                    {displayedState.frozen?.square ?? "—"}
+                    {gameUi(displayedState.frozen?.square ?? "—")}
                   </span>
                 </div>
 
                 <div className="mt-2 flex items-center justify-between">
                   <span className="text-xs text-zinc-500">{ui("Next fire wave")}</span>
                   <span className="font-black text-orange-200">
-                    {pliesUntilFire}{ui("plies")}</span>
+                    {gameUi(pliesUntilFire)}{ui("plies")}</span>
                 </div>
               </div>
             </Panel>

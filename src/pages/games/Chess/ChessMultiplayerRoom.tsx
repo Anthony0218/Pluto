@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useCallback, useEffect, useState } from "react";
@@ -63,7 +64,7 @@ function ChessPageShell({ children }: { children: React.ReactNode }) {
           </Link>
         </ChessPageHeader>
 
-        {children}
+        {gameUi(children)}
       </div>
     </main>
   );
@@ -356,7 +357,7 @@ export default function ChessMultiplayerRoom() {
             </span>
 
             <span className="text-sm font-black text-amber-300">
-              {copied ? ui("Copied ✓") : ui("Copy")}
+              {gameUi(copied ? ui("Copied ✓") : ui("Copy"))}
             </span>
           </button>
 
@@ -404,7 +405,7 @@ export default function ChessMultiplayerRoom() {
               )}
             </div>
 
-            {canChooseColor && (
+            {gameUi(canChooseColor && (
               <section className="rounded-[22px] border border-white/[0.09] bg-black/20 p-5 shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md sm:p-6">
                 <div className="flex items-baseline justify-between gap-3">
                   <p className="text-[9px] font-black uppercase tracking-[0.28em] text-amber-300/65">{ui("Your color")}</p>
@@ -418,41 +419,41 @@ export default function ChessMultiplayerRoom() {
                   onChange={(color) => void chooseColor(color)}
                 />
               </section>
-            )}
+            ))}
 
             <section className="rounded-[22px] border border-white/[0.09] bg-black/20 p-5 shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md sm:p-6 xl:p-7">
               <p className="text-[9px] font-black uppercase tracking-[0.28em] text-amber-300/65">{ui("Room status")}</p>
 
               <h2 className="mt-2 font-serif text-[27px] leading-tight text-white sm:text-[31px]">
-                {room.status === "playing"
+                {gameUi(room.status === "playing"
                   ? ui("Game is starting")
                   : players.length < 2
                     ? ui("Waiting for another player")
                     : !isCasual || bothReady
                       ? ui("Both players are ready")
-                      : ui("Waiting for both players to be ready")}
+                      : ui("Waiting for both players to be ready"))}
               </h2>
 
               <p className="mt-2 text-sm leading-6 text-zinc-500">
-                {room.status === "playing"
+                {gameUi(room.status === "playing"
                   ? ui("Opening the synchronized board...")
                   : players.length < 2
                     ? ui("The second player card will fill automatically when your opponent joins.")
                     : !isCasual || bothReady
                       ? isHost ? ui("Your opponent is here. Start whenever you are ready.") : ui("Both seats are occupied. Waiting for the host to start.")
-                      : ui("Each player picks a different color and presses Ready. Then the host can start.")}
+                      : ui("Each player picks a different color and presses Ready. Then the host can start."))}
               </p>
 
-              {isCasual && inSetup && myPlayer && (
+              {gameUi(isCasual && inSetup && myPlayer && (
                 <ReadyButton
                   ready={myReady}
                   hasColor={Boolean(myColor)}
                   saving={readySaving}
                   onToggle={() => void setReady(!myReady)}
                 />
-              )}
+              ))}
 
-              {inSetup &&
+              {gameUi(inSetup &&
                 (isHost ? (
                   <button
                     type="button"
@@ -460,26 +461,26 @@ export default function ChessMultiplayerRoom() {
                     onClick={startGame}
                     className="group mt-3 flex w-full items-center justify-between rounded-xl border border-amber-300/45 bg-amber-300/[0.06] px-4 py-3.5 text-sm font-black text-amber-200 transition hover:bg-amber-300/[0.10] disabled:cursor-not-allowed disabled:border-white/[0.08] disabled:bg-white/[0.02] disabled:text-zinc-600"
                   >
-                    <span>{starting ? ui("Starting...") : ui("Start Game")}</span>
+                    <span>{gameUi(starting ? ui("Starting...") : ui("Start Game"))}</span>
                     <span className="text-xl transition group-enabled:group-hover:translate-x-1">→</span>
                   </button>
                 ) : (
                   players.length === 2 && (
                     <div className="mt-3 rounded-xl border border-white/[0.08] bg-white/[0.025] px-4 py-3 text-sm text-zinc-500">
-                      {!isCasual || bothReady ? ui("Waiting for host...") : ui("The host can start once both players are ready.")}
+                      {gameUi(!isCasual || bothReady ? ui("Waiting for host...") : ui("The host can start once both players are ready."))}
                     </div>
                   )
-                ))}
+                )))}
 
-              {room.status === "playing" && (
+              {gameUi(room.status === "playing" && (
                 <div className="mt-6 rounded-xl border border-emerald-400/20 bg-emerald-400/[0.04] px-4 py-3 text-sm text-emerald-200">{ui("Redirecting to the game...")}</div>
-              )}
+              ))}
 
-              {error && (
+              {gameUi(error && (
                 <div className="mt-5 rounded-xl border border-red-400/20 bg-red-400/[0.05] px-4 py-3 text-sm text-red-200">
                   {ui(error)}
                 </div>
-              )}
+              ))}
             </section>
           </div>
         </div>
@@ -526,14 +527,14 @@ function PlayerCard({
               : "border-white/10 bg-white/[0.035] text-zinc-500"
           }`}
         >
-          {player && avatarId ? (
+          {gameUi(player && avatarId ? (
             <ProfileAvatar
               avatarId={avatarId}
               className="block h-full w-full"
             />
           ) : (
-            <span>{symbol}</span>
-          )}
+            <span>{gameUi(symbol)}</span>
+          ))}
         </div>
 
         <div className="min-w-0 flex-1">
@@ -546,10 +547,10 @@ function PlayerCard({
           </p>
 
           <h2 className="mt-1.5 truncate font-serif text-[25px] leading-tight text-white sm:text-[29px]">
-            {player?.display_name ?? ui("Waiting...")}
+            {gameUi(player?.display_name ?? ui("Waiting..."))}
           </h2>
 
-          {player && color !== undefined && (
+          {gameUi(player && color !== undefined && (
             <div className="mt-2 flex flex-wrap items-center gap-1.5">
               <span
                 className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-bold ${
@@ -560,8 +561,8 @@ function PlayerCard({
                       : "border-dashed border-white/15 text-zinc-500"
                 }`}
               >
-                {color && <span aria-hidden="true">{symbol}</span>}
-                {color === "white" ? ui("White") : color === "black" ? ui("Black") : ui("No color")}
+                {color && <span aria-hidden="true">{gameUi(symbol)}</span>}
+                {gameUi(color === "white" ? ui("White") : color === "black" ? ui("Black") : ui("No color"))}
               </span>
               <span
                 className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-bold ${
@@ -571,12 +572,12 @@ function PlayerCard({
                 }`}
               >
                 <span className={`h-1.5 w-1.5 rounded-full ${ready ? "bg-emerald-400" : "bg-zinc-600"}`} />
-                {ready ? ui("Ready") : ui("Not ready")}
+                {gameUi(ready ? ui("Ready") : ui("Not ready"))}
               </span>
             </div>
-          )}
+          ))}
 
-          {(!player || color === undefined) && (
+          {gameUi((!player || color === undefined) && (
             <div className="mt-2 flex items-center gap-2 text-xs text-zinc-500">
               <span
                 className={`h-2 w-2 rounded-full ${
@@ -585,9 +586,9 @@ function PlayerCard({
                     : "bg-zinc-700"
                 }`}
               />
-              <span>{player ? ui("Player joined") : ui("Waiting for player")}</span>
+              <span>{gameUi(player ? ui("Player joined") : ui("Waiting for player"))}</span>
             </div>
-          )}
+          ))}
           {canInvite && <button type="button" onClick={() => window.dispatchEvent(new Event("open-room-friends"))} className="mt-3 rounded-lg border border-amber-300/40 bg-amber-300/10 px-3 py-2 text-xs font-bold text-amber-200 transition hover:bg-amber-300/20 focus-visible:outline-2 focus-visible:outline-amber-300">{ui("Invite Friend")}</button>}
         </div>
       </div>

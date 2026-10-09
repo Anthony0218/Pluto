@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { menuVariants, type VariantCard } from "@/data/chessVariants";
 import { ui, useUiLanguage } from "@/i18n/ui";
@@ -514,8 +515,8 @@ function VariantPreviewCarousel({ language }: { language: Language }) {
                     {t(language, variant.available ? "Available" : "Coming soon")}
                   </span>
                   <span className="text-[10px] font-black tracking-[0.2em] text-zinc-400">
-                    {String(index + 1).padStart(2, "0")} /{" "}
-                    {String(previewOrder.length).padStart(2, "0")}
+                    {gameUi(String(index + 1).padStart(2, "0"))} /{gameUi(" ")}
+                    {gameUi(String(previewOrder.length).padStart(2, "0"))}
                   </span>
                 </div>
 
@@ -533,7 +534,7 @@ function VariantPreviewCarousel({ language }: { language: Language }) {
                 <div className="variant-slide-actions mt-2 flex flex-wrap gap-1.5">
                   {variant.available && variant.aiRoute && <Link to={variant.aiRoute} className="flex min-h-8 flex-1 items-center justify-center rounded-lg border border-amber-300/55 bg-amber-300 px-2 text-center text-[10px] font-black text-black transition hover:bg-amber-200">{t(language, "Singleplayer")}</Link>}
                   {variant.available && variant.multiplayerRoute && <Link to={variant.multiplayerRoute} className="flex min-h-8 flex-1 items-center justify-center rounded-lg border border-fuchsia-300/40 bg-fuchsia-300/15 px-2 text-center text-[10px] font-black text-fuchsia-100 transition hover:bg-fuchsia-300/25">{ui("Multiplayer")}</Link>}
-                  {variant.available && variant.route && <Link to={variant.route} className="flex min-h-8 flex-1 items-center justify-center rounded-lg border border-white/20 bg-white/[.06] px-2 text-center text-[10px] font-black text-zinc-100 transition hover:bg-white/[.12]">{variant.id === "3d-chess" ? ui("Play") : t(language, "Hotseat")}</Link>}
+                  {variant.available && variant.route && <Link to={variant.route} className="flex min-h-8 flex-1 items-center justify-center rounded-lg border border-white/20 bg-white/[.06] px-2 text-center text-[10px] font-black text-zinc-100 transition hover:bg-white/[.12]">{gameUi(variant.id === "3d-chess" ? ui("Play") : t(language, "Hotseat"))}</Link>}
                 </div>
 
                 <div className="variant-slide-nav mt-auto flex items-end gap-2 pt-1">
@@ -575,7 +576,7 @@ function VariantPreviewCarousel({ language }: { language: Language }) {
                 ? "w-5 bg-white/75"
                 : "w-1.5 bg-white/20 hover:bg-white/35"
             }`}
-            aria-label={`${t(language, variant.title)} ${index + 1}`}
+            aria-label={gameUi(`${t(language, variant.title)} ${index + 1}`)}
           />
         ))}
       </div>
@@ -612,7 +613,7 @@ function VariantActionButtons({
   return (
     <div className="flex gap-1.5">
       {/* 1. Singleplayer (formerly Vs AI) */}
-      {variant.aiRoute ? (
+      {gameUi(variant.aiRoute ? (
         <Link
           to={variant.aiRoute}
           className={`${base} min-w-0 flex-1 border-white/15 bg-black/25 text-zinc-300 hover:bg-white/[0.07] hover:text-white`}
@@ -625,10 +626,10 @@ function VariantActionButtons({
         >
           {t(language, "Singleplayer")}
         </span>
-      )}
+      ))}
 
       {/* 2. Multiplayer */}
-      {variant.multiplayerRoute ? (
+      {gameUi(variant.multiplayerRoute ? (
         <Link
           to={variant.multiplayerRoute}
           className={`${base} min-w-0 flex-1 border-white/15 bg-black/25 text-zinc-300 hover:bg-white/[0.07] hover:text-white`}
@@ -637,15 +638,15 @@ function VariantActionButtons({
         <span
           className="hidden"
         >{ui("Multiplayer")}</span>
-      )}
+      ))}
 
       {/* 3. Hotseat */}
-      {variant.route ? (
+      {gameUi(variant.route ? (
         <Link
           to={variant.route}
           className={`${base} min-w-0 flex-1 border-white/15 bg-black/25 text-zinc-300 hover:bg-white/[0.07] hover:text-white`}
         >
-          {variant.id === "3d-chess" ? ui("Play") : t(language, "Hotseat")}
+          {gameUi(variant.id === "3d-chess" ? ui("Play") : t(language, "Hotseat"))}
         </Link>
       ) : (
         <span
@@ -653,7 +654,7 @@ function VariantActionButtons({
         >
           {t(language, "Hotseat")}
         </span>
-      )}
+      ))}
 
     </div>
   );
@@ -676,7 +677,7 @@ export default function ChessVariantsMenu() {
   return (
     <main className="chess-custom-page relative left-1/2 min-h-[var(--app-height)] w-screen -translate-x-1/2 bg-[#07090b] text-zinc-100">
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(245,158,11,.07),transparent_32%),radial-gradient(circle_at_88%_80%,rgba(56,189,248,.05),transparent_30%)]" />
-      <ChessPageHeader className="chess-menu-header" title="Chess Variants">
+      <ChessPageHeader className="chess-menu-header" title={gameUi("Chess Variants")}>
           <Link
             to="/games/chess/rules"
             className="inline-flex items-center gap-2 text-sm text-zinc-500 transition hover:text-white"
@@ -692,10 +693,10 @@ export default function ChessVariantsMenu() {
             <Link to="/games/chess" className="mb-6 inline-flex items-center gap-2 text-sm text-zinc-500 transition hover:text-white">
               <span aria-hidden="true">←</span>{t(language, "Back to Chess")}
             </Link>
-            <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-300/80">Pluto</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-300/80">{gameUi("Pluto")}</p>
             <h1 className="mt-1.5 font-serif text-[32px] leading-tight text-white sm:text-[40px]">{t(language, "Chess Variants")}</h1>
             <p className="mt-2 text-sm leading-6 text-zinc-400">{t(language, "Different rules. Same board.")}</p>
-            <p className="mt-2 text-sm leading-6 text-zinc-500">{variants.length} {ui("unique ways to play")}</p>
+            <p className="mt-2 text-sm leading-6 text-zinc-500">{gameUi(variants.length)} {ui("unique ways to play")}</p>
           </div>
           <VariantPreviewCarousel language={language} />
         </header>
@@ -709,7 +710,7 @@ export default function ChessVariantsMenu() {
               <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={ui("Search variants")} className="w-full rounded-xl border border-white/[0.12] bg-white/[0.04] py-2.5 pl-9 pr-3 text-sm text-zinc-100 outline-none placeholder:text-zinc-500 focus:border-amber-300/50" />
             </label>
           </div>
-          {shownVariants.length ? (
+          {gameUi(shownVariants.length ? (
             <ul className="grid gap-5 lg:grid-cols-2 2xl:grid-cols-3">
               {shownVariants.map((variant) => (
                 <li key={variant.id} className="flex">
@@ -719,7 +720,7 @@ export default function ChessVariantsMenu() {
             </ul>
           ) : (
             <p className="rounded-3xl border border-white/[0.08] bg-white/[0.02] px-6 py-10 text-center text-sm text-zinc-400">{ui("No variants match your search")}</p>
-          )}
+          ))}
         </section>
       </div>
     </main>

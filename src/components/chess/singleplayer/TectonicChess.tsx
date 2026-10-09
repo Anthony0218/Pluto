@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
@@ -942,7 +943,7 @@ export default function TectonicChess({
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              {!finishedGame && (
+              {gameUi(!finishedGame && (
                 <div
                   className={`rounded-xl border px-3 py-2 text-xs font-black ${
                     tectonic.pendingShift
@@ -950,9 +951,9 @@ export default function TectonicChess({
                       : "border-white/10 bg-white/5 text-zinc-300"
                   }`}
                 >
-                  {tectonic.pendingShift ? `${t("TECTONIC SHIFT")} · ${shifterName}` : moveAfterSkippedShift ? `${shifterName} · normal move after skip` : game.turn() === "w" ? t("White to move") : t("Black to move")}
+                  {gameUi(tectonic.pendingShift ? `${t("TECTONIC SHIFT")} · ${shifterName}` : moveAfterSkippedShift ? `${shifterName} · normal move after skip` : game.turn() === "w" ? t("White to move") : t("Black to move"))}
                 </div>
-              )}
+              ))}
             </div>
           </div>
 
@@ -1000,8 +1001,8 @@ export default function TectonicChess({
                     side: entry.color,
                     content: (
                       <>
-                        <span className="font-black text-zinc-500">{entry.kind === "shift" ? "↻" : "·"}</span>
-                        <span className="truncate font-mono text-xs font-black text-zinc-200">{entry.notation}</span>
+                        <span className="font-black text-zinc-500">{gameUi(entry.kind === "shift" ? "↻" : "·")}</span>
+                        <span className="truncate font-mono text-xs font-black text-zinc-200">{gameUi(entry.notation)}</span>
                       </>
                     ),
                   }))}
@@ -1031,7 +1032,7 @@ export default function TectonicChess({
                     {t("History Preview")}
                   </p>
                   <p className="mt-1 text-sm font-bold text-white">
-                    {historyPreview.notation}
+                    {gameUi(historyPreview.notation)}
                   </p>
                 </div>
 
@@ -1045,26 +1046,26 @@ export default function TectonicChess({
               </div>
             )}
 
-            {previewGame && hoveredQuadrant && !historyPreview && (
+            {gameUi(previewGame && hoveredQuadrant && !historyPreview && (
               <div className="mb-3 flex items-center justify-between rounded-xl border border-violet-400/20 bg-violet-400/[0.07] px-4 py-3">
                 <div>
                   <p className="text-[9px] font-black uppercase tracking-widest text-violet-300">
                     {t("Shift preview")}
                   </p>
                   <p className="mt-1 text-sm font-bold text-white">
-                    ↻ {quadrantLabel(hoveredQuadrant)}
+                    ↻ {gameUi(quadrantLabel(hoveredQuadrant))}
                   </p>
                 </div>
 
-                {postShiftPreviewGame?.isCheck() && (
+                {gameUi(postShiftPreviewGame?.isCheck() && (
                   <span className="rounded-full border border-red-400/20 bg-red-400/10 px-3 py-1.5 text-[10px] font-black text-red-300">
                     {t("This shift gives check!")}
                   </span>
-                )}
+                ))}
               </div>
-            )}
+            ))}
 
-            {pendingPromotion && !historyPreview && !tectonic.pendingShift && (
+            {gameUi(pendingPromotion && !historyPreview && !tectonic.pendingShift && (
               <div className="mb-3">
                 <PromotionBar
                   onPromote={(piece) =>
@@ -1076,9 +1077,9 @@ export default function TectonicChess({
                   }
                 />
               </div>
-            )}
+            ))}
 
-            {finishedGame && !historyPreview && (
+            {gameUi(finishedGame && !historyPreview && (
               <VisibleGameResult
                 actions={
                   <button
@@ -1090,7 +1091,7 @@ export default function TectonicChess({
                   </button>
                 }
               />
-            )}
+            ))}
 
             <div className="relative">
               <Board
@@ -1138,7 +1139,7 @@ export default function TectonicChess({
                   <span className="text-2xl">↻</span>
                 </div>
 
-                {tectonic.pendingShift ? (
+                {gameUi(tectonic.pendingShift ? (
                   <div className="mt-4">
                     <div className="rounded-2xl border border-violet-300/20 bg-violet-400/[0.07] p-4 text-center">
                       <p className="text-[10px] font-black uppercase tracking-[0.2em] text-violet-300">
@@ -1146,7 +1147,7 @@ export default function TectonicChess({
                       </p>
 
                       <p className="mt-2 text-lg font-black text-white">
-                        {shifterName}
+                        {gameUi(shifterName)}
                       </p>
 
                       <p className="mt-1 text-[10px] text-zinc-500">
@@ -1184,17 +1185,17 @@ export default function TectonicChess({
                           >
                             <div className="flex items-center justify-between">
                               <span className="text-2xl font-black text-white">
-                                {quadrant}
+                                {gameUi(quadrant)}
                               </span>
                               <span className="text-lg">↻</span>
                             </div>
 
                             <p className="mt-2 text-[10px] font-bold text-zinc-500">
-                              {quadrantLabel(quadrant).slice(4)}
+                              {gameUi(quadrantLabel(quadrant).slice(4))}
                             </p>
 
                             <p className="mt-1 text-[9px] font-black uppercase tracking-wider text-zinc-600">
-                              {locked ? t("Locked") : legal ? t("Rotate 90° clockwise") : t("Illegal")}
+                              {gameUi(locked ? t("Locked") : legal ? t("Rotate 90° clockwise") : t("Illegal"))}
                             </p>
                           </button>
                         );
@@ -1212,13 +1213,13 @@ export default function TectonicChess({
                       {t("Skip Shift")}
                     </button>
 
-                    {game.isCheck() && (
+                    {gameUi(game.isCheck() && (
                       <p className="mt-2 text-[10px] leading-4 text-red-300/80">
                         {t("Skip is illegal while your King is in check.")}
                       </p>
-                    )}
+                    ))}
 
-                    {isTectonicLockedOut(game, tectonic) && (
+                    {gameUi(isTectonicLockedOut(game, tectonic) && (
                       <div className="mt-3 rounded-xl border border-red-400/15 bg-red-400/[0.06] p-3">
                         <p className="text-xs font-black text-red-300">
                           {t("Shift locked out")}
@@ -1230,7 +1231,7 @@ export default function TectonicChess({
                           )}
                         </p>
                       </div>
-                    )}
+                    ))}
 
                     <p className="mt-3 text-center text-[10px] text-zinc-600">
                       {t("Hover a legal quadrant to preview the rotation.")}
@@ -1244,11 +1245,11 @@ export default function TectonicChess({
 
                     <div className="mt-2 flex items-end justify-between">
                       <span className="text-sm font-bold text-zinc-300">
-                        {game.turn() === "w" ? t("White") : t("Black")}
+                        {gameUi(game.turn() === "w" ? t("White") : t("Black"))}
                       </span>
 
                       <span className="text-4xl font-black leading-none text-violet-300">
-                        {pliesUntilShift}
+                        {gameUi(pliesUntilShift)}
                       </span>
                     </div>
 
@@ -1265,7 +1266,7 @@ export default function TectonicChess({
                       />
                     </div>
                   </div>
-                )}
+                ))}
 
                 <div className="mt-3 grid grid-cols-2 gap-2">
                   <StatusMini
@@ -1380,7 +1381,7 @@ function QuadrantOverlay({
                 : "border-violet-300/10 bg-zinc-950/30 text-violet-300/45"
             }`}
           >
-            {quadrant}
+            {gameUi(quadrant)}
           </div>
         );
       })}
@@ -1404,7 +1405,7 @@ function Panel({
 
       <p className="mt-1 mb-4 text-xs text-zinc-600">{ui(subtitle)}</p>
 
-      {children}
+      {gameUi(children)}
     </section>
   );
 }
@@ -1413,7 +1414,7 @@ function Stat({ label, value }: { label: string; value: number }) {
   useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-2 py-3 text-center">
-      <p className="text-xl font-black text-violet-200">{value}</p>
+      <p className="text-xl font-black text-violet-200">{gameUi(value)}</p>
       <p className="mt-1 text-[9px] font-bold leading-4 text-zinc-600">
         {ui(label)}
       </p>
@@ -1428,7 +1429,7 @@ function StatusMini({ label, value }: { label: string; value: string }) {
       <p className="text-[9px] font-black uppercase tracking-wider text-zinc-600">
         {ui(label)}
       </p>
-      <p className="mt-1 text-sm font-black text-zinc-300">{value}</p>
+      <p className="mt-1 text-sm font-black text-zinc-300">{gameUi(value)}</p>
     </div>
   );
 }
@@ -1438,7 +1439,7 @@ function RuleLine({ icon, text }: { icon: string; text: string }) {
   return (
     <div className="flex items-start gap-3 rounded-xl border border-white/5 bg-black/20 px-3 py-2.5 text-xs leading-5 text-zinc-400">
       <span className="flex min-w-7 justify-center font-black text-violet-300">
-        {icon}
+        {gameUi(icon)}
       </span>
       <span>{ui(text)}</span>
     </div>

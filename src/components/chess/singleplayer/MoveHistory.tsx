@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import "./ChessBoard.css";
 
@@ -17,14 +18,14 @@ export default function MoveHistory({ moves }: MoveHistoryProps) {
 
         return (
           <div className="move-row" key={index}>
-            <span className="move-number">{index + 1}.</span>
+            <span className="move-number">{gameUi(index + 1)}.</span>
 
             <span
               className={
                 index * 2 === moves.length - 1 ? "current-move" : "white-move"
               }
             >
-              {whiteMove}
+              {gameUi(whiteMove)}
             </span>
 
             <span
@@ -34,7 +35,7 @@ export default function MoveHistory({ moves }: MoveHistoryProps) {
                   : "black-move"
               }
             >
-              {blackMove ?? ""}
+              {gameUi(blackMove ?? "")}
             </span>
           </div>
         );
