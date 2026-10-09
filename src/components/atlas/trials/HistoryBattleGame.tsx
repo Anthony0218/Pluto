@@ -49,7 +49,7 @@ export function HistoryBattleGame({ pool, byId, seed, difficulty, best, topology
         <div className="language-country"><div><span className="atlas-eyebrow">On record</span><strong>{country.name}</strong><img src={country.flag} alt={`Flag of ${country.name}`} /></div>{country.geometryId && <AtlasCountryShape topology={topology} geometryId={country.geometryId} label={country.name} showLabel={false} />}</div>
         <p className="history-fact">{round.fact}</p>
         {history.countries[round.countryId]?.background && <div className="language-translation"><span className="atlas-eyebrow">Background</span><p>{history.countries[round.countryId].background}</p></div>}
-        <small className="history-source">Source: {HISTORY_SOURCE} · public domain</small>
+        <small className="history-source">Source: {round.source ?? HISTORY_SOURCE}</small>
       </section>}
     </div>}
     {over && <GameOverPanel title="History complete" score={score} best={best} stats={[{ label: "Correct", value: `${correctCount} / ${HISTORY_BATTLE.rounds}` }, { label: "Accuracy", value: `${Math.round(correctCount / HISTORY_BATTLE.rounds * 100)}%` }, { label: "Best streak", value: bestStreak }]} onRestart={onRestart} onExit={onExit} />}

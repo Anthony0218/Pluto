@@ -11,7 +11,7 @@ type ComparisonDisplay = Pick<HigherLowerQuestion,"prompt"|"first"|"second"> & {
 /** Population reads best compact (8.1M); areas, heights and counts stay exact. */
 function formatStat(key: HigherLowerQuestion["stat"]["key"], value: number, unit: string) {
   if (key === "population") return new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(value);
-  const exact = new Intl.NumberFormat("en").format(Math.round(value));
+  const exact = new Intl.NumberFormat("en", { maximumFractionDigits: key === "areaKm2" && value < 1 ? 2 : 0 }).format(value);
   return unit === "km²" || unit === "m" ? `${exact} ${unit}` : exact;
 }
 

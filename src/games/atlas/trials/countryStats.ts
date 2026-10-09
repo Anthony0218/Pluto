@@ -3,7 +3,7 @@ import type { AtlasDifficulty, AtlasExtras, Coordinates, GeographicEntity } from
 
 /**
  * Normalized country model for the Atlas Trials modes. Every number here comes from the bundled Atlas snapshot
- * (World Bank, GeoNames, Wikidata); nothing is estimated. Stats a country lacks are simply absent, and every mode
+ * (World Bank, GeoNames, Wikidata and attributed country supplements); nothing is estimated. Stats a country lacks are simply absent, and every mode
  * filters on availability, so adding a new stat only needs a field below plus a STATS entry.
  */
 export type TrialStatId = "population" | "areaKm2" | "density" | "neighborCount" | "highestPointM" | "meanTempC" | "capitalLatitude" | "capitalEquatorDistance";
@@ -31,17 +31,17 @@ const grouped = (value: number) => new Intl.NumberFormat("en").format(Math.round
 
 export const STATS: Record<TrialStatId, StatDefinition> = {
   population: {
-    id: "population", label: "Population", unit: "people", source: "World Bank",
+    id: "population", label: "Population", unit: "people", source: "World Bank / Vatican City State",
     extremes: { highest: "the largest population", lowest: "the smallest population" },
     format: compact, usableIn: { detective: true, ranking: true, extreme: true, battle: true },
   },
   areaKm2: {
-    id: "areaKm2", label: "Area", unit: "km²", source: "World Bank",
+    id: "areaKm2", label: "Area", unit: "km²", source: "World Bank / Vatican City State",
     extremes: { highest: "the largest area", lowest: "the smallest area" },
-    format: (value) => `${value >= 1e6 ? compact(value) : grouped(value)} km²`, usableIn: { detective: true, ranking: true, extreme: true, battle: true },
+    format: (value) => `${value >= 1e6 ? compact(value) : value < 1 ? value.toLocaleString("en", { maximumFractionDigits: 2 }) : grouped(value)} km²`, usableIn: { detective: true, ranking: true, extreme: true, battle: true },
   },
   density: {
-    id: "density", label: "Population density", unit: "people/km²", source: "World Bank (population ÷ area)",
+    id: "density", label: "Population density", unit: "people/km²", source: "Bundled population ÷ area",
     extremes: { highest: "the highest population density", lowest: "the lowest population density" },
     format: (value) => `${value < 10 ? value.toFixed(1) : grouped(value)}/km²`, usableIn: { detective: true, ranking: true, extreme: false, battle: true },
   },
@@ -51,7 +51,7 @@ export const STATS: Record<TrialStatId, StatDefinition> = {
     format: (value) => `${value} ${value === 1 ? "country" : "countries"}`, usableIn: { detective: true, ranking: false, extreme: false, battle: true },
   },
   highestPointM: {
-    id: "highestPointM", label: "Highest point", unit: "m", source: "Wikidata",
+    id: "highestPointM", label: "Highest point", unit: "m", source: "Wikidata / The World Factbook",
     extremes: { highest: "the highest mountain peak", lowest: "the lowest highest point" },
     format: (value) => `${grouped(value)} m`, usableIn: { detective: true, ranking: true, extreme: true, battle: true },
   },
@@ -116,7 +116,7 @@ export function toTrialCountry(entity: GeographicEntity, extras: AtlasExtras): T
   };
 }
 
-/** UN members with a flag, population and area: the playable deck for every Trials mode. */
+/** The 195-country scope (193 UN members plus Palestine and the Holy See), narrowed only by difficulty and required card data. */
 export function buildTrialCountries(entities: GeographicEntity[], extras: AtlasExtras, difficulty: AtlasDifficulty = "expert"): TrialCountry[] {
   return entitiesForDifficulty(entitiesForScope(entities, "un195"), difficulty)
     .filter((entity) => entity.flagAsset && entity.population && entity.areaKm2)

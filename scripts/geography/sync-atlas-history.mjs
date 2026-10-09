@@ -6,11 +6,12 @@ import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { unzipSync } from "fflate";
+import { FACTBOOK_COMMIT, HISTORY_SUPPLEMENTS, SUPPLEMENT_SOURCES } from "./country-supplements.mjs";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const outputDirectory = join(root, "data", "geography");
 const publicDirectory = join(root, "public", "data", "geography");
-const COMMIT = "144d6977b2b01ac1cbd220de754c0a005616760b";
+const COMMIT = FACTBOOK_COMMIT;
 const sources = {
   worldFactbook: "https://www.cia.gov/the-world-factbook/",
   factbookJson: `https://github.com/factbook/factbook.json/tree/${COMMIT}`,
@@ -43,7 +44,7 @@ const key = (value) => value.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, 
 const profileNames = (profile) => ["conventional short form", "conventional long form"].map((form) => text(profile.Government?.["Country name"]?.[form])).filter((name) => name && name !== "none");
 
 // GEC codes differ from ISO, so profiles are matched by name; these four are spelled differently in the Atlas snapshot.
-// The State of Palestine has no single Factbook profile (West Bank and Gaza Strip are separate) and is left out.
+// Palestine has no single Factbook profile; a dated UN record supplements it below.
 const GEC_OVERRIDES = { "country:CIV": "iv", "country:FSM": "fm", "country:MMR": "bm", "country:VAT": "vt" };
 function profileFor(country) {
   if (GEC_OVERRIDES[country.id]) return profiles.find((item) => item.gec === GEC_OVERRIDES[country.id])?.profile ?? null;
@@ -167,6 +168,9 @@ for (const country of countries) {
   if (!events.length && !formerNames.length) continue;
   history[country.id] = { record: shortRecord(record), events, mentions, formerNames, background };
 }
+for (const [id, entry] of Object.entries(HISTORY_SUPPLEMENTS)) history[id] ??= structuredClone(entry);
+const missing = countries.filter((country) => !history[country.id]);
+if (missing.length) throw new Error(`Atlas history missing for: ${missing.map((country) => country.iso3).join(", ")}`);
 // A former name shared by several countries (German East Africa, United Arab Republic) has no single answer.
 const nameCounts = new Map();
 for (const entry of Object.values(history)) for (const name of entry.formerNames) nameCounts.set(name, (nameCounts.get(name) ?? 0) + 1);
@@ -174,7 +178,7 @@ for (const entry of Object.values(history)) entry.formerNames = entry.formerName
 
 const output = {
   atlasDataVersion, synchronizedAt: new Date().toISOString(),
-  source: { name: "The World Factbook (final edition, 2026)", publisher: "Central Intelligence Agency", license: "Public domain (US Government work)", commit: COMMIT, ...sources },
+  source: { name: "The World Factbook (final edition, 2026)", publisher: "Central Intelligence Agency", license: "Public domain (US Government work); supplementary UN record attributed separately", commit: COMMIT, ...sources, palestineHistory: SUPPLEMENT_SOURCES.palestineHistory },
   countries: history,
 };
 await Promise.all([

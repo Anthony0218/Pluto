@@ -2,6 +2,7 @@ import { cp, mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { unzipSync } from "fflate";
+import { applyCountrySupplements, SUPPLEMENT_SOURCES } from "./country-supplements.mjs";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const outputDirectory = join(root, "data", "geography");
@@ -149,8 +150,7 @@ const countries = m49Rows.filter((row) => row["ISO-alpha3 Code"]).map((row) => {
   const continent = row["Region Name"] === "Americas"
     ? (row["Sub-region Name"] === "South America" ? "South America" : "North America")
     : row["Region Name"] || "Other";
-  // GeoNames exposes useful fallback values but no observation year. Atlas
-  // intentionally omits them here rather than presenting an undated statistic.
+  // Use dated World Bank observations; sourced supplements below cover missing countries.
   const population = populations.get(iso3) || null;
   const areaKm2 = areas.get(iso3) || null;
   return {
@@ -170,11 +170,16 @@ const countries = m49Rows.filter((row) => row["ISO-alpha3 Code"]).map((row) => {
     sources: ["UN M49", "Natural Earth", "GeoNames", "flag-icons", ...(population ? [population.source] : []), ...(areaKm2 ? [areaKm2.source] : [])],
   };
 }).sort((left, right) => left.shortName.localeCompare(right.shortName));
+applyCountrySupplements(countries, synchronizedAt);
+const missing = [...unMembers].filter((iso3) => !countries.some((country) => country.iso3 === iso3 && country.playable));
+if (missing.length) throw new Error(`Atlas is missing countries: ${missing.join(", ")}`);
+const incomplete = countries.filter((country) => country.playable && (!country.population || !country.areaKm2 || !country.flagAsset || !country.centroid || !country.capitalCoordinates));
+if (incomplete.length) throw new Error(`Atlas countries lack required gameplay data: ${incomplete.map((country) => country.iso3).join(", ")}`);
 
 const manifest = {
   atlasDataVersion: version, synchronizedAt,
   entityCount: countries.length, playableUn195Count: countries.filter((country) => country.playable).length,
-  sources,
+  sources: { ...sources, ...SUPPLEMENT_SOURCES },
   geometry: { source: "Natural Earth via world-atlas", version: "Natural Earth 110m / world-atlas package", boundaryPolicy: "de facto rendering; gameplay scope is independently configured" },
 };
 

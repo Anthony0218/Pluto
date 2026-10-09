@@ -109,12 +109,12 @@ export type AtlasStatKey = "population" | "areaKm2" | "neighborCount" | "officia
 export type ComparableKind = "country" | "city" | "continent" | "subregion";
 
 export type AtlasCity = { id: string; name: string; countryId: string; population: number; elevationM: number | null; coordinates: Coordinates; capital: boolean };
-export type AtlasExtras = { atlasDataVersion: string; synchronizedAt: string; cities: AtlasCity[]; highestPoints: Record<string, { name: string; elevationM: number }> };
+export type AtlasExtras = { atlasDataVersion: string; synchronizedAt: string; cities: AtlasCity[]; highestPoints: Record<string, { name: string; elevationM: number; source?: string; sourceUrl?: string }> };
 
 /** One dated entry of a country's Independence record. `from` is set when the entry is about independence from a ruler. */
 export type HistoryEvent = { year: number; date: string; label: string; from?: string; power?: string; declared?: boolean };
 /** `mentions`: every power named in the country's Independence or Background entry, i.e. its recorded ties. */
-export type CountryHistory = { record: string; events: HistoryEvent[]; mentions: string[]; formerNames: string[]; background: string };
+export type CountryHistory = { record: string; events: HistoryEvent[]; mentions: string[]; formerNames: string[]; background: string; source?: { name: string; url: string } };
 export type AtlasHistory = { atlasDataVersion: string; synchronizedAt: string; source: { name: string; publisher: string; license: string }; countries: Record<string, CountryHistory> };
 
 export type AtlasDataset = { countries: GeographicEntity[]; extras: AtlasExtras; history: AtlasHistory; version: { atlasDataVersion: string; synchronizedAt: string }; topology: unknown };

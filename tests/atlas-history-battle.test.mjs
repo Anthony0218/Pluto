@@ -17,7 +17,7 @@ const byId = new Map(pools.expert.map((country) => [country.id, country]));
 const entry = (id) => history.countries[id];
 const independenceEvents = (id) => entry(id).events.filter((event) => event.from || /independen/i.test(event.label));
 
-test("the history snapshot is a public-domain World Factbook extract keyed to playable countries", async () => {
+test("the history snapshot covers playable countries with Factbook and UN attribution", async () => {
   assert.match(history.source.name, /World Factbook/);
   assert.match(history.source.license, /public domain/i);
   assert.match(history.source.commit, /^[0-9a-f]{40}$/);
@@ -25,7 +25,7 @@ test("the history snapshot is a public-domain World Factbook extract keyed to pl
   assert.deepEqual((await read("../public/data/geography/history.json")).countries, history.countries);
   const playable = new Set(countries.filter((country) => country.status === "un195").map((country) => country.id));
   const entries = Object.entries(history.countries);
-  assert.ok(entries.length >= 180);
+  assert.equal(entries.length, 195);
   const formerNames = entries.flatMap(([, value]) => value.formerNames);
   assert.equal(new Set(formerNames).size, formerNames.length, "a former name belongs to one country");
   for (const [id, value] of entries) {
@@ -44,7 +44,8 @@ test("the history snapshot is a public-domain World Factbook extract keyed to pl
   assert.deepEqual(entry("country:USA").events[0], { year: 1776, date: "4 July 1776", label: "independence declared from Great Britain", from: "Great Britain", power: "United Kingdom", declared: true });
   assert.deepEqual(entry("country:BFA").formerNames, ["Upper Volta"]);
   assert.equal(entry("country:CHE").events[0].label, "founding of the Swiss Confederation");
-  assert.equal(entry("country:PSE"), undefined);
+  assert.equal(entry("country:PSE").events[0].year, 2012);
+  assert.match(entry("country:PSE").source.name, /United Nations/);
 });
 
 test("every deck deals twelve distinct, answerable questions and repeats exactly from its seed", () => {

@@ -153,7 +153,7 @@ export const ARENA_MODES: ArenaModeDef[] = [
     solo: { kind: "trial", trial: "history-battle" }, online: "history_battle", hotseat: "turns", options: [], bestId: "history-battle",
     rules: {
       goal: "Answer questions about how and when countries came to be.",
-      play: ["Each question is about a country's past: the year it became independent, the power it broke away from, a founding event, or a name it used to carry.", `Pick one of ${HISTORY_BATTLE.options} options. Some questions name the country; in others the countries are the options.`, `After each answer you see the record behind it. Every fact comes from ${HISTORY_SOURCE}, a public-domain reference.`],
+      play: ["Each question is about a country's past: the year it became independent, the power it broke away from, a founding event, or a name it used to carry.", `Pick one of ${HISTORY_BATTLE.options} options. Some questions name the country; in others the countries are the options.`, `After each answer you see the record behind it. Facts come from ${HISTORY_SOURCE} and an attributed United Nations record for Palestine.`],
       scoring: `${HISTORY_BATTLE.correct} points per correct answer plus ${HISTORY_BATTLE.streakBonus} for each correct answer in a row before it (up to +${HISTORY_BATTLE.maxStreakBonus}). Wrong answers score zero.`,
       solo: `${HISTORY_BATTLE.rounds} questions. Beginner sticks to well-known countries and widely spaced years; Expert adds founding dates and years only a few apart.`,
       multiplayer: race, hotseat: turns(`their own ${HISTORY_BATTLE.rounds} questions`),

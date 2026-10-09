@@ -12,7 +12,7 @@ import { StatDetectiveGame } from "./StatDetectiveGame";
 import { StatRankingGame } from "./StatRankingGame";
 import type { TrialModeProps } from "./TrialsUI";
 
-/** The card-game engines behind the stat modes. Region Builder always deals from every country. */
+/** Region Builder and Stat Battle always deal from every country; battle difficulty controls the opponent. */
 export const TRIAL_GAMES: Record<TrialKind, { component: ComponentType<TrialModeProps>; fullPool?: boolean }> = {
   "country-guesser": { component: CountryGuesserGame },
   "stat-detective": { component: StatDetectiveGame },
@@ -21,7 +21,7 @@ export const TRIAL_GAMES: Record<TrialKind, { component: ComponentType<TrialMode
   "extreme-geography": { component: ExtremeGeographyGame },
   "language-guesser": { component: LanguageGuesserGame },
   "history-battle": { component: HistoryBattleGame },
-  "stat-battle": { component: StatBattleGame },
+  "stat-battle": { component: StatBattleGame, fullPool: true },
 };
 
 /** Countries at the chosen difficulty, every country, and a lookup over all of them. */

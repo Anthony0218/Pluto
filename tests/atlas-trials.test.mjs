@@ -22,12 +22,13 @@ const unique = (items) => new Set(items).size === items.length;
 const seeds = Array.from({ length: 40 }, (_, index) => `seed-${index}`);
 
 test("the adapter only exposes real dataset numbers and formats them per stat", () => {
-  assert.ok(pool.length >= 190);
+  assert.equal(pool.length, 195);
   const france = byIso.get("FRA"), source = entities.find((entity) => entity.iso3 === "FRA");
   assert.equal(getCountryStat(france, "population"), source.population.value);
   assert.equal(getCountryStat(france, "density"), source.population.value / source.areaKm2.value);
   assert.equal(getCountryStat(france, "highestPointM"), extras.highestPoints["country:FRA"].elevationM);
-  assert.equal(getCountryStat(byIso.get("GMB"), "highestPointM"), null, "missing stats stay missing");
+  assert.equal(getCountryStat(byIso.get("GMB"), "highestPointM"), 63);
+  assert.equal(getCountryStat({ ...byIso.get("GMB"), stats: {} }, "highestPointM"), null, "missing stats stay missing");
   assert.equal(byIso.get("BRA").continent, "South America");
   assert.equal(formatCountryStat("areaKm2", 43094), "43,094 km²");
   assert.equal(formatCountryStat("population", null), "—");
