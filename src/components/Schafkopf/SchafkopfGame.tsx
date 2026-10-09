@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { useEffect, useState } from "react";
 import { applyAction, chooseAiAction, collectSecondsFor, createGame, migrateGameState, resolveLegenTimeout, viewFor, type Action, type AiDifficulty, type GameRules, type GameState } from "../../games/schafkopf/schafkopf";
 import { DEFAULT_ANNOUNCEMENT_SETTINGS, SIMPLE_ANNOUNCEMENT_SETTINGS, formatDeclarationAnnouncement } from "../../games/schafkopf/announcements";
@@ -20,6 +21,7 @@ function savedAiDifficulty(): AiDifficulty {
 }
 
 export default function SchafkopfGame({ mode = "hotseat" }: { mode?: "hotseat" | "ai" }) {
+  useGameLanguage();
   const [game, setGame] = useState<GameState>(() => {
     try {
       const saved = JSON.parse(localStorage.getItem(`schafkopf-game-${mode}`) ?? "null") as GameState | null;
@@ -100,5 +102,5 @@ export default function SchafkopfGame({ mode = "hotseat" }: { mode?: "hotseat" |
       return { ...current, names, announcements: current.announcements.map(text => text.startsWith(`${previous}: `) ? `${clean}: ${text.slice(previous.length + 2)}` : text) };
     });
   };
-  return <SchafkopfTable view={viewFor(game, seat)} onAction={act} error={error} hidden={hidden} onReveal={() => setRevealed(game.revision)} onRulesChange={(rules: GameRules) => setGame(current => ({ ...current, rules: mode === "ai" ? { ...rules, legen: true } : rules }))} onRename={renameAi} aiDifficulty={mode === "ai" ? aiDifficulty : undefined} onAiDifficultyChange={mode === "ai" ? changeAiDifficulty : undefined} collectSecondsValue={collectSeconds} onCollectSecondsChange={setCustomCollectSeconds} alwaysLegen={mode === "ai"} untimedLegen={mode === "ai"} subtitle={mode === "ai" ? "Du gegen drei KI-Spieler" : "Hotseat · Vier Spieler"} />;
+  return <SchafkopfTable view={viewFor(game, seat)} onAction={act} error={error} hidden={hidden} onReveal={() => setRevealed(game.revision)} onRulesChange={(rules: GameRules) => setGame(current => ({ ...current, rules: mode === "ai" ? { ...rules, legen: true } : rules }))} onRename={renameAi} aiDifficulty={mode === "ai" ? aiDifficulty : undefined} onAiDifficultyChange={mode === "ai" ? changeAiDifficulty : undefined} collectSecondsValue={collectSeconds} onCollectSecondsChange={setCustomCollectSeconds} alwaysLegen={mode === "ai"} untimedLegen={mode === "ai"} subtitle={gameUi(mode === "ai" ? "Du gegen drei KI-Spieler" : "Hotseat · Vier Spieler")} />;
 }
