@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import type { GameDefinition } from "@/games/cards/engine/types";
@@ -14,6 +15,7 @@ type Source = { def: GameDefinition; label: string; onlineVersionId: string | nu
 
 /** `/games/card-builder/play?template=…` or `?game=…&version=…[&mode=online]` — a local test table or an online room. */
 export default function PlayPage() {
+  useGameLanguage();
   const [params] = useSearchParams();
   const templateId = params.get("template");
   const gameId = params.get("game");
@@ -48,14 +50,14 @@ export default function PlayPage() {
   const source: Source = template ? { def: template.definition, label: template.definition.name, onlineVersionId: null } : gameId ? loaded : { error: "Choose a template or a published game to play." };
   return (
     <CardBuilderLayout crumbs={[{ label: source && "label" in source ? source.label : "Play" }]}>
-      {!source && <p className="text-sm text-zinc-500">Loading…</p>}
-      {source && "error" in source && <p className="text-sm text-red-300">{source.error}</p>}
-      {source && "def" in source && (
+      {!source && <p className="text-sm text-zinc-500">{gameUi("Loading…")}</p>}
+      {source && "error" in source && <p className="text-sm text-red-300">{gameUi(source.error)}</p>}
+      {gameUi(source && "def" in source && (
         <>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <h1 className="text-2xl font-black">{source.label}</h1>
+            <h1 className="text-2xl font-black">{gameUi(source.label)}</h1>
             <Segmented
-              label="Where to play"
+              label={gameUi("Where to play")}
               value={mode}
               onChange={setMode}
               options={[
@@ -66,7 +68,7 @@ export default function PlayPage() {
           </div>
           {mode === "local" ? <TestMatch def={source.def} autoStart={quick} /> : <CreateRoomPanel def={source.def} versionId={source.onlineVersionId} />}
         </>
-      )}
+      ))}
     </CardBuilderLayout>
   );
 }

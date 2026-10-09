@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -29,6 +30,7 @@ function settingText(def: GameDefinition, key: string, value: SettingValue) {
  * re-read every couple of seconds so other players' moves show up.
  */
 export default function OnlineRoom({ code }: { code: string }) {
+  useGameLanguage();
   const navigate = useNavigate();
   const [room, setRoom] = useState<RoomSnapshot | null>(null);
   const [def, setDef] = useState<GameDefinition | null>(null);
@@ -104,39 +106,37 @@ export default function OnlineRoom({ code }: { code: string }) {
 
   if (closed) {
     return (
-      <Panel title="Room unavailable" eyebrow={`Room ${code}`}>
-        <p className="mb-4 text-sm text-zinc-400">{closed}</p>
-        <Link to="/games/card-builder" className="text-sm font-semibold text-amber-200 hover:text-amber-100">
-          Back to the card builder
-        </Link>
+      <Panel title={gameUi("Room unavailable")} eyebrow={`Room ${code}`}>
+        <p className="mb-4 text-sm text-zinc-400">{gameUi(closed)}</p>
+        <Link to="/games/card-builder" className="text-sm font-semibold text-amber-200 hover:text-amber-100">{gameUi(" Back to the card builder ")}</Link>
       </Panel>
     );
   }
-  if (!room || !def) return <p className="text-sm text-zinc-500">{error ?? "Opening the room…"}</p>;
+  if (!room || !def) return <p className="text-sm text-zinc-500">{gameUi(error ?? "Opening the room…")}</p>;
 
   const openSeats = room.capacity - room.seats.length;
   const header = (
     <div className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl border border-amber-300/20 bg-black/40 p-4">
       <div className="min-w-0 flex-1">
-        <p className="text-[10px] font-black uppercase tracking-[0.24em] text-amber-300/80">Online room</p>
-        <h1 className="truncate text-2xl font-black text-white">{def.name}</h1>
+        <p className="text-[10px] font-black uppercase tracking-[0.24em] text-amber-300/80">{gameUi("Online room")}</p>
+        <h1 className="truncate text-2xl font-black text-white">{gameUi(def.name)}</h1>
         <p className="mt-1 text-xs text-zinc-400">
-          {room.capacity} seats · {room.status === "waiting" ? `${room.seats.length} joined` : room.status === "playing" ? "in progress" : "finished"}
-          {!room.member && room.status !== "waiting" && " · you are watching"}
+          {gameUi(room.capacity)}{gameUi(" seats · ")}{gameUi(room.status === "waiting" ? `${room.seats.length} joined` : room.status === "playing" ? "in progress" : "finished")}
+          {gameUi(!room.member && room.status !== "waiting" && " · you are watching")}
         </p>
       </div>
       <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-black/40 px-3 py-2">
-        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Code</span>
+        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">{gameUi("Code")}</span>
         <span className="font-mono text-lg font-bold tracking-[0.3em] text-amber-100">{room.code}</span>
       </div>
       <Button size="sm" onClick={copyInvite}>
-        {copied ? <Check size={14} /> : <Copy size={14} />} {copied ? "Copied" : "Copy invite link"}
+        {copied ? <Check size={14} /> : <Copy size={14} />} {gameUi(copied ? "Copied" : "Copy invite link")}
       </Button>
     </div>
   );
   const errorBox = error && (
     <p role="alert" className="mb-4 rounded-xl border border-red-400/30 bg-red-400/10 p-3 text-sm text-red-200">
-      {error}
+      {gameUi(error)}
     </p>
   );
 
@@ -144,69 +144,67 @@ export default function OnlineRoom({ code }: { code: string }) {
     const settings = Object.entries(room.settings);
     return (
       <>
-        {header}
-        {errorBox}
+        {gameUi(header)}
+        {gameUi(errorBox)}
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
-          <Panel title="Seats" eyebrow="Lobby">
+          <Panel title={gameUi("Seats")} eyebrow="Lobby">
             <ul className="space-y-2">
               {Array.from({ length: room.capacity }, (_, seat) => {
                 const taken = room.seats.find((entry) => entry.seat === seat);
                 return (
                   <li key={seat} className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 ${taken?.isYou ? "border-amber-300/30 bg-amber-300/[0.05]" : "border-white/[0.08] bg-black/20"}`}>
-                    <span className="w-14 font-mono text-[11px] text-zinc-500">Seat {seat + 1}</span>
-                    {taken ? (
+                    <span className="w-14 font-mono text-[11px] text-zinc-500">{gameUi("Seat ")}{gameUi(seat + 1)}</span>
+                    {gameUi(taken ? (
                       <>
-                        <span className="min-w-0 flex-1 truncate font-semibold text-zinc-100">{taken.name}</span>
-                        {taken.isHost && (
+                        <span className="min-w-0 flex-1 truncate font-semibold text-zinc-100">{gameUi(taken.name)}</span>
+                        {gameUi(taken.isHost && (
                           <Chip tone="amber">
-                            <Crown size={11} /> host
-                          </Chip>
-                        )}
-                        {taken.isYou && <Chip tone="sky">you</Chip>}
+                            <Crown size={11} />{gameUi(" host ")}</Chip>
+                        ))}
+                        {taken.isYou && <Chip tone="sky">{gameUi("you")}</Chip>}
                       </>
                     ) : (
                       <span className="flex flex-1 items-center gap-1.5 text-sm text-zinc-500">
-                        <Bot size={14} /> Open — a bot plays if nobody joins
-                      </span>
-                    )}
+                        <Bot size={14} />{gameUi(" Open — a bot plays if nobody joins ")}</span>
+                    ))}
                     {!taken && <InviteFriendButton />}
                   </li>
                 );
               })}
             </ul>
             <div className="mt-5 flex flex-wrap items-center gap-3" aria-live="polite">
-              {room.youAreHost && (
+              {gameUi(room.youAreHost && (
                 <Button tone="primary" disabled={busy} onClick={() => void perform(() => startRoom(code))}>
-                  <Play size={16} /> Start game{openSeats > 0 ? ` with ${openSeats} bot${openSeats === 1 ? "" : "s"}` : ""}
+                  <Play size={16} />{gameUi(" Start game")}{gameUi(openSeats > 0 ? ` with ${openSeats} bot${openSeats === 1 ? "" : "s"}` : "")}
                 </Button>
-              )}
-              {!room.member && (
+              ))}
+              {gameUi(!room.member && (
                 <Button tone="blue" disabled={busy || openSeats <= 0} onClick={() => void perform(() => joinRoom(code))}>
-                  <UserPlus size={16} /> {openSeats > 0 ? "Take a seat" : "Room is full"}
+                  <UserPlus size={16} /> {gameUi(openSeats > 0 ? "Take a seat" : "Room is full")}
                 </Button>
-              )}
-              {room.member && !room.youAreHost && <p className="text-sm text-zinc-400">Waiting for the host to start the game…</p>}
-              {room.member && (
+              ))}
+              {room.member && !room.youAreHost && <p className="text-sm text-zinc-400">{gameUi("Waiting for the host to start the game…")}</p>}
+              {gameUi(room.member && (
                 <Button size="sm" tone={room.youAreHost ? "danger" : "ghost"} disabled={busy} onClick={() => void leave()}>
-                  <DoorOpen size={14} /> {room.youAreHost ? "Close room" : "Leave"}
+                  <DoorOpen size={14} /> {gameUi(room.youAreHost ? "Close room" : "Leave")}
                 </Button>
-              )}
+              ))}
             </div>
           </Panel>
-          <Panel title="Table rules" eyebrow={`${def.players.min === def.players.max ? def.players.min : `${def.players.min}–${def.players.max}`} players`}>
-            {def.description && <p className="mb-3 text-sm leading-6 text-zinc-400">{def.description}</p>}
-            {settings.length ? (
+          <Panel title={gameUi("Table rules")} eyebrow={`${def.players.min === def.players.max ? def.players.min : `${def.players.min}–${def.players.max}`} players`}>
+            {def.description && <p className="mb-3 text-sm leading-6 text-zinc-400">{gameUi(def.description)}</p>}
+            {gameUi(settings.length ? (
               <dl className="space-y-1.5 text-sm">
                 {settings.map(([key, value]) => (
                   <div key={key} className="flex justify-between gap-3">
-                    <dt className="text-zinc-500">{def.settings?.find((entry) => entry.key === key)?.label ?? key}</dt>
-                    <dd className="font-semibold text-zinc-200">{settingText(def, key, value)}</dd>
+                    <dt className="text-zinc-500">{gameUi(def.settings?.find((entry) => entry.key === key)?.label ?? key)}</dt>
+                    <dd className="font-semibold text-zinc-200">{gameUi(settingText(def, key, value))}</dd>
                   </div>
                 ))}
               </dl>
             ) : (
-              <p className="text-sm text-zinc-500">No lobby settings.</p>
-            )}
+              <p className="text-sm text-zinc-500">{gameUi("No lobby settings.")}</p>
+            ))}
           </Panel>
         </div>
       </>
@@ -219,30 +217,28 @@ export default function OnlineRoom({ code }: { code: string }) {
   };
   return (
     <>
-      {header}
+      {gameUi(header)}
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
         <div className="min-w-0">
           <GameTable def={def} state={state} viewerId={room.playerId} error={error} onAction={onAction} />
         </div>
         <aside className="space-y-3">
-          <Panel title="Players" eyebrow="Room">
+          <Panel title={gameUi("Players")} eyebrow="Room">
             <ul className="space-y-1.5 text-sm">
               {room.seats.map((seat) => (
                 <li key={seat.seat} className="flex items-center gap-2">
                   {seat.isBot ? <Bot size={14} className="text-zinc-500" /> : <span className="h-2 w-2 rounded-full bg-emerald-400" aria-hidden />}
                   <span className="min-w-0 flex-1 truncate text-zinc-200">{seat.name}</span>
-                  {seat.isHost && <Chip tone="amber">host</Chip>}
-                  {seat.isYou && <Chip tone="sky">you</Chip>}
+                  {seat.isHost && <Chip tone="amber">{gameUi("host")}</Chip>}
+                  {seat.isYou && <Chip tone="sky">{gameUi("you")}</Chip>}
                 </li>
               ))}
             </ul>
-            {room.status === "finished" && (
-              <Link to="/games/card-builder" className="mt-4 inline-block text-sm font-semibold text-amber-200 hover:text-amber-100">
-                Back to the card builder
-              </Link>
-            )}
+            {gameUi(room.status === "finished" && (
+              <Link to="/games/card-builder" className="mt-4 inline-block text-sm font-semibold text-amber-200 hover:text-amber-100">{gameUi(" Back to the card builder ")}</Link>
+            ))}
           </Panel>
-          <Panel title="Events" eyebrow="Log">
+          <Panel title={gameUi("Events")} eyebrow="Log">
             <EventLog state={state} />
           </Panel>
         </aside>
