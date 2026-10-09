@@ -1,3 +1,4 @@
+import { gameUi } from "../../i18n/gameUi.ts";
 import { FILL_SCOPES, focusForScope } from "../../games/atlas/scopes";
 import { AtlasCountryShape } from "./AtlasCountryShape";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
@@ -130,7 +131,7 @@ function AtlasWorldMapComponent({ topology, entities, onSelect, onPoint, pins = 
 
   return (
     <div className={`atlas-map-shell ${touchPanning ? "is-panning" : ""}`}>
-      <svg ref={svgRef} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="group" aria-label={ariaLabel}
+      <svg ref={svgRef} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="group" aria-label={gameUi(ariaLabel)}
         onPointerDown={(event) => { const [x, y] = pointerCoordinates(event); draggedRef.current = false; dragRef.current = { x, y, originX: view.x, originY: view.y }; event.currentTarget.setPointerCapture(event.pointerId); }}
         onPointerMove={(event) => { if (!dragRef.current || (event.pointerType === "touch" && !touchPanning)) return; const [x, y] = pointerCoordinates(event); const start = dragRef.current; if (Math.hypot(x - start.x, y - start.y) * screenWidth / WIDTH > 6) draggedRef.current = true; setView((current) => clampView({ ...current, x: start.originX + x - start.x, y: start.originY + y - start.y })); }}
         onPointerCancel={() => { dragRef.current = null; draggedRef.current = true; }}
@@ -163,13 +164,13 @@ function AtlasWorldMapComponent({ topology, entities, onSelect, onPoint, pins = 
           <path d={geoPath(prepared.projection)({ type: "Sphere" }) || ""} className="atlas-ocean" />
           {prepared.shapes.map(({ key, path, entity }) => (
             <path key={key} d={path} aria-hidden={!entity || undefined} data-atlas-entity={entity?.id} className={statusClass(entity?.id)} role={entity&&!onPoint?"button":undefined} tabIndex={entity && !disabled && !onPoint ? 0 : -1}
-              aria-label={entity ? showHoverLabels ? `Select ${entity.shortName}` : entity.centroid ? `Country near ${entity.centroid[1].toFixed(0)}° latitude, ${entity.centroid[0].toFixed(0)}° longitude` : "Country outline" : "Map entity unavailable for quiz play"}
+              aria-label={gameUi(entity ? showHoverLabels ? `Select ${entity.shortName}` : entity.centroid ? `Country near ${entity.centroid[1].toFixed(0)}° latitude, ${entity.centroid[0].toFixed(0)}° longitude` : "Country outline" : "Map entity unavailable for quiz play")}
               onClick={(event) => { event.stopPropagation(); choose(entity); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); choose(entity); } }}
               onPointerEnter={() => entity && setHovered(entity.id)} onPointerLeave={() => setHovered(null)} />
           ))}
           {prepared.smallEntities.map(({ entity, point }) => (
             <g key={`marker-${entity.id}`} data-atlas-entity={entity.id} className={statusClass(entity.id)} transform={`translate(${point[0]} ${point[1]})`} onClick={(event) => { event.stopPropagation(); choose(entity); }}
-              role={onPoint ? undefined : "button"} tabIndex={onPoint || disabled ? -1 : 0} aria-label={onPoint ? undefined : showHoverLabels ? `Select ${entity.shortName}` : `Country marker near ${entity.centroid?.[1].toFixed(0)}° latitude, ${entity.centroid?.[0].toFixed(0)}° longitude`} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") {event.preventDefault();choose(entity);} }}>
+              role={onPoint ? undefined : "button"} tabIndex={onPoint || disabled ? -1 : 0} aria-label={gameUi(onPoint ? undefined : showHoverLabels ? `Select ${entity.shortName}` : `Country marker near ${entity.centroid?.[1].toFixed(0)}° latitude, ${entity.centroid?.[0].toFixed(0)}° longitude`)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") {event.preventDefault();choose(entity);} }}>
               <circle r={18 * WIDTH / screenWidth / view.scale} className="atlas-hit-target" style={{pointerEvents:onPoint?"none":undefined}} />
               <circle r={Math.max(2.4, 4 / view.scale)} className="atlas-microstate" />
             </g>
@@ -178,23 +179,23 @@ function AtlasWorldMapComponent({ topology, entities, onSelect, onPoint, pins = 
           {pins.map(({ coordinates, label, color }, index) => {
             const point = prepared.projection(coordinates);
             return point && <g key={`${label}-${index}`} className="atlas-map-pin" transform={`translate(${point[0]} ${point[1]}) scale(${1 / view.scale})`} style={{ color }}>
-              <title>{label}</title>
+              <title>{gameUi(label)}</title>
               <path d="M0 0 C-3 -5 -10 -10 -10 -17 A10 10 0 1 1 10 -17 C10 -10 3 -5 0 0Z" />
               <circle cx={0} cy={-17} r={3.5} />
             </g>;
           })}
         </g>
       </svg>
-      <label className="atlas-map-region"><span className="sr-only">Map region</span><select aria-label="Map region" value={region} onChange={event=>{setRegion(event.target.value);setCluster([]);}}><option value="Auto">Starting view</option>{FILL_SCOPES.map(name=><option key={name} value={name}>{name}</option>)}</select></label>
-      {view.scale>1.05&&<svg className="atlas-map-overview" viewBox={`0 0 ${WIDTH} ${HEIGHT}`} aria-label="World orientation overview" role="img">{prepared.shapes.map(shape=><path key={shape.key} d={shape.path}/>)}<rect x={-view.x/view.scale} y={-view.y/view.scale} width={WIDTH/view.scale} height={HEIGHT/view.scale}/></svg>}
-      {cluster.length>1&&!disabled&&<div className="atlas-map-cluster" role="dialog" aria-label="Nearby small countries"><strong>Choose a small country</strong><p>Several markers overlap here. Zoom in or choose an outline.</p><div>{cluster.map((entity,index)=><button key={entity.id} onClick={()=>{onSelect?.(entity.id);setCluster([]);}}>{entity.geometryId?<AtlasCountryShape topology={topology} geometryId={entity.geometryId} label={`Location ${index+1}`} showLabel={false}/>:<span>● {entity.centroid?.[1].toFixed(1)}°, {entity.centroid?.[0].toFixed(1)}°</span>}<span>{showHoverLabels?entity.shortName:`Location ${index+1}`}</span></button>)}</div><button onClick={()=>{const p=prepared.projection(cluster[0].centroid!);if(p)zoomAt(2,[p[0]*view.scale+view.x,p[1]*view.scale+view.y]);setCluster([]);}}>Zoom to markers</button><button onClick={()=>setCluster([])}>Close</button></div>}
-      <div className="atlas-map-controls" aria-label="Map controls">
+      <label className="atlas-map-region"><span className="sr-only">{gameUi("Map region")}</span><select aria-label={gameUi("Map region")} value={region} onChange={event=>{setRegion(event.target.value);setCluster([]);}}><option value="Auto">{gameUi("Starting view")}</option>{FILL_SCOPES.map(name=><option key={name} value={name}>{gameUi(name)}</option>)}</select></label>
+      {view.scale>1.05&&<svg className="atlas-map-overview" viewBox={`0 0 ${WIDTH} ${HEIGHT}`} aria-label={gameUi("World orientation overview")} role="img">{prepared.shapes.map(shape=><path key={shape.key} d={shape.path}/>)}<rect x={-view.x/view.scale} y={-view.y/view.scale} width={WIDTH/view.scale} height={HEIGHT/view.scale}/></svg>}
+      {cluster.length>1&&!disabled&&<div className="atlas-map-cluster" role="dialog" aria-label={gameUi("Nearby small countries")}><strong>{gameUi("Choose a small country")}</strong><p>{gameUi("Several markers overlap here. Zoom in or choose an outline.")}</p><div>{cluster.map((entity,index)=><button key={entity.id} onClick={()=>{onSelect?.(entity.id);setCluster([]);}}>{entity.geometryId?<AtlasCountryShape topology={topology} geometryId={entity.geometryId} label={gameUi(`Location ${index+1}`)} showLabel={false}/>:<span>● {gameUi(entity.centroid?.[1].toFixed(1))}°, {gameUi(entity.centroid?.[0].toFixed(1))}°</span>}<span>{gameUi(showHoverLabels?entity.shortName:`Location ${index+1}`)}</span></button>)}</div><button onClick={()=>{const p=prepared.projection(cluster[0].centroid!);if(p)zoomAt(2,[p[0]*view.scale+view.x,p[1]*view.scale+view.y]);setCluster([]);}}>{gameUi("Zoom to markers")}</button><button onClick={()=>setCluster([])}>{gameUi("Close")}</button></div>}
+      <div className="atlas-map-controls" aria-label={gameUi("Map controls")}>
         <button type="button" className="atlas-map-pan-toggle" aria-pressed={touchPanning} onClick={() => setTouchPanning(current => !current)} aria-label={ui(touchPanning ? "Scroll page" : "Pan map")} title={ui(touchPanning ? "Scroll page" : "Pan map")}><Move size={18} /><span>{ui(touchPanning ? "Scroll page" : "Pan map")}</span></button>
-        <button type="button" onClick={() => zoom(1.3)} aria-label="Zoom in"><Plus size={18} /></button>
-        <button type="button" onClick={() => zoom(0.77)} aria-label="Zoom out"><Minus size={18} /></button>
-        <button type="button" onClick={() => setView(fitView(prepared.projection, activeFocus))} aria-label="Reset map view"><LocateFixed size={18} /></button>
+        <button type="button" onClick={() => zoom(1.3)} aria-label={gameUi("Zoom in")}><Plus size={18} /></button>
+        <button type="button" onClick={() => zoom(0.77)} aria-label={gameUi("Zoom out")}><Minus size={18} /></button>
+        <button type="button" onClick={() => setView(fitView(prepared.projection, activeFocus))} aria-label={gameUi("Reset map view")}><LocateFixed size={18} /></button>
       </div>
-      {hovered && !disabled && showHoverLabels && <div className="atlas-map-hint">{entities.find((entity) => entity.id === hovered)?.shortName}</div>}
+      {hovered && !disabled && showHoverLabels && <div className="atlas-map-hint">{gameUi(entities.find((entity) => entity.id === hovered)?.shortName)}</div>}
     </div>
   );
 }

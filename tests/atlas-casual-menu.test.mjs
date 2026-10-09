@@ -60,7 +60,7 @@ function harness(query = '', reducedMotion = false) {
   }).outputText;
   const exports = {};
   new Function('require', 'exports', 'setTimeout', 'clearTimeout', 'window', source + '\nexports.RandomModeChoice = RandomModeChoice;')(
-    name => modules[name] ?? require(name), exports,
+    name => name.endsWith('/i18n/gameUi.ts') ? { gameUi: value => value, useGameLanguage: () => ({ language: 'en' }) } : modules[name] ?? require(name), exports,
     (callback, delay) => { const id = ++timerId; timers.set(id, callback); delays.push(delay); return id; },
     id => timers.delete(id), {matchMedia: () => ({matches: reducedMotion})},
   );

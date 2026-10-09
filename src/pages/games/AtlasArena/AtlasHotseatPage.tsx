@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useRandomSeries } from "./useRandomSeries";
 import { AtlasResultHero } from "../../../components/atlas/AtlasResultHero";
 import { AtlasRandomSeriesProgress, AtlasRandomSeriesResults } from "../../../components/atlas/AtlasRandomSeriesResults";
@@ -36,6 +37,7 @@ export default function AtlasHotseatPage() {
 }
 
 function HotseatSession({ modeId }: { modeId?: string }) {
+  useGameLanguage();
   const series = useRandomSeries(modeId);
   const mode = series.mode;
   const navigate = useNavigate();
@@ -53,23 +55,23 @@ function HotseatSession({ modeId }: { modeId?: string }) {
 
   if (!players) return (
     <main className="atlas-page atlas-setup">
-      <Link className="atlas-back" to="/games/atlas-arena"><ArrowLeft /> Atlas Arena</Link>
+      <Link className="atlas-back" to="/games/atlas-arena"><ArrowLeft />{gameUi(" Atlas Arena")}</Link>
       <div className="atlas-setup-card">
-        <span className="atlas-eyebrow">Hotseat · one device</span>
-        <h1>{series.enabled ? `Random modes · ${seriesLabel(series.length)}` : mode.title}</h1>
-        <p>{series.enabled ? `Two players, up to ${series.length} different modes. First to ${Math.floor(series.length / 2) + 1} game wins; draws use a game without awarding a win. Start with ${mode.title}.` : mode.rules.hotseat}</p>
-        <label className="atlas-label">Players</label>
-        {limit > 2 && <div className="atlas-player-count" role="radiogroup" aria-label="Number of players">{[2, 3, 4].map((option) => <button type="button" role="radio" aria-checked={seats === option} key={option} className={seats === option ? "active" : ""} onClick={() => setCount(option)}>{option}</button>)}</div>}
+        <span className="atlas-eyebrow">{gameUi("Hotseat · one device")}</span>
+        <h1>{gameUi(series.enabled ? `Random modes · ${seriesLabel(series.length)}` : mode.title)}</h1>
+        <p>{gameUi(series.enabled ? `Two players, up to ${series.length} different modes. First to ${Math.floor(series.length / 2) + 1} game wins; draws use a game without awarding a win. Start with ${mode.title}.` : mode.rules.hotseat)}</p>
+        <label className="atlas-label">{gameUi("Players")}</label>
+        {limit > 2 && <div className="atlas-player-count" role="radiogroup" aria-label={gameUi("Number of players")}>{[2, 3, 4].map((option) => <button type="button" role="radio" aria-checked={seats === option} key={option} className={seats === option ? "active" : ""} onClick={() => setCount(option)}>{gameUi(option)}</button>)}</div>}
         <div className="atlas-hotseat-names">
           {Array.from({ length: seats }, (_, index) => (
-            <label key={index} style={{ "--player": PLAYER_COLORS[index] } as CSSProperties}><i aria-hidden /><span className="sr-only">Player {index + 1} name</span>
+            <label key={index} style={{ "--player": PLAYER_COLORS[index] } as CSSProperties}><i aria-hidden /><span className="sr-only">{gameUi("Player ")}{gameUi(index + 1)}{gameUi(" name")}</span>
               <input value={names[index]} maxLength={20} onChange={(event) => setNames((current) => current.map((name, position) => position === index ? event.target.value : name))} /></label>
           ))}
         </div>
         <SoloSettingsForm mode={mode} settings={settings} onChange={(next) => update({ settings: next })} />
         <button type="button" className="atlas-start" disabled={!settingsReady(mode, settings)}
           onClick={() => setPlayers(Array.from({ length: seats }, (_, index) => ({ name: names[index].trim() || `Player ${index + 1}`, color: PLAYER_COLORS[index] })))}>
-          <Users /> Start with {seats} players <ChevronRight />
+          <Users />{gameUi(" Start with ")}{gameUi(seats)}{gameUi(" players ")}<ChevronRight />
         </button>
       </div>
     </main>
@@ -78,11 +80,12 @@ function HotseatSession({ modeId }: { modeId?: string }) {
   const gameKey = `${mode.id}:${series.results.length}`;
   const props: GameProps = { mode, data, players, settings, onExit: exit, onSetup: () => { setPlayers(null); if (series.enabled) series.reset(); }, onComplete: series.enabled ? scores => series.finish(Object.fromEntries(scores.map((score, index) => [String(index), score]))) : undefined };
   const game = mode.hotseat === "pins" ? <PinsHotseat key={gameKey} {...props} /> : mode.hotseat === "duel" ? <DuelHotseat key={gameKey} {...props} /> : <TurnsHotseat key={gameKey} {...props} />;
-  return series.enabled ? <div className="atlas-series-session"><AtlasRandomSeriesProgress length={series.length} index={series.results.length} />{game}</div> : game;
+  return series.enabled ? <div className="atlas-series-session"><AtlasRandomSeriesProgress length={series.length} index={series.results.length} />{gameUi(game)}</div> : game;
 }
 
 /** Final ranking for every hotseat mode. */
 function Standings({ title, rows, unit, onAgain, onSetup, onExit, onComplete }: { title: string; rows: { player: Player; score: number; detail?: string }[]; unit: string; onAgain: () => void; onSetup: () => void; onExit: () => void; onComplete?: (scores: number[]) => void }) {
+  useGameLanguage();
   const ranked = [...rows].sort((left, right) => right.score - left.score);
   const top = ranked[0]?.score ?? 0, winners = ranked.filter((row) => row.score === top);
   return (
@@ -92,14 +95,14 @@ function Standings({ title, rows, unit, onAgain, onSetup, onExit, onComplete }: 
         {ranked.map((row) => {
           const rank = ranked.findIndex((item) => item.score === row.score) + 1;
           return <li key={row.player.name + row.player.color} style={{ "--player": row.player.color } as CSSProperties} className={rank === 1 ? "is-winner" : ""}>
-            <b>{rank}</b><span><i />{row.player.name}{row.detail && <small>{row.detail}</small>}</span><strong>{row.score.toLocaleString("en")} <small>{unit}</small></strong>
+            <b>{gameUi(rank)}</b><span><i />{row.player.name}{row.detail && <small>{gameUi(row.detail)}</small>}</span><strong>{gameUi(row.score.toLocaleString("en"))} <small>{gameUi(unit)}</small></strong>
           </li>;
         })}
       </ol>
       <div className="atlas-result-actions">
-        {onComplete ? <button type="button" onClick={() => onComplete(rows.map(row => row.score))}>See series score <ChevronRight /></button> : <button type="button" onClick={onAgain}><RotateCcw /> Replay</button>}
-        <button type="button" className="atlas-secondary" onClick={onSetup}><Users /> Players & settings</button>
-        <button type="button" className="atlas-secondary" onClick={onExit}>Back to menu</button>
+        {onComplete ? <button type="button" onClick={() => onComplete(rows.map(row => row.score))}>{gameUi("See series score ")}<ChevronRight /></button> : <button type="button" onClick={onAgain}><RotateCcw />{gameUi(" Replay")}</button>}
+        <button type="button" className="atlas-secondary" onClick={onSetup}><Users />{gameUi(" Players & settings")}</button>
+        <button type="button" className="atlas-secondary" onClick={onExit}>{gameUi("Back to menu")}</button>
       </div>
     </main>
   );
@@ -107,6 +110,7 @@ function Standings({ title, rows, unit, onAgain, onSetup, onExit, onComplete }: 
 
 /** Each player plays a full run of their own, one after another; the device is handed over in between. */
 function TurnsHotseat({ mode, data, players, settings, onExit, onSetup, onComplete }: GameProps) {
+  useGameLanguage();
   const [seed, setSeed] = useState(freshSeed);
   const [turn, setTurn] = useState(0);
   const [phase, setPhase] = useState<"handoff" | "playing" | "between" | "standings">("handoff");
@@ -129,17 +133,17 @@ function TurnsHotseat({ mode, data, players, settings, onExit, onSetup, onComple
   const calibrated=useMemo(()=>calibratedHotseatSeeds(data,mode.online,settings,seed,players.length),[data,mode.online,settings,seed,players.length]);
   const playerSeed = calibrated[turn];
 
-  if (phase === "standings") return <Standings title={mode.title} rows={players.map((item, index) => ({ player: item, score: scores[index] ?? 0 }))} unit="points" onAgain={again} onSetup={onSetup} onExit={onExit} onComplete={onComplete} />;
+  if (phase === "standings") return <Standings title={gameUi(mode.title)} rows={players.map((item, index) => ({ player: item, score: scores[index] ?? 0 }))} unit="points" onAgain={again} onSetup={onSetup} onExit={onExit} onComplete={onComplete} />;
   if (phase === "handoff") return (
     <main className="atlas-page atlas-center">
       <HandoffCard name={player.name} color={player.color} action={`Start ${player.name}'s run`} onReady={() => setPhase("playing")}
-        detail={<>{mode.title} · turn {turn + 1} of {players.length}{turn > 0 && <><br />Score to beat: {Math.max(...scores).toLocaleString("en")}</>}</>} />
-      <button type="button" className="atlas-room-leave" onClick={onExit}>Leave hotseat</button>
+        detail={<>{gameUi(mode.title)} · turn {gameUi(turn + 1)} of {gameUi(players.length)}{turn > 0 && <><br />Score to beat: {gameUi(Math.max(...scores).toLocaleString("en"))}</>}</>} />
+      <button type="button" className="atlas-room-leave" onClick={onExit}>{gameUi("Leave hotseat")}</button>
     </main>
   );
   if (phase === "between" && summary && mode.solo.kind === "arena") return <SoloResults mode={mode.solo.mode} summary={summary} entities={data.countries} eyebrow={`${player.name}'s run`}
-    actions={<button type="button" onClick={() => commit(summary.score)}>{last ? "See standings" : `Pass to ${next?.name}`} <ChevronRight /></button>} />;
-  if (mode.solo.kind === "arena") return <AtlasSoloGame key={playerSeed} data={data} mode={mode.solo.mode} settings={settings} seed={playerSeed} title={mode.title} player={player} onFinish={finishRun} onExit={onExit} />;
+    actions={<button type="button" onClick={() => commit(summary.score)}>{gameUi(last ? "See standings" : `Pass to ${next?.name}`)} <ChevronRight /></button>} />;
+  if (mode.solo.kind === "arena") return <AtlasSoloGame key={playerSeed} data={data} mode={mode.solo.mode} settings={settings} seed={playerSeed} title={gameUi(mode.title)} player={player} onFinish={finishRun} onExit={onExit} />;
   if (!pools) return null;
   const { component: Game, fullPool } = TRIAL_GAMES[mode.solo.trial];
   return (
@@ -158,6 +162,7 @@ function DuelHotseat({ data, players, settings, onExit, onComplete }: GameProps)
 
 /** Closest Wins on one device: every player pins each country in turn behind a cover screen, then all pins are revealed. */
 function PinsHotseat({ mode, data, players, settings, onExit, onSetup, onComplete }: GameProps) {
+  useGameLanguage();
   const [seed, setSeed] = useState(freshSeed);
   const questions = useMemo(() => generateMatchQuestions({ entities: data.countries, extras: data.extras, datasetVersion: data.version.atlasDataVersion, seed, difficulty: settings.difficulty, count: 10, mode: "closest_wins", categories: settings.categories }), [data, seed, settings.categories, settings.difficulty]);
   const shapes = useMemo(() => countryShapesFromTopology(data.topology), [data.topology]);
@@ -195,12 +200,12 @@ function PinsHotseat({ mode, data, players, settings, onExit, onSetup, onComplet
   };
   const again = () => { setSeed(freshSeed()); setRound(0); setStep(0); setPins(players.map(() => null)); setScores(players.map(() => 0)); setWins(players.map(() => 0)); setResults([]); setPhase("handoff"); };
 
-  if (phase === "standings") return <Standings title={mode.title} rows={players.map((item, index) => ({ player: item, score: scores[index], detail: `${wins[index]} round${wins[index] === 1 ? "" : "s"} won` }))} unit="points" onAgain={again} onSetup={onSetup} onExit={onExit} onComplete={onComplete} />;
+  if (phase === "standings") return <Standings title={gameUi(mode.title)} rows={players.map((item, index) => ({ player: item, score: scores[index], detail: `${wins[index]} round${wins[index] === 1 ? "" : "s"} won` }))} unit="points" onAgain={again} onSetup={onSetup} onExit={onExit} onComplete={onComplete} />;
   if (phase === "handoff") return (
     <main className="atlas-page atlas-center">
       <HandoffCard name={player.name} color={player.color} action={`Show ${player.name} the map`} onReady={() => setPhase("placing")}
-        detail={<>Round {round + 1} of {questions.length}{step > 0 ? ` · ${step} pin${step === 1 ? "" : "s"} already placed and hidden` : ""}</>} />
-      <button type="button" className="atlas-room-leave" onClick={onExit}>Leave hotseat</button>
+        detail={<>Round {gameUi(round + 1)} of {gameUi(questions.length)}{gameUi(step > 0 ? ` · ${step} pin${step === 1 ? "" : "s"} already placed and hidden` : "")}</>} />
+      <button type="button" className="atlas-room-leave" onClick={onExit}>{gameUi("Leave hotseat")}</button>
     </main>
   );
   const revealed = phase === "reveal";
@@ -210,22 +215,22 @@ function PinsHotseat({ mode, data, players, settings, onExit, onSetup, onComplet
   return (
     <main className="atlas-game-page">
       <header className="atlas-game-header">
-        <button type="button" className="atlas-icon-button" onClick={onExit} aria-label="Leave hotseat"><ArrowLeft /></button>
-        <div><span className="atlas-eyebrow">{mode.title} · Hotseat</span><strong>Round {round + 1} / {questions.length}</strong></div>
-        <div className="atlas-game-stats">{!revealed && <span className="atlas-turn-chip" style={{ "--player": player.color } as CSSProperties}><i />{player.name}</span>}<span><Trophy size={16} />{revealed ? "Reveal" : `${step + 1}/${players.length} pinning`}</span></div>
+        <button type="button" className="atlas-icon-button" onClick={onExit} aria-label={gameUi("Leave hotseat")}><ArrowLeft /></button>
+        <div><span className="atlas-eyebrow">{gameUi(mode.title)}{gameUi(" · Hotseat")}</span><strong>{gameUi("Round ")}{gameUi(round + 1)} / {gameUi(questions.length)}</strong></div>
+        <div className="atlas-game-stats">{!revealed && <span className="atlas-turn-chip" style={{ "--player": player.color } as CSSProperties}><i />{player.name}</span>}<span><Trophy size={16} />{gameUi(revealed ? "Reveal" : `${step + 1}/${players.length} pinning`)}</span></div>
       </header>
       <section className="atlas-play-layout">
         <aside className="atlas-question-panel">
           <div className="atlas-progress"><i style={{ width: `${(round + Number(revealed)) / questions.length * 100}%` }} /></div>
-          <span className="atlas-eyebrow">{revealed ? "All pins revealed" : `${player.name}'s pin`}</span>
-          <h1>{question?.prompt}</h1>
-          {question?.interaction === "closest_click" && question.flagAsset && <img className="atlas-question-flag" src={question.flagAsset} alt="Country flag to identify" />}
-          {!revealed && <div className="atlas-pin-controls"><p>{draft ? "Click again to move your pin, then lock it in." : `Click anywhere to place a pin. ${question?.interaction === "closest_click" && question.targetRadiusKm ? "Within 20 km of the city center" : "Inside the country"} counts as 0 km.`}</p>
-            <button type="button" className="atlas-submit" disabled={!draft} onClick={lock}><MapPin size={18} />Lock pin{step + 1 < players.length ? ` · pass to ${players[order[step + 1]].name}` : " · reveal"}</button></div>}
+          <span className="atlas-eyebrow">{gameUi(revealed ? "All pins revealed" : `${player.name}'s pin`)}</span>
+          <h1>{gameUi(question?.prompt)}</h1>
+          {question?.interaction === "closest_click" && question.flagAsset && <img className="atlas-question-flag" src={question.flagAsset} alt={gameUi("Country flag to identify")} />}
+          {!revealed && <div className="atlas-pin-controls"><p>{gameUi(draft ? "Click again to move your pin, then lock it in." : `Click anywhere to place a pin. ${question?.interaction === "closest_click" && question.targetRadiusKm ? "Within 20 km of the city center" : "Inside the country"} counts as 0 km.`)}</p>
+            <button type="button" className="atlas-submit" disabled={!draft} onClick={lock}><MapPin size={18} />{gameUi("Lock pin")}{gameUi(step + 1 < players.length ? ` · pass to ${players[order[step + 1]].name}` : " · reveal")}</button></div>}
           {revealed && <>
-            <div className="atlas-guess-result is-correct"><strong>{results.filter(item=>item.distanceKm-results[0].distanceKm<.05).map(item=>players[item.player].name).join(" & ")} wins the round — {nameOf(question?.entityId)}</strong>
-              <ul>{results.map((item) => <li key={item.player}><span>{item.distanceKm-results[0].distanceKm<.05 && <Crown size={14} />}{players[item.player].name}</span><span>{item.distanceKm < .5 ? "Inside" : `${Math.round(item.distanceKm).toLocaleString("en")} km`}</span><b>{item.distanceKm-results[0].distanceKm<.05 ? `+${ATLAS_SCORING.normalCorrect}` : "—"}</b></li>)}</ul></div>
-            <button type="button" className="atlas-submit" onClick={nextRound}>{round + 1 >= questions.length ? "See standings" : "Next round"} <ChevronRight size={18} /></button>
+            <div className="atlas-guess-result is-correct"><strong>{gameUi(results.filter(item=>item.distanceKm-results[0].distanceKm<.05).map(item=>players[item.player].name).join(" & "))}{gameUi(" wins the round — ")}{gameUi(nameOf(question?.entityId))}</strong>
+              <ul>{results.map((item) => <li key={item.player}><span>{item.distanceKm-results[0].distanceKm<.05 && <Crown size={14} />}{players[item.player].name}</span><span>{gameUi(item.distanceKm < .5 ? "Inside" : `${Math.round(item.distanceKm).toLocaleString("en")} km`)}</span><b>{gameUi(item.distanceKm-results[0].distanceKm<.05 ? `+${ATLAS_SCORING.normalCorrect}` : "—")}</b></li>)}</ul></div>
+            <button type="button" className="atlas-submit" onClick={nextRound}>{gameUi(round + 1 >= questions.length ? "See standings" : "Next round")} <ChevronRight size={18} /></button>
           </>}
           <HotseatScores players={players} scores={scores} unit="" />
         </aside>
@@ -236,4 +241,5 @@ function PinsHotseat({ mode, data, players, settings, onExit, onSetup, onComplet
   );
 }
 
-function HotseatScores({players,scores,unit}:{players:Player[];scores:number[];unit:string}) {return <div className="atlas-scoreboard">{players.map((player,index)=><div key={index}><span><i style={{background:player.color}}/>{player.name}</span><strong>{scores[index]}{unit}</strong></div>)}</div>;}
+function HotseatScores({players,scores,unit}:{players:Player[];scores:number[];unit:string}) {
+  useGameLanguage();return <div className="atlas-scoreboard">{players.map((player,index)=><div key={index}><span><i style={{background:player.color}}/>{player.name}</span><strong>{gameUi(scores[index])}{gameUi(unit)}</strong></div>)}</div>;}

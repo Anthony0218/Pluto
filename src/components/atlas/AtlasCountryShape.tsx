@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { memo, useMemo } from "react";
 import { geoAzimuthalEqualArea, geoCentroid, geoPath } from "d3-geo";
 import { feature } from "topojson-client";
@@ -8,6 +9,7 @@ const SIZE = 320;
 
 /** One country on its own, centred and scaled to fill the frame — no world map around it. */
 function AtlasCountryShapeComponent({ topology, geometryId, label, showLabel = true }: { topology: unknown; geometryId: string; label: string; showLabel?: boolean }) {
+  useGameLanguage();
   const path = useMemo(() => {
     const typed = topology as Topology<{ countries: GeometryCollection }>;
     const collection = feature(typed, typed.objects.countries) as unknown as FeatureCollection;
@@ -20,10 +22,10 @@ function AtlasCountryShapeComponent({ topology, geometryId, label, showLabel = t
   }, [geometryId, topology]);
   return (
     <figure className="atlas-country-shape">
-      <svg viewBox={`0 0 ${SIZE} ${SIZE}`} role="img" aria-label={`Outline of ${label}`}>
+      <svg viewBox={`0 0 ${SIZE} ${SIZE}`} role="img" aria-label={gameUi(`Outline of ${label}`)}>
         <path d={path} />
       </svg>
-      {showLabel && <figcaption>{label}</figcaption>}
+      {showLabel && <figcaption>{gameUi(label)}</figcaption>}
     </figure>
   );
 }
